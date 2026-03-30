@@ -6,7 +6,8 @@ import { prisma } from "../../../../../lib/prisma";
 
 export async function GET(_request, { params }) {
   await requireAdminApi();
-  const kitchen = await getKitchenById(params.id);
+  const { id } = await params;
+  const kitchen = await getKitchenById(id);
   if (!kitchen) {
     return NextResponse.json({ error: "Kitchen not found" }, { status: 404 });
   }
@@ -15,10 +16,11 @@ export async function GET(_request, { params }) {
 
 export async function POST(request, { params }) {
   await requireAdminApi();
+  const { id } = await params;
   const formData = await request.formData();
 
   await prisma.kitchen.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       name: String(formData.get("name") || "").trim(),
       slug: String(formData.get("slug") || "").trim(),
@@ -27,5 +29,5 @@ export async function POST(request, { params }) {
     },
   });
 
-  return NextResponse.redirect(new URL(`/admin/kitchens/${params.id}`, request.url), 303);
+  return NextResponse.redirect(new URL(`/admin/kitchens/${id}`, request.url), 303);
 }

@@ -5,10 +5,11 @@ import { prisma } from "../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
   await requireAdminApi();
+  const { id } = await params;
   const formData = await request.formData();
   const itemType = String(formData.get("itemType") || "");
   const item = await prisma.kitchenItem.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       itemType: Object.values(ItemType).includes(itemType) ? itemType : ItemType.COMPONENT,
       code: String(formData.get("code") || "").trim(),

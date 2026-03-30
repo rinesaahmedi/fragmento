@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { OrderStatus } from "@prisma/client";
-import { getOrdersForAdmin, listKitchensForAdmin } from "../../../lib/catalog";
+import { getOrdersForAdmin, listKitchensForAdmin } from "../../../../lib/catalog";
 
 export const dynamic = "force-dynamic";
 

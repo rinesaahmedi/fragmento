@@ -6,7 +6,8 @@ import { prisma } from "../../../../../lib/prisma";
 
 export async function GET(_request, { params }) {
   await requireAdminApi();
-  const order = await getOrderById(params.id);
+  const { id } = await params;
+  const order = await getOrderById(id);
   if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
@@ -15,15 +16,16 @@ export async function GET(_request, { params }) {
 
 export async function POST(request, { params }) {
   await requireAdminApi();
+  const { id } = await params;
   const formData = await request.formData();
   const status = String(formData.get("status") || "");
 
   await prisma.order.update({
-    where: { id: params.id },
+    where: { id },
     data: {
       status: Object.values(OrderStatus).includes(status) ? status : OrderStatus.NEW,
     },
   });
 
-  return NextResponse.redirect(new URL(`/admin/orders/${params.id}`, request.url), 303);
+  return NextResponse.redirect(new URL(`/admin/orders/${id}`, request.url), 303);
 }

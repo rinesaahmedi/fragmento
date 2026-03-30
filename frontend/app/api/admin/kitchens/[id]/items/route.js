@@ -5,12 +5,13 @@ import { prisma } from "../../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
   await requireAdminApi();
+  const { id } = await params;
   const formData = await request.formData();
   const itemType = String(formData.get("itemType") || "");
 
   await prisma.kitchenItem.create({
     data: {
-      kitchenId: params.id,
+      kitchenId: id,
       itemType: Object.values(ItemType).includes(itemType) ? itemType : ItemType.COMPONENT,
       code: String(formData.get("code") || "").trim(),
       name: String(formData.get("name") || "").trim(),
@@ -25,5 +26,5 @@ export async function POST(request, { params }) {
     },
   });
 
-  return NextResponse.redirect(new URL(`/admin/kitchens/${params.id}`, request.url), 303);
+  return NextResponse.redirect(new URL(`/admin/kitchens/${id}`, request.url), 303);
 }

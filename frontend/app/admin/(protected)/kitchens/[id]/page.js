@@ -1,11 +1,12 @@
 import { ItemType, KitchenStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { getKitchenById } from "../../../../lib/catalog";
+import { getKitchenById } from "../../../../../lib/catalog";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminKitchenDetailPage({ params }) {
-  const kitchen = await getKitchenById(params.id);
+  const { id } = await params;
+  const kitchen = await getKitchenById(id);
   if (!kitchen) notFound();
 
   return (

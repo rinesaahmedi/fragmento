@@ -6,7 +6,8 @@ import { loadLegacyDocument } from "../../../lib/load-legacy-document";
 export const dynamic = "force-dynamic";
 
 export default async function KitchenPage({ params }) {
-  const kitchen = await getKitchenBySlug(params.slug);
+  const { slug } = await params;
+  const kitchen = await getKitchenBySlug(slug);
 
   if (!kitchen || kitchen.status !== "ACTIVE") {
     notFound();

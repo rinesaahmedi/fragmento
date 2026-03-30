@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getOrdersForAdmin, listKitchensForAdmin } from "../../lib/catalog";
+import { getOrdersForAdmin, listKitchensForAdmin } from "../../../lib/catalog";
 
 export const dynamic = "force-dynamic";
 

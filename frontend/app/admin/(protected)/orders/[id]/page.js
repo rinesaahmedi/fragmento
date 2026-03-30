@@ -1,11 +1,12 @@
 import { OrderStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
-import { getOrderById } from "../../../../lib/catalog";
+import { getOrderById } from "../../../../../lib/catalog";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrderDetailPage({ params }) {
-  const order = await getOrderById(params.id);
+  const { id } = await params;
+  const order = await getOrderById(id);
   if (!order) notFound();
 
   return (
