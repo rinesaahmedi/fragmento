@@ -1,0 +1,105 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum KitchenStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum ItemType {
+  COMPONENT
+  ACCESSORY
+  SERVICE
+}
+
+enum OrderStatus {
+  NEW
+  EMAILED
+  CONFIRMED
+  CANCELLED
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Kitchen {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  name        String
+  status      KitchenStatus @default(DRAFT)
+  description String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  items       KitchenItem[]
+  orders      Order[]
+}
+
+model KitchenItem {
+  id           String      @id @default(cuid())
+  kitchenId    String
+  kitchen      Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  itemType     ItemType
+  code         String
+  name         String
+  price        Decimal     @db.Decimal(10, 2)
+  infoText     String?
+  iconKey      String?
+  colorKey     String?
+  componentKey String?
+  isLocked     Boolean     @default(false)
+  isActive     Boolean     @default(true)
+  sortOrder    Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  orderItems   OrderItem[]
+
+  @@unique([kitchenId, code])
+}
+
+model Order {
+  id             String      @id @default(cuid())
+  orderNumber    String      @unique
+  kitchenId      String
+  kitchen        Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Restrict)
+  status         OrderStatus @default(NEW)
+  contractNumber String?
+  firstName      String
+  lastName       String
+  email          String
+  phone          String
+  address1       String
+  address2       String?
+  postalCode     String
+  city           String
+  paymentMethod  String?
+  totalPrice     Decimal     @db.Decimal(10, 2)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  items          OrderItem[]
+}
+
+model OrderItem {
+  id            String       @id @default(cuid())
+  orderId       String
+  order         Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kitchenItemId String?
+  kitchenItem   KitchenItem? @relation(fields: [kitchenItemId], references: [id], onDelete: SetNull)
+  itemType      ItemType
+  code          String
+  nameSnapshot  String
+  priceSnapshot Decimal      @db.Decimal(10, 2)
+  quantity      Int          @default(1)
+  createdAt     DateTime     @default(now())
+}

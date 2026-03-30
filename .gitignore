@@ -1,4 +1,6 @@
 # Local Netlify folder
 .netlify
 .env
+.next
+node_modules
 

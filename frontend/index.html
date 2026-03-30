@@ -1,0 +1,3900 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interaktive Küche</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+    :root {
+      --bg-0: #f7f1e8;
+      --bg-1: #eee3d4;
+      --surface: rgba(255, 253, 249, 0.88);
+      --surface-2: #fffdf9;
+      --accent: #ab6b2e;
+      --accent-2: #875225;
+      --accent-soft: #f4dfc9;
+      --text-strong: #2f2a24;
+      --text-mid: #5a5249;
+      --text-soft: #7a7065;
+      --line: rgba(110, 84, 61, 0.2);
+      --shadow-sm: 0 4px 14px rgba(73, 47, 20, 0.08);
+      --shadow-md: 0 10px 28px rgba(73, 47, 20, 0.14);
+      --shadow-lg: 0 24px 56px rgba(36, 24, 12, 0.22);
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 18px;
+      --overlay-logo-size: clamp(308px, 39vw, 448px);
+    }
+    body {
+        font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: #ffffff;
+        color: var(--text-mid);
+        margin: 0;
+        padding: clamp(8px, 1.8vw, 20px);
+        box-sizing: border-box;
+        overflow-x: hidden;
+        position: relative;
+        isolation: isolate;
+      }
+      body::before {
+        display: none;
+      }
+      body > * {
+        position: relative;
+        z-index: 1;
+      }
+      h1,
+      h2 {
+        color: var(--text-strong);
+        text-align: center;
+        letter-spacing: -0.02em;
+        font-weight: 800;
+      }
+      #main-container {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 30px;
+        justify-content: center;
+        align-items: flex-start;
+        width: 100%;
+        max-width: 1400px;
+      }
+      #kitchen-svg-wrapper {
+        flex: 2 1 600px;
+        min-width: 300px;
+        border: 1px solid var(--line);
+        background: #ffffff;
+        box-shadow: var(--shadow-md);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: clamp(320px, 52vh, 680px);
+      }
+      .svg-placeholder {
+        color: #999;
+        font-size: 1.2em;
+        text-align: center;
+      }
+      #kitchen-svg-wrapper svg {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      #controls {
+        flex: 1 1 380px;
+        min-width: 320px;
+        max-width: 420px;
+        background: #ffffff;
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        box-shadow: var(--shadow-sm);
+        padding: 10px;
+        box-sizing: border-box;
+      }
+      #controls h2 {
+        margin-top: -55px;
+        border-bottom: 2px solid rgba(145, 115, 86, 0.2);
+        padding-bottom: 10px;
+      }
+      .kitchen-component {
+        cursor: pointer;
+        transition: opacity 0.25s ease-in-out;
+      }
+      #kitchen-svg-wrapper .kitchen-component:not(.selected) {
+        opacity: 0.15;
+      }
+      .kitchen-component.selected path {
+        stroke: #000000 !important;
+        stroke-width: 3px !important;
+        vector-effect: non-scaling-stroke;
+      }
+      .is-locked {
+        cursor: default !important;
+      }
+      #combined-list {
+        list-style-type: none;
+        padding: 10px;
+        margin: 0;
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        background: #ffffff;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-content: flex-start;
+      }
+      .component-item {
+        flex-basis: calc(50% - 5px);
+        height: 150px;
+        padding: 10px 5px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        background-color: #fff;
+        box-sizing: border-box;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+      }
+      .component-item:not(.selected) { background-color: #ffffff; border: 1px solid #e3e6ea; }
+      .component-item:not(.selected):hover { background-color: #fbfdff; border-color: #d8dde3; }
+      .component-item.selected:hover { background-color: #f7fff9; border-color: #24933d; }
+      .component-item:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+      .component-item.selected {
+        background-color: #ffffff;
+        border: 2px solid #28A745;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+        padding: 9px 4px;
+      }
+      .component-icon {
+        display: inline-flex; align-items: center; justify-content: center;
+        width: var(--icon-size, 50px); height: var(--icon-size, 50px); flex-shrink: 0;
+      }
+      .component-icon img { width: 100%; height: 100%; object-fit: contain; }
+      .component-name { font-size: 15px; text-align: center; line-height: 1.3; }
+      .component-name-wrap {
+        position: static;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        width: 100%;
+      }
+      .component-info-trigger {
+        position: absolute;
+        right: 8px;
+        bottom: 8px;
+        width: 20px;
+        height: 20px;
+        border: 1px solid #8f9baa;
+        border-radius: 50%;
+        background: #f8fbff;
+        color: #36506b;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        padding: 0;
+        z-index: 8;
+      }
+      .component-info-trigger:hover {
+        border-color: #36506b;
+        color: #1f3348;
+        background: #eef6ff;
+      }
+      .component-info-trigger:focus-visible {
+        outline: 2px solid rgba(171, 107, 46, 0.46);
+        outline-offset: 2px;
+      }
+      .component-info-tooltip {
+        position: absolute;
+        left: 8px;
+        right: 8px;
+        bottom: 34px;
+        width: auto;
+        box-sizing: border-box;
+        padding: 8px 10px;
+        border-radius: 10px;
+        border: 1px solid #b6c2cf;
+        background: linear-gradient(180deg, #ffffff 0%, #f5f8fc 100%);
+        color: #c62828;
+        font-size: 12px;
+        line-height: 1.35;
+        box-shadow: 0 8px 18px rgba(20, 38, 58, 0.18);
+        z-index: 35;
+        display: none;
+        text-align: left;
+        font-weight: 700;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+      .component-info-trigger:hover + .component-info-tooltip,
+      .component-item.has-info .component-name-wrap:focus-within .component-info-tooltip,
+      .component-item.has-info.is-info-open .component-info-tooltip {
+        display: block;
+      }
+      .component-price { font-size: 20px; font-weight: bold; color: #007bff; margin-top: 5px; }
+      .selection-indicator {
+        position: absolute; top: 6px; right: 6px; width: 30px; height: 30px;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+        font-weight: bold; font-size: 28px; background-color: #f1f3f5; border: 1px solid #dee2e6;
+        transition: all 0.2s; user-select: none;
+      }
+      .component-item:hover .selection-indicator { transform: scale(1.1); }
+      .component-item:not(.selected) .selection-indicator::before { content: "+"; color: #28a745; }
+      .component-item.selected .selection-indicator::before { content: "-"; color: #dc3545; }
+      .component-item.selected .selection-indicator { background-color: #ffffff; border-color: #dee2e6; }
+      
+      #selection-summary-container {
+        width: 100%; max-width: 1400px; margin-top: 40px; padding: 30px;
+        border: 1px solid var(--line); border-radius: var(--r-lg);
+        background: linear-gradient(145deg, #fffdf9 0%, #f8eee1 100%);
+        box-shadow: var(--shadow-md);
+        box-sizing: border-box;
+      }
+      #selection-summary-container h2 {
+        margin-top: 0; padding-bottom: 15px; border-bottom: 2px solid #007bff;
+        display: inline-block; margin-bottom: 25px;
+        font-size: 1.6em;
+      }
+      #selected-items-list {
+        list-style-type: none; padding: 0; margin: 0;
+      }
+      #selected-items-list li:not(.summary-header) {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 15px;
+        align-items: center;
+        padding: 14px 20px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background-color: #fff;
+        transition: all 0.2s ease-out;
+      }
+      #selected-items-list li:not(.summary-header):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 30, 80, 0.05);
+        border-color: #dbe4f0;
+      }
+      #selected-items-list .item-name {
+        color: #343a40;
+        font-weight: 500;
+      }
+      #selected-items-list .item-price {
+        font-weight: 600;
+        font-size: 1.1em;
+        color: #0056b3;
+        white-space: nowrap;
+      }
+      #selected-items-list .summary-header {
+        font-size: 1em;
+        font-weight: 600;
+        color: #2c3e50;
+        padding: 10px 15px 10px 0;
+        margin-top: 20px;
+        margin-bottom: 15px;
+        border: none;
+        border-bottom: 2px solid #dee2e6;
+      }
+      #selected-items-list .summary-header:first-of-type { margin-top: 0; }
+      .price-summary-footer { text-align: right; margin-top: 30px; padding-top: 20px; border-top: 2px solid #2c3e50; }
+      .price-summary-footer h3 {
+        margin: 0 0 10px; font-size: 1.5em; color: #2c3e50; display: inline-block;
+        margin-right: 20px; vertical-align: middle;
+      }
+      .total-price-display-footer {
+        font-size: 2.8em; font-weight: bold; color: #28a745; display: inline-block;
+        margin: 0; vertical-align: middle;
+      }
+      .list-divider {
+        flex-basis: 100%; margin: 20px 0 5px 0; padding: 0 10px;
+      }
+      .list-divider h3 {
+        margin: 0; padding-bottom: 8px; border-bottom: 2px solid #e0e0e0; font-size: 1.2em; color: #2c3e50;
+      }
+      .accessory-item {
+        flex-basis: calc(50% - 5px);
+        min-height: 100px;
+        padding: 10px;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: #fff;
+        box-sizing: border-box;
+        position: relative;
+        cursor: pointer;
+        transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+      }
+      .accessory-icon { flex-shrink: 0; width: 40px; height: 40px; color: #007bff; }
+      .accessory-details { display: flex; flex-direction: column; text-align: left; }
+      .accessory-name { font-size: 14px; font-weight: 500; line-height: 1.3; color: #343a40; }
+      .accessory-price { font-size: 20px; font-weight: bold; color: #007bff; margin-top: 4px; }
+      .accessory-item:not(.selected) { background-color: #ffffff; border: 1px solid #e3e6ea; }
+      .accessory-item:not(.selected):hover { background-color: #fbfdff; }
+      .accessory-item.selected { background-color: #ffffff; border: 2px solid #28a745; padding: 9px; }
+      .accessory-item.selected:hover { background-color: #f7fff9; }
+      .accessory-item:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+      .accessory-item .selection-indicator{
+        position:absolute;
+        top: 5px;
+        right: 5px;
+        width: 26px;
+        height: 26px;
+        border-radius:50%;
+        display:flex; align-items:center; justify-content:center;
+        font-weight:700;
+        font-size: 22px;
+        background:#f1f3f5; border:1px solid #dee2e6;
+        transition:transform .2s;
+      }
+      .accessory-item:hover .selection-indicator{ transform:scale(1.1); }
+      .accessory-item:not(.selected) .selection-indicator::before{ content:"+"; color:#28a745; }
+      .accessory-item.selected .selection-indicator::before{ content:"-"; color:#dc3545; }
+      .accessory-item.selected .selection-indicator{ background:#ffffff; border-color:#dee2e6; }
+
+      .consent-row {
+        display: grid;
+        grid-template-columns: 1.4rem 1fr;
+        column-gap: 12px;
+        row-gap: 0;
+        align-items: start;
+        grid-column: 1 / -1;
+        justify-self: start;
+      }
+      .consent-row input[type="checkbox"] {
+        inline-size: 1.25rem;
+        block-size: 1.25rem;
+        margin: 2px 0 0 0;
+        accent-color: #28a745;
+      }
+      .consent-row label {
+        margin: 0;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+        word-break: normal;
+        hyphens: auto;
+        -webkit-hyphens: auto;
+      }
+
+      #combined-list .accessory-item .selection-indicator{
+        position: absolute; top: 6px; right: 6px;
+        width: 22px; height: 22px;
+        display: flex !important;
+        align-items: center; justify-content: center;
+        border-radius: 50%;
+        font-weight: 700; font-size: 16px;
+        background: #f1f3f5; border: 1px solid #dee2e6;
+      }
+      #combined-list .accessory-item:not(.selected) .selection-indicator::before { content: "+"; color: #28a745; }
+      #combined-list .accessory-item.selected .selection-indicator::before { content: "-"; color: #dc3545; }
+      #combined-list .accessory-item .accessory-details { padding-right: 30px; }
+      #combined-list .accessory-item{
+        flex: 0 0 calc(50% - 5px);
+        max-width: calc(50% - 5px);
+      }
+
+      #controls{
+        display: flex;
+        flex-direction: column;
+        height: min(760px, calc(100vh - 130px));
+      }
+      #combined-list{
+        flex: 1 1 auto;
+        max-height: unset;
+        min-height: 0;
+        overflow-y: auto;
+      }
+
+      .overlay {
+        position: fixed; inset: 0;
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: clamp(12px, 2.2vh, 24px);
+        z-index: 9999;
+        padding: 16px;
+      }
+      .overlay.hidden { display: none !important; }
+      .overlay-brand-logo {
+        width: auto;
+        height: clamp(227px, 29.4vw, 294px);
+        object-fit: contain;
+        object-position: center top;
+        display: block;
+        flex: 0 0 auto;
+        margin: 0 auto -8px;
+        transform: none;
+      }
+      .language-card-logo {
+        width: auto;
+        height: clamp(227px, 29.4vw, 294px);
+        object-fit: contain;
+        object-position: center top;
+        display: block;
+        margin: 0 auto -8px;
+        transform: none;
+      }
+
+      .welcome-card{
+        display: flex;
+        flex-direction: column;
+        max-width: 720px;
+        width: min(92vw, 720px);
+        background: linear-gradient(170deg, rgba(255, 255, 255, 0.96) 0%, rgba(252, 246, 238, 0.95) 100%);
+        border: 1px solid rgba(177, 145, 116, 0.22);
+        border-radius: var(--r-lg);
+        box-shadow: var(--shadow-lg);
+        padding: clamp(10px, 2vw, 16px);
+        text-align: left;
+        max-height: min(88vh, 720px);
+        overflow: auto;
+        animation: cardFadeUp 0.35s ease-out;
+      }
+      .overlay-back-btn {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: linear-gradient(180deg, #fffdf8 0%, #f7ecdf 100%);
+        color: var(--text-strong);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        margin-bottom: 0;
+      }
+      .overlay-back-btn:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
+      }
+      .overlay-back-btn:focus-visible {
+        outline: 2px solid rgba(171, 107, 46, 0.46);
+        outline-offset: 2px;
+      }
+      .welcome-card-footer {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        margin-top: auto;
+        gap: 8px;
+        width: 100%;
+      }
+      .welcome-card-figura {
+        width: 112px;
+        max-width: 112px;
+        max-height: 112px;
+        height: auto;
+        object-fit: contain;
+      }
+      .welcome-card h2{
+        margin: 0 0 2px;
+        color: var(--text-strong);
+        font-size: clamp(18px, 2.2vw, 24px);
+      }
+      .welcome-card p{
+        margin: 0;
+        line-height: 1.55;
+        color: var(--text-mid);
+        font-size: clamp(14px, 1.6vw, 16px);
+        text-wrap: pretty;
+        overflow-wrap: anywhere;
+        hyphens: auto;
+      }
+      .welcome-actions{ display:flex; justify-content:flex-end; margin-top: clamp(10px, 2.5vw, 14px); gap: 8px; }
+      .welcome-actions .btn-primary{
+        background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+        border: 1px solid rgba(95, 58, 26, 0.2);
+        color: #fff;
+        padding: 10px 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        box-shadow: var(--shadow-sm);
+        transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      }
+      .welcome-actions .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+        filter: saturate(1.05);
+      }
+      .welcome-actions .btn-primary:focus-visible {
+        outline: 2px solid rgba(171, 107, 46, 0.48);
+        outline-offset: 2px;
+      }
+      .payment-options-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 15px;
+      }
+      .payment-option {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        min-height: 40px;
+        cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .payment-option:hover { border-color: #aaa; }
+      .payment-option.selected {
+        border-color: #007bff;
+        box-shadow: 0 0 0 1px #007bff;
+      }
+      .payment-option img {
+        height: 30px;
+        max-width: 100px;
+        object-fit: contain;
+      }
+      
+      #contract-overlay img {
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+      }
+      #contract-overlay img:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      }
+      #contract-overlay.overlay {
+        align-items: center;
+        justify-content: center;
+        padding: clamp(10px, 2vh, 20px);
+      }
+      #contract-overlay .welcome-card {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      #contract-overlay .contract-info-row {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin: 14px 0 16px;
+      }
+      #contract-overlay .contract-helper-box {
+        border: none;
+        background: #fffefb;
+        color: var(--text-strong);
+        font-weight: 700;
+        line-height: 1.45;
+        text-align: center;
+        padding: 12px 16px;
+        border-radius: 0;
+        flex: 1 1 auto;
+        white-space: pre-line;
+      }
+      #contract-overlay .contract-sink-img {
+        width: clamp(120px, 20vw, 190px);
+        height: auto;
+        object-fit: contain;
+        display: inline-block;
+      }
+      #contract-overlay .welcome-card h2 { margin-bottom: 8px; }
+      #contract-overlay .welcome-actions {
+        position: absolute;
+        right: clamp(12px, 2vw, 20px);
+        bottom: clamp(12px, 2vw, 18px);
+        margin-top: 0;
+      }
+      #contract-overlay label { margin-bottom: 4px; }
+      @media (max-height: 820px) {
+        #contract-overlay .contract-sink-img { width: clamp(110px, 16vw, 160px); }
+        #contract-overlay .contract-info-row { margin: 8px 0; gap: 10px; }
+      }
+      #image-lightbox {
+        z-index: 10000;
+        background: rgba(0, 0, 0, 0.75);
+      }
+      #lightbox-image {
+        max-width: 90vw;
+        max-height: 85vh;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      }
+      .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 25px;
+        font-size: 45px;
+        line-height: 1;
+        color: white;
+        cursor: pointer;
+        font-weight: 300;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.7);
+        transition: opacity 0.2s;
+      }
+      .close-btn:hover { opacity: 0.8; }
+
+      /* === START: Sticky Header & Price Display Changes === */
+      .app-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        max-width: 1400px;
+        padding: 5px 14px;
+        min-height: 62px;
+        box-sizing: border-box;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: #ffffff;
+        box-shadow: var(--shadow-md);
+        border-bottom: 1px solid var(--line);
+        margin-bottom: 10px;
+        border-radius: var(--r-md);
+        overflow: visible;
+      }
+      .main-back-wrap {
+        display: none;
+      }
+      .app-header .app-logo {
+        position: static;
+        height: 90px;
+        width: auto;
+        transform: scale(3.06);
+        transform-origin: left center;
+        margin-left: 0;
+        flex-shrink: 0;
+      }
+      .app-header h1 {
+        margin: 0;
+        text-align: center;
+        flex-grow: 1;
+        font-size: clamp(1.1rem, 1.35vw, 1.4rem);
+        line-height: 1.1;
+      }
+      #header-price-display {
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-end;
+        gap: 8px;
+        text-align: right;
+        flex-shrink: 0;
+        min-width: 0;
+      }
+      #header-price-display h3 {
+        margin: 0;
+        font-size: 0.86em;
+        font-weight: 500;
+        color: var(--text-soft);
+      }
+      #header-price-display .total-price-display {
+        margin: 0;
+        font-size: 1.45em;
+        font-weight: bold;
+        color: #28a745;
+        line-height: 1;
+      }
+      #price-summary {
+        display: none;
+      }
+      .accessory-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+      /* === END: Sticky Header & Price Display Changes === */
+
+      /* === STYLES FROM SECOND STYLE TAG (COMBINED) === */
+      .hidden { display: none !important; }
+      .btn-primary { background:linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); color:#fff; border:1px solid rgba(95, 58, 26, 0.25); border-radius:10px; padding:10px 16px; cursor:pointer; font-size: 1em; font-weight:700; box-shadow: var(--shadow-sm); transition: transform .18s ease, box-shadow .2s ease;}
+      .btn-success { background:linear-gradient(135deg, #3ca25f 0%, #2f7f4b 100%); color:#fff; border:1px solid rgba(36, 86, 53, 0.2); border-radius:10px; padding:10px 16px; cursor:pointer; font-size: 1em; font-weight:700; box-shadow: var(--shadow-sm); transition: transform .18s ease, box-shadow .2s ease;}
+      .btn-primary:disabled, .btn-success:disabled { background:#6c757d; cursor:not-allowed; opacity:0.75; }
+      .btn-primary:hover:not(:disabled), .btn-success:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+      .btn-primary:focus-visible, .btn-success:focus-visible { outline: 2px solid rgba(171, 107, 46, 0.46); outline-offset: 2px; }
+      #order-form input, #order-form textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+      #order-form label { margin-bottom: 0; }
+      
+
+      /* ================================================= */
+      /* ============ RESPONSIVE STYLES START ============ */
+      /* ================================================= */
+
+      @media (max-width: 1200px){
+        #main-container { gap: 18px; }
+        #controls {
+          flex: 1 1 350px;
+          max-width: 390px;
+        }
+        #kitchen-svg-wrapper {
+          flex: 1.8 1 520px;
+        }
+      }
+      
+      /* --- Make SVG sticky ONLY on tablet viewports --- */
+      @media (min-width: 769px) and (max-width: 992px) {
+        #kitchen-svg-wrapper {
+          width: 100%;
+          position: sticky;
+          top: 100px; /* Stick below the main header */
+          z-index: 11;
+          max-height: 45vh;
+        }
+      }
+
+      /* General stacking layout for tablet and mobile */
+      @media (max-width: 992px){
+        #main-container {
+          flex-direction: column;
+          align-items: stretch;
+          flex-wrap: nowrap;
+          gap: 14px;
+        }
+        #kitchen-svg-wrapper,
+        #controls{
+          width: 100%;
+          max-width: 100%;
+          min-width: 0;
+        }
+        #controls{
+          display: block;
+          height: auto !important;
+          max-height: none;
+        }
+        #combined-list{
+          max-height: none !important;
+          overflow-y: visible !important;
+          min-height: 0 !important;
+          flex: initial !important;
+        }
+      }
+      
+      /* --- Mobile Styles for Sticky Behavior (max-width: 768px) --- */
+      @media (max-width: 768px) {
+        body {
+          padding: 8px;
+          padding-top: 0px; /* Space for the sticky header */
+        }
+        .app-header {
+          flex-wrap: nowrap;
+          justify-content: space-between;
+          row-gap: 0;
+          padding: 5px 8px;
+          margin-bottom: 8px;
+          min-height: 54px;
+        }
+        .app-header h1 {
+          flex-basis: auto;
+          order: 0;
+          min-width: 0;
+          margin: 0 6px;
+          font-size: clamp(0.75rem, 2.6vw, 0.92rem);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .app-header .app-logo {
+           height: 60px;
+           transform: scale(2.21);
+           margin-left: 2px;
+        }
+        #header-price-display {
+          text-align: right;
+          min-width: 0;
+          gap: 4px;
+        }
+        #header-price-display h3 {
+          font-size: 0.72em;
+        }
+        #header-price-display .total-price-display {
+          font-size: 1.15em;
+        }
+        #main-container { gap: 20px; }
+        #selected-items-list .summary-header { break-before: auto; }
+        #kitchen-svg-wrapper {
+          position: sticky;
+          top: 58px;
+          z-index: 20;
+          max-height: 42vh;
+          overflow: hidden;
+          background: #fff;
+          min-height: 250px;
+        }
+        .component-item,
+        #combined-list .component-item,
+        .accessory-item,
+        #combined-list .accessory-item {
+          flex-basis: calc(100% - 8px) !important;
+          max-width: calc(100% - 8px) !important;
+        }
+      }
+
+      @media (max-width: 600px) {
+        h1 { font-size: 1.6em; } 
+        h2 { font-size: 1.3em; }
+        #total-price-display { font-size: 2em; }
+        .price-summary-footer { text-align: center; }
+        .price-summary-footer h3, .total-price-display-footer { display: block; text-align: center; margin-right: 0; }
+        .total-price-display-footer { font-size: 2.2em; }
+        
+        #combined-list { 
+            gap: 8px;
+        }
+        .component-item {
+            flex-basis: calc(100% - 10px);
+            height: auto;
+            min-height: 0;
+            padding: 12px 5px;
+            gap: 4px;
+        }
+        .component-icon {
+            --icon-size: 48px;
+        }
+        .component-name {
+            font-size: 14px;
+        }
+        .component-price {
+            font-size: 20px;
+            margin-top: 2px;
+        }
+        .accessory-item,
+        #combined-list .accessory-item {
+             flex-basis: calc(100% - 12px) !important;
+             max-width: calc(100% - 12px) !important;
+             min-height: 0;
+             padding: 10px;
+        }
+      }
+
+      @media (max-width: 520px){
+        .welcome-actions .btn-primary{ width: 100%; }
+        .overlay{ background: rgba(255, 255, 255, 0.85); }
+        :root { --overlay-logo-size: clamp(260px, 84.5vw, 380px); }
+      }
+
+      @media (max-width: 480px){
+        .app-header {
+          min-height: 50px;
+          padding: 4px 6px;
+          margin-bottom: 6px;
+        }
+        .app-header .app-logo {
+          height: 34px;
+          transform: scale(1.95);
+          margin-left: 0;
+        }
+        #kitchen-svg-wrapper { top: 58px; }
+        #header-price-display h3 { font-size: 0.66em; }
+        #header-price-display .total-price-display { font-size: 1.05em; }
+        #combined-list .accessory-item .selection-indicator{
+          width: 20px; height: 20px; font-size: 14px; top: 5px; right: 5px;
+        }
+        #combined-list .accessory-item .accessory-details { padding-right: 26px; }
+        .consent-row {
+          column-gap: 10px;
+          grid-template-columns: 1.3rem 1fr;
+        }
+        .consent-row input[type="checkbox"] {
+          inline-size: 1.35rem;
+          block-size: 1.35rem;
+        }
+      }
+
+    </style>
+    <style>
+      .hidden { display: none !important; }
+      .btn-primary { background:linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%); color:#fff; border:1px solid rgba(95, 58, 26, 0.25); border-radius:10px; padding:10px 16px; cursor:pointer; font-size: 1em; font-weight:700; box-shadow: var(--shadow-sm); transition: transform .18s ease, box-shadow .2s ease;}
+      .btn-success { background:linear-gradient(135deg, #3ca25f 0%, #2f7f4b 100%); color:#fff; border:1px solid rgba(36, 86, 53, 0.2); border-radius:10px; padding:10px 16px; cursor:pointer; font-size: 1em; font-weight:700; box-shadow: var(--shadow-sm); transition: transform .18s ease, box-shadow .2s ease;}
+      .btn-primary:disabled, .btn-success:disabled { background:#6c757d; cursor:not-allowed; opacity:0.75; }
+      .btn-primary:hover:not(:disabled), .btn-success:hover:not(:disabled) { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+      .btn-primary:focus-visible, .btn-success:focus-visible { outline: 2px solid rgba(171, 107, 46, 0.46); outline-offset: 2px; }
+      #order-form input, #order-form textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+      #order-form label { margin-bottom: 0; }
+      .language-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+        gap: 12px;
+        margin-top: 0;
+      }
+      .language-option {
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        width: 100%;
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        background: linear-gradient(180deg, #fffdf8 0%, #f7ecdf 100%);
+        color: var(--text-strong);
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 11px 14px;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      }
+      .language-option:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+      .language-option:active { transform: translateY(0); }
+      .language-option:focus-visible {
+        outline: 2px solid rgba(171, 107, 46, 0.46);
+        outline-offset: 2px;
+      }
+      #language-overlay .welcome-card {
+        max-width: 760px;
+        border: 1px solid rgba(177, 145, 116, 0.22);
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(252, 246, 238, 0.95) 100%);
+        box-shadow: var(--shadow-lg);
+        justify-content: flex-start;
+        padding-top: 4px;
+      }
+      #language-overlay .language-card-logo {
+        margin-top: -14px;
+        margin-bottom: -20px;
+      }
+      #language-title {
+        margin-top: -18px;
+        margin-bottom: 8px;
+        color: var(--text-strong);
+        letter-spacing: 0.2px;
+        position: relative;
+        top: -50px;
+      }
+      #language-overlay .language-grid {
+        margin-top: 2px;
+        position: relative;
+        top: -40px;
+      }
+      .flag-badge-img {
+        width: 24px;
+        height: 18px;
+        border-radius: 3px;
+        object-fit: cover;
+        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+        flex: 0 0 auto;
+      }
+      .lang-status-error {
+        color: #b42318;
+        margin-top: 6px;
+        min-height: 1.2em;
+      }
+      #avatar-overlay .welcome-card {
+        max-width: 520px;
+        width: min(94vw, 520px);
+        padding: clamp(10px, 1.8vw, 14px);
+        max-height: min(88vh, 760px);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        position: relative;
+        padding-bottom: 64px;
+      }
+      #avatar-overlay .overlay-brand-logo { margin-bottom: -6px; }
+      #avatar-video {
+        display: block;
+        width: 100%;
+        aspect-ratio: 9 / 16;
+        max-height: min(44vh, 380px);
+        height: auto;
+        object-fit: contain;
+        object-position: center;
+        background: #000;
+        border-radius: 8px;
+        margin: 0 auto 0;
+      }
+      #avatar-overlay h2 { margin: 0 0 4px; }
+      #avatar-overlay .welcome-actions { margin-top: 8px; flex-shrink: 0; }
+      #avatar-overlay .avatar-action-row {
+        position: absolute;
+        left: clamp(12px, 2vw, 20px);
+        right: clamp(12px, 2vw, 20px);
+        bottom: clamp(12px, 2vw, 18px);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 3;
+      }
+      #avatar-overlay .avatar-action-row .overlay-back-btn {
+        position: static;
+      }
+      #avatar-overlay .avatar-action-row .btn-primary {
+        min-width: 120px;
+        padding: 8px 14px;
+      }
+      #avatar-overlay .welcome-card-footer {
+        align-items: flex-end;
+        margin-top: auto;
+        gap: 10px;
+        padding-bottom: 0;
+      }
+      @media (min-width: 769px) and (max-width: 1024px) {
+        #avatar-overlay .welcome-card {
+          width: min(92vw, 560px);
+          max-height: min(88vh, 700px);
+        }
+        #avatar-video { max-height: min(36vh, 320px); }
+      }
+      @media (max-width: 768px) {
+        #avatar-overlay .welcome-card {
+          width: min(98vw, 720px);
+          max-height: 88vh;
+          padding: 10px;
+        }
+        #avatar-video {
+          width: 100%;
+          max-height: min(36vh, 300px);
+          object-fit: contain;
+          background: #000;
+          margin-top: 0;
+        }
+      }
+      @media (max-width: 420px) {
+        #avatar-overlay .welcome-card { padding: 8px; max-height: 90vh; }
+        #avatar-overlay h2 { margin-bottom: 4px; font-size: 1.15rem; }
+        #avatar-video {
+          width: 100%;
+          max-height: min(32vh, 250px);
+          object-fit: contain;
+          background: #000;
+        }
+        #avatar-overlay .welcome-actions { margin-top: 3px; }
+        #avatar-overlay .welcome-actions .btn-primary { width: auto; }
+      }
+      @media (max-height: 740px) {
+        #avatar-overlay .welcome-card { max-height: 92vh; padding: 8px; }
+        #avatar-video {
+          width: 100%;
+          max-height: min(32vh, 240px);
+          object-fit: contain;
+          background: #000;
+        }
+        #avatar-overlay .welcome-actions { margin-top: 3px; }
+      }
+      #instruction-mode-overlay .welcome-card,
+      #text-instructions-overlay .welcome-card {
+        max-width: 860px;
+      }
+      #instruction-mode-overlay .welcome-card,
+      #text-instructions-overlay .welcome-card,
+      #welcome-overlay .welcome-card {
+        overflow: hidden;
+      }
+      .mode-actions {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 18px;
+        width: 100%;
+        position: relative;
+        top: -30px;
+      }
+      .mode-option {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: linear-gradient(180deg, #fffdf8 0%, #f7ecdf 100%);
+        color: var(--text-strong);
+        font-weight: 600;
+        font-size: 1rem;
+        padding: 12px 14px;
+        cursor: pointer;
+        text-align: center;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        min-width: 210px;
+      }
+      .mode-option:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+      }
+      .mode-option:active { transform: translateY(0); }
+      .mode-option:focus-visible {
+        outline: 2px solid rgba(171, 107, 46, 0.46);
+        outline-offset: 2px;
+      }
+      .instruction-status {
+        color: #b42318;
+        margin-top: 12px;
+        min-height: 1.2em;
+      }
+      .text-instructions-body {
+        margin-top: 14px;
+        max-height: none;
+        overflow: hidden;
+        border: none;
+        border-radius: 0;
+        padding: 14px;
+        background: #fffefb;
+        color: #1f1f1f;
+        line-height: 1.6;
+        white-space: pre-line;
+      }
+      .instruction-mode-copy-box {
+        padding: 0;
+        margin-top: 0;
+        position: relative;
+        top: -30px;
+      }
+      .instruction-mode-copy-box h2 {
+        margin-bottom: 10px;
+      }
+      #instruction-mode-description {
+        color: #000;
+      }
+      .overlay .welcome-card h2,
+      .overlay .welcome-card p,
+      .overlay .instruction-status,
+      .overlay .text-instructions-body {
+        text-align: center;
+      }
+      #welcome-overlay .welcome-card h2 {
+        text-align: center;
+      }
+      #welcome-overlay .welcome-card p {
+        text-align: left;
+      }
+      #instruction-mode-overlay .welcome-card,
+      #text-instructions-overlay .welcome-card,
+      #contract-overlay .welcome-card,
+      #welcome-overlay .welcome-card {
+        position: relative;
+        padding-bottom: 74px;
+      }
+      .overlay-back-btn {
+        position: absolute;
+        left: clamp(12px, 2vw, 20px);
+        bottom: clamp(12px, 2vw, 18px);
+        z-index: 2;
+      }
+      #text-instructions-overlay .welcome-card {
+        max-height: min(94vh, 960px);
+        overflow: hidden;
+        padding-top: 0;
+        padding-bottom: 64px;
+      }
+      #text-instructions-overlay .overlay-brand-logo {
+        margin-top: -12px;
+        margin-bottom: -20px;
+        transform: none;
+      }
+      #text-instructions-body {
+        overflow: hidden;
+        max-height: none;
+        margin-top: 0;
+        padding: 6px 10px;
+        line-height: 1.24;
+        font-size: clamp(12px, 0.82vw, 14px);
+        min-height: 0;
+        border-width: 1px;
+        position: relative;
+        top: -30px;
+      }
+      /* Only text-instructions steps should be left-aligned */
+      #text-instructions-overlay .text-instructions-body {
+        text-align: left;
+      }
+      #text-instructions-body .step-title {
+        font-weight: 800;
+        display: inline-block;
+        padding-left: 1.4em;
+      }
+      #text-instructions-body .step-detail {
+        display: inline-block;
+        padding-left: 1.4em;
+      }
+      #text-instructions-overlay #text-instructions-title {
+        display: none;
+      }
+      #text-instructions-overlay .welcome-card-footer .welcome-card-figura {
+        display: none;
+      }
+      #text-instructions-overlay .welcome-card-footer {
+        margin-top: 0;
+        gap: 0;
+      }
+      #text-instructions-overlay .welcome-actions {
+        position: absolute;
+        right: clamp(12px, 2vw, 20px);
+        bottom: clamp(12px, 2vw, 18px);
+        margin-top: 0;
+      }
+      @media (max-height: 860px) {
+        #text-instructions-body {
+          font-size: 11.6px;
+          line-height: 1.2;
+          padding: 6px 8px;
+          min-height: 0;
+        }
+      }
+      #welcome-overlay .welcome-actions {
+        position: absolute;
+        right: clamp(12px, 2vw, 20px);
+        bottom: clamp(12px, 2vw, 18px);
+        margin-top: 0;
+      }
+      #welcome-overlay {
+        display: none !important;
+      }
+      #welcome-overlay .welcome-actions .btn-primary,
+      #text-instructions-overlay .welcome-actions .btn-primary {
+        width: auto;
+      }
+      .app-back-btn {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: linear-gradient(180deg, #fffdf8 0%, #f7ecdf 100%);
+        color: var(--text-strong);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 9px 13px;
+        min-height: 40px;
+        line-height: 1;
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+        box-shadow: 0 2px 6px rgba(42, 30, 18, 0.08);
+        white-space: nowrap;
+      }
+      .app-back-btn-inline {
+        position: absolute;
+        left: -86px;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+      .app-back-btn:hover {
+        border-color: var(--accent);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
+      }
+      .app-back-btn-inline:hover {
+        transform: translateY(calc(-50% - 1px));
+      }
+      .app-back-btn:focus-visible {
+        outline: 2px solid rgba(171, 107, 46, 0.46);
+        outline-offset: 2px;
+      }
+      @media (max-width: 700px) {
+        .app-back-btn {
+          padding: 9px 12px;
+          min-height: 38px;
+          font-size: 12px;
+          border-radius: 12px;
+          box-shadow: 0 2px 7px rgba(42, 30, 18, 0.12);
+        }
+        .app-back-btn-inline {
+          left: 0;
+          top: -46px;
+          transform: none;
+        }
+        .app-back-btn-inline:hover {
+          transform: translateY(-1px);
+        }
+        .mode-actions {
+          flex-direction: column;
+        }
+        .mode-option {
+          min-width: 0;
+          width: 100%;
+        }
+        #contract-overlay .contract-info-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        #contract-overlay .contract-sink-img {
+          margin: 0 auto;
+        }
+      }
+      @keyframes cardFadeUp {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Language Selection Overlay -->
+    <div id="language-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="language-title">
+      <div class="welcome-card">
+        <img src="img/fragmentologo.png" alt="Architecto Logo" class="language-card-logo">
+        <h2 id="language-title">Wähle deine Sprache</h2>
+        <div class="language-grid" role="group" aria-label="Language selection">
+          <button type="button" class="language-option" data-lang="de"><img class="flag-badge-img" src="https://flagcdn.com/w40/de.png" alt="" aria-hidden="true"><span>German</span></button>
+          <button type="button" class="language-option" data-lang="en"><img class="flag-badge-img" src="https://flagcdn.com/w40/gb.png" alt="" aria-hidden="true"><span>English</span></button>
+          <button type="button" class="language-option" data-lang="tr"><img class="flag-badge-img" src="https://flagcdn.com/w40/tr.png" alt="" aria-hidden="true"><span>Turkish</span></button>
+          <button type="button" class="language-option" data-lang="es"><img class="flag-badge-img" src="https://flagcdn.com/w40/es.png" alt="" aria-hidden="true"><span>Spanish</span></button>
+          <button type="button" class="language-option" data-lang="fr"><img class="flag-badge-img" src="https://flagcdn.com/w40/fr.png" alt="" aria-hidden="true"><span>French</span></button>
+          <button type="button" class="language-option" data-lang="ru"><img class="flag-badge-img" src="https://flagcdn.com/w40/ru.png" alt="" aria-hidden="true"><span>Russian</span></button>
+        </div>
+        <p id="avatar-language-status" class="lang-status-error" aria-live="polite"></p>
+        <div class="welcome-card-footer">
+          <img src="img/FIGURA.png" alt="" class="welcome-card-figura" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Instruction Mode Overlay -->
+    <div id="instruction-mode-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="instruction-mode-title">
+      <div class="welcome-card">
+        <button id="back-instruction-mode" type="button" class="overlay-back-btn">Back</button>
+        <img src="img/fragmentologo.png" alt="Architecto Logo" class="overlay-brand-logo">
+        <div class="instruction-mode-copy-box">
+          <h2 id="instruction-mode-title">How would you like instructions?</h2>
+          <p id="instruction-mode-description">Choose between:</p>
+        </div>
+        <p id="instruction-mode-status" class="instruction-status" aria-live="polite"></p>
+        <div class="mode-actions">
+          <button id="mode-text-btn" type="button" class="mode-option">Text</button>
+          <button id="mode-avatar-btn" type="button" class="mode-option">Video</button>
+        </div>
+        <div class="welcome-card-footer">
+          <img src="img/FIGURA.png" alt="" class="welcome-card-figura" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Text Instructions Overlay -->
+    <div id="text-instructions-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="text-instructions-title">
+      <div class="welcome-card">
+        <button id="back-text-instructions" type="button" class="overlay-back-btn">Back</button>
+        <img src="img/fragmentologo.png" alt="Architecto Logo" class="overlay-brand-logo">
+        <h2 id="text-instructions-title">Text instructions</h2>
+        <div id="text-instructions-body" class="text-instructions-body"></div>
+        <div class="welcome-card-footer">
+          <img src="img/FIGURA.png" alt="" class="welcome-card-figura" />
+          <div class="welcome-actions">
+            <button id="text-instructions-continue" type="button" class="btn-primary">Continue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Avatar Video Overlay -->
+    <div id="avatar-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="avatar-title">
+      <div class="welcome-card">
+        <img src="img/fragmentologo.png" alt="Architecto Logo" class="overlay-brand-logo">
+        <!-- <h2 id="avatar-title">Avatar video</h2> -->
+        <video id="avatar-video" playsinline controls preload="metadata">
+          <source id="avatar-video-source" src="" type="video/mp4">
+        </video>
+        <div class="avatar-action-row">
+          <button id="back-avatar-overlay" type="button" class="overlay-back-btn">Back</button>
+          <button id="avatar-continue" type="button" class="btn-primary">Continue</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contract Number Overlay -->
+    <div id="contract-overlay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="contract-title">
+      <div class="welcome-card">
+        <button id="back-contract-overlay" type="button" class="overlay-back-btn">Back</button>
+        <img src="img/fragmentologo.png" alt="Architecto Logo" class="overlay-brand-logo">
+        <h2 id="contract-title">Küchenvertragsnummer</h2>
+        <div class="contract-info-row">
+          <img src="img/sink2.png" alt="Sink Icon" class="contract-sink-img">
+          <p id="contract-helper-text" class="contract-helper-box">Gib deine Kaufvertragsnummer ein.
+Du findest sie auf der Innenseite deines Spülenschrankes.</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px; margin-bottom: 15px;">
+          <label id="contract-number-label" for="contractNumber">Bitte gib deine Vertragsnummer ein:*</label>
+          <input id="contractNumber" name="contractNumber" type="text" required placeholder="z.B. 123456789" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+          <small id="contract-error" style="color: #dc3545; display: none;">Die Vertragsnummer ist erforderlich.</small>
+        </div>
+        <div class="welcome-card-footer">
+          <img src="img/FIGURA.png" alt="" class="welcome-card-figura" />
+          <div class="welcome-actions">
+            <button id="submit-contract-number" class="btn-primary">Bestätigen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Welcome / Onboarding overlay -->
+    <div id="welcome-overlay" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="welcome-title">
+      <div class="welcome-card">
+        <button id="back-welcome-overlay" type="button" class="overlay-back-btn">Back</button>
+        <img src="img/fragmentologo.png" alt="Architecto Logo" class="overlay-brand-logo">
+        <h2 id="welcome-title">Willkommen</h2>
+        <p>
+          Danke für dein Interesse, deine Küche zu vervollständigen. Hier siehst du deine bereits installierte Küche.
+Diese Küche wurde von deinem Vermieter vorinstalliert. Wir helfen dir, sie passgenau zu ergänzen.
+Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohnung und auf Wunsch professioneller Montage. <br> <strong>Klicke auf 'Weiter', um deine Küche optimal zu erweitern.</strong>
+        </p>
+        <div class="welcome-card-footer">
+          <img src="img/FIGURA.png" alt="" class="welcome-card-figura" />
+          <div class="welcome-actions">
+            <button id="start-config" class="btn-primary">Weiter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <main id="app-content" class="hidden">
+  <header class="app-header">
+    <button id="app-back-btn" type="button" class="app-back-btn app-back-btn-inline">Zurück</button>
+    <img src="img/fragmentologo.png" alt="Firmenlogo" class="app-logo">
+    <h1>Deine Küche</h1>
+    <div id="header-price-display">
+      <h3>Gesamtpreis</h3>
+      <p class="total-price-display">€0,00</p>
+    </div>
+  </header>
+
+      <div id="main-container">
+        <div id="kitchen-svg-wrapper">
+         <svg xmlns="http://www.w3.org/2000/svg" width="800.000" height="600.000" viewBox="0.0 0.0 800.000 600.000" version="1.1">
+    <!-- <title>Produce by Acme CAD Converter</title> -->
+    <!-- <desc>Produce by Acme CAD Converter</desc> -->
+  <path d="M15.44 358.12L15.44 554.47M15.44 554.47L15.44 358.12"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M178.16 595.15L178.16 358.12M178.16 358.12L178.16 595.15"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M161.87 380.93L159.43 380.93"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M159.43 380.93L159.43 432.73M159.43 432.73L159.43 380.93"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M159.43 432.73L161.87 432.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M161.87 432.73L161.87 380.93M161.87 380.93L161.87 432.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 345.62L142.83 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 344.4L141.9 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.9 344.4L141.29 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.29 344.4L140.39 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.39 344.69L140.08 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.08 344.69L139.79 345.01"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.79 345.01L139.47 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 344.69L139.18 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 344.69L138.86 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.86 344.69L138.86 344.4M138.86 344.4L138.86 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.86 344.4L138.57 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 344.4L138.57 344.09M138.57 344.09L138.57 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 344.09L138.57 295.64M138.57 295.64L138.57 344.09"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 298.94L146.47 298.02M146.47 298.02L146.47 298.94"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 295.64L147.08 344.09M147.08 344.09L147.08 295.64"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 344.09L147.08 344.4M147.08 344.4L147.08 344.09"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 344.4L146.79 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.79 344.4L146.79 344.69M146.79 344.69L146.79 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.79 344.69L146.47 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 344.69L146.18 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 344.69L145.87 345.01"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.87 345.01L145.57 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.57 344.69L145.26 344.69"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.26 344.69L144.36 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.36 344.4L143.75 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.75 344.4L142.83 344.4"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 345.62L150.15 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M108.26 135.61L105.81 135.61"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M105.81 135.61L105.81 187.41M105.81 187.41L105.81 135.61"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M105.81 187.41L108.26 187.41"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M108.26 187.41L108.26 135.61M108.26 135.61L108.26 187.41"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M231.93 136.62L229.5 136.62"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M229.5 136.62L229.5 188.42M229.5 188.42L229.5 136.62"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M229.5 188.42L231.93 188.42"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M231.93 188.42L231.93 136.62M231.93 136.62L231.93 188.42"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M268.31 136.67L265.88 136.67"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M265.88 136.67L265.88 188.47M265.88 188.47L265.88 136.67"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M265.88 188.47L268.31 188.47"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M268.31 188.47L268.31 136.67M268.31 136.67L268.31 188.47"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M521.28 135.65L518.85 135.65"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M518.85 135.65L518.85 187.45M518.85 187.45L518.85 135.65"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M518.85 187.45L521.28 187.45"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M521.28 187.45L521.28 135.65M521.28 135.65L521.28 187.45"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M161.87 380.93L159.43 380.93"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M159.43 380.93L159.43 432.73M159.43 432.73L159.43 380.93"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M159.43 432.73L161.87 432.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M161.87 432.73L161.87 380.93M161.87 380.93L161.87 432.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M159.43 432.73L159.43 380.93M159.43 380.93L159.43 432.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M159.43 380.93L161.87 380.93"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M161.87 380.93L161.87 432.73M161.87 432.73L161.87 380.93"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M161.87 432.73L159.43 432.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M203.17 358.55L41.82 358.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M15.44 358.55L15.44 554.47M15.44 554.47L15.44 358.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M15.44 554.47L176.8 554.47"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M176.8 554.47L176.8 358.12M176.8 358.12L176.8 554.47"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M365.89 358.56L349.65 358.56"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M349.67 358.56L203.2 358.56"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M178.16 358.12L178.16 554.47M178.16 554.47L178.16 358.12"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M365.89 554.9L365.89 358.56M365.89 358.56L365.89 554.9"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M532.93 358.56L370.22 358.56"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 358.56L370.22 391.12M370.22 391.12L370.22 358.56"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 391.12L370.22 423.92M370.22 423.92L370.22 391.12"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.25 424.56L370.25 359.19M370.25 359.19L370.25 424.56"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 423.92L370.22 456.73M370.22 456.73L370.22 423.92"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 456.73L370.22 489.27M370.22 489.27L370.22 456.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.25 489.9L370.25 424.56M370.25 424.56L370.25 489.9"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 489.27L370.22 522.1M370.22 522.1L370.22 489.27"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 522.1L370.22 554.9M370.22 554.9L370.22 522.1"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.25 555.54L370.25 489.9M370.25 489.9L370.25 555.54"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 489.27L370.22 522.1M370.22 522.1L370.22 489.27"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.22 522.1L370.22 554.9M370.22 554.9L370.22 522.1"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.25 555.54L370.25 489.9M370.25 489.9L370.25 555.54"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M178.16 554.47L2.43 554.47"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M2.43 595.06L178.16 595.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M178.16 595.15L178.16 554.47M178.16 554.47L178.16 595.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M178.16 554.47L178.16 595.15M178.16 595.15L178.16 554.47"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M365.89 595.59L365.89 554.9M365.89 554.9L365.89 595.59"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M370.22 554.9L370.22 595.59M370.22 595.59L370.22 554.9"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M370.25 596.22L370.25 555.54M370.25 555.54L370.25 596.22"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M532.97 555.54L370.25 555.54"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 555.54L370.25 596.22M370.25 596.22L370.25 555.54"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 596.22L532.97 596.22"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 596.22L532.97 555.54M532.97 555.54L532.97 596.22"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M511.3 380.15L510.57 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M510.57 377.23L508.62 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M508.62 375.29L505.71 374.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M505.71 374.56L503.01 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M503.01 375.29L501.06 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M501.06 377.23L500.33 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M500.33 380.15L501.06 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M501.06 382.82L503.01 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M503.01 384.79L505.71 385.52"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M505.71 385.52L508.62 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M508.62 384.79L510.57 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M510.57 382.82L511.3 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M495.22 380.15L494.49 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M494.49 377.23L492.52 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M492.52 375.29L489.61 374.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M489.61 374.56L486.93 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M486.93 375.29L484.99 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M484.99 377.23L484.26 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M484.26 380.15L484.99 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M484.99 382.82L486.93 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M486.93 384.79L489.61 385.52"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M489.61 385.52L492.52 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M492.52 384.79L494.49 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M494.49 382.82L495.22 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M500.33 380.15L501.06 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M501.06 377.23L503.01 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M503.01 375.29L505.71 374.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M505.71 374.56L508.62 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M508.62 375.29L510.57 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M510.57 377.23L511.3 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M511.3 380.15L510.57 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M510.57 382.82L508.62 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M508.62 384.79L505.71 385.52"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M505.71 385.52L503.01 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M503.01 384.79L501.06 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M501.06 382.82L500.33 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M484.26 380.15L484.99 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M484.99 377.23L486.93 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M486.93 375.29L489.61 374.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M489.61 374.56L492.52 375.29"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M492.52 375.29L494.49 377.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M494.49 377.23L495.22 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M495.22 380.15L494.49 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M494.49 382.82L492.52 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M492.52 384.79L489.61 385.52"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M489.61 385.52L486.93 384.79"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M486.93 384.79L484.99 382.82"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M484.99 382.82L484.26 380.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 359.19L370.25 400.5M370.25 400.5L370.25 359.19"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 400.5L532.97 400.5"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 400.5L532.97 359.19M532.97 359.19L532.97 400.5"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M509.69 429.81L394.67 429.81"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M394.67 429.81L394.67 489.88M394.67 489.88L394.67 429.81"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M394.67 489.88L509.69 489.88"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M509.69 489.88L509.69 429.81M509.69 429.81L509.69 489.88"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M515.6 413.47L389.02 413.47"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M389.02 413.47L389.02 419.35M389.02 419.35L389.02 413.47"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M389.02 419.35L515.6 419.35"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M515.6 419.35L515.6 413.47M515.6 413.47L515.6 419.35"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M389.02 419.35L389.02 413.47M389.02 413.47L389.02 419.35"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M389.02 413.47L515.6 413.47"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M515.6 413.47L515.6 419.35M515.6 419.35L515.6 413.47"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M515.6 419.35L389.02 419.35"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M394.67 489.88L394.67 429.81M394.67 429.81L394.67 489.88"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M394.67 429.81L509.69 429.81"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M509.69 429.81L509.69 489.88M509.69 489.88L509.69 429.81"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M509.69 489.88L394.67 489.88"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 400.5L370.25 400.5"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 400.5L370.25 424.56M370.25 424.56L370.25 400.5"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 424.56L370.25 489.9M370.25 489.9L370.25 424.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 489.9L370.25 516.53M370.25 516.53L370.25 489.9"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 516.53L532.97 516.53"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 516.53L532.97 400.5M532.97 400.5L532.97 516.53"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 518.23L370.25 518.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 518.23L370.25 554.32M370.25 554.32L370.25 518.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.25 554.32L532.97 554.32"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 554.32L532.97 518.23M532.97 518.23L532.97 554.32"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M618.66 555.54L537.29 555.54"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 555.54L537.29 596.22M537.29 596.22L537.29 555.54"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 596.22L618.66 596.22"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M618.66 596.22L618.66 555.54M618.66 555.54L618.66 596.22"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.06 520.59L590.65 520.59"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M590.65 520.59L564.75 520.59"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.75 520.59L564.75 523.02M564.75 523.02L564.75 520.59"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.75 523.02L592.06 523.02"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.06 523.02L592.06 520.59M592.06 520.59L592.06 523.02"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.06 520.59L592.06 523.02M592.06 523.02L592.06 520.59"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.06 523.02L564.75 523.02"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.75 523.02L564.75 520.59M564.75 520.59L564.75 523.02"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.75 520.59L592.06 520.59"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M618.66 489.9L537.29 489.9"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 489.9L537.29 555.54M537.29 555.54L537.29 489.9"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 555.54L618.66 555.54"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M618.66 555.54L618.66 489.9M618.66 489.9L618.66 555.54"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 454.76L590.8 454.76"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M590.8 454.76L564.9 454.76"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 454.76L564.9 457.19M564.9 457.19L564.9 454.76"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 457.19L592.18 457.19"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 457.19L592.18 454.76M592.18 454.76L592.18 457.19"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 454.76L592.18 457.19M592.18 457.19L592.18 454.76"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 457.19L564.9 457.19"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 457.19L564.9 454.76M564.9 454.76L564.9 457.19"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 454.76L592.18 454.76"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M618.66 424.56L537.29 424.56"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 424.56L537.29 489.9M537.29 489.9L537.29 424.56"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 489.9L618.66 489.9"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M618.66 489.9L618.66 424.56M618.66 424.56L618.66 489.9"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 389.25L590.8 389.25"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M590.8 389.25L564.9 389.25"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 389.25L564.9 391.7M564.9 391.7L564.9 389.25"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 391.7L592.18 391.7"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 391.7L592.18 389.25M592.18 389.25L592.18 391.7"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 389.25L592.18 389.25"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 389.25L592.18 391.7M592.18 391.7L592.18 389.25"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M592.18 391.7L564.9 391.7"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M564.9 391.7L564.9 389.25M564.9 389.25L564.9 391.7"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M618.66 359.19L537.29 359.19"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 359.19L537.29 424.56M537.29 424.56L537.29 359.19"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M537.29 424.56L618.66 424.56"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M618.66 424.56L618.66 359.19M618.66 359.19L618.66 424.56"
+  fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
+  <path d="M108.26 135.61L105.81 135.61"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M105.81 135.61L105.81 187.41M105.81 187.41L105.81 135.61"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M105.81 187.41L108.26 187.41"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M108.26 187.41L108.26 135.61M108.26 135.61L108.26 187.41"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M108.26 187.41L105.81 187.41"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M105.81 187.41L105.81 135.61M105.81 135.61L105.81 187.41"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M105.81 135.61L108.26 135.61"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M108.26 135.61L108.26 187.41M108.26 187.41L108.26 135.61"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M124.8 3.53L16.31 3.53"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M16.31 3.53L16.31 206.9M16.31 206.9L16.31 3.53"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M16.31 206.9L124.8 206.9"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M124.8 206.9L124.8 3.53M124.8 3.53L124.8 206.9"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M268.31 136.67L265.88 136.67"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M265.88 136.67L265.88 188.47M265.88 188.47L265.88 136.67"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M265.88 188.47L268.31 188.47"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M268.31 188.47L268.31 136.67M268.31 136.67L268.31 188.47"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M268.31 136.67L268.31 188.47M268.31 188.47L268.31 136.67"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M268.31 188.47L265.88 188.47"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M265.88 188.47L265.88 136.67M265.88 136.67L265.88 188.47"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M265.88 136.67L268.31 136.67"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M370.2 3.53L249.53 3.53"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M249.53 3.53L249.53 206.9M249.53 206.9L249.53 3.53"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M249.53 206.9L370.2 206.9"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M370.2 206.9L370.2 3.53M370.2 3.53L370.2 206.9"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M231.93 136.62L229.5 136.62"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M229.5 136.62L229.5 188.42M229.5 188.42L229.5 136.62"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M229.5 188.42L231.93 188.42"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M231.93 188.42L231.93 136.62M231.93 136.62L231.93 188.42"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M229.5 136.62L231.93 136.62"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M231.93 136.62L231.93 188.42M231.93 188.42L231.93 136.62"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M231.93 188.42L229.5 188.42"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M229.5 188.42L229.5 136.62M229.5 136.62L229.5 188.42"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M248.17 3.53L126.14 3.53"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M126.14 3.53L126.14 206.9M126.14 206.9L126.14 3.53"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M126.14 206.9L248.17 206.9"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M248.17 206.9L248.17 3.53M248.17 3.53L248.17 206.9"
+  fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
+  <path d="M534.11 206.9L371.42 206.9"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M371.42 206.9L371.42 217.75M371.42 217.75L371.42 206.9"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M371.42 217.75L534.11 217.75"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M534.11 217.75L534.11 206.9M534.11 206.9L534.11 217.75"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M521.28 135.65L518.85 135.65"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M518.85 135.65L518.85 187.45M518.85 187.45L518.85 135.65"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M518.85 187.45L521.28 187.45"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M521.28 187.45L521.28 135.65M521.28 135.65L521.28 187.45"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M518.85 135.65L521.28 135.65"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M521.28 135.65L521.28 187.45M521.28 187.45L521.28 135.65"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M521.28 187.45L518.85 187.45"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M518.85 187.45L518.85 135.65M518.85 135.65L518.85 187.45"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M534.11 3.53L371.42 3.53"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M371.42 3.53L371.42 206.9M371.42 206.9L371.42 3.53"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M371.42 206.9L534.11 206.9"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M534.11 206.9L534.11 3.53M534.11 3.53L534.11 206.9"
+  fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  <path d="M537.29 359.19L532.97 359.19"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 359.19L532.97 400.5M532.97 400.5L532.97 359.19"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 400.5L532.97 516.53M532.97 516.53L532.97 400.5"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 516.53L532.97 596.22M532.97 596.22L532.97 516.53"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M532.97 596.22L537.29 596.22"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M537.29 596.22L537.29 555.54M537.29 555.54L537.29 596.22"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M537.29 555.54L537.29 489.9M537.29 489.9L537.29 555.54"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M537.29 489.9L537.29 424.56M537.29 424.56L537.29 489.9"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M537.29 424.56L537.29 359.19M537.29 359.19L537.29 424.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 391.12L370.22 358.56M370.22 358.56L370.22 391.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 358.56L365.89 358.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M365.89 358.56L365.89 554.9M365.89 554.9L365.89 358.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M365.89 554.9L365.89 595.59M365.89 595.59L365.89 554.9"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M365.89 595.59L370.22 595.59"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 595.59L370.22 554.9M370.22 554.9L370.22 595.59"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 554.9L370.22 522.1M370.22 522.1L370.22 554.9"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 522.1L370.22 489.27M370.22 489.27L370.22 522.1"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 489.27L370.22 456.73M370.22 456.73L370.22 489.27"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 456.73L370.22 423.92M370.22 423.92L370.22 456.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M370.22 423.92L370.22 391.12M370.22 391.12L370.22 423.92"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M622.99 347.56L2.43 347.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M2.43 358.55L15.44 358.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M2.43 358.55L203.17 358.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M176.8 358.12L178.16 358.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M203.2 358.56L349.67 358.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M349.65 358.56L365.89 358.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M365.89 358.56L622.99 359.19"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.44 346.23L150.44 345.91M150.44 345.91L150.44 346.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.44 345.91L150.15 345.91"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.15 345.91L150.15 345.62M150.15 345.62L150.15 345.91"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.15 345.62L142.83 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 345.62L135.51 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 345.62L135.51 345.91M135.51 345.91L135.51 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 345.91L135.21 345.91"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.21 345.91L135.21 346.23M135.21 346.23L135.21 345.91"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.21 346.23L135.21 347.56M135.21 347.56L135.21 346.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.21 347.56L150.44 347.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.44 347.56L150.44 346.23M150.44 346.23L150.44 347.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.15 318.13L150.15 317.84M150.15 317.84L150.15 318.13"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.15 317.84L150.15 317.52M150.15 317.52L150.15 317.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.15 317.52L150.15 317.23M150.15 317.23L150.15 317.52"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.15 317.23L149.83 316.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M149.83 316.3L149.83 316.62M149.83 316.62L149.83 316.3"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M149.83 316.3L149.54 315.99"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M149.54 315.99L149.54 315.7M149.54 315.7L149.54 315.99"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M149.54 315.7L149.22 315.7"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M149.22 315.7L148.93 315.38"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M148.93 315.38L148.61 315.09"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M148.61 315.09L148.32 314.77"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M148.32 314.77L148.01 314.48"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M148.01 314.48L147.69 314.16"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.69 314.16L147.4 313.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.4 313.56L147.08 313.26"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 313.26L147.08 324.23M147.08 324.23L147.08 313.26"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 324.23L150.15 324.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M150.15 324.23L150.15 318.13M150.15 318.13L150.15 324.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 313.26L138.25 313.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.25 313.56L137.96 314.16"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M137.96 314.16L137.65 314.48"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M137.65 314.48L137.33 314.77"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M137.33 314.77L137.04 315.09"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M137.04 315.09L136.72 315.38"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M136.72 315.38L136.43 315.7"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M136.43 315.7L136.11 315.7"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M136.11 315.7L136.11 315.99M136.11 315.99L136.11 315.7"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M136.11 315.99L135.82 316.3"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.82 316.3L135.82 316.62M135.82 316.62L135.82 316.3"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.82 316.62L135.51 317.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 317.23L135.51 317.52M135.51 317.52L135.51 317.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 317.52L135.51 317.84M135.51 317.84L135.51 317.52"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 317.84L135.51 318.13M135.51 318.13L135.51 317.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 318.13L135.51 324.23M135.51 324.23L135.51 318.13"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M135.51 324.23L138.57 324.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 324.23L138.57 313.26M138.57 313.26L138.57 324.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.79 294.37L146.47 294.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 294.37L146.18 294.05"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 294.05L145.87 293.76"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.87 293.76L145.57 293.44"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.57 293.44L145.26 293.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.26 293.15L144.65 293.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.65 293.15L144.36 292.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.36 292.84L143.75 292.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.75 292.84L143.43 292.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.43 292.84L142.83 292.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 292.84L142.22 292.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.22 292.84L141.9 292.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.9 292.84L141.29 292.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.29 292.84L141 293.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141 293.15L140.39 293.15"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.39 293.15L140.08 293.44"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.08 293.44L139.79 293.76"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.79 293.76L139.47 294.05"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 294.05L139.18 294.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 294.37L138.86 294.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.86 294.37L138.57 294.98"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 294.98L138.57 295.27M138.57 295.27L138.57 294.98"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 295.27L138.57 295.58M138.57 295.58L138.57 295.27"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 295.58L138.57 297.72M138.57 297.72L138.57 295.58"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 297.72L138.86 297.72"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.86 297.72L139.18 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 297.41L139.47 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 297.41L140.08 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.08 297.12L140.69 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.69 297.12L141.29 296.8"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.29 296.8L142.22 296.8"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.22 296.8L142.83 296.8"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 296.8L143.43 296.8"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.43 296.8L144.36 296.8"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.36 296.8L144.97 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.97 297.12L145.57 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.57 297.12L146.18 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 297.41L146.47 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 297.41L146.79 297.72"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.79 297.72L147.08 297.72"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 297.72L147.08 295.58M147.08 295.58L147.08 297.72"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 295.58L147.08 295.27M147.08 295.27L147.08 295.58"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 295.27L147.08 294.98M147.08 294.98L147.08 295.27"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 294.98L146.79 294.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 297.72L146.18 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 297.41L145.87 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.87 297.41L145.57 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.57 297.41L145.26 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.26 297.12L144.97 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.97 297.12L144.36 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.36 297.12L144.04 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.04 297.12L143.75 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.75 297.12L143.14 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.14 297.12L142.83 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 297.12L142.51 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.51 297.12L141.9 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.9 297.12L141.61 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.61 297.12L141.29 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.29 297.12L140.69 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.69 297.12L140.39 297.12"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.39 297.12L140.08 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.08 297.41L139.79 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.79 297.41L139.47 297.41"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 297.41L139.18 297.72"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 297.72L139.18 298.02M139.18 298.02L139.18 297.72"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 298.02L139.18 298.94M139.18 298.94L139.18 298.02"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 298.94L139.47 298.94"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 298.94L139.47 299.84M139.47 299.84L139.47 298.94"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 299.84L139.79 299.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.79 299.84L140.08 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.08 299.55L140.39 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.39 299.55L140.69 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.69 299.55L141 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141 299.55L141.29 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.29 299.55L141.61 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.61 299.55L141.9 299.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.9 299.23L142.51 299.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.51 299.23L142.83 299.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 299.23L143.14 299.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.14 299.23L143.75 299.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.75 299.23L144.04 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.04 299.55L144.36 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.36 299.55L144.65 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.65 299.55L144.97 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.97 299.55L145.26 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.26 299.55L145.57 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.57 299.55L145.87 299.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.87 299.84L146.18 299.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 299.84L146.18 298.94M146.18 298.94L146.18 299.84"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 298.94L146.47 298.94"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 298.94L146.47 298.02M146.47 298.02L146.47 298.94"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 298.02L146.47 297.72M146.47 297.72L146.47 298.02"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 298.33L146.79 298.33"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.79 298.33L146.47 298.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 298.62L146.47 298.94M146.47 298.94L146.47 298.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 298.94L146.47 299.23M146.47 299.23L146.47 298.94"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 299.23L146.47 299.55M146.47 299.55L146.47 299.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.47 299.55L146.18 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 299.55L146.18 300.76M146.18 300.76L146.18 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M146.18 300.76L145.87 300.76"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.87 300.76L145.57 301.08"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M145.57 301.08L144.97 301.08"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.97 301.08L144.36 301.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M144.36 301.37L143.75 301.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.75 301.37L143.14 301.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M143.14 301.37L142.83 301.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 301.37L142.51 301.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.51 301.37L141.9 301.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.9 301.37L141.29 301.37"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M141.29 301.37L140.69 301.08"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.69 301.08L140.08 301.08"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M140.08 301.08L139.79 300.76"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.79 300.76L139.47 300.76"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 300.76L139.47 299.55M139.47 299.55L139.47 300.76"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.47 299.55L139.18 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 299.55L139.18 299.23M139.18 299.23L139.18 299.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 299.23L139.18 298.94M139.18 298.94L139.18 299.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 298.94L139.18 298.62M139.18 298.62L139.18 298.94"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M139.18 298.62L138.86 298.33"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.86 298.33L138.57 298.33"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 298.33L138.57 325.13M138.57 325.13L138.57 298.33"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M138.57 325.13L136.43 325.13"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M136.43 325.19L136.43 345.62M136.43 345.62L136.43 325.19"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M136.43 345.62L142.83 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M142.83 345.62L149.22 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M149.22 345.62L149.22 325.19M149.22 325.19L149.22 345.62"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M149.22 325.13L147.08 325.13"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M147.08 325.13L147.08 298.33M147.08 298.33L147.08 325.13"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M618.66 555.54L618.66 359.19M618.66 359.19L618.66 555.54"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M622.99 359.19L622.99 391.75M622.99 391.75L622.99 359.19"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.99 391.75L622.99 424.56M622.99 424.56L622.99 391.75"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.99 457.36L622.99 489.9M622.99 489.9L622.99 457.36"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.99 489.9L622.99 522.73M622.99 522.73L622.99 489.9"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.99 522.73L622.99 555.54M622.99 555.54L622.99 522.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.99 489.9L622.99 522.73M622.99 522.73L622.99 489.9"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.99 522.73L622.99 555.54M622.99 555.54L622.99 522.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M618.66 596.22L618.66 555.54M618.66 555.54L618.66 596.22"
+  fill="none" stroke="red" stroke-width="0.5"/>
+  <path d="M622.99 555.54L622.99 596.22M622.99 596.22L622.99 555.54"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.99 391.75L622.99 359.19M622.99 359.19L622.99 391.75"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M618.66 359.19L618.66 555.54M618.66 555.54L618.66 359.19"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M618.66 555.54L618.66 596.22M618.66 596.22L618.66 555.54"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M618.66 596.22L622.99 596.22"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M622.99 596.22L622.99 555.54M622.99 555.54L622.99 596.22"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M622.99 555.54L622.99 522.73M622.99 522.73L622.99 555.54"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M622.99 522.73L622.99 489.9M622.99 489.9L622.99 522.73"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M622.99 489.9L622.99 424.56M622.99 424.56L622.99 489.9"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M622.99 424.56L622.99 391.75M622.99 391.75L622.99 424.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M365.11 359.21L365.11 596.24M365.11 596.24L365.11 359.21"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M251.18 388.02L251.18 390.48M251.18 390.48L251.18 388.02"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M251.18 390.48L302.98 390.48"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M302.98 390.48L302.98 388.02M302.98 388.02L302.98 390.48"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M301.77 388.56L249.97 388.56"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M365.11 555.56L180.8 555.56"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M177.25 596.24L181.26 596.24"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M181.26 596.24L365.11 596.24"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M365.11 596.24L365.11 555.56M365.11 555.56L365.11 596.24"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M251.18 390.48L251.18 388.02M251.18 388.02L251.18 390.48"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M249.97 388.56L301.77 388.56"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M302.98 388.02L302.98 390.48M302.98 390.48L302.98 388.02"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M302.98 390.48L251.18 390.48"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M177.25 555.56L363.82 555.56"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M363.82 555.56L363.82 359.21M363.82 359.21L363.82 555.56"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M365.11 555.56L180.8 555.56"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M177.25 596.24L181.26 596.24"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M181.26 596.24L365.11 596.24"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M365.11 596.24L365.11 555.56M365.11 555.56L365.11 596.24"
+  fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
+  <path d="M365.11 555.56L365.11 596.24M365.11 596.24L365.11 555.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M177.25 596.24L177.25 555.56M177.25 555.56L177.25 596.24"
+  fill="none" stroke="RGB(127,0,31)" stroke-width="0.5"/>
+  <path d="M177.25 555.56L177.25 359.21M177.25 359.21L177.25 555.56"
+  fill="none" stroke="RGB(127,0,31)" stroke-width="0.5"/>
+  <path d="M645.3 263.36L642.89 263.36"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M642.89 263.36L642.89 314.73M642.89 314.73L642.89 263.36"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M642.89 314.73L645.3 314.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.3 314.73L645.3 263.36M645.3 263.36L645.3 314.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M647.91 164.53L645.5 164.53"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.5 164.53L645.5 215.91M645.5 215.91L645.5 164.53"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.5 215.91L647.91 215.91"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M647.91 215.91L647.91 164.53M647.91 164.53L647.91 215.91"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M642.89 314.73L642.89 263.36M642.89 263.36L642.89 314.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M642.89 263.36L645.3 263.36"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.3 263.36L645.3 314.73M645.3 314.73L645.3 263.36"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.3 314.73L642.89 314.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M797.74 241.39L622.91 241.39"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.91 241.39L622.91 596.47M622.91 596.47L622.91 241.39"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.91 596.47L795.06 596.47"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M795.06 596.47L797.74 596.47"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M797.74 596.47L797.74 241.39M797.74 241.39L797.74 596.47"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M642.89 263.36L645.3 263.36"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.3 263.36L645.3 314.73M645.3 314.73L645.3 263.36"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.3 314.73L642.89 314.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M642.89 314.73L642.89 263.36M642.89 263.36L642.89 314.73"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M797.74 241.39L622.91 241.39"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.91 241.39L622.91 596.47M622.91 596.47L622.91 241.39"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.91 596.47L795.06 596.47"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M795.06 596.47L797.74 596.47"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M797.74 596.47L797.74 241.39M797.74 241.39L797.74 596.47"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M647.91 164.53L645.5 164.53"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.5 164.53L645.5 215.91M645.5 215.91L645.5 164.53"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.5 215.91L647.91 215.91"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M647.91 215.91L647.91 164.53M647.91 164.53L647.91 215.91"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.5 164.53L647.91 164.53"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M647.91 164.53L647.91 215.91M647.91 215.91L647.91 164.53"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M647.91 215.91L645.5 215.91"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M645.5 215.91L645.5 164.53M645.5 164.53L645.5 215.91"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M797.74 131.08L797.1 126.93"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M797.1 126.93L795.18 123.17"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M795.18 123.17L792.2 120.19"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M792.2 120.19L788.43 118.27"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M788.43 118.27L784.29 117.63"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M784.29 117.63L636.35 117.63"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M636.35 117.63L632.17 118.27"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M632.17 118.27L628.44 120.19"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M628.44 120.19L625.47 123.17"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M625.47 123.17L623.55 126.93"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M623.55 126.93L622.91 131.08"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.91 131.08L622.91 238.68M622.91 238.68L622.91 131.08"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M622.91 238.68L797.74 238.68"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M797.74 238.68L797.74 131.08M797.74 131.08L797.74 238.68"
+  fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M2.43 358.55L2.43 554.47M2.43 554.47L2.43 358.55"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M2.33 553.65L2.33 594.53M2.33 594.53L2.33 553.65"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M2.43 347.56L2.43 358.55M2.43 358.55L2.43 347.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M276.98 346.92L32.37 346.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M32.37 346.23L32.35 347.56M32.35 347.56L32.37 346.23"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M276.98 346.92L276.98 347.58M276.98 347.58L276.98 346.92"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M529.52 346.92L377.3 346.93"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M529.51 346.92L529.51 347.57M529.51 347.57L529.51 346.92"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M622.99 347.56L622.99 359.19M622.99 359.19L622.99 347.56"
+  fill="none" stroke="springgreen" stroke-width="0.5"/>
+  <path d="M15.28 10.96L15.28 207.31M15.28 207.31L15.28 10.96"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M15.28 3.53L15.28 207.31M15.28 207.31L15.28 3.53"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M2.26 3.63L2.26 207.31M2.26 207.31L2.26 3.63"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M2.26 207.31L15.28 207.31M15.28 207.31L2.26 207.31"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  <path d="M2.26 3.63L15.28 3.63M15.28 3.63L2.26 3.63"
+  fill="none" stroke="RGB(0,255,191)" stroke-width="0.5"/>
+  </svg>
+        </div>
+       <div id="controls">
+          <!-- <h2>Konfigurator</h2> -->
+          <div id="price-summary">
+            <h3>Gesamtpreis</h3>
+            <p id="total-price-display" class="total-price-display">€0,00</p>
+          </div>
+          <ul id="combined-list"></ul>
+        </div>
+      </div>
+
+      <div id="selection-summary-container">
+        <h2>Deine ausgewählte Konfiguration</h2>
+        <ul id="selected-items-list"></ul>
+        <div class="price-summary-footer">
+          <h3>Gesamtpreis</h3>
+          <p class="total-price-display total-price-display-footer">€0,00</p>
+        </div>
+      </div>
+
+      <div style="width:100%;max-width:1400px;margin-top:16px;text-align:right;">
+        <button id="continue-to-order" class="btn-primary">Weiter zur Bestellung</button>
+      </div>
+      
+          <div id="order-section" class="hidden" style="width:100%;max-width:1400px;margin-top:24px;padding:24px;border:1px solid #ccc;border-radius:8px;background:#fff;box-shadow:0 4px 12px rgba(0,0,0,0.08);box-sizing:border-box;">
+      <h2 style="margin-top:0">Bestellung abschließen</h2>
+      <p style="margin-top:6px;color:#555">Gib deine Kontaktdaten ein. Wir senden dir eine Bestellbestätigung per E-Mail.</p>
+      
+      <form id="order-form" novalidate style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:14px;">
+        <div style="display:flex;flex-direction:column;gap:6px;"><label for="firstName">Vorname*</label><input id="firstName" name="firstName" type="text" required placeholder="Max" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;"><label for="lastName">Nachname*</label><input id="lastName" name="lastName" type="text" required placeholder="Mustermann" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;"><label for="email">E-Mail*</label><input id="email" name="email" type="email" required placeholder="max@example.com" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;"><label for="phone">Telefon*</label><input id="phone" name="phone" type="tel" required placeholder="+49 170 1234567" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1;"><label for="address1">Adresse (Straße, Nr.)*</label><input id="address1" name="address1" type="text" required placeholder="Musterstraße 1" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1;"><label for="address2">Adresszusatz (optional)</label><input id="address2" name="address2" type="text" placeholder="Wohnung, Firma, etc." /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;"><label for="postalCode">PLZ*</label><input id="postalCode" name="postalCode" type="text" required placeholder="10115" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;"><label for="city">Stadt*</label><input id="city" name="city" type="text" required placeholder="Berlin" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;"><label for="country">Land*</label><input id="country" name="country" type="text" required placeholder="Deutschland" /></div>
+        <div style="display:flex;flex-direction:column;gap:6px;grid-column:1 / -1;"><label for="notes">Anmerkungen (optional)</label><textarea id="notes" name="notes" rows="3" placeholder="Hinweise zur Lieferung, Wunschtermine, etc."></textarea></div>
+        
+        <div class="consent-row">
+          <input id="consent" name="consent" type="checkbox" required />
+          <label for="consent">Ich stimme der Verarbeitung meiner Daten zum Zweck der Bestellung zu.*</label>
+        </div>
+
+        <!-- PAYMENT SECTION -->
+        <div id="payment-methods" style="grid-column: 1 / -1; margin-top: 15px;">
+          <h3 style="margin-bottom: 15px; color: #333; font-weight: 500; text-align: left;">Zahlungsmethode auswählen*</h3>
+          <div class="payment-options-container">
+            <div class="payment-option" data-value="PayPal">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/a/a4/Paypal_2014_logo.png" alt="PayPal">
+            </div>
+            <div class="payment-option" data-value="Visa">
+              <img src="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20152%2047%22%3E%3Crect%20width%3D%22152%22%20height%3D%2247%22%20rx%3D%226%22%20fill%3D%22%231A1F71%22%2F%3E%3Ctext%20x%3D%2276%22%20y%3D%2236%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2230%22%20font-weight%3D%22900%22%20font-style%3D%22italic%22%20fill%3D%22white%22%20text-anchor%3D%22middle%22%3EVISA%3C%2Ftext%3E%3C%2Fsvg%3E" alt="Visa">
+            </div>
+            <div class="payment-option" data-value="Mastercard">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+            </div>
+            <div class="payment-option" data-value="Klarna">
+              <img src="https://x.klarnacdn.net/payment-method/assets/badges/generic/klarna.svg" alt="Klarna">
+            </div>
+          </div>
+
+        </div>
+        
+        <div style="display:flex;gap:10px;grid-column:1 / -1;flex-wrap:wrap;margin-top:8px;">
+          <button type="submit" id="submit-order" class="btn-success">Bestellbestätigung senden</button>
+          <span id="order-status" style="align-self:center;color:#555"></span>
+        </div>
+      </form>
+      <small style="display:block;margin-top:10px;color:#777;">Mit * gekennzeichnete Felder sind Pflichtfelder.</small>
+    </div>
+    
+    
+        <!-- NEW: Image Lightbox Modal -->
+    <div id="image-lightbox" class="overlay hidden" role="dialog" aria-modal="true">
+      <span id="close-lightbox" class="close-btn" title="Schließen">&times;</span>
+      <img id="lightbox-image" src="" alt="Vergrößerte Ansicht des Spülenschranks">
+    </div>
+
+    <!-- Third-party libs -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+    <!-- SCRIPT BLOCK 1: Handles the interactive kitchen UI -->
+<!-- SCRIPT BLOCK 1: Handles the interactive kitchen UI -->
+<!-- SCRIPT BLOCK 1: Handles the interactive kitchen UI -->
+<script>
+  // --- OVERLAY LOGIC ---
+  let selectedLanguage = 'en';
+  const instructionContent = {
+    en: {
+      title: 'Text instructions (English)',
+      languageLabel: 'English',
+      body: [
+        'Welcome to Fragmento by Architecto!',
+        '',
+        'We help you complete your kitchen in 4 easy and precise steps, with a 100% design and fit guarantee.',
+        '',
+        'How it works:',
+        '',
+        'Step 1: Scan the QR code. You can find it on a sticker on the cooktop.',
+        'Step 2: Enter your purchase contract number. You will find it on the inside of your sink cabinet.',
+        'Step 3: Choose the components you want to add.',
+        'Step 4: Enter your personal details and complete your order.',
+        '',
+        'Additionally, we offer:',
+        'Professional transport and installation.',
+        'Support with subsidy applications if needed.',
+        '',
+        'After your order, one of our AI voice agents calls you to confirm all details.',
+        '',
+        'Simple. Fast. Reliable.',
+        'Let us start!'
+      ].join('\n')
+    },
+    tr: {
+      title: 'Text instructions (Turkish)',
+      languageLabel: 'Turkish',
+      body: [
+        'Fragmento by Architecto ya hos geldiniz!',
+        '',
+        'Mutfaginizi 4 kolay ve net adimda tamamlamaniza yardimci oluyoruz.',
+        '',
+        'Nasil calisir:',
+        '',
+        'Adim 1: QR kodunu tara. Etiketi ocak ustunde bulabilirsin.',
+        'Adim 2: Satin alma sozlesme numarani gir. Evyenin alt dolabinin ic kismina bak.',
+        'Adim 3: Eklemek istedigin bilesenleri sec.',
+        'Adim 4: Kisisel bilgilerini gir ve siparisini tamamla.',
+        '',
+        'Ek olarak sunduklarimiz:',
+        'Profesyonel tasima ve montaj.',
+        'Gerekirse tesvik basvurularinda destek.',
+        '',
+        'Siparisinden sonra bir yapay zeka sesli asistanimiz seni arayarak ayrintilari onaylar.',
+        '',
+        'Basit. Hizli. Guvenilir.',
+        'Baslayalim!'
+      ].join('\n')
+    },
+    ru: {
+      title: 'Text instructions (Russian)',
+      languageLabel: 'Russian',
+      body: [
+        'Dobro pozhalovat v Fragmento by Architecto!',
+        '',
+        'My pomogaem dopolnit vashu kuhnyu za 4 prostyh i tochnyh shaga.',
+        '',
+        'Kak eto rabotaet:',
+        '',
+        'Shag 1: Otskaniruyte QR-kod. Nakleyka nahoditsya na varochnoj paneli.',
+        'Shag 2: Vvedite nomer dogovora pokupki. On ukazan na vnutrenney storone shkafa pod moykoy.',
+        'Shag 3: Vyberite komponenty, kotorye hotite dobavit.',
+        'Shag 4: Vvedite lichnye dannye i zavershite zakaz.',
+        '',
+        'Dopolnitelno my predlagaem:',
+        'Professionalnuyu dostavku i montazh.',
+        'Pomoshch pri podache zayavok na subsidii.',
+        '',
+        'Posle zakaza AI-golosovoy agent svyazhetsya s vami dlya podtverzhdeniya detaley.',
+        '',
+        'Prosto. Bystro. Nadezhno.',
+        'Nachinaem!'
+      ].join('\n')
+    },
+    fr: {
+      title: 'Text instructions (French)',
+      languageLabel: 'French',
+      body: [
+        'Bienvenue chez Fragmento by Architecto !',
+        '',
+        'Nous vous aidons a completer votre cuisine en 4 etapes simples et precises.',
+        '',
+        'Comment ca fonctionne :',
+        '',
+        'Etape 1 : Scannez le QR code. Vous le trouverez sur un autocollant de la plaque de cuisson.',
+        'Etape 2 : Saisissez votre numero de contrat d achat. Il se trouve a l interieur du meuble evier.',
+        'Etape 3 : Choisissez les composants a ajouter.',
+        'Etape 4 : Entrez vos informations personnelles et finalisez votre commande.',
+        '',
+        'Nous proposons aussi :',
+        'Transport et montage professionnels.',
+        'Aide pour les demandes de subventions.',
+        '',
+        'Apres votre commande, un agent vocal IA vous appelle pour confirmer les details.',
+        '',
+        'Simple. Rapide. Fiable.',
+        'C est parti !'
+      ].join('\n')
+    },
+    es: {
+      title: 'Text instructions (Spanish)',
+      languageLabel: 'Spanish',
+      body: [
+        'Bienvenido a Fragmento by Architecto!',
+        '',
+        'Te ayudamos a completar tu cocina en 4 pasos simples y precisos.',
+        '',
+        'Asi funciona:',
+        '',
+        'Paso 1: Escanea el codigo QR. Lo encontraras en una pegatina en la placa.',
+        'Paso 2: Introduce tu numero de contrato de compra. Esta en la parte interior del mueble del fregadero.',
+        'Paso 3: Elige los componentes que quieres agregar.',
+        'Paso 4: Ingresa tus datos personales y completa tu pedido.',
+        '',
+        'Ademas ofrecemos:',
+        'Transporte y montaje profesional.',
+        'Apoyo con tramites de subvenciones.',
+        '',
+        'Despues del pedido, un agente de voz con IA te llama para confirmar los detalles.',
+        '',
+        'Simple. Rapido. Confiable.',
+        'Empecemos!'
+      ].join('\n')
+    },
+    de: {
+      title: 'Textanweisungen (Deutsch)',
+      languageLabel: 'Deutsch',
+      body: [
+        'Willkommen bei Fragmento by Architecto!',
+        '',
+        'Wir helfen dir, deine Küche in nur 4 Schritten einfach und präzise zu kompletieren –',
+        'mit 100 % Garantie auf das gleiche Design, die gleiche Farbe und exakt passende Maße.',
+        '',
+        'So funktioniert es:',
+        'Schritt 1:',
+        'Scanne den QR-Code. Du findest Ihn an Aufkleber auf dem Kochfeld.',
+        'Schritt 2:',
+        'Gib deine Kaufvertragsnummer ein.',
+        'Du findest sie auf der Innenseite deines Spülenschrankes.',
+        'Schritt 3:',
+        'Wähle die Komponenten aus, die du hinzufügen möchtest.',
+        'Schritt 4:',
+        'Gib deine persönlichen Daten ein und schließe deine Bestellung ab.',
+        '',
+        'Zusätzlich bieten wir dir:',
+        'Professionellen Transport und Montage',
+        'Gerne unterstützen wir dich auch bei Fördermittel-Anträgen.',
+        '',
+        'Sobald deine Bestellung bei uns eingeht, melden wir uns bei dir zur Terminvereinbarung.',
+        '',
+        'Einfach. Schnell. Zuverlässig.',
+        'Los geht\'s! 🚀'
+      ].join('\n')
+    }
+  };
+
+  const languageOverlay = document.getElementById('language-overlay');
+  const instructionModeOverlay = document.getElementById('instruction-mode-overlay');
+  const textInstructionsOverlay = document.getElementById('text-instructions-overlay');
+  const avatarOverlay = document.getElementById('avatar-overlay');
+  const avatarVideo = document.getElementById('avatar-video');
+  const avatarContinueBtn = document.getElementById('avatar-continue');
+  const avatarLanguageStatus = document.getElementById('avatar-language-status');
+  const avatarVideoSource = document.getElementById('avatar-video-source');
+  const modeTextBtn = document.getElementById('mode-text-btn');
+  const modeAvatarBtn = document.getElementById('mode-avatar-btn');
+  const languageTitleEl = document.getElementById('language-title');
+  const backInstructionModeBtn = document.getElementById('back-instruction-mode');
+  const backTextInstructionsBtn = document.getElementById('back-text-instructions');
+  const backAvatarOverlayBtn = document.getElementById('back-avatar-overlay');
+  const backContractOverlayBtn = document.getElementById('back-contract-overlay');
+  const backWelcomeOverlayBtn = document.getElementById('back-welcome-overlay');
+  const instructionModeTitle = document.getElementById('instruction-mode-title');
+  const instructionModeDescription = document.getElementById('instruction-mode-description');
+  const instructionModeStatus = document.getElementById('instruction-mode-status');
+  const textInstructionsTitle = document.getElementById('text-instructions-title');
+  const textInstructionsBody = document.getElementById('text-instructions-body');
+  const textInstructionsContinueBtn = document.getElementById('text-instructions-continue');
+  const languageButtons = document.querySelectorAll('#language-overlay .language-option');
+  const contractOverlay = document.getElementById('contract-overlay');
+  const welcomeOverlay = document.getElementById('welcome-overlay');
+  const submitContractBtn = document.getElementById('submit-contract-number');
+  const contractTitleEl = document.getElementById('contract-title');
+  const contractHelperTextEl = document.getElementById('contract-helper-text');
+  const contractNumberLabelEl = document.getElementById('contract-number-label');
+  const contractInput = document.getElementById('contractNumber');
+  const contractError = document.getElementById('contract-error');
+  const startConfigBtn = document.getElementById('start-config');
+  const appBackBtn = document.getElementById('app-back-btn');
+  const appContent = document.getElementById('app-content');
+  let lastInstructionScreen = 'text';
+
+  languageOverlay?.classList.remove('hidden');
+  instructionModeOverlay?.classList.add('hidden');
+  textInstructionsOverlay?.classList.add('hidden');
+  avatarOverlay?.classList.add('hidden');
+  contractOverlay?.classList.add('hidden');
+  welcomeOverlay?.classList.add('hidden');
+  appContent?.classList.add('hidden');
+
+  const instructionModeTexts = {
+    en: {
+      title: 'How would you like instructions?',
+      description: 'Choose between:',
+      textButton: 'Text',
+      avatarButton: 'Video',
+      avatarUnavailable: 'Avatar is not available for this language. Please choose Text.'
+    },
+    tr: {
+      title: 'Talimatlari nasil almak istersiniz?',
+      description: 'Secim yap:',
+      textButton: 'Metin',
+      avatarButton: 'Video',
+      avatarUnavailable: 'Avatar bu dil için mevcut değil. Lütfen Metin seçin.'
+    },
+    ru: {
+      title: 'Kak vy hotite poluchat instrukcii?',
+      description: 'Vyberite variant:',
+      textButton: 'Tekst',
+      avatarButton: 'Video',
+      avatarUnavailable: 'Avatar nedostupen dlya etogo yazyka. Pozhaluysta, vyberite tekst.'
+    },
+    fr: {
+      title: 'Comment souhaitez-vous recevoir les instructions ?',
+      description: 'Choisissez :',
+      textButton: 'Texte',
+      avatarButton: 'Video',
+      avatarUnavailable: 'L avatar n est pas disponible pour cette langue. Veuillez choisir Texte.'
+    },
+    es: {
+      title: 'Como quieres recibir las instrucciones?',
+      description: 'Elige entre:',
+      textButton: 'Texto',
+      avatarButton: 'Video',
+      avatarUnavailable: 'El avatar no está disponible para este idioma. Elige Texto.'
+    },
+    de: {
+      title: 'Wie möchtest du die Anweisungen erhalten?',
+      description: 'Wähle zwischen:',
+      textButton: 'Text',
+      avatarButton: 'Video',
+      avatarUnavailable: 'Der Avatar ist für diese Sprache nicht verfügbar. Bitte wähle Text.'
+    }
+  };
+
+  const contractTexts = {
+    en: {
+      title: 'Kitchen contract number',
+      helper: 'Enter your purchase contract number.\nYou can find it on the inside of your sink cabinet.',
+      label: 'Please enter your contract number:*',
+      error: 'Contract number is required.'
+    },
+    tr: {
+      title: 'Mutfak sozlesme numarasi',
+      helper: 'Satin alma sozlesme numarani gir.\nEvye dolabinin ic kisminda bulabilirsin.',
+      label: 'Lutfen sozlesme numarani gir:*',
+      error: 'Sozlesme numarasi gerekli.'
+    },
+    ru: {
+      title: 'Nomer dogovora kuhni',
+      helper: 'Vvedite nomer dogovora pokupki.\nVy naidete ego na vnutrenney storone shkafa pod moykoy.',
+      label: 'Pozhaluysta, vvedite nomer dogovora:*',
+      error: 'Trebuetsya nomer dogovora.'
+    },
+    fr: {
+      title: 'Numero de contrat de cuisine',
+      helper: 'Saisissez votre numero de contrat d achat.\nIl se trouve a l interieur du meuble evier.',
+      label: 'Veuillez saisir votre numero de contrat :*',
+      error: 'Le numero de contrat est requis.'
+    },
+    es: {
+      title: 'Numero de contrato de cocina',
+      helper: 'Introduce tu numero de contrato de compra.\nLo encuentras en la parte interior del mueble del fregadero.',
+      label: 'Introduce tu numero de contrato:*',
+      error: 'El numero de contrato es obligatorio.'
+    },
+    de: {
+      title: 'Küchenvertragsnummer',
+      helper: 'Gib deine Kaufvertragsnummer ein.\nDu findest sie auf der Innenseite deines Spülenschrankes.',
+      label: 'Bitte gib deine Vertragsnummer ein:*',
+      error: 'Die Vertragsnummer ist erforderlich.'
+    }
+  };
+
+  const actionTexts = {
+    en: { back: 'Back', continue: 'Continue', confirm: 'Confirm' },
+    tr: { back: 'Geri', continue: 'Devam', confirm: 'Onayla' },
+    ru: { back: 'Nazad', continue: 'Prodolzhit', confirm: 'Podtverdit' },
+    fr: { back: 'Retour', continue: 'Continuer', confirm: 'Confirmer' },
+    es: { back: 'Atras', continue: 'Continuar', confirm: 'Confirmar' },
+    de: { back: 'Zurück', continue: 'Weiter', confirm: 'Bestätigen' }
+  };
+
+  function applyLocalizedActionTexts() {
+    const actions = actionTexts[selectedLanguage] || actionTexts.en;
+    [
+      backInstructionModeBtn,
+      backTextInstructionsBtn,
+      backAvatarOverlayBtn,
+      backContractOverlayBtn,
+      backWelcomeOverlayBtn,
+      appBackBtn
+    ].forEach((btn) => {
+      if (btn) btn.textContent = actions.back;
+    });
+    if (textInstructionsContinueBtn) textInstructionsContinueBtn.textContent = actions.continue;
+    if (avatarContinueBtn) avatarContinueBtn.textContent = actions.continue;
+    if (startConfigBtn) startConfigBtn.textContent = actions.continue;
+    if (submitContractBtn) submitContractBtn.textContent = actions.confirm;
+  }
+
+  function applyLocalizedStaticTexts() {
+    const contractText = contractTexts[selectedLanguage] || contractTexts.en;
+    if (languageTitleEl) languageTitleEl.textContent = 'Wähle deine Sprache';
+    if (contractTitleEl) contractTitleEl.textContent = contractText.title;
+    if (contractHelperTextEl) contractHelperTextEl.textContent = contractText.helper;
+    if (contractNumberLabelEl) contractNumberLabelEl.textContent = contractText.label;
+    if (contractError) contractError.textContent = contractText.error;
+  }
+
+  function getInstructionContent() {
+    return instructionContent[selectedLanguage] || instructionContent.en;
+  }
+
+  function updateTextInstructionsContent() {
+    const content = getInstructionContent();
+    if (textInstructionsTitle) {
+      textInstructionsTitle.textContent = content.title;
+    }
+    if (textInstructionsBody) {
+      const escapeHtml = (value) => value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+
+      const lines = (content.body || '').split('\n');
+      let inStepBlock = false;
+      const html = lines.map((rawLine) => {
+        const line = rawLine || '';
+        const trimmed = line.trim();
+        if (!trimmed) {
+          inStepBlock = false;
+          return '';
+        }
+        if (/^Schritt\s*\d+:/i.test(trimmed)) {
+          inStepBlock = true;
+          return `<span class="step-title">${escapeHtml(trimmed)}</span>`;
+        }
+        if (inStepBlock) {
+          return `<span class="step-detail">${escapeHtml(trimmed)}</span>`;
+        }
+        return escapeHtml(trimmed);
+      }).join('<br>');
+
+      textInstructionsBody.innerHTML = html;
+    }
+  }
+
+  applyLocalizedStaticTexts();
+  applyLocalizedActionTexts();
+
+  function openInstructionModeOverlay() {
+    const modeText = instructionModeTexts[selectedLanguage] || instructionModeTexts.en;
+    applyLocalizedStaticTexts();
+    applyLocalizedActionTexts();
+    if (instructionModeTitle) instructionModeTitle.textContent = modeText.title;
+    if (instructionModeDescription) instructionModeDescription.textContent = modeText.description;
+    if (modeTextBtn) modeTextBtn.textContent = modeText.textButton;
+    if (modeAvatarBtn) modeAvatarBtn.textContent = modeText.avatarButton;
+    languageOverlay?.classList.add('hidden');
+    instructionModeOverlay?.classList.remove('hidden');
+  }
+
+  function openContractOverlay() {
+    instructionModeOverlay?.classList.add('hidden');
+    textInstructionsOverlay?.classList.add('hidden');
+    avatarOverlay?.classList.add('hidden');
+    contractOverlay?.classList.remove('hidden');
+  }
+
+  function openAvatarOverlay() {
+    lastInstructionScreen = 'avatar';
+    instructionModeStatus.textContent = '';
+    instructionModeOverlay?.classList.add('hidden');
+    avatarOverlay?.classList.remove('hidden');
+    if (avatarVideo) {
+      const avatarSources = {
+        en: 'AVATAR/en-avatar.mp4',
+        tr: 'AVATAR/tr-avatar.mp4',
+        de: 'AVATAR/de-avatar.mp4',
+        es: 'AVATAR/es-avatar.mp4',
+        ru: 'AVATAR/ru-avatar.mp4',
+        fr: 'AVATAR/fr-avatar.mp4'
+      };
+      const avatarSrc = avatarSources[selectedLanguage] || avatarSources.en;
+      if (avatarVideoSource) {
+        if (avatarVideoSource.getAttribute('src') !== avatarSrc) {
+          avatarVideoSource.setAttribute('src', avatarSrc);
+          avatarVideo.load();
+        }
+      } else if (avatarVideo.getAttribute('src') !== avatarSrc) {
+        avatarVideo.setAttribute('src', avatarSrc);
+        avatarVideo.load();
+      }
+      avatarVideo.defaultMuted = false;
+      avatarVideo.muted = false;
+      avatarVideo.volume = 1;
+      avatarVideo.currentTime = 0;
+      const playPromise = avatarVideo.play();
+      if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(() => {});
+      }
+    }
+  }
+
+  function openTextInstructionsOverlay() {
+    lastInstructionScreen = 'text';
+    instructionModeStatus.textContent = '';
+    instructionModeOverlay?.classList.add('hidden');
+    textInstructionsOverlay?.classList.remove('hidden');
+    updateTextInstructionsContent();
+  }
+
+  languageButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedLanguage = button.dataset.lang || 'en';
+      avatarLanguageStatus.textContent = '';
+      instructionModeStatus.textContent = '';
+      applyLocalizedStaticTexts();
+      applyLocalizedActionTexts();
+      openInstructionModeOverlay();
+    });
+  });
+
+  modeTextBtn?.addEventListener('click', () => {
+    openTextInstructionsOverlay();
+  });
+
+  modeAvatarBtn?.addEventListener('click', () => {
+    if (['en', 'tr', 'de', 'es', 'ru', 'fr'].includes(selectedLanguage)) {
+      openAvatarOverlay();
+    } else {
+      const modeText = instructionModeTexts[selectedLanguage] || instructionModeTexts.en;
+      instructionModeStatus.textContent = modeText.avatarUnavailable;
+    }
+  });
+
+  textInstructionsContinueBtn?.addEventListener('click', () => {
+    openContractOverlay();
+  });
+
+  avatarContinueBtn?.addEventListener('click', () => {
+    if (avatarVideo) {
+      avatarVideo.pause();
+      avatarVideo.currentTime = 0;
+    }
+    openContractOverlay();
+  });
+
+  backInstructionModeBtn?.addEventListener('click', () => {
+    instructionModeOverlay?.classList.add('hidden');
+    languageOverlay?.classList.remove('hidden');
+  });
+
+  backTextInstructionsBtn?.addEventListener('click', () => {
+    textInstructionsOverlay?.classList.add('hidden');
+    instructionModeOverlay?.classList.remove('hidden');
+  });
+
+  backAvatarOverlayBtn?.addEventListener('click', () => {
+    if (avatarVideo) {
+      avatarVideo.pause();
+      avatarVideo.currentTime = 0;
+    }
+    avatarOverlay?.classList.add('hidden');
+    instructionModeOverlay?.classList.remove('hidden');
+  });
+
+  backContractOverlayBtn?.addEventListener('click', () => {
+    contractOverlay?.classList.add('hidden');
+    if (lastInstructionScreen === 'avatar') {
+      openAvatarOverlay();
+      return;
+    }
+    openTextInstructionsOverlay();
+  });
+
+  backWelcomeOverlayBtn?.addEventListener('click', () => {
+    welcomeOverlay?.classList.add('hidden');
+    contractOverlay?.classList.remove('hidden');
+  });
+
+  avatarVideo?.addEventListener('error', () => {
+    if (avatarLanguageStatus) {
+      avatarLanguageStatus.textContent = 'Avatar video failed to load. Check that the video path matches the deployed folder name.';
+    }
+  });
+
+  function submitContractNumber() {
+    if (contractInput.value.trim() === '') {
+      contractError.style.display = 'block';
+    } else {
+      contractError.style.display = 'none';
+      contractOverlay?.classList.add('hidden');
+      welcomeOverlay?.classList.add('hidden');
+      appContent?.classList.remove('hidden');
+    }
+  }
+
+  submitContractBtn?.addEventListener('click', submitContractNumber);
+
+  contractInput?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      submitContractNumber();
+    }
+  });
+
+  appBackBtn?.addEventListener('click', () => {
+    appContent?.classList.add('hidden');
+    contractOverlay?.classList.remove('hidden');
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const svg = document.querySelector("#kitchen-svg-wrapper svg");
+    const combinedList = document.getElementById("combined-list");
+    
+    const updateAll = () => {
+        if (window.updateTotalPriceAndSummary) {
+            window.updateTotalPriceAndSummary();
+        }
+    };
+
+    if (!svg) {
+        console.error("SVG element for kitchen interaction not found! Visual toggling will be disabled.");
+    }
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const drawableSelectors = "path,line,polyline,polygon,rect,circle,ellipse";
+
+    function rgbToHex(rgb) {
+        const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+        if (!match) return rgb;
+        const toHex = (c) => ('0' + parseInt(c).toString(16)).slice(-2);
+        return `#${toHex(match[1])}${toHex(match[2])}${toHex(match[3])}`;
+    }
+    
+    function extractStroke(el) {
+        let s = el.getAttribute("stroke");
+        if (s && s.trim()) {
+            const color = s.trim().toLowerCase();
+            if (color.startsWith('rgb')) return rgbToHex(color);
+            return color;
+        }
+        return null;
+    }
+
+    const icons = {
+        dishwasher: `<img src="img/foto3.png" alt="Spülmaschine">`,
+        refrigerator: `<img src="img/foto6.png" alt="Kühlschrank">`,
+        base_cabinet_30: `<img src="img/foto1.png" alt="Unterschrank 30cm">`,
+        wall_cabinet_l: `<img src="img/foto4.png" alt="Oberschrank links">`,
+        wall_cabinet_r: `<img src="img/foto2.png" alt="Oberschrank rechts">`,
+        extractor_hood: `<img src="img/foto5.png" alt="Dunstabzugshaube">`,
+        delivery_assembly: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>`,
+       pickup: `<img src="img/warehouse.png" alt="Abholung im Lager">`,
+        waste_system: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>`,
+        cutlery_insert: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="4" height="18" rx="1"/><rect x="8" y="3" width="8" height="4" rx="1"/><rect x="8" y="8" width="3" height="3" rx="1"/><rect x="12" y="8" width="4" height="3" rx="1"/><rect x="8.5" y="12" width="3" height="9" rx="1"/><rect x="12.5" y="12" width="3" height="9" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>`,
+        lighting_set: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>`,
+    };
+    
+    function getComponentData(color) {
+        const dataMap = {
+            "#001f7f": { name: "Spülmaschine", icon: icons.dishwasher, price: 579, infoText: "Amica by architecto" },
+            "black": { name: "Kühlschrank", icon: icons.refrigerator, price: 579, infoText: "Amica by architecto" },
+            "#ffbf00": { name: "Unterschrank 30cm", icon: icons.base_cabinet_30, price: 175 },
+            "#00ffbf": { name: "Oberschrank (links)", icon: icons.wall_cabinet_l, price: 115 },
+            "#394c00": { name: "Oberschrank (rechts)", icon: icons.wall_cabinet_r, price: 115 },
+            "#ff7f9f": { name: "Dunstabzugshaube", icon: icons.extractor_hood, price: 349, infoText: "Amica by architecto"},
+        };
+        return dataMap[color?.toLowerCase()] || null;
+    }
+    
+    const groupsByColor = new Map();
+    svg?.querySelectorAll(drawableSelectors).forEach(el => {
+        const color = extractStroke(el);
+        if (color) {
+            if (!groupsByColor.has(color)) groupsByColor.set(color, []);
+            groupsByColor.get(color).push(el);
+        }
+    });
+    
+    const lockedColors = ["springgreen", "red", "#7f001f", "#980026"];
+    const lockedComponentIds = lockedColors.map(color => "component-" + color.replace(/[^a-z0-9#]/gi, '').toLowerCase());
+
+    groupsByColor.forEach((elemArray, color) => {
+        const componentId = "component-" + color.replace(/[^a-z0-9#]/gi, '').toLowerCase();
+        const componentData = getComponentData(color);
+
+        const g = document.createElementNS(svgNS, 'g');
+        g.classList.add('kitchen-component');
+        g.dataset.componentId = componentId;
+        if (componentData?.price) {
+            g.dataset.price = componentData.price;
+        }
+
+        const parent = elemArray[0].parentNode;
+        if (parent) {
+            parent.insertBefore(g, elemArray[0]);
+            elemArray.forEach(el => g.appendChild(el));
+        }
+
+        if (lockedComponentIds.includes(componentId)) {
+            g.classList.add('is-locked', 'selected');
+        }
+
+        if (componentData) {
+            const li = document.createElement('li');
+            li.className = 'component-item';
+            li.dataset.targetId = componentId;
+            if (componentData.infoText) {
+                li.classList.add('has-info');
+                li.dataset.hasInfo = 'true';
+            }
+            const infoMarkup = componentData.infoText ? `
+                <button type="button" class="component-info-trigger" aria-label="Info zu ${componentData.name}" aria-expanded="false">i</button>
+                <div class="component-info-tooltip">${componentData.infoText}</div>` : '';
+            li.innerHTML = `
+                <span class="selection-indicator"></span>
+                <span class="component-icon">${componentData.icon || ''}</span>
+                <span class="component-name-wrap">
+                    <span class="component-name">${componentData.name}</span>
+                    ${infoMarkup}
+                </span>
+                <span class="component-price">${formatCurrency(componentData.price)}</span>`;
+            combinedList.appendChild(li);
+        }
+    });
+
+    const accessories = [
+        { id: 'acc-waste', name: 'Mülltrennsystem', price: 89, icon: icons.waste_system },
+        { id: 'acc-cutlery', name: 'Besteckeinsatz 30cm', price: 19, icon: icons.cutlery_insert },
+        { id: 'acc-lighting', name: 'Beleuchtungsset 3 LED-Spots', price: 69, icon: icons.lighting_set },
+    ];
+    const services = [
+        { id: 'service-montage', name: 'Lieferung, Vertragen, Montage und Anschluss', price: 349, icon: icons.delivery_assembly },
+        { id: 'service-pickup', name: 'Abholung an Logistikstandort', price: 0, icon: icons.pickup }
+    ];
+
+    const createAccessoryListItem = (item) => {
+         const li = document.createElement('li');
+        li.className = 'accessory-item';
+        li.dataset.price = item.price;
+        li.id = item.id;
+        li.innerHTML = `
+            <span class="selection-indicator"></span>
+            <div class="accessory-icon">${item.icon}</div>
+            <div class="accessory-details">
+                <span class="accessory-name">${item.name}</span>
+                <span class="accessory-price">${formatCurrency(item.price)}</span>
+            </div>`;
+        return li;
+    };
+
+    const accessoryDivider = document.createElement('div');
+    accessoryDivider.className = 'list-divider';
+    accessoryDivider.innerHTML = '<h3>Zubehör</h3>';
+    combinedList.appendChild(accessoryDivider);
+    accessories.forEach(acc => combinedList.appendChild(createAccessoryListItem(acc)));
+
+    const serviceDivider = document.createElement('div');
+    serviceDivider.className = 'list-divider';
+    serviceDivider.innerHTML = '<h3>Dienstleistungen hinzufügen</h3>';
+    combinedList.appendChild(serviceDivider);
+    services.forEach(service => combinedList.appendChild(createAccessoryListItem(service)));
+    
+    // --- HELPER FUNCTIONS FOR VALIDATION ---
+
+    function areMontageConditionsMet() {
+        const selectedComponents = document.querySelectorAll('#combined-list .component-item.selected');
+        const cabinetNames = ["Unterschrank 30cm", "Oberschrank (links)", "Oberschrank (rechts)"];
+        let cabinetCount = 0;
+        selectedComponents.forEach(comp => {
+            const name = comp.querySelector('.component-name').textContent.trim();
+            if (cabinetNames.includes(name)) {
+                cabinetCount++;
+            }
+        });
+        return selectedComponents.length >= 3 && cabinetCount >= 2;
+    }
+    
+    function areAnyItemsSelected() {
+        const selectedComponents = document.querySelectorAll('#combined-list .component-item.selected');
+        const selectedAccessories = document.querySelectorAll('#combined-list .accessory-item[id^="acc-"].selected');
+        return selectedComponents.length > 0 || selectedAccessories.length > 0;
+    }
+
+    function checkAndSyncMontageService() {
+        const montageServiceItem = document.getElementById('service-montage');
+        if (!montageServiceItem || !montageServiceItem.classList.contains('selected')) {
+            return;
+        }
+        if (!areMontageConditionsMet()) {
+            montageServiceItem.classList.remove('selected');
+            // MODIFIED: Replaced alert with showMessage
+            window.showMessage('Die Montage-Dienstleistung wurde automatisch entfernt.');
+        }
+    }
+    
+    function checkAndSyncPickupService() {
+        const pickupServiceItem = document.getElementById('service-pickup');
+        if (!pickupServiceItem || !pickupServiceItem.classList.contains('selected')) {
+            return;
+        }
+        if (!areAnyItemsSelected()) {
+            pickupServiceItem.classList.remove('selected');
+            // MODIFIED: Replaced alert with showMessage
+            window.showMessage('Die Abholung wurde automatisch entfernt.');
+        }
+    }
+
+    function toggleSelection(componentId) {
+        if (lockedComponentIds.includes(componentId)) return;
+        const listItem = combinedList.querySelector(`[data-target-id="${componentId}"]`);
+        const svgGroup = svg?.querySelector(`[data-component-id="${componentId}"]`);
+        if (listItem) {
+            listItem.classList.toggle('selected');
+            svgGroup?.classList.toggle('selected');
+            
+            checkAndSyncMontageService();
+            checkAndSyncPickupService();
+            
+            updateAll();
+        }
+    }
+
+    function closeAllComponentInfoTooltips() {
+        combinedList.querySelectorAll('.component-item.is-info-open').forEach((li) => {
+            li.classList.remove('is-info-open');
+            const trigger = li.querySelector('.component-info-trigger');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        });
+    }
+    
+    combinedList.addEventListener('click', (e) => {
+        const infoTrigger = e.target.closest('.component-info-trigger');
+        if (infoTrigger) {
+            e.preventDefault();
+            e.stopPropagation();
+            const hostItem = infoTrigger.closest('.component-item');
+            const willOpen = !hostItem.classList.contains('is-info-open');
+            closeAllComponentInfoTooltips();
+            if (willOpen) {
+                hostItem.classList.add('is-info-open');
+                infoTrigger.setAttribute('aria-expanded', 'true');
+            }
+            return;
+        }
+
+        const item = e.target.closest('.accessory-item, .component-item');
+        if (!item) return;
+
+        if (item.classList.contains('component-item')) {
+            const targetId = item.dataset.targetId;
+            if (!lockedComponentIds.includes(targetId)) {
+                toggleSelection(targetId);
+            }
+            return;
+        }
+        
+        if (item.classList.contains('accessory-item')) {
+            const isCurrentlySelected = item.classList.contains('selected');
+
+            if (item.id === 'service-montage' && !isCurrentlySelected) {
+                if (!areMontageConditionsMet()) {
+                    // MODIFIED: Replaced alert with showMessage
+                    window.showMessage("Für die Montage sind mindestens 3 Artikel (davon 2 Schränke) erforderlich.", 'error');
+                    return;
+                }
+            }
+            
+            if (item.id === 'service-pickup' && !isCurrentlySelected) {
+                if (!areAnyItemsSelected()) {
+                    // MODIFIED: Replaced alert with showMessage
+                    window.showMessage("Bitte wähle zuerst einen Artikel für die Abholung aus.", 'error');
+                    return;
+                }
+            }
+
+            item.classList.toggle('selected');
+
+            if (item.classList.contains('selected')) {
+                if (item.id === 'service-montage') {
+                    document.getElementById('service-pickup')?.classList.remove('selected');
+                } else if (item.id === 'service-pickup') {
+                    document.getElementById('service-montage')?.classList.remove('selected');
+                }
+            }
+
+            if (item.id.startsWith('acc-')) {
+                 checkAndSyncMontageService();
+                 checkAndSyncPickupService();
+            }
+            
+            updateAll();
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.component-name-wrap')) {
+            closeAllComponentInfoTooltips();
+        }
+    });
+    
+    svg?.querySelectorAll('.kitchen-component:not(.is-locked)').forEach(g => {
+        g.addEventListener('click', () => toggleSelection(g.dataset.componentId));
+    });
+
+    const continueBtn = document.getElementById('continue-to-order');
+    const orderSection = document.getElementById('order-section');
+    continueBtn?.addEventListener('click', () => {
+        orderSection?.classList.remove('hidden');
+        orderSection?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+</script><!-- SCRIPT BLOCK 2: Order, PDF, and Email Logic -->
+<script>
+  // This function is now globally available to be used by the first script block
+  // and formats prices without decimals if they are whole numbers.
+  function formatCurrency(num) {
+      const hasFraction = num % 1 !== 0;
+      const options = {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits: hasFraction ? 2 : 0,
+          maximumFractionDigits: 2
+      };
+      return new Intl.NumberFormat('de-DE', options).format(num);
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+
+    /// *** The showMessage function is defined here and attached to the window ***
+    window.showMessage = function(msg, type = 'info') {
+      const box = document.createElement('div');
+      box.textContent = msg;
+      Object.assign(box.style, {
+        position: 'fixed',
+        // --- MODIFIED for Centering & Responsiveness ---
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)', // This perfectly centers the element
+        width: '850px',                      // This is the desired width on large screens
+        maxWidth: 'calc(100vw - 40px)',      // This ensures it shrinks on mobile with 20px margins
+        // --- End of Modifications ---
+        background: '#fff',
+        color: '#333',
+        border: '1px solid #ccc',
+        padding: '60px 80px',      
+        borderRadius: '20px',      
+        boxShadow: '0 15px 40px rgba(0,0,0,0.25)', 
+        fontSize: '32px',          
+        boxSizing: 'border-box',
+        textAlign: 'center',
+        zIndex: '10001',
+        transition: 'opacity 0.3s ease-out, transform 0.3s ease-out' // Added transform to transition
+      });
+
+      if (type === 'error') {
+          box.style.backgroundColor = '#f8d7da';
+          box.style.color = '#721c24';
+          box.style.borderColor = '#f5c6cb';
+      } else if (type === 'success') {
+          box.style.backgroundColor = '#d4edda';
+          box.style.color = '#155724';
+          box.style.borderColor = '#c3e6cb';
+      }
+
+      document.body.appendChild(box);
+      setTimeout(() => {
+          box.style.opacity = '0';
+          box.style.transform = 'translate(-50%, -60%)'; // Animate it upwards on exit
+          setTimeout(() => box.remove(), 300); // Remove after fade out
+      }, 3000); // Disappears after 3 seconds
+    }
+
+
+    const form = document.getElementById('order-form');
+    const statusEl = document.getElementById('order-status');
+    const submitBtn = document.getElementById('submit-order');
+
+    function parsePrice(text) { return parseFloat((text || '').toString().replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0; }
+    
+    function getSelections() {
+        const components = Array.from(document.querySelectorAll('#combined-list .component-item.selected')).map(li => ({
+            name: li.querySelector('.component-name')?.textContent?.trim(),
+            price: parsePrice(li.querySelector('.component-price')?.textContent)
+        }));
+        const accessories = Array.from(document.querySelectorAll('#combined-list .accessory-item[id^="acc-"].selected')).map(li => ({
+            name: li.querySelector('.accessory-name')?.textContent?.trim(),
+            price: parsePrice(li.dataset.price)
+        }));
+        const services = Array.from(document.querySelectorAll('#combined-list .accessory-item[id^="service-"].selected')).map(li => ({
+            name: li.querySelector('.accessory-name')?.textContent?.trim(),
+            price: parsePrice(li.dataset.price)
+        }));
+        const total = [...components, ...accessories, ...services].reduce((s, i) => s + i.price, 0);
+        return { components, accessories, services, total };
+    }
+    
+    window.updateTotalPriceAndSummary = function() {
+        const selections = getSelections();
+        document.querySelectorAll(".total-price-display").forEach(d => { d.textContent = formatCurrency(selections.total); });
+        
+        const summaryList = document.getElementById("selected-items-list");
+        summaryList.innerHTML = '';
+        const frag = document.createDocumentFragment();
+
+        if (selections.components.length > 0) {
+            const header = document.createElement('li');
+            header.className = 'summary-header'; header.textContent = 'Ausgewählte Komponenten';
+            frag.appendChild(header);
+            selections.components.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="item-name">${item.name}</span><span class="item-price">${formatCurrency(item.price)}</span>`;
+                frag.appendChild(li);
+            });
+        }
+        if (selections.accessories.length > 0) {
+            const header = document.createElement('li');
+            header.className = 'summary-header'; header.textContent = 'Ausgewähltes Zubehör';
+            frag.appendChild(header);
+            selections.accessories.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="item-name">${item.name}</span><span class="item-price">${formatCurrency(item.price)}</span>`;
+                frag.appendChild(li);
+            });
+        }
+        if (selections.services.length > 0) {
+            const header = document.createElement('li');
+            header.className = 'summary-header'; header.textContent = 'Ausgewählte Dienstleistungen';
+            frag.appendChild(header);
+            selections.services.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `<span class="item-name">${item.name}</span><span class="item-price">${formatCurrency(item.price)}</span>`;
+                frag.appendChild(li);
+            });
+        }
+        summaryList.appendChild(frag);
+    }
+    
+    if(document.getElementById("selected-items-list")){
+       window.updateTotalPriceAndSummary();
+    }
+   
+    document.querySelectorAll('.payment-option').forEach(option => {
+        option.addEventListener('click', () => {
+            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+            option.classList.add('selected');
+        });
+    });
+
+    function collectCustomer() {
+      const get = id => document.getElementById(id)?.value?.trim() || '';
+      const selectedPayment = document.querySelector('.payment-option.selected');
+      return {
+        firstName: get('firstName'), lastName: get('lastName'), email: get('email'),
+        phone: get('phone'), address1: get('address1'), address2: get('address2'),
+        postalCode: get('postalCode'), city: get('city'), country: get('country'),
+        notes: get('notes'), consent: document.getElementById('consent')?.checked,
+        contractNumber: document.getElementById('contractNumber')?.value?.trim() || 'N/A',
+        paymentMethod: selectedPayment ? selectedPayment.dataset.value : ''
+      };
+    }
+
+    function validateCustomer(c) {
+      const errors = [];
+      if (!c.firstName) errors.push('Vorname');
+      if (!c.lastName) errors.push('Nachname');
+      if (!c.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) errors.push('E-Mail');
+      if (!c.phone) errors.push('Telefon');
+      if (!c.address1) errors.push('Adresse');
+      if (!c.postalCode) errors.push('PLZ');
+      if (!c.city) errors.push('Stadt');
+      if (!c.country) errors.push('Land');
+      if (!c.consent) errors.push('Zustimmung');
+      if (!c.paymentMethod) errors.push('Zahlungsmethode');
+      return errors;
+    }
+
+    function makeOrder() {
+      const now = new Date();
+      return {
+        orderNumber: `${now.toISOString().slice(0,10).replace(/-/g,'')}-${now.toTimeString().slice(0,8).replace(/:/g,'')}`,
+        createdAt: now.toLocaleString('de-DE'),
+        customer: collectCustomer(),
+        ...getSelections()
+      };
+    }
+
+    async function generateOrderPdf(order) {
+      const { jsPDF } = window.jspdf;
+      if (!jsPDF) throw new Error('jsPDF is not loaded.');
+
+      const loadImage = (url) => {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = 'Anonymous';
+          img.onload = () => resolve(img);
+          img.onerror = (err) => reject(new Error(`Failed to load image at ${url}: ${err}`));
+          img.src = url;
+        });
+      };
+
+      const doc = new jsPDF({ unit: 'pt' });
+      const pageW = doc.internal.pageSize.getWidth();
+      const margin = 40;
+      let y = margin;
+
+      try {
+        const logoImage = await loadImage('img/fragmentologo.png');
+        const logoHeight = 120;
+        const logoWidth = (logoImage.width * logoHeight) / logoImage.height;
+        // Scale the image down to display size before embedding to avoid huge PDFs
+        const scale = 2; // 2× for sharp rendering
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(logoWidth * scale);
+        canvas.height = Math.round(logoHeight * scale);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(logoImage, 0, 0, canvas.width, canvas.height);
+        const imgData = canvas.toDataURL('image/jpeg', 0.85);
+        doc.addImage(imgData, 'JPEG', margin, y - 10, logoWidth, logoHeight);
+      } catch (error) {
+        console.error("Konnte das Logo für das PDF nicht laden:", error);
+      }
+
+      doc.setFont('helvetica', 'bold').setFontSize(22).text('Bestellbestätigung', pageW - margin, y, { align: 'right' });
+      y += 120;
+      
+      doc.setFont('helvetica', 'normal').setFontSize(11);
+      doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
+      doc.text(`Datum: ${order.createdAt}`, pageW - margin, y, { align: 'right' }); 
+      doc.text(`Küchenvertragsnr.: ${order.customer.contractNumber}`, margin, y + 15);
+      y += 45;
+
+      doc.setFont('helvetica', 'bold').text('Kundendaten:', margin, y); y += 15;
+      doc.setFont('helvetica', 'normal');
+      const customerInfo = [`${order.customer.firstName} ${order.customer.lastName}`, order.customer.address1, order.customer.address2, `${order.customer.postalCode} ${order.customer.city}`, `E-Mail: ${order.customer.email}`, `Telefon: ${order.customer.phone}`].filter(Boolean);
+      customerInfo.forEach(line => { doc.text(line, margin, y); y += 15; });
+      y += 15;
+
+      const drawSection = (title, items) => {
+          if (!items || items.length === 0) return;
+          doc.setFont('helvetica', 'bold').text(title, margin, y); y+= 10;
+          doc.setDrawColor(200).line(margin, y, pageW - margin, y); y+=20;
+          doc.text('Artikel', margin, y);
+          doc.text('Preis', pageW - margin, y, { align: 'right' }); y += 20;
+          doc.setFont('helvetica', 'normal');
+          items.forEach(item => { doc.text(item.name, margin, y); doc.text(formatCurrency(item.price), pageW - margin, y, { align: 'right' }); y += 20; });
+          y += 15;
+      };
+
+      drawSection('Komponenten:', order.components);
+      drawSection('Zubehör:', order.accessories);
+      drawSection('Dienstleistungen:', order.services);
+
+      doc.setDrawColor(150).line(margin, y, pageW - margin, y); y+=20;
+      doc.setFont('helvetica', 'bold').setFontSize(14);
+      doc.text('Gesamtpreis:', margin, y);
+      doc.text(formatCurrency(order.total), pageW - margin, y, { align: 'right' });
+
+      const filename = `Bestellung-${order.orderNumber}.pdf`;
+      return { blob: doc.output('blob'), filename, dataUrl: doc.output('datauristring') };
+    }
+    
+    function buildOrderSummaryHTML(order) {
+        let tableStyles = 'width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; margin-bottom: 25px;';
+        let thStyles = 'padding: 12px 15px; border-bottom: 2px solid #eaeaea; background-color: #f9f9f9; text-align: left; color: #333;';
+        let tdStyles = 'padding: 12px 15px; border-bottom: 1px solid #eaeaea; color: #555;';
+        let priceTdStyles = tdStyles + ' text-align: right; font-weight: bold;';
+        
+        let html = `<div style="max-width: 600px; margin: 20px 0; font-family: Arial, sans-serif; color: #333;"><div style="padding: 20px; border: 1px solid #ddd; border-radius: 8px;">`;
+
+        const createHtmlSection = (title, items) => {
+            if (!items || items.length === 0) return '';
+            let sectionHtml = `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr>
+                <th style="${thStyles}">Artikel</th>
+                <th style="${thStyles} text-align: right;">Preis</th>
+                </tr></thead><tbody>`;
+            items.forEach(item => {
+                sectionHtml += `<tr><td style="${tdStyles}">${item.name}</td><td style="${priceTdStyles}">${formatCurrency(item.price)}</td></tr>`;
+            });
+            sectionHtml += `</tbody></table>`;
+            return sectionHtml;
+        };
+
+        html += createHtmlSection('Komponenten', order.components);
+        html += createHtmlSection('Zubehör', order.accessories);
+        html += createHtmlSection('Dienstleistungen', order.services);
+
+        html += `
+            <table style="width: 100%; margin-top: 20px; border-top: 2px solid #333; padding-top: 15px;">
+                <tr>
+                    <td style="text-align: right; font-size: 1.3em; font-weight: bold;">Gesamtpreis: ${formatCurrency(order.total)}</td>
+                </tr>
+            </table>
+            </div>
+        </div>`;
+        return html;
+    }
+
+    async function sendEmail(order, pdfBlob, pdfFilename) {
+      const base64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result.split(',')[1]);
+        reader.readAsDataURL(pdfBlob);
+      });
+      const response = await fetch('/.netlify/functions/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to_name: `${order.customer.firstName} ${order.customer.lastName}`,
+          to_email: order.customer.email,
+          order_number: order.orderNumber,
+          order_summary_html: buildOrderSummaryHTML(order),
+          pdf_base64: base64,
+          pdf_filename: pdfFilename,
+          webhook_payload: {
+            customer: order.customer,
+            totalPrice: order.total,
+            components: [ ...order.components, ...order.accessories, ...order.services ],
+          },
+        })
+      });
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.error || `HTTP ${response.status}`);
+      }
+      return response.json();
+    }
+
+    async function sendToWebhook(order) {
+      const webhookPayload = {
+        customer: order.customer,
+        totalPrice: order.total,
+        components: [ ...order.components, ...order.accessories, ...order.services ]
+      };
+      const response = await fetch('/.netlify/functions/forward-webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(webhookPayload),
+        keepalive: true,
+      });
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Webhook returned status ${response.status}. Body: ${errorBody}`);
+      }
+      console.log('Successfully sent data to webhook.');
+    }
+ 
+    form?.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const errors = validateCustomer(collectCustomer());
+      if (errors.length > 0) {
+        window.showMessage(`Bitte prüfe die Eingabe: ${errors.join(', ')}`, 'error');
+        return;
+      }
+
+
+      const orderSelections = getSelections();
+      const montageService = orderSelections.services.find(s => s.name.includes('Montage'));
+      
+      if (montageService) {
+          const selectedComponents = orderSelections.components;
+          const cabinetNames = ["Unterschrank 30cm", "Oberschrank (links)", "Oberschrank (rechts)"];
+          const cabinetCount = selectedComponents.filter(c => cabinetNames.includes(c.name)).length;
+
+          if (selectedComponents.length < 3 || cabinetCount < 2) {
+              window.showMessage('Fehler: Die Montage-Bedingungen (min. 3 Artikel, davon 2 Schränke) sind nicht erfüllt.', 'error');
+              return;
+          }
+      }
+
+      submitBtn.disabled = true;
+      statusEl.style.color = '#555';
+      statusEl.textContent = 'Bestellung wird verarbeitet...';
+
+      try {
+        const order = makeOrder();
+
+        // 1. Generate PDF
+        const pdf = await generateOrderPdf(order);
+
+        // 2. Send confirmation email via Netlify Function
+        statusEl.textContent = 'Bestellbestätigung wird per E-Mail gesendet...';
+        console.log('[sendEmail] PDF blob size:', pdf.blob.size, 'bytes (~', Math.round(pdf.blob.size * 4 / 3 / 1024), 'KB base64)');
+        await sendEmail(order, pdf.blob, pdf.filename);
+
+        // 3. Show success to user
+        window.showMessage('Bestellung erfolgreich übermittelt!', 'success');
+        statusEl.textContent = 'Erfolg! Bestellung übermittelt.';
+        form.reset();
+
+      } catch (err) {
+        console.error("Order Submission Error:", err);
+        window.showMessage(`Fehler beim Senden: ${err.text || err.message}.`, 'error');
+        statusEl.style.color = '#dc3545';
+        statusEl.textContent = `Fehler beim Senden.`;
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+
+  });
+</script>
+</body>
+</html>

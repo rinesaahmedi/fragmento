@@ -1,0 +1,114 @@
+import { KitchenStatus, ItemType, OrderStatus } from "@prisma/client";
+import { prisma } from "./prisma";
+
+export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
+export const MONTAGE_REQUIRED_CODES = [
+  "component-base-cabinet-30",
+  "component-wall-cabinet-left",
+  "component-wall-cabinet-right",
+];
+
+export async function getActiveKitchens() {
+  return prisma.kitchen.findMany({
+    where: { status: KitchenStatus.ACTIVE },
+    orderBy: { name: "asc" },
+  });
+}
+
+export async function getKitchenBySlug(slug) {
+  return prisma.kitchen.findUnique({
+    where: { slug },
+    include: {
+      items: {
+        where: { isActive: true },
+        orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+      },
+    },
+  });
+}
+
+export async function listKitchensForAdmin() {
+  return prisma.kitchen.findMany({
+    include: {
+      _count: { select: { items: true, orders: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getKitchenById(id) {
+  return prisma.kitchen.findUnique({
+    where: { id },
+    include: {
+      items: {
+        orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+      },
+    },
+  });
+}
+
+export function serializeKitchenForLegacy(kitchen) {
+  const items = kitchen.items || [];
+  const toClientItem = (item) => ({
+    id: item.id,
+    code: item.code,
+    name: item.name,
+    price: Number(item.price),
+    infoText: item.infoText || "",
+    iconKey: item.iconKey || "",
+    colorKey: item.colorKey || "",
+    componentKey: item.componentKey || "",
+    isLocked: item.isLocked,
+    itemType: item.itemType.toLowerCase(),
+  });
+
+  return {
+    kitchen: {
+      id: kitchen.id,
+      slug: kitchen.slug,
+      name: kitchen.name,
+      description: kitchen.description || "",
+    },
+    components: items.filter((item) => item.itemType === ItemType.COMPONENT).map(toClientItem),
+    accessories: items.filter((item) => item.itemType === ItemType.ACCESSORY).map(toClientItem),
+    services: items.filter((item) => item.itemType === ItemType.SERVICE).map(toClientItem),
+    lockedBaseColors: LOCKED_BASE_COLORS,
+    montageRequiredCodes: MONTAGE_REQUIRED_CODES,
+  };
+}
+
+export async function getOrdersForAdmin(filters = {}) {
+  const where = {};
+
+  if (filters.kitchenId) where.kitchenId = filters.kitchenId;
+  if (filters.status && Object.values(OrderStatus).includes(filters.status)) where.status = filters.status;
+
+  if (filters.dateFrom || filters.dateTo) {
+    where.createdAt = {};
+    if (filters.dateFrom) where.createdAt.gte = new Date(filters.dateFrom);
+    if (filters.dateTo) {
+      const endDate = new Date(filters.dateTo);
+      endDate.setHours(23, 59, 59, 999);
+      where.createdAt.lte = endDate;
+    }
+  }
+
+  return prisma.order.findMany({
+    where,
+    include: {
+      kitchen: true,
+      items: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+export async function getOrderById(id) {
+  return prisma.order.findUnique({
+    where: { id },
+    include: {
+      kitchen: true,
+      items: { orderBy: { createdAt: "asc" } },
+    },
+  });
+}
