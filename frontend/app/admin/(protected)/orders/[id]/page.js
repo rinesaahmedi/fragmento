@@ -1,6 +1,22 @@
 import { OrderStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
 import { getOrderById } from "../../../../../lib/catalog";
+import {
+  AdminSection,
+  FormField,
+  MetricCard,
+  PageHero,
+  StatusBadge,
+  formGridStyle,
+  inputStyle,
+  pageGridStyle,
+  primaryButtonStyle,
+  splitGridStyle,
+  tableStyle,
+  tableWrapStyle,
+  tdStyle,
+  thStyle,
+} from "../../../../../components/admin-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -10,59 +26,88 @@ export default async function AdminOrderDetailPage({ params }) {
   if (!order) notFound();
 
   return (
-    <div style={{ display: "grid", gap: 24 }}>
-      <section style={panelStyle}>
-        <h1 style={{ marginTop: 0 }}>{order.orderNumber}</h1>
-        <p style={{ margin: "8px 0" }}>{order.kitchen.name}</p>
-        <p style={{ margin: "8px 0" }}>{`${order.firstName} ${order.lastName}`}</p>
-        <p style={{ margin: "8px 0" }}>{order.email}</p>
-        <p style={{ margin: "8px 0" }}>{`${order.address1}${order.address2 ? `, ${order.address2}` : ""}, ${order.postalCode} ${order.city}`}</p>
-        <form action={`/api/admin/orders/${order.id}`} method="post" style={{ display: "flex", gap: 12, alignItems: "center", marginTop: 16 }}>
-          <input type="hidden" name="_intent" value="status" />
-          <select name="status" defaultValue={order.status}>
-            {Object.values(OrderStatus).map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <button type="submit">Update status</button>
-        </form>
-      </section>
+    <div style={pageGridStyle}>
+      <PageHero
+        eyebrow="Order Detail"
+        title={order.orderNumber}
+        description={`Review the customer details, selected catalog items, and current order state for ${order.kitchen.name}.`}
+        stats={[
+          <MetricCard key="status" label="Status" value={order.status} />,
+          <MetricCard key="total" label="Total" value={`${Number(order.totalPrice).toFixed(2)} EUR`} />,
+          <MetricCard key="items" label="Items" value={String(order.items.length)} />,
+          <MetricCard key="kitchen" label="Kitchen" value={order.kitchen.slug} />,
+        ]}
+      />
 
-      <section style={panelStyle}>
-        <h2 style={{ marginTop: 0 }}>Items</h2>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={thStyle}>Type</th>
-              <th style={thStyle}>Code</th>
-              <th style={thStyle}>Name</th>
-              <th style={thStyle}>Price</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order.items.map((item) => (
-              <tr key={item.id}>
-                <td style={tdStyle}>{item.itemType}</td>
-                <td style={tdStyle}>{item.code}</td>
-                <td style={tdStyle}>{item.nameSnapshot}</td>
-                <td style={tdStyle}>{Number(item.priceSnapshot).toFixed(2)} EUR</td>
+      <div style={splitGridStyle}>
+        <AdminSection title="Customer" description="Primary customer and delivery information.">
+          <div style={{ display: "grid", gap: 10 }}>
+            <DetailRow label="Name" value={`${order.firstName} ${order.lastName}`} />
+            <DetailRow label="Email" value={order.email} />
+            <DetailRow label="Phone" value={order.phone} />
+            <DetailRow
+              label="Address"
+              value={`${order.address1}${order.address2 ? `, ${order.address2}` : ""}, ${order.postalCode} ${order.city}`}
+            />
+            <DetailRow label="Kitchen" value={order.kitchen.name} />
+          </div>
+        </AdminSection>
+
+        <AdminSection title="Order status" description="Keep fulfillment state aligned with the actual operational step.">
+          <form action={`/api/admin/orders/${order.id}`} method="post" style={formGridStyle}>
+            <input type="hidden" name="_intent" value="status" />
+            <FormField label="Current status">
+              <div style={{ ...inputStyle, display: "flex", alignItems: "center", background: "#f9f2e9" }}>
+                <StatusBadge status={order.status} />
+              </div>
+            </FormField>
+            <FormField label="Update to">
+              <select name="status" defaultValue={order.status} style={inputStyle}>
+                {Object.values(OrderStatus).map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </FormField>
+            <button type="submit" style={primaryButtonStyle}>Update status</button>
+          </form>
+        </AdminSection>
+      </div>
+
+      <AdminSection title="Selected items" description="Catalog snapshot stored with the order at submission time.">
+        <div style={tableWrapStyle}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thStyle}>Type</th>
+                <th style={thStyle}>Code</th>
+                <th style={thStyle}>Name</th>
+                <th style={thStyle}>Price</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+            </thead>
+            <tbody>
+              {order.items.map((item) => (
+                <tr key={item.id}>
+                  <td style={tdStyle}><StatusBadge status={item.itemType} /></td>
+                  <td style={tdStyle}>{item.code}</td>
+                  <td style={tdStyle}>{item.nameSnapshot}</td>
+                  <td style={tdStyle}>{Number(item.priceSnapshot).toFixed(2)} EUR</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </AdminSection>
     </div>
   );
 }
 
-const panelStyle = {
-  background: "#fffdf9",
-  border: "1px solid #e5d5c5",
-  borderRadius: 16,
-  padding: 20,
-};
-
-const thStyle = { textAlign: "left", borderBottom: "1px solid #e9ddd1", padding: "10px 8px" };
-const tdStyle = { borderBottom: "1px solid #f0e7dd", padding: "10px 8px" };
+function DetailRow({ label, value }) {
+  return (
+    <div style={{ display: "grid", gap: 4, paddingBottom: 10, borderBottom: "1px solid #f0e5d7" }}>
+      <span style={{ color: "#8a7159", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span>
+      <strong style={{ color: "#261a13", lineHeight: 1.5 }}>{value}</strong>
+    </div>
+  );
+}

@@ -2,5 +2,9 @@
 .netlify
 .env
 .next
+.next-dev
 node_modules
+frontend/.next
+frontend/.next-dev
+frontend/node_modules
 

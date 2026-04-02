@@ -7,6 +7,19 @@ export const MONTAGE_REQUIRED_CODES = [
   "component-wall-cabinet-left",
   "component-wall-cabinet-right",
 ];
+export const LEGACY_ICON_KEYS = [
+  "dishwasher",
+  "refrigerator",
+  "base_cabinet_30",
+  "wall_cabinet_l",
+  "wall_cabinet_r",
+  "extractor_hood",
+  "waste_system",
+  "cutlery_insert",
+  "lighting_set",
+  "delivery_assembly",
+  "pickup",
+];
 
 export async function getActiveKitchens() {
   return prisma.kitchen.findMany({
@@ -40,6 +53,7 @@ export async function getKitchenById(id) {
   return prisma.kitchen.findUnique({
     where: { id },
     include: {
+      _count: { select: { items: true, orders: true } },
       items: {
         orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
       },

@@ -1,84 +1,113 @@
 import Link from "next/link";
 import { OrderStatus } from "@prisma/client";
 import { getOrdersForAdmin, listKitchensForAdmin } from "../../../../lib/catalog";
+import {
+  AdminSection,
+  FormField,
+  MetricCard,
+  PageHero,
+  StatusBadge,
+  formGridStyle,
+  inputStyle,
+  pageGridStyle,
+  primaryButtonStyle,
+  tableStyle,
+  tableWrapStyle,
+  tdStyle,
+  thStyle,
+} from "../../../../components/admin-ui";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminOrdersPage({ searchParams }) {
+  const resolvedSearchParams = (await searchParams) || {};
   const filters = {
-    kitchenId: searchParams?.kitchenId || "",
-    status: searchParams?.status || "",
-    dateFrom: searchParams?.dateFrom || "",
-    dateTo: searchParams?.dateTo || "",
+    kitchenId: resolvedSearchParams.kitchenId || "",
+    status: resolvedSearchParams.status || "",
+    dateFrom: resolvedSearchParams.dateFrom || "",
+    dateTo: resolvedSearchParams.dateTo || "",
   };
 
   const [kitchens, orders] = await Promise.all([listKitchensForAdmin(), getOrdersForAdmin(filters)]);
 
   return (
-    <div style={{ display: "grid", gap: 24 }}>
-      <section style={panelStyle}>
-        <h1 style={{ marginTop: 0 }}>Orders</h1>
-        <form method="get" style={{ display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))" }}>
-          <select name="kitchenId" defaultValue={filters.kitchenId}>
-            <option value="">All kitchens</option>
-            {kitchens.map((kitchen) => (
-              <option key={kitchen.id} value={kitchen.id}>
-                {kitchen.name}
-              </option>
-            ))}
-          </select>
-          <select name="status" defaultValue={filters.status}>
-            <option value="">All statuses</option>
-            {Object.values(OrderStatus).map((status) => (
-              <option key={status} value={status}>
-                {status}
-              </option>
-            ))}
-          </select>
-          <input type="date" name="dateFrom" defaultValue={filters.dateFrom} />
-          <input type="date" name="dateTo" defaultValue={filters.dateTo} />
-          <button type="submit">Apply filters</button>
-        </form>
-      </section>
+    <div style={pageGridStyle}>
+      <PageHero
+        eyebrow="Orders"
+        title="Order management"
+        description="Filter incoming orders, review customer details, and move each request through the fulfillment flow."
+        stats={[
+          <MetricCard key="all" label="All orders" value={String(orders.length)} />,
+          <MetricCard key="new" label="New" value={String(orders.filter((order) => order.status === "NEW").length)} />,
+          <MetricCard key="emailed" label="Emailed" value={String(orders.filter((order) => order.status === "EMAILED").length)} />,
+          <MetricCard key="confirmed" label="Confirmed" value={String(orders.filter((order) => order.status === "CONFIRMED").length)} />,
+        ]}
+      />
 
-      <section style={panelStyle}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr>
-              <th style={thStyle}>Order</th>
-              <th style={thStyle}>Kitchen</th>
-              <th style={thStyle}>Customer</th>
-              <th style={thStyle}>Status</th>
-              <th style={thStyle}>Created</th>
-              <th style={thStyle}>Total</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order.id}>
-                <td style={tdStyle}>
-                  <Link href={`/admin/orders/${order.id}`}>{order.orderNumber}</Link>
-                </td>
-                <td style={tdStyle}>{order.kitchen.name}</td>
-                <td style={tdStyle}>{`${order.firstName} ${order.lastName}`}</td>
-                <td style={tdStyle}>{order.status}</td>
-                <td style={tdStyle}>{new Date(order.createdAt).toLocaleString("de-DE")}</td>
-                <td style={tdStyle}>{Number(order.totalPrice).toFixed(2)} EUR</td>
+      <AdminSection title="Filters" description="Narrow the order list before opening individual records.">
+        <form method="get" style={formGridStyle}>
+          <FormField label="Kitchen">
+            <select name="kitchenId" defaultValue={filters.kitchenId} style={inputStyle}>
+              <option value="">All kitchens</option>
+              {kitchens.map((kitchen) => (
+                <option key={kitchen.id} value={kitchen.id}>
+                  {kitchen.name}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Status">
+            <select name="status" defaultValue={filters.status} style={inputStyle}>
+              <option value="">All statuses</option>
+              {Object.values(OrderStatus).map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </FormField>
+          <FormField label="Date from">
+            <input type="date" name="dateFrom" defaultValue={filters.dateFrom} style={inputStyle} />
+          </FormField>
+          <FormField label="Date to">
+            <input type="date" name="dateTo" defaultValue={filters.dateTo} style={inputStyle} />
+          </FormField>
+          <button type="submit" style={primaryButtonStyle}>Apply filters</button>
+        </form>
+      </AdminSection>
+
+      <AdminSection title="Orders" description={`${orders.length} matching record(s).`}>
+        <div style={tableWrapStyle}>
+          <table style={tableStyle}>
+            <thead>
+              <tr>
+                <th style={thStyle}>Order</th>
+                <th style={thStyle}>Kitchen</th>
+                <th style={thStyle}>Customer</th>
+                <th style={thStyle}>Status</th>
+                <th style={thStyle}>Created</th>
+                <th style={thStyle}>Total</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </section>
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order.id}>
+                  <td style={tdStyle}>
+                    <Link href={`/admin/orders/${order.id}`} style={{ textDecoration: "none", color: "#8c5523", fontWeight: 800 }}>
+                      {order.orderNumber}
+                    </Link>
+                  </td>
+                  <td style={tdStyle}>{order.kitchen.name}</td>
+                  <td style={tdStyle}>{`${order.firstName} ${order.lastName}`}</td>
+                  <td style={tdStyle}><StatusBadge status={order.status} /></td>
+                  <td style={tdStyle}>{new Date(order.createdAt).toLocaleString("de-DE")}</td>
+                  <td style={tdStyle}>{Number(order.totalPrice).toFixed(2)} EUR</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </AdminSection>
     </div>
   );
 }
-
-const panelStyle = {
-  background: "#fffdf9",
-  border: "1px solid #e5d5c5",
-  borderRadius: 16,
-  padding: 20,
-};
-
-const thStyle = { textAlign: "left", borderBottom: "1px solid #e9ddd1", padding: "10px 8px" };
-const tdStyle = { borderBottom: "1px solid #f0e7dd", padding: "10px 8px" };

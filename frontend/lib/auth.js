@@ -8,7 +8,20 @@ const SESSION_COOKIE = "fragmento_admin_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 
 function getSessionSecret() {
-  return process.env.ADMIN_SESSION_SECRET || "fragmento-dev-secret";
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret || secret.trim().length < 16) {
+    throw new Error("ADMIN_SESSION_SECRET must be set and at least 16 characters long.");
+  }
+  return secret;
+}
+
+function safeEqual(a, b) {
+  const left = Buffer.from(String(a || ""), "utf8");
+  const right = Buffer.from(String(b || ""), "utf8");
+  if (left.length !== right.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(left, right);
 }
 
 function signValue(value) {
@@ -23,7 +36,7 @@ function encodeSession(payload) {
 function decodeSession(token) {
   if (!token) return null;
   const [base, signature] = token.split(".");
-  if (!base || !signature || signValue(base) !== signature) return null;
+  if (!base || !signature || !safeEqual(signValue(base), signature)) return null;
 
   try {
     const payload = JSON.parse(Buffer.from(base, "base64url").toString("utf8"));
@@ -69,19 +82,33 @@ export async function getAdminSession() {
 }
 
 export async function requireAdminPage() {
+  try {
   const admin = await getAdminSession();
   if (!admin) {
     redirect("/admin/login");
   }
   return admin;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("ADMIN_SESSION_SECRET")) {
+      redirect(`/admin/login?error=${encodeURIComponent(error.message)}`);
+    }
+    throw error;
+  }
 }
 
 export async function requireAdminApi() {
-  const admin = await getAdminSession();
-  if (!admin) {
-    const error = new Error("Unauthorized");
-    error.status = 401;
+  try {
+    const admin = await getAdminSession();
+    if (!admin) {
+      const error = new Error("Unauthorized");
+      error.status = 401;
+      throw error;
+    }
+    return admin;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("ADMIN_SESSION_SECRET")) {
+      error.status = 500;
+    }
     throw error;
   }
-  return admin;
 }

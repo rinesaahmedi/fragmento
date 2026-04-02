@@ -1,30 +1,40 @@
-import { ItemType } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { mapAdminMutationError, redirectWithFlash, validateKitchenItemInput } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
-  const formData = await request.formData();
-  const itemType = String(formData.get("itemType") || "");
-  const item = await prisma.kitchenItem.update({
-    where: { id },
-    data: {
-      itemType: Object.values(ItemType).includes(itemType) ? itemType : ItemType.COMPONENT,
-      code: String(formData.get("code") || "").trim(),
-      name: String(formData.get("name") || "").trim(),
-      price: String(formData.get("price") || "0").trim(),
-      iconKey: String(formData.get("iconKey") || "").trim() || null,
-      colorKey: String(formData.get("colorKey") || "").trim() || null,
-      componentKey: String(formData.get("componentKey") || "").trim() || null,
-      sortOrder: Number(formData.get("sortOrder") || 0),
-      infoText: String(formData.get("infoText") || "").trim() || null,
-      isLocked: formData.get("isLocked") === "true",
-      isActive: formData.get("isActive") === "true",
-    },
-    select: { kitchenId: true },
-  });
+  let kitchenId = "";
 
-  return NextResponse.redirect(new URL(`/admin/kitchens/${item.kitchenId}`, request.url), 303);
+  try {
+    const formData = await request.formData();
+    const intent = String(formData.get("_intent") || "update");
+    kitchenId = (
+      await prisma.kitchenItem.findUnique({
+        where: { id },
+        select: { kitchenId: true },
+      })
+    )?.kitchenId || "";
+
+    if (intent === "delete") {
+      const item = await prisma.kitchenItem.delete({
+        where: { id },
+        select: { kitchenId: true },
+      });
+      return redirectWithFlash(request, `/admin/kitchens/${item.kitchenId}`, "success", "Item deleted.");
+    }
+
+    const item = await prisma.kitchenItem.update({
+      where: { id },
+      data: validateKitchenItemInput(formData),
+      select: { kitchenId: true },
+    });
+
+    return redirectWithFlash(request, `/admin/kitchens/${item.kitchenId}`, "success", "Item updated.");
+  } catch (error) {
+    const fallbackPath = kitchenId ? `/admin/kitchens/${kitchenId}` : "/admin/kitchens";
+    return redirectWithFlash(request, fallbackPath, "error", mapAdminMutationError(error, "Item"));
+  }
 }

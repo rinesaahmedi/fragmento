@@ -1326,12 +1326,12 @@
         <img src="img/fragmentologo.png" alt="Architecto Logo" class="language-card-logo">
         <h2 id="language-title">Wähle deine Sprache</h2>
         <div class="language-grid" role="group" aria-label="Language selection">
-          <button type="button" class="language-option" data-lang="de"><img class="flag-badge-img" src="https://flagcdn.com/w40/de.png" alt="" aria-hidden="true"><span>German</span></button>
-          <button type="button" class="language-option" data-lang="en"><img class="flag-badge-img" src="https://flagcdn.com/w40/gb.png" alt="" aria-hidden="true"><span>English</span></button>
-          <button type="button" class="language-option" data-lang="tr"><img class="flag-badge-img" src="https://flagcdn.com/w40/tr.png" alt="" aria-hidden="true"><span>Turkish</span></button>
-          <button type="button" class="language-option" data-lang="es"><img class="flag-badge-img" src="https://flagcdn.com/w40/es.png" alt="" aria-hidden="true"><span>Spanish</span></button>
-          <button type="button" class="language-option" data-lang="fr"><img class="flag-badge-img" src="https://flagcdn.com/w40/fr.png" alt="" aria-hidden="true"><span>French</span></button>
-          <button type="button" class="language-option" data-lang="ru"><img class="flag-badge-img" src="https://flagcdn.com/w40/ru.png" alt="" aria-hidden="true"><span>Russian</span></button>
+          <button type="button" class="language-option" data-lang="de" onclick="window.selectKitchenLanguage && window.selectKitchenLanguage(this.dataset.lang)"><img class="flag-badge-img" src="https://flagcdn.com/w40/de.png" alt="" aria-hidden="true"><span>German</span></button>
+          <button type="button" class="language-option" data-lang="en" onclick="window.selectKitchenLanguage && window.selectKitchenLanguage(this.dataset.lang)"><img class="flag-badge-img" src="https://flagcdn.com/w40/gb.png" alt="" aria-hidden="true"><span>English</span></button>
+          <button type="button" class="language-option" data-lang="tr" onclick="window.selectKitchenLanguage && window.selectKitchenLanguage(this.dataset.lang)"><img class="flag-badge-img" src="https://flagcdn.com/w40/tr.png" alt="" aria-hidden="true"><span>Turkish</span></button>
+          <button type="button" class="language-option" data-lang="es" onclick="window.selectKitchenLanguage && window.selectKitchenLanguage(this.dataset.lang)"><img class="flag-badge-img" src="https://flagcdn.com/w40/es.png" alt="" aria-hidden="true"><span>Spanish</span></button>
+          <button type="button" class="language-option" data-lang="fr" onclick="window.selectKitchenLanguage && window.selectKitchenLanguage(this.dataset.lang)"><img class="flag-badge-img" src="https://flagcdn.com/w40/fr.png" alt="" aria-hidden="true"><span>French</span></button>
+          <button type="button" class="language-option" data-lang="ru" onclick="window.selectKitchenLanguage && window.selectKitchenLanguage(this.dataset.lang)"><img class="flag-badge-img" src="https://flagcdn.com/w40/ru.png" alt="" aria-hidden="true"><span>Russian</span></button>
         </div>
         <p id="avatar-language-status" class="lang-status-error" aria-live="polite"></p>
         <div class="welcome-card-footer">
@@ -1410,7 +1410,14 @@ Du findest sie auf der Innenseite deines Spülenschrankes.</p>
         <div class="welcome-card-footer">
           <img src="img/FIGURA.png" alt="" class="welcome-card-figura" />
           <div class="welcome-actions">
-            <button id="submit-contract-number" class="btn-primary">Bestätigen</button>
+            <button
+              id="submit-contract-number"
+              type="button"
+              class="btn-primary"
+              onclick="(function(){var input=document.getElementById('contractNumber');var error=document.getElementById('contract-error');var contract=document.getElementById('contract-overlay');var welcome=document.getElementById('welcome-overlay');var app=document.getElementById('app-content');if(!input||input.value.trim()===''){if(error)error.style.display='block';return;}if(error)error.style.display='none';if(contract)contract.classList.add('hidden');if(welcome)welcome.classList.add('hidden');if(app)app.classList.remove('hidden');})();"
+            >
+              Bestätigen
+            </button>
           </div>
         </div>
       </div>
@@ -3101,14 +3108,18 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
     updateTextInstructionsContent();
   }
 
+  window.selectKitchenLanguage = function(lang) {
+    selectedLanguage = lang || 'en';
+    if (avatarLanguageStatus) avatarLanguageStatus.textContent = '';
+    if (instructionModeStatus) instructionModeStatus.textContent = '';
+    applyLocalizedStaticTexts();
+    applyLocalizedActionTexts();
+    openInstructionModeOverlay();
+  };
+
   languageButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      selectedLanguage = button.dataset.lang || 'en';
-      avatarLanguageStatus.textContent = '';
-      instructionModeStatus.textContent = '';
-      applyLocalizedStaticTexts();
-      applyLocalizedActionTexts();
-      openInstructionModeOverlay();
+      window.selectKitchenLanguage(button.dataset.lang || 'en');
     });
   });
 

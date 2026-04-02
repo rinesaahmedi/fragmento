@@ -1,5 +1,6 @@
 import { KitchenStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { mapAdminMutationError, redirectWithFlash, validateKitchenInput } from "../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../lib/auth";
 import { listKitchensForAdmin } from "../../../../lib/catalog";
 import { prisma } from "../../../../lib/prisma";
@@ -11,16 +12,14 @@ export async function GET() {
 
 export async function POST(request) {
   await requireAdminApi();
-  const formData = await request.formData();
+  try {
+    const formData = await request.formData();
+    const kitchen = await prisma.kitchen.create({
+      data: validateKitchenInput(formData),
+    });
 
-  const kitchen = await prisma.kitchen.create({
-    data: {
-      name: String(formData.get("name") || "").trim(),
-      slug: String(formData.get("slug") || "").trim(),
-      status: Object.values(KitchenStatus).includes(String(formData.get("status"))) ? String(formData.get("status")) : "DRAFT",
-      description: String(formData.get("description") || "").trim() || null,
-    },
-  });
-
-  return NextResponse.redirect(new URL(`/admin/kitchens/${kitchen.id}`, request.url), 303);
+    return redirectWithFlash(request, `/admin/kitchens/${kitchen.id}`, "success", "Kitchen created.");
+  } catch (error) {
+    return redirectWithFlash(request, "/admin/kitchens", "error", mapAdminMutationError(error, "Kitchen"));
+  }
 }
