@@ -100,7 +100,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     ...kitchenConfig.components.filter((item) => item.isLocked && item.colorKey).map((item) => item.colorKey),
   ].map((color) => componentIdForColor(normalizeColor(color)));
 
-  const [selectedComponentIds, setSelectedComponentIds] = useState(lockedComponentIds);
+  const [selectedComponentIds, setSelectedComponentIds] = useState([]);
   const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState([]);
   const [selectedServiceCodes, setSelectedServiceCodes] = useState([]);
   const [hoveredComponentId, setHoveredComponentId] = useState("");
@@ -129,6 +129,10 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   const selectedServices = selectedMap(kitchenConfig.services, selectedServiceCodes);
   const lockedComponentIdsKey = lockedComponentIds.join("|");
   const selectedComponentCodes = selectedComponents.map((item) => item.code);
+  const visibleComponents = kitchenConfig.components.filter((item) => {
+    const componentId = componentIdForColor(normalizeColor(item.colorKey));
+    return !lockedComponentIds.includes(componentId);
+  });
   const hoveredComponent =
     kitchenConfig.components.find(
       (item) => componentIdForColor(normalizeColor(item.colorKey)) === hoveredComponentId,
@@ -366,9 +370,9 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          kitchen_slug: kitchenConfig.kitchen.slug,
-          order_payload: {
-            customer: {
+            kitchen_slug: kitchenConfig.kitchen.slug,
+            order_payload: {
+              customer: {
               contractNumber: customer.contractNumber,
               firstName: customer.firstName,
               lastName: customer.lastName,
@@ -377,14 +381,14 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
               address1: customer.address1,
               address2: customer.address2,
               postalCode: customer.postalCode,
-              city: customer.city,
-              paymentMethod: customer.paymentMethod,
+                city: customer.city,
+                paymentMethod: customer.paymentMethod,
+              },
+              components: selectedComponents,
+              accessories: selectedAccessories,
+              services: selectedServices,
             },
-            components: selectedComponents,
-            accessories: selectedAccessories,
-            services: selectedServices,
-          },
-        }),
+          }),
       });
 
       const payload = await response.json();
@@ -483,7 +487,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                 onClick={() => {
                   setSelectedAccessoryCodes([]);
                   setSelectedServiceCodes([]);
-                  setSelectedComponentIds(lockedComponentIds);
+                  setSelectedComponentIds([]);
                   setStatus("");
                   setStatusTone("idle");
                 }}
@@ -531,13 +535,11 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
               <section className={styles.catalogSection}>
                 <h3>Komponenten</h3>
                 <div className={styles.catalogGrid}>
-                  {kitchenConfig.components.map((item) => {
+                  {visibleComponents.map((item) => {
                     const componentId = componentIdForColor(normalizeColor(item.colorKey));
-                    const locked = lockedComponentIds.includes(componentId);
 
                     return renderCatalogItem(item, {
                       selected: selectedComponentIds.includes(componentId),
-                      locked,
                       hovered: hoveredComponentId === componentId,
                       onClick: () =>
                         setSelectedComponentIds((current) =>
