@@ -1,3 +1,25 @@
+:root {
+  --app-bg: #faf9f6;
+  --app-surface: #ffffff;
+  --app-surface-muted: #f4f4ef;
+  --app-border: #e5e5e0;
+  --app-text: #2d2d2d;
+  --app-text-muted: #6d685f;
+  --app-accent: #442a22;
+  --app-accent-strong: #2f1d17;
+  --app-accent-contrast: #ffffff;
+  --app-success-bg: #e6efe3;
+  --app-success-text: #496441;
+  --app-warning-bg: #f5efcf;
+  --app-warning-text: #7b6527;
+  --app-neutral-bg: #ebe8e2;
+  --app-neutral-text: #615850;
+  --app-info-bg: #e8edf3;
+  --app-info-text: #4d627a;
+  --app-danger-bg: #f7e8e4;
+  --app-danger-text: #9a4334;
+}
+
 html {
   color-scheme: light;
 }
@@ -6,7 +28,62 @@ html {
   box-sizing: border-box;
 }
 
+html,
+body {
+  min-height: 100%;
+}
+
 body {
   margin: 0;
-  background: #fff;
+  background: var(--app-bg);
+  color: var(--app-text);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a,
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: rgba(68, 42, 34, 0.16);
+  color: var(--app-text);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --app-bg: #0c0a09;
+    --app-surface: #151311;
+    --app-surface-muted: #1a1715;
+    --app-border: #2a2623;
+    --app-text: #f2ede6;
+    --app-text-muted: #b2aba2;
+    --app-accent: #1c1917;
+    --app-accent-strong: #141210;
+    --app-accent-contrast: #ffffff;
+    --app-success-bg: #1f2a20;
+    --app-success-text: #bfd5b8;
+    --app-warning-bg: #2e2816;
+    --app-warning-text: #e0cd8a;
+    --app-neutral-bg: #25211e;
+    --app-neutral-text: #cac1b8;
+    --app-info-bg: #1e252d;
+    --app-info-text: #c0cede;
+    --app-danger-bg: #2f1e1a;
+    --app-danger-text: #efb4a9;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  ::selection {
+    background: rgba(242, 237, 230, 0.18);
+    color: var(--app-text);
+  }
 }

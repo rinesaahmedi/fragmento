@@ -146,8 +146,15 @@ export async function forwardOrderWebhook(order) {
         },
       },
       (res) => {
+        const statusCode = res.statusCode || 200;
         res.resume();
-        res.on("end", resolve);
+        res.on("end", () => {
+          if (statusCode >= 400) {
+            reject(new Error(`Webhook returned status ${statusCode}`));
+            return;
+          }
+          resolve();
+        });
       },
     );
 

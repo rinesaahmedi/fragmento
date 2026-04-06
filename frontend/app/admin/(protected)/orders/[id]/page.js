@@ -1,16 +1,21 @@
 import { OrderStatus } from "@prisma/client";
 import { notFound } from "next/navigation";
+import { getFormMessage } from "../../../../../lib/admin-forms";
 import { getOrderById } from "../../../../../lib/catalog";
 import {
+  actionRowStyle,
   AdminSection,
+  FlashMessage,
   FormField,
   MetricCard,
   PageHero,
   StatusBadge,
+  dangerButtonStyle,
   formGridStyle,
   inputStyle,
   pageGridStyle,
   primaryButtonStyle,
+  secondaryButtonStyle,
   splitGridStyle,
   tableStyle,
   tableWrapStyle,
@@ -20,10 +25,13 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminOrderDetailPage({ params }) {
+export default async function AdminOrderDetailPage({ params, searchParams }) {
   const { id } = await params;
   const order = await getOrderById(id);
   if (!order) notFound();
+  const resolvedSearchParams = (await searchParams) || {};
+  const successMessage = getFormMessage(resolvedSearchParams, "success");
+  const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
   return (
     <div style={pageGridStyle}>
@@ -38,6 +46,9 @@ export default async function AdminOrderDetailPage({ params }) {
           <MetricCard key="kitchen" label="Kitchen" value={order.kitchen.slug} />,
         ]}
       />
+
+      {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
+      {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
       <div style={splitGridStyle}>
         <AdminSection title="Customer" description="Primary customer and delivery information.">
@@ -57,7 +68,14 @@ export default async function AdminOrderDetailPage({ params }) {
           <form action={`/api/admin/orders/${order.id}`} method="post" style={formGridStyle}>
             <input type="hidden" name="_intent" value="status" />
             <FormField label="Current status">
-              <div style={{ ...inputStyle, display: "flex", alignItems: "center", background: "#f9f2e9" }}>
+              <div
+                style={{
+                  ...inputStyle,
+                  display: "flex",
+                  alignItems: "center",
+                  background: "var(--app-surface-muted)",
+                }}
+              >
                 <StatusBadge status={order.status} />
               </div>
             </FormField>
@@ -72,6 +90,28 @@ export default async function AdminOrderDetailPage({ params }) {
             </FormField>
             <button type="submit" style={primaryButtonStyle}>Update status</button>
           </form>
+
+          <div style={actionRowStyle}>
+            <form action={`/api/admin/orders/${order.id}`} method="post">
+              <input type="hidden" name="_intent" value="resend-email" />
+              <button type="submit" style={secondaryButtonStyle}>Resend email</button>
+            </form>
+
+            <form action={`/api/admin/orders/${order.id}`} method="post">
+              <input type="hidden" name="_intent" value="retry-webhook" />
+              <button type="submit" style={secondaryButtonStyle}>Retry webhook</button>
+            </form>
+
+            <form action={`/api/admin/orders/${order.id}`} method="post">
+              <input type="hidden" name="_intent" value="confirm" />
+              <button type="submit" style={primaryButtonStyle}>Mark confirmed</button>
+            </form>
+
+            <form action={`/api/admin/orders/${order.id}`} method="post">
+              <input type="hidden" name="_intent" value="cancel" />
+              <button type="submit" style={dangerButtonStyle}>Cancel order</button>
+            </form>
+          </div>
         </AdminSection>
       </div>
 
@@ -105,9 +145,9 @@ export default async function AdminOrderDetailPage({ params }) {
 
 function DetailRow({ label, value }) {
   return (
-    <div style={{ display: "grid", gap: 4, paddingBottom: 10, borderBottom: "1px solid #f0e5d7" }}>
-      <span style={{ color: "#8a7159", fontSize: 13, textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span>
-      <strong style={{ color: "#261a13", lineHeight: 1.5 }}>{value}</strong>
+    <div style={{ display: "grid", gap: 4, paddingBottom: 12, borderBottom: "1px solid var(--app-border)" }}>
+      <span style={{ color: "var(--app-text-muted)", fontSize: 12, textTransform: "uppercase", letterSpacing: "0.12em" }}>{label}</span>
+      <strong style={{ color: "var(--app-text)", lineHeight: 1.5 }}>{value}</strong>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import LegacyConfigurator from "../../../components/legacy-configurator";
+import KitchenConfigurator from "../../../components/kitchen-configurator";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "../../../lib/catalog";
-import { loadLegacyDocument } from "../../../lib/load-legacy-document";
+import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +13,8 @@ export default async function KitchenPage({ params }) {
     notFound();
   }
 
-  const legacyDocument = await loadLegacyDocument({
-    kitchenConfig: serializeKitchenForLegacy(kitchen),
-  });
+  const kitchenConfig = serializeKitchenForLegacy(kitchen);
+  const svgMarkup = await loadKitchenSvgMarkup();
 
-  return <LegacyConfigurator {...legacyDocument} />;
+  return <KitchenConfigurator kitchenConfig={kitchenConfig} svgMarkup={svgMarkup} />;
 }

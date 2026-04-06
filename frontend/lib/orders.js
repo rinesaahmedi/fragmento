@@ -34,6 +34,86 @@ function mapCatalogItem(catalogItems, submittedItem, itemType) {
   );
 }
 
+function buildOrderForNotifications(orderRecord) {
+  return {
+    id: orderRecord.id,
+    orderNumber: orderRecord.orderNumber,
+    createdAt: orderRecord.createdAt.toISOString(),
+    total: Number(orderRecord.totalPrice),
+    kitchen: {
+      id: orderRecord.kitchen.id,
+      slug: orderRecord.kitchen.slug,
+      name: orderRecord.kitchen.name,
+    },
+    customer: {
+      contractNumber: orderRecord.contractNumber || "",
+      firstName: orderRecord.firstName,
+      lastName: orderRecord.lastName,
+      email: orderRecord.email,
+      phone: orderRecord.phone,
+      address1: orderRecord.address1,
+      address2: orderRecord.address2 || "",
+      postalCode: orderRecord.postalCode,
+      city: orderRecord.city,
+      paymentMethod: orderRecord.paymentMethod || "",
+    },
+    components: orderRecord.items
+      .filter((item) => item.itemType === ItemType.COMPONENT)
+      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
+    accessories: orderRecord.items
+      .filter((item) => item.itemType === ItemType.ACCESSORY)
+      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
+    services: orderRecord.items
+      .filter((item) => item.itemType === ItemType.SERVICE)
+      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
+  };
+}
+
+async function getOrderRecordForOperations(id) {
+  const order = await prisma.order.findUnique({
+    where: { id },
+    include: {
+      kitchen: true,
+      items: { orderBy: { createdAt: "asc" } },
+    },
+  });
+
+  if (!order) {
+    throw new Error("Order not found");
+  }
+
+  return order;
+}
+
+async function processOrderNotifications({ order, pdfBase64, pdfFilename, runEmail = true, runWebhook = true }) {
+  const results = {
+    emailSent: false,
+    webhookSent: false,
+    emailError: "",
+    webhookError: "",
+  };
+
+  if (runEmail) {
+    try {
+      await sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename });
+      results.emailSent = true;
+    } catch (error) {
+      results.emailError = error instanceof Error ? error.message : "Email sending failed";
+    }
+  }
+
+  if (runWebhook) {
+    try {
+      await forwardOrderWebhook(order);
+      results.webhookSent = true;
+    } catch (error) {
+      results.webhookError = error instanceof Error ? error.message : "Webhook forwarding failed";
+    }
+  }
+
+  return results;
+}
+
 export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdfBase64, pdfFilename }) {
   const kitchen = await prisma.kitchen.findUnique({
     where: { slug: kitchenSlug },
@@ -136,35 +216,55 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     });
   });
 
-  const orderForNotifications = {
-    orderNumber: createdOrder.orderNumber,
-    createdAt: createdOrder.createdAt.toISOString(),
-    total: Number(createdOrder.totalPrice),
-    kitchen: { id: kitchen.id, slug: kitchen.slug, name: kitchen.name },
-    customer: validatedCustomer,
-    components: createdOrder.items
-      .filter((item) => item.itemType === ItemType.COMPONENT)
-      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
-    accessories: createdOrder.items
-      .filter((item) => item.itemType === ItemType.ACCESSORY)
-      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
-    services: createdOrder.items
-      .filter((item) => item.itemType === ItemType.SERVICE)
-      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
-  };
-
-  await sendOrderConfirmationEmail({
+  const orderForNotifications = buildOrderForNotifications(createdOrder);
+  const notificationResult = await processOrderNotifications({
     order: orderForNotifications,
     pdfBase64,
     pdfFilename,
+    runEmail: true,
+    runWebhook: true,
   });
 
-  await forwardOrderWebhook(orderForNotifications);
+  if (notificationResult.emailSent) {
+    await prisma.order.update({
+      where: { id: createdOrder.id },
+      data: { status: OrderStatus.EMAILED },
+    });
+  }
 
-  await prisma.order.update({
-    where: { id: createdOrder.id },
-    data: { status: OrderStatus.EMAILED },
+  return {
+    ...orderForNotifications,
+    notifications: notificationResult,
+  };
+}
+
+export async function resendOrderEmail(orderId) {
+  const orderRecord = await getOrderRecordForOperations(orderId);
+  const order = buildOrderForNotifications(orderRecord);
+
+  await sendOrderConfirmationEmail({ order });
+
+  if (orderRecord.status === OrderStatus.NEW) {
+    await prisma.order.update({
+      where: { id: orderId },
+      data: { status: OrderStatus.EMAILED },
+    });
+  }
+
+  return order;
+}
+
+export async function retryOrderWebhook(orderId) {
+  const orderRecord = await getOrderRecordForOperations(orderId);
+  const order = buildOrderForNotifications(orderRecord);
+  await forwardOrderWebhook(order);
+  return order;
+}
+
+export async function updateOrderStatus(orderId, status) {
+  const nextStatus = Object.values(OrderStatus).includes(status) ? status : OrderStatus.NEW;
+  return prisma.order.update({
+    where: { id: orderId },
+    data: { status: nextStatus },
   });
-
-  return orderForNotifications;
 }

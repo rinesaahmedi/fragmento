@@ -1,6 +1,20 @@
 import Link from "next/link";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { listKitchensForAdmin } from "../../../../lib/catalog";
+import {
+  AdminSection,
+  FlashMessage,
+  FormField,
+  MetricCard,
+  inputStyle,
+  pageGridStyle,
+  primaryButtonStyle,
+  tableStyle,
+  tableWrapStyle,
+  tdStyle,
+  textareaStyle,
+  thStyle,
+} from "../../../../components/admin-ui";
 
 export const dynamic = "force-dynamic";
 
@@ -14,115 +28,83 @@ export default async function AdminKitchensPage({ searchParams }) {
   const totalOrders = kitchens.reduce((sum, kitchen) => sum + kitchen._count.orders, 0);
 
   return (
-    <div style={{ display: "grid", gap: 24 }}>
+    <div style={pageGridStyle}>
       <section
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-          gap: 22,
+          gridTemplateColumns: "minmax(0, 1.45fr) minmax(320px, 0.9fr)",
+          gap: 24,
           alignItems: "stretch",
         }}
       >
         <div
           style={{
-            borderRadius: 30,
-            padding: "30px 30px 28px",
-            background:
-              "linear-gradient(140deg, rgba(101, 60, 28, 0.96), rgba(58, 36, 19, 0.94)), linear-gradient(180deg, #7c491f, #2d1a10)",
-            color: "#fff7ef",
-            boxShadow: "0 22px 55px rgba(88, 54, 25, 0.18)",
+            borderRadius: 12,
+            padding: 32,
+            background: "var(--app-accent)",
+            color: "var(--app-accent-contrast)",
+            border: "1px solid var(--app-border)",
             display: "grid",
-            gap: 20,
+            gap: 24,
+            alignContent: "space-between",
           }}
         >
           <div style={{ display: "grid", gap: 10 }}>
             <span style={eyebrowStyle}>Kitchen Catalog</span>
-            <h1 style={{ margin: 0, fontSize: "clamp(2.2rem, 4vw, 3.5rem)", lineHeight: 1 }}>
+            <h1 style={{ margin: 0, fontSize: "clamp(2.4rem, 4.6vw, 4.5rem)", lineHeight: 0.95, letterSpacing: "-0.02em" }}>
               Design the structure behind every live kitchen.
             </h1>
-            <p style={{ margin: 0, maxWidth: 620, color: "rgba(255,247,239,0.78)", lineHeight: 1.7 }}>
-              Create new kitchen experiences, control status, and keep the catalog clean before customers reach the configurator.
+            <p style={{ margin: 0, maxWidth: 620, color: "rgba(255,255,255,0.78)", lineHeight: 1.7 }}>
+              Manage your global culinary footprint with a centralized catalog. Control naming, routing, and operational status from a single editorial surface.
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 }}>
-            <MetricCard label="Kitchens" value={String(kitchens.length)} />
-            <MetricCard label="Active" value={String(activeCount)} />
-            <MetricCard label="Items" value={String(totalItems)} />
-            <MetricCard label="Orders" value={String(totalOrders)} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14 }}>
+            <MetricCard label="Active units" value={String(activeCount)} detail={`${kitchens.length - activeCount} offline or draft`} />
+            <MetricCard label="Catalog depth" value={String(totalItems)} detail="Published component entries" />
+            <MetricCard label="Orders" value={String(totalOrders)} detail="Tracked across all kitchens" />
           </div>
         </div>
 
-        <section
-          style={{
-            borderRadius: 28,
-            padding: 24,
-            background: "rgba(255, 252, 247, 0.95)",
-            border: "1px solid #eadbc8",
-            boxShadow: "0 18px 44px rgba(109, 78, 45, 0.12)",
-            display: "grid",
-            gap: 16,
-            alignContent: "start",
-          }}
+        <AdminSection
+          title="Create kitchen"
+          description="Create the kitchen shell now, then refine its catalog once the route is live."
         >
-          <div style={{ display: "grid", gap: 6 }}>
-            <h2 style={{ margin: 0, fontSize: "1.7rem", color: "#251a13" }}>Create kitchen</h2>
-            <p style={{ margin: 0, color: "#6d655c", lineHeight: 1.6 }}>
-              Add a new kitchen entry and publish it later when the catalog is ready.
-            </p>
-          </div>
-
-          <form action="/api/admin/kitchens" method="post" style={{ display: "grid", gap: 14 }}>
-            <label style={fieldStyle}>
-              <span>Kitchen name</span>
+          <form action="/api/admin/kitchens" method="post" style={{ display: "grid", gap: 16 }}>
+            <FormField label="Kitchen name">
               <input name="name" placeholder="Fragmento Loft" required style={inputStyle} />
-            </label>
-            <label style={fieldStyle}>
-              <span>Slug</span>
+            </FormField>
+            <FormField label="Slug">
               <input name="slug" placeholder="fragmento-loft" required style={inputStyle} />
-            </label>
-            <label style={fieldStyle}>
-              <span>Status</span>
+            </FormField>
+            <FormField label="Status">
               <select name="status" defaultValue="DRAFT" style={inputStyle}>
                 <option value="DRAFT">Draft</option>
                 <option value="ACTIVE">Active</option>
                 <option value="ARCHIVED">Archived</option>
               </select>
-            </label>
-            <label style={fieldStyle}>
-              <span>Description</span>
+            </FormField>
+            <FormField label="Description">
               <textarea name="description" placeholder="Short description" rows={4} style={textareaStyle} />
-            </label>
-            <button type="submit" style={buttonStyle}>Create kitchen</button>
+            </FormField>
+            <button type="submit" style={primaryButtonStyle}>Confirm kitchen registration</button>
           </form>
-        </section>
+        </AdminSection>
       </section>
 
       {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
       {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
 
-      <section
-        style={{
-          borderRadius: 28,
-          padding: 24,
-          background: "rgba(255, 252, 247, 0.95)",
-          border: "1px solid #eadbc8",
-          boxShadow: "0 18px 44px rgba(109, 78, 45, 0.08)",
-          display: "grid",
-          gap: 18,
-        }}
+      <AdminSection
+        title="Existing kitchens"
+        description="Browse operational units, review route slugs, and jump directly into catalog editing."
+        actions={[
+          <span key="count" style={tableHintStyle}>
+            {kitchens.length} total entries
+          </span>,
+        ]}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-          <div style={{ display: "grid", gap: 6 }}>
-            <h2 style={{ margin: 0, fontSize: "1.7rem", color: "#251a13" }}>Existing kitchens</h2>
-            <p style={{ margin: 0, color: "#6d655c", lineHeight: 1.6 }}>
-              Jump into a kitchen to edit its catalog, lock options, or preview the public route.
-            </p>
-          </div>
-          <span style={tableHintStyle}>{kitchens.length} total entries</span>
-        </div>
-
-        <div style={{ overflowX: "auto", borderRadius: 20, border: "1px solid #efe1d0" }}>
+        <div style={tableWrapStyle}>
           <table style={tableStyle}>
             <thead>
               <tr>
@@ -136,11 +118,11 @@ export default async function AdminKitchensPage({ searchParams }) {
             </thead>
             <tbody>
               {kitchens.map((kitchen) => (
-                <tr key={kitchen.id} style={{ background: "rgba(255,255,255,0.74)" }}>
+                <tr key={kitchen.id}>
                   <td style={tdStyle}>
                     <div style={{ display: "grid", gap: 4 }}>
-                      <strong style={{ color: "#251a13" }}>{kitchen.name}</strong>
-                      <span style={{ color: "#8a7159", fontSize: 13 }}>Created catalog entry</span>
+                      <strong style={{ color: "var(--app-text)" }}>{kitchen.name}</strong>
+                      <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>Created catalog entry</span>
                     </div>
                   </td>
                   <td style={tdStyle}>
@@ -156,7 +138,7 @@ export default async function AdminKitchensPage({ searchParams }) {
                       <Link href={`/admin/kitchens/${kitchen.id}`} style={tableLinkStyle}>
                         Edit
                       </Link>
-                      <Link href={`/kitchens/${kitchen.slug}`} style={secondaryLinkStyle}>
+                      <Link href={`/kitchens/${kitchen.slug}`} style={previewLinkStyle}>
                         Preview
                       </Link>
                     </div>
@@ -166,46 +148,7 @@ export default async function AdminKitchensPage({ searchParams }) {
             </tbody>
           </table>
         </div>
-      </section>
-    </div>
-  );
-}
-
-function FlashMessage({ tone, message }) {
-  const palette =
-    tone === "error"
-      ? { color: "#9f2d2d", background: "#fff1f1", border: "#efcaca" }
-      : { color: "#1f6b3b", background: "#eefaf1", border: "#cce9d3" };
-
-  return (
-    <div
-      style={{
-        color: palette.color,
-        background: palette.background,
-        border: `1px solid ${palette.border}`,
-        borderRadius: 18,
-        padding: "14px 18px",
-      }}
-    >
-      {message}
-    </div>
-  );
-}
-
-function MetricCard({ label, value }) {
-  return (
-    <div
-      style={{
-        padding: "16px 18px",
-        borderRadius: 18,
-        background: "rgba(255,255,255,0.1)",
-        border: "1px solid rgba(255,255,255,0.08)",
-      }}
-    >
-      <div style={{ fontSize: 13, color: "rgba(255,247,239,0.7)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-        {label}
-      </div>
-      <strong style={{ fontSize: "2rem", lineHeight: 1 }}>{value}</strong>
+      </AdminSection>
     </div>
   );
 }
@@ -216,85 +159,19 @@ const eyebrowStyle = {
   padding: "8px 12px",
   borderRadius: 999,
   background: "rgba(255,255,255,0.12)",
-  color: "#f8d9b6",
+  color: "rgba(255,255,255,0.76)",
   fontSize: 12,
-  fontWeight: 800,
+  fontWeight: 700,
   letterSpacing: "0.12em",
   textTransform: "uppercase",
-};
-
-const fieldStyle = {
-  display: "grid",
-  gap: 8,
-  color: "#362a22",
-  fontWeight: 700,
-};
-
-const inputStyle = {
-  width: "100%",
-  minHeight: 54,
-  borderRadius: 16,
-  border: "1px solid #dcc8b3",
-  background: "#fffdfb",
-  padding: "14px 16px",
-  color: "#241913",
-  fontSize: "1rem",
-};
-
-const textareaStyle = {
-  width: "100%",
-  borderRadius: 16,
-  border: "1px solid #dcc8b3",
-  background: "#fffdfb",
-  padding: "14px 16px",
-  color: "#241913",
-  fontSize: "1rem",
-  resize: "vertical",
-};
-
-const buttonStyle = {
-  border: 0,
-  borderRadius: 16,
-  minHeight: 54,
-  padding: "14px 18px",
-  background: "linear-gradient(135deg, #9a5e24 0%, #74411a 100%)",
-  color: "#fff",
-  fontWeight: 800,
-  fontSize: "1rem",
-  cursor: "pointer",
-  boxShadow: "0 18px 30px rgba(140, 88, 34, 0.18)",
-};
-
-const tableStyle = {
-  width: "100%",
-  borderCollapse: "collapse",
-  minWidth: 820,
-  background: "#fffdfa",
-};
-
-const thStyle = {
-  textAlign: "left",
-  padding: "16px 18px",
-  fontSize: 13,
-  color: "#8c735e",
-  textTransform: "uppercase",
-  letterSpacing: "0.08em",
-  borderBottom: "1px solid #efe1d0",
-  background: "#f8efe5",
-};
-
-const tdStyle = {
-  padding: "18px",
-  borderBottom: "1px solid #f3e6d7",
-  color: "#352720",
 };
 
 const codePillStyle = {
   display: "inline-flex",
   padding: "8px 10px",
   borderRadius: 999,
-  background: "#f5ece2",
-  color: "#74411a",
+  background: "var(--app-surface-muted)",
+  color: "var(--app-accent)",
   fontSize: 13,
   fontWeight: 700,
 };
@@ -303,21 +180,21 @@ const tableHintStyle = {
   display: "inline-flex",
   padding: "8px 12px",
   borderRadius: 999,
-  background: "#f4e7d8",
-  color: "#7a4d24",
+  background: "var(--app-surface-muted)",
+  color: "var(--app-accent)",
   fontWeight: 700,
   fontSize: 13,
 };
 
 const tableLinkStyle = {
   textDecoration: "none",
-  color: "#8c5523",
-  fontWeight: 800,
+  color: "var(--app-accent)",
+  fontWeight: 700,
 };
 
-const secondaryLinkStyle = {
+const previewLinkStyle = {
   textDecoration: "none",
-  color: "#5d4635",
+  color: "var(--app-text-muted)",
   fontWeight: 700,
 };
 
@@ -327,10 +204,11 @@ function statusPill(status) {
       display: "inline-flex",
       padding: "8px 12px",
       borderRadius: 999,
-      background: "#eaf7ee",
-      color: "#207244",
-      fontSize: 13,
-      fontWeight: 800,
+      background: "var(--app-success-bg)",
+      color: "var(--app-success-text)",
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: "0.06em",
     };
   }
 
@@ -339,10 +217,11 @@ function statusPill(status) {
       display: "inline-flex",
       padding: "8px 12px",
       borderRadius: 999,
-      background: "#f0ece8",
-      color: "#6a5d52",
-      fontSize: 13,
-      fontWeight: 800,
+      background: "var(--app-neutral-bg)",
+      color: "var(--app-neutral-text)",
+      fontSize: 12,
+      fontWeight: 700,
+      letterSpacing: "0.06em",
     };
   }
 
@@ -350,9 +229,10 @@ function statusPill(status) {
     display: "inline-flex",
     padding: "8px 12px",
     borderRadius: 999,
-    background: "#fff4df",
-    color: "#8b641c",
-    fontSize: 13,
-    fontWeight: 800,
+    background: "var(--app-warning-bg)",
+    color: "var(--app-warning-text)",
+    fontSize: 12,
+    fontWeight: 700,
+    letterSpacing: "0.06em",
   };
 }

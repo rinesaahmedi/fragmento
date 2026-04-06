@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getOrdersForAdmin, listKitchensForAdmin } from "../../../lib/catalog";
 import {
+  ActionLink,
   AdminSection,
   MetricCard,
   PageHero,
@@ -21,13 +22,14 @@ export default async function AdminDashboardPage() {
     <div style={pageGridStyle}>
       <PageHero
         eyebrow="Overview"
-        title="Admin dashboard"
-        description="Track catalog readiness and recent customer activity from one place."
+        title="Welcome back"
+        description="Review live kitchen activity, keep the catalog clean, and monitor incoming customer requests from one editorial workspace."
         stats={[
           <MetricCard key="kitchens" label="Kitchens" value={String(kitchens.length)} />,
           <MetricCard key="orders" label="Orders" value={String(orders.length)} />,
           <MetricCard key="new" label="New orders" value={String(orders.filter((order) => order.status === "NEW").length)} />,
           <MetricCard key="emailed" label="Emailed" value={String(orders.filter((order) => order.status === "EMAILED").length)} />,
+          <MetricCard key="cancelled" label="Cancelled" value={String(orders.filter((order) => order.status === "CANCELLED").length)} />,
         ]}
       />
 
@@ -35,9 +37,9 @@ export default async function AdminDashboardPage() {
         title="Recent orders"
         description="Latest customer activity across all kitchens."
         actions={[
-          <Link key="view-all" href="/admin/orders" style={{ textDecoration: "none", color: "#8c5523", fontWeight: 800 }}>
+          <ActionLink key="view-all" href="/admin/orders">
             View all orders
-          </Link>,
+          </ActionLink>,
         ]}
       >
         <div style={tableWrapStyle}>
@@ -55,7 +57,7 @@ export default async function AdminDashboardPage() {
               {orders.slice(0, 8).map((order) => (
                 <tr key={order.id}>
                   <td style={tdStyle}>
-                    <Link href={`/admin/orders/${order.id}`} style={{ textDecoration: "none", color: "#8c5523", fontWeight: 800 }}>
+                    <Link href={`/admin/orders/${order.id}`} style={{ textDecoration: "none", color: "var(--app-accent)", fontWeight: 700 }}>
                       {order.orderNumber}
                     </Link>
                   </td>

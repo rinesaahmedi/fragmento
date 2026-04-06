@@ -128,13 +128,6 @@ function ensureLegacyCatalogRendered() {
     return false;
   }
 
-  const existingItems = combinedList.querySelectorAll(".component-item, .accessory-item").length;
-  const expectedItems =
-    (config.components?.length || 0) + (config.accessories?.length || 0) + (config.services?.length || 0);
-  if (existingItems > 0 && existingItems >= expectedItems) {
-    return true;
-  }
-
   const svgNamespace = "http://www.w3.org/2000/svg";
   const groupedByColor = groupSvgElementsByColor(svg);
   const lockedColors = [
@@ -142,8 +135,153 @@ function ensureLegacyCatalogRendered() {
     ...((config.components || []).filter((item) => item.isLocked && item.colorKey).map((item) => item.colorKey)),
   ].map(normalizeLegacyColorKey);
   const lockedComponentIds = new Set(lockedColors.map(buildLegacyComponentId));
+  const accessoryCodes = new Set((config.accessories || []).map((item) => item.code || item.id).filter(Boolean));
+  const serviceCodes = new Set((config.services || []).map((item) => item.code || item.id).filter(Boolean));
+  const montageRequiredCodes = new Set(config.montageRequiredCodes || []);
+  const existingItems = combinedList.querySelectorAll(".component-item, .accessory-item").length;
+  const expectedItems =
+    (config.components?.length || 0) + (config.accessories?.length || 0) + (config.services?.length || 0);
 
-  combinedList.innerHTML = "";
+  const closeAllComponentInfoTooltips = () => {
+    combinedList.querySelectorAll(".component-item.is-info-open").forEach((item) => {
+      item.classList.remove("is-info-open");
+      const trigger = item.querySelector(".component-info-trigger");
+      if (trigger) {
+        trigger.setAttribute("aria-expanded", "false");
+      }
+    });
+  };
+
+  const getSelectedComponentCodes = () =>
+    Array.from(combinedList.querySelectorAll(".component-item.selected"))
+      .map((item) => item.dataset.code || "")
+      .filter(Boolean);
+
+  const areMontageConditionsMet = () => {
+    const selectedCodes = getSelectedComponentCodes();
+    const matchedRequiredCodes = selectedCodes.filter((code) => montageRequiredCodes.has(code)).length;
+    return selectedCodes.length >= 3 && matchedRequiredCodes >= 2;
+  };
+
+  const areAnyItemsSelected = () =>
+    combinedList.querySelectorAll(".component-item.selected, .accessory-item[data-item-type=\"accessory\"].selected")
+      .length > 0;
+
+  const updateSelectionState = () => {
+    const montageServiceItem = combinedList.querySelector(".accessory-item[data-code=\"service-montage\"]");
+    if (montageServiceItem?.classList.contains("selected") && !areMontageConditionsMet()) {
+      montageServiceItem.classList.remove("selected");
+      window.showMessage?.("Die Montage-Dienstleistung wurde automatisch entfernt.");
+    }
+
+    const pickupServiceItem = combinedList.querySelector(".accessory-item[data-code=\"service-pickup\"]");
+    if (pickupServiceItem?.classList.contains("selected") && !areAnyItemsSelected()) {
+      pickupServiceItem.classList.remove("selected");
+      window.showMessage?.("Die Abholung wurde automatisch entfernt.");
+    }
+
+    window.updateTotalPriceAndSummary?.();
+  };
+
+  const toggleComponentSelection = (componentId) => {
+    if (!componentId || lockedComponentIds.has(componentId)) {
+      return;
+    }
+
+    const listItem = combinedList.querySelector(`[data-target-id="${componentId}"]`);
+    const svgGroup = svg?.querySelector(`[data-component-id="${componentId}"]`);
+    if (!listItem) {
+      return;
+    }
+
+    listItem.classList.toggle("selected");
+    svgGroup?.classList.toggle("selected");
+    updateSelectionState();
+  };
+
+  const bindCatalogInteractions = () => {
+    combinedList.querySelectorAll(".accessory-item").forEach((listItem) => {
+      const code = listItem.dataset.code || listItem.id || "";
+      listItem.dataset.code = code;
+      listItem.dataset.itemType = serviceCodes.has(code) ? "service" : accessoryCodes.has(code) ? "accessory" : "";
+    });
+
+    if (combinedList.dataset.catalogClickBound !== "true") {
+      combinedList.addEventListener(
+        "click",
+        (event) => {
+          const infoTrigger = event.target.closest(".component-info-trigger");
+          if (infoTrigger) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const hostItem = infoTrigger.closest(".component-item");
+            const willOpen = !hostItem?.classList.contains("is-info-open");
+            closeAllComponentInfoTooltips();
+            if (hostItem && willOpen) {
+              hostItem.classList.add("is-info-open");
+              infoTrigger.setAttribute("aria-expanded", "true");
+            }
+            return;
+          }
+
+          const item = event.target.closest(".component-item, .accessory-item");
+          if (!item || !combinedList.contains(item)) {
+            return;
+          }
+
+          event.preventDefault();
+          event.stopImmediatePropagation();
+          closeAllComponentInfoTooltips();
+
+          if (item.classList.contains("component-item")) {
+            toggleComponentSelection(item.dataset.targetId);
+            return;
+          }
+
+          const code = item.dataset.code || item.id || "";
+          const isCurrentlySelected = item.classList.contains("selected");
+          if (code === "service-montage" && !isCurrentlySelected && !areMontageConditionsMet()) {
+            window.showMessage?.("Für die Montage sind mindestens 3 Artikel (davon 2 Schränke) erforderlich.", "error");
+            return;
+          }
+
+          if (code === "service-pickup" && !isCurrentlySelected && !areAnyItemsSelected()) {
+            window.showMessage?.("Bitte wähle zuerst einen Artikel für die Abholung aus.", "error");
+            return;
+          }
+
+          item.classList.toggle("selected");
+
+          if (item.classList.contains("selected")) {
+            if (code === "service-montage") {
+              combinedList.querySelector(".accessory-item[data-code=\"service-pickup\"]")?.classList.remove("selected");
+            } else if (code === "service-pickup") {
+              combinedList.querySelector(".accessory-item[data-code=\"service-montage\"]")?.classList.remove("selected");
+            }
+          }
+
+          updateSelectionState();
+        },
+        true,
+      );
+      combinedList.dataset.catalogClickBound = "true";
+    }
+
+    if (document.body.dataset.legacyCatalogOutsideClickBound !== "true") {
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest(".component-name-wrap")) {
+          closeAllComponentInfoTooltips();
+        }
+      });
+      document.body.dataset.legacyCatalogOutsideClickBound = "true";
+    }
+  };
+
+  const shouldBuildCatalogItems = !(existingItems > 0 && existingItems >= expectedItems);
+
+  if (shouldBuildCatalogItems) {
+    combinedList.innerHTML = "";
+  }
 
   const createDivider = (title) => {
     const divider = document.createElement("div");
@@ -175,6 +313,7 @@ function ensureLegacyCatalogRendered() {
     }
 
     const componentId = buildLegacyComponentId(colorKey);
+    const hadExistingSvgGroup = Boolean(svg?.querySelector(`[data-component-id="${componentId}"]`));
     let svgGroup = svg?.querySelector(`[data-component-id="${componentId}"]`);
 
     if (!svgGroup && svg && groupedByColor.has(colorKey)) {
@@ -202,17 +341,13 @@ function ensureLegacyCatalogRendered() {
         svgGroup.classList.add("is-locked", "selected");
       }
 
-      if (svgGroup.dataset.catalogBound !== "true") {
-        svgGroup.addEventListener("click", () => {
-          if (lockedComponentIds.has(componentId)) {
-            return;
-          }
-
-          const listItem = combinedList.querySelector(`[data-target-id="${componentId}"]`);
-          listItem?.click();
-        });
+      if (!hadExistingSvgGroup && svgGroup.dataset.catalogBound !== "true") {
         svgGroup.dataset.catalogBound = "true";
       }
+    }
+
+    if (!shouldBuildCatalogItems) {
+      return;
     }
 
     const listItem = document.createElement("li");
@@ -247,21 +382,24 @@ function ensureLegacyCatalogRendered() {
     combinedList.appendChild(listItem);
   });
 
-  if (config.accessories?.length) {
-    createDivider("Zubehoer");
-    config.accessories.forEach((item) => {
-      combinedList.appendChild(createAccessoryItem(item));
-    });
+  if (shouldBuildCatalogItems) {
+    if (config.accessories?.length) {
+      createDivider("Zubehoer");
+      config.accessories.forEach((item) => {
+        combinedList.appendChild(createAccessoryItem(item));
+      });
+    }
+
+    if (config.services?.length) {
+      createDivider("Dienstleistungen hinzufuegen");
+      config.services.forEach((item) => {
+        combinedList.appendChild(createAccessoryItem(item));
+      });
+    }
   }
 
-  if (config.services?.length) {
-    createDivider("Dienstleistungen hinzufuegen");
-    config.services.forEach((item) => {
-      combinedList.appendChild(createAccessoryItem(item));
-    });
-  }
-
-  window.updateTotalPriceAndSummary?.();
+  bindCatalogInteractions();
+  updateSelectionState();
   return true;
 }
 

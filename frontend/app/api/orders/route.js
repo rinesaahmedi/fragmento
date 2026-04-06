@@ -11,7 +11,11 @@ export async function POST(request) {
       pdfFilename: body.pdf_filename,
     });
 
-    return NextResponse.json({ success: true, orderNumber: order.orderNumber });
+    return NextResponse.json({
+      success: true,
+      orderNumber: order.orderNumber,
+      notifications: order.notifications || null,
+    });
   } catch (error) {
     console.error("Order submission failed:", error);
     return NextResponse.json({ error: error.message || "Order submission failed" }, { status: 400 });

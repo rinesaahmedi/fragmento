@@ -1,8 +1,8 @@
-import { OrderStatus } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { getOrderById } from "../../../../../lib/catalog";
-import { prisma } from "../../../../../lib/prisma";
+import { resendOrderEmail, retryOrderWebhook, updateOrderStatus } from "../../../../../lib/orders";
 
 export async function GET(_request, { params }) {
   await requireAdminApi();
@@ -17,15 +17,35 @@ export async function GET(_request, { params }) {
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
-  const formData = await request.formData();
-  const status = String(formData.get("status") || "");
+  try {
+    const formData = await request.formData();
+    const intent = String(formData.get("_intent") || "status");
+    const status = String(formData.get("status") || "");
 
-  await prisma.order.update({
-    where: { id },
-    data: {
-      status: Object.values(OrderStatus).includes(status) ? status : OrderStatus.NEW,
-    },
-  });
+    if (intent === "resend-email") {
+      await resendOrderEmail(id);
+      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent.");
+    }
 
-  return NextResponse.redirect(new URL(`/admin/orders/${id}`, request.url), 303);
+    if (intent === "retry-webhook") {
+      await retryOrderWebhook(id);
+      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Webhook forwarded successfully.");
+    }
+
+    if (intent === "confirm") {
+      await updateOrderStatus(id, "CONFIRMED");
+      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order marked as confirmed.");
+    }
+
+    if (intent === "cancel") {
+      await updateOrderStatus(id, "CANCELLED");
+      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order marked as cancelled.");
+    }
+
+    await updateOrderStatus(id, status);
+    return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order status updated.");
+  } catch (error) {
+    const message = mapAdminMutationError(error, "Order");
+    return redirectWithFlash(request, `/admin/orders/${id}`, "error", message);
+  }
 }

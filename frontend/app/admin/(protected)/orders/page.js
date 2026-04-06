@@ -41,6 +41,7 @@ export default async function AdminOrdersPage({ searchParams }) {
           <MetricCard key="new" label="New" value={String(orders.filter((order) => order.status === "NEW").length)} />,
           <MetricCard key="emailed" label="Emailed" value={String(orders.filter((order) => order.status === "EMAILED").length)} />,
           <MetricCard key="confirmed" label="Confirmed" value={String(orders.filter((order) => order.status === "CONFIRMED").length)} />,
+          <MetricCard key="cancelled" label="Cancelled" value={String(orders.filter((order) => order.status === "CANCELLED").length)} />,
         ]}
       />
 
@@ -87,13 +88,14 @@ export default async function AdminOrdersPage({ searchParams }) {
                 <th style={thStyle}>Status</th>
                 <th style={thStyle}>Created</th>
                 <th style={thStyle}>Total</th>
+                <th style={thStyle}>Action</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((order) => (
                 <tr key={order.id}>
                   <td style={tdStyle}>
-                    <Link href={`/admin/orders/${order.id}`} style={{ textDecoration: "none", color: "#8c5523", fontWeight: 800 }}>
+                    <Link href={`/admin/orders/${order.id}`} style={{ textDecoration: "none", color: "var(--app-accent)", fontWeight: 700 }}>
                       {order.orderNumber}
                     </Link>
                   </td>
@@ -102,6 +104,11 @@ export default async function AdminOrdersPage({ searchParams }) {
                   <td style={tdStyle}><StatusBadge status={order.status} /></td>
                   <td style={tdStyle}>{new Date(order.createdAt).toLocaleString("de-DE")}</td>
                   <td style={tdStyle}>{Number(order.totalPrice).toFixed(2)} EUR</td>
+                  <td style={tdStyle}>
+                    <Link href={`/admin/orders/${order.id}`} style={{ textDecoration: "none", color: "var(--app-accent)", fontWeight: 700 }}>
+                      Open
+                    </Link>
+                  </td>
                 </tr>
               ))}
             </tbody>
