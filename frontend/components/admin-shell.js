@@ -17,28 +17,69 @@ export function AdminShell({ adminEmail, children }) {
     <div
       style={{
         minHeight: "100vh",
+        position: "relative",
+        overflow: "hidden",
+        isolation: "isolate",
         background: "var(--app-bg)",
         color: "var(--app-text)",
       }}
     >
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: -120,
+            right: "8%",
+            width: 380,
+            height: 380,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(255, 195, 132, 0.14) 0%, rgba(255, 195, 132, 0.06) 34%, transparent 68%)",
+            filter: "blur(16px)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 220,
+            left: -100,
+            width: 300,
+            height: 300,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(86, 181, 164, 0.12) 0%, rgba(86, 181, 164, 0.04) 34%, transparent 70%)",
+            filter: "blur(18px)",
+          }}
+        />
+      </div>
+
       <header
         style={{
           position: "sticky",
           top: 0,
           zIndex: 20,
-          background: "var(--app-surface)",
+          background: "rgba(255, 251, 247, 0.72)",
           borderBottom: "1px solid var(--app-border)",
+          backdropFilter: "blur(18px)",
+          boxShadow: "0 10px 26px rgba(120, 81, 50, 0.06)",
         }}
       >
         <div
           style={{
             maxWidth: 1440,
             margin: "0 auto",
-            padding: "16px 24px",
+            padding: "18px 24px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             gap: 16,
+            position: "relative",
           }}
         >
           <div style={{ display: "grid", gap: 6 }}>
@@ -48,6 +89,7 @@ export function AdminShell({ adminEmail, children }) {
                 fontWeight: 800,
                 letterSpacing: "-0.02em",
                 color: "var(--app-accent)",
+                textShadow: "0 1px 0 rgba(255,255,255,0.3)",
               }}
             >
               Fragmento Admin
@@ -61,13 +103,14 @@ export function AdminShell({ adminEmail, children }) {
             <button
               type="submit"
               style={{
-                border: "1px solid var(--app-border)",
-                borderRadius: 12,
-                padding: "10px 16px",
-                background: "transparent",
+                border: "1px solid var(--app-border-strong)",
+                borderRadius: 14,
+                padding: "11px 18px",
+                background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,243,232,0.72))",
                 color: "var(--app-text)",
                 fontWeight: 700,
                 cursor: "pointer",
+                boxShadow: "var(--app-shadow-soft)",
               }}
             >
               Logout
@@ -80,11 +123,12 @@ export function AdminShell({ adminEmail, children }) {
         style={{
           maxWidth: 1440,
           margin: "0 auto",
-          padding: "24px",
+          padding: "28px 24px 40px",
           display: "grid",
           gridTemplateColumns: "250px minmax(0, 1fr)",
           gap: 24,
           alignItems: "start",
+          position: "relative",
         }}
       >
         <aside
@@ -97,12 +141,13 @@ export function AdminShell({ adminEmail, children }) {
         >
           <section
             style={{
-              borderRadius: 12,
+              borderRadius: 18,
               padding: 20,
-              background: "var(--app-surface-muted)",
+              background: "linear-gradient(165deg, rgba(255,255,255,0.9), rgba(255,242,230,0.8))",
               border: "1px solid var(--app-border)",
               display: "grid",
               gap: 6,
+              boxShadow: "var(--app-shadow-soft)",
             }}
           >
             <span
@@ -131,12 +176,13 @@ export function AdminShell({ adminEmail, children }) {
           <nav
             aria-label="Sidebar"
             style={{
-              borderRadius: 12,
+              borderRadius: 18,
               padding: 12,
-              background: "var(--app-surface-muted)",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,246,236,0.8))",
               border: "1px solid var(--app-border)",
               display: "grid",
               gap: 8,
+              boxShadow: "var(--app-shadow-soft)",
             }}
           >
             {navItems.map((item) => {
@@ -153,11 +199,14 @@ export function AdminShell({ adminEmail, children }) {
                     alignItems: "center",
                     gap: 12,
                     padding: "12px 14px",
-                    borderRadius: 10,
-                    background: active ? "var(--app-surface)" : "transparent",
+                    borderRadius: 14,
+                    background: active
+                      ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.12))"
+                      : "rgba(255,255,255,0.28)",
                     color: active ? "var(--app-accent)" : "var(--app-text)",
-                    border: `1px solid ${active ? "var(--app-border)" : "transparent"}`,
+                    border: `1px solid ${active ? "var(--app-border-strong)" : "rgba(255,255,255,0.2)"}`,
                     fontWeight: active ? 700 : 600,
+                    boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "none",
                   }}
                 >
                   <Icon active={active} />
@@ -191,12 +240,17 @@ function IconFrame({ children, active = false }) {
     <span
       aria-hidden="true"
       style={{
-        width: 18,
-        height: 18,
+        width: 30,
+        height: 30,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
+        borderRadius: 10,
+        background: active
+          ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.14))"
+          : "rgba(255,255,255,0.76)",
         color: active ? "var(--app-accent)" : "var(--app-text-muted)",
+        border: `1px solid ${active ? "rgba(143,62,44,0.1)" : "rgba(172,111,70,0.12)"}`,
       }}
     >
       {children}

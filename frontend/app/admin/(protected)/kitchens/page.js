@@ -39,14 +39,16 @@ export default async function AdminKitchensPage({ searchParams }) {
       >
         <div
           style={{
-            borderRadius: 12,
+            borderRadius: 22,
             padding: 32,
-            background: "var(--app-accent)",
+            background: "var(--app-hero-overlay), var(--app-hero-gradient)",
             color: "var(--app-accent-contrast)",
-            border: "1px solid var(--app-border)",
+            border: "1px solid rgba(255,255,255,0.12)",
             display: "grid",
             gap: 24,
             alignContent: "space-between",
+            boxShadow: "var(--app-shadow)",
+            overflow: "hidden",
           }}
         >
           <div style={{ display: "grid", gap: 10 }}>
@@ -158,8 +160,8 @@ const eyebrowStyle = {
   width: "fit-content",
   padding: "8px 12px",
   borderRadius: 999,
-  background: "rgba(255,255,255,0.12)",
-  color: "rgba(255,255,255,0.76)",
+  background: "rgba(255,255,255,0.14)",
+  color: "rgba(255,248,242,0.84)",
   fontSize: 12,
   fontWeight: 700,
   letterSpacing: "0.12em",
@@ -170,20 +172,22 @@ const codePillStyle = {
   display: "inline-flex",
   padding: "8px 10px",
   borderRadius: 999,
-  background: "var(--app-surface-muted)",
+  background: "linear-gradient(135deg, var(--app-accent-soft), rgba(255,255,255,0.92))",
   color: "var(--app-accent)",
   fontSize: 13,
   fontWeight: 700,
+  border: "1px solid rgba(143, 62, 44, 0.12)",
 };
 
 const tableHintStyle = {
   display: "inline-flex",
   padding: "8px 12px",
   borderRadius: 999,
-  background: "var(--app-surface-muted)",
+  background: "linear-gradient(135deg, var(--app-highlight-soft), rgba(255,255,255,0.92))",
   color: "var(--app-accent)",
   fontWeight: 700,
   fontSize: 13,
+  border: "1px solid rgba(232, 155, 53, 0.14)",
 };
 
 const tableLinkStyle = {

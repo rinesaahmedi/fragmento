@@ -4,13 +4,15 @@ export function PageHero({ eyebrow, title, description, actions, stats }) {
   return (
     <section
       style={{
-        borderRadius: 12,
+        borderRadius: 22,
         padding: "32px",
-        background: "var(--app-accent)",
+        background: "var(--app-hero-overlay), var(--app-hero-gradient)",
         color: "var(--app-accent-contrast)",
-        border: "1px solid var(--app-border)",
+        border: "1px solid rgba(255,255,255,0.12)",
         display: "grid",
         gap: 24,
+        boxShadow: "var(--app-shadow)",
+        overflow: "hidden",
       }}
     >
       <div style={{ display: "flex", justifyContent: "space-between", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
@@ -48,8 +50,8 @@ export function AdminSection({ title, description, actions, children }) {
 export function FlashMessage({ tone, message }) {
   const palette =
     tone === "error"
-      ? { color: "var(--app-danger-text)", background: "var(--app-danger-bg)", border: "var(--app-border)" }
-      : { color: "var(--app-success-text)", background: "var(--app-success-bg)", border: "var(--app-border)" };
+      ? { color: "var(--app-danger-text)", background: "linear-gradient(135deg, var(--app-danger-bg), rgba(255,255,255,0.92))", border: "rgba(180, 71, 57, 0.18)" }
+      : { color: "var(--app-success-text)", background: "linear-gradient(135deg, var(--app-success-bg), rgba(255,255,255,0.92))", border: "rgba(53, 113, 88, 0.18)" };
 
   return (
     <div
@@ -57,8 +59,9 @@ export function FlashMessage({ tone, message }) {
         color: palette.color,
         background: palette.background,
         border: `1px solid ${palette.border}`,
-        borderRadius: 12,
+        borderRadius: 16,
         padding: "14px 18px",
+        boxShadow: "var(--app-shadow-soft)",
       }}
     >
       {message}
@@ -71,9 +74,11 @@ export function MetricCard({ label, value, detail }) {
     <div
       style={{
         padding: "18px 20px",
-        borderRadius: 12,
-        background: "rgba(255,255,255,0.08)",
+        borderRadius: 18,
+        background: "linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.06))",
         border: "1px solid rgba(255,255,255,0.14)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.08)",
+        backdropFilter: "blur(6px)",
       }}
     >
       <div style={{ fontSize: 12, color: "rgba(255,255,255,0.68)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.12em", fontWeight: 700 }}>
@@ -131,9 +136,10 @@ export const checkboxRowStyle = { display: "flex", gap: 16, alignItems: "center"
 export const actionRowStyle = { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" };
 export const tableWrapStyle = {
   overflowX: "auto",
-  borderRadius: 12,
+  borderRadius: 18,
   border: "1px solid var(--app-border)",
-  background: "var(--app-surface)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,249,245,0.86))",
+  boxShadow: "var(--app-shadow-soft)",
 };
 export const tableStyle = { width: "100%", borderCollapse: "collapse", minWidth: 820, background: "var(--app-surface)" };
 export const thStyle = {
@@ -144,7 +150,7 @@ export const thStyle = {
   textTransform: "uppercase",
   letterSpacing: "0.12em",
   borderBottom: "1px solid var(--app-border)",
-  background: "var(--app-surface-muted)",
+  background: "linear-gradient(180deg, rgba(255,250,246,0.95), rgba(252,241,232,0.88))",
   fontWeight: 700,
 };
 export const tdStyle = {
@@ -156,66 +162,72 @@ export const tdStyle = {
 export const inputStyle = {
   width: "100%",
   minHeight: 52,
-  borderRadius: 10,
-  border: "1px solid var(--app-border)",
-  background: "var(--app-surface)",
+  borderRadius: 14,
+  border: "1px solid var(--app-border-strong)",
+  background: "rgba(255,255,255,0.82)",
   padding: "13px 15px",
   color: "var(--app-text)",
   fontSize: "0.98rem",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
 };
 export const textareaStyle = {
   width: "100%",
-  borderRadius: 10,
-  border: "1px solid var(--app-border)",
-  background: "var(--app-surface)",
+  borderRadius: 14,
+  border: "1px solid var(--app-border-strong)",
+  background: "rgba(255,255,255,0.82)",
   padding: "13px 15px",
   color: "var(--app-text)",
   fontSize: "0.98rem",
   resize: "vertical",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
 };
 export const primaryButtonStyle = {
-  border: "1px solid var(--app-accent)",
-  borderRadius: 10,
+  border: "1px solid rgba(255,255,255,0.12)",
+  borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "var(--app-accent)",
+  background: "linear-gradient(135deg, var(--app-accent) 0%, #b86438 100%)",
   color: "var(--app-accent-contrast)",
   fontWeight: 700,
   fontSize: "0.98rem",
   cursor: "pointer",
+  boxShadow: "0 16px 30px rgba(143, 62, 44, 0.18)",
 };
 export const secondaryButtonStyle = {
-  border: "1px solid var(--app-border)",
-  borderRadius: 10,
+  border: "1px solid var(--app-border-strong)",
+  borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "transparent",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,243,232,0.72))",
   color: "var(--app-accent)",
   fontWeight: 700,
   fontSize: "0.98rem",
   cursor: "pointer",
+  boxShadow: "var(--app-shadow-soft)",
 };
 export const dangerButtonStyle = {
-  border: "1px solid var(--app-border)",
-  borderRadius: 10,
+  border: "1px solid rgba(180, 71, 57, 0.12)",
+  borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "var(--app-danger-bg)",
+  background: "linear-gradient(135deg, var(--app-danger-bg), rgba(255,255,255,0.92))",
   color: "var(--app-danger-text)",
   fontWeight: 700,
   fontSize: "0.98rem",
   cursor: "pointer",
+  boxShadow: "var(--app-shadow-soft)",
 };
 export const mutedTextStyle = { margin: 0, color: "var(--app-text-muted)", lineHeight: 1.6 };
 export const subMetaStyle = { display: "flex", gap: 10, flexWrap: "wrap", color: "var(--app-text-muted)", fontSize: 14 };
 export const cardListStyle = { display: "grid", gap: 16 };
 export const itemCardStyle = {
   border: "1px solid var(--app-border)",
-  borderRadius: 12,
+  borderRadius: 18,
   padding: 20,
-  background: "var(--app-surface)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,249,245,0.88))",
   display: "grid",
   gap: 16,
+  boxShadow: "var(--app-shadow-soft)",
 };
 export const itemHeaderStyle = {
   display: "flex",
@@ -229,19 +241,21 @@ export const codePillStyle = {
   display: "inline-flex",
   padding: "8px 10px",
   borderRadius: 999,
-  background: "var(--app-surface-muted)",
+  background: "linear-gradient(135deg, var(--app-accent-soft), rgba(255,255,255,0.9))",
   color: "var(--app-accent)",
   fontSize: 13,
   fontWeight: 700,
+  border: "1px solid rgba(143, 62, 44, 0.12)",
 };
 
 const panelStyle = {
-  borderRadius: 12,
+  borderRadius: 20,
   padding: 24,
-  background: "var(--app-surface)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,249,245,0.88))",
   border: "1px solid var(--app-border)",
   display: "grid",
   gap: 20,
+  boxShadow: "var(--app-shadow-soft)",
 };
 
 const sectionHeaderStyle = {
@@ -270,8 +284,8 @@ const eyebrowStyle = {
   width: "fit-content",
   padding: "7px 12px",
   borderRadius: 999,
-  background: "rgba(255,255,255,0.12)",
-  color: "rgba(255,255,255,0.76)",
+  background: "rgba(255,255,255,0.14)",
+  color: "rgba(255,248,242,0.84)",
   fontSize: 12,
   fontWeight: 700,
   letterSpacing: "0.12em",
@@ -280,23 +294,24 @@ const eyebrowStyle = {
 
 const linkButtonStyle = {
   textDecoration: "none",
-  borderRadius: 10,
+  borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "var(--app-surface)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,248,242,0.8))",
   color: "var(--app-accent)",
-  border: "1px solid rgba(255,255,255,0.18)",
+  border: "1px solid rgba(255,255,255,0.22)",
   fontWeight: 700,
   display: "inline-flex",
   alignItems: "center",
+  boxShadow: "0 12px 24px rgba(59, 25, 17, 0.14)",
 };
 
 const secondaryLinkStyle = {
   textDecoration: "none",
-  borderRadius: 10,
+  borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "transparent",
+  background: "rgba(255,255,255,0.08)",
   color: "var(--app-accent-contrast)",
   border: "1px solid rgba(255,255,255,0.24)",
   fontWeight: 700,
@@ -315,25 +330,26 @@ function statusPill(status) {
   };
 
   if (status === "ACTIVE" || status === "CONFIRMED") {
-    return { ...base, background: "var(--app-success-bg)", color: "var(--app-success-text)" };
+    return { ...base, background: "linear-gradient(135deg, var(--app-success-bg), rgba(255,255,255,0.78))", color: "var(--app-success-text)", border: "1px solid rgba(53, 113, 88, 0.14)" };
   }
 
   if (status === "ARCHIVED" || status === "CANCELLED") {
-    return { ...base, background: "var(--app-neutral-bg)", color: "var(--app-neutral-text)" };
+    return { ...base, background: "linear-gradient(135deg, var(--app-neutral-bg), rgba(255,255,255,0.72))", color: "var(--app-neutral-text)", border: "1px solid rgba(112, 89, 78, 0.12)" };
   }
 
   if (status === "EMAILED") {
-    return { ...base, background: "var(--app-info-bg)", color: "var(--app-info-text)" };
+    return { ...base, background: "linear-gradient(135deg, var(--app-info-bg), rgba(255,255,255,0.78))", color: "var(--app-info-text)", border: "1px solid rgba(45, 108, 121, 0.14)" };
   }
 
-  return { ...base, background: "var(--app-warning-bg)", color: "var(--app-warning-text)" };
+  return { ...base, background: "linear-gradient(135deg, var(--app-warning-bg), rgba(255,255,255,0.78))", color: "var(--app-warning-text)", border: "1px solid rgba(144, 98, 14, 0.12)" };
 }
 
 const typePillStyle = {
-  background: "var(--app-surface-muted)",
+  background: "linear-gradient(135deg, var(--app-secondary-soft), rgba(255,255,255,0.88))",
   color: "var(--app-accent)",
   borderRadius: 999,
   padding: "7px 12px",
   fontSize: 12,
   fontWeight: 700,
+  border: "1px solid rgba(43, 141, 128, 0.12)",
 };
