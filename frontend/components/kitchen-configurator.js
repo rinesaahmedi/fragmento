@@ -34,7 +34,7 @@ const ICON_MARKUP = {
   drawer_base_three:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><line x1="0" y1="44" x2="60" y2="44"/><line x1="20" y1="9" x2="40" y2="9" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="30" x2="40" y2="30" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="58" x2="40" y2="58" stroke-linecap="round" stroke-width="1.5"/></svg>',
   tall_refrigerator:
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 190" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="185"/><line x1="5" y1="186" x2="5" y2="189" stroke-width="1.5"/><line x1="55" y1="186" x2="55" y2="189" stroke-width="1.5"/><line x1="0" y1="110" x2="60" y2="110"/><line x1="10" y1="108" x2="50" y2="108" stroke-linecap="round" stroke-width="1.5"/><line x1="10" y1="112" x2="50" y2="112" stroke-linecap="round" stroke-width="1.5"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 190" fill="none" stroke="currentColor" stroke-width="1"><line x1="3" y1="1" x2="57" y2="1"/><line x1="3" y1="1" x2="3" y2="186"/><line x1="57" y1="1" x2="57" y2="186"/><line x1="3" y1="186" x2="57" y2="186"/><line x1="8" y1="186" x2="8" y2="189" stroke-width="1.5"/><line x1="52" y1="186" x2="52" y2="189" stroke-width="1.5"/><line x1="3" y1="110" x2="57" y2="110"/><line x1="12" y1="108" x2="48" y2="108" stroke-linecap="round" stroke-width="1.5"/><line x1="12" y1="112" x2="48" y2="112" stroke-linecap="round" stroke-width="1.5"/></svg>',
   extractor_hood_chimney:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="24" y="0.5" width="12" height="39"/><line x1="24" y1="20" x2="36" y2="20"/><rect x="10" y="40" width="40" height="12"/><g stroke="#666" stroke-width="0.75"><line x1="18" y1="55" x2="15" y2="62"/><line x1="22" y1="55" x2="22" y2="63"/><line x1="26" y1="55" x2="29" y2="62"/><line x1="34" y1="55" x2="31" y2="62"/><line x1="38" y1="55" x2="38" y2="63"/><line x1="42" y1="55" x2="45" y2="62"/></g></svg>',
   wall_cabinet_standard:
@@ -114,14 +114,50 @@ const PLAN_COMPONENT_BOUNDS = {
   "component-worktop": { x: 236, y: 392, width: 421, height: 7 },
 };
 
+const PLAN_VIEWPORT_BY_SLUG = {
+  "kitchen-model-c": {
+    viewBox: "70 140 720 320",
+    preserveAspectRatio: "xMidYMid meet",
+    canvasClassName: "wide",
+  },
+};
+
 function getPlanBounds(group, componentId) {
-  const predefined = PLAN_COMPONENT_BOUNDS[componentId];
-  if (predefined) return predefined;
   if (group && typeof group.getBBox === "function") {
     const box = group.getBBox();
-    return { x: box.x, y: box.y, width: box.width, height: box.height };
+    if (box && box.width > 0 && box.height > 0) {
+      return { x: box.x, y: box.y, width: box.width, height: box.height };
+    }
   }
-  return null;
+  return PLAN_COMPONENT_BOUNDS[componentId] || null;
+}
+
+function applyPlanViewportToMarkup(markup, slug) {
+  const viewport = PLAN_VIEWPORT_BY_SLUG[slug];
+  if (!viewport || !markup) return markup;
+
+  return markup.replace(/<svg\b([^>]*)>/i, (match, attributes) => {
+    let nextAttributes = attributes;
+
+    if (/\bviewBox\s*=\s*["'][^"']*["']/i.test(nextAttributes)) {
+      nextAttributes = nextAttributes.replace(/\bviewBox\s*=\s*["'][^"']*["']/i, `viewBox="${viewport.viewBox}"`);
+    } else {
+      nextAttributes += ` viewBox="${viewport.viewBox}"`;
+    }
+
+    if (viewport.preserveAspectRatio) {
+      if (/\bpreserveAspectRatio\s*=\s*["'][^"']*["']/i.test(nextAttributes)) {
+        nextAttributes = nextAttributes.replace(
+          /\bpreserveAspectRatio\s*=\s*["'][^"']*["']/i,
+          `preserveAspectRatio="${viewport.preserveAspectRatio}"`,
+        );
+      } else {
+        nextAttributes += ` preserveAspectRatio="${viewport.preserveAspectRatio}"`;
+      }
+    }
+
+    return `<svg${nextAttributes}>`;
+  });
 }
 
 function applyGroupVisualState(group, { selected, hovered, locked }) {
@@ -184,6 +220,8 @@ function applyGroupVisualState(group, { selected, hovered, locked }) {
 
 export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   const svgHostRef = useRef(null);
+  const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenConfig.kitchen.slug];
+  const resolvedSvgMarkup = applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug);
   const lockedComponentIds = [
     ...(kitchenConfig.lockedBaseColors || []),
     ...kitchenConfig.components
@@ -246,6 +284,34 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     const svg = host?.querySelector("svg");
     if (!host || !svg) {
       return;
+    }
+
+    if (!svg.dataset.originalViewBox) {
+      svg.dataset.originalViewBox = svg.getAttribute("viewBox") || "";
+    }
+    if (!svg.dataset.originalPreserveAspectRatio) {
+      svg.dataset.originalPreserveAspectRatio = svg.getAttribute("preserveAspectRatio") || "";
+    }
+
+    if (planViewport?.viewBox) {
+      svg.setAttribute("viewBox", planViewport.viewBox);
+      if (planViewport.preserveAspectRatio) {
+        svg.setAttribute("preserveAspectRatio", planViewport.preserveAspectRatio);
+      }
+    } else if (svg.dataset.originalViewBox) {
+      svg.setAttribute("viewBox", svg.dataset.originalViewBox);
+      if (svg.dataset.originalPreserveAspectRatio) {
+        svg.setAttribute("preserveAspectRatio", svg.dataset.originalPreserveAspectRatio);
+      } else {
+        svg.removeAttribute("preserveAspectRatio");
+      }
+    } else {
+      svg.removeAttribute("viewBox");
+      if (svg.dataset.originalPreserveAspectRatio) {
+        svg.setAttribute("preserveAspectRatio", svg.dataset.originalPreserveAspectRatio);
+      } else {
+        svg.removeAttribute("preserveAspectRatio");
+      }
     }
 
     const namespace = "http://www.w3.org/2000/svg";
@@ -321,7 +387,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     return () => {
       host.removeEventListener("click", onClick, true);
     };
-  }, [kitchenConfig.components, lockedComponentIdsKey]);
+  }, [kitchenConfig.components, lockedComponentIdsKey, planViewport]);
 
   useEffect(() => {
     const host = svgHostRef.current;
@@ -532,253 +598,264 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
           </div>
         </header>
 
-        <section className={styles.layout}>
-          <div className={styles.stage}>
-            <div className={styles.stageHeader}>
-              <div>
-                <p className={styles.eyebrow}>Plan</p>
-                <h2>Interaktive Kuechenansicht</h2>
-              </div>
-              <button
-                type="button"
-                className={styles.ghostButton}
-                onClick={() => {
-                  setSelectedAccessoryCodes([]);
-                  setSelectedServiceCodes([]);
-                  setSelectedComponentIds(lockedComponentIds);
-                  setStatus("");
-                  setStatusTone("idle");
-                }}
-              >
-                Auswahl zuruecksetzen
-              </button>
-            </div>
-            <div className={styles.stageBody}>
-              <div className={styles.svgCard}>
-                <div ref={svgHostRef} className={styles.svgCanvas} dangerouslySetInnerHTML={{ __html: svgMarkup }} />
-              </div>
-              <div className={styles.stageLegend}>
-                <span className={styles.legendChip}>
-                  <span className={styles.legendSwatch} />
-                  Im Plan anklicken oder rechts auswaehlen
-                </span>
-                <span className={styles.legendChip}>
-                  <span className={styles.legendDot} />
-                  Fixe Bestandteile bleiben immer aktiv
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <aside className={styles.sidebar}>
-            <div className={styles.sidebarHeader}>
-              <div>
-                <p className={styles.eyebrow}>Katalog</p>
-                <h2>Bauteile und Optionen</h2>
-              </div>
-              <span className={styles.badge}>
-                {selectedComponents.length + selectedAccessories.length + selectedServices.length}
-              </span>
-            </div>
-            <div className={styles.catalog}>
-              <section className={styles.catalogSection}>
-                <h3>Komponenten</h3>
-                <div className={styles.catalogGrid}>
-                  {visibleComponents.map((item) => {
-                    const componentId = componentIdForItem(item);
-
-                    return renderCatalogItem(item, {
-                      selected: selectedComponentIds.includes(componentId),
-                      onClick: () =>
-                        setSelectedComponentIds((current) =>
-                          current.includes(componentId)
-                            ? current.filter((id) => id !== componentId)
-                            : [...current, componentId],
-                        ),
-                    });
-                  })}
+        <section className={styles.contentGrid}>
+          <div className={styles.mainColumn}>
+            <div className={styles.stage}>
+              <div className={styles.stageHeader}>
+                <div>
+                  <p className={styles.eyebrow}>Plan</p>
+                  <h2>Interaktive Kuechenansicht</h2>
                 </div>
-              </section>
-
-              <section className={styles.catalogSection}>
-                <h3>Zubehoer</h3>
-                <div className={styles.catalogGrid}>
-                  {kitchenConfig.accessories.map((item) =>
-                    renderCatalogItem(item, {
-                      selected: selectedAccessoryCodes.includes(item.code),
-                      onClick: () => toggleAccessory(item.code),
-                    }),
-                  )}
-                </div>
-              </section>
-
-              <section className={styles.catalogSection}>
-                <h3>Dienstleistungen</h3>
-                <div className={styles.catalogGrid}>
-                  {kitchenConfig.services.map((item) =>
-                    renderCatalogItem(item, {
-                      selected: selectedServiceCodes.includes(item.code),
-                      onClick: () => toggleService(item.code),
-                      hint:
-                        item.code === "service-montage"
-                          ? "Mindestens 3 Artikel, davon 2 Schrank-Komponenten"
-                          : item.code === "service-pickup"
-                            ? "Nur mit mindestens einem ausgewaehlten Artikel"
-                            : "",
-                    }),
-                  )}
-                </div>
-              </section>
-            </div>
-          </aside>
-        </section>
-
-        <section className={styles.summaryGrid}>
-          <div className={styles.panel}>
-            <div className={styles.panelHeader}>
-              <div>
-                <p className={styles.eyebrow}>Uebersicht</p>
-                <h2>Deine Auswahl</h2>
-              </div>
-            </div>
-            <div className={styles.summaryList}>
-              {!selectedComponents.length && !selectedAccessories.length && !selectedServices.length ? (
-                <div className={styles.emptyState}>Noch keine Artikel ausgewaehlt.</div>
-              ) : null}
-
-              {selectedComponents.length ? <div className={styles.summarySectionTitle}>Komponenten</div> : null}
-              {selectedComponents.map((item) => (
-                <div key={item.id} className={styles.summaryRow}>
-                  <div className={styles.summaryMeta}>
-                    <strong>{item.name}</strong>
-                    <span>{item.isLocked ? "Fixer Bestandteil" : "Ausgewaehlt"}</span>
-                  </div>
-                  <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
-                  <button
-                    type="button"
-                    className={styles.summaryRemove}
-                    onClick={() => removeComponent(item)}
-                    disabled={item.isLocked}
-                  >
-                    {item.isLocked ? "Fix" : "Entfernen"}
-                  </button>
-                </div>
-              ))}
-
-              {selectedAccessories.length ? <div className={styles.summarySectionTitle}>Zubehoer</div> : null}
-              {selectedAccessories.map((item) => (
-                <div key={item.id} className={styles.summaryRow}>
-                  <div className={styles.summaryMeta}>
-                    <strong>{item.name}</strong>
-                  </div>
-                  <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
-                  <button type="button" className={styles.summaryRemove} onClick={() => removeAccessory(item)}>
-                    Entfernen
-                  </button>
-                </div>
-              ))}
-
-              {selectedServices.length ? <div className={styles.summarySectionTitle}>Dienstleistungen</div> : null}
-              {selectedServices.map((item) => (
-                <div key={item.id} className={styles.summaryRow}>
-                  <div className={styles.summaryMeta}>
-                    <strong>{item.name}</strong>
-                  </div>
-                  <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
-                  <button type="button" className={styles.summaryRemove} onClick={() => removeService(item)}>
-                    Entfernen
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className={styles.orderPanel}>
-            <div className={styles.panelHeader}>
-              <div>
-                <p className={styles.eyebrow}>Bestellung</p>
-                <h2>Kundendaten</h2>
-              </div>
-            </div>
-            <div className={styles.totalsCard}>
-              <span>Aktuelle Summe</span>
-              <strong>{formatCurrency(grandTotal)}</strong>
-              <div className={styles.totalsActions}>
-                <button type="submit" form="order-form" className={styles.primaryButton} disabled={isSubmitting}>
-                  {isSubmitting ? "Wird gesendet..." : "Bestellung absenden"}
+                <button
+                  type="button"
+                  className={styles.ghostButton}
+                  onClick={() => {
+                    setSelectedAccessoryCodes([]);
+                    setSelectedServiceCodes([]);
+                    setSelectedComponentIds(lockedComponentIds);
+                    setStatus("");
+                    setStatusTone("idle");
+                  }}
+                >
+                  Auswahl zuruecksetzen
                 </button>
               </div>
+              <div className={styles.stageBody}>
+                <div className={styles.svgCard}>
+                  <div
+                    ref={svgHostRef}
+                    className={[
+                      styles.svgCanvas,
+                      planViewport?.canvasClassName === "wide" ? styles.svgCanvasWide : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    dangerouslySetInnerHTML={{ __html: resolvedSvgMarkup }}
+                  />
+                </div>
+                <div className={styles.stageLegend}>
+                  <span className={styles.legendChip}>
+                    <span className={styles.legendSwatch} />
+                    Im Plan anklicken oder rechts auswaehlen
+                  </span>
+                  <span className={styles.legendChip}>
+                    <span className={styles.legendDot} />
+                    Fixe Bestandteile bleiben immer aktiv
+                  </span>
+                </div>
+              </div>
             </div>
 
-            <form id="order-form" className={styles.orderForm} onSubmit={handleSubmit}>
-              <div className={styles.field}>
-                <label htmlFor="contractNumber">Vertragsnummer</label>
-                <input id="contractNumber" value={customer.contractNumber} onChange={(event) => updateCustomer("contractNumber", event.target.value)} />
+            <div className={styles.panel}>
+              <div className={styles.panelHeader}>
+                <div>
+                  <p className={styles.eyebrow}>Uebersicht</p>
+                  <h2>Deine Auswahl</h2>
+                </div>
               </div>
-              <div className={styles.field}>
-                <label htmlFor="paymentMethod">Zahlungsart</label>
-                <select id="paymentMethod" value={customer.paymentMethod} onChange={(event) => updateCustomer("paymentMethod", event.target.value)}>
-                  <option value="">Bitte waehlen</option>
-                  <option value="visa">Visa</option>
-                  <option value="mastercard">Mastercard</option>
-                  <option value="klarna">Klarna</option>
-                </select>
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="firstName">Vorname</label>
-                <input id="firstName" required value={customer.firstName} onChange={(event) => updateCustomer("firstName", event.target.value)} />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="lastName">Nachname</label>
-                <input id="lastName" required value={customer.lastName} onChange={(event) => updateCustomer("lastName", event.target.value)} />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="email">E-Mail</label>
-                <input id="email" type="email" required value={customer.email} onChange={(event) => updateCustomer("email", event.target.value)} />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="phone">Telefon</label>
-                <input id="phone" required value={customer.phone} onChange={(event) => updateCustomer("phone", event.target.value)} />
-              </div>
-              <div className={styles.fieldFull}>
-                <label htmlFor="address1">Adresse</label>
-                <input id="address1" required value={customer.address1} onChange={(event) => updateCustomer("address1", event.target.value)} />
-              </div>
-              <div className={styles.fieldFull}>
-                <label htmlFor="address2">Adresszusatz</label>
-                <input id="address2" value={customer.address2} onChange={(event) => updateCustomer("address2", event.target.value)} />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="postalCode">PLZ</label>
-                <input id="postalCode" required value={customer.postalCode} onChange={(event) => updateCustomer("postalCode", event.target.value)} />
-              </div>
-              <div className={styles.field}>
-                <label htmlFor="city">Ort</label>
-                <input id="city" required value={customer.city} onChange={(event) => updateCustomer("city", event.target.value)} />
-              </div>
-              <div className={styles.checkboxRow}>
-                <input
-                  id="consent"
-                  type="checkbox"
-                  checked={customer.consent}
-                  onChange={(event) => updateCustomer("consent", event.target.checked)}
-                />
-                <label htmlFor="consent">
-                  Ich bestaetige, dass meine Angaben zur Bearbeitung der Bestellung verwendet werden duerfen.
-                </label>
-              </div>
-            </form>
+              <div className={styles.summaryList}>
+                {!selectedComponents.length && !selectedAccessories.length && !selectedServices.length ? (
+                  <div className={styles.emptyState}>Noch keine Artikel ausgewaehlt.</div>
+                ) : null}
 
-            <div
-              className={[
-                styles.status,
-                statusTone === "error" ? styles.statusError : "",
-                statusTone === "success" ? styles.statusSuccess : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              {status}
+                {selectedComponents.length ? <div className={styles.summarySectionTitle}>Komponenten</div> : null}
+                {selectedComponents.map((item) => (
+                  <div key={item.id} className={styles.summaryRow}>
+                    <div className={styles.summaryMeta}>
+                      <strong>{item.name}</strong>
+                      <span>{item.isLocked ? "Fixer Bestandteil" : "Ausgewaehlt"}</span>
+                    </div>
+                    <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
+                    <button
+                      type="button"
+                      className={styles.summaryRemove}
+                      onClick={() => removeComponent(item)}
+                      disabled={item.isLocked}
+                    >
+                      {item.isLocked ? "Fix" : "Entfernen"}
+                    </button>
+                  </div>
+                ))}
+
+                {selectedAccessories.length ? <div className={styles.summarySectionTitle}>Zubehoer</div> : null}
+                {selectedAccessories.map((item) => (
+                  <div key={item.id} className={styles.summaryRow}>
+                    <div className={styles.summaryMeta}>
+                      <strong>{item.name}</strong>
+                    </div>
+                    <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
+                    <button type="button" className={styles.summaryRemove} onClick={() => removeAccessory(item)}>
+                      Entfernen
+                    </button>
+                  </div>
+                ))}
+
+                {selectedServices.length ? <div className={styles.summarySectionTitle}>Dienstleistungen</div> : null}
+                {selectedServices.map((item) => (
+                  <div key={item.id} className={styles.summaryRow}>
+                    <div className={styles.summaryMeta}>
+                      <strong>{item.name}</strong>
+                    </div>
+                    <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
+                    <button type="button" className={styles.summaryRemove} onClick={() => removeService(item)}>
+                      Entfernen
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.sideColumn}>
+            <aside className={styles.sidebar}>
+              <div className={styles.sidebarHeader}>
+                <div>
+                  <p className={styles.eyebrow}>Katalog</p>
+                  <h2>Bauteile und Optionen</h2>
+                </div>
+                <span className={styles.badge}>
+                  {selectedComponents.length + selectedAccessories.length + selectedServices.length}
+                </span>
+              </div>
+              <div className={styles.catalog}>
+                <section className={styles.catalogSection}>
+                  <h3>Komponenten</h3>
+                  <div className={styles.catalogGrid}>
+                    {visibleComponents.map((item) => {
+                      const componentId = componentIdForItem(item);
+
+                      return renderCatalogItem(item, {
+                        selected: selectedComponentIds.includes(componentId),
+                        onClick: () =>
+                          setSelectedComponentIds((current) =>
+                            current.includes(componentId)
+                              ? current.filter((id) => id !== componentId)
+                              : [...current, componentId],
+                          ),
+                      });
+                    })}
+                  </div>
+                </section>
+
+                <section className={styles.catalogSection}>
+                  <h3>Zubehoer</h3>
+                  <div className={styles.catalogGrid}>
+                    {kitchenConfig.accessories.map((item) =>
+                      renderCatalogItem(item, {
+                        selected: selectedAccessoryCodes.includes(item.code),
+                        onClick: () => toggleAccessory(item.code),
+                      }),
+                    )}
+                  </div>
+                </section>
+
+                <section className={styles.catalogSection}>
+                  <h3>Dienstleistungen</h3>
+                  <div className={styles.catalogGrid}>
+                    {kitchenConfig.services.map((item) =>
+                      renderCatalogItem(item, {
+                        selected: selectedServiceCodes.includes(item.code),
+                        onClick: () => toggleService(item.code),
+                        hint:
+                          item.code === "service-montage"
+                            ? "Mindestens 3 Artikel, davon 2 Schrank-Komponenten"
+                            : item.code === "service-pickup"
+                              ? "Nur mit mindestens einem ausgewaehlten Artikel"
+                              : "",
+                      }),
+                    )}
+                  </div>
+                </section>
+              </div>
+            </aside>
+
+            <div className={styles.orderPanel}>
+              <div className={styles.panelHeader}>
+                <div>
+                  <p className={styles.eyebrow}>Bestellung</p>
+                  <h2>Kundendaten</h2>
+                </div>
+              </div>
+              <div className={styles.totalsCard}>
+                <span>Aktuelle Summe</span>
+                <strong>{formatCurrency(grandTotal)}</strong>
+                <div className={styles.totalsActions}>
+                  <button type="submit" form="order-form" className={styles.primaryButton} disabled={isSubmitting}>
+                    {isSubmitting ? "Wird gesendet..." : "Bestellung absenden"}
+                  </button>
+                </div>
+              </div>
+
+              <form id="order-form" className={styles.orderForm} onSubmit={handleSubmit}>
+                <div className={styles.field}>
+                  <label htmlFor="contractNumber">Vertragsnummer</label>
+                  <input id="contractNumber" value={customer.contractNumber} onChange={(event) => updateCustomer("contractNumber", event.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="paymentMethod">Zahlungsart</label>
+                  <select id="paymentMethod" value={customer.paymentMethod} onChange={(event) => updateCustomer("paymentMethod", event.target.value)}>
+                    <option value="">Bitte waehlen</option>
+                    <option value="visa">Visa</option>
+                    <option value="mastercard">Mastercard</option>
+                    <option value="klarna">Klarna</option>
+                  </select>
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="firstName">Vorname</label>
+                  <input id="firstName" required value={customer.firstName} onChange={(event) => updateCustomer("firstName", event.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="lastName">Nachname</label>
+                  <input id="lastName" required value={customer.lastName} onChange={(event) => updateCustomer("lastName", event.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="email">E-Mail</label>
+                  <input id="email" type="email" required value={customer.email} onChange={(event) => updateCustomer("email", event.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="phone">Telefon</label>
+                  <input id="phone" required value={customer.phone} onChange={(event) => updateCustomer("phone", event.target.value)} />
+                </div>
+                <div className={styles.fieldFull}>
+                  <label htmlFor="address1">Adresse</label>
+                  <input id="address1" required value={customer.address1} onChange={(event) => updateCustomer("address1", event.target.value)} />
+                </div>
+                <div className={styles.fieldFull}>
+                  <label htmlFor="address2">Adresszusatz</label>
+                  <input id="address2" value={customer.address2} onChange={(event) => updateCustomer("address2", event.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="postalCode">PLZ</label>
+                  <input id="postalCode" required value={customer.postalCode} onChange={(event) => updateCustomer("postalCode", event.target.value)} />
+                </div>
+                <div className={styles.field}>
+                  <label htmlFor="city">Ort</label>
+                  <input id="city" required value={customer.city} onChange={(event) => updateCustomer("city", event.target.value)} />
+                </div>
+                <div className={styles.checkboxRow}>
+                  <input
+                    id="consent"
+                    type="checkbox"
+                    checked={customer.consent}
+                    onChange={(event) => updateCustomer("consent", event.target.checked)}
+                  />
+                  <label htmlFor="consent">
+                    Ich bestaetige, dass meine Angaben zur Bearbeitung der Bestellung verwendet werden duerfen.
+                  </label>
+                </div>
+              </form>
+
+              <div
+                className={[
+                  styles.status,
+                  statusTone === "error" ? styles.statusError : "",
+                  statusTone === "success" ? styles.statusSuccess : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                {status}
+              </div>
             </div>
           </div>
         </section>

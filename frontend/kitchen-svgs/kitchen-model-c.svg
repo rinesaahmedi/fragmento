@@ -8,7 +8,7 @@
   <path d="M40 130V500" fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M820 130V500" fill="none" stroke="black" stroke-width="0.5"/>
 
-  <g data-component-id="component-refrigerator">
+  <g data-component-id="component-refrigerator" transform="translate(24 0)">
     <rect x="95" y="220" width="70" height="217" fill="white" stroke="black" stroke-width="1"/>
     <line x1="100" y1="437" x2="100" y2="440" stroke="black" stroke-width="1.5"/>
     <line x1="160" y1="437" x2="160" y2="440" stroke="black" stroke-width="1.5"/>
@@ -17,7 +17,7 @@
     <line x1="107" y1="352" x2="153" y2="352" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
   </g>
 
-  <g data-component-id="component-extractor-hood">
+  <g data-component-id="component-extractor-hood" transform="translate(16 34)">
     <rect x="284" y="155" width="20" height="52" fill="white" stroke="#8a6b34" stroke-width="1"/>
     <line x1="284" y1="181" x2="304" y2="181" stroke="#8a6b34" stroke-width="1"/>
     <rect x="260" y="207" width="68" height="16" fill="white" stroke="#8a6b34" stroke-width="1"/>
@@ -103,6 +103,13 @@
     </g>
   </g>
 
+  <g data-component-id="component-worktop">
+    <line x1="205" y1="338" x2="415" y2="338" fill="none" stroke="springgreen" stroke-width="1"/>
+    <line x1="205" y1="341" x2="415" y2="341" fill="none" stroke="springgreen" stroke-width="1"/>
+    <line x1="470" y1="338" x2="758" y2="338" fill="none" stroke="springgreen" stroke-width="1"/>
+    <line x1="470" y1="341" x2="758" y2="341" fill="none" stroke="springgreen" stroke-width="1"/>
+  </g>
+
   <g data-component-id="component-wm-base">
     <rect x="470" y="338" width="72" height="3" fill="white" stroke="springgreen" stroke-width="1"/>
     <rect x="470" y="341" width="72" height="82" fill="white" stroke="springgreen" stroke-width="1"/>
@@ -154,7 +161,7 @@
     <line x1="710" y1="405" x2="734" y2="405" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
   </g>
 
-  <g data-component-id="component-sink-faucet">
+  <g data-component-id="component-sink-faucet" transform="translate(0 9)">
     <rect x="575" y="326" width="5" height="3" fill="white" stroke="black" stroke-width="1"/>
     <rect x="576" y="321" width="3" height="5" fill="white" stroke="black" stroke-width="1"/>
     <path d="M577 321 L577 302 C577 294 586 294 586 302 L586 308" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
