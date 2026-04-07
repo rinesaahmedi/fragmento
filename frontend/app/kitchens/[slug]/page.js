@@ -14,7 +14,7 @@ export default async function KitchenPage({ params }) {
   }
 
   const kitchenConfig = serializeKitchenForLegacy(kitchen);
-  const svgMarkup = await loadKitchenSvgMarkup();
+  const svgMarkup = await loadKitchenSvgMarkup(slug);
 
   return <KitchenConfigurator kitchenConfig={kitchenConfig} svgMarkup={svgMarkup} />;
 }

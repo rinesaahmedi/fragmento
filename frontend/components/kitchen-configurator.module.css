@@ -167,7 +167,7 @@
 .svgCanvas {
   width: 100%;
   aspect-ratio: 4 / 3;
-  min-height: 420px;
+  min-height: 520px;
 }
 
 .svgCanvas :global(svg) {

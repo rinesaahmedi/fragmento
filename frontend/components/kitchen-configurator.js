@@ -11,6 +11,26 @@ const ICON_MARKUP = {
   wall_cabinet_l: '<img src="/img/foto4.png" alt="Oberschrank links">',
   wall_cabinet_r: '<img src="/img/foto2.png" alt="Oberschrank rechts">',
   extractor_hood: '<img src="/img/foto5.png" alt="Dunstabzugshaube">',
+  wall_cabinet_single_light:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/><g stroke="#666" stroke-width="0.75"><line x1="30" y1="60" x2="30" y2="63"/><line x1="28" y1="63" x2="32" y2="63"/><line x1="26" y1="66" x2="22" y2="74"/><line x1="30" y1="66" x2="30" y2="75"/><line x1="34" y1="66" x2="38" y2="74"/></g></svg>',
+  wall_cabinet_double_light:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/><rect x="0.5" y="60" width="59" height="2"/><g stroke="#666" stroke-width="0.75"><line x1="20" y1="62" x2="20" y2="64"/><line x1="18" y1="64" x2="22" y2="64"/><line x1="17" y1="67" x2="14" y2="73"/><line x1="20" y1="67" x2="20" y2="74"/><line x1="23" y1="67" x2="26" y2="73"/><line x1="40" y1="62" x2="40" y2="64"/><line x1="38" y1="64" x2="42" y2="64"/><line x1="37" y1="67" x2="34" y2="73"/><line x1="40" y1="67" x2="40" y2="74"/><line x1="43" y1="67" x2="46" y2="73"/></g></svg>',
+  wall_cabinet_plain:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  washing_machine_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="14" x2="60" y2="14"/><line x1="10" y1="8" x2="25" y2="8" stroke-width="0.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 16 26 C 12 26 12 46 16 46 Z"/><circle cx="30" cy="36" r="14"/><circle cx="30" cy="36" r="10"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">WM</text></svg>',
+  sink_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  dishwasher_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 10 24 L 14 44 H 46 L 50 24 Z"/><line x1="18" y1="26" x2="20" y2="44"/><line x1="26" y1="26" x2="26" y2="44"/><line x1="34" y1="26" x2="34" y2="44"/><line x1="42" y1="26" x2="40" y2="44"/><line x1="12" y1="32" x2="48" y2="32"/><line x1="13" y1="38" x2="47" y2="38"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">GS</text></svg>',
+  oven_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><rect x="44" y="6" width="4" height="4"/><rect x="52" y="6" width="4" height="4"/><line x1="0" y1="56" x2="60" y2="56"/><rect x="8" y="22" width="44" height="26"/><rect x="12" y="26" width="36" height="18"/><line x1="22" y1="62" x2="38" y2="62" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  drawer_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><line x1="20" y1="9" x2="40" y2="9" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="24" x2="40" y2="24" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  tall_refrigerator:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 190" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="185"/><line x1="5" y1="186" x2="5" y2="189" stroke-width="1.5"/><line x1="55" y1="186" x2="55" y2="189" stroke-width="1.5"/><line x1="0" y1="110" x2="60" y2="110"/><line x1="10" y1="108" x2="50" y2="108" stroke-linecap="round" stroke-width="1.5"/><line x1="10" y1="112" x2="50" y2="112" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  sink_faucet:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 30" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="28" width="4" height="2" fill="white" stroke-width="1"/><rect x="9" y="24" width="2" height="4" fill="white" stroke-width="1"/><path d="M 10 24 L 10 10 C 10 4, 16 4, 16 10 L 16 14" stroke-linecap="round"/><line x1="10" y1="18" x2="5" y2="15" stroke-linecap="round"/></svg>',
   pickup: '<img src="/img/warehouse.png" alt="Abholung im Lager">',
   waste_system:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
@@ -42,12 +62,50 @@ function normalizeColor(value) {
 
 function componentIdForColor(colorKey) {
   return `component-${String(colorKey || "")
-    .replace(/[^a-z0-9#]/gi, "")
+    .replace(/[^a-z0-9#-]/gi, "")
     .toLowerCase()}`;
+}
+
+function componentIdForKey(componentKey) {
+  return `component-${String(componentKey || "")
+    .replace(/[^a-z0-9#-]/gi, "")
+    .toLowerCase()}`;
+}
+
+function componentIdForItem(item) {
+  if (item?.componentKey) {
+    return componentIdForKey(item.componentKey);
+  }
+  return componentIdForColor(normalizeColor(item?.colorKey));
 }
 
 function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
+}
+
+const PLAN_COMPONENT_BOUNDS = {
+  "component-wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
+  "component-wall-cabinet-2": { x: 322, y: 214, width: 84, height: 118 },
+  "component-wall-cabinet-3": { x: 405, y: 214, width: 84, height: 118 },
+  "component-wall-cabinet-4": { x: 488, y: 214, width: 84, height: 126 },
+  "component-wall-cabinet-5": { x: 571, y: 214, width: 84, height: 118 },
+  "component-base-module-1": { x: 237, y: 393, width: 86, height: 127 },
+  "component-base-module-2": { x: 322, y: 393, width: 84, height: 127 },
+  "component-base-module-3": { x: 405, y: 393, width: 84, height: 127 },
+  "component-oven-module": { x: 488, y: 393, width: 84, height: 127 },
+  "component-drawer-module": { x: 571, y: 393, width: 84, height: 127 },
+  "component-refrigerator": { x: 670, y: 270, width: 76, height: 250 },
+  "component-sink-faucet": { x: 374, y: 364, width: 10, height: 29 },
+};
+
+function getPlanBounds(group, componentId) {
+  const predefined = PLAN_COMPONENT_BOUNDS[componentId];
+  if (predefined) return predefined;
+  if (group && typeof group.getBBox === "function") {
+    const box = group.getBBox();
+    return { x: box.x, y: box.y, width: box.width, height: box.height };
+  }
+  return null;
 }
 
 function applyGroupVisualState(group, { selected, hovered, locked }) {
@@ -63,20 +121,32 @@ function applyGroupVisualState(group, { selected, hovered, locked }) {
   group.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse").forEach((element) => {
     if (element.classList.contains("component-hitbox")) {
       element.style.fill = selected
-        ? "rgba(42, 145, 85, 0.12)"
+        ? "rgba(42, 145, 85, 0.08)"
         : hovered
-          ? "rgba(39, 147, 90, 0.1)"
+          ? "rgba(39, 147, 90, 0.07)"
           : locked
             ? "rgba(120, 90, 64, 0.04)"
             : "rgba(171, 107, 46, 0.02)";
       element.style.stroke = selected
-        ? "rgba(42, 145, 85, 0.52)"
+        ? "rgba(42, 145, 85, 0.22)"
         : hovered
-          ? "rgba(39, 147, 90, 0.45)"
+          ? "rgba(39, 147, 90, 0.18)"
           : locked
             ? "rgba(120, 90, 64, 0.1)"
             : "rgba(171, 107, 46, 0.06)";
       element.style.strokeWidth = "1.2px";
+      return;
+    }
+
+    if (element.classList.contains("component-frame")) {
+      element.style.fill = "none";
+      element.style.stroke = selected
+        ? "rgba(42, 145, 85, 0.88)"
+        : hovered
+          ? "rgba(39, 147, 90, 0.72)"
+          : "transparent";
+      element.style.strokeWidth = selected ? "2.4px" : hovered ? "1.8px" : "0px";
+      element.style.vectorEffect = "non-scaling-stroke";
       return;
     }
 
@@ -97,8 +167,10 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   const svgHostRef = useRef(null);
   const lockedComponentIds = [
     ...(kitchenConfig.lockedBaseColors || []),
-    ...kitchenConfig.components.filter((item) => item.isLocked && item.colorKey).map((item) => item.colorKey),
-  ].map((color) => componentIdForColor(normalizeColor(color)));
+    ...kitchenConfig.components
+      .filter((item) => item.isLocked)
+      .map((item) => (item.componentKey ? item.componentKey : normalizeColor(item.colorKey))),
+  ].map((value) => componentIdForKey(value));
 
   const [selectedComponentIds, setSelectedComponentIds] = useState([]);
   const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState([]);
@@ -123,19 +195,19 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   });
 
   const selectedComponents = kitchenConfig.components.filter((item) =>
-    selectedComponentIds.includes(componentIdForColor(normalizeColor(item.colorKey))),
+    selectedComponentIds.includes(componentIdForItem(item)),
   );
   const selectedAccessories = selectedMap(kitchenConfig.accessories, selectedAccessoryCodes);
   const selectedServices = selectedMap(kitchenConfig.services, selectedServiceCodes);
   const lockedComponentIdsKey = lockedComponentIds.join("|");
   const selectedComponentCodes = selectedComponents.map((item) => item.code);
   const visibleComponents = kitchenConfig.components.filter((item) => {
-    const componentId = componentIdForColor(normalizeColor(item.colorKey));
+    const componentId = componentIdForItem(item);
     return !lockedComponentIds.includes(componentId);
   });
   const hoveredComponent =
     kitchenConfig.components.find(
-      (item) => componentIdForColor(normalizeColor(item.colorKey)) === hoveredComponentId,
+      (item) => componentIdForItem(item) === hoveredComponentId,
     ) || null;
   const montageEligible =
     selectedComponents.length >= 3 &&
@@ -165,12 +237,11 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
 
     for (const item of kitchenConfig.components) {
       const colorKey = normalizeColor(item.colorKey);
-      if (!colorKey) continue;
-
-      const componentId = componentIdForColor(colorKey);
+      const componentId = componentIdForItem(item);
+      if (!componentId) continue;
       let group = svg.querySelector(`[data-component-id="${componentId}"]`);
 
-      if (!group && byColor.has(colorKey)) {
+      if (!group && colorKey && byColor.has(colorKey)) {
         const elements = byColor.get(colorKey);
         const firstElement = elements[0];
         const parent = firstElement?.parentNode;
@@ -184,13 +255,10 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
 
       if (group) {
         group.classList.add("kitchen-component");
-        const existingHitbox = group.querySelector(".component-hitbox");
-        if (existingHitbox) {
-          existingHitbox.remove();
-        }
+        group.querySelectorAll(".component-hitbox, .component-frame").forEach((element) => element.remove());
 
-        if (typeof group.getBBox === "function") {
-          const box = group.getBBox();
+        const box = getPlanBounds(group, componentId);
+        if (box) {
           const hitbox = document.createElementNS(namespace, "rect");
           hitbox.classList.add("component-hitbox");
           hitbox.setAttribute("x", String(box.x - 6));
@@ -202,6 +270,18 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
           hitbox.setAttribute("fill", "transparent");
           hitbox.setAttribute("stroke", "transparent");
           group.insertBefore(hitbox, group.firstChild);
+
+          const frame = document.createElementNS(namespace, "rect");
+          frame.classList.add("component-frame");
+          frame.setAttribute("x", String(box.x - 3));
+          frame.setAttribute("y", String(box.y - 3));
+          frame.setAttribute("width", String(box.width + 6));
+          frame.setAttribute("height", String(box.height + 6));
+          frame.setAttribute("rx", "6");
+          frame.setAttribute("ry", "6");
+          frame.setAttribute("fill", "none");
+          frame.setAttribute("stroke", "transparent");
+          group.insertBefore(frame, group.firstChild.nextSibling);
         }
 
         applyGroupVisualState(group, {
@@ -238,7 +318,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       setHoveredComponentId(componentId);
 
       const svgRect = svg.getBoundingClientRect();
-      const box = typeof group.getBBox === "function" ? group.getBBox() : null;
+      const box = getPlanBounds(group, componentId);
       if (!box) {
         setPlanTooltip(null);
         return;
@@ -331,7 +411,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   }
 
   function removeComponent(item) {
-    const componentId = componentIdForColor(normalizeColor(item.colorKey));
+    const componentId = componentIdForItem(item);
     if (lockedComponentIds.includes(componentId)) {
       return;
     }
@@ -536,7 +616,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                 <h3>Komponenten</h3>
                 <div className={styles.catalogGrid}>
                   {visibleComponents.map((item) => {
-                    const componentId = componentIdForColor(normalizeColor(item.colorKey));
+                    const componentId = componentIdForItem(item);
 
                     return renderCatalogItem(item, {
                       selected: selectedComponentIds.includes(componentId),
