@@ -627,6 +627,11 @@ fill="none" stroke="springgreen" stroke-width="0.5"/>
 fill="none" stroke="springgreen" stroke-width="0.5"/>
     <path d="M236.87 398.48L236.87 520.02Z"
 fill="none" stroke="springgreen" stroke-width="0.5"/>
+    <g fill="none" stroke="#ccc" stroke-width="0.5">
+      <path d="M263.9 443 C258.9 443 258.9 468 263.9 468 Z"/>
+      <circle cx="280.9" cy="455" r="17"/>
+      <circle cx="280.9" cy="455" r="12"/>
+    </g>
     <path d="M272.13 482.4L287.27 482.4"
 fill="none" stroke="springgreen" stroke-width="0.5"/>
     <path d="M287.27 482.4L287.27 496.25Z"
@@ -757,6 +762,15 @@ fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
 fill="none" stroke="springgreen" stroke-width="0.5"/>
     <path d="M488.55 499.26L488.55 520.02Z"
 fill="none" stroke="springgreen" stroke-width="0.5"/>
+    <g fill="none" stroke="#ccc" stroke-width="0.5">
+      <path d="M423.02 443 L428.02 468 H466.02 L471.02 443 Z"/>
+      <line x1="432.02" y1="445" x2="434.02" y2="468"/>
+      <line x1="442.02" y1="445" x2="442.02" y2="468"/>
+      <line x1="452.02" y1="445" x2="452.02" y2="468"/>
+      <line x1="462.02" y1="445" x2="460.02" y2="468"/>
+      <line x1="425.02" y1="452" x2="469.02" y2="452"/>
+      <line x1="426.02" y1="460" x2="468.02" y2="460"/>
+    </g>
     <path d="M440.23 482.4L455.37 482.4"
 fill="none" stroke="RGB(0,31,127)" stroke-width="0.5"/>
     <path d="M455.37 482.4L455.37 496.25Z"

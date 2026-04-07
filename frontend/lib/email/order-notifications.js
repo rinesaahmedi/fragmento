@@ -1,6 +1,115 @@
+import fs from "fs/promises";
 import http from "http";
 import https from "https";
 import nodemailer from "nodemailer";
+import path from "path";
+
+const PRODUCT_INFO_BY_CODE = {
+  "component-dishwasher": {
+    assetPath: "product-info/dishwasher-product-info.pdf",
+    filename: "Produktinformation-Geschirrspueler.pdf",
+    label: "Geschirrspueler",
+  },
+  "component-refrigerator": {
+    assetPath: "product-info/fridge-product-info.pdf",
+    filename: "Produktinformation-Kuehlschrank.pdf",
+    label: "Kuehlschrank",
+  },
+  "component-extractor-hood": {
+    assetPath: "product-info/extractor-hood-flat-product-info.pdf",
+    filename: "Produktinformation-Dunstabzugshaube-Flach.pdf",
+    label: "Dunstabzugshaube flach",
+  },
+  "model-b-base-module-1": {
+    assetPath: "product-info/washing-machine-product-info.pdf",
+    filename: "Produktinformation-Waschmaschine.pdf",
+    label: "Waschmaschine",
+  },
+  "model-b-base-module-3": {
+    assetPath: "product-info/dishwasher-product-info.pdf",
+    filename: "Produktinformation-Geschirrspueler.pdf",
+    label: "Geschirrspueler",
+  },
+  "model-b-oven-module": {
+    assetPath: "product-info/oven-product-info.pdf",
+    filename: "Produktinformation-Backofen.pdf",
+    label: "Backofen",
+  },
+  "model-b-refrigerator": {
+    assetPath: "product-info/fridge-product-info.pdf",
+    filename: "Produktinformation-Kuehlschrank.pdf",
+    label: "Kuehlschrank",
+  },
+  "model-c-refrigerator": {
+    assetPath: "product-info/fridge-product-info.pdf",
+    filename: "Produktinformation-Kuehlschrank.pdf",
+    label: "Kuehlschrank",
+  },
+  "model-c-extractor-hood": {
+    assetPath: "product-info/extractor-hood-chimney-product-info.pdf",
+    filename: "Produktinformation-Dunstabzugshaube-Kamin.pdf",
+    label: "Dunstabzugshaube Kamin",
+  },
+  "model-c-oven-base": {
+    assetPath: "product-info/oven-product-info.pdf",
+    filename: "Produktinformation-Backofen.pdf",
+    label: "Backofen",
+  },
+  "model-c-wm-base": {
+    assetPath: "product-info/washing-machine-product-info.pdf",
+    filename: "Produktinformation-Waschmaschine.pdf",
+    label: "Waschmaschine",
+  },
+  "model-c-dishwasher-base": {
+    assetPath: "product-info/dishwasher-product-info.pdf",
+    filename: "Produktinformation-Geschirrspueler.pdf",
+    label: "Geschirrspueler",
+  },
+};
+
+async function resolvePublicAssetPath(relativePath) {
+  const candidates = [
+    path.join(process.cwd(), "public", relativePath),
+    path.join(process.cwd(), "frontend", "public", relativePath),
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      await fs.access(candidate);
+      return candidate;
+    } catch {}
+  }
+
+  throw new Error(`Asset not found: ${relativePath}`);
+}
+
+async function loadProductInfoAttachments(order) {
+  const selectedItems = [...order.components, ...order.accessories, ...order.services];
+  const seenAssetPaths = new Set();
+  const attachments = [];
+  const labels = [];
+
+  for (const item of selectedItems) {
+    const config = PRODUCT_INFO_BY_CODE[item.code];
+    if (!config || seenAssetPaths.has(config.assetPath)) continue;
+
+    try {
+      const absolutePath = await resolvePublicAssetPath(config.assetPath);
+      const content = await fs.readFile(absolutePath);
+      attachments.push({
+        filename: config.filename,
+        content,
+        contentType: "application/pdf",
+      });
+      labels.push(config.label);
+      seenAssetPaths.add(config.assetPath);
+    } catch (error) {
+      console.warn(`Could not attach product info for ${item.code}:`, error.message);
+    }
+  }
+
+  return { attachments, labels };
+}
 
 function fetchBuffer(url) {
   return new Promise((resolve, reject) => {
@@ -31,6 +140,16 @@ export function buildOrderSummaryHtml(order) {
     "padding:12px 15px;border-bottom:2px solid #eaeaea;background-color:#f9f9f9;text-align:left;color:#333;";
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;";
   const priceTdStyles = `${tdStyles} text-align:right;font-weight:bold;`;
+  const orderDetailsRows = [
+    ["Kueche", order.kitchen.name],
+    ["Auftragsnummer", order.orderNumber],
+    ["Vertragsnummer", order.customer.contractNumber || "-"],
+  ]
+    .map(
+      ([label, value]) =>
+        `<tr><td style="${tdStyles};font-weight:bold;width:35%;">${label}</td><td style="${tdStyles}">${value}</td></tr>`,
+    )
+    .join("");
 
   const renderSection = (title, items) => {
     if (!items.length) return "";
@@ -49,6 +168,8 @@ export function buildOrderSummaryHtml(order) {
   return `
     <div style="max-width:600px;margin:20px 0;font-family:Arial,sans-serif;color:#333;">
       <div style="padding:20px;border:1px solid #ddd;border-radius:8px;">
+        <h4 style="margin-top:0;">Bestelldaten</h4>
+        <table style="${tableStyles}"><tbody>${orderDetailsRows}</tbody></table>
         ${renderSection("Komponenten", order.components)}
         ${renderSection("Zubehör", order.accessories)}
         ${renderSection("Dienstleistungen", order.services)}
@@ -99,8 +220,14 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     });
   }
 
+  const productInfo = await loadProductInfoAttachments(order);
+  attachments.push(...productInfo.attachments);
+
   const logoHtml = logoBuffer
     ? '<div style="margin-bottom:16px"><img src="cid:logo@fragmento" alt="Fragmento" style="height:70px;object-fit:contain" /></div>'
+    : "";
+  const productInfoHtml = productInfo.labels.length
+    ? `<p>Produktinformationen im Anhang: ${productInfo.labels.join(", ")}.</p>`
     : "";
 
   await transporter.sendMail({
@@ -111,7 +238,9 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
       ${logoHtml}
       <p>Hallo ${order.customer.firstName} ${order.customer.lastName},</p>
       <p>vielen Dank fuer deine Bestellung!</p>
+      <p>Bestellte Kueche: <strong>${order.kitchen.name}</strong>.</p>
       ${buildOrderSummaryHtml(order)}
+      ${productInfoHtml}
       <p>Dein Fragmento-Team</p>
     `,
     attachments,
