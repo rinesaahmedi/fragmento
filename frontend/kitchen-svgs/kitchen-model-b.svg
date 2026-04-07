@@ -8,10 +8,12 @@ fill="none" stroke="black" stroke-width="0.5"/>
 fill="none" stroke="black" stroke-width="0.5"/>
 <path d="M235.21 520.02L658.82 520.02"
 fill="none" stroke="black" stroke-width="0.5"/>
+  <g data-component-id="component-worktop">
 <path d="M236.87 398.48L657.16 398.48"
 fill="none" stroke="springgreen" stroke-width="0.5"/>
 <path d="M236.87 392.94L657.16 392.94"
 fill="none" stroke="springgreen" stroke-width="0.5"/>
+  </g>
 <path d="M201.99 520.02L755.72 520.02"
 fill="none" stroke="black" stroke-width="0.5"/>
 <path d="M657.16 392.94L657.16 398.48Z"

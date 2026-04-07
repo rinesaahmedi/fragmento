@@ -27,6 +27,8 @@ const ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><rect x="44" y="6" width="4" height="4"/><rect x="52" y="6" width="4" height="4"/><line x1="0" y1="56" x2="60" y2="56"/><rect x="8" y="22" width="44" height="26"/><rect x="12" y="26" width="36" height="18"/><line x1="22" y1="62" x2="38" y2="62" stroke-linecap="round" stroke-width="1.5"/></svg>',
   drawer_base:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><line x1="20" y1="9" x2="40" y2="9" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="24" x2="40" y2="24" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  worktop:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 20" fill="none" stroke="currentColor" stroke-width="1"><line x1="2" y1="7" x2="118" y2="7"/><line x1="2" y1="13" x2="118" y2="13"/><line x1="118" y1="7" x2="118" y2="13"/></svg>',
   drawer_base_two:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="18" x2="60" y2="18"/><line x1="20" y1="10" x2="40" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="26" x2="40" y2="26" stroke-linecap="round" stroke-width="1.5"/></svg>',
   drawer_base_three:
@@ -93,6 +95,9 @@ function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
 }
 
+const BASE_PLAN_STROKE = "#8f877d";
+const SELECTED_PLAN_STROKE = "#2c251e";
+
 const PLAN_COMPONENT_BOUNDS = {
   "component-wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
   "component-wall-cabinet-2": { x: 322, y: 214, width: 84, height: 118 },
@@ -106,6 +111,7 @@ const PLAN_COMPONENT_BOUNDS = {
   "component-drawer-module": { x: 571, y: 393, width: 84, height: 127 },
   "component-refrigerator": { x: 670, y: 270, width: 76, height: 250 },
   "component-sink-faucet": { x: 374, y: 364, width: 10, height: 29 },
+  "component-worktop": { x: 236, y: 392, width: 421, height: 7 },
 };
 
 function getPlanBounds(group, componentId) {
@@ -121,41 +127,27 @@ function getPlanBounds(group, componentId) {
 function applyGroupVisualState(group, { selected, hovered, locked }) {
   if (!group) return;
 
-  const emphasisStroke = selected ? "#2c251e" : hovered ? "#27935a" : "";
-  const emphasisWidth = selected ? "2.2" : hovered ? "2.6" : "";
-  const nextOpacity = locked ? "0.95" : selected ? "1" : hovered ? "0.96" : "0.78";
+  const emphasisStroke = selected ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
+  const emphasisWidth = selected ? "2.2" : "";
+  const nextOpacity = locked || selected ? "1" : "0.96";
 
   group.style.opacity = nextOpacity;
-  group.style.filter = hovered ? "drop-shadow(0 0 14px rgba(63, 136, 90, 0.22))" : "none";
+  group.style.filter = "none";
 
-  group.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse").forEach((element) => {
+  group.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse,text").forEach((element) => {
     if (element.classList.contains("component-hitbox")) {
-      element.style.fill = selected
-        ? "rgba(42, 145, 85, 0.08)"
-        : hovered
-          ? "rgba(39, 147, 90, 0.07)"
-          : locked
-            ? "rgba(120, 90, 64, 0.04)"
-            : "rgba(171, 107, 46, 0.02)";
-      element.style.stroke = selected
-        ? "rgba(42, 145, 85, 0.22)"
-        : hovered
-          ? "rgba(39, 147, 90, 0.18)"
-          : locked
-            ? "rgba(120, 90, 64, 0.1)"
-            : "rgba(171, 107, 46, 0.06)";
-      element.style.strokeWidth = "1.2px";
+      element.style.fill = "transparent";
+      element.style.stroke = "transparent";
+      element.style.strokeWidth = "0px";
       return;
     }
 
     if (element.classList.contains("component-frame")) {
       element.style.fill = "none";
       element.style.stroke = selected
-        ? "rgba(42, 145, 85, 0.88)"
-        : hovered
-          ? "rgba(39, 147, 90, 0.72)"
-          : "transparent";
-      element.style.strokeWidth = selected ? "2.4px" : hovered ? "1.8px" : "0px";
+        ? "rgba(44, 37, 30, 0.88)"
+        : "transparent";
+      element.style.strokeWidth = selected ? "2.4px" : "0px";
       element.style.vectorEffect = "non-scaling-stroke";
       return;
     }
@@ -166,10 +158,21 @@ function applyGroupVisualState(group, { selected, hovered, locked }) {
     if (!element.dataset.originalStrokeWidth) {
       element.dataset.originalStrokeWidth = element.getAttribute("stroke-width") || "0.5";
     }
+    if (!element.dataset.originalFill) {
+      element.dataset.originalFill = element.getAttribute("fill") || "";
+    }
 
-    element.style.stroke = emphasisStroke || element.dataset.originalStroke;
+    element.style.stroke = element.dataset.originalStroke === "none" ? "none" : emphasisStroke;
     element.style.strokeWidth = emphasisWidth || `${element.dataset.originalStrokeWidth}px`;
     element.style.vectorEffect = "non-scaling-stroke";
+
+    if (element.tagName === "text") {
+      element.style.fill = selected ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
+    } else if (element.dataset.originalFill && element.dataset.originalFill !== "none" && element.dataset.originalFill !== "white") {
+      element.style.fill = selected ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
+    } else if (element.dataset.originalFill) {
+      element.style.fill = element.dataset.originalFill;
+    }
   });
 }
 
@@ -182,11 +185,9 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       .map((item) => (item.componentKey ? item.componentKey : normalizeColor(item.colorKey))),
   ].map((value) => componentIdForKey(value));
 
-  const [selectedComponentIds, setSelectedComponentIds] = useState([]);
+  const [selectedComponentIds, setSelectedComponentIds] = useState(lockedComponentIds);
   const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState([]);
   const [selectedServiceCodes, setSelectedServiceCodes] = useState([]);
-  const [hoveredComponentId, setHoveredComponentId] = useState("");
-  const [planTooltip, setPlanTooltip] = useState(null);
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -215,10 +216,6 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     const componentId = componentIdForItem(item);
     return !lockedComponentIds.includes(componentId);
   });
-  const hoveredComponent =
-    kitchenConfig.components.find(
-      (item) => componentIdForItem(item) === hoveredComponentId,
-    ) || null;
   const montageEligible =
     selectedComponents.length >= 3 &&
     selectedComponentCodes.filter((code) => kitchenConfig.montageRequiredCodes.includes(code)).length >= 2;
@@ -227,6 +224,16 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     (sum, item) => sum + Number(item.price || 0),
     0,
   );
+
+  useEffect(() => {
+    setSelectedComponentIds((current) => {
+      const next = [...new Set([...lockedComponentIds, ...current])];
+      if (next.length === current.length && next.every((item, index) => item === current[index])) {
+        return current;
+      }
+      return next;
+    });
+  }, [lockedComponentIdsKey]);
 
   useEffect(() => {
     const host = svgHostRef.current;
@@ -265,7 +272,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
 
       if (group) {
         group.classList.add("kitchen-component");
-        group.querySelectorAll(".component-hitbox, .component-frame").forEach((element) => element.remove());
+        group.querySelectorAll(".component-hitbox").forEach((element) => element.remove());
 
         const box = getPlanBounds(group, componentId);
         if (box) {
@@ -280,23 +287,11 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
           hitbox.setAttribute("fill", "transparent");
           hitbox.setAttribute("stroke", "transparent");
           group.insertBefore(hitbox, group.firstChild);
-
-          const frame = document.createElementNS(namespace, "rect");
-          frame.classList.add("component-frame");
-          frame.setAttribute("x", String(box.x - 3));
-          frame.setAttribute("y", String(box.y - 3));
-          frame.setAttribute("width", String(box.width + 6));
-          frame.setAttribute("height", String(box.height + 6));
-          frame.setAttribute("rx", "6");
-          frame.setAttribute("ry", "6");
-          frame.setAttribute("fill", "none");
-          frame.setAttribute("stroke", "transparent");
-          group.insertBefore(frame, group.firstChild.nextSibling);
         }
 
         applyGroupVisualState(group, {
           selected: selectedComponentIds.includes(componentId),
-          hovered: hoveredComponentId === componentId,
+          hovered: false,
           locked: lockedComponentIds.includes(componentId),
         });
       }
@@ -316,45 +311,9 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       );
     };
 
-    const onPointerMove = (event) => {
-      const group = event.target.closest("[data-component-id]");
-      if (!group || !host.contains(group)) {
-        setHoveredComponentId("");
-        setPlanTooltip(null);
-        return;
-      }
-
-      const componentId = group.dataset.componentId || "";
-      setHoveredComponentId(componentId);
-
-      const svgRect = svg.getBoundingClientRect();
-      const box = getPlanBounds(group, componentId);
-      if (!box) {
-        setPlanTooltip(null);
-        return;
-      }
-
-      const viewBox = svg.viewBox?.baseVal;
-      const scaleX = viewBox?.width ? svgRect.width / viewBox.width : 1;
-      const scaleY = viewBox?.height ? svgRect.height / viewBox.height : 1;
-      const left = box.x * scaleX + box.width * scaleX * 0.5;
-      const top = box.y * scaleY - 12;
-
-      setPlanTooltip({ left, top });
-    };
-
-    const onPointerLeave = () => {
-      setHoveredComponentId("");
-      setPlanTooltip(null);
-    };
-
     host.addEventListener("click", onClick, true);
-    host.addEventListener("mousemove", onPointerMove, true);
-    host.addEventListener("mouseleave", onPointerLeave, true);
     return () => {
       host.removeEventListener("click", onClick, true);
-      host.removeEventListener("mousemove", onPointerMove, true);
-      host.removeEventListener("mouseleave", onPointerLeave, true);
     };
   }, [kitchenConfig.components, lockedComponentIdsKey]);
 
@@ -367,14 +326,14 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       const componentId = group.getAttribute("data-component-id");
       const selected = selectedComponentIds.includes(componentId);
       const locked = lockedComponentIds.includes(componentId);
-      const hovered = hoveredComponentId === componentId;
+      const hovered = false;
 
       group.classList.toggle("selected", selected);
       group.classList.toggle("locked", locked);
       group.classList.toggle("hovered", hovered);
       applyGroupVisualState(group, { selected, hovered, locked });
     });
-  }, [hoveredComponentId, lockedComponentIdsKey, selectedComponentIds]);
+  }, [lockedComponentIdsKey, selectedComponentIds]);
 
   useEffect(() => {
     if (!montageEligible && selectedServiceCodes.includes("service-montage")) {
@@ -511,7 +470,6 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       styles.itemCard,
       options.selected ? styles.itemCardSelected : "",
       options.locked ? styles.itemCardLocked : "",
-      options.hovered ? styles.itemCardHovered : "",
     ]
       .filter(Boolean)
       .join(" ");
@@ -523,8 +481,6 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
         className={className}
         onClick={options.onClick}
         disabled={options.locked}
-        onMouseEnter={options.onMouseEnter}
-        onMouseLeave={options.onMouseLeave}
       >
         <div className={styles.itemTop}>
           <span className={styles.itemIcon} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
@@ -577,7 +533,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                 onClick={() => {
                   setSelectedAccessoryCodes([]);
                   setSelectedServiceCodes([]);
-                  setSelectedComponentIds([]);
+                  setSelectedComponentIds(lockedComponentIds);
                   setStatus("");
                   setStatusTone("idle");
                 }}
@@ -588,15 +544,6 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
             <div className={styles.stageBody}>
               <div className={styles.svgCard}>
                 <div ref={svgHostRef} className={styles.svgCanvas} dangerouslySetInnerHTML={{ __html: svgMarkup }} />
-                {hoveredComponent && planTooltip ? (
-                  <div
-                    className={styles.planTooltip}
-                    style={{ left: `${planTooltip.left}px`, top: `${planTooltip.top}px` }}
-                  >
-                    <strong>{hoveredComponent.name}</strong>
-                    <span>{formatCurrency(hoveredComponent.price)}</span>
-                  </div>
-                ) : null}
               </div>
               <div className={styles.stageLegend}>
                 <span className={styles.legendChip}>
@@ -630,18 +577,12 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
 
                     return renderCatalogItem(item, {
                       selected: selectedComponentIds.includes(componentId),
-                      hovered: hoveredComponentId === componentId,
                       onClick: () =>
                         setSelectedComponentIds((current) =>
                           current.includes(componentId)
                             ? current.filter((id) => id !== componentId)
                             : [...current, componentId],
                         ),
-                      onMouseEnter: () => setHoveredComponentId(componentId),
-                      onMouseLeave: () => {
-                        setHoveredComponentId("");
-                        setPlanTooltip(null);
-                      },
                     });
                   })}
                 </div>

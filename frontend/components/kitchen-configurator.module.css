@@ -176,11 +176,41 @@
   height: 100%;
 }
 
+.svgCanvas :global(svg path),
+.svgCanvas :global(svg line),
+.svgCanvas :global(svg polyline),
+.svgCanvas :global(svg polygon),
+.svgCanvas :global(svg rect:not(.component-hitbox)),
+.svgCanvas :global(svg circle),
+.svgCanvas :global(svg ellipse) {
+  stroke: #8f877d !important;
+  vector-effect: non-scaling-stroke;
+}
+
+.svgCanvas :global(svg text) {
+  fill: #8f877d !important;
+}
+
 .svgCanvas :global(.kitchen-component) {
   cursor: pointer;
-  opacity: 0.78;
-  filter: saturate(1.05);
-  transition: opacity 0.2s ease, filter 0.2s ease;
+  opacity: 0.96;
+  filter: none;
+  transition: opacity 0.2s ease;
+}
+
+.svgCanvas :global(.kitchen-component path),
+.svgCanvas :global(.kitchen-component line),
+.svgCanvas :global(.kitchen-component polyline),
+.svgCanvas :global(.kitchen-component polygon),
+.svgCanvas :global(.kitchen-component rect:not(.component-hitbox):not(.component-frame)),
+.svgCanvas :global(.kitchen-component circle),
+.svgCanvas :global(.kitchen-component ellipse) {
+  stroke: #8f877d !important;
+  vector-effect: non-scaling-stroke;
+}
+
+.svgCanvas :global(.kitchen-component text) {
+  fill: #8f877d !important;
 }
 
 .svgCanvas :global(.kitchen-component.selected) {
@@ -188,32 +218,9 @@
 }
 
 .svgCanvas :global(.kitchen-component .component-hitbox) {
-  fill: rgba(171, 107, 46, 0.02);
-  stroke: rgba(171, 107, 46, 0.06);
-  stroke-width: 1.2px;
-  vector-effect: non-scaling-stroke;
-  transition: fill 0.2s ease, stroke 0.2s ease, opacity 0.2s ease;
-}
-
-.svgCanvas :global(.kitchen-component.hovered) {
-  opacity: 0.96;
-  filter: drop-shadow(0 0 14px rgba(63, 136, 90, 0.22));
-}
-
-.svgCanvas :global(.kitchen-component.hovered .component-hitbox) {
-  fill: rgba(39, 147, 90, 0.1);
-  stroke: rgba(39, 147, 90, 0.45);
-}
-
-.svgCanvas :global(.kitchen-component.hovered path),
-.svgCanvas :global(.kitchen-component.hovered line),
-.svgCanvas :global(.kitchen-component.hovered polyline),
-.svgCanvas :global(.kitchen-component.hovered polygon),
-.svgCanvas :global(.kitchen-component.hovered rect),
-.svgCanvas :global(.kitchen-component.hovered circle),
-.svgCanvas :global(.kitchen-component.hovered ellipse) {
-  stroke: #27935a !important;
-  stroke-width: 2.6px !important;
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 0;
   vector-effect: non-scaling-stroke;
 }
 
@@ -221,7 +228,7 @@
 .svgCanvas :global(.kitchen-component.selected line),
 .svgCanvas :global(.kitchen-component.selected polyline),
 .svgCanvas :global(.kitchen-component.selected polygon),
-.svgCanvas :global(.kitchen-component.selected rect),
+.svgCanvas :global(.kitchen-component.selected rect:not(.component-hitbox)),
 .svgCanvas :global(.kitchen-component.selected circle),
 .svgCanvas :global(.kitchen-component.selected ellipse) {
   stroke: #2c251e !important;
@@ -229,19 +236,20 @@
   vector-effect: non-scaling-stroke;
 }
 
-.svgCanvas :global(.kitchen-component.selected .component-hitbox) {
-  fill: rgba(42, 145, 85, 0.12);
-  stroke: rgba(42, 145, 85, 0.52);
+.svgCanvas :global(.kitchen-component .component-hitbox) {
+  fill: transparent !important;
+  stroke: transparent !important;
+  stroke-width: 0 !important;
+  pointer-events: all;
+}
+
+.svgCanvas :global(.kitchen-component.selected text) {
+  fill: #2c251e !important;
 }
 
 .svgCanvas :global(.kitchen-component.locked) {
   cursor: default;
-  opacity: 0.95;
-}
-
-.svgCanvas :global(.kitchen-component.locked .component-hitbox) {
-  fill: rgba(120, 90, 64, 0.04);
-  stroke: rgba(120, 90, 64, 0.1);
+  opacity: 1;
 }
 
 .planTooltip {

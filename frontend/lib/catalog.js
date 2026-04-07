@@ -44,6 +44,7 @@ export const LEGACY_ICON_KEYS = [
   "dishwasher_base",
   "oven_base",
   "drawer_base",
+  "worktop",
   "drawer_base_two",
   "drawer_base_three",
   "tall_refrigerator",
