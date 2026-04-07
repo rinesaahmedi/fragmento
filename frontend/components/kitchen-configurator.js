@@ -96,7 +96,7 @@ function selectedMap(items, codes) {
 }
 
 const BASE_PLAN_STROKE = "#8f877d";
-const SELECTED_PLAN_STROKE = "#2c251e";
+const SELECTED_PLAN_STROKE = "#000000";
 
 const PLAN_COMPONENT_BOUNDS = {
   "component-wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
@@ -127,28 +127,26 @@ function getPlanBounds(group, componentId) {
 function applyGroupVisualState(group, { selected, hovered, locked }) {
   if (!group) return;
 
-  const emphasisStroke = selected ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
-  const emphasisWidth = selected ? "2.2" : "";
-  const nextOpacity = locked || selected ? "1" : "0.96";
+  const isActive = selected || locked;
+  const emphasisStroke = isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
+  const emphasisWidth = isActive ? "3.2" : "";
 
-  group.style.opacity = nextOpacity;
-  group.style.filter = "none";
+  group.style.setProperty("opacity", "1", "important");
+  group.style.setProperty("filter", "none", "important");
 
   group.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse,text").forEach((element) => {
     if (element.classList.contains("component-hitbox")) {
-      element.style.fill = "transparent";
-      element.style.stroke = "transparent";
-      element.style.strokeWidth = "0px";
+      element.style.setProperty("fill", "transparent", "important");
+      element.style.setProperty("stroke", "transparent", "important");
+      element.style.setProperty("stroke-width", "0px", "important");
       return;
     }
 
     if (element.classList.contains("component-frame")) {
-      element.style.fill = "none";
-      element.style.stroke = selected
-        ? "rgba(44, 37, 30, 0.88)"
-        : "transparent";
-      element.style.strokeWidth = selected ? "2.4px" : "0px";
-      element.style.vectorEffect = "non-scaling-stroke";
+      element.style.setProperty("fill", "none", "important");
+      element.style.setProperty("stroke", isActive ? SELECTED_PLAN_STROKE : "transparent", "important");
+      element.style.setProperty("stroke-width", isActive ? "2.4px" : "0px", "important");
+      element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
       return;
     }
 
@@ -162,16 +160,24 @@ function applyGroupVisualState(group, { selected, hovered, locked }) {
       element.dataset.originalFill = element.getAttribute("fill") || "";
     }
 
-    element.style.stroke = element.dataset.originalStroke === "none" ? "none" : emphasisStroke;
-    element.style.strokeWidth = emphasisWidth || `${element.dataset.originalStrokeWidth}px`;
-    element.style.vectorEffect = "non-scaling-stroke";
+    element.style.setProperty(
+      "stroke",
+      element.dataset.originalStroke === "none" ? "none" : emphasisStroke,
+      "important",
+    );
+    element.style.setProperty(
+      "stroke-width",
+      emphasisWidth || `${element.dataset.originalStrokeWidth}px`,
+      "important",
+    );
+    element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
 
     if (element.tagName === "text") {
-      element.style.fill = selected ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
+      element.style.setProperty("fill", isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE, "important");
     } else if (element.dataset.originalFill && element.dataset.originalFill !== "none" && element.dataset.originalFill !== "white") {
-      element.style.fill = selected ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
+      element.style.setProperty("fill", isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE, "important");
     } else if (element.dataset.originalFill) {
-      element.style.fill = element.dataset.originalFill;
+      element.style.setProperty("fill", element.dataset.originalFill, "important");
     }
   });
 }
@@ -332,6 +338,12 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       group.classList.toggle("locked", locked);
       group.classList.toggle("hovered", hovered);
       applyGroupVisualState(group, { selected, hovered, locked });
+
+      // Paint selected and locked components last so neighboring grey strokes
+      // do not visually wash out their black edges.
+      if ((selected || locked) && group.parentNode) {
+        group.parentNode.appendChild(group);
+      }
     });
   }, [lockedComponentIdsKey, selectedComponentIds]);
 

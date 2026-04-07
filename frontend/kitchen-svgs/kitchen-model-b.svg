@@ -1047,8 +1047,6 @@ fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
 fill="none" stroke="RGB(255,191,0)" stroke-width="0.5"/>
   </g>
   <g data-component-id="component-refrigerator">
-    <path d="M755.72 173.94L755.72 520.02Z"
-fill="none" stroke="black" stroke-width="0.5"/>
     <path d="M745.34 517.95L670.65 517.95"
 fill="none" stroke="black" stroke-width="0.5"/>
     <path d="M670.65 517.95L746.1 517.95"
