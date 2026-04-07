@@ -37,6 +37,29 @@ const MODEL_B_ITEMS = [
   { itemType: ItemType.SERVICE, code: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
+const MODEL_C_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "model-c-refrigerator", name: "Tall Refrigerator Unit", price: "579.00", iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Amica by architecto" },
+  { itemType: ItemType.COMPONENT, code: "model-c-extractor-hood", name: "Extractor Hood", price: "349.00", iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "Wall-mounted chimney hood" },
+  { itemType: ItemType.COMPONENT, code: "model-c-cook-base-left", name: "Base Cabinet (2 Drawers) Left", price: "199.00", iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "cook-base-left", sortOrder: 30 },
+  { itemType: ItemType.COMPONENT, code: "model-c-oven-base", name: "Oven Base Unit", price: "449.00", iconKey: "oven_base", colorKey: "#00c76a", componentKey: "oven-base", sortOrder: 40, infoText: "Central cooking unit" },
+  { itemType: ItemType.COMPONENT, code: "model-c-cook-base-right", name: "Base Cabinet (2 Drawers) Right", price: "199.00", iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "cook-base-right", sortOrder: 50 },
+  { itemType: ItemType.COMPONENT, code: "model-c-wall-cabinet-1", name: "Wall Cabinet left", price: "115.00", iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 60 },
+  { itemType: ItemType.COMPONENT, code: "model-c-wall-cabinet-2", name: "Wall Cabinet mid-left", price: "115.00", iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 70 },
+  { itemType: ItemType.COMPONENT, code: "model-c-wall-cabinet-3", name: "Wall Cabinet mid-right", price: "115.00", iconKey: "wall_cabinet_standard", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 80 },
+  { itemType: ItemType.COMPONENT, code: "model-c-wall-cabinet-4", name: "Wall Cabinet right", price: "115.00", iconKey: "wall_cabinet_standard", colorKey: "#ff7f9f", componentKey: "wall-cabinet-4", sortOrder: 90 },
+  { itemType: ItemType.COMPONENT, code: "model-c-under-cabinet-light", name: "Under-Cabinet Light Accessory", price: "69.00", iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 100 },
+  { itemType: ItemType.COMPONENT, code: "model-c-wm-base", name: "Washing Machine Base Unit", price: "229.00", iconKey: "washing_machine_base", colorKey: "springgreen", componentKey: "wm-base", sortOrder: 110 },
+  { itemType: ItemType.COMPONENT, code: "model-c-sink-base", name: "Sink Base Cabinet", price: "249.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 120 },
+  { itemType: ItemType.COMPONENT, code: "model-c-dishwasher-base", name: "Dishwasher Base Unit", price: "219.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 130 },
+  { itemType: ItemType.COMPONENT, code: "model-c-drawer-base-3", name: "Base Cabinet (3 Drawers)", price: "229.00", iconKey: "drawer_base_three", colorKey: "#ffbf00", componentKey: "drawer-base-3", sortOrder: 140 },
+  { itemType: ItemType.COMPONENT, code: "model-c-sink-faucet", name: "Sink Faucet Accessory", price: "0.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 150 },
+  { itemType: ItemType.ACCESSORY, code: "acc-waste", name: "MÃƒÂ¼lltrennsystem", price: "89.00", iconKey: "waste_system", sortOrder: 200 },
+  { itemType: ItemType.ACCESSORY, code: "acc-cutlery", name: "Besteckeinsatz 30cm", price: "19.00", iconKey: "cutlery_insert", sortOrder: 210 },
+  { itemType: ItemType.ACCESSORY, code: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220 },
+  { itemType: ItemType.SERVICE, code: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
 const DEFAULT_KITCHENS = [
   {
     slug: "fragmento-default",
@@ -49,6 +72,12 @@ const DEFAULT_KITCHENS = [
     name: "KITCHEN MODEL B",
     description: "Kitchen Model B based on the cleaned CAD export.",
     items: MODEL_B_ITEMS,
+  },
+  {
+    slug: "kitchen-model-c",
+    name: "KITCHEN MODEL C",
+    description: "Kitchen Model C with cooking/storage and washing/prep zones.",
+    items: MODEL_C_ITEMS,
   },
 ];
 

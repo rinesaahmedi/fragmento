@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="600" viewBox="0 0 860 600" version="1.1">
+  <title>KITCHEN MODEL C</title>
+  <desc>Interactive grouped kitchen SVG for Kitchen Model C</desc>
+
+  <path d="M40 130H820" fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M40 500H820" fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M40 130V500" fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M820 130V500" fill="none" stroke="black" stroke-width="0.5"/>
+
+  <g data-component-id="component-refrigerator">
+    <rect x="95" y="220" width="70" height="217" fill="white" stroke="black" stroke-width="1"/>
+    <line x1="100" y1="437" x2="100" y2="440" stroke="black" stroke-width="1.5"/>
+    <line x1="160" y1="437" x2="160" y2="440" stroke="black" stroke-width="1.5"/>
+    <line x1="95" y1="348" x2="165" y2="348" stroke="black" stroke-width="1"/>
+    <line x1="107" y1="344" x2="153" y2="344" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="107" y1="352" x2="153" y2="352" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-extractor-hood">
+    <rect x="284" y="155" width="20" height="52" fill="white" stroke="#8a6b34" stroke-width="1"/>
+    <line x1="284" y1="181" x2="304" y2="181" stroke="#8a6b34" stroke-width="1"/>
+    <rect x="260" y="207" width="68" height="16" fill="white" stroke="#8a6b34" stroke-width="1"/>
+    <g fill="none" stroke="#666" stroke-width="0.75">
+      <line x1="274" y1="227" x2="269" y2="236"/>
+      <line x1="282" y1="227" x2="282" y2="237"/>
+      <line x1="290" y1="227" x2="295" y2="236"/>
+      <line x1="298" y1="227" x2="293" y2="236"/>
+      <line x1="306" y1="227" x2="306" y2="237"/>
+      <line x1="314" y1="227" x2="319" y2="236"/>
+    </g>
+  </g>
+
+  <g data-component-id="component-cook-base-left">
+    <rect x="205" y="338" width="70" height="3" fill="white" stroke="#f0a500" stroke-width="1"/>
+    <rect x="205" y="341" width="70" height="82" fill="white" stroke="#f0a500" stroke-width="1"/>
+    <rect x="205" y="423" width="70" height="12" fill="white" stroke="#f0a500" stroke-width="1"/>
+    <line x1="205" y1="360" x2="275" y2="360" stroke="#f0a500" stroke-width="1"/>
+    <line x1="228" y1="350" x2="252" y2="350" stroke="#f0a500" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="228" y1="370" x2="252" y2="370" stroke="#f0a500" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-oven-base">
+    <rect x="275" y="338" width="70" height="3" fill="white" stroke="#00c76a" stroke-width="1"/>
+    <rect x="275" y="341" width="70" height="82" fill="white" stroke="#00c76a" stroke-width="1"/>
+    <rect x="275" y="423" width="70" height="12" fill="white" stroke="#00c76a" stroke-width="1"/>
+    <line x1="275" y1="359" x2="345" y2="359" stroke="#00c76a" stroke-width="1"/>
+    <rect x="328" y="347" width="4" height="4" fill="none" stroke="#00c76a" stroke-width="1"/>
+    <rect x="336" y="347" width="4" height="4" fill="none" stroke="#00c76a" stroke-width="1"/>
+    <line x1="275" y1="400" x2="345" y2="400" stroke="#00c76a" stroke-width="1"/>
+    <rect x="287" y="367" width="46" height="30" fill="none" stroke="#00c76a" stroke-width="1"/>
+    <rect x="293" y="372" width="34" height="20" fill="none" stroke="#00c76a" stroke-width="1"/>
+    <line x1="300" y1="407" x2="320" y2="407" stroke="#00c76a" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-cook-base-right">
+    <rect x="345" y="338" width="70" height="3" fill="white" stroke="#ffbf00" stroke-width="1"/>
+    <rect x="345" y="341" width="70" height="82" fill="white" stroke="#ffbf00" stroke-width="1"/>
+    <rect x="345" y="423" width="70" height="12" fill="white" stroke="#ffbf00" stroke-width="1"/>
+    <line x1="345" y1="360" x2="415" y2="360" stroke="#ffbf00" stroke-width="1"/>
+    <line x1="368" y1="350" x2="392" y2="350" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="368" y1="370" x2="392" y2="370" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-wall-cabinet-1">
+    <rect x="470" y="185" width="72" height="72" fill="white" stroke="#00ffbf" stroke-width="1"/>
+    <line x1="494" y1="245" x2="518" y2="245" stroke="#00ffbf" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-wall-cabinet-2">
+    <rect x="542" y="185" width="72" height="72" fill="white" stroke="#00ffbf" stroke-width="1"/>
+    <line x1="566" y1="245" x2="590" y2="245" stroke="#00ffbf" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-wall-cabinet-3">
+    <rect x="614" y="185" width="72" height="72" fill="white" stroke="#394c00" stroke-width="1"/>
+    <line x1="638" y1="245" x2="662" y2="245" stroke="#394c00" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-wall-cabinet-4">
+    <rect x="686" y="185" width="72" height="72" fill="white" stroke="#ff7f9f" stroke-width="1"/>
+    <line x1="710" y1="245" x2="734" y2="245" stroke="#ff7f9f" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-under-cabinet-light">
+    <g transform="translate(532 262)">
+      <line x1="8" y1="0" x2="12" y2="0" fill="none" stroke="black" stroke-width="1"/>
+      <line x1="6" y1="4" x2="2" y2="14" fill="none" stroke="#666" stroke-width="0.75"/>
+      <line x1="10" y1="4" x2="10" y2="15" fill="none" stroke="#666" stroke-width="0.75"/>
+      <line x1="14" y1="4" x2="18" y2="14" fill="none" stroke="#666" stroke-width="0.75"/>
+    </g>
+    <g transform="translate(604 262)">
+      <line x1="8" y1="0" x2="12" y2="0" fill="none" stroke="black" stroke-width="1"/>
+      <line x1="6" y1="4" x2="2" y2="14" fill="none" stroke="#666" stroke-width="0.75"/>
+      <line x1="10" y1="4" x2="10" y2="15" fill="none" stroke="#666" stroke-width="0.75"/>
+      <line x1="14" y1="4" x2="18" y2="14" fill="none" stroke="#666" stroke-width="0.75"/>
+    </g>
+    <g transform="translate(676 262)">
+      <line x1="8" y1="0" x2="12" y2="0" fill="none" stroke="black" stroke-width="1"/>
+      <line x1="6" y1="4" x2="2" y2="14" fill="none" stroke="#666" stroke-width="0.75"/>
+      <line x1="10" y1="4" x2="10" y2="15" fill="none" stroke="#666" stroke-width="0.75"/>
+      <line x1="14" y1="4" x2="18" y2="14" fill="none" stroke="#666" stroke-width="0.75"/>
+    </g>
+  </g>
+
+  <g data-component-id="component-wm-base">
+    <rect x="470" y="338" width="72" height="3" fill="white" stroke="springgreen" stroke-width="1"/>
+    <rect x="470" y="341" width="72" height="82" fill="white" stroke="springgreen" stroke-width="1"/>
+    <rect x="470" y="423" width="72" height="12" fill="white" stroke="springgreen" stroke-width="1"/>
+    <line x1="470" y1="355" x2="542" y2="355" stroke="springgreen" stroke-width="1"/>
+    <line x1="482" y1="348" x2="500" y2="348" stroke="springgreen" stroke-width="0.5"/>
+    <g fill="none" stroke="#ccc" stroke-width="0.5">
+      <path d="M489 369 C484 369 484 394 489 394 Z"/>
+      <circle cx="506" cy="381" r="17"/>
+      <circle cx="506" cy="381" r="12"/>
+    </g>
+    <rect x="499" y="406" width="14" height="10" fill="white" stroke="springgreen" stroke-width="1"/>
+    <text x="506" y="413" font-family="sans-serif" font-size="6" text-anchor="middle" fill="springgreen" stroke="none">WM</text>
+  </g>
+
+  <g data-component-id="component-sink-base">
+    <rect x="542" y="338" width="72" height="3" fill="white" stroke="springgreen" stroke-width="1"/>
+    <rect x="542" y="341" width="72" height="82" fill="white" stroke="springgreen" stroke-width="1"/>
+    <rect x="542" y="423" width="72" height="12" fill="white" stroke="springgreen" stroke-width="1"/>
+    <line x1="566" y1="355" x2="590" y2="355" stroke="springgreen" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-dishwasher-base">
+    <rect x="614" y="338" width="72" height="3" fill="white" stroke="#001f7f" stroke-width="1"/>
+    <rect x="614" y="341" width="72" height="82" fill="white" stroke="#001f7f" stroke-width="1"/>
+    <rect x="614" y="423" width="72" height="12" fill="white" stroke="#001f7f" stroke-width="1"/>
+    <line x1="638" y1="355" x2="662" y2="355" stroke="#001f7f" stroke-width="1.5" stroke-linecap="round"/>
+    <g fill="none" stroke="#ccc" stroke-width="0.5">
+      <path d="M626 369 L631 394 H669 L674 369 Z"/>
+      <line x1="635" y1="371" x2="637" y2="394"/>
+      <line x1="645" y1="371" x2="645" y2="394"/>
+      <line x1="655" y1="371" x2="655" y2="394"/>
+      <line x1="665" y1="371" x2="663" y2="394"/>
+      <line x1="628" y1="378" x2="672" y2="378"/>
+      <line x1="629" y1="386" x2="671" y2="386"/>
+    </g>
+    <rect x="642" y="406" width="16" height="10" fill="white" stroke="#001f7f" stroke-width="1"/>
+    <text x="650" y="413" font-family="sans-serif" font-size="6" text-anchor="middle" fill="#001f7f" stroke="none">GS</text>
+  </g>
+
+  <g data-component-id="component-drawer-base-3">
+    <rect x="686" y="338" width="72" height="3" fill="white" stroke="#ffbf00" stroke-width="1"/>
+    <rect x="686" y="341" width="72" height="82" fill="white" stroke="#ffbf00" stroke-width="1"/>
+    <rect x="686" y="423" width="72" height="12" fill="white" stroke="#ffbf00" stroke-width="1"/>
+    <line x1="686" y1="357" x2="758" y2="357" stroke="#ffbf00" stroke-width="1"/>
+    <line x1="686" y1="389" x2="758" y2="389" stroke="#ffbf00" stroke-width="1"/>
+    <line x1="710" y1="349" x2="734" y2="349" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="710" y1="373" x2="734" y2="373" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="710" y1="405" x2="734" y2="405" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-sink-faucet">
+    <rect x="575" y="326" width="5" height="3" fill="white" stroke="black" stroke-width="1"/>
+    <rect x="576" y="321" width="3" height="5" fill="white" stroke="black" stroke-width="1"/>
+    <path d="M577 321 L577 302 C577 294 586 294 586 302 L586 308" fill="none" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="577" y1="313" x2="569" y2="308" stroke="black" stroke-width="1.5" stroke-linecap="round"/>
+  </g>
+</svg>
