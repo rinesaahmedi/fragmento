@@ -18,11 +18,12 @@ const DEFAULT_ITEMS = [
 ];
 
 const MODEL_B_ITEMS = [
-  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-1", name: "Wall Cabinet left", price: "115.00", iconKey: "wall_cabinet_single_light", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 10 },
-  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-2", name: "Wall Cabinet mid-left", price: "115.00", iconKey: "wall_cabinet_single_light", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 20 },
-  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-3", name: "Wall Cabinet middle", price: "115.00", iconKey: "wall_cabinet_single_light", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 30 },
-  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-4", name: "Wall Cabinet extractor hood", price: "115.00", iconKey: "wall_cabinet_double_light", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 40 },
+  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-1", name: "Wall Cabinet left", price: "115.00", iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 10 },
+  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-2", name: "Wall Cabinet mid-left", price: "115.00", iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 20 },
+  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-3", name: "Wall Cabinet middle", price: "115.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 30 },
+  { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-4", name: "Wall Cabinet extractor hood", price: "115.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 40 },
   { itemType: ItemType.COMPONENT, code: "model-b-wall-cabinet-5", name: "Wall Cabinet right", price: "115.00", iconKey: "wall_cabinet_plain", colorKey: "#ff7f9f", componentKey: "wall-cabinet-5", sortOrder: 50 },
+  { itemType: ItemType.COMPONENT, code: "model-b-under-cabinet-light", name: "Under-Cabinet Light Accessory", price: "69.00", iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 55 },
   { itemType: ItemType.COMPONENT, code: "model-b-base-module-1", name: "Washing Machine Base Unit", price: "229.00", iconKey: "washing_machine_base", colorKey: "springgreen", componentKey: "base-module-1", sortOrder: 60 },
   { itemType: ItemType.COMPONENT, code: "model-b-base-module-2", name: "Standard Sink Base Cabinet", price: "249.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "base-module-2", sortOrder: 70, isLocked: true },
   { itemType: ItemType.COMPONENT, code: "model-b-base-module-3", name: "Dishwasher Base Unit", price: "219.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 80 },

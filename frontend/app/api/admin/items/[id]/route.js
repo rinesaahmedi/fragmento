@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { mapAdminMutationError, redirectWithFlash, validateKitchenItemInput } from "../../../../../lib/admin-forms";
+import { prepareKitchenItemMutation } from "../../../../../lib/admin-kitchen-items";
+import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 
@@ -10,13 +11,21 @@ export async function POST(request, { params }) {
 
   try {
     const formData = await request.formData();
-    const intent = String(formData.get("_intent") || "update");
-    kitchenId = (
-      await prisma.kitchenItem.findUnique({
-        where: { id },
-        select: { kitchenId: true },
-      })
-    )?.kitchenId || "";
+    const intentValues = formData.getAll("_intent");
+    const intent = String(intentValues[intentValues.length - 1] || "update");
+    const existingItem = await prisma.kitchenItem.findUnique({
+      where: { id },
+      select: {
+        kitchenId: true,
+        kitchen: {
+          select: {
+            id: true,
+            slug: true,
+          },
+        },
+      },
+    });
+    kitchenId = existingItem?.kitchenId || "";
 
     if (intent === "delete") {
       const item = await prisma.kitchenItem.delete({
@@ -26,9 +35,19 @@ export async function POST(request, { params }) {
       return redirectWithFlash(request, `/admin/kitchens/${item.kitchenId}`, "success", "Item deleted.");
     }
 
+    if (!existingItem?.kitchen) {
+      throw new Error("Kitchen not found.");
+    }
+
+    const data = await prepareKitchenItemMutation({
+      formData,
+      kitchen: existingItem.kitchen,
+      excludeItemId: id,
+    });
+
     const item = await prisma.kitchenItem.update({
       where: { id },
-      data: validateKitchenItemInput(formData),
+      data,
       select: { kitchenId: true },
     });
 

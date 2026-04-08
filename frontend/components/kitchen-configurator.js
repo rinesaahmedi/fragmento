@@ -104,6 +104,7 @@ const PLAN_COMPONENT_BOUNDS = {
   "component-wall-cabinet-3": { x: 405, y: 214, width: 84, height: 118 },
   "component-wall-cabinet-4": { x: 488, y: 214, width: 84, height: 126 },
   "component-wall-cabinet-5": { x: 571, y: 214, width: 84, height: 118 },
+  "component-under-cabinet-light": { x: 270, y: 319, width: 287, height: 18 },
   "component-base-module-1": { x: 237, y: 393, width: 86, height: 127 },
   "component-base-module-2": { x: 322, y: 393, width: 84, height: 127 },
   "component-base-module-3": { x: 405, y: 393, width: 84, height: 127 },
@@ -281,6 +282,15 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
 
   useEffect(() => {
     const host = svgHostRef.current;
+    if (!host) return;
+
+    if (host.innerHTML !== resolvedSvgMarkup) {
+      host.innerHTML = resolvedSvgMarkup || "";
+    }
+  }, [resolvedSvgMarkup]);
+
+  useEffect(() => {
+    const host = svgHostRef.current;
     const svg = host?.querySelector("svg");
     if (!host || !svg) {
       return;
@@ -387,7 +397,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     return () => {
       host.removeEventListener("click", onClick, true);
     };
-  }, [kitchenConfig.components, lockedComponentIdsKey, planViewport]);
+  }, [kitchenConfig.components, lockedComponentIdsKey, planViewport, resolvedSvgMarkup]);
 
   useEffect(() => {
     const host = svgHostRef.current;
@@ -630,7 +640,6 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                     ]
                       .filter(Boolean)
                       .join(" ")}
-                    dangerouslySetInnerHTML={{ __html: resolvedSvgMarkup }}
                   />
                 </div>
                 <div className={styles.stageLegend}>
