@@ -11,6 +11,7 @@ export const MONTAGE_REQUIRED_CODES = [
   "model-b-wall-cabinet-3",
   "model-b-wall-cabinet-4",
   "model-b-wall-cabinet-5",
+  "model-b-extractor-hood",
   "model-b-base-module-1",
   "model-b-base-module-2",
   "model-b-base-module-3",

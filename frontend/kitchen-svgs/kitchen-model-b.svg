@@ -537,6 +537,8 @@ fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
 fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
     <path d="M571.61 214.64L571.61 314.73Z"
 fill="none" stroke="RGB(255,127,159)" stroke-width="0.5"/>
+  </g>
+  <g data-component-id="component-extractor-hood">
     <path d="M488.55 320.26L571.61 320.26"
 fill="none" stroke="RGB(57,76,0)" stroke-width="0.5"/>
     <path d="M571.61 320.26L571.61 314.73Z"

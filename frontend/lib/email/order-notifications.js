@@ -40,6 +40,11 @@ const PRODUCT_INFO_BY_CODE = {
     filename: "Produktinformation-Kuehlschrank.pdf",
     label: "Kuehlschrank",
   },
+  "model-b-extractor-hood": {
+    assetPath: "product-info/extractor-hood-flat-product-info.pdf",
+    filename: "Produktinformation-Dunstabzugshaube-Flach.pdf",
+    label: "Dunstabzugshaube flach",
+  },
   "model-c-refrigerator": {
     assetPath: "product-info/fridge-product-info.pdf",
     filename: "Produktinformation-Kuehlschrank.pdf",
