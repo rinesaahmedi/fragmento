@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   AdminSection,
   StatusBadge,
@@ -58,9 +59,11 @@ export default async function AdminOrdersPage() {
                   </tr>
                 ) : null}
                 {orders.map((order) => (
-                  <tr key={order.id}>
+                  <tr key={order.id} style={orderRowStyle}>
                     <td style={tdStyle}>
-                      <strong>{order.orderNumber}</strong>
+                      <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
+                        <strong>{order.orderNumber}</strong>
+                      </Link>
                     </td>
                     <td style={tdStyle}>
                       <div>{order.firstName} {order.lastName}</div>
@@ -80,3 +83,12 @@ export default async function AdminOrdersPage() {
     </AdminShell>
   );
 }
+
+const orderLinkStyle = {
+  color: "var(--app-text)",
+  textDecoration: "none",
+};
+
+const orderRowStyle = {
+  transition: "background 160ms ease",
+};

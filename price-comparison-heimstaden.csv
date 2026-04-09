@@ -1,0 +1,25 @@
+category,pdf_item,pdf_code,pdf_price_eur,app_item,app_price_eur,status,notes
+E-Geraete,vollintegrierter Geschirrspueler inkl. Moebelfront,A-EGSPV597210 + TGV60,579,Spuelmaschine,579,MATCH,
+E-Geraete,Standkuehlschrank 178 cm,OL-KGCN388140E,579,Kuehlschrank,579,MATCH,
+E-Geraete,Flachschirmhaube + Schrank+Filter,FH664621E + HD6002,349,Dunstabzugshaube,349,MATCH,
+E-Geraete,Waschmaschine + Front+ Wange,EWA34660W + TGV60 + WU16,639,,,MISSING_IN_APP,Not present in current configurator
+E-Geraete,Schraegesse+Filter,KHF664611S,209,,,MISSING_IN_APP,Not present in current configurator
+Unterschraenke,Unterschrank mit Schublade 300/600 mm,US30,175,Unterschrank 30cm,175,MATCH,
+Unterschraenke,Unterschrank mit Schublade 450/600 mm,US45,198,,,MISSING_IN_APP,45cm variant not present in current configurator
+Unterschraenke,Unterschrank mit Schublade 600/600 mm,US60,219,,,MISSING_IN_APP,60cm variant not present in current configurator
+Unterschraenke,Unterschrank 300/600 mm mit Schublade/Auszug/Auszug,US2A30,298,,,MISSING_IN_APP,Drawer variant not present in current configurator
+Unterschraenke,Unterschrank 450/600 mm mit Schublade/Auszug/Auszug,US2A45,339,,,MISSING_IN_APP,Drawer variant not present in current configurator
+Unterschraenke,Unterschrank 600/600 mm mit Schublade/Auszug/Auszug,US2A60,369,,,MISSING_IN_APP,Drawer variant not present in current configurator
+Unterschraenke,Passblende bis 20 cm,UPK20,25,,,MISSING_IN_APP,Not present in current configurator
+Oberschraenke,Oberschrank mit 1 Tuer mind.300/720/340 mm,H3002,115,Oberschrank (links)/(rechts),115,MATCH,30cm price aligns with current wall cabinet price
+Oberschraenke,Oberschrank mit 1 Tuer mind.450/720/340 mm,H4502,139,,,MISSING_IN_APP,45cm variant not present in current configurator
+Oberschraenke,Oberschrank mit 1 Tuer mind.600/720/340 mm,H6002,149,,,MISSING_IN_APP,60cm variant not present in current configurator
+Oberschraenke,Passblende bis 20 cm,HPK2002,35,,,MISSING_IN_APP,Not present in current configurator
+Accessoires & Dienstleistung,Muelltrennsystem,Blanco Botton 517467,89,Muelltrennsystem,89,MATCH,
+Accessoires & Dienstleistung,Besteckeinsatz 30cm,ZB30SG,19,Besteckeinsatz 30cm,19,MATCH,
+Accessoires & Dienstleistung,Besteckeinsatz 45cm,ZB45SG,22,,,MISSING_IN_APP,45cm variant not present in current configurator
+Accessoires & Dienstleistung,Besteckeinsatz 60 cm,ZB60SG,25,,,MISSING_IN_APP,60cm variant not present in current configurator
+Accessoires & Dienstleistung,Beleuchtungsset 3 LED-Spots,KALB KA220043_S3,69,Beleuchtungsset 3 LED-Spots,69,MATCH,
+Accessoires & Dienstleistung,"Lieferung, Vertragen, Montage und Anschluss",SERVICE,349,"Lieferung, Vertragen, Montage und Anschluss",349,MATCH,
+Accessoires & Dienstleistung,Abholung an Logistikstandort,SERVICE,0,Abholung an Logistikstandort,0,MATCH,
+Info,Mindestbestellwert ohne Montage,,1000,,,INFO_ONLY,"Business rule in PDF, not a per-item app price"

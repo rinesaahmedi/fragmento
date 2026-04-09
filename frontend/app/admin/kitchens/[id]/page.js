@@ -22,7 +22,6 @@ import {
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
-import { AdminKitchenLayoutEditor } from "../../../../components/admin-kitchen-layout-editor";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getKitchenById } from "../../../../lib/catalog";
@@ -33,6 +32,54 @@ export const dynamic = "force-dynamic";
 
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
 const KITCHEN_STATUS_OPTIONS = Object.values(KitchenStatus);
+const ITEM_ICON_MARKUP = {
+  waste_system:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
+  cutlery_insert:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="4" height="18" rx="1"/><rect x="8" y="3" width="8" height="4" rx="1"/><rect x="8" y="8" width="3" height="3" rx="1"/><rect x="12" y="8" width="4" height="3" rx="1"/><rect x="8.5" y="12" width="3" height="9" rx="1"/><rect x="12.5" y="12" width="3" height="9" rx="1"/><rect x="17" y="3" width="4" height="18" rx="1"/></svg>',
+  lighting_set:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></svg>',
+  delivery_assembly:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
+  pickup: '<img src="/img/warehouse.png" alt="Pickup service"/>',
+};
+const PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG = {
+  "kitchen-model-b": {
+    "wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
+    "wall-cabinet-2": { x: 322, y: 214, width: 84, height: 118 },
+    "wall-cabinet-3": { x: 405, y: 214, width: 84, height: 118 },
+    "wall-cabinet-4": { x: 488, y: 214, width: 84, height: 118 },
+    "wall-cabinet-5": { x: 571, y: 214, width: 84, height: 118 },
+    "extractor-hood": { x: 488, y: 314, width: 84, height: 14 },
+    "under-cabinet-light": { x: 270, y: 319, width: 287, height: 18 },
+    "base-module-1": { x: 237, y: 393, width: 86, height: 127 },
+    "base-module-2": { x: 322, y: 393, width: 84, height: 127 },
+    "base-module-3": { x: 405, y: 393, width: 84, height: 127 },
+    "oven-module": { x: 488, y: 393, width: 84, height: 127 },
+    "drawer-module": { x: 571, y: 393, width: 84, height: 127 },
+    "refrigerator": { x: 670, y: 270, width: 76, height: 250 },
+    "sink-faucet": { x: 374, y: 364, width: 14, height: 33 },
+    "worktop": { x: 236, y: 392, width: 421, height: 7 },
+  },
+  "kitchen-model-c": {
+    "refrigerator": { x: 119, y: 220, width: 70, height: 220 },
+    "extractor-hood": { x: 276, y: 189, width: 68, height: 48 },
+    "wall-cabinet-1": { x: 470, y: 185, width: 72, height: 72 },
+    "wall-cabinet-2": { x: 542, y: 185, width: 72, height: 72 },
+    "wall-cabinet-3": { x: 614, y: 185, width: 72, height: 72 },
+    "wall-cabinet-4": { x: 686, y: 185, width: 72, height: 72 },
+    "under-cabinet-light": { x: 534, y: 262, width: 160, height: 15 },
+    "cook-base-left": { x: 205, y: 338, width: 70, height: 97 },
+    "oven-base": { x: 275, y: 338, width: 70, height: 97 },
+    "cook-base-right": { x: 345, y: 338, width: 70, height: 97 },
+    "wm-base": { x: 470, y: 338, width: 72, height: 97 },
+    "sink-base": { x: 542, y: 338, width: 72, height: 97 },
+    "dishwasher-base": { x: 614, y: 338, width: 72, height: 97 },
+    "drawer-base-3": { x: 686, y: 338, width: 72, height: 97 },
+    "worktop": { x: 205, y: 338, width: 553, height: 3 },
+    "sink-faucet": { x: 569, y: 302, width: 18, height: 28 },
+  },
+};
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
@@ -40,6 +87,79 @@ function formatCurrency(value) {
     currency: "EUR",
     minimumFractionDigits: 2,
   }).format(Number(value || 0));
+}
+
+function enhanceSvgMarkup(markup) {
+  if (!markup) return "";
+
+  return markup.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+    if (/style=/i.test(attrs)) {
+      return `<svg${attrs.replace(/style=(["'])(.*?)\1/i, (styleMatch, quote, value) => ` style=${quote}${value};width:100%;height:auto;display:block${quote}`)}>`;
+    }
+
+    return `<svg${attrs} style="width:100%;height:auto;display:block">`;
+  });
+}
+
+function buildCatalogPreviewMarkup(svgMarkup, kitchenSlug, componentKey) {
+  const baseMarkup = enhanceSvgMarkup(svgMarkup);
+  if (!baseMarkup) return "";
+
+  const bounds = PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()]?.[componentKey];
+  if (!bounds) {
+    return baseMarkup;
+  }
+
+  const highlightMarkup = [
+    `<rect x="${bounds.x - 3}" y="${bounds.y - 3}" width="${bounds.width + 6}" height="${bounds.height + 6}"`,
+    ` rx="8" ry="8" fill="rgba(176, 90, 50, 0.08)" stroke="#8f3e2c" stroke-width="2.5"`,
+    ` vector-effect="non-scaling-stroke" pointer-events="none"/>`,
+  ].join("");
+
+  return baseMarkup.replace("</svg>", `${highlightMarkup}</svg>`);
+}
+
+function normalizeItemIconMarkup(iconMarkup) {
+  if (!iconMarkup) return "";
+
+  return iconMarkup
+    .replace(/<img\b([^>]*)>/i, (match, attrs) => {
+      if (/style=/i.test(attrs)) {
+        return `<img${attrs.replace(/style=(["'])(.*?)\1/i, (styleMatch, quote, value) => ` style=${quote}${value};max-width:100%;max-height:100%;display:block;object-fit:contain${quote}`)}>`;
+      }
+
+      return `<img${attrs} style="max-width:100%;max-height:100%;display:block;object-fit:contain">`;
+    })
+    .replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+      if (/style=/i.test(attrs)) {
+        return `<svg${attrs.replace(/style=(["'])(.*?)\1/i, (styleMatch, quote, value) => ` style=${quote}${value};width:100%;height:100%;display:block${quote}`)}>`;
+      }
+
+      return `<svg${attrs} style="width:100%;height:100%;display:block">`;
+    });
+}
+
+function KitchenCatalogPreview({ markup, iconMarkup, slotLabel, itemType }) {
+  const isComponent = itemType === ItemType.COMPONENT;
+  const normalizedIconMarkup = normalizeItemIconMarkup(iconMarkup);
+
+  if (normalizedIconMarkup) {
+    return (
+      <div style={previewIconWrapStyle} aria-label={`${itemType || "Item"} icon preview`}>
+        <div style={previewIconStyle} dangerouslySetInnerHTML={{ __html: normalizedIconMarkup }} />
+      </div>
+    );
+  }
+
+  if (!markup) {
+    return <div style={isComponent ? previewEmptyStyle : previewEmptyCompactStyle}>No preview</div>;
+  }
+
+  return (
+    <div style={previewWrapStyle} aria-label={slotLabel ? `${slotLabel} preview` : "Kitchen preview"}>
+      <div style={previewSvgStyle} dangerouslySetInnerHTML={{ __html: markup }} />
+    </div>
+  );
 }
 
 function serializeKitchenItem(item) {
@@ -93,7 +213,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     acc[item.componentKey] = [...(acc[item.componentKey] || []), item.name];
     return acc;
   }, {});
-  const svgMarkup = structureSlots.length ? await loadKitchenSvgMarkup(kitchen.slug).catch(() => "") : "";
+  const kitchenSvgMarkup = structureSlots.length ? await loadKitchenSvgMarkup(kitchen.slug).catch(() => "") : "";
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -143,20 +263,6 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             </div>
           </form>
         </AdminSection>
-
-        {svgMarkup ? (
-          <AdminSection
-            title="Layout editor"
-            description="Inspect the kitchen layout by clicking slots on the plan, then open the assigned component card to edit it."
-          >
-            <AdminKitchenLayoutEditor
-              items={serializedItems}
-              structureSlots={structureSlots}
-              svgMarkup={svgMarkup}
-              requestedEditId={requestedEditId}
-            />
-          </AdminSection>
-        ) : null}
 
         <AdminSection
           title="Add extra item"
@@ -218,11 +324,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             {kitchen.items.map((item) => {
               const slot = structureSlots.find((entry) => entry.componentKey === item.componentKey);
               const isRequestedEdit = requestedEditId === item.id;
+              const previewMarkup = buildCatalogPreviewMarkup(kitchenSvgMarkup, kitchen.slug, item.componentKey);
+              const iconMarkup = item.componentKey ? "" : (ITEM_ICON_MARKUP[item.iconKey] || "");
 
               return (
                 <details key={item.id} id={`item-${item.id}`} open={isRequestedEdit} style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
-                  <summary style={compactSummaryStyle}>
-                    <div style={{ display: "grid", gap: 6, minWidth: 0 }}>
+                  <summary style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
+                    <div style={compactSummaryMainStyle}>
                       <strong style={{ fontSize: "1.05rem" }}>{item.name}</strong>
                       <div style={subMetaStyle}>
                         <TypeBadge label={item.itemType} />
@@ -231,6 +339,12 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                         <span>{slot ? slot.label : "No slot"}</span>
                       </div>
                     </div>
+                    <KitchenCatalogPreview
+                      markup={previewMarkup}
+                      iconMarkup={iconMarkup}
+                      slotLabel={slot?.label || item.name}
+                      itemType={item.itemType}
+                    />
                     <div style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
                       <StatusBadge status={item.isActive ? "ACTIVE" : "ARCHIVED"} />
                       <span style={editHintStyle}>Edit</span>
@@ -335,6 +449,22 @@ const compactSummaryStyle = {
   cursor: "pointer",
   padding: "14px 16px",
   margin: 0,
+  display: "grid",
+  gap: 14,
+  gridTemplateColumns: "minmax(0, 1fr) minmax(180px, 220px) auto",
+  alignItems: "center",
+};
+
+const compactSummaryCompactPreviewStyle = {
+  ...compactSummaryStyle,
+  gridTemplateColumns: "minmax(0, 1fr) 96px auto",
+  alignItems: "center",
+};
+
+const compactSummaryMainStyle = {
+  display: "grid",
+  gap: 6,
+  minWidth: 0,
 };
 
 const compactFormStyle = {
@@ -381,5 +511,60 @@ const compactFooterStyle = {
 const editHintStyle = {
   color: "var(--app-text-muted)",
   fontSize: 13,
+  fontWeight: 700,
+};
+
+const previewWrapStyle = {
+  minWidth: 180,
+  maxWidth: 220,
+  padding: 8,
+  borderRadius: 14,
+  border: "1px solid rgba(143, 62, 44, 0.12)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,240,232,0.76))",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
+};
+
+const previewSvgStyle = {
+  width: "100%",
+  lineHeight: 0,
+};
+
+const previewIconWrapStyle = {
+  width: 96,
+  minWidth: 96,
+  maxWidth: 96,
+  padding: 4,
+  borderRadius: 10,
+  border: "1px solid rgba(143, 62, 44, 0.12)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,240,232,0.76))",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
+  minHeight: 64,
+  display: "grid",
+  placeItems: "center",
+  color: "var(--app-accent)",
+};
+
+const previewIconStyle = {
+  width: 26,
+  height: 26,
+  display: "grid",
+  placeItems: "center",
+  overflow: "hidden",
+};
+
+const previewEmptyStyle = {
+  ...previewWrapStyle,
+  display: "grid",
+  placeItems: "center",
+  minHeight: 96,
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 700,
+};
+
+const previewEmptyCompactStyle = {
+  ...previewIconWrapStyle,
+  color: "var(--app-text-muted)",
+  fontSize: 10,
   fontWeight: 700,
 };

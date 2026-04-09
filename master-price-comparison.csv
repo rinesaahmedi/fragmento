@@ -1,0 +1,28 @@
+item,heimstaden_price_eur,rahmenvertrag_price_eur,our_app_price_eur,difference_vs_heimstaden,difference_vs_rahmenvertrag,recommended_final_price_eur,recommendation_basis,notes
+Spuelmaschine,579,,579,0,,579,Heimstaden + app match,"Rahmenvertrag only contains dishwasher service lines, not a direct appliance sale price"
+Kuehlschrank,579,,579,0,,579,Heimstaden + app match,Rahmenvertrag only contains refrigerator dismantling/service references
+Flachschirmhaube + Schrank + Filter / Dunstabzugshaube,349,49,349,0,300,349,Heimstaden direct sales sheet,"Rahmenvertrag 49 EUR is the hood cabinet, not the appliance package"
+Waschmaschine + Front + Wange,639,,,,,639,Heimstaden only,Missing in current app
+Schraegesse + Filter,209,,,,,209,Heimstaden only,Missing in current app
+Unterschrank mit Schublade 300/600 mm,175,111,175,0,64,175,Heimstaden + app match,Direct mismatch against Rahmenvertrag
+Unterschrank mit Schublade 450/600 mm,198,,,,,198,Heimstaden only,Missing in current app
+Unterschrank mit Schublade 600/600 mm,219,118,,,,219,Heimstaden only,Closest Rahmenvertrag row is 1.4.300 Base cabinet with drawer 600/600 mm = 118 EUR
+Unterschrank 300/600 mm mit Schublade/Auszug/Auszug,298,206,,,,298,Heimstaden only,Closest Rahmenvertrag row is 1.4.400 Base cabinet 300/600 with 3 drawers = 206 EUR
+Unterschrank 450/600 mm mit Schublade/Auszug/Auszug,339,246,,,,339,Heimstaden only,Closest Rahmenvertrag row is 1.4.420 Base cabinet 450/600 with 3 drawers = 246 EUR
+Unterschrank 600/600 mm mit Schublade/Auszug/Auszug,369,264,,,,369,Heimstaden only,Closest Rahmenvertrag row is 1.4.440 Base cabinet 600/600 with 3 drawers = 264 EUR
+Oberschrank mit 1 Tuer 300/720/340 mm,115,47,115,0,68,115,Heimstaden + app match,"Rahmenvertrag wall unit is 580 mm high, not 720 mm"
+Oberschrank mit 1 Tuer 450/720/340 mm,139,52,,,,139,Heimstaden only,Closest Rahmenvertrag row is 1.5.30 wall unit 450/580/340 = 52 EUR
+Oberschrank mit 1 Tuer 600/720/340 mm,149,61,,,,149,Heimstaden only,Closest Rahmenvertrag row is 1.5.40 wall unit 600/580/340 = 61 EUR
+Muelltrennsystem,89,,89,0,,89,Heimstaden + app match,No direct Rahmenvertrag row found
+Besteckeinsatz 30cm,19,,19,0,,19,Heimstaden + app match,No direct Rahmenvertrag row found
+Besteckeinsatz 45cm,22,,,,,22,Heimstaden only,Missing in current app
+Besteckeinsatz 60cm,25,,,,,25,Heimstaden only,Missing in current app
+Beleuchtungsset 3 LED-Spots,69,,69,0,,69,Heimstaden + app match,No direct Rahmenvertrag row found
+"Lieferung, Vertragen, Montage und Anschluss",349,205 / 325 / 40+85,349,0,see notes,349,Heimstaden + app match,Rahmenvertrag splits related services across delivery and installation positions instead of one bundled add-on price
+Abholung an Logistikstandort,,,0,,,0,Current app only,Not found in either PDF
+Bosch Built-in Oven + Glass Ceramic Hob,,548,,,,,Reference only,"In Rahmenvertrag, not in current app catalog or Heimstaden sheet"
+Amica Built-in Oven + Glass Ceramic Hob,,438,,,,,Reference only,"In Rahmenvertrag, not in current app catalog or Heimstaden sheet"
+Blanco Sink Mixer,,59,,,,,Reference only,"In Rahmenvertrag, not in current app catalog or Heimstaden sheet"
+Built-in Sink Stainless Steel 1 Bowl,,98,,,,,Reference only,"In Rahmenvertrag, not in current app catalog or Heimstaden sheet"
+Hour Skilled Worker,,50,,,,,Reference only,Rahmenvertrag service rate only
+Hour Helper,,40,,,,,Reference only,Rahmenvertrag service rate only

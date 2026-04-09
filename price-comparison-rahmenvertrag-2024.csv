@@ -1,0 +1,16 @@
+app_item,app_price_eur,contract_reference,contract_item,contract_price_eur,comparison_status,notes
+Spuelmaschine,579,1.2.10 / 1.2.20,Dismantle dishwasher 40 / Install customer-supplied dishwasher 80,40 / 80,NO_DIRECT_MATCH,"Contract lists service work for dishwasher, not sale price for a dishwasher appliance"
+Kuehlschrank,579,1.2.40,Additional position for disassembling refrigerator,30,NO_DIRECT_MATCH,"Contract lists dismantling/disposal service only, not sale price for a refrigerator appliance"
+Unterschrank 30cm,175,1.4.260,Base cabinet with drawer 300/600 mm,111,MISMATCH,Closest direct cabinet match in contract is much lower than current app price
+Oberschrank (links)/(rechts),115,1.5.10,Wall unit with 1 door min. 300/580/340 mm,47,MISMATCH,"Closest comparable wall cabinet price in contract; contract spec is 580 mm high, not the 720 mm-height item from the other PDF"
+Dunstabzugshaube,349,1.5.90,Wall cabinet for extractor hood min. 600/300/340 mm,49,NO_DIRECT_MATCH,"This is the hood cabinet, not the extractor hood appliance itself"
+Muelltrennsystem,89,,,,NOT_FOUND_IN_CONTRACT,No matching waste-separation accessory row found in the contract
+Besteckeinsatz 30cm,19,,,,NOT_FOUND_IN_CONTRACT,No matching cutlery insert row found in the contract
+Beleuchtungsset 3 LED-Spots,69,,,,NOT_FOUND_IN_CONTRACT,No matching lighting-set row found in the contract
+"Lieferung, Vertragen, Montage und Anschluss",349,1.3.20,Installation of a kitchen up to 240 cm,325,APPROX_ONLY,"Closest contract service row, but naming/scope differs"
+"Lieferung, Vertragen, Montage und Anschluss",349,1.3.10,Delivery and installation of a complete kitchen,205,APPROX_ONLY,"Another related service row, but still not the same packaged service as the app"
+"Lieferung, Vertragen, Montage und Anschluss",349,1.3.40 / 1.3.50,Assembly of individual items 40 / Delivery of individual items 85,40 / 85,APPROX_ONLY,Contract splits delivery and assembly into separate positions for individual items
+Abholung an Logistikstandort,0,,,,NOT_FOUND_IN_CONTRACT,No pickup-from-logistics-location row found in the contract
+Reference only,,1.7.20,Amica electric built-in oven + glass ceramic hob,438,REFERENCE_ONLY,"Not in current app catalog, but one of the few actual equipment sale items found in the contract"
+Reference only,,1.7.30,Blanco sink mixer,59,REFERENCE_ONLY,Not in current app catalog
+Reference only,,1.7.40,Built-in sink stainless steel 1 bowl,98,REFERENCE_ONLY,Not in current app catalog

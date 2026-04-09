@@ -4,6 +4,26 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { codePillStyle, mutedTextStyle, primaryButtonStyle } from "./admin-ui";
 import { getCompatibilityMessage, isItemCompatibleWithSlot } from "../lib/kitchen-slot-compatibility";
 
+const PLAN_BOUNDS_BY_SLUG = {
+  "kitchen-model-b": {
+    "component-wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
+    "component-wall-cabinet-2": { x: 322, y: 214, width: 84, height: 118 },
+    "component-wall-cabinet-3": { x: 405, y: 214, width: 84, height: 118 },
+    "component-wall-cabinet-4": { x: 488, y: 214, width: 84, height: 118 },
+    "component-wall-cabinet-5": { x: 571, y: 214, width: 84, height: 118 },
+    "component-extractor-hood": { x: 488, y: 314, width: 84, height: 14 },
+    "component-under-cabinet-light": { x: 270, y: 319, width: 287, height: 18 },
+    "component-base-module-1": { x: 237, y: 393, width: 86, height: 127 },
+    "component-base-module-2": { x: 322, y: 393, width: 84, height: 127 },
+    "component-base-module-3": { x: 405, y: 393, width: 84, height: 127 },
+    "component-oven-module": { x: 488, y: 393, width: 84, height: 127 },
+    "component-drawer-module": { x: 571, y: 393, width: 84, height: 127 },
+    "component-refrigerator": { x: 670, y: 270, width: 76, height: 250 },
+    "component-sink-faucet": { x: 374, y: 364, width: 10, height: 29 },
+    "component-worktop": { x: 236, y: 392, width: 421, height: 7 },
+  },
+};
+
 function componentIdForKey(componentKey) {
   return `component-${String(componentKey || "")
     .replace(/[^a-z0-9#-]/gi, "")
@@ -25,6 +45,48 @@ function getBounds(group) {
   return null;
 }
 
+function getPlanBounds(group, componentId, kitchenSlug) {
+  const manualBounds = PLAN_BOUNDS_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()]?.[componentId];
+  if (manualBounds) {
+    return manualBounds;
+  }
+
+  return getBounds(group);
+}
+
+function getViewBox(svg) {
+  if (!svg) return null;
+
+  const rawViewBox = svg.getAttribute("viewBox");
+  if (rawViewBox) {
+    const values = rawViewBox
+      .trim()
+      .split(/[\s,]+/)
+      .map((value) => Number(value));
+
+    if (values.length === 4 && values.every((value) => Number.isFinite(value))) {
+      return {
+        x: values[0],
+        y: values[1],
+        width: values[2],
+        height: values[3],
+      };
+    }
+  }
+
+  const baseVal = svg.viewBox?.baseVal;
+  if (baseVal?.width && baseVal?.height) {
+    return {
+      x: baseVal.x,
+      y: baseVal.y,
+      width: baseVal.width,
+      height: baseVal.height,
+    };
+  }
+
+  return null;
+}
+
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -37,19 +99,11 @@ function applyAdminGroupVisualState(group, { selected }) {
   if (!group) return;
 
   const emphasisStroke = selected ? "#000000" : null;
-  const emphasisWidth = selected ? "3.2" : null;
 
   group.style.setProperty("opacity", "1", "important");
-  group.style.setProperty("filter", selected ? "drop-shadow(0 0 10px rgba(0, 0, 0, 0.18))" : "none", "important");
+  group.style.setProperty("filter", "none", "important");
 
   group.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse,text").forEach((element) => {
-    if (element.classList.contains("admin-component-hitbox")) {
-      element.style.setProperty("fill", "transparent", "important");
-      element.style.setProperty("stroke", "transparent", "important");
-      element.style.setProperty("stroke-width", "0px", "important");
-      return;
-    }
-
     if (!element.dataset.originalStroke) {
       element.dataset.originalStroke = element.getAttribute("stroke") || "";
     }
@@ -71,7 +125,7 @@ function applyAdminGroupVisualState(group, { selected }) {
     );
     element.style.setProperty(
       "stroke-width",
-      selected ? emphasisWidth : (originalStrokeWidth || ""),
+      originalStrokeWidth || "",
       "important",
     );
     element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
@@ -88,9 +142,11 @@ function applyAdminGroupVisualState(group, { selected }) {
   });
 }
 
-export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, requestedEditId = "" }) {
+export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, kitchenSlug = "", requestedEditId = "" }) {
   const hostRef = useRef(null);
   const [selectedSlotKey, setSelectedSlotKey] = useState("");
+  const [slotTargets, setSlotTargets] = useState([]);
+  const [svgViewBox, setSvgViewBox] = useState(null);
 
   const componentsBySlot = useMemo(() => {
     const map = new Map();
@@ -121,50 +177,33 @@ export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, req
     svg.style.width = "100%";
     svg.style.height = "auto";
     svg.style.display = "block";
+    svg.style.pointerEvents = "none";
 
-    const namespace = "http://www.w3.org/2000/svg";
+    setSvgViewBox(getViewBox(svg));
+
+    const nextSlotTargets = [];
 
     svg.querySelectorAll("[data-component-id]").forEach((group) => {
       const componentId = group.getAttribute("data-component-id") || "";
       const slot = slotsById.get(componentId);
-      group.style.cursor = slot ? "pointer" : "default";
+      group.style.cursor = "default";
       if (!slot) {
         return;
       }
 
-      let hitbox = group.querySelector(".admin-component-hitbox");
-      const box = getBounds(group);
+      const box = getPlanBounds(group, componentId, kitchenSlug);
       if (!box) return;
 
-      if (!hitbox) {
-        hitbox = document.createElementNS(namespace, "rect");
-        hitbox.classList.add("admin-component-hitbox");
-        hitbox.setAttribute("pointer-events", "all");
-        group.appendChild(hitbox);
-      }
-
-      hitbox.setAttribute("x", String(box.x - 4));
-      hitbox.setAttribute("y", String(box.y - 4));
-      hitbox.setAttribute("width", String(box.width + 8));
-      hitbox.setAttribute("height", String(box.height + 8));
-      hitbox.setAttribute("rx", "6");
-      hitbox.setAttribute("ry", "6");
-      hitbox.setAttribute("fill", "#ffffff");
-      hitbox.setAttribute("fill-opacity", "0.001");
-      hitbox.setAttribute("stroke", "none");
+      nextSlotTargets.push({
+        slot,
+        componentId,
+        bounds: box,
+      });
     });
 
-    const onClick = (event) => {
-      const group = event.target.closest("[data-component-id]");
-      if (!group) return;
-      const slot = slotsById.get(group.getAttribute("data-component-id") || "");
-      if (!slot) return;
-      setSelectedSlotKey(slot.componentKey);
-    };
-
-    host.addEventListener("click", onClick, true);
-    return () => host.removeEventListener("click", onClick, true);
-  }, [slotsById]);
+    setSlotTargets(nextSlotTargets);
+    return undefined;
+  }, [kitchenSlug, slotsById]);
 
   useEffect(() => {
     const svg = hostRef.current?.querySelector("svg");
@@ -193,7 +232,47 @@ export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, req
           <span style={pillStyle}>{items.filter((item) => item.itemType === "COMPONENT").length} components</span>
         </div>
         <div style={svgCanvasStyle}>
-          <div ref={hostRef} dangerouslySetInnerHTML={{ __html: svgMarkup }} />
+          <div style={svgWrapStyle}>
+            <div ref={hostRef} dangerouslySetInnerHTML={{ __html: svgMarkup }} />
+            {svgViewBox ? (
+              <div style={slotOverlayStyle}>
+                {slotTargets
+                  .slice()
+                  .sort((left, right) => (left.bounds.width * left.bounds.height) - (right.bounds.width * right.bounds.height))
+                  .map((target) => {
+                    const isSelected = target.slot.componentKey === selectedSlotKey;
+                    const left = ((target.bounds.x - svgViewBox.x) / svgViewBox.width) * 100;
+                    const top = ((target.bounds.y - svgViewBox.y) / svgViewBox.height) * 100;
+                    const width = (target.bounds.width / svgViewBox.width) * 100;
+                    const height = (target.bounds.height / svgViewBox.height) * 100;
+
+                    return (
+                      <div
+                        key={target.slot.componentKey}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={target.slot.label}
+                        onClick={() => setSelectedSlotKey(target.slot.componentKey)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setSelectedSlotKey(target.slot.componentKey);
+                          }
+                        }}
+                        style={{
+                          ...slotOverlayButtonStyle,
+                          left: `${left}%`,
+                          top: `${top}%`,
+                          width: `${width}%`,
+                          height: `${height}%`,
+                          ...(isSelected ? selectedSlotOverlayButtonStyle : null),
+                        }}
+                      />
+                    );
+                  })}
+              </div>
+            ) : null}
+          </div>
         </div>
       </section>
 
@@ -245,13 +324,14 @@ export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, req
 const layoutGridStyle = {
   display: "grid",
   gap: 20,
-  gridTemplateColumns: "minmax(0, 1.55fr) minmax(280px, 0.7fr)",
+  gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 360px)",
   alignItems: "start",
 };
 
 const canvasPanelStyle = {
   display: "grid",
   gap: 14,
+  minWidth: 0,
   borderRadius: 18,
   padding: 18,
   border: "1px solid var(--app-border)",
@@ -261,6 +341,7 @@ const canvasPanelStyle = {
 const inspectorStyle = {
   display: "grid",
   gap: 14,
+  minWidth: 0,
   borderRadius: 18,
   padding: 18,
   border: "1px solid var(--app-border)",
@@ -272,7 +353,31 @@ const svgCanvasStyle = {
   borderRadius: 14,
   border: "1px solid rgba(143, 62, 44, 0.12)",
   background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(247,240,232,0.74))",
-  overflow: "auto",
+  overflow: "hidden",
+};
+
+const svgWrapStyle = {
+  position: "relative",
+};
+
+const slotOverlayStyle = {
+  position: "absolute",
+  inset: 0,
+};
+
+const slotOverlayButtonStyle = {
+  position: "absolute",
+  padding: 0,
+  margin: 0,
+  border: "1px solid transparent",
+  borderRadius: 8,
+  background: "transparent",
+  cursor: "pointer",
+};
+
+const selectedSlotOverlayButtonStyle = {
+  borderColor: "rgba(143, 62, 44, 0.38)",
+  background: "rgba(143, 62, 44, 0.06)",
 };
 
 const metricsRowStyle = {
@@ -294,6 +399,7 @@ const pillStyle = {
 const itemSummaryStyle = {
   display: "grid",
   gap: 8,
+  minWidth: 0,
   padding: "14px 16px",
   borderRadius: 14,
   background: "linear-gradient(180deg, rgba(255, 245, 236, 0.98), rgba(255, 250, 246, 0.92))",
