@@ -1,6 +1,7 @@
 import { ItemType } from "@prisma/client";
 import { validateKitchenItemInput } from "./admin-forms";
 import { findKitchenStructureSlot, getKitchenStructureSlots } from "./kitchen-structure";
+import { getCompatibilityMessage, isItemCompatibleWithSlot } from "./kitchen-slot-compatibility";
 import { prisma } from "./prisma";
 
 export async function prepareKitchenItemMutation({ formData, kitchen, excludeItemId = "" }) {
@@ -19,8 +20,13 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
       throw new Error("Choose a kitchen position for this component.");
     }
 
-    if (!findKitchenStructureSlot(kitchen.slug, data.componentKey)) {
+    const slot = findKitchenStructureSlot(kitchen.slug, data.componentKey);
+    if (!slot) {
       throw new Error("Selected kitchen position is not valid for this kitchen.");
+    }
+
+    if (!isItemCompatibleWithSlot(data, slot)) {
+      throw new Error(getCompatibilityMessage(data, slot) || "This component is not compatible with the selected slot.");
     }
   }
 
