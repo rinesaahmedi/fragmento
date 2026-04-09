@@ -64,6 +64,25 @@ function formatCurrency(value) {
   }).format(Number(value || 0));
 }
 
+function getSummaryPriceLabel(item) {
+  const price = Number(item?.price || 0);
+  if (item?.isLocked && price <= 0) {
+    return "Inklusive";
+  }
+  return formatCurrency(price);
+}
+
+function getSummaryMetaLabel(item) {
+  const price = Number(item?.price || 0);
+  if (!item?.isLocked) {
+    return "Ausgewaehlt";
+  }
+  if (price <= 0) {
+    return "Im Grundmodell enthalten";
+  }
+  return "Standardausstattung";
+}
+
 function normalizeColor(value) {
   if (!value) return "";
   const color = String(value).trim().toLowerCase();
@@ -99,6 +118,7 @@ function selectedMap(items, codes) {
 
 const BASE_PLAN_STROKE = "#8f877d";
 const SELECTED_PLAN_STROKE = "#000000";
+const SELECTED_MUTED_APPLIANCE_STROKE = "#a39b92";
 
 const PLAN_COMPONENT_BOUNDS = {
   "component-wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
@@ -125,6 +145,103 @@ const PLAN_VIEWPORT_BY_SLUG = {
     canvasClassName: "wide",
   },
 };
+
+const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
+};
+
+const PRODUCT_INFO_BY_CODE = {
+  "component-dishwasher": "/product-info/dishwasher-product-info.pdf",
+  "component-refrigerator": "/product-info/fridge-product-info.pdf",
+  "component-extractor-hood": "/product-info/extractor-hood-flat-product-info.pdf",
+  "model-b-base-module-1": "/product-info/washing-machine-product-info.pdf",
+  "model-b-base-module-3": "/product-info/dishwasher-product-info.pdf",
+  "model-b-oven-module": "/product-info/oven-product-info.pdf",
+  "model-b-refrigerator": "/product-info/fridge-product-info.pdf",
+  "model-b-extractor-hood": "/product-info/extractor-hood-flat-product-info.pdf",
+  "model-c-refrigerator": "/product-info/fridge-product-info.pdf",
+  "model-c-extractor-hood": "/product-info/extractor-hood-chimney-product-info.pdf",
+  "model-c-oven-base": "/product-info/oven-product-info.pdf",
+  "model-c-wm-base": "/product-info/washing-machine-product-info.pdf",
+  "model-c-dishwasher-base": "/product-info/dishwasher-product-info.pdf",
+};
+
+function getLinkedComponentIds(slug, componentId) {
+  const normalizedSlug = String(slug || "").trim().toLowerCase();
+  const linkedGroups = LINKED_COMPONENT_GROUPS_BY_SLUG[normalizedSlug] || [];
+  const linkedGroup = linkedGroups.find((group) => group.includes(componentId));
+  return linkedGroup || [componentId];
+}
+
+function isHiddenLinkedComponent(slug, componentId) {
+  const linkedIds = getLinkedComponentIds(slug, componentId);
+  return linkedIds.length > 1 && linkedIds[0] !== componentId;
+}
+
+function isLinkedComponentSelected(slug, selectedIds, componentId) {
+  return getLinkedComponentIds(slug, componentId).every((id) => selectedIds.includes(id));
+}
+
+function toggleLinkedComponentSelection(slug, currentIds, componentId, lockedIds = []) {
+  const linkedIds = getLinkedComponentIds(slug, componentId);
+  const currentSet = new Set(currentIds);
+  const lockedSet = new Set(lockedIds);
+  const shouldRemove = linkedIds.every((id) => currentSet.has(id));
+
+  linkedIds.forEach((id) => {
+    if (lockedSet.has(id)) return;
+    if (shouldRemove) {
+      currentSet.delete(id);
+    } else {
+      currentSet.add(id);
+    }
+  });
+
+  return [...currentSet];
+}
+
+function getCatalogLinkedItems(allItems, slug, item) {
+  const componentId = componentIdForItem(item);
+  const linkedIds = getLinkedComponentIds(slug, componentId);
+  if (linkedIds.length <= 1) return [item];
+
+  const linkedItems = linkedIds
+    .map((linkedId) => allItems.find((candidate) => componentIdForItem(candidate) === linkedId))
+    .filter(Boolean);
+
+  return linkedItems.length ? linkedItems : [item];
+}
+
+function getCatalogDisplayItem(allItems, slug, item) {
+  const linkedItems = getCatalogLinkedItems(allItems, slug, item);
+  if (linkedItems.length <= 1) {
+    return {
+      item,
+      price: Number(item.price || 0),
+      infoPdfHref: PRODUCT_INFO_BY_CODE[item.code] || "",
+    };
+  }
+
+  const hoodItem =
+    linkedItems.find((entry) => String(entry.componentKey || "").toLowerCase() === "extractor-hood") || null;
+  const primaryItem = linkedItems[0];
+
+  return {
+    item: {
+      ...primaryItem,
+      name: hoodItem ? `${primaryItem.name} + ${hoodItem.name}` : primaryItem.name,
+      infoText: hoodItem
+        ? `${primaryItem.infoText || ""}${primaryItem.infoText ? " • " : ""}${hoodItem.infoText || ""}`.trim()
+        : primaryItem.infoText,
+      iconKey: hoodItem?.iconKey || primaryItem.iconKey,
+    },
+    price: Number((hoodItem || primaryItem).price || 0),
+    infoPdfHref:
+      (hoodItem && PRODUCT_INFO_BY_CODE[hoodItem.code]) ||
+      PRODUCT_INFO_BY_CODE[primaryItem.code] ||
+      "",
+  };
+}
 
 function getPlanBounds(group, componentId) {
   if (group && typeof group.getBBox === "function") {
@@ -164,6 +281,95 @@ function applyPlanViewportToMarkup(markup, slug) {
   });
 }
 
+function getInheritedSvgAttribute(element, attributeName, stopAt) {
+  let current = element;
+
+  while (current && current !== stopAt) {
+    const value = current.getAttribute?.(attributeName);
+    if (value != null && value !== "") {
+      return value;
+    }
+    current = current.parentElement;
+  }
+
+  return "";
+}
+
+function isPreservedDetailStroke(stroke) {
+  const normalized = String(stroke || "").trim().toLowerCase();
+  return ["#ccc", "#cccccc", "#666", "#666666", "gray", "grey"].includes(normalized);
+}
+
+function isMutedApplianceLabel(element) {
+  if (!element || element.tagName !== "text") return false;
+  const label = (element.textContent || "").trim().toUpperCase();
+  return label === "WM" || label === "GS";
+}
+
+function isMutedApplianceBadgeElement(group, element) {
+  const componentId = group?.dataset?.componentId || "";
+  if (
+    componentId !== "component-base-module-1" &&
+    componentId !== "component-base-module-3" &&
+    componentId !== "component-wm-base" &&
+    componentId !== "component-dishwasher-base"
+  ) {
+    return false;
+  }
+
+  if (element.tagName === "text") {
+    return isMutedApplianceLabel(element);
+  }
+
+  if (typeof element.getBBox !== "function" || typeof group.getBBox !== "function") {
+    return false;
+  }
+
+  const elementBox = element.getBBox();
+  const groupBox = group.getBBox();
+  if (!elementBox || !groupBox) {
+    return false;
+  }
+
+  const inBottomBadgeZone = elementBox.y >= groupBox.y + groupBox.height * 0.64;
+  const isSmallBadgeShape = elementBox.width <= 18 && elementBox.height <= 18;
+  return inBottomBadgeZone && isSmallBadgeShape;
+}
+
+function isApplianceDetailElement(group, element) {
+  const componentId = group?.dataset?.componentId || "";
+  if (
+    componentId !== "component-base-module-1" &&
+    componentId !== "component-base-module-3" &&
+    componentId !== "component-wm-base" &&
+    componentId !== "component-dishwasher-base"
+  ) {
+    return false;
+  }
+
+  if (isMutedApplianceBadgeElement(group, element)) {
+    return true;
+  }
+
+  if (typeof element.getBBox !== "function" || typeof group.getBBox !== "function") {
+    return false;
+  }
+
+  const elementBox = element.getBBox();
+  const groupBox = group.getBBox();
+  if (!elementBox || !groupBox || groupBox.width <= 0 || groupBox.height <= 0) {
+    return false;
+  }
+
+  const relativeWidth = elementBox.width / groupBox.width;
+  const relativeHeight = elementBox.height / groupBox.height;
+  const isInsideBody =
+    elementBox.y >= groupBox.y + groupBox.height * 0.18 &&
+    elementBox.y + elementBox.height <= groupBox.y + groupBox.height * 0.82;
+
+  return isInsideBody && relativeWidth <= 0.72 && relativeHeight <= 0.42;
+}
+
 function applyGroupVisualState(group, { selected, hovered, locked }) {
   if (!group) return;
 
@@ -191,29 +397,55 @@ function applyGroupVisualState(group, { selected, hovered, locked }) {
     }
 
     if (!element.dataset.originalStroke) {
-      element.dataset.originalStroke = element.getAttribute("stroke") || "";
+      element.dataset.originalStroke = getInheritedSvgAttribute(element, "stroke", group) || "";
     }
     if (!element.dataset.originalStrokeWidth) {
-      element.dataset.originalStrokeWidth = element.getAttribute("stroke-width") || "0.5";
+      element.dataset.originalStrokeWidth = getInheritedSvgAttribute(element, "stroke-width", group) || "0.5";
     }
     if (!element.dataset.originalFill) {
-      element.dataset.originalFill = element.getAttribute("fill") || "";
+      element.dataset.originalFill = getInheritedSvgAttribute(element, "fill", group) || "";
     }
+
+    if (isMutedApplianceBadgeElement(group, element)) {
+      element.style.setProperty("stroke", isActive ? SELECTED_MUTED_APPLIANCE_STROKE : BASE_PLAN_STROKE, "important");
+      element.style.setProperty("stroke-width", `${element.dataset.originalStrokeWidth}px`, "important");
+      element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
+      if (element.tagName === "text") {
+        element.style.setProperty("fill", isActive ? SELECTED_MUTED_APPLIANCE_STROKE : BASE_PLAN_STROKE, "important");
+      } else if (element.dataset.originalFill) {
+        element.style.setProperty("fill", element.dataset.originalFill, "important");
+      }
+      return;
+    }
+
+    const preserveOriginalStroke =
+      element.dataset.originalStroke &&
+      element.dataset.originalStroke !== "none" &&
+      isPreservedDetailStroke(element.dataset.originalStroke);
+    const preserveOriginalStrokeWidth = isApplianceDetailElement(group, element);
 
     element.style.setProperty(
       "stroke",
-      element.dataset.originalStroke === "none" ? "none" : emphasisStroke,
+      element.dataset.originalStroke === "none"
+        ? "none"
+        : preserveOriginalStroke
+          ? element.dataset.originalStroke
+          : emphasisStroke,
       "important",
     );
     element.style.setProperty(
       "stroke-width",
-      emphasisWidth || `${element.dataset.originalStrokeWidth}px`,
+      preserveOriginalStrokeWidth ? `${element.dataset.originalStrokeWidth}px` : emphasisWidth || `${element.dataset.originalStrokeWidth}px`,
       "important",
     );
     element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
 
     if (element.tagName === "text") {
-      element.style.setProperty("fill", isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE, "important");
+      element.style.setProperty(
+        "fill",
+        isMutedApplianceLabel(element) ? BASE_PLAN_STROKE : isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE,
+        "important",
+      );
     } else if (element.dataset.originalFill && element.dataset.originalFill !== "none" && element.dataset.originalFill !== "white") {
       element.style.setProperty("fill", isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE, "important");
     } else if (element.dataset.originalFill) {
@@ -224,6 +456,7 @@ function applyGroupVisualState(group, { selected, hovered, locked }) {
 
 export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   const svgHostRef = useRef(null);
+  const kitchenSlug = String(kitchenConfig.kitchen.slug || "").trim().toLowerCase();
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenConfig.kitchen.slug];
   const resolvedSvgMarkup = applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug);
   const lockedComponentIds = [
@@ -258,11 +491,13 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   );
   const selectedAccessories = selectedMap(kitchenConfig.accessories, selectedAccessoryCodes);
   const selectedServices = selectedMap(kitchenConfig.services, selectedServiceCodes);
+  const lockedSelectedComponents = selectedComponents.filter((item) => item.isLocked);
+  const optionalSelectedComponents = selectedComponents.filter((item) => !item.isLocked);
   const lockedComponentIdsKey = lockedComponentIds.join("|");
   const selectedComponentCodes = selectedComponents.map((item) => item.code);
   const visibleComponents = kitchenConfig.components.filter((item) => {
     const componentId = componentIdForItem(item);
-    return !lockedComponentIds.includes(componentId);
+    return !lockedComponentIds.includes(componentId) && !isHiddenLinkedComponent(kitchenSlug, componentId);
   });
   const montageEligible =
     selectedComponents.length >= 3 &&
@@ -390,9 +625,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       if (lockedComponentIds.includes(componentId)) return;
 
       setSelectedComponentIds((current) =>
-        current.includes(componentId)
-          ? current.filter((id) => id !== componentId)
-          : [...current, componentId],
+        toggleLinkedComponentSelection(kitchenSlug, current, componentId, lockedComponentIds),
       );
     };
 
@@ -400,7 +633,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     return () => {
       host.removeEventListener("click", onClick, true);
     };
-  }, [kitchenConfig.components, lockedComponentIdsKey, planViewport, resolvedSvgMarkup]);
+  }, [kitchenConfig.components, kitchenSlug, lockedComponentIdsKey, planViewport, resolvedSvgMarkup]);
 
   useEffect(() => {
     const host = svgHostRef.current;
@@ -475,7 +708,9 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     if (lockedComponentIds.includes(componentId)) {
       return;
     }
-    setSelectedComponentIds((current) => current.filter((id) => id !== componentId));
+    setSelectedComponentIds((current) =>
+      toggleLinkedComponentSelection(kitchenSlug, current, componentId, lockedComponentIds),
+    );
   }
 
   function removeAccessory(item) {
@@ -579,15 +814,55 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
             <strong>{item.name}</strong>
             {item.infoText ? <p>{item.infoText}</p> : null}
           </div>
-          <span className={styles.itemPrice}>{formatCurrency(item.price)}</span>
+          <span className={styles.itemPrice}>{formatCurrency(options.price ?? item.price)}</span>
         </div>
         <div className={styles.itemMeta}>
           <span className={options.locked ? styles.lockedPill : styles.togglePill}>
             {options.locked ? "Fix" : options.selected ? "Entfernen" : "Hinzufuegen"}
           </span>
-          {options.hint ? <span className={styles.ruleHint}>{options.hint}</span> : null}
+          <div className={styles.itemMetaAside}>
+            {options.hint ? <span className={styles.ruleHint}>{options.hint}</span> : null}
+            {options.infoPdfHref ? (
+              <a
+                href={options.infoPdfHref}
+                target="_blank"
+                rel="noreferrer"
+                className={styles.itemPdfLink}
+                onClick={(event) => event.stopPropagation()}
+              >
+                PDF
+              </a>
+            ) : null}
+          </div>
         </div>
       </button>
+    );
+  }
+
+  function renderSummaryRow(item, onRemove) {
+    const price = Number(item.price || 0);
+    const priceClassName = [
+      styles.summaryPrice,
+      item.isLocked && price <= 0 ? styles.summaryPriceIncluded : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    return (
+      <div key={item.id} className={styles.summaryRow}>
+        <div className={styles.summaryMeta}>
+          <strong>{item.name}</strong>
+          <span>{getSummaryMetaLabel(item)}</span>
+        </div>
+        <strong className={priceClassName}>{getSummaryPriceLabel(item)}</strong>
+        {item.isLocked ? (
+          <span className={[styles.summaryBadge, styles.summaryBadgeLocked].join(" ")}>Standard</span>
+        ) : (
+          <button type="button" className={styles.summaryRemove} onClick={() => onRemove(item)}>
+            Entfernen
+          </button>
+        )}
+      </div>
     );
   }
 
@@ -670,50 +945,21 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                   <div className={styles.emptyState}>Noch keine Artikel ausgewaehlt.</div>
                 ) : null}
 
-                {selectedComponents.length ? <div className={styles.summarySectionTitle}>Komponenten</div> : null}
-                {selectedComponents.map((item) => (
-                  <div key={item.id} className={styles.summaryRow}>
-                    <div className={styles.summaryMeta}>
-                      <strong>{item.name}</strong>
-                      <span>{item.isLocked ? "Fixer Bestandteil" : "Ausgewaehlt"}</span>
-                    </div>
-                    <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
-                    <button
-                      type="button"
-                      className={styles.summaryRemove}
-                      onClick={() => removeComponent(item)}
-                      disabled={item.isLocked}
-                    >
-                      {item.isLocked ? "Fix" : "Entfernen"}
-                    </button>
-                  </div>
-                ))}
+                {lockedSelectedComponents.length ? (
+                  <div className={styles.summarySectionTitle}>Standardausstattung</div>
+                ) : null}
+                {lockedSelectedComponents.map((item) => renderSummaryRow(item, removeComponent))}
+
+                {optionalSelectedComponents.length ? (
+                  <div className={styles.summarySectionTitle}>Zusaetzliche Komponenten</div>
+                ) : null}
+                {optionalSelectedComponents.map((item) => renderSummaryRow(item, removeComponent))}
 
                 {selectedAccessories.length ? <div className={styles.summarySectionTitle}>Zubehoer</div> : null}
-                {selectedAccessories.map((item) => (
-                  <div key={item.id} className={styles.summaryRow}>
-                    <div className={styles.summaryMeta}>
-                      <strong>{item.name}</strong>
-                    </div>
-                    <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
-                    <button type="button" className={styles.summaryRemove} onClick={() => removeAccessory(item)}>
-                      Entfernen
-                    </button>
-                  </div>
-                ))}
+                {selectedAccessories.map((item) => renderSummaryRow(item, removeAccessory))}
 
                 {selectedServices.length ? <div className={styles.summarySectionTitle}>Dienstleistungen</div> : null}
-                {selectedServices.map((item) => (
-                  <div key={item.id} className={styles.summaryRow}>
-                    <div className={styles.summaryMeta}>
-                      <strong>{item.name}</strong>
-                    </div>
-                    <strong className={styles.summaryPrice}>{formatCurrency(item.price)}</strong>
-                    <button type="button" className={styles.summaryRemove} onClick={() => removeService(item)}>
-                      Entfernen
-                    </button>
-                  </div>
-                ))}
+                {selectedServices.map((item) => renderSummaryRow(item, removeService))}
               </div>
             </div>
           </div>
@@ -735,14 +981,15 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                   <div className={styles.catalogGrid}>
                     {visibleComponents.map((item) => {
                       const componentId = componentIdForItem(item);
+                      const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, item);
 
-                      return renderCatalogItem(item, {
-                        selected: selectedComponentIds.includes(componentId),
+                      return renderCatalogItem(displayItem.item, {
+                        selected: isLinkedComponentSelected(kitchenSlug, selectedComponentIds, componentId),
+                        price: displayItem.price,
+                        infoPdfHref: displayItem.infoPdfHref,
                         onClick: () =>
                           setSelectedComponentIds((current) =>
-                            current.includes(componentId)
-                              ? current.filter((id) => id !== componentId)
-                              : [...current, componentId],
+                            toggleLinkedComponentSelection(kitchenSlug, current, componentId, lockedComponentIds),
                           ),
                       });
                     })}

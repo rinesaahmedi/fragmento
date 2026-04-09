@@ -219,7 +219,7 @@
 }
 
 .svgCanvas :global(.kitchen-component.selected text) {
-  fill: #000 !important;
+  fill: #8f877d !important;
 }
 
 .svgCanvas :global(.kitchen-component.locked) {
@@ -423,6 +423,13 @@
   margin-top: 12px;
 }
 
+.itemMetaAside {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
 .togglePill,
 .lockedPill {
   display: inline-flex;
@@ -450,6 +457,22 @@
   margin: 0;
   color: #7d7166;
   font-size: 0.84rem;
+}
+
+.itemPdfLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 54px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  background: #fff8f0;
+  color: #7a4d27;
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .panel {
@@ -502,6 +525,28 @@
   color: #2f2a24;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.summaryPriceIncluded {
+  color: #257147;
+}
+
+.summaryBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.summaryBadgeLocked {
+  border: 1px solid rgba(42, 145, 85, 0.14);
+  background: #eef8f1;
+  color: #257147;
 }
 
 .summaryRemove {
@@ -670,5 +715,19 @@
 
   .svgCanvasWide {
     min-height: 260px;
+  }
+
+  .summaryRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .summaryPrice {
+    justify-self: end;
+  }
+
+  .summaryRemove,
+  .summaryBadge {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
 }
