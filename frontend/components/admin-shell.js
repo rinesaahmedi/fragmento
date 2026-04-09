@@ -72,9 +72,9 @@ export function AdminShell({ adminEmail, children }) {
       >
         <div
           style={{
-            maxWidth: 1440,
+            width: "min(100%, 1880px)",
             margin: "0 auto",
-            padding: "18px 24px",
+            padding: "18px clamp(20px, 3vw, 40px)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -121,12 +121,12 @@ export function AdminShell({ adminEmail, children }) {
 
       <div
         style={{
-          maxWidth: 1440,
+          width: "min(100%, 1880px)",
           margin: "0 auto",
-          padding: "28px 24px 40px",
+          padding: "28px clamp(20px, 3vw, 40px) 40px",
           display: "grid",
-          gridTemplateColumns: "250px minmax(0, 1fr)",
-          gap: 24,
+          gridTemplateColumns: "clamp(220px, 16vw, 280px) minmax(0, 1fr)",
+          gap: "clamp(20px, 2vw, 32px)",
           alignItems: "start",
           position: "relative",
         }}
