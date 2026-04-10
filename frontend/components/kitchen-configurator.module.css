@@ -576,43 +576,36 @@
   color: #7d7166;
 }
 
-.orderPanel {
-  padding-bottom: 18px;
-}
-
-.totalsCard {
-  margin: 18px 20px 0;
-  padding: 18px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, #fff9f2 0%, #f6ecde 100%);
-  border: 1px solid rgba(120, 90, 64, 0.12);
-}
-
-.totalsCard span {
-  display: block;
-  color: #7d7166;
-  font-size: 0.92rem;
-}
-
-.totalsCard strong {
-  display: block;
-  margin-top: 6px;
-  font-size: 2rem;
-  color: #289356;
-}
-
-.totalsActions {
+.summaryActions {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 16px;
+  justify-content: flex-end;
+  padding: 18px 20px 20px;
+}
+
+.orderSectionWrap {
+  width: 100%;
+  margin: 24px 0 0;
+}
+
+.orderPanel {
+  padding: 0 0 20px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(74, 47, 20, 0.08);
+}
+
+.panelIntro {
+  margin: 16px 0 0;
+  color: #5d5d5d;
+  font-size: 0.98rem;
+  line-height: 1.55;
 }
 
 .orderForm {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  padding: 18px 20px 0;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px 12px;
+  padding: 8px 22px 0;
 }
 
 .field,
@@ -620,6 +613,15 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  grid-column: span 6;
+}
+
+.fieldQuarter {
+  grid-column: span 3;
+}
+
+.fieldThird {
+  grid-column: span 4;
 }
 
 .fieldFull {
@@ -635,16 +637,136 @@
 
 .field input,
 .fieldFull input,
+.fieldFull textarea,
 .fieldFull select,
 .field select {
   width: 100%;
   min-width: 0;
-  padding: 12px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(120, 90, 64, 0.18);
+  padding: 9px 10px;
+  border-radius: 4px;
+  border: 1px solid #d0d0d0;
+  background: #fff;
+  color: #3c3c3c;
+  font: inherit;
+}
+
+.fieldFull textarea {
+  min-height: 74px;
+  resize: vertical;
+}
+
+.paymentSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.paymentSection label {
+  color: #2f2a24;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.paymentOptions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.paymentOption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 66px;
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #d7d7d7;
   background: #fff;
   color: #2f2a24;
-  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.paymentOption:hover {
+  border-color: #b9b9b9;
+  box-shadow: 0 6px 14px rgba(51, 39, 27, 0.05);
+}
+
+.paymentOptionSelected {
+  border-color: #2f9251;
+  box-shadow: 0 0 0 2px rgba(47, 146, 81, 0.12);
+}
+
+.paymentOptionSelected:hover {
+  border-color: #2f9251;
+  box-shadow: 0 0 0 2px rgba(47, 146, 81, 0.12);
+}
+
+.paymentLogo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: 4px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.paymentLogoLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.paymentLogoPaypal {
+  color: #003087;
+  background: transparent;
+}
+
+.paymentLogoVisa {
+  color: #fff;
+  background: #1a1f71;
+  font-style: italic;
+}
+
+.paymentLogoMastercard {
+  position: relative;
+  min-width: 96px;
+  padding-left: 52px;
+  color: #111;
+  background: transparent;
+}
+
+.paymentLogoMastercard::before,
+.paymentLogoMastercard::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transform: translateY(-50%);
+  opacity: 0.95;
+}
+
+.paymentLogoMastercard::before {
+  left: 12px;
+  background: #eb001b;
+}
+
+.paymentLogoMastercard::after {
+  left: 25px;
+  background: #f79e1b;
+}
+
+.paymentLogoKlarna {
+  color: #111;
+  background: #ffb3c7;
 }
 
 .checkboxRow {
@@ -657,9 +779,41 @@
   font-size: 0.92rem;
 }
 
+.orderSubmitRow {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 6px;
+}
+
+.orderSubmitButton {
+  appearance: none;
+  border: none;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #3cab62 0%, #2f9251 100%);
+  color: #fff;
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(47, 146, 81, 0.18);
+}
+
+.orderSubmitButton:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.orderHelp {
+  grid-column: 1 / -1;
+  color: #7d7166;
+  font-size: 0.82rem;
+  margin-top: -4px;
+}
+
 .status {
   min-height: 24px;
-  padding: 12px 20px 0;
+  padding: 12px 22px 0;
   color: #5d5146;
 }
 
@@ -707,6 +861,17 @@
 
   .orderForm {
     grid-template-columns: 1fr;
+  }
+
+  .field,
+  .fieldQuarter,
+  .fieldThird,
+  .fieldFull {
+    grid-column: 1 / -1;
+  }
+
+  .paymentOptions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .svgCanvas {

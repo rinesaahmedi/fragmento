@@ -5,8 +5,9 @@ import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
 
 export const dynamic = "force-dynamic";
 
-export default async function KitchenPage({ params }) {
+export default async function KitchenPage({ params, searchParams }) {
   const { slug } = await params;
+  const resolvedSearchParams = await searchParams;
   const kitchen = await getKitchenBySlug(slug);
 
   if (!kitchen || kitchen.status !== "ACTIVE") {
@@ -15,6 +16,13 @@ export default async function KitchenPage({ params }) {
 
   const kitchenConfig = serializeKitchenForLegacy(kitchen);
   const svgMarkup = await loadKitchenSvgMarkup(slug);
+  const initialContractNumber = String(resolvedSearchParams?.contractNumber || "").trim();
 
-  return <KitchenConfigurator kitchenConfig={kitchenConfig} svgMarkup={svgMarkup} />;
+  return (
+    <KitchenConfigurator
+      kitchenConfig={kitchenConfig}
+      svgMarkup={svgMarkup}
+      initialContractNumber={initialContractNumber}
+    />
+  );
 }

@@ -56,12 +56,181 @@ const ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
 };
 
+const PAYMENT_METHOD_OPTIONS = [
+  { value: "paypal", label: "PayPal" },
+  { value: "visa", label: "Visa" },
+  { value: "mastercard", label: "Mastercard" },
+  { value: "klarna", label: "Klarna" },
+];
+
+const PAYMENT_METHOD_STYLE_BY_VALUE = {
+  paypal: "paypal",
+  visa: "visa",
+  mastercard: "mastercard",
+  klarna: "klarna",
+};
+
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
     currency: "EUR",
     minimumFractionDigits: 2,
   }).format(Number(value || 0));
+}
+
+async function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const result = reader.result;
+      if (typeof result !== "string") {
+        reject(new Error("PDF could not be encoded."));
+        return;
+      }
+      resolve(result.split(",")[1] || "");
+    };
+    reader.onerror = () => reject(new Error("PDF could not be read."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function loadPdfLogoImage(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error(`Failed to load image at ${url}.`));
+    img.src = url;
+  });
+}
+
+async function generateOrderPdf(order) {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "pt" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 40;
+  const lineHeight = 15;
+  let y = margin;
+
+  const ensureSpace = (requiredHeight = 24) => {
+    if (y + requiredHeight <= pageHeight - margin) return;
+    doc.addPage();
+    y = margin;
+  };
+
+  try {
+    const logoImage = await loadPdfLogoImage("/img/fragmentologo.png");
+    const logoHeight = 120;
+    const logoWidth = (logoImage.width * logoHeight) / logoImage.height;
+    const scale = 2;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(logoWidth * scale);
+    canvas.height = Math.round(logoHeight * scale);
+    const context = canvas.getContext("2d");
+
+    if (context) {
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, canvas.width, canvas.height);
+      context.drawImage(logoImage, 0, 0, canvas.width, canvas.height);
+      const imageData = canvas.toDataURL("image/jpeg", 0.85);
+      doc.addImage(imageData, "JPEG", margin, y - 10, logoWidth, logoHeight);
+    }
+  } catch (error) {
+    console.error("Konnte das Logo fuer das PDF nicht laden:", error);
+  }
+
+  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y, {
+    align: "right",
+  });
+  y += 120;
+
+  doc.setFont("helvetica", "normal").setFontSize(11);
+  doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
+  doc.text(`Datum: ${order.createdAt}`, pageWidth - margin, y, { align: "right" });
+  doc.text(`Kuechenvertragsnr.: ${order.customer.contractNumber || "N/A"}`, margin, y + lineHeight);
+  y += 45;
+
+  ensureSpace(90);
+  doc.setFont("helvetica", "bold").text("Kundendaten:", margin, y);
+  y += lineHeight;
+  doc.setFont("helvetica", "normal");
+
+  [
+    `${order.customer.firstName} ${order.customer.lastName}`,
+    order.customer.address1,
+    order.customer.address2,
+    `${order.customer.postalCode} ${order.customer.city}`,
+    order.customer.country,
+    `E-Mail: ${order.customer.email}`,
+    `Telefon: ${order.customer.phone}`,
+  ]
+    .filter(Boolean)
+    .forEach((line) => {
+      ensureSpace(lineHeight);
+      doc.text(line, margin, y);
+      y += lineHeight;
+    });
+
+  if (order.customer.notes) {
+    y += 8;
+    ensureSpace(50);
+    doc.setFont("helvetica", "bold").text("Anmerkungen:", margin, y);
+    y += lineHeight;
+    doc.setFont("helvetica", "normal");
+    const noteLines = doc.splitTextToSize(order.customer.notes, pageWidth - margin * 2);
+    noteLines.forEach((line) => {
+      ensureSpace(lineHeight);
+      doc.text(line, margin, y);
+      y += lineHeight;
+    });
+  }
+
+  y += 15;
+
+  const drawSection = (title, items) => {
+    if (!items?.length) return;
+
+    ensureSpace(55);
+    doc.setFont("helvetica", "bold").text(title, margin, y);
+    y += 10;
+    doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
+    y += 20;
+    doc.text("Artikel", margin, y);
+    doc.text("Preis", pageWidth - margin, y, { align: "right" });
+    y += 20;
+    doc.setFont("helvetica", "normal");
+
+    items.forEach((item) => {
+      const nameLines = doc.splitTextToSize(item.name || "", pageWidth - margin * 2 - 120);
+      const rowHeight = Math.max(nameLines.length, 1) * lineHeight + 5;
+      ensureSpace(rowHeight);
+      nameLines.forEach((line, index) => {
+        doc.text(line, margin, y + index * lineHeight);
+      });
+      doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
+      y += rowHeight;
+    });
+
+    y += 10;
+  };
+
+  drawSection("Komponenten:", order.components);
+  drawSection("Zubehoer:", order.accessories);
+  drawSection("Dienstleistungen:", order.services);
+
+  ensureSpace(40);
+  doc.setDrawColor(150).line(margin, y, pageWidth - margin, y);
+  y += 20;
+  doc.setFont("helvetica", "bold").setFontSize(14);
+  doc.text("Gesamtpreis:", margin, y);
+  doc.text(formatCurrency(order.total), pageWidth - margin, y, { align: "right" });
+
+  const filename = `Bestellung-${order.orderNumber}.pdf`;
+  return {
+    blob: doc.output("blob"),
+    filename,
+  };
 }
 
 function getSummaryPriceLabel(item) {
@@ -454,8 +623,9 @@ function applyGroupVisualState(group, { selected, hovered, locked }) {
   });
 }
 
-export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
+export default function KitchenConfigurator({ kitchenConfig, svgMarkup, initialContractNumber = "" }) {
   const svgHostRef = useRef(null);
+  const orderSectionRef = useRef(null);
   const kitchenSlug = String(kitchenConfig.kitchen.slug || "").trim().toLowerCase();
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenConfig.kitchen.slug];
   const resolvedSvgMarkup = applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug);
@@ -472,8 +642,9 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isOrderSectionOpen, setIsOrderSectionOpen] = useState(false);
   const [customer, setCustomer] = useState({
-    contractNumber: "",
+    contractNumber: initialContractNumber,
     firstName: "",
     lastName: "",
     email: "",
@@ -482,9 +653,19 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     address2: "",
     postalCode: "",
     city: "",
+    country: "",
+    notes: "",
     paymentMethod: "",
     consent: false,
   });
+
+  useEffect(() => {
+    if (!initialContractNumber) return;
+    setCustomer((current) => {
+      if (current.contractNumber === initialContractNumber) return current;
+      return { ...current, contractNumber: initialContractNumber };
+    });
+  }, [initialContractNumber]);
 
   const selectedComponents = kitchenConfig.components.filter((item) =>
     selectedComponentIds.includes(componentIdForItem(item)),
@@ -721,6 +902,13 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
     setSelectedServiceCodes((current) => current.filter((code) => code !== item.code));
   }
 
+  function openOrderSection() {
+    setIsOrderSectionOpen(true);
+    window.requestAnimationFrame(() => {
+      orderSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -736,11 +924,42 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
       return;
     }
 
+    if (!customer.paymentMethod) {
+      setStatus("Bitte waehle eine Zahlungsmethode aus.");
+      setStatusTone("error");
+      return;
+    }
+
     setIsSubmitting(true);
     setStatus("Bestellung wird gesendet...");
     setStatusTone("idle");
 
     try {
+      const pdfOrder = {
+        orderNumber: new Date().toISOString().slice(0, 19).replace(/[-:T]/g, ""),
+        createdAt: new Date().toLocaleString("de-DE"),
+        customer: {
+          contractNumber: customer.contractNumber,
+          firstName: customer.firstName,
+          lastName: customer.lastName,
+          email: customer.email,
+          phone: customer.phone,
+          address1: customer.address1,
+          address2: customer.address2,
+          postalCode: customer.postalCode,
+          city: customer.city,
+          country: customer.country,
+          notes: customer.notes,
+          paymentMethod: customer.paymentMethod,
+        },
+        components: selectedComponents,
+        accessories: selectedAccessories,
+        services: selectedServices,
+        total: grandTotal,
+      };
+      const pdf = await generateOrderPdf(pdfOrder);
+      const pdfBase64 = await blobToBase64(pdf.blob);
+
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -756,13 +975,17 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
               address1: customer.address1,
               address2: customer.address2,
               postalCode: customer.postalCode,
-                city: customer.city,
-                paymentMethod: customer.paymentMethod,
+              city: customer.city,
+              country: customer.country,
+              notes: customer.notes,
+              paymentMethod: customer.paymentMethod,
               },
               components: selectedComponents,
               accessories: selectedAccessories,
               services: selectedServices,
             },
+            pdf_base64: pdfBase64,
+            pdf_filename: pdf.filename,
           }),
       });
 
@@ -961,6 +1184,11 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                 {selectedServices.length ? <div className={styles.summarySectionTitle}>Dienstleistungen</div> : null}
                 {selectedServices.map((item) => renderSummaryRow(item, removeService))}
               </div>
+              <div className={styles.summaryActions}>
+                <button type="button" className={styles.primaryButton} onClick={openOrderSection}>
+                  Weiter zur Bestellung
+                </button>
+              </div>
             </div>
           </div>
 
@@ -1028,68 +1256,66 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
               </div>
             </aside>
 
+          </div>
+        </section>
+        {isOrderSectionOpen ? (
+          <section ref={orderSectionRef} className={styles.orderSectionWrap}>
             <div className={styles.orderPanel}>
               <div className={styles.panelHeader}>
                 <div>
-                  <p className={styles.eyebrow}>Bestellung</p>
-                  <h2>Kundendaten</h2>
+                  <h2>Bestellung abschliessen</h2>
+                  <p className={styles.panelIntro}>
+                    Gib deine Kontaktdaten ein. Wir senden dir eine Bestellbestaetigung per E-Mail.
+                  </p>
                 </div>
               </div>
-              <div className={styles.totalsCard}>
-                <span>Aktuelle Summe</span>
-                <strong>{formatCurrency(grandTotal)}</strong>
-                <div className={styles.totalsActions}>
-                  <button type="submit" form="order-form" className={styles.primaryButton} disabled={isSubmitting}>
-                    {isSubmitting ? "Wird gesendet..." : "Bestellung absenden"}
-                  </button>
-                </div>
-              </div>
-
               <form id="order-form" className={styles.orderForm} onSubmit={handleSubmit}>
-                <div className={styles.field}>
-                  <label htmlFor="contractNumber">Vertragsnummer</label>
-                  <input id="contractNumber" value={customer.contractNumber} onChange={(event) => updateCustomer("contractNumber", event.target.value)} />
+                <input id="contractNumber" type="hidden" value={customer.contractNumber} onChange={(event) => updateCustomer("contractNumber", event.target.value)} />
+                <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+                  <label htmlFor="firstName">Vorname*</label>
+                  <input id="firstName" required placeholder="Max" value={customer.firstName} onChange={(event) => updateCustomer("firstName", event.target.value)} />
                 </div>
-                <div className={styles.field}>
-                  <label htmlFor="paymentMethod">Zahlungsart</label>
-                  <select id="paymentMethod" value={customer.paymentMethod} onChange={(event) => updateCustomer("paymentMethod", event.target.value)}>
-                    <option value="">Bitte waehlen</option>
-                    <option value="visa">Visa</option>
-                    <option value="mastercard">Mastercard</option>
-                    <option value="klarna">Klarna</option>
-                  </select>
+                <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+                  <label htmlFor="lastName">Nachname*</label>
+                  <input id="lastName" required placeholder="Mustermann" value={customer.lastName} onChange={(event) => updateCustomer("lastName", event.target.value)} />
                 </div>
-                <div className={styles.field}>
-                  <label htmlFor="firstName">Vorname</label>
-                  <input id="firstName" required value={customer.firstName} onChange={(event) => updateCustomer("firstName", event.target.value)} />
+                <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+                  <label htmlFor="email">E-Mail*</label>
+                  <input id="email" type="email" required placeholder="max@example.com" value={customer.email} onChange={(event) => updateCustomer("email", event.target.value)} />
                 </div>
-                <div className={styles.field}>
-                  <label htmlFor="lastName">Nachname</label>
-                  <input id="lastName" required value={customer.lastName} onChange={(event) => updateCustomer("lastName", event.target.value)} />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="email">E-Mail</label>
-                  <input id="email" type="email" required value={customer.email} onChange={(event) => updateCustomer("email", event.target.value)} />
-                </div>
-                <div className={styles.field}>
-                  <label htmlFor="phone">Telefon</label>
-                  <input id="phone" required value={customer.phone} onChange={(event) => updateCustomer("phone", event.target.value)} />
+                <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+                  <label htmlFor="phone">Telefon*</label>
+                  <input id="phone" required placeholder="+49 170 1234567" value={customer.phone} onChange={(event) => updateCustomer("phone", event.target.value)} />
                 </div>
                 <div className={styles.fieldFull}>
-                  <label htmlFor="address1">Adresse</label>
-                  <input id="address1" required value={customer.address1} onChange={(event) => updateCustomer("address1", event.target.value)} />
+                  <label htmlFor="address1">Adresse (Straße, Nr.)*</label>
+                  <input id="address1" required placeholder="Musterstraße 1" value={customer.address1} onChange={(event) => updateCustomer("address1", event.target.value)} />
                 </div>
                 <div className={styles.fieldFull}>
-                  <label htmlFor="address2">Adresszusatz</label>
-                  <input id="address2" value={customer.address2} onChange={(event) => updateCustomer("address2", event.target.value)} />
+                  <label htmlFor="address2">Adresszusatz (optional)</label>
+                  <input id="address2" placeholder="Wohnung, Firma, etc." value={customer.address2} onChange={(event) => updateCustomer("address2", event.target.value)} />
                 </div>
-                <div className={styles.field}>
-                  <label htmlFor="postalCode">PLZ</label>
-                  <input id="postalCode" required value={customer.postalCode} onChange={(event) => updateCustomer("postalCode", event.target.value)} />
+                <div className={[styles.field, styles.fieldThird].join(" ")}>
+                  <label htmlFor="postalCode">PLZ*</label>
+                  <input id="postalCode" required placeholder="10115" value={customer.postalCode} onChange={(event) => updateCustomer("postalCode", event.target.value)} />
                 </div>
-                <div className={styles.field}>
-                  <label htmlFor="city">Ort</label>
-                  <input id="city" required value={customer.city} onChange={(event) => updateCustomer("city", event.target.value)} />
+                <div className={[styles.field, styles.fieldThird].join(" ")}>
+                  <label htmlFor="city">Stadt*</label>
+                  <input id="city" required placeholder="Berlin" value={customer.city} onChange={(event) => updateCustomer("city", event.target.value)} />
+                </div>
+                <div className={[styles.field, styles.fieldThird].join(" ")}>
+                  <label htmlFor="country">Land*</label>
+                  <input id="country" required placeholder="Deutschland" value={customer.country} onChange={(event) => updateCustomer("country", event.target.value)} />
+                </div>
+                <div className={styles.fieldFull}>
+                  <label htmlFor="notes">Anmerkungen (optional)</label>
+                  <textarea
+                    id="notes"
+                    rows="3"
+                    value={customer.notes}
+                    onChange={(event) => updateCustomer("notes", event.target.value)}
+                    placeholder="Hinweise zur Lieferung, Wunschtermine, etc."
+                  />
                 </div>
                 <div className={styles.checkboxRow}>
                   <input
@@ -1099,9 +1325,50 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                     onChange={(event) => updateCustomer("consent", event.target.checked)}
                   />
                   <label htmlFor="consent">
-                    Ich bestaetige, dass meine Angaben zur Bearbeitung der Bestellung verwendet werden duerfen.
+                    Ich stimme der Verarbeitung meiner Daten zum Zweck der Bestellung zu.*
                   </label>
                 </div>
+                <div className={styles.fieldFull}>
+                  <div className={styles.paymentSection}>
+                    <label>Zahlungsmethode auswaehlen*</label>
+                    <div className={styles.paymentOptions} role="radiogroup" aria-label="Zahlungsmethode">
+                      {PAYMENT_METHOD_OPTIONS.map((option) => {
+                        const selected = customer.paymentMethod === option.value;
+                        return (
+                          <button
+                            key={option.value}
+                            type="button"
+                            className={[
+                              styles.paymentOption,
+                              selected ? styles.paymentOptionSelected : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            onClick={() => updateCustomer("paymentMethod", option.value)}
+                            aria-pressed={selected}
+                          >
+                            <span
+                              className={[
+                                styles.paymentLogo,
+                                styles[`paymentLogo${PAYMENT_METHOD_STYLE_BY_VALUE[option.value]?.charAt(0).toUpperCase()}${PAYMENT_METHOD_STYLE_BY_VALUE[option.value]?.slice(1)}`],
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
+                            >
+                              <span className={styles.paymentLogoLabel}>{option.label}</span>
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div className={styles.orderSubmitRow}>
+                  <button type="submit" form="order-form" className={styles.orderSubmitButton} disabled={isSubmitting}>
+                    {isSubmitting ? "Wird gesendet..." : "Bestellbestaetigung senden"}
+                  </button>
+                </div>
+                <small className={styles.orderHelp}>Mit * gekennzeichnete Felder sind Pflichtfelder.</small>
               </form>
 
               <div
@@ -1116,8 +1383,8 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup }) {
                 {status}
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        ) : null}
       </div>
     </div>
   );
