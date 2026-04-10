@@ -15,6 +15,7 @@ export function AdminShell({ adminEmail, children }) {
 
   return (
     <div
+      className="admin-shell"
       style={{
         minHeight: "100vh",
         position: "relative",
@@ -120,6 +121,7 @@ export function AdminShell({ adminEmail, children }) {
       </header>
 
       <div
+        className="admin-shell__layout"
         style={{
           width: "min(100%, 1880px)",
           margin: "0 auto",
@@ -131,7 +133,51 @@ export function AdminShell({ adminEmail, children }) {
           position: "relative",
         }}
       >
+        <nav
+          aria-label="Mobile admin navigation"
+          className="admin-shell__mobile-nav"
+          style={{
+            display: "none",
+            gap: 10,
+            overflowX: "auto",
+            paddingBottom: 4,
+          }}
+        >
+          {navItems.map((item) => {
+            const active = isActivePath(pathname, item.href);
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={`mobile-${item.href}`}
+                href={item.href}
+                style={{
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "12px 14px",
+                  borderRadius: 14,
+                  whiteSpace: "nowrap",
+                  background: active
+                    ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.12))"
+                    : "rgba(255,255,255,0.7)",
+                  color: active ? "var(--app-accent)" : "var(--app-text)",
+                  border: `1px solid ${active ? "var(--app-border-strong)" : "var(--app-border)"}`,
+                  fontWeight: active ? 700 : 600,
+                  boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "var(--app-shadow-soft)",
+                  flex: "0 0 auto",
+                }}
+              >
+                <Icon active={active} />
+                <span>{item.label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
         <aside
+          className="admin-shell__sidebar"
           style={{
             position: "sticky",
             top: 92,
@@ -217,7 +263,33 @@ export function AdminShell({ adminEmail, children }) {
           </nav>
         </aside>
 
-        <main style={{ minWidth: 0 }}>{children}</main>
+        <main className="admin-shell__content" style={{ minWidth: 0 }}>{children}</main>
+
+        <style>{`
+          @media (max-width: 960px) {
+            .admin-shell__layout {
+              grid-template-columns: minmax(0, 1fr) !important;
+              padding-top: 20px !important;
+            }
+
+            .admin-shell__mobile-nav {
+              display: flex !important;
+            }
+
+            .admin-shell__sidebar {
+              display: none !important;
+            }
+          }
+
+          @media (max-width: 640px) {
+            .admin-shell__layout {
+              padding-left: 16px !important;
+              padding-right: 16px !important;
+              padding-bottom: 28px !important;
+              gap: 16px !important;
+            }
+          }
+        `}</style>
       </div>
     </div>
   );

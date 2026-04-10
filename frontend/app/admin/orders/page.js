@@ -2,7 +2,10 @@ import Link from "next/link";
 import {
   AdminSection,
   StatusBadge,
+  cardListStyle,
+  itemCardStyle,
   pageGridStyle,
+  subMetaStyle,
   tableStyle,
   tableWrapStyle,
   tdStyle,
@@ -40,7 +43,7 @@ export default async function AdminOrdersPage() {
           title="Orders"
           description="Saved orders from the public configurator. This page is read-only for now, but it gives you the core operational view."
         >
-          <div style={tableWrapStyle}>
+          <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <thead>
                 <tr>
@@ -78,6 +81,54 @@ export default async function AdminOrdersPage() {
               </tbody>
             </table>
           </div>
+
+          <div className="admin-list-cards" style={cardListStyle}>
+            {!orders.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}>No orders found.</p> : null}
+            {orders.map((order) => (
+              <article key={order.id} style={itemCardStyle}>
+                <div style={{ display: "grid", gap: 12 }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
+                    <div style={{ display: "grid", gap: 6 }}>
+                      <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
+                        <strong style={{ fontSize: "1.05rem" }}>{order.orderNumber}</strong>
+                      </Link>
+                      <div style={subMetaStyle}>
+                        <span>{order.firstName} {order.lastName}</span>
+                        <span>{order.kitchen.name}</span>
+                      </div>
+                    </div>
+                    <StatusBadge status={order.status} />
+                  </div>
+                  <div style={subMetaStyle}>
+                    <span>{order.email}</span>
+                    <span>{formatDate(order.createdAt)}</span>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
+                    <strong>{formatCurrency(order.totalPrice)}</strong>
+                    <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
+                      Open details
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <style>{`
+            .admin-list-cards {
+              display: none;
+            }
+
+            @media (max-width: 760px) {
+              .admin-list-table {
+                display: none;
+              }
+
+              .admin-list-cards {
+                display: grid;
+              }
+            }
+          `}</style>
         </AdminSection>
       </div>
     </AdminShell>

@@ -2,7 +2,10 @@ import Link from "next/link";
 import {
   AdminSection,
   StatusBadge,
+  cardListStyle,
+  itemCardStyle,
   pageGridStyle,
+  subMetaStyle,
   tableStyle,
   tableWrapStyle,
   tdStyle,
@@ -32,7 +35,7 @@ export default async function AdminKitchensPage() {
           title="Kitchens"
           description="Database-backed kitchen definitions used by the public configurator."
         >
-          <div style={tableWrapStyle}>
+          <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <thead>
                 <tr>
@@ -73,6 +76,52 @@ export default async function AdminKitchensPage() {
               </tbody>
             </table>
           </div>
+
+          <div className="admin-list-cards" style={cardListStyle}>
+            {!kitchens.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}>No kitchens found.</p> : null}
+            {kitchens.map((kitchen) => (
+              <article key={kitchen.id} style={itemCardStyle}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <Link
+                      href={`/admin/kitchens/${kitchen.id}`}
+                      style={{ color: "var(--app-accent)", fontWeight: 800, textDecoration: "none" }}
+                    >
+                      {kitchen.name}
+                    </Link>
+                    <div style={subMetaStyle}>
+                      <span>{kitchen.slug}</span>
+                      <span>{formatDate(kitchen.updatedAt)}</span>
+                    </div>
+                  </div>
+                  <StatusBadge status={kitchen.status} />
+                </div>
+                <p style={{ margin: 0, color: "var(--app-text-muted)", lineHeight: 1.6 }}>
+                  {kitchen.description || "No description"}
+                </p>
+                <div style={subMetaStyle}>
+                  <span>{kitchen._count.items} item(s)</span>
+                  <span>{kitchen._count.orders} order(s)</span>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <style>{`
+            .admin-list-cards {
+              display: none;
+            }
+
+            @media (max-width: 760px) {
+              .admin-list-table {
+                display: none;
+              }
+
+              .admin-list-cards {
+                display: grid;
+              }
+            }
+          `}</style>
         </AdminSection>
       </div>
     </AdminShell>

@@ -141,7 +141,7 @@ export const tableWrapStyle = {
   background: "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,249,245,0.86))",
   boxShadow: "var(--app-shadow-soft)",
 };
-export const tableStyle = { width: "100%", borderCollapse: "collapse", minWidth: 820, background: "var(--app-surface)" };
+export const tableStyle = { width: "100%", borderCollapse: "collapse", background: "var(--app-surface)" };
 export const thStyle = {
   textAlign: "left",
   padding: "16px 20px",

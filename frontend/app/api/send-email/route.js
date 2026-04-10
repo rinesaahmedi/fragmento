@@ -2,6 +2,7 @@ import http from "http";
 import https from "https";
 import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
+import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 
 function fetchBuffer(url) {
   return new Promise((resolve, reject) => {
@@ -26,6 +27,12 @@ export async function POST(request) {
   let webhook_payload;
 
   try {
+    const clientIp = getRequestClientIp(request);
+    enforceRateLimit(`send-email:${clientIp}`, {
+      limit: 10,
+      windowMs: 15 * 60 * 1000,
+    });
+
     ({
       to_name,
       to_email,
@@ -37,7 +44,7 @@ export async function POST(request) {
     } = await request.json());
   } catch (error) {
     console.error("Body parse error:", error.message);
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    return NextResponse.json({ error: error.message || "Invalid request body" }, { status: error.status || 400 });
   }
 
   const transporter = nodemailer.createTransport({

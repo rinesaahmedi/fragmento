@@ -30,11 +30,6 @@ const PRODUCT_INFO_BY_CODE = {
     filename: "Produktinformation-Geschirrspueler.pdf",
     label: "Geschirrspueler",
   },
-  "model-b-oven-module": {
-    assetPath: "product-info/oven-product-info.pdf",
-    filename: "Produktinformation-Backofen.pdf",
-    label: "Backofen",
-  },
   "model-b-refrigerator": {
     assetPath: "product-info/fridge-product-info.pdf",
     filename: "Produktinformation-Kuehlschrank.pdf",
@@ -54,11 +49,6 @@ const PRODUCT_INFO_BY_CODE = {
     assetPath: "product-info/extractor-hood-chimney-product-info.pdf",
     filename: "Produktinformation-Dunstabzugshaube-Kamin.pdf",
     label: "Dunstabzugshaube Kamin",
-  },
-  "model-c-oven-base": {
-    assetPath: "product-info/oven-product-info.pdf",
-    filename: "Produktinformation-Backofen.pdf",
-    label: "Backofen",
   },
   "model-c-wm-base": {
     assetPath: "product-info/washing-machine-product-info.pdf",
@@ -129,6 +119,11 @@ function fetchBuffer(url) {
   });
 }
 
+async function loadLogoBuffer() {
+  const logoPath = await resolvePublicAssetPath("img/fragmentologo.png");
+  return fs.readFile(logoPath);
+}
+
 export function formatCurrency(num) {
   const hasFraction = Number(num) % 1 !== 0;
   return new Intl.NumberFormat("de-DE", {
@@ -176,7 +171,7 @@ export function buildOrderSummaryHtml(order) {
         <h4 style="margin-top:0;">Bestelldaten</h4>
         <table style="${tableStyles}"><tbody>${orderDetailsRows}</tbody></table>
         ${renderSection("Komponenten", order.components)}
-        ${renderSection("Zubehör", order.accessories)}
+        ${renderSection("Zubehoer", order.accessories)}
         ${renderSection("Dienstleistungen", order.services)}
         <table style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;">
           <tr><td style="text-align:right;font-size:1.3em;font-weight:bold;">Gesamtpreis: ${formatCurrency(
@@ -201,7 +196,7 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
 
   let logoBuffer = null;
   try {
-    logoBuffer = await fetchBuffer("https://architectkitchen.netlify.app/img/fragmentologo.png");
+    logoBuffer = await loadLogoBuffer();
   } catch (error) {
     console.warn("Could not fetch logo:", error.message);
   }

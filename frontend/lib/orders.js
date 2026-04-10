@@ -1,20 +1,51 @@
-import { ItemType, OrderStatus } from "@prisma/client";
+import crypto from "crypto";
+import { ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { MONTAGE_REQUIRED_CODES } from "./catalog";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import { prisma } from "./prisma";
 
+const PAYMENT_METHODS = new Set(["paypal", "visa", "mastercard", "klarna"]);
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validationError(message) {
+  const error = new Error(message);
+  error.status = 400;
+  return error;
+}
+
 function requireString(value, label) {
   if (!value || !String(value).trim()) {
-    throw new Error(`${label} is required`);
+    throw validationError(`${label} is required`);
   }
   return String(value).trim();
 }
 
 function buildOrderNumber() {
-  const now = new Date();
-  const date = now.toISOString().slice(0, 10).replaceAll("-", "");
-  const time = now.toTimeString().slice(0, 8).replaceAll(":", "");
-  return `${date}-${time}`;
+  const timestamp = new Date().toISOString().replaceAll(/[-:.TZ]/g, "").slice(0, 17);
+  const suffix = crypto.randomBytes(3).toString("hex").toUpperCase();
+  return `FRG-${timestamp}-${suffix}`;
+}
+
+function validateEmail(value) {
+  const email = requireString(value, "Email").toLowerCase();
+  if (!EMAIL_PATTERN.test(email)) {
+    throw validationError("Email is invalid");
+  }
+  return email;
+}
+
+function validatePaymentMethod(value) {
+  const paymentMethod = requireString(value, "Payment method").toLowerCase();
+  if (!PAYMENT_METHODS.has(paymentMethod)) {
+    throw validationError("Payment method is invalid");
+  }
+  return paymentMethod;
+}
+
+function validateConsent(value) {
+  if (value !== true) {
+    throw validationError("Consent is required");
+  }
 }
 
 function normalizeSubmissionItems(items = []) {
@@ -115,6 +146,10 @@ async function processOrderNotifications({ order, pdfBase64, pdfFilename, runEma
 }
 
 export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdfBase64, pdfFilename }) {
+  if (!kitchenSlug || !orderPayload || typeof orderPayload !== "object") {
+    throw validationError("Order payload is invalid");
+  }
+
   const kitchen = await prisma.kitchen.findUnique({
     where: { slug: kitchenSlug },
     include: {
@@ -130,17 +165,18 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   }
 
   const customer = orderPayload?.customer || {};
+  validateConsent(customer.consent);
   const validatedCustomer = {
     contractNumber: customer.contractNumber ? String(customer.contractNumber).trim() : "",
     firstName: requireString(customer.firstName, "First name"),
     lastName: requireString(customer.lastName, "Last name"),
-    email: requireString(customer.email, "Email"),
+    email: validateEmail(customer.email),
     phone: requireString(customer.phone, "Phone"),
     address1: requireString(customer.address1, "Address"),
     address2: customer.address2 ? String(customer.address2).trim() : "",
     postalCode: requireString(customer.postalCode, "Postal code"),
     city: requireString(customer.city, "City"),
-    paymentMethod: customer.paymentMethod ? String(customer.paymentMethod).trim() : "",
+    paymentMethod: validatePaymentMethod(customer.paymentMethod),
   };
 
   const submittedGroups = {
@@ -160,61 +196,79 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   );
 
   if ([...selectedComponents, ...selectedAccessories, ...selectedServices].some((item) => !item)) {
-    throw new Error("One or more selected items are invalid or inactive");
+    throw validationError("One or more selected items are invalid or inactive");
   }
 
   const selectedComponentCodes = selectedComponents.map((item) => item.code);
   if (selectedServices.some((item) => item.code === "service-montage")) {
     const matchedCabinets = selectedComponentCodes.filter((code) => MONTAGE_REQUIRED_CODES.includes(code)).length;
     if (selectedComponents.length < 3 || matchedCabinets < 2) {
-      throw new Error("Montage conditions are not met");
+      throw validationError("Montage conditions are not met");
     }
   }
 
   const allSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];
+  if (!allSelected.length) {
+    throw validationError("At least one item must be selected");
+  }
   const totalPrice = allSelected.reduce((sum, item) => sum + Number(item.price), 0);
-  const orderNumber = buildOrderNumber();
 
-  const createdOrder = await prisma.$transaction(async (tx) => {
-    const order = await tx.order.create({
-      data: {
-        orderNumber,
-        kitchenId: kitchen.id,
-        status: OrderStatus.NEW,
-        contractNumber: validatedCustomer.contractNumber || null,
-        firstName: validatedCustomer.firstName,
-        lastName: validatedCustomer.lastName,
-        email: validatedCustomer.email,
-        phone: validatedCustomer.phone,
-        address1: validatedCustomer.address1,
-        address2: validatedCustomer.address2 || null,
-        postalCode: validatedCustomer.postalCode,
-        city: validatedCustomer.city,
-        paymentMethod: validatedCustomer.paymentMethod || null,
-        totalPrice,
-      },
-    });
+  let createdOrder = null;
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const orderNumber = buildOrderNumber();
+      createdOrder = await prisma.$transaction(async (tx) => {
+        const order = await tx.order.create({
+          data: {
+            orderNumber,
+            kitchenId: kitchen.id,
+            status: OrderStatus.NEW,
+            contractNumber: validatedCustomer.contractNumber || null,
+            firstName: validatedCustomer.firstName,
+            lastName: validatedCustomer.lastName,
+            email: validatedCustomer.email,
+            phone: validatedCustomer.phone,
+            address1: validatedCustomer.address1,
+            address2: validatedCustomer.address2 || null,
+            postalCode: validatedCustomer.postalCode,
+            city: validatedCustomer.city,
+            paymentMethod: validatedCustomer.paymentMethod,
+            totalPrice,
+          },
+        });
 
-    await tx.orderItem.createMany({
-      data: allSelected.map((item) => ({
-        orderId: order.id,
-        kitchenItemId: item.id,
-        itemType: item.itemType,
-        code: item.code,
-        nameSnapshot: item.name,
-        priceSnapshot: item.price,
-        quantity: 1,
-      })),
-    });
+        await tx.orderItem.createMany({
+          data: allSelected.map((item) => ({
+            orderId: order.id,
+            kitchenItemId: item.id,
+            itemType: item.itemType,
+            code: item.code,
+            nameSnapshot: item.name,
+            priceSnapshot: item.price,
+            quantity: 1,
+          })),
+        });
 
-    return tx.order.findUnique({
-      where: { id: order.id },
-      include: {
-        kitchen: true,
-        items: true,
-      },
-    });
-  });
+        return tx.order.findUnique({
+          where: { id: order.id },
+          include: {
+            kitchen: true,
+            items: true,
+          },
+        });
+      });
+      break;
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002" && attempt < 2) {
+        continue;
+      }
+      throw error;
+    }
+  }
+
+  if (!createdOrder) {
+    throw new Error("Order could not be created");
+  }
 
   const orderForNotifications = buildOrderForNotifications(createdOrder);
   const notificationResult = await processOrderNotifications({

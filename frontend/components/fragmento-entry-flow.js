@@ -21,12 +21,12 @@ const SCREEN_TEXT = {
     textButton: "Text",
     videoButton: "Video",
     textTitle: "Textanweisungen",
-    continueLabel: "Continue",
-    backLabel: "Back",
+    continueLabel: "Weiter",
+    backLabel: "Zurueck",
     contractTitle: "Kuechenvertragsnummer",
     contractHelper: "Gib deine Kaufvertragsnummer ein.\nDu findest sie auf der Innenseite deines Spuelenschrankes.",
-    contractLabel: "Please enter your contract number:*",
-    contractAction: "Confirm",
+    contractLabel: "Bitte gib deine Vertragsnummer ein:*",
+    contractAction: "Bestaetigen",
     contractError: "Die eingegebene Vertragsnummer passt zu keiner aktiven Kueche.",
   },
   en: {
@@ -108,25 +108,25 @@ const SCREEN_TEXT = {
 
 const INSTRUCTION_TEXTS = {
   de: [
-    "Welcome to Fragmento by Architecto!",
+    "Willkommen bei Fragmento by Architecto!",
     "",
-    "We help you complete your kitchen in 4 easy and precise steps, with a 100% design and fit guarantee.",
+    "Wir helfen dir, deine Kueche in 4 einfachen und praezisen Schritten zu vervollstaendigen, mit 100 % Design- und Passgenauigkeitsgarantie.",
     "",
-    "How it works:",
+    "So funktioniert es:",
     "",
-    "Step 1: Scan the QR code. You can find it on a sticker on the cooktop.",
-    "Step 2: Enter your purchase contract number. You will find it on the inside of your sink cabinet.",
-    "Step 3: Choose the components you want to add.",
-    "Step 4: Enter your personal details and complete your order.",
+    "Schritt 1: Scanne den QR-Code. Du findest ihn auf einem Aufkleber am Kochfeld.",
+    "Schritt 2: Gib deine Kaufvertragsnummer ein. Du findest sie auf der Innenseite deines Spuelenschrankes.",
+    "Schritt 3: Waehle die Komponenten aus, die du hinzufuegen moechtest.",
+    "Schritt 4: Gib deine persoenlichen Daten ein und schliesse deine Bestellung ab.",
     "",
-    "Additionally, we offer:",
-    "Professional transport and installation.",
-    "Support with subsidy applications if needed.",
+    "Zusaetzlich bieten wir dir:",
+    "Professionellen Transport und fachgerechte Montage.",
+    "Unterstuetzung bei Foerderantraegen, falls noetig.",
     "",
-    "After your order, one of our AI voice agents calls you to confirm all details.",
+    "Nach deiner Bestellung ruft dich einer unserer KI-Sprachassistenten an, um alle Details zu bestaetigen.",
     "",
-    "Simple. Fast. Reliable.",
-    "Let us start!",
+    "Einfach. Schnell. Zuverlaessig.",
+    "Lass uns starten!",
   ].join("\n"),
   en: [
     "Welcome to Fragmento by Architecto!",
@@ -283,6 +283,13 @@ export default function FragmentoEntryFlow({ kitchens }) {
 
   return (
     <main style={pageStyle}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap"
+        rel="stylesheet"
+      />
+      <style>{responsivePanelMedia}</style>
       <div style={centerWrapStyle}>
         <section style={panelStyle}>
           <Link href="/admin" style={adminLinkStyle}>
@@ -296,7 +303,7 @@ export default function FragmentoEntryFlow({ kitchens }) {
           {screen === "language" ? (
             <div style={contentAreaStyle}>
               <h2 style={headlineStyle}>{text.languageTitle}</h2>
-              <div style={languageGridStyle}>
+              <div className="fragmento-entry-panel-grid" style={languageGridStyle}>
                 {LANGUAGE_OPTIONS.map((language) => (
                   <button
                     key={language.code}
@@ -308,6 +315,9 @@ export default function FragmentoEntryFlow({ kitchens }) {
                     <span>{language.label}</span>
                   </button>
                 ))}
+              </div>
+              <div style={languageFooterStyle}>
+                <img src="/img/FIGURA.png" alt="" aria-hidden="true" style={languageFigureStyle} />
               </div>
             </div>
           ) : null}
@@ -404,8 +414,7 @@ export default function FragmentoEntryFlow({ kitchens }) {
               />
             </form>
           ) : null}
-
-          {screen !== "text" && screen !== "contract" ? (
+          {screen === "mode" || screen === "video" ? (
             <img src="/img/FIGURA.png" alt="" aria-hidden="true" style={figureStyle} />
           ) : null}
         </section>
@@ -417,25 +426,25 @@ export default function FragmentoEntryFlow({ kitchens }) {
 const pageStyle = {
   minHeight: "100vh",
   background: "#f8f7f4",
-  fontFamily: "Arial, sans-serif",
+  fontFamily: '"Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
 };
 
 const centerWrapStyle = {
   minHeight: "100vh",
   display: "grid",
   placeItems: "center",
-  padding: "24px",
+  padding: "28px",
 };
 
 const panelStyle = {
-  width: "min(100%, 760px)",
-  minHeight: 560,
+  width: "min(92vw, 720px)",
+  minHeight: 480,
   position: "relative",
-  background: "linear-gradient(180deg, #fffdfa 0%, #fcf7f0 100%)",
-  border: "1px solid #ead9c4",
-  borderRadius: 22,
-  boxShadow: "0 22px 46px rgba(101, 80, 51, 0.16)",
-  padding: "34px 26px 64px",
+  background: "linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(252, 246, 238, 0.95) 100%)",
+  border: "1px solid rgba(177, 145, 116, 0.22)",
+  borderRadius: 18,
+  boxShadow: "0 24px 56px rgba(36, 24, 12, 0.22)",
+  padding: "10px 16px 16px",
   overflow: "hidden",
 };
 
@@ -451,25 +460,32 @@ const adminLinkStyle = {
 const logoWrapStyle = {
   display: "grid",
   placeItems: "center",
-  marginTop: 22,
+  marginTop: -14,
+  marginBottom: -20,
 };
 
 const logoStyle = {
-  width: "min(360px, 74%)",
+  width: "min(360px, 72%)",
   height: "auto",
+  maxWidth: "100%",
   display: "block",
 };
 
 const contentAreaStyle = {
-  marginTop: 30,
+  width: "100%",
+  maxWidth: 720,
+  margin: "0 auto",
 };
 
 const headlineStyle = {
-  margin: 0,
+  margin: "-18px 0 8px",
   textAlign: "center",
-  fontSize: "clamp(1.7rem, 3vw, 2.05rem)",
-  fontWeight: 700,
+  fontSize: "clamp(18px, 2.2vw, 24px)",
+  fontWeight: 800,
   color: "#372f29",
+  letterSpacing: "0.2px",
+  position: "relative",
+  top: -50,
 };
 
 const subheadlineStyle = {
@@ -481,32 +497,36 @@ const subheadlineStyle = {
 
 const languageGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(185px, 1fr))",
   gap: 12,
-  marginTop: 24,
+  marginTop: 2,
+  position: "relative",
+  top: -40,
 };
 
 const optionButtonStyle = {
-  display: "flex",
+  display: "inline-flex",
   alignItems: "center",
-  gap: 12,
+  gap: 10,
   justifyContent: "flex-start",
-  padding: "14px 14px",
-  borderRadius: 14,
-  border: "1px solid #dbc9b1",
-  background: "linear-gradient(180deg, #f9f3ea 0%, #f3eadf 100%)",
+  padding: "11px 14px",
+  width: "100%",
+  borderRadius: 12,
+  border: "1px solid rgba(110, 84, 61, 0.2)",
+  background: "linear-gradient(180deg, #fffdf8 0%, #f7ecdf 100%)",
   color: "#372f29",
-  fontSize: 16,
-  fontWeight: 700,
+  fontSize: "1rem",
+  fontWeight: 600,
   cursor: "pointer",
+  transition: "transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease",
 };
 
 const flagStyle = {
-  width: 28,
-  height: 20,
+  width: 24,
+  height: 18,
   objectFit: "cover",
-  borderRadius: 4,
-  boxShadow: "0 0 0 1px rgba(0, 0, 0, 0.08)",
+  borderRadius: 3,
+  boxShadow: "0 0 0 1px rgba(0, 0, 0, 0.12)",
   flexShrink: 0,
 };
 
@@ -652,12 +672,50 @@ const primaryButtonStyle = {
 
 const figureStyle = {
   position: "absolute",
-  right: 26,
+  right: 20,
   bottom: 18,
-  width: 78,
+  width: 66,
   height: "auto",
   pointerEvents: "none",
 };
+
+const languageFooterStyle = {
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-end",
+  marginTop: "auto",
+  gap: 8,
+  width: "100%",
+  position: "relative",
+  top: -20,
+};
+
+const languageFigureStyle = {
+  width: 112,
+  maxWidth: 112,
+  maxHeight: 112,
+  height: "auto",
+  objectFit: "contain",
+  pointerEvents: "none",
+};
+
+const responsivePanelMedia = `
+  @media (max-width: 720px) {
+    .fragmento-entry-panel-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .fragmento-entry-panel-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    .fragmento-entry-language-footer {
+      top: 0 !important;
+    }
+  }
+`;
 
 const errorStyle = {
   margin: "8px 0 0",
