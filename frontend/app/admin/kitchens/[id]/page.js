@@ -17,6 +17,7 @@ import {
   pageGridStyle,
   primaryButtonStyle,
   secondaryButtonStyle,
+  splitGridStyle,
   subMetaStyle,
   textareaStyle,
 } from "../../../../components/admin-ui";
@@ -316,6 +317,55 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
         </AdminSection>
 
         <AdminSection
+          title="Excel catalog"
+          description="Export this kitchen to Excel, update prices or other item fields, then import the file back to update the matching kitchen items."
+        >
+          <div style={splitGridStyle}>
+            <div style={catalogPanelStyle}>
+              <div style={{ display: "grid", gap: 8 }}>
+                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}>Export current kitchen data</strong>
+                <p style={mutedTextStyle}>
+                  Download all catalog rows for this kitchen, including the current prices shown in admin.
+                </p>
+              </div>
+              <a
+                href={`/api/admin/kitchens/${kitchen.id}/catalog`}
+                style={catalogDownloadLinkStyle}
+              >
+                Export Excel
+              </a>
+            </div>
+
+            <form
+              action={`/api/admin/kitchens/${kitchen.id}/catalog`}
+              method="post"
+              encType="multipart/form-data"
+              style={catalogPanelStyle}
+            >
+              <div style={{ display: "grid", gap: 8 }}>
+                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}>Import edited file</strong>
+                <p style={mutedTextStyle}>
+                  Change the prices you want in the exported sheet, save it, then upload it here. Matching items will be updated.
+                </p>
+              </div>
+              <FormField label="Catalog file">
+                <input
+                  type="file"
+                  name="catalogFile"
+                  accept=".xlsx,.csv"
+                  style={inputStyle}
+                  required
+                />
+              </FormField>
+              <div style={actionRowStyle}>
+                <button type="submit" style={primaryButtonStyle}>Import catalog</button>
+                <span style={catalogHelpTextStyle}>Supported formats: `.xlsx` and `.csv`</span>
+              </div>
+            </form>
+          </div>
+        </AdminSection>
+
+        <AdminSection
           title="Catalog items"
           description="Compact item cards. Open only the component you want to edit."
         >
@@ -434,6 +484,27 @@ const compactItemCardStyle = {
   padding: 0,
   gap: 0,
   overflow: "hidden",
+};
+
+const catalogPanelStyle = {
+  ...itemCardStyle,
+  gap: 14,
+  alignContent: "start",
+};
+
+const catalogDownloadLinkStyle = {
+  ...secondaryButtonStyle,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  textDecoration: "none",
+  width: "fit-content",
+};
+
+const catalogHelpTextStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 700,
 };
 
 const highlightedCompactItemCardStyle = {
