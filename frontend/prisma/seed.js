@@ -73,14 +73,14 @@ const DEFAULT_KITCHENS = [
   },
   {
     slug: "kitchen-model-b",
-    name: "KITCHEN MODEL B",
-    description: "Kitchen Model B based on the cleaned CAD export.",
+    name: "Linear Kitchen",
+    description: "Compact single-wall layout ideal for smaller spaces",
     items: MODEL_B_ITEMS,
   },
   {
     slug: "kitchen-model-c",
-    name: "KITCHEN MODEL C",
-    description: "Kitchen Model C with cooking/storage and washing/prep zones.",
+    name: "Split Kitchen",
+    description: "Two-part layout with separated zones for flexibility",
     items: MODEL_C_ITEMS,
   },
 ];

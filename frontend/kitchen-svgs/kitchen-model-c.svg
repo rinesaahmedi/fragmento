@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="860" height="600" viewBox="0 0 860 600" version="1.1">
-  <title>KITCHEN MODEL C</title>
-  <desc>Interactive grouped kitchen SVG for Kitchen Model C</desc>
+  <title>Split Kitchen</title>
+  <desc>Two-part layout with separated zones for flexibility</desc>
 
   <path d="M40 130H820" fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M40 500H820" fill="none" stroke="black" stroke-width="0.5"/>

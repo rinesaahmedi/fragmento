@@ -586,12 +586,14 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const data = useMemo(() => config.data
     .map((item) => ({
       ...item,
+      axisLabel: [item.name, item.itemType, item.code].filter(Boolean).join(" | "),
       chartValue: Number(item[mode] || 0),
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
     }))
-    .sort((a, b) => b.chartValue - a.chartValue)
-    .slice(0, 8), [config.data, mode]);
+    .sort((a, b) => b.chartValue - a.chartValue), [config.data, mode]);
+
+  const chartHeight = Math.max(280, data.length * 34 + 52);
 
   return (
     <section className="chart-card">
@@ -608,7 +610,8 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       />
       <div className="top-items-frame">
         {data.length ? (
-          <ResponsiveContainer width="100%" height={280}>
+          <div className="top-items-scroll">
+            <ResponsiveContainer width="100%" height={chartHeight}>
             <BarChart
               key={mode}
               data={data}
@@ -625,12 +628,12 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
               />
               <YAxis
                 type="category"
-                dataKey="name"
-                width={136}
+                dataKey="axisLabel"
+                width={185}
                 tickLine={false}
                 axisLine={false}
-                fontSize={13}
-                tickFormatter={truncateLabel}
+                fontSize={12}
+                tickFormatter={(value) => truncateLabel(value, 28)}
               />
               <Tooltip content={<TopItemsTooltip />} />
               <Bar
@@ -651,7 +654,8 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
                 ))}
               </Bar>
             </BarChart>
-          </ResponsiveContainer>
+            </ResponsiveContainer>
+          </div>
         ) : <EmptyChart label="No item data for the selected filters." />}
       </div>
       <style jsx>{`
@@ -670,6 +674,13 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
           min-width: 0;
           min-height: 280px;
           transition: opacity 180ms ease, transform 180ms ease;
+        }
+
+        .top-items-scroll {
+          max-height: 280px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding-right: 4px;
         }
 
         .segmented-control {
@@ -710,6 +721,8 @@ function TopItemsTooltip({ active, payload }) {
   return (
     <div className="tooltip">
       <strong>{item.name}</strong>
+      <span>Category: {item.itemType || "Not captured"}</span>
+      <span>Article number: {item.code || "Not captured"}</span>
       <span>Quantity: {item.quantity}</span>
       <span>Revenue: {formatCurrency(item.revenue)}</span>
       <style jsx>{`
@@ -899,8 +912,8 @@ function GeographySection({ data }) {
     <section className="chart-card">
       <ChartHeader
         eyebrow="Geography"
-        title="Orders by country"
-        detail="Countries ranked by number of orders."
+        title="Orders by country and city"
+        detail="Locations ranked by number of orders."
       />
 
       <div className="country-chart-frame">
@@ -909,7 +922,7 @@ function GeographySection({ data }) {
             <BarChart data={data} layout="vertical" margin={{ top: 8, right: 36, left: 16, bottom: 0 }}>
               <CartesianGrid stroke="#e5e7eb" horizontal={false} />
               <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
-              <YAxis type="category" dataKey="country" width={96} tickLine={false} axisLine={false} fontSize={13} tickFormatter={truncateLabel} />
+              <YAxis type="category" dataKey="label" width={128} tickLine={false} axisLine={false} fontSize={13} tickFormatter={truncateLabel} />
               <Tooltip content={<CountryTooltip />} />
               <Bar dataKey="orders" fill="#2563eb" radius={[0, 8, 8, 0]} label={{ position: "right", fill: "#111827", fontSize: 12, fontWeight: 800 }} />
             </BarChart>
@@ -946,7 +959,9 @@ function CountryTooltip({ active, payload }) {
   const row = payload[0].payload;
   return (
     <div className="tooltip">
-      <strong>{row.country}</strong>
+      <strong>{row.label}</strong>
+      <span>City: {row.city}</span>
+      <span>Country: {row.country}</span>
       <span>Orders: {row.orders}</span>
       <span>Revenue: {formatCurrency(row.revenue)}</span>
       <span>Share: {Math.round(Number(row.orderShare || 0))}%</span>
@@ -986,9 +1001,9 @@ function EmptyChart({ label }) {
   `}</style></div>;
 }
 
-function truncateLabel(value) {
+function truncateLabel(value, maxLength = 24) {
   const label = String(value || "");
-  return label.length > 24 ? `${label.slice(0, 21)}...` : label;
+  return label.length > maxLength ? `${label.slice(0, maxLength - 3)}...` : label;
 }
 
 function compactCurrency(value) {

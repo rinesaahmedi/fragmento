@@ -193,10 +193,18 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     paymentStats.set(paymentLabel, (paymentStats.get(paymentLabel) || 0) + 1);
 
     const country = deriveCountry(order);
-    const existingCountry = geographyStats.get(country) || { country, orders: 0, revenue: 0 };
-    existingCountry.orders += 1;
-    existingCountry.revenue += Number(order.totalPrice || 0);
-    geographyStats.set(country, existingCountry);
+    const city = String(order.city || "").trim() || "Not captured";
+    const geographyKey = `${country}::${city.toLowerCase()}`;
+    const existingLocation = geographyStats.get(geographyKey) || {
+      country,
+      city,
+      label: `${city}, ${country}`,
+      orders: 0,
+      revenue: 0,
+    };
+    existingLocation.orders += 1;
+    existingLocation.revenue += Number(order.totalPrice || 0);
+    geographyStats.set(geographyKey, existingLocation);
 
     for (const item of order.items) {
       const quantity = Number(item.quantity || 0);
@@ -221,8 +229,8 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
 
   const dailyStatusData = Array.from(dailyStatusByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const kitchenTimelineData = Array.from(timelineByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
-  const topItemsByQuantity = Array.from(itemStats.values()).sort((a, b) => b.quantity - a.quantity).slice(0, 10);
-  const topItemsByRevenue = Array.from(itemStats.values()).sort((a, b) => b.revenue - a.revenue).slice(0, 10);
+  const topItemsByQuantity = Array.from(itemStats.values()).sort((a, b) => b.quantity - a.quantity);
+  const topItemsByRevenue = Array.from(itemStats.values()).sort((a, b) => b.revenue - a.revenue);
   const itemTypeData = Array.from(typeSplit.values()).sort((a, b) => b.value - a.value);
   const paymentData = Array.from(paymentStats.entries())
     .map(([label, value]) => ({ label, value }))
