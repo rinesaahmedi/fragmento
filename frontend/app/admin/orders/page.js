@@ -33,7 +33,7 @@ function formatDate(value) {
 }
 
 function formatArticleCodes(items = []) {
-  const codes = items.map((item) => item.code).filter(Boolean);
+  const codes = [...new Set(items.map((item) => item.code).filter(Boolean))];
   return codes.length ? codes.join(", ") : "No article codes";
 }
 
@@ -91,7 +91,7 @@ export default async function AdminOrdersPage() {
             </table>
           </div>
 
-          <div className="admin-list-cards" style={cardListStyle}>
+          <div className="admin-list-cards" style={{ gap: cardListStyle.gap }}>
             {!orders.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}>No orders found.</p> : null}
             {orders.map((order) => (
               <article key={order.id} style={itemCardStyle}>

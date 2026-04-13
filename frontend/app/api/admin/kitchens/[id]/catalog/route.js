@@ -51,6 +51,35 @@ export async function POST(request, { params }) {
     const existingById = new Map(kitchen.items.map((item) => [item.id, item]));
     const existingByCode = new Map(kitchen.items.map((item) => [item.code, item]));
     let updatedCount = 0;
+    const nextCodesByItemId = new Map(kitchen.items.map((item) => [item.id, item.code]));
+    const seenImportedRowKeys = new Set();
+
+    for (const row of importedRows) {
+      const existingItem = (row.id && existingById.get(row.id)) || existingByCode.get(row.code);
+      if (!existingItem) {
+        continue;
+      }
+
+      if (seenImportedRowKeys.has(existingItem.id)) {
+        throw new Error(`The catalog file contains "${existingItem.name}" more than once.`);
+      }
+
+      seenImportedRowKeys.add(existingItem.id);
+      nextCodesByItemId.set(existingItem.id, row.data.code);
+    }
+
+    const codeOwners = new Map();
+    for (const [itemId, code] of nextCodesByItemId) {
+      if (codeOwners.has(code)) {
+        const firstItem = existingById.get(codeOwners.get(code));
+        const secondItem = existingById.get(itemId);
+        throw new Error(
+          `Item code "${code}" is used by both "${firstItem?.name || "one item"}" and "${secondItem?.name || "another item"}". Article numbers must be unique.`,
+        );
+      }
+
+      codeOwners.set(code, itemId);
+    }
 
     await prisma.$transaction(async (tx) => {
       for (const row of importedRows) {

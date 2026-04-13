@@ -77,7 +77,9 @@ function getDateKeys(orders, startDate) {
 }
 
 function getItemKey(item) {
-  return [item.itemType, item.code, item.nameSnapshot].join("::");
+  const code = String(item.code || "").trim();
+  if (code) return code;
+  return [item.itemType, item.nameSnapshot].join("::");
 }
 
 function deriveCountry(order) {

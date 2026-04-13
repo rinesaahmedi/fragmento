@@ -79,7 +79,7 @@ export default async function AdminKitchensPage() {
             </table>
           </div>
 
-          <div className="admin-list-cards" style={cardListStyle}>
+          <div className="admin-list-cards" style={{ gap: cardListStyle.gap }}>
             {!kitchens.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}>No kitchens found.</p> : null}
             {kitchens.map((kitchen) => (
               <article key={kitchen.id} style={itemCardStyle}>

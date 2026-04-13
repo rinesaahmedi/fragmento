@@ -7,6 +7,21 @@ import { prisma } from "./prisma";
 export async function prepareKitchenItemMutation({ formData, kitchen, excludeItemId = "" }) {
   const data = validateKitchenItemInput(formData);
   const structureSlots = getKitchenStructureSlots(kitchen.slug);
+  const duplicateCode = await prisma.kitchenItem.findFirst({
+    where: {
+      kitchenId: kitchen.id,
+      code: data.code,
+      ...(excludeItemId ? { NOT: { id: excludeItemId } } : {}),
+    },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
+  if (duplicateCode) {
+    throw new Error(`Item code "${data.code}" is already used by "${duplicateCode.name}". Article numbers must be unique.`);
+  }
 
   if (data.itemType !== ItemType.COMPONENT) {
     return {

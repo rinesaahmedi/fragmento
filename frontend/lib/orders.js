@@ -55,12 +55,19 @@ function validateConsent(value) {
 }
 
 function normalizeSubmissionItems(items = []) {
+  const seen = new Set();
   return items
     .map((item) => ({
       code: item?.code ? String(item.code) : null,
       name: item?.name ? String(item.name) : null,
     }))
-    .filter((item) => item.code || item.name);
+    .filter((item) => {
+      if (!item.code && !item.name) return false;
+      const key = item.code || item.name;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }
 
 function mapCatalogItem(catalogItems, submittedItem, itemType) {

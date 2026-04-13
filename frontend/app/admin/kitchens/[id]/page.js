@@ -346,7 +346,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             </table>
           </div>
 
-          <div className="admin-list-cards" style={{ ...cardListStyle, marginTop: 18 }}>
+          <div className="admin-list-cards" style={{ gap: cardListStyle.gap, marginTop: 18 }}>
             {!kitchen.contracts.length ? <p style={mutedTextStyle}>No contract numbers configured.</p> : null}
             {kitchen.contracts.map((contract) => {
               const isUsed = Boolean(contract.usedAt);
