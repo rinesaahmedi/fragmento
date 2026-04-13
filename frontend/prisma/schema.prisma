@@ -35,15 +35,16 @@ model AdminUser {
 }
 
 model Kitchen {
-  id          String        @id @default(cuid())
-  slug        String        @unique
+  id          String            @id @default(cuid())
+  slug        String            @unique
   name        String
-  status      KitchenStatus @default(DRAFT)
+  status      KitchenStatus     @default(DRAFT)
   description String?
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
   items       KitchenItem[]
   orders      Order[]
+  contracts   KitchenContract[]
 }
 
 model KitchenItem {
@@ -69,25 +70,43 @@ model KitchenItem {
 }
 
 model Order {
-  id             String      @id @default(cuid())
-  orderNumber    String      @unique
+  id                String           @id @default(cuid())
+  orderNumber       String           @unique
+  kitchenId         String
+  kitchen           Kitchen          @relation(fields: [kitchenId], references: [id], onDelete: Restrict)
+  kitchenContractId String?
+  kitchenContract   KitchenContract? @relation(fields: [kitchenContractId], references: [id], onDelete: SetNull)
+  status            OrderStatus      @default(NEW)
+  contractNumber    String?
+  firstName         String
+  lastName          String
+  email             String
+  phone             String
+  address1          String
+  address2          String?
+  postalCode        String
+  city              String
+  paymentMethod     String?
+  totalPrice        Decimal          @db.Decimal(10, 2)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+  items             OrderItem[]
+
+  @@index([kitchenContractId])
+}
+
+model KitchenContract {
+  id             String    @id @default(cuid())
+  contractNumber String    @unique
   kitchenId      String
-  kitchen        Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Restrict)
-  status         OrderStatus @default(NEW)
-  contractNumber String?
-  firstName      String
-  lastName       String
-  email          String
-  phone          String
-  address1       String
-  address2       String?
-  postalCode     String
-  city           String
-  paymentMethod  String?
-  totalPrice     Decimal     @db.Decimal(10, 2)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  items          OrderItem[]
+  kitchen        Kitchen   @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  isActive       Boolean   @default(true)
+  usedAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  orders         Order[]
+
+  @@index([kitchenId])
 }
 
 model OrderItem {

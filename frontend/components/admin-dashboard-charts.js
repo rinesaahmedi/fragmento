@@ -169,55 +169,53 @@ export function AdminDashboardCharts({
         </div>
       </section>
 
-      <section className="dashboard-grid">
-        <section className="chart-card chart-card--compact">
-          <ChartHeader
-            eyebrow="Kitchen timeline"
-            title="Order activity by kitchen"
-            detail="Click a legend item to isolate it."
-          />
-          <div className="chart-frame">
-            {kitchenTimelineData.length && kitchenSeries.length ? (
-              <ResponsiveContainer width="100%" height={280}>
-                <LineChart data={kitchenTimelineData} margin={{ top: 10, right: 18, left: -12, bottom: 0 }}>
-                  <CartesianGrid stroke="#e5e7eb" vertical={false} />
-                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
-                  <Tooltip />
-                  <Legend onClick={(event) => setIsolatedSeries((current) => current === event.dataKey ? "" : event.dataKey)} />
-                  {visibleKitchenSeries.map((name, index) => (
-                    <Line
-                      key={name}
-                      type="monotone"
-                      dataKey={name}
-                      stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
-                      strokeWidth={3}
-                      dot={{ r: 3 }}
-                      activeDot={{ r: 6 }}
-                    />
-                  ))}
-                </LineChart>
-              </ResponsiveContainer>
-            ) : (
-              <EmptyChart label="No kitchen timeline data for the selected filters." />
-            )}
-          </div>
-        </section>
-
-        <GeographySection data={geographyData} />
+      <section className="chart-card chart-card--compact">
+        <ChartHeader
+          eyebrow="Kitchen timeline"
+          title="Order activity by kitchen"
+          detail="Click a legend item to isolate it."
+        />
+        <div className="chart-frame">
+          {kitchenTimelineData.length && kitchenSeries.length ? (
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={kitchenTimelineData} margin={{ top: 10, right: 18, left: -12, bottom: 0 }}>
+                <CartesianGrid stroke="#e5e7eb" vertical={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
+                <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
+                <Tooltip />
+                <Legend onClick={(event) => setIsolatedSeries((current) => current === event.dataKey ? "" : event.dataKey)} />
+                {visibleKitchenSeries.map((name, index) => (
+                  <Line
+                    key={name}
+                    type="monotone"
+                    dataKey={name}
+                    stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
+                    strokeWidth={3}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 6 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChart label="No kitchen timeline data for the selected filters." />
+          )}
+        </div>
       </section>
 
       <section className="dashboard-grid">
-        <TopItemsSection
-          topItemsByQuantity={topItemsByQuantity}
-          topItemsByRevenue={topItemsByRevenue}
-        />
+        <GeographySection data={geographyData} />
 
         <DistributionSection
           itemTypeData={itemTypeData}
           paymentData={paymentData}
         />
       </section>
+
+      <TopItemsSection
+        topItemsByQuantity={topItemsByQuantity}
+        topItemsByRevenue={topItemsByRevenue}
+      />
 
       <section className="chart-card">
         <ChartHeader eyebrow="Operations" title="Recent orders" detail="Latest matching orders for follow-up." />
@@ -586,7 +584,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const data = useMemo(() => config.data
     .map((item) => ({
       ...item,
-      axisLabel: item.code ? `${truncateLabel(item.name, 18)} | ${item.code}` : item.name,
+      axisLabel: item.code ? `${item.name} | ${item.code}` : item.name,
       chartValue: Number(item[mode] || 0),
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
@@ -594,6 +592,10 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
     .sort((a, b) => b.chartValue - a.chartValue), [config.data, mode]);
 
   const chartHeight = Math.max(280, data.length * 34 + 52);
+  const maxChartValue = data.reduce((max, item) => Math.max(max, item.chartValue), 0);
+  const xAxisMax = mode === "quantity"
+    ? Math.max(1, Math.ceil(maxChartValue * 1.12))
+    : Math.max(1, maxChartValue * 1.12);
 
   return (
     <section className="chart-card">
@@ -616,11 +618,12 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
               key={mode}
               data={data}
               layout="vertical"
-              margin={{ top: 8, right: 48, left: 22, bottom: 0 }}
+              margin={{ top: 8, right: 76, left: 0, bottom: 0 }}
             >
               <CartesianGrid stroke="#e5e7eb" horizontal={false} />
               <XAxis
                 type="number"
+                domain={[0, xAxisMax]}
                 tickLine={false}
                 axisLine={false}
                 fontSize={12}
@@ -629,11 +632,11 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
               <YAxis
                 type="category"
                 dataKey="axisLabel"
-                width={230}
+                width={320}
                 tickLine={false}
                 axisLine={false}
                 fontSize={12}
-                tickFormatter={(value) => truncateLabel(value, 42)}
+                tick={<TopItemsAxisTick />}
               />
               <Tooltip content={<TopItemsTooltip />} />
               <Bar
@@ -711,6 +714,24 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
         }
       `}</style>
     </section>
+  );
+}
+
+function TopItemsAxisTick({ x, y, payload }) {
+  const rawValue = String(payload?.value || "");
+  const [name, code] = rawValue.split(" | ");
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={-8} y={-5} textAnchor="end" fill="#374151" fontSize={12} fontWeight={700}>
+        {truncateLabel(name, 42)}
+      </text>
+      {code ? (
+        <text x={-8} y={11} textAnchor="end" fill="#6b7280" fontSize={11}>
+          {truncateLabel(code, 34)}
+        </text>
+      ) : null}
+    </g>
   );
 }
 
@@ -919,10 +940,10 @@ function GeographySection({ data }) {
       <div className="country-chart-frame">
         {data.length ? (
           <ResponsiveContainer width="100%" height={280}>
-            <BarChart data={data} layout="vertical" margin={{ top: 8, right: 36, left: 16, bottom: 0 }}>
+            <BarChart data={data} layout="vertical" margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
               <CartesianGrid stroke="#e5e7eb" horizontal={false} />
               <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
-              <YAxis type="category" dataKey="label" width={128} tickLine={false} axisLine={false} fontSize={13} tickFormatter={truncateLabel} />
+              <YAxis type="category" dataKey="label" width={136} tickLine={false} axisLine={false} tick={<CountryAxisTick />} />
               <Tooltip content={<CountryTooltip />} />
               <Bar dataKey="orders" fill="#2563eb" radius={[0, 8, 8, 0]} label={{ position: "right", fill: "#111827", fontSize: 12, fontWeight: 800 }} />
             </BarChart>
@@ -950,6 +971,23 @@ function GeographySection({ data }) {
         }
       `}</style>
     </section>
+  );
+}
+
+function CountryAxisTick({ x, y, payload }) {
+  const [city, country] = splitLocationLabel(payload?.value);
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text textAnchor="end">
+        <tspan x={0} dy="-0.18em" fill="#374151" fontSize="12" fontWeight="700">
+          {truncateLabel(city, 18)}
+        </tspan>
+        <tspan x={0} dy="1.18em" fill="#6b7280" fontSize="11">
+          {truncateLabel(country, 18)}
+        </tspan>
+      </text>
+    </g>
   );
 }
 
@@ -1004,6 +1042,13 @@ function EmptyChart({ label }) {
 function truncateLabel(value, maxLength = 24) {
   const label = String(value || "");
   return label.length > maxLength ? `${label.slice(0, maxLength - 3)}...` : label;
+}
+
+function splitLocationLabel(value) {
+  const label = String(value || "");
+  const separatorIndex = label.lastIndexOf(", ");
+  if (separatorIndex === -1) return [label, ""];
+  return [label.slice(0, separatorIndex), label.slice(separatorIndex + 2)];
 }
 
 function compactCurrency(value) {

@@ -77,6 +77,12 @@ export function validateKitchenItemInput(formData) {
   };
 }
 
+export function validateKitchenContractInput(formData) {
+  return {
+    contractNumber: requiredString(formData.get("contractNumber"), "Contract number"),
+  };
+}
+
 export function redirectWithFlash(request, pathname, type, message) {
   const url = new URL(pathname, request.url);
   url.searchParams.set(type, message);

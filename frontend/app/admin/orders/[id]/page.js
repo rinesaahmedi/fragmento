@@ -107,6 +107,16 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                   <span>{order.contractNumber || "Not provided"}</span>
                 </div>
                 <div>
+                  <span style={detailLabelStyle}>Contract usage</span>
+                  <span>
+                    {order.kitchenContract
+                      ? order.kitchenContract.usedAt
+                        ? `Used ${formatDate(order.kitchenContract.usedAt)}`
+                        : "Linked, not marked used"
+                      : "No linked contract record"}
+                  </span>
+                </div>
+                <div>
                   <span style={detailLabelStyle}>Payment</span>
                   <span>{order.paymentMethod || "Not provided"}</span>
                 </div>

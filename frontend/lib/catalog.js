@@ -82,7 +82,7 @@ export async function getKitchenBySlug(slug) {
 export async function listKitchensForAdmin() {
   return prisma.kitchen.findMany({
     include: {
-      _count: { select: { items: true, orders: true } },
+      _count: { select: { items: true, orders: true, contracts: true } },
     },
     orderBy: { createdAt: "desc" },
   });
@@ -92,7 +92,10 @@ export async function getKitchenById(id) {
   return prisma.kitchen.findUnique({
     where: { id },
     include: {
-      _count: { select: { items: true, orders: true } },
+      _count: { select: { items: true, orders: true, contracts: true } },
+      contracts: {
+        orderBy: [{ createdAt: "desc" }, { contractNumber: "asc" }],
+      },
       items: {
         orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
       },
@@ -150,6 +153,7 @@ export async function getOrdersForAdmin(filters = {}) {
     where,
     include: {
       kitchen: true,
+      kitchenContract: true,
       items: true,
     },
     orderBy: { createdAt: "desc" },
@@ -161,6 +165,7 @@ export async function getOrderById(id) {
     where: { id },
     include: {
       kitchen: true,
+      kitchenContract: true,
       items: { orderBy: { createdAt: "asc" } },
     },
   });

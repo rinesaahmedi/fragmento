@@ -214,38 +214,27 @@ const AVATAR_SOURCES = {
   ru: "/AVATAR/ru-avatar.mp4",
 };
 
-const CONTRACT_ID_BY_SLUG = {
-  "fragmento-default": "736267",
-  "kitchen-model-b": "736268",
-  "kitchen-model-c": "736269",
-};
-
-function resolveKitchenFromContract(contractNumber, kitchens) {
-  const normalizedContract = String(contractNumber || "").trim();
-  if (!normalizedContract) return null;
-  return kitchens.find((kitchen) => CONTRACT_ID_BY_SLUG[kitchen.slug] === normalizedContract) || null;
-}
-
-function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false }) {
+function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, disabled = false }) {
   return (
     <div style={footerRowStyle}>
-      <button type="button" style={secondaryButtonStyle} onClick={onBack}>
+      <button type="button" style={secondaryButtonStyle} onClick={onBack} disabled={disabled}>
         {backLabel}
       </button>
-      <button type={submit ? "submit" : "button"} style={primaryButtonStyle} onClick={onAction}>
+      <button type={submit ? "submit" : "button"} style={primaryButtonStyle} onClick={onAction} disabled={disabled}>
         {actionLabel}
       </button>
     </div>
   );
 }
 
-export default function FragmentoEntryFlow({ kitchens }) {
+export default function FragmentoEntryFlow() {
   const router = useRouter();
   const [selectedLanguage, setSelectedLanguage] = useState("de");
   const [selectedMode, setSelectedMode] = useState("");
   const [screen, setScreen] = useState("language");
   const [contractNumber, setContractNumber] = useState("");
   const [error, setError] = useState("");
+  const [isValidatingContract, setIsValidatingContract] = useState(false);
 
   const text = SCREEN_TEXT[selectedLanguage] || SCREEN_TEXT.en;
   const instructionText = INSTRUCTION_TEXTS[selectedLanguage] || INSTRUCTION_TEXTS.en;
@@ -264,21 +253,41 @@ export default function FragmentoEntryFlow({ kitchens }) {
     setScreen(mode);
   }
 
-  function handleContractSubmit(event) {
+  async function handleContractSubmit(event) {
     event.preventDefault();
-    const kitchen = resolveKitchenFromContract(contractNumber, kitchens);
-    if (!kitchen) {
-      setError(text.contractError);
+    const normalizedContractNumber = contractNumber.trim();
+    if (!normalizedContractNumber) {
+      setError("Contract number is required.");
       return;
     }
 
-    const params = new URLSearchParams({
-      contractNumber: contractNumber.trim(),
-      lang: selectedLanguage,
-      instructionMode: selectedMode || "text",
-    });
+    setIsValidatingContract(true);
+    setError("");
 
-    router.push(`/kitchens/${kitchen.slug}?${params.toString()}`);
+    try {
+      const response = await fetch("/api/kitchen-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contractNumber: normalizedContractNumber }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.error || text.contractError);
+      }
+
+      const params = new URLSearchParams({
+        contractNumber: payload.contractNumber || normalizedContractNumber,
+        lang: selectedLanguage,
+        instructionMode: selectedMode || "text",
+      });
+
+      router.push(`/kitchens/${payload.kitchenSlug}?${params.toString()}`);
+    } catch (error) {
+      setError(error.message || text.contractError);
+    } finally {
+      setIsValidatingContract(false);
+    }
   }
 
   return (
@@ -401,7 +410,7 @@ export default function FragmentoEntryFlow({ kitchens }) {
                   setContractNumber(event.target.value);
                   if (error) setError("");
                 }}
-                inputMode="numeric"
+                disabled={isValidatingContract}
                 placeholder="z.B. 123456789"
                 style={contractInputStyle}
               />
@@ -409,8 +418,9 @@ export default function FragmentoEntryFlow({ kitchens }) {
               <ActionRow
                 backLabel={text.backLabel}
                 onBack={() => setScreen(selectedMode || "mode")}
-                actionLabel={text.contractAction}
+                actionLabel={isValidatingContract ? "Checking..." : text.contractAction}
                 submit
+                disabled={isValidatingContract}
               />
             </form>
           ) : null}

@@ -1,5 +1,12 @@
 import { formatCurrency } from "./kitchen-selection-utils";
 
+const PDF_COMPANY_ADDRESS = [
+  "architecto.",
+  "by Kuechen Aktuell GmbH",
+  "Senefelderstrasse 2b",
+  "38124 Braunschweig",
+];
+
 export async function blobToBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -64,6 +71,10 @@ export async function generateOrderPdf(order) {
 
   doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y, {
     align: "right",
+  });
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  PDF_COMPANY_ADDRESS.forEach((line, index) => {
+    doc.text(line, pageWidth - margin, y + 20 + index * 12, { align: "right" });
   });
   y += 120;
 

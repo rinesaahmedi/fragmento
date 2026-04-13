@@ -85,6 +85,12 @@ const DEFAULT_KITCHENS = [
   },
 ];
 
+const DEFAULT_KITCHEN_CONTRACTS = [
+  { contractNumber: "736267", kitchenSlug: "fragmento-default" },
+  { contractNumber: "736268", kitchenSlug: "kitchen-model-b" },
+  { contractNumber: "736269", kitchenSlug: "kitchen-model-c" },
+];
+
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -162,6 +168,30 @@ async function main() {
       where: {
         kitchenId: kitchenRecord.id,
         code: { notIn: [...targetCodes] },
+      },
+    });
+  }
+
+  for (const contract of DEFAULT_KITCHEN_CONTRACTS) {
+    const kitchen = await prisma.kitchen.findUnique({
+      where: { slug: contract.kitchenSlug },
+      select: { id: true },
+    });
+
+    if (!kitchen) {
+      throw new Error(`Kitchen not found for contract seed: ${contract.kitchenSlug}`);
+    }
+
+    await prisma.kitchenContract.upsert({
+      where: { contractNumber: contract.contractNumber },
+      update: {
+        kitchenId: kitchen.id,
+        isActive: true,
+      },
+      create: {
+        contractNumber: contract.contractNumber,
+        kitchenId: kitchen.id,
+        isActive: true,
       },
     });
   }

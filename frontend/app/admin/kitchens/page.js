@@ -44,13 +44,14 @@ export default async function AdminKitchensPage() {
                   <th style={thStyle}>Status</th>
                   <th style={thStyle}>Items</th>
                   <th style={thStyle}>Orders</th>
+                  <th style={thStyle}>Contracts</th>
                   <th style={thStyle}>Updated</th>
                 </tr>
               </thead>
               <tbody>
                 {!kitchens.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={6}>No kitchens found.</td>
+                    <td style={tdStyle} colSpan={7}>No kitchens found.</td>
                   </tr>
                 ) : null}
                 {kitchens.map((kitchen) => (
@@ -70,6 +71,7 @@ export default async function AdminKitchensPage() {
                     <td style={tdStyle}><StatusBadge status={kitchen.status} /></td>
                     <td style={tdStyle}>{kitchen._count.items}</td>
                     <td style={tdStyle}>{kitchen._count.orders}</td>
+                    <td style={tdStyle}>{kitchen._count.contracts}</td>
                     <td style={tdStyle}>{formatDate(kitchen.updatedAt)}</td>
                   </tr>
                 ))}
@@ -102,6 +104,7 @@ export default async function AdminKitchensPage() {
                 <div style={subMetaStyle}>
                   <span>{kitchen._count.items} item(s)</span>
                   <span>{kitchen._count.orders} order(s)</span>
+                  <span>{kitchen._count.contracts} contract(s)</span>
                 </div>
               </article>
             ))}

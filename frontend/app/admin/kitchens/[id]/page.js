@@ -19,7 +19,11 @@ import {
   secondaryButtonStyle,
   splitGridStyle,
   subMetaStyle,
+  tableStyle,
+  tableWrapStyle,
+  tdStyle,
   textareaStyle,
+  thStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
@@ -88,6 +92,14 @@ function formatCurrency(value) {
     currency: "EUR",
     minimumFractionDigits: 2,
   }).format(Number(value || 0));
+}
+
+function formatDate(value) {
+  if (!value) return "-";
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
 }
 
 function enhanceSvgMarkup(markup) {
@@ -263,6 +275,130 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <StatusBadge status={kitchen.status} />
             </div>
           </form>
+        </AdminSection>
+
+        <AdminSection
+          title="Contract numbers"
+          description="Manage one-time-use contract numbers that unlock this kitchen for public customers."
+        >
+          <form action={`/api/admin/kitchens/${kitchen.id}/contracts`} method="post" style={formGridStyle}>
+            <FormField label="Contract number">
+              <input name="contractNumber" placeholder="ABC-123" style={inputStyle} required />
+            </FormField>
+            <div style={{ alignSelf: "end" }}>
+              <button type="submit" style={primaryButtonStyle}>Create contract</button>
+            </div>
+          </form>
+
+          <div className="admin-list-table" style={{ ...tableWrapStyle, marginTop: 18 }}>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Contract number</th>
+                  <th style={thStyle}>Active state</th>
+                  <th style={thStyle}>Usage</th>
+                  <th style={thStyle}>Used at</th>
+                  <th style={thStyle}>Created</th>
+                  <th style={thStyle}>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {!kitchen.contracts.length ? (
+                  <tr>
+                    <td style={tdStyle} colSpan={6}>No contract numbers configured.</td>
+                  </tr>
+                ) : null}
+                {kitchen.contracts.map((contract) => {
+                  const isUsed = Boolean(contract.usedAt);
+                  const canReactivate = !contract.isActive && !isUsed;
+                  return (
+                    <tr key={contract.id}>
+                      <td style={tdStyle}><strong>{contract.contractNumber}</strong></td>
+                      <td style={tdStyle}>
+                        <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
+                      </td>
+                      <td style={tdStyle}>
+                        <StatusBadge status={isUsed ? "USED" : "UNUSED"} />
+                      </td>
+                      <td style={tdStyle}>{formatDate(contract.usedAt)}</td>
+                      <td style={tdStyle}>{formatDate(contract.createdAt)}</td>
+                      <td style={tdStyle}>
+                        {contract.isActive ? (
+                          <form action={`/api/admin/contracts/${contract.id}`} method="post">
+                            <button type="submit" name="_intent" value="deactivate" style={secondaryButtonStyle}>
+                              Deactivate
+                            </button>
+                          </form>
+                        ) : canReactivate ? (
+                          <form action={`/api/admin/contracts/${contract.id}`} method="post">
+                            <button type="submit" name="_intent" value="reactivate" style={secondaryButtonStyle}>
+                              Reactivate
+                            </button>
+                          </form>
+                        ) : (
+                          <span style={mutedTextStyle}>Used contracts cannot be reactivated</span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="admin-list-cards" style={{ ...cardListStyle, marginTop: 18 }}>
+            {!kitchen.contracts.length ? <p style={mutedTextStyle}>No contract numbers configured.</p> : null}
+            {kitchen.contracts.map((contract) => {
+              const isUsed = Boolean(contract.usedAt);
+              const canReactivate = !contract.isActive && !isUsed;
+              return (
+                <article key={contract.id} style={itemCardStyle}>
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
+                    <div style={{ display: "grid", gap: 6 }}>
+                      <strong>{contract.contractNumber}</strong>
+                      <div style={subMetaStyle}>
+                        <span>{isUsed ? "Used" : "Unused"}</span>
+                        <span>Used at: {formatDate(contract.usedAt)}</span>
+                        <span>Created: {formatDate(contract.createdAt)}</span>
+                      </div>
+                    </div>
+                    <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
+                  </div>
+                  {contract.isActive ? (
+                    <form action={`/api/admin/contracts/${contract.id}`} method="post">
+                      <button type="submit" name="_intent" value="deactivate" style={secondaryButtonStyle}>
+                        Deactivate
+                      </button>
+                    </form>
+                  ) : canReactivate ? (
+                    <form action={`/api/admin/contracts/${contract.id}`} method="post">
+                      <button type="submit" name="_intent" value="reactivate" style={secondaryButtonStyle}>
+                        Reactivate
+                      </button>
+                    </form>
+                  ) : (
+                    <span style={mutedTextStyle}>Used contracts cannot be reactivated</span>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+
+          <style>{`
+            .admin-list-cards {
+              display: none;
+            }
+
+            @media (max-width: 760px) {
+              .admin-list-table {
+                display: none;
+              }
+
+              .admin-list-cards {
+                display: grid;
+              }
+            }
+          `}</style>
         </AdminSection>
 
         <AdminSection

@@ -2,6 +2,12 @@ import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { MONTAGE_REQUIRED_CODES } from "./catalog";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
+import {
+  CONTRACT_ERRORS,
+  assertUsableKitchenContract,
+  contractValidationError,
+  normalizeContractNumber,
+} from "./kitchen-contracts";
 import { prisma } from "./prisma";
 
 const PAYMENT_METHODS = new Set(["paypal", "visa", "mastercard", "klarna"]);
@@ -166,8 +172,12 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
   const customer = orderPayload?.customer || {};
   validateConsent(customer.consent);
+  const contractNumber = normalizeContractNumber(customer.contractNumber);
+  if (!contractNumber) {
+    throw validationError(CONTRACT_ERRORS.REQUIRED);
+  }
   const validatedCustomer = {
-    contractNumber: customer.contractNumber ? String(customer.contractNumber).trim() : "",
+    contractNumber,
     firstName: requireString(customer.firstName, "First name"),
     lastName: requireString(customer.lastName, "Last name"),
     email: validateEmail(customer.email),
@@ -213,17 +223,42 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   }
   const totalPrice = allSelected.reduce((sum, item) => sum + Number(item.price), 0);
 
+  const kitchenContract = await prisma.kitchenContract.findUnique({
+    where: { contractNumber: validatedCustomer.contractNumber },
+    include: { kitchen: true },
+  });
+
+  assertUsableKitchenContract(kitchenContract);
+  if (kitchenContract.kitchenId !== kitchen.id) {
+    throw contractValidationError(CONTRACT_ERRORS.KITCHEN_MISMATCH);
+  }
+
   let createdOrder = null;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const orderNumber = buildOrderNumber();
       createdOrder = await prisma.$transaction(async (tx) => {
+        const contractUpdate = await tx.kitchenContract.updateMany({
+          where: {
+            id: kitchenContract.id,
+            kitchenId: kitchen.id,
+            isActive: true,
+            usedAt: null,
+          },
+          data: { usedAt: new Date() },
+        });
+
+        if (contractUpdate.count !== 1) {
+          throw contractValidationError(CONTRACT_ERRORS.USED);
+        }
+
         const order = await tx.order.create({
           data: {
             orderNumber,
             kitchenId: kitchen.id,
+            kitchenContractId: kitchenContract.id,
             status: OrderStatus.NEW,
-            contractNumber: validatedCustomer.contractNumber || null,
+            contractNumber: kitchenContract.contractNumber,
             firstName: validatedCustomer.firstName,
             lastName: validatedCustomer.lastName,
             email: validatedCustomer.email,
