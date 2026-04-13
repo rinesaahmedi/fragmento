@@ -76,6 +76,7 @@ function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick
         <span className={styles.itemIcon} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
         <div className={styles.itemText}>
           <strong>{item.name}</strong>
+          {item.code ? <span className={styles.itemCode}>Code: {item.code}</span> : null}
           {item.infoText ? <p>{item.infoText}</p> : null}
         </div>
         <span className={styles.itemPrice}>{formatCurrency(price ?? item.price)}</span>
@@ -178,9 +179,9 @@ export default function KitchenCatalogPanel({
                 item={item}
                 selected={selectedServiceCodes.includes(item.code)}
                 hint={
-                  item.code === "service-montage"
+                  item.code === "SVC-MONTAGE-001"
                     ? "Mindestens 3 Artikel, davon 2 Schrank-Komponenten"
-                    : item.code === "service-pickup"
+                    : item.code === "SVC-PICKUP-001"
                       ? "Nur mit mindestens einem ausgewaehlten Artikel"
                       : ""
                 }

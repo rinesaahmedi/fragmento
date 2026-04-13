@@ -17,7 +17,23 @@ export const KITCHEN_CATALOG_COLUMNS = [
   "isActive",
 ];
 
+const KITCHEN_CATALOG_COLUMN_LABELS = {
+  code: "Item Code",
+};
+
 const COLUMN_WIDTHS = [10, 26, 24, 28, 16, 12, 42, 20, 16, 22, 12, 12, 12];
+
+function getColumnLabel(column) {
+  return KITCHEN_CATALOG_COLUMN_LABELS[column] || column;
+}
+
+function getColumnKey(header) {
+  const normalizedHeader = String(header || "").trim();
+  const labelEntry = Object.entries(KITCHEN_CATALOG_COLUMN_LABELS).find(
+    ([, label]) => label.toLowerCase() === normalizedHeader.toLowerCase(),
+  );
+  return labelEntry ? labelEntry[0] : normalizedHeader;
+}
 
 function normalizeCsvLineEndings(text) {
   return String(text || "").replace(/\r\n/g, "\n").replace(/\r/g, "\n");
@@ -73,7 +89,7 @@ function parseBoolean(value, label, rowNumber) {
 
 function normalizeImportedRecord(record, rowNumber) {
   const id = optionalString(record.id);
-  const code = requiredString(record.code, "code", rowNumber);
+  const code = requiredString(record.code, "Item Code", rowNumber);
 
   return {
     id,
@@ -156,7 +172,7 @@ export function buildKitchenCatalogWorkbook(kitchen) {
   const title = `${kitchen.name} Catalog Export`;
   const rows = [
     [title],
-    KITCHEN_CATALOG_COLUMNS,
+    KITCHEN_CATALOG_COLUMNS.map(getColumnLabel),
     ...(kitchen.items || []).map((item, index) => [
       index + 1,
       item.id,
@@ -201,18 +217,19 @@ function parseKitchenCatalogRows(rows) {
     throw new Error("The file is empty.");
   }
 
-  const headerIndex = rows.findIndex((row) =>
-    KITCHEN_CATALOG_COLUMNS.every((column) => row.some((value) => String(value || "").trim() === column)),
-  );
+  const headerIndex = rows.findIndex((row) => {
+    const columnKeys = row.map(getColumnKey);
+    return KITCHEN_CATALOG_COLUMNS.every((column) => columnKeys.includes(column));
+  });
 
   if (headerIndex === -1) {
-    throw new Error(`Missing columns: ${KITCHEN_CATALOG_COLUMNS.join(", ")}.`);
+    throw new Error(`Missing columns: ${KITCHEN_CATALOG_COLUMNS.map(getColumnLabel).join(", ")}.`);
   }
 
-  const headers = rows[headerIndex].map((header) => String(header || "").trim());
+  const headers = rows[headerIndex].map(getColumnKey);
   const missingColumns = KITCHEN_CATALOG_COLUMNS.filter((column) => !headers.includes(column));
   if (missingColumns.length) {
-    throw new Error(`Missing columns: ${missingColumns.join(", ")}.`);
+    throw new Error(`Missing columns: ${missingColumns.map(getColumnLabel).join(", ")}.`);
   }
 
   return rows

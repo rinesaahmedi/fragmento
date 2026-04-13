@@ -586,7 +586,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const data = useMemo(() => config.data
     .map((item) => ({
       ...item,
-      axisLabel: [item.name, item.itemType, item.code].filter(Boolean).join(" | "),
+      axisLabel: item.code ? `${truncateLabel(item.name, 18)} | ${item.code}` : item.name,
       chartValue: Number(item[mode] || 0),
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
@@ -629,11 +629,11 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
               <YAxis
                 type="category"
                 dataKey="axisLabel"
-                width={185}
+                width={230}
                 tickLine={false}
                 axisLine={false}
                 fontSize={12}
-                tickFormatter={(value) => truncateLabel(value, 28)}
+                tickFormatter={(value) => truncateLabel(value, 42)}
               />
               <Tooltip content={<TopItemsTooltip />} />
               <Bar
@@ -722,7 +722,7 @@ function TopItemsTooltip({ active, payload }) {
     <div className="tooltip">
       <strong>{item.name}</strong>
       <span>Category: {item.itemType || "Not captured"}</span>
-      <span>Article number: {item.code || "Not captured"}</span>
+      <span>Article Code: {item.code || "Not captured"}</span>
       <span>Quantity: {item.quantity}</span>
       <span>Revenue: {formatCurrency(item.revenue)}</span>
       <style jsx>{`

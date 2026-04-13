@@ -295,7 +295,7 @@ export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, kit
             {selectedPrimaryItem ? (
               <>
                 <strong style={{ fontSize: "1.05rem" }}>{selectedPrimaryItem.name}</strong>
-                <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>{selectedPrimaryItem.code}</span>
+                <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>Item Code: {selectedPrimaryItem.code}</span>
                 <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>{formatCurrency(selectedPrimaryItem.price)}</span>
                 {!isItemCompatibleWithSlot(selectedPrimaryItem, selectedSlot) ? (
                   <span style={{ color: "var(--app-danger-text)", fontSize: 13 }}>

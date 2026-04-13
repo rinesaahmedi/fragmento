@@ -171,13 +171,13 @@ function ensureLegacyCatalogRendered() {
       .length > 0;
 
   const updateSelectionState = () => {
-    const montageServiceItem = combinedList.querySelector(".accessory-item[data-code=\"service-montage\"]");
+    const montageServiceItem = combinedList.querySelector(".accessory-item[data-code=\"SVC-MONTAGE-001\"]");
     if (montageServiceItem?.classList.contains("selected") && !areMontageConditionsMet()) {
       montageServiceItem.classList.remove("selected");
       window.showMessage?.("Die Montage-Dienstleistung wurde automatisch entfernt.");
     }
 
-    const pickupServiceItem = combinedList.querySelector(".accessory-item[data-code=\"service-pickup\"]");
+    const pickupServiceItem = combinedList.querySelector(".accessory-item[data-code=\"SVC-PICKUP-001\"]");
     if (pickupServiceItem?.classList.contains("selected") && !areAnyItemsSelected()) {
       pickupServiceItem.classList.remove("selected");
       window.showMessage?.("Die Abholung wurde automatisch entfernt.");
@@ -243,12 +243,12 @@ function ensureLegacyCatalogRendered() {
 
           const code = item.dataset.code || item.id || "";
           const isCurrentlySelected = item.classList.contains("selected");
-          if (code === "service-montage" && !isCurrentlySelected && !areMontageConditionsMet()) {
+          if (code === "SVC-MONTAGE-001" && !isCurrentlySelected && !areMontageConditionsMet()) {
             window.showMessage?.("Für die Montage sind mindestens 3 Artikel (davon 2 Schränke) erforderlich.", "error");
             return;
           }
 
-          if (code === "service-pickup" && !isCurrentlySelected && !areAnyItemsSelected()) {
+          if (code === "SVC-PICKUP-001" && !isCurrentlySelected && !areAnyItemsSelected()) {
             window.showMessage?.("Bitte wähle zuerst einen Artikel für die Abholung aus.", "error");
             return;
           }
@@ -256,10 +256,10 @@ function ensureLegacyCatalogRendered() {
           item.classList.toggle("selected");
 
           if (item.classList.contains("selected")) {
-            if (code === "service-montage") {
-              combinedList.querySelector(".accessory-item[data-code=\"service-pickup\"]")?.classList.remove("selected");
-            } else if (code === "service-pickup") {
-              combinedList.querySelector(".accessory-item[data-code=\"service-montage\"]")?.classList.remove("selected");
+            if (code === "SVC-MONTAGE-001") {
+              combinedList.querySelector(".accessory-item[data-code=\"SVC-PICKUP-001\"]")?.classList.remove("selected");
+            } else if (code === "SVC-PICKUP-001") {
+              combinedList.querySelector(".accessory-item[data-code=\"SVC-MONTAGE-001\"]")?.classList.remove("selected");
             }
           }
 

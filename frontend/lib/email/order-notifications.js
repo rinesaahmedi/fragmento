@@ -5,57 +5,57 @@ import nodemailer from "nodemailer";
 import path from "path";
 
 const PRODUCT_INFO_BY_CODE = {
-  "component-dishwasher": {
+  "DISH-600-STD": {
     assetPath: "product-info/dishwasher-product-info.pdf",
     filename: "Produktinformation-Geschirrspueler.pdf",
     label: "Geschirrspueler",
   },
-  "component-refrigerator": {
+  "REF-545-1800-700": {
     assetPath: "product-info/fridge-product-info.pdf",
     filename: "Produktinformation-Kuehlschrank.pdf",
     label: "Kuehlschrank",
   },
-  "component-extractor-hood": {
+  "HOOD-600-FLAT": {
     assetPath: "product-info/extractor-hood-flat-product-info.pdf",
     filename: "Produktinformation-Dunstabzugshaube-Flach.pdf",
     label: "Dunstabzugshaube flach",
   },
-  "model-b-base-module-1": {
+  "WM-B-EWA34660W": {
     assetPath: "product-info/washing-machine-product-info.pdf",
     filename: "Produktinformation-Waschmaschine.pdf",
     label: "Waschmaschine",
   },
-  "model-b-base-module-3": {
+  "DISH-B-600-STD": {
     assetPath: "product-info/dishwasher-product-info.pdf",
     filename: "Produktinformation-Geschirrspueler.pdf",
     label: "Geschirrspueler",
   },
-  "model-b-refrigerator": {
+  "REF-B-545-1800-700": {
     assetPath: "product-info/fridge-product-info.pdf",
     filename: "Produktinformation-Kuehlschrank.pdf",
     label: "Kuehlschrank",
   },
-  "model-b-extractor-hood": {
+  "HOOD-B-FH664621E": {
     assetPath: "product-info/extractor-hood-flat-product-info.pdf",
     filename: "Produktinformation-Dunstabzugshaube-Flach.pdf",
     label: "Dunstabzugshaube flach",
   },
-  "model-c-refrigerator": {
+  "REF-C-545-1800-700": {
     assetPath: "product-info/fridge-product-info.pdf",
     filename: "Produktinformation-Kuehlschrank.pdf",
     label: "Kuehlschrank",
   },
-  "model-c-extractor-hood": {
+  "HOOD-C-FH664621E": {
     assetPath: "product-info/extractor-hood-chimney-product-info.pdf",
     filename: "Produktinformation-Dunstabzugshaube-Kamin.pdf",
     label: "Dunstabzugshaube Kamin",
   },
-  "model-c-wm-base": {
+  "WM-C-EWA34660W": {
     assetPath: "product-info/washing-machine-product-info.pdf",
     filename: "Produktinformation-Waschmaschine.pdf",
     label: "Waschmaschine",
   },
-  "model-c-dishwasher-base": {
+  "DISH-C-600-STD": {
     assetPath: "product-info/dishwasher-product-info.pdf",
     filename: "Produktinformation-Geschirrspueler.pdf",
     label: "Geschirrspueler",
@@ -156,7 +156,7 @@ export function buildOrderSummaryHtml(order) {
     const rows = items
       .map(
         (item) =>
-          `<tr><td style="${tdStyles}">${item.name}</td><td style="${priceTdStyles}">${formatCurrency(
+          `<tr><td style="${tdStyles}">${item.name}<br><span style="font-size:12px;color:#777;">Code: ${item.code || "-"}</span></td><td style="${priceTdStyles}">${formatCurrency(
             item.price,
           )}</td></tr>`,
       )

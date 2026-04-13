@@ -63,17 +63,17 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
 };
 
 const PRODUCT_INFO_BY_CODE = {
-  "component-dishwasher": "/product-info/dishwasher-product-info.pdf",
-  "component-refrigerator": "/product-info/fridge-product-info.pdf",
-  "component-extractor-hood": "/product-info/extractor-hood-flat-product-info.pdf",
-  "model-b-base-module-1": "/product-info/washing-machine-product-info.pdf",
-  "model-b-base-module-3": "/product-info/dishwasher-product-info.pdf",
-  "model-b-refrigerator": "/product-info/fridge-product-info.pdf",
-  "model-b-extractor-hood": "/product-info/extractor-hood-flat-product-info.pdf",
-  "model-c-refrigerator": "/product-info/fridge-product-info.pdf",
-  "model-c-extractor-hood": "/product-info/extractor-hood-chimney-product-info.pdf",
-  "model-c-wm-base": "/product-info/washing-machine-product-info.pdf",
-  "model-c-dishwasher-base": "/product-info/dishwasher-product-info.pdf",
+  "DISH-600-STD": "/product-info/dishwasher-product-info.pdf",
+  "REF-545-1800-700": "/product-info/fridge-product-info.pdf",
+  "HOOD-600-FLAT": "/product-info/extractor-hood-flat-product-info.pdf",
+  "WM-B-EWA34660W": "/product-info/washing-machine-product-info.pdf",
+  "DISH-B-600-STD": "/product-info/dishwasher-product-info.pdf",
+  "REF-B-545-1800-700": "/product-info/fridge-product-info.pdf",
+  "HOOD-B-FH664621E": "/product-info/extractor-hood-flat-product-info.pdf",
+  "REF-C-545-1800-700": "/product-info/fridge-product-info.pdf",
+  "HOOD-C-FH664621E": "/product-info/extractor-hood-chimney-product-info.pdf",
+  "WM-C-EWA34660W": "/product-info/washing-machine-product-info.pdf",
+  "DISH-C-600-STD": "/product-info/dishwasher-product-info.pdf",
 };
 
 export function getLinkedComponentIds(slug, componentId) {

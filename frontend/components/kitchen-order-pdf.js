@@ -119,17 +119,19 @@ export async function generateOrderPdf(order) {
     doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
     y += 20;
     doc.text("Artikel", margin, y);
+    doc.text("Item Code", margin + 250, y);
     doc.text("Preis", pageWidth - margin, y, { align: "right" });
     y += 20;
     doc.setFont("helvetica", "normal");
 
     items.forEach((item) => {
-      const nameLines = doc.splitTextToSize(item.name || "", pageWidth - margin * 2 - 120);
+      const nameLines = doc.splitTextToSize(item.name || "", 230);
       const rowHeight = Math.max(nameLines.length, 1) * lineHeight + 5;
       ensureSpace(rowHeight);
       nameLines.forEach((line, index) => {
         doc.text(line, margin, y + index * lineHeight);
       });
+      doc.text(item.code || "-", margin + 250, y);
       doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
       y += rowHeight;
     });

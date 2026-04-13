@@ -151,7 +151,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 <tr>
                   <th style={thStyle}>Item</th>
                   <th style={thStyle}>Type</th>
-                  <th style={thStyle}>Code</th>
+                  <th style={thStyle}>Item Code</th>
                   <th style={thStyle}>Quantity</th>
                   <th style={thStyle}>Unit price</th>
                   <th style={thStyle}>Line total</th>

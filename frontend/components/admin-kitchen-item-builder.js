@@ -241,8 +241,8 @@ export default function AdminKitchenItemBuilder({
             ))}
           </select>
         </FormField>
-        <FormField label="Code">
-          <input name="code" placeholder="component-dishwasher" required style={inputStyle} />
+        <FormField label="Item Code">
+          <input name="code" placeholder="DISH-600-STD" required style={inputStyle} />
         </FormField>
         <FormField label="Name">
           <input name="name" placeholder="Display name" required style={inputStyle} />

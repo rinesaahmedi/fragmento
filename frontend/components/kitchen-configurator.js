@@ -98,11 +98,11 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup, initialC
   }, [lockedComponentIds, lockedComponentIdsKey]);
 
   useEffect(() => {
-    if (!montageEligible && selectedServiceCodes.includes("service-montage")) {
-      setSelectedServiceCodes((current) => current.filter((code) => code !== "service-montage"));
+    if (!montageEligible && selectedServiceCodes.includes("SVC-MONTAGE-001")) {
+      setSelectedServiceCodes((current) => current.filter((code) => code !== "SVC-MONTAGE-001"));
     }
-    if (!hasAnyBaseSelection && selectedServiceCodes.includes("service-pickup")) {
-      setSelectedServiceCodes((current) => current.filter((code) => code !== "service-pickup"));
+    if (!hasAnyBaseSelection && selectedServiceCodes.includes("SVC-PICKUP-001")) {
+      setSelectedServiceCodes((current) => current.filter((code) => code !== "SVC-PICKUP-001"));
     }
   }, [hasAnyBaseSelection, montageEligible, selectedServiceCodes]);
 
@@ -113,13 +113,13 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup, initialC
   }
 
   function toggleService(itemCode) {
-    if (itemCode === "service-montage" && !montageEligible) {
+    if (itemCode === "SVC-MONTAGE-001" && !montageEligible) {
       setStatus("Montage ist erst ab mindestens 3 Artikeln moeglich, davon 2 Schrank-Komponenten.");
       setStatusTone("error");
       return;
     }
 
-    if (itemCode === "service-pickup" && !hasAnyBaseSelection) {
+    if (itemCode === "SVC-PICKUP-001" && !hasAnyBaseSelection) {
       setStatus("Abholung kann erst hinzugefuegt werden, wenn mindestens ein Artikel ausgewaehlt wurde.");
       setStatusTone("error");
       return;
@@ -131,8 +131,8 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup, initialC
     setSelectedServiceCodes((current) => {
       const exists = current.includes(itemCode);
       if (exists) return current.filter((code) => code !== itemCode);
-      if (itemCode === "service-montage") return [...current.filter((code) => code !== "service-pickup"), itemCode];
-      if (itemCode === "service-pickup") return [...current.filter((code) => code !== "service-montage"), itemCode];
+      if (itemCode === "SVC-MONTAGE-001") return [...current.filter((code) => code !== "SVC-PICKUP-001"), itemCode];
+      if (itemCode === "SVC-PICKUP-001") return [...current.filter((code) => code !== "SVC-MONTAGE-001"), itemCode];
       return [...current, itemCode];
     });
   }

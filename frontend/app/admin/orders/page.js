@@ -32,6 +32,11 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function formatArticleCodes(items = []) {
+  const codes = items.map((item) => item.code).filter(Boolean);
+  return codes.length ? codes.join(", ") : "No article codes";
+}
+
 export default async function AdminOrdersPage() {
   const admin = await requireAdminPage();
   const orders = await getOrdersForAdmin();
@@ -50,6 +55,7 @@ export default async function AdminOrdersPage() {
                   <th style={thStyle}>Order</th>
                   <th style={thStyle}>Customer</th>
                   <th style={thStyle}>Kitchen</th>
+                  <th style={thStyle}>Article Codes</th>
                   <th style={thStyle}>Status</th>
                   <th style={thStyle}>Total</th>
                   <th style={thStyle}>Created</th>
@@ -58,7 +64,7 @@ export default async function AdminOrdersPage() {
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={6}>No orders found.</td>
+                    <td style={tdStyle} colSpan={7}>No orders found.</td>
                   </tr>
                 ) : null}
                 {orders.map((order) => (
@@ -73,6 +79,9 @@ export default async function AdminOrdersPage() {
                       <div style={{ color: "var(--app-text-muted)", marginTop: 6 }}>{order.email}</div>
                     </td>
                     <td style={tdStyle}>{order.kitchen.name}</td>
+                    <td style={tdStyle}>
+                      <span style={articleCodesStyle}>{formatArticleCodes(order.items)}</span>
+                    </td>
                     <td style={tdStyle}><StatusBadge status={order.status} /></td>
                     <td style={tdStyle}>{formatCurrency(order.totalPrice)}</td>
                     <td style={tdStyle}>{formatDate(order.createdAt)}</td>
@@ -103,6 +112,7 @@ export default async function AdminOrdersPage() {
                     <span>{order.email}</span>
                     <span>{formatDate(order.createdAt)}</span>
                   </div>
+                  <div style={articleCodesStyle}>{formatArticleCodes(order.items)}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                     <strong>{formatCurrency(order.totalPrice)}</strong>
                     <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
@@ -142,4 +152,11 @@ const orderLinkStyle = {
 
 const orderRowStyle = {
   transition: "background 160ms ease",
+};
+
+const articleCodesStyle = {
+  color: "var(--app-text)",
+  fontSize: 13,
+  lineHeight: 1.5,
+  overflowWrap: "anywhere",
 };

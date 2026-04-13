@@ -279,8 +279,8 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 ))}
               </select>
             </FormField>
-            <FormField label="Code">
-              <input name="code" style={inputStyle} required />
+            <FormField label="Item Code">
+              <input name="code" placeholder="DISH-600-STD" style={inputStyle} required />
             </FormField>
             <FormField label="Name">
               <input name="name" style={inputStyle} required />
@@ -384,7 +384,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       <strong style={{ fontSize: "1.05rem" }}>{item.name}</strong>
                       <div style={subMetaStyle}>
                         <TypeBadge label={item.itemType} />
-                        <span>{item.code}</span>
+                        <span>Item Code: {item.code}</span>
                         <span>{formatCurrency(item.price)}</span>
                         <span>{slot ? slot.label : "No slot"}</span>
                       </div>
@@ -412,7 +412,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                           ))}
                         </select>
                       </FormField>
-                      <FormField label="Code" wide={false}>
+                      <FormField label="Item Code" wide={false}>
                         <input name="code" defaultValue={item.code} style={compactInputStyle} required />
                       </FormField>
                       <FormField label="Name" wide={false}>

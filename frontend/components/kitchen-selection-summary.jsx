@@ -19,6 +19,7 @@ function SummaryRow({ item, onRemove }) {
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{item.name}</strong>
+        {item.code ? <span className={styles.itemCode}>Code: {item.code}</span> : null}
         <span>{getSummaryMetaLabel(item)}</span>
       </div>
       <strong className={priceClassName}>{getSummaryPriceLabel(item)}</strong>

@@ -200,7 +200,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   }
 
   const selectedComponentCodes = selectedComponents.map((item) => item.code);
-  if (selectedServices.some((item) => item.code === "service-montage")) {
+  if (selectedServices.some((item) => item.code === "SVC-MONTAGE-001")) {
     const matchedCabinets = selectedComponentCodes.filter((code) => MONTAGE_REQUIRED_CODES.includes(code)).length;
     if (selectedComponents.length < 3 || matchedCabinets < 2) {
       throw validationError("Montage conditions are not met");

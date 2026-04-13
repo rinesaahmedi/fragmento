@@ -256,12 +256,12 @@ function injectKitchenConfig(script, kitchenConfig) {
             name: li.querySelector('.component-name')?.textContent?.trim(),
             price: parsePrice(li.querySelector('.component-price')?.textContent)
         }));
-        const accessories = Array.from(document.querySelectorAll('#combined-list .accessory-item[id^="acc-"].selected')).map(li => ({
+        const accessories = Array.from(document.querySelectorAll('#combined-list .accessory-item[data-item-type="accessory"].selected')).map(li => ({
             code: li.dataset.code || li.id,
             name: li.querySelector('.accessory-name')?.textContent?.trim(),
             price: parsePrice(li.dataset.price)
         }));
-        const services = Array.from(document.querySelectorAll('#combined-list .accessory-item[id^="service-"].selected')).map(li => ({
+        const services = Array.from(document.querySelectorAll('#combined-list .accessory-item[data-item-type="service"].selected')).map(li => ({
             code: li.dataset.code || li.id,
             name: li.querySelector('.accessory-name')?.textContent?.trim(),
             price: parsePrice(li.dataset.price)
