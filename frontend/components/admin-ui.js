@@ -108,7 +108,8 @@ export function ActionLink({ href, children, secondary = false }) {
 }
 
 export function StatusBadge({ status }) {
-  return <span style={statusPill(status)}>{status}</span>;
+  const label = status === "CONFIRMED" ? "CONFIRMED / EMAILED" : status;
+  return <span style={statusPill(status)}>{label}</span>;
 }
 
 export function TypeBadge({ label }) {

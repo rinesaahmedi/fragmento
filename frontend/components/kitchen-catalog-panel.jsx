@@ -114,7 +114,9 @@ export default function KitchenCatalogPanel({
   selectedComponentIds,
   selectedAccessoryCodes,
   selectedServiceCodes,
-  lockedComponentIds,
+  fixedComponentIds,
+  orderLockedAccessoryCodes,
+  orderLockedServiceCodes,
   setSelectedComponentIds,
   onToggleAccessory,
   onToggleService,
@@ -147,7 +149,7 @@ export default function KitchenCatalogPanel({
                   infoPdfHref={displayItem.infoPdfHref}
                   onClick={() =>
                     setSelectedComponentIds((current) =>
-                      toggleLinkedComponentSelection(kitchenSlug, current, componentId, lockedComponentIds),
+                      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
                     )
                   }
                 />
@@ -164,6 +166,7 @@ export default function KitchenCatalogPanel({
                 key={item.id}
                 item={item}
                 selected={selectedAccessoryCodes.includes(item.code)}
+                locked={orderLockedAccessoryCodes.has(item.code)}
                 onClick={() => onToggleAccessory(item.code)}
               />
             ))}
@@ -178,6 +181,7 @@ export default function KitchenCatalogPanel({
                 key={item.id}
                 item={item}
                 selected={selectedServiceCodes.includes(item.code)}
+                locked={orderLockedServiceCodes.has(item.code)}
                 hint={
                   item.code === "SVC-MONTAGE-001"
                     ? "Mindestens 3 Artikel, davon 2 Schrank-Komponenten"

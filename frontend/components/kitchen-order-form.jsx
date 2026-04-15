@@ -198,7 +198,7 @@ export default function KitchenOrderForm({
           <div>
             <h2>Bestellung abschliessen</h2>
             <p className={styles.panelIntro}>
-              Gib deine Kontaktdaten ein. Wir senden dir eine Bestellbestaetigung per E-Mail.
+              Gib deine Kontaktdaten ein. Deine Bestellbestaetigung folgt nach Pruefung.
             </p>
           </div>
         </div>
@@ -351,7 +351,7 @@ export default function KitchenOrderForm({
           </div>
           <div className={styles.orderSubmitRow}>
             <button type="submit" form="order-form" className={styles.orderSubmitButton} disabled={isSubmitting}>
-              {isSubmitting ? "Wird gesendet..." : "Bestellbestaetigung senden"}
+              {isSubmitting ? "Wird gespeichert..." : "Bestellung einreichen"}
             </button>
           </div>
           <small className={styles.orderHelp}>Mit * gekennzeichnete Felder sind Pflichtfelder.</small>

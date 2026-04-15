@@ -8,9 +8,10 @@ import {
 
 function SummaryRow({ item, onRemove }) {
   const price = Number(item.price || 0);
+  const isLocked = item.isLocked || item.isOrderLocked;
   const priceClassName = [
     styles.summaryPrice,
-    item.isLocked && price <= 0 ? styles.summaryPriceIncluded : "",
+    isLocked && price <= 0 ? styles.summaryPriceIncluded : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -23,8 +24,10 @@ function SummaryRow({ item, onRemove }) {
         <span>{getSummaryMetaLabel(item)}</span>
       </div>
       <strong className={priceClassName}>{getSummaryPriceLabel(item)}</strong>
-      {item.isLocked ? (
-        <span className={[styles.summaryBadge, styles.summaryBadgeLocked].join(" ")}>Standard</span>
+      {isLocked ? (
+        <span className={[styles.summaryBadge, styles.summaryBadgeLocked].join(" ")}>
+          {item.isOrderLocked ? "Bestaetigt" : "Standard"}
+        </span>
       ) : (
         <button type="button" className={styles.summaryRemove} onClick={() => onRemove(item)}>
           Entfernen

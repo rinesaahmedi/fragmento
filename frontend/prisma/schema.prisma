@@ -53,6 +53,7 @@ model KitchenItem {
   kitchen      Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
   itemType     ItemType
   code         String
+  articleNumber String?
   name         String
   price        Decimal     @db.Decimal(10, 2)
   infoText     String?

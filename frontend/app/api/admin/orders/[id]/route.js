@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { getOrderById } from "../../../../../lib/catalog";
-import { resendOrderEmail, retryOrderWebhook, updateOrderStatus } from "../../../../../lib/orders";
+import { confirmOrder, resendOrderEmail, retryOrderWebhook, updateOrderStatus } from "../../../../../lib/orders";
 
 export async function GET(_request, { params }) {
   await requireAdminApi();
@@ -33,13 +33,18 @@ export async function POST(request, { params }) {
     }
 
     if (intent === "confirm") {
-      await updateOrderStatus(id, "CONFIRMED");
-      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order marked as confirmed.");
+      await confirmOrder(id);
+      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent and order confirmed.");
     }
 
     if (intent === "cancel") {
       await updateOrderStatus(id, "CANCELLED");
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order marked as cancelled.");
+    }
+
+    if (status === "CONFIRMED") {
+      await confirmOrder(id);
+      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent and order confirmed.");
     }
 
     await updateOrderStatus(id, status);

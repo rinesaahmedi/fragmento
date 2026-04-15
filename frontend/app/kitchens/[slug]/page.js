@@ -1,12 +1,23 @@
 import { notFound } from "next/navigation";
 import KitchenConfigurator from "../../../components/kitchen-configurator";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "../../../lib/catalog";
-import { getEditableOrderForContract, getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
+import { getContractOrderState, getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
 import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
 
 export const dynamic = "force-dynamic";
 
-function serializeInitialOrder(order) {
+function serializeOrderItems(items = [], locked = false) {
+  return items.map((item) => ({
+    itemType: String(item.itemType || "").toLowerCase(),
+    code: item.code || "",
+    name: item.nameSnapshot || "",
+    locked,
+    sourceOrderId: item.sourceOrderId || "",
+    sourceOrderNumber: item.sourceOrderNumber || "",
+  }));
+}
+
+function serializeInitialOrder(order, confirmedItems = []) {
   if (!order) return null;
 
   return {
@@ -27,11 +38,16 @@ function serializeInitialOrder(order) {
       notes: order.notes || "",
       paymentMethod: order.paymentMethod || "",
     },
-    items: (order.items || []).map((item) => ({
-      itemType: String(item.itemType || "").toLowerCase(),
-      code: item.code || "",
-      name: item.nameSnapshot || "",
-    })),
+    items: [
+      ...serializeOrderItems(confirmedItems, true),
+      ...serializeOrderItems(order.items || [], false),
+    ],
+  };
+}
+
+function serializeConfirmedBaseline(confirmedItems = []) {
+  return {
+    items: serializeOrderItems(confirmedItems, true),
   };
 }
 
@@ -91,8 +107,10 @@ export default async function KitchenPage({ params, searchParams }) {
     try {
       const contract = await getKitchenContractForAccess(initialContractNumber);
       if (contract.kitchenId === kitchen.id) {
-        const editableOrder = await getEditableOrderForContract(contract.id, undefined, true);
-        initialOrder = serializeInitialOrder(editableOrder);
+        const contractOrderState = await getContractOrderState(contract.id);
+        initialOrder = contractOrderState.editableOrder
+          ? serializeInitialOrder(contractOrderState.editableOrder, contractOrderState.confirmedItems)
+          : serializeConfirmedBaseline(contractOrderState.confirmedItems);
         initialContractAddress = serializeContractAddress(contract);
       }
     } catch (error) {

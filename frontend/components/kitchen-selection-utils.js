@@ -8,7 +8,7 @@ export function formatCurrency(value) {
 
 export function getSummaryPriceLabel(item) {
   const price = Number(item?.price || 0);
-  if (item?.isLocked && price <= 0) {
+  if ((item?.isLocked || item?.isOrderLocked) && price <= 0) {
     return "Inklusive";
   }
   return formatCurrency(price);
@@ -16,6 +16,9 @@ export function getSummaryPriceLabel(item) {
 
 export function getSummaryMetaLabel(item) {
   const price = Number(item?.price || 0);
+  if (item?.isOrderLocked) {
+    return "Bereits bestaetigt";
+  }
   if (!item?.isLocked) {
     return "Ausgewaehlt";
   }

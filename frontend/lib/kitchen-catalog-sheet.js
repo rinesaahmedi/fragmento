@@ -5,6 +5,7 @@ export const KITCHEN_CATALOG_COLUMNS = [
   "order",
   "id",
   "code",
+  "articleNumber",
   "name",
   "itemType",
   "price",
@@ -19,9 +20,10 @@ export const KITCHEN_CATALOG_COLUMNS = [
 
 const KITCHEN_CATALOG_COLUMN_LABELS = {
   code: "Item Code",
+  articleNumber: "Article Number",
 };
 
-const COLUMN_WIDTHS = [10, 26, 24, 28, 16, 12, 42, 20, 16, 22, 12, 12, 12];
+const COLUMN_WIDTHS = [10, 26, 24, 22, 28, 16, 12, 42, 20, 16, 22, 12, 12, 12];
 
 function getColumnLabel(column) {
   return KITCHEN_CATALOG_COLUMN_LABELS[column] || column;
@@ -96,6 +98,7 @@ function normalizeImportedRecord(record, rowNumber) {
     code,
     data: {
       code,
+      articleNumber: optionalString(record.articleNumber),
       name: requiredString(record.name, "name", rowNumber),
       itemType: parseItemType(record.itemType, rowNumber),
       price: parsePrice(record.price, rowNumber),
@@ -177,6 +180,7 @@ export function buildKitchenCatalogWorkbook(kitchen) {
       index + 1,
       item.id,
       item.code,
+      item.articleNumber || "",
       item.name,
       item.itemType,
       Number(item.price).toFixed(2),
@@ -227,7 +231,8 @@ function parseKitchenCatalogRows(rows) {
   }
 
   const headers = rows[headerIndex].map(getColumnKey);
-  const missingColumns = KITCHEN_CATALOG_COLUMNS.filter((column) => !headers.includes(column));
+  const requiredColumns = KITCHEN_CATALOG_COLUMNS.filter((column) => column !== "articleNumber");
+  const missingColumns = requiredColumns.filter((column) => !headers.includes(column));
   if (missingColumns.length) {
     throw new Error(`Missing columns: ${missingColumns.map(getColumnLabel).join(", ")}.`);
   }

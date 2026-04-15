@@ -18,7 +18,7 @@ export default function KitchenSvgStage({
   kitchenConfig,
   kitchenSlug,
   planViewport,
-  lockedComponentIds,
+  fixedComponentIds,
   selectedComponentIds,
   setSelectedComponentIds,
   onResetSelection,
@@ -28,7 +28,7 @@ export default function KitchenSvgStage({
     () => applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug),
     [kitchenConfig.kitchen.slug, svgMarkup],
   );
-  const lockedComponentIdsKey = lockedComponentIds.join("|");
+  const fixedComponentIdsKey = fixedComponentIds.join("|");
 
   useEffect(() => {
     const host = svgHostRef.current;
@@ -38,7 +38,7 @@ export default function KitchenSvgStage({
       planViewport,
       kitchenConfig,
       selectedComponentIds,
-      lockedComponentIds,
+      lockedComponentIds: fixedComponentIds,
       componentIdForItem,
       normalizeColor,
     });
@@ -52,10 +52,10 @@ export default function KitchenSvgStage({
       if (!group) return;
 
       const componentId = group.dataset.componentId;
-      if (lockedComponentIds.includes(componentId)) return;
+      if (fixedComponentIds.includes(componentId)) return;
 
       setSelectedComponentIds((current) =>
-        toggleLinkedComponentSelection(kitchenSlug, current, componentId, lockedComponentIds),
+        toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
       );
     };
 
@@ -66,7 +66,7 @@ export default function KitchenSvgStage({
   }, [
     kitchenConfig,
     kitchenSlug,
-    lockedComponentIds,
+    fixedComponentIds,
     planViewport,
     resolvedSvgMarkup,
     selectedComponentIds,
@@ -77,9 +77,9 @@ export default function KitchenSvgStage({
     refreshKitchenPlanSelection({
       host: svgHostRef.current,
       selectedComponentIds,
-      lockedComponentIds,
+      lockedComponentIds: fixedComponentIds,
     });
-  }, [lockedComponentIdsKey, selectedComponentIds, lockedComponentIds]);
+  }, [fixedComponentIdsKey, selectedComponentIds, fixedComponentIds]);
 
   return (
     <div className={styles.stage}>

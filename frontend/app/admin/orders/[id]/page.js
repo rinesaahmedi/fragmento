@@ -28,7 +28,7 @@ import { getOrderById } from "../../../../lib/catalog";
 
 export const dynamic = "force-dynamic";
 
-const ORDER_STATUS_OPTIONS = Object.values(OrderStatus);
+const ACTIVE_ORDER_STATUS_OPTIONS = [OrderStatus.NEW, OrderStatus.CONFIRMED, OrderStatus.CANCELLED];
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
@@ -43,6 +43,15 @@ function formatDate(value) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function formatOrdinal(value) {
+  const number = Number(value || 0);
+  if (!number) return "";
+  const mod100 = number % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${number}th`;
+  const suffix = number % 10 === 1 ? "st" : number % 10 === 2 ? "nd" : number % 10 === 3 ? "rd" : "th";
+  return `${number}${suffix}`;
 }
 
 export default async function AdminOrderDetailPage({ params, searchParams }) {
@@ -65,6 +74,9 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
 
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
+  const orderStatusOptions = ACTIVE_ORDER_STATUS_OPTIONS.includes(order.status)
+    ? ACTIVE_ORDER_STATUS_OPTIONS
+    : [order.status, ...ACTIVE_ORDER_STATUS_OPTIONS];
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -90,6 +102,9 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                   <span>{order.kitchen.name}</span>
                   <span>{formatDate(order.createdAt)}</span>
                   <span>{order.items.length} item(s)</span>
+                  {order.contractOrderSequence ? (
+                    <span>{formatOrdinal(order.contractOrderSequence)} order for this contract</span>
+                  ) : null}
                 </div>
               </div>
 
@@ -105,6 +120,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 <div>
                   <span style={detailLabelStyle}>Contract number</span>
                   <span>{order.contractNumber || "Not provided"}</span>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}>Contract order</span>
+                  <span>
+                    {order.contractOrderSequence
+                      ? `${formatOrdinal(order.contractOrderSequence)} order for this contract`
+                      : "Not available"}
+                  </span>
                 </div>
                 <div>
                   <span style={detailLabelStyle}>Contract access</span>
@@ -197,7 +220,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
           <form action={`/api/admin/orders/${order.id}`} method="post" style={actionFormStyle}>
             <FormField label="Status">
               <select name="status" defaultValue={order.status} style={inputStyle}>
-                {ORDER_STATUS_OPTIONS.map((status) => (
+                {orderStatusOptions.map((status) => (
                   <option key={status} value={status}>
                     {status}
                   </option>

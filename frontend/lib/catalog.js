@@ -108,6 +108,7 @@ export function serializeKitchenForLegacy(kitchen) {
   const toClientItem = (item) => ({
     id: item.id,
     code: item.code,
+    articleNumber: item.articleNumber || "",
     name: item.name,
     price: Number(item.price),
     infoText: item.infoText || "",
@@ -149,7 +150,7 @@ export async function getOrdersForAdmin(filters = {}) {
     }
   }
 
-  return prisma.order.findMany({
+  const orders = await prisma.order.findMany({
     where,
     include: {
       kitchen: true,
@@ -158,10 +159,12 @@ export async function getOrdersForAdmin(filters = {}) {
     },
     orderBy: { createdAt: "desc" },
   });
+
+  return addContractOrderSequence(orders);
 }
 
 export async function getOrderById(id) {
-  return prisma.order.findUnique({
+  const order = await prisma.order.findUnique({
     where: { id },
     include: {
       kitchen: true,
@@ -169,4 +172,46 @@ export async function getOrderById(id) {
       items: { orderBy: { createdAt: "asc" } },
     },
   });
+
+  if (!order) return null;
+  const [sequencedOrder] = await addContractOrderSequence([order]);
+  return sequencedOrder;
+}
+
+async function addContractOrderSequence(orders) {
+  const contractIds = [...new Set(orders.map((order) => order.kitchenContractId).filter(Boolean))];
+  if (!contractIds.length) {
+    return orders.map((order) => ({
+      ...order,
+      contractOrderSequence: null,
+      contractOrderCount: null,
+    }));
+  }
+
+  const allContractOrders = await prisma.order.findMany({
+    where: {
+      kitchenContractId: { in: contractIds },
+    },
+    select: {
+      id: true,
+      kitchenContractId: true,
+      createdAt: true,
+    },
+    orderBy: [{ kitchenContractId: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+  });
+
+  const sequenceByOrderId = new Map();
+  const countByContractId = new Map();
+
+  allContractOrders.forEach((order) => {
+    const nextSequence = (countByContractId.get(order.kitchenContractId) || 0) + 1;
+    countByContractId.set(order.kitchenContractId, nextSequence);
+    sequenceByOrderId.set(order.id, nextSequence);
+  });
+
+  return orders.map((order) => ({
+    ...order,
+    contractOrderSequence: order.kitchenContractId ? sequenceByOrderId.get(order.id) || 1 : null,
+    contractOrderCount: order.kitchenContractId ? countByContractId.get(order.kitchenContractId) || 1 : null,
+  }));
 }

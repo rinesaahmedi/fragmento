@@ -170,9 +170,9 @@ export function buildOrderSummaryHtml(order) {
       <div style="padding:20px;border:1px solid #ddd;border-radius:8px;">
         <h4 style="margin-top:0;">Bestelldaten</h4>
         <table style="${tableStyles}"><tbody>${orderDetailsRows}</tbody></table>
-        ${renderSection("Komponenten", order.components)}
-        ${renderSection("Zubehoer", order.accessories)}
-        ${renderSection("Dienstleistungen", order.services)}
+        ${renderSection("Neu bestaetigte Komponenten", order.components)}
+        ${renderSection("Neu bestaetigtes Zubehoer", order.accessories)}
+        ${renderSection("Neu bestaetigte Dienstleistungen", order.services)}
         <table style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;">
           <tr><td style="text-align:right;font-size:1.3em;font-weight:bold;">Gesamtpreis: ${formatCurrency(
             order.total,
@@ -237,7 +237,7 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     html: `
       ${logoHtml}
       <p>Hallo ${order.customer.firstName} ${order.customer.lastName},</p>
-      <p>vielen Dank fuer deine Bestellung!</p>
+      <p>deine Bestellung wurde bestaetigt.</p>
       <p>Bestellte Kueche: <strong>${order.kitchen.name}</strong>.</p>
       ${buildOrderSummaryHtml(order)}
       ${productInfoHtml}

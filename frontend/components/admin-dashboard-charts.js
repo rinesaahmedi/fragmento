@@ -584,7 +584,8 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const data = useMemo(() => config.data
     .map((item) => ({
       ...item,
-      axisLabel: item.code ? `${item.name} | ${item.code}` : item.name,
+      axisLabel: item.name || "",
+      displayIdentifier: item.articleNumber || item.code || "",
       chartValue: Number(item[mode] || 0),
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
@@ -653,7 +654,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
                 }}
               >
                 {data.map((item, index) => (
-                  <Cell key={`${mode}-${item.code}-${item.name}`} fill={SERIES_COLORS[index % SERIES_COLORS.length]} />
+                  <Cell key={`${mode}-${item.code || item.name}-${item.name}`} fill={SERIES_COLORS[index % SERIES_COLORS.length]} />
                 ))}
               </Bar>
             </BarChart>
@@ -718,17 +719,18 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
 }
 
 function TopItemsAxisTick({ x, y, payload }) {
-  const rawValue = String(payload?.value || "");
-  const [name, code] = rawValue.split(" | ");
+  const row = payload?.payload || {};
+  const name = String(row.name || payload?.value || "");
+  const identifier = String(row.displayIdentifier || "");
 
   return (
     <g transform={`translate(${x},${y})`}>
       <text x={-8} y={-5} textAnchor="end" fill="#374151" fontSize={12} fontWeight={700}>
         {truncateLabel(name, 42)}
       </text>
-      {code ? (
-        <text x={-8} y={11} textAnchor="end" fill="#6b7280" fontSize={11}>
-          {truncateLabel(code, 34)}
+      {identifier ? (
+        <text x={-8} y={11} textAnchor="end" fill="#6b7280" fontSize={10}>
+          {truncateLabel(identifier, 34)}
         </text>
       ) : null}
     </g>
@@ -743,7 +745,8 @@ function TopItemsTooltip({ active, payload }) {
     <div className="tooltip">
       <strong>{item.name}</strong>
       <span>Category: {item.itemType || "Not captured"}</span>
-      <span>Article Code: {item.code || "Not captured"}</span>
+      <span>Code: {item.code || "Not captured"}</span>
+      <span>Article No: {item.articleNumber || "—"}</span>
       <span>Quantity: {item.quantity}</span>
       <span>Revenue: {formatCurrency(item.revenue)}</span>
       <style jsx>{`

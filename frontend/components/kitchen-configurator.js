@@ -97,6 +97,15 @@ function initialItemCodesByType(initialOrder, itemType) {
   );
 }
 
+function lockedItemCodesByType(initialOrder, itemType) {
+  return new Set(
+    (initialOrder?.items || [])
+      .filter((item) => item.itemType === itemType && item.locked)
+      .map((item) => item.code)
+      .filter(Boolean),
+  );
+}
+
 function buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder) {
   const componentCodes = initialItemCodesByType(initialOrder, "component");
   const existingComponentIds = kitchenConfig.components
@@ -109,6 +118,13 @@ function buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrde
 function buildInitialCodes(kitchenConfig, initialOrder, itemType, configKey) {
   const itemCodes = initialItemCodesByType(initialOrder, itemType);
   return kitchenConfig[configKey].filter((item) => itemCodes.has(item.code)).map((item) => item.code);
+}
+
+function buildOrderLockedComponentIds(kitchenConfig, initialOrder) {
+  const componentCodes = lockedItemCodesByType(initialOrder, "component");
+  return kitchenConfig.components
+    .filter((item) => componentCodes.has(item.code))
+    .map((item) => componentIdForItem(item));
 }
 
 export default function KitchenConfigurator({
@@ -131,9 +147,25 @@ export default function KitchenConfigurator({
       ].map((value) => componentIdForKey(value)),
     [kitchenConfig],
   );
+  const orderLockedComponentIds = useMemo(
+    () => buildOrderLockedComponentIds(kitchenConfig, initialOrder),
+    [kitchenConfig, initialOrder],
+  );
+  const fixedComponentIds = useMemo(
+    () => [...new Set([...lockedComponentIds, ...orderLockedComponentIds])],
+    [lockedComponentIds, orderLockedComponentIds],
+  );
+  const orderLockedAccessoryCodes = useMemo(
+    () => lockedItemCodesByType(initialOrder, "accessory"),
+    [initialOrder],
+  );
+  const orderLockedServiceCodes = useMemo(
+    () => lockedItemCodesByType(initialOrder, "service"),
+    [initialOrder],
+  );
 
   const [selectedComponentIds, setSelectedComponentIds] = useState(() =>
-    buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder),
+    buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder),
   );
   const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState(() =>
     buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"),
@@ -152,7 +184,7 @@ export default function KitchenConfigurator({
   useEffect(() => {
     if (initialOrder) {
       setCustomer(buildInitialCustomerFromOrder(initialOrder, initialContractNumber));
-      setSelectedComponentIds(buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder));
+      setSelectedComponentIds(buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder));
       setSelectedAccessoryCodes(buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"));
       setSelectedServiceCodes(buildInitialCodes(kitchenConfig, initialOrder, "service", "services"));
       return;
@@ -172,20 +204,29 @@ export default function KitchenConfigurator({
       if (current.contractNumber === initialContractNumber) return current;
       return { ...current, contractNumber: initialContractNumber };
     });
-  }, [initialContractNumber, initialOrder, initialContractAddress, kitchenConfig, lockedComponentIds]);
+  }, [initialContractNumber, initialOrder, initialContractAddress, kitchenConfig, fixedComponentIds]);
 
-  const selectedComponents = kitchenConfig.components.filter((item) =>
-    selectedComponentIds.includes(componentIdForItem(item)),
-  );
-  const selectedAccessories = selectedMap(kitchenConfig.accessories, selectedAccessoryCodes);
-  const selectedServices = selectedMap(kitchenConfig.services, selectedServiceCodes);
-  const lockedSelectedComponents = selectedComponents.filter((item) => item.isLocked);
-  const optionalSelectedComponents = selectedComponents.filter((item) => !item.isLocked);
-  const lockedComponentIdsKey = lockedComponentIds.join("|");
+  const selectedComponents = kitchenConfig.components
+    .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
+    .map((item) => ({
+      ...item,
+      isOrderLocked: orderLockedComponentIds.includes(componentIdForItem(item)),
+    }));
+  const selectedAccessories = selectedMap(kitchenConfig.accessories, selectedAccessoryCodes).map((item) => ({
+    ...item,
+    isOrderLocked: orderLockedAccessoryCodes.has(item.code),
+  }));
+  const selectedServices = selectedMap(kitchenConfig.services, selectedServiceCodes).map((item) => ({
+    ...item,
+    isOrderLocked: orderLockedServiceCodes.has(item.code),
+  }));
+  const lockedSelectedComponents = selectedComponents.filter((item) => item.isLocked || item.isOrderLocked);
+  const optionalSelectedComponents = selectedComponents.filter((item) => !item.isLocked && !item.isOrderLocked);
+  const fixedComponentIdsKey = fixedComponentIds.join("|");
   const selectedComponentCodes = selectedComponents.map((item) => item.code);
   const visibleComponents = kitchenConfig.components.filter((item) => {
     const componentId = componentIdForItem(item);
-    return !lockedComponentIds.includes(componentId) && !isHiddenLinkedComponent(kitchenSlug, componentId);
+    return !fixedComponentIds.includes(componentId) && !isHiddenLinkedComponent(kitchenSlug, componentId);
   });
   const montageEligible =
     selectedComponents.length >= 3 &&
@@ -198,13 +239,13 @@ export default function KitchenConfigurator({
 
   useEffect(() => {
     setSelectedComponentIds((current) => {
-      const next = [...new Set([...lockedComponentIds, ...current])];
+      const next = [...new Set([...fixedComponentIds, ...current])];
       if (next.length === current.length && next.every((item, index) => item === current[index])) {
         return current;
       }
       return next;
     });
-  }, [lockedComponentIds, lockedComponentIdsKey]);
+  }, [fixedComponentIds, fixedComponentIdsKey]);
 
   useEffect(() => {
     if (!montageEligible && selectedServiceCodes.includes("SVC-MONTAGE-001")) {
@@ -216,12 +257,14 @@ export default function KitchenConfigurator({
   }, [hasAnyBaseSelection, montageEligible, selectedServiceCodes]);
 
   function toggleAccessory(itemCode) {
+    if (orderLockedAccessoryCodes.has(itemCode)) return;
     setSelectedAccessoryCodes((current) =>
       current.includes(itemCode) ? current.filter((code) => code !== itemCode) : [...current, itemCode],
     );
   }
 
   function toggleService(itemCode) {
+    if (orderLockedServiceCodes.has(itemCode)) return;
     if (itemCode === "SVC-MONTAGE-001" && !montageEligible) {
       setStatus("Montage ist erst ab mindestens 3 Artikeln moeglich, davon 2 Schrank-Komponenten.");
       setStatusTone("error");
@@ -252,26 +295,28 @@ export default function KitchenConfigurator({
 
   function removeComponent(item) {
     const componentId = componentIdForItem(item);
-    if (lockedComponentIds.includes(componentId)) {
+    if (fixedComponentIds.includes(componentId)) {
       return;
     }
     setSelectedComponentIds((current) =>
-      toggleLinkedComponentSelection(kitchenSlug, current, componentId, lockedComponentIds),
+      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
     );
   }
 
   function removeAccessory(item) {
+    if (item.isOrderLocked) return;
     setSelectedAccessoryCodes((current) => current.filter((code) => code !== item.code));
   }
 
   function removeService(item) {
+    if (item.isOrderLocked) return;
     setSelectedServiceCodes((current) => current.filter((code) => code !== item.code));
   }
 
   function resetSelection() {
-    setSelectedAccessoryCodes([]);
-    setSelectedServiceCodes([]);
-    setSelectedComponentIds(lockedComponentIds);
+    setSelectedAccessoryCodes([...orderLockedAccessoryCodes]);
+    setSelectedServiceCodes([...orderLockedServiceCodes]);
+    setSelectedComponentIds(fixedComponentIds);
     setStatus("");
     setStatusTone("idle");
   }
@@ -305,7 +350,7 @@ export default function KitchenConfigurator({
     }
 
     setIsSubmitting(true);
-    setStatus("Bestellung wird gesendet...");
+    setStatus("Bestellung wird gespeichert...");
     setStatusTone("idle");
 
     try {
@@ -378,11 +423,11 @@ export default function KitchenConfigurator({
           .join(" | ");
         setStatus(`Bestellung gespeichert. Auftragsnummer: ${payload.orderNumber}. Hinweis: ${notes}`);
       } else {
-        setStatus(`Bestellung gespeichert. Auftragsnummer: ${payload.orderNumber}`);
+        setStatus(`Bestellung gespeichert. Auftragsnummer: ${payload.orderNumber}. Die Bestaetigung folgt nach Pruefung.`);
       }
       setStatusTone("success");
     } catch (error) {
-      setStatus(error.message || "Bestellung konnte nicht gesendet werden.");
+      setStatus(error.message || "Bestellung konnte nicht gespeichert werden.");
       setStatusTone("error");
     } finally {
       setIsSubmitting(false);
@@ -416,7 +461,7 @@ export default function KitchenConfigurator({
               kitchenConfig={kitchenConfig}
               kitchenSlug={kitchenSlug}
               planViewport={planViewport}
-              lockedComponentIds={lockedComponentIds}
+              fixedComponentIds={fixedComponentIds}
               selectedComponentIds={selectedComponentIds}
               setSelectedComponentIds={setSelectedComponentIds}
               onResetSelection={resetSelection}
@@ -446,7 +491,9 @@ export default function KitchenConfigurator({
               selectedComponentIds={selectedComponentIds}
               selectedAccessoryCodes={selectedAccessoryCodes}
               selectedServiceCodes={selectedServiceCodes}
-              lockedComponentIds={lockedComponentIds}
+              fixedComponentIds={fixedComponentIds}
+              orderLockedAccessoryCodes={orderLockedAccessoryCodes}
+              orderLockedServiceCodes={orderLockedServiceCodes}
               setSelectedComponentIds={setSelectedComponentIds}
               onToggleAccessory={toggleAccessory}
               onToggleService={toggleService}

@@ -199,6 +199,7 @@ function serializeKitchenItem(item) {
     kitchenId: item.kitchenId,
     itemType: item.itemType,
     code: item.code,
+    articleNumber: item.articleNumber || "",
     name: item.name,
     price: Number(item.price),
     infoText: item.infoText || "",
@@ -445,6 +446,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             <FormField label="Item Code">
               <input name="code" placeholder="DISH-600-STD" style={inputStyle} required />
             </FormField>
+            <FormField label="Article number">
+              <input name="articleNumber" placeholder="A-EGSPV597210" style={inputStyle} />
+            </FormField>
             <FormField label="Name">
               <input name="name" style={inputStyle} required />
             </FormField>
@@ -548,6 +552,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       <div style={subMetaStyle}>
                         <TypeBadge label={item.itemType} />
                         <span>Item Code: {item.code}</span>
+                        <span>Article No: {item.articleNumber || "-"}</span>
                         <span>{formatCurrency(item.price)}</span>
                         <span>{slot ? slot.label : "No slot"}</span>
                       </div>
@@ -577,6 +582,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       </FormField>
                       <FormField label="Item Code" wide={false}>
                         <input name="code" defaultValue={item.code} style={compactInputStyle} required />
+                      </FormField>
+                      <FormField label="Article number" wide={false}>
+                        <input name="articleNumber" defaultValue={item.articleNumber || ""} style={compactInputStyle} />
                       </FormField>
                       <FormField label="Name" wide={false}>
                         <input name="name" defaultValue={item.name} style={compactInputStyle} required />

@@ -65,6 +65,7 @@ export function validateKitchenItemInput(formData) {
   return {
     itemType: parseItemType(String(formData.get("itemType") || "")),
     code: requiredString(formData.get("code"), "Item code"),
+    articleNumber: optionalString(formData.get("articleNumber")),
     name: requiredString(formData.get("name"), "Item name"),
     price: validatePrice(formData.get("price")),
     iconKey: optionalString(formData.get("iconKey")),

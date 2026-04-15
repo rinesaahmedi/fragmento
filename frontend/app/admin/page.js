@@ -3,6 +3,7 @@ import { AdminDashboardCharts } from "../../components/admin-dashboard-charts";
 import { listKitchensForAdmin } from "../../lib/catalog";
 import { requireAdminPage } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
+import { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +14,23 @@ const PERIOD_OPTIONS = [
   { value: "90d", label: "Last 90 days", days: 90 },
   { value: "all", label: "All time", days: null },
 ];
+const ARTICLE_NUMBER_BY_CODE = {
+  "WM-B-EWA34660W": "EWA34660W",
+  "DISH-B-600-STD": "A-EGSPV597210",
+  "REF-B-545-1800-700": "OL-KGCN388140E",
+  "HOOD-B-FH664621E": "FH664621E",
+  "ACC-CUTLERY-ZB60SG": "ZB60SG",
+  "SINK-B-BOTTON-45": "517467",
+  "ACC-LIGHT-003": "KA220043_S3",
+  "LIGHT-B-LED-001": "KA220043_S3",
+  "WM-C-EWA34660W": "EWA34660W",
+  "DISH-C-600-STD": "A-EGSPV597210",
+  "REF-C-545-1800-700": "OL-KGCN388140E",
+  "ACC-CUTLERY-001": "ZB60SG",
+  "SINK-C-BOTTON-45": "517467",
+  "ACC-LIGHT-003": "KA220043_S3",
+  "LIGHT-C-LED-001": "KA220043_S3",
+};
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
@@ -102,6 +120,61 @@ function deriveCountry(order) {
   return "Unknown";
 }
 
+async function loadDashboardOrders(where) {
+  return prisma.order.findMany({
+    where,
+    include: { kitchen: true, items: true },
+    orderBy: { createdAt: "desc" },
+  });
+}
+
+async function hasKitchenItemArticleNumberColumn() {
+  const rows = await prisma.$queryRaw`
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'KitchenItem'
+      AND column_name = 'articleNumber'
+    LIMIT 1
+  `;
+
+  return rows.length > 0;
+}
+
+async function loadArticleNumbersByKitchenItemId(orders) {
+  const kitchenItemIds = [
+    ...new Set(
+      orders.flatMap((order) =>
+        (order.items || [])
+          .map((item) => item.kitchenItemId)
+          .filter(Boolean),
+      ),
+    ),
+  ];
+
+  if (!kitchenItemIds.length) return new Map();
+
+  try {
+    const hasColumn = await hasKitchenItemArticleNumberColumn();
+    if (!hasColumn) return new Map();
+
+    const rows = await prisma.$queryRaw`
+      SELECT "id", "articleNumber"
+      FROM "KitchenItem"
+      WHERE "id" IN (${Prisma.join(kitchenItemIds)})
+        AND "articleNumber" IS NOT NULL
+    `;
+
+    return new Map(rows.map((row) => [row.id, row.articleNumber]));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message.includes("articleNumber") || message.includes("column")) {
+      return new Map();
+    }
+    throw error;
+  }
+}
+
 export default async function AdminDashboardPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const params = await searchParams;
@@ -118,12 +191,9 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
 
   const [kitchens, orders] = await Promise.all([
     listKitchensForAdmin(),
-    prisma.order.findMany({
-      where,
-      include: { kitchen: true, items: true },
-      orderBy: { createdAt: "desc" },
-    }),
+    loadDashboardOrders(where),
   ]);
+  const articleNumbersByKitchenItemId = await loadArticleNumbersByKitchenItemId(orders);
 
   const totalOrders = orders.length;
   const totalRevenue = orders.reduce((sum, order) => sum + Number(order.totalPrice || 0), 0);
@@ -215,13 +285,22 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       const quantity = Number(item.quantity || 0);
       const revenue = Number(item.priceSnapshot || 0) * quantity;
       const itemKey = getItemKey(item);
+      const articleNumber =
+        item.kitchenItem?.articleNumber ||
+        articleNumbersByKitchenItemId.get(item.kitchenItemId) ||
+        ARTICLE_NUMBER_BY_CODE[String(item.code || "").trim()] ||
+        null;
       const existingItem = itemStats.get(itemKey) || {
         itemType: item.itemType,
         code: item.code,
+        articleNumber,
         name: item.nameSnapshot,
         quantity: 0,
         revenue: 0,
       };
+      if (!existingItem.articleNumber && articleNumber) {
+        existingItem.articleNumber = articleNumber;
+      }
       existingItem.quantity += quantity;
       existingItem.revenue += revenue;
       itemStats.set(itemKey, existingItem);

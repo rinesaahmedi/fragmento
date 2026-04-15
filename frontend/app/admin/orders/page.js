@@ -37,6 +37,20 @@ function formatArticleCodes(items = []) {
   return codes.length ? codes.join(", ") : "No article codes";
 }
 
+function formatOrdinal(value) {
+  const number = Number(value || 0);
+  if (!number) return "";
+  const mod100 = number % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${number}th`;
+  const suffix = number % 10 === 1 ? "st" : number % 10 === 2 ? "nd" : number % 10 === 3 ? "rd" : "th";
+  return `${number}${suffix}`;
+}
+
+function getContractOrderLabel(order) {
+  if (!order.contractOrderSequence) return "";
+  return `${formatOrdinal(order.contractOrderSequence)} order for contract`;
+}
+
 export default async function AdminOrdersPage() {
   const admin = await requireAdminPage();
   const orders = await getOrdersForAdmin();
@@ -73,6 +87,9 @@ export default async function AdminOrdersPage() {
                       <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
                         <strong>{order.orderNumber}</strong>
                       </Link>
+                      {order.contractOrderSequence ? (
+                        <div style={contractSequenceStyle}>{getContractOrderLabel(order)}</div>
+                      ) : null}
                     </td>
                     <td style={tdStyle}>
                       <div>{order.firstName} {order.lastName}</div>
@@ -101,6 +118,9 @@ export default async function AdminOrdersPage() {
                       <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
                         <strong style={{ fontSize: "1.05rem" }}>{order.orderNumber}</strong>
                       </Link>
+                      {order.contractOrderSequence ? (
+                        <span style={contractSequenceStyle}>{getContractOrderLabel(order)}</span>
+                      ) : null}
                       <div style={subMetaStyle}>
                         <span>{order.firstName} {order.lastName}</span>
                         <span>{order.kitchen.name}</span>
@@ -159,4 +179,18 @@ const articleCodesStyle = {
   fontSize: 13,
   lineHeight: 1.5,
   overflowWrap: "anywhere",
+};
+
+const contractSequenceStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  marginTop: 8,
+  padding: "6px 9px",
+  borderRadius: 999,
+  background: "linear-gradient(135deg, var(--app-info-bg), rgba(255,255,255,0.78))",
+  color: "var(--app-info-text)",
+  border: "1px solid rgba(45, 108, 121, 0.14)",
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: "0.04em",
 };

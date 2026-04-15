@@ -5,8 +5,9 @@ import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-n
 import {
   CONTRACT_ERRORS,
   assertUsableKitchenContract,
+  buildConfirmedItemCodeSets,
   contractValidationError,
-  getEditableOrderForContract,
+  getContractOrderState,
   normalizeContractNumber,
 } from "./kitchen-contracts";
 import { prisma } from "./prisma";
@@ -161,6 +162,14 @@ async function processOrderNotifications({ order, pdfBase64, pdfFilename, runEma
   return results;
 }
 
+function itemKey(item) {
+  return `${item.itemType}:${item.code}`;
+}
+
+function withoutConfirmedBaseline(items, confirmedItemSets) {
+  return items.filter((item) => !confirmedItemSets[item.itemType]?.has(item.code));
+}
+
 export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdfBase64, pdfFilename }) {
   if (!kitchenSlug || !orderPayload || typeof orderPayload !== "object") {
     throw validationError("Order payload is invalid");
@@ -233,7 +242,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   if (!allSelected.length) {
     throw validationError("At least one item must be selected");
   }
-  const totalPrice = allSelected.reduce((sum, item) => sum + Number(item.price), 0);
 
   const kitchenContract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: validatedCustomer.contractNumber },
@@ -246,11 +254,30 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   }
 
   let savedOrder = null;
+  let savedNewItems = [];
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const orderNumber = buildOrderNumber();
       savedOrder = await prisma.$transaction(async (tx) => {
-        const existingEditableOrder = await getEditableOrderForContract(kitchenContract.id, tx);
+        const contractOrderState = await getContractOrderState(kitchenContract.id, tx);
+        const existingEditableOrder = contractOrderState.editableOrder;
+        const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
+        const newSelectedItems = withoutConfirmedBaseline(allSelected, confirmedItemSets);
+        const newSelectionKeys = new Set(newSelectedItems.map(itemKey));
+        const submittedKeys = new Set(allSelected.map(itemKey));
+        const missingBaselineItems = contractOrderState.confirmedItems.filter(
+          (item) => !submittedKeys.has(itemKey(item)),
+        );
+
+        if (missingBaselineItems.length) {
+          throw validationError("Confirmed items cannot be removed from this contract.");
+        }
+
+        if (!newSelectedItems.length && !existingEditableOrder) {
+          throw validationError("Select at least one new item for this contract.");
+        }
+
+        const totalPrice = newSelectedItems.reduce((sum, item) => sum + Number(item.price), 0);
         const order = existingEditableOrder
           ? await tx.order.update({
               where: { id: existingEditableOrder.id },
@@ -267,6 +294,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
                 notes: validatedCustomer.notes || null,
                 paymentMethod: validatedCustomer.paymentMethod,
                 totalPrice,
+                status: OrderStatus.NEW,
               },
             })
           : await tx.order.create({
@@ -297,17 +325,21 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
           });
         }
 
-        await tx.orderItem.createMany({
-          data: allSelected.map((item) => ({
-            orderId: order.id,
-            kitchenItemId: item.id,
-            itemType: item.itemType,
-            code: item.code,
-            nameSnapshot: item.name,
-            priceSnapshot: item.price,
-            quantity: 1,
-          })),
-        });
+        if (newSelectedItems.length) {
+          await tx.orderItem.createMany({
+            data: newSelectedItems.map((item) => ({
+              orderId: order.id,
+              kitchenItemId: item.id,
+              itemType: item.itemType,
+              code: item.code,
+              nameSnapshot: item.name,
+              priceSnapshot: item.price,
+              quantity: 1,
+            })),
+          });
+        }
+
+        savedNewItems = newSelectedItems.filter((item) => newSelectionKeys.has(itemKey(item)));
 
         return tx.order.findUnique({
           where: { id: order.id },
@@ -335,19 +367,13 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     order: orderForNotifications,
     pdfBase64,
     pdfFilename,
-    runEmail: true,
+    runEmail: false,
     runWebhook: true,
   });
 
-  if (notificationResult.emailSent) {
-    await prisma.order.update({
-      where: { id: savedOrder.id },
-      data: { status: OrderStatus.EMAILED },
-    });
-  }
-
   return {
     ...orderForNotifications,
+    newItemCount: savedNewItems.length,
     notifications: notificationResult,
   };
 }
@@ -357,13 +383,6 @@ export async function resendOrderEmail(orderId) {
   const order = buildOrderForNotifications(orderRecord);
 
   await sendOrderConfirmationEmail({ order });
-
-  if (orderRecord.status === OrderStatus.NEW) {
-    await prisma.order.update({
-      where: { id: orderId },
-      data: { status: OrderStatus.EMAILED },
-    });
-  }
 
   return order;
 }
@@ -381,4 +400,24 @@ export async function updateOrderStatus(orderId, status) {
     where: { id: orderId },
     data: { status: nextStatus },
   });
+}
+
+export async function confirmOrder(orderId) {
+  const orderRecord = await getOrderRecordForOperations(orderId);
+  if (orderRecord.status === OrderStatus.CONFIRMED) {
+    return buildOrderForNotifications(orderRecord);
+  }
+  if (orderRecord.status === OrderStatus.CANCELLED) {
+    throw validationError("Cancelled orders cannot be confirmed.");
+  }
+
+  const order = buildOrderForNotifications(orderRecord);
+  await sendOrderConfirmationEmail({ order });
+
+  await prisma.order.update({
+    where: { id: orderId },
+    data: { status: OrderStatus.CONFIRMED },
+  });
+
+  return order;
 }
