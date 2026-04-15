@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
+import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 
@@ -28,7 +28,7 @@ export async function POST(request, { params }) {
     const intent = String(formData.get("_intent") || "").trim();
     const contract = await prisma.kitchenContract.findUnique({
       where: { id },
-      select: { id: true, kitchenId: true, usedAt: true },
+      select: { id: true, kitchenId: true },
     });
 
     if (!contract) {
@@ -36,8 +36,25 @@ export async function POST(request, { params }) {
     }
     kitchenId = contract.kitchenId;
 
-    if (intent === "reactivate" && contract.usedAt) {
-      throw new Error("Used contract numbers cannot be reactivated.");
+    if (intent === "update") {
+      const data = validateKitchenContractInput(formData);
+      await prisma.kitchenContract.update({
+        where: { id },
+        data: {
+          contractNumber: data.contractNumber,
+          country: data.country,
+          city: data.city,
+          postalCode: data.postalCode,
+          address1: data.address1,
+          address2: data.address2,
+          building: data.building,
+          floor: data.floor,
+          unitNumber: data.unitNumber,
+          notes: data.notes,
+        },
+      });
+
+      return redirectWithFlash(request, `/admin/kitchens/${contract.kitchenId}`, "success", "Contract number updated.");
     }
 
     const isActive = intent === "reactivate";

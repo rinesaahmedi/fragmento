@@ -6,6 +6,7 @@ import {
   CONTRACT_ERRORS,
   assertUsableKitchenContract,
   contractValidationError,
+  getEditableOrderForContract,
   normalizeContractNumber,
 } from "./kitchen-contracts";
 import { prisma } from "./prisma";
@@ -99,6 +100,8 @@ function buildOrderForNotifications(orderRecord) {
       address2: orderRecord.address2 || "",
       postalCode: orderRecord.postalCode,
       city: orderRecord.city,
+      country: orderRecord.country || "",
+      notes: orderRecord.notes || "",
       paymentMethod: orderRecord.paymentMethod || "",
     },
     components: orderRecord.items
@@ -193,6 +196,8 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     address2: customer.address2 ? String(customer.address2).trim() : "",
     postalCode: requireString(customer.postalCode, "Postal code"),
     city: requireString(customer.city, "City"),
+    country: customer.country ? String(customer.country).trim() : "",
+    notes: customer.notes ? String(customer.notes).trim() : "",
     paymentMethod: validatePaymentMethod(customer.paymentMethod),
   };
 
@@ -240,44 +245,57 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw contractValidationError(CONTRACT_ERRORS.KITCHEN_MISMATCH);
   }
 
-  let createdOrder = null;
+  let savedOrder = null;
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const orderNumber = buildOrderNumber();
-      createdOrder = await prisma.$transaction(async (tx) => {
-        const contractUpdate = await tx.kitchenContract.updateMany({
-          where: {
-            id: kitchenContract.id,
-            kitchenId: kitchen.id,
-            isActive: true,
-            usedAt: null,
-          },
-          data: { usedAt: new Date() },
-        });
+      savedOrder = await prisma.$transaction(async (tx) => {
+        const existingEditableOrder = await getEditableOrderForContract(kitchenContract.id, tx);
+        const order = existingEditableOrder
+          ? await tx.order.update({
+              where: { id: existingEditableOrder.id },
+              data: {
+                firstName: validatedCustomer.firstName,
+                lastName: validatedCustomer.lastName,
+                email: validatedCustomer.email,
+                phone: validatedCustomer.phone,
+                address1: validatedCustomer.address1,
+                address2: validatedCustomer.address2 || null,
+                postalCode: validatedCustomer.postalCode,
+                city: validatedCustomer.city,
+                country: validatedCustomer.country || null,
+                notes: validatedCustomer.notes || null,
+                paymentMethod: validatedCustomer.paymentMethod,
+                totalPrice,
+              },
+            })
+          : await tx.order.create({
+              data: {
+                orderNumber,
+                kitchenId: kitchen.id,
+                kitchenContractId: kitchenContract.id,
+                status: OrderStatus.NEW,
+                contractNumber: kitchenContract.contractNumber,
+                firstName: validatedCustomer.firstName,
+                lastName: validatedCustomer.lastName,
+                email: validatedCustomer.email,
+                phone: validatedCustomer.phone,
+                address1: validatedCustomer.address1,
+                address2: validatedCustomer.address2 || null,
+                postalCode: validatedCustomer.postalCode,
+                city: validatedCustomer.city,
+                country: validatedCustomer.country || null,
+                notes: validatedCustomer.notes || null,
+                paymentMethod: validatedCustomer.paymentMethod,
+                totalPrice,
+              },
+            });
 
-        if (contractUpdate.count !== 1) {
-          throw contractValidationError(CONTRACT_ERRORS.USED);
+        if (existingEditableOrder) {
+          await tx.orderItem.deleteMany({
+            where: { orderId: order.id },
+          });
         }
-
-        const order = await tx.order.create({
-          data: {
-            orderNumber,
-            kitchenId: kitchen.id,
-            kitchenContractId: kitchenContract.id,
-            status: OrderStatus.NEW,
-            contractNumber: kitchenContract.contractNumber,
-            firstName: validatedCustomer.firstName,
-            lastName: validatedCustomer.lastName,
-            email: validatedCustomer.email,
-            phone: validatedCustomer.phone,
-            address1: validatedCustomer.address1,
-            address2: validatedCustomer.address2 || null,
-            postalCode: validatedCustomer.postalCode,
-            city: validatedCustomer.city,
-            paymentMethod: validatedCustomer.paymentMethod,
-            totalPrice,
-          },
-        });
 
         await tx.orderItem.createMany({
           data: allSelected.map((item) => ({
@@ -308,11 +326,11 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     }
   }
 
-  if (!createdOrder) {
-    throw new Error("Order could not be created");
+  if (!savedOrder) {
+    throw new Error("Order could not be saved");
   }
 
-  const orderForNotifications = buildOrderForNotifications(createdOrder);
+  const orderForNotifications = buildOrderForNotifications(savedOrder);
   const notificationResult = await processOrderNotifications({
     order: orderForNotifications,
     pdfBase64,
@@ -323,7 +341,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
   if (notificationResult.emailSent) {
     await prisma.order.update({
-      where: { id: createdOrder.id },
+      where: { id: savedOrder.id },
       data: { status: OrderStatus.EMAILED },
     });
   }

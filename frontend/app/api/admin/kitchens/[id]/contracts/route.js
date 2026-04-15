@@ -31,6 +31,15 @@ export async function POST(request, { params }) {
         contractNumber: data.contractNumber,
         kitchenId: kitchen.id,
         isActive: true,
+        country: data.country,
+        city: data.city,
+        postalCode: data.postalCode,
+        address1: data.address1,
+        address2: data.address2,
+        building: data.building,
+        floor: data.floor,
+        unitNumber: data.unitNumber,
+        notes: data.notes,
       },
     });
 

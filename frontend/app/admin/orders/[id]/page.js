@@ -107,12 +107,12 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                   <span>{order.contractNumber || "Not provided"}</span>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}>Contract usage</span>
+                  <span style={detailLabelStyle}>Contract access</span>
                   <span>
                     {order.kitchenContract
-                      ? order.kitchenContract.usedAt
-                        ? `Used ${formatDate(order.kitchenContract.usedAt)}`
-                        : "Linked, not marked used"
+                      ? order.kitchenContract.isActive
+                        ? "Linked reusable active contract"
+                        : "Linked reusable inactive contract"
                       : "No linked contract record"}
                   </span>
                 </div>
@@ -144,7 +144,12 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                     {order.address1}
                     {order.address2 ? `, ${order.address2}` : ""}
                     {`, ${order.postalCode} ${order.city}`}
+                    {order.country ? `, ${order.country}` : ""}
                   </span>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}>Notes</span>
+                  <span>{order.notes || "Not provided"}</span>
                 </div>
               </div>
             </article>

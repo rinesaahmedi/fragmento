@@ -1,0 +1,2 @@
+ALTER TABLE "Order" ADD COLUMN "country" TEXT;
+ALTER TABLE "Order" ADD COLUMN "notes" TEXT;

@@ -1,14 +1,15 @@
-import { KitchenStatus } from "@prisma/client";
+import { KitchenStatus, OrderStatus } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export const CONTRACT_ERRORS = {
   REQUIRED: "Contract number is required.",
   NOT_FOUND: "Contract number was not found.",
   INACTIVE: "This contract number is not active.",
-  USED: "This contract number has already been used.",
   KITCHEN_UNAVAILABLE: "The kitchen for this contract number is not available.",
   KITCHEN_MISMATCH: "Contract number does not match the selected kitchen.",
 };
+
+const EDITABLE_ORDER_STATUSES = new Set([OrderStatus.NEW, OrderStatus.EMAILED]);
 
 export function normalizeContractNumber(value) {
   return String(value || "").trim();
@@ -20,15 +21,16 @@ export function contractValidationError(message, status = 400) {
   return error;
 }
 
+export function isEditableOrderStatus(status) {
+  return EDITABLE_ORDER_STATUSES.has(status);
+}
+
 export function assertUsableKitchenContract(contract) {
   if (!contract) {
     throw contractValidationError(CONTRACT_ERRORS.NOT_FOUND, 404);
   }
   if (!contract.isActive) {
     throw contractValidationError(CONTRACT_ERRORS.INACTIVE);
-  }
-  if (contract.usedAt) {
-    throw contractValidationError(CONTRACT_ERRORS.USED);
   }
   if (!contract.kitchen || contract.kitchen.status !== KitchenStatus.ACTIVE) {
     throw contractValidationError(CONTRACT_ERRORS.KITCHEN_UNAVAILABLE);
@@ -48,4 +50,26 @@ export async function getKitchenContractForAccess(contractNumber) {
 
   assertUsableKitchenContract(contract);
   return contract;
+}
+
+export async function getEditableOrderForContract(kitchenContractId, client = prisma, includeItems = false) {
+  if (!kitchenContractId) return null;
+
+  const editableOrders = await client.order.findMany({
+    where: {
+      kitchenContractId,
+      status: { in: [...EDITABLE_ORDER_STATUSES] },
+    },
+    include: includeItems ? { items: { orderBy: { createdAt: "asc" } } } : undefined,
+    orderBy: { createdAt: "desc" },
+    take: 2,
+  });
+
+  if (editableOrders.length > 1) {
+    console.warn(
+      `Multiple editable orders found for kitchenContractId=${kitchenContractId}; using newest order ${editableOrders[0].id}.`,
+    );
+  }
+
+  return editableOrders[0] || null;
 }

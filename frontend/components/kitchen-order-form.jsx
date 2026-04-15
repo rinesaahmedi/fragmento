@@ -16,7 +16,18 @@ const PAYMENT_METHOD_STYLE_BY_VALUE = {
   klarna: "klarna",
 };
 
-const COUNTRY_CITY_OPTIONS = {
+const COUNTRY_LABELS = {
+  Deutschland: "Germany",
+  Oesterreich: "Austria",
+  Schweiz: "Switzerland",
+  Ungarn: "Hungary",
+  Kosovo: "Kosovo",
+  Tschechien: "Czechia",
+  Slowakei: "Slovakia",
+  Polen: "Poland",
+};
+
+export const COUNTRY_CITY_OPTIONS = {
   Deutschland: [
     "Aachen",
     "Augsburg",
@@ -69,7 +80,7 @@ const COUNTRY_CITY_OPTIONS = {
   Polen: ["Gdansk", "Katowice", "Krakow", "Lodz", "Poznan", "Warsaw", "Wroclaw"],
 };
 
-const POSTAL_CODE_OPTIONS = {
+export const POSTAL_CODE_OPTIONS = {
   Aachen: ["52062", "52064", "52066", "52068", "52070", "52072", "52074", "52076", "52078", "52080"],
   Augsburg: ["86150", "86152", "86153", "86154", "86156", "86157", "86159", "86161", "86163", "86165", "86167", "86169", "86179", "86199"],
   Berlin: ["10115", "10117", "10119", "10178", "10179", "10243", "10245", "10247", "10249", "10315", "10317", "10318", "10319", "10405", "10407", "10409", "10435", "10437", "10439", "10551", "10553", "10555", "10557", "10559", "10585", "10587", "10589", "10623", "10625", "10627", "10629", "10707", "10709", "10711", "10713", "10715", "10717", "10719", "10777", "10779", "10781", "10783", "10785", "10787", "10789", "10823", "10825", "10827", "10829", "10961", "10963", "10965", "10967", "10969", "10997", "10999", "12043", "12045", "12047", "12049", "12051", "12053", "12055", "12057", "12059", "12099", "12101", "12103", "12105", "12107", "12109", "12157", "12159", "12161", "12163", "12165", "12167", "12169"],
@@ -162,6 +173,7 @@ const POSTAL_CODE_OPTIONS = {
 export default function KitchenOrderForm({
   orderSectionRef,
   customer,
+  contractAddress,
   isSubmitting,
   status,
   statusTone,
@@ -171,6 +183,13 @@ export default function KitchenOrderForm({
   const countryOptions = Object.keys(COUNTRY_CITY_OPTIONS);
   const cityOptions = COUNTRY_CITY_OPTIONS[customer.country] || [];
   const postalCodeOptions = POSTAL_CODE_OPTIONS[customer.city] || [];
+  const contractAddressLines = [
+    [contractAddress?.address1, contractAddress?.address2].filter(Boolean).join(", "),
+    [contractAddress?.postalCode, contractAddress?.city].filter(Boolean).join(" "),
+    contractAddress?.country || "",
+    contractAddress?.unitLabel || "",
+    contractAddress?.notes ? `Notes: ${contractAddress.notes}` : "",
+  ].filter(Boolean);
 
   return (
     <section ref={orderSectionRef} className={styles.orderSectionWrap}>
@@ -183,6 +202,14 @@ export default function KitchenOrderForm({
             </p>
           </div>
         </div>
+        {contractAddressLines.length ? (
+          <div className={styles.contractAddressBox}>
+            <strong>Adresse zu dieser Vertragsnummer</strong>
+            {contractAddressLines.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+          </div>
+        ) : null}
         <form id="order-form" className={styles.orderForm} onSubmit={onSubmit}>
           <input
             id="contractNumber"
@@ -229,7 +256,7 @@ export default function KitchenOrderForm({
             >
               <option value="">Land auswaehlen</option>
               {countryOptions.map((country) => (
-                <option key={country} value={country}>{country}</option>
+                <option key={country} value={country}>{COUNTRY_LABELS[country] || country}</option>
               ))}
             </select>
           </div>

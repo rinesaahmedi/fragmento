@@ -196,11 +196,14 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
 
     const country = deriveCountry(order);
     const city = String(order.city || "").trim() || "Not captured";
-    const geographyKey = `${country}::${city.toLowerCase()}`;
+    const postalCode = String(order.postalCode || "").trim();
+    const locationLabel = [city, postalCode].filter(Boolean).join(" ");
+    const geographyKey = `${country}::${city.toLowerCase()}::${postalCode.toLowerCase()}`;
     const existingLocation = geographyStats.get(geographyKey) || {
       country,
       city,
-      label: `${city}, ${country}`,
+      postalCode,
+      label: `${locationLabel || city}, ${country}`,
       orders: 0,
       revenue: 0,
     };

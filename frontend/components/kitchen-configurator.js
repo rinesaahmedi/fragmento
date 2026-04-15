@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import KitchenCatalogPanel from "./kitchen-catalog-panel";
 import styles from "./kitchen-configurator.module.css";
@@ -37,33 +37,142 @@ function buildInitialCustomer(contractNumber) {
   };
 }
 
-export default function KitchenConfigurator({ kitchenConfig, svgMarkup, initialContractNumber = "" }) {
+const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
+  Germany: "Deutschland",
+  Austria: "Oesterreich",
+  Switzerland: "Schweiz",
+  Hungary: "Ungarn",
+  Kosovo: "Kosovo",
+  Czechia: "Tschechien",
+  Slovakia: "Slowakei",
+  Poland: "Polen",
+};
+
+function buildCustomerAddressFromContract(contractAddress) {
+  if (!contractAddress) return {};
+
+  const unitNotes = [
+    contractAddress.building ? `Building: ${contractAddress.building}` : "",
+    contractAddress.floor ? `Floor: ${contractAddress.floor}` : "",
+    contractAddress.unitNumber ? `Unit: ${contractAddress.unitNumber}` : "",
+    contractAddress.notes || "",
+  ].filter(Boolean);
+
+  return {
+    country: ORDER_COUNTRY_BY_CONTRACT_COUNTRY[contractAddress.country] || contractAddress.country || "",
+    city: contractAddress.city || "",
+    postalCode: contractAddress.postalCode || "",
+    address1: contractAddress.address1 || "",
+    address2: contractAddress.address2 || "",
+    notes: unitNotes.join("\n"),
+  };
+}
+
+function buildInitialCustomerFromOrder(initialOrder, contractNumber) {
+  return {
+    ...buildInitialCustomer(contractNumber),
+    ...(initialOrder?.customer || {}),
+    contractNumber: initialOrder?.customer?.contractNumber || contractNumber,
+    consent: false,
+  };
+}
+
+function buildInitialCustomerState(initialOrder, contractNumber, contractAddress) {
+  if (initialOrder) {
+    return buildInitialCustomerFromOrder(initialOrder, contractNumber);
+  }
+
+  return {
+    ...buildInitialCustomer(contractNumber),
+    ...buildCustomerAddressFromContract(contractAddress),
+  };
+}
+
+function initialItemCodesByType(initialOrder, itemType) {
+  return new Set(
+    (initialOrder?.items || [])
+      .filter((item) => item.itemType === itemType)
+      .map((item) => item.code)
+      .filter(Boolean),
+  );
+}
+
+function buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder) {
+  const componentCodes = initialItemCodesByType(initialOrder, "component");
+  const existingComponentIds = kitchenConfig.components
+    .filter((item) => componentCodes.has(item.code))
+    .map((item) => componentIdForItem(item));
+
+  return [...new Set([...lockedComponentIds, ...existingComponentIds])];
+}
+
+function buildInitialCodes(kitchenConfig, initialOrder, itemType, configKey) {
+  const itemCodes = initialItemCodesByType(initialOrder, itemType);
+  return kitchenConfig[configKey].filter((item) => itemCodes.has(item.code)).map((item) => item.code);
+}
+
+export default function KitchenConfigurator({
+  kitchenConfig,
+  svgMarkup,
+  initialContractNumber = "",
+  initialOrder = null,
+  initialContractAddress = null,
+}) {
   const orderSectionRef = useRef(null);
   const kitchenSlug = String(kitchenConfig.kitchen.slug || "").trim().toLowerCase();
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenConfig.kitchen.slug];
-  const lockedComponentIds = [
-    ...(kitchenConfig.lockedBaseColors || []),
-    ...kitchenConfig.components
-      .filter((item) => item.isLocked)
-      .map((item) => (item.componentKey ? item.componentKey : normalizeColor(item.colorKey))),
-  ].map((value) => componentIdForKey(value));
+  const lockedComponentIds = useMemo(
+    () =>
+      [
+        ...(kitchenConfig.lockedBaseColors || []),
+        ...kitchenConfig.components
+          .filter((item) => item.isLocked)
+          .map((item) => (item.componentKey ? item.componentKey : normalizeColor(item.colorKey))),
+      ].map((value) => componentIdForKey(value)),
+    [kitchenConfig],
+  );
 
-  const [selectedComponentIds, setSelectedComponentIds] = useState(lockedComponentIds);
-  const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState([]);
-  const [selectedServiceCodes, setSelectedServiceCodes] = useState([]);
+  const [selectedComponentIds, setSelectedComponentIds] = useState(() =>
+    buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder),
+  );
+  const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState(() =>
+    buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"),
+  );
+  const [selectedServiceCodes, setSelectedServiceCodes] = useState(() =>
+    buildInitialCodes(kitchenConfig, initialOrder, "service", "services"),
+  );
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrderSectionOpen, setIsOrderSectionOpen] = useState(false);
-  const [customer, setCustomer] = useState(buildInitialCustomer(initialContractNumber));
+  const [customer, setCustomer] = useState(() =>
+    buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
+  );
 
   useEffect(() => {
+    if (initialOrder) {
+      setCustomer(buildInitialCustomerFromOrder(initialOrder, initialContractNumber));
+      setSelectedComponentIds(buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder));
+      setSelectedAccessoryCodes(buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"));
+      setSelectedServiceCodes(buildInitialCodes(kitchenConfig, initialOrder, "service", "services"));
+      return;
+    }
+
+    if (initialContractAddress) {
+      setCustomer((current) => ({
+        ...current,
+        ...buildCustomerAddressFromContract(initialContractAddress),
+        contractNumber: initialContractNumber,
+      }));
+      return;
+    }
+
     if (!initialContractNumber) return;
     setCustomer((current) => {
       if (current.contractNumber === initialContractNumber) return current;
       return { ...current, contractNumber: initialContractNumber };
     });
-  }, [initialContractNumber]);
+  }, [initialContractNumber, initialOrder, initialContractAddress, kitchenConfig, lockedComponentIds]);
 
   const selectedComponents = kitchenConfig.components.filter((item) =>
     selectedComponentIds.includes(componentIdForItem(item)),
@@ -349,6 +458,7 @@ export default function KitchenConfigurator({ kitchenConfig, svgMarkup, initialC
           <KitchenOrderForm
             orderSectionRef={orderSectionRef}
             customer={customer}
+            contractAddress={initialContractAddress}
             isSubmitting={isSubmitting}
             status={status}
             statusTone={statusTone}

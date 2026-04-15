@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
+import { getEditableOrderForContract, getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 
 export async function POST(request) {
@@ -12,11 +12,14 @@ export async function POST(request) {
 
     const body = await request.json();
     const contract = await getKitchenContractForAccess(body?.contractNumber);
+    const existingOrder = await getEditableOrderForContract(contract.id);
 
     return NextResponse.json({
       ok: true,
       kitchenSlug: contract.kitchen.slug,
       contractNumber: contract.contractNumber,
+      hasExistingOrder: Boolean(existingOrder),
+      existingOrderId: existingOrder?.id || null,
     });
   } catch (error) {
     return NextResponse.json(

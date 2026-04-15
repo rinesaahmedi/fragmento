@@ -999,6 +999,7 @@ function CountryTooltip({ active, payload }) {
     <div className="tooltip">
       <strong>{row.label}</strong>
       <span>City: {row.city}</span>
+      <span>Postal code: {row.postalCode || "Not captured"}</span>
       <span>Country: {row.country}</span>
       <span>Orders: {row.orders}</span>
       <span>Revenue: {formatCurrency(row.revenue)}</span>

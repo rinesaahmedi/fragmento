@@ -1,0 +1,9 @@
+ALTER TABLE "KitchenContract" ADD COLUMN "country" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "city" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "postalCode" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "address1" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "address2" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "building" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "floor" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "unitNumber" TEXT;
+ALTER TABLE "KitchenContract" ADD COLUMN "notes" TEXT;

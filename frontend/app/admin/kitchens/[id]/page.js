@@ -26,6 +26,7 @@ import {
   thStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
+import AdminContractAddressFields from "../../../../components/admin-contract-address-fields";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -100,6 +101,23 @@ function formatDate(value) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value));
+}
+
+function contractAddressLines(contract) {
+  const streetLine = [contract.address1, contract.address2].filter(Boolean).join(", ");
+  const cityLine = [contract.postalCode, contract.city].filter(Boolean).join(" ");
+  const unitLine = [
+    contract.building ? `Building ${contract.building}` : "",
+    contract.floor ? `Floor ${contract.floor}` : "",
+    contract.unitNumber ? `Unit ${contract.unitNumber}` : "",
+  ].filter(Boolean).join(" · ");
+
+  return [streetLine, cityLine, contract.country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
+}
+
+function contractAddressSummary(contract) {
+  const lines = contractAddressLines(contract);
+  return lines.length ? lines.join(" | ") : "No address context";
 }
 
 function enhanceSvgMarkup(markup) {
@@ -279,13 +297,14 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
         <AdminSection
           title="Contract numbers"
-          description="Manage one-time-use contract numbers that unlock this kitchen for public customers."
+          description="Manage reusable contract numbers that unlock this kitchen for public customers."
         >
           <form action={`/api/admin/kitchens/${kitchen.id}/contracts`} method="post" style={formGridStyle}>
             <FormField label="Contract number">
               <input name="contractNumber" placeholder="ABC-123" style={inputStyle} required />
             </FormField>
-            <div style={{ alignSelf: "end" }}>
+            <AdminContractAddressFields />
+            <div style={{ gridColumn: "1 / -1", alignSelf: "end" }}>
               <button type="submit" style={primaryButtonStyle}>Create contract</button>
             </div>
           </form>
@@ -296,8 +315,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 <tr>
                   <th style={thStyle}>Contract number</th>
                   <th style={thStyle}>Active state</th>
-                  <th style={thStyle}>Usage</th>
-                  <th style={thStyle}>Used at</th>
+                  <th style={thStyle}>Address context</th>
                   <th style={thStyle}>Created</th>
                   <th style={thStyle}>Action</th>
                 </tr>
@@ -305,83 +323,92 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <tbody>
                 {!kitchen.contracts.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={6}>No contract numbers configured.</td>
+                    <td style={tdStyle} colSpan={5}>No contract numbers configured.</td>
                   </tr>
                 ) : null}
-                {kitchen.contracts.map((contract) => {
-                  const isUsed = Boolean(contract.usedAt);
-                  const canReactivate = !contract.isActive && !isUsed;
-                  return (
-                    <tr key={contract.id}>
-                      <td style={tdStyle}><strong>{contract.contractNumber}</strong></td>
-                      <td style={tdStyle}>
-                        <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
-                      </td>
-                      <td style={tdStyle}>
-                        <StatusBadge status={isUsed ? "USED" : "UNUSED"} />
-                      </td>
-                      <td style={tdStyle}>{formatDate(contract.usedAt)}</td>
-                      <td style={tdStyle}>{formatDate(contract.createdAt)}</td>
-                      <td style={tdStyle}>
+                {kitchen.contracts.map((contract) => (
+                  <tr key={contract.id}>
+                    <td style={tdStyle}><strong>{contract.contractNumber}</strong></td>
+                    <td style={tdStyle}>
+                      <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
+                    </td>
+                    <td style={tdStyle}>{contractAddressSummary(contract)}</td>
+                    <td style={tdStyle}>{formatDate(contract.createdAt)}</td>
+                    <td style={tdStyle}>
+                      <div style={contractActionStackStyle}>
                         {contract.isActive ? (
                           <form action={`/api/admin/contracts/${contract.id}`} method="post">
                             <button type="submit" name="_intent" value="deactivate" style={secondaryButtonStyle}>
                               Deactivate
                             </button>
                           </form>
-                        ) : canReactivate ? (
+                        ) : (
                           <form action={`/api/admin/contracts/${contract.id}`} method="post">
                             <button type="submit" name="_intent" value="reactivate" style={secondaryButtonStyle}>
                               Reactivate
                             </button>
                           </form>
-                        ) : (
-                          <span style={mutedTextStyle}>Used contracts cannot be reactivated</span>
                         )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                        <details style={contractEditDetailsStyle}>
+                          <summary style={contractEditSummaryStyle}>Edit details</summary>
+                          <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
+                            <input type="hidden" name="_intent" value="update" />
+                            <FormField label="Contract number">
+                              <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
+                            </FormField>
+                            <AdminContractAddressFields contract={contract} compact />
+                            <button type="submit" style={primaryButtonStyle}>Save contract</button>
+                          </form>
+                        </details>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
           <div className="admin-list-cards" style={{ gap: cardListStyle.gap, marginTop: 18 }}>
             {!kitchen.contracts.length ? <p style={mutedTextStyle}>No contract numbers configured.</p> : null}
-            {kitchen.contracts.map((contract) => {
-              const isUsed = Boolean(contract.usedAt);
-              const canReactivate = !contract.isActive && !isUsed;
-              return (
-                <article key={contract.id} style={itemCardStyle}>
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
-                    <div style={{ display: "grid", gap: 6 }}>
-                      <strong>{contract.contractNumber}</strong>
-                      <div style={subMetaStyle}>
-                        <span>{isUsed ? "Used" : "Unused"}</span>
-                        <span>Used at: {formatDate(contract.usedAt)}</span>
-                        <span>Created: {formatDate(contract.createdAt)}</span>
-                      </div>
+            {kitchen.contracts.map((contract) => (
+              <article key={contract.id} style={itemCardStyle}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    <strong>{contract.contractNumber}</strong>
+                    <div style={subMetaStyle}>
+                      <span>Reusable access key</span>
+                      <span>{contractAddressSummary(contract)}</span>
+                      <span>Created: {formatDate(contract.createdAt)}</span>
                     </div>
-                    <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
                   </div>
-                  {contract.isActive ? (
-                    <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                      <button type="submit" name="_intent" value="deactivate" style={secondaryButtonStyle}>
-                        Deactivate
-                      </button>
-                    </form>
-                  ) : canReactivate ? (
-                    <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                      <button type="submit" name="_intent" value="reactivate" style={secondaryButtonStyle}>
-                        Reactivate
-                      </button>
-                    </form>
-                  ) : (
-                    <span style={mutedTextStyle}>Used contracts cannot be reactivated</span>
-                  )}
-                </article>
-              );
-            })}
+                  <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
+                </div>
+                {contract.isActive ? (
+                  <form action={`/api/admin/contracts/${contract.id}`} method="post">
+                    <button type="submit" name="_intent" value="deactivate" style={secondaryButtonStyle}>
+                      Deactivate
+                    </button>
+                  </form>
+                ) : (
+                  <form action={`/api/admin/contracts/${contract.id}`} method="post">
+                    <button type="submit" name="_intent" value="reactivate" style={secondaryButtonStyle}>
+                      Reactivate
+                    </button>
+                  </form>
+                )}
+                <details style={contractEditDetailsStyle}>
+                  <summary style={contractEditSummaryStyle}>Edit contract details</summary>
+                  <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
+                    <input type="hidden" name="_intent" value="update" />
+                    <FormField label="Contract number">
+                      <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
+                    </FormField>
+                    <AdminContractAddressFields contract={contract} compact />
+                    <button type="submit" style={primaryButtonStyle}>Save contract</button>
+                  </form>
+                </details>
+              </article>
+            ))}
           </div>
 
           <style>{`
@@ -626,6 +653,30 @@ const catalogPanelStyle = {
   ...itemCardStyle,
   gap: 14,
   alignContent: "start",
+};
+
+const contractActionStackStyle = {
+  display: "grid",
+  gap: 8,
+  minWidth: 220,
+};
+
+const contractEditDetailsStyle = {
+  display: "grid",
+  gap: 8,
+};
+
+const contractEditSummaryStyle = {
+  color: "var(--app-accent)",
+  cursor: "pointer",
+  fontSize: 13,
+  fontWeight: 800,
+};
+
+const contractEditFormStyle = {
+  display: "grid",
+  gap: 8,
+  paddingTop: 8,
 };
 
 const catalogDownloadLinkStyle = {

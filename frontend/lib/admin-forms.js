@@ -80,6 +80,15 @@ export function validateKitchenItemInput(formData) {
 export function validateKitchenContractInput(formData) {
   return {
     contractNumber: requiredString(formData.get("contractNumber"), "Contract number"),
+    country: optionalString(formData.get("country")),
+    city: optionalString(formData.get("city")),
+    postalCode: optionalString(formData.get("postalCode")),
+    address1: optionalString(formData.get("address1")),
+    address2: optionalString(formData.get("address2")),
+    building: optionalString(formData.get("building")),
+    floor: optionalString(formData.get("floor")),
+    unitNumber: optionalString(formData.get("unitNumber")),
+    notes: optionalString(formData.get("notes")),
   };
 }
 

@@ -86,6 +86,8 @@ model Order {
   address2          String?
   postalCode        String
   city              String
+  country           String?
+  notes             String?
   paymentMethod     String?
   totalPrice        Decimal          @db.Decimal(10, 2)
   createdAt         DateTime         @default(now())
@@ -102,6 +104,15 @@ model KitchenContract {
   kitchen        Kitchen   @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
   isActive       Boolean   @default(true)
   usedAt         DateTime?
+  country        String?
+  city           String?
+  postalCode     String?
+  address1       String?
+  address2       String?
+  building       String?
+  floor          String?
+  unitNumber     String?
+  notes          String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   orders         Order[]
