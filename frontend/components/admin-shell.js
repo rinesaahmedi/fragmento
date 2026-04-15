@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: GridIcon },
   { href: "/admin/kitchens", label: "Kitchens", icon: KitchenIcon },
+  { href: "/admin/contracts", label: "Contracts", icon: ContractsIcon },
+  { href: "/admin/property-owners", label: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", label: "Orders", icon: OrdersIcon },
   { href: "/", label: "Public site", icon: GlobeIcon },
 ];
@@ -363,6 +365,31 @@ function OrdersIcon({ active }) {
         <rect x="3" y="2.5" width="10" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
         <path d="M5.5 6H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         <path d="M5.5 9H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function ContractsIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="3" y="2.5" width="10" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M5.5 5.5H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 8H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 10.5H8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function OwnersIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2.5 13C2.9 10.8 4.1 9.5 6 9.5C7.9 9.5 9.1 10.8 9.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M10.5 6.5C11.8807 6.5 13 7.61929 13 9V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     </IconFrame>
   );

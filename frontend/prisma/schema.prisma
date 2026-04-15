@@ -48,24 +48,24 @@ model Kitchen {
 }
 
 model KitchenItem {
-  id           String      @id @default(cuid())
-  kitchenId    String
-  kitchen      Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  itemType     ItemType
-  code         String
+  id            String      @id @default(cuid())
+  kitchenId     String
+  kitchen       Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  itemType      ItemType
+  code          String
   articleNumber String?
-  name         String
-  price        Decimal     @db.Decimal(10, 2)
-  infoText     String?
-  iconKey      String?
-  colorKey     String?
-  componentKey String?
-  isLocked     Boolean     @default(false)
-  isActive     Boolean     @default(true)
-  sortOrder    Int         @default(0)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  orderItems   OrderItem[]
+  name          String
+  price         Decimal     @db.Decimal(10, 2)
+  infoText      String?
+  iconKey       String?
+  colorKey      String?
+  componentKey  String?
+  isLocked      Boolean     @default(false)
+  isActive      Boolean     @default(true)
+  sortOrder     Int         @default(0)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  orderItems    OrderItem[]
 
   @@unique([kitchenId, code])
 }
@@ -99,11 +99,13 @@ model Order {
 }
 
 model KitchenContract {
-  id             String    @id @default(cuid())
-  contractNumber String    @unique
+  id             String         @id @default(cuid())
+  contractNumber String         @unique
   kitchenId      String
-  kitchen        Kitchen   @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  isActive       Boolean   @default(true)
+  kitchen        Kitchen        @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  ownerId        String?
+  owner          PropertyOwner? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
+  isActive       Boolean        @default(true)
   usedAt         DateTime?
   country        String?
   city           String?
@@ -114,11 +116,24 @@ model KitchenContract {
   floor          String?
   unitNumber     String?
   notes          String?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
   orders         Order[]
 
   @@index([kitchenId])
+  @@index([ownerId])
+}
+
+model PropertyOwner {
+  id        String            @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  notes     String?
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+  contracts KitchenContract[]
 }
 
 model OrderItem {

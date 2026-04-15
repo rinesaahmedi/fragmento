@@ -1,4 +1,4 @@
-import { KitchenStatus, ItemType, OrderStatus } from "@prisma/client";
+import { KitchenStatus, ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
@@ -89,7 +89,7 @@ export async function listKitchensForAdmin() {
 }
 
 export async function getKitchenById(id) {
-  return prisma.kitchen.findUnique({
+  const kitchen = await prisma.kitchen.findUnique({
     where: { id },
     include: {
       _count: { select: { items: true, orders: true, contracts: true } },
@@ -101,6 +101,193 @@ export async function getKitchenById(id) {
       },
     },
   });
+
+  if (!kitchen) return null;
+  return {
+    ...kitchen,
+    contracts: await attachOwnersToContracts(kitchen.contracts),
+  };
+}
+
+export async function listPropertyOwnersForAdmin() {
+  const owners = await prisma.$queryRaw`
+    SELECT
+      po."id",
+      po."firstName",
+      po."lastName",
+      po."email",
+      po."phone",
+      po."notes",
+      po."createdAt",
+      po."updatedAt",
+      COUNT(kc."id")::int AS "contractCount"
+    FROM "PropertyOwner" po
+    LEFT JOIN "KitchenContract" kc ON kc."ownerId" = po."id"
+    GROUP BY po."id"
+    ORDER BY po."lastName" ASC, po."firstName" ASC
+  `;
+
+  return owners.map((owner) => ({
+    id: owner.id,
+    firstName: owner.firstName,
+    lastName: owner.lastName,
+    email: owner.email,
+    phone: owner.phone,
+    notes: owner.notes,
+    createdAt: owner.createdAt,
+    updatedAt: owner.updatedAt,
+    _count: { contracts: Number(owner.contractCount || 0) },
+  }));
+}
+
+export async function listKitchenContractsForAdmin(filters = {}) {
+  const whereParts = [];
+  const havingParts = [];
+  if (filters.kitchenId) whereParts.push(Prisma.sql`kc."kitchenId" = ${filters.kitchenId}`);
+  if (filters.ownerId) whereParts.push(Prisma.sql`kc."ownerId" = ${filters.ownerId}`);
+  if (filters.status === "active") whereParts.push(Prisma.sql`kc."isActive" = true`);
+  if (filters.status === "inactive") whereParts.push(Prisma.sql`kc."isActive" = false`);
+  if (filters.usage === "unused") havingParts.push(Prisma.sql`COUNT(o."id") = 0`);
+  if (filters.usage === "used") havingParts.push(Prisma.sql`COUNT(o."id") >= 1`);
+  if (filters.usage === "once") havingParts.push(Prisma.sql`COUNT(o."id") = 1`);
+  if (filters.usage === "multiple") havingParts.push(Prisma.sql`COUNT(o."id") >= 2`);
+  if (filters.query) {
+    const query = `%${filters.query}%`;
+    whereParts.push(Prisma.sql`(
+      kc."contractNumber" ILIKE ${query}
+      OR kc."city" ILIKE ${query}
+      OR kc."postalCode" ILIKE ${query}
+      OR kc."address1" ILIKE ${query}
+      OR po."firstName" ILIKE ${query}
+      OR po."lastName" ILIKE ${query}
+      OR k."name" ILIKE ${query}
+    )`);
+  }
+
+  const whereSql = whereParts.length ? Prisma.sql`WHERE ${Prisma.join(whereParts, " AND ")}` : Prisma.empty;
+  const havingSql = havingParts.length ? Prisma.sql`HAVING ${Prisma.join(havingParts, " AND ")}` : Prisma.empty;
+  const rows = await prisma.$queryRaw`
+    SELECT
+      kc."id",
+      kc."contractNumber",
+      kc."kitchenId",
+      kc."ownerId",
+      kc."isActive",
+      kc."usedAt",
+      kc."country",
+      kc."city",
+      kc."postalCode",
+      kc."address1",
+      kc."address2",
+      kc."building",
+      kc."floor",
+      kc."unitNumber",
+      kc."notes",
+      kc."createdAt",
+      kc."updatedAt",
+      k."id" AS "kitchenRecordId",
+      k."slug" AS "kitchenSlug",
+      k."name" AS "kitchenName",
+      po."id" AS "ownerRecordId",
+      po."firstName",
+      po."lastName",
+      po."email",
+      po."phone",
+      po."notes" AS "ownerNotes",
+      COUNT(o."id")::int AS "orderCount"
+    FROM "KitchenContract" kc
+    JOIN "Kitchen" k ON k."id" = kc."kitchenId"
+    LEFT JOIN "PropertyOwner" po ON po."id" = kc."ownerId"
+    LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
+    ${whereSql}
+    GROUP BY kc."id", k."id", po."id"
+    ${havingSql}
+    ORDER BY kc."createdAt" DESC, kc."contractNumber" ASC
+  `;
+
+  return rows.map((row) => ({
+    id: row.id,
+    contractNumber: row.contractNumber,
+    kitchenId: row.kitchenId,
+    ownerId: row.ownerId,
+    isActive: row.isActive,
+    usedAt: row.usedAt,
+    country: row.country,
+    city: row.city,
+    postalCode: row.postalCode,
+    address1: row.address1,
+    address2: row.address2,
+    building: row.building,
+    floor: row.floor,
+    unitNumber: row.unitNumber,
+    notes: row.notes,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
+    kitchen: {
+      id: row.kitchenRecordId,
+      slug: row.kitchenSlug,
+      name: row.kitchenName,
+    },
+    owner: row.ownerRecordId
+      ? {
+          id: row.ownerRecordId,
+          firstName: row.firstName,
+          lastName: row.lastName,
+          email: row.email,
+          phone: row.phone,
+          notes: row.ownerNotes,
+        }
+      : null,
+    _count: { orders: Number(row.orderCount || 0) },
+  }));
+}
+
+async function attachOwnersToContracts(contracts) {
+  const contractIds = contracts.map((contract) => contract.id).filter(Boolean);
+  if (!contractIds.length) return contracts;
+
+  const rows = await prisma.$queryRaw`
+    SELECT
+      kc."id" AS "contractId",
+      kc."ownerId",
+      po."id" AS "ownerRecordId",
+      po."firstName",
+      po."lastName",
+      po."email",
+      po."phone",
+      po."notes",
+      po."createdAt",
+      po."updatedAt"
+    FROM "KitchenContract" kc
+    LEFT JOIN "PropertyOwner" po ON po."id" = kc."ownerId"
+    WHERE kc."id" IN (${Prisma.join(contractIds)})
+  `;
+  const ownerByContractId = new Map(
+    rows.map((row) => [
+      row.contractId,
+      {
+        ownerId: row.ownerId || null,
+        owner: row.ownerRecordId
+          ? {
+              id: row.ownerRecordId,
+              firstName: row.firstName,
+              lastName: row.lastName,
+              email: row.email,
+              phone: row.phone,
+              notes: row.notes,
+              createdAt: row.createdAt,
+              updatedAt: row.updatedAt,
+            }
+          : null,
+      },
+    ]),
+  );
+
+  return contracts.map((contract) => ({
+    ...contract,
+    ownerId: ownerByContractId.get(contract.id)?.ownerId || null,
+    owner: ownerByContractId.get(contract.id)?.owner || null,
+  }));
 }
 
 export function serializeKitchenForLegacy(kitchen) {
@@ -160,7 +347,7 @@ export async function getOrdersForAdmin(filters = {}) {
     orderBy: { createdAt: "desc" },
   });
 
-  return addContractOrderSequence(orders);
+  return addContractOrderSequence(await attachOwnersToOrderContracts(orders));
 }
 
 export async function getOrderById(id) {
@@ -174,8 +361,19 @@ export async function getOrderById(id) {
   });
 
   if (!order) return null;
-  const [sequencedOrder] = await addContractOrderSequence([order]);
+  const [sequencedOrder] = await addContractOrderSequence(await attachOwnersToOrderContracts([order]));
   return sequencedOrder;
+}
+
+async function attachOwnersToOrderContracts(orders) {
+  const contracts = orders.map((order) => order.kitchenContract).filter(Boolean);
+  const hydratedContracts = await attachOwnersToContracts(contracts);
+  const contractById = new Map(hydratedContracts.map((contract) => [contract.id, contract]));
+
+  return orders.map((order) => ({
+    ...order,
+    kitchenContract: order.kitchenContractId ? contractById.get(order.kitchenContractId) || order.kitchenContract : order.kitchenContract,
+  }));
 }
 
 async function addContractOrderSequence(orders) {

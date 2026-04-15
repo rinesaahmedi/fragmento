@@ -67,6 +67,8 @@ export function AdminDashboardCharts({
   paymentData,
   geographyData,
   recentOrders,
+  propertyOwnerStats,
+  propertyOwners,
 }) {
   const [statusMode, setStatusMode] = useState("volume");
   const [isolatedSeries, setIsolatedSeries] = useState("");
@@ -217,6 +219,8 @@ export function AdminDashboardCharts({
         topItemsByRevenue={topItemsByRevenue}
       />
 
+      <PropertyOwnerStatsSection data={propertyOwnerStats || []} />
+
       <section className="chart-card">
         <ChartHeader eyebrow="Operations" title="Recent orders" detail="Latest matching orders for follow-up." />
         <div className="table-wrap">
@@ -244,6 +248,43 @@ export function AdminDashboardCharts({
               )) : (
                 <tr>
                   <td colSpan={6}>No recent orders match the current filters.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="chart-card">
+        <ChartHeader
+          eyebrow="Owners"
+          title="Property owners"
+          detail="Owner records available for contract-number assignment."
+          actions={<a className="panel-link" href="/admin/property-owners">Manage owners</a>}
+        />
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Owner</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Contracts</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              {propertyOwners?.length ? propertyOwners.map((owner) => (
+                <tr key={owner.id}>
+                  <td><a href="/admin/property-owners">{owner.name}</a></td>
+                  <td>{owner.email || "Not captured"}</td>
+                  <td>{owner.phone || "Not captured"}</td>
+                  <td>{owner.contractCount}</td>
+                  <td>{owner.notes || "-"}</td>
+                </tr>
+              )) : (
+                <tr>
+                  <td colSpan={5}>No property owners configured.</td>
                 </tr>
               )}
             </tbody>
@@ -465,6 +506,19 @@ export function AdminDashboardCharts({
           font-weight: 800;
         }
 
+        .panel-link {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          border-radius: 8px;
+          border: 1px solid #2563eb;
+          background: #2563eb;
+          color: #ffffff;
+          padding: 9px 12px;
+          font-weight: 800;
+          text-decoration: none;
+        }
+
         @media (max-width: 1100px) {
           .kpi-grid,
           .dashboard-grid {
@@ -562,6 +616,180 @@ function StatusTooltip({ active, payload, label, mode }) {
         }
       `}</style>
     </div>
+  );
+}
+
+function PropertyOwnerStatsSection({ data }) {
+  const activeOwners = data.filter((owner) => owner.contractCount || owner.orderCount);
+
+  return (
+    <section className="chart-card">
+      <ChartHeader
+        eyebrow="Owner performance"
+        title="Property owner kitchen activity"
+        detail="Contract, kitchen, item, and order value statistics for the current dashboard filters."
+        actions={<a className="panel-link" href="/admin/property-owners">Manage owners</a>}
+      />
+      <div className="owner-stats-grid">
+        {activeOwners.length ? activeOwners.map((owner) => (
+          <article key={owner.id} className="owner-stat-card">
+            <div className="owner-stat-header">
+              <div>
+                <strong>{owner.name}</strong>
+                <span>{owner.kitchens || "No kitchen orders yet"}</span>
+              </div>
+              <b>{formatCurrency(owner.totalRevenue)}</b>
+            </div>
+            <div className="owner-metrics">
+              <div>
+                <span>Contracts</span>
+                <strong>{owner.contractCount}</strong>
+              </div>
+              <div>
+                <span>Orders</span>
+                <strong>{owner.orderCount}</strong>
+              </div>
+              <div>
+                <span>Kitchens</span>
+                <strong>{owner.kitchenCount}</strong>
+              </div>
+              <div>
+                <span>Avg. order</span>
+                <strong>{formatCurrency(owner.averageOrderValue)}</strong>
+              </div>
+            </div>
+            <div className="top-owner-item">
+              <span>Top item</span>
+              {owner.topItem ? (
+                <strong>
+                  {owner.topItem.name}
+                  {owner.topItem.code ? ` (${owner.topItem.code})` : ""}
+                  {" | "}
+                  {owner.topItem.quantity} item(s), {formatCurrency(owner.topItem.revenue)}
+                </strong>
+              ) : (
+                <strong>No ordered items yet</strong>
+              )}
+            </div>
+          </article>
+        )) : (
+          <div className="empty-owner-stats">No owner contract or order data matches the current filters.</div>
+        )}
+      </div>
+      <style jsx>{`
+        .chart-card {
+          border: 1px solid #e5e7eb;
+          border-radius: 16px;
+          background: #ffffff;
+          box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+          display: grid;
+          gap: 12px;
+          padding: 18px;
+          min-width: 0;
+        }
+
+        .owner-stats-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          gap: 12px;
+        }
+
+        .owner-stat-card {
+          display: grid;
+          gap: 14px;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 14px;
+          background: #f9fafb;
+        }
+
+        .owner-stat-header {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+        }
+
+        .owner-stat-header div,
+        .top-owner-item {
+          display: grid;
+          gap: 4px;
+          min-width: 0;
+        }
+
+        .owner-stat-header strong {
+          color: #111827;
+          font-size: 1rem;
+        }
+
+        .owner-stat-header span,
+        .owner-metrics span,
+        .top-owner-item span {
+          color: #6b7280;
+          font-size: 12px;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+        }
+
+        .owner-stat-header b {
+          color: #16a34a;
+          white-space: nowrap;
+        }
+
+        .owner-metrics {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 8px;
+        }
+
+        .owner-metrics div {
+          display: grid;
+          gap: 4px;
+          border-radius: 8px;
+          background: #ffffff;
+          padding: 10px;
+          border: 1px solid #e5e7eb;
+        }
+
+        .owner-metrics strong,
+        .top-owner-item strong {
+          color: #111827;
+          line-height: 1.35;
+        }
+
+        .empty-owner-stats {
+          min-height: 120px;
+          display: grid;
+          place-items: center;
+          border: 1px dashed #d1d5db;
+          border-radius: 12px;
+          color: #6b7280;
+          background: #f9fafb;
+          text-align: center;
+          padding: 20px;
+        }
+
+        .panel-link {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          border-radius: 8px;
+          border: 1px solid #2563eb;
+          background: #2563eb;
+          color: #ffffff;
+          padding: 9px 12px;
+          font-weight: 800;
+          text-decoration: none;
+        }
+
+        @media (max-width: 760px) {
+          .owner-metrics {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+      `}</style>
+    </section>
   );
 }
 

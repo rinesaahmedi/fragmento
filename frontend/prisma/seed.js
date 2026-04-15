@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const { randomUUID } = require("crypto");
 const { PrismaClient, KitchenStatus, ItemType } = require("@prisma/client");
 
 const prisma = new PrismaClient();
@@ -91,6 +92,14 @@ const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "736269", kitchenSlug: "kitchen-model-c" },
 ];
 
+const DEFAULT_PROPERTY_OWNERS = [
+  { firstName: "Anna", lastName: "Schmidt", email: "anna.schmidt@example.com", phone: "+49 30 555 0101" },
+  { firstName: "Lukas", lastName: "Weber", email: "lukas.weber@example.com", phone: "+49 30 555 0102" },
+  { firstName: "Sophie", lastName: "Muller", email: "sophie.muller@example.com", phone: "+49 30 555 0103" },
+  { firstName: "Daniel", lastName: "Fischer", email: "daniel.fischer@example.com", phone: "+49 30 555 0104" },
+  { firstName: "Laura", lastName: "Becker", email: "laura.becker@example.com", phone: "+49 30 555 0105" },
+];
+
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -102,6 +111,38 @@ async function main() {
       update: { passwordHash },
       create: { email: adminEmail, passwordHash },
     });
+  }
+
+  const seededOwners = [];
+  for (const owner of DEFAULT_PROPERTY_OWNERS) {
+    const [existingOwner] = await prisma.$queryRaw`
+      SELECT "id"
+      FROM "PropertyOwner"
+      WHERE "email" = ${owner.email}
+      LIMIT 1
+    `;
+
+    const ownerId = existingOwner?.id || randomUUID();
+    if (existingOwner) {
+      await prisma.$executeRaw`
+        UPDATE "PropertyOwner"
+        SET
+          "firstName" = ${owner.firstName},
+          "lastName" = ${owner.lastName},
+          "email" = ${owner.email},
+          "phone" = ${owner.phone},
+          "notes" = ${owner.notes || null},
+          "updatedAt" = CURRENT_TIMESTAMP
+        WHERE "id" = ${ownerId}
+      `;
+    } else {
+      await prisma.$executeRaw`
+        INSERT INTO "PropertyOwner" ("id", "firstName", "lastName", "email", "phone", "notes", "createdAt", "updatedAt")
+        VALUES (${ownerId}, ${owner.firstName}, ${owner.lastName}, ${owner.email}, ${owner.phone}, ${owner.notes || null}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `;
+    }
+
+    seededOwners.push({ id: ownerId });
   }
 
   for (const kitchen of DEFAULT_KITCHENS) {
@@ -173,7 +214,7 @@ async function main() {
     });
   }
 
-  for (const contract of DEFAULT_KITCHEN_CONTRACTS) {
+  for (const [index, contract] of DEFAULT_KITCHEN_CONTRACTS.entries()) {
     const kitchen = await prisma.kitchen.findUnique({
       where: { slug: contract.kitchenSlug },
       select: { id: true },
@@ -183,7 +224,7 @@ async function main() {
       throw new Error(`Kitchen not found for contract seed: ${contract.kitchenSlug}`);
     }
 
-    await prisma.kitchenContract.upsert({
+    const contractRecord = await prisma.kitchenContract.upsert({
       where: { contractNumber: contract.contractNumber },
       update: {
         kitchenId: kitchen.id,
@@ -195,6 +236,11 @@ async function main() {
         isActive: true,
       },
     });
+    await prisma.$executeRaw`
+      UPDATE "KitchenContract"
+      SET "ownerId" = ${seededOwners[index % seededOwners.length]?.id || null}
+      WHERE "id" = ${contractRecord.id}
+    `;
   }
 }
 

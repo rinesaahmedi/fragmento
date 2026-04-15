@@ -81,6 +81,7 @@ export function validateKitchenItemInput(formData) {
 export function validateKitchenContractInput(formData) {
   return {
     contractNumber: requiredString(formData.get("contractNumber"), "Contract number"),
+    ownerId: optionalString(formData.get("ownerId")),
     country: optionalString(formData.get("country")),
     city: optionalString(formData.get("city")),
     postalCode: optionalString(formData.get("postalCode")),
@@ -89,6 +90,16 @@ export function validateKitchenContractInput(formData) {
     building: optionalString(formData.get("building")),
     floor: optionalString(formData.get("floor")),
     unitNumber: optionalString(formData.get("unitNumber")),
+    notes: optionalString(formData.get("notes")),
+  };
+}
+
+export function validatePropertyOwnerInput(formData) {
+  return {
+    firstName: requiredString(formData.get("firstName"), "First name"),
+    lastName: requiredString(formData.get("lastName"), "Last name"),
+    email: optionalString(formData.get("email")),
+    phone: optionalString(formData.get("phone")),
     notes: optionalString(formData.get("notes")),
   };
 }

@@ -3,6 +3,11 @@ import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput 
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 
+function getReturnPath(formData, fallback) {
+  const rawPath = String(formData.get("returnTo") || "").trim();
+  return rawPath.startsWith("/admin/") ? rawPath : fallback;
+}
+
 export async function GET(_request, { params }) {
   await requireAdminApi();
   const { id } = await params;
@@ -15,7 +20,39 @@ export async function GET(_request, { params }) {
     return NextResponse.json({ error: "Contract number not found" }, { status: 404 });
   }
 
-  return NextResponse.json(contract);
+  const [ownerRow] = await prisma.$queryRaw`
+    SELECT
+      kc."ownerId",
+      po."id",
+      po."firstName",
+      po."lastName",
+      po."email",
+      po."phone",
+      po."notes",
+      po."createdAt",
+      po."updatedAt"
+    FROM "KitchenContract" kc
+    LEFT JOIN "PropertyOwner" po ON po."id" = kc."ownerId"
+    WHERE kc."id" = ${id}
+    LIMIT 1
+  `;
+
+  return NextResponse.json({
+    ...contract,
+    ownerId: ownerRow?.ownerId || null,
+    owner: ownerRow?.id
+      ? {
+          id: ownerRow.id,
+          firstName: ownerRow.firstName,
+          lastName: ownerRow.lastName,
+          email: ownerRow.email,
+          phone: ownerRow.phone,
+          notes: ownerRow.notes,
+          createdAt: ownerRow.createdAt,
+          updatedAt: ownerRow.updatedAt,
+        }
+      : null,
+  });
 }
 
 export async function POST(request, { params }) {
@@ -35,6 +72,7 @@ export async function POST(request, { params }) {
       throw new Error("Contract number not found.");
     }
     kitchenId = contract.kitchenId;
+    const returnPath = getReturnPath(formData, `/admin/kitchens/${contract.kitchenId}`);
 
     if (intent === "update") {
       const data = validateKitchenContractInput(formData);
@@ -53,8 +91,13 @@ export async function POST(request, { params }) {
           notes: data.notes,
         },
       });
+      await prisma.$executeRaw`
+        UPDATE "KitchenContract"
+        SET "ownerId" = ${data.ownerId}
+        WHERE "id" = ${id}
+      `;
 
-      return redirectWithFlash(request, `/admin/kitchens/${contract.kitchenId}`, "success", "Contract number updated.");
+      return redirectWithFlash(request, returnPath, "success", "Contract number updated.");
     }
 
     const isActive = intent === "reactivate";
@@ -65,7 +108,7 @@ export async function POST(request, { params }) {
 
     return redirectWithFlash(
       request,
-      `/admin/kitchens/${contract.kitchenId}`,
+      returnPath,
       "success",
       isActive ? "Contract number reactivated." : "Contract number deactivated.",
     );

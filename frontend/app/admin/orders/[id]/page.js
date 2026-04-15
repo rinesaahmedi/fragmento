@@ -54,6 +54,13 @@ function formatOrdinal(value) {
   return `${number}${suffix}`;
 }
 
+function ownerSummary(owner) {
+  if (!owner) return "No owner selected";
+  const name = [owner.firstName, owner.lastName].filter(Boolean).join(" ");
+  const contact = [owner.email, owner.phone].filter(Boolean).join(" | ");
+  return contact ? `${name} | ${contact}` : name;
+}
+
 export default async function AdminOrderDetailPage({ params, searchParams }) {
   const admin = await requireAdminPage();
   const { id } = await params;
@@ -138,6 +145,10 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                         : "Linked reusable inactive contract"
                       : "No linked contract record"}
                   </span>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}>Property owner</span>
+                  <span>{ownerSummary(order.kitchenContract?.owner)}</span>
                 </div>
                 <div>
                   <span style={detailLabelStyle}>Payment</span>

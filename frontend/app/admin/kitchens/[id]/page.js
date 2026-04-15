@@ -19,14 +19,9 @@ import {
   secondaryButtonStyle,
   splitGridStyle,
   subMetaStyle,
-  tableStyle,
-  tableWrapStyle,
-  tdStyle,
   textareaStyle,
-  thStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
-import AdminContractAddressFields from "../../../../components/admin-contract-address-fields";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -118,6 +113,32 @@ function contractAddressLines(contract) {
 function contractAddressSummary(contract) {
   const lines = contractAddressLines(contract);
   return lines.length ? lines.join(" | ") : "No address context";
+}
+
+function ownerName(owner) {
+  if (!owner) return "No owner selected";
+  return [owner.firstName, owner.lastName].filter(Boolean).join(" ");
+}
+
+function ownerSummary(owner) {
+  if (!owner) return "No owner selected";
+  const contact = [owner.email, owner.phone].filter(Boolean).join(" | ");
+  return contact ? `${ownerName(owner)} | ${contact}` : ownerName(owner);
+}
+
+function PropertyOwnerSelect({ owners, defaultValue = "", compact = false }) {
+  return (
+    <FormField label="Property owner">
+      <select name="ownerId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle}>
+        <option value="">No owner selected</option>
+        {owners.map((owner) => (
+          <option key={owner.id} value={owner.id}>
+            {ownerSummary(owner)}
+          </option>
+        ))}
+      </select>
+    </FormField>
+  );
 }
 
 function enhanceSvgMarkup(markup) {
@@ -298,135 +319,12 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
         <AdminSection
           title="Contract numbers"
-          description="Manage reusable contract numbers that unlock this kitchen for public customers."
+          description="Reusable contract numbers now live in the dedicated Contracts admin page."
+          actions={<ActionLink href={`/admin/contracts?kitchenId=${kitchen.id}`}>Manage contracts</ActionLink>}
         >
-          <form action={`/api/admin/kitchens/${kitchen.id}/contracts`} method="post" style={formGridStyle}>
-            <FormField label="Contract number">
-              <input name="contractNumber" placeholder="ABC-123" style={inputStyle} required />
-            </FormField>
-            <AdminContractAddressFields />
-            <div style={{ gridColumn: "1 / -1", alignSelf: "end" }}>
-              <button type="submit" style={primaryButtonStyle}>Create contract</button>
-            </div>
-          </form>
-
-          <div className="admin-list-table" style={{ ...tableWrapStyle, marginTop: 18 }}>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Contract number</th>
-                  <th style={thStyle}>Active state</th>
-                  <th style={thStyle}>Address context</th>
-                  <th style={thStyle}>Created</th>
-                  <th style={thStyle}>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {!kitchen.contracts.length ? (
-                  <tr>
-                    <td style={tdStyle} colSpan={5}>No contract numbers configured.</td>
-                  </tr>
-                ) : null}
-                {kitchen.contracts.map((contract) => (
-                  <tr key={contract.id}>
-                    <td style={tdStyle}><strong>{contract.contractNumber}</strong></td>
-                    <td style={tdStyle}>
-                      <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
-                    </td>
-                    <td style={tdStyle}>{contractAddressSummary(contract)}</td>
-                    <td style={tdStyle}>{formatDate(contract.createdAt)}</td>
-                    <td style={tdStyle}>
-                      <div style={contractActionStackStyle}>
-                        {contract.isActive ? (
-                          <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                            <button type="submit" name="_intent" value="deactivate" style={secondaryButtonStyle}>
-                              Deactivate
-                            </button>
-                          </form>
-                        ) : (
-                          <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                            <button type="submit" name="_intent" value="reactivate" style={secondaryButtonStyle}>
-                              Reactivate
-                            </button>
-                          </form>
-                        )}
-                        <details style={contractEditDetailsStyle}>
-                          <summary style={contractEditSummaryStyle}>Edit details</summary>
-                          <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
-                            <input type="hidden" name="_intent" value="update" />
-                            <FormField label="Contract number">
-                              <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
-                            </FormField>
-                            <AdminContractAddressFields contract={contract} compact />
-                            <button type="submit" style={primaryButtonStyle}>Save contract</button>
-                          </form>
-                        </details>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="admin-list-cards" style={{ gap: cardListStyle.gap, marginTop: 18 }}>
-            {!kitchen.contracts.length ? <p style={mutedTextStyle}>No contract numbers configured.</p> : null}
-            {kitchen.contracts.map((contract) => (
-              <article key={contract.id} style={itemCardStyle}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <strong>{contract.contractNumber}</strong>
-                    <div style={subMetaStyle}>
-                      <span>Reusable access key</span>
-                      <span>{contractAddressSummary(contract)}</span>
-                      <span>Created: {formatDate(contract.createdAt)}</span>
-                    </div>
-                  </div>
-                  <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
-                </div>
-                {contract.isActive ? (
-                  <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                    <button type="submit" name="_intent" value="deactivate" style={secondaryButtonStyle}>
-                      Deactivate
-                    </button>
-                  </form>
-                ) : (
-                  <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                    <button type="submit" name="_intent" value="reactivate" style={secondaryButtonStyle}>
-                      Reactivate
-                    </button>
-                  </form>
-                )}
-                <details style={contractEditDetailsStyle}>
-                  <summary style={contractEditSummaryStyle}>Edit contract details</summary>
-                  <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
-                    <input type="hidden" name="_intent" value="update" />
-                    <FormField label="Contract number">
-                      <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
-                    </FormField>
-                    <AdminContractAddressFields contract={contract} compact />
-                    <button type="submit" style={primaryButtonStyle}>Save contract</button>
-                  </form>
-                </details>
-              </article>
-            ))}
-          </div>
-
-          <style>{`
-            .admin-list-cards {
-              display: none;
-            }
-
-            @media (max-width: 760px) {
-              .admin-list-table {
-                display: none;
-              }
-
-              .admin-list-cards {
-                display: grid;
-              }
-            }
-          `}</style>
+          <p style={mutedTextStyle}>
+            Use the Contracts page to create contract numbers for this kitchen, assign owners, filter contract records, and edit address details.
+          </p>
         </AdminSection>
 
         <AdminSection

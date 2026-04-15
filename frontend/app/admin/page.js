@@ -1,6 +1,6 @@
 import { AdminShell } from "../../components/admin-shell";
 import { AdminDashboardCharts } from "../../components/admin-dashboard-charts";
-import { listKitchensForAdmin } from "../../lib/catalog";
+import { listKitchensForAdmin, listPropertyOwnersForAdmin } from "../../lib/catalog";
 import { requireAdminPage } from "../../lib/auth";
 import { prisma } from "../../lib/prisma";
 import { Prisma } from "@prisma/client";
@@ -128,6 +128,90 @@ async function loadDashboardOrders(where) {
   });
 }
 
+function buildOwnerStatsOrderFilter({ startDate, kitchenId, status }) {
+  const filters = [];
+  if (startDate) filters.push(Prisma.sql`o."createdAt" >= ${startDate}`);
+  if (kitchenId) filters.push(Prisma.sql`o."kitchenId" = ${kitchenId}`);
+  if (status) filters.push(Prisma.sql`o."status" = ${status}`);
+
+  return filters.length ? Prisma.sql`AND ${Prisma.join(filters, " AND ")}` : Prisma.empty;
+}
+
+async function loadPropertyOwnerStats({ startDate, kitchenId, status }) {
+  const orderFilter = buildOwnerStatsOrderFilter({ startDate, kitchenId, status });
+
+  const ownerRows = await prisma.$queryRaw`
+    SELECT
+      po."id",
+      po."firstName",
+      po."lastName",
+      po."email",
+      po."phone",
+      COUNT(DISTINCT kc."id")::int AS "contractCount",
+      COUNT(DISTINCT o."id")::int AS "orderCount",
+      COUNT(DISTINCT o."kitchenId")::int AS "kitchenCount",
+      COALESCE(SUM(o."totalPrice"), 0) AS "totalRevenue",
+      STRING_AGG(DISTINCT k."name", ', ' ORDER BY k."name") AS "kitchens"
+    FROM "PropertyOwner" po
+    LEFT JOIN "KitchenContract" kc ON kc."ownerId" = po."id"
+    LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    LEFT JOIN "Kitchen" k ON k."id" = o."kitchenId"
+    GROUP BY po."id"
+    ORDER BY "totalRevenue" DESC, "orderCount" DESC, po."lastName" ASC, po."firstName" ASC
+  `;
+
+  const itemRows = await prisma.$queryRaw`
+    WITH ranked_items AS (
+      SELECT
+        po."id" AS "ownerId",
+        oi."code",
+        oi."nameSnapshot",
+        SUM(oi."quantity")::int AS "quantity",
+        SUM(oi."quantity" * oi."priceSnapshot") AS "revenue",
+        ROW_NUMBER() OVER (
+          PARTITION BY po."id"
+          ORDER BY SUM(oi."quantity" * oi."priceSnapshot") DESC, SUM(oi."quantity") DESC
+        ) AS rn
+      FROM "PropertyOwner" po
+      JOIN "KitchenContract" kc ON kc."ownerId" = po."id"
+      JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+      JOIN "OrderItem" oi ON oi."orderId" = o."id"
+      GROUP BY po."id", oi."code", oi."nameSnapshot"
+    )
+    SELECT "ownerId", "code", "nameSnapshot", "quantity", "revenue"
+    FROM ranked_items
+    WHERE rn = 1
+  `;
+  const topItemByOwnerId = new Map(itemRows.map((row) => [row.ownerId, row]));
+
+  return ownerRows.map((owner) => {
+    const totalRevenue = Number(owner.totalRevenue || 0);
+    const orderCount = Number(owner.orderCount || 0);
+    const topItem = topItemByOwnerId.get(owner.id);
+
+    return {
+      id: owner.id,
+      name: [owner.firstName, owner.lastName].filter(Boolean).join(" "),
+      email: owner.email || "",
+      phone: owner.phone || "",
+      contractCount: Number(owner.contractCount || 0),
+      orderCount,
+      kitchenCount: Number(owner.kitchenCount || 0),
+      kitchens: owner.kitchens || "",
+      totalRevenue,
+      averageOrderValue: orderCount ? totalRevenue / orderCount : 0,
+      topItem: topItem
+        ? {
+            code: topItem.code || "",
+            name: topItem.nameSnapshot || "",
+            quantity: Number(topItem.quantity || 0),
+            revenue: Number(topItem.revenue || 0),
+          }
+        : null,
+    };
+  });
+}
+
 async function hasKitchenItemArticleNumberColumn() {
   const rows = await prisma.$queryRaw`
     SELECT 1
@@ -189,9 +273,11 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   if (kitchenId) where.kitchenId = kitchenId;
   if (validStatus) where.status = validStatus;
 
-  const [kitchens, orders] = await Promise.all([
+  const [kitchens, orders, propertyOwners, propertyOwnerStats] = await Promise.all([
     listKitchensForAdmin(),
     loadDashboardOrders(where),
+    listPropertyOwnersForAdmin(),
+    loadPropertyOwnerStats({ startDate, kitchenId, status: validStatus }),
   ]);
   const articleNumbersByKitchenItemId = await loadArticleNumbersByKitchenItemId(orders);
 
@@ -377,6 +463,15 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         paymentData={paymentData}
         geographyData={geographyData}
         recentOrders={recentOrders}
+        propertyOwnerStats={propertyOwnerStats}
+        propertyOwners={propertyOwners.map((owner) => ({
+          id: owner.id,
+          name: [owner.firstName, owner.lastName].filter(Boolean).join(" "),
+          email: owner.email || "",
+          phone: owner.phone || "",
+          notes: owner.notes || "",
+          contractCount: owner._count?.contracts || 0,
+        }))}
       />
     </AdminShell>
   );

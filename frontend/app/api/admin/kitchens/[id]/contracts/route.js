@@ -26,7 +26,7 @@ export async function POST(request, { params }) {
     }
 
     const data = validateKitchenContractInput(formData);
-    await prisma.kitchenContract.create({
+    const createdContract = await prisma.kitchenContract.create({
       data: {
         contractNumber: data.contractNumber,
         kitchenId: kitchen.id,
@@ -42,6 +42,11 @@ export async function POST(request, { params }) {
         notes: data.notes,
       },
     });
+    await prisma.$executeRaw`
+      UPDATE "KitchenContract"
+      SET "ownerId" = ${data.ownerId}
+      WHERE "id" = ${createdContract.id}
+    `;
 
     return redirectWithFlash(request, `/admin/kitchens/${id}`, "success", "Contract number created.");
   } catch (error) {
