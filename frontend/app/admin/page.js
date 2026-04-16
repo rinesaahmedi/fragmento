@@ -424,21 +424,25 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const kpis = [
     {
       label: "Total Orders",
+      labelKey: "dashboard.totalOrders",
       value: String(totalOrders),
       trend: `${period.label} by creation date`,
     },
     {
       label: "Total Revenue",
+      labelKey: "dashboard.totalRevenue",
       value: formatCurrency(totalRevenue),
       trend: "Gross order value",
     },
     {
       label: "Average Order Value",
+      labelKey: "dashboard.averageOrderValue",
       value: formatCurrency(averageOrderValue),
       trend: "Revenue per order",
     },
     {
       label: "Conversion Rate",
+      labelKey: "dashboard.conversionRate",
       value: formatPercent(conversionRate),
       trend: `${emailedOrders} emailed / ${totalOrders} total`,
     },

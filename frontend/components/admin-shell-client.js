@@ -1,0 +1,421 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { AdminI18nProvider, AdminLanguageSwitcher, AdminText, useAdminI18n } from "./admin-i18n";
+
+const navItems = [
+  { href: "/admin", labelKey: "adminShellLogin.dashboard", fallback: "Dashboard", icon: GridIcon },
+  { href: "/admin/kitchens", labelKey: "adminShellLogin.kitchens", fallback: "Kitchens", icon: KitchenIcon },
+  { href: "/admin/contracts", labelKey: "adminShellLogin.contracts", fallback: "Contracts", icon: ContractsIcon },
+  { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
+  { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
+  { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
+];
+
+export function AdminShellClient({ adminEmail, initialLanguage = "en", children }) {
+  return (
+    <AdminI18nProvider initialLanguage={initialLanguage}>
+      <AdminShellContent adminEmail={adminEmail}>{children}</AdminShellContent>
+    </AdminI18nProvider>
+  );
+}
+
+function AdminShellContent({ adminEmail, children }) {
+  const pathname = usePathname();
+  const { translate } = useAdminI18n();
+
+  return (
+    <div
+      className="admin-shell"
+      style={{
+        minHeight: "100vh",
+        position: "relative",
+        overflow: "hidden",
+        isolation: "isolate",
+        background: "var(--app-bg)",
+        color: "var(--app-text)",
+      }}
+    >
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            top: -120,
+            right: "8%",
+            width: 380,
+            height: 380,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(255, 195, 132, 0.14) 0%, rgba(255, 195, 132, 0.06) 34%, transparent 68%)",
+            filter: "blur(16px)",
+          }}
+        />
+        <div
+          style={{
+            position: "absolute",
+            top: 220,
+            left: -100,
+            width: 300,
+            height: 300,
+            borderRadius: "50%",
+            background: "radial-gradient(circle, rgba(86, 181, 164, 0.12) 0%, rgba(86, 181, 164, 0.04) 34%, transparent 70%)",
+            filter: "blur(18px)",
+          }}
+        />
+      </div>
+
+      <header
+        style={{
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          background: "rgba(255, 251, 247, 0.72)",
+          borderBottom: "1px solid var(--app-border)",
+          backdropFilter: "blur(18px)",
+          boxShadow: "0 10px 26px rgba(120, 81, 50, 0.06)",
+        }}
+      >
+        <div
+          style={{
+            width: "min(100%, 1880px)",
+            margin: "0 auto",
+            padding: "18px clamp(20px, 3vw, 40px)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
+            position: "relative",
+          }}
+        >
+          <div style={{ display: "grid", gap: 6 }}>
+            <strong
+              style={{
+                fontSize: "1.35rem",
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+                color: "var(--app-accent)",
+                textShadow: "0 1px 0 rgba(255,255,255,0.3)",
+              }}
+            >
+              <AdminText i18nKey="adminShellLogin.fragmentoAdmin" fallback="Fragmento Admin" />
+            </strong>
+            <span style={{ color: "var(--app-text-muted)", fontSize: 14 }}>
+              <AdminText i18nKey="adminShellLogin.modernEditorialOperationsForKitchensAndOrders" fallback="Modern editorial operations for kitchens and orders." />
+            </span>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, flexWrap: "wrap" }}>
+            <AdminLanguageSwitcher />
+            <form action="/api/admin/logout" method="post" style={{ margin: 0 }}>
+              <button
+                type="submit"
+                style={{
+                  border: "1px solid var(--app-border-strong)",
+                  borderRadius: 8,
+                  padding: "11px 18px",
+                  background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,243,232,0.72))",
+                  color: "var(--app-text)",
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow: "var(--app-shadow-soft)",
+                }}
+              >
+                <AdminText i18nKey="adminShellLogin.logout" fallback="Logout" />
+              </button>
+            </form>
+          </div>
+        </div>
+      </header>
+
+      <div
+        className="admin-shell__layout"
+        style={{
+          width: "min(100%, 1880px)",
+          margin: "0 auto",
+          padding: "28px clamp(20px, 3vw, 40px) 40px",
+          display: "grid",
+          gridTemplateColumns: "clamp(220px, 16vw, 280px) minmax(0, 1fr)",
+          gap: "clamp(20px, 2vw, 32px)",
+          alignItems: "start",
+          position: "relative",
+        }}
+      >
+        <nav
+          aria-label={translate("adminShellLogin.mobileAdminNavigation", "Mobile admin navigation")}
+          className="admin-shell__mobile-nav"
+          style={{
+            display: "none",
+            gap: 10,
+            overflowX: "auto",
+            paddingBottom: 4,
+          }}
+        >
+          {navItems.map((item) => {
+            const active = isActivePath(pathname, item.href);
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={`mobile-${item.href}`}
+                href={item.href}
+                style={{
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: "12px 14px",
+                  borderRadius: 8,
+                  whiteSpace: "nowrap",
+                  background: active
+                    ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.12))"
+                    : "rgba(255,255,255,0.7)",
+                  color: active ? "var(--app-accent)" : "var(--app-text)",
+                  border: `1px solid ${active ? "var(--app-border-strong)" : "var(--app-border)"}`,
+                  fontWeight: active ? 700 : 600,
+                  boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "var(--app-shadow-soft)",
+                  flex: "0 0 auto",
+                }}
+              >
+                <Icon active={active} />
+                <span>{translate(item.labelKey, item.fallback)}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <aside
+          className="admin-shell__sidebar"
+          style={{
+            position: "sticky",
+            top: 92,
+            display: "grid",
+            gap: 18,
+          }}
+        >
+          <section
+            style={{
+              borderRadius: 8,
+              padding: 20,
+              background: "linear-gradient(165deg, rgba(255,255,255,0.9), rgba(255,242,230,0.8))",
+              border: "1px solid var(--app-border)",
+              display: "grid",
+              gap: 6,
+              boxShadow: "var(--app-shadow-soft)",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                color: "var(--app-text-muted)",
+              }}
+            >
+              <AdminText i18nKey="adminShellLogin.adminWorkspace" fallback="Admin workspace" />
+            </span>
+            <strong
+              style={{
+                fontSize: "1.2rem",
+                fontWeight: 800,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              <AdminText i18nKey="adminShellLogin.systemAdmin" fallback="System Admin" />
+            </strong>
+            <span style={{ color: "var(--app-text-muted)", lineHeight: 1.6 }}>{adminEmail}</span>
+          </section>
+
+          <nav
+            aria-label={translate("adminShellLogin.sidebar", "Sidebar")}
+            style={{
+              borderRadius: 8,
+              padding: 12,
+              background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,246,236,0.8))",
+              border: "1px solid var(--app-border)",
+              display: "grid",
+              gap: 8,
+              boxShadow: "var(--app-shadow-soft)",
+            }}
+          >
+            {navItems.map((item) => {
+              const active = isActivePath(pathname, item.href);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  style={{
+                    textDecoration: "none",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "12px 14px",
+                    borderRadius: 8,
+                    background: active
+                      ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.12))"
+                      : "rgba(255,255,255,0.28)",
+                    color: active ? "var(--app-accent)" : "var(--app-text)",
+                    border: `1px solid ${active ? "var(--app-border-strong)" : "rgba(255,255,255,0.2)"}`,
+                    fontWeight: active ? 700 : 600,
+                    boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "none",
+                  }}
+                >
+                  <Icon active={active} />
+                  <span>{translate(item.labelKey, item.fallback)}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        <main className="admin-shell__content" style={{ minWidth: 0 }}>{children}</main>
+
+        <style>{`
+          @media (max-width: 960px) {
+            .admin-shell__layout {
+              grid-template-columns: minmax(0, 1fr) !important;
+              padding-top: 20px !important;
+            }
+
+            .admin-shell__mobile-nav {
+              display: flex !important;
+            }
+
+            .admin-shell__sidebar {
+              display: none !important;
+            }
+          }
+
+          @media (max-width: 640px) {
+            .admin-shell__layout {
+              padding-left: 16px !important;
+              padding-right: 16px !important;
+              padding-bottom: 28px !important;
+              gap: 16px !important;
+            }
+          }
+        `}</style>
+      </div>
+    </div>
+  );
+}
+
+function isActivePath(pathname, href) {
+  if (href === "/admin") {
+    return pathname === "/admin";
+  }
+
+  if (href === "/") {
+    return false;
+  }
+
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function IconFrame({ children, active = false }) {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        width: 30,
+        height: 30,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 10,
+        background: active
+          ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.14))"
+          : "rgba(255,255,255,0.76)",
+        color: active ? "var(--app-accent)" : "var(--app-text-muted)",
+        border: `1px solid ${active ? "rgba(143,62,44,0.1)" : "rgba(172,111,70,0.12)"}`,
+      }}
+    >
+      {children}
+    </span>
+  );
+}
+
+function GridIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="2" y="2" width="4.5" height="4.5" rx="1.2" fill="currentColor" />
+        <rect x="9.5" y="2" width="4.5" height="4.5" rx="1.2" fill="currentColor" />
+        <rect x="2" y="9.5" width="4.5" height="4.5" rx="1.2" fill="currentColor" />
+        <rect x="9.5" y="9.5" width="4.5" height="4.5" rx="1.2" fill="currentColor" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function KitchenIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 2.5V13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 2.5V13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M10.5 2.5C12.1569 2.5 13.5 3.84315 13.5 5.5V13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M10.5 7.5H13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function OrdersIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="3" y="2.5" width="10" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M5.5 6H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 9H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function ContractsIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="3" y="2.5" width="10" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M5.5 5.5H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 8H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 10.5H8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function OwnersIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="6" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2.5 13C2.9 10.8 4.1 9.5 6 9.5C7.9 9.5 9.1 10.8 9.5 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M10.5 6.5C11.8807 6.5 13 7.61929 13 9V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function GlobeIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="5.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2.5 8H13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M8 2.5C9.62484 4.08024 10.5476 6.24031 10.5625 8C10.5476 9.75969 9.62484 11.9198 8 13.5C6.37516 11.9198 5.45244 9.75969 5.4375 8C5.45244 6.24031 6.37516 4.08024 8 2.5Z" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    </IconFrame>
+  );
+}

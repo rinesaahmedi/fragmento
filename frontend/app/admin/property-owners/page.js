@@ -19,6 +19,7 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminText } from "../../../components/admin-i18n";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listPropertyOwnersForAdmin } from "../../../lib/catalog";
@@ -52,30 +53,30 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title="Property owners"
-          description="Manage owners that can be attached to reusable contract numbers."
+          title={<AdminText i18nKey="propertyOwnersAdmin.propertyOwners" fallback="Property owners" />}
+          description={<AdminText i18nKey="propertyOwnersAdmin.manageOwnersAttachedToReusableContractNumbers" fallback="Manage owners that can be attached to reusable contract numbers." />}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
           <form action="/api/admin/property-owners" method="post" style={formGridStyle}>
-            <FormField label="First name">
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.firstName" fallback="First name" />}>
               <input name="firstName" style={inputStyle} required />
             </FormField>
-            <FormField label="Last name">
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.lastName" fallback="Last name" />}>
               <input name="lastName" style={inputStyle} required />
             </FormField>
-            <FormField label="Email">
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
               <input name="email" type="email" style={inputStyle} />
             </FormField>
-            <FormField label="Phone">
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
               <input name="phone" style={inputStyle} />
             </FormField>
-            <FormField label="Notes" wide>
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
               <textarea name="notes" rows={3} style={textareaStyle} />
             </FormField>
             <div style={{ gridColumn: "1 / -1" }}>
-              <button type="submit" style={primaryButtonStyle}>Create owner</button>
+              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.createOwner" fallback="Create owner" /></button>
             </div>
           </form>
 
@@ -83,17 +84,17 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>Owner</th>
-                  <th style={thStyle}>Contact</th>
-                  <th style={thStyle}>Contracts</th>
-                  <th style={thStyle}>Created</th>
-                  <th style={thStyle}>Action</th>
+                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.owner" fallback="Owner" /></th>
+                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.contact" fallback="Contact" /></th>
+                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.contracts" fallback="Contracts" /></th>
+                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" /></th>
+                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!owners.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={5}>No property owners configured.</td>
+                    <td style={tdStyle} colSpan={5}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersConfigured" fallback="No property owners configured." /></td>
                   </tr>
                 ) : null}
                 {owners.map((owner) => (
@@ -107,26 +108,26 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
                     <td style={tdStyle}>{formatDate(owner.createdAt)}</td>
                     <td style={tdStyle}>
                       <details style={editDetailsStyle}>
-                        <summary style={editSummaryStyle}>Edit owner</summary>
+                        <summary style={editSummaryStyle}><AdminText i18nKey="propertyOwnersAdmin.editOwner" fallback="Edit owner" /></summary>
                         <form action={`/api/admin/property-owners/${owner.id}`} method="post" style={editFormStyle}>
-                          <FormField label="First name">
+                          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.firstName" fallback="First name" />}>
                             <input name="firstName" defaultValue={owner.firstName} style={compactInputStyle} required />
                           </FormField>
-                          <FormField label="Last name">
+                          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.lastName" fallback="Last name" />}>
                             <input name="lastName" defaultValue={owner.lastName} style={compactInputStyle} required />
                           </FormField>
-                          <FormField label="Email">
+                          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
                             <input name="email" type="email" defaultValue={owner.email || ""} style={compactInputStyle} />
                           </FormField>
-                          <FormField label="Phone">
+                          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
                             <input name="phone" defaultValue={owner.phone || ""} style={compactInputStyle} />
                           </FormField>
-                          <FormField label="Notes" wide>
+                          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
                             <textarea name="notes" defaultValue={owner.notes || ""} rows={2} style={compactTextareaStyle} />
                           </FormField>
                           <div style={actionRowStyle}>
-                            <button type="submit" style={primaryButtonStyle}>Save owner</button>
-                            <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}>Delete owner</button>
+                            <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveOwner" fallback="Save owner" /></button>
+                            <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete owner" /></button>
                           </div>
                         </form>
                       </details>
@@ -138,39 +139,39 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
           </div>
 
           <div className="admin-list-cards" style={{ gap: cardListStyle.gap, marginTop: 18 }}>
-            {!owners.length ? <p style={mutedTextStyle}>No property owners configured.</p> : null}
+            {!owners.length ? <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersConfigured" fallback="No property owners configured." /></p> : null}
             {owners.map((owner) => (
               <article key={owner.id} style={itemCardStyle}>
                 <div style={{ display: "grid", gap: 6 }}>
                   <strong>{ownerName(owner)}</strong>
                   <div style={subMetaStyle}>
                     <span>{ownerContact(owner)}</span>
-                    <span>{owner._count.contracts} contract(s)</span>
-                    <span>Created: {formatDate(owner.createdAt)}</span>
+                    <span>{owner._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
+                    <span><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" />: {formatDate(owner.createdAt)}</span>
                   </div>
                   {owner.notes ? <p style={mutedTextStyle}>{owner.notes}</p> : null}
                 </div>
                 <details style={editDetailsStyle}>
-                  <summary style={editSummaryStyle}>Edit owner</summary>
+                  <summary style={editSummaryStyle}><AdminText i18nKey="propertyOwnersAdmin.editOwner" fallback="Edit owner" /></summary>
                   <form action={`/api/admin/property-owners/${owner.id}`} method="post" style={editFormStyle}>
-                    <FormField label="First name">
+                    <FormField label={<AdminText i18nKey="propertyOwnersAdmin.firstName" fallback="First name" />}>
                       <input name="firstName" defaultValue={owner.firstName} style={compactInputStyle} required />
                     </FormField>
-                    <FormField label="Last name">
+                    <FormField label={<AdminText i18nKey="propertyOwnersAdmin.lastName" fallback="Last name" />}>
                       <input name="lastName" defaultValue={owner.lastName} style={compactInputStyle} required />
                     </FormField>
-                    <FormField label="Email">
+                    <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
                       <input name="email" type="email" defaultValue={owner.email || ""} style={compactInputStyle} />
                     </FormField>
-                    <FormField label="Phone">
+                    <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
                       <input name="phone" defaultValue={owner.phone || ""} style={compactInputStyle} />
                     </FormField>
-                    <FormField label="Notes" wide>
+                    <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
                       <textarea name="notes" defaultValue={owner.notes || ""} rows={2} style={compactTextareaStyle} />
                     </FormField>
                     <div style={actionRowStyle}>
-                      <button type="submit" style={primaryButtonStyle}>Save owner</button>
-                      <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}>Delete owner</button>
+                      <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveOwner" fallback="Save owner" /></button>
+                      <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete owner" /></button>
                     </div>
                   </form>
                 </details>

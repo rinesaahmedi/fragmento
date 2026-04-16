@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useAdminI18n } from "./admin-i18n";
 import {
   Bar,
   BarChart,
@@ -70,6 +71,7 @@ export function AdminDashboardCharts({
   propertyOwnerStats,
   propertyOwners,
 }) {
+  const { translate } = useAdminI18n();
   const [statusMode, setStatusMode] = useState("volume");
   const [isolatedSeries, setIsolatedSeries] = useState("");
 
@@ -94,13 +96,13 @@ export function AdminDashboardCharts({
     <div className="analytics-dashboard">
       <section className="dashboard-toolbar">
         <div>
-          <p className="eyebrow">Analytics overview</p>
-          <h1>Order dashboard</h1>
-          <p>Monitor sales, workflow movement, kitchen demand, and item performance.</p>
+          <p className="eyebrow">{translate("dashboard.analyticsOverview", "Analytics overview")}</p>
+          <h1>{translate("dashboard.orderDashboard", "Order dashboard")}</h1>
+          <p>{translate("dashboard.monitorSalesWorkflowMovementKitchenDemandAndItemPerformance", "Monitor sales, workflow movement, kitchen demand, and item performance.")}</p>
         </div>
         <form method="get" className="filter-form">
           <label>
-            Date range
+            {translate("dashboard.dateRange", "Date range")}
             <select name="period" defaultValue={selectedPeriod}>
               {periodOptions.map((option) => (
                 <option key={option.value} value={option.value}>{option.label}</option>
@@ -108,31 +110,31 @@ export function AdminDashboardCharts({
             </select>
           </label>
           <label>
-            Kitchen
+            {translate("dashboard.kitchen", "Kitchen")}
             <select name="kitchenId" defaultValue={selectedKitchenId}>
-              <option value="">All kitchens</option>
+              <option value="">{translate("dashboard.allKitchens", "All kitchens")}</option>
               {kitchens.map((kitchen) => (
                 <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
               ))}
             </select>
           </label>
           <label>
-            Status
+            {translate("dashboard.status", "Status")}
             <select name="status" defaultValue={selectedStatus}>
-              <option value="">All statuses</option>
+              <option value="">{translate("dashboard.allStatuses", "All statuses")}</option>
               {statusOptions.map((status) => (
                 <option key={status} value={status}>{status}</option>
               ))}
             </select>
           </label>
-          <button type="submit">Apply</button>
+          <button type="submit">{translate("dashboard.apply", "Apply")}</button>
         </form>
       </section>
 
       <section className="kpi-grid" aria-label="Dashboard KPIs">
         {kpis.map((kpi) => (
           <article key={kpi.label} className="kpi-card">
-            <span>{kpi.label}</span>
+            <span>{translate(kpi.labelKey || "", kpi.label)}</span>
             <strong>{kpi.value}</strong>
             <small>{kpi.trend}</small>
           </article>
@@ -141,13 +143,13 @@ export function AdminDashboardCharts({
 
       <section className="chart-card chart-card--status">
         <ChartHeader
-          eyebrow="Daily status breakdown"
-          title="Orders by status"
-          detail="Stacked by workflow state using order creation date."
+          eyebrow={translate("dashboard.dailyStatusBreakdown", "Daily status breakdown")}
+          title={translate("dashboard.ordersByStatus", "Orders by status")}
+          detail={translate("dashboard.stackedByWorkflowStateUsingOrderCreationDate", "Stacked by workflow state using order creation date.")}
           actions={(
             <div className="segmented-control" aria-label="Status chart mode">
-              <button className={statusMode === "volume" ? "is-active" : ""} type="button" onClick={() => setStatusMode("volume")}>Volume View</button>
-              <button className={statusMode === "percentage" ? "is-active" : ""} type="button" onClick={() => setStatusMode("percentage")}>Percentage View</button>
+              <button className={statusMode === "volume" ? "is-active" : ""} type="button" onClick={() => setStatusMode("volume")}>{translate("dashboard.volumeView", "Volume View")}</button>
+              <button className={statusMode === "percentage" ? "is-active" : ""} type="button" onClick={() => setStatusMode("percentage")}>{translate("dashboard.percentageView", "Percentage View")}</button>
             </div>
           )}
         />
@@ -173,9 +175,9 @@ export function AdminDashboardCharts({
 
       <section className="chart-card chart-card--compact">
         <ChartHeader
-          eyebrow="Kitchen timeline"
-          title="Order activity by kitchen"
-          detail="Click a legend item to isolate it."
+          eyebrow={translate("dashboard.kitchenTimeline", "Kitchen timeline")}
+          title={translate("dashboard.orderActivityByKitchen", "Order activity by kitchen")}
+          detail={translate("dashboard.clickLegendItemToIsolateIt", "Click a legend item to isolate it.")}
         />
         <div className="chart-frame">
           {kitchenTimelineData.length && kitchenSeries.length ? (
@@ -222,17 +224,17 @@ export function AdminDashboardCharts({
       <PropertyOwnerStatsSection data={propertyOwnerStats || []} />
 
       <section className="chart-card">
-        <ChartHeader eyebrow="Operations" title="Recent orders" detail="Latest matching orders for follow-up." />
+        <ChartHeader eyebrow={translate("dashboard.operations", "Operations")} title={translate("dashboard.recentOrders", "Recent orders")} detail={translate("dashboard.latestMatchingOrdersForFollowUp", "Latest matching orders for follow-up.")} />
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Order</th>
-                <th>Kitchen</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>City</th>
-                <th>Created</th>
+                <th>{translate("ordersAdmin.order", "Order")}</th>
+                <th>{translate("ordersAdmin.kitchen", "Kitchen")}</th>
+                <th>{translate("ordersAdmin.status", "Status")}</th>
+                <th>{translate("ordersAdmin.total", "Total")}</th>
+                <th>{translate("contractAddressFields.city", "City")}</th>
+                <th>{translate("ordersAdmin.created", "Created")}</th>
               </tr>
             </thead>
             <tbody>
@@ -242,12 +244,12 @@ export function AdminDashboardCharts({
                   <td>{order.kitchen}</td>
                   <td><span className="status-pill" style={{ "--status-color": STATUS_COLORS[order.status] }}>{order.status}</span></td>
                   <td>{formatCurrency(order.totalPrice)}</td>
-                  <td>{order.city || "Not captured"}</td>
+                  <td>{order.city || translate("orderDetailAdmin.notProvided", "Not provided")}</td>
                   <td>{order.createdAt}</td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={6}>No recent orders match the current filters.</td>
+                  <td colSpan={6}>{translate("ordersAdmin.noOrdersFound", "No orders found.")}</td>
                 </tr>
               )}
             </tbody>
@@ -257,34 +259,34 @@ export function AdminDashboardCharts({
 
       <section className="chart-card">
         <ChartHeader
-          eyebrow="Owners"
-          title="Property owners"
-          detail="Owner records available for contract-number assignment."
-          actions={<a className="panel-link" href="/admin/property-owners">Manage owners</a>}
+          eyebrow={translate("adminShellLogin.owners", "Owners")}
+          title={translate("dashboard.propertyOwners", "Property owners")}
+          detail={translate("dashboard.ownerRecordsAvailableForContractNumberAssignment", "Owner records available for contract number assignment.")}
+          actions={<a className="panel-link" href="/admin/property-owners">{translate("dashboard.manageOwners", "Manage owners")}</a>}
         />
         <div className="table-wrap">
           <table>
             <thead>
               <tr>
-                <th>Owner</th>
-                <th>Email</th>
-                <th>Phone</th>
-                <th>Contracts</th>
-                <th>Notes</th>
+                <th>{translate("propertyOwnersAdmin.owner", "Owner")}</th>
+                <th>{translate("propertyOwnersAdmin.email", "Email")}</th>
+                <th>{translate("propertyOwnersAdmin.phone", "Phone")}</th>
+                <th>{translate("propertyOwnersAdmin.contracts", "Contracts")}</th>
+                <th>{translate("propertyOwnersAdmin.notes", "Notes")}</th>
               </tr>
             </thead>
             <tbody>
               {propertyOwners?.length ? propertyOwners.map((owner) => (
                 <tr key={owner.id}>
                   <td><a href="/admin/property-owners">{owner.name}</a></td>
-                  <td>{owner.email || "Not captured"}</td>
-                  <td>{owner.phone || "Not captured"}</td>
+                  <td>{owner.email || translate("orderDetailAdmin.notProvided", "Not provided")}</td>
+                  <td>{owner.phone || translate("orderDetailAdmin.notProvided", "Not provided")}</td>
                   <td>{owner.contractCount}</td>
                   <td>{owner.notes || "-"}</td>
                 </tr>
               )) : (
                 <tr>
-                  <td colSpan={5}>No property owners configured.</td>
+                  <td colSpan={5}>{translate("propertyOwnersAdmin.noPropertyOwnersConfigured", "No property owners configured.")}</td>
                 </tr>
               )}
             </tbody>
@@ -620,15 +622,16 @@ function StatusTooltip({ active, payload, label, mode }) {
 }
 
 function PropertyOwnerStatsSection({ data }) {
+  const { translate } = useAdminI18n();
   const activeOwners = data.filter((owner) => owner.contractCount || owner.orderCount);
 
   return (
     <section className="chart-card">
       <ChartHeader
-        eyebrow="Owner performance"
-        title="Property owner kitchen activity"
-        detail="Contract, kitchen, item, and order value statistics for the current dashboard filters."
-        actions={<a className="panel-link" href="/admin/property-owners">Manage owners</a>}
+        eyebrow={translate("dashboard.ownerPerformance", "Owner performance")}
+        title={translate("dashboard.propertyOwnerKitchenActivity", "Property owner kitchen activity")}
+        detail={translate("dashboard.contractKitchenItemAndOrderValueStatisticsForCurrentDashboardFilters", "Contract, kitchen, item, and order value statistics for the current dashboard filters.")}
+        actions={<a className="panel-link" href="/admin/property-owners">{translate("dashboard.manageOwners", "Manage owners")}</a>}
       />
       <div className="owner-stats-grid">
         {activeOwners.length ? activeOwners.map((owner) => (
@@ -642,15 +645,15 @@ function PropertyOwnerStatsSection({ data }) {
             </div>
             <div className="owner-metrics">
               <div>
-                <span>Contracts</span>
+                <span>{translate("propertyOwnersAdmin.contracts", "Contracts")}</span>
                 <strong>{owner.contractCount}</strong>
               </div>
               <div>
-                <span>Orders</span>
+                <span>{translate("ordersAdmin.orders", "Orders")}</span>
                 <strong>{owner.orderCount}</strong>
               </div>
               <div>
-                <span>Kitchens</span>
+                <span>{translate("adminShellLogin.kitchens", "Kitchens")}</span>
                 <strong>{owner.kitchenCount}</strong>
               </div>
               <div>
@@ -794,17 +797,18 @@ function PropertyOwnerStatsSection({ data }) {
 }
 
 function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
+  const { translate } = useAdminI18n();
   const [mode, setMode] = useState("quantity");
   const config = mode === "quantity"
     ? {
-        title: "Top items",
-        detail: "Top items sorted by selected performance metric.",
+        title: translate("dashboard.topItems", "Top items"),
+        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
         data: topItemsByQuantity,
         formatter: (value) => `${value} item(s)`,
       }
     : {
-        title: "Top items",
-        detail: "Top items sorted by selected performance metric.",
+        title: translate("dashboard.topItems", "Top items"),
+        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
         data: topItemsByRevenue,
         formatter: formatCurrency,
       };
@@ -829,13 +833,13 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   return (
     <section className="chart-card">
       <ChartHeader
-        eyebrow="Top items"
+        eyebrow={translate("dashboard.topItems", "Top items")}
         title={config.title}
         detail={config.detail}
         actions={(
           <div className="segmented-control" aria-label="Top items mode">
-            <button className={mode === "quantity" ? "is-active" : ""} type="button" onClick={() => setMode("quantity")}>By Quantity</button>
-            <button className={mode === "revenue" ? "is-active" : ""} type="button" onClick={() => setMode("revenue")}>By Revenue</button>
+            <button className={mode === "quantity" ? "is-active" : ""} type="button" onClick={() => setMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
+            <button className={mode === "revenue" ? "is-active" : ""} type="button" onClick={() => setMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
           </div>
         )}
       />
@@ -998,16 +1002,17 @@ function TopItemsTooltip({ active, payload }) {
 }
 
 function DistributionSection({ itemTypeData, paymentData }) {
+  const { translate } = useAdminI18n();
   const [mode, setMode] = useState("itemTypes");
   const config = mode === "itemTypes"
     ? {
-        title: "Distribution",
-        detail: "Distribution by selected category.",
+        title: translate("dashboard.distribution", "Distribution"),
+        detail: translate("dashboard.distributionBySelectedCategory", "Distribution by selected category."),
         data: itemTypeData,
       }
     : {
-        title: "Distribution",
-        detail: "Distribution by selected category. Missing payment methods appear as Not captured.",
+        title: translate("dashboard.distribution", "Distribution"),
+        detail: translate("dashboard.distributionBySelectedCategory", "Distribution by selected category."),
         data: paymentData,
       };
 
@@ -1022,13 +1027,13 @@ function DistributionSection({ itemTypeData, paymentData }) {
   return (
     <section className="chart-card">
       <ChartHeader
-        eyebrow="Distribution"
+        eyebrow={translate("dashboard.distribution", "Distribution")}
         title={config.title}
         detail={config.detail}
         actions={(
           <div className="segmented-control" aria-label="Distribution mode">
-            <button className={mode === "itemTypes" ? "is-active" : ""} type="button" onClick={() => setMode("itemTypes")}>Item Types</button>
-            <button className={mode === "paymentMethods" ? "is-active" : ""} type="button" onClick={() => setMode("paymentMethods")}>Payment Methods</button>
+            <button className={mode === "itemTypes" ? "is-active" : ""} type="button" onClick={() => setMode("itemTypes")}>{translate("dashboard.itemTypes", "Item Types")}</button>
+            <button className={mode === "paymentMethods" ? "is-active" : ""} type="button" onClick={() => setMode("paymentMethods")}>{translate("dashboard.paymentMethods", "Payment Methods")}</button>
           </div>
         )}
       />
@@ -1160,12 +1165,13 @@ function DistributionSection({ itemTypeData, paymentData }) {
 }
 
 function GeographySection({ data }) {
+  const { translate } = useAdminI18n();
   return (
     <section className="chart-card">
       <ChartHeader
-        eyebrow="Geography"
-        title="Orders by country and city"
-        detail="Locations ranked by number of orders."
+        eyebrow={translate("dashboard.geography", "Geography")}
+        title={translate("dashboard.ordersByCountryAndCity", "Orders by country and city")}
+        detail={translate("dashboard.locationsRankedByNumberOfOrders", "Locations ranked by number of orders.")}
       />
 
       <div className="country-chart-frame">

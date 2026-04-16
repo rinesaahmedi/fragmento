@@ -12,6 +12,7 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminText } from "../../../components/admin-i18n";
 import { getOrdersForAdmin } from "../../../lib/catalog";
 import { requireAdminPage } from "../../../lib/auth";
 
@@ -48,7 +49,7 @@ function formatOrdinal(value) {
 
 function getContractOrderLabel(order) {
   if (!order.contractOrderSequence) return "";
-  return `${formatOrdinal(order.contractOrderSequence)} order for contract`;
+  return formatOrdinal(order.contractOrderSequence);
 }
 
 export default async function AdminOrdersPage() {
@@ -59,26 +60,26 @@ export default async function AdminOrdersPage() {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title="Orders"
-          description="Saved orders from the public configurator. This page is read-only for now, but it gives you the core operational view."
+          title={<AdminText i18nKey="ordersAdmin.orders" fallback="Orders" />}
+          description={<><AdminText i18nKey="ordersAdmin.savedOrdersFromPublicConfigurator" fallback="Saved orders from the public configurator." /> <AdminText i18nKey="ordersAdmin.pageReadOnlyCoreOperationalView" fallback="This page is read-only for now, but it gives you the core operational view." /></>}
         >
           <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>Order</th>
-                  <th style={thStyle}>Customer</th>
-                  <th style={thStyle}>Kitchen</th>
-                  <th style={thStyle}>Article Codes</th>
-                  <th style={thStyle}>Status</th>
-                  <th style={thStyle}>Total</th>
-                  <th style={thStyle}>Created</th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.order" fallback="Order" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.customer" fallback="Customer" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.kitchen" fallback="Kitchen" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.articleCodes" fallback="Article Codes" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={7}>No orders found.</td>
+                    <td style={tdStyle} colSpan={7}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
                   </tr>
                 ) : null}
                 {orders.map((order) => (
@@ -88,7 +89,7 @@ export default async function AdminOrdersPage() {
                         <strong>{order.orderNumber}</strong>
                       </Link>
                       {order.contractOrderSequence ? (
-                        <div style={contractSequenceStyle}>{getContractOrderLabel(order)}</div>
+                        <div style={contractSequenceStyle}>{getContractOrderLabel(order)} <AdminText i18nKey="ordersAdmin.orderForContract" fallback="order for contract" /></div>
                       ) : null}
                     </td>
                     <td style={tdStyle}>
@@ -109,7 +110,7 @@ export default async function AdminOrdersPage() {
           </div>
 
           <div className="admin-list-cards" style={{ gap: cardListStyle.gap }}>
-            {!orders.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}>No orders found.</p> : null}
+            {!orders.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></p> : null}
             {orders.map((order) => (
               <article key={order.id} style={itemCardStyle}>
                 <div style={{ display: "grid", gap: 12 }}>
@@ -119,7 +120,7 @@ export default async function AdminOrdersPage() {
                         <strong style={{ fontSize: "1.05rem" }}>{order.orderNumber}</strong>
                       </Link>
                       {order.contractOrderSequence ? (
-                        <span style={contractSequenceStyle}>{getContractOrderLabel(order)}</span>
+                        <span style={contractSequenceStyle}>{getContractOrderLabel(order)} <AdminText i18nKey="ordersAdmin.orderForContract" fallback="order for contract" /></span>
                       ) : null}
                       <div style={subMetaStyle}>
                         <span>{order.firstName} {order.lastName}</span>
@@ -136,7 +137,7 @@ export default async function AdminOrdersPage() {
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                     <strong>{formatCurrency(order.totalPrice)}</strong>
                     <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
-                      Open details
+                      <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
                     </Link>
                   </div>
                 </div>

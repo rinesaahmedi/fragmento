@@ -22,6 +22,7 @@ import {
   textareaStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
+import { AdminText } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -128,9 +129,9 @@ function ownerSummary(owner) {
 
 function PropertyOwnerSelect({ owners, defaultValue = "", compact = false }) {
   return (
-    <FormField label="Property owner">
+    <FormField label={<AdminText i18nKey="orderDetailAdmin.propertyOwner" fallback="Property owner" />}>
       <select name="ownerId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle}>
-        <option value="">No owner selected</option>
+        <option value=""><AdminText i18nKey="contractsAdmin.noOwnerSelected" fallback="No owner selected" /></option>
         {owners.map((owner) => (
           <option key={owner.id} value={owner.id}>
             {ownerSummary(owner)}
@@ -204,7 +205,7 @@ function KitchenCatalogPreview({ markup, iconMarkup, slotLabel, itemType }) {
   }
 
   if (!markup) {
-    return <div style={isComponent ? previewEmptyStyle : previewEmptyCompactStyle}>No preview</div>;
+    return <div style={isComponent ? previewEmptyStyle : previewEmptyCompactStyle}><AdminText i18nKey="kitchenDetailAdmin.noPreview" fallback="No preview" /></div>;
   }
 
   return (
@@ -245,8 +246,8 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     return (
       <AdminShell adminEmail={admin.email}>
         <div style={pageGridStyle}>
-          <AdminSection title="Kitchen not found" description="The requested kitchen record does not exist.">
-            <ActionLink href="/admin/kitchens">Back to kitchens</ActionLink>
+          <AdminSection title={<AdminText i18nKey="kitchenDetailAdmin.kitchenNotFound" fallback="Kitchen not found" />} description={<AdminText i18nKey="kitchenDetailAdmin.requestedKitchenRecordDoesNotExist" fallback="The requested kitchen record does not exist." />}>
+            <ActionLink href="/admin/kitchens"><AdminText i18nKey="kitchenDetailAdmin.backToKitchens" fallback="Back to kitchens" /></ActionLink>
           </AdminSection>
         </div>
       </AdminShell>
@@ -273,13 +274,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
       <div style={pageGridStyle}>
         <AdminSection
           title={kitchen.name}
-          description="Edit the core kitchen definition used by the public configurator."
+          description={<AdminText i18nKey="kitchenDetailAdmin.editCoreKitchenDefinitionUsedByPublicConfigurator" fallback="Edit the core kitchen definition used by the public configurator." />}
           actions={
             <div style={actionRowStyle}>
               <ActionLink href="/admin/kitchens">
-                Back to kitchens
+                <AdminText i18nKey="kitchenDetailAdmin.backToKitchens" fallback="Back to kitchens" />
               </ActionLink>
-              <ActionLink href={`/kitchens/${kitchen.slug}`}>Open public page</ActionLink>
+              <ActionLink href={`/kitchens/${kitchen.slug}`}><AdminText i18nKey="kitchenDetailAdmin.openPublicPage" fallback="Open public page" /></ActionLink>
             </div>
           }
         >
@@ -287,13 +288,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
           <form action={`/api/admin/kitchens/${kitchen.id}`} method="post" style={formGridStyle}>
-            <FormField label="Kitchen name">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
               <input name="name" defaultValue={kitchen.name} style={inputStyle} required />
             </FormField>
-            <FormField label="Slug">
+            <FormField label={<AdminText i18nKey="kitchensAdmin.slug" fallback="Slug" />}>
               <input name="slug" defaultValue={kitchen.slug} style={inputStyle} required />
             </FormField>
-            <FormField label="Status">
+            <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
               <select name="status" defaultValue={kitchen.status} style={inputStyle}>
                 {KITCHEN_STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
@@ -302,7 +303,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 ))}
               </select>
             </FormField>
-            <FormField label="Description" wide>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.description" fallback="Description" />} wide>
               <textarea
                 name="description"
                 defaultValue={kitchen.description || ""}
@@ -311,26 +312,26 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               />
             </FormField>
             <div style={{ gridColumn: "1 / -1", ...actionRowStyle }}>
-              <button type="submit" style={primaryButtonStyle}>Save kitchen</button>
+              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.saveKitchen" fallback="Save kitchen" /></button>
               <StatusBadge status={kitchen.status} />
             </div>
           </form>
         </AdminSection>
 
         <AdminSection
-          title="Contract numbers"
-          description="Reusable contract numbers now live in the dedicated Contracts admin page."
-          actions={<ActionLink href={`/admin/contracts?kitchenId=${kitchen.id}`}>Manage contracts</ActionLink>}
+          title={<AdminText i18nKey="kitchenDetailAdmin.contractNumbers" fallback="Contract numbers" />}
+          description={<AdminText i18nKey="kitchenDetailAdmin.reusableContractNumbersNowLiveInDedicatedContractsAdminPage" fallback="Reusable contract numbers now live in the dedicated Contracts admin page." />}
+          actions={<ActionLink href={`/admin/contracts?kitchenId=${kitchen.id}`}><AdminText i18nKey="kitchenDetailAdmin.manageContracts" fallback="Manage contracts" /></ActionLink>}
         >
         
         </AdminSection>
 
         <AdminSection
-          title="Add extra item"
-          description="Create accessories or services for this kitchen. Components are edited only through the existing item cards below."
+          title={<AdminText i18nKey="kitchenDetailAdmin.addExtraItem" fallback="Add extra item" />}
+          description={<><AdminText i18nKey="kitchenDetailAdmin.createAccessoriesOrServicesForThisKitchen" fallback="Create accessories or services for this kitchen." /> <AdminText i18nKey="kitchenDetailAdmin.componentsAreEditedOnlyThroughExistingItemCardsBelow" fallback="Components are edited only through existing item cards below." /></>}
         >
           <form action={`/api/admin/kitchens/${kitchen.id}/items`} method="post" style={formGridStyle}>
-            <FormField label="Item type">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />}>
               <select name="itemType" defaultValue={ItemType.ACCESSORY} style={inputStyle}>
                 {[ItemType.ACCESSORY, ItemType.SERVICE].map((itemType) => (
                   <option key={itemType} value={itemType}>
@@ -339,63 +340,63 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 ))}
               </select>
             </FormField>
-            <FormField label="Item Code">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item Code" />}>
               <input name="code" placeholder="DISH-600-STD" style={inputStyle} required />
             </FormField>
-            <FormField label="Article number">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number" />}>
               <input name="articleNumber" placeholder="A-EGSPV597210" style={inputStyle} />
             </FormField>
-            <FormField label="Name">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name" />}>
               <input name="name" style={inputStyle} required />
             </FormField>
-            <FormField label="Price">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.price" fallback="Price" />}>
               <input name="price" defaultValue="0.00" style={inputStyle} required />
             </FormField>
-            <FormField label="Icon key">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />}>
               <input name="iconKey" style={inputStyle} />
             </FormField>
-            <FormField label="Color key">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.colorKey" fallback="Color key" />}>
               <input name="colorKey" style={inputStyle} />
             </FormField>
-            <FormField label="Sort order">
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />}>
               <input name="sortOrder" defaultValue="0" style={inputStyle} />
             </FormField>
-            <FormField label="Info text" wide>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
               <textarea name="infoText" rows={3} style={textareaStyle} />
             </FormField>
             <div style={{ gridColumn: "1 / -1", ...checkboxRowStyle }}>
               <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <input type="checkbox" name="isLocked" value="true" />
-                <span>Locked item</span>
+                <span><AdminText i18nKey="kitchenDetailAdmin.lockedItem" fallback="Locked item" /></span>
               </label>
               <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <input type="checkbox" name="isActive" value="true" defaultChecked />
-                <span>Active item</span>
+                <span><AdminText i18nKey="kitchenDetailAdmin.activeItem" fallback="Active item" /></span>
               </label>
             </div>
             <div style={{ gridColumn: "1 / -1" }}>
-              <button type="submit" style={primaryButtonStyle}>Create extra item</button>
+              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.createExtraItem" fallback="Create extra item" /></button>
             </div>
           </form>
         </AdminSection>
 
         <AdminSection
-          title="Excel catalog"
-          description="Export this kitchen to Excel, update prices or other item fields, then import the file back to update the matching kitchen items."
+          title={<AdminText i18nKey="kitchenDetailAdmin.excelCatalog" fallback="Excel catalog" />}
+          description={<AdminText i18nKey="kitchenDetailAdmin.exportKitchenToExcelThenImportBack" fallback="Export this kitchen to Excel, update prices or other item fields, then import the file back to update matching kitchen items." />}
         >
           <div style={splitGridStyle}>
             <div style={catalogPanelStyle}>
               <div style={{ display: "grid", gap: 8 }}>
-                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}>Export current kitchen data</strong>
+                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.exportCurrentKitchenData" fallback="Export current kitchen data" /></strong>
                 <p style={mutedTextStyle}>
-                  Download all catalog rows for this kitchen, including the current prices shown in admin.
+                  <AdminText i18nKey="kitchenDetailAdmin.downloadAllCatalogRowsForKitchenIncludingCurrentPricesShownInAdmin" fallback="Download all catalog rows for this kitchen, including current prices shown in admin." />
                 </p>
               </div>
               <a
                 href={`/api/admin/kitchens/${kitchen.id}/catalog`}
                 style={catalogDownloadLinkStyle}
               >
-                Export Excel
+                <AdminText i18nKey="kitchenDetailAdmin.exportExcel" fallback="Export Excel" />
               </a>
             </div>
 
@@ -406,12 +407,12 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               style={catalogPanelStyle}
             >
               <div style={{ display: "grid", gap: 8 }}>
-                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}>Import edited file</strong>
+                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.importEditedFile" fallback="Import edited file" /></strong>
                 <p style={mutedTextStyle}>
-                  Change the prices you want in the exported sheet, save it, then upload it here. Matching items will be updated.
+                  <AdminText i18nKey="kitchenDetailAdmin.changePricesInExportedSheetThenUpload" fallback="Change prices in the exported sheet, save it, then upload it here. Matching items will be updated." />
                 </p>
               </div>
-              <FormField label="Catalog file">
+              <FormField label={<AdminText i18nKey="kitchenDetailAdmin.catalogFile" fallback="Catalog file" />}>
                 <input
                   type="file"
                   name="catalogFile"
@@ -421,19 +422,19 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 />
               </FormField>
               <div style={actionRowStyle}>
-                <button type="submit" style={primaryButtonStyle}>Import catalog</button>
-                <span style={catalogHelpTextStyle}>Supported formats: `.xlsx` and `.csv`</span>
+                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.importCatalog" fallback="Import catalog" /></button>
+                <span style={catalogHelpTextStyle}><AdminText i18nKey="kitchenDetailAdmin.supportedFormatsXlsxAndCsv" fallback="Supported formats: .xlsx and .csv" /></span>
               </div>
             </form>
           </div>
         </AdminSection>
 
         <AdminSection
-          title="Catalog items"
-          description="Compact item cards. Open only the component you want to edit."
+          title={<AdminText i18nKey="kitchenDetailAdmin.catalogItems" fallback="Catalog items" />}
+          description={<AdminText i18nKey="kitchenDetailAdmin.compactItemCardsOpenOnlyComponentToEdit" fallback="Compact item cards. Open only the component you want to edit." />}
         >
           <div style={cardListStyle}>
-            {!kitchen.items.length ? <p style={mutedTextStyle}>No items configured for this kitchen.</p> : null}
+            {!kitchen.items.length ? <p style={mutedTextStyle}><AdminText i18nKey="kitchenDetailAdmin.noItemsConfiguredForThisKitchen" fallback="No items configured for this kitchen." /></p> : null}
             {kitchen.items.map((item) => {
               const slot = structureSlots.find((entry) => entry.componentKey === item.componentKey);
               const isRequestedEdit = requestedEditId === item.id;
@@ -447,10 +448,10 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       <strong style={{ fontSize: "1.05rem" }}>{item.name}</strong>
                       <div style={subMetaStyle}>
                         <TypeBadge label={item.itemType} />
-                        <span>Item Code: {item.code}</span>
-                        <span>Article No: {item.articleNumber || "-"}</span>
+                        <span><AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item Code" />: {item.code}</span>
+                        <span><AdminText i18nKey="kitchenDetailAdmin.articleNo" fallback="Article No" />: {item.articleNumber || "-"}</span>
                         <span>{formatCurrency(item.price)}</span>
-                        <span>{slot ? slot.label : "No slot"}</span>
+                        <span>{slot ? slot.label : <AdminText i18nKey="kitchenDetailAdmin.noSlot" fallback="No slot" />}</span>
                       </div>
                     </div>
                     <KitchenCatalogPreview
@@ -461,13 +462,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     />
                     <div style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
                       <StatusBadge status={item.isActive ? "ACTIVE" : "ARCHIVED"} />
-                      <span style={editHintStyle}>Edit</span>
+                      <span style={editHintStyle}><AdminText i18nKey="kitchenDetailAdmin.edit" fallback="Edit" /></span>
                     </div>
                   </summary>
 
                   <form action={`/api/admin/items/${item.id}`} method="post" style={compactFormStyle}>
                     <div style={compactTopGridStyle}>
-                      <FormField label="Item type" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />} wide={false}>
                         <select name="itemType" defaultValue={item.itemType} style={compactInputStyle}>
                           {ITEM_TYPE_OPTIONS.map((itemType) => (
                             <option key={itemType} value={itemType}>
@@ -476,25 +477,25 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                           ))}
                         </select>
                       </FormField>
-                      <FormField label="Item Code" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item Code" />} wide={false}>
                         <input name="code" defaultValue={item.code} style={compactInputStyle} required />
                       </FormField>
-                      <FormField label="Article number" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number" />} wide={false}>
                         <input name="articleNumber" defaultValue={item.articleNumber || ""} style={compactInputStyle} />
                       </FormField>
-                      <FormField label="Name" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name" />} wide={false}>
                         <input name="name" defaultValue={item.name} style={compactInputStyle} required />
                       </FormField>
-                      <FormField label="Price" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.price" fallback="Price" />} wide={false}>
                         <input name="price" defaultValue={String(item.price)} style={compactInputStyle} required />
                       </FormField>
-                      <FormField label="Icon key" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />} wide={false}>
                         <input name="iconKey" defaultValue={item.iconKey || ""} style={compactInputStyle} />
                       </FormField>
-                      <FormField label="Color key" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.colorKey" fallback="Color key" />} wide={false}>
                         <input name="colorKey" defaultValue={item.colorKey || ""} style={compactInputStyle} />
                       </FormField>
-                      <FormField label="Sort" wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />} wide={false}>
                         <input name="sortOrder" defaultValue={String(item.sortOrder)} style={compactInputStyle} />
                       </FormField>
                     </div>
@@ -513,7 +514,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       </div>
                     ) : null}
 
-                    <FormField label="Info text" wide>
+                    <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
                       <textarea name="infoText" defaultValue={item.infoText || ""} rows={2} style={compactTextareaStyle} />
                     </FormField>
 
@@ -521,17 +522,17 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       <div style={checkboxRowStyle}>
                         <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
                           <input type="checkbox" name="isLocked" value="true" defaultChecked={item.isLocked} />
-                          <span>Locked item</span>
+                          <span><AdminText i18nKey="kitchenDetailAdmin.lockedItem" fallback="Locked item" /></span>
                         </label>
                         <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
                           <input type="checkbox" name="isActive" value="true" defaultChecked={item.isActive} />
-                          <span>Active item</span>
+                          <span><AdminText i18nKey="kitchenDetailAdmin.activeItem" fallback="Active item" /></span>
                         </label>
                       </div>
                       <div style={actionRowStyle}>
-                        <button type="submit" style={primaryButtonStyle}>Save item</button>
+                        <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.saveItem" fallback="Save item" /></button>
                         <button type="submit" name="_intent" value="delete" style={secondaryButtonStyle}>
-                          Delete item
+                          <AdminText i18nKey="kitchenDetailAdmin.deleteItem" fallback="Delete item" />
                         </button>
                       </div>
                     </div>

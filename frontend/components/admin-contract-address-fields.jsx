@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useAdminI18n } from "./admin-i18n";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
 
 const ADMIN_COUNTRY_OPTIONS = [
@@ -72,6 +73,7 @@ function Field({ label, wide = false, children }) {
 }
 
 export default function AdminContractAddressFields({ contract = {}, compact = false }) {
+  const { translate } = useAdminI18n();
   const [country, setCountry] = useState(normalizeAdminCountry(contract.country));
   const [city, setCity] = useState(contract.city || "");
   const [postalCode, setPostalCode] = useState(contract.postalCode || "");
@@ -88,7 +90,7 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
 
   return (
     <>
-      <Field label="Country">
+      <Field label={translate("contractAddressFields.country", "Country")}>
         <select
           name="country"
           value={country}
@@ -99,14 +101,14 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
             setPostalCode("");
           }}
         >
-          <option value="">Select country</option>
+          <option value="">{translate("contractAddressFields.selectCountry", "Select country")}</option>
           {countryOptions.map((option) => (
-            <option key={option} value={option}>{option}</option>
+            <option key={option} value={option}>{translateCountry(option, translate)}</option>
           ))}
         </select>
       </Field>
 
-      <Field label="City">
+      <Field label={translate("contractAddressFields.city", "City")}>
         <select
           name="city"
           value={city}
@@ -117,14 +119,14 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
             setPostalCode("");
           }}
         >
-          <option value="">{country ? "Select city" : "Select country first"}</option>
+          <option value="">{country ? translate("contractAddressFields.selectCity", "Select city") : translate("contractAddressFields.selectCountryFirst", "Select country first")}</option>
           {cityOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
       </Field>
 
-      <Field label="Postal code">
+      <Field label={translate("contractAddressFields.postalCode", "Postal code")}>
         <select
           name="postalCode"
           value={postalCode}
@@ -132,31 +134,46 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
           disabled={!city}
           onChange={(event) => setPostalCode(event.target.value)}
         >
-          <option value="">{city ? "Select postal code" : "Select city first"}</option>
+          <option value="">{city ? translate("contractAddressFields.selectPostalCode", "Select postal code") : translate("contractAddressFields.selectCityFirst", "Select city first")}</option>
           {postalCodeOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
         </select>
       </Field>
 
-      <Field label="Address line 1">
+      <Field label={translate("contractAddressFields.addressLine1", "Address line 1")}>
         <input name="address1" defaultValue={contract.address1 || ""} style={inputStyle} />
       </Field>
-      <Field label="Address line 2">
+      <Field label={translate("contractAddressFields.addressLine2", "Address line 2")}>
         <input name="address2" defaultValue={contract.address2 || ""} style={inputStyle} />
       </Field>
-      <Field label="Building">
+      <Field label={translate("contractAddressFields.building", "Building")}>
         <input name="building" defaultValue={contract.building || ""} style={inputStyle} />
       </Field>
-      <Field label="Floor">
+      <Field label={translate("contractAddressFields.floor", "Floor")}>
         <input name="floor" defaultValue={contract.floor || ""} style={inputStyle} />
       </Field>
-      <Field label="Unit number">
+      <Field label={translate("contractAddressFields.unitNumber", "Unit number")}>
         <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={inputStyle} />
       </Field>
-      <Field label="Notes" wide>
+      <Field label={translate("contractAddressFields.notes", "Notes")} wide>
         <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={notesStyle} />
       </Field>
     </>
   );
+}
+
+function translateCountry(country, translate) {
+  const keys = {
+    Germany: "germany",
+    Austria: "austria",
+    Switzerland: "switzerland",
+    Hungary: "hungary",
+    Kosovo: "kosovo",
+    Czechia: "czechia",
+    Slovakia: "slovakia",
+    Poland: "poland",
+  };
+  const key = keys[country];
+  return key ? translate(`contractAddressFields.${key}`, country) : country;
 }

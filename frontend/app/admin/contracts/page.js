@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminText } from "../../../components/admin-i18n";
 import AdminContractAddressFields from "../../../components/admin-contract-address-fields";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
@@ -88,8 +89,8 @@ function AddressColumn({ lines, emptyText }) {
   return (
     <div style={addressBlockStyle}>
       <div style={lines.length ? addressLinesStyle : emptyAddressStyle}>
-        {displayLines.map((line) => (
-          <span key={line}>{line}</span>
+        {displayLines.map((line, index) => (
+          <span key={typeof line === "string" ? line : `empty-${index}`}>{line}</span>
         ))}
       </div>
     </div>
@@ -127,9 +128,9 @@ function FilterField({ label, children }) {
 
 function OwnerSelect({ owners, defaultValue = "", compact = false }) {
   return (
-    <FormField label="Property owner">
+    <FormField label={<AdminText i18nKey="orderDetailAdmin.propertyOwner" fallback="Property owner" />}>
       <select name="ownerId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle}>
-        <option value="">No owner selected</option>
+        <option value=""><AdminText i18nKey="contractsAdmin.noOwnerSelected" fallback="No owner selected" /></option>
         {owners.map((owner) => (
           <option key={owner.id} value={owner.id}>
             {ownerOptionSummary(owner)}
@@ -142,9 +143,9 @@ function OwnerSelect({ owners, defaultValue = "", compact = false }) {
 
 function KitchenSelect({ kitchens, defaultValue = "", compact = false, required = true }) {
   return (
-    <FormField label="Kitchen">
+    <FormField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
       <select name="kitchenId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required={required}>
-        <option value="">Select kitchen</option>
+        <option value=""><AdminText i18nKey="contractsAdmin.selectKitchen" fallback="Select kitchen" /></option>
         {kitchens.map((kitchen) => (
           <option key={kitchen.id} value={kitchen.id}>
             {kitchen.name}
@@ -179,25 +180,25 @@ export default async function AdminContractsPage({ searchParams = {} }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title="Contract numbers"
-          description="Create, filter, and edit reusable contract numbers from one place."
-          actions={<ActionLink href="/admin/property-owners">Manage owners</ActionLink>}
+          title={<AdminText i18nKey="contractsAdmin.contractNumbers" fallback="Contract numbers" />}
+          description={<AdminText i18nKey="contractsAdmin.createFilterAndEditReusableContractNumbersFromOnePlace" fallback="Create, filter, and edit reusable contract numbers from one place." />}
+          actions={<ActionLink href="/admin/property-owners"><AdminText i18nKey="dashboard.manageOwners" fallback="Manage owners" /></ActionLink>}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
           <form action="/admin/contracts" method="get" style={filterPanelStyle}>
             <div style={filterHeaderStyle}>
-              <span style={filterEyebrowStyle}>Filters</span>
-              <span style={filterHintStyle}>Narrow the contract list below</span>
+              <span style={filterEyebrowStyle}><AdminText i18nKey="contractsAdmin.filters" fallback="Filters" /></span>
+              <span style={filterHintStyle}><AdminText i18nKey="contractsAdmin.narrowTheContractListBelow" fallback="Narrow the contract list below" /></span>
             </div>
             <div style={filterGridStyle}>
-              <FilterField label="Search">
+              <FilterField label={<AdminText i18nKey="contractsAdmin.search" fallback="Search" />}>
                 <input name="q" defaultValue={filters.query} placeholder="Contract, kitchen, owner, city..." style={filterInputStyle} />
               </FilterField>
-              <FilterField label="Kitchen">
+              <FilterField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
                 <select name="kitchenId" defaultValue={filters.kitchenId} style={filterInputStyle}>
-                  <option value="">All kitchens</option>
+                  <option value=""><AdminText i18nKey="dashboard.allKitchens" fallback="All kitchens" /></option>
                   {kitchens.map((kitchen) => (
                     <option key={kitchen.id} value={kitchen.id}>
                       {kitchen.name}
@@ -205,9 +206,9 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                   ))}
                 </select>
               </FilterField>
-              <FilterField label="Owner">
+              <FilterField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Owner" />}>
                 <select name="ownerId" defaultValue={filters.ownerId} style={filterInputStyle}>
-                  <option value="">All owners</option>
+                  <option value=""><AdminText i18nKey="contractsAdmin.allOwners" fallback="All owners" /></option>
                   {owners.map((owner) => (
                     <option key={owner.id} value={owner.id}>
                       {ownerOptionSummary(owner)}
@@ -215,25 +216,25 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                   ))}
                 </select>
               </FilterField>
-              <FilterField label="Status">
+              <FilterField label={<AdminText i18nKey="dashboard.status" fallback="Status" />}>
                 <select name="status" defaultValue={filters.status} style={filterInputStyle}>
-                  <option value="">All statuses</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
+                  <option value=""><AdminText i18nKey="dashboard.allStatuses" fallback="All statuses" /></option>
+                  <option value="active"><AdminText i18nKey="contractsAdmin.active" fallback="Active" /></option>
+                  <option value="inactive"><AdminText i18nKey="contractsAdmin.inactive" fallback="Inactive" /></option>
                 </select>
               </FilterField>
-              <FilterField label="Usage">
+              <FilterField label={<AdminText i18nKey="contractsAdmin.usage" fallback="Usage" />}>
                 <select name="usage" defaultValue={filters.usage} style={filterInputStyle}>
-                  <option value="">All usage</option>
-                  <option value="unused">Unused</option>
-                  <option value="used">Used</option>
-                  <option value="once">Used once</option>
-                  <option value="multiple">Used 2+ times</option>
+                  <option value=""><AdminText i18nKey="contractsAdmin.allUsage" fallback="All usage" /></option>
+                  <option value="unused"><AdminText i18nKey="contractsAdmin.unused" fallback="Unused" /></option>
+                  <option value="used"><AdminText i18nKey="contractsAdmin.used" fallback="Used" /></option>
+                  <option value="once"><AdminText i18nKey="contractsAdmin.usedOnce" fallback="Used once" /></option>
+                  <option value="multiple"><AdminText i18nKey="contractsAdmin.usedTwoPlusTimes" fallback="Used 2+ times" /></option>
                 </select>
               </FilterField>
               <div style={filterActionsStyle}>
-                <button type="submit" style={filterApplyButtonStyle}>Apply filters</button>
-                <Link href="/admin/contracts" style={filterClearLinkStyle}>Clear</Link>
+                <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
+                <Link href="/admin/contracts" style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
               </div>
             </div>
           </form>
@@ -242,21 +243,21 @@ export default async function AdminContractsPage({ searchParams = {} }) {
         <AdminSection>
           <details style={createContractDetailsStyle}>
             <summary className="create-contract-summary" style={createContractSummaryStyle}>
-              Add contract number
+              <AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add contract number" />
             </summary>
             <div style={createContractBodyStyle}>
               <p style={createContractDescriptionStyle}>
-                Select the kitchen, add the contract address, and attach a property owner.
+                <AdminText i18nKey="contractsAdmin.selectKitchenAddContractAddressAndAttachPropertyOwner" fallback="Select the kitchen, add the contract address, and attach a property owner." />
               </p>
               <form action="/api/admin/contracts" method="post" style={formGridStyle}>
                 <KitchenSelect kitchens={kitchens} defaultValue={filters.kitchenId} />
-                <FormField label="Contract number">
+                <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                   <input name="contractNumber" placeholder="ABC-123" style={inputStyle} required />
                 </FormField>
                 <AdminContractAddressFields />
                 <OwnerSelect owners={owners} defaultValue={filters.ownerId} />
                 <div style={{ gridColumn: "1 / -1" }}>
-                  <button type="submit" style={primaryButtonStyle}>Create contract</button>
+                  <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.createContract" fallback="Create contract" /></button>
                 </div>
               </form>
             </div>
@@ -264,8 +265,8 @@ export default async function AdminContractsPage({ searchParams = {} }) {
         </AdminSection>
 
         <AdminSection
-          title="Configured contracts"
-          description={`${contracts.length} contract number(s) match the current filters.`}
+          title={<AdminText i18nKey="contractsAdmin.configuredContracts" fallback="Configured contracts" />}
+          description={<>{contracts.length} <AdminText i18nKey="contractsAdmin.contractNumbersMatchCurrentFilters" fallback="contract number(s) match the current filters." /></>}
         >
           <div className="admin-list-table" style={tableWrapStyle}>
             <table style={contractTableStyle}>
@@ -282,21 +283,21 @@ export default async function AdminContractsPage({ searchParams = {} }) {
               </colgroup>
               <thead>
                 <tr>
-                  <th style={compactThStyle}>Contract</th>
-                  <th style={compactThStyle}>Kitchen</th>
-                  <th style={compactThStyle}>Status</th>
-                  <th style={compactThStyle}>Owner</th>
-                  <th style={compactThStyle}>Contract address</th>
-                  <th style={compactThStyle}>Payment address</th>
-                  <th style={compactThStyle}>Usage</th>
-                  <th style={compactThStyle}>Created</th>
-                  <th style={compactThStyle}>Action</th>
+                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.contract" fallback="Contract" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="dashboard.status" fallback="Status" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.owner" fallback="Owner" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.contractAddress" fallback="Contract address" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.paymentAddress" fallback="Payment address" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.usage" fallback="Usage" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.created" fallback="Created" /></th>
+                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!contracts.length ? (
                   <tr>
-                    <td style={compactTableTdStyle} colSpan={9}>No contract numbers match the current filters.</td>
+                    <td style={compactTableTdStyle} colSpan={9}><AdminText i18nKey="contractsAdmin.noContractNumbersMatchCurrentFilters" fallback="No contract numbers match the current filters." /></td>
                   </tr>
                 ) : null}
                 {contracts.map((contract) => (
@@ -307,10 +308,10 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                       <td style={compactTdStyle}><StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} /></td>
                       <td style={ownerTdStyle}>{ownerSummary(contract.owner)}</td>
                       <td style={addressTdStyle}>
-                        <AddressColumn lines={contractAddressLines(contract)} emptyText="No contract address" />
+                        <AddressColumn lines={contractAddressLines(contract)} emptyText={<AdminText i18nKey="contractsAdmin.noContractAddress" fallback="No contract address" />} />
                       </td>
                       <td style={addressTdStyle}>
-                        <AddressColumn lines={contactAddressLines(contract.latestOrderAddress)} emptyText="No payment address" />
+                        <AddressColumn lines={contactAddressLines(contract.latestOrderAddress)} emptyText={<AdminText i18nKey="contractsAdmin.noPaymentAddress" fallback="No payment address" />} />
                       </td>
                       <td style={compactTdStyle}>
                         <span style={contract._count.orders ? usagePillUsedStyle : usagePillUnusedStyle}>
@@ -328,15 +329,15 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                               value={contract.isActive ? "deactivate" : "reactivate"}
                               style={contractToggleButtonStyle}
                             >
-                              {contract.isActive ? "Deactivate" : "Reactivate"}
+                              {contract.isActive ? <AdminText i18nKey="contractsAdmin.deactivate" fallback="Deactivate" /> : <AdminText i18nKey="contractsAdmin.reactivate" fallback="Reactivate" />}
                             </button>
                           </form>
                           <details style={contractDeleteDetailsStyle}>
-                            <summary style={contractDeleteSummaryStyle}>Delete</summary>
+                            <summary style={contractDeleteSummaryStyle}><AdminText i18nKey="contractsAdmin.delete" fallback="Delete" /></summary>
                             <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractDeleteFormStyle}>
                               <input type="hidden" name="returnTo" value={returnTo} />
                               <button type="submit" name="_intent" value="delete" style={contractDeleteButtonStyle}>
-                                Confirm delete
+                                <AdminText i18nKey="contractsAdmin.confirmDelete" fallback="Confirm delete" />
                               </button>
                             </form>
                           </details>
@@ -347,18 +348,18 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                       <td style={contractEditorTdStyle} colSpan={9}>
                         <details style={contractEditDetailsStyle}>
                           <summary style={contractEditSummaryStyle}>
-                            Edit contract details for {contract.contractNumber}
+                            <AdminText i18nKey="contractsAdmin.editContractDetailsFor" fallback="Edit contract details for" /> {contract.contractNumber}
                           </summary>
                           <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
                             <input type="hidden" name="_intent" value="update" />
                             <input type="hidden" name="returnTo" value={returnTo} />
-                            <FormField label="Contract number">
+                            <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                               <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
                             </FormField>
                             <AdminContractAddressFields contract={contract} compact />
                             <OwnerSelect owners={owners} defaultValue={contract.ownerId || ""} compact />
                             <div style={contractEditActionStyle}>
-                              <button type="submit" style={primaryButtonStyle}>Save contract</button>
+                              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
                             </div>
                           </form>
                         </details>
@@ -371,7 +372,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
           </div>
 
           <div className="admin-list-cards" style={{ gap: cardListStyle.gap }}>
-            {!contracts.length ? <p style={mutedTextStyle}>No contract numbers match the current filters.</p> : null}
+            {!contracts.length ? <p style={mutedTextStyle}><AdminText i18nKey="contractsAdmin.noContractNumbersMatchCurrentFilters" fallback="No contract numbers match the current filters." /></p> : null}
             {contracts.map((contract) => (
               <article key={contract.id} style={itemCardStyle}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
@@ -379,10 +380,10 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                     <strong>{contract.contractNumber}</strong>
                     <div style={subMetaStyle}>
                       <span>{contract.kitchen.name}</span>
-                      <span>Owner: {ownerName(contract.owner)}</span>
+                      <span><AdminText i18nKey="contractsAdmin.ownerLabel" fallback="Owner:" /> {ownerName(contract.owner)}</span>
                       <span>{compactAddressSummary(contract)}</span>
                       <span>{usageLabel(contract._count.orders)}</span>
-                      <span>Created: {formatDate(contract.createdAt)}</span>
+                      <span><AdminText i18nKey="contractsAdmin.createdLabel" fallback="Created:" /> {formatDate(contract.createdAt)}</span>
                     </div>
                   </div>
                   <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
@@ -395,29 +396,29 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                     value={contract.isActive ? "deactivate" : "reactivate"}
                     style={secondaryButtonStyle}
                   >
-                    {contract.isActive ? "Deactivate" : "Reactivate"}
+                    {contract.isActive ? <AdminText i18nKey="contractsAdmin.deactivate" fallback="Deactivate" /> : <AdminText i18nKey="contractsAdmin.reactivate" fallback="Reactivate" />}
                   </button>
                 </form>
                 <details style={contractDeleteDetailsStyle}>
-                  <summary style={contractDeleteSummaryStyle}>Delete contract number</summary>
+                  <summary style={contractDeleteSummaryStyle}><AdminText i18nKey="contractsAdmin.deleteContractNumber" fallback="Delete contract number" /></summary>
                   <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractDeleteFormStyle}>
                     <input type="hidden" name="returnTo" value={returnTo} />
                     <button type="submit" name="_intent" value="delete" style={contractDeleteButtonStyle}>
-                      Confirm delete
+                      <AdminText i18nKey="contractsAdmin.confirmDelete" fallback="Confirm delete" />
                     </button>
                   </form>
                 </details>
                 <details style={contractEditDetailsStyle}>
-                  <summary style={contractEditSummaryStyle}>Edit contract details</summary>
+                  <summary style={contractEditSummaryStyle}><AdminText i18nKey="contractsAdmin.editContractDetails" fallback="Edit contract details" /></summary>
                   <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
                     <input type="hidden" name="_intent" value="update" />
                     <input type="hidden" name="returnTo" value={returnTo} />
-                    <FormField label="Contract number">
+                    <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                       <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
                     </FormField>
                     <AdminContractAddressFields contract={contract} compact />
                     <OwnerSelect owners={owners} defaultValue={contract.ownerId || ""} compact />
-                    <button type="submit" style={primaryButtonStyle}>Save contract</button>
+                    <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
                   </form>
                 </details>
               </article>

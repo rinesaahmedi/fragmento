@@ -12,6 +12,8 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminText } from "../../../components/admin-i18n";
+import { AdminKitchenDescription } from "../../../components/admin-kitchen-description";
 import { listKitchensForAdmin } from "../../../lib/catalog";
 import { requireAdminPage } from "../../../lib/auth";
 
@@ -32,26 +34,26 @@ export default async function AdminKitchensPage() {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title="Kitchens"
-          description="Database-backed kitchen definitions used by the public configurator."
+          title={<AdminText i18nKey="adminShellLogin.kitchens" fallback="Kitchens" />}
+          description={<AdminText i18nKey="kitchensAdmin.databaseBackedKitchenDefinitionsUsedByPublicConfigurator" fallback="Database-backed kitchen definitions used by the public configurator." />}
         >
           <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>Kitchen</th>
-                  <th style={thStyle}>Slug</th>
-                  <th style={thStyle}>Status</th>
-                  <th style={thStyle}>Items</th>
-                  <th style={thStyle}>Orders</th>
-                  <th style={thStyle}>Contracts</th>
-                  <th style={thStyle}>Updated</th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.kitchen" fallback="Kitchen" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.slug" fallback="Slug" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.status" fallback="Status" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.items" fallback="Items" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.orders" fallback="Orders" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.contracts" fallback="Contracts" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.updated" fallback="Updated" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!kitchens.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={7}>No kitchens found.</td>
+                    <td style={tdStyle} colSpan={7}><AdminText i18nKey="kitchensAdmin.noKitchensFound" fallback="No kitchens found." /></td>
                   </tr>
                 ) : null}
                 {kitchens.map((kitchen) => (
@@ -64,7 +66,10 @@ export default async function AdminKitchensPage() {
                         {kitchen.name}
                       </Link>
                       <div style={{ color: "var(--app-text-muted)", marginTop: 6 }}>
-                        {kitchen.description || "No description"}
+                        <AdminKitchenDescription
+                          kitchen={kitchen}
+                          fallback={<AdminText i18nKey="kitchensAdmin.noDescription" fallback="No description" />}
+                        />
                       </div>
                     </td>
                     <td style={tdStyle}>{kitchen.slug}</td>
@@ -80,7 +85,7 @@ export default async function AdminKitchensPage() {
           </div>
 
           <div className="admin-list-cards" style={{ gap: cardListStyle.gap }}>
-            {!kitchens.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}>No kitchens found.</p> : null}
+            {!kitchens.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}><AdminText i18nKey="kitchensAdmin.noKitchensFound" fallback="No kitchens found." /></p> : null}
             {kitchens.map((kitchen) => (
               <article key={kitchen.id} style={itemCardStyle}>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
@@ -99,12 +104,15 @@ export default async function AdminKitchensPage() {
                   <StatusBadge status={kitchen.status} />
                 </div>
                 <p style={{ margin: 0, color: "var(--app-text-muted)", lineHeight: 1.6 }}>
-                  {kitchen.description || "No description"}
+                  <AdminKitchenDescription
+                    kitchen={kitchen}
+                    fallback={<AdminText i18nKey="kitchensAdmin.noDescription" fallback="No description" />}
+                  />
                 </p>
                 <div style={subMetaStyle}>
-                  <span>{kitchen._count.items} item(s)</span>
-                  <span>{kitchen._count.orders} order(s)</span>
-                  <span>{kitchen._count.contracts} contract(s)</span>
+                  <span>{kitchen._count.items} <AdminText i18nKey="kitchensAdmin.itemCount" fallback="item(s)" /></span>
+                  <span>{kitchen._count.orders} <AdminText i18nKey="kitchensAdmin.orderCount" fallback="order(s)" /></span>
+                  <span>{kitchen._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
                 </div>
               </article>
             ))}
