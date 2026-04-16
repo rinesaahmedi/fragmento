@@ -59,6 +59,7 @@ export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
   let kitchenId = "";
+  let returnPath = "/admin/contracts";
 
   try {
     const formData = await request.formData();
@@ -72,7 +73,7 @@ export async function POST(request, { params }) {
       throw new Error("Contract number not found.");
     }
     kitchenId = contract.kitchenId;
-    const returnPath = getReturnPath(formData, `/admin/kitchens/${contract.kitchenId}`);
+    returnPath = getReturnPath(formData, `/admin/kitchens/${contract.kitchenId}`);
 
     if (intent === "update") {
       const data = validateKitchenContractInput(formData);
@@ -100,6 +101,14 @@ export async function POST(request, { params }) {
       return redirectWithFlash(request, returnPath, "success", "Contract number updated.");
     }
 
+    if (intent === "delete") {
+      await prisma.kitchenContract.delete({
+        where: { id },
+      });
+
+      return redirectWithFlash(request, returnPath, "success", "Contract number deleted.");
+    }
+
     const isActive = intent === "reactivate";
     await prisma.kitchenContract.update({
       where: { id },
@@ -113,7 +122,7 @@ export async function POST(request, { params }) {
       isActive ? "Contract number reactivated." : "Contract number deactivated.",
     );
   } catch (error) {
-    const pathname = kitchenId ? `/admin/kitchens/${kitchenId}` : "/admin/kitchens";
+    const pathname = returnPath || (kitchenId ? `/admin/kitchens/${kitchenId}` : "/admin/contracts");
     return redirectWithFlash(request, pathname, "error", mapAdminMutationError(error, "Contract number"));
   }
 }

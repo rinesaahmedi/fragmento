@@ -194,13 +194,47 @@ export async function listKitchenContractsForAdmin(filters = {}) {
       po."email",
       po."phone",
       po."notes" AS "ownerNotes",
+      latest_order."firstName" AS "latestOrderFirstName",
+      latest_order."lastName" AS "latestOrderLastName",
+      latest_order."address1" AS "latestOrderAddress1",
+      latest_order."address2" AS "latestOrderAddress2",
+      latest_order."postalCode" AS "latestOrderPostalCode",
+      latest_order."city" AS "latestOrderCity",
+      latest_order."country" AS "latestOrderCountry",
+      latest_order."createdAt" AS "latestOrderCreatedAt",
       COUNT(o."id")::int AS "orderCount"
     FROM "KitchenContract" kc
     JOIN "Kitchen" k ON k."id" = kc."kitchenId"
     LEFT JOIN "PropertyOwner" po ON po."id" = kc."ownerId"
     LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
+    LEFT JOIN LATERAL (
+      SELECT
+        oo."firstName",
+        oo."lastName",
+        oo."address1",
+        oo."address2",
+        oo."postalCode",
+        oo."city",
+        oo."country",
+        oo."createdAt"
+      FROM "Order" oo
+      WHERE oo."kitchenContractId" = kc."id"
+      ORDER BY oo."createdAt" DESC, oo."id" DESC
+      LIMIT 1
+    ) latest_order ON true
     ${whereSql}
-    GROUP BY kc."id", k."id", po."id"
+    GROUP BY
+      kc."id",
+      k."id",
+      po."id",
+      latest_order."firstName",
+      latest_order."lastName",
+      latest_order."address1",
+      latest_order."address2",
+      latest_order."postalCode",
+      latest_order."city",
+      latest_order."country",
+      latest_order."createdAt"
     ${havingSql}
     ORDER BY kc."createdAt" DESC, kc."contractNumber" ASC
   `;
@@ -236,6 +270,18 @@ export async function listKitchenContractsForAdmin(filters = {}) {
           email: row.email,
           phone: row.phone,
           notes: row.ownerNotes,
+        }
+      : null,
+    latestOrderAddress: row.latestOrderAddress1
+      ? {
+          firstName: row.latestOrderFirstName,
+          lastName: row.latestOrderLastName,
+          address1: row.latestOrderAddress1,
+          address2: row.latestOrderAddress2,
+          postalCode: row.latestOrderPostalCode,
+          city: row.latestOrderCity,
+          country: row.latestOrderCountry,
+          createdAt: row.latestOrderCreatedAt,
         }
       : null,
     _count: { orders: Number(row.orderCount || 0) },

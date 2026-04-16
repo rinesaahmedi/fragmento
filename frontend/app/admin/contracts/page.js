@@ -4,7 +4,6 @@ import {
   FlashMessage,
   FormField,
   StatusBadge,
-  actionRowStyle,
   cardListStyle,
   formGridStyle,
   inputStyle,
@@ -19,6 +18,8 @@ import {
   tdStyle,
   thStyle,
 } from "../../../components/admin-ui";
+import Link from "next/link";
+import { Fragment } from "react";
 import { AdminShell } from "../../../components/admin-shell";
 import AdminContractAddressFields from "../../../components/admin-contract-address-fields";
 import { getFormMessage } from "../../../lib/admin-forms";
@@ -52,9 +53,47 @@ function contractAddressLines(contract) {
   return [streetLine, cityLine, contract.country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
 }
 
-function contractAddressSummary(contract) {
-  const lines = contractAddressLines(contract);
-  return lines.length ? lines.join(" | ") : "No address context";
+function contactAddressLines(address) {
+  if (!address) return [];
+  const nameLine = [address.firstName, address.lastName].filter(Boolean).join(" ");
+  const streetLine = [address.address1, address.address2].filter(Boolean).join(", ");
+  const cityLine = [address.postalCode, address.city].filter(Boolean).join(" ");
+  return [nameLine, streetLine, cityLine, address.country].filter(Boolean);
+}
+
+function addressSections(contract) {
+  const sections = [];
+  const contractLines = contractAddressLines(contract);
+  if (contractLines.length) {
+    sections.push({ label: "Contract address", lines: contractLines });
+  }
+
+  const paymentLines = contactAddressLines(contract.latestOrderAddress);
+  if (paymentLines.length) {
+    sections.push({ label: "Payment address", lines: paymentLines });
+  }
+
+  return sections.length ? sections : [{ label: "", lines: ["No address captured"] }];
+}
+
+function compactAddressSummary(contract) {
+  return addressSections(contract)
+    .map((section) => (section.label ? `${section.label}: ${section.lines.join(" | ")}` : section.lines.join(" | ")))
+    .join(" / ");
+}
+
+function AddressColumn({ lines, emptyText }) {
+  const displayLines = lines.length ? lines : [emptyText];
+
+  return (
+    <div style={addressBlockStyle}>
+      <div style={lines.length ? addressLinesStyle : emptyAddressStyle}>
+        {displayLines.map((line) => (
+          <span key={line}>{line}</span>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function ownerName(owner) {
@@ -63,14 +102,11 @@ function ownerName(owner) {
 }
 
 function ownerSummary(owner) {
-  if (!owner) return "No owner selected";
-  const contact = [owner.email, owner.phone].filter(Boolean).join(" | ");
-  return contact ? `${ownerName(owner)} | ${contact}` : ownerName(owner);
+  return ownerName(owner);
 }
 
 function ownerOptionSummary(owner) {
-  const contact = [owner.email, owner.phone].filter(Boolean).join(" | ");
-  return contact ? `${ownerName(owner)} | ${contact}` : ownerName(owner);
+  return ownerName(owner);
 }
 
 function usageLabel(orderCount) {
@@ -78,6 +114,15 @@ function usageLabel(orderCount) {
   if (count === 0) return "Unused";
   if (count === 1) return "Used once";
   return `Used ${count} times`;
+}
+
+function FilterField({ label, children }) {
+  return (
+    <label style={filterFieldStyle}>
+      <span>{label}</span>
+      {children}
+    </label>
+  );
 }
 
 function OwnerSelect({ owners, defaultValue = "", compact = false }) {
@@ -95,10 +140,10 @@ function OwnerSelect({ owners, defaultValue = "", compact = false }) {
   );
 }
 
-function KitchenSelect({ kitchens, defaultValue = "", compact = false }) {
+function KitchenSelect({ kitchens, defaultValue = "", compact = false, required = true }) {
   return (
     <FormField label="Kitchen">
-      <select name="kitchenId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required>
+      <select name="kitchenId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required={required}>
         <option value="">Select kitchen</option>
         {kitchens.map((kitchen) => (
           <option key={kitchen.id} value={kitchen.id}>
@@ -141,50 +186,81 @@ export default async function AdminContractsPage({ searchParams = {} }) {
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
-          <form action="/admin/contracts" method="get" style={filterGridStyle}>
-            <FormField label="Search">
-              <input name="q" defaultValue={filters.query} placeholder="Contract, kitchen, owner, city..." style={inputStyle} />
-            </FormField>
-            <KitchenSelect kitchens={kitchens} defaultValue={filters.kitchenId} />
-            <OwnerSelect owners={owners} defaultValue={filters.ownerId} />
-            <FormField label="Status">
-              <select name="status" defaultValue={filters.status} style={inputStyle}>
-                <option value="">All statuses</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-              </select>
-            </FormField>
-            <FormField label="Usage">
-              <select name="usage" defaultValue={filters.usage} style={inputStyle}>
-                <option value="">All usage</option>
-                <option value="unused">Unused</option>
-                <option value="used">Used</option>
-                <option value="once">Used once</option>
-                <option value="multiple">Used 2+ times</option>
-              </select>
-            </FormField>
-            <div style={{ ...actionRowStyle, alignSelf: "end" }}>
-              <button type="submit" style={primaryButtonStyle}>Apply filters</button>
-              <ActionLink href="/admin/contracts">Clear filters</ActionLink>
+          <form action="/admin/contracts" method="get" style={filterPanelStyle}>
+            <div style={filterHeaderStyle}>
+              <span style={filterEyebrowStyle}>Filters</span>
+              <span style={filterHintStyle}>Narrow the contract list below</span>
+            </div>
+            <div style={filterGridStyle}>
+              <FilterField label="Search">
+                <input name="q" defaultValue={filters.query} placeholder="Contract, kitchen, owner, city..." style={filterInputStyle} />
+              </FilterField>
+              <FilterField label="Kitchen">
+                <select name="kitchenId" defaultValue={filters.kitchenId} style={filterInputStyle}>
+                  <option value="">All kitchens</option>
+                  {kitchens.map((kitchen) => (
+                    <option key={kitchen.id} value={kitchen.id}>
+                      {kitchen.name}
+                    </option>
+                  ))}
+                </select>
+              </FilterField>
+              <FilterField label="Owner">
+                <select name="ownerId" defaultValue={filters.ownerId} style={filterInputStyle}>
+                  <option value="">All owners</option>
+                  {owners.map((owner) => (
+                    <option key={owner.id} value={owner.id}>
+                      {ownerOptionSummary(owner)}
+                    </option>
+                  ))}
+                </select>
+              </FilterField>
+              <FilterField label="Status">
+                <select name="status" defaultValue={filters.status} style={filterInputStyle}>
+                  <option value="">All statuses</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </FilterField>
+              <FilterField label="Usage">
+                <select name="usage" defaultValue={filters.usage} style={filterInputStyle}>
+                  <option value="">All usage</option>
+                  <option value="unused">Unused</option>
+                  <option value="used">Used</option>
+                  <option value="once">Used once</option>
+                  <option value="multiple">Used 2+ times</option>
+                </select>
+              </FilterField>
+              <div style={filterActionsStyle}>
+                <button type="submit" style={filterApplyButtonStyle}>Apply filters</button>
+                <Link href="/admin/contracts" style={filterClearLinkStyle}>Clear</Link>
+              </div>
             </div>
           </form>
         </AdminSection>
 
-        <AdminSection
-          title="Add contract number"
-          description="Select the kitchen, add address context, and attach a property owner."
-        >
-          <form action="/api/admin/contracts" method="post" style={formGridStyle}>
-            <KitchenSelect kitchens={kitchens} defaultValue={filters.kitchenId} />
-            <FormField label="Contract number">
-              <input name="contractNumber" placeholder="ABC-123" style={inputStyle} required />
-            </FormField>
-            <AdminContractAddressFields />
-            <OwnerSelect owners={owners} defaultValue={filters.ownerId} />
-            <div style={{ gridColumn: "1 / -1" }}>
-              <button type="submit" style={primaryButtonStyle}>Create contract</button>
+        <AdminSection>
+          <details style={createContractDetailsStyle}>
+            <summary className="create-contract-summary" style={createContractSummaryStyle}>
+              Add contract number
+            </summary>
+            <div style={createContractBodyStyle}>
+              <p style={createContractDescriptionStyle}>
+                Select the kitchen, add the contract address, and attach a property owner.
+              </p>
+              <form action="/api/admin/contracts" method="post" style={formGridStyle}>
+                <KitchenSelect kitchens={kitchens} defaultValue={filters.kitchenId} />
+                <FormField label="Contract number">
+                  <input name="contractNumber" placeholder="ABC-123" style={inputStyle} required />
+                </FormField>
+                <AdminContractAddressFields />
+                <OwnerSelect owners={owners} defaultValue={filters.ownerId} />
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <button type="submit" style={primaryButtonStyle}>Create contract</button>
+                </div>
+              </form>
             </div>
-          </form>
+          </details>
         </AdminSection>
 
         <AdminSection
@@ -192,53 +268,87 @@ export default async function AdminContractsPage({ searchParams = {} }) {
           description={`${contracts.length} contract number(s) match the current filters.`}
         >
           <div className="admin-list-table" style={tableWrapStyle}>
-            <table style={tableStyle}>
+            <table style={contractTableStyle}>
+              <colgroup>
+                <col style={contractNumberColumnStyle} />
+                <col style={kitchenColumnStyle} />
+                <col style={statusColumnStyle} />
+                <col style={ownerColumnStyle} />
+                <col style={contractAddressColumnStyle} />
+                <col style={paymentAddressColumnStyle} />
+                <col style={usageColumnStyle} />
+                <col style={createdColumnStyle} />
+                <col style={actionColumnStyle} />
+              </colgroup>
               <thead>
                 <tr>
-                  <th style={thStyle}>Contract</th>
-                  <th style={thStyle}>Kitchen</th>
-                  <th style={thStyle}>Status</th>
-                  <th style={thStyle}>Owner</th>
-                  <th style={thStyle}>Address</th>
-                  <th style={thStyle}>Usage</th>
-                  <th style={thStyle}>Created</th>
-                  <th style={thStyle}>Action</th>
+                  <th style={compactThStyle}>Contract</th>
+                  <th style={compactThStyle}>Kitchen</th>
+                  <th style={compactThStyle}>Status</th>
+                  <th style={compactThStyle}>Owner</th>
+                  <th style={compactThStyle}>Contract address</th>
+                  <th style={compactThStyle}>Payment address</th>
+                  <th style={compactThStyle}>Usage</th>
+                  <th style={compactThStyle}>Created</th>
+                  <th style={compactThStyle}>Action</th>
                 </tr>
               </thead>
               <tbody>
                 {!contracts.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={8}>No contract numbers match the current filters.</td>
+                    <td style={compactTableTdStyle} colSpan={9}>No contract numbers match the current filters.</td>
                   </tr>
                 ) : null}
                 {contracts.map((contract) => (
-                  <tr key={contract.id}>
-                    <td style={tdStyle}><strong>{contract.contractNumber}</strong></td>
-                    <td style={tdStyle}>{contract.kitchen.name}</td>
-                    <td style={tdStyle}><StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} /></td>
-                    <td style={tdStyle}>{ownerSummary(contract.owner)}</td>
-                    <td style={tdStyle}>{contractAddressSummary(contract)}</td>
-                    <td style={tdStyle}>
-                      <span style={contract._count.orders ? usagePillUsedStyle : usagePillUnusedStyle}>
-                        {usageLabel(contract._count.orders)}
-                      </span>
-                    </td>
-                    <td style={tdStyle}>{formatDate(contract.createdAt)}</td>
-                    <td style={tdStyle}>
-                      <div style={contractActionStackStyle}>
-                        <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                          <input type="hidden" name="returnTo" value={returnTo} />
-                          <button
-                            type="submit"
-                            name="_intent"
-                            value={contract.isActive ? "deactivate" : "reactivate"}
-                            style={secondaryButtonStyle}
-                          >
-                            {contract.isActive ? "Deactivate" : "Reactivate"}
-                          </button>
-                        </form>
+                  <Fragment key={contract.id}>
+                    <tr>
+                      <td style={compactTableTdStyle}><strong>{contract.contractNumber}</strong></td>
+                      <td style={compactTdStyle}>{contract.kitchen.name}</td>
+                      <td style={compactTdStyle}><StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} /></td>
+                      <td style={ownerTdStyle}>{ownerSummary(contract.owner)}</td>
+                      <td style={addressTdStyle}>
+                        <AddressColumn lines={contractAddressLines(contract)} emptyText="No contract address" />
+                      </td>
+                      <td style={addressTdStyle}>
+                        <AddressColumn lines={contactAddressLines(contract.latestOrderAddress)} emptyText="No payment address" />
+                      </td>
+                      <td style={compactTdStyle}>
+                        <span style={contract._count.orders ? usagePillUsedStyle : usagePillUnusedStyle}>
+                          {usageLabel(contract._count.orders)}
+                        </span>
+                      </td>
+                      <td style={compactTdStyle}>{formatDate(contract.createdAt)}</td>
+                      <td style={actionTdStyle}>
+                        <div style={contractActionStackStyle}>
+                          <form action={`/api/admin/contracts/${contract.id}`} method="post">
+                            <input type="hidden" name="returnTo" value={returnTo} />
+                            <button
+                              type="submit"
+                              name="_intent"
+                              value={contract.isActive ? "deactivate" : "reactivate"}
+                              style={contractToggleButtonStyle}
+                            >
+                              {contract.isActive ? "Deactivate" : "Reactivate"}
+                            </button>
+                          </form>
+                          <details style={contractDeleteDetailsStyle}>
+                            <summary style={contractDeleteSummaryStyle}>Delete</summary>
+                            <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractDeleteFormStyle}>
+                              <input type="hidden" name="returnTo" value={returnTo} />
+                              <button type="submit" name="_intent" value="delete" style={contractDeleteButtonStyle}>
+                                Confirm delete
+                              </button>
+                            </form>
+                          </details>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style={contractEditorTdStyle} colSpan={9}>
                         <details style={contractEditDetailsStyle}>
-                          <summary style={contractEditSummaryStyle}>Edit details</summary>
+                          <summary style={contractEditSummaryStyle}>
+                            Edit contract details for {contract.contractNumber}
+                          </summary>
                           <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
                             <input type="hidden" name="_intent" value="update" />
                             <input type="hidden" name="returnTo" value={returnTo} />
@@ -247,12 +357,14 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                             </FormField>
                             <AdminContractAddressFields contract={contract} compact />
                             <OwnerSelect owners={owners} defaultValue={contract.ownerId || ""} compact />
-                            <button type="submit" style={primaryButtonStyle}>Save contract</button>
+                            <div style={contractEditActionStyle}>
+                              <button type="submit" style={primaryButtonStyle}>Save contract</button>
+                            </div>
                           </form>
                         </details>
-                      </div>
-                    </td>
-                  </tr>
+                      </td>
+                    </tr>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
@@ -268,7 +380,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                     <div style={subMetaStyle}>
                       <span>{contract.kitchen.name}</span>
                       <span>Owner: {ownerName(contract.owner)}</span>
-                      <span>{contractAddressSummary(contract)}</span>
+                      <span>{compactAddressSummary(contract)}</span>
                       <span>{usageLabel(contract._count.orders)}</span>
                       <span>Created: {formatDate(contract.createdAt)}</span>
                     </div>
@@ -286,6 +398,15 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                     {contract.isActive ? "Deactivate" : "Reactivate"}
                   </button>
                 </form>
+                <details style={contractDeleteDetailsStyle}>
+                  <summary style={contractDeleteSummaryStyle}>Delete contract number</summary>
+                  <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractDeleteFormStyle}>
+                    <input type="hidden" name="returnTo" value={returnTo} />
+                    <button type="submit" name="_intent" value="delete" style={contractDeleteButtonStyle}>
+                      Confirm delete
+                    </button>
+                  </form>
+                </details>
                 <details style={contractEditDetailsStyle}>
                   <summary style={contractEditSummaryStyle}>Edit contract details</summary>
                   <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
@@ -304,6 +425,10 @@ export default async function AdminContractsPage({ searchParams = {} }) {
           </div>
 
           <style>{`
+            .create-contract-summary::-webkit-details-marker {
+              display: none;
+            }
+
             .admin-list-cards {
               display: none;
             }
@@ -326,33 +451,256 @@ export default async function AdminContractsPage({ searchParams = {} }) {
 
 const filterGridStyle = {
   display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  alignItems: "end",
+};
+
+const filterPanelStyle = {
+  display: "grid",
+  gap: 12,
+  borderRadius: 8,
+  border: "1px solid rgba(143, 62, 44, 0.16)",
+  background: "linear-gradient(180deg, rgba(255,247,241,0.82), rgba(255,255,255,0.72))",
+  padding: 14,
+};
+
+const filterHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+  flexWrap: "wrap",
+};
+
+const filterEyebrowStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  borderRadius: 999,
+  padding: "6px 10px",
+  background: "rgba(143, 62, 44, 0.1)",
+  border: "1px solid rgba(143, 62, 44, 0.14)",
+  color: "var(--app-accent)",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+
+const filterHintStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 700,
+};
+
+const filterFieldStyle = {
+  display: "grid",
+  gap: 6,
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+};
+
+const filterInputStyle = {
+  ...inputStyle,
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 11px",
+  background: "rgba(255,255,255,0.94)",
+  fontSize: "0.92rem",
+  boxShadow: "none",
+};
+
+const filterActionsStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "end",
+  flexWrap: "nowrap",
+};
+
+const filterApplyButtonStyle = {
+  ...primaryButtonStyle,
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 14px",
+  fontSize: "0.92rem",
+  whiteSpace: "nowrap",
+  boxShadow: "0 10px 20px rgba(143, 62, 44, 0.16)",
+};
+
+const filterClearLinkStyle = {
+  textDecoration: "none",
+  borderRadius: 8,
+  minHeight: 42,
+  padding: "9px 12px",
+  background: "rgba(255,255,255,0.88)",
+  color: "var(--app-accent)",
+  border: "1px solid rgba(143, 62, 44, 0.14)",
+  fontWeight: 800,
+  fontSize: "0.92rem",
+  display: "inline-flex",
+  alignItems: "center",
+  whiteSpace: "nowrap",
+};
+
+const createContractDetailsStyle = {
+  display: "grid",
   gap: 16,
-  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
-  alignItems: "start",
+};
+
+const createContractSummaryStyle = {
+  ...primaryButtonStyle,
+  width: "fit-content",
+  minHeight: 46,
+  borderRadius: 8,
+  padding: "12px 18px",
+  listStyle: "none",
+  cursor: "pointer",
+};
+
+const createContractBodyStyle = {
+  display: "grid",
+  gap: 18,
+  paddingTop: 8,
+};
+
+const createContractDescriptionStyle = {
+  ...mutedTextStyle,
+  margin: 0,
 };
 
 const contractActionStackStyle = {
   display: "grid",
   gap: 8,
-  minWidth: 220,
+  width: 124,
+};
+
+const contractTableStyle = {
+  ...tableStyle,
+  tableLayout: "fixed",
+  minWidth: 1180,
+};
+
+const contractNumberColumnStyle = { width: "8%" };
+const kitchenColumnStyle = { width: "8%" };
+const statusColumnStyle = { width: "7%" };
+const ownerColumnStyle = { width: "13%" };
+const contractAddressColumnStyle = { width: "18%" };
+const paymentAddressColumnStyle = { width: "18%" };
+const usageColumnStyle = { width: "7%" };
+const createdColumnStyle = { width: "8%" };
+const actionColumnStyle = { width: "13%" };
+
+const compactThStyle = {
+  ...thStyle,
+  padding: "12px 14px",
+  letterSpacing: "0.08em",
+};
+
+const compactTableTdStyle = {
+  ...tdStyle,
+  padding: "14px 14px",
+};
+
+const compactTdStyle = {
+  ...compactTableTdStyle,
+  width: "1%",
+  whiteSpace: "normal",
+};
+
+const ownerTdStyle = {
+  ...compactTableTdStyle,
+  whiteSpace: "normal",
+  overflowWrap: "anywhere",
+};
+
+const addressTdStyle = {
+  ...compactTableTdStyle,
+  whiteSpace: "normal",
+  overflowWrap: "anywhere",
+  paddingRight: 10,
+};
+
+const actionTdStyle = {
+  ...compactTableTdStyle,
+  paddingRight: 10,
+  whiteSpace: "nowrap",
+};
+
+const contractEditorTdStyle = {
+  padding: "0 20px 18px",
+  borderBottom: "1px solid var(--app-border)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,249,245,0.9))",
 };
 
 const contractEditDetailsStyle = {
   display: "grid",
-  gap: 8,
+  gap: 12,
+  borderRadius: 8,
+  border: "1px solid rgba(143, 62, 44, 0.14)",
+  background: "rgba(255,255,255,0.86)",
+  padding: "12px 14px",
 };
 
 const contractEditSummaryStyle = {
   color: "var(--app-accent)",
   cursor: "pointer",
-  fontSize: 13,
+  fontSize: 14,
   fontWeight: 800,
+  width: "fit-content",
 };
 
 const contractEditFormStyle = {
   display: "grid",
-  gap: 8,
-  paddingTop: 8,
+  gap: 14,
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  alignItems: "end",
+  paddingTop: 10,
+};
+
+const contractEditActionStyle = {
+  display: "flex",
+  justifyContent: "flex-end",
+  gridColumn: "1 / -1",
+};
+
+const contractToggleButtonStyle = {
+  ...secondaryButtonStyle,
+  width: "100%",
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 12px",
+  fontSize: "0.92rem",
+};
+
+const contractDeleteDetailsStyle = {
+  display: "grid",
+  gap: 6,
+};
+
+const contractDeleteSummaryStyle = {
+  color: "#9f2d20",
+  cursor: "pointer",
+  fontSize: 13,
+  fontWeight: 800,
+};
+
+const contractDeleteFormStyle = {
+  display: "grid",
+};
+
+const contractDeleteButtonStyle = {
+  ...secondaryButtonStyle,
+  width: "100%",
+  minHeight: 38,
+  borderRadius: 8,
+  padding: "8px 10px",
+  color: "#9f2d20",
+  borderColor: "rgba(159, 45, 32, 0.28)",
+  background: "rgba(159, 45, 32, 0.06)",
+  fontSize: "0.88rem",
 };
 
 const usagePillUsedStyle = {
@@ -372,6 +720,24 @@ const usagePillUnusedStyle = {
   background: "linear-gradient(135deg, var(--app-neutral-bg), rgba(255,255,255,0.72))",
   color: "var(--app-neutral-text)",
   border: "1px solid rgba(112, 89, 78, 0.12)",
+};
+
+const addressBlockStyle = {
+  display: "grid",
+  minWidth: 0,
+};
+
+const addressLinesStyle = {
+  display: "grid",
+  gap: 2,
+  color: "var(--app-text)",
+  lineHeight: 1.35,
+  overflowWrap: "anywhere",
+};
+
+const emptyAddressStyle = {
+  ...addressLinesStyle,
+  color: "var(--app-text-muted)",
 };
 
 const compactInputStyle = {

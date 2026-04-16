@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import http from "http";
 import https from "https";
+import { jsPDF } from "jspdf";
 import nodemailer from "nodemailer";
 import path from "path";
 
@@ -124,6 +125,13 @@ async function loadLogoBuffer() {
   return fs.readFile(logoPath);
 }
 
+function formatPdfDate(value) {
+  return new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "short",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
 export function formatCurrency(num) {
   const hasFraction = Number(num) % 1 !== 0;
   return new Intl.NumberFormat("de-DE", {
@@ -132,6 +140,212 @@ export function formatCurrency(num) {
     minimumFractionDigits: hasFraction ? 2 : 0,
     maximumFractionDigits: 2,
   }).format(Number(num || 0));
+}
+
+function drawItemIcon(doc, item, x, y, size = 16) {
+  const iconKey = String(item.iconKey || "").toLowerCase();
+  const name = String(item.name || "").toLowerCase();
+  const code = String(item.code || "").toLowerCase();
+  const has = (...terms) => terms.some((term) => iconKey.includes(term) || name.includes(term) || code.includes(term));
+  const midX = x + size / 2;
+  const midY = y + size / 2;
+  const bottom = y + size;
+
+  doc.setDrawColor(92, 84, 76);
+  doc.setFillColor(248, 246, 243);
+  doc.setLineWidth(0.8);
+  doc.roundedRect(x, y, size, size, 2, 2, "FD");
+
+  doc.setDrawColor(40, 40, 40);
+  doc.setLineWidth(0.7);
+
+  if (has("delivery", "montage", "pickup", "logistik", "assembly")) {
+    doc.rect(x + 3, y + 7, 7, 5);
+    doc.line(x + 10, y + 8, x + 13, y + 8);
+    doc.line(x + 13, y + 8, x + 14, y + 12);
+    doc.circle(x + 5, y + 13, 1.2);
+    doc.circle(x + 12, y + 13, 1.2);
+    return;
+  }
+
+  if (has("waste", "muell")) {
+    doc.line(x + 5, y + 5, x + 11, y + 5);
+    doc.line(x + 6, y + 6, x + 7, bottom - 3);
+    doc.line(x + 10, y + 6, x + 9, bottom - 3);
+    doc.line(x + 7, bottom - 3, x + 9, bottom - 3);
+    return;
+  }
+
+  if (has("cutlery", "besteck")) {
+    doc.line(x + 5, y + 4, x + 5, bottom - 4);
+    doc.line(x + 4, y + 4, x + 4, y + 8);
+    doc.line(x + 6, y + 4, x + 6, y + 8);
+    doc.line(x + 10, y + 4, x + 10, bottom - 4);
+    doc.circle(x + 10, y + 6, 2);
+    return;
+  }
+
+  if (has("light", "led", "beleuchtung")) {
+    doc.circle(midX, y + 7, 3.2);
+    doc.line(midX, y + 10, midX, y + 13);
+    doc.line(midX - 2, y + 13, midX + 2, y + 13);
+    return;
+  }
+
+  if (has("refrigerator", "fridge", "kuehlschrank")) {
+    doc.rect(x + 5, y + 2.5, 6, 11);
+    doc.line(x + 5, y + 7, x + 11, y + 7);
+    doc.line(x + 10, y + 4, x + 10, y + 5.5);
+    doc.line(x + 10, y + 9, x + 10, y + 10.5);
+    return;
+  }
+
+  if (has("dishwasher", "spuel", "washing", "wasch")) {
+    doc.rect(x + 4, y + 3, 8, 10);
+    doc.line(x + 4, y + 5.5, x + 12, y + 5.5);
+    doc.circle(midX, y + 9.2, 2.5);
+    return;
+  }
+
+  if (has("hood", "dunstabzug", "extractor")) {
+    doc.rect(x + 6, y + 2.5, 4, 6);
+    doc.rect(x + 3.5, y + 8.5, 9, 3);
+    doc.line(x + 5, y + 13, x + 3.5, y + 15);
+    doc.line(x + 8, y + 13, x + 8, y + 15);
+    doc.line(x + 11, y + 13, x + 12.5, y + 15);
+    return;
+  }
+
+  if (has("sink", "faucet", "spuele")) {
+    doc.rect(x + 3, y + 8, 10, 5);
+    doc.circle(midX, y + 8, 3);
+    doc.setFillColor(248, 246, 243);
+    doc.rect(x + 4, y + 8, 8, 3, "F");
+    doc.setDrawColor(40, 40, 40);
+    doc.line(midX, y + 5, midX, y + 8);
+    doc.line(midX, y + 5, x + 12, y + 5);
+    return;
+  }
+
+  if (has("worktop", "arbeitsplatte")) {
+    doc.line(x + 3, y + 6, x + 13, y + 6);
+    doc.line(x + 3, y + 10, x + 13, y + 10);
+    doc.line(x + 13, y + 6, x + 13, y + 10);
+    return;
+  }
+
+  if (has("drawer", "cabinet", "schrank", "base", "wall")) {
+    doc.rect(x + 4, y + 3, 8, 10);
+    doc.line(x + 4, y + 7, x + 12, y + 7);
+    doc.line(x + 6.5, y + 5, x + 9.5, y + 5);
+    doc.line(x + 6.5, y + 10, x + 9.5, y + 10);
+    return;
+  }
+
+  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.text(String(item.name || item.code || "?").slice(0, 2).toUpperCase(), midX, midY + 2, { align: "center" });
+}
+
+export async function generateOrderConfirmationPdf(order) {
+  const doc = new jsPDF({ unit: "pt" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 40;
+  const lineHeight = 15;
+  let y = margin;
+
+  const ensureSpace = (requiredHeight = 24) => {
+    if (y + requiredHeight <= pageHeight - margin) return;
+    doc.addPage();
+    y = margin;
+  };
+
+  doc.setFont("helvetica", "bold").setFontSize(26).setTextColor(65, 55, 48).text("fragmento.", margin, y + 42);
+  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(65, 55, 48).text("by architecto.", margin + 48, y + 56);
+
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y, {
+    align: "right",
+  });
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  ["architecto.", "by Kuechen Aktuell GmbH", "Senefelderstrasse 2b", "38124 Braunschweig"].forEach((line, index) => {
+    doc.text(line, pageWidth - margin, y + 20 + index * 12, { align: "right" });
+  });
+  y += 105;
+
+  doc.setFont("helvetica", "bold").setFontSize(11);
+  doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
+  doc.text(`Datum: ${formatPdfDate(order.createdAt)}`, pageWidth - margin, y, { align: "right" });
+  doc.text(`Kuechenvertragsnr.: ${order.customer.contractNumber || "N/A"}`, margin, y + lineHeight);
+  y += 45;
+
+  ensureSpace(90);
+  doc.setFont("helvetica", "bold").text("Kundendaten:", margin, y);
+  y += lineHeight;
+  doc.setFont("helvetica", "normal");
+  [
+    `${order.customer.firstName} ${order.customer.lastName}`,
+    order.customer.address1,
+    order.customer.address2,
+    `${order.customer.postalCode} ${order.customer.city}`,
+    order.customer.country,
+    `E-Mail: ${order.customer.email}`,
+    `Telefon: ${order.customer.phone}`,
+  ]
+    .filter(Boolean)
+    .forEach((line) => {
+      ensureSpace(lineHeight);
+      doc.text(line, margin, y);
+      y += lineHeight;
+    });
+
+  y += 15;
+
+  const drawSection = (title, items) => {
+    if (!items?.length) return;
+
+    ensureSpace(60);
+    doc.setFont("helvetica", "bold").setFontSize(11).text(title, margin, y);
+    y += 10;
+    doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
+    y += 20;
+    doc.text("Artikel", margin + 26, y);
+    doc.text("Item Code", margin + 290, y);
+    doc.text("Preis", pageWidth - margin, y, { align: "right" });
+    y += 18;
+    doc.setFont("helvetica", "normal").setFontSize(10);
+
+    items.forEach((item) => {
+      const nameLines = doc.splitTextToSize(item.name || "", 238);
+      const rowHeight = Math.max(nameLines.length * lineHeight, 22) + 6;
+      ensureSpace(rowHeight);
+      drawItemIcon(doc, item, margin, y - 4, 18);
+      nameLines.forEach((line, index) => {
+        doc.text(line, margin + 26, y + index * lineHeight);
+      });
+      doc.text(item.code || "-", margin + 290, y);
+      doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
+      y += rowHeight;
+    });
+
+    y += 10;
+  };
+
+  drawSection("Komponenten:", order.components);
+  drawSection("Zubehoer:", order.accessories);
+  drawSection("Dienstleistungen:", order.services);
+
+  ensureSpace(40);
+  doc.setDrawColor(150).line(margin, y, pageWidth - margin, y);
+  y += 20;
+  doc.setFont("helvetica", "bold").setFontSize(14);
+  doc.text("Gesamtpreis:", margin, y);
+  doc.text(formatCurrency(order.total), pageWidth - margin, y, { align: "right" });
+
+  return {
+    base64: doc.output("datauristring").split(",")[1] || "",
+    filename: `Bestellbestaetigung-${order.orderNumber}.pdf`,
+  };
 }
 
 export function buildOrderSummaryHtml(order) {
@@ -201,6 +415,14 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     console.warn("Could not fetch logo:", error.message);
   }
 
+  let effectivePdfBase64 = pdfBase64;
+  let effectivePdfFilename = pdfFilename;
+  if (!effectivePdfBase64) {
+    const generatedPdf = await generateOrderConfirmationPdf(order);
+    effectivePdfBase64 = generatedPdf.base64;
+    effectivePdfFilename = generatedPdf.filename;
+  }
+
   const attachments = [];
   if (logoBuffer) {
     attachments.push({
@@ -212,10 +434,10 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     });
   }
 
-  if (pdfBase64) {
+  if (effectivePdfBase64) {
     attachments.push({
-      filename: pdfFilename || `Bestellung-${order.orderNumber}.pdf`,
-      content: Buffer.from(pdfBase64, "base64"),
+      filename: effectivePdfFilename || `Bestellbestaetigung-${order.orderNumber}.pdf`,
+      content: Buffer.from(effectivePdfBase64, "base64"),
       contentType: "application/pdf",
     });
   }

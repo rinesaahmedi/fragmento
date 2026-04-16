@@ -322,9 +322,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
           description="Reusable contract numbers now live in the dedicated Contracts admin page."
           actions={<ActionLink href={`/admin/contracts?kitchenId=${kitchen.id}`}>Manage contracts</ActionLink>}
         >
-          <p style={mutedTextStyle}>
-            Use the Contracts page to create contract numbers for this kitchen, assign owners, filter contract records, and edit address details.
-          </p>
+        
         </AdminSection>
 
         <AdminSection

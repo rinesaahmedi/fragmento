@@ -293,6 +293,15 @@ export default function KitchenConfigurator({
     setCustomer((current) => ({ ...current, [field]: value }));
   }
 
+  function useContractAddress() {
+    if (!initialContractAddress) return;
+
+    setCustomer((current) => ({
+      ...current,
+      ...buildCustomerAddressFromContract(initialContractAddress),
+    }));
+  }
+
   function removeComponent(item) {
     const componentId = componentIdForItem(item);
     if (fixedComponentIds.includes(componentId)) {
@@ -437,12 +446,16 @@ export default function KitchenConfigurator({
   return (
     <div className={styles.page}>
       <div className={styles.shell}>
-        <header className={styles.header}>
+        <nav className={styles.topNav} aria-label="Seitennavigation">
           <Link href="/" className={styles.backLink}>
             Zurueck
           </Link>
+        </nav>
+        <header className={styles.header}>
           <div className={styles.brand}>
-            <img src="/img/fragmentologo.png" alt="Fragmento" />
+            <span className={styles.logoMark}>
+              <img src="/img/fragmentologo.png" alt="Fragmento" />
+            </span>
             <div className={styles.brandText}>
               <h1>{kitchenConfig.kitchen.name}</h1>
               <p>{kitchenConfig.kitchen.description || "Konfiguriere deine Kueche direkt aus dem aktuellen Katalog."}</p>
@@ -511,6 +524,7 @@ export default function KitchenConfigurator({
             statusTone={statusTone}
             onSubmit={handleSubmit}
             onUpdateCustomer={updateCustomer}
+            onUseContractAddress={useContractAddress}
           />
         ) : null}
       </div>

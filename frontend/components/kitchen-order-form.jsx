@@ -179,6 +179,7 @@ export default function KitchenOrderForm({
   statusTone,
   onSubmit,
   onUpdateCustomer,
+  onUseContractAddress,
 }) {
   const countryOptions = Object.keys(COUNTRY_CITY_OPTIONS);
   const cityOptions = COUNTRY_CITY_OPTIONS[customer.country] || [];
@@ -208,6 +209,11 @@ export default function KitchenOrderForm({
             {contractAddressLines.map((line) => (
               <span key={line}>{line}</span>
             ))}
+            {onUseContractAddress ? (
+              <button type="button" className={styles.useContractAddressButton} onClick={onUseContractAddress}>
+                Adresse uebernehmen
+              </button>
+            ) : null}
           </div>
         ) : null}
         <form id="order-form" className={styles.orderForm} onSubmit={onSubmit}>

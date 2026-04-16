@@ -81,6 +81,13 @@ function mapCatalogItem(catalogItems, submittedItem, itemType) {
 }
 
 function buildOrderForNotifications(orderRecord) {
+  const toNotificationItem = (item) => ({
+    code: item.code,
+    name: item.nameSnapshot,
+    price: Number(item.priceSnapshot),
+    iconKey: item.kitchenItem?.iconKey || "",
+  });
+
   return {
     id: orderRecord.id,
     orderNumber: orderRecord.orderNumber,
@@ -107,13 +114,13 @@ function buildOrderForNotifications(orderRecord) {
     },
     components: orderRecord.items
       .filter((item) => item.itemType === ItemType.COMPONENT)
-      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
+      .map(toNotificationItem),
     accessories: orderRecord.items
       .filter((item) => item.itemType === ItemType.ACCESSORY)
-      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
+      .map(toNotificationItem),
     services: orderRecord.items
       .filter((item) => item.itemType === ItemType.SERVICE)
-      .map((item) => ({ code: item.code, name: item.nameSnapshot, price: Number(item.priceSnapshot) })),
+      .map(toNotificationItem),
   };
 }
 
@@ -122,7 +129,10 @@ async function getOrderRecordForOperations(id) {
     where: { id },
     include: {
       kitchen: true,
-      items: { orderBy: { createdAt: "asc" } },
+      items: {
+        orderBy: { createdAt: "asc" },
+        include: { kitchenItem: true },
+      },
     },
   });
 
@@ -345,7 +355,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
           where: { id: order.id },
           include: {
             kitchen: true,
-            items: true,
+            items: {
+              include: { kitchenItem: true },
+            },
           },
         });
       });
