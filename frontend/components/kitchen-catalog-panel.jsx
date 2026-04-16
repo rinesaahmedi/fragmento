@@ -5,6 +5,7 @@ import {
   componentIdForItem,
   formatCurrency,
   getCatalogDisplayItem,
+  getProductInfoHref,
   isLinkedComponentSelected,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
@@ -61,7 +62,7 @@ const ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
 };
 
-function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick }) {
+function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick, onOpenInfo }) {
   const className = [
     styles.itemCard,
     selected ? styles.itemCardSelected : "",
@@ -69,9 +70,26 @@ function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick
   ]
     .filter(Boolean)
     .join(" ");
+  const handleCardKeyDown = (event) => {
+    if (locked) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick?.();
+    }
+  };
 
   return (
-    <button type="button" className={className} onClick={onClick} disabled={locked}>
+    <div
+      role="button"
+      tabIndex={locked ? -1 : 0}
+      aria-disabled={locked}
+      className={className}
+      onClick={locked ? undefined : onClick}
+      onKeyDown={handleCardKeyDown}
+    >
       <div className={styles.itemTop}>
         <span className={styles.itemIcon} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
         <div className={styles.itemText}>
@@ -88,19 +106,20 @@ function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick
         <div className={styles.itemMetaAside}>
           {hint ? <span className={styles.ruleHint}>{hint}</span> : null}
           {infoPdfHref ? (
-            <a
-              href={infoPdfHref}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              type="button"
               className={styles.itemPdfLink}
-              onClick={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenInfo?.({ item, price, infoPdfHref });
+              }}
             >
               PDF
-            </a>
+            </button>
           ) : null}
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -120,6 +139,7 @@ export default function KitchenCatalogPanel({
   setSelectedComponentIds,
   onToggleAccessory,
   onToggleService,
+  onOpenProductInfo,
 }) {
   return (
     <aside className={styles.sidebar}>
@@ -147,6 +167,7 @@ export default function KitchenCatalogPanel({
                   selected={isLinkedComponentSelected(kitchenSlug, selectedComponentIds, componentId)}
                   price={displayItem.price}
                   infoPdfHref={displayItem.infoPdfHref}
+                  onOpenInfo={onOpenProductInfo}
                   onClick={() =>
                     setSelectedComponentIds((current) =>
                       toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
@@ -167,6 +188,8 @@ export default function KitchenCatalogPanel({
                 item={item}
                 selected={selectedAccessoryCodes.includes(item.code)}
                 locked={orderLockedAccessoryCodes.has(item.code)}
+                infoPdfHref={getProductInfoHref(item.code)}
+                onOpenInfo={onOpenProductInfo}
                 onClick={() => onToggleAccessory(item.code)}
               />
             ))}
@@ -182,6 +205,8 @@ export default function KitchenCatalogPanel({
                 item={item}
                 selected={selectedServiceCodes.includes(item.code)}
                 locked={orderLockedServiceCodes.has(item.code)}
+                infoPdfHref={getProductInfoHref(item.code)}
+                onOpenInfo={onOpenProductInfo}
                 hint={
                   item.code === "SVC-MONTAGE-001"
                     ? "Mindestens 3 Artikel, davon 2 Schrank-Komponenten"

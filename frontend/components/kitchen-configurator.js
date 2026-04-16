@@ -88,6 +88,17 @@ function buildInitialCustomerState(initialOrder, contractNumber, contractAddress
   };
 }
 
+function buildProductInfoState(payload) {
+  if (!payload?.infoPdfHref || !payload?.item) return null;
+
+  return {
+    ...payload,
+    title: payload.item.name || "Produktinformation",
+    price: Number(payload.price ?? payload.item.price ?? 0),
+    infoText: payload.item.infoText || "",
+  };
+}
+
 function initialItemCodesByType(initialOrder, itemType) {
   return new Set(
     (initialOrder?.items || [])
@@ -177,6 +188,7 @@ export default function KitchenConfigurator({
   const [statusTone, setStatusTone] = useState("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrderSectionOpen, setIsOrderSectionOpen] = useState(false);
+  const [activeProductInfo, setActiveProductInfo] = useState(null);
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
   );
@@ -205,6 +217,25 @@ export default function KitchenConfigurator({
       return { ...current, contractNumber: initialContractNumber };
     });
   }, [initialContractNumber, initialOrder, initialContractAddress, kitchenConfig, fixedComponentIds]);
+
+  useEffect(() => {
+    if (!activeProductInfo) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setActiveProductInfo(null);
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [activeProductInfo]);
 
   const selectedComponents = kitchenConfig.components
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
@@ -335,6 +366,12 @@ export default function KitchenConfigurator({
     window.requestAnimationFrame(() => {
       orderSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
+  }
+
+  function openProductInfo(payload) {
+    const nextState = buildProductInfoState(payload);
+    if (!nextState) return;
+    setActiveProductInfo(nextState);
   }
 
   async function handleSubmit(event) {
@@ -486,6 +523,7 @@ export default function KitchenConfigurator({
               selectedServices={selectedServices}
               lockedSelectedComponents={lockedSelectedComponents}
               optionalSelectedComponents={optionalSelectedComponents}
+              grandTotal={grandTotal}
               onRemoveComponent={removeComponent}
               onRemoveAccessory={removeAccessory}
               onRemoveService={removeService}
@@ -510,6 +548,7 @@ export default function KitchenConfigurator({
               setSelectedComponentIds={setSelectedComponentIds}
               onToggleAccessory={toggleAccessory}
               onToggleService={toggleService}
+              onOpenProductInfo={openProductInfo}
             />
           </div>
         </section>
@@ -526,6 +565,64 @@ export default function KitchenConfigurator({
             onUpdateCustomer={updateCustomer}
             onUseContractAddress={useContractAddress}
           />
+        ) : null}
+
+        {activeProductInfo ? (
+          <div
+            className={styles.productInfoOverlay}
+            role="presentation"
+            onClick={() => setActiveProductInfo(null)}
+          >
+            <div
+              className={styles.productInfoDialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="product-info-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className={styles.productInfoHeader}>
+                <div>
+                  <p className={styles.eyebrow}>Produktinformation</p>
+                  <h2 id="product-info-title">{activeProductInfo.title}</h2>
+                  {activeProductInfo.item.code ? (
+                    <span className={styles.itemCode}>Code: {activeProductInfo.item.code}</span>
+                  ) : null}
+                </div>
+                <button
+                  type="button"
+                  className={styles.productInfoClose}
+                  aria-label="Produktinformation schliessen"
+                  onClick={() => setActiveProductInfo(null)}
+                >
+                  Schliessen
+                </button>
+              </div>
+
+              <div className={styles.productInfoMeta}>
+                <strong className={styles.productInfoPrice}>{formatCurrency(activeProductInfo.price)}</strong>
+                {activeProductInfo.infoText ? <p>{activeProductInfo.infoText}</p> : null}
+              </div>
+
+              <div className={styles.productInfoActions}>
+                <a
+                  href={activeProductInfo.infoPdfHref}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={styles.productInfoActionLink}
+                >
+                  PDF in neuem Tab oeffnen
+                </a>
+              </div>
+
+              <div className={styles.productInfoViewer}>
+                <iframe
+                  src={activeProductInfo.infoPdfHref}
+                  title={`Produktinformation ${activeProductInfo.title}`}
+                  className={styles.productInfoFrame}
+                />
+              </div>
+            </div>
+          </div>
         ) : null}
       </div>
     </div>

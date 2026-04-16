@@ -414,6 +414,12 @@ export async function updateOrderStatus(orderId, status) {
   });
 }
 
+export async function deleteOrder(orderId) {
+  return prisma.order.delete({
+    where: { id: orderId },
+  });
+}
+
 export async function confirmOrder(orderId) {
   const orderRecord = await getOrderRecordForOperations(orderId);
   if (orderRecord.status === OrderStatus.CONFIRMED) {

@@ -2,6 +2,7 @@
 
 import styles from "./kitchen-configurator.module.css";
 import {
+  formatCurrency,
   getSummaryMetaLabel,
   getSummaryPriceLabel,
 } from "./kitchen-selection-utils";
@@ -43,6 +44,7 @@ export default function KitchenSelectionSummary({
   selectedServices,
   lockedSelectedComponents,
   optionalSelectedComponents,
+  grandTotal,
   onRemoveComponent,
   onRemoveAccessory,
   onRemoveService,
@@ -86,6 +88,10 @@ export default function KitchenSelectionSummary({
         ))}
       </div>
       <div className={styles.summaryActions}>
+        <div className={styles.summaryTotal}>
+          <span>Gesamtpreis</span>
+          <strong>{formatCurrency(grandTotal)}</strong>
+        </div>
         <button type="button" className={styles.primaryButton} onClick={onOpenOrderSection}>
           Weiter zur Bestellung
         </button>

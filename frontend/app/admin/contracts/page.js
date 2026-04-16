@@ -396,37 +396,35 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                         </div>
                       </td>
                     </tr>
-                    {contract._count.orders ? (
-                      <tr>
-                        <td style={contractOrdersTdStyle} colSpan={9}>
-                          <details style={contractOrdersDetailsStyle}>
-                            <summary style={contractOrdersSummaryStyle}>
-                              <AdminText i18nKey="contractsAdmin.viewOrdersForThisContract" fallback="View orders for this contract" />
-                            </summary>
-                            <ContractOrders contract={contract} />
-                          </details>
-                        </td>
-                      </tr>
-                    ) : null}
                     <tr>
-                      <td style={contractEditorTdStyle} colSpan={9}>
-                        <details style={contractEditDetailsStyle}>
-                          <summary style={contractEditSummaryStyle}>
-                            <AdminText i18nKey="contractsAdmin.editContractDetailsFor" fallback="Edit contract details for" /> {contract.contractNumber}
-                          </summary>
-                          <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
-                            <input type="hidden" name="_intent" value="update" />
-                            <input type="hidden" name="returnTo" value={returnTo} />
-                            <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
-                              <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
-                            </FormField>
-                            <AdminContractAddressFields contract={contract} compact />
-                            <OwnerSelect owners={owners} defaultValue={contract.ownerId || ""} compact />
-                            <div style={contractEditActionStyle}>
-                              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
-                            </div>
-                          </form>
-                        </details>
+                      <td style={contractUtilityTdStyle} colSpan={9}>
+                        <div style={contractUtilityBarStyle}>
+                          {contract._count.orders ? (
+                            <details style={contractOrdersDetailsStyle}>
+                              <summary className="contract-utility-summary" style={contractOrdersSummaryStyle}>
+                                <AdminText i18nKey="contractsAdmin.viewOrdersForThisContract" fallback="View orders for this contract" />
+                              </summary>
+                              <ContractOrders contract={contract} />
+                            </details>
+                          ) : null}
+                          <details style={contractEditDetailsStyle}>
+                            <summary className="contract-utility-summary" style={contractEditSummaryStyle}>
+                              <AdminText i18nKey="contractsAdmin.editContractDetailsFor" fallback="Edit contract details for" /> {contract.contractNumber}
+                            </summary>
+                            <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
+                              <input type="hidden" name="_intent" value="update" />
+                              <input type="hidden" name="returnTo" value={returnTo} />
+                              <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
+                                <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
+                              </FormField>
+                              <AdminContractAddressFields contract={contract} compact />
+                              <OwnerSelect owners={owners} defaultValue={contract.ownerId || ""} compact />
+                              <div style={contractEditActionStyle}>
+                                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
+                              </div>
+                            </form>
+                          </details>
+                        </div>
                       </td>
                     </tr>
                   </Fragment>
@@ -503,6 +501,21 @@ export default async function AdminContractsPage({ searchParams = {} }) {
 
             .admin-list-cards {
               display: none;
+            }
+
+            .contract-utility-summary::-webkit-details-marker {
+              display: none;
+            }
+
+            .contract-utility-summary::before {
+              content: "›";
+              display: inline-flex;
+              margin-right: 8px;
+              transition: transform 120ms ease;
+            }
+
+            details[open] > .contract-utility-summary::before {
+              transform: rotate(90deg);
             }
 
             @media (max-width: 760px) {
@@ -705,19 +718,26 @@ const actionTdStyle = {
   whiteSpace: "nowrap",
 };
 
-const contractEditorTdStyle = {
-  padding: "0 20px 18px",
+const contractUtilityTdStyle = {
+  padding: "0 16px 12px",
   borderBottom: "1px solid var(--app-border)",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,249,245,0.9))",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,249,245,0.72))",
+};
+
+const contractUtilityBarStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gap: 10,
+  alignItems: "start",
 };
 
 const contractEditDetailsStyle = {
   display: "grid",
-  gap: 12,
+  gap: 10,
   borderRadius: 8,
-  border: "1px solid rgba(143, 62, 44, 0.14)",
-  background: "rgba(255,255,255,0.86)",
-  padding: "12px 14px",
+  border: "1px solid rgba(143, 62, 44, 0.12)",
+  background: "rgba(255,255,255,0.74)",
+  padding: 0,
 };
 
 const contractEditSummaryStyle = {
@@ -725,7 +745,12 @@ const contractEditSummaryStyle = {
   cursor: "pointer",
   fontSize: 14,
   fontWeight: 800,
-  width: "fit-content",
+  listStyle: "none",
+  minHeight: 46,
+  display: "flex",
+  alignItems: "center",
+  padding: "0 12px",
+  width: "100%",
 };
 
 const contractEditFormStyle = {
@@ -733,7 +758,7 @@ const contractEditFormStyle = {
   gap: 14,
   gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
   alignItems: "end",
-  paddingTop: 10,
+  padding: "0 12px 12px",
 };
 
 const contractEditActionStyle = {
@@ -798,19 +823,13 @@ const usagePillUnusedStyle = {
   border: "1px solid rgba(112, 89, 78, 0.12)",
 };
 
-const contractOrdersTdStyle = {
-  padding: "0 20px 12px",
-  borderBottom: "1px solid var(--app-border)",
-  background: "rgba(255,249,245,0.72)",
-};
-
 const contractOrdersDetailsStyle = {
   display: "grid",
   gap: 10,
   borderRadius: 8,
   border: "1px solid rgba(45, 108, 121, 0.14)",
-  background: "rgba(255,255,255,0.86)",
-  padding: "10px 12px",
+  background: "rgba(255,255,255,0.74)",
+  padding: 0,
 };
 
 const contractOrdersSummaryStyle = {
@@ -818,13 +837,18 @@ const contractOrdersSummaryStyle = {
   cursor: "pointer",
   fontSize: 13,
   fontWeight: 900,
-  width: "fit-content",
+  listStyle: "none",
+  minHeight: 46,
+  display: "flex",
+  alignItems: "center",
+  padding: "0 12px",
+  width: "100%",
 };
 
 const contractOrdersListStyle = {
   display: "grid",
   gap: 8,
-  paddingTop: 8,
+  padding: "0 12px 12px",
 };
 
 const contractOrderLinkStyle = {

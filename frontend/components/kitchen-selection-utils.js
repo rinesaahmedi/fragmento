@@ -79,6 +79,10 @@ const PRODUCT_INFO_BY_CODE = {
   "DISH-C-600-STD": "/product-info/dishwasher-product-info.pdf",
 };
 
+export function getProductInfoHref(itemCode) {
+  return PRODUCT_INFO_BY_CODE[itemCode] || "";
+}
+
 export function getLinkedComponentIds(slug, componentId) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
   const linkedGroups = LINKED_COMPONENT_GROUPS_BY_SLUG[normalizedSlug] || [];
@@ -131,7 +135,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
     return {
       item,
       price: Number(item.price || 0),
-      infoPdfHref: PRODUCT_INFO_BY_CODE[item.code] || "",
+      infoPdfHref: getProductInfoHref(item.code),
     };
   }
 
@@ -150,8 +154,8 @@ export function getCatalogDisplayItem(allItems, slug, item) {
     },
     price: Number((hoodItem || primaryItem).price || 0),
     infoPdfHref:
-      (hoodItem && PRODUCT_INFO_BY_CODE[hoodItem.code]) ||
-      PRODUCT_INFO_BY_CODE[primaryItem.code] ||
+      (hoodItem && getProductInfoHref(hoodItem.code)) ||
+      getProductInfoHref(primaryItem.code) ||
       "",
   };
 }

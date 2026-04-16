@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { getOrderById } from "../../../../../lib/catalog";
-import { confirmOrder, resendOrderEmail, retryOrderWebhook, updateOrderStatus } from "../../../../../lib/orders";
+import { confirmOrder, deleteOrder, resendOrderEmail, retryOrderWebhook, updateOrderStatus } from "../../../../../lib/orders";
 
 export async function GET(_request, { params }) {
   await requireAdminApi();
@@ -17,6 +17,7 @@ export async function GET(_request, { params }) {
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
+  let returnPath = `/admin/orders/${id}`;
   try {
     const formData = await request.formData();
     const intent = String(formData.get("_intent") || "status");
@@ -42,6 +43,12 @@ export async function POST(request, { params }) {
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order marked as cancelled.");
     }
 
+    if (intent === "delete") {
+      returnPath = "/admin/orders";
+      await deleteOrder(id);
+      return redirectWithFlash(request, returnPath, "success", "Order deleted.");
+    }
+
     if (status === "CONFIRMED") {
       await confirmOrder(id);
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent and order confirmed.");
@@ -51,6 +58,6 @@ export async function POST(request, { params }) {
     return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order status updated.");
   } catch (error) {
     const message = mapAdminMutationError(error, "Order");
-    return redirectWithFlash(request, `/admin/orders/${id}`, "error", message);
+    return redirectWithFlash(request, returnPath, "error", message);
   }
 }

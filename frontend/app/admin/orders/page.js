@@ -1,8 +1,10 @@
 import Link from "next/link";
 import {
   AdminSection,
+  FlashMessage,
   StatusBadge,
   cardListStyle,
+  dangerButtonStyle,
   itemCardStyle,
   pageGridStyle,
   subMetaStyle,
@@ -13,6 +15,7 @@ import {
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
+import { getFormMessage } from "../../../lib/admin-forms";
 import { getOrdersForAdmin } from "../../../lib/catalog";
 import { requireAdminPage } from "../../../lib/auth";
 
@@ -52,17 +55,38 @@ function getContractOrderLabel(order) {
   return formatOrdinal(order.contractOrderSequence);
 }
 
-export default async function AdminOrdersPage() {
+function DeleteOrderAction({ orderId, compact = false }) {
+  return (
+    <details style={compact ? cardDeleteDetailsStyle : tableDeleteDetailsStyle}>
+      <summary style={deleteSummaryStyle}>
+        <AdminText i18nKey="ordersAdmin.delete" fallback="Delete" />
+      </summary>
+      <form action={`/api/admin/orders/${orderId}`} method="post" style={deleteFormStyle}>
+        <button type="submit" name="_intent" value="delete" style={deleteButtonStyle}>
+          <AdminText i18nKey="ordersAdmin.confirmDelete" fallback="Confirm delete" />
+        </button>
+      </form>
+    </details>
+  );
+}
+
+export default async function AdminOrdersPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
+  const resolvedSearchParams = (await searchParams) || {};
   const orders = await getOrdersForAdmin();
+  const successMessage = getFormMessage(resolvedSearchParams, "success");
+  const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
   return (
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
           title={<AdminText i18nKey="ordersAdmin.orders" fallback="Orders" />}
-          description={<><AdminText i18nKey="ordersAdmin.savedOrdersFromPublicConfigurator" fallback="Saved orders from the public configurator." /> <AdminText i18nKey="ordersAdmin.pageReadOnlyCoreOperationalView" fallback="This page is read-only for now, but it gives you the core operational view." /></>}
+          description={<><AdminText i18nKey="ordersAdmin.savedOrdersFromPublicConfigurator" fallback="Saved orders from the public configurator." /> <AdminText i18nKey="ordersAdmin.reviewOrdersAndDeleteEntriesWhenNeeded" fallback="Review orders and delete entries when needed." /></>}
         >
+          {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
+          {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
+
           <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <thead>
@@ -74,12 +98,13 @@ export default async function AdminOrdersPage() {
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={7}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
+                    <td style={tdStyle} colSpan={8}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
                   </tr>
                 ) : null}
                 {orders.map((order) => (
@@ -103,6 +128,9 @@ export default async function AdminOrdersPage() {
                     <td style={tdStyle}><StatusBadge status={order.status} /></td>
                     <td style={tdStyle}>{formatCurrency(order.totalPrice)}</td>
                     <td style={tdStyle}>{formatDate(order.createdAt)}</td>
+                    <td style={{ ...tdStyle, width: 148 }}>
+                      <DeleteOrderAction orderId={order.id} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -136,9 +164,12 @@ export default async function AdminOrdersPage() {
                   <div style={articleCodesStyle}>{formatArticleCodes(order.items)}</div>
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
                     <strong>{formatCurrency(order.totalPrice)}</strong>
-                    <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
-                      <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
-                    </Link>
+                    <div style={cardActionRowStyle}>
+                      <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
+                        <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
+                      </Link>
+                      <DeleteOrderAction orderId={order.id} compact />
+                    </div>
                   </div>
                 </div>
               </article>
@@ -194,4 +225,38 @@ const contractSequenceStyle = {
   fontSize: 12,
   fontWeight: 700,
   letterSpacing: "0.04em",
+};
+
+const tableDeleteDetailsStyle = {
+  display: "grid",
+  gap: 8,
+  justifyItems: "start",
+};
+
+const cardDeleteDetailsStyle = {
+  display: "grid",
+  gap: 8,
+};
+
+const deleteSummaryStyle = {
+  color: "var(--app-danger-text)",
+  cursor: "pointer",
+  fontSize: 13,
+  fontWeight: 800,
+};
+
+const deleteFormStyle = {
+  paddingTop: 8,
+};
+
+const deleteButtonStyle = {
+  ...dangerButtonStyle,
+  minHeight: 38,
+};
+
+const cardActionRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  flexWrap: "wrap",
 };

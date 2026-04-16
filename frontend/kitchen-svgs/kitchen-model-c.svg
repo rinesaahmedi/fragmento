@@ -47,10 +47,10 @@
     <line x1="275" y1="359" x2="345" y2="359" stroke="#00c76a" stroke-width="1"/>
     <rect x="328" y="347" width="4" height="4" fill="none" stroke="#00c76a" stroke-width="1"/>
     <rect x="336" y="347" width="4" height="4" fill="none" stroke="#00c76a" stroke-width="1"/>
-    <line x1="275" y1="400" x2="345" y2="400" stroke="#00c76a" stroke-width="1"/>
+    <line x1="275" y1="404" x2="345" y2="404" stroke="#00c76a" stroke-width="1"/>
     <rect x="287" y="367" width="46" height="30" fill="none" stroke="#00c76a" stroke-width="1"/>
     <rect x="293" y="372" width="34" height="20" fill="none" stroke="#00c76a" stroke-width="1"/>
-    <line x1="300" y1="407" x2="320" y2="407" stroke="#00c76a" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="300" y1="414" x2="320" y2="414" stroke="#00c76a" stroke-width="1.5" stroke-linecap="round"/>
   </g>
 
   <g data-component-id="component-cook-base-right">
