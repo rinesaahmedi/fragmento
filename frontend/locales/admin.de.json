@@ -200,6 +200,8 @@
     "deleteContractNumber": "Vertragsnummer löschen",
     "editContractDetails": "Vertragsdetails bearbeiten",
     "noAddressCaptured": "Keine Adresse erfasst",
+    "viewOrdersForThisContract": "Bestellungen für diesen Vertrag anzeigen",
+    "noOrdersForThisContract": "Für diesen Vertrag gibt es noch keine Bestellungen.",
     "building": "Gebäude",
     "floor": "Etage",
     "unit": "Einheit",
@@ -298,9 +300,14 @@
     "orderActions": "Bestellaktionen",
     "updateStatusOrResendExternalNotificationsForThisOrder": "Status aktualisieren oder externe Benachrichtigungen für diese Bestellung erneut senden.",
     "saveStatus": "Status speichern",
+    "confirmAndSendEmail": "Bestätigen und E-Mail senden",
     "markConfirmed": "Als bestätigt markieren",
     "markCancelled": "Als storniert markieren",
     "resendEmail": "E-Mail erneut senden",
-    "retryWebhook": "Webhook erneut versuchen"
+    "retryWebhook": "Webhook erneut versuchen",
+    "processing": "Wird verarbeitet...",
+    "confirmingAndSendingEmail": "Bestätigung und E-Mail werden gesendet...",
+    "resendingEmail": "E-Mail wird erneut gesendet...",
+    "retryingWebhook": "Webhook wird erneut versucht..."
   }
 }

@@ -121,8 +121,20 @@ function fetchBuffer(url) {
 }
 
 async function loadLogoBuffer() {
-  const logoPath = await resolvePublicAssetPath("img/fragmentologo.png");
+  const logoPath = await resolvePublicAssetPath("img/fragmentologo-cropped.jpg");
   return fs.readFile(logoPath);
+}
+
+async function drawPdfLogo(doc, x, y, width) {
+  const logoBuffer = await loadLogoBuffer();
+  const imageData = `data:image/jpeg;base64,${logoBuffer.toString("base64")}`;
+  const height = (width * 205) / 920;
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(x, y, width, height, "F");
+  doc.addImage(imageData, "JPEG", x, y, width, height);
+
+  return height;
 }
 
 function formatPdfDate(value) {
@@ -147,102 +159,101 @@ function drawItemIcon(doc, item, x, y, size = 16) {
   const name = String(item.name || "").toLowerCase();
   const code = String(item.code || "").toLowerCase();
   const has = (...terms) => terms.some((term) => iconKey.includes(term) || name.includes(term) || code.includes(term));
+  const unit = size / 16;
+  const px = (value) => x + value * unit;
+  const py = (value) => y + value * unit;
+  const scaled = (value) => value * unit;
   const midX = x + size / 2;
   const midY = y + size / 2;
   const bottom = y + size;
 
-  doc.setDrawColor(92, 84, 76);
-  doc.setFillColor(248, 246, 243);
-  doc.setLineWidth(0.8);
-  doc.roundedRect(x, y, size, size, 2, 2, "FD");
-
   doc.setDrawColor(40, 40, 40);
-  doc.setLineWidth(0.7);
+  doc.setLineWidth(1);
 
   if (has("delivery", "montage", "pickup", "logistik", "assembly")) {
-    doc.rect(x + 3, y + 7, 7, 5);
-    doc.line(x + 10, y + 8, x + 13, y + 8);
-    doc.line(x + 13, y + 8, x + 14, y + 12);
-    doc.circle(x + 5, y + 13, 1.2);
-    doc.circle(x + 12, y + 13, 1.2);
+    doc.rect(px(3), py(7), scaled(7), scaled(5));
+    doc.line(px(10), py(8), px(13), py(8));
+    doc.line(px(13), py(8), px(14), py(12));
+    doc.circle(px(5), py(13), scaled(1.2));
+    doc.circle(px(12), py(13), scaled(1.2));
     return;
   }
 
   if (has("waste", "muell")) {
-    doc.line(x + 5, y + 5, x + 11, y + 5);
-    doc.line(x + 6, y + 6, x + 7, bottom - 3);
-    doc.line(x + 10, y + 6, x + 9, bottom - 3);
-    doc.line(x + 7, bottom - 3, x + 9, bottom - 3);
+    doc.line(px(5), py(5), px(11), py(5));
+    doc.line(px(6), py(6), px(7), bottom - scaled(3));
+    doc.line(px(10), py(6), px(9), bottom - scaled(3));
+    doc.line(px(7), bottom - scaled(3), px(9), bottom - scaled(3));
     return;
   }
 
   if (has("cutlery", "besteck")) {
-    doc.line(x + 5, y + 4, x + 5, bottom - 4);
-    doc.line(x + 4, y + 4, x + 4, y + 8);
-    doc.line(x + 6, y + 4, x + 6, y + 8);
-    doc.line(x + 10, y + 4, x + 10, bottom - 4);
-    doc.circle(x + 10, y + 6, 2);
+    doc.line(px(5), py(4), px(5), bottom - scaled(4));
+    doc.line(px(4), py(4), px(4), py(8));
+    doc.line(px(6), py(4), px(6), py(8));
+    doc.line(px(10), py(4), px(10), bottom - scaled(4));
+    doc.circle(px(10), py(6), scaled(2));
     return;
   }
 
   if (has("light", "led", "beleuchtung")) {
-    doc.circle(midX, y + 7, 3.2);
-    doc.line(midX, y + 10, midX, y + 13);
-    doc.line(midX - 2, y + 13, midX + 2, y + 13);
+    doc.circle(midX, py(7), scaled(3.2));
+    doc.line(midX, py(10), midX, py(13));
+    doc.line(midX - scaled(2), py(13), midX + scaled(2), py(13));
     return;
   }
 
   if (has("refrigerator", "fridge", "kuehlschrank")) {
-    doc.rect(x + 5, y + 2.5, 6, 11);
-    doc.line(x + 5, y + 7, x + 11, y + 7);
-    doc.line(x + 10, y + 4, x + 10, y + 5.5);
-    doc.line(x + 10, y + 9, x + 10, y + 10.5);
+    doc.rect(px(5), py(2.5), scaled(6), scaled(11));
+    doc.line(px(5), py(7), px(11), py(7));
+    doc.line(px(10), py(4), px(10), py(5.5));
+    doc.line(px(10), py(9), px(10), py(10.5));
     return;
   }
 
   if (has("dishwasher", "spuel", "washing", "wasch")) {
-    doc.rect(x + 4, y + 3, 8, 10);
-    doc.line(x + 4, y + 5.5, x + 12, y + 5.5);
-    doc.circle(midX, y + 9.2, 2.5);
+    doc.rect(px(4), py(3), scaled(8), scaled(10));
+    doc.line(px(4), py(5.5), px(12), py(5.5));
+    doc.circle(midX, py(9.2), scaled(2.5));
     return;
   }
 
   if (has("hood", "dunstabzug", "extractor")) {
-    doc.rect(x + 6, y + 2.5, 4, 6);
-    doc.rect(x + 3.5, y + 8.5, 9, 3);
-    doc.line(x + 5, y + 13, x + 3.5, y + 15);
-    doc.line(x + 8, y + 13, x + 8, y + 15);
-    doc.line(x + 11, y + 13, x + 12.5, y + 15);
+    doc.rect(px(6), py(2.5), scaled(4), scaled(6));
+    doc.rect(px(3.5), py(8.5), scaled(9), scaled(3));
+    doc.line(px(5), py(13), px(3.5), py(15));
+    doc.line(px(8), py(13), px(8), py(15));
+    doc.line(px(11), py(13), px(12.5), py(15));
     return;
   }
 
   if (has("sink", "faucet", "spuele")) {
-    doc.rect(x + 3, y + 8, 10, 5);
-    doc.circle(midX, y + 8, 3);
-    doc.setFillColor(248, 246, 243);
-    doc.rect(x + 4, y + 8, 8, 3, "F");
+    doc.rect(px(3), py(8), scaled(10), scaled(5));
+    doc.circle(midX, py(8), scaled(3));
+    doc.setFillColor(255, 255, 255);
+    doc.rect(px(4), py(8), scaled(8), scaled(3), "F");
     doc.setDrawColor(40, 40, 40);
-    doc.line(midX, y + 5, midX, y + 8);
-    doc.line(midX, y + 5, x + 12, y + 5);
+    doc.line(midX, py(5), midX, py(8));
+    doc.line(midX, py(5), px(12), py(5));
     return;
   }
 
   if (has("worktop", "arbeitsplatte")) {
-    doc.line(x + 3, y + 6, x + 13, y + 6);
-    doc.line(x + 3, y + 10, x + 13, y + 10);
-    doc.line(x + 13, y + 6, x + 13, y + 10);
+    doc.line(px(3), py(6), px(13), py(6));
+    doc.line(px(3), py(10), px(13), py(10));
+    doc.line(px(13), py(6), px(13), py(10));
     return;
   }
 
   if (has("drawer", "cabinet", "schrank", "base", "wall")) {
-    doc.rect(x + 4, y + 3, 8, 10);
-    doc.line(x + 4, y + 7, x + 12, y + 7);
-    doc.line(x + 6.5, y + 5, x + 9.5, y + 5);
-    doc.line(x + 6.5, y + 10, x + 9.5, y + 10);
+    doc.rect(px(4), py(3), scaled(8), scaled(10));
+    doc.line(px(4), py(7), px(12), py(7));
+    doc.line(px(6.5), py(5), px(9.5), py(5));
+    doc.line(px(6.5), py(10), px(9.5), py(10));
     return;
   }
 
-  doc.setFont("helvetica", "bold").setFontSize(7);
+  doc.setFont("helvetica", "bold").setFontSize(scaled(7));
   doc.text(String(item.name || item.code || "?").slice(0, 2).toUpperCase(), midX, midY + 2, { align: "center" });
 }
 
@@ -260,8 +271,13 @@ export async function generateOrderConfirmationPdf(order) {
     y = margin;
   };
 
-  doc.setFont("helvetica", "bold").setFontSize(26).setTextColor(65, 55, 48).text("fragmento.", margin, y + 42);
-  doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(65, 55, 48).text("by architecto.", margin + 48, y + 56);
+  try {
+    await drawPdfLogo(doc, margin, y + 8, 230);
+  } catch (error) {
+    console.warn("Could not draw PDF logo:", error.message);
+    doc.setFont("helvetica", "bold").setFontSize(26).setTextColor(65, 55, 48).text("fragmento.", margin, y + 42);
+    doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(65, 55, 48).text("by architecto.", margin + 48, y + 56);
+  }
 
   doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y, {
@@ -309,21 +325,21 @@ export async function generateOrderConfirmationPdf(order) {
     y += 10;
     doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
     y += 20;
-    doc.text("Artikel", margin + 26, y);
-    doc.text("Item Code", margin + 290, y);
+    doc.text("Artikel", margin + 36, y);
+    doc.text("Item Code", margin + 300, y);
     doc.text("Preis", pageWidth - margin, y, { align: "right" });
     y += 18;
     doc.setFont("helvetica", "normal").setFontSize(10);
 
     items.forEach((item) => {
-      const nameLines = doc.splitTextToSize(item.name || "", 238);
-      const rowHeight = Math.max(nameLines.length * lineHeight, 22) + 6;
+      const nameLines = doc.splitTextToSize(item.name || "", 228);
+      const rowHeight = Math.max(nameLines.length * lineHeight, 30) + 6;
       ensureSpace(rowHeight);
-      drawItemIcon(doc, item, margin, y - 4, 18);
+      drawItemIcon(doc, item, margin, y - 8, 26);
       nameLines.forEach((line, index) => {
-        doc.text(line, margin + 26, y + index * lineHeight);
+        doc.text(line, margin + 36, y + index * lineHeight);
       });
-      doc.text(item.code || "-", margin + 290, y);
+      doc.text(item.code || "-", margin + 300, y);
       doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
       y += rowHeight;
     });
@@ -426,10 +442,10 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   const attachments = [];
   if (logoBuffer) {
     attachments.push({
-      filename: "fragmentologo.png",
+      filename: "fragmentologo.jpg",
       content: logoBuffer,
       cid: "logo@fragmento",
-      contentType: "image/png",
+      contentType: "image/jpeg",
       contentDisposition: "inline",
     });
   }

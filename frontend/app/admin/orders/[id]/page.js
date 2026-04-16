@@ -1,16 +1,12 @@
-import Link from "next/link";
 import { OrderStatus } from "@prisma/client";
 import {
   ActionLink,
   AdminSection,
   FlashMessage,
-  FormField,
   StatusBadge,
   actionRowStyle,
-  checkboxRowStyle,
-  inputStyle,
+  dangerButtonStyle,
   itemCardStyle,
-  mutedTextStyle,
   pageGridStyle,
   primaryButtonStyle,
   secondaryButtonStyle,
@@ -23,13 +19,12 @@ import {
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminText } from "../../../../components/admin-i18n";
+import { OrderActionButton, OrderActionFeedback } from "../../../../components/admin-order-action-buttons";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getOrderById } from "../../../../lib/catalog";
 
 export const dynamic = "force-dynamic";
-
-const ACTIVE_ORDER_STATUS_OPTIONS = [OrderStatus.NEW, OrderStatus.CONFIRMED, OrderStatus.CANCELLED];
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
@@ -82,9 +77,9 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
 
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const orderStatusOptions = ACTIVE_ORDER_STATUS_OPTIONS.includes(order.status)
-    ? ACTIVE_ORDER_STATUS_OPTIONS
-    : [order.status, ...ACTIVE_ORDER_STATUS_OPTIONS];
+  const canConfirm = order.status === OrderStatus.NEW;
+  const canResendEmail = order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.EMAILED;
+  const canCancel = order.status !== OrderStatus.CANCELLED;
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -101,6 +96,59 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
+
+          <form action={`/api/admin/orders/${order.id}`} method="post" style={actionPanelStyle}>
+            <div style={actionSummaryStyle}>
+              <div style={actionMetricStyle}>
+                <span style={detailLabelStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></span>
+                <StatusBadge status={order.status} />
+              </div>
+              <div style={actionMetricStyle}>
+                <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.total" fallback="Total" /></span>
+                <strong>{formatCurrency(order.totalPrice)}</strong>
+              </div>
+              <div style={actionMetricStyle}>
+                <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.contractNumber" fallback="Contract number" /></span>
+                <strong>{order.contractNumber || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</strong>
+              </div>
+            </div>
+            <div style={actionButtonsStyle}>
+              {canConfirm ? (
+                <OrderActionButton
+                  intent="confirm"
+                  style={primaryButtonStyle}
+                  pendingKey="orderDetailAdmin.confirmingAndSendingEmail"
+                  pendingFallback="Confirming and sending email..."
+                >
+                  <AdminText i18nKey="orderDetailAdmin.confirmAndSendEmail" fallback="Confirm and send email" />
+                </OrderActionButton>
+              ) : null}
+              {canResendEmail ? (
+                <OrderActionButton
+                  intent="resend-email"
+                  style={primaryButtonStyle}
+                  pendingKey="orderDetailAdmin.resendingEmail"
+                  pendingFallback="Resending email..."
+                >
+                  <AdminText i18nKey="orderDetailAdmin.resendEmail" fallback="Resend email" />
+                </OrderActionButton>
+              ) : null}
+              {canCancel ? (
+                <OrderActionButton intent="cancel" style={dangerButtonStyle}>
+                  <AdminText i18nKey="orderDetailAdmin.markCancelled" fallback="Mark cancelled" />
+                </OrderActionButton>
+              ) : null}
+              <OrderActionButton
+                intent="retry-webhook"
+                style={secondaryButtonStyle}
+                pendingKey="orderDetailAdmin.retryingWebhook"
+                pendingFallback="Retrying webhook..."
+              >
+                <AdminText i18nKey="orderDetailAdmin.retryWebhook" fallback="Retry webhook" />
+              </OrderActionButton>
+            </div>
+            <OrderActionFeedback />
+          </form>
 
           <div style={splitGridStyle}>
             <article style={itemCardStyle}>
@@ -225,29 +273,6 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
           </div>
         </AdminSection>
 
-        <AdminSection
-          title={<AdminText i18nKey="orderDetailAdmin.orderActions" fallback="Order actions" />}
-          description={<AdminText i18nKey="orderDetailAdmin.updateStatusOrResendExternalNotificationsForThisOrder" fallback="Update status or resend external notifications for this order." />}
-        >
-          <form action={`/api/admin/orders/${order.id}`} method="post" style={actionFormStyle}>
-            <FormField label={<AdminText i18nKey="ordersAdmin.status" fallback="Status" />}>
-              <select name="status" defaultValue={order.status} style={inputStyle}>
-                {orderStatusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </FormField>
-            <div style={{ ...actionRowStyle, alignSelf: "end" }}>
-              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="orderDetailAdmin.saveStatus" fallback="Save status" /></button>
-              <button type="submit" name="_intent" value="confirm" style={secondaryButtonStyle}><AdminText i18nKey="orderDetailAdmin.markConfirmed" fallback="Mark confirmed" /></button>
-              <button type="submit" name="_intent" value="cancel" style={secondaryButtonStyle}><AdminText i18nKey="orderDetailAdmin.markCancelled" fallback="Mark cancelled" /></button>
-              <button type="submit" name="_intent" value="resend-email" style={secondaryButtonStyle}><AdminText i18nKey="orderDetailAdmin.resendEmail" fallback="Resend email" /></button>
-              <button type="submit" name="_intent" value="retry-webhook" style={secondaryButtonStyle}><AdminText i18nKey="orderDetailAdmin.retryWebhook" fallback="Retry webhook" /></button>
-            </div>
-          </form>
-        </AdminSection>
       </div>
     </AdminShell>
   );
@@ -273,7 +298,30 @@ const inlineLinkStyle = {
   textDecoration: "none",
 };
 
-const actionFormStyle = {
+const actionPanelStyle = {
   display: "grid",
-  gap: 16,
+  gap: 14,
+  border: "1px solid var(--app-border)",
+  borderRadius: 14,
+  background: "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,248,242,0.74))",
+  padding: 18,
+};
+
+const actionSummaryStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gap: 12,
+};
+
+const actionMetricStyle = {
+  display: "grid",
+  gap: 6,
+  minWidth: 0,
+};
+
+const actionButtonsStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 10,
+  flexWrap: "wrap",
 };

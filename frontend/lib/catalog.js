@@ -239,7 +239,7 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     ORDER BY kc."createdAt" DESC, kc."contractNumber" ASC
   `;
 
-  return rows.map((row) => ({
+  const contracts = rows.map((row) => ({
     id: row.id,
     contractNumber: row.contractNumber,
     kitchenId: row.kitchenId,
@@ -285,6 +285,44 @@ export async function listKitchenContractsForAdmin(filters = {}) {
         }
       : null,
     _count: { orders: Number(row.orderCount || 0) },
+  }));
+
+  return attachOrdersToContracts(contracts);
+}
+
+async function attachOrdersToContracts(contracts) {
+  const contractIds = contracts.map((contract) => contract.id).filter(Boolean);
+  if (!contractIds.length) return contracts;
+
+  const orders = await prisma.order.findMany({
+    where: { kitchenContractId: { in: contractIds } },
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      totalPrice: true,
+      createdAt: true,
+      firstName: true,
+      lastName: true,
+      kitchenContractId: true,
+    },
+    orderBy: [{ kitchenContractId: "asc" }, { createdAt: "asc" }, { id: "asc" }],
+  });
+
+  const ordersByContractId = new Map();
+  orders.forEach((order) => {
+    const contractOrders = ordersByContractId.get(order.kitchenContractId) || [];
+    contractOrders.push({
+      ...order,
+      totalPrice: Number(order.totalPrice || 0),
+      contractOrderSequence: contractOrders.length + 1,
+    });
+    ordersByContractId.set(order.kitchenContractId, contractOrders);
+  });
+
+  return contracts.map((contract) => ({
+    ...contract,
+    orders: [...(ordersByContractId.get(contract.id) || [])].reverse(),
   }));
 }
 

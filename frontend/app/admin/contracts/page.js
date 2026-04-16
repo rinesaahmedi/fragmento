@@ -42,6 +42,23 @@ function formatDate(value) {
   }).format(new Date(value));
 }
 
+function formatCurrency(value) {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+  }).format(Number(value || 0));
+}
+
+function formatOrdinal(value) {
+  const number = Number(value || 0);
+  if (!number) return "";
+  const mod100 = number % 100;
+  if (mod100 >= 11 && mod100 <= 13) return `${number}th`;
+  const suffix = number % 10 === 1 ? "st" : number % 10 === 2 ? "nd" : number % 10 === 3 ? "rd" : "th";
+  return `${number}${suffix}`;
+}
+
 function contractAddressLines(contract) {
   const streetLine = [contract.address1, contract.address2].filter(Boolean).join(", ");
   const cityLine = [contract.postalCode, contract.city].filter(Boolean).join(" ");
@@ -115,6 +132,41 @@ function usageLabel(orderCount) {
   if (count === 0) return "Unused";
   if (count === 1) return "Used once";
   return `Used ${count} times`;
+}
+
+function orderCustomerName(order) {
+  return [order.firstName, order.lastName].filter(Boolean).join(" ") || "-";
+}
+
+function ContractOrders({ contract }) {
+  const orders = contract.orders || [];
+
+  if (!orders.length) {
+    return (
+      <p style={emptyOrdersStyle}>
+        <AdminText i18nKey="contractsAdmin.noOrdersForThisContract" fallback="No orders for this contract yet." />
+      </p>
+    );
+  }
+
+  return (
+    <div style={contractOrdersListStyle}>
+      {orders.map((order) => (
+        <Link key={order.id} href={`/admin/orders/${order.id}`} className="contract-order-link" style={contractOrderLinkStyle}>
+          <span style={contractOrderMainStyle}>
+            <strong>{order.orderNumber}</strong>
+            <span>{formatOrdinal(order.contractOrderSequence)} <AdminText i18nKey="orderDetailAdmin.orderForThisContract" fallback="order for this contract" /></span>
+          </span>
+          <span style={contractOrderMetaStyle}>
+            <StatusBadge status={order.status} />
+            <span>{orderCustomerName(order)}</span>
+            <span>{formatCurrency(order.totalPrice)}</span>
+            <span>{formatDate(order.createdAt)}</span>
+          </span>
+        </Link>
+      ))}
+    </div>
+  );
 }
 
 function FilterField({ label, children }) {
@@ -344,6 +396,18 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                         </div>
                       </td>
                     </tr>
+                    {contract._count.orders ? (
+                      <tr>
+                        <td style={contractOrdersTdStyle} colSpan={9}>
+                          <details style={contractOrdersDetailsStyle}>
+                            <summary style={contractOrdersSummaryStyle}>
+                              <AdminText i18nKey="contractsAdmin.viewOrdersForThisContract" fallback="View orders for this contract" />
+                            </summary>
+                            <ContractOrders contract={contract} />
+                          </details>
+                        </td>
+                      </tr>
+                    ) : null}
                     <tr>
                       <td style={contractEditorTdStyle} colSpan={9}>
                         <details style={contractEditDetailsStyle}>
@@ -382,12 +446,19 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                       <span>{contract.kitchen.name}</span>
                       <span><AdminText i18nKey="contractsAdmin.ownerLabel" fallback="Owner:" /> {ownerName(contract.owner)}</span>
                       <span>{compactAddressSummary(contract)}</span>
-                      <span>{usageLabel(contract._count.orders)}</span>
                       <span><AdminText i18nKey="contractsAdmin.createdLabel" fallback="Created:" /> {formatDate(contract.createdAt)}</span>
                     </div>
                   </div>
                   <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
                 </div>
+                <details style={contractOrdersDetailsStyle}>
+                  <summary style={contractOrdersSummaryStyle}>
+                    <span style={contract._count.orders ? usagePillUsedStyle : usagePillUnusedStyle}>
+                      {usageLabel(contract._count.orders)}
+                    </span>
+                  </summary>
+                  <ContractOrders contract={contract} />
+                </details>
                 <form action={`/api/admin/contracts/${contract.id}`} method="post">
                   <input type="hidden" name="returnTo" value={returnTo} />
                   <button
@@ -441,6 +512,10 @@ export default async function AdminContractsPage({ searchParams = {} }) {
 
               .admin-list-cards {
                 display: grid;
+              }
+
+              .contract-order-link {
+                grid-template-columns: 1fr !important;
               }
             }
           `}</style>
@@ -721,6 +796,70 @@ const usagePillUnusedStyle = {
   background: "linear-gradient(135deg, var(--app-neutral-bg), rgba(255,255,255,0.72))",
   color: "var(--app-neutral-text)",
   border: "1px solid rgba(112, 89, 78, 0.12)",
+};
+
+const contractOrdersTdStyle = {
+  padding: "0 20px 12px",
+  borderBottom: "1px solid var(--app-border)",
+  background: "rgba(255,249,245,0.72)",
+};
+
+const contractOrdersDetailsStyle = {
+  display: "grid",
+  gap: 10,
+  borderRadius: 8,
+  border: "1px solid rgba(45, 108, 121, 0.14)",
+  background: "rgba(255,255,255,0.86)",
+  padding: "10px 12px",
+};
+
+const contractOrdersSummaryStyle = {
+  color: "var(--app-info-text)",
+  cursor: "pointer",
+  fontSize: 13,
+  fontWeight: 900,
+  width: "fit-content",
+};
+
+const contractOrdersListStyle = {
+  display: "grid",
+  gap: 8,
+  paddingTop: 8,
+};
+
+const contractOrderLinkStyle = {
+  display: "grid",
+  gridTemplateColumns: "minmax(190px, 1fr) minmax(260px, 2fr)",
+  gap: 12,
+  alignItems: "center",
+  textDecoration: "none",
+  color: "var(--app-text)",
+  borderRadius: 8,
+  border: "1px solid var(--app-border)",
+  background: "rgba(255,255,255,0.9)",
+  padding: "10px 12px",
+};
+
+const contractOrderMainStyle = {
+  display: "grid",
+  gap: 3,
+  minWidth: 0,
+};
+
+const contractOrderMetaStyle = {
+  display: "flex",
+  gap: 10,
+  alignItems: "center",
+  justifyContent: "flex-end",
+  flexWrap: "wrap",
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 700,
+};
+
+const emptyOrdersStyle = {
+  ...mutedTextStyle,
+  margin: 0,
 };
 
 const addressBlockStyle = {

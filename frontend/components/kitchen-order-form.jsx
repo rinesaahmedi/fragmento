@@ -216,7 +216,7 @@ export default function KitchenOrderForm({
             ) : null}
           </div>
         ) : null}
-        <form id="order-form" className={styles.orderForm} onSubmit={onSubmit}>
+        <form id="order-form" className={styles.orderForm} autoComplete="on" onSubmit={onSubmit}>
           <input
             id="contractNumber"
             type="hidden"
@@ -225,32 +225,34 @@ export default function KitchenOrderForm({
           />
           <div className={[styles.field, styles.fieldQuarter].join(" ")}>
             <label htmlFor="firstName">Vorname*</label>
-            <input id="firstName" required placeholder="Max" value={customer.firstName} onChange={(event) => onUpdateCustomer("firstName", event.target.value)} />
+            <input id="firstName" name="given-name" autoComplete="given-name" required placeholder="Max" value={customer.firstName} onChange={(event) => onUpdateCustomer("firstName", event.target.value)} />
           </div>
           <div className={[styles.field, styles.fieldQuarter].join(" ")}>
             <label htmlFor="lastName">Nachname*</label>
-            <input id="lastName" required placeholder="Mustermann" value={customer.lastName} onChange={(event) => onUpdateCustomer("lastName", event.target.value)} />
+            <input id="lastName" name="family-name" autoComplete="family-name" required placeholder="Mustermann" value={customer.lastName} onChange={(event) => onUpdateCustomer("lastName", event.target.value)} />
           </div>
           <div className={[styles.field, styles.fieldQuarter].join(" ")}>
             <label htmlFor="email">E-Mail*</label>
-            <input id="email" type="email" required placeholder="max@example.com" value={customer.email} onChange={(event) => onUpdateCustomer("email", event.target.value)} />
+            <input id="email" name="email" type="email" autoComplete="email" required placeholder="max@example.com" value={customer.email} onChange={(event) => onUpdateCustomer("email", event.target.value)} />
           </div>
           <div className={[styles.field, styles.fieldQuarter].join(" ")}>
             <label htmlFor="phone">Telefon*</label>
-            <input id="phone" required placeholder="+49 170 1234567" value={customer.phone} onChange={(event) => onUpdateCustomer("phone", event.target.value)} />
+            <input id="phone" name="tel" autoComplete="tel" required placeholder="+49 170 1234567" value={customer.phone} onChange={(event) => onUpdateCustomer("phone", event.target.value)} />
           </div>
           <div className={styles.fieldFull}>
             <label htmlFor="address1">Adresse (Straße, Nr.)*</label>
-            <input id="address1" required placeholder="Musterstraße 1" value={customer.address1} onChange={(event) => onUpdateCustomer("address1", event.target.value)} />
+            <input id="address1" name="address-line1" autoComplete="address-line1" required placeholder="Musterstraße 1" value={customer.address1} onChange={(event) => onUpdateCustomer("address1", event.target.value)} />
           </div>
           <div className={styles.fieldFull}>
             <label htmlFor="address2">Adresszusatz (optional)</label>
-            <input id="address2" placeholder="Wohnung, Firma, etc." value={customer.address2} onChange={(event) => onUpdateCustomer("address2", event.target.value)} />
+            <input id="address2" name="address-line2" autoComplete="address-line2" placeholder="Wohnung, Firma, etc." value={customer.address2} onChange={(event) => onUpdateCustomer("address2", event.target.value)} />
           </div>
           <div className={[styles.field, styles.fieldThird].join(" ")}>
             <label htmlFor="country">Land*</label>
             <select
               id="country"
+              name="country"
+              autoComplete="country-name"
               required
               value={customer.country}
               onChange={(event) => {
@@ -270,6 +272,8 @@ export default function KitchenOrderForm({
             <label htmlFor="city">Stadt*</label>
             <select
               id="city"
+              name="address-level2"
+              autoComplete="address-level2"
               required
               value={customer.city}
               disabled={!customer.country}
@@ -288,6 +292,8 @@ export default function KitchenOrderForm({
             <label htmlFor="postalCode">PLZ*</label>
             <select
               id="postalCode"
+              name="postal-code"
+              autoComplete="postal-code"
               required
               value={customer.postalCode}
               disabled={!customer.city}

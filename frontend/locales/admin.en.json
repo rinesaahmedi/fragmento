@@ -200,6 +200,8 @@
     "deleteContractNumber": "Delete contract number",
     "editContractDetails": "Edit contract details",
     "noAddressCaptured": "No address captured",
+    "viewOrdersForThisContract": "View orders for this contract",
+    "noOrdersForThisContract": "No orders for this contract yet.",
     "building": "Building",
     "floor": "Floor",
     "unit": "Unit",
@@ -298,9 +300,14 @@
     "orderActions": "Order actions",
     "updateStatusOrResendExternalNotificationsForThisOrder": "Update status or resend external notifications for this order.",
     "saveStatus": "Save status",
+    "confirmAndSendEmail": "Confirm and send email",
     "markConfirmed": "Mark confirmed",
     "markCancelled": "Mark cancelled",
     "resendEmail": "Resend email",
-    "retryWebhook": "Retry webhook"
+    "retryWebhook": "Retry webhook",
+    "processing": "Processing...",
+    "confirmingAndSendingEmail": "Confirming and sending email...",
+    "resendingEmail": "Resending email...",
+    "retryingWebhook": "Retrying webhook..."
   }
 }

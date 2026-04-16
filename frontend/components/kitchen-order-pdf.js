@@ -33,6 +33,25 @@ async function loadPdfLogoImage(url) {
   });
 }
 
+async function renderLogoDataUrl() {
+  const logoImage = await loadPdfLogoImage("/img/fragmentologo-cropped.jpg");
+  const scale = 2;
+  const logoWidth = 920;
+  const logoHeight = 205;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.round(logoWidth * scale);
+  canvas.height = Math.round(logoHeight * scale);
+  const context = canvas.getContext("2d");
+
+  if (!context) return null;
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  context.drawImage(logoImage, 0, 0, canvas.width, canvas.height);
+
+  return canvas.toDataURL("image/jpeg", 0.9);
+}
+
 export async function generateOrderPdf(order) {
   const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt" });
@@ -49,22 +68,8 @@ export async function generateOrderPdf(order) {
   };
 
   try {
-    const logoImage = await loadPdfLogoImage("/img/fragmentologo.png");
-    const logoHeight = 120;
-    const logoWidth = (logoImage.width * logoHeight) / logoImage.height;
-    const scale = 2;
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.round(logoWidth * scale);
-    canvas.height = Math.round(logoHeight * scale);
-    const context = canvas.getContext("2d");
-
-    if (context) {
-      context.fillStyle = "#ffffff";
-      context.fillRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(logoImage, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL("image/jpeg", 0.85);
-      doc.addImage(imageData, "JPEG", margin, y - 10, logoWidth, logoHeight);
-    }
+    const imageData = await renderLogoDataUrl();
+    if (imageData) doc.addImage(imageData, "JPEG", margin, y + 4, 230, 51);
   } catch (error) {
     console.error("Konnte das Logo fuer das PDF nicht laden:", error);
   }
