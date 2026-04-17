@@ -18,6 +18,11 @@ import {
 } from "./kitchen-selection-utils";
 import KitchenSvgStage from "./kitchen-svg-stage";
 import { PLAN_VIEWPORT_BY_SLUG } from "./kitchen-svg-plan-utils";
+import {
+  getServiceEligibility,
+  SERVICE_CODE_MONTAGE,
+  SERVICE_CODE_PICKUP,
+} from "../lib/service-eligibility";
 
 function buildInitialCustomer(contractNumber) {
   return {
@@ -254,15 +259,19 @@ export default function KitchenConfigurator({
   const lockedSelectedComponents = selectedComponents.filter((item) => item.isLocked || item.isOrderLocked);
   const optionalSelectedComponents = selectedComponents.filter((item) => !item.isLocked && !item.isOrderLocked);
   const fixedComponentIdsKey = fixedComponentIds.join("|");
-  const selectedComponentCodes = selectedComponents.map((item) => item.code);
   const visibleComponents = kitchenConfig.components.filter((item) => {
     const componentId = componentIdForItem(item);
     return !fixedComponentIds.includes(componentId) && !isHiddenLinkedComponent(kitchenSlug, componentId);
   });
-  const montageEligible =
-    selectedComponents.length >= 3 &&
-    selectedComponentCodes.filter((code) => kitchenConfig.montageRequiredCodes.includes(code)).length >= 2;
-  const hasAnyBaseSelection = selectedComponents.length > 0 || selectedAccessories.length > 0;
+  const serviceEligibility = useMemo(
+    () =>
+      getServiceEligibility({
+        selectedComponents,
+        selectedAccessories,
+        montageRequiredCodes: kitchenConfig.montageRequiredCodes,
+      }),
+    [kitchenConfig.montageRequiredCodes, selectedAccessories, selectedComponents],
+  );
   const grandTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
     (sum, item) => sum + Number(item.price || 0),
     0,
@@ -279,13 +288,19 @@ export default function KitchenConfigurator({
   }, [fixedComponentIds, fixedComponentIdsKey]);
 
   useEffect(() => {
-    if (!montageEligible && selectedServiceCodes.includes("SVC-MONTAGE-001")) {
-      setSelectedServiceCodes((current) => current.filter((code) => code !== "SVC-MONTAGE-001"));
+    if (
+      !serviceEligibility.montageEligible &&
+      selectedServiceCodes.includes(SERVICE_CODE_MONTAGE)
+    ) {
+      setSelectedServiceCodes((current) => current.filter((code) => code !== SERVICE_CODE_MONTAGE));
     }
-    if (!hasAnyBaseSelection && selectedServiceCodes.includes("SVC-PICKUP-001")) {
-      setSelectedServiceCodes((current) => current.filter((code) => code !== "SVC-PICKUP-001"));
+    if (
+      !serviceEligibility.pickupEligible &&
+      selectedServiceCodes.includes(SERVICE_CODE_PICKUP)
+    ) {
+      setSelectedServiceCodes((current) => current.filter((code) => code !== SERVICE_CODE_PICKUP));
     }
-  }, [hasAnyBaseSelection, montageEligible, selectedServiceCodes]);
+  }, [selectedServiceCodes, serviceEligibility]);
 
   function toggleAccessory(itemCode) {
     if (orderLockedAccessoryCodes.has(itemCode)) return;
@@ -296,13 +311,13 @@ export default function KitchenConfigurator({
 
   function toggleService(itemCode) {
     if (orderLockedServiceCodes.has(itemCode)) return;
-    if (itemCode === "SVC-MONTAGE-001" && !montageEligible) {
-      setStatus("Montage ist erst ab mindestens 3 Artikeln moeglich, davon 2 Schrank-Komponenten.");
+    if (itemCode === SERVICE_CODE_MONTAGE && !serviceEligibility.montageEligible) {
+      setStatus("Montage ist erst ab 3 zusaetzlichen Komponenten moeglich, davon 2 Schrank-Komponenten.");
       setStatusTone("error");
       return;
     }
 
-    if (itemCode === "SVC-PICKUP-001" && !hasAnyBaseSelection) {
+    if (itemCode === SERVICE_CODE_PICKUP && !serviceEligibility.pickupEligible) {
       setStatus("Abholung kann erst hinzugefuegt werden, wenn mindestens ein Artikel ausgewaehlt wurde.");
       setStatusTone("error");
       return;
@@ -314,8 +329,12 @@ export default function KitchenConfigurator({
     setSelectedServiceCodes((current) => {
       const exists = current.includes(itemCode);
       if (exists) return current.filter((code) => code !== itemCode);
-      if (itemCode === "SVC-MONTAGE-001") return [...current.filter((code) => code !== "SVC-PICKUP-001"), itemCode];
-      if (itemCode === "SVC-PICKUP-001") return [...current.filter((code) => code !== "SVC-MONTAGE-001"), itemCode];
+      if (itemCode === SERVICE_CODE_MONTAGE) {
+        return [...current.filter((code) => code !== SERVICE_CODE_PICKUP), itemCode];
+      }
+      if (itemCode === SERVICE_CODE_PICKUP) {
+        return [...current.filter((code) => code !== SERVICE_CODE_MONTAGE), itemCode];
+      }
       return [...current, itemCode];
     });
   }
@@ -549,6 +568,7 @@ export default function KitchenConfigurator({
               onToggleAccessory={toggleAccessory}
               onToggleService={toggleService}
               onOpenProductInfo={openProductInfo}
+              serviceEligibility={serviceEligibility}
             />
           </div>
         </section>

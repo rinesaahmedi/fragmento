@@ -27,6 +27,61 @@ const COUNTRY_LABELS = {
   Polen: "Poland",
 };
 
+const REQUIRED_FIELD_LABELS = [
+  { key: "firstName", label: "Vorname" },
+  { key: "lastName", label: "Nachname" },
+  { key: "email", label: "E-Mail" },
+  { key: "phone", label: "Telefon" },
+  { key: "address1", label: "Adresse" },
+  { key: "country", label: "Land" },
+  { key: "city", label: "Stadt" },
+  { key: "postalCode", label: "PLZ" },
+  { key: "paymentMethod", label: "Zahlungsmethode" },
+  { key: "consent", label: "Datenschutz" },
+];
+
+const ADDRESS_FIELD_LABELS = {
+  address1: "Adresse",
+  address2: "Adresszusatz",
+  country: "Land",
+  city: "Stadt",
+  postalCode: "PLZ",
+  notes: "Anmerkungen",
+};
+
+function normalizeValue(value) {
+  return String(value ?? "").trim();
+}
+
+function uniqueOptions(values = [], fallback = "") {
+  return [...new Set([fallback, ...values].filter(Boolean))];
+}
+
+function contractCountryToCustomerCountry(country) {
+  if (!country) return "";
+  return Object.entries(COUNTRY_LABELS).find(([, englishLabel]) => englishLabel === country)?.[0] || country;
+}
+
+function buildContractPrefill(contractAddress) {
+  if (!contractAddress) return {};
+
+  const noteParts = [
+    contractAddress.building ? `Building: ${contractAddress.building}` : "",
+    contractAddress.floor ? `Floor: ${contractAddress.floor}` : "",
+    contractAddress.unitNumber ? `Unit: ${contractAddress.unitNumber}` : "",
+    contractAddress.notes || "",
+  ].filter(Boolean);
+
+  return {
+    address1: contractAddress.address1 || "",
+    address2: contractAddress.address2 || "",
+    country: contractCountryToCustomerCountry(contractAddress.country),
+    city: contractAddress.city || "",
+    postalCode: contractAddress.postalCode || "",
+    notes: noteParts.join("\n"),
+  };
+}
+
 export const COUNTRY_CITY_OPTIONS = {
   Deutschland: [
     "Aachen",
@@ -181,9 +236,16 @@ export default function KitchenOrderForm({
   onUpdateCustomer,
   onUseContractAddress,
 }) {
-  const countryOptions = Object.keys(COUNTRY_CITY_OPTIONS);
-  const cityOptions = COUNTRY_CITY_OPTIONS[customer.country] || [];
-  const postalCodeOptions = POSTAL_CODE_OPTIONS[customer.city] || [];
+  const contractPrefill = buildContractPrefill(contractAddress);
+  const countryOptions = uniqueOptions(Object.keys(COUNTRY_CITY_OPTIONS), customer.country);
+  const cityOptions = uniqueOptions(COUNTRY_CITY_OPTIONS[customer.country] || [], customer.city);
+  const postalCodeOptions = uniqueOptions(POSTAL_CODE_OPTIONS[customer.city] || [], customer.postalCode);
+  const filledFromContractLabels = Object.entries(ADDRESS_FIELD_LABELS)
+    .filter(([key, label]) => normalizeValue(contractPrefill[key]) && normalizeValue(customer[key]) === normalizeValue(contractPrefill[key]))
+    .map(([, label]) => label);
+  const missingRequiredLabels = REQUIRED_FIELD_LABELS.filter(({ key }) =>
+    key === "consent" ? !customer.consent : !normalizeValue(customer[key]),
+  ).map(({ label }) => label);
   const contractAddressLines = [
     [contractAddress?.address1, contractAddress?.address2].filter(Boolean).join(", "),
     [contractAddress?.postalCode, contractAddress?.city].filter(Boolean).join(" "),
@@ -191,6 +253,36 @@ export default function KitchenOrderForm({
     contractAddress?.unitLabel || "",
     contractAddress?.notes ? `Notes: ${contractAddress.notes}` : "",
   ].filter(Boolean);
+
+  function getFieldClassName(fieldKey, required = false, baseClassName = styles.field) {
+    const isPrefilled =
+      normalizeValue(contractPrefill[fieldKey]) && normalizeValue(customer[fieldKey]) === normalizeValue(contractPrefill[fieldKey]);
+    const isMissing = required && !normalizeValue(customer[fieldKey]);
+
+    return [
+      baseClassName,
+      isPrefilled ? styles.fieldPrefilled : "",
+      isMissing ? styles.fieldRequiredMissing : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  function renderFieldHint(fieldKey, required = false) {
+    const isPrefilled =
+      normalizeValue(contractPrefill[fieldKey]) && normalizeValue(customer[fieldKey]) === normalizeValue(contractPrefill[fieldKey]);
+    const isMissing = required && !normalizeValue(customer[fieldKey]);
+
+    if (isPrefilled) {
+      return <span className={[styles.fieldHint, styles.fieldHintPrefilled].join(" ")}>Aus Vertragsadresse uebernommen</span>;
+    }
+
+    if (isMissing) {
+      return <span className={[styles.fieldHint, styles.fieldHintMissing].join(" ")}>Bitte noch ausfuellen</span>;
+    }
+
+    return null;
+  }
 
   return (
     <section ref={orderSectionRef} className={styles.orderSectionWrap}>
@@ -216,6 +308,24 @@ export default function KitchenOrderForm({
             ) : null}
           </div>
         ) : null}
+        <div className={styles.orderGuidance}>
+          <div className={styles.orderGuidanceBlock}>
+            <strong>Bereits ausgefuellt</strong>
+            <span>
+              {filledFromContractLabels.length
+                ? filledFromContractLabels.join(", ")
+                : "Noch keine Felder aus der Vertragsadresse uebernommen."}
+            </span>
+          </div>
+          <div className={styles.orderGuidanceBlock}>
+            <strong>Noch erforderlich</strong>
+            <span className={!missingRequiredLabels.length ? styles.orderGuidanceComplete : ""}>
+              {missingRequiredLabels.length
+                ? missingRequiredLabels.join(", ")
+                : "Alle Pflichtfelder sind ausgefuellt."}
+            </span>
+          </div>
+        </div>
         <form id="order-form" className={styles.orderForm} autoComplete="on" onSubmit={onSubmit}>
           <input
             id="contractNumber"
@@ -223,31 +333,37 @@ export default function KitchenOrderForm({
             value={customer.contractNumber}
             onChange={(event) => onUpdateCustomer("contractNumber", event.target.value)}
           />
-          <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+          <div className={getFieldClassName("firstName", true, [styles.field, styles.fieldQuarter].join(" "))}>
             <label htmlFor="firstName">Vorname*</label>
             <input id="firstName" name="given-name" autoComplete="given-name" required placeholder="Max" value={customer.firstName} onChange={(event) => onUpdateCustomer("firstName", event.target.value)} />
+            {renderFieldHint("firstName", true)}
           </div>
-          <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+          <div className={getFieldClassName("lastName", true, [styles.field, styles.fieldQuarter].join(" "))}>
             <label htmlFor="lastName">Nachname*</label>
             <input id="lastName" name="family-name" autoComplete="family-name" required placeholder="Mustermann" value={customer.lastName} onChange={(event) => onUpdateCustomer("lastName", event.target.value)} />
+            {renderFieldHint("lastName", true)}
           </div>
-          <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+          <div className={getFieldClassName("email", true, [styles.field, styles.fieldQuarter].join(" "))}>
             <label htmlFor="email">E-Mail*</label>
             <input id="email" name="email" type="email" autoComplete="email" required placeholder="max@example.com" value={customer.email} onChange={(event) => onUpdateCustomer("email", event.target.value)} />
+            {renderFieldHint("email", true)}
           </div>
-          <div className={[styles.field, styles.fieldQuarter].join(" ")}>
+          <div className={getFieldClassName("phone", true, [styles.field, styles.fieldQuarter].join(" "))}>
             <label htmlFor="phone">Telefon*</label>
             <input id="phone" name="tel" autoComplete="tel" required placeholder="+49 170 1234567" value={customer.phone} onChange={(event) => onUpdateCustomer("phone", event.target.value)} />
+            {renderFieldHint("phone", true)}
           </div>
-          <div className={styles.fieldFull}>
+          <div className={getFieldClassName("address1", true, styles.fieldFull)}>
             <label htmlFor="address1">Adresse (Straße, Nr.)*</label>
             <input id="address1" name="address-line1" autoComplete="address-line1" required placeholder="Musterstraße 1" value={customer.address1} onChange={(event) => onUpdateCustomer("address1", event.target.value)} />
+            {renderFieldHint("address1", true)}
           </div>
-          <div className={styles.fieldFull}>
+          <div className={getFieldClassName("address2", false, styles.fieldFull)}>
             <label htmlFor="address2">Adresszusatz (optional)</label>
             <input id="address2" name="address-line2" autoComplete="address-line2" placeholder="Wohnung, Firma, etc." value={customer.address2} onChange={(event) => onUpdateCustomer("address2", event.target.value)} />
+            {renderFieldHint("address2")}
           </div>
-          <div className={[styles.field, styles.fieldThird].join(" ")}>
+          <div className={getFieldClassName("country", true, [styles.field, styles.fieldThird].join(" "))}>
             <label htmlFor="country">Land*</label>
             <select
               id="country"
@@ -267,8 +383,9 @@ export default function KitchenOrderForm({
                 <option key={country} value={country}>{COUNTRY_LABELS[country] || country}</option>
               ))}
             </select>
+            {renderFieldHint("country", true)}
           </div>
-          <div className={[styles.field, styles.fieldThird].join(" ")}>
+          <div className={getFieldClassName("city", true, [styles.field, styles.fieldThird].join(" "))}>
             <label htmlFor="city">Stadt*</label>
             <select
               id="city"
@@ -287,8 +404,9 @@ export default function KitchenOrderForm({
                 <option key={city} value={city}>{city}</option>
               ))}
             </select>
+            {renderFieldHint("city", true)}
           </div>
-          <div className={[styles.field, styles.fieldThird].join(" ")}>
+          <div className={getFieldClassName("postalCode", true, [styles.field, styles.fieldThird].join(" "))}>
             <label htmlFor="postalCode">PLZ*</label>
             <select
               id="postalCode"
@@ -304,8 +422,9 @@ export default function KitchenOrderForm({
                 <option key={postalCode} value={postalCode}>{postalCode}</option>
               ))}
             </select>
+            {renderFieldHint("postalCode", true)}
           </div>
-          <div className={styles.fieldFull}>
+          <div className={getFieldClassName("notes", false, styles.fieldFull)}>
             <label htmlFor="notes">Anmerkungen (optional)</label>
             <textarea
               id="notes"
@@ -314,6 +433,7 @@ export default function KitchenOrderForm({
               onChange={(event) => onUpdateCustomer("notes", event.target.value)}
               placeholder="Hinweise zur Lieferung, Wunschtermine, etc."
             />
+            {renderFieldHint("notes")}
           </div>
           <div className={styles.checkboxRow}>
             <input

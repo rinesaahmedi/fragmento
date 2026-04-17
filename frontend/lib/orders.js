@@ -3,6 +3,11 @@ import { ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { MONTAGE_REQUIRED_CODES } from "./catalog";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
+  getServiceEligibility,
+  SERVICE_CODE_MONTAGE,
+  SERVICE_CODE_PICKUP,
+} from "./service-eligibility";
+import {
   CONTRACT_ERRORS,
   assertUsableKitchenContract,
   buildConfirmedItemCodeSets,
@@ -240,19 +245,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw validationError("One or more selected items are invalid or inactive");
   }
 
-  const selectedComponentCodes = selectedComponents.map((item) => item.code);
-  if (selectedServices.some((item) => item.code === "SVC-MONTAGE-001")) {
-    const matchedCabinets = selectedComponentCodes.filter((code) => MONTAGE_REQUIRED_CODES.includes(code)).length;
-    if (selectedComponents.length < 3 || matchedCabinets < 2) {
-      throw validationError("Montage conditions are not met");
-    }
-  }
-
-  const allSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];
-  if (!allSelected.length) {
-    throw validationError("At least one item must be selected");
-  }
-
   const kitchenContract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: validatedCustomer.contractNumber },
     include: { kitchen: true },
@@ -261,6 +253,39 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   assertUsableKitchenContract(kitchenContract);
   if (kitchenContract.kitchenId !== kitchen.id) {
     throw contractValidationError(CONTRACT_ERRORS.KITCHEN_MISMATCH);
+  }
+
+  const contractOrderState = await getContractOrderState(kitchenContract.id);
+  const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
+  const serviceEligibility = getServiceEligibility({
+    selectedComponents: selectedComponents.map((item) => ({
+      ...item,
+      isLocked: Boolean(item.isLocked),
+      isOrderLocked: confirmedItemSets[ItemType.COMPONENT].has(item.code),
+    })),
+    selectedAccessories,
+    montageRequiredCodes: MONTAGE_REQUIRED_CODES,
+  });
+  const selectedServiceCodes = selectedServices.map((item) => item.code);
+
+  if (
+    selectedServiceCodes.includes(SERVICE_CODE_MONTAGE) &&
+    selectedServiceCodes.includes(SERVICE_CODE_PICKUP)
+  ) {
+    throw validationError("Montage and pickup cannot both be selected");
+  }
+
+  if (selectedServiceCodes.includes(SERVICE_CODE_MONTAGE) && !serviceEligibility.montageEligible) {
+    throw validationError("Montage conditions are not met");
+  }
+
+  if (selectedServiceCodes.includes(SERVICE_CODE_PICKUP) && !serviceEligibility.pickupEligible) {
+    throw validationError("Pickup conditions are not met");
+  }
+
+  const allSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];
+  if (!allSelected.length) {
+    throw validationError("At least one item must be selected");
   }
 
   let savedOrder = null;

@@ -9,6 +9,11 @@ import {
   isLinkedComponentSelected,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
+import {
+  getServiceDisabledReason,
+  SERVICE_CODE_MONTAGE,
+  SERVICE_CODE_PICKUP,
+} from "../lib/service-eligibility";
 
 const DISHWASHER_BASE_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 10 24 L 14 44 H 46 L 50 24 Z"/><line x1="18" y1="26" x2="20" y2="44"/><line x1="26" y1="26" x2="26" y2="44"/><line x1="34" y1="26" x2="34" y2="44"/><line x1="42" y1="26" x2="40" y2="44"/><line x1="12" y1="32" x2="48" y2="32"/><line x1="13" y1="38" x2="47" y2="38"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">GS</text></svg>';
@@ -62,16 +67,17 @@ const ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
 };
 
-function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick, onOpenInfo }) {
+function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHref, onClick, onOpenInfo }) {
   const className = [
     styles.itemCard,
     selected ? styles.itemCardSelected : "",
     locked ? styles.itemCardLocked : "",
+    disabled ? styles.itemCardLocked : "",
   ]
     .filter(Boolean)
     .join(" ");
   const handleCardKeyDown = (event) => {
-    if (locked) {
+    if (locked || disabled) {
       return;
     }
 
@@ -84,10 +90,10 @@ function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick
   return (
     <div
       role="button"
-      tabIndex={locked ? -1 : 0}
-      aria-disabled={locked}
+      tabIndex={locked || disabled ? -1 : 0}
+      aria-disabled={locked || disabled}
       className={className}
-      onClick={locked ? undefined : onClick}
+      onClick={locked || disabled ? undefined : onClick}
       onKeyDown={handleCardKeyDown}
     >
       <div className={styles.itemTop}>
@@ -101,7 +107,7 @@ function CatalogItem({ item, selected, locked, price, hint, infoPdfHref, onClick
       </div>
       <div className={styles.itemMeta}>
         <span className={locked ? styles.lockedPill : styles.togglePill}>
-          {locked ? "Fix" : selected ? "Entfernen" : "Hinzufuegen"}
+          {locked ? "Fix" : disabled ? "Nicht verfuegbar" : selected ? "Entfernen" : "Hinzufuegen"}
         </span>
         <div className={styles.itemMetaAside}>
           {hint ? <span className={styles.ruleHint}>{hint}</span> : null}
@@ -140,6 +146,7 @@ export default function KitchenCatalogPanel({
   onToggleAccessory,
   onToggleService,
   onOpenProductInfo,
+  serviceEligibility,
 }) {
   return (
     <aside className={styles.sidebar}>
@@ -199,24 +206,34 @@ export default function KitchenCatalogPanel({
         <section className={styles.catalogSection}>
           <h3>Dienstleistungen</h3>
           <div className={styles.catalogGrid}>
-            {kitchenConfig.services.map((item) => (
-              <CatalogItem
-                key={item.id}
-                item={item}
-                selected={selectedServiceCodes.includes(item.code)}
-                locked={orderLockedServiceCodes.has(item.code)}
-                infoPdfHref={getProductInfoHref(item.code)}
-                onOpenInfo={onOpenProductInfo}
-                hint={
-                  item.code === "SVC-MONTAGE-001"
-                    ? "Mindestens 3 Artikel, davon 2 Schrank-Komponenten"
-                    : item.code === "SVC-PICKUP-001"
-                      ? "Nur mit mindestens einem ausgewaehlten Artikel"
-                      : ""
-                }
-                onClick={() => onToggleService(item.code)}
-              />
-            ))}
+            {kitchenConfig.services.map((item) => {
+              const disabledReason = getServiceDisabledReason(item.code, serviceEligibility);
+              const disabled =
+                !selectedServiceCodes.includes(item.code) &&
+                ((item.code === SERVICE_CODE_MONTAGE && !serviceEligibility.montageEligible) ||
+                  (item.code === SERVICE_CODE_PICKUP && !serviceEligibility.pickupEligible));
+
+              return (
+                <CatalogItem
+                  key={item.id}
+                  item={item}
+                  selected={selectedServiceCodes.includes(item.code)}
+                  locked={orderLockedServiceCodes.has(item.code)}
+                  disabled={disabled}
+                  infoPdfHref={getProductInfoHref(item.code)}
+                  onOpenInfo={onOpenProductInfo}
+                  hint={
+                    disabledReason ||
+                    (item.code === SERVICE_CODE_MONTAGE
+                      ? "Montage erst ab 3 zusaetzlichen Komponenten, davon 2 Schrank-Komponenten"
+                      : item.code === SERVICE_CODE_PICKUP
+                        ? "Nur mit mindestens einer Komponente oder einem Zubehoer"
+                        : "")
+                  }
+                  onClick={() => onToggleService(item.code)}
+                />
+              );
+            })}
           </div>
         </section>
       </div>
