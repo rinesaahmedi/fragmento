@@ -15,6 +15,7 @@ import {
   getContractOrderState,
   normalizeContractNumber,
 } from "./kitchen-contracts";
+import { isAddressVerificationRecordValid } from "./address-verification-server";
 import { prisma } from "./prisma";
 
 const PAYMENT_METHODS = new Set(["paypal", "visa", "mastercard", "klarna"]);
@@ -224,6 +225,11 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     notes: customer.notes ? String(customer.notes).trim() : "",
     paymentMethod: validatePaymentMethod(customer.paymentMethod),
   };
+  const addressVerification = orderPayload?.addressVerification || null;
+
+  if (!isAddressVerificationRecordValid(addressVerification, validatedCustomer)) {
+    throw validationError("Address verification is required and must match the submitted address.");
+  }
 
   const submittedGroups = {
     components: normalizeSubmissionItems(orderPayload?.components),

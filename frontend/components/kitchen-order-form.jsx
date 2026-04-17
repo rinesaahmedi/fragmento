@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "./kitchen-configurator.module.css";
+import { ADDRESS_VERIFICATION_STATUS } from "../lib/address-verification";
 
 const PAYMENT_METHOD_OPTIONS = [
   { value: "paypal", label: "PayPal" },
@@ -232,7 +233,9 @@ export default function KitchenOrderForm({
   isSubmitting,
   status,
   statusTone,
+  addressVerification,
   onSubmit,
+  onVerifyAddress,
   onUpdateCustomer,
   onUseContractAddress,
 }) {
@@ -253,6 +256,15 @@ export default function KitchenOrderForm({
     contractAddress?.unitLabel || "",
     contractAddress?.notes ? `Notes: ${contractAddress.notes}` : "",
   ].filter(Boolean);
+  const addressVerificationStatus = addressVerification?.status || ADDRESS_VERIFICATION_STATUS.IDLE;
+  const addressVerificationMessage = addressVerification?.message || "";
+  const addressVerificationSuggestion = addressVerification?.suggestion || "";
+  const isAddressVerificationLoading = addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.LOADING;
+  const isAddressVerificationValid = addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.VALID;
+  const isAddressVerificationPartial = addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.PARTIAL_MATCH;
+  const isAddressVerificationError =
+    addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.INVALID
+    || addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE;
 
   function getFieldClassName(fieldKey, required = false, baseClassName = styles.field) {
     const isPrefilled =
@@ -423,6 +435,40 @@ export default function KitchenOrderForm({
               ))}
             </select>
             {renderFieldHint("postalCode", true)}
+          </div>
+          <div className={styles.addressVerificationRow}>
+            <button
+              type="button"
+              className={[
+                styles.verifyAddressButton,
+                isAddressVerificationValid ? styles.verifyAddressButtonValid : "",
+                isAddressVerificationPartial ? styles.verifyAddressButtonWarning : "",
+                isAddressVerificationError ? styles.verifyAddressButtonError : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              onClick={onVerifyAddress}
+              disabled={isAddressVerificationLoading}
+            >
+              {isAddressVerificationLoading ? "Verifying..." : "Verify Address"}
+            </button>
+            <div
+              className={[
+                styles.addressVerificationMessage,
+                isAddressVerificationValid ? styles.addressVerificationMessageValid : "",
+                isAddressVerificationPartial ? styles.addressVerificationMessageWarning : "",
+                isAddressVerificationError ? styles.addressVerificationMessageError : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              role="status"
+              aria-live="polite"
+            >
+              {addressVerificationMessage ? <strong>{addressVerificationMessage}</strong> : <strong>Verify the address before submitting.</strong>}
+              {addressVerificationSuggestion ? <span>Suggested match: {addressVerificationSuggestion}</span> : null}
+              {isAddressVerificationPartial ? <span>Please review the street and verify again if needed.</span> : null}
+              {isAddressVerificationError ? <span>Correct the address details and run verification again.</span> : null}
+            </div>
           </div>
           <div className={getFieldClassName("notes", false, styles.fieldFull)}>
             <label htmlFor="notes">Anmerkungen (optional)</label>

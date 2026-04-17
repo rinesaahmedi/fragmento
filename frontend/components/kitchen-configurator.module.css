@@ -927,6 +927,112 @@
   font-weight: 700;
 }
 
+.addressVerificationRow {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.verifyAddressButton {
+  appearance: none;
+  min-height: 42px;
+  border: 1px solid #7a4d27;
+  border-radius: 10px;
+  background: #fff7ee;
+  color: #6d3f18;
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease,
+    color 0.18s ease;
+}
+
+.verifyAddressButton:hover:not(:disabled) {
+  background: #f8ead8;
+  box-shadow: 0 8px 18px rgba(109, 63, 24, 0.08);
+}
+
+.verifyAddressButton:disabled {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.verifyAddressButtonValid {
+  border-color: #2f9251;
+  background: #eef8f1;
+  color: #22673a;
+}
+
+.verifyAddressButtonWarning {
+  border-color: #c88a19;
+  background: #fff8e6;
+  color: #8a5a00;
+}
+
+.verifyAddressButtonError {
+  border-color: #b6542a;
+  background: #fff2eb;
+  color: #933d1c;
+}
+
+.addressVerificationMessage {
+  display: grid;
+  gap: 4px;
+  min-height: 42px;
+  padding: 10px 12px;
+  border: 1px solid rgba(120, 90, 64, 0.14);
+  border-radius: 10px;
+  background: #fcf8f2;
+  color: #5d5146;
+  font-size: 0.84rem;
+  line-height: 1.45;
+}
+
+.addressVerificationMessage strong {
+  color: #46372a;
+  font-size: 0.86rem;
+}
+
+.addressVerificationMessage span {
+  color: inherit;
+}
+
+.addressVerificationMessageValid {
+  border-color: rgba(47, 146, 81, 0.28);
+  background: #eef8f1;
+  color: #22673a;
+}
+
+.addressVerificationMessageValid strong {
+  color: #22673a;
+}
+
+.addressVerificationMessageWarning {
+  border-color: rgba(200, 138, 25, 0.28);
+  background: #fff8e6;
+  color: #8a5a00;
+}
+
+.addressVerificationMessageWarning strong {
+  color: #8a5a00;
+}
+
+.addressVerificationMessageError {
+  border-color: rgba(182, 84, 42, 0.26);
+  background: #fff2eb;
+  color: #933d1c;
+}
+
+.addressVerificationMessageError strong {
+  color: #933d1c;
+}
+
 .paymentSection {
   display: flex;
   flex-direction: column;
@@ -1147,6 +1253,10 @@
 
   .paymentOptions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .addressVerificationRow {
+    grid-template-columns: 1fr;
   }
 
   .svgCanvas {

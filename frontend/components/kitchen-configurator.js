@@ -23,6 +23,12 @@ import {
   SERVICE_CODE_MONTAGE,
   SERVICE_CODE_PICKUP,
 } from "../lib/service-eligibility";
+import {
+  ADDRESS_VERIFICATION_STATUS,
+  addressVerificationSnapshotKey,
+  buildAddressVerificationSnapshot,
+  buildAddressVerificationState,
+} from "../lib/address-verification";
 
 function buildInitialCustomer(contractNumber) {
   return {
@@ -41,6 +47,14 @@ function buildInitialCustomer(contractNumber) {
     consent: false,
   };
 }
+
+const ADDRESS_VERIFICATION_FIELD_KEYS = new Set([
+  "address1",
+  "address2",
+  "country",
+  "city",
+  "postalCode",
+]);
 
 const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
   Germany: "Deutschland",
@@ -197,10 +211,19 @@ export default function KitchenConfigurator({
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
   );
+  const [addressVerification, setAddressVerification] = useState(() =>
+    buildAddressVerificationState(),
+  );
+  const addressSnapshot = useMemo(() => buildAddressVerificationSnapshot(customer), [customer]);
+  const addressSnapshotKey = useMemo(
+    () => addressVerificationSnapshotKey(addressSnapshot),
+    [addressSnapshot],
+  );
 
   useEffect(() => {
     if (initialOrder) {
       setCustomer(buildInitialCustomerFromOrder(initialOrder, initialContractNumber));
+      setAddressVerification(buildAddressVerificationState());
       setSelectedComponentIds(buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder));
       setSelectedAccessoryCodes(buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"));
       setSelectedServiceCodes(buildInitialCodes(kitchenConfig, initialOrder, "service", "services"));
@@ -213,6 +236,7 @@ export default function KitchenConfigurator({
         ...buildCustomerAddressFromContract(initialContractAddress),
         contractNumber: initialContractNumber,
       }));
+      setAddressVerification(buildAddressVerificationState());
       return;
     }
 
@@ -221,7 +245,23 @@ export default function KitchenConfigurator({
       if (current.contractNumber === initialContractNumber) return current;
       return { ...current, contractNumber: initialContractNumber };
     });
+    setAddressVerification(buildAddressVerificationState());
   }, [initialContractNumber, initialOrder, initialContractAddress, kitchenConfig, fixedComponentIds]);
+
+  useEffect(() => {
+    const verifiedSnapshotKey = addressVerification?.verification?.snapshot
+      ? addressVerificationSnapshotKey(addressVerification.verification.snapshot)
+      : "";
+
+    if (!verifiedSnapshotKey) return;
+    if (verifiedSnapshotKey === addressSnapshotKey) return;
+
+    setAddressVerification(
+      buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.IDLE, {
+        message: "Address changed. Please verify it again before submitting.",
+      }),
+    );
+  }, [addressSnapshotKey, addressVerification]);
 
   useEffect(() => {
     if (!activeProductInfo) return undefined;
@@ -341,6 +381,30 @@ export default function KitchenConfigurator({
 
   function updateCustomer(field, value) {
     setCustomer((current) => ({ ...current, [field]: value }));
+
+    if (ADDRESS_VERIFICATION_FIELD_KEYS.has(field)) {
+      setAddressVerification((current) => {
+        const verifiedSnapshotKey = current?.verification?.snapshot
+          ? addressVerificationSnapshotKey(current.verification.snapshot)
+          : "";
+
+        if (
+          !verifiedSnapshotKey
+          && current.status === ADDRESS_VERIFICATION_STATUS.IDLE
+          && !current.message
+          && !current.suggestion
+          && !current.verification
+        ) {
+          return current;
+        }
+
+        if (!verifiedSnapshotKey || verifiedSnapshotKey === addressSnapshotKey) {
+          return buildAddressVerificationState();
+        }
+
+        return current;
+      });
+    }
   }
 
   function useContractAddress() {
@@ -350,6 +414,57 @@ export default function KitchenConfigurator({
       ...current,
       ...buildCustomerAddressFromContract(initialContractAddress),
     }));
+    setAddressVerification(buildAddressVerificationState());
+  }
+
+  async function handleVerifyAddress() {
+    if (!customer.contractNumber || !customer.address1 || !customer.country || !customer.city || !customer.postalCode) {
+      setAddressVerification(
+        buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.INVALID, {
+          message: "Enter contract number, street, country, city, and postal code before verification.",
+        }),
+      );
+      return;
+    }
+
+    setAddressVerification(
+      buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.LOADING, {
+        message: "Verifying address...",
+      }),
+    );
+
+    try {
+      const response = await fetch("/api/address-verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(addressSnapshot),
+      });
+      const payload = await response.json();
+
+      if (payload.status === ADDRESS_VERIFICATION_STATUS.VALID && payload.verification) {
+        setAddressVerification(
+          buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.VALID, {
+            message: payload.message || "Address is valid.",
+            suggestion: payload.suggestion || "",
+            verification: payload.verification,
+          }),
+        );
+        return;
+      }
+
+      setAddressVerification(
+        buildAddressVerificationState(payload.status || ADDRESS_VERIFICATION_STATUS.INVALID, {
+          message: payload.message || "Address verification failed.",
+          suggestion: payload.suggestion || "",
+        }),
+      );
+    } catch (error) {
+      setAddressVerification(
+        buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE, {
+          message: error.message || "The address verification service is unavailable right now.",
+        }),
+      );
+    }
   }
 
   function removeComponent(item) {
@@ -414,6 +529,16 @@ export default function KitchenConfigurator({
       return;
     }
 
+    if (
+      addressVerification.status !== ADDRESS_VERIFICATION_STATUS.VALID
+      || !addressVerification.verification
+      || addressVerificationSnapshotKey(addressVerification.verification.snapshot) !== addressSnapshotKey
+    ) {
+      setStatus("Bitte verifiziere die Adresse vor dem Einreichen der Bestellung.");
+      setStatusTone("error");
+      return;
+    }
+
     setIsSubmitting(true);
     setStatus("Bestellung wird gespeichert...");
     setStatusTone("idle");
@@ -465,6 +590,7 @@ export default function KitchenConfigurator({
               paymentMethod: customer.paymentMethod,
               consent: customer.consent,
             },
+            addressVerification: addressVerification.verification,
             components: selectedComponents,
             accessories: selectedAccessories,
             services: selectedServices,
@@ -581,7 +707,9 @@ export default function KitchenConfigurator({
             isSubmitting={isSubmitting}
             status={status}
             statusTone={statusTone}
+            addressVerification={addressVerification}
             onSubmit={handleSubmit}
+            onVerifyAddress={handleVerifyAddress}
             onUpdateCustomer={updateCustomer}
             onUseContractAddress={useContractAddress}
           />

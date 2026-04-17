@@ -1,7 +1,19 @@
 import { NextResponse } from "next/server";
 import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput } from "../../../../../lib/admin-forms";
+import { isAddressVerificationRecordValid } from "../../../../../lib/address-verification-server";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
+
+function parseAddressVerificationRecord(formData) {
+  const rawValue = String(formData.get("addressVerification") || "").trim();
+  if (!rawValue) return null;
+
+  try {
+    return JSON.parse(rawValue);
+  } catch {
+    return null;
+  }
+}
 
 function getReturnPath(formData, fallback) {
   const rawPath = String(formData.get("returnTo") || "").trim();
@@ -77,6 +89,10 @@ export async function POST(request, { params }) {
 
     if (intent === "update") {
       const data = validateKitchenContractInput(formData);
+      const addressVerification = parseAddressVerificationRecord(formData);
+      if (!isAddressVerificationRecordValid(addressVerification, data)) {
+        throw new Error("Verify the contract address before updating the contract.");
+      }
       await prisma.kitchenContract.update({
         where: { id },
         data: {
