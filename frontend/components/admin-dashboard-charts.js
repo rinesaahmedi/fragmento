@@ -28,6 +28,7 @@ const STATUS_COLORS = {
 const SERIES_COLORS = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#e11d48", "#65a30d", "#ea580c", "#0d9488"];
 const DISTRIBUTION_COLORS = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#e11d48", "#65a30d", "#ea580c", "#0d9488"];
 const ORDER_STATUSES = ["NEW", "EMAILED", "CONFIRMED", "CANCELLED"];
+const MAX_TOP_ITEMS = 12;
 
 export const EXAMPLE_DASHBOARD_MOCK_DATA = {
   kpis: [
@@ -74,6 +75,7 @@ export function AdminDashboardCharts({
   const { translate } = useAdminI18n();
   const [statusMode, setStatusMode] = useState("volume");
   const [isolatedSeries, setIsolatedSeries] = useState("");
+  const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
 
   const statusChartData = useMemo(() => {
     if (statusMode === "volume") return dailyStatusData;
@@ -105,7 +107,9 @@ export function AdminDashboardCharts({
             {translate("dashboard.dateRange", "Date range")}
             <select name="period" defaultValue={selectedPeriod}>
               {periodOptions.map((option) => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+                <option key={option.value} value={option.value}>
+                  {translate(option.labelKey || "", option.fallbackLabel || option.value)}
+                </option>
               ))}
             </select>
           </label>
@@ -123,7 +127,7 @@ export function AdminDashboardCharts({
             <select name="status" defaultValue={selectedStatus}>
               <option value="">{translate("dashboard.allStatuses", "All statuses")}</option>
               {statusOptions.map((status) => (
-                <option key={status} value={status}>{status}</option>
+                <option key={status} value={status}>{translateStatus(status, translate)}</option>
               ))}
             </select>
           </label>
@@ -133,10 +137,10 @@ export function AdminDashboardCharts({
 
       <section className="kpi-grid" aria-label="Dashboard KPIs">
         {kpis.map((kpi) => (
-          <article key={kpi.label} className="kpi-card">
-            <span>{translate(kpi.labelKey || "", kpi.label)}</span>
+          <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="kpi-card">
+            <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
             <strong>{kpi.value}</strong>
-            <small>{kpi.trend}</small>
+            <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
           </article>
         ))}
       </section>
@@ -161,14 +165,14 @@ export function AdminDashboardCharts({
                 <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
                 <YAxis tickLine={false} axisLine={false} fontSize={12} domain={statusMode === "percentage" ? [0, 100] : undefined} tickFormatter={(value) => statusMode === "percentage" ? `${value}%` : value} />
                 <Tooltip content={<StatusTooltip mode={statusMode} />} />
-                <Legend />
+                <Legend formatter={(value) => translateStatus(value, translate)} />
                 {ORDER_STATUSES.map((status) => (
                   <Bar key={status} dataKey={status} stackId="orders" fill={STATUS_COLORS[status]} radius={status === "CANCELLED" ? [6, 6, 0, 0] : [0, 0, 0, 0]} />
                 ))}
               </BarChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyChart label="No status data for the selected filters." />
+            <EmptyChart label={translate("dashboard.noStatusDataForSelectedFilters", "No status data for the selected filters.")} />
           )}
         </div>
       </section>
@@ -202,7 +206,7 @@ export function AdminDashboardCharts({
               </LineChart>
             </ResponsiveContainer>
           ) : (
-            <EmptyChart label="No kitchen timeline data for the selected filters." />
+            <EmptyChart label={translate("dashboard.noKitchenTimelineDataForSelectedFilters", "No kitchen timeline data for the selected filters.")} />
           )}
         </div>
       </section>
@@ -242,7 +246,7 @@ export function AdminDashboardCharts({
                 <tr key={order.id}>
                   <td><a href={`/admin/orders/${order.id}`}>{order.orderNumber}</a></td>
                   <td>{order.kitchen}</td>
-                  <td><span className="status-pill" style={{ "--status-color": STATUS_COLORS[order.status] }}>{order.status}</span></td>
+                  <td><span className="status-pill" style={{ "--status-color": STATUS_COLORS[order.status] }}>{translateStatus(order.status, translate)}</span></td>
                   <td>{formatCurrency(order.totalPrice)}</td>
                   <td>{order.city || translate("orderDetailAdmin.notProvided", "Not provided")}</td>
                   <td>{order.createdAt}</td>
@@ -591,6 +595,7 @@ function ChartHeader({ eyebrow, title, detail, actions }) {
 }
 
 function StatusTooltip({ active, payload, label, mode }) {
+  const { translate } = useAdminI18n();
   if (!active || !payload?.length) return null;
 
   return (
@@ -598,7 +603,7 @@ function StatusTooltip({ active, payload, label, mode }) {
       <strong>{label}</strong>
       {payload.map((item) => (
         <span key={item.dataKey} style={{ color: item.color }}>
-          {item.dataKey}: {item.value}{mode === "percentage" ? "%" : ""}
+          {translateStatus(item.dataKey, translate)}: {item.value}{mode === "percentage" ? "%" : ""}
         </span>
       ))}
       <style jsx>{`
@@ -624,6 +629,7 @@ function StatusTooltip({ active, payload, label, mode }) {
 function PropertyOwnerStatsSection({ data }) {
   const { translate } = useAdminI18n();
   const activeOwners = data.filter((owner) => owner.contractCount || owner.orderCount);
+  const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
 
   return (
     <section className="chart-card">
@@ -639,7 +645,7 @@ function PropertyOwnerStatsSection({ data }) {
             <div className="owner-stat-header">
               <div>
                 <strong>{owner.name}</strong>
-                <span>{owner.kitchens || "No kitchen orders yet"}</span>
+                <span>{owner.kitchens || translate("dashboard.noKitchenOrdersYet", "No kitchen orders yet")}</span>
               </div>
               <b>{formatCurrency(owner.totalRevenue)}</b>
             </div>
@@ -657,26 +663,29 @@ function PropertyOwnerStatsSection({ data }) {
                 <strong>{owner.kitchenCount}</strong>
               </div>
               <div>
-                <span>Avg. order</span>
+                <span>{translate("dashboard.averageOrderShort", "Avg. order")}</span>
                 <strong>{formatCurrency(owner.averageOrderValue)}</strong>
               </div>
             </div>
             <div className="top-owner-item">
-              <span>Top item</span>
+              <span>{translate("dashboard.topItem", "Top item")}</span>
               {owner.topItem ? (
                 <strong>
                   {owner.topItem.name}
                   {owner.topItem.code ? ` (${owner.topItem.code})` : ""}
                   {" | "}
-                  {owner.topItem.quantity} item(s), {formatCurrency(owner.topItem.revenue)}
+                  {translateText("dashboard.itemCountAndRevenue", "{count} item(s), {revenue}", {
+                    count: String(owner.topItem.quantity),
+                    revenue: formatCurrency(owner.topItem.revenue),
+                  })}
                 </strong>
               ) : (
-                <strong>No ordered items yet</strong>
+                <strong>{translate("dashboard.noOrderedItemsYet", "No ordered items yet")}</strong>
               )}
             </div>
           </article>
         )) : (
-          <div className="empty-owner-stats">No owner contract or order data matches the current filters.</div>
+          <div className="empty-owner-stats">{translate("dashboard.noOwnerDataForSelectedFilters", "No owner contract or order data matches the current filters.")}</div>
         )}
       </div>
       <style jsx>{`
@@ -799,12 +808,13 @@ function PropertyOwnerStatsSection({ data }) {
 function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const { translate } = useAdminI18n();
   const [mode, setMode] = useState("quantity");
+  const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
   const config = mode === "quantity"
     ? {
         title: translate("dashboard.topItems", "Top items"),
         detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
         data: topItemsByQuantity,
-        formatter: (value) => `${value} item(s)`,
+        formatter: (value) => translateText("dashboard.itemCountValue", "{count} item(s)", { count: String(value) }),
       }
     : {
         title: translate("dashboard.topItems", "Top items"),
@@ -813,7 +823,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
         formatter: formatCurrency,
       };
 
-  const data = useMemo(() => config.data
+  const fullData = useMemo(() => config.data
     .map((item) => ({
       ...item,
       axisLabel: item.name || "",
@@ -823,6 +833,8 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       revenue: Number(item.revenue || 0),
     }))
     .sort((a, b) => b.chartValue - a.chartValue), [config.data, mode]);
+  const data = fullData.slice(0, MAX_TOP_ITEMS);
+  const hasMoreItems = fullData.length > MAX_TOP_ITEMS;
 
   const chartHeight = Math.max(280, data.length * 34 + 52);
   const maxChartValue = data.reduce((max, item) => Math.max(max, item.chartValue), 0);
@@ -835,7 +847,9 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       <ChartHeader
         eyebrow={translate("dashboard.topItems", "Top items")}
         title={config.title}
-        detail={config.detail}
+        detail={hasMoreItems
+          ? translateText("dashboard.topItemsShowingTopCount", "Showing the top {count} items by the selected metric.", { count: String(MAX_TOP_ITEMS) })
+          : config.detail}
         actions={(
           <div className="segmented-control" aria-label="Top items mode">
             <button className={mode === "quantity" ? "is-active" : ""} type="button" onClick={() => setMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
@@ -892,7 +906,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
             </BarChart>
             </ResponsiveContainer>
           </div>
-        ) : <EmptyChart label="No item data for the selected filters." />}
+        ) : <EmptyChart label={translate("dashboard.noItemDataForSelectedFilters", "No item data for the selected filters.")} />}
       </div>
       <style jsx>{`
         .chart-card {
@@ -970,17 +984,18 @@ function TopItemsAxisTick({ x, y, payload }) {
 }
 
 function TopItemsTooltip({ active, payload }) {
+  const { translate } = useAdminI18n();
   if (!active || !payload?.length) return null;
 
   const item = payload[0].payload;
   return (
     <div className="tooltip">
       <strong>{item.name}</strong>
-      <span>Category: {item.itemType || "Not captured"}</span>
-      <span>Code: {item.code || "Not captured"}</span>
-      <span>Article No: {item.articleNumber || "—"}</span>
-      <span>Quantity: {item.quantity}</span>
-      <span>Revenue: {formatCurrency(item.revenue)}</span>
+      <span>{translate("dashboard.categoryLabel", "Category")}: {item.itemType || translate("dashboard.notCaptured", "Not captured")}</span>
+      <span>{translate("dashboard.codeLabel", "Code")}: {item.code || translate("dashboard.notCaptured", "Not captured")}</span>
+      <span>{translate("kitchenDetailAdmin.articleNo", "Article no.")}: {item.articleNumber || "-"}</span>
+      <span>{translate("orderDetailAdmin.quantity", "Quantity")}: {item.quantity}</span>
+      <span>{translate("dashboard.revenueLabel", "Revenue")}: {formatCurrency(item.revenue)}</span>
       <style jsx>{`
         .tooltip {
           display: grid;
@@ -1018,7 +1033,7 @@ function DistributionSection({ itemTypeData, paymentData }) {
 
   const data = useMemo(() => config.data
     .map((entry) => ({
-      label: entry.label?.trim() || "Not captured",
+      label: entry.label?.trim() || translate("dashboard.notCaptured", "Not captured"),
       value: Number(entry.value || 0),
     }))
     .filter((entry) => entry.value > 0)
@@ -1059,7 +1074,7 @@ function DistributionSection({ itemTypeData, paymentData }) {
                 <Tooltip formatter={(value, name) => [value, name]} />
               </PieChart>
             </ResponsiveContainer>
-          ) : <EmptyChart label="No distribution data for the selected filters." />}
+          ) : <EmptyChart label={translate("dashboard.noDistributionDataForSelectedFilters", "No distribution data for the selected filters.")} />}
         </div>
         <div className="legend-list">
           {data.map((entry, index) => (
@@ -1186,7 +1201,7 @@ function GeographySection({ data }) {
             </BarChart>
           </ResponsiveContainer>
         ) : (
-          <EmptyChart label="No country order data for the selected filters." />
+          <EmptyChart label={translate("dashboard.noCountryOrderDataForSelectedFilters", "No country order data for the selected filters.")} />
         )}
       </div>
 
@@ -1229,18 +1244,19 @@ function CountryAxisTick({ x, y, payload }) {
 }
 
 function CountryTooltip({ active, payload }) {
+  const { translate } = useAdminI18n();
   if (!active || !payload?.length) return null;
 
   const row = payload[0].payload;
   return (
     <div className="tooltip">
       <strong>{row.label}</strong>
-      <span>City: {row.city}</span>
-      <span>Postal code: {row.postalCode || "Not captured"}</span>
-      <span>Country: {row.country}</span>
-      <span>Orders: {row.orders}</span>
-      <span>Revenue: {formatCurrency(row.revenue)}</span>
-      <span>Share: {Math.round(Number(row.orderShare || 0))}%</span>
+      <span>{translate("contractAddressFields.city", "City")}: {row.city}</span>
+      <span>{translate("contractAddressFields.postalCode", "Postal code")}: {row.postalCode || translate("dashboard.notCaptured", "Not captured")}</span>
+      <span>{translate("contractAddressFields.country", "Country")}: {row.country}</span>
+      <span>{translate("ordersAdmin.orders", "Orders")}: {row.orders}</span>
+      <span>{translate("dashboard.revenueLabel", "Revenue")}: {formatCurrency(row.revenue)}</span>
+      <span>{translate("dashboard.shareLabel", "Share")}: {Math.round(Number(row.orderShare || 0))}%</span>
       <style jsx>{`
         .tooltip {
           display: grid;
@@ -1280,6 +1296,28 @@ function EmptyChart({ label }) {
 function truncateLabel(value, maxLength = 24) {
   const label = String(value || "");
   return label.length > maxLength ? `${label.slice(0, maxLength - 3)}...` : label;
+}
+
+function interpolateText(template, values) {
+  let text = String(template || "");
+  if (!values) return text;
+
+  Object.entries(values).forEach(([key, value]) => {
+    text = text.replaceAll(`{${key}}`, String(value));
+  });
+
+  return text;
+}
+
+function translateStatus(status, translate) {
+  const keys = {
+    NEW: "dashboard.statusNew",
+    EMAILED: "dashboard.statusEmailed",
+    CONFIRMED: "dashboard.statusConfirmed",
+    CANCELLED: "dashboard.statusCancelled",
+  };
+
+  return translate(keys[status] || "", status);
 }
 
 function splitLocationLabel(value) {

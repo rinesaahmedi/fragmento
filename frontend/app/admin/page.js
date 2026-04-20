@@ -2,6 +2,7 @@ import { AdminShell } from "../../components/admin-shell";
 import { AdminDashboardCharts } from "../../components/admin-dashboard-charts";
 import { listKitchensForAdmin, listPropertyOwnersForAdmin } from "../../lib/catalog";
 import { requireAdminPage } from "../../lib/auth";
+import { getProviderCountryConfig } from "../../lib/address-verification";
 import { prisma } from "../../lib/prisma";
 import { Prisma } from "@prisma/client";
 
@@ -9,10 +10,10 @@ export const dynamic = "force-dynamic";
 
 const ORDER_STATUSES = ["NEW", "EMAILED", "CONFIRMED", "CANCELLED"];
 const PERIOD_OPTIONS = [
-  { value: "7d", label: "Last 7 days", days: 7 },
-  { value: "30d", label: "Last 30 days", days: 30 },
-  { value: "90d", label: "Last 90 days", days: 90 },
-  { value: "all", label: "All time", days: null },
+  { value: "7d", labelKey: "dashboard.last7Days", fallbackLabel: "Last 7 days", days: 7 },
+  { value: "30d", labelKey: "dashboard.last30Days", fallbackLabel: "Last 30 days", days: 30 },
+  { value: "90d", labelKey: "dashboard.last90Days", fallbackLabel: "Last 90 days", days: 90 },
+  { value: "all", labelKey: "dashboard.allTime", fallbackLabel: "All time", days: null },
 ];
 const ARTICLE_NUMBER_BY_CODE = {
   "WM-B-EWA34660W": "EWA34660W",
@@ -30,6 +31,117 @@ const ARTICLE_NUMBER_BY_CODE = {
   "SINK-C-BOTTON-45": "517467",
   "ACC-LIGHT-003": "KA220043_S3",
   "LIGHT-C-LED-001": "KA220043_S3",
+};
+const TOP_ITEM_GROUP_METADATA_BY_ARTICLE_NUMBER = {
+  EWA34660W: {
+    preferredCode: "WM-B-EWA34660W",
+    preferredName: "Washing Machine (600 x 600 x 878 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "A-EGSPV597210": {
+    preferredCode: "DISH-B-600-STD",
+    preferredName: "Dishwasher (600 x 600 x 878 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "OL-KGCN388140E": {
+    preferredCode: "REF-B-545-1800-700",
+    preferredName: "Refrigerator (545 x 1800 x 700 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  FH664621E: {
+    preferredCode: "HOOD-B-FH664621E",
+    preferredName: "FH664621E Extractor Hood",
+    preferredItemType: "COMPONENT",
+  },
+  ZB60SG: {
+    preferredCode: "ACC-CUTLERY-ZB60SG",
+    preferredName: "Besteckeinsatz ZB60SG",
+    preferredItemType: "ACCESSORY",
+  },
+  KA220043_S3: {
+    preferredCode: "LIGHT-B-LED-001",
+    preferredName: "LED Lighting Set",
+    preferredItemType: "COMPONENT",
+  },
+  "517467": {
+    preferredCode: "SINK-B-BOTTON-45",
+    preferredName: "Sink and Waste System",
+    preferredItemType: "COMPONENT",
+  },
+};
+const TOP_ITEM_GROUP_METADATA_BY_CODE = {
+  "OVEN-B-600-HOB": {
+    groupKey: "mapped:oven-600-hob",
+    preferredCode: "OVEN-B-600-HOB",
+    preferredName: "Built-in Oven and Hob (600 x 600 x 878 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "OVEN-C-600-HOB": {
+    groupKey: "mapped:oven-600-hob",
+    preferredCode: "OVEN-B-600-HOB",
+    preferredName: "Built-in Oven and Hob (600 x 600 x 878 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "SINKBASE-B-600": {
+    groupKey: "mapped:sinkbase-600",
+    preferredCode: "SINKBASE-B-600",
+    preferredName: "Sink Base Cabinet (600 x 600 x 878 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "SINKBASE-C-600": {
+    groupKey: "mapped:sinkbase-600",
+    preferredCode: "SINKBASE-B-600",
+    preferredName: "Sink Base Cabinet (600 x 600 x 878 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-B-L-600": {
+    groupKey: "mapped:cab-wall-left-600",
+    preferredCode: "CAB-WALL-B-L-600",
+    preferredName: "Wall Cabinet left (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-C-L-600": {
+    groupKey: "mapped:cab-wall-left-600",
+    preferredCode: "CAB-WALL-B-L-600",
+    preferredName: "Wall Cabinet left (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-B-ML-600": {
+    groupKey: "mapped:cab-wall-mid-left-600",
+    preferredCode: "CAB-WALL-B-ML-600",
+    preferredName: "Wall Cabinet mid-left (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-C-ML-600": {
+    groupKey: "mapped:cab-wall-mid-left-600",
+    preferredCode: "CAB-WALL-B-ML-600",
+    preferredName: "Wall Cabinet mid-left (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-B-MR-600": {
+    groupKey: "mapped:cab-wall-mid-right-600",
+    preferredCode: "CAB-WALL-B-MR-600",
+    preferredName: "Wall Cabinet mid-right (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-C-MR-600": {
+    groupKey: "mapped:cab-wall-mid-right-600",
+    preferredCode: "CAB-WALL-B-MR-600",
+    preferredName: "Wall Cabinet mid-right (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-B-R-600": {
+    groupKey: "mapped:cab-wall-right-600",
+    preferredCode: "CAB-WALL-B-R-600",
+    preferredName: "Wall Cabinet right (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
+  "CAB-WALL-C-R-600": {
+    groupKey: "mapped:cab-wall-right-600",
+    preferredCode: "CAB-WALL-B-R-600",
+    preferredName: "Wall Cabinet right (600 x 723 x 320 mm)",
+    preferredItemType: "COMPONENT",
+  },
 };
 
 function formatCurrency(value) {
@@ -79,12 +191,11 @@ function toDateKey(value) {
   return new Date(value).toISOString().slice(0, 10);
 }
 
-function getDateKeys(orders, startDate) {
-  if (!orders.length && !startDate) return [];
-
+function getDateKeys(startDate, earliestCreatedAt) {
+  if (!startDate && !earliestCreatedAt) return [];
   const end = new Date();
   end.setHours(0, 0, 0, 0);
-  const start = startDate ? new Date(startDate) : new Date(orders[orders.length - 1].createdAt);
+  const start = startDate ? new Date(startDate) : new Date(earliestCreatedAt);
   start.setHours(0, 0, 0, 0);
 
   const keys = [];
@@ -100,8 +211,62 @@ function getItemKey(item) {
   return [item.itemType, item.nameSnapshot].join("::");
 }
 
+function choosePreferredText(currentValue, nextValue) {
+  const current = String(currentValue || "").trim();
+  const next = String(nextValue || "").trim();
+  if (!current) return next || null;
+  if (!next) return current;
+  return current.localeCompare(next) <= 0 ? current : next;
+}
+
+function choosePreferredItemType(currentValue, nextValue, preferredValue = null) {
+  if (preferredValue) return preferredValue;
+
+  const priority = { COMPONENT: 3, ACCESSORY: 2, SERVICE: 1 };
+  const current = String(currentValue || "").trim();
+  const next = String(nextValue || "").trim();
+  if (!current) return next || null;
+  if (!next) return current;
+  return (priority[next] || 0) > (priority[current] || 0) ? next : current;
+}
+
+function getTopItemGrouping(row, articleNumber) {
+  const normalizedArticleNumber = String(articleNumber || "").trim();
+  const normalizedCode = String(row.code || "").trim();
+
+  if (normalizedArticleNumber) {
+    const metadata = TOP_ITEM_GROUP_METADATA_BY_ARTICLE_NUMBER[normalizedArticleNumber] || {};
+    return {
+      groupKey: `article:${normalizedArticleNumber}`,
+      preferredCode: metadata.preferredCode || normalizedCode || null,
+      preferredName: metadata.preferredName || null,
+      preferredItemType: metadata.preferredItemType || null,
+    };
+  }
+
+  const mapped = TOP_ITEM_GROUP_METADATA_BY_CODE[normalizedCode];
+  if (mapped) {
+    return mapped;
+  }
+
+  return {
+    groupKey: `code:${getItemKey(row)}`,
+    preferredCode: normalizedCode || null,
+    preferredName: null,
+    preferredItemType: null,
+  };
+}
+
+function normalizeCountryName(value) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "";
+  return getProviderCountryConfig(trimmed)?.providerName || trimmed;
+}
+
 function deriveCountry(order) {
-  if (typeof order.country === "string" && order.country.trim()) return order.country.trim();
+  if (typeof order.country === "string" && order.country.trim()) {
+    return normalizeCountryName(order.country);
+  }
 
   const city = String(order.city || "").trim().toLowerCase();
   const postalCode = String(order.postalCode || "").trim();
@@ -120,21 +285,173 @@ function deriveCountry(order) {
   return "Unknown";
 }
 
-async function loadDashboardOrders(where) {
+function buildOrderFilterConditions({ startDate, kitchenId, status }, alias = "o") {
+  const table = Prisma.raw(alias);
+  const filters = [];
+  if (startDate) filters.push(Prisma.sql`${table}."createdAt" >= ${startDate}`);
+  if (kitchenId) filters.push(Prisma.sql`${table}."kitchenId" = ${kitchenId}`);
+  if (status) filters.push(Prisma.sql`${table}."status" = ${status}`);
+  return filters;
+}
+
+function buildOrderWhereClause(filters, alias = "o") {
+  const conditions = buildOrderFilterConditions(filters, alias);
+  return conditions.length ? Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}` : Prisma.empty;
+}
+
+function buildOrderAndClause(filters, alias = "o") {
+  const conditions = buildOrderFilterConditions(filters, alias);
+  return conditions.length ? Prisma.sql`AND ${Prisma.join(conditions, " AND ")}` : Prisma.empty;
+}
+
+async function loadDashboardSummary(filters) {
+  const whereClause = buildOrderWhereClause(filters, "o");
+  const [row] = await prisma.$queryRaw`
+    SELECT
+      COUNT(*)::int AS "totalOrders",
+      COALESCE(SUM(o."totalPrice"), 0) AS "totalRevenue",
+      COUNT(*) FILTER (WHERE o."status" = 'EMAILED')::int AS "emailedOrders",
+      MIN(o."createdAt") AS "earliestCreatedAt"
+    FROM "Order" o
+    ${whereClause}
+  `;
+
+  return {
+    totalOrders: Number(row?.totalOrders || 0),
+    totalRevenue: Number(row?.totalRevenue || 0),
+    emailedOrders: Number(row?.emailedOrders || 0),
+    earliestCreatedAt: row?.earliestCreatedAt || null,
+  };
+}
+
+async function loadDailyStatusRows(filters) {
+  const whereClause = buildOrderWhereClause(filters, "o");
+  return prisma.$queryRaw`
+    SELECT
+      DATE_TRUNC('day', o."createdAt")::date AS "date",
+      o."status"::text AS "status",
+      COUNT(*)::int AS "count"
+    FROM "Order" o
+    ${whereClause}
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 2 ASC
+  `;
+}
+
+async function loadKitchenTimelineRows(filters) {
+  const whereClause = buildOrderWhereClause(filters, "o");
+  return prisma.$queryRaw`
+    SELECT
+      DATE_TRUNC('day', o."createdAt")::date AS "date",
+      k."name" AS "kitchen",
+      COUNT(*)::int AS "count"
+    FROM "Order" o
+    JOIN "Kitchen" k ON k."id" = o."kitchenId"
+    ${whereClause}
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 2 ASC
+  `;
+}
+
+async function loadPaymentRows(filters) {
+  const whereClause = buildOrderWhereClause(filters, "o");
+  return prisma.$queryRaw`
+    SELECT
+      COALESCE(NULLIF(BTRIM(o."paymentMethod"), ''), 'Not captured') AS "label",
+      COUNT(*)::int AS "value"
+    FROM "Order" o
+    ${whereClause}
+    GROUP BY 1
+    ORDER BY 2 DESC, 1 ASC
+  `;
+}
+
+async function loadGeographyRows(filters) {
+  const whereClause = buildOrderWhereClause(filters, "o");
+  return prisma.$queryRaw`
+    SELECT
+      COALESCE(NULLIF(BTRIM(o."country"), ''), '') AS "country",
+      COALESCE(NULLIF(BTRIM(o."city"), ''), 'Not captured') AS "city",
+      COALESCE(NULLIF(BTRIM(o."postalCode"), ''), '') AS "postalCode",
+      COUNT(*)::int AS "orders",
+      COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
+    FROM "Order" o
+    ${whereClause}
+    GROUP BY 1, 2, 3
+    ORDER BY 4 DESC, 2 ASC, 3 ASC
+  `;
+}
+
+async function loadGroupedItemRows(filters) {
+  const whereClause = buildOrderWhereClause(filters, "o");
+
+  try {
+    const hasArticleNumberColumn = await hasKitchenItemArticleNumberColumn();
+    if (hasArticleNumberColumn) {
+      return prisma.$queryRaw`
+        SELECT
+          oi."itemType"::text AS "itemType",
+          oi."code" AS "code",
+          oi."nameSnapshot" AS "nameSnapshot",
+          MAX(ki."name") FILTER (WHERE ki."name" IS NOT NULL) AS "canonicalName",
+          ki."articleNumber" AS "articleNumber",
+          SUM(oi."quantity")::int AS "quantity",
+          COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
+        FROM "OrderItem" oi
+        JOIN "Order" o ON o."id" = oi."orderId"
+        LEFT JOIN "KitchenItem" ki ON ki."id" = oi."kitchenItemId"
+        ${whereClause}
+        GROUP BY 1, 2, 3, 5
+        ORDER BY 6 DESC, 7 DESC, 3 ASC
+      `;
+    }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (!message.includes("articleNumber") && !message.includes("column")) {
+      throw error;
+    }
+  }
+
+  return prisma.$queryRaw`
+    SELECT
+      oi."itemType"::text AS "itemType",
+      oi."code" AS "code",
+      oi."nameSnapshot" AS "nameSnapshot",
+      NULL::text AS "canonicalName",
+      NULL::text AS "articleNumber",
+      SUM(oi."quantity")::int AS "quantity",
+      COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
+    FROM "OrderItem" oi
+    JOIN "Order" o ON o."id" = oi."orderId"
+    ${whereClause}
+    GROUP BY 1, 2, 3, 4, 5
+    ORDER BY 6 DESC, 7 DESC, 3 ASC
+  `;
+}
+
+async function loadRecentOrders(where) {
   return prisma.order.findMany({
     where,
-    include: { kitchen: true, items: true },
     orderBy: { createdAt: "desc" },
+    take: 5,
+    select: {
+      id: true,
+      orderNumber: true,
+      status: true,
+      totalPrice: true,
+      city: true,
+      createdAt: true,
+      kitchen: {
+        select: {
+          name: true,
+        },
+      },
+    },
   });
 }
 
 function buildOwnerStatsOrderFilter({ startDate, kitchenId, status }) {
-  const filters = [];
-  if (startDate) filters.push(Prisma.sql`o."createdAt" >= ${startDate}`);
-  if (kitchenId) filters.push(Prisma.sql`o."kitchenId" = ${kitchenId}`);
-  if (status) filters.push(Prisma.sql`o."status" = ${status}`);
-
-  return filters.length ? Prisma.sql`AND ${Prisma.join(filters, " AND ")}` : Prisma.empty;
+  return buildOrderAndClause({ startDate, kitchenId, status }, "o");
 }
 
 async function loadPropertyOwnerStats({ startDate, kitchenId, status }) {
@@ -225,40 +542,6 @@ async function hasKitchenItemArticleNumberColumn() {
   return rows.length > 0;
 }
 
-async function loadArticleNumbersByKitchenItemId(orders) {
-  const kitchenItemIds = [
-    ...new Set(
-      orders.flatMap((order) =>
-        (order.items || [])
-          .map((item) => item.kitchenItemId)
-          .filter(Boolean),
-      ),
-    ),
-  ];
-
-  if (!kitchenItemIds.length) return new Map();
-
-  try {
-    const hasColumn = await hasKitchenItemArticleNumberColumn();
-    if (!hasColumn) return new Map();
-
-    const rows = await prisma.$queryRaw`
-      SELECT "id", "articleNumber"
-      FROM "KitchenItem"
-      WHERE "id" IN (${Prisma.join(kitchenItemIds)})
-        AND "articleNumber" IS NOT NULL
-    `;
-
-    return new Map(rows.map((row) => [row.id, row.articleNumber]));
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "";
-    if (message.includes("articleNumber") || message.includes("column")) {
-      return new Map();
-    }
-    throw error;
-  }
-}
-
 export default async function AdminDashboardPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const params = await searchParams;
@@ -273,26 +556,26 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   if (kitchenId) where.kitchenId = kitchenId;
   if (validStatus) where.status = validStatus;
 
-  const [kitchens, orders, propertyOwners, propertyOwnerStats] = await Promise.all([
+  const dashboardFilters = { startDate, kitchenId, status: validStatus };
+  const [kitchens, propertyOwners, propertyOwnerStats, summary, dailyStatusRows, kitchenTimelineRows, paymentRows, geographyRows, groupedItemRows, recentOrderRows] = await Promise.all([
     listKitchensForAdmin(),
-    loadDashboardOrders(where),
     listPropertyOwnersForAdmin(),
     loadPropertyOwnerStats({ startDate, kitchenId, status: validStatus }),
+    loadDashboardSummary(dashboardFilters),
+    loadDailyStatusRows(dashboardFilters),
+    loadKitchenTimelineRows(dashboardFilters),
+    loadPaymentRows(dashboardFilters),
+    loadGeographyRows(dashboardFilters),
+    loadGroupedItemRows(dashboardFilters),
+    loadRecentOrders(where),
   ]);
-  const articleNumbersByKitchenItemId = await loadArticleNumbersByKitchenItemId(orders);
-
-  const totalOrders = orders.length;
-  const totalRevenue = orders.reduce((sum, order) => sum + Number(order.totalPrice || 0), 0);
+  const totalOrders = summary.totalOrders;
+  const totalRevenue = summary.totalRevenue;
   const averageOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
-  const emailedOrders = orders.filter((order) => order.status === "EMAILED").length;
+  const emailedOrders = summary.emailedOrders;
   const conversionRate = totalOrders ? (emailedOrders / totalOrders) * 100 : 0;
 
-  const statusCounts = ORDER_STATUSES.reduce((acc, orderStatus) => ({ ...acc, [orderStatus]: 0 }), {});
-  const itemStats = new Map();
-  const typeSplit = new Map();
-  const paymentStats = new Map();
-  const geographyStats = new Map();
-  const dateKeys = getDateKeys(orders, startDate);
+  const dateKeys = getDateKeys(startDate, summary.earliestCreatedAt);
   const dailyStatusByDate = new Map(
     dateKeys.map((date) => [
       date,
@@ -320,10 +603,8 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     ]),
   );
 
-  for (const order of orders) {
-    const dateKey = toDateKey(order.createdAt);
-    statusCounts[order.status] = (statusCounts[order.status] || 0) + 1;
-
+  for (const row of dailyStatusRows) {
+    const dateKey = toDateKey(row.date);
     if (!dailyStatusByDate.has(dateKey)) {
       dailyStatusByDate.set(dateKey, {
         date: dateKey,
@@ -334,8 +615,11 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         CANCELLED: 0,
       });
     }
-    dailyStatusByDate.get(dateKey)[order.status] += 1;
+    dailyStatusByDate.get(dateKey)[row.status] = Number(row.count || 0);
+  }
 
+  for (const row of kitchenTimelineRows) {
+    const dateKey = toDateKey(row.date);
     if (!timelineByDate.has(dateKey)) {
       timelineByDate.set(dateKey, kitchens.reduce(
         (row, kitchen) => {
@@ -345,14 +629,47 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         { date: dateKey, label: formatDateLabel(dateKey) },
       ));
     }
-    timelineByDate.get(dateKey)[order.kitchen.name] = (timelineByDate.get(dateKey)[order.kitchen.name] || 0) + 1;
+    timelineByDate.get(dateKey)[row.kitchen] = Number(row.count || 0);
+  }
 
-    const paymentLabel = order.paymentMethod?.trim() || "Not captured";
-    paymentStats.set(paymentLabel, (paymentStats.get(paymentLabel) || 0) + 1);
+  const itemStats = new Map();
+  const typeSplit = new Map();
+  for (const row of groupedItemRows) {
+    const quantity = Number(row.quantity || 0);
+    const revenue = Number(row.revenue || 0);
+    const code = String(row.code || "").trim();
+    const canonicalName = String(row.canonicalName || "").trim() || null;
+    const fallbackName = String(row.nameSnapshot || "").trim() || "";
+    const canonicalArticleNumber = String(row.articleNumber || "").trim() || ARTICLE_NUMBER_BY_CODE[code] || null;
+    const grouping = getTopItemGrouping({ code, itemType: row.itemType, nameSnapshot: row.nameSnapshot }, canonicalArticleNumber);
+    const existingItem = itemStats.get(grouping.groupKey) || {
+      itemType: grouping.preferredItemType || row.itemType,
+      code: grouping.preferredCode || code,
+      canonicalName: null,
+      fallbackName,
+      canonicalArticleNumber: null,
+      quantity: 0,
+      revenue: 0,
+    };
+    existingItem.itemType = choosePreferredItemType(existingItem.itemType, row.itemType, grouping.preferredItemType);
+    existingItem.code = grouping.preferredCode || choosePreferredText(existingItem.code, code);
+    existingItem.canonicalName = grouping.preferredName || choosePreferredText(existingItem.canonicalName, canonicalName);
+    existingItem.fallbackName = choosePreferredText(existingItem.fallbackName, fallbackName);
+    existingItem.canonicalArticleNumber = choosePreferredText(existingItem.canonicalArticleNumber, canonicalArticleNumber);
+    existingItem.quantity += quantity;
+    existingItem.revenue += revenue;
+    itemStats.set(grouping.groupKey, existingItem);
 
-    const country = deriveCountry(order);
-    const city = String(order.city || "").trim() || "Not captured";
-    const postalCode = String(order.postalCode || "").trim();
+    const existingType = typeSplit.get(row.itemType) || { label: row.itemType, value: 0 };
+    existingType.value += quantity;
+    typeSplit.set(row.itemType, existingType);
+  }
+
+  const geographyStats = new Map();
+  for (const row of geographyRows) {
+    const country = deriveCountry(row);
+    const city = String(row.city || "").trim() || "Not captured";
+    const postalCode = String(row.postalCode || "").trim();
     const locationLabel = [city, postalCode].filter(Boolean).join(" ");
     const geographyKey = `${country}::${city.toLowerCase()}::${postalCode.toLowerCase()}`;
     const existingLocation = geographyStats.get(geographyKey) || {
@@ -363,47 +680,23 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       orders: 0,
       revenue: 0,
     };
-    existingLocation.orders += 1;
-    existingLocation.revenue += Number(order.totalPrice || 0);
+    existingLocation.orders += Number(row.orders || 0);
+    existingLocation.revenue += Number(row.revenue || 0);
     geographyStats.set(geographyKey, existingLocation);
-
-    for (const item of order.items) {
-      const quantity = Number(item.quantity || 0);
-      const revenue = Number(item.priceSnapshot || 0) * quantity;
-      const itemKey = getItemKey(item);
-      const articleNumber =
-        item.kitchenItem?.articleNumber ||
-        articleNumbersByKitchenItemId.get(item.kitchenItemId) ||
-        ARTICLE_NUMBER_BY_CODE[String(item.code || "").trim()] ||
-        null;
-      const existingItem = itemStats.get(itemKey) || {
-        itemType: item.itemType,
-        code: item.code,
-        articleNumber,
-        name: item.nameSnapshot,
-        quantity: 0,
-        revenue: 0,
-      };
-      if (!existingItem.articleNumber && articleNumber) {
-        existingItem.articleNumber = articleNumber;
-      }
-      existingItem.quantity += quantity;
-      existingItem.revenue += revenue;
-      itemStats.set(itemKey, existingItem);
-
-      const existingType = typeSplit.get(item.itemType) || { label: item.itemType, value: 0 };
-      existingType.value += quantity;
-      typeSplit.set(item.itemType, existingType);
-    }
   }
 
   const dailyStatusData = Array.from(dailyStatusByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const kitchenTimelineData = Array.from(timelineByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
-  const topItemsByQuantity = Array.from(itemStats.values()).sort((a, b) => b.quantity - a.quantity);
-  const topItemsByRevenue = Array.from(itemStats.values()).sort((a, b) => b.revenue - a.revenue);
+  const resolvedItemStats = Array.from(itemStats.values()).map((item) => ({
+    ...item,
+    name: item.canonicalName || item.fallbackName || item.code || "",
+    articleNumber: item.canonicalArticleNumber || null,
+  }));
+  const topItemsByQuantity = resolvedItemStats.slice().sort((a, b) => b.quantity - a.quantity);
+  const topItemsByRevenue = resolvedItemStats.slice().sort((a, b) => b.revenue - a.revenue);
   const itemTypeData = Array.from(typeSplit.values()).sort((a, b) => b.value - a.value);
-  const paymentData = Array.from(paymentStats.entries())
-    .map(([label, value]) => ({ label, value }))
+  const paymentData = paymentRows
+    .map((row) => ({ label: row.label, value: Number(row.value || 0) }))
     .sort((a, b) => b.value - a.value);
   const geographyData = Array.from(geographyStats.values())
     .map((row) => ({
@@ -411,7 +704,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       orderShare: totalOrders ? (row.orders / totalOrders) * 100 : 0,
     }))
     .sort((a, b) => b.orders - a.orders);
-  const recentOrders = orders.slice(0, 5).map((order) => ({
+  const recentOrders = recentOrderRows.map((order) => ({
     id: order.id,
     orderNumber: order.orderNumber,
     kitchen: order.kitchen.name,
@@ -423,28 +716,33 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
 
   const kpis = [
     {
-      label: "Total Orders",
       labelKey: "dashboard.totalOrders",
+      fallbackLabel: "Total orders",
       value: String(totalOrders),
-      trend: `${period.label} by creation date`,
+      trendKey: "dashboard.createdInSelectedPeriod",
+      trendFallback: "Created in the selected period",
     },
     {
-      label: "Total Revenue",
       labelKey: "dashboard.totalRevenue",
+      fallbackLabel: "Total revenue",
       value: formatCurrency(totalRevenue),
-      trend: "Gross order value",
+      trendKey: "dashboard.grossOrderValue",
+      trendFallback: "Gross order value",
     },
     {
-      label: "Average Order Value",
       labelKey: "dashboard.averageOrderValue",
+      fallbackLabel: "Average order value",
       value: formatCurrency(averageOrderValue),
-      trend: "Revenue per order",
+      trendKey: "dashboard.revenuePerOrder",
+      trendFallback: "Revenue per order",
     },
     {
-      label: "Conversion Rate",
-      labelKey: "dashboard.conversionRate",
+      labelKey: "dashboard.emailDispatchRate",
+      fallbackLabel: "Email dispatch rate",
       value: formatPercent(conversionRate),
-      trend: `${emailedOrders} emailed / ${totalOrders} total`,
+      trendKey: "dashboard.emailedOrdersOutOfTotal",
+      trendFallback: "{emailed} emailed / {total} total",
+      trendValues: { emailed: String(emailedOrders), total: String(totalOrders) },
     },
   ];
 
@@ -452,7 +750,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     <AdminShell adminEmail={admin.email}>
       <AdminDashboardCharts
         kpis={kpis}
-        periodOptions={PERIOD_OPTIONS.map(({ value, label }) => ({ value, label }))}
+        periodOptions={PERIOD_OPTIONS.map(({ value, labelKey, fallbackLabel }) => ({ value, labelKey, fallbackLabel }))}
         selectedPeriod={period.value}
         kitchens={kitchens.map((kitchen) => ({ id: kitchen.id, name: kitchen.name }))}
         selectedKitchenId={kitchenId}
