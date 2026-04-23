@@ -13,6 +13,8 @@ const LANGUAGE_OPTIONS = [
   { code: "ru", label: "Russian", flagSrc: "https://flagcdn.com/w40/ru.png" },
 ];
 
+const AVATAR_CDN_BASE = "https://cdn.jsdelivr.net/gh/rinesaahmedi/fragmento@main/AVATAR";
+
 const SCREEN_TEXT = {
   de: {
     languageTitle: "Waehle deine Sprache",
@@ -206,12 +208,12 @@ const INSTRUCTION_TEXTS = {
 };
 
 const AVATAR_SOURCES = {
-  de: "/AVATAR/de-avatar.mp4",
-  en: "/AVATAR/en-avatar.mp4",
-  tr: "/AVATAR/tr-avatar.mp4",
-  es: "/AVATAR/es-avatar.mp4",
-  fr: "/AVATAR/fr-avatar.mp4",
-  ru: "/AVATAR/ru-avatar.mp4",
+  de: `${AVATAR_CDN_BASE}/de-avatar.mp4`,
+  en: `${AVATAR_CDN_BASE}/en-avatar.mp4`,
+  tr: `${AVATAR_CDN_BASE}/tr-avatar.mp4`,
+  es: `${AVATAR_CDN_BASE}/es-avatar.mp4`,
+  fr: `${AVATAR_CDN_BASE}/fr-avatar.mp4`,
+  ru: `${AVATAR_CDN_BASE}/ru-avatar.mp4`,
 };
 
 function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, disabled = false }) {

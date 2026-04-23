@@ -2,6 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+const AVATAR_CDN_BASE = "https://cdn.jsdelivr.net/gh/rinesaahmedi/fragmento@main/AVATAR";
+
 function loadExternalScript(src) {
   return new Promise((resolve, reject) => {
     const existing = document.querySelector(`script[data-legacy-src="${src}"]`);
@@ -515,12 +517,12 @@ function installLegacyOverlayFallback() {
 
   const openAvatarOverlay = () => {
     const avatarSources = {
-      en: "/AVATAR/en-avatar.mp4",
-      tr: "/AVATAR/tr-avatar.mp4",
-      de: "/AVATAR/de-avatar.mp4",
-      es: "/AVATAR/es-avatar.mp4",
-      ru: "/AVATAR/ru-avatar.mp4",
-      fr: "/AVATAR/fr-avatar.mp4",
+      en: `${AVATAR_CDN_BASE}/en-avatar.mp4`,
+      tr: `${AVATAR_CDN_BASE}/tr-avatar.mp4`,
+      de: `${AVATAR_CDN_BASE}/de-avatar.mp4`,
+      es: `${AVATAR_CDN_BASE}/es-avatar.mp4`,
+      ru: `${AVATAR_CDN_BASE}/ru-avatar.mp4`,
+      fr: `${AVATAR_CDN_BASE}/fr-avatar.mp4`,
     };
     lastInstructionScreen = "avatar";
     hideAll();
