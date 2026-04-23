@@ -22,9 +22,12 @@ export async function POST(request, { params }) {
     const formData = await request.formData();
     const intent = String(formData.get("_intent") || "status");
     const status = String(formData.get("status") || "");
+    const emailSubject = String(formData.get("emailSubject") || "");
+    const emailBody = String(formData.get("emailBody") || "");
+    const emailOverrides = { subject: emailSubject, bodyText: emailBody };
 
     if (intent === "resend-email") {
-      await resendOrderEmail(id);
+      await resendOrderEmail(id, emailOverrides);
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent.");
     }
 
@@ -34,7 +37,7 @@ export async function POST(request, { params }) {
     }
 
     if (intent === "confirm") {
-      await confirmOrder(id);
+      await confirmOrder(id, emailOverrides);
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent and order confirmed.");
     }
 
@@ -50,7 +53,7 @@ export async function POST(request, { params }) {
     }
 
     if (status === "CONFIRMED") {
-      await confirmOrder(id);
+      await confirmOrder(id, emailOverrides);
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent and order confirmed.");
     }
 

@@ -413,7 +413,73 @@ export function buildOrderSummaryHtml(order) {
   `;
 }
 
-export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename }) {
+export async function buildOrderConfirmationEmailStaticHtml(order) {
+  const productInfo = await loadProductInfoAttachments(order);
+  const productInfoHtml = productInfo.labels.length
+    ? `<p>Produktinformationen im Anhang: ${productInfo.labels.join(", ")}.</p>`
+    : "";
+
+  return {
+    html: `
+      ${buildOrderSummaryHtml(order)}
+      ${productInfoHtml}
+    `,
+    attachmentLabels: productInfo.labels,
+  };
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function formatEmailBodyTextAsHtml(bodyText) {
+  return String(bodyText || "")
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph) => `<p>${escapeHtml(paragraph).replaceAll("\n", "<br />")}</p>`)
+    .join("");
+}
+
+export function buildOrderConfirmationEmailDraft(order) {
+  return {
+    subject: `Bestellbestaetigung #${order.orderNumber}`,
+    bodyText: [
+      `Hallo ${order.customer.firstName} ${order.customer.lastName},`,
+      "",
+      "deine Bestellung wurde bestaetigt.",
+      "",
+      `Bestellte Kueche: ${order.kitchen.name}.`,
+      "",
+      "Dein Fragmento-Team",
+    ].join("\n"),
+  };
+}
+
+export async function buildOrderConfirmationEmailPreview(order, overrides = {}) {
+  const draft = buildOrderConfirmationEmailDraft(order);
+  const subject = String(overrides.subject || draft.subject).trim() || draft.subject;
+  const bodyText = String(overrides.bodyText || draft.bodyText);
+  const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
+
+  return {
+    to: order.customer.email,
+    subject,
+    bodyText,
+    html: `
+      ${formatEmailBodyTextAsHtml(bodyText)}
+      ${staticHtml.html}
+    `,
+    attachmentLabels: staticHtml.attachmentLabels,
+  };
+}
+
+export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText }) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: Number.parseInt(process.env.SMTP_PORT || "0", 10),
@@ -464,22 +530,15 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   const logoHtml = logoBuffer
     ? '<div style="margin-bottom:16px"><img src="cid:logo@fragmento" alt="Fragmento" style="height:70px;object-fit:contain" /></div>'
     : "";
-  const productInfoHtml = productInfo.labels.length
-    ? `<p>Produktinformationen im Anhang: ${productInfo.labels.join(", ")}.</p>`
-    : "";
+  const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText });
 
   await transporter.sendMail({
     from: `"Fragmento" <${process.env.SMTP_FROM}>`,
     to: order.customer.email,
-    subject: `Bestellbestaetigung #${order.orderNumber}`,
+    subject: emailPreview.subject,
     html: `
       ${logoHtml}
-      <p>Hallo ${order.customer.firstName} ${order.customer.lastName},</p>
-      <p>deine Bestellung wurde bestaetigt.</p>
-      <p>Bestellte Kueche: <strong>${order.kitchen.name}</strong>.</p>
-      ${buildOrderSummaryHtml(order)}
-      ${productInfoHtml}
-      <p>Dein Fragmento-Team</p>
+      ${emailPreview.html}
     `,
     attachments,
   });

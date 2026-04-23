@@ -20,9 +20,12 @@ import {
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminText } from "../../../../components/admin-i18n";
 import { OrderActionButton, OrderActionFeedback } from "../../../../components/admin-order-action-buttons";
+import { OrderEmailReviewModal } from "../../../../components/order-email-review-modal";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getOrderById } from "../../../../lib/catalog";
+import { buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
+import { buildOrderForNotifications } from "../../../../lib/orders";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +83,9 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
   const canConfirm = order.status === OrderStatus.NEW;
   const canResendEmail = order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.EMAILED;
   const canCancel = order.status !== OrderStatus.CANCELLED;
+  const notificationOrder = buildOrderForNotifications(order);
+  const emailDraft = buildOrderConfirmationEmailDraft(notificationOrder);
+  const emailStatic = await buildOrderConfirmationEmailStaticHtml(notificationOrder);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -113,26 +119,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
               </div>
             </div>
             <div style={actionButtonsStyle}>
-              {canConfirm ? (
-                <OrderActionButton
-                  intent="confirm"
-                  style={primaryButtonStyle}
-                  pendingKey="orderDetailAdmin.confirmingAndSendingEmail"
-                  pendingFallback="Confirming and sending email..."
-                >
-                  <AdminText i18nKey="orderDetailAdmin.confirmAndSendEmail" fallback="Confirm and send email" />
-                </OrderActionButton>
-              ) : null}
-              {canResendEmail ? (
-                <OrderActionButton
-                  intent="resend-email"
-                  style={primaryButtonStyle}
-                  pendingKey="orderDetailAdmin.resendingEmail"
-                  pendingFallback="Resending email..."
-                >
-                  <AdminText i18nKey="orderDetailAdmin.resendEmail" fallback="Resend email" />
-                </OrderActionButton>
-              ) : null}
+              <OrderEmailReviewModal
+                to={order.email}
+                defaultSubject={emailDraft.subject}
+                defaultBody={emailDraft.bodyText}
+                staticHtml={emailStatic.html}
+                canConfirm={canConfirm}
+                canResendEmail={canResendEmail}
+              />
               {canCancel ? (
                 <OrderActionButton intent="cancel" style={dangerButtonStyle}>
                   <AdminText i18nKey="orderDetailAdmin.markCancelled" fallback="Mark cancelled" />

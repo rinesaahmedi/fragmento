@@ -86,7 +86,7 @@ function mapCatalogItem(catalogItems, submittedItem, itemType) {
   );
 }
 
-function buildOrderForNotifications(orderRecord) {
+export function buildOrderForNotifications(orderRecord) {
   const toNotificationItem = (item) => ({
     code: item.code,
     name: item.nameSnapshot,
@@ -127,6 +127,16 @@ function buildOrderForNotifications(orderRecord) {
     services: orderRecord.items
       .filter((item) => item.itemType === ItemType.SERVICE)
       .map(toNotificationItem),
+  };
+}
+
+function readEmailOverrides(input = {}) {
+  const subject = input?.subject ? String(input.subject).trim() : "";
+  const bodyText = input?.bodyText ? String(input.bodyText) : "";
+
+  return {
+    subject,
+    bodyText,
   };
 }
 
@@ -421,11 +431,12 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   };
 }
 
-export async function resendOrderEmail(orderId) {
+export async function resendOrderEmail(orderId, emailOverrides = {}) {
   const orderRecord = await getOrderRecordForOperations(orderId);
   const order = buildOrderForNotifications(orderRecord);
+  const { subject, bodyText } = readEmailOverrides(emailOverrides);
 
-  await sendOrderConfirmationEmail({ order });
+  await sendOrderConfirmationEmail({ order, subject, bodyText });
 
   return order;
 }
@@ -451,7 +462,7 @@ export async function deleteOrder(orderId) {
   });
 }
 
-export async function confirmOrder(orderId) {
+export async function confirmOrder(orderId, emailOverrides = {}) {
   const orderRecord = await getOrderRecordForOperations(orderId);
   if (orderRecord.status === OrderStatus.CONFIRMED) {
     return buildOrderForNotifications(orderRecord);
@@ -461,7 +472,8 @@ export async function confirmOrder(orderId) {
   }
 
   const order = buildOrderForNotifications(orderRecord);
-  await sendOrderConfirmationEmail({ order });
+  const { subject, bodyText } = readEmailOverrides(emailOverrides);
+  await sendOrderConfirmationEmail({ order, subject, bodyText });
 
   await prisma.order.update({
     where: { id: orderId },
