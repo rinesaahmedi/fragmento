@@ -1,6 +1,5 @@
 [build]
-base = "frontend"
-command = "npm run build"
+command = "npm --prefix frontend run build"
 
 [build.environment]
 NODE_VERSION = "20"
