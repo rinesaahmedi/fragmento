@@ -105,9 +105,16 @@ export function validatePropertyOwnerInput(formData) {
 }
 
 export function redirectWithFlash(request, pathname, type, message) {
-  const url = new URL(pathname, request.url);
-  url.searchParams.set(type, message);
-  return Response.redirect(url, 303);
+  const [basePath, existingQuery = ""] = String(pathname || "/").split("?");
+  const searchParams = new URLSearchParams(existingQuery);
+  searchParams.set(type, message);
+  const location = `${basePath || "/"}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+  return new Response(null, {
+    status: 303,
+    headers: {
+      Location: location,
+    },
+  });
 }
 
 export function getFormMessage(searchParams, key) {

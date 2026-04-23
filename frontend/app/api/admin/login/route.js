@@ -1,4 +1,3 @@
-import { NextResponse } from "next/server";
 import { redirectWithFlash } from "../../../../lib/admin-forms";
 import { createAdminSession, verifyPassword } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
@@ -28,7 +27,12 @@ export async function POST(request) {
     }
 
     await createAdminSession(admin.id);
-    return NextResponse.redirect(new URL("/admin", request.url), 303);
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: "/admin",
+      },
+    });
   } catch (error) {
     if (error?.status === 429) {
       return redirectWithFlash(request, "/admin/login", "error", error.message);
