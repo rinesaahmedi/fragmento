@@ -55,7 +55,7 @@ function formatOrdinal(value) {
 
 function ownerSummary(owner) {
   if (!owner) return "No owner selected";
-  const name = [owner.firstName, owner.lastName].filter(Boolean).join(" ");
+  const name = owner.name || "";
   const contact = [owner.email, owner.phone].filter(Boolean).join(" | ");
   return contact ? `${name} | ${contact}` : name;
 }
@@ -192,6 +192,10 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.propertyOwner" fallback="Property owner" /></span>
                   <span>{ownerSummary(order.kitchenContract?.owner)}</span>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}><AdminText i18nKey="contractsAdmin.propertyObject" fallback="Property object" /></span>
+                  <span>{order.kitchenContract?.propertyObject?.name || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</span>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.payment" fallback="Payment" /></span>

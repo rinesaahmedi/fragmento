@@ -1,19 +1,7 @@
 import { NextResponse } from "next/server";
 import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput } from "../../../../../lib/admin-forms";
-import { isAddressVerificationRecordValid } from "../../../../../lib/address-verification-server";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
-
-function parseAddressVerificationRecord(formData) {
-  const rawValue = String(formData.get("addressVerification") || "").trim();
-  if (!rawValue) return null;
-
-  try {
-    return JSON.parse(rawValue);
-  } catch {
-    return null;
-  }
-}
 
 function getReturnPath(formData, fallback) {
   const rawPath = String(formData.get("returnTo") || "").trim();
@@ -34,29 +22,48 @@ export async function GET(_request, { params }) {
 
   const [ownerRow] = await prisma.$queryRaw`
     SELECT
-      kc."ownerId",
-      po."id",
-      po."firstName",
-      po."lastName",
-      po."email",
-      po."phone",
-      po."notes",
-      po."createdAt",
-      po."updatedAt"
+      kc."propertyObjectId",
+      pobj."id" AS "propertyObjectRecordId",
+      pobj."name" AS "propertyObjectName",
+      pobj."country",
+      pobj."city",
+      pobj."postalCode",
+      pobj."address1",
+      pobj."address2",
+      hc."id" AS "housingCompanyRecordId",
+      hc."name" AS "housingCompanyName",
+      hc."email",
+      hc."phone",
+      hc."notes",
+      hc."createdAt",
+      hc."updatedAt"
     FROM "KitchenContract" kc
-    LEFT JOIN "PropertyOwner" po ON po."id" = kc."ownerId"
+    LEFT JOIN "PropertyObject" pobj ON pobj."id" = kc."propertyObjectId"
+    LEFT JOIN "HousingCompany" hc ON hc."id" = pobj."housingCompanyId"
     WHERE kc."id" = ${id}
     LIMIT 1
   `;
 
   return NextResponse.json({
     ...contract,
-    ownerId: ownerRow?.ownerId || null,
-    owner: ownerRow?.id
+    propertyObjectId: ownerRow?.propertyObjectId || null,
+    propertyObject: ownerRow?.propertyObjectRecordId
       ? {
-          id: ownerRow.id,
-          firstName: ownerRow.firstName,
-          lastName: ownerRow.lastName,
+          id: ownerRow.propertyObjectRecordId,
+          name: ownerRow.propertyObjectName,
+          country: ownerRow.country,
+          city: ownerRow.city,
+          postalCode: ownerRow.postalCode,
+          address1: ownerRow.address1,
+          address2: ownerRow.address2,
+        }
+      : null,
+    housingCompanyId: ownerRow?.housingCompanyRecordId || null,
+    ownerId: ownerRow?.housingCompanyRecordId || null,
+    owner: ownerRow?.housingCompanyRecordId
+      ? {
+          id: ownerRow.housingCompanyRecordId,
+          name: ownerRow.housingCompanyName,
           email: ownerRow.email,
           phone: ownerRow.phone,
           notes: ownerRow.notes,
@@ -89,30 +96,28 @@ export async function POST(request, { params }) {
 
     if (intent === "update") {
       const data = validateKitchenContractInput(formData);
-      const addressVerification = parseAddressVerificationRecord(formData);
-      if (!isAddressVerificationRecordValid(addressVerification, data)) {
-        throw new Error("Verify the contract address before updating the contract.");
+      const [propertyObject] = await prisma.$queryRaw`
+        SELECT "id"
+        FROM "PropertyObject"
+        WHERE "id" = ${data.propertyObjectId}
+          AND "housingCompanyId" = ${data.housingCompanyId}
+        LIMIT 1
+      `;
+      if (!propertyObject) {
+        throw new Error("Select a valid property object for the housing company.");
       }
+
       await prisma.kitchenContract.update({
         where: { id },
         data: {
           contractNumber: data.contractNumber,
-          country: data.country,
-          city: data.city,
-          postalCode: data.postalCode,
-          address1: data.address1,
-          address2: data.address2,
+          propertyObjectId: data.propertyObjectId,
           building: data.building,
           floor: data.floor,
           unitNumber: data.unitNumber,
           notes: data.notes,
         },
       });
-      await prisma.$executeRaw`
-        UPDATE "KitchenContract"
-        SET "ownerId" = ${data.ownerId}
-        WHERE "id" = ${id}
-      `;
 
       return redirectWithFlash(request, returnPath, "success", "Contract number updated.");
     }

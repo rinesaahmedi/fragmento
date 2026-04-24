@@ -173,8 +173,9 @@ function pickKitchenItems(kitchen) {
 }
 
 async function ensureOwners(targetCount) {
-  const existing = await prisma.propertyOwner.findMany({
+  const existing = await prisma.housingCompany.findMany({
     where: { notes: { contains: DEMO_BATCH_TAG } },
+    include: { propertyObjects: true },
     orderBy: { createdAt: "asc" },
   });
 
@@ -182,14 +183,25 @@ async function ensureOwners(targetCount) {
   for (let index = existing.length; index < targetCount; index += 1) {
     const firstName = OWNER_FIRST_NAMES[index % OWNER_FIRST_NAMES.length];
     const lastName = OWNER_LAST_NAMES[index % OWNER_LAST_NAMES.length];
-    const owner = await prisma.propertyOwner.create({
+    const location = LOCATIONS[index % LOCATIONS.length];
+    const owner = await prisma.housingCompany.create({
       data: {
-        firstName,
-        lastName,
+        name: `${firstName} ${lastName} Housing`,
         email: `demo.owner.${index + 1}@fragmento.local`,
         phone: formatPhone(index + 1),
         notes: `${DEMO_BATCH_TAG} owner ${index + 1}`,
+        propertyObjects: {
+          create: {
+            name: `Building ${(index % 8) + 1}`,
+            country: location.country,
+            city: location.city,
+            postalCode: location.postalCode,
+            address1: `Demo Street ${index + 1}`,
+            address2: index % 3 === 0 ? `Entrance ${randomInt(1, 4)}` : null,
+          },
+        },
       },
+      include: { propertyObjects: true },
     });
     owners.push(owner);
   }
@@ -200,6 +212,7 @@ async function ensureOwners(targetCount) {
 async function ensureContracts(kitchens, owners, targetCount) {
   const existing = await prisma.kitchenContract.findMany({
     where: { notes: { contains: DEMO_BATCH_TAG } },
+    include: { propertyObject: true },
     orderBy: { createdAt: "asc" },
   });
 
@@ -207,23 +220,19 @@ async function ensureContracts(kitchens, owners, targetCount) {
   for (let index = existing.length; index < targetCount; index += 1) {
     const kitchen = kitchens[index % kitchens.length];
     const owner = owners[index % owners.length];
-    const location = LOCATIONS[index % LOCATIONS.length];
+    const propertyObject = owner.propertyObjects[0];
     const contract = await prisma.kitchenContract.create({
       data: {
         contractNumber: `DM-${String(800000 + index)}`,
         kitchenId: kitchen.id,
-        ownerId: owner.id,
+        propertyObjectId: propertyObject?.id || null,
         isActive: true,
-        country: location.country,
-        city: location.city,
-        postalCode: location.postalCode,
-        address1: `Demo Street ${index + 1}`,
-        address2: index % 3 === 0 ? `Apt ${randomInt(1, 40)}` : null,
-        building: `B${(index % 8) + 1}`,
+        building: propertyObject?.name || `B${(index % 8) + 1}`,
         floor: String((index % 5) + 1),
         unitNumber: `${(index % 12) + 1}`,
         notes: `${DEMO_BATCH_TAG} contract ${index + 1}`,
       },
+      include: { propertyObject: true },
     });
     contracts.push(contract);
   }
@@ -307,11 +316,11 @@ async function createDemoOrders(orderCount, options = {}) {
     const contract = kitchenContracts.length ? sample(kitchenContracts) : null;
     const location = contract
       ? {
-          country: contract.country || sample(LOCATIONS).country,
-          city: contract.city || sample(LOCATIONS).city,
-          postalCode: contract.postalCode || sample(LOCATIONS).postalCode,
-          address1: contract.address1 || `Demo Street ${index + 1}`,
-          address2: contract.address2 || null,
+          country: contract.propertyObject?.country || sample(LOCATIONS).country,
+          city: contract.propertyObject?.city || sample(LOCATIONS).city,
+          postalCode: contract.propertyObject?.postalCode || sample(LOCATIONS).postalCode,
+          address1: contract.propertyObject?.address1 || `Demo Street ${index + 1}`,
+          address2: contract.propertyObject?.address2 || null,
         }
       : { ...sample(LOCATIONS), address1: `Demo Street ${globalIndex + 1}`, address2: null };
 

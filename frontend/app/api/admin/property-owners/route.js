@@ -16,12 +16,12 @@ export async function POST(request) {
     const formData = await request.formData();
     const data = validatePropertyOwnerInput(formData);
     await prisma.$executeRaw`
-      INSERT INTO "PropertyOwner" ("id", "firstName", "lastName", "email", "phone", "notes", "createdAt", "updatedAt")
-      VALUES (${randomUUID()}, ${data.firstName}, ${data.lastName}, ${data.email}, ${data.phone}, ${data.notes}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      INSERT INTO "HousingCompany" ("id", "name", "email", "phone", "notes", "createdAt", "updatedAt")
+      VALUES (${randomUUID()}, ${data.name}, ${data.email}, ${data.phone}, ${data.notes}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `;
 
-    return redirectWithFlash(request, "/admin/property-owners", "success", "Property owner created.");
+    return redirectWithFlash(request, "/admin/property-owners", "success", "Housing company created.");
   } catch (error) {
-    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Property owner"));
+    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Housing company"));
   }
 }

@@ -459,41 +459,42 @@ async function loadPropertyOwnerStats({ startDate, kitchenId, status }) {
 
   const ownerRows = await prisma.$queryRaw`
     SELECT
-      po."id",
-      po."firstName",
-      po."lastName",
-      po."email",
-      po."phone",
+      hc."id",
+      hc."name",
+      hc."email",
+      hc."phone",
       COUNT(DISTINCT kc."id")::int AS "contractCount",
       COUNT(DISTINCT o."id")::int AS "orderCount",
       COUNT(DISTINCT o."kitchenId")::int AS "kitchenCount",
       COALESCE(SUM(o."totalPrice"), 0) AS "totalRevenue",
       STRING_AGG(DISTINCT k."name", ', ' ORDER BY k."name") AS "kitchens"
-    FROM "PropertyOwner" po
-    LEFT JOIN "KitchenContract" kc ON kc."ownerId" = po."id"
+    FROM "HousingCompany" hc
+    LEFT JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+    LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
     LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
     LEFT JOIN "Kitchen" k ON k."id" = o."kitchenId"
-    GROUP BY po."id"
-    ORDER BY "totalRevenue" DESC, "orderCount" DESC, po."lastName" ASC, po."firstName" ASC
+    GROUP BY hc."id"
+    ORDER BY "totalRevenue" DESC, "orderCount" DESC, hc."name" ASC
   `;
 
   const itemRows = await prisma.$queryRaw`
     WITH ranked_items AS (
       SELECT
-        po."id" AS "ownerId",
+        hc."id" AS "ownerId",
         oi."code",
         oi."nameSnapshot",
         SUM(oi."quantity")::int AS "quantity",
         SUM(oi."quantity" * oi."priceSnapshot") AS "revenue",
         ROW_NUMBER() OVER (
-          PARTITION BY po."id"
+          PARTITION BY hc."id"
           ORDER BY SUM(oi."quantity" * oi."priceSnapshot") DESC, SUM(oi."quantity") DESC
         ) AS rn
-      FROM "PropertyOwner" po
-      JOIN "KitchenContract" kc ON kc."ownerId" = po."id"
+      FROM "HousingCompany" hc
+      JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+      JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
       JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
       JOIN "OrderItem" oi ON oi."orderId" = o."id"
-      GROUP BY po."id", oi."code", oi."nameSnapshot"
+      GROUP BY hc."id", oi."code", oi."nameSnapshot"
     )
     SELECT "ownerId", "code", "nameSnapshot", "quantity", "revenue"
     FROM ranked_items
@@ -508,7 +509,7 @@ async function loadPropertyOwnerStats({ startDate, kitchenId, status }) {
 
     return {
       id: owner.id,
-      name: [owner.firstName, owner.lastName].filter(Boolean).join(" "),
+      name: owner.name || "",
       email: owner.email || "",
       phone: owner.phone || "",
       contractCount: Number(owner.contractCount || 0),
@@ -768,7 +769,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         propertyOwnerStats={propertyOwnerStats}
         propertyOwners={propertyOwners.map((owner) => ({
           id: owner.id,
-          name: [owner.firstName, owner.lastName].filter(Boolean).join(" "),
+          name: owner.name || "",
           email: owner.email || "",
           phone: owner.phone || "",
           notes: owner.notes || "",

@@ -8,29 +8,33 @@ export async function GET(_request, { params }) {
   const { id } = await params;
   const [owner] = await prisma.$queryRaw`
     SELECT
-      po."id",
-      po."firstName",
-      po."lastName",
-      po."email",
-      po."phone",
-      po."notes",
-      po."createdAt",
-      po."updatedAt",
+      hc."id",
+      hc."name",
+      hc."email",
+      hc."phone",
+      hc."notes",
+      hc."createdAt",
+      hc."updatedAt",
+      COUNT(DISTINCT pobj."id")::int AS "objectCount",
       COUNT(kc."id")::int AS "contractCount"
-    FROM "PropertyOwner" po
-    LEFT JOIN "KitchenContract" kc ON kc."ownerId" = po."id"
-    WHERE po."id" = ${id}
-    GROUP BY po."id"
+    FROM "HousingCompany" hc
+    LEFT JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+    LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    WHERE hc."id" = ${id}
+    GROUP BY hc."id"
     LIMIT 1
   `;
 
   if (!owner) {
-    return NextResponse.json({ error: "Property owner not found" }, { status: 404 });
+    return NextResponse.json({ error: "Housing company not found" }, { status: 404 });
   }
 
   return NextResponse.json({
     ...owner,
-    _count: { contracts: Number(owner.contractCount || 0) },
+    _count: {
+      propertyObjects: Number(owner.objectCount || 0),
+      contracts: Number(owner.contractCount || 0),
+    },
   });
 }
 
@@ -43,16 +47,15 @@ export async function POST(request, { params }) {
     const intent = String(formData.get("_intent") || "").trim();
 
     if (intent === "delete") {
-      await prisma.$executeRaw`DELETE FROM "PropertyOwner" WHERE "id" = ${id}`;
-      return redirectWithFlash(request, "/admin/property-owners", "success", "Property owner deleted.");
+      await prisma.$executeRaw`DELETE FROM "HousingCompany" WHERE "id" = ${id}`;
+      return redirectWithFlash(request, "/admin/property-owners", "success", "Housing company deleted.");
     }
 
     const data = validatePropertyOwnerInput(formData);
     await prisma.$executeRaw`
-      UPDATE "PropertyOwner"
+      UPDATE "HousingCompany"
       SET
-        "firstName" = ${data.firstName},
-        "lastName" = ${data.lastName},
+        "name" = ${data.name},
         "email" = ${data.email},
         "phone" = ${data.phone},
         "notes" = ${data.notes},
@@ -60,8 +63,8 @@ export async function POST(request, { params }) {
       WHERE "id" = ${id}
     `;
 
-    return redirectWithFlash(request, "/admin/property-owners", "success", "Property owner updated.");
+    return redirectWithFlash(request, "/admin/property-owners", "success", "Housing company updated.");
   } catch (error) {
-    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Property owner"));
+    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Housing company"));
   }
 }

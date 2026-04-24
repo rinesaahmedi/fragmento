@@ -16,16 +16,16 @@ import {
   tableStyle,
   tableWrapStyle,
   tdStyle,
+  textareaStyle,
   thStyle,
 } from "../../../components/admin-ui";
 import Link from "next/link";
 import { Fragment } from "react";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
-import AdminContractAddressFields from "../../../components/admin-contract-address-fields";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
-import { listKitchenContractsForAdmin, listKitchensForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
+import { listKitchenContractsForAdmin, listKitchensForAdmin, listPropertyObjectsForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +60,7 @@ function formatOrdinal(value) {
 }
 
 function contractAddressLines(contract) {
+  const objectLine = contract.propertyObject?.name ? `Object ${contract.propertyObject.name}` : "";
   const streetLine = [contract.address1, contract.address2].filter(Boolean).join(", ");
   const cityLine = [contract.postalCode, contract.city].filter(Boolean).join(" ");
   const unitLine = [
@@ -68,7 +69,7 @@ function contractAddressLines(contract) {
     contract.unitNumber ? `Unit ${contract.unitNumber}` : "",
   ].filter(Boolean).join(" | ");
 
-  return [streetLine, cityLine, contract.country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
+  return [objectLine, streetLine, cityLine, contract.country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
 }
 
 function contactAddressLines(address) {
@@ -115,8 +116,8 @@ function AddressColumn({ lines, emptyText }) {
 }
 
 function ownerName(owner) {
-  if (!owner) return "No owner selected";
-  return [owner.firstName, owner.lastName].filter(Boolean).join(" ");
+  if (!owner) return "No housing company selected";
+  return owner.name || "";
 }
 
 function ownerSummary(owner) {
@@ -178,11 +179,11 @@ function FilterField({ label, children }) {
   );
 }
 
-function OwnerSelect({ owners, defaultValue = "", compact = false }) {
+function HousingCompanySelect({ owners, defaultValue = "", compact = false }) {
   return (
-    <FormField label={<AdminText i18nKey="orderDetailAdmin.propertyOwner" fallback="Property owner" />}>
-      <select name="ownerId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle}>
-        <option value=""><AdminText i18nKey="contractsAdmin.noOwnerSelected" fallback="No owner selected" /></option>
+    <FormField label={<AdminText i18nKey="orderDetailAdmin.propertyOwner" fallback="Housing company" />}>
+      <select name="housingCompanyId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required>
+        <option value=""><AdminText i18nKey="contractsAdmin.selectHousingCompany" fallback="Select housing company" /></option>
         {owners.map((owner) => (
           <option key={owner.id} value={owner.id}>
             {ownerOptionSummary(owner)}
@@ -190,6 +191,41 @@ function OwnerSelect({ owners, defaultValue = "", compact = false }) {
         ))}
       </select>
     </FormField>
+  );
+}
+
+function PropertyObjectSelect({ propertyObjects, defaultValue = "", compact = false }) {
+  return (
+    <FormField label={<AdminText i18nKey="contractsAdmin.propertyObject" fallback="Property object" />}>
+      <select name="propertyObjectId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required>
+        <option value=""><AdminText i18nKey="contractsAdmin.selectPropertyObject" fallback="Select object/building" /></option>
+        {propertyObjects.map((object) => (
+          <option key={object.id} value={object.id}>
+            {object.housingCompany.name} | {object.name}
+          </option>
+        ))}
+      </select>
+    </FormField>
+  );
+}
+
+function ContractUnitFields({ contract = {}, compact = false }) {
+  const fieldStyle = compact ? compactInputStyle : inputStyle;
+  return (
+    <>
+      <FormField label={<AdminText i18nKey="contractAddressFields.building" fallback="Building" />}>
+        <input name="building" defaultValue={contract.building || ""} style={fieldStyle} />
+      </FormField>
+      <FormField label={<AdminText i18nKey="contractAddressFields.floor" fallback="Floor" />}>
+        <input name="floor" defaultValue={contract.floor || ""} style={fieldStyle} />
+      </FormField>
+      <FormField label={<AdminText i18nKey="contractAddressFields.unitNumber" fallback="Unit number" />}>
+        <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={fieldStyle} />
+      </FormField>
+      <FormField label={<AdminText i18nKey="contractAddressFields.notes" fallback="Notes" />} wide>
+        <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={compact ? compactTextareaStyle : textareaStyle} />
+      </FormField>
+    </>
   );
 }
 
@@ -213,16 +249,18 @@ export default async function AdminContractsPage({ searchParams = {} }) {
   const resolvedSearchParams = (await searchParams) || {};
   const filters = {
     kitchenId: normalizeParam(resolvedSearchParams.kitchenId),
-    ownerId: normalizeParam(resolvedSearchParams.ownerId),
+    housingCompanyId: normalizeParam(resolvedSearchParams.housingCompanyId || resolvedSearchParams.ownerId),
+    propertyObjectId: normalizeParam(resolvedSearchParams.propertyObjectId),
     status: normalizeParam(resolvedSearchParams.status),
     usage: normalizeParam(resolvedSearchParams.usage),
     query: normalizeParam(resolvedSearchParams.q),
   };
   const returnTo = `/admin/contracts?${new URLSearchParams(Object.entries(filters).filter(([, value]) => value)).toString()}`;
 
-  const [kitchens, owners, contracts] = await Promise.all([
+  const [kitchens, owners, propertyObjects, contracts] = await Promise.all([
     listKitchensForAdmin(),
     listPropertyOwnersForAdmin(),
+    listPropertyObjectsForAdmin(),
     listKitchenContractsForAdmin(filters),
   ]);
   const successMessage = getFormMessage(resolvedSearchParams, "success");
@@ -258,12 +296,22 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                   ))}
                 </select>
               </FilterField>
-              <FilterField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Owner" />}>
-                <select name="ownerId" defaultValue={filters.ownerId} style={filterInputStyle}>
+              <FilterField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>
+                <select name="housingCompanyId" defaultValue={filters.housingCompanyId} style={filterInputStyle}>
                   <option value=""><AdminText i18nKey="contractsAdmin.allOwners" fallback="All owners" /></option>
                   {owners.map((owner) => (
                     <option key={owner.id} value={owner.id}>
                       {ownerOptionSummary(owner)}
+                    </option>
+                  ))}
+                </select>
+              </FilterField>
+              <FilterField label={<AdminText i18nKey="contractsAdmin.propertyObject" fallback="Property object" />}>
+                <select name="propertyObjectId" defaultValue={filters.propertyObjectId} style={filterInputStyle}>
+                  <option value=""><AdminText i18nKey="contractsAdmin.allPropertyObjects" fallback="All objects" /></option>
+                  {propertyObjects.map((object) => (
+                    <option key={object.id} value={object.id}>
+                      {object.housingCompany.name} | {object.name}
                     </option>
                   ))}
                 </select>
@@ -299,15 +347,16 @@ export default async function AdminContractsPage({ searchParams = {} }) {
             </summary>
             <div style={createContractBodyStyle}>
               <p style={createContractDescriptionStyle}>
-                <AdminText i18nKey="contractsAdmin.selectKitchenAddContractAddressAndAttachPropertyOwner" fallback="Select the kitchen, add the contract address, and attach a property owner." />
+                <AdminText i18nKey="contractsAdmin.selectKitchenCompanyObjectAndUnit" fallback="Select the kitchen, housing company, object, and unit details." />
               </p>
               <form action="/api/admin/contracts" method="post" style={formGridStyle}>
                 <KitchenSelect kitchens={kitchens} defaultValue={filters.kitchenId} />
                 <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                   <input name="contractNumber" placeholder="ABC-123" style={inputStyle} required />
                 </FormField>
-                <AdminContractAddressFields />
-                <OwnerSelect owners={owners} defaultValue={filters.ownerId} />
+                <HousingCompanySelect owners={owners} defaultValue={filters.housingCompanyId} />
+                <PropertyObjectSelect propertyObjects={propertyObjects} defaultValue={filters.propertyObjectId} />
+                <ContractUnitFields />
                 <div style={{ gridColumn: "1 / -1" }}>
                   <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.createContract" fallback="Create contract" /></button>
                 </div>
@@ -417,8 +466,9 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                               <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                                 <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
                               </FormField>
-                              <AdminContractAddressFields contract={contract} compact />
-                              <OwnerSelect owners={owners} defaultValue={contract.ownerId || ""} compact />
+                              <HousingCompanySelect owners={owners} defaultValue={contract.housingCompanyId || ""} compact />
+                              <PropertyObjectSelect propertyObjects={propertyObjects} defaultValue={contract.propertyObjectId || ""} compact />
+                              <ContractUnitFields contract={contract} compact />
                               <div style={contractEditActionStyle}>
                                 <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
                               </div>
@@ -485,8 +535,9 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                     <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                       <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
                     </FormField>
-                    <AdminContractAddressFields contract={contract} compact />
-                    <OwnerSelect owners={owners} defaultValue={contract.ownerId || ""} compact />
+                    <HousingCompanySelect owners={owners} defaultValue={contract.housingCompanyId || ""} compact />
+                    <PropertyObjectSelect propertyObjects={propertyObjects} defaultValue={contract.propertyObjectId || ""} compact />
+                    <ContractUnitFields contract={contract} compact />
                     <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
                   </form>
                 </details>
@@ -909,4 +960,12 @@ const compactInputStyle = {
   minHeight: 38,
   padding: "6px 10px",
   fontSize: "0.92rem",
+};
+
+const compactTextareaStyle = {
+  ...textareaStyle,
+  minHeight: 58,
+  padding: "6px 10px",
+  fontSize: "0.92rem",
+  lineHeight: 1.35,
 };

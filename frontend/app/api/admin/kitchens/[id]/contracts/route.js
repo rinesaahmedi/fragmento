@@ -1,20 +1,8 @@
 import { NextResponse } from "next/server";
 import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput } from "../../../../../../lib/admin-forms";
-import { isAddressVerificationRecordValid } from "../../../../../../lib/address-verification-server";
 import { requireAdminApi } from "../../../../../../lib/auth";
 import { getKitchenById } from "../../../../../../lib/catalog";
 import { prisma } from "../../../../../../lib/prisma";
-
-function parseAddressVerificationRecord(formData) {
-  const rawValue = String(formData.get("addressVerification") || "").trim();
-  if (!rawValue) return null;
-
-  try {
-    return JSON.parse(rawValue);
-  } catch {
-    return null;
-  }
-}
 
 export async function GET(_request, { params }) {
   await requireAdminApi();
@@ -38,31 +26,29 @@ export async function POST(request, { params }) {
     }
 
     const data = validateKitchenContractInput(formData);
-    const addressVerification = parseAddressVerificationRecord(formData);
-    if (!isAddressVerificationRecordValid(addressVerification, data)) {
-      throw new Error("Verify the contract address before creating the contract.");
+    const [propertyObject] = await prisma.$queryRaw`
+      SELECT "id"
+      FROM "PropertyObject"
+      WHERE "id" = ${data.propertyObjectId}
+        AND "housingCompanyId" = ${data.housingCompanyId}
+      LIMIT 1
+    `;
+    if (!propertyObject) {
+      throw new Error("Select a valid property object for the housing company.");
     }
-    const createdContract = await prisma.kitchenContract.create({
+
+    await prisma.kitchenContract.create({
       data: {
         contractNumber: data.contractNumber,
         kitchenId: kitchen.id,
+        propertyObjectId: data.propertyObjectId,
         isActive: true,
-        country: data.country,
-        city: data.city,
-        postalCode: data.postalCode,
-        address1: data.address1,
-        address2: data.address2,
         building: data.building,
         floor: data.floor,
         unitNumber: data.unitNumber,
         notes: data.notes,
       },
     });
-    await prisma.$executeRaw`
-      UPDATE "KitchenContract"
-      SET "ownerId" = ${data.ownerId}
-      WHERE "id" = ${createdContract.id}
-    `;
 
     return redirectWithFlash(request, `/admin/kitchens/${id}`, "success", "Contract number created.");
   } catch (error) {

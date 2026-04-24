@@ -100,41 +100,52 @@ model Order {
 }
 
 model KitchenContract {
-  id             String         @id @default(cuid())
-  contractNumber String         @unique
-  kitchenId      String
-  kitchen        Kitchen        @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  ownerId        String?
-  owner          PropertyOwner? @relation(fields: [ownerId], references: [id], onDelete: SetNull)
-  isActive       Boolean        @default(true)
-  usedAt         DateTime?
-  country        String?
-  city           String?
-  postalCode     String?
-  address1       String?
-  address2       String?
-  building       String?
-  floor          String?
-  unitNumber     String?
-  notes          String?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  orders         Order[]
+  id               String          @id @default(cuid())
+  contractNumber   String          @unique
+  kitchenId        String
+  kitchen          Kitchen         @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  propertyObjectId String?
+  propertyObject   PropertyObject? @relation(fields: [propertyObjectId], references: [id], onDelete: SetNull)
+  isActive         Boolean         @default(true)
+  usedAt           DateTime?
+  building         String?
+  floor            String?
+  unitNumber       String?
+  notes            String?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  orders           Order[]
 
   @@index([kitchenId])
-  @@index([ownerId])
+  @@index([propertyObjectId])
 }
 
-model PropertyOwner {
-  id        String            @id @default(cuid())
-  firstName String
-  lastName  String
-  email     String?
-  phone     String?
-  notes     String?
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-  contracts KitchenContract[]
+model HousingCompany {
+  id              String           @id @default(cuid())
+  name            String
+  email           String?
+  phone           String?
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  propertyObjects PropertyObject[]
+}
+
+model PropertyObject {
+  id               String            @id @default(cuid())
+  name             String
+  housingCompanyId String
+  housingCompany   HousingCompany    @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
+  country          String?
+  city             String?
+  postalCode       String?
+  address1         String?
+  address2         String?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  contracts        KitchenContract[]
+
+  @@index([housingCompanyId])
 }
 
 model OrderItem {

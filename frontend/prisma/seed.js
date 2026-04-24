@@ -93,11 +93,11 @@ const DEFAULT_KITCHEN_CONTRACTS = [
 ];
 
 const DEFAULT_PROPERTY_OWNERS = [
-  { firstName: "Anna", lastName: "Schmidt", email: "anna.schmidt@example.com", phone: "+49 30 555 0101" },
-  { firstName: "Lukas", lastName: "Weber", email: "lukas.weber@example.com", phone: "+49 30 555 0102" },
-  { firstName: "Sophie", lastName: "Muller", email: "sophie.muller@example.com", phone: "+49 30 555 0103" },
-  { firstName: "Daniel", lastName: "Fischer", email: "daniel.fischer@example.com", phone: "+49 30 555 0104" },
-  { firstName: "Laura", lastName: "Becker", email: "laura.becker@example.com", phone: "+49 30 555 0105" },
+  { name: "Anna Schmidt Housing GmbH", email: "anna.schmidt@example.com", phone: "+49 30 555 0101", objectName: "Building A", country: "Germany", city: "Berlin", postalCode: "10115", address1: "Invalidenstrasse 10" },
+  { name: "Lukas Weber Wohnen", email: "lukas.weber@example.com", phone: "+49 30 555 0102", objectName: "Building B", country: "Germany", city: "Hamburg", postalCode: "20095", address1: "Demo Street 2" },
+  { name: "Sophie Muller Immobilien", email: "sophie.muller@example.com", phone: "+49 30 555 0103", objectName: "Building C", country: "Austria", city: "Vienna", postalCode: "1010", address1: "Demo Street 3" },
+  { name: "Daniel Fischer Estates", email: "daniel.fischer@example.com", phone: "+49 30 555 0104", objectName: "Building D", country: "Hungary", city: "Budapest", postalCode: "1051", address1: "Demo Street 4" },
+  { name: "Laura Becker Living", email: "laura.becker@example.com", phone: "+49 30 555 0105", objectName: "Building E", country: "Switzerland", city: "Zurich", postalCode: "8001", address1: "Demo Street 5" },
 ];
 
 async function main() {
@@ -113,11 +113,11 @@ async function main() {
     });
   }
 
-  const seededOwners = [];
+  const seededObjects = [];
   for (const owner of DEFAULT_PROPERTY_OWNERS) {
     const [existingOwner] = await prisma.$queryRaw`
       SELECT "id"
-      FROM "PropertyOwner"
+      FROM "HousingCompany"
       WHERE "email" = ${owner.email}
       LIMIT 1
     `;
@@ -125,10 +125,9 @@ async function main() {
     const ownerId = existingOwner?.id || randomUUID();
     if (existingOwner) {
       await prisma.$executeRaw`
-        UPDATE "PropertyOwner"
+        UPDATE "HousingCompany"
         SET
-          "firstName" = ${owner.firstName},
-          "lastName" = ${owner.lastName},
+          "name" = ${owner.name},
           "email" = ${owner.email},
           "phone" = ${owner.phone},
           "notes" = ${owner.notes || null},
@@ -137,12 +136,39 @@ async function main() {
       `;
     } else {
       await prisma.$executeRaw`
-        INSERT INTO "PropertyOwner" ("id", "firstName", "lastName", "email", "phone", "notes", "createdAt", "updatedAt")
-        VALUES (${ownerId}, ${owner.firstName}, ${owner.lastName}, ${owner.email}, ${owner.phone}, ${owner.notes || null}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        INSERT INTO "HousingCompany" ("id", "name", "email", "phone", "notes", "createdAt", "updatedAt")
+        VALUES (${ownerId}, ${owner.name}, ${owner.email}, ${owner.phone}, ${owner.notes || null}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
       `;
     }
 
-    seededOwners.push({ id: ownerId });
+    const [existingObject] = await prisma.$queryRaw`
+      SELECT "id"
+      FROM "PropertyObject"
+      WHERE "housingCompanyId" = ${ownerId}
+        AND "name" = ${owner.objectName}
+      LIMIT 1
+    `;
+    const objectId = existingObject?.id || randomUUID();
+    if (existingObject) {
+      await prisma.$executeRaw`
+        UPDATE "PropertyObject"
+        SET
+          "country" = ${owner.country},
+          "city" = ${owner.city},
+          "postalCode" = ${owner.postalCode},
+          "address1" = ${owner.address1},
+          "address2" = ${owner.address2 || null},
+          "updatedAt" = CURRENT_TIMESTAMP
+        WHERE "id" = ${objectId}
+      `;
+    } else {
+      await prisma.$executeRaw`
+        INSERT INTO "PropertyObject" ("id", "name", "housingCompanyId", "country", "city", "postalCode", "address1", "address2", "createdAt", "updatedAt")
+        VALUES (${objectId}, ${owner.objectName}, ${ownerId}, ${owner.country}, ${owner.city}, ${owner.postalCode}, ${owner.address1}, ${owner.address2 || null}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      `;
+    }
+
+    seededObjects.push({ id: objectId });
   }
 
   for (const kitchen of DEFAULT_KITCHENS) {
@@ -224,23 +250,20 @@ async function main() {
       throw new Error(`Kitchen not found for contract seed: ${contract.kitchenSlug}`);
     }
 
-    const contractRecord = await prisma.kitchenContract.upsert({
+    await prisma.kitchenContract.upsert({
       where: { contractNumber: contract.contractNumber },
       update: {
         kitchenId: kitchen.id,
+        propertyObjectId: seededObjects[index % seededObjects.length]?.id || null,
         isActive: true,
       },
       create: {
         contractNumber: contract.contractNumber,
         kitchenId: kitchen.id,
+        propertyObjectId: seededObjects[index % seededObjects.length]?.id || null,
         isActive: true,
       },
     });
-    await prisma.$executeRaw`
-      UPDATE "KitchenContract"
-      SET "ownerId" = ${seededOwners[index % seededOwners.length]?.id || null}
-      WHERE "id" = ${contractRecord.id}
-    `;
   }
 }
 

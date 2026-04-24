@@ -81,12 +81,8 @@ export function validateKitchenItemInput(formData) {
 export function validateKitchenContractInput(formData) {
   return {
     contractNumber: requiredString(formData.get("contractNumber"), "Contract number"),
-    ownerId: optionalString(formData.get("ownerId")),
-    country: optionalString(formData.get("country")),
-    city: optionalString(formData.get("city")),
-    postalCode: optionalString(formData.get("postalCode")),
-    address1: optionalString(formData.get("address1")),
-    address2: optionalString(formData.get("address2")),
+    housingCompanyId: requiredString(formData.get("housingCompanyId"), "Housing company"),
+    propertyObjectId: requiredString(formData.get("propertyObjectId"), "Property object"),
     building: optionalString(formData.get("building")),
     floor: optionalString(formData.get("floor")),
     unitNumber: optionalString(formData.get("unitNumber")),
@@ -96,11 +92,21 @@ export function validateKitchenContractInput(formData) {
 
 export function validatePropertyOwnerInput(formData) {
   return {
-    firstName: requiredString(formData.get("firstName"), "First name"),
-    lastName: requiredString(formData.get("lastName"), "Last name"),
+    name: requiredString(formData.get("name"), "Company name"),
     email: optionalString(formData.get("email")),
     phone: optionalString(formData.get("phone")),
     notes: optionalString(formData.get("notes")),
+  };
+}
+
+export function validatePropertyObjectInput(formData) {
+  return {
+    name: requiredString(formData.get("name"), "Object name"),
+    country: optionalString(formData.get("country")),
+    city: optionalString(formData.get("city")),
+    postalCode: optionalString(formData.get("postalCode")),
+    address1: optionalString(formData.get("address1")),
+    address2: optionalString(formData.get("address2")),
   };
 }
 

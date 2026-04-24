@@ -105,7 +105,14 @@ function Field({ label, wide = false, children }) {
   );
 }
 
-export default function AdminContractAddressFields({ contract = {}, compact = false }) {
+export default function AdminContractAddressFields({
+  contract = {},
+  compact = false,
+  mode = "contract",
+  includeUnitFields = true,
+  includeNotes = true,
+  referenceFieldName = "contractNumber",
+}) {
   const { translate } = useAdminI18n();
   const markerRef = useRef(null);
   const [country, setCountry] = useState(normalizeAdminCountry(contract.country));
@@ -130,11 +137,12 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
   const isVerificationError =
     addressVerification.status === ADDRESS_VERIFICATION_STATUS.INVALID
     || addressVerification.status === ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE;
+  const isObjectAddress = mode === "object";
 
   function getFormSnapshot(form) {
     const formData = new FormData(form);
     return buildAddressVerificationSnapshot({
-      contractNumber: formData.get("contractNumber"),
+      contractNumber: formData.get(referenceFieldName),
       address1: formData.get("address1"),
       address2: formData.get("address2"),
       postalCode: formData.get("postalCode"),
@@ -147,7 +155,7 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
     const form = markerRef.current?.closest("form");
     if (!form) return undefined;
 
-    const relevantFieldNames = new Set(["contractNumber", "address1", "address2", "country", "city", "postalCode"]);
+    const relevantFieldNames = new Set([referenceFieldName, "address1", "address2", "country", "city", "postalCode"]);
 
     const invalidateVerification = () => {
       setAddressVerification((current) => {
@@ -210,7 +218,7 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
       form.removeEventListener("change", handleFieldMutation);
       form.removeEventListener("submit", handleSubmit);
     };
-  }, []);
+  }, [referenceFieldName]);
 
   async function handleVerifyAddress() {
     const form = markerRef.current?.closest("form");
@@ -220,7 +228,9 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
     if (!snapshot.contractNumber || !snapshot.country || !snapshot.city || !snapshot.postalCode) {
       setAddressVerification(
         buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.INVALID, {
-          message: "Enter contract number, country, city, and postal code before verification.",
+          message: isObjectAddress
+            ? "Enter object name, country, city, and postal code before verification."
+            : "Enter contract number, country, city, and postal code before verification.",
         }),
       );
       return;
@@ -228,7 +238,7 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
 
     setAddressVerification(
       buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.LOADING, {
-        message: "Verifying contract address...",
+        message: isObjectAddress ? "Verifying object address..." : "Verifying contract address...",
       }),
     );
 
@@ -325,18 +335,24 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
       <Field label={translate("contractAddressFields.addressLine2", "Address line 2")}>
         <input name="address2" defaultValue={contract.address2 || ""} style={inputStyle} />
       </Field>
-      <Field label={translate("contractAddressFields.building", "Building")}>
-        <input name="building" defaultValue={contract.building || ""} style={inputStyle} />
-      </Field>
-      <Field label={translate("contractAddressFields.floor", "Floor")}>
-        <input name="floor" defaultValue={contract.floor || ""} style={inputStyle} />
-      </Field>
-      <Field label={translate("contractAddressFields.unitNumber", "Unit number")}>
-        <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={inputStyle} />
-      </Field>
-      <Field label={translate("contractAddressFields.notes", "Notes")} wide>
-        <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={notesStyle} />
-      </Field>
+      {includeUnitFields ? (
+        <>
+          <Field label={translate("contractAddressFields.building", "Building")}>
+            <input name="building" defaultValue={contract.building || ""} style={inputStyle} />
+          </Field>
+          <Field label={translate("contractAddressFields.floor", "Floor")}>
+            <input name="floor" defaultValue={contract.floor || ""} style={inputStyle} />
+          </Field>
+          <Field label={translate("contractAddressFields.unitNumber", "Unit number")}>
+            <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={inputStyle} />
+          </Field>
+        </>
+      ) : null}
+      {includeNotes ? (
+        <Field label={translate("contractAddressFields.notes", "Notes")} wide>
+          <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={notesStyle} />
+        </Field>
+      ) : null}
       <input
         type="hidden"
         name="addressVerification"
@@ -372,8 +388,14 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
           }}
         >
           {isVerificationLoading
-            ? translate("contractAddressFields.verifyingAddress", "Verifying address...")
-            : translate("contractAddressFields.verifyAddress", "Verify address")}
+            ? translate(
+                isObjectAddress ? "contractAddressFields.verifyingObjectAddress" : "contractAddressFields.verifyingAddress",
+                isObjectAddress ? "Verifying object address..." : "Verifying address...",
+              )
+            : translate(
+                isObjectAddress ? "contractAddressFields.verifyObjectAddress" : "contractAddressFields.verifyAddress",
+                isObjectAddress ? "Verify object address" : "Verify address",
+              )}
         </button>
       </div>
       <div
@@ -399,7 +421,10 @@ export default function AdminContractAddressFields({ contract = {}, compact = fa
         }}
       >
         <strong>
-          {addressVerificationMessage || translate("contractAddressFields.verifyAddressBeforeSaving", "Verify the address before saving the contract.")}
+          {addressVerificationMessage || translate(
+            isObjectAddress ? "contractAddressFields.verifyObjectAddressBeforeSaving" : "contractAddressFields.verifyAddressBeforeSaving",
+            isObjectAddress ? "Verify the object address before saving." : "Verify the address before saving the contract.",
+          )}
         </strong>
         {addressVerificationSuggestion ? (
           <span>{translate("contractAddressFields.suggestedMatch", "Suggested match")}: {addressVerificationSuggestion}</span>
