@@ -12,6 +12,7 @@ const navItems = [
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
   { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
 ];
+const DESKTOP_SIDEBAR_WIDTH = "clamp(240px, 18vw, 300px)";
 
 export function AdminShellClient({ adminEmail, initialLanguage = "en", children }) {
   return (
@@ -31,7 +32,8 @@ function AdminShellContent({ adminEmail, children }) {
       style={{
         minHeight: "100vh",
         position: "relative",
-        overflow: "hidden",
+        overflowX: "hidden",
+        overflowY: "visible",
         isolation: "isolate",
         background: "var(--app-bg)",
         color: "var(--app-text)",
@@ -72,79 +74,12 @@ function AdminShellContent({ adminEmail, children }) {
         />
       </div>
 
-      <header
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 20,
-          background: "rgba(255, 251, 247, 0.72)",
-          borderBottom: "1px solid var(--app-border)",
-          backdropFilter: "blur(18px)",
-          boxShadow: "0 10px 26px rgba(120, 81, 50, 0.06)",
-        }}
-      >
-        <div
-          style={{
-            width: "min(100%, 1880px)",
-            margin: "0 auto",
-            padding: "18px clamp(20px, 3vw, 40px)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 16,
-            position: "relative",
-          }}
-        >
-          <div style={{ display: "grid", gap: 6 }}>
-            <strong
-              style={{
-                fontSize: "1.35rem",
-                fontWeight: 800,
-                letterSpacing: "-0.02em",
-                color: "var(--app-accent)",
-                textShadow: "0 1px 0 rgba(255,255,255,0.3)",
-              }}
-            >
-              <AdminText i18nKey="adminShellLogin.fragmentoAdmin" fallback="Fragmento Admin" />
-            </strong>
-            <span style={{ color: "var(--app-text-muted)", fontSize: 14 }}>
-              <AdminText i18nKey="adminShellLogin.modernEditorialOperationsForKitchensAndOrders" fallback="Modern editorial operations for kitchens and orders." />
-            </span>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, flexWrap: "wrap" }}>
-            <AdminLanguageSwitcher />
-            <form action="/api/admin/logout" method="post" style={{ margin: 0 }}>
-              <button
-                type="submit"
-                style={{
-                  border: "1px solid var(--app-border-strong)",
-                  borderRadius: 8,
-                  padding: "11px 18px",
-                  background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,243,232,0.72))",
-                  color: "var(--app-text)",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  boxShadow: "var(--app-shadow-soft)",
-                }}
-              >
-                <AdminText i18nKey="adminShellLogin.logout" fallback="Logout" />
-              </button>
-            </form>
-          </div>
-        </div>
-      </header>
-
       <div
         className="admin-shell__layout"
         style={{
-          width: "min(100%, 1880px)",
-          margin: "0 auto",
-          padding: "28px clamp(20px, 3vw, 40px) 40px",
-          display: "grid",
-          gridTemplateColumns: "clamp(220px, 16vw, 280px) minmax(0, 1fr)",
-          gap: "clamp(20px, 2vw, 32px)",
-          alignItems: "start",
+          width: "100%",
+          margin: 0,
+          padding: "0 0 40px 0",
           position: "relative",
         }}
       >
@@ -171,7 +106,8 @@ function AdminShellContent({ adminEmail, children }) {
                   display: "inline-flex",
                   alignItems: "center",
                   gap: 10,
-                  padding: "12px 14px",
+                  minHeight: 52,
+                  padding: "10px 14px",
                   borderRadius: 8,
                   whiteSpace: "nowrap",
                   background: active
@@ -182,6 +118,7 @@ function AdminShellContent({ adminEmail, children }) {
                   fontWeight: active ? 700 : 600,
                   boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "var(--app-shadow-soft)",
                   flex: "0 0 auto",
+                  boxSizing: "border-box",
                 }}
               >
                 <Icon active={active} />
@@ -194,21 +131,46 @@ function AdminShellContent({ adminEmail, children }) {
         <aside
           className="admin-shell__sidebar"
           style={{
-            position: "sticky",
-            top: 92,
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: DESKTOP_SIDEBAR_WIDTH,
             display: "grid",
+            gridTemplateRows: "auto auto 1fr auto",
             gap: 18,
+            alignContent: "start",
+            height: "100vh",
+            overflowY: "auto",
+            padding: "0 20px 20px",
+            background: "linear-gradient(180deg, rgba(247, 238, 228, 0.98), rgba(243, 231, 218, 0.92))",
+            borderRight: "1px solid rgba(172, 111, 70, 0.14)",
+            zIndex: 30,
+            boxSizing: "border-box",
           }}
         >
+          <div
+            style={{
+              padding: "24px 8px 6px",
+            }}
+          >
+            <img
+              src="/img/fragmentologo-cropped.jpg"
+              alt="Fragmento"
+              style={{
+                display: "block",
+                width: "100%",
+                maxWidth: 220,
+                height: "auto",
+                objectFit: "contain",
+              }}
+            />
+          </div>
+
           <section
             style={{
-              borderRadius: 8,
-              padding: 20,
-              background: "linear-gradient(165deg, rgba(255,255,255,0.9), rgba(255,242,230,0.8))",
-              border: "1px solid var(--app-border)",
+              padding: "10px 8px 4px",
               display: "grid",
               gap: 6,
-              boxShadow: "var(--app-shadow-soft)",
             }}
           >
             <span
@@ -237,13 +199,12 @@ function AdminShellContent({ adminEmail, children }) {
           <nav
             aria-label={translate("adminShellLogin.sidebar", "Sidebar")}
             style={{
-              borderRadius: 8,
-              padding: 12,
-              background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,246,236,0.8))",
-              border: "1px solid var(--app-border)",
-              display: "grid",
+              padding: 0,
+              display: "flex",
+              flexDirection: "column",
               gap: 8,
-              boxShadow: "var(--app-shadow-soft)",
+              alignItems: "stretch",
+              alignSelf: "start",
             }}
           >
             {navItems.map((item) => {
@@ -259,15 +220,17 @@ function AdminShellContent({ adminEmail, children }) {
                     display: "flex",
                     alignItems: "center",
                     gap: 12,
-                    padding: "12px 14px",
+                    minHeight: 56,
+                    padding: "10px 14px",
                     borderRadius: 8,
                     background: active
                       ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.12))"
-                      : "rgba(255,255,255,0.28)",
+                      : "transparent",
                     color: active ? "var(--app-accent)" : "var(--app-text)",
-                    border: `1px solid ${active ? "var(--app-border-strong)" : "rgba(255,255,255,0.2)"}`,
+                    border: `1px solid ${active ? "var(--app-border-strong)" : "transparent"}`,
                     fontWeight: active ? 700 : 600,
                     boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "none",
+                    boxSizing: "border-box",
                   }}
                 >
                   <Icon active={active} />
@@ -276,17 +239,113 @@ function AdminShellContent({ adminEmail, children }) {
               );
             })}
           </nav>
+
+          <div
+            className="admin-shell__primex-badge"
+            style={{
+              display: "grid",
+              gap: 2,
+              padding: "8px 12px",
+              borderRadius: 8,
+              background: "rgba(255,255,255,0.42)",
+              border: "1px solid rgba(172, 111, 70, 0.14)",
+              justifySelf: "start",
+              alignSelf: "end",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 9,
+                fontWeight: 700,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                color: "var(--app-text-muted)",
+                lineHeight: 1,
+              }}
+            >
+              Powered by
+            </span>
+            <img
+              src="/primex-logo.png"
+              alt="Primex"
+              style={{
+                display: "block",
+                width: 96,
+                height: "auto",
+                objectFit: "contain",
+                background: "transparent",
+              }}
+            />
+          </div>
         </aside>
 
-        <main className="admin-shell__content" style={{ minWidth: 0 }}>{children}</main>
+        <div
+          className="admin-shell__main-column"
+          style={{
+            minWidth: 0,
+            display: "grid",
+            gridTemplateRows: "auto minmax(0, 1fr)",
+            marginLeft: DESKTOP_SIDEBAR_WIDTH,
+            minHeight: "100vh",
+          }}
+        >
+          <header
+            className="admin-shell__topbar"
+            style={{
+              position: "sticky",
+              top: 0,
+              zIndex: 20,
+              display: "flex",
+              justifyContent: "flex-end",
+              padding: "12px clamp(20px, 3vw, 40px) 0",
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: 16,
+                pointerEvents: "auto",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, flexWrap: "wrap" }}>
+                <AdminLanguageSwitcher />
+                <form action="/api/admin/logout" method="post" style={{ margin: 0 }}>
+                  <button
+                    type="submit"
+                    style={{
+                      border: "1px solid var(--app-border-strong)",
+                      borderRadius: 8,
+                      padding: "11px 18px",
+                      background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,243,232,0.72))",
+                      color: "var(--app-text)",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                      boxShadow: "var(--app-shadow-soft)",
+                    }}
+                  >
+                    <AdminText i18nKey="adminShellLogin.logout" fallback="Logout" />
+                  </button>
+                </form>
+              </div>
+            </div>
+          </header>
+
+          <main
+            className="admin-shell__content"
+            style={{
+              minWidth: 0,
+              padding: "28px clamp(20px, 3vw, 40px) 0 clamp(20px, 2.5vw, 36px)",
+            }}
+          >
+            {children}
+          </main>
+        </div>
 
         <style>{`
           @media (max-width: 960px) {
-            .admin-shell__layout {
-              grid-template-columns: minmax(0, 1fr) !important;
-              padding-top: 20px !important;
-            }
-
             .admin-shell__mobile-nav {
               display: flex !important;
             }
@@ -294,14 +353,29 @@ function AdminShellContent({ adminEmail, children }) {
             .admin-shell__sidebar {
               display: none !important;
             }
+
+            .admin-shell__main-column {
+              margin-left: 0 !important;
+            }
+
+            .admin-shell__primex-badge {
+              order: 3;
+            }
           }
 
           @media (max-width: 640px) {
             .admin-shell__layout {
-              padding-left: 16px !important;
-              padding-right: 16px !important;
               padding-bottom: 28px !important;
               gap: 16px !important;
+            }
+
+            .admin-shell__content {
+              padding: 20px 16px 0 !important;
+            }
+
+            .admin-shell__primex-badge {
+              width: 100%;
+              justify-items: start;
             }
           }
         `}</style>
