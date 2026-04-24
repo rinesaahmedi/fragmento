@@ -170,7 +170,7 @@ function AdminShellContent({ adminEmail, children }) {
             style={{
               padding: "10px 8px 4px",
               display: "grid",
-              gap: 6,
+              gap: 4,
             }}
           >
             <span
@@ -184,16 +184,6 @@ function AdminShellContent({ adminEmail, children }) {
             >
               <AdminText i18nKey="adminShellLogin.adminWorkspace" fallback="Admin workspace" />
             </span>
-            <strong
-              style={{
-                fontSize: "1.2rem",
-                fontWeight: 800,
-                letterSpacing: "-0.02em",
-              }}
-            >
-              <AdminText i18nKey="adminShellLogin.systemAdmin" fallback="System Admin" />
-            </strong>
-            <span style={{ color: "var(--app-text-muted)", lineHeight: 1.6 }}>{adminEmail}</span>
           </section>
 
           <nav
@@ -245,12 +235,10 @@ function AdminShellContent({ adminEmail, children }) {
             style={{
               display: "grid",
               gap: 2,
-              padding: "8px 12px",
-              borderRadius: 8,
-              background: "rgba(255,255,255,0.42)",
-              border: "1px solid rgba(172, 111, 70, 0.14)",
-              justifySelf: "start",
+              justifyItems: "center",
+              justifySelf: "center",
               alignSelf: "end",
+              textAlign: "center",
             }}
           >
             <span
@@ -312,7 +300,25 @@ function AdminShellContent({ adminEmail, children }) {
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12, flexWrap: "wrap" }}>
                 <AdminLanguageSwitcher />
-                <form action="/api/admin/logout" method="post" style={{ margin: 0 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end",
+                    gap: 12,
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <span
+                    style={{
+                      color: "var(--app-text-muted)",
+                      lineHeight: 1.4,
+                      fontWeight: 600,
+                    }}
+                  >
+                    {adminEmail}
+                  </span>
+                  <form action="/api/admin/logout" method="post" style={{ margin: 0 }}>
                   <button
                     type="submit"
                     style={{
@@ -328,7 +334,8 @@ function AdminShellContent({ adminEmail, children }) {
                   >
                     <AdminText i18nKey="adminShellLogin.logout" fallback="Logout" />
                   </button>
-                </form>
+                  </form>
+                </div>
               </div>
             </div>
           </header>
