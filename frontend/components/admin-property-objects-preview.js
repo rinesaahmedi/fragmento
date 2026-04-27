@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { AdminText } from "./admin-i18n";
 
 const DEFAULT_VISIBLE_OBJECTS = 2;
@@ -15,7 +15,75 @@ function propertyObjectContact(object) {
   return object.contactPhone || "";
 }
 
-export default function AdminPropertyObjectsPreview({ objects = [] }) {
+function buildObjectSearchIndex(object) {
+  return [
+    object.name,
+    object.contactPhone,
+    object.country,
+    object.city,
+    object.postalCode,
+    object.address1,
+    object.address2,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function prioritizeObjects(objects, priorityQuery) {
+  const query = String(priorityQuery || "").trim().toLowerCase();
+  if (!query) return objects;
+
+  const matching = [];
+  const nonMatching = [];
+
+  objects.forEach((object) => {
+    if (buildObjectSearchIndex(object).includes(query)) {
+      matching.push(object);
+      return;
+    }
+    nonMatching.push(object);
+  });
+
+  return [...matching, ...nonMatching];
+}
+
+function renderHighlightedText(text, query) {
+  const value = String(text || "");
+  const needle = String(query || "").trim();
+  if (!value || !needle) return value;
+
+  const lowerValue = value.toLowerCase();
+  const lowerNeedle = needle.toLowerCase();
+  const parts = [];
+  let cursor = 0;
+
+  while (cursor < value.length) {
+    const matchIndex = lowerValue.indexOf(lowerNeedle, cursor);
+    if (matchIndex === -1) {
+      parts.push(value.slice(cursor));
+      break;
+    }
+
+    if (matchIndex > cursor) {
+      parts.push(value.slice(cursor, matchIndex));
+    }
+
+    const matchedText = value.slice(matchIndex, matchIndex + needle.length);
+    parts.push(
+      <mark key={`${matchIndex}-${matchedText}`} style={highlightMarkStyle}>
+        {matchedText}
+      </mark>,
+    );
+    cursor = matchIndex + needle.length;
+  }
+
+  return parts.map((part, index) => (
+    <Fragment key={`${typeof part === "string" ? part : "mark"}-${index}`}>{part}</Fragment>
+  ));
+}
+
+export default function AdminPropertyObjectsPreview({ objects = [], priorityQuery = "" }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!objects.length) {
@@ -26,11 +94,12 @@ export default function AdminPropertyObjectsPreview({ objects = [] }) {
     );
   }
 
-  const hasOverflow = objects.length > DEFAULT_VISIBLE_OBJECTS;
+  const prioritizedObjects = prioritizeObjects(objects, priorityQuery);
+  const hasOverflow = prioritizedObjects.length > DEFAULT_VISIBLE_OBJECTS;
   const visibleObjects = hasOverflow && !isExpanded
-    ? objects.slice(0, DEFAULT_VISIBLE_OBJECTS)
-    : objects;
-  const hiddenCount = objects.length - DEFAULT_VISIBLE_OBJECTS;
+    ? prioritizedObjects.slice(0, DEFAULT_VISIBLE_OBJECTS)
+    : prioritizedObjects;
+  const hiddenCount = prioritizedObjects.length - DEFAULT_VISIBLE_OBJECTS;
 
   return (
     <div style={objectPreviewGroupStyle}>
@@ -41,13 +110,13 @@ export default function AdminPropertyObjectsPreview({ objects = [] }) {
           return (
             <div key={object.id} style={objectPreviewCardStyle}>
               <div style={objectPreviewHeaderStyle}>
-                <strong>{object.name}</strong>
+                <strong>{renderHighlightedText(object.name, priorityQuery)}</strong>
                 <span style={objectPreviewCountStyle}>
                   {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
                 </span>
               </div>
-              {address ? <span style={objectPreviewAddressStyle}>{address}</span> : null}
-              {contact ? <span style={objectPreviewMetaStyle}>{contact}</span> : null}
+              {address ? <span style={objectPreviewAddressStyle}>{renderHighlightedText(address, priorityQuery)}</span> : null}
+              {contact ? <span style={objectPreviewMetaStyle}>{renderHighlightedText(contact, priorityQuery)}</span> : null}
             </div>
           );
         })}
@@ -145,4 +214,11 @@ const toggleButtonStyle = {
   fontWeight: 800,
   cursor: "pointer",
   boxShadow: "var(--app-shadow-soft)",
+};
+
+const highlightMarkStyle = {
+  background: "var(--app-highlight-soft)",
+  color: "inherit",
+  padding: "0 2px",
+  borderRadius: 4,
 };

@@ -1,10 +1,10 @@
 import {
+  ActionLink,
   AdminSection,
   FlashMessage,
   FormField,
-  actionRowStyle,
+  secondaryButtonStyle,
   cardListStyle,
-  dangerButtonStyle,
   formGridStyle,
   inputStyle,
   itemCardStyle,
@@ -18,17 +18,21 @@ import {
   textareaStyle,
   thStyle,
 } from "../../../components/admin-ui";
+import Link from "next/link";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
-import AdminContractAddressFields from "../../../components/admin-contract-address-fields";
 import AdminPropertyOwnerObjectBuilder from "../../../components/admin-property-owner-object-builder";
 import AdminPropertyObjectsPreview from "../../../components/admin-property-objects-preview";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listPropertyOwnersForAdmin } from "../../../lib/catalog";
-import { Fragment } from "react";
 
 export const dynamic = "force-dynamic";
+
+function normalizeParam(value) {
+  if (Array.isArray(value)) return value[0] || "";
+  return value || "";
+}
 
 function formatDate(value) {
   if (!value) return "-";
@@ -46,22 +50,88 @@ function ownerContact(owner) {
   return [owner.address, owner.email].filter(Boolean);
 }
 
-function propertyObjectAddress(object) {
-  const streetLine = [object.address1, object.address2].filter(Boolean).join(", ");
-  const cityLine = [object.postalCode, object.city].filter(Boolean).join(" ");
-  return [streetLine, cityLine, object.country].filter(Boolean).join(" | ");
+function matchingObjects(owner, query) {
+  const needle = String(query || "").trim().toLowerCase();
+  if (!needle) return [];
+
+  return (owner.propertyObjects || []).filter((object) => [
+    object.name,
+    object.contactPhone,
+    object.country,
+    object.city,
+    object.postalCode,
+    object.address1,
+    object.address2,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase()
+    .includes(needle));
 }
 
-function propertyObjectContact(object) {
-  return object.contactPhone || "";
+function buildSearchSummary(owner, query) {
+  const needle = String(query || "").trim();
+  if (!needle) return "";
+
+  const matches = matchingObjects(owner, needle);
+  if (!matches.length) return "";
+
+  const firstMatch = matches[0];
+  const location = [firstMatch.city, firstMatch.country].filter(Boolean).join(", ");
+  const locationLabel = location || firstMatch.address1 || firstMatch.name;
+  return `${needle} - ${matches.length} object${matches.length === 1 ? "" : "s"} matched in ${locationLabel} for ${owner.name}.`;
+}
+
+function buildOwnerSearchIndex(owner) {
+  const ownerFields = [
+    owner.name,
+    owner.address,
+    owner.email,
+    owner.phone,
+    owner.notes,
+  ];
+
+  const objectFields = (owner.propertyObjects || []).flatMap((object) => ([
+    object.name,
+    object.contactPhone,
+    object.country,
+    object.city,
+    object.postalCode,
+    object.address1,
+    object.address2,
+  ]));
+
+  return [...ownerFields, ...objectFields]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function filterOwners(owners, filters) {
+  return owners.filter((owner) => {
+    const searchIndex = buildOwnerSearchIndex(owner);
+    const matchesQuery = !filters.query || searchIndex.includes(filters.query.toLowerCase());
+    const matchesLocation = !filters.location || (owner.propertyObjects || []).some((object) => String(object.country || "").trim() === filters.location);
+    return matchesQuery && matchesLocation;
+  });
 }
 
 export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
+  const filters = {
+    query: normalizeParam(resolvedSearchParams.q).trim(),
+    location: normalizeParam(resolvedSearchParams.location).trim(),
+    create: normalizeParam(resolvedSearchParams.create).trim(),
+  };
   const owners = await listPropertyOwnersForAdmin();
+  const filteredOwners = filterOwners(owners, filters);
+  const availableLocations = [...new Set(
+    owners.flatMap((owner) => (owner.propertyObjects || []).map((object) => String(object.country || "").trim()).filter(Boolean)),
+  )].sort((left, right) => left.localeCompare(right));
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
+  const createOpen = filters.create === "1";
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -73,36 +143,80 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
-          <form action="/api/admin/property-owners" method="post" style={formGridStyle}>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.companyName" fallback="Company name" />}>
-              <input name="name" style={inputStyle} required />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
-              <input name="email" type="email" style={inputStyle} />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
-              <input name="phone" style={inputStyle} />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.address" fallback="Address" />} wide>
-              <input name="address" style={inputStyle} />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
-              <textarea name="notes" rows={3} style={textareaStyle} />
-            </FormField>
-            <div style={{ gridColumn: "1 / -1" }}>
-              <AdminPropertyOwnerObjectBuilder />
+          <details open={createOpen} style={createOwnerDetailsStyle}>
+            <summary className="create-owner-summary" style={createOwnerSummaryStyle}>
+              <AdminText i18nKey="propertyOwnersAdmin.addHousingCompany" fallback="Add housing company" />
+            </summary>
+            <div style={createOwnerBodyStyle}>
+              <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.createOwnerPanelDescription" fallback="Open this panel only when you want to add a new housing company and optional objects." /></p>
+              <form action="/api/admin/property-owners" method="post" style={formGridStyle}>
+                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.companyName" fallback="Company name" />}>
+                  <input name="name" style={inputStyle} required />
+                </FormField>
+                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
+                  <input name="email" type="email" style={inputStyle} />
+                </FormField>
+                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
+                  <input name="phone" style={inputStyle} />
+                </FormField>
+                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.address" fallback="Address" />} wide>
+                  <input name="address" style={inputStyle} />
+                </FormField>
+                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
+                  <textarea name="notes" rows={3} style={textareaStyle} />
+                </FormField>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <AdminPropertyOwnerObjectBuilder />
+                </div>
+                <div style={{ gridColumn: "1 / -1" }}>
+                  <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.createOwner" fallback="Create owner" /></button>
+                </div>
+              </form>
             </div>
-            <div style={{ gridColumn: "1 / -1" }}>
-              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.createOwner" fallback="Create owner" /></button>
+          </details>
+        </AdminSection>
+
+        <AdminSection
+          title={<AdminText i18nKey="propertyOwnersAdmin.configuredCompanies" fallback="Configured housing companies" />}
+          description={<>{filteredOwners.length} <AdminText i18nKey="propertyOwnersAdmin.companiesMatchFilters" fallback="housing company record(s) match the current filters." /></>}
+        >
+          <form action="/admin/property-owners" method="get" style={filterPanelStyle}>
+            <div style={filterHeaderStyle}>
+              <span style={filterEyebrowStyle}><AdminText i18nKey="contractsAdmin.filters" fallback="Filters" /></span>
+              <span style={filterHintStyle}><AdminText i18nKey="propertyOwnersAdmin.searchEverythingHint" fallback="Search across company name, address, notes, object names, city, postal code, and location fields." /></span>
+            </div>
+            <div style={filterGridStyle}>
+              <FilterField label={<AdminText i18nKey="contractsAdmin.search" fallback="Search" />}>
+                <input
+                  name="q"
+                  defaultValue={filters.query}
+                  placeholder="Name, address, postal code, city, object..."
+                  style={filterInputStyle}
+                />
+              </FilterField>
+              <FilterField label={<AdminText i18nKey="propertyOwnersAdmin.location" fallback="Location" />}>
+                <select name="location" defaultValue={filters.location} style={filterInputStyle}>
+                  <option value=""><AdminText i18nKey="propertyOwnersAdmin.allLocations" fallback="All locations" /></option>
+                  {availableLocations.map((location) => (
+                    <option key={location} value={location}>
+                      {location}
+                    </option>
+                  ))}
+                </select>
+              </FilterField>
+              <div style={filterActionsStyle}>
+                <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
+                <Link href="/admin/property-owners" style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
+              </div>
             </div>
           </form>
 
-          <div className="admin-list-table" style={{ ...tableWrapStyle, marginTop: 18 }}>
+          <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <colgroup>
-                <col style={{ width: "16%" }} />
-                <col style={{ width: "22%" }} />
-                <col style={{ width: "32%" }} />
+                <col style={{ width: "18%" }} />
+                <col style={{ width: "24%" }} />
+                <col style={{ width: "28%" }} />
                 <col style={{ width: "8%" }} />
                 <col style={{ width: "10%" }} />
                 <col style={{ width: "12%" }} />
@@ -118,57 +232,52 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
                 </tr>
               </thead>
               <tbody>
-                {!owners.length ? (
+                {!filteredOwners.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={6}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersConfigured" fallback="No property owners configured." /></td>
+                    <td style={tdStyle} colSpan={6}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersMatchFilters" fallback="No housing companies match the current filters." /></td>
                   </tr>
                 ) : null}
-                {owners.map((owner) => (
-                  <Fragment key={owner.id}>
-                    <tr>
-                      <td style={tdStyle}>
-                        <strong>{ownerName(owner)}</strong>
-                        {owner.notes ? <div style={subMetaStyle}>{owner.notes}</div> : null}
-                      </td>
-                      <td style={tdStyle}><ContactValue owner={owner} /></td>
-                      <td style={tdStyle}>
-                        <AdminPropertyObjectsPreview objects={owner.propertyObjects} />
-                      </td>
-                      <td style={tdStyle}>{owner._count.contracts}</td>
-                      <td style={tdStyle}>{formatDate(owner.createdAt)}</td>
-                      <td style={tdStyle}>
-                        <a href={`#company-controls-${owner.id}`} style={manageAnchorStyle}>
-                          <AdminText i18nKey="propertyOwnersAdmin.manage" fallback="Manage" />
-                        </a>
-                      </td>
-                    </tr>
-                    <tr id={`company-controls-${owner.id}`}>
-                      <td style={managementRowTdStyle} colSpan={6}>
-                        <CompanyManagement owner={owner} />
-                      </td>
-                    </tr>
-                  </Fragment>
+                {filteredOwners.map((owner) => (
+                  <tr key={owner.id}>
+                    <td style={tdStyle}>
+                      <strong>{ownerName(owner)}</strong>
+                      {filters.query ? <div style={matchSummaryStyle}>{buildSearchSummary(owner, filters.query)}</div> : null}
+                    </td>
+                    <td style={tdStyle}><ContactValue owner={owner} /></td>
+                    <td style={tdStyle}>
+                      <AdminPropertyObjectsPreview objects={owner.propertyObjects} priorityQuery={filters.query} />
+                    </td>
+                    <td style={tdStyle}>{owner._count.contracts}</td>
+                    <td style={tdStyle}>{formatDate(owner.createdAt)}</td>
+                    <td style={tdStyle}>
+                      <ActionLink href={`/admin/property-owners/${owner.id}`}>
+                        <AdminText i18nKey="propertyOwnersAdmin.manage" fallback="Manage" />
+                      </ActionLink>
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
-          <div className="admin-list-cards" style={{ gap: cardListStyle.gap, marginTop: 18 }}>
-            {!owners.length ? <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersConfigured" fallback="No property owners configured." /></p> : null}
-            {owners.map((owner) => (
+          <div className="admin-list-cards" style={mobileCardListStyle}>
+            {!filteredOwners.length ? <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersMatchFilters" fallback="No housing companies match the current filters." /></p> : null}
+            {filteredOwners.map((owner) => (
               <article key={owner.id} style={itemCardStyle}>
                 <div style={{ display: "grid", gap: 6 }}>
                   <strong>{ownerName(owner)}</strong>
+                  {filters.query ? <div style={matchSummaryStyle}>{buildSearchSummary(owner, filters.query)}</div> : null}
                   <div style={subMetaStyle}>
                     <ContactValue owner={owner} />
                     <span>{owner._count.propertyObjects} <AdminText i18nKey="propertyOwnersAdmin.objectCount" fallback="object(s)" /></span>
                     <span>{owner._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
                     <span><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" />: {formatDate(owner.createdAt)}</span>
                   </div>
-                  {owner.notes ? <p style={mutedTextStyle}>{owner.notes}</p> : null}
-                  <AdminPropertyObjectsPreview objects={owner.propertyObjects} />
+                  <AdminPropertyObjectsPreview objects={owner.propertyObjects} priorityQuery={filters.query} />
                 </div>
-                <CompanyManagement owner={owner} />
+                <ActionLink href={`/admin/property-owners/${owner.id}`}>
+                  <AdminText i18nKey="propertyOwnersAdmin.manage" fallback="Manage" />
+                </ActionLink>
               </article>
             ))}
           </div>
@@ -187,6 +296,10 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
                 display: grid;
               }
             }
+
+            .create-owner-summary::-webkit-details-marker {
+              display: none;
+            }
           `}</style>
         </AdminSection>
       </div>
@@ -194,124 +307,12 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
   );
 }
 
-function CompanyManagement({ owner }) {
+function FilterField({ label, children }) {
   return (
-    <div style={managementStackStyle}>
-      <details style={managementPanelStyle}>
-        <summary style={managementSummaryStyle}>
-          <span style={managementEyebrowStyle}>Company details</span>
-          <strong style={managementTitleStyle}><AdminText i18nKey="propertyOwnersAdmin.editOwner" fallback="Edit housing company" /></strong>
-          <span style={managementHintStyle}>Update the company profile, contact details, and internal notes.</span>
-        </summary>
-        <div style={managementBodyStyle}>
-          <form action={`/api/admin/property-owners/${owner.id}`} method="post" style={editFormStyle}>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.companyName" fallback="Company name" />} wide>
-              <input name="name" defaultValue={owner.name} style={compactInputStyle} required />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
-              <input name="email" type="email" defaultValue={owner.email || ""} style={compactInputStyle} />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
-              <input name="phone" defaultValue={owner.phone || ""} style={compactInputStyle} />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.address" fallback="Address" />} wide>
-              <input name="address" defaultValue={owner.address || ""} style={compactInputStyle} />
-            </FormField>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
-              <textarea name="notes" defaultValue={owner.notes || ""} rows={3} style={compactTextareaStyle} />
-            </FormField>
-            <div style={formActionRowStyle}>
-              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveOwner" fallback="Save housing company" /></button>
-              <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete housing company" /></button>
-            </div>
-          </form>
-        </div>
-      </details>
-
-      <details style={managementPanelStyle}>
-        <summary style={managementSummaryStyle}>
-          <span style={managementEyebrowStyle}>Objects</span>
-          <strong style={managementTitleStyle}><AdminText i18nKey="propertyOwnersAdmin.manageObjects" fallback="Manage objects" /></strong>
-          <span style={managementHintStyle}>Create new buildings and keep each object address tidy and easy to review.</span>
-        </summary>
-        <div style={managementBodyStyle}>
-          <div style={objectsStackStyle}>
-            <section style={objectSectionStyle}>
-              <div style={objectSectionHeaderStyle}>
-                <div style={{ display: "grid", gap: 4 }}>
-                  <strong style={objectSectionTitleStyle}>Create new object</strong>
-                  <p style={mutedTextStyle}>Add one building at a time with a verified address.</p>
-                </div>
-              </div>
-              <form action={`/api/admin/property-owners/${owner.id}/objects`} method="post" style={objectFormStyle}>
-                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
-                  <input name="name" placeholder="Building A" style={compactInputStyle} required />
-                </FormField>
-                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
-                  <input
-                    name="contactPhone"
-                    placeholder="+49 170 1234567"
-                    style={compactInputStyle}
-                  />
-                </FormField>
-                <AdminContractAddressFields mode="object" compact includeUnitFields={false} includeNotes={false} referenceFieldName="name" />
-                <div style={formActionRowStyle}>
-                  <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.createObject" fallback="Create object" /></button>
-                </div>
-              </form>
-            </section>
-
-            <section style={objectSectionStyle}>
-              <div style={objectSectionHeaderStyle}>
-                <div style={{ display: "grid", gap: 4 }}>
-                  <strong style={objectSectionTitleStyle}>Existing objects</strong>
-                  <p style={mutedTextStyle}>Open an object card only when you need to update its address or remove it.</p>
-                </div>
-              </div>
-
-              {!owner.propertyObjects?.length ? (
-                <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.noObjectsConfigured" fallback="No objects configured for this company." /></p>
-              ) : null}
-
-              <div style={objectEditorListStyle}>
-                {(owner.propertyObjects || []).map((object) => (
-                  <details key={object.id} style={objectDetailsStyle}>
-                    <summary style={objectSummaryStyle}>
-                      <div style={objectSummaryContentStyle}>
-                        <strong>{object.name}</strong>
-                        {propertyObjectAddress(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectAddress(object)}</span> : null}
-                        {propertyObjectContact(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectContact(object)}</span> : null}
-                      </div>
-                      <span style={objectPreviewCountStyle}>
-                        {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
-                      </span>
-                    </summary>
-                    <form action={`/api/admin/property-objects/${object.id}`} method="post" style={objectFormStyle}>
-                      <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
-                        <input name="name" defaultValue={object.name} style={compactInputStyle} required />
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
-                        <input
-                          name="contactPhone"
-                          defaultValue={object.contactPhone || ""}
-                          placeholder="+49 170 1234567"
-                          style={compactInputStyle}
-                        />
-                      </FormField>
-                      <AdminContractAddressFields contract={object} mode="object" compact includeUnitFields={false} includeNotes={false} referenceFieldName="name" />
-                      <div style={formActionRowStyle}>
-                        <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveObject" fallback="Save object" /></button>
-                        <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteObject" fallback="Delete object" /></button>
-                      </div>
-                    </form>
-                  </details>
-                ))}
-              </div>
-            </section>
-          </div>
-        </div>
-      </details>
-    </div>
+    <label style={filterFieldStyle}>
+      <span>{label}</span>
+      {children}
+    </label>
   );
 }
 
@@ -330,154 +331,28 @@ function ContactValue({ owner }) {
   );
 }
 
-const managementPanelStyle = {
-  display: "grid",
-  gap: 0,
-  border: "1px solid rgba(143, 62, 44, 0.12)",
-  borderRadius: 16,
-  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,249,245,0.78))",
-  boxShadow: "var(--app-shadow-soft)",
-};
-
-const managementSummaryStyle = {
-  display: "grid",
-  gap: 4,
-  padding: "14px 16px",
-  cursor: "pointer",
-  color: "var(--app-text)",
-};
-
-const managementEyebrowStyle = {
-  color: "var(--app-text-muted)",
-  fontSize: 11,
-  fontWeight: 800,
-  letterSpacing: "0.12em",
-  textTransform: "uppercase",
-};
-
-const managementTitleStyle = {
-  color: "var(--app-accent)",
-  fontSize: 15,
-  lineHeight: 1.2,
-};
-
-const managementHintStyle = {
-  color: "var(--app-text-muted)",
-  fontSize: 13,
-  lineHeight: 1.5,
-};
-
 const contactStackStyle = {
   display: "grid",
   gap: 2,
 };
 
-const managementBodyStyle = {
+const filterGridStyle = {
   display: "grid",
-  gap: 16,
-  padding: "0 16px 16px",
-  borderTop: "1px solid rgba(143, 62, 44, 0.08)",
-};
-
-const editFormStyle = {
-  display: "grid",
-  gap: 14,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-};
-
-const compactInputStyle = {
-  ...inputStyle,
-  minHeight: 44,
-  padding: "8px 12px",
-  fontSize: "0.92rem",
-};
-
-const compactTextareaStyle = {
-  ...textareaStyle,
-  minHeight: 78,
-  padding: "8px 12px",
-  fontSize: "0.92rem",
-  lineHeight: 1.35,
-};
-
-const objectPreviewCountStyle = {
-  display: "inline-flex",
-  width: "fit-content",
-  borderRadius: 999,
-  padding: "3px 7px",
-  background: "rgba(45, 108, 121, 0.09)",
-  color: "var(--app-info-text)",
-  fontSize: 11,
-  fontWeight: 800,
-  whiteSpace: "nowrap",
-};
-
-const managementStackStyle = {
-  display: "grid",
-  gap: 14,
-  alignItems: "start",
-};
-
-const objectsStackStyle = {
-  display: "grid",
-  gap: 16,
-};
-
-const objectFormStyle = {
-  display: "grid",
-  gap: 14,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  alignItems: "start",
-  padding: 18,
-  border: "1px solid rgba(143, 62, 44, 0.12)",
-  borderRadius: 16,
-  background: "rgba(255,255,255,0.8)",
-};
-
-const formActionRowStyle = {
-  ...actionRowStyle,
-  gridColumn: "1 / -1",
-  paddingTop: 2,
-};
-
-const objectDetailsStyle = {
-  display: "grid",
-  gap: 0,
-  border: "1px solid rgba(45, 108, 121, 0.14)",
-  borderRadius: 16,
-  background: "rgba(255,255,255,0.82)",
-  overflow: "hidden",
-};
-
-const objectSummaryStyle = {
-  display: "flex",
   gap: 10,
-  justifyContent: "space-between",
-  alignItems: "flex-start",
-  padding: "14px 16px",
-  cursor: "pointer",
-  color: "var(--app-text)",
-  fontSize: 14,
-  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,252,251,0.9))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  alignItems: "end",
 };
 
-const objectSummaryContentStyle = {
-  display: "grid",
-  gap: 4,
-};
-
-const objectSummaryMetaStyle = {
-  color: "var(--app-text-muted)",
-  fontSize: 12,
-  lineHeight: 1.5,
-};
-
-const objectSectionStyle = {
+const filterPanelStyle = {
   display: "grid",
   gap: 12,
+  borderRadius: 8,
+  border: "1px solid rgba(143, 62, 44, 0.16)",
+  background: "linear-gradient(180deg, rgba(255,247,241,0.82), rgba(255,255,255,0.72))",
+  padding: 14,
 };
 
-const objectSectionHeaderStyle = {
+const filterHeaderStyle = {
   display: "flex",
   justifyContent: "space-between",
   alignItems: "center",
@@ -485,25 +360,107 @@ const objectSectionHeaderStyle = {
   flexWrap: "wrap",
 };
 
-const objectSectionTitleStyle = {
-  color: "var(--app-text)",
-  fontSize: 15,
-};
-
-const objectEditorListStyle = {
-  display: "grid",
-  gap: 12,
-};
-
-const managementRowTdStyle = {
-  padding: "10px 20px 18px",
-  borderBottom: "1px solid var(--app-border)",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,249,245,0.72))",
-};
-
-const manageAnchorStyle = {
+const filterEyebrowStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  borderRadius: 999,
+  padding: "6px 10px",
+  background: "rgba(143, 62, 44, 0.1)",
+  border: "1px solid rgba(143, 62, 44, 0.14)",
   color: "var(--app-accent)",
-  fontSize: 13,
+  fontSize: 12,
   fontWeight: 800,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+
+const filterHintStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 700,
+};
+
+const filterFieldStyle = {
+  display: "grid",
+  gap: 6,
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+};
+
+const filterInputStyle = {
+  ...inputStyle,
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 11px",
+  background: "rgba(255,255,255,0.94)",
+  fontSize: "0.92rem",
+  boxShadow: "none",
+};
+
+const filterActionsStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "end",
+  flexWrap: "nowrap",
+};
+
+const filterApplyButtonStyle = {
+  ...primaryButtonStyle,
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 14px",
+  fontSize: "0.92rem",
+  whiteSpace: "nowrap",
+  boxShadow: "0 10px 20px rgba(143, 62, 44, 0.16)",
+};
+
+const filterClearLinkStyle = {
   textDecoration: "none",
+  borderRadius: 8,
+  minHeight: 42,
+  padding: "9px 12px",
+  background: "rgba(255,255,255,0.88)",
+  color: "var(--app-accent)",
+  border: "1px solid rgba(143, 62, 44, 0.14)",
+  fontWeight: 800,
+  fontSize: "0.92rem",
+  display: "inline-flex",
+  alignItems: "center",
+  whiteSpace: "nowrap",
+};
+
+const createOwnerDetailsStyle = {
+  display: "grid",
+  gap: 16,
+};
+
+const createOwnerSummaryStyle = {
+  ...secondaryButtonStyle,
+  width: "fit-content",
+  minHeight: 46,
+  borderRadius: 8,
+  padding: "12px 18px",
+  listStyle: "none",
+  cursor: "pointer",
+};
+
+const createOwnerBodyStyle = {
+  display: "grid",
+  gap: 18,
+  paddingTop: 8,
+};
+
+const mobileCardListStyle = {
+  gap: cardListStyle.gap,
+};
+
+const matchSummaryStyle = {
+  color: "var(--app-info-text)",
+  fontSize: 12,
+  fontWeight: 700,
+  lineHeight: 1.45,
+  marginTop: 4,
 };

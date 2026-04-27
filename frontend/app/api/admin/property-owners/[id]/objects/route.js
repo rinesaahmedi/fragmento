@@ -18,6 +18,7 @@ function parseAddressVerificationRecord(formData) {
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
+  const detailPath = `/admin/property-owners/${id}`;
 
   try {
     const formData = await request.formData();
@@ -39,8 +40,8 @@ export async function POST(request, { params }) {
       VALUES (${randomUUID()}, ${data.name}, ${id}, ${data.contactPhone}, ${data.country}, ${data.city}, ${data.postalCode}, ${data.address1}, ${data.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `;
 
-    return redirectWithFlash(request, "/admin/property-owners", "success", "Property object created.");
+    return redirectWithFlash(request, detailPath, "success", "Property object created.");
   } catch (error) {
-    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Property object"));
+    return redirectWithFlash(request, `${detailPath}?createObject=1`, "error", mapAdminMutationError(error, "Property object"));
   }
 }

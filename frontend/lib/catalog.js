@@ -186,6 +186,11 @@ export async function listPropertyOwnersForAdmin() {
   }));
 }
 
+export async function getPropertyOwnerForAdmin(id) {
+  const owners = await listPropertyOwnersForAdmin();
+  return owners.find((owner) => owner.id === id) || null;
+}
+
 export async function listPropertyObjectsForAdmin(filters = {}) {
   const whereParts = [];
   if (filters.housingCompanyId) whereParts.push(Prisma.sql`pobj."housingCompanyId" = ${filters.housingCompanyId}`);

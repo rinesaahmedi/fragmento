@@ -17,14 +17,22 @@ function parseAddressVerificationRecord(formData) {
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
+  let detailPath = "/admin/property-owners";
 
   try {
+    const [propertyObject] = await prisma.$queryRaw`
+      SELECT "housingCompanyId" FROM "PropertyObject" WHERE "id" = ${id} LIMIT 1
+    `;
+    if (propertyObject?.housingCompanyId) {
+      detailPath = `/admin/property-owners/${propertyObject.housingCompanyId}`;
+    }
+
     const formData = await request.formData();
     const intent = String(formData.get("_intent") || "").trim();
 
     if (intent === "delete") {
       await prisma.$executeRaw`DELETE FROM "PropertyObject" WHERE "id" = ${id}`;
-      return redirectWithFlash(request, "/admin/property-owners", "success", "Property object deleted.");
+      return redirectWithFlash(request, detailPath, "success", "Property object deleted.");
     }
 
     const data = validatePropertyObjectInput(formData);
@@ -47,8 +55,8 @@ export async function POST(request, { params }) {
       WHERE "id" = ${id}
     `;
 
-    return redirectWithFlash(request, "/admin/property-owners", "success", "Property object updated.");
+    return redirectWithFlash(request, detailPath, "success", "Property object updated.");
   } catch (error) {
-    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Property object"));
+    return redirectWithFlash(request, detailPath, "error", mapAdminMutationError(error, "Property object"));
   }
 }

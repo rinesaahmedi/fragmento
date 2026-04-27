@@ -26,22 +26,24 @@ export async function POST(request, { params }) {
     }
 
     const data = validateKitchenContractInput(formData);
-    const [propertyObject] = await prisma.$queryRaw`
-      SELECT "id"
-      FROM "PropertyObject"
-      WHERE "id" = ${data.propertyObjectId}
-        AND "housingCompanyId" = ${data.housingCompanyId}
-      LIMIT 1
-    `;
-    if (!propertyObject) {
-      throw new Error("Select a valid property object for the housing company.");
+    if (data.housingCompanyId && data.propertyObjectId) {
+      const [propertyObject] = await prisma.$queryRaw`
+        SELECT "id"
+        FROM "PropertyObject"
+        WHERE "id" = ${data.propertyObjectId}
+          AND "housingCompanyId" = ${data.housingCompanyId}
+        LIMIT 1
+      `;
+      if (!propertyObject) {
+        throw new Error("Select a valid property object for the housing company.");
+      }
     }
 
     await prisma.kitchenContract.create({
       data: {
         contractNumber: data.contractNumber,
         kitchenId: kitchen.id,
-        propertyObjectId: data.propertyObjectId,
+        propertyObjectId: data.propertyObjectId || null,
         isActive: true,
         building: data.building,
         floor: data.floor,

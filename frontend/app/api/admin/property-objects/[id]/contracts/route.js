@@ -1,0 +1,58 @@
+import { mapAdminMutationError, redirectWithFlash } from "../../../../../../lib/admin-forms";
+import { requireAdminApi } from "../../../../../../lib/auth";
+import { prisma } from "../../../../../../lib/prisma";
+
+export async function POST(request, { params }) {
+  await requireAdminApi();
+  const { id } = await params;
+  let detailPath = "/admin/property-owners";
+
+  try {
+    const formData = await request.formData();
+    const kitchenId = String(formData.get("kitchenId") || "").trim();
+    const contractNumber = String(formData.get("contractNumber") || "").trim();
+    const building = String(formData.get("building") || "").trim() || null;
+    const floor = String(formData.get("floor") || "").trim() || null;
+    const unitNumber = String(formData.get("unitNumber") || "").trim() || null;
+    const notes = String(formData.get("notes") || "").trim() || null;
+
+    if (!kitchenId) {
+      throw new Error("Kitchen is required.");
+    }
+    if (!contractNumber) {
+      throw new Error("Contract number is required.");
+    }
+
+    const [propertyObject] = await prisma.$queryRaw`
+      SELECT "id", "housingCompanyId"
+      FROM "PropertyObject"
+      WHERE "id" = ${id}
+      LIMIT 1
+    `;
+    if (!propertyObject) {
+      throw new Error("Property object not found.");
+    }
+
+    detailPath = `/admin/property-owners/${propertyObject.housingCompanyId}?openObject=${id}`;
+
+    await prisma.kitchenContract.create({
+      data: {
+        contractNumber,
+        kitchenId,
+        propertyObjectId: id,
+        isActive: true,
+        building,
+        floor,
+        unitNumber,
+        notes,
+      },
+    });
+
+    return redirectWithFlash(request, detailPath, "success", "Contract number created.");
+  } catch (error) {
+    const errorPath = detailPath.includes("?")
+      ? `${detailPath}&createContractFor=${id}`
+      : `${detailPath}?createContractFor=${id}`;
+    return redirectWithFlash(request, errorPath, "error", mapAdminMutationError(error, "Contract number"));
+  }
+}

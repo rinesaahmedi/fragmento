@@ -99,9 +99,9 @@ export function FormField({ label, children, wide = false }) {
   );
 }
 
-export function ActionLink({ href, children, secondary = false }) {
+export function ActionLink({ href, children, secondary = false, scroll }) {
   return (
-    <Link href={href} style={secondary ? secondaryLinkStyle : linkButtonStyle}>
+    <Link href={href} scroll={scroll} style={secondary ? secondaryLinkStyle : linkButtonStyle}>
       {children}
     </Link>
   );

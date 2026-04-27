@@ -99,6 +99,6 @@ export async function POST(request) {
       : "Housing company created.";
     return redirectWithFlash(request, "/admin/property-owners", "success", successMessage);
   } catch (error) {
-    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Housing company"));
+    return redirectWithFlash(request, "/admin/property-owners?create=1", "error", mapAdminMutationError(error, "Housing company"));
   }
 }

@@ -78,11 +78,25 @@ export function validateKitchenItemInput(formData) {
   };
 }
 
-export function validateKitchenContractInput(formData) {
+export function validateKitchenContractInput(formData, options = {}) {
+  const contractNumber = requiredString(formData.get("contractNumber"), "Contract number");
+  const housingCompanyId = optionalString(formData.get("housingCompanyId"));
+  const propertyObjectId = optionalString(formData.get("propertyObjectId"));
+  const allowInlineObject = Boolean(options.allowInlineObject);
+  const hasInlineObject = Boolean(options.hasInlineObject);
+
+  if (housingCompanyId && !propertyObjectId && !(allowInlineObject && hasInlineObject)) {
+    throw new Error("Select a property object for the housing company.");
+  }
+
+  if (!housingCompanyId && propertyObjectId) {
+    throw new Error("Select a housing company for the chosen property object.");
+  }
+
   return {
-    contractNumber: requiredString(formData.get("contractNumber"), "Contract number"),
-    housingCompanyId: requiredString(formData.get("housingCompanyId"), "Housing company"),
-    propertyObjectId: requiredString(formData.get("propertyObjectId"), "Property object"),
+    contractNumber,
+    housingCompanyId,
+    propertyObjectId,
     building: optionalString(formData.get("building")),
     floor: optionalString(formData.get("floor")),
     unitNumber: optionalString(formData.get("unitNumber")),

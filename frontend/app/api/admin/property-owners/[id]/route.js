@@ -42,6 +42,7 @@ export async function GET(_request, { params }) {
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
+  const detailPath = `/admin/property-owners/${id}`;
 
   try {
     const formData = await request.formData();
@@ -65,8 +66,8 @@ export async function POST(request, { params }) {
       WHERE "id" = ${id}
     `;
 
-    return redirectWithFlash(request, "/admin/property-owners", "success", "Housing company updated.");
+    return redirectWithFlash(request, detailPath, "success", "Housing company updated.");
   } catch (error) {
-    return redirectWithFlash(request, "/admin/property-owners", "error", mapAdminMutationError(error, "Housing company"));
+    return redirectWithFlash(request, detailPath, "error", mapAdminMutationError(error, "Housing company"));
   }
 }
