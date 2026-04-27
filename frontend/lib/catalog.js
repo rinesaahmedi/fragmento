@@ -256,6 +256,7 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     whereParts.push(Prisma.sql`(
       kc."contractNumber" ILIKE ${query}
       OR pobj."name" ILIKE ${query}
+      OR pobj."country" ILIKE ${query}
       OR pobj."city" ILIKE ${query}
       OR pobj."postalCode" ILIKE ${query}
       OR pobj."address1" ILIKE ${query}
@@ -558,6 +559,50 @@ export function serializeKitchenForLegacy(kitchen) {
   };
 }
 
+function buildOrderAdminSearch(query) {
+  const contains = { contains: query, mode: "insensitive" };
+
+  return [
+    { orderNumber: contains },
+    { firstName: contains },
+    { lastName: contains },
+    { email: contains },
+    { city: contains },
+    { postalCode: contains },
+    { country: contains },
+    { address1: contains },
+    { address2: contains },
+    {
+      kitchen: {
+        name: contains,
+      },
+    },
+    {
+      kitchenContract: {
+        is: {
+          OR: [
+            { contractNumber: contains },
+            {
+              propertyObject: {
+                is: {
+                  OR: [
+                    { name: contains },
+                    { city: contains },
+                    { country: contains },
+                    { postalCode: contains },
+                    { address1: contains },
+                    { address2: contains },
+                  ],
+                },
+              },
+            },
+          ],
+        },
+      },
+    },
+  ];
+}
+
 export async function getOrdersForAdmin(filters = {}) {
   const where = {};
 
@@ -572,6 +617,11 @@ export async function getOrdersForAdmin(filters = {}) {
       endDate.setHours(23, 59, 59, 999);
       where.createdAt.lte = endDate;
     }
+  }
+
+  const query = String(filters.q || "").trim();
+  if (query) {
+    where.OR = buildOrderAdminSearch(query);
   }
 
   const orders = await prisma.order.findMany({

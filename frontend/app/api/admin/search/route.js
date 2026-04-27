@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
 import { requireAdminApi } from "../../../../lib/auth";
-import { getOrdersForAdmin } from "../../../../lib/catalog";
+import { getAdminEntitySearch } from "../../../../lib/admin-search";
 
 export async function GET(request) {
   await requireAdminApi();
   const { searchParams } = new URL(request.url);
-  const orders = await getOrdersForAdmin({
+
+  const payload = {
+    q: searchParams.get("q") || "",
+    selected: searchParams.getAll("selected"),
+    period: searchParams.get("period") || "",
     kitchenId: searchParams.get("kitchenId") || "",
     status: searchParams.get("status") || "",
-    dateFrom: searchParams.get("dateFrom") || "",
-    dateTo: searchParams.get("dateTo") || "",
-    q: searchParams.get("q") || "",
-  });
+  };
 
-  return NextResponse.json(orders);
+  return NextResponse.json(await getAdminEntitySearch(payload));
 }

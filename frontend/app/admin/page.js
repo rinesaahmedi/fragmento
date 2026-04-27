@@ -1,6 +1,6 @@
 import { AdminShell } from "../../components/admin-shell";
 import { AdminDashboardCharts } from "../../components/admin-dashboard-charts";
-import { listKitchensForAdmin, listPropertyOwnersForAdmin } from "../../lib/catalog";
+import { listKitchensForAdmin } from "../../lib/catalog";
 import { requireAdminPage } from "../../lib/auth";
 import { getProviderCountryConfig } from "../../lib/address-verification";
 import { prisma } from "../../lib/prisma";
@@ -429,27 +429,6 @@ async function loadGroupedItemRows(filters) {
   `;
 }
 
-async function loadRecentOrders(where) {
-  return prisma.order.findMany({
-    where,
-    orderBy: { createdAt: "desc" },
-    take: 5,
-    select: {
-      id: true,
-      orderNumber: true,
-      status: true,
-      totalPrice: true,
-      city: true,
-      createdAt: true,
-      kitchen: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
-}
-
 function buildOwnerStatsOrderFilter({ startDate, kitchenId, status }) {
   return buildOrderAndClause({ startDate, kitchenId, status }, "o");
 }
@@ -552,15 +531,9 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const validStatus = ORDER_STATUSES.includes(status) ? status : "";
   const startDate = getPeriodStartDate(period);
 
-  const where = {};
-  if (startDate) where.createdAt = { gte: startDate };
-  if (kitchenId) where.kitchenId = kitchenId;
-  if (validStatus) where.status = validStatus;
-
   const dashboardFilters = { startDate, kitchenId, status: validStatus };
-  const [kitchens, propertyOwners, propertyOwnerStats, summary, dailyStatusRows, kitchenTimelineRows, paymentRows, geographyRows, groupedItemRows, recentOrderRows] = await Promise.all([
+  const [kitchens, propertyOwnerStats, summary, dailyStatusRows, kitchenTimelineRows, paymentRows, geographyRows, groupedItemRows] = await Promise.all([
     listKitchensForAdmin(),
-    listPropertyOwnersForAdmin(),
     loadPropertyOwnerStats({ startDate, kitchenId, status: validStatus }),
     loadDashboardSummary(dashboardFilters),
     loadDailyStatusRows(dashboardFilters),
@@ -568,7 +541,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     loadPaymentRows(dashboardFilters),
     loadGeographyRows(dashboardFilters),
     loadGroupedItemRows(dashboardFilters),
-    loadRecentOrders(where),
   ]);
   const totalOrders = summary.totalOrders;
   const totalRevenue = summary.totalRevenue;
@@ -705,16 +677,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       orderShare: totalOrders ? (row.orders / totalOrders) * 100 : 0,
     }))
     .sort((a, b) => b.orders - a.orders);
-  const recentOrders = recentOrderRows.map((order) => ({
-    id: order.id,
-    orderNumber: order.orderNumber,
-    kitchen: order.kitchen.name,
-    status: order.status,
-    totalPrice: Number(order.totalPrice || 0),
-    city: order.city || "",
-    createdAt: formatDateTime(order.createdAt),
-  }));
-
   const kpis = [
     {
       labelKey: "dashboard.totalOrders",
@@ -765,16 +727,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         itemTypeData={itemTypeData}
         paymentData={paymentData}
         geographyData={geographyData}
-        recentOrders={recentOrders}
         propertyOwnerStats={propertyOwnerStats}
-        propertyOwners={propertyOwners.map((owner) => ({
-          id: owner.id,
-          name: owner.name || "",
-          email: owner.email || "",
-          phone: owner.phone || "",
-          notes: owner.notes || "",
-          contractCount: owner._count?.contracts || 0,
-        }))}
       />
     </AdminShell>
   );

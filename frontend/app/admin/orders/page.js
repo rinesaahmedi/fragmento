@@ -5,8 +5,10 @@ import {
   StatusBadge,
   cardListStyle,
   dangerButtonStyle,
+  inputStyle,
   itemCardStyle,
   pageGridStyle,
+  primaryButtonStyle,
   subMetaStyle,
   tableStyle,
   tableWrapStyle,
@@ -16,7 +18,7 @@ import {
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
 import { getFormMessage } from "../../../lib/admin-forms";
-import { getOrdersForAdmin } from "../../../lib/catalog";
+import { getOrdersForAdmin, listKitchensForAdmin } from "../../../lib/catalog";
 import { requireAdminPage } from "../../../lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -55,6 +57,11 @@ function getContractOrderLabel(order) {
   return formatOrdinal(order.contractOrderSequence);
 }
 
+function normalizeParam(value) {
+  if (Array.isArray(value)) return value[0] || "";
+  return value || "";
+}
+
 function DeleteOrderAction({ orderId, compact = false }) {
   return (
     <details style={compact ? cardDeleteDetailsStyle : tableDeleteDetailsStyle}>
@@ -73,7 +80,17 @@ function DeleteOrderAction({ orderId, compact = false }) {
 export default async function AdminOrdersPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
-  const orders = await getOrdersForAdmin();
+  const filters = {
+    q: normalizeParam(resolvedSearchParams.q).trim(),
+    kitchenId: normalizeParam(resolvedSearchParams.kitchenId).trim(),
+    status: normalizeParam(resolvedSearchParams.status).trim(),
+    dateFrom: normalizeParam(resolvedSearchParams.dateFrom).trim(),
+    dateTo: normalizeParam(resolvedSearchParams.dateTo).trim(),
+  };
+  const [orders, kitchens] = await Promise.all([
+    getOrdersForAdmin(filters),
+    listKitchensForAdmin(),
+  ]);
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
@@ -82,10 +99,59 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
       <div style={pageGridStyle}>
         <AdminSection
           title={<AdminText i18nKey="ordersAdmin.orders" fallback="Orders" />}
-          description={<><AdminText i18nKey="ordersAdmin.savedOrdersFromPublicConfigurator" fallback="Saved orders from the public configurator." /> <AdminText i18nKey="ordersAdmin.reviewOrdersAndDeleteEntriesWhenNeeded" fallback="Review orders and delete entries when needed." /></>}
+          description={<>{orders.length} <AdminText i18nKey="ordersAdmin.ordersMatchCurrentFilters" fallback="order(s) match the current filters." /></>}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
+
+          <form action="/admin/orders" method="get" style={filterPanelStyle}>
+            <div style={filterHeaderStyle}>
+              <span style={filterEyebrowStyle}><AdminText i18nKey="contractsAdmin.filters" fallback="Filters" /></span>
+              <span style={filterHintStyle}><AdminText i18nKey="ordersAdmin.filterOrdersByCustomerContractAddressAndDate" fallback="Filter orders by customer, contract, address, kitchen, status, or date." /></span>
+            </div>
+            <div style={filterGridStyle}>
+              <label style={filterFieldStyle}>
+                <span><AdminText i18nKey="contractsAdmin.search" fallback="Search" /></span>
+                <input
+                  name="q"
+                  defaultValue={filters.q}
+                  placeholder="Order, customer, city, contract..."
+                  style={filterInputStyle}
+                />
+              </label>
+              <label style={filterFieldStyle}>
+                <span><AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" /></span>
+                <select name="kitchenId" defaultValue={filters.kitchenId} style={filterInputStyle}>
+                  <option value=""><AdminText i18nKey="dashboard.allKitchens" fallback="All kitchens" /></option>
+                  {kitchens.map((kitchen) => (
+                    <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
+                  ))}
+                </select>
+              </label>
+              <label style={filterFieldStyle}>
+                <span><AdminText i18nKey="dashboard.status" fallback="Status" /></span>
+                <select name="status" defaultValue={filters.status} style={filterInputStyle}>
+                  <option value=""><AdminText i18nKey="dashboard.allStatuses" fallback="All statuses" /></option>
+                  <option value="NEW"><AdminText i18nKey="dashboard.statusNew" fallback="New" /></option>
+                  <option value="EMAILED"><AdminText i18nKey="dashboard.statusEmailed" fallback="Emailed" /></option>
+                  <option value="CONFIRMED"><AdminText i18nKey="dashboard.statusConfirmed" fallback="Confirmed" /></option>
+                  <option value="CANCELLED"><AdminText i18nKey="dashboard.statusCancelled" fallback="Cancelled" /></option>
+                </select>
+              </label>
+              <label style={filterFieldStyle}>
+                <span><AdminText i18nKey="ordersAdmin.dateFrom" fallback="Date from" /></span>
+                <input name="dateFrom" type="date" defaultValue={filters.dateFrom} style={filterInputStyle} />
+              </label>
+              <label style={filterFieldStyle}>
+                <span><AdminText i18nKey="ordersAdmin.dateTo" fallback="Date to" /></span>
+                <input name="dateTo" type="date" defaultValue={filters.dateTo} style={filterInputStyle} />
+              </label>
+              <div style={filterActionsStyle}>
+                <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
+                <Link href="/admin/orders" style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
+              </div>
+            </div>
+          </form>
 
           <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
@@ -97,6 +163,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.articleCodes" fallback="Article Codes" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
+                  <th style={thStyle}><AdminText i18nKey="contractAddressFields.city" fallback="City" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
@@ -104,7 +171,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={8}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
+                    <td style={tdStyle} colSpan={9}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
                   </tr>
                 ) : null}
                 {orders.map((order) => (
@@ -127,6 +194,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                     </td>
                     <td style={tdStyle}><StatusBadge status={order.status} /></td>
                     <td style={tdStyle}>{formatCurrency(order.totalPrice)}</td>
+                    <td style={tdStyle}>{order.city || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</td>
                     <td style={tdStyle}>{formatDate(order.createdAt)}</td>
                     <td style={{ ...tdStyle, width: 148 }}>
                       <DeleteOrderAction orderId={order.id} />
@@ -159,6 +227,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                   </div>
                   <div style={subMetaStyle}>
                     <span>{order.email}</span>
+                    <span>{order.city || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</span>
                     <span>{formatDate(order.createdAt)}</span>
                   </div>
                   <div style={articleCodesStyle}>{formatArticleCodes(order.items)}</div>
@@ -259,4 +328,101 @@ const cardActionRowStyle = {
   alignItems: "center",
   gap: 12,
   flexWrap: "wrap",
+};
+
+const filterGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  alignItems: "end",
+};
+
+const filterPanelStyle = {
+  display: "grid",
+  gap: 12,
+  borderRadius: 8,
+  border: "1px solid rgba(143, 62, 44, 0.16)",
+  background: "linear-gradient(180deg, rgba(255,247,241,0.82), rgba(255,255,255,0.72))",
+  padding: 14,
+  marginBottom: 16,
+};
+
+const filterHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+  flexWrap: "wrap",
+};
+
+const filterEyebrowStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  borderRadius: 999,
+  padding: "6px 10px",
+  background: "rgba(143, 62, 44, 0.1)",
+  border: "1px solid rgba(143, 62, 44, 0.14)",
+  color: "var(--app-accent)",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+};
+
+const filterHintStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 700,
+};
+
+const filterFieldStyle = {
+  display: "grid",
+  gap: 6,
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 800,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
+};
+
+const filterInputStyle = {
+  ...inputStyle,
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 11px",
+  background: "rgba(255,255,255,0.94)",
+  fontSize: "0.92rem",
+  boxShadow: "none",
+};
+
+const filterActionsStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "end",
+  flexWrap: "nowrap",
+};
+
+const filterApplyButtonStyle = {
+  ...primaryButtonStyle,
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 14px",
+  fontSize: "0.92rem",
+  whiteSpace: "nowrap",
+  boxShadow: "0 10px 20px rgba(143, 62, 44, 0.16)",
+};
+
+const filterClearLinkStyle = {
+  textDecoration: "none",
+  borderRadius: 8,
+  minHeight: 42,
+  padding: "9px 12px",
+  background: "rgba(255,255,255,0.88)",
+  color: "var(--app-accent)",
+  border: "1px solid rgba(143, 62, 44, 0.14)",
+  fontWeight: 800,
+  fontSize: "0.92rem",
+  display: "inline-flex",
+  alignItems: "center",
+  whiteSpace: "nowrap",
 };

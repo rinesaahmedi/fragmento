@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useAdminI18n } from "./admin-i18n";
+import { AdminEntitySearch } from "./admin-entity-search";
 import {
   Bar,
   BarChart,
@@ -68,9 +69,7 @@ export function AdminDashboardCharts({
   itemTypeData,
   paymentData,
   geographyData,
-  recentOrders,
   propertyOwnerStats,
-  propertyOwners,
 }) {
   const { translate } = useAdminI18n();
   const [statusMode, setStatusMode] = useState("volume");
@@ -132,6 +131,7 @@ export function AdminDashboardCharts({
             </select>
           </label>
           <button type="submit">{translate("dashboard.apply", "Apply")}</button>
+          <a href="/admin" className="toolbar-link">{translate("dashboard.clearFilters", "Clear filters")}</a>
         </form>
       </section>
 
@@ -144,6 +144,8 @@ export function AdminDashboardCharts({
           </article>
         ))}
       </section>
+
+      <AdminEntitySearch period={selectedPeriod} kitchenId={selectedKitchenId} status={selectedStatus} />
 
       <section className="chart-card chart-card--status">
         <ChartHeader
@@ -227,77 +229,6 @@ export function AdminDashboardCharts({
 
       <PropertyOwnerStatsSection data={propertyOwnerStats || []} />
 
-      <section className="chart-card">
-        <ChartHeader eyebrow={translate("dashboard.operations", "Operations")} title={translate("dashboard.recentOrders", "Recent orders")} detail={translate("dashboard.latestMatchingOrdersForFollowUp", "Latest matching orders for follow-up.")} />
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>{translate("ordersAdmin.order", "Order")}</th>
-                <th>{translate("ordersAdmin.kitchen", "Kitchen")}</th>
-                <th>{translate("ordersAdmin.status", "Status")}</th>
-                <th>{translate("ordersAdmin.total", "Total")}</th>
-                <th>{translate("contractAddressFields.city", "City")}</th>
-                <th>{translate("ordersAdmin.created", "Created")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentOrders.length ? recentOrders.map((order) => (
-                <tr key={order.id}>
-                  <td><a href={`/admin/orders/${order.id}`}>{order.orderNumber}</a></td>
-                  <td>{order.kitchen}</td>
-                  <td><span className="status-pill" style={{ "--status-color": STATUS_COLORS[order.status] }}>{translateStatus(order.status, translate)}</span></td>
-                  <td>{formatCurrency(order.totalPrice)}</td>
-                  <td>{order.city || translate("orderDetailAdmin.notProvided", "Not provided")}</td>
-                  <td>{order.createdAt}</td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan={6}>{translate("ordersAdmin.noOrdersFound", "No orders found.")}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="chart-card">
-        <ChartHeader
-          eyebrow={translate("adminShellLogin.owners", "Owners")}
-          title={translate("dashboard.propertyOwners", "Property owners")}
-          detail={translate("dashboard.ownerRecordsAvailableForContractNumberAssignment", "Owner records available for contract number assignment.")}
-          actions={<a className="panel-link" href="/admin/property-owners">{translate("dashboard.manageOwners", "Manage owners")}</a>}
-        />
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>{translate("propertyOwnersAdmin.owner", "Owner")}</th>
-                <th>{translate("propertyOwnersAdmin.email", "Email")}</th>
-                <th>{translate("propertyOwnersAdmin.phone", "Phone")}</th>
-                <th>{translate("propertyOwnersAdmin.contracts", "Contracts")}</th>
-                <th>{translate("propertyOwnersAdmin.notes", "Notes")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {propertyOwners?.length ? propertyOwners.map((owner) => (
-                <tr key={owner.id}>
-                  <td><a href="/admin/property-owners">{owner.name}</a></td>
-                  <td>{owner.email || translate("orderDetailAdmin.notProvided", "Not provided")}</td>
-                  <td>{owner.phone || translate("orderDetailAdmin.notProvided", "Not provided")}</td>
-                  <td>{owner.contractCount}</td>
-                  <td>{owner.notes || "-"}</td>
-                </tr>
-              )) : (
-                <tr>
-                  <td colSpan={5}>{translate("propertyOwnersAdmin.noPropertyOwnersConfigured", "No property owners configured.")}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
       <style jsx>{`
         .analytics-dashboard {
           display: grid;
@@ -336,7 +267,7 @@ export function AdminDashboardCharts({
 
         .filter-form {
           display: grid;
-          grid-template-columns: repeat(4, minmax(130px, auto));
+          grid-template-columns: repeat(5, minmax(130px, auto));
           gap: 10px;
           align-items: end;
         }
@@ -351,6 +282,7 @@ export function AdminDashboardCharts({
           letter-spacing: 0.06em;
         }
 
+        input,
         select,
         button {
           min-height: 42px;
@@ -370,6 +302,21 @@ export function AdminDashboardCharts({
           color: #ffffff;
           font-weight: 800;
           cursor: pointer;
+        }
+
+        .toolbar-link {
+          min-height: 42px;
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+          background: #ffffff;
+          color: #111827;
+          padding: 9px 12px;
+          font: inherit;
+          font-weight: 700;
+          text-decoration: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
         }
 
         .kpi-grid,
