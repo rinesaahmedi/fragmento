@@ -47,7 +47,7 @@ Mos ngarko `.env` ne Git.
 4. Zgjidh repository-n.
 5. Netlify do perdore automatikisht:
    - Base directory: `frontend`
-   - Build command: `npm run build`
+   - Build command: `npm run build:netlify`
 
 ## 4. Domain falas
 
@@ -63,11 +63,13 @@ Mund ta ndryshosh te:
 
 ## 5. Migrimet e databazes
 
-Pasi databaza publike te jete krijuar, lokalishte ose ne server ekzekuto:
+Migrimet nuk duhen ekzekutuar gjate `Netlify build`, sepse nje migrim i deshtuar bllokon deploy-et e ardhshme edhe nese kodi i aplikacionit eshte ne rregull.
+
+Pasi databaza publike te jete krijuar, ekzekuto migrimet manualisht nga nje ambient i kontrolluar:
 
 ```bash
 cd frontend
-npx prisma migrate deploy
+npm run prisma:deploy
 node prisma/seed.js
 ```
 
@@ -75,6 +77,8 @@ Per `seed` duhen edhe:
 
 - `ADMIN_EMAIL`
 - `ADMIN_PASSWORD`
+
+Nese ke nje migrim te deshtuar ne prodhim, fillimisht duhet ta zgjidhesh ne databaze me `prisma migrate resolve`, pastaj te ekzekutosh perseri `npm run prisma:deploy`.
 
 ## 6. Cfare nuk funksionon me DB lokale ne PC
 

@@ -5,10 +5,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "build:netlify": "prisma migrate deploy && prisma generate && next build",
+    "build:netlify": "prisma generate && next build",
     "start": "next start",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "node prisma/seed.js",
     "migrate:order-item-codes": "node scripts/migrate-order-item-codes.js",
     "seed:dashboard-demo": "node scripts/seed-dashboard-demo.js"
