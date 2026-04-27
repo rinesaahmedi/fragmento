@@ -1,5 +1,5 @@
 ALTER TABLE "HousingCompany"
-ADD COLUMN "address" TEXT;
+ADD COLUMN IF NOT EXISTS "address" TEXT;
 
 ALTER TABLE "PropertyObject"
-ADD COLUMN "contactPhone" TEXT;
+ADD COLUMN IF NOT EXISTS "contactPhone" TEXT;
