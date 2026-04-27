@@ -35,8 +35,8 @@ export async function POST(request, { params }) {
     }
 
     await prisma.$executeRaw`
-      INSERT INTO "PropertyObject" ("id", "name", "housingCompanyId", "country", "city", "postalCode", "address1", "address2", "createdAt", "updatedAt")
-      VALUES (${randomUUID()}, ${data.name}, ${id}, ${data.country}, ${data.city}, ${data.postalCode}, ${data.address1}, ${data.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      INSERT INTO "PropertyObject" ("id", "name", "housingCompanyId", "contactPhone", "country", "city", "postalCode", "address1", "address2", "createdAt", "updatedAt")
+      VALUES (${randomUUID()}, ${data.name}, ${id}, ${data.contactPhone}, ${data.country}, ${data.city}, ${data.postalCode}, ${data.address1}, ${data.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `;
 
     return redirectWithFlash(request, "/admin/property-owners", "success", "Property object created.");

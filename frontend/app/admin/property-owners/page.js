@@ -21,6 +21,8 @@ import {
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
 import AdminContractAddressFields from "../../../components/admin-contract-address-fields";
+import AdminPropertyOwnerObjectBuilder from "../../../components/admin-property-owner-object-builder";
+import AdminPropertyObjectsPreview from "../../../components/admin-property-objects-preview";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listPropertyOwnersForAdmin } from "../../../lib/catalog";
@@ -41,13 +43,17 @@ function ownerName(owner) {
 }
 
 function ownerContact(owner) {
-  return [owner.email, owner.phone].filter(Boolean).join(" | ") || "No contact details";
+  return [owner.address, owner.email].filter(Boolean);
 }
 
 function propertyObjectAddress(object) {
   const streetLine = [object.address1, object.address2].filter(Boolean).join(", ");
   const cityLine = [object.postalCode, object.city].filter(Boolean).join(" ");
   return [streetLine, cityLine, object.country].filter(Boolean).join(" | ");
+}
+
+function propertyObjectContact(object) {
+  return object.contactPhone || "";
 }
 
 export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
@@ -77,9 +83,15 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
             <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
               <input name="phone" style={inputStyle} />
             </FormField>
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.address" fallback="Address" />} wide>
+              <input name="address" style={inputStyle} />
+            </FormField>
             <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
               <textarea name="notes" rows={3} style={textareaStyle} />
             </FormField>
+            <div style={{ gridColumn: "1 / -1" }}>
+              <AdminPropertyOwnerObjectBuilder />
+            </div>
             <div style={{ gridColumn: "1 / -1" }}>
               <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.createOwner" fallback="Create owner" /></button>
             </div>
@@ -118,9 +130,9 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
                         <strong>{ownerName(owner)}</strong>
                         {owner.notes ? <div style={subMetaStyle}>{owner.notes}</div> : null}
                       </td>
-                      <td style={tdStyle}>{ownerContact(owner)}</td>
+                      <td style={tdStyle}><ContactValue owner={owner} /></td>
                       <td style={tdStyle}>
-                        <PropertyObjectsPreview owner={owner} />
+                        <AdminPropertyObjectsPreview objects={owner.propertyObjects} />
                       </td>
                       <td style={tdStyle}>{owner._count.contracts}</td>
                       <td style={tdStyle}>{formatDate(owner.createdAt)}</td>
@@ -148,13 +160,13 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
                 <div style={{ display: "grid", gap: 6 }}>
                   <strong>{ownerName(owner)}</strong>
                   <div style={subMetaStyle}>
-                    <span>{ownerContact(owner)}</span>
+                    <ContactValue owner={owner} />
                     <span>{owner._count.propertyObjects} <AdminText i18nKey="propertyOwnersAdmin.objectCount" fallback="object(s)" /></span>
                     <span>{owner._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
                     <span><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" />: {formatDate(owner.createdAt)}</span>
                   </div>
                   {owner.notes ? <p style={mutedTextStyle}>{owner.notes}</p> : null}
-                  <PropertyObjectsPreview owner={owner} />
+                  <AdminPropertyObjectsPreview objects={owner.propertyObjects} />
                 </div>
                 <CompanyManagement owner={owner} />
               </article>
@@ -182,160 +194,210 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
   );
 }
 
-function PropertyObjectsPreview({ owner }) {
-  const objects = owner.propertyObjects || [];
-
-  if (!objects.length) {
-    return (
-      <span style={emptyObjectPreviewStyle}>
-        <AdminText i18nKey="propertyOwnersAdmin.noObjectsConfigured" fallback="No objects configured for this company." />
-      </span>
-    );
-  }
-
-  return (
-    <div style={objectPreviewListStyle}>
-      {objects.map((object) => {
-        const address = propertyObjectAddress(object);
-        return (
-          <div key={object.id} style={objectPreviewCardStyle}>
-            <div style={objectPreviewHeaderStyle}>
-              <strong>{object.name}</strong>
-              <span style={objectPreviewCountStyle}>
-                {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
-              </span>
-            </div>
-            {address ? <span style={objectPreviewAddressStyle}>{address}</span> : null}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function CompanyManagement({ owner }) {
   return (
     <div style={managementStackStyle}>
-      <details style={editDetailsStyle}>
-        <summary style={editSummaryStyle}><AdminText i18nKey="propertyOwnersAdmin.editOwner" fallback="Edit housing company" /></summary>
-        <form action={`/api/admin/property-owners/${owner.id}`} method="post" style={editFormStyle}>
-          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.companyName" fallback="Company name" />}>
-            <input name="name" defaultValue={owner.name} style={compactInputStyle} required />
-          </FormField>
-          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
-            <input name="email" type="email" defaultValue={owner.email || ""} style={compactInputStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
-            <input name="phone" defaultValue={owner.phone || ""} style={compactInputStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
-            <textarea name="notes" defaultValue={owner.notes || ""} rows={2} style={compactTextareaStyle} />
-          </FormField>
-          <div style={actionRowStyle}>
-            <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveOwner" fallback="Save housing company" /></button>
-            <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete housing company" /></button>
-          </div>
-        </form>
-      </details>
-
-      <details style={editDetailsStyle}>
-        <summary style={editSummaryStyle}><AdminText i18nKey="propertyOwnersAdmin.manageObjects" fallback="Manage objects" /></summary>
-        <div style={objectsStackStyle}>
-          <form action={`/api/admin/property-owners/${owner.id}/objects`} method="post" style={objectFormStyle}>
-            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />}>
-              <input name="name" placeholder="Building A" style={compactInputStyle} required />
+      <details style={managementPanelStyle}>
+        <summary style={managementSummaryStyle}>
+          <span style={managementEyebrowStyle}>Company details</span>
+          <strong style={managementTitleStyle}><AdminText i18nKey="propertyOwnersAdmin.editOwner" fallback="Edit housing company" /></strong>
+          <span style={managementHintStyle}>Update the company profile, contact details, and internal notes.</span>
+        </summary>
+        <div style={managementBodyStyle}>
+          <form action={`/api/admin/property-owners/${owner.id}`} method="post" style={editFormStyle}>
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.companyName" fallback="Company name" />} wide>
+              <input name="name" defaultValue={owner.name} style={compactInputStyle} required />
             </FormField>
-            <AdminContractAddressFields mode="object" compact includeUnitFields={false} includeNotes={false} referenceFieldName="name" />
-            <div style={actionRowStyle}>
-              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.createObject" fallback="Create object" /></button>
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.email" fallback="Email" />}>
+              <input name="email" type="email" defaultValue={owner.email || ""} style={compactInputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.phone" fallback="Phone" />}>
+              <input name="phone" defaultValue={owner.phone || ""} style={compactInputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.address" fallback="Address" />} wide>
+              <input name="address" defaultValue={owner.address || ""} style={compactInputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="propertyOwnersAdmin.notes" fallback="Notes" />} wide>
+              <textarea name="notes" defaultValue={owner.notes || ""} rows={3} style={compactTextareaStyle} />
+            </FormField>
+            <div style={formActionRowStyle}>
+              <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveOwner" fallback="Save housing company" /></button>
+              <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete housing company" /></button>
             </div>
           </form>
+        </div>
+      </details>
 
-          {!owner.propertyObjects?.length ? (
-            <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.noObjectsConfigured" fallback="No objects configured for this company." /></p>
-          ) : null}
-
-          {(owner.propertyObjects || []).map((object) => (
-            <details key={object.id} style={objectDetailsStyle}>
-              <summary style={objectSummaryStyle}>
-                <strong>{object.name}</strong>
-                <span>{object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
-              </summary>
-              <form action={`/api/admin/property-objects/${object.id}`} method="post" style={objectFormStyle}>
-                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />}>
-                  <input name="name" defaultValue={object.name} style={compactInputStyle} required />
+      <details style={managementPanelStyle}>
+        <summary style={managementSummaryStyle}>
+          <span style={managementEyebrowStyle}>Objects</span>
+          <strong style={managementTitleStyle}><AdminText i18nKey="propertyOwnersAdmin.manageObjects" fallback="Manage objects" /></strong>
+          <span style={managementHintStyle}>Create new buildings and keep each object address tidy and easy to review.</span>
+        </summary>
+        <div style={managementBodyStyle}>
+          <div style={objectsStackStyle}>
+            <section style={objectSectionStyle}>
+              <div style={objectSectionHeaderStyle}>
+                <div style={{ display: "grid", gap: 4 }}>
+                  <strong style={objectSectionTitleStyle}>Create new object</strong>
+                  <p style={mutedTextStyle}>Add one building at a time with a verified address.</p>
+                </div>
+              </div>
+              <form action={`/api/admin/property-owners/${owner.id}/objects`} method="post" style={objectFormStyle}>
+                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
+                  <input name="name" placeholder="Building A" style={compactInputStyle} required />
                 </FormField>
-                <AdminContractAddressFields contract={object} mode="object" compact includeUnitFields={false} includeNotes={false} referenceFieldName="name" />
-                <div style={actionRowStyle}>
-                  <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveObject" fallback="Save object" /></button>
-                  <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteObject" fallback="Delete object" /></button>
+                <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
+                  <input
+                    name="contactPhone"
+                    placeholder="+49 170 1234567"
+                    style={compactInputStyle}
+                  />
+                </FormField>
+                <AdminContractAddressFields mode="object" compact includeUnitFields={false} includeNotes={false} referenceFieldName="name" />
+                <div style={formActionRowStyle}>
+                  <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.createObject" fallback="Create object" /></button>
                 </div>
               </form>
-            </details>
-          ))}
+            </section>
+
+            <section style={objectSectionStyle}>
+              <div style={objectSectionHeaderStyle}>
+                <div style={{ display: "grid", gap: 4 }}>
+                  <strong style={objectSectionTitleStyle}>Existing objects</strong>
+                  <p style={mutedTextStyle}>Open an object card only when you need to update its address or remove it.</p>
+                </div>
+              </div>
+
+              {!owner.propertyObjects?.length ? (
+                <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.noObjectsConfigured" fallback="No objects configured for this company." /></p>
+              ) : null}
+
+              <div style={objectEditorListStyle}>
+                {(owner.propertyObjects || []).map((object) => (
+                  <details key={object.id} style={objectDetailsStyle}>
+                    <summary style={objectSummaryStyle}>
+                      <div style={objectSummaryContentStyle}>
+                        <strong>{object.name}</strong>
+                        {propertyObjectAddress(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectAddress(object)}</span> : null}
+                        {propertyObjectContact(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectContact(object)}</span> : null}
+                      </div>
+                      <span style={objectPreviewCountStyle}>
+                        {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
+                      </span>
+                    </summary>
+                    <form action={`/api/admin/property-objects/${object.id}`} method="post" style={objectFormStyle}>
+                      <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
+                        <input name="name" defaultValue={object.name} style={compactInputStyle} required />
+                      </FormField>
+                      <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
+                        <input
+                          name="contactPhone"
+                          defaultValue={object.contactPhone || ""}
+                          placeholder="+49 170 1234567"
+                          style={compactInputStyle}
+                        />
+                      </FormField>
+                      <AdminContractAddressFields contract={object} mode="object" compact includeUnitFields={false} includeNotes={false} referenceFieldName="name" />
+                      <div style={formActionRowStyle}>
+                        <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveObject" fallback="Save object" /></button>
+                        <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteObject" fallback="Delete object" /></button>
+                      </div>
+                    </form>
+                  </details>
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
       </details>
     </div>
   );
 }
 
-const editDetailsStyle = {
+function ContactValue({ owner }) {
+  const lines = ownerContact(owner);
+  if (!lines.length) {
+    return <AdminText i18nKey="propertyOwnersAdmin.noContactDetails" fallback="No contact details" />;
+  }
+
+  return (
+    <span style={contactStackStyle}>
+      {lines.map((line) => (
+        <span key={line}>{line}</span>
+      ))}
+    </span>
+  );
+}
+
+const managementPanelStyle = {
   display: "grid",
-  gap: 8,
+  gap: 0,
+  border: "1px solid rgba(143, 62, 44, 0.12)",
+  borderRadius: 16,
+  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,249,245,0.78))",
+  boxShadow: "var(--app-shadow-soft)",
 };
 
-const editSummaryStyle = {
-  color: "var(--app-accent)",
+const managementSummaryStyle = {
+  display: "grid",
+  gap: 4,
+  padding: "14px 16px",
   cursor: "pointer",
-  fontSize: 13,
+  color: "var(--app-text)",
+};
+
+const managementEyebrowStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 11,
   fontWeight: 800,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+};
+
+const managementTitleStyle = {
+  color: "var(--app-accent)",
+  fontSize: 15,
+  lineHeight: 1.2,
+};
+
+const managementHintStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  lineHeight: 1.5,
+};
+
+const contactStackStyle = {
+  display: "grid",
+  gap: 2,
+};
+
+const managementBodyStyle = {
+  display: "grid",
+  gap: 16,
+  padding: "0 16px 16px",
+  borderTop: "1px solid rgba(143, 62, 44, 0.08)",
 };
 
 const editFormStyle = {
   display: "grid",
-  gap: 8,
-  paddingTop: 8,
+  gap: 14,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
 };
 
 const compactInputStyle = {
   ...inputStyle,
-  minHeight: 38,
-  padding: "6px 10px",
+  minHeight: 44,
+  padding: "8px 12px",
   fontSize: "0.92rem",
 };
 
 const compactTextareaStyle = {
   ...textareaStyle,
-  minHeight: 42,
-  padding: "6px 10px",
+  minHeight: 78,
+  padding: "8px 12px",
   fontSize: "0.92rem",
   lineHeight: 1.35,
-};
-
-const objectPreviewListStyle = {
-  display: "grid",
-  gap: 6,
-  minWidth: 320,
-  maxWidth: 520,
-};
-
-const objectPreviewCardStyle = {
-  display: "grid",
-  gap: 3,
-  padding: "7px 9px",
-  borderRadius: 9,
-  border: "1px solid rgba(45, 108, 121, 0.14)",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(245,250,249,0.72))",
-};
-
-const objectPreviewHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 10,
-  color: "var(--app-text)",
-  fontSize: 13,
-  lineHeight: 1.2,
 };
 
 const objectPreviewCountStyle = {
@@ -350,64 +412,91 @@ const objectPreviewCountStyle = {
   whiteSpace: "nowrap",
 };
 
-const objectPreviewAddressStyle = {
-  color: "var(--app-text-muted)",
-  fontSize: 12,
-  lineHeight: 1.35,
-  overflowWrap: "anywhere",
-};
-
-const emptyObjectPreviewStyle = {
-  color: "var(--app-text-muted)",
-  fontSize: 13,
-  fontWeight: 700,
-};
-
 const managementStackStyle = {
   display: "grid",
-  gap: 12,
-  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+  gap: 14,
   alignItems: "start",
 };
 
 const objectsStackStyle = {
   display: "grid",
-  gap: 12,
-  paddingTop: 8,
+  gap: 16,
 };
 
 const objectFormStyle = {
   display: "grid",
-  gap: 10,
-  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
-  alignItems: "end",
-  padding: 10,
+  gap: 14,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  alignItems: "start",
+  padding: 18,
   border: "1px solid rgba(143, 62, 44, 0.12)",
-  borderRadius: 10,
-  background: "rgba(255,255,255,0.72)",
+  borderRadius: 16,
+  background: "rgba(255,255,255,0.8)",
+};
+
+const formActionRowStyle = {
+  ...actionRowStyle,
+  gridColumn: "1 / -1",
+  paddingTop: 2,
 };
 
 const objectDetailsStyle = {
   display: "grid",
-  gap: 8,
+  gap: 0,
   border: "1px solid rgba(45, 108, 121, 0.14)",
-  borderRadius: 10,
-  background: "rgba(255,255,255,0.78)",
+  borderRadius: 16,
+  background: "rgba(255,255,255,0.82)",
+  overflow: "hidden",
 };
 
 const objectSummaryStyle = {
   display: "flex",
   gap: 10,
   justifyContent: "space-between",
-  alignItems: "center",
-  padding: "10px 12px",
+  alignItems: "flex-start",
+  padding: "14px 16px",
   cursor: "pointer",
   color: "var(--app-text)",
-  fontSize: 13,
+  fontSize: 14,
+  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,252,251,0.9))",
+};
+
+const objectSummaryContentStyle = {
+  display: "grid",
+  gap: 4,
+};
+
+const objectSummaryMetaStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  lineHeight: 1.5,
+};
+
+const objectSectionStyle = {
+  display: "grid",
+  gap: 12,
+};
+
+const objectSectionHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 12,
+  flexWrap: "wrap",
+};
+
+const objectSectionTitleStyle = {
+  color: "var(--app-text)",
+  fontSize: 15,
+};
+
+const objectEditorListStyle = {
+  display: "grid",
+  gap: 12,
 };
 
 const managementRowTdStyle = {
-  padding: "0 20px 16px",
+  padding: "10px 20px 18px",
   borderBottom: "1px solid var(--app-border)",
   background: "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,249,245,0.72))",
 };

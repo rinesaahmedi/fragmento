@@ -93,20 +93,26 @@ export function validateKitchenContractInput(formData) {
 export function validatePropertyOwnerInput(formData) {
   return {
     name: requiredString(formData.get("name"), "Company name"),
+    address: optionalString(formData.get("address")),
     email: optionalString(formData.get("email")),
     phone: optionalString(formData.get("phone")),
     notes: optionalString(formData.get("notes")),
   };
 }
 
-export function validatePropertyObjectInput(formData) {
+function propertyObjectFieldName(fieldNames, key) {
+  return fieldNames?.[key] || key;
+}
+
+export function validatePropertyObjectInput(formData, fieldNames = {}) {
   return {
-    name: requiredString(formData.get("name"), "Object name"),
-    country: optionalString(formData.get("country")),
-    city: optionalString(formData.get("city")),
-    postalCode: optionalString(formData.get("postalCode")),
-    address1: optionalString(formData.get("address1")),
-    address2: optionalString(formData.get("address2")),
+    name: requiredString(formData.get(propertyObjectFieldName(fieldNames, "name")), "Object name"),
+    contactPhone: optionalString(formData.get(propertyObjectFieldName(fieldNames, "contactPhone"))),
+    country: optionalString(formData.get(propertyObjectFieldName(fieldNames, "country"))),
+    city: optionalString(formData.get(propertyObjectFieldName(fieldNames, "city"))),
+    postalCode: optionalString(formData.get(propertyObjectFieldName(fieldNames, "postalCode"))),
+    address1: optionalString(formData.get(propertyObjectFieldName(fieldNames, "address1"))),
+    address2: optionalString(formData.get(propertyObjectFieldName(fieldNames, "address2"))),
   };
 }
 

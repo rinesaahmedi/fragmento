@@ -123,6 +123,7 @@ model KitchenContract {
 model HousingCompany {
   id              String           @id @default(cuid())
   name            String
+  address         String?
   email           String?
   phone           String?
   notes           String?
@@ -136,6 +137,7 @@ model PropertyObject {
   name             String
   housingCompanyId String
   housingCompany   HousingCompany    @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
+  contactPhone     String?
   country          String?
   city             String?
   postalCode       String?

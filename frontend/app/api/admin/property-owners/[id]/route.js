@@ -10,6 +10,7 @@ export async function GET(_request, { params }) {
     SELECT
       hc."id",
       hc."name",
+      hc."address",
       hc."email",
       hc."phone",
       hc."notes",
@@ -56,6 +57,7 @@ export async function POST(request, { params }) {
       UPDATE "HousingCompany"
       SET
         "name" = ${data.name},
+        "address" = ${data.address},
         "email" = ${data.email},
         "phone" = ${data.phone},
         "notes" = ${data.notes},

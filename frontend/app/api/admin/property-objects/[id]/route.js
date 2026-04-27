@@ -37,6 +37,7 @@ export async function POST(request, { params }) {
       UPDATE "PropertyObject"
       SET
         "name" = ${data.name},
+        "contactPhone" = ${data.contactPhone},
         "country" = ${data.country},
         "city" = ${data.city},
         "postalCode" = ${data.postalCode},

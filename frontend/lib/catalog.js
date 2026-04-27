@@ -114,6 +114,7 @@ export async function listPropertyOwnersForAdmin() {
     SELECT
       hc."id",
       hc."name",
+      hc."address",
       hc."email",
       hc."phone",
       hc."notes",
@@ -125,7 +126,7 @@ export async function listPropertyOwnersForAdmin() {
     LEFT JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
     LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
     GROUP BY hc."id"
-    ORDER BY hc."name" ASC
+    ORDER BY hc."createdAt" DESC, hc."name" ASC
   `;
 
   const objects = await prisma.$queryRaw`
@@ -133,6 +134,7 @@ export async function listPropertyOwnersForAdmin() {
       pobj."id",
       pobj."name",
       pobj."housingCompanyId",
+      pobj."contactPhone",
       pobj."country",
       pobj."city",
       pobj."postalCode",
@@ -144,7 +146,7 @@ export async function listPropertyOwnersForAdmin() {
     FROM "PropertyObject" pobj
     LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
     GROUP BY pobj."id"
-    ORDER BY pobj."name" ASC
+    ORDER BY pobj."createdAt" DESC, pobj."name" ASC
   `;
 
   const objectsByCompanyId = new Map();
@@ -154,6 +156,7 @@ export async function listPropertyOwnersForAdmin() {
       id: object.id,
       name: object.name,
       housingCompanyId: object.housingCompanyId,
+      contactPhone: object.contactPhone,
       country: object.country,
       city: object.city,
       postalCode: object.postalCode,
@@ -169,6 +172,7 @@ export async function listPropertyOwnersForAdmin() {
   return companies.map((company) => ({
     id: company.id,
     name: company.name,
+    address: company.address,
     email: company.email,
     phone: company.phone,
     notes: company.notes,
@@ -192,6 +196,7 @@ export async function listPropertyObjectsForAdmin(filters = {}) {
       pobj."id",
       pobj."name",
       pobj."housingCompanyId",
+      pobj."contactPhone",
       pobj."country",
       pobj."city",
       pobj."postalCode",
@@ -206,13 +211,14 @@ export async function listPropertyObjectsForAdmin(filters = {}) {
     LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
     ${whereSql}
     GROUP BY pobj."id", hc."id"
-    ORDER BY hc."name" ASC, pobj."name" ASC
+    ORDER BY hc."createdAt" DESC, pobj."createdAt" DESC, pobj."name" ASC
   `;
 
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
     housingCompanyId: row.housingCompanyId,
+    contactPhone: row.contactPhone,
     country: row.country,
     city: row.city,
     postalCode: row.postalCode,

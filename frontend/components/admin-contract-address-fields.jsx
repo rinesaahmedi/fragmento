@@ -111,10 +111,22 @@ export default function AdminContractAddressFields({
   mode = "contract",
   includeUnitFields = true,
   includeNotes = true,
+  allowEmpty = false,
   referenceFieldName = "contractNumber",
+  fieldNames = {},
 }) {
   const { translate } = useAdminI18n();
   const markerRef = useRef(null);
+  const countryFieldName = fieldNames.country || "country";
+  const cityFieldName = fieldNames.city || "city";
+  const postalCodeFieldName = fieldNames.postalCode || "postalCode";
+  const address1FieldName = fieldNames.address1 || "address1";
+  const address2FieldName = fieldNames.address2 || "address2";
+  const buildingFieldName = fieldNames.building || "building";
+  const floorFieldName = fieldNames.floor || "floor";
+  const unitNumberFieldName = fieldNames.unitNumber || "unitNumber";
+  const notesFieldName = fieldNames.notes || "notes";
+  const addressVerificationFieldName = fieldNames.addressVerification || "addressVerification";
   const [country, setCountry] = useState(normalizeAdminCountry(contract.country));
   const [city, setCity] = useState(contract.city || "");
   const [postalCode, setPostalCode] = useState(contract.postalCode || "");
@@ -138,16 +150,26 @@ export default function AdminContractAddressFields({
     addressVerification.status === ADDRESS_VERIFICATION_STATUS.INVALID
     || addressVerification.status === ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE;
   const isObjectAddress = mode === "object";
+  const shouldSpanVerificationControls = !compact;
+
+  function isSnapshotEmpty(snapshot) {
+    return !snapshot.contractNumber
+      && !snapshot.address1
+      && !snapshot.address2
+      && !snapshot.country
+      && !snapshot.city
+      && !snapshot.postalCode;
+  }
 
   function getFormSnapshot(form) {
     const formData = new FormData(form);
     return buildAddressVerificationSnapshot({
       contractNumber: formData.get(referenceFieldName),
-      address1: formData.get("address1"),
-      address2: formData.get("address2"),
-      postalCode: formData.get("postalCode"),
-      city: formData.get("city"),
-      country: formData.get("country"),
+      address1: formData.get(address1FieldName),
+      address2: formData.get(address2FieldName),
+      postalCode: formData.get(postalCodeFieldName),
+      city: formData.get(cityFieldName),
+      country: formData.get(countryFieldName),
     });
   }
 
@@ -155,12 +177,22 @@ export default function AdminContractAddressFields({
     const form = markerRef.current?.closest("form");
     if (!form) return undefined;
 
-    const relevantFieldNames = new Set([referenceFieldName, "address1", "address2", "country", "city", "postalCode"]);
+    const relevantFieldNames = new Set([
+      referenceFieldName,
+      address1FieldName,
+      address2FieldName,
+      countryFieldName,
+      cityFieldName,
+      postalCodeFieldName,
+    ]);
 
     const invalidateVerification = () => {
       setAddressVerification((current) => {
         const verifiedSnapshot = current?.verification?.snapshot;
         const currentSnapshot = getFormSnapshot(form);
+        if (allowEmpty && isSnapshotEmpty(currentSnapshot)) {
+          return buildAddressVerificationState();
+        }
         if (!verifiedSnapshot) {
           if (
             current.status === ADDRESS_VERIFICATION_STATUS.IDLE
@@ -191,6 +223,10 @@ export default function AdminContractAddressFields({
 
     const handleSubmit = (event) => {
       const snapshot = getFormSnapshot(form);
+      if (allowEmpty && isSnapshotEmpty(snapshot)) {
+        setAddressVerification((current) => (current.status === ADDRESS_VERIFICATION_STATUS.IDLE ? current : buildAddressVerificationState()));
+        return;
+      }
 
       setAddressVerification((current) => {
         const verifiedSnapshot = current?.verification?.snapshot;
@@ -218,7 +254,15 @@ export default function AdminContractAddressFields({
       form.removeEventListener("change", handleFieldMutation);
       form.removeEventListener("submit", handleSubmit);
     };
-  }, [referenceFieldName]);
+  }, [
+    address1FieldName,
+    address2FieldName,
+    allowEmpty,
+    cityFieldName,
+    countryFieldName,
+    postalCodeFieldName,
+    referenceFieldName,
+  ]);
 
   async function handleVerifyAddress() {
     const form = markerRef.current?.closest("form");
@@ -280,7 +324,7 @@ export default function AdminContractAddressFields({
     <div ref={markerRef} style={{ display: "contents" }}>
       <Field label={translate("contractAddressFields.country", "Country")}>
         <select
-          name="country"
+          name={countryFieldName}
           value={country}
           style={inputStyle}
           onChange={(event) => {
@@ -298,7 +342,7 @@ export default function AdminContractAddressFields({
 
       <Field label={translate("contractAddressFields.city", "City")}>
         <select
-          name="city"
+          name={cityFieldName}
           value={city}
           style={inputStyle}
           disabled={!country}
@@ -316,7 +360,7 @@ export default function AdminContractAddressFields({
 
       <Field label={translate("contractAddressFields.postalCode", "Postal code")}>
         <select
-          name="postalCode"
+          name={postalCodeFieldName}
           value={postalCode}
           style={inputStyle}
           disabled={!city}
@@ -330,36 +374,36 @@ export default function AdminContractAddressFields({
       </Field>
 
       <Field label={translate("contractAddressFields.addressLine1", "Address line 1")}>
-        <input name="address1" defaultValue={contract.address1 || ""} style={inputStyle} />
+        <input name={address1FieldName} defaultValue={contract.address1 || ""} style={inputStyle} />
       </Field>
       <Field label={translate("contractAddressFields.addressLine2", "Address line 2")}>
-        <input name="address2" defaultValue={contract.address2 || ""} style={inputStyle} />
+        <input name={address2FieldName} defaultValue={contract.address2 || ""} style={inputStyle} />
       </Field>
       {includeUnitFields ? (
         <>
           <Field label={translate("contractAddressFields.building", "Building")}>
-            <input name="building" defaultValue={contract.building || ""} style={inputStyle} />
+            <input name={buildingFieldName} defaultValue={contract.building || ""} style={inputStyle} />
           </Field>
           <Field label={translate("contractAddressFields.floor", "Floor")}>
-            <input name="floor" defaultValue={contract.floor || ""} style={inputStyle} />
+            <input name={floorFieldName} defaultValue={contract.floor || ""} style={inputStyle} />
           </Field>
           <Field label={translate("contractAddressFields.unitNumber", "Unit number")}>
-            <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={inputStyle} />
+            <input name={unitNumberFieldName} defaultValue={contract.unitNumber || ""} style={inputStyle} />
           </Field>
         </>
       ) : null}
       {includeNotes ? (
         <Field label={translate("contractAddressFields.notes", "Notes")} wide>
-          <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={notesStyle} />
+          <textarea name={notesFieldName} defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={notesStyle} />
         </Field>
       ) : null}
       <input
         type="hidden"
-        name="addressVerification"
+        name={addressVerificationFieldName}
         value={addressVerification.verification ? JSON.stringify(addressVerification.verification) : ""}
         readOnly
       />
-      <div style={{ ...baseFieldStyle, gridColumn: compact ? "1 / -1" : undefined }}>
+      <div style={{ ...baseFieldStyle, gridColumn: shouldSpanVerificationControls ? "1 / -1" : undefined }}>
         <button
           type="button"
           onClick={handleVerifyAddress}
@@ -403,6 +447,7 @@ export default function AdminContractAddressFields({
         aria-live="polite"
         style={{
           ...verificationMessageBaseStyle,
+          gridColumn: shouldSpanVerificationControls ? "1 / -1" : undefined,
           background: isVerificationValid
             ? "rgba(47, 146, 81, 0.08)"
             : isVerificationPartial
