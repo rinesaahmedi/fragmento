@@ -186,9 +186,21 @@ export async function listPropertyOwnersForAdmin() {
   }));
 }
 
+function normalizeLookupId(value) {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) return "";
+
+  try {
+    return decodeURIComponent(rawValue);
+  } catch {
+    return rawValue;
+  }
+}
+
 export async function getPropertyOwnerForAdmin(id) {
+  const normalizedId = normalizeLookupId(id);
   const owners = await listPropertyOwnersForAdmin();
-  return owners.find((owner) => owner.id === id) || null;
+  return owners.find((owner) => owner.id === normalizedId || owner.id === id) || null;
 }
 
 export async function listPropertyObjectsForAdmin(filters = {}) {

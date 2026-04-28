@@ -4,6 +4,17 @@ import { isAddressVerificationRecordValid } from "../../../../../../lib/address-
 import { requireAdminApi } from "../../../../../../lib/auth";
 import { prisma } from "../../../../../../lib/prisma";
 
+function normalizeRouteId(value) {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) return "";
+
+  try {
+    return decodeURIComponent(rawValue);
+  } catch {
+    return rawValue;
+  }
+}
+
 function parseAddressVerificationRecord(formData) {
   const rawValue = String(formData.get("addressVerification") || "").trim();
   if (!rawValue) return null;
@@ -17,7 +28,8 @@ function parseAddressVerificationRecord(formData) {
 
 export async function POST(request, { params }) {
   await requireAdminApi();
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = normalizeRouteId(rawId);
   const detailPath = `/admin/property-owners/${id}`;
 
   try {

@@ -24,6 +24,17 @@ import { getPropertyOwnerForAdmin, listKitchensForAdmin } from "../../../../lib/
 
 export const dynamic = "force-dynamic";
 
+function normalizeRouteId(value) {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) return "";
+
+  try {
+    return decodeURIComponent(rawValue);
+  } catch {
+    return rawValue;
+  }
+}
+
 function normalizeParam(value) {
   if (Array.isArray(value)) return value[0] || "";
   return value || "";
@@ -49,7 +60,8 @@ function propertyObjectContact(object) {
 
 export default async function AdminPropertyOwnerDetailPage({ params, searchParams }) {
   const admin = await requireAdminPage();
-  const { id } = await params;
+  const { id: rawId } = await params;
+  const id = normalizeRouteId(rawId);
   const resolvedSearchParams = (await searchParams) || {};
   const [owner, kitchens] = await Promise.all([
     getPropertyOwnerForAdmin(id),
