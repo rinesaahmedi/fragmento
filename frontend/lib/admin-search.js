@@ -121,6 +121,33 @@ function buildAddressMatchSql(fields, queryText) {
   return buildAnyFieldMatchSql(fields, patterns);
 }
 
+function buildObjectDirectMatchSql(patterns) {
+  return buildAnyFieldMatchSql([
+    Prisma.sql`po."name"`,
+    Prisma.sql`po."address1"`,
+    Prisma.sql`po."address2"`,
+    Prisma.sql`po."postalCode"`,
+    Prisma.sql`po."city"`,
+    Prisma.sql`hc."name"`,
+  ], patterns);
+}
+
+function buildObjectLinkedOrderAddressMatchSql(patterns) {
+  return Prisma.sql`EXISTS (
+    SELECT 1
+    FROM "KitchenContract" kc_match
+    JOIN "Order" o_match ON o_match."kitchenContractId" = kc_match."id"
+    WHERE kc_match."propertyObjectId" = po."id"
+      AND ${buildAnyFieldMatchSql([
+        Prisma.sql`o_match."address1"`,
+        Prisma.sql`o_match."address2"`,
+        Prisma.sql`o_match."postalCode"`,
+        Prisma.sql`o_match."city"`,
+        Prisma.sql`o_match."country"`,
+      ], patterns)}
+  )`;
+}
+
 function buildEntityTokenConditions(entityType, tokens) {
   const conditions = [];
 
@@ -358,23 +385,16 @@ function buildContractEligibility(filters) {
 }
 
 function buildObjectEligibility(filters) {
-  const orderFilters = buildOrderFilterSql(filters, "o_scope");
-  const conditions = [
-    Prisma.sql`EXISTS (
-      SELECT 1
-      FROM "KitchenContract" kc_scope
-      WHERE kc_scope."propertyObjectId" = po."id"
-      ${filters.kitchenId ? Prisma.sql`AND kc_scope."kitchenId" = ${filters.kitchenId}` : Prisma.empty}
-      ${orderFilters.length ? Prisma.sql`AND EXISTS (
-        SELECT 1
-        FROM "Order" o_scope
-        WHERE o_scope."kitchenContractId" = kc_scope."id"
-          AND ${Prisma.join(orderFilters, " AND ")}
-      )` : Prisma.empty}
-    )`,
-  ];
+  if (!filters.kitchenId) {
+    return Prisma.sql`TRUE`;
+  }
 
-  return Prisma.sql`(${Prisma.join(conditions, " AND ")})`;
+  return Prisma.sql`EXISTS (
+    SELECT 1
+    FROM "KitchenContract" kc_scope
+    WHERE kc_scope."propertyObjectId" = po."id"
+      AND kc_scope."kitchenId" = ${filters.kitchenId}
+  )`;
 }
 
 function buildOrderWhere(filters, tokens, querySql) {
@@ -555,14 +575,26 @@ async function getResults(filters, tokens, query) {
     Prisma.sql`po."name"`,
     Prisma.sql`hc."name"`,
   ], patterns) : null;
-  const objectQuerySql = patterns ? buildAnyFieldMatchSql([
-    Prisma.sql`po."name"`,
-    Prisma.sql`po."address1"`,
-    Prisma.sql`po."address2"`,
-    Prisma.sql`po."postalCode"`,
+  const objectDirectQuerySql = patterns ? buildObjectDirectMatchSql(patterns) : null;
+  const objectLinkedOrderQuerySql = patterns ? buildObjectLinkedOrderAddressMatchSql(patterns) : null;
+  const objectQuerySql = patterns
+    ? Prisma.sql`(${objectDirectQuerySql} OR ${objectLinkedOrderQuerySql})`
+    : null;
+  const objectDirectRank = patterns ? buildRankSql([
     Prisma.sql`po."city"`,
-    Prisma.sql`hc."name"`,
-  ], patterns) : null;
+    Prisma.sql`po."postalCode"`,
+    Prisma.sql`po."address1"`,
+    Prisma.sql`po."name"`,
+  ], patterns, patterns.looksLikeContract ? 0 : 10) : Prisma.sql`0`;
+  const objectLinkedOrderRank = patterns
+    ? Prisma.sql`CASE
+        WHEN ${objectLinkedOrderQuerySql} THEN 95
+        ELSE 0
+      END`
+    : Prisma.sql`0`;
+  const objectMatchRank = patterns
+    ? Prisma.sql`GREATEST(${objectDirectRank}, ${objectLinkedOrderRank})`
+    : Prisma.sql`0`;
   const orderQuerySql = patterns ? buildAnyFieldMatchSql([
     Prisma.sql`o."orderNumber"`,
     Prisma.sql`o."firstName"`,
@@ -638,6 +670,7 @@ async function getResults(filters, tokens, query) {
           po."country",
           hc."id" AS "companyId",
           hc."name" AS "companyName",
+          ${objectMatchRank} AS "matchRank",
           COUNT(DISTINCT kc."id")::int AS "contractCount",
           COUNT(DISTINCT o."id")::int AS "orderCount"
         FROM "PropertyObject" po
@@ -647,12 +680,11 @@ async function getResults(filters, tokens, query) {
         WHERE ${buildObjectEligibility(filters)}
           ${objectTokenConditions.length ? Prisma.sql`AND ${Prisma.join(objectTokenConditions, " AND ")}` : Prisma.empty}
           ${objectQuerySql ? Prisma.sql`AND ${objectQuerySql}` : Prisma.empty}
-          ${buildOrderFilterSql(filters, "o").length ? Prisma.sql`AND ${Prisma.join(buildOrderFilterSql(filters, "o"), " AND ")}` : Prisma.empty}
         GROUP BY po."id", hc."id"
       )
       SELECT *, COUNT(*) OVER()::int AS "totalCount"
       FROM matching
-      ORDER BY "orderCount" DESC, "contractCount" DESC, "name" ASC
+      ORDER BY "matchRank" DESC, "orderCount" DESC, "contractCount" DESC, "name" ASC
       LIMIT ${SEARCH_RESULT_LIMIT}
     `,
     prisma.$queryRaw`
@@ -709,7 +741,6 @@ async function getResults(filters, tokens, query) {
         WHERE ${buildObjectEligibility(filters)}
           ${objectTokenConditions.length ? Prisma.sql`AND ${Prisma.join(objectTokenConditions, " AND ")}` : Prisma.empty}
           ${objectQuerySql ? Prisma.sql`AND ${objectQuerySql}` : Prisma.empty}
-          ${buildOrderFilterSql(filters, "o").length ? Prisma.sql`AND ${Prisma.join(buildOrderFilterSql(filters, "o"), " AND ")}` : Prisma.empty}
         GROUP BY po."id"
       )
       SELECT COUNT(*)::int AS objects

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAdminI18n } from "./admin-i18n";
 import { AdminEntitySearch } from "./admin-entity-search";
 import {
@@ -69,7 +69,7 @@ export function AdminDashboardCharts({
   itemTypeData,
   paymentData,
   geographyData,
-  propertyOwnerStats,
+  companyAnalytics,
 }) {
   const { translate } = useAdminI18n();
   const [statusMode, setStatusMode] = useState("volume");
@@ -227,7 +227,7 @@ export function AdminDashboardCharts({
         topItemsByRevenue={topItemsByRevenue}
       />
 
-      <PropertyOwnerStatsSection data={propertyOwnerStats || []} />
+      <PropertyOwnerAnalyticsSection analytics={companyAnalytics} />
 
       <style jsx>{`
         .analytics-dashboard {
@@ -505,7 +505,7 @@ function ChartHeader({ eyebrow, title, detail, actions }) {
       <div>
         <span>{eyebrow}</span>
         <h2>{title}</h2>
-        <p>{detail}</p>
+        {detail ? <p>{detail}</p> : null}
       </div>
       {actions}
       <style jsx>{`
@@ -573,65 +573,237 @@ function StatusTooltip({ active, payload, label, mode }) {
   );
 }
 
-function PropertyOwnerStatsSection({ data }) {
+function PropertyOwnerAnalyticsSection({ analytics }) {
   const { translate } = useAdminI18n();
-  const activeOwners = data.filter((owner) => owner.contractCount || owner.orderCount);
+  const companies = analytics?.companies || [];
   const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
+  const [selectedOwnerId, setSelectedOwnerId] = useState("");
+  const [itemMode, setItemMode] = useState("quantity");
+  const selectedCompany = useMemo(
+    () => companies.find((owner) => owner.id === selectedOwnerId) || companies[0] || null,
+    [companies, selectedOwnerId],
+  );
+  const selectedTimeline = selectedCompany ? (analytics?.timelineByCompany?.[selectedCompany.id] || []) : [];
+  const selectedTopItems = useMemo(
+    () => selectedCompany ? (analytics?.topItemsByCompany?.[selectedCompany.id] || []) : [],
+    [analytics, selectedCompany],
+  );
+
+  useEffect(() => {
+    if (!companies.length) {
+      setSelectedOwnerId("");
+      return;
+    }
+
+    setSelectedOwnerId((current) => (
+      current && companies.some((owner) => owner.id === current)
+        ? current
+        : analytics?.defaultCompanyId || companies[0].id
+    ));
+  }, [analytics, companies]);
+
+  const itemConfig = itemMode === "quantity"
+    ? {
+        formatter: (value) => interpolateText(translate("dashboard.itemCountValue", "{count} item(s)"), { count: String(value) }),
+        data: selectedTopItems
+          .map((item) => ({
+            ...item,
+            chartValue: Number(item.quantity || 0),
+            axisLabel: item.name || "",
+            displayIdentifier: item.articleNumber || item.code || "",
+          }))
+          .sort((a, b) => b.chartValue - a.chartValue),
+      }
+    : {
+        formatter: formatCurrency,
+        data: selectedTopItems
+          .map((item) => ({
+            ...item,
+            chartValue: Number(item.revenue || 0),
+            axisLabel: item.name || "",
+            displayIdentifier: item.articleNumber || item.code || "",
+          }))
+          .sort((a, b) => b.chartValue - a.chartValue),
+      };
+  const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
+  const hasCompanyData = Boolean(selectedCompany);
+  const topItemsChartHeight = Math.max(250, topItemChartData.length * 34 + 42);
+  const topItemsMaxValue = topItemChartData.reduce((max, item) => Math.max(max, item.chartValue), 0);
+  const topItemsXAxisMax = itemMode === "quantity"
+    ? Math.max(1, Math.ceil(topItemsMaxValue * 1.12))
+    : Math.max(1, topItemsMaxValue * 1.12);
 
   return (
     <section className="chart-card">
       <ChartHeader
         eyebrow={translate("dashboard.ownerPerformance", "Owner performance")}
         title={translate("dashboard.propertyOwnerKitchenActivity", "Property owner kitchen activity")}
-        detail={translate("dashboard.contractKitchenItemAndOrderValueStatisticsForCurrentDashboardFilters", "Contract, kitchen, item, and order value statistics for the current dashboard filters.")}
-        actions={<a className="panel-link" href="/admin/property-owners">{translate("dashboard.manageOwners", "Manage owners")}</a>}
+        actions={(
+          <div className="owner-actions">
+            <label className="owner-select-wrap">
+              <span>{translate("dashboard.selectCompany", "Housing company")}</span>
+              <select
+                value={selectedCompany?.id || ""}
+                onChange={(event) => setSelectedOwnerId(event.target.value)}
+                disabled={!companies.length}
+                aria-label={translate("dashboard.selectCompany", "Housing company")}
+              >
+                {companies.length ? companies.map((owner) => (
+                  <option key={owner.id} value={owner.id}>{owner.name}</option>
+                )) : (
+                  <option value="">{translate("dashboard.noCompaniesAvailable", "No companies available")}</option>
+                )}
+              </select>
+            </label>
+            <a className="panel-link" href={selectedCompany ? `/admin/property-owners/${selectedCompany.id}` : "/admin/property-owners"}>
+              {selectedCompany
+                ? translate("dashboard.openCompanyWorkspace", "Open company workspace")
+                : translate("dashboard.manageOwners", "Manage owners")}
+            </a>
+          </div>
+        )}
       />
       <div className="owner-stats-grid">
-        {activeOwners.length ? activeOwners.map((owner) => (
-          <article key={owner.id} className="owner-stat-card">
-            <div className="owner-stat-header">
-              <div>
-                <strong>{owner.name}</strong>
-                <span>{owner.kitchens || translate("dashboard.noKitchenOrdersYet", "No kitchen orders yet")}</span>
+        {hasCompanyData ? (
+          <>
+            <article className="owner-analytics-panel">
+              <div className="owner-stat-header">
+                <div>
+                  <strong>{selectedCompany.name}</strong>
+                </div>
               </div>
-              <b>{formatCurrency(owner.totalRevenue)}</b>
-            </div>
-            <div className="owner-metrics">
-              <div>
-                <span>{translate("propertyOwnersAdmin.contracts", "Contracts")}</span>
-                <strong>{owner.contractCount}</strong>
+              <div className="owner-kpi-grid">
+                <article>
+                  <span>{translate("dashboard.totalRevenue", "Total revenue")}</span>
+                  <strong>{formatCurrency(selectedCompany.totalRevenue)}</strong>
+                </article>
+                <article>
+                  <span>{translate("ordersAdmin.orders", "Orders")}</span>
+                  <strong>{selectedCompany.orderCount}</strong>
+                </article>
+                <article>
+                  <span>{translate("propertyOwnersAdmin.contracts", "Contracts")}</span>
+                  <strong>{selectedCompany.contractCount}</strong>
+                </article>
+                <article>
+                  <span>{translate("adminShellLogin.kitchens", "Kitchens")}</span>
+                  <strong>{selectedCompany.kitchenCount}</strong>
+                </article>
+                <article>
+                  <span>{translate("dashboard.averageOrderShort", "Avg. order")}</span>
+                  <strong>{formatCurrency(selectedCompany.averageOrderValue)}</strong>
+                </article>
               </div>
-              <div>
-                <span>{translate("ordersAdmin.orders", "Orders")}</span>
-                <strong>{owner.orderCount}</strong>
+              <div className="owner-chart-card owner-chart-card--timeline">
+                <div className="owner-chart-heading">
+                  <div>
+                    <strong>{translate("dashboard.companyTimeline", "Company timeline")}</strong>
+                  </div>
+                </div>
+                <div className="owner-chart-frame">
+                  {selectedTimeline.some((row) => row.orders || row.revenue) ? (
+                    <ResponsiveContainer width="100%" height={240}>
+                      <LineChart data={selectedTimeline} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+                        <CartesianGrid stroke="#e5e7eb" vertical={false} />
+                        <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
+                        <YAxis yAxisId="orders" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
+                        <YAxis yAxisId="revenue" orientation="right" tickLine={false} axisLine={false} fontSize={12} tickFormatter={compactCurrency} />
+                        <Tooltip content={<CompanyTimelineTooltip />} />
+                        <Legend />
+                        <Line yAxisId="orders" type="monotone" dataKey="orders" name={translate("ordersAdmin.orders", "Orders")} stroke="#2563eb" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
+                        <Line yAxisId="revenue" type="monotone" dataKey="revenue" name={translate("dashboard.revenueLabel", "Revenue")} stroke="#16a34a" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <EmptyChart label={translate("dashboard.noCompanyTimelineData", "No timeline data for the selected housing company.")} />
+                  )}
+                </div>
               </div>
-              <div>
-                <span>{translate("adminShellLogin.kitchens", "Kitchens")}</span>
-                <strong>{owner.kitchenCount}</strong>
+
+              <div className="owner-chart-card">
+                <div className="owner-chart-heading">
+                  <div>
+                    <strong>{translate("dashboard.companyTopItems", "Top items for selected housing company")}</strong>
+                  </div>
+                  <div className="segmented-control" aria-label="Selected company top items mode">
+                    <button className={itemMode === "quantity" ? "is-active" : ""} type="button" onClick={() => setItemMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
+                    <button className={itemMode === "revenue" ? "is-active" : ""} type="button" onClick={() => setItemMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
+                  </div>
+                </div>
+                <div className="owner-chart-frame">
+                  {topItemChartData.length ? (
+                    <div className="top-items-scroll">
+                      <ResponsiveContainer width="100%" height={topItemsChartHeight}>
+                        <BarChart data={topItemChartData} layout="vertical" margin={{ top: 8, right: 76, left: 0, bottom: 0 }}>
+                          <CartesianGrid stroke="#e5e7eb" horizontal={false} />
+                          <XAxis
+                            type="number"
+                            domain={[0, topItemsXAxisMax]}
+                            tickLine={false}
+                            axisLine={false}
+                            fontSize={12}
+                            tickFormatter={itemMode === "revenue" ? compactCurrency : undefined}
+                          />
+                          <YAxis
+                            type="category"
+                            dataKey="axisLabel"
+                            width={320}
+                            tickLine={false}
+                            axisLine={false}
+                            fontSize={12}
+                            tick={<TopItemsAxisTick />}
+                          />
+                          <Tooltip content={<TopItemsTooltip />} />
+                          <Bar
+                            dataKey="chartValue"
+                            radius={[0, 8, 8, 0]}
+                            label={{
+                              position: "right",
+                              fill: "#111827",
+                              fontSize: 12,
+                              fontWeight: 800,
+                              formatter: itemConfig.formatter,
+                            }}
+                          >
+                            {topItemChartData.map((item, index) => (
+                              <Cell key={`${itemMode}-${item.code || item.name}-${item.name}`} fill={SERIES_COLORS[index % SERIES_COLORS.length]} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <EmptyChart label={translate("dashboard.noCompanyItemData", "No item data for the selected housing company.")} />
+                  )}
+                </div>
               </div>
-              <div>
-                <span>{translate("dashboard.averageOrderShort", "Avg. order")}</span>
-                <strong>{formatCurrency(owner.averageOrderValue)}</strong>
-              </div>
-            </div>
-            <div className="top-owner-item">
-              <span>{translate("dashboard.topItem", "Top item")}</span>
-              {owner.topItem ? (
-                <strong>
-                  {owner.topItem.name}
-                  {owner.topItem.code ? ` (${owner.topItem.code})` : ""}
-                  {" | "}
-                  {translateText("dashboard.itemCountAndRevenue", "{count} item(s), {revenue}", {
-                    count: String(owner.topItem.quantity),
-                    revenue: formatCurrency(owner.topItem.revenue),
-                  })}
-                </strong>
-              ) : (
-                <strong>{translate("dashboard.noOrderedItemsYet", "No ordered items yet")}</strong>
-              )}
-            </div>
-          </article>
-        )) : (
+            </article>
+
+            <aside className="owner-summary-list" aria-label={translate("dashboard.companyList", "Housing companies")}>
+              {companies.map((owner) => {
+                const isSelected = owner.id === selectedCompany.id;
+                return (
+                  <button
+                    key={owner.id}
+                    type="button"
+                    className={`owner-summary-row${isSelected ? " is-selected" : ""}`}
+                    onClick={() => setSelectedOwnerId(owner.id)}
+                  >
+                    <div>
+                      <strong>{owner.name}</strong>
+                      <span>{translateText("dashboard.companyMetricsSummary", "{objects} objects, {contracts} contracts, {orders} orders", {
+                        objects: String(owner.objectCount),
+                        contracts: String(owner.contractCount),
+                        orders: String(owner.orderCount),
+                      })}</span>
+                    </div>
+                    <b>{formatCurrency(owner.totalRevenue)}</b>
+                  </button>
+                );
+              })}
+            </aside>
+          </>
+        ) : (
           <div className="empty-owner-stats">{translate("dashboard.noOwnerDataForSelectedFilters", "No owner contract or order data matches the current filters.")}</div>
         )}
       </div>
@@ -649,17 +821,48 @@ function PropertyOwnerStatsSection({ data }) {
 
         .owner-stats-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+          grid-template-columns: minmax(0, 1.6fr) minmax(260px, 0.9fr);
           gap: 12px;
         }
 
-        .owner-stat-card {
+        .owner-analytics-panel {
           display: grid;
           gap: 14px;
           border: 1px solid #e5e7eb;
           border-radius: 12px;
           padding: 14px;
           background: #f9fafb;
+        }
+
+        .owner-actions {
+          display: flex;
+          gap: 10px;
+          align-items: end;
+          flex-wrap: wrap;
+        }
+
+        .owner-select-wrap {
+          display: grid;
+          gap: 6px;
+          min-width: 220px;
+        }
+
+        .owner-select-wrap span {
+          color: #6b7280;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .owner-select-wrap select {
+          min-height: 42px;
+          border-radius: 8px;
+          border: 1px solid #d1d5db;
+          background: #ffffff;
+          color: #111827;
+          padding: 9px 12px;
+          font: inherit;
         }
 
         .owner-stat-header {
@@ -670,7 +873,7 @@ function PropertyOwnerStatsSection({ data }) {
         }
 
         .owner-stat-header div,
-        .top-owner-item {
+        .owner-chart-heading div {
           display: grid;
           gap: 4px;
           min-width: 0;
@@ -682,8 +885,8 @@ function PropertyOwnerStatsSection({ data }) {
         }
 
         .owner-stat-header span,
-        .owner-metrics span,
-        .top-owner-item span {
+        .owner-kpi-grid span,
+        .owner-chart-heading span {
           color: #6b7280;
           font-size: 12px;
           font-weight: 800;
@@ -696,13 +899,13 @@ function PropertyOwnerStatsSection({ data }) {
           white-space: nowrap;
         }
 
-        .owner-metrics {
+        .owner-kpi-grid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(5, minmax(0, 1fr));
           gap: 8px;
         }
 
-        .owner-metrics div {
+        .owner-kpi-grid article {
           display: grid;
           gap: 4px;
           border-radius: 8px;
@@ -711,10 +914,115 @@ function PropertyOwnerStatsSection({ data }) {
           border: 1px solid #e5e7eb;
         }
 
-        .owner-metrics strong,
-        .top-owner-item strong {
+        .owner-kpi-grid strong,
+        .owner-chart-heading strong,
+        .owner-status-list strong {
           color: #111827;
           line-height: 1.35;
+        }
+
+        .owner-chart-card {
+          display: grid;
+          gap: 12px;
+          border-radius: 8px;
+          background: #ffffff;
+          padding: 12px;
+          border: 1px solid #e5e7eb;
+        }
+
+        .owner-chart-card--timeline {
+          background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        }
+
+        .owner-chart-heading {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+          flex-wrap: wrap;
+        }
+
+        .owner-chart-frame {
+          min-height: 220px;
+          min-width: 0;
+        }
+
+        .top-items-scroll {
+          max-height: 280px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding-right: 4px;
+        }
+
+        .segmented-control {
+          display: flex;
+          gap: 6px;
+          padding: 4px;
+          border-radius: 8px;
+          background: #f3f4f6;
+        }
+
+        .segmented-control button {
+          min-height: 34px;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: #4b5563;
+          padding: 7px 10px;
+          font: inherit;
+          font-weight: 800;
+          cursor: pointer;
+          transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .segmented-control button.is-active {
+          background: #ffffff;
+          color: #111827;
+          box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+        }
+
+        .owner-summary-list {
+          display: grid;
+          gap: 8px;
+          align-content: start;
+          max-height: 100%;
+          overflow: auto;
+        }
+
+        .owner-summary-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+          text-align: left;
+          border: 1px solid #e5e7eb;
+          border-radius: 12px;
+          padding: 12px;
+          background: #ffffff;
+          cursor: pointer;
+        }
+
+        .owner-summary-row div {
+          display: grid;
+          gap: 4px;
+          min-width: 0;
+        }
+
+        .owner-summary-row strong,
+        .owner-summary-row b {
+          color: #111827;
+        }
+
+        .owner-summary-row span {
+          color: #6b7280;
+          font-size: 12px;
+          line-height: 1.4;
+        }
+
+        .owner-summary-row.is-selected {
+          border-color: #2563eb;
+          background: #eff6ff;
+          box-shadow: inset 0 0 0 1px #bfdbfe;
         }
 
         .empty-owner-stats {
@@ -743,12 +1051,47 @@ function PropertyOwnerStatsSection({ data }) {
         }
 
         @media (max-width: 760px) {
-          .owner-metrics {
+          .owner-stats-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .owner-kpi-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
       `}</style>
     </section>
+  );
+}
+
+function CompanyTimelineTooltip({ active, payload, label }) {
+  if (!active || !payload?.length) return null;
+
+  return (
+    <div className="tooltip">
+      <strong>{label}</strong>
+      {payload.map((item) => (
+        <span key={item.dataKey} style={{ color: item.color }}>
+          {item.name}: {item.dataKey === "revenue" ? formatCurrency(item.value) : item.value}
+        </span>
+      ))}
+      <style jsx>{`
+        .tooltip {
+          display: grid;
+          gap: 6px;
+          border: 1px solid #e5e7eb;
+          border-radius: 10px;
+          background: #ffffff;
+          padding: 10px 12px;
+          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+        }
+
+        strong,
+        span {
+          font-size: 13px;
+        }
+      `}</style>
+    </div>
   );
 }
 

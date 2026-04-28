@@ -433,80 +433,115 @@ function buildOwnerStatsOrderFilter({ startDate, kitchenId, status }) {
   return buildOrderAndClause({ startDate, kitchenId, status }, "o");
 }
 
-async function loadPropertyOwnerStats({ startDate, kitchenId, status }) {
+async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
   const orderFilter = buildOwnerStatsOrderFilter({ startDate, kitchenId, status });
 
   const ownerRows = await prisma.$queryRaw`
     SELECT
       hc."id",
       hc."name",
-      hc."email",
-      hc."phone",
+      COUNT(DISTINCT pobj."id")::int AS "objectCount",
       COUNT(DISTINCT kc."id")::int AS "contractCount",
       COUNT(DISTINCT o."id")::int AS "orderCount",
       COUNT(DISTINCT o."kitchenId")::int AS "kitchenCount",
-      COALESCE(SUM(o."totalPrice"), 0) AS "totalRevenue",
-      STRING_AGG(DISTINCT k."name", ', ' ORDER BY k."name") AS "kitchens"
+      COALESCE(SUM(o."totalPrice"), 0) AS "totalRevenue"
     FROM "HousingCompany" hc
     LEFT JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
     LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
     LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
-    LEFT JOIN "Kitchen" k ON k."id" = o."kitchenId"
     GROUP BY hc."id"
     ORDER BY "totalRevenue" DESC, "orderCount" DESC, hc."name" ASC
   `;
 
-  const itemRows = await prisma.$queryRaw`
-    WITH ranked_items AS (
-      SELECT
-        hc."id" AS "ownerId",
-        oi."code",
-        oi."nameSnapshot",
-        SUM(oi."quantity")::int AS "quantity",
-        SUM(oi."quantity" * oi."priceSnapshot") AS "revenue",
-        ROW_NUMBER() OVER (
-          PARTITION BY hc."id"
-          ORDER BY SUM(oi."quantity" * oi."priceSnapshot") DESC, SUM(oi."quantity") DESC
-        ) AS rn
-      FROM "HousingCompany" hc
-      JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-      JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
-      JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
-      JOIN "OrderItem" oi ON oi."orderId" = o."id"
-      GROUP BY hc."id", oi."code", oi."nameSnapshot"
-    )
-    SELECT "ownerId", "code", "nameSnapshot", "quantity", "revenue"
-    FROM ranked_items
-    WHERE rn = 1
+  const timelineRows = await prisma.$queryRaw`
+    SELECT
+      hc."id" AS "ownerId",
+      DATE_TRUNC('day', o."createdAt")::date AS "date",
+      COUNT(*)::int AS "orders",
+      COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
+    FROM "HousingCompany" hc
+    JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+    JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 2 ASC
   `;
-  const topItemByOwnerId = new Map(itemRows.map((row) => [row.ownerId, row]));
 
-  return ownerRows.map((owner) => {
-    const totalRevenue = Number(owner.totalRevenue || 0);
-    const orderCount = Number(owner.orderCount || 0);
-    const topItem = topItemByOwnerId.get(owner.id);
+  const kitchenRows = await prisma.$queryRaw`
+    SELECT
+      hc."id" AS "ownerId",
+      COALESCE(NULLIF(BTRIM(k."name"), ''), 'Unknown kitchen') AS "kitchenName",
+      COUNT(*)::int AS "orders",
+      COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
+    FROM "HousingCompany" hc
+    JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+    JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    LEFT JOIN "Kitchen" k ON k."id" = o."kitchenId"
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 4 DESC, 2 ASC
+  `;
 
-    return {
-      id: owner.id,
-      name: owner.name || "",
-      email: owner.email || "",
-      phone: owner.phone || "",
-      contractCount: Number(owner.contractCount || 0),
-      orderCount,
-      kitchenCount: Number(owner.kitchenCount || 0),
-      kitchens: owner.kitchens || "",
-      totalRevenue,
-      averageOrderValue: orderCount ? totalRevenue / orderCount : 0,
-      topItem: topItem
-        ? {
-            code: topItem.code || "",
-            name: topItem.nameSnapshot || "",
-            quantity: Number(topItem.quantity || 0),
-            revenue: Number(topItem.revenue || 0),
-          }
-        : null,
-    };
-  });
+  const statusRows = await prisma.$queryRaw`
+    SELECT
+      hc."id" AS "ownerId",
+      o."status"::text AS "status",
+      COUNT(*)::int AS "count"
+    FROM "HousingCompany" hc
+    JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+    JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 2 ASC
+  `;
+
+  const hasArticleNumberColumn = await hasKitchenItemArticleNumberColumn();
+  const itemRows = hasArticleNumberColumn
+    ? await prisma.$queryRaw`
+        SELECT
+          hc."id" AS "ownerId",
+          oi."itemType"::text AS "itemType",
+          oi."code" AS "code",
+          oi."nameSnapshot" AS "nameSnapshot",
+          MAX(ki."name") FILTER (WHERE ki."name" IS NOT NULL) AS "canonicalName",
+          ki."articleNumber" AS "articleNumber",
+          SUM(oi."quantity")::int AS "quantity",
+          COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
+        FROM "HousingCompany" hc
+        JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+        JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+        JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+        JOIN "OrderItem" oi ON oi."orderId" = o."id"
+        LEFT JOIN "KitchenItem" ki ON ki."id" = oi."kitchenItemId"
+        GROUP BY 1, 2, 3, 4, 6
+        ORDER BY 1 ASC, 7 DESC, 8 DESC, 4 ASC
+      `
+    : await prisma.$queryRaw`
+        SELECT
+          hc."id" AS "ownerId",
+          oi."itemType"::text AS "itemType",
+          oi."code" AS "code",
+          oi."nameSnapshot" AS "nameSnapshot",
+          NULL::text AS "canonicalName",
+          NULL::text AS "articleNumber",
+          SUM(oi."quantity")::int AS "quantity",
+          COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
+        FROM "HousingCompany" hc
+        JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
+        JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+        JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+        JOIN "OrderItem" oi ON oi."orderId" = o."id"
+        GROUP BY 1, 2, 3, 4, 5, 6
+        ORDER BY 1 ASC, 7 DESC, 8 DESC, 4 ASC
+      `;
+
+  return {
+    ownerRows,
+    timelineRows,
+    kitchenRows,
+    statusRows,
+    itemRows,
+  };
 }
 
 async function hasKitchenItemArticleNumberColumn() {
@@ -532,9 +567,9 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const startDate = getPeriodStartDate(period);
 
   const dashboardFilters = { startDate, kitchenId, status: validStatus };
-  const [kitchens, propertyOwnerStats, summary, dailyStatusRows, kitchenTimelineRows, paymentRows, geographyRows, groupedItemRows] = await Promise.all([
+  const [kitchens, propertyOwnerAnalyticsRaw, summary, dailyStatusRows, kitchenTimelineRows, paymentRows, geographyRows, groupedItemRows] = await Promise.all([
     listKitchensForAdmin(),
-    loadPropertyOwnerStats({ startDate, kitchenId, status: validStatus }),
+    loadPropertyOwnerAnalytics({ startDate, kitchenId, status: validStatus }),
     loadDashboardSummary(dashboardFilters),
     loadDailyStatusRows(dashboardFilters),
     loadKitchenTimelineRows(dashboardFilters),
@@ -677,6 +712,135 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       orderShare: totalOrders ? (row.orders / totalOrders) * 100 : 0,
     }))
     .sort((a, b) => b.orders - a.orders);
+  const companyTimelineById = new Map();
+  for (const owner of propertyOwnerAnalyticsRaw.ownerRows) {
+    companyTimelineById.set(owner.id, new Map(
+      dateKeys.map((date) => [
+        date,
+        {
+          date,
+          label: formatDateLabel(date),
+          orders: 0,
+          revenue: 0,
+        },
+      ]),
+    ));
+  }
+
+  for (const row of propertyOwnerAnalyticsRaw.timelineRows) {
+    const ownerTimeline = companyTimelineById.get(row.ownerId);
+    if (!ownerTimeline) continue;
+    const dateKey = toDateKey(row.date);
+    if (!ownerTimeline.has(dateKey)) {
+      ownerTimeline.set(dateKey, {
+        date: dateKey,
+        label: formatDateLabel(dateKey),
+        orders: 0,
+        revenue: 0,
+      });
+    }
+
+    ownerTimeline.set(dateKey, {
+      date: dateKey,
+      label: formatDateLabel(dateKey),
+      orders: Number(row.orders || 0),
+      revenue: Number(row.revenue || 0),
+    });
+  }
+
+  const kitchenBreakdownByCompany = propertyOwnerAnalyticsRaw.kitchenRows.reduce((acc, row) => {
+    if (!acc[row.ownerId]) acc[row.ownerId] = [];
+    acc[row.ownerId].push({
+      kitchenName: row.kitchenName || "Unknown kitchen",
+      orders: Number(row.orders || 0),
+      revenue: Number(row.revenue || 0),
+    });
+    return acc;
+  }, {});
+
+  const statusBreakdownByCompany = propertyOwnerAnalyticsRaw.statusRows.reduce((acc, row) => {
+    if (!acc[row.ownerId]) acc[row.ownerId] = [];
+    acc[row.ownerId].push({
+      status: row.status || "",
+      count: Number(row.count || 0),
+    });
+    return acc;
+  }, {});
+
+  const topItemsByCompanyMap = new Map();
+  for (const row of propertyOwnerAnalyticsRaw.itemRows) {
+    const ownerId = row.ownerId;
+    if (!topItemsByCompanyMap.has(ownerId)) {
+      topItemsByCompanyMap.set(ownerId, new Map());
+    }
+
+    const ownerItems = topItemsByCompanyMap.get(ownerId);
+    const quantity = Number(row.quantity || 0);
+    const revenue = Number(row.revenue || 0);
+    const code = String(row.code || "").trim();
+    const canonicalName = String(row.canonicalName || "").trim() || null;
+    const fallbackName = String(row.nameSnapshot || "").trim() || "";
+    const canonicalArticleNumber = String(row.articleNumber || "").trim() || ARTICLE_NUMBER_BY_CODE[code] || null;
+    const grouping = getTopItemGrouping({ code, itemType: row.itemType, nameSnapshot: row.nameSnapshot }, canonicalArticleNumber);
+    const existingItem = ownerItems.get(grouping.groupKey) || {
+      itemType: grouping.preferredItemType || row.itemType,
+      code: grouping.preferredCode || code,
+      canonicalName: null,
+      fallbackName,
+      canonicalArticleNumber: null,
+      quantity: 0,
+      revenue: 0,
+    };
+    existingItem.itemType = choosePreferredItemType(existingItem.itemType, row.itemType, grouping.preferredItemType);
+    existingItem.code = grouping.preferredCode || choosePreferredText(existingItem.code, code);
+    existingItem.canonicalName = grouping.preferredName || choosePreferredText(existingItem.canonicalName, canonicalName);
+    existingItem.fallbackName = choosePreferredText(existingItem.fallbackName, fallbackName);
+    existingItem.canonicalArticleNumber = choosePreferredText(existingItem.canonicalArticleNumber, canonicalArticleNumber);
+    existingItem.quantity += quantity;
+    existingItem.revenue += revenue;
+    ownerItems.set(grouping.groupKey, existingItem);
+  }
+
+  const companyTopItemsById = Array.from(topItemsByCompanyMap.entries()).reduce((acc, [ownerId, items]) => {
+    acc[ownerId] = Array.from(items.values())
+      .map((item) => ({
+        ...item,
+        name: item.canonicalName || item.fallbackName || item.code || "",
+        articleNumber: item.canonicalArticleNumber || null,
+      }))
+      .sort((a, b) => {
+        if (b.revenue !== a.revenue) return b.revenue - a.revenue;
+        return b.quantity - a.quantity;
+      });
+    return acc;
+  }, {});
+
+  const companyAnalytics = {
+    companies: propertyOwnerAnalyticsRaw.ownerRows
+      .filter((owner) => Number(owner.contractCount || 0) || Number(owner.orderCount || 0))
+      .map((owner) => {
+        const totalRevenue = Number(owner.totalRevenue || 0);
+        const orderCount = Number(owner.orderCount || 0);
+        return {
+          id: owner.id,
+          name: owner.name || "",
+          objectCount: Number(owner.objectCount || 0),
+          contractCount: Number(owner.contractCount || 0),
+          orderCount,
+          kitchenCount: Number(owner.kitchenCount || 0),
+          totalRevenue,
+          averageOrderValue: orderCount ? totalRevenue / orderCount : 0,
+        };
+      }),
+    defaultCompanyId: propertyOwnerAnalyticsRaw.ownerRows.find((owner) => Number(owner.contractCount || 0) || Number(owner.orderCount || 0))?.id || "",
+    timelineByCompany: Array.from(companyTimelineById.entries()).reduce((acc, [ownerId, rows]) => {
+      acc[ownerId] = Array.from(rows.values()).sort((a, b) => a.date.localeCompare(b.date));
+      return acc;
+    }, {}),
+    kitchenBreakdownByCompany,
+    topItemsByCompany: companyTopItemsById,
+    statusBreakdownByCompany,
+  };
   const kpis = [
     {
       labelKey: "dashboard.totalOrders",
@@ -727,7 +891,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         itemTypeData={itemTypeData}
         paymentData={paymentData}
         geographyData={geographyData}
-        propertyOwnerStats={propertyOwnerStats}
+        companyAnalytics={companyAnalytics}
       />
     </AdminShell>
   );
