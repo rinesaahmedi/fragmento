@@ -154,7 +154,7 @@ function AdminShellContent({ adminEmail, children }) {
             }}
           >
             <img
-              src="/img/fragmentologo-cropped.jpg"
+              src="/img/fragmentologo-cropped.png"
               alt="Fragmento"
               style={{
                 display: "block",
