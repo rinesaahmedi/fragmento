@@ -55,6 +55,7 @@ const ADDRESS_VERIFICATION_FIELD_KEYS = new Set([
   "city",
   "postalCode",
 ]);
+const ORDER_ADDRESS_FIELD_KEYS = ["address1", "address2", "country", "city", "postalCode"];
 
 const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
   Germany: "Deutschland",
@@ -70,21 +71,31 @@ const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
 function buildCustomerAddressFromContract(contractAddress) {
   if (!contractAddress) return {};
 
-  const unitNotes = [
-    contractAddress.building ? `Building: ${contractAddress.building}` : "",
-    contractAddress.floor ? `Floor: ${contractAddress.floor}` : "",
-    contractAddress.unitNumber ? `Unit: ${contractAddress.unitNumber}` : "",
-    contractAddress.notes || "",
-  ].filter(Boolean);
-
   return {
     country: ORDER_COUNTRY_BY_CONTRACT_COUNTRY[contractAddress.country] || contractAddress.country || "",
     city: contractAddress.city || "",
     postalCode: contractAddress.postalCode || "",
     address1: contractAddress.address1 || "",
     address2: contractAddress.address2 || "",
-    notes: unitNotes.join("\n"),
   };
+}
+
+function normalizeAddressValue(value) {
+  return String(value ?? "").trim();
+}
+
+function hasContractAddress(contractAddress) {
+  const contractCustomerAddress = buildCustomerAddressFromContract(contractAddress);
+  return ORDER_ADDRESS_FIELD_KEYS.some((fieldKey) => normalizeAddressValue(contractCustomerAddress[fieldKey]));
+}
+
+function customerUsesContractAddress(customer, contractAddress) {
+  if (!hasContractAddress(contractAddress)) return false;
+
+  const contractCustomerAddress = buildCustomerAddressFromContract(contractAddress);
+  return ORDER_ADDRESS_FIELD_KEYS.every(
+    (fieldKey) => normalizeAddressValue(customer?.[fieldKey]) === normalizeAddressValue(contractCustomerAddress[fieldKey]),
+  );
 }
 
 function buildInitialCustomerFromOrder(initialOrder, contractNumber) {
@@ -105,6 +116,11 @@ function buildInitialCustomerState(initialOrder, contractNumber, contractAddress
     ...buildInitialCustomer(contractNumber),
     ...buildCustomerAddressFromContract(contractAddress),
   };
+}
+
+function buildInitialAddressPreference(initialOrder, contractNumber, contractAddress) {
+  const initialCustomer = buildInitialCustomerState(initialOrder, contractNumber, contractAddress);
+  return customerUsesContractAddress(initialCustomer, contractAddress);
 }
 
 function buildProductInfoState(payload) {
@@ -211,6 +227,9 @@ export default function KitchenConfigurator({
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
   );
+  const [useContractAddressForOrder, setUseContractAddressForOrder] = useState(() =>
+    buildInitialAddressPreference(initialOrder, initialContractNumber, initialContractAddress),
+  );
   const [addressVerification, setAddressVerification] = useState(() =>
     buildAddressVerificationState(),
   );
@@ -222,7 +241,9 @@ export default function KitchenConfigurator({
 
   useEffect(() => {
     if (initialOrder) {
-      setCustomer(buildInitialCustomerFromOrder(initialOrder, initialContractNumber));
+      const nextCustomer = buildInitialCustomerFromOrder(initialOrder, initialContractNumber);
+      setCustomer(nextCustomer);
+      setUseContractAddressForOrder(customerUsesContractAddress(nextCustomer, initialContractAddress));
       setAddressVerification(buildAddressVerificationState());
       setSelectedComponentIds(buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder));
       setSelectedAccessoryCodes(buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"));
@@ -236,6 +257,7 @@ export default function KitchenConfigurator({
         ...buildCustomerAddressFromContract(initialContractAddress),
         contractNumber: initialContractNumber,
       }));
+      setUseContractAddressForOrder(true);
       setAddressVerification(buildAddressVerificationState());
       return;
     }
@@ -245,6 +267,7 @@ export default function KitchenConfigurator({
       if (current.contractNumber === initialContractNumber) return current;
       return { ...current, contractNumber: initialContractNumber };
     });
+    setUseContractAddressForOrder(false);
     setAddressVerification(buildAddressVerificationState());
   }, [initialContractNumber, initialOrder, initialContractAddress, kitchenConfig, fixedComponentIds]);
 
@@ -256,11 +279,7 @@ export default function KitchenConfigurator({
     if (!verifiedSnapshotKey) return;
     if (verifiedSnapshotKey === addressSnapshotKey) return;
 
-    setAddressVerification(
-      buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.IDLE, {
-        message: "Address changed. Please verify it again before submitting.",
-      }),
-    );
+    setAddressVerification(buildAddressVerificationState());
   }, [addressSnapshotKey, addressVerification]);
 
   useEffect(() => {
@@ -414,7 +433,12 @@ export default function KitchenConfigurator({
       ...current,
       ...buildCustomerAddressFromContract(initialContractAddress),
     }));
+    setUseContractAddressForOrder(true);
     setAddressVerification(buildAddressVerificationState());
+  }
+
+  function editOrderAddress() {
+    setUseContractAddressForOrder(false);
   }
 
   async function handleVerifyAddress() {
@@ -704,6 +728,7 @@ export default function KitchenConfigurator({
             orderSectionRef={orderSectionRef}
             customer={customer}
             contractAddress={initialContractAddress}
+            isUsingContractAddress={useContractAddressForOrder}
             isSubmitting={isSubmitting}
             status={status}
             statusTone={statusTone}
@@ -711,7 +736,13 @@ export default function KitchenConfigurator({
             onSubmit={handleSubmit}
             onVerifyAddress={handleVerifyAddress}
             onUpdateCustomer={updateCustomer}
-            onUseContractAddress={useContractAddress}
+            onToggleUseContractAddress={(nextChecked) => {
+              if (nextChecked) {
+                useContractAddress();
+                return;
+              }
+              editOrderAddress();
+            }}
           />
         ) : null}
 

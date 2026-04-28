@@ -45,7 +45,14 @@ export async function getKitchenContractForAccess(contractNumber) {
 
   const contract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: normalizedContractNumber },
-    include: { kitchen: true },
+    include: {
+      kitchen: true,
+      propertyObject: {
+        include: {
+          housingCompany: true,
+        },
+      },
+    },
   });
 
   assertUsableKitchenContract(contract);

@@ -131,8 +131,8 @@ function flattenResults(results, query, translate) {
     rows.push({
       id: `partner-${company.id}`,
       type: "partner",
-      badge: translate("dashboard.finderBadgePartner", "Property Partner"),
-      label: company.name || translate("dashboard.finderUnnamedPartner", "Unnamed property partner"),
+      badge: translate("dashboard.finderBadgePartner", "Housing Company"),
+      label: company.name || translate("dashboard.finderUnnamedPartner", "Unnamed housing company"),
       secondary: company.address || "",
       meta: joinMeta([
         `${company.objectCount || 0} ${translate("dashboard.finderObjectsShort", "objects")}`,
@@ -412,7 +412,7 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
             <div className="finder-footer">
               <Link href="/admin/contracts" style={FOOTER_LINK_STYLE}>{translate("dashboard.finderViewAllContracts", "View all contracts")}</Link>
               <Link href="/admin/orders" style={FOOTER_LINK_STYLE}>{translate("dashboard.finderViewAllOrders", "View all orders")}</Link>
-              <Link href="/admin/property-owners" style={FOOTER_LINK_STYLE}>{translate("dashboard.finderManagePartners", "Manage property partners")}</Link>
+              <Link href="/admin/property-owners" style={FOOTER_LINK_STYLE}>{translate("dashboard.finderManagePartners", "Manage housing companies")}</Link>
             </div>
           </div>
         ) : null}

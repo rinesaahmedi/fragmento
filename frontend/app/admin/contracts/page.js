@@ -22,6 +22,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { AdminShell } from "../../../components/admin-shell";
+import AdminContractsFilters from "../../../components/admin-contracts-filters";
 import { AdminText } from "../../../components/admin-i18n";
 import AdminContractLinkFields from "../../../components/admin-contract-link-fields";
 import { getFormMessage } from "../../../lib/admin-forms";
@@ -179,15 +180,6 @@ function ContractOrders({ contract }) {
   );
 }
 
-function FilterField({ label, children }) {
-  return (
-    <label style={filterFieldStyle}>
-      <span>{label}</span>
-      {children}
-    </label>
-  );
-}
-
 function KitchenSelect({ kitchens, defaultValue = "", compact = false, required = true }) {
   return (
     <FormField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
@@ -236,67 +228,12 @@ export default async function AdminContractsPage({ searchParams = {} }) {
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
-          <form action="/admin/contracts" method="get" style={filterPanelStyle}>
-            <div style={filterHeaderStyle}>
-              <span style={filterEyebrowStyle}><AdminText i18nKey="contractsAdmin.filters" fallback="Filters" /></span>
-              <span style={filterHintStyle}><AdminText i18nKey="contractsAdmin.narrowTheContractListBelow" fallback="Narrow the contract list below" /></span>
-            </div>
-            <div style={filterGridStyle}>
-              <FilterField label={<AdminText i18nKey="contractsAdmin.search" fallback="Search" />}>
-                <input name="q" defaultValue={filters.query} placeholder="Contract, kitchen, owner, city..." style={filterInputStyle} />
-              </FilterField>
-              <FilterField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
-                <select name="kitchenId" defaultValue={filters.kitchenId} style={filterInputStyle}>
-                  <option value=""><AdminText i18nKey="dashboard.allKitchens" fallback="All kitchens" /></option>
-                  {kitchens.map((kitchen) => (
-                    <option key={kitchen.id} value={kitchen.id}>
-                      {kitchen.name}
-                    </option>
-                  ))}
-                </select>
-              </FilterField>
-              <FilterField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>
-                <select name="housingCompanyId" defaultValue={filters.housingCompanyId} style={filterInputStyle}>
-                  <option value=""><AdminText i18nKey="contractsAdmin.allOwners" fallback="All owners" /></option>
-                  {owners.map((owner) => (
-                    <option key={owner.id} value={owner.id}>
-                      {ownerName(owner)}
-                    </option>
-                  ))}
-                </select>
-              </FilterField>
-              <FilterField label={<AdminText i18nKey="contractsAdmin.propertyObject" fallback="Property object" />}>
-                <select name="propertyObjectId" defaultValue={filters.propertyObjectId} style={filterInputStyle}>
-                  <option value=""><AdminText i18nKey="contractsAdmin.allPropertyObjects" fallback="All objects" /></option>
-                  {propertyObjects.map((object) => (
-                    <option key={object.id} value={object.id}>
-                      {object.housingCompany.name} | {object.name}
-                    </option>
-                  ))}
-                </select>
-              </FilterField>
-              <FilterField label={<AdminText i18nKey="dashboard.status" fallback="Status" />}>
-                <select name="status" defaultValue={filters.status} style={filterInputStyle}>
-                  <option value=""><AdminText i18nKey="dashboard.allStatuses" fallback="All statuses" /></option>
-                  <option value="active"><AdminText i18nKey="contractsAdmin.active" fallback="Active" /></option>
-                  <option value="inactive"><AdminText i18nKey="contractsAdmin.inactive" fallback="Inactive" /></option>
-                </select>
-              </FilterField>
-              <FilterField label={<AdminText i18nKey="contractsAdmin.usage" fallback="Usage" />}>
-                <select name="usage" defaultValue={filters.usage} style={filterInputStyle}>
-                  <option value=""><AdminText i18nKey="contractsAdmin.allUsage" fallback="All usage" /></option>
-                  <option value="unused"><AdminText i18nKey="contractsAdmin.unused" fallback="Unused" /></option>
-                  <option value="used"><AdminText i18nKey="contractsAdmin.used" fallback="Used" /></option>
-                  <option value="once"><AdminText i18nKey="contractsAdmin.usedOnce" fallback="Used once" /></option>
-                  <option value="multiple"><AdminText i18nKey="contractsAdmin.usedTwoPlusTimes" fallback="Used 2+ times" /></option>
-                </select>
-              </FilterField>
-              <div style={filterActionsStyle}>
-                <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
-                <Link href="/admin/contracts" style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
-              </div>
-            </div>
-          </form>
+          <AdminContractsFilters
+            kitchens={kitchens}
+            owners={owners}
+            propertyObjects={propertyObjects}
+            filters={filters}
+          />
         </AdminSection>
 
         <AdminSection>
@@ -564,102 +501,6 @@ export default async function AdminContractsPage({ searchParams = {} }) {
     </AdminShell>
   );
 }
-
-const filterGridStyle = {
-  display: "grid",
-  gap: 10,
-  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
-  alignItems: "end",
-};
-
-const filterPanelStyle = {
-  display: "grid",
-  gap: 12,
-  borderRadius: 8,
-  border: "1px solid rgba(143, 62, 44, 0.16)",
-  background: "linear-gradient(180deg, rgba(255,247,241,0.82), rgba(255,255,255,0.72))",
-  padding: 14,
-};
-
-const filterHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: 12,
-  flexWrap: "wrap",
-};
-
-const filterEyebrowStyle = {
-  display: "inline-flex",
-  width: "fit-content",
-  borderRadius: 999,
-  padding: "6px 10px",
-  background: "rgba(143, 62, 44, 0.1)",
-  border: "1px solid rgba(143, 62, 44, 0.14)",
-  color: "var(--app-accent)",
-  fontSize: 12,
-  fontWeight: 800,
-  letterSpacing: "0.08em",
-  textTransform: "uppercase",
-};
-
-const filterHintStyle = {
-  color: "var(--app-text-muted)",
-  fontSize: 13,
-  fontWeight: 700,
-};
-
-const filterFieldStyle = {
-  display: "grid",
-  gap: 6,
-  color: "var(--app-text-muted)",
-  fontSize: 12,
-  fontWeight: 800,
-  letterSpacing: "0.06em",
-  textTransform: "uppercase",
-};
-
-const filterInputStyle = {
-  ...inputStyle,
-  minHeight: 42,
-  borderRadius: 8,
-  padding: "9px 11px",
-  background: "rgba(255,255,255,0.94)",
-  fontSize: "0.92rem",
-  boxShadow: "none",
-};
-
-const filterActionsStyle = {
-  display: "flex",
-  gap: 8,
-  alignItems: "end",
-  flexWrap: "nowrap",
-};
-
-const filterApplyButtonStyle = {
-  ...primaryButtonStyle,
-  minHeight: 42,
-  borderRadius: 8,
-  padding: "9px 14px",
-  fontSize: "0.92rem",
-  whiteSpace: "nowrap",
-  boxShadow: "0 10px 20px rgba(143, 62, 44, 0.16)",
-};
-
-const filterClearLinkStyle = {
-  textDecoration: "none",
-  borderRadius: 8,
-  minHeight: 42,
-  padding: "9px 12px",
-  background: "rgba(255,255,255,0.88)",
-  color: "var(--app-accent)",
-  border: "1px solid rgba(143, 62, 44, 0.14)",
-  fontWeight: 800,
-  fontSize: "0.92rem",
-  display: "inline-flex",
-  alignItems: "center",
-  whiteSpace: "nowrap",
-};
 
 const createContractDetailsStyle = {
   display: "grid",

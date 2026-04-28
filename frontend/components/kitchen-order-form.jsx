@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import { ADDRESS_VERIFICATION_STATUS } from "../lib/address-verification";
 
@@ -28,26 +29,17 @@ const COUNTRY_LABELS = {
   Polen: "Poland",
 };
 
-const REQUIRED_FIELD_LABELS = [
-  { key: "firstName", label: "Vorname" },
-  { key: "lastName", label: "Nachname" },
-  { key: "email", label: "E-Mail" },
-  { key: "phone", label: "Telefon" },
-  { key: "address1", label: "Adresse" },
-  { key: "country", label: "Land" },
-  { key: "city", label: "Stadt" },
-  { key: "postalCode", label: "PLZ" },
-  { key: "paymentMethod", label: "Zahlungsmethode" },
-  { key: "consent", label: "Datenschutz" },
-];
-
-const ADDRESS_FIELD_LABELS = {
-  address1: "Adresse",
-  address2: "Adresszusatz",
-  country: "Land",
-  city: "Stadt",
-  postalCode: "PLZ",
-  notes: "Anmerkungen",
+const FIELD_ERROR_MESSAGES = {
+  firstName: "Bitte Vorname eingeben.",
+  lastName: "Bitte Nachname eingeben.",
+  email: "Bitte E-Mail eingeben.",
+  phone: "Bitte Telefonnummer eingeben.",
+  address1: "Bitte Straße und Hausnummer eingeben.",
+  country: "Bitte Land auswaehlen.",
+  city: "Bitte Stadt auswaehlen.",
+  postalCode: "Bitte PLZ auswaehlen.",
+  paymentMethod: "Bitte Zahlungsmethode auswaehlen.",
+  consent: "Bitte der Datenschutzerklaerung zustimmen.",
 };
 
 function normalizeValue(value) {
@@ -63,24 +55,17 @@ function contractCountryToCustomerCountry(country) {
   return Object.entries(COUNTRY_LABELS).find(([, englishLabel]) => englishLabel === country)?.[0] || country;
 }
 
-function buildContractPrefill(contractAddress) {
-  if (!contractAddress) return {};
+function formatCountryLabel(country) {
+  const normalizedCountry = contractCountryToCustomerCountry(country);
+  return COUNTRY_LABELS[normalizedCountry] || country || "";
+}
 
-  const noteParts = [
-    contractAddress.building ? `Building: ${contractAddress.building}` : "",
-    contractAddress.floor ? `Floor: ${contractAddress.floor}` : "",
-    contractAddress.unitNumber ? `Unit: ${contractAddress.unitNumber}` : "",
-    contractAddress.notes || "",
+function buildAddressLines(address) {
+  return [
+    [address?.address1, address?.address2].filter(Boolean).join(", "),
+    [address?.postalCode, address?.city].filter(Boolean).join(" "),
+    formatCountryLabel(address?.country),
   ].filter(Boolean);
-
-  return {
-    address1: contractAddress.address1 || "",
-    address2: contractAddress.address2 || "",
-    country: contractCountryToCustomerCountry(contractAddress.country),
-    city: contractAddress.city || "",
-    postalCode: contractAddress.postalCode || "",
-    notes: noteParts.join("\n"),
-  };
 }
 
 export const COUNTRY_CITY_OPTIONS = {
@@ -230,6 +215,7 @@ export default function KitchenOrderForm({
   orderSectionRef,
   customer,
   contractAddress,
+  isUsingContractAddress,
   isSubmitting,
   status,
   statusTone,
@@ -237,25 +223,15 @@ export default function KitchenOrderForm({
   onSubmit,
   onVerifyAddress,
   onUpdateCustomer,
-  onUseContractAddress,
+  onToggleUseContractAddress,
 }) {
-  const contractPrefill = buildContractPrefill(contractAddress);
+  const [touchedFields, setTouchedFields] = useState({});
+  const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const countryOptions = uniqueOptions(Object.keys(COUNTRY_CITY_OPTIONS), customer.country);
   const cityOptions = uniqueOptions(COUNTRY_CITY_OPTIONS[customer.country] || [], customer.city);
   const postalCodeOptions = uniqueOptions(POSTAL_CODE_OPTIONS[customer.city] || [], customer.postalCode);
-  const filledFromContractLabels = Object.entries(ADDRESS_FIELD_LABELS)
-    .filter(([key, label]) => normalizeValue(contractPrefill[key]) && normalizeValue(customer[key]) === normalizeValue(contractPrefill[key]))
-    .map(([, label]) => label);
-  const missingRequiredLabels = REQUIRED_FIELD_LABELS.filter(({ key }) =>
-    key === "consent" ? !customer.consent : !normalizeValue(customer[key]),
-  ).map(({ label }) => label);
-  const contractAddressLines = [
-    [contractAddress?.address1, contractAddress?.address2].filter(Boolean).join(", "),
-    [contractAddress?.postalCode, contractAddress?.city].filter(Boolean).join(" "),
-    contractAddress?.country || "",
-    contractAddress?.unitLabel || "",
-    contractAddress?.notes ? `Notes: ${contractAddress.notes}` : "",
-  ].filter(Boolean);
+  const contractAddressLines = buildAddressLines(contractAddress);
+  const canUseContractAddress = contractAddressLines.length > 0;
   const addressVerificationStatus = addressVerification?.status || ADDRESS_VERIFICATION_STATUS.IDLE;
   const addressVerificationMessage = addressVerification?.message || "";
   const addressVerificationSuggestion = addressVerification?.suggestion || "";
@@ -265,35 +241,40 @@ export default function KitchenOrderForm({
   const isAddressVerificationError =
     addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.INVALID
     || addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE;
+  const hasVerificationResult = addressVerificationStatus !== ADDRESS_VERIFICATION_STATUS.IDLE;
+
+  function markFieldTouched(fieldKey) {
+    setTouchedFields((current) => (current[fieldKey] ? current : { ...current, [fieldKey]: true }));
+  }
+
+  function hasFieldError(fieldKey, required = false) {
+    if (!required) return false;
+    if (!hasTriedSubmit && !touchedFields[fieldKey]) return false;
+    return fieldKey === "consent" ? !customer.consent : !normalizeValue(customer[fieldKey]);
+  }
 
   function getFieldClassName(fieldKey, required = false, baseClassName = styles.field) {
-    const isPrefilled =
-      normalizeValue(contractPrefill[fieldKey]) && normalizeValue(customer[fieldKey]) === normalizeValue(contractPrefill[fieldKey]);
-    const isMissing = required && !normalizeValue(customer[fieldKey]);
-
     return [
       baseClassName,
-      isPrefilled ? styles.fieldPrefilled : "",
-      isMissing ? styles.fieldRequiredMissing : "",
+      hasFieldError(fieldKey, required) ? styles.fieldInvalid : "",
     ]
       .filter(Boolean)
       .join(" ");
   }
 
-  function renderFieldHint(fieldKey, required = false) {
-    const isPrefilled =
-      normalizeValue(contractPrefill[fieldKey]) && normalizeValue(customer[fieldKey]) === normalizeValue(contractPrefill[fieldKey]);
-    const isMissing = required && !normalizeValue(customer[fieldKey]);
+  function renderFieldError(fieldKey, required = false) {
+    if (!hasFieldError(fieldKey, required)) return null;
 
-    if (isPrefilled) {
-      return <span className={[styles.fieldHint, styles.fieldHintPrefilled].join(" ")}>Aus Vertragsadresse uebernommen</span>;
-    }
+    return (
+      <span className={styles.fieldError} role="alert">
+        {FIELD_ERROR_MESSAGES[fieldKey] || "Dieses Feld ist erforderlich."}
+      </span>
+    );
+  }
 
-    if (isMissing) {
-      return <span className={[styles.fieldHint, styles.fieldHintMissing].join(" ")}>Bitte noch ausfuellen</span>;
-    }
-
-    return null;
+  function handleFormSubmit(event) {
+    setHasTriedSubmit(true);
+    onSubmit(event);
   }
 
   return (
@@ -302,197 +283,269 @@ export default function KitchenOrderForm({
         <div className={styles.panelHeader}>
           <div>
             <h2>Bestellung abschliessen</h2>
-            <p className={styles.panelIntro}>
-              Gib deine Kontaktdaten ein. Deine Bestellbestaetigung folgt nach Pruefung.
-            </p>
           </div>
         </div>
-        {contractAddressLines.length ? (
-          <div className={styles.contractAddressBox}>
-            <strong>Adresse zu dieser Vertragsnummer</strong>
-            {contractAddressLines.map((line) => (
-              <span key={line}>{line}</span>
-            ))}
-            {onUseContractAddress ? (
-              <button type="button" className={styles.useContractAddressButton} onClick={onUseContractAddress}>
-                Adresse uebernehmen
-              </button>
-            ) : null}
-          </div>
-        ) : null}
-        <div className={styles.orderGuidance}>
-          <div className={styles.orderGuidanceBlock}>
-            <strong>Bereits ausgefuellt</strong>
-            <span>
-              {filledFromContractLabels.length
-                ? filledFromContractLabels.join(", ")
-                : "Noch keine Felder aus der Vertragsadresse uebernommen."}
-            </span>
-          </div>
-          <div className={styles.orderGuidanceBlock}>
-            <strong>Noch erforderlich</strong>
-            <span className={!missingRequiredLabels.length ? styles.orderGuidanceComplete : ""}>
-              {missingRequiredLabels.length
-                ? missingRequiredLabels.join(", ")
-                : "Alle Pflichtfelder sind ausgefuellt."}
-            </span>
-          </div>
-        </div>
-        <form id="order-form" className={styles.orderForm} autoComplete="on" onSubmit={onSubmit}>
+        <form
+          id="order-form"
+          className={styles.orderForm}
+          autoComplete="on"
+          onSubmit={handleFormSubmit}
+          onInvalidCapture={() => setHasTriedSubmit(true)}
+        >
           <input
             id="contractNumber"
             type="hidden"
             value={customer.contractNumber}
-            onChange={(event) => onUpdateCustomer("contractNumber", event.target.value)}
+            readOnly
           />
-          <div className={getFieldClassName("firstName", true, [styles.field, styles.fieldQuarter].join(" "))}>
-            <label htmlFor="firstName">Vorname*</label>
-            <input id="firstName" name="given-name" autoComplete="given-name" required placeholder="Max" value={customer.firstName} onChange={(event) => onUpdateCustomer("firstName", event.target.value)} />
-            {renderFieldHint("firstName", true)}
-          </div>
-          <div className={getFieldClassName("lastName", true, [styles.field, styles.fieldQuarter].join(" "))}>
-            <label htmlFor="lastName">Nachname*</label>
-            <input id="lastName" name="family-name" autoComplete="family-name" required placeholder="Mustermann" value={customer.lastName} onChange={(event) => onUpdateCustomer("lastName", event.target.value)} />
-            {renderFieldHint("lastName", true)}
-          </div>
-          <div className={getFieldClassName("email", true, [styles.field, styles.fieldQuarter].join(" "))}>
-            <label htmlFor="email">E-Mail*</label>
-            <input id="email" name="email" type="email" autoComplete="email" required placeholder="max@example.com" value={customer.email} onChange={(event) => onUpdateCustomer("email", event.target.value)} />
-            {renderFieldHint("email", true)}
-          </div>
-          <div className={getFieldClassName("phone", true, [styles.field, styles.fieldQuarter].join(" "))}>
-            <label htmlFor="phone">Telefon*</label>
-            <input id="phone" name="tel" autoComplete="tel" required placeholder="+49 170 1234567" value={customer.phone} onChange={(event) => onUpdateCustomer("phone", event.target.value)} />
-            {renderFieldHint("phone", true)}
-          </div>
-          <div className={getFieldClassName("address1", true, styles.fieldFull)}>
-            <label htmlFor="address1">Adresse (Straße, Nr.)*</label>
-            <input id="address1" name="address-line1" autoComplete="address-line1" required placeholder="Musterstraße 1" value={customer.address1} onChange={(event) => onUpdateCustomer("address1", event.target.value)} />
-            {renderFieldHint("address1", true)}
-          </div>
-          <div className={getFieldClassName("address2", false, styles.fieldFull)}>
-            <label htmlFor="address2">Adresszusatz (optional)</label>
-            <input id="address2" name="address-line2" autoComplete="address-line2" placeholder="Wohnung, Firma, etc." value={customer.address2} onChange={(event) => onUpdateCustomer("address2", event.target.value)} />
-            {renderFieldHint("address2")}
-          </div>
-          <div className={getFieldClassName("country", true, [styles.field, styles.fieldThird].join(" "))}>
-            <label htmlFor="country">Land*</label>
-            <select
-              id="country"
-              name="country"
-              autoComplete="country-name"
-              required
-              value={customer.country}
-              onChange={(event) => {
-                const nextCountry = event.target.value;
-                onUpdateCustomer("country", nextCountry);
-                onUpdateCustomer("city", "");
-                onUpdateCustomer("postalCode", "");
-              }}
-            >
-              <option value="">Land auswaehlen</option>
-              {countryOptions.map((country) => (
-                <option key={country} value={country}>{COUNTRY_LABELS[country] || country}</option>
-              ))}
-            </select>
-            {renderFieldHint("country", true)}
-          </div>
-          <div className={getFieldClassName("city", true, [styles.field, styles.fieldThird].join(" "))}>
-            <label htmlFor="city">Stadt*</label>
-            <select
-              id="city"
-              name="address-level2"
-              autoComplete="address-level2"
-              required
-              value={customer.city}
-              disabled={!customer.country}
-              onChange={(event) => {
-                onUpdateCustomer("city", event.target.value);
-                onUpdateCustomer("postalCode", "");
-              }}
-            >
-              <option value="">{customer.country ? "Stadt auswaehlen" : "Zuerst Land auswaehlen"}</option>
-              {cityOptions.map((city) => (
-                <option key={city} value={city}>{city}</option>
-              ))}
-            </select>
-            {renderFieldHint("city", true)}
-          </div>
-          <div className={getFieldClassName("postalCode", true, [styles.field, styles.fieldThird].join(" "))}>
-            <label htmlFor="postalCode">PLZ*</label>
-            <select
-              id="postalCode"
-              name="postal-code"
-              autoComplete="postal-code"
-              required
-              value={customer.postalCode}
-              disabled={!customer.city}
-              onChange={(event) => onUpdateCustomer("postalCode", event.target.value)}
-            >
-              <option value="">{customer.city ? "PLZ auswaehlen" : "Zuerst Stadt auswaehlen"}</option>
-              {postalCodeOptions.map((postalCode) => (
-                <option key={postalCode} value={postalCode}>{postalCode}</option>
-              ))}
-            </select>
-            {renderFieldHint("postalCode", true)}
-          </div>
-          <div className={styles.addressVerificationRow}>
-            <button
-              type="button"
-              className={[
-                styles.verifyAddressButton,
-                isAddressVerificationValid ? styles.verifyAddressButtonValid : "",
-                isAddressVerificationPartial ? styles.verifyAddressButtonWarning : "",
-                isAddressVerificationError ? styles.verifyAddressButtonError : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={onVerifyAddress}
-              disabled={isAddressVerificationLoading}
-            >
-              {isAddressVerificationLoading ? "Verifying..." : "Verify Address"}
-            </button>
-            <div
-              className={[
-                styles.addressVerificationMessage,
-                isAddressVerificationValid ? styles.addressVerificationMessageValid : "",
-                isAddressVerificationPartial ? styles.addressVerificationMessageWarning : "",
-                isAddressVerificationError ? styles.addressVerificationMessageError : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              role="status"
-              aria-live="polite"
-            >
-              {addressVerificationMessage ? <strong>{addressVerificationMessage}</strong> : <strong>Verify the address before submitting.</strong>}
-              {addressVerificationSuggestion ? <span>Suggested match: {addressVerificationSuggestion}</span> : null}
-              {isAddressVerificationPartial ? <span>Please review the street and verify again if needed.</span> : null}
-              {isAddressVerificationError ? <span>Correct the address details and run verification again.</span> : null}
+          <div className={styles.orderSectionCard}>
+            <div className={styles.orderSectionHeader}>
+              <div>
+                <h3>Contact person</h3>
+                <p>Wer bestellt?</p>
+              </div>
+            </div>
+            <div className={styles.sectionFields}>
+              <div className={getFieldClassName("firstName", true, styles.field)}>
+                <label htmlFor="firstName">Vorname*</label>
+                <input
+                  id="firstName"
+                  name="given-name"
+                  autoComplete="given-name"
+                  required
+                  placeholder="Max"
+                  value={customer.firstName}
+                  onBlur={() => markFieldTouched("firstName")}
+                  onChange={(event) => onUpdateCustomer("firstName", event.target.value)}
+                  aria-invalid={hasFieldError("firstName", true)}
+                />
+                {renderFieldError("firstName", true)}
+              </div>
+              <div className={getFieldClassName("lastName", true, styles.field)}>
+                <label htmlFor="lastName">Nachname*</label>
+                <input
+                  id="lastName"
+                  name="family-name"
+                  autoComplete="family-name"
+                  required
+                  placeholder="Mustermann"
+                  value={customer.lastName}
+                  onBlur={() => markFieldTouched("lastName")}
+                  onChange={(event) => onUpdateCustomer("lastName", event.target.value)}
+                  aria-invalid={hasFieldError("lastName", true)}
+                />
+                {renderFieldError("lastName", true)}
+              </div>
+              <div className={getFieldClassName("email", true, styles.field)}>
+                <label htmlFor="email">E-Mail*</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="max@example.com"
+                  value={customer.email}
+                  onBlur={() => markFieldTouched("email")}
+                  onChange={(event) => onUpdateCustomer("email", event.target.value)}
+                  aria-invalid={hasFieldError("email", true)}
+                />
+                {renderFieldError("email", true)}
+              </div>
+              <div className={getFieldClassName("phone", true, styles.field)}>
+                <label htmlFor="phone">Telefon*</label>
+                <input
+                  id="phone"
+                  name="tel"
+                  autoComplete="tel"
+                  required
+                  placeholder="+49 170 1234567"
+                  value={customer.phone}
+                  onBlur={() => markFieldTouched("phone")}
+                  onChange={(event) => onUpdateCustomer("phone", event.target.value)}
+                  aria-invalid={hasFieldError("phone", true)}
+                />
+                {renderFieldError("phone", true)}
+              </div>
             </div>
           </div>
-          <div className={getFieldClassName("notes", false, styles.fieldFull)}>
-            <label htmlFor="notes">Anmerkungen (optional)</label>
-            <textarea
-              id="notes"
-              rows="3"
-              value={customer.notes}
-              onChange={(event) => onUpdateCustomer("notes", event.target.value)}
-              placeholder="Hinweise zur Lieferung, Wunschtermine, etc."
-            />
-            {renderFieldHint("notes")}
+
+          <div className={styles.orderSectionCard}>
+            <div className={styles.orderSectionHeader}>
+              <div>
+                <h3>Order / Payment address</h3>
+                <p>Waehle, ob die Vertragsadresse fuer die Bestellung verwendet werden soll.</p>
+              </div>
+            </div>
+            <div className={styles.checkboxRow}>
+              <input
+                id="use-object-address"
+                type="checkbox"
+                checked={isUsingContractAddress}
+                disabled={!canUseContractAddress}
+                onChange={(event) => onToggleUseContractAddress(event.target.checked)}
+              />
+              <label htmlFor="use-object-address">
+                Use object address as order/payment address
+              </label>
+            </div>
+            {isUsingContractAddress ? (
+              <p className={styles.sectionHint}>The contract address will be used for this order.</p>
+            ) : (
+              <div className={styles.sectionFields}>
+                <div className={getFieldClassName("address1", true, styles.fieldFull)}>
+                  <label htmlFor="address1">Adresse (Straße, Nr.)*</label>
+                  <input
+                    id="address1"
+                    name="address-line1"
+                    autoComplete="address-line1"
+                    required
+                    placeholder="Musterstraße 1"
+                    value={customer.address1}
+                    onBlur={() => markFieldTouched("address1")}
+                    onChange={(event) => onUpdateCustomer("address1", event.target.value)}
+                    aria-invalid={hasFieldError("address1", true)}
+                  />
+                  {renderFieldError("address1", true)}
+                </div>
+                <div className={getFieldClassName("address2", false, styles.fieldFull)}>
+                  <label htmlFor="address2">Adresszusatz</label>
+                  <input
+                    id="address2"
+                    name="address-line2"
+                    autoComplete="address-line2"
+                    placeholder="Wohnung, Firma, etc."
+                    value={customer.address2}
+                    onBlur={() => markFieldTouched("address2")}
+                    onChange={(event) => onUpdateCustomer("address2", event.target.value)}
+                  />
+                </div>
+                <div className={getFieldClassName("country", true, [styles.field, styles.fieldThird].join(" "))}>
+                  <label htmlFor="country">Land*</label>
+                  <select
+                    id="country"
+                    name="country"
+                    autoComplete="country-name"
+                    required
+                    value={customer.country}
+                    onBlur={() => markFieldTouched("country")}
+                    onChange={(event) => {
+                      const nextCountry = event.target.value;
+                      onUpdateCustomer("country", nextCountry);
+                      onUpdateCustomer("city", "");
+                      onUpdateCustomer("postalCode", "");
+                    }}
+                    aria-invalid={hasFieldError("country", true)}
+                  >
+                    <option value="">Land auswaehlen</option>
+                    {countryOptions.map((country) => (
+                      <option key={country} value={country}>{COUNTRY_LABELS[country] || country}</option>
+                    ))}
+                  </select>
+                  {renderFieldError("country", true)}
+                </div>
+                <div className={getFieldClassName("city", true, [styles.field, styles.fieldThird].join(" "))}>
+                  <label htmlFor="city">Stadt*</label>
+                  <select
+                    id="city"
+                    name="address-level2"
+                    autoComplete="address-level2"
+                    required
+                    value={customer.city}
+                    disabled={!customer.country}
+                    onBlur={() => markFieldTouched("city")}
+                    onChange={(event) => {
+                      onUpdateCustomer("city", event.target.value);
+                      onUpdateCustomer("postalCode", "");
+                    }}
+                    aria-invalid={hasFieldError("city", true)}
+                  >
+                    <option value="">{customer.country ? "Stadt auswaehlen" : "Zuerst Land auswaehlen"}</option>
+                    {cityOptions.map((city) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                  {renderFieldError("city", true)}
+                </div>
+                <div className={getFieldClassName("postalCode", true, [styles.field, styles.fieldThird].join(" "))}>
+                  <label htmlFor="postalCode">PLZ*</label>
+                  <select
+                    id="postalCode"
+                    name="postal-code"
+                    autoComplete="postal-code"
+                    required
+                    value={customer.postalCode}
+                    disabled={!customer.city}
+                    onBlur={() => markFieldTouched("postalCode")}
+                    onChange={(event) => onUpdateCustomer("postalCode", event.target.value)}
+                    aria-invalid={hasFieldError("postalCode", true)}
+                  >
+                    <option value="">{customer.city ? "PLZ auswaehlen" : "Zuerst Stadt auswaehlen"}</option>
+                    {postalCodeOptions.map((postalCode) => (
+                      <option key={postalCode} value={postalCode}>{postalCode}</option>
+                    ))}
+                  </select>
+                  {renderFieldError("postalCode", true)}
+                </div>
+              </div>
+            )}
           </div>
-          <div className={styles.checkboxRow}>
-            <input
-              id="consent"
-              type="checkbox"
-              checked={customer.consent}
-              onChange={(event) => onUpdateCustomer("consent", event.target.checked)}
-            />
-            <label htmlFor="consent">
-              Ich stimme der Verarbeitung meiner Daten zum Zweck der Bestellung zu.*
-            </label>
+
+          <div className={styles.orderSectionCard}>
+            <div className={styles.orderSectionHeader}>
+              <div>
+                <h3>Address verification</h3>
+              </div>
+            </div>
+            <div className={styles.addressVerificationRow}>
+              <div className={styles.addressVerificationContent}>
+                {hasVerificationResult ? (
+                  <div
+                    className={[
+                      styles.addressVerificationMessage,
+                      isAddressVerificationValid ? styles.addressVerificationMessageValid : "",
+                      isAddressVerificationPartial ? styles.addressVerificationMessageWarning : "",
+                      isAddressVerificationError ? styles.addressVerificationMessageError : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    role="status"
+                    aria-live="polite"
+                  >
+                    {addressVerificationMessage ? <strong>{addressVerificationMessage}</strong> : null}
+                    {addressVerificationSuggestion ? <span>Suggested match: {addressVerificationSuggestion}</span> : null}
+                    {isAddressVerificationPartial ? <span>Please review the street and verify again if needed.</span> : null}
+                    {isAddressVerificationError ? <span>Correct the address details and run verification again.</span> : null}
+                  </div>
+                ) : (
+                  <p className={styles.sectionHint}>Please verify the address before submitting the order.</p>
+                )}
+              </div>
+              <button
+                type="button"
+                className={[
+                  styles.verifyAddressButton,
+                  isAddressVerificationValid ? styles.verifyAddressButtonValid : "",
+                  isAddressVerificationPartial ? styles.verifyAddressButtonWarning : "",
+                  isAddressVerificationError ? styles.verifyAddressButtonError : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={onVerifyAddress}
+                disabled={isAddressVerificationLoading}
+              >
+                {isAddressVerificationLoading ? "Verifying..." : "Verify address"}
+              </button>
+            </div>
           </div>
-          <div className={styles.fieldFull}>
+
+          <div className={styles.orderSectionCard}>
+            <div className={styles.orderSectionHeader}>
+              <div>
+                <h3>Payment + Consent</h3>
+                <p>Waehle eine Zahlungsmethode, hinterlasse optional Hinweise und bestaetige den Datenschutz.</p>
+              </div>
+            </div>
             <div className={styles.paymentSection}>
               <label>Zahlungsmethode auswaehlen*</label>
               <div className={styles.paymentOptions} role="radiogroup" aria-label="Zahlungsmethode">
@@ -505,10 +558,15 @@ export default function KitchenOrderForm({
                       className={[
                         styles.paymentOption,
                         selected ? styles.paymentOptionSelected : "",
+                        hasFieldError("paymentMethod", true) ? styles.paymentOptionInvalid : "",
                       ]
                         .filter(Boolean)
                         .join(" ")}
-                      onClick={() => onUpdateCustomer("paymentMethod", option.value)}
+                      onClick={() => {
+                        markFieldTouched("paymentMethod");
+                        onUpdateCustomer("paymentMethod", option.value);
+                      }}
+                      onBlur={() => markFieldTouched("paymentMethod")}
                       aria-pressed={selected}
                     >
                       <span
@@ -525,14 +583,44 @@ export default function KitchenOrderForm({
                   );
                 })}
               </div>
+              {renderFieldError("paymentMethod", true)}
             </div>
+            <div className={styles.sectionFields}>
+              <div className={styles.fieldFull}>
+                <label htmlFor="notes">Anmerkungen (optional)</label>
+                <textarea
+                  id="notes"
+                  rows="3"
+                  value={customer.notes}
+                  onBlur={() => markFieldTouched("notes")}
+                  onChange={(event) => onUpdateCustomer("notes", event.target.value)}
+                  placeholder="Hinweise zur Lieferung, Wunschtermine, etc."
+                />
+              </div>
+            </div>
+            <div className={styles.checkboxRow}>
+              <input
+                id="consent"
+                type="checkbox"
+                checked={customer.consent}
+                onBlur={() => markFieldTouched("consent")}
+                onChange={(event) => {
+                  markFieldTouched("consent");
+                  onUpdateCustomer("consent", event.target.checked);
+                }}
+              />
+              <label htmlFor="consent">
+                Ich stimme der Verarbeitung meiner Daten zum Zweck der Bestellung zu.*
+              </label>
+            </div>
+            {renderFieldError("consent", true)}
+            <div className={styles.orderSubmitRow}>
+              <button type="submit" form="order-form" className={styles.orderSubmitButton} disabled={isSubmitting}>
+                {isSubmitting ? "Wird gespeichert..." : "Bestellung einreichen"}
+              </button>
+            </div>
+            <small className={styles.orderHelp}>Mit * gekennzeichnete Felder sind Pflichtfelder.</small>
           </div>
-          <div className={styles.orderSubmitRow}>
-            <button type="submit" form="order-form" className={styles.orderSubmitButton} disabled={isSubmitting}>
-              {isSubmitting ? "Wird gespeichert..." : "Bestellung einreichen"}
-            </button>
-          </div>
-          <small className={styles.orderHelp}>Mit * gekennzeichnete Felder sind Pflichtfelder.</small>
         </form>
 
         <div
