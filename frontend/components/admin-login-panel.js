@@ -35,7 +35,7 @@ function AdminLoginPanelContent({ errorMessage }) {
           gap: 22,
           borderRadius: 8,
           padding: "28px",
-          background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,249,245,0.88))",
+          background: "var(--color-card)",
           border: "1px solid var(--app-border)",
           boxShadow: "var(--app-shadow-soft)",
         }}
@@ -117,7 +117,7 @@ const buttonStyle = {
   minHeight: 44,
   borderRadius: 8,
   padding: "0 22px",
-  background: "linear-gradient(135deg, var(--app-accent) 0%, #b86438 100%)",
+  background: "var(--color-primary)",
   color: "var(--app-accent-contrast)",
   fontSize: "0.98rem",
   fontWeight: 800,

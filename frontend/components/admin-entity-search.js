@@ -12,10 +12,10 @@ const OPEN_LINK_STYLE = {
   alignItems: "center",
   justifyContent: "center",
   borderRadius: 10,
-  border: "1px solid #d1d5db",
-  color: "#111827",
+  border: "1px solid var(--color-primary)",
+  color: "#ffffff",
   textDecoration: "none",
-  background: "#f8fafc",
+  background: "var(--color-primary)",
   padding: "9px 12px",
   fontWeight: 800,
 };
@@ -26,9 +26,9 @@ const FOOTER_LINK_STYLE = {
   minHeight: 34,
   padding: "0 12px",
   borderRadius: 999,
-  border: "1px solid rgba(146, 64, 14, 0.16)",
-  background: "#fff7ed",
-  color: "#9a3412",
+  border: "1px solid rgba(107, 79, 58, 0.16)",
+  background: "var(--color-primary-soft)",
+  color: "var(--color-primary)",
   textDecoration: "none",
   fontSize: 13,
   fontWeight: 700,
@@ -420,10 +420,10 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
 
       <style jsx>{`
         .search-workspace {
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 18px;
-          background: #ffffff;
-          box-shadow: 0 14px 38px rgba(15, 23, 42, 0.06);
+          background: var(--color-card);
+          box-shadow: var(--app-shadow-soft);
           padding: 18px;
           display: grid;
           gap: 14px;
@@ -440,7 +440,7 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
         h2,
         h3 {
           margin: 0;
-          color: #111827;
+          color: var(--color-text);
         }
 
         h2 {
@@ -453,14 +453,14 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
 
         p {
           margin: 6px 0 0;
-          color: #6b7280;
+          color: var(--color-text-muted);
           line-height: 1.45;
         }
 
         .loading-pill {
           border-radius: 999px;
-          background: rgba(180, 83, 9, 0.1);
-          color: #92400e;
+          background: var(--color-primary-soft);
+          color: var(--color-primary);
           padding: 8px 12px;
           font-size: 12px;
           font-weight: 800;
@@ -473,9 +473,9 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
 
         .search-input-wrap {
           position: relative;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 16px;
-          background: #ffffff;
+          background: var(--color-card);
         }
 
         .input-row {
@@ -499,41 +499,47 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
           border: 0;
           outline: none;
           background: transparent;
-          color: #111827;
+          color: var(--color-text);
           font-size: 15px;
           padding: 0 4px;
         }
 
         .search-button {
           min-height: 44px;
-          border: 0;
+          border: 1px solid var(--color-primary);
           border-radius: 12px;
-          background: #111827;
+          background: var(--color-primary);
           color: #ffffff;
           padding: 0 16px;
           font-size: 14px;
           font-weight: 800;
           cursor: pointer;
           white-space: nowrap;
+          transition: background-color 160ms ease, border-color 160ms ease;
+        }
+
+        .search-button:hover {
+          background: var(--color-primary-hover);
+          border-color: var(--color-primary-hover);
         }
 
         .state-card strong,
         .match-copy strong {
           display: block;
-          color: #111827;
+          color: var(--color-text);
         }
 
         .state-card span,
         .match-copy span,
         .match-copy small {
-          color: #6b7280;
+          color: var(--color-text-muted);
           line-height: 1.4;
         }
 
         .state-card {
-          border: 1px dashed #d1d5db;
+          border: 1px dashed var(--color-border);
           border-radius: 14px;
-          background: #f9fafb;
+          background: #fbfaf7;
           padding: 16px;
           display: grid;
           gap: 6px;
@@ -545,16 +551,16 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
 
         .state-card--error {
           border-style: solid;
-          border-color: #fecaca;
-          background: #fef2f2;
+          border-color: rgba(217, 92, 92, 0.22);
+          background: var(--app-danger-bg);
         }
 
         .state-card button {
           width: fit-content;
           min-height: 38px;
-          border: 0;
+          border: 1px solid var(--color-primary);
           border-radius: 10px;
-          background: #111827;
+          background: var(--color-primary);
           color: #ffffff;
           padding: 0 14px;
           font-weight: 800;
@@ -562,9 +568,9 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
         }
 
         .matches-panel {
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 16px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 14px;
           display: grid;
           gap: 12px;
@@ -583,9 +589,9 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
         }
 
         .match-row {
-          border: 1px solid #ececec;
+          border: 1px solid var(--color-border);
           border-radius: 14px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 12px;
           display: flex;
           justify-content: space-between;
@@ -623,28 +629,28 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
         }
 
         .type-badge--contract {
-          background: #fff7ed;
-          color: #9a3412;
+          background: var(--color-primary-soft);
+          color: var(--color-primary);
         }
 
         .type-badge--order {
-          background: #eef2ff;
-          color: #3730a3;
+          background: #edf1fe;
+          color: var(--color-emailed);
         }
 
         .type-badge--partner {
-          background: #ecfeff;
-          color: #155e75;
+          background: #eef8f2;
+          color: var(--color-confirmed);
         }
 
         .type-badge--object {
-          background: #eff6ff;
-          color: #1d4ed8;
+          background: #fbf0db;
+          color: var(--color-new);
         }
 
         .type-badge--address {
-          background: #f3f4f6;
-          color: #374151;
+          background: #f0ebe5;
+          color: var(--color-text-muted);
         }
 
         .finder-footer {

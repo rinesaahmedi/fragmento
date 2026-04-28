@@ -139,7 +139,7 @@ export const tableWrapStyle = {
   overflowX: "auto",
   borderRadius: 18,
   border: "1px solid var(--app-border)",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,249,245,0.86))",
+  background: "var(--color-card)",
   boxShadow: "var(--app-shadow-soft)",
 };
 export const tableStyle = { width: "100%", borderCollapse: "collapse", background: "var(--app-surface)" };
@@ -151,7 +151,7 @@ export const thStyle = {
   textTransform: "uppercase",
   letterSpacing: "0.12em",
   borderBottom: "1px solid var(--app-border)",
-  background: "linear-gradient(180deg, rgba(255,250,246,0.95), rgba(252,241,232,0.88))",
+  background: "var(--app-surface-muted)",
   fontWeight: 700,
 };
 export const tdStyle = {
@@ -165,41 +165,41 @@ export const inputStyle = {
   minHeight: 52,
   borderRadius: 14,
   border: "1px solid var(--app-border-strong)",
-  background: "rgba(255,255,255,0.82)",
+  background: "var(--color-card)",
   padding: "13px 15px",
   color: "var(--app-text)",
   fontSize: "0.98rem",
-  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8)",
 };
 export const textareaStyle = {
   width: "100%",
   borderRadius: 14,
   border: "1px solid var(--app-border-strong)",
-  background: "rgba(255,255,255,0.82)",
+  background: "var(--color-card)",
   padding: "13px 15px",
   color: "var(--app-text)",
   fontSize: "0.98rem",
   resize: "vertical",
-  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7)",
+  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8)",
 };
 export const primaryButtonStyle = {
-  border: "1px solid rgba(255,255,255,0.12)",
+  border: "1px solid var(--color-primary)",
   borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "linear-gradient(135deg, var(--app-accent) 0%, #b86438 100%)",
+  background: "var(--color-primary)",
   color: "var(--app-accent-contrast)",
   fontWeight: 700,
   fontSize: "0.98rem",
   cursor: "pointer",
-  boxShadow: "0 16px 30px rgba(143, 62, 44, 0.18)",
+  boxShadow: "0 12px 24px rgba(84, 59, 40, 0.14)",
 };
 export const secondaryButtonStyle = {
   border: "1px solid var(--app-border-strong)",
   borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,243,232,0.72))",
+  background: "var(--color-card)",
   color: "var(--app-accent)",
   fontWeight: 700,
   fontSize: "0.98rem",
@@ -207,11 +207,11 @@ export const secondaryButtonStyle = {
   boxShadow: "var(--app-shadow-soft)",
 };
 export const dangerButtonStyle = {
-  border: "1px solid rgba(180, 71, 57, 0.12)",
+  border: "1px solid rgba(217, 92, 92, 0.24)",
   borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "linear-gradient(135deg, var(--app-danger-bg), rgba(255,255,255,0.92))",
+  background: "var(--app-danger-bg)",
   color: "var(--app-danger-text)",
   fontWeight: 700,
   fontSize: "0.98rem",
@@ -225,7 +225,7 @@ export const itemCardStyle = {
   border: "1px solid var(--app-border)",
   borderRadius: 18,
   padding: 20,
-  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,249,245,0.88))",
+  background: "var(--color-card)",
   display: "grid",
   gap: 16,
   boxShadow: "var(--app-shadow-soft)",
@@ -242,17 +242,17 @@ export const codePillStyle = {
   display: "inline-flex",
   padding: "8px 10px",
   borderRadius: 999,
-  background: "linear-gradient(135deg, var(--app-accent-soft), rgba(255,255,255,0.9))",
+  background: "var(--app-accent-soft)",
   color: "var(--app-accent)",
   fontSize: 13,
   fontWeight: 700,
-  border: "1px solid rgba(143, 62, 44, 0.12)",
+  border: "1px solid rgba(107, 79, 58, 0.14)",
 };
 
 const panelStyle = {
   borderRadius: 20,
   padding: 24,
-  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,249,245,0.88))",
+  background: "var(--color-card)",
   border: "1px solid var(--app-border)",
   display: "grid",
   gap: 20,
@@ -298,13 +298,13 @@ const linkButtonStyle = {
   borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,248,242,0.8))",
+  background: "var(--color-card)",
   color: "var(--app-accent)",
-  border: "1px solid rgba(255,255,255,0.22)",
+  border: "1px solid var(--app-border)",
   fontWeight: 700,
   display: "inline-flex",
   alignItems: "center",
-  boxShadow: "0 12px 24px rgba(59, 25, 17, 0.14)",
+  boxShadow: "var(--app-shadow-soft)",
 };
 
 const secondaryLinkStyle = {
@@ -312,7 +312,7 @@ const secondaryLinkStyle = {
   borderRadius: 14,
   minHeight: 50,
   padding: "13px 18px",
-  background: "rgba(255,255,255,0.08)",
+  background: "rgba(255,255,255,0.1)",
   color: "var(--app-accent-contrast)",
   border: "1px solid rgba(255,255,255,0.24)",
   fontWeight: 700,
@@ -331,26 +331,29 @@ function statusPill(status) {
   };
 
   if (status === "ACTIVE" || status === "CONFIRMED") {
-    return { ...base, background: "linear-gradient(135deg, var(--app-success-bg), rgba(255,255,255,0.78))", color: "var(--app-success-text)", border: "1px solid rgba(53, 113, 88, 0.14)" };
+    return { ...base, background: "var(--app-success-bg)", color: "var(--app-success-text)", border: "1px solid rgba(63, 166, 107, 0.2)" };
   }
 
   if (status === "ARCHIVED" || status === "CANCELLED") {
-    return { ...base, background: "linear-gradient(135deg, var(--app-neutral-bg), rgba(255,255,255,0.72))", color: "var(--app-neutral-text)", border: "1px solid rgba(112, 89, 78, 0.12)" };
+    const tone = status === "CANCELLED"
+      ? { background: "var(--app-danger-bg)", color: "var(--app-danger-text)", border: "1px solid rgba(217, 92, 92, 0.2)" }
+      : { background: "var(--app-neutral-bg)", color: "var(--app-neutral-text)", border: "1px solid rgba(122, 109, 97, 0.14)" };
+    return { ...base, ...tone };
   }
 
   if (status === "EMAILED") {
-    return { ...base, background: "linear-gradient(135deg, var(--app-info-bg), rgba(255,255,255,0.78))", color: "var(--app-info-text)", border: "1px solid rgba(45, 108, 121, 0.14)" };
+    return { ...base, background: "var(--app-info-bg)", color: "var(--app-info-text)", border: "1px solid rgba(74, 125, 218, 0.18)" };
   }
 
-  return { ...base, background: "linear-gradient(135deg, var(--app-warning-bg), rgba(255,255,255,0.78))", color: "var(--app-warning-text)", border: "1px solid rgba(144, 98, 14, 0.12)" };
+  return { ...base, background: "var(--app-warning-bg)", color: "var(--app-warning-text)", border: "1px solid rgba(230, 162, 60, 0.18)" };
 }
 
 const typePillStyle = {
-  background: "linear-gradient(135deg, var(--app-secondary-soft), rgba(255,255,255,0.88))",
+  background: "var(--app-secondary-soft)",
   color: "var(--app-accent)",
   borderRadius: 999,
   padding: "7px 12px",
   fontSize: 12,
   fontWeight: 700,
-  border: "1px solid rgba(43, 141, 128, 0.12)",
+  border: "1px solid rgba(91, 141, 239, 0.16)",
 };

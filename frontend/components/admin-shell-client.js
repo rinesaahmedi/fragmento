@@ -37,6 +37,7 @@ function AdminShellContent({ adminEmail, children }) {
         isolation: "isolate",
         background: "var(--app-bg)",
         color: "var(--app-text)",
+        fontFamily: "Manrope, sans-serif",
       }}
     >
       <div
@@ -56,7 +57,7 @@ function AdminShellContent({ adminEmail, children }) {
             width: 380,
             height: 380,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(255, 195, 132, 0.14) 0%, rgba(255, 195, 132, 0.06) 34%, transparent 68%)",
+            background: "radial-gradient(circle, rgba(232, 222, 212, 0.55) 0%, rgba(232, 222, 212, 0.18) 34%, transparent 68%)",
             filter: "blur(16px)",
           }}
         />
@@ -68,7 +69,7 @@ function AdminShellContent({ adminEmail, children }) {
             width: 300,
             height: 300,
             borderRadius: "50%",
-            background: "radial-gradient(circle, rgba(86, 181, 164, 0.12) 0%, rgba(86, 181, 164, 0.04) 34%, transparent 70%)",
+            background: "radial-gradient(circle, rgba(139, 113, 92, 0.16) 0%, rgba(139, 113, 92, 0.05) 34%, transparent 70%)",
             filter: "blur(18px)",
           }}
         />
@@ -111,12 +112,12 @@ function AdminShellContent({ adminEmail, children }) {
                   borderRadius: 8,
                   whiteSpace: "nowrap",
                   background: active
-                    ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.12))"
-                    : "rgba(255,255,255,0.7)",
+                    ? "var(--color-primary-soft)"
+                    : "var(--color-card)",
                   color: active ? "var(--app-accent)" : "var(--app-text)",
                   border: `1px solid ${active ? "var(--app-border-strong)" : "var(--app-border)"}`,
                   fontWeight: active ? 700 : 600,
-                  boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "var(--app-shadow-soft)",
+                  boxShadow: active ? "0 10px 22px rgba(84, 59, 40, 0.08)" : "var(--app-shadow-soft)",
                   flex: "0 0 auto",
                   boxSizing: "border-box",
                 }}
@@ -142,8 +143,8 @@ function AdminShellContent({ adminEmail, children }) {
             height: "100vh",
             overflowY: "auto",
             padding: "0 20px 20px",
-            background: "linear-gradient(180deg, rgba(247, 238, 228, 0.98), rgba(243, 231, 218, 0.92))",
-            borderRight: "1px solid rgba(172, 111, 70, 0.14)",
+            background: "var(--color-sidebar-bg)",
+            borderRight: "1px solid var(--color-border)",
             zIndex: 30,
             boxSizing: "border-box",
           }}
@@ -214,12 +215,12 @@ function AdminShellContent({ adminEmail, children }) {
                     padding: "10px 14px",
                     borderRadius: 8,
                     background: active
-                      ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.12))"
+                      ? "var(--color-primary-soft)"
                       : "transparent",
                     color: active ? "var(--app-accent)" : "var(--app-text)",
                     border: `1px solid ${active ? "var(--app-border-strong)" : "transparent"}`,
                     fontWeight: active ? 700 : 600,
-                    boxShadow: active ? "0 12px 24px rgba(143, 62, 44, 0.08)" : "none",
+                    boxShadow: active ? "0 10px 22px rgba(84, 59, 40, 0.08)" : "none",
                     boxSizing: "border-box",
                   }}
                 >
@@ -325,7 +326,7 @@ function AdminShellContent({ adminEmail, children }) {
                       border: "1px solid var(--app-border-strong)",
                       borderRadius: 8,
                       padding: "11px 18px",
-                      background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,243,232,0.72))",
+                      background: "var(--color-card)",
                       color: "var(--app-text)",
                       fontWeight: 700,
                       cursor: "pointer",
@@ -415,10 +416,10 @@ function IconFrame({ children, active = false }) {
         justifyContent: "center",
         borderRadius: 10,
         background: active
-          ? "linear-gradient(135deg, rgba(143,62,44,0.1), rgba(232,155,53,0.14))"
-          : "rgba(255,255,255,0.76)",
+          ? "var(--color-primary-soft)"
+          : "rgba(255,255,255,0.78)",
         color: active ? "var(--app-accent)" : "var(--app-text-muted)",
-        border: `1px solid ${active ? "rgba(143,62,44,0.1)" : "rgba(172,111,70,0.12)"}`,
+        border: `1px solid ${active ? "rgba(107,79,58,0.16)" : "rgba(107,79,58,0.08)"}`,
       }}
     >
       {children}

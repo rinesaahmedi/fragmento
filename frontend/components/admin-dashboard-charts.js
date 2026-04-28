@@ -20,16 +20,24 @@ import {
 } from "recharts";
 
 const STATUS_COLORS = {
-  NEW: "#9ca3af",
-  EMAILED: "#2563eb",
-  CONFIRMED: "#16a34a",
-  CANCELLED: "#dc2626",
+  NEW: "#E6A23C",
+  EMAILED: "#4A7DDA",
+  CONFIRMED: "#3FA66B",
+  CANCELLED: "#D95C5C",
 };
 
-const SERIES_COLORS = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#e11d48", "#65a30d", "#ea580c", "#0d9488"];
-const DISTRIBUTION_COLORS = ["#2563eb", "#16a34a", "#f59e0b", "#dc2626", "#7c3aed", "#0891b2", "#e11d48", "#65a30d", "#ea580c", "#0d9488"];
+const SERIES_COLORS = ["#6C8AE4", "#58BFA6", "#F08A5D", "#9B6EF3", "#E07A5F", "#5B8DEF", "#5FBF8F", "#F2A65A"];
+const DISTRIBUTION_COLORS = ["#6C8AE4", "#58BFA6", "#F08A5D", "#9B6EF3", "#E07A5F", "#5B8DEF", "#5FBF8F", "#F2A65A"];
 const ORDER_STATUSES = ["NEW", "EMAILED", "CONFIRMED", "CANCELLED"];
 const MAX_TOP_ITEMS = 12;
+const CHART_GRID = "#E5E1DC";
+const CHART_TEXT = "#2B2B2B";
+const CHART_MUTED = "#6F6F6F";
+const CATEGORY_COLORS = {
+  COMPONENT: "#5B8DEF",
+  ACCESSORY: "#5FBF8F",
+  SERVICE: "#F2A65A",
+};
 
 export const EXAMPLE_DASHBOARD_MOCK_DATA = {
   kpis: [
@@ -163,11 +171,11 @@ export function AdminDashboardCharts({
           {statusChartData.length ? (
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={statusChartData} margin={{ top: 12, right: 20, left: -10, bottom: 4 }}>
-                <CartesianGrid stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
-                <YAxis tickLine={false} axisLine={false} fontSize={12} domain={statusMode === "percentage" ? [0, 100] : undefined} tickFormatter={(value) => statusMode === "percentage" ? `${value}%` : value} />
+                <CartesianGrid stroke={CHART_GRID} vertical={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+                <YAxis tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} domain={statusMode === "percentage" ? [0, 100] : undefined} tickFormatter={(value) => statusMode === "percentage" ? `${value}%` : value} />
                 <Tooltip content={<StatusTooltip mode={statusMode} />} />
-                <Legend formatter={(value) => translateStatus(value, translate)} />
+                <Legend formatter={(value) => translateStatus(value, translate)} wrapperStyle={{ color: CHART_TEXT }} />
                 {ORDER_STATUSES.map((status) => (
                   <Bar key={status} dataKey={status} stackId="orders" fill={STATUS_COLORS[status]} radius={status === "CANCELLED" ? [6, 6, 0, 0] : [0, 0, 0, 0]} />
                 ))}
@@ -189,11 +197,11 @@ export function AdminDashboardCharts({
           {kitchenTimelineData.length && kitchenSeries.length ? (
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={kitchenTimelineData} margin={{ top: 10, right: 18, left: -12, bottom: 0 }}>
-                <CartesianGrid stroke="#e5e7eb" vertical={false} />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
-                <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
+                <CartesianGrid stroke={CHART_GRID} vertical={false} />
+                <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+                <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
                 <Tooltip />
-                <Legend onClick={(event) => setIsolatedSeries((current) => current === event.dataKey ? "" : event.dataKey)} />
+                <Legend wrapperStyle={{ color: CHART_TEXT }} onClick={(event) => setIsolatedSeries((current) => current === event.dataKey ? "" : event.dataKey)} />
                 {visibleKitchenSeries.map((name, index) => (
                   <Line
                     key={name}
@@ -230,12 +238,6 @@ export function AdminDashboardCharts({
       <PropertyOwnerAnalyticsSection analytics={companyAnalytics} />
 
       <style jsx>{`
-        .analytics-dashboard {
-          display: grid;
-          gap: 16px;
-          color: #111827;
-        }
-
         .dashboard-toolbar {
           display: flex;
           justify-content: space-between;
@@ -244,131 +246,11 @@ export function AdminDashboardCharts({
           flex-wrap: wrap;
         }
 
-        .eyebrow {
-          margin: 0 0 8px;
-          color: #2563eb;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-        }
-
-        h1 {
-          margin: 0;
-          font-size: 2.2rem;
-          line-height: 1.08;
-        }
-
-        p {
-          margin: 8px 0 0;
-          color: #6b7280;
-          line-height: 1.5;
-        }
-
         .filter-form {
           display: grid;
           grid-template-columns: repeat(5, minmax(130px, auto));
           gap: 10px;
           align-items: end;
-        }
-
-        label {
-          display: grid;
-          gap: 6px;
-          color: #4b5563;
-          font-size: 12px;
-          font-weight: 800;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-        }
-
-        input,
-        select,
-        button {
-          min-height: 42px;
-          border-radius: 8px;
-          border: 1px solid #d1d5db;
-          background: #ffffff;
-          color: #111827;
-          padding: 9px 12px;
-          font: inherit;
-          text-transform: none;
-          letter-spacing: 0;
-        }
-
-        button {
-          border-color: #2563eb;
-          background: #2563eb;
-          color: #ffffff;
-          font-weight: 800;
-          cursor: pointer;
-        }
-
-        .toolbar-link {
-          min-height: 42px;
-          border-radius: 8px;
-          border: 1px solid #d1d5db;
-          background: #ffffff;
-          color: #111827;
-          padding: 9px 12px;
-          font: inherit;
-          font-weight: 700;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .kpi-grid,
-        .dashboard-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
-        }
-
-        .dashboard-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          align-items: stretch;
-        }
-
-        .kpi-card,
-        .chart-card {
-          border: 1px solid #e5e7eb;
-          border-radius: 16px;
-          background: #ffffff;
-          box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
-        }
-
-        .kpi-card {
-          display: grid;
-          gap: 6px;
-          padding: 16px;
-        }
-
-        .kpi-card span {
-          color: #6b7280;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .kpi-card strong {
-          color: #111827;
-          font-size: 1.65rem;
-          line-height: 1.1;
-        }
-
-        .kpi-card small {
-          color: #16a34a;
-          font-weight: 700;
-        }
-
-        .chart-card {
-          display: grid;
-          gap: 12px;
-          padding: 18px;
-          min-width: 0;
         }
 
         .chart-card--status {
@@ -384,114 +266,15 @@ export function AdminDashboardCharts({
           min-width: 0;
         }
 
-        .segmented-control {
-          display: flex;
-          gap: 6px;
-          padding: 4px;
-          border-radius: 8px;
-          background: #f3f4f6;
-        }
-
-        .segmented-control button {
-          min-height: 34px;
-          border: 0;
-          background: transparent;
-          color: #4b5563;
-          padding: 7px 10px;
-        }
-
-        .segmented-control button.is-active {
-          background: #ffffff;
-          color: #111827;
-          box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
-        }
-
-        .table-wrap {
-          overflow-x: auto;
-          border: 1px solid #e5e7eb;
-          border-radius: 12px;
-        }
-
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          background: #ffffff;
-        }
-
-        th,
-        td {
-          padding: 10px 14px;
-          border-bottom: 1px solid #e5e7eb;
-          text-align: left;
-          white-space: nowrap;
-          max-width: 220px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        th {
-          color: #6b7280;
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-        }
-
-        td {
-          color: #111827;
-          font-size: 14px;
-        }
-
-        td a {
-          color: #111827;
-          font-weight: 800;
-          text-decoration: none;
-        }
-
-        .status-pill {
-          display: inline-flex;
-          align-items: center;
-          border-radius: 999px;
-          background: color-mix(in srgb, var(--status-color) 13%, #ffffff);
-          color: var(--status-color);
-          border: 1px solid color-mix(in srgb, var(--status-color) 25%, #ffffff);
-          padding: 6px 9px;
-          font-size: 12px;
-          font-weight: 800;
-        }
-
-        .panel-link {
-          min-height: 42px;
-          display: inline-flex;
-          align-items: center;
-          border-radius: 8px;
-          border: 1px solid #2563eb;
-          background: #2563eb;
-          color: #ffffff;
-          padding: 9px 12px;
-          font-weight: 800;
-          text-decoration: none;
-        }
-
         @media (max-width: 1100px) {
-          .kpi-grid,
-          .dashboard-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
           .filter-form {
             grid-template-columns: repeat(2, minmax(150px, 1fr));
           }
         }
 
         @media (max-width: 700px) {
-          .kpi-grid,
-          .dashboard-grid,
           .filter-form {
             grid-template-columns: 1fr;
-          }
-
-          h1 {
-            font-size: 1.8rem;
           }
         }
       `}</style>
@@ -518,7 +301,7 @@ function ChartHeader({ eyebrow, title, detail, actions }) {
         }
 
         span {
-          color: #6b7280;
+          color: var(--color-text-muted);
           font-size: 12px;
           font-weight: 800;
           letter-spacing: 0.08em;
@@ -527,13 +310,13 @@ function ChartHeader({ eyebrow, title, detail, actions }) {
 
         h2 {
           margin: 6px 0 0;
-          color: #111827;
+          color: var(--color-text);
           font-size: 1.2rem;
         }
 
         p {
           margin: 6px 0 0;
-          color: #6b7280;
+          color: var(--color-text-muted);
           line-height: 1.45;
         }
       `}</style>
@@ -557,11 +340,11 @@ function StatusTooltip({ active, payload, label, mode }) {
         .tooltip {
           display: grid;
           gap: 6px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 10px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 10px 12px;
-          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+          box-shadow: var(--app-shadow-soft);
         }
 
         strong,
@@ -704,14 +487,14 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
                   {selectedTimeline.some((row) => row.orders || row.revenue) ? (
                     <ResponsiveContainer width="100%" height={240}>
                       <LineChart data={selectedTimeline} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
-                        <CartesianGrid stroke="#e5e7eb" vertical={false} />
-                        <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} />
-                        <YAxis yAxisId="orders" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
-                        <YAxis yAxisId="revenue" orientation="right" tickLine={false} axisLine={false} fontSize={12} tickFormatter={compactCurrency} />
+                        <CartesianGrid stroke={CHART_GRID} vertical={false} />
+                        <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+                        <YAxis yAxisId="orders" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+                        <YAxis yAxisId="revenue" orientation="right" tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} tickFormatter={compactCurrency} />
                         <Tooltip content={<CompanyTimelineTooltip />} />
-                        <Legend />
-                        <Line yAxisId="orders" type="monotone" dataKey="orders" name={translate("ordersAdmin.orders", "Orders")} stroke="#2563eb" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
-                        <Line yAxisId="revenue" type="monotone" dataKey="revenue" name={translate("dashboard.revenueLabel", "Revenue")} stroke="#16a34a" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
+                        <Legend wrapperStyle={{ color: CHART_TEXT }} />
+                        <Line yAxisId="orders" type="monotone" dataKey="orders" name={translate("ordersAdmin.orders", "Orders")} stroke="#5B8DEF" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
+                        <Line yAxisId="revenue" type="monotone" dataKey="revenue" name={translate("dashboard.revenueLabel", "Revenue")} stroke="#3FA66B" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
                       </LineChart>
                     </ResponsiveContainer>
                   ) : (
@@ -735,7 +518,7 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
                     <div className="top-items-scroll">
                       <ResponsiveContainer width="100%" height={topItemsChartHeight}>
                         <BarChart data={topItemChartData} layout="vertical" margin={{ top: 8, right: 76, left: 0, bottom: 0 }}>
-                          <CartesianGrid stroke="#e5e7eb" horizontal={false} />
+                          <CartesianGrid stroke={CHART_GRID} horizontal={false} />
                           <XAxis
                             type="number"
                             domain={[0, topItemsXAxisMax]}
@@ -759,7 +542,7 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
                             radius={[0, 8, 8, 0]}
                             label={{
                               position: "right",
-                              fill: "#111827",
+                              fill: CHART_TEXT,
                               fontSize: 12,
                               fontWeight: 800,
                               formatter: itemConfig.formatter,
@@ -809,10 +592,10 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
       </div>
       <style jsx>{`
         .chart-card {
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 16px;
-          background: #ffffff;
-          box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+          background: var(--color-card);
+          box-shadow: var(--app-shadow-soft);
           display: grid;
           gap: 12px;
           padding: 18px;
@@ -828,10 +611,10 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         .owner-analytics-panel {
           display: grid;
           gap: 14px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 12px;
           padding: 14px;
-          background: #f9fafb;
+          background: #fbfaf7;
         }
 
         .owner-actions {
@@ -848,7 +631,7 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         }
 
         .owner-select-wrap span {
-          color: #6b7280;
+          color: var(--color-text-muted);
           font-size: 12px;
           font-weight: 800;
           letter-spacing: 0.06em;
@@ -858,9 +641,9 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         .owner-select-wrap select {
           min-height: 42px;
           border-radius: 8px;
-          border: 1px solid #d1d5db;
-          background: #ffffff;
-          color: #111827;
+          border: 1px solid var(--color-border);
+          background: var(--color-card);
+          color: var(--color-text);
           padding: 9px 12px;
           font: inherit;
         }
@@ -880,14 +663,14 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         }
 
         .owner-stat-header strong {
-          color: #111827;
+          color: var(--color-text);
           font-size: 1rem;
         }
 
         .owner-stat-header span,
         .owner-kpi-grid span,
         .owner-chart-heading span {
-          color: #6b7280;
+          color: var(--color-text-muted);
           font-size: 12px;
           font-weight: 800;
           text-transform: uppercase;
@@ -895,7 +678,7 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         }
 
         .owner-stat-header b {
-          color: #16a34a;
+          color: var(--color-confirmed);
           white-space: nowrap;
         }
 
@@ -909,15 +692,15 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
           display: grid;
           gap: 4px;
           border-radius: 8px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 10px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
         }
 
         .owner-kpi-grid strong,
         .owner-chart-heading strong,
         .owner-status-list strong {
-          color: #111827;
+          color: var(--color-text);
           line-height: 1.35;
         }
 
@@ -925,13 +708,13 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
           display: grid;
           gap: 12px;
           border-radius: 8px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 12px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
         }
 
         .owner-chart-card--timeline {
-          background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+          background: var(--color-card);
         }
 
         .owner-chart-heading {
@@ -959,7 +742,7 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
           gap: 6px;
           padding: 4px;
           border-radius: 8px;
-          background: #f3f4f6;
+          background: var(--color-primary-soft);
         }
 
         .segmented-control button {
@@ -967,7 +750,7 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
           border: 0;
           border-radius: 8px;
           background: transparent;
-          color: #4b5563;
+          color: var(--color-text-muted);
           padding: 7px 10px;
           font: inherit;
           font-weight: 800;
@@ -976,9 +759,9 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         }
 
         .segmented-control button.is-active {
-          background: #ffffff;
-          color: #111827;
-          box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+          background: var(--color-card);
+          color: var(--color-primary);
+          box-shadow: 0 5px 14px rgba(84, 59, 40, 0.1);
         }
 
         .owner-summary-list {
@@ -995,10 +778,10 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
           gap: 12px;
           align-items: flex-start;
           text-align: left;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 12px;
           padding: 12px;
-          background: #ffffff;
+          background: var(--color-card);
           cursor: pointer;
         }
 
@@ -1010,29 +793,29 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
 
         .owner-summary-row strong,
         .owner-summary-row b {
-          color: #111827;
+          color: var(--color-text);
         }
 
         .owner-summary-row span {
-          color: #6b7280;
+          color: var(--color-text-muted);
           font-size: 12px;
           line-height: 1.4;
         }
 
         .owner-summary-row.is-selected {
-          border-color: #2563eb;
-          background: #eff6ff;
-          box-shadow: inset 0 0 0 1px #bfdbfe;
+          border-color: rgba(107, 79, 58, 0.18);
+          background: var(--color-primary-soft);
+          box-shadow: inset 0 0 0 1px rgba(107, 79, 58, 0.1);
         }
 
         .empty-owner-stats {
           min-height: 120px;
           display: grid;
           place-items: center;
-          border: 1px dashed #d1d5db;
+          border: 1px dashed var(--color-border);
           border-radius: 12px;
-          color: #6b7280;
-          background: #f9fafb;
+          color: var(--color-text-muted);
+          background: #fbfaf7;
           text-align: center;
           padding: 20px;
         }
@@ -1042,8 +825,8 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
           display: inline-flex;
           align-items: center;
           border-radius: 8px;
-          border: 1px solid #2563eb;
-          background: #2563eb;
+          border: 1px solid var(--color-primary);
+          background: var(--color-primary);
           color: #ffffff;
           padding: 9px 12px;
           font-weight: 800;
@@ -1079,11 +862,11 @@ function CompanyTimelineTooltip({ active, payload, label }) {
         .tooltip {
           display: grid;
           gap: 6px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 10px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 10px 12px;
-          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+          box-shadow: var(--app-shadow-soft);
         }
 
         strong,
@@ -1157,7 +940,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
               layout="vertical"
               margin={{ top: 8, right: 76, left: 0, bottom: 0 }}
             >
-              <CartesianGrid stroke="#e5e7eb" horizontal={false} />
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
               <XAxis
                 type="number"
                 domain={[0, xAxisMax]}
@@ -1183,7 +966,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
                 animationDuration={320}
                 label={{
                   position: "right",
-                  fill: "#111827",
+                  fill: CHART_TEXT,
                   fontSize: 12,
                   fontWeight: 800,
                   formatter: config.formatter,
@@ -1200,10 +983,10 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       </div>
       <style jsx>{`
         .chart-card {
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 16px;
-          background: #ffffff;
-          box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+          background: var(--color-card);
+          box-shadow: var(--app-shadow-soft);
           display: grid;
           gap: 12px;
           padding: 18px;
@@ -1228,7 +1011,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
           gap: 6px;
           padding: 4px;
           border-radius: 8px;
-          background: #f3f4f6;
+          background: var(--color-primary-soft);
         }
 
         .segmented-control button {
@@ -1236,7 +1019,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
           border: 0;
           border-radius: 8px;
           background: transparent;
-          color: #4b5563;
+          color: var(--color-text-muted);
           padding: 7px 10px;
           font: inherit;
           font-weight: 800;
@@ -1245,9 +1028,9 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
         }
 
         .segmented-control button.is-active {
-          background: #ffffff;
-          color: #111827;
-          box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+          background: var(--color-card);
+          color: var(--color-primary);
+          box-shadow: 0 5px 14px rgba(84, 59, 40, 0.1);
         }
       `}</style>
     </section>
@@ -1261,11 +1044,11 @@ function TopItemsAxisTick({ x, y, payload }) {
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={-8} y={-5} textAnchor="end" fill="#374151" fontSize={12} fontWeight={700}>
+      <text x={-8} y={-5} textAnchor="end" fill={CHART_TEXT} fontSize={12} fontWeight={700}>
         {truncateLabel(name, 42)}
       </text>
       {identifier ? (
-        <text x={-8} y={11} textAnchor="end" fill="#6b7280" fontSize={10}>
+        <text x={-8} y={11} textAnchor="end" fill={CHART_MUTED} fontSize={10}>
           {truncateLabel(identifier, 34)}
         </text>
       ) : null}
@@ -1290,11 +1073,11 @@ function TopItemsTooltip({ active, payload }) {
         .tooltip {
           display: grid;
           gap: 6px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 10px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 10px 12px;
-          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+          box-shadow: var(--app-shadow-soft);
         }
 
         strong,
@@ -1329,6 +1112,10 @@ function DistributionSection({ itemTypeData, paymentData }) {
     .filter((entry) => entry.value > 0)
     .sort((a, b) => b.value - a.value), [config.data]);
 
+  const colors = mode === "itemTypes"
+    ? data.map((entry, index) => getDistributionColor(entry.label, index))
+    : data.map((_, index) => DISTRIBUTION_COLORS[index % DISTRIBUTION_COLORS.length]);
+
   return (
     <section className="chart-card">
       <ChartHeader
@@ -1358,7 +1145,7 @@ function DistributionSection({ itemTypeData, paymentData }) {
                   animationDuration={320}
                 >
                   {data.map((entry, index) => (
-                    <Cell key={entry.label} fill={DISTRIBUTION_COLORS[index % DISTRIBUTION_COLORS.length]} />
+                    <Cell key={entry.label} fill={colors[index]} />
                   ))}
                 </Pie>
                 <Tooltip formatter={(value, name) => [value, name]} />
@@ -1369,7 +1156,7 @@ function DistributionSection({ itemTypeData, paymentData }) {
         <div className="legend-list">
           {data.map((entry, index) => (
             <div key={entry.label}>
-              <span style={{ background: DISTRIBUTION_COLORS[index % DISTRIBUTION_COLORS.length] }} />
+              <span style={{ background: colors[index] }} />
               <strong>{entry.label}</strong>
               <small>{entry.value}</small>
             </div>
@@ -1378,10 +1165,10 @@ function DistributionSection({ itemTypeData, paymentData }) {
       </div>
       <style jsx>{`
         .chart-card {
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 16px;
-          background: #ffffff;
-          box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+          background: var(--color-card);
+          box-shadow: var(--app-shadow-soft);
           display: grid;
           gap: 12px;
           padding: 18px;
@@ -1421,14 +1208,14 @@ function DistributionSection({ itemTypeData, paymentData }) {
         .legend-list strong {
           min-width: 0;
           overflow: hidden;
-          color: #111827;
+          color: var(--color-text);
           font-size: 14px;
           text-overflow: ellipsis;
           white-space: nowrap;
         }
 
         .legend-list small {
-          color: #6b7280;
+          color: var(--color-text-muted);
           font-weight: 800;
         }
 
@@ -1437,7 +1224,7 @@ function DistributionSection({ itemTypeData, paymentData }) {
           gap: 6px;
           padding: 4px;
           border-radius: 8px;
-          background: #f3f4f6;
+          background: var(--color-primary-soft);
         }
 
         .segmented-control button {
@@ -1445,7 +1232,7 @@ function DistributionSection({ itemTypeData, paymentData }) {
           border: 0;
           border-radius: 8px;
           background: transparent;
-          color: #4b5563;
+          color: var(--color-text-muted);
           padding: 7px 10px;
           font: inherit;
           font-weight: 800;
@@ -1454,9 +1241,9 @@ function DistributionSection({ itemTypeData, paymentData }) {
         }
 
         .segmented-control button.is-active {
-          background: #ffffff;
-          color: #111827;
-          box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+          background: var(--color-card);
+          color: var(--color-primary);
+          box-shadow: 0 5px 14px rgba(84, 59, 40, 0.1);
         }
 
         @media (max-width: 700px) {
@@ -1483,11 +1270,11 @@ function GeographySection({ data }) {
         {data.length ? (
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={data} layout="vertical" margin={{ top: 8, right: 40, left: 0, bottom: 0 }}>
-              <CartesianGrid stroke="#e5e7eb" horizontal={false} />
-              <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} />
+              <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+              <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
               <YAxis type="category" dataKey="label" width={136} tickLine={false} axisLine={false} tick={<CountryAxisTick />} />
               <Tooltip content={<CountryTooltip />} />
-              <Bar dataKey="orders" fill="#2563eb" radius={[0, 8, 8, 0]} label={{ position: "right", fill: "#111827", fontSize: 12, fontWeight: 800 }} />
+              <Bar dataKey="orders" fill="#5B8DEF" radius={[0, 8, 8, 0]} label={{ position: "right", fill: CHART_TEXT, fontSize: 12, fontWeight: 800 }} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -1497,10 +1284,10 @@ function GeographySection({ data }) {
 
       <style jsx>{`
         .chart-card {
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 16px;
-          background: #ffffff;
-          box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+          background: var(--color-card);
+          box-shadow: var(--app-shadow-soft);
           display: grid;
           gap: 12px;
           padding: 18px;
@@ -1522,10 +1309,10 @@ function CountryAxisTick({ x, y, payload }) {
   return (
     <g transform={`translate(${x},${y})`}>
       <text textAnchor="end">
-        <tspan x={0} dy="-0.18em" fill="#374151" fontSize="12" fontWeight="700">
+        <tspan x={0} dy="-0.18em" fill={CHART_TEXT} fontSize="12" fontWeight="700">
           {truncateLabel(city, 18)}
         </tspan>
-        <tspan x={0} dy="1.18em" fill="#6b7280" fontSize="11">
+        <tspan x={0} dy="1.18em" fill={CHART_MUTED} fontSize="11">
           {truncateLabel(country, 18)}
         </tspan>
       </text>
@@ -1551,11 +1338,11 @@ function CountryTooltip({ active, payload }) {
         .tooltip {
           display: grid;
           gap: 6px;
-          border: 1px solid #e5e7eb;
+          border: 1px solid var(--color-border);
           border-radius: 10px;
-          background: #ffffff;
+          background: var(--color-card);
           padding: 10px 12px;
-          box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+          box-shadow: var(--app-shadow-soft);
         }
 
         strong,
@@ -1573,10 +1360,10 @@ function EmptyChart({ label }) {
       min-height: 180px;
       display: grid;
       place-items: center;
-      border: 1px dashed #d1d5db;
+      border: 1px dashed var(--color-border);
       border-radius: 12px;
-      color: #6b7280;
-      background: #f9fafb;
+      color: var(--color-text-muted);
+      background: #fbfaf7;
       text-align: center;
       padding: 20px;
     }
@@ -1615,6 +1402,14 @@ function splitLocationLabel(value) {
   const separatorIndex = label.lastIndexOf(", ");
   if (separatorIndex === -1) return [label, ""];
   return [label.slice(0, separatorIndex), label.slice(separatorIndex + 2)];
+}
+
+function getDistributionColor(label, index) {
+  const normalized = String(label || "").trim().toUpperCase();
+  if (CATEGORY_COLORS[normalized]) {
+    return CATEGORY_COLORS[normalized];
+  }
+  return DISTRIBUTION_COLORS[index % DISTRIBUTION_COLORS.length];
 }
 
 function compactCurrency(value) {

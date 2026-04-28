@@ -1,38 +1,57 @@
 :root {
-  --app-bg:
-    radial-gradient(circle at top left, rgba(255, 189, 128, 0.12), transparent 24%),
-    radial-gradient(circle at top right, rgba(103, 190, 171, 0.08), transparent 22%),
-    linear-gradient(180deg, #fff8f2 0%, #fffaf6 44%, #fffdfb 100%);
-  --app-surface: rgba(255, 255, 255, 0.88);
-  --app-surface-muted: rgba(255, 246, 239, 0.68);
-  --app-border: rgba(172, 111, 70, 0.18);
-  --app-border-strong: rgba(172, 111, 70, 0.28);
-  --app-text: #261b16;
-  --app-text-muted: #78695c;
-  --app-accent: #8f3e2c;
-  --app-accent-strong: #5f2619;
-  --app-accent-contrast: #fff8f2;
-  --app-accent-soft: #f6d7c7;
-  --app-secondary: #2b8d80;
-  --app-secondary-soft: #d8f0ea;
-  --app-highlight: #e89b35;
-  --app-highlight-soft: #ffe3b8;
-  --app-success-bg: #e2f3e7;
-  --app-success-text: #357158;
-  --app-warning-bg: #fff0c8;
-  --app-warning-text: #90620e;
-  --app-neutral-bg: #efe6de;
-  --app-neutral-text: #70594e;
-  --app-info-bg: #deeff4;
-  --app-info-text: #2d6c79;
-  --app-danger-bg: #fae1dd;
-  --app-danger-text: #b44739;
-  --app-shadow: 0 18px 48px rgba(120, 81, 50, 0.14);
-  --app-shadow-soft: 0 10px 28px rgba(120, 81, 50, 0.08);
+  --color-bg: #f7f4ef;
+  --color-card: #ffffff;
+  --color-primary: #6b4f3a;
+  --color-primary-hover: #4a3426;
+  --color-primary-soft: #e8ded4;
+  --color-sidebar-bg: #f1ece6;
+  --color-border: #e5e1dc;
+  --color-text: #2b2b2b;
+  --color-text-muted: #6f6f6f;
+  --color-confirmed: #3fa66b;
+  --color-emailed: #4a7dda;
+  --color-cancelled: #d95c5c;
+  --color-new: #e6a23c;
+  --color-component: #5b8def;
+  --color-accessory: #5fbf8f;
+  --color-service: #f2a65a;
+  --color-chart-1: #6c8ae4;
+  --color-chart-2: #58bfa6;
+  --color-chart-3: #f08a5d;
+  --color-chart-4: #9b6ef3;
+  --color-chart-5: #e07a5f;
+
+  --app-bg: var(--color-bg);
+  --app-surface: var(--color-card);
+  --app-surface-muted: #faf7f3;
+  --app-border: var(--color-border);
+  --app-border-strong: #d4cbc0;
+  --app-text: var(--color-text);
+  --app-text-muted: var(--color-text-muted);
+  --app-accent: var(--color-primary);
+  --app-accent-strong: var(--color-primary-hover);
+  --app-accent-contrast: #fffdf9;
+  --app-accent-soft: var(--color-primary-soft);
+  --app-secondary: var(--color-component);
+  --app-secondary-soft: #edf3ff;
+  --app-highlight: var(--color-new);
+  --app-highlight-soft: #faecd0;
+  --app-success-bg: #e8f5ed;
+  --app-success-text: var(--color-confirmed);
+  --app-warning-bg: #fbf0db;
+  --app-warning-text: #a06b12;
+  --app-neutral-bg: #f0ebe5;
+  --app-neutral-text: #7a6d61;
+  --app-info-bg: #e9effc;
+  --app-info-text: var(--color-emailed);
+  --app-danger-bg: #fbe9e7;
+  --app-danger-text: var(--color-cancelled);
+  --app-shadow: 0 18px 42px rgba(84, 59, 40, 0.1);
+  --app-shadow-soft: 0 10px 24px rgba(84, 59, 40, 0.06);
   --app-hero-overlay:
-    radial-gradient(circle at top right, rgba(112, 212, 190, 0.1), transparent 28%),
-    radial-gradient(circle at bottom left, rgba(255, 223, 180, 0.1), transparent 30%);
-  --app-hero-gradient: linear-gradient(135deg, rgba(105, 48, 33, 0.96) 0%, rgba(137, 75, 52, 0.94) 58%, rgba(177, 119, 65, 0.92) 100%);
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.16), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(232, 222, 212, 0.24), transparent 34%);
+  --app-hero-gradient: linear-gradient(135deg, #5d4533 0%, #6b4f3a 58%, #7d6049 100%);
 }
 
 html {
@@ -55,7 +74,6 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-attachment: fixed;
 }
 
 a,
@@ -67,14 +85,14 @@ textarea {
 }
 
 ::selection {
-  background: rgba(143, 62, 44, 0.16);
+  background: rgba(107, 79, 58, 0.18);
   color: var(--app-text);
 }
 
 .analytics-dashboard {
   display: grid;
   gap: 16px;
-  color: #111827;
+  color: var(--color-text);
 }
 
 .analytics-dashboard .dashboard-toolbar {
@@ -87,7 +105,7 @@ textarea {
 
 .analytics-dashboard .eyebrow {
   margin: 0 0 8px;
-  color: #2563eb;
+  color: var(--color-primary);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -102,7 +120,7 @@ textarea {
 
 .analytics-dashboard p {
   margin: 8px 0 0;
-  color: #6b7280;
+  color: var(--color-text-muted);
   line-height: 1.5;
 }
 
@@ -116,7 +134,7 @@ textarea {
 .analytics-dashboard label {
   display: grid;
   gap: 6px;
-  color: #4b5563;
+  color: var(--color-text-muted);
   font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
@@ -124,12 +142,13 @@ textarea {
 }
 
 .analytics-dashboard select,
-.analytics-dashboard button {
+.analytics-dashboard button,
+.analytics-dashboard .toolbar-link {
   min-height: 42px;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
-  background: #ffffff;
-  color: #111827;
+  border: 1px solid var(--color-border);
+  background: var(--color-card);
+  color: var(--color-text);
   padding: 9px 12px;
   font: inherit;
   text-transform: none;
@@ -137,11 +156,26 @@ textarea {
 }
 
 .analytics-dashboard button {
-  border-color: #2563eb;
-  background: #2563eb;
+  border-color: var(--color-primary);
+  background: var(--color-primary);
   color: #ffffff;
   font-weight: 800;
   cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.analytics-dashboard button:hover,
+.analytics-dashboard .panel-link:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+}
+
+.analytics-dashboard .toolbar-link {
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .analytics-dashboard .kpi-grid,
@@ -158,10 +192,10 @@ textarea {
 
 .analytics-dashboard .kpi-card,
 .analytics-dashboard .chart-card {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 16px;
-  background: #ffffff;
-  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+  background: var(--color-card);
+  box-shadow: var(--app-shadow-soft);
 }
 
 .analytics-dashboard .kpi-card {
@@ -171,7 +205,7 @@ textarea {
 }
 
 .analytics-dashboard .kpi-card span {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -179,13 +213,13 @@ textarea {
 }
 
 .analytics-dashboard .kpi-card strong {
-  color: #111827;
+  color: var(--color-text);
   font-size: 1.65rem;
   line-height: 1.1;
 }
 
 .analytics-dashboard .kpi-card small {
-  color: #16a34a;
+  color: var(--color-confirmed);
   font-weight: 700;
 }
 
@@ -211,39 +245,39 @@ textarea {
   gap: 6px;
   padding: 4px;
   border-radius: 8px;
-  background: #f3f4f6;
+  background: var(--color-primary-soft);
 }
 
 .analytics-dashboard .segmented-control button {
   min-height: 34px;
   border: 0;
   background: transparent;
-  color: #4b5563;
+  color: var(--color-text-muted);
   padding: 7px 10px;
 }
 
 .analytics-dashboard .segmented-control button.is-active {
-  background: #ffffff;
-  color: #111827;
-  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
+  background: var(--color-card);
+  color: var(--color-primary);
+  box-shadow: 0 5px 14px rgba(84, 59, 40, 0.1);
 }
 
 .analytics-dashboard .table-wrap {
   overflow-x: auto;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
 }
 
 .analytics-dashboard table {
   width: 100%;
   border-collapse: collapse;
-  background: #ffffff;
+  background: var(--color-card);
 }
 
 .analytics-dashboard th,
 .analytics-dashboard td {
   padding: 10px 14px;
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid var(--color-border);
   text-align: left;
   white-space: nowrap;
   max-width: 220px;
@@ -252,19 +286,19 @@ textarea {
 }
 
 .analytics-dashboard th {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
 
 .analytics-dashboard td {
-  color: #111827;
+  color: var(--color-text);
   font-size: 14px;
 }
 
 .analytics-dashboard td a {
-  color: #111827;
+  color: var(--color-text);
   font-weight: 800;
   text-decoration: none;
 }
@@ -286,8 +320,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   border-radius: 8px;
-  border: 1px solid #2563eb;
-  background: #2563eb;
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
   color: #ffffff;
   padding: 9px 12px;
   font-weight: 800;
@@ -303,7 +337,7 @@ textarea {
 }
 
 .analytics-dashboard .chart-header span {
-  color: #6b7280;
+  color: var(--color-text-muted);
   font-size: 12px;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -312,13 +346,13 @@ textarea {
 
 .analytics-dashboard .chart-header h2 {
   margin: 6px 0 0;
-  color: #111827;
+  color: var(--color-text);
   font-size: 1.2rem;
 }
 
 .analytics-dashboard .chart-header p {
   margin: 6px 0 0;
-  color: #6b7280;
+  color: var(--color-text-muted);
   line-height: 1.45;
 }
 
@@ -345,50 +379,3 @@ textarea {
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --app-bg:
-      radial-gradient(circle at top left, rgba(238, 141, 78, 0.1), transparent 22%),
-      radial-gradient(circle at top right, rgba(79, 168, 153, 0.08), transparent 20%),
-      linear-gradient(180deg, #130f0d 0%, #171210 44%, #0f0b09 100%);
-    --app-surface: rgba(29, 22, 18, 0.84);
-    --app-surface-muted: rgba(38, 30, 24, 0.8);
-    --app-border: rgba(214, 148, 105, 0.14);
-    --app-border-strong: rgba(214, 148, 105, 0.24);
-    --app-text: #f6ede6;
-    --app-text-muted: #c8b8ab;
-    --app-accent: #d17a4b;
-    --app-accent-strong: #f09a63;
-    --app-accent-contrast: #fffaf5;
-    --app-accent-soft: rgba(209, 122, 75, 0.18);
-    --app-secondary: #56b5a4;
-    --app-secondary-soft: rgba(86, 181, 164, 0.18);
-    --app-highlight: #f0bf6b;
-    --app-highlight-soft: rgba(240, 191, 107, 0.18);
-    --app-success-bg: #1e3328;
-    --app-success-text: #ade2c3;
-    --app-warning-bg: #3a2f16;
-    --app-warning-text: #f2d07f;
-    --app-neutral-bg: #2d2520;
-    --app-neutral-text: #dbc6b8;
-    --app-info-bg: #183239;
-    --app-info-text: #9ad8de;
-    --app-danger-bg: #381f1d;
-    --app-danger-text: #ffb2a9;
-    --app-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
-    --app-shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.18);
-    --app-hero-overlay:
-      radial-gradient(circle at top right, rgba(86, 181, 164, 0.1), transparent 26%),
-      radial-gradient(circle at bottom left, rgba(240, 191, 107, 0.1), transparent 30%);
-    --app-hero-gradient: linear-gradient(135deg, rgba(49, 26, 21, 0.96) 0%, rgba(92, 50, 38, 0.94) 58%, rgba(138, 92, 54, 0.9) 100%);
-  }
-
-  html {
-    color-scheme: dark;
-  }
-
-  ::selection {
-    background: rgba(242, 237, 230, 0.18);
-    color: var(--app-text);
-  }
-}
