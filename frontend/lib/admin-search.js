@@ -123,6 +123,7 @@ function buildAddressMatchSql(fields, queryText) {
 
 function buildObjectDirectMatchSql(patterns) {
   return buildAnyFieldMatchSql([
+    Prisma.sql`prj."name"`,
     Prisma.sql`po."name"`,
     Prisma.sql`po."address1"`,
     Prisma.sql`po."address2"`,
@@ -491,6 +492,7 @@ async function getSuggestions(filters, tokens, query) {
     Prisma.sql`o."orderNumber"`,
     Prisma.sql`o."firstName"`,
     Prisma.sql`o."lastName"`,
+    Prisma.sql`CONCAT_WS(' ', o."firstName", o."lastName")`,
     Prisma.sql`kc."contractNumber"`,
     Prisma.sql`o."city"`,
   ], patterns);
@@ -500,6 +502,7 @@ async function getSuggestions(filters, tokens, query) {
     Prisma.sql`o."city"`,
     Prisma.sql`o."firstName"`,
     Prisma.sql`o."lastName"`,
+    Prisma.sql`CONCAT_WS(' ', o."firstName", o."lastName")`,
   ], patterns);
 
   const [companies, contracts, addresses, orders] = await Promise.all([
@@ -612,6 +615,7 @@ async function getResults(filters, tokens, query) {
     ? Prisma.sql`(${objectDirectQuerySql} OR ${objectLinkedOrderQuerySql})`
     : null;
   const objectDirectRank = patterns ? buildRankSql([
+    Prisma.sql`prj."name"`,
     Prisma.sql`po."city"`,
     Prisma.sql`po."postalCode"`,
     Prisma.sql`po."address1"`,
@@ -630,6 +634,7 @@ async function getResults(filters, tokens, query) {
     Prisma.sql`o."orderNumber"`,
     Prisma.sql`o."firstName"`,
     Prisma.sql`o."lastName"`,
+    Prisma.sql`CONCAT_WS(' ', o."firstName", o."lastName")`,
     Prisma.sql`o."address1"`,
     Prisma.sql`o."postalCode"`,
     Prisma.sql`o."city"`,

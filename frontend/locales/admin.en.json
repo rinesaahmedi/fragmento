@@ -153,7 +153,7 @@
     "noOrdersForLocation": "No orders matched this location.",
     "noLocationDataForSelectedFilters": "No location data matched the current dashboard filters.",
     "finderTitle": "Go to",
-    "finderPlaceholder": "Search by partner, contract number, object, address, or order.",
+    "finderPlaceholder": "Search by housing company, project, contract number, object, address, or order.",
     "finderAriaLabel": "Quick find admin entities",
     "finderNoMatches": "No matches found.",
     "finderUnavailable": "Search is temporarily unavailable.",

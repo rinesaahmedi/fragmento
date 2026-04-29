@@ -374,7 +374,7 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
                 value={draftQuery}
                 onChange={(event) => setDraftQuery(event.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={translate("dashboard.finderPlaceholder", "Search by partner, contract number, object, address, or order.")}
+                placeholder={translate("dashboard.finderPlaceholder", "Search by housing company, project, contract number, object, address, or order.")}
                 aria-label={translate("dashboard.finderAriaLabel", "Quick find admin entities")}
               />
             </div>
