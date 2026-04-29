@@ -100,24 +100,24 @@ model Order {
 }
 
 model KitchenContract {
-  id               String          @id @default(cuid())
-  contractNumber   String          @unique
-  kitchenId        String
-  kitchen          Kitchen         @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  propertyObjectId String?
-  propertyObject   PropertyObject? @relation(fields: [propertyObjectId], references: [id], onDelete: SetNull)
-  isActive         Boolean         @default(true)
-  usedAt           DateTime?
-  building         String?
-  floor            String?
-  unitNumber       String?
-  notes            String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  orders           Order[]
+  id             String          @id @default(cuid())
+  contractNumber String          @unique
+  kitchenId      String
+  kitchen        Kitchen         @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  projectId      String
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  isActive       Boolean         @default(true)
+  usedAt         DateTime?
+  building       String?
+  floor          String?
+  unitNumber     String?
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  orders         Order[]
 
   @@index([kitchenId])
-  @@index([propertyObjectId])
+  @@index([projectId])
 }
 
 model HousingCompany {
@@ -129,7 +129,23 @@ model HousingCompany {
   notes           String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  projects        Project[]
   propertyObjects PropertyObject[]
+}
+
+model Project {
+  id               String         @id @default(cuid())
+  name             String
+  housingCompanyId String
+  housingCompany   HousingCompany @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
+  propertyObjectId String         @unique
+  propertyObject   PropertyObject @relation(fields: [propertyObjectId], references: [id], onDelete: Cascade)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  contracts        KitchenContract[]
+
+  @@unique([housingCompanyId, name])
+  @@index([housingCompanyId])
 }
 
 model PropertyObject {
@@ -137,6 +153,7 @@ model PropertyObject {
   name             String
   housingCompanyId String
   housingCompany   HousingCompany    @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
+  project          Project?
   contactPhone     String?
   country          String?
   city             String?
@@ -145,7 +162,6 @@ model PropertyObject {
   address2         String?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
-  contracts        KitchenContract[]
 
   @@index([housingCompanyId])
 }

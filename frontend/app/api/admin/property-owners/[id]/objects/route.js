@@ -2,6 +2,7 @@ import { randomUUID } from "crypto";
 import { mapAdminMutationError, redirectWithFlash, validatePropertyObjectInput } from "../../../../../../lib/admin-forms";
 import { isAddressVerificationRecordValid } from "../../../../../../lib/address-verification-server";
 import { requireAdminApi } from "../../../../../../lib/auth";
+import { upsertProjectForObject } from "../../../../../../lib/property-projects";
 import { prisma } from "../../../../../../lib/prisma";
 
 function normalizeRouteId(value) {
@@ -47,10 +48,18 @@ export async function POST(request, { params }) {
       throw new Error("Housing company not found.");
     }
 
-    await prisma.$executeRaw`
+    const propertyObjectId = randomUUID();
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
       INSERT INTO "PropertyObject" ("id", "name", "housingCompanyId", "contactPhone", "country", "city", "postalCode", "address1", "address2", "createdAt", "updatedAt")
-      VALUES (${randomUUID()}, ${data.name}, ${id}, ${data.contactPhone}, ${data.country}, ${data.city}, ${data.postalCode}, ${data.address1}, ${data.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+      VALUES (${propertyObjectId}, ${data.name}, ${id}, ${data.contactPhone}, ${data.country}, ${data.city}, ${data.postalCode}, ${data.address1}, ${data.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
     `;
+      await upsertProjectForObject(tx, {
+        housingCompanyId: id,
+        propertyObjectId,
+        projectName: data.projectName,
+      });
+    });
 
     return redirectWithFlash(request, detailPath, "success", "Property object created.");
   } catch (error) {

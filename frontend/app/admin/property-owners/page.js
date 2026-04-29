@@ -55,6 +55,7 @@ function matchingObjects(owner, query) {
   if (!needle) return [];
 
   return (owner.propertyObjects || []).filter((object) => [
+    object.projectName,
     object.name,
     object.contactPhone,
     object.country,
@@ -92,6 +93,7 @@ function buildOwnerSearchIndex(owner) {
   ];
 
   const objectFields = (owner.propertyObjects || []).flatMap((object) => ([
+    object.projectName,
     object.name,
     object.contactPhone,
     object.country,

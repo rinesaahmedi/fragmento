@@ -24,13 +24,17 @@ export async function POST(request, { params }) {
     }
 
     const [propertyObject] = await prisma.$queryRaw`
-      SELECT "id", "housingCompanyId"
-      FROM "PropertyObject"
-      WHERE "id" = ${id}
+      SELECT pobj."id", pobj."housingCompanyId", prj."id" AS "projectId"
+      FROM "PropertyObject" pobj
+      JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+      WHERE pobj."id" = ${id}
       LIMIT 1
     `;
     if (!propertyObject) {
       throw new Error("Property object not found.");
+    }
+    if (!propertyObject.projectId) {
+      throw new Error("Project not found for property object.");
     }
 
     detailPath = `/admin/property-owners/${propertyObject.housingCompanyId}?openObject=${id}`;
@@ -39,7 +43,7 @@ export async function POST(request, { params }) {
       data: {
         contractNumber,
         kitchenId,
-        propertyObjectId: id,
+        projectId: propertyObject.projectId,
         isActive: true,
         building,
         floor,

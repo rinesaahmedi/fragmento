@@ -81,22 +81,22 @@ export function validateKitchenItemInput(formData) {
 export function validateKitchenContractInput(formData, options = {}) {
   const contractNumber = requiredString(formData.get("contractNumber"), "Contract number");
   const housingCompanyId = optionalString(formData.get("housingCompanyId"));
-  const propertyObjectId = optionalString(formData.get("propertyObjectId"));
+  const projectId = optionalString(formData.get("projectId"));
   const allowInlineObject = Boolean(options.allowInlineObject);
   const hasInlineObject = Boolean(options.hasInlineObject);
 
-  if (housingCompanyId && !propertyObjectId && !(allowInlineObject && hasInlineObject)) {
-    throw new Error("Select a property object for the housing company.");
+  if (!housingCompanyId) {
+    throw new Error("Select a housing company for the chosen project.");
   }
 
-  if (!housingCompanyId && propertyObjectId) {
-    throw new Error("Select a housing company for the chosen property object.");
+  if (!projectId && !(allowInlineObject && hasInlineObject)) {
+    throw new Error("Select a project for the housing company.");
   }
 
   return {
     contractNumber,
     housingCompanyId,
-    propertyObjectId,
+    projectId,
     building: optionalString(formData.get("building")),
     floor: optionalString(formData.get("floor")),
     unitNumber: optionalString(formData.get("unitNumber")),
@@ -121,6 +121,7 @@ function propertyObjectFieldName(fieldNames, key) {
 export function validatePropertyObjectInput(formData, fieldNames = {}) {
   return {
     name: requiredString(formData.get(propertyObjectFieldName(fieldNames, "name")), "Object name"),
+    projectName: requiredString(formData.get(propertyObjectFieldName(fieldNames, "projectName")), "Project name"),
     contactPhone: optionalString(formData.get(propertyObjectFieldName(fieldNames, "contactPhone"))),
     country: optionalString(formData.get(propertyObjectFieldName(fieldNames, "country"))),
     city: optionalString(formData.get(propertyObjectFieldName(fieldNames, "city"))),

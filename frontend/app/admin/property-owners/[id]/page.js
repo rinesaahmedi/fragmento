@@ -21,6 +21,7 @@ import AdminContractAddressFields from "../../../../components/admin-contract-ad
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getPropertyOwnerForAdmin, listKitchensForAdmin } from "../../../../lib/catalog";
+import { projectLabel } from "../../../../lib/property-projects";
 
 export const dynamic = "force-dynamic";
 
@@ -134,7 +135,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
 
           <AdminSection
             title={<AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add contract number" />}
-            description="Create a contract number for this housing company, then choose which object it belongs to."
+            description="Create a contract number for this housing company, then choose which project/object it belongs to."
           >
             <details open={createContractOpen} style={createCompanyContractDetailsStyle}>
               <summary className="create-company-contract-summary" style={createCompanyContractSummaryStyle}>
@@ -160,12 +161,12 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                     <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                       <input name="contractNumber" placeholder="ABC-123" style={compactInputStyle} required />
                     </FormField>
-                    <FormField label={<AdminText i18nKey="contractsAdmin.propertyObject" fallback="Property object" />}>
-                      <select name="propertyObjectId" style={compactInputStyle} required>
-                        <option value=""><AdminText i18nKey="contractsAdmin.selectPropertyObject" fallback="Select object/building" /></option>
+                    <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project / object" />}>
+                      <select name="projectId" style={compactInputStyle} required>
+                        <option value=""><AdminText i18nKey="contractsAdmin.selectProject" fallback="Select project/object" /></option>
                         {(owner.propertyObjects || []).map((object) => (
-                          <option key={object.id} value={object.id}>
-                            {object.name}
+                          <option key={object.id} value={object.projectId || ""} disabled={!object.projectId}>
+                            {projectLabel(object.projectName, object.name)}
                           </option>
                         ))}
                       </select>
@@ -209,6 +210,9 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                     <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
                       <input name="name" placeholder="Building A" style={compactInputStyle} required />
                     </FormField>
+                    <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectName" fallback="Project name" />}>
+                      <input name="projectName" placeholder="Project A" style={compactInputStyle} required />
+                    </FormField>
                     <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
                       <input name="contactPhone" placeholder="+49 170 1234567" style={compactInputStyle} />
                     </FormField>
@@ -236,6 +240,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                   <div key={object.id} style={objectListItemStyle}>
                     <div style={objectDetailsStyle}>
                       <div style={objectSummaryContentStyle}>
+                        {object.projectName ? <span style={objectProjectTagStyle}>{object.projectName}</span> : null}
                         <strong>{object.name}</strong>
                         {propertyObjectAddress(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectAddress(object)}</span> : null}
                         {propertyObjectContact(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectContact(object)}</span> : null}
@@ -260,6 +265,9 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                         <form action={`/api/admin/property-objects/${object.id}`} method="post" style={objectFormStyle}>
                           <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
                             <input name="name" defaultValue={object.name} style={compactInputStyle} required />
+                          </FormField>
+                          <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectName" fallback="Project name" />}>
+                            <input name="projectName" defaultValue={object.projectName || ""} style={compactInputStyle} required />
                           </FormField>
                           <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
                             <input
@@ -402,6 +410,14 @@ const objectSummaryMetaStyle = {
   color: "var(--app-text-muted)",
   fontSize: 12,
   lineHeight: 1.5,
+};
+
+const objectProjectTagStyle = {
+  color: "var(--app-accent)",
+  fontSize: 11,
+  fontWeight: 800,
+  letterSpacing: "0.06em",
+  textTransform: "uppercase",
 };
 
 const objectPreviewCountStyle = {

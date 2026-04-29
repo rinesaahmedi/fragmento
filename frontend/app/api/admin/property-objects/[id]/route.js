@@ -1,6 +1,7 @@
 import { mapAdminMutationError, redirectWithFlash, validatePropertyObjectInput } from "../../../../../lib/admin-forms";
 import { isAddressVerificationRecordValid } from "../../../../../lib/address-verification-server";
 import { requireAdminApi } from "../../../../../lib/auth";
+import { upsertProjectForObject } from "../../../../../lib/property-projects";
 import { prisma } from "../../../../../lib/prisma";
 
 function parseAddressVerificationRecord(formData) {
@@ -40,20 +41,30 @@ export async function POST(request, { params }) {
     if (!isAddressVerificationRecordValid(addressVerification, { ...data, contractNumber: data.name })) {
       throw new Error("Verify the object address before saving.");
     }
+    if (!propertyObject?.housingCompanyId) {
+      throw new Error("Property object not found.");
+    }
 
-    await prisma.$executeRaw`
-      UPDATE "PropertyObject"
-      SET
-        "name" = ${data.name},
-        "contactPhone" = ${data.contactPhone},
-        "country" = ${data.country},
-        "city" = ${data.city},
-        "postalCode" = ${data.postalCode},
-        "address1" = ${data.address1},
-        "address2" = ${data.address2},
-        "updatedAt" = CURRENT_TIMESTAMP
-      WHERE "id" = ${id}
-    `;
+    await prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`
+        UPDATE "PropertyObject"
+        SET
+          "name" = ${data.name},
+          "contactPhone" = ${data.contactPhone},
+          "country" = ${data.country},
+          "city" = ${data.city},
+          "postalCode" = ${data.postalCode},
+          "address1" = ${data.address1},
+          "address2" = ${data.address2},
+          "updatedAt" = CURRENT_TIMESTAMP
+        WHERE "id" = ${id}
+      `;
+      await upsertProjectForObject(tx, {
+        housingCompanyId: propertyObject.housingCompanyId,
+        propertyObjectId: id,
+        projectName: data.projectName,
+      });
+    });
 
     return redirectWithFlash(request, detailPath, "success", "Property object updated.");
   } catch (error) {

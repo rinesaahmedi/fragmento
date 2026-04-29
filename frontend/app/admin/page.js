@@ -447,7 +447,8 @@ async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
       COALESCE(SUM(o."totalPrice"), 0) AS "totalRevenue"
     FROM "HousingCompany" hc
     LEFT JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-    LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    LEFT JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+    LEFT JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
     LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
     GROUP BY hc."id"
     ORDER BY "totalRevenue" DESC, "orderCount" DESC, hc."name" ASC
@@ -461,7 +462,8 @@ async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
       COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
     FROM "HousingCompany" hc
     JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-    JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
     JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
     GROUP BY 1, 2
     ORDER BY 1 ASC, 2 ASC
@@ -475,7 +477,8 @@ async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
       COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
     FROM "HousingCompany" hc
     JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-    JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
     JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
     LEFT JOIN "Kitchen" k ON k."id" = o."kitchenId"
     GROUP BY 1, 2
@@ -489,7 +492,8 @@ async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
       COUNT(*)::int AS "count"
     FROM "HousingCompany" hc
     JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-    JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
     JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
     GROUP BY 1, 2
     ORDER BY 1 ASC, 2 ASC
@@ -509,7 +513,8 @@ async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
           COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
         FROM "HousingCompany" hc
         JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-        JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+        JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+        JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
         JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
         JOIN "OrderItem" oi ON oi."orderId" = o."id"
         LEFT JOIN "KitchenItem" ki ON ki."id" = oi."kitchenItemId"
@@ -528,7 +533,8 @@ async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
           COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
         FROM "HousingCompany" hc
         JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-        JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+        JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+        JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
         JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
         JOIN "OrderItem" oi ON oi."orderId" = o."id"
         GROUP BY 1, 2, 3, 4, 5, 6

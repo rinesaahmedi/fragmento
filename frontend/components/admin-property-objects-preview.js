@@ -17,6 +17,7 @@ function propertyObjectContact(object) {
 
 function buildObjectSearchIndex(object) {
   return [
+    object.projectName,
     object.name,
     object.contactPhone,
     object.country,
@@ -110,7 +111,10 @@ export default function AdminPropertyObjectsPreview({ objects = [], priorityQuer
           return (
             <div key={object.id} style={objectPreviewCardStyle}>
               <div style={objectPreviewHeaderStyle}>
-                <strong>{renderHighlightedText(object.name, priorityQuery)}</strong>
+                <div style={objectPreviewTitleStackStyle}>
+                  {object.projectName ? <span style={objectPreviewProjectStyle}>{renderHighlightedText(object.projectName, priorityQuery)}</span> : null}
+                  <strong>{renderHighlightedText(object.name, priorityQuery)}</strong>
+                </div>
                 <span style={objectPreviewCountStyle}>
                   {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
                 </span>
@@ -166,6 +170,20 @@ const objectPreviewHeaderStyle = {
   color: "var(--app-text)",
   fontSize: 13,
   lineHeight: 1.2,
+};
+
+const objectPreviewTitleStackStyle = {
+  display: "grid",
+  gap: 3,
+  minWidth: 0,
+};
+
+const objectPreviewProjectStyle = {
+  color: "var(--app-accent)",
+  fontSize: 11,
+  fontWeight: 800,
+  letterSpacing: "0.04em",
+  textTransform: "uppercase",
 };
 
 const objectPreviewCountStyle = {

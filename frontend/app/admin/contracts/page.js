@@ -27,7 +27,8 @@ import { AdminText } from "../../../components/admin-i18n";
 import AdminContractLinkFields from "../../../components/admin-contract-link-fields";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
-import { listKitchenContractsForAdmin, listKitchensForAdmin, listPropertyObjectsForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
+import { listKitchenContractsForAdmin, listKitchensForAdmin, listProjectsForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
+import { projectLabel } from "../../../lib/property-projects";
 
 export const dynamic = "force-dynamic";
 
@@ -64,7 +65,7 @@ function formatOrdinal(value) {
 function contractAddressLines(contract) {
   const fallbackAddress = contract.propertyObject ? null : contract.latestOrderAddress;
   const objectLine = contract.propertyObject?.name
-    ? `Object ${contract.propertyObject.name}`
+    ? `Project/Object ${projectLabel(contract.projectName || contract.propertyObject?.projectName, contract.propertyObject.name)}`
     : fallbackAddress
       ? ""
       : "No object selected";
@@ -201,17 +202,17 @@ export default async function AdminContractsPage({ searchParams = {} }) {
   const filters = {
     kitchenId: normalizeParam(resolvedSearchParams.kitchenId),
     housingCompanyId: normalizeParam(resolvedSearchParams.housingCompanyId || resolvedSearchParams.ownerId),
-    propertyObjectId: normalizeParam(resolvedSearchParams.propertyObjectId),
+    projectId: normalizeParam(resolvedSearchParams.projectId),
     status: normalizeParam(resolvedSearchParams.status),
     usage: normalizeParam(resolvedSearchParams.usage),
     query: normalizeParam(resolvedSearchParams.q),
   };
   const returnTo = `/admin/contracts?${new URLSearchParams(Object.entries(filters).filter(([, value]) => value)).toString()}`;
 
-  const [kitchens, owners, propertyObjects, contracts] = await Promise.all([
+  const [kitchens, owners, projects, contracts] = await Promise.all([
     listKitchensForAdmin(),
     listPropertyOwnersForAdmin(),
-    listPropertyObjectsForAdmin(),
+    listProjectsForAdmin(),
     listKitchenContractsForAdmin(filters),
   ]);
   const successMessage = getFormMessage(resolvedSearchParams, "success");
@@ -231,7 +232,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
           <AdminContractsFilters
             kitchens={kitchens}
             owners={owners}
-            propertyObjects={propertyObjects}
+            projects={projects}
             filters={filters}
           />
         </AdminSection>
@@ -243,7 +244,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
             </summary>
             <div style={createContractBodyStyle}>
               <p style={createContractDescriptionStyle}>
-                <AdminText i18nKey="contractsAdmin.selectKitchenCompanyObjectAndUnit" fallback="Select the kitchen, then create an unassigned contract or link it to a housing company object." />
+                <AdminText i18nKey="contractsAdmin.selectKitchenCompanyObjectAndUnit" fallback="Select the kitchen, then create an unassigned contract or link it to a housing company project/object." />
               </p>
               <form action="/api/admin/contracts" method="post" style={compactCreateContractFormStyle}>
                 <input type="hidden" name="returnTo" value={returnTo} />
@@ -253,9 +254,9 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                 </FormField>
                 <AdminContractLinkFields
                   owners={owners}
-                  propertyObjects={propertyObjects}
+                  projects={projects}
                   defaultHousingCompanyId={filters.housingCompanyId}
-                  defaultPropertyObjectId={filters.propertyObjectId}
+                  defaultProjectId={filters.projectId}
                   allowInlineObjectCreate
                   compact
                   contract={{}}
@@ -371,9 +372,9 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                               </FormField>
                               <AdminContractLinkFields
                                 owners={owners}
-                                propertyObjects={propertyObjects}
+                                projects={projects}
                                 defaultHousingCompanyId={contract.housingCompanyId || ""}
-                                defaultPropertyObjectId={contract.propertyObjectId || ""}
+                                defaultProjectId={contract.projectId || ""}
                                 contract={contract}
                                 compact
                               />
@@ -445,9 +446,9 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                     </FormField>
                     <AdminContractLinkFields
                       owners={owners}
-                      propertyObjects={propertyObjects}
+                      projects={projects}
                       defaultHousingCompanyId={contract.housingCompanyId || ""}
-                      defaultPropertyObjectId={contract.propertyObjectId || ""}
+                      defaultProjectId={contract.projectId || ""}
                       contract={contract}
                       compact
                     />

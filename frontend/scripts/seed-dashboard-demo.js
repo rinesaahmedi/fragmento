@@ -206,13 +206,31 @@ async function ensureOwners(targetCount) {
     owners.push(owner);
   }
 
+  for (const [index, owner] of owners.entries()) {
+    const propertyObject = owner.propertyObjects?.[0];
+    if (!propertyObject) continue;
+
+    await prisma.project.upsert({
+      where: { propertyObjectId: propertyObject.id },
+      update: {
+        housingCompanyId: owner.id,
+        name: `Demo Project ${(index % 8) + 1}`,
+      },
+      create: {
+        propertyObjectId: propertyObject.id,
+        housingCompanyId: owner.id,
+        name: `Demo Project ${(index % 8) + 1}`,
+      },
+    });
+  }
+
   return owners;
 }
 
 async function ensureContracts(kitchens, owners, targetCount) {
   const existing = await prisma.kitchenContract.findMany({
     where: { notes: { contains: DEMO_BATCH_TAG } },
-    include: { propertyObject: true },
+    include: { project: { include: { propertyObject: true } } },
     orderBy: { createdAt: "asc" },
   });
 
@@ -221,18 +239,21 @@ async function ensureContracts(kitchens, owners, targetCount) {
     const kitchen = kitchens[index % kitchens.length];
     const owner = owners[index % owners.length];
     const propertyObject = owner.propertyObjects[0];
+    const project = propertyObject
+      ? await prisma.project.findUnique({ where: { propertyObjectId: propertyObject.id }, select: { id: true } })
+      : null;
     const contract = await prisma.kitchenContract.create({
       data: {
         contractNumber: `DM-${String(800000 + index)}`,
         kitchenId: kitchen.id,
-        propertyObjectId: propertyObject?.id || null,
+        projectId: project?.id,
         isActive: true,
         building: propertyObject?.name || `B${(index % 8) + 1}`,
         floor: String((index % 5) + 1),
         unitNumber: `${(index % 12) + 1}`,
         notes: `${DEMO_BATCH_TAG} contract ${index + 1}`,
       },
-      include: { propertyObject: true },
+      include: { project: { include: { propertyObject: true } } },
     });
     contracts.push(contract);
   }
@@ -316,11 +337,11 @@ async function createDemoOrders(orderCount, options = {}) {
     const contract = kitchenContracts.length ? sample(kitchenContracts) : null;
     const location = contract
       ? {
-          country: contract.propertyObject?.country || sample(LOCATIONS).country,
-          city: contract.propertyObject?.city || sample(LOCATIONS).city,
-          postalCode: contract.propertyObject?.postalCode || sample(LOCATIONS).postalCode,
-          address1: contract.propertyObject?.address1 || `Demo Street ${index + 1}`,
-          address2: contract.propertyObject?.address2 || null,
+          country: contract.project?.propertyObject?.country || sample(LOCATIONS).country,
+          city: contract.project?.propertyObject?.city || sample(LOCATIONS).city,
+          postalCode: contract.project?.propertyObject?.postalCode || sample(LOCATIONS).postalCode,
+          address1: contract.project?.propertyObject?.address1 || `Demo Street ${index + 1}`,
+          address2: contract.project?.propertyObject?.address2 || null,
         }
       : { ...sample(LOCATIONS), address1: `Demo Street ${globalIndex + 1}`, address2: null };
 

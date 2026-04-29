@@ -4,6 +4,7 @@ import { mapAdminMutationError, redirectWithFlash, validatePropertyObjectInput, 
 import { isAddressVerificationRecordValid } from "../../../../lib/address-verification-server";
 import { requireAdminApi } from "../../../../lib/auth";
 import { listPropertyOwnersForAdmin } from "../../../../lib/catalog";
+import { upsertProjectForObject } from "../../../../lib/property-projects";
 import { prisma } from "../../../../lib/prisma";
 
 export async function GET() {
@@ -25,6 +26,7 @@ function parseAddressVerificationRecord(rawValue) {
 function objectFieldNames(index) {
   return {
     name: `objectName__${index}`,
+    projectName: `projectName__${index}`,
     contactPhone: `objectContactPhone__${index}`,
     country: `objectCountry__${index}`,
     city: `objectCity__${index}`,
@@ -50,6 +52,7 @@ function collectPropertyObjects(formData) {
       const fields = objectFieldNames(index);
       const hasAnyValue = [
         fields.name,
+        fields.projectName,
         fields.contactPhone,
         fields.country,
         fields.city,
@@ -87,10 +90,16 @@ export async function POST(request) {
       `;
 
       for (const object of objects) {
+        const propertyObjectId = randomUUID();
         await tx.$executeRaw`
           INSERT INTO "PropertyObject" ("id", "name", "housingCompanyId", "contactPhone", "country", "city", "postalCode", "address1", "address2", "createdAt", "updatedAt")
-          VALUES (${randomUUID()}, ${object.name}, ${housingCompanyId}, ${object.contactPhone}, ${object.country}, ${object.city}, ${object.postalCode}, ${object.address1}, ${object.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+          VALUES (${propertyObjectId}, ${object.name}, ${housingCompanyId}, ${object.contactPhone}, ${object.country}, ${object.city}, ${object.postalCode}, ${object.address1}, ${object.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
         `;
+        await upsertProjectForObject(tx, {
+          housingCompanyId,
+          propertyObjectId,
+          projectName: object.projectName,
+        });
       }
     });
 

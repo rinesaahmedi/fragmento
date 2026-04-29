@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AdminText, useAdminI18n } from "./admin-i18n";
+import { projectLabel } from "../lib/property-projects";
 
 function FilterField({ label, children }) {
   return (
@@ -16,23 +17,23 @@ function FilterField({ label, children }) {
 export default function AdminContractsFilters({
   kitchens = [],
   owners = [],
-  propertyObjects = [],
+  projects = [],
   filters = {},
 }) {
   const { translate } = useAdminI18n();
   const [housingCompanyId, setHousingCompanyId] = useState(filters.housingCompanyId || "");
-  const [propertyObjectId, setPropertyObjectId] = useState(filters.propertyObjectId || "");
+  const [projectId, setProjectId] = useState(filters.projectId || "");
 
-  const visibleObjects = useMemo(() => {
-    if (!housingCompanyId) return propertyObjects;
-    return propertyObjects.filter((object) => object.housingCompanyId === housingCompanyId);
-  }, [housingCompanyId, propertyObjects]);
+  const visibleProjects = useMemo(() => {
+    if (!housingCompanyId) return projects;
+    return projects.filter((project) => project.housingCompanyId === housingCompanyId);
+  }, [housingCompanyId, projects]);
 
   useEffect(() => {
-    if (!propertyObjectId) return;
-    if (visibleObjects.some((object) => object.id === propertyObjectId)) return;
-    setPropertyObjectId("");
-  }, [propertyObjectId, visibleObjects]);
+    if (!projectId) return;
+    if (visibleProjects.some((project) => project.id === projectId)) return;
+    setProjectId("");
+  }, [projectId, visibleProjects]);
 
   return (
     <form action="/admin/contracts" method="get" style={filterPanelStyle}>
@@ -74,23 +75,25 @@ export default function AdminContractsFilters({
             ))}
           </select>
         </FilterField>
-        <FilterField label={<AdminText i18nKey="contractsAdmin.propertyObject" fallback="Property object" />}>
+        <FilterField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project / object" />}>
           <select
-            name="propertyObjectId"
-            value={propertyObjectId}
+            name="projectId"
+            value={projectId}
             style={filterInputStyle}
-            onChange={(event) => setPropertyObjectId(event.target.value)}
+            onChange={(event) => setProjectId(event.target.value)}
           >
             <option value="">
               {!housingCompanyId
-                ? translate("contractsAdmin.allPropertyObjects", "All objects")
-                : visibleObjects.length
-                  ? translate("contractsAdmin.allPropertyObjects", "All objects")
-                  : translate("contractsAdmin.noPropertyObjectsAvailable", "No objects available")}
+                ? translate("contractsAdmin.allProjects", "All projects")
+                : visibleProjects.length
+                  ? translate("contractsAdmin.allProjects", "All projects")
+                  : translate("contractsAdmin.noProjectsAvailable", "No projects available")}
             </option>
-            {visibleObjects.map((object) => (
-              <option key={object.id} value={object.id}>
-                {housingCompanyId ? object.name : `${object.housingCompany.name} | ${object.name}`}
+            {visibleProjects.map((project) => (
+              <option key={project.id} value={project.id}>
+                {housingCompanyId
+                  ? projectLabel(project.name, project.propertyObject?.name)
+                  : `${project.housingCompany.name} | ${projectLabel(project.name, project.propertyObject?.name)}`}
               </option>
             ))}
           </select>

@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput } from "../../../../lib/admin-forms";
+import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput, validatePropertyObjectInput } from "../../../../lib/admin-forms";
 import { isAddressVerificationRecordValid } from "../../../../lib/address-verification-server";
 import { requireAdminApi } from "../../../../lib/auth";
 import { listKitchenContractsForAdmin } from "../../../../lib/catalog";
+import { upsertProjectForObject } from "../../../../lib/property-projects";
 import { prisma } from "../../../../lib/prisma";
 
 export async function GET(request) {
@@ -12,7 +13,7 @@ export async function GET(request) {
   return NextResponse.json(await listKitchenContractsForAdmin({
     kitchenId: searchParams.get("kitchenId") || "",
     housingCompanyId: searchParams.get("housingCompanyId") || searchParams.get("ownerId") || "",
-    propertyObjectId: searchParams.get("propertyObjectId") || "",
+    projectId: searchParams.get("projectId") || "",
     status: searchParams.get("status") || "",
     usage: searchParams.get("usage") || "",
     query: searchParams.get("q") || "",
@@ -45,6 +46,7 @@ function parseAddressVerificationRecord(rawValue) {
 function inlineObjectFieldNames() {
   return {
     name: "inlineObjectName",
+    projectName: "inlineProjectName",
     contactPhone: "inlineObjectContactPhone",
     country: "inlineObjectCountry",
     city: "inlineObjectCity",
@@ -57,9 +59,9 @@ function inlineObjectFieldNames() {
 
 function validateInlineObjectInput(formData) {
   const fields = inlineObjectFieldNames();
-  const name = String(formData.get(fields.name) || "").trim();
   const hasAnyValue = [
     fields.name,
+    fields.projectName,
     fields.contactPhone,
     fields.country,
     fields.city,
@@ -72,19 +74,7 @@ function validateInlineObjectInput(formData) {
     return null;
   }
 
-  const data = {
-    name,
-    contactPhone: String(formData.get(fields.contactPhone) || "").trim() || null,
-    country: String(formData.get(fields.country) || "").trim() || null,
-    city: String(formData.get(fields.city) || "").trim() || null,
-    postalCode: String(formData.get(fields.postalCode) || "").trim() || null,
-    address1: String(formData.get(fields.address1) || "").trim() || null,
-    address2: String(formData.get(fields.address2) || "").trim() || null,
-  };
-  if (!data.name) {
-    throw new Error("Object name is required.");
-  }
-
+  const data = validatePropertyObjectInput(formData, fields);
   const addressVerification = parseAddressVerificationRecord(formData.get(fields.addressVerification));
   if (!isAddressVerificationRecordValid(addressVerification, { ...data, contractNumber: data.name })) {
     throw new Error("Verify the object address before saving.");
@@ -111,25 +101,31 @@ export async function POST(request) {
       hasInlineObject: Boolean(inlineObject),
     });
 
-    let propertyObjectId = data.propertyObjectId;
+    let projectId = data.projectId;
     await prisma.$transaction(async (tx) => {
       if (data.housingCompanyId) {
         if (inlineObject) {
-          propertyObjectId = randomUUID();
+          const propertyObjectId = randomUUID();
           await tx.$executeRaw`
             INSERT INTO "PropertyObject" ("id", "name", "housingCompanyId", "contactPhone", "country", "city", "postalCode", "address1", "address2", "createdAt", "updatedAt")
             VALUES (${propertyObjectId}, ${inlineObject.name}, ${data.housingCompanyId}, ${inlineObject.contactPhone}, ${inlineObject.country}, ${inlineObject.city}, ${inlineObject.postalCode}, ${inlineObject.address1}, ${inlineObject.address2}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
           `;
+          const project = await upsertProjectForObject(tx, {
+            housingCompanyId: data.housingCompanyId,
+            propertyObjectId,
+            projectName: inlineObject.projectName,
+          });
+          projectId = project.id;
         } else {
-          const [propertyObject] = await tx.$queryRaw`
+          const [project] = await tx.$queryRaw`
             SELECT "id"
-            FROM "PropertyObject"
-            WHERE "id" = ${data.propertyObjectId}
+            FROM "Project"
+            WHERE "id" = ${data.projectId}
               AND "housingCompanyId" = ${data.housingCompanyId}
             LIMIT 1
           `;
-          if (!propertyObject) {
-            throw new Error("Select a valid property object for the housing company.");
+          if (!project) {
+            throw new Error("Select a valid project for the housing company.");
           }
         }
       }
@@ -138,7 +134,7 @@ export async function POST(request) {
         data: {
           contractNumber: data.contractNumber,
           kitchenId,
-          propertyObjectId,
+          projectId,
           isActive: true,
           building: data.building,
           floor: data.floor,

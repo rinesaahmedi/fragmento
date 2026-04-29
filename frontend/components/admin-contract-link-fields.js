@@ -1,45 +1,42 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FormField, actionRowStyle, inputStyle, primaryButtonStyle, secondaryButtonStyle } from "./admin-ui";
+import { FormField, actionRowStyle, inputStyle, secondaryButtonStyle } from "./admin-ui";
 import { AdminText } from "./admin-i18n";
 import AdminContractAddressFields from "./admin-contract-address-fields";
+import { projectLabel } from "../lib/property-projects";
 
 export default function AdminContractLinkFields({
   owners = [],
-  propertyObjects = [],
+  projects = [],
   defaultHousingCompanyId = "",
-  defaultPropertyObjectId = "",
+  defaultProjectId = "",
   contract = {},
   compact = false,
   allowInlineObjectCreate = false,
-  showUnassignedToggle = true,
 }) {
-  const hasInitialLink = Boolean(defaultHousingCompanyId && defaultPropertyObjectId);
-  const [mode, setMode] = useState(hasInitialLink ? "linked" : "unassigned");
   const [housingCompanyId, setHousingCompanyId] = useState(defaultHousingCompanyId || "");
-  const [propertyObjectId, setPropertyObjectId] = useState(defaultPropertyObjectId || "");
+  const [projectId, setProjectId] = useState(defaultProjectId || "");
   const [createObjectOpen, setCreateObjectOpen] = useState(false);
 
-  const filteredObjects = propertyObjects.filter((object) => object.housingCompanyId === housingCompanyId);
+  const filteredProjects = projects.filter((project) => project.housingCompanyId === housingCompanyId);
   const fieldStyle = compact ? compactInputStyle : inputStyle;
 
   useEffect(() => {
-    if (mode !== "linked") return;
-
     if (!housingCompanyId) {
-      setPropertyObjectId("");
+      setProjectId("");
       setCreateObjectOpen(false);
       return;
     }
 
     if (createObjectOpen) return;
-    if (filteredObjects.some((object) => object.id === propertyObjectId)) return;
-    setPropertyObjectId(filteredObjects[0]?.id || "");
-  }, [createObjectOpen, filteredObjects, housingCompanyId, mode, propertyObjectId]);
+    if (filteredProjects.some((project) => project.id === projectId)) return;
+    setProjectId(filteredProjects[0]?.id || "");
+  }, [createObjectOpen, filteredProjects, housingCompanyId, projectId]);
 
   const objectFieldNames = {
     name: "inlineObjectName",
+    projectName: "inlineProjectName",
     contactPhone: "inlineObjectContactPhone",
     country: "inlineObjectCountry",
     city: "inlineObjectCity",
@@ -51,180 +48,116 @@ export default function AdminContractLinkFields({
 
   return (
     <>
-      {showUnassignedToggle ? (
-        <div style={modeToggleWrapStyle}>
-          <button
-            type="button"
-            onClick={() => {
-              setMode("unassigned");
-              setCreateObjectOpen(false);
-            }}
-            style={mode === "unassigned" ? activeModeButtonStyle : inactiveModeButtonStyle}
-          >
-            <AdminText i18nKey="contractsAdmin.unassignedContract" fallback="Unassigned contract" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("linked")}
-            style={mode === "linked" ? activeModeButtonStyle : inactiveModeButtonStyle}
-          >
-            <AdminText i18nKey="contractsAdmin.linkedContract" fallback="Linked to object" />
-          </button>
+      <FormField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>
+        <select
+          name="housingCompanyId"
+          value={housingCompanyId}
+          style={fieldStyle}
+          required
+          onChange={(event) => {
+            setHousingCompanyId(event.target.value);
+            setProjectId("");
+            setCreateObjectOpen(false);
+          }}
+        >
+          <option value=""><AdminText i18nKey="contractsAdmin.selectHousingCompany" fallback="Select housing company" /></option>
+          {owners.map((owner) => (
+            <option key={owner.id} value={owner.id}>
+              {owner.name}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project / object" />}>
+        <select
+          name="projectId"
+          value={createObjectOpen ? "" : projectId}
+          style={fieldStyle}
+          required={!createObjectOpen}
+          disabled={!housingCompanyId || createObjectOpen}
+          onChange={(event) => setProjectId(event.target.value)}
+        >
+          <option value="">
+            {!housingCompanyId
+              ? "Select housing company first"
+              : filteredProjects.length
+                ? "Select project/object"
+                : "No existing projects"}
+          </option>
+          {filteredProjects.map((project) => (
+            <option key={project.id} value={project.id}>
+              {projectLabel(project.name, project.propertyObject?.name)}
+            </option>
+          ))}
+        </select>
+      </FormField>
+
+      {allowInlineObjectCreate ? (
+        <div style={inlineObjectPanelStyle}>
+          <div style={actionRowStyle}>
+            {!createObjectOpen ? (
+              <button
+                type="button"
+                disabled={!housingCompanyId}
+                onClick={() => {
+                  setCreateObjectOpen(true);
+                  setProjectId("");
+                }}
+                style={compact ? compactSecondaryButtonStyle : secondaryButtonStyle}
+              >
+                <AdminText i18nKey="propertyOwnersAdmin.addObject" fallback="Add object" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setCreateObjectOpen(false);
+                  setProjectId(filteredProjects[0]?.id || "");
+                }}
+                style={compact ? compactSecondaryButtonStyle : secondaryButtonStyle}
+              >
+                <AdminText i18nKey="contractsAdmin.useExistingProject" fallback="Use existing project" />
+              </button>
+            )}
+          </div>
+
+          {createObjectOpen ? (
+            <div style={inlineObjectBodyStyle}>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
+                <input name={objectFieldNames.name} placeholder="Building A" style={fieldStyle} required />
+              </FormField>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectName" fallback="Project name" />}>
+                <input name={objectFieldNames.projectName} placeholder="Project A" style={fieldStyle} required />
+              </FormField>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
+                <input name={objectFieldNames.contactPhone} placeholder="+49 170 1234567" style={fieldStyle} />
+              </FormField>
+              <AdminContractAddressFields
+                mode="object"
+                compact={compact}
+                includeUnitFields={false}
+                includeNotes={false}
+                referenceFieldName={objectFieldNames.name}
+                fieldNames={objectFieldNames}
+              />
+            </div>
+          ) : null}
         </div>
       ) : null}
 
-      {mode !== "linked" ? (
-        <>
-          <input type="hidden" name="housingCompanyId" value="" />
-          <input type="hidden" name="propertyObjectId" value="" />
-          <FormField label={<AdminText i18nKey="contractAddressFields.building" fallback="Building" />}>
-            <input name="building" defaultValue={contract.building || ""} style={fieldStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="contractAddressFields.floor" fallback="Floor" />}>
-            <input name="floor" defaultValue={contract.floor || ""} style={fieldStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="contractAddressFields.unitNumber" fallback="Unit number" />}>
-            <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={fieldStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="contractAddressFields.notes" fallback="Notes" />} wide>
-            <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={compact ? compactTextareaStyle : defaultTextareaStyle} />
-          </FormField>
-        </>
-      ) : (
-        <>
-          <FormField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>
-            <select
-              name="housingCompanyId"
-              value={housingCompanyId}
-              style={fieldStyle}
-              required
-              onChange={(event) => {
-                setHousingCompanyId(event.target.value);
-                setPropertyObjectId("");
-                setCreateObjectOpen(false);
-              }}
-            >
-              <option value=""><AdminText i18nKey="contractsAdmin.selectHousingCompany" fallback="Select housing company" /></option>
-              {owners.map((owner) => (
-                <option key={owner.id} value={owner.id}>
-                  {owner.name}
-                </option>
-              ))}
-            </select>
-          </FormField>
-
-          <FormField label={<AdminText i18nKey="contractsAdmin.propertyObject" fallback="Property object" />}>
-            <select
-              name="propertyObjectId"
-              value={createObjectOpen ? "" : propertyObjectId}
-              style={fieldStyle}
-              required={!createObjectOpen}
-              disabled={!housingCompanyId || createObjectOpen}
-              onChange={(event) => setPropertyObjectId(event.target.value)}
-            >
-              <option value="">
-                {!housingCompanyId
-                  ? "Select housing company first"
-                  : filteredObjects.length
-                    ? "Select object/building"
-                    : "No existing objects"}
-              </option>
-              {filteredObjects.map((object) => (
-                <option key={object.id} value={object.id}>
-                  {object.name}
-                </option>
-              ))}
-            </select>
-          </FormField>
-
-          {allowInlineObjectCreate ? (
-            <div style={inlineObjectPanelStyle}>
-              <div style={actionRowStyle}>
-                {!createObjectOpen ? (
-                  <button
-                    type="button"
-                    disabled={!housingCompanyId}
-                    onClick={() => {
-                      setCreateObjectOpen(true);
-                      setPropertyObjectId("");
-                    }}
-                    style={compact ? compactSecondaryButtonStyle : secondaryButtonStyle}
-                  >
-                    <AdminText i18nKey="propertyOwnersAdmin.addObject" fallback="Add object" />
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCreateObjectOpen(false);
-                      setPropertyObjectId(filteredObjects[0]?.id || "");
-                    }}
-                    style={compact ? compactSecondaryButtonStyle : secondaryButtonStyle}
-                  >
-                    <AdminText i18nKey="contractsAdmin.useExistingObject" fallback="Use existing object" />
-                  </button>
-                )}
-              </div>
-
-              {createObjectOpen ? (
-                <div style={inlineObjectBodyStyle}>
-                  <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
-                    <input name={objectFieldNames.name} placeholder="Building A" style={fieldStyle} required />
-                  </FormField>
-                  <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
-                    <input name={objectFieldNames.contactPhone} placeholder="+49 170 1234567" style={fieldStyle} />
-                  </FormField>
-                  <AdminContractAddressFields
-                    mode="object"
-                    compact={compact}
-                    includeUnitFields={false}
-                    includeNotes={false}
-                    referenceFieldName={objectFieldNames.name}
-                    fieldNames={objectFieldNames}
-                  />
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-
-          <FormField label={<AdminText i18nKey="contractAddressFields.floor" fallback="Floor" />}>
-            <input name="floor" defaultValue={contract.floor || ""} style={fieldStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="contractAddressFields.unitNumber" fallback="Unit number" />}>
-            <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={fieldStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="contractAddressFields.notes" fallback="Notes" />} wide>
-            <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={compact ? compactTextareaStyle : defaultTextareaStyle} />
-          </FormField>
-        </>
-      )}
+      <FormField label={<AdminText i18nKey="contractAddressFields.floor" fallback="Floor" />}>
+        <input name="floor" defaultValue={contract.floor || ""} style={fieldStyle} />
+      </FormField>
+      <FormField label={<AdminText i18nKey="contractAddressFields.unitNumber" fallback="Unit number" />}>
+        <input name="unitNumber" defaultValue={contract.unitNumber || ""} style={fieldStyle} />
+      </FormField>
+      <FormField label={<AdminText i18nKey="contractAddressFields.notes" fallback="Notes" />} wide>
+        <textarea name="notes" defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={compact ? compactTextareaStyle : defaultTextareaStyle} />
+      </FormField>
     </>
   );
 }
-
-const modeToggleWrapStyle = {
-  display: "flex",
-  gap: 8,
-  gridColumn: "1 / -1",
-  flexWrap: "wrap",
-};
-
-const activeModeButtonStyle = {
-  ...primaryButtonStyle,
-  minHeight: 42,
-  borderRadius: 10,
-  padding: "9px 14px",
-  fontSize: "0.92rem",
-  boxShadow: "0 10px 20px rgba(143, 62, 44, 0.16)",
-};
-
-const inactiveModeButtonStyle = {
-  ...secondaryButtonStyle,
-  minHeight: 42,
-  borderRadius: 10,
-  padding: "9px 14px",
-  fontSize: "0.92rem",
-};
 
 const compactInputStyle = {
   ...inputStyle,

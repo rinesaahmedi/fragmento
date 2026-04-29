@@ -22,7 +22,9 @@ export async function GET(_request, { params }) {
 
   const [ownerRow] = await prisma.$queryRaw`
     SELECT
-      kc."propertyObjectId",
+      prj."id" AS "projectId",
+      prj."name" AS "projectName",
+      prj."propertyObjectId",
       pobj."id" AS "propertyObjectRecordId",
       pobj."name" AS "propertyObjectName",
       pobj."country",
@@ -38,19 +40,42 @@ export async function GET(_request, { params }) {
       hc."createdAt",
       hc."updatedAt"
     FROM "KitchenContract" kc
-    LEFT JOIN "PropertyObject" pobj ON pobj."id" = kc."propertyObjectId"
-    LEFT JOIN "HousingCompany" hc ON hc."id" = pobj."housingCompanyId"
+    JOIN "Project" prj ON prj."id" = kc."projectId"
+    JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
+    JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
     WHERE kc."id" = ${id}
     LIMIT 1
   `;
 
   return NextResponse.json({
     ...contract,
-    propertyObjectId: ownerRow?.propertyObjectId || null,
+    projectId: ownerRow?.projectId || null,
+    projectName: ownerRow?.projectName || null,
+    project: ownerRow?.projectId
+      ? {
+          id: ownerRow.projectId,
+          name: ownerRow.projectName,
+          housingCompanyId: ownerRow.housingCompanyRecordId,
+          propertyObjectId: ownerRow.propertyObjectId,
+          propertyObject: ownerRow.propertyObjectRecordId
+            ? {
+                id: ownerRow.propertyObjectRecordId,
+                name: ownerRow.propertyObjectName,
+                country: ownerRow.country,
+                city: ownerRow.city,
+                postalCode: ownerRow.postalCode,
+                address1: ownerRow.address1,
+                address2: ownerRow.address2,
+              }
+            : null,
+        }
+      : null,
     propertyObject: ownerRow?.propertyObjectRecordId
       ? {
           id: ownerRow.propertyObjectRecordId,
           name: ownerRow.propertyObjectName,
+          projectId: ownerRow.projectId || null,
+          projectName: ownerRow.projectName || null,
           country: ownerRow.country,
           city: ownerRow.city,
           postalCode: ownerRow.postalCode,
@@ -96,16 +121,16 @@ export async function POST(request, { params }) {
 
     if (intent === "update") {
       const data = validateKitchenContractInput(formData);
-      if (data.housingCompanyId && data.propertyObjectId) {
-        const [propertyObject] = await prisma.$queryRaw`
+      if (data.housingCompanyId && data.projectId) {
+        const [project] = await prisma.$queryRaw`
           SELECT "id"
-          FROM "PropertyObject"
-          WHERE "id" = ${data.propertyObjectId}
+          FROM "Project"
+          WHERE "id" = ${data.projectId}
             AND "housingCompanyId" = ${data.housingCompanyId}
           LIMIT 1
         `;
-        if (!propertyObject) {
-          throw new Error("Select a valid property object for the housing company.");
+        if (!project) {
+          throw new Error("Select a valid project for the housing company.");
         }
       }
 
@@ -113,7 +138,7 @@ export async function POST(request, { params }) {
         where: { id },
         data: {
           contractNumber: data.contractNumber,
-          propertyObjectId: data.propertyObjectId || null,
+          projectId: data.projectId,
           building: data.building,
           floor: data.floor,
           unitNumber: data.unitNumber,

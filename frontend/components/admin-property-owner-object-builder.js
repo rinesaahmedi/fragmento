@@ -18,6 +18,7 @@ function createObjectDraft(id) {
 function objectFieldNames(id) {
   return {
     name: `objectName__${id}`,
+    projectName: `projectName__${id}`,
     contactPhone: `objectContactPhone__${id}`,
     country: `objectCountry__${id}`,
     city: `objectCity__${id}`,
@@ -85,6 +86,15 @@ export default function AdminPropertyOwnerObjectBuilder() {
                     name={fieldNames.name}
                     placeholder={translate("propertyOwnersAdmin.objectNamePlaceholder", "Building A")}
                     style={inputStyle}
+                    required
+                  />
+                </FormField>
+                <FormField label={translate("propertyOwnersAdmin.projectName", "Project name")}>
+                  <input
+                    name={fieldNames.projectName}
+                    placeholder={translate("propertyOwnersAdmin.projectNamePlaceholder", "Project A")}
+                    style={inputStyle}
+                    required
                   />
                 </FormField>
                 <FormField label={translate("propertyOwnersAdmin.objectContactPhone", "Object contact phone")}>

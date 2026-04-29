@@ -136,8 +136,9 @@ function buildObjectLinkedOrderAddressMatchSql(patterns) {
   return Prisma.sql`EXISTS (
     SELECT 1
     FROM "KitchenContract" kc_match
+    JOIN "Project" prj_match ON prj_match."id" = kc_match."projectId"
     JOIN "Order" o_match ON o_match."kitchenContractId" = kc_match."id"
-    WHERE kc_match."propertyObjectId" = po."id"
+    WHERE prj_match."propertyObjectId" = po."id"
       AND ${buildAnyFieldMatchSql([
         Prisma.sql`o_match."address1"`,
         Prisma.sql`o_match."address2"`,
@@ -159,7 +160,8 @@ function buildEntityTokenConditions(entityType, tokens) {
         conditions.push(Prisma.sql`EXISTS (
           SELECT 1
           FROM "KitchenContract" kc_sel
-          JOIN "PropertyObject" po_sel ON po_sel."id" = kc_sel."propertyObjectId"
+          JOIN "Project" prj_sel ON prj_sel."id" = kc_sel."projectId"
+          JOIN "PropertyObject" po_sel ON po_sel."id" = prj_sel."propertyObjectId"
           WHERE kc_sel."id" = ${token.id}
             AND po_sel."housingCompanyId" = hc."id"
         )`);
@@ -175,7 +177,8 @@ function buildEntityTokenConditions(entityType, tokens) {
           SELECT 1
           FROM "Order" o_sel
           LEFT JOIN "KitchenContract" kc_sel ON kc_sel."id" = o_sel."kitchenContractId"
-          LEFT JOIN "PropertyObject" po_sel ON po_sel."id" = kc_sel."propertyObjectId"
+          LEFT JOIN "Project" prj_sel ON prj_sel."id" = kc_sel."projectId"
+          LEFT JOIN "PropertyObject" po_sel ON po_sel."id" = prj_sel."propertyObjectId"
           WHERE o_sel."id" = ${token.id}
             AND po_sel."housingCompanyId" = hc."id"
         )`);
@@ -198,7 +201,8 @@ function buildEntityTokenConditions(entityType, tokens) {
           OR EXISTS (
             SELECT 1
             FROM "KitchenContract" kc_sel
-            JOIN "PropertyObject" po_sel ON po_sel."id" = kc_sel."propertyObjectId"
+            JOIN "Project" prj_sel ON prj_sel."id" = kc_sel."projectId"
+            JOIN "PropertyObject" po_sel ON po_sel."id" = prj_sel."propertyObjectId"
             JOIN "Order" o_sel ON o_sel."kitchenContractId" = kc_sel."id"
             WHERE po_sel."housingCompanyId" = hc."id"
               AND ${buildAddressMatchSql([
@@ -217,14 +221,19 @@ function buildEntityTokenConditions(entityType, tokens) {
       if (token.type === "company") {
         conditions.push(Prisma.sql`EXISTS (
           SELECT 1
-          FROM "PropertyObject" po_sel
-          WHERE po_sel."id" = kc."propertyObjectId"
-            AND po_sel."housingCompanyId" = ${token.id}
+          FROM "Project" prj_sel
+          WHERE prj_sel."id" = kc."projectId"
+            AND prj_sel."housingCompanyId" = ${token.id}
         )`);
       } else if (token.type === "contract") {
         conditions.push(Prisma.sql`kc."id" = ${token.id}`);
       } else if (token.type === "object") {
-        conditions.push(Prisma.sql`kc."propertyObjectId" = ${token.id}`);
+        conditions.push(Prisma.sql`EXISTS (
+          SELECT 1
+          FROM "Project" prj_sel
+          WHERE prj_sel."id" = kc."projectId"
+            AND prj_sel."propertyObjectId" = ${token.id}
+        )`);
       } else if (token.type === "order") {
         conditions.push(Prisma.sql`EXISTS (
           SELECT 1
@@ -236,8 +245,9 @@ function buildEntityTokenConditions(entityType, tokens) {
         conditions.push(Prisma.sql`(
           EXISTS (
             SELECT 1
-            FROM "PropertyObject" po_sel
-            WHERE po_sel."id" = kc."propertyObjectId"
+            FROM "Project" prj_sel
+            JOIN "PropertyObject" po_sel ON po_sel."id" = prj_sel."propertyObjectId"
+            WHERE prj_sel."id" = kc."projectId"
               AND ${buildAddressMatchSql([
                 Prisma.sql`po_sel."name"`,
                 Prisma.sql`po_sel."address1"`,
@@ -271,7 +281,12 @@ function buildEntityTokenConditions(entityType, tokens) {
           SELECT 1
           FROM "KitchenContract" kc_sel
           WHERE kc_sel."id" = ${token.id}
-            AND kc_sel."propertyObjectId" = po."id"
+            AND EXISTS (
+              SELECT 1
+              FROM "Project" prj_sel
+              WHERE prj_sel."id" = kc_sel."projectId"
+                AND prj_sel."propertyObjectId" = po."id"
+            )
         )`);
       } else if (token.type === "object") {
         conditions.push(Prisma.sql`po."id" = ${token.id}`);
@@ -281,7 +296,12 @@ function buildEntityTokenConditions(entityType, tokens) {
           FROM "Order" o_sel
           LEFT JOIN "KitchenContract" kc_sel ON kc_sel."id" = o_sel."kitchenContractId"
           WHERE o_sel."id" = ${token.id}
-            AND kc_sel."propertyObjectId" = po."id"
+            AND EXISTS (
+              SELECT 1
+              FROM "Project" prj_sel
+              WHERE prj_sel."id" = kc_sel."projectId"
+                AND prj_sel."propertyObjectId" = po."id"
+            )
         )`);
       } else if (token.type === "address") {
         conditions.push(Prisma.sql`(
@@ -296,8 +316,9 @@ function buildEntityTokenConditions(entityType, tokens) {
           OR EXISTS (
             SELECT 1
             FROM "KitchenContract" kc_sel
+            JOIN "Project" prj_sel ON prj_sel."id" = kc_sel."projectId"
             JOIN "Order" o_sel ON o_sel."kitchenContractId" = kc_sel."id"
-            WHERE kc_sel."propertyObjectId" = po."id"
+            WHERE prj_sel."propertyObjectId" = po."id"
               AND ${buildAddressMatchSql([
                 Prisma.sql`o_sel."address1"`,
                 Prisma.sql`o_sel."address2"`,
@@ -315,7 +336,8 @@ function buildEntityTokenConditions(entityType, tokens) {
         conditions.push(Prisma.sql`EXISTS (
           SELECT 1
           FROM "KitchenContract" kc_sel
-          JOIN "PropertyObject" po_sel ON po_sel."id" = kc_sel."propertyObjectId"
+          JOIN "Project" prj_sel ON prj_sel."id" = kc_sel."projectId"
+          JOIN "PropertyObject" po_sel ON po_sel."id" = prj_sel."propertyObjectId"
           WHERE kc_sel."id" = o."kitchenContractId"
             AND po_sel."housingCompanyId" = ${token.id}
         )`);
@@ -326,7 +348,12 @@ function buildEntityTokenConditions(entityType, tokens) {
           SELECT 1
           FROM "KitchenContract" kc_sel
           WHERE kc_sel."id" = o."kitchenContractId"
-            AND kc_sel."propertyObjectId" = ${token.id}
+            AND EXISTS (
+              SELECT 1
+              FROM "Project" prj_sel
+              WHERE prj_sel."id" = kc_sel."projectId"
+                AND prj_sel."propertyObjectId" = ${token.id}
+            )
         )`);
       } else if (token.type === "order") {
         conditions.push(Prisma.sql`o."id" = ${token.id}`);
@@ -357,7 +384,8 @@ function buildCompanyEligibility(filters) {
   return Prisma.sql`EXISTS (
     SELECT 1
     FROM "PropertyObject" po_scope
-    JOIN "KitchenContract" kc_scope ON kc_scope."propertyObjectId" = po_scope."id"
+    JOIN "Project" prj_scope ON prj_scope."propertyObjectId" = po_scope."id"
+    JOIN "KitchenContract" kc_scope ON kc_scope."projectId" = prj_scope."id"
     ${hasScopedOrders ? Prisma.sql`JOIN "Order" o_scope ON o_scope."kitchenContractId" = kc_scope."id"` : Prisma.empty}
     WHERE po_scope."housingCompanyId" = hc."id"
       ${kitchenContractConditions.length ? Prisma.sql`AND ${Prisma.join(kitchenContractConditions, " AND ")}` : Prisma.empty}
@@ -392,7 +420,8 @@ function buildObjectEligibility(filters) {
   return Prisma.sql`EXISTS (
     SELECT 1
     FROM "KitchenContract" kc_scope
-    WHERE kc_scope."propertyObjectId" = po."id"
+    JOIN "Project" prj_scope ON prj_scope."id" = kc_scope."projectId"
+    WHERE prj_scope."propertyObjectId" = po."id"
       AND kc_scope."kitchenId" = ${filters.kitchenId}
   )`;
 }
@@ -501,8 +530,9 @@ async function getSuggestions(filters, tokens, query) {
         ${contractRank} AS rank
       FROM "KitchenContract" kc
       JOIN "Kitchen" k ON k."id" = kc."kitchenId"
-      LEFT JOIN "PropertyObject" po ON po."id" = kc."propertyObjectId"
-      LEFT JOIN "HousingCompany" hc ON hc."id" = po."housingCompanyId"
+      LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+      LEFT JOIN "PropertyObject" po ON po."id" = prj."propertyObjectId"
+      LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
       WHERE ${contractQuerySql}
         AND ${buildContractEligibility(filters)}
         ${buildEntityTokenConditions("contracts", tokens).length ? Prisma.sql`AND ${Prisma.join(buildEntityTokenConditions("contracts", tokens), " AND ")}` : Prisma.empty}
@@ -572,6 +602,7 @@ async function getResults(filters, tokens, query) {
   const contractQuerySql = patterns ? buildAnyFieldMatchSql([
     Prisma.sql`kc."contractNumber"`,
     Prisma.sql`k."name"`,
+    Prisma.sql`prj."name"`,
     Prisma.sql`po."name"`,
     Prisma.sql`hc."name"`,
   ], patterns) : null;
@@ -619,7 +650,8 @@ async function getResults(filters, tokens, query) {
           COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
         FROM "HousingCompany" hc
         LEFT JOIN "PropertyObject" po ON po."housingCompanyId" = hc."id"
-        LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = po."id"
+        LEFT JOIN "Project" prj ON prj."propertyObjectId" = po."id"
+        LEFT JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
         LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
         WHERE ${buildCompanyEligibility(filters)}
           ${companyTokenConditions.length ? Prisma.sql`AND ${Prisma.join(companyTokenConditions, " AND ")}` : Prisma.empty}
@@ -638,20 +670,22 @@ async function getResults(filters, tokens, query) {
           kc."id",
           kc."contractNumber",
           k."name" AS "kitchenName",
+          prj."name" AS "projectName",
           po."name" AS "objectName",
           hc."name" AS "companyName",
           COUNT(DISTINCT o."id")::int AS "orderCount",
           COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
         FROM "KitchenContract" kc
         JOIN "Kitchen" k ON k."id" = kc."kitchenId"
-        LEFT JOIN "PropertyObject" po ON po."id" = kc."propertyObjectId"
-        LEFT JOIN "HousingCompany" hc ON hc."id" = po."housingCompanyId"
+        LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+        LEFT JOIN "PropertyObject" po ON po."id" = prj."propertyObjectId"
+        LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
         LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
         WHERE ${buildContractEligibility(filters)}
           ${contractTokenConditions.length ? Prisma.sql`AND ${Prisma.join(contractTokenConditions, " AND ")}` : Prisma.empty}
           ${contractQuerySql ? Prisma.sql`AND ${contractQuerySql}` : Prisma.empty}
           ${buildOrderFilterSql(filters, "o").length ? Prisma.sql`AND ${Prisma.join(buildOrderFilterSql(filters, "o"), " AND ")}` : Prisma.empty}
-        GROUP BY kc."id", k."id", po."id", hc."id"
+        GROUP BY kc."id", k."id", prj."id", po."id", hc."id"
       )
       SELECT *, COUNT(*) OVER()::int AS "totalCount"
       FROM matching
@@ -675,7 +709,8 @@ async function getResults(filters, tokens, query) {
           COUNT(DISTINCT o."id")::int AS "orderCount"
         FROM "PropertyObject" po
         JOIN "HousingCompany" hc ON hc."id" = po."housingCompanyId"
-        LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = po."id"
+        LEFT JOIN "Project" prj ON prj."propertyObjectId" = po."id"
+        LEFT JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
         LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
         WHERE ${buildObjectEligibility(filters)}
           ${objectTokenConditions.length ? Prisma.sql`AND ${Prisma.join(objectTokenConditions, " AND ")}` : Prisma.empty}
@@ -701,12 +736,14 @@ async function getResults(filters, tokens, query) {
           o."createdAt",
           o."totalPrice",
           kc."contractNumber",
+          prj."name" AS "projectName",
           po."name" AS "objectName",
           hc."name" AS "companyName"
         FROM "Order" o
         LEFT JOIN "KitchenContract" kc ON kc."id" = o."kitchenContractId"
-        LEFT JOIN "PropertyObject" po ON po."id" = kc."propertyObjectId"
-        LEFT JOIN "HousingCompany" hc ON hc."id" = po."housingCompanyId"
+        LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+        LEFT JOIN "PropertyObject" po ON po."id" = prj."propertyObjectId"
+        LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
         ${buildOrderWhere(filters, tokens, orderQuerySql)}
       )
       SELECT *, COUNT(*) OVER()::int AS "totalCount"
@@ -719,8 +756,9 @@ async function getResults(filters, tokens, query) {
         SELECT kc."id"
         FROM "KitchenContract" kc
         JOIN "Kitchen" k ON k."id" = kc."kitchenId"
-        LEFT JOIN "PropertyObject" po ON po."id" = kc."propertyObjectId"
-        LEFT JOIN "HousingCompany" hc ON hc."id" = po."housingCompanyId"
+        LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+        LEFT JOIN "PropertyObject" po ON po."id" = prj."propertyObjectId"
+        LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
         LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
         WHERE ${buildContractEligibility(filters)}
           ${contractTokenConditions.length ? Prisma.sql`AND ${Prisma.join(contractTokenConditions, " AND ")}` : Prisma.empty}
@@ -736,7 +774,8 @@ async function getResults(filters, tokens, query) {
         SELECT po."id"
         FROM "PropertyObject" po
         JOIN "HousingCompany" hc ON hc."id" = po."housingCompanyId"
-        LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = po."id"
+        LEFT JOIN "Project" prj ON prj."propertyObjectId" = po."id"
+        LEFT JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
         LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
         WHERE ${buildObjectEligibility(filters)}
           ${objectTokenConditions.length ? Prisma.sql`AND ${Prisma.join(objectTokenConditions, " AND ")}` : Prisma.empty}
@@ -753,8 +792,9 @@ async function getResults(filters, tokens, query) {
           o."totalPrice"
         FROM "Order" o
         LEFT JOIN "KitchenContract" kc ON kc."id" = o."kitchenContractId"
-        LEFT JOIN "PropertyObject" po ON po."id" = kc."propertyObjectId"
-        LEFT JOIN "HousingCompany" hc ON hc."id" = po."housingCompanyId"
+        LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+        LEFT JOIN "PropertyObject" po ON po."id" = prj."propertyObjectId"
+        LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
         ${buildOrderWhere(filters, tokens, orderQuerySql)}
       )
       SELECT

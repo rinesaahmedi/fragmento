@@ -168,7 +168,23 @@ async function main() {
       `;
     }
 
-    seededObjects.push({ id: objectId });
+    const project = await prisma.project.upsert({
+      where: { propertyObjectId: objectId },
+      update: {
+        housingCompanyId: ownerId,
+        name: owner.projectName || `${owner.objectName} Project`,
+      },
+      create: {
+        propertyObjectId: objectId,
+        housingCompanyId: ownerId,
+        name: owner.projectName || `${owner.objectName} Project`,
+      },
+    });
+
+    seededObjects.push({
+      id: objectId,
+      projectId: project.id,
+    });
   }
 
   for (const kitchen of DEFAULT_KITCHENS) {
@@ -254,13 +270,13 @@ async function main() {
       where: { contractNumber: contract.contractNumber },
       update: {
         kitchenId: kitchen.id,
-        propertyObjectId: seededObjects[index % seededObjects.length]?.id || null,
+        projectId: seededObjects[index % seededObjects.length]?.projectId || undefined,
         isActive: true,
       },
       create: {
         contractNumber: contract.contractNumber,
         kitchenId: kitchen.id,
-        propertyObjectId: seededObjects[index % seededObjects.length]?.id || null,
+        projectId: seededObjects[index % seededObjects.length]?.projectId,
         isActive: true,
       },
     });

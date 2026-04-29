@@ -32,7 +32,8 @@ export async function GET(_request, { params }) {
       COUNT(kc."id")::int AS "contractCount"
     FROM "HousingCompany" hc
     LEFT JOIN "PropertyObject" pobj ON pobj."housingCompanyId" = hc."id"
-    LEFT JOIN "KitchenContract" kc ON kc."propertyObjectId" = pobj."id"
+    LEFT JOIN "Project" prj ON prj."propertyObjectId" = pobj."id"
+    LEFT JOIN "KitchenContract" kc ON kc."projectId" = prj."id"
     WHERE hc."id" = ${id}
     GROUP BY hc."id"
     LIMIT 1

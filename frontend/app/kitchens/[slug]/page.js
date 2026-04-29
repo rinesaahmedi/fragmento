@@ -54,7 +54,9 @@ function serializeConfirmedBaseline(confirmedItems = []) {
 function serializeContractAddress(contract) {
   if (!contract) return null;
 
-  const propertyObject = contract.propertyObject || null;
+  const project = contract.project || null;
+  const propertyObject = project?.propertyObject || null;
+  const housingCompany = project?.housingCompany || null;
   const unitParts = [
     contract.building ? `Building ${contract.building}` : "",
     contract.floor ? `Floor ${contract.floor}` : "",
@@ -63,8 +65,9 @@ function serializeContractAddress(contract) {
 
   const hasDetails = [
     contract.contractNumber,
+    project?.name,
     propertyObject?.name,
-    propertyObject?.housingCompany?.name,
+    housingCompany?.name,
     propertyObject?.country,
     propertyObject?.city,
     propertyObject?.postalCode,
@@ -80,8 +83,9 @@ function serializeContractAddress(contract) {
 
   return {
     contractNumber: contract.contractNumber || "",
+    projectName: project?.name || "",
     objectName: propertyObject?.name || "",
-    housingCompanyName: propertyObject?.housingCompany?.name || "",
+    housingCompanyName: housingCompany?.name || "",
     country: propertyObject?.country || "",
     city: propertyObject?.city || "",
     postalCode: propertyObject?.postalCode || "",

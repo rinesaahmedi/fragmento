@@ -47,8 +47,9 @@ export async function getKitchenContractForAccess(contractNumber) {
     where: { contractNumber: normalizedContractNumber },
     include: {
       kitchen: true,
-      propertyObject: {
+      project: {
         include: {
+          propertyObject: true,
           housingCompany: true,
         },
       },
