@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { FormField, actionRowStyle, inputStyle, secondaryButtonStyle } from "./admin-ui";
-import { AdminText } from "./admin-i18n";
+import { AdminText, useAdminI18n } from "./admin-i18n";
 import AdminContractAddressFields from "./admin-contract-address-fields";
-import { projectLabel } from "../lib/property-projects";
 
 export default function AdminContractLinkFields({
   owners = [],
@@ -15,6 +14,7 @@ export default function AdminContractLinkFields({
   compact = false,
   allowInlineObjectCreate = false,
 }) {
+  const { translate } = useAdminI18n();
   const [housingCompanyId, setHousingCompanyId] = useState(defaultHousingCompanyId || "");
   const [projectId, setProjectId] = useState(defaultProjectId || "");
   const [createObjectOpen, setCreateObjectOpen] = useState(false);
@@ -37,6 +37,10 @@ export default function AdminContractLinkFields({
   const objectFieldNames = {
     name: "inlineObjectName",
     projectName: "inlineProjectName",
+    projectCode: "inlineProjectCode",
+    projectStatus: "inlineProjectStatus",
+    projectDescription: "inlineProjectDescription",
+    projectManagerName: "inlineProjectManagerName",
     contactPhone: "inlineObjectContactPhone",
     country: "inlineObjectCountry",
     city: "inlineObjectCity",
@@ -69,7 +73,7 @@ export default function AdminContractLinkFields({
         </select>
       </FormField>
 
-      <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project / object" />}>
+      <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project" />}>
         <select
           name="projectId"
           value={createObjectOpen ? "" : projectId}
@@ -82,12 +86,12 @@ export default function AdminContractLinkFields({
             {!housingCompanyId
               ? "Select housing company first"
               : filteredProjects.length
-                ? "Select project/object"
+                ? translate("contractsAdmin.selectProject", "Select project")
                 : "No existing projects"}
           </option>
           {filteredProjects.map((project) => (
             <option key={project.id} value={project.id}>
-              {projectLabel(project.name, project.propertyObject?.name)}
+              {project.projectCode ? `${project.projectCode} - ` : ""}{project.name || translate("contractsAdmin.unnamedProject", "Unnamed project")} - {translate("contractsAdmin.objectContext", "Object")}: {project.propertyObject?.name || translate("contractsAdmin.noObject", "No object")}
             </option>
           ))}
         </select>
@@ -130,8 +134,31 @@ export default function AdminContractLinkFields({
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectName" fallback="Project name" />}>
                 <input name={objectFieldNames.projectName} placeholder="Project A" style={fieldStyle} required />
               </FormField>
-              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Object contact phone" />}>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectCode" fallback="Project code" />}>
+                <input name={objectFieldNames.projectCode} placeholder="PRJ-204" style={fieldStyle} />
+              </FormField>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectStatus" fallback="Project status" />}>
+                <select name={objectFieldNames.projectStatus} defaultValue="active" style={fieldStyle}>
+                  <option value="planning"><AdminText i18nKey="propertyOwnersAdmin.projectStatusPlanning" fallback="Planning" /></option>
+                  <option value="active"><AdminText i18nKey="propertyOwnersAdmin.projectStatusActive" fallback="Active" /></option>
+                  <option value="on_hold"><AdminText i18nKey="propertyOwnersAdmin.projectStatusOnHold" fallback="On hold" /></option>
+                  <option value="completed"><AdminText i18nKey="propertyOwnersAdmin.projectStatusCompleted" fallback="Completed" /></option>
+                  <option value="archived"><AdminText i18nKey="propertyOwnersAdmin.projectStatusArchived" fallback="Archived" /></option>
+                </select>
+              </FormField>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectManagerName" fallback="Project manager" />}>
+                <input name={objectFieldNames.projectManagerName} placeholder="Alex Meyer" style={fieldStyle} />
+              </FormField>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Contact phone" />}>
                 <input name={objectFieldNames.contactPhone} placeholder="+49 170 1234567" style={fieldStyle} />
+              </FormField>
+              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectDescription" fallback="Project description" />} wide>
+                <textarea
+                  name={objectFieldNames.projectDescription}
+                  placeholder="Internal notes about this project"
+                  rows={compact ? 2 : 3}
+                  style={compact ? compactTextareaStyle : defaultTextareaStyle}
+                />
               </FormField>
               <AdminContractAddressFields
                 mode="object"

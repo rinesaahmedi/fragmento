@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AdminText, useAdminI18n } from "./admin-i18n";
-import { projectLabel } from "../lib/property-projects";
 
 function FilterField({ label, children }) {
   return (
@@ -75,7 +74,7 @@ export default function AdminContractsFilters({
             ))}
           </select>
         </FilterField>
-        <FilterField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project / object" />}>
+        <FilterField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project" />}>
           <select
             name="projectId"
             value={projectId}
@@ -92,8 +91,8 @@ export default function AdminContractsFilters({
             {visibleProjects.map((project) => (
               <option key={project.id} value={project.id}>
                 {housingCompanyId
-                  ? projectLabel(project.name, project.propertyObject?.name)
-                  : `${project.housingCompany.name} | ${projectLabel(project.name, project.propertyObject?.name)}`}
+                  ? `${project.projectCode ? `${project.projectCode} | ` : ""}${project.name || translate("contractsAdmin.unnamedProject", "Unnamed project")} | ${translate("contractsAdmin.objectContext", "Object")}: ${project.propertyObject?.name || translate("contractsAdmin.noObject", "No object")}`
+                  : `${project.housingCompany.name} | ${project.projectCode ? `${project.projectCode} | ` : ""}${project.name || translate("contractsAdmin.unnamedProject", "Unnamed project")} | ${translate("contractsAdmin.objectContext", "Object")}: ${project.propertyObject?.name || translate("contractsAdmin.noObject", "No object")}`}
               </option>
             ))}
           </select>

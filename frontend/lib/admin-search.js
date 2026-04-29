@@ -704,6 +704,7 @@ async function getResults(filters, tokens, query) {
           po."country",
           hc."id" AS "companyId",
           hc."name" AS "companyName",
+          prj."name" AS "projectName",
           ${objectMatchRank} AS "matchRank",
           COUNT(DISTINCT kc."id")::int AS "contractCount",
           COUNT(DISTINCT o."id")::int AS "orderCount"
@@ -715,7 +716,7 @@ async function getResults(filters, tokens, query) {
         WHERE ${buildObjectEligibility(filters)}
           ${objectTokenConditions.length ? Prisma.sql`AND ${Prisma.join(objectTokenConditions, " AND ")}` : Prisma.empty}
           ${objectQuerySql ? Prisma.sql`AND ${objectQuerySql}` : Prisma.empty}
-        GROUP BY po."id", hc."id"
+        GROUP BY po."id", hc."id", prj."id"
       )
       SELECT *, COUNT(*) OVER()::int AS "totalCount"
       FROM matching
@@ -822,6 +823,7 @@ async function getResults(filters, tokens, query) {
         id: row.id,
         contractNumber: row.contractNumber || "",
         kitchenName: row.kitchenName || "",
+        projectName: row.projectName || "",
         objectName: row.objectName || "",
         companyName: row.companyName || "",
         orderCount: Number(row.orderCount || 0),
@@ -837,6 +839,7 @@ async function getResults(filters, tokens, query) {
         country: row.country || "",
         companyId: row.companyId || "",
         companyName: row.companyName || "",
+        projectName: row.projectName || "",
         contractCount: Number(row.contractCount || 0),
         orderCount: Number(row.orderCount || 0),
       })),
@@ -850,6 +853,7 @@ async function getResults(filters, tokens, query) {
         city: row.city || "",
         country: row.country || "",
         contractNumber: row.contractNumber || "",
+        projectName: row.projectName || "",
         objectName: row.objectName || "",
         companyName: row.companyName || "",
         totalPrice: Number(row.totalPrice || 0),

@@ -58,6 +58,10 @@ export async function POST(request, { params }) {
         housingCompanyId: id,
         propertyObjectId,
         projectName: data.projectName,
+        projectCode: data.projectCode,
+        projectStatus: data.projectStatus,
+        projectDescription: data.projectDescription,
+        projectManagerName: data.projectManagerName,
       });
     });
 

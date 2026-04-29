@@ -18,6 +18,10 @@ function propertyObjectContact(object) {
 function buildObjectSearchIndex(object) {
   return [
     object.projectName,
+    object.projectCode,
+    object.projectStatus,
+    object.projectDescription,
+    object.projectManagerName,
     object.name,
     object.contactPhone,
     object.country,
@@ -84,7 +88,17 @@ function renderHighlightedText(text, query) {
   ));
 }
 
-export default function AdminPropertyObjectsPreview({ objects = [], priorityQuery = "" }) {
+function formatProjectStatus(status) {
+  const value = String(status || "").trim();
+  if (!value) return "";
+  return value
+    .split("_")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function PreviewList({ objects = [], priorityQuery = "", children }) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (!objects.length) {
@@ -105,25 +119,7 @@ export default function AdminPropertyObjectsPreview({ objects = [], priorityQuer
   return (
     <div style={objectPreviewGroupStyle}>
       <div style={objectPreviewListStyle}>
-        {visibleObjects.map((object) => {
-          const address = propertyObjectAddress(object);
-          const contact = propertyObjectContact(object);
-          return (
-            <div key={object.id} style={objectPreviewCardStyle}>
-              <div style={objectPreviewHeaderStyle}>
-                <div style={objectPreviewTitleStackStyle}>
-                  {object.projectName ? <span style={objectPreviewProjectStyle}>{renderHighlightedText(object.projectName, priorityQuery)}</span> : null}
-                  <strong>{renderHighlightedText(object.name, priorityQuery)}</strong>
-                </div>
-                <span style={objectPreviewCountStyle}>
-                  {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
-                </span>
-              </div>
-              {address ? <span style={objectPreviewAddressStyle}>{renderHighlightedText(address, priorityQuery)}</span> : null}
-              {contact ? <span style={objectPreviewMetaStyle}>{renderHighlightedText(contact, priorityQuery)}</span> : null}
-            </div>
-          );
-        })}
+        {visibleObjects.map((object) => children(object))}
       </div>
 
       {hasOverflow ? (
@@ -141,6 +137,79 @@ export default function AdminPropertyObjectsPreview({ objects = [], priorityQuer
   );
 }
 
+export function AdminPropertyProjectsPreview({ objects = [], priorityQuery = "" }) {
+  return (
+    <PreviewList objects={objects} priorityQuery={priorityQuery}>
+      {(object) => (
+        <div key={object.id} style={projectOnlyCardStyle}>
+          <span style={hierarchyEyebrowStyle}><AdminText i18nKey="propertyOwnersAdmin.project" fallback="Project" /></span>
+          {object.projectCode ? <span style={projectMetaTextStyle}>{renderHighlightedText(object.projectCode, priorityQuery)}</span> : null}
+          <strong style={projectOnlyNameStyle}>
+            {renderHighlightedText(object.projectName || "Unnamed project", priorityQuery)}
+          </strong>
+          {object.projectStatus ? <span style={projectMetaTextStyle}>{renderHighlightedText(formatProjectStatus(object.projectStatus), priorityQuery)}</span> : null}
+          {object.projectManagerName ? <span style={projectMetaTextStyle}>{renderHighlightedText(object.projectManagerName, priorityQuery)}</span> : null}
+          {object.projectDescription ? <span style={projectDescriptionStyle}>{renderHighlightedText(object.projectDescription, priorityQuery)}</span> : null}
+        </div>
+      )}
+    </PreviewList>
+  );
+}
+
+export function AdminPropertyObjectDetailsPreview({ objects = [], priorityQuery = "" }) {
+  return (
+    <PreviewList objects={objects} priorityQuery={priorityQuery}>
+      {(object) => {
+        const address = propertyObjectAddress(object);
+        const contact = propertyObjectContact(object);
+        return (
+          <div key={object.id} style={objectOnlyCardStyle}>
+            <div style={objectOnlyHeaderStyle}>
+              <span style={hierarchyEyebrowStyle}><AdminText i18nKey="propertyOwnersAdmin.propertyObject" fallback="Object / Building" /></span>
+              <span style={objectPreviewCountStyle}>
+                {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
+              </span>
+            </div>
+            <strong style={objectNameStyle}>{renderHighlightedText(object.name, priorityQuery)}</strong>
+            {address ? <span style={objectPreviewAddressStyle}>{renderHighlightedText(address, priorityQuery)}</span> : null}
+            {contact ? <span style={objectPreviewMetaStyle}>{renderHighlightedText(contact, priorityQuery)}</span> : null}
+          </div>
+        );
+      }}
+    </PreviewList>
+  );
+}
+
+export default function AdminPropertyObjectsPreview({ objects = [], priorityQuery = "" }) {
+  return (
+    <PreviewList objects={objects} priorityQuery={priorityQuery}>
+      {(object) => {
+        const address = propertyObjectAddress(object);
+        const contact = propertyObjectContact(object);
+        return (
+          <div key={object.id} style={objectPreviewCardStyle}>
+            <div style={projectHeaderStyle}>
+              <div style={projectTitleStackStyle}>
+                <span style={hierarchyEyebrowStyle}><AdminText i18nKey="contractsAdmin.project" fallback="Project" /></span>
+                <strong>{renderHighlightedText(object.projectName || "Unnamed project", priorityQuery)}</strong>
+              </div>
+              <span style={objectPreviewCountStyle}>
+                {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
+              </span>
+            </div>
+            <div style={objectHierarchyStyle}>
+              <span style={hierarchyEyebrowStyle}><AdminText i18nKey="contractsAdmin.propertyObject" fallback="Object/building" /></span>
+              <strong style={objectNameStyle}>{renderHighlightedText(object.name, priorityQuery)}</strong>
+              {address ? <span style={objectPreviewAddressStyle}>{renderHighlightedText(address, priorityQuery)}</span> : null}
+              {contact ? <span style={objectPreviewMetaStyle}>{renderHighlightedText(contact, priorityQuery)}</span> : null}
+            </div>
+          </div>
+        );
+      }}
+    </PreviewList>
+  );
+}
+
 const objectPreviewGroupStyle = {
   display: "grid",
   gap: 8,
@@ -155,35 +224,95 @@ const objectPreviewListStyle = {
 
 const objectPreviewCardStyle = {
   display: "grid",
-  gap: 3,
-  padding: "7px 9px",
-  borderRadius: 9,
+  gap: 8,
+  padding: "9px 10px",
+  borderRadius: 12,
   border: "1px solid rgba(45, 108, 121, 0.14)",
   background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(245,250,249,0.72))",
 };
 
-const objectPreviewHeaderStyle = {
+const projectOnlyCardStyle = {
+  display: "grid",
+  gap: 4,
+  minHeight: "100%",
+  padding: "9px 10px",
+  borderRadius: 12,
+  border: "1px solid rgba(45, 108, 121, 0.14)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(245,250,249,0.72))",
+};
+
+const objectOnlyCardStyle = {
+  display: "grid",
+  gap: 6,
+  minHeight: "100%",
+  padding: "9px 10px",
+  borderRadius: 12,
+  border: "1px solid rgba(45, 108, 121, 0.14)",
+  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(245,250,249,0.72))",
+};
+
+const projectHeaderStyle = {
   display: "flex",
   justifyContent: "space-between",
-  alignItems: "center",
+  alignItems: "flex-start",
   gap: 10,
   color: "var(--app-text)",
   fontSize: 13,
   lineHeight: 1.2,
 };
 
-const objectPreviewTitleStackStyle = {
+const projectTitleStackStyle = {
   display: "grid",
   gap: 3,
   minWidth: 0,
 };
 
-const objectPreviewProjectStyle = {
+const projectOnlyNameStyle = {
+  color: "var(--app-text)",
+  fontSize: 13,
+  lineHeight: 1.35,
+};
+
+const projectMetaTextStyle = {
+  color: "var(--app-info-text)",
+  fontSize: 12,
+  fontWeight: 700,
+  lineHeight: 1.35,
+};
+
+const projectDescriptionStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  lineHeight: 1.4,
+  overflowWrap: "anywhere",
+};
+
+const hierarchyEyebrowStyle = {
   color: "var(--app-accent)",
-  fontSize: 11,
+  fontSize: 10,
   fontWeight: 800,
-  letterSpacing: "0.04em",
+  letterSpacing: "0.08em",
   textTransform: "uppercase",
+};
+
+const objectOnlyHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "flex-start",
+  gap: 10,
+};
+
+const objectHierarchyStyle = {
+  display: "grid",
+  gap: 2,
+  marginLeft: 12,
+  paddingLeft: 10,
+  borderLeft: "2px solid rgba(143, 62, 44, 0.16)",
+};
+
+const objectNameStyle = {
+  color: "var(--app-text)",
+  fontSize: 13,
 };
 
 const objectPreviewCountStyle = {

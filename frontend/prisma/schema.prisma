@@ -136,6 +136,10 @@ model HousingCompany {
 model Project {
   id               String         @id @default(cuid())
   name             String
+  projectCode      String?
+  status           String         @default("active")
+  description      String?
+  managerName      String?
   housingCompanyId String
   housingCompany   HousingCompany @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
   propertyObjectId String         @unique

@@ -27,6 +27,10 @@ function objectFieldNames(index) {
   return {
     name: `objectName__${index}`,
     projectName: `projectName__${index}`,
+    projectCode: `projectCode__${index}`,
+    projectStatus: `projectStatus__${index}`,
+    projectDescription: `projectDescription__${index}`,
+    projectManagerName: `projectManagerName__${index}`,
     contactPhone: `objectContactPhone__${index}`,
     country: `objectCountry__${index}`,
     city: `objectCity__${index}`,
@@ -53,6 +57,10 @@ function collectPropertyObjects(formData) {
       const hasAnyValue = [
         fields.name,
         fields.projectName,
+        fields.projectCode,
+        fields.projectStatus,
+        fields.projectDescription,
+        fields.projectManagerName,
         fields.contactPhone,
         fields.country,
         fields.city,
@@ -99,6 +107,10 @@ export async function POST(request) {
           housingCompanyId,
           propertyObjectId,
           projectName: object.projectName,
+          projectCode: object.projectCode,
+          projectStatus: object.projectStatus,
+          projectDescription: object.projectDescription,
+          projectManagerName: object.projectManagerName,
         });
       }
     });

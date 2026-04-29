@@ -24,6 +24,10 @@ export async function GET(_request, { params }) {
     SELECT
       prj."id" AS "projectId",
       prj."name" AS "projectName",
+      prj."projectCode",
+      prj."status" AS "projectStatus",
+      prj."description" AS "projectDescription",
+      prj."managerName" AS "projectManagerName",
       prj."propertyObjectId",
       pobj."id" AS "propertyObjectRecordId",
       pobj."name" AS "propertyObjectName",
@@ -55,6 +59,10 @@ export async function GET(_request, { params }) {
       ? {
           id: ownerRow.projectId,
           name: ownerRow.projectName,
+          projectCode: ownerRow.projectCode || null,
+          status: ownerRow.projectStatus || "active",
+          description: ownerRow.projectDescription || null,
+          managerName: ownerRow.projectManagerName || null,
           housingCompanyId: ownerRow.housingCompanyRecordId,
           propertyObjectId: ownerRow.propertyObjectId,
           propertyObject: ownerRow.propertyObjectRecordId
@@ -76,6 +84,10 @@ export async function GET(_request, { params }) {
           name: ownerRow.propertyObjectName,
           projectId: ownerRow.projectId || null,
           projectName: ownerRow.projectName || null,
+          projectCode: ownerRow.projectCode || null,
+          projectStatus: ownerRow.projectStatus || "active",
+          projectDescription: ownerRow.projectDescription || null,
+          projectManagerName: ownerRow.projectManagerName || null,
           country: ownerRow.country,
           city: ownerRow.city,
           postalCode: ownerRow.postalCode,

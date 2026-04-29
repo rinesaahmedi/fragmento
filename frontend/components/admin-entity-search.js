@@ -152,14 +152,19 @@ function flattenResults(results, query, translate) {
       type: "contract",
       badge: translate("dashboard.finderBadgeContract", "Contract"),
       label: contract.contractNumber || translate("dashboard.finderUnnamedContract", "Contract"),
-      secondary: [contract.companyName, contract.objectName, contract.kitchenName].filter(Boolean).join(" | "),
+      secondary: [
+        contract.companyName,
+        contract.projectName ? `${translate("contractsAdmin.project", "Project")}: ${contract.projectName}` : "",
+        contract.objectName ? `${translate("contractsAdmin.propertyObject", "Object/building")}: ${contract.objectName}` : "",
+        contract.kitchenName,
+      ].filter(Boolean).join(" | "),
       meta: joinMeta([
         `${contract.orderCount || 0} ${translate("dashboard.finderOrdersShort", "orders")}`,
         formatCurrency(contract.revenue),
       ]),
       href: `/admin/contracts?q=${encodeURIComponent(contract.contractNumber || "")}`,
-      exactFields: [contract.contractNumber, contract.objectName, contract.companyName],
-      keywords: [contract.contractNumber, contract.companyName, contract.objectName, contract.kitchenName],
+      exactFields: [contract.contractNumber, contract.projectName, contract.objectName, contract.companyName],
+      keywords: [contract.contractNumber, contract.companyName, contract.projectName, contract.project?.projectCode, contract.project?.status, contract.project?.description, contract.project?.managerName, contract.objectName, contract.kitchenName],
       sourceOrder: index++,
     });
   }
@@ -177,7 +182,10 @@ function flattenResults(results, query, translate) {
       type: "object",
       badge: translate("dashboard.finderBadgeObject", "Object"),
       label: object.name || translate("dashboard.finderUnnamedObject", "Object"),
-      secondary: object.companyName || "",
+      secondary: joinMeta([
+        object.companyName || "",
+        object.projectName ? `${translate("contractsAdmin.project", "Project")}: ${object.projectName}` : "",
+      ]),
       meta: joinMeta([
         address || translate("dashboard.finderNoAddress", "No address"),
         `${object.contractCount || 0} ${translate("dashboard.finderContractsShort", "contracts")}`,
@@ -185,7 +193,7 @@ function flattenResults(results, query, translate) {
       ]),
       href: `/admin/property-owners/${object.companyId}?openObject=${object.id}`,
       exactFields: [object.name, address, object.address1, object.city, object.postalCode],
-      keywords: [object.name, object.companyName, address, object.address1, object.address2, object.city, object.postalCode, object.country],
+      keywords: [object.name, object.projectName, object.projectCode, object.projectStatus, object.projectDescription, object.projectManagerName, object.companyName, address, object.address1, object.address2, object.city, object.postalCode, object.country],
       sourceOrder: index++,
     });
   }
@@ -203,7 +211,13 @@ function flattenResults(results, query, translate) {
       type: "order",
       badge: translate("dashboard.finderBadgeOrder", "Order"),
       label: order.orderNumber || translate("dashboard.finderUnnamedOrder", "Order"),
-      secondary: [order.companyName, order.contractNumber, order.customerName].filter(Boolean).join(" | "),
+      secondary: [
+        order.companyName,
+        order.contractNumber,
+        order.projectName ? `${translate("contractsAdmin.project", "Project")}: ${order.projectName}` : "",
+        order.objectName ? `${translate("contractsAdmin.propertyObject", "Object/building")}: ${order.objectName}` : "",
+        order.customerName,
+      ].filter(Boolean).join(" | "),
       meta: joinMeta([
         formatOrderAddressLabel(orderAddress, translate),
         formatCurrency(order.totalPrice),
@@ -211,7 +225,7 @@ function flattenResults(results, query, translate) {
       ]),
       href: `/admin/orders/${order.id}`,
       exactFields: [order.orderNumber, order.contractNumber, order.customerName, orderAddress],
-      keywords: [order.orderNumber, order.contractNumber, order.objectName, order.companyName, order.customerName, order.address1, order.address2, order.postalCode, order.city, order.country],
+      keywords: [order.orderNumber, order.contractNumber, order.projectName, order.project?.projectCode, order.project?.status, order.project?.description, order.project?.managerName, order.objectName, order.companyName, order.customerName, order.address1, order.address2, order.postalCode, order.city, order.country],
       sourceOrder: index++,
     });
   }

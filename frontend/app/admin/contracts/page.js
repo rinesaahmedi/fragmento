@@ -28,7 +28,6 @@ import AdminContractLinkFields from "../../../components/admin-contract-link-fie
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listKitchenContractsForAdmin, listKitchensForAdmin, listProjectsForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
-import { projectLabel } from "../../../lib/property-projects";
 
 export const dynamic = "force-dynamic";
 
@@ -64,8 +63,15 @@ function formatOrdinal(value) {
 
 function contractAddressLines(contract) {
   const fallbackAddress = contract.propertyObject ? null : contract.latestOrderAddress;
+  const projectLine = contract.projectName || contract.propertyObject?.projectName
+    ? `Project: ${contract.projectCode ? `${contract.projectCode} - ` : ""}${contract.projectName || contract.propertyObject?.projectName}`
+    : "";
+  const projectMetaLine = [
+    contract.projectStatus ? `Status: ${String(contract.projectStatus).replace(/_/g, " ")}` : "",
+    contract.projectManagerName ? `Manager: ${contract.projectManagerName}` : "",
+  ].filter(Boolean).join(" | ");
   const objectLine = contract.propertyObject?.name
-    ? `Project/Object ${projectLabel(contract.projectName || contract.propertyObject?.projectName, contract.propertyObject.name)}`
+    ? `Object/building: ${contract.propertyObject.name}`
     : fallbackAddress
       ? ""
       : "No object selected";
@@ -84,7 +90,7 @@ function contractAddressLines(contract) {
     contract.unitNumber ? `Unit ${contract.unitNumber}` : "",
   ].filter(Boolean).join(" | ");
 
-  return [objectLine, streetLine, cityLine, country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
+  return [projectLine, projectMetaLine, objectLine, streetLine, cityLine, country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
 }
 
 function contactAddressLines(address) {
@@ -244,7 +250,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
             </summary>
             <div style={createContractBodyStyle}>
               <p style={createContractDescriptionStyle}>
-                <AdminText i18nKey="contractsAdmin.selectKitchenCompanyObjectAndUnit" fallback="Select the kitchen, then create an unassigned contract or link it to a housing company project/object." />
+                <AdminText i18nKey="contractsAdmin.selectKitchenCompanyObjectAndUnit" fallback="Select the kitchen, housing company, project, object, and unit details." />
               </p>
               <form action="/api/admin/contracts" method="post" style={compactCreateContractFormStyle}>
                 <input type="hidden" name="returnTo" value={returnTo} />

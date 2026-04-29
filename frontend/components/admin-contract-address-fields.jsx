@@ -96,10 +96,10 @@ function normalizeAdminCountry(value) {
   return COUNTRY_VALUE_BY_SOURCE_KEY[value] || value || "";
 }
 
-function Field({ label, wide = false, children }) {
+function Field({ label, wide = false, compact = false, children }) {
   return (
-    <label style={{ ...baseFieldStyle, gridColumn: wide ? "1 / -1" : undefined }}>
-      <span style={labelStyle}>{label}</span>
+    <label style={{ ...baseFieldStyle, gap: compact ? 4 : baseFieldStyle.gap, gridColumn: wide ? "1 / -1" : undefined }}>
+      <span style={{ ...labelStyle, fontSize: compact ? 12 : labelStyle.fontSize, fontWeight: compact ? 700 : labelStyle.fontWeight }}>{label}</span>
       {children}
     </label>
   );
@@ -114,6 +114,8 @@ export default function AdminContractAddressFields({
   allowEmpty = false,
   referenceFieldName = "contractNumber",
   fieldNames = {},
+  footerActions = null,
+  hideIdleMessage = false,
 }) {
   const { translate } = useAdminI18n();
   const markerRef = useRef(null);
@@ -151,6 +153,7 @@ export default function AdminContractAddressFields({
     || addressVerification.status === ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE;
   const isObjectAddress = mode === "object";
   const shouldSpanVerificationControls = !compact;
+  const showVerificationMessage = !hideIdleMessage || addressVerificationMessage || addressVerificationSuggestion || isVerificationValid || isVerificationPartial || isVerificationError;
 
   function isSnapshotEmpty(snapshot) {
     return !snapshot.contractNumber
@@ -322,7 +325,7 @@ export default function AdminContractAddressFields({
 
   return (
     <div ref={markerRef} style={{ display: "contents" }}>
-      <Field label={translate("contractAddressFields.country", "Country")}>
+      <Field label={translate("contractAddressFields.country", "Country")} compact={compact}>
         <select
           name={countryFieldName}
           value={country}
@@ -340,7 +343,7 @@ export default function AdminContractAddressFields({
         </select>
       </Field>
 
-      <Field label={translate("contractAddressFields.city", "City")}>
+      <Field label={translate("contractAddressFields.city", "City")} compact={compact}>
         <select
           name={cityFieldName}
           value={city}
@@ -358,7 +361,7 @@ export default function AdminContractAddressFields({
         </select>
       </Field>
 
-      <Field label={translate("contractAddressFields.postalCode", "Postal code")}>
+      <Field label={translate("contractAddressFields.postalCode", "Postal code")} compact={compact}>
         <select
           name={postalCodeFieldName}
           value={postalCode}
@@ -373,27 +376,27 @@ export default function AdminContractAddressFields({
         </select>
       </Field>
 
-      <Field label={translate("contractAddressFields.addressLine1", "Address line 1")}>
+      <Field label={translate("contractAddressFields.addressLine1", "Address line 1")} compact={compact}>
         <input name={address1FieldName} defaultValue={contract.address1 || ""} style={inputStyle} />
       </Field>
-      <Field label={translate("contractAddressFields.addressLine2", "Address line 2")}>
+      <Field label={translate("contractAddressFields.addressLine2", "Address line 2")} compact={compact}>
         <input name={address2FieldName} defaultValue={contract.address2 || ""} style={inputStyle} />
       </Field>
       {includeUnitFields ? (
         <>
-          <Field label={translate("contractAddressFields.building", "Building")}>
+          <Field label={translate("contractAddressFields.building", "Building")} compact={compact}>
             <input name={buildingFieldName} defaultValue={contract.building || ""} style={inputStyle} />
           </Field>
-          <Field label={translate("contractAddressFields.floor", "Floor")}>
+          <Field label={translate("contractAddressFields.floor", "Floor")} compact={compact}>
             <input name={floorFieldName} defaultValue={contract.floor || ""} style={inputStyle} />
           </Field>
-          <Field label={translate("contractAddressFields.unitNumber", "Unit number")}>
+          <Field label={translate("contractAddressFields.unitNumber", "Unit number")} compact={compact}>
             <input name={unitNumberFieldName} defaultValue={contract.unitNumber || ""} style={inputStyle} />
           </Field>
         </>
       ) : null}
       {includeNotes ? (
-        <Field label={translate("contractAddressFields.notes", "Notes")} wide>
+        <Field label={translate("contractAddressFields.notes", "Notes")} wide compact={compact}>
           <textarea name={notesFieldName} defaultValue={contract.notes || ""} rows={compact ? 2 : 3} style={notesStyle} />
         </Field>
       ) : null}
@@ -403,84 +406,136 @@ export default function AdminContractAddressFields({
         value={addressVerification.verification ? JSON.stringify(addressVerification.verification) : ""}
         readOnly
       />
-      <div style={{ ...baseFieldStyle, gridColumn: shouldSpanVerificationControls ? "1 / -1" : undefined }}>
-        <button
-          type="button"
-          onClick={handleVerifyAddress}
-          disabled={isVerificationLoading}
+      {!footerActions ? (
+        <div style={{ ...baseFieldStyle, gridColumn: shouldSpanVerificationControls ? "1 / -1" : undefined }}>
+          <button
+            type="button"
+            onClick={handleVerifyAddress}
+            disabled={isVerificationLoading}
+            style={{
+              ...verifyButtonBaseStyle,
+              minHeight: compact ? 38 : 42,
+              padding: compact ? "6px 10px" : "9px 12px",
+              background: isVerificationValid
+                ? "rgba(47, 146, 81, 0.12)"
+                : isVerificationPartial
+                  ? "rgba(200, 138, 25, 0.12)"
+                  : isVerificationError
+                    ? "rgba(181, 59, 48, 0.08)"
+                    : verifyButtonBaseStyle.background,
+              borderColor: isVerificationValid
+                ? "rgba(47, 146, 81, 0.28)"
+                : isVerificationPartial
+                  ? "rgba(200, 138, 25, 0.3)"
+                  : isVerificationError
+                    ? "rgba(181, 59, 48, 0.22)"
+                    : "rgba(143, 62, 44, 0.2)",
+              color: isVerificationValid ? "#22673a" : isVerificationPartial ? "#8a5a00" : isVerificationError ? "#a33f35" : verifyButtonBaseStyle.color,
+              cursor: isVerificationLoading ? "progress" : "pointer",
+              opacity: isVerificationLoading ? 0.76 : 1,
+            }}
+          >
+            {isVerificationLoading
+              ? translate(
+                  isObjectAddress ? "contractAddressFields.verifyingObjectAddress" : "contractAddressFields.verifyingAddress",
+                  isObjectAddress ? "Verifying address..." : "Verifying address...",
+                )
+              : translate(
+                  isObjectAddress ? "contractAddressFields.verifyObjectAddress" : "contractAddressFields.verifyAddress",
+                  "Verify address",
+                )}
+          </button>
+        </div>
+      ) : null}
+      {showVerificationMessage ? (
+        <div
+          role="status"
+          aria-live="polite"
           style={{
-            ...verifyButtonBaseStyle,
-            minHeight: compact ? 38 : 42,
-            padding: compact ? "6px 10px" : "9px 12px",
+            ...verificationMessageBaseStyle,
+            gridColumn: shouldSpanVerificationControls ? "1 / -1" : undefined,
+            gap: compact ? 2 : verificationMessageBaseStyle.gap,
+            padding: compact ? "8px 10px" : verificationMessageBaseStyle.padding,
+            fontSize: compact ? "0.76rem" : verificationMessageBaseStyle.fontSize,
+            lineHeight: compact ? 1.35 : verificationMessageBaseStyle.lineHeight,
             background: isVerificationValid
-              ? "rgba(47, 146, 81, 0.12)"
+              ? "rgba(47, 146, 81, 0.08)"
               : isVerificationPartial
                 ? "rgba(200, 138, 25, 0.12)"
                 : isVerificationError
                   ? "rgba(181, 59, 48, 0.08)"
-                  : verifyButtonBaseStyle.background,
+                  : verificationMessageBaseStyle.background,
             borderColor: isVerificationValid
-              ? "rgba(47, 146, 81, 0.28)"
+              ? "rgba(47, 146, 81, 0.24)"
               : isVerificationPartial
                 ? "rgba(200, 138, 25, 0.3)"
                 : isVerificationError
                   ? "rgba(181, 59, 48, 0.22)"
-                  : "rgba(143, 62, 44, 0.2)",
-            color: isVerificationValid ? "#22673a" : isVerificationPartial ? "#8a5a00" : isVerificationError ? "#a33f35" : verifyButtonBaseStyle.color,
-            cursor: isVerificationLoading ? "progress" : "pointer",
-            opacity: isVerificationLoading ? 0.76 : 1,
+                  : "rgba(143, 62, 44, 0.14)",
+            color: isVerificationValid ? "#22673a" : isVerificationPartial ? "#8a5a00" : isVerificationError ? "#a33f35" : verificationMessageBaseStyle.color,
           }}
         >
-          {isVerificationLoading
-            ? translate(
-                isObjectAddress ? "contractAddressFields.verifyingObjectAddress" : "contractAddressFields.verifyingAddress",
-                isObjectAddress ? "Verifying object address..." : "Verifying address...",
-              )
-            : translate(
-                isObjectAddress ? "contractAddressFields.verifyObjectAddress" : "contractAddressFields.verifyAddress",
-                isObjectAddress ? "Verify object address" : "Verify address",
-              )}
-        </button>
-      </div>
-      <div
-        role="status"
-        aria-live="polite"
-        style={{
-          ...verificationMessageBaseStyle,
-          gridColumn: shouldSpanVerificationControls ? "1 / -1" : undefined,
-          background: isVerificationValid
-            ? "rgba(47, 146, 81, 0.08)"
-            : isVerificationPartial
-              ? "rgba(200, 138, 25, 0.12)"
-              : isVerificationError
-                ? "rgba(181, 59, 48, 0.08)"
-                : verificationMessageBaseStyle.background,
-          borderColor: isVerificationValid
-            ? "rgba(47, 146, 81, 0.24)"
-            : isVerificationPartial
-              ? "rgba(200, 138, 25, 0.3)"
-              : isVerificationError
-                ? "rgba(181, 59, 48, 0.22)"
-                : "rgba(143, 62, 44, 0.14)",
-          color: isVerificationValid ? "#22673a" : isVerificationPartial ? "#8a5a00" : isVerificationError ? "#a33f35" : verificationMessageBaseStyle.color,
-        }}
-      >
-        <strong>
-          {addressVerificationMessage || translate(
-            isObjectAddress ? "contractAddressFields.verifyObjectAddressBeforeSaving" : "contractAddressFields.verifyAddressBeforeSaving",
-            isObjectAddress ? "Verify the object address before saving." : "Verify the address before saving the contract.",
-          )}
-        </strong>
-        {addressVerificationSuggestion ? (
-          <span>{translate("contractAddressFields.suggestedMatch", "Suggested match")}: {addressVerificationSuggestion}</span>
-        ) : null}
-        {isVerificationPartial ? (
-          <span>{translate("contractAddressFields.reviewStreetDetails", "Please review the street details and verify again if needed.")}</span>
-        ) : null}
-        {isVerificationError ? (
-          <span>{translate("contractAddressFields.correctAddressAndRetry", "Correct the address details and run verification again.")}</span>
-        ) : null}
-      </div>
+          <strong>
+            {addressVerificationMessage || translate(
+              isObjectAddress ? "contractAddressFields.verifyObjectAddressBeforeSaving" : "contractAddressFields.verifyAddressBeforeSaving",
+              isObjectAddress ? "Verify before saving." : "Verify the address before saving the contract.",
+            )}
+          </strong>
+          {addressVerificationSuggestion ? (
+            <span>{translate("contractAddressFields.suggestedMatch", "Suggested match")}: {addressVerificationSuggestion}</span>
+          ) : null}
+          {isVerificationPartial ? (
+            <span>{translate("contractAddressFields.reviewStreetDetails", "Please review the street details and verify again if needed.")}</span>
+          ) : null}
+          {isVerificationError ? (
+            <span>{translate("contractAddressFields.correctAddressAndRetry", "Correct the address details and run verification again.")}</span>
+          ) : null}
+        </div>
+      ) : null}
+      {footerActions ? (
+        <div style={{ ...compactFooterRowStyle, gridColumn: "1 / -1" }}>
+          <button
+            type="button"
+            onClick={handleVerifyAddress}
+            disabled={isVerificationLoading}
+            style={{
+              ...verifyButtonBaseStyle,
+              minHeight: compact ? 38 : 42,
+              padding: compact ? "6px 10px" : "9px 12px",
+              background: isVerificationValid
+                ? "rgba(47, 146, 81, 0.12)"
+                : isVerificationPartial
+                  ? "rgba(200, 138, 25, 0.12)"
+                  : isVerificationError
+                    ? "rgba(181, 59, 48, 0.08)"
+                    : verifyButtonBaseStyle.background,
+              borderColor: isVerificationValid
+                ? "rgba(47, 146, 81, 0.28)"
+                : isVerificationPartial
+                  ? "rgba(200, 138, 25, 0.3)"
+                  : isVerificationError
+                    ? "rgba(181, 59, 48, 0.22)"
+                    : "rgba(143, 62, 44, 0.2)",
+              color: isVerificationValid ? "#22673a" : isVerificationPartial ? "#8a5a00" : isVerificationError ? "#a33f35" : verifyButtonBaseStyle.color,
+              cursor: isVerificationLoading ? "progress" : "pointer",
+              opacity: isVerificationLoading ? 0.76 : 1,
+            }}
+          >
+            {isVerificationLoading
+              ? translate(
+                  isObjectAddress ? "contractAddressFields.verifyingObjectAddress" : "contractAddressFields.verifyingAddress",
+                  isObjectAddress ? "Verifying address..." : "Verifying address...",
+                )
+              : translate(
+                  isObjectAddress ? "contractAddressFields.verifyObjectAddress" : "contractAddressFields.verifyAddress",
+                  "Verify address",
+                )}
+          </button>
+          <div style={compactFooterActionsStyle}>
+            {footerActions}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -499,3 +554,18 @@ function translateCountry(country, translate) {
   const key = keys[country];
   return key ? translate(`contractAddressFields.${key}`, country) : country;
 }
+
+const compactFooterRowStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+  justifyContent: "space-between",
+  flexWrap: "wrap",
+};
+
+const compactFooterActionsStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+  flexWrap: "wrap",
+};

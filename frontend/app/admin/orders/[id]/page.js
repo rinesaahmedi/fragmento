@@ -194,10 +194,18 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                   <span>{ownerSummary(order.kitchenContract?.owner)}</span>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}><AdminText i18nKey="contractsAdmin.project" fallback="Project / object" /></span>
+                  <span style={detailLabelStyle}><AdminText i18nKey="contractsAdmin.project" fallback="Project" /></span>
                   <span>
                     {order.kitchenContract?.project
-                      ? `${order.kitchenContract.project.name}${order.kitchenContract.project.propertyObject?.name ? ` | ${order.kitchenContract.project.propertyObject.name}` : ""}`
+                      ? order.kitchenContract.project.name
+                      : <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}
+                  </span>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}><AdminText i18nKey="contractsAdmin.propertyObject" fallback="Object/building" /></span>
+                  <span>
+                    {order.kitchenContract?.project?.propertyObject?.name
+                      ? order.kitchenContract.project.propertyObject.name
                       : <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}
                   </span>
                 </div>

@@ -22,7 +22,10 @@ import Link from "next/link";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
 import AdminPropertyOwnerObjectBuilder from "../../../components/admin-property-owner-object-builder";
-import AdminPropertyObjectsPreview from "../../../components/admin-property-objects-preview";
+import AdminPropertyObjectsPreview, {
+  AdminPropertyObjectDetailsPreview,
+  AdminPropertyProjectsPreview,
+} from "../../../components/admin-property-objects-preview";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listPropertyOwnersForAdmin } from "../../../lib/catalog";
@@ -56,6 +59,10 @@ function matchingObjects(owner, query) {
 
   return (owner.propertyObjects || []).filter((object) => [
     object.projectName,
+    object.projectCode,
+    object.projectStatus,
+    object.projectDescription,
+    object.projectManagerName,
     object.name,
     object.contactPhone,
     object.country,
@@ -94,6 +101,10 @@ function buildOwnerSearchIndex(owner) {
 
   const objectFields = (owner.propertyObjects || []).flatMap((object) => ([
     object.projectName,
+    object.projectCode,
+    object.projectStatus,
+    object.projectDescription,
+    object.projectManagerName,
     object.name,
     object.contactPhone,
     object.country,
@@ -216,18 +227,20 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
           <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <colgroup>
+                <col style={{ width: "16%" }} />
+                <col style={{ width: "18%" }} />
                 <col style={{ width: "18%" }} />
                 <col style={{ width: "24%" }} />
-                <col style={{ width: "28%" }} />
                 <col style={{ width: "8%" }} />
                 <col style={{ width: "10%" }} />
-                <col style={{ width: "12%" }} />
+                <col style={{ width: "6%" }} />
               </colgroup>
               <thead>
                 <tr>
                   <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.owner" fallback="Owner" /></th>
                   <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.contact" fallback="Contact" /></th>
-                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.objects" fallback="Objects/Buildings" /></th>
+                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.project" fallback="Project" /></th>
+                  <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.propertyObject" fallback="Object / Building" /></th>
                   <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.contracts" fallback="Contracts" /></th>
                   <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" /></th>
                   <th style={thStyle}><AdminText i18nKey="propertyOwnersAdmin.action" fallback="Action" /></th>
@@ -236,7 +249,7 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
               <tbody>
                 {!filteredOwners.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={6}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersMatchFilters" fallback="No housing companies match the current filters." /></td>
+                    <td style={tdStyle} colSpan={7}><AdminText i18nKey="propertyOwnersAdmin.noPropertyOwnersMatchFilters" fallback="No housing companies match the current filters." /></td>
                   </tr>
                 ) : null}
                 {filteredOwners.map((owner) => (
@@ -247,7 +260,10 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
                     </td>
                     <td style={tdStyle}><ContactValue owner={owner} /></td>
                     <td style={tdStyle}>
-                      <AdminPropertyObjectsPreview objects={owner.propertyObjects} priorityQuery={filters.query} />
+                      <AdminPropertyProjectsPreview objects={owner.propertyObjects} priorityQuery={filters.query} />
+                    </td>
+                    <td style={tdStyle}>
+                      <AdminPropertyObjectDetailsPreview objects={owner.propertyObjects} priorityQuery={filters.query} />
                     </td>
                     <td style={tdStyle}>{owner._count.contracts}</td>
                     <td style={tdStyle}>{formatDate(owner.createdAt)}</td>

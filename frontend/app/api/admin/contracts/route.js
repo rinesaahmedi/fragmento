@@ -47,6 +47,10 @@ function inlineObjectFieldNames() {
   return {
     name: "inlineObjectName",
     projectName: "inlineProjectName",
+    projectCode: "inlineProjectCode",
+    projectStatus: "inlineProjectStatus",
+    projectDescription: "inlineProjectDescription",
+    projectManagerName: "inlineProjectManagerName",
     contactPhone: "inlineObjectContactPhone",
     country: "inlineObjectCountry",
     city: "inlineObjectCity",
@@ -62,6 +66,10 @@ function validateInlineObjectInput(formData) {
   const hasAnyValue = [
     fields.name,
     fields.projectName,
+    fields.projectCode,
+    fields.projectStatus,
+    fields.projectDescription,
+    fields.projectManagerName,
     fields.contactPhone,
     fields.country,
     fields.city,
@@ -114,6 +122,10 @@ export async function POST(request) {
             housingCompanyId: data.housingCompanyId,
             propertyObjectId,
             projectName: inlineObject.projectName,
+            projectCode: inlineObject.projectCode,
+            projectStatus: inlineObject.projectStatus,
+            projectDescription: inlineObject.projectDescription,
+            projectManagerName: inlineObject.projectManagerName,
           });
           projectId = project.id;
         } else {

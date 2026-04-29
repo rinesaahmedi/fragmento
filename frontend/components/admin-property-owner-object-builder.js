@@ -9,6 +9,7 @@ import {
   inputStyle,
   mutedTextStyle,
   secondaryButtonStyle,
+  textareaStyle,
 } from "./admin-ui";
 
 function createObjectDraft(id) {
@@ -19,6 +20,10 @@ function objectFieldNames(id) {
   return {
     name: `objectName__${id}`,
     projectName: `projectName__${id}`,
+    projectCode: `projectCode__${id}`,
+    projectStatus: `projectStatus__${id}`,
+    projectDescription: `projectDescription__${id}`,
+    projectManagerName: `projectManagerName__${id}`,
     contactPhone: `objectContactPhone__${id}`,
     country: `objectCountry__${id}`,
     city: `objectCity__${id}`,
@@ -97,11 +102,42 @@ export default function AdminPropertyOwnerObjectBuilder() {
                     required
                   />
                 </FormField>
-                <FormField label={translate("propertyOwnersAdmin.objectContactPhone", "Object contact phone")}>
+                <FormField label={translate("propertyOwnersAdmin.projectCode", "Project code")}>
+                  <input
+                    name={fieldNames.projectCode}
+                    placeholder={translate("propertyOwnersAdmin.projectCodePlaceholder", "PRJ-204")}
+                    style={inputStyle}
+                  />
+                </FormField>
+                <FormField label={translate("propertyOwnersAdmin.projectStatus", "Project status")}>
+                  <select name={fieldNames.projectStatus} defaultValue="active" style={inputStyle}>
+                    <option value="planning">{translate("propertyOwnersAdmin.projectStatusPlanning", "Planning")}</option>
+                    <option value="active">{translate("propertyOwnersAdmin.projectStatusActive", "Active")}</option>
+                    <option value="on_hold">{translate("propertyOwnersAdmin.projectStatusOnHold", "On hold")}</option>
+                    <option value="completed">{translate("propertyOwnersAdmin.projectStatusCompleted", "Completed")}</option>
+                    <option value="archived">{translate("propertyOwnersAdmin.projectStatusArchived", "Archived")}</option>
+                  </select>
+                </FormField>
+                <FormField label={translate("propertyOwnersAdmin.projectManagerName", "Project manager")}>
+                  <input
+                    name={fieldNames.projectManagerName}
+                    placeholder={translate("propertyOwnersAdmin.projectManagerNamePlaceholder", "Alex Meyer")}
+                    style={inputStyle}
+                  />
+                </FormField>
+                <FormField label={translate("propertyOwnersAdmin.objectContactPhone", "Contact phone")}>
                   <input
                     name={fieldNames.contactPhone}
                     placeholder={translate("propertyOwnersAdmin.objectContactPhonePlaceholder", "+49 170 1234567")}
                     style={inputStyle}
+                  />
+                </FormField>
+                <FormField label={translate("propertyOwnersAdmin.projectDescription", "Project description")} wide>
+                  <textarea
+                    name={fieldNames.projectDescription}
+                    placeholder={translate("propertyOwnersAdmin.projectDescriptionPlaceholder", "Internal notes about this project")}
+                    rows={3}
+                    style={textareaStyle}
                   />
                 </FormField>
                 <AdminContractAddressFields

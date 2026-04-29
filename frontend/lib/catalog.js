@@ -137,6 +137,10 @@ export async function listPropertyOwnersForAdmin() {
       pobj."housingCompanyId",
       prj."id" AS "projectId",
       prj."name" AS "projectName",
+      prj."projectCode",
+      prj."status" AS "projectStatus",
+      prj."description" AS "projectDescription",
+      prj."managerName" AS "projectManagerName",
       pobj."contactPhone",
       pobj."country",
       pobj."city",
@@ -162,6 +166,10 @@ export async function listPropertyOwnersForAdmin() {
       housingCompanyId: object.housingCompanyId,
       projectId: object.projectId || null,
       projectName: object.projectName || null,
+      projectCode: object.projectCode || null,
+      projectStatus: object.projectStatus || "active",
+      projectDescription: object.projectDescription || null,
+      projectManagerName: object.projectManagerName || null,
       contactPhone: object.contactPhone,
       country: object.country,
       city: object.city,
@@ -221,6 +229,10 @@ export async function listPropertyObjectsForAdmin(filters = {}) {
       pobj."housingCompanyId",
       prj."id" AS "projectId",
       prj."name" AS "projectName",
+      prj."projectCode",
+      prj."status" AS "projectStatus",
+      prj."description" AS "projectDescription",
+      prj."managerName" AS "projectManagerName",
       pobj."contactPhone",
       pobj."country",
       pobj."city",
@@ -246,6 +258,10 @@ export async function listPropertyObjectsForAdmin(filters = {}) {
     housingCompanyId: row.housingCompanyId,
     projectId: row.projectId || null,
     projectName: row.projectName || null,
+    projectCode: row.projectCode || null,
+    projectStatus: row.projectStatus || "active",
+    projectDescription: row.projectDescription || null,
+    projectManagerName: row.projectManagerName || null,
     contactPhone: row.contactPhone,
     country: row.country,
     city: row.city,
@@ -272,6 +288,10 @@ export async function listProjectsForAdmin(filters = {}) {
     SELECT
       prj."id",
       prj."name",
+      prj."projectCode",
+      prj."status",
+      prj."description",
+      prj."managerName",
       prj."housingCompanyId",
       prj."propertyObjectId",
       prj."createdAt",
@@ -299,6 +319,10 @@ export async function listProjectsForAdmin(filters = {}) {
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
+    projectCode: row.projectCode || null,
+    status: row.status || "active",
+    description: row.description || null,
+    managerName: row.managerName || null,
     housingCompanyId: row.housingCompanyId,
     propertyObjectId: row.propertyObjectId,
     createdAt: row.createdAt,
@@ -341,6 +365,10 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     whereParts.push(Prisma.sql`(
       kc."contractNumber" ILIKE ${query}
       OR prj."name" ILIKE ${query}
+      OR prj."projectCode" ILIKE ${query}
+      OR prj."status" ILIKE ${query}
+      OR prj."description" ILIKE ${query}
+      OR prj."managerName" ILIKE ${query}
       OR pobj."name" ILIKE ${query}
       OR pobj."country" ILIKE ${query}
       OR pobj."city" ILIKE ${query}
@@ -369,6 +397,10 @@ export async function listKitchenContractsForAdmin(filters = {}) {
       kc."updatedAt",
       prj."id" AS "projectId",
       prj."name" AS "projectName",
+      prj."projectCode",
+      prj."status" AS "projectStatus",
+      prj."description" AS "projectDescription",
+      prj."managerName" AS "projectManagerName",
       k."id" AS "kitchenRecordId",
       k."slug" AS "kitchenSlug",
       k."name" AS "kitchenName",
@@ -439,6 +471,10 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     kitchenId: row.kitchenId,
     projectId: row.projectId || null,
     projectName: row.projectName || null,
+    projectCode: row.projectCode || null,
+    projectStatus: row.projectStatus || "active",
+    projectDescription: row.projectDescription || null,
+    projectManagerName: row.projectManagerName || null,
     housingCompanyId: row.housingCompanyRecordId,
     ownerId: row.housingCompanyRecordId,
     isActive: row.isActive,
@@ -465,6 +501,10 @@ export async function listKitchenContractsForAdmin(filters = {}) {
           name: row.propertyObjectName,
           projectId: row.projectId || null,
           projectName: row.projectName || null,
+          projectCode: row.projectCode || null,
+          projectStatus: row.projectStatus || "active",
+          projectDescription: row.projectDescription || null,
+          projectManagerName: row.projectManagerName || null,
           housingCompanyId: row.housingCompanyRecordId,
           country: row.country,
           city: row.city,
@@ -476,6 +516,10 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     project: {
       id: row.projectId,
       name: row.projectName || "",
+      projectCode: row.projectCode || null,
+      status: row.projectStatus || "active",
+      description: row.projectDescription || null,
+      managerName: row.projectManagerName || null,
       housingCompanyId: row.housingCompanyRecordId,
       propertyObjectId: row.propertyObjectRecordId,
       propertyObject: row.propertyObjectRecordId
@@ -572,6 +616,10 @@ async function attachHousingCompaniesToContracts(contracts) {
       kc."id" AS "contractId",
       prj."id" AS "projectId",
       prj."name" AS "projectName",
+      prj."projectCode",
+      prj."status" AS "projectStatus",
+      prj."description" AS "projectDescription",
+      prj."managerName" AS "projectManagerName",
       prj."propertyObjectId",
       pobj."id" AS "propertyObjectRecordId",
       pobj."name" AS "propertyObjectName",
@@ -599,9 +647,17 @@ async function attachHousingCompaniesToContracts(contracts) {
       {
         projectId: row.projectId || null,
         projectName: row.projectName || null,
+        projectCode: row.projectCode || null,
+        projectStatus: row.projectStatus || "active",
+        projectDescription: row.projectDescription || null,
+        projectManagerName: row.projectManagerName || null,
         project: {
           id: row.projectId || null,
           name: row.projectName || null,
+          projectCode: row.projectCode || null,
+          status: row.projectStatus || "active",
+          description: row.projectDescription || null,
+          managerName: row.projectManagerName || null,
           housingCompanyId: row.housingCompanyRecordId || null,
           propertyObjectId: row.propertyObjectId || null,
           propertyObject: row.propertyObjectRecordId
@@ -623,6 +679,10 @@ async function attachHousingCompaniesToContracts(contracts) {
               name: row.propertyObjectName,
               projectId: row.projectId || null,
               projectName: row.projectName || null,
+              projectCode: row.projectCode || null,
+              projectStatus: row.projectStatus || "active",
+              projectDescription: row.projectDescription || null,
+              projectManagerName: row.projectManagerName || null,
               housingCompanyId: row.housingCompanyRecordId,
               country: row.country,
               city: row.city,
@@ -724,6 +784,10 @@ function buildOrderAdminSearch(query) {
                 is: {
                   OR: [
                     { name: contains },
+                    { projectCode: contains },
+                    { status: contains },
+                    { description: contains },
+                    { managerName: contains },
                     {
                       propertyObject: {
                         is: {

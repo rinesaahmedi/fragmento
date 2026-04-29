@@ -13,6 +13,8 @@ function optionalString(value) {
   return nextValue || null;
 }
 
+const PROJECT_STATUSES = ["planning", "active", "on_hold", "completed", "archived"];
+
 function parseKitchenStatus(value) {
   return Object.values(KitchenStatus).includes(value) ? value : KitchenStatus.DRAFT;
 }
@@ -119,9 +121,18 @@ function propertyObjectFieldName(fieldNames, key) {
 }
 
 export function validatePropertyObjectInput(formData, fieldNames = {}) {
+  const projectStatus = optionalString(formData.get(propertyObjectFieldName(fieldNames, "projectStatus")));
+  if (projectStatus && !PROJECT_STATUSES.includes(projectStatus)) {
+    throw new Error("Project status is invalid.");
+  }
+
   return {
     name: requiredString(formData.get(propertyObjectFieldName(fieldNames, "name")), "Object name"),
     projectName: requiredString(formData.get(propertyObjectFieldName(fieldNames, "projectName")), "Project name"),
+    projectCode: optionalString(formData.get(propertyObjectFieldName(fieldNames, "projectCode"))),
+    projectStatus: projectStatus || "active",
+    projectDescription: optionalString(formData.get(propertyObjectFieldName(fieldNames, "projectDescription"))),
+    projectManagerName: optionalString(formData.get(propertyObjectFieldName(fieldNames, "projectManagerName"))),
     contactPhone: optionalString(formData.get(propertyObjectFieldName(fieldNames, "contactPhone"))),
     country: optionalString(formData.get(propertyObjectFieldName(fieldNames, "country"))),
     city: optionalString(formData.get(propertyObjectFieldName(fieldNames, "city"))),
