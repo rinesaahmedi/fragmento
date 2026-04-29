@@ -296,6 +296,11 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                           </ActionLink>
                         </div>
                         <form action={`/api/admin/property-objects/${object.id}`} method="post" style={editorPanelsLayoutStyle}>
+                          <input
+                            type="hidden"
+                            name="returnTo"
+                            value={buildOwnerDetailPath(owner.id, { openObject: object.id, ...(createObjectOpen ? { createObject: "1" } : {}) })}
+                          />
                           <section style={editorSubsectionStyle}>
                             <div style={editorSubsectionHeaderStyle}>
                               <span style={editorSubsectionTitleStyle}><AdminText i18nKey="propertyOwnersAdmin.project" fallback="Project" /></span>

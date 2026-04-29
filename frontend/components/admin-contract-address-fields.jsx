@@ -135,6 +135,23 @@ export default function AdminContractAddressFields({
   const [addressVerification, setAddressVerification] = useState(() => buildAddressVerificationState());
   const inputStyle = compact ? { ...defaultInputStyle, minHeight: 38, padding: "6px 10px", fontSize: "0.92rem" } : defaultInputStyle;
   const notesStyle = compact ? { ...textareaStyle, minHeight: 58, padding: "6px 10px", fontSize: "0.92rem" } : textareaStyle;
+  const initialSnapshot = useMemo(() => buildAddressVerificationSnapshot({
+    contractNumber: contract?.[referenceFieldName],
+    address1: contract?.[address1FieldName],
+    address2: contract?.[address2FieldName],
+    postalCode: contract?.[postalCodeFieldName],
+    city: contract?.[cityFieldName],
+    country: contract?.[countryFieldName],
+  }), [
+    address1FieldName,
+    address2FieldName,
+    cityFieldName,
+    contract,
+    countryFieldName,
+    postalCodeFieldName,
+    referenceFieldName,
+  ]);
+  const initialSnapshotKey = useMemo(() => addressVerificationSnapshotKey(initialSnapshot), [initialSnapshot]);
 
   const countryOptions = useMemo(
     () => uniqueOptions(ADMIN_COUNTRY_OPTIONS.map((option) => option.value), country),
@@ -196,6 +213,9 @@ export default function AdminContractAddressFields({
         if (allowEmpty && isSnapshotEmpty(currentSnapshot)) {
           return buildAddressVerificationState();
         }
+        if (addressVerificationSnapshotKey(currentSnapshot) === initialSnapshotKey) {
+          return buildAddressVerificationState();
+        }
         if (!verifiedSnapshot) {
           if (
             current.status === ADDRESS_VERIFICATION_STATUS.IDLE
@@ -233,11 +253,15 @@ export default function AdminContractAddressFields({
 
       setAddressVerification((current) => {
         const verifiedSnapshot = current?.verification?.snapshot;
+        const snapshotKey = addressVerificationSnapshotKey(snapshot);
         if (
           current.status === ADDRESS_VERIFICATION_STATUS.VALID
           && verifiedSnapshot
-          && addressVerificationSnapshotKey(verifiedSnapshot) === addressVerificationSnapshotKey(snapshot)
+          && addressVerificationSnapshotKey(verifiedSnapshot) === snapshotKey
         ) {
+          return current;
+        }
+        if (snapshotKey === initialSnapshotKey) {
           return current;
         }
 
@@ -263,6 +287,7 @@ export default function AdminContractAddressFields({
     allowEmpty,
     cityFieldName,
     countryFieldName,
+    initialSnapshotKey,
     postalCodeFieldName,
     referenceFieldName,
   ]);
