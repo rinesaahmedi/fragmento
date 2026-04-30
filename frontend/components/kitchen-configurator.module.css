@@ -541,13 +541,13 @@
 }
 
 .productInfoDialog {
-  width: min(1100px, 100%);
+  width: min(1180px, 100%);
   max-height: min(92vh, 960px);
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 24px;
-  border-radius: 28px;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 8px;
   background: #fffdf9;
   box-shadow: 0 32px 80px rgba(36, 24, 13, 0.24);
 }
@@ -571,7 +571,7 @@
   justify-content: center;
   min-height: 40px;
   padding: 0 16px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid rgba(120, 90, 64, 0.18);
   background: #fff;
   color: #5e4632;
@@ -585,8 +585,8 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px 18px;
-  border-radius: 20px;
+  padding: 12px;
+  border-radius: 8px;
   background: #f8f4ee;
 }
 
@@ -607,10 +607,265 @@
   justify-content: flex-end;
 }
 
+.productInfoContent {
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  gap: 14px;
+  flex: 1 1 auto;
+}
+
+.productInfoAssistant,
+.productInfoPdfColumn {
+  min-height: 0;
+}
+
+.productInfoAssistant {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.productInfoAssistantSection {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid rgba(120, 90, 64, 0.12);
+  border-radius: 8px;
+  background: #fffaf3;
+}
+
+.productInfoAssistantSection h3 {
+  margin: 0;
+  color: #2f2a24;
+  font-size: 0.95rem;
+}
+
+.productInfoAssistantSection p {
+  margin: 0;
+  color: #5f554b;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.productInfoAssistantSection ul {
+  margin: 0;
+  padding-left: 18px;
+  color: #5f554b;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.productInfoAssistantCtaRow {
+  display: flex;
+}
+
+.productInfoAssistantHint {
+  color: #6d6156;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.productAssistantLauncher,
+.productAssistantComposer button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 8px;
+  background: #2f2a24;
+  color: #fff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.productAssistantDock {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 55;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.productAssistantPanel {
+  width: min(380px, calc(100vw - 32px));
+  height: min(68vh, 720px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 8px;
+  background: #fffdf9;
+  box-shadow: 0 32px 80px rgba(36, 24, 13, 0.28);
+}
+
+.productAssistantHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.productAssistantHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.productAssistantHeader h2 {
+  margin: 0;
+  color: #2f2a24;
+}
+
+.productAssistantHeader p {
+  margin: 6px 0 0;
+  color: #6d6156;
+}
+
+.productAssistantMinimize {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: #5e4632;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.productAssistantContextReset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  border-radius: 999px;
+  background: #fffaf3;
+  color: #5e4632;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.productAssistantMessages {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.productAssistantMessage {
+  display: flex;
+}
+
+.productAssistantMessage span {
+  max-width: min(92%, 560px);
+  padding: 12px 14px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  border-radius: 8px;
+  line-height: 1.5;
+}
+
+.productAssistantMessageUser {
+  justify-content: flex-end;
+}
+
+.productAssistantMessageUser span {
+  background: #2f2a24;
+  color: #fff;
+  border-color: #2f2a24;
+}
+
+.productAssistantMessageAssistant span {
+  background: #fffaf3;
+  color: #2f2a24;
+}
+
+.productAssistantMessageError span {
+  border-color: rgba(181, 59, 48, 0.24);
+  color: #b53b30;
+}
+
+.productAssistantContextOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.productAssistantContextButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 8px 12px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  border-radius: 999px;
+  background: #fff;
+  color: #2f2a24;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.productAssistantContextButtonHighlighted {
+  background: #fff4dd;
+  border-color: rgba(140, 94, 35, 0.28);
+}
+
+.productAssistantComposer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.productAssistantComposer input {
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: #2f2a24;
+}
+
+.productAssistantComposer button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.productAssistantLauncher {
+  min-height: 46px;
+  padding-inline: 16px;
+  border-radius: 999px;
+  box-shadow: 0 16px 28px rgba(36, 24, 13, 0.22);
+}
+
+.productInfoPdfColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .productInfoViewer {
   min-height: 0;
   flex: 1 1 auto;
-  border-radius: 24px;
+  border-radius: 8px;
   overflow: hidden;
   border: 1px solid rgba(120, 90, 64, 0.12);
   background: #f3efe9;
@@ -1291,6 +1546,70 @@
 }
 
 @media (max-width: 760px) {
+  .productInfoOverlay {
+    padding: 10px;
+  }
+
+  .productInfoDialog {
+    max-height: 94vh;
+    padding: 12px;
+  }
+
+  .productInfoHeader {
+    gap: 10px;
+  }
+
+  .productInfoHeader h2 {
+    font-size: 1.15rem;
+  }
+
+  .productInfoClose,
+  .productInfoActionLink {
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 0.82rem;
+  }
+
+  .productInfoContent {
+    grid-template-columns: 1fr;
+    overflow: auto;
+  }
+
+  .productInfoAssistant {
+    overflow: visible;
+  }
+
+  .productAssistantDock {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    align-items: stretch;
+    gap: 0;
+    pointer-events: none;
+  }
+
+  .productAssistantPanel {
+    width: 100%;
+    height: min(72vh, 640px);
+    max-height: none;
+    border-radius: 20px 20px 0 0;
+    padding: 14px;
+    pointer-events: auto;
+  }
+
+  .productAssistantComposer {
+    grid-template-columns: 1fr;
+  }
+
+  .productAssistantLauncher {
+    margin: 0 12px 12px auto;
+    pointer-events: auto;
+  }
+
+  .productInfoFrame {
+    height: 58vh;
+  }
+
   .shell {
     width: min(100vw - 20px, 1440px);
     padding-top: 12px;

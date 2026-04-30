@@ -4,6 +4,166 @@ const { PrismaClient, KitchenStatus, ItemType } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
+const PRODUCT_INFO_BY_CODE = {
+  "DISH-600-STD": {
+    productInfoPdfPath: "/product-info/dishwasher-product-info.pdf",
+    productInfoSummary: "Vollintegrierter Geschirrspueler fuer den Einbau in die Kuechenzeile. Die Produktinformation nennt 12 Massgedecke und die Einbindung hinter einer Moebelfront.",
+    productInfoKeyFacts: [
+      "Produkttyp: vollintegrierter Geschirrspueler.",
+      "Kapazitaet: 12 Massgedecke.",
+      "Einbaugeraet fuer die Integration in die Kuechenzeile.",
+      "Die Bedien- und Produktinformationen des PDF beachten.",
+    ],
+    productInfoExtractedText: [
+      "Produktname: Vollintegrierter Geschirrspueler.",
+      "Wichtige Punkte:",
+      "- Produkttyp: vollintegrierter Geschirrspueler.",
+      "- Kapazitaet: 12 Massgedecke.",
+      "- Einbaugeraet fuer die Integration in die Kuechenzeile.",
+      "- Die Bedien- und Produktinformationen des PDF beachten.",
+      "Auswahlhinweise:",
+      "- Vor der Bestellung Einbaumass, Frontintegration und Anschlussposition pruefen.",
+    ].join("\n"),
+  },
+  "REF-545-1800-700": {
+    productInfoPdfPath: "/product-info/fridge-product-info.pdf",
+    productInfoSummary: "Kuehl-Gefriergeraet fuer die Kuechenplanung. Die Produktinformation nennt NoFrost und eine Edelstahl-Ausfuehrung.",
+    productInfoKeyFacts: [
+      "Produkttyp: Kuehl-Gefriergeraet.",
+      "Technisches Merkmal: NoFrost.",
+      "Nutzinhalt total: 250 l.",
+      "Kuehlen: 180 l.",
+      "Gefrieren: 70 l.",
+      "Ausfuehrung: Edelstahl.",
+      "Einbau- und Aufstellhinweise des PDF beachten.",
+    ],
+    productInfoExtractedText: [
+      "Produktname: Kuehl-Gefriergeraet.",
+      "Wichtige Punkte:",
+      "- Produkttyp: Kuehl-Gefriergeraet.",
+      "- Technisches Merkmal: NoFrost.",
+      "- Nutzinhalt total: 250 l.",
+      "- Kuehlen: 180 l.",
+      "- Gefrieren: 70 l.",
+      "- Ausfuehrung: Edelstahl.",
+      "- Einbau- und Aufstellhinweise des PDF beachten.",
+      "Auswahlhinweise:",
+      "- Vor der Bestellung Geraetemass, Tueranschlag und Belueftung im Kuechenplan pruefen.",
+    ].join("\n"),
+  },
+  "HOOD-600-FLAT": {
+    productInfoPdfPath: "/product-info/extractor-hood-flat-product-info.pdf",
+    productInfoSummary: "Flache Dunstabzugshaube fuer eine 60-cm-Kuechenloesung. Die Produktinformation gehoert zur flachen Haubenvariante.",
+    productInfoKeyFacts: [
+      "Produkttyp: flache Dunstabzugshaube.",
+      "Breite: 60 cm.",
+      "Einbau in den passenden Haubenbereich der Kueche.",
+      "Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
+    ],
+    productInfoExtractedText: [
+      "Produktname: Flachschirmhaube, 60 cm.",
+      "Wichtige Punkte:",
+      "- Produkttyp: flache Dunstabzugshaube.",
+      "- Breite: 60 cm.",
+      "- Einbau in den passenden Haubenbereich der Kueche.",
+      "- Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
+      "Auswahlhinweise:",
+      "- Vor der Bestellung Einbauposition und Luftfuehrung pruefen.",
+    ].join("\n"),
+  },
+  "WM-B-EWA34660W": {
+    productInfoPdfPath: "/product-info/washing-machine-product-info.pdf",
+    productInfoSummary: "Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt 8 kg Fassungsvermoegen und 1400 U/min.",
+    productInfoKeyFacts: [
+      "Produkttyp: Waschmaschine.",
+      "Modell: EWA34660W.",
+      "Fassungsvermoegen: 8 kg.",
+      "Schleuderdrehzahl: 1400 U/min.",
+      "Wasser- und Stromanschluss nach Produktinformation beachten.",
+    ],
+    productInfoExtractedText: [
+      "Produktname: Waschmaschine EWA34660W.",
+      "Wichtige Punkte:",
+      "- Produkttyp: Waschmaschine.",
+      "- Modell: EWA34660W.",
+      "- Fassungsvermoegen: 8 kg.",
+      "- Schleuderdrehzahl: 1400 U/min.",
+      "- Wasser- und Stromanschluss nach Produktinformation beachten.",
+      "Auswahlhinweise:",
+      "- Vor der Bestellung Wasseranschluss, Ablauf und Stellmass pruefen.",
+    ].join("\n"),
+  },
+  "DISH-B-600-STD": null,
+  "REF-B-545-1800-700": null,
+  "HOOD-B-FH664621E": null,
+  "REF-C-545-1800-700": null,
+  "HOOD-C-FH664621E": null,
+  "WM-C-EWA34660W": null,
+  "DISH-C-600-STD": null,
+};
+
+PRODUCT_INFO_BY_CODE["DISH-B-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["DISH-C-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = {
+  ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"],
+  productInfoSummary: "Kuehl-Gefriergeraet OL-KGCN388140E fuer die Kuechenplanung. Die Produktinformation nennt NoFrost und eine Edelstahl-Ausfuehrung.",
+  productInfoKeyFacts: [
+    "Produkttyp: Kuehl-Gefriergeraet.",
+    "Modell: OL-KGCN388140E.",
+    "Technisches Merkmal: NoFrost.",
+    "Nutzinhalt total: 250 l.",
+    "Kuehlen: 180 l.",
+    "Gefrieren: 70 l.",
+    "Ausfuehrung: Edelstahl.",
+    "Einbau- und Aufstellhinweise des PDF beachten.",
+  ],
+  productInfoExtractedText: PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoExtractedText
+    .replace("Produktname: Kuehl-Gefriergeraet.", "Produktname: Kuehl-Gefriergeraet OL-KGCN388140E.")
+    .replace(
+      "- Produkttyp: Kuehl-Gefriergeraet.",
+      "- Produkttyp: Kuehl-Gefriergeraet.\n- Modell: OL-KGCN388140E.",
+    ),
+};
+PRODUCT_INFO_BY_CODE["REF-C-545-1800-700"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
+  productInfoPdfPath: "/product-info/extractor-hood-flat-product-info.pdf",
+  productInfoSummary: "Dunstabzugshaube FH664621E fuer eine 60-cm-Kuechenloesung. Die Produktinformation nennt einen maximalen Luftstrom von 415 m3/h.",
+  productInfoKeyFacts: [
+    "Produkttyp: Dunstabzugshaube.",
+    "Modell: FH664621E.",
+    "Breite: 60 cm.",
+    "Maximaler Luftstrom: 415 m3/h.",
+    "Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
+  ],
+  productInfoExtractedText: [
+    "Produktname: Flachschirmhaube, 60 cm FH 664 621 E.",
+    "Wichtige Punkte:",
+    "- Produkttyp: Dunstabzugshaube.",
+    "- Modell: FH664621E.",
+    "- Breite: 60 cm.",
+    "- Maximaler Luftstrom: 415 m3/h.",
+    "- Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
+    "Auswahlhinweise:",
+    "- Vor der Bestellung Einbauposition und Luftfuehrung pruefen.",
+  ].join("\n"),
+};
+PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"] = {
+  ...PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"],
+  productInfoPdfPath: "/product-info/extractor-hood-chimney-product-info.pdf",
+  productInfoSummary: "Kamin-Dunstabzugshaube FH664621E fuer eine 60-cm-Kuechenloesung. Die Produktinformation nennt einen maximalen Luftstrom von 415 m3/h.",
+  productInfoKeyFacts: [
+    "Produkttyp: Kamin-Dunstabzugshaube.",
+    "Modell: FH664621E.",
+    "Breite: 60 cm.",
+    "Maximaler Luftstrom: 415 m3/h.",
+    "Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
+  ],
+  productInfoExtractedText: PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"].productInfoExtractedText
+    .replace("Produktname: Flachschirmhaube, 60 cm FH 664 621 E.", "Produktname: Kamin-Dunstabzugshaube FH 664 621 E.")
+    .replace("- Produkttyp: Dunstabzugshaube.", "- Produkttyp: Kamin-Dunstabzugshaube."),
+};
+PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
+
 const DEFAULT_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "DISH-600-STD", legacyCode: "component-dishwasher", name: "Spülmaschine", price: "579.00", infoText: "Amica by architecto", iconKey: "dishwasher", colorKey: "#001f7f", sortOrder: 10 },
   { itemType: ItemType.COMPONENT, code: "REF-545-1800-700", legacyCode: "component-refrigerator", name: "Kühlschrank", price: "579.00", infoText: "Amica by architecto", iconKey: "refrigerator", colorKey: "black", sortOrder: 20 },
@@ -218,7 +378,10 @@ async function main() {
 
     for (const item of kitchen.items) {
       const existingItem = existingByCode.get(item.code) || (item.legacyCode ? existingByCode.get(item.legacyCode) : null);
+      const productInfo = PRODUCT_INFO_BY_CODE[item.code] || {};
       const data = {
+        ...productInfo,
+        productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
         itemType: item.itemType,
         code: item.code,
         articleNumber: item.articleNumber || null,

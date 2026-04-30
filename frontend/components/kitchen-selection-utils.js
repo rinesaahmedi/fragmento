@@ -65,22 +65,8 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
 };
 
-const PRODUCT_INFO_BY_CODE = {
-  "DISH-600-STD": "/product-info/dishwasher-product-info.pdf",
-  "REF-545-1800-700": "/product-info/fridge-product-info.pdf",
-  "HOOD-600-FLAT": "/product-info/extractor-hood-flat-product-info.pdf",
-  "WM-B-EWA34660W": "/product-info/washing-machine-product-info.pdf",
-  "DISH-B-600-STD": "/product-info/dishwasher-product-info.pdf",
-  "REF-B-545-1800-700": "/product-info/fridge-product-info.pdf",
-  "HOOD-B-FH664621E": "/product-info/extractor-hood-flat-product-info.pdf",
-  "REF-C-545-1800-700": "/product-info/fridge-product-info.pdf",
-  "HOOD-C-FH664621E": "/product-info/extractor-hood-chimney-product-info.pdf",
-  "WM-C-EWA34660W": "/product-info/washing-machine-product-info.pdf",
-  "DISH-C-600-STD": "/product-info/dishwasher-product-info.pdf",
-};
-
-export function getProductInfoHref(itemCode) {
-  return PRODUCT_INFO_BY_CODE[itemCode] || "";
+export function getProductInfoHref(item) {
+  return item?.productInfoPdfPath || "";
 }
 
 export function getLinkedComponentIds(slug, componentId) {
@@ -133,15 +119,20 @@ export function getCatalogDisplayItem(allItems, slug, item) {
   const linkedItems = getCatalogLinkedItems(allItems, slug, item);
   if (linkedItems.length <= 1) {
     return {
-      item,
+      item: {
+        ...item,
+        productInfoItemId: item.id,
+        productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],
+      },
       price: Number(item.price || 0),
-      infoPdfHref: getProductInfoHref(item.code),
+      infoPdfHref: getProductInfoHref(item),
     };
   }
 
   const hoodItem =
     linkedItems.find((entry) => String(entry.componentKey || "").toLowerCase() === "extractor-hood") || null;
   const primaryItem = linkedItems[0];
+  const infoSource = hoodItem?.productInfoPdfPath ? hoodItem : primaryItem;
 
   return {
     item: {
@@ -151,11 +142,14 @@ export function getCatalogDisplayItem(allItems, slug, item) {
         ? `${primaryItem.infoText || ""}${primaryItem.infoText ? " • " : ""}${hoodItem.infoText || ""}`.trim()
         : primaryItem.infoText,
       iconKey: hoodItem?.iconKey || primaryItem.iconKey,
+      productInfoPdfPath: infoSource?.productInfoPdfPath || "",
+      productInfoSummary: infoSource?.productInfoSummary || "",
+      productInfoKeyFacts: Array.isArray(infoSource?.productInfoKeyFacts) ? infoSource.productInfoKeyFacts : [],
+      productInfoExtractedText: infoSource?.productInfoExtractedText || "",
+      productInfoUpdatedAt: infoSource?.productInfoUpdatedAt || "",
+      productInfoItemId: infoSource?.id || primaryItem.id,
     },
     price: Number((hoodItem || primaryItem).price || 0),
-    infoPdfHref:
-      (hoodItem && getProductInfoHref(hoodItem.code)) ||
-      getProductInfoHref(primaryItem.code) ||
-      "",
+    infoPdfHref: getProductInfoHref(hoodItem) || getProductInfoHref(primaryItem),
   };
 }

@@ -92,6 +92,10 @@ export function buildOrderForNotifications(orderRecord) {
     name: item.nameSnapshot,
     price: Number(item.priceSnapshot),
     iconKey: item.kitchenItem?.iconKey || "",
+    productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || "",
+    productInfoSummary: item.kitchenItem?.productInfoSummary || "",
+    productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts) ? item.kitchenItem.productInfoKeyFacts : [],
+    productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || "",
   });
 
   return {

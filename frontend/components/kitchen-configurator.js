@@ -131,7 +131,161 @@ function buildProductInfoState(payload) {
     title: payload.item.name || "Produktinformation",
     price: Number(payload.price ?? payload.item.price ?? 0),
     infoText: payload.item.infoText || "",
+    productInfoSummary: payload.item.productInfoSummary || "",
+    productInfoKeyFacts: Array.isArray(payload.item.productInfoKeyFacts) ? payload.item.productInfoKeyFacts : [],
+    productInfoExtractedText: payload.item.productInfoExtractedText || "",
+    productInfoItemId: payload.item.productInfoItemId || payload.item.id || "",
   };
+}
+
+function splitProductInfoSentences(value, limit = 3) {
+  return String(value || "")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim())
+    .filter(Boolean)
+    .slice(0, limit);
+}
+
+function extractProductInfoBullets(text, heading, limit = 6) {
+  const lines = String(text || "").split(/\r?\n/);
+  const headingIndex = lines.findIndex((line) => line.trim().toLowerCase() === `${heading.toLowerCase()}:`);
+  if (headingIndex < 0) return [];
+
+  const bullets = [];
+  for (const line of lines.slice(headingIndex + 1)) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    if (!trimmed.startsWith("-") && trimmed.endsWith(":")) break;
+    if (trimmed.startsWith("-")) {
+      bullets.push(trimmed.replace(/^-\s*/, ""));
+    }
+    if (bullets.length >= limit) break;
+  }
+  return bullets;
+}
+
+function formatProductAssistantContextLabel(activeProductInfo, selectedItems) {
+  if (activeProductInfo?.title) {
+    return activeProductInfo.title;
+  }
+
+  const names = selectedItems.map((item) => item.name).filter(Boolean);
+  if (!names.length) return "";
+  if (names.length === 1) return names[0];
+  if (names.length === 2) return `${names[0]} und ${names[1]}`;
+  return `${names[0]}, ${names[1]} und ${names.length - 2} weitere`;
+}
+
+function buildProductAssistantIntro(activeProductInfo, selectedItems) {
+  const names = selectedItems.map((item) => item.name).filter(Boolean);
+  if (activeProductInfo?.title) {
+    return `Ich sehe, du hast ${activeProductInfo.title} geöffnet. Frag mich alles dazu.`;
+  }
+  if (names.length === 1) {
+    return `Ich sehe, du hast ${names[0]} ausgewählt. Frag mich alles dazu.`;
+  }
+  if (names.length > 1) {
+    return `Ich sehe, du hast ${names.join(", ")} ausgewählt. Frag mich alles dazu.`;
+  }
+  return "Wähle zuerst ein Produkt mit Produktinformation aus.";
+}
+
+const PRODUCT_ASSISTANT_INTRO =
+  "Hallo! Ich kann dir Fragen zu den ausgewählten Produkten beantworten. Worüber möchtest du sprechen?";
+
+function buildProductAssistantContextOptions(activeProductInfo, selectedItems) {
+  const itemsById = new Map();
+
+  for (const item of selectedItems) {
+    const itemId = item.productInfoItemId || item.id;
+    const hasProductInfo = Boolean(
+      itemId && (item.productInfoExtractedText || item.productInfoSummary || item.productInfoPdfPath),
+    );
+
+    if (!hasProductInfo || itemsById.has(itemId)) continue;
+    itemsById.set(itemId, item);
+  }
+
+  const items = Array.from(itemsById.values());
+  if (!items.length) return [];
+
+  const options = [];
+  const activeItemId = activeProductInfo?.productInfoItemId;
+
+  if (activeItemId && itemsById.has(activeItemId)) {
+    const activeItem = itemsById.get(activeItemId);
+    options.push({
+      key: `current-${activeItemId}`,
+      label: `Dieses Produkt: ${activeItem.name || activeProductInfo.title}`,
+      shortLabel: activeItem.name || activeProductInfo.title || "Dieses Produkt",
+      itemIds: [activeItemId],
+      isHighlighted: true,
+      type: "current",
+    });
+  }
+
+  options.push({
+    key: "all-selected",
+    label: "Gesamte Auswahl",
+    shortLabel: "Gesamte Auswahl",
+    itemIds: items.map((item) => item.productInfoItemId || item.id).filter(Boolean),
+    type: "all",
+  });
+
+  for (const item of items) {
+    const itemId = item.productInfoItemId || item.id;
+    options.push({
+      key: `item-${itemId}`,
+      label: item.name || item.code || "Produkt",
+      shortLabel: item.name || item.code || "Produkt",
+      itemIds: [itemId],
+      type: "item",
+    });
+  }
+
+  return options;
+}
+
+function normalizeQuestionToken(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9äöüß]+/gi, "");
+}
+
+function answerFromProductInfoText(question, text) {
+  const stopWords = new Set(["der", "die", "das", "ist", "sind", "und", "oder", "zum", "zur", "mit", "was", "wie", "welche", "welcher", "welches", "bitte"]);
+  const questionTokens = String(question || "")
+    .split(/\s+/)
+    .map(normalizeQuestionToken)
+    .filter((token) => token.length >= 3 && !stopWords.has(token));
+  if (!questionTokens.length) return "";
+
+  const asksForName = questionTokens.some((token) =>
+    ["name", "produktname", "productname", "modell", "model"].includes(token),
+  );
+  if (asksForName) {
+    const productNameLine = String(text || "")
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .find((line) => /^(produktname|product name|modell|model):/i.test(line));
+
+    if (productNameLine) {
+      return productNameLine.replace(/^(produktname|product name|modell|model):\s*/i, "");
+    }
+  }
+
+  const sentences = String(text || "")
+    .replace(/\r?\n-/g, ". ")
+    .split(/(?<=[.!?])\s+/)
+    .map((sentence) => sentence.trim().replace(/^\.\s*/, ""))
+    .filter(Boolean);
+
+  const bestSentence = sentences.find((sentence) => {
+    const normalizedSentence = normalizeQuestionToken(sentence);
+    return questionTokens.some((token) => normalizedSentence.includes(token));
+  });
+
+  return bestSentence || "Diese Information konnte ich in der Produktinformation nicht finden.";
 }
 
 function initialItemCodesByType(initialOrder, itemType) {
@@ -224,6 +378,12 @@ export default function KitchenConfigurator({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrderSectionOpen, setIsOrderSectionOpen] = useState(false);
   const [activeProductInfo, setActiveProductInfo] = useState(null);
+  const [isProductAssistantOpen, setIsProductAssistantOpen] = useState(false);
+  const [productAssistantMessages, setProductAssistantMessages] = useState([]);
+  const [selectedProductAssistantContext, setSelectedProductAssistantContext] = useState(null);
+  const [productInfoQuestion, setProductInfoQuestion] = useState("");
+  const [productInfoIsLoading, setProductInfoIsLoading] = useState(false);
+  const [productInfoError, setProductInfoError] = useState("");
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
   );
@@ -301,6 +461,21 @@ export default function KitchenConfigurator({
     };
   }, [activeProductInfo]);
 
+  useEffect(() => {
+    if (!isProductAssistantOpen) return undefined;
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setIsProductAssistantOpen(false);
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [isProductAssistantOpen]);
+
   const selectedComponents = kitchenConfig.components
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
     .map((item) => ({
@@ -315,6 +490,28 @@ export default function KitchenConfigurator({
     ...item,
     isOrderLocked: orderLockedServiceCodes.has(item.code),
   }));
+  const hasAnySelectedProducts = [...selectedComponents, ...selectedAccessories, ...selectedServices].length > 0;
+  const selectedProductInfoItems = [...selectedComponents, ...selectedAccessories, ...selectedServices].filter(
+    (item) => item.productInfoPdfPath || item.productInfoExtractedText || item.productInfoSummary,
+  );
+  const productAssistantContextOptions = buildProductAssistantContextOptions(
+    activeProductInfo,
+    selectedProductInfoItems,
+  );
+  const hasProductAssistantOptions = productAssistantContextOptions.length > 0;
+  const productAssistantIntro = PRODUCT_ASSISTANT_INTRO;
+  const selectedProductInfoLabel = formatProductAssistantContextLabel(null, selectedProductInfoItems);
+  const productAssistantSelectedContextLabel = selectedProductAssistantContext?.label || "";
+  const productAssistantOptionsKey = productAssistantContextOptions
+    .map((option) => `${option.key}:${option.itemIds.join(",")}`)
+    .join("|");
+  const selectedProductInfoNames = selectedProductInfoItems.map((item) => item.name).filter(Boolean);
+  const selectedProductInfoNotes = selectedProductInfoItems.flatMap((item) =>
+    extractProductInfoBullets(item.productInfoExtractedText, "Auswahlhinweise", 2).map((note) => ({
+      key: `${item.code}-${note}`,
+      text: `${item.name}: ${note}`,
+    })),
+  );
   const lockedSelectedComponents = selectedComponents.filter((item) => item.isLocked || item.isOrderLocked);
   const optionalSelectedComponents = selectedComponents.filter((item) => !item.isLocked && !item.isOrderLocked);
   const fixedComponentIdsKey = fixedComponentIds.join("|");
@@ -331,6 +528,35 @@ export default function KitchenConfigurator({
       }),
     [kitchenConfig.montageRequiredCodes, selectedAccessories, selectedComponents],
   );
+  useEffect(() => {
+    if (hasProductAssistantOptions || hasAnySelectedProducts) return;
+
+    setProductAssistantMessages([]);
+    setSelectedProductAssistantContext(null);
+    setProductInfoQuestion("");
+    setProductInfoError("");
+    setProductInfoIsLoading(false);
+    setIsProductAssistantOpen(false);
+  }, [hasProductAssistantOptions, hasAnySelectedProducts]);
+
+  useEffect(() => {
+    if (!isProductAssistantOpen) return;
+
+    setSelectedProductAssistantContext(null);
+    setProductAssistantMessages(
+      hasProductAssistantOptions
+        ? [
+            {
+              role: "assistant",
+              text: productAssistantIntro,
+            },
+          ]
+        : [],
+    );
+    setProductInfoQuestion("");
+    setProductInfoError("");
+    setProductInfoIsLoading(false);
+  }, [isProductAssistantOpen, productAssistantOptionsKey, hasProductAssistantOptions, productAssistantIntro]);
   const grandTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
     (sum, item) => sum + Number(item.price || 0),
     0,
@@ -530,6 +756,110 @@ export default function KitchenConfigurator({
     const nextState = buildProductInfoState(payload);
     if (!nextState) return;
     setActiveProductInfo(nextState);
+  }
+
+  function resetProductAssistantContext() {
+    setSelectedProductAssistantContext(null);
+    setProductAssistantMessages([
+      {
+        role: "assistant",
+        text: productAssistantIntro,
+      },
+    ]);
+    setProductInfoQuestion("");
+    setProductInfoError("");
+    setProductInfoIsLoading(false);
+  }
+
+  function selectProductAssistantContext(option) {
+    setSelectedProductAssistantContext(option);
+    setProductAssistantMessages((current) => {
+      const introMessage = {
+        role: "assistant",
+        text: productAssistantIntro,
+      };
+      const confirmationMessage = {
+        role: "assistant",
+        text: `Alles klar. Frag mich alles zu: ${option.shortLabel}.`,
+      };
+
+      if (!current.length) {
+        return [introMessage, confirmationMessage];
+      }
+
+      return [...current, confirmationMessage];
+    });
+    setProductInfoQuestion("");
+    setProductInfoError("");
+    setProductInfoIsLoading(false);
+  }
+
+  function openProductAssistant() {
+    if (!hasAnySelectedProducts) return;
+    setIsProductAssistantOpen(true);
+    if (hasProductAssistantOptions) {
+      resetProductAssistantContext();
+    } else {
+      setSelectedProductAssistantContext(null);
+      setProductAssistantMessages([]);
+      setProductInfoQuestion("");
+      setProductInfoError("");
+      setProductInfoIsLoading(false);
+    }
+  }
+
+  async function handleProductInfoQuestionSubmit(event) {
+    event.preventDefault();
+    const question = productInfoQuestion.trim();
+    if (!question || productInfoIsLoading) return;
+    if (!selectedProductAssistantContext?.itemIds?.length) return;
+
+    const itemIds = [...new Set(selectedProductAssistantContext.itemIds)].slice(0, 10);
+
+    setProductInfoIsLoading(true);
+    setProductInfoError("");
+    setProductInfoQuestion("");
+    setProductAssistantMessages((current) => [...current, { role: "user", text: question }]);
+
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 26000);
+
+    try {
+      const response = await fetch("/api/product-info/ask", {
+        method: "POST",
+        signal: controller.signal,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question,
+          itemIds: [...new Set(itemIds)].slice(0, 10),
+        }),
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(payload.error || "Die Produktfrage konnte nicht beantwortet werden.");
+      }
+
+      setProductAssistantMessages((current) => [
+        ...current,
+        {
+          role: "assistant",
+          text: payload.answer || "Diese Information konnte ich in der Produktinformation nicht finden.",
+        },
+      ]);
+    } catch (error) {
+      const nextError =
+        error?.name === "AbortError"
+          ? "Die Anfrage dauert zu lange. Bitte versuchen Sie es erneut."
+          : error instanceof Error
+            ? error.message
+            : "Die Produktfrage konnte nicht beantwortet werden.";
+      setProductInfoError(nextError);
+      setProductAssistantMessages((current) => [...current, { role: "assistant", text: nextError, tone: "error" }]);
+    } finally {
+      window.clearTimeout(timeout);
+      setProductInfoIsLoading(false);
+    }
   }
 
   async function handleSubmit(event) {
@@ -777,30 +1107,199 @@ export default function KitchenConfigurator({
                 </button>
               </div>
 
-              <div className={styles.productInfoMeta}>
-                <strong className={styles.productInfoPrice}>{formatCurrency(activeProductInfo.price)}</strong>
-                {activeProductInfo.infoText ? <p>{activeProductInfo.infoText}</p> : null}
-              </div>
+              <div className={styles.productInfoContent}>
+                <aside className={styles.productInfoAssistant} aria-label="Product Info Assistant">
+                  <div className={styles.productInfoMeta}>
+                    <strong className={styles.productInfoPrice}>{formatCurrency(activeProductInfo.price)}</strong>
+                    {activeProductInfo.infoText ? <p>{activeProductInfo.infoText}</p> : null}
+                  </div>
 
-              <div className={styles.productInfoActions}>
-                <a
-                  href={activeProductInfo.infoPdfHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={styles.productInfoActionLink}
-                >
-                  PDF in neuem Tab oeffnen
-                </a>
-              </div>
+                  <section className={styles.productInfoAssistantSection}>
+                    <h3>Kurz erklaert</h3>
+                    {splitProductInfoSentences(activeProductInfo.productInfoSummary).length ? (
+                      splitProductInfoSentences(activeProductInfo.productInfoSummary).map((sentence) => (
+                        <p key={sentence}>{sentence}</p>
+                      ))
+                    ) : (
+                      <p>Diese Information konnte ich in der Produktinformation nicht finden.</p>
+                    )}
+                  </section>
 
-              <div className={styles.productInfoViewer}>
-                <iframe
-                  src={activeProductInfo.infoPdfHref}
-                  title={`Produktinformation ${activeProductInfo.title}`}
-                  className={styles.productInfoFrame}
-                />
+                  <section className={styles.productInfoAssistantSection}>
+                    <h3>Wichtige Punkte</h3>
+                    {activeProductInfo.productInfoKeyFacts.length ? (
+                      <ul>
+                        {activeProductInfo.productInfoKeyFacts.map((fact) => (
+                          <li key={fact}>{fact}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>Diese Information konnte ich in der Produktinformation nicht finden.</p>
+                    )}
+                  </section>
+
+                  <div className={styles.productInfoAssistantCtaRow}>
+                    <span className={styles.productInfoAssistantHint}>Produktfragen jetzt im Assistenten rechts unten.</span>
+                  </div>
+
+                  {selectedProductInfoItems.length > 1 && selectedProductInfoNotes.length ? (
+                    <section className={styles.productInfoAssistantSection}>
+                      <h3>Wichtig fuer Ihre Auswahl</h3>
+                      <p>
+                        Sie haben {selectedProductInfoNames.join(" und ")} ausgewaehlt. Hier sind die wichtigsten
+                        Hinweise vor der Bestellung:
+                      </p>
+                      <ul>
+                        {selectedProductInfoNotes.slice(0, 6).map((note) => (
+                          <li key={note.key}>{note.text}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  ) : null}
+                </aside>
+
+                <div className={styles.productInfoPdfColumn}>
+                  <div className={styles.productInfoActions}>
+                    <a
+                      href={activeProductInfo.infoPdfHref}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={styles.productInfoActionLink}
+                    >
+                      PDF in neuem Tab oeffnen
+                    </a>
+                  </div>
+
+                  <div className={styles.productInfoViewer}>
+                    <iframe
+                      src={activeProductInfo.infoPdfHref}
+                      title={`Produktinformation ${activeProductInfo.title}`}
+                      className={styles.productInfoFrame}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+        ) : null}
+
+        {false && hasAnySelectedProducts ? (
+          <div className={styles.productAssistantDock}>
+            {isProductAssistantOpen ? (
+              <div
+                className={styles.productAssistantPanel}
+                role="dialog"
+                aria-modal="false"
+                aria-labelledby="product-assistant-title"
+              >
+                <div className={styles.productAssistantHeader}>
+                  <div>
+                    <h2 id="product-assistant-title">Produkt-Assistent</h2>
+                    <p>{productAssistantSelectedContextLabel || (hasProductAssistantOptions ? "Kontext wählen" : selectedProductInfoLabel || "Keine Produktinfos")}</p>
+                  </div>
+                  <div className={styles.productAssistantHeaderActions}>
+                    {selectedProductAssistantContext ? (
+                      <button
+                        type="button"
+                        className={styles.productAssistantContextReset}
+                        onClick={resetProductAssistantContext}
+                      >
+                        Produkt wechseln
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className={styles.productAssistantMinimize}
+                      aria-label="Produkt-Assistent minimieren"
+                      onClick={() => setIsProductAssistantOpen(false)}
+                    >
+                      Schliessen
+                    </button>
+                  </div>
+                </div>
+
+                <div className={styles.productAssistantMessages} aria-live="polite">
+                  {!hasProductAssistantOptions ? (
+                    <div className={`${styles.productAssistantMessage} ${styles.productAssistantMessageAssistant}`}>
+                      <span>Für deine aktuelle Auswahl sind noch keine Produktinformationen verfügbar.</span>
+                    </div>
+                  ) : null}
+                  {productAssistantMessages.map((message, index) => (
+                    <div
+                      key={`${message.role}-${index}-${message.text}`}
+                      className={[
+                        styles.productAssistantMessage,
+                        message.role === "user" ? styles.productAssistantMessageUser : styles.productAssistantMessageAssistant,
+                        message.tone === "error" ? styles.productAssistantMessageError : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                    >
+                      <span>{message.text}</span>
+                    </div>
+                  ))}
+                  {hasProductAssistantOptions && !selectedProductAssistantContext ? (
+                    <div className={styles.productAssistantContextOptions}>
+                      {productAssistantContextOptions.map((option) => (
+                        <button
+                          key={option.key}
+                          type="button"
+                          className={[
+                            styles.productAssistantContextButton,
+                            option.isHighlighted ? styles.productAssistantContextButtonHighlighted : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          onClick={() => selectProductAssistantContext(option)}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+                  {productInfoIsLoading ? (
+                    <div className={`${styles.productAssistantMessage} ${styles.productAssistantMessageAssistant}`}>
+                      <span>Antwort wird geladen...</span>
+                    </div>
+                  ) : null}
+                </div>
+
+                <form className={styles.productAssistantComposer} onSubmit={handleProductInfoQuestionSubmit}>
+                  <input
+                    value={productInfoQuestion}
+                    onChange={(event) => setProductInfoQuestion(event.target.value)}
+                    maxLength={500}
+                    placeholder="Frage zu diesem Produkt stellen..."
+                    disabled={!selectedProductAssistantContext || productInfoIsLoading || !hasProductAssistantOptions}
+                  />
+                  <button
+                    type="submit"
+                    disabled={
+                      !productInfoQuestion.trim()
+                      || productInfoIsLoading
+                      || !selectedProductAssistantContext
+                      || !hasProductAssistantOptions
+                    }
+                  >
+                    Senden
+                  </button>
+                </form>
+              </div>
+            ) : null}
+
+            <button
+              type="button"
+              className={styles.productAssistantLauncher}
+              onClick={() => {
+                if (isProductAssistantOpen) {
+                  setIsProductAssistantOpen(false);
+                  return;
+                }
+                openProductAssistant();
+              }}
+            >
+              Produkt-Hilfe
+            </button>
           </div>
         ) : null}
       </div>

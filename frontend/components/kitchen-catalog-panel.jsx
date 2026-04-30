@@ -195,7 +195,7 @@ export default function KitchenCatalogPanel({
                 item={item}
                 selected={selectedAccessoryCodes.includes(item.code)}
                 locked={orderLockedAccessoryCodes.has(item.code)}
-                infoPdfHref={getProductInfoHref(item.code)}
+                infoPdfHref={getProductInfoHref(item)}
                 onOpenInfo={onOpenProductInfo}
                 onClick={() => onToggleAccessory(item.code)}
               />
@@ -220,7 +220,7 @@ export default function KitchenCatalogPanel({
                   selected={selectedServiceCodes.includes(item.code)}
                   locked={orderLockedServiceCodes.has(item.code)}
                   disabled={disabled}
-                  infoPdfHref={getProductInfoHref(item.code)}
+                  infoPdfHref={getProductInfoHref(item)}
                   onOpenInfo={onOpenProductInfo}
                   hint={
                     disabledReason ||

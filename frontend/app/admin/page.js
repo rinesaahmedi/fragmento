@@ -433,6 +433,170 @@ function buildOwnerStatsOrderFilter({ startDate, kitchenId, status }) {
   return buildOrderAndClause({ startDate, kitchenId, status }, "o");
 }
 
+function buildProjectContractJoinFilter({ kitchenId }) {
+  return kitchenId ? Prisma.sql`AND kc."kitchenId" = ${kitchenId}` : Prisma.empty;
+}
+
+async function loadProjectAnalytics({ startDate, kitchenId, status }) {
+  const orderFilter = buildOrderAndClause({ startDate, kitchenId, status }, "o");
+  const contractJoinFilter = buildProjectContractJoinFilter({ kitchenId });
+
+  const projectRows = await prisma.$queryRaw`
+    SELECT
+      prj."id",
+      prj."name",
+      prj."projectCode",
+      prj."status",
+      prj."managerName",
+      prj."housingCompanyId",
+      hc."name" AS "housingCompanyName",
+      pobj."id" AS "propertyObjectId",
+      pobj."name" AS "propertyObjectName",
+      pobj."country" AS "objectCountry",
+      pobj."city" AS "objectCity",
+      pobj."postalCode" AS "objectPostalCode",
+      pobj."address1" AS "objectAddress1",
+      pobj."address2" AS "objectAddress2",
+      COUNT(DISTINCT kc."id")::int AS "contractCount",
+      COUNT(DISTINCT kc."id") FILTER (WHERE o."id" IS NOT NULL)::int AS "usedContractCount",
+      COUNT(DISTINCT o."id")::int AS "orderCount",
+      COUNT(DISTINCT o."kitchenId")::int AS "kitchenCount",
+      COALESCE(SUM(o."totalPrice"), 0) AS "totalRevenue"
+    FROM "Project" prj
+    JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
+    JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
+    LEFT JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+    LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    GROUP BY prj."id", hc."id", pobj."id"
+    ORDER BY "totalRevenue" DESC, "orderCount" DESC, "contractCount" DESC, prj."name" ASC
+  `;
+
+  const timelineRows = await prisma.$queryRaw`
+    SELECT
+      prj."id" AS "projectId",
+      DATE_TRUNC('day', o."createdAt")::date AS "date",
+      COUNT(*)::int AS "orders",
+      COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
+    FROM "Project" prj
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+    JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 2 ASC
+  `;
+
+  const kitchenRows = await prisma.$queryRaw`
+    SELECT
+      prj."id" AS "projectId",
+      COALESCE(NULLIF(BTRIM(k."name"), ''), 'Unknown kitchen') AS "kitchenName",
+      COUNT(*)::int AS "orders",
+      COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
+    FROM "Project" prj
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+    JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    LEFT JOIN "Kitchen" k ON k."id" = o."kitchenId"
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 4 DESC, 2 ASC
+  `;
+
+  const statusRows = await prisma.$queryRaw`
+    SELECT
+      prj."id" AS "projectId",
+      o."status"::text AS "status",
+      COUNT(*)::int AS "count"
+    FROM "Project" prj
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+    JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    GROUP BY 1, 2
+    ORDER BY 1 ASC, 2 ASC
+  `;
+
+  const contractRows = await prisma.$queryRaw`
+    SELECT
+      prj."id" AS "projectId",
+      kc."id",
+      kc."contractNumber",
+      kc."isActive",
+      kc."usedAt",
+      kc."building",
+      kc."floor",
+      kc."unitNumber",
+      COALESCE(NULLIF(BTRIM(k."name"), ''), 'Unknown kitchen') AS "kitchenName",
+      COUNT(o."id")::int AS "orderCount",
+      COALESCE(SUM(o."totalPrice"), 0) AS "revenue",
+      MAX(o."createdAt") AS "latestOrderAt"
+    FROM "Project" prj
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+    LEFT JOIN "Kitchen" k ON k."id" = kc."kitchenId"
+    LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    GROUP BY prj."id", kc."id", k."id"
+    ORDER BY 1 ASC, "orderCount" DESC, kc."contractNumber" ASC
+  `;
+
+  const locationRows = await prisma.$queryRaw`
+    SELECT
+      prj."id" AS "projectId",
+      COALESCE(NULLIF(BTRIM(o."country"), ''), NULLIF(BTRIM(pobj."country"), ''), '') AS "country",
+      COALESCE(NULLIF(BTRIM(o."city"), ''), NULLIF(BTRIM(pobj."city"), ''), 'Not captured') AS "city",
+      COALESCE(NULLIF(BTRIM(o."postalCode"), ''), NULLIF(BTRIM(pobj."postalCode"), ''), '') AS "postalCode",
+      COUNT(o."id")::int AS "orders",
+      COALESCE(SUM(o."totalPrice"), 0) AS "revenue"
+    FROM "Project" prj
+    JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
+    JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+    LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+    GROUP BY 1, 2, 3, 4
+    ORDER BY 1 ASC, 5 DESC, 3 ASC
+  `;
+
+  const hasArticleNumberColumn = await hasKitchenItemArticleNumberColumn();
+  const itemRows = hasArticleNumberColumn
+    ? await prisma.$queryRaw`
+        SELECT
+          prj."id" AS "projectId",
+          oi."itemType"::text AS "itemType",
+          oi."code" AS "code",
+          oi."nameSnapshot" AS "nameSnapshot",
+          MAX(ki."name") FILTER (WHERE ki."name" IS NOT NULL) AS "canonicalName",
+          ki."articleNumber" AS "articleNumber",
+          SUM(oi."quantity")::int AS "quantity",
+          COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
+        FROM "Project" prj
+        JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+        JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+        JOIN "OrderItem" oi ON oi."orderId" = o."id"
+        LEFT JOIN "KitchenItem" ki ON ki."id" = oi."kitchenItemId"
+        GROUP BY 1, 2, 3, 4, 6
+        ORDER BY 1 ASC, 7 DESC, 8 DESC, 4 ASC
+      `
+    : await prisma.$queryRaw`
+        SELECT
+          prj."id" AS "projectId",
+          oi."itemType"::text AS "itemType",
+          oi."code" AS "code",
+          oi."nameSnapshot" AS "nameSnapshot",
+          NULL::text AS "canonicalName",
+          NULL::text AS "articleNumber",
+          SUM(oi."quantity")::int AS "quantity",
+          COALESCE(SUM(oi."quantity" * oi."priceSnapshot"), 0) AS "revenue"
+        FROM "Project" prj
+        JOIN "KitchenContract" kc ON kc."projectId" = prj."id" ${contractJoinFilter}
+        JOIN "Order" o ON o."kitchenContractId" = kc."id" ${orderFilter}
+        JOIN "OrderItem" oi ON oi."orderId" = o."id"
+        GROUP BY 1, 2, 3, 4, 5, 6
+        ORDER BY 1 ASC, 7 DESC, 8 DESC, 4 ASC
+      `;
+
+  return {
+    projectRows,
+    timelineRows,
+    kitchenRows,
+    statusRows,
+    contractRows,
+    locationRows,
+    itemRows,
+  };
+}
+
 async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
   const orderFilter = buildOwnerStatsOrderFilter({ startDate, kitchenId, status });
 
@@ -573,9 +737,20 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const startDate = getPeriodStartDate(period);
 
   const dashboardFilters = { startDate, kitchenId, status: validStatus };
-  const [kitchens, propertyOwnerAnalyticsRaw, summary, dailyStatusRows, kitchenTimelineRows, paymentRows, geographyRows, groupedItemRows] = await Promise.all([
+  const [
+    kitchens,
+    propertyOwnerAnalyticsRaw,
+    projectAnalyticsRaw,
+    summary,
+    dailyStatusRows,
+    kitchenTimelineRows,
+    paymentRows,
+    geographyRows,
+    groupedItemRows,
+  ] = await Promise.all([
     listKitchensForAdmin(),
     loadPropertyOwnerAnalytics({ startDate, kitchenId, status: validStatus }),
+    loadProjectAnalytics({ startDate, kitchenId, status: validStatus }),
     loadDashboardSummary(dashboardFilters),
     loadDailyStatusRows(dashboardFilters),
     loadKitchenTimelineRows(dashboardFilters),
@@ -847,6 +1022,195 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     topItemsByCompany: companyTopItemsById,
     statusBreakdownByCompany,
   };
+
+  const projectTimelineById = new Map();
+  for (const project of projectAnalyticsRaw.projectRows) {
+    projectTimelineById.set(project.id, new Map(
+      dateKeys.map((date) => [
+        date,
+        {
+          date,
+          label: formatDateLabel(date),
+          orders: 0,
+          revenue: 0,
+        },
+      ]),
+    ));
+  }
+
+  for (const row of projectAnalyticsRaw.timelineRows) {
+    const projectTimeline = projectTimelineById.get(row.projectId);
+    if (!projectTimeline) continue;
+    const dateKey = toDateKey(row.date);
+    if (!projectTimeline.has(dateKey)) {
+      projectTimeline.set(dateKey, {
+        date: dateKey,
+        label: formatDateLabel(dateKey),
+        orders: 0,
+        revenue: 0,
+      });
+    }
+
+    projectTimeline.set(dateKey, {
+      date: dateKey,
+      label: formatDateLabel(dateKey),
+      orders: Number(row.orders || 0),
+      revenue: Number(row.revenue || 0),
+    });
+  }
+
+  const kitchenBreakdownByProject = projectAnalyticsRaw.kitchenRows.reduce((acc, row) => {
+    if (!acc[row.projectId]) acc[row.projectId] = [];
+    acc[row.projectId].push({
+      kitchenName: row.kitchenName || "Unknown kitchen",
+      orders: Number(row.orders || 0),
+      revenue: Number(row.revenue || 0),
+    });
+    return acc;
+  }, {});
+
+  const statusBreakdownByProject = projectAnalyticsRaw.statusRows.reduce((acc, row) => {
+    if (!acc[row.projectId]) acc[row.projectId] = [];
+    acc[row.projectId].push({
+      status: row.status || "",
+      count: Number(row.count || 0),
+    });
+    return acc;
+  }, {});
+
+  const contractsByProject = projectAnalyticsRaw.contractRows.reduce((acc, row) => {
+    if (!acc[row.projectId]) acc[row.projectId] = [];
+    const unitParts = [row.building, row.floor, row.unitNumber].map((value) => String(value || "").trim()).filter(Boolean);
+    acc[row.projectId].push({
+      id: row.id,
+      contractNumber: row.contractNumber || "",
+      kitchenName: row.kitchenName || "Unknown kitchen",
+      isActive: Boolean(row.isActive),
+      usedAt: row.usedAt ? formatDateTime(row.usedAt) : "",
+      unitLabel: unitParts.join(" / "),
+      orderCount: Number(row.orderCount || 0),
+      revenue: Number(row.revenue || 0),
+      latestOrderAt: row.latestOrderAt ? formatDateTime(row.latestOrderAt) : "",
+    });
+    return acc;
+  }, {});
+
+  const locationsByProject = projectAnalyticsRaw.locationRows.reduce((acc, row) => {
+    if (!acc[row.projectId]) acc[row.projectId] = [];
+    const country = deriveCountry(row);
+    const city = String(row.city || "").trim() || "Not captured";
+    const postalCode = String(row.postalCode || "").trim();
+    const locationLabel = [city, postalCode].filter(Boolean).join(" ");
+    acc[row.projectId].push({
+      country,
+      city,
+      postalCode,
+      label: `${locationLabel || city}, ${country}`,
+      orders: Number(row.orders || 0),
+      revenue: Number(row.revenue || 0),
+    });
+    return acc;
+  }, {});
+
+  const topItemsByProjectMap = new Map();
+  for (const row of projectAnalyticsRaw.itemRows) {
+    const projectId = row.projectId;
+    if (!topItemsByProjectMap.has(projectId)) {
+      topItemsByProjectMap.set(projectId, new Map());
+    }
+
+    const projectItems = topItemsByProjectMap.get(projectId);
+    const quantity = Number(row.quantity || 0);
+    const revenue = Number(row.revenue || 0);
+    const code = String(row.code || "").trim();
+    const canonicalName = String(row.canonicalName || "").trim() || null;
+    const fallbackName = String(row.nameSnapshot || "").trim() || "";
+    const canonicalArticleNumber = String(row.articleNumber || "").trim() || ARTICLE_NUMBER_BY_CODE[code] || null;
+    const grouping = getTopItemGrouping({ code, itemType: row.itemType, nameSnapshot: row.nameSnapshot }, canonicalArticleNumber);
+    const existingItem = projectItems.get(grouping.groupKey) || {
+      itemType: grouping.preferredItemType || row.itemType,
+      code: grouping.preferredCode || code,
+      canonicalName: null,
+      fallbackName,
+      canonicalArticleNumber: null,
+      quantity: 0,
+      revenue: 0,
+    };
+    existingItem.itemType = choosePreferredItemType(existingItem.itemType, row.itemType, grouping.preferredItemType);
+    existingItem.code = grouping.preferredCode || choosePreferredText(existingItem.code, code);
+    existingItem.canonicalName = grouping.preferredName || choosePreferredText(existingItem.canonicalName, canonicalName);
+    existingItem.fallbackName = choosePreferredText(existingItem.fallbackName, fallbackName);
+    existingItem.canonicalArticleNumber = choosePreferredText(existingItem.canonicalArticleNumber, canonicalArticleNumber);
+    existingItem.quantity += quantity;
+    existingItem.revenue += revenue;
+    projectItems.set(grouping.groupKey, existingItem);
+  }
+
+  const projectTopItemsById = Array.from(topItemsByProjectMap.entries()).reduce((acc, [projectId, items]) => {
+    acc[projectId] = Array.from(items.values())
+      .map((item) => ({
+        ...item,
+        name: item.canonicalName || item.fallbackName || item.code || "",
+        articleNumber: item.canonicalArticleNumber || null,
+      }))
+      .sort((a, b) => {
+        if (b.revenue !== a.revenue) return b.revenue - a.revenue;
+        return b.quantity - a.quantity;
+      });
+    return acc;
+  }, {});
+
+  const projects = projectAnalyticsRaw.projectRows
+    .filter((project) => Number(project.contractCount || 0) || Number(project.orderCount || 0))
+    .map((project) => {
+      const totalRevenue = Number(project.totalRevenue || 0);
+      const orderCount = Number(project.orderCount || 0);
+      const contractCount = Number(project.contractCount || 0);
+      const projectLocations = locationsByProject[project.id] || [];
+      return {
+        id: project.id,
+        name: project.name || "",
+        projectCode: project.projectCode || "",
+        status: project.status || "active",
+        managerName: project.managerName || "",
+        housingCompanyId: project.housingCompanyId || "",
+        housingCompanyName: project.housingCompanyName || "",
+        propertyObjectName: project.propertyObjectName || "",
+        objectCity: project.objectCity || "",
+        objectPostalCode: project.objectPostalCode || "",
+        objectCountry: project.objectCountry || "",
+        objectAddress: [project.objectAddress1, project.objectAddress2].filter(Boolean).join(", "),
+        contractCount,
+        usedContractCount: Number(project.usedContractCount || 0),
+        unusedContractCount: Math.max(0, contractCount - Number(project.usedContractCount || 0)),
+        orderCount,
+        kitchenCount: Number(project.kitchenCount || 0),
+        cityCount: projectLocations.filter((location) => location.city && location.city !== "Not captured").length,
+        totalRevenue,
+        averageOrderValue: orderCount ? totalRevenue / orderCount : 0,
+      };
+    })
+    .sort((a, b) => {
+      if (b.totalRevenue !== a.totalRevenue) return b.totalRevenue - a.totalRevenue;
+      if (b.orderCount !== a.orderCount) return b.orderCount - a.orderCount;
+      if (b.contractCount !== a.contractCount) return b.contractCount - a.contractCount;
+      return a.name.localeCompare(b.name);
+    });
+
+  const projectAnalytics = {
+    projects,
+    defaultProjectId: projects[0]?.id || "",
+    timelineByProject: Array.from(projectTimelineById.entries()).reduce((acc, [projectId, rows]) => {
+      acc[projectId] = Array.from(rows.values()).sort((a, b) => a.date.localeCompare(b.date));
+      return acc;
+    }, {}),
+    kitchenBreakdownByProject,
+    statusBreakdownByProject,
+    contractsByProject,
+    locationsByProject,
+    topItemsByProject: projectTopItemsById,
+  };
+
   const kpis = [
     {
       labelKey: "dashboard.totalOrders",
@@ -898,6 +1262,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         paymentData={paymentData}
         geographyData={geographyData}
         companyAnalytics={companyAnalytics}
+        projectAnalytics={projectAnalytics}
       />
     </AdminShell>
   );

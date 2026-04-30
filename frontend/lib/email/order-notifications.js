@@ -5,64 +5,6 @@ import { jsPDF } from "jspdf";
 import nodemailer from "nodemailer";
 import path from "path";
 
-const PRODUCT_INFO_BY_CODE = {
-  "DISH-600-STD": {
-    assetPath: "product-info/dishwasher-product-info.pdf",
-    filename: "Produktinformation-Geschirrspueler.pdf",
-    label: "Geschirrspueler",
-  },
-  "REF-545-1800-700": {
-    assetPath: "product-info/fridge-product-info.pdf",
-    filename: "Produktinformation-Kuehlschrank.pdf",
-    label: "Kuehlschrank",
-  },
-  "HOOD-600-FLAT": {
-    assetPath: "product-info/extractor-hood-flat-product-info.pdf",
-    filename: "Produktinformation-Dunstabzugshaube-Flach.pdf",
-    label: "Dunstabzugshaube flach",
-  },
-  "WM-B-EWA34660W": {
-    assetPath: "product-info/washing-machine-product-info.pdf",
-    filename: "Produktinformation-Waschmaschine.pdf",
-    label: "Waschmaschine",
-  },
-  "DISH-B-600-STD": {
-    assetPath: "product-info/dishwasher-product-info.pdf",
-    filename: "Produktinformation-Geschirrspueler.pdf",
-    label: "Geschirrspueler",
-  },
-  "REF-B-545-1800-700": {
-    assetPath: "product-info/fridge-product-info.pdf",
-    filename: "Produktinformation-Kuehlschrank.pdf",
-    label: "Kuehlschrank",
-  },
-  "HOOD-B-FH664621E": {
-    assetPath: "product-info/extractor-hood-flat-product-info.pdf",
-    filename: "Produktinformation-Dunstabzugshaube-Flach.pdf",
-    label: "Dunstabzugshaube flach",
-  },
-  "REF-C-545-1800-700": {
-    assetPath: "product-info/fridge-product-info.pdf",
-    filename: "Produktinformation-Kuehlschrank.pdf",
-    label: "Kuehlschrank",
-  },
-  "HOOD-C-FH664621E": {
-    assetPath: "product-info/extractor-hood-chimney-product-info.pdf",
-    filename: "Produktinformation-Dunstabzugshaube-Kamin.pdf",
-    label: "Dunstabzugshaube Kamin",
-  },
-  "WM-C-EWA34660W": {
-    assetPath: "product-info/washing-machine-product-info.pdf",
-    filename: "Produktinformation-Waschmaschine.pdf",
-    label: "Waschmaschine",
-  },
-  "DISH-C-600-STD": {
-    assetPath: "product-info/dishwasher-product-info.pdf",
-    filename: "Produktinformation-Geschirrspueler.pdf",
-    label: "Geschirrspueler",
-  },
-};
-
 async function resolvePublicAssetPath(relativePath) {
   const candidates = [
     path.join(process.cwd(), "public", relativePath),
@@ -79,6 +21,20 @@ async function resolvePublicAssetPath(relativePath) {
   throw new Error(`Asset not found: ${relativePath}`);
 }
 
+function normalizeProductInfoAssetPath(pdfPath) {
+  const normalized = String(pdfPath || "").trim().replace(/^\/+/, "");
+  return normalized || "";
+}
+
+function buildProductInfoFilename(item, assetPath) {
+  const baseName = String(item.name || path.basename(assetPath, ".pdf") || "Produktinformation")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "");
+  return `Produktinformation-${baseName || "Produkt"}.pdf`;
+}
+
 async function loadProductInfoAttachments(order) {
   const selectedItems = [...order.components, ...order.accessories, ...order.services];
   const seenAssetPaths = new Set();
@@ -86,19 +42,19 @@ async function loadProductInfoAttachments(order) {
   const labels = [];
 
   for (const item of selectedItems) {
-    const config = PRODUCT_INFO_BY_CODE[item.code];
-    if (!config || seenAssetPaths.has(config.assetPath)) continue;
+    const assetPath = normalizeProductInfoAssetPath(item.productInfoPdfPath);
+    if (!assetPath || seenAssetPaths.has(assetPath)) continue;
 
     try {
-      const absolutePath = await resolvePublicAssetPath(config.assetPath);
+      const absolutePath = await resolvePublicAssetPath(assetPath);
       const content = await fs.readFile(absolutePath);
       attachments.push({
-        filename: config.filename,
+        filename: buildProductInfoFilename(item, assetPath),
         content,
         contentType: "application/pdf",
       });
-      labels.push(config.label);
-      seenAssetPaths.add(config.assetPath);
+      labels.push(item.name || item.code || path.basename(assetPath, ".pdf"));
+      seenAssetPaths.add(assetPath);
     } catch (error) {
       console.warn(`Could not attach product info for ${item.code}:`, error.message);
     }

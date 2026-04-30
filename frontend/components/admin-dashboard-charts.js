@@ -78,6 +78,7 @@ export function AdminDashboardCharts({
   paymentData,
   geographyData,
   companyAnalytics,
+  projectAnalytics,
 }) {
   const { translate } = useAdminI18n();
   const [statusMode, setStatusMode] = useState("volume");
@@ -235,7 +236,7 @@ export function AdminDashboardCharts({
         topItemsByRevenue={topItemsByRevenue}
       />
 
-      <PropertyOwnerAnalyticsSection analytics={companyAnalytics} />
+      <CompanyProjectAnalyticsSection companyAnalytics={companyAnalytics} projectAnalytics={projectAnalytics} />
 
       <style jsx>{`
         .dashboard-toolbar {
@@ -356,7 +357,53 @@ function StatusTooltip({ active, payload, label, mode }) {
   );
 }
 
-function PropertyOwnerAnalyticsSection({ analytics }) {
+function CompanyProjectAnalyticsSection({ companyAnalytics, projectAnalytics }) {
+  const { translate } = useAdminI18n();
+  const [mode, setMode] = useState("company");
+  const modeSwitcher = (
+    <div className="analytics-mode-switch" aria-label={translate("dashboard.analyticsFocus", "Analytics focus")}>
+      <button className={mode === "company" ? "is-active" : ""} type="button" onClick={() => setMode("company")}>
+        {translate("dashboard.companyView", "Company")}
+      </button>
+      <button className={mode === "project" ? "is-active" : ""} type="button" onClick={() => setMode("project")}>
+        {translate("dashboard.projectView", "Project")}
+      </button>
+      <style jsx>{`
+        .analytics-mode-switch {
+          display: flex;
+          gap: 6px;
+          padding: 4px;
+          border-radius: 8px;
+          background: var(--color-primary-soft);
+        }
+
+        .analytics-mode-switch button {
+          min-height: 34px;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: var(--color-text-muted);
+          padding: 7px 12px;
+          font: inherit;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .analytics-mode-switch button.is-active {
+          background: var(--color-card);
+          color: var(--color-primary);
+          box-shadow: 0 5px 14px rgba(84, 59, 40, 0.1);
+        }
+      `}</style>
+    </div>
+  );
+
+  return mode === "company"
+    ? <PropertyOwnerAnalyticsSection analytics={companyAnalytics} modeSwitcher={modeSwitcher} />
+    : <ProjectAnalyticsSection analytics={projectAnalytics} modeSwitcher={modeSwitcher} />;
+}
+
+function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
   const { translate } = useAdminI18n();
   const companies = analytics?.companies || [];
   const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
@@ -423,6 +470,7 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         title={translate("dashboard.propertyOwnerKitchenActivity", "Property owner kitchen activity")}
         actions={(
           <div className="owner-actions">
+            {modeSwitcher}
             <label className="owner-select-wrap">
               <span>{translate("dashboard.selectCompany", "Housing company")}</span>
               <select
@@ -844,6 +892,649 @@ function PropertyOwnerAnalyticsSection({ analytics }) {
         }
       `}</style>
     </section>
+  );
+}
+
+function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
+  const { translate } = useAdminI18n();
+  const projects = analytics?.projects || [];
+  const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
+  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [itemMode, setItemMode] = useState("quantity");
+  const selectedProject = useMemo(
+    () => projects.find((project) => project.id === selectedProjectId) || projects[0] || null,
+    [projects, selectedProjectId],
+  );
+  const selectedTimeline = selectedProject ? (analytics?.timelineByProject?.[selectedProject.id] || []) : [];
+  const selectedContracts = selectedProject ? (analytics?.contractsByProject?.[selectedProject.id] || []) : [];
+  const selectedLocations = selectedProject ? (analytics?.locationsByProject?.[selectedProject.id] || []) : [];
+  const selectedKitchens = selectedProject ? (analytics?.kitchenBreakdownByProject?.[selectedProject.id] || []) : [];
+  const selectedStatuses = selectedProject ? (analytics?.statusBreakdownByProject?.[selectedProject.id] || []) : [];
+  const selectedTopItems = useMemo(
+    () => selectedProject ? (analytics?.topItemsByProject?.[selectedProject.id] || []) : [],
+    [analytics, selectedProject],
+  );
+
+  useEffect(() => {
+    if (!projects.length) {
+      setSelectedProjectId("");
+      return;
+    }
+
+    setSelectedProjectId((current) => (
+      current && projects.some((project) => project.id === current)
+        ? current
+        : analytics?.defaultProjectId || projects[0].id
+    ));
+  }, [analytics, projects]);
+
+  const itemConfig = itemMode === "quantity"
+    ? {
+        formatter: (value) => interpolateText(translate("dashboard.itemCountValue", "{count} item(s)"), { count: String(value) }),
+        data: selectedTopItems
+          .map((item) => ({
+            ...item,
+            chartValue: Number(item.quantity || 0),
+            axisLabel: item.name || "",
+            displayIdentifier: item.articleNumber || item.code || "",
+          }))
+          .sort((a, b) => b.chartValue - a.chartValue),
+      }
+    : {
+        formatter: formatCurrency,
+        data: selectedTopItems
+          .map((item) => ({
+            ...item,
+            chartValue: Number(item.revenue || 0),
+            axisLabel: item.name || "",
+            displayIdentifier: item.articleNumber || item.code || "",
+          }))
+          .sort((a, b) => b.chartValue - a.chartValue),
+      };
+  const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
+  const topItemsChartHeight = Math.max(240, topItemChartData.length * 34 + 42);
+  const topItemsMaxValue = topItemChartData.reduce((max, item) => Math.max(max, item.chartValue), 0);
+  const topItemsXAxisMax = itemMode === "quantity"
+    ? Math.max(1, Math.ceil(topItemsMaxValue * 1.12))
+    : Math.max(1, topItemsMaxValue * 1.12);
+
+  return (
+    <section className="project-card">
+      <ChartHeader
+        eyebrow={translate("dashboard.projectPerformance", "Project performance")}
+        title={translate("dashboard.projectStatistics", "Project statistics")}
+        detail={translate("dashboard.projectStatisticsDetail", "Review contract numbers, locations, order flow, and item demand for one project.")}
+        actions={(
+          <div className="project-actions">
+            {modeSwitcher}
+            <label className="project-select-wrap">
+              <span>{translate("dashboard.selectProject", "Project")}</span>
+              <select
+                value={selectedProject?.id || ""}
+                onChange={(event) => setSelectedProjectId(event.target.value)}
+                disabled={!projects.length}
+                aria-label={translate("dashboard.selectProject", "Project")}
+              >
+                {projects.length ? projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.projectCode ? `${project.projectCode} - ` : ""}{project.name}
+                  </option>
+                )) : (
+                  <option value="">{translate("dashboard.noProjectsAvailable", "No projects available")}</option>
+                )}
+              </select>
+            </label>
+            <a className="panel-link" href={selectedProject ? `/admin/property-owners/${selectedProject.housingCompanyId}` : "/admin/property-owners"}>
+              {selectedProject
+                ? translate("dashboard.openCompanyWorkspace", "Open company workspace")
+                : translate("dashboard.manageOwners", "Manage owners")}
+            </a>
+          </div>
+        )}
+      />
+
+      {selectedProject ? (
+        <div className="project-grid">
+          <article className="project-main">
+            <div className="project-heading">
+              <div>
+                <strong>{selectedProject.projectCode ? `${selectedProject.projectCode} - ` : ""}{selectedProject.name}</strong>
+                <span>{selectedProject.housingCompanyName || translate("dashboard.notCaptured", "Not captured")}</span>
+                <small>{[
+                  selectedProject.propertyObjectName,
+                  selectedProject.objectAddress,
+                  [selectedProject.objectPostalCode, selectedProject.objectCity].filter(Boolean).join(" "),
+                  selectedProject.objectCountry,
+                ].filter(Boolean).join(" | ")}</small>
+              </div>
+              <b>{formatProjectStatus(selectedProject.status)}</b>
+            </div>
+
+            <div className="project-kpi-grid">
+              <article>
+                <span>{translate("dashboard.totalRevenue", "Total revenue")}</span>
+                <strong>{formatCurrency(selectedProject.totalRevenue)}</strong>
+              </article>
+              <article>
+                <span>{translate("ordersAdmin.orders", "Orders")}</span>
+                <strong>{selectedProject.orderCount}</strong>
+              </article>
+              <article>
+                <span>{translate("propertyOwnersAdmin.contracts", "Contracts")}</span>
+                <strong>{selectedProject.contractCount}</strong>
+              </article>
+              <article>
+                <span>{translate("dashboard.usedContracts", "Used contracts")}</span>
+                <strong>{selectedProject.usedContractCount}</strong>
+              </article>
+              <article>
+                <span>{translate("dashboard.unusedContracts", "Unused contracts")}</span>
+                <strong>{selectedProject.unusedContractCount}</strong>
+              </article>
+              <article>
+                <span>{translate("dashboard.averageOrderShort", "Avg. order")}</span>
+                <strong>{formatCurrency(selectedProject.averageOrderValue)}</strong>
+              </article>
+              <article>
+                <span>{translate("dashboard.cities", "Cities")}</span>
+                <strong>{selectedProject.cityCount}</strong>
+              </article>
+            </div>
+
+            <div className="project-chart-card">
+              <div className="project-chart-heading">
+                <strong>{translate("dashboard.projectTimeline", "Project timeline")}</strong>
+              </div>
+              <div className="project-chart-frame">
+                {selectedTimeline.some((row) => row.orders || row.revenue) ? (
+                  <ResponsiveContainer width="100%" height={240}>
+                    <LineChart data={selectedTimeline} margin={{ top: 8, right: 8, left: -18, bottom: 0 }}>
+                      <CartesianGrid stroke={CHART_GRID} vertical={false} />
+                      <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+                      <YAxis yAxisId="orders" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+                      <YAxis yAxisId="revenue" orientation="right" tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} tickFormatter={compactCurrency} />
+                      <Tooltip content={<CompanyTimelineTooltip />} />
+                      <Legend wrapperStyle={{ color: CHART_TEXT }} />
+                      <Line yAxisId="orders" type="monotone" dataKey="orders" name={translate("ordersAdmin.orders", "Orders")} stroke="#5B8DEF" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
+                      <Line yAxisId="revenue" type="monotone" dataKey="revenue" name={translate("dashboard.revenueLabel", "Revenue")} stroke="#3FA66B" strokeWidth={3} dot={{ r: 2 }} activeDot={{ r: 5 }} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <EmptyChart label={translate("dashboard.noProjectTimelineData", "No timeline data for the selected project.")} />
+                )}
+              </div>
+            </div>
+
+            <div className="project-split">
+              <ProjectListPanel
+                title={translate("dashboard.projectLocations", "Cities and addresses")}
+                emptyLabel={translate("dashboard.noProjectLocationData", "No location data for the selected project.")}
+                rows={selectedLocations}
+                renderRow={(location) => (
+                  <>
+                    <div>
+                      <strong>{location.label}</strong>
+                      <span>{translate("ordersAdmin.orders", "Orders")}: {location.orders}</span>
+                    </div>
+                    <b>{formatCurrency(location.revenue)}</b>
+                  </>
+                )}
+              />
+              <ProjectListPanel
+                title={translate("dashboard.projectKitchenBreakdown", "Kitchen breakdown")}
+                emptyLabel={translate("dashboard.noProjectKitchenData", "No kitchen data for the selected project.")}
+                rows={selectedKitchens}
+                renderRow={(kitchen) => (
+                  <>
+                    <div>
+                      <strong>{kitchen.kitchenName}</strong>
+                      <span>{translate("ordersAdmin.orders", "Orders")}: {kitchen.orders}</span>
+                    </div>
+                    <b>{formatCurrency(kitchen.revenue)}</b>
+                  </>
+                )}
+              />
+            </div>
+
+            <div className="project-chart-card">
+              <div className="project-chart-heading">
+                <strong>{translate("dashboard.projectTopItems", "Top items for selected project")}</strong>
+                <div className="segmented-control" aria-label="Selected project top items mode">
+                  <button className={itemMode === "quantity" ? "is-active" : ""} type="button" onClick={() => setItemMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
+                  <button className={itemMode === "revenue" ? "is-active" : ""} type="button" onClick={() => setItemMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
+                </div>
+              </div>
+              <div className="project-chart-frame">
+                {topItemChartData.length ? (
+                  <div className="top-items-scroll">
+                    <ResponsiveContainer width="100%" height={topItemsChartHeight}>
+                      <BarChart data={topItemChartData} layout="vertical" margin={{ top: 8, right: 76, left: 0, bottom: 0 }}>
+                        <CartesianGrid stroke={CHART_GRID} horizontal={false} />
+                        <XAxis
+                          type="number"
+                          domain={[0, topItemsXAxisMax]}
+                          tickLine={false}
+                          axisLine={false}
+                          fontSize={12}
+                          tickFormatter={itemMode === "revenue" ? compactCurrency : undefined}
+                        />
+                        <YAxis
+                          type="category"
+                          dataKey="axisLabel"
+                          width={320}
+                          tickLine={false}
+                          axisLine={false}
+                          fontSize={12}
+                          tick={<TopItemsAxisTick />}
+                        />
+                        <Tooltip content={<TopItemsTooltip />} />
+                        <Bar
+                          dataKey="chartValue"
+                          radius={[0, 8, 8, 0]}
+                          label={{
+                            position: "right",
+                            fill: CHART_TEXT,
+                            fontSize: 12,
+                            fontWeight: 800,
+                            formatter: itemConfig.formatter,
+                          }}
+                        >
+                          {topItemChartData.map((item, index) => (
+                            <Cell key={`${itemMode}-${item.code || item.name}-${item.name}`} fill={SERIES_COLORS[index % SERIES_COLORS.length]} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                ) : (
+                  <EmptyChart label={translate("dashboard.noProjectItemData", "No item data for the selected project.")} />
+                )}
+              </div>
+            </div>
+          </article>
+
+          <aside className="project-side">
+            <ProjectListPanel
+              title={translate("dashboard.contractNumbers", "Contract numbers")}
+              emptyLabel={translate("dashboard.noProjectContracts", "No contract numbers for the selected project.")}
+              rows={selectedContracts}
+              renderRow={(contract) => (
+                <>
+                  <div>
+                    <strong>{contract.contractNumber}</strong>
+                    <span>{contract.kitchenName}</span>
+                    {contract.unitLabel ? <span>{contract.unitLabel}</span> : null}
+                    {contract.latestOrderAt ? <span>{translate("dashboard.latestOrder", "Latest order")}: {contract.latestOrderAt}</span> : null}
+                  </div>
+                  <b>{translateText("dashboard.contractOrderCount", "{count} order(s) linked", { count: String(contract.orderCount) })}</b>
+                </>
+              )}
+            />
+            <ProjectListPanel
+              title={translate("dashboard.projectStatusDistribution", "Status distribution")}
+              emptyLabel={translate("dashboard.noProjectStatusData", "No status data for the selected project.")}
+              rows={selectedStatuses}
+              renderRow={(status) => (
+                <>
+                  <div>
+                    <strong>{translateStatus(status.status, translate)}</strong>
+                  </div>
+                  <b>{status.count}</b>
+                </>
+              )}
+            />
+            <div className="project-summary-list" aria-label={translate("dashboard.projectList", "Projects")}>
+              {projects.map((project) => {
+                const isSelected = project.id === selectedProject.id;
+                return (
+                  <button
+                    key={project.id}
+                    type="button"
+                    className={`project-summary-row${isSelected ? " is-selected" : ""}`}
+                    onClick={() => setSelectedProjectId(project.id)}
+                  >
+                    <div>
+                      <strong>{project.projectCode ? `${project.projectCode} - ` : ""}{project.name}</strong>
+                      <span>{translateText("dashboard.projectMetricsSummary", "{contracts} contracts, {orders} orders", {
+                        contracts: String(project.contractCount),
+                        orders: String(project.orderCount),
+                      })}</span>
+                    </div>
+                    <b>{formatCurrency(project.totalRevenue)}</b>
+                  </button>
+                );
+              })}
+            </div>
+          </aside>
+        </div>
+      ) : (
+        <div className="empty-project-stats">{translate("dashboard.noProjectDataForSelectedFilters", "No project, contract, or order data matches the current filters.")}</div>
+      )}
+
+      <style jsx>{`
+        .project-card {
+          border: 1px solid var(--color-border);
+          border-radius: 16px;
+          background: var(--color-card);
+          box-shadow: var(--app-shadow-soft);
+          display: grid;
+          gap: 12px;
+          padding: 18px;
+          min-width: 0;
+        }
+
+        .project-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.9fr);
+          gap: 12px;
+        }
+
+        .project-main,
+        .project-side {
+          display: grid;
+          gap: 14px;
+          align-content: start;
+        }
+
+        .project-main {
+          border: 1px solid var(--color-border);
+          border-radius: 12px;
+          padding: 14px;
+          background: #fbfaf7;
+        }
+
+        .project-actions {
+          display: flex;
+          gap: 10px;
+          align-items: end;
+          flex-wrap: wrap;
+        }
+
+        .project-select-wrap {
+          display: grid;
+          gap: 6px;
+          min-width: 240px;
+        }
+
+        .project-select-wrap span,
+        .project-kpi-grid span,
+        .project-heading span {
+          color: var(--color-text-muted);
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .project-select-wrap select {
+          min-height: 42px;
+          border-radius: 8px;
+          border: 1px solid var(--color-border);
+          background: var(--color-card);
+          color: var(--color-text);
+          padding: 9px 12px;
+          font: inherit;
+        }
+
+        .project-heading,
+        .project-chart-heading {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+          flex-wrap: wrap;
+        }
+
+        .project-heading div {
+          display: grid;
+          gap: 4px;
+          min-width: 0;
+        }
+
+        .project-heading strong,
+        .project-chart-heading strong {
+          color: var(--color-text);
+        }
+
+        .project-heading small {
+          color: var(--color-text-muted);
+          line-height: 1.45;
+        }
+
+        .project-heading b {
+          color: var(--color-confirmed);
+          text-transform: capitalize;
+        }
+
+        .project-kpi-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 8px;
+        }
+
+        .project-kpi-grid article,
+        .project-chart-card,
+        .project-list-panel {
+          border-radius: 8px;
+          background: var(--color-card);
+          padding: 10px;
+          border: 1px solid var(--color-border);
+        }
+
+        .project-kpi-grid article {
+          display: grid;
+          gap: 4px;
+        }
+
+        .project-kpi-grid strong {
+          color: var(--color-text);
+          line-height: 1.25;
+        }
+
+        .project-chart-card,
+        .project-list-panel {
+          display: grid;
+          gap: 12px;
+        }
+
+        .project-chart-frame {
+          min-height: 220px;
+          min-width: 0;
+        }
+
+        .project-split {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .top-items-scroll {
+          max-height: 280px;
+          overflow-y: auto;
+          overflow-x: hidden;
+          padding-right: 4px;
+        }
+
+        .segmented-control {
+          display: flex;
+          gap: 6px;
+          padding: 4px;
+          border-radius: 8px;
+          background: var(--color-primary-soft);
+        }
+
+        .segmented-control button {
+          min-height: 34px;
+          border: 0;
+          border-radius: 8px;
+          background: transparent;
+          color: var(--color-text-muted);
+          padding: 7px 10px;
+          font: inherit;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .segmented-control button.is-active {
+          background: var(--color-card);
+          color: var(--color-primary);
+          box-shadow: 0 5px 14px rgba(84, 59, 40, 0.1);
+        }
+
+        .panel-link {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          border-radius: 8px;
+          border: 1px solid var(--color-primary);
+          background: var(--color-primary);
+          color: #ffffff;
+          padding: 9px 12px;
+          font-weight: 800;
+          text-decoration: none;
+        }
+
+        .project-summary-list {
+          display: grid;
+          gap: 8px;
+          align-content: start;
+          max-height: 430px;
+          overflow: auto;
+        }
+
+        .project-summary-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+          text-align: left;
+          border: 1px solid var(--color-border);
+          border-radius: 12px;
+          padding: 12px;
+          background: var(--color-card);
+          cursor: pointer;
+        }
+
+        .project-summary-row div {
+          display: grid;
+          gap: 4px;
+          min-width: 0;
+        }
+
+        .project-summary-row strong,
+        .project-summary-row b {
+          color: var(--color-text);
+        }
+
+        .project-summary-row span {
+          color: var(--color-text-muted);
+          font-size: 12px;
+          line-height: 1.4;
+        }
+
+        .project-summary-row.is-selected {
+          border-color: rgba(107, 79, 58, 0.18);
+          background: var(--color-primary-soft);
+          box-shadow: inset 0 0 0 1px rgba(107, 79, 58, 0.1);
+        }
+
+        .empty-project-stats {
+          min-height: 120px;
+          display: grid;
+          place-items: center;
+          border: 1px dashed var(--color-border);
+          border-radius: 12px;
+          color: var(--color-text-muted);
+          background: #fbfaf7;
+          text-align: center;
+          padding: 20px;
+        }
+
+        @media (max-width: 900px) {
+          .project-grid,
+          .project-split {
+            grid-template-columns: 1fr;
+          }
+
+          .project-kpi-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+      `}</style>
+    </section>
+  );
+}
+
+function ProjectListPanel({ title, emptyLabel, rows, renderRow }) {
+  return (
+    <div className="project-list-panel">
+      <strong className="project-list-title">{title}</strong>
+      {rows.length ? (
+        <div className="project-list-rows">
+          {rows.map((row, index) => (
+            <div key={row.id || row.contractNumber || row.label || row.status || row.kitchenName || index} className="project-list-row">
+              {renderRow(row)}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyChart label={emptyLabel} />
+      )}
+      <style jsx>{`
+        .project-list-panel {
+          display: grid;
+          gap: 10px;
+          min-width: 0;
+          border-radius: 8px;
+          background: var(--color-card);
+          padding: 10px;
+          border: 1px solid var(--color-border);
+        }
+
+        .project-list-title {
+          color: var(--color-text);
+        }
+
+        .project-list-rows {
+          display: grid;
+          gap: 8px;
+          max-height: 280px;
+          overflow: auto;
+        }
+
+        .project-list-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          border: 1px solid var(--color-border);
+          border-radius: 10px;
+          background: #fbfaf7;
+          padding: 10px;
+        }
+
+        .project-list-row :global(div) {
+          display: grid;
+          gap: 3px;
+          min-width: 0;
+        }
+
+        .project-list-row :global(strong),
+        .project-list-row :global(b) {
+          color: var(--color-text);
+          font-size: 13px;
+        }
+
+        .project-list-row :global(span) {
+          color: var(--color-text-muted);
+          font-size: 12px;
+          line-height: 1.4;
+        }
+
+        .project-list-row :global(b) {
+          white-space: nowrap;
+        }
+      `}</style>
+    </div>
   );
 }
 
@@ -1402,6 +2093,10 @@ function splitLocationLabel(value) {
   const separatorIndex = label.lastIndexOf(", ");
   if (separatorIndex === -1) return [label, ""];
   return [label.slice(0, separatorIndex), label.slice(separatorIndex + 2)];
+}
+
+function formatProjectStatus(value) {
+  return String(value || "active").replace(/_/g, " ");
 }
 
 function getDistributionColor(label, index) {

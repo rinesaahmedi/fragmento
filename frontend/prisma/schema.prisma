@@ -58,6 +58,11 @@ model KitchenItem {
   name          String
   price         Decimal     @db.Decimal(10, 2)
   infoText      String?
+  productInfoPdfPath       String?
+  productInfoSummary       String?
+  productInfoKeyFacts      Json?
+  productInfoExtractedText String?
+  productInfoUpdatedAt     DateTime?
   iconKey       String?
   colorKey      String?
   componentKey  String?

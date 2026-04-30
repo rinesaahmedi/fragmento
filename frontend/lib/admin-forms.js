@@ -13,6 +13,14 @@ function optionalString(value) {
   return nextValue || null;
 }
 
+function optionalStringList(value) {
+  const items = String(value || "")
+    .split(/\r?\n/)
+    .map((item) => item.trim().replace(/^-\s*/, ""))
+    .filter(Boolean);
+  return items.length ? items : null;
+}
+
 const PROJECT_STATUSES = ["planning", "active", "on_hold", "completed", "archived"];
 
 function parseKitchenStatus(value) {
@@ -75,6 +83,11 @@ export function validateKitchenItemInput(formData) {
     componentKey: optionalString(formData.get("componentKey")),
     sortOrder: validateSortOrder(formData.get("sortOrder")),
     infoText: optionalString(formData.get("infoText")),
+    productInfoPdfPath: optionalString(formData.get("productInfoPdfPath")),
+    productInfoSummary: optionalString(formData.get("productInfoSummary")),
+    productInfoKeyFacts: optionalStringList(formData.get("productInfoKeyFacts")),
+    productInfoExtractedText: optionalString(formData.get("productInfoExtractedText")),
+    productInfoUpdatedAt: optionalString(formData.get("productInfoPdfPath")) ? new Date() : null,
     isLocked: formData.get("isLocked") === "true",
     isActive: formData.get("isActive") === "true",
   };

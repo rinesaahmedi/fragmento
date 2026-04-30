@@ -10,6 +10,10 @@ export const KITCHEN_CATALOG_COLUMNS = [
   "itemType",
   "price",
   "infoText",
+  "productInfoPdfPath",
+  "productInfoSummary",
+  "productInfoKeyFacts",
+  "productInfoExtractedText",
   "iconKey",
   "colorKey",
   "componentKey",
@@ -23,7 +27,7 @@ const KITCHEN_CATALOG_COLUMN_LABELS = {
   articleNumber: "Article Number",
 };
 
-const COLUMN_WIDTHS = [10, 26, 24, 22, 28, 16, 12, 42, 20, 16, 22, 12, 12, 12];
+const COLUMN_WIDTHS = [10, 26, 24, 22, 28, 16, 12, 42, 34, 46, 46, 60, 20, 16, 22, 12, 12, 12];
 
 function getColumnLabel(column) {
   return KITCHEN_CATALOG_COLUMN_LABELS[column] || column;
@@ -52,6 +56,16 @@ function requiredString(value, label, rowNumber) {
 function optionalString(value) {
   const nextValue = String(value || "").trim();
   return nextValue || null;
+}
+
+function optionalStringList(value) {
+  const nextValue = String(value || "").trim();
+  if (!nextValue) return null;
+  const items = nextValue
+    .split(/\r?\n|;/)
+    .map((item) => item.trim().replace(/^-\s*/, ""))
+    .filter(Boolean);
+  return items.length ? items : null;
 }
 
 function parseItemType(value, rowNumber) {
@@ -92,24 +106,38 @@ function parseBoolean(value, label, rowNumber) {
 function normalizeImportedRecord(record, rowNumber) {
   const id = optionalString(record.id);
   const code = requiredString(record.code, "Item Code", rowNumber);
+  const data = {
+    code,
+    articleNumber: optionalString(record.articleNumber),
+    name: requiredString(record.name, "name", rowNumber),
+    itemType: parseItemType(record.itemType, rowNumber),
+    price: parsePrice(record.price, rowNumber),
+    infoText: optionalString(record.infoText),
+    iconKey: optionalString(record.iconKey),
+    colorKey: optionalString(record.colorKey),
+    componentKey: optionalString(record.componentKey),
+    sortOrder: parseSortOrder(record.sortOrder, rowNumber),
+    isLocked: parseBoolean(record.isLocked, "isLocked", rowNumber),
+    isActive: parseBoolean(record.isActive, "isActive", rowNumber),
+  };
+
+  if (Object.prototype.hasOwnProperty.call(record, "productInfoPdfPath")) {
+    data.productInfoPdfPath = optionalString(record.productInfoPdfPath);
+  }
+  if (Object.prototype.hasOwnProperty.call(record, "productInfoSummary")) {
+    data.productInfoSummary = optionalString(record.productInfoSummary);
+  }
+  if (Object.prototype.hasOwnProperty.call(record, "productInfoKeyFacts")) {
+    data.productInfoKeyFacts = optionalStringList(record.productInfoKeyFacts);
+  }
+  if (Object.prototype.hasOwnProperty.call(record, "productInfoExtractedText")) {
+    data.productInfoExtractedText = optionalString(record.productInfoExtractedText);
+  }
 
   return {
     id,
     code,
-    data: {
-      code,
-      articleNumber: optionalString(record.articleNumber),
-      name: requiredString(record.name, "name", rowNumber),
-      itemType: parseItemType(record.itemType, rowNumber),
-      price: parsePrice(record.price, rowNumber),
-      infoText: optionalString(record.infoText),
-      iconKey: optionalString(record.iconKey),
-      colorKey: optionalString(record.colorKey),
-      componentKey: optionalString(record.componentKey),
-      sortOrder: parseSortOrder(record.sortOrder, rowNumber),
-      isLocked: parseBoolean(record.isLocked, "isLocked", rowNumber),
-      isActive: parseBoolean(record.isActive, "isActive", rowNumber),
-    },
+    data,
   };
 }
 
@@ -185,6 +213,10 @@ export function buildKitchenCatalogWorkbook(kitchen) {
       item.itemType,
       Number(item.price).toFixed(2),
       item.infoText || "",
+      item.productInfoPdfPath || "",
+      item.productInfoSummary || "",
+      Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts.join("\n") : "",
+      item.productInfoExtractedText || "",
       item.iconKey || "",
       item.colorKey || "",
       item.componentKey || "",
@@ -231,7 +263,14 @@ function parseKitchenCatalogRows(rows) {
   }
 
   const headers = rows[headerIndex].map(getColumnKey);
-  const requiredColumns = KITCHEN_CATALOG_COLUMNS.filter((column) => column !== "articleNumber");
+  const optionalColumns = new Set([
+    "articleNumber",
+    "productInfoPdfPath",
+    "productInfoSummary",
+    "productInfoKeyFacts",
+    "productInfoExtractedText",
+  ]);
+  const requiredColumns = KITCHEN_CATALOG_COLUMNS.filter((column) => !optionalColumns.has(column));
   const missingColumns = requiredColumns.filter((column) => !headers.includes(column));
   if (missingColumns.length) {
     throw new Error(`Missing columns: ${missingColumns.map(getColumnLabel).join(", ")}.`);

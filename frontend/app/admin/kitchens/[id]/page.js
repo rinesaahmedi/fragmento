@@ -225,6 +225,11 @@ function serializeKitchenItem(item) {
     name: item.name,
     price: Number(item.price),
     infoText: item.infoText || "",
+    productInfoPdfPath: item.productInfoPdfPath || "",
+    productInfoSummary: item.productInfoSummary || "",
+    productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],
+    productInfoExtractedText: item.productInfoExtractedText || "",
+    productInfoUpdatedAt: item.productInfoUpdatedAt instanceof Date ? item.productInfoUpdatedAt.toISOString() : "",
     iconKey: item.iconKey || "",
     colorKey: item.colorKey || "",
     componentKey: item.componentKey || "",
@@ -363,6 +368,18 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
               <textarea name="infoText" rows={3} style={textareaStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoPdfPath" fallback="Product info PDF path" />} wide>
+              <input name="productInfoPdfPath" placeholder="/product-info/example.pdf" style={inputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoSummary" fallback="Product info summary" />} wide>
+              <textarea name="productInfoSummary" rows={2} style={textareaStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoKeyFacts" fallback="Product info key facts" />} wide>
+              <textarea name="productInfoKeyFacts" rows={4} placeholder="One key fact per line" style={textareaStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoExtractedText" fallback="Product info extracted text" />} wide>
+              <textarea name="productInfoExtractedText" rows={5} style={textareaStyle} />
             </FormField>
             <div style={{ gridColumn: "1 / -1", ...checkboxRowStyle }}>
               <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -516,6 +533,18 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
                     <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
                       <textarea name="infoText" defaultValue={item.infoText || ""} rows={2} style={compactTextareaStyle} />
+                    </FormField>
+                    <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoPdfPath" fallback="Product info PDF path" />} wide>
+                      <input name="productInfoPdfPath" defaultValue={item.productInfoPdfPath || ""} style={compactInputStyle} />
+                    </FormField>
+                    <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoSummary" fallback="Product info summary" />} wide>
+                      <textarea name="productInfoSummary" defaultValue={item.productInfoSummary || ""} rows={2} style={compactTextareaStyle} />
+                    </FormField>
+                    <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoKeyFacts" fallback="Product info key facts" />} wide>
+                      <textarea name="productInfoKeyFacts" defaultValue={(item.productInfoKeyFacts || []).join("\n")} rows={4} style={compactTextareaStyle} />
+                    </FormField>
+                    <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoExtractedText" fallback="Product info extracted text" />} wide>
+                      <textarea name="productInfoExtractedText" defaultValue={item.productInfoExtractedText || ""} rows={5} style={compactTextareaStyle} />
                     </FormField>
 
                     <div style={compactFooterStyle}>
