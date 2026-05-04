@@ -353,6 +353,8 @@
 }
 
 .itemCard {
+  position: relative;
+  z-index: 0;
   width: 100%;
   text-align: left;
   border-radius: 18px;
@@ -364,11 +366,13 @@
 }
 
 .itemCard:hover {
+  z-index: 2;
   transform: translateY(-1px);
   box-shadow: 0 12px 24px rgba(71, 46, 20, 0.08);
 }
 
 .itemCard:focus-visible {
+  z-index: 2;
   outline: 2px solid rgba(24, 116, 255, 0.42);
   outline-offset: 2px;
 }
@@ -433,6 +437,20 @@
   overflow-wrap: anywhere;
 }
 
+.itemLinkedBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  margin-top: 6px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f6eadb;
+  color: #7a4d27;
+  font-size: 0.75rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .itemText p {
   margin: 6px 0 0;
   color: #7d7166;
@@ -491,19 +509,25 @@
   font-size: 0.84rem;
 }
 
-.itemPdfLink {
+.itemInfoWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.itemInfoTrigger {
   appearance: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 54px;
+  width: 34px;
   height: 34px;
-  padding: 0 12px;
+  padding: 0;
   border-radius: 999px;
   border: 1px solid rgba(120, 90, 64, 0.18);
   background: #fff8f0;
   color: #7a4d27;
-  font-size: 0.84rem;
+  font-size: 0.95rem;
   font-weight: 800;
   text-decoration: none;
   cursor: pointer;
@@ -515,7 +539,7 @@
     color 0.16s ease;
 }
 
-.itemPdfLink:hover {
+.itemInfoTrigger:hover {
   transform: translateY(-1px);
   border-color: rgba(122, 77, 39, 0.45);
   background: #fff0dc;
@@ -523,9 +547,94 @@
   box-shadow: 0 10px 18px rgba(122, 77, 39, 0.14);
 }
 
-.itemPdfLink:focus-visible {
+.itemInfoTrigger:focus-visible {
   outline: 2px solid rgba(24, 116, 255, 0.42);
   outline-offset: 2px;
+}
+
+.itemInfoTooltip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 10px);
+  z-index: 6;
+  display: grid;
+  gap: 8px;
+  width: min(260px, calc(100vw - 48px));
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(45, 37, 28, 0.97);
+  color: #fff8f0;
+  box-shadow: 0 18px 32px rgba(39, 26, 14, 0.22);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(6px);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.itemInfoTooltipPreview {
+  display: flex;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgba(255, 248, 240, 0.08);
+}
+
+.itemInfoTooltipPreviewImage {
+  display: block;
+  width: 100%;
+  max-width: 228px;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.itemInfoTooltipBody {
+  display: grid;
+  gap: 8px;
+}
+
+.itemInfoTooltipDocs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.itemInfoTooltipDocChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(255, 248, 240, 0.12);
+  color: rgba(255, 248, 240, 0.92);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.itemInfoTooltip strong {
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.itemInfoTooltipFacts {
+  display: grid;
+  gap: 4px;
+  color: rgba(255, 248, 240, 0.84);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.itemInfoWrap:hover .itemInfoTooltip,
+.itemInfoWrap:focus-within .itemInfoTooltip {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.catalogSection:first-of-type .catalogGrid > *:nth-child(-n + 2) .itemInfoTooltip {
+  top: calc(100% + 10px);
+  bottom: auto;
+  transform: translateY(-6px);
 }
 
 .productInfoOverlay {
@@ -545,8 +654,8 @@
   max-height: min(92vh, 960px);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px;
+  gap: 10px;
+  padding: 16px;
   border-radius: 8px;
   background: #fffdf9;
   box-shadow: 0 32px 80px rgba(36, 24, 13, 0.24);
@@ -554,13 +663,13 @@
 
 .productInfoHeader {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
 
 .productInfoHeader h2 {
-  margin: 4px 0 0;
+  margin: 0;
   color: #2f2a24;
 }
 
@@ -604,68 +713,56 @@
 
 .productInfoActions {
   display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   justify-content: flex-end;
+}
+
+.productInfoToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .productInfoContent {
   min-height: 0;
-  display: grid;
-  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
-  gap: 14px;
+  display: block;
   flex: 1 1 auto;
 }
 
-.productInfoAssistant,
 .productInfoPdfColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   min-height: 0;
 }
 
-.productInfoAssistant {
+.productInfoDocumentTabs {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  overflow: auto;
-  padding-right: 2px;
-}
-
-.productInfoAssistantSection {
-  display: grid;
+  flex-wrap: wrap;
   gap: 8px;
-  padding: 12px;
-  border: 1px solid rgba(120, 90, 64, 0.12);
-  border-radius: 8px;
-  background: #fffaf3;
 }
 
-.productInfoAssistantSection h3 {
-  margin: 0;
-  color: #2f2a24;
-  font-size: 0.95rem;
-}
-
-.productInfoAssistantSection p {
-  margin: 0;
-  color: #5f554b;
-  font-size: 0.9rem;
-  line-height: 1.45;
-}
-
-.productInfoAssistantSection ul {
-  margin: 0;
-  padding-left: 18px;
-  color: #5f554b;
-  font-size: 0.9rem;
-  line-height: 1.45;
-}
-
-.productInfoAssistantCtaRow {
-  display: flex;
-}
-
-.productInfoAssistantHint {
-  color: #6d6156;
-  font-size: 0.84rem;
+.productInfoDocumentTab,
+.productInfoDocumentTabActive {
+  appearance: none;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  background: #fff;
+  color: #5e4632;
+  font: inherit;
   font-weight: 700;
+  cursor: pointer;
+}
+
+.productInfoDocumentTabActive {
+  border-color: rgba(122, 77, 39, 0.42);
+  background: #fff3e4;
+  color: #4f331d;
 }
 
 .productAssistantLauncher,
@@ -1570,13 +1667,12 @@
     font-size: 0.82rem;
   }
 
-  .productInfoContent {
-    grid-template-columns: 1fr;
-    overflow: auto;
+  .productInfoToolbar {
+    align-items: stretch;
   }
 
-  .productInfoAssistant {
-    overflow: visible;
+  .productInfoContent {
+    overflow: auto;
   }
 
   .productAssistantDock {
@@ -1686,5 +1782,9 @@
 
   .summaryActions {
     align-items: flex-start;
+  }
+
+  .itemInfoTooltip {
+    display: none;
   }
 }

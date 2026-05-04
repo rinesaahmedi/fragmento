@@ -67,6 +67,34 @@ const ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
 };
 
+const TOOLTIP_PREVIEW_BY_CODE = {
+  "DISH-B-600-STD": "/product-info-previews/dishwasher-preview.png",
+  "DISH-C-600-STD": "/product-info-previews/dishwasher-preview.png",
+  "REF-B-545-1800-700": "/product-info-previews/fridge-preview.png",
+  "REF-C-545-1800-700": "/product-info-previews/fridge-preview.png",
+  "HOOD-B-FH664621E": "/product-info-previews/hood-preview.png",
+  "HOOD-C-FH664621E": "/product-info-previews/hood-preview.png",
+  "OVEN-B-600-HOB": "/product-info-previews/oven-hob-preview.png",
+  "OVEN-C-600-HOB": "/product-info-previews/oven-hob-preview.png",
+};
+
+function getTooltipFacts(item) {
+  return (Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : [])
+    .map((fact) => String(fact || "").trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function getTooltipPreviewSrc(item) {
+  return TOOLTIP_PREVIEW_BY_CODE[item?.tooltipPreviewCode || item?.code] || "";
+}
+
+function getTooltipDocumentLabels(item) {
+  return (Array.isArray(item?.productInfoDocuments) ? item.productInfoDocuments : [])
+    .map((document) => String(document?.label || "").trim())
+    .filter(Boolean);
+}
+
 function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHref, onClick, onOpenInfo }) {
   const className = [
     styles.itemCard,
@@ -76,6 +104,9 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
   ]
     .filter(Boolean)
     .join(" ");
+  const tooltipFacts = getTooltipFacts(item);
+  const tooltipPreviewSrc = getTooltipPreviewSrc(item);
+  const tooltipDocumentLabels = getTooltipDocumentLabels(item);
   const handleCardKeyDown = (event) => {
     if (locked || disabled) {
       return;
@@ -101,6 +132,7 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
         <div className={styles.itemText}>
           <strong>{item.name}</strong>
           {item.code ? <span className={styles.itemCode}>Code: {item.code}</span> : null}
+          {item.linkedInfoBadge ? <span className={styles.itemLinkedBadge}>{item.linkedInfoBadge}</span> : null}
           {item.infoText ? <p>{item.infoText}</p> : null}
         </div>
         <span className={styles.itemPrice}>{formatCurrency(price ?? item.price)}</span>
@@ -112,16 +144,49 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
         <div className={styles.itemMetaAside}>
           {hint ? <span className={styles.ruleHint}>{hint}</span> : null}
           {infoPdfHref ? (
-            <button
-              type="button"
-              className={styles.itemPdfLink}
-              onClick={(event) => {
-                event.stopPropagation();
-                onOpenInfo?.({ item, price, infoPdfHref });
-              }}
-            >
-              PDF
-            </button>
+            <span className={styles.itemInfoWrap}>
+              <button
+                type="button"
+                className={styles.itemInfoTrigger}
+                aria-label={`Infos zu ${item.name}`}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onOpenInfo?.({ item, price, infoPdfHref });
+                }}
+              >
+                i
+              </button>
+              <span className={styles.itemInfoTooltip} role="tooltip">
+                {tooltipPreviewSrc ? (
+                  <span className={styles.itemInfoTooltipPreview}>
+                    <img
+                      src={tooltipPreviewSrc}
+                      alt=""
+                      className={styles.itemInfoTooltipPreviewImage}
+                    />
+                  </span>
+                ) : null}
+                <span className={styles.itemInfoTooltipBody}>
+                  {item.infoText ? <strong>{item.infoText}</strong> : null}
+                  {tooltipDocumentLabels.length ? (
+                    <span className={styles.itemInfoTooltipDocs}>
+                      {tooltipDocumentLabels.map((label) => (
+                        <span key={label} className={styles.itemInfoTooltipDocChip}>{label}</span>
+                      ))}
+                    </span>
+                  ) : null}
+                  {tooltipFacts.length ? (
+                    <span className={styles.itemInfoTooltipFacts}>
+                      {tooltipFacts.map((fact) => (
+                        <span key={fact}>{fact}</span>
+                      ))}
+                    </span>
+                  ) : (
+                    <span>Mehr Infos per Klick.</span>
+                  )}
+                </span>
+              </span>
+            </span>
           ) : null}
         </div>
       </div>

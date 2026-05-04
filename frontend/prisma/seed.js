@@ -4,69 +4,74 @@ const { PrismaClient, KitchenStatus, ItemType } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
+const PRODUCT_INFO_FILES = {
+  dishwasher: "/product-info/AMICA_A-EGSPV597210_Produktinformation_Eco21.pdf",
+  oven: "/product-info/AMICA_EBX_943_600_S_Produktinformation.pdf",
+  hood: "/product-info/AMICA_FH_664_621_S_Produktinformation.pdf",
+  fridge: "/product-info/AMICA_KGC_15495_S_Produktinformation_Eco21.pdf",
+};
+
 const PRODUCT_INFO_BY_CODE = {
   "DISH-600-STD": {
-    productInfoPdfPath: "/product-info/dishwasher-product-info.pdf",
-    productInfoSummary: "Vollintegrierter Geschirrspueler fuer den Einbau in die Kuechenzeile. Die Produktinformation nennt 12 Massgedecke und die Einbindung hinter einer Moebelfront.",
+    productInfoPdfPath: PRODUCT_INFO_FILES.dishwasher,
+    productInfoSummary: "Vollintegrierter 60-cm-Geschirrspueler fuer den Einbau hinter einer Moebelfront. Die aktuelle Produktinformation nennt 12 Massgedecke, Energieklasse D und 5 Programme.",
     productInfoKeyFacts: [
-      "Produkttyp: vollintegrierter Geschirrspueler.",
-      "Kapazitaet: 12 Massgedecke.",
-      "Einbaugeraet fuer die Integration in die Kuechenzeile.",
-      "Die Bedien- und Produktinformationen des PDF beachten.",
+      "Energieklasse: D",
+      "Geraeusch: 49 dB",
+      "Breite: 60 cm",
+      "Programme: 5",
+      "Kapazitaet: 12 Massgedecke",
     ],
     productInfoExtractedText: [
-      "Produktname: Vollintegrierter Geschirrspueler.",
+      "Produktname: Architecto / AMICA A-EGSPV597210 Geschirrspueler, 60 cm.",
       "Wichtige Punkte:",
-      "- Produkttyp: vollintegrierter Geschirrspueler.",
-      "- Kapazitaet: 12 Massgedecke.",
-      "- Einbaugeraet fuer die Integration in die Kuechenzeile.",
-      "- Die Bedien- und Produktinformationen des PDF beachten.",
+      "- Produkttyp: vollintegrierter Einbau-Geschirrspueler.",
+      "- 12 Massgedecke, 5 Programme, 4 Temperaturen.",
+      "- Energieklasse D, 82 kWh / 100 Zyklen, 11.0 l / Zyklus.",
+      "- Geraeusch: 49 dB(A), Klasse C.",
+      "- Ausstattung: Aquastop, Extra Dry, OpenDry, halbe Beladung, Startzeitvorwahl 3/6/9 h.",
       "Auswahlhinweise:",
       "- Vor der Bestellung Einbaumass, Frontintegration und Anschlussposition pruefen.",
     ].join("\n"),
   },
   "REF-545-1800-700": {
-    productInfoPdfPath: "/product-info/fridge-product-info.pdf",
-    productInfoSummary: "Kuehl-Gefriergeraet fuer die Kuechenplanung. Die Produktinformation nennt NoFrost und eine Edelstahl-Ausfuehrung.",
+    productInfoPdfPath: PRODUCT_INFO_FILES.fridge,
+    productInfoSummary: "Freistehende Kuehl-Gefrierkombination KGC 15495 S fuer die Kuechenplanung. Die aktuelle Produktinformation nennt NoFrost, 180 cm Bauhoehe und Energieklasse E.",
     productInfoKeyFacts: [
-      "Produkttyp: Kuehl-Gefriergeraet.",
-      "Technisches Merkmal: NoFrost.",
-      "Nutzinhalt total: 250 l.",
-      "Kuehlen: 180 l.",
-      "Gefrieren: 70 l.",
-      "Ausfuehrung: Edelstahl.",
-      "Einbau- und Aufstellhinweise des PDF beachten.",
+      "Energieklasse: E",
+      "Geraeusch: 41 dB",
+      "Hoehe: 180 cm",
+      "Nutzinhalt: 250 l",
+      "NoFrost: Kuehlen und Gefrieren",
     ],
     productInfoExtractedText: [
-      "Produktname: Kuehl-Gefriergeraet.",
+      "Produktname: AMICA KGC 15495 S Kuehl-/Gefrierkombination, 180 cm.",
       "Wichtige Punkte:",
-      "- Produkttyp: Kuehl-Gefriergeraet.",
-      "- Technisches Merkmal: NoFrost.",
-      "- Nutzinhalt total: 250 l.",
-      "- Kuehlen: 180 l.",
-      "- Gefrieren: 70 l.",
-      "- Ausfuehrung: Edelstahl.",
-      "- Einbau- und Aufstellhinweise des PDF beachten.",
+      "- Freistehendes Kuehl-Gefriergeraet mit NoFrost und automatischer Abtauung.",
+      "- Energieklasse E, Jahresverbrauch 219 kWh, Geraeusch 41 dB(A), Klasse C.",
+      "- Kuehlen 180 l, Gefrieren 70 l, 4-Sterne-Gefrierteil.",
+      "- Ausstattung: FreshZone, VitControl Plus, LED-Licht, Flaschenregal, 3 Gefrierschubladen.",
       "Auswahlhinweise:",
       "- Vor der Bestellung Geraetemass, Tueranschlag und Belueftung im Kuechenplan pruefen.",
     ].join("\n"),
   },
   "HOOD-600-FLAT": {
-    productInfoPdfPath: "/product-info/extractor-hood-flat-product-info.pdf",
-    productInfoSummary: "Flache Dunstabzugshaube fuer eine 60-cm-Kuechenloesung. Die Produktinformation gehoert zur flachen Haubenvariante.",
+    productInfoPdfPath: PRODUCT_INFO_FILES.hood,
+    productInfoSummary: "Flachschirmhaube FH 664 621 S fuer eine 60-cm-Kuechenloesung. Die aktuelle Produktinformation nennt Energieklasse A und bis zu 70 dB Betriebsgeraesch.",
     productInfoKeyFacts: [
-      "Produkttyp: flache Dunstabzugshaube.",
-      "Breite: 60 cm.",
-      "Einbau in den passenden Haubenbereich der Kueche.",
-      "Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
+      "Energieklasse: A",
+      "Geraeusch: max. 70 dB",
+      "Breite: 60 cm",
+      "Luftleistung: 170-415 m3/h",
+      "Betriebsart: Abluft / Umluft",
     ],
     productInfoExtractedText: [
-      "Produktname: Flachschirmhaube, 60 cm.",
+      "Produktname: AMICA FH 664 621 S Flachschirmhaube, 60 cm.",
       "Wichtige Punkte:",
-      "- Produkttyp: flache Dunstabzugshaube.",
-      "- Breite: 60 cm.",
-      "- Einbau in den passenden Haubenbereich der Kueche.",
-      "- Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
+      "- Teleskophaube / Flachschirmhaube in Schwarz mit mechanischen Schaltern.",
+      "- Energieklasse A, Jahresverbrauch 24.8 kWh, Fluid-Dynamic-Effizienzklasse B.",
+      "- 3 Leistungsstufen, Luftleistung 170-415 m3/h, Geraeusch 49-70 dB.",
+      "- 2 LED-Leuchten, 2 spuelmaschinengeeignete Aluminium-Fettfilter.",
       "Auswahlhinweise:",
       "- Vor der Bestellung Einbauposition und Luftfuehrung pruefen.",
     ].join("\n"),
@@ -94,8 +99,10 @@ const PRODUCT_INFO_BY_CODE = {
     ].join("\n"),
   },
   "DISH-B-600-STD": null,
+  "OVEN-B-600-HOB": null,
   "REF-B-545-1800-700": null,
   "HOOD-B-FH664621E": null,
+  "OVEN-C-600-HOB": null,
   "REF-C-545-1800-700": null,
   "HOOD-C-FH664621E": null,
   "WM-C-EWA34660W": null,
@@ -106,63 +113,44 @@ PRODUCT_INFO_BY_CODE["DISH-B-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-C-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = {
   ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"],
-  productInfoSummary: "Kuehl-Gefriergeraet OL-KGCN388140E fuer die Kuechenplanung. Die Produktinformation nennt NoFrost und eine Edelstahl-Ausfuehrung.",
-  productInfoKeyFacts: [
-    "Produkttyp: Kuehl-Gefriergeraet.",
-    "Modell: OL-KGCN388140E.",
-    "Technisches Merkmal: NoFrost.",
-    "Nutzinhalt total: 250 l.",
-    "Kuehlen: 180 l.",
-    "Gefrieren: 70 l.",
-    "Ausfuehrung: Edelstahl.",
-    "Einbau- und Aufstellhinweise des PDF beachten.",
-  ],
   productInfoExtractedText: PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoExtractedText
-    .replace("Produktname: Kuehl-Gefriergeraet.", "Produktname: Kuehl-Gefriergeraet OL-KGCN388140E.")
+    .replace("Produktname: AMICA KGC 15495 S Kuehl-/Gefrierkombination, 180 cm.", "Produktname: AMICA KGC 15495 S Kuehl-/Gefrierkombination, 180 cm.")
     .replace(
-      "- Produkttyp: Kuehl-Gefriergeraet.",
-      "- Produkttyp: Kuehl-Gefriergeraet.\n- Modell: OL-KGCN388140E.",
+      "- Freistehendes Kuehl-Gefriergeraet mit NoFrost und automatischer Abtauung.",
+      "- Modell: KGC 15495 S.\n- Freistehendes Kuehl-Gefriergeraet mit NoFrost und automatischer Abtauung.",
     ),
 };
 PRODUCT_INFO_BY_CODE["REF-C-545-1800-700"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
-  productInfoPdfPath: "/product-info/extractor-hood-flat-product-info.pdf",
-  productInfoSummary: "Dunstabzugshaube FH664621E fuer eine 60-cm-Kuechenloesung. Die Produktinformation nennt einen maximalen Luftstrom von 415 m3/h.",
-  productInfoKeyFacts: [
-    "Produkttyp: Dunstabzugshaube.",
-    "Modell: FH664621E.",
-    "Breite: 60 cm.",
-    "Maximaler Luftstrom: 415 m3/h.",
-    "Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
-  ],
-  productInfoExtractedText: [
-    "Produktname: Flachschirmhaube, 60 cm FH 664 621 E.",
-    "Wichtige Punkte:",
-    "- Produkttyp: Dunstabzugshaube.",
-    "- Modell: FH664621E.",
-    "- Breite: 60 cm.",
-    "- Maximaler Luftstrom: 415 m3/h.",
-    "- Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
-    "Auswahlhinweise:",
-    "- Vor der Bestellung Einbauposition und Luftfuehrung pruefen.",
-  ].join("\n"),
+  ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"],
 };
 PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"] = {
   ...PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"],
-  productInfoPdfPath: "/product-info/extractor-hood-chimney-product-info.pdf",
-  productInfoSummary: "Kamin-Dunstabzugshaube FH664621E fuer eine 60-cm-Kuechenloesung. Die Produktinformation nennt einen maximalen Luftstrom von 415 m3/h.",
-  productInfoKeyFacts: [
-    "Produkttyp: Kamin-Dunstabzugshaube.",
-    "Modell: FH664621E.",
-    "Breite: 60 cm.",
-    "Maximaler Luftstrom: 415 m3/h.",
-    "Montage- und Abluft/Umluft-Hinweise des PDF beachten.",
-  ],
-  productInfoExtractedText: PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"].productInfoExtractedText
-    .replace("Produktname: Flachschirmhaube, 60 cm FH 664 621 E.", "Produktname: Kamin-Dunstabzugshaube FH 664 621 E.")
-    .replace("- Produkttyp: Dunstabzugshaube.", "- Produkttyp: Kamin-Dunstabzugshaube."),
+  productInfoSummary: "Flachschirmhaube FH 664 621 S fuer die Kochwand. Die aktuelle Produktinformation nennt Energieklasse A, 60 cm Breite und bis zu 70 dB.",
 };
 PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
+PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
+  productInfoPdfPath: PRODUCT_INFO_FILES.oven,
+  productInfoSummary: "Kombinierte Auswahl aus Einbaubackofen EBX 943 600 S und Induktionskochfeld OL-KMI 754 000 E. Die aktuellen Produktinformationen nennen 77 l Garraum, 9 Backofenfunktionen sowie 4 Kochzonen mit 9 Leistungsstufen.",
+  productInfoKeyFacts: [
+    "Backofen: Energieklasse A",
+    "Backofen: 77 l Volumen, 9 Funktionen",
+    "Kochfeld: 60 cm, 4 Kochzonen",
+    "Kochfeld: 9 Leistungsstufen",
+    "Set: Backofen + Induktionskochfeld",
+  ],
+  productInfoExtractedText: [
+    "Produktname: AMICA EBX 943 600 S Backofen + AMICA OL-KMI 754 000 E Induktionskochfeld.",
+    "Wichtige Punkte:",
+    "- Backofen: Einbau-Elektrobackofen mit 77 l Volumen, Energieklasse A und 9 Funktionen.",
+    "- Backofen: SensorControl Timer, versenkbare Knebel, CoolDoor3, Steam Clean.",
+    "- Kochfeld: autarkes Induktionskochfeld, 60 cm, 4 Kochzonen mit Booster.",
+    "- Kochfeld: 9 Leistungsstufen, Timer, Restwaermeanzeige, Topferkennung, Kindersicherung.",
+    "Auswahlhinweise:",
+    "- Vor der Bestellung Nischenmass, Anschlusswert und Elektroanschluss pruefen.",
+  ].join("\n"),
+};
+PRODUCT_INFO_BY_CODE["OVEN-C-600-HOB"] = PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"];
 
 const DEFAULT_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "DISH-600-STD", legacyCode: "component-dishwasher", name: "Spülmaschine", price: "579.00", infoText: "Amica by architecto", iconKey: "dishwasher", colorKey: "#001f7f", sortOrder: 10 },
@@ -184,15 +172,15 @@ const MODEL_B_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-B-600", legacyCode: "model-b-wall-cabinet-3", name: "Hood Wall Cabinet (600 x 723 x 320 mm)", price: "139.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 30, infoText: "HD6002, light hood setup" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-B-MR-600", legacyCode: "model-b-wall-cabinet-4", name: "Wall Cabinet mid-right (600 x 723 x 320 mm)", price: "139.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 40, infoText: "H6002, 2 adjustable shelves" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-B-R-600", legacyCode: "model-b-wall-cabinet-5", name: "Wall Cabinet right (600 x 723 x 320 mm)", price: "139.00", iconKey: "wall_cabinet_plain", colorKey: "#ff7f9f", componentKey: "wall-cabinet-5", sortOrder: 50, infoText: "H6002, 2 adjustable shelves" },
-  { itemType: ItemType.COMPONENT, code: "HOOD-B-FH664621E", legacyCode: "model-b-extractor-hood", name: "FH664621E Extractor Hood", price: "349.00", iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 52, infoText: "60 cm, max air flow 415 m3/h", articleNumber: "FH664621E" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-B-FH664621E", legacyCode: "model-b-extractor-hood", name: "FH664621E Extractor Hood", price: "349.00", iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 52, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S" },
   { itemType: ItemType.COMPONENT, code: "LIGHT-B-LED-001", legacyCode: "model-b-under-cabinet-light", name: "LED Lighting Set", price: "69.00", iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 55, infoText: "LED lighting set", articleNumber: "KA220043_S3" },
   { itemType: ItemType.COMPONENT, code: "WM-B-EWA34660W", legacyCode: "model-b-base-module-1", name: "Washing Machine (600 x 600 x 878 mm)", price: "548.00", iconKey: "washing_machine_base", colorKey: "springgreen", componentKey: "base-module-1", sortOrder: 60, infoText: "EWA34660W, 8 kg, 1400 rpm", articleNumber: "EWA34660W" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-B-600", legacyCode: "model-b-base-module-2", name: "Sink Base Cabinet (600 x 600 x 878 mm)", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "base-module-2", sortOrder: 70, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
-  { itemType: ItemType.COMPONENT, code: "DISH-B-600-STD", legacyCode: "model-b-base-module-3", name: "Dishwasher (600 x 600 x 878 mm)", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 80, infoText: "Architecto, fully integrated, 12 place settings", articleNumber: "A-EGSPV597210" },
+  { itemType: ItemType.COMPONENT, code: "DISH-B-600-STD", legacyCode: "model-b-base-module-3", name: "Dishwasher (600 x 600 x 878 mm)", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 80, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210" },
   { itemType: ItemType.COMPONENT, code: "TOP-B-3036", legacyCode: "model-b-worktop", name: "Worktop (40 x 600 x 3036 mm)", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 85, isLocked: true, infoText: "PLS, concrete slate gray" },
-  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", legacyCode: "model-b-oven-module", name: "Built-in Oven and Hob (600 x 600 x 878 mm)", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 90, infoText: "Architecto built-in oven with hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", legacyCode: "model-b-oven-module", name: "Built-in Oven and Hob (600 x 600 x 878 mm)", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 90, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-B-STR", legacyCode: "model-b-drawer-module", name: "Base Storage Cabinet (600 x 600 x 878 mm)", price: "1150.00", iconKey: "drawer_base", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 100, infoText: "STR base storage cabinet" },
-  { itemType: ItemType.COMPONENT, code: "REF-B-545-1800-700", legacyCode: "model-b-refrigerator", name: "Refrigerator (545 x 1800 x 700 mm)", price: "579.00", iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 110, infoText: "OL-KGCN388140E, NoFrost, stainless steel", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "REF-B-545-1800-700", legacyCode: "model-b-refrigerator", name: "Refrigerator (545 x 1800 x 700 mm)", price: "579.00", iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 110, infoText: "Fridge-freezer, 180 cm, NoFrost", articleNumber: "KGC 15495 S" },
   { itemType: ItemType.COMPONENT, code: "SINK-B-BOTTON-45", legacyCode: "model-b-sink-faucet", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 120, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Mülltrennsystem", price: "89.00", iconKey: "waste_system", sortOrder: 200 },
   { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Besteckeinsatz ZB60SG", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert for 60 cm cabinet", articleNumber: "ZB60SG" },
@@ -202,10 +190,10 @@ const MODEL_B_ITEMS = [
 ];
 
 const MODEL_C_ITEMS = [
-  { itemType: ItemType.COMPONENT, code: "REF-C-545-1800-700", legacyCode: "model-c-refrigerator", name: "Refrigerator (545 x 1800 x 700 mm)", price: "579.00", iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "OL-KGCN388140E, NoFrost, stainless steel", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "HOOD-C-FH664621E", legacyCode: "model-c-extractor-hood", name: "FH664621E Extractor Hood", price: "349.00", iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "60 cm, max air flow 415 m3/h" },
+  { itemType: ItemType.COMPONENT, code: "REF-C-545-1800-700", legacyCode: "model-c-refrigerator", name: "Refrigerator (545 x 1800 x 700 mm)", price: "579.00", iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 180 cm, NoFrost", articleNumber: "KGC 15495 S" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-C-FH664621E", legacyCode: "model-c-extractor-hood", name: "FH664621E Extractor Hood", price: "349.00", iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S" },
   { itemType: ItemType.COMPONENT, code: "CAB-COOK-C-L-600", legacyCode: "model-c-cook-base-left", name: "Base Cabinet (2 Drawers) Left (600 x 600 x 878 mm)", price: "199.00", iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "cook-base-left", sortOrder: 30 },
-  { itemType: ItemType.COMPONENT, code: "OVEN-C-600-HOB", legacyCode: "model-c-oven-base", name: "Built-in Oven and Hob (600 x 600 x 878 mm)", price: "449.00", iconKey: "oven_base", colorKey: "#00c76a", componentKey: "oven-base", sortOrder: 40, infoText: "Architecto built-in oven with hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "OVEN-C-600-HOB", legacyCode: "model-c-oven-base", name: "Built-in Oven and Hob (600 x 600 x 878 mm)", price: "449.00", iconKey: "oven_base", colorKey: "#00c76a", componentKey: "oven-base", sortOrder: 40, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "CAB-COOK-C-R-600", legacyCode: "model-c-cook-base-right", name: "Base Cabinet (2 Drawers) Right (600 x 600 x 878 mm)", price: "199.00", iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "cook-base-right", sortOrder: 50 },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-C-L-600", legacyCode: "model-c-wall-cabinet-1", name: "Wall Cabinet left (600 x 723 x 320 mm)", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 60, infoText: "H6002, 2 adjustable shelves" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-C-ML-600", legacyCode: "model-c-wall-cabinet-2", name: "Wall Cabinet mid-left (600 x 723 x 320 mm)", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 70, infoText: "H6002, 2 adjustable shelves" },
@@ -214,7 +202,7 @@ const MODEL_C_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "LIGHT-C-LED-001", legacyCode: "model-c-under-cabinet-light", name: "LED Lighting Set", price: "69.00", iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 100, infoText: "LED lighting set", articleNumber: "KA220043_S3" },
   { itemType: ItemType.COMPONENT, code: "WM-C-EWA34660W", legacyCode: "model-c-wm-base", name: "Washing Machine (600 x 600 x 878 mm)", price: "548.00", iconKey: "washing_machine_base", colorKey: "springgreen", componentKey: "wm-base", sortOrder: 110, infoText: "EWA34660W, 8 kg, 1400 rpm", articleNumber: "EWA34660W" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-C-600", legacyCode: "model-c-sink-base", name: "Sink Base Cabinet (600 x 600 x 878 mm)", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 120, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
-  { itemType: ItemType.COMPONENT, code: "DISH-C-600-STD", legacyCode: "model-c-dishwasher-base", name: "Dishwasher (600 x 600 x 878 mm)", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 130, infoText: "Architecto, fully integrated, 12 place settings", articleNumber: "A-EGSPV597210" },
+  { itemType: ItemType.COMPONENT, code: "DISH-C-600-STD", legacyCode: "model-c-dishwasher-base", name: "Dishwasher (600 x 600 x 878 mm)", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 130, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210" },
   { itemType: ItemType.COMPONENT, code: "TOP-C-4000", legacyCode: "model-c-worktop", name: "Worktop (40 x 600 x 4000 mm)", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 135, isLocked: true, infoText: "PLS, concrete slate gray" },
   { itemType: ItemType.COMPONENT, code: "CAB-DRAWER-C-3D", legacyCode: "model-c-drawer-base-3", name: "Base Cabinet (3 Drawers) (600 x 600 x 878 mm)", price: "229.00", iconKey: "drawer_base_three", colorKey: "#ffbf00", componentKey: "drawer-base-3", sortOrder: 140 },
   { itemType: ItemType.COMPONENT, code: "SINK-C-BOTTON-45", legacyCode: "model-c-sink-faucet", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 150, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },

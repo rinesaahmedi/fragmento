@@ -126,6 +126,16 @@ function buildInitialAddressPreference(initialOrder, contractNumber, contractAdd
 function buildProductInfoState(payload) {
   if (!payload?.infoPdfHref || !payload?.item) return null;
 
+  const productInfoDocuments = Array.isArray(payload.item.productInfoDocuments)
+    ? payload.item.productInfoDocuments.filter((document) => document?.href)
+    : payload.infoPdfHref
+      ? [{ label: "Produktinfo PDF", href: payload.infoPdfHref }]
+      : [];
+  const defaultProductInfoDocument =
+    productInfoDocuments.find((document) => String(document.label || "").toLowerCase().includes("produktinfo"))
+    || productInfoDocuments[0]
+    || null;
+
   return {
     ...payload,
     title: payload.item.name || "Produktinformation",
@@ -135,6 +145,8 @@ function buildProductInfoState(payload) {
     productInfoKeyFacts: Array.isArray(payload.item.productInfoKeyFacts) ? payload.item.productInfoKeyFacts : [],
     productInfoExtractedText: payload.item.productInfoExtractedText || "",
     productInfoItemId: payload.item.productInfoItemId || payload.item.id || "",
+    productInfoDocuments,
+    activeProductInfoDocumentHref: defaultProductInfoDocument?.href || payload.infoPdfHref,
   };
 }
 
@@ -758,6 +770,16 @@ export default function KitchenConfigurator({
     setActiveProductInfo(nextState);
   }
 
+  function selectProductInfoDocument(href) {
+    setActiveProductInfo((current) => {
+      if (!current || !href) return current;
+      return {
+        ...current,
+        activeProductInfoDocumentHref: href,
+      };
+    });
+  }
+
   function resetProductAssistantContext() {
     setSelectedProductAssistantContext(null);
     setProductAssistantMessages([
@@ -1090,13 +1112,7 @@ export default function KitchenConfigurator({
               onClick={(event) => event.stopPropagation()}
             >
               <div className={styles.productInfoHeader}>
-                <div>
-                  <p className={styles.eyebrow}>Produktinformation</p>
-                  <h2 id="product-info-title">{activeProductInfo.title}</h2>
-                  {activeProductInfo.item.code ? (
-                    <span className={styles.itemCode}>Code: {activeProductInfo.item.code}</span>
-                  ) : null}
-                </div>
+                <h2 id="product-info-title">{activeProductInfo.title}</h2>
                 <button
                   type="button"
                   className={styles.productInfoClose}
@@ -1108,71 +1124,55 @@ export default function KitchenConfigurator({
               </div>
 
               <div className={styles.productInfoContent}>
-                <aside className={styles.productInfoAssistant} aria-label="Product Info Assistant">
-                  <div className={styles.productInfoMeta}>
-                    <strong className={styles.productInfoPrice}>{formatCurrency(activeProductInfo.price)}</strong>
-                    {activeProductInfo.infoText ? <p>{activeProductInfo.infoText}</p> : null}
-                  </div>
-
-                  <section className={styles.productInfoAssistantSection}>
-                    <h3>Kurz erklaert</h3>
-                    {splitProductInfoSentences(activeProductInfo.productInfoSummary).length ? (
-                      splitProductInfoSentences(activeProductInfo.productInfoSummary).map((sentence) => (
-                        <p key={sentence}>{sentence}</p>
-                      ))
-                    ) : (
-                      <p>Diese Information konnte ich in der Produktinformation nicht finden.</p>
-                    )}
-                  </section>
-
-                  <section className={styles.productInfoAssistantSection}>
-                    <h3>Wichtige Punkte</h3>
-                    {activeProductInfo.productInfoKeyFacts.length ? (
-                      <ul>
-                        {activeProductInfo.productInfoKeyFacts.map((fact) => (
-                          <li key={fact}>{fact}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p>Diese Information konnte ich in der Produktinformation nicht finden.</p>
-                    )}
-                  </section>
-
-                  <div className={styles.productInfoAssistantCtaRow}>
-                    <span className={styles.productInfoAssistantHint}>Produktfragen jetzt im Assistenten rechts unten.</span>
-                  </div>
-
-                  {selectedProductInfoItems.length > 1 && selectedProductInfoNotes.length ? (
-                    <section className={styles.productInfoAssistantSection}>
-                      <h3>Wichtig fuer Ihre Auswahl</h3>
-                      <p>
-                        Sie haben {selectedProductInfoNames.join(" und ")} ausgewaehlt. Hier sind die wichtigsten
-                        Hinweise vor der Bestellung:
-                      </p>
-                      <ul>
-                        {selectedProductInfoNotes.slice(0, 6).map((note) => (
-                          <li key={note.key}>{note.text}</li>
-                        ))}
-                      </ul>
-                    </section>
-                  ) : null}
-                </aside>
-
                 <div className={styles.productInfoPdfColumn}>
-                  <div className={styles.productInfoActions}>
-                    <a
-                      href={activeProductInfo.infoPdfHref}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={styles.productInfoActionLink}
-                    >
-                      PDF in neuem Tab oeffnen
-                    </a>
+                  <div className={styles.productInfoToolbar}>
+                    {activeProductInfo.productInfoDocuments?.length > 1 ? (
+                      <div className={styles.productInfoDocumentTabs}>
+                        {activeProductInfo.productInfoDocuments.map((document) => {
+                          const isActive = document.href === activeProductInfo.activeProductInfoDocumentHref;
+                          return (
+                            <button
+                              key={document.href}
+                              type="button"
+                              className={isActive ? styles.productInfoDocumentTabActive : styles.productInfoDocumentTab}
+                              onClick={() => selectProductInfoDocument(document.href)}
+                            >
+                              {document.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
+
+                    <div className={styles.productInfoActions}>
+                      {activeProductInfo.productInfoDocuments?.length > 1 ? (
+                        activeProductInfo.productInfoDocuments.map((document) => (
+                          <a
+                            key={document.href}
+                            href={document.href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={styles.productInfoActionLink}
+                          >
+                            {document.label} oeffnen
+                          </a>
+                        ))
+                      ) : (
+                        <a
+                          href={activeProductInfo.activeProductInfoDocumentHref || activeProductInfo.infoPdfHref}
+                          target="_blank"
+                          rel="noreferrer"
+                          className={styles.productInfoActionLink}
+                        >
+                          PDF in neuem Tab oeffnen
+                        </a>
+                      )}
+                    </div>
                   </div>
 
                   <div className={styles.productInfoViewer}>
                     <iframe
-                      src={activeProductInfo.infoPdfHref}
+                      src={activeProductInfo.activeProductInfoDocumentHref || activeProductInfo.infoPdfHref}
                       title={`Produktinformation ${activeProductInfo.title}`}
                       className={styles.productInfoFrame}
                     />
