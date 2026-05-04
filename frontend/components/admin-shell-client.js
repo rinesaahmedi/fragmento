@@ -235,7 +235,7 @@ function AdminShellContent({ adminEmail, children }) {
             className="admin-shell__primex-badge"
             style={{
               display: "grid",
-              gap: 2,
+              gap: 8,
               justifyItems: "center",
               justifySelf: "center",
               alignSelf: "end",
@@ -255,14 +255,13 @@ function AdminShellContent({ adminEmail, children }) {
               Powered by
             </span>
             <img
-              src="/primex-logo.png"
-              alt="Primex"
+              src="/primex-agentic-logo.png"
+              alt="Primex Agentic AI"
               style={{
                 display: "block",
                 width: 96,
                 height: "auto",
                 objectFit: "contain",
-                background: "transparent",
               }}
             />
           </div>
