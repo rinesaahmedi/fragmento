@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import KitchenCatalogPanel from "./kitchen-catalog-panel";
 import styles from "./kitchen-configurator.module.css";
-import KitchenOrderForm from "./kitchen-order-form";
+import KitchenOrderForm from "./public-kitchen-order-form";
 import { blobToBase64, generateOrderPdf } from "./kitchen-order-pdf";
 import KitchenSelectionSummary from "./kitchen-selection-summary";
 import {
@@ -29,6 +29,7 @@ import {
   buildAddressVerificationSnapshot,
   buildAddressVerificationState,
 } from "../lib/address-verification";
+import { PublicI18nProvider, PublicLanguageSwitcher, usePublicI18n } from "./public-i18n";
 
 function buildInitialCustomer(contractNumber) {
   return {
@@ -123,7 +124,7 @@ function buildInitialAddressPreference(initialOrder, contractNumber, contractAdd
   return customerUsesContractAddress(initialCustomer, contractAddress);
 }
 
-function buildProductInfoState(payload) {
+function buildProductInfoState(payload, translate) {
   if (!payload?.infoPdfHref || !payload?.item) return null;
 
   const productInfoDocuments = Array.isArray(payload.item.productInfoDocuments)
@@ -138,7 +139,7 @@ function buildProductInfoState(payload) {
 
   return {
     ...payload,
-    title: payload.item.name || "Produktinformation",
+    title: payload.item.name || translate("configurator.productInfoTitle", "Product information", { title: "" }).trim(),
     price: Number(payload.price ?? payload.item.price ?? 0),
     infoText: payload.item.infoText || "",
     productInfoSummary: payload.item.productInfoSummary || "",
@@ -339,13 +340,22 @@ function buildOrderLockedComponentIds(kitchenConfig, initialOrder) {
     .map((item) => componentIdForItem(item));
 }
 
-export default function KitchenConfigurator({
+export default function KitchenConfigurator({ initialLanguage = "de", ...props }) {
+  return (
+    <PublicI18nProvider initialLanguage={initialLanguage}>
+      <KitchenConfiguratorContent {...props} />
+    </PublicI18nProvider>
+  );
+}
+
+function KitchenConfiguratorContent({
   kitchenConfig,
   svgMarkup,
   initialContractNumber = "",
   initialOrder = null,
   initialContractAddress = null,
 }) {
+  const { translate, language } = usePublicI18n();
   const orderSectionRef = useRef(null);
   const kitchenSlug = String(kitchenConfig.kitchen.slug || "").trim().toLowerCase();
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenConfig.kitchen.slug];
@@ -609,13 +619,13 @@ export default function KitchenConfigurator({
   function toggleService(itemCode) {
     if (orderLockedServiceCodes.has(itemCode)) return;
     if (itemCode === SERVICE_CODE_MONTAGE && !serviceEligibility.montageEligible) {
-      setStatus("Montage ist erst ab 3 zusaetzlichen Komponenten moeglich, davon 2 Schrank-Komponenten.");
+      setStatus(translate("configurator.serviceMontageError", "Assembly is available only from 3 extra components, including 2 cabinet components."));
       setStatusTone("error");
       return;
     }
 
     if (itemCode === SERVICE_CODE_PICKUP && !serviceEligibility.pickupEligible) {
-      setStatus("Abholung kann erst hinzugefuegt werden, wenn mindestens ein Artikel ausgewaehlt wurde.");
+      setStatus(translate("configurator.servicePickupError", "Pickup can only be added once at least one item has been selected."));
       setStatusTone("error");
       return;
     }
@@ -683,7 +693,7 @@ export default function KitchenConfigurator({
     if (!customer.contractNumber || !customer.address1 || !customer.country || !customer.city || !customer.postalCode) {
       setAddressVerification(
         buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.INVALID, {
-          message: "Enter contract number, street, country, city, and postal code before verification.",
+          message: translate("configurator.addressMissingFields", "Enter contract number, street, country, city, and postal code before verification."),
         }),
       );
       return;
@@ -691,7 +701,7 @@ export default function KitchenConfigurator({
 
     setAddressVerification(
       buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.LOADING, {
-        message: "Verifying address...",
+        message: translate("configurator.addressVerifying", "Verifying address..."),
       }),
     );
 
@@ -706,7 +716,7 @@ export default function KitchenConfigurator({
       if (payload.status === ADDRESS_VERIFICATION_STATUS.VALID && payload.verification) {
         setAddressVerification(
           buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.VALID, {
-            message: payload.message || "Address is valid.",
+            message: translate("configurator.addressValid", "The address is valid."),
             suggestion: payload.suggestion || "",
             verification: payload.verification,
           }),
@@ -716,14 +726,14 @@ export default function KitchenConfigurator({
 
       setAddressVerification(
         buildAddressVerificationState(payload.status || ADDRESS_VERIFICATION_STATUS.INVALID, {
-          message: payload.message || "Address verification failed.",
+          message: translate("configurator.addressVerificationFailed", "Address verification failed."),
           suggestion: payload.suggestion || "",
         }),
       );
-    } catch (error) {
+    } catch (_error) {
       setAddressVerification(
         buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE, {
-          message: error.message || "The address verification service is unavailable right now.",
+          message: translate("configurator.addressServiceUnavailable", "The address verification service is unavailable right now."),
         }),
       );
     }
@@ -765,7 +775,7 @@ export default function KitchenConfigurator({
   }
 
   function openProductInfo(payload) {
-    const nextState = buildProductInfoState(payload);
+    const nextState = buildProductInfoState(payload, translate);
     if (!nextState) return;
     setActiveProductInfo(nextState);
   }
@@ -888,19 +898,19 @@ export default function KitchenConfigurator({
     event.preventDefault();
 
     if (!grandTotal) {
-      setStatus("Waehle zuerst mindestens einen Artikel aus.");
+      setStatus(translate("configurator.statusSelectItem", "Select at least one item first."));
       setStatusTone("error");
       return;
     }
 
     if (!customer.consent) {
-      setStatus("Bitte bestaetige die Datenschutzeinwilligung.");
+      setStatus(translate("configurator.statusConfirmConsent", "Please confirm the data privacy consent."));
       setStatusTone("error");
       return;
     }
 
     if (!customer.paymentMethod) {
-      setStatus("Bitte waehle eine Zahlungsmethode aus.");
+      setStatus(translate("configurator.statusSelectPayment", "Please choose a payment method."));
       setStatusTone("error");
       return;
     }
@@ -910,19 +920,19 @@ export default function KitchenConfigurator({
       || !addressVerification.verification
       || addressVerificationSnapshotKey(addressVerification.verification.snapshot) !== addressSnapshotKey
     ) {
-      setStatus("Bitte verifiziere die Adresse vor dem Einreichen der Bestellung.");
+      setStatus(translate("configurator.statusVerifyAddress", "Please verify the address before submitting the order."));
       setStatusTone("error");
       return;
     }
 
     setIsSubmitting(true);
-    setStatus("Bestellung wird gespeichert...");
+    setStatus(translate("configurator.statusSavingOrder", "Saving order..."));
     setStatusTone("idle");
 
     try {
       const pdfOrder = {
         orderNumber: new Date().toISOString().slice(0, 19).replace(/[-:T]/g, ""),
-        createdAt: new Date().toLocaleString("de-DE"),
+        createdAt: new Date().toLocaleString(language === "de" ? "de-DE" : "en-GB"),
         customer: {
           contractNumber: customer.contractNumber,
           firstName: customer.firstName,
@@ -978,7 +988,7 @@ export default function KitchenConfigurator({
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload.error || "Bestellung konnte nicht gespeichert werden.");
+        throw new Error(translate("configurator.statusSaveFailed", "The order could not be saved."));
       }
 
       const emailIssue = payload.notifications?.emailError;
@@ -988,13 +998,18 @@ export default function KitchenConfigurator({
         const notes = [emailIssue ? `E-Mail: ${emailIssue}` : "", webhookIssue ? `Webhook: ${webhookIssue}` : ""]
           .filter(Boolean)
           .join(" | ");
-        setStatus(`Bestellung gespeichert. Auftragsnummer: ${payload.orderNumber}. Hinweis: ${notes}`);
+        setStatus(translate("configurator.statusSavedWithIssues", "Order saved. Order number: {orderNumber}. Note: {notes}", {
+          orderNumber: payload.orderNumber,
+          notes,
+        }));
       } else {
-        setStatus(`Bestellung gespeichert. Auftragsnummer: ${payload.orderNumber}. Die Bestaetigung folgt nach Pruefung.`);
+        setStatus(translate("configurator.statusSavedSuccess", "Order saved. Order number: {orderNumber}. Confirmation will follow after review.", {
+          orderNumber: payload.orderNumber,
+        }));
       }
       setStatusTone("success");
     } catch (error) {
-      setStatus(error.message || "Bestellung konnte nicht gespeichert werden.");
+      setStatus(error.message || translate("configurator.statusSaveFailed", "The order could not be saved."));
       setStatusTone("error");
     } finally {
       setIsSubmitting(false);
@@ -1004,10 +1019,11 @@ export default function KitchenConfigurator({
   return (
     <div className={styles.page}>
       <div className={styles.shell}>
-        <nav className={styles.topNav} aria-label="Seitennavigation">
+        <nav className={styles.topNav} aria-label="Page navigation">
           <Link href="/" className={styles.backLink}>
-            Zurueck
+            {translate("common.back", "Back")}
           </Link>
+          <PublicLanguageSwitcher />
         </nav>
         <header className={styles.header}>
           <div className={styles.brand}>
@@ -1016,11 +1032,11 @@ export default function KitchenConfigurator({
             </span>
             <div className={styles.brandText}>
               <h1>{kitchenConfig.kitchen.name}</h1>
-              <p>{kitchenConfig.kitchen.description || "Konfiguriere deine Kueche direkt aus dem aktuellen Katalog."}</p>
+              <p>{kitchenConfig.kitchen.description || translate("configurator.headerDescription", "Configure your kitchen directly from the current catalog.")}</p>
             </div>
           </div>
           <div className={styles.pricePill}>
-            <span>Gesamtpreis</span>
+            <span>{translate("common.totalPrice", "Total price")}</span>
             <strong>{formatCurrency(grandTotal)}</strong>
           </div>
         </header>
@@ -1116,10 +1132,10 @@ export default function KitchenConfigurator({
                 <button
                   type="button"
                   className={styles.productInfoClose}
-                  aria-label="Produktinformation schliessen"
+                  aria-label={translate("configurator.productInfoCloseAria", "Close product information")}
                   onClick={() => setActiveProductInfo(null)}
                 >
-                  Schliessen
+                  {translate("common.close", "Close")}
                 </button>
               </div>
 
@@ -1154,7 +1170,7 @@ export default function KitchenConfigurator({
                             rel="noreferrer"
                             className={styles.productInfoActionLink}
                           >
-                            {document.label} oeffnen
+                            {translate("configurator.productInfoOpen", "Open {label}", { label: document.label })}
                           </a>
                         ))
                       ) : (
@@ -1164,7 +1180,7 @@ export default function KitchenConfigurator({
                           rel="noreferrer"
                           className={styles.productInfoActionLink}
                         >
-                          PDF in neuem Tab oeffnen
+                          {translate("common.openPdfInNewTab", "Open PDF in new tab")}
                         </a>
                       )}
                     </div>
@@ -1173,7 +1189,7 @@ export default function KitchenConfigurator({
                   <div className={styles.productInfoViewer}>
                     <iframe
                       src={activeProductInfo.activeProductInfoDocumentHref || activeProductInfo.infoPdfHref}
-                      title={`Produktinformation ${activeProductInfo.title}`}
+                      title={translate("configurator.productInfoTitle", "Product information {title}", { title: activeProductInfo.title })}
                       className={styles.productInfoFrame}
                     />
                   </div>

@@ -14,6 +14,7 @@ import {
   SERVICE_CODE_MONTAGE,
   SERVICE_CODE_PICKUP,
 } from "../lib/service-eligibility";
+import { usePublicI18n } from "./public-i18n";
 
 const DISHWASHER_BASE_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 10 24 L 14 44 H 46 L 50 24 Z"/><line x1="18" y1="26" x2="20" y2="44"/><line x1="26" y1="26" x2="26" y2="44"/><line x1="34" y1="26" x2="34" y2="44"/><line x1="42" y1="26" x2="40" y2="44"/><line x1="12" y1="32" x2="48" y2="32"/><line x1="13" y1="38" x2="47" y2="38"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">GS</text></svg>';
@@ -96,6 +97,7 @@ function getTooltipDocumentLabels(item) {
 }
 
 function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHref, onClick, onOpenInfo }) {
+  const { translate } = usePublicI18n();
   const className = [
     styles.itemCard,
     selected ? styles.itemCardSelected : "",
@@ -131,7 +133,7 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
         <span className={styles.itemIcon} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
         <div className={styles.itemText}>
           <strong>{item.name}</strong>
-          {item.code ? <span className={styles.itemCode}>Code: {item.code}</span> : null}
+          {item.code ? <span className={styles.itemCode}>{translate("common.code", "Code")}: {item.code}</span> : null}
           {item.linkedInfoBadge ? <span className={styles.itemLinkedBadge}>{item.linkedInfoBadge}</span> : null}
           {item.infoText ? <p>{item.infoText}</p> : null}
         </div>
@@ -139,7 +141,13 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
       </div>
       <div className={styles.itemMeta}>
         <span className={locked ? styles.lockedPill : styles.togglePill}>
-          {locked ? "Fix" : disabled ? "Nicht verfuegbar" : selected ? "Entfernen" : "Hinzufuegen"}
+          {locked
+            ? translate("configurator.fixed", "Fixed")
+            : disabled
+              ? translate("configurator.unavailable", "Unavailable")
+              : selected
+                ? translate("common.remove", "Remove")
+                : translate("configurator.add", "Add")}
         </span>
         <div className={styles.itemMetaAside}>
           {hint ? <span className={styles.ruleHint}>{hint}</span> : null}
@@ -148,7 +156,7 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
               <button
                 type="button"
                 className={styles.itemInfoTrigger}
-                aria-label={`Infos zu ${item.name}`}
+                aria-label={translate("configurator.infoForItem", "Info about {name}", { name: item.name })}
                 onClick={(event) => {
                   event.stopPropagation();
                   onOpenInfo?.({ item, price, infoPdfHref });
@@ -182,7 +190,7 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
                       ))}
                     </span>
                   ) : (
-                    <span>Mehr Infos per Klick.</span>
+                    <span>{translate("common.clickForMoreInfo", "Click for more info.")}</span>
                   )}
                 </span>
               </span>
@@ -213,12 +221,13 @@ export default function KitchenCatalogPanel({
   onOpenProductInfo,
   serviceEligibility,
 }) {
+  const { translate } = usePublicI18n();
   return (
     <aside className={styles.sidebar}>
       <div className={styles.sidebarHeader}>
         <div>
-          <p className={styles.eyebrow}>Katalog</p>
-          <h2>Bauteile und Optionen</h2>
+          <p className={styles.eyebrow}>{translate("configurator.catalogEyebrow", "Catalog")}</p>
+          <h2>{translate("configurator.catalogTitle", "Components and options")}</h2>
         </div>
         <span className={styles.badge}>
           {selectedComponents.length + selectedAccessories.length + selectedServices.length}
@@ -226,7 +235,7 @@ export default function KitchenCatalogPanel({
       </div>
       <div className={styles.catalog}>
         <section className={styles.catalogSection}>
-          <h3>Komponenten</h3>
+          <h3>{translate("configurator.components", "Components")}</h3>
           <div className={styles.catalogGrid}>
             {visibleComponents.map((item) => {
               const componentId = componentIdForItem(item);
@@ -252,7 +261,7 @@ export default function KitchenCatalogPanel({
         </section>
 
         <section className={styles.catalogSection}>
-          <h3>Zubehoer</h3>
+          <h3>{translate("configurator.accessories", "Accessories")}</h3>
           <div className={styles.catalogGrid}>
             {kitchenConfig.accessories.map((item) => (
               <CatalogItem
@@ -269,7 +278,7 @@ export default function KitchenCatalogPanel({
         </section>
 
         <section className={styles.catalogSection}>
-          <h3>Dienstleistungen</h3>
+          <h3>{translate("configurator.services", "Services")}</h3>
           <div className={styles.catalogGrid}>
             {kitchenConfig.services.map((item) => {
               const disabledReason = getServiceDisabledReason(item.code, serviceEligibility);
@@ -290,9 +299,9 @@ export default function KitchenCatalogPanel({
                   hint={
                     disabledReason ||
                     (item.code === SERVICE_CODE_MONTAGE
-                      ? "Montage erst ab 3 zusaetzlichen Komponenten, davon 2 Schrank-Komponenten"
+                      ? translate("configurator.serviceHintMontage", "Assembly is available only from 3 extra components, including 2 cabinet components")
                       : item.code === SERVICE_CODE_PICKUP
-                        ? "Nur mit mindestens einer Komponente oder einem Zubehoer"
+                        ? translate("configurator.serviceHintPickup", "Only available with at least one component or accessory")
                         : "")
                   }
                   onClick={() => onToggleService(item.code)}

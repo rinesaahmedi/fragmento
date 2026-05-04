@@ -7,6 +7,7 @@ import {
   normalizeColor,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
+import { usePublicI18n } from "./public-i18n";
 import {
   applyPlanViewportToMarkup,
   refreshKitchenPlanSelection,
@@ -23,6 +24,7 @@ export default function KitchenSvgStage({
   setSelectedComponentIds,
   onResetSelection,
 }) {
+  const { translate } = usePublicI18n();
   const svgHostRef = useRef(null);
   const resolvedSvgMarkup = useMemo(
     () => applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug),
@@ -85,11 +87,11 @@ export default function KitchenSvgStage({
     <div className={styles.stage}>
       <div className={styles.stageHeader}>
         <div>
-          <p className={styles.eyebrow}>Plan</p>
-          <h2>Interaktive Kuechenansicht</h2>
+          <p className={styles.eyebrow}>{translate("configurator.stageEyebrow", "Plan")}</p>
+          <h2>{translate("configurator.stageTitle", "Interactive kitchen view")}</h2>
         </div>
         <button type="button" className={styles.ghostButton} onClick={onResetSelection}>
-          Auswahl zuruecksetzen
+          {translate("configurator.resetSelection", "Reset selection")}
         </button>
       </div>
       <div className={styles.stageBody}>
@@ -107,11 +109,11 @@ export default function KitchenSvgStage({
         <div className={styles.stageLegend}>
           <span className={styles.legendChip}>
             <span className={styles.legendSwatch} />
-            Im Plan anklicken oder rechts auswaehlen
+            {translate("configurator.stageLegendClick", "Click in the plan or choose on the right")}
           </span>
           <span className={styles.legendChip}>
             <span className={styles.legendDot} />
-            Fixe Bestandteile bleiben immer aktiv
+            {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
           </span>
         </div>
       </div>

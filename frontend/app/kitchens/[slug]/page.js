@@ -1,8 +1,10 @@
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import KitchenConfigurator from "../../../components/kitchen-configurator";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "../../../lib/catalog";
 import { getContractOrderState, getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
 import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
+import { PUBLIC_LANGUAGE_COOKIE_NAME, normalizePublicLanguage } from "../../../lib/public-language";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +104,7 @@ function serializeContractAddress(contract) {
 export default async function KitchenPage({ params, searchParams }) {
   const { slug } = await params;
   const resolvedSearchParams = await searchParams;
+  const cookieStore = await cookies();
   const kitchen = await getKitchenBySlug(slug);
 
   if (!kitchen || kitchen.status !== "ACTIVE") {
@@ -111,6 +114,9 @@ export default async function KitchenPage({ params, searchParams }) {
   const kitchenConfig = serializeKitchenForLegacy(kitchen);
   const svgMarkup = await loadKitchenSvgMarkup(slug);
   const initialContractNumber = String(resolvedSearchParams?.contractNumber || "").trim();
+  const initialLanguage = resolvedSearchParams?.lang
+    ? normalizePublicLanguage(String(resolvedSearchParams.lang))
+    : normalizePublicLanguage(cookieStore.get(PUBLIC_LANGUAGE_COOKIE_NAME)?.value);
   let initialOrder = null;
   let initialContractAddress = null;
 
@@ -133,6 +139,7 @@ export default async function KitchenPage({ params, searchParams }) {
     <KitchenConfigurator
       kitchenConfig={kitchenConfig}
       svgMarkup={svgMarkup}
+      initialLanguage={initialLanguage}
       initialContractNumber={initialContractNumber}
       initialOrder={initialOrder}
       initialContractAddress={initialContractAddress}

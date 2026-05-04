@@ -5,31 +5,31 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 const LANGUAGE_OPTIONS = [
-  { code: "de", label: "German", flagSrc: "https://flagcdn.com/w40/de.png" },
+  { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
   { code: "en", label: "English", flagSrc: "https://flagcdn.com/w40/gb.png" },
-  { code: "tr", label: "Turkish", flagSrc: "https://flagcdn.com/w40/tr.png" },
-  { code: "es", label: "Spanish", flagSrc: "https://flagcdn.com/w40/es.png" },
-  { code: "fr", label: "French", flagSrc: "https://flagcdn.com/w40/fr.png" },
-  { code: "ru", label: "Russian", flagSrc: "https://flagcdn.com/w40/ru.png" },
+  { code: "tr", label: "Türkçe", flagSrc: "https://flagcdn.com/w40/tr.png" },
+  { code: "es", label: "Español", flagSrc: "https://flagcdn.com/w40/es.png" },
+  { code: "fr", label: "Français", flagSrc: "https://flagcdn.com/w40/fr.png" },
+  { code: "ru", label: "Русский", flagSrc: "https://flagcdn.com/w40/ru.png" },
 ];
 
 const AVATAR_CDN_BASE = "https://cdn.jsdelivr.net/gh/rinesaahmedi/fragmento@main/AVATAR";
 
 const SCREEN_TEXT = {
   de: {
-    languageTitle: "Waehle deine Sprache",
-    modeTitle: "Wie moechtest du die Anweisungen erhalten?",
-    modeDescription: "Waehle zwischen:",
+    languageTitle: "Wähle deine Sprache",
+    modeTitle: "Wie möchtest du die Anweisungen erhalten?",
+    modeDescription: "Wähle zwischen:",
     textButton: "Text",
     videoButton: "Video",
     textTitle: "Textanweisungen",
     continueLabel: "Weiter",
-    backLabel: "Zurueck",
-    contractTitle: "Kuechenvertragsnummer",
-    contractHelper: "Gib deine Kaufvertragsnummer ein.\nDu findest sie auf der Innenseite deines Spuelenschrankes.",
+    backLabel: "Zurück",
+    contractTitle: "Küchenvertragsnummer",
+    contractHelper: "Gib deine Kaufvertragsnummer ein.\nDu findest sie auf der Innenseite deines Spülenschrankes.",
     contractLabel: "Bitte gib deine Vertragsnummer ein:*",
-    contractAction: "Bestaetigen",
-    contractError: "Die eingegebene Vertragsnummer passt zu keiner aktiven Kueche.",
+    contractAction: "Bestätigen",
+    contractError: "Die eingegebene Vertragsnummer passt zu keiner aktiven Küche.",
   },
   en: {
     languageTitle: "Select your language",
@@ -47,64 +47,64 @@ const SCREEN_TEXT = {
     contractError: "The entered contract number does not match any active kitchen.",
   },
   tr: {
-    languageTitle: "Dilini sec",
-    modeTitle: "Talimatlari nasil almak istersiniz?",
-    modeDescription: "Secim yap:",
+    languageTitle: "Dilini seç",
+    modeTitle: "Talimatları nasıl almak istersiniz?",
+    modeDescription: "Şunlardan birini seçin:",
     textButton: "Metin",
     videoButton: "Video",
-    textTitle: "Metin talimatlari",
-    continueLabel: "Continue",
-    backLabel: "Back",
-    contractTitle: "Mutfak sozlesme numarasi",
-    contractHelper: "Satin alma sozlesme numarani gir.\nEvye dolabinin ic kisminda bulabilirsin.",
-    contractLabel: "Please enter your contract number:*",
-    contractAction: "Confirm",
-    contractError: "Girilen sozlesme numarasi aktif bir mutfaga ait degil.",
+    textTitle: "Metin talimatları",
+    continueLabel: "Devam",
+    backLabel: "Geri",
+    contractTitle: "Mutfak sözleşme numarası",
+    contractHelper: "Satın alma sözleşme numaranı gir.\nLavabo dolabının iç kısmında bulabilirsin.",
+    contractLabel: "Lütfen sözleşme numaranı gir:*",
+    contractAction: "Onayla",
+    contractError: "Girilen sözleşme numarası aktif bir mutfakla eşleşmiyor.",
   },
   es: {
     languageTitle: "Elige tu idioma",
-    modeTitle: "Como quieres recibir las instrucciones?",
+    modeTitle: "¿Cómo quieres recibir las instrucciones?",
     modeDescription: "Elige entre:",
     textButton: "Texto",
     videoButton: "Video",
     textTitle: "Instrucciones en texto",
-    continueLabel: "Continue",
-    backLabel: "Back",
-    contractTitle: "Numero de contrato de cocina",
-    contractHelper: "Introduce tu numero de contrato de compra.\nLo encuentras en la parte interior del mueble del fregadero.",
-    contractLabel: "Please enter your contract number:*",
-    contractAction: "Confirm",
-    contractError: "El numero introducido no coincide con ninguna cocina activa.",
+    continueLabel: "Continuar",
+    backLabel: "Atrás",
+    contractTitle: "Número de contrato de cocina",
+    contractHelper: "Introduce tu número de contrato de compra.\nLo encontrarás en el interior del mueble del fregadero.",
+    contractLabel: "Introduce tu número de contrato:*",
+    contractAction: "Confirmar",
+    contractError: "El número introducido no coincide con ninguna cocina activa.",
   },
   fr: {
     languageTitle: "Choisis ta langue",
     modeTitle: "Comment souhaitez-vous recevoir les instructions ?",
     modeDescription: "Choisissez :",
     textButton: "Texte",
-    videoButton: "Video",
+    videoButton: "Vidéo",
     textTitle: "Instructions texte",
-    continueLabel: "Continue",
-    backLabel: "Back",
-    contractTitle: "Numero de contrat de cuisine",
-    contractHelper: "Saisissez votre numero de contrat d achat.\nIl se trouve a l interieur du meuble evier.",
-    contractLabel: "Please enter your contract number:*",
-    contractAction: "Confirm",
-    contractError: "Le numero saisi ne correspond a aucune cuisine active.",
+    continueLabel: "Continuer",
+    backLabel: "Retour",
+    contractTitle: "Numéro de contrat de cuisine",
+    contractHelper: "Saisissez votre numéro de contrat d'achat.\nVous le trouverez à l'intérieur du meuble évier.",
+    contractLabel: "Veuillez saisir votre numéro de contrat :*",
+    contractAction: "Confirmer",
+    contractError: "Le numéro saisi ne correspond à aucune cuisine active.",
   },
   ru: {
-    languageTitle: "Vyberi yazyk",
-    modeTitle: "Kak vy hotite poluchat instrukcii?",
-    modeDescription: "Vyberite variant:",
-    textButton: "Tekst",
-    videoButton: "Video",
-    textTitle: "Tekstovye instrukcii",
-    continueLabel: "Continue",
-    backLabel: "Back",
-    contractTitle: "Nomer dogovora kuhni",
-    contractHelper: "Vvedite nomer dogovora pokupki.\nVy naidete ego na vnutrenney storone shkafa pod moykoy.",
-    contractLabel: "Please enter your contract number:*",
-    contractAction: "Confirm",
-    contractError: "Vvedennyy nomer ne sootvetstvuet aktivnoy kuhne.",
+    languageTitle: "Выберите язык",
+    modeTitle: "Как вы хотите получить инструкции?",
+    modeDescription: "Выберите вариант:",
+    textButton: "Текст",
+    videoButton: "Видео",
+    textTitle: "Текстовые инструкции",
+    continueLabel: "Продолжить",
+    backLabel: "Назад",
+    contractTitle: "Номер договора кухни",
+    contractHelper: "Введите номер договора покупки.\nВы найдете его на внутренней стороне шкафа под мойкой.",
+    contractLabel: "Пожалуйста, введите номер договора:*",
+    contractAction: "Подтвердить",
+    contractError: "Введенный номер не соответствует активной кухне.",
   },
 };
 
@@ -112,22 +112,22 @@ const INSTRUCTION_TEXTS = {
   de: [
     "Willkommen bei Fragmento by Architecto!",
     "",
-    "Wir helfen dir, deine Kueche in 4 einfachen und praezisen Schritten zu vervollstaendigen, mit 100 % Design- und Passgenauigkeitsgarantie.",
+    "Wir helfen dir, deine Küche in 4 einfachen und präzisen Schritten zu vervollständigen, mit 100 % Design- und Passgenauigkeitsgarantie.",
     "",
     "So funktioniert es:",
     "",
     "Schritt 1: Scanne den QR-Code. Du findest ihn auf einem Aufkleber am Kochfeld.",
-    "Schritt 2: Gib deine Kaufvertragsnummer ein. Du findest sie auf der Innenseite deines Spuelenschrankes.",
-    "Schritt 3: Waehle die Komponenten aus, die du hinzufuegen moechtest.",
-    "Schritt 4: Gib deine persoenlichen Daten ein und schliesse deine Bestellung ab.",
+    "Schritt 2: Gib deine Kaufvertragsnummer ein. Du findest sie auf der Innenseite deines Spülenschrankes.",
+    "Schritt 3: Wähle die Komponenten aus, die du hinzufügen möchtest.",
+    "Schritt 4: Gib deine persönlichen Daten ein und schließe deine Bestellung ab.",
     "",
-    "Zusaetzlich bieten wir dir:",
+    "Zusätzlich bieten wir dir:",
     "Professionellen Transport und fachgerechte Montage.",
-    "Unterstuetzung bei Foerderantraegen, falls noetig.",
+    "Unterstützung bei Förderanträgen, falls nötig.",
     "",
-    "Nach deiner Bestellung ruft dich einer unserer KI-Sprachassistenten an, um alle Details zu bestaetigen.",
+    "Nach deiner Bestellung ruft dich einer unserer KI-Sprachassistenten an, um alle Details zu bestätigen.",
     "",
-    "Einfach. Schnell. Zuverlaessig.",
+    "Einfach. Schnell. Zuverlässig.",
     "Lass uns starten!",
   ].join("\n"),
   en: [
@@ -152,58 +152,52 @@ const INSTRUCTION_TEXTS = {
     "Let us start!",
   ].join("\n"),
   tr: [
-    "Fragmento by Architecto'ya hos geldiniz!",
+    "Fragmento by Architecto'ya hoş geldiniz!",
     "",
-    "Mutfaginizi 4 kolay ve net adimda tamamlamaniza yardimci oluyoruz.",
+    "Mutfağınızı 4 kolay ve net adımda tamamlamanıza yardımcı oluyoruz.",
     "",
-    "Nasil calisir:",
+    "Nasıl çalışır:",
     "",
-    "Adim 1: QR kodunu tara. Etiketi ocak ustunde bulabilirsin.",
-    "Adim 2: Satin alma sozlesme numarani gir. Evyenin alt dolabinin ic kismina bak.",
-    "Adim 3: Eklemek istedigin bilesenleri sec.",
-    "Adim 4: Kisisel bilgilerini gir ve siparisini tamamla.",
-    "",
-    "Ek olarak sunduklarimiz:",
-    "Profesyonel tasima ve montaj.",
-    "Gerekirse tesvik basvurularinda destek.",
-    "",
-    "Siparisinden sonra yapay zeka sesli asistanimiz tum detaylari teyit etmek icin seni arar.",
+    "Adım 1: QR kodunu tara. Etiketi ocak üstünde bulabilirsin.",
+    "Adım 2: Satın alma sözleşme numaranı gir. Evyenin alt dolabının iç kısmına bak.",
+    "Adım 3: Eklemek istediğin bileşenleri seç.",
+    "Adım 4: Kişisel bilgilerini gir ve siparişini tamamla.",
   ].join("\n"),
   es: [
-    "Bienvenido a Fragmento by Architecto!",
+    "¡Bienvenido a Fragmento by Architecto!",
     "",
-    "Te ayudamos a completar tu cocina en 4 pasos faciles y precisos.",
+    "Te ayudamos a completar tu cocina en 4 pasos fáciles y precisos.",
     "",
-    "Como funciona:",
+    "Cómo funciona:",
     "",
-    "Paso 1: Escanea el codigo QR.",
-    "Paso 2: Introduce tu numero de contrato de compra.",
-    "Paso 3: Elige los componentes que quieres anadir.",
-    "Paso 4: Introduce tus datos personales y completa el pedido.",
+    "Paso 1: Escanea el código QR.",
+    "Paso 2: Introduce tu número de contrato de compra.",
+    "Paso 3: Elige los componentes que quieres añadir.",
+    "Paso 4: Introduce tus datos personales y completa tu pedido.",
   ].join("\n"),
   fr: [
     "Bienvenue chez Fragmento by Architecto !",
     "",
-    "Nous vous aidons a completer votre cuisine en 4 etapes simples et precises.",
+    "Nous vous aidons à compléter votre cuisine en 4 étapes simples et précises.",
     "",
-    "Comment ca marche :",
+    "Comment ça marche :",
     "",
-    "Etape 1 : Scannez le code QR.",
-    "Etape 2 : Saisissez votre numero de contrat d achat.",
-    "Etape 3 : Choisissez les composants a ajouter.",
-    "Etape 4 : Saisissez vos informations personnelles et finalisez la commande.",
+    "Étape 1 : Scannez le code QR.",
+    "Étape 2 : Saisissez votre numéro de contrat d'achat.",
+    "Étape 3 : Choisissez les composants à ajouter.",
+    "Étape 4 : Saisissez vos informations personnelles et finalisez la commande.",
   ].join("\n"),
   ru: [
-    "Dobro pozhalovat v Fragmento by Architecto!",
+    "Добро пожаловать в Fragmento by Architecto!",
     "",
-    "My pomogaem zavershit vashu kuhnyu za 4 prostykh shaga.",
+    "Мы помогаем завершить вашу кухню за 4 простых шага.",
     "",
-    "Kak eto rabotaet:",
+    "Как это работает:",
     "",
-    "Shag 1: Otskaniruyte QR-kod.",
-    "Shag 2: Vvedite nomer dogovora pokupki.",
-    "Shag 3: Vyberite komponenty dlya dobavleniya.",
-    "Shag 4: Vvedite lichnye dannye i zavershite zakaz.",
+    "Шаг 1: Отсканируйте QR-код.",
+    "Шаг 2: Введите номер договора покупки.",
+    "Шаг 3: Выберите компоненты для добавления.",
+    "Шаг 4: Введите личные данные и завершите заказ.",
   ].join("\n"),
 };
 
@@ -215,6 +209,10 @@ const AVATAR_SOURCES = {
   fr: `${AVATAR_CDN_BASE}/fr-avatar.mp4`,
   ru: `${AVATAR_CDN_BASE}/ru-avatar.mp4`,
 };
+
+function mapIntroLanguageToKitchenLanguage(language) {
+  return language === "de" ? "de" : "en";
+}
 
 function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, disabled = false }) {
   return (
@@ -229,9 +227,9 @@ function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, d
   );
 }
 
-export default function FragmentoEntryFlow() {
+export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const router = useRouter();
-  const [selectedLanguage, setSelectedLanguage] = useState("de");
+  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage === "en" ? "en" : "de");
   const [selectedMode, setSelectedMode] = useState("");
   const [screen, setScreen] = useState("language");
   const [contractNumber, setContractNumber] = useState("");
@@ -242,8 +240,8 @@ export default function FragmentoEntryFlow() {
   const instructionText = INSTRUCTION_TEXTS[selectedLanguage] || INSTRUCTION_TEXTS.en;
   const avatarSource = AVATAR_SOURCES[selectedLanguage] || AVATAR_SOURCES.en;
 
-  function handleLanguageSelect(language) {
-    setSelectedLanguage(language);
+  function handleLanguageSelect(nextLanguage) {
+    setSelectedLanguage(nextLanguage);
     setSelectedMode("");
     setError("");
     setScreen("mode");
@@ -259,7 +257,7 @@ export default function FragmentoEntryFlow() {
     event.preventDefault();
     const normalizedContractNumber = contractNumber.trim();
     if (!normalizedContractNumber) {
-      setError("Contract number is required.");
+      setError(selectedLanguage === "de" ? "Die Vertragsnummer ist erforderlich." : text.contractLabel.replace(":*", " is required."));
       return;
     }
 
@@ -280,7 +278,7 @@ export default function FragmentoEntryFlow() {
 
       const params = new URLSearchParams({
         contractNumber: payload.contractNumber || normalizedContractNumber,
-        lang: selectedLanguage,
+        lang: mapIntroLanguageToKitchenLanguage(selectedLanguage),
         instructionMode: selectedMode || "text",
       });
 
@@ -420,7 +418,7 @@ export default function FragmentoEntryFlow() {
               <ActionRow
                 backLabel={text.backLabel}
                 onBack={() => setScreen(selectedMode || "mode")}
-                actionLabel={isValidatingContract ? "Checking..." : text.contractAction}
+                actionLabel={isValidatingContract ? (selectedLanguage === "de" ? "Wird geprüft..." : "Checking...") : text.contractAction}
                 submit
                 disabled={isValidatingContract}
               />
