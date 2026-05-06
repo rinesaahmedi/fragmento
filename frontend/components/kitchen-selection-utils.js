@@ -87,8 +87,7 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/AMICA_FH_664_621_S_Produktinformation.pdf" },
   ],
   "HOOD-C-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/FH_664_621_S_ELabel_Eco21_2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/AMICA_FH_664_621_S_Produktinformation.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/extractor-hood-chimney-product-info.pdf" },
   ],
   "OVEN-B-600-HOB": [
     { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },

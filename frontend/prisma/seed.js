@@ -8,6 +8,7 @@ const PRODUCT_INFO_FILES = {
   dishwasher: "/product-info/AMICA_A-EGSPV597210_Produktinformation_Eco21.pdf",
   oven: "/product-info/AMICA_EBX_943_600_S_Produktinformation.pdf",
   hood: "/product-info/AMICA_FH_664_621_S_Produktinformation.pdf",
+  hoodChimney: "/product-info/extractor-hood-chimney-product-info.pdf",
   fridge: "/product-info/AMICA_KGC_15495_S_Produktinformation_Eco21.pdf",
 };
 
@@ -125,8 +126,25 @@ PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
   ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"],
 };
 PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"] = {
-  ...PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"],
-  productInfoSummary: "Flachschirmhaube FH 664 621 S fuer die Kochwand. Die aktuelle Produktinformation nennt Energieklasse A, 60 cm Breite und bis zu 70 dB.",
+  productInfoPdfPath: PRODUCT_INFO_FILES.hoodChimney,
+  productInfoSummary: "Kaminhaube KHF 664 611 S Stripe X fuer die Kochwand. Die Produktinformation nennt Energieklasse A++, 60 cm Breite und bis zu 67 dB.",
+  productInfoKeyFacts: [
+    "Energieklasse: A++",
+    "Geraeusch: max. 67 dB",
+    "Breite: 60 cm",
+    "Luftleistung: 317-595 m3/h",
+    "Betriebsart: Abluft / Umluft",
+  ],
+  productInfoExtractedText: [
+    "Produktname: AMICA KHF 664 611 S Stripe X Kaminhaube, 60 cm.",
+    "Wichtige Punkte:",
+    "- Kaminhaube mit schwarzem Glasschirm und Edelstahlstreifen.",
+    "- Energieklasse A++, Jahresverbrauch 22.7 kWh, Fluid-Dynamic-Effizienzklasse A.",
+    "- 3 Leistungsstufen, Luftleistung 317-595 m3/h, Geraeusch 49-67 dB.",
+    "- SensorTouch, buerstenloser Motor, Nachlaufautomatik und 2 LED-Leuchten.",
+    "Auswahlhinweise:",
+    "- Vor der Bestellung Wandposition, Kaminschacht und Luftfuehrung pruefen.",
+  ].join("\n"),
 };
 PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
 PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
@@ -191,7 +209,7 @@ const MODEL_B_ITEMS = [
 
 const MODEL_C_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-C-545-1800-700", legacyCode: "model-c-refrigerator", name: "Refrigerator (545 x 1800 x 700 mm)", price: "579.00", iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 180 cm, NoFrost", articleNumber: "KGC 15495 S" },
-  { itemType: ItemType.COMPONENT, code: "HOOD-C-FH664621E", legacyCode: "model-c-extractor-hood", name: "FH664621E Extractor Hood", price: "349.00", iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-C-FH664621E", legacyCode: "model-c-extractor-hood", name: "KHF664611S Chimney Extractor Hood", price: "349.00", iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "Chimney hood, 60 cm", articleNumber: "KHF 664 611 S Stripe X" },
   { itemType: ItemType.COMPONENT, code: "CAB-COOK-C-L-600", legacyCode: "model-c-cook-base-left", name: "Base Cabinet (2 Drawers) Left (600 x 600 x 878 mm)", price: "199.00", iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "cook-base-left", sortOrder: 30 },
   { itemType: ItemType.COMPONENT, code: "OVEN-C-600-HOB", legacyCode: "model-c-oven-base", name: "Built-in Oven and Hob (600 x 600 x 878 mm)", price: "449.00", iconKey: "oven_base", colorKey: "#00c76a", componentKey: "oven-base", sortOrder: 40, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "CAB-COOK-C-R-600", legacyCode: "model-c-cook-base-right", name: "Base Cabinet (2 Drawers) Right (600 x 600 x 878 mm)", price: "199.00", iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "cook-base-right", sortOrder: 50 },

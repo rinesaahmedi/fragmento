@@ -5,6 +5,11 @@ const { PrismaClient } = require("@prisma/client");
 
 const prisma = new PrismaClient();
 
+const ADDITIONAL_PRODUCT_INFO_PDF_PATHS_BY_CODE = {
+  "OVEN-B-600-HOB": ["/product-info/AMICA_OL-KMI_754_000_E_Produktinformation.pdf"],
+  "OVEN-C-600-HOB": ["/product-info/AMICA_OL-KMI_754_000_E_Produktinformation.pdf"],
+};
+
 function normalizePdfPath(value) {
   return String(value || "").trim().replace(/^\/+/, "");
 }
@@ -13,6 +18,16 @@ function resolvePublicPdfPath(productInfoPdfPath) {
   const normalized = normalizePdfPath(productInfoPdfPath);
   if (!normalized) return "";
   return path.resolve(process.cwd(), "public", normalized);
+}
+
+function buildPdfPathsForItem(item) {
+  return [
+    item.productInfoPdfPath,
+    ...(ADDITIONAL_PRODUCT_INFO_PDF_PATHS_BY_CODE[item.code] || []),
+  ]
+    .map(normalizePdfPath)
+    .filter(Boolean)
+    .filter((value, index, values) => values.indexOf(value) === index);
 }
 
 function normalizeExtractedText(value) {
@@ -57,42 +72,52 @@ async function main() {
   console.log(`Found ${itemsWithPdf.length} kitchen item(s) with productInfoPdfPath.`);
 
   for (const item of itemsWithPdf) {
-    const normalizedPath = normalizePdfPath(item.productInfoPdfPath);
-    const absolutePath = resolvePublicPdfPath(item.productInfoPdfPath);
+    const pdfPaths = buildPdfPathsForItem(item);
 
     try {
-      if (!textByPdfPath.has(normalizedPath)) {
-        try {
-          await fs.access(absolutePath);
-        } catch {
-          console.warn(`[skip] PDF not found for ${item.code}: ${absolutePath}`);
-          textByPdfPath.set(normalizedPath, "");
-          skippedCount += 1;
-          continue;
-        }
+      const extractedTexts = [];
 
-        try {
-          const extractedText = await extractPdfText(absolutePath);
-          if (!extractedText) {
-            console.warn(`[skip] PDF text is empty for ${item.code}: ${absolutePath}`);
+      for (const normalizedPath of pdfPaths) {
+        const absolutePath = resolvePublicPdfPath(normalizedPath);
+
+        if (!textByPdfPath.has(normalizedPath)) {
+          try {
+            await fs.access(absolutePath);
+          } catch {
+            console.warn(`[skip] PDF not found for ${item.code}: ${absolutePath}`);
             textByPdfPath.set(normalizedPath, "");
             skippedCount += 1;
             continue;
           }
 
-          textByPdfPath.set(normalizedPath, extractedText);
-          console.log(`[extract] ${normalizedPath}: ${extractedText.length} characters`);
-        } catch (error) {
-          console.warn(`[skip] PDF extraction failed for ${item.code}: ${error.message}`);
-          textByPdfPath.set(normalizedPath, "");
-          skippedCount += 1;
-          continue;
+          try {
+            const extractedText = await extractPdfText(absolutePath);
+            if (!extractedText) {
+              console.warn(`[skip] PDF text is empty for ${item.code}: ${absolutePath}`);
+              textByPdfPath.set(normalizedPath, "");
+              skippedCount += 1;
+              continue;
+            }
+
+            textByPdfPath.set(normalizedPath, extractedText);
+            console.log(`[extract] ${normalizedPath}: ${extractedText.length} characters`);
+          } catch (error) {
+            console.warn(`[skip] PDF extraction failed for ${item.code}: ${error.message}`);
+            textByPdfPath.set(normalizedPath, "");
+            skippedCount += 1;
+            continue;
+          }
+        }
+
+        const extractedText = textByPdfPath.get(normalizedPath);
+        if (extractedText) {
+          extractedTexts.push(extractedText);
         }
       }
 
-      const text = textByPdfPath.get(normalizedPath);
+      const text = extractedTexts.join("\n\n---\n\n");
       if (!text) {
-        if (!absolutePath) {
+        if (!pdfPaths.length) {
           console.warn(`[skip] Empty productInfoPdfPath for ${item.code}`);
         }
         continue;
