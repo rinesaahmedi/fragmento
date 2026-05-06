@@ -1455,6 +1455,7 @@ function KitchenConfiguratorContent({
               type="button"
               className={styles.productAssistantLauncher}
               aria-expanded={isProductAssistantOpen}
+              hidden
               onClick={() => {
                 if (isProductAssistantOpen) {
                   setIsProductAssistantOpen(false);
