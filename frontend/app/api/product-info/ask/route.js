@@ -2,8 +2,21 @@ import { NextResponse } from "next/server";
 import { prisma } from "../../../../lib/prisma";
 import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 
-const NOT_FOUND_ANSWER = "Diese Information konnte ich in der Produktinformation nicht finden.";
-const NO_INFO_ANSWER = "Für dieses Produkt ist noch keine Produktinformation verfügbar.";
+const LANGUAGE_LABELS = {
+  de: "German",
+  en: "English",
+};
+
+const NOT_FOUND_ANSWER_BY_LANGUAGE = {
+  de: "Diese Information konnte ich in der Produktinformation nicht finden.",
+  en: "I could not find that information in the product documentation.",
+};
+
+const NO_INFO_ANSWER_BY_LANGUAGE = {
+  de: "Fuer dieses Produkt ist noch keine Produktinformation verfuegbar.",
+  en: "No product information is available for this product yet.",
+};
+
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
 const MAX_CONTEXT_CHARS = 7000;
@@ -68,7 +81,25 @@ function extractResponseText(responsePayload) {
     .trim();
 }
 
-function parseAssistantJson(text) {
+function detectQuestionLanguage(question) {
+  const value = String(question || "").trim().toLowerCase();
+  if (!value) return "en";
+
+  const germanSignals = [
+    /\b(der|die|das|und|oder|mit|fuer|für|ist|sind|hat|haben|welche|welcher|welches|was|wie|kann|gibt|breite|hoehe|höhe)\b/,
+    /[äöüß]/,
+  ];
+  const englishSignals = [
+    /\b(the|and|or|with|is|are|does|do|what|which|how|can|width|height|noise|energy)\b/,
+  ];
+
+  if (germanSignals.some((pattern) => pattern.test(value))) return "de";
+  if (englishSignals.some((pattern) => pattern.test(value))) return "en";
+  return "en";
+}
+
+function parseAssistantJson(text, language) {
+  const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
   const cleaned = String(text || "")
     .trim()
     .replace(/^```(?:json)?/i, "")
@@ -78,14 +109,14 @@ function parseAssistantJson(text) {
   try {
     const parsed = JSON.parse(cleaned);
     const answer = String(parsed?.answer || "").trim();
-    const found = parsed?.found === true && answer && answer !== NOT_FOUND_ANSWER;
+    const found = parsed?.found === true && answer && answer !== notFoundAnswer;
     return {
-      answer: found ? answer : NOT_FOUND_ANSWER,
+      answer: found ? answer : notFoundAnswer,
       found,
     };
   } catch {
     return {
-      answer: NOT_FOUND_ANSWER,
+      answer: notFoundAnswer,
       found: false,
     };
   }
@@ -102,6 +133,9 @@ export async function POST(request) {
     const body = await request.json().catch(() => ({}));
     const question = String(body?.question || "").trim();
     const itemIds = normalizeItemIds(body?.itemIds);
+    const questionLanguage = detectQuestionLanguage(question);
+    const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[questionLanguage] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
+    const noInfoAnswer = NO_INFO_ANSWER_BY_LANGUAGE[questionLanguage] || NO_INFO_ANSWER_BY_LANGUAGE.en;
 
     if (!question) {
       return jsonError("Question is required.", 400);
@@ -130,7 +164,7 @@ export async function POST(request) {
 
     const contextItems = items.filter(hasUsableProductInfo);
     if (!contextItems.length) {
-      return NextResponse.json({ answer: NO_INFO_ANSWER, found: false });
+      return NextResponse.json({ answer: noInfoAnswer, found: false });
     }
 
     const apiKey = process.env.OPENAI_API_KEY;
@@ -145,12 +179,12 @@ export async function POST(request) {
       "Answer only using the provided product information.",
       "Do not use general knowledge.",
       "Do not guess.",
-      "The customer may ask in English or German; always answer in German.",
+      `The customer asked in ${LANGUAGE_LABELS[questionLanguage] || LANGUAGE_LABELS.en}; answer in the same language.`,
       "If the customer asks for the product name, model, type, or what the product is, use only the explicit product name, model, type, code, summary, or key facts from the provided product information.",
-      `If the answer is not clearly supported by the provided product information, answer exactly: "${NOT_FOUND_ANSWER}"`,
-      "Keep answers short, clear, customer-friendly, and in German.",
+      `If the answer is not clearly supported by the provided product information, answer exactly: "${notFoundAnswer}"`,
+      `Keep answers short, clear, customer-friendly, and in ${LANGUAGE_LABELS[questionLanguage] || LANGUAGE_LABELS.en}.`,
       'Return only valid JSON with this shape: {"answer":"string","found":boolean}.',
-      `Set found to false whenever the answer is "${NOT_FOUND_ANSWER}".`,
+      `Set found to false whenever the answer is "${notFoundAnswer}".`,
     ].join("\n");
 
     const controller = new AbortController();
@@ -203,7 +237,7 @@ export async function POST(request) {
     }
 
     const responsePayload = await openAiResponse.json();
-    const parsed = parseAssistantJson(extractResponseText(responsePayload));
+    const parsed = parseAssistantJson(extractResponseText(responsePayload), questionLanguage);
 
     return NextResponse.json(parsed);
   } catch (error) {

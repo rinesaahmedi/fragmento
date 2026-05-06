@@ -5,6 +5,7 @@ import {
   componentIdForItem,
   formatCurrency,
   getCatalogDisplayItem,
+  getLocalizedItemName,
   getProductInfoHref,
   isLinkedComponentSelected,
   toggleLinkedComponentSelection,
@@ -79,6 +80,25 @@ const TOOLTIP_PREVIEW_BY_CODE = {
   "OVEN-C-600-HOB": "/product-info-previews/oven-hob-preview.png",
 };
 
+function localizeProductInfoDocumentLabel(label, translate) {
+  const normalized = String(label || "").trim().toLowerCase();
+
+  switch (normalized) {
+    case "backofen e-label":
+      return translate("configurator.productInfoLabelOvenELabel", "Oven E-Label");
+    case "backofen pdf":
+      return translate("configurator.productInfoLabelOvenPdf", "Oven PDF");
+    case "kochfeld pdf":
+      return translate("configurator.productInfoLabelHobPdf", "Hob PDF");
+    case "produktinfo pdf":
+      return translate("configurator.productInfoLabelProductPdf", "Product info PDF");
+    case "e-label pdf":
+      return translate("configurator.productInfoLabelELabelPdf", "E-Label PDF");
+    default:
+      return label;
+  }
+}
+
 function getTooltipFacts(item) {
   return (Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : [])
     .map((fact) => String(fact || "").trim())
@@ -90,14 +110,15 @@ function getTooltipPreviewSrc(item) {
   return TOOLTIP_PREVIEW_BY_CODE[item?.tooltipPreviewCode || item?.code] || "";
 }
 
-function getTooltipDocumentLabels(item) {
+function getTooltipDocumentLabels(item, translate) {
   return (Array.isArray(item?.productInfoDocuments) ? item.productInfoDocuments : [])
-    .map((document) => String(document?.label || "").trim())
+    .map((document) => localizeProductInfoDocumentLabel(document?.label, translate))
     .filter(Boolean);
 }
 
 function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHref, onClick, onOpenInfo }) {
   const { translate } = usePublicI18n();
+  const itemName = getLocalizedItemName(item, translate);
   const className = [
     styles.itemCard,
     selected ? styles.itemCardSelected : "",
@@ -108,7 +129,7 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
     .join(" ");
   const tooltipFacts = getTooltipFacts(item);
   const tooltipPreviewSrc = getTooltipPreviewSrc(item);
-  const tooltipDocumentLabels = getTooltipDocumentLabels(item);
+  const tooltipDocumentLabels = getTooltipDocumentLabels(item, translate);
   const handleCardKeyDown = (event) => {
     if (locked || disabled) {
       return;
@@ -132,7 +153,7 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
       <div className={styles.itemTop}>
         <span className={styles.itemIcon} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
         <div className={styles.itemText}>
-          <strong>{item.name}</strong>
+          <strong>{itemName}</strong>
           {item.code ? <span className={styles.itemCode}>{translate("common.code", "Code")}: {item.code}</span> : null}
           {item.linkedInfoBadge ? <span className={styles.itemLinkedBadge}>{item.linkedInfoBadge}</span> : null}
           {item.infoText ? <p>{item.infoText}</p> : null}
@@ -156,10 +177,10 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
               <button
                 type="button"
                 className={styles.itemInfoTrigger}
-                aria-label={translate("configurator.infoForItem", "Info about {name}", { name: item.name })}
+                aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemName })}
                 onClick={(event) => {
                   event.stopPropagation();
-                  onOpenInfo?.({ item, price, infoPdfHref });
+                  onOpenInfo?.({ item: { ...item, name: itemName }, price, infoPdfHref });
                 }}
               >
                 i

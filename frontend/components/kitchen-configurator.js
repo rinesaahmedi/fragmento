@@ -11,6 +11,7 @@ import {
   componentIdForItem,
   componentIdForKey,
   formatCurrency,
+  getLocalizedItemName,
   isHiddenLinkedComponent,
   normalizeColor,
   selectedMap,
@@ -124,22 +125,57 @@ function buildInitialAddressPreference(initialOrder, contractNumber, contractAdd
   return customerUsesContractAddress(initialCustomer, contractAddress);
 }
 
+function localizeProductInfoDocumentLabel(label, translate) {
+  const normalized = String(label || "").trim().toLowerCase();
+
+  switch (normalized) {
+    case "backofen e-label":
+      return translate("configurator.productInfoLabelOvenELabel", "Oven E-Label");
+    case "backofen pdf":
+      return translate("configurator.productInfoLabelOvenPdf", "Oven PDF");
+    case "kochfeld pdf":
+      return translate("configurator.productInfoLabelHobPdf", "Hob PDF");
+    case "produktinfo pdf":
+      return translate("configurator.productInfoLabelProductPdf", "Product info PDF");
+    case "e-label pdf":
+      return translate("configurator.productInfoLabelELabelPdf", "E-Label PDF");
+    default:
+      return label;
+  }
+}
+
+const PRODUCT_INFO_PDF_REVISION = "20260506";
+
+function withProductInfoPdfRevision(href) {
+  const value = String(href || "").trim();
+  if (!value) return "";
+
+  const separator = value.includes("?") ? "&" : "?";
+  return `${value}${separator}v=${PRODUCT_INFO_PDF_REVISION}`;
+}
+
 function buildProductInfoState(payload, translate) {
   if (!payload?.infoPdfHref || !payload?.item) return null;
 
-  const productInfoDocuments = Array.isArray(payload.item.productInfoDocuments)
+  const rawProductInfoDocuments = Array.isArray(payload.item.productInfoDocuments)
     ? payload.item.productInfoDocuments.filter((document) => document?.href)
     : payload.infoPdfHref
       ? [{ label: "Produktinfo PDF", href: payload.infoPdfHref }]
       : [];
   const defaultProductInfoDocument =
-    productInfoDocuments.find((document) => String(document.label || "").toLowerCase().includes("produktinfo"))
-    || productInfoDocuments[0]
+    rawProductInfoDocuments.find((document) => String(document.label || "").toLowerCase().includes("produktinfo"))
+    || rawProductInfoDocuments[0]
     || null;
+  const productInfoDocuments = rawProductInfoDocuments.map((document) => ({
+    ...document,
+    label: localizeProductInfoDocumentLabel(document.label, translate),
+    href: withProductInfoPdfRevision(document.href),
+  }));
 
   return {
     ...payload,
-    title: payload.item.name || translate("configurator.productInfoTitle", "Product information", { title: "" }).trim(),
+    infoPdfHref: withProductInfoPdfRevision(payload.infoPdfHref),
+    title: getLocalizedItemName(payload.item, translate) || translate("configurator.productInfoTitle", "Product information", { title: "" }).trim(),
     price: Number(payload.price ?? payload.item.price ?? 0),
     infoText: payload.item.infoText || "",
     productInfoSummary: payload.item.productInfoSummary || "",
@@ -147,7 +183,8 @@ function buildProductInfoState(payload, translate) {
     productInfoExtractedText: payload.item.productInfoExtractedText || "",
     productInfoItemId: payload.item.productInfoItemId || payload.item.id || "",
     productInfoDocuments,
-    activeProductInfoDocumentHref: defaultProductInfoDocument?.href || payload.infoPdfHref,
+    activeProductInfoDocumentHref:
+      withProductInfoPdfRevision(defaultProductInfoDocument?.href) || withProductInfoPdfRevision(payload.infoPdfHref),
   };
 }
 
@@ -1084,6 +1121,7 @@ function KitchenConfiguratorContent({
               onRemoveAccessory={removeAccessory}
               onRemoveService={removeService}
               onOpenOrderSection={openOrderSection}
+              onOpenProductInfo={openProductInfo}
             />
           </div>
 

@@ -1186,6 +1186,31 @@
   color: #257147;
 }
 
+.summaryLockedActions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.summaryInfoButton {
+  appearance: none;
+  border: 1px solid rgba(122, 77, 39, 0.18);
+  background: #fff8f0;
+  color: #7a4d27;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.summaryInfoButton:hover {
+  background: #fff0dc;
+}
+
 .summaryRemove {
   appearance: none;
   border: 1px solid rgba(181, 59, 48, 0.18);
@@ -1927,7 +1952,8 @@
   }
 
   .summaryRemove,
-  .summaryBadge {
+  .summaryBadge,
+  .summaryLockedActions {
     grid-column: 1 / -1;
     justify-self: start;
   }

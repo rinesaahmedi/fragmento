@@ -3,13 +3,19 @@
 import styles from "./kitchen-configurator.module.css";
 import {
   formatCurrency,
+  getLocalizedItemName,
+  getProductInfoDocuments,
+  getProductInfoHref,
 } from "./kitchen-selection-utils";
 import { usePublicI18n } from "./public-i18n";
 
-function SummaryRow({ item, onRemove }) {
+function SummaryRow({ item, onRemove, onOpenInfo }) {
   const { translate } = usePublicI18n();
   const price = Number(item.price || 0);
   const isLocked = item.isLocked || item.isOrderLocked;
+  const itemName = getLocalizedItemName(item, translate);
+  const infoPdfHref = getProductInfoHref(item);
+  const productInfoDocuments = getProductInfoDocuments(item);
   const priceClassName = [
     styles.summaryPrice,
     isLocked && price <= 0 ? styles.summaryPriceIncluded : "",
@@ -31,17 +37,38 @@ function SummaryRow({ item, onRemove }) {
   return (
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
-        <strong>{item.name}</strong>
+        <strong>{itemName}</strong>
         {item.code ? <span className={styles.itemCode}>{translate("common.code", "Code")}: {item.code}</span> : null}
         <span>{metaLabel}</span>
       </div>
       <strong className={priceClassName}>{priceLabel}</strong>
       {isLocked ? (
-        <span className={[styles.summaryBadge, styles.summaryBadgeLocked].join(" ")}>
-          {item.isOrderLocked
-            ? translate("configurator.summaryBadgeConfirmed", "Confirmed")
-            : translate("configurator.summaryBadgeStandard", "Standard")}
-        </span>
+        <div className={styles.summaryLockedActions}>
+          {infoPdfHref ? (
+            <button
+              type="button"
+              className={styles.summaryInfoButton}
+              onClick={() =>
+                onOpenInfo?.({
+                  item: {
+                    ...item,
+                    name: itemName,
+                    productInfoDocuments,
+                  },
+                  price,
+                  infoPdfHref,
+                })
+              }
+            >
+              {translate("configurator.productInfoOpenShort", "Info")}
+            </button>
+          ) : null}
+          <span className={[styles.summaryBadge, styles.summaryBadgeLocked].join(" ")}>
+            {item.isOrderLocked
+              ? translate("configurator.summaryBadgeConfirmed", "Confirmed")
+              : translate("configurator.summaryBadgeStandard", "Standard")}
+          </span>
+        </div>
       ) : (
         <button type="button" className={styles.summaryRemove} onClick={() => onRemove(item)}>
           {translate("common.remove", "Remove")}
@@ -62,6 +89,7 @@ export default function KitchenSelectionSummary({
   onRemoveAccessory,
   onRemoveService,
   onOpenOrderSection,
+  onOpenProductInfo,
 }) {
   const { translate } = usePublicI18n();
   return (
@@ -81,24 +109,24 @@ export default function KitchenSelectionSummary({
           <div className={styles.summarySectionTitle}>{translate("configurator.summaryStandardEquipment", "Standard equipment")}</div>
         ) : null}
         {lockedSelectedComponents.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} />
+          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
         ))}
 
         {optionalSelectedComponents.length ? (
           <div className={styles.summarySectionTitle}>{translate("configurator.summaryAdditionalComponents", "Additional components")}</div>
         ) : null}
         {optionalSelectedComponents.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} />
+          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
         ))}
 
         {selectedAccessories.length ? <div className={styles.summarySectionTitle}>{translate("configurator.summaryAccessories", "Accessories")}</div> : null}
         {selectedAccessories.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveAccessory} />
+          <SummaryRow key={item.id} item={item} onRemove={onRemoveAccessory} onOpenInfo={onOpenProductInfo} />
         ))}
 
         {selectedServices.length ? <div className={styles.summarySectionTitle}>{translate("configurator.summaryServices", "Services")}</div> : null}
         {selectedServices.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveService} />
+          <SummaryRow key={item.id} item={item} onRemove={onRemoveService} onOpenInfo={onOpenProductInfo} />
         ))}
       </div>
       <div className={styles.summaryActions}>

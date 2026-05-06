@@ -61,6 +61,18 @@ export function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
 }
 
+export function getLocalizedItemName(item, translate) {
+  const code = String(item?.code || "").trim().toUpperCase();
+
+  switch (code) {
+    case "OVEN-B-600-HOB":
+    case "OVEN-C-600-HOB":
+      return translate("configurator.itemNameOvenHob", "Built-in Oven and Hob");
+    default:
+      return item?.name || "";
+  }
+}
+
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
 };
@@ -68,36 +80,36 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   "DISH-B-600-STD": [
     { label: "E-Label PDF", href: "/product-info/A-EGSPV597210_Elabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/AMICA_A-EGSPV597210_Produktinformation_Eco21.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf" },
   ],
   "DISH-C-600-STD": [
     { label: "E-Label PDF", href: "/product-info/A-EGSPV597210_Elabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/AMICA_A-EGSPV597210_Produktinformation_Eco21.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf" },
   ],
   "REF-B-545-1800-700": [
     { label: "E-Label PDF", href: "/product-info/KGC_15495_S_Elabel_Eco21_2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/AMICA_KGC_15495_S_Produktinformation_Eco21.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf" },
   ],
   "REF-C-545-1800-700": [
     { label: "E-Label PDF", href: "/product-info/KGC_15495_S_Elabel_Eco21_2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/AMICA_KGC_15495_S_Produktinformation_Eco21.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf" },
   ],
   "HOOD-B-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/FH_664_621_S_ELabel_Eco21_2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/AMICA_FH_664_621_S_Produktinformation.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/FH_664_621_S_Produktinformation.pdf" },
   ],
   "HOOD-C-FH664621E": [
     { label: "Produktinfo PDF", href: "/product-info/extractor-hood-chimney-product-info.pdf" },
   ],
   "OVEN-B-600-HOB": [
     { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/AMICA_EBX_943_600_S_Produktinformation.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/AMICA_OL-KMI_754_000_E_Produktinformation.pdf" },
+    { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
   ],
   "OVEN-C-600-HOB": [
     { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/AMICA_EBX_943_600_S_Produktinformation.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/AMICA_OL-KMI_754_000_E_Produktinformation.pdf" },
+    { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
   ],
 };
 
@@ -105,7 +117,7 @@ export function getProductInfoHref(item) {
   return item?.productInfoPdfPath || "";
 }
 
-function getProductInfoDocuments(item) {
+export function getProductInfoDocuments(item) {
   const mappedDocuments = PRODUCT_INFO_DOCUMENTS_BY_CODE[item?.code];
   if (Array.isArray(mappedDocuments) && mappedDocuments.length) {
     return mappedDocuments;

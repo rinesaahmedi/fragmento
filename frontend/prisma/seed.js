@@ -5,11 +5,11 @@ const { PrismaClient, KitchenStatus, ItemType } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const PRODUCT_INFO_FILES = {
-  dishwasher: "/product-info/AMICA_A-EGSPV597210_Produktinformation_Eco21.pdf",
-  oven: "/product-info/AMICA_EBX_943_600_S_Produktinformation.pdf",
-  hood: "/product-info/AMICA_FH_664_621_S_Produktinformation.pdf",
+  dishwasher: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf",
+  oven: "/product-info/EBX_943_600_S_Produktinformation.pdf",
+  hood: "/product-info/FH_664_621_S_Produktinformation.pdf",
   hoodChimney: "/product-info/extractor-hood-chimney-product-info.pdf",
-  fridge: "/product-info/AMICA_KGC_15495_S_Produktinformation_Eco21.pdf",
+  fridge: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf",
 };
 
 const PRODUCT_INFO_BY_CODE = {
