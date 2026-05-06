@@ -942,6 +942,65 @@
   text-transform: uppercase;
 }
 
+.productAssistantPickerHint {
+  margin: 0;
+  color: #6b6259;
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.productAssistantActiveContext {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(120, 90, 64, 0.12);
+  border-radius: 16px;
+  background: #fcfaf6;
+}
+
+.productAssistantActiveContextMeta {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  text-align: right;
+}
+
+.productAssistantActiveContextMeta strong {
+  color: #2f2a24;
+  font-size: 0.88rem;
+  line-height: 1.35;
+}
+
+.productAssistantBackButton {
+  appearance: none;
+  border: 1px solid rgba(122, 77, 39, 0.18);
+  border-radius: 999px;
+  background: #fff;
+  color: #6d3f18;
+  padding: 7px 12px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.productAssistantBackButton:hover {
+  background: #faf5ee;
+  border-color: rgba(122, 77, 39, 0.32);
+  box-shadow: 0 6px 16px rgba(109, 63, 24, 0.06);
+}
+
+.productAssistantBackButton:focus-visible {
+  outline: 2px solid rgba(42, 145, 85, 0.22);
+  outline-offset: 2px;
+}
+
 .productAssistantMessages {
   min-height: 0;
   display: flex;

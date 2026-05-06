@@ -11,6 +11,7 @@ import {
   componentIdForItem,
   componentIdForKey,
   formatCurrency,
+  getCatalogDisplayItem,
   getLocalizedItemName,
   isHiddenLinkedComponent,
   normalizeColor,
@@ -175,7 +176,10 @@ function buildProductInfoState(payload, translate) {
   return {
     ...payload,
     infoPdfHref: withProductInfoPdfRevision(payload.infoPdfHref),
-    title: getLocalizedItemName(payload.item, translate) || translate("configurator.productInfoTitle", "Product information", { title: "" }).trim(),
+    title:
+      payload.item.productAssistantName
+      || getLocalizedItemName(payload.item, translate)
+      || translate("configurator.productInfoTitle", "Product information", { title: "" }).trim(),
     price: Number(payload.price ?? payload.item.price ?? 0),
     infoText: payload.item.infoText || "",
     productInfoSummary: payload.item.productInfoSummary || "",
@@ -243,16 +247,66 @@ function buildProductAssistantIntro(activeProductInfo, selectedItems) {
 const PRODUCT_ASSISTANT_INTRO =
   "Hallo! Ich kann dir Fragen zu den ausgewählten Produkten beantworten. Worüber möchtest du sprechen?";
 
-function buildProductAssistantContextOptions(activeProductInfo, selectedItems, translate) {
+function hasAssistantProductInfo(item) {
+  const itemId = item?.productInfoItemId || item?.id;
+  return Boolean(itemId && (item?.productInfoExtractedText || item?.productInfoSummary || item?.productInfoPdfPath));
+}
+
+function buildLocalizedProductAssistantIntro(activeProductInfo, selectedItems, translate) {
+  const names = selectedItems
+    .map((item) => item.productAssistantName || item.name)
+    .filter(Boolean);
+
+  if (activeProductInfo?.title) {
+    return translate("configurator.productAssistantIntroOpened", "You're now looking at {label}. Ask me anything from its product information.", {
+      label: activeProductInfo.title,
+    });
+  }
+
+  if (names.length === 1) {
+    return translate("configurator.productAssistantIntroSelectedOne", "You've selected {label}. Ask me anything from its product information.", {
+      label: names[0],
+    });
+  }
+
+  if (names.length > 1) {
+    return translate("configurator.productAssistantIntroSelectedMany", "You've selected {labels}. Ask me anything from their product information.", {
+      labels: names.join(", "),
+    });
+  }
+
+  return translate("configurator.productAssistantIntroChooseDocumented", "Choose a product with product information first.");
+}
+
+function buildAssistantCatalogItems(kitchenConfig, kitchenSlug) {
+  const itemsById = new Map();
+  const visibleComponents = kitchenConfig.components.filter((item) => {
+    const componentId = componentIdForItem(item);
+    return !isHiddenLinkedComponent(kitchenSlug, componentId);
+  });
+
+  for (const item of visibleComponents) {
+    const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, item)?.item;
+    const itemId = displayItem?.productInfoItemId || displayItem?.id;
+    if (!hasAssistantProductInfo(displayItem) || itemsById.has(itemId)) continue;
+    itemsById.set(itemId, displayItem);
+  }
+
+  for (const item of [...kitchenConfig.accessories, ...kitchenConfig.services]) {
+    const itemId = item.productInfoItemId || item.id;
+    if (!hasAssistantProductInfo(item) || itemsById.has(itemId)) continue;
+    itemsById.set(itemId, item);
+  }
+
+  return Array.from(itemsById.values());
+}
+
+function buildProductAssistantContextOptions(activeProductInfo, catalogItems, selectedItems, translate) {
   const itemsById = new Map();
 
-  for (const item of selectedItems) {
+  for (const item of catalogItems) {
     const itemId = item.productInfoItemId || item.id;
-    const hasProductInfo = Boolean(
-      itemId && (item.productInfoExtractedText || item.productInfoSummary || item.productInfoPdfPath),
-    );
-
-    if (!hasProductInfo || itemsById.has(itemId)) continue;
+    if (!hasAssistantProductInfo(item) || itemsById.has(itemId)) continue;
     itemsById.set(itemId, item);
   }
 
@@ -261,18 +315,21 @@ function buildProductAssistantContextOptions(activeProductInfo, selectedItems, t
 
   const options = [];
   const activeItemId = activeProductInfo?.productInfoItemId;
-
   options.push({
-    key: "all-selected",
-    label: translate("configurator.productAssistantAllSelection", "Entire selection"),
-    shortLabel: translate("configurator.productAssistantAllSelection", "Entire selection"),
+    key: "all-documented",
+    label: translate("configurator.productAssistantAllProducts", "All documented products"),
+    shortLabel: translate("configurator.productAssistantAllProducts", "All documented products"),
     itemIds: items.map((item) => item.productInfoItemId || item.id).filter(Boolean),
     type: "all",
   });
 
   if (activeItemId && itemsById.has(activeItemId)) {
     const activeItem = itemsById.get(activeItemId);
-    const activeItemName = activeItem.name || activeProductInfo.title || translate("configurator.productAssistantCurrentProductFallback", "This product");
+    const activeItemName =
+      activeItem.productAssistantName
+      || activeItem.name
+      || activeProductInfo.title
+      || translate("configurator.productAssistantCurrentProductFallback", "This product");
     options.push({
       key: `current-${activeItemId}`,
       label: translate("configurator.productAssistantCurrentProduct", "This product: {name}", { name: activeItemName }),
@@ -285,10 +342,11 @@ function buildProductAssistantContextOptions(activeProductInfo, selectedItems, t
 
   for (const item of items) {
     const itemId = item.productInfoItemId || item.id;
+    const itemLabel = item.productAssistantName || item.name || item.code || translate("configurator.productAssistantProductFallback", "Product");
     options.push({
       key: `item-${itemId}`,
-      label: item.name || item.code || translate("configurator.productAssistantProductFallback", "Product"),
-      shortLabel: item.name || item.code || translate("configurator.productAssistantProductFallback", "Product"),
+      label: itemLabel,
+      shortLabel: itemLabel,
       itemIds: [itemId],
       type: "item",
     });
@@ -298,7 +356,13 @@ function buildProductAssistantContextOptions(activeProductInfo, selectedItems, t
 }
 
 function getDefaultProductAssistantContext(options) {
-  return options.find((option) => option.type === "all") || options[0] || null;
+  return (
+    options.find((option) => option.type === "current")
+    || options.find((option) => option.type === "selected")
+    || options.find((option) => option.type === "all")
+    || options[0]
+    || null
+  );
 }
 
 function normalizeQuestionToken(value) {
@@ -555,31 +619,37 @@ function KitchenConfiguratorContent({
     isOrderLocked: orderLockedServiceCodes.has(item.code),
   }));
   const selectedProductCount = selectedComponents.length + selectedAccessories.length + selectedServices.length;
-  const hasAnySelectedProducts = selectedProductCount > 0;
-  const selectedProductInfoItems = [...selectedComponents, ...selectedAccessories, ...selectedServices].filter(
-    (item) => item.productInfoPdfPath || item.productInfoExtractedText || item.productInfoSummary,
+  const selectedProductInfoItems = [...selectedComponents, ...selectedAccessories, ...selectedServices].filter(hasAssistantProductInfo);
+  const assistantCatalogItems = useMemo(
+    () => buildAssistantCatalogItems(kitchenConfig, kitchenSlug),
+    [kitchenConfig, kitchenSlug],
   );
+  const hasAnySelectedProducts = selectedProductCount > 0;
+  const hasAnyAssistantProducts = assistantCatalogItems.length > 0;
   const productAssistantContextOptions = buildProductAssistantContextOptions(
     activeProductInfo,
+    assistantCatalogItems,
     selectedProductInfoItems,
     translate,
   );
   const hasProductAssistantOptions = productAssistantContextOptions.length > 0;
-  const productAssistantIntro = translate("configurator.productAssistantIntro", PRODUCT_ASSISTANT_INTRO);
-  const productAssistantDefaultContext = getDefaultProductAssistantContext(productAssistantContextOptions);
-  const productAssistantSelectionStatus = selectedProductCount
-    ? translate(
-        selectedProductCount === 1
-          ? "configurator.productAssistantSelectionCountOne"
-          : "configurator.productAssistantSelectionCountOther",
-        selectedProductCount === 1 ? "1 selected product" : "{count} selected products",
-        { count: selectedProductCount },
-      )
-    : "";
+  const productAssistantEmptyIntro = translate("configurator.productAssistantIntro", "Hi. I can answer questions about the available products and their documentation. What would you like to discuss?");
+  const productAssistantPickerIntro = hasAnySelectedProducts
+    ? buildLocalizedProductAssistantIntro(activeProductInfo, selectedProductInfoItems, translate)
+    : productAssistantEmptyIntro;
+  const productAssistantSuggestedContext = getDefaultProductAssistantContext(productAssistantContextOptions);
+  const productAssistantSubtitle = translate(
+    hasAnySelectedProducts
+      ? "configurator.productAssistantSubtitle"
+      : "configurator.productAssistantSubtitleCatalog",
+    hasAnySelectedProducts
+      ? "Questions about your current selection"
+      : "Questions about product details and documentation",
+  );
   const productAssistantOptionsKey = productAssistantContextOptions
     .map((option) => `${option.key}:${option.itemIds.join(",")}`)
     .join("|");
-  const selectedProductInfoNames = selectedProductInfoItems.map((item) => item.name).filter(Boolean);
+  const selectedProductInfoNames = selectedProductInfoItems.map((item) => item.productAssistantName || item.name).filter(Boolean);
   const selectedProductInfoNotes = selectedProductInfoItems.flatMap((item) =>
     extractProductInfoBullets(item.productInfoExtractedText, "Auswahlhinweise", 2).map((note) => ({
       key: `${item.code}-${note}`,
@@ -603,7 +673,7 @@ function KitchenConfiguratorContent({
     [kitchenConfig.montageRequiredCodes, selectedAccessories, selectedComponents],
   );
   useEffect(() => {
-    if (hasProductAssistantOptions || hasAnySelectedProducts) return;
+    if (hasProductAssistantOptions || hasAnyAssistantProducts) return;
 
     setProductAssistantMessages([]);
     setSelectedProductAssistantContext(null);
@@ -611,26 +681,17 @@ function KitchenConfiguratorContent({
     setProductInfoError("");
     setProductInfoIsLoading(false);
     setIsProductAssistantOpen(false);
-  }, [hasProductAssistantOptions, hasAnySelectedProducts]);
+  }, [hasAnyAssistantProducts, hasProductAssistantOptions]);
 
   useEffect(() => {
     if (!isProductAssistantOpen) return;
 
-    setSelectedProductAssistantContext(productAssistantDefaultContext);
-    setProductAssistantMessages(
-      hasProductAssistantOptions
-        ? [
-            {
-              role: "assistant",
-              text: productAssistantIntro,
-            },
-          ]
-        : [],
-    );
+    setSelectedProductAssistantContext(null);
+    setProductAssistantMessages([]);
     setProductInfoQuestion("");
     setProductInfoError("");
     setProductInfoIsLoading(false);
-  }, [isProductAssistantOpen, productAssistantOptionsKey, hasProductAssistantOptions, productAssistantIntro, productAssistantDefaultContext?.key]);
+  }, [isProductAssistantOpen, productAssistantOptionsKey, hasProductAssistantOptions]);
   const grandTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
     (sum, item) => sum + Number(item.price || 0),
     0,
@@ -843,11 +904,21 @@ function KitchenConfiguratorContent({
   }
 
   function resetProductAssistantContext() {
-    setSelectedProductAssistantContext(productAssistantDefaultContext);
+    setSelectedProductAssistantContext(null);
+    setProductAssistantMessages([]);
+    setProductInfoQuestion("");
+    setProductInfoError("");
+    setProductInfoIsLoading(false);
+  }
+
+  function selectProductAssistantContext(option) {
+    setSelectedProductAssistantContext(option);
     setProductAssistantMessages([
       {
         role: "assistant",
-        text: productAssistantIntro,
+        text: translate("configurator.productAssistantContextConfirmed", "You're now asking about {label}. Ask me anything from its product information.", {
+          label: option.shortLabel,
+        }),
       },
     ]);
     setProductInfoQuestion("");
@@ -855,35 +926,16 @@ function KitchenConfiguratorContent({
     setProductInfoIsLoading(false);
   }
 
-  function selectProductAssistantContext(option) {
-    if (selectedProductAssistantContext?.key === option.key) return;
-
-    setSelectedProductAssistantContext(option);
-    setProductAssistantMessages((current) => {
-      const introMessage = {
-        role: "assistant",
-        text: productAssistantIntro,
-      };
-      const confirmationMessage = {
-        role: "assistant",
-        text: translate("configurator.productAssistantContextConfirmed", "Got it. Ask me anything about: {label}.", {
-          label: option.shortLabel,
-        }),
-      };
-
-      if (!current.length) {
-        return [introMessage, confirmationMessage];
-      }
-
-      return [...current, confirmationMessage];
-    });
+  function returnToProductAssistantPicker() {
+    setSelectedProductAssistantContext(null);
+    setProductAssistantMessages([]);
     setProductInfoQuestion("");
     setProductInfoError("");
     setProductInfoIsLoading(false);
   }
 
   function openProductAssistant() {
-    if (!hasAnySelectedProducts) return;
+    if (!hasAnyAssistantProducts) return;
     setIsProductAssistantOpen(true);
     if (hasProductAssistantOptions) {
       resetProductAssistantContext();
@@ -918,6 +970,7 @@ function KitchenConfiguratorContent({
         signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          language,
           question,
           itemIds: [...new Set(itemIds)].slice(0, 10),
         }),
@@ -925,23 +978,23 @@ function KitchenConfiguratorContent({
 
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(payload.error || "Die Produktfrage konnte nicht beantwortet werden.");
+        throw new Error(payload.error || translate("configurator.productAssistantErrorUnavailable", "The product question could not be answered."));
       }
 
       setProductAssistantMessages((current) => [
         ...current,
         {
           role: "assistant",
-          text: payload.answer || "Diese Information konnte ich in der Produktinformation nicht finden.",
+          text: payload.answer || translate("configurator.productAssistantNoInfo", "No product information is available yet."),
         },
       ]);
     } catch (error) {
       const nextError =
         error?.name === "AbortError"
-          ? "Die Anfrage dauert zu lange. Bitte versuchen Sie es erneut."
+          ? translate("configurator.productAssistantErrorTimeout", "The request is taking too long. Please try again.")
           : error instanceof Error
             ? error.message
-            : "Die Produktfrage konnte nicht beantwortet werden.";
+            : translate("configurator.productAssistantErrorUnavailable", "The product question could not be answered.");
       setProductInfoError(nextError);
       setProductAssistantMessages((current) => [...current, { role: "assistant", text: nextError, tone: "error" }]);
     } finally {
@@ -1256,7 +1309,7 @@ function KitchenConfiguratorContent({
           </div>
         ) : null}
 
-        {hasAnySelectedProducts ? (
+        {hasAnyAssistantProducts ? (
           <div
             className={[
               styles.productAssistantDock,
@@ -1275,18 +1328,15 @@ function KitchenConfiguratorContent({
                 <div className={styles.productAssistantHeader}>
                   <div>
                     <h2 id="product-assistant-title">
-                      {translate("configurator.productAssistantTitle", "Product Assistant")}
+                      {translate("configurator.productAssistantTitle", "Product Agent")}
                     </h2>
-                    <p>{translate("configurator.productAssistantSubtitle", "Questions about your current selection")}</p>
-                    {productAssistantSelectionStatus ? (
-                      <span className={styles.productAssistantStatus}>{productAssistantSelectionStatus}</span>
-                    ) : null}
+                    <p>{productAssistantSubtitle}</p>
                   </div>
                   <div className={styles.productAssistantHeaderActions}>
                     <button
                       type="button"
                       className={styles.productAssistantMinimize}
-                      aria-label={translate("configurator.productAssistantCloseAria", "Close Product Assistant")}
+                      aria-label={translate("configurator.productAssistantCloseAria", "Close Product Agent")}
                       onClick={() => setIsProductAssistantOpen(false)}
                     >
                       <span aria-hidden="true">&times;</span>
@@ -1294,32 +1344,49 @@ function KitchenConfiguratorContent({
                   </div>
                 </div>
 
-                {hasProductAssistantOptions ? (
+                {!selectedProductAssistantContext && hasProductAssistantOptions ? (
                   <div className={styles.productAssistantContextSection}>
                     <div className={styles.productAssistantSectionLabel}>
-                      {translate("configurator.productAssistantContextTitle", "Context")}
+                      {translate("configurator.productAssistantContextTitle", "Choose a product")}
                     </div>
+                    <p className={styles.productAssistantPickerHint}>
+                      {translate("configurator.productAssistantPickerHint", "Select what you want to talk about, then continue in chat.")}
+                      {productAssistantSuggestedContext ? ` ${translate("configurator.productAssistantPickerSuggested", "You can start with: {label}.", { label: productAssistantSuggestedContext.shortLabel })}` : ""}
+                    </p>
                     <div className={styles.productAssistantContextOptions}>
-                      {productAssistantContextOptions.map((option) => {
-                        const isActive = selectedProductAssistantContext?.key === option.key;
-                        return (
-                          <button
-                            key={option.key}
-                            type="button"
-                            className={[
-                              styles.productAssistantContextButton,
-                              option.type === "all" ? styles.productAssistantContextButtonDefault : styles.productAssistantContextButtonSecondary,
-                              isActive ? styles.productAssistantContextButtonActive : "",
-                            ]
-                              .filter(Boolean)
-                              .join(" ")}
-                            aria-pressed={isActive}
-                            onClick={() => selectProductAssistantContext(option)}
-                          >
-                            {option.label}
-                          </button>
-                        );
-                      })}
+                      {productAssistantContextOptions.map((option) => (
+                        <button
+                          key={option.key}
+                          type="button"
+                          className={[
+                            styles.productAssistantContextButton,
+                            option.type === "all" ? styles.productAssistantContextButtonDefault : styles.productAssistantContextButtonSecondary,
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          onClick={() => selectProductAssistantContext(option)}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {selectedProductAssistantContext ? (
+                  <div className={styles.productAssistantActiveContext}>
+                    <button
+                      type="button"
+                      className={styles.productAssistantBackButton}
+                      onClick={returnToProductAssistantPicker}
+                    >
+                      {translate("configurator.productAssistantBackToPicker", "Back to products")}
+                    </button>
+                    <div className={styles.productAssistantActiveContextMeta}>
+                      <span className={styles.productAssistantSectionLabel}>
+                        {translate("configurator.productAssistantActiveContext", "Talking about")}
+                      </span>
+                      <strong>{selectedProductAssistantContext.label}</strong>
                     </div>
                   </div>
                 ) : null}
@@ -1333,6 +1400,11 @@ function KitchenConfiguratorContent({
                           "No product information is available for your current selection yet.",
                         )}
                       </span>
+                    </div>
+                  ) : null}
+                  {!selectedProductAssistantContext && hasProductAssistantOptions ? (
+                    <div className={`${styles.productAssistantMessage} ${styles.productAssistantMessageAssistant}`}>
+                      <span>{productAssistantPickerIntro}</span>
                     </div>
                   ) : null}
                   {productAssistantMessages.map((message, index) => (

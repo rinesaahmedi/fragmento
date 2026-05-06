@@ -17,9 +17,24 @@ const NO_INFO_ANSWER_BY_LANGUAGE = {
   en: "No product information is available for this product yet.",
 };
 
+const TIMEOUT_ERROR_BY_LANGUAGE = {
+  de: "Die Anfrage dauert zu lange. Bitte versuchen Sie es erneut.",
+  en: "The request is taking too long. Please try again.",
+};
+
+const UNAVAILABLE_ERROR_BY_LANGUAGE = {
+  de: "Der Produktassistent ist voruebergehend nicht verfuegbar.",
+  en: "The product assistant is temporarily unavailable.",
+};
+
+const FAILED_ERROR_BY_LANGUAGE = {
+  de: "Die Produktfrage konnte nicht beantwortet werden.",
+  en: "The product question could not be answered.",
+};
+
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
-const MAX_CONTEXT_CHARS = 7000;
+const MAX_CONTEXT_CHARS = 12000;
 const OPENAI_TIMEOUT_MS = 20000;
 
 function jsonError(message, status) {
@@ -40,6 +55,10 @@ function normalizeItemIds(value) {
 function normalizeFacts(value) {
   if (!Array.isArray(value)) return [];
   return value.map((fact) => String(fact || "").trim()).filter(Boolean);
+}
+
+function normalizeLanguage(value) {
+  return String(value || "").trim().toLowerCase() === "de" ? "de" : "en";
 }
 
 function buildProductContext(items) {
@@ -115,6 +134,12 @@ function parseAssistantJson(text, language) {
       found,
     };
   } catch {
+    if (cleaned && cleaned !== notFoundAnswer) {
+      return {
+        answer: cleaned.replace(/^answer:\s*/i, "").trim(),
+        found: true,
+      };
+    }
     return {
       answer: notFoundAnswer,
       found: false,
@@ -123,6 +148,7 @@ function parseAssistantJson(text, language) {
 }
 
 export async function POST(request) {
+  let responseLanguage = "en";
   try {
     const clientIp = getRequestClientIp(request);
     enforceRateLimit(`product-info-ask:${clientIp}`, {
@@ -132,10 +158,12 @@ export async function POST(request) {
 
     const body = await request.json().catch(() => ({}));
     const question = String(body?.question || "").trim();
+    responseLanguage = normalizeLanguage(body?.language);
     const itemIds = normalizeItemIds(body?.itemIds);
-    const questionLanguage = detectQuestionLanguage(question);
-    const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[questionLanguage] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
-    const noInfoAnswer = NO_INFO_ANSWER_BY_LANGUAGE[questionLanguage] || NO_INFO_ANSWER_BY_LANGUAGE.en;
+    const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[responseLanguage] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
+    const noInfoAnswer = NO_INFO_ANSWER_BY_LANGUAGE[responseLanguage] || NO_INFO_ANSWER_BY_LANGUAGE.en;
+    const timeoutError = TIMEOUT_ERROR_BY_LANGUAGE[responseLanguage] || TIMEOUT_ERROR_BY_LANGUAGE.en;
+    const unavailableError = UNAVAILABLE_ERROR_BY_LANGUAGE[responseLanguage] || UNAVAILABLE_ERROR_BY_LANGUAGE.en;
 
     if (!question) {
       return jsonError("Question is required.", 400);
@@ -179,10 +207,13 @@ export async function POST(request) {
       "Answer only using the provided product information.",
       "Do not use general knowledge.",
       "Do not guess.",
-      `The customer asked in ${LANGUAGE_LABELS[questionLanguage] || LANGUAGE_LABELS.en}; answer in the same language.`,
+      `The customer interface language is ${LANGUAGE_LABELS[responseLanguage] || LANGUAGE_LABELS.en}; answer in that language.`,
       "If the customer asks for the product name, model, type, or what the product is, use only the explicit product name, model, type, code, summary, or key facts from the provided product information.",
+      "When the answer is available, give a direct answer first and include the most relevant concrete specifications or features from the provided information.",
+      "If multiple relevant specs are present, prefer dimensions, capacity, energy class, controls, functions, and included parts.",
+      "If the context includes multiple products, answer for the product that best matches the question and name that product clearly when useful.",
       `If the answer is not clearly supported by the provided product information, answer exactly: "${notFoundAnswer}"`,
-      `Keep answers short, clear, customer-friendly, and in ${LANGUAGE_LABELS[questionLanguage] || LANGUAGE_LABELS.en}.`,
+      `Keep answers concise but substantive, customer-friendly, and in ${LANGUAGE_LABELS[responseLanguage] || LANGUAGE_LABELS.en}.`,
       'Return only valid JSON with this shape: {"answer":"string","found":boolean}.',
       `Set found to false whenever the answer is "${notFoundAnswer}".`,
     ].join("\n");
@@ -218,12 +249,12 @@ export async function POST(request) {
               ],
             },
           ],
-          max_output_tokens: 220,
+          max_output_tokens: 360,
         }),
       });
     } catch (error) {
       if (error?.name === "AbortError") {
-        return jsonError("Product info assistant timed out. Please try again.", 504);
+        return jsonError(timeoutError, 504);
       }
       throw error;
     } finally {
@@ -233,16 +264,17 @@ export async function POST(request) {
     if (!openAiResponse.ok) {
       const errorText = await openAiResponse.text().catch(() => "");
       console.error("OpenAI product info request failed:", openAiResponse.status, errorText);
-      return jsonError("Product info assistant is temporarily unavailable.", 503);
+      return jsonError(unavailableError, 503);
     }
 
     const responsePayload = await openAiResponse.json();
-    const parsed = parseAssistantJson(extractResponseText(responsePayload), questionLanguage);
+    const parsed = parseAssistantJson(extractResponseText(responsePayload), responseLanguage);
 
     return NextResponse.json(parsed);
   } catch (error) {
     const status = Number.isInteger(error?.status) ? error.status : 500;
+    const failedError = FAILED_ERROR_BY_LANGUAGE[responseLanguage] || FAILED_ERROR_BY_LANGUAGE.en;
     console.error("Product info assistant failed:", error);
-    return jsonError(status === 429 ? error.message : "Product info assistant failed.", status);
+    return jsonError(status === 429 ? error.message : failedError, status);
   }
 }

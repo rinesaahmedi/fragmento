@@ -99,7 +99,7 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/FH_664_621_S_Produktinformation.pdf" },
   ],
   "HOOD-C-FH664621E": [
-    { label: "Produktinfo PDF", href: "/product-info/extractor-hood-chimney-product-info.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/khf664611s-chimney-extractor-hood-product-info.pdf" },
   ],
   "OVEN-B-600-HOB": [
     { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
@@ -183,6 +183,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
       item: {
         ...item,
         productInfoItemId: item.id,
+        productAssistantName: item.name || "",
         productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],
         productInfoDocuments: getProductInfoDocuments(item),
       },
@@ -205,6 +206,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
           : `${primaryItem.name} + ${hoodItem.name}`
         : primaryItem.name,
       linkedInfoBadge: hoodItem ? "Includes extractor hood" : "",
+      productAssistantName: infoSource?.name || primaryItem.name || "",
       infoText: hoodItem
         ? `${primaryItem.infoText || ""}${primaryItem.infoText ? " • " : ""}${hoodItem.infoText || ""}`.trim()
         : primaryItem.infoText,

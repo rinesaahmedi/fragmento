@@ -8,7 +8,7 @@ const PRODUCT_INFO_FILES = {
   dishwasher: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf",
   oven: "/product-info/EBX_943_600_S_Produktinformation.pdf",
   hood: "/product-info/FH_664_621_S_Produktinformation.pdf",
-  hoodChimney: "/product-info/extractor-hood-chimney-product-info.pdf",
+  hoodChimney: "/product-info/khf664611s-chimney-extractor-hood-product-info.pdf",
   fridge: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf",
 };
 
@@ -78,7 +78,7 @@ const PRODUCT_INFO_BY_CODE = {
     ].join("\n"),
   },
   "WM-B-EWA34660W": {
-    productInfoPdfPath: "/product-info/washing-machine-product-info.pdf",
+    productInfoPdfPath: "/product-info/ewa34660w-washing-machine-product-info.pdf",
     productInfoSummary: "Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt 8 kg Fassungsvermoegen und 1400 U/min.",
     productInfoKeyFacts: [
       "Produkttyp: Waschmaschine.",
