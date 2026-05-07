@@ -784,6 +784,10 @@
     transform 0.18s ease;
 }
 
+.productAssistantLauncher[hidden] {
+  display: none;
+}
+
 .productAssistantLauncher:hover,
 .productAssistantComposer button:hover:not(:disabled) {
   background: #257e4c;
