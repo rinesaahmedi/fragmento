@@ -1,5 +1,6 @@
 import { Manrope } from "next/font/google";
 import "./globals.css";
+import PublicLegalFooter from "../components/public-legal-footer";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -15,7 +16,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="de">
-      <body className={manrope.className}>{children}</body>
+      <body className={manrope.className}>
+        <div className="public-app-shell">
+          <div className="public-app-content">{children}</div>
+          <PublicLegalFooter />
+        </div>
+      </body>
     </html>
   );
 }

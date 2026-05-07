@@ -301,6 +301,221 @@ function buildAssistantCatalogItems(kitchenConfig, kitchenSlug) {
   return Array.from(itemsById.values());
 }
 
+function formatProductAssistantOptionName(value, fallback = "") {
+  const label = String(value || "").trim();
+  if (!label) return fallback;
+
+  return label
+    .replace(/^(?=[A-Z0-9-]{5,}\s)(?=.*\d)[A-Z0-9-]+\s+/, "")
+    .replace(/\s*\(\s*\d+\s*x\s*\d+(?:\s*x\s*\d+)?\s*mm\s*\)\s*$/i, "")
+    .trim() || fallback;
+}
+
+function buildProductAssistantContextItem(item, overrides = {}) {
+  return {
+    name: overrides.name || item.productAssistantName || item.name || "",
+    code: overrides.code || item.code || "",
+    productInfoCode: overrides.productInfoCode || item.productInfoCode || item.code || "",
+    productInfoSummary: overrides.productInfoSummary ?? item.productInfoSummary ?? "",
+    productInfoKeyFacts: Array.isArray(overrides.productInfoKeyFacts)
+      ? overrides.productInfoKeyFacts
+      : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    productInfoExtractedText: overrides.productInfoExtractedText ?? item.productInfoExtractedText ?? "",
+  };
+}
+
+function filterProductAssistantFactsByPattern(facts, pattern) {
+  return (Array.isArray(facts) ? facts : []).filter((fact) => pattern.test(String(fact || "")));
+}
+
+function filterProductAssistantTextByPattern(text, pattern) {
+  const lines = String(text || "").split(/\r?\n/);
+  const selected = [];
+  let inSelectionHints = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    if (/^auswahlhinweise:/i.test(trimmed)) {
+      inSelectionHints = true;
+      selected.push(trimmed);
+      continue;
+    }
+
+    if (inSelectionHints) {
+      if (trimmed.startsWith("-")) {
+        selected.push(trimmed);
+        continue;
+      }
+      inSelectionHints = false;
+    }
+
+    if (pattern.test(trimmed)) {
+      selected.push(trimmed);
+    }
+  }
+
+  return selected.join("\n");
+}
+
+function findProductAssistantLine(text, pattern) {
+  return String(text || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find((line) => pattern.test(line)) || "";
+}
+
+function normalizeProductAssistantPublicBrand(value) {
+  return String(value || "")
+    .replace(/\bArchitecto\s*\/\s*AMICA\b/gi, "Architecto")
+    .replace(/\bAMICA\b/gi, "Architecto");
+}
+
+function buildStructuredProductAssistantFacts(baseFacts, definitions) {
+  const facts = [...baseFacts];
+
+  for (const definition of definitions) {
+    if (definition.when()) {
+      facts.push(definition.fact);
+    }
+  }
+
+  return [...new Set(facts.map((fact) => String(fact || "").trim()).filter(Boolean))];
+}
+
+function productAssistantSourceIncludes(item, pattern) {
+  const factsText = Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts.join("\n") : "";
+  return pattern.test(`${factsText}\n${item?.productInfoSummary || ""}\n${item?.productInfoExtractedText || ""}`);
+}
+
+function buildSplitProductAssistantOptions(item, itemId, translate) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  if (!code.startsWith("OVEN-") || !code.includes("-HOB")) return [];
+
+  const ovenPattern = /\b(backofen|oven)\b/i;
+  const hobPattern = /\b(kochfeld|hob)\b/i;
+
+  const ovenFacts = filterProductAssistantFactsByPattern(item.productInfoKeyFacts, ovenPattern);
+  const hobFacts = filterProductAssistantFactsByPattern(item.productInfoKeyFacts, hobPattern);
+  const ovenText = filterProductAssistantTextByPattern(item.productInfoExtractedText, ovenPattern);
+  const hobText = filterProductAssistantTextByPattern(item.productInfoExtractedText, hobPattern);
+  const productNameLine = findProductAssistantLine(item.productInfoExtractedText, /^produktname:/i);
+  const ovenModelMatch = productNameLine.match(/(?:AMICA\s+)?(EBX\s*943\s*600\s*S)\s*(?:Backofen|Oven)?/i);
+  const hobModelMatch = productNameLine.match(/(?:AMICA\s+)?(OL-KMI\s*754\s*000\s*E)\s*(?:Induktionskochfeld|Kochfeld|Hob)?/i);
+  const ovenModel = ovenModelMatch ? `Architecto ${ovenModelMatch[1].replace(/\s+/g, " ").trim()}` : "";
+  const hobModel = hobModelMatch ? `Architecto ${hobModelMatch[1].replace(/\s+/g, " ").trim()}` : "";
+  const publicProductNameLine = normalizeProductAssistantPublicBrand(productNameLine);
+
+  const options = [];
+
+  if (ovenFacts.length || ovenText) {
+    const ovenLabel = translate("configurator.productAssistantSplitOven", "Built-in Oven");
+    const structuredOvenFacts = buildStructuredProductAssistantFacts(ovenFacts, [
+      {
+        when: () => true,
+        fact: `Model: ${ovenModel || "Architecto EBX 943 600 S"}`,
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\b77\s*l\b/i),
+        fact: "Capacity: 77 l",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\b9\s*(functions|funktionen)\b/i),
+        fact: "Functions: 9",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\benergieklasse\s*a\b/i),
+        fact: "Energy class: A",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\btimer\b/i),
+        fact: "Timer: Yes",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\bsteam\s*clean\b/i),
+        fact: "Steam Clean: Yes",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\bcooldoor3\b/i),
+        fact: "CoolDoor3: Yes",
+      },
+    ]);
+    options.push({
+      key: `item-${itemId}-oven`,
+      label: ovenLabel,
+      shortLabel: ovenLabel,
+      itemIds: [itemId],
+      type: "item",
+      contextItems: [
+        buildProductAssistantContextItem(item, {
+          name: ovenLabel,
+          code: "",
+          productInfoSummary: structuredOvenFacts.join(", "),
+          productInfoKeyFacts: structuredOvenFacts,
+          productInfoExtractedText: normalizeProductAssistantPublicBrand([publicProductNameLine, ovenText].filter(Boolean).join("\n")),
+        }),
+      ],
+    });
+  }
+
+  if (hobFacts.length || hobText) {
+    const hobLabel = translate("configurator.productAssistantSplitHob", "Hob");
+    const structuredHobFacts = buildStructuredProductAssistantFacts(hobFacts, [
+      {
+        when: () => true,
+        fact: `Model: ${hobModel || "Architecto OL-KMI 754 000 E"}`,
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\b4\s*(kochzonen|cooking zones|zones)\b/i),
+        fact: "Cooking zones: 4",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\b9\s*(leistungsstufen|power levels)\b/i),
+        fact: "Power levels: 9",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\bbooster\b/i),
+        fact: "Booster: Yes",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /topferkennung|pot detection/i),
+        fact: "Pot detection: Yes",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /kindersicherung|kinder?sicherung|child safety/i),
+        fact: "Child safety lock: Yes",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /restwaermeanzeige|residual heat/i),
+        fact: "Residual heat indicator: Yes",
+      },
+      {
+        when: () => productAssistantSourceIncludes(item, /\btimer\b/i),
+        fact: "Timer: Yes",
+      },
+    ]);
+    options.push({
+      key: `item-${itemId}-hob`,
+      label: hobLabel,
+      shortLabel: hobLabel,
+      itemIds: [itemId],
+      type: "item",
+      contextItems: [
+        buildProductAssistantContextItem(item, {
+          name: hobLabel,
+          code: "",
+          productInfoSummary: structuredHobFacts.join(", "),
+          productInfoKeyFacts: structuredHobFacts,
+          productInfoExtractedText: normalizeProductAssistantPublicBrand([publicProductNameLine, hobText].filter(Boolean).join("\n")),
+        }),
+      ],
+    });
+  }
+
+  return options;
+}
+
 function buildProductAssistantContextOptions(activeProductInfo, catalogItems, selectedItems, translate) {
   const itemsById = new Map();
 
@@ -325,11 +540,10 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
 
   if (activeItemId && itemsById.has(activeItemId)) {
     const activeItem = itemsById.get(activeItemId);
-    const activeItemName =
-      activeItem.productAssistantName
-      || activeItem.name
-      || activeProductInfo.title
-      || translate("configurator.productAssistantCurrentProductFallback", "This product");
+    const activeItemName = formatProductAssistantOptionName(
+      activeItem.productAssistantName || activeItem.name || activeProductInfo.title,
+      translate("configurator.productAssistantCurrentProductFallback", "This product"),
+    );
     options.push({
       key: `current-${activeItemId}`,
       label: translate("configurator.productAssistantCurrentProduct", "This product: {name}", { name: activeItemName }),
@@ -342,13 +556,23 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
 
   for (const item of items) {
     const itemId = item.productInfoItemId || item.id;
-    const itemLabel = item.productAssistantName || item.name || item.code || translate("configurator.productAssistantProductFallback", "Product");
+    const splitOptions = buildSplitProductAssistantOptions(item, itemId, translate);
+    if (splitOptions.length) {
+      options.push(...splitOptions);
+      continue;
+    }
+
+    const itemLabel = formatProductAssistantOptionName(
+      item.productAssistantName || item.name || item.code,
+      translate("configurator.productAssistantProductFallback", "Product"),
+    );
     options.push({
       key: `item-${itemId}`,
       label: itemLabel,
       shortLabel: itemLabel,
       itemIds: [itemId],
       type: "item",
+      contextItems: [buildProductAssistantContextItem(item)],
     });
   }
 
@@ -357,9 +581,9 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
 
 function getDefaultProductAssistantContext(options) {
   return (
-    options.find((option) => option.type === "current")
-    || options.find((option) => option.type === "selected")
-    || options.find((option) => option.type === "all")
+    options.find((option) => option.type === "all")
+    || options.find((option) => option.type === "current")
+    || options.find((option) => option.type === "item")
     || options[0]
     || null
   );
@@ -446,6 +670,79 @@ function buildOrderLockedComponentIds(kitchenConfig, initialOrder) {
     .map((item) => componentIdForItem(item));
 }
 
+function buildConfiguratorDraftStorageKey(kitchenSlug, contractNumber) {
+  return `fragmento-configurator-draft:${String(kitchenSlug || "").trim().toLowerCase()}:${String(contractNumber || "").trim().toUpperCase() || "guest"}`;
+}
+
+function readConfiguratorDraft(storageKey) {
+  if (typeof window === "undefined" || !storageKey) return null;
+
+  try {
+    const rawValue = window.sessionStorage.getItem(storageKey);
+    if (!rawValue) return null;
+
+    const parsed = JSON.parse(rawValue);
+    if (!parsed || typeof parsed !== "object") return null;
+
+    return {
+      selectedComponentIds: Array.isArray(parsed.selectedComponentIds) ? parsed.selectedComponentIds : [],
+      selectedAccessoryCodes: Array.isArray(parsed.selectedAccessoryCodes) ? parsed.selectedAccessoryCodes : [],
+      selectedServiceCodes: Array.isArray(parsed.selectedServiceCodes) ? parsed.selectedServiceCodes : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeConfiguratorDraft(storageKey, draft) {
+  if (typeof window === "undefined" || !storageKey) return;
+
+  try {
+    window.sessionStorage.setItem(storageKey, JSON.stringify(draft));
+  } catch {
+    // Ignore storage write failures so the configurator remains usable.
+  }
+}
+
+function clearConfiguratorDraft(storageKey) {
+  if (typeof window === "undefined" || !storageKey) return;
+
+  try {
+    window.sessionStorage.removeItem(storageKey);
+  } catch {
+    // Ignore storage clear failures so the configurator remains usable.
+  }
+}
+
+function buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft) {
+  const baseComponentIds = buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder);
+  const baseAccessoryCodes = buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories");
+  const baseServiceCodes = buildInitialCodes(kitchenConfig, initialOrder, "service", "services");
+
+  if (!draft) {
+    return {
+      selectedComponentIds: baseComponentIds,
+      selectedAccessoryCodes: baseAccessoryCodes,
+      selectedServiceCodes: baseServiceCodes,
+    };
+  }
+
+  const validComponentIds = new Set(kitchenConfig.components.map((item) => componentIdForItem(item)));
+  const validAccessoryCodes = new Set(kitchenConfig.accessories.map((item) => item.code).filter(Boolean));
+  const validServiceCodes = new Set(kitchenConfig.services.map((item) => item.code).filter(Boolean));
+
+  return {
+    selectedComponentIds: [
+      ...new Set([
+        ...fixedComponentIds,
+        ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
+      ]),
+    ],
+    selectedAccessoryCodes: draft.selectedAccessoryCodes.filter((code) => validAccessoryCodes.has(code)),
+    selectedServiceCodes: draft.selectedServiceCodes.filter((code) => validServiceCodes.has(code)),
+  };
+}
+
 export default function KitchenConfigurator({ initialLanguage = "de", ...props }) {
   return (
     <PublicI18nProvider initialLanguage={initialLanguage}>
@@ -483,6 +780,10 @@ function KitchenConfiguratorContent({
     () => [...new Set([...lockedComponentIds, ...orderLockedComponentIds])],
     [lockedComponentIds, orderLockedComponentIds],
   );
+  const draftStorageKey = useMemo(
+    () => buildConfiguratorDraftStorageKey(kitchenSlug, initialContractNumber),
+    [initialContractNumber, kitchenSlug],
+  );
   const orderLockedAccessoryCodes = useMemo(
     () => lockedItemCodesByType(initialOrder, "accessory"),
     [initialOrder],
@@ -491,16 +792,14 @@ function KitchenConfiguratorContent({
     () => lockedItemCodesByType(initialOrder, "service"),
     [initialOrder],
   );
+  const initialSelection = useMemo(
+    () => buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, null),
+    [fixedComponentIds, initialOrder, kitchenConfig],
+  );
 
-  const [selectedComponentIds, setSelectedComponentIds] = useState(() =>
-    buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder),
-  );
-  const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState(() =>
-    buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"),
-  );
-  const [selectedServiceCodes, setSelectedServiceCodes] = useState(() =>
-    buildInitialCodes(kitchenConfig, initialOrder, "service", "services"),
-  );
+  const [selectedComponentIds, setSelectedComponentIds] = useState(initialSelection.selectedComponentIds);
+  const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState(initialSelection.selectedAccessoryCodes);
+  const [selectedServiceCodes, setSelectedServiceCodes] = useState(initialSelection.selectedServiceCodes);
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -530,16 +829,20 @@ function KitchenConfiguratorContent({
   useEffect(() => {
     if (initialOrder) {
       const nextCustomer = buildInitialCustomerFromOrder(initialOrder, initialContractNumber);
+      const draft = readConfiguratorDraft(draftStorageKey);
+      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft);
       setCustomer(nextCustomer);
       setUseContractAddressForOrder(customerUsesContractAddress(nextCustomer, initialContractAddress));
       setAddressVerification(buildAddressVerificationState());
-      setSelectedComponentIds(buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder));
-      setSelectedAccessoryCodes(buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories"));
-      setSelectedServiceCodes(buildInitialCodes(kitchenConfig, initialOrder, "service", "services"));
+      setSelectedComponentIds(nextSelection.selectedComponentIds);
+      setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
+      setSelectedServiceCodes(nextSelection.selectedServiceCodes);
       return;
     }
 
     if (initialContractAddress) {
+      const draft = readConfiguratorDraft(draftStorageKey);
+      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft);
       setCustomer((current) => ({
         ...current,
         ...buildCustomerAddressFromContract(initialContractAddress),
@@ -547,17 +850,25 @@ function KitchenConfiguratorContent({
       }));
       setUseContractAddressForOrder(true);
       setAddressVerification(buildAddressVerificationState());
+      setSelectedComponentIds(nextSelection.selectedComponentIds);
+      setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
+      setSelectedServiceCodes(nextSelection.selectedServiceCodes);
       return;
     }
 
     if (!initialContractNumber) return;
+    const draft = readConfiguratorDraft(draftStorageKey);
+    const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft);
     setCustomer((current) => {
       if (current.contractNumber === initialContractNumber) return current;
       return { ...current, contractNumber: initialContractNumber };
     });
     setUseContractAddressForOrder(false);
     setAddressVerification(buildAddressVerificationState());
-  }, [initialContractNumber, initialOrder, initialContractAddress, kitchenConfig, fixedComponentIds]);
+    setSelectedComponentIds(nextSelection.selectedComponentIds);
+    setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
+    setSelectedServiceCodes(nextSelection.selectedServiceCodes);
+  }, [draftStorageKey, fixedComponentIds, initialContractAddress, initialContractNumber, initialOrder, kitchenConfig]);
 
   useEffect(() => {
     const verifiedSnapshotKey = addressVerification?.verification?.snapshot
@@ -686,11 +997,12 @@ function KitchenConfiguratorContent({
   useEffect(() => {
     if (!isProductAssistantOpen) return;
 
-    setSelectedProductAssistantContext(null);
-    setProductAssistantMessages([]);
-    setProductInfoQuestion("");
-    setProductInfoError("");
-    setProductInfoIsLoading(false);
+    if (hasProductAssistantOptions) {
+      resetProductAssistantContext(getDefaultProductAssistantContext(productAssistantContextOptions));
+      return;
+    }
+
+    resetProductAssistantContext();
   }, [isProductAssistantOpen, productAssistantOptionsKey, hasProductAssistantOptions]);
   const grandTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
     (sum, item) => sum + Number(item.price || 0),
@@ -721,6 +1033,14 @@ function KitchenConfiguratorContent({
       setSelectedServiceCodes((current) => current.filter((code) => code !== SERVICE_CODE_PICKUP));
     }
   }, [selectedServiceCodes, serviceEligibility]);
+
+  useEffect(() => {
+    writeConfiguratorDraft(draftStorageKey, {
+      selectedComponentIds,
+      selectedAccessoryCodes,
+      selectedServiceCodes,
+    });
+  }, [draftStorageKey, selectedAccessoryCodes, selectedComponentIds, selectedServiceCodes]);
 
   function toggleAccessory(itemCode) {
     if (orderLockedAccessoryCodes.has(itemCode)) return;
@@ -802,56 +1122,6 @@ function KitchenConfiguratorContent({
     setUseContractAddressForOrder(false);
   }
 
-  async function handleVerifyAddress() {
-    if (!customer.contractNumber || !customer.address1 || !customer.country || !customer.city || !customer.postalCode) {
-      setAddressVerification(
-        buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.INVALID, {
-          message: translate("configurator.addressMissingFields", "Enter contract number, street, country, city, and postal code before verification."),
-        }),
-      );
-      return;
-    }
-
-    setAddressVerification(
-      buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.LOADING, {
-        message: translate("configurator.addressVerifying", "Verifying address..."),
-      }),
-    );
-
-    try {
-      const response = await fetch("/api/address-verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(addressSnapshot),
-      });
-      const payload = await response.json();
-
-      if (payload.status === ADDRESS_VERIFICATION_STATUS.VALID && payload.verification) {
-        setAddressVerification(
-          buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.VALID, {
-            message: translate("configurator.addressValid", "The address is valid."),
-            suggestion: payload.suggestion || "",
-            verification: payload.verification,
-          }),
-        );
-        return;
-      }
-
-      setAddressVerification(
-        buildAddressVerificationState(payload.status || ADDRESS_VERIFICATION_STATUS.INVALID, {
-          message: translate("configurator.addressVerificationFailed", "Address verification failed."),
-          suggestion: payload.suggestion || "",
-        }),
-      );
-    } catch (_error) {
-      setAddressVerification(
-        buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE, {
-          message: translate("configurator.addressServiceUnavailable", "The address verification service is unavailable right now."),
-        }),
-      );
-    }
-  }
-
   function removeComponent(item) {
     const componentId = componentIdForItem(item);
     if (fixedComponentIds.includes(componentId)) {
@@ -903,48 +1173,40 @@ function KitchenConfiguratorContent({
     });
   }
 
-  function resetProductAssistantContext() {
-    setSelectedProductAssistantContext(null);
-    setProductAssistantMessages([]);
+  function resetProductAssistantContext(option = null) {
+    setSelectedProductAssistantContext(option);
+    setProductAssistantMessages(
+      option
+        ? [
+          {
+            role: "assistant",
+            text: translate("configurator.productAssistantContextConfirmed", "You're now asking about {label}. Ask me anything from its product information.", {
+              label: option.shortLabel,
+            }),
+          },
+        ]
+        : [],
+    );
     setProductInfoQuestion("");
     setProductInfoError("");
     setProductInfoIsLoading(false);
   }
 
   function selectProductAssistantContext(option) {
-    setSelectedProductAssistantContext(option);
-    setProductAssistantMessages([
-      {
-        role: "assistant",
-        text: translate("configurator.productAssistantContextConfirmed", "You're now asking about {label}. Ask me anything from its product information.", {
-          label: option.shortLabel,
-        }),
-      },
-    ]);
-    setProductInfoQuestion("");
-    setProductInfoError("");
-    setProductInfoIsLoading(false);
+    resetProductAssistantContext(option);
   }
 
   function returnToProductAssistantPicker() {
-    setSelectedProductAssistantContext(null);
-    setProductAssistantMessages([]);
-    setProductInfoQuestion("");
-    setProductInfoError("");
-    setProductInfoIsLoading(false);
+    resetProductAssistantContext(productAssistantSuggestedContext);
   }
 
   function openProductAssistant() {
     if (!hasAnyAssistantProducts) return;
     setIsProductAssistantOpen(true);
     if (hasProductAssistantOptions) {
-      resetProductAssistantContext();
+      resetProductAssistantContext(productAssistantSuggestedContext);
     } else {
-      setSelectedProductAssistantContext(null);
-      setProductAssistantMessages([]);
-      setProductInfoQuestion("");
-      setProductInfoError("");
-      setProductInfoIsLoading(false);
+      resetProductAssistantContext();
     }
   }
 
@@ -973,6 +1235,9 @@ function KitchenConfiguratorContent({
           language,
           question,
           itemIds: [...new Set(itemIds)].slice(0, 10),
+          contextItems: Array.isArray(selectedProductAssistantContext.contextItems)
+            ? selectedProductAssistantContext.contextItems
+            : undefined,
         }),
       });
 
@@ -1020,16 +1285,6 @@ function KitchenConfiguratorContent({
 
     if (!customer.paymentMethod) {
       setStatus(translate("configurator.statusSelectPayment", "Please choose a payment method."));
-      setStatusTone("error");
-      return;
-    }
-
-    if (
-      addressVerification.status !== ADDRESS_VERIFICATION_STATUS.VALID
-      || !addressVerification.verification
-      || addressVerificationSnapshotKey(addressVerification.verification.snapshot) !== addressSnapshotKey
-    ) {
-      setStatus(translate("configurator.statusVerifyAddress", "Please verify the address before submitting the order."));
       setStatusTone("error");
       return;
     }
@@ -1116,6 +1371,7 @@ function KitchenConfiguratorContent({
           orderNumber: payload.orderNumber,
         }));
       }
+      clearConfiguratorDraft(draftStorageKey);
       setStatusTone("success");
     } catch (error) {
       setStatus(error.message || translate("configurator.statusSaveFailed", "The order could not be saved."));
@@ -1210,9 +1466,7 @@ function KitchenConfiguratorContent({
             isSubmitting={isSubmitting}
             status={status}
             statusTone={statusTone}
-            addressVerification={addressVerification}
             onSubmit={handleSubmit}
-            onVerifyAddress={handleVerifyAddress}
             onUpdateCustomer={updateCustomer}
             onToggleUseContractAddress={(nextChecked) => {
               if (nextChecked) {
@@ -1344,14 +1598,22 @@ function KitchenConfiguratorContent({
                   </div>
                 </div>
 
-                {!selectedProductAssistantContext && hasProductAssistantOptions ? (
+                {hasProductAssistantOptions ? (
                   <div className={styles.productAssistantContextSection}>
-                    <div className={styles.productAssistantSectionLabel}>
-                      {translate("configurator.productAssistantContextTitle", "Choose a product")}
+                    <div className={styles.productAssistantContextHeader}>
+                      <div className={styles.productAssistantSectionLabel}>
+                        {translate("configurator.productAssistantContextTitle", "Choose a product")}
+                      </div>
+                      {selectedProductAssistantContext?.shortLabel ? (
+                        <span className={styles.productAssistantContextCurrent}>
+                          {translate("configurator.productAssistantContextCurrentCompact", "Current: {label}", {
+                            label: selectedProductAssistantContext.shortLabel,
+                          })}
+                        </span>
+                      ) : null}
                     </div>
                     <p className={styles.productAssistantPickerHint}>
-                      {translate("configurator.productAssistantPickerHint", "Select what you want to talk about, then continue in chat.")}
-                      {productAssistantSuggestedContext ? ` ${translate("configurator.productAssistantPickerSuggested", "You can start with: {label}.", { label: productAssistantSuggestedContext.shortLabel })}` : ""}
+                      {translate("configurator.productAssistantPickerHintCompact", "Pick one product or keep all documented products selected.")}
                     </p>
                     <div className={styles.productAssistantContextOptions}>
                       {productAssistantContextOptions.map((option) => (
@@ -1361,6 +1623,7 @@ function KitchenConfiguratorContent({
                           className={[
                             styles.productAssistantContextButton,
                             option.type === "all" ? styles.productAssistantContextButtonDefault : styles.productAssistantContextButtonSecondary,
+                            selectedProductAssistantContext?.key === option.key ? styles.productAssistantContextButtonActive : "",
                           ]
                             .filter(Boolean)
                             .join(" ")}
@@ -1369,24 +1632,6 @@ function KitchenConfiguratorContent({
                           {option.label}
                         </button>
                       ))}
-                    </div>
-                  </div>
-                ) : null}
-
-                {selectedProductAssistantContext ? (
-                  <div className={styles.productAssistantActiveContext}>
-                    <button
-                      type="button"
-                      className={styles.productAssistantBackButton}
-                      onClick={returnToProductAssistantPicker}
-                    >
-                      {translate("configurator.productAssistantBackToPicker", "Back to products")}
-                    </button>
-                    <div className={styles.productAssistantActiveContextMeta}>
-                      <span className={styles.productAssistantSectionLabel}>
-                        {translate("configurator.productAssistantActiveContext", "Talking about")}
-                      </span>
-                      <strong>{selectedProductAssistantContext.label}</strong>
                     </div>
                   </div>
                 ) : null}

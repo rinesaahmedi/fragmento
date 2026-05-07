@@ -99,7 +99,16 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/FH_664_621_S_Produktinformation.pdf" },
   ],
   "HOOD-C-FH664621E": [
+    { label: "E-Label PDF", href: "/product-info/KHF_664_611_S_ELabel_Eco21_2407.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/khf664611s-chimney-extractor-hood-product-info.pdf" },
+  ],
+  "WM-B-EWA34660W": [
+    { label: "E-Label PDF", href: "/product-info/EWA_34660_W_ELabel_Eco21_2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa34660w-washing-machine-product-info.pdf" },
+  ],
+  "WM-C-EWA34660W": [
+    { label: "E-Label PDF", href: "/product-info/EWA_34660_W_ELabel_Eco21_2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa34660w-washing-machine-product-info.pdf" },
   ],
   "OVEN-B-600-HOB": [
     { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
@@ -112,6 +121,45 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
   ],
 };
+
+const PRODUCT_INFO_DISPLAY_OVERRIDES_BY_CODE = {
+  "WM-B-EWA34660W": {
+    infoText: "Washing machine, 8 kg, 1400 rpm",
+    productInfoSummary:
+      "Freestanding washing machine EWA34660W for the kitchen configuration. The current product information lists 8 kg capacity and 1400 rpm spin speed.",
+    productInfoKeyFacts: [
+      "Capacity: 8 kg",
+      "Spin speed: 1400 rpm",
+      "Model: EWA34660W",
+      "Freestanding appliance",
+      "Check water and power connection requirements",
+    ],
+  },
+  "WM-C-EWA34660W": {
+    infoText: "Washing machine, 8 kg, 1400 rpm",
+    productInfoSummary:
+      "Freestanding washing machine EWA34660W for the kitchen configuration. The current product information lists 8 kg capacity and 1400 rpm spin speed.",
+    productInfoKeyFacts: [
+      "Capacity: 8 kg",
+      "Spin speed: 1400 rpm",
+      "Model: EWA34660W",
+      "Freestanding appliance",
+      "Check water and power connection requirements",
+    ],
+  },
+};
+
+function applyProductInfoDisplayOverrides(item) {
+  if (!item) return item;
+
+  const override = PRODUCT_INFO_DISPLAY_OVERRIDES_BY_CODE[item.code];
+  if (!override) return item;
+
+  return {
+    ...item,
+    ...override,
+  };
+}
 
 export function getProductInfoHref(item) {
   return item?.productInfoPdfPath || "";
@@ -177,18 +225,20 @@ function getCatalogLinkedItems(allItems, slug, item) {
 
 export function getCatalogDisplayItem(allItems, slug, item) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
-  const linkedItems = getCatalogLinkedItems(allItems, slug, item);
+  const linkedItems = getCatalogLinkedItems(allItems, slug, item).map(applyProductInfoDisplayOverrides);
+  const displayItem = applyProductInfoDisplayOverrides(item);
+
   if (linkedItems.length <= 1) {
     return {
       item: {
-        ...item,
-        productInfoItemId: item.id,
-        productAssistantName: item.name || "",
-        productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],
-        productInfoDocuments: getProductInfoDocuments(item),
+        ...displayItem,
+        productInfoItemId: displayItem.id,
+        productAssistantName: displayItem.name || "",
+        productInfoKeyFacts: Array.isArray(displayItem.productInfoKeyFacts) ? displayItem.productInfoKeyFacts : [],
+        productInfoDocuments: getProductInfoDocuments(displayItem),
       },
-      price: Number(item.price || 0),
-      infoPdfHref: getProductInfoHref(item),
+      price: Number(displayItem.price || 0),
+      infoPdfHref: getProductInfoHref(displayItem),
     };
   }
 
@@ -216,6 +266,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
       productInfoKeyFacts: Array.isArray(infoSource?.productInfoKeyFacts) ? infoSource.productInfoKeyFacts : [],
       productInfoExtractedText: infoSource?.productInfoExtractedText || "",
       productInfoUpdatedAt: infoSource?.productInfoUpdatedAt || "",
+      productInfoCode: infoSource?.code || primaryItem.code,
       productInfoItemId: infoSource?.id || primaryItem.id,
       productInfoDocuments: getProductInfoDocuments(infoSource || primaryItem),
       tooltipPreviewCode: infoSource?.code || primaryItem.code,

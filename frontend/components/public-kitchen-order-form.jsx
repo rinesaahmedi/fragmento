@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
-import { ADDRESS_VERIFICATION_STATUS } from "../lib/address-verification";
 import { usePublicI18n } from "./public-i18n";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
 
@@ -65,9 +64,7 @@ export default function PublicKitchenOrderForm({
   isSubmitting,
   status,
   statusTone,
-  addressVerification,
   onSubmit,
-  onVerifyAddress,
   onUpdateCustomer,
   onToggleUseContractAddress,
 }) {
@@ -91,16 +88,6 @@ export default function PublicKitchenOrderForm({
   const postalCodeOptions = uniqueOptions(POSTAL_CODE_OPTIONS[customer.city] || [], customer.postalCode);
   const contractAddressLines = buildAddressLines(contractAddress, translate);
   const canUseContractAddress = contractAddressLines.length > 0;
-  const addressVerificationStatus = addressVerification?.status || ADDRESS_VERIFICATION_STATUS.IDLE;
-  const addressVerificationMessage = addressVerification?.message || "";
-  const addressVerificationSuggestion = addressVerification?.suggestion || "";
-  const isAddressVerificationLoading = addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.LOADING;
-  const isAddressVerificationValid = addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.VALID;
-  const isAddressVerificationPartial = addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.PARTIAL_MATCH;
-  const isAddressVerificationError =
-    addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.INVALID
-    || addressVerificationStatus === ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE;
-  const hasVerificationResult = addressVerificationStatus !== ADDRESS_VERIFICATION_STATUS.IDLE;
 
   function markFieldTouched(fieldKey) {
     setTouchedFields((current) => (current[fieldKey] ? current : { ...current, [fieldKey]: true }));
@@ -344,54 +331,6 @@ export default function PublicKitchenOrderForm({
                 </div>
               </div>
             )}
-          </div>
-
-          <div className={styles.orderSectionCard}>
-            <div className={styles.orderSectionHeader}>
-              <div>
-                <h3>{translate("order.addressVerificationTitle", "Address verification")}</h3>
-              </div>
-            </div>
-            <div className={styles.addressVerificationRow}>
-              <div className={styles.addressVerificationContent}>
-                {hasVerificationResult ? (
-                  <div
-                    className={[
-                      styles.addressVerificationMessage,
-                      isAddressVerificationValid ? styles.addressVerificationMessageValid : "",
-                      isAddressVerificationPartial ? styles.addressVerificationMessageWarning : "",
-                      isAddressVerificationError ? styles.addressVerificationMessageError : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                    role="status"
-                    aria-live="polite"
-                  >
-                    {addressVerificationMessage ? <strong>{addressVerificationMessage}</strong> : null}
-                    {addressVerificationSuggestion ? <span>{translate("order.suggestedMatch", "Suggested match")}: {addressVerificationSuggestion}</span> : null}
-                    {isAddressVerificationPartial ? <span>{translate("order.reviewStreet", "Please review the street details and verify again if needed.")}</span> : null}
-                    {isAddressVerificationError ? <span>{translate("order.correctAddress", "Correct the address details and run verification again.")}</span> : null}
-                  </div>
-                ) : (
-                  <p className={styles.sectionHint}>{translate("order.verifyAddressHint", "Please verify the address before submitting the order.")}</p>
-                )}
-              </div>
-              <button
-                type="button"
-                className={[
-                  styles.verifyAddressButton,
-                  isAddressVerificationValid ? styles.verifyAddressButtonValid : "",
-                  isAddressVerificationPartial ? styles.verifyAddressButtonWarning : "",
-                  isAddressVerificationError ? styles.verifyAddressButtonError : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                onClick={onVerifyAddress}
-                disabled={isAddressVerificationLoading}
-              >
-                {isAddressVerificationLoading ? translate("order.verifyingAddress", "Verifying...") : translate("order.verifyAddress", "Verify address")}
-              </button>
-            </div>
           </div>
 
           <div className={styles.orderSectionCard}>

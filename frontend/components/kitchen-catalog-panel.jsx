@@ -6,6 +6,7 @@ import {
   formatCurrency,
   getCatalogDisplayItem,
   getLocalizedItemName,
+  getProductInfoDocuments,
   getProductInfoHref,
   isLinkedComponentSelected,
   toggleLinkedComponentSelection,
@@ -76,6 +77,8 @@ const TOOLTIP_PREVIEW_BY_CODE = {
   "REF-C-545-1800-700": "/product-info-previews/fridge-preview.png",
   "HOOD-B-FH664621E": "/product-info-previews/hood-preview.png",
   "HOOD-C-FH664621E": "/product-info-previews/hood-preview.png",
+  "WM-B-EWA34660W": "/product-info-previews/washing-machine-preview.png",
+  "WM-C-EWA34660W": "/product-info-previews/washing-machine-preview.png",
   "OVEN-B-600-HOB": "/product-info-previews/oven-hob-preview.png",
   "OVEN-C-600-HOB": "/product-info-previews/oven-hob-preview.png",
 };
@@ -111,7 +114,11 @@ function getTooltipPreviewSrc(item) {
 }
 
 function getTooltipDocumentLabels(item, translate) {
-  return (Array.isArray(item?.productInfoDocuments) ? item.productInfoDocuments : [])
+  const documents = Array.isArray(item?.productInfoDocuments) && item.productInfoDocuments.length
+    ? item.productInfoDocuments
+    : getProductInfoDocuments(item);
+
+  return documents
     .map((document) => localizeProductInfoDocumentLabel(document?.label, translate))
     .filter(Boolean);
 }
@@ -129,6 +136,9 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
     .join(" ");
   const tooltipFacts = getTooltipFacts(item);
   const tooltipPreviewSrc = getTooltipPreviewSrc(item);
+  const productInfoDocuments = Array.isArray(item?.productInfoDocuments) && item.productInfoDocuments.length
+    ? item.productInfoDocuments
+    : getProductInfoDocuments(item);
   const tooltipDocumentLabels = getTooltipDocumentLabels(item, translate);
   const handleCardKeyDown = (event) => {
     if (locked || disabled) {
@@ -180,7 +190,7 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
                 aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemName })}
                 onClick={(event) => {
                   event.stopPropagation();
-                  onOpenInfo?.({ item: { ...item, name: itemName }, price, infoPdfHref });
+                  onOpenInfo?.({ item: { ...item, name: itemName, productInfoDocuments }, price, infoPdfHref });
                 }}
               >
                 i

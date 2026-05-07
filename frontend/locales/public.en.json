@@ -95,6 +95,8 @@
     "productAssistantAllSelection": "Entire selection",
     "productAssistantAllProducts": "All documented products",
     "productAssistantProductFallback": "Product",
+    "productAssistantSplitOven": "Built-in Oven",
+    "productAssistantSplitHob": "Hob",
     "productAssistantIntro": "Hi. I can answer questions about the available products and their documentation. What would you like to discuss?",
     "productAssistantIntroOpened": "You're now looking at {label}. Ask me anything from its product information.",
     "productAssistantIntroSelectedOne": "You've selected {label}. Ask me anything from its product information.",

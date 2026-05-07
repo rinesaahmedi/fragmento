@@ -95,6 +95,8 @@
     "productAssistantAllSelection": "Gesamte Auswahl",
     "productAssistantAllProducts": "Alle Produkte mit Dokumentation",
     "productAssistantProductFallback": "Produkt",
+    "productAssistantSplitOven": "Einbaubackofen",
+    "productAssistantSplitHob": "Kochfeld",
     "productAssistantIntro": "Hallo! Ich kann Fragen zu den verf\u00fcgbaren Produkten und ihrer Dokumentation beantworten. Wor\u00fcber m\u00f6chtest du sprechen?",
     "productAssistantIntroOpened": "Du siehst jetzt {label}. Frag mich alles aus der Produktinformation dazu.",
     "productAssistantIntroSelectedOne": "Du hast {label} ausgew\u00e4hlt. Frag mich alles aus der Produktinformation dazu.",

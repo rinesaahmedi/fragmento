@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import {
   formatCurrency,
@@ -92,15 +93,26 @@ export default function KitchenSelectionSummary({
   onOpenProductInfo,
 }) {
   const { translate } = usePublicI18n();
+  const [isExpanded, setIsExpanded] = useState(false);
+  const selectedItemCount =
+    selectedComponents.length + selectedAccessories.length + selectedServices.length;
+  const shouldCollapseSummary = selectedItemCount > 6;
+  const summaryListClassName = [
+    styles.summaryList,
+    shouldCollapseSummary && !isExpanded ? styles.summaryListCollapsed : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <div className={styles.panel}>
+    <div className={[styles.panel, styles.summaryPanel].join(" ")}>
       <div className={styles.panelHeader}>
         <div>
           <p className={styles.eyebrow}>{translate("configurator.summaryEyebrow", "Summary")}</p>
           <h2>{translate("configurator.summaryTitle", "Your selection")}</h2>
         </div>
       </div>
-      <div className={styles.summaryList}>
+      <div className={summaryListClassName}>
         {!selectedComponents.length && !selectedAccessories.length && !selectedServices.length ? (
           <div className={styles.emptyState}>{translate("configurator.summaryEmpty", "No items selected yet.")}</div>
         ) : null}
@@ -129,6 +141,19 @@ export default function KitchenSelectionSummary({
           <SummaryRow key={item.id} item={item} onRemove={onRemoveService} onOpenInfo={onOpenProductInfo} />
         ))}
       </div>
+      {shouldCollapseSummary ? (
+        <div className={styles.summaryToggleRow}>
+          <button
+            type="button"
+            className={styles.summaryToggleButton}
+            onClick={() => setIsExpanded((current) => !current)}
+          >
+            {isExpanded
+              ? translate("configurator.summaryShowLess", "Show less")
+              : translate("configurator.summaryShowAll", "Show all")}
+          </button>
+        </div>
+      ) : null}
       <div className={styles.summaryActions}>
         <div className={styles.summaryTotal}>
           <span>{translate("common.totalPrice", "Total price")}</span>
