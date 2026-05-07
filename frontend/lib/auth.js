@@ -53,6 +53,10 @@ export async function verifyPassword(password, passwordHash) {
   return bcrypt.compare(password, passwordHash);
 }
 
+export async function hashPassword(password) {
+  return bcrypt.hash(password, 12);
+}
+
 export async function createAdminSession(adminId) {
   const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
   const cookieStore = await cookies();
