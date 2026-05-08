@@ -799,7 +799,7 @@
 
 .productAssistantDock {
   position: fixed;
-  right: 28px;
+  right: 24px;
   bottom: 28px;
   z-index: 90;
   display: flex;
@@ -807,7 +807,7 @@
   align-items: flex-end;
   justify-content: flex-end;
   gap: 14px;
-  width: clamp(380px, 32vw, 440px);
+  width: clamp(360px, 30vw, 420px);
   pointer-events: none;
 }
 
@@ -822,15 +822,16 @@
 
 .productAssistantPanel {
   width: 100%;
+  min-width: 0;
   height: clamp(520px, 62vh, 680px);
   max-height: calc(100vh - 116px);
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
-  gap: 14px;
-  padding: 18px;
+  gap: 12px;
+  padding: 16px;
   border: 1px solid rgba(120, 90, 64, 0.16);
   border-radius: 22px;
-  background: #fff;
+  background: #fffdf9;
   box-shadow:
     0 34px 90px rgba(36, 24, 13, 0.22),
     0 10px 28px rgba(74, 47, 20, 0.12),
@@ -838,6 +839,8 @@
   animation: productAssistantIn 0.22s ease-out;
   pointer-events: auto;
   transform-origin: right bottom;
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 @keyframes productAssistantIn {
@@ -853,11 +856,13 @@
 }
 
 .productAssistantHeader {
+  min-width: 0;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 2px;
+  padding: 2px 2px 10px;
+  border-bottom: 1px solid rgba(120, 90, 64, 0.1);
 }
 
 .productAssistantHeaderActions {
@@ -868,10 +873,34 @@
   justify-content: flex-end;
 }
 
+.productAssistantTitleWrap {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.productAssistantHeaderAvatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 50px;
+  overflow: hidden;
+}
+
+.productAssistantHeaderAvatar img {
+  width: 76px;
+  height: 100px;
+  object-fit: contain;
+  object-position: left top;
+  transform: translate(-10px, -4px);
+}
+
 .productAssistantHeader h2 {
   margin: 0;
   color: #2f2a24;
-  font-size: 1.05rem;
+  font-size: 1rem;
   line-height: 1.2;
 }
 
@@ -926,16 +955,17 @@
 }
 
 .productAssistantContextSection {
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 11px;
-  border: 1px solid rgba(120, 90, 64, 0.12);
-  border-radius: 16px;
-  background: #fff;
+  gap: 8px;
+  padding: 2px 2px 8px;
+  border-bottom: 1px solid rgba(120, 90, 64, 0.1);
+  background: transparent;
 }
 
 .productAssistantContextHeader {
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -943,8 +973,8 @@
 }
 
 .productAssistantSectionLabel {
-  color: #8b775f;
-  font-size: 0.72rem;
+  color: #796858;
+  font-size: 0.7rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1028,15 +1058,16 @@
 
 .productAssistantMessages {
   min-height: 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 10px;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 14px;
+  padding: 12px 10px;
   border: 1px solid rgba(120, 90, 64, 0.12);
-  border-radius: 18px;
-  background: linear-gradient(180deg, #fff 0%, #fffdf9 100%);
+  border-radius: 16px;
+  background: #fff;
 }
 
 .productAssistantMessage {
@@ -1077,12 +1108,16 @@
 }
 
 .productAssistantContextOptions {
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  max-height: 68px;
-  overflow: auto;
-  padding-bottom: 2px;
+  flex-wrap: nowrap;
+  gap: 6px;
+  max-height: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 2px 4px;
   scrollbar-width: thin;
 }
 
@@ -1091,14 +1126,14 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  min-height: 30px;
-  padding: 6px 10px;
+  min-height: 28px;
+  padding: 5px 10px;
   border: 1px solid rgba(120, 90, 64, 0.16);
   border-radius: 999px;
   background: #fff;
   color: #2f2a24;
   font: inherit;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
   text-align: left;
@@ -1138,6 +1173,7 @@
 }
 
 .productAssistantComposer {
+  min-width: 0;
   position: sticky;
   bottom: 0;
   display: grid;

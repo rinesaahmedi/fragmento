@@ -532,8 +532,8 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
   const activeItemId = activeProductInfo?.productInfoItemId;
   options.push({
     key: "all-documented",
-    label: translate("configurator.productAssistantAllProducts", "All documented products"),
-    shortLabel: translate("configurator.productAssistantAllProducts", "All documented products"),
+    label: translate("configurator.productAssistantAllProducts", "All products"),
+    shortLabel: translate("configurator.productAssistantAllProducts", "All products"),
     itemIds: items.map((item) => item.productInfoItemId || item.id).filter(Boolean),
     type: "all",
   });
@@ -949,14 +949,6 @@ function KitchenConfiguratorContent({
     ? buildLocalizedProductAssistantIntro(activeProductInfo, selectedProductInfoItems, translate)
     : productAssistantEmptyIntro;
   const productAssistantSuggestedContext = getDefaultProductAssistantContext(productAssistantContextOptions);
-  const productAssistantSubtitle = translate(
-    hasAnySelectedProducts
-      ? "configurator.productAssistantSubtitle"
-      : "configurator.productAssistantSubtitleCatalog",
-    hasAnySelectedProducts
-      ? "Questions about your current selection"
-      : "Questions about product details and documentation",
-  );
   const productAssistantOptionsKey = productAssistantContextOptions
     .map((option) => `${option.key}:${option.itemIds.join(",")}`)
     .join("|");
@@ -1580,11 +1572,15 @@ function KitchenConfiguratorContent({
                 aria-labelledby="product-assistant-title"
               >
                 <div className={styles.productAssistantHeader}>
-                  <div>
-                    <h2 id="product-assistant-title">
-                      {translate("configurator.productAssistantTitle", "Product Agent")}
-                    </h2>
-                    <p>{productAssistantSubtitle}</p>
+                  <div className={styles.productAssistantTitleWrap}>
+                    <span className={styles.productAssistantHeaderAvatar} aria-hidden="true">
+                      <img src="/img/FIGURA.png" alt="" />
+                    </span>
+                    <div>
+                      <h2 id="product-assistant-title">
+                        {translate("configurator.productAssistantTitle", "Product Agent")}
+                      </h2>
+                    </div>
                   </div>
                   <div className={styles.productAssistantHeaderActions}>
                     <button
@@ -1604,17 +1600,7 @@ function KitchenConfiguratorContent({
                       <div className={styles.productAssistantSectionLabel}>
                         {translate("configurator.productAssistantContextTitle", "Choose a product")}
                       </div>
-                      {selectedProductAssistantContext?.shortLabel ? (
-                        <span className={styles.productAssistantContextCurrent}>
-                          {translate("configurator.productAssistantContextCurrentCompact", "Current: {label}", {
-                            label: selectedProductAssistantContext.shortLabel,
-                          })}
-                        </span>
-                      ) : null}
                     </div>
-                    <p className={styles.productAssistantPickerHint}>
-                      {translate("configurator.productAssistantPickerHintCompact", "Pick one product or keep all documented products selected.")}
-                    </p>
                     <div className={styles.productAssistantContextOptions}>
                       {productAssistantContextOptions.map((option) => (
                         <button

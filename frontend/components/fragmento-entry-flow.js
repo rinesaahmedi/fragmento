@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -14,6 +14,47 @@ const LANGUAGE_OPTIONS = [
 ];
 
 const AVATAR_BASE_PATH = "/AVATAR";
+const ENTRY_FLOW_STATE_KEY = "fragmentoEntryFlowState";
+const LEGAL_RETURN_REQUEST_KEY = "fragmentoLegalReturnRequested";
+const VALID_LANGUAGE_CODES = new Set(LANGUAGE_OPTIONS.map((language) => language.code));
+const VALID_ENTRY_SCREENS = new Set(["language", "mode", "text", "video", "contract"]);
+
+function getLegalReturnEntryState() {
+  if (typeof window === "undefined") {
+    return null;
+  }
+
+  if (window.sessionStorage.getItem(LEGAL_RETURN_REQUEST_KEY) !== "1") {
+    return null;
+  }
+
+  window.sessionStorage.removeItem(LEGAL_RETURN_REQUEST_KEY);
+
+  try {
+    const rawState = window.sessionStorage.getItem(ENTRY_FLOW_STATE_KEY);
+    if (!rawState) {
+      return null;
+    }
+
+    const parsedState = JSON.parse(rawState);
+    const selectedLanguage = VALID_LANGUAGE_CODES.has(parsedState.selectedLanguage) ? parsedState.selectedLanguage : "";
+    const selectedMode = parsedState.selectedMode === "text" || parsedState.selectedMode === "video" ? parsedState.selectedMode : "";
+    const screen = VALID_ENTRY_SCREENS.has(parsedState.screen) ? parsedState.screen : "";
+
+    if (!selectedLanguage || !screen) {
+      return null;
+    }
+
+    return {
+      selectedLanguage,
+      selectedMode,
+      screen,
+      contractNumber: typeof parsedState.contractNumber === "string" ? parsedState.contractNumber : "",
+    };
+  } catch {
+    return null;
+  }
+}
 
 const SCREEN_TEXT = {
   de: {
@@ -214,9 +255,9 @@ function mapIntroLanguageToKitchenLanguage(language) {
   return language === "de" ? "de" : "en";
 }
 
-function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, disabled = false }) {
+function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, disabled = false, compact = false }) {
   return (
-    <div style={footerRowStyle}>
+    <div style={compact ? compactFooterRowStyle : footerRowStyle}>
       <button type="button" style={secondaryButtonStyle} onClick={onBack} disabled={disabled}>
         {backLabel}
       </button>
@@ -229,16 +270,31 @@ function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, d
 
 export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const router = useRouter();
-  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage === "en" ? "en" : "de");
-  const [selectedMode, setSelectedMode] = useState("");
-  const [screen, setScreen] = useState("language");
-  const [contractNumber, setContractNumber] = useState("");
+  const [initialEntryState] = useState(() => getLegalReturnEntryState());
+  const [selectedLanguage, setSelectedLanguage] = useState(
+    initialEntryState?.selectedLanguage || (initialLanguage === "en" ? "en" : "de")
+  );
+  const [selectedMode, setSelectedMode] = useState(initialEntryState?.selectedMode || "");
+  const [screen, setScreen] = useState(initialEntryState?.screen || "language");
+  const [contractNumber, setContractNumber] = useState(initialEntryState?.contractNumber || "");
   const [error, setError] = useState("");
   const [isValidatingContract, setIsValidatingContract] = useState(false);
 
   const text = SCREEN_TEXT[selectedLanguage] || SCREEN_TEXT.en;
   const instructionText = INSTRUCTION_TEXTS[selectedLanguage] || INSTRUCTION_TEXTS.en;
   const avatarSource = AVATAR_SOURCES[selectedLanguage] || AVATAR_SOURCES.en;
+
+  useEffect(() => {
+    window.sessionStorage.setItem(
+      ENTRY_FLOW_STATE_KEY,
+      JSON.stringify({
+        selectedLanguage,
+        selectedMode,
+        screen,
+        contractNumber,
+      })
+    );
+  }, [contractNumber, screen, selectedLanguage, selectedMode]);
 
   function handleLanguageSelect(nextLanguage) {
     setSelectedLanguage(nextLanguage);
@@ -355,8 +411,12 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
             <div style={contentAreaStyle}>
               <div style={textCardCompactStyle}>
                 {instructionText.split("\n").map((line, index) => (
-                  <p key={`${selectedLanguage}-${index}`} style={textLineStyle}>
-                    {line || "\u00a0"}
+                  <p
+                    key={`${selectedLanguage}-${index}`}
+                    style={line.trim() ? textLineStyle : textBlankLineStyle}
+                    aria-hidden={line.trim() ? undefined : true}
+                  >
+                    {line}
                   </p>
                 ))}
               </div>
@@ -365,6 +425,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
                 onBack={() => setScreen("mode")}
                 actionLabel={text.continueLabel}
                 onAction={() => setScreen("contract")}
+                compact
               />
             </div>
           ) : null}
@@ -424,12 +485,21 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
               />
             </form>
           ) : null}
-          {screen === "mode" || screen === "video" ? (
+          {screen === "mode" || screen === "text" || screen === "video" || screen === "contract" ? (
             <img
+              className={`fragmento-entry-figure fragmento-entry-figure--${screen}`}
               src="/img/FIGURA.png"
               alt=""
               aria-hidden="true"
-              style={screen === "video" ? videoFigureStyle : figureStyle}
+              style={
+                screen === "video"
+                  ? videoFigureStyle
+                  : screen === "text"
+                    ? textFigureStyle
+                    : screen === "contract"
+                      ? contractFigureStyle
+                      : figureStyle
+              }
             />
           ) : null}
         </section>
@@ -475,12 +545,12 @@ const adminLinkStyle = {
 const logoWrapStyle = {
   display: "grid",
   placeItems: "center",
-  marginTop: -14,
-  marginBottom: -20,
+  marginTop: -18,
+  marginBottom: -26,
 };
 
 const logoStyle = {
-  width: "min(360px, 72%)",
+  width: "min(330px, 70%)",
   height: "auto",
   maxWidth: "100%",
   display: "block",
@@ -578,15 +648,20 @@ const textCardStyle = {
 const textCardCompactStyle = {
   ...textCardStyle,
   minHeight: 0,
-  maxWidth: 720,
+  maxWidth: 700,
   margin: "0 auto",
-  padding: "10px 6px 4px",
+  padding: "8px 6px 4px",
 };
 
 const textLineStyle = {
-  margin: "0 0 10px",
+  margin: "0 0 7px",
   fontSize: 16,
   lineHeight: 1.22,
+};
+
+const textBlankLineStyle = {
+  margin: 0,
+  height: 13,
 };
 
 const videoFrameStyle = {
@@ -663,6 +738,11 @@ const footerRowStyle = {
   gap: 16,
 };
 
+const compactFooterRowStyle = {
+  ...footerRowStyle,
+  marginTop: 30,
+};
+
 const secondaryButtonStyle = {
   border: "1px solid #dbc9b1",
   borderRadius: 12,
@@ -701,6 +781,26 @@ const videoFigureStyle = {
   width: 56,
 };
 
+const textFigureStyle = {
+  ...figureStyle,
+  top: 12,
+  right: "auto",
+  bottom: "auto",
+  left: 24,
+  width: 90,
+  opacity: 0.95,
+};
+
+const contractFigureStyle = {
+  ...figureStyle,
+  top: 4,
+  right: "auto",
+  bottom: "auto",
+  left: 8,
+  width: 96,
+  opacity: 0.95,
+};
+
 const languageFooterStyle = {
   display: "flex",
   flexDirection: "column",
@@ -731,6 +831,15 @@ const responsivePanelMedia = `
   @media (max-width: 520px) {
     .fragmento-entry-panel-grid {
       grid-template-columns: 1fr !important;
+    }
+
+    .fragmento-entry-figure--text,
+    .fragmento-entry-figure--contract {
+      top: 18px !important;
+      left: 14px !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 54px !important;
     }
 
     .fragmento-entry-language-footer {
