@@ -1700,7 +1700,7 @@ function KitchenConfiguratorContent({
               type="button"
               className={styles.productAssistantLauncher}
               aria-expanded={isProductAssistantOpen}
-              hidden
+              aria-label={translate("configurator.productAssistantLauncher", "Product help")}
               onClick={() => {
                 if (isProductAssistantOpen) {
                   setIsProductAssistantOpen(false);
@@ -1709,7 +1709,12 @@ function KitchenConfiguratorContent({
                 openProductAssistant();
               }}
             >
-              {translate("configurator.productAssistantLauncher", "Product help")}
+              <span className={styles.productAssistantLauncherBubble}>
+                {translate("configurator.productAssistantLauncherPrompt", "Ask me something")}
+              </span>
+              <span className={styles.productAssistantLauncherAvatar} aria-hidden="true">
+                <img src="/img/FIGURA.png" alt="" />
+              </span>
             </button>
           </div>
         ) : null}

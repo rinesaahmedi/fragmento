@@ -115,7 +115,8 @@
     "productAssistantErrorTimeout": "Die Anfrage dauert zu lange. Bitte versuchen Sie es erneut.",
     "productAssistantPlaceholder": "Frage zu diesem Produkt stellen\u2026",
     "productAssistantSend": "Senden",
-    "productAssistantLauncher": "Produkt-Hilfe"
+    "productAssistantLauncher": "Produkt-Hilfe",
+    "productAssistantLauncherPrompt": "Frag mich etwas"
   },
   "order": {
     "title": "Bestellung abschließen",

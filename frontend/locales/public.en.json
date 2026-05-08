@@ -115,7 +115,8 @@
     "productAssistantErrorTimeout": "The request is taking too long. Please try again.",
     "productAssistantPlaceholder": "Ask about this product\u2026",
     "productAssistantSend": "Send",
-    "productAssistantLauncher": "Product help"
+    "productAssistantLauncher": "Product help",
+    "productAssistantLauncherPrompt": "Ask me something"
   },
   "order": {
     "title": "Complete order",
