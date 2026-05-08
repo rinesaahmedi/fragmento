@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-const AVATAR_CDN_BASE = "https://cdn.jsdelivr.net/gh/rinesaahmedi/fragmento@main/AVATAR";
+const AVATAR_BASE_PATH = "/AVATAR";
 
 function loadExternalScript(src) {
   return new Promise((resolve, reject) => {
@@ -517,12 +517,12 @@ function installLegacyOverlayFallback() {
 
   const openAvatarOverlay = () => {
     const avatarSources = {
-      en: `${AVATAR_CDN_BASE}/en-avatar.mp4`,
-      tr: `${AVATAR_CDN_BASE}/tr-avatar.mp4`,
-      de: `${AVATAR_CDN_BASE}/de-avatar.mp4`,
-      es: `${AVATAR_CDN_BASE}/es-avatar.mp4`,
-      ru: `${AVATAR_CDN_BASE}/ru-avatar.mp4`,
-      fr: `${AVATAR_CDN_BASE}/fr-avatar.mp4`,
+      en: `${AVATAR_BASE_PATH}/en-avatar.mp4`,
+      tr: `${AVATAR_BASE_PATH}/tr-avatar.mp4`,
+      de: `${AVATAR_BASE_PATH}/de-avatar.mp4`,
+      es: `${AVATAR_BASE_PATH}/es-avatar.mp4`,
+      ru: `${AVATAR_BASE_PATH}/ru-avatar.mp4`,
+      fr: `${AVATAR_BASE_PATH}/fr-avatar.mp4`,
     };
     lastInstructionScreen = "avatar";
     hideAll();

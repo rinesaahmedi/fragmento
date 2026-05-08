@@ -13,7 +13,7 @@ const LANGUAGE_OPTIONS = [
   { code: "ru", label: "Русский", flagSrc: "https://flagcdn.com/w40/ru.png" },
 ];
 
-const AVATAR_CDN_BASE = "https://cdn.jsdelivr.net/gh/rinesaahmedi/fragmento@main/AVATAR";
+const AVATAR_BASE_PATH = "/AVATAR";
 
 const SCREEN_TEXT = {
   de: {
@@ -202,12 +202,12 @@ const INSTRUCTION_TEXTS = {
 };
 
 const AVATAR_SOURCES = {
-  de: `${AVATAR_CDN_BASE}/de-avatar.mp4`,
-  en: `${AVATAR_CDN_BASE}/en-avatar.mp4`,
-  tr: `${AVATAR_CDN_BASE}/tr-avatar.mp4`,
-  es: `${AVATAR_CDN_BASE}/es-avatar.mp4`,
-  fr: `${AVATAR_CDN_BASE}/fr-avatar.mp4`,
-  ru: `${AVATAR_CDN_BASE}/ru-avatar.mp4`,
+  de: `${AVATAR_BASE_PATH}/de-avatar.mp4`,
+  en: `${AVATAR_BASE_PATH}/en-avatar.mp4`,
+  tr: `${AVATAR_BASE_PATH}/tr-avatar.mp4`,
+  es: `${AVATAR_BASE_PATH}/es-avatar.mp4`,
+  fr: `${AVATAR_BASE_PATH}/fr-avatar.mp4`,
+  ru: `${AVATAR_BASE_PATH}/ru-avatar.mp4`,
 };
 
 function mapIntroLanguageToKitchenLanguage(language) {
@@ -425,7 +425,12 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
             </form>
           ) : null}
           {screen === "mode" || screen === "video" ? (
-            <img src="/img/FIGURA.png" alt="" aria-hidden="true" style={figureStyle} />
+            <img
+              src="/img/FIGURA.png"
+              alt=""
+              aria-hidden="true"
+              style={screen === "video" ? videoFigureStyle : figureStyle}
+            />
           ) : null}
         </section>
       </div>
@@ -687,6 +692,13 @@ const figureStyle = {
   width: 66,
   height: "auto",
   pointerEvents: "none",
+};
+
+const videoFigureStyle = {
+  ...figureStyle,
+  right: 26,
+  bottom: 72,
+  width: 56,
 };
 
 const languageFooterStyle = {

@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 
-const AVATAR_CDN_BASE = "https://cdn.jsdelivr.net/gh/rinesaahmedi/fragmento@main/AVATAR";
+const AVATAR_BASE_PATH = "/AVATAR";
 
 function extractMatch(input, regex) {
   const match = input.match(regex);
@@ -23,10 +23,10 @@ function normalizeLegacyAssetPaths(input) {
     .replaceAll('url("img/', 'url("/img/')
     .replaceAll('"img/', '"/img/')
     .replaceAll("'img/", "'/img/")
-    .replaceAll('"AVATAR/', `"${AVATAR_CDN_BASE}/`)
-    .replaceAll("'AVATAR/", `'${AVATAR_CDN_BASE}/`)
-    .replaceAll('"/AVATAR/', `"${AVATAR_CDN_BASE}/`)
-    .replaceAll("'/AVATAR/", `'${AVATAR_CDN_BASE}/`);
+    .replaceAll('"AVATAR/', `"${AVATAR_BASE_PATH}/`)
+    .replaceAll("'AVATAR/", `'${AVATAR_BASE_PATH}/`)
+    .replaceAll('"/AVATAR/', `"${AVATAR_BASE_PATH}/`)
+    .replaceAll("'/AVATAR/", `'${AVATAR_BASE_PATH}/`);
 }
 
 const DISHWASHER_BASE_MARKUP =
