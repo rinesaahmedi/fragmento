@@ -14,7 +14,7 @@ export default function PublicLegalFooter() {
     <footer className="public-legal-footer" aria-label="Rechtliche Hinweise">
       <div className="public-legal-footer__inner">
         <span className="public-legal-footer__copy">Fragmento</span>
-        <Link href="/impressum" className="public-legal-footer__link" hidden>
+        <Link href="/impressum" className="public-legal-footer__link">
           Impressum
         </Link>
       </div>

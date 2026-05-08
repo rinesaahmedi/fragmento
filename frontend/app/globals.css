@@ -119,9 +119,6 @@ body {
   text-decoration: none;
 }
 
-.public-legal-footer__link[hidden] {
-  display: none;
-}
 
 .public-legal-footer__link:hover,
 .public-legal-footer__link:focus-visible {
