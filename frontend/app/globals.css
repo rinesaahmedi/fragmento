@@ -745,8 +745,8 @@ textarea {
 
 .service-hero__brand {
   position: absolute;
-  top: -58px;
-  left: 22px;
+  top: -140px;
+  left: 1px;
   display: inline-flex;
   align-items: center;
   gap: 16px;

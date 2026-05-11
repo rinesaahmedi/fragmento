@@ -479,7 +479,6 @@ export default function ServiceClaimFlow() {
           <div className="service-hero__content">
             <div className="service-hero__brand">
               <Image src="/img/fragmentologo-cropped.png" alt="Fragmento" width={168} height={54} className="service-hero__logo" />
-              <p className="service-hero__eyebrow">{copy.eyebrow}</p>
             </div>
             <h1>{copy.title}</h1>
           </div>
