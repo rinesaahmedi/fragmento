@@ -346,7 +346,10 @@ export default function KitchenCatalogPanel({
                   hint={
                     disabledReason ||
                     (item.code === SERVICE_CODE_MONTAGE
-                      ? translate("configurator.serviceHintMontage", "Assembly is available only from 3 extra components, including 2 cabinet components")
+                      ? translate(
+                          "configurator.serviceHintMontage",
+                          "Assembly is available only with a merchandise value of €1,000 or more and at least 3 cabinet components",
+                        )
                       : item.code === SERVICE_CODE_PICKUP
                         ? translate("configurator.serviceHintPickup", "Only available with at least one component or accessory")
                         : "")

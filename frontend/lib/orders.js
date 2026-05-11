@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
-import { MONTAGE_REQUIRED_CODES } from "./catalog";
+import { MONTAGE_CABINET_CODES } from "./catalog";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
   getServiceEligibility,
@@ -298,7 +298,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       isOrderLocked: confirmedItemSets[ItemType.COMPONENT].has(item.code),
     })),
     selectedAccessories,
-    montageRequiredCodes: MONTAGE_REQUIRED_CODES,
+    montageCabinetCodes: MONTAGE_CABINET_CODES,
   });
   const selectedServiceCodes = selectedServices.map((item) => item.code);
 

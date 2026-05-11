@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
   <head>
     <meta charset="UTF-8" />
@@ -3302,6 +3302,12 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
             const li = document.createElement('li');
             li.className = 'component-item';
             li.dataset.targetId = componentId;
+            if (lockedComponentIds.includes(componentId)) {
+                li.dataset.merchandiseLocked = 'true';
+            }
+            if (componentData.price != null) {
+                li.dataset.price = String(componentData.price);
+            }
             if (componentData.infoText) {
                 li.classList.add('has-info');
                 li.dataset.hasInfo = 'true';
@@ -3361,16 +3367,22 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
     // --- HELPER FUNCTIONS FOR VALIDATION ---
 
     function areMontageConditionsMet() {
-        const selectedComponents = document.querySelectorAll('#combined-list .component-item.selected');
         const cabinetNames = ["Unterschrank 30cm", "Oberschrank (links)", "Oberschrank (rechts)"];
+        const selectedComponents = document.querySelectorAll('#combined-list .component-item.selected');
         let cabinetCount = 0;
+        let merchandise = 0;
         selectedComponents.forEach(comp => {
+            if (comp.dataset.merchandiseLocked === 'true') return;
+            merchandise += Number(comp.dataset.price || 0);
             const name = comp.querySelector('.component-name').textContent.trim();
             if (cabinetNames.includes(name)) {
                 cabinetCount++;
             }
         });
-        return selectedComponents.length >= 3 && cabinetCount >= 2;
+        document.querySelectorAll('#combined-list .accessory-item[id^="acc-"].selected').forEach(acc => {
+            merchandise += Number(acc.dataset.price || 0);
+        });
+        return merchandise >= 1000 && cabinetCount >= 3;
     }
     
     function areAnyItemsSelected() {
@@ -3458,7 +3470,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
             if (item.id === 'service-montage' && !isCurrentlySelected) {
                 if (!areMontageConditionsMet()) {
                     // MODIFIED: Replaced alert with showMessage
-                    window.showMessage("Für die Montage sind mindestens 3 Artikel (davon 2 Schränke) erforderlich.", 'error');
+                    window.showMessage("Für die Montage sind ein Warenwert von mindestens 1.000 Euro und mindestens 3 Schrank-Komponenten erforderlich.", 'error');
                     return;
                 }
             }
@@ -3578,7 +3590,8 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
     function getSelections() {
         const components = Array.from(document.querySelectorAll('#combined-list .component-item.selected')).map(li => ({
             name: li.querySelector('.component-name')?.textContent?.trim(),
-            price: parsePrice(li.querySelector('.component-price')?.textContent)
+            price: parsePrice(li.querySelector('.component-price')?.textContent),
+            merchandiseLocked: li.dataset.merchandiseLocked === 'true'
         }));
         const accessories = Array.from(document.querySelectorAll('#combined-list .accessory-item[id^="acc-"].selected')).map(li => ({
             name: li.querySelector('.accessory-name')?.textContent?.trim(),
@@ -3858,12 +3871,15 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
       const montageService = orderSelections.services.find(s => s.name.includes('Montage'));
       
       if (montageService) {
-          const selectedComponents = orderSelections.components;
           const cabinetNames = ["Unterschrank 30cm", "Oberschrank (links)", "Oberschrank (rechts)"];
-          const cabinetCount = selectedComponents.filter(c => cabinetNames.includes(c.name)).length;
+          const { components, accessories } = orderSelections;
+          const merchandise = [...components, ...accessories]
+            .filter((i) => !i.merchandiseLocked)
+            .reduce((s, i) => s + i.price, 0);
+          const cabinetCount = components.filter((c) => cabinetNames.includes(c.name)).length;
 
-          if (selectedComponents.length < 3 || cabinetCount < 2) {
-              window.showMessage('Fehler: Die Montage-Bedingungen (min. 3 Artikel, davon 2 Schränke) sind nicht erfüllt.', 'error');
+          if (merchandise < 1000 || cabinetCount < 3) {
+              window.showMessage('Fehler: Die Montage-Bedingungen (Warenwert mindestens 1.000 Euro und mindestens 3 Schrank-Komponenten) sind nicht erfüllt.', 'error');
               return;
           }
       }

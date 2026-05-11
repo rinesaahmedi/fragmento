@@ -30,6 +30,23 @@ export const MONTAGE_REQUIRED_CODES = [
   "DISH-C-600-STD",
   "CAB-DRAWER-C-3D",
 ];
+
+/** Built-in appliances / standalone hoods: in `MONTAGE_REQUIRED_CODES` for legacy rules but not "cabinet" units for montage eligibility. */
+export const MONTAGE_NON_CABINET_COMPONENT_CODES = [
+  "WM-B-EWA34660W",
+  "WM-C-EWA34660W",
+  "DISH-B-600-STD",
+  "DISH-C-600-STD",
+  "OVEN-B-600-HOB",
+  "OVEN-C-600-HOB",
+  "HOOD-B-FH664621E",
+  "HOOD-C-FH664621E",
+];
+
+export const MONTAGE_CABINET_CODES = MONTAGE_REQUIRED_CODES.filter(
+  (code) => !MONTAGE_NON_CABINET_COMPONENT_CODES.includes(code),
+);
+
 export const LEGACY_ICON_KEYS = [
   "dishwasher",
   "refrigerator",
@@ -760,6 +777,7 @@ export function serializeKitchenForLegacy(kitchen) {
     services: items.filter((item) => item.itemType === ItemType.SERVICE).map(toClientItem),
     lockedBaseColors: LOCKED_BASE_COLORS,
     montageRequiredCodes: MONTAGE_REQUIRED_CODES,
+    montageCabinetCodes: MONTAGE_CABINET_CODES,
   };
 }
 
