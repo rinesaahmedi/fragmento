@@ -126,6 +126,20 @@ function buildInitialAddressPreference(initialOrder, contractNumber, contractAdd
   return customerUsesContractAddress(initialCustomer, contractAddress);
 }
 
+function getOrderItemEffectivePrice(item) {
+  if (item?.isLocked || item?.isOrderLocked) {
+    return 0;
+  }
+  return Number(item?.price || 0);
+}
+
+function buildOrderSubmissionItem(item) {
+  return {
+    ...item,
+    price: getOrderItemEffectivePrice(item),
+  };
+}
+
 function localizeProductInfoDocumentLabel(label, translate) {
   const normalized = String(label || "").trim().toLowerCase();
 
@@ -177,7 +191,8 @@ function buildProductInfoState(payload, translate) {
     ...payload,
     infoPdfHref: withProductInfoPdfRevision(payload.infoPdfHref),
     title:
-      payload.item.productAssistantName
+      formatProductAssistantDisplayName(payload.item, translate)
+      || payload.item.productAssistantName
       || getLocalizedItemName(payload.item, translate)
       || translate("configurator.productInfoTitle", "Product information", { title: "" }).trim(),
     price: Number(payload.price ?? payload.item.price ?? 0),
@@ -218,6 +233,71 @@ function extractProductInfoBullets(text, heading, limit = 6) {
   return bullets;
 }
 
+function extractProductAssistantProductNameLine(item) {
+  return String(item?.productInfoExtractedText || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .find((line) => /^(produktname|product name):/i.test(line)) || "";
+}
+
+function extractProductAssistantModel(item) {
+  const articleNumber = String(item?.articleNumber || "").trim();
+  if (articleNumber) return articleNumber;
+
+  const sourceText = [
+    item?.productInfoSummary || "",
+    ...(Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    item?.productInfoExtractedText || "",
+    item?.productAssistantName || "",
+    item?.name || "",
+  ].join("\n");
+  const patterns = [
+    /\bKHF\s*664\s*611\s*S(?:\s*Stripe\s*X)?\b/i,
+    /\bFH\s*664\s*621\s*S\b/i,
+    /\bEWA34660W\b/i,
+    /\bA-EGSPV597210\b/i,
+    /\bKGC\s*15495\s*S\b/i,
+    /\bEBX\s*943\s*600\s*S\b/i,
+    /\bOL-KMI\s*754\s*000\s*E\b/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = sourceText.match(pattern);
+    if (match) return match[0].replace(/\s+/g, " ").trim();
+  }
+
+  const productNameLine = extractProductAssistantProductNameLine(item);
+  if (!productNameLine) return "";
+  return productNameLine.replace(/^(produktname|product name):\s*/i, "").trim();
+}
+
+function isExtractorHoodProductAssistantItem(item) {
+  const sourceText = [
+    item?.productInfoSummary || "",
+    ...(Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    item?.productInfoExtractedText || "",
+    item?.productAssistantName || "",
+    item?.name || "",
+  ].join("\n");
+
+  return /flachschirmhaube|teleskophaube|kaminhaube|chimney hood|extractor hood/i.test(sourceText)
+    || String(item?.productInfoCode || item?.code || "").toUpperCase().startsWith("HOOD-");
+}
+
+function formatProductAssistantDisplayName(item, translate) {
+  if (!item) return "";
+
+  if (isExtractorHoodProductAssistantItem(item)) {
+    const baseLabel = translate("configurator.productAssistantExtractorHood", "Extractor hood");
+    return baseLabel;
+  }
+
+  return formatProductAssistantOptionName(
+    item.productAssistantName || item.name || item.code,
+    translate("configurator.productAssistantProductFallback", "Product"),
+  );
+}
+
 function formatProductAssistantContextLabel(activeProductInfo, selectedItems) {
   if (activeProductInfo?.title) {
     return activeProductInfo.title;
@@ -254,7 +334,7 @@ function hasAssistantProductInfo(item) {
 
 function buildLocalizedProductAssistantIntro(activeProductInfo, selectedItems, translate) {
   const names = selectedItems
-    .map((item) => item.productAssistantName || item.name)
+    .map((item) => formatProductAssistantDisplayName(item, translate))
     .filter(Boolean);
 
   if (activeProductInfo?.title) {
@@ -313,7 +393,7 @@ function formatProductAssistantOptionName(value, fallback = "") {
 
 function buildProductAssistantContextItem(item, overrides = {}) {
   return {
-    name: overrides.name || item.productAssistantName || item.name || "",
+    name: overrides.name || formatProductAssistantDisplayName(item, (key, fallback) => fallback) || item.name || "",
     code: overrides.code || item.code || "",
     productInfoCode: overrides.productInfoCode || item.productInfoCode || item.code || "",
     productInfoSummary: overrides.productInfoSummary ?? item.productInfoSummary ?? "",
@@ -540,10 +620,12 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
 
   if (activeItemId && itemsById.has(activeItemId)) {
     const activeItem = itemsById.get(activeItemId);
-    const activeItemName = formatProductAssistantOptionName(
-      activeItem.productAssistantName || activeItem.name || activeProductInfo.title,
-      translate("configurator.productAssistantCurrentProductFallback", "This product"),
-    );
+    const activeItemName =
+      formatProductAssistantDisplayName(activeItem, translate)
+      || formatProductAssistantOptionName(
+        activeItem.productAssistantName || activeItem.name || activeProductInfo.title,
+        translate("configurator.productAssistantCurrentProductFallback", "This product"),
+      );
     options.push({
       key: `current-${activeItemId}`,
       label: translate("configurator.productAssistantCurrentProduct", "This product: {name}", { name: activeItemName }),
@@ -562,10 +644,7 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
       continue;
     }
 
-    const itemLabel = formatProductAssistantOptionName(
-      item.productAssistantName || item.name || item.code,
-      translate("configurator.productAssistantProductFallback", "Product"),
-    );
+    const itemLabel = formatProductAssistantDisplayName(item, translate);
     options.push({
       key: `item-${itemId}`,
       label: itemLabel,
@@ -997,7 +1076,7 @@ function KitchenConfiguratorContent({
     resetProductAssistantContext();
   }, [isProductAssistantOpen, productAssistantOptionsKey, hasProductAssistantOptions]);
   const grandTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
-    (sum, item) => sum + Number(item.price || 0),
+    (sum, item) => sum + getOrderItemEffectivePrice(item),
     0,
   );
 
@@ -1286,6 +1365,9 @@ function KitchenConfiguratorContent({
     setStatusTone("idle");
 
     try {
+      const pdfOrderComponents = selectedComponents.map(buildOrderSubmissionItem);
+      const pdfOrderAccessories = selectedAccessories.map(buildOrderSubmissionItem);
+      const pdfOrderServices = selectedServices.map(buildOrderSubmissionItem);
       const pdfOrder = {
         orderNumber: new Date().toISOString().slice(0, 19).replace(/[-:T]/g, ""),
         createdAt: new Date().toLocaleString(language === "de" ? "de-DE" : "en-GB"),
@@ -1303,9 +1385,9 @@ function KitchenConfiguratorContent({
           notes: customer.notes,
           paymentMethod: customer.paymentMethod,
         },
-        components: selectedComponents,
-        accessories: selectedAccessories,
-        services: selectedServices,
+        components: pdfOrderComponents,
+        accessories: pdfOrderAccessories,
+        services: pdfOrderServices,
         total: grandTotal,
       };
       const pdf = await generateOrderPdf(pdfOrder);
@@ -1333,9 +1415,9 @@ function KitchenConfiguratorContent({
               consent: customer.consent,
             },
             addressVerification: addressVerification.verification,
-            components: selectedComponents,
-            accessories: selectedAccessories,
-            services: selectedServices,
+            components: pdfOrderComponents,
+            accessories: pdfOrderAccessories,
+            services: pdfOrderServices,
           },
           pdf_base64: pdfBase64,
           pdf_filename: pdf.filename,
@@ -1377,10 +1459,12 @@ function KitchenConfiguratorContent({
     <div className={styles.page}>
       <div className={styles.shell}>
         <nav className={styles.topNav} aria-label="Page navigation">
-          <Link href="/" className={styles.backLink}>
-            {translate("common.back", "Back")}
-          </Link>
-          <PublicLanguageSwitcher />
+          <div className={styles.topNavControls}>
+            <Link href="/" className={styles.backLink}>
+              {translate("common.back", "Back")}
+            </Link>
+            <PublicLanguageSwitcher />
+          </div>
         </nav>
         <header className={styles.header}>
           <div className={styles.brand}>

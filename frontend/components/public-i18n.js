@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import de from "../locales/public.de.json";
 import en from "../locales/public.en.json";
 import {
@@ -74,37 +74,270 @@ export function usePublicI18n() {
   return value;
 }
 
-export function PublicLanguageSwitcher() {
-  const { language, setLanguage, translate } = usePublicI18n();
+function FlagBadge({ country, active = false }) {
+  const stripesByCountry = {
+    de: "linear-gradient(180deg, #111 0 33.33%, #d71818 33.33% 66.66%, #f2c94c 66.66% 100%)",
+    gb: "linear-gradient(135deg, #1f4aa8 0%, #16387f 100%)",
+  };
+  const background = stripesByCountry[country] || "#fff";
 
   return (
-    <label
+    <span
+      aria-hidden="true"
       style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 8,
-        color: "var(--app-text-muted, #6b6259)",
-        fontSize: 13,
-        fontWeight: 800,
+        position: "relative",
+        display: "inline-block",
+        width: 24,
+        height: 24,
+        borderRadius: "999px",
+        overflow: "hidden",
+        background,
+        boxShadow: active ? "none" : "0 4px 8px rgba(48, 34, 21, 0.08)",
       }}
     >
-      <span>{translate("common.language", "Language")}</span>
-      <select
-        value={language}
-        onChange={(event) => setLanguage(event.target.value)}
+      {country === "gb" ? (
+        <>
+          <span
+            style={{
+              position: "absolute",
+              inset: "0 9px",
+              background: "#fff",
+            }}
+          />
+          <span
+            style={{
+              position: "absolute",
+              inset: "9px 0",
+              background: "#fff",
+            }}
+          />
+          <span
+            style={{
+              position: "absolute",
+              inset: "0 10px",
+              background: "#c62828",
+            }}
+          />
+          <span
+            style={{
+              position: "absolute",
+              inset: "10px 0",
+              background: "#c62828",
+            }}
+          />
+        </>
+      ) : null}
+    </span>
+  );
+}
+
+function ChevronIcon({ open }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width="12"
+      height="8"
+      viewBox="0 0 12 8"
+      style={{
+        display: "block",
+        transform: open ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 160ms ease",
+      }}
+    >
+      <path
+        d="M1.5 1.5L6 6L10.5 1.5"
+        fill="none"
+        stroke="#6b4f3a"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function PublicLanguageSwitcher() {
+  const { language, setLanguage, translate } = usePublicI18n();
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef(null);
+  const languageOptions = [
+    { value: "de", label: translate("common.german", "Deutsch"), country: "de" },
+    { value: "en", label: translate("common.english", "English"), country: "gb" },
+  ];
+  const currentLanguage = languageOptions.find((option) => option.value === language) || languageOptions[0];
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+
+    function handlePointerDown(event) {
+      if (!rootRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleEscape);
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleEscape);
+    };
+  }, [isOpen]);
+
+  return (
+    <div
+      ref={rootRef}
+      style={{
+        position: "relative",
+        zIndex: isOpen ? 40 : "auto",
+        display: "inline-grid",
+        gridTemplateColumns: "auto auto",
+        alignItems: "center",
+        gap: 12,
+        minHeight: 48,
+        padding: "8px 10px 8px 14px",
+        border: "1px solid rgba(177, 145, 116, 0.24)",
+        borderRadius: 22,
+        background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,244,236,0.94) 100%)",
+        boxShadow: "0 14px 30px rgba(84, 59, 40, 0.1)",
+        backdropFilter: "blur(10px)",
+      }}
+    >
+      <span
         style={{
-          minHeight: 40,
-          border: "1px solid rgba(177, 145, 116, 0.36)",
-          borderRadius: 10,
-          background: "rgba(255,255,255,0.92)",
-          color: "#2e271f",
-          padding: "8px 10px",
-          fontWeight: 800,
+          color: "var(--app-text-muted, #6b6259)",
+          fontSize: 11,
+          fontWeight: 900,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
         }}
       >
-        <option value="de">{translate("common.german", "Deutsch")}</option>
-        <option value="en">{translate("common.english", "English")}</option>
-      </select>
-    </label>
+        {translate("common.language", "Language")}
+      </span>
+
+      <div style={{ position: "relative", display: "inline-flex" }}>
+        <button
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((current) => !current)}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 14,
+            minHeight: 40,
+            minWidth: 154,
+            padding: "8px 12px 8px 10px",
+            border: isOpen ? "1px solid rgba(122, 77, 39, 0.38)" : "1px solid rgba(122, 77, 39, 0.24)",
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.98)",
+            color: "#2e271f",
+            boxShadow: isOpen
+              ? "0 12px 26px rgba(122, 77, 39, 0.12), inset 0 1px 0 rgba(255,255,255,0.98)"
+              : "inset 0 1px 0 rgba(255,255,255,0.92)",
+            lineHeight: 1.1,
+            cursor: "pointer",
+            fontWeight: 800,
+            fontSize: 14,
+          }}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <FlagBadge country={currentLanguage.country} />
+            <span>{currentLanguage.label}</span>
+          </span>
+          <ChevronIcon open={isOpen} />
+        </button>
+
+        {isOpen ? (
+          <div
+            role="menu"
+            aria-label={translate("common.language", "Language")}
+            style={{
+              position: "absolute",
+              top: "calc(100% + 10px)",
+              right: 0,
+              zIndex: 20,
+              display: "grid",
+              gap: 8,
+              minWidth: 228,
+              padding: 12,
+              border: "1px solid rgba(177, 145, 116, 0.24)",
+              borderRadius: 24,
+              background: "linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,243,236,0.97) 100%)",
+              boxShadow: "0 22px 42px rgba(84, 59, 40, 0.18)",
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            {languageOptions.map((option) => {
+              const isActive = option.value === language;
+
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={isActive}
+                  onClick={() => {
+                    setLanguage(option.value);
+                    setIsOpen(false);
+                  }}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 14,
+                    minHeight: 42,
+                    padding: "8px 12px",
+                    border: isActive ? "1px solid rgba(111, 90, 71, 0.24)" : "1px solid transparent",
+                    borderRadius: 14,
+                    background: isActive ? "linear-gradient(180deg, #8b7968 0%, #756353 100%)" : "transparent",
+                    color: isActive ? "#fffdf8" : "#3f342a",
+                    font: "inherit",
+                    fontSize: 15,
+                    fontWeight: isActive ? 800 : 700,
+                    textAlign: "left",
+                    cursor: "pointer",
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
+                    <FlagBadge country={option.country} active={isActive} />
+                    <span>{option.label}</span>
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "999px",
+                      background: isActive ? "#fff6ea" : "transparent",
+                      boxShadow: isActive ? "0 0 0 3px rgba(255,246,234,0.16)" : "none",
+                    }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
+    </div>
   );
 }

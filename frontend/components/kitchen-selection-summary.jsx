@@ -10,9 +10,64 @@ import {
 } from "./kitchen-selection-utils";
 import { usePublicI18n } from "./public-i18n";
 
+function isWorktopSummaryItem(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const name = String(item?.name || item?.nameSnapshot || "").trim().toLowerCase();
+  return componentKey === "worktop" || code.startsWith("TOP-") || name.startsWith("worktop");
+}
+
+function isSinkSummaryItem(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const name = String(item?.name || item?.nameSnapshot || "").trim().toLowerCase();
+  return componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and waste system");
+}
+
+function mergeStandardEquipmentItems(items) {
+  const worktopItem = items.find(isWorktopSummaryItem);
+  const sinkItem = items.find(isSinkSummaryItem);
+
+  if (!worktopItem || !sinkItem) {
+    return items;
+  }
+
+  const mergedItem = {
+    ...sinkItem,
+    id: `${sinkItem.id || "sink"}-with-${worktopItem.id || "worktop"}`,
+    name: "Sink and Worktop",
+    code: [sinkItem.code, worktopItem.code].filter(Boolean).join(" + "),
+    price: Number(sinkItem.price || 0) + Number(worktopItem.price || 0),
+  };
+
+  const mergedItems = [];
+  let insertedMergedItem = false;
+
+  for (const item of items) {
+    if (item === worktopItem || item === sinkItem) {
+      if (!insertedMergedItem) {
+        mergedItems.push(mergedItem);
+        insertedMergedItem = true;
+      }
+      continue;
+    }
+
+    mergedItems.push(item);
+  }
+
+  return mergedItems;
+}
+
+function getEffectiveSummaryPrice(item) {
+  if (item?.isLocked || item?.isOrderLocked) {
+    return 0;
+  }
+  return Number(item?.price || 0);
+}
+
 function SummaryRow({ item, onRemove, onOpenInfo }) {
   const { translate } = usePublicI18n();
-  const price = Number(item.price || 0);
+  const price = getEffectiveSummaryPrice(item);
   const isLocked = item.isLocked || item.isOrderLocked;
   const itemName = getLocalizedItemName(item, translate);
   const infoPdfHref = getProductInfoHref(item);
@@ -94,6 +149,7 @@ export default function KitchenSelectionSummary({
 }) {
   const { translate } = usePublicI18n();
   const [isExpanded, setIsExpanded] = useState(false);
+  const mergedLockedSelectedComponents = mergeStandardEquipmentItems(lockedSelectedComponents);
   const selectedItemCount =
     selectedComponents.length + selectedAccessories.length + selectedServices.length;
   const shouldCollapseSummary = selectedItemCount > 6;
@@ -117,10 +173,10 @@ export default function KitchenSelectionSummary({
           <div className={styles.emptyState}>{translate("configurator.summaryEmpty", "No items selected yet.")}</div>
         ) : null}
 
-        {lockedSelectedComponents.length ? (
+        {mergedLockedSelectedComponents.length ? (
           <div className={styles.summarySectionTitle}>{translate("configurator.summaryStandardEquipment", "Standard equipment")}</div>
         ) : null}
-        {lockedSelectedComponents.map((item) => (
+        {mergedLockedSelectedComponents.map((item) => (
           <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
         ))}
 

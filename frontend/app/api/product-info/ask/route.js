@@ -132,10 +132,43 @@ function getFactValue(item, labelPattern) {
   return parts.length > 1 ? parts.slice(1).join(":").trim() : fact.trim();
 }
 
+function getEnergyClassValue(item) {
+  const factValue =
+    getFactValue(item, /^(energieklasse|energy\s+(?:efficiency\s+)?class)\s*:/i)
+    || getFactValue(item, /^class\s*:/i);
+  if (factValue) return factValue;
+
+  const sourceText = getCombinedItemInfoText(item);
+  const match = sourceText.match(
+    /\b(?:energieklasse|energy\s+(?:efficiency\s+)?class)\s*[:\-]?\s*([A-G](?:\+\+?)?)\b/i,
+  );
+  return match ? match[1].toUpperCase() : "";
+}
+
+function getAnnualConsumptionValue(item) {
+  const sourceText = getCombinedItemInfoText(item);
+  const factValue =
+    getFactValue(item, /^(jahresverbrauch|annual consumption)\s*:/i)
+    || getFactValue(item, /^energy consumption\s*:/i);
+  if (factValue) return factValue;
+
+  const perCycleMatch = sourceText.match(/\b\d+(?:[.,]\d+)?\s*kWh\s*\/\s*100\s*(?:Zyklen|cycles)\b/i);
+  if (perCycleMatch) {
+    return perCycleMatch[0].replace(/\s+/g, " ").trim();
+  }
+
+  const annualMatch = sourceText.match(/\b\d+(?:[.,]\d+)?\s*kWh\b/i);
+  return annualMatch ? annualMatch[0].replace(/\s+/g, " ").trim() : "";
+}
+
 function getItemDocumentLabels(item) {
   return getProductInfoDocuments({ code: item?.productInfoCode || item?.code })
     .map((document) => String(document?.label || "").trim())
     .filter(Boolean);
+}
+
+function hasELabelDocument(item) {
+  return getItemDocumentLabels(item).some((label) => /e[\s-]?label/i.test(label));
 }
 
 function getCombinedItemInfoText(item) {
@@ -161,14 +194,58 @@ function getPublicItemName(item, language) {
   }
 
   const explicitModel = extractKnownModel(item);
-  if (/flachschirmhaube|teleskophaube|kaminhaube|chimney hood/i.test(sourceText)) {
-    const typeLabel = /kaminhaube|chimney hood/i.test(sourceText)
-      ? (language === "de" ? "Kaminhaube" : "chimney hood")
-      : (language === "de" ? "Flachschirmhaube" : "flat pull-out hood");
-    return explicitModel ? `${explicitModel} ${typeLabel}` : typeLabel;
+  if (isExtractorHoodItem(item)) {
+    return formatExtractorHoodAnswerName(item, language, explicitModel);
   }
 
   return sanitizeProductContextName(item?.name || item?.code || (language === "de" ? "Das Produkt" : "The product"));
+}
+
+function isExtractorHoodItem(item) {
+  const sourceText = getCombinedItemInfoText(item);
+  return /flachschirmhaube|teleskophaube|kaminhaube|chimney hood|extractor hood/i.test(sourceText)
+    || String(item?.productInfoCode || item?.code || "").toUpperCase().startsWith("HOOD-");
+}
+
+function formatExtractorHoodAnswerName(item, language, explicitModel = "") {
+  const model = explicitModel || extractKnownModel(item);
+  const baseLabel = language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+  return model ? `${baseLabel} (${model})` : baseLabel;
+}
+
+function getEnergyAnswerItemName(item, language) {
+  const sourceText = getCombinedItemInfoText(item);
+  const explicitModel = extractKnownModel(item);
+
+  if (/washing machine|waschmaschine/i.test(sourceText)) {
+    return language === "de"
+      ? `Waschmaschine${explicitModel ? ` (${explicitModel})` : ""}`
+      : `Washing machine${explicitModel ? ` (${explicitModel})` : ""}`;
+  }
+
+  if (/dishwasher|geschirrsp/i.test(sourceText)) {
+    return language === "de"
+      ? `Geschirrspueler${explicitModel ? ` (${explicitModel})` : ""}`
+      : `Dishwasher${explicitModel ? ` (${explicitModel})` : ""}`;
+  }
+
+  if (/refrigerator|fridge|kuehl|kühl|gefrier/i.test(sourceText)) {
+    return language === "de"
+      ? `Kuehl-Gefrierkombination${explicitModel ? ` (${explicitModel})` : ""}`
+      : `Refrigerator${explicitModel ? ` (${explicitModel})` : ""}`;
+  }
+
+  if (isExtractorHoodItem(item)) {
+    return formatExtractorHoodAnswerName(item, language, explicitModel);
+  }
+
+  if (/oven and hob|backofen|oven|kochfeld|hob/i.test(sourceText)) {
+    return language === "de"
+      ? `Backofen${explicitModel ? ` (${explicitModel})` : ""}`
+      : `Built-in oven${explicitModel ? ` (${explicitModel})` : ""}`;
+  }
+
+  return getPublicItemName(item, language);
 }
 
 function extractNoiseValue(item) {
@@ -209,6 +286,56 @@ function extractInstallationDimensions(item) {
   );
 
   return factMatches.length ? factMatches.join(", ") : "";
+}
+
+function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
+  const value = String(question || "").toLowerCase();
+  const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
+
+  if (!/(e[\s-]?label|energy label|energielabel|energieklasse|energy\s+(?:efficiency\s+)?class)/i.test(value)) {
+    return null;
+  }
+
+  const includeConsumption = /(consumption|verbrauch|kwh)/i.test(value);
+  const entries = items
+    .map((item) => {
+      const name = getEnergyAnswerItemName(item, language);
+      const hasELabel = hasELabelDocument(item);
+      const energyClass = getEnergyClassValue(item);
+      const annualConsumption = getAnnualConsumptionValue(item);
+
+      if (!hasELabel && !energyClass) return null;
+
+      if (language === "de") {
+        const details = [];
+        details.push(hasELabel ? "E-Label verfuegbar" : "kein E-Label gefunden");
+        details.push(energyClass ? `Energieklasse ${energyClass}` : "keine dokumentierte Energieklasse gefunden");
+        if (includeConsumption && annualConsumption) {
+          details.push(`Verbrauch ${annualConsumption}`);
+        }
+        return `- ${name}: ${details.join(", ")}`;
+      }
+
+      const details = [];
+      details.push(hasELabel ? "E-label available" : "no E-label found");
+      details.push(energyClass ? `energy class ${energyClass}` : "no documented energy class found");
+      if (includeConsumption && annualConsumption) {
+        details.push(`consumption ${annualConsumption}`);
+      }
+      return `- ${name}: ${details.join(", ")}`;
+    })
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return { answer: notFoundAnswer, found: false };
+  }
+
+  return {
+    answer: language === "de"
+      ? `Ja, bei den ausgewaehlten Produkten habe ich folgende Energiedaten gefunden:\n${entries.join("\n")}\nMoechtest du, dass ich dir auch den Verbrauch pro Produkt dazuschreibe?`
+      : `Yes, here is the documented energy information for the selected products:\n${entries.join("\n")}\nWould you like me to add the consumption figures for each product as well?`,
+    found: true,
+  };
 }
 
 function answerFromExplicitMultiItemFacts(question, items, language) {
@@ -266,6 +393,7 @@ function extractKnownModel(item) {
 
   const sourceText = getCombinedItemInfoText(item);
   const patterns = [
+    /\bKHF\s*664\s*611\s*S(?:\s*Stripe\s*X)?\b/i,
     /\bFH\s*664\s*621\s*S\b/i,
     /\bEBX\s*943\s*600\s*S\b/i,
     /\bOL-KMI\s*754\s*000\s*E\b/i,
@@ -494,6 +622,11 @@ export async function POST(request) {
       return NextResponse.json({ answer: noInfoAnswer, found: false });
     }
 
+    const multiItemEnergyAnswer = answerFromExplicitMultiItemEnergyFacts(question, usableContextItems, responseLanguage);
+    if (multiItemEnergyAnswer) {
+      return NextResponse.json(multiItemEnergyAnswer);
+    }
+
     const multiItemStructuredAnswer = answerFromExplicitMultiItemFacts(question, usableContextItems, responseLanguage);
     if (multiItemStructuredAnswer) {
       return NextResponse.json(multiItemStructuredAnswer);
@@ -527,6 +660,11 @@ export async function POST(request) {
       "For yes/no questions, start with a direct yes or no, then add one short supporting sentence from the provided information.",
       "If multiple relevant specs are present, prefer dimensions, capacity, energy class, controls, functions, and included parts.",
       "If the context includes multiple products, answer for the product that best matches the question and name that product clearly when useful.",
+      "When mentioning multiple products, models, or several specifications, format the answer with line breaks so each product or major point appears on its own line.",
+      "Use short readable blocks instead of one long paragraph. Lists may use hyphens or plain line breaks.",
+      "Write like a helpful sales advisor: natural, warm, and concise, but never pushy or verbose.",
+      "When the answer is found, end with one short relevant follow-up question or suggestion that helps continue the conversation, such as offering more details, comparison, dimensions, installation info, or energy data.",
+      "Keep that follow-up to a single short sentence, and do not add it when the answer is not found or when the customer only asks for a code or model number.",
       `If the answer is not clearly supported by the provided product information, answer exactly: "${notFoundAnswer}"`,
       `Keep answers concise but substantive, customer-friendly, and in ${LANGUAGE_LABELS[responseLanguage] || LANGUAGE_LABELS.en}.`,
       'Return only valid JSON with this shape: {"answer":"string","found":boolean}.',
