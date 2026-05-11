@@ -57,6 +57,11 @@ function getContractOrderLabel(order) {
   return formatOrdinal(order.contractOrderSequence);
 }
 
+function getOrderContractLabel(order) {
+  const contractNumber = String(order?.contractNumber || order?.kitchenContract?.contractNumber || "").trim();
+  return contractNumber ? `Contract ${contractNumber}` : "";
+}
+
 function normalizeParam(value) {
   if (Array.isArray(value)) return value[0] || "";
   return value || "";
@@ -180,6 +185,12 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                       <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
                         <strong>{order.orderNumber}</strong>
                       </Link>
+                      {getOrderContractLabel(order) ? (
+                        <div style={contractMetaStyle}>
+                          <AdminText i18nKey="orderDetailAdmin.contractNumber" fallback="Contract number" />{" "}
+                          <span style={{ fontWeight: 800 }}>{String(order.contractNumber || order.kitchenContract?.contractNumber || "").trim()}</span>
+                        </div>
+                      ) : null}
                       {order.contractOrderSequence ? (
                         <div style={contractSequenceStyle}>{getContractOrderLabel(order)} <AdminText i18nKey="ordersAdmin.orderForContract" fallback="order for contract" /></div>
                       ) : null}
@@ -215,6 +226,12 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                       <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
                         <strong style={{ fontSize: "1.05rem" }}>{order.orderNumber}</strong>
                       </Link>
+                      {getOrderContractLabel(order) ? (
+                        <span style={contractMetaStyle}>
+                          <AdminText i18nKey="orderDetailAdmin.contractNumber" fallback="Contract number" />{" "}
+                          <span style={{ fontWeight: 800 }}>{String(order.contractNumber || order.kitchenContract?.contractNumber || "").trim()}</span>
+                        </span>
+                      ) : null}
                       {order.contractOrderSequence ? (
                         <span style={contractSequenceStyle}>{getContractOrderLabel(order)} <AdminText i18nKey="ordersAdmin.orderForContract" fallback="order for contract" /></span>
                       ) : null}
@@ -291,6 +308,14 @@ const contractSequenceStyle = {
   background: "linear-gradient(135deg, var(--app-info-bg), rgba(255,255,255,0.78))",
   color: "var(--app-info-text)",
   border: "1px solid rgba(45, 108, 121, 0.14)",
+  fontSize: 12,
+  fontWeight: 700,
+  letterSpacing: "0.04em",
+};
+
+const contractMetaStyle = {
+  marginTop: 6,
+  color: "var(--app-text-muted)",
   fontSize: 12,
   fontWeight: 700,
   letterSpacing: "0.04em",
