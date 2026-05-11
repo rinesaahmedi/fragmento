@@ -14,8 +14,16 @@
 
 .topNav {
   display: flex;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 8px;
+}
+
+.topNavControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .header {
@@ -106,6 +114,9 @@
 
 .pricePill {
   grid-area: price;
+  display: grid;
+  justify-items: end;
+  gap: 6px;
   text-align: right;
 }
 
@@ -1082,7 +1093,7 @@
   border-radius: 13px;
   font-size: 0.9rem;
   line-height: 1.5;
-  white-space: normal;
+  white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -1371,6 +1382,13 @@
 
 .summaryMeta {
   min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.summaryMeta strong,
+.summaryMeta span {
+  display: block;
 }
 
 .summaryPrice {
@@ -2166,9 +2184,18 @@
     justify-items: start;
   }
 
+  .topNavControls {
+    flex-wrap: wrap;
+  }
+
   .brand {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .pricePill {
+    justify-items: start;
+    text-align: left;
   }
 
   .orderForm {

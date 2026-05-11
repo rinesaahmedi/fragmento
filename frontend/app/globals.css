@@ -88,31 +88,46 @@ body {
 
 .public-legal-footer {
   flex-shrink: 0;
-  padding: 18px 20px 26px;
+  padding: 18px 20px 26px 250px;
 }
 
-.public-legal-footer__inner {
-  width: min(1120px, 100%);
-  margin: 0 auto;
-  padding: 14px 18px;
-  border: 1px solid rgba(107, 79, 58, 0.14);
-  border-radius: 16px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82) 0%, rgba(248, 243, 236, 0.92) 100%);
-  box-shadow: 0 10px 24px rgba(84, 59, 40, 0.06);
+.public-legal-footer__layout {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 20px;
 }
 
-.public-legal-footer__copy {
+.public-legal-footer__partner {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  flex: 0 0 auto;
+  padding: 0;
+}
+
+.public-legal-footer__partner-label {
   color: var(--app-text-muted);
-  font-size: 0.92rem;
-  font-weight: 600;
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.public-legal-footer__partner-logo {
+  display: block;
+  width: 92px;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .public-legal-footer__link {
+  margin-left: auto;
+  margin-right: clamp(140px, 16vw, 260px);
+  flex: 0 0 auto;
   color: var(--app-accent);
   font-size: 0.95rem;
   font-weight: 800;
@@ -516,13 +531,18 @@ textarea {
 
 @media (max-width: 700px) {
   .public-legal-footer {
-    padding: 14px 14px 20px;
+    padding: 14px 14px 20px 14px;
   }
 
-  .public-legal-footer__inner {
-    padding: 12px 14px;
-    flex-direction: column;
-    align-items: flex-start;
+  .public-legal-footer__layout {
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: start;
+  }
+
+  .public-legal-footer__link {
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .legal-page {
@@ -1031,4 +1051,3 @@ textarea {
     margin-bottom: 18px;
   }
 }
-

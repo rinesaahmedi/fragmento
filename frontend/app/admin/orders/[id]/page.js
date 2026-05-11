@@ -25,6 +25,7 @@ import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getOrderById } from "../../../../lib/catalog";
 import { buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
+import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../../lib/order-item-display";
 import { buildOrderForNotifications } from "../../../../lib/orders";
 
 export const dynamic = "force-dynamic";
@@ -84,6 +85,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
   const canResendEmail = order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.EMAILED;
   const canCancel = order.status !== OrderStatus.CANCELLED;
   const notificationOrder = buildOrderForNotifications(order);
+  const displayItems = mergeSinkAndWorktopItems(order.items || [], (sinkItem, worktopItem) => ({
+    ...sinkItem,
+    id: `${sinkItem.id}-with-${worktopItem.id}`,
+    code: SINK_AND_WORKTOP_CODE,
+    nameSnapshot: SINK_AND_WORKTOP_NAME,
+    priceSnapshot: Number(sinkItem.priceSnapshot || 0) + Number(worktopItem.priceSnapshot || 0),
+    quantity: 1,
+  }));
   const emailDraft = buildOrderConfirmationEmailDraft(notificationOrder);
   const emailStatic = await buildOrderConfirmationEmailStaticHtml(notificationOrder);
 
@@ -151,7 +160,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 <div style={subMetaStyle}>
                   <span>{order.kitchen.name}</span>
                   <span>{formatDate(order.createdAt)}</span>
-                  <span>{order.items.length} <AdminText i18nKey="orderDetailAdmin.itemCount" fallback="Items" /></span>
+                  <span>{displayItems.length} <AdminText i18nKey="orderDetailAdmin.itemCount" fallback="Items" /></span>
                   {order.contractOrderSequence ? (
                     <span>{formatOrdinal(order.contractOrderSequence)} <AdminText i18nKey="orderDetailAdmin.orderForThisContract" fallback="order for this contract" /></span>
                   ) : null}
@@ -266,7 +275,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 </tr>
               </thead>
               <tbody>
-                {order.items.map((item) => (
+                {displayItems.map((item) => (
                   <tr key={item.id}>
                     <td style={tdStyle}>
                       <strong>{item.nameSnapshot}</strong>

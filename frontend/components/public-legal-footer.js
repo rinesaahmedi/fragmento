@@ -15,8 +15,15 @@ export default function PublicLegalFooter() {
 
   return (
     <footer className="public-legal-footer" aria-label="Rechtliche Hinweise">
-      <div className="public-legal-footer__inner">
-        <span className="public-legal-footer__copy">Fragmento</span>
+      <div className="public-legal-footer__layout">
+        <div className="public-legal-footer__partner" aria-label="Powered by Primex">
+          <span className="public-legal-footer__partner-label">Powered by</span>
+          <img
+            src="/primex-agentic-logo.png"
+            alt="Primex Agentic AI"
+            className="public-legal-footer__partner-logo"
+          />
+        </div>
         <Link
           href="/impressum"
           className="public-legal-footer__link"

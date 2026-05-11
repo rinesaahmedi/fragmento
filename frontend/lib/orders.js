@@ -8,6 +8,11 @@ import {
   SERVICE_CODE_PICKUP,
 } from "./service-eligibility";
 import {
+  mergeSinkAndWorktopItems,
+  SINK_AND_WORKTOP_CODE,
+  SINK_AND_WORKTOP_NAME,
+} from "./order-item-display";
+import {
   CONTRACT_ERRORS,
   assertUsableKitchenContract,
   buildConfirmedItemCodeSets,
@@ -85,17 +90,33 @@ function mapCatalogItem(catalogItems, submittedItem, itemType) {
   );
 }
 
+function getOrderItemEffectivePrice(item) {
+  if (item?.isLocked || item?.isOrderLocked || item?.kitchenItem?.isLocked) {
+    return 0;
+  }
+  return Number(item?.priceSnapshot ?? item?.price ?? 0);
+}
+
 export function buildOrderForNotifications(orderRecord) {
   const toNotificationItem = (item) => ({
     code: item.code,
-    name: item.nameSnapshot,
-    price: Number(item.priceSnapshot),
-    iconKey: item.kitchenItem?.iconKey || "",
-    productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || "",
-    productInfoSummary: item.kitchenItem?.productInfoSummary || "",
-    productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts) ? item.kitchenItem.productInfoKeyFacts : [],
-    productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || "",
+    name: item.nameSnapshot || item.name || "",
+    price: getOrderItemEffectivePrice(item),
+    iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
+    productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
+    productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
+    productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts)
+      ? item.kitchenItem.productInfoKeyFacts
+      : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
   });
+  const notificationItems = mergeSinkAndWorktopItems(orderRecord.items || [], (sinkItem, worktopItem) => ({
+    ...toNotificationItem(sinkItem),
+    itemType: sinkItem.itemType,
+    code: SINK_AND_WORKTOP_CODE,
+    name: SINK_AND_WORKTOP_NAME,
+    price: getOrderItemEffectivePrice(sinkItem) + getOrderItemEffectivePrice(worktopItem),
+  }));
 
   return {
     id: orderRecord.id,
@@ -121,13 +142,13 @@ export function buildOrderForNotifications(orderRecord) {
       notes: orderRecord.notes || "",
       paymentMethod: orderRecord.paymentMethod || "",
     },
-    components: orderRecord.items
+    components: notificationItems
       .filter((item) => item.itemType === ItemType.COMPONENT)
       .map(toNotificationItem),
-    accessories: orderRecord.items
+    accessories: notificationItems
       .filter((item) => item.itemType === ItemType.ACCESSORY)
       .map(toNotificationItem),
-    services: orderRecord.items
+    services: notificationItems
       .filter((item) => item.itemType === ItemType.SERVICE)
       .map(toNotificationItem),
   };
@@ -325,7 +346,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
           throw validationError("Select at least one new item for this contract.");
         }
 
-        const totalPrice = newSelectedItems.reduce((sum, item) => sum + Number(item.price), 0);
+        const totalPrice = newSelectedItems.reduce((sum, item) => sum + getOrderItemEffectivePrice(item), 0);
         const order = existingEditableOrder
           ? await tx.order.update({
               where: { id: existingEditableOrder.id },
@@ -381,7 +402,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
               itemType: item.itemType,
               code: item.code,
               nameSnapshot: item.name,
-              priceSnapshot: item.price,
+              priceSnapshot: getOrderItemEffectivePrice(item),
               quantity: 1,
             })),
           });
