@@ -35,6 +35,8 @@ const FAILED_ERROR_BY_LANGUAGE = {
 
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
+const MAX_CONVERSATION_MESSAGES = 6;
+const MAX_CONVERSATION_MESSAGE_LENGTH = 900;
 const MAX_CONTEXT_CHARS = 12000;
 const OPENAI_TIMEOUT_MS = 20000;
 
@@ -80,6 +82,27 @@ function normalizeContextItems(value) {
           || item.productInfoExtractedText
         ),
     );
+}
+
+function normalizeConversationMessages(value) {
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .slice(-MAX_CONVERSATION_MESSAGES)
+    .map((message) => {
+      const role = String(message?.role || "").trim().toLowerCase() === "user" ? "user" : "assistant";
+      const text = String(message?.text || "")
+        .trim()
+        .slice(0, MAX_CONVERSATION_MESSAGE_LENGTH);
+      return { role, text };
+    })
+    .filter((message) => message.text);
+}
+
+function buildConversationContext(messages) {
+  return messages
+    .map((message) => `${message.role === "user" ? "Customer" : "Assistant"}: ${message.text}`)
+    .join("\n");
 }
 
 function normalizeLanguage(value) {
@@ -180,6 +203,84 @@ function getCombinedItemInfoText(item) {
   ]
     .map(normalizePublicProductBrand)
     .join("\n");
+}
+
+function hasExplicitMountingDistanceInfo(item) {
+  const sourceText = getCombinedItemInfoText(item);
+  const mentionsMountingDistance =
+    /(mounting\s+distance|required\s+distance|distance\s+above\s+the\s+hob|mindestabstand|montageabstand|abstand[^\n]*(?:kochfeld|hob|herd|gas|elektro))/i.test(sourceText)
+    || /(?:kochfeld|hob|herd|gas|elektro)[^\n]*abstand/i.test(sourceText);
+  const hasNumericDistance = /\b\d{2,4}(?:[.,]\d+)?\s*(?:mm|cm)\b/i.test(sourceText);
+
+  return mentionsMountingDistance && hasNumericDistance;
+}
+
+function hasExplicitDimensionInfo(item) {
+  return Boolean(extractInstallationDimensions(item));
+}
+
+function hasExplicitDuctConnectionInfo(item) {
+  const sourceText = getCombinedItemInfoText(item);
+  return /(duct\s+connection|exhaust\s+(?:connection|hose)|abluftstutzen|anschlussstutzen|anschluss\s*:?|ø|Ø|diameter|durchmesser)[^\n]*\b\d{2,4}(?:[.,]\d+)?\s*(?:mm|cm)?\b/i.test(sourceText);
+}
+
+function splitTrailingQuestion(answer) {
+  const value = String(answer || "").trim();
+  const match = value.match(/([\s\S]*?)(?:\n\s*)?([^\n?]*\?)\s*$/);
+  if (!match) return { body: value, question: "" };
+
+  return {
+    body: match[1].trim(),
+    question: match[2].trim(),
+  };
+}
+
+function isUnsupportedFollowUpQuestion(question, items) {
+  const value = String(question || "");
+  if (!value) return false;
+
+  if (
+    /(mounting\s+distance|required\s+mounting\s+distance|required\s+distance|distance\s+above\s+the\s+hob|installation\s+distance|mindestabstand|montageabstand|abstand[^\n?]*(?:kochfeld|hob|herd))/i.test(value)
+    && !items.some(hasExplicitMountingDistanceInfo)
+  ) {
+    return true;
+  }
+
+  if (/(dimension|measurement|size|h\s*x\s*w\s*x\s*d|abmessung|mass|maße|masse|hoehe|höhe|breite|tiefe)/i.test(value) && !items.some(hasExplicitDimensionInfo)) {
+    return true;
+  }
+
+  if (/(duct|exhaust\s+(?:connection|hose)|connection\s+size|anschluss|abluft|durchmesser|diameter|ø|Ø)/i.test(value) && !items.some(hasExplicitDuctConnectionInfo)) {
+    return true;
+  }
+
+  if (/(noise|geraeusch|geräusch|db\b|dba\b)/i.test(value) && !items.some(extractNoiseValue)) {
+    return true;
+  }
+
+  if (/(energy|energie|verbrauch|consumption|kwh)/i.test(value) && !items.some((item) => getEnergyClassValue(item) || getAnnualConsumptionValue(item))) {
+    return true;
+  }
+
+  return false;
+}
+
+function sanitizeUnsupportedFollowUps(answer, items, language) {
+  const value = String(answer || "").trim();
+  if (!value) return value;
+
+  const mountingDistanceQuestionPattern =
+    /(?:^|\n)\s*[^\n?]*(?:mounting\s+distance|required\s+mounting\s+distance|required\s+distance|distance\s+above\s+the\s+hob|installation\s+distance|mindestabstand|montageabstand|abstand[^\n?]*(?:kochfeld|hob|herd))[^\n?]*\?/gi;
+  const withoutUnsupportedMountingDistance = items.some(hasExplicitMountingDistanceInfo)
+    ? value
+    : value.replace(mountingDistanceQuestionPattern, "").trim();
+
+  const trailingQuestion = splitTrailingQuestion(withoutUnsupportedMountingDistance);
+  if (isUnsupportedFollowUpQuestion(trailingQuestion.question, items)) {
+    return trailingQuestion.body;
+  }
+
+  return withoutUnsupportedMountingDistance;
 }
 
 function getPublicItemName(item, language) {
@@ -585,6 +686,7 @@ export async function POST(request) {
     responseLanguage = normalizeLanguage(body?.language);
     const itemIds = normalizeItemIds(body?.itemIds);
     const contextItems = normalizeContextItems(body?.contextItems);
+    const conversationMessages = normalizeConversationMessages(body?.conversationMessages);
     const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[responseLanguage] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
     const noInfoAnswer = NO_INFO_ANSWER_BY_LANGUAGE[responseLanguage] || NO_INFO_ANSWER_BY_LANGUAGE.en;
     const timeoutError = TIMEOUT_ERROR_BY_LANGUAGE[responseLanguage] || TIMEOUT_ERROR_BY_LANGUAGE.en;
@@ -643,10 +745,13 @@ export async function POST(request) {
     }
 
     const context = buildProductContext(usableContextItems);
+    const conversationContext = buildConversationContext(conversationMessages);
     const model = process.env.OPENAI_PRODUCT_INFO_MODEL || "gpt-5.2";
     const instructions = [
       "You are a product information assistant for Fragmento kitchen orders.",
       "Answer only using the provided product information.",
+      "Recent chat messages may be used only to understand follow-up wording, pronouns, and the product/topic the customer is referring to.",
+      "Do not treat recent chat messages as product facts; product facts must come from the provided product information.",
       "Do not use general knowledge.",
       "Do not guess.",
       "Do not infer dimensions, measurements, niche sizes, or noise levels from catalog names, UI labels, or codes.",
@@ -663,7 +768,9 @@ export async function POST(request) {
       "When mentioning multiple products, models, or several specifications, format the answer with line breaks so each product or major point appears on its own line.",
       "Use short readable blocks instead of one long paragraph. Lists may use hyphens or plain line breaks.",
       "Write like a helpful sales advisor: natural, warm, and concise, but never pushy or verbose.",
-      "When the answer is found, end with one short relevant follow-up question or suggestion that helps continue the conversation, such as offering more details, comparison, dimensions, installation info, or energy data.",
+      "When the answer is found, end with one short relevant follow-up question or suggestion that helps continue the conversation.",
+      "Only offer a follow-up topic when the provided product information contains explicit support for that topic.",
+      "Do not offer mounting distances, installation distances, dimensions, noise values, or energy data unless those exact details are present in the provided product information.",
       "Keep that follow-up to a single short sentence, and do not add it when the answer is not found or when the customer only asks for a code or model number.",
       `If the answer is not clearly supported by the provided product information, answer exactly: "${notFoundAnswer}"`,
       `Keep answers concise but substantive, customer-friendly, and in ${LANGUAGE_LABELS[responseLanguage] || LANGUAGE_LABELS.en}.`,
@@ -695,6 +802,8 @@ export async function POST(request) {
                   text: [
                     "Produktinformationen:",
                     context,
+                    conversationContext ? "\nBisheriger Chatverlauf zur Referenz:" : "",
+                    conversationContext,
                     "",
                     `Kundenfrage: ${question}`,
                   ].join("\n"),
@@ -722,8 +831,11 @@ export async function POST(request) {
 
     const responsePayload = await openAiResponse.json();
     const parsed = parseAssistantJson(extractResponseText(responsePayload), responseLanguage);
+    const sanitizedAnswer = parsed.found
+      ? sanitizeUnsupportedFollowUps(parsed.answer, usableContextItems, responseLanguage)
+      : parsed.answer;
 
-    return NextResponse.json(parsed);
+    return NextResponse.json({ ...parsed, answer: sanitizedAnswer || parsed.answer });
   } catch (error) {
     const status = Number.isInteger(error?.status) ? error.status : 500;
     const failedError = FAILED_ERROR_BY_LANGUAGE[responseLanguage] || FAILED_ERROR_BY_LANGUAGE.en;

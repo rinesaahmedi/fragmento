@@ -1343,6 +1343,10 @@ function KitchenConfiguratorContent({
           language,
           question,
           itemIds: [...new Set(itemIds)].slice(0, 10),
+          conversationMessages: productAssistantMessages
+            .filter((message) => message?.role && message?.text)
+            .slice(-6)
+            .map((message) => ({ role: message.role, text: message.text })),
           contextItems: Array.isArray(selectedProductAssistantContext.contextItems)
             ? selectedProductAssistantContext.contextItems
             : undefined,
