@@ -195,6 +195,13 @@ model ServiceClaim {
   fullName           String
   phone              String?
   email              String?
+  clientAddress      String?
+  landlordName       String?
+  landlordPhone      String?
+  landlordEmail      String?
+  hausmeisterName    String?
+  hausmeisterPhone   String?
+  hausmeisterEmail   String?
   landlordContact    String
   problemDescription String
   serialNumber       String

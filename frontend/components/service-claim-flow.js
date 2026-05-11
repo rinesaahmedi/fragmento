@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -15,13 +16,15 @@ const LANGUAGE_OPTIONS = [
 const COPY = {
   de: {
     eyebrow: "Fragmento Service",
-    title: "Nachkauf oder Reklamation",
+    title: "Willkommen beim Fragmento Service",
+    intro:
+      "Wähle den passenden Weg für dein Anliegen. Du kannst mit einer Bestellung oder einem Zusatzkauf weitermachen oder direkt eine Reklamation an unser Support-Team senden.",
     purchaseBadge: "Nachkauf",
     purchaseTitle: "Zusatzkauf",
     purchaseText: "\u00d6ffne den K\u00fcchenkonfigurator und fahre mit zus\u00e4tzlichen Komponenten oder Zubeh\u00f6r fort.",
     complaintBadge: "Reklamation",
     complaintTitle: "Reklamation",
-    complaintText: "Melde ein Problem mit Ger\u00e4t oder K\u00fcche und sende die Details an das Support-Team.",
+    complaintText: "Nutze das Reklamationsformular und melde ein Problem mit Ger\u00e4t oder K\u00fcche.",
     purchasePanelTitle: "Weiter zum Kaufprozess",
     purchasePanelText: "Wenn der Mieter zus\u00e4tzliche Artikel statt einer Reklamation ben\u00f6tigt, geht es hier zum Konfigurator.",
     openConfigurator: "Konfigurator \u00f6ffnen",
@@ -36,8 +39,22 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "E-Mail-Adresse",
     emailPlaceholder: "name@beispiel.de",
-    landlordContact: "Vermieter und Hausmeister mit Kontaktdaten",
-    landlordPlaceholder: "Name des Eigent\u00fcmers, Name des Hausmeisters, Telefonnummern, E-Mail-Adressen",
+    clientAddress: "Adresse des Kunden",
+    clientAddressPlaceholder: "Stra\u00dfe, Hausnummer, PLZ, Ort",
+    landlordSection: "Vermieter",
+    landlordName: "Name des Vermieters",
+    landlordNamePlaceholder: "Vollst\u00e4ndiger Name",
+    landlordPhone: "Telefon Vermieter",
+    landlordPhonePlaceholder: "+49 ...",
+    landlordEmail: "E-Mail Vermieter",
+    landlordEmailPlaceholder: "vermieter@beispiel.de",
+    hausmeisterSection: "Hausmeister",
+    hausmeisterName: "Name des Hausmeisters",
+    hausmeisterNamePlaceholder: "Vollst\u00e4ndiger Name",
+    hausmeisterPhone: "Telefon Hausmeister",
+    hausmeisterPhonePlaceholder: "+49 ...",
+    hausmeisterEmail: "E-Mail Hausmeister",
+    hausmeisterEmailPlaceholder: "hausmeister@beispiel.de",
     problemDescription: "Problembeschreibung in Stichworten",
     problemPlaceholder: "Beschreibe das Problem kurz",
     serialNumber: "Seriennummer des E-Ger\u00e4tes",
@@ -51,13 +68,15 @@ const COPY = {
   },
   en: {
     eyebrow: "Fragmento Service",
-    title: "Additional purchase or complaint",
+    title: "Welcome to Fragmento Service",
+    intro:
+      "Choose the path that fits your request. You can continue with an order or additional purchase, or send a claim directly to our support team.",
     purchaseBadge: "Additional purchase",
     purchaseTitle: "Additional purchase",
     purchaseText: "Open the kitchen configurator and continue with extra components or accessories.",
     complaintBadge: "Complaint",
     complaintTitle: "Complaint request",
-    complaintText: "Report a device or kitchen issue and send the details to the support team.",
+    complaintText: "Report a device or kitchen issue and send the details to support.",
     purchasePanelTitle: "Continue to the purchase flow",
     purchasePanelText: "If the tenant needs additional items instead of a complaint, continue to the configurator.",
     openConfigurator: "Open configurator",
@@ -72,8 +91,22 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "Email address",
     emailPlaceholder: "name@example.com",
-    landlordContact: "Landlord and hausmeister with contact details",
-    landlordPlaceholder: "Owner name, hausmeister name, phone numbers, email addresses",
+    clientAddress: "Client address",
+    clientAddressPlaceholder: "Street, house number, postal code, city",
+    landlordSection: "Landlord",
+    landlordName: "Landlord name",
+    landlordNamePlaceholder: "Full name",
+    landlordPhone: "Landlord phone",
+    landlordPhonePlaceholder: "+49 ...",
+    landlordEmail: "Landlord email",
+    landlordEmailPlaceholder: "landlord@example.com",
+    hausmeisterSection: "Property manager",
+    hausmeisterName: "Property manager name",
+    hausmeisterNamePlaceholder: "Full name",
+    hausmeisterPhone: "Property manager phone",
+    hausmeisterPhonePlaceholder: "+49 ...",
+    hausmeisterEmail: "Property manager email",
+    hausmeisterEmailPlaceholder: "manager@example.com",
     problemDescription: "Problem description",
     problemPlaceholder: "Describe the issue briefly",
     serialNumber: "Serial number of the appliance",
@@ -87,13 +120,15 @@ const COPY = {
   },
   tr: {
     eyebrow: "Fragmento Servis",
-    title: "Ek sat\u0131n alma veya \u015fikayet",
+    title: "Fragmento Servis'e Ho\u015f Geldiniz",
+    intro:
+      "Talebinize uygun yolu se\u00e7in. Sipari\u015f veya ek sat\u0131n alma ile devam edebilir ya da do\u011frudan destek ekibine \u015fikayet g\u00f6nderebilirsiniz.",
     purchaseBadge: "Ek sat\u0131n alma",
     purchaseTitle: "Ek sat\u0131n alma",
     purchaseText: "Mutfak yap\u0131land\u0131r\u0131c\u0131s\u0131n\u0131 a\u00e7\u0131n ve ek bile\u015fenler veya aksesuarlarla devam edin.",
     complaintBadge: "\u015eikayet",
     complaintTitle: "\u015eikayet talebi",
-    complaintText: "Cihaz veya mutfak sorununu bildirin ve ayr\u0131nt\u0131lar\u0131 destek ekibine g\u00f6nderin.",
+    complaintText: "Cihaz veya mutfak sorununu bildirip ayr\u0131nt\u0131lar\u0131 deste\u011fe g\u00f6nderin.",
     purchasePanelTitle: "Sat\u0131n alma ak\u0131\u015f\u0131na devam et",
     purchasePanelText: "Kirac\u0131n\u0131n \u015fikayet yerine ek \u00fcr\u00fcnlere ihtiyac\u0131 varsa, yap\u0131land\u0131r\u0131c\u0131ya devam edin.",
     openConfigurator: "Yap\u0131land\u0131r\u0131c\u0131y\u0131 a\u00e7",
@@ -108,8 +143,22 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "E-posta adresi",
     emailPlaceholder: "isim@example.com",
-    landlordContact: "Ev sahibi ve bina g\u00f6revlisi ileti\u015fim bilgileri",
-    landlordPlaceholder: "Ev sahibi ad\u0131, bina g\u00f6revlisi ad\u0131, telefon numaralar\u0131, e-posta adresleri",
+    clientAddress: "M\u00fc\u015fteri adresi",
+    clientAddressPlaceholder: "Sokak, bina no, posta kodu, \u015fehir",
+    landlordSection: "Ev sahibi",
+    landlordName: "Ev sahibi ad\u0131",
+    landlordNamePlaceholder: "Ad soyad",
+    landlordPhone: "Ev sahibi telefonu",
+    landlordPhonePlaceholder: "+49 ...",
+    landlordEmail: "Ev sahibi e-postas\u0131",
+    landlordEmailPlaceholder: "evsahibi@example.com",
+    hausmeisterSection: "Bina g\u00f6revlisi",
+    hausmeisterName: "Bina g\u00f6revlisi ad\u0131",
+    hausmeisterNamePlaceholder: "Ad soyad",
+    hausmeisterPhone: "Bina g\u00f6revlisi telefonu",
+    hausmeisterPhonePlaceholder: "+49 ...",
+    hausmeisterEmail: "Bina g\u00f6revlisi e-postas\u0131",
+    hausmeisterEmailPlaceholder: "gorevli@example.com",
     problemDescription: "Sorun a\u00e7\u0131klamas\u0131",
     problemPlaceholder: "Sorunu k\u0131saca a\u00e7\u0131klay\u0131n",
     serialNumber: "Cihaz seri numaras\u0131",
@@ -123,13 +172,15 @@ const COPY = {
   },
   es: {
     eyebrow: "Servicio Fragmento",
-    title: "Compra adicional o reclamaci\u00f3n",
+    title: "Bienvenido al servicio de Fragmento",
+    intro:
+      "Elige la opci\u00f3n adecuada para tu solicitud. Puedes continuar con un pedido o una compra adicional, o enviar una reclamaci\u00f3n al equipo de soporte.",
     purchaseBadge: "Compra adicional",
     purchaseTitle: "Compra adicional",
     purchaseText: "Abre el configurador de cocina y contin\u00faa con componentes o accesorios adicionales.",
     complaintBadge: "Reclamaci\u00f3n",
     complaintTitle: "Solicitud de reclamaci\u00f3n",
-    complaintText: "Informa de un problema con el dispositivo o la cocina y env\u00eda los detalles al equipo de soporte.",
+    complaintText: "Informa de un problema con el dispositivo o la cocina y env\u00edalo a soporte.",
     purchasePanelTitle: "Continuar al proceso de compra",
     purchasePanelText: "Si el inquilino necesita art\u00edculos adicionales en lugar de una reclamaci\u00f3n, contin\u00faa al configurador.",
     openConfigurator: "Abrir configurador",
@@ -144,8 +195,22 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "Direcci\u00f3n de correo electr\u00f3nico",
     emailPlaceholder: "nombre@ejemplo.com",
-    landlordContact: "Propietario y encargado con datos de contacto",
-    landlordPlaceholder: "Nombre del propietario, nombre del encargado, tel\u00e9fonos, correos electr\u00f3nicos",
+    clientAddress: "Direcci\u00f3n del cliente",
+    clientAddressPlaceholder: "Calle, n\u00famero, c\u00f3digo postal, ciudad",
+    landlordSection: "Propietario",
+    landlordName: "Nombre del propietario",
+    landlordNamePlaceholder: "Nombre completo",
+    landlordPhone: "Tel\u00e9fono del propietario",
+    landlordPhonePlaceholder: "+49 ...",
+    landlordEmail: "Correo del propietario",
+    landlordEmailPlaceholder: "propietario@ejemplo.com",
+    hausmeisterSection: "Encargado",
+    hausmeisterName: "Nombre del encargado",
+    hausmeisterNamePlaceholder: "Nombre completo",
+    hausmeisterPhone: "Tel\u00e9fono del encargado",
+    hausmeisterPhonePlaceholder: "+49 ...",
+    hausmeisterEmail: "Correo del encargado",
+    hausmeisterEmailPlaceholder: "encargado@ejemplo.com",
     problemDescription: "Descripci\u00f3n del problema",
     problemPlaceholder: "Describa brevemente el problema",
     serialNumber: "N\u00famero de serie del electrodom\u00e9stico",
@@ -159,13 +224,15 @@ const COPY = {
   },
   fr: {
     eyebrow: "Service Fragmento",
-    title: "Achat compl\u00e9mentaire ou r\u00e9clamation",
+    title: "Bienvenue sur le service Fragmento",
+    intro:
+      "Choisissez le parcours adapt\u00e9 \u00e0 votre demande. Vous pouvez poursuivre une commande ou un achat compl\u00e9mentaire, ou envoyer une r\u00e9clamation \u00e0 notre \u00e9quipe de support.",
     purchaseBadge: "Achat compl\u00e9mentaire",
     purchaseTitle: "Achat compl\u00e9mentaire",
     purchaseText: "Ouvrez le configurateur de cuisine et continuez avec des composants ou accessoires suppl\u00e9mentaires.",
     complaintBadge: "R\u00e9clamation",
     complaintTitle: "Demande de r\u00e9clamation",
-    complaintText: "Signalez un probl\u00e8me avec l'appareil ou la cuisine et envoyez les d\u00e9tails \u00e0 l'\u00e9quipe de support.",
+    complaintText: "Signalez un probl\u00e8me avec l'appareil ou la cuisine et envoyez-le au support.",
     purchasePanelTitle: "Continuer vers le processus d'achat",
     purchasePanelText: "Si le locataire a besoin d'articles suppl\u00e9mentaires plut\u00f4t que d'une r\u00e9clamation, continuez vers le configurateur.",
     openConfigurator: "Ouvrir le configurateur",
@@ -180,8 +247,22 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "Adresse e-mail",
     emailPlaceholder: "nom@exemple.com",
-    landlordContact: "Propri\u00e9taire et gardien avec coordonn\u00e9es",
-    landlordPlaceholder: "Nom du propri\u00e9taire, nom du gardien, num\u00e9ros de t\u00e9l\u00e9phone, adresses e-mail",
+    clientAddress: "Adresse du client",
+    clientAddressPlaceholder: "Rue, num\u00e9ro, code postal, ville",
+    landlordSection: "Propri\u00e9taire",
+    landlordName: "Nom du propri\u00e9taire",
+    landlordNamePlaceholder: "Nom complet",
+    landlordPhone: "T\u00e9l\u00e9phone du propri\u00e9taire",
+    landlordPhonePlaceholder: "+49 ...",
+    landlordEmail: "E-mail du propri\u00e9taire",
+    landlordEmailPlaceholder: "proprietaire@exemple.com",
+    hausmeisterSection: "Gardien",
+    hausmeisterName: "Nom du gardien",
+    hausmeisterNamePlaceholder: "Nom complet",
+    hausmeisterPhone: "T\u00e9l\u00e9phone du gardien",
+    hausmeisterPhonePlaceholder: "+49 ...",
+    hausmeisterEmail: "E-mail du gardien",
+    hausmeisterEmailPlaceholder: "gardien@exemple.com",
     problemDescription: "Description du probl\u00e8me",
     problemPlaceholder: "D\u00e9crivez bri\u00e8vement le probl\u00e8me",
     serialNumber: "Num\u00e9ro de s\u00e9rie de l'appareil",
@@ -195,7 +276,9 @@ const COPY = {
   },
   ru: {
     eyebrow: "\u0421\u0435\u0440\u0432\u0438\u0441 Fragmento",
-    title: "\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u0430\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0430 \u0438\u043b\u0438 \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044f",
+    title: "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 \u0441\u0435\u0440\u0432\u0438\u0441 Fragmento",
+    intro:
+      "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u043e\u0434\u0445\u043e\u0434\u044f\u0449\u0438\u0439 \u043f\u0443\u0442\u044c \u0434\u043b\u044f \u0432\u0430\u0448\u0435\u0433\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0430. \u0412\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u043f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u044c \u0437\u0430\u043a\u0430\u0437 \u0438\u043b\u0438 \u0434\u043e\u043f\u043e\u043a\u0443\u043f\u043a\u0443, \u0438\u043b\u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e \u0432 \u0441\u043b\u0443\u0436\u0431\u0443 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0438.",
     purchaseBadge: "\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u0430\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0430",
     purchaseTitle: "\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u0430\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0430",
     purchaseText: "\u041e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440 \u043a\u0443\u0445\u043d\u0438 \u0438 \u043f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u0435 \u0441 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u043c\u0438 \u043a\u043e\u043c\u043f\u043e\u043d\u0435\u043d\u0442\u0430\u043c\u0438 \u0438\u043b\u0438 \u0430\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440\u0430\u043c\u0438.",
@@ -216,8 +299,22 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "\u0410\u0434\u0440\u0435\u0441 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u044b",
     emailPlaceholder: "name@example.com",
-    landlordContact: "\u0410\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044c \u0438 \u0445\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440 \u0441 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u043c\u0438 \u0434\u0430\u043d\u043d\u044b\u043c\u0438",
-    landlordPlaceholder: "\u0418\u043c\u044f \u0432\u043b\u0430\u0434\u0435\u043b\u044c\u0446\u0430, \u0438\u043c\u044f \u0445\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440\u0430, \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u044b, \u0430\u0434\u0440\u0435\u0441\u0430 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u044b",
+    clientAddress: "\u0410\u0434\u0440\u0435\u0441 \u043a\u043b\u0438\u0435\u043d\u0442\u0430",
+    clientAddressPlaceholder: "\u0423\u043b\u0438\u0446\u0430, \u0434\u043e\u043c, \u0438\u043d\u0434\u0435\u043a\u0441, \u0433\u043e\u0440\u043e\u0434",
+    landlordSection: "\u0410\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044c",
+    landlordName: "\u0418\u043c\u044f \u0430\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044f",
+    landlordNamePlaceholder: "\u041f\u043e\u043b\u043d\u043e\u0435 \u0438\u043c\u044f",
+    landlordPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u0430\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044f",
+    landlordPhonePlaceholder: "+49 ...",
+    landlordEmail: "E-mail \u0430\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044f",
+    landlordEmailPlaceholder: "landlord@example.com",
+    hausmeisterSection: "\u0425\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440",
+    hausmeisterName: "\u0418\u043c\u044f \u0445\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440\u0430",
+    hausmeisterNamePlaceholder: "\u041f\u043e\u043b\u043d\u043e\u0435 \u0438\u043c\u044f",
+    hausmeisterPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u0445\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440\u0430",
+    hausmeisterPhonePlaceholder: "+49 ...",
+    hausmeisterEmail: "E-mail \u0445\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440\u0430",
+    hausmeisterEmailPlaceholder: "hausmeister@example.com",
     problemDescription: "\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b",
     problemPlaceholder: "\u041a\u0440\u0430\u0442\u043a\u043e \u043e\u043f\u0438\u0448\u0438\u0442\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0443",
     serialNumber: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0430",
@@ -236,7 +333,13 @@ const INITIAL_FORM = {
   fullName: "",
   phone: "",
   email: "",
-  landlordContact: "",
+  clientAddress: "",
+  landlordName: "",
+  landlordPhone: "",
+  landlordEmail: "",
+  hausmeisterName: "",
+  hausmeisterPhone: "",
+  hausmeisterEmail: "",
   problemDescription: "",
   serialNumber: "",
 };
@@ -372,8 +475,19 @@ export default function ServiceClaimFlow() {
           </div>
         </div>
 
-        <p className="service-hero__eyebrow">{copy.eyebrow}</p>
-        <h1>{copy.title}</h1>
+        <div className="service-hero__top">
+          <div className="service-hero__content">
+            <div className="service-hero__brand">
+              <Image src="/img/fragmentologo-cropped.png" alt="Fragmento" width={168} height={54} className="service-hero__logo" />
+              <p className="service-hero__eyebrow">{copy.eyebrow}</p>
+            </div>
+            <h1>{copy.title}</h1>
+          </div>
+
+          <div className="service-hero__mascot" aria-hidden="true">
+            <Image src="/img/worker-icon-transparent.png" alt="" width={220} height={220} className="service-hero__mascot-image" />
+          </div>
+        </div>
 
         <div className="service-choice-grid">
           <button
@@ -473,15 +587,87 @@ export default function ServiceClaimFlow() {
             </div>
 
             <label className="service-field">
-              <span>{copy.landlordContact}</span>
+              <span>{copy.clientAddress}</span>
               <textarea
-                value={form.landlordContact}
-                onChange={(event) => handleFieldChange("landlordContact", event.target.value)}
-                placeholder={copy.landlordPlaceholder}
-                rows={4}
+                value={form.clientAddress}
+                onChange={(event) => handleFieldChange("clientAddress", event.target.value)}
+                placeholder={copy.clientAddressPlaceholder}
+                rows={3}
                 required
               />
             </label>
+
+            <section className="service-form__section">
+              <p className="service-form__section-title">{copy.landlordSection}</p>
+              <div className="service-field-grid">
+                <label className="service-field">
+                  <span>{copy.landlordName}</span>
+                  <input
+                    type="text"
+                    value={form.landlordName}
+                    onChange={(event) => handleFieldChange("landlordName", event.target.value)}
+                    placeholder={copy.landlordNamePlaceholder}
+                    required
+                  />
+                </label>
+
+                <label className="service-field">
+                  <span>{copy.landlordPhone}</span>
+                  <input
+                    type="tel"
+                    value={form.landlordPhone}
+                    onChange={(event) => handleFieldChange("landlordPhone", event.target.value)}
+                    placeholder={copy.landlordPhonePlaceholder}
+                  />
+                </label>
+              </div>
+
+              <label className="service-field">
+                <span>{copy.landlordEmail}</span>
+                <input
+                  type="email"
+                  value={form.landlordEmail}
+                  onChange={(event) => handleFieldChange("landlordEmail", event.target.value)}
+                  placeholder={copy.landlordEmailPlaceholder}
+                />
+              </label>
+            </section>
+
+            <section className="service-form__section">
+              <p className="service-form__section-title">{copy.hausmeisterSection}</p>
+              <div className="service-field-grid">
+                <label className="service-field">
+                  <span>{copy.hausmeisterName}</span>
+                  <input
+                    type="text"
+                    value={form.hausmeisterName}
+                    onChange={(event) => handleFieldChange("hausmeisterName", event.target.value)}
+                    placeholder={copy.hausmeisterNamePlaceholder}
+                    required
+                  />
+                </label>
+
+                <label className="service-field">
+                  <span>{copy.hausmeisterPhone}</span>
+                  <input
+                    type="tel"
+                    value={form.hausmeisterPhone}
+                    onChange={(event) => handleFieldChange("hausmeisterPhone", event.target.value)}
+                    placeholder={copy.hausmeisterPhonePlaceholder}
+                  />
+                </label>
+              </div>
+
+              <label className="service-field">
+                <span>{copy.hausmeisterEmail}</span>
+                <input
+                  type="email"
+                  value={form.hausmeisterEmail}
+                  onChange={(event) => handleFieldChange("hausmeisterEmail", event.target.value)}
+                  placeholder={copy.hausmeisterEmailPlaceholder}
+                />
+              </label>
+            </section>
 
             <label className="service-field">
               <span>{copy.problemDescription}</span>

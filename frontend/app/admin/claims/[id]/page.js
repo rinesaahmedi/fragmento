@@ -41,6 +41,13 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
       "fullName",
       "phone",
       "email",
+      "clientAddress",
+      "landlordName",
+      "landlordPhone",
+      "landlordEmail",
+      "hausmeisterName",
+      "hausmeisterPhone",
+      "hausmeisterEmail",
       "landlordContact",
       "problemDescription",
       "serialNumber",
@@ -107,6 +114,10 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   <span>{contactSummary(claim)}</span>
                 </div>
                 <div>
+                  <span style={detailLabelStyle}>Client address</span>
+                  <p style={detailTextStyle}>{claim.clientAddress || "-"}</p>
+                </div>
+                <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract number" /></span>
                   <span>{claim.contractNumber}</span>
                 </div>
@@ -129,8 +140,24 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   <span>{formatDate(claim.createdAt)}</span>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.landlordContact" fallback="Landlord / hausmeister" /></span>
-                  <p style={detailTextStyle}>{claim.landlordContact}</p>
+                  <span style={detailLabelStyle}>Landlord</span>
+                  <p style={detailTextStyle}>
+                    {[
+                      claim.landlordName || "-",
+                      claim.landlordPhone ? `Phone: ${claim.landlordPhone}` : null,
+                      claim.landlordEmail ? `Email: ${claim.landlordEmail}` : null,
+                    ].filter(Boolean).join("\n")}
+                  </p>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}>Hausmeister</span>
+                  <p style={detailTextStyle}>
+                    {[
+                      claim.hausmeisterName || "-",
+                      claim.hausmeisterPhone ? `Phone: ${claim.hausmeisterPhone}` : null,
+                      claim.hausmeisterEmail ? `Email: ${claim.hausmeisterEmail}` : null,
+                    ].filter(Boolean).join("\n")}
+                  </p>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.issue" fallback="Issue" /></span>

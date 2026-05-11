@@ -51,6 +51,13 @@ function buildWhere(filters) {
       OR "fullName" ILIKE ${query}
       OR COALESCE("phone", '') ILIKE ${query}
       OR COALESCE("email", '') ILIKE ${query}
+      OR COALESCE("clientAddress", '') ILIKE ${query}
+      OR COALESCE("landlordName", '') ILIKE ${query}
+      OR COALESCE("landlordPhone", '') ILIKE ${query}
+      OR COALESCE("landlordEmail", '') ILIKE ${query}
+      OR COALESCE("hausmeisterName", '') ILIKE ${query}
+      OR COALESCE("hausmeisterPhone", '') ILIKE ${query}
+      OR COALESCE("hausmeisterEmail", '') ILIKE ${query}
       OR "landlordContact" ILIKE ${query}
       OR "problemDescription" ILIKE ${query}
       OR "serialNumber" ILIKE ${query}
@@ -95,6 +102,13 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
       "fullName",
       "phone",
       "email",
+      "clientAddress",
+      "landlordName",
+      "landlordPhone",
+      "landlordEmail",
+      "hausmeisterName",
+      "hausmeisterPhone",
+      "hausmeisterEmail",
       "landlordContact",
       "problemDescription",
       "serialNumber",
@@ -190,7 +204,7 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                     </td>
                     <td style={tdStyle}>
                       <div>{claim.fullName}</div>
-                      <div style={rowMetaStyle}>{truncate(claim.landlordContact, 90)}</div>
+                      <div style={rowMetaStyle}>{truncate(claim.clientAddress || claim.landlordContact, 90)}</div>
                     </td>
                     <td style={tdStyle}>{formatContact(claim)}</td>
                     <td style={tdStyle}>{claim.serialNumber}</td>

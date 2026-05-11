@@ -20,6 +20,14 @@ function optionalString(value) {
   return normalized || "";
 }
 
+function buildPartySummary(label, name, phone, email) {
+  return [
+    `${label}: ${name || "-"}`,
+    `Phone: ${phone || "-"}`,
+    `Email: ${email || "-"}`,
+  ].join("\n");
+}
+
 async function postWebhook(payload) {
   const webhookUrl = String(process.env.N8N_WEBHOOK_URL || "").trim();
   if (!webhookUrl) {
@@ -115,12 +123,16 @@ function buildComplaintEmailText(payload) {
     "",
     `Contract number: ${payload.contractNumber}`,
     `Full name: ${payload.fullName}`,
+    `Client address: ${payload.clientAddress}`,
     `Phone: ${payload.phone || "-"}`,
     `Email: ${payload.email || "-"}`,
     `Serial number: ${payload.serialNumber}`,
     "",
-    "Landlord / Hausmeister contact",
-    payload.landlordContact,
+    "Landlord contact",
+    buildPartySummary("Landlord", payload.landlordName, payload.landlordPhone, payload.landlordEmail),
+    "",
+    "Hausmeister contact",
+    buildPartySummary("Hausmeister", payload.hausmeisterName, payload.hausmeisterPhone, payload.hausmeisterEmail),
     "",
     "Problem description",
     payload.problemDescription,
@@ -171,6 +183,11 @@ function buildComplaintEmailHtml(payload, { hasLogo = false } = {}) {
                   ${buildFieldHtml("Email", payload.email || "-")}
                 </td>
               </tr>
+              <tr>
+                <td colspan="2" style="padding:14px 0 0 0;vertical-align:top;">
+                  ${buildFieldHtml("Client address", payload.clientAddress)}
+                </td>
+              </tr>
             </table>
           </div>
 
@@ -182,7 +199,20 @@ function buildComplaintEmailHtml(payload, { hasLogo = false } = {}) {
             </tr>
             <tr>
               <td style="padding:0 0 24px;vertical-align:top;">
-                ${buildSectionHtml("Landlord / Hausmeister contact", payload.landlordContact, { multiline: true })}
+                ${buildSectionHtml("Landlord contact", [
+                  `Name: ${payload.landlordName}`,
+                  `Phone: ${payload.landlordPhone || "-"}`,
+                  `Email: ${payload.landlordEmail || "-"}`,
+                ].join("\n"), { multiline: true })}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:0 0 24px;vertical-align:top;">
+                ${buildSectionHtml("Hausmeister contact", [
+                  `Name: ${payload.hausmeisterName}`,
+                  `Phone: ${payload.hausmeisterPhone || "-"}`,
+                  `Email: ${payload.hausmeisterEmail || "-"}`,
+                ].join("\n"), { multiline: true })}
               </td>
             </tr>
             <tr>
@@ -246,13 +276,33 @@ export async function POST(request) {
     });
 
     const body = await request.json();
+    const landlordName = requiredString(body.landlordName, "Landlord name");
+    const landlordPhone = optionalString(body.landlordPhone);
+    const landlordEmail = optionalString(body.landlordEmail);
+    const hausmeisterName = requiredString(body.hausmeisterName, "Hausmeister name");
+    const hausmeisterPhone = optionalString(body.hausmeisterPhone);
+    const hausmeisterEmail = optionalString(body.hausmeisterEmail);
     const payload = {
       id: crypto.randomUUID(),
       contractNumber: requiredString(body.contractNumber, "Contract number"),
       fullName: requiredString(body.fullName, "Full name"),
       phone: optionalString(body.phone),
       email: optionalString(body.email),
-      landlordContact: requiredString(body.landlordContact, "Landlord and hausmeister contact"),
+      clientAddress: requiredString(body.clientAddress, "Client address"),
+      landlordName,
+      landlordPhone,
+      landlordEmail,
+      hausmeisterName,
+      hausmeisterPhone,
+      hausmeisterEmail,
+      landlordContact: [
+        `Landlord: ${landlordName}`,
+        `Landlord phone: ${landlordPhone || "-"}`,
+        `Landlord email: ${landlordEmail || "-"}`,
+        `Hausmeister: ${hausmeisterName}`,
+        `Hausmeister phone: ${hausmeisterPhone || "-"}`,
+        `Hausmeister email: ${hausmeisterEmail || "-"}`,
+      ].join("\n"),
       problemDescription: requiredString(body.problemDescription, "Problem description"),
       serialNumber: requiredString(body.serialNumber, "Serial number"),
       requestType: "complaint",
@@ -272,6 +322,13 @@ export async function POST(request) {
         "fullName",
         "phone",
         "email",
+        "clientAddress",
+        "landlordName",
+        "landlordPhone",
+        "landlordEmail",
+        "hausmeisterName",
+        "hausmeisterPhone",
+        "hausmeisterEmail",
         "landlordContact",
         "problemDescription",
         "serialNumber",
@@ -283,6 +340,13 @@ export async function POST(request) {
         ${payload.fullName},
         ${payload.phone || null},
         ${payload.email || null},
+        ${payload.clientAddress},
+        ${payload.landlordName},
+        ${payload.landlordPhone || null},
+        ${payload.landlordEmail || null},
+        ${payload.hausmeisterName},
+        ${payload.hausmeisterPhone || null},
+        ${payload.hausmeisterEmail || null},
         ${payload.landlordContact},
         ${payload.problemDescription},
         ${payload.serialNumber},
