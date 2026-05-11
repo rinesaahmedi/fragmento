@@ -246,6 +246,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
     linkedItems.find((entry) => String(entry.componentKey || "").toLowerCase() === "extractor-hood") || null;
   const primaryItem = linkedItems[0];
   const infoSource = hoodItem?.productInfoPdfPath ? hoodItem : primaryItem;
+  const assistantHoverExtractorHoodOnly = Boolean(hoodItem && infoSource === hoodItem);
 
   return {
     item: {
@@ -270,8 +271,14 @@ export function getCatalogDisplayItem(allItems, slug, item) {
       productInfoItemId: infoSource?.id || primaryItem.id,
       productInfoDocuments: getProductInfoDocuments(infoSource || primaryItem),
       tooltipPreviewCode: infoSource?.code || primaryItem.code,
+      assistantHoverExtractorHoodOnly,
     },
     price: Number((hoodItem || primaryItem).price || 0),
     infoPdfHref: getProductInfoHref(hoodItem) || getProductInfoHref(primaryItem),
   };
+}
+
+export function hasAssistantProductInfo(item) {
+  const itemId = item?.productInfoItemId || item?.id;
+  return Boolean(itemId && (item?.productInfoExtractedText || item?.productInfoSummary || item?.productInfoPdfPath));
 }

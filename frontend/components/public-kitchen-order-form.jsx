@@ -91,6 +91,7 @@ export default function PublicKitchenOrderForm({
   const canUseContractAddress = contractAddressLines.length > 0;
   const savedAddressLines = buildAddressLines(customer, translate);
   const paymentMethodLabel = PAYMENT_METHOD_OPTIONS.find((option) => option.value === customer.paymentMethod)?.label || customer.paymentMethod;
+  const savedHelpText = translate("order.savedHelp", "");
 
   function markFieldTouched(fieldKey) {
     setTouchedFields((current) => (current[fieldKey] ? current : { ...current, [fieldKey]: true }));
@@ -149,11 +150,11 @@ export default function PublicKitchenOrderForm({
           <div className={styles.orderConfirmation} role="status" aria-live="polite">
             <div className={styles.orderConfirmationBadge} aria-hidden="true">OK</div>
             <div>
-              <h3>{translate("order.savedTitle", "Order received")}</h3>
+              <h3>{translate("order.savedTitle", "Thank you")}</h3>
               <p>{status}</p>
-              <p className={styles.orderConfirmationHelp}>
-                {translate("order.savedHelp", "The form is now closed to prevent duplicate submissions. You can close this page.")}
-              </p>
+              {savedHelpText.trim() ? (
+                <p className={styles.orderConfirmationHelp}>{savedHelpText}</p>
+              ) : null}
               <button
                 type="button"
                 className={styles.orderConfirmationDetailsButton}

@@ -539,6 +539,56 @@
   align-items: center;
 }
 
+.itemAssistantWrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.itemInfoActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.itemAssistantTrigger {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  background: #fff8f0;
+  cursor: pointer;
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.itemAssistantTrigger img {
+  display: block;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.itemAssistantTrigger:hover {
+  transform: translateY(-1px);
+  border-color: rgba(122, 77, 39, 0.45);
+  background: #fff0dc;
+  box-shadow: 0 10px 18px rgba(122, 77, 39, 0.14);
+}
+
+.itemAssistantTrigger:focus-visible {
+  outline: 2px solid rgba(24, 116, 255, 0.42);
+  outline-offset: 2px;
+}
+
 .itemInfoTrigger {
   appearance: none;
   display: inline-flex;
@@ -650,7 +700,9 @@
 }
 
 .itemInfoWrap:hover .itemInfoTooltip,
-.itemInfoWrap:focus-within .itemInfoTooltip {
+.itemInfoWrap:focus-within .itemInfoTooltip,
+.itemAssistantWrap:hover .itemInfoTooltip,
+.itemAssistantWrap:focus-within .itemInfoTooltip {
   opacity: 1;
   transform: translateY(0);
 }

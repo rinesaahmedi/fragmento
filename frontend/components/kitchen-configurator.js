@@ -13,6 +13,7 @@ import {
   formatCurrency,
   getCatalogDisplayItem,
   getLocalizedItemName,
+  hasAssistantProductInfo,
   isHiddenLinkedComponent,
   normalizeColor,
   selectedMap,
@@ -326,11 +327,6 @@ function buildProductAssistantIntro(activeProductInfo, selectedItems) {
 
 const PRODUCT_ASSISTANT_INTRO =
   "Hallo! Ich kann dir Fragen zu den ausgewählten Produkten beantworten. Worüber möchtest du sprechen?";
-
-function hasAssistantProductInfo(item) {
-  const itemId = item?.productInfoItemId || item?.id;
-  return Boolean(itemId && (item?.productInfoExtractedText || item?.productInfoSummary || item?.productInfoPdfPath));
-}
 
 function buildLocalizedProductAssistantIntro(activeProductInfo, selectedItems, translate) {
   const names = selectedItems
@@ -658,6 +654,19 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
   return options;
 }
 
+function findProductAssistantOptionForCatalogItem(options, item) {
+  const itemId = item?.productInfoItemId || item?.id;
+  if (!itemId || !Array.isArray(options)) return null;
+
+  const exact = options.find((option) => option.type === "item" && option.key === `item-${itemId}`);
+  if (exact) return exact;
+
+  const splitOptions = options.filter(
+    (option) => option.type === "item" && typeof option.key === "string" && option.key.startsWith(`item-${itemId}-`),
+  );
+  return splitOptions[0] || null;
+}
+
 function getDefaultProductAssistantContext(options) {
   return (
     options.find((option) => option.type === "all")
@@ -890,6 +899,7 @@ function KitchenConfiguratorContent({
   const [productInfoQuestion, setProductInfoQuestion] = useState("");
   const [productInfoIsLoading, setProductInfoIsLoading] = useState(false);
   const [productInfoError, setProductInfoError] = useState("");
+  const productAssistantSkipOptionsResetRef = useRef(false);
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
   );
@@ -1066,7 +1076,15 @@ function KitchenConfiguratorContent({
   }, [hasAnyAssistantProducts, hasProductAssistantOptions]);
 
   useEffect(() => {
-    if (!isProductAssistantOpen) return;
+    if (!isProductAssistantOpen) {
+      productAssistantSkipOptionsResetRef.current = false;
+      return;
+    }
+
+    if (productAssistantSkipOptionsResetRef.current) {
+      productAssistantSkipOptionsResetRef.current = false;
+      return;
+    }
 
     if (hasProductAssistantOptions) {
       resetProductAssistantContext(getDefaultProductAssistantContext(productAssistantContextOptions));
@@ -1278,12 +1296,26 @@ function KitchenConfiguratorContent({
 
   function openProductAssistant() {
     if (!hasAnyAssistantProducts) return;
-    setIsProductAssistantOpen(true);
+    productAssistantSkipOptionsResetRef.current = true;
     if (hasProductAssistantOptions) {
       resetProductAssistantContext(productAssistantSuggestedContext);
     } else {
       resetProductAssistantContext();
     }
+    setIsProductAssistantOpen(true);
+  }
+
+  function openProductAssistantForCatalogItem(catalogItem) {
+    if (!hasAnyAssistantProducts || !hasAssistantProductInfo(catalogItem)) return;
+    if (!hasProductAssistantOptions) {
+      openProductAssistant();
+      return;
+    }
+    const option = findProductAssistantOptionForCatalogItem(productAssistantContextOptions, catalogItem);
+    if (!option) return;
+    productAssistantSkipOptionsResetRef.current = true;
+    resetProductAssistantContext(option);
+    setIsProductAssistantOpen(true);
   }
 
   async function handleProductInfoQuestionSubmit(event) {
@@ -1441,12 +1473,12 @@ function KitchenConfiguratorContent({
         const notes = [emailIssue ? `E-Mail: ${emailIssue}` : "", webhookIssue ? `Webhook: ${webhookIssue}` : ""]
           .filter(Boolean)
           .join(" | ");
-        setStatus(translate("configurator.statusSavedWithIssues", "Order saved. Order number: {orderNumber}. Note: {notes}", {
+        setStatus(translate("configurator.statusSavedWithIssues", "Order number: {orderNumber}. Your order has been saved. Note: {notes}", {
           orderNumber: payload.orderNumber,
           notes,
         }));
       } else {
-        setStatus(translate("configurator.statusSavedSuccess", "Order saved. Order number: {orderNumber}. Confirmation will follow after review.", {
+        setStatus(translate("configurator.statusSavedSuccess", "Order number: {orderNumber}. Your order has been saved.", {
           orderNumber: payload.orderNumber,
         }));
       }
@@ -1532,6 +1564,7 @@ function KitchenConfiguratorContent({
               onToggleAccessory={toggleAccessory}
               onToggleService={toggleService}
               onOpenProductInfo={openProductInfo}
+              onOpenProductAssistantFromItem={hasAnyAssistantProducts ? openProductAssistantForCatalogItem : undefined}
               serviceEligibility={serviceEligibility}
             />
           </div>
@@ -1666,7 +1699,11 @@ function KitchenConfiguratorContent({
                     </span>
                     <div>
                       <h2 id="product-assistant-title">
-                        {translate("configurator.productAssistantTitle", "Product Agent")}
+                        {selectedProductAssistantContext && selectedProductAssistantContext.type !== "all"
+                          ? translate("configurator.productAssistantItemAgentTitle", "{name} Agent", {
+                            name: selectedProductAssistantContext.shortLabel || selectedProductAssistantContext.label,
+                          })
+                          : translate("configurator.productAssistantTitle", "Product Agent")}
                       </h2>
                     </div>
                   </div>

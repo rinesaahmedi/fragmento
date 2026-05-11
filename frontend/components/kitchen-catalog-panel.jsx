@@ -8,6 +8,7 @@ import {
   getLocalizedItemName,
   getProductInfoDocuments,
   getProductInfoHref,
+  hasAssistantProductInfo,
   isLinkedComponentSelected,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
@@ -137,7 +138,19 @@ function splitItemNameAndDimensions(name) {
   };
 }
 
-function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHref, onClick, onOpenInfo }) {
+function CatalogItem({
+  item,
+  selected,
+  locked,
+  disabled,
+  price,
+  hint,
+  infoPdfHref,
+  onClick,
+  onOpenInfo,
+  productAssistantEnabled,
+  onOpenProductAssistant,
+}) {
   const { translate } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate);
   const itemDisplayName = splitItemNameAndDimensions(itemName);
@@ -155,6 +168,9 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
     ? item.productInfoDocuments
     : getProductInfoDocuments(item);
   const tooltipDocumentLabels = getTooltipDocumentLabels(item, translate);
+  const productAssistantPublicName = item.assistantHoverExtractorHoodOnly
+    ? translate("configurator.productAssistantExtractorHood", "Extractor hood")
+    : itemDisplayName.title;
   const handleCardKeyDown = (event) => {
     if (locked || disabled) {
       return;
@@ -198,49 +214,78 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
         </span>
         <div className={styles.itemMetaAside}>
           {hint ? <span className={styles.ruleHint}>{hint}</span> : null}
-          {infoPdfHref ? (
-            <span className={styles.itemInfoWrap}>
-              <button
-                type="button"
-                className={styles.itemInfoTrigger}
-                aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemDisplayName.title })}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onOpenInfo?.({ item: { ...item, name: itemDisplayName.title, productInfoDocuments }, price, infoPdfHref });
-                }}
-              >
-                i
-              </button>
-              <span className={styles.itemInfoTooltip} role="tooltip">
-                {tooltipPreviewSrc ? (
-                  <span className={styles.itemInfoTooltipPreview}>
-                    <img
-                      src={tooltipPreviewSrc}
-                      alt=""
-                      className={styles.itemInfoTooltipPreviewImage}
-                    />
+          {(infoPdfHref || (productAssistantEnabled && onOpenProductAssistant)) ? (
+            <span className={styles.itemInfoActions}>
+              {infoPdfHref ? (
+                <span className={styles.itemInfoWrap}>
+                  <button
+                    type="button"
+                    className={styles.itemInfoTrigger}
+                    aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemDisplayName.title })}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpenInfo?.({ item: { ...item, name: itemDisplayName.title, productInfoDocuments }, price, infoPdfHref });
+                    }}
+                  >
+                    i
+                  </button>
+                  <span className={styles.itemInfoTooltip} role="tooltip">
+                    {tooltipPreviewSrc ? (
+                      <span className={styles.itemInfoTooltipPreview}>
+                        <img
+                          src={tooltipPreviewSrc}
+                          alt=""
+                          className={styles.itemInfoTooltipPreviewImage}
+                        />
+                      </span>
+                    ) : null}
+                    <span className={styles.itemInfoTooltipBody}>
+                      {item.infoText ? <strong>{item.infoText}</strong> : null}
+                      {tooltipDocumentLabels.length ? (
+                        <span className={styles.itemInfoTooltipDocs}>
+                          {tooltipDocumentLabels.map((label) => (
+                            <span key={label} className={styles.itemInfoTooltipDocChip}>{label}</span>
+                          ))}
+                        </span>
+                      ) : null}
+                      {tooltipFacts.length ? (
+                        <span className={styles.itemInfoTooltipFacts}>
+                          {tooltipFacts.map((fact) => (
+                            <span key={fact}>{fact}</span>
+                          ))}
+                        </span>
+                      ) : (
+                        <span>{translate("common.clickForMoreInfo", "Click for more info.")}</span>
+                      )}
+                    </span>
                   </span>
-                ) : null}
-                <span className={styles.itemInfoTooltipBody}>
-                  {item.infoText ? <strong>{item.infoText}</strong> : null}
-                  {tooltipDocumentLabels.length ? (
-                    <span className={styles.itemInfoTooltipDocs}>
-                      {tooltipDocumentLabels.map((label) => (
-                        <span key={label} className={styles.itemInfoTooltipDocChip}>{label}</span>
-                      ))}
-                    </span>
-                  ) : null}
-                  {tooltipFacts.length ? (
-                    <span className={styles.itemInfoTooltipFacts}>
-                      {tooltipFacts.map((fact) => (
-                        <span key={fact}>{fact}</span>
-                      ))}
-                    </span>
-                  ) : (
-                    <span>{translate("common.clickForMoreInfo", "Click for more info.")}</span>
-                  )}
                 </span>
-              </span>
+              ) : null}
+              {productAssistantEnabled && onOpenProductAssistant ? (
+                <span className={styles.itemAssistantWrap}>
+                  <button
+                    type="button"
+                    className={styles.itemAssistantTrigger}
+                    aria-label={translate("configurator.productAssistantItemButtonAria", "Open product help for {name}", { name: productAssistantPublicName })}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onOpenProductAssistant({ ...item, name: productAssistantPublicName, productInfoDocuments });
+                    }}
+                  >
+                    <img src="/img/FIGURA.png" alt="" />
+                  </button>
+                  <span className={styles.itemInfoTooltip} role="tooltip">
+                    <span className={styles.itemInfoTooltipBody}>
+                      {item.assistantHoverExtractorHoodOnly
+                        ? translate(
+                          "configurator.productAssistantItemHoverPromptExtractorHoodOnly",
+                          "Ask me something about the extractor hood.",
+                        )
+                        : translate("configurator.productAssistantItemHoverPrompt", "Ask me something about {name}.", { name: itemDisplayName.title })}
+                    </span>
+                  </span>
+                </span>
+              ) : null}
             </span>
           ) : null}
         </div>
@@ -266,6 +311,7 @@ export default function KitchenCatalogPanel({
   onToggleAccessory,
   onToggleService,
   onOpenProductInfo,
+  onOpenProductAssistantFromItem,
   serviceEligibility,
 }) {
   const { translate } = usePublicI18n();
@@ -296,6 +342,8 @@ export default function KitchenCatalogPanel({
                   price={displayItem.price}
                   infoPdfHref={displayItem.infoPdfHref}
                   onOpenInfo={onOpenProductInfo}
+                  productAssistantEnabled={hasAssistantProductInfo(displayItem.item)}
+                  onOpenProductAssistant={onOpenProductAssistantFromItem}
                   onClick={() =>
                     setSelectedComponentIds((current) =>
                       toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
@@ -318,6 +366,8 @@ export default function KitchenCatalogPanel({
                 locked={orderLockedAccessoryCodes.has(item.code)}
                 infoPdfHref={getProductInfoHref(item)}
                 onOpenInfo={onOpenProductInfo}
+                productAssistantEnabled={hasAssistantProductInfo(item)}
+                onOpenProductAssistant={onOpenProductAssistantFromItem}
                 onClick={() => onToggleAccessory(item.code)}
               />
             ))}
@@ -343,6 +393,8 @@ export default function KitchenCatalogPanel({
                   disabled={disabled}
                   infoPdfHref={getProductInfoHref(item)}
                   onOpenInfo={onOpenProductInfo}
+                  productAssistantEnabled={hasAssistantProductInfo(item)}
+                  onOpenProductAssistant={onOpenProductAssistantFromItem}
                   hint={
                     disabledReason ||
                     (item.code === SERVICE_CODE_MONTAGE
