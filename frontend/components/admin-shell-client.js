@@ -10,6 +10,7 @@ const navItems = [
   { href: "/admin/contracts", labelKey: "adminShellLogin.contracts", fallback: "Contracts", icon: ContractsIcon },
   { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
+  { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon },
   { href: "/admin/account", labelKey: "adminShellLogin.account", fallback: "Account", icon: AccountIcon },
   { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
 ];
@@ -463,6 +464,20 @@ function OrdersIcon({ active }) {
         <rect x="3" y="2.5" width="10" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
         <path d="M5.5 6H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
         <path d="M5.5 9H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function ClaimsIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M5 2.5H11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M6 2.5H10V4H6V2.5Z" fill="currentColor" />
+        <rect x="3" y="3.5" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M5.5 7H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.5 9.5H10.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     </IconFrame>
   );

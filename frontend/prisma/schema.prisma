@@ -188,3 +188,19 @@ model OrderItem {
   quantity      Int          @default(1)
   createdAt     DateTime     @default(now())
 }
+
+model ServiceClaim {
+  id                 String   @id
+  contractNumber     String
+  fullName           String
+  phone              String?
+  email              String?
+  landlordContact    String
+  problemDescription String
+  serialNumber       String
+  requestType        String   @default("complaint")
+  createdAt          DateTime @default(now())
+
+  @@index([contractNumber])
+  @@index([createdAt])
+}
