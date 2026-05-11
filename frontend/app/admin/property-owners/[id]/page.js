@@ -148,17 +148,14 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
 
           <AdminSection
             title={<AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add contract number" />}
-            description="Create a contract number for this housing company, then choose the project it belongs to. The linked object/building is shown separately."
+            description="Create a contract number for this housing company. You can optionally choose the project it belongs to."
           >
             <details open={createContractOpen} style={createCompanyContractDetailsStyle}>
               <summary className="create-company-contract-summary" style={createCompanyContractSummaryStyle}>
                 <AdminText i18nKey="contractsAdmin.createContractForCompany" fallback="Create contract" />
               </summary>
               <div style={createCompanyContractBodyStyle}>
-                {!owner.propertyObjects?.length ? (
-                  <p style={mutedTextStyle}>Create at least one object before linking a contract number here.</p>
-                ) : (
-                  <form action="/api/admin/contracts" method="post" style={contractCreateFormStyle}>
+                <form action="/api/admin/contracts" method="post" style={contractCreateFormStyle}>
                     <input type="hidden" name="returnTo" value={`/admin/property-owners/${owner.id}`} />
                     <input type="hidden" name="housingCompanyId" value={owner.id} />
                     <FormField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
@@ -175,7 +172,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                       <input name="contractNumber" placeholder="ABC-123" style={compactInputStyle} required />
                     </FormField>
                     <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project" />}>
-                      <select name="projectId" style={compactInputStyle} required>
+                      <select name="projectId" style={compactInputStyle}>
                         <option value=""><AdminText i18nKey="contractsAdmin.selectProject" fallback="Select project" /></option>
                         {(owner.propertyObjects || []).map((object) => (
                           <option key={object.id} value={object.projectId || ""} disabled={!object.projectId}>
@@ -197,7 +194,6 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                       <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.createContract" fallback="Create contract" /></button>
                     </div>
                   </form>
-                )}
               </div>
             </details>
           </AdminSection>

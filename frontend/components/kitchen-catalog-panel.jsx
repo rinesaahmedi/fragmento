@@ -123,9 +123,24 @@ function getTooltipDocumentLabels(item, translate) {
     .filter(Boolean);
 }
 
+function splitItemNameAndDimensions(name) {
+  const normalizedName = String(name || "").trim();
+  const dimensionsMatch = normalizedName.match(/\s*\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i);
+
+  if (!dimensionsMatch) {
+    return { title: normalizedName, dimensions: "" };
+  }
+
+  return {
+    title: normalizedName.replace(dimensionsMatch[0], "").replace(/\s+/g, " ").trim(),
+    dimensions: dimensionsMatch[1].replace(/\s*[x×]\s*/gi, " × "),
+  };
+}
+
 function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHref, onClick, onOpenInfo }) {
   const { translate } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate);
+  const itemDisplayName = splitItemNameAndDimensions(itemName);
   const className = [
     styles.itemCard,
     selected ? styles.itemCardSelected : "",
@@ -163,7 +178,8 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
       <div className={styles.itemTop}>
         <span className={styles.itemIcon} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
         <div className={styles.itemText}>
-          <strong>{itemName}</strong>
+          <strong>{itemDisplayName.title}</strong>
+          {itemDisplayName.dimensions ? <span className={styles.itemDimensions}>{itemDisplayName.dimensions}</span> : null}
           {item.code ? <span className={styles.itemCode}>{translate("common.code", "Code")}: {item.code}</span> : null}
           {item.linkedInfoBadge ? <span className={styles.itemLinkedBadge}>{item.linkedInfoBadge}</span> : null}
           {item.infoText ? <p>{item.infoText}</p> : null}
@@ -187,10 +203,10 @@ function CatalogItem({ item, selected, locked, disabled, price, hint, infoPdfHre
               <button
                 type="button"
                 className={styles.itemInfoTrigger}
-                aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemName })}
+                aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemDisplayName.title })}
                 onClick={(event) => {
                   event.stopPropagation();
-                  onOpenInfo?.({ item: { ...item, name: itemName, productInfoDocuments }, price, infoPdfHref });
+                  onOpenInfo?.({ item: { ...item, name: itemDisplayName.title, productInfoDocuments }, price, infoPdfHref });
                 }}
               >
                 i

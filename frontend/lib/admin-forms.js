@@ -97,16 +97,6 @@ export function validateKitchenContractInput(formData, options = {}) {
   const contractNumber = requiredString(formData.get("contractNumber"), "Contract number");
   const housingCompanyId = optionalString(formData.get("housingCompanyId"));
   const projectId = optionalString(formData.get("projectId"));
-  const allowInlineObject = Boolean(options.allowInlineObject);
-  const hasInlineObject = Boolean(options.hasInlineObject);
-
-  if (!housingCompanyId) {
-    throw new Error("Select a housing company for the chosen project.");
-  }
-
-  if (!projectId && !(allowInlineObject && hasInlineObject)) {
-    throw new Error("Select a project for the housing company.");
-  }
 
   return {
     contractNumber,

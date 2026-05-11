@@ -427,9 +427,9 @@ export async function listKitchenContractsForAdmin(filters = {}) {
       COUNT(o."id")::int AS "orderCount"
     FROM "KitchenContract" kc
     JOIN "Kitchen" k ON k."id" = kc."kitchenId"
-    JOIN "Project" prj ON prj."id" = kc."projectId"
-    JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
-    JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
+    LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+    LEFT JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
+    LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
     LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
     LEFT JOIN LATERAL (
       SELECT
@@ -513,28 +513,30 @@ export async function listKitchenContractsForAdmin(filters = {}) {
           address2: row.address2,
         }
       : null,
-    project: {
-      id: row.projectId,
-      name: row.projectName || "",
-      projectCode: row.projectCode || null,
-      status: row.projectStatus || "active",
-      description: row.projectDescription || null,
-      managerName: row.projectManagerName || null,
-      housingCompanyId: row.housingCompanyRecordId,
-      propertyObjectId: row.propertyObjectRecordId,
-      propertyObject: row.propertyObjectRecordId
-        ? {
-            id: row.propertyObjectRecordId,
-            name: row.propertyObjectName,
-            housingCompanyId: row.housingCompanyRecordId,
-            country: row.country,
-            city: row.city,
-            postalCode: row.postalCode,
-            address1: row.address1,
-            address2: row.address2,
-          }
-        : null,
-    },
+    project: row.projectId
+      ? {
+          id: row.projectId,
+          name: row.projectName || "",
+          projectCode: row.projectCode || null,
+          status: row.projectStatus || "active",
+          description: row.projectDescription || null,
+          managerName: row.projectManagerName || null,
+          housingCompanyId: row.housingCompanyRecordId,
+          propertyObjectId: row.propertyObjectRecordId,
+          propertyObject: row.propertyObjectRecordId
+            ? {
+                id: row.propertyObjectRecordId,
+                name: row.propertyObjectName,
+                housingCompanyId: row.housingCompanyRecordId,
+                country: row.country,
+                city: row.city,
+                postalCode: row.postalCode,
+                address1: row.address1,
+                address2: row.address2,
+              }
+            : null,
+        }
+      : null,
     housingCompany: row.housingCompanyRecordId
       ? {
           id: row.housingCompanyRecordId,
@@ -636,9 +638,9 @@ async function attachHousingCompaniesToContracts(contracts) {
       hc."createdAt",
       hc."updatedAt"
     FROM "KitchenContract" kc
-    JOIN "Project" prj ON prj."id" = kc."projectId"
-    JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
-    JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
+    LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+    LEFT JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
+    LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
     WHERE kc."id" IN (${Prisma.join(contractIds)})
   `;
   const companyByContractId = new Map(

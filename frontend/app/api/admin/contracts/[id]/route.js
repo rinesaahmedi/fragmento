@@ -44,9 +44,9 @@ export async function GET(_request, { params }) {
       hc."createdAt",
       hc."updatedAt"
     FROM "KitchenContract" kc
-    JOIN "Project" prj ON prj."id" = kc."projectId"
-    JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
-    JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
+    LEFT JOIN "Project" prj ON prj."id" = kc."projectId"
+    LEFT JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
+    LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
     WHERE kc."id" = ${id}
     LIMIT 1
   `;
@@ -143,6 +143,16 @@ export async function POST(request, { params }) {
         `;
         if (!project) {
           throw new Error("Select a valid project for the housing company.");
+        }
+      } else if (data.projectId) {
+        const [project] = await prisma.$queryRaw`
+          SELECT "id"
+          FROM "Project"
+          WHERE "id" = ${data.projectId}
+          LIMIT 1
+        `;
+        if (!project) {
+          throw new Error("Select a valid project.");
         }
       }
 

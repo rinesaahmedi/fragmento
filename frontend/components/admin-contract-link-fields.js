@@ -31,7 +31,7 @@ export default function AdminContractLinkFields({
 
     if (createObjectOpen) return;
     if (filteredProjects.some((project) => project.id === projectId)) return;
-    setProjectId(filteredProjects[0]?.id || "");
+    if (projectId) setProjectId("");
   }, [createObjectOpen, filteredProjects, housingCompanyId, projectId]);
 
   const objectFieldNames = {
@@ -57,7 +57,6 @@ export default function AdminContractLinkFields({
           name="housingCompanyId"
           value={housingCompanyId}
           style={fieldStyle}
-          required
           onChange={(event) => {
             setHousingCompanyId(event.target.value);
             setProjectId("");
@@ -78,7 +77,6 @@ export default function AdminContractLinkFields({
           name="projectId"
           value={createObjectOpen ? "" : projectId}
           style={fieldStyle}
-          required={!createObjectOpen}
           disabled={!housingCompanyId || createObjectOpen}
           onChange={(event) => setProjectId(event.target.value)}
         >

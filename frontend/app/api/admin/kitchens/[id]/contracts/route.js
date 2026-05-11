@@ -37,13 +37,23 @@ export async function POST(request, { params }) {
       if (!project) {
         throw new Error("Select a valid project for the housing company.");
       }
+    } else if (data.projectId) {
+      const [project] = await prisma.$queryRaw`
+        SELECT "id"
+        FROM "Project"
+        WHERE "id" = ${data.projectId}
+        LIMIT 1
+      `;
+      if (!project) {
+        throw new Error("Select a valid project.");
+      }
     }
 
     await prisma.kitchenContract.create({
       data: {
         contractNumber: data.contractNumber,
         kitchenId: kitchen.id,
-          projectId: data.projectId,
+        projectId: data.projectId,
         isActive: true,
         building: data.building,
         floor: data.floor,

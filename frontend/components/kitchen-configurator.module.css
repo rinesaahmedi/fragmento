@@ -103,8 +103,12 @@
 
 .brandText h1 {
   margin: 0;
-  font-size: clamp(1.55rem, 2.4vw, 2.2rem);
+  color: #8b775f;
+  font-size: clamp(1.45rem, 2.3vw, 2rem);
+  font-weight: 800;
+  letter-spacing: 0.08em;
   line-height: 1;
+  text-transform: uppercase;
 }
 
 .brandText p {
@@ -437,6 +441,15 @@
   display: block;
   font-size: 0.98rem;
   color: #2f2a24;
+}
+
+.itemDimensions {
+  display: block;
+  margin-top: 3px;
+  color: #5f554c;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .itemCode {
@@ -1550,6 +1563,102 @@
   display: grid;
   gap: 10px;
   padding: 6px 16px 0;
+}
+
+.orderConfirmation {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  margin: 6px 16px 0;
+  padding: 18px 16px;
+  border: 1px solid rgba(47, 146, 81, 0.2);
+  border-radius: 14px;
+  background: rgba(47, 146, 81, 0.08);
+  color: #2f2a24;
+}
+
+.orderConfirmationBadge {
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #2f9251;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.orderConfirmation h3 {
+  margin: 0;
+  color: #257147;
+  font-size: 1rem;
+}
+
+.orderConfirmation p {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+}
+
+.orderConfirmationHelp {
+  color: #5d5146;
+}
+
+.orderConfirmationDetailsButton {
+  appearance: none;
+  margin-top: 12px;
+  border: 1px solid rgba(47, 146, 81, 0.35);
+  border-radius: 999px;
+  background: #fff;
+  color: #257147;
+  padding: 8px 14px;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.orderConfirmationDetails {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(47, 146, 81, 0.16);
+}
+
+.orderConfirmationDetails h4 {
+  margin: 0 0 10px;
+  color: #2f2a24;
+  font-size: 0.92rem;
+}
+
+.orderConfirmationDetails dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.orderConfirmationDetail {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.42fr) minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.orderConfirmationDetail dt {
+  color: #6b6259;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.orderConfirmationDetail dd {
+  margin: 0;
+  color: #2f2a24;
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
 }
 
 .orderSectionCard {

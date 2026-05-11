@@ -29,6 +29,7 @@
     "checking": "Wird geprüft..."
   },
   "configurator": {
+    "headerTitle": "Deine Küche",
     "headerDescription": "Konfiguriere deine Küche direkt aus dem aktuellen Katalog.",
     "catalogEyebrow": "Katalog",
     "catalogTitle": "Bauteile und Optionen",
@@ -158,6 +159,13 @@
     "submitSaving": "Wird gespeichert...",
     "submit": "Bestellung einreichen",
     "requiredHint": "Mit * gekennzeichnete Felder sind Pflichtfelder.",
+    "savedTitle": "Bestellung eingegangen",
+    "savedHelp": "Das Formular ist jetzt geschlossen, damit die Bestellung nicht doppelt gesendet wird. Du kannst diese Seite schließen.",
+    "showSavedDetails": "Bestelldetails anzeigen",
+    "hideSavedDetails": "Bestelldetails ausblenden",
+    "savedDetailsTitle": "Gesendete Angaben",
+    "contractNumber": "Vertragsnummer",
+    "notProvided": "Nicht angegeben",
     "fieldRequired": "Dieses Feld ist erforderlich.",
     "fieldErrors": {
       "firstName": "Bitte Vornamen eingeben.",

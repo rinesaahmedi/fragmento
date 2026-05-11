@@ -71,6 +71,7 @@ export default function PublicKitchenOrderForm({
   const { translate } = usePublicI18n();
   const [touchedFields, setTouchedFields] = useState({});
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
+  const [showSavedDetails, setShowSavedDetails] = useState(false);
   const fieldErrorMessages = useMemo(() => ({
     firstName: translate("order.fieldErrors.firstName", "Please enter the first name."),
     lastName: translate("order.fieldErrors.lastName", "Please enter the last name."),
@@ -88,6 +89,8 @@ export default function PublicKitchenOrderForm({
   const postalCodeOptions = uniqueOptions(POSTAL_CODE_OPTIONS[customer.city] || [], customer.postalCode);
   const contractAddressLines = buildAddressLines(contractAddress, translate);
   const canUseContractAddress = contractAddressLines.length > 0;
+  const savedAddressLines = buildAddressLines(customer, translate);
+  const paymentMethodLabel = PAYMENT_METHOD_OPTIONS.find((option) => option.value === customer.paymentMethod)?.label || customer.paymentMethod;
 
   function markFieldTouched(fieldKey) {
     setTouchedFields((current) => (current[fieldKey] ? current : { ...current, [fieldKey]: true }));
@@ -123,6 +126,17 @@ export default function PublicKitchenOrderForm({
     onSubmit(event);
   }
 
+  function renderSavedDetail(label, value) {
+    return (
+      <div className={styles.orderConfirmationDetail}>
+        <dt>{label}</dt>
+        <dd>{value || translate("order.notProvided", "Not provided")}</dd>
+      </div>
+    );
+  }
+
+  const isOrderSaved = statusTone === "success" && Boolean(status);
+
   return (
     <section ref={orderSectionRef} className={styles.orderSectionWrap}>
       <div className={styles.orderPanel}>
@@ -131,88 +145,127 @@ export default function PublicKitchenOrderForm({
             <h2>{translate("order.title", "Complete order")}</h2>
           </div>
         </div>
-        <form
-          id="order-form"
-          className={styles.orderForm}
-          autoComplete="on"
-          onSubmit={handleFormSubmit}
-          onInvalidCapture={() => setHasTriedSubmit(true)}
-        >
-          <input id="contractNumber" type="hidden" value={customer.contractNumber} readOnly />
-
-          <div className={styles.orderSectionCard}>
-            <div className={styles.orderSectionHeader}>
-              <div>
-                <h3>{translate("order.contactPersonTitle", "Contact person")}</h3>
-                <p>{translate("order.contactPersonHelp", "Who is ordering?")}</p>
-              </div>
-            </div>
-            <div className={styles.sectionFields}>
-              <div className={getFieldClassName("firstName", true, styles.field)}>
-                <label htmlFor="firstName">{translate("order.firstName", "First name*")}</label>
-                <input
-                  id="firstName"
-                  name="given-name"
-                  autoComplete="given-name"
-                  required
-                  placeholder="Max"
-                  value={customer.firstName}
-                  onBlur={() => markFieldTouched("firstName")}
-                  onChange={(event) => onUpdateCustomer("firstName", event.target.value)}
-                  aria-invalid={hasFieldError("firstName", true)}
-                />
-                {renderFieldError("firstName", true)}
-              </div>
-              <div className={getFieldClassName("lastName", true, styles.field)}>
-                <label htmlFor="lastName">{translate("order.lastName", "Last name*")}</label>
-                <input
-                  id="lastName"
-                  name="family-name"
-                  autoComplete="family-name"
-                  required
-                  placeholder="Mustermann"
-                  value={customer.lastName}
-                  onBlur={() => markFieldTouched("lastName")}
-                  onChange={(event) => onUpdateCustomer("lastName", event.target.value)}
-                  aria-invalid={hasFieldError("lastName", true)}
-                />
-                {renderFieldError("lastName", true)}
-              </div>
-              <div className={getFieldClassName("email", true, styles.field)}>
-                <label htmlFor="email">{translate("order.email", "Email*")}</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  placeholder="max@example.com"
-                  value={customer.email}
-                  onBlur={() => markFieldTouched("email")}
-                  onChange={(event) => onUpdateCustomer("email", event.target.value)}
-                  aria-invalid={hasFieldError("email", true)}
-                />
-                {renderFieldError("email", true)}
-              </div>
-              <div className={getFieldClassName("phone", true, styles.field)}>
-                <label htmlFor="phone">{translate("order.phone", "Phone*")}</label>
-                <input
-                  id="phone"
-                  name="tel"
-                  autoComplete="tel"
-                  required
-                  placeholder="+49 170 1234567"
-                  value={customer.phone}
-                  onBlur={() => markFieldTouched("phone")}
-                  onChange={(event) => onUpdateCustomer("phone", event.target.value)}
-                  aria-invalid={hasFieldError("phone", true)}
-                />
-                {renderFieldError("phone", true)}
-              </div>
+        {isOrderSaved ? (
+          <div className={styles.orderConfirmation} role="status" aria-live="polite">
+            <div className={styles.orderConfirmationBadge} aria-hidden="true">OK</div>
+            <div>
+              <h3>{translate("order.savedTitle", "Order received")}</h3>
+              <p>{status}</p>
+              <p className={styles.orderConfirmationHelp}>
+                {translate("order.savedHelp", "The form is now closed to prevent duplicate submissions. You can close this page.")}
+              </p>
+              <button
+                type="button"
+                className={styles.orderConfirmationDetailsButton}
+                aria-expanded={showSavedDetails}
+                onClick={() => setShowSavedDetails((current) => !current)}
+              >
+                {showSavedDetails
+                  ? translate("order.hideSavedDetails", "Hide order details")
+                  : translate("order.showSavedDetails", "View order details")}
+              </button>
+              {showSavedDetails ? (
+                <div className={styles.orderConfirmationDetails}>
+                  <h4>{translate("order.savedDetailsTitle", "Submitted details")}</h4>
+                  <dl>
+                    {renderSavedDetail(translate("order.contractNumber", "Contract number"), customer.contractNumber)}
+                    {renderSavedDetail(translate("order.contactPersonTitle", "Contact person"), [customer.firstName, customer.lastName].filter(Boolean).join(" "))}
+                    {renderSavedDetail(translate("order.email", "Email*"), customer.email)}
+                    {renderSavedDetail(translate("order.phone", "Phone*"), customer.phone)}
+                    {renderSavedDetail(
+                      translate("order.addressTitle", "Order / billing address"),
+                      savedAddressLines.join(", ") || (isUsingContractAddress ? translate("order.usingContractAddress", "The contract address will be used for this order.") : ""),
+                    )}
+                    {renderSavedDetail(translate("order.selectPaymentMethod", "Choose payment method*"), paymentMethodLabel)}
+                    {renderSavedDetail(translate("order.notes", "Notes (optional)"), customer.notes)}
+                  </dl>
+                </div>
+              ) : null}
             </div>
           </div>
+        ) : (
+          <form
+            id="order-form"
+            className={styles.orderForm}
+            autoComplete="on"
+            onSubmit={handleFormSubmit}
+            onInvalidCapture={() => setHasTriedSubmit(true)}
+          >
+            <input id="contractNumber" type="hidden" value={customer.contractNumber} readOnly />
 
-          <div className={styles.orderSectionCard}>
+            <div className={styles.orderSectionCard}>
+              <div className={styles.orderSectionHeader}>
+                <div>
+                  <h3>{translate("order.contactPersonTitle", "Contact person")}</h3>
+                  <p>{translate("order.contactPersonHelp", "Who is ordering?")}</p>
+                </div>
+              </div>
+              <div className={styles.sectionFields}>
+                <div className={getFieldClassName("firstName", true, styles.field)}>
+                  <label htmlFor="firstName">{translate("order.firstName", "First name*")}</label>
+                  <input
+                    id="firstName"
+                    name="given-name"
+                    autoComplete="given-name"
+                    required
+                    placeholder="Max"
+                    value={customer.firstName}
+                    onBlur={() => markFieldTouched("firstName")}
+                    onChange={(event) => onUpdateCustomer("firstName", event.target.value)}
+                    aria-invalid={hasFieldError("firstName", true)}
+                  />
+                  {renderFieldError("firstName", true)}
+                </div>
+                <div className={getFieldClassName("lastName", true, styles.field)}>
+                  <label htmlFor="lastName">{translate("order.lastName", "Last name*")}</label>
+                  <input
+                    id="lastName"
+                    name="family-name"
+                    autoComplete="family-name"
+                    required
+                    placeholder="Mustermann"
+                    value={customer.lastName}
+                    onBlur={() => markFieldTouched("lastName")}
+                    onChange={(event) => onUpdateCustomer("lastName", event.target.value)}
+                    aria-invalid={hasFieldError("lastName", true)}
+                  />
+                  {renderFieldError("lastName", true)}
+                </div>
+                <div className={getFieldClassName("email", true, styles.field)}>
+                  <label htmlFor="email">{translate("order.email", "Email*")}</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    placeholder="max@example.com"
+                    value={customer.email}
+                    onBlur={() => markFieldTouched("email")}
+                    onChange={(event) => onUpdateCustomer("email", event.target.value)}
+                    aria-invalid={hasFieldError("email", true)}
+                  />
+                  {renderFieldError("email", true)}
+                </div>
+                <div className={getFieldClassName("phone", true, styles.field)}>
+                  <label htmlFor="phone">{translate("order.phone", "Phone*")}</label>
+                  <input
+                    id="phone"
+                    name="tel"
+                    autoComplete="tel"
+                    required
+                    placeholder="+49 170 1234567"
+                    value={customer.phone}
+                    onBlur={() => markFieldTouched("phone")}
+                    onChange={(event) => onUpdateCustomer("phone", event.target.value)}
+                    aria-invalid={hasFieldError("phone", true)}
+                  />
+                  {renderFieldError("phone", true)}
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.orderSectionCard}>
             <div className={styles.orderSectionHeader}>
               <div>
                 <h3>{translate("order.addressTitle", "Order / billing address")}</h3>
@@ -415,19 +468,22 @@ export default function PublicKitchenOrderForm({
             </div>
             <small className={styles.orderHelp}>{translate("order.requiredHint", "Fields marked with * are required.")}</small>
           </div>
-        </form>
+          </form>
+        )}
 
-        <div
-          className={[
-            styles.status,
-            statusTone === "error" ? styles.statusError : "",
-            statusTone === "success" ? styles.statusSuccess : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-        >
-          {status}
-        </div>
+        {!isOrderSaved ? (
+          <div
+            className={[
+              styles.status,
+              statusTone === "error" ? styles.statusError : "",
+              statusTone === "success" ? styles.statusSuccess : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            {status}
+          </div>
+        ) : null}
       </div>
     </section>
   );

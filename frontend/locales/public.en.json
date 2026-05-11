@@ -29,6 +29,7 @@
     "checking": "Checking..."
   },
   "configurator": {
+    "headerTitle": "Your kitchen",
     "headerDescription": "Configure your kitchen directly from the current catalog.",
     "catalogEyebrow": "Catalog",
     "catalogTitle": "Components and options",
@@ -158,6 +159,13 @@
     "submitSaving": "Saving...",
     "submit": "Submit order",
     "requiredHint": "Fields marked with * are required.",
+    "savedTitle": "Order received",
+    "savedHelp": "The form is now closed to prevent duplicate submissions. You can close this page.",
+    "showSavedDetails": "View order details",
+    "hideSavedDetails": "Hide order details",
+    "savedDetailsTitle": "Submitted details",
+    "contractNumber": "Contract number",
+    "notProvided": "Not provided",
     "fieldRequired": "This field is required.",
     "fieldErrors": {
       "firstName": "Please enter the first name.",

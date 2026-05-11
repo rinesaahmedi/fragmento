@@ -128,7 +128,7 @@ export async function POST(request) {
             projectManagerName: inlineObject.projectManagerName,
           });
           projectId = project.id;
-        } else {
+        } else if (projectId) {
           const [project] = await tx.$queryRaw`
             SELECT "id"
             FROM "Project"
@@ -139,6 +139,16 @@ export async function POST(request) {
           if (!project) {
             throw new Error("Select a valid project for the housing company.");
           }
+        }
+      } else if (projectId) {
+        const [project] = await tx.$queryRaw`
+          SELECT "id"
+          FROM "Project"
+          WHERE "id" = ${projectId}
+          LIMIT 1
+        `;
+        if (!project) {
+          throw new Error("Select a valid project.");
         }
       }
 

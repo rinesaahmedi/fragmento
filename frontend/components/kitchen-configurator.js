@@ -1472,8 +1472,7 @@ function KitchenConfiguratorContent({
               <img src="/img/fragmentologo.png" alt="Fragmento" />
             </span>
             <div className={styles.brandText}>
-              <h1>{kitchenConfig.kitchen.name}</h1>
-              <p>{kitchenConfig.kitchen.description || translate("configurator.headerDescription", "Configure your kitchen directly from the current catalog.")}</p>
+              <h1>{translate("configurator.headerTitle", "Your kitchen")}</h1>
             </div>
           </div>
           <div className={styles.pricePill}>

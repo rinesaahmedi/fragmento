@@ -109,8 +109,8 @@ model KitchenContract {
   contractNumber String          @unique
   kitchenId      String
   kitchen        Kitchen         @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  projectId      String
-  project        Project         @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  projectId      String?
+  project        Project?        @relation(fields: [projectId], references: [id], onDelete: Restrict)
   isActive       Boolean         @default(true)
   usedAt         DateTime?
   building       String?
