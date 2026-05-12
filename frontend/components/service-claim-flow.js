@@ -3,6 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
+import { composeProblemDescriptionWithAreas } from "../lib/service-claim-problem-description";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -19,6 +21,12 @@ const CLAIM_ATTACHMENT_ACCEPT = "image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx";
 
 const CLAIM_FILENAME_PATTERN = /\.(pdf|png|jpe?g|gif|webp|bmp|tiff?|txt|docx?|xlsx?)$/i;
 
+const CONTRACT_NUMBER_HELP_IMAGES = [
+  { src: "/help/contract-number/contract-number-example-1.png", altKey: "contractNumberHelpAlt1" },
+  { src: "/help/contract-number/contract-number-example-2.png", altKey: "contractNumberHelpAlt2" },
+];
+const CONTRACT_HELP_SLIDE_COUNT = CONTRACT_NUMBER_HELP_IMAGES.length;
+
 function isClientAllowedAttachment(file) {
   const mime = (file.type || "").toLowerCase();
   if (mime === "image/svg+xml") {
@@ -28,6 +36,18 @@ function isClientAllowedAttachment(file) {
     return true;
   }
   return CLAIM_FILENAME_PATTERN.test(file.name);
+}
+
+function RequiredFieldMark({ title }) {
+  return (
+    <abbr className="service-field__required-mark" title={title}>
+      *
+    </abbr>
+  );
+}
+
+function OptionalFieldSuffix({ text }) {
+  return <span className="service-field__optional-mark">{text}</span>;
 }
 
 const COPY = {
@@ -48,8 +68,20 @@ const COPY = {
     back: "Zur\u00fcck",
     formTitle: "KD Formular",
     formIntro: "F\u00fclle unten die wichtigsten Reklamationsdaten aus.",
+    requiredFieldTitle: "Pflichtfeld",
+    fieldOptionalSuffix: " (optional)",
     contractNumber: "Kaufvertragsnummer",
     contractPlaceholder: "z.B. 736267",
+    contractNumberHelpTrigger: "Wo finde ich die Nummer?",
+    contractNumberHelpAria: "Hilfe: Kaufvertragsnummer im Dokument finden",
+    contractNumberHelpTitle: "Kaufvertragsnummer finden",
+    contractNumberHelpBody: "So findest du die Nummer in deinen Unterlagen (Beispiele aus dem Vertrag):",
+    contractNumberHelpClose: "Schlie\u00dfen",
+    contractNumberHelpAlt1: "Beispiel 1: Vertragsnummer im Dokument",
+    contractNumberHelpAlt2: "Beispiel 2: Vertragsnummer im Dokument",
+    contractNumberHelpPrev: "Vorheriges Beispiel",
+    contractNumberHelpNext: "N\u00e4chstes Beispiel",
+    contractNumberHelpSlideDot: "Beispiel {n} von {total}",
     givenName: "Vorname",
     givenNamePlaceholder: "Vorname",
     surname: "Nachname",
@@ -78,7 +110,7 @@ const COPY = {
     clientFloorPlaceholder: "z.B. 3",
     clientUnitNumber: "Wohnungsnummer",
     clientUnitNumberPlaceholder: "z.B. 3B",
-    landlordSection: "Vermieter",
+    landlordSection: "Vermieter (optional)",
     landlordGivenName: "Vorname",
     landlordGivenNamePlaceholder: "Vorname",
     landlordSurname: "Nachname",
@@ -87,7 +119,7 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "E-Mail Vermieter",
     landlordEmailPlaceholder: "vermieter@beispiel.de",
-    hausmeisterSection: "Hausmeister",
+    hausmeisterSection: "Hausmeister (optional)",
     hausmeisterGivenName: "Vorname",
     hausmeisterGivenNamePlaceholder: "Vorname",
     hausmeisterSurname: "Nachname",
@@ -107,13 +139,19 @@ const COPY = {
     attachmentsErrorTooMany: "Maximal 5 Anh\u00e4nge m\u00f6glich.",
     attachmentsErrorFileTooLarge: "Jede Datei darf h\u00f6chstens 4 MB gro\u00df sein.",
     attachmentsErrorType: "Dateityp nicht erlaubt (z. B. PDF, Bilder, Word/Excel).",
-    contactHint: "Mindestens eine Kontaktm\u00f6glichkeit ist erforderlich: Telefonnummer oder E-Mail-Adresse.",
     submit: "Reklamation senden",
     submitting: "Wird gesendet...",
     contactError: "Bitte gib mindestens eine Telefonnummer oder E-Mail-Adresse an.",
     contractLookupLoading: "Vertragsnummer wird gepr\u00fcft...",
     contractLookupSuccess: "Adresse aus den hinterlegten Vertragsdaten eingef\u00fcllt. Du kannst die Felder weiter bearbeiten.",
     contractLookupError: "Die Vertragsnummer wurde nicht gefunden.",
+    kitchenPlanEyebrow: "K\u00fcchenmodell",
+    kitchenPlanTitle: "Problemstelle in der K\u00fcche markieren",
+    kitchenPlanReset: "Auswahl zur\u00fccksetzen",
+    kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
+    kitchenPlanSelectedNone: "Noch keine Bereiche ausgew\u00e4hlt.",
+    kitchenAreasLinePrefix: "K\u00fcchenbereiche:",
+    problemDescriptionFieldLabel: "Weitere Details",
     submitError: "Deine Reklamation konnte nicht gesendet werden.",
     submitSuccess: "Deine Reklamation wurde erfolgreich \u00fcbermittelt.",
   },
@@ -134,8 +172,20 @@ const COPY = {
     back: "Back",
     formTitle: "KD Form",
     formIntro: "Fill in the main complaint details below.",
+    requiredFieldTitle: "Required field",
+    fieldOptionalSuffix: " (optional)",
     contractNumber: "Purchase contract number",
     contractPlaceholder: "e.g. 736267",
+    contractNumberHelpTrigger: "Where to find it?",
+    contractNumberHelpAria: "Help: where your purchase contract number appears on your documents",
+    contractNumberHelpTitle: "Finding your contract number",
+    contractNumberHelpBody: "These examples show where the number usually appears on your paperwork.",
+    contractNumberHelpClose: "Close",
+    contractNumberHelpAlt1: "Example 1: contract number on document",
+    contractNumberHelpAlt2: "Example 2: contract number on document",
+    contractNumberHelpPrev: "Previous example",
+    contractNumberHelpNext: "Next example",
+    contractNumberHelpSlideDot: "Example {n} of {total}",
     givenName: "Name",
     givenNamePlaceholder: "Name",
     surname: "Surname",
@@ -164,7 +214,7 @@ const COPY = {
     clientFloorPlaceholder: "e.g. 3",
     clientUnitNumber: "Unit number",
     clientUnitNumberPlaceholder: "e.g. 3B",
-    landlordSection: "Landlord",
+    landlordSection: "Landlord (optional)",
     landlordGivenName: "Name",
     landlordGivenNamePlaceholder: "Name",
     landlordSurname: "Surname",
@@ -173,7 +223,7 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "Landlord email",
     landlordEmailPlaceholder: "landlord@example.com",
-    hausmeisterSection: "Property manager",
+    hausmeisterSection: "Property manager (optional)",
     hausmeisterGivenName: "Name",
     hausmeisterGivenNamePlaceholder: "Name",
     hausmeisterSurname: "Surname",
@@ -193,9 +243,15 @@ const COPY = {
     attachmentsErrorTooMany: "You can attach at most 5 files.",
     attachmentsErrorFileTooLarge: "Each file must be 4 MB or smaller.",
     attachmentsErrorType: "This file type is not allowed. Use PDF, images, or common office formats.",
-    contactHint: "At least one contact method is required: phone number or email address.",
     contractLookupLoading: "Checking contract number...",
     contractLookupSuccess: "Address autofilled from the saved contract data. You can still edit the fields.",
+    kitchenPlanEyebrow: "Kitchen model",
+    kitchenPlanTitle: "Mark where the problem is",
+    kitchenPlanReset: "Clear selection",
+    kitchenPlanSelectedLabel: "Selected",
+    kitchenPlanSelectedNone: "No areas selected yet.",
+    kitchenAreasLinePrefix: "Kitchen areas:",
+    problemDescriptionFieldLabel: "Additional details",
     contractLookupError: "Contract number was not found.",
     submit: "Send complaint",
     submitting: "Submitting...",
@@ -220,8 +276,20 @@ const COPY = {
     back: "Geri",
     formTitle: "Servis Formu",
     formIntro: "Ana \u015fikayet bilgilerini a\u015fa\u011f\u0131ya girin.",
+    requiredFieldTitle: "Zorunlu alan",
+    fieldOptionalSuffix: " (iste\u011fe ba\u011fl\u0131)",
     contractNumber: "Sat\u0131n alma s\u00f6zle\u015fme numaras\u0131",
     contractPlaceholder: "\u00f6rn. 736267",
+    contractNumberHelpTrigger: "Numaray\u0131 nerede bulurum?",
+    contractNumberHelpAria: "Yard\u0131m: s\u00f6zle\u015fme numaras\u0131 belgede nerede",
+    contractNumberHelpTitle: "S\u00f6zle\u015fme numaras\u0131n\u0131 bulma",
+    contractNumberHelpBody: "Numara genellikle belgelerinizde \u015fu \u015fekilde g\u00f6r\u00fcn\u00fcr (\u00f6rnekler):",
+    contractNumberHelpClose: "Kapat",
+    contractNumberHelpAlt1: "\u00d6rnek 1: belgedeki s\u00f6zle\u015fme numaras\u0131",
+    contractNumberHelpAlt2: "\u00d6rnek 2: belgedeki s\u00f6zle\u015fme numaras\u0131",
+    contractNumberHelpPrev: "\u00d6nceki \u00f6rnek",
+    contractNumberHelpNext: "Sonraki \u00f6rnek",
+    contractNumberHelpSlideDot: "\u00d6rnek {n} / {total}",
     givenName: "Ad",
     givenNamePlaceholder: "Ad",
     surname: "Soyad",
@@ -250,7 +318,7 @@ const COPY = {
     clientFloorPlaceholder: "\u00f6rn. 3",
     clientUnitNumber: "Daire no",
     clientUnitNumberPlaceholder: "\u00f6rn. 3B",
-    landlordSection: "Ev sahibi",
+    landlordSection: "Ev sahibi (iste\u011fe ba\u011fl\u0131)",
     landlordGivenName: "Ad",
     landlordGivenNamePlaceholder: "Ad",
     landlordSurname: "Soyad",
@@ -259,7 +327,7 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "Ev sahibi e-postas\u0131",
     landlordEmailPlaceholder: "evsahibi@example.com",
-    hausmeisterSection: "Bina g\u00f6revlisi",
+    hausmeisterSection: "Bina g\u00f6revlisi (iste\u011fe ba\u011fl\u0131)",
     hausmeisterGivenName: "Ad",
     hausmeisterGivenNamePlaceholder: "Ad",
     hausmeisterSurname: "Soyad",
@@ -279,7 +347,6 @@ const COPY = {
     attachmentsErrorTooMany: "En fazla 5 dosya ekleyebilirsiniz.",
     attachmentsErrorFileTooLarge: "Her dosya en fazla 4 MB olabilir.",
     attachmentsErrorType: "Bu dosya t\u00fcr\u00fcne izin verilmiyor (PDF, g\u00f6rsel, Word/Excel vb.).",
-    contactHint: "En az bir ileti\u015fim bilgisi gerekli: telefon numaras\u0131 veya e-posta adresi.",
     submit: "\u015eikayeti g\u00f6nder",
     submitting: "G\u00f6nderiliyor...",
     contactError: "L\u00fctfen en az bir telefon numaras\u0131 veya e-posta adresi girin.",
@@ -303,8 +370,20 @@ const COPY = {
     back: "Atr\u00e1s",
     formTitle: "Formulario de servicio",
     formIntro: "Complete a continuaci\u00f3n los datos principales de la reclamaci\u00f3n.",
+    requiredFieldTitle: "Campo obligatorio",
+    fieldOptionalSuffix: " (opcional)",
     contractNumber: "N\u00famero de contrato de compra",
     contractPlaceholder: "p. ej. 736267",
+    contractNumberHelpTrigger: "\u00bfD\u00f3nde aparece?",
+    contractNumberHelpAria: "Ayuda: d\u00f3nde ver el n\u00famero de contrato en el documento",
+    contractNumberHelpTitle: "Encontrar el n\u00famero de contrato",
+    contractNumberHelpBody: "Estos ejemplos muestran d\u00f3nde suele figurar el n\u00famero en su documentaci\u00f3n:",
+    contractNumberHelpClose: "Cerrar",
+    contractNumberHelpAlt1: "Ejemplo 1: n\u00famero de contrato en el documento",
+    contractNumberHelpAlt2: "Ejemplo 2: n\u00famero de contrato en el documento",
+    contractNumberHelpPrev: "Ejemplo anterior",
+    contractNumberHelpNext: "Ejemplo siguiente",
+    contractNumberHelpSlideDot: "Ejemplo {n} de {total}",
     givenName: "Nombre",
     givenNamePlaceholder: "Nombre",
     surname: "Apellidos",
@@ -333,7 +412,7 @@ const COPY = {
     clientFloorPlaceholder: "p. ej. 3",
     clientUnitNumber: "N\u00famero de unidad",
     clientUnitNumberPlaceholder: "p. ej. 3B",
-    landlordSection: "Propietario",
+    landlordSection: "Propietario (opcional)",
     landlordGivenName: "Nombre",
     landlordGivenNamePlaceholder: "Nombre",
     landlordSurname: "Apellidos",
@@ -342,7 +421,7 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "Correo del propietario",
     landlordEmailPlaceholder: "propietario@ejemplo.com",
-    hausmeisterSection: "Encargado",
+    hausmeisterSection: "Encargado (opcional)",
     hausmeisterGivenName: "Nombre",
     hausmeisterGivenNamePlaceholder: "Nombre",
     hausmeisterSurname: "Apellidos",
@@ -362,7 +441,6 @@ const COPY = {
     attachmentsErrorTooMany: "Puede adjuntar como m\u00e1ximo 5 archivos.",
     attachmentsErrorFileTooLarge: "Cada archivo debe tener 4 MB o menos.",
     attachmentsErrorType: "Tipo de archivo no permitido (p. ej. PDF, im\u00e1genes, Word/Excel).",
-    contactHint: "Se requiere al menos un m\u00e9todo de contacto: tel\u00e9fono o correo electr\u00f3nico.",
     submit: "Enviar reclamaci\u00f3n",
     submitting: "Enviando...",
     contactError: "Indique al menos un n\u00famero de tel\u00e9fono o una direcci\u00f3n de correo electr\u00f3nico.",
@@ -386,8 +464,20 @@ const COPY = {
     back: "Retour",
     formTitle: "Formulaire SAV",
     formIntro: "Renseignez ci-dessous les principales informations de r\u00e9clamation.",
+    requiredFieldTitle: "Champ obligatoire",
+    fieldOptionalSuffix: " (facultatif)",
     contractNumber: "Num\u00e9ro de contrat d'achat",
     contractPlaceholder: "ex. 736267",
+    contractNumberHelpTrigger: "O\u00f9 la trouver ?",
+    contractNumberHelpAria: "Aide : o\u00f9 trouver le num\u00e9ro de contrat sur le document",
+    contractNumberHelpTitle: "Trouver le num\u00e9ro de contrat",
+    contractNumberHelpBody: "Ces exemples montrent o\u00f9 le num\u00e9ro appara\u00eet g\u00e9n\u00e9ralement sur vos documents :",
+    contractNumberHelpClose: "Fermer",
+    contractNumberHelpAlt1: "Exemple 1 : num\u00e9ro de contrat sur le document",
+    contractNumberHelpAlt2: "Exemple 2 : num\u00e9ro de contrat sur le document",
+    contractNumberHelpPrev: "Exemple pr\u00e9c\u00e9dent",
+    contractNumberHelpNext: "Exemple suivant",
+    contractNumberHelpSlideDot: "Exemple {n} sur {total}",
     givenName: "Pr\u00e9nom",
     givenNamePlaceholder: "Pr\u00e9nom",
     surname: "Nom",
@@ -416,7 +506,7 @@ const COPY = {
     clientFloorPlaceholder: "ex. 3",
     clientUnitNumber: "Num\u00e9ro d'unit\u00e9",
     clientUnitNumberPlaceholder: "ex. 3B",
-    landlordSection: "Propri\u00e9taire",
+    landlordSection: "Propri\u00e9taire (facultatif)",
     landlordGivenName: "Pr\u00e9nom",
     landlordGivenNamePlaceholder: "Pr\u00e9nom",
     landlordSurname: "Nom",
@@ -425,7 +515,7 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "E-mail du propri\u00e9taire",
     landlordEmailPlaceholder: "proprietaire@exemple.com",
-    hausmeisterSection: "Gardien",
+    hausmeisterSection: "Gardien (facultatif)",
     hausmeisterGivenName: "Pr\u00e9nom",
     hausmeisterGivenNamePlaceholder: "Pr\u00e9nom",
     hausmeisterSurname: "Nom",
@@ -445,7 +535,6 @@ const COPY = {
     attachmentsErrorTooMany: "Vous pouvez joindre au maximum 5 fichiers.",
     attachmentsErrorFileTooLarge: "Chaque fichier doit faire 4 Mo ou moins.",
     attachmentsErrorType: "Type de fichier non autoris\u00e9 (PDF, images, Word/Excel, etc.).",
-    contactHint: "Au moins un moyen de contact est requis : t\u00e9l\u00e9phone ou e-mail.",
     submit: "Envoyer la r\u00e9clamation",
     submitting: "Envoi en cours...",
     contactError: "Veuillez fournir au moins un num\u00e9ro de t\u00e9l\u00e9phone ou une adresse e-mail.",
@@ -469,8 +558,20 @@ const COPY = {
     back: "\u041d\u0430\u0437\u0430\u0434",
     formTitle: "\u0421\u0435\u0440\u0432\u0438\u0441\u043d\u0430\u044f \u0444\u043e\u0440\u043c\u0430",
     formIntro: "\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u043d\u0438\u0436\u0435 \u043e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0434\u0430\u043d\u043d\u044b\u0435 \u043f\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438.",
+    requiredFieldTitle: "\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435",
+    fieldOptionalSuffix: " (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     contractNumber: "\u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043f\u043e\u043a\u0443\u043f\u043a\u0438",
     contractPlaceholder: "\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 736267",
+    contractNumberHelpTrigger: "\u0413\u0434\u0435 \u043d\u0430\u0439\u0442\u0438?",
+    contractNumberHelpAria: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430: \u0433\u0434\u0435 \u043d\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430",
+    contractNumberHelpTitle: "\u041a\u0430\u043a \u043d\u0430\u0439\u0442\u0438 \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430",
+    contractNumberHelpBody: "\u041d\u0430 \u043f\u0440\u0438\u043c\u0435\u0440\u0430\u0445 \u043d\u0438\u0436\u0435 \u0432\u0438\u0434\u043d\u043e, \u0433\u0434\u0435 \u043e\u0431\u044b\u0447\u043d\u043e \u0443\u043a\u0430\u0437\u0430\u043d \u043d\u043e\u043c\u0435\u0440 \u0432 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0445:",
+    contractNumberHelpClose: "\u0417\u0430\u043a\u0440\u044b\u0442\u044c",
+    contractNumberHelpAlt1: "\u041f\u0440\u0438\u043c\u0435\u0440 1: \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043d\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0435",
+    contractNumberHelpAlt2: "\u041f\u0440\u0438\u043c\u0435\u0440 2: \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043d\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0435",
+    contractNumberHelpPrev: "\u041f\u0440\u0435\u0434\u044b\u0434\u0443\u0449\u0438\u0439 \u043f\u0440\u0438\u043c\u0435\u0440",
+    contractNumberHelpNext: "\u0421\u043b\u0435\u0434\u0443\u044e\u0449\u0438\u0439 \u043f\u0440\u0438\u043c\u0435\u0440",
+    contractNumberHelpSlideDot: "\u041f\u0440\u0438\u043c\u0435\u0440 {n} \u0438\u0437 {total}",
     givenName: "\u0418\u043c\u044f",
     givenNamePlaceholder: "\u0418\u043c\u044f",
     surname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
@@ -499,7 +600,7 @@ const COPY = {
     clientFloorPlaceholder: "\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 3",
     clientUnitNumber: "\u041d\u043e\u043c\u0435\u0440 \u043a\u0432\u0430\u0440\u0442\u0438\u0440\u044b",
     clientUnitNumberPlaceholder: "\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 3B",
-    landlordSection: "\u0410\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044c",
+    landlordSection: "\u0410\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044c (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     landlordGivenName: "\u0418\u043c\u044f",
     landlordGivenNamePlaceholder: "\u0418\u043c\u044f",
     landlordSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
@@ -508,7 +609,7 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "E-mail \u0430\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044f",
     landlordEmailPlaceholder: "landlord@example.com",
-    hausmeisterSection: "\u0425\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440",
+    hausmeisterSection: "\u0425\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440 (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     hausmeisterGivenName: "\u0418\u043c\u044f",
     hausmeisterGivenNamePlaceholder: "\u0418\u043c\u044f",
     hausmeisterSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
@@ -528,7 +629,6 @@ const COPY = {
     attachmentsErrorTooMany: "\u041d\u0435 \u0431\u043e\u043b\u0435\u0435 5 \u0432\u043b\u043e\u0436\u0435\u043d\u0438\u0439.",
     attachmentsErrorFileTooLarge: "\u041a\u0430\u0436\u0434\u044b\u0439 \u0444\u0430\u0439\u043b \u2014 \u043d\u0435 \u0431\u043e\u043b\u0435\u0435 4 \u041c\u0411.",
     attachmentsErrorType: "\u0422\u0438\u043f \u0444\u0430\u0439\u043b\u0430 \u043d\u0435 \u0440\u0430\u0437\u0440\u0435\u0448\u0451\u043d (PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, Word/Excel).",
-    contactHint: "\u041d\u0443\u0436\u0435\u043d \u0445\u043e\u0442\u044f \u0431\u044b \u043e\u0434\u0438\u043d \u0441\u043f\u043e\u0441\u043e\u0431 \u0441\u0432\u044f\u0437\u0438: \u0442\u0435\u043b\u0435\u0444\u043e\u043d \u0438\u043b\u0438 e-mail.",
     submit: "\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e",
     submitting: "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430...",
     contactError: "\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u0445\u043e\u0442\u044f \u0431\u044b \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430 \u0438\u043b\u0438 \u0430\u0434\u0440\u0435\u0441 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u044b.",
@@ -567,7 +667,8 @@ const EMPTY_CONTRACT_LOOKUP = {
   status: "idle",
   contractNumber: "",
   message: "",
-}
+  kitchenPlan: null,
+};
 
 function buildAutofillFieldsFromContract(contract) {
   const address = contract?.address || {};
@@ -592,11 +693,15 @@ export default function ServiceClaimFlow() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
+  const [problemComponentIds, setProblemComponentIds] = useState([]);
   const [attachments, setAttachments] = useState([]);
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
+  const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
+  const [contractHelpSlide, setContractHelpSlide] = useState(0);
   const languageMenuRef = useRef(null);
   const contractLookupTimeoutRef = useRef(null);
   const contractLookupRequestIdRef = useRef(0);
+  const contractHelpTouchXRef = useRef(null);
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
@@ -612,6 +717,9 @@ export default function ServiceClaimFlow() {
   function t(key) {
     return copy[key] || fallbackCopy[key] || "";
   }
+
+  const requiredFieldTitle = t("requiredFieldTitle");
+  const fieldOptionalSuffix = t("fieldOptionalSuffix");
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -638,6 +746,67 @@ export default function ServiceClaimFlow() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!isContractNumberHelpOpen) {
+      return undefined;
+    }
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setIsContractNumberHelpOpen(false);
+      }
+    }
+    document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [isContractNumberHelpOpen]);
+
+  useEffect(() => {
+    if (!isComplaintMode) {
+      setIsContractNumberHelpOpen(false);
+    }
+  }, [isComplaintMode]);
+
+  useEffect(() => {
+    setProblemComponentIds([]);
+  }, [contractLookup.contractNumber]);
+
+  useEffect(() => {
+    if (!isComplaintMode) {
+      return undefined;
+    }
+    const plan =
+      contractLookup.status === "found" && contractLookup.contractNumber === normalizedContractNumber
+        ? contractLookup.kitchenPlan
+        : null;
+    if (!plan?.selectableComponents?.length) {
+      return undefined;
+    }
+
+    const metaById = new Map(plan.selectableComponents.map((entry) => [entry.componentId, entry]));
+
+    setForm((prev) => {
+      const next = composeProblemDescriptionWithAreas(
+        copy.kitchenAreasLinePrefix || fallbackCopy.kitchenAreasLinePrefix,
+        problemComponentIds,
+        metaById,
+        prev.problemDescription,
+      );
+      if (next === prev.problemDescription) {
+        return prev;
+      }
+      return { ...prev, problemDescription: next };
+    });
+    return undefined;
+  }, [
+    isComplaintMode,
+    contractLookup.status,
+    contractLookup.contractNumber,
+    contractLookup.kitchenPlan,
+    problemComponentIds,
+    copy.kitchenAreasLinePrefix,
+    fallbackCopy.kitchenAreasLinePrefix,
+    normalizedContractNumber,
+  ]);
+
   function handleModeSelect(nextMode) {
     setMode(nextMode);
     setError("");
@@ -659,12 +828,13 @@ export default function ServiceClaimFlow() {
       }
 
       if (!nextContractNumber) {
-        setContractLookup(EMPTY_CONTRACT_LOOKUP);
+        setContractLookup({ ...EMPTY_CONTRACT_LOOKUP });
       } else {
         setContractLookup({
           status: "loading",
           contractNumber: nextContractNumber,
           message: "",
+          kitchenPlan: null,
         });
 
         const requestId = contractLookupRequestIdRef.current;
@@ -696,6 +866,7 @@ export default function ServiceClaimFlow() {
               status: "found",
               contractNumber: nextContractNumber,
               message: "",
+              kitchenPlan: payload.kitchenPlan || null,
             });
           } catch (lookupError) {
             if (requestId !== contractLookupRequestIdRef.current) {
@@ -706,6 +877,7 @@ export default function ServiceClaimFlow() {
               status: "missing",
               contractNumber: nextContractNumber,
               message: lookupError.message || t("contractLookupError"),
+              kitchenPlan: null,
             });
           }
         }, 450);
@@ -760,6 +932,43 @@ export default function ServiceClaimFlow() {
     setError("");
   }
 
+  function goContractHelpPrev() {
+    setContractHelpSlide((s) => Math.max(0, s - 1));
+  }
+
+  function goContractHelpNext() {
+    setContractHelpSlide((s) => Math.min(CONTRACT_HELP_SLIDE_COUNT - 1, s + 1));
+  }
+
+  function onContractHelpTouchStart(event) {
+    contractHelpTouchXRef.current = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  function onContractHelpTouchEnd(event) {
+    const start = contractHelpTouchXRef.current;
+    contractHelpTouchXRef.current = null;
+    if (start == null) {
+      return;
+    }
+    const end = event.changedTouches[0]?.clientX;
+    if (typeof end !== "number") {
+      return;
+    }
+    const delta = end - start;
+    const threshold = 56;
+    if (delta < -threshold) {
+      goContractHelpNext();
+    } else if (delta > threshold) {
+      goContractHelpPrev();
+    }
+  }
+
+  function contractHelpSlideAriaLabel(index) {
+    return t("contractNumberHelpSlideDot")
+      .replace("{n}", String(index + 1))
+      .replace("{total}", String(CONTRACT_HELP_SLIDE_COUNT));
+  }
+
   function buildClientAddress() {
     return [
       formValues.clientAddressLine1.trim(),
@@ -803,6 +1012,17 @@ export default function ServiceClaimFlow() {
       for (const [key, value] of Object.entries(payload)) {
         formData.append(key, value == null ? "" : String(value));
       }
+      const plan =
+        contractLookup.status === "found" && contractLookup.contractNumber === normalizedContractNumber
+          ? contractLookup.kitchenPlan
+          : null;
+      if (plan?.selectableComponents?.length) {
+        const metaById = new Map(plan.selectableComponents.map((entry) => [entry.componentId, entry]));
+        const problemAreas = problemComponentIds.map((id) => metaById.get(id)).filter(Boolean);
+        formData.append("problemAreasJson", JSON.stringify(problemAreas));
+      } else {
+        formData.append("problemAreasJson", "[]");
+      }
       for (const file of attachments) {
         formData.append("attachments", file);
       }
@@ -821,6 +1041,7 @@ export default function ServiceClaimFlow() {
       setSuccessMessage(payloadResponse.message || copy.submitSuccess);
       setForm(INITIAL_FORM);
       setAttachments([]);
+      setProblemComponentIds([]);
       setAttachmentFieldKey((key) => key + 1);
       setContractLookup(EMPTY_CONTRACT_LOOKUP);
     } catch (submitError) {
@@ -831,7 +1052,8 @@ export default function ServiceClaimFlow() {
   }
 
   return (
-    <main className="service-page">
+    <>
+      <main className="service-page">
       <section className="service-hero">
         <div
           ref={languageMenuRef}
@@ -936,7 +1158,23 @@ export default function ServiceClaimFlow() {
 
           <form className="service-form" onSubmit={handleSubmit}>
             <label className="service-field">
-              <span>{copy.contractNumber}</span>
+              <span className="service-field__label-row">
+                <span className="service-field__label-main">
+                  {copy.contractNumber}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <button
+                  type="button"
+                  className="service-field__help-link"
+                  aria-label={t("contractNumberHelpAria")}
+                  onClick={() => {
+                    setContractHelpSlide(0);
+                    setIsContractNumberHelpOpen(true);
+                  }}
+                >
+                  {t("contractNumberHelpTrigger")}
+                </button>
+              </span>
               <input
                 type="text"
                 value={formValues.contractNumber}
@@ -957,7 +1195,10 @@ export default function ServiceClaimFlow() {
 
             <div className="service-field-grid service-field-grid--3">
               <label className="service-field">
-                <span>{copy.gender}</span>
+                <span>
+                  {copy.gender}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
                 <select
                   value={formValues.gender}
                   onChange={(event) => handleFieldChange("gender", event.target.value)}
@@ -971,7 +1212,10 @@ export default function ServiceClaimFlow() {
               </label>
 
               <label className="service-field">
-                <span>{copy.givenName}</span>
+                <span>
+                  {copy.givenName}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
                 <input
                   type="text"
                   value={formValues.givenName}
@@ -982,7 +1226,10 @@ export default function ServiceClaimFlow() {
               </label>
 
               <label className="service-field">
-                <span>{copy.surname}</span>
+                <span>
+                  {copy.surname}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
                 <input
                   type="text"
                   value={formValues.surname}
@@ -995,7 +1242,10 @@ export default function ServiceClaimFlow() {
 
             <div className="service-field-grid">
               <label className="service-field">
-                <span>{copy.phone}</span>
+                <span>
+                  {copy.phone}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
                 <input
                   type="tel"
                   value={formValues.phone}
@@ -1005,7 +1255,10 @@ export default function ServiceClaimFlow() {
               </label>
 
               <label className="service-field">
-                <span>{copy.email}</span>
+                <span>
+                  {copy.email}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
                 <input
                   type="email"
                   value={formValues.email}
@@ -1019,7 +1272,10 @@ export default function ServiceClaimFlow() {
               <p className="service-form__section-title">{copy.clientAddress}</p>
               <div className="service-field-grid">
                 <label className="service-field">
-                  <span>{copy.clientCountry}</span>
+                  <span>
+                    {copy.clientCountry}
+                    <RequiredFieldMark title={requiredFieldTitle} />
+                  </span>
                   <input
                     type="text"
                     value={formValues.clientCountry}
@@ -1030,7 +1286,10 @@ export default function ServiceClaimFlow() {
                 </label>
 
                 <label className="service-field">
-                  <span>{copy.clientCity}</span>
+                  <span>
+                    {copy.clientCity}
+                    <RequiredFieldMark title={requiredFieldTitle} />
+                  </span>
                   <input
                     type="text"
                     value={formValues.clientCity}
@@ -1043,7 +1302,10 @@ export default function ServiceClaimFlow() {
 
               <div className="service-field-grid">
                 <label className="service-field">
-                  <span>{copy.clientPostalCode}</span>
+                  <span>
+                    {copy.clientPostalCode}
+                    <RequiredFieldMark title={requiredFieldTitle} />
+                  </span>
                   <input
                     type="text"
                     value={formValues.clientPostalCode}
@@ -1054,18 +1316,25 @@ export default function ServiceClaimFlow() {
                 </label>
 
                 <label className="service-field">
-                  <span>{copy.clientFloor}</span>
+                  <span>
+                    {copy.clientFloor}
+                    <RequiredFieldMark title={requiredFieldTitle} />
+                  </span>
                   <input
                     type="text"
                     value={formValues.clientFloor}
                     onChange={(event) => handleFieldChange("clientFloor", event.target.value)}
                     placeholder={copy.clientFloorPlaceholder}
+                    required
                   />
                 </label>
               </div>
 
               <label className="service-field">
-                <span>{copy.clientAddressLine1}</span>
+                <span>
+                  {copy.clientAddressLine1}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
                 <input
                   type="text"
                   value={formValues.clientAddressLine1}
@@ -1076,7 +1345,10 @@ export default function ServiceClaimFlow() {
               </label>
 
               <label className="service-field">
-                <span>{copy.clientAddressLine2}</span>
+                <span>
+                  {copy.clientAddressLine2}
+                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                </span>
                 <input
                   type="text"
                   value={formValues.clientAddressLine2}
@@ -1086,12 +1358,16 @@ export default function ServiceClaimFlow() {
               </label>
 
               <label className="service-field">
-                <span>{copy.clientUnitNumber}</span>
+                <span>
+                  {copy.clientUnitNumber}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
                 <input
                   type="text"
                   value={formValues.clientUnitNumber}
                   onChange={(event) => handleFieldChange("clientUnitNumber", event.target.value)}
                   placeholder={copy.clientUnitNumberPlaceholder}
+                  required
                 />
               </label>
             </section>
@@ -1106,7 +1382,6 @@ export default function ServiceClaimFlow() {
                     value={formValues.landlordGivenName}
                     onChange={(event) => handleFieldChange("landlordGivenName", event.target.value)}
                     placeholder={copy.landlordGivenNamePlaceholder}
-                    required
                   />
                 </label>
 
@@ -1117,7 +1392,6 @@ export default function ServiceClaimFlow() {
                     value={formValues.landlordSurname}
                     onChange={(event) => handleFieldChange("landlordSurname", event.target.value)}
                     placeholder={copy.landlordSurnamePlaceholder}
-                    required
                   />
                 </label>
               </div>
@@ -1153,7 +1427,6 @@ export default function ServiceClaimFlow() {
                     value={formValues.hausmeisterGivenName}
                     onChange={(event) => handleFieldChange("hausmeisterGivenName", event.target.value)}
                     placeholder={copy.hausmeisterGivenNamePlaceholder}
-                    required
                   />
                 </label>
 
@@ -1164,7 +1437,6 @@ export default function ServiceClaimFlow() {
                     value={formValues.hausmeisterSurname}
                     onChange={(event) => handleFieldChange("hausmeisterSurname", event.target.value)}
                     placeholder={copy.hausmeisterSurnamePlaceholder}
-                    required
                   />
                 </label>
               </div>
@@ -1190,19 +1462,48 @@ export default function ServiceClaimFlow() {
               </label>
             </section>
 
-            <label className="service-field">
-              <span>{copy.problemDescription}</span>
-              <textarea
-                value={formValues.problemDescription}
-                onChange={(event) => handleFieldChange("problemDescription", event.target.value)}
-                placeholder={copy.problemPlaceholder}
-                rows={6}
-                required
-              />
-            </label>
+            <section className="service-form__section service-form__section--problem-kitchen">
+              {contractLookup.status === "found" &&
+              contractLookup.contractNumber === normalizedContractNumber &&
+              contractLookup.kitchenPlan ? (
+                <>
+                  <p className="service-form__section-title">{copy.problemDescription}</p>
+                  <ServiceClaimKitchenPicker
+                    kitchenPlan={contractLookup.kitchenPlan}
+                    value={problemComponentIds}
+                    onChange={setProblemComponentIds}
+                    labels={{
+                      eyebrow: t("kitchenPlanEyebrow"),
+                      title: contractLookup.kitchenPlan.kitchenName || t("kitchenPlanTitle"),
+                      reset: t("kitchenPlanReset"),
+                    }}
+                  />
+                </>
+              ) : null}
+              <label className="service-field">
+                <span>
+                  {contractLookup.status === "found" &&
+                  contractLookup.contractNumber === normalizedContractNumber &&
+                  contractLookup.kitchenPlan
+                    ? t("problemDescriptionFieldLabel")
+                    : copy.problemDescription}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <textarea
+                  value={formValues.problemDescription}
+                  onChange={(event) => handleFieldChange("problemDescription", event.target.value)}
+                  placeholder={copy.problemPlaceholder}
+                  rows={6}
+                  required
+                />
+              </label>
+            </section>
 
             <label className="service-field">
-              <span>{copy.serialNumber}</span>
+              <span>
+                {copy.serialNumber}
+                <RequiredFieldMark title={requiredFieldTitle} />
+              </span>
               <input
                 type="text"
                 value={formValues.serialNumber}
@@ -1254,7 +1555,6 @@ export default function ServiceClaimFlow() {
               ) : null}
             </div>
 
-            {!hasContactMethod ? <p className="service-form__hint">{copy.contactHint}</p> : null}
             {error ? <p className="service-form__error">{error}</p> : null}
             {successMessage ? <p className="service-form__success">{successMessage}</p> : null}
 
@@ -1275,5 +1575,114 @@ export default function ServiceClaimFlow() {
         </section>
       ) : null}
     </main>
+
+      {isContractNumberHelpOpen ? (
+        <div className="service-contract-help" role="presentation">
+          <button
+            type="button"
+            className="service-contract-help__backdrop"
+            tabIndex={-1}
+            aria-label={t("contractNumberHelpClose")}
+            onClick={() => setIsContractNumberHelpOpen(false)}
+          />
+          <div
+            className="service-contract-help__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="service-contract-help-title"
+          >
+            <div className="service-contract-help__head">
+              <h3 id="service-contract-help-title" className="service-contract-help__title">
+                {t("contractNumberHelpTitle")}
+              </h3>
+              <button
+                type="button"
+                className="service-contract-help__close"
+                aria-label={t("contractNumberHelpClose")}
+                onClick={() => setIsContractNumberHelpOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <p className="service-contract-help__intro">{t("contractNumberHelpBody")}</p>
+            <p className="service-contract-help__sr" aria-live="polite">
+              {contractHelpSlideAriaLabel(contractHelpSlide)}
+            </p>
+            <div className="service-contract-help__carousel">
+              <button
+                type="button"
+                className="service-contract-help__arrow service-contract-help__arrow--prev"
+                onClick={goContractHelpPrev}
+                disabled={contractHelpSlide <= 0}
+                aria-label={t("contractNumberHelpPrev")}
+              >
+                ‹
+              </button>
+              <div
+                className="service-contract-help__viewport"
+                onTouchStart={onContractHelpTouchStart}
+                onTouchEnd={onContractHelpTouchEnd}
+              >
+                <div
+                  className="service-contract-help__track"
+                  style={{
+                    width: `${CONTRACT_HELP_SLIDE_COUNT * 100}%`,
+                    transform: `translateX(-${(100 * contractHelpSlide) / CONTRACT_HELP_SLIDE_COUNT}%)`,
+                  }}
+                >
+                  {CONTRACT_NUMBER_HELP_IMAGES.map((entry) => (
+                    <figure
+                      key={entry.src}
+                      className="service-contract-help__figure service-contract-help__slide"
+                      style={{ flex: `0 0 ${100 / CONTRACT_HELP_SLIDE_COUNT}%` }}
+                    >
+                      <img
+                        src={entry.src}
+                        alt={t(entry.altKey)}
+                        className="service-contract-help__img"
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                      />
+                    </figure>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="service-contract-help__arrow service-contract-help__arrow--next"
+                onClick={goContractHelpNext}
+                disabled={contractHelpSlide >= CONTRACT_HELP_SLIDE_COUNT - 1}
+                aria-label={t("contractNumberHelpNext")}
+              >
+                ›
+              </button>
+            </div>
+            <div className="service-contract-help__dots" role="tablist" aria-label={t("contractNumberHelpTitle")}>
+              {CONTRACT_NUMBER_HELP_IMAGES.map((_, index) => (
+                <button
+                  key={String(index)}
+                  type="button"
+                  role="tab"
+                  aria-selected={index === contractHelpSlide}
+                  aria-label={contractHelpSlideAriaLabel(index)}
+                  className={`service-contract-help__dot${index === contractHelpSlide ? " is-active" : ""}`}
+                  onClick={() => setContractHelpSlide(index)}
+                />
+              ))}
+            </div>
+            <div className="service-contract-help__actions">
+              <button
+                type="button"
+                className="service-button service-button--secondary"
+                onClick={() => setIsContractNumberHelpOpen(false)}
+              >
+                {t("contractNumberHelpClose")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </>
   );
 }
