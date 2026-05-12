@@ -9,6 +9,13 @@ import { prisma } from "../../../lib/prisma";
 import { isMissingAttachmentsJsonColumnError } from "../../../lib/service-claim-admin-query";
 import { persistServiceClaimAttachments } from "../../../lib/service-claim-attachments-storage";
 import { getServiceClaimContractDetails } from "../../../lib/service-claims";
+import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
+import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
+
+function descriptionHasClientKitchenAreasLine(text) {
+  const first = String(text || "").split("\n")[0] || "";
+  return KITCHEN_AREA_FIRST_LINE_PREFIXES.some((p) => first.startsWith(p));
+}
 
 function requiredString(value, fieldName) {
   const normalized = String(value || "").trim();
@@ -21,6 +28,45 @@ function requiredString(value, fieldName) {
 function optionalString(value) {
   const normalized = String(value || "").trim();
   return normalized || "";
+}
+
+function mergeProblemAreasIntoDescription(problemDescription, problemAreasJsonRaw) {
+  const base = String(problemDescription || "").trim();
+  if (descriptionHasClientKitchenAreasLine(base)) {
+    return base;
+  }
+  const raw = String(problemAreasJsonRaw || "").trim();
+  if (!raw) {
+    return base;
+  }
+  try {
+    const areas = JSON.parse(raw);
+    if (!Array.isArray(areas) || areas.length === 0) {
+      return base;
+    }
+    const lines = areas
+      .map((a) => {
+        const name = stripProductDimensionsFromLabel(String(a?.name || "").trim());
+        const code = String(a?.code || "").trim();
+        if (name && code) {
+          return `- ${name} (${code})`;
+        }
+        if (name) {
+          return `- ${name}`;
+        }
+        if (code) {
+          return `- ${code}`;
+        }
+        return null;
+      })
+      .filter(Boolean);
+    if (!lines.length) {
+      return base;
+    }
+    return `Ausgewählte Küchenbereiche:\n${lines.join("\n")}\n\n${base}`.trim();
+  } catch {
+    return base;
+  }
 }
 
 function requiredGender(value) {
@@ -458,18 +504,22 @@ export async function POST(request) {
       );
     }
 
-    const landlordGivenName = requiredString(body.landlordGivenName, "Landlord name");
-    const landlordSurname = requiredString(body.landlordSurname, "Landlord surname");
-    const landlordName = combinePersonName(landlordGivenName, landlordSurname);
+    const landlordGivenName = optionalString(body.landlordGivenName);
+    const landlordSurname = optionalString(body.landlordSurname);
+    const landlordNameJoined = combinePersonName(landlordGivenName, landlordSurname);
+    const landlordName = landlordNameJoined || null;
     const landlordPhone = optionalString(body.landlordPhone);
     const landlordEmail = optionalString(body.landlordEmail);
-    const hausmeisterGivenName = requiredString(body.hausmeisterGivenName, "Property manager name");
-    const hausmeisterSurname = requiredString(body.hausmeisterSurname, "Property manager surname");
-    const hausmeisterName = combinePersonName(hausmeisterGivenName, hausmeisterSurname);
+    const hausmeisterGivenName = optionalString(body.hausmeisterGivenName);
+    const hausmeisterSurname = optionalString(body.hausmeisterSurname);
+    const hausmeisterNameJoined = combinePersonName(hausmeisterGivenName, hausmeisterSurname);
+    const hausmeisterName = hausmeisterNameJoined || null;
     const hausmeisterPhone = optionalString(body.hausmeisterPhone);
     const hausmeisterEmail = optionalString(body.hausmeisterEmail);
     const givenName = requiredString(body.givenName, "Name");
     const surname = requiredString(body.surname, "Surname");
+    requiredString(body.clientFloor, "Floor");
+    requiredString(body.clientUnitNumber, "Unit number");
     const gender = requiredGender(body.gender);
     const genderLabel = genderDisplayLabel(gender);
     const customerDisplayName = [givenName, surname].filter(Boolean).join(" ").trim();
@@ -497,14 +547,17 @@ export async function POST(request) {
       hausmeisterPhone,
       hausmeisterEmail,
       landlordContact: [
-        `Landlord: ${landlordName}`,
+        `Landlord: ${landlordNameJoined || "—"}`,
         `Landlord phone: ${landlordPhone || "-"}`,
         `Landlord email: ${landlordEmail || "-"}`,
-        `Hausmeister: ${hausmeisterName}`,
+        `Hausmeister: ${hausmeisterNameJoined || "—"}`,
         `Hausmeister phone: ${hausmeisterPhone || "-"}`,
         `Hausmeister email: ${hausmeisterEmail || "-"}`,
       ].join("\n"),
-      problemDescription: requiredString(body.problemDescription, "Problem description"),
+      problemDescription: mergeProblemAreasIntoDescription(
+        requiredString(body.problemDescription, "Problem description"),
+        optionalString(body.problemAreasJson),
+      ),
       serialNumber: requiredString(body.serialNumber, "Serial number"),
       requestType: "complaint",
       attachmentsMeta: attachmentParts.map(({ filename, contentType, size }) => ({
