@@ -8,11 +8,13 @@ import {
   splitGridStyle,
   subMetaStyle,
 } from "../../../../components/admin-ui";
-import { AdminShell } from "../../../../components/admin-shell";
+import { AdminClaimUploadsPanel } from "../../../../components/admin-claim-uploads-panel";
 import { AdminText } from "../../../../components/admin-i18n";
+import { AdminShell } from "../../../../components/admin-shell";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
+import { queryServiceClaimById } from "../../../../lib/service-claim-admin-query";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +29,37 @@ function contactSummary(claim) {
   return [claim.phone, claim.email].filter(Boolean).join(" / ") || "No contact provided";
 }
 
+function parseClaimAttachments(raw) {
+  if (raw == null || raw === "") {
+    return [];
+  }
+  try {
+    const data = typeof raw === "string" ? JSON.parse(raw) : raw;
+    if (!Array.isArray(data)) {
+      return [];
+    }
+    return data.filter(
+      (entry) => entry && typeof entry.filename === "string" && typeof entry.size === "number",
+    );
+  } catch {
+    return [];
+  }
+}
+
+function formatBytes(bytes) {
+  const n = Number(bytes);
+  if (!Number.isFinite(n) || n < 0) {
+    return "—";
+  }
+  if (n < 1024) {
+    return `${n} B`;
+  }
+  if (n < 1024 * 1024) {
+    return `${(n / 1024).toFixed(1)} KB`;
+  }
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default async function AdminClaimDetailPage({ params, searchParams }) {
   const admin = await requireAdminPage();
   const { id } = await params;
@@ -34,29 +67,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
-  const claims = await prisma.$queryRaw`
-    SELECT
-      "id",
-      "contractNumber",
-      "fullName",
-      "phone",
-      "email",
-      "clientAddress",
-      "landlordName",
-      "landlordPhone",
-      "landlordEmail",
-      "hausmeisterName",
-      "hausmeisterPhone",
-      "hausmeisterEmail",
-      "landlordContact",
-      "problemDescription",
-      "serialNumber",
-      "requestType",
-      "createdAt"
-    FROM "ServiceClaim"
-    WHERE "id" = ${id}
-    LIMIT 1
-  `;
+  const claims = await queryServiceClaimById(prisma, id);
 
   const claim = claims[0];
 
@@ -74,6 +85,8 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
       </AdminShell>
     );
   }
+
+  const uploadedAttachments = parseClaimAttachments(claim.attachmentsJson);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -162,6 +175,35 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.issue" fallback="Issue" /></span>
                   <p style={detailTextStyle}>{claim.problemDescription}</p>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}>
+                    <AdminText i18nKey="claimsAdmin.uploadedFiles" fallback="Uploaded files" />
+                  </span>
+                  <AdminClaimUploadsPanel
+                    claimId={claim.id}
+                    files={uploadedAttachments.map((file, index) => ({
+                      index,
+                      filename: file.filename,
+                      contentType: file.contentType || "",
+                      meta: `${file.contentType || "file"} · ${formatBytes(file.size)}`,
+                    }))}
+                  />
+                  {uploadedAttachments.length ? (
+                    <p
+                      style={{
+                        margin: "12px 0 0",
+                        fontSize: 13,
+                        color: "var(--app-text-muted)",
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      <AdminText
+                        i18nKey="claimsAdmin.uploadedFilesEmailNote"
+                        fallback="Original files are also attached to the notification email when SMTP is configured."
+                      />
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </article>

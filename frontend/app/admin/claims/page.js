@@ -15,7 +15,7 @@ import { AdminText } from "../../../components/admin-i18n";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
-import { Prisma } from "@prisma/client";
+import { queryServiceClaimsList } from "../../../lib/service-claim-admin-query";
 
 export const dynamic = "force-dynamic";
 
@@ -41,48 +41,6 @@ function truncate(value, max = 140) {
   return `${text.slice(0, max - 3)}...`;
 }
 
-function buildWhere(filters) {
-  const conditions = [];
-
-  if (filters.q) {
-    const query = `%${filters.q}%`;
-    conditions.push(Prisma.sql`(
-      "contractNumber" ILIKE ${query}
-      OR "fullName" ILIKE ${query}
-      OR COALESCE("phone", '') ILIKE ${query}
-      OR COALESCE("email", '') ILIKE ${query}
-      OR COALESCE("clientAddress", '') ILIKE ${query}
-      OR COALESCE("landlordName", '') ILIKE ${query}
-      OR COALESCE("landlordPhone", '') ILIKE ${query}
-      OR COALESCE("landlordEmail", '') ILIKE ${query}
-      OR COALESCE("hausmeisterName", '') ILIKE ${query}
-      OR COALESCE("hausmeisterPhone", '') ILIKE ${query}
-      OR COALESCE("hausmeisterEmail", '') ILIKE ${query}
-      OR "landlordContact" ILIKE ${query}
-      OR "problemDescription" ILIKE ${query}
-      OR "serialNumber" ILIKE ${query}
-    )`);
-  }
-
-  if (filters.requestType) {
-    conditions.push(Prisma.sql`"requestType" = ${filters.requestType}`);
-  }
-
-  if (filters.dateFrom) {
-    conditions.push(Prisma.sql`"createdAt" >= ${new Date(`${filters.dateFrom}T00:00:00.000Z`)}`);
-  }
-
-  if (filters.dateTo) {
-    conditions.push(Prisma.sql`"createdAt" <= ${new Date(`${filters.dateTo}T23:59:59.999Z`)}`);
-  }
-
-  if (!conditions.length) {
-    return Prisma.empty;
-  }
-
-  return Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}`;
-}
-
 export default async function AdminClaimsPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
@@ -95,29 +53,7 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
-  const claims = await prisma.$queryRaw`
-    SELECT
-      "id",
-      "contractNumber",
-      "fullName",
-      "phone",
-      "email",
-      "clientAddress",
-      "landlordName",
-      "landlordPhone",
-      "landlordEmail",
-      "hausmeisterName",
-      "hausmeisterPhone",
-      "hausmeisterEmail",
-      "landlordContact",
-      "problemDescription",
-      "serialNumber",
-      "requestType",
-      "createdAt"
-    FROM "ServiceClaim"
-    ${buildWhere(filters)}
-    ORDER BY "createdAt" DESC
-  `;
+  const claims = await queryServiceClaimsList(prisma, filters);
 
   return (
     <AdminShell adminEmail={admin.email}>

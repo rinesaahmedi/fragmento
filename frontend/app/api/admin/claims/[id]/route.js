@@ -1,6 +1,7 @@
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../../lib/auth";
 import { prisma } from "../../../../../../lib/prisma";
+import { deleteServiceClaimAttachments } from "../../../../../../lib/service-claim-attachments-storage";
 
 export async function POST(request, { params }) {
   await requireAdminApi();
@@ -13,6 +14,7 @@ export async function POST(request, { params }) {
 
     if (intent === "delete") {
       returnPath = "/admin/claims";
+      await deleteServiceClaimAttachments(id).catch(() => {});
       await prisma.$executeRaw`
         DELETE FROM "ServiceClaim"
         WHERE "id" = ${id}

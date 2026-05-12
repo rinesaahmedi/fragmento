@@ -966,6 +966,10 @@ textarea {
   gap: 16px;
 }
 
+.service-field-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .service-field {
   display: grid;
   gap: 8px;
@@ -978,7 +982,8 @@ textarea {
 }
 
 .service-field input,
-.service-field textarea {
+.service-field textarea,
+.service-field select {
   width: 100%;
   min-height: 54px;
   padding: 14px 16px;
@@ -992,6 +997,19 @@ textarea {
     background-color 160ms ease;
 }
 
+.service-field select {
+  cursor: pointer;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, rgba(107, 79, 58, 0.55) 50%),
+    linear-gradient(135deg, rgba(107, 79, 58, 0.55) 50%, transparent 50%);
+  background-position:
+    calc(100% - 22px) calc(50% - 3px),
+    calc(100% - 16px) calc(50% - 3px);
+  background-size: 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 40px;
+}
+
 .service-field textarea {
   min-height: 128px;
   resize: vertical;
@@ -1003,6 +1021,107 @@ textarea {
   border-color: rgba(107, 79, 58, 0.34);
   box-shadow: 0 0 0 4px rgba(107, 79, 58, 0.08);
   background: #ffffff;
+}
+
+.service-field select:focus {
+  outline: none;
+  border-color: rgba(107, 79, 58, 0.34);
+  box-shadow: 0 0 0 4px rgba(107, 79, 58, 0.08);
+  background-color: #ffffff;
+}
+
+.service-field__file,
+.service-field input[type="file"] {
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 16px;
+  border: 1px solid rgba(107, 79, 58, 0.18);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--app-text);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.service-field__file:focus,
+.service-field input[type="file"]:focus {
+  outline: none;
+  border-color: rgba(107, 79, 58, 0.34);
+  box-shadow: 0 0 0 4px rgba(107, 79, 58, 0.08);
+  background: #ffffff;
+}
+
+.service-form__hint--attachments {
+  background: rgba(255, 255, 255, 0.72);
+  color: rgba(43, 43, 43, 0.88);
+  border: 1px solid rgba(107, 79, 58, 0.12);
+  font-weight: 600;
+}
+
+.service-attachments__summary {
+  margin: 12px 0 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--app-accent);
+}
+
+.service-attachments__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.service-attachments__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(107, 79, 58, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.service-attachments__name {
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--app-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.service-attachments__remove {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(107, 79, 58, 0.1);
+  color: var(--app-accent);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 140ms ease;
+}
+
+.service-attachments__remove:hover,
+.service-attachments__remove:focus-visible {
+  background: rgba(107, 79, 58, 0.18);
+}
+
+.service-attachments__clear {
+  margin-top: 12px;
+  min-height: 46px;
+  padding: 0 18px;
+  font-size: 0.9rem;
 }
 
 .service-form__hint,
@@ -1088,7 +1207,8 @@ textarea {
   .service-hero__top,
   .service-choice-grid,
   .service-steps,
-  .service-field-grid {
+  .service-field-grid,
+  .service-field-grid--3 {
     grid-template-columns: 1fr;
   }
 

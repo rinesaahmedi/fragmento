@@ -6,6 +6,9 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 import { prisma } from "../../../lib/prisma";
+import { isMissingAttachmentsJsonColumnError } from "../../../lib/service-claim-admin-query";
+import { persistServiceClaimAttachments } from "../../../lib/service-claim-attachments-storage";
+import { getServiceClaimContractDetails } from "../../../lib/service-claims";
 
 function requiredString(value, fieldName) {
   const normalized = String(value || "").trim();
@@ -20,11 +23,39 @@ function optionalString(value) {
   return normalized || "";
 }
 
-function buildPartySummary(label, name, phone, email) {
+function requiredGender(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized !== "female" && normalized !== "male" && normalized !== "prefer_not_to_say") {
+    throw new Error("Gender is required.");
+  }
+  return normalized;
+}
+
+function genderDisplayLabel(gender) {
+  if (gender === "male") return "Male";
+  if (gender === "female") return "Female";
+  if (gender === "prefer_not_to_say") return "Prefer not to say";
+  return String(gender || "-");
+}
+
+function buildCustomerFullName({ givenName, surname, gender }) {
+  const combined = [givenName, surname].filter(Boolean).join(" ").trim();
+  if (gender === "female" || gender === "male") {
+    return `${combined} (${gender})`;
+  }
+  return combined;
+}
+
+function combinePersonName(givenName, surname) {
+  return [givenName, surname].filter(Boolean).join(" ").trim();
+}
+
+function buildPartyContactBlock(givenName, surname, phone, email) {
   return [
-    `${label}: ${name || "-"}`,
-    `Phone: ${phone || "-"}`,
-    `Email: ${email || "-"}`,
+    `Vorname: ${givenName}`,
+    `Nachname: ${surname}`,
+    `Telefon: ${phone || "—"}`,
+    `E-Mail: ${email || "—"}`,
   ].join("\n");
 }
 
@@ -66,7 +97,7 @@ async function postWebhook(payload) {
   return true;
 }
 
-async function sendComplaintEmail(payload) {
+async function sendComplaintEmail(payload, attachmentParts = []) {
   const recipient = String(process.env.SERVICE_REQUEST_EMAIL || process.env.ADMIN_EMAIL || "").trim();
   const smtpHost = String(process.env.SMTP_HOST || "").trim();
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();
@@ -86,15 +117,22 @@ async function sendComplaintEmail(payload) {
   });
 
   const logoAttachment = await buildLogoAttachment();
+  const userFiles = attachmentParts.map((part) => ({
+    filename: part.filename,
+    content: part.content,
+    contentType: part.contentType,
+    contentDisposition: "attachment",
+  }));
+  const attachments = [...(logoAttachment ? [logoAttachment] : []), ...userFiles];
 
   await transporter.sendMail({
-    from: `"Fragmento Service Desk" <${smtpFrom}>`,
+    from: `"Fragmento" <${smtpFrom}>`,
     to: recipient,
-    subject: `Reklamation ${payload.contractNumber} - ${payload.fullName}`,
+    subject: `Reklamation ${payload.contractNumber} - ${payload.customerDisplayName}`,
     replyTo: payload.email || undefined,
     text: buildComplaintEmailText(payload),
-    html: buildComplaintEmailHtml(payload, { hasLogo: Boolean(logoAttachment) }),
-    attachments: logoAttachment ? [logoAttachment] : [],
+    html: `${buildComplaintEmailLogoHtml(Boolean(logoAttachment))}${buildComplaintEmailHtml(payload)}`,
+    attachments,
   });
 
   return true;
@@ -117,139 +155,138 @@ async function buildLogoAttachment() {
   }
 }
 
+function buildComplaintEmailLogoHtml(hasLogo) {
+  if (!hasLogo) {
+    return "";
+  }
+  return '<div style="margin-bottom:16px"><img src="cid:logo@fragmento" alt="Fragmento" style="height:70px;object-fit:contain;border:0;" /></div>';
+}
+
+function formatEmailFileSize(bytes) {
+  const n = Number(bytes);
+  if (!Number.isFinite(n) || n < 0) {
+    return "—";
+  }
+  if (n < 1024) {
+    return `${n} B`;
+  }
+  if (n < 1024 * 1024) {
+    return `${(n / 1024).toFixed(1)} KB`;
+  }
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function buildComplaintEmailText(payload) {
+  const landlordBlock = buildPartyContactBlock(
+    payload.landlordGivenName,
+    payload.landlordSurname,
+    payload.landlordPhone,
+    payload.landlordEmail,
+  );
+  const hausBlock = buildPartyContactBlock(
+    payload.hausmeisterGivenName,
+    payload.hausmeisterSurname,
+    payload.hausmeisterPhone,
+    payload.hausmeisterEmail,
+  );
   return [
-    "NEW FRAGMENTO COMPLAINT REQUEST",
+    "Servicereklamation",
     "",
-    `Contract number: ${payload.contractNumber}`,
-    `Full name: ${payload.fullName}`,
-    `Client address: ${payload.clientAddress}`,
-    `Phone: ${payload.phone || "-"}`,
-    `Email: ${payload.email || "-"}`,
-    `Serial number: ${payload.serialNumber}`,
+    `Vertragsnummer: ${payload.contractNumber}`,
+    `Kunde: ${payload.givenName} ${payload.surname} (${payload.genderLabel})`,
+    `Adresse: ${payload.clientAddress}`,
+    `Telefon: ${payload.phone || "—"}`,
+    `E-Mail: ${payload.email || "—"}`,
+    `Seriennummer: ${payload.serialNumber}`,
     "",
-    "Landlord contact",
-    buildPartySummary("Landlord", payload.landlordName, payload.landlordPhone, payload.landlordEmail),
+    "Vermieter",
+    landlordBlock,
     "",
-    "Hausmeister contact",
-    buildPartySummary("Hausmeister", payload.hausmeisterName, payload.hausmeisterPhone, payload.hausmeisterEmail),
+    "Hausmeister",
+    hausBlock,
     "",
-    "Problem description",
+    "Problem",
     payload.problemDescription,
+    ...(payload.attachmentsMeta?.length
+      ? [
+          "",
+          "Anhaenge (siehe E-Mail-Anhaenge):",
+          ...payload.attachmentsMeta.map(
+            (entry) =>
+              `- ${entry.filename} (${entry.contentType}, ${formatEmailFileSize(entry.size)})`,
+          ),
+        ]
+      : []),
   ].join("\n");
 }
 
-function buildComplaintEmailHtml(payload, { hasLogo = false } = {}) {
-  const logoHtml = hasLogo
-    ? '<img src="cid:logo@fragmento" alt="Fragmento" style="display:block;height:40px;width:auto;border:0;" />'
-    : '<div style="font-size:22px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#fffdf9;">Fragmento</div>';
+function buildComplaintEmailHtml(payload) {
+  const tableStyles = "width:100%;border-collapse:collapse;font-family:Arial,sans-serif;";
+  const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;vertical-align:top;";
+  const customerName = escapeHtml(`${payload.givenName} ${payload.surname}`.trim());
+  const landlordValue = [
+    `${payload.landlordGivenName} ${payload.landlordSurname}`.trim(),
+    payload.landlordPhone ? `Telefon: ${payload.landlordPhone}` : "",
+    payload.landlordEmail ? `E-Mail: ${payload.landlordEmail}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const hausValue = [
+    `${payload.hausmeisterGivenName} ${payload.hausmeisterSurname}`.trim(),
+    payload.hausmeisterPhone ? `Telefon: ${payload.hausmeisterPhone}` : "",
+    payload.hausmeisterEmail ? `E-Mail: ${payload.hausmeisterEmail}` : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const detailRows = [
+    ["Vertragsnummer", payload.contractNumber],
+    ["Vorname", payload.givenName],
+    ["Nachname", payload.surname],
+    ["Geschlecht", payload.genderLabel],
+    ["Kundenadresse", payload.clientAddress],
+    ["Telefon", payload.phone || "—"],
+    ["E-Mail", payload.email || "—"],
+    ["Seriennummer", payload.serialNumber],
+    ["Vermieter", landlordValue],
+    ["Hausmeister", hausValue],
+    ["Problem", payload.problemDescription],
+  ];
+
+  const tbody = detailRows
+    .map(
+      ([label, value]) =>
+        `<tr><td style="${tdStyles}font-weight:bold;width:35%;">${escapeHtml(label)}</td><td style="${tdStyles}">${formatMultiline(
+          value,
+        )}</td></tr>`,
+    )
+    .join("");
+
+  const attachmentsRow =
+    payload.attachmentsMeta?.length > 0
+      ? `<tr><td style="${tdStyles}font-weight:bold;width:35%;">Anhaenge</td><td style="${tdStyles}">${payload.attachmentsMeta
+          .map(
+            (entry) =>
+              `${escapeHtml(entry.filename)} (${escapeHtml(entry.contentType)}, ${escapeHtml(
+                formatEmailFileSize(entry.size),
+              )})`,
+          )
+          .join("<br />")}</td></tr>`
+      : "";
 
   return `
-    <div style="margin:0;padding:32px 16px;background-color:#f7f4ef;font-family:Arial,sans-serif;color:#2b2b2b;">
-      <div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #e5e1dc;border-radius:20px;overflow:hidden;box-shadow:0 18px 42px rgba(84, 59, 40, 0.1);">
-        <div style="padding:28px 32px;background:linear-gradient(135deg,#5d4533 0%,#6b4f3a 58%,#7d6049 100%);">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
-            <div>${logoHtml}</div>
-            <div style="display:inline-block;padding:8px 12px;border-radius:999px;background:rgba(255,253,249,0.16);color:#fffdf9;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;">
-              Service Complaint
-            </div>
-          </div>
-          <div style="margin-top:24px;">
-            <div style="font-size:13px;line-height:20px;color:#f4e7d9;text-transform:uppercase;letter-spacing:0.08em;">New incoming request</div>
-            <h1 style="margin:8px 0 0;font-size:28px;line-height:34px;color:#fffdf9;">Reklamation ${escapeHtml(payload.contractNumber)}</h1>
-            <p style="margin:12px 0 0;font-size:15px;line-height:24px;color:#f4e7d9;">
-              A new service complaint has been submitted and is ready for review.
-            </p>
-          </div>
-        </div>
-
-        <div style="padding:32px;">
-          <div style="margin-bottom:24px;padding:20px;border:1px solid #e5e1dc;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,243,236,0.96) 100%);">
-            <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#6b4f3a;">Customer overview</div>
-            <table role="presentation" style="width:100%;border-collapse:collapse;margin-top:14px;">
-              <tr>
-                <td style="width:50%;padding:0 12px 14px 0;vertical-align:top;">
-                  ${buildFieldHtml("Full name", payload.fullName)}
-                </td>
-                <td style="width:50%;padding:0 0 14px 12px;vertical-align:top;">
-                  ${buildFieldHtml("Contract number", payload.contractNumber)}
-                </td>
-              </tr>
-              <tr>
-                <td style="width:50%;padding:0 12px 0 0;vertical-align:top;">
-                  ${buildFieldHtml("Phone", payload.phone || "-")}
-                </td>
-                <td style="width:50%;padding:0 0 0 12px;vertical-align:top;">
-                  ${buildFieldHtml("Email", payload.email || "-")}
-                </td>
-              </tr>
-              <tr>
-                <td colspan="2" style="padding:14px 0 0 0;vertical-align:top;">
-                  ${buildFieldHtml("Client address", payload.clientAddress)}
-                </td>
-              </tr>
-            </table>
-          </div>
-
-          <table role="presentation" style="width:100%;border-collapse:collapse;">
-            <tr>
-              <td style="padding:0 0 24px;vertical-align:top;">
-                ${buildSectionHtml("Serial number", payload.serialNumber)}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0 0 24px;vertical-align:top;">
-                ${buildSectionHtml("Landlord contact", [
-                  `Name: ${payload.landlordName}`,
-                  `Phone: ${payload.landlordPhone || "-"}`,
-                  `Email: ${payload.landlordEmail || "-"}`,
-                ].join("\n"), { multiline: true })}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0 0 24px;vertical-align:top;">
-                ${buildSectionHtml("Hausmeister contact", [
-                  `Name: ${payload.hausmeisterName}`,
-                  `Phone: ${payload.hausmeisterPhone || "-"}`,
-                  `Email: ${payload.hausmeisterEmail || "-"}`,
-                ].join("\n"), { multiline: true })}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:0;vertical-align:top;">
-                ${buildSectionHtml("Problem description", payload.problemDescription, { multiline: true, emphasize: true })}
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <div style="padding:20px 32px;border-top:1px solid #e5e1dc;background:#faf7f3;">
-          <p style="margin:0;font-size:12px;line-height:18px;color:#6f6f6f;">
-            Sent automatically from the Fragmento service form.
-          </p>
-        </div>
+    <div style="max-width:600px;margin:20px 0;font-family:Arial,sans-serif;color:#333;">
+      <p style="margin:0 0 16px;line-height:1.5;">
+        Neue Servicereklamation zu Vertrag <strong>${escapeHtml(payload.contractNumber)}</strong>
+        (${customerName}).
+      </p>
+      <div style="padding:20px;border:1px solid #ddd;border-radius:8px;">
+        <h4 style="margin-top:0;">Reklamationsdaten</h4>
+        <table style="${tableStyles}"><tbody>${tbody}${attachmentsRow}</tbody></table>
       </div>
-    </div>
-  `;
-}
-
-function buildFieldHtml(label, value) {
-  return `
-    <div>
-      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#6f6f6f;">${escapeHtml(label)}</div>
-      <div style="margin-top:6px;font-size:16px;line-height:24px;color:#2b2b2b;font-weight:600;">${escapeHtml(value)}</div>
-    </div>
-  `;
-}
-
-function buildSectionHtml(label, value, options = {}) {
-  const { multiline = false, emphasize = false } = options;
-  const bodyHtml = multiline ? formatMultiline(value) : escapeHtml(value);
-
-  return `
-    <div style="padding:20px;border:1px solid ${emphasize ? "rgba(242, 166, 90, 0.34)" : "#e5e1dc"};border-radius:16px;background:${emphasize ? "#fbf0db" : "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,243,236,0.96) 100%)"};">
-      <div style="font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:${emphasize ? "#a06b12" : "#6b4f3a"};">${escapeHtml(label)}</div>
-      <div style="margin-top:10px;font-size:15px;line-height:24px;color:#2b2b2b;">${bodyHtml}</div>
+      <p style="margin:18px 0 0;font-size:12px;line-height:1.5;color:#777;">
+        E-Mail automatisch gesendet (Fragmento Servicemeldung).
+      </p>
     </div>
   `;
 }
@@ -267,6 +304,142 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
+const MAX_SERVICE_CLAIM_ATTACHMENTS = 5;
+const MAX_SERVICE_CLAIM_FILE_BYTES = 4 * 1024 * 1024;
+
+const ALLOWED_ATTACHMENT_MIME_TYPES = new Set([
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "image/bmp",
+  "image/tiff",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "text/plain",
+]);
+
+const EXTENSION_TO_MIME = {
+  pdf: "application/pdf",
+  png: "image/png",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  gif: "image/gif",
+  webp: "image/webp",
+  bmp: "image/bmp",
+  tif: "image/tiff",
+  tiff: "image/tiff",
+  txt: "text/plain",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
+
+function sanitizeServiceClaimFilename(name) {
+  let base = String(name || "attachment").replace(/^\.*[\\/]+/g, "");
+  base = base.split(/[/\\]/).pop() || "attachment";
+  base = base.replace(/[^\w.\- ()\u00C0-\u024F]+/g, "_");
+  if (base.length > 120) {
+    const dot = base.lastIndexOf(".");
+    const ext = dot > 0 ? base.slice(dot) : "";
+    base = `${base.slice(0, 110)}${ext}`;
+  }
+  return base || "attachment";
+}
+
+function getAttachmentExtension(filename) {
+  const safe = sanitizeServiceClaimFilename(filename);
+  const dot = safe.lastIndexOf(".");
+  if (dot <= 0 || dot === safe.length - 1) return "";
+  return safe.slice(dot + 1).toLowerCase();
+}
+
+function inferAttachmentContentType(filename, declared) {
+  const trimmed = String(declared || "").toLowerCase().split(";")[0].trim();
+  if (trimmed && trimmed !== "application/octet-stream") {
+    return trimmed;
+  }
+  const ext = getAttachmentExtension(filename);
+  return EXTENSION_TO_MIME[ext] || "application/octet-stream";
+}
+
+function isAllowedServiceClaimAttachment(mime, filename) {
+  const normalized = String(mime || "").toLowerCase().split(";")[0].trim();
+  if (normalized === "image/svg+xml") {
+    return false;
+  }
+  if (ALLOWED_ATTACHMENT_MIME_TYPES.has(normalized)) return true;
+  if (normalized.startsWith("image/")) return true;
+  if (normalized === "application/octet-stream" || normalized === "") {
+    const ext = getAttachmentExtension(filename);
+    return Boolean(EXTENSION_TO_MIME[ext]);
+  }
+  return false;
+}
+
+async function normalizeServiceClaimUploads(files) {
+  if (!files.length) {
+    return [];
+  }
+  if (files.length > MAX_SERVICE_CLAIM_ATTACHMENTS) {
+    throw new Error(`You can upload at most ${MAX_SERVICE_CLAIM_ATTACHMENTS} files.`);
+  }
+  const parts = [];
+  for (const file of files) {
+    if (!(file instanceof File)) {
+      continue;
+    }
+    if (file.size <= 0) {
+      continue;
+    }
+    if (file.size > MAX_SERVICE_CLAIM_FILE_BYTES) {
+      throw new Error("Each attachment must be 4 MB or smaller.");
+    }
+    const filename = sanitizeServiceClaimFilename(file.name);
+    const declaredType = file.type;
+    if (!isAllowedServiceClaimAttachment(declaredType, filename)) {
+      throw new Error(
+        "One or more files use a type that is not allowed. Use PDF, images, or common office documents.",
+      );
+    }
+    const contentType = inferAttachmentContentType(filename, declaredType);
+    const buffer = Buffer.from(await file.arrayBuffer());
+    parts.push({
+      filename,
+      contentType,
+      content: buffer,
+      size: buffer.length,
+    });
+  }
+  return parts;
+}
+
+async function parseServiceClaimRequest(request) {
+  const contentType = request.headers.get("content-type") || "";
+  if (contentType.includes("multipart/form-data")) {
+    const formData = await request.formData();
+    const body = {};
+    for (const [key, value] of formData.entries()) {
+      if (key === "attachments") {
+        continue;
+      }
+      if (typeof value === "string") {
+        body[key] = value;
+      }
+    }
+    const rawFiles = formData.getAll("attachments").filter((entry) => entry instanceof File);
+    const attachmentParts = await normalizeServiceClaimUploads(rawFiles);
+    return { body, attachmentParts };
+  }
+
+  const body = await request.json();
+  return { body, attachmentParts: [] };
+}
+
 export async function POST(request) {
   try {
     const clientIp = getRequestClientIp(request);
@@ -275,23 +448,51 @@ export async function POST(request) {
       windowMs: 15 * 60 * 1000,
     });
 
-    const body = await request.json();
-    const landlordName = requiredString(body.landlordName, "Landlord name");
+    const { body, attachmentParts } = await parseServiceClaimRequest(request);
+    const contractNumber = requiredString(body.contractNumber, "Contract number");
+    const contract = await getServiceClaimContractDetails(contractNumber);
+    if (!contract) {
+      return NextResponse.json(
+        { error: "Contract number was not found." },
+        { status: 404 },
+      );
+    }
+
+    const landlordGivenName = requiredString(body.landlordGivenName, "Landlord name");
+    const landlordSurname = requiredString(body.landlordSurname, "Landlord surname");
+    const landlordName = combinePersonName(landlordGivenName, landlordSurname);
     const landlordPhone = optionalString(body.landlordPhone);
     const landlordEmail = optionalString(body.landlordEmail);
-    const hausmeisterName = requiredString(body.hausmeisterName, "Hausmeister name");
+    const hausmeisterGivenName = requiredString(body.hausmeisterGivenName, "Property manager name");
+    const hausmeisterSurname = requiredString(body.hausmeisterSurname, "Property manager surname");
+    const hausmeisterName = combinePersonName(hausmeisterGivenName, hausmeisterSurname);
     const hausmeisterPhone = optionalString(body.hausmeisterPhone);
     const hausmeisterEmail = optionalString(body.hausmeisterEmail);
+    const givenName = requiredString(body.givenName, "Name");
+    const surname = requiredString(body.surname, "Surname");
+    const gender = requiredGender(body.gender);
+    const genderLabel = genderDisplayLabel(gender);
+    const customerDisplayName = [givenName, surname].filter(Boolean).join(" ").trim();
+    const fullName = buildCustomerFullName({ givenName, surname, gender });
     const payload = {
       id: crypto.randomUUID(),
-      contractNumber: requiredString(body.contractNumber, "Contract number"),
-      fullName: requiredString(body.fullName, "Full name"),
+      contractNumber,
+      givenName,
+      surname,
+      gender,
+      genderLabel,
+      customerDisplayName,
+      fullName,
       phone: optionalString(body.phone),
       email: optionalString(body.email),
       clientAddress: requiredString(body.clientAddress, "Client address"),
+      landlordGivenName,
+      landlordSurname,
       landlordName,
       landlordPhone,
       landlordEmail,
+      hausmeisterGivenName,
+      hausmeisterSurname,
       hausmeisterName,
       hausmeisterPhone,
       hausmeisterEmail,
@@ -306,6 +507,11 @@ export async function POST(request) {
       problemDescription: requiredString(body.problemDescription, "Problem description"),
       serialNumber: requiredString(body.serialNumber, "Serial number"),
       requestType: "complaint",
+      attachmentsMeta: attachmentParts.map(({ filename, contentType, size }) => ({
+        filename,
+        contentType,
+        size,
+      })),
     };
 
     if (!payload.phone && !payload.email) {
@@ -315,7 +521,55 @@ export async function POST(request) {
       );
     }
 
-    await prisma.$executeRaw`
+    const attachmentsJson =
+      payload.attachmentsMeta.length > 0 ? JSON.stringify(payload.attachmentsMeta) : null;
+
+    try {
+      await prisma.$executeRaw`
+      INSERT INTO "ServiceClaim" (
+        "id",
+        "contractNumber",
+        "fullName",
+        "phone",
+        "email",
+        "clientAddress",
+        "landlordName",
+        "landlordPhone",
+        "landlordEmail",
+        "hausmeisterName",
+        "hausmeisterPhone",
+        "hausmeisterEmail",
+        "landlordContact",
+        "problemDescription",
+        "serialNumber",
+        "requestType",
+        "attachmentsJson"
+      )
+      VALUES (
+        ${payload.id},
+        ${payload.contractNumber},
+        ${payload.fullName},
+        ${payload.phone || null},
+        ${payload.email || null},
+        ${payload.clientAddress},
+        ${payload.landlordName},
+        ${payload.landlordPhone || null},
+        ${payload.landlordEmail || null},
+        ${payload.hausmeisterName},
+        ${payload.hausmeisterPhone || null},
+        ${payload.hausmeisterEmail || null},
+        ${payload.landlordContact},
+        ${payload.problemDescription},
+        ${payload.serialNumber},
+        ${payload.requestType},
+        ${attachmentsJson}
+      )
+    `;
+    } catch (insertError) {
+      if (!isMissingAttachmentsJsonColumnError(insertError)) {
+        throw insertError;
+      }
+      await prisma.$executeRaw`
       INSERT INTO "ServiceClaim" (
         "id",
         "contractNumber",
@@ -353,9 +607,18 @@ export async function POST(request) {
         ${payload.requestType}
       )
     `;
+    }
+
+    if (attachmentParts.length) {
+      try {
+        await persistServiceClaimAttachments(payload.id, attachmentParts);
+      } catch (persistError) {
+        console.error("Service claim attachment persist error:", persistError);
+      }
+    }
 
     const [emailSent, webhookSent] = await Promise.all([
-      sendComplaintEmail(payload),
+      sendComplaintEmail(payload, attachmentParts),
       postWebhook(payload),
     ]);
 

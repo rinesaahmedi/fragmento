@@ -10,6 +10,7 @@
     "contracts": "Contracts",
     "owners": "Housing companies",
     "orders": "Orders",
+    "claims": "Claims",
     "account": "Account",
     "publicSite": "Public site",
     "manageKitchensCatalogAndOrders": "Manage kitchens, catalog, and orders.",
