@@ -1,6 +1,6 @@
-import { mapAdminMutationError, redirectWithFlash } from "../../../../../../lib/admin-forms";
-import { requireAdminApi } from "../../../../../../lib/auth";
-import { prisma } from "../../../../../../lib/prisma";
+import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
+import { requireAdminApi } from "../../../../../lib/auth";
+import { prisma } from "../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
   await requireAdminApi();
