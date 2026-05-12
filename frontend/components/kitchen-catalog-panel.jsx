@@ -146,6 +146,7 @@ function CatalogItem({
   selected,
   locked,
   disabled,
+  compactIcon,
   price,
   hint,
   infoPdfHref,
@@ -168,6 +169,7 @@ function CatalogItem({
     .join(" ");
   const iconClassName = [
     styles.itemIcon,
+    compactIcon ? styles.itemIconCompact : "",
     item.iconKey === "refrigerator" || item.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
   ]
     .filter(Boolean)
@@ -369,6 +371,7 @@ export default function KitchenCatalogPanel({
                 item={item}
                 selected={selectedAccessoryCodes.includes(item.code)}
                 locked={orderLockedAccessoryCodes.has(item.code)}
+                compactIcon
                 infoPdfHref={getProductInfoHref(item)}
                 onOpenInfo={onOpenProductInfo}
                 productAssistantEnabled={hasAssistantProductInfo(item)}
@@ -396,6 +399,7 @@ export default function KitchenCatalogPanel({
                   selected={selectedServiceCodes.includes(item.code)}
                   locked={orderLockedServiceCodes.has(item.code)}
                   disabled={disabled}
+                  compactIcon
                   infoPdfHref={getProductInfoHref(item)}
                   onOpenInfo={onOpenProductInfo}
                   productAssistantEnabled={hasAssistantProductInfo(item)}

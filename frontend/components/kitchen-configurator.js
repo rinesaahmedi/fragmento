@@ -285,12 +285,66 @@ function isExtractorHoodProductAssistantItem(item) {
     || String(item?.productInfoCode || item?.code || "").toUpperCase().startsWith("HOOD-");
 }
 
+function isWashingMachineProductAssistantItem(item) {
+  const sourceText = [
+    item?.productInfoSummary || "",
+    ...(Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    item?.productInfoExtractedText || "",
+    item?.productAssistantName || "",
+    item?.name || "",
+    item?.articleNumber || "",
+  ].join("\n");
+
+  return /waschmaschine|washing machine|\bEWA34660W\b/i.test(sourceText)
+    || String(item?.productInfoCode || item?.code || "").toUpperCase().startsWith("WM-");
+}
+
+function isRefrigeratorProductAssistantItem(item) {
+  const sourceText = [
+    item?.productInfoSummary || "",
+    ...(Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    item?.productInfoExtractedText || "",
+    item?.productAssistantName || "",
+    item?.name || "",
+    item?.articleNumber || "",
+  ].join("\n");
+
+  return /kuehl|kühl|gefrier|refrigerator|fridge|freezer|\bKGC\s*15495\s*S\b/i.test(sourceText)
+    || String(item?.productInfoCode || item?.code || "").toUpperCase().startsWith("REF-");
+}
+
+function isDishwasherProductAssistantItem(item) {
+  const sourceText = [
+    item?.productInfoSummary || "",
+    ...(Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    item?.productInfoExtractedText || "",
+    item?.productAssistantName || "",
+    item?.name || "",
+    item?.articleNumber || "",
+  ].join("\n");
+
+  return /geschirrspueler|geschirrspüler|dishwasher|\bA-EGSPV597210\b/i.test(sourceText)
+    || String(item?.productInfoCode || item?.code || "").toUpperCase().startsWith("DISH-");
+}
+
 function formatProductAssistantDisplayName(item, translate) {
   if (!item) return "";
 
   if (isExtractorHoodProductAssistantItem(item)) {
     const baseLabel = translate("configurator.productAssistantExtractorHood", "Extractor hood");
     return baseLabel;
+  }
+
+  if (isWashingMachineProductAssistantItem(item)) {
+    return translate("configurator.catalogItemNames.washingMachine", "Washing Machine");
+  }
+
+  if (isRefrigeratorProductAssistantItem(item)) {
+    return translate("configurator.catalogItemNames.refrigerator", "Refrigerator");
+  }
+
+  if (isDishwasherProductAssistantItem(item)) {
+    return translate("configurator.catalogItemNames.dishwasher", "Dishwasher");
   }
 
   return formatProductAssistantOptionName(
@@ -1847,7 +1901,7 @@ function KitchenConfiguratorContent({
                 <div className={styles.productAssistantHeader}>
                   <div className={styles.productAssistantTitleWrap}>
                     <span className={styles.productAssistantHeaderAvatar} aria-hidden="true">
-                      <img src="/img/FIGURA.png" alt="" />
+                      <img src="/img/Untitled%20design%20(5).png" alt="" />
                     </span>
                     <div className={styles.productAssistantTitleBlock}>
                       <h2 id="product-assistant-title">
