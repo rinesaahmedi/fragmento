@@ -5,6 +5,7 @@ import {
   componentIdForItem,
   formatCurrency,
   getCatalogDisplayItem,
+  getLocalizedItemInfoText,
   getLocalizedItemName,
   getProductInfoDocuments,
   getProductInfoHref,
@@ -84,6 +85,8 @@ const TOOLTIP_PREVIEW_BY_CODE = {
   "OVEN-C-600-HOB": "/product-info-previews/oven-hob-preview.png",
 };
 
+const PRODUCT_ASSISTANT_AVATAR_SRC = "/img/Untitled%20design%20(5).png";
+
 function localizeProductInfoDocumentLabel(label, translate) {
   const normalized = String(label || "").trim().toLowerCase();
 
@@ -153,12 +156,19 @@ function CatalogItem({
 }) {
   const { translate } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate);
+  const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitItemNameAndDimensions(itemName);
   const className = [
     styles.itemCard,
     selected ? styles.itemCardSelected : "",
     locked ? styles.itemCardLocked : "",
     disabled ? styles.itemCardLocked : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const iconClassName = [
+    styles.itemIcon,
+    item.iconKey === "refrigerator" || item.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -192,13 +202,17 @@ function CatalogItem({
       onKeyDown={handleCardKeyDown}
     >
       <div className={styles.itemTop}>
-        <span className={styles.itemIcon} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
+        <span className={iconClassName} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
         <div className={styles.itemText}>
           <strong>{itemDisplayName.title}</strong>
           {itemDisplayName.dimensions ? <span className={styles.itemDimensions}>{itemDisplayName.dimensions}</span> : null}
           {item.code ? <span className={styles.itemCode}>{translate("common.code", "Code")}: {item.code}</span> : null}
-          {item.linkedInfoBadge ? <span className={styles.itemLinkedBadge}>{item.linkedInfoBadge}</span> : null}
-          {item.infoText ? <p>{item.infoText}</p> : null}
+          {item.linkedInfoBadge ? (
+            <span className={styles.itemLinkedBadge}>
+              {translate("configurator.catalogItemInfo.includesExtractorHood", item.linkedInfoBadge)}
+            </span>
+          ) : null}
+          {itemInfoText ? <p>{itemInfoText}</p> : null}
         </div>
         <span className={styles.itemPrice}>{formatCurrency(price ?? item.price)}</span>
       </div>
@@ -224,7 +238,7 @@ function CatalogItem({
                     aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemDisplayName.title })}
                     onClick={(event) => {
                       event.stopPropagation();
-                      onOpenInfo?.({ item: { ...item, name: itemDisplayName.title, productInfoDocuments }, price, infoPdfHref });
+                      onOpenInfo?.({ item: { ...item, name: itemDisplayName.title, infoText: itemInfoText, productInfoDocuments }, price, infoPdfHref });
                     }}
                   >
                     i
@@ -240,7 +254,7 @@ function CatalogItem({
                       </span>
                     ) : null}
                     <span className={styles.itemInfoTooltipBody}>
-                      {item.infoText ? <strong>{item.infoText}</strong> : null}
+                      {itemInfoText ? <strong>{itemInfoText}</strong> : null}
                       {tooltipDocumentLabels.length ? (
                         <span className={styles.itemInfoTooltipDocs}>
                           {tooltipDocumentLabels.map((label) => (
@@ -263,6 +277,7 @@ function CatalogItem({
               ) : null}
               {productAssistantEnabled && onOpenProductAssistant ? (
                 <span className={styles.itemAssistantWrap}>
+                  <span className={styles.itemAssistantPromptCloud} aria-hidden="true" />
                   <button
                     type="button"
                     className={styles.itemAssistantTrigger}
@@ -272,18 +287,8 @@ function CatalogItem({
                       onOpenProductAssistant({ ...item, name: productAssistantPublicName, productInfoDocuments });
                     }}
                   >
-                    <img src="/img/FIGURA.png" alt="" />
+                    <img src={PRODUCT_ASSISTANT_AVATAR_SRC} alt="" />
                   </button>
-                  <span className={styles.itemInfoTooltip} role="tooltip">
-                    <span className={styles.itemInfoTooltipBody}>
-                      {item.assistantHoverExtractorHoodOnly
-                        ? translate(
-                          "configurator.productAssistantItemHoverPromptExtractorHoodOnly",
-                          "Ask me something about the extractor hood.",
-                        )
-                        : translate("configurator.productAssistantItemHoverPrompt", "Ask me something about {name}.", { name: itemDisplayName.title })}
-                    </span>
-                  </span>
                 </span>
               ) : null}
             </span>

@@ -604,6 +604,26 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
   const items = Array.from(itemsById.values());
   if (!items.length) return [];
 
+  const itemOptions = [];
+  for (const item of items) {
+    const itemId = item.productInfoItemId || item.id;
+    const splitOptions = buildSplitProductAssistantOptions(item, itemId, translate);
+    if (splitOptions.length) {
+      itemOptions.push(...splitOptions);
+      continue;
+    }
+
+    const itemLabel = formatProductAssistantDisplayName(item, translate);
+    itemOptions.push({
+      key: `item-${itemId}`,
+      label: itemLabel,
+      shortLabel: itemLabel,
+      itemIds: [itemId],
+      type: "item",
+      contextItems: [buildProductAssistantContextItem(item)],
+    });
+  }
+
   const options = [];
   const activeItemId = activeProductInfo?.productInfoItemId;
   options.push({
@@ -611,6 +631,7 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
     label: translate("configurator.productAssistantAllProducts", "All products"),
     shortLabel: translate("configurator.productAssistantAllProducts", "All products"),
     itemIds: items.map((item) => item.productInfoItemId || item.id).filter(Boolean),
+    contextItems: itemOptions.flatMap((option) => option.contextItems || []),
     type: "all",
   });
 
@@ -632,24 +653,7 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
     });
   }
 
-  for (const item of items) {
-    const itemId = item.productInfoItemId || item.id;
-    const splitOptions = buildSplitProductAssistantOptions(item, itemId, translate);
-    if (splitOptions.length) {
-      options.push(...splitOptions);
-      continue;
-    }
-
-    const itemLabel = formatProductAssistantDisplayName(item, translate);
-    options.push({
-      key: `item-${itemId}`,
-      label: itemLabel,
-      shortLabel: itemLabel,
-      itemIds: [itemId],
-      type: "item",
-      contextItems: [buildProductAssistantContextItem(item)],
-    });
-  }
+  options.push(...itemOptions);
 
   return options;
 }
@@ -899,7 +903,12 @@ function KitchenConfiguratorContent({
   const [productInfoQuestion, setProductInfoQuestion] = useState("");
   const [productInfoIsLoading, setProductInfoIsLoading] = useState(false);
   const [productInfoError, setProductInfoError] = useState("");
+  const [isProductAssistantVoiceSupported, setIsProductAssistantVoiceSupported] = useState(false);
+  const [isProductAssistantListening, setIsProductAssistantListening] = useState(false);
+  const [productAssistantVoiceError, setProductAssistantVoiceError] = useState("");
   const productAssistantSkipOptionsResetRef = useRef(false);
+  const productAssistantRecognitionRef = useRef(null);
+  const productAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
   );
@@ -1003,6 +1012,25 @@ function KitchenConfiguratorContent({
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [isProductAssistantOpen]);
+
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    setIsProductAssistantVoiceSupported(Boolean(SpeechRecognition && window.speechSynthesis));
+
+    const stopProductAssistantVoice = () => {
+      productAssistantRecognitionRef.current?.abort?.();
+      window.speechSynthesis?.cancel?.();
+    };
+
+    window.addEventListener("beforeunload", stopProductAssistantVoice);
+    window.addEventListener("pagehide", stopProductAssistantVoice);
+
+    return () => {
+      stopProductAssistantVoice();
+      window.removeEventListener("beforeunload", stopProductAssistantVoice);
+      window.removeEventListener("pagehide", stopProductAssistantVoice);
+    };
+  }, []);
 
   const selectedComponents = kitchenConfig.components
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
@@ -1268,6 +1296,8 @@ function KitchenConfiguratorContent({
   }
 
   function resetProductAssistantContext(option = null) {
+    productAssistantRecognitionRef.current?.abort?.();
+    window.speechSynthesis?.cancel?.();
     setSelectedProductAssistantContext(option);
     setProductAssistantMessages(
       option
@@ -1283,6 +1313,8 @@ function KitchenConfiguratorContent({
     );
     setProductInfoQuestion("");
     setProductInfoError("");
+    setProductAssistantVoiceError("");
+    setIsProductAssistantListening(false);
     setProductInfoIsLoading(false);
   }
 
@@ -1318,9 +1350,34 @@ function KitchenConfiguratorContent({
     setIsProductAssistantOpen(true);
   }
 
-  async function handleProductInfoQuestionSubmit(event) {
-    event.preventDefault();
-    const question = productInfoQuestion.trim();
+  function getProductAssistantSpeechLanguage() {
+    return language === "de" ? "de-DE" : "en-US";
+  }
+
+  function formatProductAssistantSpokenText(text) {
+    return String(text || "")
+      .replace(/\((?:[^)]*\b[A-Z]{2,}[-\s]?[A-Z0-9]{2,}[^)]*|\b[A-Z0-9]{3,}[-\s]?[A-Z0-9]{2,}[^)]*)\)/g, "")
+      .replace(/\b[A-Z]{2,}[-\s]?[A-Z0-9]{3,}(?:[-\s]?[A-Z0-9]{1,})*\b/g, "")
+      .replace(/\b[A-Z]-[A-Z0-9]{4,}\b/g, "")
+      .replace(/\s+([,.;:!?])/g, "$1")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function speakProductAssistantAnswer(text) {
+    const answer = formatProductAssistantSpokenText(text);
+    if (!answer || !window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(answer);
+    utterance.lang = getProductAssistantSpeechLanguage();
+    utterance.rate = 0.96;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  async function submitProductInfoQuestion(rawQuestion, options = {}) {
+    const question = String(rawQuestion || "").trim();
     if (!question || productInfoIsLoading) return;
     if (!selectedProductAssistantContext?.itemIds?.length) return;
 
@@ -1358,13 +1415,17 @@ function KitchenConfiguratorContent({
         throw new Error(payload.error || translate("configurator.productAssistantErrorUnavailable", "The product question could not be answered."));
       }
 
+      const answer = payload.answer || translate("configurator.productAssistantNoInfo", "No product information is available yet.");
       setProductAssistantMessages((current) => [
         ...current,
         {
           role: "assistant",
-          text: payload.answer || translate("configurator.productAssistantNoInfo", "No product information is available yet."),
+          text: answer,
         },
       ]);
+      if (options.speakAnswer) {
+        speakProductAssistantAnswer(answer);
+      }
     } catch (error) {
       const nextError =
         error?.name === "AbortError"
@@ -1378,6 +1439,93 @@ function KitchenConfiguratorContent({
       window.clearTimeout(timeout);
       setProductInfoIsLoading(false);
     }
+  }
+
+  async function handleProductInfoQuestionSubmit(event) {
+    event.preventDefault();
+    if (isProductAssistantListening) {
+      productAssistantRecognitionRef.current?.stop?.();
+      return;
+    }
+    const question = productInfoQuestion.trim();
+    const lastVoiceSubmit = productAssistantLastVoiceSubmitRef.current;
+    if (
+      question
+      && lastVoiceSubmit.text === question
+      && Date.now() - lastVoiceSubmit.submittedAt < 4000
+    ) {
+      setProductInfoQuestion("");
+      return;
+    }
+    await submitProductInfoQuestion(productInfoQuestion);
+  }
+
+  function toggleProductAssistantVoice() {
+    if (isProductAssistantListening) {
+      productAssistantRecognitionRef.current?.stop?.();
+      setIsProductAssistantListening(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition || !window.speechSynthesis) {
+      setProductAssistantVoiceError(
+        translate("configurator.productAssistantVoiceUnsupported", "Voice chat is not supported in this browser."),
+      );
+      return;
+    }
+
+    if (!selectedProductAssistantContext || productInfoIsLoading || !hasProductAssistantOptions) return;
+
+    window.speechSynthesis.cancel();
+    const recognition = new SpeechRecognition();
+    productAssistantRecognitionRef.current = recognition;
+    recognition.lang = getProductAssistantSpeechLanguage();
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setProductAssistantVoiceError("");
+      setIsProductAssistantListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      let transcript = "";
+      let isFinal = false;
+
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        transcript += event.results[index][0]?.transcript || "";
+        if (event.results[index].isFinal) {
+          isFinal = true;
+        }
+      }
+
+      const nextQuestion = transcript.trim();
+      if (!nextQuestion) return;
+      setProductInfoQuestion(nextQuestion);
+      if (isFinal) {
+        recognition.stop();
+        productAssistantLastVoiceSubmitRef.current = { text: nextQuestion, submittedAt: Date.now() };
+        setProductInfoQuestion("");
+        submitProductInfoQuestion(nextQuestion, { speakAnswer: true });
+      }
+    };
+
+    recognition.onerror = (event) => {
+      const message =
+        event?.error === "not-allowed"
+          ? translate("configurator.productAssistantVoicePermission", "Microphone permission is needed to use voice chat.")
+          : translate("configurator.productAssistantVoiceError", "Voice input could not be started.");
+      setProductAssistantVoiceError(message);
+      setIsProductAssistantListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsProductAssistantListening(false);
+    };
+
+    recognition.start();
   }
 
   async function handleSubmit(event) {
@@ -1701,7 +1849,7 @@ function KitchenConfiguratorContent({
                     <span className={styles.productAssistantHeaderAvatar} aria-hidden="true">
                       <img src="/img/FIGURA.png" alt="" />
                     </span>
-                    <div>
+                    <div className={styles.productAssistantTitleBlock}>
                       <h2 id="product-assistant-title">
                         {selectedProductAssistantContext && selectedProductAssistantContext.type !== "all"
                           ? translate("configurator.productAssistantItemAgentTitle", "{name} Agent", {
@@ -1709,6 +1857,11 @@ function KitchenConfiguratorContent({
                           })
                           : translate("configurator.productAssistantTitle", "Product Agent")}
                       </h2>
+                      {hasProductAssistantOptions ? (
+                        <div className={styles.productAssistantSectionLabel}>
+                          {translate("configurator.productAssistantContextTitle", "Choose a product")}
+                        </div>
+                      ) : null}
                     </div>
                   </div>
                   <div className={styles.productAssistantHeaderActions}>
@@ -1725,11 +1878,6 @@ function KitchenConfiguratorContent({
 
                 {hasProductAssistantOptions ? (
                   <div className={styles.productAssistantContextSection}>
-                    <div className={styles.productAssistantContextHeader}>
-                      <div className={styles.productAssistantSectionLabel}>
-                        {translate("configurator.productAssistantContextTitle", "Choose a product")}
-                      </div>
-                    </div>
                     <div className={styles.productAssistantContextOptions}>
                       {productAssistantContextOptions.map((option) => (
                         <button
@@ -1797,10 +1945,45 @@ function KitchenConfiguratorContent({
                     disabled={!selectedProductAssistantContext || productInfoIsLoading || !hasProductAssistantOptions}
                   />
                   <button
+                    type="button"
+                    className={[
+                      styles.productAssistantVoiceButton,
+                      isProductAssistantListening ? styles.productAssistantVoiceButtonActive : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                    aria-label={
+                      isProductAssistantListening
+                        ? translate("configurator.productAssistantVoiceStop", "Stop listening")
+                        : translate("configurator.productAssistantVoiceStart", "Start voice chat")
+                    }
+                    aria-pressed={isProductAssistantListening}
+                    title={
+                      isProductAssistantListening
+                        ? translate("configurator.productAssistantVoiceListening", "Listening...")
+                        : translate("configurator.productAssistantVoiceStart", "Start voice chat")
+                    }
+                    onClick={toggleProductAssistantVoice}
+                    disabled={
+                      !isProductAssistantVoiceSupported
+                      || productInfoIsLoading
+                      || !selectedProductAssistantContext
+                      || !hasProductAssistantOptions
+                    }
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M12 14.5a3 3 0 0 0 3-3v-5a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z" />
+                      <path d="M18.5 11.5a6.5 6.5 0 0 1-13 0" />
+                      <path d="M12 18v3" />
+                      <path d="M9 21h6" />
+                    </svg>
+                  </button>
+                  <button
                     type="submit"
                     disabled={
                       !productInfoQuestion.trim()
                       || productInfoIsLoading
+                      || isProductAssistantListening
                       || !selectedProductAssistantContext
                       || !hasProductAssistantOptions
                     }
@@ -1808,6 +1991,11 @@ function KitchenConfiguratorContent({
                     {translate("configurator.productAssistantSend", "Send")}
                   </button>
                 </form>
+                {isProductAssistantListening || productAssistantVoiceError ? (
+                  <div className={styles.productAssistantVoiceStatus} role={productAssistantVoiceError ? "alert" : "status"}>
+                    {productAssistantVoiceError || translate("configurator.productAssistantVoiceListening", "Listening...")}
+                  </div>
+                ) : null}
               </div>
             ) : null}
 
@@ -1825,10 +2013,10 @@ function KitchenConfiguratorContent({
               }}
             >
               <span className={styles.productAssistantLauncherBubble}>
-                {translate("configurator.productAssistantLauncherPrompt", "Ask me something")}
+                {translate("configurator.productAssistantLauncherPrompt", "Ask me")}
               </span>
               <span className={styles.productAssistantLauncherAvatar} aria-hidden="true">
-                <img src="/img/FIGURA.png" alt="" />
+                <img src="/img/Untitled%20design%20(4).png" alt="" />
               </span>
             </button>
           </div>

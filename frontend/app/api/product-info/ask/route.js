@@ -33,6 +33,9 @@ const FAILED_ERROR_BY_LANGUAGE = {
   en: "The product question could not be answered.",
 };
 
+const DEFAULT_WARRANTY_FACT = "Warranty: 24-month (2-year)";
+const WARRANTY_QUESTION_PATTERN = /\b(warranty|warranties|guarantee|guarantees|garantie|garantien)\b/i;
+
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
 const MAX_CONVERSATION_MESSAGES = 6;
@@ -58,6 +61,16 @@ function normalizeItemIds(value) {
 function normalizeFacts(value) {
   if (!Array.isArray(value)) return [];
   return value.map((fact) => String(fact || "").trim()).filter(Boolean);
+}
+
+function withDefaultWarrantyFact(item) {
+  const facts = normalizeFacts(item?.productInfoKeyFacts);
+  const hasWarrantyFact = facts.some((fact) => /^(warranty|garantie)\s*:/i.test(fact));
+
+  return {
+    ...item,
+    productInfoKeyFacts: hasWarrantyFact ? facts : [...facts, DEFAULT_WARRANTY_FACT],
+  };
 }
 
 function normalizeContextItems(value) {
@@ -121,22 +134,40 @@ function sanitizeProductContextName(value) {
     .trim();
 }
 
+function truncateProductContextText(value, maxLength) {
+  const text = String(value || "").trim();
+  if (!text || text.length <= maxLength) return text;
+
+  return `${text.slice(0, Math.max(0, maxLength)).trim()}\n[PDF text shortened]`;
+}
+
 function buildProductContext(items) {
-  return items
+  const usableItems = Array.isArray(items) ? items : [];
+  const perItemTextLimit = usableItems.length > 1
+    ? Math.max(900, Math.floor(MAX_CONTEXT_CHARS / usableItems.length) - 650)
+    : MAX_CONTEXT_CHARS;
+
+  const context = usableItems
     .map((item, index) => {
       const facts = normalizeFacts(item.productInfoKeyFacts).map(normalizePublicProductBrand);
+      const pdfText = truncateProductContextText(
+        normalizePublicProductBrand(item.productInfoExtractedText),
+        perItemTextLimit,
+      );
+
       return [
         `Produkt ${index + 1}: ${normalizePublicProductBrand(sanitizeProductContextName(item.name))}`,
         item.code ? `Code: ${item.code}` : "",
         item.productInfoSummary ? `Kurzfassung: ${normalizePublicProductBrand(item.productInfoSummary)}` : "",
         facts.length ? `Wichtige Punkte:\n${facts.map((fact) => `- ${fact}`).join("\n")}` : "",
-        item.productInfoExtractedText ? `PDF-Text:\n${normalizePublicProductBrand(item.productInfoExtractedText)}` : "",
+        pdfText ? `PDF-Text:\n${pdfText}` : "",
       ]
         .filter(Boolean)
         .join("\n");
     })
-    .join("\n\n---\n\n")
-    .slice(0, MAX_CONTEXT_CHARS);
+    .join("\n\n---\n\n");
+
+  return context.length <= MAX_CONTEXT_CHARS ? context : context.slice(0, MAX_CONTEXT_CHARS);
 }
 
 function hasUsableProductInfo(item) {
@@ -153,6 +184,10 @@ function getFactValue(item, labelPattern) {
 
   const parts = fact.split(":");
   return parts.length > 1 ? parts.slice(1).join(":").trim() : fact.trim();
+}
+
+function getWarrantyValue(item) {
+  return getFactValue(item, /^(warranty|garantie)\s*:/i) || "24-month (2-year)";
 }
 
 function getEnergyClassValue(item) {
@@ -302,6 +337,88 @@ function getPublicItemName(item, language) {
   return sanitizeProductContextName(item?.name || item?.code || (language === "de" ? "Das Produkt" : "The product"));
 }
 
+function getModelAnswerItemName(item, language) {
+  const explicitModel = extractKnownModel(item);
+  const rawName = sanitizeProductContextName(item?.name || "");
+  const sourceText = getCombinedItemInfoText(item);
+
+  if (/\bEBX\b/i.test(explicitModel) || /\boven\b|backofen/i.test(rawName)) {
+    return language === "de"
+      ? "Backofen"
+      : "Built-in oven";
+  }
+
+  if (/\bOL-KMI\b/i.test(explicitModel) || /\bhob\b|kochfeld/i.test(rawName)) {
+    return language === "de"
+      ? "Kochfeld"
+      : "Hob";
+  }
+
+  if (/\bEWA\b/i.test(explicitModel) || /washing machine|waschmaschine/i.test(rawName)) {
+    return language === "de"
+      ? "Waschmaschine"
+      : "Washing machine";
+  }
+
+  if (/\bA-EGSPV\b/i.test(explicitModel) || /dishwasher|geschirrsp/i.test(rawName)) {
+    return language === "de"
+      ? "Geschirrspueler"
+      : "Dishwasher";
+  }
+
+  if (/\bKGC\b/i.test(explicitModel) || /refrigerator|fridge|kuehl|kÃƒÂ¼hl|gefrier/i.test(rawName)) {
+    return language === "de"
+      ? "Kuehl-Gefrierkombination"
+      : "Refrigerator";
+  }
+
+  if (/\b(?:FH|KHF)\b/i.test(explicitModel) || isExtractorHoodItem(item)) {
+    return language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+  }
+
+  if (/washing machine|waschmaschine/i.test(sourceText) || /washing machine|waschmaschine/i.test(rawName)) {
+    return language === "de"
+      ? "Waschmaschine"
+      : "Washing machine";
+  }
+
+  if (/dishwasher|geschirrsp/i.test(sourceText) || /dishwasher|geschirrsp/i.test(rawName)) {
+    return language === "de"
+      ? "Geschirrspueler"
+      : "Dishwasher";
+  }
+
+  if (/refrigerator|fridge|kuehl|kÃ¼hl|gefrier/i.test(sourceText) || /refrigerator|fridge|kuehl|kÃ¼hl|gefrier/i.test(rawName)) {
+    return language === "de"
+      ? "Kuehl-Gefrierkombination"
+      : "Refrigerator";
+  }
+
+  if (isExtractorHoodItem(item)) {
+    return language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+  }
+
+  if (/\bhob\b|kochfeld/i.test(sourceText) || /\bhob\b|kochfeld/i.test(rawName)) {
+    return language === "de" ? "Kochfeld" : "Hob";
+  }
+
+  if (/\boven\b|backofen/i.test(sourceText) || /\boven\b|backofen/i.test(rawName)) {
+    return language === "de" ? "Backofen" : "Built-in oven";
+  }
+
+  if (explicitModel) {
+    return language === "de" ? "Produkt" : "Product";
+  }
+
+  return getPublicItemName(item, language);
+}
+
+function getWarrantyAnswerItemName(item, language) {
+  const typeLabel = getModelAnswerItemName(item, language);
+  const model = extractKnownModel(item);
+  return model ? `${typeLabel} (${model})` : typeLabel;
+}
+
 function isExtractorHoodItem(item) {
   const sourceText = getCombinedItemInfoText(item);
   return /flachschirmhaube|teleskophaube|kaminhaube|chimney hood|extractor hood/i.test(sourceText)
@@ -443,6 +560,23 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
   const value = String(question || "").toLowerCase();
   const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
 
+  if (WARRANTY_QUESTION_PATTERN.test(value)) {
+    const entries = items
+      .map((item) => `${getWarrantyAnswerItemName(item, language)}: ${getWarrantyValue(item)}`)
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? `Die dokumentierte Garantie fuer die ausgewaehlten Produkte ist:\n- ${entries.join("\n- ")}`
+        : `The documented warranty for the selected products is:\n- ${entries.join("\n- ")}`,
+      found: true,
+    };
+  }
+
   if (/(noise|geraeusch|geräusch|db\b|dba\b)/i.test(value)) {
     const entries = items
       .map((item) => {
@@ -517,6 +651,41 @@ function extractKnownModel(item) {
   if (!productNameLine) return "";
 
   return productNameLine.replace(/^(produktname|product name|modell|model):\s*/i, "").trim();
+}
+
+function answerFromExplicitMultiItemModels(question, items, language) {
+  if (!Array.isArray(items) || items.length < 2) return null;
+
+  const value = String(question || "").toLowerCase();
+  if (!/(all|alle|list|show|send|which|welche|what)\b/.test(value) && !/\bmodels?\b|\bmodell(?:e)?\b/.test(value)) {
+    return null;
+  }
+
+  if (!/\bmodels?\b|\bmodell(?:e)?\b|\bproduct names?\b|\bprodukt(?:e|namen)?\b/.test(value)) {
+    return null;
+  }
+
+  const entries = items
+    .map((item) => {
+      const model = extractKnownModel(item);
+      if (!model) return null;
+      return `- ${getModelAnswerItemName(item, language)}: ${model}`;
+    })
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return {
+      answer: NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  return {
+    answer: language === "de"
+      ? `Hier sind alle Modelle aus den verfuegbaren Produktinformationen:\n${entries.join("\n")}`
+      : `Here are all the models listed in the available product information:\n${entries.join("\n")}`,
+    found: true,
+  };
 }
 
 function answerFromStructuredFacts(question, items, language) {
@@ -607,6 +776,16 @@ function answerFromStructuredFacts(question, items, language) {
         found: true,
       };
     }
+  }
+
+  if (WARRANTY_QUESTION_PATTERN.test(value)) {
+    const warranty = getWarrantyValue(item);
+    return {
+      answer: language === "de"
+        ? `Die Garantie betraegt ${warranty}.`
+        : `The warranty is ${warranty}.`,
+      found: true,
+    };
   }
 
   return null;
@@ -719,9 +898,16 @@ export async function POST(request) {
         orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       });
 
-    const usableContextItems = items.filter(hasUsableProductInfo);
+    const usableContextItems = items
+      .map(withDefaultWarrantyFact)
+      .filter(hasUsableProductInfo);
     if (!usableContextItems.length) {
       return NextResponse.json({ answer: noInfoAnswer, found: false });
+    }
+
+    const multiItemModelAnswer = answerFromExplicitMultiItemModels(question, usableContextItems, responseLanguage);
+    if (multiItemModelAnswer) {
+      return NextResponse.json(multiItemModelAnswer);
     }
 
     const multiItemEnergyAnswer = answerFromExplicitMultiItemEnergyFacts(question, usableContextItems, responseLanguage);

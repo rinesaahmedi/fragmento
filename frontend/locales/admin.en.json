@@ -25,7 +25,10 @@
     "signIn": "Sign in",
     "language": "Language",
     "english": "English",
-    "german": "Deutsch"
+    "german": "Deutsch",
+    "mobileAdminNavigation": "Mobile admin navigation",
+    "sidebar": "Sidebar",
+    "poweredBy": "Powered by"
   },
   "accountAdmin": {
     "account": "Account",
@@ -565,5 +568,41 @@
     "confirmingAndSendingEmail": "Confirming and sending email...",
     "resendingEmail": "Resending email...",
     "retryingWebhook": "Retrying webhook..."
+  },
+  "claimsAdmin": {
+    "claims": "Claims",
+    "claimsMatchCurrentFilters": "claim(s) match the current filters.",
+    "filterClaimsByContractNameContactIssueAndDate": "Filter claims by contract, name, contact info, issue text, and date.",
+    "searchPlaceholder": "Contract, name, phone, email, issue...",
+    "requestType": "Request type",
+    "allRequestTypes": "All request types",
+    "complaint": "Complaint",
+    "contractNumber": "Contract",
+    "customer": "Customer",
+    "contact": "Contact",
+    "serialNumber": "Serial number",
+    "issue": "Issue",
+    "created": "Created",
+    "noClaimsFound": "No claims found.",
+    "noContactProvided": "No contact provided",
+    "claimNotFound": "Claim not found",
+    "requestedClaimDoesNotExist": "The requested claim does not exist.",
+    "backToClaims": "Back to claims",
+    "claimDetailDescription": "Complaint request details from the service form.",
+    "clientAddress": "Client address",
+    "requestDetails": "Request details",
+    "landlord": "Landlord",
+    "hausmeister": "Hausmeister",
+    "phone": "Phone",
+    "email": "Email",
+    "uploadedFiles": "Uploaded files",
+    "uploadedFilesEmailNote": "Original files are also attached to the notification email when SMTP is configured.",
+    "noUploadedFiles": "No files were uploaded with this claim.",
+    "viewAttachment": "View",
+    "downloadAttachment": "Download",
+    "closePreview": "Close preview",
+    "previewLoading": "Loading...",
+    "previewLoadFailed": "Could not load this file. Try Download instead.",
+    "previewNotAvailable": "No in-page preview for this file type. Use Download to open it."
   }
 }

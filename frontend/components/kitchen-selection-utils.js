@@ -63,13 +63,129 @@ export function selectedMap(items, codes) {
 
 export function getLocalizedItemName(item, translate) {
   const code = String(item?.code || "").trim().toUpperCase();
+  const rawName = String(item?.name || "").trim();
+  const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
+  const withRawDimensions = (label) => rawDimensions ? `${label} (${rawDimensions})` : label;
+
+  if (rawName === "Sink and Worktop") {
+    return translate("configurator.catalogItemNames.sinkAndWorktop", "Sink and Worktop");
+  }
 
   switch (code) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
-      return translate("configurator.itemNameOvenHob", "Built-in Oven and Hob");
+      return withRawDimensions(translate("configurator.itemNameOvenHob", "Built-in Oven and Hob"));
+    case "CAB-WALL-B-L-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
+    case "CAB-WALL-B-ML-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"));
+    case "CAB-WALL-B-MR-600":
+      return withRawDimensions(rawName.includes("+")
+        ? translate("configurator.catalogItemNames.wallCabinetMidRightExtractorHood", "Wall Cabinet mid-right + Extractor Hood")
+        : translate("configurator.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"));
+    case "CAB-WALL-B-R-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
+    case "CAB-HOOD-B-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"));
+    case "CAB-WALL-C-L-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
+    case "CAB-WALL-C-ML-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"));
+    case "CAB-WALL-C-MR-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"));
+    case "CAB-WALL-C-R-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
+    case "HOOD-B-FH664621E":
+      return translate("configurator.catalogItemNames.extractorHood", "Extractor Hood");
+    case "HOOD-C-FH664621E":
+      return translate("configurator.catalogItemNames.chimneyExtractorHood", "Chimney Extractor Hood");
+    case "LIGHT-B-LED-001":
+    case "LIGHT-C-LED-001":
+      return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
+    case "WM-B-EWA34660W":
+    case "WM-C-EWA34660W":
+      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing Machine"));
+    case "SINKBASE-B-600":
+    case "SINKBASE-C-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
+    case "DISH-B-600-STD":
+    case "DISH-C-600-STD":
+    case "DISH-600-STD":
+      return withRawDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+    case "TOP-B-3036":
+    case "TOP-C-4000":
+      return withRawDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
+    case "CAB-BASE-B-STR":
+      return withRawDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
+    case "REF-B-545-1800-700":
+    case "REF-C-545-1800-700":
+    case "REF-545-1800-700":
+      return withRawDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
+    case "SINK-B-BOTTON-45":
+    case "SINK-C-BOTTON-45":
+      return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
+    case "ACC-CUTLERY-ZB60SG":
+      return translate("configurator.catalogItemNames.cutleryInsert60", "Cutlery insert ZB60SG");
+    case "CAB-COOK-C-L-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"));
+    case "CAB-COOK-C-R-600":
+      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"));
+    case "CAB-DRAWER-C-3D":
+      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
     default:
-      return item?.name || "";
+      return rawName;
+  }
+}
+
+export function getLocalizedItemInfoText(item, translate) {
+  const code = String(item?.code || "").trim().toUpperCase();
+
+  switch (code) {
+    case "CAB-WALL-B-L-600":
+    case "CAB-WALL-B-ML-600":
+    case "CAB-WALL-B-MR-600":
+    case "CAB-WALL-B-R-600":
+    case "CAB-WALL-C-L-600":
+    case "CAB-WALL-C-ML-600":
+    case "CAB-WALL-C-MR-600":
+    case "CAB-WALL-C-R-600":
+      return translate("configurator.catalogItemInfo.adjustableShelves", "H6002, 2 adjustable shelves");
+    case "CAB-HOOD-B-600":
+      return translate("configurator.catalogItemInfo.lightHoodSetup", "HD6002, light hood setup");
+    case "HOOD-B-FH664621E":
+      return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
+    case "HOOD-C-FH664621E":
+      return translate("configurator.catalogItemInfo.chimneyHood", "Chimney hood, 60 cm");
+    case "LIGHT-B-LED-001":
+    case "LIGHT-C-LED-001":
+      return translate("configurator.catalogItemInfo.ledLightingSet", "LED lighting set");
+    case "WM-B-EWA34660W":
+    case "WM-C-EWA34660W":
+      return translate("configurator.catalogItemInfo.washingMachine", "Washing machine, 8 kg, 1400 rpm");
+    case "SINKBASE-B-600":
+    case "SINKBASE-C-600":
+      return translate("configurator.catalogItemInfo.bottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
+    case "DISH-B-600-STD":
+    case "DISH-C-600-STD":
+      return translate("configurator.catalogItemInfo.integratedDishwasher", "Fully integrated dishwasher, 60 cm");
+    case "TOP-B-3036":
+    case "TOP-C-4000":
+      return translate("configurator.catalogItemInfo.concreteSlateGray", "PLS, concrete slate gray");
+    case "OVEN-B-600-HOB":
+    case "OVEN-C-600-HOB":
+      return translate("configurator.catalogItemInfo.ovenInductionHob", "Built-in oven + induction hob");
+    case "CAB-BASE-B-STR":
+      return translate("configurator.catalogItemInfo.strBaseStorageCabinet", "STR base storage cabinet");
+    case "REF-B-545-1800-700":
+    case "REF-C-545-1800-700":
+      return translate("configurator.catalogItemInfo.fridgeFreezerNoFrost", "Fridge-freezer, 180 cm, NoFrost");
+    case "SINK-B-BOTTON-45":
+    case "SINK-C-BOTTON-45":
+      return translate("configurator.catalogItemInfo.manualWasteSystem", "Blanco Botton Pro 45/2 manual waste system");
+    case "ACC-CUTLERY-ZB60SG":
+      return translate("configurator.catalogItemInfo.cutleryInsert60", "Cutlery insert for 60 cm cabinet");
+    default:
+      return item?.infoText || "";
   }
 }
 

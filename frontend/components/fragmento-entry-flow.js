@@ -381,7 +381,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
                   </button>
                 ))}
               </div>
-              <div style={languageFooterStyle}>
+              <div className="fragmento-entry-language-footer" style={languageFooterStyle}>
                 <img src="/img/FIGURA.png" alt="" aria-hidden="true" style={languageFigureStyle} />
               </div>
             </div>
@@ -518,11 +518,13 @@ const centerWrapStyle = {
   minHeight: "100vh",
   display: "grid",
   placeItems: "center",
-  padding: "28px",
+  width: "100%",
+  padding: "28px 16px",
 };
 
 const panelStyle = {
-  width: "min(92vw, 720px)",
+  width: "100%",
+  maxWidth: 720,
   minHeight: 480,
   position: "relative",
   background: "linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(252, 246, 238, 0.95) 100%)",
@@ -545,8 +547,8 @@ const adminLinkStyle = {
 const logoWrapStyle = {
   display: "grid",
   placeItems: "center",
-  marginTop: -18,
-  marginBottom: -26,
+  marginTop: 0,
+  marginBottom: 8,
 };
 
 const logoStyle = {
@@ -563,14 +565,12 @@ const contentAreaStyle = {
 };
 
 const headlineStyle = {
-  margin: "-18px 0 8px",
+  margin: "0 0 16px",
   textAlign: "center",
   fontSize: "clamp(18px, 2.2vw, 24px)",
   fontWeight: 800,
   color: "#372f29",
   letterSpacing: "0.2px",
-  position: "relative",
-  top: -50,
 };
 
 const subheadlineStyle = {
@@ -584,9 +584,7 @@ const languageGridStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(auto-fit, minmax(185px, 1fr))",
   gap: 12,
-  marginTop: 2,
-  position: "relative",
-  top: -40,
+  marginTop: 0,
 };
 
 const optionButtonStyle = {
@@ -805,11 +803,9 @@ const languageFooterStyle = {
   display: "flex",
   flexDirection: "column",
   alignItems: "flex-end",
-  marginTop: "auto",
+  marginTop: 16,
   gap: 8,
   width: "100%",
-  position: "relative",
-  top: -20,
 };
 
 const languageFigureStyle = {
@@ -833,6 +829,10 @@ const responsivePanelMedia = `
       grid-template-columns: 1fr !important;
     }
 
+    .fragmento-entry-language-footer {
+      margin-top: 12px !important;
+    }
+
     .fragmento-entry-figure--text,
     .fragmento-entry-figure--contract {
       top: 18px !important;
@@ -840,10 +840,6 @@ const responsivePanelMedia = `
       right: auto !important;
       bottom: auto !important;
       width: 54px !important;
-    }
-
-    .fragmento-entry-language-footer {
-      top: 0 !important;
     }
   }
 `;

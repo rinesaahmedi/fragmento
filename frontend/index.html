@@ -870,6 +870,20 @@
         .welcome-actions .btn-primary{ width: 100%; }
         .overlay{ background: rgba(255, 255, 255, 0.85); }
         :root { --overlay-logo-size: clamp(260px, 84.5vw, 380px); }
+        #language-overlay .welcome-card {
+          width: min(94vw, 720px);
+          padding: 12px;
+        }
+        #language-overlay .language-card-logo {
+          height: clamp(180px, 52vw, 240px);
+          margin-bottom: 4px;
+        }
+        #language-title {
+          margin-bottom: 12px;
+        }
+        #language-overlay .welcome-card-footer {
+          margin-top: 12px;
+        }
       }
 
       @media (max-width: 480px){
@@ -948,24 +962,22 @@
         background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(252, 246, 238, 0.95) 100%);
         box-shadow: var(--shadow-lg);
         justify-content: flex-start;
-        padding-top: 4px;
+        padding-top: clamp(10px, 2vw, 16px);
       }
       #language-overlay .language-card-logo {
-        margin-top: -14px;
-        margin-bottom: -20px;
+        margin: 0 auto 8px;
       }
       #language-title {
-        margin-top: -18px;
-        margin-bottom: 8px;
+        margin: 0 0 16px;
         color: var(--text-strong);
         letter-spacing: 0.2px;
-        position: relative;
-        top: -50px;
       }
       #language-overlay .language-grid {
-        margin-top: 2px;
-        position: relative;
-        top: -40px;
+        margin-top: 0;
+      }
+      #language-overlay .welcome-card-footer {
+        align-items: center;
+        margin-top: 16px;
       }
       .flag-badge-img {
         width: 24px;

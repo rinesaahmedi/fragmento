@@ -32,7 +32,7 @@ function formatDate(value) {
 }
 
 function formatContact(claim) {
-  return [claim.phone, claim.email].filter(Boolean).join(" / ") || "No contact provided";
+  return [claim.phone, claim.email].filter(Boolean).join(" / ");
 }
 
 function truncate(value, max = 140) {
@@ -85,7 +85,7 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                 <input
                   name="q"
                   defaultValue={filters.q}
-                  placeholder="Contract, name, phone, email, issue..."
+                  placeholder="Vertrag, Name, Telefon, E-Mail, Problem..."
                   style={filterInputStyle}
                 />
               </label>
@@ -136,13 +136,13 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                   <tr key={claim.id}>
                     <td style={tdStyle}>
                       <strong>{claim.contractNumber}</strong>
-                      <div style={rowMetaStyle}>{claim.requestType}</div>
+                      <div style={rowMetaStyle}><ClaimRequestTypeText requestType={claim.requestType} /></div>
                     </td>
                     <td style={tdStyle}>
                       <div>{claim.fullName}</div>
                       <div style={rowMetaStyle}>{truncate(claim.clientAddress || claim.landlordContact, 90)}</div>
                     </td>
-                    <td style={tdStyle}>{formatContact(claim)}</td>
+                    <td style={tdStyle}>{formatContact(claim) || <AdminText i18nKey="claimsAdmin.noContactProvided" fallback="No contact provided" />}</td>
                     <td style={tdStyle}>{claim.serialNumber}</td>
                     <td style={tdStyle}>{truncate(claim.problemDescription, 160)}</td>
                     <td style={tdStyle}>{formatDate(claim.createdAt)}</td>
@@ -164,6 +164,14 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
       </div>
     </AdminShell>
   );
+}
+
+function ClaimRequestTypeText({ requestType }) {
+  if (requestType === "complaint") {
+    return <AdminText i18nKey="claimsAdmin.complaint" fallback="Complaint" />;
+  }
+
+  return requestType || "-";
 }
 
 function DeleteClaimAction({ claimId, compact = false }) {

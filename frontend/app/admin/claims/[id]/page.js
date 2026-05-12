@@ -26,7 +26,7 @@ function formatDate(value) {
 }
 
 function contactSummary(claim) {
-  return [claim.phone, claim.email].filter(Boolean).join(" / ") || "No contact provided";
+  return [claim.phone, claim.email].filter(Boolean).join(" / ");
 }
 
 function parseClaimAttachments(raw) {
@@ -104,7 +104,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
           <form action={`/api/admin/claims/${claim.id}`} method="post" style={actionPanelStyle}>
             <div style={subMetaStyle}>
               <span>{claim.fullName}</span>
-              <span>{claim.requestType}</span>
+              <span><ClaimRequestTypeText requestType={claim.requestType} /></span>
               <span>{formatDate(claim.createdAt)}</span>
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -124,10 +124,10 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.contact" fallback="Contact" /></span>
-                  <span>{contactSummary(claim)}</span>
+                  <span>{contactSummary(claim) || <AdminText i18nKey="claimsAdmin.noContactProvided" fallback="No contact provided" />}</span>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}>Client address</span>
+                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.clientAddress" fallback="Client address" /></span>
                   <p style={detailTextStyle}>{claim.clientAddress || "-"}</p>
                 </div>
                 <div>
@@ -146,28 +146,28 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
               <div style={detailGridStyle}>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.requestType" fallback="Request type" /></span>
-                  <span>{claim.requestType}</span>
+                  <span><ClaimRequestTypeText requestType={claim.requestType} /></span>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.created" fallback="Created" /></span>
                   <span>{formatDate(claim.createdAt)}</span>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}>Landlord</span>
+                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.landlord" fallback="Landlord" /></span>
                   <p style={detailTextStyle}>
                     {[
                       claim.landlordName || "-",
-                      claim.landlordPhone ? `Phone: ${claim.landlordPhone}` : null,
+                      claim.landlordPhone ? `Telefon: ${claim.landlordPhone}` : null,
                       claim.landlordEmail ? `Email: ${claim.landlordEmail}` : null,
                     ].filter(Boolean).join("\n")}
                   </p>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}>Hausmeister</span>
+                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.hausmeister" fallback="Hausmeister" /></span>
                   <p style={detailTextStyle}>
                     {[
                       claim.hausmeisterName || "-",
-                      claim.hausmeisterPhone ? `Phone: ${claim.hausmeisterPhone}` : null,
+                      claim.hausmeisterPhone ? `Telefon: ${claim.hausmeisterPhone}` : null,
                       claim.hausmeisterEmail ? `Email: ${claim.hausmeisterEmail}` : null,
                     ].filter(Boolean).join("\n")}
                   </p>
@@ -212,6 +212,14 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
       </div>
     </AdminShell>
   );
+}
+
+function ClaimRequestTypeText({ requestType }) {
+  if (requestType === "complaint") {
+    return <AdminText i18nKey="claimsAdmin.complaint" fallback="Complaint" />;
+  }
+
+  return requestType || "-";
 }
 
 const actionPanelStyle = {

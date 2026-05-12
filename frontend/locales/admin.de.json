@@ -25,7 +25,10 @@
     "signIn": "Anmelden",
     "language": "Sprache",
     "english": "English",
-    "german": "Deutsch"
+    "german": "Deutsch",
+    "mobileAdminNavigation": "Mobile Admin-Navigation",
+    "sidebar": "Seitenleiste",
+    "poweredBy": "Bereitgestellt von"
   },
   "accountAdmin": {
     "account": "Konto",
@@ -554,5 +557,41 @@
     "confirmingAndSendingEmail": "Bestätigung und E-Mail werden gesendet...",
     "resendingEmail": "E-Mail wird erneut gesendet...",
     "retryingWebhook": "Webhook wird erneut versucht..."
+  },
+  "claimsAdmin": {
+    "claims": "Reklamationen",
+    "claimsMatchCurrentFilters": "Reklamation(en) entsprechen den aktuellen Filtern.",
+    "filterClaimsByContractNameContactIssueAndDate": "Reklamationen nach Vertrag, Name, Kontaktdaten, Problemtext und Datum filtern.",
+    "searchPlaceholder": "Vertrag, Name, Telefon, E-Mail, Problem...",
+    "requestType": "Anfragetyp",
+    "allRequestTypes": "Alle Anfragetypen",
+    "complaint": "Reklamation",
+    "contractNumber": "Vertrag",
+    "customer": "Kunde",
+    "contact": "Kontakt",
+    "serialNumber": "Seriennummer",
+    "issue": "Problem",
+    "created": "Erstellt",
+    "noClaimsFound": "Keine Reklamationen gefunden.",
+    "noContactProvided": "Kein Kontakt angegeben",
+    "claimNotFound": "Reklamation nicht gefunden",
+    "requestedClaimDoesNotExist": "Die angeforderte Reklamation existiert nicht.",
+    "backToClaims": "Zurück zu den Reklamationen",
+    "claimDetailDescription": "Details der Reklamationsanfrage aus dem Serviceformular.",
+    "clientAddress": "Kundenadresse",
+    "requestDetails": "Anfragedetails",
+    "landlord": "Vermieter",
+    "hausmeister": "Hausmeister",
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "uploadedFiles": "Hochgeladene Dateien",
+    "uploadedFilesEmailNote": "Originaldateien werden auch an die Benachrichtigungs-E-Mail angehängt, wenn SMTP konfiguriert ist.",
+    "noUploadedFiles": "Mit dieser Reklamation wurden keine Dateien hochgeladen.",
+    "viewAttachment": "Ansehen",
+    "downloadAttachment": "Herunterladen",
+    "closePreview": "Vorschau schließen",
+    "previewLoading": "Wird geladen...",
+    "previewLoadFailed": "Diese Datei konnte nicht geladen werden. Verwenden Sie stattdessen Herunterladen.",
+    "previewNotAvailable": "Für diesen Dateityp gibt es keine Vorschau auf der Seite. Verwenden Sie Herunterladen, um die Datei zu öffnen."
   }
 }

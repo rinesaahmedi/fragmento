@@ -144,6 +144,7 @@ function AdminShellContent({ adminEmail, children }) {
             alignContent: "start",
             height: "100vh",
             overflowY: "auto",
+            overflowX: "hidden",
             padding: "0 20px 20px",
             background: "var(--color-sidebar-bg)",
             borderRight: "1px solid var(--color-border)",
@@ -213,6 +214,7 @@ function AdminShellContent({ adminEmail, children }) {
                     display: "flex",
                     alignItems: "center",
                     gap: 12,
+                    minWidth: 0,
                     minHeight: 56,
                     padding: "10px 14px",
                     borderRadius: 8,
@@ -227,7 +229,7 @@ function AdminShellContent({ adminEmail, children }) {
                   }}
                 >
                   <Icon active={active} />
-                  <span>{translate(item.labelKey, item.fallback)}</span>
+                  <span style={sidebarLabelStyle}>{translate(item.labelKey, item.fallback)}</span>
                 </Link>
               );
             })}
@@ -254,7 +256,7 @@ function AdminShellContent({ adminEmail, children }) {
                 lineHeight: 1,
               }}
             >
-              Powered by
+              <AdminText i18nKey="adminShellLogin.poweredBy" fallback="Powered by" />
             </span>
             <img
               src="/primex-agentic-logo.png"
@@ -540,4 +542,11 @@ const topbarLinkStyle = {
   fontWeight: 700,
   border: "1px solid var(--app-border-strong)",
   boxShadow: "var(--app-shadow-soft)",
+};
+
+const sidebarLabelStyle = {
+  minWidth: 0,
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  whiteSpace: "nowrap",
 };
