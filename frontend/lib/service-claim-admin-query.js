@@ -1,11 +1,19 @@
 import { Prisma } from "@prisma/client";
 
 export function isMissingAttachmentsJsonColumnError(error) {
+  return isMissingServiceClaimColumnError(error, "attachmentsJson");
+}
+
+export function isMissingProblemAreasJsonColumnError(error) {
+  return isMissingServiceClaimColumnError(error, "problemAreasJson");
+}
+
+function isMissingServiceClaimColumnError(error, columnName) {
   const message = String(error?.message ?? "");
   const metaMessage = typeof error?.meta?.message === "string" ? error.meta.message : "";
   const combined = `${message} ${metaMessage}`;
   return (
-    combined.includes("attachmentsJson")
+    combined.includes(columnName)
     && (combined.includes("does not exist") || combined.includes("42703"))
   );
 }

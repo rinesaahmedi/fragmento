@@ -70,6 +70,8 @@ export function AdminDashboardCharts({
   statusOptions,
   selectedStatus,
   dailyStatusData,
+  claimElementData,
+  claimCountryData,
   kitchenTimelineData,
   kitchenSeries,
   topItemsByQuantity,
@@ -155,6 +157,28 @@ export function AdminDashboardCharts({
       </section>
 
       <AdminEntitySearch period={selectedPeriod} kitchenId={selectedKitchenId} status={selectedStatus} />
+
+      <section className="chart-card chart-card--compact chart-card--claims">
+        <ChartHeader
+          eyebrow={translate("dashboard.claimElementOverview", "Claim element overview")}
+          title={translate("dashboard.claimsBySelectedElementAndCountry", "Claims by selected element and country")}
+          detail={translate("dashboard.claimsBySelectedElementAndCountryDetail", "Ranked by selected kitchen elements and the country submitted in the service claim form.")}
+        />
+        <div className="claim-overview-grid">
+          <ClaimBreakdownChart
+            title={translate("dashboard.selectedElements", "Selected elements")}
+            data={claimElementData}
+            emptyLabel={translate("dashboard.noClaimElementDataForSelectedFilters", "No selected claim element data for the current filters.")}
+            yAxisWidth={126}
+          />
+          <ClaimBreakdownChart
+            title={translate("dashboard.submittedCountries", "Submitted countries")}
+            data={claimCountryData}
+            emptyLabel={translate("dashboard.noClaimCountryDataForSelectedFilters", "No submitted country data for the current filters.")}
+            yAxisWidth={104}
+          />
+        </div>
+      </section>
 
       <section className="chart-card chart-card--status">
         <ChartHeader
@@ -262,14 +286,31 @@ export function AdminDashboardCharts({
           min-height: 360px;
         }
 
+        .chart-card--claims {
+          gap: 8px;
+          min-height: 0;
+          padding: 14px 16px 10px;
+        }
+
         .chart-frame {
           min-height: 280px;
           min-width: 0;
         }
 
+        .claim-overview-grid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
+          gap: 14px;
+          align-items: start;
+        }
+
         @media (max-width: 1100px) {
           .filter-form {
             grid-template-columns: repeat(2, minmax(150px, 1fr));
+          }
+
+          .claim-overview-grid {
+            grid-template-columns: 1fr;
           }
         }
 
@@ -283,13 +324,12 @@ export function AdminDashboardCharts({
   );
 }
 
-function ChartHeader({ eyebrow, title, detail, actions }) {
+function ChartHeader({ eyebrow, title, actions }) {
   return (
     <div className="chart-header">
       <div>
         <span>{eyebrow}</span>
         <h2>{title}</h2>
-        {detail ? <p>{detail}</p> : null}
       </div>
       {actions}
       <style jsx>{`
@@ -315,11 +355,6 @@ function ChartHeader({ eyebrow, title, detail, actions }) {
           font-size: 1.2rem;
         }
 
-        p {
-          margin: 6px 0 0;
-          color: var(--color-text-muted);
-          line-height: 1.45;
-        }
       `}</style>
     </div>
   );
@@ -351,6 +386,87 @@ function StatusTooltip({ active, payload, label, mode }) {
         strong,
         span {
           font-size: 13px;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function ClaimElementTooltip({ active, payload, label }) {
+  const { translate } = useAdminI18n();
+  if (!active || !payload?.length) return null;
+
+  const labels = {
+    claims: translate("dashboard.claims", "Claims"),
+    claimsWithAttachments: translate("dashboard.claimsWithFiles", "Claims with files"),
+  };
+
+  return (
+    <div className="tooltip">
+      <strong>{label}</strong>
+      {payload.map((item) => (
+        <span key={item.dataKey} style={{ color: item.color }}>
+          {labels[item.dataKey] || item.name}: {item.value}
+        </span>
+      ))}
+      <style jsx>{`
+        .tooltip {
+          display: grid;
+          gap: 6px;
+          border: 1px solid var(--color-border);
+          border-radius: 10px;
+          background: var(--color-card);
+          padding: 10px 12px;
+          box-shadow: var(--app-shadow-soft);
+        }
+
+        strong,
+        span {
+          font-size: 13px;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth }) {
+  const { translate } = useAdminI18n();
+  const visibleData = Array.isArray(data) ? data.slice(0, 10) : [];
+  const height = Math.max(170, visibleData.length * 40 + 42);
+
+  return (
+    <div className="claim-breakdown">
+      <h3>{title}</h3>
+      <div className="chart-frame">
+        {visibleData.length ? (
+          <ResponsiveContainer width="100%" height={height}>
+            <BarChart data={visibleData} layout="vertical" margin={{ top: 6, right: 10, left: 0, bottom: 0 }}>
+              <CartesianGrid stroke={CHART_GRID} vertical={false} />
+              <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+              <YAxis type="category" dataKey="name" width={yAxisWidth} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} tickFormatter={(value) => truncateLabel(value, 22)} />
+              <Tooltip content={<ClaimElementTooltip />} />
+              <Bar dataKey="claims" name={translate("dashboard.claims", "Claims")} fill="#8C6D4F" radius={[0, 6, 6, 0]} barSize={48} />
+            </BarChart>
+          </ResponsiveContainer>
+        ) : (
+          <EmptyChart label={emptyLabel} />
+        )}
+      </div>
+      <style jsx>{`
+        .claim-breakdown {
+          min-width: 0;
+        }
+
+        .chart-frame {
+          min-height: 0;
+          min-width: 0;
+        }
+
+        h3 {
+          margin: 0 0 6px;
+          color: var(--color-text);
+          font-size: 15px;
+          font-weight: 800;
         }
       `}</style>
     </div>

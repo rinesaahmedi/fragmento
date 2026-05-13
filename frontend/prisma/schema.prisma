@@ -196,6 +196,9 @@ model ServiceClaim {
   phone              String?
   email              String?
   clientAddress      String?
+  clientCountry      String?
+  clientCity         String?
+  clientPostalCode   String?
   landlordName       String?
   landlordPhone      String?
   landlordEmail      String?
@@ -206,6 +209,7 @@ model ServiceClaim {
   problemDescription String
   serialNumber       String
   requestType        String   @default("complaint")
+  problemAreasJson   String?  @db.Text
   attachmentsJson    String?  @db.Text
   createdAt          DateTime @default(now())
 

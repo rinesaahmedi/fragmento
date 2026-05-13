@@ -93,10 +93,6 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   return (
     <div className="service-claim-kitchen">
       <div className="service-claim-kitchen__header">
-        <div>
-          <p className="service-claim-kitchen__eyebrow">{labels?.eyebrow || ""}</p>
-          <h3 className="service-claim-kitchen__title">{labels?.title || ""}</h3>
-        </div>
         <button type="button" className="service-claim-kitchen__reset" onClick={() => onChange([])}>
           {labels?.reset || "Reset"}
         </button>

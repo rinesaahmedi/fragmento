@@ -155,6 +155,7 @@
     "productAssistantBackToPicker": "Zur\u00fcck zur Produktauswahl",
     "productAssistantActiveContext": "Aktuelles Produkt",
     "productAssistantContextConfirmed": "Du fragst jetzt zu {label}. Frag mich alles aus der Produktinformation dazu.",
+    "productAssistantContextConfirmedAll": "Du siehst jetzt alle ausgewählten Produkte. Frag mich alles aus ihren Produktinformationen.",
     "productAssistantCloseAria": "Produkt-Agent schlie\u00dfen",
     "productAssistantNoInfo": "Es sind noch keine Produktinformationen verf\u00fcgbar.",
     "productAssistantLoading": "Antwort wird geladen...",

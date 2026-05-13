@@ -20,6 +20,38 @@ const MAX_CLAIM_ATTACHMENT_BYTES = 4 * 1024 * 1024;
 const CLAIM_ATTACHMENT_ACCEPT = "image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx";
 const SERIAL_NUMBER_IMAGE_ACCEPT = "image/*";
 
+const CLAIM_AREA_LABELS_BY_CODE = {
+  de: {
+    "CAB-WALL-B-L-600": "Oberschrank links",
+    "CAB-WALL-B-ML-600": "Oberschrank mittig links",
+    "CAB-WALL-B-MR-600": "Oberschrank mittig rechts",
+    "CAB-WALL-B-R-600": "Oberschrank rechts",
+    "CAB-HOOD-B-600": "Oberschrank f\u00fcr Dunstabzugshaube",
+    "CAB-WALL-C-L-600": "Oberschrank links",
+    "CAB-WALL-C-ML-600": "Oberschrank mittig links",
+    "CAB-WALL-C-MR-600": "Oberschrank mittig rechts",
+    "CAB-WALL-C-R-600": "Oberschrank rechts",
+    "SINKBASE-B-600": "Sp\u00fclenunterschrank",
+    "SINKBASE-C-600": "Sp\u00fclenunterschrank",
+    "SINK-B-BOTTON-45": "Sp\u00fcle und M\u00fclltrennsystem",
+    "SINK-C-BOTTON-45": "Sp\u00fcle und M\u00fclltrennsystem",
+    "DISH-B-600-STD": "Geschirrsp\u00fcler",
+    "DISH-C-600-STD": "Geschirrsp\u00fcler",
+    "CAB-BASE-B-STR": "Stauraum-Unterschrank",
+    "REF-B-545-1800-700": "K\u00fchlschrank",
+    "REF-C-545-1800-700": "K\u00fchlschrank",
+    "WM-B-EWA34660W": "Waschmaschine",
+    "WM-C-EWA34660W": "Waschmaschine",
+    "OVEN-B-600-HOB": "Einbaubackofen und Kochfeld",
+    "OVEN-C-600-HOB": "Einbaubackofen und Kochfeld",
+  },
+};
+
+function formatClaimAreaName(area, fallbackName, language) {
+  const code = String(area?.code || "").trim().toUpperCase();
+  return CLAIM_AREA_LABELS_BY_CODE[language]?.[code] || fallbackName || code;
+}
+
 const CLAIM_FILENAME_PATTERN = /\.(pdf|png|jpe?g|gif|webp|bmp|tiff?|txt|docx?|xlsx?)$/i;
 
 const CONTRACT_NUMBER_HELP_IMAGES = [
@@ -841,6 +873,7 @@ export default function ServiceClaimFlow() {
         problemComponentIds,
         metaById,
         prev.problemDescription,
+        (area, fallbackName) => formatClaimAreaName(area, fallbackName, language),
       );
       if (next === prev.problemDescription) {
         return prev;
@@ -856,6 +889,7 @@ export default function ServiceClaimFlow() {
     problemComponentIds,
     copy.kitchenAreasLinePrefix,
     fallbackCopy.kitchenAreasLinePrefix,
+    language,
     normalizedContractNumber,
   ]);
 
@@ -1106,6 +1140,9 @@ export default function ServiceClaimFlow() {
       const payload = {
         ...form,
         clientAddress: buildClientAddress(),
+        clientCountry: formValues.clientCountry.trim(),
+        clientCity: formValues.clientCity.trim(),
+        clientPostalCode: formValues.clientPostalCode.trim(),
         problemDescription: buildSubmittedProblemDescription(),
         language,
       };
