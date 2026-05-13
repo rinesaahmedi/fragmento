@@ -38,6 +38,63 @@ const CATEGORY_COLORS = {
   ACCESSORY: "#5FBF8F",
   SERVICE: "#F2A65A",
 };
+const KITCHEN_ELEMENT_LABEL_KEYS = {
+  "built-in oven and hob": ["dashboard.catalogItemNames.ovenHob", "Built-in Oven and Hob"],
+  "wall cabinet left": ["dashboard.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"],
+  "wall cabinet mid-left": ["dashboard.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"],
+  "wall cabinet mid-right": ["dashboard.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"],
+  "wall cabinet mid-right + extractor hood": ["dashboard.catalogItemNames.wallCabinetMidRightExtractorHood", "Wall Cabinet mid-right + Extractor Hood"],
+  "wall cabinet right": ["dashboard.catalogItemNames.wallCabinetRight", "Wall Cabinet right"],
+  "oberschrank links": ["dashboard.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"],
+  "oberschrank mittig links": ["dashboard.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"],
+  "oberschrank mittig rechts": ["dashboard.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"],
+  "oberschrank rechts": ["dashboard.catalogItemNames.wallCabinetRight", "Wall Cabinet right"],
+  "oberschrank (links)": ["dashboard.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"],
+  "oberschrank (mittig links)": ["dashboard.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"],
+  "oberschrank (mittig rechts)": ["dashboard.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"],
+  "oberschrank (rechts)": ["dashboard.catalogItemNames.wallCabinetRight", "Wall Cabinet right"],
+  "hood wall cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"],
+  "extractor hood": ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
+  dunstabzugshaube: ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
+  "fh664621e extractor hood": ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
+  "khf664611s chimney extractor hood": ["dashboard.catalogItemNames.chimneyExtractorHood", "Chimney Extractor Hood"],
+  "chimney extractor hood": ["dashboard.catalogItemNames.chimneyExtractorHood", "Chimney Extractor Hood"],
+  "led lighting set": ["dashboard.catalogItemNames.ledLightingSet", "LED Lighting Set"],
+  "led-beleuchtungsset": ["dashboard.catalogItemNames.ledLightingSet", "LED Lighting Set"],
+  "washing machine": ["dashboard.catalogItemNames.washingMachine", "Washing Machine"],
+  waschmaschine: ["dashboard.catalogItemNames.washingMachine", "Washing Machine"],
+  "sink base cabinet": ["dashboard.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"],
+  "spülenunterschrank": ["dashboard.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"],
+  "spuelenunterschrank": ["dashboard.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"],
+  dishwasher: ["dashboard.catalogItemNames.dishwasher", "Dishwasher"],
+  "spülmaschine": ["dashboard.catalogItemNames.dishwasher", "Dishwasher"],
+  "spuelmaschine": ["dashboard.catalogItemNames.dishwasher", "Dishwasher"],
+  "geschirrspüler": ["dashboard.catalogItemNames.dishwasher", "Dishwasher"],
+  "geschirrspueler": ["dashboard.catalogItemNames.dishwasher", "Dishwasher"],
+  worktop: ["dashboard.catalogItemNames.worktop", "Worktop"],
+  arbeitsplatte: ["dashboard.catalogItemNames.worktop", "Worktop"],
+  "base storage cabinet": ["dashboard.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"],
+  "base cabinet (2 drawers) left": ["dashboard.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"],
+  "base cabinet (2 drawers) right": ["dashboard.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"],
+  "base cabinet (3 drawers)": ["dashboard.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"],
+  "unterschrank (2 schubladen) links": ["dashboard.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"],
+  "unterschrank (2 schubladen) rechts": ["dashboard.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"],
+  "unterschrank (3 schubladen)": ["dashboard.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"],
+  refrigerator: ["dashboard.catalogItemNames.refrigerator", "Refrigerator"],
+  kühlschrank: ["dashboard.catalogItemNames.refrigerator", "Refrigerator"],
+  kuehlschrank: ["dashboard.catalogItemNames.refrigerator", "Refrigerator"],
+  "sink and waste system": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
+  "spüle und mülltrennsystem": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
+  "spuele und muelltrennsystem": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
+  "sink and worktop": ["dashboard.catalogItemNames.sinkAndWorktop", "Sink and Worktop"],
+  "cutlery insert 60": ["dashboard.catalogItemNames.cutleryInsert60", "Cutlery Insert ZB60SG"],
+  "besteckeinsatz zb60sg": ["dashboard.catalogItemNames.cutleryInsert60", "Cutlery Insert ZB60SG"],
+  "mülltrennsystem": ["dashboard.catalogItemNames.wasteSeparationSystem", "Waste Separation System"],
+  "muelltrennsystem": ["dashboard.catalogItemNames.wasteSeparationSystem", "Waste Separation System"],
+  "waste separation system": ["dashboard.catalogItemNames.wasteSeparationSystem", "Waste Separation System"],
+  "lieferung, vertragen, montage und anschluss": ["dashboard.catalogItemNames.deliveryAssemblyConnection", "Delivery, Carrying, Assembly and Connection"],
+  "delivery, carrying, assembly and connection": ["dashboard.catalogItemNames.deliveryAssemblyConnection", "Delivery, Carrying, Assembly and Connection"],
+};
 
 export const EXAMPLE_DASHBOARD_MOCK_DATA = {
   kpis: [
@@ -71,7 +128,7 @@ export function AdminDashboardCharts({
   selectedStatus,
   dailyStatusData,
   claimElementData,
-  claimCountryData,
+  claimCityData,
   kitchenTimelineData,
   kitchenSeries,
   topItemsByQuantity,
@@ -161,22 +218,28 @@ export function AdminDashboardCharts({
       <section className="chart-card chart-card--compact chart-card--claims">
         <ChartHeader
           eyebrow={translate("dashboard.claimElementOverview", "Claim element overview")}
-          title={translate("dashboard.claimsBySelectedElementAndCountry", "Claims by selected element and country")}
-          detail={translate("dashboard.claimsBySelectedElementAndCountryDetail", "Ranked by selected kitchen elements and the country submitted in the service claim form.")}
+          title={translate("dashboard.claimsBySelectedElementAndCity", "Claims by selected element and city")}
+          detail={translate("dashboard.claimsBySelectedElementAndCityDetail", "Ranked by selected kitchen elements and the city submitted in the service claim form.")}
         />
         <div className="claim-overview-grid">
           <ClaimBreakdownChart
             title={translate("dashboard.selectedElements", "Selected elements")}
             data={claimElementData}
             emptyLabel={translate("dashboard.noClaimElementDataForSelectedFilters", "No selected claim element data for the current filters.")}
-            yAxisWidth={126}
+            translateElementLabels
+            yAxisWidth={154}
           />
           <ClaimBreakdownChart
-            title={translate("dashboard.submittedCountries", "Submitted countries")}
-            data={claimCountryData}
-            emptyLabel={translate("dashboard.noClaimCountryDataForSelectedFilters", "No submitted country data for the current filters.")}
+            title={translate("dashboard.submittedCities", "Submitted cities")}
+            data={claimCityData}
+            emptyLabel={translate("dashboard.noClaimCityDataForSelectedFilters", "No submitted city data for the current filters.")}
             yAxisWidth={104}
           />
+          <div className="claim-action-row">
+            <a className="claim-action-row__link" href="/admin/claims">
+              {translate("dashboard.viewAllClaims", "View all claims")}
+            </a>
+          </div>
         </div>
       </section>
 
@@ -304,6 +367,35 @@ export function AdminDashboardCharts({
           align-items: start;
         }
 
+        .claim-action-row {
+          grid-column: 1 / -1;
+          display: flex;
+          justify-content: flex-end;
+          padding-top: 2px;
+        }
+
+        .claim-action-row__link {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid var(--app-border-strong);
+          border-radius: 8px;
+          background: var(--color-primary);
+          color: #fff;
+          padding: 10px 16px;
+          font-size: 14px;
+          font-weight: 800;
+          text-decoration: none;
+          box-shadow: var(--app-shadow-soft);
+        }
+
+        .claim-action-row__link:hover,
+        .claim-action-row__link:focus-visible {
+          background: var(--color-primary-dark);
+          outline: none;
+        }
+
         @media (max-width: 1100px) {
           .filter-form {
             grid-template-columns: repeat(2, minmax(150px, 1fr));
@@ -429,9 +521,14 @@ function ClaimElementTooltip({ active, payload, label }) {
   );
 }
 
-function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth }) {
+function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth, translateElementLabels = false }) {
   const { translate } = useAdminI18n();
-  const visibleData = Array.isArray(data) ? data.slice(0, 10) : [];
+  const visibleData = Array.isArray(data)
+    ? data.slice(0, 10).map((item) => ({
+        ...item,
+        displayName: translateElementLabels ? translateKitchenElementLabel(item.name, translate) : item.name,
+      }))
+    : [];
   const height = Math.max(170, visibleData.length * 40 + 42);
 
   return (
@@ -443,7 +540,7 @@ function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth }) {
             <BarChart data={visibleData} layout="vertical" margin={{ top: 6, right: 10, left: 0, bottom: 0 }}>
               <CartesianGrid stroke={CHART_GRID} vertical={false} />
               <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
-              <YAxis type="category" dataKey="name" width={yAxisWidth} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} tickFormatter={(value) => truncateLabel(value, 22)} />
+              <YAxis type="category" dataKey="displayName" width={yAxisWidth} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} tickFormatter={(value) => truncateLabel(value, 24)} />
               <Tooltip content={<ClaimElementTooltip />} />
               <Bar dataKey="claims" name={translate("dashboard.claims", "Claims")} fill="#8C6D4F" radius={[0, 6, 6, 0]} barSize={48} />
             </BarChart>
@@ -555,8 +652,9 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
           .map((item) => ({
             ...item,
             chartValue: Number(item.quantity || 0),
-            axisLabel: item.name || "",
-            displayIdentifier: item.articleNumber || item.code || "",
+            displayName: formatTopItemLabel(item, translate),
+            axisLabel: buildTopItemAxisLabel(item, translate),
+            displayIdentifier: item.code || "",
           }))
           .sort((a, b) => b.chartValue - a.chartValue),
       }
@@ -566,8 +664,9 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
           .map((item) => ({
             ...item,
             chartValue: Number(item.revenue || 0),
-            axisLabel: item.name || "",
-            displayIdentifier: item.articleNumber || item.code || "",
+            displayName: formatTopItemLabel(item, translate),
+            axisLabel: buildTopItemAxisLabel(item, translate),
+            displayIdentifier: item.code || "",
           }))
           .sort((a, b) => b.chartValue - a.chartValue),
       };
@@ -1051,8 +1150,9 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
           .map((item) => ({
             ...item,
             chartValue: Number(item.quantity || 0),
-            axisLabel: item.name || "",
-            displayIdentifier: item.articleNumber || item.code || "",
+            displayName: formatTopItemLabel(item, translate),
+            axisLabel: buildTopItemAxisLabel(item, translate),
+            displayIdentifier: item.code || "",
           }))
           .sort((a, b) => b.chartValue - a.chartValue),
       }
@@ -1062,8 +1162,9 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
           .map((item) => ({
             ...item,
             chartValue: Number(item.revenue || 0),
-            axisLabel: item.name || "",
-            displayIdentifier: item.articleNumber || item.code || "",
+            displayName: formatTopItemLabel(item, translate),
+            axisLabel: buildTopItemAxisLabel(item, translate),
+            displayIdentifier: item.code || "",
           }))
           .sort((a, b) => b.chartValue - a.chartValue),
       };
@@ -1706,13 +1807,14 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const fullData = useMemo(() => config.data
     .map((item) => ({
       ...item,
-      axisLabel: item.name || "",
-      displayIdentifier: item.articleNumber || item.code || "",
+      displayName: formatTopItemLabel(item, translate),
+      axisLabel: buildTopItemAxisLabel(item, translate),
+      displayIdentifier: item.code || "",
       chartValue: Number(item[mode] || 0),
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
     }))
-    .sort((a, b) => b.chartValue - a.chartValue), [config.data, mode]);
+    .sort((a, b) => b.chartValue - a.chartValue), [config.data, mode, translate]);
   const data = fullData.slice(0, MAX_TOP_ITEMS);
   const hasMoreItems = fullData.length > MAX_TOP_ITEMS;
 
@@ -1846,8 +1948,9 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
 
 function TopItemsAxisTick({ x, y, payload }) {
   const row = payload?.payload || {};
-  const name = String(row.name || payload?.value || "");
-  const identifier = String(row.displayIdentifier || "");
+  const [axisName, axisIdentifier = ""] = String(payload?.value || "").split("\n");
+  const name = String(row.displayName || axisName || "");
+  const identifier = String(row.displayIdentifier || axisIdentifier || "");
 
   return (
     <g transform={`translate(${x},${y})`}>
@@ -1870,7 +1973,7 @@ function TopItemsTooltip({ active, payload }) {
   const item = payload[0].payload;
   return (
     <div className="tooltip">
-      <strong>{item.name}</strong>
+      <strong>{item.displayName || item.name}</strong>
       <span>{translate("dashboard.categoryLabel", "Category")}: {item.itemType || translate("dashboard.notCaptured", "Not captured")}</span>
       <span>{translate("dashboard.codeLabel", "Code")}: {item.code || translate("dashboard.notCaptured", "Not captured")}</span>
       <span>{translate("kitchenDetailAdmin.articleNo", "Article no.")}: {item.articleNumber || "-"}</span>
@@ -2180,6 +2283,35 @@ function EmptyChart({ label }) {
 function truncateLabel(value, maxLength = 24) {
   const label = String(value || "");
   return label.length > maxLength ? `${label.slice(0, maxLength - 3)}...` : label;
+}
+
+function stripKitchenElementSize(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s*\(\s*\d+(\s*[x×]\s*\d+){1,2}\s*mm\s*\)/gi, "")
+    .replace(/\s+\d+(\s*[x×]\s*\d+){1,2}\s*mm\s*$/i, "")
+    .replace(/\s+/g, " ");
+}
+
+function normalizeKitchenElementLabel(value) {
+  return stripKitchenElementSize(value)
+    .toLowerCase();
+}
+
+function translateKitchenElementLabel(value, translate) {
+  const labelConfig = KITCHEN_ELEMENT_LABEL_KEYS[normalizeKitchenElementLabel(value)];
+  return labelConfig ? translate(labelConfig[0], labelConfig[1]) : stripKitchenElementSize(value);
+}
+
+function formatTopItemLabel(item, translate) {
+  const translatedName = translateKitchenElementLabel(item?.name, translate);
+  return String(translatedName || item?.name || "").trim();
+}
+
+function buildTopItemAxisLabel(item, translate) {
+  return [formatTopItemLabel(item, translate), String(item?.code || "").trim()]
+    .filter(Boolean)
+    .join("\n");
 }
 
 function interpolateText(template, values) {

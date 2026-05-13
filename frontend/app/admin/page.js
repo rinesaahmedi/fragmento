@@ -1013,7 +1013,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const dailyStatusData = Array.from(dailyStatusByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const kitchenTimelineData = Array.from(timelineByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const claimElementStats = new Map();
-  const claimCountryStats = new Map();
+  const claimCityStats = new Map();
   for (const row of claimElementRows) {
     const structuredElements = extractStructuredClaimElements(row.problemAreasJson);
     const uniqueElements = new Map(
@@ -1021,15 +1021,15 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         .map((element) => [element.key, element]),
     );
     const hasAttachments = Boolean(String(row.attachmentsJson || "").trim());
-    const country = String(row.clientCountry || "").trim() || "Not captured";
-    const currentCountry = claimCountryStats.get(country) || {
-      name: country,
+    const city = String(row.clientCity || "").trim() || "Not captured";
+    const currentCity = claimCityStats.get(city) || {
+      name: city,
       claims: 0,
       claimsWithAttachments: 0,
     };
-    currentCountry.claims += 1;
-    if (hasAttachments) currentCountry.claimsWithAttachments += 1;
-    claimCountryStats.set(country, currentCountry);
+    currentCity.claims += 1;
+    if (hasAttachments) currentCity.claimsWithAttachments += 1;
+    claimCityStats.set(city, currentCity);
 
     for (const element of uniqueElements.values()) {
       const current = claimElementStats.get(element.key) || {
@@ -1048,7 +1048,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       if (b.claimsWithAttachments !== a.claimsWithAttachments) return b.claimsWithAttachments - a.claimsWithAttachments;
       return a.name.localeCompare(b.name);
     });
-  const claimCountryData = Array.from(claimCountryStats.values())
+  const claimCityData = Array.from(claimCityStats.values())
     .sort((a, b) => {
       if (b.claims !== a.claims) return b.claims - a.claims;
       if (b.claimsWithAttachments !== a.claimsWithAttachments) return b.claimsWithAttachments - a.claimsWithAttachments;
@@ -1433,7 +1433,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         selectedStatus={validStatus}
         dailyStatusData={dailyStatusData}
         claimElementData={claimElementData}
-        claimCountryData={claimCountryData}
+        claimCityData={claimCityData}
         kitchenTimelineData={kitchenTimelineData}
         kitchenSeries={kitchenSeries}
         topItemsByQuantity={topItemsByQuantity}

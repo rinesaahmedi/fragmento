@@ -46,14 +46,17 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
   const resolvedSearchParams = (await searchParams) || {};
   const filters = {
     q: normalizeParam(resolvedSearchParams.q).trim(),
-    requestType: normalizeParam(resolvedSearchParams.requestType).trim(),
+    city: normalizeParam(resolvedSearchParams.city).trim(),
     dateFrom: normalizeParam(resolvedSearchParams.dateFrom).trim(),
     dateTo: normalizeParam(resolvedSearchParams.dateTo).trim(),
   };
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
-  const claims = await queryServiceClaimsList(prisma, filters);
+  const [claims, cityOptions] = await Promise.all([
+    queryServiceClaimsList(prisma, filters),
+    listClaimCities(),
+  ]);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -90,10 +93,12 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                 />
               </label>
               <label style={filterFieldStyle}>
-                <span><AdminText i18nKey="claimsAdmin.requestType" fallback="Request type" /></span>
-                <select name="requestType" defaultValue={filters.requestType} style={filterInputStyle}>
-                  <option value=""><AdminText i18nKey="claimsAdmin.allRequestTypes" fallback="All request types" /></option>
-                  <option value="complaint"><AdminText i18nKey="claimsAdmin.complaint" fallback="Complaint" /></option>
+                <span><AdminText i18nKey="claimsAdmin.city" fallback="City" /></span>
+                <select name="city" defaultValue={filters.city} style={filterInputStyle}>
+                  <option value=""><AdminText i18nKey="claimsAdmin.allCities" fallback="All cities" /></option>
+                  {cityOptions.map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
                 </select>
               </label>
               <label style={filterFieldStyle}>
@@ -164,6 +169,17 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
       </div>
     </AdminShell>
   );
+}
+
+async function listClaimCities() {
+  const rows = await prisma.$queryRaw`
+    SELECT DISTINCT NULLIF(BTRIM("clientCity"), '') AS "city"
+    FROM "ServiceClaim"
+    WHERE NULLIF(BTRIM("clientCity"), '') IS NOT NULL
+    ORDER BY "city" ASC
+  `;
+
+  return rows.map((row) => row.city).filter(Boolean);
 }
 
 function ClaimRequestTypeText({ requestType }) {

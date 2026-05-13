@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, createContext, useContext, useEffect, useMemo, useState } from "react";
+import { Fragment, createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import de from "../locales/admin.de.json";
 import en from "../locales/admin.en.json";
 
@@ -108,35 +108,239 @@ export function AdminTranslation({ i18nKey, fallback = "", values }) {
 
 export function AdminLanguageSwitcher() {
   const { language, setLanguage, translate } = useAdminI18n();
+  const [isOpen, setIsOpen] = useState(false);
+  const menuRef = useRef(null);
+  const languageOptions = [
+    { value: "en", code: "EN", label: translate("adminShellLogin.english", "English") },
+    { value: "de", code: "DE", label: translate("adminShellLogin.german", "Deutsch") },
+  ];
+  const selectedLanguage = languageOptions.find((option) => option.value === language) || languageOptions[0];
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      if (!menuRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  function selectLanguage(nextLanguage) {
+    setLanguage(nextLanguage);
+    setIsOpen(false);
+  }
 
   return (
-    <label
-      style={{
-        display: "inline-flex",
-        alignItems: "center",
-        gap: 8,
-        color: "var(--app-text-muted)",
-        fontSize: 13,
-        fontWeight: 800,
-      }}
-    >
-      <span>{translate("adminShellLogin.language", "Language")}</span>
-      <select
-        value={language}
-        onChange={(event) => setLanguage(event.target.value)}
-        style={{
-          minHeight: 42,
-          border: "1px solid var(--app-border-strong)",
-          borderRadius: 8,
-          background: "rgba(255,255,255,0.88)",
-          color: "var(--app-text)",
-          padding: "8px 10px",
-          fontWeight: 800,
-        }}
+    <div className={`admin-language-switcher${isOpen ? " is-open" : ""}`} ref={menuRef}>
+      <span className="admin-language-switcher__label">{translate("adminShellLogin.language", "Language")}</span>
+      <button
+        type="button"
+        className="admin-language-switcher__trigger"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-label={translate("adminShellLogin.language", "Language")}
+        onClick={() => setIsOpen((current) => !current)}
       >
-        <option value="en">{translate("adminShellLogin.english", "English")}</option>
-        <option value="de">{translate("adminShellLogin.german", "Deutsch")}</option>
-      </select>
-    </label>
+        <span className="admin-language-switcher__code">{selectedLanguage.code}</span>
+        <span className="admin-language-switcher__current">{selectedLanguage.label}</span>
+        <span className="admin-language-switcher__chevron" aria-hidden="true" />
+      </button>
+      {isOpen ? (
+        <div className="admin-language-switcher__menu" role="listbox" aria-label={translate("adminShellLogin.language", "Language")}>
+          {languageOptions.map((option) => {
+            const isActive = option.value === language;
+
+            return (
+              <button
+                type="button"
+                key={option.value}
+                className={`admin-language-switcher__option${isActive ? " is-active" : ""}`}
+                role="option"
+                aria-selected={isActive}
+                onClick={() => selectLanguage(option.value)}
+              >
+                <span className="admin-language-switcher__code">{option.code}</span>
+                <span>{option.label}</span>
+                <span className="admin-language-switcher__active-dot" aria-hidden="true" />
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+      <style>{`
+        .admin-language-switcher {
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--app-text-muted);
+          font-size: 13px;
+          font-weight: 800;
+          line-height: 1;
+        }
+
+        .admin-language-switcher__label {
+          white-space: nowrap;
+        }
+
+        .admin-language-switcher__trigger,
+        .admin-language-switcher__option {
+          appearance: none;
+          border: 0;
+          font: inherit;
+          color: var(--app-text);
+        }
+
+        .admin-language-switcher__trigger {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+          border: 1px solid var(--app-border-strong);
+          border-radius: 8px;
+          background: rgba(255, 255, 255, 0.94);
+          padding: 8px 12px 8px 10px;
+          box-shadow: var(--app-shadow-soft);
+          cursor: pointer;
+          transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+        }
+
+        .admin-language-switcher__trigger:hover,
+        .admin-language-switcher__trigger:focus-visible,
+        .admin-language-switcher.is-open .admin-language-switcher__trigger {
+          border-color: rgba(115, 80, 55, 0.42);
+          background: var(--color-card);
+          box-shadow: 0 12px 28px rgba(48, 33, 24, 0.12);
+          outline: none;
+        }
+
+        .admin-language-switcher__code {
+          width: 30px;
+          min-width: 30px;
+          height: 24px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 6px;
+          background: rgba(115, 80, 55, 0.12);
+          color: var(--color-primary);
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0;
+        }
+
+        .admin-language-switcher__current {
+          min-width: 58px;
+          text-align: left;
+        }
+
+        .admin-language-switcher__chevron {
+          width: 8px;
+          height: 8px;
+          border-right: 2px solid currentColor;
+          border-bottom: 2px solid currentColor;
+          transform: translateY(-2px) rotate(45deg);
+          opacity: 0.62;
+          transition: transform 160ms ease;
+        }
+
+        .admin-language-switcher.is-open .admin-language-switcher__chevron {
+          transform: translateY(2px) rotate(225deg);
+        }
+
+        .admin-language-switcher__menu {
+          position: absolute;
+          right: 0;
+          top: calc(100% + 8px);
+          z-index: 60;
+          width: 180px;
+          display: grid;
+          gap: 4px;
+          border: 1px solid var(--app-border-strong);
+          border-radius: 10px;
+          background: var(--color-card);
+          padding: 6px;
+          box-shadow: 0 18px 42px rgba(48, 33, 24, 0.18);
+        }
+
+        .admin-language-switcher__menu::before {
+          content: "";
+          position: absolute;
+          right: 18px;
+          top: -6px;
+          width: 10px;
+          height: 10px;
+          border-left: 1px solid var(--app-border-strong);
+          border-top: 1px solid var(--app-border-strong);
+          background: var(--color-card);
+          transform: rotate(45deg);
+        }
+
+        .admin-language-switcher__option {
+          position: relative;
+          z-index: 1;
+          min-height: 38px;
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr) 8px;
+          align-items: center;
+          gap: 9px;
+          border-radius: 7px;
+          background: transparent;
+          padding: 7px 9px;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .admin-language-switcher__option:hover,
+        .admin-language-switcher__option:focus-visible,
+        .admin-language-switcher__option.is-active {
+          background: rgba(115, 80, 55, 0.1);
+          outline: none;
+        }
+
+        .admin-language-switcher__active-dot {
+          width: 7px;
+          height: 7px;
+          border-radius: 999px;
+          background: transparent;
+        }
+
+        .admin-language-switcher__option.is-active .admin-language-switcher__active-dot {
+          background: var(--color-primary);
+        }
+
+        @media (max-width: 720px) {
+          .admin-language-switcher {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .admin-language-switcher__trigger {
+            flex: 1;
+            justify-content: space-between;
+          }
+
+          .admin-language-switcher__menu {
+            left: 0;
+            right: auto;
+            width: 100%;
+            min-width: 180px;
+          }
+        }
+      `}</style>
+    </div>
   );
 }
