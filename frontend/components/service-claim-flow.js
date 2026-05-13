@@ -749,6 +749,17 @@ function buildAutofillFieldsFromContract(contract) {
   };
 }
 
+function formatShortAvailabilityDate(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 6);
+  if (digits.length <= 2) {
+    return digits;
+  }
+  if (digits.length <= 4) {
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  }
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+}
+
 export default function ServiceClaimFlow() {
   const [language, setLanguage] = useState("de");
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -891,7 +902,7 @@ export default function ServiceClaimFlow() {
   function handleFieldChange(field, value) {
     setForm((current) => ({
       ...current,
-      [field]: value,
+      [field]: field === "availabilityDate" ? formatShortAvailabilityDate(value) : value,
     }));
 
     if (field === "contractNumber") {
@@ -1408,9 +1419,12 @@ export default function ServiceClaimFlow() {
                 <label className="service-field">
                   <span>{t("availabilityDate")}</span>
                   <input
-                    type="date"
+                    type="text"
                     value={formValues.availabilityDate}
                     onChange={(event) => handleFieldChange("availabilityDate", event.target.value)}
+                    placeholder="dd/mm/yy"
+                    inputMode="numeric"
+                    pattern="\d{2}/\d{2}/\d{2}"
                   />
                 </label>
                 <label className="service-field">
