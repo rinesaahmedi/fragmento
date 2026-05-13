@@ -33,8 +33,9 @@ const FAILED_ERROR_BY_LANGUAGE = {
   en: "The product question could not be answered.",
 };
 
-const DEFAULT_WARRANTY_FACT = "Warranty: 24-month (2-year)";
+const DEFAULT_WARRANTY_FACT = "Warranty: 5-year";
 const WARRANTY_QUESTION_PATTERN = /\b(warranty|warranties|guarantee|guarantees|garantie|garantien)\b/i;
+const ENERGY_QUESTION_PATTERN = /\b(e[\s-]?label|energy label|energielabel|energieklasse|energy\s+(?:efficiency\s+)?(?:class|klasse)|energy\s+klasse|energie\s+class)\b/i;
 
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
@@ -187,7 +188,7 @@ function getFactValue(item, labelPattern) {
 }
 
 function getWarrantyValue(item) {
-  return getFactValue(item, /^(warranty|garantie)\s*:/i) || "24-month (2-year)";
+  return getFactValue(item, /^(warranty|garantie)\s*:/i) || "5-year";
 }
 
 function getEnergyClassValue(item) {
@@ -293,7 +294,7 @@ function isUnsupportedFollowUpQuestion(question, items) {
     return true;
   }
 
-  if (/(energy|energie|verbrauch|consumption|kwh)/i.test(value) && !items.some((item) => getEnergyClassValue(item) || getAnnualConsumptionValue(item))) {
+  if (/(energy|energie|klasse|class|verbrauch|consumption|kwh)/i.test(value) && !items.some((item) => getEnergyClassValue(item) || getAnnualConsumptionValue(item))) {
     return true;
   }
 
@@ -457,6 +458,10 @@ function getEnergyAnswerItemName(item, language) {
     return formatExtractorHoodAnswerName(item, language, explicitModel);
   }
 
+  if (/(?:oven|backofen)[\s\S]{0,80}(?:hob|kochfeld)|(?:hob|kochfeld)[\s\S]{0,80}(?:oven|backofen)/i.test(sourceText)) {
+    return getPublicItemName(item, language);
+  }
+
   if (/oven and hob|backofen|oven|kochfeld|hob/i.test(sourceText)) {
     return language === "de"
       ? `Backofen${explicitModel ? ` (${explicitModel})` : ""}`
@@ -464,6 +469,34 @@ function getEnergyAnswerItemName(item, language) {
   }
 
   return getPublicItemName(item, language);
+}
+
+function shouldUseModelForEnergyAnswer(items) {
+  return items.some((item) => {
+    const sourceText = getCombinedItemInfoText(item);
+    const hasMultipleProductTypes = [
+      /oven|backofen/i,
+      /hob|kochfeld/i,
+      /washing machine|waschmaschine/i,
+      /dishwasher|geschirrsp/i,
+      /refrigerator|fridge|kuehl|kÃ¼hl|gefrier/i,
+      /extractor hood|dunstabzug|haube/i,
+    ].filter((pattern) => pattern.test(sourceText)).length > 1;
+    const hasGroupedEnergyFact = /(?:^|\n)\s*(?:[^:\n]{2,40})\s*:\s*(?:energieklasse|energy\s+(?:efficiency\s+)?class)\b/i.test(sourceText);
+
+    return hasMultipleProductTypes && hasGroupedEnergyFact;
+  });
+}
+
+function getEnergyAnswerRecords(item, language) {
+  return [
+    {
+      name: getEnergyAnswerItemName(item, language),
+      hasELabel: hasELabelDocument(item),
+      energyClass: getEnergyClassValue(item),
+      annualConsumption: getAnnualConsumptionValue(item),
+    },
+  ];
 }
 
 function extractNoiseValue(item) {
@@ -510,48 +543,64 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
   const value = String(question || "").toLowerCase();
   const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
 
-  if (!/(e[\s-]?label|energy label|energielabel|energieklasse|energy\s+(?:efficiency\s+)?class)/i.test(value)) {
+  if (!ENERGY_QUESTION_PATTERN.test(value)) {
+    return null;
+  }
+
+  if (shouldUseModelForEnergyAnswer(items)) {
     return null;
   }
 
   const includeConsumption = /(consumption|verbrauch|kwh)/i.test(value);
-  const entries = items
-    .map((item) => {
-      const name = getEnergyAnswerItemName(item, language);
-      const hasELabel = hasELabelDocument(item);
-      const energyClass = getEnergyClassValue(item);
-      const annualConsumption = getAnnualConsumptionValue(item);
-
-      if (!hasELabel && !energyClass) return null;
-
+  const records = items.flatMap((item) => getEnergyAnswerRecords(item, language));
+  const knownEntries = records
+    .filter((record) => record.energyClass)
+    .map((record) => {
+      const consumption = includeConsumption && record.annualConsumption
+        ? language === "de" ? `, Verbrauch ${record.annualConsumption}` : `, consumption ${record.annualConsumption}`
+        : "";
+      return language === "de"
+        ? `- ${record.name}: Energieklasse ${record.energyClass}${consumption}`
+        : `- ${record.name}: energy class ${record.energyClass}${consumption}`;
+    });
+  const unknownEntries = records
+    .filter((record) => !record.energyClass)
+    .map((record) => {
       if (language === "de") {
-        const details = [];
-        details.push(hasELabel ? "E-Label verfuegbar" : "kein E-Label gefunden");
-        details.push(energyClass ? `Energieklasse ${energyClass}` : "keine dokumentierte Energieklasse gefunden");
-        if (includeConsumption && annualConsumption) {
-          details.push(`Verbrauch ${annualConsumption}`);
-        }
-        return `- ${name}: ${details.join(", ")}`;
+        const note = record.hasELabel ? "E-Label vorhanden, aber keine Energieklasse im verfuegbaren Produkttext gefunden" : "keine dokumentierte Energieklasse gefunden";
+        return `- ${record.name}: ${note}`;
       }
 
-      const details = [];
-      details.push(hasELabel ? "E-label available" : "no E-label found");
-      details.push(energyClass ? `energy class ${energyClass}` : "no documented energy class found");
-      if (includeConsumption && annualConsumption) {
-        details.push(`consumption ${annualConsumption}`);
-      }
-      return `- ${name}: ${details.join(", ")}`;
-    })
-    .filter(Boolean);
+      const note = record.hasELabel ? "E-label exists, but no energy class was found in the available product text" : "no documented energy class found";
+      return `- ${record.name}: ${note}`;
+    });
 
-  if (!entries.length) {
+  if (!knownEntries.length && !unknownEntries.length) {
     return { answer: notFoundAnswer, found: false };
   }
 
+  const answerBlocks = [];
+  if (knownEntries.length) {
+    answerBlocks.push(language === "de"
+      ? `Dokumentierte Energieklasse:\n${knownEntries.join("\n")}`
+      : `Documented energy class:\n${knownEntries.join("\n")}`);
+  }
+  if (unknownEntries.length) {
+    answerBlocks.push(language === "de"
+      ? `Nicht im verfuegbaren Produkttext gefunden:\n${unknownEntries.join("\n")}`
+      : `Not found in the available product text:\n${unknownEntries.join("\n")}`);
+  }
+
+  const followUp = includeConsumption
+    ? ""
+    : language === "de"
+      ? "\nSoll ich auch die dokumentierten Verbrauchswerte auflisten?"
+      : "\nWould you like me to list the documented consumption figures too?";
+
   return {
     answer: language === "de"
-      ? `Ja, bei den ausgewaehlten Produkten habe ich folgende Energiedaten gefunden:\n${entries.join("\n")}\nMoechtest du, dass ich dir auch den Verbrauch pro Produkt dazuschreibe?`
-      : `Yes, here is the documented energy information for the selected products:\n${entries.join("\n")}\nWould you like me to add the consumption figures for each product as well?`,
+      ? `${answerBlocks.join("\n\n")}${followUp}`
+      : `${answerBlocks.join("\n\n")}${followUp}`,
     found: true,
   };
 }
@@ -629,10 +678,12 @@ function extractKnownModel(item) {
   const sourceText = getCombinedItemInfoText(item);
   const patterns = [
     /\bKHF\s*664\s*611\s*S(?:\s*Stripe\s*X)?\b/i,
-    /\bFH\s*664\s*621\s*S\b/i,
+    /\bFH\s*664\s*621\s*[SE]\b/i,
+    /\bEWA\s*34660\s*W\b/i,
     /\bEBX\s*943\s*600\s*S\b/i,
     /\bOL-KMI\s*754\s*000\s*E\b/i,
     /\bKGC\s*15495\s*S\b/i,
+    /\bOL-KGCN\s*388140\s*E\b/i,
     /\bA-EGSPV597210\b/i,
   ];
 
@@ -940,13 +991,18 @@ export async function POST(request) {
       "Do not treat recent chat messages as product facts; product facts must come from the provided product information.",
       "Do not use general knowledge.",
       "Do not guess.",
+      "Understand close mixed-language wording from customers. For example, treat 'energy klasse' as 'energy class' and 'energie class' as 'Energieklasse'.",
       "Do not infer dimensions, measurements, niche sizes, or noise levels from catalog names, UI labels, or codes.",
-      "Use dimensions, measurements, installation sizes, and noise values only when they are explicitly present in the provided summary, key facts, or PDF text.",
+      "Use dimensions, measurements, installation sizes, energy classes, consumption values, and noise values only when they are explicitly present in the provided summary, key facts, or PDF text.",
       `The customer interface language is ${LANGUAGE_LABELS[responseLanguage] || LANGUAGE_LABELS.en}; answer in that language.`,
       "Prefer natural product names in answers. Do not mention internal product codes unless the customer explicitly asks for a code, model, or article number.",
+      "Do not confuse document availability with the requested specification. An E-label PDF being available does not mean the energy class is known unless the class itself is present in the provided product information.",
       "If the customer asks for the product name, model, type, or what the product is, use only the explicit product name, model, type, code, summary, or key facts from the provided product information.",
       "If the customer asks whether a product has a feature, capability, function, or mode, answer yes when that feature is explicitly listed in the summary, key facts, or PDF text, and then briefly cite the matching detail.",
       "Treat close wording matches as valid support. For example, if the documentation mentions a timer, Steam Clean, child safety lock, booster, pot detection, or similar feature wording, answer based on that explicit mention.",
+      "When the customer asks for one fact across multiple products, separate products with documented values from products where that exact value is not documented.",
+      "For bundles or sets with several sub-products, keep facts attached to the sub-product named in the documentation. If the text says 'Backofen: Energieklasse A', answer that the oven has energy class A; do not apply that class to the hob or to the whole set.",
+      "If a sub-product in a bundle has no documented value for the requested fact, say that the value is not documented for that sub-product.",
       "When the answer is available, give a direct answer first and include the most relevant concrete specifications or features from the provided information.",
       "For yes/no questions, start with a direct yes or no, then add one short supporting sentence from the provided information.",
       "If multiple relevant specs are present, prefer dimensions, capacity, energy class, controls, functions, and included parts.",
