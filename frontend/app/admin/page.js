@@ -200,16 +200,47 @@ function normalizeClaimElementLabel(value) {
     .trim();
 }
 
+function normalizeClaimElementKey(value) {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function buildClaimElementStat(area) {
+  const code = String(area?.code || "").trim();
+  const componentId = String(area?.componentId || "").trim();
+  const name = normalizeClaimElementLabel(area?.name || code || componentId);
+  const key = code
+    ? `code:${code.toUpperCase()}`
+    : componentId
+      ? `component:${componentId.toLowerCase()}`
+      : `name:${normalizeClaimElementKey(name)}`;
+  return name ? { key, name } : null;
+}
+
 function extractClaimElements(problemDescription) {
   const lines = String(problemDescription || "").split("\n").map((line) => line.trim());
   if (!lines.length) return [];
   const firstKitchenAreasPrefix = KITCHEN_AREA_FIRST_LINE_PREFIXES.find((prefix) => lines[0].startsWith(prefix));
   if (firstKitchenAreasPrefix) {
-    return lines[0]
+    const inlineElements = lines[0]
       .slice(firstKitchenAreasPrefix.length)
       .split(",")
       .map(normalizeClaimElementLabel)
-      .filter(Boolean);
+      .filter(Boolean)
+      .map((name) => buildClaimElementStat({ name }));
+    if (inlineElements.length) {
+      return inlineElements;
+    }
+    const multilineElements = [];
+    for (const line of lines.slice(1)) {
+      if (!line) break;
+      const separatorIndex = line.indexOf(":");
+      const label = separatorIndex >= 0 ? line.slice(0, separatorIndex) : line;
+      const element = buildClaimElementStat({ name: normalizeClaimElementLabel(label) });
+      if (element) {
+        multilineElements.push(element);
+      }
+    }
+    return multilineElements;
   }
 
   const selectedAreasIndex = lines.findIndex((line) => line === "Ausgewählte Küchenbereiche:");
@@ -221,7 +252,7 @@ function extractClaimElements(problemDescription) {
     if (!line.startsWith("-")) break;
     elements.push(normalizeClaimElementLabel(line.slice(1)));
   }
-  return elements.filter(Boolean);
+  return elements.filter(Boolean).map((name) => buildClaimElementStat({ name }));
 }
 
 function extractStructuredClaimElements(problemAreasJson) {
@@ -231,7 +262,7 @@ function extractStructuredClaimElements(problemAreasJson) {
     const areas = JSON.parse(raw);
     if (!Array.isArray(areas)) return [];
     return areas
-      .map((area) => normalizeClaimElementLabel(area?.name || area?.code || ""))
+      .map(buildClaimElementStat)
       .filter(Boolean);
   } catch {
     return [];
@@ -985,7 +1016,10 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const claimCountryStats = new Map();
   for (const row of claimElementRows) {
     const structuredElements = extractStructuredClaimElements(row.problemAreasJson);
-    const elements = new Set(structuredElements.length ? structuredElements : extractClaimElements(row.problemDescription));
+    const uniqueElements = new Map(
+      (structuredElements.length ? structuredElements : extractClaimElements(row.problemDescription))
+        .map((element) => [element.key, element]),
+    );
     const hasAttachments = Boolean(String(row.attachmentsJson || "").trim());
     const country = String(row.clientCountry || "").trim() || "Not captured";
     const currentCountry = claimCountryStats.get(country) || {
@@ -997,15 +1031,15 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     if (hasAttachments) currentCountry.claimsWithAttachments += 1;
     claimCountryStats.set(country, currentCountry);
 
-    for (const element of elements) {
-      const current = claimElementStats.get(element) || {
-        name: element,
+    for (const element of uniqueElements.values()) {
+      const current = claimElementStats.get(element.key) || {
+        name: element.name,
         claims: 0,
         claimsWithAttachments: 0,
       };
       current.claims += 1;
       if (hasAttachments) current.claimsWithAttachments += 1;
-      claimElementStats.set(element, current);
+      claimElementStats.set(element.key, current);
     }
   }
   const claimElementData = Array.from(claimElementStats.values())

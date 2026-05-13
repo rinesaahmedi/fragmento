@@ -2,45 +2,85 @@ import { stripProductDimensionsFromLabel } from "./product-label-format";
 
 /** First-line prefixes we may auto-insert; must match `kitchenAreasLinePrefix` in service form copy per language. */
 export const KITCHEN_AREA_FIRST_LINE_PREFIXES = [
-  "Küchenbereiche:",
+  "K\u00fcchenbereiche:",
   "Kitchen areas:",
-  "Mutfak bölgeleri:",
+  "Mutfak b\u00f6lgeleri:",
   "Zonas de la cocina:",
-  "Zones concernées :",
-  "Кухонные зоны:",
+  "Zones concern\u00e9es :",
+  "\u041a\u0443\u0445\u043e\u043d\u043d\u044b\u0435 \u0437\u043e\u043d\u044b:",
 ];
 
 export function splitKitchenAreasFromProblemDescription(text) {
   const raw = String(text ?? "");
   const lines = raw.split("\n");
   if (!lines.length) {
-    return { userText: raw };
+    return { userText: raw, areaDetailsByName: new Map(), areaDetails: [] };
   }
+
   const first = lines[0];
-  const matched = KITCHEN_AREA_FIRST_LINE_PREFIXES.some((prefix) => first.startsWith(prefix));
-  if (!matched) {
-    return { userText: raw };
+  const matchedPrefix = KITCHEN_AREA_FIRST_LINE_PREFIXES.find((prefix) => first.startsWith(prefix));
+  if (!matchedPrefix) {
+    return { userText: raw, areaDetailsByName: new Map(), areaDetails: [] };
   }
+
+  const areaDetailsByName = new Map();
+  const areaDetails = [];
   let i = 1;
+
+  while (i < lines.length && lines[i] !== "") {
+    const separatorIndex = lines[i].indexOf(":");
+    if (separatorIndex < 0) {
+      break;
+    }
+    const name = lines[i].slice(0, separatorIndex).trim();
+    const detail = lines[i].slice(separatorIndex + 1).trimStart();
+    if (name) {
+      areaDetailsByName.set(name, detail);
+      areaDetails.push(detail);
+    }
+    i += 1;
+  }
+
+  if (i === 1) {
+    const inlineAreas = first
+      .slice(matchedPrefix.length)
+      .split(",")
+      .map((name) => name.trim())
+      .filter(Boolean);
+    for (const name of inlineAreas) {
+      areaDetailsByName.set(name, "");
+      areaDetails.push("");
+    }
+  }
+
   if (lines[i] === "") {
     i += 1;
   }
-  return { userText: lines.slice(i).join("\n") };
+
+  return { userText: lines.slice(i).join("\n"), areaDetailsByName, areaDetails };
 }
 
 /**
- * Rebuilds full problem text: auto first line from selection + preserved user text below.
+ * Rebuilds full problem text: auto selected areas as editable lines + preserved user text below.
  * `metaById` maps componentId -> { name }.
  */
-export function composeProblemDescriptionWithAreas(prefix, componentIds, metaById, existingFullText) {
-  const { userText } = splitKitchenAreasFromProblemDescription(existingFullText);
+export function composeProblemDescriptionWithAreas(prefix, componentIds, metaById, existingFullText, formatName) {
+  const { userText, areaDetailsByName, areaDetails } = splitKitchenAreasFromProblemDescription(existingFullText);
   const names = (componentIds || [])
-    .map((id) => stripProductDimensionsFromLabel(metaById.get(id)?.name))
+    .map((id) => {
+      const meta = metaById.get(id);
+      const rawName = stripProductDimensionsFromLabel(meta?.name);
+      return typeof formatName === "function" ? formatName(meta, rawName) : rawName;
+    })
     .filter(Boolean);
   if (!names.length) {
     return userText.trimEnd();
   }
-  const line = `${prefix} ${names.join(", ")}`;
+
+  const lines = [
+    prefix,
+    ...names.map((name, index) => `${name}: ${areaDetailsByName.get(name) || areaDetails[index] || ""}`),
+  ];
   const rest = userText.trim();
-  return rest ? `${line}\n\n${rest}` : line;
+  return rest ? `${lines.join("\n")}\n\n${rest}` : lines.join("\n");
 }

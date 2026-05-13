@@ -1393,7 +1393,7 @@ textarea {
 .service-claim-kitchen__header {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   flex-wrap: wrap;
   margin-bottom: 14px;
@@ -1431,13 +1431,6 @@ textarea {
 .service-claim-kitchen__reset:hover,
 .service-claim-kitchen__reset:focus-visible {
   background: rgba(107, 79, 58, 0.08);
-}
-
-.service-claim-kitchen__summary {
-  margin: 14px 0 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  color: var(--app-text);
 }
 
 .service-form__section--problem-kitchen {
