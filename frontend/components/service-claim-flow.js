@@ -18,6 +18,7 @@ const LANGUAGE_OPTIONS = [
 const MAX_CLAIM_ATTACHMENT_COUNT = 5;
 const MAX_CLAIM_ATTACHMENT_BYTES = 4 * 1024 * 1024;
 const CLAIM_ATTACHMENT_ACCEPT = "image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx";
+const SERIAL_NUMBER_IMAGE_ACCEPT = "image/*";
 
 const CLAIM_FILENAME_PATTERN = /\.(pdf|png|jpe?g|gif|webp|bmp|tiff?|txt|docx?|xlsx?)$/i;
 
@@ -86,7 +87,7 @@ const COPY = {
     givenNamePlaceholder: "Vorname",
     surname: "Nachname",
     surnamePlaceholder: "Nachname",
-    gender: "Geschlecht",
+    gender: "Anrede",
     genderPlaceholder: "Bitte w\u00e4hlen",
     genderFemale: "Weiblich",
     genderMale: "M\u00e4nnlich",
@@ -95,6 +96,9 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "E-Mail-Adresse",
     emailPlaceholder: "name@beispiel.de",
+    availability: "Erreichbarkeit",
+    availabilityDate: "Datum",
+    availabilityTime: "Uhrzeit",
     clientAddress: "Adresse des Kunden",
     clientCountry: "Land",
     clientCountryPlaceholder: "Deutschland",
@@ -132,6 +136,8 @@ const COPY = {
     problemPlaceholder: "Beschreibe das Problem kurz",
     serialNumber: "Seriennummer des E-Ger\u00e4tes",
     serialPlaceholder: "Seriennummer",
+    serialNumberImage: "Foto der Seriennummer",
+    serialNumberImageHint: "",
     attachments: "Anh\u00e4nge (optional)",
     attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 5 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
@@ -199,6 +205,9 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "Email address",
     emailPlaceholder: "name@example.com",
+    availability: "Availability",
+    availabilityDate: "Date",
+    availabilityTime: "Time",
     clientAddress: "Client address",
     clientCountry: "Country",
     clientCountryPlaceholder: "Germany",
@@ -236,6 +245,8 @@ const COPY = {
     problemPlaceholder: "Describe the issue briefly",
     serialNumber: "Serial number of the appliance",
     serialPlaceholder: "Serial number",
+    serialNumberImage: "Photo of the serial number",
+    serialNumberImageHint: "",
     attachments: "Attachments (optional)",
     attachmentsHint: "PDFs, images, or office files \u2014 up to 5 files, 4 MB each.",
     attachmentsClear: "Remove all",
@@ -303,6 +314,9 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "E-posta adresi",
     emailPlaceholder: "isim@example.com",
+    availability: "Uygunluk",
+    availabilityDate: "Tarih",
+    availabilityTime: "Saat",
     clientAddress: "M\u00fc\u015fteri adresi",
     clientCountry: "\u00dclke",
     clientCountryPlaceholder: "Almanya",
@@ -340,6 +354,8 @@ const COPY = {
     problemPlaceholder: "Sorunu k\u0131saca a\u00e7\u0131klay\u0131n",
     serialNumber: "Cihaz seri numaras\u0131",
     serialPlaceholder: "Seri numaras\u0131",
+    serialNumberImage: "Seri numaras\u0131n\u0131n foto\u011fraf\u0131",
+    serialNumberImageHint: "",
     attachments: "Ekler (iste\u011fe ba\u011fl\u0131)",
     attachmentsHint: "PDF, g\u00f6rsel veya ofis dosyalar\u0131 \u2014 en fazla 5 dosya, dosya ba\u015f\u0131na en fazla 4 MB.",
     attachmentsClear: "T\u00fcm\u00fcn\u00fc kald\u0131r",
@@ -397,6 +413,9 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "Direcci\u00f3n de correo electr\u00f3nico",
     emailPlaceholder: "nombre@ejemplo.com",
+    availability: "Disponibilidad",
+    availabilityDate: "Fecha",
+    availabilityTime: "Hora",
     clientAddress: "Direcci\u00f3n del cliente",
     clientCountry: "Pa\u00eds",
     clientCountryPlaceholder: "Alemania",
@@ -434,6 +453,8 @@ const COPY = {
     problemPlaceholder: "Describa brevemente el problema",
     serialNumber: "N\u00famero de serie del electrodom\u00e9stico",
     serialPlaceholder: "N\u00famero de serie",
+    serialNumberImage: "Foto del n\u00famero de serie",
+    serialNumberImageHint: "",
     attachments: "Adjuntos (opcional)",
     attachmentsHint: "PDF, im\u00e1genes u oficina: hasta 5 archivos, 4 MB cada uno.",
     attachmentsClear: "Quitar todos",
@@ -491,6 +512,9 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "Adresse e-mail",
     emailPlaceholder: "nom@exemple.com",
+    availability: "Disponibilit\u00e9",
+    availabilityDate: "Date",
+    availabilityTime: "Heure",
     clientAddress: "Adresse du client",
     clientCountry: "Pays",
     clientCountryPlaceholder: "Allemagne",
@@ -528,6 +552,8 @@ const COPY = {
     problemPlaceholder: "D\u00e9crivez bri\u00e8vement le probl\u00e8me",
     serialNumber: "Num\u00e9ro de s\u00e9rie de l'appareil",
     serialPlaceholder: "Num\u00e9ro de s\u00e9rie",
+    serialNumberImage: "Photo du num\u00e9ro de s\u00e9rie",
+    serialNumberImageHint: "",
     attachments: "Pi\u00e8ces jointes (facultatif)",
     attachmentsHint: "PDF, images ou bureautique : jusqu'\u00e0 5 fichiers, 4 Mo chacun.",
     attachmentsClear: "Tout retirer",
@@ -585,6 +611,9 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "\u0410\u0434\u0440\u0435\u0441 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u044b",
     emailPlaceholder: "name@example.com",
+    availability: "\u041a\u043e\u0433\u0434\u0430 \u0441 \u0432\u0430\u043c\u0438 \u043c\u043e\u0436\u043d\u043e \u0441\u0432\u044f\u0437\u0430\u0442\u044c\u0441\u044f",
+    availabilityDate: "\u0414\u0430\u0442\u0430",
+    availabilityTime: "\u0412\u0440\u0435\u043c\u044f",
     clientAddress: "\u0410\u0434\u0440\u0435\u0441 \u043a\u043b\u0438\u0435\u043d\u0442\u0430",
     clientCountry: "\u0421\u0442\u0440\u0430\u043d\u0430",
     clientCountryPlaceholder: "\u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f",
@@ -622,6 +651,8 @@ const COPY = {
     problemPlaceholder: "\u041a\u0440\u0430\u0442\u043a\u043e \u043e\u043f\u0438\u0448\u0438\u0442\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0443",
     serialNumber: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0430",
     serialPlaceholder: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
+    serialNumberImage: "\u0424\u043e\u0442\u043e \u0441\u0435\u0440\u0438\u0439\u043d\u043e\u0433\u043e \u043d\u043e\u043c\u0435\u0440\u0430",
+    serialNumberImageHint: "",
     attachments: "\u0412\u043b\u043e\u0436\u0435\u043d\u0438\u044f (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     attachmentsHint: "PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f \u0438\u043b\u0438 \u043e\u0444\u0438\u0441\u043d\u044b\u0435 \u0444\u0430\u0439\u043b\u044b \u2014 \u0434\u043e 5 \u0444\u0430\u0439\u043b\u043e\u0432, \u0434\u043e 4 \u041c\u0411 \u043a\u0430\u0436\u0434\u044b\u0439.",
     attachmentsClear: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u0441\u0435",
@@ -644,6 +675,8 @@ const INITIAL_FORM = {
   gender: "",
   phone: "",
   email: "",
+  availabilityDate: "",
+  availabilityTime: "",
   clientCountry: "",
   clientAddressLine1: "",
   clientAddressLine2: "",
@@ -695,7 +728,9 @@ export default function ServiceClaimFlow() {
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
   const [problemComponentIds, setProblemComponentIds] = useState([]);
   const [attachments, setAttachments] = useState([]);
+  const [serialNumberImage, setSerialNumberImage] = useState(null);
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
+  const [serialNumberImageFieldKey, setSerialNumberImageFieldKey] = useState(0);
   const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
   const [contractHelpSlide, setContractHelpSlide] = useState(0);
   const languageMenuRef = useRef(null);
@@ -715,7 +750,13 @@ export default function ServiceClaimFlow() {
   const normalizedContractNumber = formValues.contractNumber.trim();
 
   function t(key) {
-    return copy[key] || fallbackCopy[key] || "";
+    if (Object.prototype.hasOwnProperty.call(copy, key)) {
+      return copy[key];
+    }
+    if (Object.prototype.hasOwnProperty.call(fallbackCopy, key)) {
+      return fallbackCopy[key];
+    }
+    return "";
   }
 
   const requiredFieldTitle = t("requiredFieldTitle");
@@ -901,7 +942,8 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
-        if (next.length >= MAX_CLAIM_ATTACHMENT_COUNT) {
+        const currentCount = next.length + (serialNumberImage ? 1 : 0);
+        if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
           break;
         }
@@ -922,8 +964,40 @@ export default function ServiceClaimFlow() {
     });
   }
 
+  function handleSerialNumberImageSelected(event) {
+    const picked = event.target.files?.[0] || null;
+    event.target.value = "";
+    if (!picked) {
+      return;
+    }
+
+    if (picked.size > MAX_CLAIM_ATTACHMENT_BYTES) {
+      setError(copy.attachmentsErrorFileTooLarge);
+      return;
+    }
+
+    if (!picked.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(picked)) {
+      setError(copy.attachmentsErrorType);
+      return;
+    }
+
+    if (!serialNumberImage && attachments.length + 1 > MAX_CLAIM_ATTACHMENT_COUNT) {
+      setError(copy.attachmentsErrorTooMany);
+      return;
+    }
+
+    setError("");
+    setSerialNumberImage(picked);
+  }
+
   function removeAttachment(index) {
     setAttachments((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
+  }
+
+  function removeSerialNumberImage() {
+    setSerialNumberImage(null);
+    setSerialNumberImageFieldKey((key) => key + 1);
+    setError("");
   }
 
   function clearAttachments() {
@@ -982,6 +1056,20 @@ export default function ServiceClaimFlow() {
     ].filter(Boolean).join(", ");
   }
 
+  function buildSubmittedProblemDescription() {
+    const description = String(formValues.problemDescription || "").trim();
+    const availabilityDate = String(formValues.availabilityDate || "").trim();
+    const availabilityTime = String(formValues.availabilityTime || "").trim();
+    const availability = [availabilityDate, availabilityTime].filter(Boolean).join(" ");
+    if (!availability) {
+      return description;
+    }
+    if (/^Erreichbarkeit\s*:/im.test(description)) {
+      return description;
+    }
+    return `${description}\n\nErreichbarkeit: ${availability}`.trim();
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -1007,6 +1095,7 @@ export default function ServiceClaimFlow() {
       const payload = {
         ...form,
         clientAddress: buildClientAddress(),
+        problemDescription: buildSubmittedProblemDescription(),
         language,
       };
       for (const [key, value] of Object.entries(payload)) {
@@ -1022,6 +1111,9 @@ export default function ServiceClaimFlow() {
         formData.append("problemAreasJson", JSON.stringify(problemAreas));
       } else {
         formData.append("problemAreasJson", "[]");
+      }
+      if (serialNumberImage) {
+        formData.append("attachments", serialNumberImage);
       }
       for (const file of attachments) {
         formData.append("attachments", file);
@@ -1041,8 +1133,10 @@ export default function ServiceClaimFlow() {
       setSuccessMessage(payloadResponse.message || copy.submitSuccess);
       setForm(INITIAL_FORM);
       setAttachments([]);
+      setSerialNumberImage(null);
       setProblemComponentIds([]);
       setAttachmentFieldKey((key) => key + 1);
+      setSerialNumberImageFieldKey((key) => key + 1);
       setContractLookup(EMPTY_CONTRACT_LOOKUP);
     } catch (submitError) {
       setError(submitError.message || copy.submitError);
@@ -1266,6 +1360,31 @@ export default function ServiceClaimFlow() {
                   placeholder={copy.emailPlaceholder}
                 />
               </label>
+            </div>
+
+            <div className="service-field">
+              <span>
+                {t("availability")}
+                <OptionalFieldSuffix text={fieldOptionalSuffix} />
+              </span>
+              <div className="service-field-grid">
+                <label className="service-field">
+                  <span>{t("availabilityDate")}</span>
+                  <input
+                    type="date"
+                    value={formValues.availabilityDate}
+                    onChange={(event) => handleFieldChange("availabilityDate", event.target.value)}
+                  />
+                </label>
+                <label className="service-field">
+                  <span>{t("availabilityTime")}</span>
+                  <input
+                    type="time"
+                    value={formValues.availabilityTime}
+                    onChange={(event) => handleFieldChange("availabilityTime", event.target.value)}
+                  />
+                </label>
+              </div>
             </div>
 
             <section className="service-form__section">
@@ -1499,19 +1618,55 @@ export default function ServiceClaimFlow() {
               </label>
             </section>
 
-            <label className="service-field">
-              <span>
-                {copy.serialNumber}
-                <RequiredFieldMark title={requiredFieldTitle} />
-              </span>
-              <input
-                type="text"
-                value={formValues.serialNumber}
-                onChange={(event) => handleFieldChange("serialNumber", event.target.value)}
-                placeholder={copy.serialPlaceholder}
-                required
-              />
-            </label>
+            <div className="service-field-grid">
+              <label className="service-field">
+                <span>
+                  {copy.serialNumber}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  type="text"
+                  value={formValues.serialNumber}
+                  onChange={(event) => handleFieldChange("serialNumber", event.target.value)}
+                  placeholder={copy.serialPlaceholder}
+                  required
+                />
+              </label>
+
+              <div className="service-field service-field--attachments">
+                <span>
+                  {t("serialNumberImage")}
+                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                </span>
+                {t("serialNumberImageHint") ? (
+                  <p className="service-form__hint service-form__hint--attachments">{t("serialNumberImageHint")}</p>
+                ) : null}
+                <input
+                  key={serialNumberImageFieldKey}
+                  type="file"
+                  className="service-field__file"
+                  accept={SERIAL_NUMBER_IMAGE_ACCEPT}
+                  onChange={handleSerialNumberImageSelected}
+                />
+                {serialNumberImage ? (
+                  <div className="service-attachments">
+                    <ul className="service-attachments__list">
+                      <li className="service-attachments__item">
+                        <span className="service-attachments__name">{serialNumberImage.name}</span>
+                        <button
+                          type="button"
+                          className="service-attachments__remove"
+                          onClick={removeSerialNumberImage}
+                          aria-label="Remove file"
+                        >
+                          ×
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            </div>
 
             <div className="service-field service-field--attachments">
               <span>{copy.attachments}</span>

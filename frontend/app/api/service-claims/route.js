@@ -252,6 +252,20 @@ function formatEmailFileSize(bytes) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function extractAvailabilityFromDescription(description) {
+  const raw = String(description || "");
+  const match = raw.match(/^Erreichbarkeit\s*:\s*(.+)$/m);
+  if (!match) {
+    return { description: raw.trim(), availability: "" };
+  }
+  const availability = match[1].trim();
+  const cleaned = raw
+    .replace(/^Erreichbarkeit\s*:\s*.+$/m, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+  return { description: cleaned, availability };
+}
+
 function buildComplaintEmailText(payload) {
   const landlordBlock = buildPartyContactBlock(
     payload.landlordGivenName,
@@ -264,6 +278,9 @@ function buildComplaintEmailText(payload) {
     payload.hausmeisterSurname,
     payload.hausmeisterPhone,
     payload.hausmeisterEmail,
+  );
+  const { description: problemText, availability } = extractAvailabilityFromDescription(
+    payload.problemDescription,
   );
   return [
     "Servicereklamation",
@@ -282,7 +299,8 @@ function buildComplaintEmailText(payload) {
     hausBlock,
     "",
     "Problem",
-    payload.problemDescription,
+    problemText,
+    ...(availability ? ["", `Erreichbarkeit: ${availability}`] : []),
     ...(payload.attachmentsMeta?.length
       ? [
           "",
@@ -315,6 +333,9 @@ function buildComplaintEmailHtml(payload) {
     .filter(Boolean)
     .join("\n");
 
+  const { description: problemText, availability } = extractAvailabilityFromDescription(
+    payload.problemDescription,
+  );
   const detailRows = [
     ["Vertragsnummer", payload.contractNumber],
     ["Vorname", payload.givenName],
@@ -326,7 +347,8 @@ function buildComplaintEmailHtml(payload) {
     ["Seriennummer", payload.serialNumber],
     ["Vermieter", landlordValue],
     ["Hausmeister", hausValue],
-    ["Problem", payload.problemDescription],
+    ["Problem", problemText],
+    ...(availability ? [["Erreichbarkeit", availability]] : []),
   ];
 
   const tbody = detailRows
