@@ -1358,9 +1358,14 @@ function KitchenConfiguratorContent({
         ? [
           {
             role: "assistant",
-            text: translate("configurator.productAssistantContextConfirmed", "You're now asking about {label}. Ask me anything from its product information.", {
-              label: option.shortLabel,
-            }),
+            text: option.type === "all"
+              ? translate(
+                "configurator.productAssistantContextConfirmedAll",
+                "You're now viewing all selected products. Ask me anything from their product information.",
+              )
+              : translate("configurator.productAssistantContextConfirmed", "You're now asking about {label}. Ask me anything from its product information.", {
+                label: option.shortLabel,
+              }),
           },
         ]
         : [],
@@ -1453,14 +1458,13 @@ function KitchenConfiguratorContent({
         body: JSON.stringify({
           language,
           question,
+          contractNumber: customer.contractNumber || initialContractNumber,
+          kitchenSlug,
           itemIds: [...new Set(itemIds)].slice(0, 10),
           conversationMessages: productAssistantMessages
             .filter((message) => message?.role && message?.text)
             .slice(-6)
             .map((message) => ({ role: message.role, text: message.text })),
-          contextItems: Array.isArray(selectedProductAssistantContext.contextItems)
-            ? selectedProductAssistantContext.contextItems
-            : undefined,
         }),
       });
 
