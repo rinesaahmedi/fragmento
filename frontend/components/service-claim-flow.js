@@ -1095,6 +1095,9 @@ export default function ServiceClaimFlow() {
       const payload = {
         ...form,
         clientAddress: buildClientAddress(),
+        clientCountry: formValues.clientCountry.trim(),
+        clientCity: formValues.clientCity.trim(),
+        clientPostalCode: formValues.clientPostalCode.trim(),
         problemDescription: buildSubmittedProblemDescription(),
         language,
       };

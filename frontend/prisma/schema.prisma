@@ -196,6 +196,9 @@ model ServiceClaim {
   phone              String?
   email              String?
   clientAddress      String?
+  clientCountry      String?
+  clientCity         String?
+  clientPostalCode   String?
   landlordName       String?
   landlordPhone      String?
   landlordEmail      String?

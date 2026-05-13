@@ -1,0 +1,5 @@
+ALTER TABLE "ServiceClaim"
+  ADD COLUMN IF NOT EXISTS "clientCountry" TEXT,
+  ADD COLUMN IF NOT EXISTS "clientCity" TEXT,
+  ADD COLUMN IF NOT EXISTS "clientPostalCode" TEXT;
+

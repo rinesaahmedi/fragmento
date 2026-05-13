@@ -395,18 +395,12 @@ async function loadClaimDashboardSummary(filters) {
   const whereClause = buildClaimWhereClause(filters, "sc");
   const [row] = await prisma.$queryRaw`
     SELECT
-      COUNT(*)::int AS "totalClaims",
-      COUNT(*) FILTER (WHERE sc."requestType" = 'complaint')::int AS "complaintClaims",
-      COUNT(*) FILTER (WHERE COALESCE(NULLIF(BTRIM(sc."attachmentsJson"), ''), '') <> '')::int AS "claimsWithAttachments",
       MIN(sc."createdAt") AS "earliestCreatedAt"
     FROM "ServiceClaim" sc
     ${whereClause}
   `;
 
   return {
-    totalClaims: Number(row?.totalClaims || 0),
-    complaintClaims: Number(row?.complaintClaims || 0),
-    claimsWithAttachments: Number(row?.claimsWithAttachments || 0),
     earliestCreatedAt: row?.earliestCreatedAt || null,
   };
 }
@@ -418,7 +412,10 @@ async function loadClaimElementRows(filters) {
       sc."id",
       sc."problemDescription",
       sc."problemAreasJson",
-      sc."attachmentsJson"
+      sc."attachmentsJson",
+      sc."clientCountry",
+      sc."clientCity",
+      sc."clientPostalCode"
     FROM "ServiceClaim" sc
     ${whereClause}
     ORDER BY sc."createdAt" DESC
@@ -868,9 +865,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const averageOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
   const emailedOrders = summary.emailedOrders;
   const conversionRate = totalOrders ? (emailedOrders / totalOrders) * 100 : 0;
-  const totalClaims = claimSummary.totalClaims;
-  const claimsWithAttachments = claimSummary.claimsWithAttachments;
-  const claimRate = totalOrders ? (totalClaims / totalOrders) * 100 : 0;
 
   const earliestDashboardDate = [summary.earliestCreatedAt, claimSummary.earliestCreatedAt]
     .filter(Boolean)
@@ -988,10 +982,21 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   const dailyStatusData = Array.from(dailyStatusByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const kitchenTimelineData = Array.from(timelineByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const claimElementStats = new Map();
+  const claimCountryStats = new Map();
   for (const row of claimElementRows) {
     const structuredElements = extractStructuredClaimElements(row.problemAreasJson);
     const elements = new Set(structuredElements.length ? structuredElements : extractClaimElements(row.problemDescription));
     const hasAttachments = Boolean(String(row.attachmentsJson || "").trim());
+    const country = String(row.clientCountry || "").trim() || "Not captured";
+    const currentCountry = claimCountryStats.get(country) || {
+      name: country,
+      claims: 0,
+      claimsWithAttachments: 0,
+    };
+    currentCountry.claims += 1;
+    if (hasAttachments) currentCountry.claimsWithAttachments += 1;
+    claimCountryStats.set(country, currentCountry);
+
     for (const element of elements) {
       const current = claimElementStats.get(element) || {
         name: element,
@@ -1004,6 +1009,12 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     }
   }
   const claimElementData = Array.from(claimElementStats.values())
+    .sort((a, b) => {
+      if (b.claims !== a.claims) return b.claims - a.claims;
+      if (b.claimsWithAttachments !== a.claimsWithAttachments) return b.claimsWithAttachments - a.claimsWithAttachments;
+      return a.name.localeCompare(b.name);
+    });
+  const claimCountryData = Array.from(claimCountryStats.values())
     .sort((a, b) => {
       if (b.claims !== a.claims) return b.claims - a.claims;
       if (b.claimsWithAttachments !== a.claimsWithAttachments) return b.claimsWithAttachments - a.claimsWithAttachments;
@@ -1374,29 +1385,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       trendFallback: "{emailed} emailed / {total} total",
       trendValues: { emailed: String(emailedOrders), total: String(totalOrders) },
     },
-    {
-      labelKey: "dashboard.totalClaims",
-      fallbackLabel: "Total claims",
-      value: String(totalClaims),
-      trendKey: "dashboard.claimsInSelectedPeriod",
-      trendFallback: "Claims in selected period",
-    },
-    {
-      labelKey: "dashboard.claimRate",
-      fallbackLabel: "Claim rate",
-      value: formatPercent(claimRate),
-      trendKey: "dashboard.claimsOutOfOrders",
-      trendFallback: "{claims} claims / {orders} orders",
-      trendValues: { claims: String(totalClaims), orders: String(totalOrders) },
-    },
-    {
-      labelKey: "dashboard.claimsWithAttachments",
-      fallbackLabel: "Claims with files",
-      value: String(claimsWithAttachments),
-      trendKey: "dashboard.claimsWithUploadsOutOfTotal",
-      trendFallback: "{withUploads} with files / {total} total",
-      trendValues: { withUploads: String(claimsWithAttachments), total: String(totalClaims) },
-    },
   ];
 
   return (
@@ -1411,6 +1399,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         selectedStatus={validStatus}
         dailyStatusData={dailyStatusData}
         claimElementData={claimElementData}
+        claimCountryData={claimCountryData}
         kitchenTimelineData={kitchenTimelineData}
         kitchenSeries={kitchenSeries}
         topItemsByQuantity={topItemsByQuantity}
