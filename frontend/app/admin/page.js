@@ -4,6 +4,8 @@ import { listKitchensForAdmin } from "../../lib/catalog";
 import { requireAdminPage } from "../../lib/auth";
 import { getProviderCountryConfig } from "../../lib/address-verification";
 import { prisma } from "../../lib/prisma";
+import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../lib/service-claim-problem-description";
+import { stripProductDimensionsFromLabel } from "../../lib/product-label-format";
 import { Prisma } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
@@ -191,6 +193,51 @@ function toDateKey(value) {
   return new Date(value).toISOString().slice(0, 10);
 }
 
+function normalizeClaimElementLabel(value) {
+  return stripProductDimensionsFromLabel(String(value || "").trim())
+    .replace(/\s+/g, " ")
+    .replace(/\s+\([^)]+\)$/, "")
+    .trim();
+}
+
+function extractClaimElements(problemDescription) {
+  const lines = String(problemDescription || "").split("\n").map((line) => line.trim());
+  if (!lines.length) return [];
+  const firstKitchenAreasPrefix = KITCHEN_AREA_FIRST_LINE_PREFIXES.find((prefix) => lines[0].startsWith(prefix));
+  if (firstKitchenAreasPrefix) {
+    return lines[0]
+      .slice(firstKitchenAreasPrefix.length)
+      .split(",")
+      .map(normalizeClaimElementLabel)
+      .filter(Boolean);
+  }
+
+  const selectedAreasIndex = lines.findIndex((line) => line === "Ausgewählte Küchenbereiche:");
+  if (selectedAreasIndex < 0) return [];
+
+  const elements = [];
+  for (const line of lines.slice(selectedAreasIndex + 1)) {
+    if (!line) break;
+    if (!line.startsWith("-")) break;
+    elements.push(normalizeClaimElementLabel(line.slice(1)));
+  }
+  return elements.filter(Boolean);
+}
+
+function extractStructuredClaimElements(problemAreasJson) {
+  const raw = String(problemAreasJson || "").trim();
+  if (!raw) return [];
+  try {
+    const areas = JSON.parse(raw);
+    if (!Array.isArray(areas)) return [];
+    return areas
+      .map((area) => normalizeClaimElementLabel(area?.name || area?.code || ""))
+      .filter(Boolean);
+  } catch {
+    return [];
+  }
+}
+
 function getDateKeys(startDate, earliestCreatedAt) {
   if (!startDate && !earliestCreatedAt) return [];
   const end = new Date();
@@ -304,6 +351,26 @@ function buildOrderAndClause(filters, alias = "o") {
   return conditions.length ? Prisma.sql`AND ${Prisma.join(conditions, " AND ")}` : Prisma.empty;
 }
 
+function buildClaimFilterConditions({ startDate, kitchenId }, alias = "sc") {
+  const table = Prisma.raw(alias);
+  const filters = [];
+  if (startDate) filters.push(Prisma.sql`${table}."createdAt" >= ${startDate}`);
+  if (kitchenId) {
+    filters.push(Prisma.sql`EXISTS (
+      SELECT 1
+      FROM "KitchenContract" kc
+      WHERE kc."contractNumber" = ${table}."contractNumber"
+        AND kc."kitchenId" = ${kitchenId}
+    )`);
+  }
+  return filters;
+}
+
+function buildClaimWhereClause(filters, alias = "sc") {
+  const conditions = buildClaimFilterConditions(filters, alias);
+  return conditions.length ? Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}` : Prisma.empty;
+}
+
 async function loadDashboardSummary(filters) {
   const whereClause = buildOrderWhereClause(filters, "o");
   const [row] = await prisma.$queryRaw`
@@ -322,6 +389,40 @@ async function loadDashboardSummary(filters) {
     emailedOrders: Number(row?.emailedOrders || 0),
     earliestCreatedAt: row?.earliestCreatedAt || null,
   };
+}
+
+async function loadClaimDashboardSummary(filters) {
+  const whereClause = buildClaimWhereClause(filters, "sc");
+  const [row] = await prisma.$queryRaw`
+    SELECT
+      COUNT(*)::int AS "totalClaims",
+      COUNT(*) FILTER (WHERE sc."requestType" = 'complaint')::int AS "complaintClaims",
+      COUNT(*) FILTER (WHERE COALESCE(NULLIF(BTRIM(sc."attachmentsJson"), ''), '') <> '')::int AS "claimsWithAttachments",
+      MIN(sc."createdAt") AS "earliestCreatedAt"
+    FROM "ServiceClaim" sc
+    ${whereClause}
+  `;
+
+  return {
+    totalClaims: Number(row?.totalClaims || 0),
+    complaintClaims: Number(row?.complaintClaims || 0),
+    claimsWithAttachments: Number(row?.claimsWithAttachments || 0),
+    earliestCreatedAt: row?.earliestCreatedAt || null,
+  };
+}
+
+async function loadClaimElementRows(filters) {
+  const whereClause = buildClaimWhereClause(filters, "sc");
+  return prisma.$queryRaw`
+    SELECT
+      sc."id",
+      sc."problemDescription",
+      sc."problemAreasJson",
+      sc."attachmentsJson"
+    FROM "ServiceClaim" sc
+    ${whereClause}
+    ORDER BY sc."createdAt" DESC
+  `;
 }
 
 async function loadDailyStatusRows(filters) {
@@ -747,6 +848,8 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     paymentRows,
     geographyRows,
     groupedItemRows,
+    claimSummary,
+    claimElementRows,
   ] = await Promise.all([
     listKitchensForAdmin(),
     loadPropertyOwnerAnalytics({ startDate, kitchenId, status: validStatus }),
@@ -757,14 +860,22 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     loadPaymentRows(dashboardFilters),
     loadGeographyRows(dashboardFilters),
     loadGroupedItemRows(dashboardFilters),
+    loadClaimDashboardSummary({ startDate, kitchenId }),
+    loadClaimElementRows({ startDate, kitchenId }),
   ]);
   const totalOrders = summary.totalOrders;
   const totalRevenue = summary.totalRevenue;
   const averageOrderValue = totalOrders ? totalRevenue / totalOrders : 0;
   const emailedOrders = summary.emailedOrders;
   const conversionRate = totalOrders ? (emailedOrders / totalOrders) * 100 : 0;
+  const totalClaims = claimSummary.totalClaims;
+  const claimsWithAttachments = claimSummary.claimsWithAttachments;
+  const claimRate = totalOrders ? (totalClaims / totalOrders) * 100 : 0;
 
-  const dateKeys = getDateKeys(startDate, summary.earliestCreatedAt);
+  const earliestDashboardDate = [summary.earliestCreatedAt, claimSummary.earliestCreatedAt]
+    .filter(Boolean)
+    .sort((a, b) => new Date(a) - new Date(b))[0] || null;
+  const dateKeys = getDateKeys(startDate, earliestDashboardDate);
   const dailyStatusByDate = new Map(
     dateKeys.map((date) => [
       date,
@@ -876,6 +987,28 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
 
   const dailyStatusData = Array.from(dailyStatusByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const kitchenTimelineData = Array.from(timelineByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
+  const claimElementStats = new Map();
+  for (const row of claimElementRows) {
+    const structuredElements = extractStructuredClaimElements(row.problemAreasJson);
+    const elements = new Set(structuredElements.length ? structuredElements : extractClaimElements(row.problemDescription));
+    const hasAttachments = Boolean(String(row.attachmentsJson || "").trim());
+    for (const element of elements) {
+      const current = claimElementStats.get(element) || {
+        name: element,
+        claims: 0,
+        claimsWithAttachments: 0,
+      };
+      current.claims += 1;
+      if (hasAttachments) current.claimsWithAttachments += 1;
+      claimElementStats.set(element, current);
+    }
+  }
+  const claimElementData = Array.from(claimElementStats.values())
+    .sort((a, b) => {
+      if (b.claims !== a.claims) return b.claims - a.claims;
+      if (b.claimsWithAttachments !== a.claimsWithAttachments) return b.claimsWithAttachments - a.claimsWithAttachments;
+      return a.name.localeCompare(b.name);
+    });
   const resolvedItemStats = Array.from(itemStats.values()).map((item) => ({
     ...item,
     name: item.canonicalName || item.fallbackName || item.code || "",
@@ -1241,6 +1374,29 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       trendFallback: "{emailed} emailed / {total} total",
       trendValues: { emailed: String(emailedOrders), total: String(totalOrders) },
     },
+    {
+      labelKey: "dashboard.totalClaims",
+      fallbackLabel: "Total claims",
+      value: String(totalClaims),
+      trendKey: "dashboard.claimsInSelectedPeriod",
+      trendFallback: "Claims in selected period",
+    },
+    {
+      labelKey: "dashboard.claimRate",
+      fallbackLabel: "Claim rate",
+      value: formatPercent(claimRate),
+      trendKey: "dashboard.claimsOutOfOrders",
+      trendFallback: "{claims} claims / {orders} orders",
+      trendValues: { claims: String(totalClaims), orders: String(totalOrders) },
+    },
+    {
+      labelKey: "dashboard.claimsWithAttachments",
+      fallbackLabel: "Claims with files",
+      value: String(claimsWithAttachments),
+      trendKey: "dashboard.claimsWithUploadsOutOfTotal",
+      trendFallback: "{withUploads} with files / {total} total",
+      trendValues: { withUploads: String(claimsWithAttachments), total: String(totalClaims) },
+    },
   ];
 
   return (
@@ -1254,6 +1410,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         statusOptions={ORDER_STATUSES}
         selectedStatus={validStatus}
         dailyStatusData={dailyStatusData}
+        claimElementData={claimElementData}
         kitchenTimelineData={kitchenTimelineData}
         kitchenSeries={kitchenSeries}
         topItemsByQuantity={topItemsByQuantity}

@@ -70,6 +70,7 @@ export function AdminDashboardCharts({
   statusOptions,
   selectedStatus,
   dailyStatusData,
+  claimElementData,
   kitchenTimelineData,
   kitchenSeries,
   topItemsByQuantity,
@@ -155,6 +156,31 @@ export function AdminDashboardCharts({
       </section>
 
       <AdminEntitySearch period={selectedPeriod} kitchenId={selectedKitchenId} status={selectedStatus} />
+
+      <section className="chart-card chart-card--compact">
+        <ChartHeader
+          eyebrow={translate("dashboard.claimElementOverview", "Claim element overview")}
+          title={translate("dashboard.claimsBySelectedElement", "Claims by selected element")}
+          detail={translate("dashboard.claimsBySelectedElementDetail", "Ranked by the kitchen elements selected in the service claim form.")}
+        />
+        <div className="chart-frame">
+          {claimElementData?.length ? (
+            <ResponsiveContainer width="100%" height={Math.max(240, claimElementData.slice(0, 10).length * 44 + 64)}>
+              <BarChart data={claimElementData.slice(0, 10)} layout="vertical" margin={{ top: 12, right: 24, left: 34, bottom: 4 }}>
+                <CartesianGrid stroke={CHART_GRID} vertical={false} />
+                <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
+                <YAxis type="category" dataKey="name" width={150} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} tickFormatter={(value) => truncateLabel(value, 22)} />
+                <Tooltip content={<ClaimElementTooltip />} />
+                <Legend wrapperStyle={{ color: CHART_TEXT }} />
+                <Bar dataKey="claims" name={translate("dashboard.claims", "Claims")} fill="#8C6D4F" radius={[0, 6, 6, 0]} />
+                <Bar dataKey="claimsWithAttachments" name={translate("dashboard.claimsWithFiles", "Claims with files")} fill="#58BFA6" radius={[0, 6, 6, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <EmptyChart label={translate("dashboard.noClaimElementDataForSelectedFilters", "No selected claim element data for the current filters.")} />
+          )}
+        </div>
+      </section>
 
       <section className="chart-card chart-card--status">
         <ChartHeader
@@ -335,6 +361,43 @@ function StatusTooltip({ active, payload, label, mode }) {
       {payload.map((item) => (
         <span key={item.dataKey} style={{ color: item.color }}>
           {translateStatus(item.dataKey, translate)}: {item.value}{mode === "percentage" ? "%" : ""}
+        </span>
+      ))}
+      <style jsx>{`
+        .tooltip {
+          display: grid;
+          gap: 6px;
+          border: 1px solid var(--color-border);
+          border-radius: 10px;
+          background: var(--color-card);
+          padding: 10px 12px;
+          box-shadow: var(--app-shadow-soft);
+        }
+
+        strong,
+        span {
+          font-size: 13px;
+        }
+      `}</style>
+    </div>
+  );
+}
+
+function ClaimElementTooltip({ active, payload, label }) {
+  const { translate } = useAdminI18n();
+  if (!active || !payload?.length) return null;
+
+  const labels = {
+    claims: translate("dashboard.claims", "Claims"),
+    claimsWithAttachments: translate("dashboard.claimsWithFiles", "Claims with files"),
+  };
+
+  return (
+    <div className="tooltip">
+      <strong>{label}</strong>
+      {payload.map((item) => (
+        <span key={item.dataKey} style={{ color: item.color }}>
+          {labels[item.dataKey] || item.name}: {item.value}
         </span>
       ))}
       <style jsx>{`

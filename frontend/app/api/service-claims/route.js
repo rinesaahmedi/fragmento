@@ -6,7 +6,10 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 import { prisma } from "../../../lib/prisma";
-import { isMissingAttachmentsJsonColumnError } from "../../../lib/service-claim-admin-query";
+import {
+  isMissingAttachmentsJsonColumnError,
+  isMissingProblemAreasJsonColumnError,
+} from "../../../lib/service-claim-admin-query";
 import { persistServiceClaimAttachments } from "../../../lib/service-claim-attachments-storage";
 import { getServiceClaimContractDetails } from "../../../lib/service-claims";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
@@ -66,6 +69,33 @@ function mergeProblemAreasIntoDescription(problemDescription, problemAreasJsonRa
     return `Ausgewählte Küchenbereiche:\n${lines.join("\n")}\n\n${base}`.trim();
   } catch {
     return base;
+  }
+}
+
+function normalizeProblemAreasJson(problemAreasJsonRaw) {
+  const raw = String(problemAreasJsonRaw || "").trim();
+  if (!raw) {
+    return null;
+  }
+  try {
+    const areas = JSON.parse(raw);
+    if (!Array.isArray(areas) || areas.length === 0) {
+      return null;
+    }
+    const normalized = areas
+      .map((area) => {
+        const componentId = String(area?.componentId || "").trim();
+        const name = stripProductDimensionsFromLabel(String(area?.name || "").trim());
+        const code = String(area?.code || "").trim();
+        if (!componentId && !name && !code) {
+          return null;
+        }
+        return { componentId, name, code };
+      })
+      .filter(Boolean);
+    return normalized.length ? JSON.stringify(normalized) : null;
+  } catch {
+    return null;
   }
 }
 
@@ -524,6 +554,14 @@ export async function POST(request) {
     const genderLabel = genderDisplayLabel(gender);
     const customerDisplayName = [givenName, surname].filter(Boolean).join(" ").trim();
     const fullName = buildCustomerFullName({ givenName, surname, gender });
+    const problemAreasJson = normalizeProblemAreasJson(body.problemAreasJson);
+    const problemDescription = mergeProblemAreasIntoDescription(
+      optionalString(body.problemDescription),
+      optionalString(body.problemAreasJson),
+    );
+    if (!problemDescription) {
+      throw new Error("Problem description is required.");
+    }
     const payload = {
       id: crypto.randomUUID(),
       contractNumber,
@@ -554,10 +592,8 @@ export async function POST(request) {
         `Hausmeister phone: ${hausmeisterPhone || "-"}`,
         `Hausmeister email: ${hausmeisterEmail || "-"}`,
       ].join("\n"),
-      problemDescription: mergeProblemAreasIntoDescription(
-        requiredString(body.problemDescription, "Problem description"),
-        optionalString(body.problemAreasJson),
-      ),
+      problemDescription,
+      problemAreasJson,
       serialNumber: requiredString(body.serialNumber, "Serial number"),
       requestType: "complaint",
       attachmentsMeta: attachmentParts.map(({ filename, contentType, size }) => ({
@@ -579,6 +615,50 @@ export async function POST(request) {
 
     try {
       await prisma.$executeRaw`
+      INSERT INTO "ServiceClaim" (
+        "id",
+        "contractNumber",
+        "fullName",
+        "phone",
+        "email",
+        "clientAddress",
+        "landlordName",
+        "landlordPhone",
+        "landlordEmail",
+        "hausmeisterName",
+        "hausmeisterPhone",
+        "hausmeisterEmail",
+        "landlordContact",
+        "problemDescription",
+        "serialNumber",
+        "requestType",
+        "problemAreasJson",
+        "attachmentsJson"
+      )
+      VALUES (
+        ${payload.id},
+        ${payload.contractNumber},
+        ${payload.fullName},
+        ${payload.phone || null},
+        ${payload.email || null},
+        ${payload.clientAddress},
+        ${payload.landlordName},
+        ${payload.landlordPhone || null},
+        ${payload.landlordEmail || null},
+        ${payload.hausmeisterName},
+        ${payload.hausmeisterPhone || null},
+        ${payload.hausmeisterEmail || null},
+        ${payload.landlordContact},
+        ${payload.problemDescription},
+        ${payload.serialNumber},
+        ${payload.requestType},
+        ${payload.problemAreasJson},
+        ${attachmentsJson}
+      )
+    `;
+    } catch (insertError) {
+      if (isMissingProblemAreasJsonColumnError(insertError)) {
+        await prisma.$executeRaw`
       INSERT INTO "ServiceClaim" (
         "id",
         "contractNumber",
@@ -618,11 +698,10 @@ export async function POST(request) {
         ${attachmentsJson}
       )
     `;
-    } catch (insertError) {
-      if (!isMissingAttachmentsJsonColumnError(insertError)) {
+      } else if (!isMissingAttachmentsJsonColumnError(insertError)) {
         throw insertError;
-      }
-      await prisma.$executeRaw`
+      } else {
+        await prisma.$executeRaw`
       INSERT INTO "ServiceClaim" (
         "id",
         "contractNumber",
@@ -639,7 +718,8 @@ export async function POST(request) {
         "landlordContact",
         "problemDescription",
         "serialNumber",
-        "requestType"
+        "requestType",
+        "problemAreasJson"
       )
       VALUES (
         ${payload.id},
@@ -657,9 +737,11 @@ export async function POST(request) {
         ${payload.landlordContact},
         ${payload.problemDescription},
         ${payload.serialNumber},
-        ${payload.requestType}
+        ${payload.requestType},
+        ${payload.problemAreasJson}
       )
     `;
+      }
     }
 
     if (attachmentParts.length) {
