@@ -20,7 +20,8 @@ import {
 } from "../../../components/admin-ui";
 import Link from "next/link";
 import { AdminShell } from "../../../components/admin-shell";
-import { AdminText } from "../../../components/admin-i18n";
+import { AdminPluralText, AdminText, AdminTranslatedInput } from "../../../components/admin-i18n";
+import AdminSelect from "../../../components/admin-select";
 import AdminPropertyOwnerObjectBuilder from "../../../components/admin-property-owner-object-builder";
 import AdminPropertyObjectsPreview, {
   AdminPropertyObjectDetailsPreview,
@@ -150,15 +151,15 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title={<AdminText i18nKey="propertyOwnersAdmin.propertyOwners" fallback="Property owners" />}
-          description={<AdminText i18nKey="propertyOwnersAdmin.manageOwnersAttachedToReusableContractNumbers" fallback="Manage owners that can be attached to reusable contract numbers." />}
+          title={<AdminText i18nKey="propertyOwnersAdmin.propertyOwners" fallback="Housing Companies" />}
+          description={<AdminText i18nKey="propertyOwnersAdmin.manageOwnersAttachedToReusableContractNumbers" fallback="Manage housing companies that can be assigned to reusable contract numbers." />}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
           <details open={createOpen} style={createOwnerDetailsStyle}>
             <summary className="create-owner-summary" style={createOwnerSummaryStyle}>
-              <AdminText i18nKey="propertyOwnersAdmin.addHousingCompany" fallback="Add housing company" />
+              <AdminText i18nKey="propertyOwnersAdmin.addHousingCompany" fallback="Add Housing Company" />
             </summary>
             <div style={createOwnerBodyStyle}>
               <p style={mutedTextStyle}><AdminText i18nKey="propertyOwnersAdmin.createOwnerPanelDescription" fallback="Open this panel only when you want to add a new housing company and optional objects." /></p>
@@ -190,32 +191,41 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
         </AdminSection>
 
         <AdminSection
-          title={<AdminText i18nKey="propertyOwnersAdmin.configuredCompanies" fallback="Configured housing companies" />}
-          description={<>{filteredOwners.length} <AdminText i18nKey="propertyOwnersAdmin.companiesMatchFilters" fallback="housing company record(s) match the current filters." /></>}
+          title={<AdminText i18nKey="propertyOwnersAdmin.configuredCompanies" fallback="Housing Companies" />}
+          description={(
+            <AdminPluralText
+              count={filteredOwners.length}
+              singularKey="propertyOwnersAdmin.companyMatchesFilters"
+              pluralKey="propertyOwnersAdmin.companiesMatchFilters"
+              singularFallback="{count} housing company matches the current filters."
+              pluralFallback="{count} housing companies match the current filters."
+            />
+          )}
         >
           <form action="/admin/property-owners" method="get" style={filterPanelStyle}>
             <div style={filterHeaderStyle}>
               <span style={filterEyebrowStyle}><AdminText i18nKey="contractsAdmin.filters" fallback="Filters" /></span>
-              <span style={filterHintStyle}><AdminText i18nKey="propertyOwnersAdmin.searchEverythingHint" fallback="Search across company name, address, notes, object names, city, postal code, and location fields." /></span>
+              <span style={filterHintStyle}><AdminText i18nKey="propertyOwnersAdmin.searchEverythingHint" fallback="Search across company name, address, notes, project, object, city, postal code, or location." /></span>
             </div>
             <div style={filterGridStyle}>
               <FilterField label={<AdminText i18nKey="contractsAdmin.search" fallback="Search" />}>
-                <input
+                <AdminTranslatedInput
                   name="q"
                   defaultValue={filters.query}
-                  placeholder="Name, address, postal code, city, object..."
+                  placeholderKey="propertyOwnersAdmin.searchPlaceholder"
+                  placeholderFallback="Name, address, postal code, city, object ..."
                   style={filterInputStyle}
                 />
               </FilterField>
               <FilterField label={<AdminText i18nKey="propertyOwnersAdmin.location" fallback="Location" />}>
-                <select name="location" defaultValue={filters.location} style={filterInputStyle}>
+                <AdminSelect name="location" defaultValue={filters.location} style={filterInputStyle}>
                   <option value=""><AdminText i18nKey="propertyOwnersAdmin.allLocations" fallback="All locations" /></option>
                   {availableLocations.map((location) => (
                     <option key={location} value={location}>
                       {location}
                     </option>
                   ))}
-                </select>
+                </AdminSelect>
               </FilterField>
               <div style={filterActionsStyle}>
                 <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
@@ -287,8 +297,16 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
                   {filters.query ? <div style={matchSummaryStyle}>{buildSearchSummary(owner, filters.query)}</div> : null}
                   <div style={subMetaStyle}>
                     <ContactValue owner={owner} />
-                    <span>{owner._count.propertyObjects} <AdminText i18nKey="propertyOwnersAdmin.objectCount" fallback="object(s)" /></span>
-                    <span>{owner._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
+                    <span>{owner._count.propertyObjects} <AdminText i18nKey="propertyOwnersAdmin.objectCount" fallback="objects" /></span>
+                    <span>
+                      <AdminPluralText
+                        count={owner._count.contracts}
+                        singularKey="kitchensAdmin.contractCountSingular"
+                        pluralKey="kitchensAdmin.contractCountPlural"
+                        singularFallback="{count} contract"
+                        pluralFallback="{count} contracts"
+                      />
+                    </span>
                     <span><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" />: {formatDate(owner.createdAt)}</span>
                   </div>
                   <AdminPropertyObjectsPreview objects={owner.propertyObjects} priorityQuery={filters.query} />

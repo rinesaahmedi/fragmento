@@ -17,6 +17,7 @@ import {
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
+import AdminSelect from "../../../components/admin-select";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { getOrdersForAdmin, listKitchensForAdmin } from "../../../lib/catalog";
 import { requireAdminPage } from "../../../lib/auth";
@@ -126,22 +127,22 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
               </label>
               <label style={filterFieldStyle}>
                 <span><AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" /></span>
-                <select name="kitchenId" defaultValue={filters.kitchenId} style={filterInputStyle}>
+                <AdminSelect name="kitchenId" defaultValue={filters.kitchenId} style={filterInputStyle}>
                   <option value=""><AdminText i18nKey="dashboard.allKitchens" fallback="All kitchens" /></option>
                   {kitchens.map((kitchen) => (
                     <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
                   ))}
-                </select>
+                </AdminSelect>
               </label>
               <label style={filterFieldStyle}>
                 <span><AdminText i18nKey="dashboard.status" fallback="Status" /></span>
-                <select name="status" defaultValue={filters.status} style={filterInputStyle}>
+                <AdminSelect name="status" defaultValue={filters.status} style={filterInputStyle}>
                   <option value=""><AdminText i18nKey="dashboard.allStatuses" fallback="All statuses" /></option>
                   <option value="NEW"><AdminText i18nKey="dashboard.statusNew" fallback="New" /></option>
                   <option value="EMAILED"><AdminText i18nKey="dashboard.statusEmailed" fallback="Emailed" /></option>
                   <option value="CONFIRMED"><AdminText i18nKey="dashboard.statusConfirmed" fallback="Confirmed" /></option>
                   <option value="CANCELLED"><AdminText i18nKey="dashboard.statusCancelled" fallback="Cancelled" /></option>
-                </select>
+                </AdminSelect>
               </label>
               <label style={filterFieldStyle}>
                 <span><AdminText i18nKey="ordersAdmin.dateFrom" fallback="Date from" /></span>

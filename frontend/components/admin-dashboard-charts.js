@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAdminI18n } from "./admin-i18n";
 import { AdminEntitySearch } from "./admin-entity-search";
+import AdminSelect from "./admin-select";
 import {
   Bar,
   BarChart,
@@ -172,31 +173,31 @@ export function AdminDashboardCharts({
         <form method="get" className="filter-form">
           <label>
             {translate("dashboard.dateRange", "Date range")}
-            <select name="period" defaultValue={selectedPeriod}>
+            <AdminSelect name="period" defaultValue={selectedPeriod}>
               {periodOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {translate(option.labelKey || "", option.fallbackLabel || option.value)}
                 </option>
               ))}
-            </select>
+            </AdminSelect>
           </label>
           <label>
             {translate("dashboard.kitchen", "Kitchen")}
-            <select name="kitchenId" defaultValue={selectedKitchenId}>
+            <AdminSelect name="kitchenId" defaultValue={selectedKitchenId}>
               <option value="">{translate("dashboard.allKitchens", "All kitchens")}</option>
               {kitchens.map((kitchen) => (
                 <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
               ))}
-            </select>
+            </AdminSelect>
           </label>
           <label>
             {translate("dashboard.status", "Status")}
-            <select name="status" defaultValue={selectedStatus}>
+            <AdminSelect name="status" defaultValue={selectedStatus}>
               <option value="">{translate("dashboard.allStatuses", "All statuses")}</option>
               {statusOptions.map((status) => (
                 <option key={status} value={status}>{translateStatus(status, translate)}</option>
               ))}
-            </select>
+            </AdminSelect>
           </label>
           <button type="submit">{translate("dashboard.apply", "Apply")}</button>
           <a href="/admin" className="toolbar-link">{translate("dashboard.clearFilters", "Clear filters")}</a>
@@ -688,7 +689,7 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
             {modeSwitcher}
             <label className="owner-select-wrap">
               <span>{translate("dashboard.selectCompany", "Housing company")}</span>
-              <select
+              <AdminSelect
                 value={selectedCompany?.id || ""}
                 onChange={(event) => setSelectedOwnerId(event.target.value)}
                 disabled={!companies.length}
@@ -699,7 +700,7 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
                 )) : (
                   <option value="">{translate("dashboard.noCompaniesAvailable", "No companies available")}</option>
                 )}
-              </select>
+              </AdminSelect>
             </label>
             <a className="panel-link" href={selectedCompany ? `/admin/property-owners/${selectedCompany.id}` : "/admin/property-owners"}>
               {selectedCompany
@@ -1186,7 +1187,7 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             {modeSwitcher}
             <label className="project-select-wrap">
               <span>{translate("dashboard.selectProject", "Project")}</span>
-              <select
+              <AdminSelect
                 value={selectedProject?.id || ""}
                 onChange={(event) => setSelectedProjectId(event.target.value)}
                 disabled={!projects.length}
@@ -1199,7 +1200,7 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
                 )) : (
                   <option value="">{translate("dashboard.noProjectsAvailable", "No projects available")}</option>
                 )}
-              </select>
+              </AdminSelect>
             </label>
             <a className="panel-link" href={selectedProject ? `/admin/property-owners/${selectedProject.housingCompanyId}` : "/admin/property-owners"}>
               {selectedProject

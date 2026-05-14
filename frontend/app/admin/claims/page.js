@@ -12,6 +12,7 @@ import {
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminText } from "../../../components/admin-i18n";
+import AdminSelect from "../../../components/admin-select";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
@@ -94,12 +95,12 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
               </label>
               <label style={filterFieldStyle}>
                 <span><AdminText i18nKey="claimsAdmin.city" fallback="City" /></span>
-                <select name="city" defaultValue={filters.city} style={filterInputStyle}>
+                <AdminSelect name="city" defaultValue={filters.city} style={filterInputStyle}>
                   <option value=""><AdminText i18nKey="claimsAdmin.allCities" fallback="All cities" /></option>
                   {cityOptions.map((city) => (
                     <option key={city} value={city}>{city}</option>
                   ))}
-                </select>
+                </AdminSelect>
               </label>
               <label style={filterFieldStyle}>
                 <span><AdminText i18nKey="ordersAdmin.dateFrom" fallback="Date from" /></span>

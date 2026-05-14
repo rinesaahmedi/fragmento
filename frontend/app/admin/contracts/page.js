@@ -3,28 +3,19 @@ import {
   AdminSection,
   FlashMessage,
   FormField,
-  StatusBadge,
-  cardListStyle,
-  formGridStyle,
   inputStyle,
-  itemCardStyle,
   mutedTextStyle,
   pageGridStyle,
   primaryButtonStyle,
   secondaryButtonStyle,
-  subMetaStyle,
-  tableStyle,
-  tableWrapStyle,
-  tdStyle,
-  textareaStyle,
-  thStyle,
 } from "../../../components/admin-ui";
 import Link from "next/link";
 import { Fragment } from "react";
 import { AdminShell } from "../../../components/admin-shell";
 import AdminContractsFilters from "../../../components/admin-contracts-filters";
-import { AdminText } from "../../../components/admin-i18n";
+import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
 import AdminContractLinkFields from "../../../components/admin-contract-link-fields";
+import AdminSelect from "../../../components/admin-select";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listKitchenContractsForAdmin, listKitchensForAdmin, listProjectsForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
@@ -36,14 +27,6 @@ function normalizeParam(value) {
   return value || "";
 }
 
-function formatDate(value) {
-  if (!value) return "-";
-  return new Intl.DateTimeFormat("de-DE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -52,29 +35,32 @@ function formatCurrency(value) {
   }).format(Number(value || 0));
 }
 
-function formatOrdinal(value) {
-  const number = Number(value || 0);
-  if (!number) return "";
-  const mod100 = number % 100;
-  if (mod100 >= 11 && mod100 <= 13) return `${number}th`;
-  const suffix = number % 10 === 1 ? "st" : number % 10 === 2 ? "nd" : number % 10 === 3 ? "rd" : "th";
-  return `${number}${suffix}`;
+function CountryName({ country }) {
+  if (country === "Germany" || country === "Deutschland") return <AdminText i18nKey="contractsAdmin.germany" fallback="Germany" />;
+  if (country === "Austria" || country === "Österreich") return <AdminText i18nKey="contractsAdmin.austria" fallback="Austria" />;
+  return country || "";
+}
+
+function ProjectStatusText({ status }) {
+  const statusKey = String(status || "").toLowerCase();
+  const fallback = statusKey.replace(/_/g, " ");
+  return <AdminText i18nKey={`status.${statusKey}`} fallback={fallback} />;
 }
 
 function contractAddressLines(contract) {
   const fallbackAddress = contract.propertyObject ? null : contract.latestOrderAddress;
   const projectLine = contract.projectName || contract.propertyObject?.projectName
-    ? `Project: ${contract.projectCode ? `${contract.projectCode} - ` : ""}${contract.projectName || contract.propertyObject?.projectName}`
+    ? <><AdminText i18nKey="contractsAdmin.project" fallback="Project" />: {contract.projectCode ? `${contract.projectCode} - ` : ""}{contract.projectName || contract.propertyObject?.projectName}</>
     : "";
   const projectMetaLine = [
-    contract.projectStatus ? `Status: ${String(contract.projectStatus).replace(/_/g, " ")}` : "",
-    contract.projectManagerName ? `Manager: ${contract.projectManagerName}` : "",
-  ].filter(Boolean).join(" | ");
+    contract.projectStatus ? <span key="status"><AdminText i18nKey="dashboard.status" fallback="Status" />: <ProjectStatusText status={contract.projectStatus} /></span> : "",
+    contract.projectManagerName ? <span key="manager"><AdminText i18nKey="contractsAdmin.manager" fallback="Manager" />: {contract.projectManagerName}</span> : "",
+  ].filter(Boolean);
   const objectLine = contract.propertyObject?.name
-    ? `Object/building: ${contract.propertyObject.name}`
+    ? <><AdminText i18nKey="contractsAdmin.propertyObject" fallback="Object/building" />: {contract.propertyObject.name}</>
     : fallbackAddress
       ? ""
-      : "No object selected";
+      : <AdminText i18nKey="contractsAdmin.noObjectSelected" fallback="No object selected" />;
   const streetLine = [
     contract.address1 || fallbackAddress?.address1,
     contract.address2 || fallbackAddress?.address2,
@@ -85,12 +71,21 @@ function contractAddressLines(contract) {
   ].filter(Boolean).join(" ");
   const country = contract.country || fallbackAddress?.country;
   const unitLine = [
-    contract.building ? `Building ${contract.building}` : "",
-    contract.floor ? `Floor ${contract.floor}` : "",
-    contract.unitNumber ? `Unit ${contract.unitNumber}` : "",
-  ].filter(Boolean).join(" | ");
+    contract.building ? <span key="building"><AdminText i18nKey="contractsAdmin.building" fallback="Building" /> {contract.building}</span> : "",
+    contract.floor ? <span key="floor"><AdminText i18nKey="contractsAdmin.floor" fallback="Floor" /> {contract.floor}</span> : "",
+    contract.unitNumber ? <span key="unit"><AdminText i18nKey="contractsAdmin.unit" fallback="Unit" /> {contract.unitNumber}</span> : "",
+  ].filter(Boolean);
 
-  return [projectLine, projectMetaLine, objectLine, streetLine, cityLine, country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
+  return [
+    projectLine,
+    projectMetaLine,
+    objectLine,
+    streetLine,
+    cityLine,
+    country ? <CountryName country={country} /> : "",
+    unitLine,
+    contract.notes ? <><AdminText i18nKey="contractsAdmin.notes" fallback="Notes" />: {contract.notes}</> : "",
+  ].filter(Boolean);
 }
 
 function contactAddressLines(address) {
@@ -98,28 +93,7 @@ function contactAddressLines(address) {
   const nameLine = [address.firstName, address.lastName].filter(Boolean).join(" ");
   const streetLine = [address.address1, address.address2].filter(Boolean).join(", ");
   const cityLine = [address.postalCode, address.city].filter(Boolean).join(" ");
-  return [nameLine, streetLine, cityLine, address.country].filter(Boolean);
-}
-
-function addressSections(contract) {
-  const sections = [];
-  const contractLines = contractAddressLines(contract);
-  if (contractLines.length) {
-    sections.push({ label: "Contract address", lines: contractLines });
-  }
-
-  const paymentLines = contactAddressLines(contract.latestOrderAddress);
-  if (paymentLines.length) {
-    sections.push({ label: "Payment address", lines: paymentLines });
-  }
-
-  return sections.length ? sections : [{ label: "", lines: ["No address captured"] }];
-}
-
-function compactAddressSummary(contract) {
-  return addressSections(contract)
-    .map((section) => (section.label ? `${section.label}: ${section.lines.join(" | ")}` : section.lines.join(" | ")))
-    .join(" / ");
+  return [nameLine, streetLine, cityLine, address.country ? <CountryName country={address.country} /> : ""].filter(Boolean);
 }
 
 function AddressColumn({ lines, emptyText }) {
@@ -129,15 +103,31 @@ function AddressColumn({ lines, emptyText }) {
     <div style={addressBlockStyle}>
       <div style={lines.length ? addressLinesStyle : emptyAddressStyle}>
         {displayLines.map((line, index) => (
-          <span key={typeof line === "string" ? line : `empty-${index}`}>{line}</span>
+          <span key={typeof line === "string" ? line : `empty-${index}`}>{renderLine(line)}</span>
         ))}
       </div>
     </div>
   );
 }
 
+function renderLine(line) {
+  if (!Array.isArray(line)) return line;
+  return line.map((piece, index) => (
+    <Fragment key={index}>{index ? " | " : ""}{piece}</Fragment>
+  ));
+}
+
+function ContractField({ label, children }) {
+  return (
+    <section style={contractFieldStyle}>
+      <span style={contractFieldLabelStyle}>{label}</span>
+      <div style={contractFieldValueStyle}>{children}</div>
+    </section>
+  );
+}
+
 function ownerName(owner) {
-  if (!owner) return "No housing company selected";
+  if (!owner) return <AdminText i18nKey="contractsAdmin.noOwnerSelected" fallback="No housing company selected" />;
   return owner.name || "";
 }
 
@@ -147,9 +137,9 @@ function ownerSummary(owner) {
 
 function usageLabel(orderCount) {
   const count = Number(orderCount || 0);
-  if (count === 0) return "Unused";
-  if (count === 1) return "Used once";
-  return `Used ${count} times`;
+  if (count === 0) return <AdminText i18nKey="contractsAdmin.unused" fallback="Unused" />;
+  if (count === 1) return <AdminText i18nKey="contractsAdmin.usedOnce" fallback="Used once" />;
+  return <AdminText i18nKey="contractsAdmin.usedTimes" fallback="Used {count} times" values={{ count: String(count) }} />;
 }
 
 function orderCustomerName(order) {
@@ -173,13 +163,13 @@ function ContractOrders({ contract }) {
         <Link key={order.id} href={`/admin/orders/${order.id}`} className="contract-order-link" style={contractOrderLinkStyle}>
           <span style={contractOrderMainStyle}>
             <strong>{order.orderNumber}</strong>
-            <span>{formatOrdinal(order.contractOrderSequence)} <AdminText i18nKey="orderDetailAdmin.orderForThisContract" fallback="order for this contract" /></span>
+            <span><AdminText i18nKey="contractsAdmin.orderSequence" fallback="Order {number} for this contract" values={{ number: String(order.contractOrderSequence || "") }} /></span>
           </span>
           <span style={contractOrderMetaStyle}>
-            <StatusBadge status={order.status} />
+            <AdminStatusBadge status={order.status} />
             <span>{orderCustomerName(order)}</span>
             <span>{formatCurrency(order.totalPrice)}</span>
-            <span>{formatDate(order.createdAt)}</span>
+            <span><AdminDateTime value={order.createdAt} /></span>
           </span>
         </Link>
       ))}
@@ -190,14 +180,14 @@ function ContractOrders({ contract }) {
 function KitchenSelect({ kitchens, defaultValue = "", compact = false, required = true }) {
   return (
     <FormField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
-      <select name="kitchenId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required={required}>
+      <AdminSelect name="kitchenId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required={required}>
         <option value=""><AdminText i18nKey="contractsAdmin.selectKitchen" fallback="Select kitchen" /></option>
         {kitchens.map((kitchen) => (
           <option key={kitchen.id} value={kitchen.id}>
-            {kitchen.name}
+            <AdminKitchenDisplayName slug={kitchen.slug} name={kitchen.name} />
           </option>
         ))}
-      </select>
+      </AdminSelect>
     </FormField>
   );
 }
@@ -228,8 +218,8 @@ export default async function AdminContractsPage({ searchParams = {} }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title={<AdminText i18nKey="contractsAdmin.contractNumbers" fallback="Contract numbers" />}
-          description={<AdminText i18nKey="contractsAdmin.createFilterAndEditReusableContractNumbersFromOnePlace" fallback="Create, filter, and edit reusable contract numbers from one place." />}
+          title={<AdminText i18nKey="contractsAdmin.contractNumbers" fallback="Contract Numbers" />}
+          description={<AdminText i18nKey="contractsAdmin.createFilterAndEditReusableContractNumbersFromOnePlace" fallback="Create, filter, and manage reusable contract numbers." />}
           actions={<ActionLink href="/admin/property-owners"><AdminText i18nKey="dashboard.manageOwners" fallback="Manage owners" /></ActionLink>}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
@@ -246,7 +236,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
         <AdminSection>
           <details style={createContractDetailsStyle}>
             <summary className="create-contract-summary" style={createContractSummaryStyle}>
-              <AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add contract number" />
+              <AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add Contract Number" />
             </summary>
             <div style={createContractBodyStyle}>
               <p style={createContractDescriptionStyle}>
@@ -276,191 +266,102 @@ export default async function AdminContractsPage({ searchParams = {} }) {
         </AdminSection>
 
         <AdminSection
-          title={<AdminText i18nKey="contractsAdmin.configuredContracts" fallback="Configured contracts" />}
-          description={<>{contracts.length} <AdminText i18nKey="contractsAdmin.contractNumbersMatchCurrentFilters" fallback="contract number(s) match the current filters." /></>}
+          title={<AdminText i18nKey="contractsAdmin.configuredContracts" fallback="Contract Numbers" />}
+          description={<AdminText i18nKey="contractsAdmin.contractNumbersMatchCurrentFilters" fallback="{count} contract numbers match the current filters." values={{ count: String(contracts.length) }} />}
         >
-          <div className="admin-list-table" style={tableWrapStyle}>
-            <table style={contractTableStyle}>
-              <colgroup>
-                <col style={contractNumberColumnStyle} />
-                <col style={kitchenColumnStyle} />
-                <col style={statusColumnStyle} />
-                <col style={ownerColumnStyle} />
-                <col style={contractAddressColumnStyle} />
-                <col style={paymentAddressColumnStyle} />
-                <col style={usageColumnStyle} />
-                <col style={createdColumnStyle} />
-                <col style={actionColumnStyle} />
-              </colgroup>
-              <thead>
-                <tr>
-                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.contract" fallback="Contract" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="dashboard.status" fallback="Status" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.owner" fallback="Owner" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.contractAddress" fallback="Contract address" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.paymentAddress" fallback="Payment address" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.usage" fallback="Usage" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.created" fallback="Created" /></th>
-                  <th style={compactThStyle}><AdminText i18nKey="contractsAdmin.action" fallback="Action" /></th>
-                </tr>
-              </thead>
-              <tbody>
-                {!contracts.length ? (
-                  <tr>
-                    <td style={compactTableTdStyle} colSpan={9}><AdminText i18nKey="contractsAdmin.noContractNumbersMatchCurrentFilters" fallback="No contract numbers match the current filters." /></td>
-                  </tr>
-                ) : null}
-                {contracts.map((contract) => (
-                  <Fragment key={contract.id}>
-                    <tr>
-                      <td style={compactTableTdStyle}><strong>{contract.contractNumber}</strong></td>
-                      <td style={compactTdStyle}>{contract.kitchen.name}</td>
-                      <td style={compactTdStyle}><StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} /></td>
-                      <td style={ownerTdStyle}>{ownerSummary(contract.owner)}</td>
-                      <td style={addressTdStyle}>
-                        <AddressColumn lines={contractAddressLines(contract)} emptyText={<AdminText i18nKey="contractsAdmin.noContractAddress" fallback="No contract address" />} />
-                      </td>
-                      <td style={addressTdStyle}>
-                        <AddressColumn lines={contactAddressLines(contract.latestOrderAddress)} emptyText={<AdminText i18nKey="contractsAdmin.noPaymentAddress" fallback="No payment address" />} />
-                      </td>
-                      <td style={compactTdStyle}>
-                        <span style={contract._count.orders ? usagePillUsedStyle : usagePillUnusedStyle}>
-                          {usageLabel(contract._count.orders)}
-                        </span>
-                      </td>
-                      <td style={compactTdStyle}>{formatDate(contract.createdAt)}</td>
-                      <td style={actionTdStyle}>
-                        <div style={contractActionStackStyle}>
-                          <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                            <input type="hidden" name="returnTo" value={returnTo} />
-                            <button
-                              type="submit"
-                              name="_intent"
-                              value={contract.isActive ? "deactivate" : "reactivate"}
-                              style={contractToggleButtonStyle}
-                            >
-                              {contract.isActive ? <AdminText i18nKey="contractsAdmin.deactivate" fallback="Deactivate" /> : <AdminText i18nKey="contractsAdmin.reactivate" fallback="Reactivate" />}
-                            </button>
-                          </form>
-                          <details style={contractDeleteDetailsStyle}>
-                            <summary style={contractDeleteSummaryStyle}><AdminText i18nKey="contractsAdmin.delete" fallback="Delete" /></summary>
-                            <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractDeleteFormStyle}>
-                              <input type="hidden" name="returnTo" value={returnTo} />
-                              <button type="submit" name="_intent" value="delete" style={contractDeleteButtonStyle}>
-                                <AdminText i18nKey="contractsAdmin.confirmDelete" fallback="Confirm delete" />
-                              </button>
-                            </form>
-                          </details>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={contractUtilityTdStyle} colSpan={9}>
-                        <div style={contractUtilityBarStyle}>
-                          {contract._count.orders ? (
-                            <details style={contractOrdersDetailsStyle}>
-                              <summary className="contract-utility-summary" style={contractOrdersSummaryStyle}>
-                                <AdminText i18nKey="contractsAdmin.viewOrdersForThisContract" fallback="View orders for this contract" />
-                              </summary>
-                              <ContractOrders contract={contract} />
-                            </details>
-                          ) : null}
-                          <details style={contractEditDetailsStyle}>
-                            <summary className="contract-utility-summary" style={contractEditSummaryStyle}>
-                              <AdminText i18nKey="contractsAdmin.editContractDetailsFor" fallback="Edit contract details for" /> {contract.contractNumber}
-                            </summary>
-                            <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
-                              <input type="hidden" name="_intent" value="update" />
-                              <input type="hidden" name="returnTo" value={returnTo} />
-                              <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
-                                <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
-                              </FormField>
-                              <AdminContractLinkFields
-                                owners={owners}
-                                projects={projects}
-                                defaultHousingCompanyId={contract.housingCompanyId || ""}
-                                defaultProjectId={contract.projectId || ""}
-                                contract={contract}
-                                compact
-                              />
-                              <div style={contractEditActionStyle}>
-                                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
-                              </div>
-                            </form>
-                          </details>
-                        </div>
-                      </td>
-                    </tr>
-                  </Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="admin-list-cards" style={{ gap: cardListStyle.gap }}>
+          <div className="contract-card-list" style={contractCardListStyle}>
             {!contracts.length ? <p style={mutedTextStyle}><AdminText i18nKey="contractsAdmin.noContractNumbersMatchCurrentFilters" fallback="No contract numbers match the current filters." /></p> : null}
             {contracts.map((contract) => (
-              <article key={contract.id} style={itemCardStyle}>
-                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
-                  <div style={{ display: "grid", gap: 6 }}>
-                    <strong>{contract.contractNumber}</strong>
-                    <div style={subMetaStyle}>
-                      <span>{contract.kitchen.name}</span>
-                      <span><AdminText i18nKey="contractsAdmin.ownerLabel" fallback="Owner:" /> {ownerName(contract.owner)}</span>
-                      <span>{compactAddressSummary(contract)}</span>
-                      <span><AdminText i18nKey="contractsAdmin.createdLabel" fallback="Created:" /> {formatDate(contract.createdAt)}</span>
+              <article key={contract.id} style={contractCardStyle}>
+                <div className="contract-card-grid" style={contractCardGridStyle}>
+                  <div style={contractCardIdentityStyle}>
+                    <div style={contractTitleRowStyle}>
+                      <strong style={contractTitleStyle}>{contract.contractNumber}</strong>
+                      <span style={badgeWrapStyle}><AdminStatusBadge status={contract.isActive ? "ACTIVE" : "INACTIVE"} /></span>
                     </div>
+                    <span style={contractKitchenStyle}><AdminKitchenDisplayName slug={contract.kitchen.slug} name={contract.kitchen.name} /></span>
                   </div>
-                  <StatusBadge status={contract.isActive ? "ACTIVE" : "ARCHIVED"} />
-                </div>
-                <details style={contractOrdersDetailsStyle}>
-                  <summary style={contractOrdersSummaryStyle}>
+
+                  <div className="contract-card-fields" style={contractCardFieldsStyle}>
+                    <ContractField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>
+                      {ownerSummary(contract.owner)}
+                    </ContractField>
+                    <ContractField label={<AdminText i18nKey="contractsAdmin.contractAddress" fallback="Contract address" />}>
+                      <AddressColumn lines={contractAddressLines(contract)} emptyText={<AdminText i18nKey="contractsAdmin.noContractAddress" fallback="No contract address" />} />
+                    </ContractField>
+                    <ContractField label={<AdminText i18nKey="contractsAdmin.paymentAddress" fallback="Billing address" />}>
+                      <AddressColumn lines={contactAddressLines(contract.latestOrderAddress)} emptyText={<AdminText i18nKey="contractsAdmin.noPaymentAddress" fallback="No billing address" />} />
+                    </ContractField>
+                  </div>
+
+                  <aside className="contract-card-meta" style={contractCardMetaStyle}>
                     <span style={contract._count.orders ? usagePillUsedStyle : usagePillUnusedStyle}>
                       {usageLabel(contract._count.orders)}
                     </span>
-                  </summary>
-                  <ContractOrders contract={contract} />
-                </details>
-                <form action={`/api/admin/contracts/${contract.id}`} method="post">
-                  <input type="hidden" name="returnTo" value={returnTo} />
-                  <button
-                    type="submit"
-                    name="_intent"
-                    value={contract.isActive ? "deactivate" : "reactivate"}
-                    style={secondaryButtonStyle}
-                  >
-                    {contract.isActive ? <AdminText i18nKey="contractsAdmin.deactivate" fallback="Deactivate" /> : <AdminText i18nKey="contractsAdmin.reactivate" fallback="Reactivate" />}
-                  </button>
-                </form>
-                <details style={contractDeleteDetailsStyle}>
-                  <summary style={contractDeleteSummaryStyle}><AdminText i18nKey="contractsAdmin.deleteContractNumber" fallback="Delete contract number" /></summary>
-                  <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractDeleteFormStyle}>
-                    <input type="hidden" name="returnTo" value={returnTo} />
-                    <button type="submit" name="_intent" value="delete" style={contractDeleteButtonStyle}>
-                      <AdminText i18nKey="contractsAdmin.confirmDelete" fallback="Confirm delete" />
-                    </button>
-                  </form>
-                </details>
-                <details style={contractEditDetailsStyle}>
-                  <summary style={contractEditSummaryStyle}><AdminText i18nKey="contractsAdmin.editContractDetails" fallback="Edit contract details" /></summary>
-                  <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
-                    <input type="hidden" name="_intent" value="update" />
-                    <input type="hidden" name="returnTo" value={returnTo} />
-                    <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
-                      <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
-                    </FormField>
-                    <AdminContractLinkFields
-                      owners={owners}
-                      projects={projects}
-                      defaultHousingCompanyId={contract.housingCompanyId || ""}
-                      defaultProjectId={contract.projectId || ""}
-                      contract={contract}
-                      compact
-                    />
-                    <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
-                  </form>
-                </details>
+                    <span className="contract-created" style={contractCreatedStyle}>
+                      <AdminText i18nKey="contractsAdmin.created" fallback="Created" />
+                      <strong><AdminDateTime value={contract.createdAt} /></strong>
+                    </span>
+                  </aside>
+                </div>
+
+                <div className="contract-card-actions" style={contractCardActionsStyle}>
+                  <details style={contractOrdersDetailsStyle}>
+                    <summary className="contract-utility-summary" style={contractOrdersSummaryStyle}>
+                      <AdminText i18nKey="contractsAdmin.viewOrdersForThisContract" fallback="View orders for this contract" />
+                    </summary>
+                    <ContractOrders contract={contract} />
+                  </details>
+                  <details style={contractEditDetailsStyle}>
+                    <summary className="contract-utility-summary" style={contractEditSummaryStyle}>
+                      <AdminText
+                        i18nKey="contractsAdmin.editContractDetailsForContract"
+                        fallback="Edit contract details for {contractNumber}"
+                        values={{ contractNumber: contract.contractNumber }}
+                      />
+                    </summary>
+                    <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractEditFormStyle}>
+                      <input type="hidden" name="_intent" value="update" />
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
+                        <input name="contractNumber" defaultValue={contract.contractNumber} style={compactInputStyle} required />
+                      </FormField>
+                      <AdminContractLinkFields
+                        owners={owners}
+                        projects={projects}
+                        defaultHousingCompanyId={contract.housingCompanyId || ""}
+                        defaultProjectId={contract.projectId || ""}
+                        contract={contract}
+                        compact
+                      />
+                      <div style={contractEditActionStyle}>
+                        <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.saveContract" fallback="Save contract" /></button>
+                      </div>
+                    </form>
+                  </details>
+                  <div style={contractInlineActionsStyle}>
+                    <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractInlineActionFormStyle}>
+                      <input type="hidden" name="returnTo" value={returnTo} />
+                      <button
+                        type="submit"
+                        name="_intent"
+                        value={contract.isActive ? "deactivate" : "reactivate"}
+                        style={contractToggleButtonStyle}
+                      >
+                        {contract.isActive ? <AdminText i18nKey="contractsAdmin.deactivate" fallback="Deactivate" /> : <AdminText i18nKey="contractsAdmin.reactivate" fallback="Reactivate" />}
+                      </button>
+                    </form>
+                    <details style={contractDeleteDetailsStyle}>
+                      <summary style={contractDeleteSummaryStyle}><AdminText i18nKey="contractsAdmin.delete" fallback="Delete" /></summary>
+                      <form action={`/api/admin/contracts/${contract.id}`} method="post" style={contractDeleteFormStyle}>
+                        <input type="hidden" name="returnTo" value={returnTo} />
+                        <button type="submit" name="_intent" value="delete" style={contractDeleteButtonStyle}>
+                          <AdminText i18nKey="contractsAdmin.confirmDelete" fallback="Confirm delete" />
+                        </button>
+                      </form>
+                    </details>
+                  </div>
+                </div>
               </article>
             ))}
           </div>
@@ -470,16 +371,12 @@ export default async function AdminContractsPage({ searchParams = {} }) {
               display: none;
             }
 
-            .admin-list-cards {
-              display: none;
-            }
-
             .contract-utility-summary::-webkit-details-marker {
               display: none;
             }
 
             .contract-utility-summary::before {
-              content: "›";
+              content: ">";
               display: inline-flex;
               margin-right: 8px;
               transition: transform 120ms ease;
@@ -489,13 +386,25 @@ export default async function AdminContractsPage({ searchParams = {} }) {
               transform: rotate(90deg);
             }
 
-            @media (max-width: 760px) {
-              .admin-list-table {
-                display: none;
+            @media (max-width: 920px) {
+              .contract-card-grid {
+                grid-template-columns: 1fr !important;
               }
 
-              .admin-list-cards {
-                display: grid;
+              .contract-card-fields {
+                grid-template-columns: 1fr !important;
+              }
+
+              .contract-card-actions {
+                grid-template-columns: 1fr !important;
+              }
+
+              .contract-card-meta {
+                align-items: flex-start !important;
+              }
+
+              .contract-created {
+                justify-items: start !important;
               }
 
               .contract-order-link {
@@ -549,75 +458,134 @@ const compactCreateActionStyle = {
   paddingTop: 2,
 };
 
-const contractActionStackStyle = {
+const contractCardListStyle = {
+  display: "grid",
+  gap: 14,
+};
+
+const contractCardStyle = {
+  display: "grid",
+  gap: 14,
+  borderRadius: 8,
+  border: "1px solid var(--app-border)",
+  background: "rgba(255,255,255,0.9)",
+  boxShadow: "var(--app-card-shadow)",
+  padding: 16,
+};
+
+const contractCardGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "minmax(180px, 0.9fr) minmax(360px, 2.2fr) minmax(180px, 0.8fr)",
+  gap: 16,
+  alignItems: "start",
+};
+
+const contractCardIdentityStyle = {
   display: "grid",
   gap: 8,
-  width: 124,
+  minWidth: 0,
 };
 
-const contractTableStyle = {
-  ...tableStyle,
-  tableLayout: "fixed",
-  minWidth: 1180,
+const contractTitleRowStyle = {
+  display: "flex",
+  gap: 10,
+  alignItems: "center",
+  flexWrap: "wrap",
 };
 
-const contractNumberColumnStyle = { width: "8%" };
-const kitchenColumnStyle = { width: "8%" };
-const statusColumnStyle = { width: "7%" };
-const ownerColumnStyle = { width: "13%" };
-const contractAddressColumnStyle = { width: "18%" };
-const paymentAddressColumnStyle = { width: "18%" };
-const usageColumnStyle = { width: "7%" };
-const createdColumnStyle = { width: "8%" };
-const actionColumnStyle = { width: "13%" };
-
-const compactThStyle = {
-  ...thStyle,
-  padding: "12px 14px",
-  letterSpacing: "0.08em",
-};
-
-const compactTableTdStyle = {
-  ...tdStyle,
-  padding: "14px 14px",
-};
-
-const compactTdStyle = {
-  ...compactTableTdStyle,
-  width: "1%",
-  whiteSpace: "normal",
-};
-
-const ownerTdStyle = {
-  ...compactTableTdStyle,
-  whiteSpace: "normal",
-  overflowWrap: "anywhere",
-};
-
-const addressTdStyle = {
-  ...compactTableTdStyle,
-  whiteSpace: "normal",
-  overflowWrap: "anywhere",
-  paddingRight: 10,
-};
-
-const actionTdStyle = {
-  ...compactTableTdStyle,
-  paddingRight: 10,
+const badgeWrapStyle = {
+  display: "inline-flex",
   whiteSpace: "nowrap",
 };
 
-const contractUtilityTdStyle = {
-  padding: "0 16px 12px",
-  borderBottom: "1px solid var(--app-border)",
-  background: "linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,249,245,0.72))",
+const contractTitleStyle = {
+  color: "var(--app-text)",
+  fontSize: "1.08rem",
+  lineHeight: 1.2,
+  overflowWrap: "anywhere",
 };
 
-const contractUtilityBarStyle = {
+const contractKitchenStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 800,
+  lineHeight: 1.3,
+};
+
+const contractCardFieldsStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+  gridTemplateColumns: "minmax(210px, 0.9fr) repeat(2, minmax(240px, 1fr))",
+  gap: 12,
+  minWidth: 0,
+};
+
+const contractFieldStyle = {
+  display: "grid",
+  gap: 6,
+  minWidth: 0,
+};
+
+const contractFieldLabelStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 11,
+  fontWeight: 900,
+  letterSpacing: "0.06em",
+  lineHeight: 1.25,
+  textTransform: "uppercase",
+  overflowWrap: "normal",
+  wordBreak: "normal",
+  hyphens: "none",
+};
+
+const contractFieldValueStyle = {
+  color: "var(--app-text)",
+  fontSize: 14,
+  fontWeight: 700,
+  lineHeight: 1.42,
+  minWidth: 0,
+  overflowWrap: "break-word",
+  wordBreak: "normal",
+  hyphens: "none",
+};
+
+const contractCardMetaStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 10,
+  alignItems: "flex-end",
+  minWidth: 0,
+};
+
+const contractCreatedStyle = {
+  display: "grid",
+  gap: 3,
+  justifyItems: "end",
+  color: "var(--app-text-muted)",
+  fontSize: 11,
+  fontWeight: 900,
+  letterSpacing: "0.05em",
+  lineHeight: 1.25,
+  textTransform: "uppercase",
+  whiteSpace: "nowrap",
+};
+
+const contractCardActionsStyle = {
+  display: "grid",
+  gridTemplateColumns: "minmax(240px, 1fr) minmax(260px, 1.4fr) minmax(180px, auto)",
   gap: 10,
   alignItems: "start",
+};
+
+const contractInlineActionsStyle = {
+  display: "flex",
+  gap: 10,
+  alignItems: "flex-start",
+  justifyContent: "flex-end",
+  flexWrap: "wrap",
+};
+
+const contractInlineActionFormStyle = {
+  display: "grid",
 };
 
 const contractEditDetailsStyle = {
@@ -658,7 +626,8 @@ const contractEditActionStyle = {
 
 const contractToggleButtonStyle = {
   ...secondaryButtonStyle,
-  width: "100%",
+  width: "auto",
+  minWidth: 130,
   minHeight: 42,
   borderRadius: 8,
   padding: "9px 12px",
@@ -695,6 +664,7 @@ const contractDeleteButtonStyle = {
 
 const usagePillUsedStyle = {
   display: "inline-flex",
+  alignItems: "center",
   width: "fit-content",
   padding: "8px 10px",
   borderRadius: 999,
@@ -703,6 +673,8 @@ const usagePillUsedStyle = {
   border: "1px solid rgba(45, 108, 121, 0.14)",
   fontSize: 12,
   fontWeight: 800,
+  lineHeight: 1.2,
+  whiteSpace: "nowrap",
 };
 
 const usagePillUnusedStyle = {
@@ -782,10 +754,13 @@ const addressBlockStyle = {
 
 const addressLinesStyle = {
   display: "grid",
-  gap: 2,
-  color: "var(--app-text)",
-  lineHeight: 1.35,
-  overflowWrap: "anywhere",
+  gap: 3,
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  lineHeight: 1.38,
+  overflowWrap: "break-word",
+  wordBreak: "normal",
+  hyphens: "none",
 };
 
 const emptyAddressStyle = {

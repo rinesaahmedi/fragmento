@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { AdminText } from "./admin-i18n";
+import { AdminPluralText, AdminText, useAdminI18n } from "./admin-i18n";
 
 const DEFAULT_VISIBLE_OBJECTS = 2;
 
@@ -88,9 +88,17 @@ function renderHighlightedText(text, query) {
   ));
 }
 
-function formatProjectStatus(status) {
+function formatProjectStatus(status, translate) {
   const value = String(status || "").trim();
   if (!value) return "";
+  const statusKey = value
+    .split("_")
+    .filter(Boolean)
+    .map((part, index) => (index === 0 ? part : part.charAt(0).toUpperCase() + part.slice(1)))
+    .join("");
+  const translatedStatus = translate(`propertyOwnersAdmin.projectStatus${statusKey.charAt(0).toUpperCase() + statusKey.slice(1)}`, "");
+  if (translatedStatus) return translatedStatus;
+
   return value
     .split("_")
     .filter(Boolean)
@@ -138,6 +146,8 @@ function PreviewList({ objects = [], priorityQuery = "", children }) {
 }
 
 export function AdminPropertyProjectsPreview({ objects = [], priorityQuery = "" }) {
+  const { translate } = useAdminI18n();
+
   return (
     <PreviewList objects={objects} priorityQuery={priorityQuery}>
       {(object) => (
@@ -147,7 +157,7 @@ export function AdminPropertyProjectsPreview({ objects = [], priorityQuery = "" 
           <strong style={projectOnlyNameStyle}>
             {renderHighlightedText(object.projectName || "Unnamed project", priorityQuery)}
           </strong>
-          {object.projectStatus ? <span style={projectMetaTextStyle}>{renderHighlightedText(formatProjectStatus(object.projectStatus), priorityQuery)}</span> : null}
+          {object.projectStatus ? <span style={projectMetaTextStyle}>{renderHighlightedText(formatProjectStatus(object.projectStatus, translate), priorityQuery)}</span> : null}
           {object.projectManagerName ? <span style={projectMetaTextStyle}>{renderHighlightedText(object.projectManagerName, priorityQuery)}</span> : null}
           {object.projectDescription ? <span style={projectDescriptionStyle}>{renderHighlightedText(object.projectDescription, priorityQuery)}</span> : null}
         </div>
@@ -167,7 +177,13 @@ export function AdminPropertyObjectDetailsPreview({ objects = [], priorityQuery 
             <div style={objectOnlyHeaderStyle}>
               <span style={hierarchyEyebrowStyle}><AdminText i18nKey="propertyOwnersAdmin.propertyObject" fallback="Object / Building" /></span>
               <span style={objectPreviewCountStyle}>
-                {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
+                <AdminPluralText
+                  count={object._count.contracts}
+                  singularKey="kitchensAdmin.contractCountSingular"
+                  pluralKey="kitchensAdmin.contractCountPlural"
+                  singularFallback="{count} contract"
+                  pluralFallback="{count} contracts"
+                />
               </span>
             </div>
             <strong style={objectNameStyle}>{renderHighlightedText(object.name, priorityQuery)}</strong>
@@ -194,11 +210,17 @@ export default function AdminPropertyObjectsPreview({ objects = [], priorityQuer
                 <strong>{renderHighlightedText(object.projectName || "Unnamed project", priorityQuery)}</strong>
               </div>
               <span style={objectPreviewCountStyle}>
-                {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
+                <AdminPluralText
+                  count={object._count.contracts}
+                  singularKey="kitchensAdmin.contractCountSingular"
+                  pluralKey="kitchensAdmin.contractCountPlural"
+                  singularFallback="{count} contract"
+                  pluralFallback="{count} contracts"
+                />
               </span>
             </div>
             <div style={objectHierarchyStyle}>
-              <span style={hierarchyEyebrowStyle}><AdminText i18nKey="contractsAdmin.propertyObject" fallback="Object/building" /></span>
+              <span style={hierarchyEyebrowStyle}><AdminText i18nKey="contractsAdmin.propertyObject" fallback="Object / Building" /></span>
               <strong style={objectNameStyle}>{renderHighlightedText(object.name, priorityQuery)}</strong>
               {address ? <span style={objectPreviewAddressStyle}>{renderHighlightedText(address, priorityQuery)}</span> : null}
               {contact ? <span style={objectPreviewMetaStyle}>{renderHighlightedText(contact, priorityQuery)}</span> : null}
