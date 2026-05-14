@@ -29,6 +29,9 @@ export function buildServiceClaimListWhere(filters, { includeAttachmentsJsonInSe
       Prisma.sql`COALESCE("phone", '') ILIKE ${query}`,
       Prisma.sql`COALESCE("email", '') ILIKE ${query}`,
       Prisma.sql`COALESCE("clientAddress", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE("clientCity", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE("clientPostalCode", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE("clientCountry", '') ILIKE ${query}`,
     ];
     if (includeAttachmentsJsonInSearch) {
       parts.push(Prisma.sql`COALESCE("attachmentsJson", '') ILIKE ${query}`);
@@ -47,8 +50,8 @@ export function buildServiceClaimListWhere(filters, { includeAttachmentsJsonInSe
     conditions.push(Prisma.sql`(${Prisma.join(parts, " OR ")})`);
   }
 
-  if (filters.requestType) {
-    conditions.push(Prisma.sql`"requestType" = ${filters.requestType}`);
+  if (filters.city) {
+    conditions.push(Prisma.sql`LOWER(COALESCE("clientCity", '')) = LOWER(${filters.city})`);
   }
 
   if (filters.dateFrom) {
@@ -73,6 +76,9 @@ const CLAIM_COLUMNS = `
       "phone",
       "email",
       "clientAddress",
+      "clientCountry",
+      "clientCity",
+      "clientPostalCode",
       "landlordName",
       "landlordPhone",
       "landlordEmail",
