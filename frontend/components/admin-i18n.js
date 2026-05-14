@@ -107,6 +107,12 @@ export function AdminTranslation({ i18nKey, fallback = "", values }) {
   return text;
 }
 
+export function AdminTranslatedInput({ placeholderKey, placeholderFallback = "", ...props }) {
+  const { translate } = useAdminI18n();
+
+  return <input {...props} placeholder={translate(placeholderKey, placeholderFallback)} />;
+}
+
 export function AdminStatusBadge({ status }) {
   const { translate } = useAdminI18n();
   const statusKey = String(status || "").toLowerCase();
@@ -137,6 +143,31 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
   const normalizedSlug = String(slug || "").toLowerCase();
   const displayName = String(name || "").trim();
   const normalizedName = displayName.toLowerCase();
+  const isTwoPartKitchen =
+    normalizedSlug === "kitchen-model-c" ||
+    ["two-part kitchen", "split kitchen", "zweiteilige küche", "zweiteilige kÃ¼che"].includes(normalizedName);
+  const isStandardKitchen =
+    normalizedSlug === "kitchen-model-b" ||
+    ["standard kitchen", "linear kitchen", "standardküche", "standardkÃ¼che"].includes(normalizedName);
+  const isDefaultDemoKitchen =
+    normalizedSlug === "fragmento-default" ||
+    [
+      "default kitchen",
+      "default demo kitchen",
+      "fragmento default kitchen",
+      "standard-demoküche",
+      "standard-demokÃ¼che",
+    ].includes(normalizedName);
+
+  if (language === "de") {
+    if (isTwoPartKitchen) return "Zweiteilige Küche";
+    if (isStandardKitchen) return "Standardküche";
+    if (isDefaultDemoKitchen) return "Standard-Demoküche";
+  } else {
+    if (isTwoPartKitchen) return "Two-Part Kitchen";
+    if (isStandardKitchen) return "Standard Kitchen";
+    if (isDefaultDemoKitchen) return "Default Demo Kitchen";
+  }
 
   if (language === "de") {
     if (normalizedSlug === "kitchen-model-c" || normalizedName === "two-part kitchen" || normalizedName === "split kitchen") {
@@ -182,6 +213,30 @@ export function AdminKitchenDisplayName({ slug, name }) {
   const { language } = useAdminI18n();
 
   return getLocalizedKitchenDisplayName({ slug, name }, language);
+}
+
+export function AdminKitchenNameInput({ slug, name, style, required = false }) {
+  const { language } = useAdminI18n();
+  const localizedName = getLocalizedKitchenDisplayName({ slug, name }, language);
+  const lastLocalizedNameRef = useRef(localizedName);
+  const [value, setValue] = useState(localizedName);
+
+  useEffect(() => {
+    if (value === lastLocalizedNameRef.current) {
+      setValue(localizedName);
+    }
+    lastLocalizedNameRef.current = localizedName;
+  }, [localizedName, value]);
+
+  return (
+    <input
+      name="name"
+      value={value}
+      onChange={(event) => setValue(event.target.value)}
+      style={style}
+      required={required}
+    />
+  );
 }
 
 export function AdminLanguageSwitcher() {

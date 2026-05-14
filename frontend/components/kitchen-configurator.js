@@ -431,6 +431,30 @@ function buildAssistantCatalogItems(kitchenConfig, kitchenSlug) {
   return Array.from(itemsById.values());
 }
 
+function isWorktopSelectionItem(item) {
+  return String(item?.componentKey || "").trim().toLowerCase() === "worktop";
+}
+
+function isSinkSelectionItem(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const name = String(item?.name || item?.nameSnapshot || "").trim().toLowerCase();
+  return componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and waste system");
+}
+
+function getSelectedDisplayCount(lockedSelectedComponents, optionalSelectedComponents, selectedAccessories, selectedServices) {
+  const standardMergeAdjustment =
+    lockedSelectedComponents.some(isWorktopSelectionItem) && lockedSelectedComponents.some(isSinkSelectionItem) ? 1 : 0;
+
+  return (
+    lockedSelectedComponents.length -
+    standardMergeAdjustment +
+    optionalSelectedComponents.length +
+    selectedAccessories.length +
+    selectedServices.length
+  );
+}
+
 function formatProductAssistantOptionName(value, fallback = "") {
   const label = String(value || "").trim();
   if (!label) return fallback;
@@ -1132,6 +1156,12 @@ function KitchenConfiguratorContent({
   );
   const lockedSelectedComponents = selectedComponents.filter((item) => item.isLocked || item.isOrderLocked);
   const optionalSelectedComponents = selectedComponents.filter((item) => !item.isLocked && !item.isOrderLocked);
+  const selectedDisplayCount = getSelectedDisplayCount(
+    lockedSelectedComponents,
+    optionalSelectedComponents,
+    selectedAccessories,
+    selectedServices,
+  );
   const fixedComponentIdsKey = fixedComponentIds.join("|");
   const visibleComponents = kitchenConfig.components.filter((item) => {
     const componentId = componentIdForItem(item);
@@ -1767,6 +1797,7 @@ function KitchenConfiguratorContent({
               selectedComponentIds={selectedComponentIds}
               selectedAccessoryCodes={selectedAccessoryCodes}
               selectedServiceCodes={selectedServiceCodes}
+              selectedDisplayCount={selectedDisplayCount}
               fixedComponentIds={fixedComponentIds}
               orderLockedAccessoryCodes={orderLockedAccessoryCodes}
               orderLockedServiceCodes={orderLockedServiceCodes}

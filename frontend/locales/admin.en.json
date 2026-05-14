@@ -368,6 +368,7 @@
     "supportedFormatsXlsxAndCsv": "Supported formats: .xlsx and .csv",
     "catalogItems": "Catalog Items",
     "compactItemCardsOpenOnlyComponentToEdit": "Compact item cards. Open only the component you want to edit.",
+    "searchItemsPlaceholder": "Name or code",
     "noItemsConfiguredForThisKitchen": "No items configured for this kitchen.",
     "noCatalogItemsMatchFilters": "No catalog items match the current filters.",
     "articleNo": "Article no.",
