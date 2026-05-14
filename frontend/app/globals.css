@@ -843,9 +843,15 @@ textarea {
   text-align: left;
   cursor: pointer;
   transition:
-    transform 160ms ease,
-    box-shadow 160ms ease,
-    border-color 160ms ease;
+      transform 160ms ease,
+      box-shadow 160ms ease,
+      border-color 160ms ease;
+}
+
+.service-choice-card--complaint {
+  border-color: rgba(172, 96, 57, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 249, 0.99) 0%, rgba(248, 236, 228, 0.96) 100%);
 }
 
 .service-choice-card:hover,
@@ -856,9 +862,33 @@ textarea {
   box-shadow: 0 18px 28px rgba(84, 59, 40, 0.12);
 }
 
+.service-choice-card--complaint:hover,
+.service-choice-card--complaint:focus-visible,
+.service-choice-card--complaint.is-active {
+  border-color: rgba(172, 96, 57, 0.56);
+  box-shadow: 0 20px 30px rgba(126, 73, 43, 0.16);
+}
+
 .service-choice-card:focus-visible {
   outline: 2px solid rgba(107, 79, 58, 0.28);
   outline-offset: 3px;
+}
+
+.service-choice-card__icon {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(172, 96, 57, 0.14);
+  color: #ac6039;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .service-choice-card__label {
@@ -877,6 +907,14 @@ textarea {
 .service-choice-card strong {
   font-size: 1.35rem;
   line-height: 1.15;
+}
+
+.service-choice-card__brand {
+  color: var(--app-accent);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .service-choice-card p {
