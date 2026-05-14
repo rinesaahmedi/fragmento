@@ -86,15 +86,17 @@ function OptionalFieldSuffix({ text }) {
 const COPY = {
   de: {
     eyebrow: "Fragmento Service",
-    title: "Willkommen beim Fragmento Service",
+    title: "Willkommen bei Architecto",
     intro:
       "Wähle den passenden Weg für dein Anliegen. Du kannst mit einer Bestellung oder einem Zusatzkauf weitermachen oder direkt eine Reklamation an unser Support-Team senden.",
     purchaseBadge: "Nachkauf",
     purchaseTitle: "Zusatzkauf",
+    purchaseBrand: "FRAGMENTO BY ARCHITECTO",
     purchaseText: "\u00d6ffne den K\u00fcchenkonfigurator und fahre mit zus\u00e4tzlichen Komponenten oder Zubeh\u00f6r fort.",
     complaintBadge: "Reklamation",
-    complaintTitle: "Reklamation",
-    complaintText: "Nutze das Reklamationsformular und melde ein Problem mit Ger\u00e4t oder K\u00fcche.",
+    complaintTitle: "Reklamation melden",
+    complaintBrand: "ARCHITECTO SERVICE CENTER",
+    complaintText: "F\u00fcr Defekte, Sch\u00e4den oder fehlende Teile: Nutze das Reklamationsformular und sende den Fall an den Support.",
     purchasePanelTitle: "Weiter zum Kaufprozess",
     purchasePanelText: "Wenn der Mieter zus\u00e4tzliche Artikel statt einer Reklamation ben\u00f6tigt, geht es hier zum Konfigurator.",
     openConfigurator: "Konfigurator \u00f6ffnen",
@@ -195,15 +197,17 @@ const COPY = {
   },
   en: {
     eyebrow: "Fragmento Service",
-    title: "Welcome to Fragmento Service",
+    title: "Welcome to Architecto",
     intro:
       "Choose the path that fits your request. You can continue with an order or additional purchase, or send a claim directly to our support team.",
     purchaseBadge: "Additional purchase",
     purchaseTitle: "Additional purchase",
+    purchaseBrand: "FRAGMENTO BY ARCHITECTO",
     purchaseText: "Open the kitchen configurator and continue with extra components or accessories.",
     complaintBadge: "Complaint",
-    complaintTitle: "Complaint request",
-    complaintText: "Report a device or kitchen issue and send the details to support.",
+    complaintTitle: "File a complaint",
+    complaintBrand: "ARCHITECTO SERVICE CENTER",
+    complaintText: "For damage, defects, or missing parts, use the complaint form and send the case to support.",
     purchasePanelTitle: "Continue to the purchase flow",
     purchasePanelText: "If the tenant needs additional items instead of a complaint, continue to the configurator.",
     openConfigurator: "Open configurator",
@@ -304,15 +308,17 @@ const COPY = {
   },
   tr: {
     eyebrow: "Fragmento Servis",
-    title: "Fragmento Servis'e Ho\u015f Geldiniz",
+    title: "Architecto'ya Ho\u015f Geldiniz",
     intro:
       "Talebinize uygun yolu se\u00e7in. Sipari\u015f veya ek sat\u0131n alma ile devam edebilir ya da do\u011frudan destek ekibine \u015fikayet g\u00f6nderebilirsiniz.",
     purchaseBadge: "Ek sat\u0131n alma",
     purchaseTitle: "Ek sat\u0131n alma",
+    purchaseBrand: "FRAGMENTO BY ARCHITECTO",
     purchaseText: "Mutfak yap\u0131land\u0131r\u0131c\u0131s\u0131n\u0131 a\u00e7\u0131n ve ek bile\u015fenler veya aksesuarlarla devam edin.",
     complaintBadge: "\u015eikayet",
-    complaintTitle: "\u015eikayet talebi",
-    complaintText: "Cihaz veya mutfak sorununu bildirip ayr\u0131nt\u0131lar\u0131 deste\u011fe g\u00f6nderin.",
+    complaintTitle: "\u015eikayet bildir",
+    complaintBrand: "ARCHITECTO SERVICE CENTER",
+    complaintText: "Hasar, ar\u0131za veya eksik par\u00e7alar i\u00e7in \u015fikayet formunu kullan\u0131n ve durumu deste\u011fe g\u00f6nderin.",
     purchasePanelTitle: "Sat\u0131n alma ak\u0131\u015f\u0131na devam et",
     purchasePanelText: "Kirac\u0131n\u0131n \u015fikayet yerine ek \u00fcr\u00fcnlere ihtiyac\u0131 varsa, yap\u0131land\u0131r\u0131c\u0131ya devam edin.",
     openConfigurator: "Yap\u0131land\u0131r\u0131c\u0131y\u0131 a\u00e7",
@@ -403,15 +409,17 @@ const COPY = {
   },
   es: {
     eyebrow: "Servicio Fragmento",
-    title: "Bienvenido al servicio de Fragmento",
+    title: "Bienvenido a Architecto",
     intro:
       "Elige la opci\u00f3n adecuada para tu solicitud. Puedes continuar con un pedido o una compra adicional, o enviar una reclamaci\u00f3n al equipo de soporte.",
     purchaseBadge: "Compra adicional",
     purchaseTitle: "Compra adicional",
+    purchaseBrand: "FRAGMENTO BY ARCHITECTO",
     purchaseText: "Abre el configurador de cocina y contin\u00faa con componentes o accesorios adicionales.",
     complaintBadge: "Reclamaci\u00f3n",
-    complaintTitle: "Solicitud de reclamaci\u00f3n",
-    complaintText: "Informa de un problema con el dispositivo o la cocina y env\u00edalo a soporte.",
+    complaintTitle: "Enviar reclamaci\u00f3n",
+    complaintBrand: "ARCHITECTO SERVICE CENTER",
+    complaintText: "Para da\u00f1os, defectos o piezas faltantes, usa el formulario de reclamaci\u00f3n y env\u00eda el caso a soporte.",
     purchasePanelTitle: "Continuar al proceso de compra",
     purchasePanelText: "Si el inquilino necesita art\u00edculos adicionales en lugar de una reclamaci\u00f3n, contin\u00faa al configurador.",
     openConfigurator: "Abrir configurador",
@@ -502,15 +510,17 @@ const COPY = {
   },
   fr: {
     eyebrow: "Service Fragmento",
-    title: "Bienvenue sur le service Fragmento",
+    title: "Bienvenue chez Architecto",
     intro:
       "Choisissez le parcours adapt\u00e9 \u00e0 votre demande. Vous pouvez poursuivre une commande ou un achat compl\u00e9mentaire, ou envoyer une r\u00e9clamation \u00e0 notre \u00e9quipe de support.",
     purchaseBadge: "Achat compl\u00e9mentaire",
     purchaseTitle: "Achat compl\u00e9mentaire",
+    purchaseBrand: "FRAGMENTO BY ARCHITECTO",
     purchaseText: "Ouvrez le configurateur de cuisine et continuez avec des composants ou accessoires suppl\u00e9mentaires.",
     complaintBadge: "R\u00e9clamation",
-    complaintTitle: "Demande de r\u00e9clamation",
-    complaintText: "Signalez un probl\u00e8me avec l'appareil ou la cuisine et envoyez-le au support.",
+    complaintTitle: "D\u00e9poser une r\u00e9clamation",
+    complaintBrand: "ARCHITECTO SERVICE CENTER",
+    complaintText: "Pour un dommage, un d\u00e9faut ou une pi\u00e8ce manquante, utilisez le formulaire de r\u00e9clamation et envoyez le dossier au support.",
     purchasePanelTitle: "Continuer vers le processus d'achat",
     purchasePanelText: "Si le locataire a besoin d'articles suppl\u00e9mentaires plut\u00f4t que d'une r\u00e9clamation, continuez vers le configurateur.",
     openConfigurator: "Ouvrir le configurateur",
@@ -601,15 +611,17 @@ const COPY = {
   },
   ru: {
     eyebrow: "\u0421\u0435\u0440\u0432\u0438\u0441 Fragmento",
-    title: "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 \u0441\u0435\u0440\u0432\u0438\u0441 Fragmento",
+    title: "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 Architecto",
     intro:
       "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u043e\u0434\u0445\u043e\u0434\u044f\u0449\u0438\u0439 \u043f\u0443\u0442\u044c \u0434\u043b\u044f \u0432\u0430\u0448\u0435\u0433\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0430. \u0412\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u043f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u044c \u0437\u0430\u043a\u0430\u0437 \u0438\u043b\u0438 \u0434\u043e\u043f\u043e\u043a\u0443\u043f\u043a\u0443, \u0438\u043b\u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e \u0432 \u0441\u043b\u0443\u0436\u0431\u0443 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0438.",
     purchaseBadge: "\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u0430\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0430",
     purchaseTitle: "\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u0430\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0430",
+    purchaseBrand: "FRAGMENTO BY ARCHITECTO",
     purchaseText: "\u041e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440 \u043a\u0443\u0445\u043d\u0438 \u0438 \u043f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u0435 \u0441 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u043c\u0438 \u043a\u043e\u043c\u043f\u043e\u043d\u0435\u043d\u0442\u0430\u043c\u0438 \u0438\u043b\u0438 \u0430\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440\u0430\u043c\u0438.",
     complaintBadge: "\u0420\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044f",
-    complaintTitle: "\u0417\u0430\u044f\u0432\u043a\u0430 \u043d\u0430 \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e",
-    complaintText: "\u0421\u043e\u043e\u0431\u0449\u0438\u0442\u0435 \u043e \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0435 \u0441 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u043e\u043c \u0438\u043b\u0438 \u043a\u0443\u0445\u043d\u0435\u0439 \u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0434\u0435\u0442\u0430\u043b\u0438 \u0432 \u0441\u043b\u0443\u0436\u0431\u0443 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0438.",
+    complaintTitle: "\u041f\u043e\u0434\u0430\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e",
+    complaintBrand: "ARCHITECTO SERVICE CENTER",
+    complaintText: "\u0414\u043b\u044f \u043f\u043e\u0432\u0440\u0435\u0436\u0434\u0435\u043d\u0438\u0439, \u0434\u0435\u0444\u0435\u043a\u0442\u043e\u0432 \u0438\u043b\u0438 \u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0445 \u0434\u0435\u0442\u0430\u043b\u0435\u0439 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u0444\u043e\u0440\u043c\u0443 \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438 \u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443.",
     purchasePanelTitle: "\u041f\u0435\u0440\u0435\u0439\u0442\u0438 \u043a \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0443 \u043f\u043e\u043a\u0443\u043f\u043a\u0438",
     purchasePanelText: "\u0415\u0441\u043b\u0438 \u0430\u0440\u0435\u043d\u0434\u0430\u0442\u043e\u0440\u0443 \u043d\u0443\u0436\u043d\u044b \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u0442\u043e\u0432\u0430\u0440\u044b \u0432\u043c\u0435\u0441\u0442\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438, \u043f\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u0432 \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440.",
     openConfigurator: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440",
@@ -791,6 +803,21 @@ export default function ServiceClaimFlow() {
     [formValues.email, formValues.phone],
   );
   const normalizedContractNumber = formValues.contractNumber.trim();
+  const kitchenAreasLinePrefix = copy.kitchenAreasLinePrefix || fallbackCopy.kitchenAreasLinePrefix;
+  const activeKitchenPlan = useMemo(() => {
+    if (
+      contractLookup.status === "found" &&
+      contractLookup.contractNumber === normalizedContractNumber
+    ) {
+      return contractLookup.kitchenPlan;
+    }
+    return null;
+  }, [
+    contractLookup.status,
+    contractLookup.contractNumber,
+    contractLookup.kitchenPlan,
+    normalizedContractNumber,
+  ]);
 
   function t(key) {
     if (Object.prototype.hasOwnProperty.call(copy, key)) {
@@ -857,10 +884,7 @@ export default function ServiceClaimFlow() {
     if (!isComplaintMode) {
       return undefined;
     }
-    const plan =
-      contractLookup.status === "found" && contractLookup.contractNumber === normalizedContractNumber
-        ? contractLookup.kitchenPlan
-        : null;
+    const plan = activeKitchenPlan;
     if (!plan?.selectableComponents?.length) {
       return undefined;
     }
@@ -869,7 +893,7 @@ export default function ServiceClaimFlow() {
 
     setForm((prev) => {
       const next = composeProblemDescriptionWithAreas(
-        copy.kitchenAreasLinePrefix || fallbackCopy.kitchenAreasLinePrefix,
+        kitchenAreasLinePrefix,
         problemComponentIds,
         metaById,
         prev.problemDescription,
@@ -883,14 +907,10 @@ export default function ServiceClaimFlow() {
     return undefined;
   }, [
     isComplaintMode,
-    contractLookup.status,
-    contractLookup.contractNumber,
-    contractLookup.kitchenPlan,
+    activeKitchenPlan,
     problemComponentIds,
-    copy.kitchenAreasLinePrefix,
-    fallbackCopy.kitchenAreasLinePrefix,
+    kitchenAreasLinePrefix,
     language,
-    normalizedContractNumber,
   ]);
 
   function handleModeSelect(nextMode) {
@@ -1254,15 +1274,20 @@ export default function ServiceClaimFlow() {
           >
             <span className="service-choice-card__label">{copy.purchaseBadge}</span>
             <strong>{copy.purchaseTitle}</strong>
+            <span className="service-choice-card__brand">{copy.purchaseBrand}</span>
             <p>{copy.purchaseText}</p>
           </button>
           <button
             type="button"
-            className={`service-choice-card${isComplaintMode ? " is-active" : ""}`}
+            className={`service-choice-card service-choice-card--complaint${isComplaintMode ? " is-active" : ""}`}
             onClick={() => handleModeSelect("complaint")}
           >
+            <span className="service-choice-card__icon" aria-hidden="true">
+              !
+            </span>
             <span className="service-choice-card__label">{copy.complaintBadge}</span>
             <strong>{copy.complaintTitle}</strong>
+            <span className="service-choice-card__brand">{copy.complaintBrand}</span>
             <p>{copy.complaintText}</p>
           </button>
         </div>
@@ -1271,7 +1296,7 @@ export default function ServiceClaimFlow() {
       {mode === "nachkauf" ? (
         <section className="service-panel">
           <div className="service-panel__header">
-            <p className="service-panel__eyebrow">{copy.purchaseBadge}</p>
+            <p className="service-panel__eyebrow">{copy.purchaseBrand}</p>
             <h2>{copy.purchasePanelTitle}</h2>
             <p>{copy.purchasePanelText}</p>
           </div>
@@ -1293,7 +1318,7 @@ export default function ServiceClaimFlow() {
       {isComplaintMode ? (
         <section className="service-panel">
           <div className="service-panel__header">
-            <p className="service-panel__eyebrow">{copy.complaintBadge}</p>
+            <p className="service-panel__eyebrow">{copy.complaintBrand}</p>
             <h2>{copy.formTitle}</h2>
             <p>{copy.formIntro}</p>
           </div>

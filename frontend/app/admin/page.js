@@ -438,19 +438,55 @@ async function loadClaimDashboardSummary(filters) {
 
 async function loadClaimElementRows(filters) {
   const whereClause = buildClaimWhereClause(filters, "sc");
-  return prisma.$queryRaw`
-    SELECT
-      sc."id",
-      sc."problemDescription",
-      sc."problemAreasJson",
-      sc."attachmentsJson",
-      sc."clientCountry",
-      sc."clientCity",
-      sc."clientPostalCode"
-    FROM "ServiceClaim" sc
-    ${whereClause}
-    ORDER BY sc."createdAt" DESC
-  `;
+  const hasMissingClaimAnalyticsColumn = (error) => {
+    const message = String(error?.message ?? "");
+    const metaMessage = typeof error?.meta?.message === "string" ? error.meta.message : "";
+    const combined = `${message} ${metaMessage}`;
+    return (
+      combined.includes("does not exist")
+      && (
+        combined.includes("problemAreasJson")
+        || combined.includes("attachmentsJson")
+        || combined.includes("clientCountry")
+        || combined.includes("clientCity")
+        || combined.includes("clientPostalCode")
+        || combined.includes("42703")
+      )
+    );
+  };
+  try {
+    return await prisma.$queryRaw`
+      SELECT
+        sc."id",
+        sc."problemDescription",
+        sc."problemAreasJson",
+        sc."attachmentsJson",
+        sc."clientCountry",
+        sc."clientCity",
+        sc."clientPostalCode"
+      FROM "ServiceClaim" sc
+      ${whereClause}
+      ORDER BY sc."createdAt" DESC
+    `;
+  } catch (error) {
+    if (!hasMissingClaimAnalyticsColumn(error)) {
+      throw error;
+    }
+
+    return await prisma.$queryRaw`
+      SELECT
+        sc."id",
+        sc."problemDescription",
+        NULL::text AS "problemAreasJson",
+        NULL::text AS "attachmentsJson",
+        NULL::text AS "clientCountry",
+        NULL::text AS "clientCity",
+        NULL::text AS "clientPostalCode"
+      FROM "ServiceClaim" sc
+      ${whereClause}
+      ORDER BY sc."createdAt" DESC
+    `;
+  }
 }
 
 async function loadDailyStatusRows(filters) {
