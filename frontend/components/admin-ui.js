@@ -112,6 +112,10 @@ export function StatusBadge({ status }) {
   return <span style={statusPill(status)}>{label}</span>;
 }
 
+export function StatusBadgeLabel({ status, label }) {
+  return <span style={statusPill(status)}>{label}</span>;
+}
+
 export function TypeBadge({ label }) {
   return <span style={typePillStyle}>{label}</span>;
 }

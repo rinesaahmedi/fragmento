@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { StatusBadgeLabel } from "./admin-ui";
 import de from "../locales/admin.de.json";
 import en from "../locales/admin.en.json";
 
@@ -104,6 +105,83 @@ export function AdminTranslation({ i18nKey, fallback = "", values }) {
   }
 
   return text;
+}
+
+export function AdminStatusBadge({ status }) {
+  const { translate } = useAdminI18n();
+  const statusKey = String(status || "").toLowerCase();
+  const label = translate(`status.${statusKey}`, status === "CONFIRMED" ? "Confirmed / emailed" : status);
+
+  return <StatusBadgeLabel status={status} label={label} />;
+}
+
+function formatAdminDate(value, language = "en") {
+  const formatter = new Intl.DateTimeFormat(language === "de" ? "de-DE" : "en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  });
+  const parts = Object.fromEntries(formatter.formatToParts(new Date(value)).map((part) => [part.type, part.value]));
+
+  if (language === "de") {
+    return `${parts.day}. ${parts.month} ${parts.year}, ${parts.hour}:${parts.minute}`;
+  }
+
+  return `${parts.day} ${parts.month} ${parts.year}, ${parts.hour}:${parts.minute}`;
+}
+
+function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
+  const normalizedSlug = String(slug || "").toLowerCase();
+  const displayName = String(name || "").trim();
+  const normalizedName = displayName.toLowerCase();
+
+  if (language === "de") {
+    if (normalizedSlug === "kitchen-model-c" || normalizedName === "two-part kitchen" || normalizedName === "split kitchen") {
+      return "Zweiteilige Küche";
+    }
+
+    if (normalizedSlug === "kitchen-model-b" || normalizedName === "standard kitchen" || normalizedName === "linear kitchen") {
+      return "Standardküche";
+    }
+
+    if (
+      normalizedSlug === "fragmento-default" ||
+      normalizedName === "default kitchen" ||
+      normalizedName === "default demo kitchen" ||
+      normalizedName === "fragmento default kitchen"
+    ) {
+      return "Standard-Demoküche";
+    }
+  }
+
+  if (normalizedSlug === "kitchen-model-c" || displayName === "Zweiteilige Küche") {
+    return "Two-Part Kitchen";
+  }
+
+  if (normalizedSlug === "kitchen-model-b" || displayName === "Standardküche") {
+    return "Standard Kitchen";
+  }
+
+  if (normalizedSlug === "fragmento-default" || displayName === "Default Kitchen" || displayName === "Fragmento Default Kitchen") {
+    return "Default Demo Kitchen";
+  }
+
+  return displayName;
+}
+
+export function AdminDateTime({ value }) {
+  const { language } = useAdminI18n();
+
+  return formatAdminDate(value, language);
+}
+
+export function AdminKitchenDisplayName({ slug, name }) {
+  const { language } = useAdminI18n();
+
+  return getLocalizedKitchenDisplayName({ slug, name }, language);
 }
 
 export function AdminLanguageSwitcher() {

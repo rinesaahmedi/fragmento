@@ -417,7 +417,7 @@
 
 .itemTop {
   display: grid;
-  grid-template-columns: 58px 1fr auto;
+  grid-template-columns: 66px 1fr auto;
   gap: 12px;
   align-items: start;
 }
@@ -426,10 +426,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 58px;
-  height: 58px;
+  width: 66px;
+  height: 66px;
   color: #000;
-  transform: translateY(6px);
+  transform: translateY(3px);
 }
 
 .itemIcon img,
@@ -440,8 +440,8 @@
 
 .itemIconCompact img,
 .itemIconCompact svg {
-  max-width: 72%;
-  max-height: 72%;
+  max-width: 78%;
+  max-height: 78%;
 }
 
 .itemIconTall img,
@@ -550,16 +550,20 @@
 }
 
 .itemInfoWrap {
-  position: relative;
+  position: absolute;
+  left: 47px;
+  top: 92px;
+  z-index: 3;
   display: inline-flex;
   align-items: center;
+  transform: translateX(-50%);
 }
 
 .itemAssistantWrap {
   position: relative;
   display: inline-flex;
   align-items: center;
-  width: 46px;
+  width: 52px;
   height: 34px;
   isolation: isolate;
 }
@@ -573,14 +577,14 @@
 .itemAssistantTrigger {
   appearance: none;
   position: absolute;
-  right: -10px;
-  bottom: -12px;
+  right: -12px;
+  bottom: -14px;
   z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 66px;
-  height: 76px;
+  width: 76px;
+  height: 88px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -592,8 +596,8 @@
 
 .itemAssistantTrigger img {
   display: block;
-  width: 66px;
-  height: 76px;
+  width: 76px;
+  height: 88px;
   object-fit: contain;
   filter: drop-shadow(0 6px 8px rgba(74, 47, 20, 0.14));
 }
@@ -611,7 +615,7 @@
 .itemAssistantPromptCloud {
   position: absolute;
   right: 0;
-  bottom: 50px;
+  bottom: 60px;
   z-index: 1;
   width: 32px;
   height: 20px;
@@ -654,15 +658,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border-radius: 999px;
   border: 1px solid rgba(120, 90, 64, 0.18);
   background: #fff8f0;
   color: #7a4d27;
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: 1.12rem;
+  font-weight: 950;
+  line-height: 1;
   text-decoration: none;
   cursor: pointer;
   transition:
@@ -688,8 +693,8 @@
 
 .itemInfoTooltip {
   position: absolute;
-  right: 0;
-  bottom: calc(100% + 10px);
+  left: calc(100% + 10px);
+  top: 50%;
   z-index: 6;
   display: grid;
   gap: 8px;
@@ -701,7 +706,7 @@
   box-shadow: 0 18px 32px rgba(39, 26, 14, 0.22);
   opacity: 0;
   pointer-events: none;
-  transform: translateY(6px);
+  transform: translate(8px, -50%);
   transition: opacity 0.16s ease, transform 0.16s ease;
 }
 
@@ -764,13 +769,18 @@
 .itemAssistantWrap:hover .itemInfoTooltip,
 .itemAssistantWrap:focus-within .itemInfoTooltip {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(0, -50%);
 }
 
 .catalogSection:first-of-type .catalogGrid > *:nth-child(-n + 2) .itemInfoTooltip {
-  top: calc(100% + 10px);
+  top: 50%;
   bottom: auto;
-  transform: translateY(-6px);
+  transform: translate(8px, -50%);
+}
+
+.catalogSection:first-of-type .catalogGrid > *:nth-child(-n + 2) .itemInfoWrap:hover .itemInfoTooltip,
+.catalogSection:first-of-type .catalogGrid > *:nth-child(-n + 2) .itemInfoWrap:focus-within .itemInfoTooltip {
+  transform: translate(0, -50%);
 }
 
 .productInfoOverlay {
@@ -1390,8 +1400,8 @@
 
 .productAssistantLauncher {
   position: relative;
-  min-height: 188px;
-  min-width: 184px;
+  min-height: 204px;
+  min-width: 204px;
   padding: 0;
   border-radius: 28px;
   background: transparent;
@@ -1411,8 +1421,8 @@
 
 .productAssistantLauncherBubble {
   position: absolute;
-  right: 134px;
-  bottom: 120px;
+  right: 150px;
+  bottom: 154px;
   width: max-content;
   max-width: 210px;
   padding: 12px 16px;
@@ -1449,8 +1459,8 @@
   bottom: 14px;
   display: grid;
   place-items: center;
-  width: 152px;
-  height: 182px;
+  width: 170px;
+  height: 204px;
   overflow: visible;
   filter: drop-shadow(0 14px 18px rgba(36, 24, 13, 0.18));
 }
