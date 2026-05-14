@@ -86,7 +86,7 @@ function OptionalFieldSuffix({ text }) {
 const COPY = {
   de: {
     eyebrow: "Fragmento Service",
-    title: "Willkommen bei Architecto",
+    title: "Willkommen bei architecto",
     intro:
       "Wähle den passenden Weg für dein Anliegen. Du kannst mit einer Bestellung oder einem Zusatzkauf weitermachen oder direkt eine Reklamation an unser Support-Team senden.",
     purchaseBadge: "Nachkauf",
@@ -210,7 +210,7 @@ const COPY = {
   },
   en: {
     eyebrow: "Fragmento Service",
-    title: "Welcome to Architecto",
+    title: "Welcome to architecto",
     intro:
       "Choose the path that fits your request. You can continue with an order or additional purchase, or send a claim directly to our support team.",
     purchaseBadge: "Additional purchase",
@@ -334,7 +334,7 @@ const COPY = {
   },
   tr: {
     eyebrow: "Fragmento Servis",
-    title: "Architecto'ya Ho\u015f Geldiniz",
+    title: "architecto'ya Ho\u015f Geldiniz",
     intro:
       "Talebinize uygun yolu se\u00e7in. Sipari\u015f veya ek sat\u0131n alma ile devam edebilir ya da do\u011frudan destek ekibine \u015fikayet g\u00f6nderebilirsiniz.",
     purchaseBadge: "Ek sat\u0131n alma",
@@ -435,7 +435,7 @@ const COPY = {
   },
   es: {
     eyebrow: "Servicio Fragmento",
-    title: "Bienvenido a Architecto",
+    title: "Bienvenido a architecto",
     intro:
       "Elige la opci\u00f3n adecuada para tu solicitud. Puedes continuar con un pedido o una compra adicional, o enviar una reclamaci\u00f3n al equipo de soporte.",
     purchaseBadge: "Compra adicional",
@@ -536,7 +536,7 @@ const COPY = {
   },
   fr: {
     eyebrow: "Service Fragmento",
-    title: "Bienvenue chez Architecto",
+    title: "Bienvenue chez architecto",
     intro:
       "Choisissez le parcours adapt\u00e9 \u00e0 votre demande. Vous pouvez poursuivre une commande ou un achat compl\u00e9mentaire, ou envoyer une r\u00e9clamation \u00e0 notre \u00e9quipe de support.",
     purchaseBadge: "Achat compl\u00e9mentaire",
@@ -637,7 +637,7 @@ const COPY = {
   },
   ru: {
     eyebrow: "\u0421\u0435\u0440\u0432\u0438\u0441 Fragmento",
-    title: "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 Architecto",
+    title: "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 architecto",
     intro:
       "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u043e\u0434\u0445\u043e\u0434\u044f\u0449\u0438\u0439 \u043f\u0443\u0442\u044c \u0434\u043b\u044f \u0432\u0430\u0448\u0435\u0433\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0430. \u0412\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u043f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u044c \u0437\u0430\u043a\u0430\u0437 \u0438\u043b\u0438 \u0434\u043e\u043f\u043e\u043a\u0443\u043f\u043a\u0443, \u0438\u043b\u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e \u0432 \u0441\u043b\u0443\u0436\u0431\u0443 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0438.",
     purchaseBadge: "\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u0430\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0430",

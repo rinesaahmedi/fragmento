@@ -918,18 +918,19 @@ textarea {
 
 .service-choice-card__logo {
   width: auto;
-  height: 42px;
+  height: 54px;
   object-fit: contain;
 }
 
 .service-choice-card__logo--complaint {
-  height: 56px;
-  transform: translateY(-12px);
-  margin-bottom: -12px;
+  height: 68px;
+  transform: translateY(-10px);
+  margin-bottom: -10px;
+  margin-left: -12px;
 }
 
 .service-choice-card strong {
-  font-size: 1.35rem;
+  font-size: 1.2rem;
   line-height: 1.15;
 }
 
@@ -1922,7 +1923,7 @@ textarea {
   }
 
   .service-choice-card__logo {
-    height: 34px;
+    height: 42px;
   }
 
   .service-hero__logo {
@@ -1930,9 +1931,10 @@ textarea {
   }
 
   .service-choice-card__logo--complaint {
-    height: 44px;
-    transform: translateY(-8px);
-    margin-bottom: -8px;
+    height: 52px;
+    transform: translateY(-6px);
+    margin-bottom: -6px;
+    margin-left: -8px;
   }
 
   .service-hero__mascot-image {
