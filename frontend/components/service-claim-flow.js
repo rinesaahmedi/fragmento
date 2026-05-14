@@ -1256,39 +1256,63 @@ export default function ServiceClaimFlow() {
         <div className="service-hero__top">
           <div className="service-hero__content">
             <div className="service-hero__brand">
-              <Image src="/img/fragmentologo-cropped.png" alt="Fragmento" width={168} height={54} className="service-hero__logo" />
+              <Image src="/img/LOGO_1.png" alt="Architecto" width={220} height={72} className="service-hero__logo" />
+              <span className="service-hero__brand-note">{"by K\u00fcchen Aktuell"}</span>
             </div>
             <h1>{copy.title}</h1>
           </div>
 
           <div className="service-hero__mascot" aria-hidden="true">
-            <Image src="/img/worker-icon-transparent.png" alt="" width={220} height={220} className="service-hero__mascot-image" />
           </div>
         </div>
 
         <div className="service-choice-grid">
           <button
             type="button"
-            className={`service-choice-card${mode === "nachkauf" ? " is-active" : ""}`}
+            className={`service-choice-card service-choice-card--purchase${mode === "nachkauf" ? " is-active" : ""}`}
             onClick={() => handleModeSelect("nachkauf")}
           >
-            <span className="service-choice-card__label">{copy.purchaseBadge}</span>
+            <Image
+              src="/img/fragmentologo-cropped.png"
+              alt="Fragmento"
+              width={168}
+              height={54}
+              className="service-choice-card__logo"
+            />
             <strong>{copy.purchaseTitle}</strong>
-            <span className="service-choice-card__brand">{copy.purchaseBrand}</span>
             <p>{copy.purchaseText}</p>
+            <Image
+              src="/img/Untitled%20design%20(4).png"
+              alt=""
+              width={118}
+              height={168}
+              className="service-choice-card__mascot"
+              aria-hidden="true"
+            />
           </button>
           <button
             type="button"
-            className={`service-choice-card service-choice-card--complaint${isComplaintMode ? " is-active" : ""}`}
+            className={`service-choice-card service-choice-card--complaint service-choice-card--complaint-mascot${isComplaintMode ? " is-active" : ""}`}
             onClick={() => handleModeSelect("complaint")}
           >
-            <span className="service-choice-card__icon" aria-hidden="true">
-              !
-            </span>
-            <span className="service-choice-card__label">{copy.complaintBadge}</span>
+            <Image
+              src="/img/260513-asc-logo-03 copy.png"
+              alt="Architecto Service Center"
+              width={168}
+              height={54}
+              className="service-choice-card__logo service-choice-card__logo--complaint"
+            />
+            
             <strong>{copy.complaintTitle}</strong>
-            <span className="service-choice-card__brand">{copy.complaintBrand}</span>
             <p>{copy.complaintText}</p>
+            <Image
+              src="/img/worker-icon-transparent.png"
+              alt=""
+              width={220}
+              height={220}
+              className="service-choice-card__mascot service-choice-card__mascot--complaint"
+              aria-hidden="true"
+            />
           </button>
         </div>
       </section>
