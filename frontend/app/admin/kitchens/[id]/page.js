@@ -23,6 +23,7 @@ import {
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
+import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getKitchenById } from "../../../../lib/catalog";
@@ -248,13 +249,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <input name="slug" defaultValue={kitchen.slug} style={compactInputStyle} required />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
-              <select name="status" defaultValue={kitchen.status} style={compactInputStyle}>
+              <AdminSelect name="status" defaultValue={kitchen.status} style={compactInputStyle}>
                 {KITCHEN_STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
                     {status}
                   </option>
                 ))}
-              </select>
+              </AdminSelect>
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.description" fallback="Description" />} wide>
               <textarea
@@ -280,6 +281,55 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
         </div>
 
         <AdminSection
+          title={<AdminText i18nKey="kitchenDetailAdmin.excelCatalog" fallback="Import / Export Catalog" />}
+          description={<AdminText i18nKey="kitchenDetailAdmin.exportKitchenToExcelThenImportBack" fallback="Export this kitchen to Excel, update prices or other item fields, then import the file back to update matching kitchen items." />}
+        >
+          <div style={splitGridStyle}>
+            <div style={catalogPanelStyle}>
+              <div style={{ display: "grid", gap: 8 }}>
+                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.exportCurrentKitchenData" fallback="Export current kitchen data" /></strong>
+                <p style={mutedTextStyle}>
+                  <AdminText i18nKey="kitchenDetailAdmin.downloadAllCatalogRowsForKitchenIncludingCurrentPricesShownInAdmin" fallback="Download all catalog rows for this kitchen, including current prices shown in admin." />
+                </p>
+              </div>
+              <a
+                href={`/api/admin/kitchens/${kitchen.id}/catalog`}
+                style={catalogDownloadLinkStyle}
+              >
+                <AdminText i18nKey="kitchenDetailAdmin.exportExcel" fallback="Export Excel" />
+              </a>
+            </div>
+
+            <form
+              action={`/api/admin/kitchens/${kitchen.id}/catalog`}
+              method="post"
+              encType="multipart/form-data"
+              style={catalogPanelStyle}
+            >
+              <div style={{ display: "grid", gap: 8 }}>
+                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.importEditedFile" fallback="Import edited file" /></strong>
+                <p style={mutedTextStyle}>
+                  <AdminText i18nKey="kitchenDetailAdmin.changePricesInExportedSheetThenUpload" fallback="Change prices in the exported sheet, save it, then upload it here. Matching items will be updated." />
+                </p>
+              </div>
+              <FormField label={<AdminText i18nKey="kitchenDetailAdmin.catalogFile" fallback="Catalog file" />}>
+                <input
+                  type="file"
+                  name="catalogFile"
+                  accept=".xlsx,.csv"
+                  style={inputStyle}
+                  required
+                />
+              </FormField>
+              <div style={actionRowStyle}>
+                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.importCatalog" fallback="Import catalog" /></button>
+                <span style={catalogHelpTextStyle}><AdminText i18nKey="kitchenDetailAdmin.supportedFormatsXlsxAndCsv" fallback="Supported formats: .xlsx and .csv" /></span>
+              </div>
+            </form>
+          </div>
+        </AdminSection>
+
+        <AdminSection
           title={<AdminText i18nKey="kitchenDetailAdmin.catalogItems" fallback="Catalog Items" />}
         >
           <form method="get" style={catalogFiltersStyle}>
@@ -293,21 +343,21 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.filterType" fallback="Type" />}>
-              <select name="itemType" defaultValue={itemTypeFilter} style={compactInputStyle}>
+              <AdminSelect name="itemType" defaultValue={itemTypeFilter} style={compactInputStyle}>
                 <option value=""><AdminText i18nKey="kitchenDetailAdmin.allTypes" fallback="All types" /></option>
                 {ITEM_TYPE_OPTIONS.map((itemType) => (
                   <option key={itemType} value={itemType}>
                     {itemType}
                   </option>
                 ))}
-              </select>
+              </AdminSelect>
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.filterStatus" fallback="Status" />}>
-              <select name="itemStatus" defaultValue={itemStatusFilter} style={compactInputStyle}>
+              <AdminSelect name="itemStatus" defaultValue={itemStatusFilter} style={compactInputStyle}>
                 <option value=""><AdminText i18nKey="kitchenDetailAdmin.allStatuses" fallback="All statuses" /></option>
                 <option value="active"><AdminText i18nKey="kitchenDetailAdmin.active" fallback="Active" /></option>
                 <option value="inactive"><AdminText i18nKey="kitchenDetailAdmin.inactive" fallback="Inactive" /></option>
-              </select>
+              </AdminSelect>
             </FormField>
             <div style={{ ...actionRowStyle, alignSelf: "end" }}>
               <button type="submit" style={secondaryButtonStyle}><AdminText i18nKey="dashboard.apply" fallback="Apply" /></button>
@@ -357,13 +407,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                   <form action={`/api/admin/items/${item.id}`} method="post" style={compactFormStyle}>
                     <div style={compactTopGridStyle}>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />} wide={false}>
-                        <select name="itemType" defaultValue={item.itemType} style={compactInputStyle}>
+                        <AdminSelect name="itemType" defaultValue={item.itemType} style={compactInputStyle}>
                           {ITEM_TYPE_OPTIONS.map((itemType) => (
                             <option key={itemType} value={itemType}>
                               {itemType}
                             </option>
                           ))}
-                        </select>
+                        </AdminSelect>
                       </FormField>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />} wide={false}>
                         <input name="code" defaultValue={item.code} style={compactInputStyle} required />
@@ -449,55 +499,6 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
         </AdminSection>
 
         <AdminSection
-          title={<AdminText i18nKey="kitchenDetailAdmin.excelCatalog" fallback="Import / Export Catalog" />}
-          description={<AdminText i18nKey="kitchenDetailAdmin.exportKitchenToExcelThenImportBack" fallback="Export this kitchen to Excel, update prices or other item fields, then import the file back to update matching kitchen items." />}
-        >
-          <div style={splitGridStyle}>
-            <div style={catalogPanelStyle}>
-              <div style={{ display: "grid", gap: 8 }}>
-                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.exportCurrentKitchenData" fallback="Export current kitchen data" /></strong>
-                <p style={mutedTextStyle}>
-                  <AdminText i18nKey="kitchenDetailAdmin.downloadAllCatalogRowsForKitchenIncludingCurrentPricesShownInAdmin" fallback="Download all catalog rows for this kitchen, including current prices shown in admin." />
-                </p>
-              </div>
-              <a
-                href={`/api/admin/kitchens/${kitchen.id}/catalog`}
-                style={catalogDownloadLinkStyle}
-              >
-                <AdminText i18nKey="kitchenDetailAdmin.exportExcel" fallback="Export Excel" />
-              </a>
-            </div>
-
-            <form
-              action={`/api/admin/kitchens/${kitchen.id}/catalog`}
-              method="post"
-              encType="multipart/form-data"
-              style={catalogPanelStyle}
-            >
-              <div style={{ display: "grid", gap: 8 }}>
-                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.importEditedFile" fallback="Import edited file" /></strong>
-                <p style={mutedTextStyle}>
-                  <AdminText i18nKey="kitchenDetailAdmin.changePricesInExportedSheetThenUpload" fallback="Change prices in the exported sheet, save it, then upload it here. Matching items will be updated." />
-                </p>
-              </div>
-              <FormField label={<AdminText i18nKey="kitchenDetailAdmin.catalogFile" fallback="Catalog file" />}>
-                <input
-                  type="file"
-                  name="catalogFile"
-                  accept=".xlsx,.csv"
-                  style={inputStyle}
-                  required
-                />
-              </FormField>
-              <div style={actionRowStyle}>
-                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.importCatalog" fallback="Import catalog" /></button>
-                <span style={catalogHelpTextStyle}><AdminText i18nKey="kitchenDetailAdmin.supportedFormatsXlsxAndCsv" fallback="Supported formats: .xlsx and .csv" /></span>
-              </div>
-            </form>
-          </div>
-        </AdminSection>
-
-        <AdminSection
           title={<AdminText i18nKey="kitchenDetailAdmin.addExtraItem" fallback="Add Catalog Item" />}
         >
           <details style={addItemDetailsStyle}>
@@ -509,13 +510,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 <legend style={formGroupLegendStyle}><AdminText i18nKey="kitchenDetailAdmin.basicInfo" fallback="Basic Info" /></legend>
                 <div style={formGridStyle}>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />}>
-                    <select name="itemType" defaultValue={ItemType.ACCESSORY} style={inputStyle}>
+                    <AdminSelect name="itemType" defaultValue={ItemType.ACCESSORY} style={inputStyle}>
                       {[ItemType.ACCESSORY, ItemType.SERVICE].map((itemType) => (
                         <option key={itemType} value={itemType}>
                           {itemType}
                         </option>
                       ))}
-                    </select>
+                    </AdminSelect>
                   </FormField>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name" />}>
                     <input name="name" style={inputStyle} required />

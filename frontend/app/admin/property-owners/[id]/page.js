@@ -17,8 +17,9 @@ import {
   textareaStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
-import { AdminText } from "../../../../components/admin-i18n";
+import { AdminPluralText, AdminText } from "../../../../components/admin-i18n";
 import AdminContractAddressFields from "../../../../components/admin-contract-address-fields";
+import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getPropertyOwnerForAdmin, listKitchensForAdmin } from "../../../../lib/catalog";
@@ -114,7 +115,15 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
 
           <div style={subMetaStyle}>
             <span>{owner._count.propertyObjects} <AdminText i18nKey="propertyOwnersAdmin.objectCount" fallback="object(s)" /></span>
-            <span>{owner._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
+            <span>
+              <AdminPluralText
+                count={owner._count.contracts}
+                singularKey="kitchensAdmin.contractCountSingular"
+                pluralKey="kitchensAdmin.contractCountPlural"
+                singularFallback="{count} contract"
+                pluralFallback="{count} contracts"
+              />
+            </span>
             <span><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" />: {formatDate(owner.createdAt)}</span>
           </div>
         </AdminSection>
@@ -159,27 +168,27 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                     <input type="hidden" name="returnTo" value={`/admin/property-owners/${owner.id}`} />
                     <input type="hidden" name="housingCompanyId" value={owner.id} />
                     <FormField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
-                      <select name="kitchenId" style={compactInputStyle} required>
+                      <AdminSelect name="kitchenId" style={compactInputStyle} required>
                         <option value=""><AdminText i18nKey="contractsAdmin.selectKitchen" fallback="Select kitchen" /></option>
                         {kitchens.map((kitchen) => (
                           <option key={kitchen.id} value={kitchen.id}>
                             {kitchen.name}
                           </option>
                         ))}
-                      </select>
+                      </AdminSelect>
                     </FormField>
                     <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
                       <input name="contractNumber" placeholder="ABC-123" style={compactInputStyle} required />
                     </FormField>
                     <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project" />}>
-                      <select name="projectId" style={compactInputStyle}>
+                      <AdminSelect name="projectId" style={compactInputStyle}>
                         <option value=""><AdminText i18nKey="contractsAdmin.selectProject" fallback="Select project" /></option>
                         {(owner.propertyObjects || []).map((object) => (
                           <option key={object.id} value={object.projectId || ""} disabled={!object.projectId}>
                             {object.projectCode ? `${object.projectCode} - ` : ""}{object.projectName || "Unnamed project"} - Object: {object.name}
                           </option>
                         ))}
-                      </select>
+                      </AdminSelect>
                     </FormField>
                     <FormField label={<AdminText i18nKey="contractAddressFields.floor" fallback="Floor" />}>
                       <input name="floor" style={compactInputStyle} />
@@ -216,7 +225,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
             {createObjectOpen ? (
               <section style={compactCreateObjectCardStyle}>
                 <form action={`/api/admin/property-owners/${owner.id}/objects`} method="post" style={denseObjectFormStyle}>
-                  <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
+                  <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object / building name" />} wide>
                     <input name="name" placeholder="Building A" style={compactInputStyle} required />
                   </FormField>
                   <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectName" fallback="Project name" />}>
@@ -226,13 +235,13 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                     <input name="projectCode" placeholder="PRJ-204" style={compactInputStyle} />
                   </FormField>
                   <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectStatus" fallback="Project status" />}>
-                    <select name="projectStatus" defaultValue="active" style={compactInputStyle}>
+                    <AdminSelect name="projectStatus" defaultValue="active" style={compactInputStyle}>
                       <option value="planning"><AdminText i18nKey="propertyOwnersAdmin.projectStatusPlanning" fallback="Planning" /></option>
                       <option value="active"><AdminText i18nKey="propertyOwnersAdmin.projectStatusActive" fallback="Active" /></option>
                       <option value="on_hold"><AdminText i18nKey="propertyOwnersAdmin.projectStatusOnHold" fallback="On hold" /></option>
                       <option value="completed"><AdminText i18nKey="propertyOwnersAdmin.projectStatusCompleted" fallback="Completed" /></option>
                       <option value="archived"><AdminText i18nKey="propertyOwnersAdmin.projectStatusArchived" fallback="Archived" /></option>
-                    </select>
+                    </AdminSelect>
                   </FormField>
                   <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectManagerName" fallback="Project manager" />}>
                     <input name="projectManagerName" placeholder="Alex Meyer" style={compactInputStyle} />
@@ -275,7 +284,13 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                         <StatusBadge status={String(object.projectStatus || "active").toUpperCase()} />
                         <div style={objectActionRowStyle}>
                           <span style={objectPreviewCountStyle}>
-                            {object._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" />
+                            <AdminPluralText
+                              count={object._count.contracts}
+                              singularKey="kitchensAdmin.contractCountSingular"
+                              pluralKey="kitchensAdmin.contractCountPlural"
+                              singularFallback="{count} contract"
+                              pluralFallback="{count} contracts"
+                            />
                           </span>
                           <ActionLink href={buildOwnerDetailPath(owner.id, { openObject: object.id, ...(createObjectOpen ? { createObject: "1" } : {}) })} scroll={false}>
                             <AdminText i18nKey="propertyOwnersAdmin.manage" fallback="Manage" />
@@ -309,13 +324,13 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                                 <input name="projectCode" defaultValue={object.projectCode || ""} style={compactInputStyle} />
                               </FormField>
                               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectStatus" fallback="Project status" />}>
-                                <select name="projectStatus" defaultValue={object.projectStatus || "active"} style={compactInputStyle}>
+                                <AdminSelect name="projectStatus" defaultValue={object.projectStatus || "active"} style={compactInputStyle}>
                                   <option value="planning"><AdminText i18nKey="propertyOwnersAdmin.projectStatusPlanning" fallback="Planning" /></option>
                                   <option value="active"><AdminText i18nKey="propertyOwnersAdmin.projectStatusActive" fallback="Active" /></option>
                                   <option value="on_hold"><AdminText i18nKey="propertyOwnersAdmin.projectStatusOnHold" fallback="On hold" /></option>
                                   <option value="completed"><AdminText i18nKey="propertyOwnersAdmin.projectStatusCompleted" fallback="Completed" /></option>
                                   <option value="archived"><AdminText i18nKey="propertyOwnersAdmin.projectStatusArchived" fallback="Archived" /></option>
-                                </select>
+                                </AdminSelect>
                               </FormField>
                               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectManagerName" fallback="Project manager" />}>
                                 <input
@@ -338,7 +353,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                               <span style={editorSubsectionTitleStyle}><AdminText i18nKey="propertyOwnersAdmin.propertyObject" fallback="Object / Building" /></span>
                             </div>
                             <div style={denseObjectFormStyle}>
-                              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
+                              <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object / building name" />} wide>
                                 <input name="name" defaultValue={object.name} style={compactInputStyle} required />
                               </FormField>
                               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectContactPhone" fallback="Contact phone" />}>

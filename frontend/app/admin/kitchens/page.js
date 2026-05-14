@@ -12,7 +12,7 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
-import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
+import { AdminDateTime, AdminKitchenDisplayName, AdminPluralText, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
 import { listKitchensForAdmin } from "../../../lib/catalog";
 import { requireAdminPage } from "../../../lib/auth";
 
@@ -97,7 +97,15 @@ export default async function AdminKitchensPage() {
                 <div style={subMetaStyle}>
                   <span>{kitchen._count.items} <AdminText i18nKey="kitchensAdmin.itemCount" fallback="item(s)" /></span>
                   <span>{kitchen._count.orders} <AdminText i18nKey="kitchensAdmin.orderCount" fallback="order(s)" /></span>
-                  <span>{kitchen._count.contracts} <AdminText i18nKey="kitchensAdmin.contractCount" fallback="contract(s)" /></span>
+                  <span>
+                    <AdminPluralText
+                      count={kitchen._count.contracts}
+                      singularKey="kitchensAdmin.contractCountSingular"
+                      pluralKey="kitchensAdmin.contractCountPlural"
+                      singularFallback="{count} contract"
+                      pluralFallback="{count} contracts"
+                    />
+                  </span>
                 </div>
                 <div>
                   <ActionLink href={`/admin/kitchens/${kitchen.id}`}>

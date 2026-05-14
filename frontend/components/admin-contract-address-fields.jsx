@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAdminI18n } from "./admin-i18n";
+import AdminSelect from "./admin-select";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
 import {
   ADDRESS_VERIFICATION_STATUS,
@@ -351,7 +352,7 @@ export default function AdminContractAddressFields({
   return (
     <div ref={markerRef} style={{ display: "contents" }}>
       <Field label={translate("contractAddressFields.country", "Country")} compact={compact}>
-        <select
+        <AdminSelect
           name={countryFieldName}
           value={country}
           style={inputStyle}
@@ -365,11 +366,11 @@ export default function AdminContractAddressFields({
           {countryOptions.map((option) => (
             <option key={option} value={option}>{translateCountry(option, translate)}</option>
           ))}
-        </select>
+        </AdminSelect>
       </Field>
 
       <Field label={translate("contractAddressFields.city", "City")} compact={compact}>
-        <select
+        <AdminSelect
           name={cityFieldName}
           value={city}
           style={inputStyle}
@@ -383,11 +384,11 @@ export default function AdminContractAddressFields({
           {cityOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
-        </select>
+        </AdminSelect>
       </Field>
 
       <Field label={translate("contractAddressFields.postalCode", "Postal code")} compact={compact}>
-        <select
+        <AdminSelect
           name={postalCodeFieldName}
           value={postalCode}
           style={inputStyle}
@@ -398,7 +399,7 @@ export default function AdminContractAddressFields({
           {postalCodeOptions.map((option) => (
             <option key={option} value={option}>{option}</option>
           ))}
-        </select>
+        </AdminSelect>
       </Field>
 
       <Field label={translate("contractAddressFields.addressLine1", "Address line 1")} compact={compact}>

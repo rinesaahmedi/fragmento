@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { AdminText, useAdminI18n } from "./admin-i18n";
+import { AdminKitchenDisplayName, AdminText, useAdminI18n } from "./admin-i18n";
+import AdminSelect from "./admin-select";
 
 function FilterField({ label, children }) {
   return (
@@ -45,22 +46,22 @@ export default function AdminContractsFilters({
           <input
             name="q"
             defaultValue={filters.query || ""}
-            placeholder="Contract, kitchen, owner, city..."
+            placeholder={translate("contractsAdmin.contractKitchenOwnerCityPlaceholder", "Contract, kitchen, housing company, city...")}
             style={filterInputStyle}
           />
         </FilterField>
         <FilterField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
-          <select name="kitchenId" defaultValue={filters.kitchenId || ""} style={filterInputStyle}>
+          <AdminSelect name="kitchenId" defaultValue={filters.kitchenId || ""} style={filterInputStyle}>
             <option value=""><AdminText i18nKey="dashboard.allKitchens" fallback="All kitchens" /></option>
             {kitchens.map((kitchen) => (
               <option key={kitchen.id} value={kitchen.id}>
-                {kitchen.name}
+                <AdminKitchenDisplayName slug={kitchen.slug} name={kitchen.name} />
               </option>
             ))}
-          </select>
+          </AdminSelect>
         </FilterField>
         <FilterField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>
-          <select
+          <AdminSelect
             name="housingCompanyId"
             value={housingCompanyId}
             style={filterInputStyle}
@@ -69,13 +70,13 @@ export default function AdminContractsFilters({
             <option value=""><AdminText i18nKey="contractsAdmin.allOwners" fallback="All owners" /></option>
             {owners.map((owner) => (
               <option key={owner.id} value={owner.id}>
-                {owner.name}
-              </option>
-            ))}
-          </select>
+              {owner.name}
+            </option>
+          ))}
+          </AdminSelect>
         </FilterField>
         <FilterField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project" />}>
-          <select
+          <AdminSelect
             name="projectId"
             value={projectId}
             style={filterInputStyle}
@@ -92,26 +93,26 @@ export default function AdminContractsFilters({
               <option key={project.id} value={project.id}>
                 {housingCompanyId
                   ? `${project.projectCode ? `${project.projectCode} | ` : ""}${project.name || translate("contractsAdmin.unnamedProject", "Unnamed project")} | ${translate("contractsAdmin.objectContext", "Object")}: ${project.propertyObject?.name || translate("contractsAdmin.noObject", "No object")}`
-                  : `${project.housingCompany.name} | ${project.projectCode ? `${project.projectCode} | ` : ""}${project.name || translate("contractsAdmin.unnamedProject", "Unnamed project")} | ${translate("contractsAdmin.objectContext", "Object")}: ${project.propertyObject?.name || translate("contractsAdmin.noObject", "No object")}`}
-              </option>
-            ))}
-          </select>
+                : `${project.housingCompany.name} | ${project.projectCode ? `${project.projectCode} | ` : ""}${project.name || translate("contractsAdmin.unnamedProject", "Unnamed project")} | ${translate("contractsAdmin.objectContext", "Object")}: ${project.propertyObject?.name || translate("contractsAdmin.noObject", "No object")}`}
+            </option>
+          ))}
+          </AdminSelect>
         </FilterField>
         <FilterField label={<AdminText i18nKey="dashboard.status" fallback="Status" />}>
-          <select name="status" defaultValue={filters.status || ""} style={filterInputStyle}>
+          <AdminSelect name="status" defaultValue={filters.status || ""} style={filterInputStyle}>
             <option value=""><AdminText i18nKey="dashboard.allStatuses" fallback="All statuses" /></option>
             <option value="active"><AdminText i18nKey="contractsAdmin.active" fallback="Active" /></option>
             <option value="inactive"><AdminText i18nKey="contractsAdmin.inactive" fallback="Inactive" /></option>
-          </select>
+          </AdminSelect>
         </FilterField>
         <FilterField label={<AdminText i18nKey="contractsAdmin.usage" fallback="Usage" />}>
-          <select name="usage" defaultValue={filters.usage || ""} style={filterInputStyle}>
+          <AdminSelect name="usage" defaultValue={filters.usage || ""} style={filterInputStyle}>
             <option value=""><AdminText i18nKey="contractsAdmin.allUsage" fallback="All usage" /></option>
             <option value="unused"><AdminText i18nKey="contractsAdmin.unused" fallback="Unused" /></option>
             <option value="used"><AdminText i18nKey="contractsAdmin.used" fallback="Used" /></option>
             <option value="once"><AdminText i18nKey="contractsAdmin.usedOnce" fallback="Used once" /></option>
             <option value="multiple"><AdminText i18nKey="contractsAdmin.usedTwoPlusTimes" fallback="Used 2+ times" /></option>
-          </select>
+          </AdminSelect>
         </FilterField>
         <div style={filterActionsStyle}>
           <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
@@ -125,8 +126,9 @@ export default function AdminContractsFilters({
 const filterGridStyle = {
   display: "grid",
   gap: 10,
-  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(170px, 100%), 1fr))",
   alignItems: "end",
+  minWidth: 0,
 };
 
 const filterPanelStyle = {
@@ -136,6 +138,7 @@ const filterPanelStyle = {
   border: "1px solid rgba(143, 62, 44, 0.16)",
   background: "linear-gradient(180deg, rgba(255,247,241,0.82), rgba(255,255,255,0.72))",
   padding: 14,
+  minWidth: 0,
 };
 
 const filterHeaderStyle = {
@@ -169,6 +172,7 @@ const filterHintStyle = {
 const filterFieldStyle = {
   display: "grid",
   gap: 6,
+  minWidth: 0,
   color: "var(--app-text-muted)",
   fontSize: 12,
   fontWeight: 800,
@@ -178,6 +182,7 @@ const filterFieldStyle = {
 
 const filterInputStyle = {
   minHeight: 42,
+  minWidth: 0,
   borderRadius: 8,
   padding: "9px 11px",
   background: "rgba(255,255,255,0.94)",
@@ -192,10 +197,12 @@ const filterActionsStyle = {
   display: "flex",
   gap: 8,
   alignItems: "end",
-  flexWrap: "nowrap",
+  flexWrap: "wrap",
+  minWidth: 0,
 };
 
 const filterApplyButtonStyle = {
+  flex: "1 1 112px",
   minHeight: 42,
   borderRadius: 8,
   padding: "9px 14px",
@@ -210,6 +217,7 @@ const filterApplyButtonStyle = {
 };
 
 const filterClearLinkStyle = {
+  flex: "1 1 112px",
   textDecoration: "none",
   borderRadius: 8,
   minHeight: 42,
@@ -221,5 +229,6 @@ const filterClearLinkStyle = {
   fontSize: "0.92rem",
   display: "inline-flex",
   alignItems: "center",
+  justifyContent: "center",
   whiteSpace: "nowrap",
 };

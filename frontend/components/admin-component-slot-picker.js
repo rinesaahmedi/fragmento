@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import AdminSelect from "./admin-select";
 
 export function AdminComponentSlotPicker({
   name,
@@ -47,7 +48,7 @@ export function AdminComponentSlotPicker({
             </div>
           </div>
 
-          <select
+          <AdminSelect
             value={selectedKey}
             onChange={(event) => setSelectedKey(event.target.value)}
             style={compactSelectStyle}
@@ -64,7 +65,7 @@ export function AdminComponentSlotPicker({
                 </option>
               );
             })}
-          </select>
+          </AdminSelect>
         </div>
       ) : (
       <div style={gridStyle}>

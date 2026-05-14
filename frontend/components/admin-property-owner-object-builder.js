@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AdminContractAddressFields from "./admin-contract-address-fields";
+import AdminSelect from "./admin-select";
 import { useAdminI18n } from "./admin-i18n";
 import {
   FormField,
@@ -110,13 +111,13 @@ export default function AdminPropertyOwnerObjectBuilder() {
                   />
                 </FormField>
                 <FormField label={translate("propertyOwnersAdmin.projectStatus", "Project status")}>
-                  <select name={fieldNames.projectStatus} defaultValue="active" style={inputStyle}>
+                  <AdminSelect name={fieldNames.projectStatus} defaultValue="active" style={inputStyle}>
                     <option value="planning">{translate("propertyOwnersAdmin.projectStatusPlanning", "Planning")}</option>
                     <option value="active">{translate("propertyOwnersAdmin.projectStatusActive", "Active")}</option>
                     <option value="on_hold">{translate("propertyOwnersAdmin.projectStatusOnHold", "On hold")}</option>
                     <option value="completed">{translate("propertyOwnersAdmin.projectStatusCompleted", "Completed")}</option>
                     <option value="archived">{translate("propertyOwnersAdmin.projectStatusArchived", "Archived")}</option>
-                  </select>
+                  </AdminSelect>
                 </FormField>
                 <FormField label={translate("propertyOwnersAdmin.projectManagerName", "Project manager")}>
                   <input

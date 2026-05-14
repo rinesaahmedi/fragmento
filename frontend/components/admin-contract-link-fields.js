@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { FormField, actionRowStyle, inputStyle, secondaryButtonStyle } from "./admin-ui";
 import { AdminText, useAdminI18n } from "./admin-i18n";
 import AdminContractAddressFields from "./admin-contract-address-fields";
+import AdminSelect from "./admin-select";
 
 export default function AdminContractLinkFields({
   owners = [],
@@ -53,7 +54,7 @@ export default function AdminContractLinkFields({
   return (
     <>
       <FormField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>
-        <select
+        <AdminSelect
           name="housingCompanyId"
           value={housingCompanyId}
           style={fieldStyle}
@@ -69,11 +70,11 @@ export default function AdminContractLinkFields({
               {owner.name}
             </option>
           ))}
-        </select>
+        </AdminSelect>
       </FormField>
 
       <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project" />}>
-        <select
+        <AdminSelect
           name="projectId"
           value={createObjectOpen ? "" : projectId}
           style={fieldStyle}
@@ -82,17 +83,17 @@ export default function AdminContractLinkFields({
         >
           <option value="">
             {!housingCompanyId
-              ? "Select housing company first"
+              ? translate("contractsAdmin.selectHousingCompanyFirst", "Select housing company first")
               : filteredProjects.length
                 ? translate("contractsAdmin.selectProject", "Select project")
-                : "No existing projects"}
+                : translate("contractsAdmin.noExistingProjects", "No existing projects")}
           </option>
           {filteredProjects.map((project) => (
             <option key={project.id} value={project.id}>
               {project.projectCode ? `${project.projectCode} - ` : ""}{project.name || translate("contractsAdmin.unnamedProject", "Unnamed project")} - {translate("contractsAdmin.objectContext", "Object")}: {project.propertyObject?.name || translate("contractsAdmin.noObject", "No object")}
             </option>
           ))}
-        </select>
+        </AdminSelect>
       </FormField>
 
       {allowInlineObjectCreate ? (
@@ -136,13 +137,13 @@ export default function AdminContractLinkFields({
                 <input name={objectFieldNames.projectCode} placeholder="PRJ-204" style={fieldStyle} />
               </FormField>
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectStatus" fallback="Project status" />}>
-                <select name={objectFieldNames.projectStatus} defaultValue="active" style={fieldStyle}>
+                <AdminSelect name={objectFieldNames.projectStatus} defaultValue="active" style={fieldStyle}>
                   <option value="planning"><AdminText i18nKey="propertyOwnersAdmin.projectStatusPlanning" fallback="Planning" /></option>
                   <option value="active"><AdminText i18nKey="propertyOwnersAdmin.projectStatusActive" fallback="Active" /></option>
                   <option value="on_hold"><AdminText i18nKey="propertyOwnersAdmin.projectStatusOnHold" fallback="On hold" /></option>
                   <option value="completed"><AdminText i18nKey="propertyOwnersAdmin.projectStatusCompleted" fallback="Completed" /></option>
                   <option value="archived"><AdminText i18nKey="propertyOwnersAdmin.projectStatusArchived" fallback="Archived" /></option>
-                </select>
+                </AdminSelect>
               </FormField>
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectManagerName" fallback="Project manager" />}>
                 <input name={objectFieldNames.projectManagerName} placeholder="Alex Meyer" style={fieldStyle} />

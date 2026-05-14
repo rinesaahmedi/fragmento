@@ -10,6 +10,7 @@ import {
   primaryButtonStyle,
   textareaStyle,
 } from "./admin-ui";
+import AdminSelect from "./admin-select";
 
 const ITEM_TYPES = ["COMPONENT", "ACCESSORY", "SERVICE"];
 
@@ -233,13 +234,13 @@ export default function AdminKitchenItemBuilder({
 
       <div style={formGridStyle}>
         <FormField label="Type">
-          <select name="itemType" value={itemType} onChange={(event) => setItemType(event.target.value)} style={inputStyle}>
+          <AdminSelect name="itemType" value={itemType} onChange={(event) => setItemType(event.target.value)} style={inputStyle}>
             {ITEM_TYPES.map((type) => (
               <option key={type} value={type}>
                 {type}
               </option>
             ))}
-          </select>
+          </AdminSelect>
         </FormField>
         <FormField label="Item Code">
           <input name="code" placeholder="DISH-600-STD" required style={inputStyle} />

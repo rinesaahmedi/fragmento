@@ -107,6 +107,28 @@ export function AdminTranslation({ i18nKey, fallback = "", values }) {
   return text;
 }
 
+export function AdminPluralText({
+  count,
+  singularKey,
+  pluralKey,
+  singularFallback = "",
+  pluralFallback = "",
+  values,
+}) {
+  const { translate } = useAdminI18n();
+  const numericCount = Number(count || 0);
+  const key = numericCount === 1 ? singularKey : pluralKey;
+  const fallback = numericCount === 1 ? singularFallback : pluralFallback;
+  let text = translate(key, fallback);
+  const replacements = { count: numericCount, ...values };
+
+  Object.entries(replacements).forEach(([name, value]) => {
+    text = text.replaceAll(`{${name}}`, value);
+  });
+
+  return text;
+}
+
 export function AdminTranslatedInput({ placeholderKey, placeholderFallback = "", ...props }) {
   const { translate } = useAdminI18n();
 
@@ -122,6 +144,8 @@ export function AdminStatusBadge({ status }) {
 }
 
 function formatAdminDate(value, language = "en") {
+  if (!value) return "-";
+
   const formatter = new Intl.DateTimeFormat(language === "de" ? "de-DE" : "en-GB", {
     day: "numeric",
     month: "long",
