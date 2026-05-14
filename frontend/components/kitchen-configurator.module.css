@@ -429,7 +429,7 @@
   width: 66px;
   height: 66px;
   color: #000;
-  transform: translateY(3px);
+  transform: translateY(14px);
 }
 
 .itemIcon img,
@@ -442,6 +442,11 @@
 .itemIconCompact svg {
   max-width: 78%;
   max-height: 78%;
+}
+
+.itemIconCompact {
+  align-self: start;
+  transform: none;
 }
 
 .itemIconTall img,
@@ -550,13 +555,12 @@
 }
 
 .itemInfoWrap {
-  position: absolute;
-  left: 47px;
-  top: 92px;
+  position: relative;
   z-index: 3;
   display: inline-flex;
   align-items: center;
-  transform: translateX(-50%);
+  justify-content: center;
+  margin-left: 6px;
 }
 
 .itemAssistantWrap {
@@ -655,6 +659,7 @@
 
 .itemInfoTrigger {
   appearance: none;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -664,11 +669,14 @@
   border-radius: 999px;
   border: 1px solid rgba(120, 90, 64, 0.18);
   background: #fff8f0;
-  color: #7a4d27;
-  font-size: 1.12rem;
-  font-weight: 950;
+  color: #2563eb;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+  font-style: italic;
+  font-weight: 700;
   line-height: 1;
   text-decoration: none;
+  text-indent: -9999px;
   cursor: pointer;
   transition:
     transform 0.16s ease,
@@ -678,11 +686,20 @@
     color 0.16s ease;
 }
 
+.itemInfoTrigger::before {
+  content: "i";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-indent: 0;
+}
+
 .itemInfoTrigger:hover {
   transform: translateY(-1px);
   border-color: rgba(122, 77, 39, 0.45);
   background: #fff0dc;
-  color: #5d3618;
+  color: #1d4ed8;
   box-shadow: 0 10px 18px rgba(122, 77, 39, 0.14);
 }
 
@@ -693,8 +710,8 @@
 
 .itemInfoTooltip {
   position: absolute;
-  left: calc(100% + 10px);
-  top: 50%;
+  left: 50%;
+  bottom: calc(100% + 10px);
   z-index: 6;
   display: grid;
   gap: 8px;
@@ -706,7 +723,7 @@
   box-shadow: 0 18px 32px rgba(39, 26, 14, 0.22);
   opacity: 0;
   pointer-events: none;
-  transform: translate(8px, -50%);
+  transform: translate(-50%, 8px);
   transition: opacity 0.16s ease, transform 0.16s ease;
 }
 
@@ -769,18 +786,7 @@
 .itemAssistantWrap:hover .itemInfoTooltip,
 .itemAssistantWrap:focus-within .itemInfoTooltip {
   opacity: 1;
-  transform: translate(0, -50%);
-}
-
-.catalogSection:first-of-type .catalogGrid > *:nth-child(-n + 2) .itemInfoTooltip {
-  top: 50%;
-  bottom: auto;
-  transform: translate(8px, -50%);
-}
-
-.catalogSection:first-of-type .catalogGrid > *:nth-child(-n + 2) .itemInfoWrap:hover .itemInfoTooltip,
-.catalogSection:first-of-type .catalogGrid > *:nth-child(-n + 2) .itemInfoWrap:focus-within .itemInfoTooltip {
-  transform: translate(0, -50%);
+  transform: translate(-50%, 0);
 }
 
 .productInfoOverlay {

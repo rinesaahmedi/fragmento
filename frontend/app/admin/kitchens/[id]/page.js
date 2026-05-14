@@ -21,7 +21,7 @@ import {
   textareaStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
-import { AdminStatusBadge, AdminText } from "../../../../components/admin-i18n";
+import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -227,7 +227,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title={kitchen.name}
+          title={<AdminKitchenDisplayName slug={kitchen.slug} name={kitchen.name} />}
           actions={
             <div style={actionRowStyle}>
               <ActionLink href="/admin/kitchens">
@@ -242,7 +242,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
           <form action={`/api/admin/kitchens/${kitchen.id}`} method="post" style={kitchenDetailsFormStyle}>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
-              <input name="name" defaultValue={kitchen.name} style={compactInputStyle} required />
+              <AdminKitchenNameInput slug={kitchen.slug} name={kitchen.name} style={compactInputStyle} required />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.slug" fallback="Slug" />}>
               <input name="slug" defaultValue={kitchen.slug} style={compactInputStyle} required />
@@ -284,7 +284,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
         >
           <form method="get" style={catalogFiltersStyle}>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.searchItems" fallback="Search items" />}>
-              <input name="itemSearch" defaultValue={itemSearchQuery} placeholder="Name or code" style={compactInputStyle} />
+              <AdminTranslatedInput
+                name="itemSearch"
+                defaultValue={itemSearchQuery}
+                placeholderKey="kitchenDetailAdmin.searchItemsPlaceholder"
+                placeholderFallback="Name or code"
+                style={compactInputStyle}
+              />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.filterType" fallback="Type" />}>
               <select name="itemType" defaultValue={itemTypeFilter} style={compactInputStyle}>
