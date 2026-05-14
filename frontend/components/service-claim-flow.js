@@ -194,6 +194,19 @@ const COPY = {
     problemDescriptionFieldLabel: "Weitere Details",
     submitError: "Deine Reklamation konnte nicht gesendet werden.",
     submitSuccess: "Deine Reklamation wurde erfolgreich \u00fcbermittelt.",
+    claimAssistantTitle: "Reklamations-Agent",
+    claimAssistantContextTitle: "Bereich w\u00e4hlen",
+    claimAssistantContextClaim: "Gesamte Reklamation",
+    claimAssistantCloseAria: "Reklamations-Agent schlie\u00dfen",
+    claimAssistantLauncher: "Reklamationshilfe",
+    claimAssistantLauncherPrompt: "Frag mich",
+    claimAssistantIntro:
+      "Ich helfe dir, den Defekt klar zu beschreiben und die passenden Fotos oder Angaben f\u00fcr den Service zu erg\u00e4nzen.",
+    claimAssistantIntroSelected: "Du fokussierst dich auf {label}. Frag mich, was du angeben oder fotografieren solltest.",
+    claimAssistantPlaceholder: "Frage zu dieser Reklamation stellen...",
+    claimAssistantLoading: "Hinweise werden vorbereitet...",
+    claimAssistantSend: "Senden",
+    claimAssistantErrorUnavailable: "Die Reklamationshilfe konnte dazu gerade keine Antwort geben.",
   },
   en: {
     eyebrow: "Fragmento Service",
@@ -305,6 +318,19 @@ const COPY = {
     contactError: "Please provide at least a phone number or an email address.",
     submitError: "Your complaint could not be submitted.",
     submitSuccess: "Your complaint has been submitted successfully.",
+    claimAssistantTitle: "Claim Agent",
+    claimAssistantContextTitle: "Choose a focus",
+    claimAssistantContextClaim: "Entire claim",
+    claimAssistantCloseAria: "Close Claim Agent",
+    claimAssistantLauncher: "Claim help",
+    claimAssistantLauncherPrompt: "Ask me",
+    claimAssistantIntro:
+      "I can help you describe the issue clearly and suggest which photos or details to add for service support.",
+    claimAssistantIntroSelected: "You're focusing on {label}. Ask me what to include or how to describe the issue.",
+    claimAssistantPlaceholder: "Ask about this claim...",
+    claimAssistantLoading: "Preparing suggestions...",
+    claimAssistantSend: "Send",
+    claimAssistantErrorUnavailable: "The claim helper could not answer that right now.",
   },
   tr: {
     eyebrow: "Fragmento Servis",
@@ -747,6 +773,8 @@ const EMPTY_CONTRACT_LOOKUP = {
   kitchenPlan: null,
 };
 
+const EMPTY_CLAIM_ASSISTANT_MESSAGES = [];
+
 function buildAutofillFieldsFromContract(contract) {
   const address = contract?.address || {};
 
@@ -788,6 +816,11 @@ export default function ServiceClaimFlow() {
   const [serialNumberImageFieldKey, setSerialNumberImageFieldKey] = useState(0);
   const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
   const [contractHelpSlide, setContractHelpSlide] = useState(0);
+  const [isClaimAssistantOpen, setIsClaimAssistantOpen] = useState(false);
+  const [claimAssistantMessages, setClaimAssistantMessages] = useState(EMPTY_CLAIM_ASSISTANT_MESSAGES);
+  const [claimAssistantQuestion, setClaimAssistantQuestion] = useState("");
+  const [isClaimAssistantLoading, setIsClaimAssistantLoading] = useState(false);
+  const [selectedClaimAssistantContextKey, setSelectedClaimAssistantContextKey] = useState("claim");
   const languageMenuRef = useRef(null);
   const contractLookupTimeoutRef = useRef(null);
   const contractLookupRequestIdRef = useRef(0);
@@ -818,6 +851,36 @@ export default function ServiceClaimFlow() {
     contractLookup.kitchenPlan,
     normalizedContractNumber,
   ]);
+  const selectedProblemAreas = useMemo(() => {
+    if (!activeKitchenPlan?.selectableComponents?.length || !problemComponentIds.length) {
+      return [];
+    }
+    const selectedIds = new Set(problemComponentIds);
+    return activeKitchenPlan.selectableComponents
+      .filter((entry) => selectedIds.has(entry.componentId))
+      .map((entry) => ({
+        ...entry,
+        label: formatClaimAreaName(entry, entry.name, language),
+      }));
+  }, [activeKitchenPlan, problemComponentIds, language]);
+  const claimAssistantContextOptions = useMemo(() => {
+    return [
+      { key: "claim", label: t("claimAssistantContextClaim"), type: "claim" },
+      ...selectedProblemAreas.map((area) => ({
+        key: area.componentId,
+        label: area.label,
+        type: "area",
+        area,
+      })),
+    ];
+  }, [selectedProblemAreas, language]);
+  const selectedClaimAssistantContext =
+    claimAssistantContextOptions.find((option) => option.key === selectedClaimAssistantContextKey)
+    || claimAssistantContextOptions[0];
+  const claimAssistantIntroText =
+    selectedClaimAssistantContext?.type === "area"
+      ? t("claimAssistantIntroSelected").replace("{label}", selectedClaimAssistantContext.label)
+      : t("claimAssistantIntro");
 
   function t(key) {
     if (Object.prototype.hasOwnProperty.call(copy, key)) {
@@ -875,6 +938,22 @@ export default function ServiceClaimFlow() {
       setIsContractNumberHelpOpen(false);
     }
   }, [isComplaintMode]);
+
+  useEffect(() => {
+    if (!isComplaintMode) {
+      setIsClaimAssistantOpen(false);
+      setClaimAssistantQuestion("");
+      setIsClaimAssistantLoading(false);
+      setSelectedClaimAssistantContextKey("claim");
+    }
+  }, [isComplaintMode]);
+
+  useEffect(() => {
+    if (claimAssistantContextOptions.some((option) => option.key === selectedClaimAssistantContextKey)) {
+      return;
+    }
+    setSelectedClaimAssistantContextKey("claim");
+  }, [claimAssistantContextOptions, selectedClaimAssistantContextKey]);
 
   useEffect(() => {
     setProblemComponentIds([]);
@@ -1135,6 +1214,67 @@ export default function ServiceClaimFlow() {
     return `${description}\n\nErreichbarkeit: ${availability}`.trim();
   }
 
+  async function handleClaimAssistantSubmit(event) {
+    event.preventDefault();
+    const question = claimAssistantQuestion.trim();
+    if (!question || isClaimAssistantLoading) {
+      return;
+    }
+
+    const nextUserMessage = { role: "user", text: question };
+    setClaimAssistantMessages((current) => [...current, nextUserMessage]);
+    setClaimAssistantQuestion("");
+    setIsClaimAssistantLoading(true);
+
+    try {
+      const response = await fetch("/api/service-claims/assistant", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          language,
+          question,
+          context: selectedClaimAssistantContext,
+          conversationMessages: claimAssistantMessages,
+          selectedAreas: selectedProblemAreas.map((area) => ({
+            componentId: area.componentId,
+            code: area.code,
+            name: area.label,
+          })),
+          claim: {
+            contractNumber: normalizedContractNumber,
+            problemDescription: buildSubmittedProblemDescription(),
+            serialNumber: String(formValues.serialNumber || "").trim(),
+            hasSerialNumberImage: Boolean(serialNumberImage),
+            attachmentCount: attachments.length + (serialNumberImage ? 1 : 0),
+            availabilityDate: String(formValues.availabilityDate || "").trim(),
+            availabilityTime: String(formValues.availabilityTime || "").trim(),
+            hasPhone: Boolean(String(formValues.phone || "").trim()),
+            hasEmail: Boolean(String(formValues.email || "").trim()),
+          },
+        }),
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.error || t("claimAssistantErrorUnavailable"));
+      }
+
+      setClaimAssistantMessages((current) => [
+        ...current,
+        { role: "assistant", text: payload.answer || t("claimAssistantErrorUnavailable") },
+      ]);
+    } catch (assistantError) {
+      setClaimAssistantMessages((current) => [
+        ...current,
+        { role: "assistant", text: assistantError.message || t("claimAssistantErrorUnavailable"), tone: "error" },
+      ]);
+    } finally {
+      setIsClaimAssistantLoading(false);
+    }
+  }
+
   async function handleSubmit(event) {
     event.preventDefault();
 
@@ -1263,6 +1403,13 @@ export default function ServiceClaimFlow() {
           </div>
 
           <div className="service-hero__mascot" aria-hidden="true">
+            <Image
+              src="/img/Untitled%20design%20(4).png"
+              alt=""
+              width={220}
+              height={312}
+              className="service-hero__mascot-image"
+            />
           </div>
         </div>
 
@@ -1281,18 +1428,10 @@ export default function ServiceClaimFlow() {
             />
             <strong>{copy.purchaseTitle}</strong>
             <p>{copy.purchaseText}</p>
-            <Image
-              src="/img/Untitled%20design%20(4).png"
-              alt=""
-              width={118}
-              height={168}
-              className="service-choice-card__mascot"
-              aria-hidden="true"
-            />
           </button>
           <button
             type="button"
-            className={`service-choice-card service-choice-card--complaint service-choice-card--complaint-mascot${isComplaintMode ? " is-active" : ""}`}
+            className={`service-choice-card service-choice-card--complaint${isComplaintMode ? " is-active" : ""}`}
             onClick={() => handleModeSelect("complaint")}
           >
             <Image
@@ -1305,14 +1444,6 @@ export default function ServiceClaimFlow() {
             
             <strong>{copy.complaintTitle}</strong>
             <p>{copy.complaintText}</p>
-            <Image
-              src="/img/worker-icon-transparent.png"
-              alt=""
-              width={220}
-              height={220}
-              className="service-choice-card__mascot service-choice-card__mascot--complaint"
-              aria-hidden="true"
-            />
           </button>
         </div>
       </section>
@@ -1830,6 +1961,111 @@ export default function ServiceClaimFlow() {
         </section>
       ) : null}
     </main>
+
+      {isComplaintMode ? (
+        <div className={`service-claim-agent${isClaimAssistantOpen ? " is-open" : ""}`}>
+          {isClaimAssistantOpen ? (
+            <div
+              className="service-claim-agent__panel"
+              role="dialog"
+              aria-modal="false"
+              aria-labelledby="service-claim-agent-title"
+            >
+              <div className="service-claim-agent__header">
+                <div className="service-claim-agent__title-wrap">
+                  <span className="service-claim-agent__header-avatar" aria-hidden="true">
+                    <img src="/img/worker-icon-transparent.png" alt="" />
+                  </span>
+                  <div className="service-claim-agent__title-block">
+                    <h2 id="service-claim-agent-title">{t("claimAssistantTitle")}</h2>
+                    <div className="service-claim-agent__section-label">{t("claimAssistantContextTitle")}</div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="service-claim-agent__close"
+                  aria-label={t("claimAssistantCloseAria")}
+                  onClick={() => setIsClaimAssistantOpen(false)}
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <div className="service-claim-agent__context-options">
+                {claimAssistantContextOptions.map((option) => (
+                  <button
+                    key={option.key}
+                    type="button"
+                    className={`service-claim-agent__context-button${selectedClaimAssistantContext?.key === option.key ? " is-active" : ""}`}
+                    onClick={() => setSelectedClaimAssistantContextKey(option.key)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+
+              <div className="service-claim-agent__messages" aria-live="polite">
+                {!claimAssistantMessages.length ? (
+                  <div className="service-claim-agent__message service-claim-agent__message--assistant">
+                    <span>{claimAssistantIntroText}</span>
+                  </div>
+                ) : null}
+                {claimAssistantMessages.map((message, index) => (
+                  <div
+                    key={`${message.role}-${index}-${message.text}`}
+                    className={[
+                      "service-claim-agent__message",
+                      message.role === "user"
+                        ? "service-claim-agent__message--user"
+                        : "service-claim-agent__message--assistant",
+                      message.tone === "error" ? "service-claim-agent__message--error" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    <span>{message.text}</span>
+                  </div>
+                ))}
+                {isClaimAssistantLoading ? (
+                  <div className="service-claim-agent__message service-claim-agent__message--assistant">
+                    <span>{t("claimAssistantLoading")}</span>
+                  </div>
+                ) : null}
+              </div>
+
+              <form className="service-claim-agent__composer" onSubmit={handleClaimAssistantSubmit}>
+                <input
+                  value={claimAssistantQuestion}
+                  onChange={(event) => setClaimAssistantQuestion(event.target.value)}
+                  maxLength={400}
+                  placeholder={t("claimAssistantPlaceholder")}
+                  disabled={isClaimAssistantLoading}
+                />
+                <button
+                  type="submit"
+                  className="service-button service-button--primary"
+                  disabled={!claimAssistantQuestion.trim() || isClaimAssistantLoading}
+                >
+                  {t("claimAssistantSend")}
+                </button>
+              </form>
+            </div>
+          ) : null}
+
+          <button
+            type="button"
+            className="service-claim-agent__launcher"
+            aria-expanded={isClaimAssistantOpen}
+            aria-label={t("claimAssistantLauncher")}
+            onClick={() => setIsClaimAssistantOpen((current) => !current)}
+          >
+            <span className="service-claim-agent__launcher-bubble">{t("claimAssistantLauncherPrompt")}</span>
+            <span className="service-claim-agent__launcher-avatar" aria-hidden="true">
+              <img src="/img/worker-icon-transparent.png" alt="" />
+            </span>
+          </button>
+        </div>
+      ) : null}
 
       {isContractNumberHelpOpen ? (
         <div className="service-contract-help" role="presentation">
