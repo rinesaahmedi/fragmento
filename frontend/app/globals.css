@@ -747,25 +747,25 @@ textarea {
   position: absolute;
   top: -140px;
   left: 1px;
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  padding: 10px 16px 10px 10px;
-  border: 1px solid rgba(107, 79, 58, 0.12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 24px rgba(84, 59, 40, 0.08);
+  display: inline-grid;
+  justify-items: start;
+  gap: 4px;
   z-index: 4;
 }
 
 .service-hero__logo {
   width: auto;
-  height: 34px;
+  height: 32px;
   object-fit: contain;
 }
 
-.service-hero__brand .service-hero__eyebrow {
-  margin: 0;
+.service-hero__brand-note {
+  color: var(--app-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  justify-self: end;
+  text-align: right;
 }
 
 .service-hero__mascot {
@@ -793,7 +793,10 @@ textarea {
 
 .service-hero h1 {
   max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
   font-size: clamp(2rem, 4.2vw, 3.45rem);
+  text-align: center;
 }
 
 .service-hero__eyebrow,
@@ -854,6 +857,16 @@ textarea {
     linear-gradient(180deg, rgba(255, 252, 249, 0.99) 0%, rgba(248, 236, 228, 0.96) 100%);
 }
 
+.service-choice-card--purchase {
+  padding-right: 148px;
+  overflow: hidden;
+}
+
+.service-choice-card--complaint-mascot {
+  padding-right: 172px;
+  overflow: hidden;
+}
+
 .service-choice-card:hover,
 .service-choice-card:focus-visible,
 .service-choice-card.is-active {
@@ -904,6 +917,34 @@ textarea {
   text-transform: uppercase;
 }
 
+.service-choice-card__logo {
+  width: auto;
+  height: 42px;
+  object-fit: contain;
+}
+
+.service-choice-card__logo--complaint {
+  height: 56px;
+  transform: translateY(-12px);
+  margin-bottom: -12px;
+}
+
+.service-choice-card__mascot {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  width: auto;
+  height: 220px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.service-choice-card__mascot--complaint {
+  height: 185px;
+  right: 18px;
+  bottom: 11px;
+}
+
 .service-choice-card strong {
   font-size: 1.35rem;
   line-height: 1.15;
@@ -919,7 +960,8 @@ textarea {
 
 .service-choice-card p {
   margin: 0;
-  max-width: 34ch;
+  max-width: none;
+  line-height: 1.5;
 }
 
 .service-panel {
@@ -1645,14 +1687,38 @@ textarea {
     position: static;
     display: grid;
     justify-items: start;
-    gap: 10px;
     margin-bottom: 14px;
-    border-radius: 24px;
-    padding-right: 12px;
+  }
+
+  .service-choice-card__logo {
+    height: 34px;
   }
 
   .service-hero__logo {
     height: 28px;
+  }
+
+  .service-choice-card__logo--complaint {
+    height: 44px;
+    transform: translateY(-8px);
+    margin-bottom: -8px;
+  }
+
+  .service-choice-card--purchase {
+    padding-right: 118px;
+  }
+
+  .service-choice-card--complaint-mascot {
+    padding-right: 134px;
+  }
+
+  .service-choice-card__mascot {
+    right: 12px;
+    height: 170px;
+  }
+
+  .service-choice-card__mascot--complaint {
+    height: 150px;
   }
 
   .service-hero__mascot {
