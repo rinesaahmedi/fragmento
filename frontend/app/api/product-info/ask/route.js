@@ -46,7 +46,7 @@ const BUSINESS_POLICY = {
   },
 };
 const WARRANTY_QUESTION_PATTERN = /\b(warranty|warranties|guarantee|guarantees|garantie|garantien)\b/i;
-const ENERGY_QUESTION_PATTERN = /\b(e[\s-]?labels?|energy labels?|energielabels?|energieeffizienzklassen?|energieklassen?|energieklasse|energy\s+(?:efficiency\s+)?(?:class(?:es)?|klasse)|energy\s+klasse|energie\s+class)\b/i;
+const ENERGY_QUESTION_PATTERN = /\b(e[\s-]?labels?|energy labels?|energielabels?|energieeffizienzklassen?|energieklassen?|energieklasse|energie\s+klasse|energy\s+(?:efficiency\s+)?(?:class(?:es)?|classe|klass|klasse)|energy\s+klasse|energie\s+class(?:e)?|what\s+energy)\b/i;
 
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
@@ -129,11 +129,11 @@ function normalizeConversationalPrompt(value) {
 }
 
 const TOPIC_PATTERNS = {
-  energy: /\b(energy\s+(?:efficiency\s+)?class(?:es)?|energy labels?|e[\s-]?labels?|energy klasse|energie\s+class|energieeffizienzklassen?|energieklassen?|energieklasse|energielabels?|classe énergétique|classe energetique|klasa e energjisë|klasa e energjise)\b/i,
-  consumption: /\b(consumption|energy use|electricity cost|electricity costs|cost matters|uses the most energy|use the most energy|kwh|verbrauch|energieverbrauch|stromverbrauch|stromkosten|energiekosten|verbraucht)\b/i,
-  noise: /\b(noise|quietest|loudest|db|dba|geräusch|geraeusch|lautstärke|lautstaerke|leisesten|lautesten)\b/i,
-  dimensions: /\b(dimensions|measurements|size|width|height|depth|installation size|niche size|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe|einbauma[sß]e|nischenma[sß]e)\b/i,
-  features: /\b(functions?|programs?|capacity|steam clean|timer|child safety|booster|pot detection|programme|funktionen|kapazität|kapazitaet|kindersicherung|topferkennung)\b/i,
+  energy: /\b(energy\s+(?:efficiency\s+)?class(?:es)?|energy\s+(?:classe|klass|klasse)|energy labels?|e[\s-]?labels?|energie\s+(?:class(?:e)?|klasse)|energieeffizienzklassen?|energieklassen?|energieklasse|energielabels?|what\s+energy|label|classe énergétique|classe energetique|klasa e energjisë|klasa e energjise)\b/i,
+  consumption: /\b(consumption|energy use|electricity cost|electricity costs|cost matters|uses the most energy|use the most energy|kwh|water|watter|water use|liters?|litres?|\bl\b|verbrauch|energieverbrauch|stromverbrauch|wasserverbrauch|stromkosten|energiekosten|verbraucht)\b/i,
+  noise: /\b(noise|quietest|loudest|decibels?|dezi(?:bel)?|dezibel|db|dba|dB\(A\)|sound|loud|geräusch|geraeusch|lautstärke|lautstaerke|luftschallemission|leisesten|lautesten|laut)\b/i,
+  dimensions: /\b(dimensions|dimesnions|dimensons|dimentions|measurements|mesurements|size|how big|width|height|depth|installation size|niche size|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe|einbauma[sß]e|nischenma[sß]e)\b/i,
+  features: /\b(functions?|features?|programs?|programmes?|capacity|load capacity|place settings|cooking zones?|zones?|kg|kilograms?|kilos?|steam clean|timer|child safety|booster|pot detection|programme|programme?|funktionen|kapazität|kapazitaet|füllmenge|fuellmenge|fassungsvermögen|fassungsvermoegen|beladung|gewicht|kochzonen?|kindersicherung|topferkennung)\b/i,
 };
 
 function detectTopic(question) {
@@ -208,7 +208,7 @@ function classifyProductAssistantIntent(question) {
         ? "help"
         : isIncompleteVaguePrompt(value)
           ? "incomplete"
-          : isOverviewRequest(value)
+          : isOverviewRequest(value) && !topic
             ? "overview"
             : comparison
               ? "comparison"
@@ -440,6 +440,150 @@ function getWaterConsumptionValue(item) {
   return match ? match[0].replace(/\s+/g, " ").trim() : "";
 }
 
+function getKilogramSpec(item) {
+  const extractValue = (value) => {
+    const match = String(value || "").match(/\b\d+(?:[.,]\d+)?\s*kg\b/i);
+    return match ? match[0].replace(/\s+/g, " ").trim() : "";
+  };
+  const normalizeLabel = (source, language) => {
+    if (/(weight|gewicht)/i.test(source)) {
+      return language === "de" ? "Gewicht" : "Weight";
+    }
+    return language === "de" ? "Kapazität" : "Capacity";
+  };
+
+  const fact = normalizeFacts(item?.productInfoKeyFacts)
+    .map(normalizePublicProductBrand)
+    .find((entry) =>
+      /^(capacity|load capacity|füllmenge|fuellmenge|beladung|gewicht|weight)\s*:/i.test(entry)
+      && /\b\d+(?:[.,]\d+)?\s*kg\b/i.test(entry),
+    );
+  if (fact) {
+    return {
+      value: extractValue(fact),
+      labelSource: fact,
+    };
+  }
+
+  const line = getItemInfoLines(item).find((entry) =>
+    /(capacity|load|füllmenge|fuellmenge|beladung|gewicht|weight|waschkapazität|waschkapazitaet)/i.test(entry)
+    && /\b\d+(?:[.,]\d+)?\s*kg\b/i.test(entry),
+  );
+
+  return {
+    value: extractValue(line),
+    labelSource: line || "",
+    normalizeLabel,
+  };
+}
+
+function formatKilogramSpecEntry(item, language) {
+  const spec = getKilogramSpec(item);
+  if (!spec.value) return "";
+
+  const label = spec.normalizeLabel
+    ? spec.normalizeLabel(spec.labelSource, language)
+    : (/(weight|gewicht)/i.test(spec.labelSource) ? (language === "de" ? "Gewicht" : "Weight") : (language === "de" ? "Kapazität" : "Capacity"));
+  return `${getPublicItemName(item, language)}: ${label}: ${spec.value}`;
+}
+
+function findLabeledInfoLine(item, labelPattern, valuePattern = /\S/) {
+  const fact = normalizeFacts(item?.productInfoKeyFacts)
+    .map(normalizePublicProductBrand)
+    .find((entry) => labelPattern.test(entry) && valuePattern.test(entry));
+  if (fact) return fact;
+
+  return getItemInfoLines(item).find((entry) => labelPattern.test(entry) && valuePattern.test(entry)) || "";
+}
+
+function getLabelValueFromLine(line) {
+  const value = String(line || "").trim();
+  if (!value) return "";
+
+  const parts = value.split(":");
+  return (parts.length > 1 ? parts.slice(1).join(":") : value).trim();
+}
+
+function getLiterSpec(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(water consumption|water use|wasserverbrauch|volume|capacity|nutzinhalt|volumen|inhalt|liter|litre|liter|l\b)/i,
+    /\b\d+(?:[.,]\d+)?\s*(?:l|liter|litre|liters|litres)\b/i,
+  );
+  const match = line.match(/\b\d+(?:[.,]\d+)?\s*(?:l|liter|litre|liters|litres)\b/i);
+  if (!match) return { value: "", labelSource: "" };
+
+  return {
+    value: match[0].replace(/\s+/g, " ").trim(),
+    labelSource: line,
+  };
+}
+
+function formatLiterSpecEntry(item, language) {
+  const spec = getLiterSpec(item);
+  if (!spec.value) return "";
+
+  const label = /(water|wasser)/i.test(spec.labelSource)
+    ? (language === "de" ? "Wasserverbrauch" : "Water consumption")
+    : (language === "de" ? "Volumen/Kapazität" : "Volume/capacity");
+  return `${getPublicItemName(item, language)}: ${label}: ${spec.value}`;
+}
+
+function getPlaceSettingsValue(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(place settings?|gedecke|maßgedecke|massgedecke)/i,
+    /\b\d{1,2}\b/,
+  );
+  const value = getLabelValueFromLine(line);
+  const match = value.match(/\b\d{1,2}\b/);
+  return match ? match[0] : "";
+}
+
+function formatPlaceSettingsEntry(item, language) {
+  const value = getPlaceSettingsValue(item);
+  if (!value) return "";
+
+  const label = language === "de" ? "Maßgedecke" : "Place settings";
+  return `${getPublicItemName(item, language)}: ${label}: ${value}`;
+}
+
+function getCookingZonesValue(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(cooking zones?|zones?|kochzonen?|kochstellen)/i,
+    /\b\d{1,2}\b/,
+  );
+  const value = getLabelValueFromLine(line);
+  const match = value.match(/\b\d{1,2}\b/);
+  return match ? match[0] : "";
+}
+
+function formatCookingZonesEntry(item, language) {
+  const value = getCookingZonesValue(item);
+  if (!value) return "";
+
+  const label = language === "de" ? "Kochzonen" : "Cooking zones";
+  return `${getPublicItemName(item, language)}: ${label}: ${value}`;
+}
+
+function getProgramOrFeatureValue(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(programs?|programmes?|features?|functions?|programme|funktionen|ausstattung)/i,
+    /:\s*\S/,
+  );
+  return getLabelValueFromLine(line);
+}
+
+function formatProgramOrFeatureEntry(item, language) {
+  const value = getProgramOrFeatureValue(item);
+  if (!value) return "";
+
+  const label = language === "de" ? "Programme/Funktionen" : "Programs/features";
+  return `${getPublicItemName(item, language)}: ${label}: ${value}`;
+}
+
 function getItemDocumentLabels(item) {
   return getProductInfoDocuments({ code: item?.productInfoCode || item?.code })
     .map((document) => String(document?.label || "").trim())
@@ -448,6 +592,43 @@ function getItemDocumentLabels(item) {
 
 function hasELabelDocument(item) {
   return getItemDocumentLabels(item).some((label) => /e[\s-]?label/i.test(label));
+}
+
+function answerFromELabelDocumentFacts(question, items, language) {
+  const value = String(question || "");
+  if (!/\b(?:e[\s-]?label|energy label|energielabel|label)\b/i.test(value)) {
+    return null;
+  }
+  if (
+    /\b(?:energy labels?|energielabels?)\b/i.test(value)
+    && !/\b(?:has?|have|available|exists?|pdf|document|doc|file|datei|gibt|vorhanden)\b/i.test(value)
+  ) {
+    return null;
+  }
+
+  const scopedItems = scopeItemsForQuestion(items, question);
+  const entries = scopedItems
+    .map((item) => {
+      if (!hasELabelDocument(item)) return null;
+      return language === "de"
+        ? `${getPublicItemName(item, language)}: Energielabel-PDF vorhanden`
+        : `${getPublicItemName(item, language)}: E-label PDF available`;
+    })
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return {
+      answer: EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  return {
+    answer: language === "de"
+      ? formatSectionWithBullets("Dokumentierte Energielabel-Dateien:", entries)
+      : formatSectionWithBullets("Documented energy-label files:", entries),
+    found: true,
+  };
 }
 
 function getCombinedItemInfoText(item) {
@@ -776,8 +957,8 @@ const SUB_PRODUCT_ALIASES = {
   hob: ["hob", "kochfeld"],
   oven: ["oven", "built-in oven", "backofen", "einbaubackofen"],
   hood: ["extractor hood", "hood", "dunstabzugshaube", "haube"],
-  dishwasher: ["dishwasher", "geschirrspüler", "geschirrspueler"],
-  washing_machine: ["washing machine", "washer", "waschmaschine"],
+  dishwasher: ["dishwasher", "geschirrspüler", "geschirrspueler", "lavastovilje"],
+  washing_machine: ["washing machine", "washer", "waschmaschine", "lavatriçe", "lavatriqe"],
   refrigerator_freezer: ["refrigerator-freezer", "refrigerator", "fridge", "kühl-gefrierkombination", "kuehl-gefrierkombination", "kühlschrank", "gefrier"],
 };
 
@@ -1310,7 +1491,7 @@ function detectComparisonTopics(question) {
   if (/(water use|water consumption|wasser|wasserverbrauch)/i.test(value)) {
     topics.push("waterConsumption");
   }
-  if (/(noise|quiet|loud|db|dba|geräusch|geraeusch|lautstärke|lautstaerke|leise|laut|ruhig)/i.test(value)) {
+  if (/(noise|quiet|loud|decibels?|db|dba|geräusch|geraeusch|lautstärke|lautstaerke|leise|laut|ruhig)/i.test(value)) {
     topics.push("noise");
   }
   if (/(dimensions|measurements|size|width|height|depth|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe)/i.test(value)) {
@@ -1862,7 +2043,7 @@ function extractNoiseValueStrict(item) {
   if (factValue) return factValue;
 
   const line = getItemInfoLines(item).find((entry) =>
-    /(geraeusch|geräusch|schallleistung|noise|sound\s+power|lautstärke|lautstaerke|\blaut\b)/i.test(entry)
+    /(geraeusch|geräusch|schallleistung|noise|sound\s+power|lautstärke|lautstaerke|decibels?|\blaut\b)/i.test(entry)
     && /\b\d{2,3}(?:\s*-\s*\d{2,3})?\s*dB(?:\(A\))?\b/i.test(entry),
   );
   const match = line?.match(/\b\d{2,3}(?:\s*-\s*\d{2,3})?\s*dB(?:\(A\))?\b/i);
@@ -1893,7 +2074,27 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
   if (missingSubProductAnswer) return missingSubProductAnswer;
   const scopedItems = scopeItemsForQuestion(items, question);
 
+  const asksWaterConsumptionOnly = /\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value);
   const asksConsumptionOnly = /(consumption|verbrauch|kwh)/i.test(value) && !ENERGY_QUESTION_PATTERN.test(value);
+
+  if (asksWaterConsumptionOnly) {
+    const entries = scopedItems
+      .flatMap((item) => getEnergyAnswerRecords(item, language))
+      .filter((record) => record.waterConsumption)
+      .map((record) => formatConsumptionEntry({ ...record, annualConsumption: "" }, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Wasserverbrauchswerte sind:", entries)
+        : formatSectionWithBullets("The documented water consumption values are:", entries),
+      found: true,
+    };
+  }
 
   if (!ENERGY_QUESTION_PATTERN.test(value) && !asksConsumptionOnly) {
     return null;
@@ -1997,7 +2198,43 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
     };
   }
 
-  if (/(consumption|verbrauch|kwh)/i.test(value)) {
+  if (/\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value)) {
+    const entries = scopedItems
+      .flatMap((item) => getEnergyAnswerRecords(item, language))
+      .filter((record) => record.waterConsumption)
+      .map((record) => formatConsumptionEntry({ ...record, annualConsumption: "" }, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Wasserverbrauchswerte sind:", entries)
+        : formatSectionWithBullets("The documented water consumption values are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:liter|litre|liters|litres|volume|nutzinhalt|volumen)\b|\bl\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatLiterSpecEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Liter-Angaben sind:", entries)
+        : formatSectionWithBullets("The documented litre values are:", entries),
+      found: true,
+    };
+  }
+
+  if (/(consumption|verbrauch|kwh|energy use|energieverbrauch|stromverbrauch)/i.test(value)) {
     const entries = scopedItems
       .flatMap((item) => getEnergyAnswerRecords(item, language))
       .filter((record) => record.annualConsumption || record.waterConsumption)
@@ -2019,7 +2256,75 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
     };
   }
 
-  if (/(noise|geraeusch|geräusch|lautstärke|lautstaerke|\blaut\b|db\b|dba\b)/i.test(value)) {
+  if (/\b(?:place settings?|gedecke|maßgedecke|massgedecke)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatPlaceSettingsEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Maßgedecke sind:", entries)
+        : formatSectionWithBullets("The documented place settings are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:kg|kilograms?|kilos?|capacity|load capacity|füllmenge|fuellmenge|beladung|gewicht|weight)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatKilogramSpecEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Kilogramm-Angaben sind:", entries)
+        : formatSectionWithBullets("The documented kilogram values are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:cooking zones?|zones?|kochzonen?|kochstellen)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatCookingZonesEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Kochzonen sind:", entries)
+        : formatSectionWithBullets("The documented cooking zones are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:programs?|programmes?|features?|functions?|programme|funktionen)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatProgramOrFeatureEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Programme/Funktionen sind:", entries)
+        : formatSectionWithBullets("The documented programs/features are:", entries),
+      found: true,
+    };
+  }
+
+  if (/(noise|sound|loud|geraeusch|geräusch|lautstärke|lautstaerke|luftschallemission|dezibel|dezi(?:bel)?|decibels?|\blaut\b|db\b|dba\b)/i.test(value)) {
     const entries = scopedItems
       .map((item) => {
         const noise = extractNoiseValueStrict(item);
@@ -2040,7 +2345,7 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
     };
   }
 
-  if (/(installation dimensions|dimensions|measurements|size|abmessungen|ma[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e)/i.test(value)) {
+  if (/(installation dimensions|dimensions|dimesnions|dimensons|dimentions|measurements|mesurements|how big|size|width|height|depth|abmessungen|ma[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e|breite|höhe|hoehe|tiefe)/i.test(value)) {
     const requestedSubProductDimensions = answerForRequestedSubProductDimensions(question, items, language);
     if (requestedSubProductDimensions) {
       return requestedSubProductDimensions;
@@ -2574,6 +2879,11 @@ export async function POST(request) {
     const multiItemModelAnswer = answerFromExplicitMultiItemModels(effectiveQuestion, usableContextItems, responseLanguage);
     if (multiItemModelAnswer) {
       return NextResponse.json(multiItemModelAnswer);
+    }
+
+    const eLabelDocumentAnswer = answerFromELabelDocumentFacts(effectiveQuestion, usableContextItems, responseLanguage);
+    if (eLabelDocumentAnswer) {
+      return NextResponse.json(eLabelDocumentAnswer);
     }
 
     const multiItemEnergyAnswer = answerFromExplicitMultiItemEnergyFacts(effectiveQuestion, usableContextItems, responseLanguage);

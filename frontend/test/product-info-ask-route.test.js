@@ -799,6 +799,279 @@ test("POST routes quiet-home recommendations to documented noise values", async 
   );
 });
 
+test("POST treats dB and decibel wording as noise questions, not overview or not-found", async () => {
+  const selectedProducts = [
+    product({
+      id: "hood",
+      name: "Dunstabzugshaube",
+      productInfoKeyFacts: ["Model: FH 664 621 S", "Schallleistung: max. 70 dB"],
+    }),
+    product({
+      id: "dishwasher",
+      name: "Geschirrspüler",
+      productInfoKeyFacts: ["Model: A-EGSPV597210", "Noise: 49 dB"],
+    }),
+    product({
+      id: "fridge",
+      name: "Kühl-Gefrierkombination",
+      productInfoKeyFacts: ["Model: KGC15495S", "Geräusch: 41 dB"],
+    }),
+  ];
+  const route = loadRoute({
+    prisma: {
+      kitchenItem: {
+        findMany: async () => selectedProducts,
+      },
+    },
+  });
+  const basePayload = {
+    language: "en",
+    contractNumber: "CON-1",
+    kitchenSlug: "demo-kitchen",
+    itemIds: selectedProducts.map((item) => item.id),
+  };
+
+  for (const question of [
+    "tell me about db",
+    "noise?",
+    "how many decibels",
+    "What are the documented decibel values for the selected products?",
+    "What are the documented noise levels in decibels for the selected appliances?",
+  ]) {
+    const response = await route.POST(request({ ...basePayload, question }));
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, /^The documented noise values are:/);
+    assert.match(response.body.answer, /Extractor hood \(FH 664 621 S\): max. 70 dB/);
+    assert.match(response.body.answer, /Dishwasher \(A-EGSPV597210\): 49 dB/);
+    assert.match(response.body.answer, /Refrigerator-freezer \(KGC 15495 S\): 41 dB/);
+    assert.doesNotMatch(response.body.answer, /could not find|short overview|ventilation above the hob/i);
+  }
+});
+
+test("POST answers common shorthand and misspellings for appliance facts", async () => {
+  const selectedProducts = [
+    product({
+      id: "washer",
+      name: "Washer",
+      productInfoKeyFacts: [
+        "Model: EWA34660W",
+        "Energy class: A",
+        "Capacity: 8 kg",
+        "Noise: 72 dB(A)",
+        "Appliance dimensions H x W x D: 830 x 600 x 540 mm",
+      ],
+    }),
+  ];
+  const route = loadRoute({
+    prisma: {
+      kitchenItem: {
+        findMany: async () => selectedProducts,
+      },
+    },
+  });
+  const basePayload = {
+    language: "en",
+    contractNumber: "CON-1",
+    kitchenSlug: "demo-kitchen",
+    itemIds: ["washer"],
+  };
+
+  const energy = await route.POST(request({ ...basePayload, question: "energy classe" }));
+  assert.equal(energy.status, 200);
+  assert.match(energy.body.answer, /^Documented energy class:/);
+  assert.match(energy.body.answer, /Washing machine \(EWA 34660 W\): energy class A/);
+
+  const kilograms = await route.POST(request({ ...basePayload, question: "how many kg" }));
+  assert.equal(kilograms.status, 200);
+  assert.match(kilograms.body.answer, /^The documented kilogram values are:/);
+  assert.match(kilograms.body.answer, /Washing machine \(EWA 34660 W\): Capacity: 8 kg/);
+
+  const dimensions = await route.POST(request({ ...basePayload, question: "dimesnions" }));
+  assert.equal(dimensions.status, 200);
+  assert.match(dimensions.body.answer, /^I found these documented appliance or niche dimensions:/);
+  assert.match(dimensions.body.answer, /Appliance dimensions H x W x D: 830 x 600 x 540 mm/);
+
+  const decibels = await route.POST(request({ ...basePayload, question: "decibels" }));
+  assert.equal(decibels.status, 200);
+  assert.match(decibels.body.answer, /^The documented noise values are:/);
+  assert.match(decibels.body.answer, /Washing machine \(EWA 34660 W\): 72 dB\(A\)/);
+});
+
+test("POST understands short imperfect English product-topic questions", async () => {
+  const selectedProducts = [
+    product({
+      id: "washer",
+      name: "Washer",
+      productInfoKeyFacts: [
+        "Model: EWA34660W",
+        "Energy class: A",
+        "Capacity: 8 kg",
+        "Water consumption: 48 l/cycle",
+        "Energy consumption: 47 kWh",
+        "Noise: 72 dB(A)",
+        "Programs: Cotton, Eco, Quick",
+      ],
+    }),
+    product({
+      id: "dishwasher",
+      name: "Dishwasher",
+      productInfoKeyFacts: [
+        "Model: A-EGSPV597210",
+        "Water consumption: 11 l/cycle",
+        "Energy consumption: 82 kWh",
+        "Noise: 49 dB",
+        "Place settings: 14",
+        "Programs: Eco, Auto",
+        "Appliance dimensions H x W x D: 815 x 598 x 550 mm",
+      ],
+    }),
+    product({
+      id: "hob",
+      name: "Hob",
+      productInfoKeyFacts: [
+        "Model: OL-KMI 754 000 E",
+        "Cooking zones: 4",
+      ],
+    }),
+  ];
+  const route = loadRoute({
+    prisma: {
+      kitchenItem: {
+        findMany: async () => selectedProducts,
+      },
+    },
+  });
+  const basePayload = {
+    language: "en",
+    contractNumber: "CON-1",
+    kitchenSlug: "demo-kitchen",
+    itemIds: selectedProducts.map((item) => item.id),
+  };
+
+  for (const question of ["how many db", "tell me about db", "how much noise"]) {
+    const response = await route.POST(request({ ...basePayload, question }));
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, /^The documented noise values are:/);
+    assert.match(response.body.answer, /Washing machine \(EWA 34660 W\): 72 dB\(A\)/);
+    assert.match(response.body.answer, /Dishwasher \(A-EGSPV597210\): 49 dB/);
+  }
+
+  const energy = await route.POST(request({ ...basePayload, question: "energy klass" }));
+  assert.match(energy.body.answer, /Washing machine \(EWA 34660 W\): energy class A/);
+
+  const kilograms = await route.POST(request({ ...basePayload, question: "how many kg" }));
+  assert.match(kilograms.body.answer, /Washing machine \(EWA 34660 W\): Capacity: 8 kg/);
+
+  const water = await route.POST(request({ ...basePayload, question: "how much water" }));
+  assert.match(water.body.answer, /^The documented water consumption values are:/);
+  assert.match(water.body.answer, /Dishwasher \(A-EGSPV597210\): Water consumption: 11 l/);
+
+  const kwh = await route.POST(request({ ...basePayload, question: "kwh?" }));
+  assert.match(kwh.body.answer, /^Here are the documented consumption values/);
+  assert.match(kwh.body.answer, /Washing machine \(EWA 34660 W\): Energy consumption per 100 wash cycles: 47 kWh/);
+
+  const dimensions = await route.POST(request({ ...basePayload, question: "how big is the dishwasher" }));
+  assert.match(dimensions.body.answer, /^I found these documented dimensions for the dishwasher:/);
+  assert.match(dimensions.body.answer, /Dishwasher \(A-EGSPV597210\):/);
+  assert.doesNotMatch(dimensions.body.answer, /Washing machine|Hob/);
+
+  const programs = await route.POST(request({ ...basePayload, question: "programs?" }));
+  assert.match(programs.body.answer, /^The documented programs\/features are:/);
+  assert.match(programs.body.answer, /Washing machine \(EWA 34660 W\): Programs\/features: Cotton, Eco, Quick/);
+
+  const zones = await route.POST(request({ ...basePayload, question: "how many cooking zones" }));
+  assert.match(zones.body.answer, /^The documented cooking zones are:/);
+  assert.match(zones.body.answer, /Hob \(OL-KMI 754 000 E\): Cooking zones: 4/);
+});
+
+test("POST understands short imperfect German product-topic questions", async () => {
+  const selectedProducts = [
+    product({
+      id: "washer",
+      name: "Waschmaschine",
+      productInfoKeyFacts: [
+        "Model: EWA34660W",
+        "Energieeffizienzklasse: A",
+        "Füllmenge: 8 kg",
+        "Wasserverbrauch: 48 l/Zyklus",
+        "Energieverbrauch: 47 kWh",
+        "Geräusch: 72 dB(A)",
+        "Programme: Baumwolle, Eco, Kurz",
+      ],
+    }),
+    product({
+      id: "dishwasher",
+      name: "Geschirrspüler",
+      productInfoKeyFacts: [
+        "Model: A-EGSPV597210",
+        "Wasserverbrauch: 11 l/Spülgang",
+        "Energieverbrauch: 82 kWh",
+        "Geräusch: 49 dB",
+        "Maßgedecke: 14",
+        "Programme: Eco, Auto",
+        "Gerätemaße H x B x T: 815 x 598 x 550 mm",
+      ],
+    }),
+    product({
+      id: "hob",
+      name: "Kochfeld",
+      productInfoKeyFacts: [
+        "Model: OL-KMI 754 000 E",
+        "Kochzonen: 4",
+      ],
+    }),
+  ];
+  const route = loadRoute({
+    prisma: {
+      kitchenItem: {
+        findMany: async () => selectedProducts,
+      },
+    },
+  });
+  const basePayload = {
+    language: "de",
+    contractNumber: "CON-1",
+    kitchenSlug: "demo-kitchen",
+    itemIds: selectedProducts.map((item) => item.id),
+  };
+
+  for (const question of ["wie viele db", "dezibel?", "wie laut"]) {
+    const response = await route.POST(request({ ...basePayload, question }));
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, /^Die dokumentierten Ger/);
+    assert.match(response.body.answer, /Waschmaschine \(EWA 34660 W\): 72 dB\(A\)/);
+    assert.match(response.body.answer, /Geschirrspüler \(A-EGSPV597210\): 49 dB/);
+  }
+
+  const energy = await route.POST(request({ ...basePayload, question: "energie klasse" }));
+  assert.match(energy.body.answer, /Waschmaschine \(EWA 34660 W\): Klasse A/);
+
+  const kilograms = await route.POST(request({ ...basePayload, question: "wie viel kg" }));
+  assert.match(kilograms.body.answer, /^Die dokumentierten Kilogramm-Angaben sind:/);
+  assert.match(kilograms.body.answer, /Waschmaschine \(EWA 34660 W\): Kapazität: 8 kg/);
+
+  const water = await route.POST(request({ ...basePayload, question: "wasserverbrauch?" }));
+  assert.match(water.body.answer, /^Die dokumentierten Wasserverbrauchswerte sind:/);
+  assert.match(water.body.answer, /Geschirrspüler \(A-EGSPV597210\): Wasserverbrauch pro Spülgang: 11 l/);
+
+  const kwh = await route.POST(request({ ...basePayload, question: "kwh?" }));
+  assert.match(kwh.body.answer, /^Hier sind die dokumentierten Verbrauchswerte/);
+  assert.match(kwh.body.answer, /Waschmaschine \(EWA 34660 W\): Energieverbrauch pro 100 Waschzyklen: 47 kWh/);
+
+  const dimensions = await route.POST(request({ ...basePayload, question: "maße geschirrspüler" }));
+  assert.match(dimensions.body.answer, /^Ich habe diese dokumentierten Maße für den Geschirrspüler gefunden:/);
+  assert.match(dimensions.body.answer, /Geschirrspüler \(A-EGSPV597210\):/);
+  assert.doesNotMatch(dimensions.body.answer, /Waschmaschine|Kochfeld/);
+
+  const programs = await route.POST(request({ ...basePayload, question: "programme?" }));
+  assert.match(programs.body.answer, /^Die dokumentierten Programme\/Funktionen sind:/);
+  assert.match(programs.body.answer, /Waschmaschine \(EWA 34660 W\): Programme\/Funktionen: Baumwolle, Eco, Kurz/);
+
+  const zones = await route.POST(request({ ...basePayload, question: "wie viele kochzonen" }));
+  assert.match(zones.body.answer, /^Die dokumentierten Kochzonen sind:/);
+  assert.match(zones.body.answer, /Kochfeld \(OL-KMI 754 000 E\): Kochzonen: 4/);
+});
+
 test("POST compares requested products across multiple requested topics", async () => {
   const selectedProducts = [
     product({
