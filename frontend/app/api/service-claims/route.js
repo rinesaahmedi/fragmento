@@ -33,6 +33,11 @@ function optionalString(value) {
   return normalized || "";
 }
 
+function booleanFromFormValue(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "on";
+}
+
 function mergeProblemAreasIntoDescription(problemDescription, problemAreasJsonRaw) {
   const base = String(problemDescription || "").trim();
   if (descriptionHasClientKitchenAreasLine(base)) {
@@ -584,6 +589,15 @@ export async function POST(request) {
     if (!problemDescription) {
       throw new Error("Problem description is required.");
     }
+    const rawSerialNumber = optionalString(body.serialNumber);
+    const hasSerialNumberImage = booleanFromFormValue(body.hasSerialNumberImage);
+    if (!rawSerialNumber && !hasSerialNumberImage) {
+      return NextResponse.json(
+        { error: "Please provide a serial number or upload a serial number photo." },
+        { status: 400 },
+      );
+    }
+
     const payload = {
       id: crypto.randomUUID(),
       contractNumber,
@@ -619,8 +633,9 @@ export async function POST(request) {
       ].join("\n"),
       problemDescription,
       problemAreasJson,
-      serialNumber: requiredString(body.serialNumber, "Serial number"),
+      serialNumber: rawSerialNumber || "See serial number photo in attachments.",
       requestType: "complaint",
+      hasSerialNumberImage,
       attachmentsMeta: attachmentParts.map(({ filename, contentType, size }) => ({
         filename,
         contentType,

@@ -216,3 +216,25 @@ model ServiceClaim {
   @@index([contractNumber])
   @@index([createdAt])
 }
+
+model ServiceClaimKnowledgeEntry {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  brand         String
+  applianceType String
+  topicType     String
+  code          String?
+  titleKey      String
+  symptomKeys   Json?
+  checkKeys     Json?
+  causeKeys     Json?
+  actionKeys    Json?
+  triggerTerms  Json?
+  priority      Int      @default(0)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([brand, applianceType, isActive])
+  @@index([topicType, code])
+}
