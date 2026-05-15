@@ -104,6 +104,7 @@ function AdminShellContent({ adminEmail, children }) {
               <Link
                 key={`mobile-${item.href}`}
                 href={item.href}
+                prefetch={false}
                 style={{
                   textDecoration: "none",
                   display: "inline-flex",
@@ -209,6 +210,7 @@ function AdminShellContent({ adminEmail, children }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={false}
                   style={{
                     textDecoration: "none",
                     display: "flex",

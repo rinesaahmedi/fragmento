@@ -14,8 +14,9 @@ import {
   splitGridStyle,
   textareaStyle,
 } from "../../../../components/admin-ui";
+import Link from "next/link";
 import { AdminShell } from "../../../../components/admin-shell";
-import { AdminDateTime, AdminPluralText, AdminStatusBadge, AdminText } from "../../../../components/admin-i18n";
+import { AdminDateTime, AdminPluralText, AdminText } from "../../../../components/admin-i18n";
 import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
 import AdminContractAddressFields from "../../../../components/admin-contract-address-fields";
 import AdminSelect from "../../../../components/admin-select";
@@ -280,8 +281,8 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                         {propertyObjectAddress(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectAddress(object)}</span> : null}
                       </div>
                       <div style={objectSummaryAsideStyle}>
-                        <AdminStatusBadge status={String(object.projectStatus || "active").toUpperCase()} />
                         <div style={objectActionRowStyle}>
+                          <ObjectProjectStatusBadge status={object.projectStatus} />
                           <span style={objectPreviewCountStyle}>
                             <AdminPluralText
                               count={object._count.contracts}
@@ -291,9 +292,13 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                               pluralFallback="{count} contract numbers"
                             />
                           </span>
-                          <ActionLink href={buildOwnerDetailPath(owner.id, { openObject: object.id, ...(createObjectOpen ? { createObject: "1" } : {}) })} scroll={false}>
+                          <Link
+                            href={buildOwnerDetailPath(owner.id, { openObject: object.id, ...(createObjectOpen ? { createObject: "1" } : {}) })}
+                            scroll={false}
+                            style={objectManageLinkStyle}
+                          >
                             <AdminText i18nKey="propertyOwnersAdmin.manage" fallback="Manage" />
-                          </ActionLink>
+                          </Link>
                         </div>
                       </div>
                     </div>
@@ -424,6 +429,24 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
   );
 }
 
+function ObjectProjectStatusBadge({ status }) {
+  const statusKey = String(status || "active").toLowerCase();
+  const labels = {
+    planning: { i18nKey: "propertyOwnersAdmin.projectStatusPlanning", fallback: "Planning" },
+    active: { i18nKey: "propertyOwnersAdmin.projectStatusActive", fallback: "Active" },
+    on_hold: { i18nKey: "propertyOwnersAdmin.projectStatusOnHold", fallback: "On hold" },
+    completed: { i18nKey: "propertyOwnersAdmin.projectStatusCompleted", fallback: "Completed" },
+    archived: { i18nKey: "propertyOwnersAdmin.projectStatusArchived", fallback: "Archived" },
+  };
+  const label = labels[statusKey] || labels.active;
+
+  return (
+    <span style={objectStatusPillStyle}>
+      <AdminText i18nKey={label.i18nKey} fallback={label.fallback} />
+    </span>
+  );
+}
+
 const formGridStyle = {
   display: "grid",
   gap: 10,
@@ -480,7 +503,8 @@ const objectWorkspaceStyle = {
 
 const objectSectionTitleStyle = {
   color: "var(--app-text)",
-  fontSize: 14,
+  fontSize: "1rem",
+  lineHeight: 1.3,
 };
 
 const denseObjectFormStyle = {
@@ -506,27 +530,28 @@ const objectDetailsStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   border: "1px solid rgba(45, 108, 121, 0.14)",
-  borderRadius: 10,
+  borderRadius: 12,
   background: "rgba(255,255,255,0.82)",
-  padding: "9px 11px",
+  padding: "12px 14px",
 };
 
 const objectSummaryContentStyle = {
   display: "grid",
-  gap: 2,
+  gap: 3,
   minWidth: 0,
 };
 
 const objectSummaryAsideStyle = {
-  display: "grid",
-  gap: 6,
-  justifyItems: "end",
+  display: "flex",
+  justifyContent: "flex-end",
+  alignItems: "center",
+  minWidth: "fit-content",
 };
 
 const objectSummaryMetaStyle = {
   color: "var(--app-text-muted)",
-  fontSize: 11,
-  lineHeight: 1.35,
+  fontSize: 13,
+  lineHeight: 1.4,
   whiteSpace: "nowrap",
   overflow: "hidden",
   textOverflow: "ellipsis",
@@ -534,7 +559,7 @@ const objectSummaryMetaStyle = {
 
 const objectProjectTagStyle = {
   color: "var(--app-accent)",
-  fontSize: 10,
+  fontSize: 12,
   fontWeight: 800,
   letterSpacing: "0.06em",
   textTransform: "uppercase",
@@ -543,20 +568,45 @@ const objectProjectTagStyle = {
 const objectPreviewCountStyle = {
   display: "inline-flex",
   width: "fit-content",
-  borderRadius: 999,
-  padding: "3px 7px",
-  background: "rgba(45, 108, 121, 0.13)",
-  color: "var(--app-info-text)",
-  fontSize: 11,
-  fontWeight: 800,
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 700,
   whiteSpace: "nowrap",
+};
+
+const objectStatusPillStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  borderRadius: 999,
+  padding: "4px 9px",
+  background: "rgba(63, 166, 107, 0.08)",
+  border: "1px solid rgba(63, 166, 107, 0.16)",
+  color: "var(--app-success-text)",
+  fontSize: 13,
+  fontWeight: 700,
+  whiteSpace: "nowrap",
+};
+
+const objectManageLinkStyle = {
+  textDecoration: "none",
+  borderRadius: 8,
+  minHeight: 36,
+  padding: "8px 12px",
+  background: "rgba(255,255,255,0.9)",
+  color: "var(--app-accent)",
+  border: "1px solid var(--app-border)",
+  fontSize: 14,
+  fontWeight: 800,
+  display: "inline-flex",
+  alignItems: "center",
+  boxShadow: "none",
 };
 
 const objectEditorCardStyle = {
   ...itemCardStyle,
   display: "grid",
-  gap: 12,
-  padding: 14,
+  gap: 14,
+  padding: 16,
 };
 
 const editorPanelsLayoutStyle = {
@@ -578,7 +628,7 @@ const editorSubsectionHeaderStyle = {
 
 const editorSubsectionTitleStyle = {
   color: "var(--app-accent)",
-  fontSize: 11,
+  fontSize: 12,
   fontWeight: 800,
   letterSpacing: "0.06em",
   textTransform: "uppercase",
@@ -641,7 +691,7 @@ const compactInlineActionsStyle = {
 
 const objectActionRowStyle = {
   display: "flex",
-  gap: 8,
+  gap: 10,
   alignItems: "center",
   flexWrap: "wrap",
   justifyContent: "flex-end",

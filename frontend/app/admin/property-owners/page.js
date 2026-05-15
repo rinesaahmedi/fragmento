@@ -574,21 +574,21 @@ const compactPrimaryButtonStyle = {
 
 const compactThStyle = {
   textAlign: "left",
-  padding: "11px 14px",
-  fontSize: 11,
+  padding: "12px 14px",
+  fontSize: 12,
   color: "var(--app-text-muted)",
   textTransform: "uppercase",
-  letterSpacing: "0.1em",
+  letterSpacing: "0.08em",
   borderBottom: "1px solid var(--app-border)",
   background: "var(--app-surface-muted)",
   fontWeight: 800,
 };
 
 const compactTdStyle = {
-  padding: "12px 14px",
+  padding: "14px",
   borderBottom: "1px solid var(--app-border)",
   color: "var(--app-text)",
   verticalAlign: "middle",
-  fontSize: 13,
-  lineHeight: 1.45,
+  fontSize: 14,
+  lineHeight: 1.5,
 };

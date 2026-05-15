@@ -478,6 +478,49 @@ textarea {
   border-color: var(--color-primary-hover);
 }
 
+.analytics-dashboard .filter-form .admin-select__trigger {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.analytics-dashboard .filter-form .admin-select__trigger:hover,
+.analytics-dashboard .filter-form .admin-select.is-open .admin-select__trigger,
+.analytics-dashboard .filter-form .admin-select__trigger:focus-visible {
+  border-color: var(--color-primary-hover) !important;
+  background-color: var(--color-primary-hover) !important;
+  color: #ffffff;
+}
+
+.analytics-dashboard .filter-form .admin-select__value,
+.analytics-dashboard .filter-form .admin-select__value.is-placeholder {
+  color: #fff8ef;
+}
+
+.analytics-dashboard .filter-form .admin-select__chevron {
+  border-color: #fff8ef;
+}
+
+.analytics-dashboard .filter-form .admin-select__menu .admin-select__option {
+  border: 0;
+  background: transparent;
+  color: var(--app-text);
+  font-weight: 600;
+}
+
+.analytics-dashboard .filter-form .admin-select__menu .admin-select__option:hover,
+.analytics-dashboard .filter-form .admin-select__menu .admin-select__option.is-active {
+  background: rgba(232, 222, 212, 0.72);
+  color: var(--app-text);
+}
+
+.analytics-dashboard .filter-form .admin-select__menu .admin-select__option.is-selected {
+  background: rgba(107, 79, 58, 0.12);
+  color: var(--app-accent-strong);
+  font-weight: 800;
+}
+
 .analytics-dashboard .toolbar-link {
   font-weight: 700;
   text-decoration: none;
