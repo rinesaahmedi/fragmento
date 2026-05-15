@@ -457,7 +457,7 @@ test("POST keeps German consumption and energy intents aligned with English for 
       id: "fridge",
       code: "KGC15495S",
       name: "Kühl-Gefrierkombination",
-      productInfoKeyFacts: ["Model: KGC15495S", "Energieeffizienzklasse: E", "Jährlicher Energieverbrauch: 219,0 kWh/Jahr"],
+      productInfoKeyFacts: ["Model: KGC15495S", "Energieeffizienzklasse: E", "Jährlicher Energieverbrauch: 219,0 kWh/Jahr", "Hoehe: 180 cm"],
     }),
   ];
   const route = loadRoute({
@@ -577,6 +577,11 @@ test("POST keeps German consumption and energy intents aligned with English for 
   assert.match(englishDishwasherDimensions.body.answer, /^I found these documented dimensions for the dishwasher:/);
   assert.match(englishDishwasherDimensions.body.answer, /Dishwasher \(A-EGSPV597210\):/);
   assert.doesNotMatch(englishDishwasherDimensions.body.answer, /Built-in oven/);
+
+  const englishFridgeDimensions = await route.POST(request({ ...basePayload, language: "en", question: "what are the fridge dimensions" }));
+  assert.match(englishFridgeDimensions.body.answer, /^I found these documented dimensions for the refrigerator-freezer:/);
+  assert.match(englishFridgeDimensions.body.answer, /Refrigerator-freezer \(KGC 15495 S\):\n  Height: 180 cm/);
+  assert.doesNotMatch(englishFridgeDimensions.body.answer, /Dishwasher|Built-in oven/);
 });
 
 test("POST handles German ja only for actionable assistant follow-ups", async () => {
@@ -1070,6 +1075,103 @@ test("POST understands short imperfect German product-topic questions", async ()
   const zones = await route.POST(request({ ...basePayload, question: "wie viele kochzonen" }));
   assert.match(zones.body.answer, /^Die dokumentierten Kochzonen sind:/);
   assert.match(zones.body.answer, /Kochfeld \(OL-KMI 754 000 E\): Kochzonen: 4/);
+});
+
+test("POST scopes fuzzy product aliases and typo topics to the intended appliance", async () => {
+  const selectedProducts = [
+    product({
+      id: "fridge",
+      name: "Refrigerator",
+      productInfoKeyFacts: [
+        "Model: KGC15495S",
+        "Hoehe: 180 cm",
+        "Noise: 41 dB",
+      ],
+    }),
+    product({
+      id: "washer",
+      name: "Washer",
+      productInfoKeyFacts: [
+        "Model: EWA34660W",
+        "Appliance dimensions H x W x D: 830 x 600 x 540 mm",
+      ],
+    }),
+    product({
+      id: "dishwasher",
+      name: "Dishwasher",
+      productInfoKeyFacts: [
+        "Model: A-EGSPV597210",
+        "Water consumption: 11 l/cycle",
+      ],
+    }),
+    product({
+      id: "hood",
+      name: "Extractor hood",
+      productInfoKeyFacts: [
+        "Model: FH 664 621 S",
+        "Noise: max. 70 dB",
+      ],
+    }),
+  ];
+  const route = loadRoute({
+    prisma: {
+      kitchenItem: {
+        findMany: async () => selectedProducts,
+      },
+    },
+  });
+  const basePayload = {
+    contractNumber: "CON-1",
+    kitchenSlug: "demo-kitchen",
+    itemIds: selectedProducts.map((item) => item.id),
+  };
+
+  for (const question of ["what are the fridge dimensions", "refrigator dimesnions ?"]) {
+    const response = await route.POST(request({ ...basePayload, language: "en", question }));
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, /^I found these documented dimensions for the refrigerator-freezer:/);
+    assert.match(response.body.answer, /Refrigerator-freezer \(KGC 15495 S\):\n  Height: 180 cm/);
+    assert.doesNotMatch(response.body.answer, /Washing machine|Dishwasher|Extractor hood/);
+  }
+
+  for (const question of ["refrigerator", "fridge"]) {
+    const response = await route.POST(request({ ...basePayload, language: "en", question }));
+    assert.equal(response.status, 200);
+    assert.equal(
+      response.body.answer,
+      "The refrigerator-freezer is KGC 15495 S. I can help with its energy class, consumption, noise, volume, dimensions, or features.",
+    );
+  }
+
+  const washerDimensions = await route.POST(request({ ...basePayload, language: "en", question: "washer dimesnions" }));
+  assert.match(washerDimensions.body.answer, /^I found these documented dimensions for the washing machine:/);
+  assert.match(washerDimensions.body.answer, /Washing machine \(EWA 34660 W\):/);
+  assert.doesNotMatch(washerDimensions.body.answer, /Refrigerator-freezer|Dishwasher|Extractor hood/);
+
+  const dishwasherWater = await route.POST(request({ ...basePayload, language: "en", question: "dishwaser water" }));
+  assert.match(dishwasherWater.body.answer, /^The documented water consumption values are:/);
+  assert.match(dishwasherWater.body.answer, /Dishwasher \(A-EGSPV597210\): Water consumption: 11 l/);
+  assert.doesNotMatch(dishwasherWater.body.answer, /Refrigerator-freezer|Washing machine|Extractor hood/);
+
+  const hoodNoise = await route.POST(request({ ...basePayload, language: "en", question: "hood db" }));
+  assert.match(hoodNoise.body.answer, /^The documented noise values are:/);
+  assert.match(hoodNoise.body.answer, /Extractor hood \(FH 664 621 S\): max. 70 dB/);
+  assert.doesNotMatch(hoodNoise.body.answer, /Refrigerator-freezer|Washing machine|Dishwasher/);
+
+  const fridgeGermanDimensions = await route.POST(request({ ...basePayload, language: "de", question: "kühlschrank maße" }));
+  assert.match(fridgeGermanDimensions.body.answer, /^Ich habe diese dokumentierten Maße für die Kühl-Gefrierkombination gefunden:/);
+  assert.match(fridgeGermanDimensions.body.answer, /Kühl-Gefrierkombination \(KGC 15495 S\):\n  Höhe: 180 cm/);
+  assert.doesNotMatch(fridgeGermanDimensions.body.answer, /Waschmaschine|Geschirrspüler|Dunstabzugshaube/);
+
+  const dishwasherGermanWater = await route.POST(request({ ...basePayload, language: "de", question: "spuelmaschine wasserverbrauch" }));
+  assert.match(dishwasherGermanWater.body.answer, /^Die dokumentierten Wasserverbrauchswerte sind:/);
+  assert.match(dishwasherGermanWater.body.answer, /Geschirrspüler \(A-EGSPV597210\): Wasserverbrauch pro Spülgang: 11 l/);
+  assert.doesNotMatch(dishwasherGermanWater.body.answer, /Kühl-Gefrierkombination|Waschmaschine|Dunstabzugshaube/);
+
+  const albanianFridgeNoise = await route.POST(request({ ...basePayload, language: "en", question: "sa db ka frigoriferi" }));
+  assert.match(albanianFridgeNoise.body.answer, /^The documented noise values are:/);
+  assert.match(albanianFridgeNoise.body.answer, /Refrigerator-freezer \(KGC 15495 S\): 41 dB/);
+  assert.doesNotMatch(albanianFridgeNoise.body.answer, /Washing machine|Dishwasher|Extractor hood/);
 });
 
 test("POST compares requested products across multiple requested topics", async () => {

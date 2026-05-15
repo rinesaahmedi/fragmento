@@ -46,7 +46,7 @@ const BUSINESS_POLICY = {
   },
 };
 const WARRANTY_QUESTION_PATTERN = /\b(warranty|warranties|guarantee|guarantees|garantie|garantien)\b/i;
-const ENERGY_QUESTION_PATTERN = /\b(e[\s-]?labels?|energy labels?|energielabels?|energieeffizienzklassen?|energieklassen?|energieklasse|energie\s+klasse|energy\s+(?:efficiency\s+)?(?:class(?:es)?|classe|klass|klasse)|energy\s+klasse|energie\s+class(?:e)?|what\s+energy)\b/i;
+const ENERGY_QUESTION_PATTERN = /\b(e[\s-]?labels?|energy labels?|energielabels?|energieeffizienzklassen?|energieklassen?|energieklasse|energie\s+klasse|energy\s+(?:efficiency\s+)?(?:class(?:es)?|classe|klass|klasse)|energy\s+klasse|energie\s+class(?:e)?|energj|what\s+energy)\b/i;
 
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
@@ -129,10 +129,10 @@ function normalizeConversationalPrompt(value) {
 }
 
 const TOPIC_PATTERNS = {
-  energy: /\b(energy\s+(?:efficiency\s+)?class(?:es)?|energy\s+(?:classe|klass|klasse)|energy labels?|e[\s-]?labels?|energie\s+(?:class(?:e)?|klasse)|energieeffizienzklassen?|energieklassen?|energieklasse|energielabels?|what\s+energy|label|classe énergétique|classe energetique|klasa e energjisë|klasa e energjise)\b/i,
+  energy: /\b(energy\s+(?:efficiency\s+)?class(?:es)?|energy\s+(?:classe|klass|klasse)|energy labels?|e[\s-]?labels?|energie\s+(?:class(?:e)?|klasse)|energieeffizienzklassen?|energieklassen?|energieklasse|energielabels?|energj|what\s+energy|label|classe énergétique|classe energetique|klasa e energjisë|klasa e energjise)\b/i,
   consumption: /\b(consumption|energy use|electricity cost|electricity costs|cost matters|uses the most energy|use the most energy|kwh|water|watter|water use|liters?|litres?|\bl\b|verbrauch|energieverbrauch|stromverbrauch|wasserverbrauch|stromkosten|energiekosten|verbraucht)\b/i,
   noise: /\b(noise|quietest|loudest|decibels?|dezi(?:bel)?|dezibel|db|dba|dB\(A\)|sound|loud|geräusch|geraeusch|lautstärke|lautstaerke|luftschallemission|leisesten|lautesten|laut)\b/i,
-  dimensions: /\b(dimensions|dimesnions|dimensons|dimentions|measurements|mesurements|size|how big|width|height|depth|installation size|niche size|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe|einbauma[sß]e|nischenma[sß]e)\b/i,
+  dimensions: /\b(dimensions|dimesnions|dimensons|dimentions|dimmensions|measurements|mesurements|size|how big|width|height|depth|installation size|niche size|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe|einbauma[sß]e|nischenma[sß]e)\b/i,
   features: /\b(functions?|features?|programs?|programmes?|capacity|load capacity|place settings|cooking zones?|zones?|kg|kilograms?|kilos?|steam clean|timer|child safety|booster|pot detection|programme|programme?|funktionen|kapazität|kapazitaet|füllmenge|fuellmenge|fassungsvermögen|fassungsvermoegen|beladung|gewicht|kochzonen?|kindersicherung|topferkennung)\b/i,
 };
 
@@ -806,7 +806,7 @@ function formatSectionWithBullets(title, entries) {
 
 function splitDocumentedDimensionLines(value) {
   return String(value || "")
-    .split(/\r?\n|\s*,\s+(?=(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Dimensions|Appliance dimensions|Niche dimensions)\b)/i)
+    .split(/\r?\n|\s*,\s+(?=(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Dimensions|Appliance dimensions|Niche dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)\b)/i)
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
 }
@@ -820,7 +820,7 @@ function normalizeIdenticalLeadingDimensionRange(value) {
 
 function normalizeDimensionLabel(line, language) {
   const match = String(line || "").trim().match(
-    /^(?<label>(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Ausschnittmaße|Einbautiefe|Appliance dimensions|Niche dimensions|Installation dimensions|Cut-out dimensions|Built-in depth|Dimensions)(?:\s+H\s*x\s*(?:B|W)\s*x\s*(?:T|D))?(?:\s+W\s*x\s*D)?(?:\s*\((?:mm|cm)\))?)\s*:?\s*(?<value>.+)$/i,
+    /^(?<label>(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Ausschnittmaße|Einbautiefe|Appliance dimensions|Niche dimensions|Installation dimensions|Cut-out dimensions|Built-in depth|Dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)(?:\s+H\s*x\s*(?:B|W)\s*x\s*(?:T|D))?(?:\s+W\s*x\s*D)?(?:\s*\((?:mm|cm)\))?)\s*:?\s*(?<value>.+)$/i,
   );
   if (!match?.groups) return String(line || "").trim();
 
@@ -835,6 +835,9 @@ function normalizeDimensionLabel(line, language) {
       .replace(/^Einbaumasse/i, "Einbaumaße")
       .replace(/^Cut-out dimensions/i, "Ausschnittmaße")
       .replace(/^Built-in depth/i, "Einbautiefe")
+      .replace(/^Height/i, "Höhe")
+      .replace(/^Hoehe/i, "Höhe")
+      .replace(/^Bauhoehe/i, "Bauhöhe")
       .replace(/\bH\s*x\s*W\s*x\s*D\b/i, "H x B x T");
 
     return `${germanLabel}: ${rawValue}`;
@@ -851,6 +854,8 @@ function normalizeDimensionLabel(line, language) {
     englishLabel = rawLabel.replace(/^Ausschnittmaße/i, "Cut-out dimensions");
   } else if (/^Einbautiefe/i.test(rawLabel)) {
     englishLabel = rawLabel.replace(/^Einbautiefe/i, "Built-in depth");
+  } else if (/^(Höhe|Hoehe|Bauhöhe|Bauhoehe)/i.test(rawLabel)) {
+    englishLabel = rawLabel.replace(/^(Höhe|Hoehe|Bauhöhe|Bauhoehe)/i, "Height");
   }
 
   englishLabel = englishLabel.replace(/\bH\s*x\s*B\s*x\s*T\b/i, "H x W x D");
@@ -954,12 +959,12 @@ function stripAffirmativeLead(answer, question) {
 }
 
 const SUB_PRODUCT_ALIASES = {
-  hob: ["hob", "kochfeld"],
-  oven: ["oven", "built-in oven", "backofen", "einbaubackofen"],
-  hood: ["extractor hood", "hood", "dunstabzugshaube", "haube"],
-  dishwasher: ["dishwasher", "geschirrspüler", "geschirrspueler", "lavastovilje"],
-  washing_machine: ["washing machine", "washer", "waschmaschine", "lavatriçe", "lavatriqe"],
-  refrigerator_freezer: ["refrigerator-freezer", "refrigerator", "fridge", "kühl-gefrierkombination", "kuehl-gefrierkombination", "kühlschrank", "gefrier"],
+  hob: ["hob", "hobb", "cooktop", "stove top", "induction", "kochfeld", "herdplatte", "pllaka", "pllakë gatimi", "pllaka gatimi"],
+  oven: ["oven", "owen", "back oven", "built-in oven", "backofen", "einbaubackofen", "ofen", "furrë", "furre"],
+  hood: ["extractor hood", "extractor", "hood", "vent", "fan hood", "dunstabzugshaube", "haube", "flachschirmhaube", "aspirator"],
+  dishwasher: ["dishwasher", "dish washer", "dishwaser", "dish washer machine", "geschirrspüler", "geschirrspueler", "spülmaschine", "spuelmaschine", "lavastovilje", "enëlarëse", "enelarese"],
+  washing_machine: ["washing machine", "washer", "wash machine", "wasching machine", "waschmaschine", "lavatriçe", "lavatriqe"],
+  refrigerator_freezer: ["refrigerator-freezer", "refrigerator", "refrigator", "fridge", "refridge", "freezer", "fridge freezer", "fridge-freezer", "kühl-gefrierkombination", "kuehl-gefrierkombination", "kühlschrank", "kuehlschrank", "kuhlschrank", "gefrierschrank", "gefrier", "frigorifer", "frigoriferi"],
 };
 
 function getSubProductDisplayLabel(subProduct, language) {
@@ -1079,6 +1084,46 @@ function detectRequestedSubProducts(question) {
   return Object.entries(SUB_PRODUCT_ALIASES)
     .filter(([, aliases]) => aliases.some((alias) => textContainsAlias(value, alias)))
     .map(([subProduct]) => subProduct);
+}
+
+function isLikelyProductAliasOnlyQuestion(question) {
+  const value = normalizeConversationalPrompt(question);
+  const requestedSubProduct = detectRequestedSubProduct(value);
+  if (!requestedSubProduct || detectTopic(value) || isOverviewRequest(value) || isHelpRequest(value)) return false;
+
+  const aliases = SUB_PRODUCT_ALIASES[requestedSubProduct] || [];
+  return aliases.some((alias) => {
+    const normalizedAlias = normalizeConversationalPrompt(alias);
+    return value === normalizedAlias || value === `the ${normalizedAlias}` || value === `der ${normalizedAlias}` || value === `die ${normalizedAlias}` || value === `das ${normalizedAlias}`;
+  });
+}
+
+function answerFromProductAliasOnly(question, items, language) {
+  if (!isLikelyProductAliasOnlyQuestion(question)) return null;
+
+  const requestedSubProduct = detectRequestedSubProduct(question);
+  const item = items.find((entry) => itemMatchesSubProduct(entry, requestedSubProduct));
+  if (!item) return null;
+
+  const model = extractKnownModel(item);
+  const typeLabel = getPublicTypeLabelForModel(model, item, language);
+  if (language === "de") {
+    const subject = requestedSubProduct === "refrigerator_freezer"
+      ? "Die Kühl-Gefrierkombination"
+      : getSubProductArticleLabel(requestedSubProduct, "de").replace(/^d/, "D");
+    const modelText = model ? ` ist ${model}` : " ist ausgewählt";
+    return {
+      answer: `${subject}${modelText}. Ich kann Ihnen bei Energieeffizienzklasse, Verbrauch, Lautstärke, Volumen, Maßen oder Funktionen helfen.`,
+      found: true,
+    };
+  }
+
+  const subject = typeLabel || getSubProductDisplayLabel(requestedSubProduct, "en");
+  const modelText = model ? ` is ${model}` : " is selected";
+  return {
+    answer: `The ${subject.toLowerCase()}${modelText}. I can help with its energy class, consumption, noise, volume, dimensions, or features.`,
+    found: true,
+  };
 }
 
 function getGroupedSubProductContent(item, subProduct) {
@@ -2054,9 +2099,9 @@ function extractInstallationDimensionsStrict(item) {
   const hasNumericDimensionPattern = (value) =>
     /\b\d{2,4}(?:[.,]\d+)?\s*(?:x|×|-)\s*\d{2,4}(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d{2,4}(?:[.,]\d+)?)?(?:\s*mm|\s*cm)?\b/i.test(value)
     || /\b(?:min\.?\s*)?\d{2,4}(?:[.,]\d+)?\s*mm\b/i.test(value)
-    || /\b(?:breite|width|hoehe|höhe|tiefe|depth)\s*:\s*\d+(?:[.,]\d+)?\s*(?:mm|cm)\b/i.test(value);
+    || /\b(?:breite|width|hoehe|höhe|bauhoehe|bauhöhe|tiefe|depth|height)\s*:\s*\d+(?:[.,]\d+)?\s*(?:mm|cm)\b/i.test(value);
   const hasDimensionLabel = (value) =>
-    /(abmessungen|dimensions|geraetemass|geraetemasse|gerätemaße|geraetemaße|nischenmass|nischenmaße|einbaumass|einbaumaße)/i.test(value);
+    /(abmessungen|dimensions|geraetemass|geraetemasse|gerätemaße|geraetemaße|nischenmass|nischenmaße|einbaumass|einbaumaße|breite|width|hoehe|höhe|bauhoehe|bauhöhe|tiefe|depth|height)/i.test(value);
 
   const matchingLines = getItemInfoLines(item).filter((line) => hasDimensionLabel(line) && hasNumericDimensionPattern(line));
   if (matchingLines.length) return matchingLines.join("\n");
@@ -2345,7 +2390,7 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
     };
   }
 
-  if (/(installation dimensions|dimensions|dimesnions|dimensons|dimentions|measurements|mesurements|how big|size|width|height|depth|abmessungen|ma[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e|breite|höhe|hoehe|tiefe)/i.test(value)) {
+  if (/(installation dimensions|dimensions|dimesnions|dimensons|dimentions|dimmensions|measurements|mesurements|how big|size|width|height|depth|abmessungen|ma[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e|breite|höhe|hoehe|tiefe)/i.test(value)) {
     const requestedSubProductDimensions = answerForRequestedSubProductDimensions(question, items, language);
     if (requestedSubProductDimensions) {
       return requestedSubProductDimensions;
@@ -2869,6 +2914,11 @@ export async function POST(request) {
     const recommendationAnswer = answerFromRecommendation(effectiveQuestion, usableContextItems, responseLanguage);
     if (recommendationAnswer) {
       return NextResponse.json(recommendationAnswer);
+    }
+
+    const productAliasOnlyAnswer = answerFromProductAliasOnly(effectiveQuestion, usableContextItems, responseLanguage);
+    if (productAliasOnlyAnswer) {
+      return NextResponse.json(productAliasOnlyAnswer);
     }
 
     const overviewAnswer = answerFromProductOverview(effectiveQuestion, usableContextItems, responseLanguage);
