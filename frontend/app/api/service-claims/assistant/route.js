@@ -4,9 +4,11 @@ import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit
 const COPY = {
   en: {
     greetingReply:
-      "Hi. I can help you write the claim, choose the affected kitchen area, and suggest which photos or serial details to add.",
+      "Hi. I can help you with the claim.",
     greetingFollowUp:
-      "Tell me what is not working, or ask me for help with wording, photos, or the right kitchen area.",
+      "Tell me what is wrong, or ask about wording, photos, or the right kitchen area.",
+    greetingExamples:
+      "For example: \"The sink is leaking\", \"What photos should I attach?\", or \"Which area should I select?\"",
     unavailable: "The claim helper could not answer that right now.",
     openingGeneral: "Here is the fastest way to make the claim clearer for service support.",
     openingArea: "For {label}, here is what service support usually needs first.",
@@ -36,12 +38,24 @@ const COPY = {
     nextMissingContact: "Provide at least one contact option so the team can reach you.",
     nextAttachmentReady: "You already added attachments, so keep the written description short and precise.",
     askFollowUp: "If you want, ask me for a sample wording for the final problem description.",
+    briefPrompt:
+      "Please tell me what is wrong, which kitchen part is affected, and what you have already noticed.",
+    briefPromptWithArea:
+      "Please tell me what is wrong with {label} and what you have already noticed.",
+    sampleWordingIntro: "You can use this wording:",
+    sampleWordingAreaFallback: "the affected area",
+    sampleWordingAreaLabel: "Affected area",
+    sampleWordingFallback:
+      "The issue started [when]. It is [constant/intermittent]. The affected area is [area]. I noticed [visible issue]. Please check and advise on the next step.",
+    sampleWordingOutro: "Please check and advise on the next step.",
   },
   de: {
     greetingReply:
-      "Hallo. Ich helfe dir dabei, die Reklamation zu formulieren, den betroffenen K\u00fcchenbereich zu w\u00e4hlen und passende Fotos oder Seriendaten zu erg\u00e4nzen.",
+      "Hallo. Ich helfe dir bei der Reklamation.",
     greetingFollowUp:
-      "Schreib mir einfach, was nicht funktioniert, oder frag nach Hilfe bei Formulierung, Fotos oder dem richtigen K\u00fcchenbereich.",
+      "Schreib einfach, was nicht funktioniert, oder frag nach Hilfe bei Formulierung, Fotos oder dem richtigen K\u00fcchenbereich.",
+    greetingExamples:
+      "Zum Beispiel: \"Die Sp\u00fcle ist undicht\", \"Welche Fotos soll ich anh\u00e4ngen?\" oder \"Welchen Bereich soll ich ausw\u00e4hlen?\"",
     unavailable: "Die Reklamationshilfe konnte dazu gerade keine Antwort geben.",
     openingGeneral: "So wird die Reklamation f\u00fcr den Service am schnellsten klarer.",
     openingArea: "F\u00fcr {label} ben\u00f6tigt der Service meistens zuerst diese Angaben.",
@@ -71,6 +85,16 @@ const COPY = {
     nextMissingContact: "Hinterlege mindestens eine Kontaktm\u00f6glichkeit, damit der Service dich erreichen kann.",
     nextAttachmentReady: "Du hast bereits Anh\u00e4nge hinzugef\u00fcgt. Halte die schriftliche Beschreibung jetzt kurz und pr\u00e4zise.",
     askFollowUp: "Wenn du willst, formuliere ich dir als N\u00e4chstes einen passenden Text f\u00fcr die Problembeschreibung.",
+    briefPrompt:
+      "Beschreibe bitte kurz, was nicht funktioniert, welcher K\u00fcchenbereich betroffen ist und was du bereits beobachtet hast.",
+    briefPromptWithArea:
+      "Beschreibe bitte kurz, was bei {label} nicht funktioniert und was du bereits beobachtet hast.",
+    sampleWordingIntro: "Du kannst zum Beispiel so schreiben:",
+    sampleWordingAreaFallback: "der betroffene Bereich",
+    sampleWordingAreaLabel: "Betroffener Bereich",
+    sampleWordingFallback:
+      "Das Problem besteht seit [Zeitpunkt]. Es tritt [dauerhaft/gelegentlich] auf. Betroffen ist [Bereich]. Sichtbar ist [Beobachtung]. Bitte pr\u00fcfen Sie den Fall und teilen Sie mir die n\u00e4chsten Schritte mit.",
+    sampleWordingOutro: "Bitte pr\u00fcfen Sie den Fall und teilen Sie mir die n\u00e4chsten Schritte mit.",
   },
 };
 
@@ -107,6 +131,23 @@ function isLowInformationQuestion(question) {
     return true;
   }
   return false;
+}
+
+function isSampleWordingRequest(question) {
+  const normalized = normalizeText(question).toLowerCase();
+  if (!normalized) return false;
+  return /\b(sample|wording|phrase|write|beschreibung|formul|text)\b/.test(normalized);
+}
+
+function buildSampleWording(copy, claim, focusLabel) {
+  const description = normalizeText(claim?.problemDescription);
+  const area = focusLabel || copy.sampleWordingAreaFallback;
+  if (!description) {
+    return `${copy.sampleWordingIntro}\n\n${copy.sampleWordingFallback.replace("[area]", area)}`;
+  }
+
+  const sentence = description.endsWith(".") ? description : `${description}.`;
+  return `${copy.sampleWordingIntro}\n\n${sentence} ${copy.sampleWordingAreaLabel}: ${area}. ${copy.sampleWordingOutro}`;
 }
 
 function detectAreaCategory(area) {
@@ -201,7 +242,7 @@ function buildAnswer({ language, question, context, selectedAreas, claim }) {
   const focusLabel = normalizeText(context?.label);
   const questionText = normalizeText(question);
   if (isGreeting(questionText)) {
-    return `${copy.greetingReply}\n\n${copy.greetingFollowUp}`;
+    return `${copy.greetingReply}\n\n${copy.greetingFollowUp}\n\n${copy.greetingExamples}`;
   }
   const descriptionText = normalizeText(claim?.problemDescription);
   const combinedText = `${questionText}\n${descriptionText}`.trim();
@@ -216,6 +257,10 @@ function buildAnswer({ language, question, context, selectedAreas, claim }) {
       ? copy.openingArea.replace("{label}", focusLabel)
       : copy.openingGeneral;
 
+  if (isSampleWordingRequest(questionText)) {
+    return buildSampleWording(copy, claim || {}, focusLabel);
+  }
+
   const includeItems = buildAreaAdvice(copy, categories, combinedText);
   const nextItems = buildNextSteps(copy, claim || {}, categories, scopedAreas);
 
@@ -227,7 +272,11 @@ function buildAnswer({ language, question, context, selectedAreas, claim }) {
   ].filter(Boolean);
 
   if (!questionText || isLowInformationQuestion(questionText)) {
-    sections.unshift(copy.fallbackQuestion);
+    sections.unshift(
+      context?.type === "area" && focusLabel
+        ? copy.briefPromptWithArea.replace("{label}", focusLabel)
+        : copy.briefPrompt,
+    );
   }
 
   return sections.join("\n\n").trim();
