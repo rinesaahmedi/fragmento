@@ -351,7 +351,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
       <style>{responsivePanelMedia}</style>
       <div style={centerWrapStyle}>
         <section style={panelStyle}>
-          <Link href="/admin" style={adminLinkStyle}>
+          <Link href="/admin" prefetch={false} style={adminLinkStyle}>
             Admin
           </Link>
 

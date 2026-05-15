@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAdminI18n } from "./admin-i18n";
 import { AdminEntitySearch } from "./admin-entity-search";
@@ -200,7 +201,7 @@ export function AdminDashboardCharts({
             </AdminSelect>
           </label>
           <button type="submit">{translate("dashboard.apply", "Apply")}</button>
-          <a href="/admin" className="toolbar-link">{translate("dashboard.clearFilters", "Clear filters")}</a>
+          <Link href="/admin" prefetch={false} className="toolbar-link">{translate("dashboard.clearFilters", "Clear filters")}</Link>
         </form>
       </section>
 
@@ -229,17 +230,21 @@ export function AdminDashboardCharts({
             emptyLabel={translate("dashboard.noClaimElementDataForSelectedFilters", "No selected claim element data for the current filters.")}
             translateElementLabels
             yAxisWidth={154}
+            maxRows={5}
+            compact
           />
           <ClaimBreakdownChart
             title={translate("dashboard.submittedCities", "Submitted cities")}
             data={claimCityData}
             emptyLabel={translate("dashboard.noClaimCityDataForSelectedFilters", "No submitted city data for the current filters.")}
             yAxisWidth={104}
+            maxRows={6}
+            compact
           />
           <div className="claim-action-row">
-            <a className="claim-action-row__link" href="/admin/claims">
+            <Link className="claim-action-row__link" href="/admin/claims" prefetch={false}>
               {translate("dashboard.viewAllClaims", "View all claims")}
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -351,9 +356,24 @@ export function AdminDashboardCharts({
         }
 
         .chart-card--claims {
-          gap: 8px;
+          gap: 6px;
           min-height: 0;
-          padding: 14px 16px 10px;
+          padding: 14px 16px 12px;
+        }
+
+        .chart-card--claims :global(.chart-header) {
+          gap: 10px;
+        }
+
+        .chart-card--claims :global(.chart-header span) {
+          font-size: 11px;
+          letter-spacing: 0.06em;
+        }
+
+        .chart-card--claims :global(.chart-header h2) {
+          margin-top: 4px;
+          font-size: 1rem;
+          line-height: 1.2;
         }
 
         .chart-frame {
@@ -364,7 +384,7 @@ export function AdminDashboardCharts({
         .claim-overview-grid {
           display: grid;
           grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.8fr);
-          gap: 14px;
+          gap: 16px;
           align-items: start;
         }
 
@@ -522,15 +542,16 @@ function ClaimElementTooltip({ active, payload, label }) {
   );
 }
 
-function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth, translateElementLabels = false }) {
+function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth, translateElementLabels = false, maxRows = 10, compact = false }) {
   const { translate } = useAdminI18n();
   const visibleData = Array.isArray(data)
-    ? data.slice(0, 10).map((item) => ({
+    ? data.slice(0, maxRows).map((item) => ({
         ...item,
         displayName: translateElementLabels ? translateKitchenElementLabel(item.name, translate) : item.name,
       }))
     : [];
-  const height = Math.max(170, visibleData.length * 40 + 42);
+  const rowHeight = compact ? 28 : 40;
+  const height = Math.max(compact ? 132 : 170, visibleData.length * rowHeight + (compact ? 26 : 42));
 
   return (
     <div className="claim-breakdown">
@@ -538,12 +559,12 @@ function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth, translateEle
       <div className="chart-frame">
         {visibleData.length ? (
           <ResponsiveContainer width="100%" height={height}>
-            <BarChart data={visibleData} layout="vertical" margin={{ top: 6, right: 10, left: 0, bottom: 0 }}>
+            <BarChart data={visibleData} layout="vertical" margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
               <CartesianGrid stroke={CHART_GRID} vertical={false} />
-              <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
-              <YAxis type="category" dataKey="displayName" width={yAxisWidth} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} tickFormatter={(value) => truncateLabel(value, 24)} />
+              <XAxis type="number" allowDecimals={false} tickLine={false} axisLine={false} fontSize={compact ? 10 : 12} tick={{ fill: CHART_MUTED }} />
+              <YAxis type="category" dataKey="displayName" width={yAxisWidth} tickLine={false} axisLine={false} fontSize={compact ? 10 : 12} tick={{ fill: CHART_MUTED }} tickFormatter={(value) => truncateLabel(value, compact ? 20 : 24)} />
               <Tooltip content={<ClaimElementTooltip />} />
-              <Bar dataKey="claims" name={translate("dashboard.claims", "Claims")} fill="#8C6D4F" radius={[0, 6, 6, 0]} barSize={48} />
+              <Bar dataKey="claims" name={translate("dashboard.claims", "Claims")} fill="#8C6D4F" radius={[0, 5, 5, 0]} barSize={compact ? 24 : 48} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -561,9 +582,9 @@ function ClaimBreakdownChart({ title, data, emptyLabel, yAxisWidth, translateEle
         }
 
         h3 {
-          margin: 0 0 6px;
+          margin: 0 0 4px;
           color: var(--color-text);
-          font-size: 15px;
+          font-size: ${compact ? "13px" : "15px"};
           font-weight: 800;
         }
       `}</style>
@@ -702,11 +723,11 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
                 )}
               </AdminSelect>
             </label>
-            <a className="panel-link" href={selectedCompany ? `/admin/property-owners/${selectedCompany.id}` : "/admin/property-owners"}>
+            <Link className="panel-link" href={selectedCompany ? `/admin/property-owners/${selectedCompany.id}` : "/admin/property-owners"} prefetch={false}>
               {selectedCompany
                 ? translate("dashboard.openCompanyWorkspace", "Open company workspace")
                 : translate("dashboard.manageOwners", "Manage owners")}
-            </a>
+            </Link>
           </div>
         )}
       />
@@ -1202,11 +1223,11 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
                 )}
               </AdminSelect>
             </label>
-            <a className="panel-link" href={selectedProject ? `/admin/property-owners/${selectedProject.housingCompanyId}` : "/admin/property-owners"}>
+            <Link className="panel-link" href={selectedProject ? `/admin/property-owners/${selectedProject.housingCompanyId}` : "/admin/property-owners"} prefetch={false}>
               {selectedProject
                 ? translate("dashboard.openCompanyWorkspace", "Open company workspace")
                 : translate("dashboard.manageOwners", "Manage owners")}
-            </a>
+            </Link>
           </div>
         )}
       />

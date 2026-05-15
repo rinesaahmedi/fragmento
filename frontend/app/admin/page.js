@@ -7,6 +7,7 @@ import { prisma } from "../../lib/prisma";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../lib/service-claim-problem-description";
 import { stripProductDimensionsFromLabel } from "../../lib/product-label-format";
 import { Prisma } from "@prisma/client";
+import { cache } from "react";
 
 export const dynamic = "force-dynamic";
 
@@ -879,7 +880,7 @@ async function loadPropertyOwnerAnalytics({ startDate, kitchenId, status }) {
   };
 }
 
-async function hasKitchenItemArticleNumberColumn() {
+const hasKitchenItemArticleNumberColumn = cache(async function hasKitchenItemArticleNumberColumn() {
   const rows = await prisma.$queryRaw`
     SELECT 1
     FROM information_schema.columns
@@ -890,7 +891,7 @@ async function hasKitchenItemArticleNumberColumn() {
   `;
 
   return rows.length > 0;
-}
+});
 
 export default async function AdminDashboardPage({ searchParams = {} }) {
   const admin = await requireAdminPage();

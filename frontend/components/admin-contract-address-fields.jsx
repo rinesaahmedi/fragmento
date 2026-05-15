@@ -1,7 +1,5 @@
 "use client";
 
-"use client";
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAdminI18n } from "./admin-i18n";
 import AdminSelect from "./admin-select";
@@ -234,7 +232,7 @@ export default function AdminContractAddressFields({
         }
 
         return buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.IDLE, {
-          message: "Address changed. Verify it again before saving the contract.",
+          message: translate("contractAddressFields.addressChangedVerifyAgain", "Address changed. Verify it again before saving."),
         });
       });
     };
@@ -268,7 +266,7 @@ export default function AdminContractAddressFields({
 
         event.preventDefault();
         return buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.INVALID, {
-          message: "Verify the contract address before submitting this form.",
+          message: translate("contractAddressFields.verifyAddressBeforeSubmitting", "Verify the address before submitting this form."),
         });
       });
     };
@@ -291,6 +289,7 @@ export default function AdminContractAddressFields({
     initialSnapshotKey,
     postalCodeFieldName,
     referenceFieldName,
+    translate,
   ]);
 
   async function handleVerifyAddress() {
@@ -302,8 +301,8 @@ export default function AdminContractAddressFields({
       setAddressVerification(
         buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.INVALID, {
           message: isObjectAddress
-            ? "Enter object name, country, city, and postal code before verification."
-            : "Enter contract number, country, city, and postal code before verification.",
+            ? translate("contractAddressFields.objectAddressMissingFields", "Enter object name, country, city, and postal code before verification.")
+            : translate("contractAddressFields.contractAddressMissingFields", "Enter contract number, country, city, and postal code before verification."),
         }),
       );
       return;
@@ -311,7 +310,9 @@ export default function AdminContractAddressFields({
 
     setAddressVerification(
       buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.LOADING, {
-        message: isObjectAddress ? "Verifying object address..." : "Verifying contract address...",
+        message: isObjectAddress
+          ? translate("contractAddressFields.verifyingObjectAddress", "Verifying address...")
+          : translate("contractAddressFields.verifyingAddress", "Verifying address..."),
       }),
     );
 
@@ -326,7 +327,7 @@ export default function AdminContractAddressFields({
       if (payload.status === ADDRESS_VERIFICATION_STATUS.VALID && payload.verification) {
         setAddressVerification(
           buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.VALID, {
-            message: payload.message || "Address is valid.",
+            message: translate("contractAddressFields.addressIsValid", "Address is valid."),
             suggestion: payload.suggestion || "",
             verification: payload.verification,
           }),
@@ -336,14 +337,14 @@ export default function AdminContractAddressFields({
 
       setAddressVerification(
         buildAddressVerificationState(payload.status || ADDRESS_VERIFICATION_STATUS.INVALID, {
-          message: payload.message || "Address verification failed.",
+          message: translate("contractAddressFields.addressVerificationFailed", "Address verification failed."),
           suggestion: payload.suggestion || "",
         }),
       );
-    } catch (error) {
+    } catch {
       setAddressVerification(
         buildAddressVerificationState(ADDRESS_VERIFICATION_STATUS.SERVICE_UNAVAILABLE, {
-          message: error.message || "The address verification service is unavailable right now.",
+          message: translate("contractAddressFields.addressVerificationUnavailable", "The address verification service is unavailable right now."),
         }),
       );
     }

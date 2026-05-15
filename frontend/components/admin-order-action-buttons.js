@@ -26,7 +26,15 @@ function getActionMessage(translate, intent, pendingKey, pendingFallback) {
   return messageByIntent[intent] || translate("orderDetailAdmin.processing", "Processing...");
 }
 
-export function OrderActionButton({ intent, style, children, pendingKey = "orderDetailAdmin.processing", pendingFallback = "Processing..." }) {
+export function OrderActionButton({
+  intent,
+  style,
+  children,
+  pendingKey = "orderDetailAdmin.processing",
+  pendingFallback = "Processing...",
+  confirmKey,
+  confirmFallback,
+}) {
   const { pending, data } = useFormStatus();
   const { translate } = useAdminI18n();
   const [clickedIntent, setClickedIntent] = useState(null);
@@ -39,6 +47,12 @@ export function OrderActionButton({ intent, style, children, pendingKey = "order
     const form = button.form;
 
     if (!form || clickedIntent) return;
+    const confirmMessage = confirmKey ? translate(confirmKey, confirmFallback || "") : confirmFallback;
+
+    if (confirmMessage && !window.confirm(confirmMessage)) {
+      event.preventDefault();
+      return;
+    }
 
     event.preventDefault();
     setClickedIntent(intent);

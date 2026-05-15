@@ -2,8 +2,8 @@ import Link from "next/link";
 import {
   AdminSection,
   FlashMessage,
-  dangerButtonStyle,
   inputStyle,
+  itemCardStyle,
   pageGridStyle,
   tableStyle,
   tableWrapStyle,
@@ -11,8 +11,10 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
-import { AdminText } from "../../../components/admin-i18n";
+import { AdminDateTime, AdminPluralText, AdminText, AdminTranslatedInput } from "../../../components/admin-i18n";
 import AdminSelect from "../../../components/admin-select";
+import AdminConfirmSubmitButton from "../../../components/admin-confirm-submit-button";
+import { AdminClaimLocalizedText } from "../../../components/admin-claim-localized-text";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
@@ -25,15 +27,12 @@ function normalizeParam(value) {
   return value || "";
 }
 
-function formatDate(value) {
-  return new Intl.DateTimeFormat("de-DE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
 function formatContact(claim) {
   return [claim.phone, claim.email].filter(Boolean).join(" / ");
+}
+
+function formatClaimCustomerName(value) {
+  return String(value || "").replace(/\s*\((female|male|diverse|other)\)\s*$/i, "").trim();
 }
 
 function truncate(value, max = 140) {
@@ -65,9 +64,13 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
         <AdminSection
           title={<AdminText i18nKey="claimsAdmin.claims" fallback="Claims" />}
           description={
-            <>
-              {claims.length} <AdminText i18nKey="claimsAdmin.claimsMatchCurrentFilters" fallback="claim(s) match the current filters." />
-            </>
+            <AdminPluralText
+              count={claims.length}
+              singularKey="claimsAdmin.claimMatchesCurrentFilters"
+              pluralKey="claimsAdmin.claimsMatchCurrentFilters"
+              singularFallback="{count} claim matches the current filters."
+              pluralFallback="{count} claims match the current filters."
+            />
           }
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
@@ -79,17 +82,18 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
               <span style={filterHintStyle}>
                 <AdminText
                   i18nKey="claimsAdmin.filterClaimsByContractNameContactIssueAndDate"
-                  fallback="Filter claims by contract, name, contact info, issue text, and date."
+                  fallback="Filter by customer, contract, product, issue, status, or date."
                 />
               </span>
             </div>
             <div style={filterGridStyle}>
               <label style={filterFieldStyle}>
                 <span><AdminText i18nKey="contractsAdmin.search" fallback="Search" /></span>
-                <input
+                <AdminTranslatedInput
                   name="q"
                   defaultValue={filters.q}
-                  placeholder="Vertrag, Name, Telefon, E-Mail, Problem..."
+                  placeholderKey="claimsAdmin.searchPlaceholder"
+                  placeholderFallback="Search by contract, name, phone, email, issue..."
                   style={filterInputStyle}
                 />
               </label>
@@ -121,12 +125,12 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract" /></th>
+                  <th style={thStyle}><AdminText i18nKey="claimsAdmin.claim" fallback="Claim" /></th>
                   <th style={thStyle}><AdminText i18nKey="claimsAdmin.customer" fallback="Customer" /></th>
                   <th style={thStyle}><AdminText i18nKey="claimsAdmin.contact" fallback="Contact" /></th>
                   <th style={thStyle}><AdminText i18nKey="claimsAdmin.serialNumber" fallback="Serial number" /></th>
                   <th style={thStyle}><AdminText i18nKey="claimsAdmin.issue" fallback="Issue" /></th>
-                  <th style={thStyle}><AdminText i18nKey="claimsAdmin.created" fallback="Created" /></th>
+                  <th className="claims-table-date" style={thStyle}><AdminText i18nKey="claimsAdmin.createdAt" fallback="Created" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
@@ -139,20 +143,22 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                   </tr>
                 ) : null}
                 {claims.map((claim) => (
-                  <tr key={claim.id}>
+                  <tr key={claim.id} className="claims-table-row">
                     <td style={tdStyle}>
                       <strong>{claim.contractNumber}</strong>
                       <div style={rowMetaStyle}><ClaimRequestTypeText requestType={claim.requestType} /></div>
                     </td>
                     <td style={tdStyle}>
-                      <div>{claim.fullName}</div>
+                      <div style={customerNameStyle}>{formatClaimCustomerName(claim.fullName)}</div>
                       <div style={rowMetaStyle}>{truncate(claim.clientAddress || claim.landlordContact, 90)}</div>
                     </td>
-                    <td style={tdStyle}>{formatContact(claim) || <AdminText i18nKey="claimsAdmin.noContactProvided" fallback="No contact provided" />}</td>
+                    <td style={tdStyle}><span style={mutedValueStyle}>{formatContact(claim) || <AdminText i18nKey="claimsAdmin.noContactProvided" fallback="No contact provided" />}</span></td>
                     <td style={tdStyle}>{claim.serialNumber}</td>
-                    <td style={tdStyle}>{truncate(claim.problemDescription, 160)}</td>
-                    <td style={tdStyle}>{formatDate(claim.createdAt)}</td>
-                    <td style={{ ...tdStyle, width: 180 }}>
+                    <td style={tdStyle}>
+                      <AdminClaimLocalizedText text={truncate(claim.problemDescription, 220)} style={issueClampStyle} />
+                    </td>
+                    <td className="claims-table-date" style={tdStyle}><AdminDateTime value={claim.createdAt} /></td>
+                    <td style={{ ...tdStyle, width: 220 }}>
                       <div style={actionCellStyle}>
                         <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
                           <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
@@ -165,6 +171,73 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
               </tbody>
             </table>
           </div>
+
+          <div className="admin-claims-cards" style={{ display: "none", gap: 12 }}>
+            {!claims.length ? <p style={{ margin: 0, color: "var(--app-text-muted)" }}><AdminText i18nKey="claimsAdmin.noClaimsFound" fallback="No claims found." /></p> : null}
+            {claims.map((claim) => (
+              <article key={claim.id} style={itemCardStyle}>
+                <div style={{ display: "grid", gap: 10 }}>
+                  <div>
+                    <strong>
+                      <AdminText i18nKey="claimsAdmin.claim" fallback="Claim" /> {claim.contractNumber}
+                    </strong>
+                    <div style={rowMetaStyle}>
+                      <ClaimRequestTypeText requestType={claim.requestType} /> · <AdminText i18nKey="claimsAdmin.createdAt" fallback="Created" /> <AdminDateTime value={claim.createdAt} />
+                    </div>
+                  </div>
+                  <div>
+                    <div style={customerNameStyle}>{formatClaimCustomerName(claim.fullName)}</div>
+                    <div style={rowMetaStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract" /> {claim.contractNumber}</div>
+                  </div>
+                  <AdminClaimLocalizedText text={truncate(claim.problemDescription, 160)} style={issueClampStyle} />
+                  <div style={actionCellStyle}>
+                    <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
+                      <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
+                    </Link>
+                    <DeleteClaimAction claimId={claim.id} compact />
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <style>{`
+            .admin-claims-cards {
+              display: none;
+            }
+
+            .claims-table-row {
+              transition: background 160ms ease;
+            }
+
+            .claims-table-row:hover {
+              background: rgba(143, 62, 44, 0.045);
+            }
+
+            .admin-claims-table a:focus-visible,
+            .admin-claims-cards a:focus-visible,
+            .admin-claims-table button:focus-visible,
+            .admin-claims-cards button:focus-visible {
+              outline: 3px solid rgba(143, 62, 44, 0.24);
+              outline-offset: 2px;
+            }
+
+            @media (max-width: 980px) {
+              .claims-table-date {
+                display: none;
+              }
+            }
+
+            @media (max-width: 760px) {
+              .admin-claims-table {
+                display: none;
+              }
+
+              .admin-claims-cards {
+                display: grid !important;
+              }
+            }
+          `}</style>
 
         </AdminSection>
       </div>
@@ -193,16 +266,17 @@ function ClaimRequestTypeText({ requestType }) {
 
 function DeleteClaimAction({ claimId, compact = false }) {
   return (
-    <details style={compact ? cardDeleteDetailsStyle : tableDeleteDetailsStyle}>
-      <summary style={deleteSummaryStyle}>
+    <form action={`/api/admin/claims/${claimId}`} method="post" style={deleteFormStyle}>
+      <AdminConfirmSubmitButton
+        name="_intent"
+        value="delete"
+        style={compact ? compactDeleteButtonStyle : deleteButtonStyle}
+        confirmKey="claimsAdmin.deleteConfirmMessage"
+        confirmFallback={"Delete this claim?\nThis action cannot be undone."}
+      >
         <AdminText i18nKey="ordersAdmin.delete" fallback="Delete" />
-      </summary>
-      <form action={`/api/admin/claims/${claimId}`} method="post" style={deleteFormStyle}>
-        <button type="submit" name="_intent" value="delete" style={deleteButtonStyle}>
-          <AdminText i18nKey="ordersAdmin.confirmDelete" fallback="Confirm delete" />
-        </button>
-      </form>
-    </details>
+      </AdminConfirmSubmitButton>
+    </form>
   );
 }
 
@@ -214,9 +288,18 @@ const rowMetaStyle = {
 };
 
 const detailsLinkStyle = {
-  color: "var(--app-accent)",
+  border: "1px solid var(--color-primary)",
+  borderRadius: 8,
+  background: "var(--color-primary)",
+  color: "var(--app-accent-contrast)",
   textDecoration: "none",
-  fontWeight: 700,
+  fontWeight: 800,
+  minHeight: 38,
+  padding: "9px 12px",
+  display: "inline-flex",
+  alignItems: "center",
+  whiteSpace: "nowrap",
+  fontSize: 13,
 };
 
 const actionCellStyle = {
@@ -226,31 +309,42 @@ const actionCellStyle = {
   flexWrap: "wrap",
 };
 
-const tableDeleteDetailsStyle = {
-  display: "grid",
-  gap: 8,
-  justifyItems: "start",
-};
-
-const cardDeleteDetailsStyle = {
-  display: "grid",
-  gap: 8,
-};
-
-const deleteSummaryStyle = {
-  color: "var(--app-danger-text)",
-  cursor: "pointer",
-  fontSize: 13,
-  fontWeight: 800,
-};
-
 const deleteFormStyle = {
-  paddingTop: 8,
+  margin: 0,
 };
 
 const deleteButtonStyle = {
-  ...dangerButtonStyle,
+  border: "1px solid rgba(217, 92, 92, 0.24)",
+  borderRadius: 8,
+  background: "rgba(255,255,255,0.72)",
+  color: "var(--app-danger-text)",
   minHeight: 38,
+  padding: "9px 12px",
+  fontSize: 13,
+  fontWeight: 800,
+  cursor: "pointer",
+  boxShadow: "none",
+  whiteSpace: "nowrap",
+};
+
+const compactDeleteButtonStyle = {
+  ...deleteButtonStyle,
+};
+
+const customerNameStyle = {
+  fontWeight: 800,
+};
+
+const mutedValueStyle = {
+  color: "var(--app-text-muted)",
+};
+
+const issueClampStyle = {
+  display: "-webkit-box",
+  WebkitLineClamp: 2,
+  WebkitBoxOrient: "vertical",
+  overflow: "hidden",
+  lineHeight: 1.5,
 };
 
 const filterGridStyle = {
