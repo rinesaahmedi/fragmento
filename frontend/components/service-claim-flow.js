@@ -168,10 +168,11 @@ const COPY = {
     hausmeisterEmailPlaceholder: "hausmeister@beispiel.de",
     problemDescription: "Problembeschreibung in Stichworten",
     problemPlaceholder: "Beschreibe das Problem kurz",
-    serialNumber: "Seriennummer des E-Ger\u00e4tes",
-    serialPlaceholder: "Seriennummer",
-    serialNumberImage: "Foto der Seriennummer",
-    serialNumberImageHint: "",
+    serialNumber: "Seriennummer(n) des E-Ger\u00e4tes",
+    serialPlaceholder: "Seriennummer eingeben",
+    serialNumberAdd: "Hinzuf\u00fcgen",
+    serialNumberRequired: "Bitte gib mindestens eine Seriennummer ein oder lade ein Foto der Seriennummer hoch.",
+    serialNumberImage: "Foto der Seriennummer(n)",
     attachments: "Anh\u00e4nge (optional)",
     attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 5 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
@@ -206,6 +207,12 @@ const COPY = {
     claimAssistantPlaceholder: "Frage zu dieser Reklamation stellen...",
     claimAssistantLoading: "Hinweise werden vorbereitet...",
     claimAssistantSend: "Senden",
+    claimAssistantVoiceStart: "Sprachchat starten",
+    claimAssistantVoiceStop: "Zuhören beenden",
+    claimAssistantVoiceListening: "Ich höre zu...",
+    claimAssistantVoiceUnsupported: "Sprachchat wird in diesem Browser nicht unterstützt.",
+    claimAssistantVoicePermission: "Mikrofonfreigabe wird für den Sprachchat benötigt.",
+    claimAssistantVoiceError: "Die Spracheingabe konnte nicht gestartet werden.",
     claimAssistantErrorUnavailable: "Die Reklamationshilfe konnte dazu gerade keine Antwort geben.",
   },
   en: {
@@ -292,10 +299,11 @@ const COPY = {
     hausmeisterEmailPlaceholder: "manager@example.com",
     problemDescription: "Problem description",
     problemPlaceholder: "Describe the issue briefly",
-    serialNumber: "Serial number of the appliance",
-    serialPlaceholder: "Serial number",
-    serialNumberImage: "Photo of the serial number",
-    serialNumberImageHint: "",
+    serialNumber: "Serial number(s) of the appliance",
+    serialPlaceholder: "Enter a serial number",
+    serialNumberAdd: "Add",
+    serialNumberRequired: "Please enter at least one serial number or upload a photo of the serial number.",
+    serialNumberImage: "Photo of the serial number(s)",
     attachments: "Attachments (optional)",
     attachmentsHint: "PDFs, images, or office files \u2014 up to 5 files, 4 MB each.",
     attachmentsClear: "Remove all",
@@ -330,6 +338,12 @@ const COPY = {
     claimAssistantPlaceholder: "Ask about this claim...",
     claimAssistantLoading: "Preparing suggestions...",
     claimAssistantSend: "Send",
+    claimAssistantVoiceStart: "Start voice chat",
+    claimAssistantVoiceStop: "Stop listening",
+    claimAssistantVoiceListening: "Listening...",
+    claimAssistantVoiceUnsupported: "Voice chat is not supported in this browser.",
+    claimAssistantVoicePermission: "Microphone permission is needed to use voice chat.",
+    claimAssistantVoiceError: "Voice input could not be started.",
     claimAssistantErrorUnavailable: "The claim helper could not answer that right now.",
   },
   tr: {
@@ -416,10 +430,11 @@ const COPY = {
     hausmeisterEmailPlaceholder: "gorevli@example.com",
     problemDescription: "Sorun a\u00e7\u0131klamas\u0131",
     problemPlaceholder: "Sorunu k\u0131saca a\u00e7\u0131klay\u0131n",
-    serialNumber: "Cihaz seri numaras\u0131",
-    serialPlaceholder: "Seri numaras\u0131",
-    serialNumberImage: "Seri numaras\u0131n\u0131n foto\u011fraf\u0131",
-    serialNumberImageHint: "",
+    serialNumber: "Cihaz seri numaras\u0131 / numaralar\u0131",
+    serialPlaceholder: "Bir seri numaras\u0131 girin",
+    serialNumberAdd: "Ekle",
+    serialNumberRequired: "L\u00fctfen en az bir seri numaras\u0131 girin veya seri numaras\u0131n\u0131n foto\u011fraf\u0131n\u0131 y\u00fckleyin.",
+    serialNumberImage: "Seri numaras\u0131 / numaralar\u0131 foto\u011fraf\u0131",
     attachments: "Ekler (iste\u011fe ba\u011fl\u0131)",
     attachmentsHint: "PDF, g\u00f6rsel veya ofis dosyalar\u0131 \u2014 en fazla 5 dosya, dosya ba\u015f\u0131na en fazla 4 MB.",
     attachmentsClear: "T\u00fcm\u00fcn\u00fc kald\u0131r",
@@ -517,10 +532,11 @@ const COPY = {
     hausmeisterEmailPlaceholder: "encargado@ejemplo.com",
     problemDescription: "Descripci\u00f3n del problema",
     problemPlaceholder: "Describa brevemente el problema",
-    serialNumber: "N\u00famero de serie del electrodom\u00e9stico",
-    serialPlaceholder: "N\u00famero de serie",
-    serialNumberImage: "Foto del n\u00famero de serie",
-    serialNumberImageHint: "",
+    serialNumber: "N\u00famero(s) de serie del electrodom\u00e9stico",
+    serialPlaceholder: "Introduzca un n\u00famero de serie",
+    serialNumberAdd: "A\u00f1adir",
+    serialNumberRequired: "Introduzca al menos un n\u00famero de serie o suba una foto del n\u00famero de serie.",
+    serialNumberImage: "Foto del n\u00famero o de los n\u00fameros de serie",
     attachments: "Adjuntos (opcional)",
     attachmentsHint: "PDF, im\u00e1genes u oficina: hasta 5 archivos, 4 MB cada uno.",
     attachmentsClear: "Quitar todos",
@@ -618,10 +634,11 @@ const COPY = {
     hausmeisterEmailPlaceholder: "gardien@exemple.com",
     problemDescription: "Description du probl\u00e8me",
     problemPlaceholder: "D\u00e9crivez bri\u00e8vement le probl\u00e8me",
-    serialNumber: "Num\u00e9ro de s\u00e9rie de l'appareil",
-    serialPlaceholder: "Num\u00e9ro de s\u00e9rie",
-    serialNumberImage: "Photo du num\u00e9ro de s\u00e9rie",
-    serialNumberImageHint: "",
+    serialNumber: "Num\u00e9ro(s) de s\u00e9rie de l'appareil",
+    serialPlaceholder: "Saisissez un num\u00e9ro de s\u00e9rie",
+    serialNumberAdd: "Ajouter",
+    serialNumberRequired: "Veuillez saisir au moins un num\u00e9ro de s\u00e9rie ou envoyer une photo du num\u00e9ro de s\u00e9rie.",
+    serialNumberImage: "Photo du ou des num\u00e9ros de s\u00e9rie",
     attachments: "Pi\u00e8ces jointes (facultatif)",
     attachmentsHint: "PDF, images ou bureautique : jusqu'\u00e0 5 fichiers, 4 Mo chacun.",
     attachmentsClear: "Tout retirer",
@@ -719,10 +736,11 @@ const COPY = {
     hausmeisterEmailPlaceholder: "hausmeister@example.com",
     problemDescription: "\u041e\u043f\u0438\u0441\u0430\u043d\u0438\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b",
     problemPlaceholder: "\u041a\u0440\u0430\u0442\u043a\u043e \u043e\u043f\u0438\u0448\u0438\u0442\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0443",
-    serialNumber: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0430",
-    serialPlaceholder: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
-    serialNumberImage: "\u0424\u043e\u0442\u043e \u0441\u0435\u0440\u0438\u0439\u043d\u043e\u0433\u043e \u043d\u043e\u043c\u0435\u0440\u0430",
-    serialNumberImageHint: "",
+    serialNumber: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 / \u043d\u043e\u043c\u0435\u0440\u0430 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0430",
+    serialPlaceholder: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
+    serialNumberAdd: "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c",
+    serialNumberRequired: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0445\u043e\u0442\u044f \u0431\u044b \u043e\u0434\u0438\u043d \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0438\u043b\u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0444\u043e\u0442\u043e \u0448\u0438\u043b\u044c\u0434\u0438\u043a\u0430.",
+    serialNumberImage: "\u0424\u043e\u0442\u043e \u0441\u0435\u0440\u0438\u0439\u043d\u043e\u0433\u043e \u043d\u043e\u043c\u0435\u0440\u0430 / \u043d\u043e\u043c\u0435\u0440\u043e\u0432",
     attachments: "\u0412\u043b\u043e\u0436\u0435\u043d\u0438\u044f (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     attachmentsHint: "PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f \u0438\u043b\u0438 \u043e\u0444\u0438\u0441\u043d\u044b\u0435 \u0444\u0430\u0439\u043b\u044b \u2014 \u0434\u043e 5 \u0444\u0430\u0439\u043b\u043e\u0432, \u0434\u043e 4 \u041c\u0411 \u043a\u0430\u0436\u0434\u044b\u0439.",
     attachmentsClear: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u0441\u0435",
@@ -800,6 +818,21 @@ function formatShortAvailabilityDate(value) {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
+function normalizeSerialNumberList(value) {
+  return String(value || "")
+    .split(/\r?\n|,|;/)
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .join(", ");
+}
+
+function parseSerialNumberList(value) {
+  return String(value || "")
+    .split(/\r?\n|,|;/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 export default function ServiceClaimFlow() {
   const [language, setLanguage] = useState("de");
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -820,11 +853,17 @@ export default function ServiceClaimFlow() {
   const [claimAssistantMessages, setClaimAssistantMessages] = useState(EMPTY_CLAIM_ASSISTANT_MESSAGES);
   const [claimAssistantQuestion, setClaimAssistantQuestion] = useState("");
   const [isClaimAssistantLoading, setIsClaimAssistantLoading] = useState(false);
+  const [isClaimAssistantVoiceSupported, setIsClaimAssistantVoiceSupported] = useState(false);
+  const [isClaimAssistantListening, setIsClaimAssistantListening] = useState(false);
+  const [claimAssistantVoiceError, setClaimAssistantVoiceError] = useState("");
   const [selectedClaimAssistantContextKey, setSelectedClaimAssistantContextKey] = useState("claim");
+  const [serialNumberDraft, setSerialNumberDraft] = useState("");
   const languageMenuRef = useRef(null);
   const contractLookupTimeoutRef = useRef(null);
   const contractLookupRequestIdRef = useRef(0);
   const contractHelpTouchXRef = useRef(null);
+  const claimAssistantRecognitionRef = useRef(null);
+  const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
@@ -881,6 +920,10 @@ export default function ServiceClaimFlow() {
     selectedClaimAssistantContext?.type === "area"
       ? t("claimAssistantIntroSelected").replace("{label}", selectedClaimAssistantContext.label)
       : t("claimAssistantIntro");
+  const serialNumberEntries = useMemo(
+    () => parseSerialNumberList(formValues.serialNumber),
+    [formValues.serialNumber],
+  );
 
   function t(key) {
     if (Object.prototype.hasOwnProperty.call(copy, key)) {
@@ -944,9 +987,41 @@ export default function ServiceClaimFlow() {
       setIsClaimAssistantOpen(false);
       setClaimAssistantQuestion("");
       setIsClaimAssistantLoading(false);
+      setIsClaimAssistantListening(false);
+      setClaimAssistantVoiceError("");
       setSelectedClaimAssistantContextKey("claim");
     }
   }, [isComplaintMode]);
+
+  useEffect(() => {
+    if (isClaimAssistantOpen) {
+      return;
+    }
+    claimAssistantRecognitionRef.current?.abort?.();
+    window.speechSynthesis?.cancel?.();
+    setIsClaimAssistantListening(false);
+    setClaimAssistantVoiceError("");
+  }, [isClaimAssistantOpen]);
+
+  useEffect(() => {
+    const SpeechRecognition =
+      typeof window === "undefined" ? null : window.SpeechRecognition || window.webkitSpeechRecognition;
+    setIsClaimAssistantVoiceSupported(Boolean(SpeechRecognition && window?.speechSynthesis));
+
+    const stopClaimAssistantVoice = () => {
+      claimAssistantRecognitionRef.current?.abort?.();
+      window.speechSynthesis?.cancel?.();
+    };
+
+    window.addEventListener("beforeunload", stopClaimAssistantVoice);
+    window.addEventListener("pagehide", stopClaimAssistantVoice);
+
+    return () => {
+      stopClaimAssistantVoice();
+      window.removeEventListener("beforeunload", stopClaimAssistantVoice);
+      window.removeEventListener("pagehide", stopClaimAssistantVoice);
+    };
+  }, []);
 
   useEffect(() => {
     if (claimAssistantContextOptions.some((option) => option.key === selectedClaimAssistantContextKey)) {
@@ -1150,6 +1225,32 @@ export default function ServiceClaimFlow() {
     setError("");
   }
 
+  function syncSerialNumberEntries(entries) {
+    handleFieldChange("serialNumber", normalizeSerialNumberList(entries.join("\n")));
+  }
+
+  function addSerialNumberEntry(rawValue = serialNumberDraft) {
+    const nextEntry = String(rawValue || "").trim();
+    if (!nextEntry) {
+      return;
+    }
+
+    const alreadyExists = serialNumberEntries.some(
+      (entry) => entry.toLowerCase() === nextEntry.toLowerCase(),
+    );
+    if (alreadyExists) {
+      setSerialNumberDraft("");
+      return;
+    }
+
+    syncSerialNumberEntries([...serialNumberEntries, nextEntry]);
+    setSerialNumberDraft("");
+  }
+
+  function removeSerialNumberEntry(index) {
+    syncSerialNumberEntries(serialNumberEntries.filter((_, entryIndex) => entryIndex !== index));
+  }
+
   function goContractHelpPrev() {
     setContractHelpSlide((s) => Math.max(0, s - 1));
   }
@@ -1214,17 +1315,52 @@ export default function ServiceClaimFlow() {
     return `${description}\n\nErreichbarkeit: ${availability}`.trim();
   }
 
-  async function handleClaimAssistantSubmit(event) {
-    event.preventDefault();
-    const question = claimAssistantQuestion.trim();
+  function getClaimAssistantSpeechLanguage() {
+    if (language === "de") return "de-DE";
+    if (language === "tr") return "tr-TR";
+    if (language === "es") return "es-ES";
+    if (language === "fr") return "fr-FR";
+    if (language === "ru") return "ru-RU";
+    return "en-US";
+  }
+
+  function formatClaimAssistantSpokenText(text) {
+    return String(text || "")
+      .replace(/\s+([,.;:!?])/g, "$1")
+      .replace(/[ \t]{2,}/g, " ")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+  }
+
+  function speakClaimAssistantAnswer(text) {
+    const answer = formatClaimAssistantSpokenText(text);
+    if (!answer || !window.speechSynthesis) {
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(answer);
+    utterance.lang = getClaimAssistantSpeechLanguage();
+    utterance.rate = 0.96;
+    window.speechSynthesis.speak(utterance);
+  }
+
+  async function submitClaimAssistantQuestion(rawQuestion, options = {}) {
+    const question = String(rawQuestion || "").trim();
     if (!question || isClaimAssistantLoading) {
       return;
     }
 
     const nextUserMessage = { role: "user", text: question };
+    const nextConversationMessages = claimAssistantMessages
+      .filter((message) => message?.role && message?.text)
+      .slice(-6)
+      .map((message) => ({ role: message.role, text: message.text }));
+
     setClaimAssistantMessages((current) => [...current, nextUserMessage]);
     setClaimAssistantQuestion("");
     setIsClaimAssistantLoading(true);
+    setClaimAssistantVoiceError("");
 
     try {
       const response = await fetch("/api/service-claims/assistant", {
@@ -1236,7 +1372,7 @@ export default function ServiceClaimFlow() {
           language,
           question,
           context: selectedClaimAssistantContext,
-          conversationMessages: claimAssistantMessages,
+          conversationMessages: nextConversationMessages,
           selectedAreas: selectedProblemAreas.map((area) => ({
             componentId: area.componentId,
             code: area.code,
@@ -1256,15 +1392,32 @@ export default function ServiceClaimFlow() {
         }),
       });
 
-      const payload = await response.json();
+      const responseText = await response.text();
+      let payload = {};
+      try {
+        payload = responseText ? JSON.parse(responseText) : {};
+      } catch {
+        throw new Error(t("claimAssistantErrorUnavailable"));
+      }
       if (!response.ok) {
         throw new Error(payload.error || t("claimAssistantErrorUnavailable"));
       }
 
+      if (payload.language && payload.language !== language) {
+        setLanguage(payload.language);
+      }
+
       setClaimAssistantMessages((current) => [
         ...current,
-        { role: "assistant", text: payload.answer || t("claimAssistantErrorUnavailable") },
+        {
+          role: "assistant",
+          text: payload.answer || t("claimAssistantErrorUnavailable"),
+          ...(Array.isArray(payload.actions) && payload.actions.length ? { actions: payload.actions } : {}),
+        },
       ]);
+      if (options.speakAnswer) {
+        speakClaimAssistantAnswer(payload.answer || t("claimAssistantErrorUnavailable"));
+      }
     } catch (assistantError) {
       setClaimAssistantMessages((current) => [
         ...current,
@@ -1273,6 +1426,96 @@ export default function ServiceClaimFlow() {
     } finally {
       setIsClaimAssistantLoading(false);
     }
+  }
+
+  async function handleClaimAssistantSubmit(event) {
+    event.preventDefault();
+    if (isClaimAssistantListening) {
+      claimAssistantRecognitionRef.current?.stop?.();
+      return;
+    }
+    const question = claimAssistantQuestion.trim();
+    const lastVoiceSubmit = claimAssistantLastVoiceSubmitRef.current;
+    if (
+      question
+      && lastVoiceSubmit.text === question
+      && Date.now() - lastVoiceSubmit.submittedAt < 4000
+    ) {
+      setClaimAssistantQuestion("");
+      return;
+    }
+    await submitClaimAssistantQuestion(question);
+  }
+
+  function toggleClaimAssistantVoice() {
+    if (isClaimAssistantListening) {
+      claimAssistantRecognitionRef.current?.stop?.();
+      setIsClaimAssistantListening(false);
+      return;
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition || !window.speechSynthesis) {
+      setClaimAssistantVoiceError(t("claimAssistantVoiceUnsupported"));
+      return;
+    }
+
+    if (isClaimAssistantLoading) {
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    const recognition = new SpeechRecognition();
+    claimAssistantRecognitionRef.current = recognition;
+    recognition.lang = getClaimAssistantSpeechLanguage();
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      setClaimAssistantVoiceError("");
+      setIsClaimAssistantListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      let transcript = "";
+      let isFinal = false;
+
+      for (let index = event.resultIndex; index < event.results.length; index += 1) {
+        transcript += event.results[index][0]?.transcript || "";
+        if (event.results[index].isFinal) {
+          isFinal = true;
+        }
+      }
+
+      const nextQuestion = transcript.trim();
+      if (!nextQuestion) {
+        return;
+      }
+
+      setClaimAssistantQuestion(nextQuestion);
+      if (isFinal) {
+        recognition.stop();
+        claimAssistantLastVoiceSubmitRef.current = { text: nextQuestion, submittedAt: Date.now() };
+        setClaimAssistantQuestion("");
+        submitClaimAssistantQuestion(nextQuestion, { speakAnswer: true });
+      }
+    };
+
+    recognition.onerror = (event) => {
+      const message =
+        event?.error === "not-allowed"
+          ? t("claimAssistantVoicePermission")
+          : t("claimAssistantVoiceError");
+      setClaimAssistantVoiceError(message);
+      setIsClaimAssistantListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsClaimAssistantListening(false);
+    };
+
+    recognition.start();
   }
 
   async function handleSubmit(event) {
@@ -1297,6 +1540,14 @@ export default function ServiceClaimFlow() {
 
     try {
       const formData = new FormData();
+      const normalizedSerialNumbers = normalizeSerialNumberList(
+        [formValues.serialNumber, serialNumberDraft].filter(Boolean).join("\n"),
+      );
+      if (!normalizedSerialNumbers && !serialNumberImage) {
+        setError(t("serialNumberRequired"));
+        setIsSubmitting(false);
+        return;
+      }
       const payload = {
         ...form,
         clientAddress: buildClientAddress(),
@@ -1304,6 +1555,8 @@ export default function ServiceClaimFlow() {
         clientCity: formValues.clientCity.trim(),
         clientPostalCode: formValues.clientPostalCode.trim(),
         problemDescription: buildSubmittedProblemDescription(),
+        serialNumber: normalizedSerialNumbers,
+        hasSerialNumberImage: serialNumberImage ? "true" : "false",
         language,
       };
       for (const [key, value] of Object.entries(payload)) {
@@ -1340,6 +1593,7 @@ export default function ServiceClaimFlow() {
 
       setSuccessMessage(payloadResponse.message || copy.submitSuccess);
       setForm(INITIAL_FORM);
+      setSerialNumberDraft("");
       setAttachments([]);
       setSerialNumberImage(null);
       setProblemComponentIds([]);
@@ -1853,25 +2107,54 @@ export default function ServiceClaimFlow() {
               <label className="service-field">
                 <span>
                   {copy.serialNumber}
-                  <RequiredFieldMark title={requiredFieldTitle} />
                 </span>
-                <input
-                  type="text"
-                  value={formValues.serialNumber}
-                  onChange={(event) => handleFieldChange("serialNumber", event.target.value)}
-                  placeholder={copy.serialPlaceholder}
-                  required
-                />
+                <div className="service-serial-field">
+                  <div className="service-serial-field__input-row">
+                    <input
+                      type="text"
+                      value={serialNumberDraft}
+                      onChange={(event) => setSerialNumberDraft(event.target.value)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") {
+                          event.preventDefault();
+                          addSerialNumberEntry();
+                        }
+                      }}
+                      placeholder={copy.serialPlaceholder}
+                    />
+                    <button
+                      type="button"
+                      className="service-button service-button--secondary service-serial-field__add"
+                      onClick={() => addSerialNumberEntry()}
+                      disabled={!serialNumberDraft.trim()}
+                    >
+                      {t("serialNumberAdd")}
+                    </button>
+                  </div>
+                  {serialNumberEntries.length ? (
+                    <ul className="service-serial-field__list">
+                      {serialNumberEntries.map((entry, index) => (
+                        <li key={`${entry}-${index}`} className="service-serial-field__item">
+                          <span className="service-serial-field__value">{entry}</span>
+                          <button
+                            type="button"
+                            className="service-serial-field__remove"
+                            onClick={() => removeSerialNumberEntry(index)}
+                            aria-label="Remove serial number"
+                          >
+                            &times;
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
               </label>
 
               <div className="service-field service-field--attachments">
                 <span>
                   {t("serialNumberImage")}
-                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
                 </span>
-                {t("serialNumberImageHint") ? (
-                  <p className="service-form__hint service-form__hint--attachments">{t("serialNumberImageHint")}</p>
-                ) : null}
                 <input
                   key={serialNumberImageFieldKey}
                   type="file"
@@ -2012,7 +2295,7 @@ export default function ServiceClaimFlow() {
                 ) : null}
                 {claimAssistantMessages.map((message, index) => (
                   <div
-                    key={`${message.role}-${index}-${message.text}`}
+                    key={`${message.role}-${index}-${message.text}-${message.actions?.map((a) => a.id).join(",") || ""}`}
                     className={[
                       "service-claim-agent__message",
                       message.role === "user"
@@ -2023,7 +2306,24 @@ export default function ServiceClaimFlow() {
                       .filter(Boolean)
                       .join(" ")}
                   >
-                    <span>{message.text}</span>
+                    <div className="service-claim-agent__message-stack">
+                      <span>{message.text}</span>
+                      {message.role === "assistant" && message.actions?.length ? (
+                        <div className="service-claim-agent__message-actions">
+                          {message.actions.map((action) => (
+                            <button
+                              key={action.id}
+                              type="button"
+                              className="service-claim-agent__action-chip"
+                              disabled={isClaimAssistantLoading}
+                              onClick={() => submitClaimAssistantQuestion(action.prompt || action.label)}
+                            >
+                              {action.label}
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 ))}
                 {isClaimAssistantLoading ? (
@@ -2042,13 +2342,45 @@ export default function ServiceClaimFlow() {
                   disabled={isClaimAssistantLoading}
                 />
                 <button
+                  type="button"
+                  className={`service-claim-agent__voice-button${isClaimAssistantListening ? " is-active" : ""}`}
+                  aria-label={
+                    isClaimAssistantListening
+                      ? t("claimAssistantVoiceStop")
+                      : t("claimAssistantVoiceStart")
+                  }
+                  aria-pressed={isClaimAssistantListening}
+                  title={
+                    isClaimAssistantListening
+                      ? t("claimAssistantVoiceListening")
+                      : t("claimAssistantVoiceStart")
+                  }
+                  onClick={toggleClaimAssistantVoice}
+                  disabled={!isClaimAssistantVoiceSupported || isClaimAssistantLoading}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 14.5a3 3 0 0 0 3-3v-5a3 3 0 1 0-6 0v5a3 3 0 0 0 3 3Z" />
+                    <path d="M18.5 11.5a6.5 6.5 0 0 1-13 0" />
+                    <path d="M12 18v3" />
+                    <path d="M9 21h6" />
+                  </svg>
+                </button>
+                <button
                   type="submit"
                   className="service-button service-button--primary"
-                  disabled={!claimAssistantQuestion.trim() || isClaimAssistantLoading}
+                  disabled={!claimAssistantQuestion.trim() || isClaimAssistantLoading || isClaimAssistantListening}
                 >
                   {t("claimAssistantSend")}
                 </button>
               </form>
+              {isClaimAssistantListening || claimAssistantVoiceError ? (
+                <div
+                  className="service-claim-agent__voice-status"
+                  role={claimAssistantVoiceError ? "alert" : "status"}
+                >
+                  {claimAssistantVoiceError || t("claimAssistantVoiceListening")}
+                </div>
+              ) : null}
             </div>
           ) : null}
 

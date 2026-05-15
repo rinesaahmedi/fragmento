@@ -1635,6 +1635,69 @@ textarea {
   font-size: 0.9rem;
 }
 
+.service-serial-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.service-serial-field__input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+}
+
+.service-serial-field__add {
+  min-height: 48px;
+}
+
+.service-serial-field__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.service-serial-field__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 10px 8px 12px;
+  border: 1px solid rgba(42, 145, 85, 0.18);
+  border-radius: 999px;
+  background: #e9f7ee;
+  color: #24583b;
+}
+
+.service-serial-field__value {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.service-serial-field__remove {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: rgba(36, 88, 59, 0.12);
+  color: #24583b;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.service-serial-field__remove:hover,
+.service-serial-field__remove:focus-visible {
+  background: rgba(36, 88, 59, 0.18);
+}
+
 .service-claim-kitchen {
   margin-top: 20px;
   padding: 20px;
@@ -1930,6 +1993,42 @@ textarea {
   display: flex;
 }
 
+.service-claim-agent__message-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 88%;
+  align-items: flex-start;
+}
+
+.service-claim-agent__message--user .service-claim-agent__message-stack {
+  align-items: flex-end;
+}
+
+.service-claim-agent__message-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.service-claim-agent__action-chip {
+  min-height: 36px;
+  padding: 8px 14px;
+  border: 1px solid rgba(42, 145, 85, 0.42);
+  border-radius: 999px;
+  background: #ebf7ef;
+  color: #24583b;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.service-claim-agent__action-chip:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .service-claim-agent__message span {
   display: inline-block;
   max-width: 88%;
@@ -1963,7 +2062,7 @@ textarea {
 
 .service-claim-agent__composer {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   gap: 10px;
 }
 
@@ -1980,6 +2079,60 @@ textarea {
   outline: none;
   border-color: rgba(42, 145, 85, 0.62);
   box-shadow: 0 0 0 3px rgba(42, 145, 85, 0.12);
+}
+
+.service-claim-agent__voice-button {
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 14px;
+  background: #fff;
+  color: #24583b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.service-claim-agent__voice-button:hover,
+.service-claim-agent__voice-button:focus-visible {
+  border-color: rgba(42, 145, 85, 0.62);
+  background: #ebf7ef;
+  color: #1e4a31;
+}
+
+.service-claim-agent__voice-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(42, 145, 85, 0.12);
+}
+
+.service-claim-agent__voice-button:disabled {
+  opacity: 0.48;
+  cursor: not-allowed;
+}
+
+.service-claim-agent__voice-button.is-active {
+  border-color: rgba(42, 145, 85, 0.72);
+  background: #e9f7ee;
+  color: #1f5637;
+}
+
+.service-claim-agent__voice-button svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.service-claim-agent__voice-status {
+  margin-top: 8px;
+  font-size: 0.84rem;
+  color: #5e564d;
 }
 
 .service-claim-agent__launcher {
