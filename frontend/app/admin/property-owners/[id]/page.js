@@ -3,7 +3,6 @@ import {
   AdminSection,
   FlashMessage,
   FormField,
-  StatusBadge,
   actionRowStyle,
   dangerButtonStyle,
   inputStyle,
@@ -13,11 +12,11 @@ import {
   primaryButtonStyle,
   secondaryButtonStyle,
   splitGridStyle,
-  subMetaStyle,
   textareaStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
-import { AdminPluralText, AdminText } from "../../../../components/admin-i18n";
+import { AdminDateTime, AdminPluralText, AdminStatusBadge, AdminText } from "../../../../components/admin-i18n";
+import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
 import AdminContractAddressFields from "../../../../components/admin-contract-address-fields";
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
@@ -42,26 +41,10 @@ function normalizeParam(value) {
   return value || "";
 }
 
-function formatDate(value) {
-  if (!value) return "-";
-  return new Intl.DateTimeFormat("de-DE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
 function propertyObjectAddress(object) {
   const streetLine = [object.address1, object.address2].filter(Boolean).join(", ");
   const cityLine = [object.postalCode, object.city].filter(Boolean).join(" ");
   return [streetLine, cityLine, object.country].filter(Boolean).join(" | ");
-}
-
-function propertyObjectContact(object) {
-  return object.contactPhone || "";
-}
-
-function projectStatusLabel(status) {
-  return String(status || "").replace(/_/g, " ") || "active";
 }
 
 function buildOwnerDetailPath(ownerId, searchValues = {}) {
@@ -105,7 +88,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
 
   return (
     <AdminShell adminEmail={admin.email}>
-      <div style={pageGridStyle}>
+      <div className="housing-company-admin" style={pageGridStyle}>
         <AdminSection
           title={owner.name}
           actions={<ActionLink href="/admin/property-owners"><AdminText i18nKey="propertyOwnersAdmin.backToOwners" fallback="Back to housing companies" /></ActionLink>}
@@ -113,18 +96,26 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
-          <div style={subMetaStyle}>
-            <span>{owner._count.propertyObjects} <AdminText i18nKey="propertyOwnersAdmin.objectCount" fallback="object(s)" /></span>
-            <span>
+          <div style={detailHeaderStatsStyle}>
+            <span style={detailStatPillStyle}>
               <AdminPluralText
-                count={owner._count.contracts}
-                singularKey="kitchensAdmin.contractCountSingular"
-                pluralKey="kitchensAdmin.contractCountPlural"
-                singularFallback="{count} contract"
-                pluralFallback="{count} contracts"
+                count={owner._count.propertyObjects}
+                singularKey="propertyOwnersAdmin.objectCountSingular"
+                pluralKey="propertyOwnersAdmin.objectCountPlural"
+                singularFallback="{count} object"
+                pluralFallback="{count} objects"
               />
             </span>
-            <span><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created" />: {formatDate(owner.createdAt)}</span>
+            <span style={detailStatPillStyle}>
+              <AdminPluralText
+                count={owner._count.contracts}
+                singularKey="propertyOwnersAdmin.contractNumberCountSingular"
+                pluralKey="propertyOwnersAdmin.contractNumberCountPlural"
+                singularFallback="{count} contract number"
+                pluralFallback="{count} contract numbers"
+              />
+            </span>
+            <span style={detailStatPillStyle}><AdminText i18nKey="propertyOwnersAdmin.created" fallback="Created at" />: <AdminDateTime value={owner.createdAt} /></span>
           </div>
         </AdminSection>
 
@@ -149,19 +140,27 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                 <textarea name="notes" defaultValue={owner.notes || ""} rows={3} style={compactTextareaStyle} />
               </FormField>
               <div style={formActionRowStyle}>
-                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveOwner" fallback="Save housing company" /></button>
-                <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete housing company" /></button>
+                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveOwner" fallback="Save" /></button>
+                <AdminConfirmSubmitButton
+                  name="_intent"
+                  value="delete"
+                  style={dangerButtonStyle}
+                  confirmKey="propertyOwnersAdmin.confirmDeleteOwner"
+                  confirmFallback="Delete this housing company?"
+                >
+                  <AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete housing company" />
+                </AdminConfirmSubmitButton>
               </div>
             </form>
           </AdminSection>
 
           <AdminSection
             title={<AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add contract number" />}
-            description="Create a contract number for this housing company. You can optionally choose the project it belongs to."
+            description={<AdminText i18nKey="propertyOwnersAdmin.createContractDescription" fallback="Create a contract number for this housing company. Optionally assign it to a project." />}
           >
             <details open={createContractOpen} style={createCompanyContractDetailsStyle}>
               <summary className="create-company-contract-summary" style={createCompanyContractSummaryStyle}>
-                <AdminText i18nKey="contractsAdmin.createContractForCompany" fallback="Create contract" />
+                <AdminText i18nKey="contractsAdmin.createContractForCompany" fallback="Create contract number" />
               </summary>
               <div style={createCompanyContractBodyStyle}>
                 <form action="/api/admin/contracts" method="post" style={contractCreateFormStyle}>
@@ -185,7 +184,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                         <option value=""><AdminText i18nKey="contractsAdmin.selectProject" fallback="Select project" /></option>
                         {(owner.propertyObjects || []).map((object) => (
                           <option key={object.id} value={object.projectId || ""} disabled={!object.projectId}>
-                            {object.projectCode ? `${object.projectCode} - ` : ""}{object.projectName || "Unnamed project"} - Object: {object.name}
+                            {object.projectCode ? `${object.projectCode} - ` : ""}{object.projectName || object.name || object.id} - {object.name || object.id}
                           </option>
                         ))}
                       </AdminSelect>
@@ -200,7 +199,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                       <textarea name="notes" rows={2} style={compactTextareaStyle} />
                     </FormField>
                     <div style={formActionRowStyle}>
-                      <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.createContract" fallback="Create contract" /></button>
+                      <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.createContract" fallback="Create contract number" /></button>
                     </div>
                   </form>
               </div>
@@ -272,24 +271,24 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
               <div style={objectEditorListStyle}>
                 {(owner.propertyObjects || []).map((object) => (
                   <div key={object.id} style={objectListItemStyle}>
-                    <div style={objectDetailsStyle}>
+                    <div className="housing-object-summary" style={objectDetailsStyle}>
                       <div style={objectSummaryContentStyle}>
                         <span style={objectProjectTagStyle}>
-                          {object.projectCode ? `${object.projectCode} - ` : ""}{object.projectName || "Unnamed project"}
+                          {object.projectCode ? `${object.projectCode} - ` : ""}{object.projectName || object.name}
                         </span>
                         <strong>{object.name}</strong>
                         {propertyObjectAddress(object) ? <span style={objectSummaryMetaStyle}>{propertyObjectAddress(object)}</span> : null}
                       </div>
                       <div style={objectSummaryAsideStyle}>
-                        <StatusBadge status={String(object.projectStatus || "active").toUpperCase()} />
+                        <AdminStatusBadge status={String(object.projectStatus || "active").toUpperCase()} />
                         <div style={objectActionRowStyle}>
                           <span style={objectPreviewCountStyle}>
                             <AdminPluralText
                               count={object._count.contracts}
-                              singularKey="kitchensAdmin.contractCountSingular"
-                              pluralKey="kitchensAdmin.contractCountPlural"
-                              singularFallback="{count} contract"
-                              pluralFallback="{count} contracts"
+                              singularKey="propertyOwnersAdmin.contractNumberCountSingular"
+                              pluralKey="propertyOwnersAdmin.contractNumberCountPlural"
+                              singularFallback="{count} contract number"
+                              pluralFallback="{count} contract numbers"
                             />
                           </span>
                           <ActionLink href={buildOwnerDetailPath(owner.id, { openObject: object.id, ...(createObjectOpen ? { createObject: "1" } : {}) })} scroll={false}>
@@ -375,7 +374,15 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                                 footerActions={(
                                   <>
                                     <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.saveObject" fallback="Save object" /></button>
-                                    <button type="submit" name="_intent" value="delete" style={secondaryButtonStyle}><AdminText i18nKey="propertyOwnersAdmin.deleteObject" fallback="Delete object" /></button>
+                                    <AdminConfirmSubmitButton
+                                      name="_intent"
+                                      value="delete"
+                                      style={dangerObjectButtonStyle}
+                                      confirmKey="propertyOwnersAdmin.confirmDeleteObject"
+                                      confirmFallback="Delete this object?"
+                                    >
+                                      <AdminText i18nKey="propertyOwnersAdmin.deleteObject" fallback="Delete object" />
+                                    </AdminConfirmSubmitButton>
                                   </>
                                 )}
                               />
@@ -399,6 +406,18 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
           .create-company-contract-summary::-webkit-details-marker {
             display: none;
           }
+
+          .housing-company-admin :is(input, textarea, select, button, a, summary):focus-visible {
+            outline: 3px solid rgba(143, 62, 44, 0.26);
+            outline-offset: 2px;
+          }
+
+          @media (max-width: 760px) {
+            .housing-object-summary {
+              align-items: flex-start !important;
+              flex-direction: column;
+            }
+          }
         `}</style>
       </div>
     </AdminShell>
@@ -407,22 +426,24 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
 
 const formGridStyle = {
   display: "grid",
-  gap: 14,
+  gap: 10,
   gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
 };
 
 const compactInputStyle = {
   ...inputStyle,
-  minHeight: 38,
-  padding: "6px 10px",
-  fontSize: "0.9rem",
+  minHeight: 40,
+  borderRadius: 8,
+  padding: "8px 10px",
+  fontSize: "0.92rem",
 };
 
 const compactTextareaStyle = {
   ...textareaStyle,
   minHeight: 64,
-  padding: "6px 10px",
-  fontSize: "0.9rem",
+  borderRadius: 8,
+  padding: "8px 10px",
+  fontSize: "0.92rem",
   lineHeight: 1.35,
 };
 
@@ -430,6 +451,26 @@ const formActionRowStyle = {
   ...actionRowStyle,
   gridColumn: "1 / -1",
   paddingTop: 2,
+};
+
+const detailHeaderStatsStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+  flexWrap: "wrap",
+};
+
+const detailStatPillStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  minHeight: 34,
+  borderRadius: 999,
+  padding: "7px 10px",
+  background: "rgba(143, 62, 44, 0.08)",
+  border: "1px solid rgba(143, 62, 44, 0.14)",
+  color: "var(--app-accent)",
+  fontSize: 13,
+  fontWeight: 800,
 };
 
 const objectWorkspaceStyle = {
@@ -440,13 +481,6 @@ const objectWorkspaceStyle = {
 const objectSectionTitleStyle = {
   color: "var(--app-text)",
   fontSize: 14,
-};
-
-const objectFormStyle = {
-  display: "grid",
-  gap: 14,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-  alignItems: "start",
 };
 
 const denseObjectFormStyle = {
@@ -472,9 +506,9 @@ const objectDetailsStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   border: "1px solid rgba(45, 108, 121, 0.14)",
-  borderRadius: 14,
+  borderRadius: 10,
   background: "rgba(255,255,255,0.82)",
-  padding: "10px 12px",
+  padding: "9px 11px",
 };
 
 const objectSummaryContentStyle = {
@@ -511,7 +545,7 @@ const objectPreviewCountStyle = {
   width: "fit-content",
   borderRadius: 999,
   padding: "3px 7px",
-  background: "rgba(45, 108, 121, 0.09)",
+  background: "rgba(45, 108, 121, 0.13)",
   color: "var(--app-info-text)",
   fontSize: 11,
   fontWeight: 800,
@@ -521,8 +555,8 @@ const objectPreviewCountStyle = {
 const objectEditorCardStyle = {
   ...itemCardStyle,
   display: "grid",
-  gap: 14,
-  padding: 16,
+  gap: 12,
+  padding: 14,
 };
 
 const editorPanelsLayoutStyle = {
@@ -611,4 +645,12 @@ const objectActionRowStyle = {
   alignItems: "center",
   flexWrap: "wrap",
   justifyContent: "flex-end",
+};
+
+const dangerObjectButtonStyle = {
+  ...dangerButtonStyle,
+  minHeight: 38,
+  borderRadius: 8,
+  padding: "8px 12px",
+  fontSize: "0.9rem",
 };

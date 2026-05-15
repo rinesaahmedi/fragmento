@@ -2,14 +2,15 @@ import {
   ActionLink,
   AdminSection,
   FlashMessage,
-  dangerButtonStyle,
   itemCardStyle,
   pageGridStyle,
   splitGridStyle,
   subMetaStyle,
 } from "../../../../components/admin-ui";
 import { AdminClaimUploadsPanel } from "../../../../components/admin-claim-uploads-panel";
-import { AdminText } from "../../../../components/admin-i18n";
+import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
+import { AdminClaimLocalizedText } from "../../../../components/admin-claim-localized-text";
+import { AdminDateTime, AdminText } from "../../../../components/admin-i18n";
 import { AdminShell } from "../../../../components/admin-shell";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -18,15 +19,33 @@ import { queryServiceClaimById } from "../../../../lib/service-claim-admin-query
 
 export const dynamic = "force-dynamic";
 
-function formatDate(value) {
-  return new Intl.DateTimeFormat("de-DE", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
-
 function contactSummary(claim) {
   return [claim.phone, claim.email].filter(Boolean).join(" / ");
+}
+
+function formatClaimCustomerName(value) {
+  return String(value || "").replace(/\s*\((female|male|diverse|other)\)\s*$/i, "").trim();
+}
+
+function getClaimCustomerGender(value) {
+  const match = String(value || "").match(/\((female|male|diverse|other)\)\s*$/i);
+  return match?.[1]?.toLowerCase() || "";
+}
+
+function ClaimGenderText({ gender }) {
+  if (gender === "female") {
+    return <AdminText i18nKey="claimsAdmin.genderFemale" fallback="Female" />;
+  }
+  if (gender === "male") {
+    return <AdminText i18nKey="claimsAdmin.genderMale" fallback="Male" />;
+  }
+  if (gender === "diverse") {
+    return <AdminText i18nKey="claimsAdmin.genderDiverse" fallback="Diverse" />;
+  }
+  if (gender === "other") {
+    return <AdminText i18nKey="claimsAdmin.genderOther" fallback="Other" />;
+  }
+  return <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />;
 }
 
 function parseClaimAttachments(raw) {
@@ -87,13 +106,14 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
   }
 
   const uploadedAttachments = parseClaimAttachments(claim.attachmentsJson);
+  const customerGender = getClaimCustomerGender(claim.fullName);
 
   return (
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title={`${claim.contractNumber}`}
-          description={<AdminText i18nKey="claimsAdmin.claimDetailDescription" fallback="Complaint request details from the service form." />}
+          title={<AdminText i18nKey="claimsAdmin.claimTitle" fallback="Claim {claimNumber}" values={{ claimNumber: claim.contractNumber }} />}
+          description={<AdminText i18nKey="claimsAdmin.claimDetailDescription" fallback="Details from the submitted service request." />}
           actions={
             <ActionLink href="/admin/claims"><AdminText i18nKey="claimsAdmin.backToClaims" fallback="Back to claims" /></ActionLink>
           }
@@ -103,14 +123,22 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
 
           <form action={`/api/admin/claims/${claim.id}`} method="post" style={actionPanelStyle}>
             <div style={subMetaStyle}>
-              <span>{claim.fullName}</span>
+              <span>{formatClaimCustomerName(claim.fullName)}</span>
+              <span aria-hidden="true">·</span>
               <span><ClaimRequestTypeText requestType={claim.requestType} /></span>
-              <span>{formatDate(claim.createdAt)}</span>
+              <span aria-hidden="true">·</span>
+              <span><AdminDateTime value={claim.createdAt} /></span>
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button type="submit" name="_intent" value="delete" style={dangerButtonStyle}>
-                <AdminText i18nKey="ordersAdmin.confirmDelete" fallback="Confirm delete" />
-              </button>
+              <AdminConfirmSubmitButton
+                name="_intent"
+                value="delete"
+                style={deleteClaimButtonStyle}
+                confirmKey="claimsAdmin.deleteConfirmMessage"
+                confirmFallback={"Delete this claim?\nThis action cannot be undone."}
+              >
+                <AdminText i18nKey="claimsAdmin.deleteClaim" fallback="Delete claim" />
+              </AdminConfirmSubmitButton>
             </div>
           </form>
 
@@ -119,8 +147,12 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
               <strong style={sectionTitleStyle}><AdminText i18nKey="claimsAdmin.customer" fallback="Customer" /></strong>
               <div style={detailGridStyle}>
                 <div>
-                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.customer" fallback="Customer" /></span>
-                  <span>{claim.fullName}</span>
+                  <span style={detailLabelStyle}><AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name" /></span>
+                  <strong>{formatClaimCustomerName(claim.fullName)}</strong>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.gender" fallback="Gender" /></span>
+                  <span><ClaimGenderText gender={customerGender} /></span>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.contact" fallback="Contact" /></span>
@@ -131,7 +163,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   <p style={detailTextStyle}>{claim.clientAddress || "-"}</p>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract number" /></span>
+                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract" /></span>
                   <span>{claim.contractNumber}</span>
                 </div>
                 <div>
@@ -150,15 +182,15 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.created" fallback="Created" /></span>
-                  <span>{formatDate(claim.createdAt)}</span>
+                  <span><AdminDateTime value={claim.createdAt} /></span>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.landlord" fallback="Landlord" /></span>
                   <p style={detailTextStyle}>
                     {[
                       claim.landlordName || "-",
-                      claim.landlordPhone ? `Telefon: ${claim.landlordPhone}` : null,
-                      claim.landlordEmail ? `Email: ${claim.landlordEmail}` : null,
+                      claim.landlordPhone ? `${claim.landlordPhone}` : null,
+                      claim.landlordEmail ? `${claim.landlordEmail}` : null,
                     ].filter(Boolean).join("\n")}
                   </p>
                 </div>
@@ -167,14 +199,14 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   <p style={detailTextStyle}>
                     {[
                       claim.hausmeisterName || "-",
-                      claim.hausmeisterPhone ? `Telefon: ${claim.hausmeisterPhone}` : null,
-                      claim.hausmeisterEmail ? `Email: ${claim.hausmeisterEmail}` : null,
+                      claim.hausmeisterPhone ? `${claim.hausmeisterPhone}` : null,
+                      claim.hausmeisterEmail ? `${claim.hausmeisterEmail}` : null,
                     ].filter(Boolean).join("\n")}
                   </p>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.issue" fallback="Issue" /></span>
-                  <p style={detailTextStyle}>{claim.problemDescription}</p>
+                  <p style={detailTextStyle}><AdminClaimLocalizedText text={claim.problemDescription} /></p>
                 </div>
                 <div>
                   <span style={detailLabelStyle}>
@@ -208,6 +240,13 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
               </div>
             </article>
           </div>
+          <style>{`
+            button:focus-visible,
+            a:focus-visible {
+              outline: 3px solid rgba(143, 62, 44, 0.24);
+              outline-offset: 2px;
+            }
+          `}</style>
         </AdminSection>
       </div>
     </AdminShell>
@@ -229,6 +268,19 @@ const actionPanelStyle = {
   borderRadius: 14,
   background: "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,248,242,0.74))",
   padding: 18,
+};
+
+const deleteClaimButtonStyle = {
+  border: "1px solid rgba(217, 92, 92, 0.24)",
+  borderRadius: 10,
+  minHeight: 42,
+  padding: "10px 14px",
+  background: "rgba(255,255,255,0.72)",
+  color: "var(--app-danger-text)",
+  fontWeight: 800,
+  fontSize: "0.92rem",
+  cursor: "pointer",
+  boxShadow: "none",
 };
 
 const sectionTitleStyle = {

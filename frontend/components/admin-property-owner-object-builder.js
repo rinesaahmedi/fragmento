@@ -91,7 +91,7 @@ export default function AdminPropertyOwnerObjectBuilder() {
                   <input
                     name={fieldNames.name}
                     placeholder={translate("propertyOwnersAdmin.objectNamePlaceholder", "Building A")}
-                    style={inputStyle}
+                    style={compactInputStyle}
                     required
                   />
                 </FormField>
@@ -99,7 +99,7 @@ export default function AdminPropertyOwnerObjectBuilder() {
                   <input
                     name={fieldNames.projectName}
                     placeholder={translate("propertyOwnersAdmin.projectNamePlaceholder", "Project A")}
-                    style={inputStyle}
+                    style={compactInputStyle}
                     required
                   />
                 </FormField>
@@ -107,11 +107,11 @@ export default function AdminPropertyOwnerObjectBuilder() {
                   <input
                     name={fieldNames.projectCode}
                     placeholder={translate("propertyOwnersAdmin.projectCodePlaceholder", "PRJ-204")}
-                    style={inputStyle}
+                    style={compactInputStyle}
                   />
                 </FormField>
                 <FormField label={translate("propertyOwnersAdmin.projectStatus", "Project status")}>
-                  <AdminSelect name={fieldNames.projectStatus} defaultValue="active" style={inputStyle}>
+                  <AdminSelect name={fieldNames.projectStatus} defaultValue="active" style={compactInputStyle}>
                     <option value="planning">{translate("propertyOwnersAdmin.projectStatusPlanning", "Planning")}</option>
                     <option value="active">{translate("propertyOwnersAdmin.projectStatusActive", "Active")}</option>
                     <option value="on_hold">{translate("propertyOwnersAdmin.projectStatusOnHold", "On hold")}</option>
@@ -123,14 +123,14 @@ export default function AdminPropertyOwnerObjectBuilder() {
                   <input
                     name={fieldNames.projectManagerName}
                     placeholder={translate("propertyOwnersAdmin.projectManagerNamePlaceholder", "Alex Meyer")}
-                    style={inputStyle}
+                    style={compactInputStyle}
                   />
                 </FormField>
                 <FormField label={translate("propertyOwnersAdmin.objectContactPhone", "Contact phone")}>
                   <input
                     name={fieldNames.contactPhone}
                     placeholder={translate("propertyOwnersAdmin.objectContactPhonePlaceholder", "+49 170 1234567")}
-                    style={inputStyle}
+                    style={compactInputStyle}
                   />
                 </FormField>
                 <FormField label={translate("propertyOwnersAdmin.projectDescription", "Project description")} wide>
@@ -138,11 +138,12 @@ export default function AdminPropertyOwnerObjectBuilder() {
                     name={fieldNames.projectDescription}
                     placeholder={translate("propertyOwnersAdmin.projectDescriptionPlaceholder", "Internal notes about this project")}
                     rows={3}
-                    style={textareaStyle}
+                    style={compactTextareaStyle}
                   />
                 </FormField>
                 <AdminContractAddressFields
                   mode="object"
+                  compact
                   includeUnitFields={false}
                   includeNotes={false}
                   referenceFieldName={fieldNames.name}
@@ -160,11 +161,27 @@ export default function AdminPropertyOwnerObjectBuilder() {
 
 const builderStyle = {
   display: "grid",
-  gap: 14,
-  padding: 18,
+  gap: 10,
+  padding: 12,
   border: "1px solid rgba(143, 62, 44, 0.12)",
-  borderRadius: 18,
-  background: "linear-gradient(180deg, rgba(255,255,255,0.86), rgba(255,247,240,0.72))",
+  borderRadius: 10,
+  background: "linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,247,240,0.62))",
+};
+
+const compactInputStyle = {
+  ...inputStyle,
+  minHeight: 40,
+  borderRadius: 8,
+  padding: "8px 10px",
+  fontSize: "0.92rem",
+};
+
+const compactTextareaStyle = {
+  ...textareaStyle,
+  minHeight: 64,
+  borderRadius: 8,
+  padding: "8px 10px",
+  fontSize: "0.92rem",
 };
 
 const builderHeaderStyle = {
@@ -182,14 +199,14 @@ const builderTitleStyle = {
 
 const draftListStyle = {
   display: "grid",
-  gap: 12,
+  gap: 10,
 };
 
 const draftCardStyle = {
   display: "grid",
-  gap: 12,
-  padding: 14,
-  borderRadius: 16,
+  gap: 10,
+  padding: 12,
+  borderRadius: 10,
   border: "1px solid rgba(45, 108, 121, 0.12)",
   background: "rgba(255,255,255,0.78)",
 };
@@ -206,19 +223,20 @@ const draftLabelStyle = {
 
 const draftGridStyle = {
   display: "grid",
-  gap: 14,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
   alignItems: "start",
 };
 
 const removeButtonStyle = {
   border: "1px solid rgba(180, 71, 57, 0.16)",
-  borderRadius: 12,
-  minHeight: 42,
-  padding: "9px 12px",
+  borderRadius: 8,
+  minHeight: 38,
+  padding: "8px 10px",
   background: "rgba(255, 247, 245, 0.9)",
   color: "var(--app-danger-text)",
   font: "inherit",
   fontWeight: 700,
+  fontSize: "0.9rem",
   cursor: "pointer",
 };
