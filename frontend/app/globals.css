@@ -1802,7 +1802,7 @@ textarea {
 
 .service-field--claim-attachments {
   width: fit-content;
-  max-width: min(100%, 26rem);
+  max-width: min(100%, 30rem);
 }
 
 .service-field--claim-attachments .service-form__hint--attachments,
@@ -1810,7 +1810,7 @@ textarea {
 .service-field--claim-attachments input[type="file"],
 .service-field--claim-attachments .service-attachments {
   width: 100%;
-  max-width: 26rem;
+  max-width: 30rem;
   box-sizing: border-box;
 }
 

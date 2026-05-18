@@ -14,7 +14,9 @@ import { AdminDateTime, AdminText } from "../../../../components/admin-i18n";
 import { AdminShell } from "../../../../components/admin-shell";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
+import { renderClaimKitchenPreviewSvg } from "../../../../lib/claim-kitchen-preview";
 import { prisma } from "../../../../lib/prisma";
+import { formatServiceClaimProblemAreaList } from "../../../../lib/service-claim-problem-areas";
 import { queryServiceClaimById } from "../../../../lib/service-claim-admin-query";
 
 export const dynamic = "force-dynamic";
@@ -79,6 +81,15 @@ function formatBytes(bytes) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function formatClaimKitchenSummaryLines(claim) {
+  const kitchenName = String(claim.kitchenName || "").trim();
+  const selectedAreas = formatServiceClaimProblemAreaList(claim.problemAreasJson);
+  return [
+    kitchenName ? `Kitchen: ${kitchenName}` : "",
+    selectedAreas.length ? `Selected part: ${selectedAreas.join(", ")}` : "",
+  ].filter(Boolean);
+}
+
 export default async function AdminClaimDetailPage({ params, searchParams }) {
   const admin = await requireAdminPage();
   const { id } = await params;
@@ -107,6 +118,11 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
 
   const uploadedAttachments = parseClaimAttachments(claim.attachmentsJson);
   const customerGender = getClaimCustomerGender(claim.fullName);
+  const claimKitchenSummaryLines = formatClaimKitchenSummaryLines(claim);
+  const claimKitchenPreview = await renderClaimKitchenPreviewSvg({
+    kitchenSlug: claim.kitchenSlug,
+    selectedAreas: claim.problemAreasJson,
+  }).catch(() => null);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -165,6 +181,21 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract" /></span>
                   <span>{claim.contractNumber}</span>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.kitchen" fallback="Kitchen" /></span>
+                  <div style={claimKitchenSectionStyle}>
+                    {claimKitchenPreview?.markup ? (
+                      <div style={claimKitchenPreviewCardStyle}>
+                        <div
+                          aria-label="Kitchen preview"
+                          style={claimKitchenPreviewWrapStyle}
+                          dangerouslySetInnerHTML={{ __html: claimKitchenPreview.markup }}
+                        />
+                      </div>
+                    ) : null}
+                    <p style={detailTextStyle}>{claimKitchenSummaryLines.join("\n") || "-"}</p>
+                  </div>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.serialNumber" fallback="Serial number" /></span>
@@ -309,4 +340,22 @@ const detailTextStyle = {
   color: "var(--app-text)",
   lineHeight: 1.6,
   whiteSpace: "pre-wrap",
+};
+
+const claimKitchenSectionStyle = {
+  display: "grid",
+  gap: 12,
+};
+
+const claimKitchenPreviewCardStyle = {
+  maxWidth: 520,
+  padding: 14,
+  border: "1px solid var(--app-border)",
+  borderRadius: 16,
+  background: "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,248,242,0.82))",
+};
+
+const claimKitchenPreviewWrapStyle = {
+  width: "100%",
+  margin: 0,
 };
