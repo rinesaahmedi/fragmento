@@ -55,6 +55,7 @@ export function FlashMessage({ tone, message }) {
 
   return (
     <div
+      suppressHydrationWarning
       style={{
         color: palette.color,
         background: palette.background,
