@@ -47,7 +47,7 @@ export async function POST(request) {
     return NextResponse.json({ error: error.message || "Invalid request body" }, { status: error.status || 400 });
   }
 
-  const smtpHost = String(process.env.SMTP_HOST || "").trim();
+  const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
   const smtpUser = String(process.env.SMTP_USER || "").trim();
   const smtpPass = String(process.env.SMTP_PASS || "");

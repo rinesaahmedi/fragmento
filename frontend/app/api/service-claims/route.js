@@ -218,7 +218,7 @@ async function postWebhook(payload) {
 
 async function sendComplaintEmail(payload, attachmentParts = []) {
   const recipient = String(process.env.SERVICE_REQUEST_EMAIL || process.env.ADMIN_EMAIL || "").trim();
-  const smtpHost = String(process.env.SMTP_HOST || "").trim();
+  const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();
 
   if (!recipient || !smtpHost || !smtpFrom) {

@@ -436,7 +436,7 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
 }
 
 export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText }) {
-  const smtpHost = String(process.env.SMTP_HOST || "").trim();
+  const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
   const smtpUser = String(process.env.SMTP_USER || "").trim();
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();

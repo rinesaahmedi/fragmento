@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AdminI18nProvider, AdminLanguageSwitcher, AdminText, useAdminI18n } from "./admin-i18n";
@@ -18,16 +17,6 @@ const navItems = [
 const DESKTOP_SIDEBAR_WIDTH = "clamp(240px, 18vw, 300px)";
 
 export function AdminShellClient({ adminEmail, initialLanguage = "en", children }) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return null;
-  }
-
   return (
     <AdminI18nProvider initialLanguage={initialLanguage}>
       <AdminShellContent adminEmail={adminEmail}>{children}</AdminShellContent>
