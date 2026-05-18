@@ -47,13 +47,29 @@ export async function POST(request) {
     return NextResponse.json({ error: error.message || "Invalid request body" }, { status: error.status || 400 });
   }
 
+  const smtpHost = String(process.env.SMTP_HOST || "").trim();
+  const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
+  const smtpUser = String(process.env.SMTP_USER || "").trim();
+  const smtpPass = String(process.env.SMTP_PASS || "");
+  const smtpFrom = String(process.env.SMTP_FROM || "").trim();
+
+  if (!smtpHost || !smtpUser || !smtpPass || !smtpFrom) {
+    const missing = [
+      !smtpHost ? "SMTP_HOST" : "",
+      !smtpUser ? "SMTP_USER" : "",
+      !smtpPass ? "SMTP_PASS" : "",
+      !smtpFrom ? "SMTP_FROM" : "",
+    ].filter(Boolean).join(", ");
+    return NextResponse.json({ error: `Email SMTP config is missing: ${missing}` }, { status: 500 });
+  }
+
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number.parseInt(process.env.SMTP_PORT || "0", 10),
+    host: smtpHost,
+    port: smtpPort,
     secure: process.env.SMTP_SECURE === "true",
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: smtpUser,
+      pass: smtpPass,
     },
   });
 
@@ -87,7 +103,7 @@ export async function POST(request) {
     : "";
 
   const mailOptions = {
-    from: `"Fragmento" <${process.env.SMTP_FROM}>`,
+    from: `"Fragmento" <${smtpFrom}>`,
     to: to_email,
     subject: `Bestellbestaetigung #${order_number}`,
     html: `
@@ -112,13 +128,14 @@ export async function POST(request) {
         warning: `PDF attachment skipped: ${error.message}`,
       });
     } catch (fallbackError) {
+      const message = `Email sending failed via ${smtpHost}:${smtpPort} as ${smtpUser}: ${fallbackError.message}`;
       console.error(
         "SMTP error (fallback):",
-        fallbackError.message,
+        message,
         fallbackError.code || "",
         fallbackError.response || "",
       );
-      return NextResponse.json({ error: fallbackError.message }, { status: 500 });
+      return NextResponse.json({ error: message }, { status: 500 });
     }
   }
 
