@@ -37,7 +37,6 @@ export async function POST(request, { params }) {
     }
 
     if (intent === "confirm") {
-      console.info(`[admin-order-action] confirm ${id}`);
       await confirmOrder(id, emailOverrides);
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent and order confirmed.");
     }
@@ -62,7 +61,6 @@ export async function POST(request, { params }) {
     return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order status updated.");
   } catch (error) {
     const message = mapAdminMutationError(error, "Order");
-    console.error(`[admin-order-action] ${id} failed:`, message);
     return redirectWithFlash(request, returnPath, "error", message);
   }
 }

@@ -452,8 +452,6 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     throw new Error(`Email SMTP config is missing: ${missing}`);
   }
 
-  console.info(`[order-email] SMTP target ${smtpHost}:${smtpPort} as ${smtpUser}`);
-
   const transporter = nodemailer.createTransport({
     host: smtpHost,
     port: smtpPort,
