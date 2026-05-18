@@ -1511,6 +1511,44 @@ test("affirmative follow-up continues naturally for documented consumption value
   assert.doesNotMatch(response.body.answer, /^Yes[—\-:, ]/i);
 });
 
+test("affirmative follow-up skips topics already answered in the conversation", async () => {
+  const route = loadRoute({
+    prisma: {
+      kitchenItem: {
+        findMany: async () => [product({
+          id: "hood",
+          name: "Extractor hood",
+          productInfoKeyFacts: [
+            "Model: FH 664 621 S",
+            "Energy class: A",
+            "Annual energy consumption: 24,8 kWh/Jahr",
+            "Noise: max. 70 dB",
+            "Ger\u00e4tema\u00dfe H x B x T: 173 x 599 x 303 mm",
+          ],
+        })],
+      },
+    },
+  });
+
+  const response = await route.POST(request({
+    language: "en",
+    question: "yes",
+    contractNumber: "CON-1",
+    kitchenSlug: "demo-kitchen",
+    itemIds: ["hood"],
+    conversationMessages: [
+      { role: "assistant", text: "The documented noise values are:\n- Extractor hood (FH 664 621 S): max. 70 dB\n\nWould you like me to list the documented appliance or niche dimensions too?" },
+      { role: "user", text: "energy class" },
+      { role: "assistant", text: "Documented energy class:\n- Extractor hood (FH 664 621 S): energy class A\n\nWould you like me to list the documented consumption values too?" },
+    ],
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /^Here are the documented consumption values from the product information:/);
+  assert.doesNotMatch(response.body.answer, /documented noise values next/i);
+  assert.match(response.body.answer, /documented appliance or niche dimensions too/i);
+});
+
 test("affirmative follow-up wording also works for sure and ja", async () => {
   const route = loadRoute({
     prisma: {

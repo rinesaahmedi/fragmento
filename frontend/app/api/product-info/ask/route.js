@@ -891,6 +891,41 @@ function detectTopicFromText(text) {
   return "";
 }
 
+function detectAnsweredTopicsFromText(text) {
+  const value = String(text || "");
+  const topics = new Set();
+
+  if (/(documented energy class|documented energy classes|dokumentierte energieeffizienzklasse|dokumentierten energieeffizienzklassen)/i.test(value)) {
+    topics.add("energy");
+  }
+  if (/(documented consumption values|dokumentierten verbrauchswerte|annual energy consumption|jährlicher energieverbrauch|jaehrlicher energieverbrauch)/i.test(value)) {
+    topics.add("consumption");
+  }
+  if (/(documented noise values|documented noise levels|dokumentierten geräuschwerte|dokumentierten geraeuschwerte|max\.\s*\d+\s*dB|\d+\s*dB(?:\(A\))?)/i.test(value)) {
+    topics.add("noise");
+  }
+  if (/(documented appliance or niche dimensions|dokumentierten geräte- oder nischenmaße|dokumentierten geraete- oder nischenmasse|appliance dimensions|niche dimensions|gerätemaße|geraetemasse|nischenmaße|nischenmasse)/i.test(value)) {
+    topics.add("dimensions");
+  }
+
+  return topics;
+}
+
+function getPreviouslyAnsweredTopics(conversationMessages) {
+  const topics = new Set();
+  if (!Array.isArray(conversationMessages)) return topics;
+
+  for (const message of conversationMessages) {
+    if (message?.role !== "assistant" || !message?.text) continue;
+    const answerBody = splitTrailingQuestion(message.text).body || message.text;
+    for (const topic of detectAnsweredTopicsFromText(answerBody)) {
+      topics.add(topic);
+    }
+  }
+
+  return topics;
+}
+
 function resolveFollowUpTopic(question, conversationMessages) {
   if (!isAffirmativeFollowUp(question)) return "";
 
@@ -1883,7 +1918,35 @@ function answerFromRecommendation(question, items, language) {
   };
 }
 
-function getNextDocumentedFollowUp(items, language, topic) {
+function getNextDocumentedFollowUp(items, language, topic, answeredTopics = new Set()) {
+  const topicOrder = ["energy", "consumption", "noise", "dimensions"];
+  const startIndex = topicOrder.indexOf(topic);
+  if (startIndex >= 0 && answeredTopics.size) {
+    const hasTopicValue = {
+      consumption: () => items.some((item) => getAnnualConsumptionValue(item)),
+      noise: () => items.some(hasDocumentedNoiseValue),
+      dimensions: () => items.some(hasDocumentedDimensionValue),
+    };
+    const copy = {
+      consumption: language === "de"
+        ? "Möchten Sie auch die dokumentierten Verbrauchswerte sehen?"
+        : "Would you like me to list the documented consumption values too?",
+      noise: language === "de"
+        ? "Möchten Sie als Nächstes die dokumentierten Geräuschwerte sehen?"
+        : "Would you like me to list the documented noise values next?",
+      dimensions: language === "de"
+        ? "Möchten Sie auch die dokumentierten Geräte- oder Nischenmaße sehen?"
+        : "Would you like me to list the documented appliance or niche dimensions too?",
+    };
+
+    for (const candidate of topicOrder.slice(startIndex + 1)) {
+      if (answeredTopics.has(candidate)) continue;
+      if (hasTopicValue[candidate]?.()) return copy[candidate] || "";
+    }
+
+    return "";
+  }
+
   if (topic === "energy") {
     return items.some((item) => getAnnualConsumptionValue(item))
       ? (language === "de"
@@ -2112,7 +2175,7 @@ function extractInstallationDimensionsStrict(item) {
   return factMatches.length ? factMatches.join(", ") : "";
 }
 
-function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
+function answerFromExplicitMultiItemEnergyFacts(question, items, language, answeredTopics = new Set()) {
   const value = String(question || "").toLowerCase();
   const notFoundAnswer = EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en;
   const missingSubProductAnswer = answerForRequestedSubProductEnergy(question, items, language);
@@ -2163,7 +2226,7 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
     const body = language === "de"
       ? formatSectionWithBullets(records.length > 1 ? "Hier sind die dokumentierten Verbrauchswerte für alle ausgewählten Produkte:" : "Hier sind die dokumentierten Verbrauchswerte aus den Produktinformationen:", consumptionEntries)
       : formatSectionWithBullets("Here are the documented consumption values from the product information:", consumptionEntries);
-    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption");
+    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption", answeredTopics);
 
     return {
       answer: followUp ? `${body}\n\n${followUp}` : body,
@@ -2205,7 +2268,7 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
       : formatSectionWithBullets("Not found in the available product text:", unknownEntries));
   }
 
-  const followUp = getNextDocumentedFollowUp(scopedItems, language, "energy");
+  const followUp = getNextDocumentedFollowUp(scopedItems, language, "energy", answeredTopics);
 
   return {
     answer: followUp ? `${answerBlocks.join("\n\n")}\n\n${followUp}` : answerBlocks.join("\n\n"),
@@ -2213,7 +2276,7 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
   };
 }
 
-function answerFromExplicitMultiItemFacts(question, items, language) {
+function answerFromExplicitMultiItemFacts(question, items, language, answeredTopics = new Set()) {
   const value = String(question || "").toLowerCase();
   const notFoundAnswer = EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en;
   const installationDistanceRefusal = answerForInstallationDistanceRefusal(question, items, language);
@@ -2290,7 +2353,7 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
       return { answer: notFoundAnswer, found: false };
     }
 
-    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption");
+    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption", answeredTopics);
     const body = language === "de"
       ? formatSectionWithBullets(scopedItems.length > 1 ? "Hier sind die dokumentierten Verbrauchswerte für alle ausgewählten Produkte:" : "Hier sind die dokumentierten Verbrauchswerte aus den Produktinformationen:", entries)
       : formatSectionWithBullets("Here are the documented consumption values from the product information:", entries);
@@ -2382,10 +2445,13 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
       return { answer: notFoundAnswer, found: false };
     }
 
+    const followUp = getNextDocumentedFollowUp(scopedItems, language, "noise", answeredTopics);
+    const body = language === "de"
+      ? formatSectionWithBullets("Die dokumentierten Geräuschwerte sind:", entries)
+      : formatSectionWithBullets("The documented noise values are:", entries);
+
     return {
-      answer: language === "de"
-        ? `${formatSectionWithBullets("Die dokumentierten Geräuschwerte sind:", entries)}${getNextDocumentedFollowUp(scopedItems, language, "noise") ? `\n\n${getNextDocumentedFollowUp(scopedItems, language, "noise")}` : ""}`
-        : `${formatSectionWithBullets("The documented noise values are:", entries)}${getNextDocumentedFollowUp(scopedItems, language, "noise") ? `\n\n${getNextDocumentedFollowUp(scopedItems, language, "noise")}` : ""}`,
+      answer: followUp ? `${body}\n\n${followUp}` : body,
       found: true,
     };
   }
@@ -2861,6 +2927,7 @@ export async function POST(request) {
     const kitchenSlug = normalizeRequiredString(body?.kitchenSlug);
     const conversationMessages = normalizeConversationMessages(body?.conversationMessages);
     const effectiveQuestion = resolveEffectiveQuestion(question, conversationMessages, responseLanguage);
+    const answeredTopics = getPreviouslyAnsweredTopics(conversationMessages);
     const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[responseLanguage] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
     const noInfoAnswer = NO_INFO_ANSWER_BY_LANGUAGE[responseLanguage] || NO_INFO_ANSWER_BY_LANGUAGE.en;
     const timeoutError = TIMEOUT_ERROR_BY_LANGUAGE[responseLanguage] || TIMEOUT_ERROR_BY_LANGUAGE.en;
@@ -2936,12 +3003,12 @@ export async function POST(request) {
       return NextResponse.json(eLabelDocumentAnswer);
     }
 
-    const multiItemEnergyAnswer = answerFromExplicitMultiItemEnergyFacts(effectiveQuestion, usableContextItems, responseLanguage);
+    const multiItemEnergyAnswer = answerFromExplicitMultiItemEnergyFacts(effectiveQuestion, usableContextItems, responseLanguage, answeredTopics);
     if (multiItemEnergyAnswer) {
       return NextResponse.json(multiItemEnergyAnswer);
     }
 
-    const multiItemStructuredAnswer = answerFromExplicitMultiItemFacts(effectiveQuestion, usableContextItems, responseLanguage);
+    const multiItemStructuredAnswer = answerFromExplicitMultiItemFacts(effectiveQuestion, usableContextItems, responseLanguage, answeredTopics);
     if (multiItemStructuredAnswer) {
       return NextResponse.json(multiItemStructuredAnswer);
     }
