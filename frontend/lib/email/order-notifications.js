@@ -436,12 +436,17 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
 }
 
 export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText }) {
+  const smtpHost = String(process.env.SMTP_HOST || "").trim();
+  const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
+  const smtpUser = String(process.env.SMTP_USER || "").trim();
+  const smtpFrom = String(process.env.SMTP_FROM || "").trim();
+
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number.parseInt(process.env.SMTP_PORT || "0", 10),
+    host: smtpHost,
+    port: smtpPort,
     secure: process.env.SMTP_SECURE === "true",
     auth: {
-      user: process.env.SMTP_USER,
+      user: smtpUser,
       pass: process.env.SMTP_PASS,
     },
   });
@@ -488,16 +493,20 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     : "";
   const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText });
 
-  await transporter.sendMail({
-    from: `"Fragmento" <${process.env.SMTP_FROM}>`,
-    to: order.customer.email,
-    subject: emailPreview.subject,
-    html: `
-      ${logoHtml}
-      ${emailPreview.html}
-    `,
-    attachments,
-  });
+  try {
+    await transporter.sendMail({
+      from: `"Fragmento" <${smtpFrom}>`,
+      to: order.customer.email,
+      subject: emailPreview.subject,
+      html: `
+        ${logoHtml}
+        ${emailPreview.html}
+      `,
+      attachments,
+    });
+  } catch (error) {
+    throw new Error(`Email sending failed via ${smtpHost || "(missing SMTP_HOST)"}:${smtpPort} as ${smtpUser || "(missing SMTP_USER)"}: ${error.message}`);
+  }
 }
 
 export async function forwardOrderWebhook(order) {
