@@ -1894,8 +1894,8 @@ function KitchenConfiguratorContent({
 
               <div className={styles.productInfoContent}>
                 <div className={styles.productInfoPdfColumn}>
-                  <div className={styles.productInfoToolbar}>
-                    {activeProductInfo.productInfoDocuments?.length > 1 ? (
+                  {activeProductInfo.productInfoDocuments?.length > 1 ? (
+                    <div className={styles.productInfoToolbar}>
                       <div className={styles.productInfoDocumentTabs}>
                         {activeProductInfo.productInfoDocuments.map((document) => {
                           const isActive = document.href === activeProductInfo.activeProductInfoDocumentHref;
@@ -1911,33 +1911,8 @@ function KitchenConfiguratorContent({
                           );
                         })}
                       </div>
-                    ) : null}
-
-                    <div className={styles.productInfoActions}>
-                      {activeProductInfo.productInfoDocuments?.length > 1 ? (
-                        activeProductInfo.productInfoDocuments.map((document) => (
-                          <a
-                            key={document.href}
-                            href={document.href}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={styles.productInfoActionLink}
-                          >
-                            {translate("configurator.productInfoOpen", "Open {label}", { label: document.label })}
-                          </a>
-                        ))
-                      ) : (
-                        <a
-                          href={activeProductInfo.activeProductInfoDocumentHref || activeProductInfo.infoPdfHref}
-                          target="_blank"
-                          rel="noreferrer"
-                          className={styles.productInfoActionLink}
-                        >
-                          {translate("common.openPdfInNewTab", "Open PDF in new tab")}
-                        </a>
-                      )}
                     </div>
-                  </div>
+                  ) : null}
 
                   <div className={styles.productInfoViewer}>
                     <iframe
