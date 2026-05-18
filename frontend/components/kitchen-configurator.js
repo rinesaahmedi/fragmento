@@ -1557,7 +1557,7 @@ function KitchenConfiguratorContent({
       setProductInfoQuestion("");
       return;
     }
-    await submitProductInfoQuestion(productInfoQuestion);
+    await submitProductInfoQuestion(productInfoQuestion, { speakAnswer: true });
   }
 
   function toggleProductAssistantVoice() {
