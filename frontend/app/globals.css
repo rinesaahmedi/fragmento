@@ -1218,6 +1218,63 @@ textarea {
   gap: 8px;
 }
 
+.service-form__section--hausmeister {
+  gap: 12px;
+}
+
+.service-yes-no-field {
+  display: grid;
+  gap: 10px;
+}
+
+.service-yes-no-field__question {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.service-yes-no-field__control {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  padding: 4px;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.9);
+  gap: 4px;
+}
+
+.service-yes-no-field__option {
+  min-width: 4.75rem;
+  min-height: 42px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: rgba(56, 38, 25, 0.72);
+  font: inherit;
+  font-size: 0.94rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.service-yes-no-field__option:hover {
+  color: var(--app-text);
+}
+
+.service-yes-no-field__option:focus-visible {
+  outline: 2px solid rgba(107, 79, 58, 0.35);
+  outline-offset: 2px;
+}
+
+.service-yes-no-field__option.is-active {
+  background: #fff;
+  color: var(--app-text);
+  box-shadow: 0 1px 4px rgba(56, 38, 25, 0.12);
+}
+
 .service-form__section-helper {
   margin: 0;
   color: rgba(56, 38, 25, 0.72);
@@ -2485,6 +2542,17 @@ textarea {
     grid-template-columns: 1fr;
     width: 100%;
     max-width: none;
+  }
+
+  .service-yes-no-field__control {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .service-yes-no-field__option {
+    width: 100%;
+    min-width: 0;
   }
 
   .service-field--serial-number .service-serial-field__input-row {

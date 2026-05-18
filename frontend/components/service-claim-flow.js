@@ -95,6 +95,42 @@ function OptionalFieldSuffix({ text }) {
   return <span className="service-field__optional-mark">{text}</span>;
 }
 
+function ServiceYesNoChoice({ question, value, yesLabel, noLabel, onChange }) {
+  const isYes = value === "yes";
+  const isNo = value === "no" || !value;
+
+  return (
+    <div className="service-yes-no-field">
+      <p className="service-yes-no-field__question">{question}</p>
+      <div className="service-yes-no-field__control" role="radiogroup" aria-label={question}>
+        <button
+          type="button"
+          className={`service-yes-no-field__option${isNo ? " is-active" : ""}`}
+          aria-pressed={isNo}
+          onClick={() => onChange("no")}
+        >
+          {noLabel}
+        </button>
+        <button
+          type="button"
+          className={`service-yes-no-field__option${isYes ? " is-active" : ""}`}
+          aria-pressed={isYes}
+          onClick={() => onChange("yes")}
+        >
+          {yesLabel}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const EMPTY_HAUSMEISTER_FIELDS = {
+  hausmeisterGivenName: "",
+  hausmeisterSurname: "",
+  hausmeisterPhone: "",
+  hausmeisterEmail: "",
+};
+
 const COPY = {
   de: {
     eyebrow: "Fragmento Service",
@@ -173,19 +209,13 @@ const COPY = {
     clientUnitNumber: "Wohnungsnummer",
     clientUnitNumberPlaceholder: "z.B. 3B",
     landlordSection: "Vermieter (optional)",
-    landlordPersonGroup: "Vermieter",
     landlordContactPersonGroup: "Ansprechperson",
-    landlordContactGender: "Anrede",
-    landlordGivenName: "Vorname",
-    landlordGivenNamePlaceholder: "Vorname",
-    landlordSurname: "Nachname",
-    landlordSurnamePlaceholder: "Nachname",
     landlordCompanyName: "Firmenname",
     landlordCompanyNamePlaceholder: "Firma / Hausverwaltung",
-    landlordCompanyPhone: "Telefon Firma",
+    landlordCompanyPhone: "Telefon",
     landlordCompanyPhonePlaceholder: "+49 ...",
-    landlordCompanyEmail: "E-Mail Firma",
-    landlordCompanyEmailPlaceholder: "firma@beispiel.de",
+    landlordCompanyEmail: "E-Mail",
+    landlordCompanyEmailPlaceholder: "kontakt@beispiel.de",
     landlordContactGivenName: "Vorname",
     landlordContactGivenNamePlaceholder: "Vorname",
     landlordContactSurname: "Nachname",
@@ -194,7 +224,10 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "E-Mail Ansprechperson",
     landlordEmailPlaceholder: "kontakt@beispiel.de",
-    hausmeisterSection: "Hausmeister (optional)",
+    hausmeisterSection: "Hausmeister",
+    hausmeisterInvolvedQuestion: "Hausverwaltung beteiligt?",
+    hausmeisterYes: "Ja",
+    hausmeisterNo: "Nein",
     hausmeisterGivenName: "Vorname",
     hausmeisterGivenNamePlaceholder: "Vorname",
     hausmeisterSurname: "Nachname",
@@ -335,19 +368,13 @@ const COPY = {
     clientUnitNumber: "Unit number",
     clientUnitNumberPlaceholder: "e.g. 3B",
     landlordSection: "Landlord (optional)",
-    landlordPersonGroup: "Landlord",
     landlordContactPersonGroup: "Contact person",
-    landlordContactGender: "Gender",
-    landlordGivenName: "First name",
-    landlordGivenNamePlaceholder: "First name",
-    landlordSurname: "Surname",
-    landlordSurnamePlaceholder: "Surname",
     landlordCompanyName: "Company name",
     landlordCompanyNamePlaceholder: "Company / property management",
-    landlordCompanyPhone: "Company phone",
+    landlordCompanyPhone: "Phone",
     landlordCompanyPhonePlaceholder: "+49 ...",
-    landlordCompanyEmail: "Company email",
-    landlordCompanyEmailPlaceholder: "company@example.com",
+    landlordCompanyEmail: "Email",
+    landlordCompanyEmailPlaceholder: "contact@example.com",
     landlordContactGivenName: "First name",
     landlordContactGivenNamePlaceholder: "First name",
     landlordContactSurname: "Surname",
@@ -356,7 +383,10 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "Contact person email",
     landlordEmailPlaceholder: "contact@example.com",
-    hausmeisterSection: "Property manager (optional)",
+    hausmeisterSection: "Property manager",
+    hausmeisterInvolvedQuestion: "Property manager involved?",
+    hausmeisterYes: "Yes",
+    hausmeisterNo: "No",
     hausmeisterGivenName: "Name",
     hausmeisterGivenNamePlaceholder: "Name",
     hausmeisterSurname: "Surname",
@@ -486,19 +516,13 @@ const COPY = {
     clientUnitNumber: "Daire no",
     clientUnitNumberPlaceholder: "\u00f6rn. 3B",
     landlordSection: "Ev sahibi (iste\u011fe ba\u011fl\u0131)",
-    landlordPersonGroup: "Ev sahibi",
     landlordContactPersonGroup: "\u0130leti\u015fim ki\u015fisi",
-    landlordContactGender: "Cinsiyet",
-    landlordGivenName: "Ad",
-    landlordGivenNamePlaceholder: "Ad",
-    landlordSurname: "Soyad",
-    landlordSurnamePlaceholder: "Soyad",
     landlordCompanyName: "Firma ad\u0131",
     landlordCompanyNamePlaceholder: "Firma / site y\u00f6netimi",
-    landlordCompanyPhone: "Firma telefonu",
+    landlordCompanyPhone: "Telefon",
     landlordCompanyPhonePlaceholder: "+49 ...",
-    landlordCompanyEmail: "Firma e-postas\u0131",
-    landlordCompanyEmailPlaceholder: "firma@example.com",
+    landlordCompanyEmail: "E-posta",
+    landlordCompanyEmailPlaceholder: "iletisim@example.com",
     landlordContactGivenName: "Ad",
     landlordContactGivenNamePlaceholder: "Ad",
     landlordContactSurname: "Soyad",
@@ -507,7 +531,10 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "\u0130leti\u015fim ki\u015fisi e-postas\u0131",
     landlordEmailPlaceholder: "iletisim@example.com",
-    hausmeisterSection: "Bina g\u00f6revlisi (iste\u011fe ba\u011fl\u0131)",
+    hausmeisterSection: "Bina g\u00f6revlisi",
+    hausmeisterInvolvedQuestion: "Bina g\u00f6revlisi dahil mi?",
+    hausmeisterYes: "Evet",
+    hausmeisterNo: "Hay\u0131r",
     hausmeisterGivenName: "Ad",
     hausmeisterGivenNamePlaceholder: "Ad",
     hausmeisterSurname: "Soyad",
@@ -608,19 +635,13 @@ const COPY = {
     clientUnitNumber: "N\u00famero de unidad",
     clientUnitNumberPlaceholder: "p. ej. 3B",
     landlordSection: "Propietario (opcional)",
-    landlordPersonGroup: "Propietario",
     landlordContactPersonGroup: "Persona de contacto",
-    landlordContactGender: "Sexo",
-    landlordGivenName: "Nombre",
-    landlordGivenNamePlaceholder: "Nombre",
-    landlordSurname: "Apellidos",
-    landlordSurnamePlaceholder: "Apellidos",
     landlordCompanyName: "Nombre de la empresa",
     landlordCompanyNamePlaceholder: "Empresa / administraci\u00f3n de fincas",
-    landlordCompanyPhone: "Tel\u00e9fono de la empresa",
+    landlordCompanyPhone: "Tel\u00e9fono",
     landlordCompanyPhonePlaceholder: "+49 ...",
-    landlordCompanyEmail: "Correo de la empresa",
-    landlordCompanyEmailPlaceholder: "empresa@ejemplo.com",
+    landlordCompanyEmail: "Correo",
+    landlordCompanyEmailPlaceholder: "contacto@ejemplo.com",
     landlordContactGivenName: "Nombre",
     landlordContactGivenNamePlaceholder: "Nombre",
     landlordContactSurname: "Apellidos",
@@ -629,7 +650,10 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "Correo de la persona de contacto",
     landlordEmailPlaceholder: "contacto@ejemplo.com",
-    hausmeisterSection: "Encargado (opcional)",
+    hausmeisterSection: "Encargado",
+    hausmeisterInvolvedQuestion: "\u00bfHay encargado involucrado?",
+    hausmeisterYes: "S\u00ed",
+    hausmeisterNo: "No",
     hausmeisterGivenName: "Nombre",
     hausmeisterGivenNamePlaceholder: "Nombre",
     hausmeisterSurname: "Apellidos",
@@ -730,19 +754,13 @@ const COPY = {
     clientUnitNumber: "Num\u00e9ro d'unit\u00e9",
     clientUnitNumberPlaceholder: "ex. 3B",
     landlordSection: "Propri\u00e9taire (facultatif)",
-    landlordPersonGroup: "Propri\u00e9taire",
     landlordContactPersonGroup: "Personne de contact",
-    landlordContactGender: "Genre",
-    landlordGivenName: "Pr\u00e9nom",
-    landlordGivenNamePlaceholder: "Pr\u00e9nom",
-    landlordSurname: "Nom",
-    landlordSurnamePlaceholder: "Nom",
     landlordCompanyName: "Nom de l'entreprise",
     landlordCompanyNamePlaceholder: "Entreprise / gestion immobili\u00e8re",
-    landlordCompanyPhone: "T\u00e9l\u00e9phone de l'entreprise",
+    landlordCompanyPhone: "T\u00e9l\u00e9phone",
     landlordCompanyPhonePlaceholder: "+49 ...",
-    landlordCompanyEmail: "E-mail de l'entreprise",
-    landlordCompanyEmailPlaceholder: "entreprise@exemple.com",
+    landlordCompanyEmail: "E-mail",
+    landlordCompanyEmailPlaceholder: "contact@exemple.com",
     landlordContactGivenName: "Pr\u00e9nom",
     landlordContactGivenNamePlaceholder: "Pr\u00e9nom",
     landlordContactSurname: "Nom",
@@ -751,7 +769,10 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "E-mail du contact",
     landlordEmailPlaceholder: "contact@exemple.com",
-    hausmeisterSection: "Gardien (facultatif)",
+    hausmeisterSection: "Gardien",
+    hausmeisterInvolvedQuestion: "Gardien concern\u00e9 ?",
+    hausmeisterYes: "Oui",
+    hausmeisterNo: "Non",
     hausmeisterGivenName: "Pr\u00e9nom",
     hausmeisterGivenNamePlaceholder: "Pr\u00e9nom",
     hausmeisterSurname: "Nom",
@@ -852,25 +873,24 @@ const COPY = {
     clientUnitNumber: "\u041d\u043e\u043c\u0435\u0440 \u043a\u0432\u0430\u0440\u0442\u0438\u0440\u044b",
     clientUnitNumberPlaceholder: "\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 3B",
     landlordSection: "\u0410\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044c (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
-    landlordGivenName: "\u0418\u043c\u044f",
-    landlordGivenNamePlaceholder: "\u0418\u043c\u044f",
-    landlordSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
-    landlordSurnamePlaceholder: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
     landlordPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0433\u043e \u043b\u0438\u0446\u0430",
     landlordPhonePlaceholder: "+49 ...",
     landlordCompanyName: "\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438",
     landlordCompanyNamePlaceholder: "\u041a\u043e\u043c\u043f\u0430\u043d\u0438\u044f / \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u043d\u0435\u0434\u0432\u0438\u0436\u0438\u043c\u043e\u0441\u0442\u044c\u044e",
-    landlordCompanyPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438",
+    landlordCompanyPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d",
     landlordCompanyPhonePlaceholder: "+49 ...",
-    landlordCompanyEmail: "E-mail \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438",
-    landlordCompanyEmailPlaceholder: "company@example.com",
+    landlordCompanyEmail: "E-mail",
+    landlordCompanyEmailPlaceholder: "contact@example.com",
     landlordContactGivenName: "\u0418\u043c\u044f",
     landlordContactGivenNamePlaceholder: "\u0418\u043c\u044f",
     landlordContactSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
     landlordContactSurnamePlaceholder: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
     landlordEmail: "E-mail \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0433\u043e \u043b\u0438\u0446\u0430",
     landlordEmailPlaceholder: "contact@example.com",
-    hausmeisterSection: "\u0425\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440 (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
+    hausmeisterSection: "\u0425\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440",
+    hausmeisterInvolvedQuestion: "\u0423\u043a\u0430\u0437\u0430\u043d \u0445\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440?",
+    hausmeisterYes: "\u0414\u0430",
+    hausmeisterNo: "\u041d\u0435\u0442",
     hausmeisterGivenName: "\u0418\u043c\u044f",
     hausmeisterGivenNamePlaceholder: "\u0418\u043c\u044f",
     hausmeisterSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
@@ -925,16 +945,14 @@ const INITIAL_FORM = {
   clientCity: "",
   clientFloor: "",
   clientUnitNumber: "",
-  landlordGivenName: "",
-  landlordSurname: "",
   landlordCompanyName: "",
   landlordCompanyPhone: "",
   landlordCompanyEmail: "",
-  landlordContactGender: "",
   landlordContactGivenName: "",
   landlordContactSurname: "",
   landlordPhone: "",
   landlordEmail: "",
+  hausmeisterInvolved: "no",
   hausmeisterGivenName: "",
   hausmeisterSurname: "",
   hausmeisterPhone: "",
@@ -1291,6 +1309,27 @@ export default function ServiceClaimFlow() {
     setMode(nextMode);
     setError("");
     setSuccessMessage("");
+  }
+
+  function handleHausmeisterInvolvedChange(nextValue) {
+    setForm((current) => {
+      if (nextValue === "no") {
+        return {
+          ...current,
+          hausmeisterInvolved: "no",
+          ...EMPTY_HAUSMEISTER_FIELDS,
+        };
+      }
+
+      return {
+        ...current,
+        hausmeisterInvolved: "yes",
+      };
+    });
+
+    if (error) {
+      setError("");
+    }
   }
 
   function handleFieldChange(field, value) {
@@ -1881,6 +1920,7 @@ export default function ServiceClaimFlow() {
         setIsSubmitting(false);
         return;
       }
+      const includeHausmeister = formValues.hausmeisterInvolved === "yes";
       const payload = {
         ...form,
         clientAddress: buildClientAddress(),
@@ -1891,8 +1931,12 @@ export default function ServiceClaimFlow() {
         serialNumber: normalizedSerialNumbers,
         hasSerialNumberImage: serialNumberImage ? "true" : "false",
         language,
+        ...(includeHausmeister ? {} : EMPTY_HAUSMEISTER_FIELDS),
       };
       for (const [key, value] of Object.entries(payload)) {
+        if (key === "hausmeisterInvolved") {
+          continue;
+        }
         formData.append(key, value == null ? "" : String(value));
       }
       const plan =
@@ -2361,28 +2405,6 @@ export default function ServiceClaimFlow() {
 
             <section className="service-form__section">
               <p className="service-form__section-title">{copy.landlordSection}</p>
-              <p className="service-form__field-group-label">{t("landlordPersonGroup")}</p>
-              <div className="service-field-grid">
-                <label className="service-field">
-                  <span>{t("landlordGivenName")}</span>
-                  <input
-                    type="text"
-                    value={formValues.landlordGivenName}
-                    onChange={(event) => handleFieldChange("landlordGivenName", event.target.value)}
-                    placeholder={t("landlordGivenNamePlaceholder")}
-                  />
-                </label>
-
-                <label className="service-field">
-                  <span>{t("landlordSurname")}</span>
-                  <input
-                    type="text"
-                    value={formValues.landlordSurname}
-                    onChange={(event) => handleFieldChange("landlordSurname", event.target.value)}
-                    placeholder={t("landlordSurnamePlaceholder")}
-                  />
-                </label>
-              </div>
 
               <div className="service-field-grid service-field-grid--landlord-company">
                 <label className="service-field">
@@ -2417,20 +2439,7 @@ export default function ServiceClaimFlow() {
               </div>
 
               <p className="service-form__field-group-label">{t("landlordContactPersonGroup")}</p>
-              <div className="service-field-grid service-field-grid--3">
-                <label className="service-field">
-                  <span>{t("landlordContactGender")}</span>
-                  <select
-                    value={formValues.landlordContactGender}
-                    onChange={(event) => handleFieldChange("landlordContactGender", event.target.value)}
-                  >
-                    <option value="">{copy.genderPlaceholder}</option>
-                    <option value="female">{copy.genderFemale}</option>
-                    <option value="male">{copy.genderMale}</option>
-                    <option value="prefer_not_to_say">{copy.genderPreferNot}</option>
-                  </select>
-                </label>
-
+              <div className="service-field-grid">
                 <label className="service-field">
                   <span>{t("landlordContactGivenName")}</span>
                   <input
@@ -2475,11 +2484,24 @@ export default function ServiceClaimFlow() {
               </div>
             </section>
 
-            <section className="service-form__section">
+            <section className="service-form__section service-form__section--hausmeister">
               <p className="service-form__section-title">{copy.hausmeisterSection}</p>
+              <ServiceYesNoChoice
+                question={t("hausmeisterInvolvedQuestion")}
+                value={formValues.hausmeisterInvolved}
+                yesLabel={t("hausmeisterYes")}
+                noLabel={t("hausmeisterNo")}
+                onChange={handleHausmeisterInvolvedChange}
+              />
+
+              {formValues.hausmeisterInvolved === "yes" ? (
+              <div className="service-form__section-copy">
               <div className="service-field-grid">
                 <label className="service-field">
-                  <span>{copy.hausmeisterGivenName}</span>
+                  <span>
+                    {copy.hausmeisterGivenName}
+                    <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                  </span>
                   <input
                     type="text"
                     value={formValues.hausmeisterGivenName}
@@ -2489,7 +2511,10 @@ export default function ServiceClaimFlow() {
                 </label>
 
                 <label className="service-field">
-                  <span>{copy.hausmeisterSurname}</span>
+                  <span>
+                    {copy.hausmeisterSurname}
+                    <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                  </span>
                   <input
                     type="text"
                     value={formValues.hausmeisterSurname}
@@ -2501,7 +2526,10 @@ export default function ServiceClaimFlow() {
 
               <div className="service-field-grid service-field-grid--phone-email">
                 <label className="service-field">
-                  <span>{copy.hausmeisterPhone}</span>
+                  <span>
+                    {copy.hausmeisterPhone}
+                    <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                  </span>
                   <input
                     type="tel"
                     value={formValues.hausmeisterPhone}
@@ -2511,7 +2539,10 @@ export default function ServiceClaimFlow() {
                 </label>
 
                 <label className="service-field">
-                  <span>{copy.hausmeisterEmail}</span>
+                  <span>
+                    {copy.hausmeisterEmail}
+                    <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                  </span>
                   <input
                     type="email"
                     value={formValues.hausmeisterEmail}
@@ -2520,6 +2551,8 @@ export default function ServiceClaimFlow() {
                   />
                 </label>
               </div>
+              </div>
+              ) : null}
             </section>
 
             <section className="service-form__section service-form__section--problem-kitchen">
