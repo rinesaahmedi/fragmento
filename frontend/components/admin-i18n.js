@@ -153,6 +153,7 @@ function formatAdminDate(value, language = "en") {
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
+    timeZone: "Europe/Berlin",
   });
   const parts = Object.fromEntries(formatter.formatToParts(new Date(value)).map((part) => [part.type, part.value]));
 
