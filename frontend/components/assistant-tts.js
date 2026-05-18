@@ -50,7 +50,8 @@ export async function speakAssistantTextWithTts(text, options = {}) {
     audio.addEventListener("error", releaseAudio, { once: true });
     await audio.play();
     return;
-  } catch {
+  } catch (error) {
+    console.warn("Assistant TTS fell back to browser speech:", error?.message || error);
     if (!window.speechSynthesis) {
       return;
     }
