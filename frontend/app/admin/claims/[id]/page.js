@@ -189,8 +189,10 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   <p style={detailTextStyle}>
                     {[
                       claim.landlordName || "-",
-                      claim.landlordPhone ? `${claim.landlordPhone}` : null,
-                      claim.landlordEmail ? `${claim.landlordEmail}` : null,
+                      claim.landlordCompanyPhone ? `Company phone: ${claim.landlordCompanyPhone}` : null,
+                      claim.landlordCompanyEmail ? `Company email: ${claim.landlordCompanyEmail}` : null,
+                      claim.landlordPhone ? `Contact phone: ${claim.landlordPhone}` : null,
+                      claim.landlordEmail ? `Contact email: ${claim.landlordEmail}` : null,
                     ].filter(Boolean).join("\n")}
                   </p>
                 </div>

@@ -10,6 +10,7 @@ import {
   composeProblemDescriptionWithAreas,
   splitKitchenAreasFromProblemDescription,
 } from "../lib/service-claim-problem-description";
+import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -181,6 +182,10 @@ const COPY = {
     landlordSurnamePlaceholder: "Nachname",
     landlordCompanyName: "Firmenname",
     landlordCompanyNamePlaceholder: "Firma / Hausverwaltung",
+    landlordCompanyPhone: "Telefon Firma",
+    landlordCompanyPhonePlaceholder: "+49 ...",
+    landlordCompanyEmail: "E-Mail Firma",
+    landlordCompanyEmailPlaceholder: "firma@beispiel.de",
     landlordContactGivenName: "Vorname",
     landlordContactGivenNamePlaceholder: "Vorname",
     landlordContactSurname: "Nachname",
@@ -222,7 +227,7 @@ const COPY = {
     submitting: "Wird gesendet...",
     contactError: "Bitte gib mindestens eine Telefonnummer oder E-Mail-Adresse an.",
     contractLookupLoading: "Vertragsnummer wird gepr\u00fcft...",
-    contractLookupSuccess: "Adresse aus den hinterlegten Vertragsdaten eingef\u00fcllt. Du kannst die Felder weiter bearbeiten.",
+    contractLookupSuccess: "Adresse und Vermieterdaten aus den hinterlegten Vertragsdaten eingef\u00fcllt. Du kannst die Felder weiter bearbeiten.",
     contractLookupError: "Die Vertragsnummer wurde nicht gefunden.",
     kitchenPlanEyebrow: "K\u00fcchenmodell",
     kitchenPlanTitle: "Problemstelle in der K\u00fcche markieren",
@@ -339,6 +344,10 @@ const COPY = {
     landlordSurnamePlaceholder: "Surname",
     landlordCompanyName: "Company name",
     landlordCompanyNamePlaceholder: "Company / property management",
+    landlordCompanyPhone: "Company phone",
+    landlordCompanyPhonePlaceholder: "+49 ...",
+    landlordCompanyEmail: "Company email",
+    landlordCompanyEmailPlaceholder: "company@example.com",
     landlordContactGivenName: "First name",
     landlordContactGivenNamePlaceholder: "First name",
     landlordContactSurname: "Surname",
@@ -377,7 +386,7 @@ const COPY = {
     attachmentsErrorFileTooLarge: "Each file must be 4 MB or smaller.",
     attachmentsErrorType: "This file type is not allowed. Use PDF, images, or common office formats.",
     contractLookupLoading: "Checking contract number...",
-    contractLookupSuccess: "Address autofilled from the saved contract data. You can still edit the fields.",
+    contractLookupSuccess: "Address and landlord details autofilled from the saved contract data. You can still edit the fields.",
     kitchenPlanEyebrow: "Kitchen model",
     kitchenPlanTitle: "Mark where the problem is",
     kitchenPlanReset: "Clear selection",
@@ -486,6 +495,10 @@ const COPY = {
     landlordSurnamePlaceholder: "Soyad",
     landlordCompanyName: "Firma ad\u0131",
     landlordCompanyNamePlaceholder: "Firma / site y\u00f6netimi",
+    landlordCompanyPhone: "Firma telefonu",
+    landlordCompanyPhonePlaceholder: "+49 ...",
+    landlordCompanyEmail: "Firma e-postas\u0131",
+    landlordCompanyEmailPlaceholder: "firma@example.com",
     landlordContactGivenName: "Ad",
     landlordContactGivenNamePlaceholder: "Ad",
     landlordContactSurname: "Soyad",
@@ -604,6 +617,10 @@ const COPY = {
     landlordSurnamePlaceholder: "Apellidos",
     landlordCompanyName: "Nombre de la empresa",
     landlordCompanyNamePlaceholder: "Empresa / administraci\u00f3n de fincas",
+    landlordCompanyPhone: "Tel\u00e9fono de la empresa",
+    landlordCompanyPhonePlaceholder: "+49 ...",
+    landlordCompanyEmail: "Correo de la empresa",
+    landlordCompanyEmailPlaceholder: "empresa@ejemplo.com",
     landlordContactGivenName: "Nombre",
     landlordContactGivenNamePlaceholder: "Nombre",
     landlordContactSurname: "Apellidos",
@@ -722,6 +739,10 @@ const COPY = {
     landlordSurnamePlaceholder: "Nom",
     landlordCompanyName: "Nom de l'entreprise",
     landlordCompanyNamePlaceholder: "Entreprise / gestion immobili\u00e8re",
+    landlordCompanyPhone: "T\u00e9l\u00e9phone de l'entreprise",
+    landlordCompanyPhonePlaceholder: "+49 ...",
+    landlordCompanyEmail: "E-mail de l'entreprise",
+    landlordCompanyEmailPlaceholder: "entreprise@exemple.com",
     landlordContactGivenName: "Pr\u00e9nom",
     landlordContactGivenNamePlaceholder: "Pr\u00e9nom",
     landlordContactSurname: "Nom",
@@ -839,6 +860,10 @@ const COPY = {
     landlordPhonePlaceholder: "+49 ...",
     landlordCompanyName: "\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438",
     landlordCompanyNamePlaceholder: "\u041a\u043e\u043c\u043f\u0430\u043d\u0438\u044f / \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u043d\u0435\u0434\u0432\u0438\u0436\u0438\u043c\u043e\u0441\u0442\u044c\u044e",
+    landlordCompanyPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438",
+    landlordCompanyPhonePlaceholder: "+49 ...",
+    landlordCompanyEmail: "E-mail \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438",
+    landlordCompanyEmailPlaceholder: "company@example.com",
     landlordContactGivenName: "\u0418\u043c\u044f",
     landlordContactGivenNamePlaceholder: "\u0418\u043c\u044f",
     landlordContactSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
@@ -903,6 +928,8 @@ const INITIAL_FORM = {
   landlordGivenName: "",
   landlordSurname: "",
   landlordCompanyName: "",
+  landlordCompanyPhone: "",
+  landlordCompanyEmail: "",
   landlordContactGender: "",
   landlordContactGivenName: "",
   landlordContactSurname: "",
@@ -924,20 +951,6 @@ const EMPTY_CONTRACT_LOOKUP = {
 };
 
 const EMPTY_CLAIM_ASSISTANT_MESSAGES = [];
-
-function buildAutofillFieldsFromContract(contract) {
-  const address = contract?.address || {};
-
-  return {
-    clientCountry: String(address.country || "").trim(),
-    clientAddressLine1: String(address.address1 || "").trim(),
-    clientAddressLine2: String(address.address2 || "").trim(),
-    clientPostalCode: String(address.postalCode || "").trim(),
-    clientCity: String(address.city || "").trim(),
-    clientFloor: String(contract?.floor || "").trim(),
-    clientUnitNumber: String(contract?.unitNumber || "").trim(),
-  };
-}
 
 function normalizeSerialNumberList(value) {
   return String(value || "")
@@ -1332,7 +1345,7 @@ export default function ServiceClaimFlow() {
 
               return {
                 ...current,
-                ...buildAutofillFieldsFromContract(payload.contract),
+                ...buildServiceClaimAutofillFromContract(payload.contract),
               };
             });
 
@@ -1707,6 +1720,11 @@ export default function ServiceClaimFlow() {
 
       if (payload.language && payload.language !== language) {
         setLanguage(payload.language);
+      }
+
+      const suggestedProblemDescription = String(payload.suggestedProblemDescription || "").trim();
+      if (suggestedProblemDescription) {
+        handleAdditionalProblemDetailsChange(suggestedProblemDescription);
       }
 
       setClaimAssistantMessages((current) => [
@@ -2366,15 +2384,37 @@ export default function ServiceClaimFlow() {
                 </label>
               </div>
 
-              <label className="service-field service-field--landlord-company">
-                <span>{t("landlordCompanyName")}</span>
-                <input
-                  type="text"
-                  value={formValues.landlordCompanyName}
-                  onChange={(event) => handleFieldChange("landlordCompanyName", event.target.value)}
-                  placeholder={t("landlordCompanyNamePlaceholder")}
-                />
-              </label>
+              <div className="service-field-grid service-field-grid--landlord-company">
+                <label className="service-field">
+                  <span>{t("landlordCompanyName")}</span>
+                  <input
+                    type="text"
+                    value={formValues.landlordCompanyName}
+                    onChange={(event) => handleFieldChange("landlordCompanyName", event.target.value)}
+                    placeholder={t("landlordCompanyNamePlaceholder")}
+                  />
+                </label>
+
+                <label className="service-field">
+                  <span>{t("landlordCompanyPhone")}</span>
+                  <input
+                    type="tel"
+                    value={formValues.landlordCompanyPhone}
+                    onChange={(event) => handleFieldChange("landlordCompanyPhone", event.target.value)}
+                    placeholder={t("landlordCompanyPhonePlaceholder")}
+                  />
+                </label>
+
+                <label className="service-field">
+                  <span>{t("landlordCompanyEmail")}</span>
+                  <input
+                    type="email"
+                    value={formValues.landlordCompanyEmail}
+                    onChange={(event) => handleFieldChange("landlordCompanyEmail", event.target.value)}
+                    placeholder={t("landlordCompanyEmailPlaceholder")}
+                  />
+                </label>
+              </div>
 
               <p className="service-form__field-group-label">{t("landlordContactPersonGroup")}</p>
               <div className="service-field-grid service-field-grid--3">
@@ -2526,8 +2566,10 @@ export default function ServiceClaimFlow() {
                   ))}
                   <label className="service-field service-field--problem-area-row">
                     <span className="service-field__problem-area-label">
-                      {t("problemDescriptionFieldLabel")}
-                      <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                      <span className="service-field__problem-area-label-text">
+                        {t("problemDescriptionFieldLabel")}
+                        <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                      </span>
                     </span>
                     <textarea
                       className="service-field__problem-area-input"

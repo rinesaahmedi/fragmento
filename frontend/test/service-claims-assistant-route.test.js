@@ -158,6 +158,33 @@ test("explicit dishwasher E1 uses concise water inlet guidance", async () => {
   assert.doesNotMatch(response.body.answer, /For the claim form/);
   assert.doesNotMatch(response.body.answer, /Suggested problem description/);
   assert.doesNotMatch(response.body.answer, /What it means/);
+  assert.equal(response.body.suggestedProblemDescription, undefined);
+});
+
+test("show claim-form help after E1 conversation returns suggested description for the form", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "en",
+    question: "Show claim-form help",
+    conversationMessages: [
+      { role: "user", text: "im seeing the error E1" },
+      {
+        role: "assistant",
+        text: "This sounds like a water inlet problem and matches error code E1 on architecto dishwashers.",
+      },
+    ],
+    selectedAreas: dishwasherArea(),
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /For the claim form/);
+  assert.match(
+    response.body.suggestedProblemDescription,
+    /My architecto dishwasher is not taking in water and may show error code E1/,
+  );
+  assert.ok(!response.body.actions);
 });
 
 test("dishwasher temperature issue maps to E3 without unrelated leak advice", async () => {
@@ -1188,6 +1215,10 @@ test("what should i write shows english claim-form guidance and suggested descri
   assert.match(response.body.answer, /For the claim form/);
   assert.match(response.body.answer, /Mention that the dishwasher is not taking in water and add E1/);
   assert.match(response.body.answer, /Suggested problem description/);
+  assert.match(
+    response.body.suggestedProblemDescription,
+    /My architecto dishwasher is not taking in water and may show error code E1/,
+  );
   assert.ok(!response.body.actions);
 });
 
@@ -1229,6 +1260,10 @@ test("show claim-form help shows english claim-form guidance", async () => {
   assert.equal(response.body.language, "en");
   assert.match(response.body.answer, /For the claim form/);
   assert.match(response.body.answer, /Mention that the dishwasher is not heating or the water stays cold, and add E3/);
+  assert.match(
+    response.body.suggestedProblemDescription,
+    /My architecto dishwasher is not heating properly and may show error code E3/,
+  );
   assert.ok(!response.body.actions);
 });
 
@@ -1250,6 +1285,10 @@ test("claim-form help phrase shows english drainage claim-form guidance", async 
   assert.match(response.body.answer, /For the claim form/);
   assert.match(response.body.answer, /Mention that the dishwasher is not draining properly/);
   assert.match(response.body.answer, /My architecto dishwasher is not draining properly/);
+  assert.equal(
+    response.body.suggestedProblemDescription,
+    "My architecto dishwasher is not draining properly and may show error code E02. I checked the filters, drain hose, and pump area, but the issue remains. Please arrange a check or advise on the next step.",
+  );
   assert.ok(!response.body.actions);
 });
 

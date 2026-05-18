@@ -199,9 +199,11 @@ model ServiceClaim {
   clientCountry      String?
   clientCity         String?
   clientPostalCode   String?
-  landlordName       String?
-  landlordPhone      String?
-  landlordEmail      String?
+  landlordName            String?
+  landlordCompanyPhone    String?
+  landlordCompanyEmail    String?
+  landlordPhone           String?
+  landlordEmail           String?
   hausmeisterName    String?
   hausmeisterPhone   String?
   hausmeisterEmail   String?

@@ -1260,9 +1260,8 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.service-field--landlord-company {
-  width: fit-content;
-  max-width: min(100%, 26rem);
+.service-field-grid--landlord-company {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .service-field-grid--client-location {
@@ -2023,9 +2022,11 @@ textarea {
   line-height: 1.45;
 }
 
-.service-field--problem-area-row > .service-field__problem-area-label .service-field__required-mark {
+.service-field--problem-area-row > .service-field__problem-area-label .service-field__required-mark,
+.service-field--problem-area-row > .service-field__problem-area-label .service-field__optional-mark {
   margin-left: 0.08em;
   flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 /* Service claim: compact kitchen plan (configurator SVG uses large min-heights) */
@@ -2476,16 +2477,12 @@ textarea {
   .service-field-grid,
   .service-field-grid--3,
   .service-field-grid--phone-email,
+  .service-field-grid--landlord-company,
   .service-field-grid--client-location,
   .service-field-grid--client-address-details,
   .service-field-grid--preferred-contact,
   .service-field-grid--preferred-contact-custom {
     grid-template-columns: 1fr;
-    width: 100%;
-    max-width: none;
-  }
-
-  .service-field--landlord-company {
     width: 100%;
     max-width: none;
   }

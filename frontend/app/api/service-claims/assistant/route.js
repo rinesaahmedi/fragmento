@@ -1076,12 +1076,18 @@ function normalizeAssistantReturn(value) {
 }
 
 function buildClaimFormHelpAnswer({ language, claimGuidance, description }) {
-  return [
+  const normalizedDescription = normalizeText(description);
+  const answer = [
     formatSection(language === "de" ? "Für das Schadensformular" : "For the claim form", claimGuidance || []),
-    formatQuotedBlock(language === "de" ? "Vorschlag für die Beschreibung" : "Suggested problem description", description),
+    formatQuotedBlock(language === "de" ? "Vorschlag für die Beschreibung" : "Suggested problem description", normalizedDescription),
   ]
     .filter(Boolean)
     .join("\n\n");
+
+  return {
+    answer,
+    ...(normalizedDescription ? { suggestedProblemDescription: normalizedDescription } : {}),
+  };
 }
 
 function hasOnlyDishwasherErrorCodeDisplayContext(text) {
@@ -1965,6 +1971,9 @@ export async function POST(request) {
     const payload = { answer: finalAnswer, language };
     if (built.actions?.length) {
       payload.actions = built.actions;
+    }
+    if (built.suggestedProblemDescription) {
+      payload.suggestedProblemDescription = built.suggestedProblemDescription;
     }
 
     return NextResponse.json(payload);

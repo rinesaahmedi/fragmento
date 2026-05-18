@@ -1,0 +1,49 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  buildServiceClaimAutofillFromContract,
+  splitPersonName,
+} from "../lib/service-claim-contract-autofill.js";
+
+test("splitPersonName splits a full name into given name and surname", () => {
+  assert.deepEqual(splitPersonName("Max Mustermann"), {
+    givenName: "Max",
+    surname: "Mustermann",
+  });
+  assert.deepEqual(splitPersonName("Anna"), {
+    givenName: "Anna",
+    surname: "",
+  });
+});
+
+test("buildServiceClaimAutofillFromContract maps address and landlord fields", () => {
+  const autofill = buildServiceClaimAutofillFromContract({
+    floor: "2",
+    unitNumber: "14",
+    address: {
+      country: "Germany",
+      address1: "Invalidenstrasse 10",
+      address2: "Hinterhaus",
+      postalCode: "10115",
+      city: "Berlin",
+    },
+    landlord: {
+      companyName: "Anna Schmidt Housing GmbH",
+      email: "anna.schmidt@example.com",
+      phone: "+49 30 555 0101",
+      managerName: "Clara Kontakt",
+    },
+  });
+
+  assert.equal(autofill.clientCountry, "Germany");
+  assert.equal(autofill.clientAddressLine1, "Invalidenstrasse 10");
+  assert.equal(autofill.clientFloor, "2");
+  assert.equal(autofill.clientUnitNumber, "14");
+  assert.equal(autofill.landlordCompanyName, "Anna Schmidt Housing GmbH");
+  assert.equal(autofill.landlordCompanyPhone, "+49 30 555 0101");
+  assert.equal(autofill.landlordCompanyEmail, "anna.schmidt@example.com");
+  assert.equal(autofill.landlordContactGivenName, "Clara");
+  assert.equal(autofill.landlordContactSurname, "Kontakt");
+  assert.equal(autofill.landlordPhone, undefined);
+  assert.equal(autofill.landlordEmail, undefined);
+});

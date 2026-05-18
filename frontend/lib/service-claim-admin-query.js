@@ -38,6 +38,8 @@ export function buildServiceClaimListWhere(filters, { includeAttachmentsJsonInSe
     }
     parts.push(
       Prisma.sql`COALESCE("landlordName", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE("landlordCompanyPhone", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE("landlordCompanyEmail", '') ILIKE ${query}`,
       Prisma.sql`COALESCE("landlordPhone", '') ILIKE ${query}`,
       Prisma.sql`COALESCE("landlordEmail", '') ILIKE ${query}`,
       Prisma.sql`COALESCE("hausmeisterName", '') ILIKE ${query}`,
@@ -80,6 +82,8 @@ const CLAIM_COLUMNS = `
       "clientCity",
       "clientPostalCode",
       "landlordName",
+      "landlordCompanyPhone",
+      "landlordCompanyEmail",
       "landlordPhone",
       "landlordEmail",
       "hausmeisterName",

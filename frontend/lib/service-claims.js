@@ -1,5 +1,7 @@
 import { prisma } from "./prisma";
 
+export { buildServiceClaimAutofillFromContract, splitPersonName } from "./service-claim-contract-autofill";
+
 export function normalizeServiceClaimContractNumber(value) {
   return String(value || "").trim();
 }
@@ -66,6 +68,8 @@ export async function getServiceClaimContractDetails(contractNumber) {
           country: "",
         };
 
+  const housingCompany = contract.project?.housingCompany || null;
+
   return {
     id: contract.id,
     contractNumber: contract.contractNumber,
@@ -75,7 +79,15 @@ export async function getServiceClaimContractDetails(contractNumber) {
     unitNumber: contract.unitNumber || "",
     projectName: contract.project?.name || "",
     propertyObjectName: propertyObject?.name || "",
-    housingCompanyName: contract.project?.housingCompany?.name || "",
+    housingCompanyName: housingCompany?.name || "",
     address: addressSource,
+    landlord: housingCompany
+      ? {
+          companyName: housingCompany.name || "",
+          email: housingCompany.email || "",
+          phone: housingCompany.phone || "",
+          managerName: contract.project?.managerName || "",
+        }
+      : null,
   };
 }
