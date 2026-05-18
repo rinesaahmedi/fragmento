@@ -915,6 +915,16 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrd
 }
 
 export default function KitchenConfigurator({ initialLanguage = "de", ...props }) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <PublicI18nProvider initialLanguage={initialLanguage}>
       <KitchenConfiguratorContent {...props} />
@@ -1547,7 +1557,7 @@ function KitchenConfiguratorContent({
       setProductInfoQuestion("");
       return;
     }
-    await submitProductInfoQuestion(productInfoQuestion);
+    await submitProductInfoQuestion(productInfoQuestion, { speakAnswer: true });
   }
 
   function toggleProductAssistantVoice() {

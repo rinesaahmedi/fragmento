@@ -1746,7 +1746,7 @@ export default function ServiceClaimFlow() {
       setClaimAssistantQuestion("");
       return;
     }
-    await submitClaimAssistantQuestion(question);
+    await submitClaimAssistantQuestion(question, { speakAnswer: true });
   }
 
   function toggleClaimAssistantVoice() {
@@ -2791,7 +2791,7 @@ export default function ServiceClaimFlow() {
                               type="button"
                               className="service-claim-agent__action-chip"
                               disabled={isClaimAssistantLoading}
-                              onClick={() => submitClaimAssistantQuestion(action.prompt || action.label)}
+                              onClick={() => submitClaimAssistantQuestion(action.prompt || action.label, { speakAnswer: true })}
                             >
                               {action.label}
                             </button>
