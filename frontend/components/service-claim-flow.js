@@ -172,18 +172,23 @@ const COPY = {
     clientUnitNumber: "Wohnungsnummer",
     clientUnitNumberPlaceholder: "z.B. 3B",
     landlordSection: "Vermieter (optional)",
+    landlordPersonGroup: "Vermieter",
+    landlordContactPersonGroup: "Ansprechperson",
+    landlordContactGender: "Anrede",
     landlordGivenName: "Vorname",
     landlordGivenNamePlaceholder: "Vorname",
     landlordSurname: "Nachname",
     landlordSurnamePlaceholder: "Nachname",
     landlordCompanyName: "Firmenname",
     landlordCompanyNamePlaceholder: "Firma / Hausverwaltung",
-    landlordContactPerson: "Ansprechperson",
-    landlordContactPersonPlaceholder: "Vor- und Nachname",
-    landlordPhone: "Telefon Vermieter",
+    landlordContactGivenName: "Vorname",
+    landlordContactGivenNamePlaceholder: "Vorname",
+    landlordContactSurname: "Nachname",
+    landlordContactSurnamePlaceholder: "Nachname",
+    landlordPhone: "Telefon Ansprechperson",
     landlordPhonePlaceholder: "+49 ...",
-    landlordEmail: "E-Mail Vermieter",
-    landlordEmailPlaceholder: "vermieter@beispiel.de",
+    landlordEmail: "E-Mail Ansprechperson",
+    landlordEmailPlaceholder: "kontakt@beispiel.de",
     hausmeisterSection: "Hausmeister (optional)",
     hausmeisterGivenName: "Vorname",
     hausmeisterGivenNamePlaceholder: "Vorname",
@@ -325,18 +330,23 @@ const COPY = {
     clientUnitNumber: "Unit number",
     clientUnitNumberPlaceholder: "e.g. 3B",
     landlordSection: "Landlord (optional)",
+    landlordPersonGroup: "Landlord",
+    landlordContactPersonGroup: "Contact person",
+    landlordContactGender: "Gender",
     landlordGivenName: "First name",
     landlordGivenNamePlaceholder: "First name",
     landlordSurname: "Surname",
     landlordSurnamePlaceholder: "Surname",
     landlordCompanyName: "Company name",
     landlordCompanyNamePlaceholder: "Company / property management",
-    landlordContactPerson: "Contact person",
-    landlordContactPersonPlaceholder: "Full name",
-    landlordPhone: "Landlord phone",
+    landlordContactGivenName: "First name",
+    landlordContactGivenNamePlaceholder: "First name",
+    landlordContactSurname: "Surname",
+    landlordContactSurnamePlaceholder: "Surname",
+    landlordPhone: "Contact person phone",
     landlordPhonePlaceholder: "+49 ...",
-    landlordEmail: "Landlord email",
-    landlordEmailPlaceholder: "landlord@example.com",
+    landlordEmail: "Contact person email",
+    landlordEmailPlaceholder: "contact@example.com",
     hausmeisterSection: "Property manager (optional)",
     hausmeisterGivenName: "Name",
     hausmeisterGivenNamePlaceholder: "Name",
@@ -467,14 +477,23 @@ const COPY = {
     clientUnitNumber: "Daire no",
     clientUnitNumberPlaceholder: "\u00f6rn. 3B",
     landlordSection: "Ev sahibi (iste\u011fe ba\u011fl\u0131)",
+    landlordPersonGroup: "Ev sahibi",
+    landlordContactPersonGroup: "\u0130leti\u015fim ki\u015fisi",
+    landlordContactGender: "Cinsiyet",
     landlordGivenName: "Ad",
     landlordGivenNamePlaceholder: "Ad",
     landlordSurname: "Soyad",
     landlordSurnamePlaceholder: "Soyad",
-    landlordPhone: "Ev sahibi telefonu",
+    landlordCompanyName: "Firma ad\u0131",
+    landlordCompanyNamePlaceholder: "Firma / site y\u00f6netimi",
+    landlordContactGivenName: "Ad",
+    landlordContactGivenNamePlaceholder: "Ad",
+    landlordContactSurname: "Soyad",
+    landlordContactSurnamePlaceholder: "Soyad",
+    landlordPhone: "\u0130leti\u015fim ki\u015fisi telefonu",
     landlordPhonePlaceholder: "+49 ...",
-    landlordEmail: "Ev sahibi e-postas\u0131",
-    landlordEmailPlaceholder: "evsahibi@example.com",
+    landlordEmail: "\u0130leti\u015fim ki\u015fisi e-postas\u0131",
+    landlordEmailPlaceholder: "iletisim@example.com",
     hausmeisterSection: "Bina g\u00f6revlisi (iste\u011fe ba\u011fl\u0131)",
     hausmeisterGivenName: "Ad",
     hausmeisterGivenNamePlaceholder: "Ad",
@@ -576,14 +595,23 @@ const COPY = {
     clientUnitNumber: "N\u00famero de unidad",
     clientUnitNumberPlaceholder: "p. ej. 3B",
     landlordSection: "Propietario (opcional)",
+    landlordPersonGroup: "Propietario",
+    landlordContactPersonGroup: "Persona de contacto",
+    landlordContactGender: "Sexo",
     landlordGivenName: "Nombre",
     landlordGivenNamePlaceholder: "Nombre",
     landlordSurname: "Apellidos",
     landlordSurnamePlaceholder: "Apellidos",
-    landlordPhone: "Tel\u00e9fono del propietario",
+    landlordCompanyName: "Nombre de la empresa",
+    landlordCompanyNamePlaceholder: "Empresa / administraci\u00f3n de fincas",
+    landlordContactGivenName: "Nombre",
+    landlordContactGivenNamePlaceholder: "Nombre",
+    landlordContactSurname: "Apellidos",
+    landlordContactSurnamePlaceholder: "Apellidos",
+    landlordPhone: "Tel\u00e9fono de la persona de contacto",
     landlordPhonePlaceholder: "+49 ...",
-    landlordEmail: "Correo del propietario",
-    landlordEmailPlaceholder: "propietario@ejemplo.com",
+    landlordEmail: "Correo de la persona de contacto",
+    landlordEmailPlaceholder: "contacto@ejemplo.com",
     hausmeisterSection: "Encargado (opcional)",
     hausmeisterGivenName: "Nombre",
     hausmeisterGivenNamePlaceholder: "Nombre",
@@ -685,14 +713,23 @@ const COPY = {
     clientUnitNumber: "Num\u00e9ro d'unit\u00e9",
     clientUnitNumberPlaceholder: "ex. 3B",
     landlordSection: "Propri\u00e9taire (facultatif)",
+    landlordPersonGroup: "Propri\u00e9taire",
+    landlordContactPersonGroup: "Personne de contact",
+    landlordContactGender: "Genre",
     landlordGivenName: "Pr\u00e9nom",
     landlordGivenNamePlaceholder: "Pr\u00e9nom",
     landlordSurname: "Nom",
     landlordSurnamePlaceholder: "Nom",
-    landlordPhone: "T\u00e9l\u00e9phone du propri\u00e9taire",
+    landlordCompanyName: "Nom de l'entreprise",
+    landlordCompanyNamePlaceholder: "Entreprise / gestion immobili\u00e8re",
+    landlordContactGivenName: "Pr\u00e9nom",
+    landlordContactGivenNamePlaceholder: "Pr\u00e9nom",
+    landlordContactSurname: "Nom",
+    landlordContactSurnamePlaceholder: "Nom",
+    landlordPhone: "T\u00e9l\u00e9phone du contact",
     landlordPhonePlaceholder: "+49 ...",
-    landlordEmail: "E-mail du propri\u00e9taire",
-    landlordEmailPlaceholder: "proprietaire@exemple.com",
+    landlordEmail: "E-mail du contact",
+    landlordEmailPlaceholder: "contact@exemple.com",
     hausmeisterSection: "Gardien (facultatif)",
     hausmeisterGivenName: "Pr\u00e9nom",
     hausmeisterGivenNamePlaceholder: "Pr\u00e9nom",
@@ -798,10 +835,16 @@ const COPY = {
     landlordGivenNamePlaceholder: "\u0418\u043c\u044f",
     landlordSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
     landlordSurnamePlaceholder: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
-    landlordPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u0430\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044f",
+    landlordPhone: "\u0422\u0435\u043b\u0435\u0444\u043e\u043d \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0433\u043e \u043b\u0438\u0446\u0430",
     landlordPhonePlaceholder: "+49 ...",
-    landlordEmail: "E-mail \u0430\u0440\u0435\u043d\u0434\u043e\u0434\u0430\u0442\u0435\u043b\u044f",
-    landlordEmailPlaceholder: "landlord@example.com",
+    landlordCompanyName: "\u041d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u043a\u043e\u043c\u043f\u0430\u043d\u0438\u0438",
+    landlordCompanyNamePlaceholder: "\u041a\u043e\u043c\u043f\u0430\u043d\u0438\u044f / \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435 \u043d\u0435\u0434\u0432\u0438\u0436\u0438\u043c\u043e\u0441\u0442\u044c\u044e",
+    landlordContactGivenName: "\u0418\u043c\u044f",
+    landlordContactGivenNamePlaceholder: "\u0418\u043c\u044f",
+    landlordContactSurname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
+    landlordContactSurnamePlaceholder: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
+    landlordEmail: "E-mail \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u043e\u0433\u043e \u043b\u0438\u0446\u0430",
+    landlordEmailPlaceholder: "contact@example.com",
     hausmeisterSection: "\u0425\u0430\u0443\u0441\u043c\u0430\u0439\u0441\u0442\u0435\u0440 (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     hausmeisterGivenName: "\u0418\u043c\u044f",
     hausmeisterGivenNamePlaceholder: "\u0418\u043c\u044f",
@@ -860,7 +903,9 @@ const INITIAL_FORM = {
   landlordGivenName: "",
   landlordSurname: "",
   landlordCompanyName: "",
-  landlordContactPerson: "",
+  landlordContactGender: "",
+  landlordContactGivenName: "",
+  landlordContactSurname: "",
   landlordPhone: "",
   landlordEmail: "",
   hausmeisterGivenName: "",
@@ -2003,7 +2048,7 @@ export default function ServiceClaimFlow() {
           </div>
 
           <form className="service-form" onSubmit={handleSubmit}>
-            <label className="service-field">
+            <label className="service-field service-field--contract-number">
               <span className="service-field__label-row service-field__label-row--contract">
                 <span className="service-field__label-main">
                   {copy.contractNumber}
@@ -2122,7 +2167,7 @@ export default function ServiceClaimFlow() {
                 </p>
                 <p className="service-form__section-helper">{t("preferredContactTimeHelper")}</p>
               </div>
-              <div className="service-field-grid">
+              <div className="service-field-grid service-field-grid--preferred-contact">
                 <label className="service-field">
                   <span>{t("preferredContactDate")}</span>
                   <div className="service-field__date-picker">
@@ -2195,7 +2240,7 @@ export default function ServiceClaimFlow() {
 
             <section className="service-form__section">
               <p className="service-form__section-title">{copy.clientAddress}</p>
-              <div className="service-field-grid">
+              <div className="service-field-grid service-field-grid--client-location">
                 <label className="service-field">
                   <span>
                     {copy.clientCountry}
@@ -2223,9 +2268,7 @@ export default function ServiceClaimFlow() {
                     required
                   />
                 </label>
-              </div>
 
-              <div className="service-field-grid">
                 <label className="service-field">
                   <span>
                     {copy.clientPostalCode}
@@ -2239,7 +2282,9 @@ export default function ServiceClaimFlow() {
                     required
                   />
                 </label>
+              </div>
 
+              <div className="service-field-grid service-field-grid--client-address-details">
                 <label className="service-field">
                   <span>
                     {copy.clientFloor}
@@ -2251,6 +2296,19 @@ export default function ServiceClaimFlow() {
                     onChange={(event) => handleFieldChange("clientFloor", event.target.value)}
                     placeholder={copy.clientFloorPlaceholder}
                     required
+                  />
+                </label>
+
+                <label className="service-field">
+                  <span>
+                    {copy.clientUnitNumber}
+                    <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                  </span>
+                  <input
+                    type="text"
+                    value={formValues.clientUnitNumber}
+                    onChange={(event) => handleFieldChange("clientUnitNumber", event.target.value)}
+                    placeholder={copy.clientUnitNumberPlaceholder}
                   />
                 </label>
               </div>
@@ -2281,23 +2339,11 @@ export default function ServiceClaimFlow() {
                   placeholder={copy.clientAddressLine2Placeholder}
                 />
               </label>
-
-              <label className="service-field">
-                <span>
-                  {copy.clientUnitNumber}
-                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
-                </span>
-                <input
-                  type="text"
-                  value={formValues.clientUnitNumber}
-                  onChange={(event) => handleFieldChange("clientUnitNumber", event.target.value)}
-                  placeholder={copy.clientUnitNumberPlaceholder}
-                />
-              </label>
             </section>
 
             <section className="service-form__section">
               <p className="service-form__section-title">{copy.landlordSection}</p>
+              <p className="service-form__field-group-label">{t("landlordPersonGroup")}</p>
               <div className="service-field-grid">
                 <label className="service-field">
                   <span>{t("landlordGivenName")}</span>
@@ -2320,47 +2366,73 @@ export default function ServiceClaimFlow() {
                 </label>
               </div>
 
-              <div className="service-field-grid">
+              <label className="service-field service-field--landlord-company">
+                <span>{t("landlordCompanyName")}</span>
+                <input
+                  type="text"
+                  value={formValues.landlordCompanyName}
+                  onChange={(event) => handleFieldChange("landlordCompanyName", event.target.value)}
+                  placeholder={t("landlordCompanyNamePlaceholder")}
+                />
+              </label>
+
+              <p className="service-form__field-group-label">{t("landlordContactPersonGroup")}</p>
+              <div className="service-field-grid service-field-grid--3">
                 <label className="service-field">
-                  <span>{t("landlordCompanyName")}</span>
+                  <span>{t("landlordContactGender")}</span>
+                  <select
+                    value={formValues.landlordContactGender}
+                    onChange={(event) => handleFieldChange("landlordContactGender", event.target.value)}
+                  >
+                    <option value="">{copy.genderPlaceholder}</option>
+                    <option value="female">{copy.genderFemale}</option>
+                    <option value="male">{copy.genderMale}</option>
+                    <option value="prefer_not_to_say">{copy.genderPreferNot}</option>
+                  </select>
+                </label>
+
+                <label className="service-field">
+                  <span>{t("landlordContactGivenName")}</span>
                   <input
                     type="text"
-                    value={formValues.landlordCompanyName}
-                    onChange={(event) => handleFieldChange("landlordCompanyName", event.target.value)}
-                    placeholder={t("landlordCompanyNamePlaceholder")}
+                    value={formValues.landlordContactGivenName}
+                    onChange={(event) => handleFieldChange("landlordContactGivenName", event.target.value)}
+                    placeholder={t("landlordContactGivenNamePlaceholder")}
                   />
                 </label>
 
                 <label className="service-field">
-                  <span>{t("landlordContactPerson")}</span>
+                  <span>{t("landlordContactSurname")}</span>
                   <input
                     type="text"
-                    value={formValues.landlordContactPerson}
-                    onChange={(event) => handleFieldChange("landlordContactPerson", event.target.value)}
-                    placeholder={t("landlordContactPersonPlaceholder")}
+                    value={formValues.landlordContactSurname}
+                    onChange={(event) => handleFieldChange("landlordContactSurname", event.target.value)}
+                    placeholder={t("landlordContactSurnamePlaceholder")}
                   />
                 </label>
               </div>
 
-              <label className="service-field">
-                <span>{copy.landlordPhone}</span>
-                <input
-                  type="tel"
-                  value={formValues.landlordPhone}
-                  onChange={(event) => handleFieldChange("landlordPhone", event.target.value)}
-                  placeholder={copy.landlordPhonePlaceholder}
-                />
-              </label>
+              <div className="service-field-grid service-field-grid--phone-email">
+                <label className="service-field">
+                  <span>{copy.landlordPhone}</span>
+                  <input
+                    type="tel"
+                    value={formValues.landlordPhone}
+                    onChange={(event) => handleFieldChange("landlordPhone", event.target.value)}
+                    placeholder={copy.landlordPhonePlaceholder}
+                  />
+                </label>
 
-              <label className="service-field">
-                <span>{copy.landlordEmail}</span>
-                <input
-                  type="email"
-                  value={formValues.landlordEmail}
-                  onChange={(event) => handleFieldChange("landlordEmail", event.target.value)}
-                  placeholder={copy.landlordEmailPlaceholder}
-                />
-              </label>
+                <label className="service-field">
+                  <span>{copy.landlordEmail}</span>
+                  <input
+                    type="email"
+                    value={formValues.landlordEmail}
+                    onChange={(event) => handleFieldChange("landlordEmail", event.target.value)}
+                    placeholder={copy.landlordEmailPlaceholder}
+                  />
+                </label>
+              </div>
             </section>
 
             <section className="service-form__section">
@@ -2387,25 +2459,27 @@ export default function ServiceClaimFlow() {
                 </label>
               </div>
 
-              <label className="service-field">
-                <span>{copy.hausmeisterPhone}</span>
-                <input
-                  type="tel"
-                  value={formValues.hausmeisterPhone}
-                  onChange={(event) => handleFieldChange("hausmeisterPhone", event.target.value)}
-                  placeholder={copy.hausmeisterPhonePlaceholder}
-                />
-              </label>
+              <div className="service-field-grid service-field-grid--phone-email">
+                <label className="service-field">
+                  <span>{copy.hausmeisterPhone}</span>
+                  <input
+                    type="tel"
+                    value={formValues.hausmeisterPhone}
+                    onChange={(event) => handleFieldChange("hausmeisterPhone", event.target.value)}
+                    placeholder={copy.hausmeisterPhonePlaceholder}
+                  />
+                </label>
 
-              <label className="service-field">
-                <span>{copy.hausmeisterEmail}</span>
-                <input
-                  type="email"
-                  value={formValues.hausmeisterEmail}
-                  onChange={(event) => handleFieldChange("hausmeisterEmail", event.target.value)}
-                  placeholder={copy.hausmeisterEmailPlaceholder}
-                />
-              </label>
+                <label className="service-field">
+                  <span>{copy.hausmeisterEmail}</span>
+                  <input
+                    type="email"
+                    value={formValues.hausmeisterEmail}
+                    onChange={(event) => handleFieldChange("hausmeisterEmail", event.target.value)}
+                    placeholder={copy.hausmeisterEmailPlaceholder}
+                  />
+                </label>
+              </div>
             </section>
 
             <section className="service-form__section service-form__section--problem-kitchen">
@@ -2490,7 +2564,7 @@ export default function ServiceClaimFlow() {
             </section>
 
             <div className="service-field-grid">
-              <label className="service-field">
+              <label className="service-field service-field--serial-number">
                 <span className="service-field__label-row service-field__label-row--serial">
                   <span className="service-field__label-main">
                     {copy.serialNumber}
@@ -2525,7 +2599,7 @@ export default function ServiceClaimFlow() {
                     />
                     <button
                       type="button"
-                      className="service-button service-button--secondary service-serial-field__add"
+                      className="service-serial-field__add"
                       onClick={() => addSerialNumberEntry()}
                       disabled={!serialNumberDraft.trim()}
                     >
@@ -2583,7 +2657,7 @@ export default function ServiceClaimFlow() {
               </div>
             </div>
 
-            <div className="service-field service-field--attachments">
+            <div className="service-field service-field--attachments service-field--claim-attachments">
               <span>{copy.attachments}</span>
               <p className="service-form__hint service-form__hint--attachments">{copy.attachmentsHint}</p>
               <input

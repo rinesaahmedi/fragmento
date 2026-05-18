@@ -119,6 +119,26 @@ function genderDisplayLabel(gender) {
   return String(gender || "-");
 }
 
+function optionalGender(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  if (normalized === "female" || normalized === "male" || normalized === "prefer_not_to_say") {
+    return normalized;
+  }
+  return "";
+}
+
+function formatContactPersonName({ gender, givenName, surname, legacyName = "" }) {
+  const joined = combinePersonName(givenName, surname);
+  const person = legacyName || joined;
+  if (!person) {
+    return "";
+  }
+  if (gender === "female" || gender === "male") {
+    return `${person} (${genderDisplayLabel(gender)})`;
+  }
+  return person;
+}
+
 function buildCustomerFullName({ givenName, surname, gender }) {
   const combined = [givenName, surname].filter(Boolean).join(" ").trim();
   if (gender === "female" || gender === "male") {
@@ -138,11 +158,17 @@ function buildPartyContactBlock(contact) {
   const surname = String(contact?.surname || "").trim();
   const phone = String(contact?.phone || "").trim();
   const email = String(contact?.email || "").trim();
-  const resolvedContactPerson = contactPerson || combinePersonName(givenName, surname);
+  const resolvedContactPerson =
+    formatContactPersonName({
+      gender: contact?.gender,
+      givenName: contact?.contactGivenName || givenName,
+      surname: contact?.contactSurname || surname,
+      legacyName: contactPerson,
+    }) || "—";
 
   return [
     `Firma: ${companyName || "—"}`,
-    `Ansprechperson: ${resolvedContactPerson || "—"}`,
+    `Ansprechperson: ${resolvedContactPerson}`,
     `Telefon: ${phone || "—"}`,
     `E-Mail: ${email || "—"}`,
   ].join("\n");
@@ -283,6 +309,9 @@ function buildComplaintEmailText(payload) {
   const landlordBlock = buildPartyContactBlock({
     companyName: payload.landlordCompanyName,
     contactPerson: payload.landlordContactPerson,
+    gender: payload.landlordContactGender,
+    contactGivenName: payload.landlordContactGivenName,
+    contactSurname: payload.landlordContactSurname,
     givenName: payload.landlordGivenName,
     surname: payload.landlordSurname,
     phone: payload.landlordPhone,
@@ -333,11 +362,18 @@ function buildComplaintEmailHtml(payload) {
   const tableStyles = "width:100%;border-collapse:collapse;font-family:Arial,sans-serif;";
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;vertical-align:top;";
   const customerName = escapeHtml(`${payload.givenName} ${payload.surname}`.trim());
+  const landlordContactDisplay = formatContactPersonName({
+    gender: payload.landlordContactGender,
+    givenName: payload.landlordContactGivenName,
+    surname: payload.landlordContactSurname,
+    legacyName: payload.landlordContactPerson,
+  });
   const landlordValue = [
     payload.landlordCompanyName ? `Firma: ${payload.landlordCompanyName}` : "",
-    payload.landlordContactPerson
-      ? `Ansprechperson: ${payload.landlordContactPerson}`
-      : `${payload.landlordGivenName} ${payload.landlordSurname}`.trim(),
+    landlordContactDisplay ? `Ansprechperson: ${landlordContactDisplay}` : "",
+    !landlordContactDisplay && `${payload.landlordGivenName} ${payload.landlordSurname}`.trim()
+      ? `${payload.landlordGivenName} ${payload.landlordSurname}`.trim()
+      : "",
     payload.landlordPhone ? `Telefon: ${payload.landlordPhone}` : "",
     payload.landlordEmail ? `E-Mail: ${payload.landlordEmail}` : "",
   ]
@@ -575,11 +611,25 @@ export async function POST(request) {
     }
 
     const landlordCompanyName = optionalString(body.landlordCompanyName);
-    const landlordContactPerson = optionalString(body.landlordContactPerson);
+    const landlordContactGender = optionalGender(body.landlordContactGender);
+    const landlordContactGivenName = optionalString(body.landlordContactGivenName);
+    const landlordContactSurname = optionalString(body.landlordContactSurname);
+    const landlordContactPersonJoined = combinePersonName(
+      landlordContactGivenName,
+      landlordContactSurname,
+    );
+    const landlordContactPerson =
+      optionalString(body.landlordContactPerson) || landlordContactPersonJoined;
     const landlordGivenName = optionalString(body.landlordGivenName);
     const landlordSurname = optionalString(body.landlordSurname);
     const landlordNameJoined = combinePersonName(landlordGivenName, landlordSurname);
-    const landlordResolvedContactPerson = landlordContactPerson || landlordNameJoined;
+    const landlordResolvedContactPerson =
+      formatContactPersonName({
+        gender: landlordContactGender,
+        givenName: landlordContactGivenName,
+        surname: landlordContactSurname,
+        legacyName: landlordContactPerson || landlordNameJoined,
+      }) || landlordContactPerson || landlordNameJoined;
     const landlordName = [landlordCompanyName, landlordResolvedContactPerson].filter(Boolean).join(" / ") || null;
     const landlordPhone = optionalString(body.landlordPhone);
     const landlordEmail = optionalString(body.landlordEmail);
@@ -629,6 +679,9 @@ export async function POST(request) {
       clientCity: requiredString(body.clientCity, "Client city"),
       clientPostalCode: requiredString(body.clientPostalCode, "Client postal code"),
       landlordCompanyName,
+      landlordContactGender,
+      landlordContactGivenName,
+      landlordContactSurname,
       landlordContactPerson: landlordResolvedContactPerson,
       landlordGivenName,
       landlordSurname,
@@ -643,8 +696,8 @@ export async function POST(request) {
       landlordContact: [
         `Landlord company: ${landlordCompanyName || "—"}`,
         `Landlord contact person: ${landlordResolvedContactPerson || "—"}`,
-        `Landlord phone: ${landlordPhone || "-"}`,
-        `Landlord email: ${landlordEmail || "-"}`,
+        `Contact person phone: ${landlordPhone || "-"}`,
+        `Contact person email: ${landlordEmail || "-"}`,
         `Hausmeister: ${hausmeisterNameJoined || "—"}`,
         `Hausmeister phone: ${hausmeisterPhone || "-"}`,
         `Hausmeister email: ${hausmeisterEmail || "-"}`,
