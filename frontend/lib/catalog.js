@@ -753,6 +753,7 @@ export function serializeKitchenForLegacy(kitchen) {
     name: item.name,
     price: Number(item.price),
     infoText: item.infoText || "",
+    productImagePath: item.productImagePath || "",
     productInfoPdfPath: item.productInfoPdfPath || "",
     productInfoSummary: item.productInfoSummary || "",
     productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],

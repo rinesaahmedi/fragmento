@@ -986,6 +986,7 @@ function KitchenConfiguratorContent({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrderSectionOpen, setIsOrderSectionOpen] = useState(false);
   const [activeProductInfo, setActiveProductInfo] = useState(null);
+  const [activeProductPhotos, setActiveProductPhotos] = useState(null);
   const [isProductAssistantOpen, setIsProductAssistantOpen] = useState(false);
   const [productAssistantMessages, setProductAssistantMessages] = useState([]);
   const [selectedProductAssistantContext, setSelectedProductAssistantContext] = useState(null);
@@ -1387,6 +1388,27 @@ function KitchenConfiguratorContent({
       return {
         ...current,
         activeProductInfoDocumentHref: href,
+      };
+    });
+  }
+
+  function openProductPhotos(payload) {
+    const images = Array.isArray(payload?.images) ? payload.images.filter(Boolean) : [];
+    if (!images.length) return;
+    setActiveProductPhotos({
+      title: payload.title || translate("configurator.productPhotosTitle", "Product photos"),
+      images,
+      index: 0,
+    });
+  }
+
+  function showProductPhoto(direction) {
+    setActiveProductPhotos((current) => {
+      if (!current?.images?.length) return current;
+      const length = current.images.length;
+      return {
+        ...current,
+        index: (current.index + direction + length) % length,
       };
     });
   }
@@ -1817,6 +1839,7 @@ function KitchenConfiguratorContent({
               onToggleAccessory={toggleAccessory}
               onToggleService={toggleService}
               onOpenProductInfo={openProductInfo}
+              onOpenProductPhotos={openProductPhotos}
               onOpenProductAssistantFromItem={hasAnyAssistantProducts ? openProductAssistantForCatalogItem : undefined}
               serviceEligibility={serviceEligibility}
             />
@@ -1924,6 +1947,60 @@ function KitchenConfiguratorContent({
                     />
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {activeProductPhotos ? (
+          <div
+            className={styles.productPhotoOverlay}
+            role="presentation"
+            onClick={() => setActiveProductPhotos(null)}
+          >
+            <div
+              className={styles.productPhotoDialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="product-photo-title"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className={styles.productInfoHeader}>
+                <h2 id="product-photo-title">{activeProductPhotos.title}</h2>
+                <button
+                  type="button"
+                  className={styles.productInfoClose}
+                  aria-label={translate("configurator.productPhotosCloseAria", "Close product photos")}
+                  onClick={() => setActiveProductPhotos(null)}
+                >
+                  {translate("common.close", "Close")}
+                </button>
+              </div>
+              <div className={styles.productPhotoStage}>
+                <button
+                  type="button"
+                  className={styles.productPhotoNav}
+                  aria-label={translate("configurator.previousPhoto", "Previous photo")}
+                  onClick={() => showProductPhoto(-1)}
+                >
+                  {"<"}
+                </button>
+                <img
+                  src={activeProductPhotos.images[activeProductPhotos.index]}
+                  alt={activeProductPhotos.title}
+                  className={styles.productPhotoImage}
+                />
+                <button
+                  type="button"
+                  className={styles.productPhotoNav}
+                  aria-label={translate("configurator.nextPhoto", "Next photo")}
+                  onClick={() => showProductPhoto(1)}
+                >
+                  {">"}
+                </button>
+              </div>
+              <div className={styles.productPhotoFooter}>
+                {activeProductPhotos.index + 1} / {activeProductPhotos.images.length}
               </div>
             </div>
           </div>

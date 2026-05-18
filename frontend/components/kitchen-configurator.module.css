@@ -829,7 +829,8 @@
 }
 
 .productInfoClose,
-.productInfoActionLink {
+.productInfoActionLink,
+.itemPhotoTrigger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -842,6 +843,15 @@
   font-weight: 700;
   text-decoration: none;
   cursor: pointer;
+}
+
+.itemPhotoTrigger {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  line-height: 1;
 }
 
 .productInfoMeta {
@@ -1496,6 +1506,66 @@
   overflow: hidden;
   border: 1px solid rgba(120, 90, 64, 0.12);
   background: #f3efe9;
+}
+
+.productPhotoOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(31, 23, 15, 0.48);
+  backdrop-filter: blur(6px);
+}
+
+.productPhotoDialog {
+  width: min(1040px, 100%);
+  max-height: min(92vh, 900px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #fffdf9;
+  box-shadow: 0 32px 80px rgba(36, 24, 13, 0.24);
+}
+
+.productPhotoStage {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+}
+
+.productPhotoImage {
+  display: block;
+  width: 100%;
+  height: min(72vh, 680px);
+  object-fit: contain;
+  border: 1px solid rgba(120, 90, 64, 0.12);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.productPhotoNav {
+  width: 48px;
+  height: 64px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  border-radius: 8px;
+  background: #fff;
+  color: #5e4632;
+  font-size: 2rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.productPhotoFooter {
+  color: #6d6156;
+  font-weight: 700;
+  text-align: center;
 }
 
 .productInfoFrame {

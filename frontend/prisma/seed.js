@@ -13,8 +13,19 @@ const PRODUCT_INFO_FILES = {
   fridge: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf",
 };
 
+const PRODUCT_IMAGE_FILES = {
+  dishwasher: "/product-images/email/a-egspv597210-dishwasher.jpg",
+  oven: "/product-images/email/ebx943600s-oven.jpg",
+  hob: "/product-images/email/ol-kmi754000e-hob.jpg",
+  hood: "/product-images/email/fh664621s-flat-hood.jpg",
+  hoodChimney: "/product-images/email/khf664611s-chimney-hood.jpg",
+  fridge: "/product-images/email/kgc15495s-fridge.jpg",
+  washingMachine: "/product-images/email/ewa34660w-washing-machine.jpg",
+};
+
 const PRODUCT_INFO_BY_CODE = {
   "DISH-600-STD": {
+    productImagePath: PRODUCT_IMAGE_FILES.dishwasher,
     productInfoPdfPath: PRODUCT_INFO_FILES.dishwasher,
     productInfoSummary: "Vollintegrierter 60-cm-Geschirrspueler fuer den Einbau hinter einer Moebelfront. Die aktuelle Produktinformation nennt 12 Massgedecke, Energieklasse D und 5 Programme.",
     productInfoKeyFacts: [
@@ -37,6 +48,7 @@ const PRODUCT_INFO_BY_CODE = {
     ].join("\n"),
   },
   "REF-545-1800-700": {
+    productImagePath: PRODUCT_IMAGE_FILES.fridge,
     productInfoPdfPath: PRODUCT_INFO_FILES.fridge,
     productInfoSummary: "Freistehende Kuehl-Gefrierkombination KGC 15495 S fuer die Kuechenplanung. Die aktuelle Produktinformation nennt NoFrost, 180 cm Bauhoehe und Energieklasse E.",
     productInfoKeyFacts: [
@@ -58,6 +70,7 @@ const PRODUCT_INFO_BY_CODE = {
     ].join("\n"),
   },
   "HOOD-600-FLAT": {
+    productImagePath: PRODUCT_IMAGE_FILES.hood,
     productInfoPdfPath: PRODUCT_INFO_FILES.hood,
     productInfoSummary: "Flachschirmhaube FH 664 621 S fuer eine 60-cm-Kuechenloesung. Die aktuelle Produktinformation nennt Energieklasse A und bis zu 70 dB Betriebsgeraesch.",
     productInfoKeyFacts: [
@@ -79,6 +92,7 @@ const PRODUCT_INFO_BY_CODE = {
     ].join("\n"),
   },
   "WM-B-EWA34660W": {
+    productImagePath: PRODUCT_IMAGE_FILES.washingMachine,
     productInfoPdfPath: "/product-info/ewa34660w-washing-machine-product-info.pdf",
     productInfoSummary: "Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt 8 kg Fassungsvermoegen und 1400 U/min.",
     productInfoKeyFacts: [
@@ -127,6 +141,7 @@ PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
   ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"],
 };
 PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"] = {
+  productImagePath: PRODUCT_IMAGE_FILES.hoodChimney,
   productInfoPdfPath: PRODUCT_INFO_FILES.hoodChimney,
   productInfoSummary: "Kaminhaube KHF 664 611 S Stripe X fuer die Kochwand. Die Produktinformation nennt Energieklasse A++, 60 cm Breite und bis zu 67 dB.",
   productInfoKeyFacts: [
@@ -149,6 +164,7 @@ PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"] = {
 };
 PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
 PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
+  productImagePath: PRODUCT_IMAGE_FILES.oven,
   productInfoPdfPath: PRODUCT_INFO_FILES.oven,
   productInfoSummary: "Kombinierte Auswahl aus Einbaubackofen EBX 943 600 S und Induktionskochfeld OL-KMI 754 000 E. Die aktuellen Produktinformationen nennen 77 l Garraum, 9 Backofenfunktionen sowie 4 Kochzonen mit 9 Leistungsstufen.",
   productInfoKeyFacts: [

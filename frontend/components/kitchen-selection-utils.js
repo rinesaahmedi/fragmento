@@ -327,6 +327,31 @@ export function toggleLinkedComponentSelection(slug, currentIds, componentId, lo
   return [...currentSet];
 }
 
+const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
+  "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-C-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
+  "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
+  "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
+  "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
+  "REF-B-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
+  "REF-C-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
+  "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
+  "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
+};
+
+export function getProductImagePaths(item) {
+  const candidates = [item?.productInfoCode, item?.code, item?.tooltipPreviewCode].filter(Boolean);
+  for (const code of candidates) {
+    const gallery = PRODUCT_IMAGE_GALLERIES_BY_CODE[String(code).toUpperCase()];
+    if (gallery?.length) return gallery;
+  }
+  return item?.productImagePath ? [item.productImagePath] : [];
+}
+
 function getCatalogLinkedItems(allItems, slug, item) {
   const componentId = componentIdForItem(item);
   const linkedIds = getLinkedComponentIds(slug, componentId);
@@ -350,6 +375,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
         ...displayItem,
         productInfoItemId: displayItem.id,
         productAssistantName: displayItem.name || "",
+        productImagePath: displayItem.productImagePath || "",
         productInfoKeyFacts: Array.isArray(displayItem.productInfoKeyFacts) ? displayItem.productInfoKeyFacts : [],
         productInfoDocuments: getProductInfoDocuments(displayItem),
       },
@@ -379,6 +405,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
         : primaryItem.infoText,
       iconKey: hoodItem?.iconKey || primaryItem.iconKey,
       productInfoPdfPath: infoSource?.productInfoPdfPath || "",
+      productImagePath: infoSource?.productImagePath || primaryItem.productImagePath || "",
       productInfoSummary: infoSource?.productInfoSummary || "",
       productInfoKeyFacts: Array.isArray(infoSource?.productInfoKeyFacts) ? infoSource.productInfoKeyFacts : [],
       productInfoExtractedText: infoSource?.productInfoExtractedText || "",
