@@ -231,7 +231,7 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
 export function AdminDateTime({ value }) {
   const { language } = useAdminI18n();
 
-  return formatAdminDate(value, language);
+  return <span suppressHydrationWarning>{formatAdminDate(value, language)}</span>;
 }
 
 export function AdminKitchenDisplayName({ slug, name }) {
