@@ -1297,6 +1297,14 @@ textarea {
   gap: 16px;
 }
 
+.service-field-grid--claim-serial-row {
+  align-items: start;
+}
+
+.service-field-grid--claim-serial-row > .service-field {
+  align-self: start;
+}
+
 .service-field-grid--3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -1814,37 +1822,59 @@ textarea {
   box-sizing: border-box;
 }
 
+.service-attachments {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.service-attachments__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .service-attachments__summary {
-  margin: 12px 0 8px;
-  font-size: 0.9rem;
+  margin: 0;
+  font-size: 0.8rem;
   font-weight: 700;
-  color: var(--app-accent);
+  color: rgba(107, 79, 58, 0.92);
 }
 
 .service-attachments__list {
   margin: 0;
   padding: 0;
   list-style: none;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
   gap: 8px;
+  max-height: 4.35rem;
+  overflow-y: auto;
+  padding-right: 4px;
 }
 
 .service-attachments__item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: 14px;
-  border: 1px solid rgba(107, 79, 58, 0.12);
-  background: rgba(255, 255, 255, 0.88);
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 5px 8px 5px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(156, 124, 94, 0.34);
+  background: rgba(245, 234, 217, 0.92);
 }
 
 .service-attachments__name {
   min-width: 0;
-  font-size: 0.9rem;
+  max-width: clamp(8rem, 24vw, 12rem);
+  font-size: 0.78rem;
   font-weight: 600;
-  color: var(--app-text);
+  color: rgba(64, 49, 37, 0.92);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1852,28 +1882,46 @@ textarea {
 
 .service-attachments__remove {
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
   border: none;
-  border-radius: 10px;
-  background: rgba(107, 79, 58, 0.1);
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(156, 124, 94, 0.14);
   color: var(--app-accent);
-  font-size: 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
-  transition: background-color 140ms ease;
+  transition:
+    background-color 140ms ease,
+    color 140ms ease;
 }
 
 .service-attachments__remove:hover,
 .service-attachments__remove:focus-visible {
-  background: rgba(107, 79, 58, 0.18);
+  background: rgba(156, 124, 94, 0.26);
+  color: rgba(72, 50, 34, 0.96);
 }
 
 .service-attachments__clear {
-  margin-top: 12px;
-  min-height: 46px;
-  padding: 0 18px;
-  font-size: 0.9rem;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: rgba(107, 79, 58, 0.84);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+  cursor: pointer;
+}
+
+.service-attachments__clear:hover,
+.service-attachments__clear:focus-visible {
+  color: rgba(72, 50, 34, 0.96);
 }
 
 .service-serial-field {
@@ -1895,6 +1943,10 @@ textarea {
   max-width: 100%;
   min-height: 44px;
   padding: 10px 14px;
+}
+
+.service-field--serial-number {
+  align-content: start;
 }
 
 .service-serial-field__add {

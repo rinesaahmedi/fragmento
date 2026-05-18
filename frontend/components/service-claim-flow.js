@@ -95,6 +95,52 @@ function OptionalFieldSuffix({ text }) {
   return <span className="service-field__optional-mark">{text}</span>;
 }
 
+function ServiceAttachmentChips({
+  files,
+  summary,
+  maxCount,
+  clearLabel,
+  onRemove,
+  onClearAll,
+}) {
+  if (!files.length) {
+    return null;
+  }
+
+  return (
+    <div className="service-attachments">
+      <div className="service-attachments__header">
+        <p className="service-attachments__summary">
+          {summary}
+          {typeof maxCount === "number" ? ` (${files.length}/${maxCount})` : ""}
+        </p>
+        {typeof onClearAll === "function" ? (
+          <button type="button" className="service-attachments__clear" onClick={onClearAll}>
+            {clearLabel}
+          </button>
+        ) : null}
+      </div>
+      <ul className="service-attachments__list">
+        {files.map((file, index) => (
+          <li key={`${file.name}-${file.size}-${index}`} className="service-attachments__item">
+            <span className="service-attachments__name" title={file.name}>
+              {file.name}
+            </span>
+            <button
+              type="button"
+              className="service-attachments__remove"
+              onClick={() => onRemove(index)}
+              aria-label="Remove file"
+            >
+              &times;
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 function ServiceYesNoChoice({ question, value, yesLabel, noLabel, onChange }) {
   const isYes = value === "yes";
   const isNo = value === "no" || !value;
@@ -1035,7 +1081,7 @@ export default function ServiceClaimFlow() {
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
   const [problemComponentIds, setProblemComponentIds] = useState([]);
   const [attachments, setAttachments] = useState([]);
-  const [serialNumberImage, setSerialNumberImage] = useState(null);
+  const [serialNumberImages, setSerialNumberImages] = useState([]);
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
   const [serialNumberImageFieldKey, setSerialNumberImageFieldKey] = useState(0);
   const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
@@ -1476,7 +1522,7 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
-        const currentCount = next.length + (serialNumberImage ? 1 : 0);
+        const currentCount = next.length + serialNumberImages.length;
         if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
           break;
@@ -1499,37 +1545,45 @@ export default function ServiceClaimFlow() {
   }
 
   function handleSerialNumberImageSelected(event) {
-    const picked = event.target.files?.[0] || null;
+    const picked = Array.from(event.target.files || []);
     event.target.value = "";
-    if (!picked) {
-      return;
-    }
-
-    if (picked.size > MAX_CLAIM_ATTACHMENT_BYTES) {
-      setError(copy.attachmentsErrorFileTooLarge);
-      return;
-    }
-
-    if (!picked.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(picked)) {
-      setError(copy.attachmentsErrorType);
-      return;
-    }
-
-    if (!serialNumberImage && attachments.length + 1 > MAX_CLAIM_ATTACHMENT_COUNT) {
-      setError(copy.attachmentsErrorTooMany);
+    if (!picked.length) {
       return;
     }
 
     setError("");
-    setSerialNumberImage(picked);
+    setSerialNumberImages((prev) => {
+      const next = [...prev];
+      let message = "";
+      for (const file of picked) {
+        const currentCount = attachments.length + next.length;
+        if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
+          message = copy.attachmentsErrorTooMany;
+          break;
+        }
+        if (file.size > MAX_CLAIM_ATTACHMENT_BYTES) {
+          message = copy.attachmentsErrorFileTooLarge;
+          continue;
+        }
+        if (!file.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(file)) {
+          message = copy.attachmentsErrorType;
+          continue;
+        }
+        next.push(file);
+      }
+      if (message) {
+        queueMicrotask(() => setError(message));
+      }
+      return next;
+    });
   }
 
   function removeAttachment(index) {
     setAttachments((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
   }
 
-  function removeSerialNumberImage() {
-    setSerialNumberImage(null);
+  function removeSerialNumberImage(index) {
+    setSerialNumberImages((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
     setSerialNumberImageFieldKey((key) => key + 1);
     setError("");
   }
@@ -1732,8 +1786,8 @@ export default function ServiceClaimFlow() {
             contractNumber: normalizedContractNumber,
             problemDescription: buildSubmittedProblemDescription(),
             serialNumber: String(formValues.serialNumber || "").trim(),
-            hasSerialNumberImage: Boolean(serialNumberImage),
-            attachmentCount: attachments.length + (serialNumberImage ? 1 : 0),
+            hasSerialNumberImage: serialNumberImages.length > 0,
+            attachmentCount: attachments.length + serialNumberImages.length,
             preferredContactDate: String(formValues.preferredContactDate || "").trim(),
             preferredContactTimeWindow: String(formValues.preferredContactTimeWindow || "").trim(),
             preferredContactTimeFrom: String(formValues.preferredContactTimeFrom || "").trim(),
@@ -1915,7 +1969,7 @@ export default function ServiceClaimFlow() {
       const normalizedSerialNumbers = normalizeSerialNumberList(
         [formValues.serialNumber, serialNumberDraft].filter(Boolean).join("\n"),
       );
-      if (!normalizedSerialNumbers && !serialNumberImage) {
+      if (!normalizedSerialNumbers && serialNumberImages.length === 0) {
         setError(t("serialNumberRequired"));
         setIsSubmitting(false);
         return;
@@ -1929,7 +1983,7 @@ export default function ServiceClaimFlow() {
         clientPostalCode: formValues.clientPostalCode.trim(),
         problemDescription: buildSubmittedProblemDescription(),
         serialNumber: normalizedSerialNumbers,
-        hasSerialNumberImage: serialNumberImage ? "true" : "false",
+        hasSerialNumberImage: serialNumberImages.length > 0 ? "true" : "false",
         language,
         ...(includeHausmeister ? {} : EMPTY_HAUSMEISTER_FIELDS),
       };
@@ -1950,8 +2004,8 @@ export default function ServiceClaimFlow() {
       } else {
         formData.append("problemAreasJson", "[]");
       }
-      if (serialNumberImage) {
-        formData.append("attachments", serialNumberImage);
+      for (const file of serialNumberImages) {
+        formData.append("attachments", file);
       }
       for (const file of attachments) {
         formData.append("attachments", file);
@@ -1972,7 +2026,7 @@ export default function ServiceClaimFlow() {
       setForm(INITIAL_FORM);
       setSerialNumberDraft("");
       setAttachments([]);
-      setSerialNumberImage(null);
+      setSerialNumberImages([]);
       setProblemComponentIds([]);
       setAttachmentFieldKey((key) => key + 1);
       setSerialNumberImageFieldKey((key) => key + 1);
@@ -2193,7 +2247,7 @@ export default function ServiceClaimFlow() {
               </label>
             </div>
 
-            <div className="service-field-grid">
+            <div className="service-field-grid service-field-grid--claim-serial-row">
               <label className="service-field">
                 <span>
                   {copy.phone}
@@ -2710,25 +2764,15 @@ export default function ServiceClaimFlow() {
                   type="file"
                   className="service-field__file"
                   accept={SERIAL_NUMBER_IMAGE_ACCEPT}
+                  multiple
                   onChange={handleSerialNumberImageSelected}
                 />
-                {serialNumberImage ? (
-                  <div className="service-attachments">
-                    <ul className="service-attachments__list">
-                      <li className="service-attachments__item">
-                        <span className="service-attachments__name">{serialNumberImage.name}</span>
-                        <button
-                          type="button"
-                          className="service-attachments__remove"
-                          onClick={removeSerialNumberImage}
-                          aria-label="Remove file"
-                        >
-                          ×
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                ) : null}
+                <ServiceAttachmentChips
+                  files={serialNumberImages}
+                  summary={copy.attachmentsSelected.replace("{count}", String(serialNumberImages.length))}
+                  maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
+                  onRemove={removeSerialNumberImage}
+                />
               </div>
             </div>
 
@@ -2743,35 +2787,14 @@ export default function ServiceClaimFlow() {
                 multiple
                 onChange={handleAttachmentsSelected}
               />
-              {attachments.length > 0 ? (
-                <div className="service-attachments">
-                  <p className="service-attachments__summary">
-                    {copy.attachmentsSelected.replace("{count}", String(attachments.length))}
-                  </p>
-                  <ul className="service-attachments__list">
-                    {attachments.map((file, index) => (
-                      <li key={`${file.name}-${file.size}-${index}`} className="service-attachments__item">
-                        <span className="service-attachments__name">{file.name}</span>
-                        <button
-                          type="button"
-                          className="service-attachments__remove"
-                          onClick={() => removeAttachment(index)}
-                          aria-label="Remove file"
-                        >
-                          ×
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                  <button
-                    type="button"
-                    className="service-button service-button--secondary service-attachments__clear"
-                    onClick={clearAttachments}
-                  >
-                    {copy.attachmentsClear}
-                  </button>
-                </div>
-              ) : null}
+              <ServiceAttachmentChips
+                files={attachments}
+                summary={copy.attachmentsSelected.replace("{count}", String(attachments.length))}
+                maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
+                clearLabel={copy.attachmentsClear}
+                onRemove={removeAttachment}
+                onClearAll={clearAttachments}
+              />
             </div>
 
             {error ? <p className="service-form__error">{error}</p> : null}
