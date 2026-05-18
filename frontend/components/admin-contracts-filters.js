@@ -46,7 +46,7 @@ export default function AdminContractsFilters({
           <input
             name="q"
             defaultValue={filters.query || ""}
-            placeholder={translate("contractsAdmin.contractKitchenOwnerCityPlaceholder", "Contract, kitchen, housing company, city...")}
+            placeholder={translate("contractsAdmin.contractKitchenOwnerCityPlaceholder", "Contract number, kitchen, partner, city...")}
             style={filterInputStyle}
           />
         </FilterField>

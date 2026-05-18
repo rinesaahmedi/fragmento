@@ -169,7 +169,7 @@ export function AdminDashboardCharts({
         <div>
           <p className="eyebrow">{translate("dashboard.analyticsOverview", "Analytics overview")}</p>
           <h1>{translate("dashboard.orderDashboard", "Order dashboard")}</h1>
-          <p>{translate("dashboard.monitorSalesWorkflowMovementKitchenDemandAndItemPerformance", "Monitor sales, workflow movement, kitchen demand, and item performance.")}</p>
+          <p>{translate("dashboard.monitorSalesWorkflowMovementKitchenDemandAndItemPerformance", "Track orders, workflow, kitchens, and item performance.")}</p>
         </div>
         <form method="get" className="filter-form">
           <label>
@@ -219,15 +219,15 @@ export function AdminDashboardCharts({
 
       <section className="chart-card chart-card--compact chart-card--claims">
         <ChartHeader
-          eyebrow={translate("dashboard.claimElementOverview", "Claim element overview")}
-          title={translate("dashboard.claimsBySelectedElementAndCity", "Claims by selected element and city")}
-          detail={translate("dashboard.claimsBySelectedElementAndCityDetail", "Ranked by selected kitchen elements and the city submitted in the service claim form.")}
+          eyebrow={translate("dashboard.claimElementOverview", "Claims by item")}
+          title={translate("dashboard.claimsBySelectedElementAndCity", "Claims by selected item and city")}
+          detail={translate("dashboard.claimsBySelectedElementAndCityDetail", "Ranked by selected kitchen items and the city submitted in the service request form.")}
         />
         <div className="claim-overview-grid">
           <ClaimBreakdownChart
-            title={translate("dashboard.selectedElements", "Selected elements")}
+            title={translate("dashboard.selectedElements", "Selected items")}
             data={claimElementData}
-            emptyLabel={translate("dashboard.noClaimElementDataForSelectedFilters", "No selected claim element data for the current filters.")}
+            emptyLabel={translate("dashboard.noClaimElementDataForSelectedFilters", "No item-level claim data for the current filters.")}
             translateElementLabels
             yAxisWidth={154}
             maxRows={5}

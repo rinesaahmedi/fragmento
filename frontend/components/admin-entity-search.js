@@ -136,7 +136,7 @@ function flattenResults(results, query, translate) {
       secondary: company.address || "",
       meta: joinMeta([
         `${company.objectCount || 0} ${translate("dashboard.finderObjectsShort", "objects")}`,
-        `${company.contractCount || 0} ${translate("dashboard.finderContractsShort", "contracts")}`,
+        `${company.contractCount || 0} ${translate("dashboard.finderContractsShort", "contract numbers")}`,
         `${company.orderCount || 0} ${translate("dashboard.finderOrdersShort", "orders")}`,
       ]),
       href: `/admin/property-owners/${company.id}`,
@@ -150,8 +150,8 @@ function flattenResults(results, query, translate) {
     rows.push({
       id: `contract-${contract.id}`,
       type: "contract",
-      badge: translate("dashboard.finderBadgeContract", "Contract"),
-      label: contract.contractNumber || translate("dashboard.finderUnnamedContract", "Contract"),
+      badge: translate("dashboard.finderBadgeContract", "Contract number"),
+      label: contract.contractNumber || translate("dashboard.finderUnnamedContract", "Contract number"),
       secondary: [
         contract.companyName,
         contract.projectName ? `${translate("contractsAdmin.project", "Project")}: ${contract.projectName}` : "",
@@ -188,7 +188,7 @@ function flattenResults(results, query, translate) {
       ]),
       meta: joinMeta([
         address || translate("dashboard.finderNoAddress", "No address"),
-        `${object.contractCount || 0} ${translate("dashboard.finderContractsShort", "contracts")}`,
+        `${object.contractCount || 0} ${translate("dashboard.finderContractsShort", "contract numbers")}`,
         `${object.orderCount || 0} ${translate("dashboard.finderOrdersShort", "orders")}`,
       ]),
       href: `/admin/property-owners/${object.companyId}?openObject=${object.id}`,
