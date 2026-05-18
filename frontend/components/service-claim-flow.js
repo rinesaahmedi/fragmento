@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
+import { speakAssistantTextWithTts } from "./assistant-tts";
 import {
   composeProblemDescriptionFromParts,
   composeProblemDescriptionWithAreas,
@@ -979,6 +980,7 @@ export default function ServiceClaimFlow() {
   const contractLookupRequestIdRef = useRef(0);
   const contractHelpTouchXRef = useRef(null);
   const claimAssistantRecognitionRef = useRef(null);
+  const claimAssistantAudioRef = useRef(null);
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
   const preferredContactDatePickerRef = useRef(null);
 
@@ -1585,15 +1587,15 @@ export default function ServiceClaimFlow() {
 
   function speakClaimAssistantAnswer(text) {
     const answer = formatClaimAssistantSpokenText(text);
-    if (!answer || !window.speechSynthesis) {
+    if (!answer) {
       return;
     }
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(answer);
-    utterance.lang = getClaimAssistantSpeechLanguage();
-    utterance.rate = 0.96;
-    window.speechSynthesis.speak(utterance);
+    speakAssistantTextWithTts(answer, {
+      audioRef: claimAssistantAudioRef,
+      language: getClaimAssistantSpeechLanguage(),
+      fallbackRate: 0.96,
+    });
   }
 
   async function submitClaimAssistantQuestion(rawQuestion, options = {}) {

@@ -10,12 +10,17 @@ const LANGUAGE_LABELS = {
 };
 
 const NOT_FOUND_ANSWER_BY_LANGUAGE = {
-  de: "Diese Information konnte ich in der Produktinformation nicht finden.",
+  de: "Dazu finde ich in den verfügbaren Produktinformationen keine eindeutig dokumentierte Angabe.",
+  en: "I could not find that information in the product documentation.",
+};
+
+const EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE = {
+  de: "Diese Information ist in den verfügbaren Produktinformationen nicht eindeutig dokumentiert.",
   en: "I could not find that information in the product documentation.",
 };
 
 const NO_INFO_ANSWER_BY_LANGUAGE = {
-  de: "Für dieses Produkt ist noch keine Produktinformation verfügbar.",
+  de: "Für dieses Produkt sind aktuell noch keine Produktinformationen verfügbar.",
   en: "No product information is available for this product yet.",
 };
 
@@ -41,7 +46,7 @@ const BUSINESS_POLICY = {
   },
 };
 const WARRANTY_QUESTION_PATTERN = /\b(warranty|warranties|guarantee|guarantees|garantie|garantien)\b/i;
-const ENERGY_QUESTION_PATTERN = /\b(e[\s-]?label|energy label|energielabel|energieklasse|energy\s+(?:efficiency\s+)?(?:class(?:es)?|klasse)|energy\s+klasse|energie\s+class)\b/i;
+const ENERGY_QUESTION_PATTERN = /\b(e[\s-]?labels?|energy labels?|energielabels?|energieeffizienzklassen?|energieklassen?|energieklasse|energie\s+klasse|energy\s+(?:efficiency\s+)?(?:class(?:es)?|classe|klass|klasse)|energy\s+klasse|energie\s+class(?:e)?|energj|what\s+energy)\b/i;
 
 const MAX_QUESTION_LENGTH = 500;
 const MAX_ITEM_IDS = 10;
@@ -49,6 +54,26 @@ const MAX_CONVERSATION_MESSAGES = 6;
 const MAX_CONVERSATION_MESSAGE_LENGTH = 900;
 const MAX_CONTEXT_CHARS = 12000;
 const OPENAI_TIMEOUT_MS = 20000;
+
+const GREETING_HELPER_MESSAGE_BY_LANGUAGE = {
+  de: "Hallo! Ich unterstütze Sie gerne bei den ausgewählten Produkten \u2014 zum Beispiel bei Energieeffizienzklasse, Maßen, Lautstärke, Verbrauch, Funktionen oder Modellnamen. Welche Information benötigen Sie?",
+  en: "Hello! I can help you with the selected products \u2014 for example energy class, dimensions, noise level, consumption, functions, or model names. What would you like to know?",
+};
+
+const CLARIFICATION_QUESTION_BY_LANGUAGE = {
+  de: "Gerne \u2014 worüber möchten Sie mehr erfahren? Ich kann zum Beispiel Energieeffizienzklasse, Maße, Lautstärke, Verbrauch, Funktionen oder Modellnamen erklären.",
+  en: "What would you like to know about the selected products: energy class, dimensions, noise level, consumption, functions, or model names?",
+};
+
+const HELP_TOPIC_MESSAGE_BY_LANGUAGE = {
+  de: "Ich kann Ihnen bei Energieeffizienzklasse, Verbrauch, Lautstärke, Maßen, Einbaudetails, Kapazität, Programmen oder Funktionen helfen. Welche Information möchten Sie prüfen?",
+  en: "I can help with energy class, consumption, noise level, dimensions, installation details, capacity, programs, or features. Which topic would you like to check?",
+};
+
+const AFFIRMATIVE_CLARIFICATION_BY_LANGUAGE = {
+  de: "Gerne \u2014 welches Gerät oder welche Information meinen Sie?",
+  en: "Please name the product or information you mean.",
+};
 
 function jsonError(message, status) {
   return NextResponse.json({ ok: false, error: message }, { status });
@@ -93,6 +118,207 @@ function buildConversationContext(messages) {
 
 function normalizeLanguage(value) {
   return String(value || "").trim().toLowerCase() === "de" ? "de" : "en";
+}
+
+function normalizeConversationalPrompt(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[?!.,:;]+$/g, "")
+    .replace(/\s+/g, " ");
+}
+
+const TOPIC_PATTERNS = {
+  energy: /\b(energy\s+(?:efficiency\s+)?class(?:es)?|energy\s+(?:classe|klass|klasse)|energy labels?|e[\s-]?labels?|energie\s+(?:class(?:e)?|klasse)|energieeffizienzklassen?|energieklassen?|energieklasse|energielabels?|energj|what\s+energy|label|classe énergétique|classe energetique|klasa e energjisë|klasa e energjise)\b/i,
+  consumption: /\b(consumption|energy use|electricity cost|electricity costs|cost matters|uses the most energy|use the most energy|kwh|water|watter|water use|liters?|litres?|\bl\b|verbrauch|energieverbrauch|stromverbrauch|wasserverbrauch|stromkosten|energiekosten|verbraucht)\b/i,
+  noise: /\b(noise|quietest|loudest|decibels?|dezi(?:bel)?|dezibel|db|dba|dB\(A\)|sound|loud|geräusch|geraeusch|lautstärke|lautstaerke|luftschallemission|leisesten|lautesten|laut)\b/i,
+  dimensions: /\b(dimensions|dimesnions|dimensons|dimentions|dimmensions|measurements|mesurements|size|how big|width|height|depth|installation size|niche size|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe|einbauma[sß]e|nischenma[sß]e)\b/i,
+  features: /\b(functions?|features?|programs?|programmes?|capacity|load capacity|place settings|cooking zones?|zones?|kg|kilograms?|kilos?|steam clean|timer|child safety|booster|pot detection|programme|programme?|funktionen|kapazität|kapazitaet|füllmenge|fuellmenge|fassungsvermögen|fassungsvermoegen|beladung|gewicht|kochzonen?|kindersicherung|topferkennung)\b/i,
+};
+
+function detectTopic(question) {
+  const value = String(question || "");
+  if (TOPIC_PATTERNS.energy.test(value)) return "energy";
+  if (TOPIC_PATTERNS.consumption.test(value)) return "consumption";
+  if (TOPIC_PATTERNS.noise.test(value)) return "noise";
+  if (TOPIC_PATTERNS.dimensions.test(value)) return "dimensions";
+  if (TOPIC_PATTERNS.features.test(value)) return "features";
+  if (WARRANTY_QUESTION_PATTERN.test(value)) return "warranty";
+  return "";
+}
+
+function isOverviewRequest(question) {
+  return /(overview|summary|summarize|selected products|explain the selected products briefly|give me an overview|which products are selected|überblick|ueberblick|zusammenfassung|welche produkte sind ausgewählt|welche produkte sind ausgewaehlt|ausgewählten geräte kurz|ausgewaehlten geraete kurz|erklären sie mir die ausgewählten geräte kurz|erklaeren sie mir die ausgewaehlten geraete kurz)/i.test(String(question || ""));
+}
+
+function isHelpRequest(question) {
+  return /(what can you help me with|how can you help|what do you do|i need some info about (?:the )?(?:appliances|products)|i need information about (?:the )?(?:appliances|products)|need some info about (?:the )?(?:appliances|products)|wobei können sie mir helfen|wobei koennen sie mir helfen|womit können sie helfen|womit koennen sie helfen|ich brauche.*(?:info|informationen).*(?:geräte|geraete|produkte)|ich benötige.*(?:info|informationen).*(?:geräte|geraete|produkte))/i.test(String(question || ""));
+}
+
+function isSimpleGreeting(question) {
+  const value = normalizeConversationalPrompt(question);
+  return /^(hello|hi|hey|good morning|hallo|guten morgen|guten tag)$/.test(value);
+}
+
+function hasClearProductAssistantTopic(value) {
+  return Boolean(detectTopic(value) || isOverviewRequest(value) || /(model|modell|product name|produktname|code|article|artikel)/i.test(value));
+}
+
+function isIncompleteVaguePrompt(question) {
+  const value = normalizeConversationalPrompt(question);
+  if (!value) return false;
+
+  const exactPrompts = [
+    "tell me something about",
+    "tell me about",
+    "what about",
+    "can you tell me",
+    "erzähl mir etwas über",
+    "erzaehl mir etwas ueber",
+    "kannst du mir etwas sagen über",
+    "kannst du mir etwas sagen ueber",
+    "sag mir etwas zu",
+    "was ist mit",
+  ];
+  if (exactPrompts.includes(value)) return true;
+
+  const vaguePrefix = /^(tell me something about|tell me about|what about|can you tell me|erzähl mir etwas über|erzaehl mir etwas ueber|kannst du mir etwas sagen über|kannst du mir etwas sagen ueber|sag mir etwas zu|was ist mit)\s+(.+)$/i;
+  const remainder = value.match(vaguePrefix)?.[2] || "";
+  if (!remainder) return false;
+
+  if (/^(it|this|that|them|the product|the products|es|das|dies|diese|den produkten?|dem produkt)$/.test(remainder)) {
+    return true;
+  }
+
+  return !hasClearProductAssistantTopic(remainder);
+}
+
+function classifyProductAssistantIntent(question) {
+  const value = String(question || "");
+  const topic = detectTopic(value);
+  const comparison = /(which|what|welches|welcher|welche).*(quietest|loudest|uses the most|use the most|leisesten|lautesten|verbraucht am meisten|am meisten energie)|quietest|loudest|leisesten|lautesten|uses the most energy|verbraucht am meisten energie/i.test(value);
+  const recommendation = /(best|recommend|suitable|small apartment|should i look at first|should i choose|which one should i choose|am besten|empfehlen|geeignet|kleine wohnung|welches.*wählen|welches.*waehlen|welches.*zuerst)/i.test(value);
+  const allProducts = /(all selected|all products|all appliances|for all|alle produkte|alle ausgewählten|alle ausgewaehlten|alle geräte|alle geraete|ausgewählten produkte|ausgewaehlten produkte)/i.test(value);
+  const requestedSubProduct = detectRequestedSubProduct(value);
+
+  return {
+    kind: isSimpleGreeting(value)
+      ? "greeting"
+      : isHelpRequest(value)
+        ? "help"
+        : isIncompleteVaguePrompt(value)
+          ? "incomplete"
+          : isOverviewRequest(value) && !topic
+            ? "overview"
+            : comparison
+              ? "comparison"
+              : recommendation
+                ? "recommendation"
+                : topic
+                  ? "fact"
+                  : "unknown",
+    topic,
+    scope: requestedSubProduct ? "product" : (allProducts ? "all" : "selected"),
+    requestedSubProduct,
+  };
+}
+
+function getConversationalRouteAnswer(question, language) {
+  const intent = classifyProductAssistantIntent(question);
+  if (intent.kind === "greeting") {
+    return {
+      answer: GREETING_HELPER_MESSAGE_BY_LANGUAGE[language] || GREETING_HELPER_MESSAGE_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  if (intent.kind === "help") {
+    return {
+      answer: HELP_TOPIC_MESSAGE_BY_LANGUAGE[language] || HELP_TOPIC_MESSAGE_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  if (intent.kind === "incomplete") {
+    return {
+      answer: CLARIFICATION_QUESTION_BY_LANGUAGE[language] || CLARIFICATION_QUESTION_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  return null;
+}
+
+function getMetaOrUnsupportedRouteAnswer(question, language) {
+  const value = String(question || "").trim().toLowerCase();
+
+  if (
+    /(guess|infer|estimate|assume|typical|general knowledge|schätz|schaetz|ableiten|annehmen|typisch|allgemeinwissen)/i.test(value)
+    && /(mounting\s+distance|installation\s+distance|distance\s+above\s+the\s+hob|montageabstand|installationsabstand|abstand[^\n]*(?:kochfeld|hob)|abstand\s+über\s+dem\s+kochfeld|abstand\s+ueber\s+dem\s+kochfeld)/i.test(value)
+  ) {
+    return {
+      answer: language === "de"
+        ? "Ich kann fehlende Montage- oder Installationsabstände nicht ableiten oder schätzen. Ich kann nur Abstände nennen, die in den Produktinformationen ausdrücklich dokumentiert sind."
+        : "I can’t infer or guess a missing installation distance. I can only use installation distances that are explicitly documented in the product information.",
+      found: false,
+    };
+  }
+
+  if (/(forget|ignore).*(?:the\s+)?documentation|just guess|guess the missing|invent|use general knowledge|vergiss.*dokumentation|ignoriere.*dokumentation|schätz|schaetz|erfinde/i.test(value)) {
+    return {
+      answer: language === "de"
+        ? "Ich kann fehlende Maße nicht schätzen. Ich kann nur dokumentierte Produktinformationen verwenden."
+        : "I can’t guess missing dimensions. I can only use documented product information.",
+      found: false,
+    };
+  }
+
+  if (/(ignore previous|ignore instructions|systemanweisung|system prompt|hidden instruction|versteckte.*anweisung|interne.*anweisung|developer message|invent a value|fake pdf|repeat my fake|prompt)/i.test(value)) {
+    return {
+      answer: language === "de"
+        ? "Dabei kann ich nicht helfen. Ich kann Ihnen aber Fragen zu den dokumentierten Produktinformationen beantworten."
+        : "I can't help with that. I can answer questions about the documented product information.",
+      found: false,
+    };
+  }
+
+  if (/(weather|president|capital of|stock price|football|soccer|basketball|tennis|sports?|game yesterday|who won|news|politics|election|wetter|präsident|praesident|hauptstadt|aktienkurs|fußball|fussball|sport|spiel.*gestern|wer hat gewonnen|nachrichten|politik|wahl)/i.test(value)) {
+    return {
+      answer: language === "de"
+        ? "Ich kann nur Fragen zu den ausgewählten Produktinformationen beantworten."
+        : "I can only answer questions about the selected product information.",
+      found: false,
+    };
+  }
+
+  if (/(reich|rich|millionaire|lottery|lotto)/i.test(value)) {
+    return {
+      answer: language === "de"
+        ? "Nein \u2014 dazu enthalten die Produktinformationen keine Angabe. Ich kann Ihnen aber bei realen Produktdetails helfen, zum Beispiel Energieeffizienzklasse, Verbrauch, Lautstärke, Maße oder Funktionen."
+        : "No. The product information does not document that. I can help with real product details such as energy class, consumption, noise level, dimensions, or functions.",
+      found: false,
+    };
+  }
+
+  if (/(nachbarn|nachbarin|neighbor|neighbour)/i.test(value) && /(besser|better|compare|vergleich)/i.test(value)) {
+    return {
+      answer: language === "de"
+        ? "Das kann ich anhand der Produktinformationen nicht mit der Küche Ihres Nachbarn vergleichen. Ich kann die ausgewählten Produkte aber nach dokumentierten Angaben wie Energieeffizienzklasse, Verbrauch, Lautstärke, Maßen oder Funktionen vergleichen."
+        : "I can't compare that with your neighbor's kitchen from the product information. I can compare the selected products using documented details such as energy class, consumption, noise level, dimensions, or functions.",
+      found: false,
+    };
+  }
+
+  if (/(e[\s-]?label|energy label|energielabel).*automatisch|automatisch.*(e[\s-]?label|energy label|energielabel)/i.test(value)) {
+    return {
+      answer: language === "de"
+        ? "Nein. Ein vorhandenes Energielabel-PDF bedeutet nicht automatisch, dass die Energieeffizienzklasse im verfügbaren Produkttext auslesbar ist. Die Klasse darf nur genannt werden, wenn sie ausdrücklich dokumentiert ist.\n\nMöchten Sie die dokumentierten Energieeffizienzklassen aller ausgewählten Produkte sehen?"
+        : "No. An available E-label PDF does not automatically mean the energy class is readable in the available product text. The class may only be stated when it is explicitly documented.\n\nWould you like to see the documented energy classes for all selected products?",
+      found: false,
+    };
+  }
+
+  return null;
 }
 
 function normalizeRequiredString(value) {
@@ -175,12 +401,12 @@ function getDocumentedWarrantyValue(item) {
 
 function getEnergyClassValue(item) {
   const factValue =
-    getFactValue(item, /^(energieklasse|energy\s+(?:efficiency\s+)?class)\s*:/i)
+    getFactValue(item, /^(energieeffizienzklasse|energieklasse|energy\s+(?:efficiency\s+)?class)\s*:/i)
     || getFactValue(item, /^class\s*:/i);
   if (factValue) return factValue;
 
   const match = getItemInfoLines(item)
-    .map((line) => line.match(/\b(?:energieklasse|energy\s+(?:efficiency\s+)?class|energy\s+class)\s*[:\-]?\s*([A-G](?:\+\+?)?)\b/i))
+    .map((line) => line.match(/\b(?:energieeffizienzklasse|energieklasse|energy\s+(?:efficiency\s+)?class|energy\s+class)\s*[:\-]?\s*([A-G](?:\+\+?)?)\b/i))
     .find(Boolean);
   return match ? match[1].toUpperCase() : "";
 }
@@ -191,11 +417,171 @@ function getAnnualConsumptionValue(item) {
   if (factValue) return factValue;
 
   const line = getItemInfoLines(item).find((entry) =>
-    /(jahresverbrauch|annual consumption|energy consumption|energieverbrauch|verbrauch[^\n]*(?:100\s*(?:zyklen|cycles)|jahr|year))/i.test(entry)
+    /(jahresverbrauch|jährlicher energieverbrauch|jaehrlicher energieverbrauch|annual consumption|energy consumption|energieverbrauch|verbrauch[^\n]*(?:100\s*(?:zyklen|cycles)|jahr|year))/i.test(entry)
     && /\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|Jahr|year))?\b/i.test(entry),
   );
+  const pairedMatch = line?.match(/\b\d+(?:[.,]\d+)?\s*kWh\s*\/\s*\d+(?:[.,]\d+)?\s*kWh\b/i);
+  if (pairedMatch) return pairedMatch[0].replace(/\s+/g, " ").trim();
+
   const match = line?.match(/\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|Jahr|year))?\b/i);
   return match ? match[0].replace(/\s+/g, " ").trim() : "";
+}
+
+function getWaterConsumptionValue(item) {
+  const factValue =
+    getFactValue(item, /^(wasserverbrauch|water consumption)\s*:/i);
+  if (factValue) return factValue;
+
+  const line = getItemInfoLines(item).find((entry) =>
+    /(wasserverbrauch|water consumption|water use)/i.test(entry)
+    && /\b\d+(?:[.,]\d+)?\s*(?:l|liter|litre|liters|litres)(?:\s*\/\s*(?:zyklus|cycle|spülgang|spuelgang))?\b/i.test(entry),
+  );
+  const match = line?.match(/\b\d+(?:[.,]\d+)?\s*(?:l|liter|litre|liters|litres)(?:\s*\/\s*(?:zyklus|cycle|spülgang|spuelgang))?\b/i);
+  return match ? match[0].replace(/\s+/g, " ").trim() : "";
+}
+
+function getKilogramSpec(item) {
+  const extractValue = (value) => {
+    const match = String(value || "").match(/\b\d+(?:[.,]\d+)?\s*kg\b/i);
+    return match ? match[0].replace(/\s+/g, " ").trim() : "";
+  };
+  const normalizeLabel = (source, language) => {
+    if (/(weight|gewicht)/i.test(source)) {
+      return language === "de" ? "Gewicht" : "Weight";
+    }
+    return language === "de" ? "Kapazität" : "Capacity";
+  };
+
+  const fact = normalizeFacts(item?.productInfoKeyFacts)
+    .map(normalizePublicProductBrand)
+    .find((entry) =>
+      /^(capacity|load capacity|füllmenge|fuellmenge|beladung|gewicht|weight)\s*:/i.test(entry)
+      && /\b\d+(?:[.,]\d+)?\s*kg\b/i.test(entry),
+    );
+  if (fact) {
+    return {
+      value: extractValue(fact),
+      labelSource: fact,
+    };
+  }
+
+  const line = getItemInfoLines(item).find((entry) =>
+    /(capacity|load|füllmenge|fuellmenge|beladung|gewicht|weight|waschkapazität|waschkapazitaet)/i.test(entry)
+    && /\b\d+(?:[.,]\d+)?\s*kg\b/i.test(entry),
+  );
+
+  return {
+    value: extractValue(line),
+    labelSource: line || "",
+    normalizeLabel,
+  };
+}
+
+function formatKilogramSpecEntry(item, language) {
+  const spec = getKilogramSpec(item);
+  if (!spec.value) return "";
+
+  const label = spec.normalizeLabel
+    ? spec.normalizeLabel(spec.labelSource, language)
+    : (/(weight|gewicht)/i.test(spec.labelSource) ? (language === "de" ? "Gewicht" : "Weight") : (language === "de" ? "Kapazität" : "Capacity"));
+  return `${getPublicItemName(item, language)}: ${label}: ${spec.value}`;
+}
+
+function findLabeledInfoLine(item, labelPattern, valuePattern = /\S/) {
+  const fact = normalizeFacts(item?.productInfoKeyFacts)
+    .map(normalizePublicProductBrand)
+    .find((entry) => labelPattern.test(entry) && valuePattern.test(entry));
+  if (fact) return fact;
+
+  return getItemInfoLines(item).find((entry) => labelPattern.test(entry) && valuePattern.test(entry)) || "";
+}
+
+function getLabelValueFromLine(line) {
+  const value = String(line || "").trim();
+  if (!value) return "";
+
+  const parts = value.split(":");
+  return (parts.length > 1 ? parts.slice(1).join(":") : value).trim();
+}
+
+function getLiterSpec(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(water consumption|water use|wasserverbrauch|volume|capacity|nutzinhalt|volumen|inhalt|liter|litre|liter|l\b)/i,
+    /\b\d+(?:[.,]\d+)?\s*(?:l|liter|litre|liters|litres)\b/i,
+  );
+  const match = line.match(/\b\d+(?:[.,]\d+)?\s*(?:l|liter|litre|liters|litres)\b/i);
+  if (!match) return { value: "", labelSource: "" };
+
+  return {
+    value: match[0].replace(/\s+/g, " ").trim(),
+    labelSource: line,
+  };
+}
+
+function formatLiterSpecEntry(item, language) {
+  const spec = getLiterSpec(item);
+  if (!spec.value) return "";
+
+  const label = /(water|wasser)/i.test(spec.labelSource)
+    ? (language === "de" ? "Wasserverbrauch" : "Water consumption")
+    : (language === "de" ? "Volumen/Kapazität" : "Volume/capacity");
+  return `${getPublicItemName(item, language)}: ${label}: ${spec.value}`;
+}
+
+function getPlaceSettingsValue(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(place settings?|gedecke|maßgedecke|massgedecke)/i,
+    /\b\d{1,2}\b/,
+  );
+  const value = getLabelValueFromLine(line);
+  const match = value.match(/\b\d{1,2}\b/);
+  return match ? match[0] : "";
+}
+
+function formatPlaceSettingsEntry(item, language) {
+  const value = getPlaceSettingsValue(item);
+  if (!value) return "";
+
+  const label = language === "de" ? "Maßgedecke" : "Place settings";
+  return `${getPublicItemName(item, language)}: ${label}: ${value}`;
+}
+
+function getCookingZonesValue(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(cooking zones?|zones?|kochzonen?|kochstellen)/i,
+    /\b\d{1,2}\b/,
+  );
+  const value = getLabelValueFromLine(line);
+  const match = value.match(/\b\d{1,2}\b/);
+  return match ? match[0] : "";
+}
+
+function formatCookingZonesEntry(item, language) {
+  const value = getCookingZonesValue(item);
+  if (!value) return "";
+
+  const label = language === "de" ? "Kochzonen" : "Cooking zones";
+  return `${getPublicItemName(item, language)}: ${label}: ${value}`;
+}
+
+function getProgramOrFeatureValue(item) {
+  const line = findLabeledInfoLine(
+    item,
+    /(programs?|programmes?|features?|functions?|programme|funktionen|ausstattung)/i,
+    /:\s*\S/,
+  );
+  return getLabelValueFromLine(line);
+}
+
+function formatProgramOrFeatureEntry(item, language) {
+  const value = getProgramOrFeatureValue(item);
+  if (!value) return "";
+
+  const label = language === "de" ? "Programme/Funktionen" : "Programs/features";
+  return `${getPublicItemName(item, language)}: ${label}: ${value}`;
 }
 
 function getItemDocumentLabels(item) {
@@ -206,6 +592,43 @@ function getItemDocumentLabels(item) {
 
 function hasELabelDocument(item) {
   return getItemDocumentLabels(item).some((label) => /e[\s-]?label/i.test(label));
+}
+
+function answerFromELabelDocumentFacts(question, items, language) {
+  const value = String(question || "");
+  if (!/\b(?:e[\s-]?label|energy label|energielabel|label)\b/i.test(value)) {
+    return null;
+  }
+  if (
+    /\b(?:energy labels?|energielabels?)\b/i.test(value)
+    && !/\b(?:has?|have|available|exists?|pdf|document|doc|file|datei|gibt|vorhanden)\b/i.test(value)
+  ) {
+    return null;
+  }
+
+  const scopedItems = scopeItemsForQuestion(items, question);
+  const entries = scopedItems
+    .map((item) => {
+      if (!hasELabelDocument(item)) return null;
+      return language === "de"
+        ? `${getPublicItemName(item, language)}: Energielabel-PDF vorhanden`
+        : `${getPublicItemName(item, language)}: E-label PDF available`;
+    })
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return {
+      answer: EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  return {
+    answer: language === "de"
+      ? formatSectionWithBullets("Dokumentierte Energielabel-Dateien:", entries)
+      : formatSectionWithBullets("Documented energy-label files:", entries),
+    found: true,
+  };
 }
 
 function getCombinedItemInfoText(item) {
@@ -335,7 +758,7 @@ function getPublicTypeLabelForModel(model, item, language) {
     return language === "de" ? "Geschirrspüler" : "Dishwasher";
   }
   if (compactModel === "EBX943600S") {
-    return language === "de" ? "Backofen" : "Built-in oven";
+    return language === "de" ? "Einbaubackofen" : "Built-in oven";
   }
   if (compactModel === "OL-KMI754000E") {
     return language === "de" ? "Kochfeld" : "Hob";
@@ -354,7 +777,7 @@ function getPublicTypeLabelForModel(model, item, language) {
     return language === "de" ? "Geschirrspüler" : "Dishwasher";
   }
   if (/\bEBX\s*943\s*600\s*S\b|oven|backofen/i.test(value)) {
-    return language === "de" ? "Backofen" : "Built-in oven";
+    return language === "de" ? "Einbaubackofen" : "Built-in oven";
   }
   if (/\bOL-KMI\s*754\s*000\s*E\b|hob|kochfeld/i.test(value)) {
     return language === "de" ? "Kochfeld" : "Hob";
@@ -383,7 +806,7 @@ function formatSectionWithBullets(title, entries) {
 
 function splitDocumentedDimensionLines(value) {
   return String(value || "")
-    .split(/\r?\n|\s*,\s+(?=(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Dimensions|Appliance dimensions|Niche dimensions)\b)/i)
+    .split(/\r?\n|\s*,\s+(?=(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Dimensions|Appliance dimensions|Niche dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)\b)/i)
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
 }
@@ -397,7 +820,7 @@ function normalizeIdenticalLeadingDimensionRange(value) {
 
 function normalizeDimensionLabel(line, language) {
   const match = String(line || "").trim().match(
-    /^(?<label>(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Ausschnittmaße|Einbautiefe|Appliance dimensions|Niche dimensions|Installation dimensions|Cut-out dimensions|Built-in depth|Dimensions)(?:\s+H\s*x\s*(?:B|W)\s*x\s*(?:T|D))?(?:\s+W\s*x\s*D)?(?:\s*\((?:mm|cm)\))?)\s*:?\s*(?<value>.+)$/i,
+    /^(?<label>(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Ausschnittmaße|Einbautiefe|Appliance dimensions|Niche dimensions|Installation dimensions|Cut-out dimensions|Built-in depth|Dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)(?:\s+H\s*x\s*(?:B|W)\s*x\s*(?:T|D))?(?:\s+W\s*x\s*D)?(?:\s*\((?:mm|cm)\))?)\s*:?\s*(?<value>.+)$/i,
   );
   if (!match?.groups) return String(line || "").trim();
 
@@ -412,6 +835,9 @@ function normalizeDimensionLabel(line, language) {
       .replace(/^Einbaumasse/i, "Einbaumaße")
       .replace(/^Cut-out dimensions/i, "Ausschnittmaße")
       .replace(/^Built-in depth/i, "Einbautiefe")
+      .replace(/^Height/i, "Höhe")
+      .replace(/^Hoehe/i, "Höhe")
+      .replace(/^Bauhoehe/i, "Bauhöhe")
       .replace(/\bH\s*x\s*W\s*x\s*D\b/i, "H x B x T");
 
     return `${germanLabel}: ${rawValue}`;
@@ -428,6 +854,8 @@ function normalizeDimensionLabel(line, language) {
     englishLabel = rawLabel.replace(/^Ausschnittmaße/i, "Cut-out dimensions");
   } else if (/^Einbautiefe/i.test(rawLabel)) {
     englishLabel = rawLabel.replace(/^Einbautiefe/i, "Built-in depth");
+  } else if (/^(Höhe|Hoehe|Bauhöhe|Bauhoehe)/i.test(rawLabel)) {
+    englishLabel = rawLabel.replace(/^(Höhe|Hoehe|Bauhöhe|Bauhoehe)/i, "Height");
   }
 
   englishLabel = englishLabel.replace(/\bH\s*x\s*B\s*x\s*T\b/i, "H x W x D");
@@ -454,10 +882,48 @@ function isAffirmativeFollowUp(value) {
 
 function detectTopicFromText(text) {
   const value = String(text || "");
+  if (!/\?/.test(value)) return "";
+  if (!/(would you like|möchten sie|moechten sie|soll ich)/i.test(value)) return "";
   if (/(noise values|geräuschwerte|geraeuschwerte|noise levels)/i.test(value)) return "noise";
+  if (/(energy classes|energy class|energieeffizienzklassen|energieeffizienzklasse|energieklassen|energieklasse)/i.test(value)) return "energy";
   if (/(dimensions|Gerätemaße|Nischenmaße|maße|masse|installation dimensions)/i.test(value)) return "dimensions";
   if (/(consumption figures|consumption values|verbrauchswerte|verbrauchsangaben)/i.test(value)) return "consumption";
   return "";
+}
+
+function detectAnsweredTopicsFromText(text) {
+  const value = String(text || "");
+  const topics = new Set();
+
+  if (/(documented energy class|documented energy classes|dokumentierte energieeffizienzklasse|dokumentierten energieeffizienzklassen)/i.test(value)) {
+    topics.add("energy");
+  }
+  if (/(documented consumption values|dokumentierten verbrauchswerte|annual energy consumption|jährlicher energieverbrauch|jaehrlicher energieverbrauch)/i.test(value)) {
+    topics.add("consumption");
+  }
+  if (/(documented noise values|documented noise levels|dokumentierten geräuschwerte|dokumentierten geraeuschwerte|max\.\s*\d+\s*dB|\d+\s*dB(?:\(A\))?)/i.test(value)) {
+    topics.add("noise");
+  }
+  if (/(documented appliance or niche dimensions|dokumentierten geräte- oder nischenmaße|dokumentierten geraete- oder nischenmasse|appliance dimensions|niche dimensions|gerätemaße|geraetemasse|nischenmaße|nischenmasse)/i.test(value)) {
+    topics.add("dimensions");
+  }
+
+  return topics;
+}
+
+function getPreviouslyAnsweredTopics(conversationMessages) {
+  const topics = new Set();
+  if (!Array.isArray(conversationMessages)) return topics;
+
+  for (const message of conversationMessages) {
+    if (message?.role !== "assistant" || !message?.text) continue;
+    const answerBody = splitTrailingQuestion(message.text).body || message.text;
+    for (const topic of detectAnsweredTopicsFromText(answerBody)) {
+      topics.add(topic);
+    }
+  }
+
+  return topics;
 }
 
 function resolveFollowUpTopic(question, conversationMessages) {
@@ -472,23 +938,45 @@ function resolveFollowUpTopic(question, conversationMessages) {
     const trailingQuestion = splitTrailingQuestion(text).question;
     const trailingTopic = detectTopicFromText(trailingQuestion);
     if (trailingTopic) return trailingTopic;
-
-    const fullTopic = detectTopicFromText(text);
-    if (fullTopic) return fullTopic;
   }
 
   return "";
 }
 
+function hasAssistantClarificationQuestion(messages) {
+  const assistantMessages = Array.isArray(messages)
+    ? messages.filter((message) => message?.role === "assistant" && message?.text).slice(-3).reverse()
+    : [];
+
+  return assistantMessages.some((message) => {
+    const question = splitTrailingQuestion(message.text).question || String(message.text || "");
+    return /(für welches gerät|fuer welches geraet|welches gerät meinen sie|welches geraet meinen sie|welche information benötigen sie|welche information benoetigen sie|worüber möchten sie mehr erfahren|worueber moechten sie mehr erfahren|which product do you mean|what would you like to know)/i.test(question);
+  });
+}
+
+function getUnresolvedAffirmativeAnswer(question, conversationMessages, language) {
+  if (!isAffirmativeFollowUp(question)) return null;
+  if (resolveFollowUpTopic(question, conversationMessages)) return null;
+  if (!hasAssistantClarificationQuestion(conversationMessages)) return null;
+
+  return {
+    answer: AFFIRMATIVE_CLARIFICATION_BY_LANGUAGE[language] || AFFIRMATIVE_CLARIFICATION_BY_LANGUAGE.en,
+    found: false,
+  };
+}
+
 function buildResolvedFollowUpQuestion(topic, language) {
+  if (topic === "energy") {
+    return language === "de" ? "Bitte zeigen Sie die dokumentierten Energieeffizienzklassen aller ausgewählten Produkte." : "Please show the documented energy classes for all selected products.";
+  }
   if (topic === "consumption") {
-    return language === "de" ? "Bitte liste die dokumentierten Verbrauchswerte auf." : "Please list the documented consumption values.";
+    return language === "de" ? "Bitte zeigen Sie die dokumentierten Verbrauchswerte." : "Please list the documented consumption values.";
   }
   if (topic === "noise") {
-    return language === "de" ? "Bitte liste die dokumentierten Geräuschwerte auf." : "Please list the documented noise values.";
+    return language === "de" ? "Bitte zeigen Sie die dokumentierten Geräuschwerte." : "Please list the documented noise values.";
   }
   if (topic === "dimensions") {
-    return language === "de" ? "Bitte liste die dokumentierten Geräte- oder Nischenmaße auf." : "Please list the documented appliance or niche dimensions.";
+    return language === "de" ? "Bitte zeigen Sie die dokumentierten Geräte- oder Nischenmaße." : "Please list the documented appliance or niche dimensions.";
   }
 
   return "";
@@ -506,18 +994,18 @@ function stripAffirmativeLead(answer, question) {
 }
 
 const SUB_PRODUCT_ALIASES = {
-  hob: ["hob", "kochfeld"],
-  oven: ["oven", "built-in oven", "backofen", "einbaubackofen"],
-  hood: ["extractor hood", "hood", "dunstabzugshaube", "haube"],
-  dishwasher: ["dishwasher", "geschirrspüler", "geschirrspueler"],
-  washing_machine: ["washing machine", "washer", "waschmaschine"],
-  refrigerator_freezer: ["refrigerator-freezer", "refrigerator", "fridge", "kühl-gefrierkombination", "kuehl-gefrierkombination", "kühlschrank", "gefrier"],
+  hob: ["hob", "hobb", "cooktop", "stove top", "induction", "kochfeld", "herdplatte", "pllaka", "pllakë gatimi", "pllaka gatimi"],
+  oven: ["oven", "owen", "back oven", "built-in oven", "backofen", "einbaubackofen", "ofen", "furrë", "furre"],
+  hood: ["extractor hood", "extractor", "hood", "vent", "fan hood", "dunstabzugshaube", "haube", "flachschirmhaube", "aspirator"],
+  dishwasher: ["dishwasher", "dish washer", "dishwaser", "dish washer machine", "geschirrspüler", "geschirrspueler", "spülmaschine", "spuelmaschine", "lavastovilje", "enëlarëse", "enelarese"],
+  washing_machine: ["washing machine", "washer", "wash machine", "wasching machine", "waschmaschine", "lavatriçe", "lavatriqe"],
+  refrigerator_freezer: ["refrigerator-freezer", "refrigerator", "refrigator", "fridge", "refridge", "freezer", "fridge freezer", "fridge-freezer", "kühl-gefrierkombination", "kuehl-gefrierkombination", "kühlschrank", "kuehlschrank", "kuhlschrank", "gefrierschrank", "gefrier", "frigorifer", "frigoriferi"],
 };
 
 function getSubProductDisplayLabel(subProduct, language) {
   const labels = {
     hob: { de: "Kochfeld", en: "hob" },
-    oven: { de: "Backofen", en: "oven" },
+    oven: { de: "Einbaubackofen", en: "oven" },
     hood: { de: "Dunstabzugshaube", en: "extractor hood" },
     dishwasher: { de: "Geschirrspüler", en: "dishwasher" },
     washing_machine: { de: "Waschmaschine", en: "washing machine" },
@@ -527,12 +1015,150 @@ function getSubProductDisplayLabel(subProduct, language) {
   return labels[subProduct]?.[language] || (language === "de" ? "Produkt" : "product");
 }
 
+function getSubProductArticleLabel(subProduct, language) {
+  if (language !== "de") {
+    return `the ${getSubProductDisplayLabel(subProduct, "en")}`;
+  }
+
+  const labels = {
+    hob: "das Kochfeld",
+    oven: "den Einbaubackofen",
+    hood: "die Dunstabzugshaube",
+    dishwasher: "den Geschirrspüler",
+    washing_machine: "die Waschmaschine",
+    refrigerator_freezer: "die Kühl-Gefrierkombination",
+  };
+
+  return labels[subProduct] || "das Produkt";
+}
+
+function getGermanEnergyComparisonName(item, subProduct) {
+  const model = normalizeKnownModel(extractKnownModelFromText(getGroupedSubProductContent(item, subProduct).join("\n")) || extractModelForSubProduct(item, subProduct) || extractKnownModel(item));
+  if (subProduct === "hob") return model ? `das Induktionskochfeld ${model}` : "das Kochfeld";
+  if (subProduct === "oven") return model ? `den Einbaubackofen ${model}` : "den Einbaubackofen";
+  const label = getSubProductArticleLabel(subProduct, "de");
+  return model ? `${label} ${model}` : label;
+}
+
+function getEnglishEnergyComparisonName(item, subProduct) {
+  const model = normalizeKnownModel(extractKnownModelFromText(getGroupedSubProductContent(item, subProduct).join("\n")) || extractModelForSubProduct(item, subProduct) || extractKnownModel(item));
+  const comparisonLabels = {
+    oven: "built-in oven",
+    hob: "hob",
+    hood: "extractor hood",
+    dishwasher: "dishwasher",
+    washing_machine: "washing machine",
+    refrigerator_freezer: "refrigerator-freezer",
+  };
+  const label = subProduct ? comparisonLabels[subProduct] || getSubProductDisplayLabel(subProduct, "en") : getPublicTypeLabelForModel(model, item, "en");
+  const displayLabel = label ? `${label.charAt(0).toUpperCase()}${label.slice(1)}` : "Product";
+  return model ? `${displayLabel} (${model})` : displayLabel;
+}
+
+function extractModelForSubProduct(item, subProduct) {
+  const sourceText = getCombinedItemInfoText(item);
+  const patterns = {
+    hob: /\bOL-KMI\s*754\s*000\s*E\b/i,
+    oven: /\bEBX\s*943\s*600\s*S\b/i,
+    hood: /\b(?:FH\s*664\s*621\s*[SE]|KHF\s*664\s*611\s*S(?:\s*Stripe\s*X)?)\b/i,
+    dishwasher: /\bA-EGSPV597210\b/i,
+    washing_machine: /\bEWA\s*34660\s*W\b/i,
+    refrigerator_freezer: /\b(?:KGC\s*15495\s*S|OL-KGCN\s*388140\s*E)\b/i,
+  };
+  const match = sourceText.match(patterns[subProduct]);
+  return match ? normalizeKnownModel(match[0]) : "";
+}
+
+function itemMatchesSubProduct(item, subProduct) {
+  if (!subProduct) return false;
+  const model = extractKnownModel(item);
+  const typeLabel = getPublicTypeLabelForModel(model, item, "en").toLowerCase();
+  const sourceText = getCombinedItemInfoText(item).toLowerCase();
+
+  const patterns = {
+    hob: /\bhob\b|kochfeld|ol-kmi/,
+    oven: /\boven\b|backofen|einbaubackofen|ebx/,
+    hood: /extractor hood|dunstabzug|haube|fh\s*664|khf\s*664/,
+    dishwasher: /dishwasher|geschirrsp|a-egspv/,
+    washing_machine: /washing machine|waschmaschine|ewa\s*34660/,
+    refrigerator_freezer: /refrigerator|fridge|kühl|kuehl|gefrier|kgc\s*15495|ol-kgcn/,
+  };
+
+  const pattern = patterns[subProduct];
+  return Boolean(pattern && (pattern.test(typeLabel) || pattern.test(sourceText)));
+}
+
+function scopeItemsForQuestion(items, question) {
+  const requestedSubProduct = detectRequestedSubProduct(question);
+  if (!requestedSubProduct) return items;
+
+  const scopedItems = items.filter((item) => itemMatchesSubProduct(item, requestedSubProduct));
+  return scopedItems.length ? scopedItems : items;
+}
+
+function escapeRegex(value) {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function textContainsAlias(text, alias) {
+  const escapedAlias = escapeRegex(alias).replace(/\s+/g, "\\s+");
+  const pattern = new RegExp(`(?:^|[^a-zäöüß])${escapedAlias}(?:$|[^a-zäöüß])`, "i");
+  return pattern.test(String(text || ""));
+}
+
 function detectRequestedSubProduct(question) {
   const value = String(question || "").toLowerCase();
 
   return Object.entries(SUB_PRODUCT_ALIASES).find(([, aliases]) =>
-    aliases.some((alias) => value.includes(alias.toLowerCase())),
+    aliases.some((alias) => textContainsAlias(value, alias)),
   )?.[0] || "";
+}
+
+function detectRequestedSubProducts(question) {
+  const value = String(question || "").toLowerCase();
+  return Object.entries(SUB_PRODUCT_ALIASES)
+    .filter(([, aliases]) => aliases.some((alias) => textContainsAlias(value, alias)))
+    .map(([subProduct]) => subProduct);
+}
+
+function isLikelyProductAliasOnlyQuestion(question) {
+  const value = normalizeConversationalPrompt(question);
+  const requestedSubProduct = detectRequestedSubProduct(value);
+  if (!requestedSubProduct || detectTopic(value) || isOverviewRequest(value) || isHelpRequest(value)) return false;
+
+  const aliases = SUB_PRODUCT_ALIASES[requestedSubProduct] || [];
+  return aliases.some((alias) => {
+    const normalizedAlias = normalizeConversationalPrompt(alias);
+    return value === normalizedAlias || value === `the ${normalizedAlias}` || value === `der ${normalizedAlias}` || value === `die ${normalizedAlias}` || value === `das ${normalizedAlias}`;
+  });
+}
+
+function answerFromProductAliasOnly(question, items, language) {
+  if (!isLikelyProductAliasOnlyQuestion(question)) return null;
+
+  const requestedSubProduct = detectRequestedSubProduct(question);
+  const item = items.find((entry) => itemMatchesSubProduct(entry, requestedSubProduct));
+  if (!item) return null;
+
+  const model = extractKnownModel(item);
+  const typeLabel = getPublicTypeLabelForModel(model, item, language);
+  if (language === "de") {
+    const subject = requestedSubProduct === "refrigerator_freezer"
+      ? "Die Kühl-Gefrierkombination"
+      : getSubProductArticleLabel(requestedSubProduct, "de").replace(/^d/, "D");
+    const modelText = model ? ` ist ${model}` : " ist ausgewählt";
+    return {
+      answer: `${subject}${modelText}. Ich kann Ihnen bei Energieeffizienzklasse, Verbrauch, Lautstärke, Volumen, Maßen oder Funktionen helfen.`,
+      found: true,
+    };
+  }
+
+  const subject = typeLabel || getSubProductDisplayLabel(requestedSubProduct, "en");
+  const modelText = model ? ` is ${model}` : " is selected";
+  return {
+    answer: `The ${subject.toLowerCase()}${modelText}. I can help with its energy class, consumption, noise, volume, dimensions, or features.`,
+    found: true,
+  };
 }
 
 function getGroupedSubProductContent(item, subProduct) {
@@ -582,7 +1208,7 @@ function getSubProductPublicName(item, subProduct, language) {
 
 function extractSubProductEnergyClass(item, subProduct) {
   return getGroupedSubProductContent(item, subProduct)
-    .map((line) => line.match(/\b(?:energieklasse|energy\s+(?:efficiency\s+)?class|energy\s+class)\s*[:\-]?\s*([A-G](?:\+\+?)?)\b/i)?.[1] || "")
+    .map((line) => line.match(/\b(?:energieeffizienzklasse|energieklasse|energy\s+(?:efficiency\s+)?class|energy\s+class)\s*[:\-]?\s*([A-G](?:\+\+?)?)\b/i)?.[1] || "")
     .find(Boolean)
     ?.toUpperCase() || "";
 }
@@ -650,7 +1276,7 @@ function getModelAnswerItemName(item, language) {
 
   if (/\bEBX\b/i.test(explicitModel) || /\boven\b|backofen/i.test(rawName)) {
     return language === "de"
-      ? "Backofen"
+      ? "Einbaubackofen"
       : "Built-in oven";
   }
 
@@ -672,7 +1298,7 @@ function getModelAnswerItemName(item, language) {
       : "Dishwasher";
   }
 
-  if (/\bKGC\b/i.test(explicitModel) || /refrigerator|fridge|kuehl|kÃƒÂ¼hl|gefrier/i.test(rawName)) {
+  if (/\bKGC\b/i.test(explicitModel) || /refrigerator|fridge|kuehl|kühl|gefrier/i.test(rawName)) {
     return language === "de"
       ? "Kühl-Gefrierkombination"
       : "Refrigerator";
@@ -694,7 +1320,7 @@ function getModelAnswerItemName(item, language) {
       : "Dishwasher";
   }
 
-  if (/refrigerator|fridge|kuehl|kÃ¼hl|gefrier/i.test(sourceText) || /refrigerator|fridge|kuehl|kÃ¼hl|gefrier/i.test(rawName)) {
+  if (/refrigerator|fridge|kuehl|kühl|gefrier/i.test(sourceText) || /refrigerator|fridge|kuehl|kühl|gefrier/i.test(rawName)) {
     return language === "de"
       ? "Kühl-Gefrierkombination"
       : "Refrigerator";
@@ -709,7 +1335,7 @@ function getModelAnswerItemName(item, language) {
   }
 
   if (/\boven\b|backofen/i.test(sourceText) || /\boven\b|backofen/i.test(rawName)) {
-    return language === "de" ? "Backofen" : "Built-in oven";
+    return language === "de" ? "Einbaubackofen" : "Built-in oven";
   }
 
   if (explicitModel) {
@@ -795,7 +1421,7 @@ function getEnergyAnswerItemName(item, language) {
 
   if (/oven and hob|backofen|oven|kochfeld|hob/i.test(sourceText)) {
     return language === "de"
-      ? `Backofen${explicitModel ? ` (${explicitModel})` : ""}`
+      ? `Einbaubackofen${explicitModel ? ` (${explicitModel})` : ""}`
       : `Built-in oven${explicitModel ? ` (${explicitModel})` : ""}`;
   }
 
@@ -810,10 +1436,10 @@ function shouldUseModelForEnergyAnswer(items) {
       /hob|kochfeld/i,
       /washing machine|waschmaschine/i,
       /dishwasher|geschirrsp/i,
-      /refrigerator|fridge|kuehl|kÃ¼hl|gefrier/i,
+      /refrigerator|fridge|kuehl|kühl|gefrier/i,
       /extractor hood|dunstabzug|haube/i,
     ].filter((pattern) => pattern.test(sourceText)).length > 1;
-    const hasGroupedEnergyFact = /(?:^|\n)\s*(?:[^:\n]{2,40})\s*:\s*(?:energieklasse|energy\s+(?:efficiency\s+)?class)\b/i.test(sourceText);
+    const hasGroupedEnergyFact = /(?:^|\n)\s*(?:[^:\n]{2,40})\s*:\s*(?:energieeffizienzklasse|energieklasse|energy\s+(?:efficiency\s+)?class)\b/i.test(sourceText);
 
     return hasMultipleProductTypes && hasGroupedEnergyFact;
   });
@@ -827,6 +1453,7 @@ function getEnergyAnswerRecords(item, language) {
       hasELabel: hasELabelDocument(item),
       energyClass: getEnergyClassValue(item),
       annualConsumption: getAnnualConsumptionValue(item),
+      waterConsumption: getWaterConsumptionValue(item),
     },
   ];
 }
@@ -861,10 +1488,12 @@ function getConsumptionLabel(item, language, value) {
       return "Energieverbrauch konventionell / Heißluft";
     }
     if (isPerHundredCycles) {
-      return typeLabel === "Washing machine"
-        ? "Energieverbrauch pro 100 Waschzyklen"
-        : "Energieverbrauch pro 100 Zyklen";
+      if (typeLabel === "Washing machine") return "Energieverbrauch pro 100 Waschzyklen";
+      if (typeLabel === "Dishwasher") return "Energieverbrauch pro 100 Spülgänge";
+      return "Energieverbrauch pro 100 Zyklen";
     }
+    if (typeLabel === "Washing machine") return "Energieverbrauch pro 100 Waschzyklen";
+    if (typeLabel === "Dishwasher") return "Energieverbrauch pro 100 Spülgänge";
 
     return "Dokumentierter Verbrauch";
   }
@@ -880,20 +1509,448 @@ function getConsumptionLabel(item, language, value) {
       ? "Energy consumption per 100 wash cycles"
       : "Energy consumption per 100 cycles";
   }
+  if (typeLabel === "Washing machine") return "Energy consumption per 100 wash cycles";
+  if (typeLabel === "Dishwasher") return "Energy consumption per 100 cycles";
 
   return "Documented consumption";
 }
 
 function formatConsumptionEntry(record, language) {
-  if (!record?.annualConsumption) return "";
-  return `${record.name}: ${getConsumptionLabel(record.item, language, record.annualConsumption)}: ${record.annualConsumption}`;
+  const parts = [];
+  const typeLabel = getPublicTypeLabelForModel(extractKnownModel(record.item), record.item, "en");
+  if (record?.annualConsumption) {
+    parts.push(`${getConsumptionLabel(record.item, language, record.annualConsumption)}: ${record.annualConsumption}`);
+  }
+  if (record?.waterConsumption) {
+    const waterValue = String(record.waterConsumption)
+      .replace(/\s*\/\s*(?:zyklus|cycle|spülgang|spuelgang)\b/ig, "")
+      .trim();
+    let waterLabel = language === "de" ? "Wasserverbrauch" : "Water consumption";
+    if (language === "de") {
+      if (typeLabel === "Washing machine") waterLabel = "Wasserverbrauch pro Zyklus";
+      if (typeLabel === "Dishwasher") waterLabel = "Wasserverbrauch pro Spülgang";
+    }
+    parts.push(`${waterLabel}: ${waterValue}`);
+  }
+  if (!parts.length) return "";
+  return `${record.name}: ${parts.join("; ")}`;
 }
 
-function getNextDocumentedFollowUp(items, language, topic) {
+function parseFirstNumber(value) {
+  const match = String(value || "").match(/\d+(?:[.,]\d+)?/);
+  return match ? Number(match[0].replace(",", ".")) : NaN;
+}
+
+function normalizeConsumptionValueForAnswer(value, language) {
+  let text = String(value || "").replace(/\s+/g, " ").trim();
+  if (language === "en") {
+    text = text
+      .replace(",", ".")
+      .replace(/\s*\/\s*Jahr/i, "/year")
+      .replace(/\s*\/\s*jahr/i, "/year");
+  }
+  return text;
+}
+
+function isAnnualConsumptionRecord(record) {
+  const value = String(record?.annualConsumption || "");
+  const sourceLine = getConsumptionSourceLine(record.item, value);
+  return /(annual|year|jahr|jährlich|jaehrlich)/i.test(`${value}\n${sourceLine}`);
+}
+
+function detectComparisonTopics(question) {
+  const value = String(question || "");
+  const topics = [];
+
+  if (/(energy\s+(?:efficiency\s+)?class(?:es)?|energieeffizienzklassen?|energieklassen?|energieklasse)/i.test(value)) {
+    topics.push("energyClass");
+  }
+  if (/(energy use|energy consumption|electricity use|kwh|verbrauch|energieverbrauch|stromverbrauch|verbraucht)/i.test(value)) {
+    topics.push("energyConsumption");
+  }
+  if (/(water use|water consumption|wasser|wasserverbrauch)/i.test(value)) {
+    topics.push("waterConsumption");
+  }
+  if (/(noise|quiet|loud|decibels?|db|dba|geräusch|geraeusch|lautstärke|lautstaerke|leise|laut|ruhig)/i.test(value)) {
+    topics.push("noise");
+  }
+  if (/(dimensions|measurements|size|width|height|depth|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe)/i.test(value)) {
+    topics.push("dimensions");
+  }
+  if (/(features?|functions?|programs?|capacity|funktionen|programme|kapazität|kapazitaet)/i.test(value)) {
+    topics.push("features");
+  }
+
+  return [...new Set(topics)];
+}
+
+function isMultiProductComparisonQuestion(question) {
+  const value = String(question || "");
+  const requestedSubProducts = detectRequestedSubProducts(value);
+  const topics = detectComparisonTopics(value);
+  return requestedSubProducts.length >= 2
+    && topics.length >= 2
+    && /(compare|comparison|versus| vs\.? | by |better|vergleich|vergleichen|besser| oder | und | nach )/i.test(value);
+}
+
+function normalizeCompactValue(value) {
+  return String(value || "")
+    .replace(/\s*\/\s*(?:cycle|zyklus|spülgang|spuelgang)\b/ig, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getFeatureSummary(item, language) {
+  const facts = normalizeFacts(item.productInfoKeyFacts)
+    .map(normalizePublicProductBrand)
+    .filter((fact) =>
+      !/^(model|energieeffizienzklasse|energieklasse|energy\s+(?:efficiency\s+)?class|energy consumption|energieverbrauch|wasserverbrauch|water consumption|geräusch|geraeusch|noise|dimensions|abmessungen|gerätemaße|geraetemaße|nischenmaße|nischenmasse)\s*:/i.test(fact),
+    )
+    .slice(0, 3);
+
+  if (facts.length) return facts.join("; ");
+  return language === "de" ? "keine dokumentierten Funktionen gefunden" : "no documented features found";
+}
+
+function formatComparisonValue(item, topic, language) {
+  const record = getEnergyAnswerRecords(item, language)[0];
+
+  if (topic === "energyClass") {
+    return record.energyClass
+      ? (language === "de" ? `Energieeffizienzklasse: ${record.energyClass}` : `Energy class: ${record.energyClass}`)
+      : (language === "de" ? "Energieeffizienzklasse: nicht dokumentiert" : "Energy class: not documented");
+  }
+
+  if (topic === "energyConsumption") {
+    return record.annualConsumption
+      ? `${getConsumptionLabel(item, language, record.annualConsumption)}: ${record.annualConsumption}`
+      : (language === "de" ? "Energieverbrauch: nicht dokumentiert" : "Energy use: not documented");
+  }
+
+  if (topic === "waterConsumption") {
+    return record.waterConsumption
+      ? `${language === "de" ? "Wasserverbrauch" : "Water use"}: ${normalizeCompactValue(record.waterConsumption)}`
+      : (language === "de" ? "Wasserverbrauch: nicht dokumentiert" : "Water use: not documented");
+  }
+
+  if (topic === "noise") {
+    const noise = extractNoiseValueStrict(item);
+    return noise
+      ? `${language === "de" ? "Lautstärke" : "Noise"}: ${noise}`
+      : (language === "de" ? "Lautstärke: nicht dokumentiert" : "Noise: not documented");
+  }
+
+  if (topic === "dimensions") {
+    const dimensions = extractInstallationDimensionsStrict(item);
+    return dimensions
+      ? `${language === "de" ? "Maße" : "Dimensions"}: ${splitDocumentedDimensionLines(dimensions).map((line) => normalizeDimensionLabel(line, language)).join("; ")}`
+      : (language === "de" ? "Maße: nicht dokumentiert" : "Dimensions: not documented");
+  }
+
+  if (topic === "features") {
+    return `${language === "de" ? "Funktionen" : "Features"}: ${getFeatureSummary(item, language)}`;
+  }
+
+  return "";
+}
+
+function getCompactComparisonItemName(item, language) {
+  const type = getControlledOverviewType(item);
+  const model = extractKnownModel(item);
+  const labels = {
+    en: {
+      hood: "Extractor hood",
+      dishwasher: "Dishwasher",
+      washing_machine: "Washing machine",
+      fridge_freezer: "Fridge-freezer",
+      oven_hob: "Oven/hob set",
+      oven: "Built-in oven",
+      hob: "Hob",
+      product: "Product",
+    },
+    de: {
+      hood: "Dunstabzugshaube",
+      dishwasher: "Geschirrspüler",
+      washing_machine: "Waschmaschine",
+      fridge_freezer: "Kühl-Gefrierkombination",
+      oven_hob: "Backofen-Kochfeld-Set",
+      oven: "Einbaubackofen",
+      hob: "Kochfeld",
+      product: "Produkt",
+    },
+  };
+  const label = labels[language]?.[type] || labels.en[type] || labels[language]?.product || "Product";
+  return model ? `${label} (${model})` : label;
+}
+
+function answerFromMultiTopicComparison(question, items, language) {
+  if (!isMultiProductComparisonQuestion(question)) return null;
+
+  const requestedSubProducts = detectRequestedSubProducts(question);
+  const topics = detectComparisonTopics(question);
+  const comparisonItems = requestedSubProducts
+    .map((subProduct) => items.find((item) => itemMatchesSubProduct(item, subProduct)))
+    .filter(Boolean);
+
+  if (comparisonItems.length < 2 || topics.length < 2) return null;
+
+  const entries = comparisonItems.map((item) => {
+    const values = topics
+      .map((topic) => formatComparisonValue(item, topic, language))
+      .filter(Boolean)
+      .join("; ");
+    return `${getCompactComparisonItemName(item, language)}: ${values}`;
+  });
+
+  return {
+    answer: language === "de"
+      ? formatSectionWithBullets("Hier ist der kompakte Vergleich der angefragten Geräte:", entries)
+      : formatSectionWithBullets("Here is a compact comparison of the requested appliances:", entries),
+    found: true,
+  };
+}
+
+function getQuietRecommendationName(item, language) {
+  const type = getControlledOverviewType(item);
+  const model = extractKnownModel(item);
+  const labels = {
+    en: {
+      hood: "Extractor hood",
+      dishwasher: "Dishwasher",
+      washing_machine: "Washing machine",
+      fridge_freezer: "Fridge-freezer",
+      oven_hob: "Oven/hob set",
+      oven: "Oven/hob set",
+      hob: "Oven/hob set",
+      product: "Product",
+    },
+    de: {
+      hood: "Dunstabzugshaube",
+      dishwasher: "Geschirrspüler",
+      washing_machine: "Waschmaschine",
+      fridge_freezer: "Kühl-Gefrierkombination",
+      oven_hob: "Backofen-Kochfeld-Set",
+      oven: "Backofen-Kochfeld-Set",
+      hob: "Backofen-Kochfeld-Set",
+      product: "Produkt",
+    },
+  };
+  const label = labels[language]?.[type] || labels.en[type] || labels[language]?.product || "Product";
+  return model && !/(oven_hob|oven|hob)/.test(type) ? `${label} (${model})` : label;
+}
+
+function getQuietRecommendationLeadName(item, language) {
+  const type = getControlledOverviewType(item);
+  const labels = {
+    en: {
+      hood: "extractor hood",
+      dishwasher: "dishwasher",
+      washing_machine: "washing machine",
+      fridge_freezer: "refrigerator-freezer",
+      oven_hob: "oven/hob set",
+      oven: "oven/hob set",
+      hob: "oven/hob set",
+      product: "product",
+    },
+    de: {
+      hood: "Dunstabzugshaube",
+      dishwasher: "Geschirrspüler",
+      washing_machine: "Waschmaschine",
+      fridge_freezer: "Kühl-Gefrierkombination",
+      oven_hob: "Backofen-Kochfeld-Set",
+      oven: "Backofen-Kochfeld-Set",
+      hob: "Backofen-Kochfeld-Set",
+      product: "Produkt",
+    },
+  };
+
+  return labels[language]?.[type] || labels.en[type] || labels[language]?.product || "product";
+}
+
+function answerFromQuietRecommendation(question, items, language) {
+  if (!/(quiet|noise|silent|low noise|quiet home|lautstärke|lautstaerke|geräusch|geraeusch|leise|leis|ruhig)/i.test(String(question || ""))) {
+    return null;
+  }
+
+  const records = items
+    .map((item) => ({
+      item,
+      name: getQuietRecommendationName(item, language),
+      value: extractNoiseValueStrict(item),
+    }))
+    .map((record) => ({ ...record, numeric: parseFirstNumber(record.value) }))
+    .filter((record) => record.value && Number.isFinite(record.numeric));
+
+  if (!records.length) return null;
+
+  records.sort((a, b) => a.numeric - b.numeric);
+  const winner = records[0];
+  const documentedValues = formatBulletEntries(records.map((record) => `${record.name}: ${record.value}`));
+
+  const missingNames = [
+    ...new Set(
+      items
+        .filter((item) => !extractNoiseValueStrict(item))
+        .map((item) => getQuietRecommendationName(item, language)),
+    ),
+  ];
+  const missingNote = missingNames.length
+    ? (language === "de"
+      ? `\n\nFür ${missingNames[0] === "Backofen-Kochfeld-Set" ? "das" : "die"} ${missingNames[0]} finde ich keinen dokumentierten Geräuschwert.`
+      : `\n\nI could not find a documented noise value for the ${missingNames[0].toLowerCase()}.`)
+    : "";
+
+  return {
+    answer: language === "de"
+      ? `Für eine ruhige Wohnung ist die ${getQuietRecommendationLeadName(winner.item, language)} anhand der dokumentierten Geräuschwerte am besten geeignet: ${winner.value}.\n\nDokumentierte Geräuschwerte:\n${documentedValues}${missingNote}`
+      : `For a quiet home, the ${getQuietRecommendationLeadName(winner.item, language)} looks best based on the documented noise values: ${winner.value}.\n\nDocumented noise values:\n${documentedValues}${missingNote}`,
+    found: true,
+  };
+}
+
+function answerFromComparison(question, items, language) {
+  const intent = classifyProductAssistantIntent(question);
+  if (intent.kind !== "comparison") return null;
+
+  if (intent.topic === "noise") {
+    const records = items
+      .map((item) => ({ name: getPublicItemName(item, language), value: extractNoiseValueStrict(item) }))
+      .map((record) => ({ ...record, numeric: parseFirstNumber(record.value) }))
+      .filter((record) => record.value && Number.isFinite(record.numeric));
+    if (!records.length) return null;
+
+    const asksLoudest = /(loudest|lautesten)/i.test(String(question || ""));
+    records.sort((a, b) => asksLoudest ? b.numeric - a.numeric : a.numeric - b.numeric);
+    const winner = records[0];
+    const values = records.map((record) => `${record.name}: ${record.value}`);
+    return {
+      answer: language === "de"
+        ? `${winner.name} ist nach den dokumentierten Werten ${asksLoudest ? "am lautesten" : "am leisesten"} (${winner.value}).\n${formatBulletEntries(values)}`
+        : `${winner.name} is the ${asksLoudest ? "loudest" : "quietest"} based on the documented values (${winner.value}).\n${formatBulletEntries(values)}`,
+      found: true,
+    };
+  }
+
+  if (intent.topic === "consumption") {
+    const records = items
+      .flatMap((item) => getEnergyAnswerRecords(item, language))
+      .filter((record) => record.annualConsumption)
+      .map((record) => ({ ...record, numeric: parseFirstNumber(record.annualConsumption) }))
+      .filter((record) => Number.isFinite(record.numeric));
+    if (!records.length) return null;
+
+    records.sort((a, b) => b.numeric - a.numeric);
+    const winner = records[0];
+    const values = records.map((record) => formatConsumptionEntry(record, language)).filter(Boolean);
+    const caveat = language === "de"
+      ? "Hinweis: Verbrauchswerte mit unterschiedlichen Einheiten oder Nutzungsarten sind nur eingeschränkt direkt vergleichbar."
+      : "Note: consumption values with different units or usage types are only partly directly comparable.";
+
+    return {
+      answer: language === "de"
+        ? `${winner.name} hat unter den dokumentierten Werten den höchsten genannten Energieverbrauch (${winner.annualConsumption}).\n${formatBulletEntries(values)}\n\n${caveat}`
+        : `${winner.name} has the highest documented energy consumption value (${winner.annualConsumption}).\n${formatBulletEntries(values)}\n\n${caveat}`,
+      found: true,
+    };
+  }
+
+  return null;
+}
+
+function answerFromRecommendation(question, items, language) {
+  const intent = classifyProductAssistantIntent(question);
+  if (intent.kind !== "recommendation") return null;
+  const value = String(question || "");
+
+  const quietRecommendation = answerFromQuietRecommendation(question, items, language);
+  if (quietRecommendation) return quietRecommendation;
+
+  if (/(electricity cost|electricity costs|cost matters|stromkosten|energiekosten)/i.test(value)) {
+    const records = items
+      .flatMap((item) => getEnergyAnswerRecords(item, language))
+      .filter((record) => record.annualConsumption && isAnnualConsumptionRecord(record))
+      .map((record) => ({ ...record, numeric: parseFirstNumber(record.annualConsumption) }))
+      .filter((record) => Number.isFinite(record.numeric));
+
+    if (!records.length) return null;
+
+    records.sort((a, b) => b.numeric - a.numeric);
+    const winner = records[0];
+    const consumption = normalizeConsumptionValueForAnswer(winner.annualConsumption, language);
+    const winnerType = getPublicTypeLabelForModel(extractKnownModel(winner.item), winner.item, language);
+    const winnerName = language === "de"
+      ? winnerType
+      : winnerType.toLowerCase().replace("refrigerator-freezer", "fridge-freezer");
+
+    return {
+      answer: language === "de"
+        ? `Wenn Stromkosten wichtig sind, würde ich zuerst auf ${winnerName} schauen. Dort ist der höchste dokumentierte jährliche Energieverbrauch angegeben: ${consumption}. Hinweis: Andere Produkte verwenden andere Einheiten, zum Beispiel kWh pro 100 Zyklen oder pro Nutzung, und sind daher nicht direkt vergleichbar.`
+        : `If electricity cost matters, start with the ${winnerName} because it has the highest documented annual consumption: ${consumption}. Note: other products use different units, such as kWh per 100 cycles or per use, so they are not directly comparable.`,
+      found: true,
+    };
+  }
+
+  if (/(which product is best|which one should i choose|which appliance should i choose|welches produkt ist am besten|welches gerät ist am besten|welches geraet ist am besten|welches.*soll.*wählen|welches.*soll.*waehlen)/i.test(value)) {
+    return {
+      answer: language === "de"
+        ? "Ich kann die ausgewählten Produkte nach dokumentierten Angaben wie Energieverbrauch, Lautstärke, Maßen, Kapazität oder Funktionen vergleichen. Welches Kriterium ist Ihnen am wichtigsten?"
+        : "I can compare the selected products by documented specs such as energy consumption, noise level, dimensions, capacity, or features. Which criterion matters most to you?",
+      found: false,
+    };
+  }
+
+  const documentedDetails = items
+    .map((item) => {
+      const facts = normalizeFacts(item.productInfoKeyFacts)
+        .filter((fact) => /(energy|energie|verbrauch|consumption|noise|geräusch|geraeusch|lautstärke|ma[sß]e|dimension|capacity|kapazität|funktion|function)/i.test(fact))
+        .slice(0, 3);
+      return facts.length ? `${getPublicItemName(item, language)}: ${facts.join("; ")}` : "";
+    })
+    .filter(Boolean);
+
+  if (!documentedDetails.length) return null;
+
+  return {
+    answer: language === "de"
+      ? `Ich kann keine allgemeine Lifestyle-Empfehlung geben, aber ich kann nach dokumentierten Produktdaten vergleichen:\n${formatBulletEntries(documentedDetails)}`
+      : `I can't make a general lifestyle recommendation, but I can compare documented product details:\n${formatBulletEntries(documentedDetails)}`,
+    found: true,
+  };
+}
+
+function getNextDocumentedFollowUp(items, language, topic, answeredTopics = new Set()) {
+  const topicOrder = ["energy", "consumption", "noise", "dimensions"];
+  const startIndex = topicOrder.indexOf(topic);
+  if (startIndex >= 0 && answeredTopics.size) {
+    const hasTopicValue = {
+      consumption: () => items.some((item) => getAnnualConsumptionValue(item)),
+      noise: () => items.some(hasDocumentedNoiseValue),
+      dimensions: () => items.some(hasDocumentedDimensionValue),
+    };
+    const copy = {
+      consumption: language === "de"
+        ? "Möchten Sie auch die dokumentierten Verbrauchswerte sehen?"
+        : "Would you like me to list the documented consumption values too?",
+      noise: language === "de"
+        ? "Möchten Sie als Nächstes die dokumentierten Geräuschwerte sehen?"
+        : "Would you like me to list the documented noise values next?",
+      dimensions: language === "de"
+        ? "Möchten Sie auch die dokumentierten Geräte- oder Nischenmaße sehen?"
+        : "Would you like me to list the documented appliance or niche dimensions too?",
+    };
+
+    for (const candidate of topicOrder.slice(startIndex + 1)) {
+      if (answeredTopics.has(candidate)) continue;
+      if (hasTopicValue[candidate]?.()) return copy[candidate] || "";
+    }
+
+    return "";
+  }
+
   if (topic === "energy") {
     return items.some((item) => getAnnualConsumptionValue(item))
       ? (language === "de"
-        ? "Soll ich auch die dokumentierten Verbrauchswerte auflisten?"
+        ? "Möchten Sie auch die dokumentierten Verbrauchswerte sehen?"
         : "Would you like me to list the documented consumption values too?")
       : "";
   }
@@ -901,7 +1958,7 @@ function getNextDocumentedFollowUp(items, language, topic) {
   if (topic === "consumption") {
     return items.some(hasDocumentedNoiseValue)
       ? (language === "de"
-        ? "Soll ich als Nächstes auch die dokumentierten Geräuschwerte auflisten?"
+        ? "Möchten Sie als Nächstes die dokumentierten Geräuschwerte sehen?"
         : "Would you like me to list the documented noise values next?")
       : "";
   }
@@ -909,7 +1966,7 @@ function getNextDocumentedFollowUp(items, language, topic) {
   if (topic === "noise") {
     return items.some(hasDocumentedDimensionValue)
       ? (language === "de"
-        ? "Soll ich auch die dokumentierten Geräte- oder Nischenmaße auflisten?"
+        ? "Möchten Sie auch die dokumentierten Geräte- oder Nischenmaße sehen?"
         : "Would you like me to list the documented appliance or niche dimensions too?")
       : "";
   }
@@ -919,51 +1976,104 @@ function getNextDocumentedFollowUp(items, language, topic) {
 
 function answerForRequestedSubProductEnergy(question, items, language) {
   const requestedSubProduct = detectRequestedSubProduct(question);
-  if (!requestedSubProduct || items.length !== 1) return null;
-
-  const item = items[0];
-  const requestedEnergyClass = extractSubProductEnergyClass(item, requestedSubProduct);
-  if (requestedEnergyClass) return null;
-
-  const otherKnown = Object.keys(SUB_PRODUCT_ALIASES)
+  if (!requestedSubProduct) return null;
+  const mentionedOtherSubProducts = Object.keys(SUB_PRODUCT_ALIASES)
     .filter((subProduct) => subProduct !== requestedSubProduct)
-    .map((subProduct) => ({
-      subProduct,
-      energyClass: extractSubProductEnergyClass(item, subProduct),
+    .filter((subProduct) => (SUB_PRODUCT_ALIASES[subProduct] || []).some((alias) => textContainsAlias(question, alias)));
+
+  if (items.length === 1) {
+    const item = items[0];
+    const requestedEnergyClass = extractSubProductEnergyClass(item, requestedSubProduct);
+    if (requestedEnergyClass) return null;
+
+    const candidateOtherSubProducts = mentionedOtherSubProducts.length
+      ? mentionedOtherSubProducts
+      : Object.keys(SUB_PRODUCT_ALIASES).filter((subProduct) => subProduct !== requestedSubProduct);
+    const otherKnown = candidateOtherSubProducts
+      .map((subProduct) => ({
+        subProduct,
+        energyClass: extractSubProductEnergyClass(item, subProduct)
+          || (itemMatchesSubProduct(item, subProduct) ? getEnergyClassValue(item) : ""),
+      }))
+      .filter((entry) => entry.energyClass);
+
+    if (!otherKnown.length) return null;
+
+    const primaryOther = otherKnown[0];
+
+    return {
+      answer: language === "de"
+        ? `Für ${getGermanEnergyComparisonName(item, requestedSubProduct)} finde ich keine dokumentierte Energieeffizienzklasse. Für ${getGermanEnergyComparisonName(item, primaryOther.subProduct)} ist Energieeffizienzklasse ${primaryOther.energyClass} dokumentiert.`
+        : `I could not find a documented energy class for the ${getSubProductDisplayLabel(requestedSubProduct, "en")}. The ${getEnglishEnergyComparisonName(item, primaryOther.subProduct)} has documented energy class ${primaryOther.energyClass}.`,
+      found: false,
+    };
+  }
+
+  const requestedItems = items.filter((item) => itemMatchesSubProduct(item, requestedSubProduct));
+  if (!requestedItems.length || requestedItems.some((item) => getEnergyClassValue(item))) return null;
+
+  const otherItems = items
+    .filter((item) => mentionedOtherSubProducts.some((subProduct) => itemMatchesSubProduct(item, subProduct)))
+    .map((item) => ({
+      item,
+      subProduct: mentionedOtherSubProducts.find((subProduct) => itemMatchesSubProduct(item, subProduct)) || "",
+      energyClass: getEnergyClassValue(item),
     }))
     .filter((entry) => entry.energyClass);
 
-  if (!otherKnown.length) return null;
+  if (!otherItems.length) return null;
 
-  const requestedLabel = getSubProductDisplayLabel(requestedSubProduct, language);
-  const primaryOther = otherKnown[0];
-  const otherLabel = getSubProductDisplayLabel(primaryOther.subProduct, language);
+  const primaryOther = otherItems[0];
 
   return {
     answer: language === "de"
-      ? `Ich konnte keine dokumentierte Energieklasse für das ${requestedLabel} finden. Für das ${otherLabel} ist eine dokumentierte Energieeffizienzklasse angegeben, aber für das ${requestedLabel} ist keine Energieklasse aufgeführt.`
-      : `I could not find a documented energy class for the ${requestedLabel}. The ${otherLabel} has a documented energy efficiency class, but no energy class is listed for the ${requestedLabel}.`,
+      ? `Für ${getGermanEnergyComparisonName(requestedItems[0], requestedSubProduct)} finde ich keine dokumentierte Energieeffizienzklasse. Für ${getGermanEnergyComparisonName(primaryOther.item, primaryOther.subProduct)} ist Energieeffizienzklasse ${primaryOther.energyClass} dokumentiert.`
+      : `I could not find a documented energy class for the ${getSubProductDisplayLabel(requestedSubProduct, "en")}. The ${getEnglishEnergyComparisonName(primaryOther.item, primaryOther.subProduct)} has documented energy class ${primaryOther.energyClass}.`,
     found: false,
   };
 }
 
 function answerForRequestedSubProductDimensions(question, items, language) {
   const requestedSubProduct = detectRequestedSubProduct(question);
-  if (!requestedSubProduct || items.length !== 1) return null;
+  if (!requestedSubProduct) return null;
 
-  const item = items[0];
-  const dimensionLines = extractSubProductDimensionLines(item, requestedSubProduct);
-  if (!dimensionLines.length) return null;
+  if (items.length === 1) {
+    const item = items[0];
+    const dimensionLines = extractSubProductDimensionLines(item, requestedSubProduct);
+    if (!dimensionLines.length && !itemMatchesSubProduct(item, requestedSubProduct)) return null;
+    const lines = dimensionLines.length
+      ? dimensionLines
+      : splitDocumentedDimensionLines(extractInstallationDimensionsStrict(item));
+    if (!lines.length) return null;
 
-  const formattedEntry = [
-    `- ${getSubProductPublicName(item, requestedSubProduct, language)}:`,
-    ...dimensionLines.map((line) => `  ${normalizeDimensionLabel(line, language)}`),
-  ].join("\n");
+    const formattedEntry = [
+      `- ${getSubProductPublicName(item, requestedSubProduct, language)}:`,
+      ...lines.map((line) => `  ${normalizeDimensionLabel(line, language)}`),
+    ].join("\n");
+
+    return {
+      answer: language === "de"
+        ? `Ich habe diese dokumentierten Maße für ${getSubProductArticleLabel(requestedSubProduct, language)} gefunden:\n\n${formattedEntry}`
+        : `I found these documented dimensions for ${getSubProductArticleLabel(requestedSubProduct, language)}:\n\n${formattedEntry}`,
+      found: true,
+    };
+  }
+
+  const entries = items
+    .filter((item) => itemMatchesSubProduct(item, requestedSubProduct))
+    .map((item) => {
+      const dimensions = extractInstallationDimensionsStrict(item);
+      if (!dimensions) return null;
+      return formatDimensionEntryByLanguage(getPublicItemName(item, language), dimensions, language);
+    })
+    .filter(Boolean);
+
+  if (!entries.length) return null;
 
   return {
     answer: language === "de"
-      ? `Ich habe diese dokumentierten Maße gefunden:\n\n${formattedEntry}`
-      : `I found these documented dimensions:\n\n${formattedEntry}`,
+      ? `Ich habe diese dokumentierten Maße für ${getSubProductArticleLabel(requestedSubProduct, language)} gefunden:\n\n${entries.join("\n\n")}`
+      : `I found these documented dimensions for ${getSubProductArticleLabel(requestedSubProduct, language)}:\n\n${entries.join("\n\n")}`,
     found: true,
   };
 }
@@ -1041,7 +2151,7 @@ function extractNoiseValueStrict(item) {
   if (factValue) return factValue;
 
   const line = getItemInfoLines(item).find((entry) =>
-    /(geraeusch|geräusch|schallleistung|noise|sound\s+power|lautstärke)/i.test(entry)
+    /(geraeusch|geräusch|schallleistung|noise|sound\s+power|lautstärke|lautstaerke|decibels?|\blaut\b)/i.test(entry)
     && /\b\d{2,3}(?:\s*-\s*\d{2,3})?\s*dB(?:\(A\))?\b/i.test(entry),
   );
   const match = line?.match(/\b\d{2,3}(?:\s*-\s*\d{2,3})?\s*dB(?:\(A\))?\b/i);
@@ -1052,9 +2162,9 @@ function extractInstallationDimensionsStrict(item) {
   const hasNumericDimensionPattern = (value) =>
     /\b\d{2,4}(?:[.,]\d+)?\s*(?:x|×|-)\s*\d{2,4}(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d{2,4}(?:[.,]\d+)?)?(?:\s*mm|\s*cm)?\b/i.test(value)
     || /\b(?:min\.?\s*)?\d{2,4}(?:[.,]\d+)?\s*mm\b/i.test(value)
-    || /\b(?:breite|width|hoehe|höhe|tiefe|depth)\s*:\s*\d+(?:[.,]\d+)?\s*(?:mm|cm)\b/i.test(value);
+    || /\b(?:breite|width|hoehe|höhe|bauhoehe|bauhöhe|tiefe|depth|height)\s*:\s*\d+(?:[.,]\d+)?\s*(?:mm|cm)\b/i.test(value);
   const hasDimensionLabel = (value) =>
-    /(abmessungen|dimensions|geraetemass|geraetemasse|gerätemaße|geraetemaße|nischenmass|nischenmaße|einbaumass|einbaumaße)/i.test(value);
+    /(abmessungen|dimensions|geraetemass|geraetemasse|gerätemaße|geraetemaße|nischenmass|nischenmaße|einbaumass|einbaumaße|breite|width|hoehe|höhe|bauhoehe|bauhöhe|tiefe|depth|height)/i.test(value);
 
   const matchingLines = getItemInfoLines(item).filter((line) => hasDimensionLabel(line) && hasNumericDimensionPattern(line));
   if (matchingLines.length) return matchingLines.join("\n");
@@ -1065,25 +2175,46 @@ function extractInstallationDimensionsStrict(item) {
   return factMatches.length ? factMatches.join(", ") : "";
 }
 
-function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
+function answerFromExplicitMultiItemEnergyFacts(question, items, language, answeredTopics = new Set()) {
   const value = String(question || "").toLowerCase();
-  const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
+  const notFoundAnswer = EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en;
   const missingSubProductAnswer = answerForRequestedSubProductEnergy(question, items, language);
   if (missingSubProductAnswer) return missingSubProductAnswer;
+  const scopedItems = scopeItemsForQuestion(items, question);
 
+  const asksWaterConsumptionOnly = /\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value);
   const asksConsumptionOnly = /(consumption|verbrauch|kwh)/i.test(value) && !ENERGY_QUESTION_PATTERN.test(value);
+
+  if (asksWaterConsumptionOnly) {
+    const entries = scopedItems
+      .flatMap((item) => getEnergyAnswerRecords(item, language))
+      .filter((record) => record.waterConsumption)
+      .map((record) => formatConsumptionEntry({ ...record, annualConsumption: "" }, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Wasserverbrauchswerte sind:", entries)
+        : formatSectionWithBullets("The documented water consumption values are:", entries),
+      found: true,
+    };
+  }
 
   if (!ENERGY_QUESTION_PATTERN.test(value) && !asksConsumptionOnly) {
     return null;
   }
 
-  if (shouldUseModelForEnergyAnswer(items)) {
+  if (shouldUseModelForEnergyAnswer(scopedItems)) {
     return null;
   }
 
-  const records = items.flatMap((item) => getEnergyAnswerRecords(item, language));
+  const records = scopedItems.flatMap((item) => getEnergyAnswerRecords(item, language));
   const consumptionEntries = records
-    .filter((record) => record.annualConsumption)
+    .filter((record) => record.annualConsumption || record.waterConsumption)
     .map((record) => formatConsumptionEntry(record, language))
     .filter(Boolean);
 
@@ -1093,9 +2224,9 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
     }
 
     const body = language === "de"
-      ? formatSectionWithBullets("Hier sind die dokumentierten Verbrauchswerte aus der Produktinformation:", consumptionEntries)
+      ? formatSectionWithBullets(records.length > 1 ? "Hier sind die dokumentierten Verbrauchswerte für alle ausgewählten Produkte:" : "Hier sind die dokumentierten Verbrauchswerte aus den Produktinformationen:", consumptionEntries)
       : formatSectionWithBullets("Here are the documented consumption values from the product information:", consumptionEntries);
-    const followUp = getNextDocumentedFollowUp(items, language, "consumption");
+    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption", answeredTopics);
 
     return {
       answer: followUp ? `${body}\n\n${followUp}` : body,
@@ -1106,14 +2237,14 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
     .filter((record) => record.energyClass)
     .map((record) => {
       return language === "de"
-        ? `${record.name}: Energieklasse ${record.energyClass}`
+        ? `${record.name}: Klasse ${record.energyClass}`
         : `${record.name}: energy class ${record.energyClass}`;
     });
   const unknownEntries = records
     .filter((record) => !record.energyClass)
     .map((record) => {
       if (language === "de") {
-        const note = record.hasELabel ? "E-Label vorhanden, aber keine Energieklasse im verfügbaren Produkttext gefunden" : "keine dokumentierte Energieklasse gefunden";
+        const note = record.hasELabel ? "Energielabel vorhanden, aber keine Energieeffizienzklasse in den verfügbaren Produktinformationen eindeutig dokumentiert" : "keine Energieeffizienzklasse eindeutig dokumentiert";
         return `- ${record.name}: ${note}`;
       }
 
@@ -1128,16 +2259,16 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
   const answerBlocks = [];
   if (knownEntries.length) {
     answerBlocks.push(language === "de"
-      ? formatSectionWithBullets("Dokumentierte Energieklasse:", knownEntries)
+      ? formatSectionWithBullets(records.length > 1 ? "Hier sind die dokumentierten Energieeffizienzklassen der ausgewählten Produkte:" : "Die dokumentierte Energieeffizienzklasse ist:", knownEntries)
       : formatSectionWithBullets("Documented energy class:", knownEntries));
   }
   if (unknownEntries.length) {
     answerBlocks.push(language === "de"
-      ? `Nicht im verfügbaren Produkttext gefunden:\n${unknownEntries.join("\n")}`
+      ? `In den verfügbaren Produktinformationen nicht eindeutig dokumentiert:\n${unknownEntries.join("\n")}`
       : formatSectionWithBullets("Not found in the available product text:", unknownEntries));
   }
 
-  const followUp = getNextDocumentedFollowUp(items, language, "energy");
+  const followUp = getNextDocumentedFollowUp(scopedItems, language, "energy", answeredTopics);
 
   return {
     answer: followUp ? `${answerBlocks.join("\n\n")}\n\n${followUp}` : answerBlocks.join("\n\n"),
@@ -1145,14 +2276,15 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language) {
   };
 }
 
-function answerFromExplicitMultiItemFacts(question, items, language) {
+function answerFromExplicitMultiItemFacts(question, items, language, answeredTopics = new Set()) {
   const value = String(question || "").toLowerCase();
-  const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
+  const notFoundAnswer = EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en;
   const installationDistanceRefusal = answerForInstallationDistanceRefusal(question, items, language);
   if (installationDistanceRefusal) return installationDistanceRefusal;
+  const scopedItems = scopeItemsForQuestion(items, question);
 
   if (WARRANTY_QUESTION_PATTERN.test(value)) {
-    const entries = items
+    const entries = scopedItems
       .map((item) => {
         const warranty = getDocumentedWarrantyValue(item);
         return warranty ? `${getWarrantyAnswerItemName(item, language)}: ${warranty}` : null;
@@ -1169,15 +2301,51 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
     }
 
     return {
-      answer: getBusinessPolicyWarrantyAnswer(language, items.length, isWarrantyDocumentationQuestion(question)),
+      answer: getBusinessPolicyWarrantyAnswer(language, scopedItems.length, isWarrantyDocumentationQuestion(question)),
       found: true,
     };
   }
 
-  if (/(consumption|verbrauch|kwh)/i.test(value)) {
-    const entries = items
+  if (/\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value)) {
+    const entries = scopedItems
       .flatMap((item) => getEnergyAnswerRecords(item, language))
-      .filter((record) => record.annualConsumption)
+      .filter((record) => record.waterConsumption)
+      .map((record) => formatConsumptionEntry({ ...record, annualConsumption: "" }, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Wasserverbrauchswerte sind:", entries)
+        : formatSectionWithBullets("The documented water consumption values are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:liter|litre|liters|litres|volume|nutzinhalt|volumen)\b|\bl\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatLiterSpecEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Liter-Angaben sind:", entries)
+        : formatSectionWithBullets("The documented litre values are:", entries),
+      found: true,
+    };
+  }
+
+  if (/(consumption|verbrauch|kwh|energy use|energieverbrauch|stromverbrauch)/i.test(value)) {
+    const entries = scopedItems
+      .flatMap((item) => getEnergyAnswerRecords(item, language))
+      .filter((record) => record.annualConsumption || record.waterConsumption)
       .map((record) => formatConsumptionEntry(record, language))
       .filter(Boolean);
 
@@ -1185,9 +2353,9 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
       return { answer: notFoundAnswer, found: false };
     }
 
-    const followUp = getNextDocumentedFollowUp(items, language, "consumption");
+    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption", answeredTopics);
     const body = language === "de"
-      ? formatSectionWithBullets("Hier sind die dokumentierten Verbrauchswerte aus der Produktinformation:", entries)
+      ? formatSectionWithBullets(scopedItems.length > 1 ? "Hier sind die dokumentierten Verbrauchswerte für alle ausgewählten Produkte:" : "Hier sind die dokumentierten Verbrauchswerte aus den Produktinformationen:", entries)
       : formatSectionWithBullets("Here are the documented consumption values from the product information:", entries);
 
     return {
@@ -1196,8 +2364,76 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
     };
   }
 
-  if (/(noise|geraeusch|geräusch|db\b|dba\b)/i.test(value)) {
-    const entries = items
+  if (/\b(?:place settings?|gedecke|maßgedecke|massgedecke)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatPlaceSettingsEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Maßgedecke sind:", entries)
+        : formatSectionWithBullets("The documented place settings are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:kg|kilograms?|kilos?|capacity|load capacity|füllmenge|fuellmenge|beladung|gewicht|weight)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatKilogramSpecEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Kilogramm-Angaben sind:", entries)
+        : formatSectionWithBullets("The documented kilogram values are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:cooking zones?|zones?|kochzonen?|kochstellen)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatCookingZonesEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Kochzonen sind:", entries)
+        : formatSectionWithBullets("The documented cooking zones are:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:programs?|programmes?|features?|functions?|programme|funktionen)\b/i.test(value)) {
+    const entries = scopedItems
+      .map((item) => formatProgramOrFeatureEntry(item, language))
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Programme/Funktionen sind:", entries)
+        : formatSectionWithBullets("The documented programs/features are:", entries),
+      found: true,
+    };
+  }
+
+  if (/(noise|sound|loud|geraeusch|geräusch|lautstärke|lautstaerke|luftschallemission|dezibel|dezi(?:bel)?|decibels?|\blaut\b|db\b|dba\b)/i.test(value)) {
+    const entries = scopedItems
       .map((item) => {
         const noise = extractNoiseValueStrict(item);
         if (!noise) return null;
@@ -1209,21 +2445,24 @@ function answerFromExplicitMultiItemFacts(question, items, language) {
       return { answer: notFoundAnswer, found: false };
     }
 
+    const followUp = getNextDocumentedFollowUp(scopedItems, language, "noise", answeredTopics);
+    const body = language === "de"
+      ? formatSectionWithBullets("Die dokumentierten Geräuschwerte sind:", entries)
+      : formatSectionWithBullets("The documented noise values are:", entries);
+
     return {
-      answer: language === "de"
-        ? `${formatSectionWithBullets("Die dokumentierten Geräuschwerte sind:", entries)}${getNextDocumentedFollowUp(items, language, "noise") ? `\n\n${getNextDocumentedFollowUp(items, language, "noise")}` : ""}`
-        : `${formatSectionWithBullets("The documented noise values are:", entries)}${getNextDocumentedFollowUp(items, language, "noise") ? `\n\n${getNextDocumentedFollowUp(items, language, "noise")}` : ""}`,
+      answer: followUp ? `${body}\n\n${followUp}` : body,
       found: true,
     };
   }
 
-  if (/(installation dimensions|dimensions|measurements|size|abmessungen|ma[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e)/i.test(value)) {
+  if (/(installation dimensions|dimensions|dimesnions|dimensons|dimentions|dimmensions|measurements|mesurements|how big|size|width|height|depth|abmessungen|ma[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e|breite|höhe|hoehe|tiefe)/i.test(value)) {
     const requestedSubProductDimensions = answerForRequestedSubProductDimensions(question, items, language);
     if (requestedSubProductDimensions) {
       return requestedSubProductDimensions;
     }
 
-    const entries = items
+    const entries = scopedItems
       .map((item) => {
         const dimensions = extractInstallationDimensionsStrict(item);
         if (!dimensions) return null;
@@ -1283,11 +2522,7 @@ function answerFromExplicitMultiItemModels(question, items, language) {
   if (!Array.isArray(items) || items.length < 2) return null;
 
   const value = String(question || "").toLowerCase();
-  if (!/(all|alle|list|show|send|which|welche|what)\b/.test(value) && !/\bmodels?\b|\bmodell(?:e)?\b/.test(value)) {
-    return null;
-  }
-
-  if (!/\bmodels?\b|\bmodell(?:e)?\b|\bproduct names?\b|\bprodukt(?:e|namen)?\b/.test(value)) {
+  if (!/\bmodels?\b|\bmodell(?:e|namen)?\b|\bproduct names?\b|\bproduktnamen\b|\bgerätenamen\b|\bgeraetenamen\b|\bwelche produkte\b|\bwhat products\b|\bwhich products\b/i.test(value)) {
     return null;
   }
 
@@ -1310,6 +2545,77 @@ function answerFromExplicitMultiItemModels(question, items, language) {
     answer: language === "de"
       ? formatSectionWithBullets("Hier sind alle Modelle aus den verfügbaren Produktinformationen:", entries)
       : formatSectionWithBullets("Here are all the models listed in the available product information:", entries),
+    found: true,
+  };
+}
+
+function isOverviewQuestion(question) {
+  return isOverviewRequest(question) && !detectTopic(question);
+}
+
+function getControlledOverviewType(item) {
+  const sourceText = getCombinedItemInfoText(item);
+  const model = extractKnownModel(item);
+  const typeLabel = getPublicTypeLabelForModel(model, item, "en");
+  const hasOven = /\boven\b|backofen|einbaubackofen|ebx\s*943/i.test(sourceText) || typeLabel === "Built-in oven";
+  const hasHob = /\bhob\b|kochfeld|ol-kmi\s*754/i.test(sourceText) || typeLabel === "Hob";
+
+  if (hasOven && hasHob) return "oven_hob";
+  if (/extractor hood|dunstabzug|haube|fh\s*664|khf\s*664/i.test(sourceText) || typeLabel === "Extractor hood") return "hood";
+  if (/washing machine|waschmaschine|ewa\s*34660/i.test(sourceText) || typeLabel === "Washing machine") return "washing_machine";
+  if (/dishwasher|geschirrsp|a-egspv/i.test(sourceText) || typeLabel === "Dishwasher") return "dishwasher";
+  if (/refrigerator|fridge|kühl|kuehl|gefrier|kgc\s*15495|ol-kgcn/i.test(sourceText) || typeLabel === "Refrigerator-freezer") return "fridge_freezer";
+  if (hasOven) return "oven";
+  if (hasHob) return "hob";
+  return "product";
+}
+
+function buildProductOverviewEntry(item, language) {
+  const type = getControlledOverviewType(item);
+  const entries = {
+    en: {
+      hood: "Extractor hood: ventilation above the hob.",
+      washing_machine: "Washing machine: built-in appliance for laundry.",
+      dishwasher: "Dishwasher: fully integrated 60 cm dishwasher.",
+      oven_hob: "Oven + hob set: appliances for baking and cooking.",
+      oven: "Built-in oven: appliance for baking.",
+      hob: "Hob: appliance for cooking.",
+      fridge_freezer: "Fridge-freezer: appliance for cooling and freezing.",
+      product: "Product: selected appliance with available product information.",
+    },
+    de: {
+      hood: "Dunstabzugshaube: Lüftung über dem Kochfeld.",
+      washing_machine: "Waschmaschine: Einbaugerät zum Waschen.",
+      dishwasher: "Geschirrspüler: vollintegrierter 60-cm-Geschirrspüler.",
+      oven_hob: "Backofen + Kochfeld: Geräte zum Backen und Kochen.",
+      oven: "Einbaubackofen: Gerät zum Backen.",
+      hob: "Kochfeld: Gerät zum Kochen.",
+      fridge_freezer: "Kühl-Gefrierkombination: Gerät zum Kühlen und Gefrieren.",
+      product: "Produkt: ausgewähltes Gerät mit verfügbaren Produktinformationen.",
+    },
+  };
+
+  return entries[language]?.[type] || entries.en[type] || "";
+}
+
+function answerFromProductOverview(question, items, language) {
+  if (!isOverviewQuestion(question)) return null;
+
+  const entries = items
+    .map((item) => buildProductOverviewEntry(item, language))
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return {
+      answer: NOT_FOUND_ANSWER_BY_LANGUAGE[language] || NOT_FOUND_ANSWER_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  return {
+    answer: language === "de"
+      ? formatSectionWithBullets("Hier ist ein kurzer Überblick über die ausgewählten Geräte:", entries)
+      : formatSectionWithBullets("Here is a short overview of the selected appliances:", entries),
     found: true,
   };
 }
@@ -1367,7 +2673,7 @@ function answerFromStructuredFacts(question, items, language) {
     if (hasELabelPdf) {
       return {
         answer: language === "de"
-          ? `Ja. Für dieses Produkt gibt es ein E-Label PDF.`
+          ? `Ja. Für dieses Produkt gibt es ein Energielabel-PDF.`
           : `Yes. There is an E-label PDF for this product.`,
         found: true,
       };
@@ -1379,7 +2685,7 @@ function answerFromStructuredFacts(question, items, language) {
     if (/flachschirmhaube|teleskophaube/i.test(sourceText)) {
       return {
         answer: language === "de"
-          ? "Es ist eine Flachschirmhaube beziehungsweise Teleskophaube, keine Kaminhaube."
+          ? "Es handelt sich um eine Flachschirmhaube / Teleskophaube, nicht um eine Kaminhaube."
           : "It is a flat pull-out hood (Flachschirmhaube / Teleskophaube), not a chimney hood.",
         found: true,
       };
@@ -1387,7 +2693,7 @@ function answerFromStructuredFacts(question, items, language) {
     if (/chimney hood|kaminhaube/i.test(sourceText)) {
       return {
         answer: language === "de"
-          ? "Es ist eine Kaminhaube."
+          ? "Es handelt sich um eine Kaminhaube."
           : "It is a chimney hood.",
         found: true,
       };
@@ -1524,6 +2830,7 @@ function buildRoleInstructions() {
   return [
     "You are a product information assistant for Fragmento kitchen orders.",
     "Write like a helpful sales advisor: natural, warm, and concise, but never pushy or verbose.",
+    "For German answers, use polished customer-facing German with a consistent formal Sie/Ihnen tone, not literal translated phrasing.",
   ];
 }
 
@@ -1545,7 +2852,9 @@ function buildConversationInstructions() {
 
 function buildProductFactInstructions() {
   return [
-    "Understand close mixed-language wording from customers. For example, treat 'energy klasse' as 'energy class' and 'energie class' as 'Energieklasse'.",
+    "Understand close mixed-language wording from customers. For example, treat 'energy klasse' as 'energy class' and 'energie class' as 'Energieeffizienzklasse'.",
+    "Accept German umlauts and fallback spellings as equivalent, including für/fuer, Geräusch/Geraeusch, Kühl/Kuehl, Maße/Masse, and Höhe/Hoehe.",
+    "Use consistent German terminology: Energieeffizienzklasse, Energielabel, Energieverbrauch, jährlicher Energieverbrauch, Verbrauchswerte, Lautstärke, Geräuschwerte, Maße, Gerätemaße, Nischenmaße, Einbaumaße, Ausschnittmaße, Einbautiefe, Dunstabzugshaube, Flachschirmhaube / Teleskophaube, Kaminhaube, Geschirrspüler, Waschmaschine, Einbaubackofen, Kochfeld, Kühl-Gefrierkombination, Garantie, Fragmento-Geschäftsrichtlinie, Produktdokumentation, and Produktinformationen.",
     "Do not infer dimensions, measurements, niche sizes, or noise levels from catalog names, UI labels, or codes.",
     "Use dimensions, measurements, installation sizes, energy classes, consumption values, and noise values only when explicitly present in the provided summary, key facts, or PDF text.",
     "Business policy may be used only when it is explicitly labeled as business policy; never describe business policy as PDF or product documentation.",
@@ -1618,6 +2927,7 @@ export async function POST(request) {
     const kitchenSlug = normalizeRequiredString(body?.kitchenSlug);
     const conversationMessages = normalizeConversationMessages(body?.conversationMessages);
     const effectiveQuestion = resolveEffectiveQuestion(question, conversationMessages, responseLanguage);
+    const answeredTopics = getPreviouslyAnsweredTopics(conversationMessages);
     const notFoundAnswer = NOT_FOUND_ANSWER_BY_LANGUAGE[responseLanguage] || NOT_FOUND_ANSWER_BY_LANGUAGE.en;
     const noInfoAnswer = NO_INFO_ANSWER_BY_LANGUAGE[responseLanguage] || NO_INFO_ANSWER_BY_LANGUAGE.en;
     const timeoutError = TIMEOUT_ERROR_BY_LANGUAGE[responseLanguage] || TIMEOUT_ERROR_BY_LANGUAGE.en;
@@ -1635,6 +2945,21 @@ export async function POST(request) {
       return jsonError("At least one product item is required.", 400);
     }
 
+    const unresolvedAffirmativeAnswer = getUnresolvedAffirmativeAnswer(question, conversationMessages, responseLanguage);
+    if (unresolvedAffirmativeAnswer) {
+      return NextResponse.json(unresolvedAffirmativeAnswer);
+    }
+
+    const metaOrUnsupportedAnswer = getMetaOrUnsupportedRouteAnswer(effectiveQuestion, responseLanguage);
+    if (metaOrUnsupportedAnswer) {
+      return NextResponse.json(metaOrUnsupportedAnswer);
+    }
+
+    const conversationalAnswer = getConversationalRouteAnswer(effectiveQuestion, responseLanguage);
+    if (conversationalAnswer) {
+      return NextResponse.json(conversationalAnswer);
+    }
+
     const items = await loadAuthorizedProductInfoItems({ itemIds, contractNumber, kitchenSlug });
 
     const usableContextItems = items
@@ -1643,17 +2968,47 @@ export async function POST(request) {
       return NextResponse.json({ answer: noInfoAnswer, found: false });
     }
 
+    const multiTopicComparisonAnswer = answerFromMultiTopicComparison(effectiveQuestion, usableContextItems, responseLanguage);
+    if (multiTopicComparisonAnswer) {
+      return NextResponse.json(multiTopicComparisonAnswer);
+    }
+
+    const comparisonAnswer = answerFromComparison(effectiveQuestion, usableContextItems, responseLanguage);
+    if (comparisonAnswer) {
+      return NextResponse.json(comparisonAnswer);
+    }
+
+    const recommendationAnswer = answerFromRecommendation(effectiveQuestion, usableContextItems, responseLanguage);
+    if (recommendationAnswer) {
+      return NextResponse.json(recommendationAnswer);
+    }
+
+    const productAliasOnlyAnswer = answerFromProductAliasOnly(effectiveQuestion, usableContextItems, responseLanguage);
+    if (productAliasOnlyAnswer) {
+      return NextResponse.json(productAliasOnlyAnswer);
+    }
+
+    const overviewAnswer = answerFromProductOverview(effectiveQuestion, usableContextItems, responseLanguage);
+    if (overviewAnswer) {
+      return NextResponse.json(overviewAnswer);
+    }
+
     const multiItemModelAnswer = answerFromExplicitMultiItemModels(effectiveQuestion, usableContextItems, responseLanguage);
     if (multiItemModelAnswer) {
       return NextResponse.json(multiItemModelAnswer);
     }
 
-    const multiItemEnergyAnswer = answerFromExplicitMultiItemEnergyFacts(effectiveQuestion, usableContextItems, responseLanguage);
+    const eLabelDocumentAnswer = answerFromELabelDocumentFacts(effectiveQuestion, usableContextItems, responseLanguage);
+    if (eLabelDocumentAnswer) {
+      return NextResponse.json(eLabelDocumentAnswer);
+    }
+
+    const multiItemEnergyAnswer = answerFromExplicitMultiItemEnergyFacts(effectiveQuestion, usableContextItems, responseLanguage, answeredTopics);
     if (multiItemEnergyAnswer) {
       return NextResponse.json(multiItemEnergyAnswer);
     }
 
-    const multiItemStructuredAnswer = answerFromExplicitMultiItemFacts(effectiveQuestion, usableContextItems, responseLanguage);
+    const multiItemStructuredAnswer = answerFromExplicitMultiItemFacts(effectiveQuestion, usableContextItems, responseLanguage, answeredTopics);
     if (multiItemStructuredAnswer) {
       return NextResponse.json(multiItemStructuredAnswer);
     }
@@ -1755,3 +3110,4 @@ export async function POST(request) {
     return jsonError(status === 429 ? error.message : failedError, status);
   }
 }
+

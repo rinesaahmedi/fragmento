@@ -153,6 +153,7 @@ function formatAdminDate(value, language = "en") {
     hour: "2-digit",
     minute: "2-digit",
     hourCycle: "h23",
+    timeZone: "Europe/Berlin",
   });
   const parts = Object.fromEntries(formatter.formatToParts(new Date(value)).map((part) => [part.type, part.value]));
 
@@ -230,7 +231,7 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
 export function AdminDateTime({ value }) {
   const { language } = useAdminI18n();
 
-  return formatAdminDate(value, language);
+  return <span suppressHydrationWarning>{formatAdminDate(value, language)}</span>;
 }
 
 export function AdminKitchenDisplayName({ slug, name }) {
