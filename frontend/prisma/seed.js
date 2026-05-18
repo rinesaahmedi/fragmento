@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { randomUUID } = require("crypto");
 const { PrismaClient, KitchenStatus, ItemType } = require("@prisma/client");
+const SERVICE_CLAIM_TROUBLESHOOTING_DATA = require("../lib/service-claim-troubleshooting-data.json");
 
 const prisma = new PrismaClient();
 
@@ -258,106 +259,7 @@ const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "736269", kitchenSlug: "kitchen-model-c" },
 ];
 
-const SERVICE_CLAIM_KNOWLEDGE_ENTRIES = [
-  {
-    slug: "amica-dishwasher-e1",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E1",
-    titleKey: "water_inlet",
-    symptomKeys: ["water_inlet_error"],
-    checkKeys: ["check_water_tap", "check_inlet_hose_kinks", "clean_hose_connection_filter"],
-    causeKeys: [],
-    actionKeys: ["report_error_code_e1"],
-    triggerTerms: ["e1", "wasserzulauf", "water inlet", "inlet hose", "zulaufschlauch", "water tap"],
-    priority: 100,
-  },
-  {
-    slug: "amica-dishwasher-e3",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E3",
-    titleKey: "heating_temperature",
-    symptomKeys: ["target_temperature_not_reached"],
-    checkKeys: [],
-    causeKeys: ["heater_may_be_defective", "temperature_sensor_may_be_defective"],
-    actionKeys: ["report_error_code_e3"],
-    triggerTerms: ["e3", "temperature", "heating", "heizung", "temperatursensor", "not heating", "not hot"],
-    priority: 100,
-  },
-  {
-    slug: "amica-dishwasher-e4",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E4",
-    titleKey: "leak_overflow",
-    symptomKeys: ["water_in_base_tray", "continuous_pumping", "beeping_alarm"],
-    checkKeys: [],
-    causeKeys: ["appliance_leak", "hose_to_sump_connection_leak"],
-    actionKeys: ["check_base_tray_for_water"],
-    triggerTerms: ["e4", "undicht", "leak", "overflow", "base tray", "bodenwanne", "pumpt dauerhaft", "continuous pumping", "beeping"],
-    priority: 110,
-  },
-  {
-    slug: "amica-dishwasher-e02",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E02",
-    titleKey: "drainage",
-    symptomKeys: ["water_not_draining"],
-    checkKeys: ["clean_filters", "check_drain_hose", "check_pump_blockage"],
-    causeKeys: [],
-    actionKeys: ["report_error_code_e02"],
-    triggerTerms: ["e02", "e2", "wasserablauf", "drain", "not draining", "ablauf", "abpumpen", "pumpe verstopft"],
-    priority: 105,
-  },
-  {
-    slug: "amica-dishwasher-reset-device",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "immediate_step",
-    code: null,
-    titleKey: "reset_device",
-    symptomKeys: [],
-    checkKeys: [],
-    causeKeys: [],
-    actionKeys: ["unplug_one_to_two_minutes"],
-    triggerTerms: ["reset", "restart", "e1", "e3", "e4", "e02"],
-    priority: 80,
-  },
-  {
-    slug: "amica-dishwasher-clean-filters",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "immediate_step",
-    code: null,
-    titleKey: "clean_filters",
-    symptomKeys: [],
-    checkKeys: [],
-    causeKeys: [],
-    actionKeys: ["inspect_inner_filters_for_dirt"],
-    triggerTerms: ["filter", "filters", "e02", "drain", "ablauf", "water not draining", "not draining", "verstopft"],
-    priority: 75,
-  },
-  {
-    slug: "amica-dishwasher-check-base-tray",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "immediate_step",
-    code: null,
-    titleKey: "check_base_tray",
-    symptomKeys: [],
-    checkKeys: [],
-    causeKeys: [],
-    actionKeys: ["tilt_forward_to_drain_base_tray_water"],
-    triggerTerms: ["e4", "base tray", "bodenwanne", "continuous pumping", "pumps continuously", "pumpt dauerhaft"],
-    priority: 90,
-  },
-];
+const SERVICE_CLAIM_KNOWLEDGE_ENTRIES = SERVICE_CLAIM_TROUBLESHOOTING_DATA.lookupEntries;
 
 const DEFAULT_PROPERTY_OWNERS = [
   { name: "Anna Schmidt Housing GmbH", email: "anna.schmidt@example.com", phone: "+49 30 555 0101", objectName: "Building A", country: "Germany", city: "Berlin", postalCode: "10115", address1: "Invalidenstrasse 10" },

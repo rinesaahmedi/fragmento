@@ -1,0 +1,240 @@
+{
+  "lookupEntries": [
+    {
+      "slug": "amica-dishwasher-e1",
+      "brand": "Amica",
+      "applianceType": "dishwasher",
+      "topicType": "error_code",
+      "code": "E1",
+      "titleKey": "water_inlet",
+      "symptomKeys": ["water_inlet_error"],
+      "checkKeys": ["check_water_tap", "check_inlet_hose_kinks", "clean_hose_connection_filter"],
+      "causeKeys": [],
+      "actionKeys": ["report_error_code_e1"],
+      "triggerTerms": ["e1", "wasserzulauf", "water inlet", "inlet hose", "zulaufschlauch", "water tap", "zieht kein wasser", "not taking in water"],
+      "priority": 100
+    },
+    {
+      "slug": "amica-dishwasher-e3",
+      "brand": "Amica",
+      "applianceType": "dishwasher",
+      "topicType": "error_code",
+      "code": "E3",
+      "titleKey": "heating_temperature",
+      "symptomKeys": ["target_temperature_not_reached"],
+      "checkKeys": [],
+      "causeKeys": ["heater_may_be_defective", "temperature_sensor_may_be_defective"],
+      "actionKeys": ["report_error_code_e3"],
+      "triggerTerms": ["e3", "temperature", "heating", "heizung", "temperatursensor", "not heating", "not hot", "heizt nicht", "water stays cold"],
+      "priority": 100
+    },
+    {
+      "slug": "amica-dishwasher-e4",
+      "brand": "Amica",
+      "applianceType": "dishwasher",
+      "topicType": "error_code",
+      "code": "E4",
+      "titleKey": "leak_overflow",
+      "symptomKeys": ["water_in_base_tray", "continuous_pumping", "beeping_alarm"],
+      "checkKeys": [],
+      "causeKeys": ["appliance_leak", "hose_to_sump_connection_leak"],
+      "actionKeys": ["check_base_tray_for_water"],
+      "triggerTerms": ["e4", "undicht", "leak", "overflow", "base tray", "bodenwanne", "pumpt dauerhaft", "continuous pumping", "beeping", "water in the base tray"],
+      "priority": 110
+    },
+    {
+      "slug": "amica-dishwasher-e02",
+      "brand": "Amica",
+      "applianceType": "dishwasher",
+      "topicType": "error_code",
+      "code": "E02",
+      "titleKey": "drainage",
+      "symptomKeys": ["water_not_draining"],
+      "checkKeys": ["clean_filters", "check_drain_hose", "check_pump_blockage"],
+      "causeKeys": [],
+      "actionKeys": ["report_error_code_e02"],
+      "triggerTerms": ["e02", "e2", "wasserablauf", "drain", "not draining", "ablauf", "abpumpen", "pumpe verstopft", "pumpt nicht ab"],
+      "priority": 105
+    },
+    {
+      "slug": "amica-dishwasher-reset-device",
+      "brand": "Amica",
+      "applianceType": "dishwasher",
+      "topicType": "immediate_step",
+      "code": null,
+      "titleKey": "reset_device",
+      "symptomKeys": [],
+      "checkKeys": [],
+      "causeKeys": [],
+      "actionKeys": ["unplug_one_to_two_minutes"],
+      "triggerTerms": ["reset", "restart", "e1", "e3", "e4", "e02"],
+      "priority": 80
+    },
+    {
+      "slug": "amica-dishwasher-clean-filters",
+      "brand": "Amica",
+      "applianceType": "dishwasher",
+      "topicType": "immediate_step",
+      "code": null,
+      "titleKey": "clean_filters",
+      "symptomKeys": [],
+      "checkKeys": [],
+      "causeKeys": [],
+      "actionKeys": ["inspect_inner_filters_for_dirt"],
+      "triggerTerms": ["e02", "drain", "not draining", "ablauf", "filter", "temperature"],
+      "priority": 75
+    },
+    {
+      "slug": "amica-dishwasher-check-base-tray",
+      "brand": "Amica",
+      "applianceType": "dishwasher",
+      "topicType": "immediate_step",
+      "code": null,
+      "titleKey": "check_base_tray",
+      "symptomKeys": [],
+      "checkKeys": [],
+      "causeKeys": [],
+      "actionKeys": ["tilt_forward_to_drain_base_tray_water"],
+      "triggerTerms": ["e4", "base tray", "bodenwanne", "continuous pumping", "pumpt dauerhaft"],
+      "priority": 90
+    }
+  ],
+  "guides": [
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "en",
+      "error_code": "E1",
+      "issue_key": "water_inlet",
+      "title": "Water inlet problem",
+      "description": "The dishwasher is not getting enough water.",
+      "troubleshooting_steps": [
+        "Check that the water tap is fully open.",
+        "Check whether the inlet hose is bent or kinked.",
+        "Clean the small filter or sieve in the hose connection.",
+        "Unplug the dishwasher for 1 to 2 minutes to reset it."
+      ],
+      "claim_guidance": "Mention that the dishwasher is not taking in water and add E1 if it appears on the display.",
+      "optional_form_description": "My Amica dishwasher is not taking in water and may show error code E1. I checked the water tap and inlet hose, but the issue remains. Please arrange a check or advise on the next step.",
+      "keywords": ["water inlet", "not taking in water", "water tap", "inlet hose", "zulauf", "zieht kein wasser"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "de",
+      "error_code": "E1",
+      "issue_key": "water_inlet",
+      "title": "Problem mit dem Wasserzulauf",
+      "description": "Der Geschirrspüler bekommt nicht genug Wasser.",
+      "troubleshooting_steps": [
+        "Prüfen Sie, ob der Wasserhahn vollständig geöffnet ist.",
+        "Prüfen Sie, ob der Zulaufschlauch geknickt oder blockiert ist.",
+        "Reinigen Sie das kleine Sieb im Schlauchanschluss.",
+        "Ziehen Sie den Stecker für etwa 1 bis 2 Minuten, um das Gerät zurückzusetzen."
+      ],
+      "claim_guidance": "Geben Sie an, dass der Geschirrspüler kein Wasser zieht. Fügen Sie E1 hinzu, falls dieser Fehlercode angezeigt wird.",
+      "optional_form_description": "Mein Amica-Geschirrspüler zieht kein Wasser. E1 wird angezeigt. Ich habe den Wasserhahn und den Zulaufschlauch geprüft, aber das Problem besteht weiterhin. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.",
+      "keywords": ["wasserzulauf", "zieht kein wasser", "zulaufschlauch", "wasserhahn", "e1"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "en",
+      "error_code": "E3",
+      "issue_key": "heating_temperature",
+      "title": "Heating or temperature problem",
+      "description": "The dishwasher is not heating properly and the water may stay cold.",
+      "troubleshooting_steps": [
+        "Unplug the appliance for about 1 to 2 minutes to reset it.",
+        "Inspect the inside filters for dirt and buildup."
+      ],
+      "claim_guidance": "Mention that the dishwasher is not heating or the water stays cold, and add E3 if it appears on the display.",
+      "optional_form_description": "My Amica dishwasher is not heating properly and may show error code E3. The water stays cold and does not reach the required temperature. I reset the appliance and checked the filters, but the issue remains. Please arrange a check or advise on the next step.",
+      "keywords": ["heating", "temperature", "cold water", "not heating", "water stays cold", "e3"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "de",
+      "error_code": "E3",
+      "issue_key": "heating_temperature",
+      "title": "Heiz- oder Temperaturproblem",
+      "description": "Der Geschirrspüler heizt nicht richtig und das Wasser kann kalt bleiben.",
+      "troubleshooting_steps": [
+        "Ziehen Sie den Stecker für etwa 1 bis 2 Minuten, um das Gerät zurückzusetzen.",
+        "Prüfen Sie die Siebe im Innenraum auf Verschmutzungen."
+      ],
+      "claim_guidance": "Geben Sie an, dass der Geschirrspüler nicht richtig heizt oder das Wasser kalt bleibt. Fügen Sie E3 hinzu, falls dieser Fehlercode angezeigt wird.",
+      "optional_form_description": "Mein Amica-Geschirrspüler heizt nicht richtig. E3 wird angezeigt. Das Wasser bleibt kalt oder erreicht nicht die erforderliche Temperatur. Ich habe das Gerät zurückgesetzt und die Siebe geprüft, aber das Problem besteht weiterhin. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.",
+      "keywords": ["heizt nicht", "wasser bleibt kalt", "temperatur", "heizung", "e3"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "en",
+      "error_code": "E4",
+      "issue_key": "leak_overflow",
+      "title": "Leak or overflow problem",
+      "description": "The appliance may have a leak or overflow issue and can keep pumping continuously.",
+      "troubleshooting_steps": [
+        "If the unit keeps pumping even after power-off, check whether there is water in the base tray.",
+        "If it keeps pumping and there is water in the base tray, tilt the appliance slightly forward so the water can run out."
+      ],
+      "claim_guidance": "Mention that the dishwasher is leaking, keeps pumping, or there may be water in the base tray, and include a photo if possible.",
+      "optional_form_description": "My Amica dishwasher appears to have a leak or overflow problem and may show error code E4. The appliance keeps pumping and there may be water in the base tray. Please arrange a check or advise on the next step.",
+      "keywords": ["leak", "overflow", "base tray", "continuous pumping", "water in the base tray", "e4"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "de",
+      "error_code": "E4",
+      "issue_key": "leak_overflow",
+      "title": "Leck- oder Überlaufproblem",
+      "description": "Das Gerät kann undicht sein oder ein Überlaufproblem haben und dauerhaft weiterpumpen.",
+      "troubleshooting_steps": [
+        "Wenn das Gerät auch nach dem Ausschalten weiterpumpt, prüfen Sie, ob sich Wasser in der Bodenwanne befindet.",
+        "Wenn es weiterpumpt und Wasser in der Bodenwanne steht, kippen Sie das Gerät leicht nach vorne, damit das Wasser ablaufen kann."
+      ],
+      "claim_guidance": "Geben Sie an, dass der Geschirrspüler undicht ist, dauerhaft pumpt oder Wasser in der Bodenwanne sein könnte. Fügen Sie E4 hinzu, falls dieser Fehlercode angezeigt wird.",
+      "optional_form_description": "Mein Amica-Geschirrspüler scheint undicht zu sein oder ein Überlaufproblem zu haben. E4 wird angezeigt. Das Gerät pumpt dauerhaft oder es könnte sich Wasser in der Bodenwanne befinden. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.",
+      "keywords": ["undicht", "überlauf", "bodenwanne", "pumpt dauerhaft", "wasser in der bodenwanne", "e4"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "en",
+      "error_code": "E02",
+      "issue_key": "drainage",
+      "title": "Water drainage problem",
+      "description": "The dishwasher is not draining properly and water may stay inside.",
+      "troubleshooting_steps": [
+        "Clean the internal filters.",
+        "Check the drain hose for blockages or kinks.",
+        "Check the pump area for blockages.",
+        "Unplug the appliance for about 1 to 2 minutes to reset it."
+      ],
+      "claim_guidance": "Mention that the dishwasher is not draining properly, and add E02 if it appears on the display.",
+      "optional_form_description": "My Amica dishwasher is not draining properly and may show error code E02. I checked the filters, drain hose, and pump area, but the issue remains. Please arrange a check or advise on the next step.",
+      "keywords": ["drainage", "not draining", "water stays inside", "drain hose", "pump blockage", "e02"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "de",
+      "error_code": "E02",
+      "issue_key": "drainage",
+      "title": "Problem mit dem Wasserablauf",
+      "description": "Der Geschirrspüler pumpt nicht richtig ab und Wasser kann im Gerät stehen bleiben.",
+      "troubleshooting_steps": [
+        "Reinigen Sie die Innensiebe.",
+        "Prüfen Sie den Ablaufschlauch auf Verstopfungen oder Knicke.",
+        "Prüfen Sie den Pumpenbereich auf Verstopfungen.",
+        "Ziehen Sie den Stecker für etwa 1 bis 2 Minuten, um das Gerät zurückzusetzen."
+      ],
+      "claim_guidance": "Geben Sie an, dass der Geschirrspüler nicht abpumpt. Fügen Sie E02 hinzu, falls dieser Fehlercode angezeigt wird.",
+      "optional_form_description": "Mein Amica-Geschirrspüler pumpt nicht richtig ab. E02 wird angezeigt. Ich habe die Siebe, den Ablaufschlauch und den Pumpenbereich geprüft, aber das Problem besteht weiterhin. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.",
+      "keywords": ["wasserablauf", "pumpt nicht ab", "ablaufschlauch", "pumpenbereich", "e02"]
+    }
+  ]
+}

@@ -131,10 +131,18 @@ function combinePersonName(givenName, surname) {
   return [givenName, surname].filter(Boolean).join(" ").trim();
 }
 
-function buildPartyContactBlock(givenName, surname, phone, email) {
+function buildPartyContactBlock(contact) {
+  const companyName = String(contact?.companyName || "").trim();
+  const contactPerson = String(contact?.contactPerson || "").trim();
+  const givenName = String(contact?.givenName || "").trim();
+  const surname = String(contact?.surname || "").trim();
+  const phone = String(contact?.phone || "").trim();
+  const email = String(contact?.email || "").trim();
+  const resolvedContactPerson = contactPerson || combinePersonName(givenName, surname);
+
   return [
-    `Vorname: ${givenName}`,
-    `Nachname: ${surname}`,
+    `Firma: ${companyName || "—"}`,
+    `Ansprechperson: ${resolvedContactPerson || "—"}`,
     `Telefon: ${phone || "—"}`,
     `E-Mail: ${email || "—"}`,
   ].join("\n");
@@ -272,18 +280,20 @@ function extractAvailabilityFromDescription(description) {
 }
 
 function buildComplaintEmailText(payload) {
-  const landlordBlock = buildPartyContactBlock(
-    payload.landlordGivenName,
-    payload.landlordSurname,
-    payload.landlordPhone,
-    payload.landlordEmail,
-  );
-  const hausBlock = buildPartyContactBlock(
-    payload.hausmeisterGivenName,
-    payload.hausmeisterSurname,
-    payload.hausmeisterPhone,
-    payload.hausmeisterEmail,
-  );
+  const landlordBlock = buildPartyContactBlock({
+    companyName: payload.landlordCompanyName,
+    contactPerson: payload.landlordContactPerson,
+    givenName: payload.landlordGivenName,
+    surname: payload.landlordSurname,
+    phone: payload.landlordPhone,
+    email: payload.landlordEmail,
+  });
+  const hausBlock = buildPartyContactBlock({
+    givenName: payload.hausmeisterGivenName,
+    surname: payload.hausmeisterSurname,
+    phone: payload.hausmeisterPhone,
+    email: payload.hausmeisterEmail,
+  });
   const { description: problemText, availability } = extractAvailabilityFromDescription(
     payload.problemDescription,
   );
@@ -324,7 +334,10 @@ function buildComplaintEmailHtml(payload) {
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;vertical-align:top;";
   const customerName = escapeHtml(`${payload.givenName} ${payload.surname}`.trim());
   const landlordValue = [
-    `${payload.landlordGivenName} ${payload.landlordSurname}`.trim(),
+    payload.landlordCompanyName ? `Firma: ${payload.landlordCompanyName}` : "",
+    payload.landlordContactPerson
+      ? `Ansprechperson: ${payload.landlordContactPerson}`
+      : `${payload.landlordGivenName} ${payload.landlordSurname}`.trim(),
     payload.landlordPhone ? `Telefon: ${payload.landlordPhone}` : "",
     payload.landlordEmail ? `E-Mail: ${payload.landlordEmail}` : "",
   ]
@@ -561,10 +574,13 @@ export async function POST(request) {
       );
     }
 
+    const landlordCompanyName = optionalString(body.landlordCompanyName);
+    const landlordContactPerson = optionalString(body.landlordContactPerson);
     const landlordGivenName = optionalString(body.landlordGivenName);
     const landlordSurname = optionalString(body.landlordSurname);
     const landlordNameJoined = combinePersonName(landlordGivenName, landlordSurname);
-    const landlordName = landlordNameJoined || null;
+    const landlordResolvedContactPerson = landlordContactPerson || landlordNameJoined;
+    const landlordName = [landlordCompanyName, landlordResolvedContactPerson].filter(Boolean).join(" / ") || null;
     const landlordPhone = optionalString(body.landlordPhone);
     const landlordEmail = optionalString(body.landlordEmail);
     const hausmeisterGivenName = optionalString(body.hausmeisterGivenName);
@@ -576,7 +592,6 @@ export async function POST(request) {
     const givenName = requiredString(body.givenName, "Name");
     const surname = requiredString(body.surname, "Surname");
     requiredString(body.clientFloor, "Floor");
-    requiredString(body.clientUnitNumber, "Unit number");
     const gender = requiredGender(body.gender);
     const genderLabel = genderDisplayLabel(gender);
     const customerDisplayName = [givenName, surname].filter(Boolean).join(" ").trim();
@@ -613,6 +628,8 @@ export async function POST(request) {
       clientCountry: requiredString(body.clientCountry, "Client country"),
       clientCity: requiredString(body.clientCity, "Client city"),
       clientPostalCode: requiredString(body.clientPostalCode, "Client postal code"),
+      landlordCompanyName,
+      landlordContactPerson: landlordResolvedContactPerson,
       landlordGivenName,
       landlordSurname,
       landlordName,
@@ -624,7 +641,8 @@ export async function POST(request) {
       hausmeisterPhone,
       hausmeisterEmail,
       landlordContact: [
-        `Landlord: ${landlordNameJoined || "—"}`,
+        `Landlord company: ${landlordCompanyName || "—"}`,
+        `Landlord contact person: ${landlordResolvedContactPerson || "—"}`,
         `Landlord phone: ${landlordPhone || "-"}`,
         `Landlord email: ${landlordEmail || "-"}`,
         `Hausmeister: ${hausmeisterNameJoined || "—"}`,

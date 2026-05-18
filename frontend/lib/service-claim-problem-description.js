@@ -66,6 +66,26 @@ export function splitKitchenAreasFromProblemDescription(text) {
  */
 export function composeProblemDescriptionWithAreas(prefix, componentIds, metaById, existingFullText, formatName) {
   const { userText, areaDetailsByName, areaDetails } = splitKitchenAreasFromProblemDescription(existingFullText);
+  return composeProblemDescriptionFromParts(
+    prefix,
+    componentIds,
+    metaById,
+    areaDetailsByName,
+    userText,
+    formatName,
+    areaDetails,
+  );
+}
+
+export function composeProblemDescriptionFromParts(
+  prefix,
+  componentIds,
+  metaById,
+  areaDetailsByName,
+  userText,
+  formatName,
+  fallbackAreaDetails = [],
+) {
   const names = (componentIds || [])
     .map((id) => {
       const meta = metaById.get(id);
@@ -79,7 +99,9 @@ export function composeProblemDescriptionWithAreas(prefix, componentIds, metaByI
 
   const lines = [
     prefix,
-    ...names.map((name, index) => `${name}: ${areaDetailsByName.get(name) || areaDetails[index] || ""}`),
+    ...names.map(
+      (name, index) => `${name}: ${areaDetailsByName.get(name) || fallbackAreaDetails[index] || ""}`,
+    ),
   ];
   const rest = userText.trim();
   return rest ? `${lines.join("\n")}\n\n${rest}` : lines.join("\n");

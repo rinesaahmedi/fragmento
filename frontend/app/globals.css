@@ -1213,6 +1213,18 @@ textarea {
   text-transform: uppercase;
 }
 
+.service-form__section-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.service-form__section-helper {
+  margin: 0;
+  color: rgba(56, 38, 25, 0.72);
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
 .service-field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1221,6 +1233,10 @@ textarea {
 
 .service-field-grid--3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.service-field-grid--preferred-contact-custom {
+  max-width: 420px;
 }
 
 .service-field {
@@ -1263,6 +1279,21 @@ textarea {
   min-width: 0;
 }
 
+.service-field__label-row--contract {
+  justify-content: flex-start;
+  gap: 6px 8px;
+}
+
+.service-field__label-row--contract .service-field__label-main {
+  flex: 0 0 auto;
+}
+
+.service-field__label-row--serial {
+  justify-content: flex-start;
+  gap: 8px;
+  align-items: center;
+}
+
 .service-field__help-link {
   flex: 0 0 auto;
   margin: 0;
@@ -1284,6 +1315,32 @@ textarea {
 }
 
 .service-field__help-link:focus-visible {
+  outline: 2px solid rgba(217, 122, 38, 0.55);
+  outline-offset: 2px;
+}
+
+.service-field__help-badge {
+  flex: 0 0 auto;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid rgba(107, 79, 58, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.service-field__help-badge:hover {
+  border-color: rgba(107, 79, 58, 0.4);
+  background: rgba(255, 247, 238, 0.98);
+}
+
+.service-field__help-badge:focus-visible {
   outline: 2px solid rgba(217, 122, 38, 0.55);
   outline-offset: 2px;
 }
@@ -1521,6 +1578,65 @@ textarea {
   padding-right: 40px;
 }
 
+.service-field__date-picker {
+  position: relative;
+}
+
+.service-field__date-picker input[type="text"] {
+  padding-right: 56px;
+}
+
+.service-field__date-picker-button {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 10px;
+  background: rgba(107, 79, 58, 0.08);
+  color: rgba(107, 79, 58, 0.82);
+  transform: translateY(-50%);
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.service-field__date-picker-button:hover,
+.service-field__date-picker-button:focus-visible {
+  background: rgba(107, 79, 58, 0.14);
+  color: var(--app-accent);
+}
+
+.service-field__date-picker-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(107, 79, 58, 0.08);
+}
+
+.service-field__date-picker-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.service-field__date-picker-native {
+  position: absolute;
+  inset: 0;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .service-field textarea {
   min-height: 128px;
   resize: vertical;
@@ -1755,6 +1871,43 @@ textarea {
 
 .service-form__section--problem-kitchen .service-claim-kitchen {
   margin-top: 0;
+}
+
+.service-field--problem-area-row {
+  grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
+  align-items: start;
+  gap: 10px 10px;
+}
+
+.service-field--problem-area-row > .service-field__problem-area-label {
+  display: flex;
+  align-items: flex-start;
+  justify-self: start;
+  align-self: start;
+  max-width: 100%;
+  min-height: 54px;
+  line-height: 1.3;
+}
+
+.service-field__problem-area-label-text {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  width: fit-content;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
+.service-field__problem-area-input {
+  min-height: 54px !important;
+  resize: none !important;
+  overflow: hidden;
+  line-height: 1.45;
+}
+
+.service-field--problem-area-row > .service-field__problem-area-label .service-field__required-mark {
+  margin-left: 0.08em;
+  flex: 0 0 auto;
 }
 
 /* Service claim: compact kitchen plan (configurator SVG uses large min-heights) */
@@ -2205,6 +2358,14 @@ textarea {
   .service-field-grid,
   .service-field-grid--3 {
     grid-template-columns: 1fr;
+  }
+
+  .service-field--problem-area-row {
+    grid-template-columns: 1fr;
+  }
+
+  .service-field--problem-area-row > .service-field__problem-area-label {
+    min-height: 0;
   }
 
   .service-hero__mascot {
