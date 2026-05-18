@@ -230,8 +230,13 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
 
 export function AdminDateTime({ value }) {
   const { language } = useAdminI18n();
+  const [isMounted, setIsMounted] = useState(false);
 
-  return <span suppressHydrationWarning>{formatAdminDate(value, language)}</span>;
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  return <span suppressHydrationWarning>{isMounted ? formatAdminDate(value, language) : ""}</span>;
 }
 
 export function AdminKitchenDisplayName({ slug, name }) {
