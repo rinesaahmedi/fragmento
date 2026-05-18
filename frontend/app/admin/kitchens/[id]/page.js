@@ -26,6 +26,7 @@ import { AdminComponentSlotPicker } from "../../../../components/admin-component
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
+import { buildKitchenPreviewSvgMarkup } from "../../../../lib/claim-kitchen-preview";
 import { getKitchenById } from "../../../../lib/catalog";
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
@@ -45,44 +46,6 @@ const ITEM_ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
   pickup: '<img src="/img/warehouse.png" alt="Pickup service"/>',
 };
-const PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG = {
-  "kitchen-model-b": {
-    "wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
-    "wall-cabinet-2": { x: 322, y: 214, width: 84, height: 118 },
-    "wall-cabinet-3": { x: 405, y: 214, width: 84, height: 118 },
-    "wall-cabinet-4": { x: 488, y: 214, width: 84, height: 118 },
-    "wall-cabinet-5": { x: 571, y: 214, width: 84, height: 118 },
-    "extractor-hood": { x: 488, y: 314, width: 84, height: 14 },
-    "under-cabinet-light": { x: 270, y: 319, width: 287, height: 18 },
-    "base-module-1": { x: 237, y: 393, width: 86, height: 127 },
-    "base-module-2": { x: 322, y: 393, width: 84, height: 127 },
-    "base-module-3": { x: 405, y: 393, width: 84, height: 127 },
-    "oven-module": { x: 488, y: 393, width: 84, height: 127 },
-    "drawer-module": { x: 571, y: 393, width: 84, height: 127 },
-    "refrigerator": { x: 670, y: 270, width: 76, height: 250 },
-    "sink-faucet": { x: 374, y: 364, width: 14, height: 33 },
-    "worktop": { x: 236, y: 392, width: 421, height: 7 },
-  },
-  "kitchen-model-c": {
-    "refrigerator": { x: 119, y: 220, width: 70, height: 220 },
-    "extractor-hood": { x: 276, y: 189, width: 68, height: 48 },
-    "wall-cabinet-1": { x: 470, y: 185, width: 72, height: 72 },
-    "wall-cabinet-2": { x: 542, y: 185, width: 72, height: 72 },
-    "wall-cabinet-3": { x: 614, y: 185, width: 72, height: 72 },
-    "wall-cabinet-4": { x: 686, y: 185, width: 72, height: 72 },
-    "under-cabinet-light": { x: 534, y: 262, width: 160, height: 15 },
-    "cook-base-left": { x: 205, y: 338, width: 70, height: 97 },
-    "oven-base": { x: 275, y: 338, width: 70, height: 97 },
-    "cook-base-right": { x: 345, y: 338, width: 70, height: 97 },
-    "wm-base": { x: 470, y: 338, width: 72, height: 97 },
-    "sink-base": { x: 542, y: 338, width: 72, height: 97 },
-    "dishwasher-base": { x: 614, y: 338, width: 72, height: 97 },
-    "drawer-base-3": { x: 686, y: 338, width: 72, height: 97 },
-    "worktop": { x: 205, y: 338, width: 553, height: 3 },
-    "sink-faucet": { x: 569, y: 302, width: 18, height: 28 },
-  },
-};
-
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -103,34 +66,12 @@ function contractAddressLines(contract) {
   return [streetLine, cityLine, contract.country, unitLine, contract.notes ? `Notes: ${contract.notes}` : ""].filter(Boolean);
 }
 
-function enhanceSvgMarkup(markup) {
-  if (!markup) return "";
-
-  return markup.replace(/<svg\b([^>]*)>/i, (match, attrs) => {
-    if (/style=/i.test(attrs)) {
-      return `<svg${attrs.replace(/style=(["'])(.*?)\1/i, (styleMatch, quote, value) => ` style=${quote}${value};width:100%;height:auto;display:block${quote}`)}>`;
-    }
-
-    return `<svg${attrs} style="width:100%;height:auto;display:block">`;
-  });
-}
-
 function buildCatalogPreviewMarkup(svgMarkup, kitchenSlug, componentKey) {
-  const baseMarkup = enhanceSvgMarkup(svgMarkup);
-  if (!baseMarkup) return "";
-
-  const bounds = PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()]?.[componentKey];
-  if (!bounds) {
-    return baseMarkup;
-  }
-
-  const highlightMarkup = [
-    `<rect x="${bounds.x - 3}" y="${bounds.y - 3}" width="${bounds.width + 6}" height="${bounds.height + 6}"`,
-    ` rx="8" ry="8" fill="rgba(176, 90, 50, 0.08)" stroke="#8f3e2c" stroke-width="2.5"`,
-    ` vector-effect="non-scaling-stroke" pointer-events="none"/>`,
-  ].join("");
-
-  return baseMarkup.replace("</svg>", `${highlightMarkup}</svg>`);
+  return buildKitchenPreviewSvgMarkup({
+    svgMarkup,
+    kitchenSlug,
+    highlightedComponentKeys: componentKey ? [componentKey] : [],
+  });
 }
 
 function normalizeItemIconMarkup(iconMarkup) {

@@ -1,5 +1,5 @@
 import { KitchenStatus, ItemType, OrderStatus, Prisma } from "@prisma/client";
-import { prisma } from "./prisma";
+import { prisma } from "./prisma.js";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [

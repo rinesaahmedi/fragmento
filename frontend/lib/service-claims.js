@@ -15,6 +15,7 @@ export async function getServiceClaimContractDetails(contractNumber) {
   const contract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: normalizedContractNumber },
     include: {
+      kitchen: true,
       project: {
         include: {
           propertyObject: true,
@@ -74,6 +75,9 @@ export async function getServiceClaimContractDetails(contractNumber) {
     id: contract.id,
     contractNumber: contract.contractNumber,
     isActive: contract.isActive,
+    kitchenId: contract.kitchenId,
+    kitchenName: contract.kitchen?.name || "",
+    kitchenSlug: contract.kitchen?.slug || "",
     building: contract.building || propertyObject?.name || "",
     floor: contract.floor || "",
     unitNumber: contract.unitNumber || "",

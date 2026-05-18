@@ -2,31 +2,38 @@ import { Prisma } from "@prisma/client";
 
 const OPTIONAL_SERVICE_CLAIM_COLUMNS = [
   "attachmentsJson",
+  "problemAreasJson",
   "landlordCompanyPhone",
   "landlordCompanyEmail",
 ];
 
 const REQUIRED_CLAIM_COLUMNS = `
-      "id",
-      "contractNumber",
-      "fullName",
-      "phone",
-      "email",
-      "clientAddress",
-      "clientCountry",
-      "clientCity",
-      "clientPostalCode",
-      "landlordName",
-      "landlordPhone",
-      "landlordEmail",
-      "hausmeisterName",
-      "hausmeisterPhone",
-      "hausmeisterEmail",
-      "landlordContact",
-      "problemDescription",
-      "serialNumber",
-      "requestType",
+      sc."id",
+      sc."contractNumber",
+      sc."fullName",
+      sc."phone",
+      sc."email",
+      sc."clientAddress",
+      sc."clientCountry",
+      sc."clientCity",
+      sc."clientPostalCode",
+      sc."landlordName",
+      sc."landlordPhone",
+      sc."landlordEmail",
+      sc."hausmeisterName",
+      sc."hausmeisterPhone",
+      sc."hausmeisterEmail",
+      sc."landlordContact",
+      sc."problemDescription",
+      sc."serialNumber",
+      sc."requestType",
 `;
+
+let serviceClaimQueryColumnSupportPromise = null;
+
+export function resetServiceClaimQueryColumnSupportCache() {
+  serviceClaimQueryColumnSupportPromise = null;
+}
 
 export function isMissingAttachmentsJsonColumnError(error) {
   return isMissingServiceClaimColumnError(error, "attachmentsJson");
@@ -56,6 +63,9 @@ function isColumnEnabled(options, columnName) {
   if (columnName === "attachmentsJson") {
     return options.includeAttachmentsJson;
   }
+  if (columnName === "problemAreasJson") {
+    return options.includeProblemAreasJson;
+  }
   if (columnName === "landlordCompanyPhone") {
     return options.includeLandlordCompanyPhone;
   }
@@ -69,6 +79,9 @@ function disableColumn(options, columnName) {
   if (columnName === "attachmentsJson") {
     options.includeAttachmentsJson = false;
   }
+  if (columnName === "problemAreasJson") {
+    options.includeProblemAreasJson = false;
+  }
   if (columnName === "landlordCompanyPhone") {
     options.includeLandlordCompanyPhone = false;
   }
@@ -77,58 +90,102 @@ function disableColumn(options, columnName) {
   }
 }
 
+async function getServiceClaimQueryColumnSupport(prisma) {
+  if (!serviceClaimQueryColumnSupportPromise) {
+    serviceClaimQueryColumnSupportPromise = prisma.$queryRaw`
+      SELECT "column_name"
+      FROM "information_schema"."columns"
+      WHERE "table_schema" = 'public'
+        AND "table_name" = 'ServiceClaim'
+    `
+      .then((rows) => {
+        const availableColumns = new Set(
+          Array.isArray(rows)
+            ? rows
+                .map((row) => String(row?.column_name || "").trim())
+                .filter(Boolean)
+            : [],
+        );
+
+        return {
+          includeAttachmentsJson: availableColumns.has("attachmentsJson"),
+          includeProblemAreasJson: availableColumns.has("problemAreasJson"),
+          includeLandlordCompanyPhone: availableColumns.has("landlordCompanyPhone"),
+          includeLandlordCompanyEmail: availableColumns.has("landlordCompanyEmail"),
+        };
+      })
+      .catch(() => ({
+        includeAttachmentsJson: true,
+        includeProblemAreasJson: true,
+        includeLandlordCompanyPhone: true,
+        includeLandlordCompanyEmail: true,
+      }));
+  }
+
+  return serviceClaimQueryColumnSupportPromise;
+}
+
 export function buildServiceClaimListWhere(filters, {
   includeAttachmentsJsonInSearch = true,
+  includeProblemAreasJsonInSearch = true,
   includeLandlordCompanyPhoneInSearch = true,
   includeLandlordCompanyEmailInSearch = true,
+  claimAlias = "sc",
+  kitchenAlias = "k",
 } = {}) {
+  const claim = Prisma.raw(claimAlias);
+  const kitchen = Prisma.raw(kitchenAlias);
   const conditions = [];
 
   if (filters.q) {
     const query = `%${filters.q}%`;
     const parts = [
-      Prisma.sql`"contractNumber" ILIKE ${query}`,
-      Prisma.sql`"fullName" ILIKE ${query}`,
-      Prisma.sql`COALESCE("phone", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("email", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("clientAddress", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("clientCity", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("clientPostalCode", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("clientCountry", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("landlordName", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("landlordPhone", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("landlordEmail", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("hausmeisterName", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("hausmeisterPhone", '') ILIKE ${query}`,
-      Prisma.sql`COALESCE("hausmeisterEmail", '') ILIKE ${query}`,
-      Prisma.sql`"landlordContact" ILIKE ${query}`,
-      Prisma.sql`"problemDescription" ILIKE ${query}`,
-      Prisma.sql`"serialNumber" ILIKE ${query}`,
+      Prisma.sql`${claim}."contractNumber" ILIKE ${query}`,
+      Prisma.sql`${claim}."fullName" ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."phone", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."email", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."clientAddress", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."clientCity", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."clientPostalCode", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."clientCountry", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."landlordName", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."landlordPhone", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."landlordEmail", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."hausmeisterName", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."hausmeisterPhone", '') ILIKE ${query}`,
+      Prisma.sql`COALESCE(${claim}."hausmeisterEmail", '') ILIKE ${query}`,
+      Prisma.sql`${claim}."landlordContact" ILIKE ${query}`,
+      Prisma.sql`${claim}."problemDescription" ILIKE ${query}`,
+      Prisma.sql`${claim}."serialNumber" ILIKE ${query}`,
+      Prisma.sql`COALESCE(${kitchen}."name", '') ILIKE ${query}`,
     ];
 
     if (includeAttachmentsJsonInSearch) {
-      parts.push(Prisma.sql`COALESCE("attachmentsJson", '') ILIKE ${query}`);
+      parts.push(Prisma.sql`COALESCE(${claim}."attachmentsJson", '') ILIKE ${query}`);
+    }
+    if (includeProblemAreasJsonInSearch) {
+      parts.push(Prisma.sql`COALESCE(${claim}."problemAreasJson", '') ILIKE ${query}`);
     }
     if (includeLandlordCompanyPhoneInSearch) {
-      parts.push(Prisma.sql`COALESCE("landlordCompanyPhone", '') ILIKE ${query}`);
+      parts.push(Prisma.sql`COALESCE(${claim}."landlordCompanyPhone", '') ILIKE ${query}`);
     }
     if (includeLandlordCompanyEmailInSearch) {
-      parts.push(Prisma.sql`COALESCE("landlordCompanyEmail", '') ILIKE ${query}`);
+      parts.push(Prisma.sql`COALESCE(${claim}."landlordCompanyEmail", '') ILIKE ${query}`);
     }
 
     conditions.push(Prisma.sql`(${Prisma.join(parts, " OR ")})`);
   }
 
   if (filters.city) {
-    conditions.push(Prisma.sql`LOWER(COALESCE("clientCity", '')) = LOWER(${filters.city})`);
+    conditions.push(Prisma.sql`LOWER(COALESCE(${claim}."clientCity", '')) = LOWER(${filters.city})`);
   }
 
   if (filters.dateFrom) {
-    conditions.push(Prisma.sql`"createdAt" >= ${new Date(`${filters.dateFrom}T00:00:00.000Z`)}`);
+    conditions.push(Prisma.sql`${claim}."createdAt" >= ${new Date(`${filters.dateFrom}T00:00:00.000Z`)}`);
   }
 
   if (filters.dateTo) {
-    conditions.push(Prisma.sql`"createdAt" <= ${new Date(`${filters.dateTo}T23:59:59.999Z`)}`);
+    conditions.push(Prisma.sql`${claim}."createdAt" <= ${new Date(`${filters.dateTo}T23:59:59.999Z`)}`);
   }
 
   if (!conditions.length) {
@@ -140,32 +197,34 @@ export function buildServiceClaimListWhere(filters, {
 
 function buildClaimColumns({
   includeAttachmentsJson = true,
+  includeProblemAreasJson = true,
   includeLandlordCompanyPhone = true,
   includeLandlordCompanyEmail = true,
 } = {}) {
   const optionalColumns = [];
 
   if (includeLandlordCompanyPhone) {
-    optionalColumns.push(`      "landlordCompanyPhone"`);
+    optionalColumns.push(`      sc."landlordCompanyPhone"`);
   }
 
   if (includeLandlordCompanyEmail) {
-    optionalColumns.push(`      "landlordCompanyEmail"`);
+    optionalColumns.push(`      sc."landlordCompanyEmail"`);
   }
 
   if (includeAttachmentsJson) {
-    optionalColumns.push(`      "attachmentsJson"`);
+    optionalColumns.push(`      sc."attachmentsJson"`);
+  }
+  if (includeProblemAreasJson) {
+    optionalColumns.push(`      sc."problemAreasJson"`);
   }
 
-  return `${REQUIRED_CLAIM_COLUMNS}${optionalColumns.length ? `${optionalColumns.join(",\n")},\n` : ""}      "createdAt"`;
+  return `${REQUIRED_CLAIM_COLUMNS}${optionalColumns.length ? `${optionalColumns.join(",\n")},\n` : ""}      k."name" AS "kitchenName",
+      k."slug" AS "kitchenSlug",
+      sc."createdAt"`;
 }
 
 async function queryServiceClaims(prisma, queryBuilder) {
-  const options = {
-    includeAttachmentsJson: true,
-    includeLandlordCompanyPhone: true,
-    includeLandlordCompanyEmail: true,
-  };
+  const options = { ...(await getServiceClaimQueryColumnSupport(prisma)) };
 
   while (true) {
     try {
@@ -189,6 +248,7 @@ export async function queryServiceClaimsList(prisma, filters) {
   return queryServiceClaims(prisma, async (options) => {
     const where = buildServiceClaimListWhere(filters, {
       includeAttachmentsJsonInSearch: options.includeAttachmentsJson,
+      includeProblemAreasJsonInSearch: options.includeProblemAreasJson,
       includeLandlordCompanyPhoneInSearch: options.includeLandlordCompanyPhone,
       includeLandlordCompanyEmailInSearch: options.includeLandlordCompanyEmail,
     });
@@ -196,9 +256,11 @@ export async function queryServiceClaimsList(prisma, filters) {
     return prisma.$queryRaw`
       SELECT
       ${Prisma.raw(buildClaimColumns(options))}
-      FROM "ServiceClaim"
+      FROM "ServiceClaim" sc
+      LEFT JOIN "KitchenContract" kc ON kc."contractNumber" = sc."contractNumber"
+      LEFT JOIN "Kitchen" k ON k."id" = kc."kitchenId"
       ${where}
-      ORDER BY "createdAt" DESC
+      ORDER BY sc."createdAt" DESC
     `;
   });
 }
@@ -208,8 +270,10 @@ export async function queryServiceClaimById(prisma, id) {
     return prisma.$queryRaw`
       SELECT
       ${Prisma.raw(buildClaimColumns(options))}
-      FROM "ServiceClaim"
-      WHERE "id" = ${id}
+      FROM "ServiceClaim" sc
+      LEFT JOIN "KitchenContract" kc ON kc."contractNumber" = sc."contractNumber"
+      LEFT JOIN "Kitchen" k ON k."id" = kc."kitchenId"
+      WHERE sc."id" = ${id}
       LIMIT 1
     `;
   });

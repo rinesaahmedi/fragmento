@@ -3,6 +3,7 @@ import http from "http";
 import https from "https";
 import nodemailer from "nodemailer";
 import path from "path";
+import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 import { prisma } from "../../../lib/prisma";
@@ -11,7 +12,9 @@ import {
   isMissingProblemAreasJsonColumnError,
 } from "../../../lib/service-claim-admin-query";
 import { persistServiceClaimAttachments } from "../../../lib/service-claim-attachments-storage";
+import { renderClaimKitchenPreviewPng } from "../../../lib/claim-kitchen-preview";
 import { getServiceClaimContractDetails } from "../../../lib/service-claims";
+import { formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 
@@ -78,30 +81,8 @@ function mergeProblemAreasIntoDescription(problemDescription, problemAreasJsonRa
 }
 
 function normalizeProblemAreasJson(problemAreasJsonRaw) {
-  const raw = String(problemAreasJsonRaw || "").trim();
-  if (!raw) {
-    return null;
-  }
-  try {
-    const areas = JSON.parse(raw);
-    if (!Array.isArray(areas) || areas.length === 0) {
-      return null;
-    }
-    const normalized = areas
-      .map((area) => {
-        const componentId = String(area?.componentId || "").trim();
-        const name = stripProductDimensionsFromLabel(String(area?.name || "").trim());
-        const code = String(area?.code || "").trim();
-        if (!componentId && !name && !code) {
-          return null;
-        }
-        return { componentId, name, code };
-      })
-      .filter(Boolean);
-    return normalized.length ? JSON.stringify(normalized) : null;
-  } catch {
-    return null;
-  }
+  const normalized = parseServiceClaimProblemAreas(problemAreasJsonRaw);
+  return normalized.length ? JSON.stringify(normalized) : null;
 }
 
 function requiredGender(value) {
@@ -235,6 +216,7 @@ async function sendComplaintEmail(payload, attachmentParts = []) {
     },
   });
 
+  const kitchenPreviewAttachment = await buildClaimKitchenPreviewAttachment(payload);
   const logoAttachment = await buildLogoAttachment();
   const userFiles = attachmentParts.map((part) => ({
     filename: part.filename,
@@ -242,7 +224,11 @@ async function sendComplaintEmail(payload, attachmentParts = []) {
     contentType: part.contentType,
     contentDisposition: "attachment",
   }));
-  const attachments = [...(logoAttachment ? [logoAttachment] : []), ...userFiles];
+  const attachments = [
+    ...(logoAttachment ? [logoAttachment] : []),
+    ...(kitchenPreviewAttachment ? [kitchenPreviewAttachment] : []),
+    ...userFiles,
+  ];
 
   await transporter.sendMail({
     from: `"Fragmento" <${smtpFrom}>`,
@@ -250,7 +236,7 @@ async function sendComplaintEmail(payload, attachmentParts = []) {
     subject: `Reklamation ${payload.contractNumber} - ${payload.customerDisplayName}`,
     replyTo: payload.email || undefined,
     text: buildComplaintEmailText(payload),
-    html: `${buildComplaintEmailLogoHtml(Boolean(logoAttachment))}${buildComplaintEmailHtml(payload)}`,
+    html: `${buildComplaintEmailLogoHtml(Boolean(logoAttachment))}${buildComplaintEmailHtml(payload, kitchenPreviewAttachment?.cid || "")}`,
     attachments,
   });
 
@@ -309,6 +295,193 @@ function extractAvailabilityFromDescription(description) {
   return { description: cleaned, availability };
 }
 
+function buildSelectedKitchenAreaLines(problemAreasJson) {
+  return formatServiceClaimProblemAreaList(problemAreasJson);
+}
+
+let serviceClaimInsertColumnSupportPromise = null;
+
+async function getServiceClaimInsertColumnSupport(prismaClient) {
+  if (!serviceClaimInsertColumnSupportPromise) {
+    serviceClaimInsertColumnSupportPromise = prismaClient.$queryRaw`
+      SELECT "column_name"
+      FROM "information_schema"."columns"
+      WHERE "table_schema" = 'public'
+        AND "table_name" = 'ServiceClaim'
+    `
+      .then((rows) => {
+        const availableColumns = new Set(
+          Array.isArray(rows)
+            ? rows
+                .map((row) => String(row?.column_name || "").trim())
+                .filter(Boolean)
+            : [],
+        );
+
+        return {
+          includeAttachmentsJson: availableColumns.has("attachmentsJson"),
+          includeProblemAreasJson: availableColumns.has("problemAreasJson"),
+          includeLandlordCompanyPhone: availableColumns.has("landlordCompanyPhone"),
+          includeLandlordCompanyEmail: availableColumns.has("landlordCompanyEmail"),
+        };
+      })
+      .catch(() => ({
+        includeAttachmentsJson: true,
+        includeProblemAreasJson: true,
+        includeLandlordCompanyPhone: true,
+        includeLandlordCompanyEmail: true,
+      }));
+  }
+
+  return serviceClaimInsertColumnSupportPromise;
+}
+
+function isMissingServiceClaimInsertColumnError(error, columnName) {
+  const message = String(error?.message ?? "");
+  const metaMessage = typeof error?.meta?.message === "string" ? error.meta.message : "";
+  const combined = `${message} ${metaMessage}`;
+  return (
+    combined.includes(columnName)
+    && (combined.includes("does not exist") || combined.includes("42703"))
+  );
+}
+
+export function getMissingOptionalInsertColumns(error, options) {
+  const missing = [];
+  if (options.includeAttachmentsJson && isMissingAttachmentsJsonColumnError(error)) {
+    missing.push("attachmentsJson");
+  }
+  if (options.includeProblemAreasJson && isMissingProblemAreasJsonColumnError(error)) {
+    missing.push("problemAreasJson");
+  }
+  if (options.includeLandlordCompanyPhone && isMissingServiceClaimInsertColumnError(error, "landlordCompanyPhone")) {
+    missing.push("landlordCompanyPhone");
+  }
+  if (options.includeLandlordCompanyEmail && isMissingServiceClaimInsertColumnError(error, "landlordCompanyEmail")) {
+    missing.push("landlordCompanyEmail");
+  }
+  return missing;
+}
+
+function buildServiceClaimInsertSql(payload, options) {
+  const columns = [
+    Prisma.raw(`"id"`),
+    Prisma.raw(`"contractNumber"`),
+    Prisma.raw(`"fullName"`),
+    Prisma.raw(`"phone"`),
+    Prisma.raw(`"email"`),
+    Prisma.raw(`"clientAddress"`),
+    Prisma.raw(`"clientCountry"`),
+    Prisma.raw(`"clientCity"`),
+    Prisma.raw(`"clientPostalCode"`),
+    Prisma.raw(`"landlordName"`),
+    ...(options.includeLandlordCompanyPhone ? [Prisma.raw(`"landlordCompanyPhone"`)] : []),
+    ...(options.includeLandlordCompanyEmail ? [Prisma.raw(`"landlordCompanyEmail"`)] : []),
+    Prisma.raw(`"landlordPhone"`),
+    Prisma.raw(`"landlordEmail"`),
+    Prisma.raw(`"hausmeisterName"`),
+    Prisma.raw(`"hausmeisterPhone"`),
+    Prisma.raw(`"hausmeisterEmail"`),
+    Prisma.raw(`"landlordContact"`),
+    Prisma.raw(`"problemDescription"`),
+    Prisma.raw(`"serialNumber"`),
+    Prisma.raw(`"requestType"`),
+    ...(options.includeProblemAreasJson ? [Prisma.raw(`"problemAreasJson"`)] : []),
+    ...(options.includeAttachmentsJson ? [Prisma.raw(`"attachmentsJson"`)] : []),
+  ];
+
+  const values = [
+    payload.id,
+    payload.contractNumber,
+    payload.fullName,
+    payload.phone || null,
+    payload.email || null,
+    payload.clientAddress,
+    payload.clientCountry,
+    payload.clientCity,
+    payload.clientPostalCode,
+    payload.landlordName,
+    ...(options.includeLandlordCompanyPhone ? [payload.landlordCompanyPhone || null] : []),
+    ...(options.includeLandlordCompanyEmail ? [payload.landlordCompanyEmail || null] : []),
+    payload.landlordPhone || null,
+    payload.landlordEmail || null,
+    payload.hausmeisterName,
+    payload.hausmeisterPhone || null,
+    payload.hausmeisterEmail || null,
+    payload.landlordContact,
+    payload.problemDescription,
+    payload.serialNumber,
+    payload.requestType,
+    ...(options.includeProblemAreasJson ? [payload.problemAreasJson] : []),
+    ...(options.includeAttachmentsJson ? [payload.attachmentsJson] : []),
+  ].map((value) => Prisma.sql`${value}`);
+
+  return Prisma.sql`
+    INSERT INTO "ServiceClaim" (${Prisma.join(columns)})
+    VALUES (${Prisma.join(values)})
+  `;
+}
+
+async function insertServiceClaimRecord(prismaClient, payload) {
+  const options = { ...(await getServiceClaimInsertColumnSupport(prismaClient)) };
+
+  while (true) {
+    try {
+      await prismaClient.$executeRaw(buildServiceClaimInsertSql(payload, options));
+      return;
+    } catch (error) {
+      const missingColumns = getMissingOptionalInsertColumns(error, options);
+      if (!missingColumns.length) {
+        throw error;
+      }
+
+      for (const columnName of missingColumns) {
+        if (columnName === "attachmentsJson") {
+          options.includeAttachmentsJson = false;
+        }
+        if (columnName === "problemAreasJson") {
+          options.includeProblemAreasJson = false;
+        }
+        if (columnName === "landlordCompanyPhone") {
+          options.includeLandlordCompanyPhone = false;
+        }
+        if (columnName === "landlordCompanyEmail") {
+          options.includeLandlordCompanyEmail = false;
+        }
+      }
+    }
+  }
+}
+
+async function buildClaimKitchenPreviewAttachment(payload) {
+  if (!String(payload?.kitchenSlug || "").trim()) {
+    return null;
+  }
+
+  const selectedAreas = parseServiceClaimProblemAreas(payload.problemAreasJson);
+  if (!selectedAreas.length) {
+    return null;
+  }
+
+  const preview = await renderClaimKitchenPreviewPng({
+    kitchenSlug: payload.kitchenSlug,
+    selectedAreas,
+    width: 960,
+  }).catch(() => null);
+
+  if (!preview?.content?.length) {
+    return null;
+  }
+
+  return {
+    filename: `claim-kitchen-preview-${payload.contractNumber || payload.id}.png`,
+    content: preview.content,
+    cid: "claim-kitchen-preview@fragmento",
+    contentType: preview.contentType || "image/png",
+    contentDisposition: "inline",
+  };
+}
+
 function buildComplaintEmailText(payload) {
   const landlordBlock = buildPartyContactBlock({
     companyName: payload.landlordCompanyName,
@@ -332,15 +505,24 @@ function buildComplaintEmailText(payload) {
   const { description: problemText, availability } = extractAvailabilityFromDescription(
     payload.problemDescription,
   );
+  const selectedAreas = buildSelectedKitchenAreaLines(payload.problemAreasJson);
   return [
     "Servicereklamation",
     "",
     `Vertragsnummer: ${payload.contractNumber}`,
+    `Kueche: ${payload.kitchenName || "-"}`,
     `Kunde: ${payload.givenName} ${payload.surname} (${payload.genderLabel})`,
     `Adresse: ${payload.clientAddress}`,
     `Telefon: ${payload.phone || "—"}`,
     `E-Mail: ${payload.email || "—"}`,
     `Seriennummer: ${payload.serialNumber}`,
+    ...(selectedAreas.length
+      ? [
+          "",
+          "Ausgewaehltes Kuechenteil",
+          ...selectedAreas.map((entry) => `- ${entry}`),
+        ]
+      : []),
     "",
     "Vermieter",
     landlordBlock,
@@ -364,7 +546,7 @@ function buildComplaintEmailText(payload) {
   ].join("\n");
 }
 
-function buildComplaintEmailHtml(payload) {
+function buildComplaintEmailHtml(payload, previewCid = "") {
   const tableStyles = "width:100%;border-collapse:collapse;font-family:Arial,sans-serif;";
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;vertical-align:top;";
   const customerName = escapeHtml(`${payload.givenName} ${payload.surname}`.trim());
@@ -398,8 +580,10 @@ function buildComplaintEmailHtml(payload) {
   const { description: problemText, availability } = extractAvailabilityFromDescription(
     payload.problemDescription,
   );
+  const selectedAreas = buildSelectedKitchenAreaLines(payload.problemAreasJson);
   const detailRows = [
     ["Vertragsnummer", payload.contractNumber],
+    ["Kueche", payload.kitchenName || "-"],
     ["Vorname", payload.givenName],
     ["Nachname", payload.surname],
     ["Geschlecht", payload.genderLabel],
@@ -407,6 +591,7 @@ function buildComplaintEmailHtml(payload) {
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],
     ["Seriennummer", payload.serialNumber],
+    ["Ausgewähltes Küchenteil", selectedAreas.length ? selectedAreas.join("\n") : "-"],
     ["Vermieter", landlordValue],
     ["Hausmeister", hausValue],
     ["Problem", problemText],
@@ -433,6 +618,16 @@ function buildComplaintEmailHtml(payload) {
           )
           .join("<br />")}</td></tr>`
       : "";
+  const previewBlock = previewCid
+    ? `
+      <div style="margin:0 0 18px;">
+        <div style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#777;">Küche / ausgewähltes Teil</div>
+        <div style="padding:12px;border:1px solid #eaeaea;border-radius:10px;background:#fffaf5;">
+          <img src="cid:${escapeHtml(previewCid)}" alt="Kitchen preview with selected claim area highlighted" style="display:block;width:100%;max-width:440px;height:auto;border:0;" />
+        </div>
+      </div>
+    `
+    : "";
 
   return `
     <div style="max-width:600px;margin:20px 0;font-family:Arial,sans-serif;color:#333;">
@@ -440,6 +635,7 @@ function buildComplaintEmailHtml(payload) {
         Neue Servicereklamation zu Vertrag <strong>${escapeHtml(payload.contractNumber)}</strong>
         (${customerName}).
       </p>
+      ${previewBlock}
       <div style="padding:20px;border:1px solid #ddd;border-radius:8px;">
         <h4 style="margin-top:0;">Reklamationsdaten</h4>
         <table style="${tableStyles}"><tbody>${tbody}${attachmentsRow}</tbody></table>
@@ -682,6 +878,8 @@ export async function POST(request) {
       genderLabel,
       customerDisplayName,
       fullName,
+      kitchenName: contract.kitchenName || "",
+      kitchenSlug: contract.kitchenSlug || "",
       phone: optionalString(body.phone),
       email: optionalString(body.email),
       clientAddress: requiredString(body.clientAddress, "Client address"),
@@ -735,169 +933,10 @@ export async function POST(request) {
       );
     }
 
-    const attachmentsJson =
+    payload.attachmentsJson =
       payload.attachmentsMeta.length > 0 ? JSON.stringify(payload.attachmentsMeta) : null;
 
-    try {
-      await prisma.$executeRaw`
-      INSERT INTO "ServiceClaim" (
-        "id",
-        "contractNumber",
-        "fullName",
-        "phone",
-        "email",
-        "clientAddress",
-        "clientCountry",
-        "clientCity",
-        "clientPostalCode",
-        "landlordName",
-        "landlordCompanyPhone",
-        "landlordCompanyEmail",
-        "landlordPhone",
-        "landlordEmail",
-        "hausmeisterName",
-        "hausmeisterPhone",
-        "hausmeisterEmail",
-        "landlordContact",
-        "problemDescription",
-        "serialNumber",
-        "requestType",
-        "problemAreasJson",
-        "attachmentsJson"
-      )
-      VALUES (
-        ${payload.id},
-        ${payload.contractNumber},
-        ${payload.fullName},
-        ${payload.phone || null},
-        ${payload.email || null},
-        ${payload.clientAddress},
-        ${payload.clientCountry},
-        ${payload.clientCity},
-        ${payload.clientPostalCode},
-        ${payload.landlordName},
-        ${payload.landlordCompanyPhone || null},
-        ${payload.landlordCompanyEmail || null},
-        ${payload.landlordPhone || null},
-        ${payload.landlordEmail || null},
-        ${payload.hausmeisterName},
-        ${payload.hausmeisterPhone || null},
-        ${payload.hausmeisterEmail || null},
-        ${payload.landlordContact},
-        ${payload.problemDescription},
-        ${payload.serialNumber},
-        ${payload.requestType},
-        ${payload.problemAreasJson},
-        ${attachmentsJson}
-      )
-    `;
-    } catch (insertError) {
-      if (isMissingProblemAreasJsonColumnError(insertError)) {
-        await prisma.$executeRaw`
-      INSERT INTO "ServiceClaim" (
-        "id",
-        "contractNumber",
-        "fullName",
-        "phone",
-        "email",
-        "clientAddress",
-        "clientCountry",
-        "clientCity",
-        "clientPostalCode",
-        "landlordName",
-        "landlordCompanyPhone",
-        "landlordCompanyEmail",
-        "landlordPhone",
-        "landlordEmail",
-        "hausmeisterName",
-        "hausmeisterPhone",
-        "hausmeisterEmail",
-        "landlordContact",
-        "problemDescription",
-        "serialNumber",
-        "requestType",
-        "attachmentsJson"
-      )
-      VALUES (
-        ${payload.id},
-        ${payload.contractNumber},
-        ${payload.fullName},
-        ${payload.phone || null},
-        ${payload.email || null},
-        ${payload.clientAddress},
-        ${payload.clientCountry},
-        ${payload.clientCity},
-        ${payload.clientPostalCode},
-        ${payload.landlordName},
-        ${payload.landlordCompanyPhone || null},
-        ${payload.landlordCompanyEmail || null},
-        ${payload.landlordPhone || null},
-        ${payload.landlordEmail || null},
-        ${payload.hausmeisterName},
-        ${payload.hausmeisterPhone || null},
-        ${payload.hausmeisterEmail || null},
-        ${payload.landlordContact},
-        ${payload.problemDescription},
-        ${payload.serialNumber},
-        ${payload.requestType},
-        ${attachmentsJson}
-      )
-    `;
-      } else if (!isMissingAttachmentsJsonColumnError(insertError)) {
-        throw insertError;
-      } else {
-        await prisma.$executeRaw`
-      INSERT INTO "ServiceClaim" (
-        "id",
-        "contractNumber",
-        "fullName",
-        "phone",
-        "email",
-        "clientAddress",
-        "clientCountry",
-        "clientCity",
-        "clientPostalCode",
-        "landlordName",
-        "landlordCompanyPhone",
-        "landlordCompanyEmail",
-        "landlordPhone",
-        "landlordEmail",
-        "hausmeisterName",
-        "hausmeisterPhone",
-        "hausmeisterEmail",
-        "landlordContact",
-        "problemDescription",
-        "serialNumber",
-        "requestType",
-        "problemAreasJson"
-      )
-      VALUES (
-        ${payload.id},
-        ${payload.contractNumber},
-        ${payload.fullName},
-        ${payload.phone || null},
-        ${payload.email || null},
-        ${payload.clientAddress},
-        ${payload.clientCountry},
-        ${payload.clientCity},
-        ${payload.clientPostalCode},
-        ${payload.landlordName},
-        ${payload.landlordCompanyPhone || null},
-        ${payload.landlordCompanyEmail || null},
-        ${payload.landlordPhone || null},
-        ${payload.landlordEmail || null},
-        ${payload.hausmeisterName},
-        ${payload.hausmeisterPhone || null},
-        ${payload.hausmeisterEmail || null},
-        ${payload.landlordContact},
-        ${payload.problemDescription},
-        ${payload.serialNumber},
-        ${payload.requestType},
-        ${payload.problemAreasJson}
-      )
-    `;
-      }
-    }
+    await insertServiceClaimRecord(prisma, payload);
 
     if (attachmentParts.length) {
       try {
