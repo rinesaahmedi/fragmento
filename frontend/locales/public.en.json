@@ -9,7 +9,7 @@
     "code": "Code",
     "remove": "Remove",
     "openPdfInNewTab": "Open PDF in new tab",
-    "clickForMoreInfo": "Click for more info."
+    "clickForMoreInfo": "Show more information."
   },
   "entry": {
     "admin": "Admin",
@@ -159,9 +159,9 @@
     "productAssistantCloseAria": "Close Product Agent",
     "productAssistantNoInfo": "No product information is available yet.",
     "productAssistantLoading": "Loading answer...",
-    "productAssistantErrorUnavailable": "The product question could not be answered.",
-    "productAssistantErrorTimeout": "The request is taking too long. Please try again.",
-    "productAssistantPlaceholder": "Ask about this product\u2026",
+    "productAssistantErrorUnavailable": "I couldn't answer that product question. Please try again.",
+    "productAssistantErrorTimeout": "This is taking too long. Please try again.",
+    "productAssistantPlaceholder": "Ask about this product…",
     "productAssistantVoiceStart": "Start voice chat",
     "productAssistantVoiceStop": "Stop listening",
     "productAssistantVoiceListening": "Listening...",

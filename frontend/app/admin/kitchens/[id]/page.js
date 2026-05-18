@@ -399,6 +399,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     <details style={advancedDetailsStyle}>
                       <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
                       <div style={advancedFieldsStyle}>
+                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productImagePath" fallback="Image Path" />} wide>
+                          <input name="productImagePath" defaultValue={item.productImagePath || ""} style={compactInputStyle} />
+                        </FormField>
                         <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoPdfPath" fallback="PDF Path" />} wide>
                           <input name="productInfoPdfPath" defaultValue={item.productInfoPdfPath || ""} style={compactInputStyle} />
                         </FormField>
@@ -503,6 +506,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <details style={advancedDetailsStyle}>
                 <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
                 <div style={advancedFieldsStyle}>
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productImagePath" fallback="Image Path" />} wide>
+                    <input name="productImagePath" placeholder="/product-images/email/example.jpg" style={inputStyle} />
+                  </FormField>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoPdfPath" fallback="PDF Path" />} wide>
                     <input name="productInfoPdfPath" placeholder="/product-info/example.pdf" style={inputStyle} />
                   </FormField>

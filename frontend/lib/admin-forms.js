@@ -83,6 +83,7 @@ export function validateKitchenItemInput(formData) {
     componentKey: optionalString(formData.get("componentKey")),
     sortOrder: validateSortOrder(formData.get("sortOrder")),
     infoText: optionalString(formData.get("infoText")),
+    productImagePath: optionalString(formData.get("productImagePath")),
     productInfoPdfPath: optionalString(formData.get("productInfoPdfPath")),
     productInfoSummary: optionalString(formData.get("productInfoSummary")),
     productInfoKeyFacts: optionalStringList(formData.get("productInfoKeyFacts")),

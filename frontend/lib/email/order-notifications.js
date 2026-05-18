@@ -35,6 +35,57 @@ function buildProductInfoFilename(item, assetPath) {
   return `Produktinformation-${baseName || "Produkt"}.pdf`;
 }
 
+function normalizeProductImageAssetPath(imagePath) {
+  const normalized = String(imagePath || "").trim().replace(/^\/+/, "");
+  return normalized || "";
+}
+
+function buildProductImageCid(item, index) {
+  const code = String(item.code || item.name || `product-${index}`)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `product-image-${code || index}@fragmento`;
+}
+
+async function loadProductImageAttachments(order) {
+  const selectedItems = [...order.components, ...order.accessories, ...order.services];
+  const seenAssetPaths = new Map();
+  const attachments = [];
+  const cidByAssetPath = new Map();
+
+  for (const [index, item] of selectedItems.entries()) {
+    const assetPath = normalizeProductImageAssetPath(item.productImagePath);
+    if (!assetPath) continue;
+
+    if (seenAssetPaths.has(assetPath)) {
+      cidByAssetPath.set(assetPath, seenAssetPaths.get(assetPath));
+      continue;
+    }
+
+    try {
+      const absolutePath = await resolvePublicAssetPath(assetPath);
+      const content = await fs.readFile(absolutePath);
+      const ext = path.extname(assetPath).toLowerCase();
+      const contentType = ext === ".png" ? "image/png" : "image/jpeg";
+      const cid = buildProductImageCid(item, index);
+      attachments.push({
+        filename: path.basename(assetPath),
+        content,
+        cid,
+        contentType,
+        contentDisposition: "inline",
+      });
+      seenAssetPaths.set(assetPath, cid);
+      cidByAssetPath.set(assetPath, cid);
+    } catch (error) {
+      console.warn(`Could not attach product image for ${item.code}:`, error.message);
+    }
+  }
+
+  return { attachments, cidByAssetPath };
+}
+
 async function loadProductInfoAttachments(order) {
   const selectedItems = [...order.components, ...order.accessories, ...order.services];
   const seenAssetPaths = new Set();
@@ -337,15 +388,20 @@ export function buildOrderSummaryHtml(order) {
     )
     .join("");
 
-  const renderSection = (title, items) => {
+  const renderSection = (title, items, imageCidByAssetPath = new Map()) => {
     if (!items.length) return "";
     const rows = items
-      .map(
-        (item) =>
-          `<tr><td style="${tdStyles}">${item.name}<br><span style="font-size:12px;color:#777;">Code: ${item.code || "-"}</span></td><td style="${priceTdStyles}">${formatCurrency(
+      .map((item) => {
+        const productImagePath = normalizeProductImageAssetPath(item.productImagePath);
+        const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
+        const imageHtml = imageCid
+          ? `<img src="cid:${imageCid}" alt="${escapeHtml(item.name || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
+          : "";
+
+        return `<tr><td style="${tdStyles}"><div style="display:flex;align-items:center;gap:12px;">${imageHtml}<div>${escapeHtml(item.name)}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(item.code || "-")}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(
             item.price,
-          )}</td></tr>`,
-      )
+          )}</td></tr>`;
+      })
       .join("");
 
     return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles}">Artikel</th><th style="${thStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
@@ -356,9 +412,9 @@ export function buildOrderSummaryHtml(order) {
       <div style="padding:20px;border:1px solid #ddd;border-radius:8px;">
         <h4 style="margin-top:0;">Bestelldaten</h4>
         <table style="${tableStyles}"><tbody>${orderDetailsRows}</tbody></table>
-        ${renderSection("Neu bestaetigte Komponenten", order.components)}
-        ${renderSection("Neu bestaetigtes Zubehoer", order.accessories)}
-        ${renderSection("Neu bestaetigte Dienstleistungen", order.services)}
+        ${renderSection("Neu bestaetigte Komponenten", order.components, order.productImageCids)}
+        ${renderSection("Neu bestaetigtes Zubehoer", order.accessories, order.productImageCids)}
+        ${renderSection("Neu bestaetigte Dienstleistungen", order.services, order.productImageCids)}
         <table style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;">
           <tr><td style="text-align:right;font-size:1.3em;font-weight:bold;">Gesamtpreis: ${formatCurrency(
             order.total,
@@ -371,16 +427,22 @@ export function buildOrderSummaryHtml(order) {
 
 export async function buildOrderConfirmationEmailStaticHtml(order) {
   const productInfo = await loadProductInfoAttachments(order);
+  const productImages = await loadProductImageAttachments(order);
+  const orderWithProductImages = {
+    ...order,
+    productImageCids: productImages.cidByAssetPath,
+  };
   const productInfoHtml = productInfo.labels.length
     ? `<p>Produktinformationen im Anhang: ${productInfo.labels.join(", ")}.</p>`
     : "";
 
   return {
     html: `
-      ${buildOrderSummaryHtml(order)}
+      ${buildOrderSummaryHtml(orderWithProductImages)}
       ${productInfoHtml}
     `,
     attachmentLabels: productInfo.labels,
+    productImageAttachments: productImages.attachments,
   };
 }
 
@@ -432,6 +494,7 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
       ${staticHtml.html}
     `,
     attachmentLabels: staticHtml.attachmentLabels,
+    productImageAttachments: staticHtml.productImageAttachments,
   };
 }
 
@@ -503,6 +566,7 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     ? '<div style="margin-bottom:16px"><img src="cid:logo@fragmento" alt="Fragmento" style="height:70px;object-fit:contain" /></div>'
     : "";
   const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText });
+  attachments.push(...(emailPreview.productImageAttachments || []));
 
   try {
     await transporter.sendMail({

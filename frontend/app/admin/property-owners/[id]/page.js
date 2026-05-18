@@ -76,7 +76,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
         <div style={pageGridStyle}>
           <AdminSection
             title={<AdminText i18nKey="propertyOwnersAdmin.ownerNotFound" fallback="Housing company not found" />}
-            description={<AdminText i18nKey="propertyOwnersAdmin.ownerRecordDoesNotExist" fallback="The requested housing company record does not exist." />}
+            description={<AdminText i18nKey="propertyOwnersAdmin.ownerRecordDoesNotExist" fallback="The requested partner record does not exist." />}
             actions={<ActionLink href="/admin/property-owners"><AdminText i18nKey="propertyOwnersAdmin.backToOwners" fallback="Back to housing companies" /></ActionLink>}
           />
         </div>
@@ -122,7 +122,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
 
         <div style={splitGridStyle}>
           <AdminSection
-            title={<AdminText i18nKey="propertyOwnersAdmin.editOwner" fallback="Edit housing company" />}
+            title={<AdminText i18nKey="propertyOwnersAdmin.editOwner" fallback="Edit partner" />}
           >
             <form action={`/api/admin/property-owners/${owner.id}`} method="post" style={formGridStyle}>
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.companyName" fallback="Company name" />} wide>
@@ -147,9 +147,9 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                   value="delete"
                   style={dangerButtonStyle}
                   confirmKey="propertyOwnersAdmin.confirmDeleteOwner"
-                  confirmFallback="Delete this housing company?"
+                  confirmFallback="Delete this partner?"
                 >
-                  <AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete housing company" />
+                  <AdminText i18nKey="propertyOwnersAdmin.deleteOwner" fallback="Delete partner" />
                 </AdminConfirmSubmitButton>
               </div>
             </form>
@@ -157,7 +157,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
 
           <AdminSection
             title={<AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add contract number" />}
-            description={<AdminText i18nKey="propertyOwnersAdmin.createContractDescription" fallback="Create a contract number for this housing company. Optionally assign it to a project." />}
+            description={<AdminText i18nKey="propertyOwnersAdmin.createContractDescription" fallback="Create a contract number for this partner. Optionally assign it to a project." />}
           >
             <details open={createContractOpen} style={createCompanyContractDetailsStyle}>
               <summary className="create-company-contract-summary" style={createCompanyContractSummaryStyle}>

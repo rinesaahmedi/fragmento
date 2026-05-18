@@ -10,6 +10,7 @@ export const KITCHEN_CATALOG_COLUMNS = [
   "itemType",
   "price",
   "infoText",
+  "productImagePath",
   "productInfoPdfPath",
   "productInfoSummary",
   "productInfoKeyFacts",
@@ -27,7 +28,7 @@ const KITCHEN_CATALOG_COLUMN_LABELS = {
   articleNumber: "Article Number",
 };
 
-const COLUMN_WIDTHS = [10, 26, 24, 22, 28, 16, 12, 42, 34, 46, 46, 60, 20, 16, 22, 12, 12, 12];
+const COLUMN_WIDTHS = [10, 26, 24, 22, 28, 16, 12, 42, 34, 34, 46, 46, 60, 20, 16, 22, 12, 12, 12];
 
 function getColumnLabel(column) {
   return KITCHEN_CATALOG_COLUMN_LABELS[column] || column;
@@ -124,6 +125,9 @@ function normalizeImportedRecord(record, rowNumber) {
   if (Object.prototype.hasOwnProperty.call(record, "productInfoPdfPath")) {
     data.productInfoPdfPath = optionalString(record.productInfoPdfPath);
   }
+  if (Object.prototype.hasOwnProperty.call(record, "productImagePath")) {
+    data.productImagePath = optionalString(record.productImagePath);
+  }
   if (Object.prototype.hasOwnProperty.call(record, "productInfoSummary")) {
     data.productInfoSummary = optionalString(record.productInfoSummary);
   }
@@ -213,6 +217,7 @@ export function buildKitchenCatalogWorkbook(kitchen) {
       item.itemType,
       Number(item.price).toFixed(2),
       item.infoText || "",
+      item.productImagePath || "",
       item.productInfoPdfPath || "",
       item.productInfoSummary || "",
       Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts.join("\n") : "",
@@ -265,6 +270,7 @@ function parseKitchenCatalogRows(rows) {
   const headers = rows[headerIndex].map(getColumnKey);
   const optionalColumns = new Set([
     "articleNumber",
+    "productImagePath",
     "productInfoPdfPath",
     "productInfoSummary",
     "productInfoKeyFacts",

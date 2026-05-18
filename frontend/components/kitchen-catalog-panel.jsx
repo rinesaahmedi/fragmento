@@ -7,6 +7,7 @@ import {
   getCatalogDisplayItem,
   getLocalizedItemInfoText,
   getLocalizedItemName,
+  getProductImagePaths,
   getProductInfoDocuments,
   getProductInfoHref,
   hasAssistantProductInfo,
@@ -152,6 +153,7 @@ function CatalogItem({
   infoPdfHref,
   onClick,
   onOpenInfo,
+  onOpenPhotos,
   productAssistantEnabled,
   onOpenProductAssistant,
 }) {
@@ -179,6 +181,7 @@ function CatalogItem({
   const productInfoDocuments = Array.isArray(item?.productInfoDocuments) && item.productInfoDocuments.length
     ? item.productInfoDocuments
     : getProductInfoDocuments(item);
+  const productImagePaths = getProductImagePaths(item);
   const tooltipDocumentLabels = getTooltipDocumentLabels(item, translate);
   const productAssistantPublicName = item.assistantHoverExtractorHoodOnly
     ? translate("configurator.productAssistantExtractorHood", "Extractor hood")
@@ -273,6 +276,22 @@ function CatalogItem({
             </span>
           </span>
         ) : null}
+        {productImagePaths.length ? (
+          <button
+            type="button"
+            className={styles.itemPhotoTrigger}
+            aria-label={translate("configurator.photosForItem", "Photos of {name}", { name: itemDisplayName.title })}
+            onClick={(event) => {
+              event.stopPropagation();
+              onOpenPhotos?.({
+                title: itemDisplayName.title,
+                images: productImagePaths,
+              });
+            }}
+          >
+            <span aria-hidden="true">IMG</span>
+          </button>
+        ) : null}
         <div className={styles.itemMetaAside}>
           {hint ? <span className={styles.ruleHint}>{hint}</span> : null}
           {productAssistantEnabled && onOpenProductAssistant ? (
@@ -317,6 +336,7 @@ export default function KitchenCatalogPanel({
   onToggleAccessory,
   onToggleService,
   onOpenProductInfo,
+  onOpenProductPhotos,
   onOpenProductAssistantFromItem,
   serviceEligibility,
 }) {
@@ -348,6 +368,7 @@ export default function KitchenCatalogPanel({
                   price={displayItem.price}
                   infoPdfHref={displayItem.infoPdfHref}
                   onOpenInfo={onOpenProductInfo}
+                  onOpenPhotos={onOpenProductPhotos}
                   productAssistantEnabled={hasAssistantProductInfo(displayItem.item)}
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   onClick={() =>
@@ -373,6 +394,7 @@ export default function KitchenCatalogPanel({
                 compactIcon
                 infoPdfHref={getProductInfoHref(item)}
                 onOpenInfo={onOpenProductInfo}
+                onOpenPhotos={onOpenProductPhotos}
                 productAssistantEnabled={hasAssistantProductInfo(item)}
                 onOpenProductAssistant={onOpenProductAssistantFromItem}
                 onClick={() => onToggleAccessory(item.code)}
@@ -401,6 +423,7 @@ export default function KitchenCatalogPanel({
                   compactIcon
                   infoPdfHref={getProductInfoHref(item)}
                   onOpenInfo={onOpenProductInfo}
+                  onOpenPhotos={onOpenProductPhotos}
                   productAssistantEnabled={hasAssistantProductInfo(item)}
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   hint={

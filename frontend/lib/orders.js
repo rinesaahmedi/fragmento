@@ -103,6 +103,7 @@ export function buildOrderForNotifications(orderRecord) {
     name: item.nameSnapshot || item.name || "",
     price: getOrderItemEffectivePrice(item),
     iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
+    productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
     productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
     productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
     productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts)
