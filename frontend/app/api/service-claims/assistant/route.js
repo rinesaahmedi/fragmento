@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 import { prisma } from "../../../../lib/prisma";
+import SERVICE_CLAIM_TROUBLESHOOTING_DATA from "../../../../lib/service-claim-troubleshooting-data.json";
 
 const COPY = {
   en: {
@@ -44,8 +45,8 @@ const COPY = {
     sampleWordingFallback:
       "The issue started [when]. It is [constant/intermittent]. The affected area is [area]. I noticed [visible issue]. Please check and advise on the next step.",
     sampleWordingOutro: "Please check and advise on the next step.",
-    knowledgeOpening: "I found matching Amica dishwasher troubleshooting guidance for this issue.",
-    knowledgeOpeningArea: "For {label}, I found matching Amica dishwasher troubleshooting guidance.",
+    knowledgeOpening: "I found matching architecto dishwasher troubleshooting guidance for this issue.",
+    knowledgeOpeningArea: "For {label}, I found matching architecto dishwasher troubleshooting guidance.",
     knowledgeCodeTitle: "Matching guidance",
     knowledgeSymptomsTitle: "What it usually means",
     knowledgeChecksTitle: "Check first",
@@ -94,8 +95,8 @@ const COPY = {
     sampleWordingFallback:
       "Das Problem besteht seit [Zeitpunkt]. Es tritt [dauerhaft/gelegentlich] auf. Betroffen ist [Bereich]. Sichtbar ist [Beobachtung]. Bitte prüfen Sie den Fall und teilen Sie mir die nächsten Schritte mit.",
     sampleWordingOutro: "Bitte prüfen Sie den Fall und teilen Sie mir die nächsten Schritte mit.",
-    knowledgeOpening: "Ich habe passende Hinweise zu Amica-Geschirrspülern für dieses Problem gefunden.",
-    knowledgeOpeningArea: "Für {label} habe ich passende Hinweise zu Amica-Geschirrspülern gefunden.",
+    knowledgeOpening: "Ich habe passende Hinweise zu architecto-Geschirrspülern für dieses Problem gefunden.",
+    knowledgeOpeningArea: "Für {label} habe ich passende Hinweise zu architecto-Geschirrspülern gefunden.",
     knowledgeCodeTitle: "Passende Hinweise",
     knowledgeSymptomsTitle: "Das bedeutet meist",
     knowledgeChecksTitle: "Zuerst prüfen",
@@ -642,6 +643,86 @@ function normalizeCode(raw) {
   return `E${digits}`;
 }
 
+function replaceDishwasherBrandCopy(text) {
+  const normalized = normalizeText(text);
+  if (!normalized) return "";
+
+  return normalized
+    .replace(/Amica-Geschirrspülern/g, "architecto-Geschirrspülern")
+    .replace(/Amica-Geschirrspüler/gi, "architecto-Geschirrspüler")
+    .replace(/Amica dishwashers/gi, "architecto dishwashers")
+    .replace(/Amica dishwasher/gi, "architecto dishwasher")
+    .replace(/Amica-Fehlercodes/g, "architecto-Fehlercodes")
+    .replace(/Amica/gi, "architecto");
+}
+
+function getDishwasherTroubleshootingLanguage(language) {
+  return language === "de" ? "de" : "en";
+}
+
+function listDishwasherTroubleshootingGuides(language) {
+  const normalizedLanguage = getDishwasherTroubleshootingLanguage(language);
+  return arrayValue(SERVICE_CLAIM_TROUBLESHOOTING_DATA?.guides).filter((entry) =>
+    entry?.brand === "Amica"
+    && entry?.appliance_type === "dishwasher"
+    && entry?.language === normalizedLanguage
+  );
+}
+
+function findDishwasherTroubleshootingGuide({ language, code, issueKey }) {
+  const normalizedCode = normalizeCode(code || "");
+  const normalizedIssueKey = normalizeText(issueKey);
+
+  return listDishwasherTroubleshootingGuides(language).find((entry) => {
+    if (normalizedCode && normalizeCode(entry?.error_code || "") === normalizedCode) {
+      return true;
+    }
+    return normalizedIssueKey && normalizeText(entry?.issue_key) === normalizedIssueKey;
+  }) || null;
+}
+
+function buildDishwasherGuideForMatch(match, language) {
+  const guide = findDishwasherTroubleshootingGuide({
+    language,
+    code: match?.code,
+    issueKey: match?.titleKey,
+  });
+  if (!guide) return null;
+
+  const normalizedCode = normalizeCode(guide.error_code || match?.code || "");
+  const claimGuidance = normalizeText(guide.claim_guidance);
+  const suggestedDescriptionTemplate = normalizeText(guide.optional_form_description);
+  const suggestedDescription = normalizedCode
+    ? suggestedDescriptionTemplate
+      .replace(/\bE\d{1,2}\b/, normalizedCode)
+      .replace(/error code E\d{1,2}/i, `error code ${normalizedCode}`)
+    : suggestedDescriptionTemplate;
+
+  return {
+    ...guide,
+    errorCode: normalizedCode,
+    description: replaceDishwasherBrandCopy(guide.description),
+    troubleshootingSteps: arrayValue(guide.troubleshooting_steps),
+    claimGuidance: claimGuidance ? [replaceDishwasherBrandCopy(claimGuidance.replace(/\bE\d{1,2}\b/, normalizedCode || ""))] : [],
+    suggestedDescription: replaceDishwasherBrandCopy(suggestedDescription),
+  };
+}
+
+function formatDishwasherIssueSummary(guide, language) {
+  const title = normalizeText(guide?.title);
+  if (!title) {
+    return language === "de" ? "Problem mit dem Geschirrspüler" : "dishwasher problem";
+  }
+  if (language === "de") return title;
+  return title.charAt(0).toLowerCase() + title.slice(1);
+}
+
+function buildDishwasherErrorCodeList(language) {
+  return listDishwasherTroubleshootingGuides(language)
+    .filter((entry) => normalizeText(entry?.error_code))
+    .map((entry) => `- ${normalizeCode(entry.error_code)}: ${normalizeText(entry.title)}`);
+}
+
 function arrayValue(value) {
   return Array.isArray(value) ? value : [];
 }
@@ -1014,6 +1095,28 @@ function hasOnlyDishwasherErrorCodeDisplayContext(text) {
   return mentionsDisplayError && !hasExplicitCode && !hasOtherSpecificSymptom;
 }
 
+function shouldAssumeDishwasherFromErrorCode(text, selectedAreas) {
+  const normalizedText = normalizeText(text);
+  const errorCodes = extractErrorCodes(normalizedText);
+  if (!errorCodes.length) return false;
+
+  const haystack = normalizedText.toLowerCase();
+  const selectedAreaCategories = arrayValue(selectedAreas).map(detectAreaCategory);
+  if (selectedAreaCategories.some((category) => category && category !== "dishwasher")) {
+    return false;
+  }
+
+  const mentionsGeneralCategory =
+    /\belectrical|electricity|light|lighting|lamp|socket|switch|power|fuse|breaker|strom|licht|leak|leaking|water issue|sink|tap|drain|blocked|clogged|damage|damaged|broken|oven|fridge|refrigerator|freezer|washing machine|dryer|hob|cooktop|extractor|hood/i.test(
+      haystack,
+    );
+  if (mentionsGeneralCategory) {
+    return false;
+  }
+
+  return /\berror\b|\bcode\b|\bdisplay\b|\bshown\b|\bi see\b|\bit says\b|^e\s*0?\d{1,2}$/i.test(haystack);
+}
+
 function buildGenericAnswer({ language, question, context, selectedAreas, claim }) {
   const copy = t(language);
   const focusLabel = normalizeText(context?.label);
@@ -1124,40 +1227,19 @@ function hasSpecificDishwasherSymptom(text) {
 }
 
 function getIssueSummaryKeyLegacy(titleKey) {
-  if (titleKey === "water_inlet") return "water inlet problem";
-  if (titleKey === "heating_temperature") return "heating problem";
-  if (titleKey === "leak_overflow") return "leak or overflow problem";
-  if (titleKey === "drainage") return "drainage problem";
-  return "dishwasher problem";
+  return formatDishwasherIssueSummary(
+    findDishwasherTroubleshootingGuide({ language: "en", issueKey: titleKey }),
+    "en",
+  );
 }
 
 function getWaterInletResponseCopyLegacy(language, code) {
-  const normalizedCode = normalizeCode(code || "E1");
-  if (language === "tr") {
-    return {
-      whatItMeans: ["Bulaşık makinesi yeterli su almıyor."],
-      actions: [
-        "Su musluğunun tamamen açık olduğunu kontrol edin.",
-        "Giriş hortumunun bükülmüş veya kıvrılmış olup olmadığını kontrol edin.",
-        "Hortum bağlantısındaki küçük filtreyi veya süzgeci temizleyin.",
-        "Sıfırlamak için bulaşık makinesinin fişini 1 ila 2 dakika çekin.",
-      ],
-      claimGuidance: [`Bulaşık makinesinin su almadığını belirtin ve ekranda görünüyorsa ${normalizedCode} hata kodunu ekleyin.`],
-      suggestedDescription:
-        `Amica bulaşık makinem su almıyor${normalizedCode ? ` ve ${normalizedCode} hata kodu görünebilir` : ""}. Musluğu ve giriş hortumunu kontrol ettim ancak sorun devam ediyor. Lütfen kontrol ayarlayın veya sonraki adımı paylaşın.`,
-    };
-  }
+  const guide = buildDishwasherGuideForMatch({ code: code || "E1", titleKey: "water_inlet" }, language === "tr" ? "en" : language);
   return {
-    whatItMeans: ["The dishwasher is not getting enough water."],
-    actions: [
-      "Check that the water tap is fully open.",
-      "Check whether the inlet hose is bent or kinked.",
-      "Clean the small filter or sieve in the hose connection.",
-      "Unplug the dishwasher for 1 to 2 minutes to reset it.",
-    ],
-    claimGuidance: [`Mention that the dishwasher is not taking in water and add ${normalizedCode} if it appears on the display.`],
-    suggestedDescription:
-      `My Amica dishwasher is not taking in water${normalizedCode ? ` and may show error code ${normalizedCode}` : ""}. I checked the water tap and inlet hose, but the issue remains. Please arrange a check or advise on the next step.`,
+    whatItMeans: guide?.description ? [guide.description] : [],
+    actions: guide?.troubleshootingSteps || [],
+    claimGuidance: guide?.claimGuidance || [],
+    suggestedDescription: guide?.suggestedDescription || "",
   };
 }
 
@@ -1197,18 +1279,8 @@ function getRelevantImmediateActionKeys(titleKey, context, matches) {
 }
 
 function buildClaimGuidanceItemsLegacy(copy, claim, categories, selectedAreas, topMatch, context, language) {
-  if (topMatch?.titleKey === "water_inlet") {
-    return getWaterInletResponseCopy(language, topMatch.code).claimGuidance;
-  }
-  if (topMatch?.titleKey === "heating_temperature") {
-    return [`Mention that the dishwasher is not heating or the water stays cold, and add ${normalizeCode(topMatch.code || "E3")} if it appears on the display.`];
-  }
-  if (topMatch?.titleKey === "drainage") {
-    return [`Mention that the dishwasher is not draining properly, and add ${normalizeCode(topMatch.code || "E02")} if it appears on the display.`];
-  }
-  if (topMatch?.titleKey === "leak_overflow") {
-    return ["Mention that the dishwasher is leaking, keeps pumping, or there may be water in the base tray, and include a photo if possible."];
-  }
+  const guide = buildDishwasherGuideForMatch(topMatch, language);
+  if (guide?.claimGuidance?.length) return guide.claimGuidance;
 
   const steps = [];
 
@@ -1242,27 +1314,14 @@ function buildClaimGuidanceItemsLegacy(copy, claim, categories, selectedAreas, t
 }
 
 function buildSuggestedProblemDescriptionLegacy(topMatch, context, language) {
-  const explicitCode = topMatch?.code ? normalizeCode(topMatch.code) : "";
-  const issueKey = topMatch?.titleKey || "";
-
-  if (issueKey === "heating_temperature") {
-    return `My Amica dishwasher is not heating properly${explicitCode ? ` and may show error code ${explicitCode}` : ""}. The water stays cold and does not reach the required temperature. I reset the appliance and checked the filters, but the issue remains. Please arrange a check or advise on the next step.`;
-  }
-  if (issueKey === "water_inlet") {
-    return getWaterInletResponseCopy(language, explicitCode).suggestedDescription;
-  }
-  if (issueKey === "leak_overflow") {
-    return `My Amica dishwasher appears to have a leak or overflow problem${explicitCode ? ` and may show error code ${explicitCode}` : ""}. The appliance keeps pumping and there may be water in the base tray. Please arrange a check or advise on the next step.`;
-  }
-  if (issueKey === "drainage") {
-    return `My Amica dishwasher is not draining properly${explicitCode ? ` and may show error code ${explicitCode}` : ""}. I checked the filters, drain hose, and pump area, but the issue remains. Please arrange a check or advise on the next step.`;
-  }
+  const guide = buildDishwasherGuideForMatch(topMatch, language);
+  if (guide?.suggestedDescription) return guide.suggestedDescription;
 
   const fallback = normalizeText(context.combinedText).replace(/\s+/g, " ");
   if (!fallback) {
-    return "My Amica dishwasher is not working properly. Please check the appliance and advise on the next step.";
+    return "My architecto dishwasher is not working properly. Please check the appliance and advise on the next step.";
   }
-  return `My Amica dishwasher has the following issue: ${fallback}. Please check the appliance and advise on the next step.`;
+  return `My architecto dishwasher has the following issue: ${fallback}. Please check the appliance and advise on the next step.`;
 }
 
 function scoreKnowledgeEntry(entry, combinedText, errorCodes) {
@@ -1364,9 +1423,9 @@ function buildKnowledgeAnswerLegacy({ language, question, context, selectedAreas
     return buildGenericAnswer({ language, question, context, selectedAreas, claim });
   }
 
-  const issueSummary = getIssueSummaryKey(topMatch.titleKey);
+  const issueSummary = getIssueSummaryKeyLegacy(topMatch.titleKey);
   const explicitCodeMentioned = arrayValue(dishwasherContext.explicitErrorCodes).includes(normalizeCode(topMatch.code));
-  const intro = `This sounds like a ${issueSummary}${topMatch.code ? explicitCodeMentioned ? ` and matches error code ${normalizeCode(topMatch.code)} on Amica dishwashers.` : `, often linked to error code ${normalizeCode(topMatch.code)} on Amica dishwashers.` : "."}`;
+  const intro = `This sounds like a ${issueSummary}${topMatch.code ? explicitCodeMentioned ? ` and matches error code ${normalizeCode(topMatch.code)} on architecto dishwashers.` : `, often linked to error code ${normalizeCode(topMatch.code)} on architecto dishwashers.` : "."}`;
   const troubleshootingActions = translateKnowledgeList(
     getRelevantImmediateActionKeys(topMatch.titleKey, dishwasherContext, matches),
     language,
@@ -1391,18 +1450,10 @@ function buildKnowledgeAnswerLegacy({ language, question, context, selectedAreas
 }
 
 function getIssueSummaryKeyByLanguage(titleKey, language) {
-  if (language === "de") {
-    if (titleKey === "water_inlet") return "Problem mit dem Wasserzulauf";
-    if (titleKey === "heating_temperature") return "Heiz- oder Temperaturproblem";
-    if (titleKey === "leak_overflow") return "Leck- oder Überlaufproblem";
-    if (titleKey === "drainage") return "Problem mit dem Wasserablauf";
-    return "Problem mit dem Geschirrspüler";
-  }
-  if (titleKey === "water_inlet") return "water inlet problem";
-  if (titleKey === "heating_temperature") return "heating problem";
-  if (titleKey === "leak_overflow") return "leak or overflow problem";
-  if (titleKey === "drainage") return "drainage problem";
-  return "dishwasher problem";
+  return formatDishwasherIssueSummary(
+    findDishwasherTroubleshootingGuide({ language, issueKey: titleKey }),
+    language,
+  );
 }
 
 function buildClarifyingAnswer({ intro, lead, options, detailPrompt }) {
@@ -1715,127 +1766,53 @@ function buildDishwasherClarifyingAnswer(language) {
 }
 
 function buildDishwasherErrorCodePromptAnswer(language) {
+  const codeLines = buildDishwasherErrorCodeList(language);
   if (language === "de") {
     return [
       "Ich helfe Ihnen gerne weiter. Welcher Fehlercode wird auf dem Display angezeigt?",
-      [
-        "Häufige Amica-Fehlercodes sind:",
-        "- E1: Problem mit dem Wasserzulauf",
-        "- E3: Heiz- oder Temperaturproblem",
-        "- E4: Leck oder Überlauf",
-        "- E02: Problem mit dem Wasserablauf",
-      ].join("\n"),
-      "Bitte nennen Sie mir den Fehlercode, dann gebe ich Ihnen die passenden Schritte und eine Formulierung für das Schadensformular.",
+      ["H\u00e4ufige architecto-Fehlercodes sind:", ...codeLines].join("\n"),
+      "Bitte nennen Sie mir den Fehlercode, dann gebe ich Ihnen die passenden Schritte und eine Formulierung f\u00fcr das Schadensformular.",
     ].join("\n\n");
   }
 
   return [
     "I can help with that. What error code is shown on the display?",
-    [
-      "Common Amica dishwasher codes include:",
-      "- E1: Water inlet problem",
-      "- E3: Heating or temperature problem",
-      "- E4: Leak or overflow problem",
-      "- E02: Water drainage problem",
-    ].join("\n"),
+    ["Common architecto dishwasher codes include:", ...codeLines].join("\n"),
     "Please tell me the code, and I can give you the right troubleshooting steps and claim wording.",
   ].join("\n\n");
 }
 
 function getWaterInletResponseCopy(language, code) {
-  const normalizedCode = normalizeCode(code || "E1");
-  if (language === "de") {
-    return {
-      actions: [
-        "Ist der Wasserhahn vollständig geöffnet?",
-        "Ist der Zulaufschlauch geknickt oder blockiert?",
-        "Reinigen Sie das kleine Sieb im Schlauchanschluss.",
-        "Ziehen Sie den Stecker für etwa 1–2 Minuten, um die Elektronik zurückzusetzen.",
-      ],
-      claimGuidance: [`Geben Sie an, dass der Geschirrspüler kein Wasser zieht. Fügen Sie ${normalizedCode} hinzu, falls dieser Fehlercode angezeigt wird.`],
-      suggestedDescription:
-        `Mein Amica-Geschirrspüler zieht kein Wasser. ${normalizedCode ? `${normalizedCode} wird angezeigt. ` : ""}Ich habe den Wasserhahn und den Zulaufschlauch geprüft, aber das Problem besteht weiterhin. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.`,
-      outro: "Sie können diesen Text in das Formular kopieren. Falls ein Fehlercode angezeigt wird, fügen Sie ihn bitte hinzu.",
-    };
-  }
+  const guide = buildDishwasherGuideForMatch({ code: code || "E1", titleKey: "water_inlet" }, language);
   return {
-    whatItMeans: ["The dishwasher is not getting enough water."],
-    actions: [
-      "Check that the water tap is fully open.",
-      "Check whether the inlet hose is bent or kinked.",
-      "Clean the small filter or sieve in the hose connection.",
-      "Unplug the dishwasher for 1 to 2 minutes to reset it.",
-    ],
-    claimGuidance: [`Mention that the dishwasher is not taking in water and add ${normalizedCode} if it appears on the display.`],
-    suggestedDescription:
-      `My Amica dishwasher is not taking in water${normalizedCode ? ` and may show error code ${normalizedCode}` : ""}. I checked the water tap and inlet hose, but the issue remains. Please arrange a check or advise on the next step.`,
+    whatItMeans: guide?.description ? [guide.description] : [],
+    actions: guide?.troubleshootingSteps || [],
+    claimGuidance: guide?.claimGuidance || [],
+    suggestedDescription: guide?.suggestedDescription || "",
+    outro: language === "de"
+      ? "Sie k\u00f6nnen diesen Text in das Formular kopieren. Falls ein Fehlercode angezeigt wird, f\u00fcgen Sie ihn bitte hinzu."
+      : undefined,
   };
 }
 
 function buildClaimGuidanceItems(copy, claim, categories, selectedAreas, topMatch, context, language) {
-  if (topMatch?.titleKey === "water_inlet") {
-    return getWaterInletResponseCopy(language, topMatch.code).claimGuidance;
-  }
-  if (topMatch?.titleKey === "heating_temperature") {
-    return language === "de"
-      ? [`Geben Sie an, dass der Geschirrspüler nicht richtig heizt oder das Wasser kalt bleibt. Fügen Sie ${normalizeCode(topMatch.code || "E3")} hinzu, falls dieser Fehlercode angezeigt wird.`]
-      : [`Mention that the dishwasher is not heating or the water stays cold, and add ${normalizeCode(topMatch.code || "E3")} if it appears on the display.`];
-  }
-  if (topMatch?.titleKey === "drainage") {
-    return language === "de"
-      ? [`Geben Sie an, dass der Geschirrspüler nicht abpumpt. Fügen Sie ${normalizeCode(topMatch.code || "E02")} hinzu, falls dieser Fehlercode angezeigt wird.`]
-      : [`Mention that the dishwasher is not draining properly, and add ${normalizeCode(topMatch.code || "E02")} if it appears on the display.`];
-  }
-  if (topMatch?.titleKey === "leak_overflow") {
-    return language === "de"
-      ? ["Geben Sie an, dass der Geschirrspüler undicht ist, dauerhaft pumpt oder Wasser in der Bodenwanne sein könnte. Fügen Sie E4 hinzu, falls dieser Fehlercode angezeigt wird."]
-      : ["Mention that the dishwasher is leaking, keeps pumping, or there may be water in the base tray, and include a photo if possible."];
-  }
-
-  return [];
+  const guide = buildDishwasherGuideForMatch(topMatch, language);
+  return guide?.claimGuidance || [];
 }
 
 function buildSuggestedProblemDescription(topMatch, context, language) {
-  const explicitCode = topMatch?.code ? normalizeCode(topMatch.code) : "";
-  const issueKey = topMatch?.titleKey || "";
-
-  if (language === "de") {
-    if (issueKey === "heating_temperature") {
-      return `Mein Amica-Geschirrspüler heizt nicht richtig. ${explicitCode ? `${explicitCode} wird angezeigt. ` : ""}Das Wasser bleibt kalt oder erreicht nicht die erforderliche Temperatur. Ich habe das Gerät zurückgesetzt und die Siebe geprüft, aber das Problem besteht weiterhin. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.`;
-    }
-    if (issueKey === "water_inlet") {
-      return getWaterInletResponseCopy(language, explicitCode).suggestedDescription;
-    }
-    if (issueKey === "leak_overflow") {
-      return `Mein Amica-Geschirrspüler scheint undicht zu sein oder ein Überlaufproblem zu haben. ${explicitCode ? `${explicitCode} wird angezeigt. ` : ""}Das Gerät pumpt dauerhaft oder es könnte sich Wasser in der Bodenwanne befinden. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.`;
-    }
-    if (issueKey === "drainage") {
-      return `Mein Amica-Geschirrspüler pumpt nicht richtig ab. ${explicitCode ? `${explicitCode} wird angezeigt. ` : ""}Ich habe die Siebe, den Ablaufschlauch und den Pumpenbereich geprüft, aber das Problem besteht weiterhin. Bitte prüfen Sie das Gerät oder teilen Sie mir die nächsten Schritte mit.`;
-    }
-  }
-
-  if (issueKey === "heating_temperature") {
-    return `My Amica dishwasher is not heating properly${explicitCode ? ` and may show error code ${explicitCode}` : ""}. The water stays cold and does not reach the required temperature. I reset the appliance and checked the filters, but the issue remains. Please arrange a check or advise on the next step.`;
-  }
-  if (issueKey === "water_inlet") {
-    return getWaterInletResponseCopy(language, explicitCode).suggestedDescription;
-  }
-  if (issueKey === "leak_overflow") {
-    return `My Amica dishwasher appears to have a leak or overflow problem${explicitCode ? ` and may show error code ${explicitCode}` : ""}. The appliance keeps pumping and there may be water in the base tray. Please arrange a check or advise on the next step.`;
-  }
-  if (issueKey === "drainage") {
-    return `My Amica dishwasher is not draining properly${explicitCode ? ` and may show error code ${explicitCode}` : ""}. I checked the filters, drain hose, and pump area, but the issue remains. Please arrange a check or advise on the next step.`;
-  }
+  const guide = buildDishwasherGuideForMatch(topMatch, language);
+  if (guide?.suggestedDescription) return guide.suggestedDescription;
 
   const fallback = normalizeText(context.combinedText).replace(/\s+/g, " ");
   if (!fallback) {
     return language === "de"
-      ? "Mein Amica-Geschirrspüler funktioniert nicht richtig. Bitte prüfen Sie das Gerät und teilen Sie mir die nächsten Schritte mit."
-      : "My Amica dishwasher is not working properly. Please check the appliance and advise on the next step.";
+      ? "Mein architecto-Geschirrsp\u00fcler funktioniert nicht richtig. Bitte pr\u00fcfen Sie das Ger\u00e4t und teilen Sie mir die n\u00e4chsten Schritte mit."
+      : "My architecto dishwasher is not working properly. Please check the appliance and advise on the next step.";
   }
   return language === "de"
-    ? `Mein Amica-Geschirrspüler hat folgendes Problem: ${fallback}. Bitte prüfen Sie das Gerät und teilen Sie mir die nächsten Schritte mit.`
-    : `My Amica dishwasher has the following issue: ${fallback}. Please check the appliance and advise on the next step.`;
+    ? `Mein architecto-Geschirrsp\u00fcler hat folgendes Problem: ${fallback}. Bitte pr\u00fcfen Sie das Ger\u00e4t und teilen Sie mir die n\u00e4chsten Schritte mit.`
+    : `My architecto dishwasher has the following issue: ${fallback}. Please check the appliance and advise on the next step.`;
 }
 
 function buildKnowledgeAnswer({ language, question, context, selectedAreas, claim, matches, dishwasherContext }) {
@@ -1844,23 +1821,19 @@ function buildKnowledgeAnswer({ language, question, context, selectedAreas, clai
     return buildGenericAnswer({ language, question, context, selectedAreas, claim });
   }
 
+  const guide = buildDishwasherGuideForMatch(topMatch, language);
   const explicitCodeMentioned = arrayValue(dishwasherContext.explicitErrorCodes).includes(normalizeCode(topMatch.code));
-  const issueSummary = getIssueSummaryKeyByLanguage(topMatch.titleKey, language);
+  const issueSummary = formatDishwasherIssueSummary(guide, language);
   const intro = language === "de"
-    ? `Das klingt nach einem ${issueSummary}${topMatch.code ? explicitCodeMentioned ? `, passend zu Fehlercode ${normalizeCode(topMatch.code)} bei Amica-Geschirrspülern.` : `, häufig verbunden mit Fehlercode ${normalizeCode(topMatch.code)} bei Amica-Geschirrspülern.` : "."}`
-    : `This sounds like a ${issueSummary}${topMatch.code ? explicitCodeMentioned ? ` and matches error code ${normalizeCode(topMatch.code)} on Amica dishwashers.` : `, often linked to error code ${normalizeCode(topMatch.code)} on Amica dishwashers.` : "."}`;
-  const troubleshootingActions = translateKnowledgeList(
-    getRelevantImmediateActionKeys(topMatch.titleKey, dishwasherContext, matches),
-    language,
-  ).slice(0, 4);
-  const displayedActions =
-    topMatch.titleKey === "water_inlet"
-      ? getWaterInletResponseCopy(language, topMatch.code).actions
-      : troubleshootingActions;
+    ? `Das klingt nach einem ${issueSummary}${topMatch.code ? explicitCodeMentioned ? ", passend zu Fehlercode " + normalizeCode(topMatch.code) + " bei architecto-Geschirrsp\u00fclern." : ", h\u00e4ufig verbunden mit Fehlercode " + normalizeCode(topMatch.code) + " bei architecto-Geschirrsp\u00fclern." : "."}`
+    : `This sounds like a ${issueSummary}${topMatch.code ? explicitCodeMentioned ? " and matches error code " + normalizeCode(topMatch.code) + " on architecto dishwashers." : ", often linked to error code " + normalizeCode(topMatch.code) + " on architecto dishwashers." : "."}`;
+  const troubleshootingActions = guide?.troubleshootingSteps?.length
+    ? guide.troubleshootingSteps
+    : translateKnowledgeList(getRelevantImmediateActionKeys(topMatch.titleKey, dishwasherContext, matches), language).slice(0, 4);
   return buildCompactSupportAnswer({
     language,
     intro,
-    steps: displayedActions,
+    steps: troubleshootingActions,
   });
 }
 
@@ -1889,7 +1862,7 @@ async function buildAnswer({ language, question, context, selectedAreas, claim, 
     getDishwasherContext({ question, claim, selectedAreas }),
     conversationMessages,
   );
-  if (dishwasherContext.hasDishwasherContext) {
+  if (dishwasherContext.hasDishwasherContext || shouldAssumeDishwasherFromErrorCode(question, selectedAreas)) {
     const entries = await loadDishwasherKnowledgeEntries();
     const matches = selectKnowledgeMatches(entries, dishwasherContext);
     if (wantsClaimFormHelp && matches.codeMatches.length) {

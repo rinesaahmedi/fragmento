@@ -4,107 +4,10 @@ const path = require("node:path");
 const test = require("node:test");
 
 const routePath = path.join(__dirname, "..", "app", "api", "service-claims", "assistant", "route.js");
+const troubleshootingDataPath = path.join(__dirname, "..", "lib", "service-claim-troubleshooting-data.json");
+const SERVICE_CLAIM_TROUBLESHOOTING_DATA = JSON.parse(fs.readFileSync(troubleshootingDataPath, "utf8"));
 
-const KNOWLEDGE_ENTRIES = [
-  {
-    slug: "amica-dishwasher-e1",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E1",
-    titleKey: "water_inlet",
-    symptomKeys: ["water_inlet_error"],
-    checkKeys: ["check_water_tap", "check_inlet_hose_kinks", "clean_hose_connection_filter"],
-    causeKeys: [],
-    actionKeys: ["report_error_code_e1"],
-    triggerTerms: ["e1", "wasserzulauf", "water inlet", "zulaufschlauch"],
-    priority: 100,
-  },
-  {
-    slug: "amica-dishwasher-e3",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E3",
-    titleKey: "heating_temperature",
-    symptomKeys: ["target_temperature_not_reached"],
-    checkKeys: [],
-    causeKeys: ["heater_may_be_defective", "temperature_sensor_may_be_defective"],
-    actionKeys: ["report_error_code_e3"],
-    triggerTerms: ["e3", "heating", "temperature", "heizung", "cold"],
-    priority: 100,
-  },
-  {
-    slug: "amica-dishwasher-e4",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E4",
-    titleKey: "leak_overflow",
-    symptomKeys: ["water_in_base_tray", "continuous_pumping", "beeping_alarm"],
-    checkKeys: [],
-    causeKeys: ["appliance_leak", "hose_to_sump_connection_leak"],
-    actionKeys: ["check_base_tray_for_water"],
-    triggerTerms: ["e4", "base tray", "bodenwanne", "continuous pumping", "pumpt dauerhaft", "beeping"],
-    priority: 110,
-  },
-  {
-    slug: "amica-dishwasher-e02",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "error_code",
-    code: "E02",
-    titleKey: "drainage",
-    symptomKeys: ["water_not_draining"],
-    checkKeys: ["clean_filters", "check_drain_hose", "check_pump_blockage"],
-    causeKeys: [],
-    actionKeys: ["report_error_code_e02"],
-    triggerTerms: ["e02", "e2", "drain", "not draining", "wasserablauf", "ablauf"],
-    priority: 105,
-  },
-  {
-    slug: "amica-dishwasher-reset-device",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "immediate_step",
-    code: null,
-    titleKey: "reset_device",
-    symptomKeys: [],
-    checkKeys: [],
-    causeKeys: [],
-    actionKeys: ["unplug_one_to_two_minutes"],
-    triggerTerms: ["e1", "e3", "e4", "e02"],
-    priority: 80,
-  },
-  {
-    slug: "amica-dishwasher-clean-filters",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "immediate_step",
-    code: null,
-    titleKey: "clean_filters",
-    symptomKeys: [],
-    checkKeys: [],
-    causeKeys: [],
-    actionKeys: ["inspect_inner_filters_for_dirt"],
-    triggerTerms: ["e02", "drain", "not draining", "ablauf", "filter", "temperature"],
-    priority: 75,
-  },
-  {
-    slug: "amica-dishwasher-check-base-tray",
-    brand: "Amica",
-    applianceType: "dishwasher",
-    topicType: "immediate_step",
-    code: null,
-    titleKey: "check_base_tray",
-    symptomKeys: [],
-    checkKeys: [],
-    causeKeys: [],
-    actionKeys: ["tilt_forward_to_drain_base_tray_water"],
-    triggerTerms: ["e4", "base tray", "bodenwanne", "continuous pumping", "pumpt dauerhaft"],
-    priority: 90,
-  },
-];
+const KNOWLEDGE_ENTRIES = SERVICE_CLAIM_TROUBLESHOOTING_DATA.lookupEntries;
 
 function loadRoute(overrides = {}) {
   const source = fs
@@ -135,6 +38,7 @@ function loadRoute(overrides = {}) {
     "prisma",
     "enforceRateLimit",
     "getRequestClientIp",
+    "SERVICE_CLAIM_TROUBLESHOOTING_DATA",
     `${source}
 return {
   POST,
@@ -148,6 +52,7 @@ return {
     prisma,
     overrides.enforceRateLimit || (() => {}),
     overrides.getRequestClientIp || (() => "127.0.0.1"),
+    SERVICE_CLAIM_TROUBLESHOOTING_DATA,
   );
 }
 
@@ -266,7 +171,7 @@ test("dishwasher temperature issue maps to E3 without unrelated leak advice", as
   }));
 
   assert.equal(response.status, 200);
-  assert.match(response.body.answer, /heating problem/);
+  assert.match(response.body.answer, /heating or temperature problem/);
   assert.match(response.body.answer, /often linked to error code E3/);
   assert.match(response.body.answer, /Unplug the appliance for about 1 to 2 minutes/);
   assert.match(response.body.answer, /Inspect the inside filters/);
@@ -430,7 +335,7 @@ test("it is not heating or the water stays cold maps to E3", async () => {
   }));
 
   assert.equal(response.status, 200);
-  assert.match(response.body.answer, /heating problem/);
+  assert.match(response.body.answer, /heating or temperature problem/);
   assert.match(response.body.answer, /often linked to error code E3/);
 });
 
@@ -532,6 +437,22 @@ test("E1 shown on the display returns E1 guidance", async () => {
   assert.match(response.body.answer, /matches error code E1/);
 });
 
+test("i see error E1 returns dishwasher guidance without prior dishwasher context", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error E1",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /matches error code E1/);
+  assert.match(response.body.answer, /water inlet problem/);
+  assert.doesNotMatch(response.body.answer, /An appliance is not working/);
+});
+
 test("E3 shown on the display returns E3 guidance", async () => {
   const route = loadRoute();
 
@@ -564,6 +485,22 @@ test("E02 shown on the display returns E02 guidance", async () => {
 
   assert.equal(response.status, 200);
   assert.match(response.body.answer, /matches error code E02/);
+});
+
+test("i see error E02 returns dishwasher guidance without prior dishwasher context", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error E02",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /matches error code E02/);
+  assert.match(response.body.answer, /drainage problem/);
+  assert.doesNotMatch(response.body.answer, /There is a leak or water issue/);
 });
 
 test("user-provided code uses matches wording while inferred code uses often linked wording", async () => {
@@ -1312,7 +1249,7 @@ test("claim-form help phrase shows english drainage claim-form guidance", async 
   assert.equal(response.body.language, "en");
   assert.match(response.body.answer, /For the claim form/);
   assert.match(response.body.answer, /Mention that the dishwasher is not draining properly/);
-  assert.match(response.body.answer, /My Amica dishwasher is not draining properly/);
+  assert.match(response.body.answer, /My architecto dishwasher is not draining properly/);
   assert.ok(!response.body.actions);
 });
 
@@ -1331,7 +1268,7 @@ test("Was soll ich schreiben shows german dishwasher claim-form guidance", async
   assert.equal(response.body.language, "de");
   assert.match(response.body.answer, /Für das Schadensformular/);
   assert.match(response.body.answer, /Geben Sie an, dass der Geschirrspüler nicht abpumpt/);
-  assert.match(response.body.answer, /Mein Amica-Geschirrspüler pumpt nicht richtig ab/);
+  assert.match(response.body.answer, /Mein architecto-Geschirrspüler pumpt nicht richtig ab/);
   assert.ok(!response.body.actions);
 });
 
@@ -1352,4 +1289,35 @@ test("Formulierung triggers german dishwasher claim-form guidance", async () => 
   assert.match(response.body.answer, /nicht richtig heizt/);
   assert.match(response.body.answer, /Vorschlag für die Beschreibung/);
   assert.ok(!response.body.actions);
+});
+
+test("structured troubleshooting data contains english and german dishwasher guides for required Amica codes", () => {
+  const guides = SERVICE_CLAIM_TROUBLESHOOTING_DATA.guides.filter((entry) =>
+    entry.brand === "Amica" && entry.appliance_type === "dishwasher"
+  );
+
+  for (const language of ["en", "de"]) {
+    for (const code of ["E1", "E3", "E4", "E02"]) {
+      const match = guides.find((entry) => entry.language === language && entry.error_code === code);
+      assert.ok(match, `missing ${language} guide for ${code}`);
+      assert.ok(match.title);
+      assert.ok(match.description);
+      assert.ok(Array.isArray(match.troubleshooting_steps) && match.troubleshooting_steps.length > 0);
+      assert.ok(match.optional_form_description);
+      assert.ok(Array.isArray(match.keywords) && match.keywords.length > 0);
+    }
+  }
+});
+
+test("route no longer hardcodes dishwasher troubleshooting titles or sample descriptions", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.doesNotMatch(source, /Water inlet problem/);
+  assert.doesNotMatch(source, /Heating or temperature problem/);
+  assert.doesNotMatch(source, /Leak or overflow problem/);
+  assert.doesNotMatch(source, /Water drainage problem/);
+  assert.doesNotMatch(source, /My architecto dishwasher is not taking in water/);
+  assert.doesNotMatch(source, /My architecto dishwasher is not heating properly/);
+  assert.doesNotMatch(source, /My architecto dishwasher appears to have a leak or overflow problem/);
+  assert.doesNotMatch(source, /My architecto dishwasher is not draining properly/);
 });

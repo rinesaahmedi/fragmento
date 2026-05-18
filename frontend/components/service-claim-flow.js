@@ -4,7 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
-import { composeProblemDescriptionWithAreas } from "../lib/service-claim-problem-description";
+import {
+  composeProblemDescriptionFromParts,
+  composeProblemDescriptionWithAreas,
+  splitKitchenAreasFromProblemDescription,
+} from "../lib/service-claim-problem-description";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -57,8 +61,14 @@ const CLAIM_FILENAME_PATTERN = /\.(pdf|png|jpe?g|gif|webp|bmp|tiff?|txt|docx?|xl
 const CONTRACT_NUMBER_HELP_IMAGES = [
   { src: "/help/contract-number/contract-number-example-1.png", altKey: "contractNumberHelpAlt1" },
   { src: "/help/contract-number/contract-number-example-2.png", altKey: "contractNumberHelpAlt2" },
+  { src: "/img/CONTRACT%20NR%20IMG.png", altKey: "contractNumberHelpAlt3" },
 ];
 const CONTRACT_HELP_SLIDE_COUNT = CONTRACT_NUMBER_HELP_IMAGES.length;
+const SERIAL_NUMBER_HELP_IMAGES = [
+  { src: "/img/AMICA%20SR%20NR.webp", altKey: "serialNumberHelpAlt1" },
+  { src: "/img/AMICA%20FRIDGE.webp", altKey: "serialNumberHelpAlt2" },
+];
+const SERIAL_HELP_SLIDE_COUNT = SERIAL_NUMBER_HELP_IMAGES.length;
 
 function isClientAllowedAttachment(file) {
   const mime = (file.type || "").toLowerCase();
@@ -106,7 +116,7 @@ const COPY = {
     requiredFieldTitle: "Pflichtfeld",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Kaufvertragsnummer",
-    contractPlaceholder: "z.B. 736267",
+    contractPlaceholder: "e.g. 670 123456",
     contractNumberHelpTrigger: "Wo finde ich die Nummer?",
     contractNumberHelpAria: "Hilfe: Kaufvertragsnummer im Dokument finden",
     contractNumberHelpTitle: "Kaufvertragsnummer finden",
@@ -114,6 +124,7 @@ const COPY = {
     contractNumberHelpClose: "Schlie\u00dfen",
     contractNumberHelpAlt1: "Beispiel 1: Vertragsnummer im Dokument",
     contractNumberHelpAlt2: "Beispiel 2: Vertragsnummer im Dokument",
+    contractNumberHelpAlt3: "Beispiel 3: Vertragsnummer im Dokument",
     contractNumberHelpPrev: "Vorheriges Beispiel",
     contractNumberHelpNext: "N\u00e4chstes Beispiel",
     contractNumberHelpSlideDot: "Beispiel {n} von {total}",
@@ -130,9 +141,20 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "E-Mail-Adresse",
     emailPlaceholder: "name@beispiel.de",
-    availability: "Erreichbarkeit",
-    availabilityDate: "Datum",
-    availabilityTime: "Uhrzeit",
+    preferredContactTime: "Bevorzugte Kontaktzeit",
+    preferredContactTimeHelper:
+      "Bitte teilen Sie uns mit, wann Sie am besten erreichbar sind, damit unser Team Sie zu einem passenden Zeitpunkt kontaktieren kann.",
+    preferredContactDate: "Bevorzugtes Datum",
+    preferredContactTimeWindow: "Bevorzugtes Zeitfenster",
+    preferredContactTimeWindowPlaceholder: "Bitte wählen",
+    preferredContactTimeWindowMorning: "Vormittag, 08:00–12:00",
+    preferredContactTimeWindowAfternoon: "Nachmittag, 12:00–17:00",
+    preferredContactTimeWindowEvening: "Abend, 17:00–20:00",
+    preferredContactTimeWindowCustom: "Eigene Uhrzeit",
+    preferredContactTimeFrom: "Von",
+    preferredContactTimeTo: "Bis",
+    preferredContactTimeCustomRequired: "Bitte geben Sie bei eigener Uhrzeit sowohl Von als auch Bis an.",
+    preferredContactTimeCustomOrder: "Die Bis-Uhrzeit muss später als die Von-Uhrzeit sein.",
     clientAddress: "Adresse des Kunden",
     clientCountry: "Land",
     clientCountryPlaceholder: "Deutschland",
@@ -153,6 +175,10 @@ const COPY = {
     landlordGivenNamePlaceholder: "Vorname",
     landlordSurname: "Nachname",
     landlordSurnamePlaceholder: "Nachname",
+    landlordCompanyName: "Firmenname",
+    landlordCompanyNamePlaceholder: "Firma / Hausverwaltung",
+    landlordContactPerson: "Ansprechperson",
+    landlordContactPersonPlaceholder: "Vor- und Nachname",
     landlordPhone: "Telefon Vermieter",
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "E-Mail Vermieter",
@@ -173,6 +199,12 @@ const COPY = {
     serialNumberAdd: "Hinzuf\u00fcgen",
     serialNumberRequired: "Bitte gib mindestens eine Seriennummer ein oder lade ein Foto der Seriennummer hoch.",
     serialNumberImage: "Foto der Seriennummer(n)",
+    serialNumberHelpTrigger: "i",
+    serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
+    serialNumberHelpTitle: "Seriennummer finden",
+    serialNumberHelpBody: "Die Seriennummer finden Sie meist auf dem Typenschild im Ger\u00e4t oder an der Innenwand. Die Beispiele unten zeigen typische Positionen.",
+    serialNumberHelpAlt1: "Beispiel: Seriennummer auf dem Typenschild",
+    serialNumberHelpAlt2: "Beispiel: Seriennummer im K\u00fchlschrank",
     attachments: "Anh\u00e4nge (optional)",
     attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 5 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
@@ -237,7 +269,7 @@ const COPY = {
     requiredFieldTitle: "Required field",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Purchase contract number",
-    contractPlaceholder: "e.g. 736267",
+    contractPlaceholder: "e.g. 670 123456",
     contractNumberHelpTrigger: "Where to find it?",
     contractNumberHelpAria: "Help: where your purchase contract number appears on your documents",
     contractNumberHelpTitle: "Finding your contract number",
@@ -245,6 +277,7 @@ const COPY = {
     contractNumberHelpClose: "Close",
     contractNumberHelpAlt1: "Example 1: contract number on document",
     contractNumberHelpAlt2: "Example 2: contract number on document",
+    contractNumberHelpAlt3: "Example 3: contract number on document",
     contractNumberHelpPrev: "Previous example",
     contractNumberHelpNext: "Next example",
     contractNumberHelpSlideDot: "Example {n} of {total}",
@@ -261,9 +294,20 @@ const COPY = {
     phonePlaceholder: "+49 ...",
     email: "Email address",
     emailPlaceholder: "name@example.com",
-    availability: "Availability",
-    availabilityDate: "Date",
-    availabilityTime: "Time",
+    preferredContactTime: "Preferred contact time",
+    preferredContactTimeHelper:
+      "Please let us know when you are best reachable, so our team can contact you at a suitable time.",
+    preferredContactDate: "Preferred date",
+    preferredContactTimeWindow: "Preferred time window",
+    preferredContactTimeWindowPlaceholder: "Select…",
+    preferredContactTimeWindowMorning: "Morning, 08:00–12:00",
+    preferredContactTimeWindowAfternoon: "Afternoon, 12:00–17:00",
+    preferredContactTimeWindowEvening: "Evening, 17:00–20:00",
+    preferredContactTimeWindowCustom: "Custom time",
+    preferredContactTimeFrom: "From",
+    preferredContactTimeTo: "To",
+    preferredContactTimeCustomRequired: "Please enter both From and To for a custom time.",
+    preferredContactTimeCustomOrder: "The To time must be later than the From time.",
     clientAddress: "Client address",
     clientCountry: "Country",
     clientCountryPlaceholder: "Germany",
@@ -280,10 +324,14 @@ const COPY = {
     clientUnitNumber: "Unit number",
     clientUnitNumberPlaceholder: "e.g. 3B",
     landlordSection: "Landlord (optional)",
-    landlordGivenName: "Name",
-    landlordGivenNamePlaceholder: "Name",
+    landlordGivenName: "First name",
+    landlordGivenNamePlaceholder: "First name",
     landlordSurname: "Surname",
     landlordSurnamePlaceholder: "Surname",
+    landlordCompanyName: "Company name",
+    landlordCompanyNamePlaceholder: "Company / property management",
+    landlordContactPerson: "Contact person",
+    landlordContactPersonPlaceholder: "Full name",
     landlordPhone: "Landlord phone",
     landlordPhonePlaceholder: "+49 ...",
     landlordEmail: "Landlord email",
@@ -304,6 +352,12 @@ const COPY = {
     serialNumberAdd: "Add",
     serialNumberRequired: "Please enter at least one serial number or upload a photo of the serial number.",
     serialNumberImage: "Photo of the serial number(s)",
+    serialNumberHelpTrigger: "i",
+    serialNumberHelpAria: "Help: where to find the serial number",
+    serialNumberHelpTitle: "Finding the serial number",
+    serialNumberHelpBody: "You can usually find the serial number on the appliance rating plate or on an inside wall. The examples below show typical locations.",
+    serialNumberHelpAlt1: "Example: serial number on the appliance label",
+    serialNumberHelpAlt2: "Example: serial number inside the fridge",
     attachments: "Attachments (optional)",
     attachmentsHint: "PDFs, images, or office files \u2014 up to 5 files, 4 MB each.",
     attachmentsClear: "Remove all",
@@ -376,6 +430,7 @@ const COPY = {
     contractNumberHelpClose: "Kapat",
     contractNumberHelpAlt1: "\u00d6rnek 1: belgedeki s\u00f6zle\u015fme numaras\u0131",
     contractNumberHelpAlt2: "\u00d6rnek 2: belgedeki s\u00f6zle\u015fme numaras\u0131",
+    contractNumberHelpAlt3: "\u00d6rnek 3: belgedeki s\u00f6zle\u015fme numaras\u0131",
     contractNumberHelpPrev: "\u00d6nceki \u00f6rnek",
     contractNumberHelpNext: "Sonraki \u00f6rnek",
     contractNumberHelpSlideDot: "\u00d6rnek {n} / {total}",
@@ -435,6 +490,12 @@ const COPY = {
     serialNumberAdd: "Ekle",
     serialNumberRequired: "L\u00fctfen en az bir seri numaras\u0131 girin veya seri numaras\u0131n\u0131n foto\u011fraf\u0131n\u0131 y\u00fckleyin.",
     serialNumberImage: "Seri numaras\u0131 / numaralar\u0131 foto\u011fraf\u0131",
+    serialNumberHelpTrigger: "i",
+    serialNumberHelpAria: "Yard\u0131m: seri numaras\u0131 nerede bulunur?",
+    serialNumberHelpTitle: "Seri numaras\u0131n\u0131 bulma",
+    serialNumberHelpBody: "Seri numaras\u0131n\u0131 genelde cihaz etiketinde veya i\u00e7 taraftaki bir y\u00fczeyde bulabilirsiniz. A\u015fa\u011f\u0131daki \u00f6rnekler tipik konumlar\u0131 g\u00f6sterir.",
+    serialNumberHelpAlt1: "\u00d6rnek: cihaz etiketindeki seri numaras\u0131",
+    serialNumberHelpAlt2: "\u00d6rnek: buzdolab\u0131 i\u00e7indeki seri numaras\u0131",
     attachments: "Ekler (iste\u011fe ba\u011fl\u0131)",
     attachmentsHint: "PDF, g\u00f6rsel veya ofis dosyalar\u0131 \u2014 en fazla 5 dosya, dosya ba\u015f\u0131na en fazla 4 MB.",
     attachmentsClear: "T\u00fcm\u00fcn\u00fc kald\u0131r",
@@ -478,6 +539,7 @@ const COPY = {
     contractNumberHelpClose: "Cerrar",
     contractNumberHelpAlt1: "Ejemplo 1: n\u00famero de contrato en el documento",
     contractNumberHelpAlt2: "Ejemplo 2: n\u00famero de contrato en el documento",
+    contractNumberHelpAlt3: "Ejemplo 3: n\u00famero de contrato en el documento",
     contractNumberHelpPrev: "Ejemplo anterior",
     contractNumberHelpNext: "Ejemplo siguiente",
     contractNumberHelpSlideDot: "Ejemplo {n} de {total}",
@@ -537,6 +599,12 @@ const COPY = {
     serialNumberAdd: "A\u00f1adir",
     serialNumberRequired: "Introduzca al menos un n\u00famero de serie o suba una foto del n\u00famero de serie.",
     serialNumberImage: "Foto del n\u00famero o de los n\u00fameros de serie",
+    serialNumberHelpTrigger: "i",
+    serialNumberHelpAria: "Ayuda: d\u00f3nde encontrar el n\u00famero de serie",
+    serialNumberHelpTitle: "Encontrar el n\u00famero de serie",
+    serialNumberHelpBody: "Normalmente puede encontrar el n\u00famero de serie en la placa del aparato o en una pared interior. Los ejemplos siguientes muestran ubicaciones t\u00edpicas.",
+    serialNumberHelpAlt1: "Ejemplo: n\u00famero de serie en la etiqueta del aparato",
+    serialNumberHelpAlt2: "Ejemplo: n\u00famero de serie dentro del frigor\u00edfico",
     attachments: "Adjuntos (opcional)",
     attachmentsHint: "PDF, im\u00e1genes u oficina: hasta 5 archivos, 4 MB cada uno.",
     attachmentsClear: "Quitar todos",
@@ -580,6 +648,7 @@ const COPY = {
     contractNumberHelpClose: "Fermer",
     contractNumberHelpAlt1: "Exemple 1 : num\u00e9ro de contrat sur le document",
     contractNumberHelpAlt2: "Exemple 2 : num\u00e9ro de contrat sur le document",
+    contractNumberHelpAlt3: "Exemple 3 : num\u00e9ro de contrat sur le document",
     contractNumberHelpPrev: "Exemple pr\u00e9c\u00e9dent",
     contractNumberHelpNext: "Exemple suivant",
     contractNumberHelpSlideDot: "Exemple {n} sur {total}",
@@ -639,6 +708,12 @@ const COPY = {
     serialNumberAdd: "Ajouter",
     serialNumberRequired: "Veuillez saisir au moins un num\u00e9ro de s\u00e9rie ou envoyer une photo du num\u00e9ro de s\u00e9rie.",
     serialNumberImage: "Photo du ou des num\u00e9ros de s\u00e9rie",
+    serialNumberHelpTrigger: "i",
+    serialNumberHelpAria: "Aide : o\u00f9 trouver le num\u00e9ro de s\u00e9rie",
+    serialNumberHelpTitle: "Trouver le num\u00e9ro de s\u00e9rie",
+    serialNumberHelpBody: "Vous trouverez g\u00e9n\u00e9ralement le num\u00e9ro de s\u00e9rie sur la plaque signal\u00e9tique de l'appareil ou sur une paroi int\u00e9rieure. Les exemples ci-dessous montrent les emplacements les plus courants.",
+    serialNumberHelpAlt1: "Exemple : num\u00e9ro de s\u00e9rie sur l'\u00e9tiquette de l'appareil",
+    serialNumberHelpAlt2: "Exemple : num\u00e9ro de s\u00e9rie \u00e0 l'int\u00e9rieur du r\u00e9frig\u00e9rateur",
     attachments: "Pi\u00e8ces jointes (facultatif)",
     attachmentsHint: "PDF, images ou bureautique : jusqu'\u00e0 5 fichiers, 4 Mo chacun.",
     attachmentsClear: "Tout retirer",
@@ -682,6 +757,7 @@ const COPY = {
     contractNumberHelpClose: "\u0417\u0430\u043a\u0440\u044b\u0442\u044c",
     contractNumberHelpAlt1: "\u041f\u0440\u0438\u043c\u0435\u0440 1: \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043d\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0435",
     contractNumberHelpAlt2: "\u041f\u0440\u0438\u043c\u0435\u0440 2: \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043d\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0435",
+    contractNumberHelpAlt3: "\u041f\u0440\u0438\u043c\u0435\u0440 3: \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043d\u0430 \u0434\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0435",
     contractNumberHelpPrev: "\u041f\u0440\u0435\u0434\u044b\u0434\u0443\u0449\u0438\u0439 \u043f\u0440\u0438\u043c\u0435\u0440",
     contractNumberHelpNext: "\u0421\u043b\u0435\u0434\u0443\u044e\u0449\u0438\u0439 \u043f\u0440\u0438\u043c\u0435\u0440",
     contractNumberHelpSlideDot: "\u041f\u0440\u0438\u043c\u0435\u0440 {n} \u0438\u0437 {total}",
@@ -741,6 +817,12 @@ const COPY = {
     serialNumberAdd: "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c",
     serialNumberRequired: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0445\u043e\u0442\u044f \u0431\u044b \u043e\u0434\u0438\u043d \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0438\u043b\u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0444\u043e\u0442\u043e \u0448\u0438\u043b\u044c\u0434\u0438\u043a\u0430.",
     serialNumberImage: "\u0424\u043e\u0442\u043e \u0441\u0435\u0440\u0438\u0439\u043d\u043e\u0433\u043e \u043d\u043e\u043c\u0435\u0440\u0430 / \u043d\u043e\u043c\u0435\u0440\u043e\u0432",
+    serialNumberHelpTrigger: "i",
+    serialNumberHelpAria: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430: \u0433\u0434\u0435 \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
+    serialNumberHelpTitle: "\u041a\u0430\u043a \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
+    serialNumberHelpBody: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043e\u0431\u044b\u0447\u043d\u043e \u0443\u043a\u0430\u0437\u0430\u043d \u043d\u0430 \u0437\u0430\u0432\u043e\u0434\u0441\u043a\u043e\u0439 \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0435 \u043f\u0440\u0438\u0431\u043e\u0440\u0430 \u0438\u043b\u0438 \u043d\u0430 \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0435\u0439 \u0441\u0442\u0435\u043d\u043a\u0435. \u041d\u0438\u0436\u0435 \u043f\u043e\u043a\u0430\u0437\u0430\u043d\u044b \u0442\u0438\u043f\u0438\u0447\u043d\u044b\u0435 \u043c\u0435\u0441\u0442\u0430.",
+    serialNumberHelpAlt1: "\u041f\u0440\u0438\u043c\u0435\u0440: \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0435 \u043f\u0440\u0438\u0431\u043e\u0440\u0430",
+    serialNumberHelpAlt2: "\u041f\u0440\u0438\u043c\u0435\u0440: \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0432\u043d\u0443\u0442\u0440\u0438 \u0445\u043e\u043b\u043e\u0434\u0438\u043b\u044c\u043d\u0438\u043a\u0430",
     attachments: "\u0412\u043b\u043e\u0436\u0435\u043d\u0438\u044f (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     attachmentsHint: "PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f \u0438\u043b\u0438 \u043e\u0444\u0438\u0441\u043d\u044b\u0435 \u0444\u0430\u0439\u043b\u044b \u2014 \u0434\u043e 5 \u0444\u0430\u0439\u043b\u043e\u0432, \u0434\u043e 4 \u041c\u0411 \u043a\u0430\u0436\u0434\u044b\u0439.",
     attachmentsClear: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u0441\u0435",
@@ -763,8 +845,10 @@ const INITIAL_FORM = {
   gender: "",
   phone: "",
   email: "",
-  availabilityDate: "",
-  availabilityTime: "",
+  preferredContactDate: "",
+  preferredContactTimeWindow: "",
+  preferredContactTimeFrom: "",
+  preferredContactTimeTo: "",
   clientCountry: "",
   clientAddressLine1: "",
   clientAddressLine2: "",
@@ -774,6 +858,8 @@ const INITIAL_FORM = {
   clientUnitNumber: "",
   landlordGivenName: "",
   landlordSurname: "",
+  landlordCompanyName: "",
+  landlordContactPerson: "",
   landlordPhone: "",
   landlordEmail: "",
   hausmeisterGivenName: "",
@@ -807,17 +893,6 @@ function buildAutofillFieldsFromContract(contract) {
   };
 }
 
-function formatShortAvailabilityDate(value) {
-  const digits = String(value || "").replace(/\D/g, "").slice(0, 6);
-  if (digits.length <= 2) {
-    return digits;
-  }
-  if (digits.length <= 4) {
-    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
-  }
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-}
-
 function normalizeSerialNumberList(value) {
   return String(value || "")
     .split(/\r?\n|,|;/)
@@ -831,6 +906,45 @@ function parseSerialNumberList(value) {
     .split(/\r?\n|,|;/)
     .map((entry) => entry.trim())
     .filter(Boolean);
+}
+
+function autoResizeTextarea(element) {
+  if (!element) {
+    return;
+  }
+  element.style.height = "auto";
+  element.style.height = `${element.scrollHeight}px`;
+}
+
+function isPreferredContactCustom(windowValue) {
+  return String(windowValue || "").trim() === "custom";
+}
+
+function formatIsoDateToShort(value) {
+  const match = String(value || "").trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) {
+    return "";
+  }
+  return `${match[3]}/${match[2]}/${match[1].slice(-2)}`;
+}
+
+function formatShortDateToIso(value) {
+  const match = String(value || "").trim().match(/^(\d{2})\/(\d{2})\/(\d{2})$/);
+  if (!match) {
+    return "";
+  }
+  return `20${match[3]}-${match[2]}-${match[1]}`;
+}
+
+function normalizeShortDateInput(value) {
+  const digits = String(value || "").replace(/\D/g, "").slice(0, 6);
+  if (digits.length <= 2) {
+    return digits;
+  }
+  if (digits.length <= 4) {
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`;
+  }
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
 export default function ServiceClaimFlow() {
@@ -848,7 +962,9 @@ export default function ServiceClaimFlow() {
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
   const [serialNumberImageFieldKey, setSerialNumberImageFieldKey] = useState(0);
   const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
+  const [isSerialNumberHelpOpen, setIsSerialNumberHelpOpen] = useState(false);
   const [contractHelpSlide, setContractHelpSlide] = useState(0);
+  const [serialHelpSlide, setSerialHelpSlide] = useState(0);
   const [isClaimAssistantOpen, setIsClaimAssistantOpen] = useState(false);
   const [claimAssistantMessages, setClaimAssistantMessages] = useState(EMPTY_CLAIM_ASSISTANT_MESSAGES);
   const [claimAssistantQuestion, setClaimAssistantQuestion] = useState("");
@@ -864,6 +980,7 @@ export default function ServiceClaimFlow() {
   const contractHelpTouchXRef = useRef(null);
   const claimAssistantRecognitionRef = useRef(null);
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
+  const preferredContactDatePickerRef = useRef(null);
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
@@ -924,6 +1041,17 @@ export default function ServiceClaimFlow() {
     () => parseSerialNumberList(formValues.serialNumber),
     [formValues.serialNumber],
   );
+  const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
+  const parsedProblemDescription = useMemo(
+    () => splitKitchenAreasFromProblemDescription(formValues.problemDescription),
+    [formValues.problemDescription],
+  );
+  const selectedProblemAreasWithDetails = useMemo(() => {
+    return selectedProblemAreas.map((area) => ({
+      ...area,
+      detail: parsedProblemDescription.areaDetailsByName.get(area.label) || "",
+    }));
+  }, [parsedProblemDescription, selectedProblemAreas]);
 
   function t(key) {
     if (Object.prototype.hasOwnProperty.call(copy, key)) {
@@ -937,6 +1065,38 @@ export default function ServiceClaimFlow() {
 
   const requiredFieldTitle = t("requiredFieldTitle");
   const fieldOptionalSuffix = t("fieldOptionalSuffix");
+
+  function getPreferredContactWindowLabel(windowValue) {
+    if (windowValue === "morning") return t("preferredContactTimeWindowMorning");
+    if (windowValue === "afternoon") return t("preferredContactTimeWindowAfternoon");
+    if (windowValue === "evening") return t("preferredContactTimeWindowEvening");
+    if (windowValue === "custom") return t("preferredContactTimeWindowCustom");
+    return "";
+  }
+
+  function buildPreferredContactSummary() {
+    const preferredContactDate = String(formValues.preferredContactDate || "").trim();
+    const preferredContactTimeWindow = String(formValues.preferredContactTimeWindow || "").trim();
+    const preferredContactTimeFrom = String(formValues.preferredContactTimeFrom || "").trim();
+    const preferredContactTimeTo = String(formValues.preferredContactTimeTo || "").trim();
+
+    if (!preferredContactDate && !preferredContactTimeWindow) {
+      return "";
+    }
+
+    const summaryParts = [];
+    if (preferredContactDate) {
+      summaryParts.push(preferredContactDate);
+    }
+    if (preferredContactTimeWindow) {
+      summaryParts.push(
+        preferredContactTimeWindow === "custom"
+          ? `${t("preferredContactTimeWindowCustom")}${preferredContactTimeFrom && preferredContactTimeTo ? ` (${preferredContactTimeFrom}–${preferredContactTimeTo})` : ""}`
+          : getPreferredContactWindowLabel(preferredContactTimeWindow),
+      );
+    }
+    return summaryParts.join(" | ");
+  }
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -1074,10 +1234,17 @@ export default function ServiceClaimFlow() {
   }
 
   function handleFieldChange(field, value) {
-    setForm((current) => ({
-      ...current,
-      [field]: field === "availabilityDate" ? formatShortAvailabilityDate(value) : value,
-    }));
+    setForm((current) => {
+      const next = {
+        ...current,
+        [field]: field === "preferredContactDate" ? normalizeShortDateInput(value) : value,
+      };
+      if (field === "preferredContactTimeWindow" && value !== "custom") {
+        next.preferredContactTimeFrom = "";
+        next.preferredContactTimeTo = "";
+      }
+      return next;
+    });
 
     if (field === "contractNumber") {
       const nextContractNumber = value.trim();
@@ -1147,6 +1314,55 @@ export default function ServiceClaimFlow() {
     if (error) {
       setError("");
     }
+  }
+
+  function updateProblemDescriptionWithSelectedAreas(areaDetailsByComponentId, userText) {
+    const plan = activeKitchenPlan;
+    if (!plan?.selectableComponents?.length) {
+      handleFieldChange("problemDescription", userText);
+      return;
+    }
+
+    const metaById = new Map(plan.selectableComponents.map((entry) => [entry.componentId, entry]));
+    const areaDetailsByName = new Map();
+
+    for (const componentId of problemComponentIds) {
+      const meta = metaById.get(componentId);
+      if (!meta) {
+        continue;
+      }
+      areaDetailsByName.set(
+        formatClaimAreaName(meta, meta.name, language),
+        areaDetailsByComponentId[componentId] || "",
+      );
+    }
+
+    handleFieldChange(
+      "problemDescription",
+      composeProblemDescriptionFromParts(
+        kitchenAreasLinePrefix,
+        problemComponentIds,
+        metaById,
+        areaDetailsByName,
+        userText,
+        (area, fallbackName) => formatClaimAreaName(area, fallbackName, language),
+      ),
+    );
+  }
+
+  function handleProblemAreaDetailChange(componentId, value) {
+    const nextDetailsByComponentId = Object.fromEntries(
+      selectedProblemAreasWithDetails.map((area) => [area.componentId, area.detail]),
+    );
+    nextDetailsByComponentId[componentId] = value;
+    updateProblemDescriptionWithSelectedAreas(nextDetailsByComponentId, parsedProblemDescription.userText);
+  }
+
+  function handleAdditionalProblemDetailsChange(value) {
+    const currentDetailsByComponentId = Object.fromEntries(
+      selectedProblemAreasWithDetails.map((area) => [area.componentId, area.detail]),
+    );
+    updateProblemDescriptionWithSelectedAreas(currentDetailsByComponentId, value);
   }
 
   function handleAttachmentsSelected(event) {
@@ -1259,7 +1475,19 @@ export default function ServiceClaimFlow() {
     setContractHelpSlide((s) => Math.min(CONTRACT_HELP_SLIDE_COUNT - 1, s + 1));
   }
 
+  function goSerialHelpPrev() {
+    setSerialHelpSlide((s) => Math.max(0, s - 1));
+  }
+
+  function goSerialHelpNext() {
+    setSerialHelpSlide((s) => Math.min(SERIAL_HELP_SLIDE_COUNT - 1, s + 1));
+  }
+
   function onContractHelpTouchStart(event) {
+    contractHelpTouchXRef.current = event.changedTouches[0]?.clientX ?? null;
+  }
+
+  function onSerialHelpTouchStart(event) {
     contractHelpTouchXRef.current = event.changedTouches[0]?.clientX ?? null;
   }
 
@@ -1282,10 +1510,35 @@ export default function ServiceClaimFlow() {
     }
   }
 
+  function onSerialHelpTouchEnd(event) {
+    const start = contractHelpTouchXRef.current;
+    contractHelpTouchXRef.current = null;
+    if (start == null) {
+      return;
+    }
+    const end = event.changedTouches[0]?.clientX;
+    if (typeof end !== "number") {
+      return;
+    }
+    const delta = end - start;
+    const threshold = 56;
+    if (delta < -threshold) {
+      goSerialHelpNext();
+    } else if (delta > threshold) {
+      goSerialHelpPrev();
+    }
+  }
+
   function contractHelpSlideAriaLabel(index) {
     return t("contractNumberHelpSlideDot")
       .replace("{n}", String(index + 1))
       .replace("{total}", String(CONTRACT_HELP_SLIDE_COUNT));
+  }
+
+  function serialHelpSlideAriaLabel(index) {
+    return t("contractNumberHelpSlideDot")
+      .replace("{n}", String(index + 1))
+      .replace("{total}", String(SERIAL_HELP_SLIDE_COUNT));
   }
 
   function buildClientAddress() {
@@ -1303,16 +1556,14 @@ export default function ServiceClaimFlow() {
 
   function buildSubmittedProblemDescription() {
     const description = String(formValues.problemDescription || "").trim();
-    const availabilityDate = String(formValues.availabilityDate || "").trim();
-    const availabilityTime = String(formValues.availabilityTime || "").trim();
-    const availability = [availabilityDate, availabilityTime].filter(Boolean).join(" ");
-    if (!availability) {
+    const preferredContact = buildPreferredContactSummary();
+    if (!preferredContact) {
       return description;
     }
     if (/^Erreichbarkeit\s*:/im.test(description)) {
       return description;
     }
-    return `${description}\n\nErreichbarkeit: ${availability}`.trim();
+    return `${description}\n\nErreichbarkeit: ${preferredContact}`.trim();
   }
 
   function getClaimAssistantSpeechLanguage() {
@@ -1384,8 +1635,12 @@ export default function ServiceClaimFlow() {
             serialNumber: String(formValues.serialNumber || "").trim(),
             hasSerialNumberImage: Boolean(serialNumberImage),
             attachmentCount: attachments.length + (serialNumberImage ? 1 : 0),
-            availabilityDate: String(formValues.availabilityDate || "").trim(),
-            availabilityTime: String(formValues.availabilityTime || "").trim(),
+            preferredContactDate: String(formValues.preferredContactDate || "").trim(),
+            preferredContactTimeWindow: String(formValues.preferredContactTimeWindow || "").trim(),
+            preferredContactTimeFrom: String(formValues.preferredContactTimeFrom || "").trim(),
+            preferredContactTimeTo: String(formValues.preferredContactTimeTo || "").trim(),
+            availabilityDate: String(formValues.preferredContactDate || "").trim(),
+            availabilityTime: buildPreferredContactSummary(),
             hasPhone: Boolean(String(formValues.phone || "").trim()),
             hasEmail: Boolean(String(formValues.email || "").trim()),
           },
@@ -1532,6 +1787,19 @@ export default function ServiceClaimFlow() {
     if (!hasContactMethod) {
       setError(copy.contactError);
       return;
+    }
+
+    if (isPreferredContactCustomTime) {
+      const preferredContactTimeFrom = String(formValues.preferredContactTimeFrom || "").trim();
+      const preferredContactTimeTo = String(formValues.preferredContactTimeTo || "").trim();
+      if (!preferredContactTimeFrom || !preferredContactTimeTo) {
+        setError(t("preferredContactTimeCustomRequired"));
+        return;
+      }
+      if (preferredContactTimeTo <= preferredContactTimeFrom) {
+        setError(t("preferredContactTimeCustomOrder"));
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -1734,7 +2002,7 @@ export default function ServiceClaimFlow() {
 
           <form className="service-form" onSubmit={handleSubmit}>
             <label className="service-field">
-              <span className="service-field__label-row">
+              <span className="service-field__label-row service-field__label-row--contract">
                 <span className="service-field__label-main">
                   {copy.contractNumber}
                   <RequiredFieldMark title={requiredFieldTitle} />
@@ -1844,33 +2112,84 @@ export default function ServiceClaimFlow() {
               </label>
             </div>
 
-            <div className="service-field">
-              <span>
-                {t("availability")}
-                <OptionalFieldSuffix text={fieldOptionalSuffix} />
-              </span>
+            <section className="service-form__section service-form__section--preferred-contact">
+              <div className="service-form__section-copy">
+                <p className="service-form__section-title">
+                  {t("preferredContactTime")}
+                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                </p>
+                <p className="service-form__section-helper">{t("preferredContactTimeHelper")}</p>
+              </div>
               <div className="service-field-grid">
                 <label className="service-field">
-                  <span>{t("availabilityDate")}</span>
-                  <input
-                    type="text"
-                    value={formValues.availabilityDate}
-                    onChange={(event) => handleFieldChange("availabilityDate", event.target.value)}
-                    placeholder="dd/mm/yy"
-                    inputMode="numeric"
-                    pattern="\d{2}/\d{2}/\d{2}"
-                  />
+                  <span>{t("preferredContactDate")}</span>
+                  <div className="service-field__date-picker">
+                    <input
+                      type="text"
+                      value={formValues.preferredContactDate}
+                      onChange={(event) => handleFieldChange("preferredContactDate", event.target.value)}
+                      placeholder="dd/mm/yy"
+                      inputMode="numeric"
+                      maxLength={8}
+                    />
+                    <button
+                      type="button"
+                      className="service-field__date-picker-button"
+                      aria-label={t("preferredContactDate")}
+                      onClick={() => preferredContactDatePickerRef.current?.showPicker?.()}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M7 2v3M17 2v3M3.5 9.5h17M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 19 20.5H5A1.5 1.5 0 0 1 3.5 19V7A1.5 1.5 0 0 1 5 5.5Z" />
+                      </svg>
+                    </button>
+                    <input
+                      ref={preferredContactDatePickerRef}
+                      className="service-field__date-picker-native"
+                      type="date"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                      value={formatShortDateToIso(formValues.preferredContactDate)}
+                      onChange={(event) => handleFieldChange("preferredContactDate", formatIsoDateToShort(event.target.value))}
+                    />
+                  </div>
                 </label>
                 <label className="service-field">
-                  <span>{t("availabilityTime")}</span>
-                  <input
-                    type="time"
-                    value={formValues.availabilityTime}
-                    onChange={(event) => handleFieldChange("availabilityTime", event.target.value)}
-                  />
+                  <span>{t("preferredContactTimeWindow")}</span>
+                  <select
+                    value={formValues.preferredContactTimeWindow}
+                    onChange={(event) => handleFieldChange("preferredContactTimeWindow", event.target.value)}
+                  >
+                    <option value="">{t("preferredContactTimeWindowPlaceholder")}</option>
+                    <option value="morning">{t("preferredContactTimeWindowMorning")}</option>
+                    <option value="afternoon">{t("preferredContactTimeWindowAfternoon")}</option>
+                    <option value="evening">{t("preferredContactTimeWindowEvening")}</option>
+                    <option value="custom">{t("preferredContactTimeWindowCustom")}</option>
+                  </select>
                 </label>
               </div>
-            </div>
+              {isPreferredContactCustomTime ? (
+                <div className="service-field-grid service-field-grid--preferred-contact-custom">
+                  <label className="service-field">
+                    <span>{t("preferredContactTimeFrom")}</span>
+                    <input
+                      type="time"
+                      value={formValues.preferredContactTimeFrom}
+                      onChange={(event) => handleFieldChange("preferredContactTimeFrom", event.target.value)}
+                      required
+                    />
+                  </label>
+                  <label className="service-field">
+                    <span>{t("preferredContactTimeTo")}</span>
+                    <input
+                      type="time"
+                      value={formValues.preferredContactTimeTo}
+                      onChange={(event) => handleFieldChange("preferredContactTimeTo", event.target.value)}
+                      required
+                    />
+                  </label>
+                </div>
+              ) : null}
+            </section>
 
             <section className="service-form__section">
               <p className="service-form__section-title">{copy.clientAddress}</p>
@@ -1964,14 +2283,13 @@ export default function ServiceClaimFlow() {
               <label className="service-field">
                 <span>
                   {copy.clientUnitNumber}
-                  <RequiredFieldMark title={requiredFieldTitle} />
+                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
                 </span>
                 <input
                   type="text"
                   value={formValues.clientUnitNumber}
                   onChange={(event) => handleFieldChange("clientUnitNumber", event.target.value)}
                   placeholder={copy.clientUnitNumberPlaceholder}
-                  required
                 />
               </label>
             </section>
@@ -1980,22 +2298,44 @@ export default function ServiceClaimFlow() {
               <p className="service-form__section-title">{copy.landlordSection}</p>
               <div className="service-field-grid">
                 <label className="service-field">
-                  <span>{copy.landlordGivenName}</span>
+                  <span>{t("landlordGivenName")}</span>
                   <input
                     type="text"
                     value={formValues.landlordGivenName}
                     onChange={(event) => handleFieldChange("landlordGivenName", event.target.value)}
-                    placeholder={copy.landlordGivenNamePlaceholder}
+                    placeholder={t("landlordGivenNamePlaceholder")}
                   />
                 </label>
 
                 <label className="service-field">
-                  <span>{copy.landlordSurname}</span>
+                  <span>{t("landlordSurname")}</span>
                   <input
                     type="text"
                     value={formValues.landlordSurname}
                     onChange={(event) => handleFieldChange("landlordSurname", event.target.value)}
-                    placeholder={copy.landlordSurnamePlaceholder}
+                    placeholder={t("landlordSurnamePlaceholder")}
+                  />
+                </label>
+              </div>
+
+              <div className="service-field-grid">
+                <label className="service-field">
+                  <span>{t("landlordCompanyName")}</span>
+                  <input
+                    type="text"
+                    value={formValues.landlordCompanyName}
+                    onChange={(event) => handleFieldChange("landlordCompanyName", event.target.value)}
+                    placeholder={t("landlordCompanyNamePlaceholder")}
+                  />
+                </label>
+
+                <label className="service-field">
+                  <span>{t("landlordContactPerson")}</span>
+                  <input
+                    type="text"
+                    value={formValues.landlordContactPerson}
+                    onChange={(event) => handleFieldChange("landlordContactPerson", event.target.value)}
+                    placeholder={t("landlordContactPersonPlaceholder")}
                   />
                 </label>
               </div>
@@ -2084,29 +2424,88 @@ export default function ServiceClaimFlow() {
                   />
                 </>
               ) : null}
-              <label className="service-field">
-                <span>
-                  {contractLookup.status === "found" &&
-                  contractLookup.contractNumber === normalizedContractNumber &&
-                  contractLookup.kitchenPlan
-                    ? t("problemDescriptionFieldLabel")
-                    : copy.problemDescription}
-                  <RequiredFieldMark title={requiredFieldTitle} />
-                </span>
-                <textarea
-                  value={formValues.problemDescription}
-                  onChange={(event) => handleFieldChange("problemDescription", event.target.value)}
-                  placeholder={copy.problemPlaceholder}
-                  rows={6}
-                  required
-                />
-              </label>
+              {selectedProblemAreasWithDetails.length ? (
+                <>
+                  {selectedProblemAreasWithDetails.map((area) => (
+                    <label key={area.componentId} className="service-field service-field--problem-area-row">
+                      <span className="service-field__problem-area-label">
+                        <span className="service-field__problem-area-label-text">
+                          {area.label}
+                          <RequiredFieldMark title={requiredFieldTitle} />
+                        </span>
+                      </span>
+                      <textarea
+                        className="service-field__problem-area-input"
+                        value={area.detail}
+                        onChange={(event) => {
+                          autoResizeTextarea(event.target);
+                          handleProblemAreaDetailChange(area.componentId, event.target.value);
+                        }}
+                        ref={(element) => autoResizeTextarea(element)}
+                        placeholder={copy.problemPlaceholder}
+                        rows={1}
+                        required
+                      />
+                    </label>
+                  ))}
+                  <label className="service-field service-field--problem-area-row">
+                    <span className="service-field__problem-area-label">
+                      {t("problemDescriptionFieldLabel")}
+                      <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                    </span>
+                    <textarea
+                      className="service-field__problem-area-input"
+                      value={parsedProblemDescription.userText}
+                      onChange={(event) => {
+                        autoResizeTextarea(event.target);
+                        handleAdditionalProblemDetailsChange(event.target.value);
+                      }}
+                      ref={(element) => autoResizeTextarea(element)}
+                      placeholder={copy.problemPlaceholder}
+                      rows={1}
+                    />
+                  </label>
+                </>
+              ) : (
+                <label className="service-field">
+                  <span>
+                    {contractLookup.status === "found" &&
+                    contractLookup.contractNumber === normalizedContractNumber &&
+                    contractLookup.kitchenPlan
+                      ? t("problemDescriptionFieldLabel")
+                      : copy.problemDescription}
+                    <RequiredFieldMark title={requiredFieldTitle} />
+                  </span>
+                  <textarea
+                    value={formValues.problemDescription}
+                    onChange={(event) => handleFieldChange("problemDescription", event.target.value)}
+                    placeholder={copy.problemPlaceholder}
+                    rows={6}
+                    required
+                  />
+                </label>
+              )}
             </section>
 
             <div className="service-field-grid">
               <label className="service-field">
-                <span>
-                  {copy.serialNumber}
+                <span className="service-field__label-row service-field__label-row--serial">
+                  <span className="service-field__label-main">
+                    {copy.serialNumber}
+                  </span>
+                  <button
+                    type="button"
+                    className="service-field__help-badge"
+                    aria-expanded={isSerialNumberHelpOpen}
+                    aria-controls="service-serial-help-title"
+                    aria-label={t("serialNumberHelpAria")}
+                    onClick={() => {
+                      setSerialHelpSlide(0);
+                      setIsSerialNumberHelpOpen(true);
+                    }}
+                  >
+                    {t("serialNumberHelpTrigger")}
+                  </button>
                 </span>
                 <div className="service-serial-field">
                   <div className="service-serial-field__input-row">
@@ -2424,7 +2823,7 @@ export default function ServiceClaimFlow() {
                 aria-label={t("contractNumberHelpClose")}
                 onClick={() => setIsContractNumberHelpOpen(false)}
               >
-                ×
+                &times;
               </button>
             </div>
             <p className="service-contract-help__intro">{t("contractNumberHelpBody")}</p>
@@ -2439,7 +2838,7 @@ export default function ServiceClaimFlow() {
                 disabled={contractHelpSlide <= 0}
                 aria-label={t("contractNumberHelpPrev")}
               >
-                ‹
+                &#8249;
               </button>
               <div
                 className="service-contract-help__viewport"
@@ -2478,7 +2877,7 @@ export default function ServiceClaimFlow() {
                 disabled={contractHelpSlide >= CONTRACT_HELP_SLIDE_COUNT - 1}
                 aria-label={t("contractNumberHelpNext")}
               >
-                ›
+                &#8250;
               </button>
             </div>
             <div className="service-contract-help__dots" role="tablist" aria-label={t("contractNumberHelpTitle")}>
@@ -2499,6 +2898,114 @@ export default function ServiceClaimFlow() {
                 type="button"
                 className="service-button service-button--secondary"
                 onClick={() => setIsContractNumberHelpOpen(false)}
+              >
+                {t("contractNumberHelpClose")}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {isSerialNumberHelpOpen ? (
+        <div className="service-contract-help" role="presentation">
+          <button
+            type="button"
+            className="service-contract-help__backdrop"
+            tabIndex={-1}
+            aria-label={t("contractNumberHelpClose")}
+            onClick={() => setIsSerialNumberHelpOpen(false)}
+          />
+          <div
+            className="service-contract-help__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="service-serial-help-title"
+          >
+            <div className="service-contract-help__head">
+              <h3 id="service-serial-help-title" className="service-contract-help__title">
+                {t("serialNumberHelpTitle")}
+              </h3>
+              <button
+                type="button"
+                className="service-contract-help__close"
+                aria-label={t("contractNumberHelpClose")}
+                onClick={() => setIsSerialNumberHelpOpen(false)}
+              >
+                &times;
+              </button>
+            </div>
+            <p className="service-contract-help__intro">{t("serialNumberHelpBody")}</p>
+            <p className="service-contract-help__sr" aria-live="polite">
+              {serialHelpSlideAriaLabel(serialHelpSlide)}
+            </p>
+            <div className="service-contract-help__carousel">
+              <button
+                type="button"
+                className="service-contract-help__arrow service-contract-help__arrow--prev"
+                onClick={goSerialHelpPrev}
+                disabled={serialHelpSlide <= 0}
+                aria-label={t("contractNumberHelpPrev")}
+              >
+                &#8249;
+              </button>
+              <div
+                className="service-contract-help__viewport"
+                onTouchStart={onSerialHelpTouchStart}
+                onTouchEnd={onSerialHelpTouchEnd}
+              >
+                <div
+                  className="service-contract-help__track"
+                  style={{
+                    width: `${SERIAL_HELP_SLIDE_COUNT * 100}%`,
+                    transform: `translateX(-${(100 * serialHelpSlide) / SERIAL_HELP_SLIDE_COUNT}%)`,
+                  }}
+                >
+                  {SERIAL_NUMBER_HELP_IMAGES.map((entry) => (
+                    <figure
+                      key={entry.src}
+                      className="service-contract-help__figure service-contract-help__slide"
+                      style={{ flex: `0 0 ${100 / SERIAL_HELP_SLIDE_COUNT}%` }}
+                    >
+                      <img
+                        src={entry.src}
+                        alt={t(entry.altKey)}
+                        className="service-contract-help__img"
+                        loading="lazy"
+                        decoding="async"
+                        draggable={false}
+                      />
+                    </figure>
+                  ))}
+                </div>
+              </div>
+              <button
+                type="button"
+                className="service-contract-help__arrow service-contract-help__arrow--next"
+                onClick={goSerialHelpNext}
+                disabled={serialHelpSlide >= SERIAL_HELP_SLIDE_COUNT - 1}
+                aria-label={t("contractNumberHelpNext")}
+              >
+                &#8250;
+              </button>
+            </div>
+            <div className="service-contract-help__dots" role="tablist" aria-label={t("serialNumberHelpTitle")}>
+              {SERIAL_NUMBER_HELP_IMAGES.map((_, index) => (
+                <button
+                  key={String(index)}
+                  type="button"
+                  role="tab"
+                  aria-selected={index === serialHelpSlide}
+                  aria-label={serialHelpSlideAriaLabel(index)}
+                  className={`service-contract-help__dot${index === serialHelpSlide ? " is-active" : ""}`}
+                  onClick={() => setSerialHelpSlide(index)}
+                />
+              ))}
+            </div>
+            <div className="service-contract-help__actions">
+              <button
+                type="button"
+                className="service-button service-button--secondary"
+                onClick={() => setIsSerialNumberHelpOpen(false)}
               >
                 {t("contractNumberHelpClose")}
               </button>
