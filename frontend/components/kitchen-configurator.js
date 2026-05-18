@@ -21,6 +21,7 @@ import {
 } from "./kitchen-selection-utils";
 import KitchenSvgStage from "./kitchen-svg-stage";
 import { PLAN_VIEWPORT_BY_SLUG } from "./kitchen-svg-plan-utils";
+import { speakAssistantTextWithTts } from "./assistant-tts";
 import {
   getServiceEligibility,
   SERVICE_CODE_MONTAGE,
@@ -986,6 +987,7 @@ function KitchenConfiguratorContent({
   const [productAssistantVoiceError, setProductAssistantVoiceError] = useState("");
   const productAssistantSkipOptionsResetRef = useRef(false);
   const productAssistantRecognitionRef = useRef(null);
+  const productAssistantAudioRef = useRef(null);
   const productAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
@@ -1456,13 +1458,13 @@ function KitchenConfiguratorContent({
 
   function speakProductAssistantAnswer(text) {
     const answer = formatProductAssistantSpokenText(text);
-    if (!answer || !window.speechSynthesis) return;
+    if (!answer) return;
 
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(answer);
-    utterance.lang = getProductAssistantSpeechLanguage();
-    utterance.rate = 0.96;
-    window.speechSynthesis.speak(utterance);
+    speakAssistantTextWithTts(answer, {
+      audioRef: productAssistantAudioRef,
+      language: getProductAssistantSpeechLanguage(),
+      fallbackRate: 0.96,
+    });
   }
 
   async function submitProductInfoQuestion(rawQuestion, options = {}) {
