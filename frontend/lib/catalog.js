@@ -77,6 +77,38 @@ export const LEGACY_ICON_KEYS = [
   "pickup",
 ];
 
+function isMissingKitchenItemProductImagePath(error) {
+  const message = String(error?.message || "");
+  return (
+    (error?.code === "P2022" || /column .* does not exist/i.test(message)) &&
+    message.includes("KitchenItem.productImagePath")
+  );
+}
+
+const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
+  id: true,
+  kitchenId: true,
+  itemType: true,
+  code: true,
+  articleNumber: true,
+  name: true,
+  price: true,
+  infoText: true,
+  productInfoPdfPath: true,
+  productInfoSummary: true,
+  productInfoKeyFacts: true,
+  productInfoExtractedText: true,
+  productInfoUpdatedAt: true,
+  iconKey: true,
+  colorKey: true,
+  componentKey: true,
+  isLocked: true,
+  isActive: true,
+  sortOrder: true,
+  createdAt: true,
+  updatedAt: true,
+};
+
 export async function getActiveKitchens() {
   return prisma.kitchen.findMany({
     where: { status: KitchenStatus.ACTIVE },
@@ -96,12 +128,7 @@ export async function getKitchenBySlug(slug) {
       },
     });
   } catch (error) {
-    const message = String(error?.message || "");
-    const missingProductImagePath =
-      (error?.code === "P2022" || /column .* does not exist/i.test(message)) &&
-      message.includes("KitchenItem.productImagePath");
-
-    if (!missingProductImagePath) {
+    if (!isMissingKitchenItemProductImagePath(error)) {
       throw error;
     }
 
@@ -112,29 +139,7 @@ export async function getKitchenBySlug(slug) {
         items: {
           where: { isActive: true },
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
-          select: {
-            id: true,
-            kitchenId: true,
-            itemType: true,
-            code: true,
-            articleNumber: true,
-            name: true,
-            price: true,
-            infoText: true,
-            productInfoPdfPath: true,
-            productInfoSummary: true,
-            productInfoKeyFacts: true,
-            productInfoExtractedText: true,
-            productInfoUpdatedAt: true,
-            iconKey: true,
-            colorKey: true,
-            componentKey: true,
-            isLocked: true,
-            isActive: true,
-            sortOrder: true,
-            createdAt: true,
-            updatedAt: true,
-          },
+          select: KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH,
         },
       },
     });
@@ -151,18 +156,40 @@ export async function listKitchensForAdmin() {
 }
 
 export async function getKitchenById(id) {
-  const kitchen = await prisma.kitchen.findUnique({
-    where: { id },
-    include: {
-      _count: { select: { items: true, orders: true, contracts: true } },
-      contracts: {
-        orderBy: [{ createdAt: "desc" }, { contractNumber: "asc" }],
+  let kitchen;
+  try {
+    kitchen = await prisma.kitchen.findUnique({
+      where: { id },
+      include: {
+        _count: { select: { items: true, orders: true, contracts: true } },
+        contracts: {
+          orderBy: [{ createdAt: "desc" }, { contractNumber: "asc" }],
+        },
+        items: {
+          orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+        },
       },
-      items: {
-        orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+    });
+  } catch (error) {
+    if (!isMissingKitchenItemProductImagePath(error)) {
+      throw error;
+    }
+
+    // Compatibility fallback for databases that have not applied the productImagePath migration yet.
+    kitchen = await prisma.kitchen.findUnique({
+      where: { id },
+      include: {
+        _count: { select: { items: true, orders: true, contracts: true } },
+        contracts: {
+          orderBy: [{ createdAt: "desc" }, { contractNumber: "asc" }],
+        },
+        items: {
+          orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+          select: KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH,
+        },
       },
-    },
-  });
+    });
+  }
 
   if (!kitchen) return null;
   return {

@@ -6,11 +6,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
 import { speakAssistantTextWithTts } from "./assistant-tts";
-import {
-  composeProblemDescriptionFromParts,
-  composeProblemDescriptionWithAreas,
-  splitKitchenAreasFromProblemDescription,
-} from "../lib/service-claim-problem-description";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
 
 const LANGUAGE_OPTIONS = [
@@ -1317,6 +1312,7 @@ export default function ServiceClaimFlow() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
   const [problemComponentIds, setProblemComponentIds] = useState([]);
+  const [problemAreaDetailsByComponentId, setProblemAreaDetailsByComponentId] = useState({});
   const [attachments, setAttachments] = useState([]);
   const [serialNumberImages, setSerialNumberImages] = useState([]);
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
@@ -1431,16 +1427,12 @@ export default function ServiceClaimFlow() {
     [formValues.serialNumber],
   );
   const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
-  const parsedProblemDescription = useMemo(
-    () => splitKitchenAreasFromProblemDescription(formValues.problemDescription),
-    [formValues.problemDescription],
-  );
   const selectedProblemAreasWithDetails = useMemo(() => {
     return selectedProblemAreas.map((area) => ({
       ...area,
-      detail: parsedProblemDescription.areaDetailsByName.get(area.label) || "",
+      detail: problemAreaDetailsByComponentId[area.componentId] || "",
     }));
-  }, [parsedProblemDescription, selectedProblemAreas]);
+  }, [problemAreaDetailsByComponentId, selectedProblemAreas]);
 
   function t(key) {
     if (Object.prototype.hasOwnProperty.call(copy, key)) {
@@ -1642,40 +1634,8 @@ export default function ServiceClaimFlow() {
 
   useEffect(() => {
     setProblemComponentIds([]);
+    setProblemAreaDetailsByComponentId({});
   }, [contractLookup.contractNumber]);
-
-  useEffect(() => {
-    if (!isComplaintMode) {
-      return undefined;
-    }
-    const plan = activeKitchenPlan;
-    if (!plan?.selectableComponents?.length) {
-      return undefined;
-    }
-
-    const metaById = new Map(plan.selectableComponents.map((entry) => [entry.componentId, entry]));
-
-    setForm((prev) => {
-      const next = composeProblemDescriptionWithAreas(
-        kitchenAreasLinePrefix,
-        problemComponentIds,
-        metaById,
-        prev.problemDescription,
-        (area, fallbackName) => formatClaimAreaName(area, fallbackName, language),
-      );
-      if (next === prev.problemDescription) {
-        return prev;
-      }
-      return { ...prev, problemDescription: next };
-    });
-    return undefined;
-  }, [
-    isComplaintMode,
-    activeKitchenPlan,
-    problemComponentIds,
-    kitchenAreasLinePrefix,
-    language,
-  ]);
 
   function handleModeSelect(nextMode) {
     setMode(nextMode);
@@ -1828,53 +1788,18 @@ export default function ServiceClaimFlow() {
     }
   }
 
-  function updateProblemDescriptionWithSelectedAreas(areaDetailsByComponentId, userText) {
-    const plan = activeKitchenPlan;
-    if (!plan?.selectableComponents?.length) {
-      handleFieldChange("problemDescription", userText);
-      return;
-    }
-
-    const metaById = new Map(plan.selectableComponents.map((entry) => [entry.componentId, entry]));
-    const areaDetailsByName = new Map();
-
-    for (const componentId of problemComponentIds) {
-      const meta = metaById.get(componentId);
-      if (!meta) {
-        continue;
-      }
-      areaDetailsByName.set(
-        formatClaimAreaName(meta, meta.name, language),
-        areaDetailsByComponentId[componentId] || "",
-      );
-    }
-
-    handleFieldChange(
-      "problemDescription",
-      composeProblemDescriptionFromParts(
-        kitchenAreasLinePrefix,
-        problemComponentIds,
-        metaById,
-        areaDetailsByName,
-        userText,
-        (area, fallbackName) => formatClaimAreaName(area, fallbackName, language),
-      ),
-    );
-  }
-
   function handleProblemAreaDetailChange(componentId, value) {
-    const nextDetailsByComponentId = Object.fromEntries(
-      selectedProblemAreasWithDetails.map((area) => [area.componentId, area.detail]),
-    );
-    nextDetailsByComponentId[componentId] = value;
-    updateProblemDescriptionWithSelectedAreas(nextDetailsByComponentId, parsedProblemDescription.userText);
+    setProblemAreaDetailsByComponentId((current) => ({
+      ...current,
+      [componentId]: value,
+    }));
+    if (error) {
+      setError("");
+    }
   }
 
   function handleAdditionalProblemDetailsChange(value) {
-    const currentDetailsByComponentId = Object.fromEntries(
-      selectedProblemAreasWithDetails.map((area) => [area.componentId, area.detail]),
-    );
-    updateProblemDescriptionWithSelectedAreas(currentDetailsByComponentId, value);
+    handleFieldChange("problemDescription", value);
   }
 
   function handleAttachmentsSelected(event) {
@@ -2075,7 +2000,16 @@ export default function ServiceClaimFlow() {
   }
 
   function buildSubmittedProblemDescription() {
-    const description = String(formValues.problemDescription || "").trim();
+    const userDescription = String(formValues.problemDescription || "").trim();
+    const selectedAreasBlock = selectedProblemAreasWithDetails.length
+      ? [
+          kitchenAreasLinePrefix,
+          ...selectedProblemAreasWithDetails.map(
+            (area) => `${area.label}: ${String(area.detail || "").trim()}`,
+          ),
+        ].join("\n")
+      : "";
+    const description = [selectedAreasBlock, userDescription].filter(Boolean).join("\n\n").trim();
     const preferredContact = buildPreferredContactSummary();
     if (!preferredContact) {
       return description;
@@ -2395,6 +2329,7 @@ export default function ServiceClaimFlow() {
       setAttachments([]);
       setSerialNumberImages([]);
       setProblemComponentIds([]);
+      setProblemAreaDetailsByComponentId({});
       setAttachmentFieldKey((key) => key + 1);
       setSerialNumberImageFieldKey((key) => key + 1);
       setContractLookup(EMPTY_CONTRACT_LOOKUP);
@@ -3238,23 +3173,16 @@ export default function ServiceClaimFlow() {
                       />
                     </label>
                   ))}
-                  <label className="service-field service-field--problem-area-row">
-                    <span className="service-field__problem-area-label">
-                      <span className="service-field__problem-area-label-text">
-                        {t("problemDescriptionFieldLabel")}
-                        <OptionalFieldSuffix text={fieldOptionalSuffix} />
-                      </span>
+                  <label className="service-field">
+                    <span>
+                      {t("problemDescriptionFieldLabel")}
+                      <OptionalFieldSuffix text={fieldOptionalSuffix} />
                     </span>
                     <textarea
-                      className="service-field__problem-area-input"
-                      value={parsedProblemDescription.userText}
-                      onChange={(event) => {
-                        autoResizeTextarea(event.target);
-                        handleAdditionalProblemDetailsChange(event.target.value);
-                      }}
-                      ref={(element) => autoResizeTextarea(element)}
+                      value={formValues.problemDescription}
+                      onChange={(event) => handleAdditionalProblemDetailsChange(event.target.value)}
                       placeholder={copy.problemPlaceholder}
-                      rows={1}
+                      rows={6}
                     />
                   </label>
                 </>

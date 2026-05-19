@@ -2745,15 +2745,15 @@ textarea {
 
 .service-field--problem-area-row {
   grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
-  align-items: start;
+  align-items: center;
   gap: 10px 10px;
 }
 
 .service-field--problem-area-row > .service-field__problem-area-label {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-self: start;
-  align-self: start;
+  align-self: center;
   max-width: 100%;
   min-height: 54px;
   line-height: 1.3;
