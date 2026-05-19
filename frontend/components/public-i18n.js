@@ -75,11 +75,11 @@ export function usePublicI18n() {
 }
 
 function FlagBadge({ country, active = false }) {
-  const stripesByCountry = {
-    de: "linear-gradient(180deg, #111 0 33.33%, #d71818 33.33% 66.66%, #f2c94c 66.66% 100%)",
-    gb: "linear-gradient(135deg, #1f4aa8 0%, #16387f 100%)",
+  const flagSrcByCountry = {
+    de: "https://flagcdn.com/w40/de.png",
+    gb: "https://flagcdn.com/w40/gb.png",
   };
-  const background = stripesByCountry[country] || "#fff";
+  const flagSrc = flagSrcByCountry[country];
 
   return (
     <span
@@ -91,41 +91,21 @@ function FlagBadge({ country, active = false }) {
         height: 24,
         borderRadius: "999px",
         overflow: "hidden",
-        background,
+        background: "#fff",
         boxShadow: active ? "none" : "0 4px 8px rgba(48, 34, 21, 0.08)",
       }}
     >
-      {country === "gb" ? (
-        <>
-          <span
-            style={{
-              position: "absolute",
-              inset: "0 9px",
-              background: "#fff",
-            }}
-          />
-          <span
-            style={{
-              position: "absolute",
-              inset: "9px 0",
-              background: "#fff",
-            }}
-          />
-          <span
-            style={{
-              position: "absolute",
-              inset: "0 10px",
-              background: "#c62828",
-            }}
-          />
-          <span
-            style={{
-              position: "absolute",
-              inset: "10px 0",
-              background: "#c62828",
-            }}
-          />
-        </>
+      {flagSrc ? (
+        <img
+          src={flagSrc}
+          alt=""
+          style={{
+            display: "block",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
       ) : null}
     </span>
   );
