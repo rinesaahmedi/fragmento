@@ -268,241 +268,250 @@ export function AdminKitchenNameInput({ slug, name, style, required = false }) {
   );
 }
 
+function FlagBadge({ country, active = false }) {
+  const flagSrcByCountry = {
+    de: "https://flagcdn.com/w40/de.png",
+    gb: "https://flagcdn.com/w40/gb.png",
+  };
+  const flagSrc = flagSrcByCountry[country];
+
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        position: "relative",
+        display: "inline-block",
+        width: 24,
+        height: 24,
+        borderRadius: "999px",
+        overflow: "hidden",
+        background: "#fff",
+        boxShadow: active ? "none" : "0 4px 8px rgba(48, 34, 21, 0.08)",
+      }}
+    >
+      {flagSrc ? (
+        <img
+          src={flagSrc}
+          alt=""
+          style={{
+            display: "block",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+      ) : null}
+    </span>
+  );
+}
+
+function ChevronIcon({ open }) {
+  return (
+    <svg
+      aria-hidden="true"
+      width="12"
+      height="8"
+      viewBox="0 0 12 8"
+      style={{
+        display: "block",
+        transform: open ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 160ms ease",
+      }}
+    >
+      <path
+        d="M1.5 1.5L6 6L10.5 1.5"
+        fill="none"
+        stroke="#6b4f3a"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function AdminLanguageSwitcher() {
   const { language, setLanguage, translate } = useAdminI18n();
   const [isOpen, setIsOpen] = useState(false);
-  const menuRef = useRef(null);
+  const rootRef = useRef(null);
   const languageOptions = [
-    { value: "en", code: "EN", label: translate("adminShellLogin.english", "English") },
-    { value: "de", code: "DE", label: translate("adminShellLogin.german", "Deutsch") },
+    { value: "en", label: translate("adminShellLogin.english", "English"), country: "gb" },
+    { value: "de", label: translate("adminShellLogin.german", "Deutsch"), country: "de" },
   ];
-  const selectedLanguage = languageOptions.find((option) => option.value === language) || languageOptions[0];
+  const currentLanguage = languageOptions.find((option) => option.value === language) || languageOptions[0];
 
   useEffect(() => {
+    if (!isOpen) return undefined;
+
     function handlePointerDown(event) {
-      if (!menuRef.current?.contains(event.target)) {
+      if (!rootRef.current?.contains(event.target)) {
         setIsOpen(false);
       }
     }
 
-    function handleKeyDown(event) {
+    function handleEscape(event) {
       if (event.key === "Escape") {
         setIsOpen(false);
       }
     }
 
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKeyDown);
-
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleEscape);
     return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleEscape);
     };
-  }, []);
-
-  function selectLanguage(nextLanguage) {
-    setLanguage(nextLanguage);
-    setIsOpen(false);
-  }
+  }, [isOpen]);
 
   return (
-    <div className={`admin-language-switcher${isOpen ? " is-open" : ""}`} ref={menuRef}>
-      <span className="admin-language-switcher__label">{translate("adminShellLogin.language", "Language")}</span>
-      <button
-        type="button"
-        className="admin-language-switcher__trigger"
-        aria-haspopup="listbox"
-        aria-expanded={isOpen}
-        aria-label={translate("adminShellLogin.language", "Language")}
-        onClick={() => setIsOpen((current) => !current)}
+    <div
+      ref={rootRef}
+      style={{
+        position: "relative",
+        zIndex: isOpen ? 40 : "auto",
+        display: "inline-grid",
+        gridTemplateColumns: "auto auto",
+        alignItems: "center",
+        gap: 12,
+        minHeight: 48,
+        padding: "8px 10px 8px 14px",
+        border: "1px solid rgba(177, 145, 116, 0.24)",
+        borderRadius: 22,
+        background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(249,244,236,0.94) 100%)",
+        boxShadow: "0 14px 30px rgba(84, 59, 40, 0.1)",
+        backdropFilter: "blur(10px)",
+      }}
+    >
+      <span
+        style={{
+          color: "var(--app-text-muted, #6b6259)",
+          fontSize: 11,
+          fontWeight: 900,
+          letterSpacing: "0.08em",
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+        }}
       >
-        <span className="admin-language-switcher__code">{selectedLanguage.code}</span>
-        <span className="admin-language-switcher__current">{selectedLanguage.label}</span>
-        <span className="admin-language-switcher__chevron" aria-hidden="true" />
-      </button>
-      {isOpen ? (
-        <div className="admin-language-switcher__menu" role="listbox" aria-label={translate("adminShellLogin.language", "Language")}>
-          {languageOptions.map((option) => {
-            const isActive = option.value === language;
+        {translate("adminShellLogin.language", "Language")}
+      </span>
 
-            return (
-              <button
-                type="button"
-                key={option.value}
-                className={`admin-language-switcher__option${isActive ? " is-active" : ""}`}
-                role="option"
-                aria-selected={isActive}
-                onClick={() => selectLanguage(option.value)}
-              >
-                <span className="admin-language-switcher__code">{option.code}</span>
-                <span>{option.label}</span>
-                <span className="admin-language-switcher__active-dot" aria-hidden="true" />
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
-      <style>{`
-        .admin-language-switcher {
-          position: relative;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          color: var(--app-text-muted);
-          font-size: 13px;
-          font-weight: 800;
-          line-height: 1;
-        }
+      <div style={{ position: "relative", display: "inline-flex" }}>
+        <button
+          type="button"
+          aria-haspopup="menu"
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((current) => !current)}
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 14,
+            minHeight: 40,
+            minWidth: 154,
+            padding: "8px 12px 8px 10px",
+            border: isOpen ? "1px solid rgba(122, 77, 39, 0.38)" : "1px solid rgba(122, 77, 39, 0.24)",
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.98)",
+            color: "#2e271f",
+            boxShadow: isOpen
+              ? "0 12px 26px rgba(122, 77, 39, 0.12), inset 0 1px 0 rgba(255,255,255,0.98)"
+              : "inset 0 1px 0 rgba(255,255,255,0.92)",
+            lineHeight: 1.1,
+            cursor: "pointer",
+            fontWeight: 800,
+            fontSize: 14,
+          }}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <FlagBadge country={currentLanguage.country} />
+            <span>{currentLanguage.label}</span>
+          </span>
+          <ChevronIcon open={isOpen} />
+        </button>
 
-        .admin-language-switcher__label {
-          white-space: nowrap;
-        }
+        {isOpen ? (
+          <div
+            role="menu"
+            aria-label={translate("adminShellLogin.language", "Language")}
+            style={{
+              position: "absolute",
+              top: "calc(100% + 10px)",
+              right: 0,
+              zIndex: 20,
+              display: "grid",
+              gap: 8,
+              minWidth: 228,
+              padding: 12,
+              border: "1px solid rgba(177, 145, 116, 0.24)",
+              borderRadius: 24,
+              background: "linear-gradient(180deg, rgba(255,255,255,0.99) 0%, rgba(248,243,236,0.97) 100%)",
+              boxShadow: "0 22px 42px rgba(84, 59, 40, 0.18)",
+              backdropFilter: "blur(12px)",
+            }}
+          >
+            {languageOptions.map((option) => {
+              const isActive = option.value === language;
 
-        .admin-language-switcher__trigger,
-        .admin-language-switcher__option {
-          appearance: none;
-          border: 0;
-          font: inherit;
-          color: var(--app-text);
-        }
-
-        .admin-language-switcher__trigger {
-          min-height: 42px;
-          display: inline-flex;
-          align-items: center;
-          gap: 9px;
-          border: 1px solid var(--app-border-strong);
-          border-radius: 8px;
-          background: rgba(255, 255, 255, 0.94);
-          padding: 8px 12px 8px 10px;
-          box-shadow: var(--app-shadow-soft);
-          cursor: pointer;
-          transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
-        }
-
-        .admin-language-switcher__trigger:hover,
-        .admin-language-switcher__trigger:focus-visible,
-        .admin-language-switcher.is-open .admin-language-switcher__trigger {
-          border-color: rgba(115, 80, 55, 0.42);
-          background: var(--color-card);
-          box-shadow: 0 12px 28px rgba(48, 33, 24, 0.12);
-          outline: none;
-        }
-
-        .admin-language-switcher__code {
-          width: 30px;
-          min-width: 30px;
-          height: 24px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 6px;
-          background: rgba(115, 80, 55, 0.12);
-          color: var(--color-primary);
-          font-size: 11px;
-          font-weight: 900;
-          letter-spacing: 0;
-        }
-
-        .admin-language-switcher__current {
-          min-width: 58px;
-          text-align: left;
-        }
-
-        .admin-language-switcher__chevron {
-          width: 8px;
-          height: 8px;
-          border-right: 2px solid currentColor;
-          border-bottom: 2px solid currentColor;
-          transform: translateY(-2px) rotate(45deg);
-          opacity: 0.62;
-          transition: transform 160ms ease;
-        }
-
-        .admin-language-switcher.is-open .admin-language-switcher__chevron {
-          transform: translateY(2px) rotate(225deg);
-        }
-
-        .admin-language-switcher__menu {
-          position: absolute;
-          right: 0;
-          top: calc(100% + 8px);
-          z-index: 60;
-          width: 180px;
-          display: grid;
-          gap: 4px;
-          border: 1px solid var(--app-border-strong);
-          border-radius: 10px;
-          background: var(--color-card);
-          padding: 6px;
-          box-shadow: 0 18px 42px rgba(48, 33, 24, 0.18);
-        }
-
-        .admin-language-switcher__menu::before {
-          content: "";
-          position: absolute;
-          right: 18px;
-          top: -6px;
-          width: 10px;
-          height: 10px;
-          border-left: 1px solid var(--app-border-strong);
-          border-top: 1px solid var(--app-border-strong);
-          background: var(--color-card);
-          transform: rotate(45deg);
-        }
-
-        .admin-language-switcher__option {
-          position: relative;
-          z-index: 1;
-          min-height: 38px;
-          display: grid;
-          grid-template-columns: auto minmax(0, 1fr) 8px;
-          align-items: center;
-          gap: 9px;
-          border-radius: 7px;
-          background: transparent;
-          padding: 7px 9px;
-          text-align: left;
-          cursor: pointer;
-        }
-
-        .admin-language-switcher__option:hover,
-        .admin-language-switcher__option:focus-visible,
-        .admin-language-switcher__option.is-active {
-          background: rgba(115, 80, 55, 0.1);
-          outline: none;
-        }
-
-        .admin-language-switcher__active-dot {
-          width: 7px;
-          height: 7px;
-          border-radius: 999px;
-          background: transparent;
-        }
-
-        .admin-language-switcher__option.is-active .admin-language-switcher__active-dot {
-          background: var(--color-primary);
-        }
-
-        @media (max-width: 720px) {
-          .admin-language-switcher {
-            width: 100%;
-            justify-content: space-between;
-          }
-
-          .admin-language-switcher__trigger {
-            flex: 1;
-            justify-content: space-between;
-          }
-
-          .admin-language-switcher__menu {
-            left: 0;
-            right: auto;
-            width: 100%;
-            min-width: 180px;
-          }
-        }
-      `}</style>
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="menuitemradio"
+                  aria-checked={isActive}
+                  onClick={() => {
+                    setLanguage(option.value);
+                    setIsOpen(false);
+                  }}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 14,
+                    minHeight: 42,
+                    padding: "8px 12px",
+                    border: isActive ? "1px solid rgba(111, 90, 71, 0.24)" : "1px solid transparent",
+                    borderRadius: 14,
+                    background: isActive ? "linear-gradient(180deg, #8b7968 0%, #756353 100%)" : "transparent",
+                    color: isActive ? "#fffdf8" : "#3f342a",
+                    font: "inherit",
+                    fontSize: 15,
+                    fontWeight: isActive ? 800 : 700,
+                    textAlign: "left",
+                    cursor: "pointer",
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
+                    <FlagBadge country={option.country} active={isActive} />
+                    <span>{option.label}</span>
+                  </span>
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: "999px",
+                      background: isActive ? "#fff6ea" : "transparent",
+                      boxShadow: isActive ? "0 0 0 3px rgba(255,246,234,0.16)" : "none",
+                    }}
+                  />
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </div>
     </div>
   );
 }

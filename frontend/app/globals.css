@@ -1305,6 +1305,32 @@ textarea {
   align-self: start;
 }
 
+.service-serial-section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: start;
+}
+
+.service-serial-section__column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.service-serial-section__column--left,
+.service-serial-section__column--right,
+.service-field--serial-number,
+.service-field--serial-image-upload {
+  align-self: start;
+}
+
+.service-field--serial-image-upload,
+.service-field--serial-number {
+  align-content: start;
+}
+
 .service-field-grid--3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -1315,10 +1341,10 @@ textarea {
   grid-template-columns: minmax(9.5rem, 10.75rem) minmax(13rem, 18rem);
 }
 
-.service-field-grid--preferred-contact-custom {
+.service-field-grid--preferred-contact-custom-active {
   width: fit-content;
-  max-width: min(100%, 20rem);
-  grid-template-columns: repeat(2, minmax(7.5rem, 1fr));
+  max-width: min(100%, 50rem);
+  grid-template-columns: minmax(9.5rem, 10.75rem) minmax(13rem, 18rem) repeat(2, minmax(7.5rem, 8.5rem));
 }
 
 .service-field-grid--phone-email {
@@ -1699,42 +1725,100 @@ textarea {
 
 .service-field__date-picker {
   position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  padding: 0 12px 0 0;
+  border: 1px solid rgba(177, 145, 116, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 10px 24px rgba(107, 79, 58, 0.08);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+  isolation: isolate;
+}
+
+.service-field--preferred-date .service-field__date-picker:hover {
+  border-color: rgba(122, 77, 39, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 12px 28px rgba(107, 79, 58, 0.11);
+}
+
+.service-field--preferred-date .service-field__date-picker:focus-within {
+  border-color: rgba(122, 77, 39, 0.4);
+  box-shadow:
+    0 0 0 4px rgba(122, 77, 39, 0.08),
+    0 14px 28px rgba(107, 79, 58, 0.12);
+}
+
+.service-field--preferred-date .service-field__date-picker.is-open {
+  z-index: 20;
 }
 
 .service-field__date-picker input[type="text"] {
-  padding-right: 56px;
+  min-height: 52px;
+  padding: 14px 14px 14px 16px;
+  padding-right: 12px;
+  border: 0;
+  border-radius: 16px 0 0 16px;
+  background: transparent;
+  box-shadow: none;
+}
+
+.service-field--preferred-date .service-field__date-picker input[type="text"]:focus {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
 }
 
 .service-field__date-picker-button {
-  position: absolute;
-  top: 50%;
-  right: 12px;
+  flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   border: none;
-  border-radius: 10px;
-  background: rgba(107, 79, 58, 0.08);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 235, 225, 0.92) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 18px rgba(107, 79, 58, 0.08);
   color: rgba(107, 79, 58, 0.82);
-  transform: translateY(-50%);
   cursor: pointer;
   transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
     background-color 160ms ease,
     color 160ms ease;
 }
 
 .service-field__date-picker-button:hover,
 .service-field__date-picker-button:focus-visible {
-  background: rgba(107, 79, 58, 0.14);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(240, 227, 214, 0.98) 100%);
   color: var(--app-accent);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 10px 20px rgba(107, 79, 58, 0.12);
 }
 
 .service-field__date-picker-button:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 4px rgba(107, 79, 58, 0.08);
+}
+
+.service-field--preferred-date > span {
+  color: rgba(56, 38, 25, 0.84);
+}
+
+.service-field--preferred-time > span {
+  color: rgba(56, 38, 25, 0.84);
 }
 
 .service-field__date-picker-button svg {
@@ -1747,13 +1831,293 @@ textarea {
   stroke-linejoin: round;
 }
 
-.service-field__date-picker-native {
+.service-field__calendar {
   position: absolute;
-  inset: 0;
-  width: 0 !important;
-  height: 0 !important;
-  opacity: 0;
-  pointer-events: none;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 30;
+  width: min(100vw - 2rem, 18.5rem);
+  padding: 12px;
+  border: 1px solid rgba(177, 145, 116, 0.24);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 243, 236, 0.98) 100%);
+  box-shadow: 0 22px 42px rgba(84, 59, 40, 0.18);
+}
+
+.service-field__calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.service-field__calendar-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--app-text);
+  text-transform: capitalize;
+}
+
+.service-field__calendar-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(177, 145, 116, 0.22);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(56, 38, 25, 0.84);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.service-field__calendar-nav:hover,
+.service-field__calendar-nav:focus-visible {
+  background: rgba(240, 227, 214, 0.92);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(107, 79, 58, 0.12);
+}
+
+.service-field__calendar-weekdays,
+.service-field__calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.service-field__calendar-weekdays {
+  margin-bottom: 8px;
+}
+
+.service-field__calendar-weekdays span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 24px;
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(107, 79, 58, 0.66);
+}
+
+.service-field__calendar-grid {
+  gap: 4px;
+}
+
+.service-field__calendar-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.service-field__calendar-day:hover,
+.service-field__calendar-day:focus-visible {
+  background: rgba(232, 222, 212, 0.82);
+  border-color: rgba(177, 145, 116, 0.22);
+  transform: translateY(-1px);
+}
+
+.service-field__calendar-day.is-outside-month {
+  color: rgba(107, 79, 58, 0.42);
+}
+
+.service-field__calendar-day.is-today {
+  border-color: rgba(197, 120, 45, 0.32);
+  color: var(--app-accent-strong);
+}
+
+.service-field__calendar-day.is-selected {
+  background: linear-gradient(135deg, #c5782d 0%, #9a5823 100%);
+  color: #fffdf9;
+  box-shadow: 0 8px 18px rgba(154, 88, 35, 0.22);
+}
+
+.service-field__calendar-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.service-field__calendar-action {
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.service-field__calendar-action--secondary {
+  color: rgba(107, 79, 58, 0.82);
+}
+
+.service-field__calendar-action:hover,
+.service-field__calendar-action:focus-visible {
+  color: var(--app-accent-strong);
+}
+
+.service-field__time-picker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 54px;
+  padding: 0 12px 0 0;
+  border: 1px solid rgba(177, 145, 116, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 10px 24px rgba(107, 79, 58, 0.08);
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+  isolation: isolate;
+}
+
+.service-field__time-picker:hover {
+  border-color: rgba(122, 77, 39, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 12px 28px rgba(107, 79, 58, 0.11);
+}
+
+.service-field__time-picker:focus-within {
+  border-color: rgba(122, 77, 39, 0.4);
+  box-shadow:
+    0 0 0 4px rgba(122, 77, 39, 0.08),
+    0 14px 28px rgba(107, 79, 58, 0.12);
+}
+
+.service-field__time-picker.is-open {
+  z-index: 20;
+}
+
+.service-field__time-picker input[type="text"] {
+  min-height: 52px;
+  padding: 14px 14px 14px 16px;
+  padding-right: 12px;
+  border: 0;
+  border-radius: 16px 0 0 16px;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.service-field__time-picker input[type="text"]:focus {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
+}
+
+.service-field__time-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  z-index: 30;
+  width: min(100vw - 2rem, 14rem);
+  padding: 8px;
+  border: 1px solid rgba(177, 145, 116, 0.24);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 243, 236, 0.98) 100%);
+  box-shadow: 0 22px 42px rgba(84, 59, 40, 0.18);
+}
+
+.service-field__time-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.service-field__time-column {
+  min-width: 0;
+}
+
+.service-field__time-column-label {
+  display: block;
+  margin-bottom: 6px;
+  padding: 0 4px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(107, 79, 58, 0.68);
+}
+
+.service-field__time-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 13rem;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.service-field__time-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    transform 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease;
+}
+
+.service-field__time-option:hover,
+.service-field__time-option:focus-visible {
+  background: rgba(232, 222, 212, 0.82);
+  border-color: rgba(177, 145, 116, 0.22);
+  transform: translateY(-1px);
+}
+
+.service-field__time-option.is-selected {
+  background: linear-gradient(135deg, #c5782d 0%, #9a5823 100%);
+  color: #fffdf9;
+  box-shadow: 0 8px 18px rgba(154, 88, 35, 0.22);
+}
+
+.service-field__time-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 
 .service-field textarea {
@@ -1776,17 +2140,219 @@ textarea {
   background-color: #ffffff;
 }
 
+.service-field--preferred-time-window {
+  position: relative;
+}
+
+.service-field--preferred-time-window > span {
+  color: rgba(56, 38, 25, 0.84);
+}
+
+.service-select--preferred-time-window .admin-select__trigger {
+  min-height: 54px;
+  padding: 14px 16px;
+  border: 1px solid rgba(177, 145, 116, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 10px 24px rgba(107, 79, 58, 0.08);
+}
+
+.service-select--preferred-time-window .admin-select__trigger:hover {
+  border-color: rgba(122, 77, 39, 0.32) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 12px 28px rgba(107, 79, 58, 0.11) !important;
+}
+
+.service-select--preferred-time-window .admin-select__trigger:focus-visible,
+.service-select--preferred-time-window.is-open .admin-select__trigger {
+  border-color: rgba(122, 77, 39, 0.4) !important;
+  box-shadow:
+    0 0 0 4px rgba(122, 77, 39, 0.08),
+    0 14px 28px rgba(107, 79, 58, 0.12) !important;
+}
+
+.service-select--preferred-time-window .admin-select__value {
+  color: var(--app-text);
+}
+
+.service-select--preferred-time-window .admin-select__value.is-placeholder {
+  color: rgba(56, 38, 25, 0.52);
+}
+
+.service-select--preferred-time-window .admin-select__chevron {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 235, 225, 0.92) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 18px rgba(107, 79, 58, 0.08);
+  position: relative;
+  transform: none;
+}
+
+.service-select--preferred-time-window .admin-select__chevron::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(107, 79, 58, 0.72);
+  border-bottom: 2px solid rgba(107, 79, 58, 0.72);
+  transform: rotate(45deg);
+}
+
+.service-select--preferred-time-window.is-open .admin-select__chevron {
+  transform: none;
+}
+
+.service-select--preferred-time-window.is-open .admin-select__chevron::after {
+  top: 13px;
+  transform: rotate(225deg);
+}
+
+.service-select--preferred-time-window .admin-select__menu {
+  top: calc(100% + 10px);
+  min-width: 100%;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid rgba(177, 145, 116, 0.24);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 243, 236, 0.97) 100%);
+  box-shadow: 0 22px 42px rgba(84, 59, 40, 0.18);
+}
+
+.service-select--preferred-time-window .admin-select__option {
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.service-select--preferred-time-window .admin-select__option:hover,
+.service-select--preferred-time-window .admin-select__option.is-active {
+  background: rgba(232, 222, 212, 0.82);
+}
+
+.service-select--preferred-time-window .admin-select__option.is-selected {
+  background: linear-gradient(180deg, rgba(139, 121, 104, 0.16) 0%, rgba(117, 99, 83, 0.12) 100%);
+  color: var(--app-accent-strong);
+}
+
+.service-select--gender .admin-select__trigger {
+  min-height: 54px;
+  padding: 14px 16px;
+  border: 1px solid rgba(177, 145, 116, 0.28);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 10px 24px rgba(107, 79, 58, 0.08);
+}
+
+.service-select--gender .admin-select__trigger:hover {
+  border-color: rgba(122, 77, 39, 0.32) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 12px 28px rgba(107, 79, 58, 0.11) !important;
+}
+
+.service-select--gender .admin-select__trigger:focus-visible,
+.service-select--gender.is-open .admin-select__trigger {
+  border-color: rgba(122, 77, 39, 0.4) !important;
+  box-shadow:
+    0 0 0 4px rgba(122, 77, 39, 0.08),
+    0 14px 28px rgba(107, 79, 58, 0.12) !important;
+}
+
+.service-select--gender .admin-select__value {
+  color: var(--app-text);
+}
+
+.service-select--gender .admin-select__value.is-placeholder {
+  color: rgba(56, 38, 25, 0.52);
+}
+
+.service-select--gender .admin-select__chevron {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(244, 235, 225, 0.92) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 8px 18px rgba(107, 79, 58, 0.08);
+  position: relative;
+  transform: none;
+}
+
+.service-select--gender .admin-select__chevron::after {
+  content: "";
+  position: absolute;
+  top: 9px;
+  left: 10px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(107, 79, 58, 0.72);
+  border-bottom: 2px solid rgba(107, 79, 58, 0.72);
+  transform: rotate(45deg);
+}
+
+.service-select--gender.is-open .admin-select__chevron {
+  transform: none;
+}
+
+.service-select--gender.is-open .admin-select__chevron::after {
+  top: 13px;
+  transform: rotate(225deg);
+}
+
+.service-select--gender .admin-select__menu {
+  top: calc(100% + 10px);
+  min-width: 100%;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid rgba(177, 145, 116, 0.24);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 243, 236, 0.97) 100%);
+  box-shadow: 0 22px 42px rgba(84, 59, 40, 0.18);
+}
+
+.service-select--gender .admin-select__option {
+  min-height: 42px;
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.service-select--gender .admin-select__option:hover,
+.service-select--gender .admin-select__option.is-active {
+  background: rgba(232, 222, 212, 0.82);
+}
+
+.service-select--gender .admin-select__option.is-selected {
+  background: linear-gradient(180deg, rgba(139, 121, 104, 0.16) 0%, rgba(117, 99, 83, 0.12) 100%);
+  color: var(--app-accent-strong);
+}
+
 .service-field__file,
 .service-field input[type="file"] {
   width: 100%;
   min-height: 54px;
-  padding: 12px 16px;
-  border: 1px solid rgba(107, 79, 58, 0.18);
+  padding: 10px 12px;
+  border: 1px solid rgba(177, 145, 116, 0.28);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.94);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
   color: var(--app-text);
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 10px 24px rgba(107, 79, 58, 0.08);
   transition:
     border-color 160ms ease,
     box-shadow 160ms ease,
@@ -1796,9 +2362,68 @@ textarea {
 .service-field__file:focus,
 .service-field input[type="file"]:focus {
   outline: none;
-  border-color: rgba(107, 79, 58, 0.34);
-  box-shadow: 0 0 0 4px rgba(107, 79, 58, 0.08);
+  border-color: rgba(122, 77, 39, 0.4);
+  box-shadow:
+    0 0 0 4px rgba(122, 77, 39, 0.08),
+    0 14px 28px rgba(107, 79, 58, 0.12);
   background: #ffffff;
+}
+
+.service-field__file:hover,
+.service-field input[type="file"]:hover {
+  border-color: rgba(122, 77, 39, 0.32);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 12px 28px rgba(107, 79, 58, 0.11);
+}
+
+.service-field__file::file-selector-button,
+.service-field input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  border: 1px solid transparent;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #c5782d 0%, #9a5823 100%);
+  color: #fffdf9;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(154, 88, 35, 0.22);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    filter 160ms ease;
+}
+
+.service-field__file:hover::file-selector-button,
+.service-field__file:focus::file-selector-button,
+.service-field input[type="file"]:hover::file-selector-button,
+.service-field input[type="file"]:focus::file-selector-button {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(154, 88, 35, 0.28);
+  filter: saturate(1.03);
+}
+
+.service-field__file::-webkit-file-upload-button,
+.service-field input[type="file"]::-webkit-file-upload-button {
+  margin-right: 12px;
+  border: 1px solid transparent;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #c5782d 0%, #9a5823 100%);
+  color: #fffdf9;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(154, 88, 35, 0.22);
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    filter 160ms ease;
 }
 
 .service-form__hint--attachments {
@@ -1867,6 +2492,25 @@ textarea {
   border-radius: 999px;
   border: 1px solid rgba(156, 124, 94, 0.34);
   background: rgba(245, 234, 217, 0.92);
+}
+
+.service-attachments__toggle {
+  align-self: flex-start;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  cursor: pointer;
+}
+
+.service-attachments__toggle:hover,
+.service-attachments__toggle:focus-visible {
+  color: var(--app-accent-strong);
 }
 
 .service-attachments__name {
@@ -2590,7 +3234,7 @@ textarea {
   .service-field-grid--client-location,
   .service-field-grid--client-address-details,
   .service-field-grid--preferred-contact,
-  .service-field-grid--preferred-contact-custom {
+  .service-field-grid--preferred-contact-custom-active {
     grid-template-columns: 1fr;
     width: 100%;
     max-width: none;
@@ -2615,6 +3259,10 @@ textarea {
     flex: 1 1 auto;
     width: auto;
     min-width: 0;
+  }
+
+  .service-serial-section {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .service-field--claim-attachments {
