@@ -114,6 +114,20 @@ function ItemTypeLabel({ type }) {
   return type || "-";
 }
 
+function PaymentStatusBadge({ status }) {
+  const value = String(status || "UNPAID").toUpperCase();
+  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : "Unpaid";
+  const style = value === "PAID"
+    ? paymentStatusPaidStyle
+    : value === "PENDING"
+      ? paymentStatusPendingStyle
+      : value === "FAILED"
+        ? paymentStatusFailedStyle
+        : paymentStatusUnpaidStyle;
+
+  return <span style={style}>{label}</span>;
+}
+
 export default async function AdminOrderDetailPage({ params, searchParams }) {
   const admin = await requireAdminPage();
   const { id } = await params;
@@ -169,6 +183,10 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
               <div style={actionMetricStyle}>
                 <span style={detailLabelStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></span>
                 <AdminStatusBadge status={order.status} />
+              </div>
+              <div style={actionMetricStyle}>
+                <span style={detailLabelStyle}>Payment status</span>
+                <PaymentStatusBadge status={order.paymentStatus} />
               </div>
               <div style={actionMetricStyle}>
                 <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.total" fallback="Total" /></span>
@@ -273,6 +291,10 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.payment" fallback="Payment" /></span>
                   <span>{formatPaymentMethod(order.paymentMethod) || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</span>
+                  <div style={{ marginTop: 8 }}><PaymentStatusBadge status={order.paymentStatus} /></div>
+                  {order.stripeCheckoutSessionId ? (
+                    <span style={stripeMetaStyle}>Stripe session: {order.stripeCheckoutSessionId}</span>
+                  ) : null}
                 </div>
               </div>
             </article>
@@ -397,6 +419,55 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
 const detailGridStyle = {
   display: "grid",
   gap: 14,
+};
+
+const paymentStatusBaseStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  borderRadius: 999,
+  padding: "7px 10px",
+  border: "1px solid transparent",
+  fontSize: 12,
+  fontWeight: 900,
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
+  whiteSpace: "nowrap",
+};
+
+const paymentStatusPaidStyle = {
+  ...paymentStatusBaseStyle,
+  color: "#1f6f43",
+  background: "rgba(42, 145, 85, 0.12)",
+  borderColor: "rgba(42, 145, 85, 0.22)",
+};
+
+const paymentStatusPendingStyle = {
+  ...paymentStatusBaseStyle,
+  color: "#8a5a13",
+  background: "rgba(207, 145, 36, 0.12)",
+  borderColor: "rgba(207, 145, 36, 0.22)",
+};
+
+const paymentStatusFailedStyle = {
+  ...paymentStatusBaseStyle,
+  color: "var(--app-danger-text)",
+  background: "rgba(217, 92, 92, 0.12)",
+  borderColor: "rgba(217, 92, 92, 0.22)",
+};
+
+const paymentStatusUnpaidStyle = {
+  ...paymentStatusBaseStyle,
+  color: "var(--app-text-muted)",
+  background: "rgba(115, 80, 55, 0.07)",
+  borderColor: "rgba(115, 80, 55, 0.12)",
+};
+
+const stripeMetaStyle = {
+  display: "block",
+  marginTop: 8,
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  overflowWrap: "anywhere",
 };
 
 const detailLabelStyle = {

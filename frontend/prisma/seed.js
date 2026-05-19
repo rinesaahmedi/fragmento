@@ -31,6 +31,8 @@ const PRODUCT_INFO_BY_CODE = {
     productInfoSummary: "Vollintegrierter 60-cm-Geschirrspueler fuer den Einbau hinter einer Moebelfront. Die aktuelle Produktinformation nennt 12 Massgedecke, Energieklasse D und 5 Programme.",
     productInfoKeyFacts: [
       "Energieklasse: D",
+      "Energieverbrauch: 82 kWh / 100 Zyklen.",
+      "Wasserverbrauch: 11.0 l/Zyklus.",
       "Geraeusch: 49 dB",
       "Breite: 60 cm",
       "Geraetemasse H x B x T (mm): 815 x 598 x 550.",
@@ -45,6 +47,8 @@ const PRODUCT_INFO_BY_CODE = {
       "- Produkttyp: vollintegrierter Einbau-Geschirrspueler.",
       "- 12 Massgedecke, 5 Programme, 4 Temperaturen.",
       "- Energieklasse D, 82 kWh / 100 Zyklen, 11.0 l / Zyklus.",
+      "- Energieverbrauch: 82 kWh / 100 Zyklen.",
+      "- Wasserverbrauch: 11.0 l/Zyklus.",
       "- Geraeusch: 49 dB(A), Klasse C.",
       "- Geraetemasse H x B x T (mm): 815 x 598 x 550.",
       "- Einbaumasse H x B x T (mm): 820 - 870 x 600 x 580.",
@@ -150,6 +154,7 @@ PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = {
   ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"],
   productInfoKeyFacts: [
     ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoKeyFacts,
+    "Jahresverbrauch: 219 kWh/Jahr.",
     "Geraetemasse H x B x T (mm): 1800 x 545 x 590.",
   ],
   productInfoExtractedText: PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoExtractedText
@@ -164,6 +169,7 @@ PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
   ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"],
   productInfoKeyFacts: [
     ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"].productInfoKeyFacts,
+    "Jahresverbrauch: 24.8 kWh/Jahr.",
     "Geraetemasse H x B x T (mm): 173,0 x 599 x 303.",
   ],
 };
@@ -196,6 +202,7 @@ PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
   productInfoSummary: "Kombinierte Auswahl aus Einbaubackofen EBX 943 600 S und Induktionskochfeld OL-KMI 754 000 E. Die aktuellen Produktinformationen nennen 77 l Garraum, 9 Backofenfunktionen sowie 4 Kochzonen mit 9 Leistungsstufen.",
   productInfoKeyFacts: [
     "Backofen: Energieklasse A",
+    "Backofen: Energieverbrauch: 0.99 kWh conventional / 0.83 kWh hot air.",
     "Backofen: 77 l Volumen, 9 Funktionen",
     "Backofen: Geraetemasse H x B x T (mm): 595 x 595 x 575.",
     "Backofen: Einbaumasse H x B x T (mm): 595,0 x 560 x 560.",
@@ -209,6 +216,7 @@ PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
     "Produktname: AMICA EBX 943 600 S Backofen + AMICA OL-KMI 754 000 E Induktionskochfeld.",
     "Wichtige Punkte:",
     "- Backofen: Einbau-Elektrobackofen mit 77 l Volumen, Energieklasse A und 9 Funktionen.",
+    "- Backofen: Energieverbrauch: 0.99 kWh conventional / 0.83 kWh hot air.",
     "- Backofen: Geraetemasse H x B x T (mm): 595 x 595 x 575.",
     "- Backofen: Einbaumasse H x B x T (mm): 595,0 x 560 x 560.",
     "- Backofen: SensorControl Timer, versenkbare Knebel, CoolDoor3, Steam Clean.",

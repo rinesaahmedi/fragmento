@@ -331,6 +331,23 @@ function isDishwasherProductAssistantItem(item) {
     || String(item?.productInfoCode || item?.code || "").toUpperCase().startsWith("DISH-");
 }
 
+function isLedLightingProductAssistantItem(item) {
+  const sourceText = [
+    item?.productInfoSummary || "",
+    ...(Array.isArray(item?.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+    item?.productInfoExtractedText || "",
+    item?.productAssistantName || "",
+    item?.name || "",
+    item?.articleNumber || "",
+  ].join("\n");
+  const code = String(item?.productInfoCode || item?.code || "").trim().toUpperCase();
+
+  return /\bKA220043_S3\b|led lighting set|led-beleuchtungsset|beleuchtungsset/i.test(sourceText)
+    || code === "LIGHT-B-LED-001"
+    || code === "LIGHT-C-LED-001"
+    || code === "ACC-LIGHT-003";
+}
+
 function formatProductAssistantDisplayName(item, translate) {
   if (!item) return "";
 
@@ -349,6 +366,10 @@ function formatProductAssistantDisplayName(item, translate) {
 
   if (isDishwasherProductAssistantItem(item)) {
     return translate("configurator.catalogItemNames.dishwasher", "Dishwasher");
+  }
+
+  if (isLedLightingProductAssistantItem(item)) {
+    return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
   }
 
   return formatProductAssistantOptionName(
@@ -952,16 +973,6 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrd
 }
 
 export default function KitchenConfigurator({ initialLanguage = "de", ...props }) {
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  if (!isMounted) {
-    return null;
-  }
-
   return (
     <PublicI18nProvider initialLanguage={initialLanguage}>
       <KitchenConfiguratorContent {...props} />
@@ -1781,6 +1792,13 @@ function KitchenConfiguratorContent({
 
       const emailIssue = payload.notifications?.emailError;
       const webhookIssue = payload.notifications?.webhookError;
+
+      if (payload.checkoutUrl) {
+        setStatus(translate("configurator.statusRedirectingToPayment", "Redirecting to secure payment..."));
+        clearConfiguratorDraft(draftStorageKey);
+        window.location.assign(payload.checkoutUrl);
+        return;
+      }
 
       if (emailIssue || webhookIssue) {
         const notes = [emailIssue ? `E-Mail: ${emailIssue}` : "", webhookIssue ? `Webhook: ${webhookIssue}` : ""]

@@ -4,6 +4,7 @@ import KitchenConfigurator from "../../../components/kitchen-configurator";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "../../../lib/catalog";
 import { getContractOrderState, getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
 import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
+import { prisma } from "../../../lib/prisma";
 import { PUBLIC_LANGUAGE_COOKIE_NAME, normalizePublicLanguage } from "../../../lib/public-language";
 
 export const dynamic = "force-dynamic";
@@ -113,12 +114,26 @@ export default async function KitchenPage({ params, searchParams }) {
 
   const kitchenConfig = serializeKitchenForLegacy(kitchen);
   const svgMarkup = await loadKitchenSvgMarkup(slug);
-  const initialContractNumber = String(resolvedSearchParams?.contractNumber || "").trim();
+  let initialContractNumber = String(resolvedSearchParams?.contractNumber || "").trim();
+  const returnOrderNumber = String(resolvedSearchParams?.order || "").trim();
   const initialLanguage = resolvedSearchParams?.lang
     ? normalizePublicLanguage(String(resolvedSearchParams.lang))
     : normalizePublicLanguage(cookieStore.get(PUBLIC_LANGUAGE_COOKIE_NAME)?.value);
   let initialOrder = null;
   let initialContractAddress = null;
+
+  if (!initialContractNumber && returnOrderNumber) {
+    const returnOrder = await prisma.order.findUnique({
+      where: { orderNumber: returnOrderNumber },
+      select: {
+        contractNumber: true,
+        kitchenId: true,
+      },
+    });
+    if (returnOrder?.kitchenId === kitchen.id) {
+      initialContractNumber = returnOrder.contractNumber || "";
+    }
+  }
 
   if (initialContractNumber) {
     try {
