@@ -85,15 +85,60 @@ export async function getActiveKitchens() {
 }
 
 export async function getKitchenBySlug(slug) {
-  return prisma.kitchen.findUnique({
-    where: { slug },
-    include: {
-      items: {
-        where: { isActive: true },
-        orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+  try {
+    return await prisma.kitchen.findUnique({
+      where: { slug },
+      include: {
+        items: {
+          where: { isActive: true },
+          orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    const message = String(error?.message || "");
+    const missingProductImagePath =
+      (error?.code === "P2022" || /column .* does not exist/i.test(message)) &&
+      message.includes("KitchenItem.productImagePath");
+
+    if (!missingProductImagePath) {
+      throw error;
+    }
+
+    // Compatibility fallback for databases that have not applied the productImagePath migration yet.
+    return prisma.kitchen.findUnique({
+      where: { slug },
+      include: {
+        items: {
+          where: { isActive: true },
+          orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
+          select: {
+            id: true,
+            kitchenId: true,
+            itemType: true,
+            code: true,
+            articleNumber: true,
+            name: true,
+            price: true,
+            infoText: true,
+            productInfoPdfPath: true,
+            productInfoSummary: true,
+            productInfoKeyFacts: true,
+            productInfoExtractedText: true,
+            productInfoUpdatedAt: true,
+            iconKey: true,
+            colorKey: true,
+            componentKey: true,
+            isLocked: true,
+            isActive: true,
+            sortOrder: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+      },
+    });
+  }
 }
 
 export async function listKitchensForAdmin() {
