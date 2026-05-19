@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
 import { speakAssistantTextWithTts } from "./assistant-tts";
 import {
@@ -102,10 +103,23 @@ function ServiceAttachmentChips({
   clearLabel,
   onRemove,
   onClearAll,
+  expandLabel = "View more",
+  collapseLabel = "View less",
 }) {
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (files.length <= 3) {
+      setExpanded(false);
+    }
+  }, [files.length]);
+
   if (!files.length) {
     return null;
   }
+  const shouldCollapse = files.length > 3;
+  const indexedFiles = files.map((file, index) => ({ file, index }));
+  const visibleFiles = shouldCollapse && !expanded ? indexedFiles.slice(0, 3) : indexedFiles;
 
   return (
     <div className="service-attachments">
@@ -121,7 +135,7 @@ function ServiceAttachmentChips({
         ) : null}
       </div>
       <ul className="service-attachments__list">
-        {files.map((file, index) => (
+        {visibleFiles.map(({ file, index }) => (
           <li key={`${file.name}-${file.size}-${index}`} className="service-attachments__item">
             <span className="service-attachments__name" title={file.name}>
               {file.name}
@@ -137,6 +151,15 @@ function ServiceAttachmentChips({
           </li>
         ))}
       </ul>
+      {shouldCollapse ? (
+        <button
+          type="button"
+          className="service-attachments__toggle"
+          onClick={() => setExpanded((current) => !current)}
+        >
+          {expanded ? collapseLabel : `${expandLabel} (${files.length - 3})`}
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -237,6 +260,12 @@ const COPY = {
     preferredContactTimeWindowCustom: "Eigene Uhrzeit",
     preferredContactTimeFrom: "Von",
     preferredContactTimeTo: "Bis",
+    preferredContactCalendarClear: "Löschen",
+    preferredContactCalendarToday: "Heute",
+    preferredContactCalendarPrevMonth: "Vorheriger Monat",
+    preferredContactCalendarNextMonth: "Nächster Monat",
+    preferredContactTimePickerPlaceholder: "1 AM",
+    preferredContactTimePickerClear: "Löschen",
     preferredContactTimeCustomRequired: "Bitte geben Sie bei eigener Uhrzeit sowohl Von als auch Bis an.",
     preferredContactTimeCustomOrder: "Die Bis-Uhrzeit muss später als die Von-Uhrzeit sein.",
     clientAddress: "Adresse des Kunden",
@@ -298,6 +327,8 @@ const COPY = {
     attachments: "Anh\u00e4nge (optional)",
     attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 5 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
+    attachmentsViewMore: "Mehr anzeigen",
+    attachmentsViewLess: "Weniger anzeigen",
     attachmentsSelected: "{count} Datei(en) ausgew\u00e4hlt",
     attachmentsErrorTooMany: "Maximal 5 Anh\u00e4nge m\u00f6glich.",
     attachmentsErrorFileTooLarge: "Jede Datei darf h\u00f6chstens 4 MB gro\u00df sein.",
@@ -396,6 +427,12 @@ const COPY = {
     preferredContactTimeWindowCustom: "Custom time",
     preferredContactTimeFrom: "From",
     preferredContactTimeTo: "To",
+    preferredContactCalendarClear: "Clear",
+    preferredContactCalendarToday: "Today",
+    preferredContactCalendarPrevMonth: "Previous month",
+    preferredContactCalendarNextMonth: "Next month",
+    preferredContactTimePickerPlaceholder: "1 AM",
+    preferredContactTimePickerClear: "Clear",
     preferredContactTimeCustomRequired: "Please enter both From and To for a custom time.",
     preferredContactTimeCustomOrder: "The To time must be later than the From time.",
     clientAddress: "Client address",
@@ -457,6 +494,8 @@ const COPY = {
     attachments: "Attachments (optional)",
     attachmentsHint: "PDFs, images, or office files \u2014 up to 5 files, 4 MB each.",
     attachmentsClear: "Remove all",
+    attachmentsViewMore: "View more",
+    attachmentsViewLess: "View less",
     attachmentsSelected: "{count} file(s) selected",
     attachmentsErrorTooMany: "You can attach at most 5 files.",
     attachmentsErrorFileTooLarge: "Each file must be 4 MB or smaller.",
@@ -605,6 +644,8 @@ const COPY = {
     attachments: "Ekler (iste\u011fe ba\u011fl\u0131)",
     attachmentsHint: "PDF, g\u00f6rsel veya ofis dosyalar\u0131 \u2014 en fazla 5 dosya, dosya ba\u015f\u0131na en fazla 4 MB.",
     attachmentsClear: "T\u00fcm\u00fcn\u00fc kald\u0131r",
+    attachmentsViewMore: "Daha fazla g\u00f6ster",
+    attachmentsViewLess: "Daha az g\u00f6ster",
     attachmentsSelected: "{count} dosya se\u00e7ildi",
     attachmentsErrorTooMany: "En fazla 5 dosya ekleyebilirsiniz.",
     attachmentsErrorFileTooLarge: "Her dosya en fazla 4 MB olabilir.",
@@ -744,6 +785,8 @@ const COPY = {
     attachments: "Adjuntos (opcional)",
     attachmentsHint: "PDF, im\u00e1genes u oficina: hasta 5 archivos, 4 MB cada uno.",
     attachmentsClear: "Quitar todos",
+    attachmentsViewMore: "Ver m\u00e1s",
+    attachmentsViewLess: "Ver menos",
     attachmentsSelected: "{count} archivo(s) seleccionado(s)",
     attachmentsErrorTooMany: "Puede adjuntar como m\u00e1ximo 5 archivos.",
     attachmentsErrorFileTooLarge: "Cada archivo debe tener 4 MB o menos.",
@@ -883,6 +926,8 @@ const COPY = {
     attachments: "Pi\u00e8ces jointes (facultatif)",
     attachmentsHint: "PDF, images ou bureautique : jusqu'\u00e0 5 fichiers, 4 Mo chacun.",
     attachmentsClear: "Tout retirer",
+    attachmentsViewMore: "Voir plus",
+    attachmentsViewLess: "Voir moins",
     attachmentsSelected: "{count} fichier(s) s\u00e9lectionn\u00e9(s)",
     attachmentsErrorTooMany: "Vous pouvez joindre au maximum 5 fichiers.",
     attachmentsErrorFileTooLarge: "Chaque fichier doit faire 4 Mo ou moins.",
@@ -1021,6 +1066,8 @@ const COPY = {
     attachments: "\u0412\u043b\u043e\u0436\u0435\u043d\u0438\u044f (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     attachmentsHint: "PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f \u0438\u043b\u0438 \u043e\u0444\u0438\u0441\u043d\u044b\u0435 \u0444\u0430\u0439\u043b\u044b \u2014 \u0434\u043e 5 \u0444\u0430\u0439\u043b\u043e\u0432, \u0434\u043e 4 \u041c\u0411 \u043a\u0430\u0436\u0434\u044b\u0439.",
     attachmentsClear: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u0441\u0435",
+    attachmentsViewMore: "\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u0435\u0449\u0435",
+    attachmentsViewLess: "\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u043c\u0435\u043d\u044c\u0448\u0435",
     attachmentsSelected: "\u0412\u044b\u0431\u0440\u0430\u043d\u043e \u0444\u0430\u0439\u043b\u043e\u0432: {count}",
     attachmentsErrorTooMany: "\u041d\u0435 \u0431\u043e\u043b\u0435\u0435 5 \u0432\u043b\u043e\u0436\u0435\u043d\u0438\u0439.",
     attachmentsErrorFileTooLarge: "\u041a\u0430\u0436\u0434\u044b\u0439 \u0444\u0430\u0439\u043b \u2014 \u043d\u0435 \u0431\u043e\u043b\u0435\u0435 4 \u041c\u0411.",
@@ -1099,6 +1146,8 @@ const EMPTY_CONTRACT_LOOKUP = {
 };
 
 const EMPTY_CLAIM_ASSISTANT_MESSAGES = [];
+const PREFERRED_CONTACT_HOUR_OPTIONS = buildHourOptions();
+const PREFERRED_CONTACT_PERIOD_OPTIONS = buildPeriodOptions();
 
 function normalizeSerialNumberList(value) {
   return String(value || "")
@@ -1127,20 +1176,124 @@ function isPreferredContactCustom(windowValue) {
   return String(windowValue || "").trim() === "custom";
 }
 
-function formatIsoDateToShort(value) {
-  const match = String(value || "").trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) {
-    return "";
-  }
-  return `${match[3]}/${match[2]}/${match[1].slice(-2)}`;
-}
-
-function formatShortDateToIso(value) {
+function parseShortDate(value) {
   const match = String(value || "").trim().match(/^(\d{2})\/(\d{2})\/(\d{2})$/);
   if (!match) {
+    return null;
+  }
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const year = 2000 + Number(match[3]);
+  const date = new Date(year, month - 1, day);
+  if (
+    Number.isNaN(date.getTime()) ||
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null;
+  }
+  return date;
+}
+
+function formatDateToShort(date) {
+  if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
     return "";
   }
-  return `20${match[3]}-${match[2]}-${match[1]}`;
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
+  return `${day}/${month}/${year}`;
+}
+
+function startOfCalendarMonth(date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+function addMonths(date, amount) {
+  return new Date(date.getFullYear(), date.getMonth() + amount, 1);
+}
+
+function buildCalendarDays(monthDate) {
+  const firstDayOfMonth = startOfCalendarMonth(monthDate);
+  const startDate = new Date(firstDayOfMonth);
+  startDate.setDate(firstDayOfMonth.getDate() - firstDayOfMonth.getDay());
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + index);
+    return {
+      key: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
+      date,
+      isCurrentMonth: date.getMonth() === monthDate.getMonth(),
+    };
+  });
+}
+
+function isSameCalendarDay(left, right) {
+  if (!(left instanceof Date) || !(right instanceof Date)) {
+    return false;
+  }
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
+}
+
+function getWeekdayLabels(language) {
+  const baseSunday = new Date(2026, 4, 17);
+  const formatter = new Intl.DateTimeFormat(language || "en", { weekday: "short" });
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(baseSunday);
+    date.setDate(baseSunday.getDate() + index);
+    return formatter.format(date).replace(/\.$/, "");
+  });
+}
+
+function getCalendarMonthLabel(date, language) {
+  return new Intl.DateTimeFormat(language || "en", {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+function buildHourOptions() {
+  return Array.from({ length: 12 }, (_, index) => String(index + 1));
+}
+
+function buildPeriodOptions() {
+  return ["AM", "PM"];
+}
+
+function parseTimeValue(value) {
+  const match = String(value || "").trim().match(/^(\d{1,2})\s*(AM|PM)$/i);
+  if (!match) {
+    return { hours: "", period: "" };
+  }
+  return {
+    hours: match[1],
+    period: match[2].toUpperCase(),
+  };
+}
+
+function combineTimeValue(hours, period) {
+  if (!hours && !period) {
+    return "";
+  }
+  return `${hours || "12"} ${period || "AM"}`;
+}
+
+function convertMeridiemTimeToMinutes(value) {
+  const parsed = parseTimeValue(value);
+  if (!parsed.hours || !parsed.period) {
+    return Number.NaN;
+  }
+  const normalizedHours = Number(parsed.hours);
+  if (!Number.isInteger(normalizedHours) || normalizedHours < 1 || normalizedHours > 12) {
+    return Number.NaN;
+  }
+  const hours24 = normalizedHours % 12 + (parsed.period === "PM" ? 12 : 0);
+  return hours24 * 60;
 }
 
 function normalizeShortDateInput(value) {
@@ -1181,6 +1334,11 @@ export default function ServiceClaimFlow() {
   const [claimAssistantVoiceError, setClaimAssistantVoiceError] = useState("");
   const [selectedClaimAssistantContextKey, setSelectedClaimAssistantContextKey] = useState("claim");
   const [serialNumberDraft, setSerialNumberDraft] = useState("");
+  const [isPreferredContactCalendarOpen, setIsPreferredContactCalendarOpen] = useState(false);
+  const [preferredContactCalendarMonth, setPreferredContactCalendarMonth] = useState(() =>
+    startOfCalendarMonth(new Date()),
+  );
+  const [openPreferredContactTimeField, setOpenPreferredContactTimeField] = useState(null);
   const languageMenuRef = useRef(null);
   const contractLookupTimeoutRef = useRef(null);
   const contractLookupRequestIdRef = useRef(0);
@@ -1188,13 +1346,36 @@ export default function ServiceClaimFlow() {
   const claimAssistantRecognitionRef = useRef(null);
   const claimAssistantAudioRef = useRef(null);
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
-  const preferredContactDatePickerRef = useRef(null);
+  const preferredContactCalendarRef = useRef(null);
+  const preferredContactTimeFromRef = useRef(null);
+  const preferredContactTimeToRef = useRef(null);
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
   const formValues = { ...INITIAL_FORM, ...form };
   const selectedLanguage = LANGUAGE_OPTIONS.find((option) => option.code === language) || LANGUAGE_OPTIONS[0];
   const isComplaintMode = mode === "complaint";
+  const selectedPreferredContactDate = useMemo(
+    () => parseShortDate(formValues.preferredContactDate),
+    [formValues.preferredContactDate],
+  );
+  const preferredContactWeekdayLabels = useMemo(() => getWeekdayLabels(language), [language]);
+  const preferredContactCalendarDays = useMemo(
+    () => buildCalendarDays(preferredContactCalendarMonth),
+    [preferredContactCalendarMonth],
+  );
+  const preferredContactCalendarMonthLabel = useMemo(
+    () => getCalendarMonthLabel(preferredContactCalendarMonth, language),
+    [preferredContactCalendarMonth, language],
+  );
+  const preferredContactTimeFromParts = useMemo(
+    () => parseTimeValue(formValues.preferredContactTimeFrom),
+    [formValues.preferredContactTimeFrom],
+  );
+  const preferredContactTimeToParts = useMemo(
+    () => parseTimeValue(formValues.preferredContactTimeTo),
+    [formValues.preferredContactTimeTo],
+  );
   const hasContactMethod = useMemo(
     () => Boolean(formValues.phone.trim() || formValues.email.trim()),
     [formValues.email, formValues.phone],
@@ -1362,6 +1543,67 @@ export default function ServiceClaimFlow() {
   }, [isComplaintMode]);
 
   useEffect(() => {
+    if (!isPreferredContactCalendarOpen) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      if (!preferredContactCalendarRef.current?.contains(event.target)) {
+        setIsPreferredContactCalendarOpen(false);
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setIsPreferredContactCalendarOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isPreferredContactCalendarOpen]);
+
+  useEffect(() => {
+    if (!isPreferredContactCalendarOpen) {
+      return;
+    }
+    setPreferredContactCalendarMonth(startOfCalendarMonth(selectedPreferredContactDate || new Date()));
+  }, [isPreferredContactCalendarOpen, selectedPreferredContactDate]);
+
+  useEffect(() => {
+    if (!openPreferredContactTimeField) {
+      return undefined;
+    }
+
+    function handlePointerDown(event) {
+      const activeRef =
+        openPreferredContactTimeField === "from" ? preferredContactTimeFromRef.current : preferredContactTimeToRef.current;
+      if (!activeRef?.contains(event.target)) {
+        setOpenPreferredContactTimeField(null);
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setOpenPreferredContactTimeField(null);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [openPreferredContactTimeField]);
+
+  useEffect(() => {
     if (isClaimAssistantOpen) {
       return;
     }
@@ -1462,6 +1704,43 @@ export default function ServiceClaimFlow() {
     }
   }
 
+  function handlePreferredContactCalendarToggle() {
+    setIsPreferredContactCalendarOpen((current) => !current);
+  }
+
+  function handlePreferredContactCalendarSelect(date) {
+    handleFieldChange("preferredContactDate", formatDateToShort(date));
+    setPreferredContactCalendarMonth(startOfCalendarMonth(date));
+    setIsPreferredContactCalendarOpen(false);
+  }
+
+  function handlePreferredContactCalendarClear() {
+    handleFieldChange("preferredContactDate", "");
+    setPreferredContactCalendarMonth(startOfCalendarMonth(new Date()));
+    setIsPreferredContactCalendarOpen(false);
+  }
+
+  function handlePreferredContactCalendarToday() {
+    const today = new Date();
+    handlePreferredContactCalendarSelect(today);
+  }
+
+  function handlePreferredContactTimeToggle(field) {
+    setOpenPreferredContactTimeField((current) => (current === field ? null : field));
+  }
+
+  function handlePreferredContactTimePartSelect(field, part, nextValue) {
+    const currentParts = parseTimeValue(formValues[field]);
+    const hours = part === "hours" ? nextValue : currentParts.hours || "12";
+    const period = part === "period" ? nextValue : currentParts.period || "AM";
+    handleFieldChange(field, combineTimeValue(hours, period));
+  }
+
+  function handlePreferredContactTimeClear(field) {
+    handleFieldChange(field, "");
+    setOpenPreferredContactTimeField(null);
+  }
+
   function handleFieldChange(field, value) {
     setForm((current) => {
       const next = {
@@ -1474,6 +1753,10 @@ export default function ServiceClaimFlow() {
       }
       return next;
     });
+
+    if (field === "preferredContactTimeWindow" && value !== "custom") {
+      setOpenPreferredContactTimeField(null);
+    }
 
     if (field === "contractNumber") {
       const nextContractNumber = value.trim();
@@ -2038,7 +2321,7 @@ export default function ServiceClaimFlow() {
         setError(t("preferredContactTimeCustomRequired"));
         return;
       }
-      if (preferredContactTimeTo <= preferredContactTimeFrom) {
+      if (convertMeridiemTimeToMinutes(preferredContactTimeTo) <= convertMeridiemTimeToMinutes(preferredContactTimeFrom)) {
         setError(t("preferredContactTimeCustomOrder"));
         return;
       }
@@ -2290,16 +2573,20 @@ export default function ServiceClaimFlow() {
                   {copy.gender}
                   <RequiredFieldMark title={requiredFieldTitle} />
                 </span>
-                <select
+                <AdminSelect
+                  name="gender"
                   value={formValues.gender}
                   onChange={(event) => handleFieldChange("gender", event.target.value)}
+                  placeholder={copy.genderPlaceholder}
+                  aria-label={copy.gender}
+                  className="service-select service-select--gender"
                   required
                 >
                   <option value="">{copy.genderPlaceholder}</option>
                   <option value="female">{copy.genderFemale}</option>
                   <option value="male">{copy.genderMale}</option>
                   <option value="prefer_not_to_say">{copy.genderPreferNot}</option>
-                </select>
+                </AdminSelect>
               </label>
 
               <label className="service-field">
@@ -2367,10 +2654,17 @@ export default function ServiceClaimFlow() {
                 </p>
                 <p className="service-form__section-helper">{t("preferredContactTimeHelper")}</p>
               </div>
-              <div className="service-field-grid service-field-grid--preferred-contact">
-                <label className="service-field">
+              <div
+                className={`service-field-grid service-field-grid--preferred-contact${
+                  isPreferredContactCustomTime ? " service-field-grid--preferred-contact-custom-active" : ""
+                }`}
+              >
+                <label className="service-field service-field--preferred-date">
                   <span>{t("preferredContactDate")}</span>
-                  <div className="service-field__date-picker">
+                  <div
+                    ref={preferredContactCalendarRef}
+                    className={`service-field__date-picker${isPreferredContactCalendarOpen ? " is-open" : ""}`}
+                  >
                     <input
                       type="text"
                       value={formValues.preferredContactDate}
@@ -2378,64 +2672,273 @@ export default function ServiceClaimFlow() {
                       placeholder="dd/mm/yy"
                       inputMode="numeric"
                       maxLength={8}
+                      onFocus={() => setIsPreferredContactCalendarOpen(true)}
                     />
                     <button
                       type="button"
                       className="service-field__date-picker-button"
                       aria-label={t("preferredContactDate")}
-                      onClick={() => preferredContactDatePickerRef.current?.showPicker?.()}
+                      aria-expanded={isPreferredContactCalendarOpen}
+                      aria-haspopup="dialog"
+                      onClick={handlePreferredContactCalendarToggle}
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                         <path d="M7 2v3M17 2v3M3.5 9.5h17M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v12A1.5 1.5 0 0 1 19 20.5H5A1.5 1.5 0 0 1 3.5 19V7A1.5 1.5 0 0 1 5 5.5Z" />
                       </svg>
                     </button>
-                    <input
-                      ref={preferredContactDatePickerRef}
-                      className="service-field__date-picker-native"
-                      type="date"
-                      tabIndex={-1}
-                      aria-hidden="true"
-                      value={formatShortDateToIso(formValues.preferredContactDate)}
-                      onChange={(event) => handleFieldChange("preferredContactDate", formatIsoDateToShort(event.target.value))}
-                    />
+                    {isPreferredContactCalendarOpen ? (
+                      <div className="service-field__calendar" role="dialog" aria-label={t("preferredContactDate")}>
+                        <div className="service-field__calendar-header">
+                          <button
+                            type="button"
+                            className="service-field__calendar-nav"
+                            aria-label={copy.preferredContactCalendarPrevMonth || "Previous month"}
+                            onClick={() => setPreferredContactCalendarMonth((current) => addMonths(current, -1))}
+                          >
+                            &#8249;
+                          </button>
+                          <span className="service-field__calendar-title">{preferredContactCalendarMonthLabel}</span>
+                          <button
+                            type="button"
+                            className="service-field__calendar-nav"
+                            aria-label={copy.preferredContactCalendarNextMonth || "Next month"}
+                            onClick={() => setPreferredContactCalendarMonth((current) => addMonths(current, 1))}
+                          >
+                            &#8250;
+                          </button>
+                        </div>
+                        <div className="service-field__calendar-weekdays" aria-hidden="true">
+                          {preferredContactWeekdayLabels.map((label, index) => (
+                            <span key={`${label}-${index}`}>{label}</span>
+                          ))}
+                        </div>
+                        <div className="service-field__calendar-grid">
+                          {preferredContactCalendarDays.map((entry) => {
+                            const isToday = isSameCalendarDay(entry.date, new Date());
+                            const isSelected = isSameCalendarDay(entry.date, selectedPreferredContactDate);
+                            return (
+                              <button
+                                key={entry.key}
+                                type="button"
+                                className={[
+                                  "service-field__calendar-day",
+                                  entry.isCurrentMonth ? "" : "is-outside-month",
+                                  isToday ? "is-today" : "",
+                                  isSelected ? "is-selected" : "",
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
+                                onClick={() => handlePreferredContactCalendarSelect(entry.date)}
+                              >
+                                {entry.date.getDate()}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <div className="service-field__calendar-actions">
+                          <button
+                            type="button"
+                            className="service-field__calendar-action service-field__calendar-action--secondary"
+                            onClick={handlePreferredContactCalendarClear}
+                          >
+                            {copy.preferredContactCalendarClear || "Clear"}
+                          </button>
+                          <button
+                            type="button"
+                            className="service-field__calendar-action"
+                            onClick={handlePreferredContactCalendarToday}
+                          >
+                            {copy.preferredContactCalendarToday || "Today"}
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                 </label>
-                <label className="service-field">
+                <label className="service-field service-field--preferred-time-window">
                   <span>{t("preferredContactTimeWindow")}</span>
-                  <select
+                  <AdminSelect
+                    name="preferredContactTimeWindow"
                     value={formValues.preferredContactTimeWindow}
                     onChange={(event) => handleFieldChange("preferredContactTimeWindow", event.target.value)}
+                    placeholder={t("preferredContactTimeWindowPlaceholder")}
+                    aria-label={t("preferredContactTimeWindow")}
+                    className="service-select service-select--preferred-time-window"
                   >
                     <option value="">{t("preferredContactTimeWindowPlaceholder")}</option>
                     <option value="morning">{t("preferredContactTimeWindowMorning")}</option>
                     <option value="afternoon">{t("preferredContactTimeWindowAfternoon")}</option>
                     <option value="evening">{t("preferredContactTimeWindowEvening")}</option>
                     <option value="custom">{t("preferredContactTimeWindowCustom")}</option>
-                  </select>
+                  </AdminSelect>
                 </label>
+                {isPreferredContactCustomTime ? (
+                  <>
+                    <label className="service-field service-field--preferred-time">
+                      <span>{t("preferredContactTimeFrom")}</span>
+                      <div
+                        ref={preferredContactTimeFromRef}
+                        className={`service-field__time-picker${openPreferredContactTimeField === "from" ? " is-open" : ""}`}
+                      >
+                        <input
+                          type="text"
+                          value={formValues.preferredContactTimeFrom}
+                          onFocus={() => setOpenPreferredContactTimeField("from")}
+                          placeholder={copy.preferredContactTimePickerPlaceholder || "hh:mm"}
+                          readOnly
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="service-field__date-picker-button"
+                          aria-label={t("preferredContactTimeFrom")}
+                          aria-expanded={openPreferredContactTimeField === "from"}
+                          aria-haspopup="listbox"
+                          onClick={() => handlePreferredContactTimeToggle("from")}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M12 6v6l4 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                          </svg>
+                        </button>
+                        {openPreferredContactTimeField === "from" ? (
+                          <div className="service-field__time-menu" role="listbox" aria-label={t("preferredContactTimeFrom")}>
+                            <div className="service-field__time-columns">
+                              <div className="service-field__time-column">
+                                <span className="service-field__time-column-label">Hour</span>
+                                <div className="service-field__time-options">
+                                  {PREFERRED_CONTACT_HOUR_OPTIONS.map((option) => (
+                                    <button
+                                      key={option}
+                                      type="button"
+                                      className={`service-field__time-option${
+                                        preferredContactTimeFromParts.hours === option ? " is-selected" : ""
+                                      }`}
+                                      onClick={() =>
+                                        handlePreferredContactTimePartSelect("preferredContactTimeFrom", "hours", option)
+                                      }
+                                    >
+                                      {option}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="service-field__time-column service-field__time-column--period">
+                                <span className="service-field__time-column-label">AM/PM</span>
+                                <div className="service-field__time-options">
+                                  {PREFERRED_CONTACT_PERIOD_OPTIONS.map((option) => (
+                                    <button
+                                      key={option}
+                                      type="button"
+                                      className={`service-field__time-option${
+                                        preferredContactTimeFromParts.period === option ? " is-selected" : ""
+                                      }`}
+                                      onClick={() =>
+                                        handlePreferredContactTimePartSelect("preferredContactTimeFrom", "period", option)
+                                      }
+                                    >
+                                      {option}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="service-field__time-actions">
+                              <button
+                                type="button"
+                                className="service-field__calendar-action service-field__calendar-action--secondary"
+                                onClick={() => handlePreferredContactTimeClear("preferredContactTimeFrom")}
+                              >
+                                {copy.preferredContactTimePickerClear || "Clear"}
+                              </button>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </label>
+                    <label className="service-field service-field--preferred-time">
+                      <span>{t("preferredContactTimeTo")}</span>
+                      <div
+                        ref={preferredContactTimeToRef}
+                        className={`service-field__time-picker${openPreferredContactTimeField === "to" ? " is-open" : ""}`}
+                      >
+                        <input
+                          type="text"
+                          value={formValues.preferredContactTimeTo}
+                          onFocus={() => setOpenPreferredContactTimeField("to")}
+                          placeholder={copy.preferredContactTimePickerPlaceholder || "hh:mm"}
+                          readOnly
+                          required
+                        />
+                        <button
+                          type="button"
+                          className="service-field__date-picker-button"
+                          aria-label={t("preferredContactTimeTo")}
+                          aria-expanded={openPreferredContactTimeField === "to"}
+                          aria-haspopup="listbox"
+                          onClick={() => handlePreferredContactTimeToggle("to")}
+                        >
+                          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M12 6v6l4 2M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
+                          </svg>
+                        </button>
+                        {openPreferredContactTimeField === "to" ? (
+                          <div className="service-field__time-menu" role="listbox" aria-label={t("preferredContactTimeTo")}>
+                            <div className="service-field__time-columns">
+                              <div className="service-field__time-column">
+                                <span className="service-field__time-column-label">Hour</span>
+                                <div className="service-field__time-options">
+                                  {PREFERRED_CONTACT_HOUR_OPTIONS.map((option) => (
+                                    <button
+                                      key={option}
+                                      type="button"
+                                      className={`service-field__time-option${
+                                        preferredContactTimeToParts.hours === option ? " is-selected" : ""
+                                      }`}
+                                      onClick={() =>
+                                        handlePreferredContactTimePartSelect("preferredContactTimeTo", "hours", option)
+                                      }
+                                    >
+                                      {option}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                              <div className="service-field__time-column service-field__time-column--period">
+                                <span className="service-field__time-column-label">AM/PM</span>
+                                <div className="service-field__time-options">
+                                  {PREFERRED_CONTACT_PERIOD_OPTIONS.map((option) => (
+                                    <button
+                                      key={option}
+                                      type="button"
+                                      className={`service-field__time-option${
+                                        preferredContactTimeToParts.period === option ? " is-selected" : ""
+                                      }`}
+                                      onClick={() =>
+                                        handlePreferredContactTimePartSelect("preferredContactTimeTo", "period", option)
+                                      }
+                                    >
+                                      {option}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="service-field__time-actions">
+                              <button
+                                type="button"
+                                className="service-field__calendar-action service-field__calendar-action--secondary"
+                                onClick={() => handlePreferredContactTimeClear("preferredContactTimeTo")}
+                              >
+                                {copy.preferredContactTimePickerClear || "Clear"}
+                              </button>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </label>
+                  </>
+                ) : null}
               </div>
-              {isPreferredContactCustomTime ? (
-                <div className="service-field-grid service-field-grid--preferred-contact-custom">
-                  <label className="service-field">
-                    <span>{t("preferredContactTimeFrom")}</span>
-                    <input
-                      type="time"
-                      value={formValues.preferredContactTimeFrom}
-                      onChange={(event) => handleFieldChange("preferredContactTimeFrom", event.target.value)}
-                      required
-                    />
-                  </label>
-                  <label className="service-field">
-                    <span>{t("preferredContactTimeTo")}</span>
-                    <input
-                      type="time"
-                      value={formValues.preferredContactTimeTo}
-                      onChange={(event) => handleFieldChange("preferredContactTimeTo", event.target.value)}
-                      required
-                    />
-                  </label>
-                </div>
-              ) : null}
             </section>
 
             <section className="service-form__section">
@@ -2776,109 +3279,119 @@ export default function ServiceClaimFlow() {
               )}
             </section>
 
-            <div className="service-field-grid">
-              <label className="service-field service-field--serial-number">
-                <span className="service-field__label-row service-field__label-row--serial">
-                  <span className="service-field__label-main">
-                    {copy.serialNumber}
-                  </span>
-                  <button
-                    type="button"
-                    className="service-field__help-badge"
-                    aria-expanded={isSerialNumberHelpOpen}
-                    aria-controls="service-serial-help-title"
-                    aria-label={t("serialNumberHelpAria")}
-                    onClick={() => {
-                      setSerialHelpSlide(0);
-                      setIsSerialNumberHelpOpen(true);
-                    }}
-                  >
-                    {t("serialNumberHelpTrigger")}
-                  </button>
-                </span>
-                <div className="service-serial-field">
-                  <div className="service-serial-field__input-row">
-                    <input
-                      type="text"
-                      value={serialNumberDraft}
-                      onChange={(event) => setSerialNumberDraft(event.target.value)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          event.preventDefault();
-                          addSerialNumberEntry();
-                        }
-                      }}
-                      placeholder={copy.serialPlaceholder}
-                    />
+            <div className="service-serial-section">
+              <div className="service-serial-section__column service-serial-section__column--left">
+                <label className="service-field service-field--serial-number">
+                  <span className="service-field__label-row service-field__label-row--serial">
+                    <span className="service-field__label-main">
+                      {copy.serialNumber}
+                    </span>
                     <button
                       type="button"
-                      className="service-serial-field__add"
-                      onClick={() => addSerialNumberEntry()}
-                      disabled={!serialNumberDraft.trim()}
+                      className="service-field__help-badge"
+                      aria-expanded={isSerialNumberHelpOpen}
+                      aria-controls="service-serial-help-title"
+                      aria-label={t("serialNumberHelpAria")}
+                      onClick={() => {
+                        setSerialHelpSlide(0);
+                        setIsSerialNumberHelpOpen(true);
+                      }}
                     >
-                      {t("serialNumberAdd")}
+                      {t("serialNumberHelpTrigger")}
                     </button>
+                  </span>
+                  <div className="service-serial-field">
+                    <div className="service-serial-field__input-row">
+                      <input
+                        type="text"
+                        value={serialNumberDraft}
+                        onChange={(event) => setSerialNumberDraft(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            addSerialNumberEntry();
+                          }
+                        }}
+                        placeholder={copy.serialPlaceholder}
+                      />
+                      <button
+                        type="button"
+                        className="service-serial-field__add"
+                        onClick={() => addSerialNumberEntry()}
+                        disabled={!serialNumberDraft.trim()}
+                      >
+                        {t("serialNumberAdd")}
+                      </button>
+                    </div>
+                    {serialNumberEntries.length ? (
+                      <ul className="service-serial-field__list">
+                        {serialNumberEntries.map((entry, index) => (
+                          <li key={`${entry}-${index}`} className="service-serial-field__item">
+                            <span className="service-serial-field__value">{entry}</span>
+                            <button
+                              type="button"
+                              className="service-serial-field__remove"
+                              onClick={() => removeSerialNumberEntry(index)}
+                              aria-label="Remove serial number"
+                            >
+                              &times;
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
                   </div>
-                  {serialNumberEntries.length ? (
-                    <ul className="service-serial-field__list">
-                      {serialNumberEntries.map((entry, index) => (
-                        <li key={`${entry}-${index}`} className="service-serial-field__item">
-                          <span className="service-serial-field__value">{entry}</span>
-                          <button
-                            type="button"
-                            className="service-serial-field__remove"
-                            onClick={() => removeSerialNumberEntry(index)}
-                            aria-label="Remove serial number"
-                          >
-                            &times;
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                </label>
+
+                <div className="service-field service-field--attachments service-field--claim-attachments">
+                  <span>{copy.attachments}</span>
+                  <p className="service-form__hint service-form__hint--attachments">{copy.attachmentsHint}</p>
+                  <input
+                    key={attachmentFieldKey}
+                    type="file"
+                    className="service-field__file"
+                    accept={CLAIM_ATTACHMENT_ACCEPT}
+                    multiple
+                    onChange={handleAttachmentsSelected}
+                  />
+                  <ServiceAttachmentChips
+                    files={attachments}
+                    summary={copy.attachmentsSelected.replace("{count}", String(attachments.length))}
+                    maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
+                    clearLabel={copy.attachmentsClear}
+                    onRemove={removeAttachment}
+                    onClearAll={clearAttachments}
+                    expandLabel={copy.attachmentsViewMore}
+                    collapseLabel={copy.attachmentsViewLess}
+                  />
+                </div>
+              </div>
+
+              <div className="service-serial-section__column service-serial-section__column--right">
+                <div className="service-field service-field--attachments service-field--serial-image-upload">
+                  <span>
+                    {t("serialNumberImage")}
+                  </span>
+                  <input
+                    key={serialNumberImageFieldKey}
+                    type="file"
+                    className="service-field__file"
+                    accept={SERIAL_NUMBER_IMAGE_ACCEPT}
+                    multiple
+                    onChange={handleSerialNumberImageSelected}
+                  />
+                  {serialNumberImages.length ? (
+                    <ServiceAttachmentChips
+                      files={serialNumberImages}
+                      summary={copy.attachmentsSelected.replace("{count}", String(serialNumberImages.length))}
+                      maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
+                      onRemove={removeSerialNumberImage}
+                      expandLabel={copy.attachmentsViewMore}
+                      collapseLabel={copy.attachmentsViewLess}
+                    />
                   ) : null}
                 </div>
-              </label>
-
-              <div className="service-field service-field--attachments">
-                <span>
-                  {t("serialNumberImage")}
-                </span>
-                <input
-                  key={serialNumberImageFieldKey}
-                  type="file"
-                  className="service-field__file"
-                  accept={SERIAL_NUMBER_IMAGE_ACCEPT}
-                  multiple
-                  onChange={handleSerialNumberImageSelected}
-                />
-                <ServiceAttachmentChips
-                  files={serialNumberImages}
-                  summary={copy.attachmentsSelected.replace("{count}", String(serialNumberImages.length))}
-                  maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
-                  onRemove={removeSerialNumberImage}
-                />
               </div>
-            </div>
-
-            <div className="service-field service-field--attachments service-field--claim-attachments">
-              <span>{copy.attachments}</span>
-              <p className="service-form__hint service-form__hint--attachments">{copy.attachmentsHint}</p>
-              <input
-                key={attachmentFieldKey}
-                type="file"
-                className="service-field__file"
-                accept={CLAIM_ATTACHMENT_ACCEPT}
-                multiple
-                onChange={handleAttachmentsSelected}
-              />
-              <ServiceAttachmentChips
-                files={attachments}
-                summary={copy.attachmentsSelected.replace("{count}", String(attachments.length))}
-                maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
-                clearLabel={copy.attachmentsClear}
-                onRemove={removeAttachment}
-                onClearAll={clearAttachments}
-              />
             </div>
 
             {error ? <p className="service-form__error">{error}</p> : null}
