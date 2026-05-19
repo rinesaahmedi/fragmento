@@ -53,6 +53,106 @@ const COPY = {
     knowledgeCausesTitle: "Possible cause",
     knowledgeActionsTitle: "Immediate steps",
     knowledgeGeneralCode: "Code",
+    issueSubject_appliance: "the appliance",
+    issueSubject_leak: "the leak",
+    issueSubject_sink_or_drain: "the sink or drain",
+    issueSubject_electrical_issue: "the electrical issue",
+    issueSubject_this: "this",
+    issueSubject_sink_area: "the sink area",
+    issueSubject_blockage: "the blockage",
+    issueSubject_lighting: "the lighting",
+    issueSubject_oven: "the oven",
+    issueSubject_fridge_or_freezer: "the fridge or freezer",
+    issueSubject_washing_machine: "the washing machine",
+    issueSubject_dryer: "the dryer",
+    issueSubject_hob: "the hob",
+    issueSubject_extractor: "the extractor",
+    issueSubject_kitchen: "the kitchen",
+    generalClarifyLead: "To help you faster, which of these fits best?",
+    generalClarifyApplianceIntro: "",
+    generalClarifyApplianceIntroWithSubject: "I'm sorry you're having trouble with {subject}.",
+    generalClarifyKitchenIntro: "I'm sorry you're having trouble in the kitchen.",
+    generalClarifyGenericIntro: "I'm sorry you're having trouble with this.",
+    generalClarifyApplianceDetail: "If you can, also tell me what the appliance is doing or whether an error code is shown.",
+    generalClarifyGenericDetail: "If you can, also tell me which item or area is affected.",
+    generalClarifyApplianceOpt1: "It is not turning on or not working at all.",
+    generalClarifyApplianceOpt2: "It is not heating, cooling, or draining properly.",
+    generalClarifyApplianceOpt3: "It is leaking, making unusual noise, or smells unusual.",
+    generalClarifyApplianceOpt4: "It shows an error code on the display.",
+    generalClarifyApplianceOpt5: "There is visible damage or something else is wrong.",
+    generalClarifyKitchenOpt1: "An appliance is not working.",
+    generalClarifyKitchenOpt2: "There is a leak or water issue.",
+    generalClarifyKitchenOpt3: "A sink, tap, or drain is blocked or damaged.",
+    generalClarifyKitchenOpt4: "There is an electrical or lighting issue.",
+    generalClarifyKitchenOpt5: "Something is broken or damaged.",
+    dishwasherClarifyIntro: "I'm sorry you're having trouble with the dishwasher.",
+    dishwasherClarifyLead: "To help you faster, which of these fits best?",
+    dishwasherOptionNotHeating: "It is not heating or the water stays cold.",
+    dishwasherOptionNoWater: "It is not taking in water.",
+    dishwasherOptionNotDraining: "It is not draining.",
+    dishwasherOptionLeakPump: "It is leaking, keeps pumping, or there may be water in the base tray.",
+    dishwasherOptionCode: "It shows an error code on the display.",
+    dishwasherDetailPrompt: "If you can, also tell me the error code or what the dishwasher is doing.",
+    dishwasherCodeAsk: "I can help with that. What error code is shown on the display?",
+    dishwasherCodeListIntro: "Common architecto dishwasher codes include:",
+    dishwasherCodeOutro: "Please tell me the code, and I can give you the right troubleshooting steps and claim wording.",
+    generalLeakIntro: "This sounds like a leak around {subject}.",
+    generalLeakStep1: "If safe, stop using the affected sink or fitting for now.",
+    generalLeakStep2: "Check whether the water is coming from the pipe, drain, or tap connection.",
+    generalLeakStep3: "Wipe up standing water to limit further damage.",
+    generalLeakStep4: "Take a photo of the leak or wet area if possible.",
+    generalLeakClaim1: "Mention where the leak is and attach a photo if possible.",
+    generalLeakDescription:
+      "There is water leaking in the affected area. The surface underneath is wet, and the leak may be coming from the pipe, drain, or connection. Please arrange an inspection or repair.",
+    generalDrainageIntro: "This sounds like a blockage or drainage problem around {subject}.",
+    generalDrainageStep1: "Stop using the sink or drain if water is backing up.",
+    generalDrainageStep2: "Check whether the blockage is complete or only draining slowly.",
+    generalDrainageStep3: "Remove standing water if it is safe to do so.",
+    generalDrainageStep4: "Take a photo if the blockage or overflow is visible.",
+    generalDrainageClaim1: "Mention that the sink or drain is blocked or not draining properly, and include a photo if possible.",
+    generalDrainageDescription:
+      "The sink or drain is blocked or not draining properly. Water may be draining slowly or backing up. Please arrange a check or repair.",
+    generalElectricalIntro: "This sounds like an electrical or lighting issue with {subject}.",
+    generalElectricalStep1: "If safe, stop using the affected light, switch, or socket for now.",
+    generalElectricalStep2: "Check whether only one fitting is affected or the whole area.",
+    generalElectricalStep3: "Note any flickering, loss of power, or tripped fuse.",
+    generalElectricalStep4: "Take a photo if there is visible damage.",
+    generalElectricalClaim1: "Mention the affected area and whether the issue is no power, flickering, or visible damage.",
+    generalElectricalDescription:
+      "There is an electrical or lighting issue in the affected area. Please check the fitting and advise on the next step or arrange a repair.",
+    generalDamageIntro: "This sounds like a damaged or broken item in {subject}.",
+    generalDamageStep1: "Take a clear photo of the damaged part.",
+    generalDamageStep2: "Note whether the item is still usable or no longer works properly.",
+    generalDamageStep3: "Avoid forcing moving parts if they are stuck or loose.",
+    generalDamageClaim1: "Mention what is broken or damaged and attach a photo if possible.",
+    generalDamageDescription:
+      "There is visible damage to the affected item. Please inspect it and advise on the next step or arrange a repair.",
+    applianceChoiceIntro: "Which appliance is not working?",
+    applianceChoiceDishwasher: "Dishwasher",
+    applianceChoiceOven: "Oven",
+    applianceChoiceFridge: "Fridge or freezer",
+    applianceChoiceWasher: "Washing machine or dryer",
+    applianceChoiceHob: "Hob or cooker",
+    applianceChoiceHood: "Extractor hood",
+    applianceChoiceOther: "Another appliance",
+    claimFormTrySteps: "You can try",
+    claimFormForForm: "For the claim form",
+    claimFormSuggestedDescription: "Suggested problem description",
+    claimFormHelpClosing: "I can also give you wording for the claim form if needed.",
+    claimFormHelpAction: "Show claim-form help",
+    claimFormNextStep: "If the issue continues, you can create a claim.",
+    claimFormDamageStepsTitle: "Please name the affected item or area, for example",
+    claimFormCopyOutro:
+      "You can copy this into the claim form. If anything changes or you see an error code, include that too.",
+    waterInletOutro: "You can copy this into the claim form. If an error code appears, include it too.",
+    knowledgeIntroStart: "This sounds like a ",
+    knowledgeCodeExplicit: " and matches error code {code} on architecto dishwashers.",
+    knowledgeCodeImplicit: ", often linked to error code {code} on architecto dishwashers.",
+    dishwasherProblemPhrase: "dishwasher problem",
+    dishwasherSuggestFallback:
+      "My architecto dishwasher is not working properly. Please check the appliance and advise on the next step.",
+    dishwasherSuggestWithIssue:
+      "My architecto dishwasher has the following issue: {issue}. Please check the appliance and advise on the next step.",
   },
   de: {
     greetingReply: "Hallo. Ich helfe Ihnen bei der Reklamation.",
@@ -103,6 +203,106 @@ const COPY = {
     knowledgeCausesTitle: "Mögliche Ursache",
     knowledgeActionsTitle: "Sofortmaßnahmen",
     knowledgeGeneralCode: "Code",
+    issueSubject_appliance: "dem Gerät",
+    issueSubject_leak: "der Leckage",
+    issueSubject_sink_or_drain: "Spüle oder Abfluss",
+    issueSubject_electrical_issue: "dem Stromproblem",
+    issueSubject_this: "dem Problem",
+    issueSubject_sink_area: "dem Spülenbereich",
+    issueSubject_blockage: "der Verstopfung",
+    issueSubject_lighting: "der Beleuchtung",
+    issueSubject_oven: "dem Backofen",
+    issueSubject_fridge_or_freezer: "Kühlschrank oder Gefrierschrank",
+    issueSubject_washing_machine: "der Waschmaschine",
+    issueSubject_dryer: "dem Trockner",
+    issueSubject_hob: "dem Kochfeld",
+    issueSubject_extractor: "der Dunstabzugshaube",
+    issueSubject_kitchen: "der Küche",
+    generalClarifyLead: "Damit ich schneller helfen kann: Was passt am besten?",
+    generalClarifyApplianceIntro: "Es tut mir leid, dass Sie Probleme mit einem Gerät haben.",
+    generalClarifyApplianceIntroWithSubject: "Es tut mir leid, dass Sie Probleme mit {subject} haben.",
+    generalClarifyKitchenIntro: "Es tut mir leid, dass es in der Küche ein Problem gibt.",
+    generalClarifyGenericIntro: "Es tut mir leid, dass Sie Probleme damit haben.",
+    generalClarifyApplianceDetail: "Wenn möglich, beschreiben Sie bitte auch, was das Gerät genau macht oder ob ein Fehlercode angezeigt wird.",
+    generalClarifyGenericDetail: "Wenn möglich, nennen Sie bitte auch den betroffenen Gegenstand oder Bereich.",
+    generalClarifyApplianceOpt1: "Es schaltet sich nicht ein oder funktioniert gar nicht.",
+    generalClarifyApplianceOpt2: "Es heizt, kühlt oder pumpt nicht richtig.",
+    generalClarifyApplianceOpt3: "Es ist undicht, macht ungewöhnliche Geräusche oder riecht ungewöhnlich.",
+    generalClarifyApplianceOpt4: "Auf dem Display wird ein Fehlercode angezeigt.",
+    generalClarifyApplianceOpt5: "Es gibt einen sichtbaren Schaden oder etwas anderes stimmt nicht.",
+    generalClarifyKitchenOpt1: "Ein Gerät funktioniert nicht.",
+    generalClarifyKitchenOpt2: "Es gibt ein Leck oder ein Wasserproblem.",
+    generalClarifyKitchenOpt3: "Spüle, Wasserhahn oder Abfluss ist verstopft oder beschädigt.",
+    generalClarifyKitchenOpt4: "Es gibt ein Problem mit Strom oder Beleuchtung.",
+    generalClarifyKitchenOpt5: "Etwas ist kaputt oder beschädigt.",
+    dishwasherClarifyIntro: "Es tut mir leid, dass Sie Probleme mit der Spülmaschine haben.",
+    dishwasherClarifyLead: "Damit ich schneller helfen kann: Was passt am besten?",
+    dishwasherOptionNotHeating: "Sie heizt nicht oder das Wasser bleibt kalt.",
+    dishwasherOptionNoWater: "Sie zieht kein Wasser.",
+    dishwasherOptionNotDraining: "Sie pumpt nicht ab.",
+    dishwasherOptionLeakPump: "Sie ist undicht, pumpt dauerhaft oder es befindet sich Wasser in der Bodenwanne.",
+    dishwasherOptionCode: "Auf dem Display wird ein Fehlercode angezeigt.",
+    dishwasherDetailPrompt: "Wenn möglich, nennen Sie bitte auch den Fehlercode oder beschreiben Sie, was die Spülmaschine genau macht.",
+    dishwasherCodeAsk: "Ich helfe Ihnen gerne weiter. Welcher Fehlercode wird auf dem Display angezeigt?",
+    dishwasherCodeListIntro: "H\u00e4ufige architecto-Fehlercodes sind:",
+    dishwasherCodeOutro: "Bitte nennen Sie mir den Fehlercode, dann gebe ich Ihnen die passenden Schritte und eine Formulierung f\u00fcr das Schadensformular.",
+    generalLeakIntro: "Das klingt nach einem Leck oder Wasserproblem.",
+    generalLeakStep1: "Wenn Wasser austritt, benutzen Sie den betroffenen Bereich vorerst nicht weiter.",
+    generalLeakStep2: "Wischen Sie stehendes Wasser auf, wenn das sicher möglich ist.",
+    generalLeakStep3: "Prüfen Sie, wo das Wasser austritt, zum Beispiel unter der Spüle, am Wasserhahn, am Schlauch oder am Gerät.",
+    generalLeakStep4: "Machen Sie ein Foto der nassen Stelle oder der undichten Verbindung.",
+    generalLeakClaim1: "Geben Sie an, wo das Wasser austritt und ob es dauerhaft tropft oder plötzlich ausgelaufen ist.",
+    generalLeakDescription:
+      "Es gibt ein Leck oder Wasserproblem im betroffenen Bereich. Wasser tritt aus oder sammelt sich dort. Bitte prüfen Sie die Ursache und veranlassen Sie eine Reparatur.",
+    generalDrainageIntro: "Das klingt nach einer Verstopfung oder einem Ablaufproblem.",
+    generalDrainageStep1: "Benutzen Sie Spüle oder Ablauf nicht weiter, wenn sich das Wasser zurückstaut.",
+    generalDrainageStep2: "Prüfen Sie, ob der Ablauf komplett blockiert ist oder nur langsam abläuft.",
+    generalDrainageStep3: "Entfernen Sie stehendes Wasser, wenn das sicher möglich ist.",
+    generalDrainageStep4: "Machen Sie ein Foto, falls die Verstopfung oder Überlaufspur sichtbar ist.",
+    generalDrainageClaim1: "Geben Sie an, dass Spüle oder Ablauf verstopft sind oder nicht richtig ablaufen, und fügen Sie wenn möglich ein Foto hinzu.",
+    generalDrainageDescription:
+      "Die Spüle oder der Ablauf ist verstopft oder läuft nicht richtig ab. Das Wasser läuft nur langsam ab oder staut sich zurück. Bitte prüfen Sie den Fall oder veranlassen Sie eine Reparatur.",
+    generalElectricalIntro: "Das klingt nach einem Strom- oder Beleuchtungsproblem.",
+    generalElectricalStep1: "Wenn es sicher ist, benutzen Sie die betroffene Ausstattung vorerst nicht weiter.",
+    generalElectricalStep2: "Prüfen Sie, ob nur ein einzelner Punkt betroffen ist oder der ganze Bereich.",
+    generalElectricalStep3: "Notieren Sie Flackern, Stromausfall oder eine ausgelöste Sicherung.",
+    generalElectricalStep4: "Machen Sie ein Foto, falls ein sichtbarer Schaden vorhanden ist.",
+    generalElectricalClaim1: "Geben Sie an, welcher Bereich betroffen ist und ob kein Strom vorhanden ist, etwas flackert oder ein sichtbarer Schaden vorliegt.",
+    generalElectricalDescription:
+      "Im betroffenen Bereich liegt ein Strom- oder Beleuchtungsproblem vor. Bitte prüfen Sie die Installation und veranlassen Sie bei Bedarf eine Reparatur.",
+    generalDamageIntro: "Es scheint einen sichtbaren Schaden am betroffenen Gegenstand zu geben.",
+    generalDamageStep1: "Machen Sie ein gut lesbares Foto der beschädigten Stelle.",
+    generalDamageStep2: "Notieren Sie, ob der Gegenstand noch nutzbar ist oder nicht mehr richtig funktioniert.",
+    generalDamageStep3: "Versuchen Sie nicht, bewegliche Teile mit Gewalt zu bewegen, wenn sie klemmen oder locker sind.",
+    generalDamageClaim1: "Geben Sie an, was beschädigt oder kaputt ist, und fügen Sie wenn möglich ein Foto hinzu.",
+    generalDamageDescription:
+      "Es liegt ein sichtbarer Schaden am betroffenen Gegenstand vor. Bitte prüfen Sie den Fall und teilen Sie die weiteren Schritte mit oder veranlassen Sie eine Reparatur.",
+    applianceChoiceIntro: "Welches Gerät funktioniert nicht?",
+    applianceChoiceDishwasher: "Spülmaschine",
+    applianceChoiceOven: "Backofen",
+    applianceChoiceFridge: "Kühlschrank oder Gefrierschrank",
+    applianceChoiceWasher: "Waschmaschine oder Trockner",
+    applianceChoiceHob: "Kochfeld oder Herd",
+    applianceChoiceHood: "Dunstabzugshaube",
+    applianceChoiceOther: "Ein anderes Gerät",
+    claimFormTrySteps: "Sie können Folgendes prüfen",
+    claimFormForForm: "Für das Schadensformular",
+    claimFormSuggestedDescription: "Vorschlag für die Beschreibung",
+    claimFormHelpClosing: "Wenn Sie möchten, kann ich Ihnen auch eine passende Formulierung für das Formular geben.",
+    claimFormHelpAction: "Formularhilfe anzeigen",
+    claimFormNextStep: "Falls das Problem weiterhin besteht, können Sie eine Reklamation erstellen.",
+    claimFormDamageStepsTitle: "Bitte nennen Sie den betroffenen Gegenstand oder Bereich, zum Beispiel",
+    claimFormCopyOutro:
+      "Sie k\u00f6nnen diesen Text in das Formular kopieren. Falls sich etwas \u00e4ndert oder ein Fehlercode angezeigt wird, f\u00fcgen Sie ihn bitte hinzu.",
+    waterInletOutro: "Sie k\u00f6nnen diesen Text in das Formular kopieren. Falls ein Fehlercode angezeigt wird, f\u00fcgen Sie ihn bitte hinzu.",
+    knowledgeIntroStart: "Das klingt nach einem ",
+    knowledgeCodeExplicit: ", passend zu Fehlercode {code} bei architecto-Geschirrsp\u00fclern.",
+    knowledgeCodeImplicit: ", h\u00e4ufig verbunden mit Fehlercode {code} bei architecto-Geschirrsp\u00fclern.",
+    dishwasherProblemPhrase: "Problem mit dem Geschirrsp\u00fcler",
+    dishwasherSuggestFallback:
+      "Mein architecto-Geschirrsp\u00fcler funktioniert nicht richtig. Bitte pr\u00fcfen Sie das Ger\u00e4t und teilen Sie mir die n\u00e4chsten Schritte mit.",
+    dishwasherSuggestWithIssue:
+      "Mein architecto-Geschirrsp\u00fcler hat folgendes Problem: {issue}. Bitte pr\u00fcfen Sie das Ger\u00e4t und teilen Sie mir die n\u00e4chsten Schritte mit.",
   },
   tr: {
     greetingReply: "Merhaba. Şikayet konusunda yardımcı olabilirim.",
@@ -153,6 +353,106 @@ const COPY = {
     knowledgeCausesTitle: "Olası neden",
     knowledgeActionsTitle: "Hemen yapılacaklar",
     knowledgeGeneralCode: "Kod",
+    issueSubject_appliance: "cihaz",
+    issueSubject_leak: "sızıntı",
+    issueSubject_sink_or_drain: "eviye veya gider",
+    issueSubject_electrical_issue: "elektrik sorunu",
+    issueSubject_this: "bu durum",
+    issueSubject_sink_area: "eviye bölgesi",
+    issueSubject_blockage: "tıkanıklık",
+    issueSubject_lighting: "aydınlatma",
+    issueSubject_oven: "fırın",
+    issueSubject_fridge_or_freezer: "buzdolabı veya dondurucu",
+    issueSubject_washing_machine: "çamaşır makinesi",
+    issueSubject_dryer: "kurutma makinesi",
+    issueSubject_hob: "ocak",
+    issueSubject_extractor: "aspiratör",
+    issueSubject_kitchen: "mutfak",
+    generalClarifyLead: "Size daha hızlı yardımcı olabilmem için hangisi en uygun?",
+    generalClarifyApplianceIntro: "",
+    generalClarifyApplianceIntroWithSubject: "{subject} ile ilgili sorun yaşadığınız için üzgünüm.",
+    generalClarifyKitchenIntro: "Mutfağınızda bir sorun olduğu için üzgünüm.",
+    generalClarifyGenericIntro: "Bu konuda sorun yaşadığınız için üzgünüm.",
+    generalClarifyApplianceDetail: "Mümkünse cihazın ne yaptığını veya bir hata kodu görünüp görünmediğini de yazın.",
+    generalClarifyGenericDetail: "Mümkünse hangi eşya veya alanın etkilendiğini de belirtin.",
+    generalClarifyApplianceOpt1: "Hiç açılmıyor veya hiç çalışmıyor.",
+    generalClarifyApplianceOpt2: "Isıtmıyor, soğutmuyor veya suyu düzgün boşaltmıyor.",
+    generalClarifyApplianceOpt3: "Sızdırıyor, olağandışı ses çıkarıyor veya olağandışı koku var.",
+    generalClarifyApplianceOpt4: "Ekranda bir hata kodu görünüyor.",
+    generalClarifyApplianceOpt5: "Görünür hasar var veya başka bir sorun var.",
+    generalClarifyKitchenOpt1: "Bir cihaz çalışmıyor.",
+    generalClarifyKitchenOpt2: "Sızıntı veya su sorunu var.",
+    generalClarifyKitchenOpt3: "Eviye, musluk veya gider tıkalı veya hasarlı.",
+    generalClarifyKitchenOpt4: "Elektrik veya aydınlatma sorunu var.",
+    generalClarifyKitchenOpt5: "Bir şey kırık veya hasarlı.",
+    dishwasherClarifyIntro: "Bulaşık makinesiyle ilgili sorun yaşadığınız için üzgünüm.",
+    dishwasherClarifyLead: "Size daha hızlı yardımcı olabilmem için hangisi en uygun?",
+    dishwasherOptionNotHeating: "Isıtmıyor veya su soğuk kalıyor.",
+    dishwasherOptionNoWater: "Su almıyor.",
+    dishwasherOptionNotDraining: "Su boşaltmıyor.",
+    dishwasherOptionLeakPump: "Sızdırıyor, sürekli pompalıyor veya tabanda su olabilir.",
+    dishwasherOptionCode: "Ekranda bir hata kodu görünüyor.",
+    dishwasherDetailPrompt: "Mümkünse hata kodunu veya makinenin ne yaptığını yazın.",
+    dishwasherCodeAsk: "Yardımcı olabilirim. Ekranda hangi hata kodu görünüyor?",
+    dishwasherCodeListIntro: "Yaygın architecto bulaşık makinesi kodları:",
+    dishwasherCodeOutro: "Lütfen kodu yazın; doğru adımları ve form için metni paylaşayım.",
+    generalLeakIntro: "{subject} çevresinde sızıntı gibi duruyor.",
+    generalLeakStep1: "Emniyetliyse, etkilenen eviye veya bağlantıyı şimdilik kullanmayın.",
+    generalLeakStep2: "Suyun boru, gider veya musluk bağlantısından gelip gelmediğini kontrol edin.",
+    generalLeakStep3: "Daha fazla hasarı önlemek için birikmiş suyu silin.",
+    generalLeakStep4: "Mümkünse sızıntının veya ıslak alanın fotoğrafını çekin.",
+    generalLeakClaim1: "Sızıntının nerede olduğunu belirtin ve mümkünse foto ekleyin.",
+    generalLeakDescription:
+      "Etkilenen alanda su sızıntısı var. Yüzey ıslak; sızıntı boru, gider veya bağlantıdan olabilir. Lütfen kontrol veya onarım ayarlayın.",
+    generalDrainageIntro: "{subject} çevresinde tıkanıklık veya gider sorunu gibi duruyor.",
+    generalDrainageStep1: "Su geri geliyorsa eviye veya gideri kullanmayın.",
+    generalDrainageStep2: "Tıkanıklığın tam mı yoksa yavaş akıyor mu olduğunu kontrol edin.",
+    generalDrainageStep3: "Güvenliyse birikmiş suyu alın.",
+    generalDrainageStep4: "Taşma veya tıkanıklık görünüyorsa fotoğraf çekin.",
+    generalDrainageClaim1: "Eviye veya giderin tıkalı veya düzgün boşalmadığını belirtin; mümkünse foto ekleyin.",
+    generalDrainageDescription:
+      "Eviye veya gider tıkalı veya düzgün boşalmıyor. Su yavaş akıyor veya geri geliyor. Lütfen kontrol veya onarım ayarlayın.",
+    generalElectricalIntro: "{subject} ile ilgili elektrik veya aydınlatma sorunu gibi duruyor.",
+    generalElectricalStep1: "Güvenliyse, etkilenen lamba, anahtar veya prizi şimdilik kullanmayın.",
+    generalElectricalStep2: "Sadece bir nokta mı yoksa tüm alan mı etkilendi kontrol edin.",
+    generalElectricalStep3: "Titreme, enerji kesintisi veya atan sigorta not edin.",
+    generalElectricalStep4: "Görünür hasar varsa fotoğraf çekin.",
+    generalElectricalClaim1: "Etkilenen alanı ve sorunun enerji yokluğu, titreme veya görünür hasar olup olmadığını belirtin.",
+    generalElectricalDescription:
+      "Etkilenen alanda elektrik veya aydınlatma sorunu var. Lütfen bağlantıyı kontrol edin veya onarım ayarlayın.",
+    generalDamageIntro: "{subject} içinde kırık veya hasarlı bir eşya gibi duruyor.",
+    generalDamageStep1: "Hasarlı kısmın net bir fotoğrafını çekin.",
+    generalDamageStep2: "Eşya hâlâ kullanılabilir mi yoksa düzgün çalışmıyor mu not edin.",
+    generalDamageStep3: "Sıkışan veya gevşek parçalara zorlamayın.",
+    generalDamageClaim1: "Neyin kırık veya hasarlı olduğunu belirtin; mümkünse foto ekleyin.",
+    generalDamageDescription:
+      "Etkilenen eşyada görünür hasar var. Lütfen inceleyin ve sonraki adımı bildirin veya onarım ayarlayın.",
+    applianceChoiceIntro: "Hangi cihaz çalışmıyor?",
+    applianceChoiceDishwasher: "Bulaşık makinesi",
+    applianceChoiceOven: "Fırın",
+    applianceChoiceFridge: "Buzdolabı veya dondurucu",
+    applianceChoiceWasher: "Çamaşır veya kurutma makinesi",
+    applianceChoiceHob: "Ocak veya fırın üstü",
+    applianceChoiceHood: "Davlumbaz",
+    applianceChoiceOther: "Başka bir cihaz",
+    claimFormTrySteps: "Şunları deneyebilirsiniz",
+    claimFormForForm: "Form için",
+    claimFormSuggestedDescription: "Önerilen problem açıklaması",
+    claimFormHelpClosing: "İsterseniz form için uygun metin de önerebilirim.",
+    claimFormHelpAction: "Form yardımını göster",
+    claimFormNextStep: "Sorun sürerse bir şikayet oluşturabilirsiniz.",
+    claimFormDamageStepsTitle: "Lütfen etkilenen eşya veya alanı örneğin şöyle adlandırın",
+    claimFormCopyOutro:
+      "Metni forma kopyalayabilirsiniz. Durum değişirse veya bir hata kodunda görürseniz bunu da ekleyin.",
+    waterInletOutro: "Metni forma kopyalayabilirsiniz. Bir hata kodu görünüyorsa ekleyin.",
+    knowledgeIntroStart: "Bu şuna benziyor: ",
+    knowledgeCodeExplicit: " ve architecto bulaşık makinelerinde {code} hata koduyla eşleşiyor.",
+    knowledgeCodeImplicit: ", architecto bulaşık makinelerinde sıklıkla {code} hata koduyla ilişkilendirilir.",
+    dishwasherProblemPhrase: "bulaşık makinesi sorunu",
+    dishwasherSuggestFallback:
+      "architecto bulaşık makinem düzgün çalışmıyor. Lütfen cihazı kontrol edin ve sonraki adımı bildirin.",
+    dishwasherSuggestWithIssue:
+      "architecto bulaşık makinemde şu sorun var: {issue}. Lütfen cihazı kontrol edin ve sonraki adımı bildirin.",
   },
   es: {
     greetingReply: "Hola. Puedo ayudarte con la reclamación.",
@@ -203,6 +503,106 @@ const COPY = {
     knowledgeCausesTitle: "Posible causa",
     knowledgeActionsTitle: "Medidas inmediatas",
     knowledgeGeneralCode: "Código",
+    issueSubject_appliance: "el electrodoméstico",
+    issueSubject_leak: "la fuga",
+    issueSubject_sink_or_drain: "el fregadero o el desagüe",
+    issueSubject_electrical_issue: "el problema eléctrico",
+    issueSubject_this: "esto",
+    issueSubject_sink_area: "la zona del fregadero",
+    issueSubject_blockage: "la obstrucción",
+    issueSubject_lighting: "la iluminación",
+    issueSubject_oven: "el horno",
+    issueSubject_fridge_or_freezer: "el frigorífico o congelador",
+    issueSubject_washing_machine: "la lavadora",
+    issueSubject_dryer: "la secadora",
+    issueSubject_hob: "la placa",
+    issueSubject_extractor: "la campana",
+    issueSubject_kitchen: "la cocina",
+    generalClarifyLead: "Para ayudarte más rápido, ¿cuál encaja mejor?",
+    generalClarifyApplianceIntro: "",
+    generalClarifyApplianceIntroWithSubject: "Lamento que tengas problemas con {subject}.",
+    generalClarifyKitchenIntro: "Lamento que haya un problema en la cocina.",
+    generalClarifyGenericIntro: "Lamento que tengas este problema.",
+    generalClarifyApplianceDetail: "Si puedes, indica también qué hace el aparato o si aparece un código de error.",
+    generalClarifyGenericDetail: "Si puedes, indica también qué elemento o zona está afectada.",
+    generalClarifyApplianceOpt1: "No enciende o no funciona en absoluto.",
+    generalClarifyApplianceOpt2: "No calienta, enfría o desagua bien.",
+    generalClarifyApplianceOpt3: "Tiene fugas, hace ruido raro o huele raro.",
+    generalClarifyApplianceOpt4: "Muestra un código de error en la pantalla.",
+    generalClarifyApplianceOpt5: "Hay daño visible u otra incidencia.",
+    generalClarifyKitchenOpt1: "Un electrodoméstico no funciona.",
+    generalClarifyKitchenOpt2: "Hay una fuga o problema de agua.",
+    generalClarifyKitchenOpt3: "El fregadero, grifo o desagüe está atascado o dañado.",
+    generalClarifyKitchenOpt4: "Hay un problema eléctrico o de iluminación.",
+    generalClarifyKitchenOpt5: "Algo está roto o dañado.",
+    dishwasherClarifyIntro: "Lamento que tengas problemas con el lavavajillas.",
+    dishwasherClarifyLead: "Para ayudarte más rápido, ¿cuál encaja mejor?",
+    dishwasherOptionNotHeating: "No calienta o el agua sigue fría.",
+    dishwasherOptionNoWater: "No entra agua.",
+    dishwasherOptionNotDraining: "No desagua.",
+    dishwasherOptionLeakPump: "Pierde agua, bombea sin parar o puede haber agua en la bandeja inferior.",
+    dishwasherOptionCode: "Muestra un código de error en la pantalla.",
+    dishwasherDetailPrompt: "Si puedes, indica el código de error o qué hace el lavavajillas.",
+    dishwasherCodeAsk: "Puedo ayudarte. ¿Qué código de error aparece en la pantalla?",
+    dishwasherCodeListIntro: "Códigos habituales de lavavajillas architecto:",
+    dishwasherCodeOutro: "Indica el código y te daré los pasos adecuados y un texto para el formulario.",
+    generalLeakIntro: "Parece una fuga cerca de {subject}.",
+    generalLeakStep1: "Si es seguro, deja de usar el fregadero o la zona afectada por ahora.",
+    generalLeakStep2: "Comprueba si el agua viene de la tubería, el desagüe o la conexión del grifo.",
+    generalLeakStep3: "Seca el agua acumulada para limitar daños.",
+    generalLeakStep4: "Haz una foto de la fuga o zona húmeda si puedes.",
+    generalLeakClaim1: "Indica dónde está la fuga y adjunta una foto si puedes.",
+    generalLeakDescription:
+      "Hay una fuga de agua en la zona afectada. La superficie está húmeda; la fuga puede venir de tubería, desagüe o conexión. Solicita una revisión o reparación.",
+    generalDrainageIntro: "Parece una obstrucción o problema de desagüe cerca de {subject}.",
+    generalDrainageStep1: "Si el agua retrocede, no uses el fregadero o desagüe.",
+    generalDrainageStep2: "Comprueba si está totalmente bloqueado o solo desagua despacio.",
+    generalDrainageStep3: "Retira el agua estancada si es seguro.",
+    generalDrainageStep4: "Haz una foto si se ve la obstrucción o desbordamiento.",
+    generalDrainageClaim1: "Indica que el fregadero o desagüe está bloqueado o no desagua bien; incluye foto si puedes.",
+    generalDrainageDescription:
+      "El fregadero o desagüe está bloqueado o no desagua bien. El agua puede ir despacio o retroceder. Solicita una revisión o reparación.",
+    generalElectricalIntro: "Parece un problema eléctrico o de iluminación con {subject}.",
+    generalElectricalStep1: "Si es seguro, no uses la luz, interruptor o enchufe afectado por ahora.",
+    generalElectricalStep2: "Comprueba si solo un punto está afectado o toda la zona.",
+    generalElectricalStep3: "Anota parpadeos, falta de suministro o fusible disparado.",
+    generalElectricalStep4: "Haz una foto si hay daño visible.",
+    generalElectricalClaim1: "Indica la zona afectada y si no hay luz, hay parpadeos o daño visible.",
+    generalElectricalDescription:
+      "Hay un problema eléctrico o de iluminación en la zona afectada. Revisa la instalación o solicita una reparación.",
+    generalDamageIntro: "Parece un objeto dañado o roto en {subject}.",
+    generalDamageStep1: "Haz una foto clara de la parte dañada.",
+    generalDamageStep2: "Anota si el objeto sigue siendo usable o ya no funciona bien.",
+    generalDamageStep3: "No fuerces piezas móviles si están atascadas o sueltas.",
+    generalDamageClaim1: "Indica qué está roto o dañado y adjunta foto si puedes.",
+    generalDamageDescription:
+      "Hay daño visible en el objeto afectado. Solicita una inspección o reparación.",
+    applianceChoiceIntro: "¿Qué electrodoméstico no funciona?",
+    applianceChoiceDishwasher: "Lavavajillas",
+    applianceChoiceOven: "Horno",
+    applianceChoiceFridge: "Frigorífico o congelador",
+    applianceChoiceWasher: "Lavadora o secadora",
+    applianceChoiceHob: "Placa o cocina",
+    applianceChoiceHood: "Campana extractora",
+    applianceChoiceOther: "Otro electrodoméstico",
+    claimFormTrySteps: "Puedes probar",
+    claimFormForForm: "Para el formulario",
+    claimFormSuggestedDescription: "Descripción del problema sugerida",
+    claimFormHelpClosing: "Si quieres, también te propongo texto para el formulario.",
+    claimFormHelpAction: "Mostrar ayuda del formulario",
+    claimFormNextStep: "Si el problema continúa, puedes crear una reclamación.",
+    claimFormDamageStepsTitle: "Indica el elemento o zona afectada, por ejemplo",
+    claimFormCopyOutro:
+      "Puedes copiar esto en el formulario. Si algo cambia o ves un código de error, inclúyelo también.",
+    waterInletOutro: "Copia este texto en el formulario. Si aparece un código de error, inclúyelo también.",
+    knowledgeIntroStart: "Esto parece ",
+    knowledgeCodeExplicit: " y coincide con el código de error {code} en lavavajillas architecto.",
+    knowledgeCodeImplicit: ", a menudo relacionado con el código de error {code} en lavavajillas architecto.",
+    dishwasherProblemPhrase: "problema de lavavajillas",
+    dishwasherSuggestFallback:
+      "Mi lavavajillas architecto no funciona bien. Por favor, revisen el aparato e indiquen el siguiente paso.",
+    dishwasherSuggestWithIssue:
+      "Mi lavavajillas architecto tiene este problema: {issue}. Por favor, revisen el aparato e indiquen el siguiente paso.",
   },
   fr: {
     greetingReply: "Bonjour. Je peux vous aider avec la réclamation.",
@@ -253,6 +653,108 @@ const COPY = {
     knowledgeCausesTitle: "Cause possible",
     knowledgeActionsTitle: "Mesures immédiates",
     knowledgeGeneralCode: "Code",
+    issueSubject_appliance: "l'appareil",
+    issueSubject_leak: "la fuite",
+    issueSubject_sink_or_drain: "l'évier ou l'évacuation",
+    issueSubject_electrical_issue: "le problème électrique",
+    issueSubject_this: "ce problème",
+    issueSubject_sink_area: "la zone de l'évier",
+    issueSubject_blockage: "l'obstruction",
+    issueSubject_lighting: "l'éclairage",
+    issueSubject_oven: "le four",
+    issueSubject_fridge_or_freezer: "le réfrigérateur ou congélateur",
+    issueSubject_washing_machine: "le lave-linge",
+    issueSubject_dryer: "le sèche-linge",
+    issueSubject_hob: "la plaque de cuisson",
+    issueSubject_extractor: "la hotte",
+    issueSubject_kitchen: "la cuisine",
+    generalClarifyLead: "Pour aller plus vite, laquelle de ces options correspond le mieux ?",
+    generalClarifyApplianceIntro: "",
+    generalClarifyApplianceIntroWithSubject: "Je suis désolé que vous ayez un problème avec {subject}.",
+    generalClarifyKitchenIntro: "Je suis désolé qu'il y ait un problème dans la cuisine.",
+    generalClarifyGenericIntro: "Je suis désolé que vous rencontriez ce problème.",
+    generalClarifyApplianceDetail: "Si possible, précisez ce que fait l'appareil ou si un code erreur s'affiche.",
+    generalClarifyGenericDetail: "Si possible, indiquez aussi l'objet ou la zone concerné(e).",
+    generalClarifyApplianceOpt1: "Il ne s'allume pas ou ne fonctionne pas du tout.",
+    generalClarifyApplianceOpt2: "Il ne chauffe pas, ne refroidit pas ou ne vidange pas correctement.",
+    generalClarifyApplianceOpt3: "Il fuit, fait un bruit inhabituel ou sent mauvais.",
+    generalClarifyApplianceOpt4: "Un code erreur s'affiche.",
+    generalClarifyApplianceOpt5: "Il y a des dommages visibles ou autre chose ne va pas.",
+    generalClarifyKitchenOpt1: "Un appareil ne fonctionne pas.",
+    generalClarifyKitchenOpt2: "Il y a une fuite ou un problème d'eau.",
+    generalClarifyKitchenOpt3: "Évier, robinet ou évacuation bouché(s) ou endommagé(s).",
+    generalClarifyKitchenOpt4: "Il y a un problème d'électricité ou d'éclairage.",
+    generalClarifyKitchenOpt5: "Quelque chose est cassé ou endommagé.",
+    dishwasherClarifyIntro: "Je suis désolé que vous ayez un problème avec le lave-vaisselle.",
+    dishwasherClarifyLead: "Pour aller plus vite, laquelle de ces options correspond le mieux ?",
+    dishwasherOptionNotHeating: "Il ne chauffe pas ou l'eau reste froide.",
+    dishwasherOptionNoWater: "Il n'arrive pas à prendre l'eau.",
+    dishwasherOptionNotDraining: "Il ne vidange pas.",
+    dishwasherOptionLeakPump: "Il fuit, pompe en continu ou il peut y avoir de l'eau dans le bac inférieur.",
+    dishwasherOptionCode: "Un code erreur s'affiche.",
+    dishwasherDetailPrompt: "Si possible, indiquez le code erreur ou ce que fait le lave-vaisselle.",
+    dishwasherCodeAsk: "Je peux vous aider. Quel code erreur s'affiche ?",
+    dishwasherCodeListIntro: "Codes fréquents des lave-vaisselle architecto :",
+    dishwasherCodeOutro: "Indiquez le code et je vous donnerai les bonnes étapes et une formulation pour le formulaire.",
+    generalLeakIntro: "Cela ressemble à une fuite près de {subject}.",
+    generalLeakStep1: "Si c'est sûr, évitez d'utiliser l'évier ou le raccord concerné pour l'instant.",
+    generalLeakStep2: "Vérifiez si l'eau vient de la canalisation, de l'évacuation ou du raccord du robinet.",
+    generalLeakStep3: "Épongez l'eau stagnante pour limiter les dégâts.",
+    generalLeakStep4: "Prenez une photo de la fuite ou de la zone humide si possible.",
+    generalLeakClaim1: "Indiquez où se trouve la fuite et joignez une photo si possible.",
+    generalLeakDescription:
+      "Il y a une fuite d'eau dans la zone concernée. La surface est humide; l'eau peut venir de la canalisation, de l'évacuation ou du raccord. Veuillez organiser une inspection ou une réparation.",
+    generalDrainageIntro: "Cela ressemble à un bouchon ou un problème d'évacuation près de {subject}.",
+    generalDrainageStep1: "N'utilisez pas l'évier ou l'évacuation si l'eau remonte.",
+    generalDrainageStep2: "Vérifiez si le bouchon est total ou si l'eau s'écoule lentement.",
+    generalDrainageStep3: "Retirez l'eau stagnante si c'est sans danger.",
+    generalDrainageStep4: "Prenez une photo si le bouchon ou le débordement est visible.",
+    generalDrainageClaim1:
+      "Indiquez que l'évier ou l'évacuation est bouché ou ne vidange pas correctement, et joignez une photo si possible.",
+    generalDrainageDescription:
+      "L'évier ou l'évacuation est bouché ou ne vidange pas correctement. L'eau peut s'écouler lentement ou remonter. Veuillez organiser une vérification ou une réparation.",
+    generalElectricalIntro: "Cela ressemble à un problème électrique ou d'éclairage avec {subject}.",
+    generalElectricalStep1: "Si c'est sans danger, n'utilisez pas pour l'instant la lumière, l'interrupteur ou la prise concerné(e).",
+    generalElectricalStep2: "Vérifiez si un seul point ou toute la zone est concerné(e).",
+    generalElectricalStep3: "Notez tout scintillement, coupure de courant ou fusible déclenché.",
+    generalElectricalStep4: "Prenez une photo en cas de dommage visible.",
+    generalElectricalClaim1:
+      "Mentionnez la zone concernée et si le problème est une absence de courant, un scintillement ou un dommage visible.",
+    generalElectricalDescription:
+      "Il y a un problème électrique ou d'éclairage dans la zone concernée. Faites contrôler l'installation ou organisez une réparation.",
+    generalDamageIntro: "Cela ressemble à un objet endommagé ou cassé dans {subject}.",
+    generalDamageStep1: "Prenez une photo nette de la pièce endommagée.",
+    generalDamageStep2: "Notez si l'objet est encore utilisable ou ne fonctionne plus correctement.",
+    generalDamageStep3: "N'insistez pas sur les pièces mobiles si elles sont bloquées ou desserrées.",
+    generalDamageClaim1: "Indiquez ce qui est cassé ou endommagé et joignez une photo si possible.",
+    generalDamageDescription:
+      "Il y a un dommage visible sur l'objet concerné. Faites inspecter et indiquez la suite ou organisez une réparation.",
+    applianceChoiceIntro: "Quel appareil ne fonctionne pas ?",
+    applianceChoiceDishwasher: "Lave-vaisselle",
+    applianceChoiceOven: "Four",
+    applianceChoiceFridge: "Réfrigérateur ou congélateur",
+    applianceChoiceWasher: "Lave-linge ou sèche-linge",
+    applianceChoiceHob: "Table de cuisson ou cuisinière",
+    applianceChoiceHood: "Hotte aspirante",
+    applianceChoiceOther: "Un autre appareil",
+    claimFormTrySteps: "Vous pouvez essayer",
+    claimFormForForm: "Pour le formulaire",
+    claimFormSuggestedDescription: "Description du problème suggérée",
+    claimFormHelpClosing: "Si besoin, je peux aussi proposer une formulation pour le formulaire.",
+    claimFormHelpAction: "Afficher l'aide pour le formulaire",
+    claimFormNextStep: "Si le problème continue, vous pouvez créer une réclamation.",
+    claimFormDamageStepsTitle: "Indiquez l'objet ou la zone concerné(e), par exemple",
+    claimFormCopyOutro:
+      "Vous pouvez copier ceci dans le formulaire. Si quelque chose change ou si un code erreur apparaît, indiquez-le aussi.",
+    waterInletOutro: "Vous pouvez copier ce texte dans le formulaire. Si un code erreur apparaît, ajoutez-le aussi.",
+    knowledgeIntroStart: "Cela ressemble à ",
+    knowledgeCodeExplicit: " et correspond au code erreur {code} sur les lave-vaisselle architecto.",
+    knowledgeCodeImplicit: ", souvent lié au code erreur {code} sur les lave-vaisselle architecto.",
+    dishwasherProblemPhrase: "problème de lave-vaisselle",
+    dishwasherSuggestFallback:
+      "Mon lave-vaisselle architecto ne fonctionne pas correctement. Merci de vérifier l'appareil et de m'indiquer la suite.",
+    dishwasherSuggestWithIssue:
+      "Mon lave-vaisselle architecto présente le problème suivant : {issue}. Merci de vérifier l'appareil et de m'indiquer la suite.",
   },
   ru: {
     greetingReply: "Здравствуйте. Я могу помочь с рекламацией.",
@@ -303,6 +805,106 @@ const COPY = {
     knowledgeCausesTitle: "Возможная причина",
     knowledgeActionsTitle: "Срочные действия",
     knowledgeGeneralCode: "Код",
+    issueSubject_appliance: "приборе",
+    issueSubject_leak: "протечке",
+    issueSubject_sink_or_drain: "мойке или сливе",
+    issueSubject_electrical_issue: "проблеме с электрикой",
+    issueSubject_this: "этой ситуации",
+    issueSubject_sink_area: "зоне мойки",
+    issueSubject_blockage: "засоре",
+    issueSubject_lighting: "освещении",
+    issueSubject_oven: "духовке",
+    issueSubject_fridge_or_freezer: "холодильнике или морозильнике",
+    issueSubject_washing_machine: "стиральной машине",
+    issueSubject_dryer: "сушильной машине",
+    issueSubject_hob: "варочной панели",
+    issueSubject_extractor: "вытяжке",
+    issueSubject_kitchen: "кухне",
+    generalClarifyLead: "Чтобы я мог помочь быстрее, что подходит больше всего?",
+    generalClarifyApplianceIntro: "",
+    generalClarifyApplianceIntroWithSubject: "Сожалею, что у вас проблема с {subject}.",
+    generalClarifyKitchenIntro: "Сожалею, что на кухне возникла проблема.",
+    generalClarifyGenericIntro: "Сожалею, что у вас эта проблема.",
+    generalClarifyApplianceDetail: "Если можете, опишите, что делает прибор, или указан ли код ошибки.",
+    generalClarifyGenericDetail: "Если можете, укажите предмет или зону, которые затронуты.",
+    generalClarifyApplianceOpt1: "Не включается или совсем не работает.",
+    generalClarifyApplianceOpt2: "Не греет, не охлаждает или плохо сливает воду.",
+    generalClarifyApplianceOpt3: "Протекает, странно шумит или необычно пахнет.",
+    generalClarifyApplianceOpt4: "На дисплее показывается код ошибки.",
+    generalClarifyApplianceOpt5: "Есть видимые повреждения или что-то ещё не так.",
+    generalClarifyKitchenOpt1: "Не работает какой-то прибор.",
+    generalClarifyKitchenOpt2: "Есть протечка или проблема с водой.",
+    generalClarifyKitchenOpt3: "Мойка, кран или слив забиты или повреждены.",
+    generalClarifyKitchenOpt4: "Проблема с электрикой или освещением.",
+    generalClarifyKitchenOpt5: "Что-то сломано или повреждено.",
+    dishwasherClarifyIntro: "Сожалею, что у вас проблема с посудомоечной машиной.",
+    dishwasherClarifyLead: "Чтобы я мог помочь быстрее, что подходит больше всего?",
+    dishwasherOptionNotHeating: "Не нагревает воду или вода остаётся холодной.",
+    dishwasherOptionNoWater: "Не набирает воду.",
+    dishwasherOptionNotDraining: "Не сливает воду.",
+    dishwasherOptionLeakPump: "Протекает, постоянно качает или в поддоне может быть вода.",
+    dishwasherOptionCode: "На дисплее показывается код ошибки.",
+    dishwasherDetailPrompt: "Если можете, укажите код ошибки или опишите поведение машины.",
+    dishwasherCodeAsk: "Могу помочь. Какой код ошибки отображается?",
+    dishwasherCodeListIntro: "Частые коды посудомоечных машин architecto:",
+    dishwasherCodeOutro: "Напишите код, и я подскажу шаги и формулировку для формы.",
+    generalLeakIntro: "Похоже на протечку возле {subject}.",
+    generalLeakStep1: "Если безопасно, временно не пользуйтесь затронутой мойкой или узлом.",
+    generalLeakStep2: "Проверьте, идёт ли вода из трубы, слива или соединения крана.",
+    generalLeakStep3: "Уберите лужи, чтобы снизить повреждения.",
+    generalLeakStep4: "По возможности сфотографируйте протечку или мокрую зону.",
+    generalLeakClaim1: "Укажите, где протекает, и по возможности приложите фото.",
+    generalLeakDescription:
+      "В затронутой зоне протечка воды. Поверхность мокрая; вода может идти из трубы, слива или соединения. Организуйте осмотр или ремонт.",
+    generalDrainageIntro: "Похоже на засор или проблему со сливом возле {subject}.",
+    generalDrainageStep1: "Если вода поднимается, не пользуйтесь мойкой или сливом.",
+    generalDrainageStep2: "Проверьте, полный ли засор или вода уходит медленно.",
+    generalDrainageStep3: "Если безопасно, удалите стоячую воду.",
+    generalDrainageStep4: "Сфотографируйте засор или перелив, если это видно.",
+    generalDrainageClaim1: "Укажите, что мойка или слив забиты или плохо уходят, и приложите фото по возможности.",
+    generalDrainageDescription:
+      "Мойка или слив забиты или плохо уходят. Вода может уходить медленно или подниматься обратно. Организуйте проверку или ремонт.",
+    generalElectricalIntro: "Похоже на проблему с электрикой или освещением у {subject}.",
+    generalElectricalStep1: "Если безопасно, временно не пользуйтесь затронутым светильником, выключателем или розеткой.",
+    generalElectricalStep2: "Проверьте, один ли элемент не работает или вся зона.",
+    generalElectricalStep3: "Отметьте мерцание, отсутствие питания или сработавший автомат.",
+    generalElectricalStep4: "Сфотографируйте видимые повреждения.",
+    generalElectricalClaim1: "Укажите зону и есть ли отсутствие питания, мерцание или видимые повреждения.",
+    generalElectricalDescription:
+      "В затронутой зоне проблема с электрикой или освещением. Проверьте подключение или организуйте ремонт.",
+    generalDamageIntro: "Похоже на повреждённый предмет в {subject}.",
+    generalDamageStep1: "Сделайте чёткое фото повреждённого места.",
+    generalDamageStep2: "Отметьте, можно ли ещё пользоваться предметом или он работает неправильно.",
+    generalDamageStep3: "Не прилагайте силу к подвижным частям, если они заклинили или болтаются.",
+    generalDamageClaim1: "Укажите, что сломано или повреждено, и по возможности приложите фото.",
+    generalDamageDescription:
+      "На затронутом предмете есть видимые повреждения. Организуйте осмотр или ремонт.",
+    applianceChoiceIntro: "Какой прибор не работает?",
+    applianceChoiceDishwasher: "Посудомоечная машина",
+    applianceChoiceOven: "Духовка",
+    applianceChoiceFridge: "Холодильник или морозильник",
+    applianceChoiceWasher: "Стиральная или сушильная машина",
+    applianceChoiceHob: "Варочная панель или плита",
+    applianceChoiceHood: "Вытяжка",
+    applianceChoiceOther: "Другой прибор",
+    claimFormTrySteps: "Можно попробовать",
+    claimFormForForm: "Для формы",
+    claimFormSuggestedDescription: "Предлагаемое описание проблемы",
+    claimFormHelpClosing: "При необходимости могу предложить формулировку для формы.",
+    claimFormHelpAction: "Показать подсказку по форме",
+    claimFormNextStep: "Если проблема сохранится, можно создать рекламацию.",
+    claimFormDamageStepsTitle: "Укажите затронутый предмет или зону, например",
+    claimFormCopyOutro:
+      "Можно скопировать это в форму. Если что-то изменится или появится код ошибки, тоже укажите.",
+    waterInletOutro: "Скопируйте текст в форму. Если появляется код ошибки, укажите и его.",
+    knowledgeIntroStart: "Похоже на ",
+    knowledgeCodeExplicit: " и соответствует коду ошибки {code} у посудомоечных машин architecto.",
+    knowledgeCodeImplicit: ", часто связанный с кодом ошибки {code} у посудомоечных машин architecto.",
+    dishwasherProblemPhrase: "проблему с посудомоечной машиной",
+    dishwasherSuggestFallback:
+      "Моя посудомоечная машина architecto работает неправильно. Пожалуйста, проверьте прибор и сообщите следующий шаг.",
+    dishwasherSuggestWithIssue:
+      "У моей посудомоечной машины architecto такая проблема: {issue}. Пожалуйста, проверьте прибор и сообщите следующий шаг.",
   },
 };
 
@@ -535,6 +1137,19 @@ function t(language) {
   return COPY[language] || COPY.en;
 }
 
+function issueSubjectLabel(copy, subjectKey) {
+  const key = `issueSubject_${subjectKey}`;
+  return copy[key] || copy.issueSubject_this || "";
+}
+
+function applySubjectTemplate(text, copy, subjectKey) {
+  const normalized = normalizeText(text);
+  if (!normalized.includes("{subject}")) {
+    return normalized;
+  }
+  return normalized.replace("{subject}", issueSubjectLabel(copy, subjectKey));
+}
+
 function copyText(copy, key) {
   return copy[key] || COPY.en[key] || "";
 }
@@ -710,8 +1325,9 @@ function buildDishwasherGuideForMatch(match, language) {
 
 function formatDishwasherIssueSummary(guide, language) {
   const title = normalizeText(guide?.title);
+  const copy = t(language);
   if (!title) {
-    return language === "de" ? "Problem mit dem Geschirrspüler" : "dishwasher problem";
+    return copy.dishwasherProblemPhrase;
   }
   if (language === "de") return title;
   return title.charAt(0).toLowerCase() + title.slice(1);
@@ -736,6 +1352,15 @@ function isGreeting(question) {
     "hello",
     "hey",
     "hallo",
+    "hola",
+    "buenos dias",
+    "buenas",
+    "merhaba",
+    "salut",
+    "bonjour",
+    "coucou",
+    "privet",
+    "zdrazvstvuyte",
     "servus",
     "guten tag",
     "good morning",
@@ -889,74 +1514,66 @@ function classifyGeneralIssue({ question, claim, selectedAreas, conversationMess
   const hasDamage = /\bbroken|damaged|scratch|scratched|crack|hinge|drawer|door|window|furniture|cabinet|tap|sink|drain|kaputt|beschadigt|beschädigt/i.test(haystack);
 
   if (structuredChoice === "appliance_choice") {
-    return { subject: "the appliance", type: "appliance_choice", specific: false };
+    return { subjectKey: "appliance", type: "appliance_choice", specific: false };
   }
   if (structuredChoice === "leak_choice") {
-    return { subject: "the leak", type: "leak", specific: true };
+    return { subjectKey: "leak", type: "leak", specific: true };
   }
   if (structuredChoice === "drainage_choice") {
-    return { subject: "the sink or drain", type: "drainage", specific: true };
+    return { subjectKey: "sink_or_drain", type: "drainage", specific: true };
   }
   if (structuredChoice === "electrical_choice") {
-    return { subject: "the electrical issue", type: "electrical", specific: true };
+    return { subjectKey: "electrical_issue", type: "electrical", specific: true };
   }
   if (structuredChoice === "damage_choice") {
-    return { subject: "this", type: "damage_choice", specific: false };
+    return { subjectKey: "this", type: "damage_choice", specific: false };
   }
 
   if (hasLeak) {
     return {
-      subject: /sink/i.test(haystack) ? "the sink area" : "the leak",
+      subjectKey: /sink/i.test(haystack) ? "sink_area" : "leak",
       type: "leak",
       specific: true,
     };
   }
   if (hasDrainage) {
     return {
-      subject: /sink|drain|tap/i.test(haystack) ? "the sink or drain" : "the blockage",
+      subjectKey: /sink|drain|tap/i.test(haystack) ? "sink_or_drain" : "blockage",
       type: "drainage",
       specific: true,
     };
   }
   if (hasElectrical) {
     return {
-      subject: /light|lighting|lamp/i.test(haystack) ? "the lighting" : "the electrical issue",
+      subjectKey: /light|lighting|lamp/i.test(haystack) ? "lighting" : "electrical_issue",
       type: "electrical",
       specific: true,
     };
   }
   if (hasAppliance) {
-    return {
-      subject: /oven|backofen/i.test(haystack)
-        ? "the oven"
-        : /fridge|refrigerator|freezer/i.test(haystack)
-          ? "the fridge or freezer"
-          : /washing machine/i.test(haystack)
-            ? "the washing machine"
-            : /dryer/i.test(haystack)
-              ? "the dryer"
-              : /hob|cooktop/i.test(haystack)
-                ? "the hob"
-                : /extractor|hood/i.test(haystack)
-                  ? "the extractor"
-                  : "the appliance",
-      type: "appliance_vague",
-      specific: false,
-    };
+    let subjectKey = "appliance";
+    if (/oven|backofen/i.test(haystack)) subjectKey = "oven";
+    else if (/fridge|refrigerator|freezer/i.test(haystack)) subjectKey = "fridge_or_freezer";
+    else if (/washing machine/i.test(haystack)) subjectKey = "washing_machine";
+    else if (/dryer/i.test(haystack)) subjectKey = "dryer";
+    else if (/hob|cooktop/i.test(haystack)) subjectKey = "hob";
+    else if (/extractor|hood/i.test(haystack)) subjectKey = "extractor";
+    return { subjectKey, type: "appliance_vague", specific: false };
   }
   if (hasKitchenArea || hasDamage) {
     const isVagueDamage = /etwas ist kaputt|ich habe ein problem|es funktioniert nicht|in der kuche ist etwas kaputt|in der küche ist etwas kaputt/i.test(
       haystack,
     );
+    const isKitchen = /kitchen/i.test(haystack);
     return {
-      subject: /kitchen/i.test(haystack) ? "the kitchen" : "this",
+      subjectKey: isKitchen ? "kitchen" : "this",
       type: hasDamage && !isVagueDamage ? "damage" : "area_vague",
       specific: hasDamage && !isVagueDamage && !/something is broken|problem in the kitchen|need help with maintenance/i.test(haystack),
     };
   }
 
   return {
-    subject: "this",
+    subjectKey: "this",
     type: "generic_vague",
     specific: false,
   };
@@ -1037,28 +1654,25 @@ function formatQuotedBlock(title, text) {
 }
 
 function getClaimFormHelpClosingSentence(language) {
-  return language === "de"
-    ? "Wenn Sie möchten, kann ich Ihnen auch eine passende Formulierung für das Formular geben."
-    : "I can also give you wording for the claim form if needed.";
+  return t(language).claimFormHelpClosing;
 }
 
 function buildClaimFormHelpActions(language) {
-  const label = language === "de" ? "Formularhilfe anzeigen" : "Show claim-form help";
+  const label = t(language).claimFormHelpAction;
   return [{ id: "claim_form_help", label, prompt: label }];
 }
 
 function getClaimFormNextStep(language) {
-  return language === "de"
-    ? "Falls das Problem weiterhin besteht, können Sie eine Reklamation erstellen."
-    : "If the issue continues, you can create a claim.";
+  return t(language).claimFormNextStep;
 }
 
 function buildCompactSupportAnswer({ language, intro, stepsTitle, steps }) {
+  const copy = t(language);
   const answer = [
     intro,
-    formatSection(stepsTitle || (language === "de" ? "Sie können Folgendes prüfen" : "You can try"), steps || []),
-    getClaimFormNextStep(language),
-    getClaimFormHelpClosingSentence(language),
+    formatSection(stepsTitle || copy.claimFormTrySteps, steps || []),
+    copy.claimFormNextStep,
+    copy.claimFormHelpClosing,
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -1076,10 +1690,11 @@ function normalizeAssistantReturn(value) {
 }
 
 function buildClaimFormHelpAnswer({ language, claimGuidance, description }) {
+  const copy = t(language);
   const normalizedDescription = normalizeText(description);
   const answer = [
-    formatSection(language === "de" ? "Für das Schadensformular" : "For the claim form", claimGuidance || []),
-    formatQuotedBlock(language === "de" ? "Vorschlag für die Beschreibung" : "Suggested problem description", normalizedDescription),
+    formatSection(copy.claimFormForForm, claimGuidance || []),
+    formatQuotedBlock(copy.claimFormSuggestedDescription, normalizedDescription),
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -1431,7 +2046,13 @@ function buildKnowledgeAnswerLegacy({ language, question, context, selectedAreas
 
   const issueSummary = getIssueSummaryKeyLegacy(topMatch.titleKey);
   const explicitCodeMentioned = arrayValue(dishwasherContext.explicitErrorCodes).includes(normalizeCode(topMatch.code));
-  const intro = `This sounds like a ${issueSummary}${topMatch.code ? explicitCodeMentioned ? ` and matches error code ${normalizeCode(topMatch.code)} on architecto dishwashers.` : `, often linked to error code ${normalizeCode(topMatch.code)} on architecto dishwashers.` : "."}`;
+  const intro = topMatch.code
+    ? `${copy.knowledgeIntroStart}${issueSummary}${
+        explicitCodeMentioned
+          ? copy.knowledgeCodeExplicit.replace("{code}", normalizeCode(topMatch.code))
+          : copy.knowledgeCodeImplicit.replace("{code}", normalizeCode(topMatch.code))
+      }`
+    : `${copy.knowledgeIntroStart}${issueSummary}.`;
   const troubleshootingActions = translateKnowledgeList(
     getRelevantImmediateActionKeys(topMatch.titleKey, dishwasherContext, matches),
     language,
@@ -1442,11 +2063,10 @@ function buildKnowledgeAnswerLegacy({ language, question, context, selectedAreas
     topMatch.titleKey === "water_inlet"
       ? getWaterInletResponseCopy(language, topMatch.code).actions
       : troubleshootingActions;
-  const outro = topMatch.titleKey === "water_inlet"
-    ? "You can copy this into the claim form. If an error code appears, include it too."
-    : "You can copy this into the claim form. If anything changes or an error code appears, include that too.";
+  const outro = topMatch.titleKey === "water_inlet" ? copy.waterInletOutro : copy.claimFormCopyOutro;
 
   return buildSpecificSupportAnswer({
+    language,
     intro,
     steps: displayedActions,
     claimGuidance,
@@ -1463,83 +2083,64 @@ function getIssueSummaryKeyByLanguage(titleKey, language) {
 }
 
 function buildClarifyingAnswer({ intro, lead, options, detailPrompt }) {
-  return [
+  const segments = [
     intro,
-    lead == null ? "To help you faster, which of these fits best?" : lead,
+    lead,
     options.map((item) => `- ${item}`).join("\n"),
     detailPrompt,
-  ].join("\n\n");
+  ].filter((segment) => normalizeText(segment) !== "");
+  return segments.join("\n\n");
 }
 
-function buildSpecificSupportAnswer({ intro, stepsTitle, steps, claimTitle, claimGuidance, descriptionTitle, description, outro }) {
+function buildSpecificSupportAnswer({ language, intro, stepsTitle, steps, claimTitle, claimGuidance, descriptionTitle, description, outro }) {
+  const copy = t(language);
   return [
     intro,
-    formatSection(stepsTitle || "You can try", steps),
-    formatSection(claimTitle || "For the claim form", claimGuidance),
-    formatQuotedBlock(descriptionTitle || "Suggested problem description", description),
-    outro == null ? "You can copy this into the claim form. If anything changes or you see an error code, include that too." : outro,
+    formatSection(stepsTitle || copy.claimFormTrySteps, steps),
+    formatSection(claimTitle || copy.claimFormForForm, claimGuidance),
+    formatQuotedBlock(descriptionTitle || copy.claimFormSuggestedDescription, description),
+    outro == null ? copy.claimFormCopyOutro : outro,
   ]
     .filter(Boolean)
     .join("\n\n");
 }
 
 function buildGeneralClarifyingAnswer(context, language) {
-  if (language === "de") {
-    if (context.type === "appliance_vague") {
-      return buildClarifyingAnswer({
-        intro: "Es tut mir leid, dass Sie Probleme mit einem Gerät haben.",
-        lead: "Damit ich schneller helfen kann: Was passt am besten?",
-        options: [
-          "Es schaltet sich nicht ein oder funktioniert gar nicht.",
-          "Es heizt, kühlt oder pumpt nicht richtig.",
-          "Es ist undicht, macht ungewöhnliche Geräusche oder riecht ungewöhnlich.",
-          "Auf dem Display wird ein Fehlercode angezeigt.",
-          "Es gibt einen sichtbaren Schaden oder etwas anderes stimmt nicht.",
-        ],
-        detailPrompt: "Wenn möglich, beschreiben Sie bitte auch, was das Gerät genau macht oder ob ein Fehlercode angezeigt wird.",
-      });
-    }
-
-    return buildClarifyingAnswer({
-      intro: context.subject === "the kitchen" ? "Es tut mir leid, dass es in der Küche ein Problem gibt." : "Es tut mir leid, dass Sie Probleme damit haben.",
-      lead: "Damit ich schneller helfen kann: Was passt am besten?",
-      options: [
-        "Ein Gerät funktioniert nicht.",
-        "Es gibt ein Leck oder ein Wasserproblem.",
-        "Spüle, Wasserhahn oder Abfluss ist verstopft oder beschädigt.",
-        "Es gibt ein Problem mit Strom oder Beleuchtung.",
-        "Etwas ist kaputt oder beschädigt.",
-      ],
-      detailPrompt: "Wenn möglich, nennen Sie bitte auch den betroffenen Gegenstand oder Bereich.",
-    });
-  }
+  const copy = t(language);
+  const applianceIntro =
+    language === "de"
+      ? copy.generalClarifyApplianceIntro
+      : applySubjectTemplate(copy.generalClarifyApplianceIntroWithSubject, copy, context.subjectKey);
 
   if (context.type === "appliance_vague") {
     return buildClarifyingAnswer({
-      intro: `I'm sorry you're having trouble with ${context.subject}.`,
-      lead: "To help you faster, which of these fits best?",
+      intro: applianceIntro,
+      lead: copy.generalClarifyLead,
       options: [
-        "It is not turning on or not working at all.",
-        "It is not heating, cooling, or draining properly.",
-        "It is leaking, making unusual noise, or smells unusual.",
-        "It shows an error code on the display.",
-        "There is visible damage or something else is wrong.",
+        copy.generalClarifyApplianceOpt1,
+        copy.generalClarifyApplianceOpt2,
+        copy.generalClarifyApplianceOpt3,
+        copy.generalClarifyApplianceOpt4,
+        copy.generalClarifyApplianceOpt5,
       ],
-      detailPrompt: "If you can, also tell me what the appliance is doing or whether an error code is shown.",
+      detailPrompt: copy.generalClarifyApplianceDetail,
     });
   }
 
+  const genericIntro =
+    context.subjectKey === "kitchen" ? copy.generalClarifyKitchenIntro : copy.generalClarifyGenericIntro;
+
   return buildClarifyingAnswer({
-    intro: context.subject === "the kitchen" ? "I'm sorry you're having trouble in the kitchen." : "I'm sorry you're having trouble with this.",
-    lead: "To help you faster, which of these fits best?",
+    intro: genericIntro,
+    lead: copy.generalClarifyLead,
     options: [
-      "An appliance is not working.",
-      "There is a leak or water issue.",
-      "A sink, tap, or drain is blocked or damaged.",
-      "There is an electrical or lighting issue.",
-      "Something is broken or damaged.",
+      copy.generalClarifyKitchenOpt1,
+      copy.generalClarifyKitchenOpt2,
+      copy.generalClarifyKitchenOpt3,
+      copy.generalClarifyKitchenOpt4,
+      copy.generalClarifyKitchenOpt5,
     ],
-    detailPrompt: "If you can, also tell me which item or area is affected.",
+    detailPrompt: copy.generalClarifyGenericDetail,
   });
 }
 
@@ -1636,62 +2237,66 @@ function getGeneralSpecificSupportData(context, language) {
     return null;
   }
 
+  const copy = t(language);
+
+  if (context.type === "appliance_choice") {
+    return {
+      intro: copy.applianceChoiceIntro,
+      options: [
+        copy.applianceChoiceDishwasher,
+        copy.applianceChoiceOven,
+        copy.applianceChoiceFridge,
+        copy.applianceChoiceWasher,
+        copy.applianceChoiceHob,
+        copy.applianceChoiceHood,
+        copy.applianceChoiceOther,
+      ],
+    };
+  }
+
   if (context.type === "leak") {
     return {
-      intro: `This sounds like a leak around ${context.subject}.`,
-      steps: [
-        "If safe, stop using the affected sink or fitting for now.",
-        "Check whether the water is coming from the pipe, drain, or tap connection.",
-        "Wipe up standing water to limit further damage.",
-        "Take a photo of the leak or wet area if possible.",
-      ],
-      claimGuidance: ["Mention where the leak is and attach a photo if possible."],
-      description:
-        "There is water leaking in the affected area. The surface underneath is wet, and the leak may be coming from the pipe, drain, or connection. Please arrange an inspection or repair.",
+      intro: applySubjectTemplate(copy.generalLeakIntro, copy, context.subjectKey),
+      steps: [copy.generalLeakStep1, copy.generalLeakStep2, copy.generalLeakStep3, copy.generalLeakStep4],
+      claimGuidance: [copy.generalLeakClaim1],
+      description: copy.generalLeakDescription,
     };
   }
 
   if (context.type === "drainage") {
     return {
-      intro: `This sounds like a blockage or drainage problem around ${context.subject}.`,
+      intro: applySubjectTemplate(copy.generalDrainageIntro, copy, context.subjectKey),
       steps: [
-        "Stop using the sink or drain if water is backing up.",
-        "Check whether the blockage is complete or only draining slowly.",
-        "Remove standing water if it is safe to do so.",
-        "Take a photo if the blockage or overflow is visible.",
+        copy.generalDrainageStep1,
+        copy.generalDrainageStep2,
+        copy.generalDrainageStep3,
+        copy.generalDrainageStep4,
       ],
-      claimGuidance: ["Mention that the sink or drain is blocked or not draining properly, and include a photo if possible."],
-      description:
-        "The sink or drain is blocked or not draining properly. Water may be draining slowly or backing up. Please arrange a check or repair.",
+      claimGuidance: [copy.generalDrainageClaim1],
+      description: copy.generalDrainageDescription,
     };
   }
 
   if (context.type === "electrical") {
     return {
-      intro: `This sounds like an electrical or lighting issue with ${context.subject}.`,
+      intro: applySubjectTemplate(copy.generalElectricalIntro, copy, context.subjectKey),
       steps: [
-        "If safe, stop using the affected light, switch, or socket for now.",
-        "Check whether only one fitting is affected or the whole area.",
-        "Note any flickering, loss of power, or tripped fuse.",
-        "Take a photo if there is visible damage.",
+        copy.generalElectricalStep1,
+        copy.generalElectricalStep2,
+        copy.generalElectricalStep3,
+        copy.generalElectricalStep4,
       ],
-      claimGuidance: ["Mention the affected area and whether the issue is no power, flickering, or visible damage."],
-      description:
-        "There is an electrical or lighting issue in the affected area. Please check the fitting and advise on the next step or arrange a repair.",
+      claimGuidance: [copy.generalElectricalClaim1],
+      description: copy.generalElectricalDescription,
     };
   }
 
   if (context.type === "damage") {
     return {
-      intro: `This sounds like a damaged or broken item in ${context.subject}.`,
-      steps: [
-        "Take a clear photo of the damaged part.",
-        "Note whether the item is still usable or no longer works properly.",
-        "Avoid forcing moving parts if they are stuck or loose.",
-      ],
-      claimGuidance: ["Mention what is broken or damaged and attach a photo if possible."],
-      description:
-        "There is visible damage to the affected item. Please inspect it and advise on the next step or arrange a repair.",
+      intro: applySubjectTemplate(copy.generalDamageIntro, copy, context.subjectKey),
+      steps: [copy.generalDamageStep1, copy.generalDamageStep2, copy.generalDamageStep3],
+      claimGuidance: [copy.generalDamageClaim1],
+      description: copy.generalDamageDescription,
     };
   }
 
@@ -1712,11 +2317,11 @@ function buildGeneralSpecificAnswer(context, language, formHelpOnly = false) {
   }
 
   if (context.type === "damage" || context.type === "damage_choice") {
+    const copy = t(language);
     return buildSpecificSupportAnswer({
+      language,
       intro: support.intro,
-      stepsTitle: language === "de"
-        ? "Bitte nennen Sie den betroffenen Gegenstand oder Bereich, zum Beispiel"
-        : "Please name the affected item or area, for example",
+      stepsTitle: copy.claimFormDamageStepsTitle,
       steps: support.steps,
       claimTitle: "",
       claimGuidance: [],
@@ -1742,62 +2347,38 @@ function buildGeneralSpecificAnswer(context, language, formHelpOnly = false) {
 }
 
 function buildDishwasherClarifyingAnswer(language) {
-  if (language === "de") {
-    return buildClarifyingAnswer({
-      intro: "Es tut mir leid, dass Sie Probleme mit der Spülmaschine haben.",
-      lead: "Damit ich schneller helfen kann: Was passt am besten?",
-      options: [
-        "Sie heizt nicht oder das Wasser bleibt kalt.",
-        "Sie zieht kein Wasser.",
-        "Sie pumpt nicht ab.",
-        "Sie ist undicht, pumpt dauerhaft oder es befindet sich Wasser in der Bodenwanne.",
-        "Auf dem Display wird ein Fehlercode angezeigt.",
-      ],
-      detailPrompt: "Wenn möglich, nennen Sie bitte auch den Fehlercode oder beschreiben Sie, was die Spülmaschine genau macht.",
-    });
-  }
-
+  const copy = t(language);
   return buildClarifyingAnswer({
-    intro: "I'm sorry you're having trouble with the dishwasher.",
-    lead: "To help you faster, which of these fits best?",
+    intro: copy.dishwasherClarifyIntro,
+    lead: copy.dishwasherClarifyLead,
     options: [
-      "It is not heating or the water stays cold.",
-      "It is not taking in water.",
-      "It is not draining.",
-      "It is leaking, keeps pumping, or there may be water in the base tray.",
-      "It shows an error code on the display.",
+      copy.dishwasherOptionNotHeating,
+      copy.dishwasherOptionNoWater,
+      copy.dishwasherOptionNotDraining,
+      copy.dishwasherOptionLeakPump,
+      copy.dishwasherOptionCode,
     ],
-    detailPrompt: "If you can, also tell me the error code or what the dishwasher is doing.",
+    detailPrompt: copy.dishwasherDetailPrompt,
   });
 }
 
 function buildDishwasherErrorCodePromptAnswer(language) {
+  const copy = t(language);
   const codeLines = buildDishwasherErrorCodeList(language);
-  if (language === "de") {
-    return [
-      "Ich helfe Ihnen gerne weiter. Welcher Fehlercode wird auf dem Display angezeigt?",
-      ["H\u00e4ufige architecto-Fehlercodes sind:", ...codeLines].join("\n"),
-      "Bitte nennen Sie mir den Fehlercode, dann gebe ich Ihnen die passenden Schritte und eine Formulierung f\u00fcr das Schadensformular.",
-    ].join("\n\n");
-  }
-
-  return [
-    "I can help with that. What error code is shown on the display?",
-    ["Common architecto dishwasher codes include:", ...codeLines].join("\n"),
-    "Please tell me the code, and I can give you the right troubleshooting steps and claim wording.",
-  ].join("\n\n");
+  return [copy.dishwasherCodeAsk, [copy.dishwasherCodeListIntro, ...codeLines].join("\n"), copy.dishwasherCodeOutro].join(
+    "\n\n",
+  );
 }
 
 function getWaterInletResponseCopy(language, code) {
+  const copy = t(language);
   const guide = buildDishwasherGuideForMatch({ code: code || "E1", titleKey: "water_inlet" }, language);
   return {
     whatItMeans: guide?.description ? [guide.description] : [],
     actions: guide?.troubleshootingSteps || [],
     claimGuidance: guide?.claimGuidance || [],
     suggestedDescription: guide?.suggestedDescription || "",
-    outro: language === "de"
-      ? "Sie k\u00f6nnen diesen Text in das Formular kopieren. Falls ein Fehlercode angezeigt wird, f\u00fcgen Sie ihn bitte hinzu."
-      : undefined,
+    outro: copy.waterInletOutro,
   };
 }
 
@@ -1807,18 +2388,15 @@ function buildClaimGuidanceItems(copy, claim, categories, selectedAreas, topMatc
 }
 
 function buildSuggestedProblemDescription(topMatch, context, language) {
+  const copy = t(language);
   const guide = buildDishwasherGuideForMatch(topMatch, language);
   if (guide?.suggestedDescription) return guide.suggestedDescription;
 
   const fallback = normalizeText(context.combinedText).replace(/\s+/g, " ");
   if (!fallback) {
-    return language === "de"
-      ? "Mein architecto-Geschirrsp\u00fcler funktioniert nicht richtig. Bitte pr\u00fcfen Sie das Ger\u00e4t und teilen Sie mir die n\u00e4chsten Schritte mit."
-      : "My architecto dishwasher is not working properly. Please check the appliance and advise on the next step.";
+    return copy.dishwasherSuggestFallback;
   }
-  return language === "de"
-    ? `Mein architecto-Geschirrsp\u00fcler hat folgendes Problem: ${fallback}. Bitte pr\u00fcfen Sie das Ger\u00e4t und teilen Sie mir die n\u00e4chsten Schritte mit.`
-    : `My architecto dishwasher has the following issue: ${fallback}. Please check the appliance and advise on the next step.`;
+  return copy.dishwasherSuggestWithIssue.replace("{issue}", fallback);
 }
 
 function buildKnowledgeAnswer({ language, question, context, selectedAreas, claim, matches, dishwasherContext }) {
@@ -1827,12 +2405,17 @@ function buildKnowledgeAnswer({ language, question, context, selectedAreas, clai
     return buildGenericAnswer({ language, question, context, selectedAreas, claim });
   }
 
+  const copy = t(language);
   const guide = buildDishwasherGuideForMatch(topMatch, language);
   const explicitCodeMentioned = arrayValue(dishwasherContext.explicitErrorCodes).includes(normalizeCode(topMatch.code));
   const issueSummary = formatDishwasherIssueSummary(guide, language);
-  const intro = language === "de"
-    ? `Das klingt nach einem ${issueSummary}${topMatch.code ? explicitCodeMentioned ? ", passend zu Fehlercode " + normalizeCode(topMatch.code) + " bei architecto-Geschirrsp\u00fclern." : ", h\u00e4ufig verbunden mit Fehlercode " + normalizeCode(topMatch.code) + " bei architecto-Geschirrsp\u00fclern." : "."}`
-    : `This sounds like a ${issueSummary}${topMatch.code ? explicitCodeMentioned ? " and matches error code " + normalizeCode(topMatch.code) + " on architecto dishwashers." : ", often linked to error code " + normalizeCode(topMatch.code) + " on architecto dishwashers." : "."}`;
+  const intro = topMatch.code
+    ? `${copy.knowledgeIntroStart}${issueSummary}${
+        explicitCodeMentioned
+          ? copy.knowledgeCodeExplicit.replace("{code}", normalizeCode(topMatch.code))
+          : copy.knowledgeCodeImplicit.replace("{code}", normalizeCode(topMatch.code))
+      }`
+    : `${copy.knowledgeIntroStart}${issueSummary}.`;
   const troubleshootingActions = guide?.troubleshootingSteps?.length
     ? guide.troubleshootingSteps
     : translateKnowledgeList(getRelevantImmediateActionKeys(topMatch.titleKey, dishwasherContext, matches), language).slice(0, 4);
