@@ -102,9 +102,10 @@ function ServiceAttachmentChips({
   collapseLabel = "View less",
 }) {
   const [expanded, setExpanded] = useState(false);
+  const collapsedVisibleCount = 2;
 
   useEffect(() => {
-    if (files.length <= 3) {
+    if (files.length <= collapsedVisibleCount) {
       setExpanded(false);
     }
   }, [files.length]);
@@ -112,9 +113,9 @@ function ServiceAttachmentChips({
   if (!files.length) {
     return null;
   }
-  const shouldCollapse = files.length > 3;
+  const shouldCollapse = files.length > collapsedVisibleCount;
   const indexedFiles = files.map((file, index) => ({ file, index }));
-  const visibleFiles = shouldCollapse && !expanded ? indexedFiles.slice(0, 3) : indexedFiles;
+  const visibleFiles = shouldCollapse && !expanded ? indexedFiles.slice(0, collapsedVisibleCount) : indexedFiles;
 
   return (
     <div className="service-attachments">
@@ -152,7 +153,7 @@ function ServiceAttachmentChips({
           className="service-attachments__toggle"
           onClick={() => setExpanded((current) => !current)}
         >
-          {expanded ? collapseLabel : `${expandLabel} (${files.length - 3})`}
+          {expanded ? collapseLabel : `${expandLabel} (${files.length - collapsedVisibleCount})`}
         </button>
       ) : null}
     </div>
