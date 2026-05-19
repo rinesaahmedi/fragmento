@@ -236,6 +236,15 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
     { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
   ],
+  "LIGHT-B-LED-001": [
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+  ],
+  "LIGHT-C-LED-001": [
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+  ],
+  "ACC-LIGHT-003": [
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+  ],
 };
 
 const PRODUCT_INFO_DISPLAY_OVERRIDES_BY_CODE = {
@@ -424,4 +433,13 @@ export function getCatalogDisplayItem(allItems, slug, item) {
 export function hasAssistantProductInfo(item) {
   const itemId = item?.productInfoItemId || item?.id;
   return Boolean(itemId && (item?.productInfoExtractedText || item?.productInfoSummary || item?.productInfoPdfPath));
+}
+
+export function shouldShowProductAssistantLauncher(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  if (code === "LIGHT-B-LED-001" || code === "LIGHT-C-LED-001" || code === "ACC-LIGHT-003") {
+    return false;
+  }
+
+  return hasAssistantProductInfo(item);
 }

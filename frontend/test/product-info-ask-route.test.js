@@ -397,8 +397,8 @@ test("POST keeps German answers polished across the same product-info paths as E
 
   const englishDimensions = await route.POST(request({ ...basePayload, language: "en", question: "What are the dimensions?" }));
   const germanDimensions = await route.POST(request({ ...basePayload, language: "de", question: "Welche Maße hat das Produkt?" }));
-  assert.match(englishDimensions.body.answer, /documented appliance or niche dimensions/);
-  assert.match(germanDimensions.body.answer, /Ich habe diese dokumentierten Geräte- oder Nischenmaße gefunden:/);
+  assert.match(englishDimensions.body.answer, /documented dimensions/);
+  assert.match(germanDimensions.body.answer, /Ich habe diese dokumentierten Geräte- oder Einbaumaße gefunden:/);
   assert.match(germanDimensions.body.answer, /Gerätemaße H x B x T/);
 
   const englishNoise = await route.POST(request({ ...basePayload, language: "en", question: "What is the noise level?" }));
@@ -575,12 +575,12 @@ test("POST keeps German consumption and energy intents aligned with English for 
 
   const englishDishwasherDimensions = await route.POST(request({ ...basePayload, language: "en", question: "What are the dishwasher dimensions?" }));
   assert.match(englishDishwasherDimensions.body.answer, /^I found these documented dimensions for the dishwasher:/);
-  assert.match(englishDishwasherDimensions.body.answer, /Dishwasher \(A-EGSPV597210\):/);
+  assert.match(englishDishwasherDimensions.body.answer, /- Dishwasher\n  Appliance: 815 × 598 × 550 mm\n  Installation: 820–870 × 600 × 580 mm/);
   assert.doesNotMatch(englishDishwasherDimensions.body.answer, /Built-in oven/);
 
   const englishFridgeDimensions = await route.POST(request({ ...basePayload, language: "en", question: "what are the fridge dimensions" }));
   assert.match(englishFridgeDimensions.body.answer, /^I found these documented dimensions for the refrigerator-freezer:/);
-  assert.match(englishFridgeDimensions.body.answer, /Refrigerator-freezer \(KGC 15495 S\):\n  Height: 180 cm/);
+  assert.match(englishFridgeDimensions.body.answer, /- Refrigerator-freezer: height 180 cm/);
   assert.doesNotMatch(englishFridgeDimensions.body.answer, /Dishwasher|Built-in oven/);
 });
 
@@ -893,8 +893,8 @@ test("POST answers common shorthand and misspellings for appliance facts", async
 
   const dimensions = await route.POST(request({ ...basePayload, question: "dimesnions" }));
   assert.equal(dimensions.status, 200);
-  assert.match(dimensions.body.answer, /^I found these documented appliance or niche dimensions:/);
-  assert.match(dimensions.body.answer, /Appliance dimensions H x W x D: 830 x 600 x 540 mm/);
+  assert.match(dimensions.body.answer, /^I found these documented dimensions:/);
+  assert.match(dimensions.body.answer, /- Washing machine: 830 × 600 × 540 mm/);
 
   const decibels = await route.POST(request({ ...basePayload, question: "decibels" }));
   assert.equal(decibels.status, 200);
@@ -977,7 +977,7 @@ test("POST understands short imperfect English product-topic questions", async (
 
   const dimensions = await route.POST(request({ ...basePayload, question: "how big is the dishwasher" }));
   assert.match(dimensions.body.answer, /^I found these documented dimensions for the dishwasher:/);
-  assert.match(dimensions.body.answer, /Dishwasher \(A-EGSPV597210\):/);
+  assert.match(dimensions.body.answer, /- Dishwasher: 815 × 598 × 550 mm/);
   assert.doesNotMatch(dimensions.body.answer, /Washing machine|Hob/);
 
   const programs = await route.POST(request({ ...basePayload, question: "programs?" }));
@@ -1130,7 +1130,7 @@ test("POST scopes fuzzy product aliases and typo topics to the intended applianc
     const response = await route.POST(request({ ...basePayload, language: "en", question }));
     assert.equal(response.status, 200);
     assert.match(response.body.answer, /^I found these documented dimensions for the refrigerator-freezer:/);
-    assert.match(response.body.answer, /Refrigerator-freezer \(KGC 15495 S\):\n  Height: 180 cm/);
+    assert.match(response.body.answer, /- Refrigerator-freezer: height 180 cm/);
     assert.doesNotMatch(response.body.answer, /Washing machine|Dishwasher|Extractor hood/);
   }
 
@@ -1145,7 +1145,7 @@ test("POST scopes fuzzy product aliases and typo topics to the intended applianc
 
   const washerDimensions = await route.POST(request({ ...basePayload, language: "en", question: "washer dimesnions" }));
   assert.match(washerDimensions.body.answer, /^I found these documented dimensions for the washing machine:/);
-  assert.match(washerDimensions.body.answer, /Washing machine \(EWA 34660 W\):/);
+  assert.match(washerDimensions.body.answer, /- Washing machine: 830 × 600 × 540 mm/);
   assert.doesNotMatch(washerDimensions.body.answer, /Refrigerator-freezer|Dishwasher|Extractor hood/);
 
   const dishwasherWater = await route.POST(request({ ...basePayload, language: "en", question: "dishwaser water" }));
@@ -1367,7 +1367,7 @@ test("POST follows general product-assistant intent rules", async () => {
 
   const dimensions = await route.POST(request({ ...basePayload, question: "What are the dishwasher dimensions?" }));
   assert.match(dimensions.body.answer, /^I found these documented dimensions for the dishwasher:/);
-  assert.match(dimensions.body.answer, /Dishwasher \(A-EGSPV597210\)/);
+  assert.match(dimensions.body.answer, /- Dishwasher: 815 × 598 × 550 mm/);
   assert.doesNotMatch(dimensions.body.answer, /Washing machine/);
 
   const energy = await route.POST(request({ ...basePayload, question: "What are the energy classes for all selected products?" }));
@@ -1537,7 +1537,7 @@ test("affirmative follow-up skips topics already answered in the conversation", 
     kitchenSlug: "demo-kitchen",
     itemIds: ["hood"],
     conversationMessages: [
-      { role: "assistant", text: "The documented noise values are:\n- Extractor hood (FH 664 621 S): max. 70 dB\n\nWould you like me to list the documented appliance or niche dimensions too?" },
+      { role: "assistant", text: "The documented noise values are:\n- Extractor hood (FH 664 621 S): max. 70 dB\n\nWould you like me to list the documented dimensions too?" },
       { role: "user", text: "energy class" },
       { role: "assistant", text: "Documented energy class:\n- Extractor hood (FH 664 621 S): energy class A\n\nWould you like me to list the documented consumption values too?" },
     ],
@@ -1546,7 +1546,7 @@ test("affirmative follow-up skips topics already answered in the conversation", 
   assert.equal(response.status, 200);
   assert.match(response.body.answer, /^Here are the documented consumption values from the product information:/);
   assert.doesNotMatch(response.body.answer, /documented noise values next/i);
-  assert.match(response.body.answer, /documented appliance or niche dimensions too/i);
+  assert.match(response.body.answer, /documented dimensions too/i);
 });
 
 test("affirmative follow-up wording also works for sure and ja", async () => {
@@ -1637,8 +1637,9 @@ test("dimension answers use readable multiline bullets and hide internal codes",
 
   const answer = route.answerFromExplicitMultiItemFacts("List dimensions", items, "en");
   assert.equal(answer.found, true);
-  assert.match(answer.answer, /^I found these documented appliance or niche dimensions:\n\n- Extractor hood \(FH 664 621 S\):\n  Appliance dimensions H x W x D: 173,0 x 599 x 303 mm/m);
-  assert.match(answer.answer, /\n\n- Washing machine \(EWA 34660 W\):\n  Appliance dimensions H x W x D: 830 x 600 x 540 mm\n  Niche dimensions H x W x D: 825 x 600 x 580 mm/);
+  assert.match(answer.answer, /^I found these documented dimensions:\n\n- Extractor hood: 173 × 599 × 303 mm/m);
+  assert.match(answer.answer, /- Washing machine\n  Appliance: 830 × 600 × 540 mm\n  Installation: 825 × 600 × 580 mm/);
+  assert.match(answer.answer, /Format: H × W × D unless stated otherwise\./);
   assert.doesNotMatch(answer.answer, /FH664621E/);
 });
 

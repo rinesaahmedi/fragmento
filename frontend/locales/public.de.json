@@ -42,6 +42,7 @@
     "serviceHintMontage": "Montage ab Warenwert 1.000 Euro und mindestens 3 Schrank-Komponenten",
     "serviceHintPickup": "Nur mit mindestens einer Komponente oder einem Zubehör",
     "infoForItem": "Infos zu {name}",
+    "photoButtonLabel": "Foto",
     "stageEyebrow": "Plan",
     "stageTitle": "Interaktive Küchenansicht",
     "resetSelection": "Auswahl zurücksetzen",

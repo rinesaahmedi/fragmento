@@ -11,6 +11,7 @@ const PRODUCT_INFO_FILES = {
   hood: "/product-info/FH_664_621_S_Produktinformation.pdf",
   hoodChimney: "/product-info/khf664611s-chimney-extractor-hood-product-info.pdf",
   fridge: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf",
+  ledLightingLabel: "/product-info/led-lighting-set-label.pdf",
 };
 
 const PRODUCT_IMAGE_FILES = {
@@ -32,6 +33,9 @@ const PRODUCT_INFO_BY_CODE = {
       "Energieklasse: D",
       "Geraeusch: 49 dB",
       "Breite: 60 cm",
+      "Geraetemasse H x B x T (mm): 815 x 598 x 550.",
+      "Einbaumasse H x B x T (mm): 820 - 870 x 600 x 580.",
+      "Tiefe bei geoeffneter Tuer (mm): 1150.",
       "Programme: 5",
       "Kapazitaet: 12 Massgedecke",
     ],
@@ -42,6 +46,9 @@ const PRODUCT_INFO_BY_CODE = {
       "- 12 Massgedecke, 5 Programme, 4 Temperaturen.",
       "- Energieklasse D, 82 kWh / 100 Zyklen, 11.0 l / Zyklus.",
       "- Geraeusch: 49 dB(A), Klasse C.",
+      "- Geraetemasse H x B x T (mm): 815 x 598 x 550.",
+      "- Einbaumasse H x B x T (mm): 820 - 870 x 600 x 580.",
+      "- Tiefe bei geoeffneter Tuer (mm): 1150.",
       "- Ausstattung: Aquastop, Extra Dry, OpenDry, halbe Beladung, Startzeitvorwahl 3/6/9 h.",
       "Auswahlhinweise:",
       "- Vor der Bestellung Einbaumass, Frontintegration und Anschlussposition pruefen.",
@@ -94,12 +101,18 @@ const PRODUCT_INFO_BY_CODE = {
   "WM-B-EWA34660W": {
     productImagePath: PRODUCT_IMAGE_FILES.washingMachine,
     productInfoPdfPath: "/product-info/ewa34660w-washing-machine-product-info.pdf",
-    productInfoSummary: "Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt 8 kg Fassungsvermoegen und 1400 U/min.",
+    productInfoSummary: "Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt Energieeffizienzklasse A, 47 kWh / 100 Zyklen, 48 l/Zyklus, 8 kg Fassungsvermoegen, 1400 U/min, 72 dB(A) und Geraetemasse 830 x 600 x 540 mm.",
     productInfoKeyFacts: [
       "Produkttyp: Waschmaschine.",
       "Modell: EWA34660W.",
+      "Energieeffizienzklasse: A.",
+      "Energieverbrauch: 47 kWh / 100 Zyklen.",
+      "Wasserverbrauch: 48 l/Zyklus.",
       "Fassungsvermoegen: 8 kg.",
       "Schleuderdrehzahl: 1400 U/min.",
+      "Geraeusch: 72 dB(A)",
+      "Geraetemasse H x B x T (mm): 830 x 600 x 540.",
+      "Einbaumasse H x B x T (mm): 825 x 600 x 580.",
       "Wasser- und Stromanschluss nach Produktinformation beachten.",
     ],
     productInfoExtractedText: [
@@ -107,8 +120,14 @@ const PRODUCT_INFO_BY_CODE = {
       "Wichtige Punkte:",
       "- Produkttyp: Waschmaschine.",
       "- Modell: EWA34660W.",
+      "- Energieeffizienzklasse: A.",
+      "- Energieverbrauch: 47 kWh / 100 Zyklen.",
+      "- Wasserverbrauch: 48 l/Zyklus.",
       "- Fassungsvermoegen: 8 kg.",
       "- Schleuderdrehzahl: 1400 U/min.",
+      "- Geraeusch: 72 dB(A)",
+      "- Geraetemasse H x B x T (mm): 830 x 600 x 540.",
+      "- Einbaumasse H x B x T (mm): 825 x 600 x 580.",
       "- Wasser- und Stromanschluss nach Produktinformation beachten.",
       "Auswahlhinweise:",
       "- Vor der Bestellung Wasseranschluss, Ablauf und Stellmass pruefen.",
@@ -129,16 +148,24 @@ PRODUCT_INFO_BY_CODE["DISH-B-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-C-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = {
   ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"],
+  productInfoKeyFacts: [
+    ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoKeyFacts,
+    "Geraetemasse H x B x T (mm): 1800 x 545 x 590.",
+  ],
   productInfoExtractedText: PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoExtractedText
     .replace("Produktname: AMICA KGC 15495 S Kuehl-/Gefrierkombination, 180 cm.", "Produktname: AMICA KGC 15495 S Kuehl-/Gefrierkombination, 180 cm.")
     .replace(
       "- Freistehendes Kuehl-Gefriergeraet mit NoFrost und automatischer Abtauung.",
-      "- Modell: KGC 15495 S.\n- Freistehendes Kuehl-Gefriergeraet mit NoFrost und automatischer Abtauung.",
+      "- Modell: KGC 15495 S.\n- Freistehendes Kuehl-Gefriergeraet mit NoFrost und automatischer Abtauung.\n- Geraetemasse H x B x T (mm): 1800 x 545 x 590.",
     ),
 };
 PRODUCT_INFO_BY_CODE["REF-C-545-1800-700"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
   ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"],
+  productInfoKeyFacts: [
+    ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"].productInfoKeyFacts,
+    "Geraetemasse H x B x T (mm): 173,0 x 599 x 303.",
+  ],
 };
 PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"] = {
   productImagePath: PRODUCT_IMAGE_FILES.hoodChimney,
@@ -170,7 +197,11 @@ PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
   productInfoKeyFacts: [
     "Backofen: Energieklasse A",
     "Backofen: 77 l Volumen, 9 Funktionen",
+    "Backofen: Geraetemasse H x B x T (mm): 595 x 595 x 575.",
+    "Backofen: Einbaumasse H x B x T (mm): 595,0 x 560 x 560.",
     "Kochfeld: 60 cm, 4 Kochzonen",
+    "Kochfeld: Geraetemasse B x T (mm): 590 x 520.",
+    "Kochfeld: Ausschnittmasse B x T (mm): 560 x 490.",
     "Kochfeld: 9 Leistungsstufen",
     "Set: Backofen + Induktionskochfeld",
   ],
@@ -178,14 +209,43 @@ PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
     "Produktname: AMICA EBX 943 600 S Backofen + AMICA OL-KMI 754 000 E Induktionskochfeld.",
     "Wichtige Punkte:",
     "- Backofen: Einbau-Elektrobackofen mit 77 l Volumen, Energieklasse A und 9 Funktionen.",
+    "- Backofen: Geraetemasse H x B x T (mm): 595 x 595 x 575.",
+    "- Backofen: Einbaumasse H x B x T (mm): 595,0 x 560 x 560.",
     "- Backofen: SensorControl Timer, versenkbare Knebel, CoolDoor3, Steam Clean.",
     "- Kochfeld: autarkes Induktionskochfeld, 60 cm, 4 Kochzonen mit Booster.",
+    "- Kochfeld: Geraetemasse B x T (mm): 590 x 520.",
+    "- Kochfeld: Ausschnittmasse B x T (mm): 560 x 490.",
     "- Kochfeld: 9 Leistungsstufen, Timer, Restwaermeanzeige, Topferkennung, Kindersicherung.",
     "Auswahlhinweise:",
     "- Vor der Bestellung Nischenmass, Anschlusswert und Elektroanschluss pruefen.",
   ].join("\n"),
 };
 PRODUCT_INFO_BY_CODE["OVEN-C-600-HOB"] = PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"];
+const LED_LIGHTING_PRODUCT_INFO = {
+  productInfoPdfPath: PRODUCT_INFO_FILES.ledLightingLabel,
+  productInfoSummary: "Energie-Label fuer das LED-Beleuchtungsset KA220043_S3. Das Label nennt Energieeffizienzklasse E und 3 kWh / 1000 h.",
+  productInfoKeyFacts: [
+    "Product type: LED lighting set.",
+    "Model: KA220043_S3.",
+    "Energy efficiency class: E.",
+    "Energy consumption: 3 kWh / 1000 h.",
+    "Document: Energy label.",
+  ],
+  productInfoExtractedText: [
+    "Product name: LED lighting set KA220043_S3.",
+    "Wichtige Punkte:",
+    "- Product type: LED lighting set.",
+    "- Model: KA220043_S3.",
+    "- Energy efficiency class: E.",
+    "- Energy consumption: 3 kWh / 1000 h.",
+    "- Document: Energy label.",
+    "Auswahlhinweise:",
+    "- Show this label with the LED lighting set.",
+  ].join("\n"),
+};
+PRODUCT_INFO_BY_CODE["LIGHT-B-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
+PRODUCT_INFO_BY_CODE["LIGHT-C-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
+PRODUCT_INFO_BY_CODE["ACC-LIGHT-003"] = LED_LIGHTING_PRODUCT_INFO;
 
 const DEFAULT_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "DISH-600-STD", legacyCode: "component-dishwasher", name: "Spülmaschine", price: "579.00", infoText: "Amica by architecto", iconKey: "dishwasher", colorKey: "#001f7f", sortOrder: 10 },
