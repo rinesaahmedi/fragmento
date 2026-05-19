@@ -10,8 +10,8 @@ import {
   getProductImagePaths,
   getProductInfoDocuments,
   getProductInfoHref,
-  hasAssistantProductInfo,
   isLinkedComponentSelected,
+  shouldShowProductAssistantLauncher,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
 import {
@@ -173,6 +173,7 @@ function CatalogItem({
     styles.itemIcon,
     compactIcon ? styles.itemIconCompact : "",
     item.iconKey === "refrigerator" || item.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
+    item.iconKey === "lighting_set" ? styles.itemIconLightingSet : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -289,7 +290,7 @@ function CatalogItem({
               });
             }}
           >
-            <span aria-hidden="true">IMG</span>
+            <span aria-hidden="true">{translate("configurator.photoButtonLabel", "Photo")}</span>
           </button>
         ) : null}
         <div className={styles.itemMetaAside}>
@@ -369,7 +370,7 @@ export default function KitchenCatalogPanel({
                   infoPdfHref={displayItem.infoPdfHref}
                   onOpenInfo={onOpenProductInfo}
                   onOpenPhotos={onOpenProductPhotos}
-                  productAssistantEnabled={hasAssistantProductInfo(displayItem.item)}
+                  productAssistantEnabled={shouldShowProductAssistantLauncher(displayItem.item)}
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   onClick={() =>
                     setSelectedComponentIds((current) =>
@@ -395,7 +396,7 @@ export default function KitchenCatalogPanel({
                 infoPdfHref={getProductInfoHref(item)}
                 onOpenInfo={onOpenProductInfo}
                 onOpenPhotos={onOpenProductPhotos}
-                productAssistantEnabled={hasAssistantProductInfo(item)}
+                productAssistantEnabled={shouldShowProductAssistantLauncher(item)}
                 onOpenProductAssistant={onOpenProductAssistantFromItem}
                 onClick={() => onToggleAccessory(item.code)}
               />
@@ -424,7 +425,7 @@ export default function KitchenCatalogPanel({
                   infoPdfHref={getProductInfoHref(item)}
                   onOpenInfo={onOpenProductInfo}
                   onOpenPhotos={onOpenProductPhotos}
-                  productAssistantEnabled={hasAssistantProductInfo(item)}
+                  productAssistantEnabled={shouldShowProductAssistantLauncher(item)}
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   hint={
                     disabledReason ||

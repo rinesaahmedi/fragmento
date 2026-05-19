@@ -132,7 +132,7 @@ const TOPIC_PATTERNS = {
   energy: /\b(energy\s+(?:efficiency\s+)?class(?:es)?|energy\s+(?:classe|klass|klasse)|energy labels?|e[\s-]?labels?|energie\s+(?:class(?:e)?|klasse)|energieeffizienzklassen?|energieklassen?|energieklasse|energielabels?|energj|what\s+energy|label|classe énergétique|classe energetique|klasa e energjisë|klasa e energjise)\b/i,
   consumption: /\b(consumption|energy use|electricity cost|electricity costs|cost matters|uses the most energy|use the most energy|kwh|water|watter|water use|liters?|litres?|\bl\b|verbrauch|energieverbrauch|stromverbrauch|wasserverbrauch|stromkosten|energiekosten|verbraucht)\b/i,
   noise: /\b(noise|quietest|loudest|decibels?|dezi(?:bel)?|dezibel|db|dba|dB\(A\)|sound|loud|geräusch|geraeusch|lautstärke|lautstaerke|luftschallemission|leisesten|lautesten|laut)\b/i,
-  dimensions: /\b(dimensions|dimesnions|dimensons|dimentions|dimmensions|measurements|mesurements|size|how big|width|height|depth|installation size|niche size|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe|einbauma[sß]e|nischenma[sß]e)\b/i,
+  dimensions: /\b(dimensions|dimesnions|dimensons|dimentions|dimmensions|measurements|mesurements|size|how big|width|height|depth|installation size|required installation space|niche size|ma[sß]e|masse|abmessungen|breite|höhe|hoehe|tiefe|einbauma[sß]e|nischenma[sß]e)\b/i,
   features: /\b(functions?|features?|programs?|programmes?|capacity|load capacity|place settings|cooking zones?|zones?|kg|kilograms?|kilos?|steam clean|timer|child safety|booster|pot detection|programme|programme?|funktionen|kapazität|kapazitaet|füllmenge|fuellmenge|fassungsvermögen|fassungsvermoegen|beladung|gewicht|kochzonen?|kindersicherung|topferkennung)\b/i,
 };
 
@@ -418,12 +418,12 @@ function getAnnualConsumptionValue(item) {
 
   const line = getItemInfoLines(item).find((entry) =>
     /(jahresverbrauch|jährlicher energieverbrauch|jaehrlicher energieverbrauch|annual consumption|energy consumption|energieverbrauch|verbrauch[^\n]*(?:100\s*(?:zyklen|cycles)|jahr|year))/i.test(entry)
-    && /\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|Jahr|year))?\b/i.test(entry),
+    && /\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|1000\s*h|Jahr|year))?\b/i.test(entry),
   );
   const pairedMatch = line?.match(/\b\d+(?:[.,]\d+)?\s*kWh\s*\/\s*\d+(?:[.,]\d+)?\s*kWh\b/i);
   if (pairedMatch) return pairedMatch[0].replace(/\s+/g, " ").trim();
 
-  const match = line?.match(/\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|Jahr|year))?\b/i);
+  const match = line?.match(/\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|1000\s*h|Jahr|year))?\b/i);
   return match ? match[0].replace(/\s+/g, " ").trim() : "";
 }
 
@@ -728,7 +728,7 @@ function sanitizeUnsupportedFollowUps(answer, items, language) {
 }
 
 function normalizeKnownModel(value) {
-  const text = String(value || "").replace(/\s+/g, " ").trim();
+  const text = String(value || "").replace(/\s+/g, " ").trim().replace(/[.;,]+$/, "");
   const compact = text.replace(/\s+/g, "").toUpperCase();
 
   if (/^FH664621[SE]$/.test(compact)) return "FH 664 621 S";
@@ -738,6 +738,7 @@ function normalizeKnownModel(value) {
   if (/^OL-KMI754000E$/.test(compact)) return "OL-KMI 754 000 E";
   if (/^KGC15495S$/.test(compact)) return "KGC 15495 S";
   if (/^OL-KGCN388140E$/.test(compact)) return "OL-KGCN 388140 E";
+  if (/^KA220043_S3$/.test(compact)) return "KA220043_S3";
   if (/^A-EGSPV597210$/.test(compact)) return "A-EGSPV597210";
 
   return text;
@@ -767,6 +768,10 @@ function getPublicTypeLabelForModel(model, item, language) {
     return language === "de" ? "Kühl-Gefrierkombination" : "Refrigerator-freezer";
   }
 
+  if (compactModel === "KA220043_S3") {
+    return language === "de" ? "LED-Beleuchtungsset" : "LED lighting set";
+  }
+
   if (/\b(?:FH|KHF)\b|FH\s*664\s*621|KHF\s*664\s*611|extractor hood|dunstabzug|haube/i.test(value)) {
     return language === "de" ? "Dunstabzugshaube" : "Extractor hood";
   }
@@ -784,6 +789,10 @@ function getPublicTypeLabelForModel(model, item, language) {
   }
   if (/\b(?:KGC\s*15495\s*S|OL-KGCN\s*388140\s*E)\b|refrigerator|fridge|kuehl|kühl|gefrier/i.test(value)) {
     return language === "de" ? "Kühl-Gefrierkombination" : "Refrigerator-freezer";
+  }
+
+  if (/\bKA220043_S3\b|LED lighting set|LED-Beleuchtungsset|Beleuchtungsset/i.test(value)) {
+    return language === "de" ? "LED-Beleuchtungsset" : "LED lighting set";
   }
 
   return language === "de" ? "Produkt" : "Product";
@@ -806,7 +815,7 @@ function formatSectionWithBullets(title, entries) {
 
 function splitDocumentedDimensionLines(value) {
   return String(value || "")
-    .split(/\r?\n|\s*,\s+(?=(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Dimensions|Appliance dimensions|Niche dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)\b)/i)
+    .split(/\r?\n|\s*,\s+(?=(?:Gerätemaße|Geraetemaße|Geraetemasse|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Ausschnittmaße|Ausschnittmasse|Dimensions|Appliance dimensions|Niche dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)\b)/i)
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean);
 }
@@ -818,11 +827,93 @@ function normalizeIdenticalLeadingDimensionRange(value) {
   );
 }
 
+function getDocumentedFactLines(item) {
+  return [
+    ...normalizeFacts(item?.productInfoKeyFacts),
+    ...String(item?.productInfoExtractedText || "").split(/\r?\n/),
+  ]
+    .map((line) => line.trim().replace(/^-\s*/, ""))
+    .filter(Boolean);
+}
+
+function normalizeDimensionAxis(value) {
+  return String(value || "")
+    .replace(/\bH\s*x\s*B\s*x\s*T\b/i, "H x W x D")
+    .replace(/\bB\s*x\s*T\b/i, "W x D")
+    .replace(/\s*x\s*/gi, " x ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function formatEnglishSizeDimensionLabel(label, value) {
+  const labelText = normalizeDimensionAxis(label);
+  let valueText = normalizeDimensionAxis(value);
+  const axisMatch =
+    labelText.match(/\b(H\s*x\s*W\s*x\s*D|W\s*x\s*D)\b/i)
+    || valueText.match(/^\s*(H\s*x\s*W\s*x\s*D|W\s*x\s*D)\b/i);
+  const axis = axisMatch ? normalizeDimensionAxis(axisMatch[1]) : "";
+  const unitMatch = labelText.match(/\((mm|cm)\)/i) || valueText.match(/\((mm|cm)\)/i) || valueText.match(/\b(mm|cm)\b\s*$/i);
+  const unit = unitMatch ? unitMatch[1].toLowerCase() : "";
+
+  let baseLabel = "";
+  if (/^Appliance dimensions/i.test(labelText)) baseLabel = "Appliance size";
+  else if (/^Niche dimensions/i.test(labelText)) baseLabel = "Required installation space";
+  else if (/^Installation dimensions/i.test(labelText)) baseLabel = "Required installation space";
+  else if (/^Cut-out dimensions/i.test(labelText)) baseLabel = "Cut-out size";
+  if (!baseLabel) return "";
+
+  valueText = valueText
+    .replace(/^\s*(H\s*x\s*W\s*x\s*D|W\s*x\s*D)\s*/i, "")
+    .replace(/^\((mm|cm)\)\s*/i, "")
+    .replace(/\s*\((mm|cm)\)\s*/i, " ")
+    .replace(/\s*\b(mm|cm)\b\s*$/i, "")
+    .replace(/[.;]\s*$/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return `${baseLabel}: ${valueText}${unit ? ` ${unit}` : ""}${axis ? ` (${axis})` : ""}`;
+}
+
 function normalizeDimensionLabel(line, language) {
-  const match = String(line || "").trim().match(
-    /^(?<label>(?:Gerätemaße|Geraetemaße|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Ausschnittmaße|Einbautiefe|Appliance dimensions|Niche dimensions|Installation dimensions|Cut-out dimensions|Built-in depth|Dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)(?:\s+H\s*x\s*(?:B|W)\s*x\s*(?:T|D))?(?:\s+W\s*x\s*D)?(?:\s*\((?:mm|cm)\))?)\s*:?\s*(?<value>.+)$/i,
+  const normalizedLine = String(line || "").trim().replace(/^-\s*/, "");
+
+  const prefixedSubProductMatch = normalizedLine.match(/^(Backofen|Kochfeld|Oven|Hob)\s*:\s*(.+)$/i);
+  if (prefixedSubProductMatch) {
+    const [, rawPrefix, rest] = prefixedSubProductMatch;
+    const normalizedRest = normalizeDimensionLabel(rest, language);
+    if (language === "de") {
+      const germanPrefix = /^hob$/i.test(rawPrefix) ? "Kochfeld" : /^oven$/i.test(rawPrefix) ? "Backofen" : rawPrefix;
+      return `${germanPrefix}: ${normalizedRest}`;
+    }
+    const englishPrefix = /^(backofen|oven)$/i.test(rawPrefix) ? "Oven" : "Hob";
+    return `${englishPrefix} ${normalizedRest.charAt(0).toLowerCase()}${normalizedRest.slice(1)}`;
+  }
+
+  if (language !== "de") {
+    const directEnglishDimensionLabels = [
+      [/^Breite\s*:?\s*(.+)$/i, "Width"],
+      [/^Tiefe\s+bei\s+ge.*?T(?:ü|ue)r\s*:?\s*(.+)$/i, "Depth with door open"],
+      [/^Tiefe\s+bei\s+ge(?:ö|oe)ffneter\s+Tür\s*:?\s*(.+)$/i, "Depth with door open"],
+      [/^Tiefe\s*:?\s*(.+)$/i, "Depth"],
+      [/^Blendenh.*?he\s*:?\s*(.+)$/i, "Panel height"],
+      [/^Blendenh(?:ö|oe)he\s*:?\s*(.+)$/i, "Panel height"],
+      [/^Höhe\s*:?\s*(.+)$/i, "Height"],
+      [/^Hoehe\s*:?\s*(.+)$/i, "Height"],
+      [/^Bauh(?:ö|oe)he\s*:?\s*(.+)$/i, "Build height"],
+    ];
+
+    for (const [pattern, label] of directEnglishDimensionLabels) {
+      const directMatch = normalizedLine.match(pattern);
+      if (directMatch) {
+        return `${label}: ${normalizeIdenticalLeadingDimensionRange(directMatch[1].trim())}`;
+      }
+    }
+  }
+
+  const match = normalizedLine.match(
+    /^(?<label>(?:Gerätemaße|Geraetemaße|Geraetemasse|Nischenmaße|Nischenmasse|Einbaumaße|Einbaumasse|Ausschnittmaße|Ausschnittmasse|Einbautiefe|Appliance dimensions|Niche dimensions|Installation dimensions|Cut-out dimensions|Built-in depth|Dimensions|Height|Höhe|Hoehe|Bauhöhe|Bauhoehe)(?:\s+H\s*x\s*(?:B|W)\s*x\s*(?:T|D))?(?:\s+(?:B|W)\s*x\s*(?:T|D))?(?:\s*\((?:mm|cm)\))?)\s*:?\s*(?<value>.+)$/i,
   );
-  if (!match?.groups) return String(line || "").trim();
+  if (!match?.groups) return normalizedLine;
 
   const rawLabel = match.groups.label.trim();
   const rawValue = normalizeIdenticalLeadingDimensionRange(match.groups.value.trim());
@@ -830,9 +921,11 @@ function normalizeDimensionLabel(line, language) {
   if (language === "de") {
     const germanLabel = rawLabel
       .replace(/^Geraetemaße/i, "Gerätemaße")
+      .replace(/^Geraetemasse/i, "Gerätemaße")
       .replace(/^Geraetemaasse/i, "Gerätemaße")
       .replace(/^Nischenmasse/i, "Nischenmaße")
       .replace(/^Einbaumasse/i, "Einbaumaße")
+      .replace(/^Ausschnittmasse/i, "Ausschnittmaße")
       .replace(/^Cut-out dimensions/i, "Ausschnittmaße")
       .replace(/^Built-in depth/i, "Einbautiefe")
       .replace(/^Height/i, "Höhe")
@@ -844,36 +937,148 @@ function normalizeDimensionLabel(line, language) {
   }
 
   let englishLabel = rawLabel;
-  if (/^(Gerätemaße|Geraetemaße)/i.test(rawLabel)) {
-    englishLabel = rawLabel.replace(/^(Gerätemaße|Geraetemaße)/i, "Appliance dimensions");
+  if (/^(Gerätemaße|Geraetemaße|Geraetemasse)/i.test(rawLabel)) {
+    englishLabel = rawLabel.replace(/^(Gerätemaße|Geraetemaße|Geraetemasse)/i, "Appliance dimensions");
   } else if (/^(Nischenmaße|Nischenmasse)/i.test(rawLabel)) {
     englishLabel = rawLabel.replace(/^(Nischenmaße|Nischenmasse)/i, "Niche dimensions");
   } else if (/^(Einbaumaße|Einbaumasse)/i.test(rawLabel)) {
     englishLabel = rawLabel.replace(/^(Einbaumaße|Einbaumasse)/i, "Installation dimensions");
-  } else if (/^Ausschnittmaße/i.test(rawLabel)) {
-    englishLabel = rawLabel.replace(/^Ausschnittmaße/i, "Cut-out dimensions");
+  } else if (/^(Ausschnittmaße|Ausschnittmasse)/i.test(rawLabel)) {
+    englishLabel = rawLabel.replace(/^(Ausschnittmaße|Ausschnittmasse)/i, "Cut-out dimensions");
   } else if (/^Einbautiefe/i.test(rawLabel)) {
     englishLabel = rawLabel.replace(/^Einbautiefe/i, "Built-in depth");
   } else if (/^(Höhe|Hoehe|Bauhöhe|Bauhoehe)/i.test(rawLabel)) {
     englishLabel = rawLabel.replace(/^(Höhe|Hoehe|Bauhöhe|Bauhoehe)/i, "Height");
   }
 
-  englishLabel = englishLabel.replace(/\bH\s*x\s*B\s*x\s*T\b/i, "H x W x D");
-  return `${englishLabel}: ${rawValue}`;
+  englishLabel = englishLabel
+    .replace(/\bH\s*x\s*B\s*x\s*T\b/i, "H x W x D")
+    .replace(/\bB\s*x\s*T\b/i, "W x D");
+  const englishValue = rawValue
+    .replace(/\bH\s*x\s*B\s*x\s*T\b/i, "H x W x D")
+    .replace(/\bB\s*x\s*T\b/i, "W x D");
+  const formattedSize = formatEnglishSizeDimensionLabel(englishLabel, englishValue);
+  if (formattedSize) return formattedSize;
+  return `${englishLabel}: ${englishValue}`;
 }
 
 function formatDimensionEntry(name, dimensions) {
   const lines = splitDocumentedDimensionLines(dimensions);
   if (!lines.length) return "";
 
-  return [`- ${name}:`, ...lines.map((line) => `  ${normalizeDimensionLabel(line, "en")}`)].join("\n");
+  const normalizedLines = [...new Set(lines.map((line) => normalizeDimensionLabel(line, "en")))];
+  return [`- ${name}:`, ...normalizedLines.map((line) => `  ${line}`)].join("\n");
+}
+
+function getCompactDimensionName(name) {
+  return String(name || "")
+    .replace(/\s*\([^)]*\)\s*$/g, "")
+    .replace(/^Built-in oven and hob$/i, "Built-in oven")
+    .trim();
+}
+
+function formatCompactDimensionValue(value) {
+  return String(value || "")
+    .replace(/[.;]\s*$/g, "")
+    .replace(/\s*\((?:H|W|D|x|\s)+\)\s*$/i, "")
+    .replace(/\b(\d+)[,.]0\b/g, "$1")
+    .replace(/\b(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\b/g, "$1-$2")
+    .replace(/\b(\d+(?:[.,]\d+)?)\s*-\s*(\d+(?:[.,]\d+)?)\b/g, "$1-$2")
+    .replace(/-/g, "–")
+    .replace(/\s*x\s*/gi, " × ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function compactEnglishDimensionRecord(line, fallbackName) {
+  const normalizedLine = String(line || "").trim();
+  const valueFrom = (pattern) => {
+    const match = normalizedLine.match(pattern);
+    return match ? formatCompactDimensionValue(match[1]) : "";
+  };
+
+  const applianceSize = valueFrom(/^Appliance size:\s*(.+)$/i);
+  if (applianceSize) return { subject: fallbackName, label: "Appliance", value: applianceSize };
+
+  const requiredSpace = valueFrom(/^Required installation space:\s*(.+)$/i);
+  if (requiredSpace) return { subject: fallbackName, label: "Installation", value: requiredSpace };
+
+  const ovenSize = valueFrom(/^Oven appliance size:\s*(.+)$/i);
+  if (ovenSize) return { subject: "Built-in oven", label: "Appliance", value: ovenSize };
+
+  const ovenSpace = valueFrom(/^Oven required installation space:\s*(.+)$/i);
+  if (ovenSpace) return { subject: "Built-in oven", label: "Installation", value: ovenSpace };
+
+  const hobSize = valueFrom(/^Hob appliance size:\s*(.+)$/i);
+  if (hobSize) return { subject: "Hob", label: "Appliance", value: hobSize };
+
+  const hobCutOut = valueFrom(/^Hob cut-out size:\s*(.+)$/i);
+  if (hobCutOut) return { subject: "Hob", label: "Cut-out", value: hobCutOut };
+
+  const cutOut = valueFrom(/^Cut-out size:\s*(.+)$/i);
+  if (cutOut) return { subject: fallbackName, label: "Cut-out", value: cutOut };
+
+  const width = valueFrom(/^Width:\s*(.+)$/i);
+  if (width) return { subject: fallbackName, label: "", value: `width ${width}` };
+
+  const height = valueFrom(/^Height:\s*(.+)$/i);
+  if (height) return { subject: fallbackName, label: "", value: `height ${height}` };
+
+  const depth = valueFrom(/^Depth:\s*(.+)$/i);
+  if (depth) return { subject: fallbackName, label: "", value: `depth ${depth}` };
+
+  return null;
+}
+
+function formatCompactEnglishDimensionRecords(records) {
+  const groups = new Map();
+  for (const record of records) {
+    if (!record?.subject || !record.value) continue;
+    const key = record.subject;
+    if (!groups.has(key)) groups.set(key, []);
+    const entries = groups.get(key);
+    if (!entries.some((entry) => entry.label === record.label && entry.value === record.value)) {
+      entries.push({ label: record.label, value: record.value });
+    }
+  }
+
+  return [...groups.entries()]
+    .map(([subject, entries]) => {
+      if (entries.length === 1 && !entries[0].label) return `- ${subject}: ${entries[0].value}`;
+      if (entries.length === 1 && entries[0].label === "Appliance") return `- ${subject}: ${entries[0].value}`;
+      return [`- ${subject}`, ...entries.map((entry) => `  ${entry.label}: ${entry.value}`)].join("\n");
+    })
+    .join("\n");
+}
+
+function formatCompactDimensionEntryByLanguage(name, dimensions, language) {
+  if (language === "de") return formatDimensionEntryByLanguage(name, dimensions, language);
+
+  const compactName = getCompactDimensionName(name);
+  const lines = splitDocumentedDimensionLines(dimensions);
+  const normalizedLines = [...new Set(lines.map((line) => normalizeDimensionLabel(line, "en")))];
+  const hasFullSize = normalizedLines.some((line) =>
+    /^(?:Appliance size|Oven appliance size|Hob appliance size):/i.test(line),
+  );
+
+  const compactRecords = normalizedLines
+    .filter((line) => !(hasFullSize && /^(?:Width|Height):/i.test(line)))
+    .map((line) => compactEnglishDimensionRecord(line, compactName))
+    .filter(Boolean);
+
+  return formatCompactEnglishDimensionRecords(compactRecords);
+}
+
+function getEnglishDimensionFormatNote() {
+  return "Format: H × W × D unless stated otherwise.";
 }
 
 function formatDimensionEntryByLanguage(name, dimensions, language) {
   const lines = splitDocumentedDimensionLines(dimensions);
   if (!lines.length) return "";
 
-  return [`- ${name}:`, ...lines.map((line) => `  ${normalizeDimensionLabel(line, language)}`)].join("\n");
+  const normalizedLines = [...new Set(lines.map((line) => normalizeDimensionLabel(line, language)))];
+  return [`- ${name}:`, ...normalizedLines.map((line) => `  ${line}`)].join("\n");
 }
 
 function isAffirmativeFollowUp(value) {
@@ -904,7 +1109,7 @@ function detectAnsweredTopicsFromText(text) {
   if (/(documented noise values|documented noise levels|dokumentierten geräuschwerte|dokumentierten geraeuschwerte|max\.\s*\d+\s*dB|\d+\s*dB(?:\(A\))?)/i.test(value)) {
     topics.add("noise");
   }
-  if (/(documented appliance or niche dimensions|dokumentierten geräte- oder nischenmaße|dokumentierten geraete- oder nischenmasse|appliance dimensions|niche dimensions|gerätemaße|geraetemasse|nischenmaße|nischenmasse)/i.test(value)) {
+  if (/(documented dimensions|documented appliance or niche dimensions|dokumentierten geräte- oder nischenmaße|dokumentierten geraete- oder nischenmasse|appliance dimensions|required installation space|niche dimensions|gerätemaße|geraetemasse|nischenmaße|nischenmasse)/i.test(value)) {
     topics.add("dimensions");
   }
 
@@ -976,7 +1181,7 @@ function buildResolvedFollowUpQuestion(topic, language) {
     return language === "de" ? "Bitte zeigen Sie die dokumentierten Geräuschwerte." : "Please list the documented noise values.";
   }
   if (topic === "dimensions") {
-    return language === "de" ? "Bitte zeigen Sie die dokumentierten Geräte- oder Nischenmaße." : "Please list the documented appliance or niche dimensions.";
+    return language === "de" ? "Bitte zeigen Sie die dokumentierten Geräte- oder Einbaumaße." : "Please list the documented dimensions.";
   }
 
   return "";
@@ -1185,6 +1390,7 @@ function extractKnownModelFromText(value) {
     /\bOL-KMI\s*754\s*000\s*E\b/i,
     /\bKGC\s*15495\s*S\b/i,
     /\bOL-KGCN\s*388140\s*E\b/i,
+    /\bKA220043_S3\b/i,
     /\bA-EGSPV597210\b/i,
   ];
 
@@ -1935,8 +2141,8 @@ function getNextDocumentedFollowUp(items, language, topic, answeredTopics = new 
         ? "Möchten Sie als Nächstes die dokumentierten Geräuschwerte sehen?"
         : "Would you like me to list the documented noise values next?",
       dimensions: language === "de"
-        ? "Möchten Sie auch die dokumentierten Geräte- oder Nischenmaße sehen?"
-        : "Would you like me to list the documented appliance or niche dimensions too?",
+        ? "Möchten Sie auch die dokumentierten Geräte- oder Einbaumaße sehen?"
+        : "Would you like me to list the documented dimensions too?",
     };
 
     for (const candidate of topicOrder.slice(startIndex + 1)) {
@@ -1966,8 +2172,8 @@ function getNextDocumentedFollowUp(items, language, topic, answeredTopics = new 
   if (topic === "noise") {
     return items.some(hasDocumentedDimensionValue)
       ? (language === "de"
-        ? "Möchten Sie auch die dokumentierten Geräte- oder Nischenmaße sehen?"
-        : "Would you like me to list the documented appliance or niche dimensions too?")
+        ? "Möchten Sie auch die dokumentierten Geräte- oder Einbaumaße sehen?"
+        : "Would you like me to list the documented dimensions too?")
       : "";
   }
 
@@ -2046,15 +2252,21 @@ function answerForRequestedSubProductDimensions(question, items, language) {
       : splitDocumentedDimensionLines(extractInstallationDimensionsStrict(item));
     if (!lines.length) return null;
 
-    const formattedEntry = [
-      `- ${getSubProductPublicName(item, requestedSubProduct, language)}:`,
-      ...lines.map((line) => `  ${normalizeDimensionLabel(line, language)}`),
-    ].join("\n");
+    const formattedEntry = language === "de"
+      ? [
+        `- ${getSubProductPublicName(item, requestedSubProduct, language)}:`,
+        ...lines.map((line) => `  ${normalizeDimensionLabel(line, language)}`),
+      ].join("\n")
+      : formatCompactEnglishDimensionRecords(lines
+        .map((line) => normalizeDimensionLabel(line, "en"))
+        .map((line) => compactEnglishDimensionRecord(line, getCompactDimensionName(getSubProductPublicName(item, requestedSubProduct, language))))
+        .filter(Boolean));
+    const formatNote = language === "de" ? "" : `\n\n${getEnglishDimensionFormatNote()}`;
 
     return {
       answer: language === "de"
         ? `Ich habe diese dokumentierten Maße für ${getSubProductArticleLabel(requestedSubProduct, language)} gefunden:\n\n${formattedEntry}`
-        : `I found these documented dimensions for ${getSubProductArticleLabel(requestedSubProduct, language)}:\n\n${formattedEntry}`,
+        : `I found these documented dimensions for ${getSubProductArticleLabel(requestedSubProduct, language)}:\n\n${formattedEntry}${formatNote}`,
       found: true,
     };
   }
@@ -2064,7 +2276,7 @@ function answerForRequestedSubProductDimensions(question, items, language) {
     .map((item) => {
       const dimensions = extractInstallationDimensionsStrict(item);
       if (!dimensions) return null;
-      return formatDimensionEntryByLanguage(getPublicItemName(item, language), dimensions, language);
+      return formatCompactDimensionEntryByLanguage(getPublicItemName(item, language), dimensions, language);
     })
     .filter(Boolean);
 
@@ -2073,7 +2285,7 @@ function answerForRequestedSubProductDimensions(question, items, language) {
   return {
     answer: language === "de"
       ? `Ich habe diese dokumentierten Maße für ${getSubProductArticleLabel(requestedSubProduct, language)} gefunden:\n\n${entries.join("\n\n")}`
-      : `I found these documented dimensions for ${getSubProductArticleLabel(requestedSubProduct, language)}:\n\n${entries.join("\n\n")}`,
+      : `I found these documented dimensions for ${getSubProductArticleLabel(requestedSubProduct, language)}:\n\n${entries.join("\n")}\n\n${getEnglishDimensionFormatNote()}`,
     found: true,
   };
 }
@@ -2124,10 +2336,7 @@ function extractInstallationDimensions(item) {
     || /\b(?:min\.?\s*)?\d{2,4}(?:[.,]\d+)?\s*mm\b/i.test(value)
     || /\b(?:breite|width|hoehe|höhe|tiefe|depth)\s*:\s*\d+(?:[.,]\d+)?\s*(?:mm|cm)\b/i.test(value);
 
-  const lines = String(item?.productInfoExtractedText || "")
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const lines = getDocumentedFactLines(item);
 
   const matchingLines = lines.filter((line) =>
     /(abmessungen|dimensions|geraetemass|geraetemasse|geraetema[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e)/i.test(line)
@@ -2164,9 +2373,9 @@ function extractInstallationDimensionsStrict(item) {
     || /\b(?:min\.?\s*)?\d{2,4}(?:[.,]\d+)?\s*mm\b/i.test(value)
     || /\b(?:breite|width|hoehe|höhe|bauhoehe|bauhöhe|tiefe|depth|height)\s*:\s*\d+(?:[.,]\d+)?\s*(?:mm|cm)\b/i.test(value);
   const hasDimensionLabel = (value) =>
-    /(abmessungen|dimensions|geraetemass|geraetemasse|gerätemaße|geraetemaße|nischenmass|nischenmaße|einbaumass|einbaumaße|breite|width|hoehe|höhe|bauhoehe|bauhöhe|tiefe|depth|height)/i.test(value);
+    /(abmessungen|dimensions|geraetemass|geraetemasse|gerätemaße|geraetemaße|nischenmass|nischenmaße|einbaumass|einbaumaße|ausschnitt|cut-out|cutout|breite|width|hoehe|höhe|bauhoehe|bauhöhe|tiefe|depth|height)/i.test(value);
 
-  const matchingLines = getItemInfoLines(item).filter((line) => hasDimensionLabel(line) && hasNumericDimensionPattern(line));
+  const matchingLines = getDocumentedFactLines(item).filter((line) => hasDimensionLabel(line) && hasNumericDimensionPattern(line));
   if (matchingLines.length) return matchingLines.join("\n");
 
   const factMatches = normalizeFacts(item?.productInfoKeyFacts)
@@ -2462,22 +2671,29 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
       return requestedSubProductDimensions;
     }
 
+    let documentedDimensionCount = 0;
     const entries = scopedItems
       .map((item) => {
         const dimensions = extractInstallationDimensionsStrict(item);
-        if (!dimensions) return null;
-        return formatDimensionEntryByLanguage(getPublicItemName(item, language), dimensions, language);
+        if (dimensions) {
+          documentedDimensionCount += 1;
+          return formatCompactDimensionEntryByLanguage(getPublicItemName(item, language), dimensions, language);
+        }
+        if (scopedItems.length <= 1) return null;
+        return language === "de"
+          ? `- ${getPublicItemName(item, language)}:\n  H x B x T: nicht in den bereitgestellten Produktinformationen dokumentiert.`
+          : `- ${getCompactDimensionName(getPublicItemName(item, language))}: not documented`;
       })
       .filter(Boolean);
 
-    if (!entries.length) {
+    if (!documentedDimensionCount) {
       return { answer: notFoundAnswer, found: false };
     }
 
     return {
       answer: language === "de"
-        ? `Ich habe diese dokumentierten Geräte- oder Nischenmaße gefunden:\n\n${entries.join("\n\n")}`
-        : `I found these documented appliance or niche dimensions:\n\n${entries.join("\n\n")}`,
+        ? `Ich habe diese dokumentierten Geräte- oder Einbaumaße gefunden:\n\n${entries.join("\n\n")}`
+        : `I found these documented dimensions:\n\n${entries.join("\n")}\n\n${getEnglishDimensionFormatNote()}`,
       found: true,
     };
   }
@@ -2565,6 +2781,7 @@ function getControlledOverviewType(item) {
   if (/washing machine|waschmaschine|ewa\s*34660/i.test(sourceText) || typeLabel === "Washing machine") return "washing_machine";
   if (/dishwasher|geschirrsp|a-egspv/i.test(sourceText) || typeLabel === "Dishwasher") return "dishwasher";
   if (/refrigerator|fridge|kühl|kuehl|gefrier|kgc\s*15495|ol-kgcn/i.test(sourceText) || typeLabel === "Refrigerator-freezer") return "fridge_freezer";
+  if (/\bKA220043_S3\b|LED lighting set|LED-Beleuchtungsset|Beleuchtungsset/i.test(sourceText) || typeLabel === "LED lighting set") return "lighting_set";
   if (hasOven) return "oven";
   if (hasHob) return "hob";
   return "product";
@@ -2581,6 +2798,7 @@ function buildProductOverviewEntry(item, language) {
       oven: "Built-in oven: appliance for baking.",
       hob: "Hob: appliance for cooking.",
       fridge_freezer: "Fridge-freezer: appliance for cooling and freezing.",
+      lighting_set: "LED lighting set: selected lighting set with an energy label.",
       product: "Product: selected appliance with available product information.",
     },
     de: {

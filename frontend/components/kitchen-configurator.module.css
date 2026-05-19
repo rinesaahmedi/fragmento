@@ -449,6 +449,12 @@
   transform: none;
 }
 
+.itemIconLightingSet svg {
+  width: 42px;
+  height: 42px;
+  transform: translateY(2px);
+}
+
 .itemIconTall img,
 .itemIconTall svg {
   max-width: none;
@@ -845,11 +851,11 @@
 }
 
 .itemPhotoTrigger {
-  min-width: 34px;
-  min-height: 34px;
+  min-width: 0;
+  min-height: 30px;
   padding: 0 8px;
   border-radius: 999px;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   line-height: 1;
 }
 

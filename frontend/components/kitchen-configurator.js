@@ -17,6 +17,7 @@ import {
   isHiddenLinkedComponent,
   normalizeColor,
   selectedMap,
+  shouldShowProductAssistantLauncher,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
 import KitchenSvgStage from "./kitchen-svg-stage";
@@ -167,8 +168,10 @@ function withProductInfoPdfRevision(href) {
   const value = String(href || "").trim();
   if (!value) return "";
 
-  const separator = value.includes("?") ? "&" : "?";
-  return `${value}${separator}v=${PRODUCT_INFO_PDF_REVISION}`;
+  const [pathWithQuery, fragment] = value.split("#", 2);
+  const separator = pathWithQuery.includes("?") ? "&" : "?";
+  const revisedHref = `${pathWithQuery}${separator}v=${PRODUCT_INFO_PDF_REVISION}`;
+  return fragment ? `${revisedHref}#${fragment}` : revisedHref;
 }
 
 function buildProductInfoState(payload, translate) {
@@ -418,18 +421,37 @@ function buildAssistantCatalogItems(kitchenConfig, kitchenSlug) {
 
   for (const item of visibleComponents) {
     const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, item)?.item;
-    const itemId = displayItem?.productInfoItemId || displayItem?.id;
+    const itemId = getProductAssistantIdentityKey(displayItem);
     if (!hasAssistantProductInfo(displayItem) || itemsById.has(itemId)) continue;
     itemsById.set(itemId, displayItem);
   }
 
   for (const item of [...kitchenConfig.accessories, ...kitchenConfig.services]) {
-    const itemId = item.productInfoItemId || item.id;
+    const itemId = getProductAssistantIdentityKey(item);
     if (!hasAssistantProductInfo(item) || itemsById.has(itemId)) continue;
     itemsById.set(itemId, item);
   }
 
   return Array.from(itemsById.values());
+}
+
+function getProductAssistantIdentityKey(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  if (code === "LIGHT-B-LED-001" || code === "LIGHT-C-LED-001" || code === "ACC-LIGHT-003") {
+    return "model:KA220043_S3";
+  }
+
+  return item?.productInfoItemId || item?.id || code;
+}
+
+function uniqueProductAssistantItems(items) {
+  const itemsByKey = new Map();
+  for (const item of items) {
+    const key = getProductAssistantIdentityKey(item);
+    if (!key || itemsByKey.has(key)) continue;
+    itemsByKey.set(key, item);
+  }
+  return Array.from(itemsByKey.values());
 }
 
 function isWorktopSelectionItem(item) {
@@ -675,7 +697,7 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
   const itemsById = new Map();
 
   for (const item of catalogItems) {
-    const itemId = item.productInfoItemId || item.id;
+    const itemId = getProductAssistantIdentityKey(item);
     if (!hasAssistantProductInfo(item) || itemsById.has(itemId)) continue;
     itemsById.set(itemId, item);
   }
@@ -684,27 +706,42 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
   if (!items.length) return [];
 
   const itemOptions = [];
+  const selectableItemOptions = [];
   for (const item of items) {
-    const itemId = item.productInfoItemId || item.id;
+    const itemId = getProductAssistantIdentityKey(item);
     const splitOptions = buildSplitProductAssistantOptions(item, itemId, translate);
     if (splitOptions.length) {
       itemOptions.push(...splitOptions);
+      if (shouldShowProductAssistantLauncher(item)) {
+        selectableItemOptions.push(...splitOptions);
+      }
       continue;
     }
 
     const itemLabel = formatProductAssistantDisplayName(item, translate);
-    itemOptions.push({
+    const option = {
       key: `item-${itemId}`,
       label: itemLabel,
       shortLabel: itemLabel,
       itemIds: [itemId],
       type: "item",
       contextItems: [buildProductAssistantContextItem(item)],
-    });
+    };
+    itemOptions.push(option);
+    if (shouldShowProductAssistantLauncher(item)) {
+      selectableItemOptions.push(option);
+    }
   }
 
   const options = [];
   const activeItemId = activeProductInfo?.productInfoItemId;
+  const activeItemIdentityKey = activeProductInfo
+    ? getProductAssistantIdentityKey({
+        id: activeProductInfo.productInfoItemId,
+        productInfoItemId: activeProductInfo.productInfoItemId,
+        code: activeProductInfo.item?.code || activeProductInfo.code,
+      })
+    : "";
   options.push({
     key: "all-documented",
     label: translate("configurator.productAssistantAllProducts", "All products"),
@@ -714,8 +751,8 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
     type: "all",
   });
 
-  if (activeItemId && itemsById.has(activeItemId)) {
-    const activeItem = itemsById.get(activeItemId);
+  if (activeItemIdentityKey && itemsById.has(activeItemIdentityKey) && shouldShowProductAssistantLauncher(itemsById.get(activeItemIdentityKey))) {
+    const activeItem = itemsById.get(activeItemIdentityKey);
     const activeItemName =
       formatProductAssistantDisplayName(activeItem, translate)
       || formatProductAssistantOptionName(
@@ -723,16 +760,16 @@ function buildProductAssistantContextOptions(activeProductInfo, catalogItems, se
         translate("configurator.productAssistantCurrentProductFallback", "This product"),
       );
     options.push({
-      key: `current-${activeItemId}`,
+      key: `current-${activeItemIdentityKey}`,
       label: translate("configurator.productAssistantCurrentProduct", "This product: {name}", { name: activeItemName }),
       shortLabel: activeItemName,
-      itemIds: [activeItemId],
+      itemIds: [activeItem.productInfoItemId || activeItem.id].filter(Boolean),
       isHighlighted: true,
       type: "current",
     });
   }
 
-  options.push(...itemOptions);
+  options.push(...selectableItemOptions);
 
   return options;
 }
@@ -1138,7 +1175,9 @@ function KitchenConfiguratorContent({
     isOrderLocked: orderLockedServiceCodes.has(item.code),
   }));
   const selectedProductCount = selectedComponents.length + selectedAccessories.length + selectedServices.length;
-  const selectedProductInfoItems = [...selectedComponents, ...selectedAccessories, ...selectedServices].filter(hasAssistantProductInfo);
+  const selectedProductInfoItems = uniqueProductAssistantItems(
+    [...selectedComponents, ...selectedAccessories, ...selectedServices].filter(hasAssistantProductInfo),
+  );
   const assistantCatalogItems = useMemo(
     () => buildAssistantCatalogItems(kitchenConfig, kitchenSlug),
     [kitchenConfig, kitchenSlug],
@@ -1461,7 +1500,7 @@ function KitchenConfiguratorContent({
   }
 
   function openProductAssistantForCatalogItem(catalogItem) {
-    if (!hasAnyAssistantProducts || !hasAssistantProductInfo(catalogItem)) return;
+    if (!hasAnyAssistantProducts || !shouldShowProductAssistantLauncher(catalogItem)) return;
     if (!hasProductAssistantOptions) {
       openProductAssistant();
       return;
@@ -1579,7 +1618,7 @@ function KitchenConfiguratorContent({
       setProductInfoQuestion("");
       return;
     }
-    await submitProductInfoQuestion(productInfoQuestion, { speakAnswer: true });
+    await submitProductInfoQuestion(productInfoQuestion);
   }
 
   function toggleProductAssistantVoice() {
