@@ -399,7 +399,7 @@ test("POST keeps German answers polished across the same product-info paths as E
   const germanDimensions = await route.POST(request({ ...basePayload, language: "de", question: "Welche Maße hat das Produkt?" }));
   assert.match(englishDimensions.body.answer, /documented dimensions/);
   assert.match(germanDimensions.body.answer, /Ich habe diese dokumentierten Geräte- oder Einbaumaße gefunden:/);
-  assert.match(germanDimensions.body.answer, /Gerätemaße H x B x T/);
+  assert.match(germanDimensions.body.answer, /- Geschirrspüler: 815 × 598 × 550 mm/);
 
   const englishNoise = await route.POST(request({ ...basePayload, language: "en", question: "What is the noise level?" }));
   const germanNoise = await route.POST(request({ ...basePayload, language: "de", question: "Wie laut ist das Produkt?" }));
@@ -527,7 +527,7 @@ test("POST keeps German consumption and energy intents aligned with English for 
     assert.match(response.body.answer, /Einbaubackofen \(EBX 943 600 S\): Energieverbrauch konventionell \/ Heißluft: 0,99 kWh \/ 0,83 kWh/);
     assert.doesNotMatch(response.body.answer, /Einbaubackofen[\s\S]*Wasserverbrauch/);
     assert.match(response.body.answer, /Kühl-Gefrierkombination \(KGC 15495 S\): Jährlicher Energieverbrauch: 219,0 kWh\/Jahr/);
-    assert.match(response.body.answer, /Möchten Sie als Nächstes die dokumentierten Geräuschwerte sehen\?/);
+    assert.doesNotMatch(response.body.answer, /Möchten Sie als Nächstes die dokumentierten Geräuschwerte sehen\?/);
     assert.doesNotMatch(response.body.answer, /^Hier sind alle Modelle/);
     assert.doesNotMatch(response.body.answer, /Geräusch:|dB\(A\)/);
   }
@@ -541,8 +541,12 @@ test("POST keeps German consumption and energy intents aligned with English for 
     const response = await route.POST(request({ ...basePayload, language: "en", question }));
     assert.equal(response.status, 200);
     assert.match(response.body.answer, /^Here are the documented consumption values from the product information:/);
-    assert.match(response.body.answer, /Extractor hood \(FH 664 621 S\): Annual energy consumption: 24,8 kWh\/Jahr/);
-    assert.match(response.body.answer, /Washing machine \(EWA 34660 W\): Energy consumption per 100 wash cycles: 47,0 kWh; Water consumption: 48 l/);
+    assert.match(response.body.answer, /- Extractor hood: 24.8 kWh\/year/);
+    assert.match(response.body.answer, /- Washing machine: 47 kWh \/ 100 cycles, 48 l water\/cycle/);
+    assert.match(response.body.answer, /- Dishwasher: 82 kWh \/ 100 cycles/);
+    assert.match(response.body.answer, /- Built-in oven: 0.99 kWh conventional \/ 0.83 kWh hot air/);
+    assert.match(response.body.answer, /- Refrigerator-freezer: 219 kWh\/year/);
+    assert.doesNotMatch(response.body.answer, /Would you like me/);
     assert.doesNotMatch(response.body.answer, /^Here are all the models/);
   }
 
@@ -565,17 +569,17 @@ test("POST keeps German consumption and energy intents aligned with English for 
 
   const dishwasherDimensions = await route.POST(request({ ...basePayload, question: "Welche Maße hat der Geschirrspüler?" }));
   assert.match(dishwasherDimensions.body.answer, /^Ich habe diese dokumentierten Maße für den Geschirrspüler gefunden:/);
-  assert.match(dishwasherDimensions.body.answer, /- Geschirrspüler \(A-EGSPV597210\):\n  Gerätemaße H x B x T: 815 x 598 x 550 mm\n  Nischenmaße H x B x T: 820–870 x 600 x 580 mm/);
+  assert.match(dishwasherDimensions.body.answer, /- Geschirrspüler\n  Gerätemaße: 815 × 598 × 550 mm\n  Nischenmaße: 820–870 × 600 × 580 mm/);
   assert.doesNotMatch(dishwasherDimensions.body.answer, /Einbaubackofen/);
 
   const ovenDimensions = await route.POST(request({ ...basePayload, question: "Welche Maße hat der Backofen?" }));
   assert.match(ovenDimensions.body.answer, /^Ich habe diese dokumentierten Maße für den Einbaubackofen gefunden:/);
-  assert.match(ovenDimensions.body.answer, /Einbaubackofen \(EBX 943 600 S\):\n  Gerätemaße H x B x T: 595 x 595 x 575 mm/);
+  assert.match(ovenDimensions.body.answer, /- Einbaubackofen: 595 × 595 × 575 mm/);
   assert.doesNotMatch(ovenDimensions.body.answer, /Geschirrspüler/);
 
   const englishDishwasherDimensions = await route.POST(request({ ...basePayload, language: "en", question: "What are the dishwasher dimensions?" }));
   assert.match(englishDishwasherDimensions.body.answer, /^I found these documented dimensions for the dishwasher:/);
-  assert.match(englishDishwasherDimensions.body.answer, /- Dishwasher\n  Appliance: 815 × 598 × 550 mm\n  Installation: 820–870 × 600 × 580 mm/);
+  assert.match(englishDishwasherDimensions.body.answer, /- Dishwasher\n  Appliance dimensions: 815 × 598 × 550 mm\n  Installation dimensions: 820–870 × 600 × 580 mm/);
   assert.doesNotMatch(englishDishwasherDimensions.body.answer, /Built-in oven/);
 
   const englishFridgeDimensions = await route.POST(request({ ...basePayload, language: "en", question: "what are the fridge dimensions" }));
@@ -973,7 +977,7 @@ test("POST understands short imperfect English product-topic questions", async (
 
   const kwh = await route.POST(request({ ...basePayload, question: "kwh?" }));
   assert.match(kwh.body.answer, /^Here are the documented consumption values/);
-  assert.match(kwh.body.answer, /Washing machine \(EWA 34660 W\): Energy consumption per 100 wash cycles: 47 kWh/);
+  assert.match(kwh.body.answer, /- Washing machine: 47 kWh \/ 100 cycles, 48 l water\/cycle/);
 
   const dimensions = await route.POST(request({ ...basePayload, question: "how big is the dishwasher" }));
   assert.match(dimensions.body.answer, /^I found these documented dimensions for the dishwasher:/);
@@ -983,6 +987,7 @@ test("POST understands short imperfect English product-topic questions", async (
   const programs = await route.POST(request({ ...basePayload, question: "programs?" }));
   assert.match(programs.body.answer, /^The documented programs\/features are:/);
   assert.match(programs.body.answer, /Washing machine \(EWA 34660 W\): Programs\/features: Cotton, Eco, Quick/);
+  assert.doesNotMatch(programs.body.answer, /Funktionen|Volumen|LED-Licht|Flaschenregal|Gefrierschubladen/);
 
   const zones = await route.POST(request({ ...basePayload, question: "how many cooking zones" }));
   assert.match(zones.body.answer, /^The documented cooking zones are:/);
@@ -1065,7 +1070,7 @@ test("POST understands short imperfect German product-topic questions", async ()
 
   const dimensions = await route.POST(request({ ...basePayload, question: "maße geschirrspüler" }));
   assert.match(dimensions.body.answer, /^Ich habe diese dokumentierten Maße für den Geschirrspüler gefunden:/);
-  assert.match(dimensions.body.answer, /Geschirrspüler \(A-EGSPV597210\):/);
+  assert.match(dimensions.body.answer, /- Geschirrspüler: 815 × 598 × 550 mm/);
   assert.doesNotMatch(dimensions.body.answer, /Waschmaschine|Kochfeld/);
 
   const programs = await route.POST(request({ ...basePayload, question: "programme?" }));
@@ -1160,7 +1165,7 @@ test("POST scopes fuzzy product aliases and typo topics to the intended applianc
 
   const fridgeGermanDimensions = await route.POST(request({ ...basePayload, language: "de", question: "kühlschrank maße" }));
   assert.match(fridgeGermanDimensions.body.answer, /^Ich habe diese dokumentierten Maße für die Kühl-Gefrierkombination gefunden:/);
-  assert.match(fridgeGermanDimensions.body.answer, /Kühl-Gefrierkombination \(KGC 15495 S\):\n  Höhe: 180 cm/);
+  assert.match(fridgeGermanDimensions.body.answer, /- Kühl-Gefrierkombination: Höhe 180 cm/);
   assert.doesNotMatch(fridgeGermanDimensions.body.answer, /Waschmaschine|Geschirrspüler|Dunstabzugshaube/);
 
   const dishwasherGermanWater = await route.POST(request({ ...basePayload, language: "de", question: "spuelmaschine wasserverbrauch" }));
@@ -1546,7 +1551,7 @@ test("affirmative follow-up skips topics already answered in the conversation", 
   assert.equal(response.status, 200);
   assert.match(response.body.answer, /^Here are the documented consumption values from the product information:/);
   assert.doesNotMatch(response.body.answer, /documented noise values next/i);
-  assert.match(response.body.answer, /documented dimensions too/i);
+  assert.doesNotMatch(response.body.answer, /documented dimensions too/i);
 });
 
 test("affirmative follow-up wording also works for sure and ja", async () => {
@@ -1599,7 +1604,7 @@ test("consumption wording uses appliance-appropriate cycle labels", () => {
       productInfoKeyFacts: ["Model: A-EGSPV597210", "Energy consumption: 82 kWh / 100 cycles"],
     }),
   ], "en");
-  assert.match(dishwasherAnswer.answer, /Energy consumption per 100 cycles: 82 kWh \/ 100 cycles/);
+  assert.match(dishwasherAnswer.answer, /- Dishwasher: 82 kWh \/ 100 cycles/);
   assert.doesNotMatch(dishwasherAnswer.answer, /wash cycles/);
 
   const washingMachineAnswer = route.answerFromExplicitMultiItemFacts("Bitte Verbrauchswerte auflisten", [
@@ -1608,7 +1613,7 @@ test("consumption wording uses appliance-appropriate cycle labels", () => {
       productInfoKeyFacts: ["Model: EWA34660W", "Energy consumption: 51 kWh / 100 cycles"],
     }),
   ], "en");
-  assert.match(washingMachineAnswer.answer, /Energy consumption per 100 wash cycles: 51 kWh \/ 100 cycles/);
+  assert.match(washingMachineAnswer.answer, /- Washing machine: 51 kWh \/ 100 cycles/);
 });
 
 test("dimension answers use readable multiline bullets and hide internal codes", () => {
@@ -1638,7 +1643,7 @@ test("dimension answers use readable multiline bullets and hide internal codes",
   const answer = route.answerFromExplicitMultiItemFacts("List dimensions", items, "en");
   assert.equal(answer.found, true);
   assert.match(answer.answer, /^I found these documented dimensions:\n\n- Extractor hood: 173 × 599 × 303 mm/m);
-  assert.match(answer.answer, /- Washing machine\n  Appliance: 830 × 600 × 540 mm\n  Installation: 825 × 600 × 580 mm/);
+  assert.match(answer.answer, /- Washing machine\n  Appliance dimensions: 830 × 600 × 540 mm\n  Installation dimensions: 825 × 600 × 580 mm/);
   assert.match(answer.answer, /Format: H × W × D unless stated otherwise\./);
   assert.doesNotMatch(answer.answer, /FH664621E/);
 });
@@ -1650,14 +1655,43 @@ test("German dimensions keep German labels and include colons", () => {
       id: "washer",
       productInfoKeyFacts: [
         "Model: EWA34660W",
+        "Breite: 60 cm",
         "Gerätemaße H x B x T (mm) 830 x 600 x 540",
+        "Hoehe: 83 cm",
         "Nischenmaße H x B x T (mm) 825 - 825 x 600 x 580",
       ],
     }),
   ], "de");
 
-  assert.match(answer.answer, /Gerätemaße H x B x T \(mm\): 830 x 600 x 540/);
-  assert.match(answer.answer, /Nischenmaße H x B x T \(mm\): 825 x 600 x 580/);
+  assert.match(answer.answer, /Gerätemaße: 830 × 600 × 540 mm/);
+  assert.match(answer.answer, /Nischenmaße: 825 × 600 × 580 mm/);
+  assert.doesNotMatch(answer.answer, /Breite 60 cm/);
+  assert.doesNotMatch(answer.answer, /Höhe 83 cm/);
+});
+
+test("German all-product dimension answers mirror English compact formatting", () => {
+  const route = loadRoute();
+  const answer = route.answerFromExplicitMultiItemFacts("Bitte Abmessungen auflisten", [
+    product({
+      id: "light",
+      name: "LED-Beleuchtungsset (KA220043_S3)",
+      productInfoKeyFacts: ["Model: KA220043_S3"],
+    }),
+    product({
+      id: "hob",
+      name: "Kochfeld",
+      productInfoKeyFacts: [
+        "Kochfeld: Gerätemaße B x T (mm): 590 x 520.",
+        "Kochfeld: Ausschnittmaße B x T (mm): 560 x 490.",
+      ],
+    }),
+  ], "de");
+
+  assert.match(answer.answer, /- LED-Beleuchtungsset: nicht dokumentiert/);
+  assert.match(answer.answer, /- Kochfeld\n  Gerätemaße: 590 × 520 mm\n  Ausschnittmaße: 560 × 490 mm/);
+  assert.doesNotMatch(answer.answer, /KA220043_S3/);
+  assert.doesNotMatch(answer.answer, /H x B x T: nicht in den bereitgestellten Produktinformationen dokumentiert/);
+  assert.doesNotMatch(answer.answer, /Gerätemaße: B × T/);
 });
 
 test("model list answers use standardized public names", () => {

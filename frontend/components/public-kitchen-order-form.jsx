@@ -6,17 +6,11 @@ import { usePublicI18n } from "./public-i18n";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
 
 const PAYMENT_METHOD_OPTIONS = [
-  { value: "paypal", label: "PayPal" },
-  { value: "visa", label: "Visa" },
-  { value: "mastercard", label: "Mastercard" },
-  { value: "klarna", label: "Klarna" },
+  { value: "card", label: "Card" },
 ];
 
 const PAYMENT_METHOD_STYLE_BY_VALUE = {
-  paypal: "paypal",
-  visa: "visa",
-  mastercard: "mastercard",
-  klarna: "klarna",
+  card: "card",
 };
 
 const COUNTRY_LABELS = {

@@ -97,6 +97,10 @@ model Order {
   country           String?
   notes             String?
   paymentMethod     String?
+  paymentStatus     String           @default("UNPAID")
+  stripeCheckoutSessionId String?    @unique
+  stripePaymentIntentId   String?
+  paidAt            DateTime?
   totalPrice        Decimal          @db.Decimal(10, 2)
   createdAt         DateTime         @default(now())
   updatedAt         DateTime         @updatedAt

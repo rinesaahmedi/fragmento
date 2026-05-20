@@ -1,6 +1,66 @@
 import { NextResponse } from "next/server";
 import { createOrderFromSubmission } from "../../../lib/orders";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
+import { createCheckoutSessionForOrder } from "../../../lib/stripe-payments";
+
+function getRequestOrigin(request) {
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const forwardedHost = request.headers.get("x-forwarded-host");
+
+  if (forwardedHost) {
+    return `${forwardedProto || "https"}://${forwardedHost}`;
+  }
+
+  return request.nextUrl.origin;
+}
+
+function buildCheckoutCancelUrl({ request, origin, order, kitchenSlug }) {
+  const fallbackUrl = new URL(`/kitchens/${encodeURIComponent(kitchenSlug)}`, origin);
+  const referer = request.headers.get("referer");
+  let cancelUrl = fallbackUrl;
+
+  if (referer) {
+    try {
+      const refererUrl = new URL(referer);
+      if (
+        refererUrl.origin === origin &&
+        refererUrl.pathname === `/kitchens/${kitchenSlug}`
+      ) {
+        cancelUrl = refererUrl;
+      }
+    } catch {
+      cancelUrl = fallbackUrl;
+    }
+  }
+
+  cancelUrl.searchParams.set("checkout", "cancelled");
+  cancelUrl.searchParams.set("order", order.orderNumber);
+  if (!cancelUrl.searchParams.get("contractNumber") && order.customer.contractNumber) {
+    cancelUrl.searchParams.set("contractNumber", order.customer.contractNumber);
+  }
+
+  return cancelUrl.toString();
+}
+
+async function createCheckoutSession({ request, order, kitchenSlug }) {
+  const origin = getRequestOrigin(request);
+  const cancelUrl = buildCheckoutCancelUrl({ request, origin, order, kitchenSlug });
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return null;
+  }
+
+  return createCheckoutSessionForOrder({
+    order: {
+      ...order,
+      totalPrice: order.total,
+      email: order.customer.email,
+      paymentMethod: order.customer.paymentMethod,
+    },
+    origin,
+    cancelUrl,
+  });
+}
 
 export async function POST(request) {
   try {
@@ -17,10 +77,16 @@ export async function POST(request) {
       pdfBase64: body.pdf_base64,
       pdfFilename: body.pdf_filename,
     });
+    const checkoutSession = await createCheckoutSession({
+      request,
+      order,
+      kitchenSlug: body.kitchen_slug,
+    });
 
     return NextResponse.json({
       success: true,
       orderNumber: order.orderNumber,
+      checkoutUrl: checkoutSession?.url || null,
       notifications: order.notifications || null,
     });
   } catch (error) {

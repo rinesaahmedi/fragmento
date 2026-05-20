@@ -3,6 +3,29 @@ import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/adm
 import { requireAdminApi } from "../../../../../lib/auth";
 import { getOrderById } from "../../../../../lib/catalog";
 import { confirmOrder, deleteOrder, resendOrderEmail, retryOrderWebhook, updateOrderStatus } from "../../../../../lib/orders";
+import { cancelOrderPayment, createCheckoutSessionForOrder } from "../../../../../lib/stripe-payments";
+
+function getRequestOrigin(request) {
+  const forwardedProto = request.headers.get("x-forwarded-proto");
+  const forwardedHost = request.headers.get("x-forwarded-host");
+
+  if (forwardedHost) {
+    return `${forwardedProto || "https"}://${forwardedHost}`;
+  }
+
+  return new URL(request.url).origin;
+}
+
+function buildAdminPaymentCancelUrl({ request, order }) {
+  const origin = getRequestOrigin(request);
+  const cancelUrl = new URL(`/kitchens/${encodeURIComponent(order.kitchen.slug)}`, origin);
+  cancelUrl.searchParams.set("checkout", "cancelled");
+  cancelUrl.searchParams.set("order", order.orderNumber);
+  if (order.contractNumber) {
+    cancelUrl.searchParams.set("contractNumber", order.contractNumber);
+  }
+  return cancelUrl.toString();
+}
 
 export async function GET(_request, { params }) {
   await requireAdminApi();
@@ -36,13 +59,33 @@ export async function POST(request, { params }) {
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Webhook forwarded successfully.");
     }
 
+    if (intent === "create-payment-link") {
+      const order = await getOrderById(id);
+      if (!order) {
+        throw new Error("Order not found.");
+      }
+      if (order.status === "CANCELLED") {
+        throw new Error("Cancelled orders cannot receive a new payment link.");
+      }
+      if (String(order.paymentStatus || "").toUpperCase() === "PAID") {
+        throw new Error("This order is already paid.");
+      }
+      const session = await createCheckoutSessionForOrder({
+        order,
+        origin: getRequestOrigin(request),
+        cancelUrl: buildAdminPaymentCancelUrl({ request, order }),
+      });
+      const returnPathWithLink = `/admin/orders/${id}?paymentLink=${encodeURIComponent(session.url || "")}`;
+      return redirectWithFlash(request, returnPathWithLink, "success", "Payment link created.");
+    }
+
     if (intent === "confirm") {
       await confirmOrder(id, emailOverrides);
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Confirmation email sent and order confirmed.");
     }
 
     if (intent === "cancel") {
-      await updateOrderStatus(id, "CANCELLED");
+      await cancelOrderPayment(id);
       return redirectWithFlash(request, `/admin/orders/${id}`, "success", "Order marked as cancelled.");
     }
 

@@ -114,6 +114,22 @@ function ItemCount({ count }) {
   );
 }
 
+function PaymentStatusBadge({ status }) {
+  const value = String(status || "UNPAID").toUpperCase();
+  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : value === "CANCELLED" ? "Cancelled" : "Unpaid";
+  const style = value === "PAID"
+    ? paymentStatusPaidStyle
+    : value === "PENDING"
+      ? paymentStatusPendingStyle
+      : value === "FAILED"
+        ? paymentStatusFailedStyle
+        : value === "CANCELLED"
+          ? paymentStatusFailedStyle
+        : paymentStatusUnpaidStyle;
+
+  return <span style={style}>{label}</span>;
+}
+
 function DeleteOrderAction({ orderId, compact = false }) {
   return (
     <form action={`/api/admin/orders/${orderId}`} method="post" style={deleteFormStyle}>
@@ -261,6 +277,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.kitchen" fallback="Kitchen" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.items" fallback="Items" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
+                  <th style={thStyle}>Payment</th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
                   <th className="orders-table-optional" style={thStyle}><AdminText i18nKey="contractAddressFields.city" fallback="City" /></th>
                   <th className="orders-table-date" style={thStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
@@ -270,7 +287,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={9}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
+                    <td style={tdStyle} colSpan={10}><AdminText i18nKey="ordersAdmin.noOrdersFound" fallback="No orders found." /></td>
                   </tr>
                 ) : null}
                 {orders.map((order) => {
@@ -312,6 +329,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                       </span>
                     </td>
                     <td style={tdStyle}><AdminStatusBadge status={order.status} /></td>
+                    <td style={tdStyle}><PaymentStatusBadge status={order.paymentStatus} /></td>
                     <td style={tdStyle}><strong style={totalStyle}>{formatCurrency(order.totalPrice)}</strong></td>
                     <td className="orders-table-optional" style={tdStyle}>{order.city || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</td>
                     <td className="orders-table-date" style={tdStyle}><AdminDateTime value={order.createdAt} /></td>
@@ -365,6 +383,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                     </div>
                     <div style={{ display: "grid", gap: 8, justifyItems: "end" }}>
                       <AdminStatusBadge status={order.status} />
+                      <PaymentStatusBadge status={order.paymentStatus} />
                       <strong style={totalStyle}>{formatCurrency(order.totalPrice)}</strong>
                     </div>
                   </div>
@@ -467,6 +486,47 @@ const articleCountStyle = {
   fontSize: 13,
   fontWeight: 800,
   whiteSpace: "nowrap",
+};
+
+const paymentStatusBaseStyle = {
+  display: "inline-flex",
+  width: "fit-content",
+  borderRadius: 999,
+  padding: "7px 10px",
+  border: "1px solid transparent",
+  fontSize: 12,
+  fontWeight: 900,
+  textTransform: "uppercase",
+  letterSpacing: "0.04em",
+  whiteSpace: "nowrap",
+};
+
+const paymentStatusPaidStyle = {
+  ...paymentStatusBaseStyle,
+  color: "#1f6f43",
+  background: "rgba(42, 145, 85, 0.12)",
+  borderColor: "rgba(42, 145, 85, 0.22)",
+};
+
+const paymentStatusPendingStyle = {
+  ...paymentStatusBaseStyle,
+  color: "#8a5a13",
+  background: "rgba(207, 145, 36, 0.12)",
+  borderColor: "rgba(207, 145, 36, 0.22)",
+};
+
+const paymentStatusFailedStyle = {
+  ...paymentStatusBaseStyle,
+  color: "var(--app-danger-text)",
+  background: "rgba(217, 92, 92, 0.12)",
+  borderColor: "rgba(217, 92, 92, 0.22)",
+};
+
+const paymentStatusUnpaidStyle = {
+  ...paymentStatusBaseStyle,
+  color: "var(--app-text-muted)",
+  background: "rgba(115, 80, 55, 0.07)",
+  borderColor: "rgba(115, 80, 55, 0.12)",
 };
 
 const contractSequenceStyle = {

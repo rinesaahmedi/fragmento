@@ -416,6 +416,18 @@ function getAnnualConsumptionValue(item) {
     getFactValue(item, /^(jahresverbrauch|annual consumption|energy consumption|energieverbrauch)\s*:/i);
   if (factValue) return factValue;
 
+  const factLine = getDocumentedFactLines(item).find((entry) =>
+    /(jahresverbrauch|annual consumption|energy consumption|energieverbrauch)/i.test(entry)
+    && /\b\d+(?:[.,]\d+)?\s*kWh\b/i.test(entry),
+  );
+  if (factLine) {
+    const ovenMatch = factLine.match(/\b\d+(?:[.,]\d+)?\s*kWh\s*(?:conventional|konventionell)?\s*\/\s*\d+(?:[.,]\d+)?\s*kWh\s*(?:hot air|heißluft|heissluft)?\b/i);
+    if (ovenMatch) return ovenMatch[0].replace(/\s+/g, " ").trim();
+
+    const factMatch = factLine.match(/\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|1000\s*h|Jahr|year))?\b/i);
+    if (factMatch) return factMatch[0].replace(/\s+/g, " ").trim();
+  }
+
   const line = getItemInfoLines(item).find((entry) =>
     /(jahresverbrauch|jährlicher energieverbrauch|jaehrlicher energieverbrauch|annual consumption|energy consumption|energieverbrauch|verbrauch[^\n]*(?:100\s*(?:zyklen|cycles)|jahr|year))/i.test(entry)
     && /\b\d+(?:[.,]\d+)?\s*kWh(?:\s*\/\s*(?:100\s*(?:Zyklen|cycles)|1000\s*h|Jahr|year))?\b/i.test(entry),
@@ -431,6 +443,16 @@ function getWaterConsumptionValue(item) {
   const factValue =
     getFactValue(item, /^(wasserverbrauch|water consumption)\s*:/i);
   if (factValue) return factValue;
+
+  const typeLabel = getPublicTypeLabelForModel(extractKnownModel(item), item, "en");
+  const combinedLine = getItemInfoLines(item).find((entry) =>
+    typeLabel === "Dishwasher"
+    && /\b\d+(?:[.,]\d+)?\s*l\s*\/\s*zyklus\b/i.test(entry),
+  );
+  if (combinedLine) {
+    const combinedMatch = combinedLine.match(/\b\d+(?:[.,]\d+)?\s*l\s*\/\s*zyklus\b/i);
+    if (combinedMatch) return combinedMatch[0].replace(/\s+/g, " ").trim();
+  }
 
   const line = getItemInfoLines(item).find((entry) =>
     /(wasserverbrauch|water consumption|water use)/i.test(entry)
@@ -568,6 +590,13 @@ function formatCookingZonesEntry(item, language) {
 }
 
 function getProgramOrFeatureValue(item) {
+  const typeLabel = getPublicTypeLabelForModel(extractKnownModel(item), item, "en");
+  if (typeLabel === "Dishwasher") {
+    const line = findLabeledInfoLine(item, /(programs?|programmes?|programme)/i, /\b\d{1,2}\b/);
+    const match = line.match(/\b\d{1,2}\b/);
+    if (match) return match[0];
+  }
+
   const line = findLabeledInfoLine(
     item,
     /(programs?|programmes?|features?|functions?|programme|funktionen|ausstattung)/i,
@@ -576,12 +605,43 @@ function getProgramOrFeatureValue(item) {
   return getLabelValueFromLine(line);
 }
 
+function normalizeProgramOrFeatureValue(value, language) {
+  let text = String(value || "").replace(/\s+/g, " ").trim();
+  if (!text) return "";
+
+  if (language !== "de") {
+    text = text
+      .replace(/\b(\d+)\s+Programme?\b/gi, "$1 programs")
+      .replace(/\b(\d+)\s+Funktionen\b/gi, "$1 functions")
+      .replace(/\b(\d+)\s*l\s+Volumen\b/gi, "$1 l capacity")
+      .replace(/\bGarraumvolumen\b/gi, "oven capacity")
+      .replace(/\bVolumen\b/gi, "capacity")
+      .replace(/\bLED-Licht\b/gi, "LED light")
+      .replace(/\bFlaschenregal\b/gi, "bottle rack")
+      .replace(/\bGefrierschubladen\b/gi, "freezer drawers")
+      .replace(/\bGefrierschublade\b/gi, "freezer drawer")
+      .replace(/\bAusstattung\b/gi, "features")
+      .replace(/\bFunktionen\b/gi, "functions")
+      .replace(/\bProgramme\b/gi, "programs")
+      .replace(/\bProgramm\b/gi, "program")
+      .replace(/\bund\b/gi, "and")
+      .replace(/\s*,\s*/g, ", ")
+      .trim();
+  }
+
+  if (/^\d+$/.test(text)) {
+    return language === "de" ? `${text} Programme` : `${text} programs`;
+  }
+
+  return text;
+}
+
 function formatProgramOrFeatureEntry(item, language) {
   const value = getProgramOrFeatureValue(item);
   if (!value) return "";
 
   const label = language === "de" ? "Programme/Funktionen" : "Programs/features";
-  return `${getPublicItemName(item, language)}: ${label}: ${value}`;
+  return `${getPublicItemName(item, language)}: ${label}: ${normalizeProgramOrFeatureValue(value, language)}`;
 }
 
 function getItemDocumentLabels(item) {
@@ -998,25 +1058,25 @@ function compactEnglishDimensionRecord(line, fallbackName) {
   };
 
   const applianceSize = valueFrom(/^Appliance size:\s*(.+)$/i);
-  if (applianceSize) return { subject: fallbackName, label: "Appliance", value: applianceSize };
+  if (applianceSize) return { subject: fallbackName, label: "Appliance dimensions", value: applianceSize };
 
   const requiredSpace = valueFrom(/^Required installation space:\s*(.+)$/i);
-  if (requiredSpace) return { subject: fallbackName, label: "Installation", value: requiredSpace };
+  if (requiredSpace) return { subject: fallbackName, label: "Installation dimensions", value: requiredSpace };
 
   const ovenSize = valueFrom(/^Oven appliance size:\s*(.+)$/i);
-  if (ovenSize) return { subject: "Built-in oven", label: "Appliance", value: ovenSize };
+  if (ovenSize) return { subject: "Built-in oven", label: "Appliance dimensions", value: ovenSize };
 
   const ovenSpace = valueFrom(/^Oven required installation space:\s*(.+)$/i);
-  if (ovenSpace) return { subject: "Built-in oven", label: "Installation", value: ovenSpace };
+  if (ovenSpace) return { subject: "Built-in oven", label: "Installation dimensions", value: ovenSpace };
 
   const hobSize = valueFrom(/^Hob appliance size:\s*(.+)$/i);
-  if (hobSize) return { subject: "Hob", label: "Appliance", value: hobSize };
+  if (hobSize) return { subject: "Hob", label: "Appliance dimensions", value: hobSize };
 
   const hobCutOut = valueFrom(/^Hob cut-out size:\s*(.+)$/i);
-  if (hobCutOut) return { subject: "Hob", label: "Cut-out", value: hobCutOut };
+  if (hobCutOut) return { subject: "Hob", label: "Cut-out dimensions", value: hobCutOut };
 
   const cutOut = valueFrom(/^Cut-out size:\s*(.+)$/i);
-  if (cutOut) return { subject: fallbackName, label: "Cut-out", value: cutOut };
+  if (cutOut) return { subject: fallbackName, label: "Cut-out dimensions", value: cutOut };
 
   const width = valueFrom(/^Width:\s*(.+)$/i);
   if (width) return { subject: fallbackName, label: "", value: `width ${width}` };
@@ -1030,7 +1090,49 @@ function compactEnglishDimensionRecord(line, fallbackName) {
   return null;
 }
 
-function formatCompactEnglishDimensionRecords(records) {
+function compactGermanDimensionRecord(line, fallbackName) {
+  const normalizedLine = String(line || "").trim();
+  const valueFrom = (pattern) => {
+    const match = normalizedLine.match(pattern);
+    if (!match) return "";
+    const unit = match[0].match(/\((mm|cm)\)/i)?.[1] || "";
+    const value = match[1].replace(/[.;]\s*$/g, "");
+    const valueWithUnit = unit && !new RegExp(`\\b${unit}\\b`, "i").test(value) ? `${value} ${unit}` : value;
+    return formatCompactDimensionValue(valueWithUnit);
+  };
+
+  const subjectFromPrefix = (prefix) => (/^Kochfeld$/i.test(prefix) ? "Kochfeld" : "Einbaubackofen");
+  const prefixed = normalizedLine.match(/^(Backofen|Einbaubackofen|Kochfeld):\s*(.+)$/i);
+  if (prefixed) {
+    const nested = compactGermanDimensionRecord(prefixed[2], subjectFromPrefix(prefixed[1]));
+    return nested ? { ...nested, subject: subjectFromPrefix(prefixed[1]) } : null;
+  }
+
+  const applianceSize = valueFrom(/^Gerätemaße(?:\s+H\s*x\s*B\s*x\s*T|\s+B\s*x\s*T)?(?:\s*\((?:mm|cm)\))?\s*:?\s*(.+)$/i);
+  if (applianceSize) return { subject: fallbackName, label: "Gerätemaße", value: applianceSize };
+
+  const nicheSize = valueFrom(/^Nischenmaße(?:\s+H\s*x\s*B\s*x\s*T)?(?:\s*\((?:mm|cm)\))?\s*:?\s*(.+)$/i);
+  if (nicheSize) return { subject: fallbackName, label: "Nischenmaße", value: nicheSize };
+
+  const installationSize = valueFrom(/^Einbaumaße(?:\s+H\s*x\s*B\s*x\s*T)?(?:\s*\((?:mm|cm)\))?\s*:?\s*(.+)$/i);
+  if (installationSize) return { subject: fallbackName, label: "Einbaumaße", value: installationSize };
+
+  const cutOutSize = valueFrom(/^Ausschnittmaße(?:\s+B\s*x\s*T)?(?:\s*\((?:mm|cm)\))?\s*:?\s*(.+)$/i);
+  if (cutOutSize) return { subject: fallbackName, label: "Ausschnittmaße", value: cutOutSize };
+
+  const width = valueFrom(/^Breite:\s*(.+)$/i);
+  if (width) return { subject: fallbackName, label: "", value: `Breite ${width}` };
+
+  const height = valueFrom(/^Höhe:\s*(.+)$/i);
+  if (height) return { subject: fallbackName, label: "", value: `Höhe ${height}` };
+
+  const depth = valueFrom(/^Tiefe:\s*(.+)$/i);
+  if (depth) return { subject: fallbackName, label: "", value: `Tiefe ${depth}` };
+
+  return null;
+}
+
+function formatCompactDimensionRecords(records) {
   const groups = new Map();
   for (const record of records) {
     if (!record?.subject || !record.value) continue;
@@ -1045,28 +1147,30 @@ function formatCompactEnglishDimensionRecords(records) {
   return [...groups.entries()]
     .map(([subject, entries]) => {
       if (entries.length === 1 && !entries[0].label) return `- ${subject}: ${entries[0].value}`;
-      if (entries.length === 1 && entries[0].label === "Appliance") return `- ${subject}: ${entries[0].value}`;
+      if (entries.length === 1 && /^(Appliance dimensions|Gerätemaße)$/.test(entries[0].label)) {
+        return `- ${subject}: ${entries[0].value}`;
+      }
       return [`- ${subject}`, ...entries.map((entry) => `  ${entry.label}: ${entry.value}`)].join("\n");
     })
     .join("\n");
 }
 
 function formatCompactDimensionEntryByLanguage(name, dimensions, language) {
-  if (language === "de") return formatDimensionEntryByLanguage(name, dimensions, language);
-
   const compactName = getCompactDimensionName(name);
   const lines = splitDocumentedDimensionLines(dimensions);
-  const normalizedLines = [...new Set(lines.map((line) => normalizeDimensionLabel(line, "en")))];
+  const normalizedLines = [...new Set(lines.map((line) => normalizeDimensionLabel(line, language)))];
   const hasFullSize = normalizedLines.some((line) =>
-    /^(?:Appliance size|Oven appliance size|Hob appliance size):/i.test(line),
+    /^(?:Appliance size|Oven appliance size|Hob appliance size|Gerätemaße(?:\s+H\s*x\s*B\s*x\s*T|\s+B\s*x\s*T)?(?:\s*\((?:mm|cm)\))?|(?:Backofen|Einbaubackofen|Kochfeld):\s*Gerätemaße(?:\s+H\s*x\s*B\s*x\s*T|\s+B\s*x\s*T)?(?:\s*\((?:mm|cm)\))?):/i.test(line),
   );
 
   const compactRecords = normalizedLines
-    .filter((line) => !(hasFullSize && /^(?:Width|Height):/i.test(line)))
-    .map((line) => compactEnglishDimensionRecord(line, compactName))
+    .filter((line) => !(hasFullSize && /^(?:Width|Height|Build height|Breite|Höhe|Hoehe|Bauhöhe|Bauhoehe):/i.test(line)))
+    .map((line) => language === "de"
+      ? compactGermanDimensionRecord(line, compactName)
+      : compactEnglishDimensionRecord(line, compactName))
     .filter(Boolean);
 
-  return formatCompactEnglishDimensionRecords(compactRecords);
+  return formatCompactDimensionRecords(compactRecords);
 }
 
 function getEnglishDimensionFormatNote() {
@@ -1740,6 +1844,69 @@ function formatConsumptionEntry(record, language) {
   }
   if (!parts.length) return "";
   return `${record.name}: ${parts.join("; ")}`;
+}
+
+function normalizeCompactConsumptionValue(value, item) {
+  let text = String(value || "")
+    .replace(/\s+/g, " ")
+    .replace(/[.;]\s*$/g, "")
+    .trim();
+  const typeLabel = getPublicTypeLabelForModel(extractKnownModel(item), item, "en");
+
+  text = text
+    .replace(/,/g, ".")
+    .replace(/\b(\d+)\.0\b/g, "$1")
+    .replace(/\s*\/\s*Jahr/i, "/year")
+    .replace(/\s*\/\s*jahr/i, "/year")
+    .replace(/\s*\/\s*year/i, "/year")
+    .replace(/\s*\/\s*100\s*Zyklen/i, " / 100 cycles")
+    .replace(/\s*\/\s*100\s*cycles/i, " / 100 cycles")
+    .replace(/\s*\/\s*1000\s*h/i, " / 1000 h")
+    .replace(/\s+conventional\s*\/\s*/i, " conventional / ")
+    .replace(/\s+hot air/i, " hot air")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (/kWh$/i.test(text) && /^(Extractor hood|Refrigerator-freezer)$/.test(typeLabel)) {
+    text = `${text}/year`;
+  }
+  if (/kWh$/i.test(text) && /^(Washing machine|Dishwasher)$/.test(typeLabel)) {
+    text = `${text} / 100 cycles`;
+  }
+  if (/^Built-in oven$/.test(typeLabel) && /\b\d+(?:\.\d+)?\s*kWh\s*\/\s*\d+(?:\.\d+)?\s*kWh\b/i.test(text)) {
+    text = text.replace(
+      /\b(\d+(?:\.\d+)?)\s*kWh\s*\/\s*(\d+(?:\.\d+)?)\s*kWh\b/i,
+      "$1 kWh conventional / $2 kWh hot air",
+    );
+  }
+
+  return text;
+}
+
+function normalizeCompactWaterConsumptionValue(value) {
+  const match = String(value || "")
+    .replace(",", ".")
+    .match(/\b\d+(?:\.\d+)?\s*l\b/i);
+  return match ? `${match[0]} water/cycle` : "";
+}
+
+function formatCompactConsumptionEntry(record, language) {
+  if (language === "de") return formatConsumptionEntry(record, language);
+
+  const name = getCompactDimensionName(record.name);
+  const parts = [];
+  if (record?.annualConsumption) {
+    parts.push(normalizeCompactConsumptionValue(record.annualConsumption, record.item));
+  }
+
+  const typeLabel = getPublicTypeLabelForModel(extractKnownModel(record.item), record.item, "en");
+  if (record?.waterConsumption && typeLabel === "Washing machine") {
+    const waterValue = normalizeCompactWaterConsumptionValue(record.waterConsumption);
+    if (waterValue) parts.push(waterValue);
+  }
+
+  if (!parts.length) return "";
+  return `${name}: ${parts.join(", ")}`;
 }
 
 function parseFirstNumber(value) {
@@ -2424,7 +2591,7 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language, answe
   const records = scopedItems.flatMap((item) => getEnergyAnswerRecords(item, language));
   const consumptionEntries = records
     .filter((record) => record.annualConsumption || record.waterConsumption)
-    .map((record) => formatConsumptionEntry(record, language))
+    .map((record) => formatCompactConsumptionEntry(record, language))
     .filter(Boolean);
 
   if (asksConsumptionOnly) {
@@ -2435,10 +2602,8 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language, answe
     const body = language === "de"
       ? formatSectionWithBullets(records.length > 1 ? "Hier sind die dokumentierten Verbrauchswerte für alle ausgewählten Produkte:" : "Hier sind die dokumentierten Verbrauchswerte aus den Produktinformationen:", consumptionEntries)
       : formatSectionWithBullets("Here are the documented consumption values from the product information:", consumptionEntries);
-    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption", answeredTopics);
-
     return {
-      answer: followUp ? `${body}\n\n${followUp}` : body,
+      answer: body,
       found: true,
     };
   }
@@ -2555,20 +2720,19 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
     const entries = scopedItems
       .flatMap((item) => getEnergyAnswerRecords(item, language))
       .filter((record) => record.annualConsumption || record.waterConsumption)
-      .map((record) => formatConsumptionEntry(record, language))
+      .map((record) => formatCompactConsumptionEntry(record, language))
       .filter(Boolean);
 
     if (!entries.length) {
       return { answer: notFoundAnswer, found: false };
     }
 
-    const followUp = getNextDocumentedFollowUp(scopedItems, language, "consumption", answeredTopics);
     const body = language === "de"
       ? formatSectionWithBullets(scopedItems.length > 1 ? "Hier sind die dokumentierten Verbrauchswerte für alle ausgewählten Produkte:" : "Hier sind die dokumentierten Verbrauchswerte aus den Produktinformationen:", entries)
       : formatSectionWithBullets("Here are the documented consumption values from the product information:", entries);
 
     return {
-      answer: followUp ? `${body}\n\n${followUp}` : body,
+      answer: body,
       found: true,
     };
   }
@@ -2660,7 +2824,7 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
       : formatSectionWithBullets("The documented noise values are:", entries);
 
     return {
-      answer: followUp ? `${body}\n\n${followUp}` : body,
+      answer: body,
       found: true,
     };
   }
@@ -2681,7 +2845,7 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
         }
         if (scopedItems.length <= 1) return null;
         return language === "de"
-          ? `- ${getPublicItemName(item, language)}:\n  H x B x T: nicht in den bereitgestellten Produktinformationen dokumentiert.`
+          ? `- ${getCompactDimensionName(getPublicItemName(item, language))}: nicht dokumentiert`
           : `- ${getCompactDimensionName(getPublicItemName(item, language))}: not documented`;
       })
       .filter(Boolean);
