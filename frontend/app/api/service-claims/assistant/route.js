@@ -1258,6 +1258,13 @@ function normalizeCode(raw) {
   return `E${digits}`;
 }
 
+function errorCodeAliases(code) {
+  const normalized = normalizeCode(code);
+  if (normalized === "E2") return ["E2", "E02"];
+  if (normalized === "E02") return ["E02", "E2"];
+  return normalized ? [normalized] : [];
+}
+
 function replaceDishwasherBrandCopy(text) {
   const normalized = normalizeText(text);
   if (!normalized) return "";
@@ -1272,7 +1279,9 @@ function replaceDishwasherBrandCopy(text) {
 }
 
 function getDishwasherTroubleshootingLanguage(language) {
-  return language === "de" ? "de" : "en";
+  if (language === "de") return "de";
+  if (language === "es") return "es";
+  return "en";
 }
 
 function listDishwasherTroubleshootingGuides(language) {
@@ -1389,7 +1398,7 @@ function isSampleWordingRequest(question) {
 function isClaimFormHelpRequest(question) {
   const normalized = normalizeLanguageHintText(question);
   if (!normalized) return false;
-  return /\b(show claim form help|claim form help|formularhilfe anzeigen|formularhilfe|what should i write|what do i write|what should i put|was soll ich schreiben|welche formulierung|formulierung fur das formular|formulierung fuer das formular|formulierung)\b/.test(
+  return /\b(show claim form help|claim form help|formularhilfe anzeigen|formularhilfe|what should i write|what do i write|what should i put|was soll ich schreiben|welche formulierung|formulierung fur das formular|formulierung fuer das formular|formulierung|mostrar ayuda del formulario|ayuda del formulario|que debo escribir|que tengo que escribir|que pongo en el formulario)\b/.test(
     normalized,
   );
 }
@@ -1446,12 +1455,21 @@ function dedupe(items) {
 
 function extractErrorCodes(text) {
   const matches = [];
-  const pattern = /(^|[^A-Z0-9])(E\s*0?\d{1,2})(?=$|[^A-Z0-9])/gi;
-  let match = pattern.exec(text);
+  const eCodePattern = /(^|[^A-Z0-9])(E\s*0?\d{1,2})(?=$|[^A-Z0-9])/gi;
+  let match = eCodePattern.exec(text);
   while (match) {
-    matches.push(normalizeCode(match[2]));
-    match = pattern.exec(text);
+    matches.push(...errorCodeAliases(match[2]));
+    match = eCodePattern.exec(text);
   }
+
+  const namedCodePattern =
+    /\b(?:error|error code|code|fehler|fehlercode)\s*[:#-]?\s*(\d{1,2})\b/gi;
+  match = namedCodePattern.exec(text);
+  while (match) {
+    matches.push(...errorCodeAliases(`E${match[1]}`));
+    match = namedCodePattern.exec(text);
+  }
+
   return dedupe(matches);
 }
 
@@ -1817,8 +1835,13 @@ function enrichDishwasherContextWithConversation(baseContext, conversationMessag
     .trim();
   const combinedText = `${conversationText}\n${baseContext.combinedText}`.trim();
   const categories = dedupe([...baseContext.categories, ...detectTextCategories(combinedText)]);
-  const explicitErrorCodes = dedupe([...baseContext.explicitErrorCodes, ...extractErrorCodes(combinedText)]);
-  const inferredErrorCodes = dedupe([...baseContext.inferredErrorCodes, ...inferDishwasherCodesFromSymptoms(combinedText)]);
+  const hasCurrentExplicitCodes = baseContext.explicitErrorCodes.length > 0;
+  const explicitErrorCodes = hasCurrentExplicitCodes
+    ? baseContext.explicitErrorCodes
+    : dedupe([...baseContext.explicitErrorCodes, ...extractErrorCodes(conversationText)]);
+  const inferredErrorCodes = hasCurrentExplicitCodes
+    ? baseContext.inferredErrorCodes
+    : dedupe([...baseContext.inferredErrorCodes, ...inferDishwasherCodesFromSymptoms(conversationText)]);
   const errorCodes = dedupe([...explicitErrorCodes, ...inferredErrorCodes]);
   const hasDishwasherContext =
     baseContext.hasDishwasherContext
@@ -1826,7 +1849,7 @@ function enrichDishwasherContextWithConversation(baseContext, conversationMessag
     || /amica|dishwasher|geschirrsp|geschirrsp[uü]l|geschirrspul|sp[uü]lmaschine|sp[uü]lmachine|sp[uü]lmaschiene|spulmaschine|spuelmaschine|bulaÅŸÄ±k|lavavajillas|lave-vaisselle|Ð¿Ð¾ÑÑƒÐ´Ð¾Ð¼Ð¾/i.test(combinedText);
 
   return {
-    combinedText,
+    combinedText: hasCurrentExplicitCodes ? baseContext.combinedText : combinedText,
     categories,
     explicitErrorCodes,
     inferredErrorCodes,
