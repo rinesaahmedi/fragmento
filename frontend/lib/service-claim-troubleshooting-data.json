@@ -121,6 +121,24 @@
     {
       "brand": "Amica",
       "appliance_type": "dishwasher",
+      "language": "es",
+      "error_code": "E1",
+      "issue_key": "water_inlet",
+      "title": "Problema de entrada de agua",
+      "description": "El lavavajillas no recibe suficiente agua.",
+      "troubleshooting_steps": [
+        "Comprueba que el grifo del agua esté completamente abierto.",
+        "Comprueba si la manguera de entrada está doblada o torcida.",
+        "Limpia el pequeño filtro o tamiz de la conexión de la manguera.",
+        "Desenchufa el lavavajillas durante 1 o 2 minutos para reiniciarlo."
+      ],
+      "claim_guidance": "Indica que el lavavajillas no toma agua y añade E1 si aparece en la pantalla.",
+      "optional_form_description": "Mi lavavajillas Amica no toma agua y puede mostrar el código de error E1. He comprobado el grifo del agua y la manguera de entrada, pero el problema continúa. Por favor, revisen el aparato o indíquenme el siguiente paso.",
+      "keywords": ["entrada de agua", "no entra agua", "grifo", "manguera de entrada", "e1"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
       "language": "de",
       "error_code": "E1",
       "issue_key": "water_inlet",
@@ -151,6 +169,22 @@
       "claim_guidance": "Mention that the dishwasher is not heating or the water stays cold, and add E3 if it appears on the display.",
       "optional_form_description": "My Amica dishwasher is not heating properly and may show error code E3. The water stays cold and does not reach the required temperature. I reset the appliance and checked the filters, but the issue remains. Please arrange a check or advise on the next step.",
       "keywords": ["heating", "temperature", "cold water", "not heating", "water stays cold", "e3"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "es",
+      "error_code": "E3",
+      "issue_key": "heating_temperature",
+      "title": "Problema de calentamiento o temperatura",
+      "description": "El lavavajillas no calienta bien y el agua puede quedarse fría.",
+      "troubleshooting_steps": [
+        "Desenchufa el aparato durante 1 o 2 minutos para reiniciarlo.",
+        "Revisa los filtros interiores por si tienen suciedad o residuos."
+      ],
+      "claim_guidance": "Indica que el lavavajillas no calienta o que el agua sigue fría, y añade E3 si aparece en la pantalla.",
+      "optional_form_description": "Mi lavavajillas Amica no calienta bien y puede mostrar el código de error E3. El agua sigue fría y no alcanza la temperatura necesaria. He reiniciado el aparato y revisado los filtros, pero el problema continúa. Por favor, revisen el aparato o indíquenme el siguiente paso.",
+      "keywords": ["calentamiento", "temperatura", "agua fría", "no calienta", "el agua sigue fría", "e3"]
     },
     {
       "brand": "Amica",
@@ -187,6 +221,22 @@
     {
       "brand": "Amica",
       "appliance_type": "dishwasher",
+      "language": "es",
+      "error_code": "E4",
+      "issue_key": "leak_overflow",
+      "title": "Problema de fuga o desbordamiento",
+      "description": "El aparato puede tener una fuga o un problema de desbordamiento y puede seguir bombeando continuamente.",
+      "troubleshooting_steps": [
+        "Si el aparato sigue bombeando incluso después de apagarlo, comprueba si hay agua en la bandeja inferior.",
+        "Si sigue bombeando y hay agua en la bandeja inferior, inclina el aparato ligeramente hacia delante para que el agua pueda salir."
+      ],
+      "claim_guidance": "Indica que el lavavajillas pierde agua, sigue bombeando o que puede haber agua en la bandeja inferior, y adjunta una foto si es posible.",
+      "optional_form_description": "Mi lavavajillas Amica parece tener una fuga o un problema de desbordamiento y puede mostrar el código de error E4. El aparato sigue bombeando y puede haber agua en la bandeja inferior. Por favor, revisen el aparato o indíquenme el siguiente paso.",
+      "keywords": ["fuga", "desbordamiento", "bandeja inferior", "bombea sin parar", "agua en la bandeja inferior", "e4"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
       "language": "de",
       "error_code": "E4",
       "issue_key": "leak_overflow",
@@ -217,6 +267,24 @@
       "claim_guidance": "Mention that the dishwasher is not draining properly, and add E02 if it appears on the display.",
       "optional_form_description": "My Amica dishwasher is not draining properly and may show error code E02. I checked the filters, drain hose, and pump area, but the issue remains. Please arrange a check or advise on the next step.",
       "keywords": ["drainage", "not draining", "water stays inside", "drain hose", "pump blockage", "e02"]
+    },
+    {
+      "brand": "Amica",
+      "appliance_type": "dishwasher",
+      "language": "es",
+      "error_code": "E02",
+      "issue_key": "drainage",
+      "title": "Problema de desagüe",
+      "description": "El lavavajillas no desagua bien y puede quedar agua dentro.",
+      "troubleshooting_steps": [
+        "Limpia los filtros interiores.",
+        "Comprueba si la manguera de desagüe tiene obstrucciones o dobleces.",
+        "Comprueba si hay obstrucciones en la zona de la bomba.",
+        "Desenchufa el aparato durante 1 o 2 minutos para reiniciarlo."
+      ],
+      "claim_guidance": "Indica que el lavavajillas no desagua bien y añade E02 si aparece en la pantalla.",
+      "optional_form_description": "Mi lavavajillas Amica no desagua bien y puede mostrar el código de error E02. He revisado los filtros, la manguera de desagüe y la zona de la bomba, pero el problema continúa. Por favor, revisen el aparato o indíquenme el siguiente paso.",
+      "keywords": ["desagüe", "no desagua", "queda agua dentro", "manguera de desagüe", "bloqueo de bomba", "e02"]
     },
     {
       "brand": "Amica",

@@ -90,6 +90,9 @@ function assertClaimFormHelpAction(body, language) {
   if (language === "de") {
     assert.equal(action.label, "Formularhilfe anzeigen");
     assert.equal(action.prompt, "Formularhilfe anzeigen");
+  } else if (language === "es") {
+    assert.equal(action.label, "Mostrar ayuda del formulario");
+    assert.equal(action.prompt, "Mostrar ayuda del formulario");
   } else {
     assert.equal(action.label, "Show claim-form help");
     assert.equal(action.prompt, "Show claim-form help");
@@ -480,6 +483,22 @@ test("i see error E1 returns dishwasher guidance without prior dishwasher contex
   assert.doesNotMatch(response.body.answer, /An appliance is not working/);
 });
 
+test("i see error 4 returns dishwasher E4 guidance without prior dishwasher context", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error 4",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /matches error code E4/);
+  assert.match(response.body.answer, /leak or overflow problem/);
+  assert.doesNotMatch(response.body.answer, /An appliance is not working/);
+});
+
 test("E3 shown on the display returns E3 guidance", async () => {
   const route = loadRoute();
 
@@ -512,6 +531,76 @@ test("E02 shown on the display returns E02 guidance", async () => {
 
   assert.equal(response.status, 200);
   assert.match(response.body.answer, /matches error code E02/);
+});
+
+test("latest dishwasher error code overrides earlier conversation codes", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error E2",
+    conversationMessages: [
+      { role: "user", text: "the dishwasher isnt working" },
+      { role: "assistant", text: "To help you faster, which of these fits best?" },
+      { role: "user", text: "i see error E1" },
+      { role: "assistant", text: "This sounds like a water inlet problem and matches error code E1 on architecto dishwashers." },
+      { role: "user", text: "i see error E4" },
+      { role: "assistant", text: "This sounds like a leak or overflow problem and matches error code E4 on architecto dishwashers." },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /matches error code E02/);
+  assert.match(response.body.answer, /drainage problem/);
+  assert.doesNotMatch(response.body.answer, /matches error code E4/);
+  assert.doesNotMatch(response.body.answer, /leak or overflow problem/);
+});
+
+test("latest german dishwasher error code overrides earlier conversation codes", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "de",
+    question: "ich sehe Fehler E2",
+    conversationMessages: [
+      { role: "user", text: "die Spülmaschine funktioniert nicht" },
+      { role: "assistant", text: "Welcher Fehlercode wird auf dem Display angezeigt?" },
+      { role: "user", text: "ich sehe Fehler E1" },
+      { role: "assistant", text: "Das klingt nach einem Problem mit dem Wasserzulauf, passend zu Fehlercode E1." },
+      { role: "user", text: "ich sehe Fehler E4" },
+      { role: "assistant", text: "Das klingt nach einem Leck- oder Überlaufproblem, passend zu Fehlercode E4." },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.language, "de");
+  assert.match(response.body.answer, /Fehlercode E02/);
+  assert.match(response.body.answer, /Problem mit dem Wasserablauf/i);
+  assert.doesNotMatch(response.body.answer, /Fehlercode E4/);
+  assert.doesNotMatch(response.body.answer, /Leck- oder Überlaufproblem/i);
+});
+
+test("error 4 after dishwasher clarification returns E4 guidance", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error 4",
+    conversationMessages: [
+      { role: "user", text: "the dishwasher isnt working" },
+      { role: "assistant", text: "To help you faster, which of these fits best?" },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /matches error code E4/);
+  assert.match(response.body.answer, /leak or overflow problem/);
 });
 
 test("i see error E02 returns dishwasher guidance without prior dishwasher context", async () => {
@@ -1267,6 +1356,54 @@ test("show claim-form help shows english claim-form guidance", async () => {
   assert.ok(!response.body.actions);
 });
 
+test("spanish E3 dishwasher guidance stays in spanish", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "es",
+    question: "Veo el error E3",
+    conversationMessages: [
+      { role: "user", text: "El lavavajillas no funciona" },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.language, "es");
+  assert.match(response.body.answer, /problema de calentamiento o temperatura/i);
+  assert.match(response.body.answer, /Puedes probar/);
+  assert.match(response.body.answer, /Desenchufa el aparato durante 1 o 2 minutos para reiniciarlo/i);
+  assert.doesNotMatch(response.body.answer, /Unplug the appliance/i);
+  assertClaimFormHelpAction(response.body, "es");
+});
+
+test("mostrar ayuda del formulario shows spanish claim-form guidance", async () => {
+  const route = loadRoute();
+
+  const response = await route.POST(request({
+    language: "es",
+    question: "Mostrar ayuda del formulario",
+    conversationMessages: [
+      { role: "user", text: "Veo el error E3" },
+      { role: "assistant", text: "Esto parece un problema de calentamiento o temperatura y coincide con el código de error E3 en lavavajillas architecto." },
+    ],
+    selectedAreas: dishwasherArea(),
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.language, "es");
+  assert.match(response.body.answer, /Para el formulario/);
+  assert.match(response.body.answer, /Indica que el lavavajillas no calienta o que el agua sigue fría, y añade E3/i);
+  assert.match(response.body.answer, /Descripción del problema sugerida/);
+  assert.match(
+    response.body.suggestedProblemDescription,
+    /Mi lavavajillas architecto no calienta bien y puede mostrar el código de error E3/i,
+  );
+  assert.ok(!response.body.actions);
+});
+
 test("claim-form help phrase shows english drainage claim-form guidance", async () => {
   const route = loadRoute();
 
@@ -1335,7 +1472,7 @@ test("structured troubleshooting data contains english and german dishwasher gui
     entry.brand === "Amica" && entry.appliance_type === "dishwasher"
   );
 
-  for (const language of ["en", "de"]) {
+  for (const language of ["en", "de", "es"]) {
     for (const code of ["E1", "E3", "E4", "E02"]) {
       const match = guides.find((entry) => entry.language === language && entry.error_code === code);
       assert.ok(match, `missing ${language} guide for ${code}`);
