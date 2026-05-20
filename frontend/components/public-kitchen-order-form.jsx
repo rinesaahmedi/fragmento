@@ -5,14 +5,6 @@ import styles from "./kitchen-configurator.module.css";
 import { usePublicI18n } from "./public-i18n";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
 
-const PAYMENT_METHOD_OPTIONS = [
-  { value: "card", label: "Card" },
-];
-
-const PAYMENT_METHOD_STYLE_BY_VALUE = {
-  card: "card",
-};
-
 const COUNTRY_LABELS = {
   Deutschland: "Germany",
   Oesterreich: "Austria",
@@ -62,7 +54,7 @@ export default function PublicKitchenOrderForm({
   onUpdateCustomer,
   onToggleUseContractAddress,
 }) {
-  const { translate } = usePublicI18n();
+  const { language, translate } = usePublicI18n();
   const [touchedFields, setTouchedFields] = useState({});
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const [showSavedDetails, setShowSavedDetails] = useState(false);
@@ -75,7 +67,6 @@ export default function PublicKitchenOrderForm({
     country: translate("order.fieldErrors.country", "Please select a country."),
     city: translate("order.fieldErrors.city", "Please select a city."),
     postalCode: translate("order.fieldErrors.postalCode", "Please select a postal code."),
-    paymentMethod: translate("order.fieldErrors.paymentMethod", "Please choose a payment method."),
     consent: translate("order.fieldErrors.consent", "Please accept the privacy statement."),
   }), [translate]);
   const countryOptions = uniqueOptions(Object.keys(COUNTRY_CITY_OPTIONS), customer.country);
@@ -84,7 +75,6 @@ export default function PublicKitchenOrderForm({
   const contractAddressLines = buildAddressLines(contractAddress, translate);
   const canUseContractAddress = contractAddressLines.length > 0;
   const savedAddressLines = buildAddressLines(customer, translate);
-  const paymentMethodLabel = PAYMENT_METHOD_OPTIONS.find((option) => option.value === customer.paymentMethod)?.label || customer.paymentMethod;
   const savedHelpText = translate("order.savedHelp", "");
 
   function markFieldTouched(fieldKey) {
@@ -171,7 +161,6 @@ export default function PublicKitchenOrderForm({
                       translate("order.addressTitle", "Order / billing address"),
                       savedAddressLines.join(", ") || (isUsingContractAddress ? translate("order.usingContractAddress", "The contract address will be used for this order.") : ""),
                     )}
-                    {renderSavedDetail(translate("order.selectPaymentMethod", "Choose payment method*"), paymentMethodLabel)}
                     {renderSavedDetail(translate("order.notes", "Notes (optional)"), customer.notes)}
                   </dl>
                 </div>
@@ -384,48 +373,9 @@ export default function PublicKitchenOrderForm({
           <div className={styles.orderSectionCard}>
             <div className={styles.orderSectionHeader}>
               <div>
-                <h3>{translate("order.paymentConsentTitle", "Payment + consent")}</h3>
-                <p>{translate("order.paymentConsentHelp", "Choose a payment method, leave optional notes, and confirm data privacy consent.")}</p>
+                <h3>{translate("order.paymentConsentTitle", "Order notes")}</h3>
+                <p>{translate("order.paymentConsentHelp", "Add delivery details if needed, then confirm the privacy notice.")}</p>
               </div>
-            </div>
-            <div className={styles.paymentSection}>
-              <label>{translate("order.selectPaymentMethod", "Choose payment method*")}</label>
-              <div className={styles.paymentOptions} role="radiogroup" aria-label={translate("order.paymentMethodAria", "Payment method")}>
-                {PAYMENT_METHOD_OPTIONS.map((option) => {
-                  const selected = customer.paymentMethod === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={[
-                        styles.paymentOption,
-                        selected ? styles.paymentOptionSelected : "",
-                        hasFieldError("paymentMethod", true) ? styles.paymentOptionInvalid : "",
-                      ]
-                        .filter(Boolean)
-                        .join(" ")}
-                      onClick={() => {
-                        markFieldTouched("paymentMethod");
-                        onUpdateCustomer("paymentMethod", option.value);
-                      }}
-                      onBlur={() => markFieldTouched("paymentMethod")}
-                      aria-pressed={selected}
-                    >
-                      <span
-                        className={[
-                          styles.paymentLogo,
-                          styles[`paymentLogo${PAYMENT_METHOD_STYLE_BY_VALUE[option.value]?.charAt(0).toUpperCase()}${PAYMENT_METHOD_STYLE_BY_VALUE[option.value]?.slice(1)}`],
-                        ]
-                          .filter(Boolean)
-                          .join(" ")}
-                      >
-                        <span className={styles.paymentLogoLabel}>{option.label}</span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-              {renderFieldError("paymentMethod", true)}
             </div>
             <div className={styles.sectionFields}>
               <div className={styles.fieldFull}>
@@ -452,13 +402,21 @@ export default function PublicKitchenOrderForm({
                 }}
               />
               <label htmlFor="consent">
-                {translate("order.consent", "I agree to the processing of my data for the purpose of this order.*")}
+                {translate("order.consentPrefix", "I have read the ")}
+                <a
+                  href={language === "de" ? "https://myarchitecto.de/datenschutz/" : "https://myarchitecto.de/en/privacy-policy/"}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {translate("order.privacyPolicy", "privacy policy")}
+                </a>
+                {translate("order.consentSuffix", " and confirm that my order data may be used to process this order.*")}
               </label>
             </div>
             {renderFieldError("consent", true)}
             <div className={styles.orderSubmitRow}>
               <button type="submit" form="order-form" className={styles.orderSubmitButton} disabled={isSubmitting}>
-                {isSubmitting ? translate("order.submitSaving", "Saving...") : translate("order.submit", "Submit order")}
+                {isSubmitting ? translate("order.submitSaving", "Saving...") : translate("order.submit", "Order and pay")}
               </button>
             </div>
             <small className={styles.orderHelp}>{translate("order.requiredHint", "Fields marked with * are required.")}</small>

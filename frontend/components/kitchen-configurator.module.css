@@ -2250,17 +2250,19 @@
 }
 
 .paymentOptions {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
 .paymentOption {
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 52px;
-  padding: 10px;
+  justify-content: flex-start;
+  gap: 10px;
+  min-height: 48px;
+  min-width: 184px;
+  padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid #d7d7d7;
   background: #fff;
@@ -2276,8 +2278,22 @@
   box-shadow: 0 6px 14px rgba(51, 39, 27, 0.05);
 }
 
+.paymentOption::before {
+  content: "";
+  width: 24px;
+  height: 16px;
+  flex: 0 0 auto;
+  border-radius: 4px;
+  border: 1.5px solid #2f9251;
+  background:
+    linear-gradient(#2f9251, #2f9251) 0 4px / 100% 3px no-repeat,
+    linear-gradient(#dfe9e2, #dfe9e2) 6px 11px / 9px 2px no-repeat,
+    #fff;
+}
+
 .paymentOptionSelected {
   border-color: #2f9251;
+  background: #f4fbf6;
   box-shadow: 0 0 0 2px rgba(47, 146, 81, 0.12);
 }
 
@@ -2295,13 +2311,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 72px;
   min-height: 24px;
-  padding: 0 8px;
-  border-radius: 4px;
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0;
 }
 
 .paymentLogoLabel {
@@ -2315,8 +2328,8 @@
 }
 
 .paymentLogoCard {
-  color: #fff;
-  background: #2f9251;
+  color: #236f3d;
+  background: transparent;
 }
 
 .paymentLogoVisa {
