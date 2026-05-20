@@ -49,7 +49,7 @@ function buildInitialCustomer(contractNumber) {
     city: "",
     country: "",
     notes: "",
-    paymentMethod: "",
+    paymentMethod: "card",
     consent: false,
   };
 }
@@ -1715,17 +1715,12 @@ function KitchenConfiguratorContent({
       return;
     }
 
-    if (!customer.paymentMethod) {
-      setStatus(translate("configurator.statusSelectPayment", "Please choose a payment method."));
-      setStatusTone("error");
-      return;
-    }
-
     setIsSubmitting(true);
     setStatus(translate("configurator.statusSavingOrder", "Saving order..."));
     setStatusTone("idle");
 
     try {
+      const paymentMethod = customer.paymentMethod || "card";
       const pdfOrderComponents = selectedComponents.map(buildOrderSubmissionItem);
       const pdfOrderAccessories = selectedAccessories.map(buildOrderSubmissionItem);
       const pdfOrderServices = selectedServices.map(buildOrderSubmissionItem);
@@ -1744,7 +1739,7 @@ function KitchenConfiguratorContent({
           city: customer.city,
           country: customer.country,
           notes: customer.notes,
-          paymentMethod: customer.paymentMethod,
+          paymentMethod,
         },
         components: pdfOrderComponents,
         accessories: pdfOrderAccessories,
@@ -1772,7 +1767,7 @@ function KitchenConfiguratorContent({
               city: customer.city,
               country: customer.country,
               notes: customer.notes,
-              paymentMethod: customer.paymentMethod,
+              paymentMethod,
               consent: customer.consent,
             },
             addressVerification: addressVerification.verification,
