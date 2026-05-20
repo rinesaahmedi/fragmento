@@ -116,13 +116,15 @@ function ItemCount({ count }) {
 
 function PaymentStatusBadge({ status }) {
   const value = String(status || "UNPAID").toUpperCase();
-  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : "Unpaid";
+  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : value === "CANCELLED" ? "Cancelled" : "Unpaid";
   const style = value === "PAID"
     ? paymentStatusPaidStyle
     : value === "PENDING"
       ? paymentStatusPendingStyle
       : value === "FAILED"
         ? paymentStatusFailedStyle
+        : value === "CANCELLED"
+          ? paymentStatusFailedStyle
         : paymentStatusUnpaidStyle;
 
   return <span style={style}>{label}</span>;

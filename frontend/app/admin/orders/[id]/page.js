@@ -73,8 +73,12 @@ function getStatusHintFallback(status) {
 }
 
 function formatPaymentMethod(value) {
-  if (!value) return "";
-  return String(value).toLowerCase() === "paypal" ? "PayPal" : value;
+  const normalized = String(value || "").trim().toLowerCase();
+  if (!normalized) return "";
+  if (normalized === "card" || normalized === "visa" || normalized === "mastercard") return "Card";
+  if (normalized === "paypal") return "PayPal";
+  if (normalized === "klarna") return "Klarna";
+  return value;
 }
 
 function OwnerSummary({ owner }) {
@@ -116,13 +120,15 @@ function ItemTypeLabel({ type }) {
 
 function PaymentStatusBadge({ status }) {
   const value = String(status || "UNPAID").toUpperCase();
-  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : "Unpaid";
+  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : value === "CANCELLED" ? "Cancelled" : "Unpaid";
   const style = value === "PAID"
     ? paymentStatusPaidStyle
     : value === "PENDING"
       ? paymentStatusPendingStyle
       : value === "FAILED"
         ? paymentStatusFailedStyle
+        : value === "CANCELLED"
+          ? paymentStatusFailedStyle
         : paymentStatusUnpaidStyle;
 
   return <span style={style}>{label}</span>;
@@ -148,9 +154,13 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
 
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
+  const paymentLink = getFormMessage(resolvedSearchParams, "paymentLink");
   const canConfirm = order.status === OrderStatus.NEW;
   const canResendEmail = order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.EMAILED;
   const canCancel = order.status !== OrderStatus.CANCELLED;
+  const canCreatePaymentLink =
+    order.status !== OrderStatus.CANCELLED &&
+    String(order.paymentStatus || "UNPAID").toUpperCase() !== "PAID";
   const notificationOrder = buildOrderForNotifications(order);
   const displayItems = mergeSinkAndWorktopItems(order.items || [], (sinkItem, worktopItem) => ({
     ...sinkItem,
@@ -177,6 +187,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
+          {paymentLink ? (
+            <div style={paymentLinkPanelStyle}>
+              <strong>Payment link</strong>
+              <a href={paymentLink} target="_blank" rel="noreferrer" style={paymentLinkAnchorStyle}>
+                {paymentLink}
+              </a>
+            </div>
+          ) : null}
 
           <form action={`/api/admin/orders/${order.id}`} method="post" style={actionPanelStyle}>
             <div style={actionSummaryStyle}>
@@ -227,6 +245,15 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
               >
                 <AdminText i18nKey="orderDetailAdmin.retryWebhook" fallback="Retry webhook" />
               </OrderActionButton>
+              {canCreatePaymentLink ? (
+                <OrderActionButton
+                  intent="create-payment-link"
+                  style={paymentLinkButtonStyle}
+                  pendingFallback="Creating payment link..."
+                >
+                  Create payment link
+                </OrderActionButton>
+              ) : null}
             </div>
             <OrderActionFeedback />
           </form>
@@ -549,6 +576,35 @@ const technicalButtonStyle = {
   fontSize: "0.98rem",
   cursor: "pointer",
   boxShadow: "none",
+};
+
+const paymentLinkButtonStyle = {
+  border: "1px solid rgba(42, 145, 85, 0.24)",
+  borderRadius: 14,
+  minHeight: 50,
+  padding: "13px 18px",
+  background: "rgba(42, 145, 85, 0.1)",
+  color: "#1f6f43",
+  fontWeight: 800,
+  fontSize: "0.98rem",
+  cursor: "pointer",
+  boxShadow: "none",
+};
+
+const paymentLinkPanelStyle = {
+  display: "grid",
+  gap: 8,
+  border: "1px solid rgba(42, 145, 85, 0.24)",
+  borderRadius: 12,
+  background: "rgba(42, 145, 85, 0.08)",
+  color: "var(--app-text)",
+  padding: "12px 14px",
+};
+
+const paymentLinkAnchorStyle = {
+  color: "#1f6f43",
+  overflowWrap: "anywhere",
+  fontWeight: 800,
 };
 
 const mobileItemCardStyle = {

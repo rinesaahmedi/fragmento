@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { createOrderFromSubmission } from "../../../lib/orders";
-import { prisma } from "../../../lib/prisma";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
-import { getStripeClient } from "../../../lib/stripe";
+import { createCheckoutSessionForOrder } from "../../../lib/stripe-payments";
 
 function getRequestOrigin(request) {
   const forwardedProto = request.headers.get("x-forwarded-proto");
@@ -44,46 +43,22 @@ function buildCheckoutCancelUrl({ request, origin, order, kitchenSlug }) {
 }
 
 async function createCheckoutSession({ request, order, kitchenSlug }) {
-  const stripe = getStripeClient();
-
-  if (!stripe) {
-    return null;
-  }
-
   const origin = getRequestOrigin(request);
-  const amount = Math.round(Number(order.total || 0) * 100);
   const cancelUrl = buildCheckoutCancelUrl({ request, origin, order, kitchenSlug });
 
-  if (!Number.isFinite(amount) || amount <= 0) {
+  if (!process.env.STRIPE_SECRET_KEY) {
     return null;
   }
 
-  return stripe.checkout.sessions.create({
-    mode: "payment",
-    payment_method_types: ["card"],
-    customer_email: order.customer.email,
-    client_reference_id: order.orderNumber,
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: process.env.STRIPE_CURRENCY || "eur",
-          unit_amount: amount,
-          product_data: {
-            name: `Fragmento order ${order.orderNumber}`,
-            description: order.kitchen.name,
-          },
-        },
-      },
-    ],
-    metadata: {
-      orderId: order.id,
-      orderNumber: order.orderNumber,
-      kitchenSlug,
-      paymentMethod: order.customer.paymentMethod || "",
+  return createCheckoutSessionForOrder({
+    order: {
+      ...order,
+      totalPrice: order.total,
+      email: order.customer.email,
+      paymentMethod: order.customer.paymentMethod,
     },
-    success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}&order=${encodeURIComponent(order.orderNumber)}`,
-    cancel_url: cancelUrl,
+    origin,
+    cancelUrl,
   });
 }
 
@@ -107,16 +82,6 @@ export async function POST(request) {
       order,
       kitchenSlug: body.kitchen_slug,
     });
-
-    if (checkoutSession?.id) {
-      await prisma.order.update({
-        where: { id: order.id },
-        data: {
-          paymentStatus: "PENDING",
-          stripeCheckoutSessionId: checkoutSession.id,
-        },
-      });
-    }
 
     return NextResponse.json({
       success: true,

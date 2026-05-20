@@ -466,7 +466,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
                   if (error) setError("");
                 }}
                 disabled={isValidatingContract}
-                placeholder="z.B. 123456789"
+                placeholder="e.g. 670 123456"
                 style={contractInputStyle}
               />
               {error ? <p style={errorStyle}>{error}</p> : null}
