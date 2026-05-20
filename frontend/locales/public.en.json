@@ -212,6 +212,7 @@
     "consent": "I have read the privacy policy and confirm that my order data may be used to process this order.*",
     "consentPrefix": "I have read the ",
     "privacyPolicy": "privacy policy",
+    "privacyPolicyPending": "Privacy policy will be available soon.",
     "consentSuffix": " and confirm that my order data may be used to process this order.*",
     "submitSaving": "Saving...",
     "submit": "Order and pay",

@@ -54,7 +54,7 @@ export default function PublicKitchenOrderForm({
   onUpdateCustomer,
   onToggleUseContractAddress,
 }) {
-  const { language, translate } = usePublicI18n();
+  const { translate } = usePublicI18n();
   const [touchedFields, setTouchedFields] = useState({});
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const [showSavedDetails, setShowSavedDetails] = useState(false);
@@ -403,13 +403,12 @@ export default function PublicKitchenOrderForm({
               />
               <label htmlFor="consent">
                 {translate("order.consentPrefix", "I have read the ")}
-                <a
-                  href={language === "de" ? "https://myarchitecto.de/datenschutz/" : "https://myarchitecto.de/en/privacy-policy/"}
-                  target="_blank"
-                  rel="noreferrer"
+                <span
+                  className={styles.pendingLegalText}
+                  title={translate("order.privacyPolicyPending", "Privacy policy will be available soon.")}
                 >
                   {translate("order.privacyPolicy", "privacy policy")}
-                </a>
+                </span>
                 {translate("order.consentSuffix", " and confirm that my order data may be used to process this order.*")}
               </label>
             </div>

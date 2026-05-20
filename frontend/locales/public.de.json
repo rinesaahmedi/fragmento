@@ -212,6 +212,7 @@
     "consent": "Ich habe die Datenschutzerklärung gelesen und bestätige, dass meine Bestelldaten zur Bearbeitung dieser Bestellung verwendet werden dürfen.*",
     "consentPrefix": "Ich habe die ",
     "privacyPolicy": "Datenschutzerklärung",
+    "privacyPolicyPending": "Die Datenschutzerklärung ist bald verfügbar.",
     "consentSuffix": " gelesen und bestätige, dass meine Bestelldaten zur Bearbeitung dieser Bestellung verwendet werden dürfen.*",
     "submitSaving": "Wird gespeichert...",
     "submit": "Kostenpflichtig bestellen",

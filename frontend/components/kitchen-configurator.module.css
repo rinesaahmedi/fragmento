@@ -2386,6 +2386,48 @@
   margin-top: 1px;
 }
 
+.pendingLegalText {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #2f6fad;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  cursor: help;
+}
+
+.pendingLegalText::after {
+  content: attr(title);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  z-index: 5;
+  width: max-content;
+  max-width: 220px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #2f2a24;
+  color: #fff;
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.25;
+  text-align: center;
+  white-space: normal;
+  box-shadow: 0 8px 18px rgba(47, 42, 36, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 4px);
+  transition:
+    opacity 0.14s ease,
+    transform 0.14s ease;
+}
+
+.pendingLegalText:hover::after {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
 .orderSubmitRow {
   display: flex;
   justify-content: flex-start;
