@@ -243,6 +243,7 @@ export function syncKitchenPlan({
   kitchenConfig,
   selectedComponentIds,
   lockedComponentIds,
+  visibleComponentIds,
   componentIdForItem,
   normalizeColor,
 }) {
@@ -285,6 +286,7 @@ export function syncKitchenPlan({
 
   const namespace = "http://www.w3.org/2000/svg";
   const byColor = new Map();
+  const visibleSet = Array.isArray(visibleComponentIds) ? new Set(visibleComponentIds) : null;
   svg.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse").forEach((element) => {
     if (element.closest("[data-component-id]")) return;
     const color = normalizeColor(element.getAttribute("stroke"));
@@ -313,6 +315,13 @@ export function syncKitchenPlan({
 
     if (!group) continue;
 
+    if (visibleSet && !visibleSet.has(componentId)) {
+      group.style.setProperty("display", "none", "important");
+      group.querySelectorAll(".component-hitbox").forEach((element) => element.remove());
+      continue;
+    }
+
+    group.style.removeProperty("display");
     group.classList.add("kitchen-component");
     group.querySelectorAll(".component-hitbox").forEach((element) => element.remove());
 
@@ -334,6 +343,16 @@ export function syncKitchenPlan({
     applyGroupVisualState(group, {
       selected: selectedComponentIds.includes(componentId),
       locked: lockedComponentIds.includes(componentId),
+    });
+  }
+
+  if (visibleSet) {
+    svg.querySelectorAll("[data-component-id]").forEach((group) => {
+      const componentId = group.getAttribute("data-component-id");
+      if (componentId && !visibleSet.has(componentId)) {
+        group.style.setProperty("display", "none", "important");
+        group.querySelectorAll(".component-hitbox").forEach((element) => element.remove());
+      }
     });
   }
 

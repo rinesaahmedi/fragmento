@@ -26,13 +26,32 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   );
 
   const fixedComponentIds = useMemo(() => {
-    const allowed = new Set(selectableComponentIds);
-    return (kitchenConfig.components || [])
-      .map((item) => componentIdForItem(item))
-      .filter((id) => !allowed.has(id));
-  }, [kitchenConfig.components, selectableComponentIds]);
+    return [];
+  }, []);
+  const defaultComponentIds = useMemo(
+    () =>
+      (kitchenConfig.components || [])
+        .filter((item) => item.isLocked)
+        .map((item) => componentIdForItem(item))
+        .filter(Boolean),
+    [kitchenConfig.components],
+  );
+  const visibleComponentIds = useMemo(
+    () => [...new Set([...(selectableComponentIds || []), ...defaultComponentIds])],
+    [defaultComponentIds, selectableComponentIds],
+  );
 
   const fixedKey = fixedComponentIds.join("|");
+  const selectableKey = (selectableComponentIds || []).join("|");
+  const visibleKey = visibleComponentIds.join("|");
+
+  useEffect(() => {
+    const selectable = new Set(selectableComponentIds || []);
+    if (!value.some((id) => !selectable.has(id))) {
+      return;
+    }
+    onChange((current) => current.filter((id) => selectable.has(id)));
+  }, [onChange, selectableComponentIds, selectableKey, value]);
 
   useEffect(() => {
     const host = svgHostRef.current;
@@ -43,6 +62,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
       kitchenConfig,
       selectedComponentIds: value,
       lockedComponentIds: fixedComponentIds,
+      visibleComponentIds,
       componentIdForItem,
       normalizeColor,
     });
@@ -58,7 +78,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
       }
 
       const componentId = group.dataset.componentId;
-      if (fixedComponentIds.includes(componentId)) {
+      if (!selectableComponentIds.includes(componentId)) {
         return;
       }
 
@@ -79,6 +99,10 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     onChange,
     planViewport,
     resolvedSvgMarkup,
+    selectableComponentIds,
+    selectableKey,
+    visibleComponentIds,
+    visibleKey,
     value,
   ]);
 

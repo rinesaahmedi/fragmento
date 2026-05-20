@@ -1,5 +1,5 @@
 import { ItemType, KitchenStatus } from "@prisma/client";
-import { componentIdForItem } from "../components/kitchen-selection-utils";
+import { componentIdForItem, getLinkedComponentIds } from "../components/kitchen-selection-utils";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "./catalog";
 import { getContractOrderState } from "./kitchen-contracts";
 import { loadKitchenSvgMarkup } from "./load-kitchen-svg";
@@ -9,8 +9,7 @@ import { normalizeServiceClaimContractNumber } from "./service-claims";
 
 /**
  * Loads kitchen SVG + config for a contract so the service form can show an interactive plan.
- * Selectable components default to COMPONENT lines from confirmed + editable orders; if none,
- * all catalog components for that kitchen are selectable.
+ * Selectable components come from COMPONENT lines on confirmed + editable orders.
  */
 export async function getServiceClaimKitchenPlan(contractNumber) {
   const normalized = normalizeServiceClaimContractNumber(contractNumber);
@@ -54,6 +53,7 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
     ];
 
     const selectableIds = new Set();
+    const selectableMetaIds = new Set();
     const selectableMeta = [];
 
     for (const line of orderLines) {
@@ -65,26 +65,30 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
         continue;
       }
       const componentId = componentIdForItem(ki);
-      if (selectableIds.has(componentId)) {
-        continue;
+      getLinkedComponentIds(slug, componentId).forEach((id) => selectableIds.add(id));
+      if (!selectableMetaIds.has(componentId)) {
+        selectableMetaIds.add(componentId);
+        selectableMeta.push({
+          componentId,
+          code: line.code,
+          name: stripProductDimensionsFromLabel(
+            String(line.nameSnapshot || ki.name || line.code || "").trim() || line.code,
+          ),
+        });
       }
-      selectableIds.add(componentId);
-      selectableMeta.push({
-        componentId,
-        code: line.code,
-        name: stripProductDimensionsFromLabel(
-          String(line.nameSnapshot || ki.name || line.code || "").trim() || line.code,
-        ),
-      });
     }
 
-    if (selectableIds.size === 0) {
-      for (const comp of kitchenConfig.components || []) {
-        const componentId = componentIdForItem(comp);
-        if (selectableIds.has(componentId)) {
-          continue;
-        }
-        selectableIds.add(componentId);
+    for (const comp of kitchenConfig.components || []) {
+      if (!comp.isLocked) {
+        continue;
+      }
+      const componentId = componentIdForItem(comp);
+      if (!componentId) {
+        continue;
+      }
+      getLinkedComponentIds(slug, componentId).forEach((id) => selectableIds.add(id));
+      if (!selectableMetaIds.has(componentId)) {
+        selectableMetaIds.add(componentId);
         selectableMeta.push({
           componentId,
           code: comp.code,

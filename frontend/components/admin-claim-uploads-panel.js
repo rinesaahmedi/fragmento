@@ -7,6 +7,27 @@ function normalizeMime(value) {
   return String(value || "").toLowerCase().split(";")[0].trim();
 }
 
+function inferMimeFromFilename(filename) {
+  const ext = String(filename || "").toLowerCase().split(".").pop();
+  if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+  if (ext === "png") return "image/png";
+  if (ext === "gif") return "image/gif";
+  if (ext === "webp") return "image/webp";
+  if (ext === "bmp") return "image/bmp";
+  if (ext === "tif" || ext === "tiff") return "image/tiff";
+  if (ext === "pdf") return "application/pdf";
+  if (ext === "txt") return "text/plain";
+  return "";
+}
+
+function getPreviewContentType(file) {
+  const declared = normalizeMime(file?.contentType);
+  if (declared && declared !== "application/octet-stream") {
+    return declared;
+  }
+  return inferMimeFromFilename(file?.filename);
+}
+
 function isInlineImage(contentType) {
   const m = normalizeMime(contentType);
   return m.startsWith("image/") && m !== "image/svg+xml";
@@ -34,12 +55,14 @@ export function AdminClaimUploadsPanel({ claimId, files }) {
   const [textBody, setTextBody] = useState("");
   const [textError, setTextError] = useState("");
   const [textLoading, setTextLoading] = useState(false);
+  const [mediaError, setMediaError] = useState(false);
 
   const close = useCallback(() => {
     setPreview(null);
     setTextBody("");
     setTextError("");
     setTextLoading(false);
+    setMediaError(false);
   }, []);
 
   useEffect(() => {
@@ -114,7 +137,14 @@ export function AdminClaimUploadsPanel({ claimId, files }) {
               <span style={attachmentActionsStyle}>
                 <button
                   type="button"
-                  onClick={() => setPreview({ index: file.index, filename: file.filename, contentType: file.contentType })}
+                  onClick={() => {
+                    setMediaError(false);
+                    setPreview({
+                      index: file.index,
+                      filename: file.filename,
+                      contentType: getPreviewContentType(file),
+                    });
+                  }}
                   style={attachmentButtonPrimaryStyle}
                 >
                   <AdminText i18nKey="claimsAdmin.viewAttachment" fallback="View" as="span" />
@@ -174,11 +204,12 @@ export function AdminClaimUploadsPanel({ claimId, files }) {
               </div>
             </div>
             <div style={modalBodyStyle}>
-              {isInlineImage(preview.contentType) ? (
+              {isInlineImage(preview.contentType) && !mediaError ? (
                 <img
                   src={attachmentViewerUrl(claimId, preview.index)}
                   alt=""
                   style={modalImageStyle}
+                  onError={() => setMediaError(true)}
                 />
               ) : null}
               {isPdf(preview.contentType) ? (
@@ -206,6 +237,15 @@ export function AdminClaimUploadsPanel({ claimId, files }) {
                   ) : null}
                   {!textLoading && !textError ? <pre style={modalPreStyle}>{textBody}</pre> : null}
                 </div>
+              ) : null}
+              {mediaError ? (
+                <p style={modalErrorStyle}>
+                  <AdminText
+                    i18nKey="claimsAdmin.previewLoadFailed"
+                    fallback="Could not load this file. Try Download instead."
+                    as="span"
+                  />
+                </p>
               ) : null}
               {!isInlineImage(preview.contentType) && !isPdf(preview.contentType) && !isPlainText(preview.contentType) ? (
                 <p style={modalMutedStyle}>
