@@ -1,4 +1,5 @@
 import { cookies } from "next/headers";
+import { showAdminClaimsInNav } from "../lib/admin-claims-access";
 import { AdminShellClient } from "./admin-shell-client";
 
 function normalizeLanguage(value) {
@@ -10,7 +11,11 @@ export async function AdminShell({ adminEmail, children }) {
   const initialLanguage = normalizeLanguage(cookieStore.get("adminLanguage")?.value);
 
   return (
-    <AdminShellClient adminEmail={adminEmail} initialLanguage={initialLanguage}>
+    <AdminShellClient
+      adminEmail={adminEmail}
+      initialLanguage={initialLanguage}
+      showClaimsNav={showAdminClaimsInNav(adminEmail)}
+    >
       {children}
     </AdminShellClient>
   );

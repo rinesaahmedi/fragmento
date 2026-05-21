@@ -7,6 +7,7 @@ import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
+import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -231,7 +232,7 @@ const COPY = {
     requiredFieldTitle: "Pflichtfeld",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Kaufvertragsnummer",
-    contractPlaceholder: "e.g. 670 123456",
+    contractPlaceholder: "e.g. 670123456",
     contractNumberHelpTrigger: "Wo finde ich die Nummer?",
     contractNumberHelpAria: "Hilfe: Kaufvertragsnummer im Dokument finden",
     contractNumberHelpTitle: "Kaufvertragsnummer finden",
@@ -398,7 +399,7 @@ const COPY = {
     requiredFieldTitle: "Required field",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Purchase contract number",
-    contractPlaceholder: "e.g. 670 123456",
+    contractPlaceholder: "e.g. 670123456",
     contractNumberHelpTrigger: "Where to find it?",
     contractNumberHelpAria: "Help: where your purchase contract number appears on your documents",
     contractNumberHelpTitle: "Finding your contract number",
@@ -1180,6 +1181,18 @@ function autoResizeTextarea(element) {
   element.style.height = `${element.scrollHeight}px`;
 }
 
+function renderClaimAssistantMessageText(text) {
+  const value = String(text || "");
+  const segments = value.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+
+  return segments.map((segment, index) => {
+    if (/^\*\*[^*]+\*\*$/.test(segment)) {
+      return <strong key={`msg-${index}`}>{segment.slice(2, -2)}</strong>;
+    }
+    return <span key={`msg-${index}`}>{segment}</span>;
+  });
+}
+
 function isPreferredContactCustom(windowValue) {
   return String(windowValue || "").trim() === "custom";
 }
@@ -1406,6 +1419,7 @@ export default function ServiceClaimFlow() {
   const claimAssistantAudioRef = useRef(null);
   const claimAssistantTtsAbortControllerRef = useRef(null);
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
+  const latestFormRef = useRef(INITIAL_FORM);
   const preferredContactCalendarRef = useRef(null);
   const preferredContactTimeFromRef = useRef(null);
   const preferredContactTimeToRef = useRef(null);
@@ -1441,7 +1455,11 @@ export default function ServiceClaimFlow() {
     () => Boolean(formValues.phone.trim() || formValues.email.trim()),
     [formValues.email, formValues.phone],
   );
-  const normalizedContractNumber = formValues.contractNumber.trim();
+
+  useEffect(() => {
+    latestFormRef.current = formValues;
+  }, [formValues]);
+  const normalizedContractNumber = normalizeServiceClaimContractNumber(formValues.contractNumber);
   const kitchenAreasLinePrefix = copy.kitchenAreasLinePrefix || fallbackCopy.kitchenAreasLinePrefix;
   const activeKitchenPlan = useMemo(() => {
     if (
@@ -1871,7 +1889,7 @@ export default function ServiceClaimFlow() {
     }
 
     if (field === "contractNumber") {
-      const nextContractNumber = value.trim();
+      const nextContractNumber = normalizeServiceClaimContractNumber(value);
       contractLookupRequestIdRef.current += 1;
 
       if (contractLookupTimeoutRef.current) {
@@ -1903,7 +1921,7 @@ export default function ServiceClaimFlow() {
             }
 
             setForm((current) => {
-              if (current.contractNumber.trim() !== nextContractNumber) {
+              if (normalizeServiceClaimContractNumber(current.contractNumber) !== nextContractNumber) {
                 return current;
               }
 
@@ -2274,8 +2292,8 @@ export default function ServiceClaimFlow() {
     ].filter(Boolean).join(", ");
   }
 
-  function buildSubmittedProblemDescription() {
-    const userDescription = String(formValues.problemDescription || "").trim();
+  function buildSubmittedProblemDescription(formState = formValues) {
+    const userDescription = String(formState.problemDescription || "").trim();
     const selectedAreasBlock = selectedProblemAreasWithDetails.length
       ? [
           kitchenAreasLinePrefix,
@@ -2352,6 +2370,7 @@ export default function ServiceClaimFlow() {
       return;
     }
 
+    const latestFormValues = latestFormRef.current || formValues;
     const nextUserMessage = { role: "user", text: question };
     const nextConversationMessages = claimAssistantMessages
       .filter((message) => message?.role && message?.text)
@@ -2381,18 +2400,18 @@ export default function ServiceClaimFlow() {
           })),
           claim: {
             contractNumber: normalizedContractNumber,
-            problemDescription: buildSubmittedProblemDescription(),
-            serialNumber: String(formValues.serialNumber || "").trim(),
+            problemDescription: buildSubmittedProblemDescription(latestFormValues),
+            serialNumber: String(latestFormValues.serialNumber || "").trim(),
             hasSerialNumberImage: serialNumberImages.length > 0,
             attachmentCount: attachments.length + serialNumberImages.length + problemAreaAttachmentCount,
-            preferredContactDate: String(formValues.preferredContactDate || "").trim(),
-            preferredContactTimeWindow: String(formValues.preferredContactTimeWindow || "").trim(),
-            preferredContactTimeFrom: String(formValues.preferredContactTimeFrom || "").trim(),
-            preferredContactTimeTo: String(formValues.preferredContactTimeTo || "").trim(),
-            availabilityDate: String(formValues.preferredContactDate || "").trim(),
+            preferredContactDate: String(latestFormValues.preferredContactDate || "").trim(),
+            preferredContactTimeWindow: String(latestFormValues.preferredContactTimeWindow || "").trim(),
+            preferredContactTimeFrom: String(latestFormValues.preferredContactTimeFrom || "").trim(),
+            preferredContactTimeTo: String(latestFormValues.preferredContactTimeTo || "").trim(),
+            availabilityDate: String(latestFormValues.preferredContactDate || "").trim(),
             availabilityTime: buildPreferredContactSummary(),
-            hasPhone: Boolean(String(formValues.phone || "").trim()),
-            hasEmail: Boolean(String(formValues.email || "").trim()),
+            hasPhone: Boolean(String(latestFormValues.phone || "").trim()),
+            hasEmail: Boolean(String(latestFormValues.email || "").trim()),
           },
         }),
       });
@@ -2574,6 +2593,7 @@ export default function ServiceClaimFlow() {
       const includeHausmeister = formValues.hausmeisterInvolved === "yes";
       const payload = {
         ...form,
+        contractNumber: normalizedContractNumber,
         clientAddress: buildClientAddress(),
         clientCountry: formValues.clientCountry.trim(),
         clientCity: formValues.clientCity.trim(),
@@ -3483,9 +3503,11 @@ export default function ServiceClaimFlow() {
                     kitchenPlan={contractLookup.kitchenPlan}
                     value={problemComponentIds}
                     onChange={setProblemComponentIds}
+                    contractNumber={normalizedContractNumber}
                     labels={{
                       eyebrow: t("kitchenPlanEyebrow"),
                       title: contractLookup.kitchenPlan.kitchenName || t("kitchenPlanTitle"),
+                      contractLabel: copy.contractNumber,
                       reset: t("kitchenPlanReset"),
                     }}
                   />
@@ -3766,7 +3788,9 @@ export default function ServiceClaimFlow() {
               <div className="service-claim-agent__messages" aria-live="polite">
                 {!claimAssistantMessages.length ? (
                   <div className="service-claim-agent__message service-claim-agent__message--assistant">
-                    <span>{claimAssistantIntroText}</span>
+                    <div className="service-claim-agent__message-body">
+                      {claimAssistantIntroText}
+                    </div>
                   </div>
                 ) : null}
                 {claimAssistantMessages.map((message, index) => (
@@ -3783,7 +3807,9 @@ export default function ServiceClaimFlow() {
                       .join(" ")}
                   >
                     <div className="service-claim-agent__message-stack">
-                      <span>{message.text}</span>
+                      <div className="service-claim-agent__message-body">
+                        {renderClaimAssistantMessageText(message.text)}
+                      </div>
                       {message.role === "assistant" && message.actions?.length ? (
                         <div className="service-claim-agent__message-actions">
                           {message.actions.map((action) => (

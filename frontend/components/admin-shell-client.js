@@ -10,23 +10,26 @@ const navItems = [
   { href: "/admin/contracts", labelKey: "adminShellLogin.contracts", fallback: "Contracts", icon: ContractsIcon },
   { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
-  { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon },
+  { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon, requiresClaimsNav: true },
   { href: "/admin/account", labelKey: "adminShellLogin.account", fallback: "Account", icon: AccountIcon },
   { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
 ];
 const DESKTOP_SIDEBAR_WIDTH = "clamp(240px, 18vw, 300px)";
 
-export function AdminShellClient({ adminEmail, initialLanguage = "en", children }) {
+export function AdminShellClient({ adminEmail, initialLanguage = "en", showClaimsNav = false, children }) {
   return (
     <AdminI18nProvider initialLanguage={initialLanguage}>
-      <AdminShellContent adminEmail={adminEmail}>{children}</AdminShellContent>
+      <AdminShellContent adminEmail={adminEmail} showClaimsNav={showClaimsNav}>
+        {children}
+      </AdminShellContent>
     </AdminI18nProvider>
   );
 }
 
-function AdminShellContent({ adminEmail, children }) {
+function AdminShellContent({ adminEmail, showClaimsNav, children }) {
   const pathname = usePathname();
   const { translate } = useAdminI18n();
+  const visibleNavItems = navItems.filter((item) => !item.requiresClaimsNav || showClaimsNav);
 
   return (
     <div
@@ -96,7 +99,7 @@ function AdminShellContent({ adminEmail, children }) {
             paddingBottom: 4,
           }}
         >
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const active = isActivePath(pathname, item.href);
             const Icon = item.icon;
 
@@ -202,7 +205,7 @@ function AdminShellContent({ adminEmail, children }) {
               alignSelf: "start",
             }}
           >
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const active = isActivePath(pathname, item.href);
               const Icon = item.icon;
 

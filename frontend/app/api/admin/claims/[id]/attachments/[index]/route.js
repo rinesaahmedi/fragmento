@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireAdminApi } from "../../../../../../../lib/auth";
+import { requireAdminClaimsApi } from "../../../../../../../lib/admin-claims-access";
 import { prisma } from "../../../../../../../lib/prisma";
 import { queryServiceClaimById } from "../../../../../../../lib/service-claim-admin-query";
 import { readServiceClaimAttachmentBytes } from "../../../../../../../lib/service-claim-attachments-storage";
@@ -50,7 +50,7 @@ function wantsInlineView(request) {
 
 export async function GET(request, { params }) {
   try {
-    await requireAdminApi();
+    await requireAdminClaimsApi();
   } catch (error) {
     const status = error.status || 401;
     return NextResponse.json(

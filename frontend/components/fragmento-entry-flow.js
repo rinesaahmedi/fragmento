@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { normalizeContractNumber } from "../lib/kitchen-contracts";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -311,7 +312,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
 
   async function handleContractSubmit(event) {
     event.preventDefault();
-    const normalizedContractNumber = contractNumber.trim();
+    const normalizedContractNumber = normalizeContractNumber(contractNumber);
     if (!normalizedContractNumber) {
       setError(selectedLanguage === "de" ? "Die Vertragsnummer ist erforderlich." : text.contractLabel.replace(":*", " is required."));
       return;
@@ -466,7 +467,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
                   if (error) setError("");
                 }}
                 disabled={isValidatingContract}
-                placeholder="e.g. 670 123456"
+                placeholder="e.g. 670123456"
                 style={contractInputStyle}
               />
               {error ? <p style={errorStyle}>{error}</p> : null}

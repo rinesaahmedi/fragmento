@@ -3,7 +3,7 @@ import { prisma } from "./prisma";
 export { buildServiceClaimAutofillFromContract, splitPersonName } from "./service-claim-contract-autofill";
 
 export function normalizeServiceClaimContractNumber(value) {
-  return String(value || "").trim();
+  return String(value || "").trim().replace(/\s+/g, "");
 }
 
 export async function getServiceClaimContractDetails(contractNumber) {

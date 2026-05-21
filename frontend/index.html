@@ -1416,7 +1416,7 @@ Du findest sie auf der Innenseite deines Spülenschrankes.</p>
         </div>
         <div style="display:flex;flex-direction:column;gap:6px; margin-bottom: 15px;">
           <label id="contract-number-label" for="contractNumber">Bitte gib deine Vertragsnummer ein:*</label>
-          <input id="contractNumber" name="contractNumber" type="text" required placeholder="e.g. 670 123456" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
+          <input id="contractNumber" name="contractNumber" type="text" required placeholder="e.g. 670123456" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;" />
           <small id="contract-error" style="color: #dc3545; display: none;">Die Vertragsnummer ist erforderlich.</small>
         </div>
         <div class="welcome-card-footer">
@@ -3684,7 +3684,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
         phone: get('phone'), address1: get('address1'), address2: get('address2'),
         postalCode: get('postalCode'), city: get('city'), country: get('country'),
         notes: get('notes'), consent: document.getElementById('consent')?.checked,
-        contractNumber: document.getElementById('contractNumber')?.value?.trim() || 'N/A',
+        contractNumber: document.getElementById('contractNumber')?.value?.trim().replace(/\s+/g, '') || 'N/A',
         paymentMethod: selectedPayment ? selectedPayment.dataset.value : ''
       };
     }

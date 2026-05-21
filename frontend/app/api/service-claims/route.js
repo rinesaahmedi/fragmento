@@ -13,7 +13,10 @@ import {
 } from "../../../lib/service-claim-admin-query";
 import { persistServiceClaimAttachments } from "../../../lib/service-claim-attachments-storage";
 import { renderClaimKitchenPreviewPng } from "../../../lib/claim-kitchen-preview";
-import { getServiceClaimContractDetails } from "../../../lib/service-claims";
+import {
+  getServiceClaimContractDetails,
+  normalizeServiceClaimContractNumber,
+} from "../../../lib/service-claims";
 import { formatServiceClaimProblemArea, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
@@ -512,6 +515,7 @@ async function buildClaimKitchenPreviewAttachment(payload) {
   const preview = await renderClaimKitchenPreviewPng({
     kitchenSlug: payload.kitchenSlug,
     selectedAreas,
+    contractNumber: payload.contractNumber,
     width: 960,
   }).catch(() => null);
 
@@ -885,7 +889,9 @@ export async function POST(request) {
       serialNumberImageFiles,
       problemAreaAttachmentFilesByComponentId,
     } = await parseServiceClaimRequest(request);
-    const contractNumber = requiredString(body.contractNumber, "Contract number");
+    const contractNumber = normalizeServiceClaimContractNumber(
+      requiredString(body.contractNumber, "Contract number"),
+    );
     const contract = await getServiceClaimContractDetails(contractNumber);
     if (!contract) {
       return NextResponse.json(

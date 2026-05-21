@@ -1,10 +1,10 @@
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
-import { requireAdminApi } from "../../../../../lib/auth";
+import { requireAdminClaimsApi } from "../../../../../lib/admin-claims-access";
 import { prisma } from "../../../../../lib/prisma";
 import { deleteServiceClaimAttachments } from "../../../../../lib/service-claim-attachments-storage";
 
 export async function POST(request, { params }) {
-  await requireAdminApi();
+  await requireAdminClaimsApi();
   const { id } = await params;
   let returnPath = `/admin/claims/${id}`;
 

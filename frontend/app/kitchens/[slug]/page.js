@@ -2,7 +2,11 @@ import { notFound } from "next/navigation";
 import { cookies } from "next/headers";
 import KitchenConfigurator from "../../../components/kitchen-configurator";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "../../../lib/catalog";
-import { getContractOrderState, getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
+import {
+  getContractOrderState,
+  getKitchenContractForAccess,
+  normalizeContractNumber,
+} from "../../../lib/kitchen-contracts";
 import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
 import { prisma } from "../../../lib/prisma";
 import { PUBLIC_LANGUAGE_COOKIE_NAME, normalizePublicLanguage } from "../../../lib/public-language";
@@ -114,7 +118,7 @@ export default async function KitchenPage({ params, searchParams }) {
 
   const kitchenConfig = serializeKitchenForLegacy(kitchen);
   const svgMarkup = await loadKitchenSvgMarkup(slug);
-  let initialContractNumber = String(resolvedSearchParams?.contractNumber || "").trim();
+  let initialContractNumber = normalizeContractNumber(resolvedSearchParams?.contractNumber);
   const returnOrderNumber = String(resolvedSearchParams?.order || "").trim();
   const initialLanguage = resolvedSearchParams?.lang
     ? normalizePublicLanguage(String(resolvedSearchParams.lang))

@@ -13,7 +13,7 @@ import { AdminClaimLocalizedText } from "../../../../components/admin-claim-loca
 import { AdminDateTime, AdminText } from "../../../../components/admin-i18n";
 import { AdminShell } from "../../../../components/admin-shell";
 import { getFormMessage } from "../../../../lib/admin-forms";
-import { requireAdminPage } from "../../../../lib/auth";
+import { requireAdminClaimsPage } from "../../../../lib/admin-claims-access";
 import { renderClaimKitchenPreviewSvg } from "../../../../lib/claim-kitchen-preview";
 import { prisma } from "../../../../lib/prisma";
 import { formatServiceClaimProblemArea, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../../lib/service-claim-problem-areas";
@@ -112,7 +112,7 @@ function formatClaimKitchenSummaryLines(claim) {
 }
 
 export default async function AdminClaimDetailPage({ params, searchParams }) {
-  const admin = await requireAdminPage();
+  const admin = await requireAdminClaimsPage();
   const { id } = await params;
   const resolvedSearchParams = (await searchParams) || {};
   const successMessage = getFormMessage(resolvedSearchParams, "success");
@@ -144,6 +144,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
   const claimKitchenPreview = await renderClaimKitchenPreviewSvg({
     kitchenSlug: claim.kitchenSlug,
     selectedAreas: claim.problemAreasJson,
+    contractNumber: claim.contractNumber,
   }).catch(() => null);
   const uploadedAttachmentFiles = rawUploadedAttachments.map((file, index) => ({
     index,

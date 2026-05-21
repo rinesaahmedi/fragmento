@@ -12,7 +12,7 @@ export const CONTRACT_ERRORS = {
 const EDITABLE_ORDER_STATUSES = new Set([OrderStatus.NEW]);
 
 export function normalizeContractNumber(value) {
-  return String(value || "").trim();
+  return String(value || "").trim().replace(/\s+/g, "");
 }
 
 export function contractValidationError(message, status = 400) {

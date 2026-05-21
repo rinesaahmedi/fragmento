@@ -16,7 +16,7 @@ import AdminSelect from "../../../components/admin-select";
 import AdminConfirmSubmitButton from "../../../components/admin-confirm-submit-button";
 import { AdminClaimLocalizedText } from "../../../components/admin-claim-localized-text";
 import { getFormMessage } from "../../../lib/admin-forms";
-import { requireAdminPage } from "../../../lib/auth";
+import { requireAdminClaimsPage } from "../../../lib/admin-claims-access";
 import { prisma } from "../../../lib/prisma";
 import { formatServiceClaimProblemAreaList } from "../../../lib/service-claim-problem-areas";
 import { queryServiceClaimsList } from "../../../lib/service-claim-admin-query";
@@ -52,7 +52,7 @@ function formatClaimKitchenSummary(claim) {
 }
 
 export default async function AdminClaimsPage({ searchParams = {} }) {
-  const admin = await requireAdminPage();
+  const admin = await requireAdminClaimsPage();
   const resolvedSearchParams = (await searchParams) || {};
   const filters = {
     q: normalizeParam(resolvedSearchParams.q).trim(),

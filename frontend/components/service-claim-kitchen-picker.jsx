@@ -10,7 +10,7 @@ import {
 } from "./kitchen-svg-plan-utils";
 import styles from "./kitchen-configurator.module.css";
 
-export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange, labels }) {
+export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange, labels, contractNumber }) {
   const svgHostRef = useRef(null);
   const { kitchenConfig, svgMarkup, kitchenSlug, selectableComponentIds } = kitchenPlan;
 
@@ -120,9 +120,19 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     });
   }, [fixedKey, value, fixedComponentIds]);
 
+  const normalizedContractNumber = String(contractNumber || "").trim();
+
   return (
     <div className="service-claim-kitchen">
       <div className="service-claim-kitchen__header">
+        {normalizedContractNumber ? (
+          <div className="service-claim-kitchen__meta">
+            {labels?.contractLabel ? (
+              <p className="service-claim-kitchen__eyebrow">{labels.contractLabel}</p>
+            ) : null}
+            <p className="service-claim-kitchen__contract">{normalizedContractNumber}</p>
+          </div>
+        ) : null}
         <button type="button" className="service-claim-kitchen__reset" onClick={() => onChange([])}>
           {labels?.reset || "Reset"}
         </button>

@@ -3,8 +3,7 @@ const path = require("path");
 const bcrypt = require("bcryptjs");
 const { PrismaClient } = require("@prisma/client");
 
-function loadEnvFile() {
-  const envPath = path.resolve(__dirname, "../.env");
+function loadEnvFile(envPath) {
   if (!fs.existsSync(envPath)) return;
 
   const lines = fs.readFileSync(envPath, "utf8").split(/\r?\n/);
@@ -30,9 +29,24 @@ function loadEnvFile() {
   }
 }
 
-loadEnvFile();
+for (const envPath of [
+  path.resolve(__dirname, "../../.env"),
+  path.resolve(__dirname, "../.env"),
+]) {
+  loadEnvFile(envPath);
+}
 
 const prisma = new PrismaClient();
+
+async function syncAdminUser(email, password, label) {
+  const passwordHash = await bcrypt.hash(password, 12);
+  await prisma.adminUser.upsert({
+    where: { email },
+    update: { passwordHash },
+    create: { email, passwordHash },
+  });
+  console.log(`${label} synced for ${email}`);
+}
 
 async function main() {
   const adminEmail = String(process.env.ADMIN_EMAIL || "").trim();
@@ -46,15 +60,32 @@ async function main() {
     throw new Error("ADMIN_PASSWORD is missing in frontend/.env");
   }
 
-  const passwordHash = await bcrypt.hash(adminPassword, 12);
+  await syncAdminUser(adminEmail, adminPassword, "Primary admin user");
 
-  await prisma.adminUser.upsert({
-    where: { email: adminEmail },
-    update: { passwordHash },
-    create: { email: adminEmail, passwordHash },
-  });
+  const claimsEmail = String(process.env.ADMIN_CLAIMS_EMAIL || "").trim();
+  const claimsPassword = String(process.env.ADMIN_CLAIMS_PASSWORD || "");
 
-  console.log(`Admin user synced for ${adminEmail}`);
+  if (claimsEmail || claimsPassword) {
+    if (!claimsEmail) {
+      throw new Error("ADMIN_CLAIMS_EMAIL is missing but ADMIN_CLAIMS_PASSWORD is set in frontend/.env");
+    }
+    if (!claimsPassword) {
+      throw new Error("ADMIN_CLAIMS_PASSWORD is missing but ADMIN_CLAIMS_EMAIL is set in frontend/.env");
+    }
+
+    await syncAdminUser(claimsEmail, claimsPassword, "Claims admin user");
+
+    const allowedClaimsEmails = String(process.env.ADMIN_CLAIMS_ACCESS_EMAILS || "")
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean);
+
+    if (!allowedClaimsEmails.includes(claimsEmail.toLowerCase())) {
+      console.warn(
+        `Warning: ${claimsEmail} is not listed in ADMIN_CLAIMS_ACCESS_EMAILS, so that account will not see Claims.`,
+      );
+    }
+  }
 }
 
 main()

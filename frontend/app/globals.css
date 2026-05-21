@@ -2789,10 +2789,23 @@ textarea {
 .service-claim-kitchen__header {
   display: flex;
   align-items: flex-start;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 0;
+  margin-bottom: 8px;
+}
+
+.service-claim-kitchen__meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.service-claim-kitchen__contract {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--app-text);
+  letter-spacing: 0.02em;
 }
 
 .service-claim-kitchen__eyebrow {
@@ -3204,9 +3217,9 @@ textarea {
   cursor: not-allowed;
 }
 
-.service-claim-agent__message span {
+.service-claim-agent__message-body {
   display: inline-block;
-  max-width: 88%;
+  max-width: 100%;
   padding: 11px 13px;
   border: 1px solid rgba(107, 79, 58, 0.12);
   border-radius: 16px;
@@ -3215,7 +3228,19 @@ textarea {
   white-space: pre-wrap;
 }
 
-.service-claim-agent__message--assistant span {
+.service-claim-agent__message-body span {
+  display: inline;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.service-claim-agent__message--assistant .service-claim-agent__message-body {
   background: #f7f5f1;
   color: #2f2a24;
 }
@@ -3224,13 +3249,13 @@ textarea {
   justify-content: flex-end;
 }
 
-.service-claim-agent__message--user span {
+.service-claim-agent__message--user .service-claim-agent__message-body {
   background: #e9f7ee;
   color: #24583b;
   border-color: rgba(42, 145, 85, 0.18);
 }
 
-.service-claim-agent__message--error span {
+.service-claim-agent__message--error .service-claim-agent__message-body {
   color: #b53b30;
   border-color: rgba(181, 59, 48, 0.22);
 }

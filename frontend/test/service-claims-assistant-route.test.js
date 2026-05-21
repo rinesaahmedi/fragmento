@@ -116,26 +116,7 @@ test("normalizes dishwasher error codes", () => {
   assert.equal(route.normalizeCode("E3"), "E3");
 });
 
-test("claim assistant uses OpenAI responses API with gpt-5.1 and no reasoning", async () => {
-  process.env.OPENAI_API_KEY = "test-key";
-
-  let capturedRequest = null;
-  installFetchMock(async (_url, init) => {
-    capturedRequest = JSON.parse(init.body);
-    return {
-      ok: true,
-      async json() {
-        return {
-          output_text: JSON.stringify({
-            answer: "Check that the water tap is fully open, then tell me if the dishwasher still shows E1.",
-            showClaimFormHelpAction: true,
-            suggestedProblemDescription: null,
-          }),
-        };
-      },
-    };
-  });
-
+test("known dishwasher error uses local knowledge and offers claim-form help", async () => {
   const route = loadRoute();
   const response = await route.POST(request({
     language: "en",
@@ -146,37 +127,13 @@ test("claim assistant uses OpenAI responses API with gpt-5.1 and no reasoning", 
 
   assert.equal(response.status, 200);
   assert.match(response.body.answer, /water tap is fully open/i);
+  assert.match(response.body.answer, /water inlet problem/i);
   assert.ok(Array.isArray(response.body.actions));
   assert.equal(response.body.actions[0].id, "claim_form_help");
-
-  assert.equal(capturedRequest.model, "gpt-5.1");
-  assert.equal(capturedRequest.reasoning.effort, "none");
-  assert.match(capturedRequest.instructions, /Fragmento claim assistant/);
-
-  const promptText = capturedRequest.input[0].content[0].text;
-  assert.match(promptText, /"selected_areas"/);
-  assert.match(promptText, /"legacy_assistant_draft"/);
-  assert.match(promptText, /"database_knowledge_entries"/);
+  assert.match(response.body.actions[0].prompt, /E1/i);
 });
 
 test("claim-form help returns suggested problem description without action chips", async () => {
-  process.env.OPENAI_API_KEY = "test-key";
-  process.env.OPENAI_CLAIM_ASSISTANT_MODEL = "gpt-5.1";
-
-  installFetchMock(async () => ({
-    ok: true,
-    async json() {
-      return {
-        output_text: JSON.stringify({
-          answer: "For the claim form, use the text below.",
-          showClaimFormHelpAction: false,
-          suggestedProblemDescription:
-            "My architecto dishwasher is not taking in water and may show error code E1. Please check the appliance and advise on the next step.",
-        }),
-      };
-    },
-  }));
-
   const route = loadRoute();
   const response = await route.POST(request({
     language: "en",
@@ -190,17 +147,86 @@ test("claim-form help returns suggested problem description without action chips
   }));
 
   assert.equal(response.status, 200);
-  assert.equal(response.body.answer, "For the claim form, use the text below.");
+  assert.match(response.body.answer, /For the claim form/i);
   assert.equal(
     response.body.suggestedProblemDescription,
-    "My architecto dishwasher is not taking in water and may show error code E1. Please check the appliance and advise on the next step.",
+    "E1: My architecto dishwasher is not taking in water and may show error code E1. I checked the water tap and inlet hose, but the issue remains. Please arrange a check or advise on the next step.",
+  );
+  assert.match(response.body.answer, /\*\*E1:\*\*/);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("latest explicit dishwasher error code overrides older form description context", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error E1",
+    conversationMessages: [
+      { role: "user", text: "the dishwasher its not working" },
+      { role: "assistant", text: "Which of these fits best?" },
+      { role: "user", text: "i see error E2" },
+    ],
+    selectedAreas: dishwasherArea(),
+    claim: {
+      ...emptyClaim(),
+      problemDescription:
+        "E02: My architecto dishwasher is not draining properly and may show error code E02. I checked the filters, drain hose, and pump area, but the issue remains. Please arrange a check or advise on the next step.",
+    },
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /water inlet problem/i);
+  assert.match(response.body.answer, /water tap is fully open/i);
+  assert.doesNotMatch(response.body.answer, /water drainage problem/i);
+  assert.match(response.body.actions[0].prompt, /E1/i);
+});
+
+test("generic claim-form-help request follows the latest dishwasher error in conversation", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "Show claim-form help",
+    conversationMessages: [
+      { role: "user", text: "the dishwasher its not working" },
+      { role: "assistant", text: "Which of these fits best?" },
+      { role: "user", text: "i see error E1" },
+      { role: "assistant", text: "This sounds like a water inlet problem." },
+      { role: "user", text: "Show claim-form help E1" },
+      { role: "assistant", text: "For the claim form..." },
+      { role: "user", text: "i see error E2" },
+    ],
+    selectedAreas: dishwasherArea(),
+    claim: {
+      ...emptyClaim(),
+      problemDescription:
+        "E1: My architecto dishwasher is not taking in water and may show error code E1. I checked the water tap and inlet hose, but the issue remains. Please arrange a check or advise on the next step.",
+    },
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /not draining properly/i);
+  assert.equal(
+    response.body.suggestedProblemDescription,
+    "E02: My architecto dishwasher is not draining properly and may show error code E02. I checked the filters, drain hose, and pump area, but the issue remains. Please arrange a check or advise on the next step.",
   );
   assert.equal(response.body.actions, undefined);
 });
 
-test("missing OpenAI configuration returns 503", async () => {
-  delete process.env.OPENAI_API_KEY;
+test("low-information greeting does not show claim-form help action", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "hi",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
 
+  assert.equal(response.status, 200);
+  assert.equal(response.body.actions, undefined);
+  assert.match(response.body.answer, /help you with the claim/i);
+});
+
+test("generic non-database issue does not show claim-form help action", async () => {
   const route = loadRoute();
   const response = await route.POST(request({
     language: "en",
@@ -209,6 +235,7 @@ test("missing OpenAI configuration returns 503", async () => {
     claim: emptyClaim(),
   }));
 
-  assert.equal(response.status, 503);
-  assert.equal(response.body.error, "Claim assistant is not configured.");
+  assert.equal(response.status, 200);
+  assert.equal(response.body.actions, undefined);
+  assert.match(response.body.answer, /leak around the sink area/i);
 });
