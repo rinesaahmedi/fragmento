@@ -68,6 +68,7 @@ export default function PublicKitchenOrderForm({
     city: translate("order.fieldErrors.city", "Please select a city."),
     postalCode: translate("order.fieldErrors.postalCode", "Please select a postal code."),
     consent: translate("order.fieldErrors.consent", "Please accept the privacy statement."),
+    termsConsent: translate("order.fieldErrors.termsConsent", "Please accept the terms and conditions."),
   }), [translate]);
   const countryOptions = uniqueOptions(Object.keys(COUNTRY_CITY_OPTIONS), customer.country);
   const cityOptions = uniqueOptions(COUNTRY_CITY_OPTIONS[customer.country] || [], customer.city);
@@ -84,7 +85,7 @@ export default function PublicKitchenOrderForm({
   function hasFieldError(fieldKey, required = false) {
     if (!required) return false;
     if (!hasTriedSubmit && !touchedFields[fieldKey]) return false;
-    return fieldKey === "consent" ? !customer.consent : !normalizeValue(customer[fieldKey]);
+    return fieldKey === "consent" || fieldKey === "termsConsent" ? !customer[fieldKey] : !normalizeValue(customer[fieldKey]);
   }
 
   function getFieldClassName(fieldKey, required = false, baseClassName = styles.field) {
@@ -390,32 +391,54 @@ export default function PublicKitchenOrderForm({
                 />
               </div>
             </div>
-            <div className={styles.checkboxRow}>
-              <input
-                id="consent"
-                type="checkbox"
-                checked={customer.consent}
-                onBlur={() => markFieldTouched("consent")}
-                onChange={(event) => {
-                  markFieldTouched("consent");
-                  onUpdateCustomer("consent", event.target.checked);
-                }}
-              />
-              <label htmlFor="consent">
-                {translate("order.consentPrefix", "I have read the ")}
-                <span
-                  className={styles.pendingLegalText}
-                  title={translate("order.privacyPolicyPending", "Privacy policy will be available soon.")}
-                >
-                  {translate("order.privacyPolicy", "privacy policy")}
-                </span>
-                {translate("order.consentSuffix", " and confirm that my order data may be used to process this order.*")}
-              </label>
+            <div className={styles.legalConsentGroup}>
+              <div className={styles.checkboxRow}>
+                <input
+                  id="consent"
+                  type="checkbox"
+                  checked={customer.consent}
+                  onBlur={() => markFieldTouched("consent")}
+                  onChange={(event) => {
+                    markFieldTouched("consent");
+                    onUpdateCustomer("consent", event.target.checked);
+                  }}
+                />
+                <label htmlFor="consent">
+                  {translate("order.consentShortPrefix", "I accept the ")}
+                  <span
+                    className={styles.pendingLegalText}
+                    title={translate("order.privacyPolicyPending", "Privacy policy will be available soon.")}
+                  >
+                    {translate("order.privacyPolicy", "privacy policy")}
+                  </span>
+                  {translate("order.consentShortSuffix", ".*")}
+                </label>
+              </div>
+              {renderFieldError("consent", true)}
+              <div className={styles.checkboxRow}>
+                <input
+                  id="termsConsent"
+                  type="checkbox"
+                  checked={Boolean(customer.termsConsent)}
+                  onBlur={() => markFieldTouched("termsConsent")}
+                  onChange={(event) => {
+                    markFieldTouched("termsConsent");
+                    onUpdateCustomer("termsConsent", event.target.checked);
+                  }}
+                />
+                <label htmlFor="termsConsent">
+                  {translate("order.termsConsentPrefix", "I have read the ")}
+                  <a href="/legal/AGB-Architecto-2026.pdf?v=2026052102" target="_blank" rel="noreferrer">
+                    {translate("order.termsAndConditions", "terms and conditions")}
+                  </a>
+                  {translate("order.termsConsentSuffix", " and agree.*")}
+                </label>
+              </div>
+              {renderFieldError("termsConsent", true)}
             </div>
-            {renderFieldError("consent", true)}
             <div className={styles.orderSubmitRow}>
               <button type="submit" form="order-form" className={styles.orderSubmitButton} disabled={isSubmitting}>
-                {isSubmitting ? translate("order.submitSaving", "Saving...") : translate("order.submit", "Order and pay")}
+                {isSubmitting ? translate("order.submitSaving", "Saving...") : translate("order.submit", "Order with obligation to pay")}
               </button>
             </div>
             <small className={styles.orderHelp}>{translate("order.requiredHint", "Fields marked with * are required.")}</small>

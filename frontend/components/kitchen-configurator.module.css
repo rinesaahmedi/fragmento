@@ -2373,17 +2373,31 @@
   background: #ffb3c7;
 }
 
+.legalConsentGroup {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
 .checkboxRow {
   display: grid;
   grid-template-columns: 20px 1fr;
-  gap: 8px;
+  gap: 10px;
   align-items: start;
   color: #5d5146;
   font-size: 0.85rem;
+  line-height: 1.35;
 }
 
 .checkboxRow input {
-  margin-top: 1px;
+  margin-top: 2px;
+}
+
+.checkboxRow a {
+  color: #2f6fad;
+  font-weight: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .pendingLegalText {
@@ -2392,7 +2406,6 @@
   align-items: center;
   color: #2f6fad;
   text-decoration: underline;
-  text-decoration-style: dotted;
   text-underline-offset: 2px;
   cursor: help;
 }

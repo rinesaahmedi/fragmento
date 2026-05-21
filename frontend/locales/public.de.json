@@ -70,6 +70,7 @@
     "addressServiceUnavailable": "Der Dienst zur Adressprüfung ist momentan nicht verfügbar.",
     "statusSelectItem": "Wähle zuerst mindestens einen Artikel aus.",
     "statusConfirmConsent": "Bitte bestätige die Datenschutzeinwilligung.",
+    "statusConfirmTerms": "Bitte bestätige, dass du die AGBs gelesen hast und zustimmst.",
     "statusSelectPayment": "Bitte wähle eine Zahlungsmethode aus.",
     "statusVerifyAddress": "Bitte prüfe die Adresse vor dem Absenden der Bestellung.",
     "statusSavingOrder": "Bestellung wird gespeichert...",
@@ -214,6 +215,11 @@
     "privacyPolicy": "Datenschutzerklärung",
     "privacyPolicyPending": "Die Datenschutzerklärung ist bald verfügbar.",
     "consentSuffix": " gelesen und bestätige, dass meine Bestelldaten zur Bearbeitung dieser Bestellung verwendet werden dürfen.*",
+    "consentShortPrefix": "Ich stimme der ",
+    "consentShortSuffix": " zu.*",
+    "termsConsentPrefix": "Ich habe die ",
+    "termsAndConditions": "AGBs",
+    "termsConsentSuffix": " gelesen und stimme zu.*",
     "submitSaving": "Wird gespeichert...",
     "submit": "Kostenpflichtig bestellen",
     "requiredHint": "Mit * gekennzeichnete Felder sind Pflichtfelder.",
@@ -235,7 +241,8 @@
       "city": "Bitte Stadt auswählen.",
       "postalCode": "Bitte PLZ auswählen.",
       "paymentMethod": "Bitte Zahlungsmethode auswählen.",
-      "consent": "Bitte der Datenschutzerklärung zustimmen."
+      "consent": "Bitte der Datenschutzerklärung zustimmen.",
+      "termsConsent": "Bitte den AGBs zustimmen."
     }
   },
   "countries": {

@@ -250,6 +250,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
   const customer = orderPayload?.customer || {};
   validateConsent(customer.consent);
+  validateConsent(customer.termsConsent);
   const contractNumber = normalizeContractNumber(customer.contractNumber);
   if (!contractNumber) {
     throw validationError(CONTRACT_ERRORS.REQUIRED);

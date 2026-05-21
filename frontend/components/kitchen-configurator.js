@@ -51,6 +51,7 @@ function buildInitialCustomer(contractNumber) {
     notes: "",
     paymentMethod: "card",
     consent: false,
+    termsConsent: false,
   };
 }
 
@@ -110,6 +111,7 @@ function buildInitialCustomerFromOrder(initialOrder, contractNumber) {
     ...(initialOrder?.customer || {}),
     contractNumber: initialOrder?.customer?.contractNumber || contractNumber,
     consent: false,
+    termsConsent: false,
   };
 }
 
@@ -1728,6 +1730,12 @@ function KitchenConfiguratorContent({
       return;
     }
 
+    if (!customer.termsConsent) {
+      setStatus(translate("configurator.statusConfirmTerms", "Please confirm that you have read and accept the terms and conditions."));
+      setStatusTone("error");
+      return;
+    }
+
     setIsSubmitting(true);
     setStatus(translate("configurator.statusSavingOrder", "Saving order..."));
     setStatusTone("idle");
@@ -1782,6 +1790,7 @@ function KitchenConfiguratorContent({
               notes: customer.notes,
               paymentMethod,
               consent: customer.consent,
+              termsConsent: customer.termsConsent,
             },
             addressVerification: addressVerification.verification,
             components: pdfOrderComponents,
