@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import {
-  componentIdForItem,
-  normalizeColor,
-  toggleLinkedComponentSelection,
-} from "./kitchen-selection-utils";
+import { componentIdForItem, normalizeColor } from "./kitchen-selection-utils";
 import {
   PLAN_VIEWPORT_BY_SLUG,
   applyPlanViewportToMarkup,
@@ -82,9 +78,19 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
         return;
       }
 
-      onChange((current) =>
-        toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
-      );
+      onChange((current) => {
+        const locked = new Set(fixedComponentIds);
+        if (locked.has(componentId)) {
+          return current;
+        }
+        const next = new Set(current);
+        if (next.has(componentId)) {
+          next.delete(componentId);
+        } else {
+          next.add(componentId);
+        }
+        return [...next];
+      });
     };
 
     host.addEventListener("click", onClick, true);

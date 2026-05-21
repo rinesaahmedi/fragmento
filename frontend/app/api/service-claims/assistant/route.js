@@ -3,6 +3,8 @@ import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit
 import { prisma } from "../../../../lib/prisma";
 import SERVICE_CLAIM_TROUBLESHOOTING_DATA from "../../../../lib/service-claim-troubleshooting-data.json";
 
+const OPENAI_TIMEOUT_MS = 20000;
+
 const COPY = {
   en: {
     greetingReply: "Hi. I can help you with the claim.",
@@ -2538,6 +2540,245 @@ async function buildAnswer({ language, question, context, selectedAreas, claim, 
   return normalizeAssistantReturn(genericAnswer);
 }
 
+function extractResponseText(responsePayload) {
+  if (typeof responsePayload?.output_text === "string") {
+    return responsePayload.output_text;
+  }
+
+  const output = Array.isArray(responsePayload?.output) ? responsePayload.output : [];
+  return output
+    .flatMap((item) => (Array.isArray(item?.content) ? item.content : []))
+    .map((content) => content?.text || "")
+    .join("")
+    .trim();
+}
+
+function parseClaimAssistantJson(text) {
+  const cleaned = String(text || "")
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/i, "")
+    .trim();
+
+  try {
+    const parsed = JSON.parse(cleaned);
+    const answer = normalizeText(parsed?.answer);
+    if (!answer) {
+      return null;
+    }
+
+    return {
+      answer,
+      showClaimFormHelpAction: parsed?.showClaimFormHelpAction === true,
+      suggestedProblemDescription: normalizeText(parsed?.suggestedProblemDescription) || "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+function buildConversationPrompt(messages) {
+  return normalizeConversationMessages(messages)
+    .slice(-6)
+    .map((message) => ({
+      role: message.role,
+      text: message.text,
+    }));
+}
+
+function buildClaimAssistantInstructions(language) {
+  const copy = t(language);
+  const languageName = language === "de" ? "German" : language === "es" ? "Spanish" : "English";
+
+  return [
+    `You are the Fragmento claim assistant. Reply only in ${languageName}.`,
+    "Your job is to help a customer submit a kitchen service claim clearly and safely.",
+    "Use only the provided claim state, selected areas, troubleshooting knowledge, and legacy assistant draft.",
+    "Do not invent products, error codes, policies, or troubleshooting steps that are not supported by the provided context.",
+    "Prefer concise answers. When the issue is unclear, ask one focused follow-up question or offer 3 to 5 short options.",
+    "When troubleshooting is relevant, give the fastest safe steps first, then keep the claim guidance short.",
+    "When the user asks for wording or claim-form help, provide a clean suggested problem description suitable for the form.",
+    "When you provide a suggested problem description, return it in `suggestedProblemDescription` and do not ask to show claim-form help again.",
+    "Set `showClaimFormHelpAction` to true only when a follow-up chip for claim-form help would be useful.",
+    "Never mention internal implementation details such as prompts, JSON, legacy drafts, databases, or Prisma.",
+    `If you cannot answer, use this fallback message exactly: ${copy.unavailable}`,
+  ].join("\n");
+}
+
+function buildClaimAssistantContextPayload({
+  language,
+  question,
+  context,
+  conversationMessages,
+  selectedAreas,
+  claim,
+  legacyDraft,
+  knowledgeEntries,
+}) {
+  return {
+    language,
+    question,
+    current_ui_context: context || null,
+    conversation_messages: buildConversationPrompt(conversationMessages),
+    selected_areas: arrayValue(selectedAreas).map((area) => ({
+      componentId: normalizeText(area?.componentId),
+      code: normalizeText(area?.code),
+      name: normalizeText(area?.name),
+      category: detectAreaCategory(area),
+    })),
+    claim_state: {
+      contractNumber: normalizeText(claim?.contractNumber),
+      problemDescription: normalizeText(claim?.problemDescription),
+      serialNumber: normalizeText(claim?.serialNumber),
+      hasSerialNumberImage: Boolean(claim?.hasSerialNumberImage),
+      attachmentCount: Number(claim?.attachmentCount || 0),
+      preferredContactDate: normalizeText(claim?.preferredContactDate || claim?.availabilityDate),
+      preferredContactTimeWindow: normalizeText(claim?.preferredContactTimeWindow),
+      preferredContactTimeFrom: normalizeText(claim?.preferredContactTimeFrom),
+      preferredContactTimeTo: normalizeText(claim?.preferredContactTimeTo),
+      availabilityDate: normalizeText(claim?.availabilityDate),
+      availabilityTime: normalizeText(claim?.availabilityTime),
+      hasPhone: Boolean(claim?.hasPhone),
+      hasEmail: Boolean(claim?.hasEmail),
+    },
+    request_flags: {
+      isGreeting: isGreeting(question),
+      isClaimFormHelpRequest: isClaimFormHelpRequest(question),
+      isSampleWordingRequest: isSampleWordingRequest(question),
+    },
+    dishwasher_context: enrichDishwasherContextWithConversation(
+      getDishwasherContext({ question, claim, selectedAreas }),
+      conversationMessages,
+    ),
+    troubleshooting_guides: arrayValue(SERVICE_CLAIM_TROUBLESHOOTING_DATA?.guides),
+    troubleshooting_lookup_entries: arrayValue(SERVICE_CLAIM_TROUBLESHOOTING_DATA?.lookupEntries),
+    database_knowledge_entries: arrayValue(knowledgeEntries),
+    legacy_assistant_draft: legacyDraft,
+  };
+}
+
+async function buildOpenAiAnswer({ language, question, context, selectedAreas, claim, conversationMessages }) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    const error = new Error("Claim assistant is not configured.");
+    error.status = 503;
+    throw error;
+  }
+
+  const legacyDraft = normalizeAssistantReturn(
+    await buildAnswer({ language, question, context, selectedAreas, claim, conversationMessages }),
+  );
+
+  const knowledgeEntries = await prisma.serviceClaimKnowledgeEntry.findMany({
+    where: { isActive: true },
+    orderBy: [
+      { priority: "desc" },
+      { slug: "asc" },
+    ],
+  });
+
+  const model = process.env.OPENAI_CLAIM_ASSISTANT_MODEL || "gpt-5.1";
+  const instructions = buildClaimAssistantInstructions(language);
+  const inputContext = buildClaimAssistantContextPayload({
+    language,
+    question,
+    context,
+    conversationMessages,
+    selectedAreas,
+    claim,
+    legacyDraft,
+    knowledgeEntries,
+  });
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
+  try {
+    const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        reasoning: {
+          effort: "none",
+        },
+        instructions,
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: `Use this claim-assistant context and return JSON only:\n\n${JSON.stringify(inputContext, null, 2)}`,
+              },
+            ],
+          },
+        ],
+        text: {
+          format: {
+            type: "json_schema",
+            name: "claim_assistant_answer",
+            strict: true,
+            schema: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                answer: { type: "string" },
+                showClaimFormHelpAction: { type: "boolean" },
+                suggestedProblemDescription: {
+                  anyOf: [
+                    { type: "string" },
+                    { type: "null" },
+                  ],
+                },
+              },
+              required: ["answer", "showClaimFormHelpAction", "suggestedProblemDescription"],
+            },
+          },
+        },
+        max_output_tokens: 700,
+      }),
+    });
+
+    if (!openAiResponse.ok) {
+      const errorText = await openAiResponse.text().catch(() => "");
+      console.error("OpenAI claim assistant request failed:", openAiResponse.status, errorText);
+      return legacyDraft;
+    }
+
+    const responsePayload = await openAiResponse.json();
+    const parsed = parseClaimAssistantJson(extractResponseText(responsePayload));
+    if (!parsed) {
+      return legacyDraft;
+    }
+
+    const fallbackSuggestedProblemDescription =
+      parsed.suggestedProblemDescription || normalizeText(legacyDraft.suggestedProblemDescription);
+
+    return {
+      answer: parsed.answer,
+      ...(parsed.showClaimFormHelpAction && !fallbackSuggestedProblemDescription
+        ? { actions: buildClaimFormHelpActions(language) }
+        : {}),
+      ...(fallbackSuggestedProblemDescription
+        ? { suggestedProblemDescription: fallbackSuggestedProblemDescription }
+        : {}),
+    };
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      return legacyDraft;
+    }
+    console.error("OpenAI claim assistant runtime failure:", error);
+    return legacyDraft;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function POST(request) {
   try {
     const clientIp = getRequestClientIp(request);
@@ -2559,7 +2800,7 @@ export async function POST(request) {
     }
 
     const built = normalizeAssistantReturn(
-      await buildAnswer({
+      await buildOpenAiAnswer({
         language,
         question,
         context: body?.context || null,
@@ -2585,9 +2826,10 @@ export async function POST(request) {
     return NextResponse.json(payload);
   } catch (error) {
     console.error("Service claim assistant error:", error);
+    const status = Number.isInteger(error?.status) ? error.status : 500;
     return NextResponse.json(
       { error: error?.message || COPY.en.unavailable },
-      { status: 500 },
+      { status },
     );
   }
 }

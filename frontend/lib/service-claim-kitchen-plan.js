@@ -1,5 +1,5 @@
 import { ItemType, KitchenStatus } from "@prisma/client";
-import { componentIdForItem, getLinkedComponentIds } from "../components/kitchen-selection-utils";
+import { componentIdForItem } from "../components/kitchen-selection-utils";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "./catalog";
 import { getContractOrderState } from "./kitchen-contracts";
 import { loadKitchenSvgMarkup } from "./load-kitchen-svg";
@@ -46,6 +46,32 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
         .filter((item) => item.itemType === ItemType.COMPONENT)
         .map((item) => [item.code, item]),
     );
+    const componentMetaById = new Map();
+
+    for (const item of kitchen.items || []) {
+      if (item.itemType !== ItemType.COMPONENT) {
+        continue;
+      }
+      const componentId = componentIdForItem(item);
+      if (!componentId) {
+        continue;
+      }
+      componentMetaById.set(componentId, {
+        code: String(item.code || "").trim(),
+        name: stripProductDimensionsFromLabel(String(item.name || item.code || "").trim() || item.code),
+      });
+    }
+
+    for (const comp of kitchenConfig.components || []) {
+      const componentId = componentIdForItem(comp);
+      if (!componentId || componentMetaById.has(componentId)) {
+        continue;
+      }
+      componentMetaById.set(componentId, {
+        code: String(comp.code || "").trim(),
+        name: stripProductDimensionsFromLabel(String(comp.name || comp.code || "").trim() || comp.code),
+      });
+    }
 
     const orderLines = [
       ...(orderState.confirmedItems || []),
@@ -56,6 +82,25 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
     const selectableMetaIds = new Set();
     const selectableMeta = [];
 
+    function addSelectableMeta(componentId, fallbackMeta = {}) {
+      if (!componentId || selectableMetaIds.has(componentId)) {
+        return;
+      }
+
+      selectableMetaIds.add(componentId);
+      const resolvedMeta = componentMetaById.get(componentId) || {};
+      const code = String(resolvedMeta.code || fallbackMeta.code || "").trim();
+      const name = stripProductDimensionsFromLabel(
+        String(resolvedMeta.name || fallbackMeta.name || code || componentId).trim() || code || componentId,
+      );
+
+      selectableMeta.push({
+        componentId,
+        code,
+        name,
+      });
+    }
+
     for (const line of orderLines) {
       if (line.itemType !== ItemType.COMPONENT) {
         continue;
@@ -65,17 +110,14 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
         continue;
       }
       const componentId = componentIdForItem(ki);
-      getLinkedComponentIds(slug, componentId).forEach((id) => selectableIds.add(id));
-      if (!selectableMetaIds.has(componentId)) {
-        selectableMetaIds.add(componentId);
-        selectableMeta.push({
-          componentId,
-          code: line.code,
-          name: stripProductDimensionsFromLabel(
-            String(line.nameSnapshot || ki.name || line.code || "").trim() || line.code,
-          ),
-        });
-      }
+      const fallbackMeta = {
+        code: String(line.code || "").trim(),
+        name: stripProductDimensionsFromLabel(
+          String(line.nameSnapshot || ki.name || line.code || "").trim() || line.code,
+        ),
+      };
+      selectableIds.add(componentId);
+      addSelectableMeta(componentId, fallbackMeta);
     }
 
     for (const comp of kitchenConfig.components || []) {
@@ -86,15 +128,12 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       if (!componentId) {
         continue;
       }
-      getLinkedComponentIds(slug, componentId).forEach((id) => selectableIds.add(id));
-      if (!selectableMetaIds.has(componentId)) {
-        selectableMetaIds.add(componentId);
-        selectableMeta.push({
-          componentId,
-          code: comp.code,
-          name: stripProductDimensionsFromLabel(String(comp.name || comp.code || "").trim() || comp.code),
-        });
-      }
+      const fallbackMeta = {
+        code: String(comp.code || "").trim(),
+        name: stripProductDimensionsFromLabel(String(comp.name || comp.code || "").trim() || comp.code),
+      };
+      selectableIds.add(componentId);
+      addSelectableMeta(componentId, fallbackMeta);
     }
 
     return {

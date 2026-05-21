@@ -14,7 +14,7 @@ import {
 import { persistServiceClaimAttachments } from "../../../lib/service-claim-attachments-storage";
 import { renderClaimKitchenPreviewPng } from "../../../lib/claim-kitchen-preview";
 import { getServiceClaimContractDetails } from "../../../lib/service-claims";
-import { formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
+import { formatServiceClaimProblemArea, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 
@@ -83,6 +83,23 @@ function mergeProblemAreasIntoDescription(problemDescription, problemAreasJsonRa
 function normalizeProblemAreasJson(problemAreasJsonRaw) {
   const normalized = parseServiceClaimProblemAreas(problemAreasJsonRaw);
   return normalized.length ? JSON.stringify(normalized) : null;
+}
+
+function formatAttachmentLabel(entry) {
+  const areaName = String(entry?.areaName || "").trim();
+  const areaCode = String(entry?.areaCode || "").trim();
+  const role = String(entry?.role || "").trim();
+  const areaLabel = areaName && areaCode
+    ? `${areaName} (${areaCode})`
+    : areaName || areaCode;
+
+  if (role === "problem_area" && areaLabel) {
+    return `[${areaLabel}] ${entry.filename}`;
+  }
+  if (role === "serial_number") {
+    return `[Serial number] ${entry.filename}`;
+  }
+  return entry.filename;
 }
 
 function requiredGender(value) {
@@ -159,6 +176,25 @@ function buildPartyContactBlock(contact) {
   ].join("\n");
 }
 
+function formatServiceClaimErrorMessage(error) {
+  const direct = String(error?.message || "").trim();
+  if (direct) {
+    return direct;
+  }
+
+  if (error && typeof error === "object" && Array.isArray(error.errors)) {
+    const nested = error.errors
+      .map((entry) => String(entry?.message || entry || "").trim())
+      .filter(Boolean);
+    if (nested.length) {
+      return nested.join(" ");
+    }
+  }
+
+  const fallback = String(error || "").trim();
+  return fallback || "The complaint request could not be processed.";
+}
+
 async function postWebhook(payload) {
   const webhookUrl = String(process.env.N8N_WEBHOOK_URL || "").trim();
   if (!webhookUrl) {
@@ -169,32 +205,36 @@ async function postWebhook(payload) {
   const requestBody = JSON.stringify(payload);
   const lib = target.protocol === "https:" ? https : http;
 
-  await new Promise((resolve, reject) => {
-    const req = lib.request(
-      {
-        hostname: target.hostname,
-        port: target.port || (target.protocol === "https:" ? 443 : 80),
-        path: `${target.pathname}${target.search}`,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Length": Buffer.byteLength(requestBody),
-          "ngrok-skip-browser-warning": "true",
-          "User-Agent": "fragmento-service-claims/1.0",
+  try {
+    await new Promise((resolve, reject) => {
+      const req = lib.request(
+        {
+          hostname: target.hostname,
+          port: target.port || (target.protocol === "https:" ? 443 : 80),
+          path: `${target.pathname}${target.search}`,
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Content-Length": Buffer.byteLength(requestBody),
+            "ngrok-skip-browser-warning": "true",
+            "User-Agent": "fragmento-service-claims/1.0",
+          },
         },
-      },
-      (res) => {
-        res.resume();
-        res.on("end", resolve);
-      },
-    );
+        (res) => {
+          res.resume();
+          res.on("end", resolve);
+        },
+      );
 
-    req.on("error", reject);
-    req.write(requestBody);
-    req.end();
-  });
-
-  return true;
+      req.on("error", reject);
+      req.write(requestBody);
+      req.end();
+    });
+    return true;
+  } catch (error) {
+    console.warn("Service claim webhook delivery failed:", formatServiceClaimErrorMessage(error));
+    return false;
+  }
 }
 
 async function sendComplaintEmail(payload, attachmentParts = []) {
@@ -296,7 +336,13 @@ function extractAvailabilityFromDescription(description) {
 }
 
 function buildSelectedKitchenAreaLines(problemAreasJson) {
-  return formatServiceClaimProblemAreaList(problemAreasJson);
+  return parseServiceClaimProblemAreas(problemAreasJson)
+    .map((area) => {
+      const base = formatServiceClaimProblemArea(area);
+      const detail = String(area?.detail || "").trim();
+      return detail ? `${base}: ${detail}` : base;
+    })
+    .filter(Boolean);
 }
 
 let serviceClaimInsertColumnSupportPromise = null;
@@ -539,7 +585,7 @@ function buildComplaintEmailText(payload) {
           "Anhaenge (siehe E-Mail-Anhaenge):",
           ...payload.attachmentsMeta.map(
             (entry) =>
-              `- ${entry.filename} (${entry.contentType}, ${formatEmailFileSize(entry.size)})`,
+              `- ${formatAttachmentLabel(entry)} (${entry.contentType}, ${formatEmailFileSize(entry.size)})`,
           ),
         ]
       : []),
@@ -612,7 +658,7 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
       ? `<tr><td style="${tdStyles}font-weight:bold;width:35%;">Anhaenge</td><td style="${tdStyles}">${payload.attachmentsMeta
           .map(
             (entry) =>
-              `${escapeHtml(entry.filename)} (${escapeHtml(entry.contentType)}, ${escapeHtml(
+              `${escapeHtml(formatAttachmentLabel(entry))} (${escapeHtml(entry.contentType)}, ${escapeHtml(
                 formatEmailFileSize(entry.size),
               )})`,
           )
@@ -779,21 +825,50 @@ async function parseServiceClaimRequest(request) {
   if (contentType.includes("multipart/form-data")) {
     const formData = await request.formData();
     const body = {};
+    const generalAttachmentFiles = [];
+    const serialNumberImageFiles = [];
+    const problemAreaAttachmentFilesByComponentId = {};
     for (const [key, value] of formData.entries()) {
-      if (key === "attachments") {
+      if (value instanceof File) {
+        if (key === "attachments" || key === "generalAttachments") {
+          generalAttachmentFiles.push(value);
+          continue;
+        }
+        if (key === "serialNumberImages") {
+          serialNumberImageFiles.push(value);
+          continue;
+        }
+        if (key.startsWith("problemAreaAttachment:")) {
+          const componentId = key.slice("problemAreaAttachment:".length).trim();
+          if (componentId) {
+            if (!Array.isArray(problemAreaAttachmentFilesByComponentId[componentId])) {
+              problemAreaAttachmentFilesByComponentId[componentId] = [];
+            }
+            problemAreaAttachmentFilesByComponentId[componentId].push(value);
+          }
+          continue;
+        }
         continue;
       }
       if (typeof value === "string") {
         body[key] = value;
       }
     }
-    const rawFiles = formData.getAll("attachments").filter((entry) => entry instanceof File);
-    const attachmentParts = await normalizeServiceClaimUploads(rawFiles);
-    return { body, attachmentParts };
+    return {
+      body,
+      generalAttachmentFiles,
+      serialNumberImageFiles,
+      problemAreaAttachmentFilesByComponentId,
+    };
   }
 
   const body = await request.json();
-  return { body, attachmentParts: [] };
+  return {
+    body,
+    generalAttachmentFiles: [],
+    serialNumberImageFiles: [],
+    problemAreaAttachmentFilesByComponentId: {},
+  };
 }
 
 export async function POST(request) {
@@ -804,7 +879,12 @@ export async function POST(request) {
       windowMs: 15 * 60 * 1000,
     });
 
-    const { body, attachmentParts } = await parseServiceClaimRequest(request);
+    const {
+      body,
+      generalAttachmentFiles,
+      serialNumberImageFiles,
+      problemAreaAttachmentFilesByComponentId,
+    } = await parseServiceClaimRequest(request);
     const contractNumber = requiredString(body.contractNumber, "Contract number");
     const contract = await getServiceClaimContractDetails(contractNumber);
     if (!contract) {
@@ -857,6 +937,35 @@ export async function POST(request) {
       optionalString(body.problemDescription),
       optionalString(body.problemAreasJson),
     );
+    const parsedProblemAreas = parseServiceClaimProblemAreas(problemAreasJson);
+    const problemAreasByComponentId = new Map(
+      parsedProblemAreas.map((area) => [String(area.componentId || "").trim(), area]),
+    );
+    const generalAttachmentParts = await normalizeServiceClaimUploads(generalAttachmentFiles);
+    const serialNumberImageParts = await normalizeServiceClaimUploads(serialNumberImageFiles);
+    const problemAreaAttachmentParts = [];
+    for (const [componentId, files] of Object.entries(problemAreaAttachmentFilesByComponentId)) {
+      const normalizedComponentId = String(componentId || "").trim();
+      if (!normalizedComponentId || !files?.length) {
+        continue;
+      }
+      const area = problemAreasByComponentId.get(normalizedComponentId) || {};
+      const parts = await normalizeServiceClaimUploads(files);
+      for (const part of parts) {
+        problemAreaAttachmentParts.push({
+          ...part,
+          role: "problem_area",
+          areaComponentId: normalizedComponentId,
+          areaName: String(area?.name || "").trim(),
+          areaCode: String(area?.code || "").trim(),
+        });
+      }
+    }
+    const attachmentParts = [
+      ...serialNumberImageParts.map((part) => ({ ...part, role: "serial_number" })),
+      ...generalAttachmentParts.map((part) => ({ ...part, role: "general" })),
+      ...problemAreaAttachmentParts,
+    ];
     if (!problemDescription) {
       throw new Error("Problem description is required.");
     }
@@ -919,10 +1028,14 @@ export async function POST(request) {
       serialNumber: rawSerialNumber || "See serial number photo in attachments.",
       requestType: "complaint",
       hasSerialNumberImage,
-      attachmentsMeta: attachmentParts.map(({ filename, contentType, size }) => ({
+      attachmentsMeta: attachmentParts.map(({ filename, contentType, size, role, areaComponentId, areaName, areaCode }) => ({
         filename,
         contentType,
         size,
+        role: role || "general",
+        ...(areaComponentId ? { areaComponentId } : {}),
+        ...(areaName ? { areaName } : {}),
+        ...(areaCode ? { areaCode } : {}),
       })),
     };
 
@@ -947,7 +1060,10 @@ export async function POST(request) {
     }
 
     const [emailSent, webhookSent] = await Promise.all([
-      sendComplaintEmail(payload, attachmentParts),
+      sendComplaintEmail(payload, attachmentParts).catch((error) => {
+        console.warn("Service claim email delivery failed:", formatServiceClaimErrorMessage(error));
+        return false;
+      }),
       postWebhook(payload),
     ]);
 
@@ -965,7 +1081,7 @@ export async function POST(request) {
   } catch (error) {
     console.error("Service claim submit error:", error);
     return NextResponse.json(
-      { error: error.message || "The complaint request could not be processed." },
+      { error: formatServiceClaimErrorMessage(error) },
       { status: error.status || 500 },
     );
   }
