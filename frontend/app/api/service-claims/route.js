@@ -660,7 +660,7 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-const MAX_SERVICE_CLAIM_ATTACHMENTS = 5;
+const MAX_SERVICE_CLAIM_ATTACHMENTS = 20;
 const MAX_SERVICE_CLAIM_FILE_BYTES = 4 * 1024 * 1024;
 
 const ALLOWED_ATTACHMENT_MIME_TYPES = new Set([

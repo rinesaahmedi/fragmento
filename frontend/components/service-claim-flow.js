@@ -17,7 +17,7 @@ const LANGUAGE_OPTIONS = [
   { code: "ru", label: "\u0420\u0443\u0441\u0441\u043a\u0438\u0439", flagSrc: "https://flagcdn.com/w40/ru.png" },
 ];
 
-const MAX_CLAIM_ATTACHMENT_COUNT = 5;
+const MAX_CLAIM_ATTACHMENT_COUNT = 20;
 const MAX_CLAIM_ATTACHMENT_BYTES = 4 * 1024 * 1024;
 const CLAIM_ATTACHMENT_ACCEPT = "image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx";
 const SERIAL_NUMBER_IMAGE_ACCEPT = "image/*";
@@ -321,12 +321,12 @@ const COPY = {
     serialNumberHelpAlt1: "Beispiel: Seriennummer auf dem Typenschild",
     serialNumberHelpAlt2: "Beispiel: Seriennummer im K\u00fchlschrank",
     attachments: "Anh\u00e4nge (optional)",
-    attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 5 Dateien, je max. 4 MB.",
+    attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 20 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
     attachmentsViewMore: "Mehr anzeigen",
     attachmentsViewLess: "Weniger anzeigen",
     attachmentsSelected: "{count} Datei(en) ausgew\u00e4hlt",
-    attachmentsErrorTooMany: "Maximal 5 Anh\u00e4nge m\u00f6glich.",
+    attachmentsErrorTooMany: "Maximal 20 Anh\u00e4nge m\u00f6glich.",
     attachmentsErrorFileTooLarge: "Jede Datei darf h\u00f6chstens 4 MB gro\u00df sein.",
     attachmentsErrorType: "Dateityp nicht erlaubt (z. B. PDF, Bilder, Word/Excel).",
     submit: "Reklamation senden",
@@ -488,12 +488,12 @@ const COPY = {
     serialNumberHelpAlt1: "Example: serial number on the appliance label",
     serialNumberHelpAlt2: "Example: serial number inside the fridge",
     attachments: "Attachments (optional)",
-    attachmentsHint: "PDFs, images, or office files \u2014 up to 5 files, 4 MB each.",
+    attachmentsHint: "PDFs, images, or office files \u2014 up to 20 files, 4 MB each.",
     attachmentsClear: "Remove all",
     attachmentsViewMore: "View more",
     attachmentsViewLess: "View less",
     attachmentsSelected: "{count} file(s) selected",
-    attachmentsErrorTooMany: "You can attach at most 5 files.",
+    attachmentsErrorTooMany: "You can attach at most 20 files.",
     attachmentsErrorFileTooLarge: "Each file must be 4 MB or smaller.",
     attachmentsErrorType: "This file type is not allowed. Use PDF, images, or common office formats.",
     contractLookupLoading: "Checking contract number...",
@@ -638,12 +638,12 @@ const COPY = {
     serialNumberHelpAlt1: "\u00d6rnek: cihaz etiketindeki seri numaras\u0131",
     serialNumberHelpAlt2: "\u00d6rnek: buzdolab\u0131 i\u00e7indeki seri numaras\u0131",
     attachments: "Ekler (iste\u011fe ba\u011fl\u0131)",
-    attachmentsHint: "PDF, g\u00f6rsel veya ofis dosyalar\u0131 \u2014 en fazla 5 dosya, dosya ba\u015f\u0131na en fazla 4 MB.",
+    attachmentsHint: "PDF, g\u00f6rsel veya ofis dosyalar\u0131 \u2014 en fazla 20 dosya, dosya ba\u015f\u0131na en fazla 4 MB.",
     attachmentsClear: "T\u00fcm\u00fcn\u00fc kald\u0131r",
     attachmentsViewMore: "Daha fazla g\u00f6ster",
     attachmentsViewLess: "Daha az g\u00f6ster",
     attachmentsSelected: "{count} dosya se\u00e7ildi",
-    attachmentsErrorTooMany: "En fazla 5 dosya ekleyebilirsiniz.",
+    attachmentsErrorTooMany: "En fazla 20 dosya ekleyebilirsiniz.",
     attachmentsErrorFileTooLarge: "Her dosya en fazla 4 MB olabilir.",
     attachmentsErrorType: "Bu dosya t\u00fcr\u00fcne izin verilmiyor (PDF, g\u00f6rsel, Word/Excel vb.).",
     submit: "\u015eikayeti g\u00f6nder",
@@ -779,12 +779,12 @@ const COPY = {
     serialNumberHelpAlt1: "Ejemplo: n\u00famero de serie en la etiqueta del aparato",
     serialNumberHelpAlt2: "Ejemplo: n\u00famero de serie dentro del frigor\u00edfico",
     attachments: "Adjuntos (opcional)",
-    attachmentsHint: "PDF, im\u00e1genes u oficina: hasta 5 archivos, 4 MB cada uno.",
+    attachmentsHint: "PDF, im\u00e1genes u oficina: hasta 20 archivos, 4 MB cada uno.",
     attachmentsClear: "Quitar todos",
     attachmentsViewMore: "Ver m\u00e1s",
     attachmentsViewLess: "Ver menos",
     attachmentsSelected: "{count} archivo(s) seleccionado(s)",
-    attachmentsErrorTooMany: "Puede adjuntar como m\u00e1ximo 5 archivos.",
+    attachmentsErrorTooMany: "Puede adjuntar como m\u00e1ximo 20 archivos.",
     attachmentsErrorFileTooLarge: "Cada archivo debe tener 4 MB o menos.",
     attachmentsErrorType: "Tipo de archivo no permitido (p. ej. PDF, im\u00e1genes, Word/Excel).",
     submit: "Enviar reclamaci\u00f3n",
@@ -920,12 +920,12 @@ const COPY = {
     serialNumberHelpAlt1: "Exemple : num\u00e9ro de s\u00e9rie sur l'\u00e9tiquette de l'appareil",
     serialNumberHelpAlt2: "Exemple : num\u00e9ro de s\u00e9rie \u00e0 l'int\u00e9rieur du r\u00e9frig\u00e9rateur",
     attachments: "Pi\u00e8ces jointes (facultatif)",
-    attachmentsHint: "PDF, images ou bureautique : jusqu'\u00e0 5 fichiers, 4 Mo chacun.",
+    attachmentsHint: "PDF, images ou bureautique : jusqu'\u00e0 20 fichiers, 4 Mo chacun.",
     attachmentsClear: "Tout retirer",
     attachmentsViewMore: "Voir plus",
     attachmentsViewLess: "Voir moins",
     attachmentsSelected: "{count} fichier(s) s\u00e9lectionn\u00e9(s)",
-    attachmentsErrorTooMany: "Vous pouvez joindre au maximum 5 fichiers.",
+    attachmentsErrorTooMany: "Vous pouvez joindre au maximum 20 fichiers.",
     attachmentsErrorFileTooLarge: "Chaque fichier doit faire 4 Mo ou moins.",
     attachmentsErrorType: "Type de fichier non autoris\u00e9 (PDF, images, Word/Excel, etc.).",
     submit: "Envoyer la r\u00e9clamation",
@@ -1060,12 +1060,12 @@ const COPY = {
     serialNumberHelpAlt1: "\u041f\u0440\u0438\u043c\u0435\u0440: \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0435 \u043f\u0440\u0438\u0431\u043e\u0440\u0430",
     serialNumberHelpAlt2: "\u041f\u0440\u0438\u043c\u0435\u0440: \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0432\u043d\u0443\u0442\u0440\u0438 \u0445\u043e\u043b\u043e\u0434\u0438\u043b\u044c\u043d\u0438\u043a\u0430",
     attachments: "\u0412\u043b\u043e\u0436\u0435\u043d\u0438\u044f (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
-    attachmentsHint: "PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f \u0438\u043b\u0438 \u043e\u0444\u0438\u0441\u043d\u044b\u0435 \u0444\u0430\u0439\u043b\u044b \u2014 \u0434\u043e 5 \u0444\u0430\u0439\u043b\u043e\u0432, \u0434\u043e 4 \u041c\u0411 \u043a\u0430\u0436\u0434\u044b\u0439.",
+    attachmentsHint: "PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f \u0438\u043b\u0438 \u043e\u0444\u0438\u0441\u043d\u044b\u0435 \u0444\u0430\u0439\u043b\u044b \u2014 \u0434\u043e 20 \u0444\u0430\u0439\u043b\u043e\u0432, \u0434\u043e 4 \u041c\u0411 \u043a\u0430\u0436\u0434\u044b\u0439.",
     attachmentsClear: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0432\u0441\u0435",
     attachmentsViewMore: "\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u0435\u0449\u0435",
     attachmentsViewLess: "\u041f\u043e\u043a\u0430\u0437\u0430\u0442\u044c \u043c\u0435\u043d\u044c\u0448\u0435",
     attachmentsSelected: "\u0412\u044b\u0431\u0440\u0430\u043d\u043e \u0444\u0430\u0439\u043b\u043e\u0432: {count}",
-    attachmentsErrorTooMany: "\u041d\u0435 \u0431\u043e\u043b\u0435\u0435 5 \u0432\u043b\u043e\u0436\u0435\u043d\u0438\u0439.",
+    attachmentsErrorTooMany: "\u041d\u0435 \u0431\u043e\u043b\u0435\u0435 20 \u0432\u043b\u043e\u0436\u0435\u043d\u0438\u0439.",
     attachmentsErrorFileTooLarge: "\u041a\u0430\u0436\u0434\u044b\u0439 \u0444\u0430\u0439\u043b \u2014 \u043d\u0435 \u0431\u043e\u043b\u0435\u0435 4 \u041c\u0411.",
     attachmentsErrorType: "\u0422\u0438\u043f \u0444\u0430\u0439\u043b\u0430 \u043d\u0435 \u0440\u0430\u0437\u0440\u0435\u0448\u0451\u043d (PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, Word/Excel).",
     submit: "\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e",
@@ -1236,6 +1236,16 @@ function isSameCalendarDay(left, right) {
   );
 }
 
+function isBeforeCalendarDay(left, right) {
+  if (!(left instanceof Date) || !(right instanceof Date)) {
+    return false;
+  }
+  return (
+    new Date(left.getFullYear(), left.getMonth(), left.getDate()).getTime()
+    < new Date(right.getFullYear(), right.getMonth(), right.getDate()).getTime()
+  );
+}
+
 function getWeekdayLabels(language) {
   const baseSunday = new Date(2026, 4, 17);
   const formatter = new Intl.DateTimeFormat(language || "en", { weekday: "short" });
@@ -1290,6 +1300,42 @@ function convertMeridiemTimeToMinutes(value) {
   }
   const hours24 = normalizedHours % 12 + (parsed.period === "PM" ? 12 : 0);
   return hours24 * 60;
+}
+
+function isMeridiemTimeAfter(value, minimumValue) {
+  const minutes = convertMeridiemTimeToMinutes(value);
+  const minimumMinutes = convertMeridiemTimeToMinutes(minimumValue);
+  return Number.isFinite(minutes) && Number.isFinite(minimumMinutes) && minutes > minimumMinutes;
+}
+
+function getPreferredContactTimeCombinationsForPart(part, nextValue) {
+  if (part === "hours") {
+    return PREFERRED_CONTACT_PERIOD_OPTIONS.map((period) => combineTimeValue(nextValue, period));
+  }
+  if (part === "period") {
+    return PREFERRED_CONTACT_HOUR_OPTIONS.map((hours) => combineTimeValue(hours, nextValue));
+  }
+  return [];
+}
+
+function getPreferredContactTimeCandidate({ currentValue, part, nextValue, minimumValue }) {
+  const currentParts = parseTimeValue(currentValue);
+
+  if (!minimumValue) {
+    const hours = part === "hours" ? nextValue : currentParts.hours || "12";
+    const period = part === "period" ? nextValue : currentParts.period || "AM";
+    return combineTimeValue(hours, period);
+  }
+
+  const hours = part === "hours" ? nextValue : currentParts.hours || "12";
+  const period = part === "period" ? nextValue : currentParts.period || "AM";
+  const candidate = combineTimeValue(hours, period);
+  if (isMeridiemTimeAfter(candidate, minimumValue)) {
+    return candidate;
+  }
+
+  return getPreferredContactTimeCombinationsForPart(part, nextValue)
+    .find((option) => isMeridiemTimeAfter(option, minimumValue)) || "";
 }
 
 function normalizeShortDateInput(value) {
@@ -1435,6 +1481,18 @@ export default function ServiceClaimFlow() {
       detail: problemAreaDetailsByComponentId[area.componentId] || "",
     }));
   }, [problemAreaDetailsByComponentId, selectedProblemAreas]);
+
+  function isPreferredContactToTimePartDisabled(part, nextValue) {
+    if (!formValues.preferredContactTimeFrom) {
+      return false;
+    }
+    return !getPreferredContactTimeCandidate({
+      currentValue: formValues.preferredContactTimeTo,
+      part,
+      nextValue,
+      minimumValue: formValues.preferredContactTimeFrom,
+    });
+  }
 
   function t(key) {
     if (Object.prototype.hasOwnProperty.call(copy, key)) {
@@ -1692,10 +1750,16 @@ export default function ServiceClaimFlow() {
   }
 
   function handlePreferredContactTimePartSelect(field, part, nextValue) {
-    const currentParts = parseTimeValue(formValues[field]);
-    const hours = part === "hours" ? nextValue : currentParts.hours || "12";
-    const period = part === "period" ? nextValue : currentParts.period || "AM";
-    handleFieldChange(field, combineTimeValue(hours, period));
+    const nextTime = getPreferredContactTimeCandidate({
+      currentValue: formValues[field],
+      part,
+      nextValue,
+      minimumValue: field === "preferredContactTimeTo" ? formValues.preferredContactTimeFrom : "",
+    });
+    if (!nextTime) {
+      return;
+    }
+    handleFieldChange(field, nextTime);
   }
 
   function handlePreferredContactTimeClear(field) {
@@ -1711,6 +1775,13 @@ export default function ServiceClaimFlow() {
       };
       if (field === "preferredContactTimeWindow" && value !== "custom") {
         next.preferredContactTimeFrom = "";
+        next.preferredContactTimeTo = "";
+      }
+      if (
+        field === "preferredContactTimeFrom"
+        && next.preferredContactTimeTo
+        && !isMeridiemTimeAfter(next.preferredContactTimeTo, next.preferredContactTimeFrom)
+      ) {
         next.preferredContactTimeTo = "";
       }
       return next;
@@ -2663,17 +2734,21 @@ export default function ServiceClaimFlow() {
                         </div>
                         <div className="service-field__calendar-grid">
                           {preferredContactCalendarDays.map((entry) => {
-                            const isToday = isSameCalendarDay(entry.date, new Date());
+                            const today = new Date();
+                            const isToday = isSameCalendarDay(entry.date, today);
                             const isSelected = isSameCalendarDay(entry.date, selectedPreferredContactDate);
+                            const isPast = isBeforeCalendarDay(entry.date, today);
                             return (
                               <button
                                 key={entry.key}
                                 type="button"
+                                disabled={isPast}
                                 className={[
                                   "service-field__calendar-day",
                                   entry.isCurrentMonth ? "" : "is-outside-month",
                                   isToday ? "is-today" : "",
                                   isSelected ? "is-selected" : "",
+                                  isPast ? "is-disabled" : "",
                                 ]
                                   .filter(Boolean)
                                   .join(" ")}
@@ -2836,39 +2911,49 @@ export default function ServiceClaimFlow() {
                               <div className="service-field__time-column">
                                 <span className="service-field__time-column-label">Hour</span>
                                 <div className="service-field__time-options">
-                                  {PREFERRED_CONTACT_HOUR_OPTIONS.map((option) => (
-                                    <button
-                                      key={option}
-                                      type="button"
-                                      className={`service-field__time-option${
-                                        preferredContactTimeToParts.hours === option ? " is-selected" : ""
-                                      }`}
-                                      onClick={() =>
-                                        handlePreferredContactTimePartSelect("preferredContactTimeTo", "hours", option)
-                                      }
-                                    >
-                                      {option}
-                                    </button>
-                                  ))}
+                                  {PREFERRED_CONTACT_HOUR_OPTIONS.map((option) => {
+                                    const isDisabled = isPreferredContactToTimePartDisabled("hours", option);
+                                    return (
+                                      <button
+                                        key={option}
+                                        type="button"
+                                        className={`service-field__time-option${
+                                          preferredContactTimeToParts.hours === option ? " is-selected" : ""
+                                        }`}
+                                        disabled={isDisabled}
+                                        aria-disabled={isDisabled}
+                                        onClick={() =>
+                                          handlePreferredContactTimePartSelect("preferredContactTimeTo", "hours", option)
+                                        }
+                                      >
+                                        {option}
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                               <div className="service-field__time-column service-field__time-column--period">
                                 <span className="service-field__time-column-label">AM/PM</span>
                                 <div className="service-field__time-options">
-                                  {PREFERRED_CONTACT_PERIOD_OPTIONS.map((option) => (
-                                    <button
-                                      key={option}
-                                      type="button"
-                                      className={`service-field__time-option${
-                                        preferredContactTimeToParts.period === option ? " is-selected" : ""
-                                      }`}
-                                      onClick={() =>
-                                        handlePreferredContactTimePartSelect("preferredContactTimeTo", "period", option)
-                                      }
-                                    >
-                                      {option}
-                                    </button>
-                                  ))}
+                                  {PREFERRED_CONTACT_PERIOD_OPTIONS.map((option) => {
+                                    const isDisabled = isPreferredContactToTimePartDisabled("period", option);
+                                    return (
+                                      <button
+                                        key={option}
+                                        type="button"
+                                        className={`service-field__time-option${
+                                          preferredContactTimeToParts.period === option ? " is-selected" : ""
+                                        }`}
+                                        disabled={isDisabled}
+                                        aria-disabled={isDisabled}
+                                        onClick={() =>
+                                          handlePreferredContactTimePartSelect("preferredContactTimeTo", "period", option)
+                                        }
+                                      >
+                                        {option}
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>

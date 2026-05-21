@@ -21,6 +21,23 @@ function asciiDispositionFilename(name) {
   return s.replace(/"/g, "_") || "file";
 }
 
+function inferContentTypeFromFilename(filename) {
+  const ext = String(filename || "").toLowerCase().split(".").pop();
+  if (ext === "jpg" || ext === "jpeg") return "image/jpeg";
+  if (ext === "png") return "image/png";
+  if (ext === "gif") return "image/gif";
+  if (ext === "webp") return "image/webp";
+  if (ext === "bmp") return "image/bmp";
+  if (ext === "tif" || ext === "tiff") return "image/tiff";
+  if (ext === "pdf") return "application/pdf";
+  if (ext === "txt") return "text/plain; charset=utf-8";
+  if (ext === "doc") return "application/msword";
+  if (ext === "docx") return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  if (ext === "xls") return "application/vnd.ms-excel";
+  if (ext === "xlsx") return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+  return "";
+}
+
 function wantsInlineView(request) {
   const url = new URL(request.url);
   const view = url.searchParams.get("view");
@@ -72,10 +89,14 @@ export async function GET(request, { params }) {
   }
 
   const filename = typeof meta.filename === "string" ? meta.filename : `attachment-${index}`;
-  const contentType =
+  const declaredContentType =
     typeof meta.contentType === "string" && meta.contentType.trim()
       ? meta.contentType.trim()
-      : "application/octet-stream";
+      : "";
+  const contentType =
+    declaredContentType && declaredContentType.toLowerCase().split(";")[0].trim() !== "application/octet-stream"
+      ? declaredContentType
+      : inferContentTypeFromFilename(filename) || "application/octet-stream";
   const asciiName = asciiDispositionFilename(filename);
   const starName = encodeURIComponent(filename);
   const inline = wantsInlineView(request);

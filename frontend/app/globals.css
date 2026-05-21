@@ -1112,10 +1112,10 @@ textarea {
 }
 
 .service-choice-card__logo--complaint {
-  height: 68px;
-  transform: translateY(-10px);
-  margin-bottom: -10px;
-  margin-left: -12px;
+  height: 82px;
+  transform: translateY(-14px);
+  margin-bottom: -18px;
+  margin-left: -16px;
 }
 
 .service-choice-card strong {
@@ -1613,17 +1613,17 @@ textarea {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  border-radius: 16px;
-  border: 1px solid rgba(107, 79, 58, 0.12);
-  background: rgba(255, 255, 255, 0.92);
+  border-radius: 0;
+  border: 0;
+  background: transparent;
   touch-action: pan-x;
+  height: min(52vh, 500px);
   max-height: min(52vh, 500px);
 }
 
 .service-contract-help__track {
   display: flex;
   height: 100%;
-  min-height: min(48vh, 460px);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
@@ -1633,7 +1633,7 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -1645,10 +1645,8 @@ textarea {
 
 .service-contract-help__img {
   display: block;
-  max-width: 100%;
-  max-height: min(46vh, 440px);
-  width: auto;
-  height: auto;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   vertical-align: middle;
   user-select: none;
@@ -1943,6 +1941,23 @@ textarea {
   color: rgba(107, 79, 58, 0.42);
 }
 
+.service-field__calendar-day.is-disabled,
+.service-field__calendar-day:disabled {
+  color: rgba(107, 79, 58, 0.26);
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.service-field__calendar-day.is-disabled:hover,
+.service-field__calendar-day.is-disabled:focus-visible,
+.service-field__calendar-day:disabled:hover,
+.service-field__calendar-day:disabled:focus-visible {
+  background: transparent;
+  border-color: transparent;
+  transform: none;
+  box-shadow: none;
+}
+
 .service-field__calendar-day.is-today {
   border-color: rgba(197, 120, 45, 0.32);
   color: var(--app-accent-strong);
@@ -2117,6 +2132,23 @@ textarea {
   background: rgba(232, 222, 212, 0.82);
   border-color: rgba(177, 145, 116, 0.22);
   transform: translateY(-1px);
+}
+
+.service-field__time-option:disabled,
+.service-field__time-option[aria-disabled="true"] {
+  color: rgba(107, 79, 58, 0.32);
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+.service-field__time-option:disabled:hover,
+.service-field__time-option:disabled:focus-visible,
+.service-field__time-option[aria-disabled="true"]:hover,
+.service-field__time-option[aria-disabled="true"]:focus-visible {
+  border-color: transparent;
+  background: transparent;
+  transform: none;
 }
 
 .service-field__time-option.is-selected {
@@ -2700,7 +2732,7 @@ textarea {
 
 .service-claim-kitchen {
   margin-top: 20px;
-  padding: 20px;
+  padding: 1px 20px 20px;
   border-radius: 18px;
   border: 1px solid rgba(107, 79, 58, 0.14);
   background: rgba(255, 255, 255, 0.92);
@@ -2712,7 +2744,7 @@ textarea {
   justify-content: flex-end;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 14px;
+  margin-bottom: 0;
 }
 
 .service-claim-kitchen__eyebrow {
@@ -2734,6 +2766,7 @@ textarea {
 .service-claim-kitchen__reset {
   flex-shrink: 0;
   min-height: 42px;
+  margin-top: -16px;
   padding: 0 16px;
   border-radius: 12px;
   border: 1px solid rgba(107, 79, 58, 0.2);
@@ -2755,6 +2788,8 @@ textarea {
 
 .service-form__section--problem-kitchen .service-claim-kitchen {
   margin-top: 0;
+  border-color: transparent;
+  background: transparent;
 }
 
 .service-field--problem-area-row {
@@ -2798,24 +2833,26 @@ textarea {
 
 /* Service claim: compact kitchen plan (configurator SVG uses large min-heights) */
 .service-claim-kitchen__plan {
-  padding: 12px 10px;
+  padding: 0 10px 12px;
 }
 
 .service-claim-kitchen__svg-card {
-  max-width: min(100%, 680px);
+  max-width: min(100%, 860px);
   margin: 0 auto;
+  border: 0;
+  background: transparent;
 }
 
 .service-claim-kitchen__svg-host {
   min-height: 0 !important;
-  max-height: 380px !important;
+  max-height: 460px !important;
   width: 100%;
   aspect-ratio: 4 / 3;
 }
 
 .service-claim-kitchen__svg-host--wide {
   aspect-ratio: 9 / 4;
-  max-height: 340px !important;
+  max-height: 420px !important;
 }
 
 .service-claim-kitchen__svg-host svg {
