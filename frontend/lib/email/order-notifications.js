@@ -584,18 +584,30 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   }
 }
 
-export async function forwardOrderWebhook(order) {
-  if (!process.env.N8N_WEBHOOK_URL) return;
-
-  const n8nUrl = new URL(process.env.N8N_WEBHOOK_URL);
-  const lib = n8nUrl.protocol === "https:" ? https : http;
-  const body = JSON.stringify({
+export function buildOrderWebhookPayload(order) {
+  return {
     customer: order.customer,
     totalPrice: order.total,
     components: [...order.components, ...order.accessories, ...order.services],
     kitchen: order.kitchen,
     orderNumber: order.orderNumber,
-  });
+    callback: {
+      requested: true,
+      trigger: "order_created",
+      phone: order.customer.phone,
+      name: `${order.customer.firstName} ${order.customer.lastName}`,
+      orderNumber: order.orderNumber,
+      reason: "New Fragmento order placed",
+    },
+  };
+}
+
+export async function forwardOrderWebhook(order) {
+  if (!process.env.N8N_WEBHOOK_URL) return;
+
+  const n8nUrl = new URL(process.env.N8N_WEBHOOK_URL);
+  const lib = n8nUrl.protocol === "https:" ? https : http;
+  const body = JSON.stringify(buildOrderWebhookPayload(order));
 
   await new Promise((resolve, reject) => {
     const req = lib.request(

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
-import { speakAssistantTextWithTts } from "./assistant-tts";
+import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
 
 const LANGUAGE_OPTIONS = [
@@ -1404,6 +1404,7 @@ export default function ServiceClaimFlow() {
   const contractHelpTouchXRef = useRef(null);
   const claimAssistantRecognitionRef = useRef(null);
   const claimAssistantAudioRef = useRef(null);
+  const claimAssistantTtsAbortControllerRef = useRef(null);
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
   const preferredContactCalendarRef = useRef(null);
   const preferredContactTimeFromRef = useRef(null);
@@ -1663,7 +1664,7 @@ export default function ServiceClaimFlow() {
 
   useEffect(() => {
     if (!isComplaintMode) {
-      setIsClaimAssistantOpen(false);
+      closeClaimAssistant();
       setClaimAssistantQuestion("");
       setIsClaimAssistantLoading(false);
       setIsClaimAssistantListening(false);
@@ -1738,7 +1739,7 @@ export default function ServiceClaimFlow() {
       return;
     }
     claimAssistantRecognitionRef.current?.abort?.();
-    window.speechSynthesis?.cancel?.();
+    stopClaimAssistantSpeech();
     setIsClaimAssistantListening(false);
     setClaimAssistantVoiceError("");
   }, [isClaimAssistantOpen]);
@@ -1750,7 +1751,7 @@ export default function ServiceClaimFlow() {
 
     const stopClaimAssistantVoice = () => {
       claimAssistantRecognitionRef.current?.abort?.();
-      window.speechSynthesis?.cancel?.();
+      stopClaimAssistantSpeech();
     };
 
     window.addEventListener("beforeunload", stopClaimAssistantVoice);
@@ -2328,9 +2329,21 @@ export default function ServiceClaimFlow() {
 
     speakAssistantTextWithTts(answer, {
       audioRef: claimAssistantAudioRef,
+      abortControllerRef: claimAssistantTtsAbortControllerRef,
       language: getClaimAssistantSpeechLanguage(),
       fallbackRate: 0.96,
     });
+  }
+
+  function stopClaimAssistantSpeech() {
+    stopAssistantSpeech(claimAssistantAudioRef, claimAssistantTtsAbortControllerRef);
+  }
+
+  function closeClaimAssistant() {
+    claimAssistantRecognitionRef.current?.abort?.();
+    stopClaimAssistantSpeech();
+    setIsClaimAssistantListening(false);
+    setIsClaimAssistantOpen(false);
   }
 
   async function submitClaimAssistantQuestion(rawQuestion, options = {}) {
@@ -2461,7 +2474,7 @@ export default function ServiceClaimFlow() {
       return;
     }
 
-    window.speechSynthesis.cancel();
+    stopClaimAssistantSpeech();
     const recognition = new SpeechRecognition();
     claimAssistantRecognitionRef.current = recognition;
     recognition.lang = getClaimAssistantSpeechLanguage();
@@ -3728,7 +3741,7 @@ export default function ServiceClaimFlow() {
                   type="button"
                   className="service-claim-agent__close"
                   aria-label={t("claimAssistantCloseAria")}
-                  onClick={() => setIsClaimAssistantOpen(false)}
+                  onClick={closeClaimAssistant}
                 >
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -3740,7 +3753,10 @@ export default function ServiceClaimFlow() {
                     key={option.key}
                     type="button"
                     className={`service-claim-agent__context-button${selectedClaimAssistantContext?.key === option.key ? " is-active" : ""}`}
-                    onClick={() => setSelectedClaimAssistantContextKey(option.key)}
+                    onClick={() => {
+                      stopClaimAssistantSpeech();
+                      setSelectedClaimAssistantContextKey(option.key);
+                    }}
                   >
                     {option.label}
                   </button>
@@ -3849,7 +3865,13 @@ export default function ServiceClaimFlow() {
             className="service-claim-agent__launcher"
             aria-expanded={isClaimAssistantOpen}
             aria-label={t("claimAssistantLauncher")}
-            onClick={() => setIsClaimAssistantOpen((current) => !current)}
+            onClick={() => {
+              if (isClaimAssistantOpen) {
+                closeClaimAssistant();
+                return;
+              }
+              setIsClaimAssistantOpen(true);
+            }}
           >
             <span className="service-claim-agent__launcher-bubble">{t("claimAssistantLauncherPrompt")}</span>
             <span className="service-claim-agent__launcher-avatar" aria-hidden="true">

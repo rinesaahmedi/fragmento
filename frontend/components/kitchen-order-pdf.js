@@ -1,3 +1,4 @@
+import { jsPDF } from "jspdf";
 import { formatCurrency } from "./kitchen-selection-utils";
 
 const PDF_COMPANY_ADDRESS = [
@@ -53,7 +54,6 @@ async function renderLogoDataUrl() {
 }
 
 export async function generateOrderPdf(order) {
-  const { jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
