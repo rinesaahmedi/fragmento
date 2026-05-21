@@ -22,7 +22,7 @@ import {
 } from "./kitchen-selection-utils";
 import KitchenSvgStage from "./kitchen-svg-stage";
 import { PLAN_VIEWPORT_BY_SLUG } from "./kitchen-svg-plan-utils";
-import { speakAssistantTextWithTts } from "./assistant-tts";
+import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import {
   getServiceEligibility,
   SERVICE_CODE_MONTAGE,
@@ -1047,6 +1047,7 @@ function KitchenConfiguratorContent({
   const productAssistantSkipOptionsResetRef = useRef(false);
   const productAssistantRecognitionRef = useRef(null);
   const productAssistantAudioRef = useRef(null);
+  const productAssistantTtsAbortControllerRef = useRef(null);
   const productAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
@@ -1142,7 +1143,7 @@ function KitchenConfiguratorContent({
 
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
-        setIsProductAssistantOpen(false);
+        closeProductAssistant();
       }
     };
 
@@ -1158,7 +1159,7 @@ function KitchenConfiguratorContent({
 
     const stopProductAssistantVoice = () => {
       productAssistantRecognitionRef.current?.abort?.();
-      window.speechSynthesis?.cancel?.();
+      stopProductAssistantSpeech();
     };
 
     window.addEventListener("beforeunload", stopProductAssistantVoice);
@@ -1247,7 +1248,7 @@ function KitchenConfiguratorContent({
     setProductInfoQuestion("");
     setProductInfoError("");
     setProductInfoIsLoading(false);
-    setIsProductAssistantOpen(false);
+    closeProductAssistant();
   }, [hasAnyAssistantProducts, hasProductAssistantOptions]);
 
   useEffect(() => {
@@ -1465,7 +1466,7 @@ function KitchenConfiguratorContent({
 
   function resetProductAssistantContext(option = null) {
     productAssistantRecognitionRef.current?.abort?.();
-    window.speechSynthesis?.cancel?.();
+    stopProductAssistantSpeech();
     setSelectedProductAssistantContext(option);
     setProductAssistantMessages(
       option
@@ -1493,6 +1494,17 @@ function KitchenConfiguratorContent({
 
   function selectProductAssistantContext(option) {
     resetProductAssistantContext(option);
+  }
+
+  function stopProductAssistantSpeech() {
+    stopAssistantSpeech(productAssistantAudioRef, productAssistantTtsAbortControllerRef);
+  }
+
+  function closeProductAssistant() {
+    productAssistantRecognitionRef.current?.abort?.();
+    stopProductAssistantSpeech();
+    setIsProductAssistantListening(false);
+    setIsProductAssistantOpen(false);
   }
 
   function returnToProductAssistantPicker() {
@@ -1544,6 +1556,7 @@ function KitchenConfiguratorContent({
 
     speakAssistantTextWithTts(answer, {
       audioRef: productAssistantAudioRef,
+      abortControllerRef: productAssistantTtsAbortControllerRef,
       language: getProductAssistantSpeechLanguage(),
       fallbackRate: 0.96,
     });
@@ -1649,7 +1662,7 @@ function KitchenConfiguratorContent({
 
     if (!selectedProductAssistantContext || productInfoIsLoading || !hasProductAssistantOptions) return;
 
-    window.speechSynthesis.cancel();
+    stopProductAssistantSpeech();
     const recognition = new SpeechRecognition();
     productAssistantRecognitionRef.current = recognition;
     recognition.lang = getProductAssistantSpeechLanguage();
@@ -2074,7 +2087,7 @@ function KitchenConfiguratorContent({
                       type="button"
                       className={styles.productAssistantMinimize}
                       aria-label={translate("configurator.productAssistantCloseAria", "Close Product Agent")}
-                      onClick={() => setIsProductAssistantOpen(false)}
+                      onClick={closeProductAssistant}
                     >
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -2211,7 +2224,7 @@ function KitchenConfiguratorContent({
               aria-label={translate("configurator.productAssistantLauncher", "Product help")}
               onClick={() => {
                 if (isProductAssistantOpen) {
-                  setIsProductAssistantOpen(false);
+                  closeProductAssistant();
                   return;
                 }
                 openProductAssistant();

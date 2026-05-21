@@ -22,7 +22,14 @@ import {
 } from "./kitchen-contracts";
 import { prisma } from "./prisma";
 
-const PAYMENT_METHODS = new Set(["card", "visa", "mastercard"]);
+const PAYMENT_METHOD_ALIASES = new Map([
+  ["card", "card"],
+  ["visa", "card"],
+  ["mastercard", "card"],
+  ["master card", "card"],
+  ["paypal", "card"],
+  ["klarna", "card"],
+]);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function validationError(message) {
@@ -54,10 +61,11 @@ function validateEmail(value) {
 
 function validatePaymentMethod(value) {
   const paymentMethod = requireString(value, "Payment method").toLowerCase();
-  if (!PAYMENT_METHODS.has(paymentMethod)) {
+  const normalizedPaymentMethod = PAYMENT_METHOD_ALIASES.get(paymentMethod);
+  if (!normalizedPaymentMethod) {
     throw validationError("Payment method is invalid");
   }
-  return paymentMethod === "visa" || paymentMethod === "mastercard" ? "card" : paymentMethod;
+  return normalizedPaymentMethod;
 }
 
 function validateConsent(value) {
