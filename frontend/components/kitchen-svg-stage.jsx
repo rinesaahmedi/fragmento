@@ -88,7 +88,7 @@ export default function KitchenSvgStage({
       <div className={styles.stageHeader}>
         <div>
           <p className={styles.eyebrow}>{translate("configurator.stageEyebrow", "Plan")}</p>
-          <h2>{translate("configurator.stageTitle", "Interactive kitchen view")}</h2>
+          <h2>{translate("configurator.stageTitle", "Plan your kitchen")}</h2>
         </div>
         <button type="button" className={styles.ghostButton} onClick={onResetSelection}>
           {translate("configurator.resetSelection", "Reset selection")}

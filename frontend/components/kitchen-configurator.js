@@ -1857,7 +1857,7 @@ function KitchenConfiguratorContent({
               <img src="/img/fragmentologo.png" alt="Fragmento" />
             </span>
             <div className={styles.brandText}>
-              <h1>{translate("configurator.headerTitle", "Your kitchen")}</h1>
+              <h1>{translate("configurator.headerTitle", "Your customized kitchen")}</h1>
             </div>
           </div>
           <div className={styles.pricePill}>
