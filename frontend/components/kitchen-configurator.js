@@ -1542,25 +1542,46 @@ function KitchenConfiguratorContent({
   }
 
   function formatProductAssistantSpokenText(text) {
+    const isGerman = language === "de";
     return String(text || "")
+      .replace(/^\s*[-*]\s+/gm, ". ")
+      .replace(/\n\s*(?=[A-Z\u00c4\u00d6\u00dc][^\n:]{2,40}\n)/g, ". ")
       .replace(/\((?:[^)]*\b[A-Z]{2,}[-\s]?[A-Z0-9]{2,}[^)]*|\b[A-Z0-9]{3,}[-\s]?[A-Z0-9]{2,}[^)]*)\)/g, "")
       .replace(/\b[A-Z]{2,}[-\s]?[A-Z0-9]{3,}(?:[-\s]?[A-Z0-9]{1,})*\b/g, "")
       .replace(/\b[A-Z]-[A-Z0-9]{4,}\b/g, "")
+      .replace(/\bH\s*[\u00d7x]\s*B\s*[\u00d7x]\s*T\b/gi, isGerman ? "Hoehe, Breite, Tiefe" : "height, width, depth")
+      .replace(/\bB\s*[\u00d7x]\s*T\b/gi, isGerman ? "Breite, Tiefe" : "width, depth")
+      .replace(/([0-9]+(?:[,.][0-9]+)?)\s*[\u2013-]\s*([0-9]+(?:[,.][0-9]+)?)/g, `$1 ${isGerman ? "bis" : "to"} $2`)
+      .replace(/([0-9]+(?:[,.][0-9]+)?)\s*[\u00d7x]\s*([0-9]+(?:[,.][0-9]+)?)\s*[\u00d7x]\s*([0-9]+(?:[,.][0-9]+)?)/g, `$1 ${isGerman ? "mal" : "by"} $2 ${isGerman ? "mal" : "by"} $3`)
+      .replace(/([0-9]+(?:[,.][0-9]+)?)\s*[\u00d7x]\s*([0-9]+(?:[,.][0-9]+)?)/g, `$1 ${isGerman ? "mal" : "by"} $2`)
+      .replace(/\bmm\b/gi, isGerman ? "Millimeter" : "millimeters")
+      .replace(/\bdB\(A\)\b/g, isGerman ? "Dezibel A" : "decibels A")
+      .replace(/\bdB\b/g, isGerman ? "Dezibel" : "decibels")
+      .replace(/\u2014|\u2013/g, ", ")
+      .replace(/\n+/g, ". ")
+      .replace(/:\s*/g, ". ")
+      .replace(/;\s*/g, ". ")
       .replace(/\s+([,.;:!?])/g, "$1")
       .replace(/[ \t]{2,}/g, " ")
-      .replace(/\n{3,}/g, "\n\n")
+      .replace(/\.{2,}/g, ".")
+      .replace(/\.\s*\./g, ".")
       .trim();
   }
 
   function speakProductAssistantAnswer(text) {
     const answer = formatProductAssistantSpokenText(text);
     if (!answer) return;
+    const hasTechnicalList = /\d+\s*(?:mal|by|bis|to)\s*\d+/i.test(answer)
+      || /\b(?:millimeters?|millimeter|dezibel|decibels?|dB)\b/i.test(answer)
+      || /\b(?:appliance dimensions|installation dimensions|cut-out dimensions|gerätemaße|einbaumaße|ausschnittmaße)\b/i.test(answer);
 
     speakAssistantTextWithTts(answer, {
       audioRef: productAssistantAudioRef,
       abortControllerRef: productAssistantTtsAbortControllerRef,
       language: getProductAssistantSpeechLanguage(),
-      fallbackRate: 0.96,
+      fallbackRate: 0.88,
+      chunkLongText: true,
+      ttsSpeed: hasTechnicalList ? 0.78 : 0.98,
     });
   }
 
