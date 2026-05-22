@@ -7,6 +7,7 @@ import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
+import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -100,6 +101,7 @@ function ServiceAttachmentChips({
   onClearAll,
   expandLabel = "View more",
   collapseLabel = "View less",
+  inlineExpandToggle = false,
 }) {
   const [expanded, setExpanded] = useState(false);
   const collapsedVisibleCount = 2;
@@ -116,9 +118,25 @@ function ServiceAttachmentChips({
   const shouldCollapse = files.length > collapsedVisibleCount;
   const indexedFiles = files.map((file, index) => ({ file, index }));
   const visibleFiles = shouldCollapse && !expanded ? indexedFiles.slice(0, collapsedVisibleCount) : indexedFiles;
+  const expandToggleButton = shouldCollapse ? (
+    <button
+      type="button"
+      className="service-attachments__toggle"
+      onClick={() => setExpanded((current) => !current)}
+    >
+      {expanded ? collapseLabel : `${expandLabel} (${files.length - collapsedVisibleCount})`}
+    </button>
+  ) : null;
 
   return (
-    <div className="service-attachments">
+    <div
+      className={[
+        "service-attachments",
+        inlineExpandToggle ? "service-attachments--inline-expand" : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
+    >
       <div className="service-attachments__header">
         <p className="service-attachments__summary">
           {summary}
@@ -146,16 +164,11 @@ function ServiceAttachmentChips({
             </button>
           </li>
         ))}
+        {inlineExpandToggle && expandToggleButton ? (
+          <li className="service-attachments__toggle-item">{expandToggleButton}</li>
+        ) : null}
       </ul>
-      {shouldCollapse ? (
-        <button
-          type="button"
-          className="service-attachments__toggle"
-          onClick={() => setExpanded((current) => !current)}
-        >
-          {expanded ? collapseLabel : `${expandLabel} (${files.length - collapsedVisibleCount})`}
-        </button>
-      ) : null}
+      {!inlineExpandToggle && expandToggleButton}
     </div>
   );
 }
@@ -219,7 +232,7 @@ const COPY = {
     requiredFieldTitle: "Pflichtfeld",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Kaufvertragsnummer",
-    contractPlaceholder: "e.g. 670 123456",
+    contractPlaceholder: "e.g. 670123456",
     contractNumberHelpTrigger: "Wo finde ich die Nummer?",
     contractNumberHelpAria: "Hilfe: Kaufvertragsnummer im Dokument finden",
     contractNumberHelpTitle: "Kaufvertragsnummer finden",
@@ -386,7 +399,7 @@ const COPY = {
     requiredFieldTitle: "Required field",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Purchase contract number",
-    contractPlaceholder: "e.g. 670 123456",
+    contractPlaceholder: "e.g. 670123456",
     contractNumberHelpTrigger: "Where to find it?",
     contractNumberHelpAria: "Help: where your purchase contract number appears on your documents",
     contractNumberHelpTitle: "Finding your contract number",
@@ -1168,6 +1181,18 @@ function autoResizeTextarea(element) {
   element.style.height = `${element.scrollHeight}px`;
 }
 
+function renderClaimAssistantMessageText(text) {
+  const value = String(text || "");
+  const segments = value.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+
+  return segments.map((segment, index) => {
+    if (/^\*\*[^*]+\*\*$/.test(segment)) {
+      return <strong key={`msg-${index}`}>{segment.slice(2, -2)}</strong>;
+    }
+    return <span key={`msg-${index}`}>{segment}</span>;
+  });
+}
+
 function isPreferredContactCustom(windowValue) {
   return String(windowValue || "").trim() === "custom";
 }
@@ -1360,10 +1385,14 @@ export default function ServiceClaimFlow() {
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
   const [problemComponentIds, setProblemComponentIds] = useState([]);
   const [problemAreaDetailsByComponentId, setProblemAreaDetailsByComponentId] = useState({});
+  const [problemAreaAttachmentsByComponentId, setProblemAreaAttachmentsByComponentId] = useState({});
   const [attachments, setAttachments] = useState([]);
   const [serialNumberImages, setSerialNumberImages] = useState([]);
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
   const [serialNumberImageFieldKey, setSerialNumberImageFieldKey] = useState(0);
+  const [problemAreaAttachmentFieldKeysByComponentId, setProblemAreaAttachmentFieldKeysByComponentId] = useState({});
+  const [isContractNumberStickyEnabled, setIsContractNumberStickyEnabled] = useState(true);
+  const [isContractNumberCurrentlyStuck, setIsContractNumberCurrentlyStuck] = useState(false);
   const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
   const [isSerialNumberHelpOpen, setIsSerialNumberHelpOpen] = useState(false);
   const [contractHelpSlide, setContractHelpSlide] = useState(0);
@@ -1390,9 +1419,11 @@ export default function ServiceClaimFlow() {
   const claimAssistantAudioRef = useRef(null);
   const claimAssistantTtsAbortControllerRef = useRef(null);
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
+  const latestFormRef = useRef(INITIAL_FORM);
   const preferredContactCalendarRef = useRef(null);
   const preferredContactTimeFromRef = useRef(null);
   const preferredContactTimeToRef = useRef(null);
+  const contractNumberFieldRef = useRef(null);
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
@@ -1424,7 +1455,11 @@ export default function ServiceClaimFlow() {
     () => Boolean(formValues.phone.trim() || formValues.email.trim()),
     [formValues.email, formValues.phone],
   );
-  const normalizedContractNumber = formValues.contractNumber.trim();
+
+  useEffect(() => {
+    latestFormRef.current = formValues;
+  }, [formValues]);
+  const normalizedContractNumber = normalizeServiceClaimContractNumber(formValues.contractNumber);
   const kitchenAreasLinePrefix = copy.kitchenAreasLinePrefix || fallbackCopy.kitchenAreasLinePrefix;
   const activeKitchenPlan = useMemo(() => {
     if (
@@ -1479,8 +1514,23 @@ export default function ServiceClaimFlow() {
     return selectedProblemAreas.map((area) => ({
       ...area,
       detail: problemAreaDetailsByComponentId[area.componentId] || "",
+      attachments: problemAreaAttachmentsByComponentId[area.componentId] || [],
+      attachmentFieldKey: problemAreaAttachmentFieldKeysByComponentId[area.componentId] || 0,
     }));
-  }, [problemAreaDetailsByComponentId, selectedProblemAreas]);
+  }, [
+    problemAreaAttachmentsByComponentId,
+    problemAreaAttachmentFieldKeysByComponentId,
+    problemAreaDetailsByComponentId,
+    selectedProblemAreas,
+  ]);
+  const problemAreaAttachmentCount = useMemo(
+    () =>
+      Object.values(problemAreaAttachmentsByComponentId).reduce(
+        (sum, files) => sum + (Array.isArray(files) ? files.length : 0),
+        0,
+      ),
+    [problemAreaAttachmentsByComponentId],
+  );
 
   function isPreferredContactToTimePartDisabled(part, nextValue) {
     if (!formValues.preferredContactTimeFrom) {
@@ -1580,8 +1630,55 @@ export default function ServiceClaimFlow() {
   useEffect(() => {
     if (!isComplaintMode) {
       setIsContractNumberHelpOpen(false);
+      setIsContractNumberStickyEnabled(true);
+      setIsContractNumberCurrentlyStuck(false);
     }
   }, [isComplaintMode]);
+
+  useEffect(() => {
+    if (!isComplaintMode || !isContractNumberStickyEnabled) {
+      setIsContractNumberCurrentlyStuck(false);
+      return undefined;
+    }
+
+    function updateStickyState() {
+      const element = contractNumberFieldRef.current;
+      if (!element) {
+        setIsContractNumberCurrentlyStuck(false);
+        return;
+      }
+      const top = element.getBoundingClientRect().top;
+      setIsContractNumberCurrentlyStuck(top <= 12.5);
+    }
+
+    updateStickyState();
+    window.addEventListener("scroll", updateStickyState, { passive: true });
+    window.addEventListener("resize", updateStickyState);
+    return () => {
+      window.removeEventListener("scroll", updateStickyState);
+      window.removeEventListener("resize", updateStickyState);
+    };
+  }, [isComplaintMode, isContractNumberStickyEnabled]);
+
+  useEffect(() => {
+    const selectedIds = new Set(selectedProblemAreas.map((area) => area.componentId));
+
+    setProblemAreaDetailsByComponentId((current) =>
+      Object.fromEntries(
+        Object.entries(current).filter(([componentId]) => selectedIds.has(componentId)),
+      ),
+    );
+    setProblemAreaAttachmentsByComponentId((current) =>
+      Object.fromEntries(
+        Object.entries(current).filter(([componentId]) => selectedIds.has(componentId)),
+      ),
+    );
+    setProblemAreaAttachmentFieldKeysByComponentId((current) =>
+      Object.fromEntries(
+        Object.entries(current).filter(([componentId]) => selectedIds.has(componentId)),
+      ),
+    );
+  }, [selectedProblemAreas]);
 
   useEffect(() => {
     if (!isComplaintMode) {
@@ -1792,7 +1889,7 @@ export default function ServiceClaimFlow() {
     }
 
     if (field === "contractNumber") {
-      const nextContractNumber = value.trim();
+      const nextContractNumber = normalizeServiceClaimContractNumber(value);
       contractLookupRequestIdRef.current += 1;
 
       if (contractLookupTimeoutRef.current) {
@@ -1824,7 +1921,7 @@ export default function ServiceClaimFlow() {
             }
 
             setForm((current) => {
-              if (current.contractNumber.trim() !== nextContractNumber) {
+              if (normalizeServiceClaimContractNumber(current.contractNumber) !== nextContractNumber) {
                 return current;
               }
 
@@ -1871,8 +1968,95 @@ export default function ServiceClaimFlow() {
     }
   }
 
+  function handleProblemAreaAttachmentsSelected(componentId, event) {
+    const picked = event.target.files ? Array.from(event.target.files) : [];
+    event.target.value = "";
+    if (!picked.length) {
+      return;
+    }
+
+    setError("");
+    setProblemAreaAttachmentsByComponentId((current) => {
+      const existingFiles = Array.isArray(current[componentId]) ? current[componentId] : [];
+      const nextFiles = [...existingFiles];
+      const otherProblemAreaFileCount = Object.entries(current).reduce((sum, [currentComponentId, files]) => {
+        if (currentComponentId === componentId) {
+          return sum;
+        }
+        return sum + (Array.isArray(files) ? files.length : 0);
+      }, 0);
+      const fixedAttachmentCount = attachments.length + serialNumberImages.length + otherProblemAreaFileCount;
+      let message = "";
+
+      for (const file of picked) {
+        const currentCount = fixedAttachmentCount + nextFiles.length;
+        if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
+          message = copy.attachmentsErrorTooMany;
+          break;
+        }
+        if (file.size > MAX_CLAIM_ATTACHMENT_BYTES) {
+          message = copy.attachmentsErrorFileTooLarge;
+          continue;
+        }
+        if (!isClientAllowedAttachment(file)) {
+          message = copy.attachmentsErrorType;
+          continue;
+        }
+        nextFiles.push(file);
+      }
+
+      if (message) {
+        queueMicrotask(() => setError(message));
+      }
+
+      return {
+        ...current,
+        [componentId]: nextFiles,
+      };
+    });
+  }
+
   function handleAdditionalProblemDetailsChange(value) {
     handleFieldChange("problemDescription", value);
+  }
+
+  function appendSuggestedProblemDescription(value) {
+    const nextSuggestion = String(value || "").trim();
+    if (!nextSuggestion) {
+      return;
+    }
+
+    setForm((current) => {
+      const existingDescription = String(current.problemDescription || "").trim();
+      if (!existingDescription) {
+        return {
+          ...current,
+          problemDescription: nextSuggestion,
+        };
+      }
+
+      const normalizedSuggestion = nextSuggestion.replace(/\s+/g, " ").trim().toLowerCase();
+      const existingBlocks = existingDescription
+        .split(/\n\s*\n+/)
+        .map((block) => block.trim())
+        .filter(Boolean);
+      const hasSuggestionAlready = existingBlocks.some(
+        (block) => block.replace(/\s+/g, " ").trim().toLowerCase() === normalizedSuggestion,
+      );
+
+      if (hasSuggestionAlready) {
+        return current;
+      }
+
+      return {
+        ...current,
+        problemDescription: `${existingDescription}\n\n${nextSuggestion}`,
+      };
+    });
+
+    if (error) {
+      setError("");
+    }
   }
 
   function handleAttachmentsSelected(event) {
@@ -1887,7 +2071,7 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
-        const currentCount = next.length + serialNumberImages.length;
+        const currentCount = next.length + serialNumberImages.length + problemAreaAttachmentCount;
         if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
           break;
@@ -1921,7 +2105,7 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
-        const currentCount = attachments.length + next.length;
+        const currentCount = attachments.length + next.length + problemAreaAttachmentCount;
         if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
           break;
@@ -1947,6 +2131,26 @@ export default function ServiceClaimFlow() {
     setAttachments((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
   }
 
+  function removeProblemAreaAttachment(componentId, index) {
+    setProblemAreaAttachmentsByComponentId((current) => {
+      const nextFiles = (current[componentId] || []).filter((_, itemIndex) => itemIndex !== index);
+      if (!nextFiles.length) {
+        const next = { ...current };
+        delete next[componentId];
+        return next;
+      }
+      return {
+        ...current,
+        [componentId]: nextFiles,
+      };
+    });
+    setProblemAreaAttachmentFieldKeysByComponentId((current) => ({
+      ...current,
+      [componentId]: (current[componentId] || 0) + 1,
+    }));
+    setError("");
+  }
+
   function removeSerialNumberImage(index) {
     setSerialNumberImages((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
     setSerialNumberImageFieldKey((key) => key + 1);
@@ -1956,6 +2160,22 @@ export default function ServiceClaimFlow() {
   function clearAttachments() {
     setAttachments([]);
     setAttachmentFieldKey((key) => key + 1);
+    setError("");
+  }
+
+  function clearProblemAreaAttachments(componentId) {
+    setProblemAreaAttachmentsByComponentId((current) => {
+      if (!current[componentId]?.length) {
+        return current;
+      }
+      const next = { ...current };
+      delete next[componentId];
+      return next;
+    });
+    setProblemAreaAttachmentFieldKeysByComponentId((current) => ({
+      ...current,
+      [componentId]: (current[componentId] || 0) + 1,
+    }));
     setError("");
   }
 
@@ -2072,8 +2292,8 @@ export default function ServiceClaimFlow() {
     ].filter(Boolean).join(", ");
   }
 
-  function buildSubmittedProblemDescription() {
-    const userDescription = String(formValues.problemDescription || "").trim();
+  function buildSubmittedProblemDescription(formState = formValues) {
+    const userDescription = String(formState.problemDescription || "").trim();
     const selectedAreasBlock = selectedProblemAreasWithDetails.length
       ? [
           kitchenAreasLinePrefix,
@@ -2091,6 +2311,15 @@ export default function ServiceClaimFlow() {
       return description;
     }
     return `${description}\n\nErreichbarkeit: ${preferredContact}`.trim();
+  }
+
+  function buildProblemAreasPayload() {
+    return selectedProblemAreasWithDetails.map((area) => ({
+      componentId: area.componentId,
+      code: area.code,
+      name: area.name,
+      detail: String(area.detail || "").trim(),
+    }));
   }
 
   function getClaimAssistantSpeechLanguage() {
@@ -2141,6 +2370,7 @@ export default function ServiceClaimFlow() {
       return;
     }
 
+    const latestFormValues = latestFormRef.current || formValues;
     const nextUserMessage = { role: "user", text: question };
     const nextConversationMessages = claimAssistantMessages
       .filter((message) => message?.role && message?.text)
@@ -2170,18 +2400,18 @@ export default function ServiceClaimFlow() {
           })),
           claim: {
             contractNumber: normalizedContractNumber,
-            problemDescription: buildSubmittedProblemDescription(),
-            serialNumber: String(formValues.serialNumber || "").trim(),
+            problemDescription: buildSubmittedProblemDescription(latestFormValues),
+            serialNumber: String(latestFormValues.serialNumber || "").trim(),
             hasSerialNumberImage: serialNumberImages.length > 0,
-            attachmentCount: attachments.length + serialNumberImages.length,
-            preferredContactDate: String(formValues.preferredContactDate || "").trim(),
-            preferredContactTimeWindow: String(formValues.preferredContactTimeWindow || "").trim(),
-            preferredContactTimeFrom: String(formValues.preferredContactTimeFrom || "").trim(),
-            preferredContactTimeTo: String(formValues.preferredContactTimeTo || "").trim(),
-            availabilityDate: String(formValues.preferredContactDate || "").trim(),
+            attachmentCount: attachments.length + serialNumberImages.length + problemAreaAttachmentCount,
+            preferredContactDate: String(latestFormValues.preferredContactDate || "").trim(),
+            preferredContactTimeWindow: String(latestFormValues.preferredContactTimeWindow || "").trim(),
+            preferredContactTimeFrom: String(latestFormValues.preferredContactTimeFrom || "").trim(),
+            preferredContactTimeTo: String(latestFormValues.preferredContactTimeTo || "").trim(),
+            availabilityDate: String(latestFormValues.preferredContactDate || "").trim(),
             availabilityTime: buildPreferredContactSummary(),
-            hasPhone: Boolean(String(formValues.phone || "").trim()),
-            hasEmail: Boolean(String(formValues.email || "").trim()),
+            hasPhone: Boolean(String(latestFormValues.phone || "").trim()),
+            hasEmail: Boolean(String(latestFormValues.email || "").trim()),
           },
         }),
       });
@@ -2203,7 +2433,7 @@ export default function ServiceClaimFlow() {
 
       const suggestedProblemDescription = String(payload.suggestedProblemDescription || "").trim();
       if (suggestedProblemDescription) {
-        handleAdditionalProblemDetailsChange(suggestedProblemDescription);
+        appendSuggestedProblemDescription(suggestedProblemDescription);
       }
 
       setClaimAssistantMessages((current) => [
@@ -2363,6 +2593,7 @@ export default function ServiceClaimFlow() {
       const includeHausmeister = formValues.hausmeisterInvolved === "yes";
       const payload = {
         ...form,
+        contractNumber: normalizedContractNumber,
         clientAddress: buildClientAddress(),
         clientCountry: formValues.clientCountry.trim(),
         clientCity: formValues.clientCity.trim(),
@@ -2385,16 +2616,26 @@ export default function ServiceClaimFlow() {
           : null;
       if (plan?.selectableComponents?.length) {
         const metaById = new Map(plan.selectableComponents.map((entry) => [entry.componentId, entry]));
-        const problemAreas = problemComponentIds.map((id) => metaById.get(id)).filter(Boolean);
+        const problemAreas = buildProblemAreasPayload()
+          .map((area) => ({
+            ...metaById.get(area.componentId),
+            detail: area.detail,
+          }))
+          .filter(Boolean);
         formData.append("problemAreasJson", JSON.stringify(problemAreas));
       } else {
         formData.append("problemAreasJson", "[]");
       }
       for (const file of serialNumberImages) {
-        formData.append("attachments", file);
+        formData.append("serialNumberImages", file);
       }
       for (const file of attachments) {
-        formData.append("attachments", file);
+        formData.append("generalAttachments", file);
+      }
+      for (const area of selectedProblemAreasWithDetails) {
+        for (const file of area.attachments) {
+          formData.append(`problemAreaAttachment:${area.componentId}`, file);
+        }
       }
 
       const response = await fetch("/api/service-claims", {
@@ -2415,6 +2656,8 @@ export default function ServiceClaimFlow() {
       setSerialNumberImages([]);
       setProblemComponentIds([]);
       setProblemAreaDetailsByComponentId({});
+      setProblemAreaAttachmentsByComponentId({});
+      setProblemAreaAttachmentFieldKeysByComponentId({});
       setAttachmentFieldKey((key) => key + 1);
       setSerialNumberImageFieldKey((key) => key + 1);
       setContractLookup(EMPTY_CONTRACT_LOOKUP);
@@ -2551,7 +2794,25 @@ export default function ServiceClaimFlow() {
           </div>
 
           <form className="service-form" onSubmit={handleSubmit}>
-            <label className="service-field service-field--contract-number">
+            <label
+              ref={contractNumberFieldRef}
+              className={[
+                "service-field",
+                "service-field--contract-number",
+                isContractNumberCurrentlyStuck ? "service-field--contract-number-stuck" : "",
+                !isContractNumberStickyEnabled ? "service-field--contract-number-static" : "",
+              ].filter(Boolean).join(" ")}
+            >
+              {isContractNumberStickyEnabled && isContractNumberCurrentlyStuck ? (
+                <button
+                  type="button"
+                  className="service-field__sticky-dismiss"
+                  aria-label="Disable fixed contract number box"
+                  onClick={() => setIsContractNumberStickyEnabled(false)}
+                >
+                  &times;
+                </button>
+              ) : null}
               <span className="service-field__label-row service-field__label-row--contract">
                 <span className="service-field__label-main">
                   {copy.contractNumber}
@@ -2579,7 +2840,9 @@ export default function ServiceClaimFlow() {
               {contractLookup.status === "loading" ? (
                 <p className="service-form__hint">{t("contractLookupLoading")}</p>
               ) : null}
-              {contractLookup.status === "found" && contractLookup.contractNumber === normalizedContractNumber ? (
+              {contractLookup.status === "found" &&
+              contractLookup.contractNumber === normalizedContractNumber &&
+              !isContractNumberCurrentlyStuck ? (
                 <p className="service-form__success">{t("contractLookupSuccess")}</p>
               ) : null}
               {contractLookup.status === "missing" && contractLookup.contractNumber === normalizedContractNumber ? (
@@ -3240,9 +3503,11 @@ export default function ServiceClaimFlow() {
                     kitchenPlan={contractLookup.kitchenPlan}
                     value={problemComponentIds}
                     onChange={setProblemComponentIds}
+                    contractNumber={normalizedContractNumber}
                     labels={{
                       eyebrow: t("kitchenPlanEyebrow"),
                       title: contractLookup.kitchenPlan.kitchenName || t("kitchenPlanTitle"),
+                      contractLabel: copy.contractNumber,
                       reset: t("kitchenPlanReset"),
                     }}
                   />
@@ -3251,26 +3516,59 @@ export default function ServiceClaimFlow() {
               {selectedProblemAreasWithDetails.length ? (
                 <>
                   {selectedProblemAreasWithDetails.map((area) => (
-                    <label key={area.componentId} className="service-field service-field--problem-area-row">
-                      <span className="service-field__problem-area-label">
+                    <div key={area.componentId} className="service-field service-field--problem-area-row">
+                      <label className="service-field__problem-area-label">
                         <span className="service-field__problem-area-label-text">
                           {area.label}
                           <RequiredFieldMark title={requiredFieldTitle} />
                         </span>
-                      </span>
-                      <textarea
-                        className="service-field__problem-area-input"
-                        value={area.detail}
-                        onChange={(event) => {
-                          autoResizeTextarea(event.target);
-                          handleProblemAreaDetailChange(area.componentId, event.target.value);
-                        }}
-                        ref={(element) => autoResizeTextarea(element)}
-                        placeholder={copy.problemPlaceholder}
-                        rows={1}
-                        required
-                      />
-                    </label>
+                      </label>
+                      <div className="service-field__problem-area-stack">
+                        <div className="service-field__problem-area-input-wrap">
+                          <textarea
+                            className="service-field__problem-area-input"
+                            value={area.detail}
+                            onChange={(event) => {
+                              autoResizeTextarea(event.target);
+                              handleProblemAreaDetailChange(area.componentId, event.target.value);
+                            }}
+                            ref={(element) => autoResizeTextarea(element)}
+                            placeholder={copy.problemPlaceholder}
+                            rows={1}
+                            required
+                          />
+                          <input
+                            key={area.attachmentFieldKey}
+                            type="file"
+                            className="service-field__problem-area-file"
+                            accept={CLAIM_ATTACHMENT_ACCEPT}
+                            multiple
+                            onChange={(event) => handleProblemAreaAttachmentsSelected(area.componentId, event)}
+                            id={`problem-area-upload-${area.componentId}`}
+                          />
+                          <label
+                            htmlFor={`problem-area-upload-${area.componentId}`}
+                            className="service-field__problem-area-upload-button"
+                            title={copy.attachments}
+                          >
+                            +
+                          </label>
+                        </div>
+                        {area.attachments.length ? (
+                          <ServiceAttachmentChips
+                            files={area.attachments}
+                            summary={copy.attachmentsSelected.replace("{count}", String(area.attachments.length))}
+                            maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
+                            clearLabel={copy.attachmentsClear}
+                            onRemove={(index) => removeProblemAreaAttachment(area.componentId, index)}
+                            onClearAll={() => clearProblemAreaAttachments(area.componentId)}
+                            expandLabel={copy.attachmentsViewMore}
+                            collapseLabel={copy.attachmentsViewLess}
+                            inlineExpandToggle
+                          />
+                        ) : null}
+                      </div>
+                    </div>
                   ))}
                   <label className="service-field">
                     <span>
@@ -3490,7 +3788,9 @@ export default function ServiceClaimFlow() {
               <div className="service-claim-agent__messages" aria-live="polite">
                 {!claimAssistantMessages.length ? (
                   <div className="service-claim-agent__message service-claim-agent__message--assistant">
-                    <span>{claimAssistantIntroText}</span>
+                    <div className="service-claim-agent__message-body">
+                      {claimAssistantIntroText}
+                    </div>
                   </div>
                 ) : null}
                 {claimAssistantMessages.map((message, index) => (
@@ -3507,7 +3807,9 @@ export default function ServiceClaimFlow() {
                       .join(" ")}
                   >
                     <div className="service-claim-agent__message-stack">
-                      <span>{message.text}</span>
+                      <div className="service-claim-agent__message-body">
+                        {renderClaimAssistantMessageText(message.text)}
+                      </div>
                       {message.role === "assistant" && message.actions?.length ? (
                         <div className="service-claim-agent__message-actions">
                           {message.actions.map((action) => (

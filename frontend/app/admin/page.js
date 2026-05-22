@@ -1,6 +1,7 @@
 import { AdminShell } from "../../components/admin-shell";
 import { AdminDashboardCharts } from "../../components/admin-dashboard-charts";
 import { listKitchensForAdmin } from "../../lib/catalog";
+import { showAdminClaimsInNav } from "../../lib/admin-claims-access";
 import { requireAdminPage } from "../../lib/auth";
 import { getProviderCountryConfig } from "../../lib/address-verification";
 import { prisma } from "../../lib/prisma";
@@ -1461,6 +1462,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   return (
     <AdminShell adminEmail={admin.email}>
       <AdminDashboardCharts
+        showClaimsLink={showAdminClaimsInNav(admin.email)}
         kpis={kpis}
         periodOptions={PERIOD_OPTIONS.map(({ value, labelKey, fallbackLabel }) => ({ value, labelKey, fallbackLabel }))}
         selectedPeriod={period.value}

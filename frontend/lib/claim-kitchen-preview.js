@@ -46,6 +46,52 @@ function normalizeKitchenSlug(kitchenSlug) {
   return String(kitchenSlug || "").trim().toLowerCase();
 }
 
+/**
+ * Hides SVG component groups that are not part of the client's order (same rule as the service form picker).
+ */
+export function applyVisibleComponentsToSvgMarkup(markup, visibleComponentIds) {
+  if (!markup || !Array.isArray(visibleComponentIds) || !visibleComponentIds.length) {
+    return markup || "";
+  }
+
+  const visibleSet = new Set(visibleComponentIds);
+  return String(markup).replace(/<g\b([^>]*?\bdata-component-id="([^"]+)"[^>]*)>/gi, (match, attrs, componentId) => {
+    if (visibleSet.has(componentId)) {
+      return match;
+    }
+
+    if (/style\s*=/i.test(attrs)) {
+      const nextAttrs = attrs.replace(/style=(["'])(.*?)\1/i, (_, quote, value) => {
+        const cleaned = value.replace(/display\s*:\s*none\s*!?important?;?/gi, "").trim();
+        const displayRule = "display:none";
+        return `style=${quote}${cleaned ? `${cleaned};` : ""}${displayRule}${quote}`;
+      });
+      return `<g${nextAttrs}>`;
+    }
+
+    return `<g${attrs} style="display:none">`;
+  });
+}
+
+export async function resolveVisibleComponentIdsForContract(contractNumber, kitchenSlug) {
+  const normalizedContract = String(contractNumber || "").trim();
+  const normalizedSlug = normalizeKitchenSlug(kitchenSlug);
+  if (!normalizedContract || !normalizedSlug) {
+    return null;
+  }
+
+  const { getServiceClaimKitchenPlan } = await import("./service-claim-kitchen-plan.js");
+  const plan = await getServiceClaimKitchenPlan(normalizedContract).catch(() => null);
+  if (!plan || normalizeKitchenSlug(plan.kitchenSlug) !== normalizedSlug) {
+    return null;
+  }
+
+  const visibleComponentIds = Array.isArray(plan.selectableComponentIds)
+    ? plan.selectableComponentIds.filter(Boolean)
+    : [];
+  return visibleComponentIds.length ? visibleComponentIds : null;
+}
+
 export function enhanceKitchenPreviewSvgMarkup(markup) {
   if (!markup) return "";
 
@@ -66,9 +112,18 @@ function buildHighlightMarkup(bounds) {
   ].join("");
 }
 
-export function buildKitchenPreviewSvgMarkup({ svgMarkup, kitchenSlug, highlightedComponentKeys = [] }) {
-  const baseMarkup = enhanceKitchenPreviewSvgMarkup(svgMarkup);
+export function buildKitchenPreviewSvgMarkup({
+  svgMarkup,
+  kitchenSlug,
+  highlightedComponentKeys = [],
+  visibleComponentIds = null,
+}) {
+  let baseMarkup = enhanceKitchenPreviewSvgMarkup(svgMarkup);
   if (!baseMarkup) return "";
+
+  if (Array.isArray(visibleComponentIds) && visibleComponentIds.length) {
+    baseMarkup = applyVisibleComponentsToSvgMarkup(baseMarkup, visibleComponentIds);
+  }
 
   const boundsByKey = PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG[normalizeKitchenSlug(kitchenSlug)] || {};
   const highlightMarkup = [...new Set(highlightedComponentKeys.map((key) => String(key || "").trim()).filter(Boolean))]
@@ -139,7 +194,11 @@ async function loadClaimKitchenPreviewContext(kitchenSlug) {
   };
 }
 
-export async function renderClaimKitchenPreviewSvg({ kitchenSlug, selectedAreas = [] }) {
+export async function renderClaimKitchenPreviewSvg({
+  kitchenSlug,
+  selectedAreas = [],
+  contractNumber = null,
+}) {
   const context = await loadClaimKitchenPreviewContext(kitchenSlug);
   if (!context) {
     return null;
@@ -152,24 +211,32 @@ export async function renderClaimKitchenPreviewSvg({ kitchenSlug, selectedAreas 
     selectedAreas: normalizedAreas,
     kitchenConfig: context.kitchenConfig,
   });
+  const visibleComponentIds = await resolveVisibleComponentIdsForContract(contractNumber, kitchenSlug);
   const markup = buildKitchenPreviewSvgMarkup({
     svgMarkup: context.svgMarkup,
     kitchenSlug,
     highlightedComponentKeys,
+    visibleComponentIds,
   });
 
   return markup
     ? {
         markup,
         highlightedComponentKeys,
+        visibleComponentIds,
         kitchenName: context.kitchen?.name || "",
         kitchenSlug: normalizeKitchenSlug(kitchenSlug),
       }
     : null;
 }
 
-export async function renderClaimKitchenPreviewPng({ kitchenSlug, selectedAreas = [], width = 900 }) {
-  const preview = await renderClaimKitchenPreviewSvg({ kitchenSlug, selectedAreas });
+export async function renderClaimKitchenPreviewPng({
+  kitchenSlug,
+  selectedAreas = [],
+  contractNumber = null,
+  width = 900,
+}) {
+  const preview = await renderClaimKitchenPreviewSvg({ kitchenSlug, selectedAreas, contractNumber });
   if (!preview?.markup) {
     return null;
   }

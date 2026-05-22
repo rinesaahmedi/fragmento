@@ -13,10 +13,10 @@ import { AdminClaimLocalizedText } from "../../../../components/admin-claim-loca
 import { AdminDateTime, AdminText } from "../../../../components/admin-i18n";
 import { AdminShell } from "../../../../components/admin-shell";
 import { getFormMessage } from "../../../../lib/admin-forms";
-import { requireAdminPage } from "../../../../lib/auth";
+import { requireAdminClaimsPage } from "../../../../lib/admin-claims-access";
 import { renderClaimKitchenPreviewSvg } from "../../../../lib/claim-kitchen-preview";
 import { prisma } from "../../../../lib/prisma";
-import { formatServiceClaimProblemAreaList } from "../../../../lib/service-claim-problem-areas";
+import { formatServiceClaimProblemArea, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../../lib/service-claim-problem-areas";
 import { queryServiceClaimById } from "../../../../lib/service-claim-admin-query";
 
 export const dynamic = "force-dynamic";
@@ -67,6 +67,10 @@ function parseClaimAttachments(raw) {
   }
 }
 
+function parseClaimProblemAreas(raw) {
+  return parseServiceClaimProblemAreas(raw);
+}
+
 function formatBytes(bytes) {
   const n = Number(bytes);
   if (!Number.isFinite(n) || n < 0) {
@@ -81,6 +85,23 @@ function formatBytes(bytes) {
   return `${(n / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function buildAttachmentMetaText(file) {
+  const parts = [file.contentType || "file", formatBytes(file.size)];
+  if (file.role === "serial_number") {
+    parts.push("serial number");
+  }
+  if (file.role === "problem_area") {
+    const areaLabel = formatServiceClaimProblemArea({
+      name: file.areaName,
+      code: file.areaCode,
+    });
+    if (areaLabel) {
+      parts.push(areaLabel);
+    }
+  }
+  return parts.filter(Boolean).join(" · ");
+}
+
 function formatClaimKitchenSummaryLines(claim) {
   const kitchenName = String(claim.kitchenName || "").trim();
   const selectedAreas = formatServiceClaimProblemAreaList(claim.problemAreasJson);
@@ -91,7 +112,7 @@ function formatClaimKitchenSummaryLines(claim) {
 }
 
 export default async function AdminClaimDetailPage({ params, searchParams }) {
-  const admin = await requireAdminPage();
+  const admin = await requireAdminClaimsPage();
   const { id } = await params;
   const resolvedSearchParams = (await searchParams) || {};
   const successMessage = getFormMessage(resolvedSearchParams, "success");
@@ -116,13 +137,35 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
     );
   }
 
-  const uploadedAttachments = parseClaimAttachments(claim.attachmentsJson);
+  const rawUploadedAttachments = parseClaimAttachments(claim.attachmentsJson);
+  const parsedProblemAreas = parseClaimProblemAreas(claim.problemAreasJson);
   const customerGender = getClaimCustomerGender(claim.fullName);
   const claimKitchenSummaryLines = formatClaimKitchenSummaryLines(claim);
   const claimKitchenPreview = await renderClaimKitchenPreviewSvg({
     kitchenSlug: claim.kitchenSlug,
     selectedAreas: claim.problemAreasJson,
+    contractNumber: claim.contractNumber,
   }).catch(() => null);
+  const uploadedAttachmentFiles = rawUploadedAttachments.map((file, index) => ({
+    index,
+    filename: file.filename,
+    contentType: file.contentType || "",
+    size: file.size,
+    role: file.role || "general",
+    areaComponentId: file.areaComponentId || "",
+    areaName: file.areaName || "",
+    areaCode: file.areaCode || "",
+    meta: buildAttachmentMetaText(file),
+  }));
+  const generalUploadedAttachments = uploadedAttachmentFiles.filter((file) => file.role !== "problem_area");
+  const uploadedAttachments = generalUploadedAttachments;
+  const problemAreaSections = parsedProblemAreas.map((area) => ({
+    ...area,
+    label: formatServiceClaimProblemArea(area),
+    files: uploadedAttachmentFiles.filter(
+      (file) => file.role === "problem_area" && file.areaComponentId === area.componentId,
+    ),
+  }));
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -241,6 +284,26 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.issue" fallback="Issue" /></span>
                   <p style={detailTextStyle}><AdminClaimLocalizedText text={claim.problemDescription} /></p>
                 </div>
+                {problemAreaSections.length ? (
+                  <div>
+                    <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.selectedPart" fallback="Affected items" /></span>
+                    <div style={problemAreaListStyle}>
+                      {problemAreaSections.map((area) => (
+                        <article key={area.componentId || area.label} style={problemAreaCardStyle}>
+                          <strong style={problemAreaTitleStyle}>{area.label || "-"}</strong>
+                          <p style={detailTextStyle}>
+                            {area.detail ? <AdminClaimLocalizedText text={area.detail} /> : "No item-specific description provided."}
+                          </p>
+                          {area.files.length ? (
+                            <AdminClaimUploadsPanel claimId={claim.id} files={area.files} />
+                          ) : (
+                            <p style={detailTextStyle}>No item-specific files uploaded.</p>
+                          )}
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
                 <div>
                   <span style={detailLabelStyle}>
                     <AdminText i18nKey="claimsAdmin.uploadedFiles" fallback="Uploaded files" />
@@ -358,4 +421,22 @@ const claimKitchenPreviewCardStyle = {
 const claimKitchenPreviewWrapStyle = {
   width: "100%",
   margin: 0,
+};
+
+const problemAreaListStyle = {
+  display: "grid",
+  gap: 12,
+};
+
+const problemAreaCardStyle = {
+  display: "grid",
+  gap: 10,
+  padding: 14,
+  border: "1px solid var(--app-border)",
+  borderRadius: 14,
+  background: "rgba(255,255,255,0.72)",
+};
+
+const problemAreaTitleStyle = {
+  fontSize: "0.98rem",
 };

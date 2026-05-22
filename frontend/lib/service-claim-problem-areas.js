@@ -17,12 +17,38 @@ export function parseServiceClaimProblemAreas(raw) {
         const componentId = String(area?.componentId || "").trim();
         const name = stripProductDimensionsFromLabel(String(area?.name || "").trim());
         const code = String(area?.code || "").trim();
+        const detail = String(area?.detail || "").trim();
+        const attachments = Array.isArray(area?.attachments)
+          ? area.attachments
+              .map((attachment) => {
+                const filename = String(attachment?.filename || "").trim();
+                const contentType = String(attachment?.contentType || "").trim();
+                const size = Number(attachment?.size || 0);
+
+                if (!filename) {
+                  return null;
+                }
+
+                return {
+                  filename,
+                  contentType,
+                  size: Number.isFinite(size) && size >= 0 ? size : 0,
+                };
+              })
+              .filter(Boolean)
+          : [];
 
         if (!componentId && !name && !code) {
           return null;
         }
 
-        return { componentId, name, code };
+        return {
+          componentId,
+          name,
+          code,
+          ...(detail ? { detail } : {}),
+          ...(attachments.length ? { attachments } : {}),
+        };
       })
       .filter(Boolean);
   } catch {

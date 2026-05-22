@@ -121,6 +121,7 @@ export const EXAMPLE_DASHBOARD_MOCK_DATA = {
 };
 
 export function AdminDashboardCharts({
+  showClaimsLink = false,
   kpis,
   periodOptions,
   selectedPeriod,
@@ -241,11 +242,13 @@ export function AdminDashboardCharts({
             maxRows={6}
             compact
           />
-          <div className="claim-action-row">
-            <Link className="claim-action-row__link" href="/admin/claims" prefetch={false}>
-              {translate("dashboard.viewAllClaims", "View all claims")}
-            </Link>
-          </div>
+          {showClaimsLink ? (
+            <div className="claim-action-row">
+              <Link className="claim-action-row__link" href="/admin/claims" prefetch={false}>
+                {translate("dashboard.viewAllClaims", "View all claims")}
+              </Link>
+            </div>
+          ) : null}
         </div>
       </section>
 

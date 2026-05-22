@@ -1272,7 +1272,7 @@ textarea {
 .service-yes-no-field__option.is-active {
   background: #fff;
   color: var(--app-text);
-  box-shadow: 0 1px 4px rgba(56, 38, 25, 0.12);
+  box-shadow: none;
 }
 
 .service-form__section-helper {
@@ -1366,6 +1366,54 @@ textarea {
 .service-field {
   display: grid;
   gap: 8px;
+}
+
+.service-field--contract-number {
+  position: sticky;
+  top: 12px;
+  z-index: 40;
+  padding: 14px 16px 16px;
+  border: 1px solid rgba(107, 79, 58, 0.14);
+  border-radius: 20px;
+  background: rgba(255, 250, 244, 0.96);
+  box-shadow: none;
+  backdrop-filter: blur(10px);
+}
+
+.service-field--contract-number-stuck {
+  box-shadow: 0 12px 28px rgba(56, 38, 25, 0.08);
+}
+
+.service-field--contract-number-static {
+  position: static;
+  top: auto;
+}
+
+.service-field__sticky-dismiss {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(107, 79, 58, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: rgba(107, 79, 58, 0.75);
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.service-field__sticky-dismiss:hover,
+.service-field__sticky-dismiss:focus-visible {
+  background: #fff;
+  border-color: rgba(107, 79, 58, 0.24);
+}
+
+.service-field__sticky-dismiss:focus-visible {
+  outline: 2px solid rgba(217, 122, 38, 0.55);
+  outline-offset: 2px;
 }
 
 .service-field > span {
@@ -1729,10 +1777,8 @@ textarea {
   padding: 0 12px 0 0;
   border: 1px solid rgba(177, 145, 116, 0.28);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 10px 24px rgba(107, 79, 58, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: none;
   transition:
     border-color 160ms ease,
     box-shadow 160ms ease,
@@ -1742,16 +1788,12 @@ textarea {
 
 .service-field--preferred-date .service-field__date-picker:hover {
   border-color: rgba(122, 77, 39, 0.32);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 12px 28px rgba(107, 79, 58, 0.11);
+  box-shadow: none;
 }
 
 .service-field--preferred-date .service-field__date-picker:focus-within {
   border-color: rgba(122, 77, 39, 0.4);
-  box-shadow:
-    0 0 0 4px rgba(122, 77, 39, 0.08),
-    0 14px 28px rgba(107, 79, 58, 0.12);
+  box-shadow: none;
 }
 
 .service-field--preferred-date .service-field__date-picker.is-open {
@@ -2197,25 +2239,19 @@ textarea {
   padding: 14px 16px;
   border: 1px solid rgba(177, 145, 116, 0.28);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 10px 24px rgba(107, 79, 58, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: none;
 }
 
 .service-select--preferred-time-window .admin-select__trigger:hover {
   border-color: rgba(122, 77, 39, 0.32) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 12px 28px rgba(107, 79, 58, 0.11) !important;
+  box-shadow: none !important;
 }
 
 .service-select--preferred-time-window .admin-select__trigger:focus-visible,
 .service-select--preferred-time-window.is-open .admin-select__trigger {
   border-color: rgba(122, 77, 39, 0.4) !important;
-  box-shadow:
-    0 0 0 4px rgba(122, 77, 39, 0.08),
-    0 14px 28px rgba(107, 79, 58, 0.12) !important;
+  box-shadow: none !important;
 }
 
 .service-select--preferred-time-window .admin-select__value {
@@ -2291,27 +2327,21 @@ textarea {
 .service-select--gender .admin-select__trigger {
   min-height: 54px;
   padding: 14px 16px;
-  border: 1px solid rgba(177, 145, 116, 0.28);
+  border: 1px solid rgba(198, 169, 142, 0.28);
   border-radius: 16px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 244, 237, 0.96) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 10px 24px rgba(107, 79, 58, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: none;
 }
 
 .service-select--gender .admin-select__trigger:hover {
   border-color: rgba(122, 77, 39, 0.32) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.96),
-    0 12px 28px rgba(107, 79, 58, 0.11) !important;
+  box-shadow: none !important;
 }
 
 .service-select--gender .admin-select__trigger:focus-visible,
 .service-select--gender.is-open .admin-select__trigger {
   border-color: rgba(122, 77, 39, 0.4) !important;
-  box-shadow:
-    0 0 0 4px rgba(122, 77, 39, 0.08),
-    0 14px 28px rgba(107, 79, 58, 0.12) !important;
+  box-shadow: none !important;
 }
 
 .service-select--gender .admin-select__value {
@@ -2424,17 +2454,17 @@ textarea {
 .service-field__file::file-selector-button,
 .service-field input[type="file"]::file-selector-button {
   margin-right: 12px;
-  border: 1px solid rgba(214, 188, 166, 0.9);
+  border: 1px solid rgba(188, 151, 122, 0.95);
   padding: 10px 16px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(248, 243, 238, 0.98) 0%, rgba(243, 235, 227, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(246, 239, 233, 0.99) 0%, rgba(239, 230, 221, 0.96) 100%);
   color: #6b4f3a;
   font: inherit;
   font-size: 0.86rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   cursor: pointer;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.62);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
@@ -2455,17 +2485,17 @@ textarea {
 .service-field__file::-webkit-file-upload-button,
 .service-field input[type="file"]::-webkit-file-upload-button {
   margin-right: 12px;
-  border: 1px solid rgba(214, 188, 166, 0.9);
+  border: 1px solid rgba(188, 151, 122, 0.95);
   padding: 10px 16px;
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(248, 243, 238, 0.98) 0%, rgba(243, 235, 227, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(246, 239, 233, 0.99) 0%, rgba(239, 230, 221, 0.96) 100%);
   color: #6b4f3a;
   font: inherit;
   font-size: 0.86rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   cursor: pointer;
-  box-shadow: 0 8px 16px rgba(154, 88, 35, 0.22);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   transition:
     transform 160ms ease,
     box-shadow 160ms ease,
@@ -2557,6 +2587,24 @@ textarea {
 .service-attachments__toggle:hover,
 .service-attachments__toggle:focus-visible {
   color: var(--app-accent-strong);
+}
+
+.service-field--problem-area-row .service-attachments--inline-expand {
+  gap: 6px;
+}
+
+.service-attachments--inline-expand .service-attachments__list {
+  align-items: center;
+}
+
+.service-attachments--inline-expand .service-attachments__toggle-item {
+  display: flex;
+  align-items: center;
+}
+
+.service-attachments--inline-expand .service-attachments__toggle {
+  align-self: center;
+  white-space: nowrap;
 }
 
 .service-attachments__name {
@@ -2741,10 +2789,23 @@ textarea {
 .service-claim-kitchen__header {
   display: flex;
   align-items: flex-start;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 0;
+  margin-bottom: 8px;
+}
+
+.service-claim-kitchen__meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.service-claim-kitchen__contract {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--app-text);
+  letter-spacing: 0.02em;
 }
 
 .service-claim-kitchen__eyebrow {
@@ -2817,11 +2878,62 @@ textarea {
   flex-wrap: wrap;
 }
 
+.service-field__problem-area-stack {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.service-field__problem-area-input-wrap {
+  position: relative;
+  min-width: 0;
+}
+
 .service-field__problem-area-input {
   min-height: 54px !important;
   resize: none !important;
   overflow: hidden;
   line-height: 1.45;
+  padding-right: 62px !important;
+}
+
+.service-field__problem-area-file {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.service-field__problem-area-upload-button {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--app-accent);
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(56, 38, 25, 0.08);
+}
+
+.service-field__problem-area-upload-button:hover,
+.service-field__problem-area-upload-button:focus-visible {
+  background: rgba(255, 248, 242, 0.98);
+  border-color: rgba(107, 79, 58, 0.24);
+}
+
+.service-field__problem-area-upload-button:focus-visible {
+  outline: 2px solid rgba(217, 122, 38, 0.55);
+  outline-offset: 2px;
 }
 
 .service-field--problem-area-row > .service-field__problem-area-label .service-field__required-mark,
@@ -3105,9 +3217,9 @@ textarea {
   cursor: not-allowed;
 }
 
-.service-claim-agent__message span {
+.service-claim-agent__message-body {
   display: inline-block;
-  max-width: 88%;
+  max-width: 100%;
   padding: 11px 13px;
   border: 1px solid rgba(107, 79, 58, 0.12);
   border-radius: 16px;
@@ -3116,7 +3228,19 @@ textarea {
   white-space: pre-wrap;
 }
 
-.service-claim-agent__message--assistant span {
+.service-claim-agent__message-body span {
+  display: inline;
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.service-claim-agent__message--assistant .service-claim-agent__message-body {
   background: #f7f5f1;
   color: #2f2a24;
 }
@@ -3125,13 +3249,13 @@ textarea {
   justify-content: flex-end;
 }
 
-.service-claim-agent__message--user span {
+.service-claim-agent__message--user .service-claim-agent__message-body {
   background: #e9f7ee;
   color: #24583b;
   border-color: rgba(42, 145, 85, 0.18);
 }
 
-.service-claim-agent__message--error span {
+.service-claim-agent__message--error .service-claim-agent__message-body {
   color: #b53b30;
   border-color: rgba(181, 59, 48, 0.22);
 }

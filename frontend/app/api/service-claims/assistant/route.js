@@ -3,6 +3,8 @@ import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit
 import { prisma } from "../../../../lib/prisma";
 import SERVICE_CLAIM_TROUBLESHOOTING_DATA from "../../../../lib/service-claim-troubleshooting-data.json";
 
+const OPENAI_TIMEOUT_MS = 20000;
+
 const COPY = {
   en: {
     greetingReply: "Hi. I can help you with the claim.",
@@ -1671,20 +1673,51 @@ function formatQuotedBlock(title, text) {
   return `${title}\n"${normalized}"`;
 }
 
+function prefixSuggestedDescriptionWithErrorCode(description, code, options = {}) {
+  const normalizedDescription = normalizeText(description);
+  const normalizedCode = normalizeCode(code);
+  if (!normalizedDescription || !normalizedCode) {
+    return normalizedDescription;
+  }
+
+  const prefixed = `${normalizedCode}: ${normalizedDescription}`.trim();
+  if (options.boldPrefix) {
+    return prefixed.replace(new RegExp(`^${normalizedCode}:`), `**${normalizedCode}:**`);
+  }
+  return prefixed;
+}
+
 function getClaimFormHelpClosingSentence(language) {
   return t(language).claimFormHelpClosing;
 }
 
-function buildClaimFormHelpActions(language) {
+function buildClaimFormHelpActions(language, promptOverride = "") {
   const label = t(language).claimFormHelpAction;
-  return [{ id: "claim_form_help", label, prompt: label }];
+  const prompt = normalizeText(promptOverride) || label;
+  return [{ id: "claim_form_help", label, prompt }];
+}
+
+function buildClaimFormHelpPromptForMatch(language, topMatch) {
+  const label = t(language).claimFormHelpAction;
+  const code = normalizeCode(topMatch?.code);
+  if (code) {
+    return `${label} for dishwasher error code ${code}`;
+  }
+  return label;
 }
 
 function getClaimFormNextStep(language) {
   return t(language).claimFormNextStep;
 }
 
-function buildCompactSupportAnswer({ language, intro, stepsTitle, steps }) {
+function buildCompactSupportAnswer({
+  language,
+  intro,
+  stepsTitle,
+  steps,
+  includeClaimFormHelpAction = false,
+  claimFormHelpPrompt = "",
+}) {
   const copy = t(language);
   const answer = [
     intro,
@@ -1694,10 +1727,12 @@ function buildCompactSupportAnswer({ language, intro, stepsTitle, steps }) {
   ]
     .filter(Boolean)
     .join("\n\n");
-  return {
-    answer,
-    actions: buildClaimFormHelpActions(language),
-  };
+  return includeClaimFormHelpAction
+    ? {
+      answer,
+      actions: buildClaimFormHelpActions(language, claimFormHelpPrompt),
+    }
+    : { answer };
 }
 
 function normalizeAssistantReturn(value) {
@@ -1710,9 +1745,13 @@ function normalizeAssistantReturn(value) {
 function buildClaimFormHelpAnswer({ language, claimGuidance, description }) {
   const copy = t(language);
   const normalizedDescription = normalizeText(description);
+  const displayDescription = normalizedDescription.replace(
+    /^([A-Z]\d{1,2}:)/,
+    (match) => `**${match}**`,
+  );
   const answer = [
     formatSection(copy.claimFormForForm, claimGuidance || []),
-    formatQuotedBlock(copy.claimFormSuggestedDescription, normalizedDescription),
+    formatQuotedBlock(copy.claimFormSuggestedDescription, displayDescription),
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -1826,6 +1865,37 @@ function getDishwasherContext({ question, claim, selectedAreas }) {
   };
 }
 
+function getDishwasherContextResolved({ question, claim, selectedAreas }) {
+  const questionText = normalizeText(question);
+  const descriptionText = normalizeText(claim?.problemDescription);
+  const combinedText = `${questionText}\n${descriptionText}`.trim();
+  const explicitErrorCodesFromQuestion = extractErrorCodes(questionText);
+  const hasCurrentExplicitCodes = explicitErrorCodesFromQuestion.length > 0;
+  const matchingText = hasCurrentExplicitCodes ? questionText : combinedText;
+  const areaCategories = arrayValue(selectedAreas).map(detectAreaCategory);
+  const categories = dedupe([...areaCategories, ...detectTextCategories(matchingText)]);
+  const explicitErrorCodes = hasCurrentExplicitCodes
+    ? explicitErrorCodesFromQuestion
+    : extractErrorCodes(combinedText);
+  const inferredErrorCodes = hasCurrentExplicitCodes
+    ? inferDishwasherCodesFromSymptoms(questionText)
+    : inferDishwasherCodesFromSymptoms(combinedText);
+  const errorCodes = dedupe([...explicitErrorCodes, ...inferredErrorCodes]);
+  const hasDishwasherContext =
+    categories.includes("dishwasher")
+    || /dishwasher|geschirrsp|spulmaschine|spuelmaschine|lavavajillas|lave-vaisselle/i.test(matchingText);
+
+  return {
+    combinedText: matchingText,
+    categories,
+    explicitErrorCodes,
+    inferredErrorCodes,
+    errorCodes,
+    hasDishwasherContext,
+    hasCurrentExplicitCodes,
+  };
+}
+
 function enrichDishwasherContextWithConversation(baseContext, conversationMessages) {
   const conversationText = normalizeConversationMessages(conversationMessages)
     .filter((message) => message.role === "user")
@@ -1835,7 +1905,7 @@ function enrichDishwasherContextWithConversation(baseContext, conversationMessag
     .trim();
   const combinedText = `${conversationText}\n${baseContext.combinedText}`.trim();
   const categories = dedupe([...baseContext.categories, ...detectTextCategories(combinedText)]);
-  const hasCurrentExplicitCodes = baseContext.explicitErrorCodes.length > 0;
+  const hasCurrentExplicitCodes = baseContext.hasCurrentExplicitCodes === true;
   const explicitErrorCodes = hasCurrentExplicitCodes
     ? baseContext.explicitErrorCodes
     : dedupe([...baseContext.explicitErrorCodes, ...extractErrorCodes(conversationText)]);
@@ -1959,13 +2029,21 @@ function buildClaimGuidanceItemsLegacy(copy, claim, categories, selectedAreas, t
 
 function buildSuggestedProblemDescriptionLegacy(topMatch, context, language) {
   const guide = buildDishwasherGuideForMatch(topMatch, language);
-  if (guide?.suggestedDescription) return guide.suggestedDescription;
+  if (guide?.suggestedDescription) {
+    return prefixSuggestedDescriptionWithErrorCode(guide.suggestedDescription, topMatch?.code);
+  }
 
   const fallback = normalizeText(context.combinedText).replace(/\s+/g, " ");
   if (!fallback) {
-    return "My architecto dishwasher is not working properly. Please check the appliance and advise on the next step.";
+    return prefixSuggestedDescriptionWithErrorCode(
+      "My architecto dishwasher is not working properly. Please check the appliance and advise on the next step.",
+      topMatch?.code,
+    );
   }
-  return `My architecto dishwasher has the following issue: ${fallback}. Please check the appliance and advise on the next step.`;
+  return prefixSuggestedDescriptionWithErrorCode(
+    `My architecto dishwasher has the following issue: ${fallback}. Please check the appliance and advise on the next step.`,
+    topMatch?.code,
+  );
 }
 
 function scoreKnowledgeEntry(entry, combinedText, errorCodes) {
@@ -2043,6 +2121,52 @@ function selectKnowledgeMatches(entries, context) {
   return {
     codeMatches: codeMatches.slice(0, 2),
     immediateMatches: immediateMatches.slice(0, 3),
+  };
+}
+
+function getLatestExplicitDishwasherCode(question, conversationMessages, claim) {
+  const currentQuestionCodes = extractErrorCodes(question);
+  if (currentQuestionCodes.length) {
+    return currentQuestionCodes[0];
+  }
+
+  const latestConversationCode = normalizeConversationMessages(conversationMessages)
+    .filter((message) => message.role === "user")
+    .slice()
+    .reverse()
+    .flatMap((message) => extractErrorCodes(message.text))[0];
+  if (latestConversationCode) {
+    return latestConversationCode;
+  }
+
+  const claimCodes = extractErrorCodes(normalizeText(claim?.problemDescription));
+  if (claimCodes.length) {
+    return claimCodes[claimCodes.length - 1];
+  }
+
+  return "";
+}
+
+function prioritizeKnowledgeMatchesByCode(matches, preferredCode) {
+  const normalizedPreferredCode = normalizeCode(preferredCode);
+  if (!normalizedPreferredCode) {
+    return matches;
+  }
+  const preferredAliases = new Set(errorCodeAliases(normalizedPreferredCode));
+
+  const preferredMatch = arrayValue(matches?.codeMatches).find(
+    (entry) => preferredAliases.has(normalizeCode(entry?.code)),
+  );
+  if (!preferredMatch) {
+    return matches;
+  }
+
+  return {
+    ...matches,
+    codeMatches: [
+      preferredMatch,
+      ...arrayValue(matches?.codeMatches).filter((entry) => entry?.slug !== preferredMatch.slug),
+    ],
   };
 }
 
@@ -2366,6 +2490,7 @@ function buildGeneralSpecificAnswer(context, language, formHelpOnly = false) {
     language,
     intro: support.intro,
     steps: support.steps,
+    includeClaimFormHelpAction: false,
   });
 }
 
@@ -2413,13 +2538,18 @@ function buildClaimGuidanceItems(copy, claim, categories, selectedAreas, topMatc
 function buildSuggestedProblemDescription(topMatch, context, language) {
   const copy = t(language);
   const guide = buildDishwasherGuideForMatch(topMatch, language);
-  if (guide?.suggestedDescription) return guide.suggestedDescription;
+  if (guide?.suggestedDescription) {
+    return prefixSuggestedDescriptionWithErrorCode(guide.suggestedDescription, topMatch?.code);
+  }
 
   const fallback = normalizeText(context.combinedText).replace(/\s+/g, " ");
   if (!fallback) {
-    return copy.dishwasherSuggestFallback;
+    return prefixSuggestedDescriptionWithErrorCode(copy.dishwasherSuggestFallback, topMatch?.code);
   }
-  return copy.dishwasherSuggestWithIssue.replace("{issue}", fallback);
+  return prefixSuggestedDescriptionWithErrorCode(
+    copy.dishwasherSuggestWithIssue.replace("{issue}", fallback),
+    topMatch?.code,
+  );
 }
 
 function buildKnowledgeAnswer({ language, question, context, selectedAreas, claim, matches, dishwasherContext }) {
@@ -2446,6 +2576,8 @@ function buildKnowledgeAnswer({ language, question, context, selectedAreas, clai
     language,
     intro,
     steps: troubleshootingActions,
+    includeClaimFormHelpAction: true,
+    claimFormHelpPrompt: buildClaimFormHelpPromptForMatch(language, topMatch),
   });
 }
 
@@ -2471,12 +2603,16 @@ async function buildAnswer({ language, question, context, selectedAreas, claim, 
   }
 
   const dishwasherContext = enrichDishwasherContextWithConversation(
-    getDishwasherContext({ question, claim, selectedAreas }),
+    getDishwasherContextResolved({ question, claim, selectedAreas }),
     conversationMessages,
   );
   if (dishwasherContext.hasDishwasherContext || shouldAssumeDishwasherFromErrorCode(question, selectedAreas)) {
     const entries = await loadDishwasherKnowledgeEntries();
-    const matches = selectKnowledgeMatches(entries, dishwasherContext);
+    const latestExplicitDishwasherCode = getLatestExplicitDishwasherCode(question, conversationMessages, claim);
+    const matches = prioritizeKnowledgeMatchesByCode(
+      selectKnowledgeMatches(entries, dishwasherContext),
+      wantsClaimFormHelp ? latestExplicitDishwasherCode : question,
+    );
     if (wantsClaimFormHelp && matches.codeMatches.length) {
       return normalizeAssistantReturn(
         buildKnowledgeClaimFormHelpAnswer({
@@ -2538,6 +2674,245 @@ async function buildAnswer({ language, question, context, selectedAreas, claim, 
   return normalizeAssistantReturn(genericAnswer);
 }
 
+function extractResponseText(responsePayload) {
+  if (typeof responsePayload?.output_text === "string") {
+    return responsePayload.output_text;
+  }
+
+  const output = Array.isArray(responsePayload?.output) ? responsePayload.output : [];
+  return output
+    .flatMap((item) => (Array.isArray(item?.content) ? item.content : []))
+    .map((content) => content?.text || "")
+    .join("")
+    .trim();
+}
+
+function parseClaimAssistantJson(text) {
+  const cleaned = String(text || "")
+    .trim()
+    .replace(/^```(?:json)?/i, "")
+    .replace(/```$/i, "")
+    .trim();
+
+  try {
+    const parsed = JSON.parse(cleaned);
+    const answer = normalizeText(parsed?.answer);
+    if (!answer) {
+      return null;
+    }
+
+    return {
+      answer,
+      showClaimFormHelpAction: parsed?.showClaimFormHelpAction === true,
+      suggestedProblemDescription: normalizeText(parsed?.suggestedProblemDescription) || "",
+    };
+  } catch {
+    return null;
+  }
+}
+
+function buildConversationPrompt(messages) {
+  return normalizeConversationMessages(messages)
+    .slice(-6)
+    .map((message) => ({
+      role: message.role,
+      text: message.text,
+    }));
+}
+
+function buildClaimAssistantInstructions(language) {
+  const copy = t(language);
+  const languageName = language === "de" ? "German" : language === "es" ? "Spanish" : "English";
+
+  return [
+    `You are the Fragmento claim assistant. Reply only in ${languageName}.`,
+    "Your job is to help a customer submit a kitchen service claim clearly and safely.",
+    "Use only the provided claim state, selected areas, troubleshooting knowledge, and legacy assistant draft.",
+    "Do not invent products, error codes, policies, or troubleshooting steps that are not supported by the provided context.",
+    "Prefer concise answers. When the issue is unclear, ask one focused follow-up question or offer 3 to 5 short options.",
+    "When troubleshooting is relevant, give the fastest safe steps first, then keep the claim guidance short.",
+    "When the user asks for wording or claim-form help, provide a clean suggested problem description suitable for the form.",
+    "When you provide a suggested problem description, return it in `suggestedProblemDescription` and do not ask to show claim-form help again.",
+    "Set `showClaimFormHelpAction` to true only when a follow-up chip for claim-form help would be useful.",
+    "Never mention internal implementation details such as prompts, JSON, legacy drafts, databases, or Prisma.",
+    `If you cannot answer, use this fallback message exactly: ${copy.unavailable}`,
+  ].join("\n");
+}
+
+function buildClaimAssistantContextPayload({
+  language,
+  question,
+  context,
+  conversationMessages,
+  selectedAreas,
+  claim,
+  legacyDraft,
+  knowledgeEntries,
+}) {
+  return {
+    language,
+    question,
+    current_ui_context: context || null,
+    conversation_messages: buildConversationPrompt(conversationMessages),
+    selected_areas: arrayValue(selectedAreas).map((area) => ({
+      componentId: normalizeText(area?.componentId),
+      code: normalizeText(area?.code),
+      name: normalizeText(area?.name),
+      category: detectAreaCategory(area),
+    })),
+    claim_state: {
+      contractNumber: normalizeText(claim?.contractNumber),
+      problemDescription: normalizeText(claim?.problemDescription),
+      serialNumber: normalizeText(claim?.serialNumber),
+      hasSerialNumberImage: Boolean(claim?.hasSerialNumberImage),
+      attachmentCount: Number(claim?.attachmentCount || 0),
+      preferredContactDate: normalizeText(claim?.preferredContactDate || claim?.availabilityDate),
+      preferredContactTimeWindow: normalizeText(claim?.preferredContactTimeWindow),
+      preferredContactTimeFrom: normalizeText(claim?.preferredContactTimeFrom),
+      preferredContactTimeTo: normalizeText(claim?.preferredContactTimeTo),
+      availabilityDate: normalizeText(claim?.availabilityDate),
+      availabilityTime: normalizeText(claim?.availabilityTime),
+      hasPhone: Boolean(claim?.hasPhone),
+      hasEmail: Boolean(claim?.hasEmail),
+    },
+    request_flags: {
+      isGreeting: isGreeting(question),
+      isClaimFormHelpRequest: isClaimFormHelpRequest(question),
+      isSampleWordingRequest: isSampleWordingRequest(question),
+    },
+    dishwasher_context: enrichDishwasherContextWithConversation(
+      getDishwasherContextResolved({ question, claim, selectedAreas }),
+      conversationMessages,
+    ),
+    troubleshooting_guides: arrayValue(SERVICE_CLAIM_TROUBLESHOOTING_DATA?.guides),
+    troubleshooting_lookup_entries: arrayValue(SERVICE_CLAIM_TROUBLESHOOTING_DATA?.lookupEntries),
+    database_knowledge_entries: arrayValue(knowledgeEntries),
+    legacy_assistant_draft: legacyDraft,
+  };
+}
+
+async function buildOpenAiAnswer({ language, question, context, selectedAreas, claim, conversationMessages }) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    const error = new Error("Claim assistant is not configured.");
+    error.status = 503;
+    throw error;
+  }
+
+  const legacyDraft = normalizeAssistantReturn(
+    await buildAnswer({ language, question, context, selectedAreas, claim, conversationMessages }),
+  );
+
+  const knowledgeEntries = await prisma.serviceClaimKnowledgeEntry.findMany({
+    where: { isActive: true },
+    orderBy: [
+      { priority: "desc" },
+      { slug: "asc" },
+    ],
+  });
+
+  const model = process.env.OPENAI_CLAIM_ASSISTANT_MODEL || "gpt-5.1";
+  const instructions = buildClaimAssistantInstructions(language);
+  const inputContext = buildClaimAssistantContextPayload({
+    language,
+    question,
+    context,
+    conversationMessages,
+    selectedAreas,
+    claim,
+    legacyDraft,
+    knowledgeEntries,
+  });
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+
+  try {
+    const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      signal: controller.signal,
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        reasoning: {
+          effort: "none",
+        },
+        instructions,
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: `Use this claim-assistant context and return JSON only:\n\n${JSON.stringify(inputContext, null, 2)}`,
+              },
+            ],
+          },
+        ],
+        text: {
+          format: {
+            type: "json_schema",
+            name: "claim_assistant_answer",
+            strict: true,
+            schema: {
+              type: "object",
+              additionalProperties: false,
+              properties: {
+                answer: { type: "string" },
+                showClaimFormHelpAction: { type: "boolean" },
+                suggestedProblemDescription: {
+                  anyOf: [
+                    { type: "string" },
+                    { type: "null" },
+                  ],
+                },
+              },
+              required: ["answer", "showClaimFormHelpAction", "suggestedProblemDescription"],
+            },
+          },
+        },
+        max_output_tokens: 700,
+      }),
+    });
+
+    if (!openAiResponse.ok) {
+      const errorText = await openAiResponse.text().catch(() => "");
+      console.error("OpenAI claim assistant request failed:", openAiResponse.status, errorText);
+      return legacyDraft;
+    }
+
+    const responsePayload = await openAiResponse.json();
+    const parsed = parseClaimAssistantJson(extractResponseText(responsePayload));
+    if (!parsed) {
+      return legacyDraft;
+    }
+
+    const fallbackSuggestedProblemDescription =
+      parsed.suggestedProblemDescription || normalizeText(legacyDraft.suggestedProblemDescription);
+
+    return {
+      answer: parsed.answer,
+      ...(parsed.showClaimFormHelpAction && !fallbackSuggestedProblemDescription
+        ? { actions: buildClaimFormHelpActions(language) }
+        : {}),
+      ...(fallbackSuggestedProblemDescription
+        ? { suggestedProblemDescription: fallbackSuggestedProblemDescription }
+        : {}),
+    };
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      return legacyDraft;
+    }
+    console.error("OpenAI claim assistant runtime failure:", error);
+    return legacyDraft;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function POST(request) {
   try {
     const clientIp = getRequestClientIp(request);
@@ -2585,9 +2960,10 @@ export async function POST(request) {
     return NextResponse.json(payload);
   } catch (error) {
     console.error("Service claim assistant error:", error);
+    const status = Number.isInteger(error?.status) ? error.status : 500;
     return NextResponse.json(
       { error: error?.message || COPY.en.unavailable },
-      { status: 500 },
+      { status },
     );
   }
 }

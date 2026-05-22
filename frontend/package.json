@@ -17,7 +17,8 @@
     "prisma:seed": "node prisma/seed.js",
     "extract:product-info": "node scripts/extract-product-info-pdfs.js",
     "migrate:order-item-codes": "node scripts/migrate-order-item-codes.js",
-    "seed:dashboard-demo": "node scripts/seed-dashboard-demo.js"
+    "seed:dashboard-demo": "node scripts/seed-dashboard-demo.js",
+    "admin:create": "node scripts/create-admin.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
