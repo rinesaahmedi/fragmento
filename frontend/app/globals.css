@@ -1137,6 +1137,27 @@ textarea {
   line-height: 1.5;
 }
 
+.service-choice-card__cta {
+  width: fit-content;
+  margin-top: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(107, 79, 58, 0.92);
+  color: #fffdf9;
+  font-size: 0.88rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(84, 59, 40, 0.14);
+}
+
+.service-choice-card--complaint .service-choice-card__cta {
+  background: rgba(172, 96, 57, 0.94);
+}
+
 .service-panel {
   padding: 28px;
   display: grid;
@@ -3474,19 +3495,20 @@ textarea {
 @media (max-width: 700px) {
   .service-page {
     width: min(100% - 20px, 1120px);
-    padding: 22px 0 34px;
-    gap: 18px;
+    padding: 14px 0 28px;
+    gap: 14px;
   }
 
   .service-hero,
   .service-panel {
-    padding: 22px 18px;
+    padding: 16px 18px;
     border-radius: 20px;
   }
 
   .service-hero h1 {
-    font-size: clamp(2.3rem, 10vw, 3.3rem);
+    font-size: clamp(2rem, 8.7vw, 2.7rem);
     margin-top: 0;
+    text-align: center;
   }
 
   .service-form__actions,
@@ -3503,49 +3525,161 @@ textarea {
     position: static;
     min-width: 0;
     width: 100%;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
   }
 
   .service-hero__top {
     padding-top: 0;
+    gap: 8px;
+  }
+
+  .service-hero__content {
+    justify-items: center;
+    text-align: center;
   }
 
   .service-hero__brand {
     position: static;
     display: grid;
-    justify-items: start;
-    margin-bottom: 14px;
+    justify-items: center;
+    margin-bottom: 8px;
+  }
+
+  .service-hero__brand-note {
+    justify-self: center;
+    text-align: center;
   }
 
   .service-choice-card__logo {
-    height: 42px;
+    height: 38px;
   }
 
   .service-hero__logo {
-    height: 28px;
+    height: 26px;
   }
 
   .service-choice-card__logo--complaint {
-    height: 52px;
-    transform: translateY(-6px);
-    margin-bottom: -6px;
+    height: 48px;
+    transform: translateY(-5px);
+    margin-bottom: -7px;
     margin-left: -8px;
   }
 
   .service-hero__mascot-image {
-    width: min(100%, 150px);
+    width: min(100%, 112px);
   }
 
   .service-claim-agent {
     right: 12px;
-    bottom: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: auto;
+    width: auto;
+    transform: none;
   }
 
   .service-claim-agent__panel {
-    width: min(100vw - 20px, 420px);
+    width: 100%;
     min-height: 0;
-    max-height: min(72vh, 620px);
-    border-radius: 24px;
+    max-height: min(66dvh, 560px);
+    gap: 9px;
+    padding: 12px 12px 10px;
+    border-radius: 18px;
+  }
+
+  .service-claim-agent__header {
+    align-items: center;
+    gap: 8px;
+  }
+
+  .service-claim-agent__title-wrap {
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .service-claim-agent__header-avatar {
+    width: 42px;
+    height: 42px;
+    overflow: hidden;
+  }
+
+  .service-claim-agent__header-avatar img {
+    display: block;
+  }
+
+  .service-claim-agent__title-block {
+    min-width: 0;
+  }
+
+  .service-claim-agent__title-block h2 {
+    font-size: 1.2rem;
+    line-height: 1.08;
+  }
+
+  .service-claim-agent__section-label {
+    margin-top: 3px;
+    font-size: 0.8rem;
+  }
+
+  .service-claim-agent__close {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+  }
+
+  .service-claim-agent__context-options {
+    gap: 6px;
+  }
+
+  .service-claim-agent__context-button,
+  .service-claim-agent__action-chip {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
+
+  .service-claim-agent__message-stack {
+    max-width: 100%;
+  }
+
+  .service-claim-agent__message-body {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .service-claim-agent__composer {
+    position: relative;
+    display: block;
+  }
+
+  .service-claim-agent__composer input {
+    width: 100%;
+    min-height: 50px;
+    padding: 0 128px 0 14px;
+    font-size: 0.9rem;
+    border-radius: 16px;
+  }
+
+  .service-claim-agent__voice-button {
+    position: absolute;
+    top: 6px;
+    right: 82px;
+    width: 38px;
+    min-width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .service-claim-agent__composer .service-button {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: auto;
+    min-width: 70px;
+    min-height: 38px;
+    padding: 0 14px;
+    box-shadow: none;
   }
 
   .service-claim-agent__launcher {
@@ -3572,6 +3706,198 @@ textarea {
   }
 
   .service-choice-card {
-    padding: 20px;
+    gap: 8px;
+    padding: 16px;
+    border-radius: 18px;
+    box-shadow: 0 10px 22px rgba(84, 59, 40, 0.08);
+  }
+
+  .service-choice-grid {
+    margin-top: 14px;
+    gap: 12px;
+  }
+
+  .service-choice-card strong {
+    font-size: 1.08rem;
+  }
+
+  .service-choice-card p {
+    line-height: 1.4;
+  }
+
+  .service-choice-card__cta {
+    min-height: 34px;
+    padding: 0 13px;
+    font-size: 0.84rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .service-claim-agent {
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    left: auto;
+    width: auto;
+    transform: none;
+  }
+
+  .service-claim-agent__launcher {
+    min-width: 150px;
+    min-height: 150px;
+  }
+
+  .service-claim-agent__launcher-bubble {
+    right: 106px;
+    bottom: 108px;
+    max-width: 170px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .service-claim-agent__launcher-avatar {
+    width: 132px;
+    height: 150px;
+  }
+
+  .service-claim-agent.is-open {
+    position: fixed;
+    inset: auto 0 0;
+    width: 100%;
+    max-width: none;
+    transform: none;
+    z-index: 4200;
+    align-items: stretch;
+    justify-content: stretch;
+  }
+
+  .service-claim-agent.is-open::before {
+    background: rgba(25, 18, 12, 0.26);
+    pointer-events: auto;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__panel {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: none;
+    height: min(72dvh, 620px);
+    max-height: min(72dvh, 620px);
+    min-height: 0;
+    grid-template-rows: auto auto minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 14px 16px max(14px, env(safe-area-inset-bottom));
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 22px 22px 0 0;
+    box-shadow: 0 -18px 44px rgba(31, 22, 14, 0.24);
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__header {
+    z-index: 2;
+    align-items: center;
+    gap: 8px;
+    min-height: 42px;
+    padding-bottom: 4px;
+    background: rgba(255, 255, 255, 0.98);
+    overflow: hidden;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__title-wrap {
+    min-width: 0;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__header-avatar {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    overflow: hidden;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__header-avatar img {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__title-block {
+    min-width: 0;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__title-block h2 {
+    font-size: 1.2rem;
+    line-height: 1.08;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__section-label {
+    margin-top: 3px;
+    font-size: 0.8rem;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__close {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__context-options {
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+    margin-top: 2px;
+    padding-left: 0;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__context-button,
+  .service-claim-agent.is-open .service-claim-agent__action-chip {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.82rem;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__messages {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 2px 2px 4px 0;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__composer {
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px minmax(74px, auto);
+    gap: 8px;
+    padding-top: 4px;
+    background: rgba(255, 255, 255, 0.98);
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__composer input {
+    width: auto;
+    min-height: 46px;
+    padding: 0 12px;
+    border-radius: 14px;
+    font-size: 0.9rem;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__voice-button {
+    position: static;
+    width: 44px;
+    min-width: 44px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .service-claim-agent.is-open .service-claim-agent__composer .service-button {
+    position: static;
+    width: auto;
+    min-width: 74px;
+    min-height: 46px;
+    padding: 0 14px;
+    box-shadow: none;
   }
 }

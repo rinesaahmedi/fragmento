@@ -218,11 +218,13 @@ const COPY = {
     purchaseBadge: "Nachkauf",
     purchaseTitle: "Zusatzkauf",
     purchaseBrand: "FRAGMENTO BY ARCHITECTO",
-    purchaseText: "\u00d6ffne den K\u00fcchenkonfigurator und fahre mit zus\u00e4tzlichen Komponenten oder Zubeh\u00f6r fort.",
+    purchaseText: "K\u00fcchenkonfigurator \u00f6ffnen und Zubeh\u00f6r erg\u00e4nzen.",
+    purchaseCta: "Konfigurator \u00f6ffnen",
     complaintBadge: "Reklamation",
     complaintTitle: "Reklamation melden",
     complaintBrand: "ARCHITECTO SERVICE CENTER",
-    complaintText: "F\u00fcr Defekte, Sch\u00e4den oder fehlende Teile: Nutze das Reklamationsformular und sende den Fall an den Support.",
+    complaintText: "Defekte, Sch\u00e4den oder fehlende Teile melden.",
+    complaintCta: "Reklamation starten",
     purchasePanelTitle: "Weiter zum Kaufprozess",
     purchasePanelText: "Wenn der Mieter zus\u00e4tzliche Artikel statt einer Reklamation ben\u00f6tigt, geht es hier zum Konfigurator.",
     openConfigurator: "Konfigurator \u00f6ffnen",
@@ -2743,6 +2745,7 @@ export default function ServiceClaimFlow() {
             />
             <strong>{copy.purchaseTitle}</strong>
             <p>{copy.purchaseText}</p>
+            <span className="service-choice-card__cta">{copy.purchaseCta || copy.openConfigurator}</span>
           </button>
           <button
             type="button"
@@ -2759,6 +2762,7 @@ export default function ServiceClaimFlow() {
             
             <strong>{copy.complaintTitle}</strong>
             <p>{copy.complaintText}</p>
+            <span className="service-choice-card__cta">{copy.complaintCta || copy.complaintTitle}</span>
           </button>
         </div>
       </section>
