@@ -29,10 +29,10 @@
     "checking": "Wird geprüft..."
   },
   "configurator": {
-    "headerTitle": "Ihre individuelle Einbauküche",
+    "headerTitle": "Deine individuelle Einbauküche",
     "headerDescription": "Suchen Sie sich die Ergänzungsartikel für Ihre Einbauküche aus.",
     "catalogEyebrow": "Katalog",
-    "catalogTitle": "Ergänzungsartikel zu deine individuellen Einbauküche",
+    "catalogTitle": "Ergänzungsartikel zu deiner individuellen Einbauküche",
     "components": "Komponenten",
     "accessories": "Zubehör",
     "services": "Dienstleistungen",
@@ -44,7 +44,7 @@
     "infoForItem": "Infos zu {name}",
     "photoButtonLabel": "Foto",
     "stageEyebrow": "Plan",
-    "stageTitle": "Planen Sie Ihre Küche",
+    "stageTitle": "Plane deine individuelle Küche",
     "resetSelection": "Auswahl zurücksetzen",
     "stageLegendClick": "Im Plan anklicken oder rechts auswählen",
     "stageLegendFixed": "Fixe Bestandteile bleiben immer aktiv",

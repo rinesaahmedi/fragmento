@@ -29,7 +29,7 @@
     "checking": "Checking..."
   },
   "configurator": {
-    "headerTitle": "Your customized kitchen",
+    "headerTitle": "Your individual built-in kitchen",
     "headerDescription": "Choose additional items for your built-in kitchen.",
     "catalogEyebrow": "Catalog",
     "catalogTitle": "Additional items for your\nbuilt-in kitchen",
@@ -44,7 +44,7 @@
     "infoForItem": "Info about {name}",
     "photoButtonLabel": "Photo",
     "stageEyebrow": "Plan",
-    "stageTitle": "Plan your kitchen",
+    "stageTitle": "Plan your individual kitchen",
     "resetSelection": "Reset selection",
     "stageLegendClick": "Click in the plan or choose on the right",
     "stageLegendFixed": "Fixed parts always remain active",
