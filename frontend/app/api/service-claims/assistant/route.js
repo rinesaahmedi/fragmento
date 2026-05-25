@@ -1256,14 +1256,20 @@ function normalizeCode(raw) {
   if (!match) return compact;
   const digits = match[1];
   if (digits.length === 1) return `E${digits}`;
+  if (digits === "01") return "E1";
+  if (digits === "03") return "E3";
+  if (digits === "04") return "E4";
   if (digits.length === 2 && digits.startsWith("0")) return `E0${digits[1]}`;
   return `E${digits}`;
 }
 
 function errorCodeAliases(code) {
   const normalized = normalizeCode(code);
+  if (normalized === "E1") return ["E1", "E01"];
   if (normalized === "E2") return ["E2", "E02"];
   if (normalized === "E02") return ["E02", "E2"];
+  if (normalized === "E3") return ["E3", "E03"];
+  if (normalized === "E4") return ["E4", "E04"];
   return normalized ? [normalized] : [];
 }
 
@@ -1358,7 +1364,7 @@ function isGreeting(question) {
   const normalized = normalizeLanguageHintText(question);
   if (!normalized) return false;
   if (/^hal{1,2}o?$/.test(normalized)) return true;
-  return [
+  const greetings = [
     "hi",
     "hello",
     "hey",
@@ -1377,7 +1383,15 @@ function isGreeting(question) {
     "good morning",
     "good afternoon",
     "good evening",
-  ].includes(normalized);
+  ];
+  if (greetings.includes(normalized)) return true;
+
+  const words = normalized.split(/\s+/).filter(Boolean);
+  if (words.length > 1 && words.length <= 3 && words.every((word) => greetings.includes(word) || /^hal{1,2}o?$/.test(word))) {
+    return true;
+  }
+
+  return false;
 }
 
 function isLowInformationQuestion(question) {
@@ -1389,6 +1403,42 @@ function isLowInformationQuestion(question) {
     return true;
   }
   return false;
+}
+
+function buildOutOfScopeAnswer(language) {
+  const answers = {
+    en:
+      "I can only help with kitchen service claims.\n\nPlease tell me what is not working in the kitchen or which item is affected.",
+    de:
+      "Ich kann nur bei Küchenreklamationen helfen.\n\nBeschreiben Sie bitte, was in der Küche nicht funktioniert oder welcher Gegenstand betroffen ist.",
+    tr:
+      "Sadece mutfak servis talepleri konusunda yardimci olabilirim.\n\nLutfen mutfakta neyin calismadigini veya hangi parcanin etkilendigini yazin.",
+    es:
+      "Solo puedo ayudar con reclamaciones de servicio de cocina.\n\nIndica que no funciona en la cocina o que elemento esta afectado.",
+    fr:
+      "Je peux seulement aider pour les reclamations de service cuisine.\n\nIndiquez ce qui ne fonctionne pas dans la cuisine ou quel element est concerne.",
+    ru:
+      "Ya mogu pomoch tolko s servisnymi reklamatsiyami po kuhne.\n\nOpishite, chto ne rabotaet na kuhne ili kakoy predmet zatronut.",
+  };
+  return answers[language] || answers.en;
+}
+
+function hasServiceClaimContext(text) {
+  const haystack = normalizeLanguageHintText(text);
+  if (!haystack) return false;
+  if (detectTextCategories(haystack).length) return true;
+  return /\b(kitchen|claim|service|repair|technician|photo|picture|serial|contract|availability|appointment|appliance|dishwasher|sink|tap|faucet|drain|leak|water|blocked|clogged|electrical|lighting|light|socket|switch|broken|damaged|oven|hob|fridge|freezer|washing machine|dryer|extractor|hood|cabinet|drawer|hinge|error code|reclamation|reklamation|kuche|kueche|spule|spuele|spulmaschine|spuelmaschine|geschirrspuler|geschirrspueler|abfluss|undicht|wasser|defekt|kaputt|foto|seriennummer|lavavajillas|fregadero|desague|reclamacion|cocina|fuite|evier|reclamation|cuisine|lave vaisselle|mutfak|sikayet|eviye|bulasik|lavabo)\b/.test(
+    haystack,
+  );
+}
+
+function isClearlyOutOfScopeQuestion(question) {
+  const haystack = normalizeLanguageHintText(question);
+  if (!haystack || isGreeting(haystack) || hasServiceClaimContext(haystack)) return false;
+
+  return /\b(weather|forecast|temperature outside|bitcoin|stock price|exchange rate|president|prime minister|latest news|write (?:me )?(?:a )?(?:poem|story|song|joke)|tell (?:me )?(?:a )?joke|recipe|cook pasta|how do i cook|football|soccer|basketball|movie|music|homework|math problem|translate this|order status|track my order|payment|invoice|refund|buy (?:a )?(?:new|another)?\s*kitchen|purchase (?:a )?(?:new|another)?\s*kitchen|configurator)\b/.test(
+    haystack,
+  );
 }
 
 function isSampleWordingRequest(question) {
@@ -2602,6 +2652,10 @@ async function buildAnswer({ language, question, context, selectedAreas, claim, 
     return normalizeAssistantReturn(genericAnswer);
   }
 
+  if (isClearlyOutOfScopeQuestion(question)) {
+    return normalizeAssistantReturn(buildOutOfScopeAnswer(language));
+  }
+
   const dishwasherContext = enrichDishwasherContextWithConversation(
     getDishwasherContextResolved({ question, claim, selectedAreas }),
     conversationMessages,
@@ -2722,7 +2776,15 @@ function buildConversationPrompt(messages) {
 
 function buildClaimAssistantInstructions(language) {
   const copy = t(language);
-  const languageName = language === "de" ? "German" : language === "es" ? "Spanish" : "English";
+  const languageNames = {
+    en: "English",
+    de: "German",
+    tr: "Turkish",
+    es: "Spanish",
+    fr: "French",
+    ru: "Russian",
+  };
+  const languageName = languageNames[language] || languageNames.en;
 
   return [
     `You are the Fragmento claim assistant. Reply only in ${languageName}.`,
@@ -2791,6 +2853,7 @@ function buildClaimAssistantContextPayload({
   };
 }
 
+// This is prepared for future use. The current POST handler still uses the rule-based buildAnswer fallback.
 async function buildOpenAiAnswer({ language, question, context, selectedAreas, claim, conversationMessages }) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {

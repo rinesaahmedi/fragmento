@@ -100,19 +100,19 @@ function KitchenCatalogPreview({ markup, iconMarkup, slotLabel, itemType }) {
 
   if (normalizedIconMarkup) {
     return (
-      <div style={previewIconWrapStyle} aria-label={`${itemType || "Item"} icon preview`}>
+      <div className="kitchen-catalog-preview--icon" style={previewIconWrapStyle} aria-label={`${itemType || "Item"} icon preview`}>
         <div style={previewIconStyle} dangerouslySetInnerHTML={{ __html: normalizedIconMarkup }} />
       </div>
     );
   }
 
   if (!markup) {
-    return <div style={isComponent ? previewEmptyStyle : previewEmptyCompactStyle}><AdminText i18nKey="kitchenDetailAdmin.noPreview" fallback="No preview" /></div>;
+    return <div className="kitchen-catalog-preview--empty" style={isComponent ? previewEmptyStyle : previewEmptyCompactStyle}><AdminText i18nKey="kitchenDetailAdmin.noPreview" fallback="No preview" /></div>;
   }
 
   return (
-    <div style={previewWrapStyle} aria-label={slotLabel ? `${slotLabel} preview` : "Kitchen preview"}>
-      <div style={previewSvgStyle} dangerouslySetInnerHTML={{ __html: markup }} />
+    <div className="kitchen-catalog-preview" style={previewWrapStyle} aria-label={slotLabel ? `${slotLabel} preview` : "Kitchen preview"}>
+      <div className="kitchen-catalog-preview__svg" style={previewSvgStyle} dangerouslySetInnerHTML={{ __html: markup }} />
     </div>
   );
 }
@@ -273,7 +273,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
         <AdminSection
           title={<AdminText i18nKey="kitchenDetailAdmin.catalogItems" fallback="Catalog Items" />}
         >
-          <form method="get" style={catalogFiltersStyle}>
+          <form method="get" className="kitchen-catalog-items__filters" style={catalogFiltersStyle}>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.searchItems" fallback="Search items" />}>
               <AdminTranslatedInput
                 name="itemSearch"
@@ -321,11 +321,11 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               const iconMarkup = item.componentKey ? "" : (ITEM_ICON_MARKUP[item.iconKey] || "");
 
               return (
-                <details key={item.id} id={`item-${item.id}`} open={isRequestedEdit} style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
-                  <summary style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
-                    <div style={compactSummaryMainStyle}>
-                      <strong style={{ fontSize: "1.05rem" }}>{item.name}</strong>
-                      <div style={subMetaStyle}>
+                <details key={item.id} id={`item-${item.id}`} open={isRequestedEdit} className="kitchen-catalog-item-card" style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
+                  <summary className="kitchen-catalog-item-card__summary" style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
+                    <div className="kitchen-catalog-item-card__main" style={compactSummaryMainStyle}>
+                      <strong className="kitchen-catalog-item-card__title" style={{ fontSize: "1.05rem" }}>{item.name}</strong>
+                      <div className="kitchen-catalog-item-card__meta" style={subMetaStyle}>
                         <TypeBadge label={item.itemType} />
                         <span><AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />: {item.code}</span>
                         <span><AdminText i18nKey="kitchenDetailAdmin.articleNo" fallback="Article No" />: {item.articleNumber || "-"}</span>
@@ -339,7 +339,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       slotLabel={slot?.label || item.name}
                       itemType={item.itemType}
                     />
-                    <div style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
+                    <div className="kitchen-catalog-item-card__actions" style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
                       <AdminStatusBadge status={item.isActive ? "ACTIVE" : "ARCHIVED"} />
                       <span style={editHintStyle}><AdminText i18nKey="kitchenDetailAdmin.edit" fallback="Edit" /></span>
                     </div>
@@ -530,6 +530,110 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             </form>
           </details>
         </AdminSection>
+        <style>{`
+          @media (max-width: 700px) {
+            .kitchen-catalog-items__filters {
+              grid-template-columns: 1fr !important;
+              gap: 10px !important;
+            }
+
+            .kitchen-catalog-items__filters > div:last-child {
+              width: 100%;
+              display: grid !important;
+              grid-template-columns: 1fr 1fr;
+              gap: 8px !important;
+              align-self: stretch !important;
+            }
+
+            .kitchen-catalog-items__filters button,
+            .kitchen-catalog-items__filters a {
+              width: 100%;
+              justify-content: center;
+              min-height: 44px;
+            }
+
+            .kitchen-catalog-item-card {
+              border-radius: 14px !important;
+            }
+
+            .kitchen-catalog-item-card__summary {
+              display: grid !important;
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+              align-items: stretch !important;
+              padding: 14px !important;
+            }
+
+            .kitchen-catalog-item-card__title {
+              display: block;
+              font-size: 1rem !important;
+              line-height: 1.25;
+              overflow-wrap: anywhere;
+            }
+
+            .kitchen-catalog-item-card__meta {
+              display: grid !important;
+              grid-template-columns: 1fr !important;
+              gap: 5px !important;
+              color: var(--app-text-muted);
+              font-size: 12px !important;
+              line-height: 1.35;
+            }
+
+            .kitchen-catalog-item-card__meta > span {
+              min-width: 0;
+              overflow-wrap: anywhere;
+            }
+
+            .kitchen-catalog-preview,
+            .kitchen-catalog-preview--icon,
+            .kitchen-catalog-preview--empty {
+              width: 100% !important;
+              min-width: 0 !important;
+              max-width: none !important;
+              box-sizing: border-box;
+            }
+
+            .kitchen-catalog-preview {
+              min-height: 0 !important;
+              overflow: visible;
+            }
+
+            .kitchen-catalog-preview__svg {
+              width: 100% !important;
+              max-height: none;
+              overflow: visible;
+            }
+
+            .kitchen-catalog-preview__svg svg {
+              width: 100% !important;
+              height: auto !important;
+              display: block;
+            }
+
+            .kitchen-catalog-preview--icon {
+              min-height: 72px !important;
+              justify-items: start !important;
+              padding: 12px !important;
+            }
+
+            .kitchen-catalog-item-card__actions {
+              width: 100%;
+              justify-content: space-between !important;
+              align-items: center !important;
+              gap: 10px !important;
+              padding-top: 2px;
+            }
+
+            .kitchen-catalog-item-card form {
+              padding: 12px !important;
+            }
+
+            .kitchen-catalog-item-card form > div:first-child {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
       </div>
     </AdminShell>
   );

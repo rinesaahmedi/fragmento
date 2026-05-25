@@ -2351,7 +2351,8 @@ export default function ServiceClaimFlow() {
       audioRef: claimAssistantAudioRef,
       abortControllerRef: claimAssistantTtsAbortControllerRef,
       language: getClaimAssistantSpeechLanguage(),
-      fallbackRate: 0.96,
+      fallbackRate: 1.03,
+      ttsSpeed: 1.03,
     });
   }
 
