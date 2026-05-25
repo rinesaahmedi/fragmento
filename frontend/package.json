@@ -16,6 +16,9 @@
     "check:contract-project-migration": "node scripts/check-contract-project-migration.js",
     "prisma:seed": "node prisma/seed.js",
     "extract:product-info": "node scripts/extract-product-info-pdfs.js",
+    "audit:product-info": "node scripts/audit-product-info.js",
+    "propose:product-info-cleanup": "node scripts/propose-product-info-cleanup.js",
+    "apply:product-info-cleanup": "node scripts/apply-product-info-cleanup.js",
     "migrate:order-item-codes": "node scripts/migrate-order-item-codes.js",
     "seed:dashboard-demo": "node scripts/seed-dashboard-demo.js",
     "admin:create": "node scripts/create-admin.js"

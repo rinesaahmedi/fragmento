@@ -1,0 +1,83 @@
+{
+  "generatedAt": "2026-05-25T11:50:02.051Z",
+  "mutation": false,
+  "summary": {
+    "itemsScanned": 18,
+    "itemsWithProposals": 0,
+    "fieldProposals": 0,
+    "germanNormalizationChanges": 0,
+    "keyFactsFormatProposals": 0,
+    "reviewNeededCount": 0,
+    "likelyOkayCount": 4
+  },
+  "proposals": [
+    {
+      "id": "cmoh7lg6h001csn1ofjbisbr6",
+      "kitchenSlug": "kitchen-model-b",
+      "kitchenName": "Standardküche",
+      "code": "OVEN-B-600-HOB",
+      "name": "Built-in Oven and Hob (600 x 600 x 878 mm)",
+      "proposals": [],
+      "reviewNeeded": [],
+      "likelyOkay": [
+        {
+          "key": "noise",
+          "label": "noise / dB",
+          "note": "Likely okay: Oven/hob has no noise value; do not add unless documented.",
+          "severity": "likelyOkay"
+        }
+      ]
+    },
+    {
+      "id": "cmoh7lg6i001gsn1ogpmnossp",
+      "kitchenSlug": "kitchen-model-b",
+      "kitchenName": "Standardküche",
+      "code": "REF-B-545-1800-700",
+      "name": "Refrigerator (545 x 1800 x 700 mm)",
+      "proposals": [],
+      "reviewNeeded": [],
+      "likelyOkay": [
+        {
+          "key": "installationDimensions",
+          "label": "installation/niche dimensions",
+          "note": "Likely okay: Refrigerator appears to be freestanding, so installation/niche dimensions may not be required. Do not add unless documented.",
+          "severity": "likelyOkay"
+        }
+      ]
+    },
+    {
+      "id": "cmoh7lg6r001vsn1ouaehundg",
+      "kitchenSlug": "kitchen-model-c",
+      "kitchenName": "Zweiteilige Küche",
+      "code": "REF-C-545-1800-700",
+      "name": "Refrigerator (545 x 1800 x 700 mm)",
+      "proposals": [],
+      "reviewNeeded": [],
+      "likelyOkay": [
+        {
+          "key": "installationDimensions",
+          "label": "installation/niche dimensions",
+          "note": "Likely okay: Refrigerator appears to be freestanding, so installation/niche dimensions may not be required. Do not add unless documented.",
+          "severity": "likelyOkay"
+        }
+      ]
+    },
+    {
+      "id": "cmoh7lg6u0021sn1ow81r9k2z",
+      "kitchenSlug": "kitchen-model-c",
+      "kitchenName": "Zweiteilige Küche",
+      "code": "OVEN-C-600-HOB",
+      "name": "Built-in Oven and Hob (600 x 600 x 878 mm)",
+      "proposals": [],
+      "reviewNeeded": [],
+      "likelyOkay": [
+        {
+          "key": "noise",
+          "label": "noise / dB",
+          "note": "Likely okay: Oven/hob has no noise value; do not add unless documented.",
+          "severity": "likelyOkay"
+        }
+      ]
+    }
+  ]
+}

@@ -589,7 +589,7 @@ function formatCookingZonesEntry(item, language) {
   return `${getPublicItemName(item, language)}: ${label}: ${value}`;
 }
 
-function getProgramOrFeatureValue(item) {
+function getProgramOrFeatureValue(item, question = "") {
   const typeLabel = getPublicTypeLabelForModel(extractKnownModel(item), item, "en");
   if (typeLabel === "Dishwasher") {
     const line = findLabeledInfoLine(item, /(programs?|programmes?|programme)/i, /\b\d{1,2}\b/);
@@ -597,9 +597,18 @@ function getProgramOrFeatureValue(item) {
     if (match) return match[0];
   }
 
+  if (/\b(functions?|features?|funktionen|zusatzfunktionen)\b/i.test(String(question || ""))) {
+    const functionLine = findLabeledInfoLine(
+      item,
+      /(additional functions?|zusatzfunktionen|functions?|funktionen)/i,
+      /:\s*\S/,
+    );
+    if (functionLine) return getLabelValueFromLine(functionLine);
+  }
+
   const line = findLabeledInfoLine(
     item,
-    /(programs?|programmes?|features?|functions?|programme|funktionen|ausstattung)/i,
+    /(programs?|programmes?|features?|functions?|programme|funktionen|zusatzprogramme|zusatzfunktionen|ausstattung)/i,
     /:\s*\S/,
   );
   return getLabelValueFromLine(line);
@@ -636,8 +645,8 @@ function normalizeProgramOrFeatureValue(value, language) {
   return text;
 }
 
-function formatProgramOrFeatureEntry(item, language) {
-  const value = getProgramOrFeatureValue(item);
+function formatProgramOrFeatureEntry(item, language, question = "") {
+  const value = getProgramOrFeatureValue(item, question);
   if (!value) return "";
 
   const label = language === "de" ? "Programme/Funktionen" : "Programs/features";
@@ -1153,6 +1162,10 @@ function formatCompactDimensionRecords(records) {
       return [`- ${subject}`, ...entries.map((entry) => `  ${entry.label}: ${entry.value}`)].join("\n");
     })
     .join("\n");
+}
+
+function formatCompactEnglishDimensionRecords(records) {
+  return formatCompactDimensionRecords(records);
 }
 
 function formatCompactDimensionEntryByLanguage(name, dimensions, language) {
@@ -2457,6 +2470,69 @@ function answerForRequestedSubProductDimensions(question, items, language) {
   };
 }
 
+function answerForRequestedSubProductsDimensions(question, items, language) {
+  const requestedSubProducts = detectRequestedSubProducts(question);
+  if (requestedSubProducts.length < 2 || items.length !== 1) return null;
+
+  const item = items[0];
+  const entries = requestedSubProducts
+    .map((subProduct) => {
+      const lines = extractSubProductDimensionLines(item, subProduct);
+      if (!lines.length) return null;
+      const publicName = getSubProductPublicName(item, subProduct, language);
+      if (language === "de") {
+        return [
+          `- ${publicName}:`,
+          ...lines.map((line) => `  ${normalizeDimensionLabel(line, language)}`),
+        ].join("\n");
+      }
+      return formatCompactEnglishDimensionRecords(lines
+        .map((line) => normalizeDimensionLabel(line, "en"))
+        .map((line) => compactEnglishDimensionRecord(line, getCompactDimensionName(publicName)))
+        .filter(Boolean));
+    })
+    .filter(Boolean);
+
+  if (!entries.length) return null;
+
+  return {
+    answer: language === "de"
+      ? `Ich habe diese dokumentierten Maße gefunden:\n\n${entries.join("\n\n")}`
+      : `I found these documented dimensions:\n\n${entries.join("\n")}\n\n${getEnglishDimensionFormatNote()}`,
+    found: true,
+  };
+}
+
+function answerForRequestedSubProductsFeatures(question, items, language) {
+  const requestedSubProducts = detectRequestedSubProducts(question);
+  if (requestedSubProducts.length < 2 || items.length !== 1) return null;
+  if (!/\b(?:programs?|programmes?|features?|functions?|cooking zones?|zones?|programme|funktionen|kochzonen?)\b/i.test(String(question || ""))) return null;
+
+  const item = items[0];
+  const entries = requestedSubProducts
+    .map((subProduct) => {
+      const lines = getGroupedSubProductContent(item, subProduct)
+        .filter((line) =>
+          /(functions?|features?|programs?|programme|funktionen|kochzonen?|cooking zones?|leistungsstufen|power levels|zonen|zones)/i.test(line),
+        );
+      if (!lines.length) return null;
+      const value = lines
+        .map((line) => normalizeProgramOrFeatureValue(line, language))
+        .join("; ");
+      return `${getSubProductPublicName(item, subProduct, language)}: ${value}`;
+    })
+    .filter(Boolean);
+
+  if (!entries.length) return null;
+
+  return {
+    answer: language === "de"
+      ? formatSectionWithBullets("Die dokumentierten Programme/Funktionen sind:", entries)
+      : formatSectionWithBullets("The documented programs/features are:", entries),
+    found: true,
+  };
+}
+
 function answerForInstallationDistanceRefusal(question, items, language) {
   if (!/(mounting\s+distance|required\s+distance|distance\s+above\s+the\s+hob|installation\s+distance|mindestabstand|montageabstand|abstand)/i.test(String(question || ""))) {
     return null;
@@ -2554,12 +2630,11 @@ function extractInstallationDimensionsStrict(item) {
 function answerFromExplicitMultiItemEnergyFacts(question, items, language, answeredTopics = new Set()) {
   const value = String(question || "").toLowerCase();
   const notFoundAnswer = EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en;
-  const missingSubProductAnswer = answerForRequestedSubProductEnergy(question, items, language);
-  if (missingSubProductAnswer) return missingSubProductAnswer;
   const scopedItems = scopeItemsForQuestion(items, question);
 
   const asksWaterConsumptionOnly = /\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value);
   const asksConsumptionOnly = /(consumption|verbrauch|kwh)/i.test(value) && !ENERGY_QUESTION_PATTERN.test(value);
+  const asksEnergy = ENERGY_QUESTION_PATTERN.test(value);
 
   if (asksWaterConsumptionOnly) {
     const entries = scopedItems
@@ -2580,8 +2655,13 @@ function answerFromExplicitMultiItemEnergyFacts(question, items, language, answe
     };
   }
 
-  if (!ENERGY_QUESTION_PATTERN.test(value) && !asksConsumptionOnly) {
+  if (!asksEnergy && !asksConsumptionOnly) {
     return null;
+  }
+
+  if (asksEnergy) {
+    const missingSubProductAnswer = answerForRequestedSubProductEnergy(question, items, language);
+    if (missingSubProductAnswer) return missingSubProductAnswer;
   }
 
   if (shouldUseModelForEnergyAnswer(scopedItems)) {
@@ -2699,21 +2779,23 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
     };
   }
 
-  if (/\b(?:liter|litre|liters|litres|volume|nutzinhalt|volumen)\b|\bl\b/i.test(value)) {
+  if (/\b(?:liter|litre|liters|litres|volume|capacity|nutzinhalt|volumen|kapazität|kapazitaet)\b|\bl\b/i.test(value)) {
     const entries = scopedItems
       .map((item) => formatLiterSpecEntry(item, language))
       .filter(Boolean);
 
-    if (!entries.length) {
-      return { answer: notFoundAnswer, found: false };
+    if (entries.length) {
+      return {
+        answer: language === "de"
+          ? formatSectionWithBullets("Die dokumentierten Liter-Angaben sind:", entries)
+          : formatSectionWithBullets("The documented litre values are:", entries),
+        found: true,
+      };
     }
 
-    return {
-      answer: language === "de"
-        ? formatSectionWithBullets("Die dokumentierten Liter-Angaben sind:", entries)
-        : formatSectionWithBullets("The documented litre values are:", entries),
-      found: true,
-    };
+    if (!/\b(?:capacity|kapazität|kapazitaet)\b/i.test(value)) {
+      return { answer: notFoundAnswer, found: false };
+    }
   }
 
   if (/(consumption|verbrauch|kwh|energy use|energieverbrauch|stromverbrauch)/i.test(value)) {
@@ -2788,9 +2870,31 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
     };
   }
 
-  if (/\b(?:programs?|programmes?|features?|functions?|programme|funktionen)\b/i.test(value)) {
+  if (/\bsteam\s*wash\b/i.test(value)) {
     const entries = scopedItems
-      .map((item) => formatProgramOrFeatureEntry(item, language))
+      .filter((item) => /steam\s*wash/i.test(getCombinedItemInfoText(item)))
+      .map((item) => `${getPublicItemName(item, language)}: Steam Wash`);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Dokumentiert:", entries)
+        : formatSectionWithBullets("Documented:", entries),
+      found: true,
+    };
+  }
+
+  if (/\b(?:programs?|programmes?|features?|functions?|programme|funktionen)\b/i.test(value)) {
+    const requestedSubProductsFeatures = answerForRequestedSubProductsFeatures(question, items, language);
+    if (requestedSubProductsFeatures) {
+      return requestedSubProductsFeatures;
+    }
+
+    const entries = scopedItems
+      .map((item) => formatProgramOrFeatureEntry(item, language, question))
       .filter(Boolean);
 
     if (!entries.length) {
@@ -2830,6 +2934,42 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
   }
 
   if (/(installation dimensions|dimensions|dimesnions|dimensons|dimentions|dimmensions|measurements|mesurements|how big|size|width|height|depth|abmessungen|ma[sß]e|nischenmass|nischenma[sß]e|einbaumass|einbauma[sß]e|breite|höhe|hoehe|tiefe)/i.test(value)) {
+    const asksOnlyInstallationOrNiche = /(installation dimensions|niche dimensions|nischenmass|nischenma(?:ß|ss)e|einbaumass|einbauma(?:ß|ss)e|einbau|niche)/i.test(value);
+    if (asksOnlyInstallationOrNiche) {
+      const entries = scopedItems
+        .map((item) => {
+          const dimensions = extractInstallationDimensionsStrict(item);
+          const lines = splitDocumentedDimensionLines(dimensions).filter((line) =>
+            /(niche dimensions|installation dimensions|cut-out dimensions|nischenma(?:ß|ss)e|einbauma(?:ß|ss)e|ausschnittma(?:ß|ss)e)/i.test(line),
+          );
+          if (!lines.length) return null;
+          const normalizedLines = lines.map((line) => normalizeDimensionLabel(line, language));
+          if (language === "de") {
+            return [`- ${getCompactDimensionName(getPublicItemName(item, language))}:`, ...normalizedLines.map((line) => `  ${line}`)].join("\n");
+          }
+          return formatCompactEnglishDimensionRecords(normalizedLines
+            .map((line) => compactEnglishDimensionRecord(line, getCompactDimensionName(getPublicItemName(item, language))))
+            .filter(Boolean));
+        })
+        .filter(Boolean);
+
+      if (!entries.length) {
+        return { answer: notFoundAnswer, found: false };
+      }
+
+      return {
+        answer: language === "de"
+          ? `Ich habe diese dokumentierten Einbau- oder Nischenmaße gefunden:\n\n${entries.join("\n\n")}`
+          : `I found these documented installation or niche dimensions:\n\n${entries.join("\n")}\n\n${getEnglishDimensionFormatNote()}`,
+        found: true,
+      };
+    }
+
+    const requestedSubProductsDimensions = answerForRequestedSubProductsDimensions(question, items, language);
+    if (requestedSubProductsDimensions) {
+      return requestedSubProductsDimensions;
+    }
+
     const requestedSubProductDimensions = answerForRequestedSubProductDimensions(question, items, language);
     if (requestedSubProductDimensions) {
       return requestedSubProductDimensions;
@@ -3009,6 +3149,16 @@ function answerFromStructuredFacts(question, items, language) {
 
   const name = item.name || (language === "de" ? "Das Produkt" : "The product");
   const yes = language === "de" ? "Ja." : "Yes.";
+  const combinedInfoText = getCombinedItemInfoText(item);
+
+  if (/steam\s*wash/i.test(value) && /steam\s*wash/i.test(combinedInfoText)) {
+    return {
+      answer: language === "de"
+        ? `${yes} Steam Wash ist in den Produktinformationen dokumentiert.`
+        : `${yes} Steam Wash is documented in the product information.`,
+      found: true,
+    };
+  }
 
   const checks = [
     {
