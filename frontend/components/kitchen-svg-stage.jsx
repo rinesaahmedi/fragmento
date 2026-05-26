@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
+import Kitchen3DViewer from "./Kitchen3DViewer";
 import {
   componentIdForItem,
   normalizeColor,
@@ -26,13 +27,23 @@ export default function KitchenSvgStage({
 }) {
   const { translate } = usePublicI18n();
   const svgHostRef = useRef(null);
+  const has3dModel = kitchenSlug === "test-3d-kitchen";
+  const [activeView, setActiveView] = useState("2d");
   const resolvedSvgMarkup = useMemo(
     () => applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug),
     [kitchenConfig.kitchen.slug, svgMarkup],
   );
   const fixedComponentIdsKey = fixedComponentIds.join("|");
+  const componentIds = useMemo(
+    () => new Set(kitchenConfig.components.map((item) => componentIdForItem(item))),
+    [kitchenConfig.components],
+  );
 
   useEffect(() => {
+    if (activeView !== "2d") {
+      return undefined;
+    }
+
     const host = svgHostRef.current;
     const svg = syncKitchenPlan({
       host,
@@ -69,6 +80,7 @@ export default function KitchenSvgStage({
     kitchenConfig,
     kitchenSlug,
     fixedComponentIds,
+    activeView,
     planViewport,
     resolvedSvgMarkup,
     selectedComponentIds,
@@ -76,12 +88,16 @@ export default function KitchenSvgStage({
   ]);
 
   useEffect(() => {
+    if (activeView !== "2d") {
+      return;
+    }
+
     refreshKitchenPlanSelection({
       host: svgHostRef.current,
       selectedComponentIds,
       lockedComponentIds: fixedComponentIds,
     });
-  }, [fixedComponentIdsKey, selectedComponentIds, fixedComponentIds]);
+  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds]);
 
   return (
     <div className={styles.stage}>
@@ -90,32 +106,84 @@ export default function KitchenSvgStage({
           <p className={styles.eyebrow}>{translate("configurator.stageEyebrow", "Plan")}</p>
           <h2>{translate("configurator.stageTitle", "Plan your kitchen")}</h2>
         </div>
-        <button type="button" className={styles.ghostButton} onClick={onResetSelection}>
-          {translate("configurator.resetSelection", "Reset selection")}
-        </button>
+        <div className={styles.stageHeaderActions}>
+          {has3dModel ? (
+            <div className={styles.viewToggle} role="tablist" aria-label="Kitchen preview view">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeView === "2d"}
+                className={activeView === "2d" ? styles.viewToggleButtonActive : styles.viewToggleButton}
+                onClick={() => setActiveView("2d")}
+              >
+                2D View
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeView === "3d"}
+                className={activeView === "3d" ? styles.viewToggleButtonActive : styles.viewToggleButton}
+                onClick={() => setActiveView("3d")}
+              >
+                3D View
+              </button>
+            </div>
+          ) : null}
+          <button type="button" className={styles.ghostButton} onClick={onResetSelection}>
+            {translate("configurator.resetSelection", "Reset selection")}
+          </button>
+        </div>
       </div>
       <div className={styles.stageBody}>
-        <div className={styles.svgCard}>
-          <div
-            ref={svgHostRef}
-            className={[
-              styles.svgCanvas,
-              planViewport?.canvasClassName === "wide" ? styles.svgCanvasWide : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          />
-        </div>
-        <div className={styles.stageLegend}>
-          <span className={styles.legendChip}>
-            <span className={styles.legendSwatch} />
-            {translate("configurator.stageLegendClick", "Click in the plan or choose on the right")}
-          </span>
-          <span className={styles.legendChip}>
-            <span className={styles.legendDot} />
-            {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
-          </span>
-        </div>
+        {has3dModel && activeView === "3d" ? (
+          <>
+            <Kitchen3DViewer
+              components={kitchenConfig.components}
+              componentIds={componentIds}
+              fixedComponentIds={fixedComponentIds}
+              selectedComponentIds={selectedComponentIds}
+              onToggleComponent={(componentId) => {
+                setSelectedComponentIds((current) =>
+                  toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
+                );
+              }}
+            />
+            <div className={styles.stageLegend}>
+              <span className={styles.legendChip}>
+                <span className={styles.legendSwatch} />
+                Click parts in the 3D preview or choose on the right
+              </span>
+              <span className={styles.legendChip}>
+                <span className={styles.legendDot} />
+                Fixed parts always remain active
+              </span>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.svgCard}>
+              <div
+                ref={svgHostRef}
+                className={[
+                  styles.svgCanvas,
+                  planViewport?.canvasClassName === "wide" ? styles.svgCanvasWide : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+              />
+            </div>
+            <div className={styles.stageLegend}>
+              <span className={styles.legendChip}>
+                <span className={styles.legendSwatch} />
+                {translate("configurator.stageLegendClick", "Click in the plan or choose on the right")}
+              </span>
+              <span className={styles.legendChip}>
+                <span className={styles.legendDot} />
+                {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
+              </span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

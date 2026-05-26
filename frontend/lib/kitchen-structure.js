@@ -18,6 +18,28 @@ const KNOWN_KITCHEN_STRUCTURES = {
       { componentKey: "sink-faucet", label: "Sink faucet", zone: "Work surface", compatibleKinds: ["sink-faucet"] },
     ],
   },
+  "test-3d-kitchen": {
+    slots: [
+      { componentKey: "t3d-wall-1", label: "TEST 3D wall cabinet 1", zone: "Upper run", compatibleKinds: ["wall-cabinet"] },
+      { componentKey: "t3d-wall-2", label: "TEST 3D wall cabinet 2", zone: "Upper run", compatibleKinds: ["wall-cabinet"] },
+      { componentKey: "t3d-wall-3", label: "TEST 3D wall cabinet 3", zone: "Upper run", compatibleKinds: ["wall-cabinet"] },
+      { componentKey: "t3d-wall-4", label: "TEST 3D wall cabinet 4", zone: "Upper run", compatibleKinds: ["wall-cabinet"] },
+      { componentKey: "t3d-wall-5", label: "TEST 3D wall cabinet 5", zone: "Upper run", compatibleKinds: ["wall-cabinet"] },
+      { componentKey: "t3d-light", label: "TEST 3D under-cabinet light", zone: "Lighting", compatibleKinds: ["under-cabinet-light"] },
+      { componentKey: "t3d-washer", label: "TEST 3D washing machine", zone: "Main lower run", compatibleKinds: ["washing-machine-base"] },
+      { componentKey: "t3d-sink-base", label: "TEST 3D sink base", zone: "Main lower run", compatibleKinds: ["sink-base"] },
+      { componentKey: "t3d-dishwasher", label: "TEST 3D dishwasher", zone: "Main lower run", compatibleKinds: ["dishwasher-base"] },
+      { componentKey: "t3d-oven", label: "TEST 3D oven base", zone: "Main lower run", compatibleKinds: ["oven-base"] },
+      { componentKey: "t3d-storage", label: "TEST 3D storage base", zone: "Main lower run", compatibleKinds: ["drawer-base-2"] },
+      { componentKey: "t3d-worktop-main", label: "TEST 3D main worktop", zone: "Work surface", compatibleKinds: ["worktop"] },
+      { componentKey: "t3d-sink", label: "TEST 3D sink", zone: "Work surface", compatibleKinds: ["sink-faucet"] },
+      { componentKey: "t3d-hood", label: "TEST 3D extractor hood", zone: "Upper run", compatibleKinds: ["extractor-hood"] },
+      { componentKey: "t3d-corner", label: "TEST 3D corner base", zone: "Return lower run", compatibleKinds: ["drawer-base-2"] },
+      { componentKey: "t3d-base", label: "TEST 3D return base", zone: "Return lower run", compatibleKinds: ["drawer-base-2"] },
+      { componentKey: "t3d-drawers", label: "TEST 3D return drawers", zone: "Return lower run", compatibleKinds: ["drawer-base-3"] },
+      { componentKey: "t3d-worktop-return", label: "TEST 3D return worktop", zone: "Work surface", compatibleKinds: ["worktop"] },
+    ],
+  },
   "kitchen-model-c": {
     slots: [
       { componentKey: "refrigerator", label: "Tall refrigerator", zone: "Tall units", compatibleKinds: ["refrigerator"] },

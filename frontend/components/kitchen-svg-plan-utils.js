@@ -9,6 +9,8 @@ export const PLAN_VIEWPORT_BY_SLUG = {
 const BASE_PLAN_STROKE = "#8f877d";
 const SELECTED_PLAN_STROKE = "#000000";
 const SELECTED_MUTED_APPLIANCE_STROKE = "#374151";
+const TEST_3D_PLAN_STROKE = "#e9eeeb";
+const TEST_3D_SELECTED_PLAN_STROKE = "#ffffff";
 
 const PLAN_COMPONENT_BOUNDS = {
   "component-wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
@@ -26,6 +28,24 @@ const PLAN_COMPONENT_BOUNDS = {
   "component-refrigerator": { x: 670, y: 270, width: 76, height: 250 },
   "component-sink-faucet": { x: 374, y: 364, width: 10, height: 29 },
   "component-worktop": { x: 236, y: 392, width: 421, height: 7 },
+  "component-t3d-wall-1": { x: 132, y: 68, width: 92, height: 140 },
+  "component-t3d-wall-2": { x: 198, y: 68, width: 92, height: 140 },
+  "component-t3d-wall-3": { x: 264, y: 68, width: 92, height: 140 },
+  "component-t3d-wall-4": { x: 330, y: 68, width: 92, height: 140 },
+  "component-t3d-wall-5": { x: 396, y: 68, width: 92, height: 140 },
+  "component-t3d-light": { x: 170, y: 235, width: 276, height: 37 },
+  "component-t3d-hood": { x: 414, y: 258, width: 70, height: 36 },
+  "component-t3d-washer": { x: 92, y: 350, width: 88, height: 132 },
+  "component-t3d-sink-base": { x: 180, y: 350, width: 88, height: 132 },
+  "component-t3d-dishwasher": { x: 268, y: 350, width: 88, height: 132 },
+  "component-t3d-oven": { x: 356, y: 350, width: 88, height: 132 },
+  "component-t3d-storage": { x: 444, y: 350, width: 92, height: 132 },
+  "component-t3d-worktop-main": { x: 92, y: 304, width: 474, height: 46 },
+  "component-t3d-sink": { x: 188, y: 276, width: 98, height: 58 },
+  "component-t3d-corner": { x: 536, y: 270, width: 84, height: 80 },
+  "component-t3d-base": { x: 620, y: 270, width: 84, height: 80 },
+  "component-t3d-drawers": { x: 704, y: 270, width: 84, height: 80 },
+  "component-t3d-worktop-return": { x: 536, y: 224, width: 282, height: 46 },
 };
 
 function getPlanBounds(group, componentId) {
@@ -159,8 +179,16 @@ export function applyGroupVisualState(group, { selected, locked }) {
   if (!group) return;
 
   const isActive = selected || locked;
-  const emphasisStroke = isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE;
-  const emphasisWidth = isActive ? "3.2" : "";
+  const componentId = group.getAttribute("data-component-id") || "";
+  const isTest3dComponent = componentId.startsWith("component-t3d-");
+  const emphasisStroke = isTest3dComponent
+    ? isActive
+      ? TEST_3D_SELECTED_PLAN_STROKE
+      : TEST_3D_PLAN_STROKE
+    : isActive
+      ? SELECTED_PLAN_STROKE
+      : BASE_PLAN_STROKE;
+  const emphasisWidth = isActive ? (isTest3dComponent ? "1.8" : "3.2") : "";
 
   group.style.setProperty("opacity", "1", "important");
   group.style.setProperty("filter", "none", "important");
@@ -225,9 +253,22 @@ export function applyGroupVisualState(group, { selected, locked }) {
     if (element.tagName === "text") {
       element.style.setProperty(
         "fill",
-        isMutedApplianceLabel(element) ? BASE_PLAN_STROKE : isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE,
+        isTest3dComponent
+          ? TEST_3D_PLAN_STROKE
+          : isMutedApplianceLabel(element)
+            ? BASE_PLAN_STROKE
+            : isActive
+              ? SELECTED_PLAN_STROKE
+              : BASE_PLAN_STROKE,
         "important",
       );
+    } else if (
+      isTest3dComponent &&
+      element.dataset.originalFill &&
+      element.dataset.originalFill !== "none" &&
+      element.dataset.originalFill !== "white"
+    ) {
+      element.style.setProperty("fill", element.dataset.originalFill, "important");
     } else if (element.dataset.originalFill && element.dataset.originalFill !== "none" && element.dataset.originalFill !== "white") {
       element.style.setProperty("fill", isActive ? SELECTED_PLAN_STROKE : BASE_PLAN_STROKE, "important");
     } else if (element.dataset.originalFill) {
