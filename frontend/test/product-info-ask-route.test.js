@@ -4,14 +4,20 @@ const path = require("node:path");
 const test = require("node:test");
 
 const routePath = path.join(__dirname, "..", "app", "api", "product-info", "ask", "route.js");
+const routeCorePath = path.join(__dirname, "..", "lib", "product-info-ask.js");
 const configuratorPath = path.join(__dirname, "..", "components", "kitchen-configurator.js");
 const publicEnPath = path.join(__dirname, "..", "locales", "public.en.json");
 
-function loadRoute(overrides = {}) {
-  const source = fs
-    .readFileSync(routePath, "utf8")
-    .replace(/^import .*;\r?\n/gm, "")
+function loadModuleSource(filePath) {
+  return fs
+    .readFileSync(filePath, "utf8")
+    .replace(/^import[\s\S]*?;\r?\n/gm, "")
+    .replace(/export\s+\{[\s\S]*?\};\r?\n?/g, "")
     .replace("export async function POST", "async function POST");
+}
+
+function loadRoute(overrides = {}) {
+  const source = `${loadModuleSource(routeCorePath)}\n${loadModuleSource(routePath)}`;
 
   const NextResponse = overrides.NextResponse || {
     json(body, init = {}) {
@@ -75,6 +81,29 @@ function request(payload) {
   };
 }
 
+async function withExpectedRouteErrorLog(expectedMessage, callback) {
+  const originalError = console.error;
+  const captured = [];
+
+  console.error = (...args) => {
+    const [label, error] = args;
+    const message = error instanceof Error ? error.message : String(error || "");
+    if (label === "Product info assistant failed:" && message.includes(expectedMessage)) {
+      captured.push(message);
+      return;
+    }
+
+    originalError(...args);
+  };
+
+  try {
+    return await callback();
+  } finally {
+    console.error = originalError;
+    assert.equal(captured.length, 1);
+  }
+}
+
 function product(overrides = {}) {
   return {
     id: "item-1",
@@ -101,7 +130,10 @@ test("all-products UI copy uses plural wording", () => {
 });
 
 test("product info route source has no corrupted UTF-8 markers", () => {
-  const routeSource = fs.readFileSync(routePath, "utf8");
+  const routeSource = [
+    fs.readFileSync(routePath, "utf8"),
+    fs.readFileSync(routeCorePath, "utf8"),
+  ].join("\n");
   assert.doesNotMatch(routeSource, new RegExp(String.fromCharCode(0x00c3)));
 });
 
@@ -150,13 +182,16 @@ test("POST rejects itemIds that are not active and authorized for the contract k
     },
   });
 
-  const response = await route.POST(request({
-    language: "en",
-    question: "What is the energy class?",
-    contractNumber: "CON-1",
-    kitchenSlug: "demo-kitchen",
-    itemIds: ["bad-item"],
-  }));
+  const response = await withExpectedRouteErrorLog(
+    "No authorized active product items were found.",
+    () => route.POST(request({
+      language: "en",
+      question: "What is the energy class?",
+      contractNumber: "CON-1",
+      kitchenSlug: "demo-kitchen",
+      itemIds: ["bad-item"],
+    })),
+  );
 
   assert.equal(response.status, 404);
   assert.equal(response.body.ok, false);
@@ -165,13 +200,16 @@ test("POST rejects itemIds that are not active and authorized for the contract k
 test("POST rejects contract kitchen mismatch", async () => {
   const route = loadRoute();
 
-  const response = await route.POST(request({
-    language: "en",
-    question: "What is the model?",
-    contractNumber: "CON-1",
-    kitchenSlug: "other-kitchen",
-    itemIds: ["item-1"],
-  }));
+  const response = await withExpectedRouteErrorLog(
+    "Contract number does not match the selected kitchen.",
+    () => route.POST(request({
+      language: "en",
+      question: "What is the model?",
+      contractNumber: "CON-1",
+      kitchenSlug: "other-kitchen",
+      itemIds: ["item-1"],
+    })),
+  );
 
   assert.equal(response.status, 403);
   assert.equal(response.body.ok, false);
