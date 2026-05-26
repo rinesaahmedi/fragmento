@@ -138,6 +138,7 @@ const TOPIC_PATTERNS = {
 
 function detectTopic(question) {
   const value = String(question || "");
+  if (/(opendry|open\s*dry|startzeit|zeitvorwahl|extra\s*trocknen|extra\s*dry|halbbeladung|aquastop|aquastopp)/i.test(value)) return "features";
   if (TOPIC_PATTERNS.energy.test(value)) return "energy";
   if (TOPIC_PATTERNS.consumption.test(value)) return "consumption";
   if (TOPIC_PATTERNS.noise.test(value)) return "noise";
@@ -282,7 +283,7 @@ function getMetaOrUnsupportedRouteAnswer(question, language) {
     };
   }
 
-  if (/(weather|president|capital of|stock price|football|soccer|basketball|tennis|sports?|game yesterday|who won|news|politics|election|wetter|präsident|praesident|hauptstadt|aktienkurs|fußball|fussball|sport|spiel.*gestern|wer hat gewonnen|nachrichten|politik|wahl)/i.test(value)) {
+  if (/(weather|president|capital of|stock price|football|soccer|basketball|tennis|sports?|game yesterday|who won|news|politics|election|wetter|präsident|praesident|hauptstadt|aktienkurs|fußball|fussball|sport|spiel.*gestern|wer hat gewonnen|nachrichten|politik|\bwahl\b)/i.test(value)) {
     return {
       answer: language === "de"
         ? "Ich kann nur Fragen zu den ausgewählten Produktinformationen beantworten."
@@ -2599,11 +2600,11 @@ function extractInstallationDimensions(item) {
 }
 
 function extractNoiseValueStrict(item) {
-  const factValue = getFactValue(item, /^(geraeusch|geräusch|schallleistung|noise)\s*:/i);
+  const factValue = getFactValue(item, /^(geraeusch|geräusch|schallleistung|luftschallemission|noise)\s*:/i);
   if (factValue) return factValue;
 
   const line = getItemInfoLines(item).find((entry) =>
-    /(geraeusch|geräusch|schallleistung|noise|sound\s+power|lautstärke|lautstaerke|decibels?|\blaut\b)/i.test(entry)
+    /(geraeusch|geräusch|schallleistung|luftschallemission|noise|sound\s+power|lautstärke|lautstaerke|decibels?|\blaut\b)/i.test(entry)
     && /\b\d{2,3}(?:\s*-\s*\d{2,3})?\s*dB(?:\(A\))?\b/i.test(entry),
   );
   const match = line?.match(/\b\d{2,3}(?:\s*-\s*\d{2,3})?\s*dB(?:\(A\))?\b/i);
@@ -2627,12 +2628,58 @@ function extractInstallationDimensionsStrict(item) {
   return factMatches.length ? factMatches.join(", ") : "";
 }
 
+const NAMED_FEATURE_PATTERNS = [
+  { label: "OpenDry", query: /\bopen\s*dry\b|\bopendry\b/i, source: /\bopen\s*dry\b|\bopendry\b/i },
+  { label: "Startzeitvorwahl", query: /startzeit|zeitvorwahl|delay|timer/i, source: /startzeit|zeitvorwahl|delay|timer/i },
+  { label: "Extra trocknen", query: /extra\s*trocknen|extra\s*dry/i, source: /extra\s*trocknen|extra\s*dry/i },
+  { label: "Halbbeladung", query: /halbbeladung|half\s*load/i, source: /halbbeladung|half\s*load/i },
+  { label: "Aquastopp", query: /aquastop|aquastopp/i, source: /aquastop|aquastopp/i },
+];
+
+function getFeatureSupportLine(item, pattern) {
+  return getDocumentedFactLines(item)
+    .find((line) => pattern.test(line)) || "";
+}
+
+function answerFromNamedDocumentedFeatures(question, items, language) {
+  const requestedFeatures = NAMED_FEATURE_PATTERNS.filter((feature) => feature.query.test(String(question || "")));
+  if (!requestedFeatures.length) return null;
+
+  const entries = items
+    .map((item) => {
+      const foundFeatures = requestedFeatures
+        .map((feature) => {
+          const supportLine = getFeatureSupportLine(item, feature.source);
+          return supportLine ? `${feature.label}${supportLine.includes(":") ? ` (${supportLine})` : ""}` : "";
+        })
+        .filter(Boolean);
+
+      return foundFeatures.length ? `${getPublicItemName(item, language)}: ${foundFeatures.join("; ")}` : null;
+    })
+    .filter(Boolean);
+
+  if (!entries.length) {
+    return {
+      answer: EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en,
+      found: false,
+    };
+  }
+
+  return {
+    answer: language === "de"
+      ? formatSectionWithBullets("Ja, dokumentiert:", entries)
+      : formatSectionWithBullets("Yes, documented:", entries),
+    found: true,
+  };
+}
+
 function answerFromExplicitMultiItemEnergyFacts(question, items, language, answeredTopics = new Set()) {
   const value = String(question || "").toLowerCase();
   const notFoundAnswer = EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE[language] || EXACT_UNSUPPORTED_FACT_ANSWER_BY_LANGUAGE.en;
   const scopedItems = scopeItemsForQuestion(items, question);
 
-  const asksWaterConsumptionOnly = /\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value);
+  const asksEnergyConsumption = /\b(?:energy consumption|energieverbrauch|stromverbrauch|kwh)\b/i.test(value);
+  const asksWaterConsumptionOnly = /\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value) && !asksEnergyConsumption;
   const asksConsumptionOnly = /(consumption|verbrauch|kwh)/i.test(value) && !ENERGY_QUESTION_PATTERN.test(value);
   const asksEnergy = ENERGY_QUESTION_PATTERN.test(value);
 
@@ -2736,6 +2783,8 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
   const installationDistanceRefusal = answerForInstallationDistanceRefusal(question, items, language);
   if (installationDistanceRefusal) return installationDistanceRefusal;
   const scopedItems = scopeItemsForQuestion(items, question);
+  const asksProgramsOrFeatures = /\b(?:programs?|programmes?|features?|functions?|programme|funktionen)\b/i.test(value);
+  const asksNoise = /(noise|sound|loud|geraeusch|gerÃ¤usch|lautstÃ¤rke|lautstaerke|luftschallemission|dezibel|dezi(?:bel)?|decibels?|\blaut\b|db\b|dba\b)/i.test(value);
 
   if (WARRANTY_QUESTION_PATTERN.test(value)) {
     const entries = scopedItems
@@ -2760,7 +2809,7 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
     };
   }
 
-  if (/\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value)) {
+  if (/\b(?:water|watter|water use|water consumption|wasserverbrauch|how much water)\b/i.test(value) && !/\b(?:energy consumption|energieverbrauch|stromverbrauch|kwh)\b/i.test(value)) {
     const entries = scopedItems
       .flatMap((item) => getEnergyAnswerRecords(item, language))
       .filter((record) => record.waterConsumption)
@@ -2887,7 +2936,33 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
     };
   }
 
-  if (/\b(?:programs?|programmes?|features?|functions?|programme|funktionen)\b/i.test(value)) {
+  if (asksProgramsOrFeatures && asksNoise) {
+    const entries = scopedItems
+      .map((item) => {
+        const features = formatProgramOrFeatureEntry(item, language, question);
+        const noise = extractNoiseValueStrict(item);
+        const noiseText = noise ? `${language === "de" ? "Geraeusch" : "Noise"}: ${noise}` : "";
+        const parts = [features, noiseText].filter(Boolean);
+        return parts.length ? parts.join("; ") : null;
+      })
+      .filter(Boolean);
+
+    if (!entries.length) {
+      return { answer: notFoundAnswer, found: false };
+    }
+
+    return {
+      answer: language === "de"
+        ? formatSectionWithBullets("Die dokumentierten Programme/Funktionen und Geraeuschwerte sind:", entries)
+        : formatSectionWithBullets("The documented programs/features and noise values are:", entries),
+      found: true,
+    };
+  }
+
+  const namedFeatureAnswer = answerFromNamedDocumentedFeatures(question, scopedItems, language);
+  if (namedFeatureAnswer) return namedFeatureAnswer;
+
+  if (asksProgramsOrFeatures) {
     const requestedSubProductsFeatures = answerForRequestedSubProductsFeatures(question, items, language);
     if (requestedSubProductsFeatures) {
       return requestedSubProductsFeatures;
@@ -2909,7 +2984,7 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
     };
   }
 
-  if (/(noise|sound|loud|geraeusch|geräusch|lautstärke|lautstaerke|luftschallemission|dezibel|dezi(?:bel)?|decibels?|\blaut\b|db\b|dba\b)/i.test(value)) {
+  if (asksNoise) {
     const entries = scopedItems
       .map((item) => {
         const noise = extractNoiseValueStrict(item);

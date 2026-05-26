@@ -23,6 +23,7 @@ import {
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
+import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -233,37 +234,16 @@ function ChatbotReadinessStatus({ item }) {
 
 function KeyFactsGuidance({ keyFacts }) {
   const warning = getKeyFactsQuality(keyFacts);
-
-  return (
-    <div style={keyFactsGuidanceStyle}>
-      <p style={productInfoHelpTextStyle}>
-        <AdminText
-          i18nKey="kitchenDetailAdmin.keyFactsFormatHelp"
-          fallback="Add one fact per line in Subject label: value or Label: value format."
-        />
-      </p>
-      <ul style={keyFactsExamplesStyle}>
-        <li><AdminText i18nKey="kitchenDetailAdmin.keyFactExampleBackofenEnergyClass" fallback="Backofen energy class: A" /></li>
-        <li><AdminText i18nKey="kitchenDetailAdmin.keyFactExampleBackofenEnergyConsumption" fallback="Backofen energy consumption: 0.99 kWh conventional / 0.83 kWh hot air" /></li>
-        <li><AdminText i18nKey="kitchenDetailAdmin.keyFactExampleBackofenApplianceDimensions" fallback="Backofen appliance dimensions: 595 x 595 x 575 mm" /></li>
-        <li><AdminText i18nKey="kitchenDetailAdmin.keyFactExampleBackofenInstallationDimensions" fallback="Backofen installation dimensions: 595 x 560 x 560 mm" /></li>
-        <li><AdminText i18nKey="kitchenDetailAdmin.keyFactExampleKochfeldCookingZones" fallback="Kochfeld cooking zones: 4" /></li>
-        <li><AdminText i18nKey="kitchenDetailAdmin.keyFactExampleKochfeldCutOutDimensions" fallback="Kochfeld cut-out dimensions: 560 x 490 mm" /></li>
-      </ul>
-      {warning ? (
-        <p style={warning.style}>
-          <AdminText i18nKey={warning.i18nKey} fallback={warning.fallback} />
-        </p>
-      ) : null}
-    </div>
-  );
+  return warning ? (
+    <p style={warning.style}>
+      <AdminText i18nKey={warning.i18nKey} fallback={warning.fallback} />
+    </p>
+  ) : null;
 }
 
 function ProductInformationFields({ item = {}, compact = false, placeholders = false }) {
   const currentInputStyle = compact ? compactInputStyle : inputStyle;
-  const currentTextareaStyle = compact ? compactTextareaStyle : textareaStyle;
   const imagePath = item.productImagePath || "";
-  const pdfPath = item.productInfoPdfPath || "";
   const keyFacts = Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [];
 
   return (
@@ -272,25 +252,12 @@ function ProductInformationFields({ item = {}, compact = false, placeholders = f
         <legend style={productInfoGroupLegendStyle}>
           <AdminText i18nKey="kitchenDetailAdmin.productFiles" fallback="Product Files" />
         </legend>
-        <p style={productInfoHelpTextStyle}>
-          <AdminText
-            i18nKey="kitchenDetailAdmin.productFilesHelp"
-            fallback="Public file paths used for product display, images, and documents."
-          />
-        </p>
         <div style={productInfoFieldsStyle}>
           <ProductPathField
             label={<AdminText i18nKey="kitchenDetailAdmin.productImagePath" fallback="Image Path" />}
             name="productImagePath"
             value={imagePath}
             placeholder={placeholders ? "/product-images/email/example.jpg" : undefined}
-            style={currentInputStyle}
-          />
-          <ProductPathField
-            label={<AdminText i18nKey="kitchenDetailAdmin.productInfoPdfPath" fallback="PDF Path" />}
-            name="productInfoPdfPath"
-            value={pdfPath}
-            placeholder={placeholders ? "/product-info/example.pdf" : undefined}
             style={currentInputStyle}
           />
         </div>
@@ -300,31 +267,16 @@ function ProductInformationFields({ item = {}, compact = false, placeholders = f
         <legend style={productInfoGroupLegendStyle}>
           <AdminText i18nKey="kitchenDetailAdmin.chatbotInformation" fallback="Chatbot Information" />
         </legend>
-        <p style={productInfoHelpTextStyle}>
-          <AdminText
-            i18nKey="kitchenDetailAdmin.chatbotInformationHelp"
-            fallback="Database-driven facts used by the product assistant/chatbot."
-          />
-        </p>
         <ChatbotReadinessStatus item={item} />
         <div style={productInfoFieldsStyle}>
-          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoSummary" fallback="Intro Summary" />} wide>
-            <textarea name="productInfoSummary" defaultValue={item.productInfoSummary || ""} rows={2} spellCheck={false} style={currentTextareaStyle} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoKeyFacts" fallback="Key Facts" />} wide>
-            <textarea
-              name="productInfoKeyFacts"
-              defaultValue={keyFacts.join("\n")}
-              rows={4}
-              placeholder={placeholders ? "One key fact per line" : undefined}
-              spellCheck={false}
-              style={currentTextareaStyle}
-            />
-            <KeyFactsGuidance keyFacts={keyFacts} />
-          </FormField>
-          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoExtractedText" fallback="Extracted Product Text" />} wide>
-            <textarea name="productInfoExtractedText" defaultValue={item.productInfoExtractedText || ""} rows={5} spellCheck={false} style={currentTextareaStyle} />
-          </FormField>
+          <AdminProductInfoPdfManager
+            initialPdfPath={item.productInfoPdfPath || ""}
+            initialSummary={item.productInfoSummary || ""}
+            initialKeyFacts={keyFacts}
+            initialExtractedText={item.productInfoExtractedText || ""}
+            compact={compact}
+          />
+          <KeyFactsGuidance keyFacts={keyFacts} />
         </div>
       </fieldset>
     </div>
@@ -1039,20 +991,6 @@ const chatbotPartialStyle = {
 const chatbotMissingStyle = {
   color: "var(--app-text-muted)",
   fontWeight: 900,
-};
-
-const keyFactsGuidanceStyle = {
-  display: "grid",
-  gap: 6,
-};
-
-const keyFactsExamplesStyle = {
-  margin: 0,
-  paddingLeft: 18,
-  color: "var(--app-text-muted)",
-  fontSize: 12,
-  lineHeight: 1.45,
-  fontWeight: 600,
 };
 
 const productInfoNoticeMutedStyle = {
