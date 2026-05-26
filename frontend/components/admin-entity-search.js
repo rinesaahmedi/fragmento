@@ -719,6 +719,11 @@ export function AdminEntitySearch({ period, kitchenId, status, compact = false, 
             align-items: stretch;
           }
 
+          .input-slot {
+            flex: 0 1 auto;
+            width: 100%;
+          }
+
           .match-row {
             flex-direction: column;
           }
