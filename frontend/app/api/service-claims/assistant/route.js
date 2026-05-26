@@ -1182,10 +1182,7 @@ function normalizeLanguage(value) {
 }
 
 function hasDishwasherKeyword(text) {
-  const normalized = normalizeLanguageHintText(text);
-  return /\bdishwasher\b|\bgeschirrspuler\b|\bgeschirrspulmaschine\b|\bspulmaschine\b|\bspulmachine\b|\bspulmaschiene\b|\bschpulmachine\b|\bschpulmaschine\b/.test(
-    normalized,
-  );
+  return hasServiceCategoryTerm(text, SERVICE_CATEGORY_TERMS.dishwasher);
 }
 
 function normalizeLanguageHintText(value) {
@@ -1196,6 +1193,154 @@ function normalizeLanguageHintText(value) {
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+const SERVICE_CATEGORY_TERMS = {
+  dishwasher: [
+    "dishwasher",
+    "dish washer",
+    "geschirrspuler",
+    "geschirrspueler",
+    "geschirrspulmaschine",
+    "spulmaschine",
+    "spuelmaschine",
+    "spulmachine",
+    "lavavajillas",
+    "lave vaisselle",
+    "bulasik",
+  ],
+  "washing-machine": [
+    "washing machine",
+    "washer",
+    "wash machine",
+    "waschmaschine",
+    "lavadora",
+    "lave linge",
+  ],
+  "oven-hob": [
+    "oven",
+    "backofen",
+    "hob",
+    "cooktop",
+    "cooker",
+    "kochfeld",
+    "herd",
+  ],
+  fridge: [
+    "fridge",
+    "refrigerator",
+    "freezer",
+    "kuhlschrank",
+    "kuehlschrank",
+    "gefrierschrank",
+    "refrigirator",
+  ],
+  hood: [
+    "hood",
+    "extractor",
+    "extractor hood",
+    "ventilation",
+    "dunstabzugshaube",
+    "dunstabzug",
+  ],
+  sink: [
+    "sink",
+    "tap",
+    "faucet",
+    "drain",
+    "spule",
+    "spuele",
+    "wasserhahn",
+    "abfluss",
+    "fregadero",
+    "evier",
+    "eviye",
+  ],
+  cabinet: [
+    "cabinet",
+    "cupboard",
+    "drawer",
+    "hinge",
+    "front",
+    "door",
+    "schrank",
+    "schublade",
+    "scharnier",
+  ],
+};
+
+function editDistanceAtMost(left, right, maxDistance) {
+  if (!left || !right) return false;
+  if (left === right) return true;
+  if (Math.abs(left.length - right.length) > maxDistance) return false;
+
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= left.length; i += 1) {
+    const current = [i];
+    let rowMin = current[0];
+    for (let j = 1; j <= right.length; j += 1) {
+      const substitutionCost = left[i - 1] === right[j - 1] ? 0 : 1;
+      const value = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + substitutionCost,
+      );
+      current[j] = value;
+      rowMin = Math.min(rowMin, value);
+    }
+    if (rowMin > maxDistance) return false;
+    previous = current;
+  }
+
+  return previous[right.length] <= maxDistance;
+}
+
+function fuzzyTermDistance(term) {
+  if (term.length >= 10) return 2;
+  if (term.length >= 4) return 1;
+  return 0;
+}
+
+function tokenMatchesServiceTerm(token, term) {
+  const normalizedToken = normalizeLanguageHintText(token);
+  const normalizedTerm = normalizeLanguageHintText(term);
+  if (!normalizedToken || !normalizedTerm) return false;
+  if (normalizedToken === normalizedTerm) return true;
+  if (normalizedToken.length < 4 || normalizedTerm.length < 4) return false;
+  if (normalizedToken[0] !== normalizedTerm[0]) return false;
+  return editDistanceAtMost(normalizedToken, normalizedTerm, fuzzyTermDistance(normalizedTerm));
+}
+
+function hasServiceCategoryTerm(text, terms) {
+  const normalized = normalizeLanguageHintText(text);
+  if (!normalized) return false;
+
+  const compactText = normalized.replace(/\s+/g, "");
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+
+  return terms.some((term) => {
+    const normalizedTerm = normalizeLanguageHintText(term);
+    if (!normalizedTerm) return false;
+    const escapedTerm = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (new RegExp(`(^|\\s)${escapedTerm}(?=\\s|$)`).test(normalized)) {
+      return true;
+    }
+
+    const termWords = normalizedTerm.split(/\s+/).filter(Boolean);
+    if (termWords.length > 1) {
+      const compactTerm = normalizedTerm.replace(/\s+/g, "");
+      if (compactText.includes(compactTerm)) return true;
+      return termWords.every((word) => tokens.some((token) => tokenMatchesServiceTerm(token, word)));
+    }
+
+    return tokens.some((token) => tokenMatchesServiceTerm(token, normalizedTerm));
+  });
+}
+
+function detectServiceCategories(text) {
+  return Object.entries(SERVICE_CATEGORY_TERMS)
+    .filter(([, terms]) => hasServiceCategoryTerm(text, terms))
+    .map(([category]) => category);
 }
 
 function detectExplicitLanguageSwitch(text) {
@@ -1467,7 +1612,10 @@ function buildSampleWording(copy, claim, focusLabel) {
 }
 
 function detectAreaCategory(area) {
-  const haystack = `${normalizeText(area?.name)} ${normalizeText(area?.code)}`.toLowerCase();
+  const rawHaystack = `${normalizeText(area?.name)} ${normalizeText(area?.code)}`;
+  const fuzzyCategories = detectServiceCategories(rawHaystack);
+  if (fuzzyCategories.length) return fuzzyCategories[0];
+  const haystack = rawHaystack.toLowerCase();
   if (!haystack) return "generic";
   if (haystack.includes("dish") || haystack.includes("geschirr") || /sp[uü]lma|spuelma|spulma|schpulma|schpulmachine/.test(haystack)) return "dishwasher";
   if (haystack.includes("wm-") || haystack.includes("washing") || haystack.includes("wasch")) return "washing-machine";
@@ -1481,7 +1629,7 @@ function detectAreaCategory(area) {
 
 function detectTextCategories(text) {
   const haystack = normalizeText(text).toLowerCase();
-  const categories = [];
+  const categories = [...detectServiceCategories(text)];
   if (
     /dishwasher|geschirrsp|geschirrsp[uü]l|geschirrspul|sp[uü]lmaschine|sp[uü]lmachine|sp[uü]lmaschiene|spulmaschine|spuelmaschine|bulaşık|lavavajillas|lave-vaisselle|посудомо/i.test(haystack)
     || hasDishwasherKeyword(text)
@@ -1494,7 +1642,7 @@ function detectTextCategories(text) {
   if (/fridge|refrigerator|kühlschrank|réfrig|холодиль/i.test(haystack)) {
     categories.push("fridge");
   }
-  return categories;
+  return dedupe(categories);
 }
 
 function isApplianceCategory(category) {
@@ -1573,10 +1721,11 @@ function classifyGeneralIssue({ question, claim, selectedAreas, conversationMess
   const haystack = combinedText.toLowerCase();
   const structuredChoice = detectStructuredMenuChoice(question);
   const areaCategories = arrayValue(selectedAreas).map(detectAreaCategory);
+  const textCategories = detectTextCategories(combinedText);
   const hasAppliance =
     /oven|backofen|fridge|refrigerator|freezer|washing machine|dryer|hob|cooktop|extractor|hood|appliance/i.test(combinedText)
     || hasDishwasherKeyword(combinedText)
-    || areaCategories.some((category) => ["oven-hob", "fridge", "washing-machine", "hood"].includes(category));
+    || dedupe([...areaCategories, ...textCategories]).some(isApplianceCategory);
   const hasKitchenArea = /kitchen|küche|room|maintenance|broken|help|problem/i.test(combinedText);
   const hasLeak = /\bleak|leaking|water leaking|water under|wet area|pipe leaking|under the sink|undicht|austritt/i.test(haystack);
   const hasDrainage = /\bblocked|clogged|drain|drainage|not draining|slow drain|backing up|ablauf|verstopf/i.test(haystack);
@@ -1622,12 +1771,13 @@ function classifyGeneralIssue({ question, claim, selectedAreas, conversationMess
   }
   if (hasAppliance) {
     let subjectKey = "appliance";
-    if (/oven|backofen/i.test(haystack)) subjectKey = "oven";
-    else if (/fridge|refrigerator|freezer/i.test(haystack)) subjectKey = "fridge_or_freezer";
-    else if (/washing machine/i.test(haystack)) subjectKey = "washing_machine";
+    const combinedCategories = dedupe([...textCategories, ...areaCategories]);
+    if (combinedCategories.includes("oven-hob") || /oven|backofen/i.test(haystack)) subjectKey = "oven";
+    else if (combinedCategories.includes("fridge") || /fridge|refrigerator|freezer/i.test(haystack)) subjectKey = "fridge_or_freezer";
+    else if (combinedCategories.includes("washing-machine") || /washing machine/i.test(haystack)) subjectKey = "washing_machine";
     else if (/dryer/i.test(haystack)) subjectKey = "dryer";
     else if (/hob|cooktop/i.test(haystack)) subjectKey = "hob";
-    else if (/extractor|hood/i.test(haystack)) subjectKey = "extractor";
+    else if (combinedCategories.includes("hood") || /extractor|hood/i.test(haystack)) subjectKey = "extractor";
     return { subjectKey, type: "appliance_vague", specific: false };
   }
   if (hasKitchenArea || hasDamage) {

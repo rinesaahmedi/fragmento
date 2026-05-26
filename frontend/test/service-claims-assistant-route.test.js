@@ -286,3 +286,61 @@ test("generic non-database issue does not show claim-form help action", async ()
   assert.equal(response.body.actions, undefined);
   assert.match(response.body.answer, /leak around the sink area/i);
 });
+
+test("misspelled dishwasher question still opens dishwasher triage", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "dishwaher isn work ???",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /trouble with the dishwasher/i);
+  assert.match(response.body.answer, /not draining/i);
+});
+
+test("misspelled appliance names are classified across claim assistant triage", async () => {
+  const route = loadRoute();
+  const cases = [
+    { question: "frige isnt cooling", expected: /fridge or freezer/i },
+    { question: "washing mashine isnt working", expected: /washing machine/i },
+    { question: "owen not heating", expected: /oven/i },
+    { question: "extracor hood doesnt work", expected: /extractor/i },
+  ];
+
+  for (const item of cases) {
+    const response = await route.POST(request({
+      language: "en",
+      question: item.question,
+      selectedAreas: [],
+      claim: emptyClaim(),
+    }));
+
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, item.expected);
+    assert.doesNotMatch(response.body.answer, /only help with kitchen service claims/i);
+  }
+});
+
+test("misspelled kitchen area names are still treated as service claim context", async () => {
+  const route = loadRoute();
+  const cases = [
+    { question: "sinkk is leaking", expected: /leak/i },
+    { question: "cabnet door broken", expected: /damaged or broken item/i },
+  ];
+
+  for (const item of cases) {
+    const response = await route.POST(request({
+      language: "en",
+      question: item.question,
+      selectedAreas: [],
+      claim: emptyClaim(),
+    }));
+
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, item.expected);
+    assert.doesNotMatch(response.body.answer, /only help with kitchen service claims/i);
+  }
+});
