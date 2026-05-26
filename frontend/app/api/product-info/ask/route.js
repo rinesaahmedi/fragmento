@@ -2784,7 +2784,7 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
   if (installationDistanceRefusal) return installationDistanceRefusal;
   const scopedItems = scopeItemsForQuestion(items, question);
   const asksProgramsOrFeatures = /\b(?:programs?|programmes?|features?|functions?|programme|funktionen)\b/i.test(value);
-  const asksNoise = /(noise|sound|loud|geraeusch|gerÃ¤usch|lautstÃ¤rke|lautstaerke|luftschallemission|dezibel|dezi(?:bel)?|decibels?|\blaut\b|db\b|dba\b)/i.test(value);
+  const asksNoise = /(noise|sound|loud|geraeusch|geräusch|lautstärke|lautstaerke|luftschallemission|dezibel|dezi(?:bel)?|decibels?|\blaut\b|db\b|dba\b)/i.test(value);
 
   if (WARRANTY_QUESTION_PATTERN.test(value)) {
     const entries = scopedItems

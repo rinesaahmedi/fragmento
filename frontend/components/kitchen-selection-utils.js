@@ -240,75 +240,75 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
 
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   "DISH-B-600-STD": [
-    { label: "E-Label PDF", href: "/product-info/A-EGSPV597210_Elabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "DISH-C-600-STD": [
-    { label: "E-Label PDF", href: "/product-info/A-EGSPV597210_Elabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "T3D-DISH-001": [
-    { label: "E-Label PDF", href: "/product-info/A-EGSPV597210_Elabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "REF-B-545-1800-700": [
-    { label: "E-Label PDF", href: "/product-info/KGC_15495_S_Elabel_Eco21_2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "REF-C-545-1800-700": [
-    { label: "E-Label PDF", href: "/product-info/KGC_15495_S_Elabel_Eco21_2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "HOOD-B-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/FH_664_621_S_ELabel_Eco21_2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/FH_664_621_S_Produktinformation.pdf" },
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
   "HOOD-C-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/KHF_664_611_S_ELabel_Eco21_2407.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/khf664611s-chimney-extractor-hood-product-info.pdf" },
+    { label: "E-Label PDF", href: "/product-info/khf-664-611-s-elabel-eco21-2407.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf" },
   ],
   "T3D-HOOD-001": [
-    { label: "E-Label PDF", href: "/product-info/FH_664_621_S_ELabel_Eco21_2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/FH_664_621_S_Produktinformation.pdf" },
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
   "WM-B-EWA34660W": [
-    { label: "E-Label PDF", href: "/product-info/EWA_34660_W_ELabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/ewa34660w-washing-machine-product-info.pdf" },
+    { label: "E-Label PDF", href: "/product-info/ewa-34660-w-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa-34660-w-product-info.pdf" },
   ],
   "WM-C-EWA34660W": [
-    { label: "E-Label PDF", href: "/product-info/EWA_34660_W_ELabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/ewa34660w-washing-machine-product-info.pdf" },
+    { label: "E-Label PDF", href: "/product-info/ewa-34660-w-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa-34660-w-product-info.pdf" },
   ],
   "T3D-WASHER-001": [
-    { label: "E-Label PDF", href: "/product-info/EWA_34660_W_ELabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/ewa34660w-washing-machine-product-info.pdf" },
+    { label: "E-Label PDF", href: "/product-info/ewa-34660-w-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa-34660-w-product-info.pdf" },
   ],
   "OVEN-B-600-HOB": [
-    { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
   ],
   "OVEN-C-600-HOB": [
-    { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
   ],
   "T3D-OVEN-HOB-001": [
-    { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
   ],
   "LIGHT-B-LED-001": [
-    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
   ],
   "LIGHT-C-LED-001": [
-    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
   ],
   "T3D-LIGHT-001": [
-    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
   ],
   "ACC-LIGHT-003": [
-    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
   ],
 };
 

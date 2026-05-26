@@ -428,7 +428,7 @@ export default function PublicKitchenOrderForm({
                 />
                 <label htmlFor="termsConsent">
                   {translate("order.termsConsentPrefix", "I have read the ")}
-                  <a href="/legal/AGB-Architecto-2026.pdf?v=2026052102" target="_blank" rel="noreferrer">
+                  <a href="/legal/architecto-agb-2026.pdf?v=2026052102" target="_blank" rel="noreferrer">
                     {translate("order.termsAndConditions", "terms and conditions")}
                   </a>
                   {translate("order.termsConsentSuffix", " and agree.*")}

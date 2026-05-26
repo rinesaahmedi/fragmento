@@ -6,8 +6,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const ADDITIONAL_PRODUCT_INFO_PDF_PATHS_BY_CODE = {
-  "OVEN-B-600-HOB": ["/product-info/OL-KMI_754_000_E_Produktinformation.pdf"],
-  "OVEN-C-600-HOB": ["/product-info/OL-KMI_754_000_E_Produktinformation.pdf"],
+  "OVEN-B-600-HOB": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
+  "OVEN-C-600-HOB": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
 };
 
 function normalizePdfPath(value) {
