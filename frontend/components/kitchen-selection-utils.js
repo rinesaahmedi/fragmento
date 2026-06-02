@@ -74,6 +74,7 @@ export function getLocalizedItemName(item, translate) {
   switch (code) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
+    case "T3D-OVEN-HOB-001":
       return withRawDimensions(translate("configurator.itemNameOvenHob", "Built-in Oven and Hob"));
     case "CAB-WALL-B-L-600":
       return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
@@ -132,6 +133,35 @@ export function getLocalizedItemName(item, translate) {
       return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"));
     case "CAB-DRAWER-C-3D":
       return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
+    case "T3D-CAB-WALL-01":
+    case "T3D-CAB-WALL-02":
+    case "T3D-CAB-WALL-03":
+    case "T3D-CAB-WALL-04":
+    case "T3D-CAB-WALL-05":
+      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinet", "Wall Cabinet"));
+    case "T3D-LIGHT-001":
+      return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
+    case "T3D-WASHER-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing Machine"));
+    case "T3D-SINKBASE-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
+    case "T3D-DISH-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+    case "T3D-CAB-STORAGE-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
+    case "T3D-CAB-CORNER-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.cornerBaseCabinet", "Corner Base Cabinet"));
+    case "T3D-CAB-BASE-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.returnBaseCabinet", "Return Base Cabinet"));
+    case "T3D-CAB-DRAWERS-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
+    case "T3D-TOP-MAIN-001":
+    case "T3D-TOP-RETURN-001":
+      return withRawDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
+    case "T3D-SINK-001":
+      return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
+    case "T3D-HOOD-001":
+      return translate("configurator.catalogItemNames.extractorHood", "Extractor Hood");
     default:
       return rawName;
   }
@@ -149,38 +179,53 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-WALL-C-ML-600":
     case "CAB-WALL-C-MR-600":
     case "CAB-WALL-C-R-600":
+    case "T3D-CAB-WALL-01":
+    case "T3D-CAB-WALL-02":
+    case "T3D-CAB-WALL-03":
+    case "T3D-CAB-WALL-04":
+    case "T3D-CAB-WALL-05":
       return translate("configurator.catalogItemInfo.adjustableShelves", "H6002, 2 adjustable shelves");
     case "CAB-HOOD-B-600":
       return translate("configurator.catalogItemInfo.lightHoodSetup", "HD6002, light hood setup");
     case "HOOD-B-FH664621E":
+    case "T3D-HOOD-001":
       return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
     case "HOOD-C-FH664621E":
       return translate("configurator.catalogItemInfo.chimneyHood", "Chimney hood, 60 cm");
     case "LIGHT-B-LED-001":
     case "LIGHT-C-LED-001":
+    case "T3D-LIGHT-001":
       return translate("configurator.catalogItemInfo.ledLightingSet", "LED lighting set");
     case "WM-B-EWA34660W":
     case "WM-C-EWA34660W":
+    case "T3D-WASHER-001":
       return translate("configurator.catalogItemInfo.washingMachine", "Washing machine, 8 kg, 1400 rpm");
     case "SINKBASE-B-600":
     case "SINKBASE-C-600":
+    case "T3D-SINKBASE-001":
       return translate("configurator.catalogItemInfo.bottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
     case "DISH-B-600-STD":
     case "DISH-C-600-STD":
+    case "T3D-DISH-001":
       return translate("configurator.catalogItemInfo.integratedDishwasher", "Fully integrated dishwasher, 60 cm");
     case "TOP-B-3036":
     case "TOP-C-4000":
+    case "T3D-TOP-MAIN-001":
+    case "T3D-TOP-RETURN-001":
       return translate("configurator.catalogItemInfo.concreteSlateGray", "PLS, concrete slate gray");
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
+    case "T3D-OVEN-HOB-001":
       return translate("configurator.catalogItemInfo.ovenInductionHob", "Built-in oven + induction hob");
     case "CAB-BASE-B-STR":
+    case "T3D-CAB-STORAGE-001":
       return translate("configurator.catalogItemInfo.strBaseStorageCabinet", "STR base storage cabinet");
     case "REF-B-545-1800-700":
     case "REF-C-545-1800-700":
       return translate("configurator.catalogItemInfo.fridgeFreezerNoFrost", "Fridge-freezer, 180 cm, NoFrost");
     case "SINK-B-BOTTON-45":
     case "SINK-C-BOTTON-45":
+    case "T3D-SINK-001":
       return translate("configurator.catalogItemInfo.manualWasteSystem", "Blanco Botton Pro 45/2 manual waste system");
     case "ACC-CUTLERY-ZB60SG":
       return translate("configurator.catalogItemInfo.cutleryInsert60", "Cutlery insert for 60 cm cabinet");
@@ -195,55 +240,75 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
 
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   "DISH-B-600-STD": [
-    { label: "E-Label PDF", href: "/product-info/A-EGSPV597210_Elabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "DISH-C-600-STD": [
-    { label: "E-Label PDF", href: "/product-info/A-EGSPV597210_Elabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
+  "T3D-DISH-001": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "REF-B-545-1800-700": [
-    { label: "E-Label PDF", href: "/product-info/KGC_15495_S_Elabel_Eco21_2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "REF-C-545-1800-700": [
-    { label: "E-Label PDF", href: "/product-info/KGC_15495_S_Elabel_Eco21_2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf" },
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "HOOD-B-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/FH_664_621_S_ELabel_Eco21_2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/FH_664_621_S_Produktinformation.pdf" },
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
   "HOOD-C-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/KHF_664_611_S_ELabel_Eco21_2407.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/khf664611s-chimney-extractor-hood-product-info.pdf" },
+    { label: "E-Label PDF", href: "/product-info/khf-664-611-s-elabel-eco21-2407.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf" },
+  ],
+  "T3D-HOOD-001": [
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
   "WM-B-EWA34660W": [
-    { label: "E-Label PDF", href: "/product-info/EWA_34660_W_ELabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/ewa34660w-washing-machine-product-info.pdf" },
+    { label: "E-Label PDF", href: "/product-info/ewa-34660-w-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa-34660-w-product-info.pdf" },
   ],
   "WM-C-EWA34660W": [
-    { label: "E-Label PDF", href: "/product-info/EWA_34660_W_ELabel_Eco21_2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/ewa34660w-washing-machine-product-info.pdf" },
+    { label: "E-Label PDF", href: "/product-info/ewa-34660-w-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa-34660-w-product-info.pdf" },
+  ],
+  "T3D-WASHER-001": [
+    { label: "E-Label PDF", href: "/product-info/ewa-34660-w-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/ewa-34660-w-product-info.pdf" },
   ],
   "OVEN-B-600-HOB": [
-    { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
   ],
   "OVEN-C-600-HOB": [
-    { label: "Backofen E-Label", href: "/product-info/EBX_943_600_S_ELabel_1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/EBX_943_600_S_Produktinformation.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/OL-KMI_754_000_E_Produktinformation.pdf" },
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
+  ],
+  "T3D-OVEN-HOB-001": [
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
   ],
   "LIGHT-B-LED-001": [
-    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
   ],
   "LIGHT-C-LED-001": [
-    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
+  ],
+  "T3D-LIGHT-001": [
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
   ],
   "ACC-LIGHT-003": [
-    { label: "E-Label PDF", href: "/product-info/led-lighting-set-label.pdf#zoom=300" },
+    { label: "E-Label PDF", href: "/product-info/led-lighting-set-elabel.pdf#zoom=300" },
   ],
 };
 
@@ -264,6 +329,18 @@ const PRODUCT_INFO_DISPLAY_OVERRIDES_BY_CODE = {
     infoText: "Washing machine, 8 kg, 1400 rpm",
     productInfoSummary:
       "Freestanding washing machine EWA34660W for the kitchen configuration. The current product information lists 8 kg capacity and 1400 rpm spin speed.",
+    productInfoKeyFacts: [
+      "Capacity: 8 kg",
+      "Spin speed: 1400 rpm",
+      "Model: EWA34660W",
+      "Freestanding appliance",
+      "Check water and power connection requirements",
+    ],
+  },
+  "T3D-WASHER-001": {
+    infoText: "Washing machine, 8 kg, 1400 rpm",
+    productInfoSummary:
+      "Freestanding washing machine EWA34660W for the TEST 3D kitchen configuration. The current product information lists 8 kg capacity and 1400 rpm spin speed.",
     productInfoKeyFacts: [
       "Capacity: 8 kg",
       "Spin speed: 1400 rpm",
@@ -340,16 +417,20 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-C-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
+  "T3D-OVEN-HOB-001": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
+  "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-B-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-C-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
+  "T3D-WASHER-001": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
 };
 
 export function getProductImagePaths(item) {

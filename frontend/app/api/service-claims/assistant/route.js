@@ -1300,6 +1300,154 @@ function fuzzyTextHasAny(text, phrases) {
   return arrayValue(phrases).some((phrase) => fuzzyTextIncludesPhrase(text, phrase));
 }
 
+const SERVICE_CATEGORY_TERMS = {
+  dishwasher: [
+    "dishwasher",
+    "dish washer",
+    "geschirrspuler",
+    "geschirrspueler",
+    "geschirrspulmaschine",
+    "spulmaschine",
+    "spuelmaschine",
+    "spulmachine",
+    "lavavajillas",
+    "lave vaisselle",
+    "bulasik",
+  ],
+  "washing-machine": [
+    "washing machine",
+    "washer",
+    "wash machine",
+    "waschmaschine",
+    "lavadora",
+    "lave linge",
+  ],
+  "oven-hob": [
+    "oven",
+    "backofen",
+    "hob",
+    "cooktop",
+    "cooker",
+    "kochfeld",
+    "herd",
+  ],
+  fridge: [
+    "fridge",
+    "refrigerator",
+    "freezer",
+    "kuhlschrank",
+    "kuehlschrank",
+    "gefrierschrank",
+    "refrigirator",
+  ],
+  hood: [
+    "hood",
+    "extractor",
+    "extractor hood",
+    "ventilation",
+    "dunstabzugshaube",
+    "dunstabzug",
+  ],
+  sink: [
+    "sink",
+    "tap",
+    "faucet",
+    "drain",
+    "spule",
+    "spuele",
+    "wasserhahn",
+    "abfluss",
+    "fregadero",
+    "evier",
+    "eviye",
+  ],
+  cabinet: [
+    "cabinet",
+    "cupboard",
+    "drawer",
+    "hinge",
+    "front",
+    "door",
+    "schrank",
+    "schublade",
+    "scharnier",
+  ],
+};
+
+function editDistanceAtMost(left, right, maxDistance) {
+  if (!left || !right) return false;
+  if (left === right) return true;
+  if (Math.abs(left.length - right.length) > maxDistance) return false;
+
+  let previous = Array.from({ length: right.length + 1 }, (_, index) => index);
+  for (let i = 1; i <= left.length; i += 1) {
+    const current = [i];
+    let rowMin = current[0];
+    for (let j = 1; j <= right.length; j += 1) {
+      const substitutionCost = left[i - 1] === right[j - 1] ? 0 : 1;
+      const value = Math.min(
+        previous[j] + 1,
+        current[j - 1] + 1,
+        previous[j - 1] + substitutionCost,
+      );
+      current[j] = value;
+      rowMin = Math.min(rowMin, value);
+    }
+    if (rowMin > maxDistance) return false;
+    previous = current;
+  }
+
+  return previous[right.length] <= maxDistance;
+}
+
+function fuzzyTermDistance(term) {
+  if (term.length >= 10) return 2;
+  if (term.length >= 4) return 1;
+  return 0;
+}
+
+function tokenMatchesServiceTerm(token, term) {
+  const normalizedToken = normalizeLanguageHintText(token);
+  const normalizedTerm = normalizeLanguageHintText(term);
+  if (!normalizedToken || !normalizedTerm) return false;
+  if (normalizedToken === normalizedTerm) return true;
+  if (normalizedToken.length < 4 || normalizedTerm.length < 4) return false;
+  if (normalizedToken[0] !== normalizedTerm[0]) return false;
+  return editDistanceAtMost(normalizedToken, normalizedTerm, fuzzyTermDistance(normalizedTerm));
+}
+
+function hasServiceCategoryTerm(text, terms) {
+  const normalized = normalizeLanguageHintText(text);
+  if (!normalized) return false;
+
+  const compactText = normalized.replace(/\s+/g, "");
+  const tokens = normalized.split(/\s+/).filter(Boolean);
+
+  return terms.some((term) => {
+    const normalizedTerm = normalizeLanguageHintText(term);
+    if (!normalizedTerm) return false;
+    const escapedTerm = normalizedTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    if (new RegExp(`(^|\\s)${escapedTerm}(?=\\s|$)`).test(normalized)) {
+      return true;
+    }
+
+    const termWords = normalizedTerm.split(/\s+/).filter(Boolean);
+    if (termWords.length > 1) {
+      const compactTerm = normalizedTerm.replace(/\s+/g, "");
+      if (compactText.includes(compactTerm)) return true;
+      return termWords.every((word) => tokens.some((token) => tokenMatchesServiceTerm(token, word)));
+    }
+
+    return tokens.some((token) => tokenMatchesServiceTerm(token, normalizedTerm));
+  });
+}
+
+function detectServiceCategories(text) {
+  return Object.entries(SERVICE_CATEGORY_TERMS)
+    .filter(([, terms]) => hasServiceCategoryTerm(text, terms))
+    .map(([category]) => category);
+}
+
 function detectExplicitLanguageSwitch(text) {
   const normalized = normalizeLanguageHintText(text);
   if (!normalized) return null;
@@ -1358,14 +1506,20 @@ function normalizeCode(raw) {
   if (!match) return compact;
   const digits = match[1];
   if (digits.length === 1) return `E${digits}`;
+  if (digits === "01") return "E1";
+  if (digits === "03") return "E3";
+  if (digits === "04") return "E4";
   if (digits.length === 2 && digits.startsWith("0")) return `E0${digits[1]}`;
   return `E${digits}`;
 }
 
 function errorCodeAliases(code) {
   const normalized = normalizeCode(code);
+  if (normalized === "E1") return ["E1", "E01"];
   if (normalized === "E2") return ["E2", "E02"];
   if (normalized === "E02") return ["E02", "E2"];
+  if (normalized === "E3") return ["E3", "E03"];
+  if (normalized === "E4") return ["E4", "E04"];
   return normalized ? [normalized] : [];
 }
 
@@ -1519,7 +1673,7 @@ function isGreeting(question) {
   const normalized = normalizeLanguageHintText(question);
   if (!normalized) return false;
   if (/^hal{1,2}o?$/.test(normalized)) return true;
-  return [
+  const greetings = [
     "hi",
     "hello",
     "hey",
@@ -1538,7 +1692,15 @@ function isGreeting(question) {
     "good morning",
     "good afternoon",
     "good evening",
-  ].includes(normalized);
+  ];
+  if (greetings.includes(normalized)) return true;
+
+  const words = normalized.split(/\s+/).filter(Boolean);
+  if (words.length > 1 && words.length <= 3 && words.every((word) => greetings.includes(word) || /^hal{1,2}o?$/.test(word))) {
+    return true;
+  }
+
+  return false;
 }
 
 function isLowInformationQuestion(question) {
@@ -1550,6 +1712,42 @@ function isLowInformationQuestion(question) {
     return true;
   }
   return false;
+}
+
+function buildOutOfScopeAnswer(language) {
+  const answers = {
+    en:
+      "I can only help with kitchen service claims.\n\nPlease tell me what is not working in the kitchen or which item is affected.",
+    de:
+      "Ich kann nur bei Küchenreklamationen helfen.\n\nBeschreiben Sie bitte, was in der Küche nicht funktioniert oder welcher Gegenstand betroffen ist.",
+    tr:
+      "Sadece mutfak servis talepleri konusunda yardimci olabilirim.\n\nLutfen mutfakta neyin calismadigini veya hangi parcanin etkilendigini yazin.",
+    es:
+      "Solo puedo ayudar con reclamaciones de servicio de cocina.\n\nIndica que no funciona en la cocina o que elemento esta afectado.",
+    fr:
+      "Je peux seulement aider pour les reclamations de service cuisine.\n\nIndiquez ce qui ne fonctionne pas dans la cuisine ou quel element est concerne.",
+    ru:
+      "Ya mogu pomoch tolko s servisnymi reklamatsiyami po kuhne.\n\nOpishite, chto ne rabotaet na kuhne ili kakoy predmet zatronut.",
+  };
+  return answers[language] || answers.en;
+}
+
+function hasServiceClaimContext(text) {
+  const haystack = normalizeLanguageHintText(text);
+  if (!haystack) return false;
+  if (detectTextCategories(haystack).length) return true;
+  return /\b(kitchen|claim|service|repair|technician|photo|picture|serial|contract|availability|appointment|appliance|dishwasher|sink|tap|faucet|drain|leak|water|blocked|clogged|electrical|lighting|light|socket|switch|broken|damaged|oven|hob|fridge|freezer|washing machine|dryer|extractor|hood|cabinet|drawer|hinge|error code|reclamation|reklamation|kuche|kueche|spule|spuele|spulmaschine|spuelmaschine|geschirrspuler|geschirrspueler|abfluss|undicht|wasser|defekt|kaputt|foto|seriennummer|lavavajillas|fregadero|desague|reclamacion|cocina|fuite|evier|reclamation|cuisine|lave vaisselle|mutfak|sikayet|eviye|bulasik|lavabo)\b/.test(
+    haystack,
+  );
+}
+
+function isClearlyOutOfScopeQuestion(question) {
+  const haystack = normalizeLanguageHintText(question);
+  if (!haystack || isGreeting(haystack) || hasServiceClaimContext(haystack)) return false;
+
+  return /\b(weather|forecast|temperature outside|bitcoin|stock price|exchange rate|president|prime minister|latest news|write (?:me )?(?:a )?(?:poem|story|song|joke)|tell (?:me )?(?:a )?joke|recipe|cook pasta|how do i cook|football|soccer|basketball|movie|music|homework|math problem|translate this|order status|track my order|payment|invoice|refund|buy (?:a )?(?:new|another)?\s*kitchen|purchase (?:a )?(?:new|another)?\s*kitchen|configurator)\b/.test(
+    haystack,
+  );
 }
 
 function isSampleWordingRequest(question) {
@@ -1578,7 +1776,10 @@ function buildSampleWording(copy, claim, focusLabel) {
 }
 
 function detectAreaCategory(area) {
-  const haystack = `${normalizeText(area?.name)} ${normalizeText(area?.code)}`.toLowerCase();
+  const rawHaystack = `${normalizeText(area?.name)} ${normalizeText(area?.code)}`;
+  const fuzzyCategories = detectServiceCategories(rawHaystack);
+  if (fuzzyCategories.length) return fuzzyCategories[0];
+  const haystack = rawHaystack.toLowerCase();
   if (!haystack) return "generic";
   if (haystack.includes("dish") || haystack.includes("geschirr") || /sp[uü]lma|spuelma|spulma|schpulma|schpulmachine/.test(haystack)) return "dishwasher";
   if (haystack.includes("wm-") || haystack.includes("washing") || haystack.includes("wasch")) return "washing-machine";
@@ -1592,7 +1793,7 @@ function detectAreaCategory(area) {
 
 function detectTextCategories(text) {
   const haystack = normalizeLanguageHintText(text);
-  const categories = [];
+  const categories = [...detectServiceCategories(text)];
   if (
     /dishwasher|geschirrsp|geschirrsp[uü]l|geschirrspul|sp[uü]lmaschine|sp[uü]lmachine|sp[uü]lmaschiene|spulmaschine|spuelmaschine|bulaşık|lavavajillas|lave-vaisselle|посудомо/i.test(haystack)
     || hasDishwasherKeyword(text)
@@ -1605,7 +1806,7 @@ function detectTextCategories(text) {
   if (/fridge|refrigerator|kühlschrank|réfrig|холодиль/i.test(haystack)) {
     categories.push("fridge");
   }
-  return categories;
+  return dedupe(categories);
 }
 
 function isApplianceCategory(category) {
@@ -1714,10 +1915,11 @@ function classifyGeneralIssue({ question, claim, selectedAreas, conversationMess
   const haystack = combinedText.toLowerCase();
   const structuredChoice = detectStructuredMenuChoice(question);
   const areaCategories = arrayValue(selectedAreas).map(detectAreaCategory);
+  const textCategories = detectTextCategories(combinedText);
   const hasAppliance =
     /oven|backofen|fridge|refrigerator|freezer|washing machine|dryer|hob|cooktop|extractor|hood|appliance/i.test(combinedText)
     || hasDishwasherKeyword(combinedText)
-    || areaCategories.some((category) => ["oven-hob", "fridge", "washing-machine", "hood"].includes(category));
+    || dedupe([...areaCategories, ...textCategories]).some(isApplianceCategory);
   const hasKitchenArea = /kitchen|küche|room|maintenance|broken|help|problem/i.test(combinedText);
   const hasLeak = /\bleak|leaking|water leaking|water under|wet area|pipe leaking|under the sink|undicht|austritt/i.test(haystack);
   const hasDrainage = /\bblocked|clogged|drain|drainage|not draining|slow drain|backing up|ablauf|verstopf/i.test(haystack);
@@ -1763,12 +1965,13 @@ function classifyGeneralIssue({ question, claim, selectedAreas, conversationMess
   }
   if (hasAppliance) {
     let subjectKey = "appliance";
-    if (/oven|backofen/i.test(haystack)) subjectKey = "oven";
-    else if (/fridge|refrigerator|freezer/i.test(haystack)) subjectKey = "fridge_or_freezer";
-    else if (/washing machine/i.test(haystack)) subjectKey = "washing_machine";
+    const combinedCategories = dedupe([...textCategories, ...areaCategories]);
+    if (combinedCategories.includes("oven-hob") || /oven|backofen/i.test(haystack)) subjectKey = "oven";
+    else if (combinedCategories.includes("fridge") || /fridge|refrigerator|freezer/i.test(haystack)) subjectKey = "fridge_or_freezer";
+    else if (combinedCategories.includes("washing-machine") || /washing machine/i.test(haystack)) subjectKey = "washing_machine";
     else if (/dryer/i.test(haystack)) subjectKey = "dryer";
     else if (/hob|cooktop/i.test(haystack)) subjectKey = "hob";
-    else if (/extractor|hood/i.test(haystack)) subjectKey = "extractor";
+    else if (combinedCategories.includes("hood") || /extractor|hood/i.test(haystack)) subjectKey = "extractor";
     return { subjectKey, type: "appliance_vague", specific: false };
   }
   if (hasKitchenArea || hasDamage) {
@@ -2859,6 +3062,10 @@ async function buildAnswer({ language, question, context, selectedAreas, claim, 
     return normalizeAssistantReturn(genericAnswer);
   }
 
+  if (isClearlyOutOfScopeQuestion(question)) {
+    return normalizeAssistantReturn(buildOutOfScopeAnswer(language));
+  }
+
   const dishwasherContext = enrichDishwasherContextWithConversation(
     getDishwasherContextResolved({ question, claim, selectedAreas }),
     conversationMessages,
@@ -3015,7 +3222,15 @@ function buildCurrentApplianceFocus(question, conversationMessages, selectedArea
 
 function buildClaimAssistantInstructions(language) {
   const copy = t(language);
-  const languageName = language === "de" ? "German" : language === "es" ? "Spanish" : "English";
+  const languageNames = {
+    en: "English",
+    de: "German",
+    tr: "Turkish",
+    es: "Spanish",
+    fr: "French",
+    ru: "Russian",
+  };
+  const languageName = languageNames[language] || languageNames.en;
 
   return [
     `You are the Fragmento claim assistant. Reply only in ${languageName}.`,
@@ -3088,6 +3303,7 @@ function buildClaimAssistantContextPayload({
   };
 }
 
+// This is prepared for future use. The current POST handler still uses the rule-based buildAnswer fallback.
 function canShowClaimFormHelpAction(legacyDraft, suggestedProblemDescription) {
   if (normalizeText(suggestedProblemDescription)) {
     return false;
@@ -3095,6 +3311,7 @@ function canShowClaimFormHelpAction(legacyDraft, suggestedProblemDescription) {
   return Array.isArray(legacyDraft?.actions) && legacyDraft.actions.some((action) => action?.id === "claim_form_help");
 }
 
+// This is prepared for future use. The current POST handler still uses the rule-based buildAnswer fallback.
 async function buildOpenAiAnswer({ language, question, context, selectedAreas, claim, conversationMessages }) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {

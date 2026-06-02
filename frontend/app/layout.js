@@ -1,5 +1,6 @@
 import { Manrope } from "next/font/google";
 import "./globals.css";
+import "./admin-critical.css";
 import PublicLegalFooter from "../components/public-legal-footer";
 
 const manrope = Manrope({

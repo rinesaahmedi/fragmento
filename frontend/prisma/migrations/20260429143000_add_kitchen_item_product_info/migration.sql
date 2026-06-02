@@ -44,7 +44,7 @@ Auswahlhinweise:
     ),
     (
       'WM-B-EWA34660W',
-      '/product-info/washing-machine-product-info.pdf',
+      '/product-info/ewa-34660-w-product-info.pdf',
       'Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt 8 kg Fassungsvermoegen und 1400 U/min.',
       'Wichtige Punkte:
 - Produkttyp: Waschmaschine.
@@ -108,7 +108,7 @@ Auswahlhinweise:
     ),
     (
       'HOOD-C-FH664621E',
-      '/product-info/extractor-hood-chimney-product-info.pdf',
+      '/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf',
       'Kamin-Dunstabzugshaube FH664621E fuer eine 60-cm-Kuechenloesung. Die Produktinformation nennt einen maximalen Luftstrom von 415 m3/h.',
       'Wichtige Punkte:
 - Produkttyp: Kamin-Dunstabzugshaube.
@@ -121,7 +121,7 @@ Auswahlhinweise:
     ),
     (
       'WM-C-EWA34660W',
-      '/product-info/washing-machine-product-info.pdf',
+      '/product-info/ewa-34660-w-product-info.pdf',
       'Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt 8 kg Fassungsvermoegen und 1400 U/min.',
       'Wichtige Punkte:
 - Produkttyp: Waschmaschine.

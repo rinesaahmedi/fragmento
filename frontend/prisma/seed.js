@@ -6,12 +6,12 @@ const SERVICE_CLAIM_TROUBLESHOOTING_DATA = require("../lib/service-claim-trouble
 const prisma = new PrismaClient();
 
 const PRODUCT_INFO_FILES = {
-  dishwasher: "/product-info/A-EGSPV597210_Produktinformation_Eco21.pdf",
-  oven: "/product-info/EBX_943_600_S_Produktinformation.pdf",
-  hood: "/product-info/FH_664_621_S_Produktinformation.pdf",
-  hoodChimney: "/product-info/khf664611s-chimney-extractor-hood-product-info.pdf",
-  fridge: "/product-info/KGC_15495_S_Produktinformation_Eco21.pdf",
-  ledLightingLabel: "/product-info/led-lighting-set-label.pdf",
+  dishwasher: "/product-info/a-egspv597210-product-info-eco21.pdf",
+  oven: "/product-info/ebx-943-600-s-product-info.pdf",
+  hood: "/product-info/fh-664-621-s-product-info.pdf",
+  hoodChimney: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf",
+  fridge: "/product-info/kgc-15495-s-product-info-eco21.pdf",
+  ledLightingLabel: "/product-info/led-lighting-set-elabel.pdf",
 };
 
 const PRODUCT_IMAGE_FILES = {
@@ -104,7 +104,7 @@ const PRODUCT_INFO_BY_CODE = {
   },
   "WM-B-EWA34660W": {
     productImagePath: PRODUCT_IMAGE_FILES.washingMachine,
-    productInfoPdfPath: "/product-info/ewa34660w-washing-machine-product-info.pdf",
+    productInfoPdfPath: "/product-info/ewa-34660-w-product-info.pdf",
     productInfoSummary: "Waschmaschine EWA34660W fuer die Kuechenkonfiguration. Die Produktinformation nennt Energieeffizienzklasse A, 47 kWh / 100 Zyklen, 48 l/Zyklus, 8 kg Fassungsvermoegen, 1400 U/min, 72 dB(A) und Geraetemasse 830 x 600 x 540 mm.",
     productInfoKeyFacts: [
       "Produkttyp: Waschmaschine.",

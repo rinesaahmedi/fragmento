@@ -247,7 +247,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
               </label>
               <div style={filterActionsStyle}>
                 <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
-                <Link href="/admin/orders" style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
+                <Link href="/admin/orders" scroll={false} style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
               </div>
             </div>
           </form>
@@ -259,6 +259,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                 <Link
                   key={filter.status || "all"}
                   href={getStatusHref(filters, filter.status)}
+                  scroll={false}
                   className="orders-status-filter"
                   style={isActive ? statusFilterActiveStyle : statusFilterStyle}
                 >

@@ -1,6 +1,6 @@
 UPDATE "KitchenItem"
 SET
-  "productInfoPdfPath" = '/product-info/led-lighting-set-label.pdf',
+  "productInfoPdfPath" = '/product-info/led-lighting-set-elabel.pdf',
   "productInfoSummary" = 'Energie-Label fuer das LED-Beleuchtungsset KA220043_S3.',
   "productInfoKeyFacts" = '["Produkttyp: LED-Beleuchtungsset.","Artikelnummer: KA220043_S3.","Dokument: Energie-Label."]'::jsonb,
   "productInfoExtractedText" = 'Produktname: LED-Beleuchtungsset KA220043_S3.

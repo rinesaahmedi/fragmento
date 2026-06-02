@@ -23,6 +23,7 @@ import {
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
+import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -100,19 +101,184 @@ function KitchenCatalogPreview({ markup, iconMarkup, slotLabel, itemType }) {
 
   if (normalizedIconMarkup) {
     return (
-      <div style={previewIconWrapStyle} aria-label={`${itemType || "Item"} icon preview`}>
+      <div className="kitchen-catalog-preview--icon" style={previewIconWrapStyle} aria-label={`${itemType || "Item"} icon preview`}>
         <div style={previewIconStyle} dangerouslySetInnerHTML={{ __html: normalizedIconMarkup }} />
       </div>
     );
   }
 
   if (!markup) {
-    return <div style={isComponent ? previewEmptyStyle : previewEmptyCompactStyle}><AdminText i18nKey="kitchenDetailAdmin.noPreview" fallback="No preview" /></div>;
+    return <div className="kitchen-catalog-preview--empty" style={isComponent ? previewEmptyStyle : previewEmptyCompactStyle}><AdminText i18nKey="kitchenDetailAdmin.noPreview" fallback="No preview" /></div>;
   }
 
   return (
-    <div style={previewWrapStyle} aria-label={slotLabel ? `${slotLabel} preview` : "Kitchen preview"}>
-      <div style={previewSvgStyle} dangerouslySetInnerHTML={{ __html: markup }} />
+    <div className="kitchen-catalog-preview" style={previewWrapStyle} aria-label={slotLabel ? `${slotLabel} preview` : "Kitchen preview"}>
+      <div className="kitchen-catalog-preview__svg" style={previewSvgStyle} dangerouslySetInnerHTML={{ __html: markup }} />
+    </div>
+  );
+}
+
+function ProductPathStatus({ path }) {
+  const normalizedPath = String(path || "").trim();
+
+  return (
+    <div style={productPathMetaStyle}>
+      <span style={normalizedPath ? productPathAddedStyle : productPathMissingStyle}>
+        <AdminText
+          i18nKey={normalizedPath ? "kitchenDetailAdmin.pathAdded" : "kitchenDetailAdmin.missingPath"}
+          fallback={normalizedPath ? "Path added" : "Missing path"}
+        />
+      </span>
+      {normalizedPath ? (
+        <a href={normalizedPath} target="_blank" rel="noreferrer" style={productPathLinkStyle}>
+          <AdminText i18nKey="kitchenDetailAdmin.openPath" fallback="Open" />
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
+function ProductPathField({ label, name, value, placeholder, style }) {
+  return (
+    <div style={productPathFieldStyle}>
+      <label style={productPathLabelStyle}>
+        <span>{label}</span>
+        <input name={name} defaultValue={value} placeholder={placeholder} spellCheck={false} style={style} />
+      </label>
+      <ProductPathStatus path={value} />
+    </div>
+  );
+}
+
+function getKeyFactLines(keyFacts) {
+  return (Array.isArray(keyFacts) ? keyFacts : [])
+    .map((fact) => String(fact || "").trim())
+    .filter(Boolean);
+}
+
+function getKeyFactsQuality(keyFacts) {
+  const lines = getKeyFactLines(keyFacts);
+
+  if (!lines.length) {
+    return {
+      i18nKey: "kitchenDetailAdmin.noKeyFactsAdded",
+      fallback: "No key facts added",
+      style: productInfoNoticeMutedStyle,
+    };
+  }
+
+  const linesWithLabel = lines.filter((line) => line.includes(":")).length;
+
+  if (!linesWithLabel) {
+    return {
+      i18nKey: "kitchenDetailAdmin.useLabelValueFormat",
+      fallback: "Use Label: Value format for better chatbot answers",
+      style: productInfoNoticeWarningStyle,
+    };
+  }
+
+  if (linesWithLabel < lines.length) {
+    return {
+      i18nKey: "kitchenDetailAdmin.someLinesMayNotFollowLabelValueFormat",
+      fallback: "Some lines may not follow Label: Value format",
+      style: productInfoNoticeSubtleStyle,
+    };
+  }
+
+  return null;
+}
+
+function getChatbotReadiness(item) {
+  const hasSummary = Boolean(String(item.productInfoSummary || "").trim());
+  const hasKeyFacts = Boolean(getKeyFactLines(item.productInfoKeyFacts).length);
+  const hasExtractedText = Boolean(String(item.productInfoExtractedText || "").trim());
+  const count = [hasSummary, hasKeyFacts, hasExtractedText].filter(Boolean).length;
+
+  if (count === 3) {
+    return {
+      i18nKey: "kitchenDetailAdmin.chatbotReady",
+      fallback: "Ready",
+      style: chatbotReadyStyle,
+    };
+  }
+
+  if (count > 0) {
+    return {
+      i18nKey: "kitchenDetailAdmin.chatbotPartial",
+      fallback: "Partial",
+      style: chatbotPartialStyle,
+    };
+  }
+
+  return {
+    i18nKey: "kitchenDetailAdmin.chatbotMissing",
+    fallback: "Missing",
+    style: chatbotMissingStyle,
+  };
+}
+
+function ChatbotReadinessStatus({ item }) {
+  const status = getChatbotReadiness(item);
+
+  return (
+    <div style={chatbotReadinessRowStyle}>
+      <span style={chatbotReadinessLabelStyle}>
+        <AdminText i18nKey="kitchenDetailAdmin.chatbotReadiness" fallback="Chatbot readiness" />
+      </span>
+      <span style={status.style}>
+        <AdminText i18nKey={status.i18nKey} fallback={status.fallback} />
+      </span>
+    </div>
+  );
+}
+
+function KeyFactsGuidance({ keyFacts }) {
+  const warning = getKeyFactsQuality(keyFacts);
+  return warning ? (
+    <p style={warning.style}>
+      <AdminText i18nKey={warning.i18nKey} fallback={warning.fallback} />
+    </p>
+  ) : null;
+}
+
+function ProductInformationFields({ item = {}, compact = false, placeholders = false }) {
+  const currentInputStyle = compact ? compactInputStyle : inputStyle;
+  const imagePath = item.productImagePath || "";
+  const keyFacts = Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [];
+
+  return (
+    <div style={productInfoGroupsStyle}>
+      <fieldset style={productInfoGroupStyle}>
+        <legend style={productInfoGroupLegendStyle}>
+          <AdminText i18nKey="kitchenDetailAdmin.productFiles" fallback="Product Files" />
+        </legend>
+        <div style={productInfoFieldsStyle}>
+          <ProductPathField
+            label={<AdminText i18nKey="kitchenDetailAdmin.productImagePath" fallback="Image Path" />}
+            name="productImagePath"
+            value={imagePath}
+            placeholder={placeholders ? "/product-images/email/example.jpg" : undefined}
+            style={currentInputStyle}
+          />
+        </div>
+      </fieldset>
+
+      <fieldset style={productInfoGroupStyle}>
+        <legend style={productInfoGroupLegendStyle}>
+          <AdminText i18nKey="kitchenDetailAdmin.chatbotInformation" fallback="Chatbot Information" />
+        </legend>
+        <ChatbotReadinessStatus item={item} />
+        <div style={productInfoFieldsStyle}>
+          <AdminProductInfoPdfManager
+            initialPdfPath={item.productInfoPdfPath || ""}
+            initialSummary={item.productInfoSummary || ""}
+            initialKeyFacts={keyFacts}
+            initialExtractedText={item.productInfoExtractedText || ""}
+            compact={compact}
+          />
+          <KeyFactsGuidance keyFacts={keyFacts} />
+        </div>
+      </fieldset>
     </div>
   );
 }
@@ -273,7 +439,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
         <AdminSection
           title={<AdminText i18nKey="kitchenDetailAdmin.catalogItems" fallback="Catalog Items" />}
         >
-          <form method="get" style={catalogFiltersStyle}>
+          <form method="get" className="kitchen-catalog-items__filters" style={catalogFiltersStyle}>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.searchItems" fallback="Search items" />}>
               <AdminTranslatedInput
                 name="itemSearch"
@@ -321,11 +487,11 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               const iconMarkup = item.componentKey ? "" : (ITEM_ICON_MARKUP[item.iconKey] || "");
 
               return (
-                <details key={item.id} id={`item-${item.id}`} open={isRequestedEdit} style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
-                  <summary style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
-                    <div style={compactSummaryMainStyle}>
-                      <strong style={{ fontSize: "1.05rem" }}>{item.name}</strong>
-                      <div style={subMetaStyle}>
+                <details key={item.id} id={`item-${item.id}`} open={isRequestedEdit} className="kitchen-catalog-item-card" style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
+                  <summary className="kitchen-catalog-item-card__summary" style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
+                    <div className="kitchen-catalog-item-card__main" style={compactSummaryMainStyle}>
+                      <strong className="kitchen-catalog-item-card__title" style={{ fontSize: "1.05rem" }}>{item.name}</strong>
+                      <div className="kitchen-catalog-item-card__meta" style={subMetaStyle}>
                         <TypeBadge label={item.itemType} />
                         <span><AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />: {item.code}</span>
                         <span><AdminText i18nKey="kitchenDetailAdmin.articleNo" fallback="Article No" />: {item.articleNumber || "-"}</span>
@@ -339,7 +505,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       slotLabel={slot?.label || item.name}
                       itemType={item.itemType}
                     />
-                    <div style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
+                    <div className="kitchen-catalog-item-card__actions" style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
                       <AdminStatusBadge status={item.isActive ? "ACTIVE" : "ARCHIVED"} />
                       <span style={editHintStyle}><AdminText i18nKey="kitchenDetailAdmin.edit" fallback="Edit" /></span>
                     </div>
@@ -399,21 +565,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     <details style={advancedDetailsStyle}>
                       <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
                       <div style={advancedFieldsStyle}>
-                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productImagePath" fallback="Image Path" />} wide>
-                          <input name="productImagePath" defaultValue={item.productImagePath || ""} style={compactInputStyle} />
-                        </FormField>
-                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoPdfPath" fallback="PDF Path" />} wide>
-                          <input name="productInfoPdfPath" defaultValue={item.productInfoPdfPath || ""} style={compactInputStyle} />
-                        </FormField>
-                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoSummary" fallback="Intro Summary" />} wide>
-                          <textarea name="productInfoSummary" defaultValue={item.productInfoSummary || ""} rows={2} style={compactTextareaStyle} />
-                        </FormField>
-                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoKeyFacts" fallback="Key Facts" />} wide>
-                          <textarea name="productInfoKeyFacts" defaultValue={(item.productInfoKeyFacts || []).join("\n")} rows={4} style={compactTextareaStyle} />
-                        </FormField>
-                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoExtractedText" fallback="Extracted Product Text" />} wide>
-                          <textarea name="productInfoExtractedText" defaultValue={item.productInfoExtractedText || ""} rows={5} style={compactTextareaStyle} />
-                        </FormField>
+                        <ProductInformationFields item={item} compact />
                       </div>
                     </details>
 
@@ -506,21 +658,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <details style={advancedDetailsStyle}>
                 <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
                 <div style={advancedFieldsStyle}>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productImagePath" fallback="Image Path" />} wide>
-                    <input name="productImagePath" placeholder="/product-images/email/example.jpg" style={inputStyle} />
-                  </FormField>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoPdfPath" fallback="PDF Path" />} wide>
-                    <input name="productInfoPdfPath" placeholder="/product-info/example.pdf" style={inputStyle} />
-                  </FormField>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoSummary" fallback="Intro Summary" />} wide>
-                    <textarea name="productInfoSummary" rows={2} style={textareaStyle} />
-                  </FormField>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoKeyFacts" fallback="Key Facts" />} wide>
-                    <textarea name="productInfoKeyFacts" rows={4} placeholder="One key fact per line" style={textareaStyle} />
-                  </FormField>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.productInfoExtractedText" fallback="Extracted Product Text" />} wide>
-                    <textarea name="productInfoExtractedText" rows={5} style={textareaStyle} />
-                  </FormField>
+                  <ProductInformationFields placeholders />
                 </div>
               </details>
 
@@ -530,6 +668,110 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             </form>
           </details>
         </AdminSection>
+        <style>{`
+          @media (max-width: 700px) {
+            .kitchen-catalog-items__filters {
+              grid-template-columns: 1fr !important;
+              gap: 10px !important;
+            }
+
+            .kitchen-catalog-items__filters > div:last-child {
+              width: 100%;
+              display: grid !important;
+              grid-template-columns: 1fr 1fr;
+              gap: 8px !important;
+              align-self: stretch !important;
+            }
+
+            .kitchen-catalog-items__filters button,
+            .kitchen-catalog-items__filters a {
+              width: 100%;
+              justify-content: center;
+              min-height: 44px;
+            }
+
+            .kitchen-catalog-item-card {
+              border-radius: 14px !important;
+            }
+
+            .kitchen-catalog-item-card__summary {
+              display: grid !important;
+              grid-template-columns: 1fr !important;
+              gap: 12px !important;
+              align-items: stretch !important;
+              padding: 14px !important;
+            }
+
+            .kitchen-catalog-item-card__title {
+              display: block;
+              font-size: 1rem !important;
+              line-height: 1.25;
+              overflow-wrap: anywhere;
+            }
+
+            .kitchen-catalog-item-card__meta {
+              display: grid !important;
+              grid-template-columns: 1fr !important;
+              gap: 5px !important;
+              color: var(--app-text-muted);
+              font-size: 12px !important;
+              line-height: 1.35;
+            }
+
+            .kitchen-catalog-item-card__meta > span {
+              min-width: 0;
+              overflow-wrap: anywhere;
+            }
+
+            .kitchen-catalog-preview,
+            .kitchen-catalog-preview--icon,
+            .kitchen-catalog-preview--empty {
+              width: 100% !important;
+              min-width: 0 !important;
+              max-width: none !important;
+              box-sizing: border-box;
+            }
+
+            .kitchen-catalog-preview {
+              min-height: 0 !important;
+              overflow: visible;
+            }
+
+            .kitchen-catalog-preview__svg {
+              width: 100% !important;
+              max-height: none;
+              overflow: visible;
+            }
+
+            .kitchen-catalog-preview__svg svg {
+              width: 100% !important;
+              height: auto !important;
+              display: block;
+            }
+
+            .kitchen-catalog-preview--icon {
+              min-height: 72px !important;
+              justify-items: start !important;
+              padding: 12px !important;
+            }
+
+            .kitchen-catalog-item-card__actions {
+              width: 100%;
+              justify-content: space-between !important;
+              align-items: center !important;
+              gap: 10px !important;
+              padding-top: 2px;
+            }
+
+            .kitchen-catalog-item-card form {
+              padding: 12px !important;
+            }
+
+            .kitchen-catalog-item-card form > div:first-child {
+              grid-template-columns: 1fr !important;
+            }
+          }
+        `}</style>
       </div>
     </AdminShell>
   );
@@ -651,6 +893,125 @@ const advancedFieldsStyle = {
   display: "grid",
   gap: 12,
   padding: "0 14px 14px",
+};
+
+const productInfoGroupsStyle = {
+  display: "grid",
+  gap: 12,
+};
+
+const productInfoGroupStyle = {
+  border: "1px solid var(--app-border)",
+  borderRadius: 10,
+  padding: "12px",
+  margin: 0,
+  display: "grid",
+  gap: 10,
+  background: "rgba(255,255,255,0.72)",
+};
+
+const productInfoGroupLegendStyle = {
+  padding: "0 6px",
+  color: "var(--app-text)",
+  fontSize: "0.92rem",
+  fontWeight: 800,
+};
+
+const productInfoHelpTextStyle = {
+  ...mutedTextStyle,
+  fontSize: 13,
+};
+
+const productInfoFieldsStyle = {
+  display: "grid",
+  gap: 10,
+};
+
+const productPathFieldStyle = {
+  display: "grid",
+  gap: 8,
+  color: "var(--app-text)",
+  fontWeight: 700,
+};
+
+const productPathLabelStyle = {
+  display: "grid",
+  gap: 8,
+};
+
+const productPathMetaStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+  flexWrap: "wrap",
+  fontSize: 12,
+  lineHeight: 1.3,
+};
+
+const productPathAddedStyle = {
+  color: "var(--app-success-text)",
+  fontWeight: 800,
+};
+
+const productPathMissingStyle = {
+  color: "var(--app-text-muted)",
+  fontWeight: 800,
+};
+
+const productPathLinkStyle = {
+  color: "var(--app-accent)",
+  fontWeight: 800,
+  textDecoration: "underline",
+  textUnderlineOffset: 2,
+};
+
+const chatbotReadinessRowStyle = {
+  display: "flex",
+  gap: 8,
+  alignItems: "center",
+  flexWrap: "wrap",
+  fontSize: 12,
+};
+
+const chatbotReadinessLabelStyle = {
+  color: "var(--app-text-muted)",
+  fontWeight: 800,
+};
+
+const chatbotReadyStyle = {
+  color: "var(--app-success-text)",
+  fontWeight: 900,
+};
+
+const chatbotPartialStyle = {
+  color: "var(--app-accent)",
+  fontWeight: 900,
+};
+
+const chatbotMissingStyle = {
+  color: "var(--app-text-muted)",
+  fontWeight: 900,
+};
+
+const productInfoNoticeMutedStyle = {
+  margin: 0,
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 800,
+};
+
+const productInfoNoticeSubtleStyle = {
+  margin: 0,
+  color: "var(--app-accent)",
+  fontSize: 12,
+  fontWeight: 800,
+};
+
+const productInfoNoticeWarningStyle = {
+  margin: 0,
+  color: "var(--app-danger-text)",
+  fontSize: 12,
+  fontWeight: 800,
 };
 
 const catalogPanelStyle = {

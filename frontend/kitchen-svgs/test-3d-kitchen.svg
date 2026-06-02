@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="600" viewBox="0 0 860 600" version="1.1">
+  <title>TEST 3D Kitchen CAD Style Plan</title>
+  <desc>Clean CAD-style 2D projection for the TEST 3D kitchen layout with selectable component groups.</desc>
+
+  <rect x="0" y="0" width="860" height="600" fill="#172126"/>
+
+  <g data-component-id="component-t3d-wall-1">
+    <rect x="132" y="82" width="66" height="126" fill="#777d79" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M132 82L158 68H224L198 82Z" fill="#8d928e" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M198 82L224 68V194L198 208Z" fill="#666d69" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M165 102V190M181 142V180" fill="none" stroke="#e9eeeb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-t3d-wall-2">
+    <rect x="198" y="82" width="66" height="126" fill="#777d79" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M198 82L224 68H290L264 82Z" fill="#8d928e" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M231 102V190M247 142V180" fill="none" stroke="#e9eeeb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-t3d-wall-3">
+    <rect x="264" y="82" width="66" height="126" fill="#777d79" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M264 82L290 68H356L330 82Z" fill="#8d928e" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M297 102V190M313 142V180" fill="none" stroke="#e9eeeb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-t3d-wall-4">
+    <rect x="330" y="82" width="66" height="126" fill="#777d79" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M330 82L356 68H422L396 82Z" fill="#8d928e" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M363 102V190M379 142V180" fill="none" stroke="#e9eeeb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-t3d-wall-5">
+    <rect x="396" y="82" width="66" height="126" fill="#777d79" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M396 82L422 68H488L462 82Z" fill="#8d928e" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M462 82L488 68V194L462 208Z" fill="#666d69" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M429 102V190M445 142V180" fill="none" stroke="#e9eeeb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-t3d-light">
+    <rect x="170" y="235" width="276" height="12" fill="#707773" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M216 250l-8 20M224 250l-2 22M232 250l6 20" fill="none" stroke="#e9eeeb" stroke-width="1"/>
+    <path d="M300 250l-8 20M308 250l-2 22M316 250l6 20" fill="none" stroke="#e9eeeb" stroke-width="1"/>
+  </g>
+
+  <g data-component-id="component-t3d-hood">
+    <rect x="414" y="258" width="70" height="36" fill="#747b77" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M426 286H472" fill="none" stroke="#e9eeeb" stroke-width="1.75" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-t3d-worktop-main">
+    <rect x="92" y="324" width="444" height="26" fill="#8f9490" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M92 324L122 304H566L536 324Z" fill="#a0a5a1" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M122 304H566M92 350H536" fill="none" stroke="#e9eeeb" stroke-width="1"/>
+  </g>
+
+  <g data-component-id="component-t3d-worktop-return">
+    <rect x="536" y="244" width="252" height="26" fill="#8f9490" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M536 244L566 224H818L788 244Z" fill="#a0a5a1" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M566 224H818M536 270H788" fill="none" stroke="#e9eeeb" stroke-width="1"/>
+  </g>
+
+  <g data-component-id="component-t3d-sink">
+    <rect x="188" y="304" width="86" height="30" fill="#858a86" stroke="#e9eeeb" stroke-width="1.25"/>
+    <rect x="208" y="310" width="46" height="16" fill="none" stroke="#e9eeeb" stroke-width="1"/>
+    <path d="M260 305V276M260 276C280 276 286 286 274 296" fill="none" stroke="#e9eeeb" stroke-width="3" stroke-linecap="round"/>
+  </g>
+
+  <g data-component-id="component-t3d-washer">
+    <rect x="92" y="350" width="88" height="132" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M92 382H180M136 350V482" fill="none" stroke="#e9eeeb" stroke-width="1"/>
+    <path d="M112 410H160M112 442H160" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+  </g>
+
+  <g data-component-id="component-t3d-sink-base">
+    <rect x="180" y="350" width="88" height="132" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M224 350V482M196 398H252" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+  </g>
+
+  <g data-component-id="component-t3d-dishwasher">
+    <rect x="268" y="350" width="88" height="132" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M284 382H340M296 402H328" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+  </g>
+
+  <g data-component-id="component-t3d-oven">
+    <rect x="356" y="350" width="88" height="132" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <rect x="378" y="392" width="44" height="58" fill="#7b817d" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M370 372H430M384 460H416" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+    <circle cx="388" cy="365" r="3" fill="#6f7672" stroke="#e9eeeb" stroke-width="1"/>
+    <circle cx="412" cy="365" r="3" fill="#6f7672" stroke="#e9eeeb" stroke-width="1"/>
+  </g>
+
+  <g data-component-id="component-t3d-storage">
+    <rect x="444" y="350" width="92" height="132" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M490 350V482M462 382H518M462 414H518M462 446H518" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+  </g>
+
+  <g data-component-id="component-t3d-corner">
+    <rect x="536" y="270" width="84" height="80" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M578 270V350M552 312H604" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+  </g>
+
+  <g data-component-id="component-t3d-base">
+    <rect x="620" y="270" width="84" height="80" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M662 270V350M636 312H688" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+  </g>
+
+  <g data-component-id="component-t3d-drawers">
+    <rect x="704" y="270" width="84" height="80" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M704 296H788M704 323H788" fill="none" stroke="#e9eeeb" stroke-width="1"/>
+    <path d="M726 284H766M726 310H766M726 338H766" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+  </g>
+</svg>

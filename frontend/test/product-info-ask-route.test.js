@@ -4,14 +4,20 @@ const path = require("node:path");
 const test = require("node:test");
 
 const routePath = path.join(__dirname, "..", "app", "api", "product-info", "ask", "route.js");
+const routeCorePath = path.join(__dirname, "..", "lib", "product-info-ask.js");
 const configuratorPath = path.join(__dirname, "..", "components", "kitchen-configurator.js");
 const publicEnPath = path.join(__dirname, "..", "locales", "public.en.json");
 
-function loadRoute(overrides = {}) {
-  const source = fs
-    .readFileSync(routePath, "utf8")
-    .replace(/^import .*;\r?\n/gm, "")
+function loadModuleSource(filePath) {
+  return fs
+    .readFileSync(filePath, "utf8")
+    .replace(/^import[\s\S]*?;\r?\n/gm, "")
+    .replace(/export\s+\{[\s\S]*?\};\r?\n?/g, "")
     .replace("export async function POST", "async function POST");
+}
+
+function loadRoute(overrides = {}) {
+  const source = `${loadModuleSource(routeCorePath)}\n${loadModuleSource(routePath)}`;
 
   const NextResponse = overrides.NextResponse || {
     json(body, init = {}) {
@@ -75,6 +81,29 @@ function request(payload) {
   };
 }
 
+async function withExpectedRouteErrorLog(expectedMessage, callback) {
+  const originalError = console.error;
+  const captured = [];
+
+  console.error = (...args) => {
+    const [label, error] = args;
+    const message = error instanceof Error ? error.message : String(error || "");
+    if (label === "Product info assistant failed:" && message.includes(expectedMessage)) {
+      captured.push(message);
+      return;
+    }
+
+    originalError(...args);
+  };
+
+  try {
+    return await callback();
+  } finally {
+    console.error = originalError;
+    assert.equal(captured.length, 1);
+  }
+}
+
 function product(overrides = {}) {
   return {
     id: "item-1",
@@ -101,7 +130,10 @@ test("all-products UI copy uses plural wording", () => {
 });
 
 test("product info route source has no corrupted UTF-8 markers", () => {
-  const routeSource = fs.readFileSync(routePath, "utf8");
+  const routeSource = [
+    fs.readFileSync(routePath, "utf8"),
+    fs.readFileSync(routeCorePath, "utf8"),
+  ].join("\n");
   assert.doesNotMatch(routeSource, new RegExp(String.fromCharCode(0x00c3)));
 });
 
@@ -150,13 +182,16 @@ test("POST rejects itemIds that are not active and authorized for the contract k
     },
   });
 
-  const response = await route.POST(request({
-    language: "en",
-    question: "What is the energy class?",
-    contractNumber: "CON-1",
-    kitchenSlug: "demo-kitchen",
-    itemIds: ["bad-item"],
-  }));
+  const response = await withExpectedRouteErrorLog(
+    "No authorized active product items were found.",
+    () => route.POST(request({
+      language: "en",
+      question: "What is the energy class?",
+      contractNumber: "CON-1",
+      kitchenSlug: "demo-kitchen",
+      itemIds: ["bad-item"],
+    })),
+  );
 
   assert.equal(response.status, 404);
   assert.equal(response.body.ok, false);
@@ -165,13 +200,16 @@ test("POST rejects itemIds that are not active and authorized for the contract k
 test("POST rejects contract kitchen mismatch", async () => {
   const route = loadRoute();
 
-  const response = await route.POST(request({
-    language: "en",
-    question: "What is the model?",
-    contractNumber: "CON-1",
-    kitchenSlug: "other-kitchen",
-    itemIds: ["item-1"],
-  }));
+  const response = await withExpectedRouteErrorLog(
+    "Contract number does not match the selected kitchen.",
+    () => route.POST(request({
+      language: "en",
+      question: "What is the model?",
+      contractNumber: "CON-1",
+      kitchenSlug: "other-kitchen",
+      itemIds: ["item-1"],
+    })),
+  );
 
   assert.equal(response.status, 403);
   assert.equal(response.body.ok, false);
@@ -1177,6 +1215,114 @@ test("POST scopes fuzzy product aliases and typo topics to the intended applianc
   assert.match(albanianFridgeNoise.body.answer, /^The documented noise values are:/);
   assert.match(albanianFridgeNoise.body.answer, /Refrigerator-freezer \(KGC 15495 S\): 41 dB/);
   assert.doesNotMatch(albanianFridgeNoise.body.answer, /Washing machine|Dishwasher|Extractor hood/);
+});
+
+test("POST handles cleaned product-info manual verification questions", async () => {
+  const washer = product({
+    id: "washer",
+    name: "Washing Machine (600 x 600 x 878 mm)",
+    productInfoKeyFacts: [
+      "Model: EWA34660W",
+      "Energy class: A",
+      "Water consumption: 48 l/cycle",
+      "Noise: 72 dB(A)",
+      "Capacity: 8 kg",
+      "Appliance dimensions H x W x D: 830 x 600 x 540 mm",
+      "Installation dimensions H x W x D: 825 - 825 x 600 x 580 mm",
+      "Programs: 16",
+      "Additional programs: Steam Wash, Express 15', Baby Comfort",
+      "Additional functions: Standby, Startzeitvorwahl, Schleuderwahl, Temperaturwahl, Start/Pause",
+    ],
+    productInfoExtractedText: "Zusatzprogramme: Steam Wash, Express 15', Baby Comfort.\nZusatzfunktionen: Standby, Startzeitvorwahl, Schleuderwahl, Temperaturwahl, Start/Pause.",
+  });
+  const fridge = product({
+    id: "fridge",
+    name: "Refrigerator",
+    productInfoKeyFacts: [
+      "Model: KGC15495S",
+      "Energy class: E",
+      "Noise: 41 dB",
+      "Nutzinhalt: 250 l",
+      "Appliance dimensions H x W x D: 1800 x 545 x 590 mm",
+    ],
+  });
+  const ovenHob = product({
+    id: "oven-hob",
+    name: "Built-in Oven and Hob",
+    productInfoKeyFacts: [
+      "Backofen: Model: EBX943600S",
+      "Backofen: Energy class: A",
+      "Backofen: 77 l volume, 9 functions",
+      "Backofen: Appliance dimensions H x W x D: 595 x 595 x 575 mm",
+      "Backofen: Installation dimensions H x W x D: 595 x 560 x 560 mm",
+      "Kochfeld: Model: OL-KMI754000E",
+      "Kochfeld: 4 cooking zones",
+      "Kochfeld: 9 power levels",
+      "Kochfeld: Appliance dimensions W x D: 590 x 520 mm",
+      "Kochfeld: Cut-out dimensions W x D: 560 x 490 mm",
+    ],
+  });
+  const route = loadRoute({
+    prisma: {
+      kitchenItem: {
+        findMany: async ({ where }) => [washer, fridge, ovenHob].filter((item) => where.id.in.includes(item.id)),
+      },
+    },
+  });
+  const basePayload = {
+    language: "en",
+    contractNumber: "CON-1",
+    kitchenSlug: "demo-kitchen",
+  };
+
+  const programCount = await route.POST(request({ ...basePayload, itemIds: ["washer"], question: "how many programs does the washing machine have?" }));
+  assert.equal(programCount.status, 200);
+  assert.match(programCount.body.answer, /16 programs/i);
+
+  const washerFunctions = await route.POST(request({ ...basePayload, itemIds: ["washer"], question: "what functions does the washing machine have?" }));
+  assert.equal(washerFunctions.status, 200);
+  assert.match(washerFunctions.body.answer, /Startzeitvorwahl/);
+  assert.match(washerFunctions.body.answer, /Schleuderwahl/);
+  assert.match(washerFunctions.body.answer, /Temperaturwahl/);
+  assert.match(washerFunctions.body.answer, /Start\/Pause/);
+
+  const steamWash = await route.POST(request({ ...basePayload, itemIds: ["washer"], question: "does it have Steam Wash?" }));
+  assert.equal(steamWash.status, 200);
+  assert.match(steamWash.body.answer, /Steam Wash/i);
+  assert.equal(steamWash.body.found, true);
+
+  const washerDimensions = await route.POST(request({ ...basePayload, itemIds: ["washer"], question: "what are the washing machine dimensions?" }));
+  assert.equal(washerDimensions.status, 200);
+  assert.match(washerDimensions.body.answer, /830\s*(?:x|\u00d7)\s*600\s*(?:x|\u00d7)\s*540 mm/);
+  assert.match(washerDimensions.body.answer, /825.*600.*580 mm/);
+
+  const fridgeCapacity = await route.POST(request({ ...basePayload, itemIds: ["fridge"], question: "what is the fridge capacity?" }));
+  assert.equal(fridgeCapacity.status, 200);
+  assert.match(fridgeCapacity.body.answer, /250 l/);
+
+  const ovenHobDimensions = await route.POST(request({ ...basePayload, itemIds: ["oven-hob"], question: "what are the oven and hob dimensions?" }));
+  assert.equal(ovenHobDimensions.status, 200);
+  assert.match(ovenHobDimensions.body.answer, /Oven/);
+  assert.match(ovenHobDimensions.body.answer, /595\s*(?:x|\u00d7)\s*595\s*(?:x|\u00d7)\s*575 mm/);
+  assert.match(ovenHobDimensions.body.answer, /Hob/);
+  assert.match(ovenHobDimensions.body.answer, /590\s*(?:x|\u00d7)\s*520 mm/);
+
+  const ovenHobFunctions = await route.POST(request({ ...basePayload, itemIds: ["oven-hob"], question: "what functions does the oven and hob have?" }));
+  assert.equal(ovenHobFunctions.status, 200);
+  assert.match(ovenHobFunctions.body.answer, /9 functions/i);
+  assert.match(ovenHobFunctions.body.answer, /4 cooking zones/i);
+  assert.match(ovenHobFunctions.body.answer, /9 power levels/i);
+
+  const ovenHobNoise = await route.POST(request({ ...basePayload, itemIds: ["oven-hob"], question: "what is the oven hob noise value?" }));
+  assert.equal(ovenHobNoise.status, 200);
+  assert.equal(ovenHobNoise.body.found, false);
+  assert.match(ovenHobNoise.body.answer, /could not find|not documented/i);
+  assert.doesNotMatch(ovenHobNoise.body.answer, /energy class/i);
+
+  const fridgeNiche = await route.POST(request({ ...basePayload, itemIds: ["fridge"], question: "what are the fridge niche dimensions?" }));
+  assert.equal(fridgeNiche.status, 200);
+  assert.equal(fridgeNiche.body.found, false);
+  assert.match(fridgeNiche.body.answer, /could not find|not documented/i);
 });
 
 test("POST compares requested products across multiple requested topics", async () => {

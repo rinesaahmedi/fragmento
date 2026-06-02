@@ -112,8 +112,11 @@ test.afterEach(() => {
 test("normalizes dishwasher error codes", () => {
   const route = loadRoute();
   assert.equal(route.normalizeCode(" e 02 "), "E02");
+  assert.equal(route.normalizeCode("E01"), "E1");
   assert.equal(route.normalizeCode("e1"), "E1");
   assert.equal(route.normalizeCode("E3"), "E3");
+  assert.equal(route.normalizeCode("E03"), "E3");
+  assert.equal(route.normalizeCode("E04"), "E4");
 });
 
 test("known dishwasher error uses local knowledge and offers claim-form help", async () => {
@@ -224,6 +227,50 @@ test("low-information greeting does not show claim-form help action", async () =
   assert.equal(response.status, 200);
   assert.equal(response.body.actions, undefined);
   assert.match(response.body.answer, /help you with the claim/i);
+});
+
+test("repeated greeting uses the greeting response instead of vague issue triage", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "hello hello",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.actions, undefined);
+  assert.match(response.body.answer, /help you with the claim/i);
+  assert.doesNotMatch(response.body.answer, /which of these fits best/i);
+});
+
+test("clearly unrelated question redirects to service claim scope", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "what is the weather today?",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.actions, undefined);
+  assert.match(response.body.answer, /only help with kitchen service claims/i);
+  assert.match(response.body.answer, /what is not working in the kitchen/i);
+});
+
+test("vague service issue is not blocked by out-of-scope guard", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "something is broken",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(response.body.answer, /only help with kitchen service claims/i);
+  assert.match(response.body.answer, /damaged or broken item/i);
 });
 
 test("generic non-database issue does not show claim-form help action", async () => {
@@ -432,4 +479,62 @@ test("OpenAI context marks appliance switches so latest user issue wins", async 
 
   assert.equal(response.status, 200);
   assert.equal(response.body.answer, "This is about the washing machine now.");
+});
+
+test("misspelled dishwasher question still opens dishwasher triage", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "dishwaher isn work ???",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /trouble with the dishwasher/i);
+  assert.match(response.body.answer, /not draining/i);
+});
+
+test("misspelled appliance names are classified across claim assistant triage", async () => {
+  const route = loadRoute();
+  const cases = [
+    { question: "frige isnt cooling", expected: /fridge or freezer/i },
+    { question: "washing mashine isnt working", expected: /washing machine/i },
+    { question: "owen not heating", expected: /oven/i },
+    { question: "extracor hood doesnt work", expected: /extractor/i },
+  ];
+
+  for (const item of cases) {
+    const response = await route.POST(request({
+      language: "en",
+      question: item.question,
+      selectedAreas: [],
+      claim: emptyClaim(),
+    }));
+
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, item.expected);
+    assert.doesNotMatch(response.body.answer, /only help with kitchen service claims/i);
+  }
+});
+
+test("misspelled kitchen area names are still treated as service claim context", async () => {
+  const route = loadRoute();
+  const cases = [
+    { question: "sinkk is leaking", expected: /leak/i },
+    { question: "cabnet door broken", expected: /damaged or broken item/i },
+  ];
+
+  for (const item of cases) {
+    const response = await route.POST(request({
+      language: "en",
+      question: item.question,
+      selectedAreas: [],
+      claim: emptyClaim(),
+    }));
+
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, item.expected);
+    assert.doesNotMatch(response.body.answer, /only help with kitchen service claims/i);
+  }
 });

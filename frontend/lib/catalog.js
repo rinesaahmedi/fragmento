@@ -29,6 +29,20 @@ export const MONTAGE_REQUIRED_CODES = [
   "SINKBASE-C-600",
   "DISH-C-600-STD",
   "CAB-DRAWER-C-3D",
+  "T3D-CAB-WALL-01",
+  "T3D-CAB-WALL-02",
+  "T3D-CAB-WALL-03",
+  "T3D-CAB-WALL-04",
+  "T3D-CAB-WALL-05",
+  "T3D-WASHER-001",
+  "T3D-SINKBASE-001",
+  "T3D-DISH-001",
+  "T3D-OVEN-HOB-001",
+  "T3D-CAB-STORAGE-001",
+  "T3D-HOOD-001",
+  "T3D-CAB-CORNER-001",
+  "T3D-CAB-BASE-001",
+  "T3D-CAB-DRAWERS-001",
 ];
 
 /** Built-in appliances / standalone hoods: in `MONTAGE_REQUIRED_CODES` for legacy rules but not "cabinet" units for montage eligibility. */
@@ -41,6 +55,10 @@ export const MONTAGE_NON_CABINET_COMPONENT_CODES = [
   "OVEN-C-600-HOB",
   "HOOD-B-FH664621E",
   "HOOD-C-FH664621E",
+  "T3D-WASHER-001",
+  "T3D-DISH-001",
+  "T3D-OVEN-HOB-001",
+  "T3D-HOOD-001",
 ];
 
 export const MONTAGE_CABINET_CODES = MONTAGE_REQUIRED_CODES.filter(

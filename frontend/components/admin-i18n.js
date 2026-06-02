@@ -366,6 +366,7 @@ export function AdminLanguageSwitcher() {
   return (
     <div
       ref={rootRef}
+      className="admin-language-switcher"
       style={{
         position: "relative",
         zIndex: isOpen ? 40 : "auto",
@@ -383,6 +384,7 @@ export function AdminLanguageSwitcher() {
       }}
     >
       <span
+        className="admin-language-switcher__label"
         style={{
           color: "var(--app-text-muted, #6b6259)",
           fontSize: 11,
@@ -397,6 +399,7 @@ export function AdminLanguageSwitcher() {
 
       <div style={{ position: "relative", display: "inline-flex" }}>
         <button
+          className="admin-language-switcher__trigger"
           type="button"
           aria-haspopup="menu"
           aria-expanded={isOpen}
@@ -430,13 +433,14 @@ export function AdminLanguageSwitcher() {
             }}
           >
             <FlagBadge country={currentLanguage.country} />
-            <span>{currentLanguage.label}</span>
+            <span className="admin-language-switcher__current-label">{currentLanguage.label}</span>
           </span>
           <ChevronIcon open={isOpen} />
         </button>
 
         {isOpen ? (
           <div
+            className="admin-language-switcher__menu"
             role="menu"
             aria-label={translate("adminShellLogin.language", "Language")}
             style={{
@@ -460,6 +464,7 @@ export function AdminLanguageSwitcher() {
 
               return (
                 <button
+                  className="admin-language-switcher__option"
                   key={option.value}
                   type="button"
                   role="menuitemradio"
@@ -494,7 +499,7 @@ export function AdminLanguageSwitcher() {
                     }}
                   >
                     <FlagBadge country={option.country} active={isActive} />
-                    <span>{option.label}</span>
+                    <span className="admin-language-switcher__option-label">{option.label}</span>
                   </span>
                   <span
                     aria-hidden="true"

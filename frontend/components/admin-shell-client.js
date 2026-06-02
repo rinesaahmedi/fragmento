@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import { AdminI18nProvider, AdminLanguageSwitcher, AdminText, useAdminI18n } from "./admin-i18n";
 
 const navItems = [
@@ -29,7 +30,9 @@ export function AdminShellClient({ adminEmail, initialLanguage = "en", showClaim
 function AdminShellContent({ adminEmail, showClaimsNav, children }) {
   const pathname = usePathname();
   const { translate } = useAdminI18n();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const visibleNavItems = navItems.filter((item) => !item.requiresClaimsNav || showClaimsNav);
+  const activeNavItem = visibleNavItems.find((item) => isActivePath(pathname, item.href)) ?? visibleNavItems[0];
 
   return (
     <div
@@ -94,45 +97,96 @@ function AdminShellContent({ adminEmail, showClaimsNav, children }) {
           className="admin-shell__mobile-nav"
           style={{
             display: "none",
-            gap: 10,
-            overflowX: "auto",
-            paddingBottom: 4,
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            padding: "12px 16px",
+            background: "rgba(241, 236, 230, 0.94)",
+            borderBottom: "1px solid var(--app-border)",
+            boxShadow: "0 10px 24px rgba(84, 59, 40, 0.08)",
+            position: "sticky",
+            top: 0,
+            zIndex: 60,
+            backdropFilter: "blur(14px)",
           }}
         >
-          {visibleNavItems.map((item) => {
-            const active = isActivePath(pathname, item.href);
-            const Icon = item.icon;
+          <button
+            type="button"
+            aria-label={translate("adminShellLogin.sidebar", "Sidebar")}
+            aria-expanded={isMobileNavOpen}
+            aria-controls="admin-mobile-sidebar"
+            onClick={() => setIsMobileNavOpen((current) => !current)}
+            style={mobileMenuButtonStyle}
+          >
+            <MenuIcon />
+          </button>
 
-            return (
-              <Link
-                key={`mobile-${item.href}`}
-                href={item.href}
-                prefetch={false}
+          <div style={mobileActivePageStyle}>
+            <span style={mobileActiveEyebrowStyle}>
+              <AdminText i18nKey="adminShellLogin.adminWorkspace" fallback="Admin workspace" />
+            </span>
+            <strong>{translate(activeNavItem.labelKey, activeNavItem.fallback)}</strong>
+          </div>
+
+          <button
+            type="button"
+            aria-label={translate("adminShellLogin.closeSidebar", "Close sidebar")}
+            className={`admin-shell__mobile-sidebar-backdrop${isMobileNavOpen ? " is-open" : ""}`}
+            onPointerDown={() => setIsMobileNavOpen(false)}
+          />
+
+          <aside
+            id="admin-mobile-sidebar"
+            className={`admin-shell__mobile-sidebar${isMobileNavOpen ? " is-open" : ""}`}
+            aria-hidden={!isMobileNavOpen}
+          >
+            <div style={mobileSidebarHeaderStyle}>
+              <img
+                src="/img/fragmentologo-cropped.png"
+                alt="Fragmento"
                 style={{
-                  textDecoration: "none",
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 10,
-                  minHeight: 52,
-                  padding: "10px 14px",
-                  borderRadius: 8,
-                  whiteSpace: "nowrap",
-                  background: active
-                    ? "var(--color-primary-soft)"
-                    : "var(--color-card)",
-                  color: active ? "var(--app-accent)" : "var(--app-text)",
-                  border: `1px solid ${active ? "var(--app-border-strong)" : "var(--app-border)"}`,
-                  fontWeight: active ? 700 : 600,
-                  boxShadow: active ? "0 10px 22px rgba(84, 59, 40, 0.08)" : "var(--app-shadow-soft)",
-                  flex: "0 0 auto",
-                  boxSizing: "border-box",
+                  display: "block",
+                  width: 150,
+                  height: "auto",
+                  objectFit: "contain",
                 }}
+              />
+              <button
+                type="button"
+                aria-label={translate("adminShellLogin.closeSidebar", "Close sidebar")}
+                onClick={() => setIsMobileNavOpen(false)}
+                style={mobileIconButtonStyle}
               >
-                <Icon active={active} />
-                <span>{translate(item.labelKey, item.fallback)}</span>
-              </Link>
-            );
-          })}
+                <CloseIcon />
+              </button>
+            </div>
+
+            <div style={mobileSidebarNavStyle}>
+              {visibleNavItems.map((item) => {
+                const active = isActivePath(pathname, item.href);
+                const Icon = item.icon;
+
+                return (
+                  <Link
+                    key={`mobile-${item.href}`}
+                    href={item.href}
+                    prefetch={false}
+                    onClick={() => setIsMobileNavOpen(false)}
+                    style={{
+                      ...mobileSidebarLinkStyle,
+                      background: active ? "var(--color-primary-soft)" : "transparent",
+                      color: active ? "var(--app-accent)" : "var(--app-text)",
+                      borderColor: active ? "var(--app-border-strong)" : "transparent",
+                      fontWeight: active ? 800 : 700,
+                    }}
+                  >
+                    <Icon active={active} />
+                    <span style={sidebarLabelStyle}>{translate(item.labelKey, item.fallback)}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </aside>
         </nav>
 
         <aside
@@ -319,6 +373,7 @@ function AdminShellContent({ adminEmail, showClaimsNav, children }) {
                   }}
                 >
                   <span
+                    className="admin-shell__email"
                     style={{
                       color: "var(--app-text-muted)",
                       lineHeight: 1.4,
@@ -332,6 +387,7 @@ function AdminShellContent({ adminEmail, showClaimsNav, children }) {
                   </Link>
                   <form action="/api/admin/logout" method="post" style={{ margin: 0 }}>
                   <button
+                    className="admin-shell__logout-button"
                     type="submit"
                     style={{
                       border: "1px solid var(--app-border-strong)",
@@ -369,6 +425,52 @@ function AdminShellContent({ adminEmail, showClaimsNav, children }) {
               display: flex !important;
             }
 
+            .admin-shell__mobile-sidebar-backdrop {
+              position: fixed;
+              inset: 0;
+              z-index: 79;
+              display: block;
+              width: 100vw;
+              height: 100dvh;
+              padding: 0;
+              border: 0;
+              background: rgba(27, 23, 20, 0.28);
+              opacity: 0;
+              pointer-events: none;
+              cursor: pointer;
+              transition: opacity 180ms ease;
+            }
+
+            .admin-shell__mobile-sidebar-backdrop.is-open {
+              opacity: 1;
+              pointer-events: auto;
+            }
+
+            .admin-shell__mobile-sidebar {
+              position: fixed;
+              top: 0;
+              left: 0;
+              z-index: 80;
+              width: min(320px, calc(100vw - 48px));
+              height: 100dvh;
+              overflow-y: auto;
+              padding: 18px 16px 22px;
+              background: var(--color-sidebar-bg);
+              border-right: 1px solid var(--color-border);
+              box-shadow: 18px 0 38px rgba(84, 59, 40, 0.2);
+              transform: translateX(-104%);
+              transition: transform 220ms ease;
+              box-sizing: border-box;
+              visibility: hidden;
+              pointer-events: none;
+            }
+
+            .admin-shell__mobile-sidebar.is-open {
+              transform: translateX(0);
+              visibility: visible;
+              pointer-events: auto;
+            }
+
             .admin-shell__sidebar {
               display: none !important;
             }
@@ -390,6 +492,81 @@ function AdminShellContent({ adminEmail, showClaimsNav, children }) {
 
             .admin-shell__content {
               padding: 20px 16px 0 !important;
+            }
+
+            .admin-shell__topbar {
+              padding: 14px 16px 0 !important;
+              position: static !important;
+            }
+
+            .admin-shell__topbar > div,
+            .admin-shell__topbar > div > div {
+              width: 100%;
+              gap: 8px !important;
+            }
+
+            .admin-shell__topbar > div > div {
+              justify-content: space-between !important;
+            }
+
+            .admin-language-switcher {
+              display: inline-flex !important;
+              grid-template-columns: none !important;
+              min-height: 40px !important;
+              padding: 0 !important;
+              border: 0 !important;
+              border-radius: 10px !important;
+              background: transparent !important;
+              box-shadow: none !important;
+              backdrop-filter: none !important;
+            }
+
+            .admin-language-switcher__label,
+            .admin-language-switcher__current-label,
+            .admin-shell__email {
+              display: none !important;
+            }
+
+            .admin-language-switcher__trigger {
+              min-width: 54px !important;
+              min-height: 40px !important;
+              padding: 6px 9px !important;
+              border: 1px solid var(--app-border-strong) !important;
+              gap: 6px !important;
+              background: var(--color-card) !important;
+              box-shadow: var(--app-shadow-soft) !important;
+            }
+
+            .admin-language-switcher__menu {
+              position: absolute !important;
+              top: calc(100% + 8px) !important;
+              left: 0 !important;
+              right: auto !important;
+              width: min(240px, calc(100vw - 32px)) !important;
+              min-width: 0 !important;
+              border-radius: 14px !important;
+              padding: 8px !important;
+              z-index: 120 !important;
+            }
+
+            .admin-language-switcher__option {
+              width: 100% !important;
+              min-height: 44px !important;
+              border-radius: 10px !important;
+              padding: 8px 10px !important;
+            }
+
+            .admin-language-switcher__option-label {
+              display: inline !important;
+              white-space: nowrap !important;
+            }
+
+            .admin-shell__topbar a[href="/admin/account"],
+            .admin-shell__logout-button {
+              min-height: 40px !important;
+              padding: 9px 11px !important;
+              border-radius: 8px !important;
+              font-size: 13px !important;
             }
 
             .admin-shell__primex-badge {
@@ -538,6 +715,25 @@ function AccountIcon({ active }) {
   );
 }
 
+function MenuIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M3 5H15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M3 9H15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M3 13H15" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M4.5 4.5L13.5 13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M13.5 4.5L4.5 13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const topbarLinkStyle = {
   textDecoration: "none",
   borderRadius: 8,
@@ -547,6 +743,81 @@ const topbarLinkStyle = {
   fontWeight: 700,
   border: "1px solid var(--app-border-strong)",
   boxShadow: "var(--app-shadow-soft)",
+};
+
+const mobileMenuButtonStyle = {
+  width: 44,
+  flex: "0 0 44px",
+  minHeight: 44,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: "1px solid var(--app-border-strong)",
+  borderRadius: 8,
+  padding: 0,
+  background: "var(--color-card)",
+  color: "var(--app-text)",
+  font: "inherit",
+  fontWeight: 800,
+  cursor: "pointer",
+  boxShadow: "var(--app-shadow-soft)",
+};
+
+const mobileActivePageStyle = {
+  minWidth: 0,
+  display: "grid",
+  gap: 2,
+  justifyItems: "end",
+  textAlign: "right",
+};
+
+const mobileActiveEyebrowStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 10,
+  fontWeight: 800,
+  letterSpacing: "0.08em",
+  lineHeight: 1.1,
+  textTransform: "uppercase",
+};
+
+const mobileSidebarHeaderStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 14,
+  padding: "2px 0 16px",
+};
+
+const mobileIconButtonStyle = {
+  width: 42,
+  height: 42,
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  border: "1px solid var(--app-border-strong)",
+  borderRadius: 8,
+  background: "var(--color-card)",
+  color: "var(--app-text)",
+  cursor: "pointer",
+  boxShadow: "var(--app-shadow-soft)",
+};
+
+const mobileSidebarNavStyle = {
+  display: "grid",
+  gap: 8,
+};
+
+const mobileSidebarLinkStyle = {
+  textDecoration: "none",
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  minWidth: 0,
+  minHeight: 54,
+  padding: "10px 12px",
+  borderRadius: 8,
+  border: "1px solid transparent",
+  boxSizing: "border-box",
 };
 
 const sidebarLabelStyle = {

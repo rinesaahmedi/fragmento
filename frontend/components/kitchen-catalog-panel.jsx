@@ -347,7 +347,7 @@ export default function KitchenCatalogPanel({
       <div className={styles.sidebarHeader}>
         <div>
           <p className={styles.eyebrow}>{translate("configurator.catalogEyebrow", "Catalog")}</p>
-          <h2>{translate("configurator.catalogTitle", "Components and options")}</h2>
+          <h2>{translate("configurator.catalogTitle", "Additional items for your built-in kitchen")}</h2>
         </div>
         <span className={styles.badge}>
           {selectedDisplayCount ?? selectedComponents.length + selectedAccessories.length + selectedServices.length}

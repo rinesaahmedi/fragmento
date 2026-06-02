@@ -29,10 +29,10 @@
     "checking": "Checking..."
   },
   "configurator": {
-    "headerTitle": "Your kitchen",
-    "headerDescription": "Configure your kitchen directly from the current catalog.",
+    "headerTitle": "Your individual built-in kitchen",
+    "headerDescription": "Choose additional items for your built-in kitchen.",
     "catalogEyebrow": "Catalog",
-    "catalogTitle": "Components and options",
+    "catalogTitle": "Additional items for your\nbuilt-in kitchen",
     "components": "Components",
     "accessories": "Accessories",
     "services": "Services",
@@ -44,7 +44,7 @@
     "infoForItem": "Info about {name}",
     "photoButtonLabel": "Photo",
     "stageEyebrow": "Plan",
-    "stageTitle": "Interactive kitchen view",
+    "stageTitle": "Plan your individual kitchen",
     "resetSelection": "Reset selection",
     "stageLegendClick": "Click in the plan or choose on the right",
     "stageLegendFixed": "Fixed parts always remain active",
@@ -70,6 +70,7 @@
     "addressServiceUnavailable": "The address verification service is unavailable right now.",
     "statusSelectItem": "Select at least one item first.",
     "statusConfirmConsent": "Please confirm the data privacy consent.",
+    "statusConfirmTerms": "Please confirm that you have read and accept the terms and conditions.",
     "statusSelectPayment": "Please choose a payment method.",
     "statusVerifyAddress": "Please verify the address before submitting the order.",
     "statusSavingOrder": "Saving order...",
@@ -214,8 +215,13 @@
     "privacyPolicy": "privacy policy",
     "privacyPolicyPending": "Privacy policy will be available soon.",
     "consentSuffix": " and confirm that my order data may be used to process this order.*",
+    "consentShortPrefix": "I accept the ",
+    "consentShortSuffix": ".*",
+    "termsConsentPrefix": "I have read the ",
+    "termsAndConditions": "terms and conditions",
+    "termsConsentSuffix": " and agree.*",
     "submitSaving": "Saving...",
-    "submit": "Order and pay",
+    "submit": "Order with obligation to pay",
     "requiredHint": "Fields marked with * are required.",
     "savedTitle": "Thank you",
     "savedHelp": "",
@@ -235,7 +241,8 @@
       "city": "Please select a city.",
       "postalCode": "Please select a postal code.",
       "paymentMethod": "Please choose a payment method.",
-      "consent": "Please accept the privacy statement."
+      "consent": "Please accept the privacy statement.",
+      "termsConsent": "Please accept the terms and conditions."
     }
   },
   "countries": {

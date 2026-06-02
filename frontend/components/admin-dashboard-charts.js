@@ -40,6 +40,58 @@ const CATEGORY_COLORS = {
   ACCESSORY: "#5FBF8F",
   SERVICE: "#F2A65A",
 };
+const mobileBarStyles = `
+  .mobile-bar-list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .mobile-bar-row {
+    display: grid;
+    gap: 7px;
+  }
+
+  .mobile-bar-row div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  .mobile-bar-row strong {
+    min-width: 0;
+    color: #1f1f1f;
+    font-size: 14px;
+    font-weight: 850;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+
+  .mobile-bar-row span {
+    flex: 0 0 auto;
+    color: #2f2924;
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .mobile-bar-row i {
+    display: block;
+    width: 100%;
+    height: 12px;
+    border-radius: 999px;
+    background: #ece5dc;
+    overflow: hidden;
+  }
+
+  .mobile-bar-row i::before {
+    content: "";
+    display: block;
+    width: var(--bar-width);
+    height: 100%;
+    border-radius: inherit;
+    background: var(--bar-color);
+  }
+`;
 const KITCHEN_ELEMENT_LABEL_KEYS = {
   "built-in oven and hob": ["dashboard.catalogItemNames.ovenHob", "Built-in Oven and Hob"],
   "wall cabinet left": ["dashboard.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"],
@@ -145,6 +197,8 @@ export function AdminDashboardCharts({
   const { translate } = useAdminI18n();
   const [statusMode, setStatusMode] = useState("volume");
   const [isolatedSeries, setIsolatedSeries] = useState("");
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
+  const [mobileSection, setMobileSection] = useState("overview");
   const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
 
   const statusChartData = useMemo(() => {
@@ -163,6 +217,48 @@ export function AdminDashboardCharts({
   }, [dailyStatusData, statusMode]);
 
   const visibleKitchenSeries = isolatedSeries ? kitchenSeries.filter((name) => name === isolatedSeries) : kitchenSeries;
+  const mobileKpis = kpis.slice(0, 4);
+  const mobileTabs = [
+    { value: "overview", label: translate("dashboard.mobileTabOverview", "Overview") },
+    { value: "claims", label: translate("dashboard.mobileTabClaims", "Claims") },
+    { value: "orders", label: translate("dashboard.mobileTabOrders", "Orders") },
+    { value: "housing", label: translate("dashboard.mobileTabHousing", "Housing") },
+    { value: "products", label: translate("dashboard.mobileTabProducts", "Products") },
+  ];
+  const renderFilterForm = (className = "filter-form desktop-filter-form") => (
+    <form method="get" className={className}>
+      <label>
+        {translate("dashboard.dateRange", "Date range")}
+        <AdminSelect name="period" defaultValue={selectedPeriod}>
+          {periodOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {translate(option.labelKey || "", option.fallbackLabel || option.value)}
+            </option>
+          ))}
+        </AdminSelect>
+      </label>
+      <label>
+        {translate("dashboard.kitchen", "Kitchen")}
+        <AdminSelect name="kitchenId" defaultValue={selectedKitchenId}>
+          <option value="">{translate("dashboard.allKitchens", "All kitchens")}</option>
+          {kitchens.map((kitchen) => (
+            <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
+          ))}
+        </AdminSelect>
+      </label>
+      <label>
+        {translate("dashboard.status", "Status")}
+        <AdminSelect name="status" defaultValue={selectedStatus}>
+          <option value="">{translate("dashboard.allStatuses", "All statuses")}</option>
+          {statusOptions.map((status) => (
+            <option key={status} value={status}>{translateStatus(status, translate)}</option>
+          ))}
+        </AdminSelect>
+      </label>
+      <button type="submit">{translate("dashboard.apply", "Apply")}</button>
+      <Link href="/admin" prefetch={false} className="toolbar-link">{translate("dashboard.clearFilters", "Clear filters")}</Link>
+    </form>
+  );
 
   return (
     <div className="analytics-dashboard">
@@ -172,41 +268,10 @@ export function AdminDashboardCharts({
           <h1>{translate("dashboard.orderDashboard", "Order dashboard")}</h1>
           <p>{translate("dashboard.monitorSalesWorkflowMovementKitchenDemandAndItemPerformance", "Track orders, workflow, kitchens, and item performance.")}</p>
         </div>
-        <form method="get" className="filter-form">
-          <label>
-            {translate("dashboard.dateRange", "Date range")}
-            <AdminSelect name="period" defaultValue={selectedPeriod}>
-              {periodOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {translate(option.labelKey || "", option.fallbackLabel || option.value)}
-                </option>
-              ))}
-            </AdminSelect>
-          </label>
-          <label>
-            {translate("dashboard.kitchen", "Kitchen")}
-            <AdminSelect name="kitchenId" defaultValue={selectedKitchenId}>
-              <option value="">{translate("dashboard.allKitchens", "All kitchens")}</option>
-              {kitchens.map((kitchen) => (
-                <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
-              ))}
-            </AdminSelect>
-          </label>
-          <label>
-            {translate("dashboard.status", "Status")}
-            <AdminSelect name="status" defaultValue={selectedStatus}>
-              <option value="">{translate("dashboard.allStatuses", "All statuses")}</option>
-              {statusOptions.map((status) => (
-                <option key={status} value={status}>{translateStatus(status, translate)}</option>
-              ))}
-            </AdminSelect>
-          </label>
-          <button type="submit">{translate("dashboard.apply", "Apply")}</button>
-          <Link href="/admin" prefetch={false} className="toolbar-link">{translate("dashboard.clearFilters", "Clear filters")}</Link>
-        </form>
+        {renderFilterForm()}
       </section>
 
-      <section className="kpi-grid" aria-label="Dashboard KPIs">
+      <section className="kpi-grid desktop-dashboard-section" aria-label="Dashboard KPIs">
         {kpis.map((kpi) => (
           <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="kpi-card">
             <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
@@ -216,9 +281,116 @@ export function AdminDashboardCharts({
         ))}
       </section>
 
-      <AdminEntitySearch period={selectedPeriod} kitchenId={selectedKitchenId} status={selectedStatus} />
+      <div className="desktop-dashboard-section">
+        <AdminEntitySearch period={selectedPeriod} kitchenId={selectedKitchenId} status={selectedStatus} />
+      </div>
 
-      <section className="chart-card chart-card--compact chart-card--claims">
+      <section className="mobile-dashboard">
+        <div className="mobile-kpi-grid" aria-label="Dashboard KPIs">
+          {mobileKpis.map((kpi) => (
+            <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="mobile-kpi-card">
+              <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
+              <strong>{kpi.value}</strong>
+              <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+            </article>
+          ))}
+        </div>
+
+        <div className="mobile-actions-row">
+          <button type="button" className="mobile-filter-button" onClick={() => setIsMobileFiltersOpen(true)}>
+            {translate("dashboard.openFilters", "Filter öffnen")}
+          </button>
+        </div>
+
+        <div className={`mobile-filter-backdrop${isMobileFiltersOpen ? " is-open" : ""}`} onClick={() => setIsMobileFiltersOpen(false)} />
+        <aside className={`mobile-filter-sheet${isMobileFiltersOpen ? " is-open" : ""}`} aria-hidden={!isMobileFiltersOpen}>
+          <div className="mobile-filter-sheet__header">
+            <div>
+              <span>{translate("dashboard.filters", "Filters")}</span>
+              <strong>{translate("dashboard.refineDashboard", "Refine dashboard")}</strong>
+            </div>
+            <button type="button" onClick={() => setIsMobileFiltersOpen(false)} aria-label={translate("dashboard.closeFilters", "Close filters")}>x</button>
+          </div>
+          {renderFilterForm("mobile-filter-form")}
+        </aside>
+
+        <div className="mobile-search-section">
+          <AdminEntitySearch
+            period={selectedPeriod}
+            kitchenId={selectedKitchenId}
+            status={selectedStatus}
+            compact
+            placeholderFallback="Search by company, project, contract number"
+          />
+        </div>
+
+        <nav className="mobile-dashboard-tabs" aria-label={translate("dashboard.mobileDashboardSections", "Dashboard sections")}>
+          {mobileTabs.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              className={mobileSection === tab.value ? "is-active" : ""}
+              onClick={() => setMobileSection(tab.value)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
+        <div className="mobile-tab-panel">
+          {mobileSection === "overview" ? (
+            <>
+              <MobileStatusBars data={dailyStatusData} />
+              <MobileKitchenActivity data={kitchenTimelineData} kitchenSeries={kitchenSeries} />
+            </>
+          ) : null}
+
+          {mobileSection === "claims" ? (
+            <section className="mobile-chart-card mobile-chart-card--claims">
+              <ChartHeader
+                eyebrow={translate("dashboard.claimElementOverview", "Claims by item")}
+                title={translate("dashboard.claimsBySelectedElementAndCity", "Claims by selected item and city")}
+              />
+              <MobileClaimBars
+                title={translate("dashboard.selectedElements", "Selected items")}
+                data={claimElementData}
+                emptyLabel={translate("dashboard.noClaimElementDataForSelectedFilters", "No item-level claim data for the current filters.")}
+                translateElementLabels
+              />
+              <MobileClaimBars
+                title={translate("dashboard.submittedCities", "Submitted cities")}
+                data={claimCityData}
+                emptyLabel={translate("dashboard.noClaimCityDataForSelectedFilters", "No submitted city data for the current filters.")}
+              />
+              {showClaimsLink ? (
+                <Link className="mobile-panel-link" href="/admin/claims" prefetch={false}>
+                  {translate("dashboard.viewAllClaims", "View all claims")}
+                </Link>
+              ) : null}
+            </section>
+          ) : null}
+
+          {mobileSection === "orders" ? (
+            <>
+              <MobileStatusBars data={dailyStatusData} />
+              <MobileGeographyBars data={geographyData} />
+            </>
+          ) : null}
+
+          {mobileSection === "housing" ? (
+            <MobileHousingSection companyAnalytics={companyAnalytics} />
+          ) : null}
+
+          {mobileSection === "products" ? (
+            <>
+              <MobileTopItems topItemsByQuantity={topItemsByQuantity} topItemsByRevenue={topItemsByRevenue} />
+              <DistributionSection itemTypeData={itemTypeData} paymentData={paymentData} />
+            </>
+          ) : null}
+        </div>
+      </section>
+
+      <section className="chart-card chart-card--compact chart-card--claims desktop-dashboard-section">
         <ChartHeader
           eyebrow={translate("dashboard.claimElementOverview", "Claims by item")}
           title={translate("dashboard.claimsBySelectedElementAndCity", "Claims by selected item and city")}
@@ -252,7 +424,7 @@ export function AdminDashboardCharts({
         </div>
       </section>
 
-      <section className="chart-card chart-card--status">
+      <section className="chart-card chart-card--status desktop-dashboard-section">
         <ChartHeader
           eyebrow={translate("dashboard.dailyStatusBreakdown", "Daily status breakdown")}
           title={translate("dashboard.ordersByStatus", "Orders by status")}
@@ -284,7 +456,7 @@ export function AdminDashboardCharts({
         </div>
       </section>
 
-      <section className="chart-card chart-card--compact">
+      <section className="chart-card chart-card--compact desktop-dashboard-section">
         <ChartHeader
           eyebrow={translate("dashboard.kitchenTimeline", "Kitchen timeline")}
           title={translate("dashboard.orderActivityByKitchen", "Order activity by kitchen")}
@@ -318,7 +490,7 @@ export function AdminDashboardCharts({
         </div>
       </section>
 
-      <section className="dashboard-grid">
+      <section className="dashboard-grid desktop-dashboard-section">
         <GeographySection data={geographyData} />
 
         <DistributionSection
@@ -327,12 +499,16 @@ export function AdminDashboardCharts({
         />
       </section>
 
-      <TopItemsSection
-        topItemsByQuantity={topItemsByQuantity}
-        topItemsByRevenue={topItemsByRevenue}
-      />
+      <div className="desktop-dashboard-section">
+        <TopItemsSection
+          topItemsByQuantity={topItemsByQuantity}
+          topItemsByRevenue={topItemsByRevenue}
+        />
+      </div>
 
-      <CompanyProjectAnalyticsSection companyAnalytics={companyAnalytics} projectAnalytics={projectAnalytics} />
+      <div className="desktop-dashboard-section">
+        <CompanyProjectAnalyticsSection companyAnalytics={companyAnalytics} projectAnalytics={projectAnalytics} />
+      </div>
 
       <style jsx>{`
         .dashboard-toolbar {
@@ -348,6 +524,10 @@ export function AdminDashboardCharts({
           grid-template-columns: repeat(5, minmax(130px, auto));
           gap: 10px;
           align-items: end;
+        }
+
+        .mobile-dashboard {
+          display: none;
         }
 
         .chart-card--status {
@@ -431,7 +611,317 @@ export function AdminDashboardCharts({
         }
 
         @media (max-width: 700px) {
+          .desktop-dashboard-section,
+          .desktop-filter-form,
+          .dashboard-toolbar .filter-form,
+          .dashboard-toolbar p:not(.eyebrow) {
+            display: none !important;
+          }
+
+          .dashboard-toolbar {
+            display: block;
+          }
+
+          .dashboard-toolbar h1 {
+            font-size: 1.72rem;
+            line-height: 1.08;
+          }
+
+          .mobile-dashboard {
+            display: grid;
+            gap: 14px;
+          }
+
+          .mobile-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+          }
+
+          .mobile-kpi-card {
+            display: grid;
+            gap: 6px;
+            min-height: 112px;
+            border: 1px solid rgba(107, 79, 58, 0.18);
+            border-radius: 10px;
+            background: #fffdf9;
+            padding: 13px;
+            box-shadow: 0 8px 22px rgba(84, 59, 40, 0.08);
+          }
+
+          .mobile-kpi-card span {
+            color: #5c5046;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.07em;
+            line-height: 1.25;
+            text-transform: uppercase;
+          }
+
+          .mobile-kpi-card strong {
+            color: #151515;
+            font-size: 1.35rem;
+            line-height: 1.05;
+          }
+
+          .mobile-kpi-card small {
+            color: #217546;
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.35;
+          }
+
+          .mobile-actions-row {
+            display: flex;
+            justify-content: flex-end;
+          }
+
+          .mobile-filter-button,
+          .mobile-panel-link {
+            min-height: 42px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--color-primary);
+            border-radius: 8px;
+            background: var(--color-primary);
+            color: #fff;
+            padding: 10px 14px;
+            font: inherit;
+            font-weight: 900;
+            text-decoration: none;
+            cursor: pointer;
+          }
+
+          .mobile-filter-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 90;
+            background: rgba(27, 23, 20, 0.32);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 180ms ease;
+          }
+
+          .mobile-filter-backdrop.is-open {
+            opacity: 1;
+            pointer-events: auto;
+          }
+
+          .mobile-filter-sheet {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            display: grid;
+            gap: 16px;
+            max-height: 86dvh;
+            overflow-y: auto;
+            border-radius: 18px 18px 0 0;
+            border: 1px solid rgba(107, 79, 58, 0.18);
+            background: #fffdf9;
+            padding: 18px 16px 22px;
+            box-shadow: 0 -18px 42px rgba(84, 59, 40, 0.22);
+            transform: translateY(104%);
+            visibility: hidden;
+            pointer-events: none;
+            transition: transform 220ms ease, visibility 220ms ease;
+            box-sizing: border-box;
+          }
+
+          .mobile-filter-sheet.is-open {
+            transform: translateY(0);
+            visibility: visible;
+            pointer-events: auto;
+          }
+
+          .mobile-filter-sheet__header {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+          }
+
+          .mobile-filter-sheet__header div {
+            display: grid;
+            gap: 3px;
+          }
+
+          .mobile-filter-sheet__header span {
+            color: var(--color-text-muted);
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+          }
+
+          .mobile-filter-sheet__header strong {
+            color: var(--color-text);
+            font-size: 1.05rem;
+          }
+
+          .mobile-filter-sheet__header button {
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            background: var(--color-card);
+            color: var(--color-text);
+            font-size: 18px;
+            font-weight: 900;
+            cursor: pointer;
+          }
+
+          .mobile-filter-form {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+
+          .mobile-filter-form label {
+            display: grid;
+            gap: 7px;
+            color: var(--color-text-muted);
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+          }
+
+          .mobile-filter-form button,
+          .mobile-filter-form .toolbar-link {
+            min-height: 46px;
+            border-radius: 8px;
+            font-weight: 900;
+          }
+
+          .mobile-filter-form .toolbar-link {
+            border: 1px solid var(--color-border);
+            background: var(--color-card);
+            color: var(--color-text);
+            text-decoration: none;
+          }
+
+          .mobile-search-section :global(.search-workspace) {
+            border-radius: 10px;
+            padding: 12px;
+            gap: 10px;
+          }
+
+          .mobile-search-section :global(.finder-footer) {
+            display: none;
+          }
+
+          .mobile-search-section :global(.matches-panel) {
+            padding: 10px;
+            border-radius: 10px;
+          }
+
+          .mobile-dashboard-tabs {
+            position: sticky;
+            top: 0;
+            z-index: 15;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 5px;
+            border: 1px solid rgba(107, 79, 58, 0.14);
+            border-radius: 10px;
+            background: rgba(255, 253, 249, 0.96);
+            box-shadow: 0 8px 20px rgba(84, 59, 40, 0.07);
+            backdrop-filter: blur(12px);
+          }
+
+          .mobile-dashboard-tabs button {
+            flex: 0 0 auto;
+            min-height: 36px;
+            border: 0;
+            border-radius: 8px;
+            background: transparent;
+            color: #5c5046;
+            padding: 8px 11px;
+            font: inherit;
+            font-size: 13px;
+            font-weight: 900;
+            cursor: pointer;
+          }
+
+          .mobile-dashboard-tabs button.is-active {
+            background: var(--color-primary);
+            color: #fff;
+          }
+
+          .mobile-tab-panel {
+            display: grid;
+            gap: 14px;
+          }
+
+          .mobile-chart-card,
+          .mobile-tab-panel :global(.chart-card),
+          .mobile-tab-panel :global(.project-card) {
+            border-radius: 10px !important;
+            border-color: rgba(107, 79, 58, 0.18) !important;
+            background: #fffdf9 !important;
+            padding: 14px !important;
+            box-shadow: 0 8px 22px rgba(84, 59, 40, 0.08) !important;
+          }
+
+          .mobile-chart-card {
+            display: grid;
+            gap: 14px;
+          }
+
+          .mobile-tab-panel :global(.chart-header) {
+            gap: 8px !important;
+          }
+
+          .mobile-tab-panel :global(.chart-header h2) {
+            font-size: 1rem !important;
+            line-height: 1.2 !important;
+          }
+
+          .mobile-tab-panel :global(.segmented-control) {
+            width: 100%;
+            overflow-x: auto;
+          }
+
+          .mobile-tab-panel :global(.chart-frame),
+          .mobile-tab-panel :global(.country-chart-frame),
+          .mobile-tab-panel :global(.donut-frame),
+          .mobile-tab-panel :global(.project-chart-frame),
+          .mobile-tab-panel :global(.owner-chart-frame) {
+            min-height: 240px !important;
+          }
+
+          .mobile-tab-panel :global(.claim-breakdown .chart-frame) {
+            min-height: 170px !important;
+          }
+
+          .mobile-tab-panel :global(.donut-layout) {
+            gap: 8px !important;
+            align-items: start !important;
+          }
+
+          .mobile-tab-panel :global(.donut-frame) {
+            min-height: 180px !important;
+          }
+
+          .mobile-tab-panel :global(.donut-frame .recharts-responsive-container) {
+            max-height: 190px !important;
+          }
+
+          .mobile-tab-panel :global(.legend-list) {
+            gap: 7px !important;
+          }
+
           .filter-form {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .mobile-kpi-grid {
             grid-template-columns: 1fr;
           }
         }
@@ -473,6 +963,446 @@ function ChartHeader({ eyebrow, title, actions }) {
 
       `}</style>
     </div>
+  );
+}
+
+function MobileStatusBars({ data }) {
+  const { translate } = useAdminI18n();
+  const totals = ORDER_STATUSES.map((status) => ({
+    key: status,
+    label: translateStatus(status, translate),
+    value: data.reduce((sum, row) => sum + Number(row[status] || 0), 0),
+    color: STATUS_COLORS[status],
+  }));
+  const maxValue = Math.max(1, ...totals.map((item) => item.value));
+
+  return (
+    <section className="mobile-chart-card">
+      <ChartHeader
+        eyebrow={translate("dashboard.dailyStatusBreakdown", "Daily status breakdown")}
+        title={translate("dashboard.ordersByStatus", "Orders by status")}
+      />
+      <div className="mobile-bar-list">
+        {totals.map((item) => (
+          <div key={item.key} className="mobile-bar-row">
+            <div>
+              <strong>{item.label}</strong>
+              <span>{item.value}</span>
+            </div>
+            <i style={{ "--bar-width": `${Math.max(4, (item.value / maxValue) * 100)}%`, "--bar-color": item.color }} />
+          </div>
+        ))}
+      </div>
+      <style jsx>{mobileBarStyles}</style>
+    </section>
+  );
+}
+
+function MobileKitchenActivity({ data, kitchenSeries }) {
+  const { translate } = useAdminI18n();
+  const totals = kitchenSeries
+    .map((name) => ({
+      label: name,
+      value: data.reduce((sum, row) => sum + Number(row[name] || 0), 0),
+    }))
+    .filter((item) => item.value > 0)
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+  const maxValue = Math.max(1, ...totals.map((item) => item.value));
+
+  return (
+    <section className="mobile-chart-card">
+      <ChartHeader
+        eyebrow={translate("dashboard.kitchenTimeline", "Kitchen timeline")}
+        title={translate("dashboard.orderActivityByKitchen", "Order activity by kitchen")}
+      />
+      {totals.length ? (
+        <div className="mobile-bar-list">
+          {totals.map((item, index) => (
+            <div key={item.label} className="mobile-bar-row">
+              <div>
+                <strong>{item.label}</strong>
+                <span>{item.value}</span>
+              </div>
+              <i style={{ "--bar-width": `${Math.max(4, (item.value / maxValue) * 100)}%`, "--bar-color": SERIES_COLORS[index % SERIES_COLORS.length] }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyChart label={translate("dashboard.noKitchenTimelineDataForSelectedFilters", "No kitchen timeline data for the selected filters.")} />
+      )}
+      <style jsx>{mobileBarStyles}</style>
+    </section>
+  );
+}
+
+function MobileTopItems({ topItemsByQuantity, topItemsByRevenue }) {
+  const { translate } = useAdminI18n();
+  const [mode, setMode] = useState("quantity");
+  const source = mode === "quantity" ? topItemsByQuantity : topItemsByRevenue;
+  const rows = source
+    .map((item) => ({
+      ...item,
+      displayName: formatTopItemLabel(item, translate),
+      value: Number(item[mode] || 0),
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+  const maxValue = Math.max(1, ...rows.map((item) => item.value));
+  const formatter = mode === "quantity"
+    ? (value) => translate("dashboard.itemCountValue", "{count} item(s)").replace("{count}", String(value))
+    : formatCurrency;
+
+  return (
+    <section className="mobile-chart-card">
+      <ChartHeader
+        eyebrow={translate("dashboard.topItems", "Top items")}
+        title={translate("dashboard.topItems", "Top items")}
+        actions={(
+          <div className="segmented-control" aria-label="Top items mode">
+            <button className={mode === "quantity" ? "is-active" : ""} type="button" onClick={() => setMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
+            <button className={mode === "revenue" ? "is-active" : ""} type="button" onClick={() => setMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
+          </div>
+        )}
+      />
+      {rows.length ? (
+        <div className="mobile-bar-list">
+          {rows.map((item, index) => (
+            <div key={`${mode}-${item.code || item.name}-${index}`} className="mobile-bar-row">
+              <div>
+                <strong>{item.displayName}</strong>
+                <span>{formatter(item.value)}</span>
+              </div>
+              <i style={{ "--bar-width": `${Math.max(4, (item.value / maxValue) * 100)}%`, "--bar-color": SERIES_COLORS[index % SERIES_COLORS.length] }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyChart label={translate("dashboard.noItemDataForSelectedFilters", "No item data for the selected filters.")} />
+      )}
+      <style jsx>{mobileBarStyles}</style>
+    </section>
+  );
+}
+
+function MobileClaimBars({ title, data, emptyLabel, translateElementLabels = false }) {
+  const { translate } = useAdminI18n();
+  const rows = Array.isArray(data)
+    ? data.slice(0, 5).map((item) => ({
+        label: translateElementLabels ? translateKitchenElementLabel(item.name, translate) : item.name,
+        value: Number(item.claims || item.value || 0),
+      }))
+    : [];
+  const maxValue = Math.max(1, ...rows.map((item) => item.value));
+
+  return (
+    <section className="mobile-subsection">
+      <h3>{title}</h3>
+      {rows.length ? (
+        <div className="mobile-bar-list">
+          {rows.map((item, index) => (
+            <div key={`${item.label}-${index}`} className="mobile-bar-row">
+              <div>
+                <strong>{item.label || translate("dashboard.notCaptured", "Not captured")}</strong>
+                <span>{translate("dashboard.claimCountValue", "{count} claims").replace("{count}", String(item.value))}</span>
+              </div>
+              <i style={{ "--bar-width": `${Math.max(4, (item.value / maxValue) * 100)}%`, "--bar-color": SERIES_COLORS[index % SERIES_COLORS.length] }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyChart label={emptyLabel} />
+      )}
+      <style jsx>{`
+        .mobile-subsection {
+          display: grid;
+          gap: 10px;
+        }
+
+        h3 {
+          margin: 0;
+          color: var(--color-text);
+          font-size: 0.95rem;
+        }
+
+        ${mobileBarStyles}
+      `}</style>
+    </section>
+  );
+}
+
+function MobileGeographyBars({ data }) {
+  const { translate } = useAdminI18n();
+  const rows = Array.isArray(data)
+    ? data.slice(0, 5).map((item) => ({
+        label: item.city || item.label || item.country || translate("dashboard.notCaptured", "Not captured"),
+        detail: [item.postalCode, item.country].filter(Boolean).join(" | "),
+        value: Number(item.orders || 0),
+      }))
+    : [];
+  const maxValue = Math.max(1, ...rows.map((item) => item.value));
+
+  return (
+    <section className="mobile-chart-card">
+      <ChartHeader
+        eyebrow={translate("dashboard.geography", "Geography")}
+        title={translate("dashboard.ordersByCountryAndCity", "Orders by country and city")}
+      />
+      {rows.length ? (
+        <div className="mobile-bar-list">
+          {rows.map((item, index) => (
+            <div key={`${item.label}-${index}`} className="mobile-bar-row">
+              <div>
+                <strong>{item.label}</strong>
+                <span>{translate("dashboard.orderCountValue", "{count} orders").replace("{count}", String(item.value))}</span>
+              </div>
+              {item.detail ? <small>{item.detail}</small> : null}
+              <i style={{ "--bar-width": `${Math.max(4, (item.value / maxValue) * 100)}%`, "--bar-color": SERIES_COLORS[index % SERIES_COLORS.length] }} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <EmptyChart label={translate("dashboard.noCountryOrderDataForSelectedFilters", "No country order data for the selected filters.")} />
+      )}
+      <style jsx>{`
+        ${mobileBarStyles}
+
+        .mobile-bar-row small {
+          color: var(--color-text-muted);
+          font-size: 12px;
+          font-weight: 700;
+        }
+      `}</style>
+    </section>
+  );
+}
+
+function MobileHousingSection({ companyAnalytics }) {
+  const { translate } = useAdminI18n();
+  const companies = companyAnalytics?.companies || [];
+  const [selectedOwnerId, setSelectedOwnerId] = useState(companyAnalytics?.defaultCompanyId || companies[0]?.id || "");
+  const [showCompanies, setShowCompanies] = useState(false);
+  const selectedCompany = companies.find((owner) => owner.id === selectedOwnerId) || companies[0] || null;
+  const selectedTimeline = selectedCompany ? (companyAnalytics?.timelineByCompany?.[selectedCompany.id] || []) : [];
+  const selectedTopItems = selectedCompany ? (companyAnalytics?.topItemsByCompany?.[selectedCompany.id] || []) : [];
+  const topItems = selectedTopItems
+    .map((item) => ({
+      label: formatTopItemLabel(item, translate),
+      value: Number(item.quantity || 0),
+    }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 5);
+  const maxItemValue = Math.max(1, ...topItems.map((item) => item.value));
+
+  useEffect(() => {
+    if (!companies.length) {
+      setSelectedOwnerId("");
+      return;
+    }
+
+    setSelectedOwnerId((current) => (
+      current && companies.some((owner) => owner.id === current)
+        ? current
+        : companyAnalytics?.defaultCompanyId || companies[0].id
+    ));
+  }, [companyAnalytics, companies]);
+
+  return (
+    <section className="mobile-chart-card mobile-housing">
+      <ChartHeader
+        eyebrow={translate("dashboard.ownerPerformance", "Owner performance")}
+        title={translate("dashboard.propertyOwnerKitchenActivity", "Property owner kitchen activity")}
+      />
+
+      <label className="mobile-owner-select">
+        <span>{translate("dashboard.selectCompany", "Housing company")}</span>
+        <AdminSelect
+          value={selectedCompany?.id || ""}
+          onChange={(event) => setSelectedOwnerId(event.target.value)}
+          disabled={!companies.length}
+          aria-label={translate("dashboard.selectCompany", "Housing company")}
+        >
+          {companies.length ? companies.map((owner) => (
+            <option key={owner.id} value={owner.id}>{owner.name}</option>
+          )) : (
+            <option value="">{translate("dashboard.noCompaniesAvailable", "No companies available")}</option>
+          )}
+        </AdminSelect>
+      </label>
+
+      {selectedCompany ? (
+        <>
+          <div className="mobile-owner-kpis">
+            <article>
+              <span>{translate("dashboard.totalRevenue", "Total revenue")}</span>
+              <strong>{formatCurrency(selectedCompany.totalRevenue)}</strong>
+            </article>
+            <article>
+              <span>{translate("ordersAdmin.orders", "Orders")}</span>
+              <strong>{selectedCompany.orderCount}</strong>
+            </article>
+            <article>
+              <span>{translate("propertyOwnersAdmin.contracts", "Contracts")}</span>
+              <strong>{selectedCompany.contractCount}</strong>
+            </article>
+            <article>
+              <span>{translate("dashboard.averageOrderShort", "Avg. order")}</span>
+              <strong>{formatCurrency(selectedCompany.averageOrderValue)}</strong>
+            </article>
+          </div>
+
+          <section className="mobile-inner-card">
+            <h3>{translate("dashboard.companyTimeline", "Company timeline")}</h3>
+            {selectedTimeline.some((row) => row.orders || row.revenue) ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <LineChart data={selectedTimeline} margin={{ top: 8, right: 8, left: -24, bottom: 0 }}>
+                  <CartesianGrid stroke={CHART_GRID} vertical={false} />
+                  <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={10} tick={{ fill: CHART_MUTED }} interval="preserveStartEnd" />
+                  <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={10} tick={{ fill: CHART_MUTED }} />
+                  <Tooltip content={<CompanyTimelineTooltip />} />
+                  <Line type="monotone" dataKey="orders" name={translate("ordersAdmin.orders", "Orders")} stroke="#5B8DEF" strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <EmptyChart label={translate("dashboard.noCompanyTimelineData", "No timeline data for the selected housing company.")} />
+            )}
+          </section>
+
+          <section className="mobile-inner-card">
+            <h3>{translate("dashboard.companyTopItems", "Top items for selected housing company")}</h3>
+            {topItems.length ? (
+              <div className="mobile-bar-list">
+                {topItems.map((item, index) => (
+                  <div key={`${item.label}-${index}`} className="mobile-bar-row">
+                    <div>
+                      <strong>{item.label}</strong>
+                      <span>{translate("dashboard.itemCountValue", "{count} item(s)").replace("{count}", String(item.value))}</span>
+                    </div>
+                    <i style={{ "--bar-width": `${Math.max(4, (item.value / maxItemValue) * 100)}%`, "--bar-color": SERIES_COLORS[index % SERIES_COLORS.length] }} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyChart label={translate("dashboard.noCompanyItemData", "No item data for the selected housing company.")} />
+            )}
+          </section>
+
+          <section className="mobile-inner-card">
+            <button type="button" className="mobile-collapse-button" onClick={() => setShowCompanies((current) => !current)}>
+              {translate("dashboard.companyList", "Housing companies")} <span>{showCompanies ? "-" : "+"}</span>
+            </button>
+            {showCompanies ? (
+              <div className="mobile-company-list">
+                {companies.map((owner) => (
+                  <button key={owner.id} type="button" onClick={() => setSelectedOwnerId(owner.id)}>
+                    <strong>{owner.name}</strong>
+                    <span>{owner.orderCount} {translate("ordersAdmin.orders", "Orders")} | {formatCurrency(owner.totalRevenue)}</span>
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </section>
+        </>
+      ) : (
+        <EmptyChart label={translate("dashboard.noOwnerDataForSelectedFilters", "No owner contract or order data matches the current filters.")} />
+      )}
+
+      <style jsx>{`
+        .mobile-housing {
+          gap: 12px;
+        }
+
+        .mobile-owner-select {
+          display: grid;
+          gap: 7px;
+        }
+
+        .mobile-owner-select span,
+        .mobile-owner-kpis span {
+          color: var(--color-text-muted);
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .mobile-owner-kpis {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+
+        .mobile-owner-kpis article,
+        .mobile-inner-card {
+          border: 1px solid rgba(107, 79, 58, 0.14);
+          border-radius: 8px;
+          background: #fff;
+          padding: 10px;
+        }
+
+        .mobile-owner-kpis article {
+          display: grid;
+          gap: 4px;
+        }
+
+        .mobile-owner-kpis strong {
+          color: var(--color-text);
+          line-height: 1.2;
+        }
+
+        .mobile-inner-card {
+          display: grid;
+          gap: 10px;
+        }
+
+        h3 {
+          margin: 0;
+          color: var(--color-text);
+          font-size: 0.95rem;
+        }
+
+        .mobile-collapse-button,
+        .mobile-company-list button {
+          width: 100%;
+          border: 0;
+          background: transparent;
+          color: var(--color-text);
+          font: inherit;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .mobile-collapse-button {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 0;
+          font-weight: 900;
+        }
+
+        .mobile-company-list {
+          display: grid;
+          gap: 8px;
+        }
+
+        .mobile-company-list button {
+          display: grid;
+          gap: 3px;
+          border: 1px solid var(--color-border);
+          border-radius: 8px;
+          padding: 10px;
+          background: var(--color-card);
+        }
+
+        .mobile-company-list span {
+          color: var(--color-text-muted);
+          font-size: 12px;
+          font-weight: 700;
+        }
+
+        ${mobileBarStyles}
+      `}</style>
+    </section>
   );
 }
 

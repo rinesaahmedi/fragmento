@@ -253,7 +253,7 @@ function flattenResults(results, query, translate) {
   return [...topRows.slice(0, -1), firstObjectRow];
 }
 
-export function AdminEntitySearch({ period, kitchenId, status }) {
+export function AdminEntitySearch({ period, kitchenId, status, compact = false, placeholderFallback }) {
   const { translate } = useAdminI18n();
   const inputRef = useRef(null);
   const [draftQuery, setDraftQuery] = useState("");
@@ -355,7 +355,7 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
   }
 
   return (
-    <section className="search-workspace">
+    <section className={`search-workspace${compact ? " search-workspace--compact" : ""}`}>
       <div className="search-header">
         <div>
           <h2>{translate("dashboard.finderTitle", "Go to")}</h2>
@@ -374,7 +374,9 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
                 value={draftQuery}
                 onChange={(event) => setDraftQuery(event.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder={translate("dashboard.finderPlaceholder", "Search by housing company, project, contract number, object, address, or order.")}
+                placeholder={compact
+                  ? translate("dashboard.finderCompactPlaceholder", placeholderFallback || "Search by company, project, contract number")
+                  : translate("dashboard.finderPlaceholder", "Search by housing company, project, contract number, object, address, or order.")}
                 aria-label={translate("dashboard.finderAriaLabel", "Quick find admin entities")}
               />
             </div>
@@ -441,6 +443,44 @@ export function AdminEntitySearch({ period, kitchenId, status }) {
           padding: 18px;
           display: grid;
           gap: 14px;
+        }
+
+        .search-workspace--compact {
+          border-radius: 10px;
+          padding: 12px;
+          gap: 10px;
+        }
+
+        .search-workspace--compact .search-header {
+          align-items: center;
+        }
+
+        .search-workspace--compact h2 {
+          font-size: 1rem;
+        }
+
+        .search-workspace--compact .search-shell {
+          gap: 8px;
+        }
+
+        .search-workspace--compact .search-input-wrap {
+          border-radius: 10px;
+        }
+
+        .search-workspace--compact .input-row {
+          padding: 6px;
+          gap: 8px;
+        }
+
+        .search-workspace--compact input {
+          min-height: 40px;
+          font-size: 14px;
+        }
+
+        .search-workspace--compact .search-button {
+          min-height: 40px;
+          border-radius: 8px;
+          padding: 0 12px;
         }
 
         .search-header {
