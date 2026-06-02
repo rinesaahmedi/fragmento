@@ -1368,20 +1368,30 @@ textarea {
   gap: 8px;
 }
 
+.service-field__sticky-sentinel {
+  height: 0;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
 .service-field--contract-number {
   position: sticky;
   top: 12px;
   z-index: 40;
   padding: 14px 16px 16px;
-  border: 1px solid rgba(107, 79, 58, 0.14);
+  border: 1px solid rgba(20, 24, 28, 0.08);
   border-radius: 20px;
-  background: rgba(255, 250, 244, 0.96);
+  background: rgba(255, 255, 255, 0.92);
   box-shadow: none;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(8px);
 }
 
 .service-field--contract-number-stuck {
-  box-shadow: 0 12px 28px rgba(56, 38, 25, 0.08);
+  border-color: rgba(217, 122, 38, 0.28);
+  box-shadow:
+    0 10px 24px rgba(17, 24, 39, 0.06),
+    0 0 0 3px rgba(217, 122, 38, 0.08);
 }
 
 .service-field--contract-number-static {
@@ -1396,10 +1406,10 @@ textarea {
   width: 28px;
   height: 28px;
   padding: 0;
-  border: 1px solid rgba(107, 79, 58, 0.14);
+  border: 1px solid rgba(20, 24, 28, 0.08);
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.96);
-  color: rgba(107, 79, 58, 0.75);
+  color: rgba(20, 24, 28, 0.56);
   font-size: 1.05rem;
   line-height: 1;
   cursor: pointer;
@@ -1408,7 +1418,7 @@ textarea {
 .service-field__sticky-dismiss:hover,
 .service-field__sticky-dismiss:focus-visible {
   background: #fff;
-  border-color: rgba(107, 79, 58, 0.24);
+  border-color: rgba(20, 24, 28, 0.14);
 }
 
 .service-field__sticky-dismiss:focus-visible {
@@ -2981,6 +2991,10 @@ textarea {
   padding: 14px 16px;
   border-radius: 16px;
   font-weight: 600;
+}
+
+.service-form__feedback--hidden {
+  visibility: hidden;
 }
 
 .service-form__hint {

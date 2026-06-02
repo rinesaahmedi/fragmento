@@ -239,3 +239,197 @@ test("generic non-database issue does not show claim-form help action", async ()
   assert.equal(response.body.actions, undefined);
   assert.match(response.body.answer, /leak around the sink area/i);
 });
+
+test("known fridge cooling issue uses claims knowledge and offers claim-form help", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My fridge is warm and not cooling.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /cooling problem/i);
+  assert.match(response.body.answer, /temperature setting/i);
+  assert.ok(Array.isArray(response.body.actions));
+  assert.match(response.body.actions[0].prompt, /fridge/i);
+});
+
+test("gas smell issue returns urgent gas-hob claims guidance", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "I smell gas from the gas hob.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /gas smell/i);
+  assert.match(response.body.answer, /stop using the appliance immediately/i);
+  assert.ok(Array.isArray(response.body.actions));
+});
+
+test("common typo in 'error' still matches dishwasher code guidance", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My dishwaser shows eror E1.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /water inlet problem/i);
+  assert.match(response.body.answer, /water tap is fully open/i);
+});
+
+test("common typo in appliance and symptom still matches fridge knowledge", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My frdge is warm and not coolng.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /cooling problem/i);
+  assert.match(response.body.answer, /temperature setting/i);
+});
+
+test("generic fuzzy matching handles broader misspellings, not just hardcoded words", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "I smels lkie gas from the gas hbo.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /gas smell/i);
+  assert.match(response.body.answer, /stop using the appliance immediately/i);
+});
+
+test("vague washing machine issue asks for clarification instead of guessing a leak", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "the washing machine its not working",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /which of these fits best/i);
+  assert.doesNotMatch(response.body.answer, /washing machine leak/i);
+  assert.doesNotMatch(response.body.answer, /stop using the appliance/i);
+});
+
+test("POST uses OpenAI assistant path when OPENAI_API_KEY is configured", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+  process.env.OPENAI_CLAIM_ASSISTANT_MODEL = "gpt-5.1";
+
+  installFetchMock(async (url, init) => {
+    assert.equal(url, "https://api.openai.com/v1/responses");
+    assert.match(init.headers.Authorization, /^Bearer test-key$/);
+    return {
+      ok: true,
+      async json() {
+        return {
+          output_text: JSON.stringify({
+            answer: "LLM answer for ambiguous washing machine issue.",
+            showClaimFormHelpAction: false,
+            suggestedProblemDescription: null,
+          }),
+        };
+      },
+    };
+  });
+
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "the washing machine its not working",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.answer, "LLM answer for ambiguous washing machine issue.");
+});
+
+test("OpenAI path does not show claim-form-help chip on vague clarifying responses", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+
+  installFetchMock(async () => ({
+    ok: true,
+    async json() {
+      return {
+        output_text: JSON.stringify({
+          answer: "Which of these fits best?",
+          showClaimFormHelpAction: true,
+          suggestedProblemDescription: null,
+        }),
+      };
+    },
+  }));
+
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "the dishwasher its not working",
+    selectedAreas: dishwasherArea(),
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.answer, "Which of these fits best?");
+  assert.equal(response.body.actions, undefined);
+});
+
+test("OpenAI context marks appliance switches so latest user issue wins", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+
+  installFetchMock(async (_url, init) => {
+    const payload = JSON.parse(init.body);
+    const text = payload.input[0].content[0].text;
+
+    assert.match(text, /"current_message_appliance_types": \[\s*"washing_machine"\s*\]/);
+    assert.match(text, /"previous_conversation_appliance_types": \[\s*"dishwasher"\s*\]/);
+    assert.match(text, /"appliance_switch_from_previous": true/);
+
+    return {
+      ok: true,
+      async json() {
+        return {
+          output_text: JSON.stringify({
+            answer: "This is about the washing machine now.",
+            showClaimFormHelpAction: false,
+            suggestedProblemDescription: null,
+          }),
+        };
+      },
+    };
+  });
+
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "the washing machine its not wokring",
+    conversationMessages: [
+      { role: "user", text: "the dishwasher its not working" },
+      { role: "assistant", text: "Which of these fits best?" },
+      { role: "user", text: "i see error E3" },
+      { role: "assistant", text: "This sounds like a heating problem." },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.equal(response.body.answer, "This is about the washing machine now.");
+});

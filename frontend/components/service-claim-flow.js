@@ -8,6 +8,7 @@ import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
 import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
+import { getContractNumberStickyState } from "../lib/service-claim-sticky";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -394,7 +395,7 @@ const COPY = {
     purchasePanelText: "If the tenant needs additional items instead of a complaint, continue to the configurator.",
     openConfigurator: "Open configurator",
     back: "Back",
-    formTitle: "KD Form",
+    formTitle: "Complaint Form",
     formIntro: "Fill in the main complaint details below.",
     requiredFieldTitle: "Required field",
     fieldOptionalSuffix: " (optional)",
@@ -1423,7 +1424,7 @@ export default function ServiceClaimFlow() {
   const preferredContactCalendarRef = useRef(null);
   const preferredContactTimeFromRef = useRef(null);
   const preferredContactTimeToRef = useRef(null);
-  const contractNumberFieldRef = useRef(null);
+  const contractNumberStickySentinelRef = useRef(null);
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
@@ -1460,6 +1461,8 @@ export default function ServiceClaimFlow() {
     latestFormRef.current = formValues;
   }, [formValues]);
   const normalizedContractNumber = normalizeServiceClaimContractNumber(formValues.contractNumber);
+  const isCurrentContractLookupResult = contractLookup.contractNumber === normalizedContractNumber;
+  const shouldHideContractLookupFeedback = isContractNumberCurrentlyStuck;
   const kitchenAreasLinePrefix = copy.kitchenAreasLinePrefix || fallbackCopy.kitchenAreasLinePrefix;
   const activeKitchenPlan = useMemo(() => {
     if (
@@ -1641,22 +1644,48 @@ export default function ServiceClaimFlow() {
       return undefined;
     }
 
+    const stickyTopOffset = 12;
+    const stickyEnterBuffer = 6;
+    const stickyExitBuffer = 18;
+    let frameId = null;
+
     function updateStickyState() {
-      const element = contractNumberFieldRef.current;
-      if (!element) {
+      const sentinel = contractNumberStickySentinelRef.current;
+      if (!sentinel) {
         setIsContractNumberCurrentlyStuck(false);
         return;
       }
-      const top = element.getBoundingClientRect().top;
-      setIsContractNumberCurrentlyStuck(top <= 12.5);
+
+      setIsContractNumberCurrentlyStuck((currentValue) =>
+        getContractNumberStickyState({
+          currentIsStuck: currentValue,
+          sentinelTop: sentinel.getBoundingClientRect().top,
+          stickyTopOffset,
+          stickyEnterBuffer,
+          stickyExitBuffer,
+        }),
+      );
+    }
+
+    function queueStickyStateUpdate() {
+      if (frameId !== null) {
+        return;
+      }
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        updateStickyState();
+      });
     }
 
     updateStickyState();
-    window.addEventListener("scroll", updateStickyState, { passive: true });
-    window.addEventListener("resize", updateStickyState);
+    window.addEventListener("scroll", queueStickyStateUpdate, { passive: true });
+    window.addEventListener("resize", queueStickyStateUpdate);
     return () => {
-      window.removeEventListener("scroll", updateStickyState);
-      window.removeEventListener("resize", updateStickyState);
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+      window.removeEventListener("scroll", queueStickyStateUpdate);
+      window.removeEventListener("resize", queueStickyStateUpdate);
     };
   }, [isComplaintMode, isContractNumberStickyEnabled]);
 
@@ -2794,8 +2823,12 @@ export default function ServiceClaimFlow() {
           </div>
 
           <form className="service-form" onSubmit={handleSubmit}>
-            <label
-              ref={contractNumberFieldRef}
+            <div
+              ref={contractNumberStickySentinelRef}
+              className="service-field__sticky-sentinel"
+              aria-hidden="true"
+            />
+            <div
               className={[
                 "service-field",
                 "service-field--contract-number",
@@ -2813,7 +2846,10 @@ export default function ServiceClaimFlow() {
                   &times;
                 </button>
               ) : null}
-              <span className="service-field__label-row service-field__label-row--contract">
+              <label
+                htmlFor="service-claim-contract-number"
+                className="service-field__label-row service-field__label-row--contract"
+              >
                 <span className="service-field__label-main">
                   {copy.contractNumber}
                   <RequiredFieldMark title={requiredFieldTitle} />
@@ -2829,26 +2865,49 @@ export default function ServiceClaimFlow() {
                 >
                   {t("contractNumberHelpTrigger")}
                 </button>
-              </span>
+              </label>
               <input
+                id="service-claim-contract-number"
                 type="text"
                 value={formValues.contractNumber}
                 onChange={(event) => handleFieldChange("contractNumber", event.target.value)}
                 placeholder={copy.contractPlaceholder}
                 required
               />
-              {contractLookup.status === "loading" ? (
-                <p className="service-form__hint">{t("contractLookupLoading")}</p>
-              ) : null}
-              {contractLookup.status === "found" &&
-              contractLookup.contractNumber === normalizedContractNumber &&
-              !isContractNumberCurrentlyStuck ? (
-                <p className="service-form__success">{t("contractLookupSuccess")}</p>
-              ) : null}
-              {contractLookup.status === "missing" && contractLookup.contractNumber === normalizedContractNumber ? (
-                <p className="service-form__error">{contractLookup.message || t("contractLookupError")}</p>
-              ) : null}
-            </label>
+            </div>
+            {contractLookup.status === "loading" ? (
+              <p
+                className={[
+                  "service-form__hint",
+                  shouldHideContractLookupFeedback ? "service-form__feedback--hidden" : "",
+                ].filter(Boolean).join(" ")}
+                aria-hidden={shouldHideContractLookupFeedback ? "true" : undefined}
+              >
+                {t("contractLookupLoading")}
+              </p>
+            ) : null}
+            {contractLookup.status === "found" && isCurrentContractLookupResult ? (
+              <p
+                className={[
+                  "service-form__success",
+                  shouldHideContractLookupFeedback ? "service-form__feedback--hidden" : "",
+                ].filter(Boolean).join(" ")}
+                aria-hidden={shouldHideContractLookupFeedback ? "true" : undefined}
+              >
+                {t("contractLookupSuccess")}
+              </p>
+            ) : null}
+            {contractLookup.status === "missing" && isCurrentContractLookupResult ? (
+              <p
+                className={[
+                  "service-form__error",
+                  shouldHideContractLookupFeedback ? "service-form__feedback--hidden" : "",
+                ].filter(Boolean).join(" ")}
+                aria-hidden={shouldHideContractLookupFeedback ? "true" : undefined}
+              >
+                {contractLookup.message || t("contractLookupError")}
+              </p>
+            ) : null}
 
             <div className="service-field-grid service-field-grid--3">
               <label className="service-field">
