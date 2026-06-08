@@ -39,6 +39,8 @@ test("buildServiceClaimAutofillFromContract maps address and landlord fields", (
   assert.equal(autofill.clientAddressLine1, "Invalidenstrasse 10");
   assert.equal(autofill.clientFloor, "2");
   assert.equal(autofill.clientUnitNumber, "14");
+  assert.equal(autofill.registrationVerificationPostalCode, "10115");
+  assert.equal(autofill.registrationVerificationUnit, "Invalidenstrasse 10");
   assert.equal(autofill.landlordCompanyName, "Anna Schmidt Housing GmbH");
   assert.equal(autofill.landlordCompanyPhone, "+49 30 555 0101");
   assert.equal(autofill.landlordCompanyEmail, "anna.schmidt@example.com");

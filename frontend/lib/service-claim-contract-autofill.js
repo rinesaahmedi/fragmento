@@ -24,6 +24,14 @@ export function buildServiceClaimAutofillFromContract(contract) {
   const registration = contract?.registration || {};
   const contact = splitPersonName(landlord.managerName);
   const customer = splitPersonName(registration.fullName);
+  const registrationVerificationUnit = [
+    address.address1,
+    address.address2,
+    contract?.unitNumber,
+    contract?.floor,
+    contract?.building,
+    contract?.propertyObjectName,
+  ].find((value) => String(value || "").trim());
 
   return {
     givenName: String(customer.givenName || "").trim(),
@@ -37,6 +45,8 @@ export function buildServiceClaimAutofillFromContract(contract) {
     clientCity: String(address.city || "").trim(),
     clientFloor: String(contract?.floor || "").trim(),
     clientUnitNumber: String(contract?.unitNumber || "").trim(),
+    registrationVerificationPostalCode: String(address.postalCode || "").trim(),
+    registrationVerificationUnit: String(registrationVerificationUnit || "").trim(),
     landlordCompanyName: String(landlord.companyName || "").trim(),
     landlordCompanyPhone: String(landlord.phone || "").trim(),
     landlordCompanyEmail: String(landlord.email || "").trim(),

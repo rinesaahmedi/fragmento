@@ -1314,10 +1314,10 @@ const INITIAL_FORM = {
   hausmeisterEmail: "",
   problemDescription: "",
   serialNumber: "",
-  registrationFullName: "",
+  registrationGivenName: "",
+  registrationSurname: "",
   registrationEmail: "",
   registrationPhone: "",
-  registrationAddressNote: "",
   registrationVerificationPostalCode: "",
   registrationVerificationUnit: "",
   registrationVerificationCode: "",
@@ -2880,7 +2880,9 @@ export default function ServiceClaimFlow() {
       return;
     }
 
-    const fullName = String(formValues.registrationFullName || "").trim();
+    const givenName = String(formValues.registrationGivenName || "").trim();
+    const surname = String(formValues.registrationSurname || "").trim();
+    const fullName = [givenName, surname].filter(Boolean).join(" ");
     const email = String(formValues.registrationEmail || "").trim();
     const phone = String(formValues.registrationPhone || "").trim();
     const verificationPostalCode = String(formValues.registrationVerificationPostalCode || "").trim();
@@ -2890,7 +2892,7 @@ export default function ServiceClaimFlow() {
       setError(t("contractLookupError"));
       return;
     }
-    if (!fullName) {
+    if (!givenName || !surname) {
       setError(t("registerFullNameRequired"));
       return;
     }
@@ -2918,7 +2920,6 @@ export default function ServiceClaimFlow() {
           fullName,
           email,
           phone,
-          addressNote: formValues.registrationAddressNote,
           verificationPostalCode,
           verificationAddress: verificationUnit,
         }),
@@ -2981,10 +2982,10 @@ export default function ServiceClaimFlow() {
         surname: current.surname || nameParts.slice(1).join(" ") || "",
         email: current.email || pendingRegistration.email || "",
         phone: current.phone || pendingRegistration.phone || "",
-        registrationFullName: "",
+        registrationGivenName: "",
+        registrationSurname: "",
         registrationEmail: "",
         registrationPhone: "",
-        registrationAddressNote: "",
         registrationVerificationPostalCode: "",
         registrationVerificationUnit: "",
         registrationVerificationCode: "",
@@ -3184,6 +3185,62 @@ export default function ServiceClaimFlow() {
             <div className="service-field-grid service-field-grid--phone-email">
               <label className="service-field">
                 <span>
+                  {copy.givenName}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationGivenName"
+                  value={formValues.registrationGivenName}
+                  onChange={(event) => handleFieldChange("registrationGivenName", event.target.value)}
+                  placeholder={copy.givenNamePlaceholder}
+                  required
+                />
+              </label>
+              <label className="service-field">
+                <span>
+                  {copy.surname}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationSurname"
+                  value={formValues.registrationSurname}
+                  onChange={(event) => handleFieldChange("registrationSurname", event.target.value)}
+                  placeholder={copy.surnamePlaceholder}
+                  required
+                />
+              </label>
+            </div>
+
+            <div className="service-field-grid service-field-grid--phone-email">
+              <label className="service-field">
+                <span>{copy.phone}</span>
+                <input
+                  name="registrationPhone"
+                  type="tel"
+                  value={formValues.registrationPhone}
+                  onChange={(event) => handleFieldChange("registrationPhone", event.target.value)}
+                  placeholder={copy.phonePlaceholder}
+                />
+              </label>
+              <label className="service-field">
+                <span>
+                  {copy.email}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationEmail"
+                  type="email"
+                  value={formValues.registrationEmail}
+                  onChange={(event) => handleFieldChange("registrationEmail", event.target.value)}
+                  placeholder={copy.emailPlaceholder}
+                  required
+                />
+              </label>
+            </div>
+
+            <div className="service-field-grid service-field-grid--phone-email">
+              <label className="service-field">
+                <span>
                   {copy.registerVerificationPostalCode}
                   <RequiredFieldMark title={requiredFieldTitle} />
                 </span>
@@ -3206,60 +3263,6 @@ export default function ServiceClaimFlow() {
                   onChange={(event) => handleFieldChange("registrationVerificationUnit", event.target.value)}
                   placeholder={copy.registerVerificationUnitPlaceholder}
                   required
-                />
-              </label>
-            </div>
-
-            <div className="service-field-grid service-field-grid--phone-email">
-              <label className="service-field">
-                <span>
-                  {copy.registerFullName}
-                  <RequiredFieldMark title={requiredFieldTitle} />
-                </span>
-                <input
-                  name="registrationFullName"
-                  value={formValues.registrationFullName}
-                  onChange={(event) => handleFieldChange("registrationFullName", event.target.value)}
-                  placeholder={copy.registerFullNamePlaceholder}
-                  required
-                />
-              </label>
-              <label className="service-field">
-                <span>
-                  {copy.email}
-                  <RequiredFieldMark title={requiredFieldTitle} />
-                </span>
-                <input
-                  name="registrationEmail"
-                  type="email"
-                  value={formValues.registrationEmail}
-                  onChange={(event) => handleFieldChange("registrationEmail", event.target.value)}
-                  placeholder={copy.emailPlaceholder}
-                  required
-                />
-              </label>
-            </div>
-
-            <div className="service-field-grid service-field-grid--phone-email">
-              <label className="service-field">
-                <span>{copy.phone}</span>
-                <input
-                  name="registrationPhone"
-                  value={formValues.registrationPhone}
-                  onChange={(event) => handleFieldChange("registrationPhone", event.target.value)}
-                  placeholder={copy.phonePlaceholder}
-                />
-              </label>
-              <label className="service-field">
-                <span>
-                  {copy.registerAddressNote}
-                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
-                </span>
-                <input
-                  name="registrationAddressNote"
-                  value={formValues.registrationAddressNote}
-                  onChange={(event) => handleFieldChange("registrationAddressNote", event.target.value)}
-                  placeholder={copy.registerAddressNotePlaceholder}
                 />
               </label>
             </div>
