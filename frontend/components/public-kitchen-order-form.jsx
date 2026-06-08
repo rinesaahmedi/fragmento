@@ -67,8 +67,8 @@ export default function PublicKitchenOrderForm({
     country: translate("order.fieldErrors.country", "Please select a country."),
     city: translate("order.fieldErrors.city", "Please select a city."),
     postalCode: translate("order.fieldErrors.postalCode", "Please select a postal code."),
-    consent: translate("order.fieldErrors.consent", "Please accept the privacy statement."),
-    termsConsent: translate("order.fieldErrors.termsConsent", "Please accept the terms and conditions."),
+    consent: translate("order.fieldErrors.consent", "Please confirm that you have read the privacy statement."),
+    termsConsent: translate("order.fieldErrors.termsConsent", "Please confirm the terms and conditions."),
   }), [translate]);
   const countryOptions = uniqueOptions(Object.keys(COUNTRY_CITY_OPTIONS), customer.country);
   const cityOptions = uniqueOptions(COUNTRY_CITY_OPTIONS[customer.country] || [], customer.city);
@@ -404,7 +404,7 @@ export default function PublicKitchenOrderForm({
                   }}
                 />
                 <label htmlFor="consent">
-                  {translate("order.consentShortPrefix", "I accept the ")}
+                  {translate("order.consentShortPrefix", "I have read the ")}
                   <span
                     className={styles.pendingLegalText}
                     title={translate("order.privacyPolicyPending", "Privacy policy will be available soon.")}
@@ -438,7 +438,7 @@ export default function PublicKitchenOrderForm({
             </div>
             <div className={styles.orderSubmitRow}>
               <button type="submit" form="order-form" className={styles.orderSubmitButton} disabled={isSubmitting}>
-                {isSubmitting ? translate("order.submitSaving", "Saving...") : translate("order.submit", "Order with obligation to pay")}
+                {isSubmitting ? translate("order.submitSaving", "Saving...") : translate("order.submit", "Complete paid order")}
               </button>
             </div>
             <small className={styles.orderHelp}>{translate("order.requiredHint", "Fields marked with * are required.")}</small>

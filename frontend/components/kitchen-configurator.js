@@ -154,7 +154,7 @@ function localizeProductInfoDocumentLabel(label, translate) {
     case "backofen pdf":
       return translate("configurator.productInfoLabelOvenPdf", "Oven PDF");
     case "kochfeld pdf":
-      return translate("configurator.productInfoLabelHobPdf", "Hob PDF");
+      return translate("configurator.productInfoLabelHobPdf", "Cooktop PDF");
     case "produktinfo pdf":
       return translate("configurator.productInfoLabelProductPdf", "Product info PDF");
     case "e-label pdf":
@@ -359,7 +359,7 @@ function formatProductAssistantDisplayName(item, translate) {
   }
 
   if (isWashingMachineProductAssistantItem(item)) {
-    return translate("configurator.catalogItemNames.washingMachine", "Washing Machine");
+    return translate("configurator.catalogItemNames.washingMachine", "Washing machine");
   }
 
   if (isRefrigeratorProductAssistantItem(item)) {
@@ -395,13 +395,13 @@ function formatProductAssistantContextLabel(activeProductInfo, selectedItems) {
 function buildProductAssistantIntro(activeProductInfo, selectedItems) {
   const names = selectedItems.map((item) => item.name).filter(Boolean);
   if (activeProductInfo?.title) {
-    return `Ich sehe, du hast ${activeProductInfo.title} geöffnet. Frag mich alles dazu.`;
+    return `Ich sehe, du hast ${activeProductInfo.title} geöffnet. Stelle eine Frage dazu.`;
   }
   if (names.length === 1) {
-    return `Ich sehe, du hast ${names[0]} ausgewählt. Frag mich alles dazu.`;
+    return `Ich sehe, du hast ${names[0]} ausgewählt. Stelle eine Frage dazu.`;
   }
   if (names.length > 1) {
-    return `Ich sehe, du hast ${names.join(", ")} ausgewählt. Frag mich alles dazu.`;
+    return `Ich sehe, du hast ${names.join(", ")} ausgewählt. Stelle eine Frage dazu.`;
   }
   return "Wähle zuerst ein Produkt mit Produktinformation aus.";
 }
@@ -415,19 +415,19 @@ function buildLocalizedProductAssistantIntro(activeProductInfo, selectedItems, t
     .filter(Boolean);
 
   if (activeProductInfo?.title) {
-    return translate("configurator.productAssistantIntroOpened", "You're now looking at {label}. Ask me anything from its product information.", {
+    return translate("configurator.productAssistantIntroOpened", "You're now viewing {label}. Ask a question about its product information.", {
       label: activeProductInfo.title,
     });
   }
 
   if (names.length === 1) {
-    return translate("configurator.productAssistantIntroSelectedOne", "You've selected {label}. Ask me anything from its product information.", {
+    return translate("configurator.productAssistantIntroSelectedOne", "You've selected {label}. Ask a question about its product information.", {
       label: names[0],
     });
   }
 
   if (names.length > 1) {
-    return translate("configurator.productAssistantIntroSelectedMany", "You've selected {labels}. Ask me anything from their product information.", {
+    return translate("configurator.productAssistantIntroSelectedMany", "You've selected {labels}. Ask a question about their product information.", {
       labels: names.join(", "),
     });
   }
@@ -610,7 +610,7 @@ function buildSplitProductAssistantOptions(item, itemId, translate) {
   const options = [];
 
   if (ovenFacts.length || ovenText) {
-    const ovenLabel = translate("configurator.productAssistantSplitOven", "Built-in Oven");
+    const ovenLabel = translate("configurator.productAssistantSplitOven", "Built-in oven");
     const structuredOvenFacts = buildStructuredProductAssistantFacts(ovenFacts, [
       {
         when: () => true,
@@ -660,7 +660,7 @@ function buildSplitProductAssistantOptions(item, itemId, translate) {
   }
 
   if (hobFacts.length || hobText) {
-    const hobLabel = translate("configurator.productAssistantSplitHob", "Hob");
+    const hobLabel = translate("configurator.productAssistantSplitHob", "Cooktop");
     const structuredHobFacts = buildStructuredProductAssistantFacts(hobFacts, [
       {
         when: () => true,
@@ -1205,7 +1205,7 @@ function KitchenConfiguratorContent({
     translate,
   );
   const hasProductAssistantOptions = productAssistantContextOptions.length > 0;
-  const productAssistantEmptyIntro = translate("configurator.productAssistantIntro", "Hi. I can answer questions about the available products and their documentation. What would you like to discuss?");
+  const productAssistantEmptyIntro = translate("configurator.productAssistantIntro", "Hi. I can answer questions about the available products and their documentation. What would you like to know?");
   const productAssistantPickerIntro = hasAnySelectedProducts
     ? buildLocalizedProductAssistantIntro(activeProductInfo, selectedProductInfoItems, translate)
     : productAssistantEmptyIntro;
@@ -1478,9 +1478,9 @@ function KitchenConfiguratorContent({
             text: option.type === "all"
               ? translate(
                 "configurator.productAssistantContextConfirmedAll",
-                "You're now viewing all selected products. Ask me anything from their product information.",
+                "You're now viewing all selected products. Ask a question about their product information.",
               )
-              : translate("configurator.productAssistantContextConfirmed", "You're now asking about {label}. Ask me anything from its product information.", {
+              : translate("configurator.productAssistantContextConfirmed", "You're asking about {label}. Ask a question about its product information.", {
                 label: option.shortLabel,
               }),
           },
@@ -1623,7 +1623,7 @@ function KitchenConfiguratorContent({
         throw new Error(payload.error || translate("configurator.productAssistantErrorUnavailable", "The product question could not be answered."));
       }
 
-      const answer = payload.answer || translate("configurator.productAssistantNoInfo", "No product information is available yet.");
+      const answer = payload.answer || translate("configurator.productAssistantNoInfo", "Product information will be available soon.");
       setProductAssistantMessages((current) => [
         ...current,
         {
@@ -1637,7 +1637,7 @@ function KitchenConfiguratorContent({
     } catch (error) {
       const nextError =
         error?.name === "AbortError"
-          ? translate("configurator.productAssistantErrorTimeout", "The request is taking too long. Please try again.")
+          ? translate("configurator.productAssistantErrorTimeout", "The response is taking longer than expected. Please try again.")
           : error instanceof Error
             ? error.message
             : translate("configurator.productAssistantErrorUnavailable", "The product question could not be answered.");
@@ -1678,7 +1678,7 @@ function KitchenConfiguratorContent({
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition || !window.speechSynthesis) {
       setProductAssistantVoiceError(
-        translate("configurator.productAssistantVoiceUnsupported", "Voice chat is not supported in this browser."),
+        translate("configurator.productAssistantVoiceUnsupported", "Voice chat is not available in your browser."),
       );
       return;
     }
@@ -1723,8 +1723,8 @@ function KitchenConfiguratorContent({
     recognition.onerror = (event) => {
       const message =
         event?.error === "not-allowed"
-          ? translate("configurator.productAssistantVoicePermission", "Microphone permission is needed to use voice chat.")
-          : translate("configurator.productAssistantVoiceError", "Voice input could not be started.");
+          ? translate("configurator.productAssistantVoicePermission", "Please allow microphone access to use voice chat.")
+          : translate("configurator.productAssistantVoiceError", "Voice input could not start. Please try again.");
       setProductAssistantVoiceError(message);
       setIsProductAssistantListening(false);
     };
@@ -1746,13 +1746,13 @@ function KitchenConfiguratorContent({
     }
 
     if (!customer.consent) {
-      setStatus(translate("configurator.statusConfirmConsent", "Please confirm the data privacy consent."));
+      setStatus(translate("configurator.statusConfirmConsent", "Please confirm that you have read the privacy policy."));
       setStatusTone("error");
       return;
     }
 
     if (!customer.termsConsent) {
-      setStatus(translate("configurator.statusConfirmTerms", "Please confirm that you have read and accept the terms and conditions."));
+      setStatus(translate("configurator.statusConfirmTerms", "Please confirm that you have read and agree to the terms and conditions."));
       setStatusTone("error");
       return;
     }
@@ -1878,7 +1878,7 @@ function KitchenConfiguratorContent({
               <img src="/img/fragmentologo.png" alt="Fragmento" />
             </span>
             <div className={styles.brandText}>
-              <h1>{translate("configurator.headerTitle", "Your customized kitchen")}</h1>
+              <h1>{translate("configurator.headerTitle", "Customize your kitchen")}</h1>
             </div>
           </div>
           <div className={styles.pricePill}>
@@ -2100,10 +2100,10 @@ function KitchenConfiguratorContent({
                     <div className={styles.productAssistantTitleBlock}>
                       <h2 id="product-assistant-title">
                         {selectedProductAssistantContext && selectedProductAssistantContext.type !== "all"
-                          ? translate("configurator.productAssistantItemAgentTitle", "{name} Agent", {
+                          ? translate("configurator.productAssistantItemAgentTitle", "Product assistant: {name}", {
                             name: selectedProductAssistantContext.shortLabel || selectedProductAssistantContext.label,
                           })
-                          : translate("configurator.productAssistantTitle", "Product Agent")}
+                          : translate("configurator.productAssistantTitle", "Product assistant")}
                       </h2>
                       {hasProductAssistantOptions ? (
                         <div className={styles.productAssistantSectionLabel}>
@@ -2116,7 +2116,7 @@ function KitchenConfiguratorContent({
                     <button
                       type="button"
                       className={styles.productAssistantMinimize}
-                      aria-label={translate("configurator.productAssistantCloseAria", "Close Product Agent")}
+                      aria-label={translate("configurator.productAssistantCloseAria", "Close product assistant")}
                       onClick={closeProductAssistant}
                     >
                       <span aria-hidden="true">&times;</span>
@@ -2153,7 +2153,7 @@ function KitchenConfiguratorContent({
                       <span>
                         {translate(
                           "configurator.productAssistantNoInfo",
-                          "No product information is available for your current selection yet.",
+                          "Product information will be available soon.",
                         )}
                       </span>
                     </div>
@@ -2251,7 +2251,7 @@ function KitchenConfiguratorContent({
               type="button"
               className={styles.productAssistantLauncher}
               aria-expanded={isProductAssistantOpen}
-              aria-label={translate("configurator.productAssistantLauncher", "Product help")}
+              aria-label={translate("configurator.productAssistantLauncher", "Product assistant")}
               onClick={() => {
                 if (isProductAssistantOpen) {
                   closeProductAssistant();
@@ -2261,7 +2261,7 @@ function KitchenConfiguratorContent({
               }}
             >
               <span className={styles.productAssistantLauncherBubble}>
-                {translate("configurator.productAssistantLauncherPrompt", "Ask me")}
+                {translate("configurator.productAssistantLauncherPrompt", "Ask a question")}
               </span>
               <span className={styles.productAssistantLauncherAvatar} aria-hidden="true">
                 <img src="/img/Untitled%20design%20(4).png" alt="" />

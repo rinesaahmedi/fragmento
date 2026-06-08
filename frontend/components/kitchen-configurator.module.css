@@ -1257,6 +1257,7 @@
 }
 
 .productAssistantHeaderActions {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -1265,6 +1266,7 @@
 }
 
 .productAssistantTitleWrap {
+  flex: 1 1 auto;
   min-width: 0;
   display: flex;
   align-items: center;
@@ -1294,10 +1296,15 @@
 }
 
 .productAssistantHeader h2 {
+  min-width: 0;
+  max-width: 100%;
   margin: 0;
+  overflow: hidden;
   color: #2f2a24;
   font-size: 1rem;
   line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .productAssistantHeader p {

@@ -34,7 +34,7 @@ const FIELD_ERROR_MESSAGES = {
   city: "Bitte Stadt auswaehlen.",
   postalCode: "Bitte PLZ auswaehlen.",
   paymentMethod: "Bitte Zahlungsmethode auswaehlen.",
-  consent: "Bitte der Datenschutzerklaerung zustimmen.",
+  consent: "Bitte bestaetige, dass du die Datenschutzerklaerung gelesen hast.",
 };
 
 function normalizeValue(value) {
@@ -233,7 +233,7 @@ export default function KitchenOrderForm({
     city: translate("order.fieldErrors.city", "Please select a city."),
     postalCode: translate("order.fieldErrors.postalCode", "Please select a postal code."),
     paymentMethod: translate("order.fieldErrors.paymentMethod", "Please choose a payment method."),
-    consent: translate("order.fieldErrors.consent", "Please accept the privacy statement."),
+    consent: translate("order.fieldErrors.consent", "Please confirm that you have read the privacy statement."),
   }), [translate]);
   const countryOptions = uniqueOptions(Object.keys(COUNTRY_CITY_OPTIONS), customer.country);
   const cityOptions = uniqueOptions(COUNTRY_CITY_OPTIONS[customer.country] || [], customer.city);
