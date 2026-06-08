@@ -64,10 +64,10 @@ function getPlanBounds(group, componentId) {
 }
 
 const L_SHAPED_PLAN_COMPONENT_BOUNDS = {
-  "component-wall-cabinet-1": { x: 156, y: 71, width: 98, height: 186 },
-  "component-wall-cabinet-2": { x: 253, y: 71, width: 103, height: 186 },
-  "component-wall-cabinet-3": { x: 356, y: 72, width: 100, height: 185 },
-  "component-wall-cabinet-4": { x: 456, y: 72, width: 159, height: 165 },
+  "component-wall-cabinet-1": { x: 156, y: 114, width: 96, height: 137 },
+  "component-wall-cabinet-2": { x: 207, y: 98, width: 122, height: 163 },
+  "component-wall-cabinet-3": { x: 284, y: 86, width: 108, height: 139 },
+  "component-wall-cabinet-4": { x: 347, y: 71, width: 128, height: 142 },
   "component-under-cabinet-light": { x: 329, y: 246, width: 70, height: 42 },
   "component-refrigerator": { x: 566, y: 331, width: 49, height: 147 },
   "component-worktop": { x: 156, y: 237, width: 459, height: 92 },
@@ -80,10 +80,10 @@ const L_SHAPED_PLAN_COMPONENT_BOUNDS = {
 };
 
 const L_SHAPED_PLAN_COMPONENT_SHAPES = {
-  "component-wall-cabinet-1": "M156 166 L200 192 L200 322 L156 296 Z M200 192 L253 181 L253 312 L200 322 Z",
-  "component-wall-cabinet-2": "M253 181 L356 161 L356 291 L253 312 Z",
-  "component-wall-cabinet-3": "M356 161 L456 141 L456 272 L356 291 Z",
-  "component-wall-cabinet-4": "M456 141 L615 110 L615 237 L456 272 Z",
+  "component-wall-cabinet-1": "M156 124 L207 114 L252 140 L201 151 Z M156 124 L201 151 L201 251 L156 224 Z M201 151 L252 140 L252 240 L201 251 Z",
+  "component-wall-cabinet-2": "M207 114 L284 98 L329 125 L252 140 Z M252 140 L329 125 L329 225 L252 240 Z M260 242 L284 242 L284 264 L260 264 Z M299 235 L323 235 L323 257 L299 257 Z",
+  "component-wall-cabinet-3": "M284 98 L347 86 L392 112 L329 125 Z M329 125 L392 112 L392 213 L329 225 Z",
+  "component-wall-cabinet-4": "M347 86 L424 71 L469 97 L392 112 Z M392 112 L469 97 L469 198 L392 213 Z M469 97 L475 96 L475 196 L469 198 Z M462 249 L473 249 L473 269 L462 269 Z",
   "component-under-cabinet-light": "M329 276 L399 263 L399 282 L329 296 Z",
   "component-refrigerator": "M566 341 L615 331 L615 478 L566 462 Z",
   "component-worktop": "M156 296 L356 257 L516 351 L615 332 L456 237 L356 257 L156 296 Z M156 329 L400 281 L516 350 L566 341 L330 388 Z",
@@ -269,6 +269,7 @@ export function applyGroupVisualState(group, { selected, locked }) {
   const selectionMode = group.dataset.selectionMode || "";
   const useOutlineOnlySelection = selectionMode === "outline";
   const useCadLineworkSelection = selectionMode === "cad-linework";
+  const useHitboxOnlySelection = selectionMode === "hitbox-only";
 
   group.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse,text").forEach((element) => {
     if (element.classList.contains("component-hitbox")) {
@@ -302,14 +303,32 @@ export function applyGroupVisualState(group, { selected, locked }) {
       element.dataset.originalFill = getInheritedSvgAttribute(element, "fill", group) || "";
     }
 
-    if (useOutlineOnlySelection) {
-      element.style.setProperty("stroke", element.dataset.originalStroke || "none", "important");
-      element.style.setProperty("stroke-width", `${element.dataset.originalStrokeWidth}px`, "important");
+    if (useOutlineOnlySelection || useHitboxOnlySelection) {
+      const hasOriginalStroke = element.dataset.originalStroke && element.dataset.originalStroke !== "none";
+      const selectedHitboxStrokeWidth = useHitboxOnlySelection && isActive && hasOriginalStroke ? "3.2px" : "";
+      const hitboxOnlyStroke =
+        useHitboxOnlySelection && hasOriginalStroke
+          ? isActive
+            ? SELECTED_PLAN_STROKE
+            : BASE_PLAN_STROKE
+          : element.dataset.originalStroke || "none";
+      element.style.setProperty(
+        "stroke",
+        hitboxOnlyStroke,
+        "important",
+      );
+      element.style.setProperty(
+        "stroke-width",
+        selectedHitboxStrokeWidth || `${element.dataset.originalStrokeWidth}px`,
+        "important",
+      );
       element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
       if (element.tagName === "text") {
         element.style.setProperty("fill", element.dataset.originalFill || BASE_PLAN_STROKE, "important");
-      } else if (element.dataset.originalFill) {
+      } else if (element.dataset.originalFill && element.dataset.originalFill !== "none") {
         element.style.setProperty("fill", element.dataset.originalFill, "important");
+      } else {
+        element.style.setProperty("fill", "none", "important");
       }
       return;
     }
@@ -485,8 +504,9 @@ export function syncKitchenPlan({
 
     group.style.removeProperty("display");
     group.classList.add("kitchen-component");
-    if (kitchenConfig.kitchen.slug === "l-shaped-kitchen" && !group.dataset.selectionMode) {
-      group.dataset.selectionMode = "cad-linework";
+    if (kitchenConfig.kitchen.slug === "l-shaped-kitchen") {
+      group.dataset.selectionMode = "hitbox-only";
+      group.querySelectorAll(".component-selection-outline").forEach((element) => element.remove());
     }
     if (item.code) {
       group.dataset.componentCode = item.code;

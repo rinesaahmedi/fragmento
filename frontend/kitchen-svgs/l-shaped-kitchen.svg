@@ -29862,89 +29862,105 @@ fill="none" stroke="black" stroke-width="0.5"/>
 fill="none" stroke="black" stroke-width="0.5"/>
 <path d="M614.74 458.84L515.37 478.46"
 fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M200 149.89L251.11 139.8"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M251.85 140.23L200.74 150.33"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M155.74 123.67L200.74 150.33"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M155.74 223.91L155.74 123.67Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M251.85 140.23L206.85 113.58"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M251.85 140.23L206.85 113.58"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M155.74 123.67L206.85 113.58"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M155.74 123.67L200.74 150.33"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M251.85 140.23L200.74 150.33"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M155.74 123.67L206.85 113.58"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M155.74 223.91L155.74 123.67Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M251.11 139.8L327.77 124.66"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M328.51 125.09L251.85 140.23"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M206.85 113.58L251.85 140.23"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M328.51 125.09L283.51 98.44"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M328.51 125.09L283.51 98.44"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M206.85 113.58L283.51 98.44"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M206.85 113.58L251.85 140.23"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M328.51 125.09L251.85 140.23"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M206.85 113.58L283.51 98.44"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M391.66 112.04L327.77 124.66"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M392.4 112.48L328.51 125.09"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M283.51 98.44L328.51 125.09"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M392.4 112.48L347.4 85.82"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M392.4 112.48L347.4 85.82"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M283.51 98.44L347.4 85.82"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M283.51 98.44L328.51 125.09"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M392.4 112.48L328.51 125.09"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M283.51 98.44L347.4 85.82"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M468.32 96.9L391.66 112.04"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M469.06 97.34L392.4 112.48"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M347.4 85.82L392.4 112.48"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M469.06 97.34L424.06 70.68"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M469.06 97.34L424.06 70.68"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M347.4 85.82L424.06 70.68"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M347.4 85.82L392.4 112.48"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M469.06 97.34L392.4 112.48"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M347.4 85.82L424.06 70.68"
-fill="none" stroke="black" stroke-width="0.5"/>
-<path d="M469.06 97.34L475.45 96.08"
-fill="none" stroke="black" stroke-width="0.5"/>
 <g id="layer-component-under-cabinet-light" data-component-id="component-under-cabinet-light" data-layer-name="FH664621E Flat Pull-Out Extractor Hood">
   <path d="M400.73 283.28L356.47 257.06"
 fill="none" stroke="black" stroke-width="0.5"/>
 </g>
 <g id="layer-component-wall-cabinet-1" data-component-id="component-wall-cabinet-1" data-layer-name="H4002L Wall Cabinet left">
+  <path d="M200 149.89L251.11 139.8"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 140.23L200.74 150.33"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M155.74 123.67L200.74 150.33"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M155.74 223.91L155.74 123.67Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 140.23L206.85 113.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 140.23L206.85 113.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M155.74 123.67L206.85 113.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M155.74 123.67L200.74 150.33"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 140.23L200.74 150.33"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M155.74 123.67L206.85 113.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M155.74 223.91L155.74 123.67Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 139.8L251.11 240.03Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 240.03L200 250.13"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M200 250.13L200 149.89Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M242.61 204.09L243.89 203.83"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M242.61 231.82L242.61 204.09Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M242.61 204.09L242.61 231.82Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M242.61 204.09L243.35 204.52"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.35 232.25L243.35 204.52Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M242.61 231.82L243.35 232.25"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M244.62 204.27L244.62 232Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.89 203.83L244.62 204.27"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.89 203.83L242.61 204.09"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.89 203.83L244.62 204.27"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.35 204.52L244.62 204.27"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M242.61 204.09L243.35 204.52"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.35 204.52L244.62 204.27"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M244.62 204.27L244.62 232Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M244.62 232L243.35 232.25"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.35 232.25L243.35 204.52Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M200.74 150.33L200.74 250.56Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M200.74 250.56L251.85 240.47"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 240.47L251.85 140.23Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M200.74 250.56L155.74 223.91"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M200.74 150.33L200.74 250.56Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M200.74 250.56L155.74 223.91"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M200.74 250.56L251.85 240.47"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 240.47L251.85 140.23Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M242.61 204.09L242.61 231.82Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M243.89 203.83L242.61 204.09"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 240.03L251.11 139.8Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 246.97L251.11 240.03Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 140.23L251.85 240.47Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 140.23L251.85 240.47Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 246.97L251.11 240.03Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 240.03L251.11 246.97Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+</g>
+<g id="detail-component-wall-cabinet-1-lower" data-layer-name="H4002L Wall Cabinet left lower detail">
   <path d="M286.98 271.36L211.17 286.33"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M253.15 311.2L211.17 286.33"
@@ -30109,78 +30125,132 @@ fill="none" stroke="black" stroke-width="0.5"/>
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M252.23 297.45L253.31 296.86"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 139.8L251.11 240.03Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 240.03L200 250.13"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M200 250.13L200 149.89Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M242.61 204.09L243.89 203.83"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M242.61 231.82L242.61 204.09Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M242.61 204.09L242.61 231.82Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M242.61 204.09L243.35 204.52"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.35 232.25L243.35 204.52Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M242.61 231.82L243.35 232.25"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M244.62 204.27L244.62 232Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.89 203.83L244.62 204.27"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.89 203.83L242.61 204.09"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.89 203.83L244.62 204.27"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.35 204.52L244.62 204.27"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M242.61 204.09L243.35 204.52"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.35 204.52L244.62 204.27"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M244.62 204.27L244.62 232Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M244.62 232L243.35 232.25"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.35 232.25L243.35 204.52Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M200.74 150.33L200.74 250.56Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M200.74 250.56L251.85 240.47"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.85 240.47L251.85 140.23Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M200.74 250.56L155.74 223.91"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M200.74 150.33L200.74 250.56Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M200.74 250.56L155.74 223.91"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M200.74 250.56L251.85 240.47"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.85 240.47L251.85 140.23Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M242.61 204.09L242.61 231.82Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M243.89 203.83L242.61 204.09"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 240.03L251.11 139.8Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 246.97L251.11 240.03Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.85 140.23L251.85 240.47Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.85 140.23L251.85 240.47Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 246.97L251.11 240.03Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 240.03L251.11 246.97Z"
-fill="none" stroke="black" stroke-width="0.5"/>
 </g>
 <g id="layer-component-wall-cabinet-2" data-component-id="component-wall-cabinet-2" data-layer-name="HD6002L Hood Wall Cabinet">
+  <path d="M251.11 139.8L327.77 124.66"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 125.09L251.85 140.23"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M206.85 113.58L251.85 140.23"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 125.09L283.51 98.44"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 125.09L283.51 98.44"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M206.85 113.58L283.51 98.44"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M206.85 113.58L251.85 140.23"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 125.09L251.85 140.23"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M206.85 113.58L283.51 98.44"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M271.72 247.76L271.72 259.38Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M274.97 247.12L279.18 257.9"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M268.47 248.41L264.26 260.85"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M310.56 240.1L310.56 251.71Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M313.81 239.45L318.01 250.23"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M307.31 240.74L303.1 253.18"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 124.66L327.77 224.9Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 224.9L251.11 240.03"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 189.41L318.23 189.15"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 217.14L316.95 189.41Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 240.03L327.77 224.9"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 224.9L327.77 231.83Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 231.83L251.11 246.97"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M269.28 243.38L274.39 242.37"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M274.39 242.37L274.39 243.76Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M274.39 243.76L269.28 244.77"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M269.28 244.77L269.28 243.38Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M308.11 235.71L313.22 234.7"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M313.22 234.7L313.22 236.09Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M313.22 236.09L308.11 237.1"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M308.11 237.1L308.11 235.71Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.97 189.59L318.97 217.32Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.23 189.15L318.97 189.59"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.23 189.15L316.95 189.41"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.23 189.15L318.97 189.59"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M317.69 189.84L318.97 189.59"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 189.41L317.69 189.84"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 189.41L316.95 217.14Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 189.41L317.69 189.84"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M317.69 217.57L317.69 189.84Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 217.14L317.69 217.57"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 217.14L317.69 217.57"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.97 217.32L317.69 217.57"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.97 217.32L317.69 217.57"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M317.69 217.57L317.69 189.84Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M317.69 189.84L318.97 189.59"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.97 189.59L318.97 217.32Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 240.47L328.51 225.33"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 225.33L328.51 125.09Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.85 240.47L328.51 225.33"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 225.33L328.51 125.09Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M318.23 189.15L316.95 189.41"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M316.95 189.41L316.95 217.14Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 231.83L251.11 246.97"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 224.9L327.77 231.83Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 240.03L327.77 224.9"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 224.9L251.11 240.03"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M251.11 246.97L327.77 231.83"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 231.83L327.77 224.9Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M327.77 124.66L327.77 224.9Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 125.09L328.51 225.33Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M328.51 125.09L328.51 225.33Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+</g>
+<g id="detail-component-wall-cabinet-2-lower" data-layer-name="HD6002L Hood Wall Cabinet lower detail">
   <path d="M356.47 257.06L155.74 296.69"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M253.15 311.2L328.96 296.23"
@@ -30563,105 +30633,43 @@ fill="none" stroke="black" stroke-width="0.5"/>
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M305.49 294.35L303.84 294.75"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M271.72 247.76L271.72 259.38Z"
+</g>
+<g id="layer-component-wall-cabinet-3" data-component-id="component-wall-cabinet-3" data-layer-name="H5002R Wall Cabinet right">
+  <path d="M391.66 112.04L327.77 124.66"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M274.97 247.12L279.18 257.9"
+  <path d="M392.4 112.48L328.51 125.09"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M268.47 248.41L264.26 260.85"
+  <path d="M283.51 98.44L328.51 125.09"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M310.56 240.1L310.56 251.71Z"
+  <path d="M392.4 112.48L347.4 85.82"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M313.81 239.45L318.01 250.23"
+  <path d="M392.4 112.48L347.4 85.82"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M307.31 240.74L303.1 253.18"
+  <path d="M283.51 98.44L347.4 85.82"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 124.66L327.77 224.9Z"
+  <path d="M283.51 98.44L328.51 125.09"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 224.9L251.11 240.03"
+  <path d="M392.4 112.48L328.51 125.09"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 189.41L318.23 189.15"
+  <path d="M283.51 98.44L347.4 85.82"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 217.14L316.95 189.41Z"
+  <path d="M327.77 224.9L391.66 212.28"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 240.03L327.77 224.9"
+  <path d="M391.66 212.28L391.66 112.04Z"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 224.9L327.77 231.83Z"
+  <path d="M328.51 225.33L392.4 212.72"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 231.83L251.11 246.97"
+  <path d="M392.4 212.72L392.4 112.48Z"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M269.28 243.38L274.39 242.37"
+  <path d="M328.51 225.33L392.4 212.72"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M274.39 242.37L274.39 243.76Z"
+  <path d="M392.4 212.72L392.4 112.48Z"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M274.39 243.76L269.28 244.77"
+  <path d="M391.66 112.04L391.66 212.28Z"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M269.28 244.77L269.28 243.38Z"
+  <path d="M392.4 112.48L392.4 212.72Z"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M308.11 235.71L313.22 234.7"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M313.22 234.7L313.22 236.09Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M313.22 236.09L308.11 237.1"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M308.11 237.1L308.11 235.71Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.97 189.59L318.97 217.32Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.23 189.15L318.97 189.59"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.23 189.15L316.95 189.41"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.23 189.15L318.97 189.59"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M317.69 189.84L318.97 189.59"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 189.41L317.69 189.84"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 189.41L316.95 217.14Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 189.41L317.69 189.84"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M317.69 217.57L317.69 189.84Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 217.14L317.69 217.57"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 217.14L317.69 217.57"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.97 217.32L317.69 217.57"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.97 217.32L317.69 217.57"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M317.69 217.57L317.69 189.84Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M317.69 189.84L318.97 189.59"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.97 189.59L318.97 217.32Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.85 240.47L328.51 225.33"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M328.51 225.33L328.51 125.09Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.85 240.47L328.51 225.33"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M328.51 225.33L328.51 125.09Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M318.23 189.15L316.95 189.41"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M316.95 189.41L316.95 217.14Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 231.83L251.11 246.97"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 224.9L327.77 231.83Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 240.03L327.77 224.9"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 224.9L251.11 240.03"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M251.11 246.97L327.77 231.83"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 231.83L327.77 224.9Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 124.66L327.77 224.9Z"
+  <path d="M392.4 112.48L392.4 212.72Z"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M334.19 186L335.47 185.75"
 fill="none" stroke="black" stroke-width="0.5"/>
@@ -30699,16 +30707,12 @@ fill="none" stroke="black" stroke-width="0.5"/>
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M334.93 186.44L336.21 186.19"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M328.51 125.09L328.51 225.33Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M328.51 125.09L328.51 225.33Z"
-fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M335.47 185.75L334.19 186"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M334.19 186L334.19 213.73Z"
 fill="none" stroke="black" stroke-width="0.5"/>
 </g>
-<g id="layer-component-wall-cabinet-3" data-component-id="component-wall-cabinet-3" data-layer-name="H5002R Wall Cabinet right">
+<g id="detail-component-wall-cabinet-3-lower" data-layer-name="H5002R Wall Cabinet right lower detail">
   <path d="M455.83 237.43L356.47 257.06"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M410.12 280.23L409.25 280.4"
@@ -32941,21 +32945,47 @@ fill="none" stroke="black" stroke-width="0.5"/>
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M412.52 280.25L412.47 280.27"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M327.77 224.9L391.66 212.28"
+</g>
+<g id="layer-component-wall-cabinet-4" data-component-id="component-wall-cabinet-4" data-layer-name="H6002R Wall Cabinet right">
+  <path d="M468.32 96.9L391.66 112.04"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M391.66 212.28L391.66 112.04Z"
+  <path d="M469.06 97.34L392.4 112.48"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M328.51 225.33L392.4 212.72"
+  <path d="M347.4 85.82L392.4 112.48"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M392.4 212.72L392.4 112.48Z"
+  <path d="M469.06 97.34L424.06 70.68"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M328.51 225.33L392.4 212.72"
+  <path d="M469.06 97.34L424.06 70.68"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M392.4 212.72L392.4 112.48Z"
+  <path d="M347.4 85.82L424.06 70.68"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M391.66 112.04L391.66 212.28Z"
+  <path d="M347.4 85.82L392.4 112.48"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M469.06 97.34L392.4 112.48"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M347.4 85.82L424.06 70.68"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M469.06 97.34L475.45 96.08"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M468.32 197.14L468.32 96.9Z"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M391.66 212.28L468.32 197.14"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M392.4 212.72L469.06 197.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M392.4 212.72L469.06 197.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M469.06 197.58L469.06 97.34Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M469.06 197.58L469.06 97.34Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M475.45 96.08L475.45 196.32Z"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M475.45 196.32L469.06 197.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M465.86 265.55L464.61 252.58"
+fill="none" stroke="black" stroke-width="0.5"/>
+  <path d="M468.78 252.16L470.11 265.58"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M398.08 173.39L399.36 173.13"
 fill="none" stroke="black" stroke-width="0.5"/>
@@ -32993,20 +33023,12 @@ fill="none" stroke="black" stroke-width="0.5"/>
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M398.82 201.55L398.82 173.82Z"
 fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M392.4 112.48L392.4 212.72Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M392.4 212.72L469.06 197.58"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M392.4 112.48L392.4 212.72Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M392.4 212.72L469.06 197.58"
-fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M398.08 173.39L398.08 201.12Z"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M399.36 173.13L398.08 173.39"
 fill="none" stroke="black" stroke-width="0.5"/>
 </g>
-<g id="layer-component-wall-cabinet-4" data-component-id="component-wall-cabinet-4" data-layer-name="H6002R Wall Cabinet right">
+<g id="detail-component-wall-cabinet-4-lower" data-layer-name="H6002R Wall Cabinet right lower detail">
   <path d="M470.45 268.31L469.58 268.48"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M469.58 268.48L469.58 268.63Z"
@@ -59006,20 +59028,6 @@ fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M466.14 266.11L466.14 266.11Z"
 fill="none" stroke="black" stroke-width="0.5"/>
   <path d="M466.14 266.11L466.14 266.11Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M465.86 265.55L464.61 252.58"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M468.78 252.16L470.11 265.58"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M468.32 197.14L468.32 96.9Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M469.06 197.58L469.06 97.34Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M469.06 197.58L469.06 97.34Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M475.45 96.08L475.45 196.32Z"
-fill="none" stroke="black" stroke-width="0.5"/>
-  <path d="M475.45 196.32L469.06 197.58"
 fill="none" stroke="black" stroke-width="0.5"/>
 </g>
 <g id="layer-component-base-module-1" data-component-id="component-base-module-1" data-layer-name="US40L Base Cabinet left">

@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { NextResponse } from "next/server";
+import { isMissingKitchenRegistrationTableError, kitchenRegistrationUnavailableMessage } from "../../../../lib/kitchen-registration-db";
 import { prisma } from "../../../../lib/prisma";
 import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 
@@ -136,6 +137,9 @@ export async function POST(request) {
     });
   } catch (error) {
     console.error("Kitchen registration verification error:", error);
+    if (isMissingKitchenRegistrationTableError(error)) {
+      return NextResponse.json({ error: kitchenRegistrationUnavailableMessage() }, { status: 503 });
+    }
     return NextResponse.json(
       { error: formatVerificationError(error) },
       { status: error.status || 500 },

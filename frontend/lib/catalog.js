@@ -1,5 +1,6 @@
 import { KitchenStatus, ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma.js";
+import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
@@ -705,28 +706,35 @@ async function attachRegistrationsToContracts(contracts) {
   const contractIds = contracts.map((contract) => contract.id).filter(Boolean);
   if (!contractIds.length) return contracts;
 
-  const registrations = await prisma.kitchenRegistration.findMany({
-    where: { kitchenContractId: { in: contractIds } },
-    select: {
-      id: true,
-      kitchenContractId: true,
-      fullName: true,
-      email: true,
-      phone: true,
-      addressNote: true,
-      isActive: true,
-      registeredAt: true,
-      deactivatedAt: true,
-      verifiedAt: true,
-      verificationExpiresAt: true,
-    },
-    orderBy: [
-      { kitchenContractId: "asc" },
-      { isActive: "desc" },
-      { registeredAt: "desc" },
-      { id: "desc" },
-    ],
-  });
+  let registrations = [];
+  try {
+    registrations = await prisma.kitchenRegistration.findMany({
+      where: { kitchenContractId: { in: contractIds } },
+      select: {
+        id: true,
+        kitchenContractId: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        addressNote: true,
+        isActive: true,
+        registeredAt: true,
+        deactivatedAt: true,
+        verifiedAt: true,
+        verificationExpiresAt: true,
+      },
+      orderBy: [
+        { kitchenContractId: "asc" },
+        { isActive: "desc" },
+        { registeredAt: "desc" },
+        { id: "desc" },
+      ],
+    });
+  } catch (error) {
+    if (!isMissingKitchenRegistrationTableError(error)) {
+      throw error;
+    }
+  }
 
   const registrationsByContractId = new Map();
   registrations.forEach((registration) => {

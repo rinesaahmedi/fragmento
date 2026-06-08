@@ -236,6 +236,7 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],
 };
 
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
@@ -260,6 +261,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "HOOD-B-FH664621E": [
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+  ],
+  "HOOD-LS-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
@@ -423,6 +428,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "T3D-OVEN-HOB-001": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "HOOD-LS-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
@@ -475,7 +481,11 @@ export function getCatalogDisplayItem(allItems, slug, item) {
   }
 
   const hoodItem =
-    linkedItems.find((entry) => String(entry.componentKey || "").toLowerCase() === "extractor-hood") || null;
+    linkedItems.find((entry) => {
+      const componentKey = String(entry.componentKey || "").toLowerCase();
+      const code = String(entry.code || "").trim().toUpperCase();
+      return componentKey === "extractor-hood" || code.startsWith("HOOD-");
+    }) || null;
   const primaryItem = linkedItems[0];
   const infoSource = hoodItem?.productInfoPdfPath ? hoodItem : primaryItem;
   const assistantHoverExtractorHoodOnly = Boolean(hoodItem && infoSource === hoodItem);
