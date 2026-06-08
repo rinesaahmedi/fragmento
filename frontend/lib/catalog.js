@@ -29,6 +29,18 @@ export const MONTAGE_REQUIRED_CODES = [
   "SINKBASE-C-600",
   "DISH-C-600-STD",
   "CAB-DRAWER-C-3D",
+  "CAB-WALL-LS-400",
+  "CAB-HOOD-LS-600",
+  "CAB-WALL-LS-500",
+  "CAB-WALL-LS-600",
+  "HOOD-LS-FH664621E",
+  "CAB-BASE-LS-400",
+  "OVEN-LS-600-HOB",
+  "CAB-BASE-LS-500",
+  "CORNER-LS-650",
+  "SINKBASE-LS-600",
+  "DISH-LS-600-STD",
+  "CAB-DRAWER-LS-300",
   "T3D-CAB-WALL-01",
   "T3D-CAB-WALL-02",
   "T3D-CAB-WALL-03",
@@ -53,8 +65,11 @@ export const MONTAGE_NON_CABINET_COMPONENT_CODES = [
   "DISH-C-600-STD",
   "OVEN-B-600-HOB",
   "OVEN-C-600-HOB",
+  "OVEN-LS-600-HOB",
   "HOOD-B-FH664621E",
   "HOOD-C-FH664621E",
+  "HOOD-LS-FH664621E",
+  "DISH-LS-600-STD",
   "T3D-WASHER-001",
   "T3D-DISH-001",
   "T3D-OVEN-HOB-001",
@@ -458,6 +473,7 @@ export async function listProjectsForAdmin(filters = {}) {
 export async function listKitchenContractsForAdmin(filters = {}) {
   const whereParts = [];
   const havingParts = [];
+  if (filters.contractId) whereParts.push(Prisma.sql`kc."id" = ${filters.contractId}`);
   if (filters.kitchenId) whereParts.push(Prisma.sql`kc."kitchenId" = ${filters.kitchenId}`);
   if (filters.housingCompanyId || filters.ownerId) whereParts.push(Prisma.sql`hc."id" = ${filters.housingCompanyId || filters.ownerId}`);
   if (filters.projectId) whereParts.push(Prisma.sql`prj."id" = ${filters.projectId}`);
@@ -677,7 +693,66 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     _count: { orders: Number(row.orderCount || 0) },
   }));
 
-  return attachOrdersToContracts(contracts);
+  return attachOrdersToContracts(await attachRegistrationsToContracts(contracts));
+}
+
+export async function getKitchenContractForAdmin(id) {
+  const contracts = await listKitchenContractsForAdmin({ contractId: id });
+  return contracts[0] || null;
+}
+
+async function attachRegistrationsToContracts(contracts) {
+  const contractIds = contracts.map((contract) => contract.id).filter(Boolean);
+  if (!contractIds.length) return contracts;
+
+  const registrations = await prisma.kitchenRegistration.findMany({
+    where: { kitchenContractId: { in: contractIds } },
+    select: {
+      id: true,
+      kitchenContractId: true,
+      fullName: true,
+      email: true,
+      phone: true,
+      addressNote: true,
+      isActive: true,
+      registeredAt: true,
+      deactivatedAt: true,
+      verifiedAt: true,
+      verificationExpiresAt: true,
+    },
+    orderBy: [
+      { kitchenContractId: "asc" },
+      { isActive: "desc" },
+      { registeredAt: "desc" },
+      { id: "desc" },
+    ],
+  });
+
+  const registrationsByContractId = new Map();
+  registrations.forEach((registration) => {
+    const contractRegistrations = registrationsByContractId.get(registration.kitchenContractId) || [];
+    contractRegistrations.push(registration);
+    registrationsByContractId.set(registration.kitchenContractId, contractRegistrations);
+  });
+
+  return contracts.map((contract) => {
+    const contractRegistrations = registrationsByContractId.get(contract.id) || [];
+    const activeRegistration = contractRegistrations.find((registration) => registration.isActive) || null;
+    const previousRegistrations = contractRegistrations.filter(
+      (registration) => !registration.isActive && registration.verifiedAt,
+    );
+    const pendingRegistrations = contractRegistrations.filter(
+      (registration) => !registration.isActive && !registration.verifiedAt && !registration.deactivatedAt,
+    );
+
+    return {
+      ...contract,
+      activeRegistration,
+      previousRegistrations,
+      pendingRegistrations,
+      registrations: contractRegistrations,
+    };
+  });
 }
 
 async function attachOrdersToContracts(contracts) {

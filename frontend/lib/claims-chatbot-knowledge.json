@@ -1,0 +1,2045 @@
+{
+  "sourceDocument": "Amica_Claims_Chatbot_Knowledge_Tables_DECISION_GUIDE.docx",
+  "scope": "claims_page_chatbot",
+  "productAliasMap": [
+    {
+      "alias": "A-EGSPV597210",
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher"
+    },
+    {
+      "alias": "EGSPV 597 210",
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher"
+    },
+    {
+      "alias": "FH 664 621 S",
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood"
+    },
+    {
+      "alias": "FH664621E",
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood"
+    },
+    {
+      "alias": "FH 664 621 E",
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood"
+    },
+    {
+      "alias": "KHF 664 611 S",
+      "sourceSection": "KHF 664 611 S - Chimney Hood"
+    },
+    {
+      "alias": "KGC 15495 S",
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer"
+    },
+    {
+      "alias": "KGC15495S",
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer"
+    },
+    {
+      "alias": "OL-KGCN388140E",
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer"
+    },
+    {
+      "alias": "KGCN 388 140 E",
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer"
+    },
+    {
+      "alias": "OL-KMI 754 000 E",
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob"
+    },
+    {
+      "alias": "KMI 754 000 E",
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob"
+    },
+    {
+      "alias": "KMI 754 600 C",
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob"
+    },
+    {
+      "alias": "EWA 34660 W",
+      "sourceSection": "EWA 34660 W - Washing Machine"
+    },
+    {
+      "alias": "EWA34660W",
+      "sourceSection": "EWA 34660 W - Washing Machine"
+    },
+    {
+      "alias": "EBX 943 600 S",
+      "sourceSection": "EBX 943 600 S - Oven"
+    }
+  ],
+  "entries": [
+    {
+      "id": "a-egspv597210-error-signal-rapid-light-flickers-quickly-longer-inlet-time",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Error signal: Rapid light flickers quickly / longer inlet time",
+      "possibleCause": "Water inlet time too long; faucet closed, water intake restricted, or pressure too low.",
+      "safeUserCheck": "Check that water tap is open, inlet hose is not kinked/restricted, and water pressure is available.",
+      "claimTrigger": "Create claim/service case if the error remains after normal water-supply checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Error signal: Rapid light flickers quickly / longer inlet time",
+        "rapid light flickers quickly / longer inlet time"
+      ]
+    },
+    {
+      "id": "a-egspv597210-error-signal-rapid-90-min-lights-flicker-quickly",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Error signal: Rapid + 90 Min lights flicker quickly",
+      "possibleCause": "Required temperature not reached; heating element malfunction.",
+      "safeUserCheck": "Restart once only if safe. Ask for photo/video of the display signal.",
+      "claimTrigger": "Create claim/service case. Do not suggest internal repair.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Error signal: Rapid + 90 Min lights flicker quickly",
+        "rapid + 90 min lights flicker quickly"
+      ]
+    },
+    {
+      "id": "a-egspv597210-error-signal-eco-light-flickers-quickly-overflow",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Error signal: Eco light flickers quickly / overflow",
+      "possibleCause": "Overflow or leak in dishwasher element.",
+      "safeUserCheck": "Stop use. Turn off water valve if safe. Ask for photos of water/leak area.",
+      "claimTrigger": "Urgent claim/service case.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Error signal: Eco light flickers quickly / overflow",
+        "eco light flickers quickly / overflow"
+      ]
+    },
+    {
+      "id": "a-egspv597210-error-signal-rapid-eco-intensive-lights-flicker-quickly",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Error signal: Rapid + Eco + Intensive lights flicker quickly",
+      "possibleCause": "Communication failure between main PCB and display PCB; open circuit/broken wiring.",
+      "safeUserCheck": "Restart once only if safe. Ask for photo/video of display.",
+      "claimTrigger": "Create claim/service case.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Error signal: Rapid + Eco + Intensive lights flicker quickly",
+        "rapid + eco + intensive lights flicker quickly"
+      ]
+    },
+    {
+      "id": "a-egspv597210-dishwasher-will-not-start",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher will not start",
+      "possibleCause": "Door open/not fully closed, not connected to mains, delay start selected, or child lock enabled.",
+      "safeUserCheck": "Ask user to close door fully, check power, cancel delay start, and turn off child lock if active.",
+      "claimTrigger": "Create claim if power is available and user checks do not solve it.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Dishwasher will not start"
+      ]
+    },
+    {
+      "id": "a-egspv597210-dishwasher-beeps-at-end-of-wash-cycle",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher beeps at end of wash cycle",
+      "possibleCause": "End of wash programme; normal completion signal.",
+      "safeUserCheck": "Explain this can be normal at programme end.",
+      "claimTrigger": "No claim unless beeping continues abnormally or another error appears.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Dishwasher beeps at end of wash cycle"
+      ]
+    },
+    {
+      "id": "a-egspv597210-rinse-aid-indicator-is-on-display-shows-lsb",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Rinse aid indicator is on / display shows “Lsb”",
+      "possibleCause": "Rinse aid is low/empty.",
+      "safeUserCheck": "Add rinse aid.",
+      "claimTrigger": "No claim unless indicator remains after refill or dispenser is damaged.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Rinse aid indicator is on / display shows “Lsb”"
+      ]
+    },
+    {
+      "id": "a-egspv597210-wash-cycle-takes-too-long",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Wash cycle takes too long",
+      "possibleCause": "Connected to hot water, heavy soil extends programme duration, or disinfection option selected.",
+      "safeUserCheck": "Check correct connection and selected programme/options. Explain that auto/normal programmes may extend when heavy soil is detected.",
+      "claimTrigger": "Create claim only if programme never finishes or time is clearly abnormal.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Wash cycle takes too long"
+      ]
+    },
+    {
+      "id": "a-egspv597210-dishes-are-not-clean-enough",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishes are not clean enough",
+      "possibleCause": "Low water pressure, inlet water too cold, dishes too close together, wrong detergent amount, unsuitable programme, or spray arm blocked.",
+      "safeUserCheck": "Rearrange dishes, check spray arms rotate freely, use suitable detergent/programme, and run when pressure is normal.",
+      "claimTrigger": "Create claim if poor cleaning continues after normal use checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Dishes are not clean enough"
+      ]
+    },
+    {
+      "id": "a-egspv597210-dishes-are-not-dry-enough",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishes are not dry enough",
+      "possibleCause": "Rinse aid empty/too low, dishes placed incorrectly, or programme without drying stage.",
+      "safeUserCheck": "Fill/increase rinse aid, rearrange dishes, select programme with drying stage.",
+      "claimTrigger": "Create claim if drying remains poor after correct programme/rinse aid checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Dishes are not dry enough"
+      ]
+    },
+    {
+      "id": "a-egspv597210-stains-deposits-on-dishes",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Stains/deposits on dishes",
+      "possibleCause": "Hard water, incorrect loading, old rinse aid, rinse aid empty, too much detergent, water over 70 C.",
+      "safeUserCheck": "Use new rinse aid, add rinse aid, adjust detergent amount, rearrange dishes, check water temperature.",
+      "claimTrigger": "Create claim only if deposits continue despite correct settings/use.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Stains/deposits on dishes"
+      ]
+    },
+    {
+      "id": "a-egspv597210-detergent-not-fully-released-from-dispenser",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Detergent not fully released from dispenser",
+      "possibleCause": "Detergent old or spray arm rotation blocked.",
+      "safeUserCheck": "Use new detergent and rearrange dishes so spray arm can rotate.",
+      "claimTrigger": "Create claim if dispenser still fails to release detergent.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Detergent not fully released from dispenser"
+      ]
+    },
+    {
+      "id": "a-egspv597210-detergent-dispenser-will-not-close",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Detergent dispenser will not close",
+      "possibleCause": "Dispenser lid malfunction or detergent/rinse aid added incorrectly.",
+      "safeUserCheck": "Check nothing blocks the lid; add detergent according to instructions.",
+      "claimTrigger": "Create claim if lid remains faulty or damaged.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Detergent dispenser will not close"
+      ]
+    },
+    {
+      "id": "a-egspv597210-water-remains-in-dishwasher-does-not-drain",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Water remains in dishwasher / does not drain",
+      "possibleCause": "Programme interrupted, pump clogged by food residue/glass, drain clogged, drain hose bent/incorrectly connected.",
+      "safeUserCheck": "Check/clean accessible filter/pump area if safe, check drain hose not bent and correctly connected.",
+      "claimTrigger": "Create claim if water remains, pump is blocked, or drain issue continues.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Water remains in dishwasher / does not drain"
+      ]
+    },
+    {
+      "id": "a-egspv597210-foam-in-dishwasher",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Foam in dishwasher",
+      "possibleCause": "Wrong detergent used.",
+      "safeUserCheck": "Use only dishwasher-suitable detergent.",
+      "claimTrigger": "No claim unless foaming happens with correct detergent or appliance leaks.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Foam in dishwasher"
+      ]
+    },
+    {
+      "id": "a-egspv597210-dishwasher-leaking",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher leaking",
+      "possibleCause": "Wrong detergent residue or dishwasher not level.",
+      "safeUserCheck": "Check correct detergent and whether appliance is level. Ask for photos/video of leak.",
+      "claimTrigger": "Create claim if leak continues or water is under/around appliance.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of leak/damage",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Dishwasher leaking",
+        "dishwasher leaking",
+        "leak"
+      ]
+    },
+    {
+      "id": "a-egspv597210-black-or-grey-streaks-on-dishes",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Black or grey streaks on dishes",
+      "possibleCause": "Aluminium dishes rubbed against plates.",
+      "safeUserCheck": "Rearrange dishes and avoid aluminium contact.",
+      "claimTrigger": "No claim unless marks continue without aluminium contact or appliance damage is suspected.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Black or grey streaks on dishes"
+      ]
+    },
+    {
+      "id": "a-egspv597210-interior-dishwasher-stained",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Interior dishwasher stained",
+      "possibleCause": "Coffee/tea residue or reddish stains.",
+      "safeUserCheck": "Use certified stain remover; run rinsing programme for reddish stains.",
+      "claimTrigger": "Claim only if staining is linked to rust, leak, defect, or cannot be cleaned normally.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Interior dishwasher stained"
+      ]
+    },
+    {
+      "id": "a-egspv597210-noise",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Noise",
+      "possibleCause": "Detergent dispenser lid/pump noise can be normal; hard object may have fallen into dishwasher system.",
+      "safeUserCheck": "If object drops to bottom, noise may stop. Record video if noise continues.",
+      "claimTrigger": "Create claim if noise continues after full wash cycle or sounds mechanical.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "video for noise/vibration",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Noise",
+        "noise",
+        "making noise"
+      ]
+    },
+    {
+      "id": "a-egspv597210-appliance-does-not-fill-with-water",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "A-EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Appliance does not fill with water",
+      "possibleCause": "Water tap shut off or door lock not engaged.",
+      "safeUserCheck": "Check water tap is open and door is closed/latched.",
+      "claimTrigger": "Create claim if water supply is available but dishwasher still does not fill.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
+      "matchTerms": [
+        "Appliance does not fill with water"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-hood-does-not-start",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Hood does not start",
+      "possibleCause": "Retractable/front panel not pulled out, speed not selected, hood set to off, or no power.",
+      "safeUserCheck": "Pull out/eject the panel, select a fan speed, and check power/fuse only.",
+      "claimTrigger": "Create claim if power is available and hood still does not operate.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Hood does not start",
+        "not starting",
+        "wont start",
+        "will not start"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-light-not-working",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Light not working",
+      "possibleCause": "Light is switched off or lighting module/bulb issue.",
+      "safeUserCheck": "Press light button and check whether fan still works.",
+      "claimTrigger": "Create claim/service if light remains off or replacement is not user-accessible.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Light not working"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-weak-suction-odours-remain",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Weak suction / odours remain",
+      "possibleCause": "Wrong fan speed, grease filter dirty, charcoal filter saturated, or extraction/recirculation setup issue.",
+      "safeUserCheck": "Use higher speed when frying/grilling. Clean grease filter. In recirculation mode, replace charcoal filter every 3-4 months or more often with intensive use.",
+      "claimTrigger": "Create claim if suction remains weak after filter check/replacement or installation issue is suspected.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Weak suction / odours remain",
+        "weak suction",
+        "hood suction is weak",
+        "odours remain",
+        "smell remains"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-hood-turns-off-after-delay-timer-active",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Hood turns off after delay / timer active",
+      "possibleCause": "Off-Timer enabled; delay is about 15 minutes to filter fumes after cooking.",
+      "safeUserCheck": "Explain normal timer behaviour. Cancel by pushing retractable panel back in or turning off, depending on model.",
+      "claimTrigger": "No claim unless timer cannot be cancelled or behaviour is abnormal.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Hood turns off after delay / timer active"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-filter-cleaning-indication-appears",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Filter-cleaning indication appears",
+      "possibleCause": "Aluminium filter cleaning reminder after approx. 60 hours of fan operation.",
+      "safeUserCheck": "Clean aluminium filters. Clear the indication after cleaning while the appliance is not operating.",
+      "claimTrigger": "No claim unless indication cannot be cleared after cleaning/reset.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Filter-cleaning indication appears"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-grease-filter-colour-changed-after-washing",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Grease filter colour changed after washing",
+      "possibleCause": "Normal colour change after repeated dishwasher washing.",
+      "safeUserCheck": "Explain that colour change does not indicate a defect.",
+      "claimTrigger": "No claim unless filter is damaged, missing, or does not fit/lock.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Grease filter colour changed after washing"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-charcoal-filter-saturated-bad-odour",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Charcoal filter saturated / bad odour",
+      "possibleCause": "Charcoal filter used in recirculation mode is saturated; it cannot be washed/regenerated.",
+      "safeUserCheck": "Replace charcoal filter every 3-4 months or more often with intensive use.",
+      "claimTrigger": "Create claim only if correct filter cannot be installed or odour remains after replacement.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Charcoal filter saturated / bad odour"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-hood-too-loud-vibration",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Hood too loud / vibration",
+      "possibleCause": "Filter/cover not seated correctly, ducting/installation issue, or loose part.",
+      "safeUserCheck": "Ask user to check visible filter/cover seating and record video.",
+      "claimTrigger": "Create claim with video if noise/vibration continues or a part is loose/damaged.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "video for noise/vibration",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Hood too loud / vibration"
+      ]
+    },
+    {
+      "id": "fh-664-621-s-damaged-power-cord-electrical-issue",
+      "productCode": "FH 664 621 S",
+      "aliases": [
+        "FH 664 621 S",
+        "FH664621E",
+        "FH 664 621 E"
+      ],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 S / FH664621E",
+      "problem": "Damaged power cord / electrical issue",
+      "possibleCause": "Possible electrical defect.",
+      "safeUserCheck": "Stop using appliance. Do not open or repair.",
+      "claimTrigger": "Urgent claim/service case.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of leak/damage",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood",
+      "matchTerms": [
+        "Damaged power cord / electrical issue",
+        "damaged power cord",
+        "electrical issue",
+        "burning smell",
+        "smoke"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-hood-does-not-start",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Hood does not start",
+      "possibleCause": "Retractable/front panel not pulled out, speed not selected, hood set to off, or no power.",
+      "safeUserCheck": "Pull out/eject the panel, select a fan speed, and check power/fuse only.",
+      "claimTrigger": "Create claim if power is available and hood still does not operate.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Hood does not start",
+        "not starting",
+        "wont start",
+        "will not start"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-light-not-working",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Light not working",
+      "possibleCause": "Light is switched off or lighting module/bulb issue.",
+      "safeUserCheck": "Press light button and check whether fan still works.",
+      "claimTrigger": "Create claim/service if light remains off or replacement is not user-accessible.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Light not working"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-weak-suction-odours-remain",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Weak suction / odours remain",
+      "possibleCause": "Wrong fan speed, grease filter dirty, charcoal filter saturated, or extraction/recirculation setup issue.",
+      "safeUserCheck": "Use higher speed when frying/grilling. Clean grease filter. In recirculation mode, replace charcoal filter every 3-4 months or more often with intensive use.",
+      "claimTrigger": "Create claim if suction remains weak after filter check/replacement or installation issue is suspected.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Weak suction / odours remain",
+        "weak suction",
+        "hood suction is weak",
+        "odours remain",
+        "smell remains"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-hood-turns-off-after-delay-timer-active",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Hood turns off after delay / timer active",
+      "possibleCause": "Off-Timer enabled; delay is about 15 minutes to filter fumes after cooking.",
+      "safeUserCheck": "Explain normal timer behaviour. Cancel by pushing retractable panel back in or turning off, depending on model.",
+      "claimTrigger": "No claim unless timer cannot be cancelled or behaviour is abnormal.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Hood turns off after delay / timer active"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-filter-cleaning-indication-appears",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Filter-cleaning indication appears",
+      "possibleCause": "Aluminium filter cleaning reminder after approx. 60 hours of fan operation.",
+      "safeUserCheck": "Clean aluminium filters. Clear the indication after cleaning while the appliance is not operating.",
+      "claimTrigger": "No claim unless indication cannot be cleared after cleaning/reset.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Filter-cleaning indication appears"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-grease-filter-colour-changed-after-washing",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Grease filter colour changed after washing",
+      "possibleCause": "Normal colour change after repeated dishwasher washing.",
+      "safeUserCheck": "Explain that colour change does not indicate a defect.",
+      "claimTrigger": "No claim unless filter is damaged, missing, or does not fit/lock.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Grease filter colour changed after washing"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-charcoal-filter-saturated-bad-odour",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Charcoal filter saturated / bad odour",
+      "possibleCause": "Charcoal filter used in recirculation mode is saturated; it cannot be washed/regenerated.",
+      "safeUserCheck": "Replace charcoal filter every 3-4 months or more often with intensive use.",
+      "claimTrigger": "Create claim only if correct filter cannot be installed or odour remains after replacement.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Charcoal filter saturated / bad odour"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-hood-too-loud-vibration",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Hood too loud / vibration",
+      "possibleCause": "Filter/cover not seated correctly, ducting/installation issue, or loose part.",
+      "safeUserCheck": "Ask user to check visible filter/cover seating and record video.",
+      "claimTrigger": "Create claim with video if noise/vibration continues or a part is loose/damaged.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "video for noise/vibration",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Hood too loud / vibration"
+      ]
+    },
+    {
+      "id": "khf-664-611-s-damaged-power-cord-electrical-issue",
+      "productCode": "KHF 664 611 S",
+      "aliases": [
+        "KHF 664 611 S"
+      ],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Damaged power cord / electrical issue",
+      "possibleCause": "Possible electrical defect.",
+      "safeUserCheck": "Stop using appliance. Do not open or repair.",
+      "claimTrigger": "Urgent claim/service case.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of leak/damage",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "matchTerms": [
+        "Damaged power cord / electrical issue",
+        "damaged power cord",
+        "electrical issue",
+        "burning smell",
+        "smoke"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-appliance-does-not-work",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Appliance does not work",
+      "possibleCause": "Electric circuit interrupted; plug not inserted; power cable damaged; no socket voltage; thermostat set to 0.",
+      "safeUserCheck": "Check plug/socket/fuse only, test socket with another appliance, and set thermostat above 0.",
+      "claimTrigger": "Create claim if power is available but appliance still does not work. Stop using if cable is damaged.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Appliance does not work",
+        "not working",
+        "not turn on",
+        "no power",
+        "dead"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-interior-light-does-not-work",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Interior light does not work",
+      "possibleCause": "Bulb loose/fused or LED lighting issue, depending on model.",
+      "safeUserCheck": "Check whether cooling still works. For bulb type only, replace if user manual allows.",
+      "claimTrigger": "Create claim/service if LED module/light remains off or cannot be safely replaced.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Interior light does not work",
+        "not working",
+        "not turn on",
+        "no power",
+        "dead"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-appliance-works-continuously",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Appliance works continuously",
+      "possibleCause": "Temperature setting too low or appliance not cold enough due to other cause.",
+      "safeUserCheck": "Set adjustment knob to a lower/correct position and check door/ventilation.",
+      "claimTrigger": "Create claim if compressor runs continuously and temperature remains wrong.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Appliance works continuously"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-water-collects-in-lower-part",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Water collects in lower part",
+      "possibleCause": "Water discharge opening clogged, or internal air circulation obstructed by food touching rear wall.",
+      "safeUserCheck": "Clean discharge opening using manual method; place food so it does not touch rear wall.",
+      "claimTrigger": "Create claim if water returns after cleaning or drain cannot be cleared safely.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Water collects in lower part"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-unusual-noise",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Unusual noise",
+      "possibleCause": "Appliance not level or touching furniture/objects.",
+      "safeUserCheck": "Level appliance and ensure clearances around it. Move bottles/shelves/drawers if they are causing noise.",
+      "claimTrigger": "Create claim with video if abnormal/loud noise continues after checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "video for noise/vibration",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Unusual noise",
+        "noise",
+        "making noise"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-temperature-too-low-or-too-high",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Temperature too low or too high",
+      "possibleCause": "Wrong temperature setting.",
+      "safeUserCheck": "Reset knob higher/lower as needed and wait several hours.",
+      "claimTrigger": "Create claim if temperature remains incorrect after normal waiting period.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Temperature too low or too high"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-temperature-too-low-high",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Temperature too low/high",
+      "possibleCause": "Ambient temperature outside appliance climate range.",
+      "safeUserCheck": "Check room temperature is suitable for the climate class.",
+      "claimTrigger": "Create claim only if environment is suitable but temperature remains wrong.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Temperature too low/high"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-temperature-too-high",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Temperature too high",
+      "possibleCause": "Appliance in sunlight/near heat source or rear air circulation blocked.",
+      "safeUserCheck": "Move away from heat/sun if possible and keep at least 30 mm wall clearance.",
+      "claimTrigger": "Create claim if placement/clearance is correct but cooling remains poor.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Temperature too high"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-temperature-too-high-after-loading-food",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Temperature too high after loading food",
+      "possibleCause": "Too much warm food loaded at one time.",
+      "safeUserCheck": "Wait up to 72 hours for food to cool/freeze and required temperature to be reached.",
+      "claimTrigger": "No claim unless temperature does not recover after waiting.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Temperature too high after loading food"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-temperature-too-high",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Temperature too high",
+      "possibleCause": "Door opened too often/too long or door does not close completely.",
+      "safeUserCheck": "Reduce door openings; rearrange food so it does not block the door.",
+      "claimTrigger": "Create claim if door/seal remains faulty or deformed.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Temperature too high"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-door-gasket-issue",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Door gasket issue",
+      "possibleCause": "Door gasket inserted incorrectly, loose, torn, or deformed.",
+      "safeUserCheck": "Press gasket in and keep seal clean.",
+      "claimTrigger": "Create claim with photo if gasket is damaged or will not seat correctly.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of leak/damage",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Door gasket issue"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-normal-refrigerator-sounds",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Normal refrigerator sounds",
+      "possibleCause": "Compressor/thermostat switching, cooling-agent flow, clicking bottles, shelves/drawers, or appliance not level.",
+      "safeUserCheck": "Explain that some sounds are normal. Level appliance and move bottles/shelves if needed.",
+      "claimTrigger": "Create claim only if noise is unusually loud, new, continuous, or linked to cooling failure.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "matchTerms": [
+        "Normal refrigerator sounds",
+        "fridge making noise",
+        "fridge noise",
+        "refrigerator sounds",
+        "normal sounds"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-appliance-does-not-work",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Appliance does not work",
+      "possibleCause": "No power.",
+      "safeUserCheck": "Check fuse/power supply only.",
+      "claimTrigger": "Create claim if power is available but hob still does not work.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Appliance does not work",
+        "not working",
+        "not turn on",
+        "no power",
+        "dead"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-sensor-fields-do-not-respond-when-touched",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Sensor fields do not respond when touched",
+      "possibleCause": "Appliance not turned on, sensor touched too briefly, or multiple sensors touched at same time.",
+      "safeUserCheck": "Turn on appliance. Touch one sensor field longer; use only one sensor at a time except when switching off a zone.",
+      "claimTrigger": "Create claim if controls still do not respond after correct use.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Sensor fields do not respond when touched"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-appliance-does-not-respond-and-emits-extended-beep",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Appliance does not respond and emits extended beep",
+      "possibleCause": "Wrong sensor touched, sensors touched too briefly, or sensor fields covered/dirty.",
+      "safeUserCheck": "Reconnect/reset the hob; uncover or clean sensor fields.",
+      "claimTrigger": "Create claim if repeated after reset/cleaning.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Appliance does not respond and emits extended beep"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-appliance-switches-itself-off",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Appliance switches itself off",
+      "possibleCause": "No sensor touched for 10 seconds after activation, or sensor fields covered/dirty.",
+      "safeUserCheck": "Switch on and set heat without delay; clean/uncover sensor fields.",
+      "claimTrigger": "Create claim if it happens during normal use.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Appliance switches itself off"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-single-cooking-zone-switches-off-and-residual-heat-h-is-shown",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Single cooking zone switches off and residual heat “H” is shown",
+      "possibleCause": "Limited cook time, sensor fields covered/dirty, or electronic components overheated.",
+      "safeUserCheck": "Switch on zone again; clean sensors; let appliance cool and check ventilation is not blocked.",
+      "claimTrigger": "Create claim if zone repeatedly fails or overheating repeats.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Single cooking zone switches off and residual heat “H” is shown"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-residual-heat-indicator-disappears-although-zones-are-hot",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Residual heat indicator disappears although zones are hot",
+      "possibleCause": "Power outage or appliance disconnected.",
+      "safeUserCheck": "Warn user not to touch hot zones. Indicator may show again after appliance is switched on/off.",
+      "claimTrigger": "No claim unless indicator repeatedly fails.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Residual heat indicator disappears although zones are hot"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-hob-cooking-surface-is-cracked",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Hob cooking surface is cracked",
+      "possibleCause": "Glass/ceramic surface damaged.",
+      "safeUserCheck": "Stop using immediately and disconnect power/switch off circuit breaker.",
+      "claimTrigger": "Urgent claim/service case.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of leak/damage",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Hob cooking surface is cracked",
+        "cracked hob glass",
+        "hob glass cracked",
+        "cracked glass"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-problem-still-not-remedied",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Problem still not remedied",
+      "possibleCause": "Fault remains after basic user checks.",
+      "safeUserCheck": "Disconnect power or switch off circuit breaker/fuse.",
+      "claimTrigger": "Create claim/service case.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Problem still not remedied"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-buzzing-sound",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Buzzing sound",
+      "possibleCause": "Cooling fan operating to cool internal electronics.",
+      "safeUserCheck": "Explain this can be normal.",
+      "claimTrigger": "No claim unless sound is unusually loud, new, or continuous.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "video for noise/vibration",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Buzzing sound",
+        "buzzing",
+        "buzzing sound"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-hissing-whistling-sounds",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Hissing/whistling sounds",
+      "possibleCause": "Several cooking zones at full power; frequency noise from coils.",
+      "safeUserCheck": "Explain this can be normal.",
+      "claimTrigger": "No claim unless abnormal or accompanied by malfunction.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "video for noise/vibration",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Hissing/whistling sounds",
+        "hissing",
+        "whistling"
+      ]
+    },
+    {
+      "id": "kmi-754-600-c-hob-cooking-zones-will-not-operate",
+      "productCode": "KMI 754 600 C",
+      "aliases": [
+        "OL-KMI 754 000 E",
+        "KMI 754 000 E",
+        "KMI 754 600 C"
+      ],
+      "itemType": "induction_hob",
+      "model": "KMI 754 600 C / KMI 754 000 E",
+      "problem": "Hob/cooking zones will not operate",
+      "possibleCause": "Faulty electronics.",
+      "safeUserCheck": "Reset by unplugging/disconnecting fuse for a few minutes.",
+      "claimTrigger": "Create claim if reset does not solve it.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "matchTerms": [
+        "Hob/cooking zones will not operate"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-washing-machine-not-working",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Washing machine not working",
+      "possibleCause": "Water tap closed, mesh filter/supply hose issue, door open, or Start/Pause not pressed.",
+      "safeUserCheck": "Check tap, supply hose/filter, close door, press Start/Pause.",
+      "claimTrigger": "Create claim if still not working after checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Washing machine not working",
+        "washing machine not working"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-water-leakage",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Water leakage",
+      "possibleCause": "Water supply hose not properly connected.",
+      "safeUserCheck": "Ask for photos of leak area and hose connection.",
+      "claimTrigger": "Create claim if leak continues.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of leak/damage",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Water leakage",
+        "washing machine leaking",
+        "water leak"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-load-has-not-been-spun",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Load has not been spun",
+      "possibleCause": "Load uneven or pump filter dirty.",
+      "safeUserCheck": "Redistribute load and clean pump filter if accessible.",
+      "claimTrigger": "Create claim if spin still fails.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Load has not been spun"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-unpleasant-smell-in-drum",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Unpleasant smell in drum",
+      "possibleCause": "Drum needs cleaning.",
+      "safeUserCheck": "Run drum autoclean programme.",
+      "claimTrigger": "Claim only if smell continues with drainage/water issue.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Unpleasant smell in drum"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-no-water-in-drum",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "No water in drum",
+      "possibleCause": "Water tap closed.",
+      "safeUserCheck": "Open water supply tap.",
+      "claimTrigger": "Create claim if water supply is okay but machine does not fill.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "No water in drum"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-water-left-in-fabric-softener-container",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Water left in fabric softener container",
+      "possibleCause": "Softener compartment tab issue.",
+      "safeUserCheck": "Press down plastic tab in the central detergent compartment.",
+      "claimTrigger": "Create claim if drawer/compartment is damaged.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Water left in fabric softener container"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-washing-not-properly-rinsed",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Washing not properly rinsed",
+      "possibleCause": "Incorrect detergent amount for soiling level/water hardness.",
+      "safeUserCheck": "Use correct detergent amount according to detergent packaging.",
+      "claimTrigger": "No claim unless rinse issue continues after correct use.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Washing not properly rinsed"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-appliance-does-not-fill-with-water",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Appliance does not fill with water",
+      "possibleCause": "Valve closed, programme settings, low pressure, supply hose disconnected/bent/blocked.",
+      "safeUserCheck": "Check valve, pressure, hose, door, and programme settings.",
+      "claimTrigger": "Create claim if still no fill.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Appliance does not fill with water"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-simultaneous-water-intake-and-draining",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Simultaneous water intake and draining",
+      "possibleCause": "Drain hose end too low.",
+      "safeUserCheck": "Check drain hose end is higher than appliance water level, approx. 0-100 cm guidance from manual.",
+      "claimTrigger": "Create claim if installation is correct but issue continues.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Simultaneous water intake and draining"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-water-does-not-drain-properly",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Water does not drain properly",
+      "possibleCause": "Pump filter, drain hose, or drain hose placement issue.",
+      "safeUserCheck": "Check pump filter, drain hose, and hose placement.",
+      "claimTrigger": "Create claim if water remains or pump/drain still fails.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Water does not drain properly"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-appliance-vibrating",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Appliance vibrating",
+      "possibleCause": "Transit bolts not removed, machine not level, feet not locked.",
+      "safeUserCheck": "Check transit bolts removed, level machine, tighten feet nuts.",
+      "claimTrigger": "Create claim if strong vibration continues.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Appliance vibrating",
+        "washing machine vibrating",
+        "vibration"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-foam-leaks-from-detergent-drawer",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Foam leaks from detergent drawer",
+      "possibleCause": "Too much detergent, wrong detergent, water hardness/detergent mismatch.",
+      "safeUserCheck": "Reduce detergent and use detergent according to manufacturer instructions.",
+      "claimTrigger": "Claim only if drawer leaks with correct detergent/use.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of leak/damage",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Foam leaks from detergent drawer"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-programme-interrupted-before-finished",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Programme interrupted before finished",
+      "possibleCause": "Electrical power, water supply, or water outlet issue.",
+      "safeUserCheck": "Check power, water supply, and outlet.",
+      "claimTrigger": "Create claim if programme still interrupts.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Programme interrupted before finished"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-noise-from-outlet-pump-after-water-removed",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Noise from outlet pump after water removed",
+      "possibleCause": "Normal pump operation after water drained.",
+      "safeUserCheck": "Explain this can be normal.",
+      "claimTrigger": "No claim unless noise is abnormal or continuous.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "video for noise/vibration",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Noise from outlet pump after water removed",
+        "noise",
+        "making noise"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-short-breaks-during-wash-cycle",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Short breaks during wash cycle",
+      "possibleCause": "Automatic refill or pause to remove excess foam.",
+      "safeUserCheck": "Explain this can be normal.",
+      "claimTrigger": "No claim.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Short breaks during wash cycle"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-error-e10",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Error E10",
+      "possibleCause": "Low water pressure or no water in washing machine.",
+      "safeUserCheck": "Open water valve; check water inlet hose/filter and water pressure.",
+      "claimTrigger": "Create claim if E10 remains after checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Error E10",
+        "e10",
+        "error e10"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-error-e21",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Error E21",
+      "possibleCause": "Water does not drain properly.",
+      "safeUserCheck": "Check drain pump and filter.",
+      "claimTrigger": "Create claim if E21 remains or water stays inside.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Error E21",
+        "e21",
+        "error e21"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-error-e30",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Error E30",
+      "possibleCause": "Door is not closed.",
+      "safeUserCheck": "Check door is fully closed and nothing is stuck in the door.",
+      "claimTrigger": "Create claim if door/latch issue continues.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Error E30",
+        "e30",
+        "error e30"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-other-error-code",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Other error code",
+      "possibleCause": "Unspecified fault.",
+      "safeUserCheck": "Try restart once.",
+      "claimTrigger": "Create claim/contact service if error remains.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W - Washing Machine",
+      "matchTerms": [
+        "Other error code"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-appliance-does-not-work",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Appliance does not work",
+      "possibleCause": "Break in power supply.",
+      "safeUserCheck": "Check household fuse/power supply only.",
+      "claimTrigger": "Create claim if power is available but oven still does not work.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EBX 943 600 S - Oven",
+      "matchTerms": [
+        "Appliance does not work",
+        "not working",
+        "not turn on",
+        "no power",
+        "dead"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-programmer-display-shows-0-00",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Programmer display shows “0.00”",
+      "possibleCause": "Appliance disconnected from mains or temporary power cut.",
+      "safeUserCheck": "Set the current time.",
+      "claimTrigger": "No claim unless display cannot be set or keeps resetting.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EBX 943 600 S - Oven",
+      "matchTerms": [
+        "Programmer display shows “0.00”"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-oven-lighting-does-not-work",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Oven lighting does not work",
+      "possibleCause": "Bulb loose or damaged.",
+      "safeUserCheck": "Ask whether oven heating still works. If manual allows safe bulb replacement, user may replace/tighten bulb.",
+      "claimTrigger": "Create claim if light still does not work or is not user-accessible.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EBX 943 600 S - Oven",
+      "matchTerms": [
+        "Oven lighting does not work",
+        "not working",
+        "not turn on",
+        "no power",
+        "dead"
+      ]
+    }
+  ]
+}

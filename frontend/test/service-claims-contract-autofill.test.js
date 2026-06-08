@@ -47,3 +47,18 @@ test("buildServiceClaimAutofillFromContract maps address and landlord fields", (
   assert.equal(autofill.landlordPhone, undefined);
   assert.equal(autofill.landlordEmail, undefined);
 });
+
+test("buildServiceClaimAutofillFromContract maps active registration customer fields", () => {
+  const autofill = buildServiceClaimAutofillFromContract({
+    registration: {
+      fullName: "Lena Beispiel",
+      email: "lena@example.com",
+      phone: "+49 170 123456",
+    },
+  });
+
+  assert.equal(autofill.givenName, "Lena");
+  assert.equal(autofill.surname, "Beispiel");
+  assert.equal(autofill.email, "lena@example.com");
+  assert.equal(autofill.phone, "+49 170 123456");
+});

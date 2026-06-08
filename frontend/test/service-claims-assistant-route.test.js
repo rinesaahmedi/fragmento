@@ -5,7 +5,9 @@ const test = require("node:test");
 
 const routePath = path.join(__dirname, "..", "app", "api", "service-claims", "assistant", "route.js");
 const troubleshootingDataPath = path.join(__dirname, "..", "lib", "service-claim-troubleshooting-data.json");
+const claimsChatbotKnowledgePath = path.join(__dirname, "..", "lib", "claims-chatbot-knowledge.json");
 const SERVICE_CLAIM_TROUBLESHOOTING_DATA = JSON.parse(fs.readFileSync(troubleshootingDataPath, "utf8"));
+const CLAIMS_CHATBOT_KNOWLEDGE = JSON.parse(fs.readFileSync(claimsChatbotKnowledgePath, "utf8"));
 
 const KNOWLEDGE_ENTRIES = SERVICE_CLAIM_TROUBLESHOOTING_DATA.lookupEntries;
 const ORIGINAL_OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -41,12 +43,14 @@ function loadRoute(overrides = {}) {
     "prisma",
     "enforceRateLimit",
     "getRequestClientIp",
+    "CLAIMS_CHATBOT_KNOWLEDGE",
     "SERVICE_CLAIM_TROUBLESHOOTING_DATA",
     `${source}
 return {
   POST,
   buildAnswer,
-  normalizeCode
+  normalizeCode,
+  findClaimsChatbotKnowledgeMatch
 };`,
   );
 
@@ -55,6 +59,7 @@ return {
     prisma,
     overrides.enforceRateLimit || (() => {}),
     overrides.getRequestClientIp || (() => "127.0.0.1"),
+    CLAIMS_CHATBOT_KNOWLEDGE,
     SERVICE_CLAIM_TROUBLESHOOTING_DATA,
   );
 }
@@ -360,7 +365,7 @@ test("generic fuzzy matching handles broader misspellings, not just hardcoded wo
   assert.match(response.body.answer, /stop using the appliance immediately/i);
 });
 
-test("vague washing machine issue asks for clarification instead of guessing a leak", async () => {
+test("washing machine generic not-working issue uses decision-guide self-checks", async () => {
   delete process.env.OPENAI_API_KEY;
   const route = loadRoute();
   const response = await route.POST(request({
@@ -371,9 +376,189 @@ test("vague washing machine issue asks for clarification instead of guessing a l
   }));
 
   assert.equal(response.status, 200);
-  assert.match(response.body.answer, /which of these fits best/i);
-  assert.doesNotMatch(response.body.answer, /washing machine leak/i);
+  assert.match(response.body.answer, /safe self-check first/i);
+  assert.match(response.body.answer, /Check tap, supply hose\/filter, close door, press Start\/Pause/i);
   assert.doesNotMatch(response.body.answer, /stop using the appliance/i);
+});
+
+test("claims decision-guide aliases map to the correct knowledge section", () => {
+  const route = loadRoute();
+  const match = route.findClaimsChatbotKnowledgeMatch({
+    question: "FH664621E hood suction is weak",
+    claim: emptyClaim(),
+    selectedAreas: [],
+    conversationMessages: [],
+  });
+
+  assert.equal(match.sourceSection, "FH 664 621 S / FH664621E - Extractor Hood");
+  assert.equal(match.model, "FH 664 621 S / FH664621E");
+  assert.equal(match.problem, "Weak suction / odours remain");
+});
+
+test("claims decision-guide normal behaviour does not trigger immediate claim creation", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My KMI 754 000 E induction hob is buzzing.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /this can be normal/i);
+  assert.match(response.body.answer, /No claim/i);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("claims decision-guide self-check issue asks user to try safe check first", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My FH 664 621 S hood suction is weak.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /safe self-check first/i);
+  assert.match(response.body.answer, /Clean grease filter/i);
+  assert.match(response.body.answer, /Did this solve the issue/i);
+});
+
+test("claims decision-guide unresolved self-check guides user to create a claim", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "It still has weak suction after cleaning the filter.",
+    conversationMessages: [
+      { role: "user", text: "My FH 664 621 S hood suction is weak." },
+      { role: "assistant", text: "Clean the grease filter first." },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /continue with a claim/i);
+  assert.match(response.body.answer, /suction remains weak/i);
+  assert.ok(Array.isArray(response.body.actions));
+  assert.match(response.body.suggestedProblemDescription, /checked\/tried/i);
+});
+
+test("claims decision-guide urgent issue stops use and escalates immediately", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My KMI 754 600 C hob glass is cracked.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /Stop using the appliance now/i);
+  assert.match(response.body.answer, /Create or escalate the claim immediately/i);
+  assert.match(response.body.answer, /Do not open electrical parts/i);
+  assert.ok(Array.isArray(response.body.actions));
+});
+
+test("oven not working gives only safe checks then direct claim description", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My EBX 943 600 S oven does not work.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /oven not working can be a service issue/i);
+  assert.match(response.body.answer, /function and temperature/i);
+  assert.match(response.body.answer, /household fuse\/power supply/i);
+  assert.match(response.body.answer, /There is no further safe self-check/i);
+  assert.doesNotMatch(response.body.answer, /Suggested problem description/i);
+  assert.ok(Array.isArray(response.body.actions));
+  assert.match(response.body.suggestedProblemDescription, /EBX 943 600 S/);
+});
+
+test("dishwasher E3 gives direct service guidance and suggested claim description", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My dishwasher shows E3.",
+    selectedAreas: dishwasherArea(),
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /Error E3 is a heating\/temperature issue/i);
+  assert.match(response.body.answer, /There is no further safe self-check/i);
+  assert.doesNotMatch(response.body.answer, /Suggested problem description/i);
+  assert.match(response.body.suggestedProblemDescription, /error E3/i);
+  assert.ok(Array.isArray(response.body.actions));
+});
+
+test("dishwasher E02 then E3 combines both errors in claim description", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "Now it also shows E3.",
+    conversationMessages: [
+      { role: "user", text: "My dishwasher showed E02 and does not drain." },
+      { role: "assistant", text: "Check the filters and drain hose." },
+    ],
+    selectedAreas: dishwasherArea(),
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /both E02\/E2 and E3/i);
+  assert.match(response.body.suggestedProblemDescription, /E02\/E2 and E3/i);
+  assert.match(response.body.suggestedProblemDescription, /not draining properly/i);
+  assert.match(response.body.suggestedProblemDescription, /heating\/temperature issue/i);
+});
+
+test("washing machine E10 final step is direct if unresolved", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My EWA 34660 W washing machine shows E10.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /Open water supply tap|water valve|inlet hose/i);
+  assert.match(response.body.answer, /There is no further safe self-check/i);
+  assert.ok(Array.isArray(response.body.actions));
+  assert.equal(response.body.actions[0].id, "claim_form_help");
+});
+
+test("washing machine not working then E10 combines context in claim summary when unresolved", async () => {
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "E10 still appears after checking the tap and hose.",
+    conversationMessages: [
+      { role: "user", text: "The washing machine is not working." },
+      { role: "assistant", text: "Check the tap, supply hose/filter, door, and Start/Pause." },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /continue with a claim/i);
+  assert.match(response.body.suggestedProblemDescription, /Washing machine not working/i);
+  assert.match(response.body.suggestedProblemDescription, /Error E10/i);
+});
+
+test("claims decision-guide data is scoped to the service-claims assistant route", () => {
+  const productInfoRoute = fs.readFileSync(
+    path.join(__dirname, "..", "app", "api", "product-info", "ask", "route.js"),
+    "utf8",
+  );
+
+  assert.doesNotMatch(productInfoRoute, /claims-chatbot-knowledge/);
 });
 
 test("POST uses OpenAI assistant path when OPENAI_API_KEY is configured", async () => {
@@ -407,6 +592,95 @@ test("POST uses OpenAI assistant path when OPENAI_API_KEY is configured", async 
 
   assert.equal(response.status, 200);
   assert.equal(response.body.answer, "LLM answer for ambiguous washing machine issue.");
+});
+
+test("POST sanitizes Amica from OpenAI user-facing answers", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+
+  installFetchMock(async () => ({
+    ok: true,
+    async json() {
+      return {
+        output_text: JSON.stringify({
+          answer: "Error E4 on an Amica/architecto dishwasher indicates overflow.",
+          showClaimFormHelpAction: false,
+          suggestedProblemDescription: "My Amica dishwasher shows E4.",
+        }),
+      };
+    },
+  }));
+
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error E4",
+    selectedAreas: dishwasherArea(),
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(response.body.answer, /Amica/i);
+  assert.match(response.body.answer, /architecto dishwasher/i);
+  assert.doesNotMatch(response.body.suggestedProblemDescription, /Amica/i);
+});
+
+test("OpenAI path keeps claim-form-help chip when suggested description exists", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+
+  installFetchMock(async () => ({
+    ok: true,
+    async json() {
+      return {
+        output_text: JSON.stringify({
+          answer: "Error E3 needs service if the safe checks do not solve it.",
+          showClaimFormHelpAction: false,
+          suggestedProblemDescription: "My architecto dishwasher shows error E3.",
+        }),
+      };
+    },
+  }));
+
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "i see error E3",
+    selectedAreas: dishwasherArea(),
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.ok(Array.isArray(response.body.actions));
+  assert.equal(response.body.actions[0].id, "claim_form_help");
+  assert.match(response.body.suggestedProblemDescription, /E3/i);
+});
+
+test("POST collapses duplicate architecto brand wording", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+
+  installFetchMock(async () => ({
+    ok: true,
+    async json() {
+      return {
+        output_text: JSON.stringify({
+          answer: "On your architecto / architecto washing machine, error E10 means no water.",
+          showClaimFormHelpAction: false,
+          suggestedProblemDescription: null,
+        }),
+      };
+    },
+  }));
+
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "washing machine E10",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(response.body.answer, /architecto\s*\/\s*architecto/i);
+  assert.match(response.body.answer, /architecto washing machine/i);
 });
 
 test("OpenAI path does not show claim-form-help chip on vague clarifying responses", async () => {

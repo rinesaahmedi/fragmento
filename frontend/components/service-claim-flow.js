@@ -226,6 +226,32 @@ const COPY = {
     complaintBrand: "ARCHITECTO SERVICE CENTER",
     complaintText: "Defekte, Sch\u00e4den oder fehlende Teile melden.",
     complaintCta: "Reklamation starten",
+    registerBadge: "Registrierung",
+    registerTitle: "K\u00fcche registrieren",
+    registerBrand: "ARCHITECTO REGISTRIERUNG",
+    registerText: "Kaufvertragsnummer mit deinen Kontaktdaten verkn\u00fcpfen.",
+    registerCta: "Jetzt registrieren",
+    registerPanelTitle: "K\u00fcche auf mich registrieren",
+    registerPanelText: "Trage die Kaufvertragsnummer, deine Kontaktdaten und die Wohnungsdaten zur Pr\u00fcfung ein. Die Nummer bleibt gleich, aber die aktive Registrierung wechselt zu dir.",
+    registerFullName: "Vollst\u00e4ndiger Name",
+    registerFullNamePlaceholder: "Vorname Nachname",
+    registerAddressNote: "Adresse / Wohnung",
+    registerAddressNotePlaceholder: "Optional: Adresse, Etage oder Wohnungsnummer",
+    registerEmailRequired: "Bitte gib eine E-Mail-Adresse f\u00fcr die Best\u00e4tigung ein.",
+    registerVerificationPostalCode: "Postleitzahl zur Pr\u00fcfung",
+    registerVerificationPostalCodePlaceholder: "z. B. 10115",
+    registerVerificationUnit: "Stra\u00dfe / Wohnung zur Pr\u00fcfung",
+    registerVerificationUnitPlaceholder: "z. B. Demo Street 2",
+    registerVerificationRequired: "Bitte gib Postleitzahl und Stra\u00dfe, Wohnung oder Etage zur Pr\u00fcfung ein.",
+    registerCode: "E-Mail-Code",
+    registerCodePlaceholder: "6-stelliger Code",
+    registerCodeRequired: "Bitte gib den E-Mail-Code ein.",
+    registerVerifySubmit: "Registrierung best\u00e4tigen",
+    registerVerifySubmitting: "Best\u00e4tigung...",
+    registerSubmit: "K\u00fcche registrieren",
+    registerSubmitting: "Registrierung...",
+    registerSuccess: "Diese K\u00fcche ist jetzt auf dich registriert.",
+    registerError: "Die K\u00fcche konnte nicht registriert werden.",
     purchasePanelTitle: "Weiter zum Kaufprozess",
     purchasePanelText: "Wenn der Mieter zus\u00e4tzliche Artikel statt einer Reklamation ben\u00f6tigt, geht es hier zum Konfigurator.",
     openConfigurator: "Konfigurator \u00f6ffnen",
@@ -276,7 +302,7 @@ const COPY = {
     preferredContactCalendarToday: "Heute",
     preferredContactCalendarPrevMonth: "Vorheriger Monat",
     preferredContactCalendarNextMonth: "Nächster Monat",
-    preferredContactTimePickerPlaceholder: "1 AM",
+    preferredContactTimePickerPlaceholder: "00:00",
     preferredContactTimePickerClear: "Löschen",
     preferredContactTimeCustomRequired: "Bitte geben Sie bei eigener Uhrzeit sowohl Von als auch Bis an.",
     preferredContactTimeCustomOrder: "Die Bis-Uhrzeit muss später als die Von-Uhrzeit sein.",
@@ -329,6 +355,7 @@ const COPY = {
     serialPlaceholder: "Seriennummer eingeben",
     serialNumberAdd: "Hinzuf\u00fcgen",
     serialNumberRequired: "Bitte gib mindestens eine Seriennummer ein oder lade ein Foto der Seriennummer hoch.",
+    serialNumberCountRequired: "Bitte gib f\u00fcr die ausgew\u00e4hlten K\u00fcchenteile mindestens {count} Seriennummer(n) ein.",
     serialNumberImage: "Foto der Seriennummer(n)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
@@ -337,6 +364,7 @@ const COPY = {
     serialNumberHelpAlt1: "Beispiel: Seriennummer auf dem Typenschild",
     serialNumberHelpAlt2: "Beispiel: Seriennummer im K\u00fchlschrank",
     attachments: "Anh\u00e4nge (optional)",
+    uploadFile: "Datei hochladen",
     attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 20 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
     attachmentsViewMore: "Mehr anzeigen",
@@ -393,6 +421,32 @@ const COPY = {
     complaintTitle: "File a complaint",
     complaintBrand: "ARCHITECTO SERVICE CENTER",
     complaintText: "For damage, defects, or missing parts, use the complaint form and send the case to support.",
+    registerBadge: "Registration",
+    registerTitle: "Register my kitchen",
+    registerBrand: "ARCHITECTO REGISTRATION",
+    registerText: "Connect the purchase contract number to your current contact details.",
+    registerCta: "Register now",
+    registerPanelTitle: "Register this kitchen to me",
+    registerPanelText: "Enter the purchase contract number, your contact details, and the apartment details for verification. The contract number stays the same, but the active registration moves to you.",
+    registerFullName: "Full name",
+    registerFullNamePlaceholder: "First name Last name",
+    registerAddressNote: "Address / apartment",
+    registerAddressNotePlaceholder: "Optional: address, floor, or apartment number",
+    registerEmailRequired: "Please provide an email address for verification.",
+    registerVerificationPostalCode: "Verification postal code",
+    registerVerificationPostalCodePlaceholder: "e.g. 10115",
+    registerVerificationUnit: "Verification street / apartment",
+    registerVerificationUnitPlaceholder: "e.g. Demo Street 2",
+    registerVerificationRequired: "Please enter the postal code and street, apartment, or floor for verification.",
+    registerCode: "Email code",
+    registerCodePlaceholder: "6-digit code",
+    registerCodeRequired: "Please enter the email verification code.",
+    registerVerifySubmit: "Confirm registration",
+    registerVerifySubmitting: "Confirming...",
+    registerSubmit: "Register kitchen",
+    registerSubmitting: "Registering...",
+    registerSuccess: "This kitchen is now registered to you.",
+    registerError: "The kitchen could not be registered.",
     purchasePanelTitle: "Continue to the purchase flow",
     purchasePanelText: "If the tenant needs additional items instead of a complaint, continue to the configurator.",
     openConfigurator: "Open configurator",
@@ -443,7 +497,7 @@ const COPY = {
     preferredContactCalendarToday: "Today",
     preferredContactCalendarPrevMonth: "Previous month",
     preferredContactCalendarNextMonth: "Next month",
-    preferredContactTimePickerPlaceholder: "1 AM",
+    preferredContactTimePickerPlaceholder: "00:00",
     preferredContactTimePickerClear: "Clear",
     preferredContactTimeCustomRequired: "Please enter both From and To for a custom time.",
     preferredContactTimeCustomOrder: "The To time must be later than the From time.",
@@ -496,6 +550,7 @@ const COPY = {
     serialPlaceholder: "Enter a serial number",
     serialNumberAdd: "Add",
     serialNumberRequired: "Please enter at least one serial number or upload a photo of the serial number.",
+    serialNumberCountRequired: "Please enter at least {count} serial number(s) for the selected kitchen item(s).",
     serialNumberImage: "Photo of the serial number(s)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Help: where to find the serial number",
@@ -504,6 +559,7 @@ const COPY = {
     serialNumberHelpAlt1: "Example: serial number on the appliance label",
     serialNumberHelpAlt2: "Example: serial number inside the fridge",
     attachments: "Attachments (optional)",
+    uploadFile: "Upload file",
     attachmentsHint: "PDFs, images, or office files \u2014 up to 20 files, 4 MB each.",
     attachmentsClear: "Remove all",
     attachmentsViewMore: "View more",
@@ -1148,6 +1204,13 @@ const INITIAL_FORM = {
   hausmeisterEmail: "",
   problemDescription: "",
   serialNumber: "",
+  registrationFullName: "",
+  registrationEmail: "",
+  registrationPhone: "",
+  registrationAddressNote: "",
+  registrationVerificationPostalCode: "",
+  registrationVerificationUnit: "",
+  registrationVerificationCode: "",
 };
 
 const EMPTY_CONTRACT_LOOKUP = {
@@ -1158,8 +1221,7 @@ const EMPTY_CONTRACT_LOOKUP = {
 };
 
 const EMPTY_CLAIM_ASSISTANT_MESSAGES = [];
-const PREFERRED_CONTACT_HOUR_OPTIONS = buildHourOptions();
-const PREFERRED_CONTACT_PERIOD_OPTIONS = buildPeriodOptions();
+const PREFERRED_CONTACT_TIME_OPTIONS = buildTimeOptions();
 
 function normalizeSerialNumberList(value) {
   return String(value || "")
@@ -1198,6 +1260,17 @@ function renderClaimAssistantMessageText(text) {
 
 function isPreferredContactCustom(windowValue) {
   return String(windowValue || "").trim() === "custom";
+}
+
+function mergeNonEmptyAutofillValues(current, autofill) {
+  return Object.fromEntries(
+    Object.entries(autofill || {}).filter(([key, value]) => {
+      if (String(value || "").trim()) {
+        return true;
+      }
+      return !String(current?.[key] || "").trim();
+    }),
+  );
 }
 
 function parseShortDate(value) {
@@ -1291,79 +1364,50 @@ function getCalendarMonthLabel(date, language) {
   }).format(date);
 }
 
-function buildHourOptions() {
-  return Array.from({ length: 12 }, (_, index) => String(index + 1));
-}
-
-function buildPeriodOptions() {
-  return ["AM", "PM"];
+function buildTimeOptions() {
+  return Array.from({ length: 24 }, (_, index) => `${String(index).padStart(2, "0")}:00`);
 }
 
 function parseTimeValue(value) {
-  const match = String(value || "").trim().match(/^(\d{1,2})\s*(AM|PM)$/i);
+  const match = String(value || "").trim().match(/^(\d{1,2}):([0-5]\d)$/);
   if (!match) {
-    return { hours: "", period: "" };
+    return { time: "" };
+  }
+  const hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  if (!Number.isInteger(hours) || hours < 0 || hours > 23) {
+    return { time: "" };
   }
   return {
-    hours: match[1],
-    period: match[2].toUpperCase(),
+    time: `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`,
   };
 }
 
-function combineTimeValue(hours, period) {
-  if (!hours && !period) {
-    return "";
-  }
-  return `${hours || "12"} ${period || "AM"}`;
-}
-
-function convertMeridiemTimeToMinutes(value) {
+function convertTimeToMinutes(value) {
   const parsed = parseTimeValue(value);
-  if (!parsed.hours || !parsed.period) {
+  if (!parsed.time) {
     return Number.NaN;
   }
-  const normalizedHours = Number(parsed.hours);
-  if (!Number.isInteger(normalizedHours) || normalizedHours < 1 || normalizedHours > 12) {
-    return Number.NaN;
-  }
-  const hours24 = normalizedHours % 12 + (parsed.period === "PM" ? 12 : 0);
-  return hours24 * 60;
+  const [hours, minutes] = parsed.time.split(":").map((part) => Number(part));
+  return hours * 60 + minutes;
 }
 
-function isMeridiemTimeAfter(value, minimumValue) {
-  const minutes = convertMeridiemTimeToMinutes(value);
-  const minimumMinutes = convertMeridiemTimeToMinutes(minimumValue);
+function isTimeAfter(value, minimumValue) {
+  const minutes = convertTimeToMinutes(value);
+  const minimumMinutes = convertTimeToMinutes(minimumValue);
   return Number.isFinite(minutes) && Number.isFinite(minimumMinutes) && minutes > minimumMinutes;
 }
 
-function getPreferredContactTimeCombinationsForPart(part, nextValue) {
-  if (part === "hours") {
-    return PREFERRED_CONTACT_PERIOD_OPTIONS.map((period) => combineTimeValue(nextValue, period));
-  }
-  if (part === "period") {
-    return PREFERRED_CONTACT_HOUR_OPTIONS.map((hours) => combineTimeValue(hours, nextValue));
-  }
-  return [];
-}
-
-function getPreferredContactTimeCandidate({ currentValue, part, nextValue, minimumValue }) {
-  const currentParts = parseTimeValue(currentValue);
-
+function getPreferredContactTimeCandidate({ nextValue, minimumValue }) {
   if (!minimumValue) {
-    const hours = part === "hours" ? nextValue : currentParts.hours || "12";
-    const period = part === "period" ? nextValue : currentParts.period || "AM";
-    return combineTimeValue(hours, period);
+    return nextValue;
   }
 
-  const hours = part === "hours" ? nextValue : currentParts.hours || "12";
-  const period = part === "period" ? nextValue : currentParts.period || "AM";
-  const candidate = combineTimeValue(hours, period);
-  if (isMeridiemTimeAfter(candidate, minimumValue)) {
-    return candidate;
+  if (isTimeAfter(nextValue, minimumValue)) {
+    return nextValue;
   }
 
-  return getPreferredContactTimeCombinationsForPart(part, nextValue)
-    .find((option) => isMeridiemTimeAfter(option, minimumValue)) || "";
+  return "";
 }
 
 function normalizeShortDateInput(value) {
@@ -1385,6 +1429,7 @@ export default function ServiceClaimFlow() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pendingRegistration, setPendingRegistration] = useState(null);
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
   const [problemComponentIds, setProblemComponentIds] = useState([]);
   const [problemAreaDetailsByComponentId, setProblemAreaDetailsByComponentId] = useState({});
@@ -1433,6 +1478,7 @@ export default function ServiceClaimFlow() {
   const formValues = { ...INITIAL_FORM, ...form };
   const selectedLanguage = LANGUAGE_OPTIONS.find((option) => option.code === language) || LANGUAGE_OPTIONS[0];
   const isComplaintMode = mode === "complaint";
+  const isRegisterMode = mode === "register";
   const selectedPreferredContactDate = useMemo(
     () => parseShortDate(formValues.preferredContactDate),
     [formValues.preferredContactDate],
@@ -1514,6 +1560,7 @@ export default function ServiceClaimFlow() {
     () => parseSerialNumberList(formValues.serialNumber),
     [formValues.serialNumber],
   );
+  const requiredSelectedSerialNumberCount = selectedProblemAreas.length;
   const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
   const selectedProblemAreasWithDetails = useMemo(() => {
     return selectedProblemAreas.map((area) => ({
@@ -1537,13 +1584,11 @@ export default function ServiceClaimFlow() {
     [problemAreaAttachmentsByComponentId],
   );
 
-  function isPreferredContactToTimePartDisabled(part, nextValue) {
+  function isPreferredContactToTimeDisabled(nextValue) {
     if (!formValues.preferredContactTimeFrom) {
       return false;
     }
     return !getPreferredContactTimeCandidate({
-      currentValue: formValues.preferredContactTimeTo,
-      part,
       nextValue,
       minimumValue: formValues.preferredContactTimeFrom,
     });
@@ -1829,6 +1874,7 @@ export default function ServiceClaimFlow() {
     setMode(nextMode);
     setError("");
     setSuccessMessage("");
+    setPendingRegistration(null);
   }
 
   function handleHausmeisterInvolvedChange(nextValue) {
@@ -1877,10 +1923,8 @@ export default function ServiceClaimFlow() {
     setOpenPreferredContactTimeField((current) => (current === field ? null : field));
   }
 
-  function handlePreferredContactTimePartSelect(field, part, nextValue) {
+  function handlePreferredContactTimeSelect(field, nextValue) {
     const nextTime = getPreferredContactTimeCandidate({
-      currentValue: formValues[field],
-      part,
       nextValue,
       minimumValue: field === "preferredContactTimeTo" ? formValues.preferredContactTimeFrom : "",
     });
@@ -1908,7 +1952,7 @@ export default function ServiceClaimFlow() {
       if (
         field === "preferredContactTimeFrom"
         && next.preferredContactTimeTo
-        && !isMeridiemTimeAfter(next.preferredContactTimeTo, next.preferredContactTimeFrom)
+        && !isTimeAfter(next.preferredContactTimeTo, next.preferredContactTimeFrom)
       ) {
         next.preferredContactTimeTo = "";
       }
@@ -1958,7 +2002,10 @@ export default function ServiceClaimFlow() {
 
               return {
                 ...current,
-                ...buildServiceClaimAutofillFromContract(payload.contract),
+                ...mergeNonEmptyAutofillValues(
+                  current,
+                  buildServiceClaimAutofillFromContract(payload.contract),
+                ),
               };
             });
 
@@ -2464,7 +2511,8 @@ export default function ServiceClaimFlow() {
       }
 
       const suggestedProblemDescription = String(payload.suggestedProblemDescription || "").trim();
-      if (suggestedProblemDescription) {
+      const assistantActions = Array.isArray(payload.actions) ? payload.actions : [];
+      if (suggestedProblemDescription && !assistantActions.length) {
         appendSuggestedProblemDescription(suggestedProblemDescription);
       }
 
@@ -2473,7 +2521,7 @@ export default function ServiceClaimFlow() {
         {
           role: "assistant",
           text: payload.answer || t("claimAssistantErrorUnavailable"),
-          ...(Array.isArray(payload.actions) && payload.actions.length ? { actions: payload.actions } : {}),
+          ...(assistantActions.length ? { actions: assistantActions } : {}),
         },
       ]);
       if (options.speakAnswer) {
@@ -2602,7 +2650,7 @@ export default function ServiceClaimFlow() {
         setError(t("preferredContactTimeCustomRequired"));
         return;
       }
-      if (convertMeridiemTimeToMinutes(preferredContactTimeTo) <= convertMeridiemTimeToMinutes(preferredContactTimeFrom)) {
+      if (convertTimeToMinutes(preferredContactTimeTo) <= convertTimeToMinutes(preferredContactTimeFrom)) {
         setError(t("preferredContactTimeCustomOrder"));
         return;
       }
@@ -2617,6 +2665,12 @@ export default function ServiceClaimFlow() {
       const normalizedSerialNumbers = normalizeSerialNumberList(
         [formValues.serialNumber, serialNumberDraft].filter(Boolean).join("\n"),
       );
+      const submittedSerialNumberCount = parseSerialNumberList(normalizedSerialNumbers).length;
+      if (requiredSelectedSerialNumberCount > 0 && submittedSerialNumberCount < requiredSelectedSerialNumberCount) {
+        setError(t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount)));
+        setIsSubmitting(false);
+        return;
+      }
       if (!normalizedSerialNumbers && serialNumberImages.length === 0) {
         setError(t("serialNumberRequired"));
         setIsSubmitting(false);
@@ -2695,6 +2749,140 @@ export default function ServiceClaimFlow() {
       setContractLookup(EMPTY_CONTRACT_LOOKUP);
     } catch (submitError) {
       setError(submitError.message || copy.submitError);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleRegistrationSubmit(event) {
+    event.preventDefault();
+
+    if (pendingRegistration?.id) {
+      await handleRegistrationVerificationSubmit();
+      return;
+    }
+
+    if (
+      contractLookup.status === "missing"
+      && contractLookup.contractNumber === normalizedContractNumber
+    ) {
+      setError(contractLookup.message || t("contractLookupError"));
+      return;
+    }
+
+    const fullName = String(formValues.registrationFullName || "").trim();
+    const email = String(formValues.registrationEmail || "").trim();
+    const phone = String(formValues.registrationPhone || "").trim();
+    const verificationPostalCode = String(formValues.registrationVerificationPostalCode || "").trim();
+    const verificationUnit = String(formValues.registrationVerificationUnit || "").trim();
+
+    if (!normalizedContractNumber) {
+      setError(t("contractLookupError"));
+      return;
+    }
+    if (!fullName) {
+      setError(`${t("registerFullName")} is required.`);
+      return;
+    }
+    if (!verificationPostalCode || !verificationUnit) {
+      setError(t("registerVerificationRequired"));
+      return;
+    }
+    if (!email) {
+      setError(t("registerEmailRequired"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch("/api/kitchen-registrations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contractNumber: normalizedContractNumber,
+          fullName,
+          email,
+          phone,
+          addressNote: formValues.registrationAddressNote,
+          verificationPostalCode,
+          verificationAddress: verificationUnit,
+        }),
+      });
+      const payloadResponse = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payloadResponse.error || t("registerError"));
+      }
+
+      setPendingRegistration({
+        id: payloadResponse.registration?.id,
+        contractNumber: normalizedContractNumber,
+        fullName,
+        email,
+        phone,
+      });
+      setSuccessMessage(payloadResponse.message || t("registerSuccess"));
+    } catch (submitError) {
+      setError(submitError.message || t("registerError"));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleRegistrationVerificationSubmit() {
+    const code = String(formValues.registrationVerificationCode || "").trim();
+    if (!code) {
+      setError(t("registerCodeRequired"));
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+    setSuccessMessage("");
+
+    try {
+      const response = await fetch("/api/kitchen-registrations/verify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          registrationId: pendingRegistration.id,
+          code,
+        }),
+      });
+      const payloadResponse = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payloadResponse.error || t("registerError"));
+      }
+
+      const fullName = pendingRegistration.fullName || "";
+      const nameParts = fullName.split(/\s+/).filter(Boolean);
+      setSuccessMessage(payloadResponse.message || t("registerSuccess"));
+      setForm((current) => ({
+        ...current,
+        givenName: current.givenName || nameParts[0] || "",
+        surname: current.surname || nameParts.slice(1).join(" ") || "",
+        email: current.email || pendingRegistration.email || "",
+        phone: current.phone || pendingRegistration.phone || "",
+        registrationFullName: "",
+        registrationEmail: "",
+        registrationPhone: "",
+        registrationAddressNote: "",
+        registrationVerificationPostalCode: "",
+        registrationVerificationUnit: "",
+        registrationVerificationCode: "",
+      }));
+      setPendingRegistration(null);
+      setMode("complaint");
+    } catch (submitError) {
+      setError(submitError.message || t("registerError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -2794,6 +2982,15 @@ export default function ServiceClaimFlow() {
             <p>{copy.complaintText}</p>
             <span className="service-choice-card__cta">{copy.complaintCta || copy.complaintTitle}</span>
           </button>
+          <button
+            type="button"
+            className={`service-choice-card service-choice-card--register${isRegisterMode ? " is-active" : ""}`}
+            onClick={() => handleModeSelect("register")}
+          >
+            <strong>{copy.registerTitle}</strong>
+            <p>{copy.registerText}</p>
+            <span className="service-choice-card__cta">{copy.registerCta || copy.registerTitle}</span>
+          </button>
         </div>
       </section>
 
@@ -2816,6 +3013,181 @@ export default function ServiceClaimFlow() {
               {copy.back}
             </button>
           </div>
+        </section>
+      ) : null}
+
+      {isRegisterMode ? (
+        <section className="service-panel">
+          <div className="service-panel__header">
+            <p className="service-panel__eyebrow">{copy.registerBrand}</p>
+            <h2>{copy.registerPanelTitle}</h2>
+            <p>{copy.registerPanelText}</p>
+          </div>
+
+          <form className="service-form service-form--registration" onSubmit={handleRegistrationSubmit}>
+            <label className="service-field">
+              <span className="service-field__label-row service-field__label-row--contract">
+                <span className="service-field__label-main">
+                  {copy.contractNumber}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <button
+                  type="button"
+                  className="service-field__help-badge"
+                  onClick={() => setIsContractNumberHelpOpen(true)}
+                  aria-label={copy.contractNumberHelpAria}
+                  aria-haspopup="dialog"
+                  aria-controls="service-contract-help-title"
+                >
+                  ?
+                </button>
+              </span>
+              <input
+                name="registrationContractNumber"
+                value={formValues.contractNumber}
+                onChange={(event) => handleFieldChange("contractNumber", event.target.value)}
+                placeholder={copy.contractPlaceholder}
+                required
+              />
+            </label>
+            {contractLookup.status === "loading" ? (
+              <p className="service-form__hint service-form__hint--contract-status">
+                {t("contractLookupLoading")}
+              </p>
+            ) : null}
+            {contractLookup.status === "found" && isCurrentContractLookupResult ? (
+              <p className="service-form__success service-form__success--contract-status">
+                {t("contractLookupSuccess")}
+              </p>
+            ) : null}
+            {contractLookup.status === "missing" && isCurrentContractLookupResult ? (
+              <p className="service-form__error service-form__error--contract-status">
+                {contractLookup.message || t("contractLookupError")}
+              </p>
+            ) : null}
+
+            <div className="service-field-grid service-field-grid--phone-email">
+              <label className="service-field">
+                <span>
+                  {copy.registerVerificationPostalCode}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationVerificationPostalCode"
+                  value={formValues.registrationVerificationPostalCode}
+                  onChange={(event) => handleFieldChange("registrationVerificationPostalCode", event.target.value)}
+                  placeholder={copy.registerVerificationPostalCodePlaceholder}
+                  required
+                />
+              </label>
+              <label className="service-field">
+                <span>
+                  {copy.registerVerificationUnit}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationVerificationUnit"
+                  value={formValues.registrationVerificationUnit}
+                  onChange={(event) => handleFieldChange("registrationVerificationUnit", event.target.value)}
+                  placeholder={copy.registerVerificationUnitPlaceholder}
+                  required
+                />
+              </label>
+            </div>
+
+            <div className="service-field-grid service-field-grid--phone-email">
+              <label className="service-field">
+                <span>
+                  {copy.registerFullName}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationFullName"
+                  value={formValues.registrationFullName}
+                  onChange={(event) => handleFieldChange("registrationFullName", event.target.value)}
+                  placeholder={copy.registerFullNamePlaceholder}
+                  required
+                />
+              </label>
+              <label className="service-field">
+                <span>
+                  {copy.email}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationEmail"
+                  type="email"
+                  value={formValues.registrationEmail}
+                  onChange={(event) => handleFieldChange("registrationEmail", event.target.value)}
+                  placeholder={copy.emailPlaceholder}
+                  required
+                />
+              </label>
+            </div>
+
+            <div className="service-field-grid service-field-grid--phone-email">
+              <label className="service-field">
+                <span>{copy.phone}</span>
+                <input
+                  name="registrationPhone"
+                  value={formValues.registrationPhone}
+                  onChange={(event) => handleFieldChange("registrationPhone", event.target.value)}
+                  placeholder={copy.phonePlaceholder}
+                />
+              </label>
+              <label className="service-field">
+                <span>
+                  {copy.registerAddressNote}
+                  <OptionalFieldSuffix text={fieldOptionalSuffix} />
+                </span>
+                <input
+                  name="registrationAddressNote"
+                  value={formValues.registrationAddressNote}
+                  onChange={(event) => handleFieldChange("registrationAddressNote", event.target.value)}
+                  placeholder={copy.registerAddressNotePlaceholder}
+                />
+              </label>
+            </div>
+
+            {pendingRegistration?.id ? (
+              <label className="service-field">
+                <span>
+                  {copy.registerCode}
+                  <RequiredFieldMark title={requiredFieldTitle} />
+                </span>
+                <input
+                  name="registrationVerificationCode"
+                  value={formValues.registrationVerificationCode}
+                  onChange={(event) => handleFieldChange("registrationVerificationCode", event.target.value)}
+                  placeholder={copy.registerCodePlaceholder}
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  required
+                />
+              </label>
+            ) : null}
+
+            {error ? <p className="service-form__error">{error}</p> : null}
+            {successMessage ? <p className="service-form__success">{successMessage}</p> : null}
+
+            <div className="service-form__actions">
+              <button
+                type="button"
+                className="service-button service-button--secondary"
+                onClick={() => {
+                  setPendingRegistration(null);
+                  setMode("");
+                }}
+              >
+                {copy.back}
+              </button>
+              <button type="submit" className="service-button service-button--primary" disabled={isSubmitting}>
+                {pendingRegistration?.id
+                  ? (isSubmitting ? t("registerVerifySubmitting") : t("registerVerifySubmit"))
+                  : (isSubmitting ? t("registerSubmitting") : t("registerSubmit"))}
+              </button>
+            </div>
+          </form>
         </section>
       ) : null}
 
@@ -3155,37 +3527,16 @@ export default function ServiceClaimFlow() {
                           <div className="service-field__time-menu" role="listbox" aria-label={t("preferredContactTimeFrom")}>
                             <div className="service-field__time-columns">
                               <div className="service-field__time-column">
-                                <span className="service-field__time-column-label">Hour</span>
+                                <span className="service-field__time-column-label">Time</span>
                                 <div className="service-field__time-options">
-                                  {PREFERRED_CONTACT_HOUR_OPTIONS.map((option) => (
+                                  {PREFERRED_CONTACT_TIME_OPTIONS.map((option) => (
                                     <button
                                       key={option}
                                       type="button"
                                       className={`service-field__time-option${
-                                        preferredContactTimeFromParts.hours === option ? " is-selected" : ""
+                                        preferredContactTimeFromParts.time === option ? " is-selected" : ""
                                       }`}
-                                      onClick={() =>
-                                        handlePreferredContactTimePartSelect("preferredContactTimeFrom", "hours", option)
-                                      }
-                                    >
-                                      {option}
-                                    </button>
-                                  ))}
-                                </div>
-                              </div>
-                              <div className="service-field__time-column service-field__time-column--period">
-                                <span className="service-field__time-column-label">AM/PM</span>
-                                <div className="service-field__time-options">
-                                  {PREFERRED_CONTACT_PERIOD_OPTIONS.map((option) => (
-                                    <button
-                                      key={option}
-                                      type="button"
-                                      className={`service-field__time-option${
-                                        preferredContactTimeFromParts.period === option ? " is-selected" : ""
-                                      }`}
-                                      onClick={() =>
-                                        handlePreferredContactTimePartSelect("preferredContactTimeFrom", "period", option)
-                                      }
+                                      onClick={() => handlePreferredContactTimeSelect("preferredContactTimeFrom", option)}
                                     >
                                       {option}
                                     </button>
@@ -3236,46 +3587,20 @@ export default function ServiceClaimFlow() {
                           <div className="service-field__time-menu" role="listbox" aria-label={t("preferredContactTimeTo")}>
                             <div className="service-field__time-columns">
                               <div className="service-field__time-column">
-                                <span className="service-field__time-column-label">Hour</span>
+                                <span className="service-field__time-column-label">Time</span>
                                 <div className="service-field__time-options">
-                                  {PREFERRED_CONTACT_HOUR_OPTIONS.map((option) => {
-                                    const isDisabled = isPreferredContactToTimePartDisabled("hours", option);
+                                  {PREFERRED_CONTACT_TIME_OPTIONS.map((option) => {
+                                    const isDisabled = isPreferredContactToTimeDisabled(option);
                                     return (
                                       <button
                                         key={option}
                                         type="button"
                                         className={`service-field__time-option${
-                                          preferredContactTimeToParts.hours === option ? " is-selected" : ""
+                                          preferredContactTimeToParts.time === option ? " is-selected" : ""
                                         }`}
                                         disabled={isDisabled}
                                         aria-disabled={isDisabled}
-                                        onClick={() =>
-                                          handlePreferredContactTimePartSelect("preferredContactTimeTo", "hours", option)
-                                        }
-                                      >
-                                        {option}
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
-                              <div className="service-field__time-column service-field__time-column--period">
-                                <span className="service-field__time-column-label">AM/PM</span>
-                                <div className="service-field__time-options">
-                                  {PREFERRED_CONTACT_PERIOD_OPTIONS.map((option) => {
-                                    const isDisabled = isPreferredContactToTimePartDisabled("period", option);
-                                    return (
-                                      <button
-                                        key={option}
-                                        type="button"
-                                        className={`service-field__time-option${
-                                          preferredContactTimeToParts.period === option ? " is-selected" : ""
-                                        }`}
-                                        disabled={isDisabled}
-                                        aria-disabled={isDisabled}
-                                        onClick={() =>
-                                          handlePreferredContactTimePartSelect("preferredContactTimeTo", "period", option)
-                                        }
+                                        onClick={() => handlePreferredContactTimeSelect("preferredContactTimeTo", option)}
                                       >
                                         {option}
                                       </button>
@@ -3588,36 +3913,34 @@ export default function ServiceClaimFlow() {
                         </span>
                       </label>
                       <div className="service-field__problem-area-stack">
-                        <div className="service-field__problem-area-input-wrap">
-                          <textarea
-                            className="service-field__problem-area-input"
-                            value={area.detail}
-                            onChange={(event) => {
-                              autoResizeTextarea(event.target);
-                              handleProblemAreaDetailChange(area.componentId, event.target.value);
-                            }}
-                            ref={(element) => autoResizeTextarea(element)}
-                            placeholder={copy.problemPlaceholder}
-                            rows={1}
-                            required
-                          />
-                          <input
-                            key={area.attachmentFieldKey}
-                            type="file"
-                            className="service-field__problem-area-file"
-                            accept={CLAIM_ATTACHMENT_ACCEPT}
-                            multiple
-                            onChange={(event) => handleProblemAreaAttachmentsSelected(area.componentId, event)}
-                            id={`problem-area-upload-${area.componentId}`}
-                          />
-                          <label
-                            htmlFor={`problem-area-upload-${area.componentId}`}
-                            className="service-field__problem-area-upload-button"
-                            title={copy.attachments}
-                          >
-                            +
-                          </label>
-                        </div>
+                        <textarea
+                          className="service-field__problem-area-input"
+                          value={area.detail}
+                          onChange={(event) => {
+                            autoResizeTextarea(event.target);
+                            handleProblemAreaDetailChange(area.componentId, event.target.value);
+                          }}
+                          ref={(element) => autoResizeTextarea(element)}
+                          placeholder={copy.problemPlaceholder}
+                          rows={1}
+                          required
+                        />
+                        <input
+                          key={area.attachmentFieldKey}
+                          type="file"
+                          className="service-field__problem-area-file"
+                          accept={CLAIM_ATTACHMENT_ACCEPT}
+                          multiple
+                          onChange={(event) => handleProblemAreaAttachmentsSelected(area.componentId, event)}
+                          id={`problem-area-upload-${area.componentId}`}
+                        />
+                        <label
+                          htmlFor={`problem-area-upload-${area.componentId}`}
+                          className="service-field__problem-area-upload-button"
+                          title={copy.attachments}
+                        >
+                          {t("uploadFile")}
+                        </label>
                         {area.attachments.length ? (
                           <ServiceAttachmentChips
                             files={area.attachments}
@@ -3674,6 +3997,9 @@ export default function ServiceClaimFlow() {
                   <span className="service-field__label-row service-field__label-row--serial">
                     <span className="service-field__label-main">
                       {copy.serialNumber}
+                      {requiredSelectedSerialNumberCount > 0 ? (
+                        <RequiredFieldMark title={requiredFieldTitle} />
+                      ) : null}
                     </span>
                     <button
                       type="button"
@@ -3689,6 +4015,11 @@ export default function ServiceClaimFlow() {
                       {t("serialNumberHelpTrigger")}
                     </button>
                   </span>
+                  {requiredSelectedSerialNumberCount > 0 ? (
+                    <p className="service-form__hint">
+                      {t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount))}
+                    </p>
+                  ) : null}
                   <div className="service-serial-field">
                     <div className="service-serial-field__input-row">
                       <input

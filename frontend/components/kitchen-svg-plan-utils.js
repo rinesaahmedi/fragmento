@@ -4,10 +4,15 @@ export const PLAN_VIEWPORT_BY_SLUG = {
     preserveAspectRatio: "xMidYMid meet",
     canvasClassName: "wide",
   },
+  "l-shaped-kitchen": {
+    viewBox: "120 45 540 450",
+    preserveAspectRatio: "xMidYMid meet",
+  },
 };
 
 const BASE_PLAN_STROKE = "#8f877d";
 const SELECTED_PLAN_STROKE = "#000000";
+const OVERLAY_SELECTED_STROKE = "#2a9155";
 const SELECTED_MUTED_APPLIANCE_STROKE = "#374151";
 const TEST_3D_PLAN_STROKE = "#e9eeeb";
 const TEST_3D_SELECTED_PLAN_STROKE = "#ffffff";
@@ -56,6 +61,74 @@ function getPlanBounds(group, componentId) {
     }
   }
   return PLAN_COMPONENT_BOUNDS[componentId] || null;
+}
+
+const L_SHAPED_PLAN_COMPONENT_BOUNDS = {
+  "component-wall-cabinet-1": { x: 156, y: 71, width: 98, height: 186 },
+  "component-wall-cabinet-2": { x: 253, y: 71, width: 103, height: 186 },
+  "component-wall-cabinet-3": { x: 356, y: 72, width: 100, height: 185 },
+  "component-wall-cabinet-4": { x: 456, y: 72, width: 159, height: 165 },
+  "component-under-cabinet-light": { x: 329, y: 246, width: 70, height: 42 },
+  "component-refrigerator": { x: 566, y: 331, width: 49, height: 147 },
+  "component-worktop": { x: 156, y: 237, width: 459, height: 92 },
+  "component-base-module-1": { x: 200, y: 318, width: 53, height: 122 },
+  "component-oven-base": { x: 253, y: 318, width: 77, height: 122 },
+  "component-base-module-2": { x: 330, y: 303, width: 71, height: 122 },
+  "component-corner-base": { x: 401, y: 289, width: 115, height: 95 },
+  "component-base-module-3": { x: 401, y: 317, width: 115, height: 155 },
+  "component-drawer-base": { x: 516, y: 337, width: 50, height: 125 },
+};
+
+const L_SHAPED_PLAN_COMPONENT_SHAPES = {
+  "component-wall-cabinet-1": "M156 166 L200 192 L200 322 L156 296 Z M200 192 L253 181 L253 312 L200 322 Z",
+  "component-wall-cabinet-2": "M253 181 L356 161 L356 291 L253 312 Z",
+  "component-wall-cabinet-3": "M356 161 L456 141 L456 272 L356 291 Z",
+  "component-wall-cabinet-4": "M456 141 L615 110 L615 237 L456 272 Z",
+  "component-under-cabinet-light": "M329 276 L399 263 L399 282 L329 296 Z",
+  "component-refrigerator": "M566 341 L615 331 L615 478 L566 462 Z",
+  "component-worktop": "M156 296 L356 257 L516 351 L615 332 L456 237 L356 257 L156 296 Z M156 329 L400 281 L516 350 L566 341 L330 388 Z",
+  "component-base-module-1": "M200 356 L253 346 L253 439 L200 450 Z",
+  "component-oven-base": "M253 346 L330 331 L330 425 L253 439 Z",
+  "component-base-module-2": "M330 331 L401 317 L401 411 L330 425 Z",
+  "component-corner-base": "M401 317 L516 294 L566 323 L516 351 L401 375 Z",
+  "component-base-module-3": "M401 317 L516 294 L566 323 L566 462 L516 472 L401 411 Z",
+  "component-drawer-base": "M516 351 L566 341 L566 462 L516 472 Z",
+};
+
+function getPlanBoundsForSlug(slug, componentId) {
+  if (slug === "l-shaped-kitchen") {
+    return L_SHAPED_PLAN_COMPONENT_BOUNDS[componentId] || PLAN_COMPONENT_BOUNDS[componentId] || null;
+  }
+  return PLAN_COMPONENT_BOUNDS[componentId] || null;
+}
+
+function getPlanShapeForSlug(slug, componentId) {
+  if (slug === "l-shaped-kitchen") {
+    return L_SHAPED_PLAN_COMPONENT_SHAPES[componentId] || "";
+  }
+  return "";
+}
+
+function createRect(namespace, className, box, padding) {
+  const rect = document.createElementNS(namespace, "rect");
+  rect.classList.add(className);
+  rect.setAttribute("x", String(box.x - padding));
+  rect.setAttribute("y", String(box.y - padding));
+  rect.setAttribute("width", String(box.width + padding * 2));
+  rect.setAttribute("height", String(box.height + padding * 2));
+  rect.setAttribute("rx", "8");
+  rect.setAttribute("ry", "8");
+  return rect;
+}
+
+function createShapeElement(namespace, className, shapePath, box, padding) {
+  if (shapePath) {
+    const path = document.createElementNS(namespace, "path");
+    path.classList.add(className);
+    path.setAttribute("d", shapePath);
+    return path;
+  }
+  return createRect(namespace, className, box, padding);
 }
 
 export function applyPlanViewportToMarkup(markup, slug) {
@@ -193,11 +266,29 @@ export function applyGroupVisualState(group, { selected, locked }) {
   group.style.setProperty("opacity", "1", "important");
   group.style.setProperty("filter", "none", "important");
 
+  const selectionMode = group.dataset.selectionMode || "";
+  const useOutlineOnlySelection = selectionMode === "outline";
+  const useCadLineworkSelection = selectionMode === "cad-linework";
+
   group.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse,text").forEach((element) => {
     if (element.classList.contains("component-hitbox")) {
       element.style.setProperty("fill", "transparent", "important");
       element.style.setProperty("stroke", "transparent", "important");
       element.style.setProperty("stroke-width", "0px", "important");
+      return;
+    }
+
+    if (element.classList.contains("component-selection-outline")) {
+      const isOverlaySelection = group.classList.contains("kitchen-component-overlay");
+      element.style.setProperty("fill", "none", "important");
+      element.style.setProperty(
+        "stroke",
+        isActive ? (isOverlaySelection ? OVERLAY_SELECTED_STROKE : SELECTED_PLAN_STROKE) : "transparent",
+        "important",
+      );
+      element.style.setProperty("stroke-width", isActive ? (isOverlaySelection ? "1.4px" : "2.2px") : "0px", "important");
+      element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
+      element.style.setProperty("pointer-events", "none", "important");
       return;
     }
 
@@ -209,6 +300,18 @@ export function applyGroupVisualState(group, { selected, locked }) {
     }
     if (!element.dataset.originalFill) {
       element.dataset.originalFill = getInheritedSvgAttribute(element, "fill", group) || "";
+    }
+
+    if (useOutlineOnlySelection) {
+      element.style.setProperty("stroke", element.dataset.originalStroke || "none", "important");
+      element.style.setProperty("stroke-width", `${element.dataset.originalStrokeWidth}px`, "important");
+      element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
+      if (element.tagName === "text") {
+        element.style.setProperty("fill", element.dataset.originalFill || BASE_PLAN_STROKE, "important");
+      } else if (element.dataset.originalFill) {
+        element.style.setProperty("fill", element.dataset.originalFill, "important");
+      }
+      return;
     }
 
     if (isMutedApplianceBadgeElement(group, element)) {
@@ -229,6 +332,10 @@ export function applyGroupVisualState(group, { selected, locked }) {
       isPreservedDetailStroke(element.dataset.originalStroke);
     const preserveOriginalStrokeWidth = isApplianceDetailElement(group, element);
     const applianceDetailStroke = preserveOriginalStrokeWidth && isActive ? SELECTED_MUTED_APPLIANCE_STROKE : "";
+    const cadLineworkStrokeWidth =
+      useCadLineworkSelection && isActive
+        ? String(Number.parseFloat(element.dataset.originalStrokeWidth || "0.5") || 0.5)
+        : "";
 
     element.style.setProperty(
       "stroke",
@@ -243,7 +350,9 @@ export function applyGroupVisualState(group, { selected, locked }) {
     );
     element.style.setProperty(
       "stroke-width",
-      preserveOriginalStrokeWidth
+      cadLineworkStrokeWidth
+        ? `${cadLineworkStrokeWidth}px`
+        : preserveOriginalStrokeWidth
         ? `${element.dataset.originalStrokeWidth}px`
         : emphasisWidth || `${element.dataset.originalStrokeWidth}px`,
       "important",
@@ -328,13 +437,16 @@ export function syncKitchenPlan({
   const namespace = "http://www.w3.org/2000/svg";
   const byColor = new Map();
   const visibleSet = Array.isArray(visibleComponentIds) ? new Set(visibleComponentIds) : null;
-  svg.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse").forEach((element) => {
-    if (element.closest("[data-component-id]")) return;
-    const color = normalizeColor(element.getAttribute("stroke"));
-    if (!color) return;
-    if (!byColor.has(color)) byColor.set(color, []);
-    byColor.get(color).push(element);
-  });
+  const useColorGrouping = kitchenConfig.kitchen.slug !== "l-shaped-kitchen";
+  if (useColorGrouping) {
+    svg.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse").forEach((element) => {
+      if (element.closest("[data-component-id]")) return;
+      const color = normalizeColor(element.getAttribute("stroke"));
+      if (!color) return;
+      if (!byColor.has(color)) byColor.set(color, []);
+      byColor.get(color).push(element);
+    });
+  }
 
   for (const item of kitchenConfig.components) {
     const colorKey = normalizeColor(item.colorKey);
@@ -342,7 +454,7 @@ export function syncKitchenPlan({
     if (!componentId) continue;
     let group = svg.querySelector(`[data-component-id="${componentId}"]`);
 
-    if (!group && colorKey && byColor.has(colorKey)) {
+    if (!group && useColorGrouping && colorKey && byColor.has(colorKey)) {
       const elements = byColor.get(colorKey);
       const firstElement = elements[0];
       const parent = firstElement?.parentNode;
@@ -354,7 +466,16 @@ export function syncKitchenPlan({
       elements.forEach((element) => group.appendChild(element));
     }
 
-    if (!group) continue;
+    if (!group) {
+      const box = getPlanBoundsForSlug(kitchenConfig.kitchen.slug, componentId);
+      if (!box) continue;
+
+      group = document.createElementNS(namespace, "g");
+      group.dataset.componentId = componentId;
+      group.dataset.selectionMode = "outline";
+      group.classList.add("kitchen-component", "kitchen-component-overlay");
+      svg.appendChild(group);
+    }
 
     if (visibleSet && !visibleSet.has(componentId)) {
       group.style.setProperty("display", "none", "important");
@@ -364,21 +485,45 @@ export function syncKitchenPlan({
 
     group.style.removeProperty("display");
     group.classList.add("kitchen-component");
-    group.querySelectorAll(".component-hitbox").forEach((element) => element.remove());
+    if (kitchenConfig.kitchen.slug === "l-shaped-kitchen" && !group.dataset.selectionMode) {
+      group.dataset.selectionMode = "cad-linework";
+    }
+    if (item.code) {
+      group.dataset.componentCode = item.code;
+    }
+    if (item.name && !group.querySelector(":scope > title")) {
+      const title = document.createElementNS(namespace, "title");
+      title.textContent = item.name;
+      group.insertBefore(title, group.firstChild);
+    }
+    const existingHitbox = group.querySelector(".component-hitbox");
 
-    const box = getPlanBounds(group, componentId);
-    if (box) {
-      const hitbox = document.createElementNS(namespace, "rect");
-      hitbox.classList.add("component-hitbox");
-      hitbox.setAttribute("x", String(box.x - 6));
-      hitbox.setAttribute("y", String(box.y - 6));
-      hitbox.setAttribute("width", String(box.width + 12));
-      hitbox.setAttribute("height", String(box.height + 12));
-      hitbox.setAttribute("rx", "8");
-      hitbox.setAttribute("ry", "8");
-      hitbox.setAttribute("fill", "transparent");
-      hitbox.setAttribute("stroke", "transparent");
-      group.insertBefore(hitbox, group.firstChild);
+    if (!existingHitbox) {
+      const box =
+        kitchenConfig.kitchen.slug === "l-shaped-kitchen"
+          ? getPlanBoundsForSlug(kitchenConfig.kitchen.slug, componentId)
+          : getPlanBounds(group, componentId) || getPlanBoundsForSlug(kitchenConfig.kitchen.slug, componentId);
+      if (box) {
+        const shapePath = getPlanShapeForSlug(kitchenConfig.kitchen.slug, componentId);
+        const hitbox = createShapeElement(namespace, "component-hitbox", shapePath, box, 6);
+        hitbox.setAttribute("fill", "transparent");
+        hitbox.setAttribute("stroke", "transparent");
+        hitbox.setAttribute("pointer-events", "all");
+        group.insertBefore(hitbox, group.firstChild);
+      }
+    }
+
+    const hasOutline = group.querySelector(".component-selection-outline");
+    if (!hasOutline && group.dataset.selectionMode === "outline") {
+      const box = getPlanBoundsForSlug(kitchenConfig.kitchen.slug, componentId);
+      if (box) {
+        const shapePath = getPlanShapeForSlug(kitchenConfig.kitchen.slug, componentId);
+        const outline = createShapeElement(namespace, "component-selection-outline", shapePath, box, 3);
+        outline.setAttribute("fill", "none");
+        outline.setAttribute("stroke", "transparent");
+        outline.setAttribute("stroke-width", "0");
+        group.appendChild(outline);
+      }
     }
 
     applyGroupVisualState(group, {

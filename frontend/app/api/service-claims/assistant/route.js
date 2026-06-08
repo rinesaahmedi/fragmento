@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 import { prisma } from "../../../../lib/prisma";
+import CLAIMS_CHATBOT_KNOWLEDGE from "../../../../lib/claims-chatbot-knowledge.json";
 import SERVICE_CLAIM_TROUBLESHOOTING_DATA from "../../../../lib/service-claim-troubleshooting-data.json";
 
 const OPENAI_TIMEOUT_MS = 20000;
@@ -1528,6 +1529,8 @@ function replaceArchitectoBrandCopy(text) {
   if (!normalized) return "";
 
   return normalized
+    .replace(/architecto\s*\/\s*architecto/gi, "architecto")
+    .replace(/Amica\/architecto/gi, "architecto")
     .replace(/Amica-Geschirrspülern/g, "architecto-Geschirrspülern")
     .replace(/Amica-Geschirrspüler/gi, "architecto-Geschirrspüler")
     .replace(/Amica dishwashers/gi, "architecto dishwashers")
@@ -2278,16 +2281,18 @@ function getDishwasherContextResolved({ question, claim, selectedAreas }) {
   const matchingText = hasCurrentExplicitCodes ? questionText : combinedText;
   const areaCategories = arrayValue(selectedAreas).map(detectAreaCategory);
   const categories = dedupe([...areaCategories, ...detectTextCategories(matchingText)]);
-  const explicitErrorCodes = hasCurrentExplicitCodes
-    ? explicitErrorCodesFromQuestion
-    : extractErrorCodes(combinedText);
-  const inferredErrorCodes = hasCurrentExplicitCodes
-    ? inferDishwasherCodesFromSymptoms(questionText)
-    : inferDishwasherCodesFromSymptoms(combinedText);
-  const errorCodes = dedupe([...explicitErrorCodes, ...inferredErrorCodes]);
   const hasDishwasherContext =
     categories.includes("dishwasher")
     || /dishwasher|geschirrsp|spulmaschine|spuelmaschine|lavavajillas|lave-vaisselle/i.test(matchingText);
+  const explicitErrorCodes = hasCurrentExplicitCodes
+    ? explicitErrorCodesFromQuestion
+    : extractErrorCodes(combinedText);
+  const inferredErrorCodes = hasDishwasherContext && hasCurrentExplicitCodes
+    ? inferDishwasherCodesFromSymptoms(questionText)
+    : hasDishwasherContext
+      ? inferDishwasherCodesFromSymptoms(combinedText)
+      : [];
+  const errorCodes = dedupe([...explicitErrorCodes, ...inferredErrorCodes]);
 
   return {
     combinedText: matchingText,
@@ -2296,6 +2301,7 @@ function getDishwasherContextResolved({ question, claim, selectedAreas }) {
     explicitErrorCodes,
     inferredErrorCodes,
     errorCodes,
+    sessionErrorCodes: errorCodes,
     hasDishwasherContext,
     hasCurrentExplicitCodes,
   };
@@ -2314,14 +2320,20 @@ function enrichDishwasherContextWithConversation(baseContext, conversationMessag
   const explicitErrorCodes = hasCurrentExplicitCodes
     ? baseContext.explicitErrorCodes
     : dedupe([...baseContext.explicitErrorCodes, ...extractErrorCodes(conversationText)]);
-  const inferredErrorCodes = hasCurrentExplicitCodes
-    ? baseContext.inferredErrorCodes
-    : dedupe([...baseContext.inferredErrorCodes, ...inferDishwasherCodesFromSymptoms(conversationText)]);
-  const errorCodes = dedupe([...explicitErrorCodes, ...inferredErrorCodes]);
   const hasDishwasherContext =
     baseContext.hasDishwasherContext
     || categories.includes("dishwasher")
     || /amica|dishwasher|geschirrsp|geschirrsp[uü]l|geschirrspul|sp[uü]lmaschine|sp[uü]lmachine|sp[uü]lmaschiene|spulmaschine|spuelmaschine|bulaÅŸÄ±k|lavavajillas|lave-vaisselle|Ð¿Ð¾ÑÑƒÐ´Ð¾Ð¼Ð¾/i.test(combinedText);
+  const inferredErrorCodes = hasCurrentExplicitCodes || !hasDishwasherContext
+    ? baseContext.inferredErrorCodes
+    : dedupe([...baseContext.inferredErrorCodes, ...inferDishwasherCodesFromSymptoms(conversationText)]);
+  const errorCodes = dedupe([...explicitErrorCodes, ...inferredErrorCodes]);
+  const sessionErrorCodes = dedupe([
+    ...arrayValue(baseContext.explicitErrorCodes),
+    ...arrayValue(baseContext.inferredErrorCodes),
+    ...extractErrorCodes(conversationText),
+    ...(hasDishwasherContext ? inferDishwasherCodesFromSymptoms(conversationText) : []),
+  ]);
 
   return {
     combinedText: hasCurrentExplicitCodes ? baseContext.combinedText : combinedText,
@@ -2333,6 +2345,7 @@ function enrichDishwasherContextWithConversation(baseContext, conversationMessag
     explicitErrorCodes,
     inferredErrorCodes,
     errorCodes,
+    sessionErrorCodes,
     hasDishwasherContext,
   };
 }
@@ -3012,6 +3025,80 @@ function buildSuggestedProblemDescription(topMatch, context, language) {
   );
 }
 
+function hasDishwasherCode(context, code) {
+  const aliases = new Set(errorCodeAliases(code).map(normalizeCode));
+  return [
+    ...arrayValue(context?.errorCodes),
+    ...arrayValue(context?.sessionErrorCodes),
+    ...arrayValue(context?.explicitErrorCodes),
+  ].some((value) => aliases.has(normalizeCode(value)));
+}
+
+function getDishwasherClaimEvidence(codes) {
+  const evidence = ["photo of display/error code", "product model/serial number", "short description of what the user already checked"];
+  if (codes.some((code) => ["E02", "E2"].includes(normalizeCode(code)))) {
+    evidence.push("photo or short note if water remains inside");
+  }
+  return [...new Set(evidence)];
+}
+
+function buildDishwasherCodeSuggestedDescription(codes) {
+  const normalizedCodes = dedupe(codes.flatMap(errorCodeAliases)).filter((code) => ["E02", "E2", "E3"].includes(normalizeCode(code)));
+  const hasDrainage = normalizedCodes.some((code) => ["E02", "E2"].includes(normalizeCode(code)));
+  const hasHeating = normalizedCodes.some((code) => normalizeCode(code) === "E3");
+
+  if (hasDrainage && hasHeating) {
+    return "My architecto dishwasher shows E02/E2 and E3. It is not draining properly and also appears to have a heating/temperature issue. I checked the filters, drain hose, pump area, and reset the appliance, but the issue remains. Please arrange a service check.";
+  }
+
+  if (hasHeating) {
+    return "My architecto dishwasher shows error E3 and does not heat properly. The water stays cold or the required temperature is not reached. I reset the appliance and checked the filters, but the issue remains. Please arrange a service check.";
+  }
+
+  return "";
+}
+
+function buildDirectDishwasherServiceAnswer({ language, topMatch, guide, dishwasherContext }) {
+  const currentCode = normalizeCode(topMatch?.code);
+  const hasDrainageAndHeating = hasDishwasherCode(dishwasherContext, "E02") && hasDishwasherCode(dishwasherContext, "E3");
+  const shouldUseDirectServiceAnswer = currentCode === "E3" || hasDrainageAndHeating;
+  if (!shouldUseDirectServiceAnswer) {
+    return null;
+  }
+
+  const codes = hasDrainageAndHeating ? ["E02", "E3"] : [currentCode];
+  const suggestedDescription = buildDishwasherCodeSuggestedDescription(codes);
+  const evidenceSection = formatSection("Helpful claim evidence", getDishwasherClaimEvidence(codes));
+
+  if (hasDrainageAndHeating) {
+    return {
+      answer: [
+        "Your dishwasher has shown both E02/E2 and E3. E02/E2 indicates a drainage problem, and E3 indicates a heating/temperature problem.",
+        "If you already checked the filters, drain hose, pump area, and tried a reset, please continue with a service claim.",
+        NO_FURTHER_SAFE_SELF_CHECK,
+        evidenceSection,
+      ].filter(Boolean).join("\n\n"),
+      actions: buildClaimFormHelpActions(language, buildClaimFormHelpPromptForMatch(language, topMatch)),
+      suggestedProblemDescription: suggestedDescription,
+    };
+  }
+
+  const steps = guide?.troubleshootingSteps?.length
+    ? guide.troubleshootingSteps
+    : ["Unplug the dishwasher for 1 to 2 minutes to reset it.", "Check and clean the internal filters."];
+
+  return {
+    answer: [
+      "Error E3 is a heating/temperature issue.",
+      formatSection("You can safely try", steps),
+      "If E3 still appears or the water stays cold, there is no further safe self-check I can recommend. Please continue with a service claim.",
+      evidenceSection,
+    ].filter(Boolean).join("\n\n"),
+    actions: buildClaimFormHelpActions(language, buildClaimFormHelpPromptForMatch(language, topMatch)),
+    suggestedProblemDescription: suggestedDescription,
+  };
+}
+
 function buildKnowledgeAnswer({ language, question, context, selectedAreas, claim, matches, dishwasherContext }) {
   const topMatch = matches.primaryMatches?.[0] || matches.codeMatches[0] || null;
   if (!topMatch) {
@@ -3032,6 +3119,16 @@ function buildKnowledgeAnswer({ language, question, context, selectedAreas, clai
   const troubleshootingActions = guide?.troubleshootingSteps?.length
     ? guide.troubleshootingSteps
     : translateKnowledgeList(getRelevantImmediateActionKeys(topMatch.titleKey, dishwasherContext, matches), language).slice(0, 4);
+  const directDishwasherServiceAnswer = buildDirectDishwasherServiceAnswer({
+    language,
+    topMatch,
+    guide,
+    dishwasherContext,
+  });
+  if (directDishwasherServiceAnswer) {
+    return directDishwasherServiceAnswer;
+  }
+
   return buildCompactSupportAnswer({
     language,
     intro,
@@ -3054,6 +3151,327 @@ function buildKnowledgeClaimFormHelpAnswer({ language, question, context, select
   });
 }
 
+function normalizeClaimsMatchText(value) {
+  return normalizeLanguageHintText(value).replace(/\s+/g, "");
+}
+
+function claimsEntryApplianceTypes(entry) {
+  const itemType = normalizeText(entry?.itemType);
+  if (itemType === "fridge_freezer") return ["fridge", "freezer"];
+  if (itemType === "induction_hob") return ["hob"];
+  if (itemType === "extractor_hood") return ["extractor_hood"];
+  return [itemType].filter(Boolean);
+}
+
+function claimsAreaApplianceTypes(selectedAreas) {
+  return dedupe(arrayValue(selectedAreas).flatMap((area) => {
+    const category = detectAreaCategory(area);
+    if (category === "dishwasher") return ["dishwasher"];
+    if (category === "washing-machine") return ["washing_machine"];
+    if (category === "oven-hob") return ["oven", "hob"];
+    if (category === "fridge") return ["fridge", "freezer"];
+    if (category === "hood") return ["extractor_hood"];
+    return [];
+  }));
+}
+
+function getClaimsConversationText(conversationMessages) {
+  return normalizeConversationMessages(conversationMessages)
+    .filter((message) => message.role === "user")
+    .slice(-4)
+    .map((message) => message.text)
+    .join(" ");
+}
+
+const NO_FURTHER_SAFE_SELF_CHECK =
+  "There is no further safe self-check I can recommend for this issue. Please continue with a service claim.";
+
+function isUnresolvedClaimsSelfCheck(question) {
+  const normalized = normalizeLanguageHintText(question);
+  return /\b(still|again|same|continues|continued|remain|remains|unsolved|not solved|did not work|didnt work|not fixed|after checking|after reset|after cleaning|after trying|no)\b/.test(normalized);
+}
+
+function claimsTermScore(entry, currentText, combinedText) {
+  const currentCompact = normalizeClaimsMatchText(currentText);
+  const combinedCompact = normalizeClaimsMatchText(combinedText);
+  let score = 0;
+
+  for (const term of arrayValue(entry?.matchTerms)) {
+    const normalized = normalizeLanguageHintText(term);
+    const compact = normalizeClaimsMatchText(term);
+    if (!compact) continue;
+    if (currentCompact.includes(compact)) score += Math.min(80, 20 + compact.length);
+    else if (combinedCompact.includes(compact)) score += Math.min(35, 10 + compact.length);
+    else if (fuzzyTextHasAny(normalizeLanguageHintText(currentText), [normalized])) score += 18;
+  }
+
+  const problemText = normalizeLanguageHintText(entry?.problem);
+  const currentNormalized = normalizeLanguageHintText(currentText);
+  const combinedNormalized = normalizeLanguageHintText(combinedText);
+  if (problemText.includes("not working") && /\bnot working\b|\bdoes not work\b|\bdoesnt work\b|\bis not working\b/.test(currentNormalized)) {
+    score += 35;
+  } else if (problemText.includes("not working") && /\bnot working\b|\bdoes not work\b|\bdoesnt work\b|\bis not working\b/.test(combinedNormalized)) {
+    score += 20;
+  }
+  const ignoredIssueWords = new Set([
+    "amica",
+    "appliance",
+    "dishwasher",
+    "hood",
+    "extractor",
+    "fridge",
+    "freezer",
+    "refrigerator",
+    "washing",
+    "machine",
+    "oven",
+    "hob",
+    "induction",
+    "cooking",
+    "zone",
+    "error",
+    "signal",
+    "problem",
+  ]);
+  const issueWords = normalizedTokens(problemText)
+    .filter((token) => token.length >= 4 && !ignoredIssueWords.has(token));
+  const currentTokens = new Set(normalizedTokens(currentText));
+  const combinedTokens = new Set(normalizedTokens(combinedText));
+  for (const token of issueWords) {
+    if (currentTokens.has(token)) score += 8;
+    else if (combinedTokens.has(token)) score += 3;
+  }
+
+  return score;
+}
+
+function claimsDecisionRank(decision) {
+  return {
+    URGENT_CLAIM_STOP_USE: 4,
+    CREATE_CLAIM_SERVICE: 3,
+    SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED: 2,
+    NO_CLAIM_NORMAL: 1,
+  }[decision] || 0;
+}
+
+function findClaimsChatbotKnowledgeMatch({ question, claim, selectedAreas, conversationMessages }) {
+  const currentText = [
+    question,
+    normalizeText(claim?.problemDescription),
+    arrayValue(selectedAreas).map((area) => `${area?.code || ""} ${area?.name || ""}`).join(" "),
+  ].join(" ");
+  const conversationText = getClaimsConversationText(conversationMessages);
+  const combinedText = `${currentText} ${conversationText}`;
+  const compactCombined = normalizeClaimsMatchText(combinedText);
+  const explicitCodes = extractErrorCodes(currentText);
+  const typedApplianceTypes = detectKnowledgeApplianceTypes(combinedText, selectedAreas);
+  const areaApplianceTypes = claimsAreaApplianceTypes(selectedAreas);
+  const applianceTypes = dedupe([...typedApplianceTypes, ...areaApplianceTypes]);
+
+  const scored = arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries)
+    .map((entry) => {
+      const aliasMatched = arrayValue(entry?.aliases).some((alias) =>
+        compactCombined.includes(normalizeClaimsMatchText(alias))
+      );
+      const applianceMatched = claimsEntryApplianceTypes(entry).some((type) => applianceTypes.includes(type));
+      const entryCodeText = normalizeClaimsMatchText(`${entry?.problem || ""} ${arrayValue(entry?.matchTerms).join(" ")}`);
+      const supportsExplicitCode =
+        !explicitCodes.length || explicitCodes.some((code) => entryCodeText.includes(normalizeClaimsMatchText(code)));
+      const score = claimsTermScore(entry, currentText, combinedText)
+        + (aliasMatched ? 80 : 0)
+        + (applianceMatched ? 30 : 0)
+        + (normalizeText(entry?.chatbotDecision) === "URGENT_CLAIM_STOP_USE" && /smoke|burning|cracked|leak|power cord|electrical/.test(normalizeLanguageHintText(currentText)) ? 25 : 0);
+      return { entry, score: supportsExplicitCode ? score : 0, aliasMatched, applianceMatched };
+    })
+    .filter((item) => item.score >= 35 && (item.aliasMatched || item.applianceMatched))
+    .sort((a, b) =>
+      b.score - a.score
+      || claimsDecisionRank(b.entry?.chatbotDecision) - claimsDecisionRank(a.entry?.chatbotDecision)
+      || String(a.entry?.id || "").localeCompare(String(b.entry?.id || ""))
+    );
+
+  return scored[0]?.entry || null;
+}
+
+function buildClaimsEvidenceList(entry) {
+  return arrayValue(entry?.evidenceToRequest).slice(0, 4);
+}
+
+function buildClaimsClaimPrompt(entry) {
+  return `Show claim-form help for ${entry.model}: ${entry.problem}`;
+}
+
+function claimsSafeUserCheck(entry) {
+  const safeCheck = normalizeText(entry?.safeUserCheck);
+  if (
+    normalizeText(entry?.itemType) === "oven"
+    && normalizeLanguageHintText(entry?.problem) === "appliance does not work"
+    && !/function|temperature/i.test(safeCheck)
+  ) {
+    return "Make sure the oven function and temperature are selected correctly, and check whether the household fuse/power supply is working.";
+  }
+  return safeCheck;
+}
+
+function claimsProductLabel(entry) {
+  const labels = {
+    dishwasher: "dishwasher",
+    extractor_hood: "extractor hood",
+    fridge_freezer: "fridge-freezer",
+    induction_hob: "induction hob",
+    washing_machine: "washing machine",
+    oven: "oven",
+  };
+  const itemLabel = labels[normalizeText(entry?.itemType)] || "appliance";
+  return `${itemLabel} ${entry.model}`.trim();
+}
+
+function collectRelatedClaimsEntries({ primaryEntry, question, claim, selectedAreas, conversationMessages }) {
+  const currentText = [
+    question,
+    normalizeText(claim?.problemDescription),
+    getClaimsConversationText(conversationMessages),
+    arrayValue(selectedAreas).map((area) => `${area?.code || ""} ${area?.name || ""}`).join(" "),
+  ].join(" ");
+  const compact = normalizeClaimsMatchText(currentText);
+  const primaryAliases = new Set(arrayValue(primaryEntry?.aliases).map(normalizeClaimsMatchText));
+  const primaryApplianceTypes = claimsEntryApplianceTypes(primaryEntry);
+
+  const related = arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries)
+    .filter((entry) => entry?.id !== primaryEntry?.id)
+    .filter((entry) => {
+      const sameAlias = arrayValue(entry?.aliases).some((alias) => primaryAliases.has(normalizeClaimsMatchText(alias)));
+      const sameAppliance = claimsEntryApplianceTypes(entry).some((type) => primaryApplianceTypes.includes(type));
+      return sameAlias || sameAppliance;
+    })
+    .map((entry) => ({ entry, score: claimsTermScore(entry, currentText, currentText) }))
+    .filter((item) => item.score >= 35)
+    .sort((a, b) => b.score - a.score)
+    .map((item) => item.entry);
+
+  const explicitCodes = extractErrorCodes(currentText);
+  const codeRelated = arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries).filter((entry) => {
+    if (entry?.id === primaryEntry?.id) return false;
+    const sameAppliance = claimsEntryApplianceTypes(entry).some((type) => primaryApplianceTypes.includes(type));
+    if (!sameAppliance) return false;
+    const entryCodeText = normalizeClaimsMatchText(`${entry?.problem || ""} ${arrayValue(entry?.matchTerms).join(" ")}`);
+    return explicitCodes.some((code) => entryCodeText.includes(normalizeClaimsMatchText(code)));
+  });
+
+  return [primaryEntry, ...related, ...codeRelated]
+    .filter(Boolean)
+    .filter((entry, index, entries) => entries.findIndex((item) => item?.id === entry?.id) === index)
+    .filter((entry, index, entries) => entries.findIndex((item) => normalizeText(item?.problem) === normalizeText(entry?.problem)) === index)
+    .slice(0, 4);
+}
+
+function combineEvidenceToRequest(entries) {
+  return [...new Set(arrayValue(entries).flatMap((entry) => buildClaimsEvidenceList(entry)))].slice(0, 5);
+}
+
+function buildClaimsSuggestedDescription(entry, unresolved = false, relatedEntries = []) {
+  const entries = relatedEntries.length ? relatedEntries : [entry];
+  const symptoms = entries.map((item) => item.problem).filter(Boolean).join("; ");
+  const checks = [...new Set(entries.map((item) => claimsSafeUserCheck(item)).filter(Boolean))].join(" ");
+  const checked = unresolved && checks ? ` I checked/tried: ${checks}` : "";
+  return `My architecto ${claimsProductLabel(entry)} has this issue: ${symptoms}.${checked} The issue still remains. Please arrange a service check or advise on the next step.`;
+}
+
+function formatSuggestedClaimDescription(description) {
+  const normalized = normalizeText(description);
+  return normalized ? formatQuotedBlock("Suggested problem description", normalized) : "";
+}
+
+function buildClaimsChatbotKnowledgeAnswer({ language, question, entry, claim, selectedAreas, conversationMessages }) {
+  if (!entry) return null;
+  const decision = normalizeText(entry.chatbotDecision);
+  const unresolved = decision === "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED" && isUnresolvedClaimsSelfCheck(question);
+  const relatedEntries = collectRelatedClaimsEntries({ primaryEntry: entry, question, claim, selectedAreas, conversationMessages });
+  const evidence = combineEvidenceToRequest(relatedEntries);
+  const evidenceSection = evidence.length ? formatSection("Helpful claim evidence", evidence) : "";
+  const suggestedDescription = buildClaimsSuggestedDescription(entry, true, relatedEntries);
+  const safeUserCheck = claimsSafeUserCheck(entry);
+  const isOvenNotWorking =
+    normalizeText(entry?.itemType) === "oven"
+    && normalizeLanguageHintText(entry?.problem) === "appliance does not work";
+
+  if (decision === "NO_CLAIM_NORMAL") {
+    const abnormalEvidence = evidence.length
+      ? `If it is unusually loud, new, repeated, continuous, or combined with another fault, please add ${evidence.join(", ")} and continue with a claim.`
+      : "If it becomes abnormal, repeated, or combined with another fault, please continue with a claim.";
+    return {
+      answer: [
+        `For the architecto ${claimsProductLabel(entry)}, this can be normal: ${entry.problem}.`,
+        safeUserCheck,
+        `This can be normal behaviour and does not require a claim by itself. ${entry.claimTrigger}`,
+        abnormalEvidence,
+      ].filter(Boolean).join("\n\n"),
+    };
+  }
+
+  if (decision === "URGENT_CLAIM_STOP_USE") {
+    return {
+      answer: [
+        `For the architecto ${claimsProductLabel(entry)}, this needs urgent claim handling: ${entry.problem}.`,
+        "Stop using the appliance now. Do not open electrical parts, dismantle the appliance, bypass safety features, or keep testing it.",
+        safeUserCheck,
+        evidenceSection,
+        "Create or escalate the claim immediately.",
+      ].filter(Boolean).join("\n\n"),
+      actions: buildClaimFormHelpActions(language, buildClaimsClaimPrompt(entry)),
+      suggestedProblemDescription: suggestedDescription,
+    };
+  }
+
+  if (decision === "CREATE_CLAIM_SERVICE") {
+    return {
+      answer: [
+        `For the architecto ${claimsProductLabel(entry)}, this likely requires service/claim handling: ${entry.problem}.`,
+        `Safe check: ${safeUserCheck}`,
+        NO_FURTHER_SAFE_SELF_CHECK,
+        evidenceSection,
+      ].filter(Boolean).join("\n\n"),
+      actions: buildClaimFormHelpActions(language, buildClaimsClaimPrompt(entry)),
+      suggestedProblemDescription: suggestedDescription,
+    };
+  }
+
+  if (unresolved) {
+    return {
+      answer: [
+        `Since the issue is still present after the safe check, continue with a claim for the architecto ${claimsProductLabel(entry)}.`,
+        NO_FURTHER_SAFE_SELF_CHECK,
+        evidenceSection,
+        entry.claimTrigger,
+      ].filter(Boolean).join("\n\n"),
+      actions: buildClaimFormHelpActions(language, buildClaimsClaimPrompt(entry)),
+      suggestedProblemDescription: suggestedDescription,
+    };
+  }
+
+  if (isOvenNotWorking) {
+    return {
+      answer: [
+        "The oven not working can be a service issue.",
+        `You can safely check only the basic points: ${safeUserCheck}`,
+        `If the oven still does not work, ${NO_FURTHER_SAFE_SELF_CHECK}`,
+        evidenceSection,
+      ].filter(Boolean).join("\n\n"),
+      actions: buildClaimFormHelpActions(language, buildClaimsClaimPrompt(entry)),
+      suggestedProblemDescription: suggestedDescription,
+    };
+  }
+
+  return {
+    answer: [
+      `For the architecto ${claimsProductLabel(entry)}, try this safe self-check first: ${entry.problem}.`,
+      safeUserCheck,
+      `Did this solve the issue? If it did not, ${NO_FURTHER_SAFE_SELF_CHECK}`,
+    ].filter(Boolean).join("\n\n"),
+    actions: buildClaimFormHelpActions(language, buildClaimsClaimPrompt(entry)),
+  };
+}
+
 async function buildAnswer({ language, question, context, selectedAreas, claim, conversationMessages }) {
   const genericAnswer = buildGenericAnswer({ language, question, context, selectedAreas, claim });
   const wantsClaimFormHelp = isClaimFormHelpRequest(question) || isSampleWordingRequest(question);
@@ -3064,6 +3482,27 @@ async function buildAnswer({ language, question, context, selectedAreas, claim, 
 
   if (isClearlyOutOfScopeQuestion(question)) {
     return normalizeAssistantReturn(buildOutOfScopeAnswer(language));
+  }
+
+  if (!wantsClaimFormHelp) {
+    const claimsKnowledgeMatch = findClaimsChatbotKnowledgeMatch({
+      question,
+      claim,
+      selectedAreas,
+      conversationMessages,
+    });
+    if (claimsKnowledgeMatch) {
+      return normalizeAssistantReturn(
+        buildClaimsChatbotKnowledgeAnswer({
+          language,
+          question,
+          entry: claimsKnowledgeMatch,
+          claim,
+          selectedAreas,
+          conversationMessages,
+        }),
+      );
+    }
   }
 
   const dishwasherContext = enrichDishwasherContextWithConversation(
@@ -3298,6 +3737,11 @@ function buildClaimAssistantContextPayload({
     ),
     troubleshooting_guides: arrayValue(SERVICE_CLAIM_TROUBLESHOOTING_DATA?.guides),
     troubleshooting_lookup_entries: arrayValue(SERVICE_CLAIM_TROUBLESHOOTING_DATA?.lookupEntries),
+    claims_page_decision_guide: {
+      scope: CLAIMS_CHATBOT_KNOWLEDGE?.scope,
+      product_alias_map: arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.productAliasMap),
+      entries: arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries),
+    },
     database_knowledge_entries: arrayValue(knowledgeEntries),
     legacy_assistant_draft: legacyDraft,
   };
@@ -3305,9 +3749,6 @@ function buildClaimAssistantContextPayload({
 
 // This is prepared for future use. The current POST handler still uses the rule-based buildAnswer fallback.
 function canShowClaimFormHelpAction(legacyDraft, suggestedProblemDescription) {
-  if (normalizeText(suggestedProblemDescription)) {
-    return false;
-  }
   return Array.isArray(legacyDraft?.actions) && legacyDraft.actions.some((action) => action?.id === "claim_form_help");
 }
 
@@ -3418,7 +3859,7 @@ async function buildOpenAiAnswer({ language, question, context, selectedAreas, c
 
     return {
       answer: parsed.answer,
-      ...(parsed.showClaimFormHelpAction && canShowClaimFormHelpAction(legacyDraft, fallbackSuggestedProblemDescription)
+      ...(canShowClaimFormHelpAction(legacyDraft, fallbackSuggestedProblemDescription)
         ? { actions: buildClaimFormHelpActions(language, actionPrompt) }
         : {}),
       ...(fallbackSuggestedProblemDescription
@@ -3471,17 +3912,19 @@ export async function POST(request) {
         : buildAnswer(assistantInput)),
     );
 
-    const finalAnswer =
+    const finalAnswerRaw =
       language === "de" && detectExplicitLanguageSwitch(question) === "de"
         ? `Natürlich, ich kann auf Deutsch antworten.\n\n${built.answer}`
         : built.answer;
+
+    const finalAnswer = replaceArchitectoBrandCopy(finalAnswerRaw);
 
     const payload = { answer: finalAnswer, language };
     if (built.actions?.length) {
       payload.actions = built.actions;
     }
     if (built.suggestedProblemDescription) {
-      payload.suggestedProblemDescription = built.suggestedProblemDescription;
+      payload.suggestedProblemDescription = replaceArchitectoBrandCopy(built.suggestedProblemDescription);
     }
 
     return NextResponse.json(payload);
