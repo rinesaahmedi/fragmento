@@ -44,6 +44,13 @@ function booleanFromFormValue(value) {
   return normalized === "true" || normalized === "1" || normalized === "yes" || normalized === "on";
 }
 
+function parseSerialNumberEntries(value) {
+  return String(value || "")
+    .split(/\r?\n|,|;/)
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+}
+
 function mergeProblemAreasIntoDescription(problemDescription, problemAreasJsonRaw) {
   const base = String(problemDescription || "").trim();
   if (descriptionHasClientKitchenAreasLine(base)) {
@@ -977,6 +984,12 @@ export async function POST(request) {
     }
     const rawSerialNumber = optionalString(body.serialNumber);
     const hasSerialNumberImage = booleanFromFormValue(body.hasSerialNumberImage);
+    if (parsedProblemAreas.length > 0 && parseSerialNumberEntries(rawSerialNumber).length < parsedProblemAreas.length) {
+      return NextResponse.json(
+        { error: `Please provide at least ${parsedProblemAreas.length} serial number(s) for the selected kitchen item(s).` },
+        { status: 400 },
+      );
+    }
     if (!rawSerialNumber && !hasSerialNumberImage) {
       return NextResponse.json(
         { error: "Please provide a serial number or upload a serial number photo." },

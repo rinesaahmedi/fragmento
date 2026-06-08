@@ -21,9 +21,15 @@ export function splitPersonName(fullName) {
 export function buildServiceClaimAutofillFromContract(contract) {
   const address = contract?.address || {};
   const landlord = contract?.landlord || {};
+  const registration = contract?.registration || {};
   const contact = splitPersonName(landlord.managerName);
+  const customer = splitPersonName(registration.fullName);
 
   return {
+    givenName: String(customer.givenName || "").trim(),
+    surname: String(customer.surname || "").trim(),
+    phone: String(registration.phone || "").trim(),
+    email: String(registration.email || "").trim(),
     clientCountry: String(address.country || "").trim(),
     clientAddressLine1: String(address.address1 || "").trim(),
     clientAddressLine2: String(address.address2 || "").trim(),

@@ -26,6 +26,11 @@ export async function getServiceClaimContractDetails(contractNumber) {
         orderBy: [{ createdAt: "desc" }, { id: "desc" }],
         take: 1,
       },
+      registrations: {
+        where: { isActive: true },
+        orderBy: [{ registeredAt: "desc" }, { id: "desc" }],
+        take: 1,
+      },
     },
   });
 
@@ -35,6 +40,7 @@ export async function getServiceClaimContractDetails(contractNumber) {
 
   const propertyObject = contract.project?.propertyObject || null;
   const latestOrder = contract.orders?.[0] || null;
+  const activeRegistration = contract.registrations?.[0] || null;
   const hasPropertyObjectAddress = Boolean(
     propertyObject?.address1
     || propertyObject?.address2
@@ -91,6 +97,15 @@ export async function getServiceClaimContractDetails(contractNumber) {
           email: housingCompany.email || "",
           phone: housingCompany.phone || "",
           managerName: contract.project?.managerName || "",
+        }
+      : null,
+    registration: activeRegistration
+      ? {
+          fullName: activeRegistration.fullName || "",
+          email: activeRegistration.email || "",
+          phone: activeRegistration.phone || "",
+          addressNote: activeRegistration.addressNote || "",
+          registeredAt: activeRegistration.registeredAt,
         }
       : null,
   };

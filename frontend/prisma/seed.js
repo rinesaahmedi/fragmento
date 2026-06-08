@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const { randomUUID } = require("crypto");
 const { PrismaClient, KitchenStatus, ItemType } = require("@prisma/client");
+const CLAIMS_CHATBOT_KNOWLEDGE = require("../lib/claims-chatbot-knowledge.json");
 const SERVICE_CLAIM_TROUBLESHOOTING_DATA = require("../lib/service-claim-troubleshooting-data.json");
 
 const prisma = new PrismaClient();
@@ -150,6 +151,7 @@ const PRODUCT_INFO_BY_CODE = {
 
 PRODUCT_INFO_BY_CODE["DISH-B-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-C-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["DISH-LS-600-STD"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = {
   ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"],
   productInfoKeyFacts: [
@@ -195,6 +197,7 @@ PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"] = {
     "- Vor der Bestellung Wandposition, Kaminschacht und Luftfuehrung pruefen.",
   ].join("\n"),
 };
+PRODUCT_INFO_BY_CODE["HOOD-LS-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
 PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
   productImagePath: PRODUCT_IMAGE_FILES.oven,
@@ -316,6 +319,28 @@ const MODEL_C_ITEMS = [
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
+const L_SHAPED_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-LS-400", name: "H4002L Wall Cabinet left (400 x 723 mm)", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 10, infoText: "H4002L, 1 door, 2 adjustable shelves", articleNumber: "H4002L" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-LS-600", name: "HD6002L Hood Wall Cabinet (600 x 723 mm)", price: "139.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 20, infoText: "HD6002L, wall cabinet for light hood, 1 door, 2 adjustable shelves", articleNumber: "HD6002L" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-LS-500", name: "H5002R Wall Cabinet right (500 x 723 mm)", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 30, infoText: "H5002R, 1 door, 2 adjustable shelves", articleNumber: "H5002R" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-LS-600", name: "H6002R Wall Cabinet right (600 x 723 mm)", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#ff7f9f", componentKey: "wall-cabinet-4", sortOrder: 40, infoText: "H6002R, 1 door, 2 adjustable shelves", articleNumber: "H6002R" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-LS-FH664621E", name: "FH664621E Flat Pull-Out Extractor Hood (173 x 599 x 303 mm)", price: "349.00", iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "under-cabinet-light", sortOrder: 50, infoText: "Flat pull-out hood, 60 cm, max. 415 m3/h, energy class A", articleNumber: "FH664621E" },
+  { itemType: ItemType.COMPONENT, code: "REF-LS-KGCN388140E", name: "Kuehl-/Gefrierkombi (545 x 1800 mm)", price: "579.00", iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 60, infoText: "OL-KGCN388140E, freestanding fridge-freezer, 180 cm, stainless-steel look, energy class D", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "TOP-LS-PLR", name: "PLR Worktops (40 mm, 1571 x 600 mm + 2200 x 800 mm)", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 70, infoText: "PLR worktop, 40 mm, Beton-Optik Schiefer dunkelgrau / Beton-Optik natur", articleNumber: "PLR60 / PLR80" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-LS-400", name: "US40L Base Cabinet left (400 x 723 mm)", price: "199.00", iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 80, infoText: "US40L, 1 drawer, 1 door, 1 adjustable shelf", articleNumber: "US40L" },
+  { itemType: ItemType.COMPONENT, code: "OVEN-LS-600-HOB", name: "Built-in Oven and Ceramic Hob with UHK Base (600 x 600 mm)", price: "449.00", iconKey: "oven_base", colorKey: "#00c76a", componentKey: "oven-base", sortOrder: 90, infoText: "UHK oven base with EH92364E-A oven + 9EC744100C ceramic hob; oven niche 600 x 560 x 560 mm", articleNumber: "UHK / EH92364E-A / 9EC744100C" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-LS-500", name: "US50R Base Cabinet right (500 x 723 mm)", price: "199.00", iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 100, infoText: "US50R, 1 drawer, 1 door, 1 adjustable shelf", articleNumber: "US50R" },
+  { itemType: ItemType.COMPONENT, code: "CORNER-LS-650", name: "UPEF65 Corner Filler (560 x 650 mm)", price: "0.00", iconKey: "base_cabinet_30", colorKey: "springgreen", componentKey: "corner-base", sortOrder: 110, infoText: "Corner filler for base cabinets, 723 mm high, 90 degrees", articleNumber: "UPEF65" },
+  { itemType: ItemType.COMPONENT, code: "SINKBASE-LS-600", name: "SP60L Sink Base Cabinet (600 x 723 mm)", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "base-module-3", sortOrder: 120, infoText: "SP60L, 1 door, fixed inner front panel", articleNumber: "SP60L" },
+  { itemType: ItemType.COMPONENT, code: "CAB-DRAWER-LS-300", name: "US2A30 Base Cabinet with Drawers (300 x 723 mm)", price: "229.00", iconKey: "drawer_base_three", colorKey: "#ffbf00", componentKey: "drawer-base", sortOrder: 140, infoText: "US2A30, 1 drawer, 2 pull-outs", articleNumber: "US2A30" },
+  { itemType: ItemType.ACCESSORY, code: "DISH-LS-600-STD", name: "A-EGSPV597210 Integrated Dishwasher with TGV60 Front", price: "579.00", iconKey: "dishwasher_base", sortOrder: 190, infoText: "Fully integrated dishwasher, 60 cm, 12 place settings, energy class D", articleNumber: "A-EGSPV597210 / TGV60" },
+  { itemType: ItemType.ACCESSORY, code: "SINK-LS-TIPO45", name: "BLANCO TIPO 45 S Sink", price: "89.00", iconKey: "sink_faucet", sortOrder: 200, infoText: "Stainless steel natural finish, reversible, undermount dimension 450 mm", articleNumber: "526335" },
+  { itemType: ItemType.ACCESSORY, code: "TAP-LS-DARAS-F-HD", name: "BLANCO DARAS-F HD Tap", price: "0.00", iconKey: "sink_faucet", sortOrder: 210, infoText: "Chrome high-pressure tap, 360 degree swivel spout, 35 mm tap hole", articleNumber: "521751" },
+  { itemType: ItemType.ACCESSORY, code: "FILTER-LS-FWK124", name: "FWK124 Charcoal Filter Set", price: "0.00", iconKey: "extractor_hood", sortOrder: 220, infoText: "2 charcoal filters, 124 x 124 x 33.6 mm", articleNumber: "FWK124" },
+  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
 const DEFAULT_KITCHENS = [
   {
     slug: "fragmento-default",
@@ -335,15 +360,63 @@ const DEFAULT_KITCHENS = [
     description: "Two-part layout with separated zones for flexibility",
     items: MODEL_C_ITEMS,
   },
+  {
+    slug: "l-shaped-kitchen",
+    name: "L-Shaped Kitchen",
+    description: "L-shaped layout based on offer 670 105805 with return worktop and integrated appliances",
+    items: L_SHAPED_ITEMS,
+  },
 ];
 
 const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "736267", kitchenSlug: "fragmento-default" },
   { contractNumber: "736268", kitchenSlug: "kitchen-model-b" },
   { contractNumber: "736269", kitchenSlug: "kitchen-model-c" },
+  { contractNumber: "736270", kitchenSlug: "l-shaped-kitchen" },
 ];
 
-const SERVICE_CLAIM_KNOWLEDGE_ENTRIES = SERVICE_CLAIM_TROUBLESHOOTING_DATA.lookupEntries;
+function normalizeSeedSlug(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 96);
+}
+
+function mapClaimsDecisionGuideEntry(entry) {
+  const priorityByDecision = {
+    URGENT_CLAIM_STOP_USE: 130,
+    CREATE_CLAIM_SERVICE: 115,
+    SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED: 100,
+    NO_CLAIM_NORMAL: 70,
+  };
+
+  return {
+    slug: `claims-guide-${normalizeSeedSlug(entry.id || `${entry.productCode}-${entry.problem}`)}`,
+    brand: "Amica",
+    applianceType: entry.itemType,
+    topicType: "claims_decision_guide",
+    code: null,
+    titleKey: entry.problem,
+    symptomKeys: [entry.problem],
+    checkKeys: [entry.safeUserCheck].filter(Boolean),
+    causeKeys: [entry.possibleCause].filter(Boolean),
+    actionKeys: [entry.claimTrigger, entry.chatbotDecision].filter(Boolean),
+    triggerTerms: [
+      ...new Set([
+        ...(Array.isArray(entry.aliases) ? entry.aliases : []),
+        ...(Array.isArray(entry.matchTerms) ? entry.matchTerms : []),
+      ]),
+    ],
+    priority: priorityByDecision[entry.chatbotDecision] || 80,
+    isActive: true,
+  };
+}
+
+const SERVICE_CLAIM_KNOWLEDGE_ENTRIES = [
+  ...SERVICE_CLAIM_TROUBLESHOOTING_DATA.lookupEntries,
+  ...CLAIMS_CHATBOT_KNOWLEDGE.entries.map(mapClaimsDecisionGuideEntry),
+];
 
 const DEFAULT_PROPERTY_OWNERS = [
   { name: "Anna Schmidt Housing GmbH", email: "anna.schmidt@example.com", phone: "+49 30 555 0101", objectName: "Building A", country: "Germany", city: "Berlin", postalCode: "10115", address1: "Invalidenstrasse 10" },

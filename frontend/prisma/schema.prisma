@@ -125,9 +125,33 @@ model KitchenContract {
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   orders         Order[]
+  registrations  KitchenRegistration[]
 
   @@index([kitchenId])
   @@index([projectId])
+}
+
+model KitchenRegistration {
+  id                String          @id @default(cuid())
+  kitchenContractId String
+  kitchenContract   KitchenContract @relation(fields: [kitchenContractId], references: [id], onDelete: Cascade)
+  fullName          String
+  email             String?
+  phone             String?
+  addressNote       String?
+  isActive          Boolean         @default(true)
+  verificationCodeHash String?
+  verificationExpiresAt DateTime?
+  verificationAttempts Int          @default(0)
+  verifiedAt        DateTime?
+  registeredAt      DateTime        @default(now())
+  deactivatedAt     DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([kitchenContractId, isActive])
+  @@index([email])
+  @@index([phone])
 }
 
 model HousingCompany {
