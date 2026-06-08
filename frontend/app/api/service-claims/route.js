@@ -268,25 +268,37 @@ async function sendComplaintEmail(payload, attachmentParts = []) {
 
   const kitchenPreviewAttachment = await buildClaimKitchenPreviewAttachment(payload);
   const logoAttachment = await buildLogoAttachment();
-  const userFiles = attachmentParts.map((part) => ({
+  const emailAttachmentParts = attachmentParts.map((part, index) => ({
+    ...part,
+    cid: isEmailInlineImage(part.contentType) ? buildUserAttachmentCid(payload.id, index) : "",
+  }));
+  const userFiles = emailAttachmentParts.map((part) => ({
     filename: part.filename,
     content: part.content,
     contentType: part.contentType,
-    contentDisposition: "attachment",
+    ...(part.cid ? { cid: part.cid } : {}),
+    contentDisposition: part.cid ? "inline" : "attachment",
   }));
   const attachments = [
     ...(logoAttachment ? [logoAttachment] : []),
     ...(kitchenPreviewAttachment ? [kitchenPreviewAttachment] : []),
     ...userFiles,
   ];
+  const emailPayload = {
+    ...payload,
+    attachmentsMeta: (payload.attachmentsMeta || []).map((entry, index) => ({
+      ...entry,
+      cid: emailAttachmentParts[index]?.cid || "",
+    })),
+  };
 
   await transporter.sendMail({
     from: `"Fragmento" <${smtpFrom}>`,
     to: recipient,
     subject: `Reklamation ${payload.contractNumber} - ${payload.customerDisplayName}`,
     replyTo: payload.email || undefined,
-    text: buildComplaintEmailText(payload),
-    html: `${buildComplaintEmailLogoHtml(Boolean(logoAttachment))}${buildComplaintEmailHtml(payload, kitchenPreviewAttachment?.cid || "")}`,
+    text: buildComplaintEmailText(emailPayload),
+    html: `${buildComplaintEmailLogoHtml(Boolean(logoAttachment))}${buildComplaintEmailHtml(emailPayload, kitchenPreviewAttachment?.cid || "")}`,
     attachments,
   });
 
@@ -345,14 +357,124 @@ function extractAvailabilityFromDescription(description) {
   return { description: cleaned, availability };
 }
 
-function buildSelectedKitchenAreaLines(problemAreasJson) {
-  return parseServiceClaimProblemAreas(problemAreasJson)
-    .map((area) => {
-      const base = formatServiceClaimProblemArea(area);
-      const detail = String(area?.detail || "").trim();
-      return detail ? `${base}: ${detail}` : base;
-    })
-    .filter(Boolean);
+function stripSelectedKitchenAreasFromProblemText(description) {
+  let text = String(description || "").trim();
+  if (!text) {
+    return "";
+  }
+
+  for (const prefix of KITCHEN_AREA_FIRST_LINE_PREFIXES) {
+    if (text.startsWith(prefix)) {
+      const lines = text.split("\n");
+      let index = 1;
+      while (index < lines.length && lines[index].trim()) {
+        index += 1;
+      }
+      return lines.slice(index).join("\n").trim();
+    }
+  }
+
+  if (text.startsWith("AusgewÃ¤hlte KÃ¼chenbereiche:")) {
+    const lines = text.split("\n");
+    let index = 1;
+    while (index < lines.length && lines[index].trim().startsWith("-")) {
+      index += 1;
+    }
+    return lines.slice(index).join("\n").trim();
+  }
+
+  return text;
+}
+
+function isEmailInlineImage(contentType) {
+  const normalized = String(contentType || "").toLowerCase().split(";")[0].trim();
+  return normalized.startsWith("image/") && normalized !== "image/svg+xml";
+}
+
+function buildUserAttachmentCid(claimId, index) {
+  return `claim-upload-${String(claimId || "claim").replace(/[^a-z0-9-]/gi, "")}-${index}@fragmento`;
+}
+
+function formatAttachmentMetaLine(entry) {
+  return `${formatAttachmentLabel(entry)} (${entry.contentType}, ${formatEmailFileSize(entry.size)})`;
+}
+
+function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
+  const attachmentsByComponentId = new Map();
+  const orphanProblemAreaAttachments = [];
+
+  for (const entry of attachmentsMeta || []) {
+    if (entry?.role !== "problem_area") {
+      continue;
+    }
+    const componentId = String(entry.areaComponentId || "").trim();
+    if (!componentId) {
+      orphanProblemAreaAttachments.push(entry);
+      continue;
+    }
+    const list = attachmentsByComponentId.get(componentId) || [];
+    list.push(entry);
+    attachmentsByComponentId.set(componentId, list);
+  }
+
+  const rows = parseServiceClaimProblemAreas(problemAreasJson).map((area) => {
+    const componentId = String(area.componentId || "").trim();
+    return {
+      label: formatServiceClaimProblemArea(area),
+      detail: String(area.detail || "").trim(),
+      attachments: componentId ? attachmentsByComponentId.get(componentId) || [] : [],
+    };
+  });
+
+  for (const entry of orphanProblemAreaAttachments) {
+    const areaLabel = [entry.areaName, entry.areaCode ? `(${entry.areaCode})` : ""].filter(Boolean).join(" ").trim();
+    rows.push({
+      label: areaLabel || "Kuechenteil",
+      detail: "",
+      attachments: [entry],
+    });
+  }
+
+  return rows;
+}
+
+function buildClaimItemText(row) {
+  return [
+    row.label || "-",
+    row.detail ? `Problem: ${row.detail}` : "",
+    row.attachments?.length
+      ? [
+          "Anhaenge:",
+          ...row.attachments.map((entry) => `  - ${formatAttachmentMetaLine(entry)}`),
+        ].join("\n")
+      : "Anhaenge: -",
+  ].filter(Boolean).join("\n");
+}
+
+function buildClaimItemHtml(row) {
+  return [
+    `<strong>${escapeHtml(row.label || "-")}</strong>`,
+    row.detail ? `<div style="margin-top:4px;">Problem: ${formatMultiline(row.detail)}</div>` : "",
+    `<div style="margin-top:6px;"><strong>Anhaenge:</strong><br />${
+      row.attachments?.length
+        ? row.attachments.map(formatAttachmentHtml).join("")
+        : "-"
+    }</div>`,
+  ].filter(Boolean).join("");
+}
+
+function formatAttachmentHtml(entry) {
+  const label = escapeHtml(formatAttachmentMetaLine(entry));
+  if (!entry?.cid || !isEmailInlineImage(entry.contentType)) {
+    return `<div style="margin-top:4px;">${label}</div>`;
+  }
+
+  return `
+    <div style="margin-top:8px;">
+      <div style="margin-bottom:6px;">${label}</div>
+      <img src="cid:${escapeHtml(entry.cid)}" alt="${escapeHtml(entry.filename || "Uploaded image")}" style="display:block;width:100%;max-width:220px;height:auto;border:1px solid #e5e5e5;border-radius:6px;" />
+    </div>
+  `;
 }
 
 let serviceClaimInsertColumnSupportPromise = null;
@@ -562,7 +684,10 @@ function buildComplaintEmailText(payload) {
   const { description: problemText, availability } = extractAvailabilityFromDescription(
     payload.problemDescription,
   );
-  const selectedAreas = buildSelectedKitchenAreaLines(payload.problemAreasJson);
+  const standaloneProblemText = stripSelectedKitchenAreasFromProblemText(problemText);
+  const claimItemRows = buildClaimItemRows(payload.problemAreasJson, payload.attachmentsMeta);
+  const serialNumberAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "serial_number");
+  const generalAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "general");
   return [
     "Servicereklamation",
     "",
@@ -573,11 +698,22 @@ function buildComplaintEmailText(payload) {
     `Telefon: ${payload.phone || "—"}`,
     `E-Mail: ${payload.email || "—"}`,
     `Seriennummer: ${payload.serialNumber}`,
-    ...(selectedAreas.length
+    ...(serialNumberAttachments.length
       ? [
           "",
-          "Ausgewaehltes Kuechenteil",
-          ...selectedAreas.map((entry) => `- ${entry}`),
+          "Seriennummer-Anhaenge",
+          ...serialNumberAttachments.map((entry) => `- ${formatAttachmentMetaLine(entry)}`),
+        ]
+      : []),
+    ...(claimItemRows.length
+      ? [
+          "",
+          "Ausgewaehlte Kuechenteile",
+          ...claimItemRows.flatMap((row, index) => [
+            "",
+            `Kuechenteil ${index + 1}:`,
+            buildClaimItemText(row),
+          ]),
         ]
       : []),
     "",
@@ -588,16 +724,13 @@ function buildComplaintEmailText(payload) {
     hausBlock,
     "",
     "Problem",
-    problemText,
+    standaloneProblemText || "-",
     ...(availability ? ["", `Erreichbarkeit: ${availability}`] : []),
-    ...(payload.attachmentsMeta?.length
+    ...(generalAttachments.length
       ? [
           "",
-          "Anhaenge (siehe E-Mail-Anhaenge):",
-          ...payload.attachmentsMeta.map(
-            (entry) =>
-              `- ${formatAttachmentLabel(entry)} (${entry.contentType}, ${formatEmailFileSize(entry.size)})`,
-          ),
+          "Allgemeine Anhaenge (siehe E-Mail-Anhaenge):",
+          ...generalAttachments.map((entry) => `- ${formatAttachmentMetaLine(entry)}`),
         ]
       : []),
   ].join("\n");
@@ -637,7 +770,10 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
   const { description: problemText, availability } = extractAvailabilityFromDescription(
     payload.problemDescription,
   );
-  const selectedAreas = buildSelectedKitchenAreaLines(payload.problemAreasJson);
+  const standaloneProblemText = stripSelectedKitchenAreasFromProblemText(problemText);
+  const claimItemRows = buildClaimItemRows(payload.problemAreasJson, payload.attachmentsMeta);
+  const serialNumberAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "serial_number");
+  const generalAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "general");
   const detailRows = [
     ["Vertragsnummer", payload.contractNumber],
     ["Kueche", payload.kitchenName || "-"],
@@ -648,32 +784,32 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],
     ["Seriennummer", payload.serialNumber],
-    ["Ausgewähltes Küchenteil", selectedAreas.length ? selectedAreas.join("\n") : "-"],
+    ...(serialNumberAttachments.length
+      ? [["Seriennummer-Anhaenge", serialNumberAttachments.map(formatAttachmentMetaLine).join("\n")]]
+      : []),
+    ...claimItemRows.map((row, index) => [`Kuechenteil ${index + 1}`, { html: buildClaimItemHtml(row) }]),
     ["Vermieter", landlordValue],
     ["Hausmeister", hausValue],
-    ["Problem", problemText],
+    ["Problem", standaloneProblemText || "-"],
     ...(availability ? [["Erreichbarkeit", availability]] : []),
   ];
 
   const tbody = detailRows
     .map(
-      ([label, value]) =>
-        `<tr><td style="${tdStyles}font-weight:bold;width:35%;">${escapeHtml(label)}</td><td style="${tdStyles}">${formatMultiline(
-          value,
-        )}</td></tr>`,
+      ([label, value]) => {
+        const renderedValue = value && typeof value === "object" && "html" in value
+          ? value.html
+          : formatMultiline(value);
+        return `<tr><td style="${tdStyles}font-weight:bold;width:35%;">${escapeHtml(label)}</td><td style="${tdStyles}">${renderedValue}</td></tr>`;
+      },
     )
     .join("");
 
   const attachmentsRow =
-    payload.attachmentsMeta?.length > 0
-      ? `<tr><td style="${tdStyles}font-weight:bold;width:35%;">Anhaenge</td><td style="${tdStyles}">${payload.attachmentsMeta
-          .map(
-            (entry) =>
-              `${escapeHtml(formatAttachmentLabel(entry))} (${escapeHtml(entry.contentType)}, ${escapeHtml(
-                formatEmailFileSize(entry.size),
-              )})`,
-          )
-          .join("<br />")}</td></tr>`
+    generalAttachments.length > 0
+      ? `<tr><td style="${tdStyles}font-weight:bold;width:35%;">Allgemeine Anhaenge</td><td style="${tdStyles}">${generalAttachments
+          .map(formatAttachmentHtml)
+          .join("")}</td></tr>`
       : "";
   const previewBlock = previewCid
     ? `

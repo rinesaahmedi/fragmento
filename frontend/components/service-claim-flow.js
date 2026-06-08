@@ -235,12 +235,13 @@ const COPY = {
     registerPanelText: "Trage die Kaufvertragsnummer, deine Kontaktdaten und die Wohnungsdaten zur Pr\u00fcfung ein. Die Nummer bleibt gleich, aber die aktive Registrierung wechselt zu dir.",
     registerFullName: "Vollst\u00e4ndiger Name",
     registerFullNamePlaceholder: "Vorname Nachname",
+    registerFullNameRequired: "Bitte gib deinen vollst\u00e4ndigen Namen ein.",
     registerAddressNote: "Adresse / Wohnung",
     registerAddressNotePlaceholder: "Optional: Adresse, Etage oder Wohnungsnummer",
     registerEmailRequired: "Bitte gib eine E-Mail-Adresse f\u00fcr die Best\u00e4tigung ein.",
-    registerVerificationPostalCode: "Postleitzahl zur Pr\u00fcfung",
+    registerVerificationPostalCode: "Postleitzahl",
     registerVerificationPostalCodePlaceholder: "z. B. 10115",
-    registerVerificationUnit: "Stra\u00dfe / Wohnung zur Pr\u00fcfung",
+    registerVerificationUnit: "Stra\u00dfe / Wohnung",
     registerVerificationUnitPlaceholder: "z. B. Demo Street 2",
     registerVerificationRequired: "Bitte gib Postleitzahl und Stra\u00dfe, Wohnung oder Etage zur Pr\u00fcfung ein.",
     registerCode: "E-Mail-Code",
@@ -430,12 +431,13 @@ const COPY = {
     registerPanelText: "Enter the purchase contract number, your contact details, and the apartment details for verification. The contract number stays the same, but the active registration moves to you.",
     registerFullName: "Full name",
     registerFullNamePlaceholder: "First name Last name",
+    registerFullNameRequired: "Please enter your full name.",
     registerAddressNote: "Address / apartment",
     registerAddressNotePlaceholder: "Optional: address, floor, or apartment number",
     registerEmailRequired: "Please provide an email address for verification.",
-    registerVerificationPostalCode: "Verification postal code",
+    registerVerificationPostalCode: "Postal code",
     registerVerificationPostalCodePlaceholder: "e.g. 10115",
-    registerVerificationUnit: "Verification street / apartment",
+    registerVerificationUnit: "Street / apartment",
     registerVerificationUnitPlaceholder: "e.g. Demo Street 2",
     registerVerificationRequired: "Please enter the postal code and street, apartment, or floor for verification.",
     registerCode: "Email code",
@@ -616,6 +618,33 @@ const COPY = {
     complaintTitle: "\u015eikayet bildir",
     complaintBrand: "ARCHITECTO SERVICE CENTER",
     complaintText: "Hasar, ar\u0131za veya eksik par\u00e7alar i\u00e7in \u015fikayet formunu kullan\u0131n ve durumu deste\u011fe g\u00f6nderin.",
+    registerBadge: "Kay\u0131t",
+    registerTitle: "Mutfa\u011f\u0131m\u0131 kaydet",
+    registerBrand: "ARCHITECTO KAYIT",
+    registerText: "Sat\u0131n alma s\u00f6zle\u015fme numaras\u0131n\u0131 mevcut ileti\u015fim bilgilerinizle ba\u011flay\u0131n.",
+    registerCta: "\u015eimdi kaydet",
+    registerPanelTitle: "Bu mutfa\u011f\u0131 bana kaydet",
+    registerPanelText: "Sat\u0131n alma s\u00f6zle\u015fme numaras\u0131n\u0131, ileti\u015fim bilgilerinizi ve daire bilgilerini girin. S\u00f6zle\u015fme numaras\u0131 ayn\u0131 kal\u0131r, aktif kay\u0131t size ge\u00e7er.",
+    registerFullName: "Ad soyad",
+    registerFullNamePlaceholder: "Ad Soyad",
+    registerFullNameRequired: "L\u00fctfen ad\u0131n\u0131z\u0131 ve soyad\u0131n\u0131z\u0131 girin.",
+    registerAddressNote: "Adres / daire",
+    registerAddressNotePlaceholder: "\u0130ste\u011fe ba\u011fl\u0131: adres, kat veya daire numaras\u0131",
+    registerEmailRequired: "L\u00fctfen onay i\u00e7in bir e-posta adresi girin.",
+    registerVerificationPostalCode: "Posta kodu",
+    registerVerificationPostalCodePlaceholder: "\u00f6rn. 10115",
+    registerVerificationUnit: "Sokak / daire",
+    registerVerificationUnitPlaceholder: "\u00f6rn. Demo Street 2",
+    registerVerificationRequired: "L\u00fctfen posta kodunu ve sokak, daire veya kat bilgisini girin.",
+    registerCode: "E-posta kodu",
+    registerCodePlaceholder: "6 haneli kod",
+    registerCodeRequired: "L\u00fctfen e-posta kodunu girin.",
+    registerVerifySubmit: "Kayd\u0131 onayla",
+    registerVerifySubmitting: "Onaylan\u0131yor...",
+    registerSubmit: "Mutfa\u011f\u0131 kaydet",
+    registerSubmitting: "Kaydediliyor...",
+    registerSuccess: "Bu mutfak art\u0131k sizin ad\u0131n\u0131za kay\u0131tl\u0131.",
+    registerError: "Mutfak kaydedilemedi.",
     purchasePanelTitle: "Sat\u0131n alma ak\u0131\u015f\u0131na devam et",
     purchasePanelText: "Kirac\u0131n\u0131n \u015fikayet yerine ek \u00fcr\u00fcnlere ihtiyac\u0131 varsa, yap\u0131land\u0131r\u0131c\u0131ya devam edin.",
     openConfigurator: "Yap\u0131land\u0131r\u0131c\u0131y\u0131 a\u00e7",
@@ -757,6 +786,33 @@ const COPY = {
     complaintTitle: "Enviar reclamaci\u00f3n",
     complaintBrand: "ARCHITECTO SERVICE CENTER",
     complaintText: "Para da\u00f1os, defectos o piezas faltantes, usa el formulario de reclamaci\u00f3n y env\u00eda el caso a soporte.",
+    registerBadge: "Registro",
+    registerTitle: "Registrar mi cocina",
+    registerBrand: "REGISTRO ARCHITECTO",
+    registerText: "Vincula el n\u00famero de contrato de compra con tus datos de contacto actuales.",
+    registerCta: "Registrar ahora",
+    registerPanelTitle: "Registrar esta cocina a mi nombre",
+    registerPanelText: "Introduce el n\u00famero de contrato de compra, tus datos de contacto y los datos del apartamento. El n\u00famero de contrato permanece igual, pero el registro activo pasa a tu nombre.",
+    registerFullName: "Nombre completo",
+    registerFullNamePlaceholder: "Nombre Apellidos",
+    registerFullNameRequired: "Introduce tu nombre completo.",
+    registerAddressNote: "Direcci\u00f3n / apartamento",
+    registerAddressNotePlaceholder: "Opcional: direcci\u00f3n, piso o n\u00famero de apartamento",
+    registerEmailRequired: "Introduce una direcci\u00f3n de correo para la confirmaci\u00f3n.",
+    registerVerificationPostalCode: "C\u00f3digo postal",
+    registerVerificationPostalCodePlaceholder: "p. ej. 10115",
+    registerVerificationUnit: "Calle / apartamento",
+    registerVerificationUnitPlaceholder: "p. ej. Demo Street 2",
+    registerVerificationRequired: "Introduce el c\u00f3digo postal y la calle, apartamento o piso.",
+    registerCode: "C\u00f3digo de correo",
+    registerCodePlaceholder: "C\u00f3digo de 6 d\u00edgitos",
+    registerCodeRequired: "Introduce el c\u00f3digo recibido por correo.",
+    registerVerifySubmit: "Confirmar registro",
+    registerVerifySubmitting: "Confirmando...",
+    registerSubmit: "Registrar cocina",
+    registerSubmitting: "Registrando...",
+    registerSuccess: "Esta cocina ya est\u00e1 registrada a tu nombre.",
+    registerError: "No se pudo registrar la cocina.",
     purchasePanelTitle: "Continuar al proceso de compra",
     purchasePanelText: "Si el inquilino necesita art\u00edculos adicionales en lugar de una reclamaci\u00f3n, contin\u00faa al configurador.",
     openConfigurator: "Abrir configurador",
@@ -898,6 +954,33 @@ const COPY = {
     complaintTitle: "D\u00e9poser une r\u00e9clamation",
     complaintBrand: "ARCHITECTO SERVICE CENTER",
     complaintText: "Pour un dommage, un d\u00e9faut ou une pi\u00e8ce manquante, utilisez le formulaire de r\u00e9clamation et envoyez le dossier au support.",
+    registerBadge: "Enregistrement",
+    registerTitle: "Enregistrer ma cuisine",
+    registerBrand: "ENREGISTREMENT ARCHITECTO",
+    registerText: "Associez le num\u00e9ro de contrat d'achat \u00e0 vos coordonn\u00e9es actuelles.",
+    registerCta: "Enregistrer maintenant",
+    registerPanelTitle: "Enregistrer cette cuisine \u00e0 mon nom",
+    registerPanelText: "Saisissez le num\u00e9ro de contrat d'achat, vos coordonn\u00e9es et les informations de l'appartement. Le num\u00e9ro de contrat reste le m\u00eame, mais l'enregistrement actif passe \u00e0 votre nom.",
+    registerFullName: "Nom complet",
+    registerFullNamePlaceholder: "Pr\u00e9nom Nom",
+    registerFullNameRequired: "Veuillez saisir votre nom complet.",
+    registerAddressNote: "Adresse / appartement",
+    registerAddressNotePlaceholder: "Facultatif : adresse, \u00e9tage ou num\u00e9ro d'appartement",
+    registerEmailRequired: "Veuillez saisir une adresse e-mail pour la confirmation.",
+    registerVerificationPostalCode: "Code postal",
+    registerVerificationPostalCodePlaceholder: "ex. 10115",
+    registerVerificationUnit: "Rue / appartement",
+    registerVerificationUnitPlaceholder: "ex. Demo Street 2",
+    registerVerificationRequired: "Veuillez saisir le code postal et la rue, l'appartement ou l'\u00e9tage.",
+    registerCode: "Code e-mail",
+    registerCodePlaceholder: "Code \u00e0 6 chiffres",
+    registerCodeRequired: "Veuillez saisir le code re\u00e7u par e-mail.",
+    registerVerifySubmit: "Confirmer l'enregistrement",
+    registerVerifySubmitting: "Confirmation...",
+    registerSubmit: "Enregistrer la cuisine",
+    registerSubmitting: "Enregistrement...",
+    registerSuccess: "Cette cuisine est maintenant enregistr\u00e9e \u00e0 votre nom.",
+    registerError: "La cuisine n'a pas pu \u00eatre enregistr\u00e9e.",
     purchasePanelTitle: "Continuer vers le processus d'achat",
     purchasePanelText: "Si le locataire a besoin d'articles suppl\u00e9mentaires plut\u00f4t que d'une r\u00e9clamation, continuez vers le configurateur.",
     openConfigurator: "Ouvrir le configurateur",
@@ -1039,6 +1122,33 @@ const COPY = {
     complaintTitle: "\u041f\u043e\u0434\u0430\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e",
     complaintBrand: "ARCHITECTO SERVICE CENTER",
     complaintText: "\u0414\u043b\u044f \u043f\u043e\u0432\u0440\u0435\u0436\u0434\u0435\u043d\u0438\u0439, \u0434\u0435\u0444\u0435\u043a\u0442\u043e\u0432 \u0438\u043b\u0438 \u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0445 \u0434\u0435\u0442\u0430\u043b\u0435\u0439 \u0438\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u0444\u043e\u0440\u043c\u0443 \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438 \u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u044c\u0442\u0435 \u0437\u0430\u044f\u0432\u043a\u0443 \u0432 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0443.",
+    registerBadge: "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044f",
+    registerTitle: "\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043c\u043e\u044e \u043a\u0443\u0445\u043d\u044e",
+    registerBrand: "\u0420\u0415\u0413\u0418\u0421\u0422\u0420\u0410\u0426\u0418\u042f ARCHITECTO",
+    registerText: "\u0421\u0432\u044f\u0436\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043f\u043e\u043a\u0443\u043f\u043a\u0438 \u0441 \u0432\u0430\u0448\u0438\u043c\u0438 \u0442\u0435\u043a\u0443\u0449\u0438\u043c\u0438 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u043c\u0438 \u0434\u0430\u043d\u043d\u044b\u043c\u0438.",
+    registerCta: "\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c",
+    registerPanelTitle: "\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u044d\u0442\u0443 \u043a\u0443\u0445\u043d\u044e \u043d\u0430 \u043c\u0435\u043d\u044f",
+    registerPanelText: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043f\u043e\u043a\u0443\u043f\u043a\u0438, \u0432\u0430\u0448\u0438 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u044b \u0438 \u0434\u0430\u043d\u043d\u044b\u0435 \u043a\u0432\u0430\u0440\u0442\u0438\u0440\u044b. \u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043e\u0441\u0442\u0430\u0435\u0442\u0441\u044f \u0442\u0435\u043c \u0436\u0435, \u043d\u043e \u0430\u043a\u0442\u0438\u0432\u043d\u0430\u044f \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044f \u043f\u0435\u0440\u0435\u0439\u0434\u0435\u0442 \u043a \u0432\u0430\u043c.",
+    registerFullName: "\u041f\u043e\u043b\u043d\u043e\u0435 \u0438\u043c\u044f",
+    registerFullNamePlaceholder: "\u0418\u043c\u044f \u0424\u0430\u043c\u0438\u043b\u0438\u044f",
+    registerFullNameRequired: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043f\u043e\u043b\u043d\u043e\u0435 \u0438\u043c\u044f.",
+    registerAddressNote: "\u0410\u0434\u0440\u0435\u0441 / \u043a\u0432\u0430\u0440\u0442\u0438\u0440\u0430",
+    registerAddressNotePlaceholder: "\u041d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e: \u0430\u0434\u0440\u0435\u0441, \u044d\u0442\u0430\u0436 \u0438\u043b\u0438 \u043d\u043e\u043c\u0435\u0440 \u043a\u0432\u0430\u0440\u0442\u0438\u0440\u044b",
+    registerEmailRequired: "\u0423\u043a\u0430\u0436\u0438\u0442\u0435 e-mail \u0434\u043b\u044f \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f.",
+    registerVerificationPostalCode: "\u041f\u043e\u0447\u0442\u043e\u0432\u044b\u0439 \u0438\u043d\u0434\u0435\u043a\u0441",
+    registerVerificationPostalCodePlaceholder: "\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 10115",
+    registerVerificationUnit: "\u0423\u043b\u0438\u0446\u0430 / \u043a\u0432\u0430\u0440\u0442\u0438\u0440\u0430",
+    registerVerificationUnitPlaceholder: "\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 Demo Street 2",
+    registerVerificationRequired: "\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u0438\u043d\u0434\u0435\u043a\u0441 \u0438 \u0443\u043b\u0438\u0446\u0443, \u043a\u0432\u0430\u0440\u0442\u0438\u0440\u0443 \u0438\u043b\u0438 \u044d\u0442\u0430\u0436.",
+    registerCode: "\u041a\u043e\u0434 \u0438\u0437 e-mail",
+    registerCodePlaceholder: "6-\u0437\u043d\u0430\u0447\u043d\u044b\u0439 \u043a\u043e\u0434",
+    registerCodeRequired: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043a\u043e\u0434 \u0438\u0437 e-mail.",
+    registerVerifySubmit: "\u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0434\u0438\u0442\u044c \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044e",
+    registerVerifySubmitting: "\u041f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u0435...",
+    registerSubmit: "\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u0443\u0445\u043d\u044e",
+    registerSubmitting: "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044f...",
+    registerSuccess: "\u042d\u0442\u0430 \u043a\u0443\u0445\u043d\u044f \u0442\u0435\u043f\u0435\u0440\u044c \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u0430 \u043d\u0430 \u0432\u0430\u0441.",
+    registerError: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u0443\u0445\u043d\u044e.",
     purchasePanelTitle: "\u041f\u0435\u0440\u0435\u0439\u0442\u0438 \u043a \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0443 \u043f\u043e\u043a\u0443\u043f\u043a\u0438",
     purchasePanelText: "\u0415\u0441\u043b\u0438 \u0430\u0440\u0435\u043d\u0434\u0430\u0442\u043e\u0440\u0443 \u043d\u0443\u0436\u043d\u044b \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u0442\u043e\u0432\u0430\u0440\u044b \u0432\u043c\u0435\u0441\u0442\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438, \u043f\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u0432 \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440.",
     openConfigurator: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440",
@@ -2781,7 +2891,7 @@ export default function ServiceClaimFlow() {
       return;
     }
     if (!fullName) {
-      setError(`${t("registerFullName")} is required.`);
+      setError(t("registerFullNameRequired"));
       return;
     }
     if (!verificationPostalCode || !verificationUnit) {
@@ -2954,13 +3064,15 @@ export default function ServiceClaimFlow() {
             className={`service-choice-card service-choice-card--purchase${mode === "nachkauf" ? " is-active" : ""}`}
             onClick={() => handleModeSelect("nachkauf")}
           >
-            <Image
-              src="/img/fragmentologo-cropped.png"
-              alt="Fragmento"
-              width={168}
-              height={54}
-              className="service-choice-card__logo"
-            />
+            <span className="service-choice-card__logo-slot">
+              <Image
+                src="/img/fragmentologo-cropped.png"
+                alt="Fragmento"
+                width={168}
+                height={54}
+                className="service-choice-card__logo"
+              />
+            </span>
             <strong>{copy.purchaseTitle}</strong>
             <p>{copy.purchaseText}</p>
             <span className="service-choice-card__cta">{copy.purchaseCta || copy.openConfigurator}</span>
@@ -2970,13 +3082,15 @@ export default function ServiceClaimFlow() {
             className={`service-choice-card service-choice-card--complaint${isComplaintMode ? " is-active" : ""}`}
             onClick={() => handleModeSelect("complaint")}
           >
-            <Image
-              src="/img/260513-asc-logo-03 copy.png"
-              alt="Architecto Service Center"
-              width={168}
-              height={54}
-              className="service-choice-card__logo service-choice-card__logo--complaint"
-            />
+            <span className="service-choice-card__logo-slot">
+              <Image
+                src="/img/260513-asc-logo-03 copy.png"
+                alt="Architecto Service Center"
+                width={168}
+                height={54}
+                className="service-choice-card__logo service-choice-card__logo--complaint"
+              />
+            </span>
             
             <strong>{copy.complaintTitle}</strong>
             <p>{copy.complaintText}</p>
@@ -2987,6 +3101,7 @@ export default function ServiceClaimFlow() {
             className={`service-choice-card service-choice-card--register${isRegisterMode ? " is-active" : ""}`}
             onClick={() => handleModeSelect("register")}
           >
+            <span className="service-choice-card__logo-slot service-choice-card__logo-slot--empty" aria-hidden="true" />
             <strong>{copy.registerTitle}</strong>
             <p>{copy.registerText}</p>
             <span className="service-choice-card__cta">{copy.registerCta || copy.registerTitle}</span>
