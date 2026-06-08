@@ -356,7 +356,7 @@ const COPY = {
     serialPlaceholder: "Seriennummer eingeben",
     serialNumberAdd: "Hinzuf\u00fcgen",
     serialNumberRequired: "Bitte gib mindestens eine Seriennummer ein oder lade ein Foto der Seriennummer hoch.",
-    serialNumberCountRequired: "Bitte gib f\u00fcr die ausgew\u00e4hlten K\u00fcchenteile mindestens {count} Seriennummer(n) ein.",
+    serialNumberCountRequired: "Bitte gib f\u00fcr die ausgew\u00e4hlten K\u00fcchenteile mindestens {count} Seriennummer(n) ein oder lade Foto(s) der Seriennummer(n) hoch.",
     serialNumberImage: "Foto der Seriennummer(n)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
@@ -552,7 +552,7 @@ const COPY = {
     serialPlaceholder: "Enter a serial number",
     serialNumberAdd: "Add",
     serialNumberRequired: "Please enter at least one serial number or upload a photo of the serial number.",
-    serialNumberCountRequired: "Please enter at least {count} serial number(s) for the selected kitchen item(s).",
+    serialNumberCountRequired: "Please enter at least {count} serial number(s) for the selected kitchen item(s), or upload serial number photo(s).",
     serialNumberImage: "Photo of the serial number(s)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Help: where to find the serial number",
@@ -2776,7 +2776,11 @@ export default function ServiceClaimFlow() {
         [formValues.serialNumber, serialNumberDraft].filter(Boolean).join("\n"),
       );
       const submittedSerialNumberCount = parseSerialNumberList(normalizedSerialNumbers).length;
-      if (requiredSelectedSerialNumberCount > 0 && submittedSerialNumberCount < requiredSelectedSerialNumberCount) {
+      const submittedSerialEvidenceCount = submittedSerialNumberCount + serialNumberImages.length;
+      if (
+        requiredSelectedSerialNumberCount > 0
+        && submittedSerialEvidenceCount < requiredSelectedSerialNumberCount
+      ) {
         setError(t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount)));
         setIsSubmitting(false);
         return;
