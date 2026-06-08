@@ -75,14 +75,14 @@ export function getLocalizedItemName(item, translate) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
     case "T3D-OVEN-HOB-001":
-      return withRawDimensions(translate("configurator.itemNameOvenHob", "Built-in Oven and Hob"));
+      return withRawDimensions(translate("configurator.itemNameOvenHob", "Built-in oven and cooktop"));
     case "CAB-WALL-B-L-600":
       return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-B-ML-600":
       return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"));
     case "CAB-WALL-B-MR-600":
       return withRawDimensions(rawName.includes("+")
-        ? translate("configurator.catalogItemNames.wallCabinetMidRightExtractorHood", "Wall Cabinet mid-right + Extractor Hood")
+        ? translate("configurator.catalogItemNames.wallCabinetMidRightExtractorHood", "Wall Cabinet mid-right + extractor hood")
         : translate("configurator.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"));
     case "CAB-WALL-B-R-600":
       return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
@@ -97,15 +97,15 @@ export function getLocalizedItemName(item, translate) {
     case "CAB-WALL-C-R-600":
       return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
     case "HOOD-B-FH664621E":
-      return translate("configurator.catalogItemNames.extractorHood", "Extractor Hood");
+      return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
-      return translate("configurator.catalogItemNames.chimneyExtractorHood", "Chimney Extractor Hood");
+      return translate("configurator.catalogItemNames.chimneyExtractorHood", "Chimney extractor hood");
     case "LIGHT-B-LED-001":
     case "LIGHT-C-LED-001":
       return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
     case "WM-B-EWA34660W":
     case "WM-C-EWA34660W":
-      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing Machine"));
+      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
     case "SINKBASE-B-600":
     case "SINKBASE-C-600":
       return withRawDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
@@ -142,7 +142,7 @@ export function getLocalizedItemName(item, translate) {
     case "T3D-LIGHT-001":
       return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
     case "T3D-WASHER-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing Machine"));
+      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
     case "T3D-SINKBASE-001":
       return withRawDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
     case "T3D-DISH-001":
@@ -161,7 +161,7 @@ export function getLocalizedItemName(item, translate) {
     case "T3D-SINK-001":
       return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
     case "T3D-HOOD-001":
-      return translate("configurator.catalogItemNames.extractorHood", "Extractor Hood");
+      return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     default:
       return rawName;
   }
@@ -203,7 +203,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "SINKBASE-B-600":
     case "SINKBASE-C-600":
     case "T3D-SINKBASE-001":
-      return translate("configurator.catalogItemInfo.bottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
+      return translate("configurator.catalogItemInfo.blancoBottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
     case "DISH-B-600-STD":
     case "DISH-C-600-STD":
     case "T3D-DISH-001":
@@ -216,7 +216,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
     case "T3D-OVEN-HOB-001":
-      return translate("configurator.catalogItemInfo.ovenInductionHob", "Built-in oven + induction hob");
+      return translate("configurator.catalogItemInfo.ovenInductionHob", "Built-in oven + induction cooktop");
     case "CAB-BASE-B-STR":
     case "T3D-CAB-STORAGE-001":
       return translate("configurator.catalogItemInfo.strBaseStorageCabinet", "STR base storage cabinet");
@@ -485,7 +485,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
       ...primaryItem,
       name: hoodItem
         ? normalizedSlug === "kitchen-model-b"
-          ? `${primaryItem.name} + Extractor Hood`
+          ? `${primaryItem.name} + extractor hood`
           : `${primaryItem.name} + ${hoodItem.name}`
         : primaryItem.name,
       linkedInfoBadge: hoodItem ? "Includes extractor hood" : "",
