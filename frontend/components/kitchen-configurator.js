@@ -75,6 +75,18 @@ const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
   Poland: "Polen",
 };
 
+const DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG = {
+  "l-shaped-kitchen": ["worktop", "oven-base", "corner-base"],
+};
+
+const DEFAULT_LOCKED_PLAN_COMPONENT_KEYS_BY_SLUG = {
+  "l-shaped-kitchen": ["sink-faucet"],
+};
+
+const DEFAULT_LOCKED_ACCESSORY_CODES_BY_SLUG = {
+  "l-shaped-kitchen": ["SINK-LS-TIPO45", "TAP-LS-DARAS-F-HD"],
+};
+
 function buildCustomerAddressFromContract(contractAddress) {
   if (!contractAddress) return {};
 
@@ -901,6 +913,29 @@ function buildOrderLockedComponentIds(kitchenConfig, initialOrder) {
     .map((item) => componentIdForItem(item));
 }
 
+function buildDefaultLockedComponentIds(kitchenSlug, kitchenConfig) {
+  const componentKeys = DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()] || [];
+  if (!componentKeys.length) return [];
+
+  const availableComponentIds = new Set(kitchenConfig.components.map((item) => componentIdForItem(item)));
+  return componentKeys
+    .map((componentKey) => componentIdForKey(componentKey))
+    .filter((componentId) => availableComponentIds.has(componentId));
+}
+
+function buildDefaultLockedPlanComponentIds(kitchenSlug) {
+  const componentKeys = DEFAULT_LOCKED_PLAN_COMPONENT_KEYS_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()] || [];
+  return componentKeys.map((componentKey) => componentIdForKey(componentKey));
+}
+
+function buildDefaultLockedAccessoryCodes(kitchenSlug, kitchenConfig) {
+  const accessoryCodes = DEFAULT_LOCKED_ACCESSORY_CODES_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()] || [];
+  if (!accessoryCodes.length) return [];
+
+  const availableAccessoryCodes = new Set(kitchenConfig.accessories.map((item) => item.code).filter(Boolean));
+  return accessoryCodes.filter((code) => availableAccessoryCodes.has(code));
+}
+
 function buildConfiguratorDraftStorageKey(kitchenSlug, contractNumber) {
   return `fragmento-configurator-draft:${String(kitchenSlug || "").trim().toLowerCase()}:${String(contractNumber || "").trim().toUpperCase() || "guest"}`;
 }
@@ -945,9 +980,9 @@ function clearConfiguratorDraft(storageKey) {
   }
 }
 
-function buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft) {
+function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft) {
   const baseComponentIds = buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder);
-  const baseAccessoryCodes = buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories");
+  const baseAccessoryCodes = [...new Set([...fixedAccessoryCodes, ...buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories")])];
   const baseServiceCodes = buildInitialCodes(kitchenConfig, initialOrder, "service", "services");
 
   if (!draft) {
@@ -969,7 +1004,12 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrd
         ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
       ]),
     ],
-    selectedAccessoryCodes: draft.selectedAccessoryCodes.filter((code) => validAccessoryCodes.has(code)),
+    selectedAccessoryCodes: [
+      ...new Set([
+        ...fixedAccessoryCodes,
+        ...draft.selectedAccessoryCodes.filter((code) => validAccessoryCodes.has(code)),
+      ]),
+    ],
     selectedServiceCodes: draft.selectedServiceCodes.filter((code) => validServiceCodes.has(code)),
   };
 }
@@ -1003,13 +1043,28 @@ function KitchenConfiguratorContent({
       ].map((value) => componentIdForKey(value)),
     [kitchenConfig],
   );
+  const defaultLockedComponentIds = useMemo(
+    () => buildDefaultLockedComponentIds(kitchenSlug, kitchenConfig),
+    [kitchenConfig, kitchenSlug],
+  );
+  const defaultLockedPlanComponentIds = useMemo(
+    () => buildDefaultLockedPlanComponentIds(kitchenSlug),
+    [kitchenSlug],
+  );
   const orderLockedComponentIds = useMemo(
     () => buildOrderLockedComponentIds(kitchenConfig, initialOrder),
     [kitchenConfig, initialOrder],
   );
   const fixedComponentIds = useMemo(
-    () => [...new Set([...lockedComponentIds, ...orderLockedComponentIds])],
-    [lockedComponentIds, orderLockedComponentIds],
+    () => [
+      ...new Set([
+        ...lockedComponentIds,
+        ...defaultLockedComponentIds,
+        ...defaultLockedPlanComponentIds,
+        ...orderLockedComponentIds,
+      ]),
+    ],
+    [defaultLockedComponentIds, defaultLockedPlanComponentIds, lockedComponentIds, orderLockedComponentIds],
   );
   const draftStorageKey = useMemo(
     () => buildConfiguratorDraftStorageKey(kitchenSlug, initialContractNumber),
@@ -1019,13 +1074,21 @@ function KitchenConfiguratorContent({
     () => lockedItemCodesByType(initialOrder, "accessory"),
     [initialOrder],
   );
+  const defaultLockedAccessoryCodes = useMemo(
+    () => new Set(buildDefaultLockedAccessoryCodes(kitchenSlug, kitchenConfig)),
+    [kitchenConfig, kitchenSlug],
+  );
+  const fixedAccessoryCodes = useMemo(
+    () => new Set([...defaultLockedAccessoryCodes, ...orderLockedAccessoryCodes]),
+    [defaultLockedAccessoryCodes, orderLockedAccessoryCodes],
+  );
   const orderLockedServiceCodes = useMemo(
     () => lockedItemCodesByType(initialOrder, "service"),
     [initialOrder],
   );
   const initialSelection = useMemo(
-    () => buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, null),
-    [fixedComponentIds, initialOrder, kitchenConfig],
+    () => buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, null),
+    [fixedAccessoryCodes, fixedComponentIds, initialOrder, kitchenConfig],
   );
 
   const [selectedComponentIds, setSelectedComponentIds] = useState(initialSelection.selectedComponentIds);
@@ -1070,7 +1133,7 @@ function KitchenConfiguratorContent({
     if (initialOrder) {
       const nextCustomer = buildInitialCustomerFromOrder(initialOrder, initialContractNumber);
       const draft = readConfiguratorDraft(draftStorageKey);
-      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft);
+      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft);
       setCustomer(nextCustomer);
       setUseContractAddressForOrder(customerUsesContractAddress(nextCustomer, initialContractAddress));
       setAddressVerification(buildAddressVerificationState());
@@ -1082,7 +1145,7 @@ function KitchenConfiguratorContent({
 
     if (initialContractAddress) {
       const draft = readConfiguratorDraft(draftStorageKey);
-      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft);
+      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft);
       setCustomer((current) => ({
         ...current,
         ...buildCustomerAddressFromContract(initialContractAddress),
@@ -1098,7 +1161,7 @@ function KitchenConfiguratorContent({
 
     if (!initialContractNumber) return;
     const draft = readConfiguratorDraft(draftStorageKey);
-    const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, initialOrder, draft);
+    const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft);
     setCustomer((current) => {
       if (current.contractNumber === initialContractNumber) return current;
       return { ...current, contractNumber: initialContractNumber };
@@ -1108,7 +1171,7 @@ function KitchenConfiguratorContent({
     setSelectedComponentIds(nextSelection.selectedComponentIds);
     setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
     setSelectedServiceCodes(nextSelection.selectedServiceCodes);
-  }, [draftStorageKey, fixedComponentIds, initialContractAddress, initialContractNumber, initialOrder, kitchenConfig]);
+  }, [draftStorageKey, fixedAccessoryCodes, fixedComponentIds, initialContractAddress, initialContractNumber, initialOrder, kitchenConfig]);
 
   useEffect(() => {
     const verifiedSnapshotKey = addressVerification?.verification?.snapshot
@@ -1178,10 +1241,12 @@ function KitchenConfiguratorContent({
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
     .map((item) => ({
       ...item,
+      isLocked: item.isLocked || defaultLockedComponentIds.includes(componentIdForItem(item)),
       isOrderLocked: orderLockedComponentIds.includes(componentIdForItem(item)),
     }));
   const selectedAccessories = selectedMap(kitchenConfig.accessories, selectedAccessoryCodes).map((item) => ({
     ...item,
+    isLocked: item.isLocked || defaultLockedAccessoryCodes.has(item.code),
     isOrderLocked: orderLockedAccessoryCodes.has(item.code),
   }));
   const selectedServices = selectedMap(kitchenConfig.services, selectedServiceCodes).map((item) => ({
@@ -1287,6 +1352,16 @@ function KitchenConfiguratorContent({
   }, [fixedComponentIds, fixedComponentIdsKey]);
 
   useEffect(() => {
+    setSelectedAccessoryCodes((current) => {
+      const next = [...new Set([...fixedAccessoryCodes, ...current])];
+      if (next.length === current.length && next.every((item, index) => item === current[index])) {
+        return current;
+      }
+      return next;
+    });
+  }, [fixedAccessoryCodes]);
+
+  useEffect(() => {
     if (
       !serviceEligibility.montageEligible &&
       selectedServiceCodes.includes(SERVICE_CODE_MONTAGE)
@@ -1310,7 +1385,7 @@ function KitchenConfiguratorContent({
   }, [draftStorageKey, selectedAccessoryCodes, selectedComponentIds, selectedServiceCodes]);
 
   function toggleAccessory(itemCode) {
-    if (orderLockedAccessoryCodes.has(itemCode)) return;
+    if (fixedAccessoryCodes.has(itemCode)) return;
     setSelectedAccessoryCodes((current) =>
       current.includes(itemCode) ? current.filter((code) => code !== itemCode) : [...current, itemCode],
     );
@@ -1405,7 +1480,7 @@ function KitchenConfiguratorContent({
   }
 
   function removeAccessory(item) {
-    if (item.isOrderLocked) return;
+    if (item.isLocked || item.isOrderLocked) return;
     setSelectedAccessoryCodes((current) => current.filter((code) => code !== item.code));
   }
 
@@ -1415,7 +1490,7 @@ function KitchenConfiguratorContent({
   }
 
   function resetSelection() {
-    setSelectedAccessoryCodes([...orderLockedAccessoryCodes]);
+    setSelectedAccessoryCodes([...fixedAccessoryCodes]);
     setSelectedServiceCodes([...orderLockedServiceCodes]);
     setSelectedComponentIds(fixedComponentIds);
     setStatus("");
@@ -1928,7 +2003,7 @@ function KitchenConfiguratorContent({
               selectedServiceCodes={selectedServiceCodes}
               selectedDisplayCount={selectedDisplayCount}
               fixedComponentIds={fixedComponentIds}
-              orderLockedAccessoryCodes={orderLockedAccessoryCodes}
+              orderLockedAccessoryCodes={fixedAccessoryCodes}
               orderLockedServiceCodes={orderLockedServiceCodes}
               setSelectedComponentIds={setSelectedComponentIds}
               onToggleAccessory={toggleAccessory}

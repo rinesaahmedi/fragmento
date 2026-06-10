@@ -94,7 +94,6 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{itemName}</strong>
-        {item.code ? <span className={styles.itemCode}>{translate("common.code", "Code")}: {item.code}</span> : null}
         <span>{metaLabel}</span>
       </div>
       <strong className={priceClassName}>{priceLabel}</strong>

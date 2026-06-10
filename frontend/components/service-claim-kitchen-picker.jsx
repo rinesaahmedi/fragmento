@@ -117,8 +117,9 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
       host: svgHostRef.current,
       selectedComponentIds: value,
       lockedComponentIds: fixedComponentIds,
+      kitchenSlug,
     });
-  }, [fixedKey, value, fixedComponentIds]);
+  }, [fixedKey, value, fixedComponentIds, kitchenSlug]);
 
   const normalizedContractNumber = String(contractNumber || "").trim();
 

@@ -5,6 +5,7 @@ import styles from "./kitchen-configurator.module.css";
 import Kitchen3DViewer from "./Kitchen3DViewer";
 import {
   componentIdForItem,
+  isHiddenLinkedComponent,
   normalizeColor,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
@@ -35,8 +36,13 @@ export default function KitchenSvgStage({
   );
   const fixedComponentIdsKey = fixedComponentIds.join("|");
   const componentIds = useMemo(
-    () => new Set(kitchenConfig.components.map((item) => componentIdForItem(item))),
-    [kitchenConfig.components],
+    () =>
+      new Set(
+        kitchenConfig.components
+          .map((item) => componentIdForItem(item))
+          .filter((componentId) => !isHiddenLinkedComponent(kitchenSlug, componentId)),
+      ),
+    [kitchenConfig.components, kitchenSlug],
   );
 
   useEffect(() => {
@@ -114,8 +120,9 @@ export default function KitchenSvgStage({
       host: svgHostRef.current,
       selectedComponentIds,
       lockedComponentIds: fixedComponentIds,
+      kitchenSlug,
     });
-  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds]);
+  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds, kitchenSlug]);
 
   return (
     <div className={styles.stage}>

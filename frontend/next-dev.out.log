@@ -1,0 +1,17 @@
+
+> arc-fragmento@1.0.0 dev
+> next dev --port 3001
+
+   ▲ Next.js 15.5.14
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.15.118:3001
+   - Environments: .env
+
+ ✓ Starting...
+ ✓ Ready in 2.4s
+ ○ Compiling /kitchens/[slug] ...
+ ✓ Compiled /kitchens/[slug] in 3s (2239 modules)
+ GET /kitchens/kitchen-model-b 200 in 5027ms
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 219ms
+ ✓ Compiled in 642ms (2239 modules)
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 535ms
