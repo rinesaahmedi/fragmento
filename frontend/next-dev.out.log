@@ -15,3 +15,19 @@
  GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 219ms
  ✓ Compiled in 642ms (2239 modules)
  GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 535ms
+ ✓ Compiled in 601ms (2239 modules)
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 610ms
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 150ms
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 155ms
+ ✓ Compiled in 649ms (2239 modules)
+ ✓ Compiled in 394ms (2239 modules)
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 599ms
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 202ms
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 183ms
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 157ms
+ ✓ Compiled in 1636ms (2253 modules)
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 287ms
+ ✓ Compiled in 826ms (2239 modules)
+ ✓ Compiled in 1246ms (2249 modules)
+ GET /kitchens/kitchen-model-b?contractNumber=670888888&lang=en&instructionMode=text 200 in 439ms
+ ✓ Compiled in 504ms (2239 modules)

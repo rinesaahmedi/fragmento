@@ -149,6 +149,23 @@ function getStructuredDimensions(item) {
   return `${values.map((value) => value ?? "-").join(" x ")} mm`;
 }
 
+function splitCatalogItemNameAndDimensions(name) {
+  const normalizedName = String(name || "").trim();
+  const dimensionValue = "(?:-|\\d+(?:[.,]\\d+)?)";
+  const dimensionsMatch = normalizedName.match(
+    new RegExp(`\\s*\\(\\s*(${dimensionValue}\\s*(?:x|\\u00d7)\\s*${dimensionValue}(?:\\s*(?:x|\\u00d7)\\s*${dimensionValue})?\\s*(?:mm|cm|m))\\s*\\)`, "i"),
+  );
+
+  if (!dimensionsMatch) {
+    return { title: normalizedName, dimensions: "" };
+  }
+
+  return {
+    title: normalizedName.replace(dimensionsMatch[0], "").replace(/\s+/g, " ").trim(),
+    dimensions: dimensionsMatch[1].replace(/\s*(?:x|\u00d7)\s*/gi, " x "),
+  };
+}
+
 function CatalogItem({
   item,
   selected,
@@ -167,7 +184,7 @@ function CatalogItem({
   const { translate } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate);
   const itemInfoText = getLocalizedItemInfoText(item, translate);
-  const itemDisplayName = splitItemNameAndDimensions(itemName);
+  const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const itemDimensions = getStructuredDimensions(item) || itemDisplayName.dimensions;
   const className = [
     styles.itemCard,
