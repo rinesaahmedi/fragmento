@@ -356,16 +356,17 @@ const COPY = {
     registerSubmit: "K\u00fcche registrieren",
     registerSubmitting: "Registrierung...",
     registerSuccess: "Diese K\u00fcche ist jetzt auf dich registriert.",
+    registeredNextSuccess: "Diese K\u00fcche ist jetzt auf dich registriert. Vorherige aktive Registrierungen f\u00fcr diesen Vertrag wurden geschlossen.",
     registeredNextTitle: "K\u00fcche registriert",
     registeredNextText: "Deine K\u00fcche ist verkn\u00fcpft. W\u00e4hle jetzt den passenden Bereich.",
     registeredNextOrderLabel: "Zusatzkauf",
     registeredNextOrderTitle: "Ich m\u00f6chte etwas bestellen",
     registeredNextOrderText: "F\u00fcr Zubeh\u00f6r, Zusatzteile oder weitere Komponenten. Der Konfigurator wird direkt mit deiner Vertragsnummer ge\u00f6ffnet.",
     registeredNextOrderCta: "Zum Konfigurator",
-    registeredNextClaimLabel: "Service",
-    registeredNextClaimTitle: "Ich m\u00f6chte ein Problem melden",
-    registeredNextClaimText: "F\u00fcr Defekte, Sch\u00e4den, fehlende Teile oder Reklamationen. Das Serviceformular startet mit deinen Registrierungsdaten.",
-    registeredNextClaimCta: "Serviceformular \u00f6ffnen",
+    registeredNextClaimLabel: "Reklamation",
+    registeredNextClaimTitle: "Ich m\u00f6chte eine Reklamation einreichen",
+    registeredNextClaimText: "F\u00fcr Defekte, Sch\u00e4den, fehlende Teile oder Reklamationen. Das Reklamationsformular startet mit deinen Registrierungsdaten.",
+    registeredNextClaimCta: "Reklamationsformular \u00f6ffnen",
     registerError: "Die K\u00fcche konnte nicht registriert werden.",
     purchasePanelTitle: "Weiter zum Kaufprozess",
     purchasePanelText: "Wenn der Mieter zus\u00e4tzliche Artikel statt einer Reklamation ben\u00f6tigt, geht es hier zum Konfigurator.",
@@ -581,16 +582,17 @@ const COPY = {
     registerSubmit: "Register kitchen",
     registerSubmitting: "Registering...",
     registerSuccess: "This kitchen is now registered to you.",
+    registeredNextSuccess: "This kitchen is now registered to you. Previous active registrations for this contract were closed.",
     registeredNextTitle: "Kitchen registered",
     registeredNextText: "Your kitchen is connected. Choose the area that matches what you need.",
     registeredNextOrderLabel: "Purchase",
     registeredNextOrderTitle: "I want to order something",
     registeredNextOrderText: "For accessories, add-ons, or additional components. The configurator opens with your registered contract number.",
     registeredNextOrderCta: "Open configurator",
-    registeredNextClaimLabel: "Service",
-    registeredNextClaimTitle: "I want to report a problem",
-    registeredNextClaimText: "For defects, damage, missing parts, or complaints. The service form starts with your registration details.",
-    registeredNextClaimCta: "Open service form",
+    registeredNextClaimLabel: "Claim",
+    registeredNextClaimTitle: "I want to submit a claim",
+    registeredNextClaimText: "For defects, damage, missing parts, or complaints. The claim form starts with your registration details.",
+    registeredNextClaimCta: "Open claim form",
     registerError: "The kitchen could not be registered.",
     purchasePanelTitle: "Continue to the purchase flow",
     purchasePanelText: "If the tenant needs additional items instead of a complaint, continue to the configurator.",
@@ -806,6 +808,17 @@ const COPY = {
     registerSubmit: "Mutfa\u011f\u0131 kaydet",
     registerSubmitting: "Kaydediliyor...",
     registerSuccess: "Bu mutfak art\u0131k sizin ad\u0131n\u0131za kay\u0131tl\u0131.",
+    registeredNextSuccess: "Bu mutfak art\u0131k sizin ad\u0131n\u0131za kay\u0131tl\u0131. Bu s\u00f6zle\u015fme i\u00e7in \u00f6nceki aktif kay\u0131tlar kapat\u0131ld\u0131.",
+    registeredNextTitle: "Mutfak kaydedildi",
+    registeredNextText: "Mutfa\u011f\u0131n\u0131z ba\u011fland\u0131. \u0130htiyac\u0131n\u0131za uygun alan\u0131 se\u00e7in.",
+    registeredNextOrderLabel: "Sat\u0131n alma",
+    registeredNextOrderTitle: "Bir \u015fey sipari\u015f etmek istiyorum",
+    registeredNextOrderText: "Aksesuarlar, ek par\u00e7alar veya ilave bile\u015fenler i\u00e7in. Yap\u0131land\u0131r\u0131c\u0131 kay\u0131tl\u0131 s\u00f6zle\u015fme numaran\u0131zla a\u00e7\u0131l\u0131r.",
+    registeredNextOrderCta: "Yap\u0131land\u0131r\u0131c\u0131y\u0131 a\u00e7",
+    registeredNextClaimLabel: "Talep",
+    registeredNextClaimTitle: "Talep olu\u015fturmak istiyorum",
+    registeredNextClaimText: "Defekt, hasar, eksik par\u00e7alar veya \u015fikayetler i\u00e7in. Talep formu kay\u0131t bilgilerinizle ba\u015flar.",
+    registeredNextClaimCta: "Talep formunu a\u00e7",
     registerError: "Mutfak kaydedilemedi.",
     purchasePanelTitle: "Sat\u0131n alma ak\u0131\u015f\u0131na devam et",
     purchasePanelText: "Kirac\u0131n\u0131n \u015fikayet yerine ek \u00fcr\u00fcnlere ihtiyac\u0131 varsa, yap\u0131land\u0131r\u0131c\u0131ya devam edin.",
@@ -993,6 +1006,17 @@ const COPY = {
     registerSubmit: "Registrar cocina",
     registerSubmitting: "Registrando...",
     registerSuccess: "Esta cocina ya est\u00e1 registrada a tu nombre.",
+    registeredNextSuccess: "Esta cocina ya est\u00e1 registrada a tu nombre. Los registros activos anteriores de este contrato se han cerrado.",
+    registeredNextTitle: "Cocina registrada",
+    registeredNextText: "Tu cocina est\u00e1 vinculada. Elige el \u00e1rea que se ajusta a lo que necesitas.",
+    registeredNextOrderLabel: "Compra",
+    registeredNextOrderTitle: "Quiero pedir algo",
+    registeredNextOrderText: "Para accesorios, complementos o componentes adicionales. El configurador se abre con tu n\u00famero de contrato registrado.",
+    registeredNextOrderCta: "Abrir configurador",
+    registeredNextClaimLabel: "Reclamaci\u00f3n",
+    registeredNextClaimTitle: "Quiero presentar una reclamaci\u00f3n",
+    registeredNextClaimText: "Para defectos, da\u00f1os, piezas faltantes o quejas. El formulario de reclamaci\u00f3n se inicia con tus datos de registro.",
+    registeredNextClaimCta: "Abrir formulario de reclamaci\u00f3n",
     registerError: "No se pudo registrar la cocina.",
     purchasePanelTitle: "Continuar al proceso de compra",
     purchasePanelText: "Si el inquilino necesita art\u00edculos adicionales en lugar de una reclamaci\u00f3n, contin\u00faa al configurador.",
@@ -1180,6 +1204,17 @@ const COPY = {
     registerSubmit: "Enregistrer la cuisine",
     registerSubmitting: "Enregistrement...",
     registerSuccess: "Cette cuisine est maintenant enregistr\u00e9e \u00e0 votre nom.",
+    registeredNextSuccess: "Cette cuisine est maintenant enregistr\u00e9e \u00e0 votre nom. Les enregistrements actifs pr\u00e9c\u00e9dents pour ce contrat ont \u00e9t\u00e9 cl\u00f4tur\u00e9s.",
+    registeredNextTitle: "Cuisine enregistr\u00e9e",
+    registeredNextText: "Votre cuisine est associ\u00e9e. Choisissez la zone qui correspond \u00e0 votre besoin.",
+    registeredNextOrderLabel: "Achat",
+    registeredNextOrderTitle: "Je souhaite commander quelque chose",
+    registeredNextOrderText: "Pour des accessoires, des compl\u00e9ments ou des composants suppl\u00e9mentaires. Le configurateur s'ouvre avec votre num\u00e9ro de contrat enregistr\u00e9.",
+    registeredNextOrderCta: "Ouvrir le configurateur",
+    registeredNextClaimLabel: "R\u00e9clamation",
+    registeredNextClaimTitle: "Je souhaite d\u00e9poser une r\u00e9clamation",
+    registeredNextClaimText: "Pour des d\u00e9fauts, dommages, pi\u00e8ces manquantes ou r\u00e9clamations. Le formulaire de r\u00e9clamation commence avec vos donn\u00e9es d'enregistrement.",
+    registeredNextClaimCta: "Ouvrir le formulaire de r\u00e9clamation",
     registerError: "La cuisine n'a pas pu \u00eatre enregistr\u00e9e.",
     purchasePanelTitle: "Continuer vers le processus d'achat",
     purchasePanelText: "Si le locataire a besoin d'articles suppl\u00e9mentaires plut\u00f4t que d'une r\u00e9clamation, continuez vers le configurateur.",
@@ -1367,6 +1402,17 @@ const COPY = {
     registerSubmit: "\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u0443\u0445\u043d\u044e",
     registerSubmitting: "\u0420\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u044f...",
     registerSuccess: "\u042d\u0442\u0430 \u043a\u0443\u0445\u043d\u044f \u0442\u0435\u043f\u0435\u0440\u044c \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u0430 \u043d\u0430 \u0432\u0430\u0441.",
+    registeredNextSuccess: "\u042d\u0442\u0430 \u043a\u0443\u0445\u043d\u044f \u0442\u0435\u043f\u0435\u0440\u044c \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u0430 \u043d\u0430 \u0432\u0430\u0441. \u041f\u0440\u0435\u0436\u043d\u0438\u0435 \u0430\u043a\u0442\u0438\u0432\u043d\u044b\u0435 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u0438 \u043f\u043e \u044d\u0442\u043e\u043c\u0443 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0443 \u0437\u0430\u043a\u0440\u044b\u0442\u044b.",
+    registeredNextTitle: "\u041a\u0443\u0445\u043d\u044f \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u0430",
+    registeredNextText: "\u0412\u0430\u0448\u0430 \u043a\u0443\u0445\u043d\u044f \u043f\u0440\u0438\u0432\u044f\u0437\u0430\u043d\u0430. \u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0440\u0430\u0437\u0434\u0435\u043b, \u043a\u043e\u0442\u043e\u0440\u044b\u0439 \u0441\u043e\u043e\u0442\u0432\u0435\u0442\u0441\u0442\u0432\u0443\u0435\u0442 \u0432\u0430\u0448\u0435\u0439 \u043f\u043e\u0442\u0440\u0435\u0431\u043d\u043e\u0441\u0442\u0438.",
+    registeredNextOrderLabel: "\u041f\u043e\u043a\u0443\u043f\u043a\u0430",
+    registeredNextOrderTitle: "\u042f \u0445\u043e\u0447\u0443 \u0447\u0442\u043e-\u0442\u043e \u0437\u0430\u043a\u0430\u0437\u0430\u0442\u044c",
+    registeredNextOrderText: "\u0414\u043b\u044f \u0430\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440\u043e\u0432, \u0434\u043e\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u0439 \u0438\u043b\u0438 \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0445 \u043a\u043e\u043c\u043f\u043e\u043d\u0435\u043d\u0442\u043e\u0432. \u041a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440 \u043e\u0442\u043a\u0440\u043e\u0435\u0442\u0441\u044f \u0441 \u0432\u0430\u0448\u0438\u043c \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u043c \u043d\u043e\u043c\u0435\u0440\u043e\u043c \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430.",
+    registeredNextOrderCta: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440",
+    registeredNextClaimLabel: "\u0420\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044f",
+    registeredNextClaimTitle: "\u042f \u0445\u043e\u0447\u0443 \u043f\u043e\u0434\u0430\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e",
+    registeredNextClaimText: "\u0414\u043b\u044f \u0434\u0435\u0444\u0435\u043a\u0442\u043e\u0432, \u043f\u043e\u0432\u0440\u0435\u0436\u0434\u0435\u043d\u0438\u0439, \u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0445 \u0434\u0435\u0442\u0430\u043b\u0435\u0439 \u0438\u043b\u0438 \u0436\u0430\u043b\u043e\u0431. \u0424\u043e\u0440\u043c\u0430 \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438 \u043d\u0430\u0447\u043d\u0435\u0442\u0441\u044f \u0441 \u0432\u0430\u0448\u0438\u0445 \u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0430\u0446\u0438\u043e\u043d\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445.",
+    registeredNextClaimCta: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0444\u043e\u0440\u043c\u0443 \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438",
     registerError: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u0443\u0445\u043d\u044e.",
     purchasePanelTitle: "\u041f\u0435\u0440\u0435\u0439\u0442\u0438 \u043a \u043f\u0440\u043e\u0446\u0435\u0441\u0441\u0443 \u043f\u043e\u043a\u0443\u043f\u043a\u0438",
     purchasePanelText: "\u0415\u0441\u043b\u0438 \u0430\u0440\u0435\u043d\u0434\u0430\u0442\u043e\u0440\u0443 \u043d\u0443\u0436\u043d\u044b \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u0442\u043e\u0432\u0430\u0440\u044b \u0432\u043c\u0435\u0441\u0442\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438, \u043f\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u0432 \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440.",
@@ -3437,7 +3483,7 @@ export default function ServiceClaimFlow() {
       const fullName = pendingRegistration.fullName || "";
       const nameParts = fullName.split(/\s+/).filter(Boolean);
       const verifiedRegistration = payloadResponse.registration || {};
-      setSuccessMessage(payloadResponse.message || t("registerSuccess"));
+      setSuccessMessage(t("registerSuccess"));
       setForm((current) => ({
         ...current,
         contractNumber: current.contractNumber || pendingRegistration.contractNumber || verifiedRegistration.contractNumber || "",
@@ -3471,46 +3517,50 @@ export default function ServiceClaimFlow() {
     }
   }
 
+  const languageSwitcher = (
+    <div
+      ref={languageMenuRef}
+      className={`service-language-switcher${isLanguageMenuOpen ? " is-open" : ""}`}
+      aria-label="Language switcher"
+    >
+      <button
+        type="button"
+        className="service-language-switcher__trigger"
+        onClick={() => setIsLanguageMenuOpen((current) => !current)}
+        aria-haspopup="listbox"
+        aria-expanded={isLanguageMenuOpen}
+      >
+        <img src={selectedLanguage.flagSrc} alt="" aria-hidden="true" />
+        <span>{selectedLanguage.label}</span>
+      </button>
+      <div className="service-language-switcher__menu" role="listbox" aria-activedescendant={`language-option-${language}`}>
+        {LANGUAGE_OPTIONS.map((option) => (
+          <button
+            key={option.code}
+            id={`language-option-${option.code}`}
+            type="button"
+            role="option"
+            aria-selected={language === option.code}
+            className={`service-language-switcher__option${language === option.code ? " is-active" : ""}`}
+            onClick={() => {
+              setLanguage(option.code);
+              setIsLanguageMenuOpen(false);
+            }}
+          >
+            <img src={option.flagSrc} alt="" aria-hidden="true" />
+            <span>{option.label}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <>
       <main className="service-page">
       {!isRegisteredNextMode ? (
       <section className="service-hero">
-        <div
-          ref={languageMenuRef}
-          className={`service-language-switcher${isLanguageMenuOpen ? " is-open" : ""}`}
-          aria-label="Language switcher"
-        >
-          <button
-            type="button"
-            className="service-language-switcher__trigger"
-            onClick={() => setIsLanguageMenuOpen((current) => !current)}
-            aria-haspopup="listbox"
-            aria-expanded={isLanguageMenuOpen}
-          >
-            <img src={selectedLanguage.flagSrc} alt="" aria-hidden="true" />
-            <span>{selectedLanguage.label}</span>
-          </button>
-          <div className="service-language-switcher__menu" role="listbox" aria-activedescendant={`language-option-${language}`}>
-            {LANGUAGE_OPTIONS.map((option) => (
-              <button
-                key={option.code}
-                id={`language-option-${option.code}`}
-                type="button"
-                role="option"
-                aria-selected={language === option.code}
-                className={`service-language-switcher__option${language === option.code ? " is-active" : ""}`}
-                onClick={() => {
-                  setLanguage(option.code);
-                  setIsLanguageMenuOpen(false);
-                }}
-              >
-                <img src={option.flagSrc} alt="" aria-hidden="true" />
-                <span>{option.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+        {languageSwitcher}
 
         <div className="service-hero__top">
           <div className="service-hero__content">
@@ -3629,13 +3679,15 @@ export default function ServiceClaimFlow() {
 
       {isRegisteredNextMode ? (
         <section className="service-panel service-panel--registered-next">
+          {languageSwitcher}
+
           <div className="service-panel__header">
             <p className="service-panel__eyebrow">{copy.registerBrand}</p>
             <h2>{t("registeredNextTitle")}</h2>
             <p>{t("registeredNextText")}</p>
           </div>
 
-          {successMessage ? <p className="service-form__success">{successMessage}</p> : null}
+          <p className="service-form__success">{t("registeredNextSuccess")}</p>
 
           <div className="service-next-choice-grid">
             <Link

@@ -1353,6 +1353,7 @@ textarea {
 }
 
 .service-panel--registered-next {
+  position: relative;
   width: min(820px, 100%);
   justify-self: center;
   margin-top: 42px;
@@ -1362,6 +1363,7 @@ textarea {
 
 .service-panel--registered-next .service-panel__header {
   gap: 8px;
+  padding-right: 260px;
 }
 
 .service-panel--registered-next .service-panel__header h2 {
@@ -3981,6 +3983,10 @@ textarea {
   .service-panel--registered-next {
     margin-top: 0;
     padding: 24px;
+  }
+
+  .service-panel--registered-next .service-panel__header {
+    padding-right: 0;
   }
 
   .service-next-choice {
