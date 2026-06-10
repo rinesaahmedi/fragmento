@@ -10,6 +10,51 @@ import {
 } from "./kitchen-svg-plan-utils";
 import styles from "./kitchen-configurator.module.css";
 
+const SERVICE_CLAIM_CLICK_BOUNDS_BY_SLUG = {
+  "kitchen-model-b": [
+    {
+      componentId: "component-extractor-hood",
+      x: 488,
+      y: 314,
+      width: 84,
+      height: 18,
+    },
+  ],
+};
+
+function getSvgPoint(svg, event) {
+  if (!svg || typeof svg.createSVGPoint !== "function") return null;
+
+  const point = svg.createSVGPoint();
+  point.x = event.clientX;
+  point.y = event.clientY;
+  const matrix = svg.getScreenCTM();
+  if (!matrix) return null;
+
+  return point.matrixTransform(matrix.inverse());
+}
+
+function resolveClaimClickComponentId({ svg, event, kitchenSlug, selectableComponentIds }) {
+  const point = getSvgPoint(svg, event);
+  const clickBounds = SERVICE_CLAIM_CLICK_BOUNDS_BY_SLUG[kitchenSlug] || [];
+
+  if (point) {
+    const matchedBounds = clickBounds.find((bounds) => (
+      selectableComponentIds.includes(bounds.componentId)
+      && point.x >= bounds.x
+      && point.x <= bounds.x + bounds.width
+      && point.y >= bounds.y
+      && point.y <= bounds.y + bounds.height
+    ));
+    if (matchedBounds) {
+      return matchedBounds.componentId;
+    }
+  }
+
+  const group = event.target.closest("[data-component-id]");
+  return group?.dataset?.componentId || "";
+}
+
 export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange, labels, contractNumber }) {
   const svgHostRef = useRef(null);
   const { kitchenConfig, svgMarkup, kitchenSlug, selectableComponentIds } = kitchenPlan;
@@ -60,12 +105,12 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     }
 
     const onClick = (event) => {
-      const group = event.target.closest("[data-component-id]");
-      if (!group) {
-        return;
-      }
-
-      const componentId = group.dataset.componentId;
+      const componentId = resolveClaimClickComponentId({
+        svg,
+        event,
+        kitchenSlug,
+        selectableComponentIds,
+      });
       if (!selectableComponentIds.includes(componentId)) {
         return;
       }
