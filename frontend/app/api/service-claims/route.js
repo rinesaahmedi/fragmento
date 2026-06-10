@@ -1115,12 +1115,16 @@ export async function POST(request) {
       ...generalAttachmentParts.map((part) => ({ ...part, role: "general" })),
       ...problemAreaAttachmentParts,
     ];
+    if (attachmentParts.length > MAX_SERVICE_CLAIM_ATTACHMENTS) {
+      throw new Error(`You can upload at most ${MAX_SERVICE_CLAIM_ATTACHMENTS} files.`);
+    }
     if (!problemDescription) {
       throw new Error("Problem description is required.");
     }
     const rawSerialNumber = optionalString(body.serialNumber);
-    const hasSerialNumberImage = booleanFromFormValue(body.hasSerialNumberImage);
-    if (parsedProblemAreas.length > 0 && parseSerialNumberEntries(rawSerialNumber).length < parsedProblemAreas.length) {
+    const hasSerialNumberImage = serialNumberImageParts.length > 0 || booleanFromFormValue(body.hasSerialNumberImage);
+    const serialEvidenceCount = parseSerialNumberEntries(rawSerialNumber).length + serialNumberImageParts.length;
+    if (parsedProblemAreas.length > 0 && serialEvidenceCount < parsedProblemAreas.length) {
       return NextResponse.json(
         { error: `Please provide at least ${parsedProblemAreas.length} serial number(s) for the selected kitchen item(s).` },
         { status: 400 },
@@ -1194,9 +1198,9 @@ export async function POST(request) {
       })),
     };
 
-    if (!payload.phone && !payload.email) {
+    if (!payload.phone || !payload.email) {
       return NextResponse.json(
-        { error: "Please provide at least a phone number or an email address." },
+        { error: "Please provide both a phone number and an email address." },
         { status: 400 },
       );
     }

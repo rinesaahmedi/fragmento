@@ -24,17 +24,9 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   const fixedComponentIds = useMemo(() => {
     return [];
   }, []);
-  const defaultComponentIds = useMemo(
-    () =>
-      (kitchenConfig.components || [])
-        .filter((item) => item.isLocked)
-        .map((item) => componentIdForItem(item))
-        .filter(Boolean),
-    [kitchenConfig.components],
-  );
   const visibleComponentIds = useMemo(
-    () => [...new Set([...(selectableComponentIds || []), ...defaultComponentIds])],
-    [defaultComponentIds, selectableComponentIds],
+    () => [...new Set(selectableComponentIds || [])],
+    [selectableComponentIds],
   );
 
   const fixedKey = fixedComponentIds.join("|");

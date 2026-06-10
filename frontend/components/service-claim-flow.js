@@ -100,11 +100,18 @@ function ServiceAttachmentChips({
   clearLabel,
   onRemove,
   onClearAll,
+  viewLabel = "View",
+  viewAriaLabel = "View file",
+  closePreviewLabel = "Close",
+  previewUnavailableText = "This file type cannot be previewed in the browser.",
+  removeLabel = "Remove file",
   expandLabel = "View more",
   collapseLabel = "View less",
   inlineExpandToggle = false,
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [previewFile, setPreviewFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
   const collapsedVisibleCount = 2;
 
   useEffect(() => {
@@ -113,12 +120,53 @@ function ServiceAttachmentChips({
     }
   }, [files.length]);
 
+  useEffect(() => {
+    if (!previewFile) {
+      setPreviewUrl("");
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(previewFile);
+    setPreviewUrl(objectUrl);
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [previewFile]);
+
+  useEffect(() => {
+    if (previewFile && !files.includes(previewFile)) {
+      setPreviewFile(null);
+    }
+  }, [files, previewFile]);
+
+  useEffect(() => {
+    if (!previewFile) {
+      return undefined;
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        setPreviewFile(null);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [previewFile]);
+
   if (!files.length) {
     return null;
   }
   const shouldCollapse = files.length > collapsedVisibleCount;
   const indexedFiles = files.map((file, index) => ({ file, index }));
   const visibleFiles = shouldCollapse && !expanded ? indexedFiles.slice(0, collapsedVisibleCount) : indexedFiles;
+  const previewMime = String(previewFile?.type || "").toLowerCase().split(";")[0].trim();
+  const canPreviewAsImage = previewMime.startsWith("image/");
+  const canPreviewInFrame =
+    previewMime === "application/pdf" ||
+    previewMime.startsWith("text/");
   const expandToggleButton = shouldCollapse ? (
     <button
       type="button"
@@ -157,9 +205,17 @@ function ServiceAttachmentChips({
             </span>
             <button
               type="button"
+              className="service-attachments__view"
+              onClick={() => setPreviewFile(file)}
+              aria-label={`${viewAriaLabel}: ${file.name}`}
+            >
+              {viewLabel}
+            </button>
+            <button
+              type="button"
               className="service-attachments__remove"
               onClick={() => onRemove(index)}
-              aria-label="Remove file"
+              aria-label={removeLabel}
             >
               &times;
             </button>
@@ -170,6 +226,54 @@ function ServiceAttachmentChips({
         ) : null}
       </ul>
       {!inlineExpandToggle && expandToggleButton}
+      {previewFile ? (
+        <div className="service-file-preview" role="presentation">
+          <button
+            type="button"
+            className="service-file-preview__backdrop"
+            aria-label={closePreviewLabel}
+            onClick={() => setPreviewFile(null)}
+          />
+          <div
+            className="service-file-preview__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${viewAriaLabel}: ${previewFile.name}`}
+          >
+            <div className="service-file-preview__head">
+              <div className="service-file-preview__title" title={previewFile.name}>
+                {previewFile.name}
+              </div>
+              <button
+                type="button"
+                className="service-file-preview__close"
+                aria-label={closePreviewLabel}
+                onClick={() => setPreviewFile(null)}
+              >
+                &times;
+              </button>
+            </div>
+            <div className="service-file-preview__body">
+              {previewUrl && canPreviewAsImage ? (
+                <img src={previewUrl} alt={previewFile.name} className="service-file-preview__image" />
+              ) : null}
+              {previewUrl && !canPreviewAsImage && canPreviewInFrame ? (
+                <iframe
+                  src={previewUrl}
+                  title={previewFile.name}
+                  className="service-file-preview__frame"
+                />
+              ) : null}
+              {!canPreviewAsImage && !canPreviewInFrame ? (
+                <div className="service-file-preview__unsupported">
+                  <strong>{previewFile.name}</strong>
+                  <span>{previewUnavailableText}</span>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -252,6 +356,16 @@ const COPY = {
     registerSubmit: "K\u00fcche registrieren",
     registerSubmitting: "Registrierung...",
     registerSuccess: "Diese K\u00fcche ist jetzt auf dich registriert.",
+    registeredNextTitle: "K\u00fcche registriert",
+    registeredNextText: "Deine K\u00fcche ist verkn\u00fcpft. W\u00e4hle jetzt den passenden Bereich.",
+    registeredNextOrderLabel: "Zusatzkauf",
+    registeredNextOrderTitle: "Ich m\u00f6chte etwas bestellen",
+    registeredNextOrderText: "F\u00fcr Zubeh\u00f6r, Zusatzteile oder weitere Komponenten. Der Konfigurator wird direkt mit deiner Vertragsnummer ge\u00f6ffnet.",
+    registeredNextOrderCta: "Zum Konfigurator",
+    registeredNextClaimLabel: "Service",
+    registeredNextClaimTitle: "Ich m\u00f6chte ein Problem melden",
+    registeredNextClaimText: "F\u00fcr Defekte, Sch\u00e4den, fehlende Teile oder Reklamationen. Das Serviceformular startet mit deinen Registrierungsdaten.",
+    registeredNextClaimCta: "Serviceformular \u00f6ffnen",
     registerError: "Die K\u00fcche konnte nicht registriert werden.",
     purchasePanelTitle: "Weiter zum Kaufprozess",
     purchasePanelText: "Wenn der Mieter zus\u00e4tzliche Artikel statt einer Reklamation ben\u00f6tigt, geht es hier zum Konfigurator.",
@@ -376,7 +490,7 @@ const COPY = {
     attachmentsErrorType: "Dateityp nicht erlaubt (z. B. PDF, Bilder, Word/Excel).",
     submit: "Reklamation senden",
     submitting: "Wird gesendet...",
-    contactError: "Bitte gib mindestens eine Telefonnummer oder E-Mail-Adresse an.",
+    contactError: "Bitte gib Telefonnummer und E-Mail-Adresse an.",
     contractLookupLoading: "Vertragsnummer wird gepr\u00fcft...",
     contractLookupSuccess: "Adresse und Vermieterdaten aus den hinterlegten Vertragsdaten eingef\u00fcllt. Du kannst die Felder weiter bearbeiten.",
     contractLookupError: "Die Vertragsnummer wurde nicht gefunden.",
@@ -408,6 +522,25 @@ const COPY = {
     claimAssistantVoicePermission: "Bitte erlaube den Mikrofonzugriff, um den Sprachchat zu nutzen.",
     claimAssistantVoiceError: "Die Spracheingabe konnte nicht starten. Bitte versuche es erneut.",
     claimAssistantErrorUnavailable: "Die Reklamationshilfe konnte dazu gerade keine Antwort geben.",
+    tourStart: "Hilfe / Tour starten",
+    tourStartAria: "Tour der Serviceseite starten",
+    tourStepProgress: "Schritt {current} von {total}",
+    tourNext: "Weiter",
+    tourSkip: "Tour überspringen",
+    tourFinish: "Fertig",
+    tourPurchaseTitle: "Zusatzartikel bestellen",
+    tourPurchaseDescription: "Öffne hier den Konfigurator, um zusätzliche Küchenkomponenten, Zubehör oder Services zu deiner bestehenden Küche hinzuzufügen.",
+    tourComplaintTitle: "Problem melden",
+    tourComplaintDescription: "Melde hier Schäden, Defekte, fehlende Teile, Geräteprobleme oder andere Servicefälle. Du kannst Details und Fotos hinzufügen.",
+    tourRegisterTitle: "Küche registrieren",
+    tourRegisterDescription: "Verknüpfe hier deine Kaufvertragsnummer mit deinen aktuellen Kontaktdaten, damit das Serviceteam deine Küche schneller zuordnen kann.",
+    removeFileAria: "Datei entfernen",
+    viewFile: "Ansehen",
+    viewFileAria: "Datei ansehen",
+    closeFilePreview: "Vorschau schlie\u00dfen",
+    filePreviewUnavailable: "Dieser Dateityp kann im Browser nicht als Vorschau angezeigt werden.",
+    removeSerialNumberAria: "Seriennummer entfernen",
+    stickyContractDismissAria: "Fixiertes Feld für Kaufvertragsnummer deaktivieren",
   },
   en: {
     eyebrow: "Fragmento Service",
@@ -448,6 +581,16 @@ const COPY = {
     registerSubmit: "Register kitchen",
     registerSubmitting: "Registering...",
     registerSuccess: "This kitchen is now registered to you.",
+    registeredNextTitle: "Kitchen registered",
+    registeredNextText: "Your kitchen is connected. Choose the area that matches what you need.",
+    registeredNextOrderLabel: "Purchase",
+    registeredNextOrderTitle: "I want to order something",
+    registeredNextOrderText: "For accessories, add-ons, or additional components. The configurator opens with your registered contract number.",
+    registeredNextOrderCta: "Open configurator",
+    registeredNextClaimLabel: "Service",
+    registeredNextClaimTitle: "I want to report a problem",
+    registeredNextClaimText: "For defects, damage, missing parts, or complaints. The service form starts with your registration details.",
+    registeredNextClaimCta: "Open service form",
     registerError: "The kitchen could not be registered.",
     purchasePanelTitle: "Continue to the purchase flow",
     purchasePanelText: "If the tenant needs additional items instead of a complaint, continue to the configurator.",
@@ -582,7 +725,7 @@ const COPY = {
     contractLookupError: "Contract number was not found.",
     submit: "Send complaint",
     submitting: "Submitting...",
-    contactError: "Please provide at least a phone number or an email address.",
+    contactError: "Please provide both a phone number and an email address.",
     submitError: "Your complaint could not be submitted.",
     submitSuccess: "Your complaint has been submitted successfully.",
     claimAssistantTitle: "Claim Agent",
@@ -604,6 +747,25 @@ const COPY = {
     claimAssistantVoicePermission: "Please allow microphone access to use voice chat.",
     claimAssistantVoiceError: "Voice input could not start. Please try again.",
     claimAssistantErrorUnavailable: "The claim helper could not answer that right now.",
+    tourStart: "Help / Start tour",
+    tourStartAria: "Start service page tour",
+    tourStepProgress: "Step {current} of {total}",
+    tourNext: "Next",
+    tourSkip: "Skip tour",
+    tourFinish: "Finish",
+    tourPurchaseTitle: "Order extra items",
+    tourPurchaseDescription: "Use this section to open the configurator and add extra kitchen components, accessories, or related services to your existing kitchen setup.",
+    tourComplaintTitle: "Report a problem",
+    tourComplaintDescription: "Use this section to file a complaint for damage, defects, missing parts, appliance issues, or other service problems. You can add details and photos so the support team can help.",
+    tourRegisterTitle: "Register your kitchen",
+    tourRegisterDescription: "Use this section to connect your purchase contract number with your current contact details. This helps the service team identify your kitchen faster.",
+    removeFileAria: "Remove file",
+    viewFile: "View",
+    viewFileAria: "View file",
+    closeFilePreview: "Close preview",
+    filePreviewUnavailable: "This file type cannot be previewed in the browser.",
+    removeSerialNumberAria: "Remove serial number",
+    stickyContractDismissAria: "Disable fixed contract number box",
   },
   tr: {
     eyebrow: "Fragmento Servis",
@@ -749,7 +911,7 @@ const COPY = {
     attachmentsErrorType: "Bu dosya t\u00fcr\u00fcne izin verilmiyor (PDF, g\u00f6rsel, Word/Excel vb.).",
     submit: "\u015eikayeti g\u00f6nder",
     submitting: "G\u00f6nderiliyor...",
-    contactError: "L\u00fctfen en az bir telefon numaras\u0131 veya e-posta adresi girin.",
+    contactError: "L\u00fctfen telefon numaras\u0131 ve e-posta adresi girin.",
     submitError: "\u015eikayetiniz g\u00f6nderilemedi.",
     submitSuccess: "\u015eikayetiniz ba\u015far\u0131yla g\u00f6nderildi.",
     claimAssistantTitle: "\u015eikayet asistan\u0131",
@@ -772,6 +934,25 @@ const COPY = {
     claimAssistantVoicePermission: "Sesli sohbet i\u00e7in mikrofon izni gerekir.",
     claimAssistantVoiceError: "Sesli giri\u015f ba\u015flat\u0131lamad\u0131.",
     claimAssistantErrorUnavailable: "\u015eikayet yard\u0131mc\u0131s\u0131 \u015fu anda yan\u0131t veremedi.",
+    tourStart: "Yard\u0131m / Turu ba\u015flat",
+    tourStartAria: "Servis sayfas\u0131 turunu ba\u015flat",
+    tourStepProgress: "Ad\u0131m {current} / {total}",
+    tourNext: "Devam",
+    tourSkip: "Turu ge\u00e7",
+    tourFinish: "Bitir",
+    tourPurchaseTitle: "Ek \u00fcr\u00fcn sipari\u015f et",
+    tourPurchaseDescription: "Mevcut mutfa\u011f\u0131n\u0131za ek mutfak par\u00e7alar\u0131, aksesuarlar veya ilgili hizmetler eklemek i\u00e7in yap\u0131land\u0131r\u0131c\u0131y\u0131 burada a\u00e7\u0131n.",
+    tourComplaintTitle: "Sorun bildir",
+    tourComplaintDescription: "Hasar, ar\u0131za, eksik par\u00e7a, cihaz sorunu veya di\u011fer servis konular\u0131 i\u00e7in buradan \u015fikayet olu\u015fturun. Detay ve foto\u011fraf ekleyebilirsiniz.",
+    tourRegisterTitle: "Mutfa\u011f\u0131 kaydet",
+    tourRegisterDescription: "Servis ekibinin mutfa\u011f\u0131n\u0131z\u0131 daha h\u0131zl\u0131 bulabilmesi i\u00e7in sat\u0131n alma s\u00f6zle\u015fmesi numaran\u0131z\u0131 g\u00fcncel ileti\u015fim bilgilerinizle ba\u011flay\u0131n.",
+    removeFileAria: "Dosyay\u0131 kald\u0131r",
+    viewFile: "G\u00f6r",
+    viewFileAria: "Dosyay\u0131 g\u00f6r",
+    closeFilePreview: "\u00d6nizlemeyi kapat",
+    filePreviewUnavailable: "Bu dosya t\u00fcr\u00fc taray\u0131c\u0131da \u00f6nizlenemez.",
+    removeSerialNumberAria: "Seri numaras\u0131n\u0131 kald\u0131r",
+    stickyContractDismissAria: "Sabit s\u00f6zle\u015fme numaras\u0131 alan\u0131n\u0131 kapat",
   },
   es: {
     eyebrow: "Servicio Fragmento",
@@ -917,7 +1098,7 @@ const COPY = {
     attachmentsErrorType: "Tipo de archivo no permitido (p. ej. PDF, im\u00e1genes, Word/Excel).",
     submit: "Enviar reclamaci\u00f3n",
     submitting: "Enviando...",
-    contactError: "Indique al menos un n\u00famero de tel\u00e9fono o una direcci\u00f3n de correo electr\u00f3nico.",
+    contactError: "Indique un n\u00famero de tel\u00e9fono y una direcci\u00f3n de correo electr\u00f3nico.",
     submitError: "No se pudo enviar la reclamaci\u00f3n.",
     submitSuccess: "La reclamaci\u00f3n se ha enviado correctamente.",
     claimAssistantTitle: "Asistente de reclamaciones",
@@ -940,6 +1121,25 @@ const COPY = {
     claimAssistantVoicePermission: "Se necesita permiso del micr\u00f3fono para el chat de voz.",
     claimAssistantVoiceError: "No se pudo iniciar la entrada de voz.",
     claimAssistantErrorUnavailable: "El asistente de reclamaciones no pudo responder ahora.",
+    tourStart: "Ayuda / Iniciar tour",
+    tourStartAria: "Iniciar tour de la p\u00e1gina de servicio",
+    tourStepProgress: "Paso {current} de {total}",
+    tourNext: "Siguiente",
+    tourSkip: "Omitir tour",
+    tourFinish: "Finalizar",
+    tourPurchaseTitle: "Pedir art\u00edculos extra",
+    tourPurchaseDescription: "Abra aqu\u00ed el configurador para a\u00f1adir componentes de cocina, accesorios o servicios relacionados a su cocina existente.",
+    tourComplaintTitle: "Informar de un problema",
+    tourComplaintDescription: "Use esta secci\u00f3n para reclamar da\u00f1os, defectos, piezas faltantes, problemas de electrodom\u00e9sticos u otros casos de servicio. Puede a\u00f1adir detalles y fotos.",
+    tourRegisterTitle: "Registrar su cocina",
+    tourRegisterDescription: "Conecte aqu\u00ed su n\u00famero de contrato con sus datos de contacto actuales para que el equipo de servicio identifique su cocina m\u00e1s r\u00e1pido.",
+    removeFileAria: "Quitar archivo",
+    viewFile: "Ver",
+    viewFileAria: "Ver archivo",
+    closeFilePreview: "Cerrar vista previa",
+    filePreviewUnavailable: "Este tipo de archivo no se puede previsualizar en el navegador.",
+    removeSerialNumberAria: "Quitar n\u00famero de serie",
+    stickyContractDismissAria: "Desactivar el campo fijo del n\u00famero de contrato",
   },
   fr: {
     eyebrow: "Service Fragmento",
@@ -1085,7 +1285,7 @@ const COPY = {
     attachmentsErrorType: "Type de fichier non autoris\u00e9 (PDF, images, Word/Excel, etc.).",
     submit: "Envoyer la r\u00e9clamation",
     submitting: "Envoi en cours...",
-    contactError: "Veuillez fournir au moins un num\u00e9ro de t\u00e9l\u00e9phone ou une adresse e-mail.",
+    contactError: "Veuillez fournir un num\u00e9ro de t\u00e9l\u00e9phone et une adresse e-mail.",
     submitError: "La r\u00e9clamation n'a pas pu \u00eatre envoy\u00e9e.",
     submitSuccess: "La r\u00e9clamation a \u00e9t\u00e9 envoy\u00e9e avec succ\u00e8s.",
     claimAssistantTitle: "Assistant r\u00e9clamation",
@@ -1108,6 +1308,25 @@ const COPY = {
     claimAssistantVoicePermission: "L'autorisation du microphone est n\u00e9cessaire pour la conversation vocale.",
     claimAssistantVoiceError: "Impossible de d\u00e9marrer la saisie vocale.",
     claimAssistantErrorUnavailable: "L'assistant r\u00e9clamation ne peut pas r\u00e9pondre pour le moment.",
+    tourStart: "Aide / D\u00e9marrer la visite",
+    tourStartAria: "D\u00e9marrer la visite de la page de service",
+    tourStepProgress: "\u00c9tape {current} sur {total}",
+    tourNext: "Suivant",
+    tourSkip: "Ignorer la visite",
+    tourFinish: "Terminer",
+    tourPurchaseTitle: "Commander des articles suppl\u00e9mentaires",
+    tourPurchaseDescription: "Ouvrez ici le configurateur pour ajouter des composants de cuisine, des accessoires ou des services \u00e0 votre cuisine existante.",
+    tourComplaintTitle: "Signaler un probl\u00e8me",
+    tourComplaintDescription: "Utilisez cette section pour signaler des dommages, d\u00e9fauts, pi\u00e8ces manquantes, probl\u00e8mes d'appareil ou autres demandes de service. Vous pouvez ajouter des d\u00e9tails et des photos.",
+    tourRegisterTitle: "Enregistrer votre cuisine",
+    tourRegisterDescription: "Associez ici votre num\u00e9ro de contrat \u00e0 vos coordonn\u00e9es actuelles afin que l'\u00e9quipe de service identifie votre cuisine plus rapidement.",
+    removeFileAria: "Retirer le fichier",
+    viewFile: "Voir",
+    viewFileAria: "Voir le fichier",
+    closeFilePreview: "Fermer l'aper\u00e7u",
+    filePreviewUnavailable: "Ce type de fichier ne peut pas \u00eatre pr\u00e9visualis\u00e9 dans le navigateur.",
+    removeSerialNumberAria: "Retirer le num\u00e9ro de s\u00e9rie",
+    stickyContractDismissAria: "D\u00e9sactiver le champ fixe du num\u00e9ro de contrat",
   },
   ru: {
     eyebrow: "\u0421\u0435\u0440\u0432\u0438\u0441 Fragmento",
@@ -1252,7 +1471,7 @@ const COPY = {
     attachmentsErrorType: "\u0422\u0438\u043f \u0444\u0430\u0439\u043b\u0430 \u043d\u0435 \u0440\u0430\u0437\u0440\u0435\u0448\u0451\u043d (PDF, \u0438\u0437\u043e\u0431\u0440\u0430\u0436\u0435\u043d\u0438\u044f, Word/Excel).",
     submit: "\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e",
     submitting: "\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430...",
-    contactError: "\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u0445\u043e\u0442\u044f \u0431\u044b \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430 \u0438\u043b\u0438 \u0430\u0434\u0440\u0435\u0441 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u044b.",
+    contactError: "\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430 \u0438 \u0430\u0434\u0440\u0435\u0441 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043d\u043d\u043e\u0439 \u043f\u043e\u0447\u0442\u044b.",
     submitError: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e.",
     submitSuccess: "\u0420\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044f \u0443\u0441\u043f\u0435\u0448\u043d\u043e \u043e\u0442\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0430.",
     claimAssistantTitle: "\u041f\u043e\u043c\u043e\u0449\u043d\u0438\u043a \u043f\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438",
@@ -1279,6 +1498,25 @@ const COPY = {
     claimAssistantVoiceError: "\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0437\u0430\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u0433\u043e\u043b\u043e\u0441\u043e\u0432\u043e\u0439 \u0432\u0432\u043e\u0434.",
     claimAssistantErrorUnavailable:
       "\u041f\u043e\u043c\u043e\u0449\u043d\u0438\u043a \u043f\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044f\u043c \u0441\u0435\u0439\u0447\u0430\u0441 \u043d\u0435 \u043c\u043e\u0436\u0435\u0442 \u043e\u0442\u0432\u0435\u0442\u0438\u0442\u044c.",
+    tourStart: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430 / \u041d\u0430\u0447\u0430\u0442\u044c \u0442\u0443\u0440",
+    tourStartAria: "\u041d\u0430\u0447\u0430\u0442\u044c \u0442\u0443\u0440 \u043f\u043e \u0441\u0435\u0440\u0432\u0438\u0441\u043d\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435",
+    tourStepProgress: "\u0428\u0430\u0433 {current} \u0438\u0437 {total}",
+    tourNext: "\u0414\u0430\u043b\u0435\u0435",
+    tourSkip: "\u041f\u0440\u043e\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u0442\u0443\u0440",
+    tourFinish: "\u0413\u043e\u0442\u043e\u0432\u043e",
+    tourPurchaseTitle: "\u0417\u0430\u043a\u0430\u0437\u0430\u0442\u044c \u0434\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u0442\u043e\u0432\u0430\u0440\u044b",
+    tourPurchaseDescription: "\u041e\u0442\u043a\u0440\u043e\u0439\u0442\u0435 \u0437\u0434\u0435\u0441\u044c \u043a\u043e\u043d\u0444\u0438\u0433\u0443\u0440\u0430\u0442\u043e\u0440, \u0447\u0442\u043e\u0431\u044b \u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043a \u0432\u0430\u0448\u0435\u0439 \u043a\u0443\u0445\u043d\u0435 \u0434\u0435\u0442\u0430\u043b\u0438, \u0430\u043a\u0441\u0435\u0441\u0441\u0443\u0430\u0440\u044b \u0438\u043b\u0438 \u0441\u0435\u0440\u0432\u0438\u0441\u044b.",
+    tourComplaintTitle: "\u0421\u043e\u043e\u0431\u0449\u0438\u0442\u044c \u043e \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0435",
+    tourComplaintDescription: "\u0417\u0434\u0435\u0441\u044c \u043c\u043e\u0436\u043d\u043e \u043e\u0444\u043e\u0440\u043c\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e \u043f\u043e \u043f\u043e\u0432\u043e\u0434\u0443 \u043f\u043e\u0432\u0440\u0435\u0436\u0434\u0435\u043d\u0438\u0439, \u0434\u0435\u0444\u0435\u043a\u0442\u043e\u0432, \u043e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u044e\u0449\u0438\u0445 \u0434\u0435\u0442\u0430\u043b\u0435\u0439, \u043f\u0440\u043e\u0431\u043b\u0435\u043c \u0441 \u0442\u0435\u0445\u043d\u0438\u043a\u043e\u0439 \u0438\u043b\u0438 \u0434\u0440\u0443\u0433\u0438\u0445 \u0441\u0435\u0440\u0432\u0438\u0441\u043d\u044b\u0445 \u0441\u043b\u0443\u0447\u0430\u0435\u0432. \u041c\u043e\u0436\u043d\u043e \u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u0434\u0435\u0442\u0430\u043b\u0438 \u0438 \u0444\u043e\u0442\u043e.",
+    tourRegisterTitle: "\u0417\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u043a\u0443\u0445\u043d\u044e",
+    tourRegisterDescription: "\u0421\u0432\u044f\u0436\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u0441 \u0432\u0430\u0448\u0438\u043c\u0438 \u0442\u0435\u043a\u0443\u0449\u0438\u043c\u0438 \u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043d\u044b\u043c\u0438 \u0434\u0430\u043d\u043d\u044b\u043c\u0438, \u0447\u0442\u043e\u0431\u044b \u0441\u0435\u0440\u0432\u0438\u0441\u043d\u0430\u044f \u043a\u043e\u043c\u0430\u043d\u0434\u0430 \u0431\u044b\u0441\u0442\u0440\u0435\u0435 \u043d\u0430\u0448\u043b\u0430 \u0432\u0430\u0448\u0443 \u043a\u0443\u0445\u043d\u044e.",
+    removeFileAria: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0444\u0430\u0439\u043b",
+    viewFile: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c",
+    viewFileAria: "\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0444\u0430\u0439\u043b",
+    closeFilePreview: "\u0417\u0430\u043a\u0440\u044b\u0442\u044c \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440",
+    filePreviewUnavailable: "\u042d\u0442\u043e\u0442 \u0442\u0438\u043f \u0444\u0430\u0439\u043b\u0430 \u043d\u0435\u043b\u044c\u0437\u044f \u043f\u0440\u0435\u0434\u0432\u0430\u0440\u0438\u0442\u0435\u043b\u044c\u043d\u043e \u043f\u0440\u043e\u0441\u043c\u043e\u0442\u0440\u0435\u0442\u044c \u0432 \u0431\u0440\u0430\u0443\u0437\u0435\u0440\u0435.",
+    removeSerialNumberAria: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
+    stickyContractDismissAria: "\u041e\u0442\u043a\u043b\u044e\u0447\u0438\u0442\u044c \u0444\u0438\u043a\u0441\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u043e\u0435 \u043f\u043e\u043b\u0435 \u043d\u043e\u043c\u0435\u0440\u0430 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430",
   },
 };
 
@@ -1531,6 +1769,172 @@ function normalizeShortDateInput(value) {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
+const SERVICE_TOUR_STORAGE_KEY = "fragmentoServiceTourCompleted";
+function getServiceTourSteps(copy) {
+  return [
+    {
+      target: "purchase",
+      title: copy.tourPurchaseTitle || COPY.en.tourPurchaseTitle,
+      description: copy.tourPurchaseDescription || COPY.en.tourPurchaseDescription,
+    },
+    {
+      target: "complaint",
+      title: copy.tourComplaintTitle || COPY.en.tourComplaintTitle,
+      description: copy.tourComplaintDescription || COPY.en.tourComplaintDescription,
+    },
+    {
+      target: "register",
+      title: copy.tourRegisterTitle || COPY.en.tourRegisterTitle,
+      description: copy.tourRegisterDescription || COPY.en.tourRegisterDescription,
+    },
+  ];
+}
+
+function hasCompletedServiceTour() {
+  try {
+    return window.localStorage.getItem(SERVICE_TOUR_STORAGE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function saveCompletedServiceTour() {
+  try {
+    window.localStorage.setItem(SERVICE_TOUR_STORAGE_KEY, "true");
+  } catch {
+    // The tour can still be used if browser storage is unavailable.
+  }
+}
+
+function ServiceGuidedTour({ isOpen, activeStepIndex, steps, copy, onBack, onNext, onSkip, onFinish }) {
+  const dialogRef = useRef(null);
+  const tourSteps = steps?.length ? steps : getServiceTourSteps(COPY.en);
+  const activeStep = tourSteps[activeStepIndex] || tourSteps[0];
+  const isFirstStep = activeStepIndex === 0;
+  const isLastStep = activeStepIndex === tourSteps.length - 1;
+  const progressText = (copy.tourStepProgress || COPY.en.tourStepProgress)
+    .replace("{current}", String(activeStepIndex + 1))
+    .replace("{total}", String(tourSteps.length));
+
+  useEffect(() => {
+    if (!isOpen) {
+      return undefined;
+    }
+
+    const activeTarget = document.querySelector(`[data-service-tour-target="${activeStep.target}"]`);
+    if (activeTarget) {
+      const rect = activeTarget.getBoundingClientRect();
+      const isVisible =
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= window.innerHeight &&
+        rect.right <= window.innerWidth;
+      if (!isVisible) {
+        activeTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+      }
+    }
+
+    const focusTimer = window.setTimeout(() => {
+      dialogRef.current?.focus();
+    }, 120);
+
+    function handleKeyDown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onSkip();
+        return;
+      }
+
+      if (event.key !== "Tab" || !dialogRef.current) {
+        return;
+      }
+
+      const focusableElements = dialogRef.current.querySelectorAll(
+        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      );
+      const focusable = Array.from(focusableElements);
+      if (!focusable.length) {
+        event.preventDefault();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [activeStep.target, isOpen, onSkip]);
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <>
+      <div className="service-tour__overlay" aria-hidden="true" />
+      <div className="service-tour__stage">
+        <section
+          ref={dialogRef}
+          className="service-tour__dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="service-tour-title"
+          aria-describedby="service-tour-description"
+          tabIndex={-1}
+        >
+          <div
+            className="service-tour__progress"
+            role="group"
+            aria-label={progressText}
+          >
+            {tourSteps.map((step, index) => (
+              <span
+                key={step.target}
+                className={`service-tour__dot${index === activeStepIndex ? " is-active" : ""}`}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+          <p className="service-tour__eyebrow">{progressText}</p>
+          <h2 id="service-tour-title">{activeStep.title}</h2>
+          <p id="service-tour-description">{activeStep.description}</p>
+          <div className="service-tour__actions">
+            {!isFirstStep ? (
+              <button type="button" className="service-button service-button--secondary" onClick={onBack}>
+                {copy.back || COPY.en.back}
+              </button>
+            ) : null}
+            <button type="button" className="service-tour__skip" onClick={onSkip}>
+              {copy.tourSkip || COPY.en.tourSkip}
+            </button>
+            {isLastStep ? (
+              <button type="button" className="service-button service-button--primary" onClick={onFinish}>
+                {copy.tourFinish || COPY.en.tourFinish}
+              </button>
+            ) : (
+              <button type="button" className="service-button service-button--primary" onClick={onNext}>
+                {copy.tourNext || COPY.en.tourNext}
+              </button>
+            )}
+          </div>
+        </section>
+      </div>
+    </>
+  );
+}
+
 export default function ServiceClaimFlow() {
   const [language, setLanguage] = useState("de");
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
@@ -1540,6 +1944,7 @@ export default function ServiceClaimFlow() {
   const [successMessage, setSuccessMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [pendingRegistration, setPendingRegistration] = useState(null);
+  const [completedRegistration, setCompletedRegistration] = useState(null);
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
   const [problemComponentIds, setProblemComponentIds] = useState([]);
   const [problemAreaDetailsByComponentId, setProblemAreaDetailsByComponentId] = useState({});
@@ -1564,6 +1969,8 @@ export default function ServiceClaimFlow() {
   const [claimAssistantVoiceError, setClaimAssistantVoiceError] = useState("");
   const [selectedClaimAssistantContextKey, setSelectedClaimAssistantContextKey] = useState("claim");
   const [serialNumberDraft, setSerialNumberDraft] = useState("");
+  const [isTourOpen, setIsTourOpen] = useState(false);
+  const [tourStepIndex, setTourStepIndex] = useState(0);
   const [isPreferredContactCalendarOpen, setIsPreferredContactCalendarOpen] = useState(false);
   const [preferredContactCalendarMonth, setPreferredContactCalendarMonth] = useState(() =>
     startOfCalendarMonth(new Date()),
@@ -1584,11 +1991,14 @@ export default function ServiceClaimFlow() {
   const contractNumberStickySentinelRef = useRef(null);
 
   const copy = COPY[language] || COPY.en;
+  const serviceTourSteps = useMemo(() => getServiceTourSteps(copy), [copy]);
   const fallbackCopy = COPY.en;
   const formValues = { ...INITIAL_FORM, ...form };
   const selectedLanguage = LANGUAGE_OPTIONS.find((option) => option.code === language) || LANGUAGE_OPTIONS[0];
   const isComplaintMode = mode === "complaint";
   const isRegisterMode = mode === "register";
+  const isRegisteredNextMode = mode === "registered-next";
+  const activeTourTarget = isTourOpen ? serviceTourSteps[tourStepIndex]?.target : null;
   const selectedPreferredContactDate = useMemo(
     () => parseShortDate(formValues.preferredContactDate),
     [formValues.preferredContactDate],
@@ -1610,15 +2020,53 @@ export default function ServiceClaimFlow() {
     () => parseTimeValue(formValues.preferredContactTimeTo),
     [formValues.preferredContactTimeTo],
   );
-  const hasContactMethod = useMemo(
-    () => Boolean(formValues.phone.trim() || formValues.email.trim()),
+  const hasRequiredContactFields = useMemo(
+    () => Boolean(formValues.phone.trim() && formValues.email.trim()),
     [formValues.email, formValues.phone],
   );
 
   useEffect(() => {
     latestFormRef.current = formValues;
   }, [formValues]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!hasCompletedServiceTour()) {
+      setTourStepIndex(0);
+      setIsTourOpen(true);
+    }
+  }, []);
+
+  function completeTour() {
+    if (typeof window !== "undefined") {
+      saveCompletedServiceTour();
+    }
+    setIsTourOpen(false);
+  }
+
+  function startTour() {
+    setTourStepIndex(0);
+    setIsTourOpen(true);
+  }
+
+  function goToNextTourStep() {
+    setTourStepIndex((current) => Math.min(current + 1, serviceTourSteps.length - 1));
+  }
+
+  function goToPreviousTourStep() {
+    setTourStepIndex((current) => Math.max(current - 1, 0));
+  }
   const normalizedContractNumber = normalizeServiceClaimContractNumber(formValues.contractNumber);
+  const completedRegistrationContractNumber = normalizeServiceClaimContractNumber(
+    completedRegistration?.contractNumber || normalizedContractNumber,
+  );
+  const completedRegistrationKitchenSlug = String(completedRegistration?.kitchenSlug || "").trim();
+  const completedRegistrationOrderHref = completedRegistrationKitchenSlug
+    ? `/kitchens/${encodeURIComponent(completedRegistrationKitchenSlug)}?contractNumber=${encodeURIComponent(completedRegistrationContractNumber)}`
+    : "/";
   const isCurrentContractLookupResult = contractLookup.contractNumber === normalizedContractNumber;
   const shouldHideContractLookupFeedback = isContractNumberCurrentlyStuck;
   const kitchenAreasLinePrefix = copy.kitchenAreasLinePrefix || fallbackCopy.kitchenAreasLinePrefix;
@@ -1985,6 +2433,13 @@ export default function ServiceClaimFlow() {
     setError("");
     setSuccessMessage("");
     setPendingRegistration(null);
+    setCompletedRegistration(null);
+  }
+
+  function handleRegisteredClaimSelect() {
+    setError("");
+    setSuccessMessage("");
+    setMode("complaint");
   }
 
   function handleHausmeisterInvolvedChange(nextValue) {
@@ -2748,7 +3203,7 @@ export default function ServiceClaimFlow() {
       return;
     }
 
-    if (!hasContactMethod) {
+    if (!hasRequiredContactFields) {
       setError(copy.contactError);
       return;
     }
@@ -2937,6 +3392,8 @@ export default function ServiceClaimFlow() {
       setPendingRegistration({
         id: payloadResponse.registration?.id,
         contractNumber: normalizedContractNumber,
+        kitchenName: payloadResponse.registration?.kitchenName || "",
+        kitchenSlug: payloadResponse.registration?.kitchenSlug || "",
         fullName,
         email,
         phone,
@@ -2979,9 +3436,11 @@ export default function ServiceClaimFlow() {
 
       const fullName = pendingRegistration.fullName || "";
       const nameParts = fullName.split(/\s+/).filter(Boolean);
+      const verifiedRegistration = payloadResponse.registration || {};
       setSuccessMessage(payloadResponse.message || t("registerSuccess"));
       setForm((current) => ({
         ...current,
+        contractNumber: current.contractNumber || pendingRegistration.contractNumber || verifiedRegistration.contractNumber || "",
         givenName: current.givenName || nameParts[0] || "",
         surname: current.surname || nameParts.slice(1).join(" ") || "",
         email: current.email || pendingRegistration.email || "",
@@ -2994,8 +3453,17 @@ export default function ServiceClaimFlow() {
         registrationVerificationUnit: "",
         registrationVerificationCode: "",
       }));
+      setCompletedRegistration({
+        id: verifiedRegistration.id || pendingRegistration.id,
+        contractNumber: verifiedRegistration.contractNumber || pendingRegistration.contractNumber || normalizedContractNumber,
+        kitchenName: verifiedRegistration.kitchenName || pendingRegistration.kitchenName || "",
+        kitchenSlug: verifiedRegistration.kitchenSlug || pendingRegistration.kitchenSlug || "",
+        fullName: verifiedRegistration.fullName || pendingRegistration.fullName || "",
+        email: verifiedRegistration.email || pendingRegistration.email || "",
+        phone: verifiedRegistration.phone || pendingRegistration.phone || "",
+      });
       setPendingRegistration(null);
-      setMode("complaint");
+      setMode("registered-next");
     } catch (submitError) {
       setError(submitError.message || t("registerError"));
     } finally {
@@ -3006,6 +3474,7 @@ export default function ServiceClaimFlow() {
   return (
     <>
       <main className="service-page">
+      {!isRegisteredNextMode ? (
       <section className="service-hero">
         <div
           ref={languageMenuRef}
@@ -3066,7 +3535,14 @@ export default function ServiceClaimFlow() {
         <div className="service-choice-grid">
           <button
             type="button"
-            className={`service-choice-card service-choice-card--purchase${mode === "nachkauf" ? " is-active" : ""}`}
+            data-service-tour-target="purchase"
+            className={[
+              "service-choice-card service-choice-card--purchase",
+              mode === "nachkauf" ? "is-active" : "",
+              activeTourTarget === "purchase" ? "is-tour-highlight" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
             onClick={() => handleModeSelect("nachkauf")}
           >
             <span className="service-choice-card__logo-slot">
@@ -3084,7 +3560,14 @@ export default function ServiceClaimFlow() {
           </button>
           <button
             type="button"
-            className={`service-choice-card service-choice-card--complaint${isComplaintMode ? " is-active" : ""}`}
+            data-service-tour-target="complaint"
+            className={[
+              "service-choice-card service-choice-card--complaint",
+              isComplaintMode ? "is-active" : "",
+              activeTourTarget === "complaint" ? "is-tour-highlight" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
             onClick={() => handleModeSelect("complaint")}
           >
             <span className="service-choice-card__logo-slot">
@@ -3103,7 +3586,14 @@ export default function ServiceClaimFlow() {
           </button>
           <button
             type="button"
-            className={`service-choice-card service-choice-card--register${isRegisterMode ? " is-active" : ""}`}
+            data-service-tour-target="register"
+            className={[
+              "service-choice-card service-choice-card--register",
+              isRegisterMode ? "is-active" : "",
+              activeTourTarget === "register" ? "is-tour-highlight" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
             onClick={() => handleModeSelect("register")}
           >
             <span className="service-choice-card__logo-slot service-choice-card__logo-slot--empty" aria-hidden="true" />
@@ -3113,6 +3603,7 @@ export default function ServiceClaimFlow() {
           </button>
         </div>
       </section>
+      ) : null}
 
       {mode === "nachkauf" ? (
         <section className="service-panel">
@@ -3131,6 +3622,44 @@ export default function ServiceClaimFlow() {
               onClick={() => setMode("")}
             >
               {copy.back}
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {isRegisteredNextMode ? (
+        <section className="service-panel service-panel--registered-next">
+          <div className="service-panel__header">
+            <p className="service-panel__eyebrow">{copy.registerBrand}</p>
+            <h2>{t("registeredNextTitle")}</h2>
+            <p>{t("registeredNextText")}</p>
+          </div>
+
+          {successMessage ? <p className="service-form__success">{successMessage}</p> : null}
+
+          <div className="service-next-choice-grid">
+            <Link
+              href={completedRegistrationOrderHref}
+              className="service-next-choice service-next-choice--order"
+            >
+              <span className="service-next-choice__label">{t("registeredNextOrderLabel")}</span>
+              <strong>{t("registeredNextOrderTitle")}</strong>
+              <p>{t("registeredNextOrderText")}</p>
+              <span className="service-button service-button--primary service-next-choice__button">
+                {t("registeredNextOrderCta")}
+              </span>
+            </Link>
+            <button
+              type="button"
+              className="service-next-choice service-next-choice--claim"
+              onClick={handleRegisteredClaimSelect}
+            >
+              <span className="service-next-choice__label">{t("registeredNextClaimLabel")}</span>
+              <strong>{t("registeredNextClaimTitle")}</strong>
+              <p>{t("registeredNextClaimText")}</p>
+              <span className="service-button service-button--secondary service-next-choice__button">
+                {t("registeredNextClaimCta")}
+              </span>
             </button>
           </div>
         </section>
@@ -3339,7 +3868,7 @@ export default function ServiceClaimFlow() {
                 <button
                   type="button"
                   className="service-field__sticky-dismiss"
-                  aria-label="Disable fixed contract number box"
+                  aria-label={t("stickyContractDismissAria")}
                   onClick={() => setIsContractNumberStickyEnabled(false)}
                 >
                   &times;
@@ -3470,6 +3999,7 @@ export default function ServiceClaimFlow() {
                   value={formValues.phone}
                   onChange={(event) => handleFieldChange("phone", event.target.value)}
                   placeholder={copy.phonePlaceholder}
+                  required
                 />
               </label>
 
@@ -3483,6 +4013,7 @@ export default function ServiceClaimFlow() {
                   value={formValues.email}
                   onChange={(event) => handleFieldChange("email", event.target.value)}
                   placeholder={copy.emailPlaceholder}
+                  required
                 />
               </label>
             </div>
@@ -4071,6 +4602,11 @@ export default function ServiceClaimFlow() {
                             clearLabel={copy.attachmentsClear}
                             onRemove={(index) => removeProblemAreaAttachment(area.componentId, index)}
                             onClearAll={() => clearProblemAreaAttachments(area.componentId)}
+                            viewLabel={t("viewFile")}
+                            viewAriaLabel={t("viewFileAria")}
+                            closePreviewLabel={t("closeFilePreview")}
+                            previewUnavailableText={t("filePreviewUnavailable")}
+                            removeLabel={t("removeFileAria")}
                             expandLabel={copy.attachmentsViewMore}
                             collapseLabel={copy.attachmentsViewLess}
                             inlineExpandToggle
@@ -4174,7 +4710,7 @@ export default function ServiceClaimFlow() {
                               type="button"
                               className="service-serial-field__remove"
                               onClick={() => removeSerialNumberEntry(index)}
-                              aria-label="Remove serial number"
+                              aria-label={t("removeSerialNumberAria")}
                             >
                               &times;
                             </button>
@@ -4203,6 +4739,11 @@ export default function ServiceClaimFlow() {
                     clearLabel={copy.attachmentsClear}
                     onRemove={removeAttachment}
                     onClearAll={clearAttachments}
+                    viewLabel={t("viewFile")}
+                    viewAriaLabel={t("viewFileAria")}
+                    closePreviewLabel={t("closeFilePreview")}
+                    previewUnavailableText={t("filePreviewUnavailable")}
+                    removeLabel={t("removeFileAria")}
                     expandLabel={copy.attachmentsViewMore}
                     collapseLabel={copy.attachmentsViewLess}
                   />
@@ -4228,6 +4769,11 @@ export default function ServiceClaimFlow() {
                       summary={copy.attachmentsSelected.replace("{count}", String(serialNumberImages.length))}
                       maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
                       onRemove={removeSerialNumberImage}
+                      viewLabel={t("viewFile")}
+                      viewAriaLabel={t("viewFileAria")}
+                      closePreviewLabel={t("closeFilePreview")}
+                      previewUnavailableText={t("filePreviewUnavailable")}
+                      removeLabel={t("removeFileAria")}
                       expandLabel={copy.attachmentsViewMore}
                       collapseLabel={copy.attachmentsViewLess}
                     />
@@ -4256,6 +4802,14 @@ export default function ServiceClaimFlow() {
         </section>
       ) : null}
     </main>
+      <button
+        type="button"
+        className="service-tour-start"
+        onClick={startTour}
+        aria-label={t("tourStartAria")}
+      >
+        {t("tourStart")}
+      </button>
 
       {isComplaintMode ? (
         <div className={`service-claim-agent${isClaimAssistantOpen ? " is-open" : ""}`}>
@@ -4639,6 +5193,16 @@ export default function ServiceClaimFlow() {
           </div>
         </div>
       ) : null}
+      <ServiceGuidedTour
+        isOpen={isTourOpen}
+        activeStepIndex={tourStepIndex}
+        steps={serviceTourSteps}
+        copy={copy}
+        onBack={goToPreviousTourStep}
+        onNext={goToNextTourStep}
+        onSkip={completeTour}
+        onFinish={completeTour}
+      />
     </>
   );
 }

@@ -13,5 +13,19 @@ test("serial number photo field accepts multiple files and submits them all as a
     /accept=\{SERIAL_NUMBER_IMAGE_ACCEPT\}[\s\S]*?multiple[\s\S]*?onChange=\{handleSerialNumberImageSelected\}/,
   );
   assert.match(source, /const \[serialNumberImages,\s*setSerialNumberImages\] = useState\(\[\]\)/);
-  assert.match(source, /for \(const file of serialNumberImages\) \{\s*formData\.append\("attachments", file\);/);
+  assert.match(source, /for \(const file of serialNumberImages\) \{\s*formData\.append\("serialNumberImages", file\);/);
+  assert.match(source, /URL\.createObjectURL\(previewFile\)/);
+  assert.doesNotMatch(source, /window\.open\(/);
+  assert.match(source, /className="service-attachments__view"/);
+  assert.match(source, /className="service-file-preview__dialog"/);
+});
+
+test("registration verification offers order or claim next steps", () => {
+  const source = fs.readFileSync(sourcePath, "utf8");
+
+  assert.match(source, /setMode\("registered-next"\)/);
+  assert.doesNotMatch(source, /setMode\("complaint"\);\s*\}\s*catch \(submitError\)/);
+  assert.match(source, /completedRegistrationOrderHref/);
+  assert.match(source, /registeredNextOrderTitle/);
+  assert.match(source, /registeredNextClaimTitle/);
 });

@@ -9,7 +9,7 @@ import { normalizeServiceClaimContractNumber } from "./service-claims";
 
 /**
  * Loads kitchen SVG + config for a contract so the service form can show an interactive plan.
- * Selectable components come from COMPONENT lines on confirmed + editable orders.
+ * Selectable components come from COMPONENT lines on confirmed orders only.
  */
 export async function getServiceClaimKitchenPlan(contractNumber) {
   const normalized = normalizeServiceClaimContractNumber(contractNumber);
@@ -73,10 +73,7 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       });
     }
 
-    const orderLines = [
-      ...(orderState.confirmedItems || []),
-      ...((orderState.editableOrder && orderState.editableOrder.items) || []),
-    ];
+    const orderLines = orderState.confirmedItems || [];
 
     const selectableIds = new Set();
     const selectableMetaIds = new Set();
@@ -115,22 +112,6 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
         name: stripProductDimensionsFromLabel(
           String(line.nameSnapshot || ki.name || line.code || "").trim() || line.code,
         ),
-      };
-      selectableIds.add(componentId);
-      addSelectableMeta(componentId, fallbackMeta);
-    }
-
-    for (const comp of kitchenConfig.components || []) {
-      if (!comp.isLocked) {
-        continue;
-      }
-      const componentId = componentIdForItem(comp);
-      if (!componentId) {
-        continue;
-      }
-      const fallbackMeta = {
-        code: String(comp.code || "").trim(),
-        name: stripProductDimensionsFromLabel(String(comp.name || comp.code || "").trim() || comp.code),
       };
       selectableIds.add(componentId);
       addSelectableMeta(componentId, fallbackMeta);
