@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   applyVisibleComponentsToSvgMarkup,
   buildKitchenPreviewSvgMarkup,
+  inferKitchenSlugFromSelectedAreas,
   resolveClaimPreviewComponentKeys,
 } from "../lib/claim-kitchen-preview.js";
 
@@ -90,4 +91,22 @@ test("resolveClaimPreviewComponentKeys resolves explicit keys, component ids, an
   });
 
   assert.deepEqual(keys, ["refrigerator", "dishwasher-base", "sink-base"]);
+});
+
+test("inferKitchenSlugFromSelectedAreas resolves model b from stored claim area codes", () => {
+  const slug = inferKitchenSlugFromSelectedAreas([
+    { componentId: "component-oven-module", code: "OVEN-B-600-HOB" },
+    { componentId: "component-refrigerator", code: "REF-B-545-1800-700" },
+  ]);
+
+  assert.equal(slug, "kitchen-model-b");
+});
+
+test("inferKitchenSlugFromSelectedAreas does not guess when areas conflict", () => {
+  const slug = inferKitchenSlugFromSelectedAreas([
+    { code: "OVEN-B-600-HOB" },
+    { code: "DISH-C-600-STD" },
+  ]);
+
+  assert.equal(slug, "");
 });

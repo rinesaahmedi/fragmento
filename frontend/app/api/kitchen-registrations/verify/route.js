@@ -129,6 +129,7 @@ export async function POST(request) {
         id: activated.id,
         contractNumber: registration.kitchenContract.contractNumber,
         kitchenName: registration.kitchenContract.kitchen.name,
+        kitchenSlug: registration.kitchenContract.kitchen.slug,
         fullName: activated.fullName,
         email: activated.email,
         phone: activated.phone,

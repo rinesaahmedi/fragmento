@@ -27,5 +27,5 @@ test("service-claims route embeds a kitchen preview png in notification emails w
   assert.match(source, /buildClaimKitchenPreviewAttachment/);
   assert.match(source, /claim-kitchen-preview@fragmento/);
   assert.match(source, /contentDisposition:\s*"inline"/);
-  assert.match(source, /buildComplaintEmailHtml\(payload,\s*kitchenPreviewAttachment\?\.cid \|\| ""\)/);
+  assert.match(source, /buildComplaintEmailHtml\(emailPayload,\s*kitchenPreviewAttachment\?\.cid \|\| ""\)/);
 });

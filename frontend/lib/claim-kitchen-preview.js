@@ -46,6 +46,83 @@ function normalizeKitchenSlug(kitchenSlug) {
   return String(kitchenSlug || "").trim().toLowerCase();
 }
 
+function inferKitchenSlugFromAreaCode(code) {
+  const normalizedCode = String(code || "").trim().toUpperCase();
+  if (!normalizedCode) {
+    return "";
+  }
+
+  if (normalizedCode.startsWith("T3D-")) {
+    return "test-3d-kitchen";
+  }
+  if (
+    normalizedCode.includes("-LS-")
+    || normalizedCode.startsWith("REF-LS-")
+    || normalizedCode.startsWith("SINKBASE-LS-")
+    || normalizedCode.startsWith("DISH-LS-")
+    || normalizedCode.startsWith("CORNER-LS-")
+  ) {
+    return "l-shaped-kitchen";
+  }
+  if (/(?:^|-)B(?:-|$)/.test(normalizedCode)) {
+    return "kitchen-model-b";
+  }
+  if (/(?:^|-)C(?:-|$)/.test(normalizedCode)) {
+    return "kitchen-model-c";
+  }
+
+  return "";
+}
+
+function inferKitchenSlugFromComponentId(componentId) {
+  const normalizedComponentId = String(componentId || "").trim().toLowerCase();
+  if (!normalizedComponentId) {
+    return "";
+  }
+
+  if (
+    normalizedComponentId === "component-oven-module"
+    || normalizedComponentId === "component-base-module-1"
+    || normalizedComponentId === "component-base-module-2"
+    || normalizedComponentId === "component-base-module-3"
+    || normalizedComponentId === "component-drawer-module"
+  ) {
+    return "kitchen-model-b";
+  }
+  if (
+    normalizedComponentId === "component-oven-base"
+    || normalizedComponentId === "component-wm-base"
+    || normalizedComponentId === "component-sink-base"
+    || normalizedComponentId === "component-dishwasher-base"
+    || normalizedComponentId === "component-drawer-base-3"
+    || normalizedComponentId === "component-cook-base-left"
+    || normalizedComponentId === "component-cook-base-right"
+  ) {
+    return "kitchen-model-c";
+  }
+  if (
+    normalizedComponentId === "component-corner-base"
+    || normalizedComponentId === "component-drawer-base"
+  ) {
+    return "l-shaped-kitchen";
+  }
+
+  return "";
+}
+
+export function inferKitchenSlugFromSelectedAreas(selectedAreas = []) {
+  const slugs = new Set(
+    (Array.isArray(selectedAreas) ? selectedAreas : [])
+      .flatMap((area) => [
+        inferKitchenSlugFromAreaCode(area?.code),
+        inferKitchenSlugFromComponentId(area?.componentId),
+      ])
+      .filter(Boolean),
+  );
+
+  return slugs.size === 1 ? [...slugs][0] : "";
+}
+
 /**
  * Hides SVG component groups that are not part of the client's order (same rule as the service form picker).
  */
@@ -80,8 +157,9 @@ export async function resolveVisibleComponentIdsForContract(contractNumber, kitc
     return null;
   }
 
-  const { getServiceClaimKitchenPlan } = await import("./service-claim-kitchen-plan.js");
-  const plan = await getServiceClaimKitchenPlan(normalizedContract).catch(() => null);
+  const plan = await import("./service-claim-kitchen-plan.js")
+    .then(({ getServiceClaimKitchenPlan }) => getServiceClaimKitchenPlan(normalizedContract))
+    .catch(() => null);
   if (!plan || normalizeKitchenSlug(plan.kitchenSlug) !== normalizedSlug) {
     return null;
   }
@@ -199,22 +277,24 @@ export async function renderClaimKitchenPreviewSvg({
   selectedAreas = [],
   contractNumber = null,
 }) {
-  const context = await loadClaimKitchenPreviewContext(kitchenSlug);
+  const normalizedAreas = Array.isArray(selectedAreas)
+    ? selectedAreas
+    : parseServiceClaimProblemAreas(selectedAreas);
+  const resolvedKitchenSlug = normalizeKitchenSlug(kitchenSlug)
+    || inferKitchenSlugFromSelectedAreas(normalizedAreas);
+  const context = await loadClaimKitchenPreviewContext(resolvedKitchenSlug);
   if (!context) {
     return null;
   }
 
-  const normalizedAreas = Array.isArray(selectedAreas)
-    ? selectedAreas
-    : parseServiceClaimProblemAreas(selectedAreas);
   const highlightedComponentKeys = resolveClaimPreviewComponentKeys({
     selectedAreas: normalizedAreas,
     kitchenConfig: context.kitchenConfig,
   });
-  const visibleComponentIds = await resolveVisibleComponentIdsForContract(contractNumber, kitchenSlug);
+  const visibleComponentIds = await resolveVisibleComponentIdsForContract(contractNumber, resolvedKitchenSlug);
   const markup = buildKitchenPreviewSvgMarkup({
     svgMarkup: context.svgMarkup,
-    kitchenSlug,
+    kitchenSlug: resolvedKitchenSlug,
     highlightedComponentKeys,
     visibleComponentIds,
   });
@@ -225,7 +305,7 @@ export async function renderClaimKitchenPreviewSvg({
         highlightedComponentKeys,
         visibleComponentIds,
         kitchenName: context.kitchen?.name || "",
-        kitchenSlug: normalizeKitchenSlug(kitchenSlug),
+        kitchenSlug: resolvedKitchenSlug,
       }
     : null;
 }
