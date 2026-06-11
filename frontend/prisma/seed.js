@@ -341,6 +341,21 @@ const L_SHAPED_ITEMS = [
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
+const L_KITCHEN_NEW_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "LKNEW-TOP-400", name: "TOP - 400_1 Wall Cabinet", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#111111", componentKey: "top-400", sortOrder: 10, infoText: "DXF layer: TOP - 400_1" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-ASPIRATOR", name: "ASPIRATOR Hood Area", price: "349.00", iconKey: "extractor_hood", colorKey: "#222222", componentKey: "aspirator", sortOrder: 20, infoText: "DXF layer: ASPIRATOR" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-TOP-500", name: "TOP - 500_1 Wall Cabinet", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#333333", componentKey: "top-500", sortOrder: 30, infoText: "DXF layer: TOP - 500_1" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-TOP-600", name: "TOP - 600_1 Wall Cabinet", price: "139.00", iconKey: "wall_cabinet_standard", colorKey: "#444444", componentKey: "top-600", sortOrder: 40, infoText: "DXF layer: TOP - 600_1" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-BASE", name: "BASE Worktop and Fixed Elements", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "base", sortOrder: 50, isLocked: true, infoText: "DXF layer: BASE" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-BOTTOM-400", name: "BOTTOM - 400_1 Base Cabinet", price: "199.00", iconKey: "drawer_base_two", colorKey: "#555555", componentKey: "bottom-400", sortOrder: 60, infoText: "DXF layer: BOTTOM - 400_1" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-BOTTOM-500", name: "BOTTOM - 500_1 Base Cabinet", price: "199.00", iconKey: "drawer_base_two", colorKey: "#666666", componentKey: "bottom-500", sortOrder: 70, infoText: "DXF layer: BOTTOM - 500_1" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-DISHWASHER", name: "DISHWASHER", price: "579.00", iconKey: "dishwasher_base", colorKey: "#777777", componentKey: "dishwasher", sortOrder: 80, infoText: "DXF layer: DISHWASHER", articleNumber: "A-EGSPV597210" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-BOTTOM-300", name: "BOTTOM - 300 Drawer Cabinet", price: "229.00", iconKey: "drawer_base_three", colorKey: "#888888", componentKey: "bottom-300", sortOrder: 90, infoText: "DXF layer: BOTTOM - 300" },
+  { itemType: ItemType.COMPONENT, code: "LKNEW-REFRIGERATOR", name: "REFRIGERATOR", price: "579.00", iconKey: "tall_refrigerator", colorKey: "#999999", componentKey: "refrigerator", sortOrder: 100, infoText: "DXF layer: REFRIGERATOR" },
+  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
 const DEFAULT_KITCHENS = [
   {
     slug: "fragmento-default",
@@ -366,6 +381,12 @@ const DEFAULT_KITCHENS = [
     description: "L-shaped layout based on offer 670 105805 with return worktop and integrated appliances",
     items: L_SHAPED_ITEMS,
   },
+  {
+    slug: "l-kitchen-new",
+    name: "L Kitchen New",
+    description: "Layer-based L kitchen imported from L - KITCHEN.dxf",
+    items: L_KITCHEN_NEW_ITEMS,
+  },
 ];
 
 const DEFAULT_KITCHEN_CONTRACTS = [
@@ -373,6 +394,7 @@ const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "736268", kitchenSlug: "kitchen-model-b" },
   { contractNumber: "736269", kitchenSlug: "kitchen-model-c" },
   { contractNumber: "736270", kitchenSlug: "l-shaped-kitchen" },
+  { contractNumber: "736271", kitchenSlug: "l-kitchen-new" },
 ];
 
 function normalizeSeedSlug(value) {
