@@ -525,6 +525,9 @@ const COPY = {
     claimAssistantErrorUnavailable: "Die Reklamationshilfe konnte dazu gerade keine Antwort geben.",
     tourStart: "Hilfe / Tour starten",
     tourStartAria: "Tour der Serviceseite starten",
+    tourVideoTitle: "Video-Guide der Serviceseite",
+    tourVideoClose: "Video-Guide schliessen",
+    tourVideoUnsupported: "Dein Browser kann dieses Video nicht abspielen.",
     tourStepProgress: "Schritt {current} von {total}",
     tourNext: "Weiter",
     tourSkip: "Tour überspringen",
@@ -751,6 +754,9 @@ const COPY = {
     claimAssistantErrorUnavailable: "The claim helper could not answer that right now.",
     tourStart: "Help / Start tour",
     tourStartAria: "Start service page tour",
+    tourVideoTitle: "Service page video guide",
+    tourVideoClose: "Close video guide",
+    tourVideoUnsupported: "Your browser cannot play this video.",
     tourStepProgress: "Step {current} of {total}",
     tourNext: "Next",
     tourSkip: "Skip tour",
@@ -1546,6 +1552,9 @@ const COPY = {
       "\u041f\u043e\u043c\u043e\u0449\u043d\u0438\u043a \u043f\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044f\u043c \u0441\u0435\u0439\u0447\u0430\u0441 \u043d\u0435 \u043c\u043e\u0436\u0435\u0442 \u043e\u0442\u0432\u0435\u0442\u0438\u0442\u044c.",
     tourStart: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430 / \u041d\u0430\u0447\u0430\u0442\u044c \u0442\u0443\u0440",
     tourStartAria: "\u041d\u0430\u0447\u0430\u0442\u044c \u0442\u0443\u0440 \u043f\u043e \u0441\u0435\u0440\u0432\u0438\u0441\u043d\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435",
+    tourVideoTitle: "\u0412\u0438\u0434\u0435\u043e\u0433\u0438\u0434 \u043f\u043e \u0441\u0435\u0440\u0432\u0438\u0441\u043d\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435",
+    tourVideoClose: "\u0417\u0430\u043a\u0440\u044b\u0442\u044c \u0432\u0438\u0434\u0435\u043e\u0433\u0438\u0434",
+    tourVideoUnsupported: "\u0412\u0430\u0448 \u0431\u0440\u0430\u0443\u0437\u0435\u0440 \u043d\u0435 \u043c\u043e\u0436\u0435\u0442 \u0432\u043e\u0441\u043f\u0440\u043e\u0438\u0437\u0432\u0435\u0441\u0442\u0438 \u044d\u0442\u043e \u0432\u0438\u0434\u0435\u043e.",
     tourStepProgress: "\u0428\u0430\u0433 {current} \u0438\u0437 {total}",
     tourNext: "\u0414\u0430\u043b\u0435\u0435",
     tourSkip: "\u041f\u0440\u043e\u043f\u0443\u0441\u0442\u0438\u0442\u044c \u0442\u0443\u0440",
@@ -1815,113 +1824,43 @@ function normalizeShortDateInput(value) {
   return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
 }
 
-const SERVICE_TOUR_STORAGE_KEY = "fragmentoServiceTourCompleted";
-function getServiceTourSteps(copy) {
-  return [
-    {
-      target: "purchase",
-      title: copy.tourPurchaseTitle || COPY.en.tourPurchaseTitle,
-      description: copy.tourPurchaseDescription || COPY.en.tourPurchaseDescription,
-    },
-    {
-      target: "complaint",
-      title: copy.tourComplaintTitle || COPY.en.tourComplaintTitle,
-      description: copy.tourComplaintDescription || COPY.en.tourComplaintDescription,
-    },
-    {
-      target: "register",
-      title: copy.tourRegisterTitle || COPY.en.tourRegisterTitle,
-      description: copy.tourRegisterDescription || COPY.en.tourRegisterDescription,
-    },
-  ];
-}
+const SERVICE_TOUR_VIDEO_SRC = "/video/fragmento-tutorial-ru-faststart.mp4";
 
-function hasCompletedServiceTour() {
-  try {
-    return window.localStorage.getItem(SERVICE_TOUR_STORAGE_KEY) === "true";
-  } catch {
-    return false;
-  }
-}
-
-function saveCompletedServiceTour() {
-  try {
-    window.localStorage.setItem(SERVICE_TOUR_STORAGE_KEY, "true");
-  } catch {
-    // The tour can still be used if browser storage is unavailable.
-  }
-}
-
-function ServiceGuidedTour({ isOpen, activeStepIndex, steps, copy, onBack, onNext, onSkip, onFinish }) {
-  const dialogRef = useRef(null);
-  const tourSteps = steps?.length ? steps : getServiceTourSteps(COPY.en);
-  const activeStep = tourSteps[activeStepIndex] || tourSteps[0];
-  const isFirstStep = activeStepIndex === 0;
-  const isLastStep = activeStepIndex === tourSteps.length - 1;
-  const progressText = (copy.tourStepProgress || COPY.en.tourStepProgress)
-    .replace("{current}", String(activeStepIndex + 1))
-    .replace("{total}", String(tourSteps.length));
+function ServiceVideoGuide({ isOpen, copy, onClose, onFinish }) {
+  const videoRef = useRef(null);
+  const title = copy.tourVideoTitle || COPY.en.tourVideoTitle;
+  const closeLabel = copy.tourVideoClose || COPY.en.tourVideoClose;
+  const unsupportedText = copy.tourVideoUnsupported || COPY.en.tourVideoUnsupported;
 
   useEffect(() => {
     if (!isOpen) {
       return undefined;
     }
 
-    const activeTarget = document.querySelector(`[data-service-tour-target="${activeStep.target}"]`);
-    if (activeTarget) {
-      const rect = activeTarget.getBoundingClientRect();
-      const isVisible =
-        rect.top >= 0 &&
-        rect.left >= 0 &&
-        rect.bottom <= window.innerHeight &&
-        rect.right <= window.innerWidth;
-      if (!isVisible) {
-        activeTarget.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
-      }
+    const video = videoRef.current;
+    if (video) {
+      video.currentTime = 0;
+      video.muted = false;
+      video.volume = 1;
+      const playPromise = video.play();
+      playPromise?.catch?.(() => {});
     }
-
-    const focusTimer = window.setTimeout(() => {
-      dialogRef.current?.focus();
-    }, 120);
 
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         event.preventDefault();
-        onSkip();
-        return;
-      }
-
-      if (event.key !== "Tab" || !dialogRef.current) {
-        return;
-      }
-
-      const focusableElements = dialogRef.current.querySelectorAll(
-        'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      );
-      const focusable = Array.from(focusableElements);
-      if (!focusable.length) {
-        event.preventDefault();
-        return;
-      }
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
+        onClose();
       }
     }
 
     document.addEventListener("keydown", handleKeyDown);
-
     return () => {
-      window.clearTimeout(focusTimer);
+      if (video) {
+        video.pause();
+      }
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [activeStep.target, isOpen, onSkip]);
+  }, [isOpen, onClose]);
 
   if (!isOpen) {
     return null;
@@ -1929,54 +1868,37 @@ function ServiceGuidedTour({ isOpen, activeStepIndex, steps, copy, onBack, onNex
 
   return (
     <>
-      <div className="service-tour__overlay" aria-hidden="true" />
-      <div className="service-tour__stage">
-        <section
-          ref={dialogRef}
-          className="service-tour__dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="service-tour-title"
-          aria-describedby="service-tour-description"
-          tabIndex={-1}
+      <div className="service-video-guide__backdrop" aria-hidden="true" />
+      <section className="service-video-guide" role="dialog" aria-label={title}>
+        <button
+          type="button"
+          className="service-video-guide__close"
+          aria-label={closeLabel}
+          onClick={onClose}
         >
-          <div
-            className="service-tour__progress"
-            role="group"
-            aria-label={progressText}
-          >
-            {tourSteps.map((step, index) => (
-              <span
-                key={step.target}
-                className={`service-tour__dot${index === activeStepIndex ? " is-active" : ""}`}
-                aria-hidden="true"
-              />
-            ))}
-          </div>
-          <p className="service-tour__eyebrow">{progressText}</p>
-          <h2 id="service-tour-title">{activeStep.title}</h2>
-          <p id="service-tour-description">{activeStep.description}</p>
-          <div className="service-tour__actions">
-            {!isFirstStep ? (
-              <button type="button" className="service-button service-button--secondary" onClick={onBack}>
-                {copy.back || COPY.en.back}
-              </button>
-            ) : null}
-            <button type="button" className="service-tour__skip" onClick={onSkip}>
-              {copy.tourSkip || COPY.en.tourSkip}
-            </button>
-            {isLastStep ? (
-              <button type="button" className="service-button service-button--primary" onClick={onFinish}>
-                {copy.tourFinish || COPY.en.tourFinish}
-              </button>
-            ) : (
-              <button type="button" className="service-button service-button--primary" onClick={onNext}>
-                {copy.tourNext || COPY.en.tourNext}
-              </button>
-            )}
-          </div>
-        </section>
-      </div>
+          &times;
+        </button>
+        <video
+          ref={videoRef}
+          className="service-video-guide__media"
+          src={SERVICE_TOUR_VIDEO_SRC}
+          controls
+          autoPlay
+          playsInline
+          preload="auto"
+          onCanPlay={() => {
+            const video = videoRef.current;
+            if (!video || !video.paused) return;
+            video.muted = false;
+            video.volume = 1;
+            const playPromise = video.play();
+            playPromise?.catch?.(() => {});
+          }}
+          onEnded={onFinish}
+        >
+          {unsupportedText}
+        </video>
+      </section>
     </>
   );
 }
@@ -2016,7 +1938,6 @@ export default function ServiceClaimFlow() {
   const [selectedClaimAssistantContextKey, setSelectedClaimAssistantContextKey] = useState("claim");
   const [serialNumberDraft, setSerialNumberDraft] = useState("");
   const [isTourOpen, setIsTourOpen] = useState(false);
-  const [tourStepIndex, setTourStepIndex] = useState(0);
   const [isPreferredContactCalendarOpen, setIsPreferredContactCalendarOpen] = useState(false);
   const [preferredContactCalendarMonth, setPreferredContactCalendarMonth] = useState(() =>
     startOfCalendarMonth(new Date()),
@@ -2037,14 +1958,12 @@ export default function ServiceClaimFlow() {
   const contractNumberStickySentinelRef = useRef(null);
 
   const copy = COPY[language] || COPY.en;
-  const serviceTourSteps = useMemo(() => getServiceTourSteps(copy), [copy]);
   const fallbackCopy = COPY.en;
   const formValues = { ...INITIAL_FORM, ...form };
   const selectedLanguage = LANGUAGE_OPTIONS.find((option) => option.code === language) || LANGUAGE_OPTIONS[0];
   const isComplaintMode = mode === "complaint";
   const isRegisterMode = mode === "register";
   const isRegisteredNextMode = mode === "registered-next";
-  const activeTourTarget = isTourOpen ? serviceTourSteps[tourStepIndex]?.target : null;
   const selectedPreferredContactDate = useMemo(
     () => parseShortDate(formValues.preferredContactDate),
     [formValues.preferredContactDate],
@@ -2080,30 +1999,15 @@ export default function ServiceClaimFlow() {
       return;
     }
 
-    if (!hasCompletedServiceTour()) {
-      setTourStepIndex(0);
-      setIsTourOpen(true);
-    }
+    setIsTourOpen(true);
   }, []);
 
   function completeTour() {
-    if (typeof window !== "undefined") {
-      saveCompletedServiceTour();
-    }
     setIsTourOpen(false);
   }
 
   function startTour() {
-    setTourStepIndex(0);
     setIsTourOpen(true);
-  }
-
-  function goToNextTourStep() {
-    setTourStepIndex((current) => Math.min(current + 1, serviceTourSteps.length - 1));
-  }
-
-  function goToPreviousTourStep() {
-    setTourStepIndex((current) => Math.max(current - 1, 0));
   }
   const normalizedContractNumber = normalizeServiceClaimContractNumber(formValues.contractNumber);
   const completedRegistrationContractNumber = normalizeServiceClaimContractNumber(
@@ -3585,11 +3489,9 @@ export default function ServiceClaimFlow() {
         <div className="service-choice-grid">
           <button
             type="button"
-            data-service-tour-target="purchase"
             className={[
               "service-choice-card service-choice-card--purchase",
               mode === "nachkauf" ? "is-active" : "",
-              activeTourTarget === "purchase" ? "is-tour-highlight" : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -3610,11 +3512,9 @@ export default function ServiceClaimFlow() {
           </button>
           <button
             type="button"
-            data-service-tour-target="complaint"
             className={[
               "service-choice-card service-choice-card--complaint",
               isComplaintMode ? "is-active" : "",
-              activeTourTarget === "complaint" ? "is-tour-highlight" : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -3636,11 +3536,9 @@ export default function ServiceClaimFlow() {
           </button>
           <button
             type="button"
-            data-service-tour-target="register"
             className={[
               "service-choice-card service-choice-card--register",
               isRegisterMode ? "is-active" : "",
-              activeTourTarget === "register" ? "is-tour-highlight" : "",
             ]
               .filter(Boolean)
               .join(" ")}
@@ -4854,14 +4752,17 @@ export default function ServiceClaimFlow() {
         </section>
       ) : null}
     </main>
-      <button
-        type="button"
-        className="service-tour-start"
-        onClick={startTour}
-        aria-label={t("tourStartAria")}
-      >
-        {t("tourStart")}
-      </button>
+      {!isTourOpen ? (
+        <button
+          type="button"
+          className="service-tour-start"
+          onClick={startTour}
+          aria-label={t("tourStartAria")}
+        >
+          <span className="service-tour-start__icon" aria-hidden="true">&#9658;</span>
+          <span>{t("tourStart")}</span>
+        </button>
+      ) : null}
 
       {isComplaintMode ? (
         <div className={`service-claim-agent${isClaimAssistantOpen ? " is-open" : ""}`}>
@@ -5245,14 +5146,10 @@ export default function ServiceClaimFlow() {
           </div>
         </div>
       ) : null}
-      <ServiceGuidedTour
+      <ServiceVideoGuide
         isOpen={isTourOpen}
-        activeStepIndex={tourStepIndex}
-        steps={serviceTourSteps}
         copy={copy}
-        onBack={goToPreviousTourStep}
-        onNext={goToNextTourStep}
-        onSkip={completeTour}
+        onClose={completeTour}
         onFinish={completeTour}
       />
     </>
