@@ -1,5 +1,5 @@
 import { ItemType, KitchenStatus } from "@prisma/client";
-import { componentIdForItem } from "../components/kitchen-selection-utils";
+import { componentIdForItem, getLinkedComponentIds } from "../components/kitchen-selection-utils";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "./catalog";
 import { getContractOrderState } from "./kitchen-contracts";
 import { loadKitchenSvgMarkup } from "./load-kitchen-svg";
@@ -9,8 +9,19 @@ import { normalizeServiceClaimContractNumber } from "./service-claims";
 
 /**
  * Loads kitchen SVG + config for a contract so the service form can show an interactive plan.
- * Selectable components come from included base items plus COMPONENT lines on confirmed orders.
+ * Selectable components come from locked default components and included base items plus COMPONENT lines on confirmed orders.
  */
+const CLAIM_COMPONENT_CODE_ALIASES = new Map([
+  ["HOOD-B-FH664621E", "CAB-HOOD-B-600"],
+]);
+
+const CLAIM_LINKED_COMPONENT_META = {
+  "component-extractor-hood": {
+    code: "HOOD-B-FH664621E",
+    name: "Extractor Hood",
+  },
+};
+
 export async function getServiceClaimKitchenPlan(contractNumber) {
   const normalized = normalizeServiceClaimContractNumber(contractNumber);
   if (!normalized) {
@@ -96,6 +107,36 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       });
     }
 
+    function addSelectableComponent(componentId, fallbackMeta = {}) {
+      if (!componentId) {
+        return;
+      }
+
+      const linkedIds = getLinkedComponentIds(slug, componentId);
+      linkedIds.forEach((linkedId) => {
+        selectableIds.add(linkedId);
+        addSelectableMeta(linkedId, linkedId === componentId
+          ? fallbackMeta
+          : CLAIM_LINKED_COMPONENT_META[linkedId]);
+      });
+    }
+
+    for (const item of kitchen.items || []) {
+      if (item.itemType !== ItemType.COMPONENT || !item.isLocked) {
+        continue;
+      }
+
+      const componentId = componentIdForItem(item);
+      if (!componentId) {
+        continue;
+      }
+
+      addSelectableComponent(componentId, {
+        code: String(item.code || "").trim(),
+        name: stripProductDimensionsFromLabel(String(item.name || item.code || "").trim() || item.code),
+      });
+    }
+
     for (const item of kitchen.items || []) {
       if (item.itemType !== ItemType.COMPONENT || !item.isLocked) {
         continue;
@@ -121,19 +162,19 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       if (line.itemType !== ItemType.COMPONENT) {
         continue;
       }
-      const ki = componentItemsByCode.get(line.code);
+      const normalizedCode = CLAIM_COMPONENT_CODE_ALIASES.get(line.code) || line.code;
+      const ki = componentItemsByCode.get(normalizedCode);
       if (!ki) {
         continue;
       }
       const componentId = componentIdForItem(ki);
       const fallbackMeta = {
-        code: String(line.code || "").trim(),
+        code: String(normalizedCode || line.code || "").trim(),
         name: stripProductDimensionsFromLabel(
           String(line.nameSnapshot || ki.name || line.code || "").trim() || line.code,
         ),
       };
-      selectableIds.add(componentId);
-      addSelectableMeta(componentId, fallbackMeta);
+      addSelectableComponent(componentId, fallbackMeta);
     }
 
     return {

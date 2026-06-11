@@ -12,6 +12,7 @@ import {
   componentIdForKey,
   formatCurrency,
   getCatalogDisplayItem,
+  getLinkedComponentIds,
   getLocalizedItemName,
   hasAssistantProductInfo,
   isHiddenLinkedComponent,
@@ -892,13 +893,21 @@ function lockedItemCodesByType(initialOrder, itemType) {
   );
 }
 
-function buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder) {
+function expandLinkedComponentIds(kitchenSlug, componentIds) {
+  return [
+    ...new Set(
+      componentIds.flatMap((componentId) => getLinkedComponentIds(kitchenSlug, componentId)),
+    ),
+  ];
+}
+
+function buildInitialComponentIds(kitchenConfig, lockedComponentIds, initialOrder, kitchenSlug) {
   const componentCodes = initialItemCodesByType(initialOrder, "component");
   const existingComponentIds = kitchenConfig.components
     .filter((item) => componentCodes.has(item.code))
     .map((item) => componentIdForItem(item));
 
-  return [...new Set([...lockedComponentIds, ...existingComponentIds])];
+  return expandLinkedComponentIds(kitchenSlug, [...lockedComponentIds, ...existingComponentIds]);
 }
 
 function buildInitialCodes(kitchenConfig, initialOrder, itemType, configKey) {
@@ -906,11 +915,13 @@ function buildInitialCodes(kitchenConfig, initialOrder, itemType, configKey) {
   return kitchenConfig[configKey].filter((item) => itemCodes.has(item.code)).map((item) => item.code);
 }
 
-function buildOrderLockedComponentIds(kitchenConfig, initialOrder) {
+function buildOrderLockedComponentIds(kitchenConfig, initialOrder, kitchenSlug) {
   const componentCodes = lockedItemCodesByType(initialOrder, "component");
-  return kitchenConfig.components
+  const componentIds = kitchenConfig.components
     .filter((item) => componentCodes.has(item.code))
     .map((item) => componentIdForItem(item));
+
+  return expandLinkedComponentIds(kitchenSlug, componentIds);
 }
 
 function buildDefaultLockedComponentIds(kitchenSlug, kitchenConfig) {
@@ -980,8 +991,8 @@ function clearConfiguratorDraft(storageKey) {
   }
 }
 
-function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft) {
-  const baseComponentIds = buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder);
+function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft, kitchenSlug) {
+  const baseComponentIds = buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder, kitchenSlug);
   const baseAccessoryCodes = [...new Set([...fixedAccessoryCodes, ...buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories")])];
   const baseServiceCodes = buildInitialCodes(kitchenConfig, initialOrder, "service", "services");
 
@@ -1052,8 +1063,8 @@ function KitchenConfiguratorContent({
     [kitchenSlug],
   );
   const orderLockedComponentIds = useMemo(
-    () => buildOrderLockedComponentIds(kitchenConfig, initialOrder),
-    [kitchenConfig, initialOrder],
+    () => buildOrderLockedComponentIds(kitchenConfig, initialOrder, kitchenSlug),
+    [kitchenConfig, initialOrder, kitchenSlug],
   );
   const fixedComponentIds = useMemo(
     () => [
@@ -1087,8 +1098,8 @@ function KitchenConfiguratorContent({
     [initialOrder],
   );
   const initialSelection = useMemo(
-    () => buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, null),
-    [fixedAccessoryCodes, fixedComponentIds, initialOrder, kitchenConfig],
+    () => buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, null, kitchenSlug),
+    [fixedAccessoryCodes, fixedComponentIds, initialOrder, kitchenConfig, kitchenSlug],
   );
 
   const [selectedComponentIds, setSelectedComponentIds] = useState(initialSelection.selectedComponentIds);
@@ -1133,7 +1144,7 @@ function KitchenConfiguratorContent({
     if (initialOrder) {
       const nextCustomer = buildInitialCustomerFromOrder(initialOrder, initialContractNumber);
       const draft = readConfiguratorDraft(draftStorageKey);
-      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft);
+      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft, kitchenSlug);
       setCustomer(nextCustomer);
       setUseContractAddressForOrder(customerUsesContractAddress(nextCustomer, initialContractAddress));
       setAddressVerification(buildAddressVerificationState());
@@ -1145,7 +1156,7 @@ function KitchenConfiguratorContent({
 
     if (initialContractAddress) {
       const draft = readConfiguratorDraft(draftStorageKey);
-      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft);
+      const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft, kitchenSlug);
       setCustomer((current) => ({
         ...current,
         ...buildCustomerAddressFromContract(initialContractAddress),
@@ -1161,7 +1172,7 @@ function KitchenConfiguratorContent({
 
     if (!initialContractNumber) return;
     const draft = readConfiguratorDraft(draftStorageKey);
-    const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft);
+    const nextSelection = buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft, kitchenSlug);
     setCustomer((current) => {
       if (current.contractNumber === initialContractNumber) return current;
       return { ...current, contractNumber: initialContractNumber };
@@ -1171,7 +1182,7 @@ function KitchenConfiguratorContent({
     setSelectedComponentIds(nextSelection.selectedComponentIds);
     setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
     setSelectedServiceCodes(nextSelection.selectedServiceCodes);
-  }, [draftStorageKey, fixedAccessoryCodes, fixedComponentIds, initialContractAddress, initialContractNumber, initialOrder, kitchenConfig]);
+  }, [draftStorageKey, fixedAccessoryCodes, fixedComponentIds, initialContractAddress, initialContractNumber, initialOrder, kitchenConfig, kitchenSlug]);
 
   useEffect(() => {
     const verifiedSnapshotKey = addressVerification?.verification?.snapshot
