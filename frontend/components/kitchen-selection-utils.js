@@ -128,7 +128,7 @@ export function getLocalizedItemName(item, translate) {
     case "TOP-C-4000":
       return withDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
     case "CAB-BASE-B-STR":
-      return withDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawers", "Base Cabinet (2 Drawers)"));
     case "REF-B-545-1800-700":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
@@ -136,6 +136,9 @@ export function getLocalizedItemName(item, translate) {
     case "SINK-B-BOTTON-45":
     case "SINK-C-BOTTON-45":
       return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
+    case "ACC-WASTE-001":
+    case "T3D-ACC-WASTE-001":
+      return translate("configurator.catalogItemNames.wasteSeparationSystem", "Waste separation system");
     case "ACC-CUTLERY-ZB60SG":
       return translate("configurator.catalogItemNames.cutleryInsert60", "Cutlery insert ZB60SG");
     case "CAB-COOK-C-L-600":
@@ -143,7 +146,7 @@ export function getLocalizedItemName(item, translate) {
     case "CAB-COOK-C-R-600":
       return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"));
     case "CAB-DRAWER-C-3D":
-      return withDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
+      return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawers", "Base Cabinet (2 Drawers)"));
     case "T3D-CAB-WALL-01":
     case "T3D-CAB-WALL-02":
     case "T3D-CAB-WALL-03":
@@ -241,6 +244,9 @@ export function getLocalizedItemInfoText(item, translate) {
       return translate("configurator.catalogItemInfo.manualWasteSystem", "Blanco Botton Pro 45/2 manual waste system");
     case "ACC-CUTLERY-ZB60SG":
       return translate("configurator.catalogItemInfo.cutleryInsert60", "Cutlery insert for 60 cm cabinet");
+    case "ACC-WASTE-001":
+    case "T3D-ACC-WASTE-001":
+      return translate("configurator.catalogItemInfo.wasteSeparationSystem", "Blanco Botton 517467");
     default:
       return item?.infoText || "";
   }

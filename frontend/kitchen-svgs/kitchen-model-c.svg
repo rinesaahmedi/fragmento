@@ -154,11 +154,9 @@
     <rect x="686" y="338" width="72" height="3" fill="white" stroke="#ffbf00" stroke-width="1"/>
     <rect x="686" y="341" width="72" height="82" fill="white" stroke="#ffbf00" stroke-width="1"/>
     <rect x="686" y="423" width="72" height="12" fill="white" stroke="#ffbf00" stroke-width="1"/>
-    <line x1="686" y1="357" x2="758" y2="357" stroke="#ffbf00" stroke-width="1"/>
-    <line x1="686" y1="389" x2="758" y2="389" stroke="#ffbf00" stroke-width="1"/>
-    <line x1="710" y1="349" x2="734" y2="349" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="710" y1="373" x2="734" y2="373" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
-    <line x1="710" y1="405" x2="734" y2="405" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="686" y1="360" x2="758" y2="360" stroke="#ffbf00" stroke-width="1"/>
+    <line x1="710" y1="350" x2="734" y2="350" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="710" y1="370" x2="734" y2="370" stroke="#ffbf00" stroke-width="1.5" stroke-linecap="round"/>
   </g>
 
   <g data-component-id="component-sink-faucet" transform="translate(0 9)">

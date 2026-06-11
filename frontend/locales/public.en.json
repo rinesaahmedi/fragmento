@@ -102,7 +102,9 @@
       "refrigerator": "Refrigerator",
       "sinkAndWasteSystem": "Sink and Waste System",
       "sinkAndWorktop": "Sink and Worktop",
-      "cutleryInsert60": "Cutlery insert ZB60SG",
+      "wasteSeparationSystem": "Waste separation system",
+      "cutleryInsert60": "Cutlery insert 60 cm",
+      "baseCabinetTwoDrawers": "Base Cabinet (2 Drawers)",
       "baseCabinetTwoDrawersLeft": "Base Cabinet (2 Drawers) Left",
       "baseCabinetTwoDrawersRight": "Base Cabinet (2 Drawers) Right",
       "baseCabinetThreeDrawers": "Base Cabinet (3 Drawers)"
@@ -121,7 +123,8 @@
       "strBaseStorageCabinet": "STR base storage cabinet",
       "fridgeFreezerNoFrost": "Fridge-freezer, 180 cm, NoFrost",
       "manualWasteSystem": "Blanco Botton Pro 45/2 manual waste system",
-      "cutleryInsert60": "Cutlery insert for 60 cm cabinet",
+      "wasteSeparationSystem": "Blanco Botton 517467",
+      "cutleryInsert60": "Cutlery insert 60 cm",
       "includesExtractorHood": "Includes extractor hood"
     },
     "productInfoLabelOvenELabel": "Oven E-Label",

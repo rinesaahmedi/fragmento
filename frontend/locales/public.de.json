@@ -102,7 +102,9 @@
       "refrigerator": "Kühlschrank",
       "sinkAndWasteSystem": "Spüle und Mülltrennsystem",
       "sinkAndWorktop": "Spüle und Arbeitsplatte",
-      "cutleryInsert60": "Besteckeinsatz ZB60SG",
+      "wasteSeparationSystem": "Mülltrennsystem",
+      "cutleryInsert60": "Besteckeinsatz 60 cm",
+      "baseCabinetTwoDrawers": "Unterschrank (2 Schubladen)",
       "baseCabinetTwoDrawersLeft": "Unterschrank (2 Schubladen) links",
       "baseCabinetTwoDrawersRight": "Unterschrank (2 Schubladen) rechts",
       "baseCabinetThreeDrawers": "Unterschrank (3 Schubladen)"
@@ -121,7 +123,8 @@
       "strBaseStorageCabinet": "STR Stauraum-Unterschrank",
       "fridgeFreezerNoFrost": "Kühl-Gefrierkombination, 180 cm, NoFrost",
       "manualWasteSystem": "Blanco Botton Pro 45/2 manuelles Mülltrennsystem",
-      "cutleryInsert60": "Besteckeinsatz für 60-cm-Schrank",
+      "wasteSeparationSystem": "Blanco Botton 517467",
+      "cutleryInsert60": "Besteckeinsatz 60 cm",
       "includesExtractorHood": "Enthält Dunstabzugshaube"
     },
     "productInfoLabelOvenELabel": "Backofen E-Label",
