@@ -783,10 +783,10 @@ textarea {
 }
 
 .service-tour-start {
-  position: fixed;
-  left: 22px;
-  bottom: 22px;
-  z-index: 5200;
+  position: absolute;
+  left: 40px;
+  top: calc(100% + 24px);
+  z-index: 4;
   min-height: 46px;
   display: inline-flex;
   align-items: center;
@@ -3913,6 +3913,12 @@ textarea {
   .service-hero__content {
     padding-left: 0;
   }
+
+  .service-tour-start {
+    position: static;
+    justify-self: start;
+    margin-top: 18px;
+  }
 }
 
 @media (max-width: 700px) {
@@ -3965,9 +3971,8 @@ textarea {
   }
 
   .service-tour-start {
-    left: 12px;
-    bottom: max(12px, env(safe-area-inset-bottom));
     min-height: 40px;
+    justify-self: center;
     padding: 8px 13px;
     font-size: 0.84rem;
   }

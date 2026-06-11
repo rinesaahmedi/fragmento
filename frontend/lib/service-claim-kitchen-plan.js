@@ -9,7 +9,7 @@ import { normalizeServiceClaimContractNumber } from "./service-claims";
 
 /**
  * Loads kitchen SVG + config for a contract so the service form can show an interactive plan.
- * Selectable components come from COMPONENT lines on confirmed orders only.
+ * Selectable components come from included base items plus COMPONENT lines on confirmed orders.
  */
 export async function getServiceClaimKitchenPlan(contractNumber) {
   const normalized = normalizeServiceClaimContractNumber(contractNumber);
@@ -73,8 +73,6 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       });
     }
 
-    const orderLines = orderState.confirmedItems || [];
-
     const selectableIds = new Set();
     const selectableMetaIds = new Set();
     const selectableMeta = [];
@@ -97,6 +95,27 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
         name,
       });
     }
+
+    for (const item of kitchen.items || []) {
+      if (item.itemType !== ItemType.COMPONENT || !item.isLocked) {
+        continue;
+      }
+
+      const componentId = componentIdForItem(item);
+      if (!componentId) {
+        continue;
+      }
+
+      selectableIds.add(componentId);
+      addSelectableMeta(componentId, {
+        code: String(item.code || "").trim(),
+        name: stripProductDimensionsFromLabel(
+          String(item.name || item.code || "").trim() || item.code,
+        ),
+      });
+    }
+
+    const orderLines = orderState.confirmedItems || [];
 
     for (const line of orderLines) {
       if (line.itemType !== ItemType.COMPONENT) {
