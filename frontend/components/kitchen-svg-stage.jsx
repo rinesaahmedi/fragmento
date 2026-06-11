@@ -5,6 +5,7 @@ import styles from "./kitchen-configurator.module.css";
 import Kitchen3DViewer from "./Kitchen3DViewer";
 import {
   componentIdForItem,
+  isHiddenLinkedComponent,
   normalizeColor,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
@@ -35,8 +36,13 @@ export default function KitchenSvgStage({
   );
   const fixedComponentIdsKey = fixedComponentIds.join("|");
   const componentIds = useMemo(
-    () => new Set(kitchenConfig.components.map((item) => componentIdForItem(item))),
-    [kitchenConfig.components],
+    () =>
+      new Set(
+        kitchenConfig.components
+          .map((item) => componentIdForItem(item))
+          .filter((componentId) => !isHiddenLinkedComponent(kitchenSlug, componentId)),
+      ),
+    [kitchenConfig.components, kitchenSlug],
   );
 
   useEffect(() => {
@@ -50,7 +56,7 @@ export default function KitchenSvgStage({
       svgMarkup: resolvedSvgMarkup,
       planViewport,
       kitchenConfig,
-      selectedComponentIds,
+      selectedComponentIds: [],
       lockedComponentIds: fixedComponentIds,
       componentIdForItem,
       normalizeColor,
@@ -61,7 +67,25 @@ export default function KitchenSvgStage({
     }
 
     const onClick = (event) => {
-      const group = event.target.closest("[data-component-id]");
+      const groupsAtPoint = typeof document.elementsFromPoint === "function"
+        ? document.elementsFromPoint(event.clientX, event.clientY)
+          .map((element) => element.closest?.("[data-component-id]"))
+          .filter(Boolean)
+        : [event.target.closest?.("[data-component-id]")].filter(Boolean);
+      const uniqueGroups = [...new Map(groupsAtPoint.map((group) => [group.dataset.componentId, group])).values()]
+        .filter((group) => group.dataset.componentId && componentIds.has(group.dataset.componentId));
+      if (!uniqueGroups.length) return;
+
+      const group = uniqueGroups
+        .map((candidate) => {
+          const hitbox = candidate.querySelector(".component-hitbox") || candidate;
+          const rect = hitbox.getBoundingClientRect();
+          return {
+            group: candidate,
+            area: Math.max(rect.width, 1) * Math.max(rect.height, 1),
+          };
+        })
+        .sort((a, b) => a.area - b.area)[0]?.group;
       if (!group) return;
 
       const componentId = group.dataset.componentId;
@@ -81,9 +105,9 @@ export default function KitchenSvgStage({
     kitchenSlug,
     fixedComponentIds,
     activeView,
+    componentIds,
     planViewport,
     resolvedSvgMarkup,
-    selectedComponentIds,
     setSelectedComponentIds,
   ]);
 
@@ -96,8 +120,9 @@ export default function KitchenSvgStage({
       host: svgHostRef.current,
       selectedComponentIds,
       lockedComponentIds: fixedComponentIds,
+      kitchenSlug,
     });
-  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds]);
+  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds, kitchenSlug]);
 
   return (
     <div className={styles.stage}>

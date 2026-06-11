@@ -61,11 +61,21 @@ export function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
 }
 
+function getStructuredDimensions(item) {
+  const values = [item?.widthMm, item?.heightMm, item?.depthMm];
+  if (values.every((value) => value === null || value === undefined || value === "")) return "";
+  return `${values.map((value) => value ?? "-").join(" x ")} mm`;
+}
+
 export function getLocalizedItemName(item, translate) {
   const code = String(item?.code || "").trim().toUpperCase();
   const rawName = String(item?.name || "").trim();
   const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
-  const withRawDimensions = (label) => rawDimensions ? `${label} (${rawDimensions})` : label;
+  const structuredDimensions = getStructuredDimensions(item);
+  const withDimensions = (label) => {
+    const dimensions = structuredDimensions || rawDimensions;
+    return dimensions ? `${label} (${dimensions})` : label;
+  };
 
   if (rawName === "Sink and Worktop") {
     return translate("configurator.catalogItemNames.sinkAndWorktop", "Sink and Worktop");
@@ -75,27 +85,27 @@ export function getLocalizedItemName(item, translate) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
     case "T3D-OVEN-HOB-001":
-      return withRawDimensions(translate("configurator.itemNameOvenHob", "Built-in oven and cooktop"));
+      return withDimensions(translate("configurator.itemNameOvenHob", "Built-in oven and induction hob"));
     case "CAB-WALL-B-L-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-B-ML-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"));
     case "CAB-WALL-B-MR-600":
-      return withRawDimensions(rawName.includes("+")
+      return withDimensions(rawName.includes("+")
         ? translate("configurator.catalogItemNames.wallCabinetMidRightExtractorHood", "Wall Cabinet mid-right + extractor hood")
         : translate("configurator.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"));
     case "CAB-WALL-B-R-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
     case "CAB-HOOD-B-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"));
     case "CAB-WALL-C-L-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-C-ML-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"));
     case "CAB-WALL-C-MR-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"));
     case "CAB-WALL-C-R-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
     case "HOOD-B-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
@@ -105,59 +115,60 @@ export function getLocalizedItemName(item, translate) {
       return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
     case "WM-B-EWA34660W":
     case "WM-C-EWA34660W":
-      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
+      return withDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
     case "SINKBASE-B-600":
     case "SINKBASE-C-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
     case "DISH-B-600-STD":
     case "DISH-C-600-STD":
+    case "DISH-LS-600-STD":
     case "DISH-600-STD":
-      return withRawDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+      return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
     case "TOP-B-3036":
     case "TOP-C-4000":
-      return withRawDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
+      return withDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
     case "CAB-BASE-B-STR":
-      return withRawDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
     case "REF-B-545-1800-700":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
-      return withRawDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
+      return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
     case "SINK-B-BOTTON-45":
     case "SINK-C-BOTTON-45":
       return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
     case "ACC-CUTLERY-ZB60SG":
       return translate("configurator.catalogItemNames.cutleryInsert60", "Cutlery insert ZB60SG");
     case "CAB-COOK-C-L-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"));
+      return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"));
     case "CAB-COOK-C-R-600":
-      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"));
+      return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"));
     case "CAB-DRAWER-C-3D":
-      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
+      return withDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
     case "T3D-CAB-WALL-01":
     case "T3D-CAB-WALL-02":
     case "T3D-CAB-WALL-03":
     case "T3D-CAB-WALL-04":
     case "T3D-CAB-WALL-05":
-      return withRawDimensions(translate("configurator.catalogItemNames.wallCabinet", "Wall Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.wallCabinet", "Wall Cabinet"));
     case "T3D-LIGHT-001":
       return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
     case "T3D-WASHER-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
+      return withDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
     case "T3D-SINKBASE-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
     case "T3D-DISH-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+      return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
     case "T3D-CAB-STORAGE-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
     case "T3D-CAB-CORNER-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.cornerBaseCabinet", "Corner Base Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.cornerBaseCabinet", "Corner Base Cabinet"));
     case "T3D-CAB-BASE-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.returnBaseCabinet", "Return Base Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.returnBaseCabinet", "Return Base Cabinet"));
     case "T3D-CAB-DRAWERS-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
+      return withDimensions(translate("configurator.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"));
     case "T3D-TOP-MAIN-001":
     case "T3D-TOP-RETURN-001":
-      return withRawDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
+      return withDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
     case "T3D-SINK-001":
       return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
     case "T3D-HOOD-001":
@@ -206,6 +217,7 @@ export function getLocalizedItemInfoText(item, translate) {
       return translate("configurator.catalogItemInfo.blancoBottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
     case "DISH-B-600-STD":
     case "DISH-C-600-STD":
+    case "DISH-LS-600-STD":
     case "T3D-DISH-001":
       return translate("configurator.catalogItemInfo.integratedDishwasher", "Fully integrated dishwasher, 60 cm");
     case "TOP-B-3036":
@@ -216,7 +228,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
     case "T3D-OVEN-HOB-001":
-      return translate("configurator.catalogItemInfo.ovenInductionHob", "Built-in oven + induction cooktop");
+      return translate("configurator.catalogItemInfo.ovenInductionHob", "Built-in oven + induction hob");
     case "CAB-BASE-B-STR":
     case "T3D-CAB-STORAGE-001":
       return translate("configurator.catalogItemInfo.strBaseStorageCabinet", "STR base storage cabinet");
@@ -236,6 +248,7 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],
 };
 
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
@@ -244,6 +257,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "DISH-C-600-STD": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
+  "DISH-LS-600-STD": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
@@ -260,6 +277,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "HOOD-B-FH664621E": [
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+  ],
+  "HOOD-LS-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
@@ -417,12 +438,14 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-C-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-LS-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-OVEN-HOB-001": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "HOOD-LS-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
@@ -475,7 +498,11 @@ export function getCatalogDisplayItem(allItems, slug, item) {
   }
 
   const hoodItem =
-    linkedItems.find((entry) => String(entry.componentKey || "").toLowerCase() === "extractor-hood") || null;
+    linkedItems.find((entry) => {
+      const componentKey = String(entry.componentKey || "").toLowerCase();
+      const code = String(entry.code || "").trim().toUpperCase();
+      return componentKey === "extractor-hood" || code.startsWith("HOOD-");
+    }) || null;
   const primaryItem = linkedItems[0];
   const infoSource = hoodItem?.productInfoPdfPath ? hoodItem : primaryItem;
   const assistantHoverExtractorHoodOnly = Boolean(hoodItem && infoSource === hoodItem);

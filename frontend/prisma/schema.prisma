@@ -57,6 +57,9 @@ model KitchenItem {
   articleNumber String?
   name          String
   price         Decimal     @db.Decimal(10, 2)
+  widthMm       Int?
+  heightMm      Int?
+  depthMm       Int?
   infoText      String?
   productImagePath String?
   productInfoPdfPath       String?

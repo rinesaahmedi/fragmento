@@ -645,7 +645,7 @@
 
 .itemTop {
   display: grid;
-  grid-template-columns: 66px 1fr auto;
+  grid-template-columns: 66px minmax(0, 1fr) auto;
   gap: 12px;
   align-items: start;
 }
@@ -657,7 +657,7 @@
   width: 66px;
   height: 66px;
   color: #000;
-  transform: translateY(14px);
+  transform: none;
 }
 
 .itemIcon img,
@@ -694,8 +694,10 @@
 
 .itemText strong {
   display: block;
+  overflow-wrap: anywhere;
   font-size: 0.98rem;
   color: #2f2a24;
+  line-height: 1.18;
 }
 
 .itemDimensions {
@@ -739,7 +741,7 @@
 
 .itemPrice {
   color: #1874ff;
-  font-size: 1.2rem;
+  font-size: clamp(1rem, 2.7vw, 1.2rem);
   font-weight: 800;
   white-space: nowrap;
 }
