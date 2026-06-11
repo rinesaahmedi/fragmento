@@ -3473,6 +3473,17 @@ export default function ServiceClaimFlow() {
               <span className="service-hero__brand-note">{"by K\u00fcchen Aktuell"}</span>
             </div>
             <h1>{copy.title}</h1>
+            {!isTourOpen ? (
+              <button
+                type="button"
+                className="service-tour-start"
+                onClick={startTour}
+                aria-label={t("tourStartAria")}
+              >
+                <span className="service-tour-start__icon" aria-hidden="true">&#9658;</span>
+                <span>{t("tourStart")}</span>
+              </button>
+            ) : null}
           </div>
 
           <div className="service-hero__mascot" aria-hidden="true">
@@ -4752,18 +4763,6 @@ export default function ServiceClaimFlow() {
         </section>
       ) : null}
     </main>
-      {!isTourOpen ? (
-        <button
-          type="button"
-          className="service-tour-start"
-          onClick={startTour}
-          aria-label={t("tourStartAria")}
-        >
-          <span className="service-tour-start__icon" aria-hidden="true">&#9658;</span>
-          <span>{t("tourStart")}</span>
-        </button>
-      ) : null}
-
       {isComplaintMode ? (
         <div className={`service-claim-agent${isClaimAssistantOpen ? " is-open" : ""}`}>
           {isClaimAssistantOpen ? (

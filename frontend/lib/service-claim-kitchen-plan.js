@@ -9,7 +9,7 @@ import { normalizeServiceClaimContractNumber } from "./service-claims";
 
 /**
  * Loads kitchen SVG + config for a contract so the service form can show an interactive plan.
- * Selectable components come from locked default components and COMPONENT lines on confirmed orders only.
+ * Selectable components come from locked default components and included base items plus COMPONENT lines on confirmed orders.
  */
 const CLAIM_COMPONENT_CODE_ALIASES = new Map([
   ["HOOD-B-FH664621E", "CAB-HOOD-B-600"],
@@ -84,8 +84,6 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       });
     }
 
-    const orderLines = orderState.confirmedItems || [];
-
     const selectableIds = new Set();
     const selectableMetaIds = new Set();
     const selectableMeta = [];
@@ -138,6 +136,27 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
         name: stripProductDimensionsFromLabel(String(item.name || item.code || "").trim() || item.code),
       });
     }
+
+    for (const item of kitchen.items || []) {
+      if (item.itemType !== ItemType.COMPONENT || !item.isLocked) {
+        continue;
+      }
+
+      const componentId = componentIdForItem(item);
+      if (!componentId) {
+        continue;
+      }
+
+      selectableIds.add(componentId);
+      addSelectableMeta(componentId, {
+        code: String(item.code || "").trim(),
+        name: stripProductDimensionsFromLabel(
+          String(item.name || item.code || "").trim() || item.code,
+        ),
+      });
+    }
+
+    const orderLines = orderState.confirmedItems || [];
 
     for (const line of orderLines) {
       if (line.itemType !== ItemType.COMPONENT) {
