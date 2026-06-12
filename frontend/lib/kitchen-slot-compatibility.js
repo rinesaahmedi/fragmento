@@ -17,7 +17,7 @@ export function inferSlotKindFromComponentKey(componentKey) {
   if (key.includes("sink-base") || key.includes("base-module-2")) return "sink-base";
   if (key.includes("dishwasher-base") || key.includes("base-module-3")) return "dishwasher-base";
   if (key.includes("oven-base") || key.includes("oven-module")) return "oven-base";
-  if (key.includes("drawer-base-3")) return "drawer-base-3";
+  if (key.includes("drawer-base-3")) return "drawer-base-2";
   if (key.includes("cook-base") || key.includes("drawer-module")) return "drawer-base-2";
   if (key.includes("worktop")) return "worktop";
   if (key.includes("sink-faucet") || key.includes("faucet")) return "sink-faucet";

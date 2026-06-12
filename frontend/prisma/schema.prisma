@@ -38,6 +38,7 @@ model AdminUser {
 model Kitchen {
   id          String            @id @default(cuid())
   slug        String            @unique
+  kitchenCode String?
   name        String
   status      KitchenStatus     @default(DRAFT)
   description String?

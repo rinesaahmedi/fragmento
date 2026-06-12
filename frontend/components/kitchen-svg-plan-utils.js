@@ -5,7 +5,7 @@ export const PLAN_VIEWPORT_BY_SLUG = {
     canvasClassName: "wide",
   },
   "l-shaped-kitchen": {
-    viewBox: "120 45 540 450",
+    viewBox: "60 45 600 450",
     preserveAspectRatio: "xMidYMid meet",
   },
 };
@@ -14,6 +14,7 @@ const BASE_PLAN_STROKE = "#8f877d";
 const SELECTED_PLAN_STROKE = "#000000";
 const OVERLAY_SELECTED_STROKE = "#2a9155";
 const SELECTED_MUTED_APPLIANCE_STROKE = "#374151";
+const DISHWASHER_INTERNAL_ICON_IDLE_STROKE = "#e2dfdf";
 const TEST_3D_PLAN_STROKE = "#e9eeeb";
 const TEST_3D_SELECTED_PLAN_STROKE = "#ffffff";
 
@@ -64,12 +65,12 @@ function getPlanBounds(group, componentId) {
 }
 
 const L_SHAPED_PLAN_COMPONENT_BOUNDS = {
-  "component-wall-cabinet-1": { x: 156, y: 114, width: 96, height: 137 },
-  "component-wall-cabinet-2": { x: 207, y: 98, width: 122, height: 163 },
-  "component-wall-cabinet-3": { x: 284, y: 86, width: 108, height: 139 },
-  "component-wall-cabinet-4": { x: 347, y: 71, width: 128, height: 142 },
+  "component-wall-cabinet-1": { x: 176, y: 126, width: 76, height: 125 },
+  "component-wall-cabinet-2": { x: 227, y: 111, width: 102, height: 153 },
+  "component-wall-cabinet-3": { x: 304, y: 98, width: 88, height: 127 },
+  "component-wall-cabinet-4": { x: 368, y: 83, width: 107, height: 130 },
   "component-under-cabinet-light": { x: 329, y: 246, width: 70, height: 42 },
-  "component-refrigerator": { x: 566, y: 331, width: 49, height: 147 },
+  "component-refrigerator": { x: 77, y: 183, width: 114, height: 287 },
   "component-worktop": { x: 156, y: 237, width: 459, height: 92 },
   "component-base-module-1": { x: 200, y: 318, width: 53, height: 122 },
   "component-oven-base": { x: 253, y: 318, width: 77, height: 122 },
@@ -81,12 +82,12 @@ const L_SHAPED_PLAN_COMPONENT_BOUNDS = {
 };
 
 const L_SHAPED_PLAN_COMPONENT_SHAPES = {
-  "component-wall-cabinet-1": "M156 124 L207 114 L252 140 L201 151 Z M156 124 L201 151 L201 251 L156 224 Z M201 151 L252 140 L252 240 L201 251 Z",
-  "component-wall-cabinet-2": "M207 114 L284 98 L329 125 L252 140 Z M252 140 L329 125 L329 225 L252 240 Z M260 242 L284 242 L284 264 L260 264 Z M299 235 L323 235 L323 257 L299 257 Z",
-  "component-wall-cabinet-3": "M284 98 L347 86 L392 112 L329 125 Z M329 125 L392 112 L392 213 L329 225 Z",
-  "component-wall-cabinet-4": "M347 86 L424 71 L469 97 L392 112 Z M392 112 L469 97 L469 198 L392 213 Z M469 97 L475 96 L475 196 L469 198 Z",
+  "component-wall-cabinet-1": "M176 136 L227 126 L252 140 L201 151 Z M176 136 L201 151 L201 251 L176 236 Z M201 151 L252 140 L252 240 L201 251 Z",
+  "component-wall-cabinet-2": "M227 126 L304 111 L329 125 L252 140 Z M252 140 L329 125 L329 225 L252 240 Z M260 242 L284 242 L284 264 L260 264 Z M299 235 L323 235 L323 257 L299 257 Z",
+  "component-wall-cabinet-3": "M304 111 L368 98 L392 112 L329 125 Z M329 125 L392 112 L392 213 L329 225 Z",
+  "component-wall-cabinet-4": "M368 98 L445 83 L469 97 L392 112 Z M392 112 L469 97 L469 198 L392 213 Z M469 97 L475 96 L475 196 L469 198 Z",
   "component-under-cabinet-light": "M329 276 L399 263 L399 282 L329 296 Z",
-  "component-refrigerator": "M566 341 L615 331 L615 478 L566 462 Z",
+  "component-refrigerator": "M77.9 197.48 L148.52 183.53 L190.52 208.53 L190.52 455.98 L119.47 470.02 L77.47 445.02 Z",
   "component-worktop": "M156 296 L356 257 L516 351 L615 332 L456 237 L356 257 L156 296 Z M156 329 L400 281 L516 350 L566 341 L330 388 Z",
   "component-base-module-1": "M202 328 L253 318 L253 440 L202 450 Z",
   "component-oven-base": "M253 346 L330 331 L330 425 L253 439 Z",
@@ -98,10 +99,10 @@ const L_SHAPED_PLAN_COMPONENT_SHAPES = {
 };
 
 const L_SHAPED_PLAN_COMPONENT_SELECTION_OUTLINE_SHAPES = {
-  "component-wall-cabinet-1": "M156 124 L207 114 L252 140 L201 151 Z M156 124 L201 151 L201 251 L156 224 Z M201 151 L252 140 L252 240 L201 251 Z",
-  "component-wall-cabinet-2": "M207 114 L284 98 L329 125 L252 140 Z M252 140 L329 125 L329 225 L252 240 Z",
-  "component-wall-cabinet-3": "M284 98 L347 86 L392 112 L329 125 Z M329 125 L392 112 L392 213 L329 225 Z",
-  "component-wall-cabinet-4": "M347 86 L424 71 L469 97 L392 112 Z M392 112 L469 97 L469 198 L392 213 Z M469 97 L475 96 L475 196 L469 198 Z",
+  "component-wall-cabinet-1": "M176 136 L227 126 L252 140 L201 151 Z M176 136 L201 151 L201 251 L176 236 Z M201 151 L252 140 L252 240 L201 251 Z",
+  "component-wall-cabinet-2": "M227 126 L304 111 L329 125 L252 140 Z M252 140 L329 125 L329 225 L252 240 Z",
+  "component-wall-cabinet-3": "M304 111 L368 98 L392 112 L329 125 Z M329 125 L392 112 L392 213 L329 225 Z",
+  "component-wall-cabinet-4": "M368 98 L445 83 L469 97 L392 112 Z M392 112 L469 97 L469 198 L392 213 Z M469 97 L475 96 L475 196 L469 198 Z",
 };
 
 const L_SHAPED_HOOD_CABINET_DETAIL_PATHS = new Set([
@@ -468,6 +469,15 @@ function applyLShapedDishwasherInternalIconStyles(svg, selectedComponentIds = []
   });
 }
 
+function bringLShapedRefrigeratorForward(svg, slug) {
+  if (slug !== "l-shaped-kitchen") return;
+
+  const refrigeratorGroup = svg?.querySelector('[data-component-id="component-refrigerator"]');
+  if (refrigeratorGroup?.parentNode) {
+    refrigeratorGroup.parentNode.appendChild(refrigeratorGroup);
+  }
+}
+
 function isApplianceDetailElement(group, element) {
   const componentId = group?.dataset?.componentId || "";
   if (
@@ -560,6 +570,20 @@ export function applyGroupVisualState(group, { selected, locked }) {
     }
     if (!element.dataset.originalFill) {
       element.dataset.originalFill = getInheritedSvgAttribute(element, "fill", group) || "";
+    }
+
+    if (isLShapedDishwasherInternalIconElement(group, element)) {
+      element.style.setProperty(
+        "stroke",
+        isActive ? SELECTED_MUTED_APPLIANCE_STROKE : DISHWASHER_INTERNAL_ICON_IDLE_STROKE,
+        "important",
+      );
+      element.style.setProperty("stroke-width", `${element.dataset.originalStrokeWidth}px`, "important");
+      element.style.setProperty("vector-effect", "non-scaling-stroke", "important");
+      if (element.dataset.originalFill) {
+        element.style.setProperty("fill", element.dataset.originalFill, "important");
+      }
+      return;
     }
 
     if (useOutlineOnlySelection || useHitboxOnlySelection) {
@@ -864,6 +888,7 @@ export function syncKitchenPlan({
   cleanupPlanInteractionOverlays(svg, kitchenConfig.kitchen.slug);
   applyLShapedDefaultSelectedDetailStyles(svg, lockedComponentIds, selectedComponentIds);
   applyLShapedDishwasherInternalIconStyles(svg, selectedComponentIds);
+  bringLShapedRefrigeratorForward(svg, kitchenConfig.kitchen.slug);
 
   return svg;
 }
@@ -889,4 +914,5 @@ export function refreshKitchenPlanSelection({ host, selectedComponentIds, locked
   cleanupPlanInteractionOverlays(svg, kitchenSlug);
   applyLShapedDefaultSelectedDetailStyles(svg, lockedComponentIds, selectedComponentIds);
   applyLShapedDishwasherInternalIconStyles(svg, selectedComponentIds);
+  bringLShapedRefrigeratorForward(svg, kitchenSlug);
 }

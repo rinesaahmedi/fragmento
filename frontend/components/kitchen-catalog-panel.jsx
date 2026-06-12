@@ -188,6 +188,7 @@ function CatalogItem({
   const itemDimensions = getStructuredDimensions(item) || itemDisplayName.dimensions;
   const className = [
     styles.itemCard,
+    compactIcon ? styles.itemCardCompact : "",
     selected ? styles.itemCardSelected : "",
     locked ? styles.itemCardLocked : "",
     disabled ? styles.itemCardLocked : "",
@@ -199,6 +200,7 @@ function CatalogItem({
     compactIcon ? styles.itemIconCompact : "",
     item.iconKey === "refrigerator" || item.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
     item.iconKey === "lighting_set" ? styles.itemIconLightingSet : "",
+    String(item.iconKey || "").startsWith("drawer_base") ? styles.itemIconDrawerBase : "",
   ]
     .filter(Boolean)
     .join(" ");

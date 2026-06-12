@@ -85,7 +85,7 @@ const DEFAULT_LOCKED_PLAN_COMPONENT_KEYS_BY_SLUG = {
 };
 
 const DEFAULT_LOCKED_ACCESSORY_CODES_BY_SLUG = {
-  "l-shaped-kitchen": ["SINK-LS-TIPO45", "TAP-LS-DARAS-F-HD"],
+  "l-shaped-kitchen": [],
 };
 
 function buildCustomerAddressFromContract(contractAddress) {

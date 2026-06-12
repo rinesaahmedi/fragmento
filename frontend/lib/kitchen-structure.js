@@ -55,7 +55,7 @@ const KNOWN_KITCHEN_STRUCTURES = {
       { componentKey: "wm-base", label: "Washing machine base", zone: "Lower run", compatibleKinds: ["washing-machine-base"] },
       { componentKey: "sink-base", label: "Sink base", zone: "Lower run", compatibleKinds: ["sink-base"] },
       { componentKey: "dishwasher-base", label: "Dishwasher base", zone: "Lower run", compatibleKinds: ["dishwasher-base"] },
-      { componentKey: "drawer-base-3", label: "Drawer base 3", zone: "Lower run", compatibleKinds: ["drawer-base-3"] },
+      { componentKey: "drawer-base-3", label: "Drawer base", zone: "Lower run", compatibleKinds: ["drawer-base-2"] },
       { componentKey: "worktop", label: "Worktop", zone: "Work surface", compatibleKinds: ["worktop"] },
       { componentKey: "sink-faucet", label: "Sink faucet", zone: "Work surface", compatibleKinds: ["sink-faucet"] },
     ],

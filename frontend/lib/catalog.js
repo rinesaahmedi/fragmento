@@ -184,12 +184,26 @@ export async function getKitchenBySlug(slug) {
 }
 
 export async function listKitchensForAdmin() {
-  return prisma.kitchen.findMany({
+  const kitchens = await prisma.kitchen.findMany({
     include: {
       _count: { select: { items: true, orders: true, contracts: true } },
     },
     orderBy: { createdAt: "desc" },
   });
+
+  try {
+    const codes = await prisma.$queryRaw`
+      SELECT "id", "kitchenCode"
+      FROM "Kitchen"
+    `;
+    const codeById = new Map(codes.map((row) => [row.id, row.kitchenCode || null]));
+    return kitchens.map((kitchen) => ({
+      ...kitchen,
+      kitchenCode: codeById.get(kitchen.id) || null,
+    }));
+  } catch {
+    return kitchens;
+  }
 }
 
 export async function getKitchenById(id) {
