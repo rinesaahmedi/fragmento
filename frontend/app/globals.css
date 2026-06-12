@@ -809,6 +809,11 @@ textarea {
     border-color 160ms ease;
 }
 
+.service-tour-start--mascot {
+  left: calc(55% + 8px);
+  top: 190px;
+}
+
 .service-tour-start__icon {
   width: 24px;
   height: 24px;
