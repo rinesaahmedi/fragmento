@@ -3473,20 +3473,9 @@ export default function ServiceClaimFlow() {
               <span className="service-hero__brand-note">{"by K\u00fcchen Aktuell"}</span>
             </div>
             <h1>{copy.title}</h1>
-            {!isTourOpen ? (
-              <button
-                type="button"
-                className="service-tour-start"
-                onClick={startTour}
-                aria-label={t("tourStartAria")}
-              >
-                <span className="service-tour-start__icon" aria-hidden="true">&#9658;</span>
-                <span>{t("tourStart")}</span>
-              </button>
-            ) : null}
           </div>
 
-          <div className="service-hero__mascot" aria-hidden="true">
+          <div className="service-hero__mascot">
             <Image
               src="/img/Untitled%20design%20(4).png"
               alt=""
@@ -3494,6 +3483,17 @@ export default function ServiceClaimFlow() {
               height={312}
               className="service-hero__mascot-image"
             />
+            {!isTourOpen ? (
+              <button
+                type="button"
+                className="service-tour-start service-tour-start--mascot"
+                onClick={startTour}
+                aria-label={t("tourStartAria")}
+              >
+                <span className="service-tour-start__icon" aria-hidden="true">&#9658;</span>
+                <span>{t("tourStart")}</span>
+              </button>
+            ) : null}
           </div>
         </div>
 
