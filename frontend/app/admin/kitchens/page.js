@@ -18,6 +18,10 @@ import { requireAdminPage } from "../../../lib/auth";
 
 export const dynamic = "force-dynamic";
 
+function formatKitchenCode(kitchen) {
+  return kitchen.kitchenCode || kitchen.slug;
+}
+
 export default async function AdminKitchensPage() {
   const admin = await requireAdminPage();
   const kitchens = await listKitchensForAdmin();
@@ -58,7 +62,7 @@ export default async function AdminKitchensPage() {
                         <AdminKitchenDisplayName slug={kitchen.slug} name={kitchen.name} />
                       </Link>
                     </td>
-                    <td style={tdStyle}>{kitchen.slug}</td>
+                    <td style={tdStyle}>{formatKitchenCode(kitchen)}</td>
                     <td style={tdStyle}><AdminStatusBadge status={kitchen.status} /></td>
                     <td style={tdStyle}>{kitchen._count.items}</td>
                     <td style={tdStyle}>{kitchen._count.orders}</td>
@@ -88,7 +92,7 @@ export default async function AdminKitchensPage() {
                       <AdminKitchenDisplayName slug={kitchen.slug} name={kitchen.name} />
                     </Link>
                     <div style={subMetaStyle}>
-                      <span>{kitchen.slug}</span>
+                      <span>{formatKitchenCode(kitchen)}</span>
                       <span><AdminDateTime value={kitchen.updatedAt.toISOString()} /></span>
                     </div>
                   </div>
