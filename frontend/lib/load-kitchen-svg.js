@@ -10,11 +10,11 @@ function normalizeAssetPaths(input) {
 }
 
 const SVG_BY_SLUG = {
-  "kitchen-model-b": path.join(process.cwd(), "kitchen-svgs", "kitchen-model-b.svg"),
-  "kitchen-model-c": path.join(process.cwd(), "kitchen-svgs", "kitchen-model-c.svg"),
-  "l-kitchen-new": path.join(process.cwd(), "kitchen-svgs", "l-kitchen-new.svg"),
-  "l-shaped-kitchen": path.join(process.cwd(), "kitchen-svgs", "l-shaped-kitchen.svg"),
-  "test-3d-kitchen": path.join(process.cwd(), "kitchen-svgs", "test-3d-kitchen.svg"),
+  "kitchen-model-b": path.join(process.cwd(), "kitchen-svgs", "active", "kitchen-model-b.svg"),
+  "kitchen-model-c": path.join(process.cwd(), "kitchen-svgs", "active", "kitchen-model-c.svg"),
+  "l-kitchen-new": path.join(process.cwd(), "kitchen-svgs", "active", "l-kitchen-new.svg"),
+  "l-shaped-kitchen": path.join(process.cwd(), "kitchen-svgs", "active", "l-shaped-kitchen.svg"),
+  "test-3d-kitchen": path.join(process.cwd(), "kitchen-svgs", "active", "test-3d-kitchen.svg"),
 };
 
 async function loadSvgFromFile(filePath) {
