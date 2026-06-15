@@ -67,9 +67,9 @@ function getStructuredDimensions(item) {
   return `${values.map((value) => value ?? "-").join(" x ")} mm`;
 }
 
-export function getLocalizedItemName(item, translate) {
+export function getLocalizedItemName(item, translate, language = "en") {
   const code = String(item?.code || "").trim().toUpperCase();
-  const rawName = String(item?.name || "").trim();
+  const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
   const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
   const structuredDimensions = getStructuredDimensions(item);
   const withDimensions = (label) => {

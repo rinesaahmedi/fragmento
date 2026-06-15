@@ -262,20 +262,6 @@ PRODUCT_INFO_BY_CODE["LIGHT-B-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
 PRODUCT_INFO_BY_CODE["LIGHT-C-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
 PRODUCT_INFO_BY_CODE["ACC-LIGHT-003"] = LED_LIGHTING_PRODUCT_INFO;
 
-const DEFAULT_ITEMS = [
-  { itemType: ItemType.COMPONENT, code: "DISH-600-STD", legacyCode: "component-dishwasher", name: "Spülmaschine", price: "579.00", infoText: "Amica by architecto", iconKey: "dishwasher", colorKey: "#001f7f", sortOrder: 10 },
-  { itemType: ItemType.COMPONENT, code: "REF-545-1800-700", legacyCode: "component-refrigerator", name: "Kühlschrank", price: "579.00", infoText: "Amica by architecto", iconKey: "refrigerator", colorKey: "black", sortOrder: 20 },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-030", legacyCode: "component-base-cabinet-30", name: "Unterschrank 30cm", price: "175.00", iconKey: "base_cabinet_30", colorKey: "#ffbf00", sortOrder: 30 },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-L-060", legacyCode: "component-wall-cabinet-left", name: "Oberschrank (links)", price: "115.00", iconKey: "wall_cabinet_l", colorKey: "#00ffbf", sortOrder: 40 },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-R-060", legacyCode: "component-wall-cabinet-right", name: "Oberschrank (rechts)", price: "115.00", iconKey: "wall_cabinet_r", colorKey: "#394c00", sortOrder: 50 },
-  { itemType: ItemType.COMPONENT, code: "HOOD-600-FLAT", legacyCode: "component-extractor-hood", name: "Dunstabzugshaube", price: "349.00", infoText: "Amica by architecto", iconKey: "extractor_hood", colorKey: "#ff7f9f", sortOrder: 60 },
-  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Mülltrennsystem", price: "89.00", iconKey: "waste_system", sortOrder: 100 },
-  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-001", legacyCode: "acc-cutlery", name: "Besteckeinsatz 30cm", price: "19.00", iconKey: "cutlery_insert", sortOrder: 110 },
-  { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 120 },
-  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 200 },
-  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 210 },
-];
-
 const MODEL_B_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-B-L-600", legacyCode: "model-b-wall-cabinet-1", name: "Wall Cabinet left (600 x 723 x 320 mm)", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 10, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-B-ML-600", legacyCode: "model-b-wall-cabinet-2", name: "Wall Cabinet mid-left (600 x 723 x 320 mm)", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 20, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
@@ -354,7 +340,7 @@ const L_SHAPED_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-LS-400", name: "Base Cabinet left", price: "0.01", widthMm: 400, heightMm: 720, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 80, infoText: "1 drawer, 1 door, 1 adjustable shelf" },
   { itemType: ItemType.COMPONENT, code: "OVEN-LS-600-HOB", name: "Built-in Oven and Ceramic Hob with UHK Base (600 x 600 mm)", price: "449.00", iconKey: "oven_base", colorKey: "#00c76a", componentKey: "oven-base", sortOrder: 90, isLocked: true, infoText: "UHK oven base with EH92364E-A oven + 9EC744100C ceramic hob; oven niche 600 x 560 x 560 mm", articleNumber: "UHK / EH92364E-A / 9EC744100C" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-LS-500", name: "Base Cabinet right", price: "0.01", widthMm: 500, heightMm: 720, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 100, infoText: "1 drawer, 1 door, 1 adjustable shelf" },
-  { itemType: ItemType.COMPONENT, code: "CORNER-LS-650", name: "Corner Filler (560 x 650 mm)", price: "0.00", iconKey: "base_cabinet_30", colorKey: "springgreen", componentKey: "corner-base", sortOrder: 110, isLocked: true, infoText: "Corner filler for base cabinets, 723 mm high, 90 degrees", articleNumber: "UPEF65" },
+  { itemType: ItemType.COMPONENT, code: "CORNER-LS-650", name: "Corner Filler (560 x 650 mm)", price: "0.00", colorKey: "springgreen", componentKey: "corner-base", sortOrder: 110, isLocked: true, infoText: "Corner filler for base cabinets, 723 mm high, 90 degrees", articleNumber: "UPEF65" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-LS-600", name: "Sink Base Cabinet", price: "175.00", widthMm: 300, heightMm: 720, depthMm: 600, iconKey: "drawer_base_two", colorKey: "springgreen", componentKey: "base-module-3", sortOrder: 120, infoText: "US30, sink base cabinet", articleNumber: "US30" },
   { itemType: ItemType.COMPONENT, code: "CAB-DRAWER-LS-300", name: "Base Cabinet with Drawers (300 x 723 mm)", price: "229.00", iconKey: "drawer_base_three", colorKey: "#ffbf00", componentKey: "drawer-base", sortOrder: 140, infoText: "US2A30, 1 drawer, 2 pull-outs", articleNumber: "US2A30", isActive: false },
   { itemType: ItemType.COMPONENT, code: "DISH-LS-600-STD", name: "Fully Integrated Dishwasher incl. Furniture Front", price: "579.00", widthMm: 598, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 130, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
@@ -382,12 +368,6 @@ const L_KITCHEN_NEW_ITEMS = [
 ];
 
 const DEFAULT_KITCHENS = [
-  {
-    slug: "fragmento-default",
-    name: "Fragmento Default Kitchen",
-    description: "Seeded default kitchen based on the legacy configurator.",
-    items: DEFAULT_ITEMS,
-  },
   {
     slug: "kitchen-model-b",
     kitchenCode: "260 309",
@@ -425,7 +405,6 @@ const DEFAULT_KITCHENS = [
 ];
 
 const DEFAULT_KITCHEN_CONTRACTS = [
-  { contractNumber: "736267", kitchenSlug: "fragmento-default" },
   { contractNumber: "736268", kitchenSlug: "kitchen-model-b" },
   { contractNumber: "736269", kitchenSlug: "kitchen-model-c" },
   { contractNumber: "736270", kitchenSlug: "l-shaped-kitchen" },

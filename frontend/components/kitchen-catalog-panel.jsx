@@ -27,9 +27,6 @@ const DISHWASHER_BASE_MARKUP =
 const ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
   refrigerator: '<img src="/img/foto6.png" alt="Kuehlschrank">',
-  base_cabinet_30: '<img src="/img/foto1.png" alt="Unterschrank 30cm">',
-  wall_cabinet_l: '<img src="/img/foto4.png" alt="Oberschrank links">',
-  wall_cabinet_r: '<img src="/img/foto2.png" alt="Oberschrank rechts">',
   extractor_hood: '<img src="/img/foto5.png" alt="Dunstabzugshaube">',
   wall_cabinet_single_light:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/><g stroke="#666" stroke-width="0.75"><line x1="30" y1="60" x2="30" y2="63"/><line x1="28" y1="63" x2="32" y2="63"/><line x1="26" y1="66" x2="22" y2="74"/><line x1="30" y1="66" x2="30" y2="75"/><line x1="34" y1="66" x2="38" y2="74"/></g></svg>',
@@ -181,8 +178,8 @@ function CatalogItem({
   productAssistantEnabled,
   onOpenProductAssistant,
 }) {
-  const { translate } = usePublicI18n();
-  const itemName = getLocalizedItemName(item, translate);
+  const { translate, language } = usePublicI18n();
+  const itemName = getLocalizedItemName(item, translate, language);
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const itemDimensions = getStructuredDimensions(item) || itemDisplayName.dimensions;

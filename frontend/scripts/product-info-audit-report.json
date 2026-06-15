@@ -1,1307 +1,1159 @@
-{
-  "generatedAt": "2026-05-25T11:50:02.050Z",
-  "reportPath": "C:\\Users\\Admin\\Desktop\\Projects\\ARC FRAGMENTO\\frontend\\scripts\\product-info-audit-report.json",
-  "mutation": false,
-  "summary": {
-    "auditedItems": 18,
-    "readiness": {
-      "ready": 18,
-      "partial": 0,
-      "missing": 0
-    },
-    "keyFacts": {
-      "empty": 0,
-      "withFormatWarnings": 2
-    },
-    "importantFacts": {
-      "applianceLikeItems": 13,
-      "withMissingRelevantFacts": 4
-    },
-    "germanNormalization": {
-      "itemsWithWarnings": 0,
-      "totalWarnings": 0
-    }
-  },
-  "items": [
-    {
-      "id": "cmoh7lg5t0003sn1o2skwo1pz",
-      "kitchenSlug": "fragmento-default",
-      "kitchenName": "Standard-Demoküche",
-      "code": "DISH-600-STD",
-      "name": "Spülmaschine",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": true,
-            "present": true
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": true,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg5w0005sn1oyu7264rd",
-      "kitchenSlug": "fragmento-default",
-      "kitchenName": "Standard-Demoküche",
-      "code": "REF-545-1800-700",
-      "name": "Kühlschrank",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg60000dsn1oeicr2kpf",
-      "kitchenSlug": "fragmento-default",
-      "kitchenName": "Standard-Demoküche",
-      "code": "HOOD-600-FLAT",
-      "name": "Dunstabzugshaube",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg62000jsn1ohmfdv2ok",
-      "kitchenSlug": "fragmento-default",
-      "kitchenName": "Standard-Demoküche",
-      "code": "ACC-LIGHT-003",
-      "name": "Beleuchtungsset 3 LED-Spots",
-      "itemType": "ACCESSORY",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": false,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": false,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": false,
-            "present": false
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": false,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": false
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": false
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6d0010sn1ojhbd6wx9",
-      "kitchenSlug": "kitchen-model-b",
-      "kitchenName": "Standardküche",
-      "code": "HOOD-B-FH664621E",
-      "name": "FH664621E Extractor Hood",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6e0012sn1o92u6pbc2",
-      "kitchenSlug": "kitchen-model-b",
-      "kitchenName": "Standardküche",
-      "code": "LIGHT-B-LED-001",
-      "name": "LED Lighting Set",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": false,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": false,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": false,
-            "present": false
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": false,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": false
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": false
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6f0014sn1oh5ahargz",
-      "kitchenSlug": "kitchen-model-b",
-      "kitchenName": "Standardküche",
-      "code": "WM-B-EWA34660W",
-      "name": "Washing Machine (600 x 600 x 878 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": true,
-            "present": true
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": true,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6g0018sn1oj5osgx4y",
-      "kitchenSlug": "kitchen-model-b",
-      "kitchenName": "Standardküche",
-      "code": "DISH-B-600-STD",
-      "name": "Dishwasher (600 x 600 x 878 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": true,
-            "present": true
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": true,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6h001csn1ofjbisbr6",
-      "kitchenSlug": "kitchen-model-b",
-      "kitchenName": "Standardküche",
-      "code": "OVEN-B-600-HOB",
-      "name": "Built-in Oven and Hob (600 x 600 x 878 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [
-          {
-            "label": "backofen",
-            "count": 5
-          },
-          {
-            "label": "kochfeld",
-            "count": 4
-          }
-        ],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": false
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": true,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": [
-          {
-            "key": "noise",
-            "label": "noise / dB"
-          }
-        ]
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6i001gsn1ogpmnossp",
-      "kitchenSlug": "kitchen-model-b",
-      "kitchenName": "Standardküche",
-      "code": "REF-B-545-1800-700",
-      "name": "Refrigerator (545 x 1800 x 700 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": false
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": false
-          }
-        },
-        "missingRelevantFacts": [
-          {
-            "key": "installationDimensions",
-            "label": "installation/niche dimensions"
-          }
-        ]
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6l001osn1oncb3fnln",
-      "kitchenSlug": "kitchen-model-b",
-      "kitchenName": "Standardküche",
-      "code": "ACC-LIGHT-003",
-      "name": "Beleuchtungsset 3 LED-Spots",
-      "itemType": "ACCESSORY",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": false,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": false,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": false,
-            "present": false
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": false,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": false
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": false
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6r001vsn1ouaehundg",
-      "kitchenSlug": "kitchen-model-c",
-      "kitchenName": "Zweiteilige Küche",
-      "code": "REF-C-545-1800-700",
-      "name": "Refrigerator (545 x 1800 x 700 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": false
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": false
-          }
-        },
-        "missingRelevantFacts": [
-          {
-            "key": "installationDimensions",
-            "label": "installation/niche dimensions"
-          }
-        ]
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6s001xsn1oa5cox5xq",
-      "kitchenSlug": "kitchen-model-c",
-      "kitchenName": "Zweiteilige Küche",
-      "code": "HOOD-C-FH664621E",
-      "name": "KHF664611S Chimney Extractor Hood",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg6u0021sn1ow81r9k2z",
-      "kitchenSlug": "kitchen-model-c",
-      "kitchenName": "Zweiteilige Küche",
-      "code": "OVEN-C-600-HOB",
-      "name": "Built-in Oven and Hob (600 x 600 x 878 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [
-          {
-            "label": "backofen",
-            "count": 5
-          },
-          {
-            "label": "kochfeld",
-            "count": 4
-          }
-        ],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": false
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": true,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": [
-          {
-            "key": "noise",
-            "label": "noise / dB"
-          }
-        ]
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg70002dsn1otbwbo776",
-      "kitchenSlug": "kitchen-model-c",
-      "kitchenName": "Zweiteilige Küche",
-      "code": "LIGHT-C-LED-001",
-      "name": "LED Lighting Set",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": false,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": false,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": false,
-            "present": false
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": false,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": false
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": false
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg71002fsn1ocscieiq4",
-      "kitchenSlug": "kitchen-model-c",
-      "kitchenName": "Zweiteilige Küche",
-      "code": "WM-C-EWA34660W",
-      "name": "Washing Machine (600 x 600 x 878 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": true,
-            "present": true
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": true,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg73002jsn1okk2mcb1y",
-      "kitchenSlug": "kitchen-model-c",
-      "kitchenName": "Zweiteilige Küche",
-      "code": "DISH-C-600-STD",
-      "name": "Dishwasher (600 x 600 x 878 mm)",
-      "itemType": "COMPONENT",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": true,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": true,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": true,
-            "present": true
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": true,
-            "present": true
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": true,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": true,
-            "present": true
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": true,
-            "present": true
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": true,
-            "present": true
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    },
-    {
-      "id": "cmoh7lg77002vsn1o7y08ov5f",
-      "kitchenSlug": "kitchen-model-c",
-      "kitchenName": "Zweiteilige Küche",
-      "code": "ACC-LIGHT-003",
-      "name": "Beleuchtungsset 3 LED-Spots",
-      "itemType": "ACCESSORY",
-      "completeness": {
-        "hasProductInfoPdfPath": true,
-        "hasProductInfoSummary": true,
-        "hasProductInfoKeyFacts": true,
-        "hasProductInfoExtractedText": true,
-        "chatbotReadiness": "Ready"
-      },
-      "keyFacts": {
-        "empty": false,
-        "allNonEmptyLinesUseLabelValueFormat": true,
-        "linesWithoutColon": [],
-        "duplicateFactLabels": [],
-        "longLines": []
-      },
-      "importantFacts": {
-        "applianceLike": false,
-        "checks": {
-          "energyClass": {
-            "label": "energy class",
-            "relevant": false,
-            "present": true
-          },
-          "noise": {
-            "label": "noise / dB",
-            "relevant": false,
-            "present": false
-          },
-          "dimensions": {
-            "label": "dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "installationDimensions": {
-            "label": "installation/niche dimensions",
-            "relevant": false,
-            "present": false
-          },
-          "energyConsumption": {
-            "label": "energy consumption / kWh",
-            "relevant": false,
-            "present": true
-          },
-          "waterConsumption": {
-            "label": "water consumption",
-            "relevant": false,
-            "present": false
-          },
-          "capacity": {
-            "label": "capacity / volume",
-            "relevant": false,
-            "present": false
-          },
-          "programsFunctions": {
-            "label": "programs / functions",
-            "relevant": false,
-            "present": false
-          }
-        },
-        "missingRelevantFacts": []
-      },
-      "germanNormalizationWarnings": []
-    }
-  ]
+﻿{
+    "generatedAt":  "2026-05-25T11:50:02.050Z",
+    "reportPath":  "C:\\Users\\Admin\\Desktop\\Projects\\ARC FRAGMENTO\\frontend\\scripts\\product-info-audit-report.json",
+    "mutation":  false,
+    "summary":  {
+                    "auditedItems":  14,
+                    "readiness":  {
+                                      "ready":  14,
+                                      "partial":  0,
+                                      "missing":  0
+                                  },
+                    "keyFacts":  {
+                                     "empty":  0,
+                                     "withFormatWarnings":  2
+                                 },
+                    "importantFacts":  {
+                                           "applianceLikeItems":  10,
+                                           "withMissingRelevantFacts":  4
+                                       },
+                    "germanNormalization":  {
+                                                "itemsWithWarnings":  0,
+                                                "totalWarnings":  0
+                                            }
+                },
+    "items":  [
+                  {
+                      "id":  "cmoh7lg6d0010sn1ojhbd6wx9",
+                      "kitchenSlug":  "kitchen-model-b",
+                      "kitchenName":  "StandardkÃ¼che",
+                      "code":  "HOOD-B-FH664621E",
+                      "name":  "FH664621E Extractor Hood",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  false,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6e0012sn1o92u6pbc2",
+                      "kitchenSlug":  "kitchen-model-b",
+                      "kitchenName":  "StandardkÃ¼che",
+                      "code":  "LIGHT-B-LED-001",
+                      "name":  "LED Lighting Set",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  false,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  false,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  false,
+                                                                          "present":  false
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  false,
+                                                                               "present":  false
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  false,
+                                                                                           "present":  false
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  false,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  false,
+                                                                             "present":  false
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  false
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6f0014sn1oh5ahargz",
+                      "kitchenSlug":  "kitchen-model-b",
+                      "kitchenName":  "StandardkÃ¼che",
+                      "code":  "WM-B-EWA34660W",
+                      "name":  "Washing Machine (600 x 600 x 878 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  true,
+                                                                                     "present":  true
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6g0018sn1oj5osgx4y",
+                      "kitchenSlug":  "kitchen-model-b",
+                      "kitchenName":  "StandardkÃ¼che",
+                      "code":  "DISH-B-600-STD",
+                      "name":  "Dishwasher (600 x 600 x 878 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  true,
+                                                                                     "present":  true
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6h001csn1ofjbisbr6",
+                      "kitchenSlug":  "kitchen-model-b",
+                      "kitchenName":  "StandardkÃ¼che",
+                      "code":  "OVEN-B-600-HOB",
+                      "name":  "Built-in Oven and Hob (600 x 600 x 878 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+                                                                   {
+                                                                       "label":  "backofen",
+                                                                       "count":  5
+                                                                   },
+                                                                   {
+                                                                       "label":  "kochfeld",
+                                                                       "count":  4
+                                                                   }
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  false
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+                                                                          {
+                                                                              "key":  "noise",
+                                                                              "label":  "noise / dB"
+                                                                          }
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6i001gsn1ogpmnossp",
+                      "kitchenSlug":  "kitchen-model-b",
+                      "kitchenName":  "StandardkÃ¼che",
+                      "code":  "REF-B-545-1800-700",
+                      "name":  "Refrigerator (545 x 1800 x 700 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  false
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  false
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+                                                                          {
+                                                                              "key":  "installationDimensions",
+                                                                              "label":  "installation/niche dimensions"
+                                                                          }
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6l001osn1oncb3fnln",
+                      "kitchenSlug":  "kitchen-model-b",
+                      "kitchenName":  "StandardkÃ¼che",
+                      "code":  "ACC-LIGHT-003",
+                      "name":  "Beleuchtungsset 3 LED-Spots",
+                      "itemType":  "ACCESSORY",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  false,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  false,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  false,
+                                                                          "present":  false
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  false,
+                                                                               "present":  false
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  false,
+                                                                                           "present":  false
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  false,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  false,
+                                                                             "present":  false
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  false
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6r001vsn1ouaehundg",
+                      "kitchenSlug":  "kitchen-model-c",
+                      "kitchenName":  "Zweiteilige KÃ¼che",
+                      "code":  "REF-C-545-1800-700",
+                      "name":  "Refrigerator (545 x 1800 x 700 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  false
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  false
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+                                                                          {
+                                                                              "key":  "installationDimensions",
+                                                                              "label":  "installation/niche dimensions"
+                                                                          }
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6s001xsn1oa5cox5xq",
+                      "kitchenSlug":  "kitchen-model-c",
+                      "kitchenName":  "Zweiteilige KÃ¼che",
+                      "code":  "HOOD-C-FH664621E",
+                      "name":  "KHF664611S Chimney Extractor Hood",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  false,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg6u0021sn1ow81r9k2z",
+                      "kitchenSlug":  "kitchen-model-c",
+                      "kitchenName":  "Zweiteilige KÃ¼che",
+                      "code":  "OVEN-C-600-HOB",
+                      "name":  "Built-in Oven and Hob (600 x 600 x 878 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+                                                                   {
+                                                                       "label":  "backofen",
+                                                                       "count":  5
+                                                                   },
+                                                                   {
+                                                                       "label":  "kochfeld",
+                                                                       "count":  4
+                                                                   }
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  false
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+                                                                          {
+                                                                              "key":  "noise",
+                                                                              "label":  "noise / dB"
+                                                                          }
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg70002dsn1otbwbo776",
+                      "kitchenSlug":  "kitchen-model-c",
+                      "kitchenName":  "Zweiteilige KÃ¼che",
+                      "code":  "LIGHT-C-LED-001",
+                      "name":  "LED Lighting Set",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  false,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  false,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  false,
+                                                                          "present":  false
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  false,
+                                                                               "present":  false
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  false,
+                                                                                           "present":  false
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  false,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  false,
+                                                                             "present":  false
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  false
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg71002fsn1ocscieiq4",
+                      "kitchenSlug":  "kitchen-model-c",
+                      "kitchenName":  "Zweiteilige KÃ¼che",
+                      "code":  "WM-C-EWA34660W",
+                      "name":  "Washing Machine (600 x 600 x 878 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  true,
+                                                                                     "present":  true
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg73002jsn1okk2mcb1y",
+                      "kitchenSlug":  "kitchen-model-c",
+                      "kitchenName":  "Zweiteilige KÃ¼che",
+                      "code":  "DISH-C-600-STD",
+                      "name":  "Dishwasher (600 x 600 x 878 mm)",
+                      "itemType":  "COMPONENT",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  true,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  true,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  true,
+                                                                          "present":  true
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  true,
+                                                                               "present":  true
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  true,
+                                                                                           "present":  true
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  true,
+                                                                                     "present":  true
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  true,
+                                                                             "present":  true
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  true,
+                                                                                      "present":  true
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  },
+                  {
+                      "id":  "cmoh7lg77002vsn1o7y08ov5f",
+                      "kitchenSlug":  "kitchen-model-c",
+                      "kitchenName":  "Zweiteilige KÃ¼che",
+                      "code":  "ACC-LIGHT-003",
+                      "name":  "Beleuchtungsset 3 LED-Spots",
+                      "itemType":  "ACCESSORY",
+                      "completeness":  {
+                                           "hasProductInfoPdfPath":  true,
+                                           "hasProductInfoSummary":  true,
+                                           "hasProductInfoKeyFacts":  true,
+                                           "hasProductInfoExtractedText":  true,
+                                           "chatbotReadiness":  "Ready"
+                                       },
+                      "keyFacts":  {
+                                       "empty":  false,
+                                       "allNonEmptyLinesUseLabelValueFormat":  true,
+                                       "linesWithoutColon":  [
+
+                                                             ],
+                                       "duplicateFactLabels":  [
+
+                                                               ],
+                                       "longLines":  [
+
+                                                     ]
+                                   },
+                      "importantFacts":  {
+                                             "applianceLike":  false,
+                                             "checks":  {
+                                                            "energyClass":  {
+                                                                                "label":  "energy class",
+                                                                                "relevant":  false,
+                                                                                "present":  true
+                                                                            },
+                                                            "noise":  {
+                                                                          "label":  "noise / dB",
+                                                                          "relevant":  false,
+                                                                          "present":  false
+                                                                      },
+                                                            "dimensions":  {
+                                                                               "label":  "dimensions",
+                                                                               "relevant":  false,
+                                                                               "present":  false
+                                                                           },
+                                                            "installationDimensions":  {
+                                                                                           "label":  "installation/niche dimensions",
+                                                                                           "relevant":  false,
+                                                                                           "present":  false
+                                                                                       },
+                                                            "energyConsumption":  {
+                                                                                      "label":  "energy consumption / kWh",
+                                                                                      "relevant":  false,
+                                                                                      "present":  true
+                                                                                  },
+                                                            "waterConsumption":  {
+                                                                                     "label":  "water consumption",
+                                                                                     "relevant":  false,
+                                                                                     "present":  false
+                                                                                 },
+                                                            "capacity":  {
+                                                                             "label":  "capacity / volume",
+                                                                             "relevant":  false,
+                                                                             "present":  false
+                                                                         },
+                                                            "programsFunctions":  {
+                                                                                      "label":  "programs / functions",
+                                                                                      "relevant":  false,
+                                                                                      "present":  false
+                                                                                  }
+                                                        },
+                                             "missingRelevantFacts":  [
+
+                                                                      ]
+                                         },
+                      "germanNormalizationWarnings":  [
+
+                                                      ]
+                  }
+              ]
 }

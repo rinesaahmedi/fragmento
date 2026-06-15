@@ -313,7 +313,6 @@
     "contractCountSingular": "{count} contract number",
     "contractCountPlural": "{count} contract numbers",
     "descriptions": {
-      "fragmentoDefault": "Seeded default kitchen based on the legacy configurator.",
       "linearKitchen": "Compact single-wall layout ideal for smaller spaces",
       "splitKitchen": "Two-part layout with separated zones for flexibility"
     }

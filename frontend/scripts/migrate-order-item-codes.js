@@ -3,19 +3,6 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const LEGACY_CODE_BY_KITCHEN = {
-  "fragmento-default": {
-    "component-dishwasher": "DISH-600-STD",
-    "component-refrigerator": "REF-545-1800-700",
-    "component-base-cabinet-30": "CAB-BASE-030",
-    "component-wall-cabinet-left": "CAB-WALL-L-060",
-    "component-wall-cabinet-right": "CAB-WALL-R-060",
-    "component-extractor-hood": "HOOD-600-FLAT",
-    "acc-waste": "ACC-WASTE-001",
-    "acc-cutlery": "ACC-CUTLERY-001",
-    "acc-lighting": "ACC-LIGHT-003",
-    "service-montage": "SVC-MONTAGE-001",
-    "service-pickup": "SVC-PICKUP-001",
-  },
   "kitchen-model-b": {
     "model-b-wall-cabinet-1": "CAB-WALL-B-L-600",
     "model-b-wall-cabinet-2": "CAB-WALL-B-ML-600",

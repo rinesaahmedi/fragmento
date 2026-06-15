@@ -83,10 +83,6 @@ export const MONTAGE_CABINET_CODES = MONTAGE_REQUIRED_CODES.filter(
 
 export const LEGACY_ICON_KEYS = [
   "dishwasher",
-  "refrigerator",
-  "base_cabinet_30",
-  "wall_cabinet_l",
-  "wall_cabinet_r",
   "extractor_hood",
   "wall_cabinet_single_light",
   "wall_cabinet_double_light",
@@ -116,6 +112,14 @@ function isMissingKitchenItemProductImagePath(error) {
   return (
     (error?.code === "P2022" || /column .* does not exist/i.test(message)) &&
     message.includes("KitchenItem.productImagePath")
+  );
+}
+
+function isMissingKitchenItemNameDe(error) {
+  const message = String(error?.message || "");
+  return (
+    (error?.code === "P2022" || /column .* does not exist/i.test(message)) &&
+    message.includes("KitchenItem.nameDe")
   );
 }
 
@@ -165,7 +169,7 @@ export async function getKitchenBySlug(slug) {
       },
     });
   } catch (error) {
-    if (!isMissingKitchenItemProductImagePath(error)) {
+    if (!isMissingKitchenItemProductImagePath(error) && !isMissingKitchenItemNameDe(error)) {
       throw error;
     }
 
@@ -206,6 +210,34 @@ export async function listKitchensForAdmin() {
   }
 }
 
+export async function listKitchenItemCodeOptionsForAdmin() {
+  return [
+    { code: "CAB-WALL-600-01", label: "COMPONENT - Wall cabinet 600 mm. Use -02, -03 for repeats." },
+    { code: "CAB-WALL-500-01", label: "COMPONENT - Wall cabinet 500 mm. Use -02, -03 for repeats." },
+    { code: "CAB-WALL-400-01", label: "COMPONENT - Wall cabinet 400 mm. Use -02, -03 for repeats." },
+    { code: "CAB-HOOD-600", label: "COMPONENT - Hood wall cabinet / extractor cabinet" },
+    { code: "HOOD-600", label: "COMPONENT - Extractor hood appliance" },
+    { code: "CAB-BASE-600", label: "COMPONENT - Base cabinet 600 mm" },
+    { code: "CAB-BASE-500", label: "COMPONENT - Base cabinet 500 mm" },
+    { code: "CAB-BASE-400", label: "COMPONENT - Base cabinet 400 mm" },
+    { code: "CAB-DRAWER-600", label: "COMPONENT - Drawer base cabinet 600 mm" },
+    { code: "CAB-DRAWER-300", label: "COMPONENT - Drawer base cabinet 300 mm" },
+    { code: "SINKBASE-600", label: "COMPONENT - Sink base cabinet 600 mm" },
+    { code: "DISH-600-STD", label: "COMPONENT - Dishwasher 600 mm" },
+    { code: "WM-600-STD", label: "COMPONENT - Washing machine 600 mm" },
+    { code: "OVEN-HOB-600", label: "COMPONENT - Oven and hob set 600 mm" },
+    { code: "REF-545-1800", label: "COMPONENT - Tall refrigerator" },
+    { code: "TOP-MAIN", label: "COMPONENT - Main worktop" },
+    { code: "TOP-RETURN", label: "COMPONENT - Return worktop / L-shape worktop" },
+    { code: "SINK-WASTE", label: "COMPONENT - Sink and waste system" },
+    { code: "ACC-WASTE-001", label: "ACCESSORY - Waste separation system" },
+    { code: "ACC-CUTLERY-ZB60SG", label: "ACCESSORY - Cutlery insert 60 cm" },
+    { code: "ACC-LIGHT-003", label: "ACCESSORY - LED lighting set" },
+    { code: "SVC-MONTAGE-001", label: "SERVICE - Delivery, carrying, assembly and connection" },
+    { code: "SVC-PICKUP-001", label: "SERVICE - Pickup at logistics location" },
+  ];
+}
+
 export async function getKitchenById(id) {
   let kitchen;
   try {
@@ -222,7 +254,7 @@ export async function getKitchenById(id) {
       },
     });
   } catch (error) {
-    if (!isMissingKitchenItemProductImagePath(error)) {
+    if (!isMissingKitchenItemProductImagePath(error) && !isMissingKitchenItemNameDe(error)) {
       throw error;
     }
 
@@ -941,6 +973,7 @@ export function serializeKitchenForLegacy(kitchen) {
     code: item.code,
     articleNumber: item.articleNumber || "",
     name: item.name,
+    nameDe: item.nameDe || "",
     price: Number(item.price),
     widthMm: item.widthMm ?? null,
     heightMm: item.heightMm ?? null,

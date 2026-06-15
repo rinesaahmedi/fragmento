@@ -29,7 +29,7 @@ import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { buildKitchenPreviewSvgMarkup } from "../../../../lib/claim-kitchen-preview";
-import { LEGACY_ICON_KEYS, getKitchenById } from "../../../../lib/catalog";
+import { LEGACY_ICON_KEYS, getKitchenById, listKitchenItemCodeOptionsForAdmin } from "../../../../lib/catalog";
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
 
@@ -41,10 +41,6 @@ const DISHWASHER_BASE_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 10 24 L 14 44 H 46 L 50 24 Z"/><line x1="18" y1="26" x2="20" y2="44"/><line x1="26" y1="26" x2="26" y2="44"/><line x1="34" y1="26" x2="34" y2="44"/><line x1="42" y1="26" x2="40" y2="44"/><line x1="12" y1="32" x2="48" y2="32"/><line x1="13" y1="38" x2="47" y2="38"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">GS</text></svg>';
 const ITEM_ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
-  refrigerator: '<img src="/img/foto6.png" alt="Kuehlschrank">',
-  base_cabinet_30: '<img src="/img/foto1.png" alt="Unterschrank 30cm">',
-  wall_cabinet_l: '<img src="/img/foto4.png" alt="Oberschrank links">',
-  wall_cabinet_r: '<img src="/img/foto2.png" alt="Oberschrank rechts">',
   extractor_hood: '<img src="/img/foto5.png" alt="Dunstabzugshaube">',
   wall_cabinet_single_light:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/><g stroke="#666" stroke-width="0.75"><line x1="30" y1="60" x2="30" y2="63"/><line x1="28" y1="63" x2="32" y2="63"/><line x1="26" y1="66" x2="22" y2="74"/><line x1="30" y1="66" x2="30" y2="75"/><line x1="34" y1="66" x2="38" y2="74"/></g></svg>',
@@ -387,6 +383,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     return acc;
   }, {});
   const kitchenSvgMarkup = structureSlots.length ? await loadKitchenSvgMarkup(kitchen.slug).catch(() => "") : "";
+  const itemCodeOptions = await listKitchenItemCodeOptionsForAdmin();
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -580,13 +577,19 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                         </AdminSelect>
                       </FormField>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />} wide={false}>
-                        <input name="code" defaultValue={item.code} style={compactInputStyle} required />
+                        <div style={fieldWithHelpStyle}>
+                          <input name="code" defaultValue={item.code} list="admin-kitchen-item-code-options" style={compactInputStyle} required />
+                          <span style={fieldHelpTextStyle}>Use templates; add -01, -02 for repeated cabinets.</span>
+                        </div>
                       </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number" />} wide={false}>
-                        <input name="articleNumber" defaultValue={item.articleNumber || ""} style={compactInputStyle} />
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number(s)" />} wide={false}>
+                        <input name="articleNumber" defaultValue={item.articleNumber || ""} placeholder="CODE-1 + CODE-2" style={compactInputStyle} />
                       </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name" />} wide={false}>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name (English)" />} wide={false}>
                         <input name="name" defaultValue={item.name} style={compactInputStyle} required />
+                      </FormField>
+                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.nameDe" fallback="Name (German)" />} wide={false}>
+                        <input name="nameDe" defaultValue={item.nameDe || ""} style={compactInputStyle} />
                       </FormField>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.price" fallback="Price" />} wide={false}>
                         <input name="price" defaultValue={String(item.price)} style={compactInputStyle} required />
@@ -664,21 +667,27 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 <div style={formGridStyle}>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />}>
                     <AdminSelect name="itemType" defaultValue={ItemType.ACCESSORY} style={inputStyle}>
-                      {[ItemType.ACCESSORY, ItemType.SERVICE].map((itemType) => (
+                      {[ItemType.COMPONENT, ItemType.ACCESSORY, ItemType.SERVICE].map((itemType) => (
                         <option key={itemType} value={itemType}>
                           {itemType}
                         </option>
                       ))}
                     </AdminSelect>
                   </FormField>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name" />}>
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name (English)" />}>
                     <input name="name" style={inputStyle} required />
                   </FormField>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />}>
-                    <input name="code" placeholder="DISH-600-STD" style={inputStyle} required />
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.nameDe" fallback="Name (German)" />}>
+                    <input name="nameDe" style={inputStyle} />
                   </FormField>
-                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number" />}>
-                    <input name="articleNumber" placeholder="A-EGSPV597210" style={inputStyle} />
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />}>
+                    <div style={fieldWithHelpStyle}>
+                      <input name="code" placeholder="DISH-600-STD" list="admin-kitchen-item-code-options" style={inputStyle} required />
+                      <span style={fieldHelpTextStyle}>Use templates; add -01, -02 for repeated cabinets. Article numbers go in the article field.</span>
+                    </div>
+                  </FormField>
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number(s)" />}>
+                    <input name="articleNumber" placeholder="A-EGSPV597210 + ZB60SG" style={inputStyle} />
                   </FormField>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.price" fallback="Price" />}>
                     <input name="price" defaultValue="0.00" style={inputStyle} required />
@@ -710,6 +719,20 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     <textarea name="infoText" rows={2} style={textareaStyle} />
                   </FormField>
                 </div>
+                {structureSlots.length ? (
+                  <div style={componentSlotCreateStyle}>
+                    <AdminComponentSlotPicker
+                      name="componentKey"
+                      slots={structureSlots}
+                      occupiedByKey={occupiedByKey}
+                      helperText="Required only when item type is COMPONENT. Accessories and services ignore this field."
+                    />
+                  </div>
+                ) : (
+                  <p style={componentSlotHelpStyle}>
+                    Components can be created for this kitchen without a position because this kitchen has no predefined layout slots yet.
+                  </p>
+                )}
               </fieldset>
 
               <details style={advancedDetailsStyle}>
@@ -725,6 +748,11 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             </form>
           </details>
         </AdminSection>
+        <datalist id="admin-kitchen-item-code-options">
+          {itemCodeOptions.map((item) => (
+            <option key={item.code} value={item.code} label={item.label} />
+          ))}
+        </datalist>
         <style>{`
           @media (max-width: 700px) {
             .kitchen-catalog-items__filters {
@@ -929,6 +957,28 @@ const checkboxInlineStyle = {
   alignItems: "center",
   color: "var(--app-text)",
   fontWeight: 700,
+};
+
+const fieldWithHelpStyle = {
+  display: "grid",
+  gap: 6,
+};
+
+const fieldHelpTextStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  lineHeight: 1.35,
+  fontWeight: 700,
+};
+
+const componentSlotCreateStyle = {
+  display: "grid",
+  gap: 8,
+};
+
+const componentSlotHelpStyle = {
+  ...mutedTextStyle,
+  fontSize: 13,
 };
 
 const advancedDetailsStyle = {

@@ -421,7 +421,6 @@ async function main() {
     .filter((arg) => arg.startsWith("--exclude-kitchen="))
     .map((arg) => arg.split("=")[1])
     .filter(Boolean);
-  const excludeDefault = process.argv.includes("--exclude-default");
   const orderCount = countArg ? Number.parseInt(countArg.split("=")[1], 10) : DEFAULT_ORDER_COUNT;
 
   if (!Number.isInteger(orderCount) || orderCount <= 0) {
@@ -429,9 +428,6 @@ async function main() {
   }
 
   const excludedKitchenSlugs = new Set(excludeKitchenArgs);
-  if (excludeDefault) {
-    excludedKitchenSlugs.add("fragmento-default");
-  }
 
   const result = await createDemoOrders(orderCount, {
     excludedKitchenSlugs: [...excludedKitchenSlugs],

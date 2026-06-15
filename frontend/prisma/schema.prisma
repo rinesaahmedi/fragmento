@@ -57,6 +57,7 @@ model KitchenItem {
   code          String
   articleNumber String?
   name          String
+  nameDe        String?
   price         Decimal     @db.Decimal(10, 2)
   widthMm       Int?
   heightMm      Int?

@@ -173,24 +173,13 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
   const isStandardKitchen =
     normalizedSlug === "kitchen-model-b" ||
     ["standard kitchen", "linear kitchen", "standardküche", "standardkÃ¼che"].includes(normalizedName);
-  const isDefaultDemoKitchen =
-    normalizedSlug === "fragmento-default" ||
-    [
-      "default kitchen",
-      "default demo kitchen",
-      "fragmento default kitchen",
-      "standard-demoküche",
-      "standard-demokÃ¼che",
-    ].includes(normalizedName);
 
   if (language === "de") {
     if (isTwoPartKitchen) return "Zweiteilige Küche";
     if (isStandardKitchen) return "Standardküche";
-    if (isDefaultDemoKitchen) return "Standard-Demoküche";
   } else {
     if (isTwoPartKitchen) return "Two-Part Kitchen";
     if (isStandardKitchen) return "Standard Kitchen";
-    if (isDefaultDemoKitchen) return "Default Demo Kitchen";
   }
 
   if (language === "de") {
@@ -201,15 +190,6 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
     if (normalizedSlug === "kitchen-model-b" || normalizedName === "standard kitchen" || normalizedName === "linear kitchen") {
       return "Standardküche";
     }
-
-    if (
-      normalizedSlug === "fragmento-default" ||
-      normalizedName === "default kitchen" ||
-      normalizedName === "default demo kitchen" ||
-      normalizedName === "fragmento default kitchen"
-    ) {
-      return "Standard-Demoküche";
-    }
   }
 
   if (normalizedSlug === "kitchen-model-c" || displayName === "Zweiteilige Küche") {
@@ -218,10 +198,6 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
 
   if (normalizedSlug === "kitchen-model-b" || displayName === "Standardküche") {
     return "Standard Kitchen";
-  }
-
-  if (normalizedSlug === "fragmento-default" || displayName === "Default Kitchen" || displayName === "Fragmento Default Kitchen") {
-    return "Default Demo Kitchen";
   }
 
   return displayName;

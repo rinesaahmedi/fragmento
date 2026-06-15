@@ -189,7 +189,7 @@ function withProductInfoPdfRevision(href) {
   return fragment ? `${revisedHref}#${fragment}` : revisedHref;
 }
 
-function buildProductInfoState(payload, translate) {
+function buildProductInfoState(payload, translate, language = "en") {
   if (!payload?.infoPdfHref || !payload?.item) return null;
 
   const rawProductInfoDocuments = Array.isArray(payload.item.productInfoDocuments)
@@ -213,7 +213,7 @@ function buildProductInfoState(payload, translate) {
     title:
       formatProductAssistantDisplayName(payload.item, translate)
       || payload.item.productAssistantName
-      || getLocalizedItemName(payload.item, translate)
+      || getLocalizedItemName(payload.item, translate, language)
       || translate("configurator.productInfoTitle", "Product information", { title: "" }).trim(),
     price: Number(payload.price ?? payload.item.price ?? 0),
     infoText: payload.item.infoText || "",
@@ -1516,7 +1516,7 @@ function KitchenConfiguratorContent({
   }
 
   function openProductInfo(payload) {
-    const nextState = buildProductInfoState(payload, translate);
+    const nextState = buildProductInfoState(payload, translate, language);
     if (!nextState) return;
     setActiveProductInfo(nextState);
   }

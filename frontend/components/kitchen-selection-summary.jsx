@@ -66,10 +66,10 @@ function getEffectiveSummaryPrice(item) {
 }
 
 function SummaryRow({ item, onRemove, onOpenInfo }) {
-  const { translate } = usePublicI18n();
+  const { translate, language } = usePublicI18n();
   const price = getEffectiveSummaryPrice(item);
   const isLocked = item.isLocked || item.isOrderLocked;
-  const itemName = getLocalizedItemName(item, translate);
+  const itemName = getLocalizedItemName(item, translate, language);
   const infoPdfHref = getProductInfoHref(item);
   const productInfoDocuments = getProductInfoDocuments(item);
   const priceClassName = [
