@@ -1,34 +1,91 @@
+import { KitchenStatus } from "@prisma/client";
 import Link from "next/link";
 import {
   ActionLink,
   AdminSection,
+  FlashMessage,
+  FormField,
+  actionRowStyle,
   cardListStyle,
+  formGridStyle,
+  inputStyle,
   itemCardStyle,
   pageGridStyle,
+  primaryButtonStyle,
   subMetaStyle,
   tableStyle,
   tableWrapStyle,
   tdStyle,
   thStyle,
+  textareaStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminDateTime, AdminKitchenDisplayName, AdminPluralText, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
+import AdminSelect from "../../../components/admin-select";
 import { listKitchensForAdmin } from "../../../lib/catalog";
+import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 
 export const dynamic = "force-dynamic";
 
 function formatKitchenCode(kitchen) {
-  return kitchen.kitchenCode || kitchen.slug;
+  return kitchen.kitchenCode || "No code";
 }
 
-export default async function AdminKitchensPage() {
+const KITCHEN_STATUS_OPTIONS = Object.values(KitchenStatus);
+
+export default async function AdminKitchensPage({ searchParams }) {
   const admin = await requireAdminPage();
+  const resolvedSearchParams = (await searchParams) || {};
+  const successMessage = getFormMessage(resolvedSearchParams, "success");
+  const errorMessage = getFormMessage(resolvedSearchParams, "error");
   const kitchens = await listKitchensForAdmin();
 
   return (
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
+        <AdminSection
+          title={<AdminText i18nKey="kitchensAdmin.addKitchen" fallback="Add Kitchen" />}
+          description={<AdminText i18nKey="kitchensAdmin.addKitchenDescription" fallback="Create a kitchen record with the three default catalog items. Add the remaining items from the kitchen detail page." />}
+        >
+          {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
+          {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
+
+          <form action="/api/admin/kitchens" method="post" style={formGridStyle}>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
+              <input name="name" placeholder="AB 105807 Kitchen" style={inputStyle} required />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" />}>
+              <input name="kitchenCode" placeholder="105 807" style={inputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
+              <AdminSelect name="status" defaultValue={KitchenStatus.DRAFT} style={inputStyle}>
+                {KITCHEN_STATUS_OPTIONS.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </AdminSelect>
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.description" fallback="Description" />} wide>
+              <textarea
+                name="description"
+                placeholder="Kitchen configuration based on frontend/public/pdfs/AB 105807.pdf"
+                rows={2}
+                style={textareaStyle}
+              />
+            </FormField>
+            <div style={{ gridColumn: "1 / -1", ...actionRowStyle }}>
+              <button type="submit" style={primaryButtonStyle}>
+                <AdminText i18nKey="kitchensAdmin.createKitchen" fallback="Create kitchen" />
+              </button>
+              <span style={defaultItemsHintStyle}>
+                <AdminText i18nKey="kitchensAdmin.defaultItemsHint" fallback="Defaults added: waste separation, cutlery insert, LED lighting." />
+              </span>
+            </div>
+          </form>
+        </AdminSection>
+
         <AdminSection
           title={<AdminText i18nKey="adminShellLogin.kitchens" fallback="Kitchens" />}
         >
@@ -37,7 +94,7 @@ export default async function AdminKitchensPage() {
               <thead>
                 <tr>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.kitchen" fallback="Kitchen" /></th>
-                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.slug" fallback="Slug" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" /></th>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.status" fallback="Status" /></th>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.items" fallback="Items" /></th>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.orders" fallback="Orders" /></th>
@@ -140,3 +197,9 @@ export default async function AdminKitchensPage() {
     </AdminShell>
   );
 }
+
+const defaultItemsHintStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 700,
+};

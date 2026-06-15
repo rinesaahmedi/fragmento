@@ -23,12 +23,13 @@ import {
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
+import { AdminIconKeySelect } from "../../../../components/admin-icon-key-select";
 import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { buildKitchenPreviewSvgMarkup } from "../../../../lib/claim-kitchen-preview";
-import { getKitchenById } from "../../../../lib/catalog";
+import { LEGACY_ICON_KEYS, getKitchenById } from "../../../../lib/catalog";
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
 
@@ -36,7 +37,46 @@ export const dynamic = "force-dynamic";
 
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
 const KITCHEN_STATUS_OPTIONS = Object.values(KitchenStatus);
+const DISHWASHER_BASE_MARKUP =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 10 24 L 14 44 H 46 L 50 24 Z"/><line x1="18" y1="26" x2="20" y2="44"/><line x1="26" y1="26" x2="26" y2="44"/><line x1="34" y1="26" x2="34" y2="44"/><line x1="42" y1="26" x2="40" y2="44"/><line x1="12" y1="32" x2="48" y2="32"/><line x1="13" y1="38" x2="47" y2="38"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">GS</text></svg>';
 const ITEM_ICON_MARKUP = {
+  dishwasher: DISHWASHER_BASE_MARKUP,
+  refrigerator: '<img src="/img/foto6.png" alt="Kuehlschrank">',
+  base_cabinet_30: '<img src="/img/foto1.png" alt="Unterschrank 30cm">',
+  wall_cabinet_l: '<img src="/img/foto4.png" alt="Oberschrank links">',
+  wall_cabinet_r: '<img src="/img/foto2.png" alt="Oberschrank rechts">',
+  extractor_hood: '<img src="/img/foto5.png" alt="Dunstabzugshaube">',
+  wall_cabinet_single_light:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/><g stroke="#666" stroke-width="0.75"><line x1="30" y1="60" x2="30" y2="63"/><line x1="28" y1="63" x2="32" y2="63"/><line x1="26" y1="66" x2="22" y2="74"/><line x1="30" y1="66" x2="30" y2="75"/><line x1="34" y1="66" x2="38" y2="74"/></g></svg>',
+  wall_cabinet_double_light:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/><rect x="0.5" y="60" width="59" height="2"/><g stroke="#666" stroke-width="0.75"><line x1="20" y1="62" x2="20" y2="64"/><line x1="18" y1="64" x2="22" y2="64"/><line x1="17" y1="67" x2="14" y2="73"/><line x1="20" y1="67" x2="20" y2="74"/><line x1="23" y1="67" x2="26" y2="73"/><line x1="40" y1="62" x2="40" y2="64"/><line x1="38" y1="64" x2="42" y2="64"/><line x1="37" y1="67" x2="34" y2="73"/><line x1="40" y1="67" x2="40" y2="74"/><line x1="43" y1="67" x2="46" y2="73"/></g></svg>',
+  wall_cabinet_plain:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  washing_machine_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="14" x2="60" y2="14"/><line x1="10" y1="8" x2="25" y2="8" stroke-width="0.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 16 26 C 12 26 12 46 16 46 Z"/><circle cx="30" cy="36" r="14"/><circle cx="30" cy="36" r="10"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">WM</text></svg>',
+  sink_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  dishwasher_base: DISHWASHER_BASE_MARKUP,
+  oven_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><rect x="44" y="6" width="4" height="4"/><rect x="52" y="6" width="4" height="4"/><line x1="0" y1="56" x2="60" y2="56"/><rect x="8" y="22" width="44" height="26"/><rect x="12" y="26" width="36" height="18"/><line x1="22" y1="62" x2="38" y2="62" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  drawer_base:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><line x1="20" y1="9" x2="40" y2="9" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="24" x2="40" y2="24" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  worktop:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 20" fill="none" stroke="currentColor" stroke-width="1"><line x1="2" y1="7" x2="118" y2="7"/><line x1="2" y1="13" x2="118" y2="13"/><line x1="118" y1="7" x2="118" y2="13"/></svg>',
+  drawer_base_two:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="18" x2="60" y2="18"/><line x1="20" y1="10" x2="40" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="26" x2="40" y2="26" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  drawer_base_three:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><line x1="0" y1="44" x2="60" y2="44"/><line x1="20" y1="9" x2="40" y2="9" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="30" x2="40" y2="30" stroke-linecap="round" stroke-width="1.5"/><line x1="20" y1="58" x2="40" y2="58" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  tall_refrigerator:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 190" fill="none" stroke="currentColor" stroke-width="1"><line x1="3" y1="1" x2="57" y2="1"/><line x1="3" y1="1" x2="3" y2="186"/><line x1="57" y1="1" x2="57" y2="186"/><line x1="3" y1="186" x2="57" y2="186"/><line x1="8" y1="186" x2="8" y2="189" stroke-width="1.5"/><line x1="52" y1="186" x2="52" y2="189" stroke-width="1.5"/><line x1="3" y1="110" x2="57" y2="110"/><line x1="12" y1="108" x2="48" y2="108" stroke-linecap="round" stroke-width="1.5"/><line x1="12" y1="112" x2="48" y2="112" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  extractor_hood_chimney:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="24" y="0.5" width="12" height="39"/><line x1="24" y1="20" x2="36" y2="20"/><rect x="10" y="40" width="40" height="12"/><g stroke="#666" stroke-width="0.75"><line x1="18" y1="55" x2="15" y2="62"/><line x1="22" y1="55" x2="22" y2="63"/><line x1="26" y1="55" x2="29" y2="62"/><line x1="34" y1="55" x2="31" y2="62"/><line x1="38" y1="55" x2="38" y2="63"/><line x1="42" y1="55" x2="45" y2="62"/></g></svg>',
+  wall_cabinet_standard:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="20" y1="50" x2="40" y2="50" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  under_cabinet_light:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="#666" stroke-width="0.75"><line x1="8" y1="0" x2="12" y2="0" stroke="currentColor" stroke-width="1"/><line x1="6" y1="4" x2="2" y2="14"/><line x1="10" y1="4" x2="10" y2="15"/><line x1="14" y1="4" x2="18" y2="14"/></svg>',
+  sink_faucet:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 30" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="28" width="4" height="2" fill="white" stroke-width="1"/><rect x="9" y="24" width="2" height="4" fill="white" stroke-width="1"/><path d="M 10 24 L 10 10 C 10 4, 16 4, 16 10 L 16 14" stroke-linecap="round"/><line x1="10" y1="18" x2="5" y2="15" stroke-linecap="round"/></svg>',
   waste_system:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
   cutlery_insert:
@@ -115,6 +155,23 @@ function KitchenCatalogPreview({ markup, iconMarkup, slotLabel, itemType }) {
     <div className="kitchen-catalog-preview" style={previewWrapStyle} aria-label={slotLabel ? `${slotLabel} preview` : "Kitchen preview"}>
       <div className="kitchen-catalog-preview__svg" style={previewSvgStyle} dangerouslySetInnerHTML={{ __html: markup }} />
     </div>
+  );
+}
+
+function IconKeySelect({ name = "iconKey", defaultValue = "", style = inputStyle }) {
+  const currentValue = String(defaultValue || "").trim();
+  const options = currentValue && !LEGACY_ICON_KEYS.includes(currentValue)
+    ? [currentValue, ...LEGACY_ICON_KEYS]
+    : LEGACY_ICON_KEYS;
+
+  return (
+    <AdminIconKeySelect
+      name={name}
+      defaultValue={currentValue}
+      iconKeys={options}
+      iconMarkupByKey={ITEM_ICON_MARKUP}
+      selectStyle={style}
+    />
   );
 }
 
@@ -352,8 +409,8 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
               <AdminKitchenNameInput slug={kitchen.slug} name={kitchen.name} style={compactInputStyle} required />
             </FormField>
-            <FormField label={<AdminText i18nKey="kitchensAdmin.slug" fallback="Slug" />}>
-              <input name="slug" defaultValue={kitchen.slug} style={compactInputStyle} required />
+            <FormField label={<AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" />}>
+              <input name="kitchenCode" defaultValue={kitchen.kitchenCode || ""} style={compactInputStyle} />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
               <AdminSelect name="status" defaultValue={kitchen.status} style={compactInputStyle}>
@@ -535,7 +592,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                         <input name="price" defaultValue={String(item.price)} style={compactInputStyle} required />
                       </FormField>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />} wide={false}>
-                        <input name="iconKey" defaultValue={item.iconKey || ""} style={compactInputStyle} />
+                        <IconKeySelect defaultValue={item.iconKey || ""} style={compactInputStyle} />
                       </FormField>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.colorKey" fallback="Color key" />} wide={false}>
                         <input name="colorKey" defaultValue={item.colorKey || ""} style={compactInputStyle} />
@@ -637,7 +694,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 <legend style={formGroupLegendStyle}><AdminText i18nKey="kitchenDetailAdmin.display" fallback="Display" /></legend>
                 <div style={formGridStyle}>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />}>
-                    <input name="iconKey" style={inputStyle} />
+                    <IconKeySelect />
                   </FormField>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.colorKey" fallback="Color key" />}>
                     <input name="colorKey" style={inputStyle} />

@@ -31,12 +31,19 @@ function parseItemType(value) {
   return Object.values(ItemType).includes(value) ? value : ItemType.COMPONENT;
 }
 
-function normalizeSlug(value) {
-  return requiredString(value, "Slug").toLowerCase();
+function slugify(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function validateSlug(value) {
-  const slug = normalizeSlug(value);
+  const slug = slugify(value);
+  if (!slug) {
+    throw new Error("Kitchen name or code is required to create a URL.");
+  }
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     throw new Error("Slug must use lowercase letters, numbers, and hyphens only.");
   }
@@ -62,10 +69,15 @@ function validateSortOrder(value) {
   return parsed;
 }
 
-export function validateKitchenInput(formData) {
+export function validateKitchenInput(formData, options = {}) {
+  const name = requiredString(formData.get("name"), "Kitchen name");
+  const kitchenCode = optionalString(formData.get("kitchenCode"));
+  const slugSource = formData.get("slug") || options.fallbackSlug || kitchenCode || name;
+
   return {
-    name: requiredString(formData.get("name"), "Kitchen name"),
-    slug: validateSlug(formData.get("slug")),
+    name,
+    slug: validateSlug(slugSource),
+    kitchenCode,
     status: parseKitchenStatus(String(formData.get("status") || "")),
     description: optionalString(formData.get("description")),
   };

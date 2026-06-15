@@ -19,10 +19,18 @@ export async function POST(request, { params }) {
   const { id } = await params;
   try {
     const formData = await request.formData();
+    const existingKitchen = await prisma.kitchen.findUnique({
+      where: { id },
+      select: { slug: true },
+    });
+
+    if (!existingKitchen) {
+      throw new Error("Kitchen not found.");
+    }
 
     await prisma.kitchen.update({
       where: { id },
-      data: validateKitchenInput(formData),
+      data: validateKitchenInput(formData, { fallbackSlug: existingKitchen.slug }),
     });
 
     return redirectWithFlash(request, `/admin/kitchens/${id}`, "success", "Kitchen updated.");
