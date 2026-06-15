@@ -444,6 +444,23 @@
   min-height: 420px;
 }
 
+.pdfCard {
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 90, 64, 0.12);
+  overflow: hidden;
+  background: #f3efe9;
+}
+
+.pdfFrame {
+  display: block;
+  width: 100%;
+  height: min(78vh, 920px);
+  min-height: 620px;
+  border: 0;
+  background: #f3efe9;
+}
+
 .svgCanvas :global(svg) {
   display: block;
   width: 100%;

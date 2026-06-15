@@ -16,6 +16,10 @@ import {
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
 
+const PDF_VIEW_BY_SLUG = {
+  "ab-105807": "/pdfs/AB%20105807.pdf",
+};
+
 export default function KitchenSvgStage({
   svgMarkup,
   kitchenConfig,
@@ -29,6 +33,8 @@ export default function KitchenSvgStage({
   const { translate } = usePublicI18n();
   const svgHostRef = useRef(null);
   const has3dModel = kitchenSlug === "test-3d-kitchen";
+  const pdfViewHref = PDF_VIEW_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()] || "";
+  const hasPdfView = Boolean(pdfViewHref);
   const [activeView, setActiveView] = useState("2d");
   const resolvedSvgMarkup = useMemo(
     () => applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug),
@@ -46,7 +52,7 @@ export default function KitchenSvgStage({
   );
 
   useEffect(() => {
-    if (activeView !== "2d") {
+    if (activeView !== "2d" || hasPdfView) {
       return undefined;
     }
 
@@ -104,6 +110,7 @@ export default function KitchenSvgStage({
     kitchenConfig,
     kitchenSlug,
     fixedComponentIds,
+    hasPdfView,
     activeView,
     componentIds,
     planViewport,
@@ -112,7 +119,7 @@ export default function KitchenSvgStage({
   ]);
 
   useEffect(() => {
-    if (activeView !== "2d") {
+    if (activeView !== "2d" || hasPdfView) {
       return;
     }
 
@@ -122,7 +129,7 @@ export default function KitchenSvgStage({
       lockedComponentIds: fixedComponentIds,
       kitchenSlug,
     });
-  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds, kitchenSlug]);
+  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds, kitchenSlug, hasPdfView]);
 
   return (
     <div className={styles.stage}>
@@ -181,6 +188,26 @@ export default function KitchenSvgStage({
               <span className={styles.legendChip}>
                 <span className={styles.legendDot} />
                 Fixed parts always remain active
+              </span>
+            </div>
+          </>
+        ) : hasPdfView ? (
+          <>
+            <div className={styles.pdfCard}>
+              <iframe
+                src={pdfViewHref}
+                title={`${kitchenConfig.kitchen.name || "Kitchen"} PDF view`}
+                className={styles.pdfFrame}
+              />
+            </div>
+            <div className={styles.stageLegend}>
+              <span className={styles.legendChip}>
+                <span className={styles.legendSwatch} />
+                {translate("configurator.stageLegendChooseRight", "Choose elements on the right")}
+              </span>
+              <span className={styles.legendChip}>
+                <span className={styles.legendDot} />
+                {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
               </span>
             </div>
           </>

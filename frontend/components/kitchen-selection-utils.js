@@ -274,6 +274,7 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],
 };
@@ -291,6 +292,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
+  "DISH-AB105807-600": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
   "T3D-DISH-001": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
@@ -303,11 +308,19 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
+  "REF-AB105807-KGCN388140E": [
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+  ],
   "HOOD-B-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
   "HOOD-LS-FH664621E": [
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+  ],
+  "HOOD-AB105807-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
@@ -337,6 +350,11 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
   ],
   "OVEN-C-600-HOB": [
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
+  ],
+  "OVEN-AB105807-600-HOB": [
     { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
     { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
     { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
@@ -466,18 +484,22 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-C-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-LS-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105807-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
+  "OVEN-AB105807-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-OVEN-HOB-001": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-LS-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "HOOD-AB105807-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-B-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-C-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
+  "REF-AB105807-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-WASHER-001": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
