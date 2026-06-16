@@ -23,6 +23,8 @@ import {
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 const IMAGE_VIEW_BY_SLUG = {
   "ab-105806": "/plans/AB%20105806.svg",
+  "ab-105812": "/plans/AB%20105812.svg",
+  "ab-105819": "/plans/AB%20105819.svg",
   "ab-105820": "/plans/AB%20105820.svg",
 };
 
@@ -53,6 +55,34 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-3", left: 52.99, top: 60.56, width: 14.58, height: 30.17 },
     { componentKey: "sink-base", left: 67.57, top: 60.56, width: 14.56, height: 30.17 },
     { componentKey: "drawer-module", left: 82.13, top: 60.56, width: 14.59, height: 30.17 },
+  ],
+  "ab-105812": [
+    { componentKey: "refrigerator", left: 2.49, top: 29.68, width: 13.23, height: 60.02 },
+    { componentKey: "wall-cabinet-1", left: 17.07, top: 16.85, width: 7.11, height: 24.32 },
+    { componentKey: "wall-cabinet-2", left: 24.18, top: 16.85, width: 14.28, height: 24.32 },
+    { componentKey: "wall-cabinet-3", left: 38.46, top: 16.85, width: 14.26, height: 24.32 },
+    { componentKey: "wall-cabinet-4", left: 52.72, top: 16.85, width: 14.25, height: 24.32 },
+    { componentKey: "wall-cabinet-5", left: 66.97, top: 16.85, width: 14.26, height: 24.32 },
+    { componentKey: "wall-cabinet-6", left: 81.23, top: 16.85, width: 14.27, height: 24.32 },
+    { componentKey: "worktop", left: 17.07, top: 58.83, width: 78.43, height: 1.33 },
+    { componentKey: "base-module-1", left: 17.07, top: 60.16, width: 7.11, height: 29.54 },
+    { componentKey: "oven-module", left: 24.18, top: 60.16, width: 14.28, height: 29.54 },
+    { componentKey: "base-module-2", left: 38.46, top: 60.16, width: 14.26, height: 29.54 },
+    { componentKey: "base-module-3", left: 52.72, top: 60.16, width: 14.25, height: 29.54 },
+    { componentKey: "sink-base", left: 66.97, top: 60.16, width: 14.26, height: 29.54 },
+    { componentKey: "drawer-module", left: 81.23, top: 60.16, width: 14.27, height: 29.54 },
+  ],
+  "ab-105819": [
+    { componentKey: "wall-cabinet-1", left: 0.85, top: 22.9, width: 11.7, height: 19.0 },
+    { componentKey: "wall-cabinet-2", left: 12.55, top: 22.9, width: 11.15, height: 19.0 },
+    { componentKey: "wall-cabinet-3", left: 23.7, top: 22.9, width: 11.14, height: 19.0 },
+    { componentKey: "wall-cabinet-4", left: 34.84, top: 22.9, width: 11.14, height: 20.39 },
+    { componentKey: "worktop", left: 0.85, top: 55.73, width: 45.13, height: 1.02 },
+    { componentKey: "base-module-1", left: 0.85, top: 56.75, width: 11.7, height: 19.02 },
+    { componentKey: "sink-base", left: 12.55, top: 56.75, width: 11.15, height: 19.02 },
+    { componentKey: "base-module-3", left: 23.7, top: 56.75, width: 11.14, height: 19.02 },
+    { componentKey: "oven-module", left: 34.84, top: 56.75, width: 11.14, height: 19.02 },
+    { componentKey: "refrigerator", left: 48.39, top: 32.86, width: 10.33, height: 46.96 },
   ],
   "ab-105820": [
     { componentKey: "refrigerator", left: 2.11, top: 29.8, width: 13.22, height: 60.5 },

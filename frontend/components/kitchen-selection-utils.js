@@ -74,9 +74,9 @@ function stripDimensionsFromName(name) {
     .trim();
 }
 
-// Plan callout numbers, keyed by item code. AB 105820 shares AB 105806's callout layout and
-// reuses its codes for identical slots, so those numbers already apply; only the four
-// differently-sized AB 105820 cabinets need their own entries.
+// Plan callout numbers, keyed by item code. Reused codes keep their original numbers;
+// kitchen-specific codes are minted when an otherwise identical item appears under a
+// different callout number.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "OVEN-AB105806-600-HOB": "1",
   "TOP-AB105806": "2",
@@ -96,6 +96,12 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-BASE-AB105820-US60": "6",
   "CAB-WALL-AB105820-H3002-300": "9",
   "CAB-WALL-AB105820-H6002": "11",
+  "CAB-BASE-AB105819-US60-R": "4",
+  "DISH-AB105819-600": "5",
+  "REF-AB105819-KGCN388140E": "6",
+  "CAB-WALL-AB105819-H6002-R": "7",
+  "CAB-WALL-AB105819-H6002-L1": "8",
+  "CAB-WALL-AB105819-H6002-L2": "9",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -170,6 +176,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
+    case "DISH-AB105819-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
@@ -182,6 +189,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "CAB-BASE-B-STR":
     case "CAB-BASE-AB105806-US60":
     case "CAB-BASE-AB105807-US60":
+    case "CAB-BASE-AB105819-US60-R":
       return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawers", "Base Cabinet (2 Drawers)"));
     case "CAB-BASE-LS-400":
       return translate("configurator.catalogItemNames.baseCabinetLeftLs", "Base Cabinet left");
@@ -190,6 +198,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "REF-B-545-1800-700":
     case "REF-AB105806-KGCN388140E":
     case "REF-AB105807-KGCN388140E":
+    case "REF-AB105819-KGCN388140E":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
       return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
@@ -301,6 +310,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
+    case "DISH-AB105819-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "T3D-DISH-001":
@@ -329,6 +339,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "REF-B-545-1800-700":
     case "REF-AB105806-KGCN388140E":
     case "REF-AB105807-KGCN388140E":
+    case "REF-AB105819-KGCN388140E":
     case "REF-C-545-1800-700":
       return translate("configurator.catalogItemInfo.fridgeFreezerNoFrost", "Fridge-freezer, 180 cm, NoFrost");
     case "SINK-B-BOTTON-45":
@@ -349,6 +360,8 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105819": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
@@ -376,6 +389,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
+  "DISH-AB105819-600": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
   "T3D-DISH-001": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
@@ -393,6 +410,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "REF-AB105807-KGCN388140E": [
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+  ],
+  "REF-AB105819-KGCN388140E": [
     { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
@@ -579,6 +600,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-LS-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105806-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105807-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105819-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
@@ -597,6 +619,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-C-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-AB105806-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-AB105807-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
+  "REF-AB105819-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-WASHER-001": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
