@@ -104,7 +104,7 @@ Each item object supports:
 | --- | --- | --- |
 | `itemType` | `ItemType.COMPONENT` / `ACCESSORY` / `SERVICE` | yes |
 | `code` | SKU-style id, **unique per kitchen** (`@@unique([kitchenId, code])`) | yes |
-| `name` | Human label | yes |
+| `name` | Human label — **no dimensions in the name** (see convention below) | yes |
 | `price` | EUR string, e.g. `"149.00"` (`"0.00"` = included) | yes |
 | `componentKey` | Plan slot id, e.g. `wall-cabinet-1` | yes for COMPONENT |
 | `iconKey` | Visual type (list below) | yes for COMPONENT |
@@ -120,9 +120,20 @@ Each item object supports:
 > ⚠️ **Always set `widthMm`/`heightMm`/`depthMm` from the Excel `DIMENSIONET` column.** The catalog
 > shows them on their own line under the article number (`getStructuredDimensions` in
 > `kitchen-catalog-panel.jsx`; missing values are skipped, so a fridge with no depth reads
-> `710 x 1780 mm`). If an item has no `Mm` values, the only dimensions shown are ones that happen to
-> be baked into its `name` (e.g. `Wall Cabinet (600 x 720 x 340 mm)`) — so don't rely on that, set
-> the fields. The seed's upsert writes these columns (see Step 4); verify they aren't `null` in the DB.
+> `710 x 1780 mm`). The seed's upsert writes these columns (see Step 4); verify they aren't `null`
+> in the DB.
+
+### Naming conventions (apply to every kitchen)
+
+1. **Contract number = `670` + the kitchen's 6-digit plan number.** Example: `AB 105811` → contract
+>   `670105811`. Add it to `DEFAULT_KITCHEN_CONTRACTS` (whitespace is ignored, so `670 105811` also
+>   resolves). Don't reuse the old sequential `7362xx` scheme for new kitchens.
+2. **Never put dimensions in an element `name`.** Dimensions live only in `widthMm`/`heightMm`/`depthMm`
+>   and render as the `W x H x D mm` line under the article. `stripDimensionsFromName`
+>   (`kitchen-selection-utils.js`) defensively removes any dimension format from the displayed title
+>   — parenthesised `(600 x 720 x 340 mm)`, bare `600 x 720 x 340 mm`, slash `600/600 mm`, and single
+>   `178 cm` — but keep the seed `name` clean anyway (e.g. `Base cabinet with drawer`, not
+>   `Base cabinet with drawer 600/600 mm`).
 
 Common `iconKey` values already in use: `wall_cabinet_plain`, `wall_cabinet_standard`,
 `hood_wall_cabinet`,
@@ -224,7 +235,8 @@ only for items that differ.
      description: "Kitchen configuration based on frontend/public/jpg/<PLAN>_page-0001.jpg",
      items: <PLAN>_ITEMS },
    ```
-3. Add a `DEFAULT_KITCHEN_CONTRACTS` entry with the next free contract number.
+3. Add a `DEFAULT_KITCHEN_CONTRACTS` entry. **Contract number = `670` + the kitchen's 6-digit plan
+   number** (e.g. `AB 105811` → `670105811`), not the old `7362xx` sequence.
 4. **Only if you minted new appliance codes** (didn't reuse), add their `PRODUCT_INFO_BY_CODE`
    aliases next to the existing ones, e.g. `PRODUCT_INFO_BY_CODE["REF-<PLAN>-…"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];`
 

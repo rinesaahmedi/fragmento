@@ -415,6 +415,30 @@ const AB_105841_ITEMS = [
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
+// AB 105811: compact run (4 wall + 4 base + freestanding fridge on the right).
+// Plan callouts: 1 oven, 2 worktop, 3 sink base (DEFAULT/locked), 4 US60 base, 5 dishwasher,
+// 6 fridge, 7-9 wall cabinets (H6002), 10 hood cabinet. Shared default + hood codes are reused
+// so they inherit names/product info; the rest are AB105811-specific.
+const AB_105811_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105811-US60", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 10, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 20, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105811-600", name: "Fully integrated dishwasher incl. furniture front", price: "579.00", widthMm: 600, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-2", sortOrder: 40, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 50, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105811-KGCN388140E", name: "Freestanding refrigerator", price: "579.00", widthMm: 710, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 60, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105811-1", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105811-2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105811-3", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 110, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220, articleNumber: "KA220043_S3" },
+  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
 const MODEL_C_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-C-545-1800-700", legacyCode: "model-c-refrigerator", name: "Freestanding refrigerator 178 cm", price: "579.00", widthMm: 710, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 180 cm, NoFrost", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "HOOD-C-FH664621E", legacyCode: "model-c-extractor-hood", name: "Angled extractor hood + filter", price: "209.00", iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "Chimney hood, 60 cm", articleNumber: "KHF664611S" },
@@ -535,6 +559,13 @@ const DEFAULT_KITCHENS = [
     items: AB_105841_ITEMS,
   },
   {
+    slug: "ab-105811",
+    kitchenCode: "105 811",
+    name: "AB 105811 Kitchen",
+    description: "Kitchen configuration based on frontend/public/jpg/AB 105811_page-0001.jpg",
+    items: AB_105811_ITEMS,
+  },
+  {
     slug: "l-shaped-kitchen",
     kitchenCode: "105 809",
     name: "L-Shaped Kitchen",
@@ -560,6 +591,8 @@ const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "736275", kitchenSlug: "ab-105819" },
   { contractNumber: "736276", kitchenSlug: "ab-105812" },
   { contractNumber: "736277", kitchenSlug: "ab-105841" },
+  // New convention: contract number = "670" + the kitchen's 6-digit plan number.
+  { contractNumber: "670105811", kitchenSlug: "ab-105811" },
 ];
 
 function normalizeSeedSlug(value) {
