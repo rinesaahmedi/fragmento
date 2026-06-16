@@ -20,7 +20,7 @@ PDF  ──render-plan-svg.py──►  /public/plans/<plan>.svg   (crisp vector
 PDF  ──render-plan-pdf.py──►  /public/jpg/<plan>.jpg      (raster, only used to detect edges)
 JPG  ──detect-plan-hotspots.py──►  cabinet edges in %     (pixel-perfect click boxes)
 Excel ──► seed.js item rows + kitchen + contract
-        ──► kitchen-svg-stage.jsx (plan image + hotspot boxes)
+        ──► kitchen-svg-stage.jsx (plan image + hotspot boxes, including linked hood area)
         ──► kitchen-selection-utils.js (callout numbers + hood link)
 verify: prisma db seed → next build → browser
 ```
@@ -125,6 +125,7 @@ Each item object supports:
 > the fields. The seed's upsert writes these columns (see Step 4); verify they aren't `null` in the DB.
 
 Common `iconKey` values already in use: `wall_cabinet_plain`, `wall_cabinet_standard`,
+`hood_wall_cabinet`,
 `tall_refrigerator`, `oven_base`, `dishwasher_base`, `sink_base`, `sink_faucet`,
 `drawer_base_two`, `drawer_base_three`, `base_cabinet_30`, `washing_machine_base`,
 `extractor_hood`, `extractor_hood_chimney`, `under_cabinet_light`, `worktop`, `waste_system`,
@@ -142,7 +143,10 @@ Selection is a list of **component ids**, where `componentId = "component-" + co
 - `isLocked: true` → rendered highlighted + non-clickable (always in the order).
 - Linked items (e.g. a hood **cabinet** that also pulls in a hidden **hood** appliance row) toggle
   together. Declare the link in `LINKED_COMPONENT_GROUPS_BY_SLUG`, set the helper row
-  `isActive: false`, and give it **no** hotspot (only the visible cabinet gets one).
+  `isActive: false`, and give the hood cabinet package the `hood_wall_cabinet` catalog icon.
+  For image/SVG hotspot plans, add both hotspots: one for the visible hood wall cabinet and one
+  small `extractor-hood` hotspot around the hood drawing directly below the cabinet. Both hotspots
+  use the same linked group, so either click highlights/selects the package together.
 
 ### 5.3 ♻️ Code-reuse rule (important, saves most of the work)
 Because `code` is unique **per kitchen**, a new kitchen can **reuse an existing kitchen's codes**
@@ -200,7 +204,8 @@ single-wall layout uses these keys (left→right):
   `drawer-module` (names are slots, not types — a slot can hold any cabinet/appliance)
 - Worktop: `worktop`
 - Wall run: `wall-cabinet-1` … `wall-cabinet-6`
-- Hidden helper: `extractor-hood` (linked to the hood cabinet, `isActive:false`, no hotspot)
+- Hidden helper: `extractor-hood` (linked to the hood cabinet, `isActive:false`; add a small
+  linked hotspot around the visible hood drawing under the cabinet when the plan image shows it)
 
 Apply the **code-reuse rule** (5.3): reuse an existing identical kitchen's codes; mint new codes
 only for items that differ.
@@ -208,7 +213,8 @@ only for items that differ.
 ### Step 4 — Seed (`frontend/prisma/seed.js`)
 1. Add an items array `const <PLAN>_ITEMS = [ … ]` (one object per Excel row + the standard
    accessory/service rows). Set `isLocked` on the `DEFAULT` items, `isActive:false` on the hidden
-   hood, and fill `widthMm`/`heightMm`/`depthMm` from each row's `DIMENSIONET` so the catalog can
+   hood, set the hood cabinet package's `iconKey` to `hood_wall_cabinet`, and fill
+   `widthMm`/`heightMm`/`depthMm` from each row's `DIMENSIONET` so the catalog can
    show the size line. The upsert `data` object in `main()` already persists
    `widthMm`/`heightMm`/`depthMm`/`nameDe`; if you add a new item field, add it there too or it
    silently won't reach the DB.
@@ -225,6 +231,9 @@ only for items that differ.
 ### Step 5 — Show the plan (`frontend/components/kitchen-svg-stage.jsx`)
 1. Add the slug to `IMAGE_VIEW_BY_SLUG` → `/plans/<PLAN>.svg` (or `/jpg/<PLAN>_page-0001.jpg`).
 2. Add the slug to `IMAGE_HOTSPOTS_BY_SLUG` with one box per visible `componentKey` from Step 2.
+   For a linked hood package, also add a small `{ componentKey: "extractor-hood", ... }` box around
+   the hood/aspirator drawing under the wall cabinet. This helper component is hidden from the
+   catalog, but the stage resolves the hotspot through the linked visible cabinet.
 
 ### Step 6 — Wire interactivity (`frontend/components/kitchen-selection-utils.js`)
 1. Add callout numbers for any **new** codes to `AB_105806_PHOTO_NUMBER_BY_CODE` (reused codes
@@ -292,6 +301,7 @@ flagged to the user).
   { componentKey: "refrigerator", left: 2.11, top: 29.8, width: 13.22, height: 60.5 },
   { componentKey: "wall-cabinet-1", left: 17.16, top: 17.5, width: 7.12, height: 24.27 },
   { componentKey: "wall-cabinet-2", left: 24.28, top: 17.5, width: 14.24, height: 24.27 },
+  { componentKey: "extractor-hood", left: 24.28, top: 41.77, width: 14.24, height: 7.05 },
   { componentKey: "wall-cabinet-3", left: 38.52, top: 17.5, width: 14.26, height: 24.27 },
   { componentKey: "wall-cabinet-4", left: 52.78, top: 17.5, width: 14.23, height: 24.27 },
   { componentKey: "wall-cabinet-5", left: 67.01, top: 17.5, width: 14.25, height: 24.27 },
@@ -310,6 +320,8 @@ flagged to the user).
 - `IMAGE_VIEW_BY_SLUG["ab-105820"] = "/plans/AB%20105820.svg"`.
 - `AB_105806_PHOTO_NUMBER_BY_CODE` gained the 4 new codes → numbers `5, 6, 9, 11`.
 - `LINKED_COMPONENT_GROUPS_BY_SLUG["ab-105820"] = [["component-wall-cabinet-2", "component-extractor-hood"]]`.
+- The hood cabinet catalog row uses `iconKey: "hood_wall_cabinet"` and the plan includes an
+  `extractor-hood` hotspot below `wall-cabinet-2`, so the cabinet and hood area highlight together.
 - `DEFAULT_KITCHENS` += `ab-105820` (code `105 820`); `DEFAULT_KITCHEN_CONTRACTS` += `736274`.
 
 ---
@@ -322,7 +334,8 @@ flagged to the user).
 - [ ] All Excel rows seeded; identical items **reuse** existing codes, differing ones get new codes.
 - [ ] Standard accessory + service rows included; `DEFAULT` items `isLocked`; hidden hood `isActive:false`.
 - [ ] Kitchen registered in `DEFAULT_KITCHENS` + a `DEFAULT_KITCHEN_CONTRACTS` entry.
-- [ ] `IMAGE_VIEW_BY_SLUG` + `IMAGE_HOTSPOTS_BY_SLUG` updated.
+- [ ] `IMAGE_VIEW_BY_SLUG` + `IMAGE_HOTSPOTS_BY_SLUG` updated, including a linked
+      `extractor-hood` hotspot under every hood wall cabinet shown in the drawing.
 - [ ] Callout numbers added for new codes; hood link added to `LINKED_COMPONENT_GROUPS_BY_SLUG`.
 - [ ] `prisma db seed` ok, `next build` ok, page verified in the browser (hover/click/lock/link).
 

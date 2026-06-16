@@ -102,6 +102,13 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105819-H6002-R": "7",
   "CAB-WALL-AB105819-H6002-L1": "8",
   "CAB-WALL-AB105819-H6002-L2": "9",
+  "CAB-BASE-AB105841-US60-1": "4",
+  "CAB-BASE-AB105841-US60-2": "5",
+  "DISH-AB105841-600": "6",
+  "CAB-BASE-AB105841-US60-3": "7",
+  "REF-AB105841-KGCN388140E": "8",
+  "CAB-WALL-AB105841-H6002-1": "9",
+  "CAB-WALL-AB105841-H6002-2": "11",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -363,9 +370,11 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105819": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105841": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],
+  "l-kitchen-new": [["component-top-400", "component-aspirator"]],
 };
 
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
@@ -579,7 +588,9 @@ export function toggleLinkedComponentSelection(slug, currentIds, componentId, lo
   const linkedIds = getLinkedComponentIds(slug, componentId);
   const currentSet = new Set(currentIds);
   const lockedSet = new Set(lockedIds);
-  const shouldRemove = linkedIds.every((id) => currentSet.has(id));
+  // Linked parts toggle as one unit. Treat the group as "on" if any member is selected so a
+  // single click reliably turns it off — even when a hidden partner wasn't persisted on reload.
+  const shouldRemove = linkedIds.some((id) => currentSet.has(id));
 
   linkedIds.forEach((id) => {
     if (lockedSet.has(id)) return;
@@ -601,6 +612,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105806-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105807-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105819-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
@@ -620,6 +632,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB105806-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-AB105807-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-AB105819-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
+  "REF-AB105841-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-WASHER-001": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
@@ -646,6 +659,11 @@ function getCatalogLinkedItems(allItems, slug, item) {
   return linkedItems.length ? linkedItems : [item];
 }
 
+function isHoodWallCabinetItem(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  return code.startsWith("CAB-HOOD-");
+}
+
 export function getCatalogDisplayItem(allItems, slug, item) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
   const linkedItems = getCatalogLinkedItems(allItems, slug, item).map(applyProductInfoDisplayOverrides);
@@ -655,6 +673,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
     return {
       item: {
         ...displayItem,
+        iconKey: isHoodWallCabinetItem(displayItem) ? "hood_wall_cabinet" : displayItem.iconKey,
         productInfoItemId: displayItem.id,
         productAssistantName: displayItem.name || "",
         productImagePath: displayItem.productImagePath || "",
@@ -670,7 +689,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
     linkedItems.find((entry) => {
       const componentKey = String(entry.componentKey || "").toLowerCase();
       const code = String(entry.code || "").trim().toUpperCase();
-      return componentKey === "extractor-hood" || code.startsWith("HOOD-");
+      return componentKey === "extractor-hood" || componentKey === "aspirator" || code.startsWith("HOOD-") || code.includes("ASPIRATOR");
     }) || null;
   const primaryItem = linkedItems[0];
   const infoSource = hoodItem?.productInfoPdfPath ? hoodItem : primaryItem;
@@ -689,7 +708,7 @@ export function getCatalogDisplayItem(allItems, slug, item) {
       infoText: hoodItem
         ? `${primaryItem.infoText || ""}${primaryItem.infoText ? " • " : ""}${hoodItem.infoText || ""}`.trim()
         : primaryItem.infoText,
-      iconKey: hoodItem?.iconKey || primaryItem.iconKey,
+      iconKey: hoodItem ? "hood_wall_cabinet" : primaryItem.iconKey || hoodItem?.iconKey,
       productInfoPdfPath: infoSource?.productInfoPdfPath || "",
       productImagePath: infoSource?.productImagePath || primaryItem.productImagePath || "",
       productInfoSummary: infoSource?.productInfoSummary || "",

@@ -6,6 +6,7 @@ import Kitchen3DViewer from "./Kitchen3DViewer";
 import {
   componentIdForItem,
   componentIdForKey,
+  getLinkedComponentIds,
   getLocalizedItemName,
   isHiddenLinkedComponent,
   normalizeColor,
@@ -26,6 +27,7 @@ const IMAGE_VIEW_BY_SLUG = {
   "ab-105812": "/plans/AB%20105812.svg",
   "ab-105819": "/plans/AB%20105819.svg",
   "ab-105820": "/plans/AB%20105820.svg",
+  "ab-105841": "/plans/AB%20105841.svg",
 };
 
 const PDF_VIEW_BY_SLUG = {
@@ -44,11 +46,13 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "refrigerator", left: 4.65, top: 28.85, width: 13.53, height: 61.88 },
     { componentKey: "wall-cabinet-1", left: 18.58, top: 16.25, width: 9.72, height: 24.88 },
     { componentKey: "wall-cabinet-2", left: 28.3, top: 16.25, width: 14.59, height: 24.88 },
+    { componentKey: "extractor-hood", left: 28.3, top: 41.13, width: 14.59, height: 7.05 },
     { componentKey: "wall-cabinet-3", left: 42.89, top: 16.25, width: 9.72, height: 24.88 },
     { componentKey: "wall-cabinet-4", left: 52.61, top: 16.25, width: 14.56, height: 24.88 },
     { componentKey: "wall-cabinet-5", left: 67.17, top: 16.25, width: 14.58, height: 24.88 },
     { componentKey: "wall-cabinet-6", left: 81.75, top: 16.25, width: 14.57, height: 24.88 },
     { componentKey: "worktop", left: 18.58, top: 59.15, width: 78.14, height: 1.4 },
+    { componentKey: "sink-faucet", left: 68.74, top: 52.55, width: 4.95, height: 8 },
     { componentKey: "base-module-1", left: 18.58, top: 60.56, width: 10.1, height: 30.17 },
     { componentKey: "oven-module", left: 28.68, top: 60.56, width: 14.59, height: 30.17 },
     { componentKey: "base-module-2", left: 43.27, top: 60.56, width: 9.72, height: 30.17 },
@@ -60,11 +64,13 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "refrigerator", left: 2.49, top: 29.68, width: 13.23, height: 60.02 },
     { componentKey: "wall-cabinet-1", left: 17.07, top: 16.85, width: 7.11, height: 24.32 },
     { componentKey: "wall-cabinet-2", left: 24.18, top: 16.85, width: 14.28, height: 24.32 },
+    { componentKey: "extractor-hood", left: 24.18, top: 41.17, width: 14.28, height: 7.05 },
     { componentKey: "wall-cabinet-3", left: 38.46, top: 16.85, width: 14.26, height: 24.32 },
     { componentKey: "wall-cabinet-4", left: 52.72, top: 16.85, width: 14.25, height: 24.32 },
     { componentKey: "wall-cabinet-5", left: 66.97, top: 16.85, width: 14.26, height: 24.32 },
     { componentKey: "wall-cabinet-6", left: 81.23, top: 16.85, width: 14.27, height: 24.32 },
     { componentKey: "worktop", left: 17.07, top: 58.83, width: 78.43, height: 1.33 },
+    { componentKey: "sink-faucet", left: 68.77, top: 52.16, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.07, top: 60.16, width: 7.11, height: 29.54 },
     { componentKey: "oven-module", left: 24.18, top: 60.16, width: 14.28, height: 29.54 },
     { componentKey: "base-module-2", left: 38.46, top: 60.16, width: 14.26, height: 29.54 },
@@ -77,7 +83,9 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-2", left: 12.55, top: 22.9, width: 11.15, height: 19.0 },
     { componentKey: "wall-cabinet-3", left: 23.7, top: 22.9, width: 11.14, height: 19.0 },
     { componentKey: "wall-cabinet-4", left: 34.84, top: 22.9, width: 11.14, height: 20.39 },
+    { componentKey: "extractor-hood", left: 34.84, top: 43.29, width: 11.14, height: 5.9 },
     { componentKey: "worktop", left: 0.85, top: 55.73, width: 45.13, height: 1.02 },
+    { componentKey: "sink-faucet", left: 18.86, top: 48.75, width: 3.79, height: 8 },
     { componentKey: "base-module-1", left: 0.85, top: 56.75, width: 11.7, height: 19.02 },
     { componentKey: "sink-base", left: 12.55, top: 56.75, width: 11.15, height: 19.02 },
     { componentKey: "base-module-3", left: 23.7, top: 56.75, width: 11.14, height: 19.02 },
@@ -88,11 +96,13 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "refrigerator", left: 2.11, top: 29.8, width: 13.22, height: 60.5 },
     { componentKey: "wall-cabinet-1", left: 17.16, top: 17.5, width: 7.12, height: 24.27 },
     { componentKey: "wall-cabinet-2", left: 24.28, top: 17.5, width: 14.24, height: 24.27 },
+    { componentKey: "extractor-hood", left: 24.28, top: 41.77, width: 14.24, height: 7.05 },
     { componentKey: "wall-cabinet-3", left: 38.52, top: 17.5, width: 14.26, height: 24.27 },
     { componentKey: "wall-cabinet-4", left: 52.78, top: 17.5, width: 14.23, height: 24.27 },
     { componentKey: "wall-cabinet-5", left: 67.01, top: 17.5, width: 14.25, height: 24.27 },
     { componentKey: "wall-cabinet-6", left: 81.26, top: 17.5, width: 14.24, height: 24.27 },
     { componentKey: "worktop", left: 17.16, top: 59.48, width: 78.34, height: 1.4 },
+    { componentKey: "sink-faucet", left: 68.06, top: 52.88, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.16, top: 60.79, width: 7.12, height: 29.51 },
     { componentKey: "oven-module", left: 24.28, top: 60.79, width: 14.24, height: 29.51 },
     { componentKey: "base-module-2", left: 38.52, top: 60.79, width: 14.26, height: 29.51 },
@@ -100,9 +110,58 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-base", left: 67.01, top: 60.79, width: 14.25, height: 29.51 },
     { componentKey: "drawer-module", left: 81.26, top: 60.79, width: 14.24, height: 29.51 },
   ],
+  "ab-105841": [
+    { componentKey: "wall-cabinet-1", left: 1.55, top: 19.23, width: 13.33, height: 22.73 },
+    { componentKey: "wall-cabinet-2", left: 14.88, top: 19.23, width: 13.32, height: 22.73 },
+    { componentKey: "extractor-hood", left: 14.88, top: 41.9, width: 13.32, height: 5.5 },
+    { componentKey: "wall-cabinet-3", left: 28.2, top: 19.23, width: 13.34, height: 22.73 },
+    { componentKey: "wall-cabinet-4", left: 41.54, top: 19.23, width: 13.32, height: 22.73 },
+    { componentKey: "wall-cabinet-5", left: 54.86, top: 19.23, width: 13.32, height: 22.73 },
+    { componentKey: "wall-cabinet-6", left: 68.18, top: 19.23, width: 13.34, height: 22.73 },
+    { componentKey: "worktop", left: 1.55, top: 58.47, width: 80.33, height: 1.4 },
+    { componentKey: "sink-faucet", left: 49.19, top: 51.87, width: 4.53, height: 8 },
+    { componentKey: "base-module-1", left: 1.55, top: 59.9, width: 13.33, height: 27.44 },
+    { componentKey: "oven-module", left: 14.88, top: 59.9, width: 13.32, height: 27.44 },
+    { componentKey: "base-module-2", left: 28.2, top: 59.9, width: 13.34, height: 27.44 },
+    { componentKey: "sink-base", left: 41.54, top: 59.9, width: 13.32, height: 27.44 },
+    { componentKey: "base-module-3", left: 54.86, top: 59.9, width: 13.32, height: 27.44 },
+    { componentKey: "drawer-module", left: 68.18, top: 59.9, width: 13.7, height: 27.44 },
+    { componentKey: "refrigerator", left: 85.15, top: 30.73, width: 12.34, height: 56.6 },
+  ],
 };
 
 const CALIBRATION_TICKS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+
+// The sink (faucet + waste) is always part of the default configuration and sits on the
+// worktop directly above the sink base. Rather than hand-placing a faucet box per kitchen,
+// we derive one automatically for every plan: centered over the sink-base hotspot and resting
+// on the worktop. This keeps the sink shown as selected by default on every current and future
+// kitchen without extra per-kitchen wiring.
+function withDerivedSinkFaucet(definitions, components) {
+  if (!definitions.length) return definitions;
+  if (definitions.some((definition) => definition.componentKey === "sink-faucet")) {
+    return definitions;
+  }
+  const hasFaucetComponent = components.some(
+    (item) => String(item?.componentKey || "").toLowerCase() === "sink-faucet",
+  );
+  if (!hasFaucetComponent) return definitions;
+
+  const sinkBase = definitions.find((definition) => definition.componentKey === "sink-base");
+  const worktop = definitions.find((definition) => definition.componentKey === "worktop");
+  if (!sinkBase || !worktop) return definitions;
+
+  const width = Math.max(sinkBase.width * 0.34, 3);
+  const height = 8;
+  const faucet = {
+    componentKey: "sink-faucet",
+    left: sinkBase.left + (sinkBase.width - width) / 2,
+    top: worktop.top + worktop.height - height,
+    width,
+    height,
+  };
+  return [...definitions, faucet];
+}
 
 export default function KitchenSvgStage({
   svgMarkup,
@@ -138,7 +197,10 @@ export default function KitchenSvgStage({
     [kitchenConfig.components, kitchenSlug],
   );
   const imageHotspots = useMemo(() => {
-    const definitions = IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [];
+    const definitions = withDerivedSinkFaucet(
+      IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
+      kitchenConfig.components,
+    );
     if (!definitions.length) return [];
 
     const componentById = new Map(
@@ -148,8 +210,12 @@ export default function KitchenSvgStage({
     return definitions
       .map((definition) => {
         const componentId = componentIdForKey(definition.componentKey);
-        const item = componentById.get(componentId);
-        if (!item || isHiddenLinkedComponent(normalizedKitchenSlug, componentId)) {
+        const item =
+          componentById.get(componentId) ||
+          getLinkedComponentIds(normalizedKitchenSlug, componentId)
+            .map((linkedComponentId) => componentById.get(linkedComponentId))
+            .find(Boolean);
+        if (!item) {
           return null;
         }
         return {
@@ -162,6 +228,13 @@ export default function KitchenSvgStage({
   }, [kitchenConfig.components, normalizedKitchenSlug, translate, language]);
   const hasImageHotspots = imageHotspots.length > 0;
   const [isCalibrating, setIsCalibrating] = useState(false);
+  const [hoveredComponentId, setHoveredComponentId] = useState(null);
+  // Linked parts (e.g. the hood wall cabinet + its pull-out extractor hood) should react as
+  // one unit, so hovering either hotspot highlights the whole group.
+  const hoveredLinkedGroup = useMemo(
+    () => (hoveredComponentId ? getLinkedComponentIds(normalizedKitchenSlug, hoveredComponentId) : []),
+    [hoveredComponentId, normalizedKitchenSlug],
+  );
   useEffect(() => {
     if (typeof window === "undefined") return;
     const value = new URLSearchParams(window.location.search).get("calibrate");
@@ -322,13 +395,20 @@ export default function KitchenSvgStage({
                   <div className={styles.planHotspotLayer}>
                     {imageHotspots.map((hotspot) => {
                       const isLocked = fixedComponentIds.includes(hotspot.componentId);
-                      const isSelected = isLocked || selectedComponentIds.includes(hotspot.componentId);
+                      // Linked parts (e.g. the hood cabinet + its pull-out hood) toggle together,
+                      // but the hidden partner isn't persisted on its own. Mirror the group's
+                      // selection so both stay highlighted after a refresh.
+                      const linkedIds = getLinkedComponentIds(kitchenSlug, hotspot.componentId);
+                      const isSelected =
+                        isLocked || linkedIds.some((linkedId) => selectedComponentIds.includes(linkedId));
+                      const isGroupHovered = hoveredLinkedGroup.includes(hotspot.componentId);
                       return (
                         <button
                           key={hotspot.componentId}
                           type="button"
                           className={[
                             styles.planHotspot,
+                            isGroupHovered ? styles.planHotspotHover : "",
                             isSelected ? styles.planHotspotSelected : "",
                             isLocked ? styles.planHotspotLocked : "",
                             isCalibrating ? styles.planHotspotCalibrate : "",
@@ -345,6 +425,18 @@ export default function KitchenSvgStage({
                           aria-label={hotspot.label}
                           title={`${hotspot.componentKey} — left:${hotspot.left} top:${hotspot.top} width:${hotspot.width} height:${hotspot.height}`}
                           disabled={isLocked}
+                          onMouseEnter={() => setHoveredComponentId(hotspot.componentId)}
+                          onMouseLeave={() =>
+                            setHoveredComponentId((current) =>
+                              current === hotspot.componentId ? null : current,
+                            )
+                          }
+                          onFocus={() => setHoveredComponentId(hotspot.componentId)}
+                          onBlur={() =>
+                            setHoveredComponentId((current) =>
+                              current === hotspot.componentId ? null : current,
+                            )
+                          }
                           onClick={() => {
                             if (fixedComponentIds.includes(hotspot.componentId)) return;
                             setSelectedComponentIds((current) =>
