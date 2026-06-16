@@ -5,6 +5,8 @@ import styles from "./kitchen-configurator.module.css";
 import Kitchen3DViewer from "./Kitchen3DViewer";
 import {
   componentIdForItem,
+  componentIdForKey,
+  getLocalizedItemName,
   isHiddenLinkedComponent,
   normalizeColor,
   toggleLinkedComponentSelection,
@@ -16,9 +18,41 @@ import {
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
 
+const IMAGE_VIEW_BY_SLUG = {
+  "ab-105806": "/jpg/AB%20105806_page-0001.jpg",
+};
+
 const PDF_VIEW_BY_SLUG = {
   "ab-105807": "/pdfs/AB%20105807.pdf",
 };
+
+// Clickable selection boxes drawn on top of a flat plan image.
+// Coordinates are percentages of the rendered image (left/top/width/height),
+// so they stay aligned at any display size. `componentKey` must match the
+// component's `componentKey` in the kitchen data (see prisma/seed.js).
+// Coordinates auto-detected from the 3509x2480 plan render by edge-detecting the CAD
+// linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
+// stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
+const IMAGE_HOTSPOTS_BY_SLUG = {
+  "ab-105806": [
+    { componentKey: "refrigerator", left: 4.65, top: 28.85, width: 13.53, height: 61.88 },
+    { componentKey: "wall-cabinet-1", left: 18.58, top: 16.25, width: 9.72, height: 24.88 },
+    { componentKey: "wall-cabinet-2", left: 28.3, top: 16.25, width: 14.59, height: 24.88 },
+    { componentKey: "wall-cabinet-3", left: 42.89, top: 16.25, width: 9.72, height: 24.88 },
+    { componentKey: "wall-cabinet-4", left: 52.61, top: 16.25, width: 14.56, height: 24.88 },
+    { componentKey: "wall-cabinet-5", left: 67.17, top: 16.25, width: 14.58, height: 24.88 },
+    { componentKey: "wall-cabinet-6", left: 81.75, top: 16.25, width: 14.57, height: 24.88 },
+    { componentKey: "worktop", left: 18.58, top: 59.15, width: 78.14, height: 1.4 },
+    { componentKey: "base-module-1", left: 18.58, top: 60.56, width: 10.1, height: 30.17 },
+    { componentKey: "oven-module", left: 28.68, top: 60.56, width: 14.59, height: 30.17 },
+    { componentKey: "base-module-2", left: 43.27, top: 60.56, width: 9.72, height: 30.17 },
+    { componentKey: "base-module-3", left: 52.99, top: 60.56, width: 14.58, height: 30.17 },
+    { componentKey: "sink-base", left: 67.57, top: 60.56, width: 14.56, height: 30.17 },
+    { componentKey: "drawer-module", left: 82.13, top: 60.56, width: 14.59, height: 30.17 },
+  ],
+};
+
+const CALIBRATION_TICKS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
 export default function KitchenSvgStage({
   svgMarkup,
@@ -30,10 +64,13 @@ export default function KitchenSvgStage({
   setSelectedComponentIds,
   onResetSelection,
 }) {
-  const { translate } = usePublicI18n();
+  const { translate, language } = usePublicI18n();
   const svgHostRef = useRef(null);
   const has3dModel = kitchenSlug === "test-3d-kitchen";
-  const pdfViewHref = PDF_VIEW_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()] || "";
+  const normalizedKitchenSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const imageViewHref = IMAGE_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
+  const pdfViewHref = PDF_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
+  const hasImageView = Boolean(imageViewHref);
   const hasPdfView = Boolean(pdfViewHref);
   const [activeView, setActiveView] = useState("2d");
   const resolvedSvgMarkup = useMemo(
@@ -50,9 +87,39 @@ export default function KitchenSvgStage({
       ),
     [kitchenConfig.components, kitchenSlug],
   );
+  const imageHotspots = useMemo(() => {
+    const definitions = IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [];
+    if (!definitions.length) return [];
+
+    const componentById = new Map(
+      kitchenConfig.components.map((item) => [componentIdForItem(item), item]),
+    );
+
+    return definitions
+      .map((definition) => {
+        const componentId = componentIdForKey(definition.componentKey);
+        const item = componentById.get(componentId);
+        if (!item || isHiddenLinkedComponent(normalizedKitchenSlug, componentId)) {
+          return null;
+        }
+        return {
+          ...definition,
+          componentId,
+          label: getLocalizedItemName(item, translate, language) || item.name || "",
+        };
+      })
+      .filter(Boolean);
+  }, [kitchenConfig.components, normalizedKitchenSlug, translate, language]);
+  const hasImageHotspots = imageHotspots.length > 0;
+  const [isCalibrating, setIsCalibrating] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const value = new URLSearchParams(window.location.search).get("calibrate");
+    setIsCalibrating(value === "1" || value === "true");
+  }, []);
 
   useEffect(() => {
-    if (activeView !== "2d" || hasPdfView) {
+    if (activeView !== "2d" || hasImageView || hasPdfView) {
       return undefined;
     }
 
@@ -110,6 +177,7 @@ export default function KitchenSvgStage({
     kitchenConfig,
     kitchenSlug,
     fixedComponentIds,
+    hasImageView,
     hasPdfView,
     activeView,
     componentIds,
@@ -119,7 +187,7 @@ export default function KitchenSvgStage({
   ]);
 
   useEffect(() => {
-    if (activeView !== "2d" || hasPdfView) {
+    if (activeView !== "2d" || hasImageView || hasPdfView) {
       return;
     }
 
@@ -129,7 +197,7 @@ export default function KitchenSvgStage({
       lockedComponentIds: fixedComponentIds,
       kitchenSlug,
     });
-  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds, kitchenSlug, hasPdfView]);
+  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds, kitchenSlug, hasImageView, hasPdfView]);
 
   return (
     <div className={styles.stage}>
@@ -188,6 +256,105 @@ export default function KitchenSvgStage({
               <span className={styles.legendChip}>
                 <span className={styles.legendDot} />
                 Fixed parts always remain active
+              </span>
+            </div>
+          </>
+        ) : hasImageView ? (
+          <>
+            <div className={styles.pdfCard}>
+              {hasImageHotspots ? (
+                <div className={styles.planImageWrap}>
+                  <img
+                    src={imageViewHref}
+                    alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
+                    className={styles.planImageInteractive}
+                  />
+                  <div className={styles.planHotspotLayer}>
+                    {imageHotspots.map((hotspot) => {
+                      const isLocked = fixedComponentIds.includes(hotspot.componentId);
+                      const isSelected = isLocked || selectedComponentIds.includes(hotspot.componentId);
+                      return (
+                        <button
+                          key={hotspot.componentId}
+                          type="button"
+                          className={[
+                            styles.planHotspot,
+                            isSelected ? styles.planHotspotSelected : "",
+                            isLocked ? styles.planHotspotLocked : "",
+                            isCalibrating ? styles.planHotspotCalibrate : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ")}
+                          style={{
+                            left: `${hotspot.left}%`,
+                            top: `${hotspot.top}%`,
+                            width: `${hotspot.width}%`,
+                            height: `${hotspot.height}%`,
+                          }}
+                          aria-pressed={isSelected}
+                          aria-label={hotspot.label}
+                          title={`${hotspot.componentKey} — left:${hotspot.left} top:${hotspot.top} width:${hotspot.width} height:${hotspot.height}`}
+                          disabled={isLocked}
+                          onClick={() => {
+                            if (fixedComponentIds.includes(hotspot.componentId)) return;
+                            setSelectedComponentIds((current) =>
+                              toggleLinkedComponentSelection(
+                                kitchenSlug,
+                                current,
+                                hotspot.componentId,
+                                fixedComponentIds,
+                              ),
+                            );
+                          }}
+                        >
+                          {isCalibrating ? (
+                            <span className={styles.planHotspotTag}>{hotspot.componentKey}</span>
+                          ) : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {isCalibrating ? (
+                    <div className={styles.planCalibrationGrid} aria-hidden="true">
+                      {CALIBRATION_TICKS.map((tick) => (
+                        <div
+                          key={`v-${tick}`}
+                          className={styles.planCalibrationLineV}
+                          style={{ left: `${tick}%` }}
+                        >
+                          <span className={styles.planCalibrationLabel}>{tick}</span>
+                        </div>
+                      ))}
+                      {CALIBRATION_TICKS.map((tick) => (
+                        <div
+                          key={`h-${tick}`}
+                          className={styles.planCalibrationLineH}
+                          style={{ top: `${tick}%` }}
+                        >
+                          <span className={styles.planCalibrationLabelH}>{tick}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <img
+                  src={imageViewHref}
+                  alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
+                  className={styles.planImage}
+                />
+              )}
+            </div>
+            <div className={styles.stageLegend}>
+              <span className={styles.legendChip}>
+                <span className={styles.legendSwatch} />
+                {hasImageHotspots
+                  ? translate("configurator.stageLegendClick", "Click in the plan or choose on the right")
+                  : translate("configurator.stageLegendChooseRight", "Choose elements on the right")}
+              </span>
+              <span className={styles.legendChip}>
+                <span className={styles.legendDot} />
+                {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
               </span>
             </div>
           </>

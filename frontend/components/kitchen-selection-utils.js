@@ -67,14 +67,39 @@ function getStructuredDimensions(item) {
   return `${values.map((value) => value ?? "-").join(" x ")} mm`;
 }
 
+function stripDimensionsFromName(name) {
+  return String(name || "")
+    .replace(/\s*\(\s*[-\d.,]+\s*(?:x|Ã—|\u00d7)\s*[-\d.,]+(?:\s*(?:x|Ã—|\u00d7)\s*[-\d.,]+)?\s*(?:mm|cm|m)\s*\)/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const AB_105806_PHOTO_NUMBER_BY_CODE = {
+  "OVEN-AB105806-600-HOB": "1",
+  "TOP-AB105806": "2",
+  "SINKBASE-AB105806-600": "3",
+  "REF-AB105806-KGCN388140E": "4",
+  "CAB-BASE-AB105806-400-L": "5",
+  "CAB-BASE-AB105806-400-R": "6",
+  "DISH-AB105806-600": "7",
+  "CAB-BASE-AB105806-US60": "8",
+  "CAB-WALL-AB105806-400-L": "9",
+  "CAB-HOOD-AB105806-600": "10",
+  "CAB-WALL-AB105806-400-R": "11",
+  "CAB-WALL-AB105806-1": "12",
+  "CAB-WALL-AB105806-2": "13",
+  "CAB-WALL-AB105806-3": "14",
+};
+
 export function getLocalizedItemName(item, translate, language = "en") {
   const code = String(item?.code || "").trim().toUpperCase();
   const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
   const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
-  const structuredDimensions = getStructuredDimensions(item);
+  const rawTitle = stripDimensionsFromName(rawName);
+  const photoNumber = AB_105806_PHOTO_NUMBER_BY_CODE[code] || "";
+  const withPhotoNumber = (label) => (photoNumber ? `${photoNumber}. ${label}` : label);
   const withDimensions = (label) => {
-    const dimensions = structuredDimensions || rawDimensions;
-    return dimensions ? `${label} (${dimensions})` : label;
+    return withPhotoNumber(stripDimensionsFromName(label));
   };
 
   if (rawName === "Sink and Worktop") {
@@ -84,6 +109,8 @@ export function getLocalizedItemName(item, translate, language = "en") {
   switch (code) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
+    case "OVEN-AB105806-600-HOB":
+    case "OVEN-AB105807-600-HOB":
     case "T3D-OVEN-HOB-001":
       return withDimensions(translate("configurator.itemNameOvenHob", "Built-in oven and induction hob"));
     case "CAB-WALL-B-L-600":
@@ -97,6 +124,8 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "CAB-WALL-B-R-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetRight", "Wall Cabinet right"));
     case "CAB-HOOD-B-600":
+    case "CAB-HOOD-AB105806-600":
+    case "CAB-HOOD-AB105807-600":
       return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
@@ -113,6 +142,8 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "CAB-WALL-LS-600":
       return translate("configurator.catalogItemNames.wallCabinetRightLs2", "Wall Cabinet right 2");
     case "HOOD-B-FH664621E":
+    case "HOOD-AB105806-FH664621E":
+    case "HOOD-AB105807-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
       return translate("configurator.catalogItemNames.chimneyExtractorHood", "Chimney extractor hood");
@@ -123,29 +154,41 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "WM-C-EWA34660W":
       return withDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
     case "SINKBASE-B-600":
+    case "SINKBASE-AB105806-600":
+    case "SINKBASE-AB105807-600":
     case "SINKBASE-C-600":
       return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
     case "SINKBASE-LS-600":
       return translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet");
     case "DISH-B-600-STD":
+    case "DISH-AB105806-600":
+    case "DISH-AB105807-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
       return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
     case "TOP-B-3036":
+    case "TOP-AB105806":
+    case "TOP-AB105807":
     case "TOP-C-4000":
       return withDimensions(translate("configurator.catalogItemNames.worktop", "Worktop"));
     case "CAB-BASE-B-STR":
+    case "CAB-BASE-AB105806-US60":
+    case "CAB-BASE-AB105807-US60":
       return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawers", "Base Cabinet (2 Drawers)"));
     case "CAB-BASE-LS-400":
       return translate("configurator.catalogItemNames.baseCabinetLeftLs", "Base Cabinet left");
     case "CAB-BASE-LS-500":
       return translate("configurator.catalogItemNames.baseCabinetRightLs", "Base Cabinet right");
     case "REF-B-545-1800-700":
+    case "REF-AB105806-KGCN388140E":
+    case "REF-AB105807-KGCN388140E":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
       return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
     case "SINK-B-BOTTON-45":
+    case "SINK-AB105806-BOTTON-45":
+    case "SINK-AB105807-BOTTON-45":
     case "SINK-C-BOTTON-45":
       return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
     case "ACC-WASTE-001":
@@ -189,7 +232,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "T3D-HOOD-001":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     default:
-      return rawName;
+      return withPhotoNumber(rawTitle);
   }
 }
 
@@ -201,6 +244,12 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-WALL-B-ML-600":
     case "CAB-WALL-B-MR-600":
     case "CAB-WALL-B-R-600":
+    case "CAB-WALL-AB105806-1":
+    case "CAB-WALL-AB105806-2":
+    case "CAB-WALL-AB105806-3":
+    case "CAB-WALL-AB105807-1":
+    case "CAB-WALL-AB105807-2":
+    case "CAB-WALL-AB105807-3":
     case "CAB-WALL-C-L-600":
     case "CAB-WALL-C-ML-600":
     case "CAB-WALL-C-MR-600":
@@ -216,8 +265,12 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-WALL-LS-600":
       return translate("configurator.catalogItemInfo.oneDoorTwoShelves", "1 door, 2 adjustable shelves");
     case "CAB-HOOD-B-600":
+    case "CAB-HOOD-AB105806-600":
+    case "CAB-HOOD-AB105807-600":
       return translate("configurator.catalogItemInfo.lightHoodSetup", "HD6002, light hood setup");
     case "HOOD-B-FH664621E":
+    case "HOOD-AB105806-FH664621E":
+    case "HOOD-AB105807-FH664621E":
     case "T3D-HOOD-001":
       return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
     case "HOOD-C-FH664621E":
@@ -231,35 +284,49 @@ export function getLocalizedItemInfoText(item, translate) {
     case "T3D-WASHER-001":
       return translate("configurator.catalogItemInfo.washingMachine", "Washing machine, 8 kg, 1400 rpm");
     case "SINKBASE-B-600":
+    case "SINKBASE-AB105806-600":
+    case "SINKBASE-AB105807-600":
     case "SINKBASE-C-600":
     case "T3D-SINKBASE-001":
       return translate("configurator.catalogItemInfo.blancoBottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
     case "SINKBASE-LS-600":
       return translate("configurator.catalogItemInfo.us30SinkBaseCabinet", "US30, sink base cabinet");
     case "DISH-B-600-STD":
+    case "DISH-AB105806-600":
+    case "DISH-AB105807-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "T3D-DISH-001":
       return translate("configurator.catalogItemInfo.integratedDishwasher", "Fully integrated dishwasher, 60 cm");
     case "TOP-B-3036":
+    case "TOP-AB105806":
+    case "TOP-AB105807":
     case "TOP-C-4000":
     case "T3D-TOP-MAIN-001":
     case "T3D-TOP-RETURN-001":
       return translate("configurator.catalogItemInfo.concreteSlateGray", "PLS, concrete slate gray");
     case "OVEN-B-600-HOB":
+    case "OVEN-AB105806-600-HOB":
+    case "OVEN-AB105807-600-HOB":
     case "OVEN-C-600-HOB":
     case "T3D-OVEN-HOB-001":
       return translate("configurator.catalogItemInfo.ovenInductionHob", "Built-in oven + induction hob");
     case "CAB-BASE-B-STR":
+    case "CAB-BASE-AB105806-US60":
+    case "CAB-BASE-AB105807-US60":
     case "T3D-CAB-STORAGE-001":
       return translate("configurator.catalogItemInfo.strBaseStorageCabinet", "STR base storage cabinet");
     case "CAB-BASE-LS-400":
     case "CAB-BASE-LS-500":
       return translate("configurator.catalogItemInfo.oneDrawerOneDoorOneShelf", "1 drawer, 1 door, 1 adjustable shelf");
     case "REF-B-545-1800-700":
+    case "REF-AB105806-KGCN388140E":
+    case "REF-AB105807-KGCN388140E":
     case "REF-C-545-1800-700":
       return translate("configurator.catalogItemInfo.fridgeFreezerNoFrost", "Fridge-freezer, 180 cm, NoFrost");
     case "SINK-B-BOTTON-45":
+    case "SINK-AB105806-BOTTON-45":
+    case "SINK-AB105807-BOTTON-45":
     case "SINK-C-BOTTON-45":
     case "T3D-SINK-001":
       return translate("configurator.catalogItemInfo.manualWasteSystem", "Blanco Botton Pro 45/2 manual waste system");
@@ -274,6 +341,7 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],
@@ -289,6 +357,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "DISH-LS-600-STD": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
+  "DISH-AB105806-600": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
@@ -308,6 +380,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
+  "REF-AB105806-KGCN388140E": [
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+  ],
   "REF-AB105807-KGCN388140E": [
     { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
@@ -317,6 +393,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
   "HOOD-LS-FH664621E": [
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+  ],
+  "HOOD-AB105806-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
@@ -350,6 +430,11 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
   ],
   "OVEN-C-600-HOB": [
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
+  ],
+  "OVEN-AB105806-600-HOB": [
     { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
     { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
     { label: "Kochfeld PDF", href: "/product-info/ol-kmi-754-000-e-product-info.pdf" },
@@ -484,21 +569,25 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-C-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-LS-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105806-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105807-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
+  "OVEN-AB105806-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "OVEN-AB105807-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-OVEN-HOB-001": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.png`),
   "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-LS-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "HOOD-AB105806-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-AB105807-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-B-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-C-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
+  "REF-AB105806-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "REF-AB105807-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.png`),
