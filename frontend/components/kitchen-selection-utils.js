@@ -74,6 +74,9 @@ function stripDimensionsFromName(name) {
     .trim();
 }
 
+// Plan callout numbers, keyed by item code. AB 105820 shares AB 105806's callout layout and
+// reuses its codes for identical slots, so those numbers already apply; only the four
+// differently-sized AB 105820 cabinets need their own entries.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "OVEN-AB105806-600-HOB": "1",
   "TOP-AB105806": "2",
@@ -89,6 +92,10 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105806-1": "12",
   "CAB-WALL-AB105806-2": "13",
   "CAB-WALL-AB105806-3": "14",
+  "CAB-BASE-AB105820-US30-300": "5",
+  "CAB-BASE-AB105820-US60": "6",
+  "CAB-WALL-AB105820-H3002-300": "9",
+  "CAB-WALL-AB105820-H6002": "11",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -342,6 +349,7 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],

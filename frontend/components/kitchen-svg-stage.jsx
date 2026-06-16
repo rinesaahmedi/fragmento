@@ -18,8 +18,12 @@ import {
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
 
+// Vector plans (rendered from the source PDFs via docs/render-plan-svg.py) so the drawing
+// stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
+// (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 const IMAGE_VIEW_BY_SLUG = {
-  "ab-105806": "/jpg/AB%20105806_page-0001.jpg",
+  "ab-105806": "/plans/AB%20105806.svg",
+  "ab-105820": "/plans/AB%20105820.svg",
 };
 
 const PDF_VIEW_BY_SLUG = {
@@ -49,6 +53,22 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-3", left: 52.99, top: 60.56, width: 14.58, height: 30.17 },
     { componentKey: "sink-base", left: 67.57, top: 60.56, width: 14.56, height: 30.17 },
     { componentKey: "drawer-module", left: 82.13, top: 60.56, width: 14.59, height: 30.17 },
+  ],
+  "ab-105820": [
+    { componentKey: "refrigerator", left: 2.11, top: 29.8, width: 13.22, height: 60.5 },
+    { componentKey: "wall-cabinet-1", left: 17.16, top: 17.5, width: 7.12, height: 24.27 },
+    { componentKey: "wall-cabinet-2", left: 24.28, top: 17.5, width: 14.24, height: 24.27 },
+    { componentKey: "wall-cabinet-3", left: 38.52, top: 17.5, width: 14.26, height: 24.27 },
+    { componentKey: "wall-cabinet-4", left: 52.78, top: 17.5, width: 14.23, height: 24.27 },
+    { componentKey: "wall-cabinet-5", left: 67.01, top: 17.5, width: 14.25, height: 24.27 },
+    { componentKey: "wall-cabinet-6", left: 81.26, top: 17.5, width: 14.24, height: 24.27 },
+    { componentKey: "worktop", left: 17.16, top: 59.48, width: 78.34, height: 1.4 },
+    { componentKey: "base-module-1", left: 17.16, top: 60.79, width: 7.12, height: 29.51 },
+    { componentKey: "oven-module", left: 24.28, top: 60.79, width: 14.24, height: 29.51 },
+    { componentKey: "base-module-2", left: 38.52, top: 60.79, width: 14.26, height: 29.51 },
+    { componentKey: "base-module-3", left: 52.78, top: 60.79, width: 14.23, height: 29.51 },
+    { componentKey: "sink-base", left: 67.01, top: 60.79, width: 14.25, height: 29.51 },
+    { componentKey: "drawer-module", left: 81.26, top: 60.79, width: 14.24, height: 29.51 },
   ],
 };
 
