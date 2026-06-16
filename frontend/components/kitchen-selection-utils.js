@@ -123,6 +123,10 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105811-1": "7",
   "CAB-WALL-AB105811-2": "8",
   "CAB-WALL-AB105811-3": "9",
+  "CAB-BASE-AB105810-US45": "5",
+  "CAB-BASE-AB105810-FILLER-400": "6",
+  "CAB-WALL-AB105810-H4502": "9",
+  "CAB-WALL-AB105810-FILLER-400": "11",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -381,7 +385,10 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105810": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105814": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105819": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105841": [["component-wall-cabinet-2", "component-extractor-hood"]],

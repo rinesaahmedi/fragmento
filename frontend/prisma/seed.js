@@ -387,6 +387,38 @@ const AB_105820_ITEMS = [
 // AB 105812 matches AB 105820's plan and Excel rows, so it reuses the same item codes.
 const AB_105812_ITEMS = AB_105820_ITEMS;
 
+// AB 105808 shares AB 105820's Excel rows (same appliances/cabinets, fridge-left layout).
+const AB_105808_ITEMS = AB_105820_ITEMS;
+
+// AB 105810: fridge-left run with US45 + 400 mm filler bases, H4502 + 400 mm filler wall,
+// hood, and three H6002 cabinets. Plan callouts 1–3 DEFAULT (locked); shared appliance codes reused.
+const AB_105810_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator", price: "579.00", widthMm: 710, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105810-US45", name: "Base cabinet with drawer", price: "198.00", widthMm: 450, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 20, infoText: "US45 base storage cabinet, hinge right", articleNumber: "US45" },
+  { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 30, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105810-FILLER-400", name: "Base cabinet", price: "0.01", widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "NUK E KENA base cabinet filler, hinge left", articleNumber: "NUK E KENA-Unterschrank" },
+  { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 50, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Fully integrated dishwasher incl. furniture front", price: "579.00", widthMm: 600, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105806-US60", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 75, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105810-H4502", name: "Wall Cabinet", price: "139.00", widthMm: 450, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H4502, hinge right, 2 adjustable shelves", articleNumber: "H4502" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105810-FILLER-400", name: "Wall Cabinet", price: "0.01", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "NUK E KENA wall cabinet filler, hinge right", articleNumber: "NUK E KENA-Oberschrank" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-1", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-3", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 140, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220, articleNumber: "KA220043_S3" },
+  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
+// AB 105814 has the same item schedule as AB 105810; it gets its own plan/hotspots/contract.
+const AB_105814_ITEMS = AB_105810_ITEMS;
+
 // AB 105841 shares AB 105806's single-wall layout (fridge on the RIGHT). Items whose callout
 // number matches AB 105806's scheme reuse its codes (oven 1, worktop 2, sink base 3, hood 10,
 // wall cabinets 12/13/14, sink+waste); the rest get AB105841 codes so their plan numbers (4-9, 11)
@@ -531,11 +563,32 @@ const DEFAULT_KITCHENS = [
     items: AB_105807_ITEMS,
   },
   {
+    slug: "ab-105808",
+    kitchenCode: "105 808",
+    name: "AB 105808 Kitchen",
+    description: "Kitchen configuration based on frontend/public/jpg/AB 105808_page-0001.jpg",
+    items: AB_105808_ITEMS,
+  },
+  {
+    slug: "ab-105810",
+    kitchenCode: "105 810",
+    name: "AB 105810 Kitchen",
+    description: "Kitchen configuration based on frontend/public/jpg/AB 105810_page-0001.jpg",
+    items: AB_105810_ITEMS,
+  },
+  {
     slug: "ab-105812",
     kitchenCode: "105 812",
     name: "AB 105812 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105812_page-0001.jpg",
     items: AB_105812_ITEMS,
+  },
+  {
+    slug: "ab-105814",
+    kitchenCode: "105 814",
+    name: "AB 105814 Kitchen",
+    description: "Kitchen configuration based on frontend/public/jpg/AB 105814_page-0001.jpg",
+    items: AB_105814_ITEMS,
   },
   {
     slug: "ab-105819",
@@ -592,7 +645,10 @@ const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "736276", kitchenSlug: "ab-105812" },
   { contractNumber: "736277", kitchenSlug: "ab-105841" },
   // New convention: contract number = "670" + the kitchen's 6-digit plan number.
+  { contractNumber: "670105808", kitchenSlug: "ab-105808" },
+  { contractNumber: "670105810", kitchenSlug: "ab-105810" },
   { contractNumber: "670105811", kitchenSlug: "ab-105811" },
+  { contractNumber: "670105814", kitchenSlug: "ab-105814" },
 ];
 
 function normalizeSeedSlug(value) {
