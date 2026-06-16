@@ -141,9 +141,11 @@ function splitItemNameAndDimensions(name) {
 }
 
 function getStructuredDimensions(item) {
-  const values = [item?.widthMm, item?.heightMm, item?.depthMm];
-  if (values.every((value) => value === null || value === undefined || value === "")) return "";
-  return `${values.map((value) => value ?? "-").join(" x ")} mm`;
+  const values = [item?.widthMm, item?.heightMm, item?.depthMm].filter(
+    (value) => value !== null && value !== undefined && value !== "",
+  );
+  if (!values.length) return "";
+  return `${values.join(" x ")} mm`;
 }
 
 function splitCatalogItemNameAndDimensions(name) {
@@ -235,8 +237,8 @@ function CatalogItem({
         <span className={iconClassName} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
         <div className={styles.itemText}>
           <strong>{itemDisplayName.title}</strong>
-          {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}
           {item.articleNumber ? <span className={styles.itemCode}>{translate("common.article", "Article")}: {item.articleNumber}</span> : null}
+          {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}
           {item.linkedInfoBadge ? (
             <span className={styles.itemLinkedBadge}>
               {translate("configurator.catalogItemInfo.includesExtractorHood", item.linkedInfoBadge)}

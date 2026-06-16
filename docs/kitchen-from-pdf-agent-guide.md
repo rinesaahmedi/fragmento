@@ -110,11 +110,19 @@ Each item object supports:
 | `iconKey` | Visual type (list below) | yes for COMPONENT |
 | `colorKey` | Used for SVG color grouping; any value is fine | yes for COMPONENT |
 | `sortOrder` | Order in the catalog list | yes |
-| `articleNumber` | Manufacturer article | optional |
-| `widthMm` / `heightMm` / `depthMm` | Dimensions | optional |
+| `articleNumber` | Manufacturer article (shown as `Article: …` in the catalog) | optional |
+| `widthMm` / `heightMm` / `depthMm` | Dimensions in mm — rendered as a `W x H x D mm` line **directly below the article** in the catalog | optional but **fill them in** |
+| `nameDe` | German label | optional |
 | `isLocked` | `true` = always included, not deselectable | optional |
 | `isActive` | `false` = hidden helper row (e.g. a linked hood) | optional |
 | `infoText` | Short catalog note (shown when no localized case exists) | optional |
+
+> ⚠️ **Always set `widthMm`/`heightMm`/`depthMm` from the Excel `DIMENSIONET` column.** The catalog
+> shows them on their own line under the article number (`getStructuredDimensions` in
+> `kitchen-catalog-panel.jsx`; missing values are skipped, so a fridge with no depth reads
+> `710 x 1780 mm`). If an item has no `Mm` values, the only dimensions shown are ones that happen to
+> be baked into its `name` (e.g. `Wall Cabinet (600 x 720 x 340 mm)`) — so don't rely on that, set
+> the fields. The seed's upsert writes these columns (see Step 4); verify they aren't `null` in the DB.
 
 Common `iconKey` values already in use: `wall_cabinet_plain`, `wall_cabinet_standard`,
 `tall_refrigerator`, `oven_base`, `dishwasher_base`, `sink_base`, `sink_faucet`,
@@ -200,7 +208,10 @@ only for items that differ.
 ### Step 4 — Seed (`frontend/prisma/seed.js`)
 1. Add an items array `const <PLAN>_ITEMS = [ … ]` (one object per Excel row + the standard
    accessory/service rows). Set `isLocked` on the `DEFAULT` items, `isActive:false` on the hidden
-   hood.
+   hood, and fill `widthMm`/`heightMm`/`depthMm` from each row's `DIMENSIONET` so the catalog can
+   show the size line. The upsert `data` object in `main()` already persists
+   `widthMm`/`heightMm`/`depthMm`/`nameDe`; if you add a new item field, add it there too or it
+   silently won't reach the DB.
 2. Register the kitchen in `DEFAULT_KITCHENS`:
    ```js
    { slug: "<slug>", kitchenCode: "<code>", name: "<NAME> Kitchen",
@@ -325,7 +336,7 @@ flagged to the user).
 | `frontend/prisma/schema.prisma` | `KitchenItem` model; `@@unique([kitchenId, code])` |
 | `frontend/components/kitchen-svg-stage.jsx` | Plan stage: `IMAGE_VIEW_BY_SLUG` + `IMAGE_HOTSPOTS_BY_SLUG` + `?calibrate=1` grid |
 | `frontend/components/kitchen-selection-utils.js` | component ids, callout numbers, names/info, linked groups, product info, galleries |
-| `frontend/components/kitchen-catalog-panel.jsx` | Right-hand selectable list |
+| `frontend/components/kitchen-catalog-panel.jsx` | Right-hand selectable list; renders name → `Article: …` → `W x H x D mm` dimension line (`getStructuredDimensions`) |
 | `frontend/components/kitchen-configurator.js` | Orchestrates selection state, locking, order |
 | `docs/render-plan-svg.py` | PDF → vector SVG plan |
 | `docs/render-plan-pdf.py` | PDF → JPG (detection input / raster fallback) |
@@ -342,6 +353,10 @@ flagged to the user).
 - **SVG looks wrong / empty** — the PDF is likely raster; use the JPG plan instead.
 - **Catalog name reads oddly for a new code** — add a `case` in `getLocalizedItemName` /
   `getLocalizedItemInfoText`, or just set a clean `name`/`infoText` on the item (fallback).
+- **Dimensions not showing under the article** — the item's `widthMm`/`heightMm`/`depthMm` are
+  `null` in the DB. Either you didn't set them on the item row, or a field you added isn't being
+  written by the seed's upsert `data` object (`main()` in `seed.js` must list every column it
+  saves). Set the fields, confirm the `data` object includes them, then re-run `prisma db seed`.
 - **Seed error about a missing kitchen for a contract** — the `kitchenSlug` in
   `DEFAULT_KITCHEN_CONTRACTS` must match a `DEFAULT_KITCHENS` slug.
 - **`DEFAULT`/included pricing unclear** — mirror an existing kitchen and flag the assumption to
