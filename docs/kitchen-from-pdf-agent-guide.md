@@ -209,6 +209,9 @@ From the output build a box per visible component (`left`, `top`, `width`, `heig
 - Wall cabinets: `top` = wall-top line, `height` = wall-bottom − wall-top.
 - Base cabinets: `top` = worktop-bottom line, `height` = base-bottom − worktop-bottom.
 - Worktop: a thin full-width strip at the worktop line.
+- Narrow side blende / side-panel strips: add an extra locked `worktop` hotspot on the actual
+  cabinet side line. Keep it very narrow (`width` about `0.42%`-`0.45%`, like `ab-105841`),
+  and do not cover the full gap between the fridge/tall wall and the base run.
 - Fridge / tall unit: detect its own left/right/top/bottom (it sits left of the run).
 
 ### Step 3 — Map Excel rows → components
@@ -347,6 +350,8 @@ flagged to the user).
 - [ ] `pip install pymupdf pypdfium2 pillow numpy` done.
 - [ ] `/public/plans/<PLAN>.svg` and `/public/jpg/<PLAN>_page-0001.jpg` generated.
 - [ ] Hotspots detected and **overlay-verified** (boxes hug the linework).
+- [ ] Narrow side blende / side-panel strips included when drawn: extra locked `worktop`
+      hotspot, about `0.42%`-`0.45%` wide, aligned to the actual cabinet side line.
 - [ ] All Excel rows seeded; identical items **reuse** existing codes, differing ones get new codes.
 - [ ] Standard accessory + service rows included; `DEFAULT` items `isLocked`; hidden hood `isActive:false`.
 - [ ] Kitchen registered in `DEFAULT_KITCHENS` + a `DEFAULT_KITCHEN_CONTRACTS` entry.

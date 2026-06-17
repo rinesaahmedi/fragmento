@@ -474,12 +474,12 @@
   position: relative;
   width: 100%;
   background: #fff;
+  overflow: hidden;
 }
 
 .planImageInteractive {
+  position: absolute;
   display: block;
-  width: 100%;
-  height: auto;
   background: #fff;
 }
 

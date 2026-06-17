@@ -56,6 +56,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 67.17, top: 16.25, width: 14.58, height: 24.88 },
     { componentKey: "wall-cabinet-6", left: 81.75, top: 16.25, width: 14.57, height: 24.88 },
     { componentKey: "worktop", left: 18.58, top: 59.15, width: 78.14, height: 1.4 },
+    { componentKey: "worktop", left: 18.58, top: 59.11, width: 0.45, height: 31.62 },
     { componentKey: "sink-faucet", left: 68.74, top: 52.55, width: 4.95, height: 8 },
     { componentKey: "base-module-1", left: 18.58, top: 59.11, width: 10.1, height: 31.62 },
     { componentKey: "oven-module", left: 28.68, top: 59.11, width: 14.59, height: 31.62 },
@@ -70,12 +71,12 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-3", left: 36.63, top: 16.01, width: 15.68, height: 26.73 },
     { componentKey: "wall-cabinet-4", left: 52.31, top: 16.01, width: 15.69, height: 26.73 },
     { componentKey: "extractor-hood", left: 52.31, top: 42.74, width: 15.69, height: 7.05 },
-    { componentKey: "worktop", left: 5.27, top: 62.14, width: 62.73, height: 1.49 },
+    { componentKey: "worktop", left: 5.27, top: 62.14, width: 63.14, height: 1.49 },
     { componentKey: "sink-faucet", left: 30.7, top: 54.5, width: 4.4, height: 8 },
     { componentKey: "drawer-module", left: 5.27, top: 63.63, width: 15.68, height: 32.5 },
     { componentKey: "base-module-2", left: 20.95, top: 63.63, width: 15.68, height: 32.5 },
     { componentKey: "base-module-3", left: 36.63, top: 63.63, width: 15.68, height: 32.5 },
-    { componentKey: "oven-module", left: 52.31, top: 63.63, width: 15.69, height: 32.5 },
+    { componentKey: "oven-module", left: 52.31, top: 63.63, width: 16.1, height: 32.5 },
     { componentKey: "refrigerator", left: 71.37, top: 29.54, width: 14.55, height: 66.59 },
   ],
   "ab-105808": [
@@ -88,6 +89,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 67.1, top: 15.89, width: 14.13, height: 24.09 },
     { componentKey: "wall-cabinet-6", left: 81.23, top: 15.89, width: 14.12, height: 24.09 },
     { componentKey: "worktop", left: 17.67, top: 57.46, width: 77.68, height: 1.35 },
+    { componentKey: "worktop", left: 17.2, top: 57.42, width: 0.45, height: 30.64 },
     { componentKey: "sink-faucet", left: 68.85, top: 50.73, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.65, top: 57.42, width: 7.07, height: 30.64 },
     { componentKey: "oven-module", left: 24.72, top: 57.42, width: 14.14, height: 30.64 },
@@ -106,6 +108,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 66, top: 15.77, width: 14.01, height: 23.91 },
     { componentKey: "wall-cabinet-6", left: 80.01, top: 15.77, width: 14.01, height: 23.91 },
     { componentKey: "worktop", left: 18.12, top: 57.02, width: 75.9, height: 1.35 },
+    { componentKey: "worktop", left: 17.67, top: 56.98, width: 0.45, height: 30.38 },
     { componentKey: "sink-faucet", left: 67.65, top: 50.15, width: 4.35, height: 8 },
     { componentKey: "base-module-1", left: 18.12, top: 56.98, width: 10.51, height: 30.38 },
     { componentKey: "oven-module", left: 28.63, top: 56.98, width: 14.02, height: 30.38 },
@@ -124,6 +127,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 66.97, top: 16.85, width: 14.26, height: 24.32 },
     { componentKey: "wall-cabinet-6", left: 81.23, top: 16.85, width: 14.27, height: 24.32 },
     { componentKey: "worktop", left: 17.07, top: 58.83, width: 78.43, height: 1.33 },
+    { componentKey: "worktop", left: 16.62, top: 58.79, width: 0.45, height: 30.91 },
     { componentKey: "sink-faucet", left: 68.77, top: 52.16, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.07, top: 58.79, width: 7.11, height: 30.91 },
     { componentKey: "oven-module", left: 24.18, top: 58.79, width: 14.28, height: 30.91 },
@@ -142,6 +146,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 66.4, top: 16.05, width: 14.31, height: 24.41 },
     { componentKey: "wall-cabinet-6", left: 80.71, top: 16.05, width: 14.3, height: 24.41 },
     { componentKey: "worktop", left: 17.51, top: 58.19, width: 77.5, height: 1.35 },
+    { componentKey: "worktop", left: 17.06, top: 58.15, width: 0.45, height: 31.09 },
     { componentKey: "sink-faucet", left: 68.2, top: 51.95, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.51, top: 58.15, width: 10.73, height: 31.09 },
     { componentKey: "oven-module", left: 28.24, top: 58.15, width: 14.32, height: 31.09 },
@@ -160,6 +165,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 67.0, top: 15.97, width: 14.23, height: 24.27 },
     { componentKey: "wall-cabinet-6", left: 81.23, top: 15.97, width: 14.24, height: 24.27 },
     { componentKey: "worktop", left: 17.17, top: 57.9, width: 78.3, height: 1.35 },
+    { componentKey: "worktop", left: 16.72, top: 57.86, width: 0.45, height: 30.89 },
     { componentKey: "sink-faucet", left: 68.75, top: 51.95, width: 4.35, height: 8 },
     { componentKey: "base-module-1", left: 17.17, top: 57.86, width: 7.12, height: 30.89 },
     { componentKey: "oven-module", left: 24.29, top: 57.86, width: 14.25, height: 30.89 },
@@ -169,18 +175,19 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "drawer-module", left: 81.23, top: 57.86, width: 14.24, height: 30.89 },
   ],
   "ab-105819": [
-    { componentKey: "wall-cabinet-1", left: 0.85, top: 22.9, width: 11.7, height: 19.0 },
-    { componentKey: "wall-cabinet-2", left: 12.55, top: 22.9, width: 11.15, height: 19.0 },
-    { componentKey: "wall-cabinet-3", left: 23.7, top: 22.9, width: 11.14, height: 19.0 },
-    { componentKey: "wall-cabinet-4", left: 34.84, top: 22.9, width: 11.14, height: 20.39 },
-    { componentKey: "extractor-hood", left: 34.84, top: 43.29, width: 11.14, height: 5.9 },
-    { componentKey: "worktop", left: 0.85, top: 55.73, width: 45.13, height: 1.02 },
-    { componentKey: "sink-faucet", left: 18.86, top: 48.75, width: 3.79, height: 8 },
-    { componentKey: "base-module-1", left: 0.85, top: 56.75, width: 11.7, height: 19.02 },
-    { componentKey: "sink-base", left: 12.55, top: 56.75, width: 11.15, height: 19.02 },
-    { componentKey: "base-module-3", left: 23.7, top: 56.75, width: 11.14, height: 19.02 },
-    { componentKey: "oven-module", left: 34.84, top: 56.75, width: 11.14, height: 19.02 },
-    { componentKey: "refrigerator", left: 48.39, top: 32.54, width: 10.34, height: 47.32 },
+    { componentKey: "wall-cabinet-1", left: 3.68, top: 17.34, width: 15.66, height: 26.73 },
+    { componentKey: "wall-cabinet-2", left: 19.34, top: 17.34, width: 15.67, height: 26.73 },
+    { componentKey: "wall-cabinet-3", left: 35.01, top: 17.34, width: 15.67, height: 26.73 },
+    { componentKey: "wall-cabinet-4", left: 50.68, top: 17.34, width: 15.68, height: 26.73 },
+    { componentKey: "extractor-hood", left: 50.68, top: 44.07, width: 15.68, height: 7.05 },
+    { componentKey: "worktop", left: 3.68, top: 63.47, width: 62.68, height: 1.35 },
+    { componentKey: "worktop", left: 66.36, top: 63.57, width: 0.45, height: 33.87 },
+    { componentKey: "sink-faucet", left: 30.18, top: 56.05, width: 1.48, height: 7.42 },
+    { componentKey: "base-module-1", left: 3.68, top: 63.57, width: 15.66, height: 33.87 },
+    { componentKey: "sink-base", left: 19.34, top: 63.57, width: 15.67, height: 33.87 },
+    { componentKey: "base-module-3", left: 35.01, top: 63.57, width: 15.67, height: 33.87 },
+    { componentKey: "oven-module", left: 50.68, top: 63.57, width: 15.68, height: 33.87 },
+    { componentKey: "refrigerator", left: 69.75, top: 31.0, width: 14.52, height: 66.43 },
   ],
   "ab-105820": [
     { componentKey: "refrigerator", left: 2.14, top: 29.82, width: 13.19, height: 60.48 },
@@ -192,6 +199,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 67.01, top: 17.5, width: 14.25, height: 24.27 },
     { componentKey: "wall-cabinet-6", left: 81.26, top: 17.5, width: 14.24, height: 24.27 },
     { componentKey: "worktop", left: 17.16, top: 59.48, width: 78.34, height: 1.4 },
+    { componentKey: "worktop", left: 16.71, top: 59.44, width: 0.45, height: 30.86 },
     { componentKey: "sink-faucet", left: 68.06, top: 52.88, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.16, top: 59.44, width: 7.12, height: 30.86 },
     { componentKey: "oven-module", left: 24.28, top: 59.44, width: 14.24, height: 30.86 },
@@ -209,6 +217,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 54.86, top: 19.23, width: 13.32, height: 22.73 },
     { componentKey: "wall-cabinet-6", left: 68.18, top: 19.23, width: 13.34, height: 22.73 },
     { componentKey: "worktop", left: 1.55, top: 58.47, width: 80.33, height: 1.4 },
+    { componentKey: "worktop", left: 81.88, top: 59.9, width: 0.45, height: 27.44 },
     { componentKey: "sink-faucet", left: 49.19, top: 51.87, width: 4.53, height: 8 },
     { componentKey: "base-module-1", left: 1.55, top: 59.9, width: 13.33, height: 27.44 },
     { componentKey: "oven-module", left: 14.88, top: 59.9, width: 13.32, height: 27.44 },
@@ -225,6 +234,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-4", left: 34.84, top: 24.03, width: 11.16, height: 19.01 },
     { componentKey: "extractor-hood", left: 34.84, top: 43.04, width: 11.16, height: 5.46 },
     { componentKey: "worktop", left: 1.4, top: 56.85, width: 44.6, height: 1.03 },
+    { componentKey: "worktop", left: 46, top: 57.88, width: 0.45, height: 23.11 },
     { componentKey: "sink-faucet", left: 18.88, top: 49.88, width: 3.79, height: 8 },
     { componentKey: "base-module-1", left: 1.4, top: 57.88, width: 11.15, height: 23.11 },
     { componentKey: "sink-base", left: 12.55, top: 57.88, width: 11.15, height: 23.11 },
@@ -235,17 +245,72 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
 };
 
 const CALIBRATION_TICKS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+const PLAN_IMAGE_SOURCE_WIDTH = 842;
+const PLAN_IMAGE_SOURCE_HEIGHT = 595;
+
+function clampPercent(value) {
+  return Math.max(0, Math.min(100, value));
+}
+
+function getPlanDisplayCrop(hotspots) {
+  if (!hotspots.length) {
+    return { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 };
+  }
+
+  const bounds = hotspots.reduce(
+    (current, hotspot) => ({
+      left: Math.min(current.left, hotspot.left),
+      top: Math.min(current.top, hotspot.top),
+      right: Math.max(current.right, hotspot.left + hotspot.width),
+      bottom: Math.max(current.bottom, hotspot.top + hotspot.height),
+    }),
+    { left: 100, top: 100, right: 0, bottom: 0 },
+  );
+
+  // Hotspots hug cabinet bodies; the CAD frame, end panels, and fridge alcove often extend
+  // beyond them. Pull the crop toward the page edges when there is still margin left.
+  const trailingX = 100 - bounds.right;
+  const trailingY = 100 - bounds.bottom;
+  const leadingX = bounds.left;
+  const leadingY = bounds.top;
+
+  const left = clampPercent(bounds.left - Math.max(2.6, leadingX * 0.6));
+  const top = clampPercent(bounds.top - Math.max(4, leadingY * 0.5));
+  const right = clampPercent(Math.min(99.5, bounds.right + Math.max(3.2, trailingX * 0.92)));
+  const bottom = clampPercent(Math.min(99.5, bounds.bottom + Math.max(1, trailingY * 0.85)));
+
+  return {
+    left,
+    top,
+    right,
+    bottom,
+    width: Math.max(right - left, 1),
+    height: Math.max(bottom - top, 1),
+  };
+}
+
+function cropPlanHotspot(hotspot, crop) {
+  const left = Math.max(hotspot.left, crop.left);
+  const top = Math.max(hotspot.top, crop.top);
+  const right = Math.min(hotspot.left + hotspot.width, crop.right);
+  const bottom = Math.min(hotspot.top + hotspot.height, crop.bottom);
+
+  return {
+    ...hotspot,
+    left: (left - crop.left) / crop.width * 100,
+    top: (top - crop.top) / crop.height * 100,
+    width: Math.max(right - left, 0) / crop.width * 100,
+    height: Math.max(bottom - top, 0) / crop.height * 100,
+  };
+}
 
 // The sink (faucet + waste) is always part of the default configuration and sits on the
-// worktop directly above the sink base. Rather than hand-placing a faucet box per kitchen,
-// we derive one automatically for every plan: centered over the sink-base hotspot and resting
+// worktop directly above the sink base. Instead of trusting per-kitchen faucet boxes with
+// different sizes, derive one automatically for every plan: centered over the sink-base hotspot and resting
 // on the worktop. This keeps the sink shown as selected by default on every current and future
 // kitchen without extra per-kitchen wiring.
 function withDerivedSinkFaucet(definitions, components) {
   if (!definitions.length) return definitions;
-  if (definitions.some((definition) => definition.componentKey === "sink-faucet")) {
-    return definitions;
-  }
   const hasFaucetComponent = components.some(
     (item) => String(item?.componentKey || "").toLowerCase() === "sink-faucet",
   );
@@ -255,16 +320,23 @@ function withDerivedSinkFaucet(definitions, components) {
   const worktop = definitions.find((definition) => definition.componentKey === "worktop");
   if (!sinkBase || !worktop) return definitions;
 
-  const width = Math.max(sinkBase.width * 0.34, 3);
+  const existingFaucet = definitions.find((definition) => definition.componentKey === "sink-faucet");
+  const width = Math.max(4.6, Math.min(sinkBase.width * 0.34, 5.1));
   const height = 8;
+  const center = existingFaucet
+    ? existingFaucet.left + existingFaucet.width / 2
+    : sinkBase.left + sinkBase.width / 2;
   const faucet = {
     componentKey: "sink-faucet",
-    left: sinkBase.left + (sinkBase.width - width) / 2,
-    top: worktop.top + worktop.height - height,
+    left: center - width / 2,
+    top: worktop.top - height,
     width,
     height,
   };
-  return [...definitions, faucet];
+  return [
+    ...definitions.filter((definition) => definition.componentKey !== "sink-faucet"),
+    faucet,
+  ];
 }
 
 export default function KitchenSvgStage({
@@ -331,6 +403,19 @@ export default function KitchenSvgStage({
       .filter(Boolean);
   }, [kitchenConfig.components, normalizedKitchenSlug, translate, language]);
   const hasImageHotspots = imageHotspots.length > 0;
+  const planDisplayCrop = useMemo(
+    () => getPlanDisplayCrop(imageHotspots),
+    [imageHotspots],
+  );
+  const croppedImageHotspots = useMemo(
+    () =>
+      imageHotspots
+        .map((hotspot) => cropPlanHotspot(hotspot, planDisplayCrop))
+        .filter((hotspot) => hotspot.width > 0 && hotspot.height > 0),
+    [imageHotspots, planDisplayCrop],
+  );
+  const croppedPlanAspectRatio =
+    `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [hoveredComponentId, setHoveredComponentId] = useState(null);
   // Linked parts (e.g. the hood wall cabinet + its pull-out extractor hood) should react as
@@ -490,14 +575,23 @@ export default function KitchenSvgStage({
           <>
             <div className={styles.pdfCard}>
               {hasImageHotspots ? (
-                <div className={styles.planImageWrap}>
+                <div
+                  className={styles.planImageWrap}
+                  style={{ aspectRatio: croppedPlanAspectRatio }}
+                >
                   <img
                     src={imageViewHref}
                     alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
                     className={styles.planImageInteractive}
+                    style={{
+                      left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
+                      top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
+                      width: `${(100 / planDisplayCrop.width) * 100}%`,
+                      height: `${(100 / planDisplayCrop.height) * 100}%`,
+                    }}
                   />
                   <div className={styles.planHotspotLayer}>
-                    {imageHotspots.map((hotspot) => {
+                    {croppedImageHotspots.map((hotspot) => {
                       const isLocked = fixedComponentIds.includes(hotspot.componentId);
                       // Linked parts (e.g. the hood cabinet + its pull-out hood) toggle together,
                       // but the hidden partner isn't persisted on its own. Mirror the group's
@@ -508,7 +602,7 @@ export default function KitchenSvgStage({
                       const isGroupHovered = hoveredLinkedGroup.includes(hotspot.componentId);
                       return (
                         <button
-                          key={hotspot.componentId}
+                          key={`${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
                           type="button"
                           className={[
                             styles.planHotspot,

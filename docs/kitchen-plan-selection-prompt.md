@@ -118,6 +118,23 @@ Seed: hood cabinet → `iconKey: "hood_wall_cabinet"`; hidden hood row → `isAc
 - Thin horizontal strip at the worktop line (~1.3–1.4% tall).
 - **left** = start of base run; **width** = full run width.
 
+### Narrow side blende / side panel strips
+
+Some plans show a very thin vertical side strip between the tall fridge/wall area and the base
+run. It can be on the left or on the right, depending on where the tall wall/fridge sits.
+
+- Add this as an extra image hotspot so it is selected by default.
+- Use `componentKey: "worktop"` for the strip. The worktop is locked, so the strip renders blue
+  without creating a new catalog item or changing the order.
+- Make it narrow: `width` should be about `0.42%` to `0.45%`, like the `ab-105841` reference.
+- Align it to the actual drawn cabinet side line, not the open gap and not the full alcove.
+  If the first base cabinet starts at `18.58%`, the strip should start at `18.58%`; if the strip
+  is on the right, place it on the final base-run side line.
+- Its `top` / `height` should match the base cabinet body area, from the base door top down to
+  the cabinet bottom. Do not include the plinth/toe-kick or floor dimension line.
+- Because this creates a second `worktop` hotspot, the rendered hotspot key must include the
+  coordinates, not only `componentId`, otherwise React will collapse duplicate hotspots.
+
 ### Refrigerator (`refrigerator`)
 
 **Critical:** Do **not** size the box to the full alcove between dividers. Dimension ticks and gaps make it look too wide.
@@ -249,6 +266,8 @@ When adding a kitchen similar to an existing one, **reuse identical item codes**
 
 - [ ] Overlay PNG: every box hugs its cabinet (no overlap into neighbours, no gap inside drawing).
 - [ ] Fridge box matches **drawn** fridge, not full alcove width.
+- [ ] Narrow side blende strip exists when drawn, is selected by default via locked `worktop`,
+      and is only ~0.42-0.45% wide on the actual cabinet side line.
 - [ ] Base boxes align with **door tops**, not sitting low under worktop.
 - [ ] Faucet box sits on the actual faucet position.
 - [ ] Hood cabinet + aspirator highlight together on hover and after refresh.
@@ -289,6 +308,7 @@ Requirements:
 - Locked defaults: oven, worktop, sink base, sink+faucet (blue on plan)
 - Hood linked: wall-cabinet-N + extractor-hood (green together)
 - Fridge hotspot = drawn cabinet body (~left 4.15%, width ~11.15%), not full alcove
+- Narrow side blende = extra locked `worktop` hotspot, ~0.42-0.45% wide, aligned to actual cabinet side line
 - Base hotspots = cabinet door top (~1.35% above detector base-top line)
 - Verify with detect-plan-hotspots.py --overlay and ?calibrate=1
 - Run prisma db seed and test in browser
