@@ -5,6 +5,10 @@ Hand this file to a coding agent **together with**:
 1. the kitchen **plan PDF** (e.g. `AB 105820.pdf`), and
 2. the **Excel/CSV item list** (one row per item, with article numbers, dimensions, L/R, price).
 
+For a focused brief on **plan selection boxes (hotspots) and catalog dimensions**, also attach
+`docs/kitchen-plan-selection-prompt.md` — it documents measurement rules, layout types, and every
+implemented AB kitchen.
+
 The agent's job: add the kitchen to the Fragmento configurator so that it **looks exactly like the
 plan, is razor-sharp (vector), and every cabinet is clickable/selectable** and wired to its data.
 

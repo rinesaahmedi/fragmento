@@ -390,6 +390,18 @@ const AB_105812_ITEMS = AB_105820_ITEMS;
 // AB 105808 shares AB 105820's Excel rows (same appliances/cabinets, fridge-left layout).
 const AB_105808_ITEMS = AB_105820_ITEMS;
 
+// AB 105816 matches AB 105820 except callout 11 is an H6002 with left hinge.
+const AB_105816_ITEMS = AB_105820_ITEMS.map((item) =>
+  item.code === "CAB-WALL-AB105820-H6002"
+    ? {
+        ...item,
+        code: "CAB-WALL-AB105816-H6002-L",
+        name: "Wall Cabinet",
+        infoText: "H6002, hinge left, 2 adjustable shelves",
+      }
+    : item
+);
+
 // AB 105810: fridge-left run with US45 + 400 mm filler bases, H4502 + 400 mm filler wall,
 // hood, and three H6002 cabinets. Plan callouts 1–3 DEFAULT (locked); shared appliance codes reused.
 const AB_105810_ITEMS = [
@@ -559,7 +571,7 @@ const DEFAULT_KITCHENS = [
     slug: "ab-105807",
     kitchenCode: "105 807",
     name: "AB 105807 Kitchen",
-    description: "Kitchen configuration based on pdfs/AB 105807.pdf",
+    description: "Kitchen configuration based on frontend/public/plans/AB 105807.svg",
     items: AB_105807_ITEMS,
   },
   {
@@ -589,6 +601,13 @@ const DEFAULT_KITCHENS = [
     name: "AB 105814 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105814_page-0001.jpg",
     items: AB_105814_ITEMS,
+  },
+  {
+    slug: "ab-105816",
+    kitchenCode: "105 816",
+    name: "AB 105816 Kitchen",
+    description: "Kitchen configuration based on frontend/public/jpg/AB 105816_page-0001.jpg",
+    items: AB_105816_ITEMS,
   },
   {
     slug: "ab-105819",
@@ -649,6 +668,7 @@ const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "670105810", kitchenSlug: "ab-105810" },
   { contractNumber: "670105811", kitchenSlug: "ab-105811" },
   { contractNumber: "670105814", kitchenSlug: "ab-105814" },
+  { contractNumber: "670105816", kitchenSlug: "ab-105816" },
 ];
 
 function normalizeSeedSlug(value) {
