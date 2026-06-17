@@ -178,7 +178,7 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
                       </AdminSelect>
                     </FormField>
                     <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
-                      <input name="contractNumber" placeholder="ABC-123" style={compactInputStyle} required />
+                      <input name="contractNumber" placeholder="670123456" style={compactInputStyle} required />
                     </FormField>
                     <FormField label={<AdminText i18nKey="contractsAdmin.project" fallback="Project" />}>
                       <AdminSelect name="projectId" style={compactInputStyle}>

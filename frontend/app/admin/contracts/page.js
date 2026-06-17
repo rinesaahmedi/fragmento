@@ -303,7 +303,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                 <input type="hidden" name="returnTo" value={returnTo} />
                 <KitchenSelect kitchens={kitchens} defaultValue={filters.kitchenId} compact />
                 <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
-                  <input name="contractNumber" placeholder="ABC-123" style={compactInputStyle} required />
+                  <input name="contractNumber" placeholder="670123456" style={compactInputStyle} required />
                 </FormField>
                 <AdminContractLinkFields
                   owners={owners}

@@ -32,6 +32,8 @@ const IMAGE_VIEW_BY_SLUG = {
   "ab-105816": "/plans/AB%20105816.svg",
   "ab-105819": "/plans/AB%20105819.svg",
   "ab-105820": "/plans/AB%20105820.svg",
+  "ab-105821": "/plans/AB%20105821.svg",
+  "ab-105822": "/plans/AB%20105822.svg",
   "ab-105841": "/plans/AB%20105841.svg",
   "ab-105811": "/plans/AB%20105811.svg",
 };
@@ -189,6 +191,40 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "oven-module", left: 50.68, top: 63.57, width: 15.68, height: 33.87 },
     { componentKey: "refrigerator", left: 69.75, top: 31.0, width: 14.52, height: 66.43 },
   ],
+  "ab-105821": [
+    { componentKey: "wall-cabinet-1", left: 10.34, top: 16.49, width: 13.09, height: 24.32 },
+    { componentKey: "wall-cabinet-2", left: 23.43, top: 16.49, width: 14.26, height: 24.32 },
+    { componentKey: "wall-cabinet-3", left: 37.69, top: 16.49, width: 14.25, height: 24.32 },
+    { componentKey: "wall-cabinet-4", left: 51.94, top: 16.49, width: 14.26, height: 24.32 },
+    { componentKey: "extractor-hood", left: 51.94, top: 40.81, width: 14.26, height: 7.05 },
+    { componentKey: "wall-cabinet-5", left: 66.2, top: 16.49, width: 7.13, height: 24.32 },
+    { componentKey: "worktop", left: 10.34, top: 58.47, width: 62.99, height: 1.35 },
+    { componentKey: "worktop", left: 73.33, top: 58.49, width: 0.45, height: 25.66 },
+    { componentKey: "sink-faucet", left: 30.35, top: 50.1, width: 6.25, height: 9.4, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 10.34, top: 58.49, width: 13.09, height: 25.66 },
+    { componentKey: "sink-base", left: 23.43, top: 58.49, width: 14.26, height: 25.66 },
+    { componentKey: "base-module-3", left: 37.69, top: 58.49, width: 14.25, height: 25.66 },
+    { componentKey: "oven-module", left: 51.94, top: 58.49, width: 14.26, height: 25.66 },
+    { componentKey: "drawer-module", left: 66.2, top: 58.49, width: 7.13, height: 25.66 },
+    { componentKey: "refrigerator", left: 75.20, top: 29, width: 13.20, height: 60.5}
+  ],
+  "ab-105822": [
+    { componentKey: "refrigerator", left: 8.54, top: 28.69, width: 13.13, height: 59.66 },
+    { componentKey: "wall-cabinet-1", left: 23.62, top: 16.41, width: 11.79, height: 24.19 },
+    { componentKey: "wall-cabinet-2", left: 35.41, top: 16.41, width: 14.18, height: 24.19 },
+    { componentKey: "extractor-hood", left: 35.41, top: 40.6, width: 14.18, height: 7.05 },
+    { componentKey: "wall-cabinet-3", left: 49.59, top: 16.41, width: 14.17, height: 24.19 },
+    { componentKey: "wall-cabinet-4", left: 63.76, top: 16.41, width: 14.17, height: 24.19 },
+    { componentKey: "wall-cabinet-5", left: 77.93, top: 16.41, width: 14.18, height: 24.19 },
+    { componentKey: "worktop", left: 23.24, top: 58.17, width: 70.5, height: 1.33 },
+    { componentKey: "worktop", left: 23.24, top: 59.5, width: 0.45, height: 29.16, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 23.63, top: 59.5, width: 11.8, height: 24.16 },
+    { componentKey: "oven-module", left: 35.43, top: 59.5, width: 14.16, height: 24.16 },
+    { componentKey: "base-module-2", left: 49.6, top: 59.5, width: 14.17, height: 24.16 },
+    { componentKey: "base-module-3", left: 63.77, top: 59.5, width: 14.16, height: 24.16 },
+    { componentKey: "sink-base", left: 77.94, top: 59.5, width: 14.16, height: 24.16 },
+    { componentKey: "sink-faucet", left: 80.05, top: 51, width: 4.25, height: 7.5, preserveManualSize: true },
+  ],
   "ab-105820": [
     { componentKey: "refrigerator", left: 2.14, top: 29.82, width: 13.19, height: 60.48 },
     { componentKey: "wall-cabinet-1", left: 17.16, top: 17.5, width: 7.12, height: 24.27 },
@@ -247,6 +283,64 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
 const CALIBRATION_TICKS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const PLAN_IMAGE_SOURCE_WIDTH = 842;
 const PLAN_IMAGE_SOURCE_HEIGHT = 595;
+const PLAN_DIMENSION_LINE_PERCENT = 98.43;
+const BASE_BODY_COMPONENT_KEYS = new Set([
+  "base-module-1",
+  "base-module-2",
+  "base-module-3",
+  "oven-module",
+  "sink-base",
+  "drawer-module",
+]);
+// Typical toe-kick height on the 3509×2480 CAD renders (~5.2–5.3% of image height).
+const BASE_PLINTH_EXTENSION_PERCENT = 5.25;
+// If the base run already reaches within this margin of the floor dimension line, assume
+// plinth is included and do not extend (avoids double-counting on older hotspot maps).
+const BASE_PLINTH_ALREADY_INCLUDED_GAP = 8;
+
+function isBaseBodyHotspot(definition) {
+  if (definition.preserveManualSize) {
+    return false;
+  }
+  if (BASE_BODY_COMPONENT_KEYS.has(definition.componentKey)) {
+    return true;
+  }
+  // Tall worktop side strips share the base body column and should include the plinth too.
+  return definition.componentKey === "worktop" && definition.height >= 15;
+}
+
+// Base hotspots are measured from the door top down to the cabinet bottom, which sits above
+// the plinth/toe-kick. Extend them downward so the whole drawn cabinet—including the kick
+// board—is clickable, without re-measuring every kitchen.
+function withBasePlinthExtension(definitions) {
+  const baseBodies = definitions.filter(isBaseBodyHotspot);
+  if (!baseBodies.length) return definitions;
+
+  const bodyBottom = Math.max(...baseBodies.map((hotspot) => hotspot.top + hotspot.height));
+  const gapToFloor = PLAN_DIMENSION_LINE_PERCENT - bodyBottom;
+  if (gapToFloor <= BASE_PLINTH_ALREADY_INCLUDED_GAP) {
+    return definitions;
+  }
+
+  const targetBottom = Math.min(
+    bodyBottom + BASE_PLINTH_EXTENSION_PERCENT,
+    PLAN_DIMENSION_LINE_PERCENT - 1,
+  );
+
+  return definitions.map((definition) => {
+    if (!isBaseBodyHotspot(definition)) {
+      return definition;
+    }
+    const currentBottom = definition.top + definition.height;
+    if (currentBottom >= targetBottom - 0.2) {
+      return definition;
+    }
+    return {
+      ...definition,
+      height: targetBottom - definition.top,
+    };
+  });
+}
 
 function clampPercent(value) {
   return Math.max(0, Math.min(100, value));
@@ -304,11 +398,9 @@ function cropPlanHotspot(hotspot, crop) {
   };
 }
 
-// The sink (faucet + waste) is always part of the default configuration and sits on the
-// worktop directly above the sink base. Instead of trusting per-kitchen faucet boxes with
-// different sizes, derive one automatically for every plan: centered over the sink-base hotspot and resting
-// on the worktop. This keeps the sink shown as selected by default on every current and future
-// kitchen without extra per-kitchen wiring.
+// The sink (faucet + waste) is always part of the default configuration and usually sits on
+// the worktop directly above the sink base. Derive a consistent fallback box for those plans,
+// while allowing manually calibrated hotspots when the visible bowl/faucet is offset.
 function withDerivedSinkFaucet(definitions, components) {
   if (!definitions.length) return definitions;
   const hasFaucetComponent = components.some(
@@ -321,6 +413,10 @@ function withDerivedSinkFaucet(definitions, components) {
   if (!sinkBase || !worktop) return definitions;
 
   const existingFaucet = definitions.find((definition) => definition.componentKey === "sink-faucet");
+  if (existingFaucet?.preserveManualSize) {
+    return definitions;
+  }
+
   const width = Math.max(4.6, Math.min(sinkBase.width * 0.34, 5.1));
   const height = 8;
   const center = existingFaucet
@@ -373,9 +469,11 @@ export default function KitchenSvgStage({
     [kitchenConfig.components, kitchenSlug],
   );
   const imageHotspots = useMemo(() => {
-    const definitions = withDerivedSinkFaucet(
-      IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
-      kitchenConfig.components,
+    const definitions = withBasePlinthExtension(
+      withDerivedSinkFaucet(
+        IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
+        kitchenConfig.components,
+      ),
     );
     if (!definitions.length) return [];
 
