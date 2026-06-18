@@ -143,6 +143,13 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105822-H6002-1": "10",
   "CAB-WALL-AB105822-H6002-2": "11",
   "CAB-WALL-AB105822-H6002-3": "12",
+  "CAB-BASE-AB105833-FILLER-500-R": "7",
+  "DISH-AB105833-600": "8",
+  "CAB-WALL-AB105833-FILLER-500-L": "9",
+  "CAB-WALL-AB105833-H6002-L1": "11",
+  "CAB-WALL-AB105833-FILLER-500-R": "12",
+  "CAB-WALL-AB105833-H6002-L2": "13",
+  "CAB-WALL-AB105833-H6002-L3": "14",
   "CAB-BASE-AB105826-US60-R": "5",
   "CAB-BASE-AB105826-US60-L": "6",
   "CAB-WALL-AB105826-H6002-R": "8",
@@ -245,6 +252,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
     case "DISH-AB105822-600":
+    case "DISH-AB105833-600":
     case "DISH-AB105836-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
@@ -383,6 +391,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
     case "DISH-AB105822-600":
+    case "DISH-AB105833-600":
     case "DISH-AB105836-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
@@ -443,6 +452,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105821": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105822": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105833": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105826": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105827": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105835": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -485,6 +495,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "DISH-AB105822-600": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
+  "DISH-AB105833-600": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
@@ -712,6 +726,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105819-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105821-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105822-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105833-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105836-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
