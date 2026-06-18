@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prepareKitchenItemMutation } from "../../../../../../lib/admin-kitchen-items";
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../../lib/auth";
+import { autoSyncKitchenHotspots } from "../../../../../../lib/kitchen-hotspots";
 import { prisma } from "../../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
@@ -29,6 +30,10 @@ export async function POST(request, { params }) {
         ...data,
       },
     });
+
+    if (data.componentKey) {
+      await autoSyncKitchenHotspots(prisma, id, { force: true });
+    }
 
     return redirectWithFlash(request, `/admin/kitchens/${id}`, "success", "Item created.");
   } catch (error) {

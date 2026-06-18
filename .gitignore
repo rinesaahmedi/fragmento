@@ -8,6 +8,7 @@ frontend/.next
 frontend/.next-dev
 frontend/node_modules
 frontend/.prisma-preflight-client
+frontend/.kitchen-imports
 frontend/data/service-claim-uploads
 frontend/voices/
 frontend/vendor/

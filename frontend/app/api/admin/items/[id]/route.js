@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prepareKitchenItemMutation } from "../../../../../lib/admin-kitchen-items";
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
+import { autoSyncKitchenHotspots } from "../../../../../lib/kitchen-hotspots";
 import { prisma } from "../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
@@ -30,8 +31,11 @@ export async function POST(request, { params }) {
     if (intent === "delete") {
       const item = await prisma.kitchenItem.delete({
         where: { id },
-        select: { kitchenId: true },
+        select: { kitchenId: true, componentKey: true },
       });
+      if (item.componentKey) {
+        await autoSyncKitchenHotspots(prisma, item.kitchenId, { force: true });
+      }
       return redirectWithFlash(request, `/admin/kitchens/${item.kitchenId}`, "success", "Item deleted.");
     }
 
@@ -50,6 +54,10 @@ export async function POST(request, { params }) {
       data,
       select: { kitchenId: true },
     });
+
+    if (data.componentKey) {
+      await autoSyncKitchenHotspots(prisma, item.kitchenId, { force: true });
+    }
 
     return redirectWithFlash(request, `/admin/kitchens/${item.kitchenId}`, "success", "Item updated.");
   } catch (error) {

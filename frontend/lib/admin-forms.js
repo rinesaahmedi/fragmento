@@ -21,6 +21,17 @@ function optionalStringList(value) {
   return items.length ? items : null;
 }
 
+function optionalJson(value, label) {
+  const rawValue = String(value || "").trim();
+  if (!rawValue) return null;
+
+  try {
+    return JSON.parse(rawValue);
+  } catch {
+    throw new Error(`${label} must be valid JSON.`);
+  }
+}
+
 const PROJECT_STATUSES = ["planning", "active", "on_hold", "completed", "archived"];
 
 function parseKitchenStatus(value) {
@@ -80,6 +91,10 @@ export function validateKitchenInput(formData, options = {}) {
     kitchenCode,
     status: parseKitchenStatus(String(formData.get("status") || "")),
     description: optionalString(formData.get("description")),
+    planImagePath: optionalString(formData.get("planImagePath")),
+    planPdfPath: optionalString(formData.get("planPdfPath")),
+    hotspots: optionalJson(formData.get("hotspots"), "Hotspots"),
+    linkedComponentGroups: optionalJson(formData.get("linkedComponentGroups"), "Linked component groups"),
   };
 }
 
@@ -94,6 +109,7 @@ export function validateKitchenItemInput(formData) {
     iconKey: optionalString(formData.get("iconKey")),
     colorKey: optionalString(formData.get("colorKey")),
     componentKey: optionalString(formData.get("componentKey")),
+    calloutNumber: optionalString(formData.get("calloutNumber")),
     sortOrder: validateSortOrder(formData.get("sortOrder")),
     infoText: optionalString(formData.get("infoText")),
     productImagePath: optionalString(formData.get("productImagePath")),
@@ -180,6 +196,13 @@ export function getFormMessage(searchParams, key) {
 export function mapAdminMutationError(error, entityLabel) {
   if (error instanceof Prisma.PrismaClientKnownRequestError) {
     if (error.code === "P2002") {
+      const targets = Array.isArray(error.meta?.target) ? error.meta.target : [];
+      if (targets.includes("slug")) {
+        return "A kitchen with this name/code already exists.";
+      }
+      if (targets.includes("contractNumber")) {
+        return "This contract number is already assigned to another kitchen.";
+      }
       return `${entityLabel} conflicts with an existing record.`;
     }
     if (error.code === "P2025") {

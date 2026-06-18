@@ -385,6 +385,70 @@ const AB_105820_ITEMS = [
 // AB 105812 matches AB 105820's plan and Excel rows, so it reuses the same item codes.
 const AB_105812_ITEMS = AB_105820_ITEMS;
 
+const AB_105806_HOTSPOTS = [
+  { componentKey: "refrigerator", left: 4.65, top: 28.85, width: 13.53, height: 61.88 },
+  { componentKey: "wall-cabinet-1", left: 18.58, top: 16.25, width: 9.72, height: 24.88 },
+  { componentKey: "wall-cabinet-2", left: 28.3, top: 16.25, width: 14.59, height: 24.88 },
+  { componentKey: "wall-cabinet-3", left: 42.89, top: 16.25, width: 9.72, height: 24.88 },
+  { componentKey: "wall-cabinet-4", left: 52.61, top: 16.25, width: 14.56, height: 24.88 },
+  { componentKey: "wall-cabinet-5", left: 67.17, top: 16.25, width: 14.58, height: 24.88 },
+  { componentKey: "wall-cabinet-6", left: 81.75, top: 16.25, width: 14.57, height: 24.88 },
+  { componentKey: "worktop", left: 18.58, top: 59.15, width: 78.14, height: 1.4 },
+  { componentKey: "base-module-1", left: 18.58, top: 60.56, width: 10.1, height: 30.17 },
+  { componentKey: "oven-module", left: 28.68, top: 60.56, width: 14.59, height: 30.17 },
+  { componentKey: "base-module-2", left: 43.27, top: 60.56, width: 9.72, height: 30.17 },
+  { componentKey: "base-module-3", left: 52.99, top: 60.56, width: 14.58, height: 30.17 },
+  { componentKey: "sink-base", left: 67.57, top: 60.56, width: 14.56, height: 30.17 },
+  { componentKey: "drawer-module", left: 82.13, top: 60.56, width: 14.59, height: 30.17 },
+];
+
+const AB_105812_HOTSPOTS = [
+  { componentKey: "refrigerator", left: 2.49, top: 29.68, width: 13.23, height: 60.02 },
+  { componentKey: "wall-cabinet-1", left: 17.07, top: 16.85, width: 7.11, height: 24.32 },
+  { componentKey: "wall-cabinet-2", left: 24.18, top: 16.85, width: 14.28, height: 24.32 },
+  { componentKey: "wall-cabinet-3", left: 38.46, top: 16.85, width: 14.26, height: 24.32 },
+  { componentKey: "wall-cabinet-4", left: 52.72, top: 16.85, width: 14.25, height: 24.32 },
+  { componentKey: "wall-cabinet-5", left: 66.97, top: 16.85, width: 14.26, height: 24.32 },
+  { componentKey: "wall-cabinet-6", left: 81.23, top: 16.85, width: 14.27, height: 24.32 },
+  { componentKey: "worktop", left: 17.07, top: 58.83, width: 78.43, height: 1.33 },
+  { componentKey: "base-module-1", left: 17.07, top: 60.16, width: 7.11, height: 29.54 },
+  { componentKey: "oven-module", left: 24.18, top: 60.16, width: 14.28, height: 29.54 },
+  { componentKey: "base-module-2", left: 38.46, top: 60.16, width: 14.26, height: 29.54 },
+  { componentKey: "base-module-3", left: 52.72, top: 60.16, width: 14.25, height: 29.54 },
+  { componentKey: "sink-base", left: 66.97, top: 60.16, width: 14.26, height: 29.54 },
+  { componentKey: "drawer-module", left: 81.23, top: 60.16, width: 14.27, height: 29.54 },
+];
+
+const AB_105819_HOTSPOTS = [
+  { componentKey: "wall-cabinet-1", left: 0.85, top: 22.9, width: 11.7, height: 19.0 },
+  { componentKey: "wall-cabinet-2", left: 12.55, top: 22.9, width: 11.15, height: 19.0 },
+  { componentKey: "wall-cabinet-3", left: 23.7, top: 22.9, width: 11.14, height: 19.0 },
+  { componentKey: "wall-cabinet-4", left: 34.84, top: 22.9, width: 11.14, height: 20.39 },
+  { componentKey: "worktop", left: 0.85, top: 55.73, width: 45.13, height: 1.02 },
+  { componentKey: "base-module-1", left: 0.85, top: 56.75, width: 11.7, height: 19.02 },
+  { componentKey: "sink-base", left: 12.55, top: 56.75, width: 11.15, height: 19.02 },
+  { componentKey: "base-module-3", left: 23.7, top: 56.75, width: 11.14, height: 19.02 },
+  { componentKey: "oven-module", left: 34.84, top: 56.75, width: 11.14, height: 19.02 },
+  { componentKey: "refrigerator", left: 48.39, top: 32.86, width: 10.33, height: 46.96 },
+];
+
+const AB_105820_HOTSPOTS = [
+  { componentKey: "refrigerator", left: 2.11, top: 29.8, width: 13.22, height: 60.5 },
+  { componentKey: "wall-cabinet-1", left: 17.16, top: 17.5, width: 7.12, height: 24.27 },
+  { componentKey: "wall-cabinet-2", left: 24.28, top: 17.5, width: 14.24, height: 24.27 },
+  { componentKey: "wall-cabinet-3", left: 38.52, top: 17.5, width: 14.26, height: 24.27 },
+  { componentKey: "wall-cabinet-4", left: 52.78, top: 17.5, width: 14.23, height: 24.27 },
+  { componentKey: "wall-cabinet-5", left: 67.01, top: 17.5, width: 14.25, height: 24.27 },
+  { componentKey: "wall-cabinet-6", left: 81.26, top: 17.5, width: 14.24, height: 24.27 },
+  { componentKey: "worktop", left: 17.16, top: 59.48, width: 78.34, height: 1.4 },
+  { componentKey: "base-module-1", left: 17.16, top: 60.79, width: 7.12, height: 29.51 },
+  { componentKey: "oven-module", left: 24.28, top: 60.79, width: 14.24, height: 29.51 },
+  { componentKey: "base-module-2", left: 38.52, top: 60.79, width: 14.26, height: 29.51 },
+  { componentKey: "base-module-3", left: 52.78, top: 60.79, width: 14.23, height: 29.51 },
+  { componentKey: "sink-base", left: 67.01, top: 60.79, width: 14.25, height: 29.51 },
+  { componentKey: "drawer-module", left: 81.26, top: 60.79, width: 14.24, height: 29.51 },
+];
+
 const MODEL_C_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-C-545-1800-700", legacyCode: "model-c-refrigerator", name: "Freestanding refrigerator 178 cm", price: "579.00", widthMm: 710, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 180 cm, NoFrost", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "HOOD-C-FH664621E", legacyCode: "model-c-extractor-hood", name: "Angled extractor hood + filter", price: "209.00", iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "Chimney hood, 60 cm", articleNumber: "KHF664611S" },
@@ -467,6 +531,10 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 806",
     name: "AB 105806 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105806_page-0001.jpg",
+    planImagePath: "/plans/AB%20105806.svg",
+    planPdfPath: "/pdfs/AB%20105806.pdf",
+    hotspots: AB_105806_HOTSPOTS,
+    linkedComponentGroups: [["component-wall-cabinet-2", "component-extractor-hood"]],
     items: AB_105806_ITEMS,
   },
   {
@@ -481,6 +549,10 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 812",
     name: "AB 105812 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105812_page-0001.jpg",
+    planImagePath: "/plans/AB%20105812.svg",
+    planPdfPath: "/pdfs/AB%20105812.pdf",
+    hotspots: AB_105812_HOTSPOTS,
+    linkedComponentGroups: [["component-wall-cabinet-2", "component-extractor-hood"]],
     items: AB_105812_ITEMS,
   },
   {
@@ -488,6 +560,10 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 819",
     name: "AB 105819 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105819_page-0001.jpg",
+    planImagePath: "/plans/AB%20105819.svg",
+    planPdfPath: "/pdfs/AB%20105819.pdf",
+    hotspots: AB_105819_HOTSPOTS,
+    linkedComponentGroups: [["component-wall-cabinet-4", "component-extractor-hood"]],
     items: AB_105819_ITEMS,
   },
   {
@@ -495,6 +571,10 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 820",
     name: "AB 105820 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105820_page-0001.jpg",
+    planImagePath: "/plans/AB%20105820.svg",
+    planPdfPath: "/pdfs/AB%20105820.pdf",
+    hotspots: AB_105820_HOTSPOTS,
+    linkedComponentGroups: [["component-wall-cabinet-2", "component-extractor-hood"]],
     items: AB_105820_ITEMS,
   },
   {
@@ -676,6 +756,10 @@ async function main() {
             kitchenCode: kitchen.kitchenCode || null,
             status: KitchenStatus.ACTIVE,
             description: kitchen.description,
+            planImagePath: kitchen.planImagePath || null,
+            planPdfPath: kitchen.planPdfPath || null,
+            hotspots: kitchen.hotspots || undefined,
+            linkedComponentGroups: kitchen.linkedComponentGroups || undefined,
           },
           include: { items: true },
         })
@@ -686,6 +770,10 @@ async function main() {
             name: kitchen.name,
             status: KitchenStatus.ACTIVE,
             description: kitchen.description,
+            planImagePath: kitchen.planImagePath || null,
+            planPdfPath: kitchen.planPdfPath || null,
+            hotspots: kitchen.hotspots || undefined,
+            linkedComponentGroups: kitchen.linkedComponentGroups || undefined,
           },
           include: { items: true },
         });
@@ -708,6 +796,7 @@ async function main() {
         iconKey: item.iconKey || null,
         colorKey: item.colorKey || null,
         componentKey: item.componentKey || null,
+        calloutNumber: item.calloutNumber || null,
         sortOrder: item.sortOrder || 0,
         isLocked: Boolean(item.isLocked),
         isActive: item.isActive !== false,

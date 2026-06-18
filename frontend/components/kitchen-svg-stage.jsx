@@ -104,10 +104,49 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
 
 const CALIBRATION_TICKS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
+function withDerivedSinkFaucet(definitions, components) {
+  const hasFaucetHotspot = definitions.some((entry) => entry.componentKey === "sink-faucet");
+  const hasSinkHotspot = definitions.some((entry) => entry.componentKey === "sink-base");
+  const hasFaucetComponent = components.some((item) => item.componentKey === "sink-faucet");
+  if (hasFaucetHotspot || !hasSinkHotspot || !hasFaucetComponent) {
+    return definitions;
+  }
+
+  const sinkHotspot = definitions.find((entry) => entry.componentKey === "sink-base");
+  if (!sinkHotspot) {
+    return definitions;
+  }
+
+  const centerX = sinkHotspot.left + sinkHotspot.width / 2;
+  return [
+    ...definitions,
+    {
+      componentKey: "sink-faucet",
+      left: Math.max(0, centerX - 2.25),
+      top: Math.max(0, sinkHotspot.top - 5),
+      width: 4.5,
+      height: 8,
+    },
+  ];
+}
+
+function rasterPlanHrefFromPdf(pdfHref) {
+  if (!pdfHref) return "";
+  try {
+    const relative = decodeURIComponent(String(pdfHref).replace(/^\//, ""));
+    const baseName = relative.replace(/^pdfs\//i, "").replace(/\.pdf$/i, "");
+    if (!baseName) return "";
+    return `/jpg/${baseName.split("/").map(encodeURIComponent).join("/")}_page-0001.jpg`;
+  } catch {
+    return "";
+  }
+}
+
 export default function KitchenSvgStage({
   svgMarkup,
   kitchenConfig,
   kitchenSlug,
+  linkedComponentGroups = [],
   planViewport,
   fixedComponentIds,
   selectedComponentIds,
@@ -115,11 +154,24 @@ export default function KitchenSvgStage({
   onResetSelection,
 }) {
   const { translate, language } = usePublicI18n();
-  const svgHostRef = useRef(null);
-  const has3dModel = kitchenSlug === "test-3d-kitchen";
   const normalizedKitchenSlug = String(kitchenSlug || "").trim().toLowerCase();
-  const imageViewHref = IMAGE_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
-  const pdfViewHref = PDF_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
+  const svgHostRef = useRef(null);
+  const planImageRef = useRef(null);
+  const planImageWrapRef = useRef(null);
+  const [planImageSrc, setPlanImageSrc] = useState("");
+  const planImageFallbackHref =
+    kitchenConfig.kitchen.planImagePath || IMAGE_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
+  const has3dModel = kitchenSlug === "test-3d-kitchen";
+  const pdfViewHref = kitchenConfig.kitchen.planPdfPath || PDF_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
+  const configuredHotspots = Array.isArray(kitchenConfig.kitchen.hotspots) ? kitchenConfig.kitchen.hotspots : [];
+  // Hotspots are measured on the plan JPG; show the same raster when hotspots exist.
+  const rasterPlanHref = configuredHotspots.length && pdfViewHref ? rasterPlanHrefFromPdf(pdfViewHref) : "";
+  const vectorPlanHref =
+    !configuredHotspots.length && String(kitchenConfig.kitchen.planImagePath || "").toLowerCase().endsWith(".svg")
+      ? kitchenConfig.kitchen.planImagePath
+      : "";
+  const imageViewHref =
+    rasterPlanHref || vectorPlanHref || kitchenConfig.kitchen.planImagePath || IMAGE_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
   const hasImageView = Boolean(imageViewHref);
   const hasPdfView = Boolean(pdfViewHref);
   const [activeView, setActiveView] = useState("2d");
@@ -133,12 +185,15 @@ export default function KitchenSvgStage({
       new Set(
         kitchenConfig.components
           .map((item) => componentIdForItem(item))
-          .filter((componentId) => !isHiddenLinkedComponent(kitchenSlug, componentId)),
+          .filter((componentId) => !isHiddenLinkedComponent(kitchenSlug, componentId, linkedComponentGroups)),
       ),
-    [kitchenConfig.components, kitchenSlug],
+    [kitchenConfig.components, kitchenSlug, linkedComponentGroups],
   );
   const imageHotspots = useMemo(() => {
-    const definitions = IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [];
+    const definitions = withDerivedSinkFaucet(
+      configuredHotspots.length ? configuredHotspots : IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
+      kitchenConfig.components,
+    );
     if (!definitions.length) return [];
 
     const componentById = new Map(
@@ -149,7 +204,7 @@ export default function KitchenSvgStage({
       .map((definition) => {
         const componentId = componentIdForKey(definition.componentKey);
         const item = componentById.get(componentId);
-        if (!item || isHiddenLinkedComponent(normalizedKitchenSlug, componentId)) {
+        if (!item || isHiddenLinkedComponent(normalizedKitchenSlug, componentId, linkedComponentGroups)) {
           return null;
         }
         return {
@@ -159,7 +214,7 @@ export default function KitchenSvgStage({
         };
       })
       .filter(Boolean);
-  }, [kitchenConfig.components, normalizedKitchenSlug, translate, language]);
+  }, [configuredHotspots, kitchenConfig.components, normalizedKitchenSlug, translate, language, linkedComponentGroups]);
   const hasImageHotspots = imageHotspots.length > 0;
   const [isCalibrating, setIsCalibrating] = useState(false);
   useEffect(() => {
@@ -167,6 +222,10 @@ export default function KitchenSvgStage({
     const value = new URLSearchParams(window.location.search).get("calibrate");
     setIsCalibrating(value === "1" || value === "true");
   }, []);
+
+  useEffect(() => {
+    setPlanImageSrc(imageViewHref);
+  }, [imageViewHref]);
 
   useEffect(() => {
     if (activeView !== "2d" || hasImageView || hasPdfView) {
@@ -215,7 +274,7 @@ export default function KitchenSvgStage({
       if (fixedComponentIds.includes(componentId)) return;
 
       setSelectedComponentIds((current) =>
-        toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
+        toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds, linkedComponentGroups),
       );
     };
 
@@ -234,6 +293,7 @@ export default function KitchenSvgStage({
     planViewport,
     resolvedSvgMarkup,
     setSelectedComponentIds,
+    linkedComponentGroups,
   ]);
 
   useEffect(() => {
@@ -294,7 +354,7 @@ export default function KitchenSvgStage({
               selectedComponentIds={selectedComponentIds}
               onToggleComponent={(componentId) => {
                 setSelectedComponentIds((current) =>
-                  toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
+                  toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds, linkedComponentGroups),
                 );
               }}
             />
@@ -313,24 +373,33 @@ export default function KitchenSvgStage({
           <>
             <div className={styles.pdfCard}>
               {hasImageHotspots ? (
-                <div className={styles.planImageWrap}>
-                  <img
-                    src={imageViewHref}
-                    alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
-                    className={styles.planImageInteractive}
-                  />
-                  <div className={styles.planHotspotLayer}>
+                <div className={styles.planImageWrap} ref={planImageWrapRef}>
+                  <div className={styles.planImageFrame}>
+                    <img
+                      ref={planImageRef}
+                      src={planImageSrc || imageViewHref}
+                      alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
+                      className={styles.planImageInteractive}
+                      onError={() => {
+                        const fallback = planImageFallbackHref;
+                        if (fallback && planImageSrc !== fallback) {
+                          setPlanImageSrc(fallback);
+                        }
+                      }}
+                    />
+                    <div className={styles.planHotspotLayer}>
                     {imageHotspots.map((hotspot) => {
                       const isLocked = fixedComponentIds.includes(hotspot.componentId);
-                      const isSelected = isLocked || selectedComponentIds.includes(hotspot.componentId);
+                      const isOptionalSelected =
+                        !isLocked && selectedComponentIds.includes(hotspot.componentId);
                       return (
                         <button
                           key={hotspot.componentId}
                           type="button"
                           className={[
                             styles.planHotspot,
-                            isSelected ? styles.planHotspotSelected : "",
                             isLocked ? styles.planHotspotLocked : "",
+                            isOptionalSelected ? styles.planHotspotSelected : "",
                             isCalibrating ? styles.planHotspotCalibrate : "",
                           ]
                             .filter(Boolean)
@@ -341,7 +410,7 @@ export default function KitchenSvgStage({
                             width: `${hotspot.width}%`,
                             height: `${hotspot.height}%`,
                           }}
-                          aria-pressed={isSelected}
+                          aria-pressed={isLocked || isOptionalSelected}
                           aria-label={hotspot.label}
                           title={`${hotspot.componentKey} — left:${hotspot.left} top:${hotspot.top} width:${hotspot.width} height:${hotspot.height}`}
                           disabled={isLocked}
@@ -353,6 +422,7 @@ export default function KitchenSvgStage({
                                 current,
                                 hotspot.componentId,
                                 fixedComponentIds,
+                                linkedComponentGroups,
                               ),
                             );
                           }}
@@ -363,6 +433,7 @@ export default function KitchenSvgStage({
                         </button>
                       );
                     })}
+                    </div>
                   </div>
                   {isCalibrating ? (
                     <div className={styles.planCalibrationGrid} aria-hidden="true">

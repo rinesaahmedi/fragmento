@@ -87,6 +87,127 @@ export default async function AdminKitchensPage({ searchParams }) {
         </AdminSection>
 
         <AdminSection
+          title="Import Kitchen from PDF + Excel"
+          description="Upload the AB plan PDF and supplier Excel sheet. NR in Excel must match the numbered callouts on the PDF. Slots, hotspots, and catalog items are assigned automatically from article codes (US60, H6002, A-EGSPV…, DEFAULT rows). Layout template is optional and only used for product names when PDF callouts are missing."
+        >
+          <form action="/api/admin/kitchens/import" method="post" encType="multipart/form-data" style={formGridStyle}>
+            <FormField label="Plan PDF">
+              <input name="pdfFile" type="file" accept="application/pdf,.pdf" style={inputStyle} required />
+            </FormField>
+            <FormField label="Supplier Excel">
+              <input
+                name="excelFile"
+                type="file"
+                accept=".xlsx,.xls,.csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv"
+                style={inputStyle}
+                required
+              />
+            </FormField>
+            <FormField label="Layout template kitchen (optional)">
+              <AdminSelect name="layoutTemplateKitchenId" style={inputStyle}>
+                <option value="">No template — use componentKey column or auto-detect</option>
+                {kitchens.map((kitchen) => (
+                  <option key={`template-${kitchen.id}`} value={kitchen.id}>
+                    {formatKitchenCode(kitchen)} - {kitchen.name}
+                  </option>
+                ))}
+              </AdminSelect>
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
+              <input name="name" placeholder="AB 105813 Kitchen" style={inputStyle} required />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" />}>
+              <input name="kitchenCode" placeholder="105 813" style={inputStyle} />
+            </FormField>
+            <FormField label="Contract number">
+              <input name="contractNumber" placeholder="736277" style={inputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
+              <AdminSelect name="status" defaultValue={KitchenStatus.DRAFT} style={inputStyle}>
+                {KITCHEN_STATUS_OPTIONS.map((status) => (
+                  <option key={`import-${status}`} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </AdminSelect>
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.description" fallback="Description" />} wide>
+              <textarea
+                name="description"
+                placeholder="Optional description. Defaults to the uploaded file names."
+                rows={2}
+                style={textareaStyle}
+              />
+            </FormField>
+            <input type="hidden" name="startCodexAgent" value="false" />
+            <label style={{ gridColumn: "1 / -1", display: "flex", gap: 8, alignItems: "center", color: "var(--app-text)", fontWeight: 800 }}>
+              <input type="checkbox" name="startCodexAgent" value="true" defaultChecked />
+              <span>Start Codex finisher automatically after import</span>
+            </label>
+            <div style={{ gridColumn: "1 / -1", ...actionRowStyle }}>
+              <button type="submit" style={primaryButtonStyle}>Import kitchen</button>
+              <span style={defaultItemsHintStyle}>
+                Preferred: add componentKey per row (e.g. wall-cabinet-2, oven-module). Requires Python 3 and local Codex CLI on the server.
+              </span>
+            </div>
+          </form>
+        </AdminSection>
+
+        <AdminSection
+          title="Duplicate Kitchen"
+          description="Copy an existing kitchen, its catalog items, plan metadata, and optional contract number. Use this for repeated AB PDF kitchens with the same layout."
+        >
+          <form action="/api/admin/kitchens/duplicate" method="post" style={formGridStyle}>
+            <FormField label="Source kitchen">
+              <AdminSelect name="sourceKitchenId" style={inputStyle} required>
+                <option value="">Choose source</option>
+                {kitchens.map((kitchen) => (
+                  <option key={kitchen.id} value={kitchen.id}>
+                    {formatKitchenCode(kitchen)} - {kitchen.name}
+                  </option>
+                ))}
+              </AdminSelect>
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
+              <input name="name" placeholder="AB 105812 Kitchen" style={inputStyle} required />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" />}>
+              <input name="kitchenCode" placeholder="105 812" style={inputStyle} />
+            </FormField>
+            <FormField label="Contract number">
+              <input name="contractNumber" placeholder="736276" style={inputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
+              <AdminSelect name="status" defaultValue={KitchenStatus.DRAFT} style={inputStyle}>
+                {KITCHEN_STATUS_OPTIONS.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </AdminSelect>
+            </FormField>
+            <FormField label="Plan image path">
+              <input name="planImagePath" placeholder="/plans/AB%20105812.svg" style={inputStyle} />
+            </FormField>
+            <FormField label="Plan PDF path">
+              <input name="planPdfPath" placeholder="/pdfs/AB%20105812.pdf" style={inputStyle} />
+            </FormField>
+            <FormField label={<AdminText i18nKey="kitchenDetailAdmin.description" fallback="Description" />} wide>
+              <textarea
+                name="description"
+                placeholder="Kitchen configuration based on frontend/public/jpg/AB 105812_page-0001.jpg"
+                rows={2}
+                style={textareaStyle}
+              />
+            </FormField>
+            <div style={{ gridColumn: "1 / -1", ...actionRowStyle }}>
+              <button type="submit" style={primaryButtonStyle}>Duplicate kitchen</button>
+              <span style={defaultItemsHintStyle}>Blank plan paths inherit from the source kitchen.</span>
+            </div>
+          </form>
+        </AdminSection>
+
+        <AdminSection
           title={<AdminText i18nKey="adminShellLogin.kitchens" fallback="Kitchens" />}
         >
           <div className="admin-list-table" style={tableWrapStyle}>

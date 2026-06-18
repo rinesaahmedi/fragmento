@@ -57,6 +57,43 @@ export function componentIdForItem(item) {
   return componentIdForColor(normalizeColor(item?.colorKey));
 }
 
+/** Catalog display order: fridge, then base run, then wall run. */
+export function getComponentCatalogBand(item) {
+  const key = String(item?.componentKey || "").trim();
+  if (key === "refrigerator") return 0;
+  if (key.startsWith("wall-cabinet") || key === "extractor-hood") return 2;
+  return 1;
+}
+
+function calloutNumberValue(item) {
+  const nr = Number.parseInt(String(item?.calloutNumber || ""), 10);
+  return Number.isFinite(nr) ? nr : Number.MAX_SAFE_INTEGER;
+}
+
+function calloutXPct(item, calloutPositionsByNr) {
+  const nr = String(item?.calloutNumber || "").trim();
+  if (!nr || !calloutPositionsByNr) return Number.MAX_SAFE_INTEGER;
+  const xPct = calloutPositionsByNr.get(nr);
+  return Number.isFinite(xPct) ? xPct : Number.MAX_SAFE_INTEGER;
+}
+
+export function compareComponentsForCatalog(left, right, calloutPositionsByNr = null) {
+  const bandDiff = getComponentCatalogBand(left) - getComponentCatalogBand(right);
+  if (bandDiff !== 0) return bandDiff;
+
+  const xDiff = calloutXPct(left, calloutPositionsByNr) - calloutXPct(right, calloutPositionsByNr);
+  if (xDiff !== 0) return xDiff;
+
+  const nrDiff = calloutNumberValue(left) - calloutNumberValue(right);
+  if (nrDiff !== 0) return nrDiff;
+
+  return (left?.sortOrder ?? 0) - (right?.sortOrder ?? 0);
+}
+
+export function sortComponentsForCatalog(items, calloutPositionsByNr = null) {
+  return [...items].sort((left, right) => compareComponentsForCatalog(left, right, calloutPositionsByNr));
+}
+
 export function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
 }
@@ -109,7 +146,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
   const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
   const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
   const rawTitle = stripDimensionsFromName(rawName);
-  const photoNumber = AB_105806_PHOTO_NUMBER_BY_CODE[code] || "";
+  const photoNumber = String(item?.calloutNumber || "").trim() || AB_105806_PHOTO_NUMBER_BY_CODE[code] || "";
   const withPhotoNumber = (label) => (photoNumber ? `${photoNumber}. ${label}` : label);
   const withDimensions = (label) => {
     return withPhotoNumber(stripDimensionsFromName(label));
@@ -559,24 +596,33 @@ export function getProductInfoDocuments(item) {
   return [{ label: "Produktinfo PDF", href }];
 }
 
-export function getLinkedComponentIds(slug, componentId) {
+function normalizeLinkedComponentGroups(groups) {
+  return Array.isArray(groups)
+    ? groups
+        .map((group) => Array.isArray(group) ? group.map((id) => String(id || "").trim()).filter(Boolean) : [])
+        .filter((group) => group.length > 1)
+    : [];
+}
+
+export function getLinkedComponentIds(slug, componentId, linkedComponentGroups = null) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
-  const linkedGroups = LINKED_COMPONENT_GROUPS_BY_SLUG[normalizedSlug] || [];
+  const configuredGroups = normalizeLinkedComponentGroups(linkedComponentGroups);
+  const linkedGroups = configuredGroups.length ? configuredGroups : LINKED_COMPONENT_GROUPS_BY_SLUG[normalizedSlug] || [];
   const linkedGroup = linkedGroups.find((group) => group.includes(componentId));
   return linkedGroup || [componentId];
 }
 
-export function isHiddenLinkedComponent(slug, componentId) {
-  const linkedIds = getLinkedComponentIds(slug, componentId);
+export function isHiddenLinkedComponent(slug, componentId, linkedComponentGroups = null) {
+  const linkedIds = getLinkedComponentIds(slug, componentId, linkedComponentGroups);
   return linkedIds.length > 1 && linkedIds[0] !== componentId;
 }
 
-export function isLinkedComponentSelected(slug, selectedIds, componentId) {
-  return getLinkedComponentIds(slug, componentId).every((id) => selectedIds.includes(id));
+export function isLinkedComponentSelected(slug, selectedIds, componentId, linkedComponentGroups = null) {
+  return getLinkedComponentIds(slug, componentId, linkedComponentGroups).every((id) => selectedIds.includes(id));
 }
 
-export function toggleLinkedComponentSelection(slug, currentIds, componentId, lockedIds = []) {
-  const linkedIds = getLinkedComponentIds(slug, componentId);
+export function toggleLinkedComponentSelection(slug, currentIds, componentId, lockedIds = [], linkedComponentGroups = null) {
+  const linkedIds = getLinkedComponentIds(slug, componentId, linkedComponentGroups);
   const currentSet = new Set(currentIds);
   const lockedSet = new Set(lockedIds);
   const shouldRemove = linkedIds.every((id) => currentSet.has(id));
@@ -634,9 +680,9 @@ export function getProductImagePaths(item) {
   return item?.productImagePath ? [item.productImagePath] : [];
 }
 
-function getCatalogLinkedItems(allItems, slug, item) {
+function getCatalogLinkedItems(allItems, slug, item, linkedComponentGroups = null) {
   const componentId = componentIdForItem(item);
-  const linkedIds = getLinkedComponentIds(slug, componentId);
+  const linkedIds = getLinkedComponentIds(slug, componentId, linkedComponentGroups);
   if (linkedIds.length <= 1) return [item];
 
   const linkedItems = linkedIds
@@ -646,9 +692,9 @@ function getCatalogLinkedItems(allItems, slug, item) {
   return linkedItems.length ? linkedItems : [item];
 }
 
-export function getCatalogDisplayItem(allItems, slug, item) {
+export function getCatalogDisplayItem(allItems, slug, item, linkedComponentGroups = null) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
-  const linkedItems = getCatalogLinkedItems(allItems, slug, item).map(applyProductInfoDisplayOverrides);
+  const linkedItems = getCatalogLinkedItems(allItems, slug, item, linkedComponentGroups).map(applyProductInfoDisplayOverrides);
   const displayItem = applyProductInfoDisplayOverrides(item);
 
   if (linkedItems.length <= 1) {

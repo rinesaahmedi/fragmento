@@ -402,6 +402,23 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
+          {kitchen.importAgentStatus ? (
+            <div style={agentStatusStyle}>
+              <div style={agentStatusHeaderStyle}>
+                <strong>Codex finisher</strong>
+                <span style={agentStatusBadgeStyle}>{kitchen.importAgentStatus}</span>
+              </div>
+              <div style={agentStatusMetaStyle}>
+                {kitchen.importAgentStartedAt ? <span>Started: {kitchen.importAgentStartedAt.toLocaleString("de-DE")}</span> : null}
+                {kitchen.importAgentFinishedAt ? <span>Finished: {kitchen.importAgentFinishedAt.toLocaleString("de-DE")}</span> : null}
+                {kitchen.importAgentLogPath ? <span>Log: {kitchen.importAgentLogPath}</span> : null}
+              </div>
+              {kitchen.importAgentLastMessage ? (
+                <pre style={agentStatusMessageStyle}>{kitchen.importAgentLastMessage}</pre>
+              ) : null}
+            </div>
+          ) : null}
+
           <form action={`/api/admin/kitchens/${kitchen.id}`} method="post" style={kitchenDetailsFormStyle}>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
               <AdminKitchenNameInput slug={kitchen.slug} name={kitchen.name} style={compactInputStyle} required />
@@ -423,6 +440,38 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 name="description"
                 defaultValue={kitchen.description || ""}
                 rows={2}
+                style={compactTextareaStyle}
+              />
+            </FormField>
+            <FormField label="Plan image path">
+              <input
+                name="planImagePath"
+                defaultValue={kitchen.planImagePath || ""}
+                placeholder="/plans/AB%20105812.svg"
+                style={compactInputStyle}
+              />
+            </FormField>
+            <FormField label="Plan PDF path">
+              <input
+                name="planPdfPath"
+                defaultValue={kitchen.planPdfPath || ""}
+                placeholder="/pdfs/AB%20105812.pdf"
+                style={compactInputStyle}
+              />
+            </FormField>
+            <FormField label="Hotspots JSON" wide>
+              <textarea
+                name="hotspots"
+                defaultValue={kitchen.hotspots ? JSON.stringify(kitchen.hotspots, null, 2) : ""}
+                rows={5}
+                style={compactTextareaStyle}
+              />
+            </FormField>
+            <FormField label="Linked component groups JSON" wide>
+              <textarea
+                name="linkedComponentGroups"
+                defaultValue={kitchen.linkedComponentGroups ? JSON.stringify(kitchen.linkedComponentGroups, null, 2) : ""}
+                rows={3}
                 style={compactTextareaStyle}
               />
             </FormField>
@@ -603,6 +652,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />} wide={false}>
                         <input name="sortOrder" defaultValue={String(item.sortOrder)} style={compactInputStyle} />
                       </FormField>
+                      <FormField label="Plan number" wide={false}>
+                        <input name="calloutNumber" defaultValue={item.calloutNumber || ""} placeholder="10" style={compactInputStyle} />
+                      </FormField>
                     </div>
 
                     {item.itemType === ItemType.COMPONENT ? (
@@ -710,6 +762,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                   </FormField>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />}>
                     <input name="sortOrder" defaultValue="0" style={inputStyle} />
+                  </FormField>
+                  <FormField label="Plan number">
+                    <input name="calloutNumber" placeholder="10" style={inputStyle} />
                   </FormField>
                   <label style={{ ...checkboxInlineStyle, alignSelf: "end" }}>
                     <input type="checkbox" name="isLocked" value="true" />
@@ -872,6 +927,56 @@ const compactItemCardStyle = {
 const kitchenDetailsFormStyle = {
   ...formGridStyle,
   gap: 12,
+};
+
+const agentStatusStyle = {
+  border: "1px solid var(--app-border)",
+  borderRadius: 12,
+  background: "var(--app-surface)",
+  padding: "12px 14px",
+  display: "grid",
+  gap: 8,
+};
+
+const agentStatusHeaderStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: 12,
+  alignItems: "center",
+  color: "var(--app-text)",
+};
+
+const agentStatusBadgeStyle = {
+  border: "1px solid var(--app-border-strong)",
+  borderRadius: 999,
+  padding: "4px 8px",
+  fontSize: 12,
+  fontWeight: 900,
+  color: "var(--app-accent)",
+  background: "var(--color-card)",
+};
+
+const agentStatusMetaStyle = {
+  display: "flex",
+  gap: 10,
+  flexWrap: "wrap",
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 700,
+};
+
+const agentStatusMessageStyle = {
+  margin: 0,
+  maxHeight: 180,
+  overflow: "auto",
+  whiteSpace: "pre-wrap",
+  color: "var(--app-text)",
+  background: "var(--color-card)",
+  border: "1px solid var(--app-border)",
+  borderRadius: 10,
+  padding: 10,
+  fontSize: 12,
+  lineHeight: 1.45,
 };
 
 const contractNoticeStyle = {

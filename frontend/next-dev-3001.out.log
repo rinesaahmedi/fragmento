@@ -1,0 +1,26 @@
+
+> arc-fragmento@1.0.0 dev
+> next dev -p 3001
+
+   ▲ Next.js 15.5.14
+   - Local:        http://localhost:3001
+   - Network:      http://192.168.112.1:3001
+   - Environments: .env
+   - Experiments (use with caution):
+     · serverActions
+     · middlewareClientMaxBodySize: "25mb"
+
+ ✓ Starting...
+ ✓ Ready in 3.2s
+ ○ Compiling /api/kitchens/[slug] ...
+ ✓ Compiled /api/kitchens/[slug] in 7.9s (2259 modules)
+ GET /api/kitchens/105899 404 in 9595ms
+ GET /kitchens/105899?calibrate=1 404 in 10499ms
+ GET /kitchens/105899?contractNumber=670898989&calibrate=1 404 in 212ms
+ GET /api/kitchens/105899?contractNumber=670898989 404 in 70ms
+ GET /kitchens/105899?contractNumber=670898989&lang=en&instructionMode=text 404 in 368ms
+ GET /api/kitchens/105899 200 in 939ms
+ GET /kitchens/105899?contractNumber=670898989&calibrate=1 200 in 1487ms
+ GET /api/kitchens/105899 200 in 112ms
+ GET /kitchens/105899?contractNumber=670898989&lang=en&instructionMode=text 200 in 1124ms
+ GET /kitchens/99999?calibrate=1&contractNumber=999999 200 in 1731ms

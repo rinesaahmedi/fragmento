@@ -11,22 +11,88 @@ plan, is razor-sharp (vector), and every cabinet is clickable/selectable** and w
 Read this whole file first, then follow the **Recipe** (section 6) top to bottom. Section 7 is a
 fully worked example (`AB 105820`) you can copy.
 
+For **pixel-perfect selection boxes** and catalog dimension rules, also read
+`docs/kitchen-plan-selection-prompt.md`.
+
+## 0. Non-negotiable completion gates for agents
+
+Do not mark the task done just because the import command created a kitchen or because an existing
+kitchen looks similar. The uploaded PDF and Excel are the source of truth.
+
+Before finishing, you must prove all of these are true:
+
+- You inspected the uploaded PDF and uploaded Excel/CSV, not only an existing kitchen.
+- Every Excel `NR` row is explicitly mapped to the correct `componentKey`.
+- Every selectable visible component has exactly one hotspot, and the hotspot belongs to the
+  cabinet/appliance shown by the PDF callout.
+- No non-exempt hotspot overlaps another non-exempt hotspot.
+- Default/included rows are locked, the hidden hood helper is inactive, and linked hood selection
+  works.
+- The resulting kitchen uses the uploaded plan assets and supplier data. You may reuse item codes
+  only for truly identical products, but you must not wholesale-copy another kitchen as the final
+  answer unless the PDF, Excel rows, dimensions, prices, callouts, plan image, and hotspots have all
+  been checked against the upload.
+- `node scripts/verify-kitchen-hotspots.mjs <slug> --repair` passes.
+- An overlay PNG is written and visually inspected against the plan. If the overlay is wrong, fix
+  the hotspot data and rerun verification.
+- A build/check is run after code or schema changes. If you cannot run it, state the exact blocker.
+
+If any gate fails, keep working. Do not set any import-agent status field yourself; the runner owns
+agent status after the process exits.
+
 ---
 
 ## 1. TL;DR — the pipeline
 
+**Preferred path for new AB single-wall kitchens: Admin import or CLI (no `seed.js` edits).**
+
 ```
+PDF + Excel  ──importKitchenFromFiles()──►  Kitchen + KitchenItems in DB
 PDF  ──render-plan-svg.py──►  /public/plans/<plan>.svg   (crisp vector plan, what users see)
-PDF  ──render-plan-pdf.py──►  /public/jpg/<plan>.jpg      (raster, only used to detect edges)
-JPG  ──detect-plan-hotspots.py──►  cabinet edges in %     (pixel-perfect click boxes)
+PDF  ──render-plan-pdf.py──►  /public/jpg/<plan>.jpg      (raster, used to detect edges)
+PDF  ──detect-plan-callouts.py──►  NR positions (xPct, yPct)
+JPG + callouts + items ──build-hotspots-json.py──►  kitchen.hotspots (one box per NR column)
+Post-import ──finalizeImportedKitchenHotspots()──►  repair keys, regen hotspots, verify + overlay PNG
+verify: /kitchens/<slug>?calibrate=1  OR  node scripts/verify-kitchen-hotspots.mjs <slug> --repair
+```
+
+**Legacy path (maintenance only):** hand-author `seed.js` + `IMAGE_HOTSPOTS_BY_SLUG` in
+`kitchen-svg-stage.jsx` — do **not** use this for new kitchens.
+
+The plan picture is **the real drawing** (vector SVG when available). Excel `NR` must match PDF
+callout numbers. Each catalog row maps to one `componentKey` and one hotspot column.
+
+### CLI import (batch / local)
+
+From `frontend/`:
+
+```bash
+node scripts/import-kitchen.mjs --pdf "../path/plan.pdf" --excel "../path/items.xlsx" --name "AB 105866" --code "105866"
+node scripts/verify-kitchen-hotspots.mjs 105866 --repair
+```
+
+### Maintenance scripts
+
+| Script | Purpose |
+| --- | --- |
+| `scripts/repair-kitchen-component-keys.mjs <slug>` | Re-map Excel NR → componentKey from PDF callouts |
+| `scripts/resync-kitchen-catalog.mjs <slug>` | Re-sort catalog + force hotspot regen |
+| `scripts/verify-kitchen-hotspots.mjs <slug> [--repair]` | Coverage + overlap check; optional overlay PNG |
+| `scripts/sync-all-kitchen-hotspots.mjs --force` | Batch hotspot regen |
+
+---
+
+## 1b. Legacy TL;DR (seed.js only — do not use for new kitchens)
+
+```
+PDF  ──render-plan-svg.py──►  /public/plans/<plan>.svg
+PDF  ──render-plan-pdf.py──►  /public/jpg/<plan>.jpg
+JPG  ──detect-plan-hotspots.py──►  cabinet edges in %
 Excel ──► seed.js item rows + kitchen + contract
         ──► kitchen-svg-stage.jsx (plan image + hotspot boxes)
         ──► kitchen-selection-utils.js (callout numbers + hood link)
 verify: prisma db seed → next build → browser
 ```
-
-The plan picture is **the real drawing** (vector), so it is pixel-perfect by definition. The only
-hand-work is mapping Excel rows to cabinet slots — and even the click boxes are auto-detected.
 
 ---
 

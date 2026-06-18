@@ -3,6 +3,7 @@ import { mapAdminMutationError, redirectWithFlash } from "../../../../../../lib/
 import { requireAdminApi } from "../../../../../../lib/auth";
 import { getKitchenById } from "../../../../../../lib/catalog";
 import { buildKitchenCatalogWorkbook, parseKitchenCatalogSheet } from "../../../../../../lib/kitchen-catalog-sheet";
+import { autoSyncKitchenHotspots } from "../../../../../../lib/kitchen-hotspots";
 import { prisma } from "../../../../../../lib/prisma";
 
 export async function GET(_request, { params }) {
@@ -99,6 +100,8 @@ export async function POST(request, { params }) {
     if (!updatedCount) {
       throw new Error("No matching kitchen items were found. Re-import the file exported from this kitchen.");
     }
+
+    await autoSyncKitchenHotspots(prisma, id, { force: true });
 
     return redirectWithFlash(
       request,

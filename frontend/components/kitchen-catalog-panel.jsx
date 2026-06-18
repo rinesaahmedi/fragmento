@@ -345,6 +345,7 @@ function CatalogItem({
 export default function KitchenCatalogPanel({
   kitchenConfig,
   kitchenSlug,
+  linkedComponentGroups = [],
   visibleComponents,
   selectedComponents,
   selectedAccessories,
@@ -382,13 +383,13 @@ export default function KitchenCatalogPanel({
           <div className={styles.catalogGrid}>
             {visibleComponents.map((item) => {
               const componentId = componentIdForItem(item);
-              const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, item);
+              const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, item, linkedComponentGroups);
 
               return (
                 <CatalogItem
                   key={item.id}
                   item={displayItem.item}
-                  selected={isLinkedComponentSelected(kitchenSlug, selectedComponentIds, componentId)}
+                  selected={isLinkedComponentSelected(kitchenSlug, selectedComponentIds, componentId, linkedComponentGroups)}
                   price={displayItem.price}
                   infoPdfHref={displayItem.infoPdfHref}
                   onOpenInfo={onOpenProductInfo}
@@ -397,7 +398,7 @@ export default function KitchenCatalogPanel({
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   onClick={() =>
                     setSelectedComponentIds((current) =>
-                      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
+                      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds, linkedComponentGroups),
                     )
                   }
                 />
