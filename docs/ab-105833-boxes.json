@@ -1,0 +1,20 @@
+[
+  { "componentKey": "refrigerator", "left": 7.12, "top": 31.88, "width": 7.67, "height": 45.88 },
+  { "componentKey": "wall-cabinet-1", "left": 17.10, "top": 11.77, "width": 9.08, "height": 10.69 },
+  { "componentKey": "wall-cabinet-2", "left": 26.18, "top": 11.77, "width": 10.91, "height": 10.69 },
+  { "componentKey": "extractor-hood", "left": 26.18, "top": 33.0, "width": 10.91, "height": 10.5 },
+  { "componentKey": "wall-cabinet-3", "left": 37.09, "top": 11.77, "width": 10.90, "height": 10.69 },
+  { "componentKey": "wall-cabinet-4", "left": 64.21, "top": 11.77, "width": 10.44, "height": 10.69 },
+  { "componentKey": "wall-cabinet-5", "left": 74.65, "top": 11.77, "width": 10.89, "height": 10.69 },
+  { "componentKey": "wall-cabinet-6", "left": 85.54, "top": 11.77, "width": 10.90, "height": 10.69 },
+  { "componentKey": "worktop", "left": 17.10, "top": 54.25, "width": 30.89, "height": 1.35 },
+  { "componentKey": "worktop", "left": 64.21, "top": 54.25, "width": 32.23, "height": 1.35 },
+  { "componentKey": "worktop", "left": 17.10, "top": 54.25, "width": 0.45, "height": 19.9 },
+  { "componentKey": "sink-faucet", "left": 89.0, "top": 50.0, "width": 4.5, "height": 8.0 },
+  { "componentKey": "base-module-1", "left": 17.10, "top": 54.25, "width": 9.08, "height": 19.9 },
+  { "componentKey": "oven-module", "left": 26.18, "top": 54.25, "width": 10.91, "height": 19.9 },
+  { "componentKey": "base-module-2", "left": 37.09, "top": 54.25, "width": 10.90, "height": 19.9 },
+  { "componentKey": "base-module-3", "left": 64.21, "top": 54.25, "width": 10.44, "height": 19.9 },
+  { "componentKey": "drawer-module", "left": 74.65, "top": 54.25, "width": 10.89, "height": 19.9 },
+  { "componentKey": "sink-base", "left": 85.54, "top": 54.25, "width": 10.90, "height": 19.9 }
+]

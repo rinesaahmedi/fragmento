@@ -34,6 +34,7 @@ const IMAGE_VIEW_BY_SLUG = {
   "ab-105820": "/plans/AB%20105820.svg",
   "ab-105821": "/plans/AB%20105821.svg",
   "ab-105822": "/plans/AB%20105822.svg",
+  "ab-105833": "/plans/AB%20105833.svg",
   "ab-105841": "/plans/AB%20105841.svg",
   "ab-105811": "/plans/AB%20105811.svg",
 };
@@ -225,6 +226,27 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-base", left: 77.94, top: 59.5, width: 14.16, height: 24.16 },
     { componentKey: "sink-faucet", left: 80.05, top: 51, width: 4.25, height: 7.5, preserveManualSize: true },
   ],
+  "ab-105833": [
+    { componentKey: "refrigerator", left: 5.42, top: 31.88, width: 10.17, height: 46.12 },
+    { componentKey: "wall-cabinet-1", left: 17.1, top: 22.37, width: 9.08, height: 18.75 },
+    { componentKey: "wall-cabinet-2", left: 26.14, top: 22.37, width: 10.90, height: 18.75 },
+    { componentKey: "extractor-hood", left: 26.18, top: 41.0, width: 10.91, height: 5.5 },
+    { componentKey: "wall-cabinet-3", left: 37.09, top: 22.37
+      , width: 11.9, height: 18.75 },
+    { componentKey: "wall-cabinet-4", left: 64.21, top: 22.37, width: 10.44, height:18.75 },
+    { componentKey: "wall-cabinet-5", left: 74.65, top: 22.37, width: 10.89, height: 18.75 },
+    { componentKey: "wall-cabinet-6", left: 85.54, top: 22.37, width: 11.6, height: 18.75},
+    { componentKey: "worktop", left: 16.81, top: 54.56, width: 32.09, height: 1.04 },
+    { componentKey: "worktop", left: 64.21, top: 54.56, width: 32.83, height: 1.04 },
+    { componentKey: "worktop", left: 16.81, top: 54.56, width: 0.29, height: 23.61, preserveManualSize: true },
+    { componentKey: "sink-faucet", left: 81.05, top: 49.25, width: 3.35, height: 5.45, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 17.1, top: 55.6, width: 9.08, height: 22.57, preserveManualSize: true },
+    { componentKey: "oven-module", left: 26.18, top: 55.6, width: 10.91, height: 22.57, preserveManualSize: true },
+    { componentKey: "base-module-2", left: 37.09, top: 55.6, width: 11.8, height: 22.57, preserveManualSize: true },
+    { componentKey: "base-module-3", left: 64.21, top: 55.6, width: 10.44, height: 22.57, preserveManualSize: true },
+    { componentKey: "sink-base", left: 74.65, top: 55.6, width: 10.89, height: 22.57, preserveManualSize: true },
+    { componentKey: "drawer-module", left: 85.54, top: 55.6, width: 11.6, height: 22.57, preserveManualSize: true },
+  ],
   "ab-105820": [
     { componentKey: "refrigerator", left: 2.14, top: 29.82, width: 13.19, height: 60.48 },
     { componentKey: "wall-cabinet-1", left: 17.16, top: 17.5, width: 7.12, height: 24.27 },
@@ -292,11 +314,25 @@ const BASE_BODY_COMPONENT_KEYS = new Set([
   "sink-base",
   "drawer-module",
 ]);
+const BASE_PLINTH_EXTENSION_DISABLED_SLUGS = new Set([
+  "ab-105808",
+  "ab-105810",
+  "ab-105812",
+  "ab-105816",
+]);
 // Typical toe-kick height on the 3509×2480 CAD renders (~5.2–5.3% of image height).
 const BASE_PLINTH_EXTENSION_PERCENT = 5.25;
 // If the base run already reaches within this margin of the floor dimension line, assume
 // plinth is included and do not extend (avoids double-counting on older hotspot maps).
 const BASE_PLINTH_ALREADY_INCLUDED_GAP = 8;
+const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
+  // AB 105833 has a split run with a large blank page area below the lower cabinets.
+  // Keep the crop close to the plinth/floor line instead of carrying the full page tail.
+  "ab-105833": {
+    bottomPadding: 4,
+    bottomLimit: 84,
+  },
+};
 
 function isBaseBodyHotspot(definition) {
   if (definition.preserveManualSize) {
@@ -312,7 +348,11 @@ function isBaseBodyHotspot(definition) {
 // Base hotspots are measured from the door top down to the cabinet bottom, which sits above
 // the plinth/toe-kick. Extend them downward so the whole drawn cabinet—including the kick
 // board—is clickable, without re-measuring every kitchen.
-function withBasePlinthExtension(definitions) {
+function withBasePlinthExtension(definitions, slug) {
+  if (BASE_PLINTH_EXTENSION_DISABLED_SLUGS.has(slug)) {
+    return definitions;
+  }
+
   const baseBodies = definitions.filter(isBaseBodyHotspot);
   if (!baseBodies.length) return definitions;
 
@@ -346,7 +386,7 @@ function clampPercent(value) {
   return Math.max(0, Math.min(100, value));
 }
 
-function getPlanDisplayCrop(hotspots) {
+function getPlanDisplayCrop(hotspots, slug) {
   if (!hotspots.length) {
     return { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 };
   }
@@ -367,11 +407,14 @@ function getPlanDisplayCrop(hotspots) {
   const trailingY = 100 - bounds.bottom;
   const leadingX = bounds.left;
   const leadingY = bounds.top;
+  const cropTuning = PLAN_DISPLAY_CROP_TUNING_BY_SLUG[slug] || {};
 
   const left = clampPercent(bounds.left - Math.max(2.6, leadingX * 0.6));
   const top = clampPercent(bounds.top - Math.max(4, leadingY * 0.5));
   const right = clampPercent(Math.min(99.5, bounds.right + Math.max(3.2, trailingX * 0.92)));
-  const bottom = clampPercent(Math.min(99.5, bounds.bottom + Math.max(1, trailingY * 0.85)));
+  const bottomPadding = cropTuning.bottomPadding ?? Math.max(1, trailingY * 0.85);
+  const bottomLimit = cropTuning.bottomLimit ?? 99.5;
+  const bottom = clampPercent(Math.min(bottomLimit, bounds.bottom + bottomPadding));
 
   return {
     left,
@@ -474,6 +517,7 @@ export default function KitchenSvgStage({
         IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
         kitchenConfig.components,
       ),
+      normalizedKitchenSlug,
     );
     if (!definitions.length) return [];
 
@@ -502,8 +546,8 @@ export default function KitchenSvgStage({
   }, [kitchenConfig.components, normalizedKitchenSlug, translate, language]);
   const hasImageHotspots = imageHotspots.length > 0;
   const planDisplayCrop = useMemo(
-    () => getPlanDisplayCrop(imageHotspots),
-    [imageHotspots],
+    () => getPlanDisplayCrop(imageHotspots, normalizedKitchenSlug),
+    [imageHotspots, normalizedKitchenSlug],
   );
   const croppedImageHotspots = useMemo(
     () =>
