@@ -34,6 +34,10 @@ const IMAGE_VIEW_BY_SLUG = {
   "ab-105820": "/plans/AB%20105820.svg",
   "ab-105821": "/plans/AB%20105821.svg",
   "ab-105822": "/plans/AB%20105822.svg",
+  "ab-105826": "/plans/AB%20105826.svg",
+  "ab-105827": "/plans/AB%20105827.svg",
+  "ab-105835": "/plans/AB%20105835.svg",
+  "ab-105836": "/plans/AB%20105836.svg",
   "ab-105841": "/plans/AB%20105841.svg",
   "ab-105811": "/plans/AB%20105811.svg",
 };
@@ -208,6 +212,62 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "drawer-module", left: 66.2, top: 58.49, width: 7.13, height: 25.66 },
     { componentKey: "refrigerator", left: 75.20, top: 29, width: 13.20, height: 60.5}
   ],
+  "ab-105827": [
+    { componentKey: "wall-cabinet-1", left: 12.11, top: 15.85, width: 12.28, height: 22.88 },
+    { componentKey: "wall-cabinet-2", left: 24.39, top: 15.85, width: 13.41, height: 22.88 },
+    { componentKey: "wall-cabinet-3", left: 37.8, top: 15.85, width: 13.44, height: 22.88 },
+    { componentKey: "wall-cabinet-4", left: 51.24, top: 15.85, width: 13.42, height: 22.88 },
+    { componentKey: "extractor-hood", left: 51.24, top: 38.73, width: 13.42, height: 7.05 },
+    { componentKey: "wall-cabinet-5", left: 64.66, top: 15.85, width: 7.01, height: 22.88 },
+    { componentKey: "worktop", left: 12.11, top: 55.36, width: 59.71, height: 1.25 },
+    { componentKey: "worktop", left: 71.37, top: 55.36, width: 0.45, height: 24.12 },
+    { componentKey: "sink-faucet", left: 31.5, top: 47.5, width: 3.25, height: 9.4, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 12.11, top: 56.61, width: 12.28, height: 22.87 },
+    { componentKey: "sink-base", left: 24.39, top: 56.61, width: 13.41, height: 22.87 },
+    { componentKey: "base-module-3", left: 37.8, top: 56.61, width: 13.44, height: 22.87 },
+    { componentKey: "oven-module", left: 51.24, top: 56.61, width: 13.42, height: 22.87 },
+    { componentKey: "drawer-module", left: 64.66, top: 56.61, width: 7.16, height: 22.87 },
+    { componentKey: "refrigerator", left: 73.04, top: 27.44, width: 12.44, height: 56.99 },
+  ],
+  "ab-105835": [
+    { componentKey: "wall-cabinet-1", left: 0.9, top: 18.87, width: 14.46, height: 22.8 },
+    { componentKey: "wall-cabinet-2", left: 15.36, top: 18.87, width: 13.38, height: 22.8 },
+    { componentKey: "extractor-hood", left: 15.36, top: 41.67, width: 13.38, height: 7.05 },
+    { componentKey: "wall-cabinet-3", left: 28.74, top: 18.87, width: 13.38, height: 22.8 },
+    { componentKey: "wall-cabinet-4", left: 42.12, top: 18.87, width: 13.38, height: 22.8 },
+    { componentKey: "wall-cabinet-5", left: 55.5, top: 18.87, width: 13.37, height: 22.8 },
+    { componentKey: "wall-cabinet-6", left: 68.87, top: 18.87, width: 13.37, height: 22.8, preserveManualSize: true },
+    { componentKey: "worktop", left: 0.9, top: 58.25, width: 82.14, height: 1.23 },
+    { componentKey: "worktop", left: 82.59, top: 58.25, width: 0.45, height: 24.05 },
+    { componentKey: "sink-faucet", left: 49.5, top: 51.5, width: 3.85, height: 8 },
+    { componentKey: "base-module-1", left: 0.9, top: 59.48, width: 14.46, height: 22.82 },
+    { componentKey: "oven-module", left: 15.36, top: 59.48, width: 13.38, height: 22.82 },
+    { componentKey: "base-module-2", left: 28.74, top: 59.48, width: 13.38, height: 22.82 },
+    { componentKey: "sink-base", left: 42.12, top: 59.48, width: 13.38, height: 22.82 },
+    { componentKey: "base-module-3", left: 55.5, top: 59.48, width: 13.37, height: 22.82 },
+    { componentKey: "drawer-module", left: 68.87, top: 59.48, width: 14.17, height: 22.82 },
+    { componentKey: "refrigerator", left: 84.61, top: 30.3, width: 12.4, height: 56.7 },
+  ],
+  "ab-105836": [
+    { componentKey: "refrigerator", left: 2.3, top: 31.85, width: 10.54, height: 46.8, preserveManualSize: true },
+    { componentKey: "worktop", left: 13.23, top: 54.78, width: 0.45, height: 23.94, preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", left: 13.75, top: 22.3, width: 10.85, height: 18.71 },
+    { componentKey: "wall-cabinet-2", left: 24.73, top: 22.3, width: 11.06, height: 18.71 },
+    { componentKey: "extractor-hood", left: 24.73, top: 41.07, width: 11.06, height: 7.05 },
+    { componentKey: "wall-cabinet-3", left: 35.79, top: 22.3, width: 14.0, height: 18.71 },
+    { componentKey: "worktop", left: 13.68, top: 54.78, width: 35.96, height: 1.05 },
+    { componentKey: "base-module-1", left: 13.68, top: 55.83, width: 11.04, height: 22.89, preserveManualSize: true },
+    { componentKey: "oven-module", left: 24.73, top: 55.83, width: 11.06, height: 22.89, preserveManualSize: true },
+    { componentKey: "base-module-2", left: 35.79, top: 55.83, width: 14.0, height: 22.89, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 63.66, top: 22.94, width: 10.55, height: 18.71 },
+    { componentKey: "wall-cabinet-5", left: 74.21, top: 22.94, width: 11.06, height: 18.71 },
+    { componentKey: "wall-cabinet-6", left: 85.27, top: 22.94, width: 11.75, height: 18.71 },
+    { componentKey: "worktop", left: 63.66, top: 54.78, width: 33.37, height: 1.05 },
+    { componentKey: "sink-faucet", left: 80.5, top: 48.0, width: 2.85, height: 8, preserveManualSize: true },
+    { componentKey: "base-module-3", left: 63.66, top: 55.83, width: 10.55, height: 22.89, preserveManualSize: true },
+    { componentKey: "sink-base", left: 74.21, top: 55.83, width: 11.06, height: 22.89, preserveManualSize: true },
+    { componentKey: "drawer-module", left: 85.27, top: 55.83, width: 11.76, height: 22.89, preserveManualSize: true },
+  ],
   "ab-105822": [
     { componentKey: "refrigerator", left: 8.54, top: 28.69, width: 13.13, height: 59.66 },
     { componentKey: "wall-cabinet-1", left: 23.62, top: 16.41, width: 11.79, height: 24.19 },
@@ -224,6 +284,23 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-3", left: 63.77, top: 59.5, width: 14.16, height: 24.16 },
     { componentKey: "sink-base", left: 77.94, top: 59.5, width: 14.16, height: 24.16 },
     { componentKey: "sink-faucet", left: 80.05, top: 51, width: 4.25, height: 7.5, preserveManualSize: true },
+  ],
+  "ab-105826": [
+    { componentKey: "refrigerator", left: 6.10, top: 28.5, width: 13.0, height: 59.5 },
+    { componentKey: "wall-cabinet-1", left: 20.8, top: 16.45, width: 14.05, height: 23.99 },
+    { componentKey: "wall-cabinet-2", left: 34.85, top: 16.45, width: 14.1, height: 23.99 },
+    { componentKey: "extractor-hood", left: 34.85, top: 40.44, width: 14.1, height: 7.05 },
+    { componentKey: "wall-cabinet-3", left: 48.95, top: 16.45, width: 14.06, height: 23.99 },
+    { componentKey: "wall-cabinet-4", left: 63.01, top: 16.45, width: 14.08, height: 23.99 },
+    { componentKey: "wall-cabinet-5", left: 77.09, top: 16.45, width: 15.73, height: 23.99 },
+    { componentKey: "worktop", left: 20.8, top: 57.89, width: 72.02, height: 1.35 },
+    { componentKey: "worktop", left: 20.35, top: 57.89, width: 0.45, height: 25.3 },
+    { componentKey: "sink-faucet", left: 79.05, top: 51.0, width: 4.85, height: 8 },
+    { componentKey: "base-module-1", left: 20.8, top: 59.15, width: 14.05, height: 24.04 },
+    { componentKey: "oven-module", left: 34.85, top: 59.15, width: 14.1, height: 24.04 },
+    { componentKey: "base-module-2", left: 48.95, top: 59.15, width: 14.06, height: 24.04 },
+    { componentKey: "base-module-3", left: 63.01, top: 59.15, width: 14.08, height: 24.04 },
+    { componentKey: "sink-base", left: 77.09, top: 59.15, width: 15.73, height: 24.04 },
   ],
   "ab-105820": [
     { componentKey: "refrigerator", left: 2.14, top: 29.82, width: 13.19, height: 60.48 },
@@ -284,6 +361,7 @@ const CALIBRATION_TICKS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 const PLAN_IMAGE_SOURCE_WIDTH = 842;
 const PLAN_IMAGE_SOURCE_HEIGHT = 595;
 const PLAN_DIMENSION_LINE_PERCENT = 98.43;
+const WALL_CABINET_COMPONENT_KEY_PATTERN = /^wall-cabinet-\d+$/;
 const BASE_BODY_COMPONENT_KEYS = new Set([
   "base-module-1",
   "base-module-2",
@@ -292,6 +370,10 @@ const BASE_BODY_COMPONENT_KEYS = new Set([
   "sink-base",
   "drawer-module",
 ]);
+const CORNER_BLENDE_MAX_WIDTH = 1.25;
+const CORNER_BLENDE_MIN_HEIGHT = 15;
+const CORNER_BLENDE_EDGE_TOLERANCE = 1.2;
+const CORNER_BLENDE_VERTICAL_TOLERANCE = 0.35;
 // Typical toe-kick height on the 3509×2480 CAD renders (~5.2–5.3% of image height).
 const BASE_PLINTH_EXTENSION_PERCENT = 5.25;
 // If the base run already reaches within this margin of the floor dimension line, assume
@@ -307,6 +389,102 @@ function isBaseBodyHotspot(definition) {
   }
   // Tall worktop side strips share the base body column and should include the plinth too.
   return definition.componentKey === "worktop" && definition.height >= 15;
+}
+
+function isWallCabinetHotspot(definition) {
+  return WALL_CABINET_COMPONENT_KEY_PATTERN.test(definition.componentKey);
+}
+
+function isHorizontalWorktopHotspot(definition) {
+  return (
+    definition.componentKey === "worktop" &&
+    definition.width >= 5 &&
+    definition.height <= 2
+  );
+}
+
+function isCornerBlendeHotspot(definition) {
+  return (
+    definition.componentKey === "worktop" &&
+    definition.width > 0 &&
+    definition.width <= CORNER_BLENDE_MAX_WIDTH &&
+    definition.height >= CORNER_BLENDE_MIN_HEIGHT
+  );
+}
+
+function canExtendToCornerBlende(definition) {
+  if (definition.preserveManualSize) {
+    return false;
+  }
+  return (
+    isWallCabinetHotspot(definition) ||
+    isBaseBodyHotspot(definition) ||
+    isHorizontalWorktopHotspot(definition)
+  );
+}
+
+function roundHotspotPercent(value) {
+  return Math.round(value * 100) / 100;
+}
+
+function verticallyOverlapsCornerBlende(definition, blende) {
+  const top = definition.top;
+  const bottom = definition.top + definition.height;
+  const blendeTop = blende.top;
+  const blendeBottom = blende.top + blende.height;
+
+  return (
+    blendeBottom >= top - CORNER_BLENDE_VERTICAL_TOLERANCE &&
+    blendeTop <= bottom + CORNER_BLENDE_VERTICAL_TOLERANCE
+  );
+}
+
+function withCornerBlendeExtensions(definitions) {
+  const cornerBlenden = definitions.filter(isCornerBlendeHotspot);
+  if (!cornerBlenden.length) return definitions;
+
+  return definitions.map((definition) => {
+    if (!canExtendToCornerBlende(definition) || isCornerBlendeHotspot(definition)) {
+      return definition;
+    }
+
+    let left = definition.left;
+    let right = definition.left + definition.width;
+
+    cornerBlenden.forEach((blende) => {
+      const blendeLeft = blende.left;
+      const blendeRight = blende.left + blende.width;
+      if (!verticallyOverlapsCornerBlende(definition, blende)) {
+        return;
+      }
+
+      if (
+        blendeRight >= left - CORNER_BLENDE_EDGE_TOLERANCE &&
+        blendeRight <= left + CORNER_BLENDE_EDGE_TOLERANCE
+      ) {
+        left = Math.min(left, blendeLeft);
+      }
+
+      if (
+        blendeLeft >= right - CORNER_BLENDE_EDGE_TOLERANCE &&
+        blendeLeft <= right + CORNER_BLENDE_EDGE_TOLERANCE
+      ) {
+        right = Math.max(right, blendeRight);
+      }
+    });
+
+    const nextLeft = roundHotspotPercent(left);
+    const nextWidth = roundHotspotPercent(right - left);
+    if (nextLeft === definition.left && nextWidth === definition.width) {
+      return definition;
+    }
+
+    return {
+      ...definition,
+      left: nextLeft,
+      width: nextWidth,
+    };
+  });
 }
 
 // Base hotspots are measured from the door top down to the cabinet bottom, which sits above
@@ -470,9 +648,11 @@ export default function KitchenSvgStage({
   );
   const imageHotspots = useMemo(() => {
     const definitions = withBasePlinthExtension(
-      withDerivedSinkFaucet(
-        IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
-        kitchenConfig.components,
+      withCornerBlendeExtensions(
+        withDerivedSinkFaucet(
+          IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
+          kitchenConfig.components,
+        ),
       ),
     );
     if (!definitions.length) return [];

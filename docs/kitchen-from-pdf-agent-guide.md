@@ -212,6 +212,18 @@ From the output build a box per visible component (`left`, `top`, `width`, `heig
 - Narrow side blende / side-panel strips: add an extra locked `worktop` hotspot on the actual
   cabinet side line. Keep it very narrow (`width` about `0.42%`-`0.45%`, like `ab-105841`),
   and do not cover the full gap between the fridge/tall wall and the base run.
+- Corner blende rule (mandatory): whenever a cabinet sits at the left or right outside corner of
+  the kitchen run and a Blende/side filler is drawn directly beside it, the Blende must be part of
+  that cabinet's hotspot. Do **not** leave the Blende as an unselected strip, and do not create a
+  separate selectable component for it. Move the cabinet hotspot's `left` edge outward for a
+  left-corner Blende, or increase its `width` to the outside edge for a right-corner Blende. Apply
+  this to both wall cabinets and base cabinets, whether the cabinet is locked/default or selectable.
+  If the locked worktop runs over the Blende, extend the worktop hotspot to the same outside edge.
+  The renderer also runs `withCornerBlendeExtensions` in `kitchen-svg-stage.jsx` for very narrow
+  vertical `worktop` side strips, but still measure the source hotspot correctly here so overlays,
+  JSON verification files, and screenshots all agree.
+  Examples: in `ab-105826`, the right Blende is included in the rightmost wall cabinet and locked
+  `sink-base`; in `ab-105827`, the left Blende is included in `wall-cabinet-1` and `base-module-1`.
 - Fridge / tall unit: detect its own left/right/top/bottom (it sits left of the run).
 
 ### Step 3 — Map Excel rows → components
@@ -352,6 +364,10 @@ flagged to the user).
 - [ ] Hotspots detected and **overlay-verified** (boxes hug the linework).
 - [ ] Narrow side blende / side-panel strips included when drawn: extra locked `worktop`
       hotspot, about `0.42%`-`0.45%` wide, aligned to the actual cabinet side line.
+- [ ] Corner Blende rule checked on both left and right outside edges: every Blende directly next
+      to a corner wall/base cabinet is included in that adjacent cabinet's hotspot, not left as an
+      unselected strip. This includes selectable cabinets and locked/default cabinets. The locked
+      worktop reaches the same outside edge when it runs over the Blende.
 - [ ] All Excel rows seeded; identical items **reuse** existing codes, differing ones get new codes.
 - [ ] Standard accessory + service rows included; `DEFAULT` items `isLocked`; hidden hood `isActive:false`.
 - [ ] Kitchen registered in `DEFAULT_KITCHENS` + a `DEFAULT_KITCHEN_CONTRACTS` entry.

@@ -77,6 +77,7 @@ const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
 };
 
 const DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG = {
+  "ab-105835": ["oven-module", "worktop", "sink-base", "sink-faucet"],
   "l-shaped-kitchen": ["worktop", "oven-base", "corner-base"],
 };
 

@@ -143,6 +143,31 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105822-H6002-1": "10",
   "CAB-WALL-AB105822-H6002-2": "11",
   "CAB-WALL-AB105822-H6002-3": "12",
+  "CAB-BASE-AB105826-US60-R": "5",
+  "CAB-BASE-AB105826-US60-L": "6",
+  "CAB-WALL-AB105826-H6002-R": "8",
+  "CAB-WALL-AB105826-H6002-L1": "10",
+  "CAB-WALL-AB105826-H6002-L2": "11",
+  "CAB-WALL-AB105826-H6002-L3": "12",
+  "CAB-BASE-AB105827-FILLER-500": "4",
+  "CAB-WALL-AB105827-FILLER-500": "7",
+  "CAB-BASE-AB105835-US60-R": "4",
+  "CAB-BASE-AB105835-US60-L1": "5",
+  "CAB-BASE-AB105835-US60-L2": "7",
+  "CAB-WALL-AB105835-H6002-R": "9",
+  "CAB-WALL-AB105835-H6002-L": "11",
+  "CAB-WALL-AB105835-H6002-R2": "12",
+  "CAB-WALL-AB105835-H6002-R3": "13",
+  "CAB-WALL-AB105835-H6002-L2": "14",
+  "CAB-BASE-AB105836-US60-R": "5",
+  "CAB-BASE-AB105836-US60-L": "6",
+  "CAB-BASE-AB105836-FILLER-500": "7",
+  "DISH-AB105836-600": "8",
+  "CAB-WALL-AB105836-H6002-R": "9",
+  "CAB-WALL-AB105836-H6002-L1": "11",
+  "CAB-WALL-AB105836-FILLER-500": "12",
+  "CAB-WALL-AB105836-H6002-L2": "13",
+  "CAB-WALL-AB105836-H6002-L3": "14",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -220,6 +245,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
     case "DISH-AB105822-600":
+    case "DISH-AB105836-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
@@ -357,6 +383,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
     case "DISH-AB105822-600":
+    case "DISH-AB105836-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "T3D-DISH-001":
@@ -416,6 +443,10 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105821": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105822": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105826": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105827": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-105835": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105836": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105841": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105811": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
@@ -681,6 +712,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105819-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105821-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105822-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105836-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
