@@ -1,0 +1,20 @@
+[
+  { "name": "refrigerator", "left": 0.84, "top": 31.85, "width": 12.84, "height": 42.87 },
+  { "name": "worktop-side-left", "left": 13.23, "top": 54.78, "width": 0.45, "height": 23.94 },
+  { "name": "wall-cabinet-1", "left": 13.95, "top": 22.26, "width": 10.65, "height": 18.75 },
+  { "name": "wall-cabinet-2", "left": 24.73, "top": 22.26, "width": 11.06, "height": 18.75 },
+  { "name": "extractor-hood", "left": 24.73, "top": 41.07, "width": 11.06, "height": 7.05 },
+  { "name": "wall-cabinet-3", "left": 35.79, "top": 22.26, "width": 11.05, "height": 18.75 },
+  { "name": "worktop-left", "left": 13.68, "top": 54.78, "width": 35.96, "height": 1.05 },
+  { "name": "base-module-1", "left": 13.68, "top": 55.83, "width": 11.04, "height": 22.89 },
+  { "name": "oven-module", "left": 24.73, "top": 55.83, "width": 11.06, "height": 22.89 },
+  { "name": "base-module-2", "left": 35.79, "top": 55.83, "width": 11.05, "height": 22.89 },
+  { "name": "wall-cabinet-4", "left": 63.66, "top": 22.9, "width": 10.55, "height": 18.75 },
+  { "name": "wall-cabinet-5", "left": 74.21, "top": 22.9, "width": 11.06, "height": 18.75 },
+  { "name": "wall-cabinet-6", "left": 85.27, "top": 22.9, "width": 11.05, "height": 18.75 },
+  { "name": "worktop-right", "left": 63.66, "top": 54.78, "width": 33.37, "height": 1.05 },
+  { "name": "sink-faucet", "left": 78.5, "top": 48.0, "width": 4.85, "height": 8 },
+  { "name": "base-module-3", "left": 63.66, "top": 55.83, "width": 10.55, "height": 22.89 },
+  { "name": "sink-base", "left": 74.21, "top": 55.83, "width": 11.06, "height": 22.89 },
+  { "name": "drawer-module", "left": 85.27, "top": 55.83, "width": 11.76, "height": 22.89 }
+]
