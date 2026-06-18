@@ -175,6 +175,15 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105836-FILLER-500": "12",
   "CAB-WALL-AB105836-H6002-L2": "13",
   "CAB-WALL-AB105836-H6002-L3": "14",
+  "CAB-BASE-AB105842-US60-R": "5",
+  "CAB-BASE-AB105842-US60-L": "6",
+  "CAB-BASE-AB105842-FILLER-500": "7",
+  "DISH-AB105842-600": "8",
+  "CAB-WALL-AB105842-H6002-R": "9",
+  "CAB-WALL-AB105842-H6002-L1": "11",
+  "CAB-WALL-AB105842-FILLER-500": "12",
+  "CAB-WALL-AB105842-H6002-L2": "13",
+  "CAB-WALL-AB105842-H6002-L3": "14",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -254,6 +263,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "DISH-AB105822-600":
     case "DISH-AB105833-600":
     case "DISH-AB105836-600":
+    case "DISH-AB105842-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
@@ -393,6 +403,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105822-600":
     case "DISH-AB105833-600":
     case "DISH-AB105836-600":
+    case "DISH-AB105842-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "T3D-DISH-001":
@@ -457,6 +468,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105827": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105835": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105836": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105842": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105841": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105811": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
@@ -728,6 +740,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105822-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105833-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105836-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105842-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
