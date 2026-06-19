@@ -95,8 +95,8 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-3", left: 38.86, top: 15.89, width: 14.12, height: 24.09 },
     { componentKey: "wall-cabinet-4", left: 52.98, top: 15.89, width: 14.12, height: 24.09 },
     { componentKey: "wall-cabinet-5", left: 67.1, top: 15.89, width: 14.13, height: 24.09 },
-    { componentKey: "wall-cabinet-6", left: 81.23, top: 15.89, width: 14.12, height: 24.09 },
-    { componentKey: "worktop", left: 17.67, top: 57.46, width: 77.68, height: 1.35 },
+    { componentKey: "wall-cabinet-6", left: 81.23, top: 15.89, width: 15.07, height: 24.09 },
+    { componentKey: "worktop", left: 17.67, top: 57.46, width: 78.63, height: 1.35 },
     { componentKey: "worktop", left: 17.2, top: 57.42, width: 0.45, height: 30.64 },
     { componentKey: "sink-faucet", left: 68.85, top: 50.73, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.65, top: 57.42, width: 7.07, height: 30.64 },
@@ -104,7 +104,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-2", left: 38.86, top: 57.42, width: 14.12, height: 30.64 },
     { componentKey: "base-module-3", left: 52.98, top: 57.42, width: 14.12, height: 30.64 },
     { componentKey: "sink-base", left: 67.1, top: 57.42, width: 14.13, height: 30.64 },
-    { componentKey: "drawer-module", left: 81.23, top: 57.42, width: 14.12, height: 30.64 },
+    { componentKey: "drawer-module", left: 81.23, top: 57.42, width: 15.07, height: 30.64 },
   ],
   "ab-105810": [
     { componentKey: "refrigerator", left: 3.9, top: 27.88, width: 12.97, height: 59.48 },
@@ -271,7 +271,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "drawer-module", left: 85.27, top: 55.83, width: 11.76, height: 22.89, preserveManualSize: true },
   ],
   "ab-105842": [
-    { componentKey: "refrigerator", left: 0.67, top: 31.79, width: 12.04, height: 46.93, preserveManualSize: true },
+    { componentKey: "refrigerator", left: 3.27, top: 33.29, width: 10.04, height: 44.93, preserveManualSize: true },
     { componentKey: "worktop", left: 14.62, top: 55.55, width: 0.27, height: 22.99, preserveManualSize: true },
     { componentKey: "wall-cabinet-1", left: 14.89, top: 24.29, width: 10.62, height: 18.11 },
     { componentKey: "wall-cabinet-2", left: 25.51, top: 24.25, width: 10.62, height: 18.11 },
@@ -285,7 +285,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 75.32, top: 24.25, width: 10.62, height: 18.11 },
     { componentKey: "wall-cabinet-6", left: 85.94, top: 24.25, width: 11.13, height: 18.11 },
     { componentKey: "worktop", left: 65.15, top: 55.55, width: 31.92, height: 1.01 },
-    { componentKey: "sink-faucet", left: 80.6, top: 48.0, width: 4.85, height: 8, preserveManualSize: true },
+    { componentKey: "sink-faucet", left: 80.6, top: 49.0, width: 3.85, height: 7, preserveManualSize: true },
     { componentKey: "base-module-3", left: 65.15, top: 56.56, width: 10.17, height: 21.98, preserveManualSize: true },
     { componentKey: "sink-base", left: 75.32, top: 56.56, width: 10.62, height: 21.98, preserveManualSize: true },
     { componentKey: "drawer-module", left: 85.94, top: 56.56, width: 11.13, height: 21.98, preserveManualSize: true },
@@ -434,6 +434,12 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
   "ab-105833": {
     bottomPadding: 4,
     bottomLimit: 84,
+  },
+  "ab-105842": {
+    bottomPadding: 4.8,
+  },
+  "ab-105836": {
+    bottomPadding: 4.8,
   },
 };
 
