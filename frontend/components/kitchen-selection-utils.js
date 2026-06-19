@@ -197,6 +197,12 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105834-500-R": "9",
   "CAB-WALL-AB105834-H6002-L1": "11",
   "CAB-WALL-AB105834-H6002-L2": "12",
+  "CAB-BASE-AB105837-US60-R1": "5",
+  "CAB-BASE-AB105837-500-L": "6",
+  "DISH-AB105837-600": "7",
+  "CAB-BASE-AB105837-US60-R2": "8",
+  "CAB-HOOD-AB105837-600": "9",
+  "CAB-BASE-AB105837-US60-L": "10",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -234,6 +240,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "CAB-HOOD-B-600":
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
+    case "CAB-HOOD-AB105837-600":
       return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
@@ -252,6 +259,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "HOOD-B-FH664621E":
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
+    case "HOOD-AB105837-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
       return translate("configurator.catalogItemNames.chimneyExtractorHood", "Chimney extractor hood");
@@ -278,6 +286,7 @@ export function getLocalizedItemName(item, translate, language = "en") {
     case "DISH-AB105836-600":
     case "DISH-AB105842-600":
     case "DISH-AB105834-600":
+    case "DISH-AB105837-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
@@ -385,10 +394,12 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-HOOD-B-600":
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
+    case "CAB-HOOD-AB105837-600":
       return translate("configurator.catalogItemInfo.lightHoodSetup", "HD6002, light hood setup");
     case "HOOD-B-FH664621E":
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
+    case "HOOD-AB105837-FH664621E":
     case "T3D-HOOD-001":
       return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
     case "HOOD-C-FH664621E":
@@ -419,6 +430,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105836-600":
     case "DISH-AB105842-600":
     case "DISH-AB105834-600":
+    case "DISH-AB105837-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "T3D-DISH-001":
@@ -472,6 +484,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105809": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105834": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105810": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105814": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -759,6 +772,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105836-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105842-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105834-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
+  "DISH-AB105837-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.png`),
@@ -772,6 +786,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "HOOD-LS-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-AB105806-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-AB105807-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "HOOD-AB105837-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
+  "CAB-HOOD-AB105837-600": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
