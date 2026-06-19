@@ -512,6 +512,29 @@ const AB_105812_ITEMS = AB_105820_ITEMS;
 // AB 105808 shares AB 105820's Excel rows (same appliances/cabinets, fridge-left layout).
 const AB_105808_ITEMS = AB_105820_ITEMS;
 
+// AB 105809: L-shaped isometric plan (callouts 1-12).
+const AB_105809_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator", price: "579.00", widthMm: 710, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-400-R", name: "Base cabinet with drawer", price: "0.01", widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 20, infoText: "Base cabinet, hinge right", articleNumber: "NUK E KEMI-Unterschrank" },
+  { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 30, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-500-L", name: "Base cabinet with drawer", price: "0.01", widthMm: 500, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "NUK E KEMI-Unterschrank" },
+  { itemType: ItemType.COMPONENT, code: "CORNER-AB105809-650", name: "Corner filler", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "corner-base", sortOrder: 45, isLocked: true, infoText: "Corner filler for base cabinets, 90 degrees", articleNumber: "UPEF65" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Fully integrated dishwasher incl. furniture front", price: "579.00", widthMm: 600, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105809-US30", name: "Sink Base Cabinet", price: "0.00", widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 60, infoText: "US30 sink base cabinet, hinge left", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 75, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105809-FILLER", name: "Wall Cabinet", price: "0.01", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "Wall cabinet filler", articleNumber: "NUK E KEMI-Oberschrank" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105809-500-L", name: "Wall Cabinet", price: "0.01", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "Wall cabinet, hinge left", articleNumber: "NUK E KEMI-Oberschrank" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105809-H6002-L", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 140, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220, articleNumber: "KA220043_S3" },
+  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
 // AB 105816 matches AB 105820 except callout 11 is an H6002 with left hinge.
 const AB_105816_ITEMS = AB_105820_ITEMS.map((item) =>
   item.code === "CAB-WALL-AB105820-H6002"
@@ -754,6 +777,13 @@ const DEFAULT_KITCHENS = [
     name: "AB 105808 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105808_page-0001.jpg",
     items: AB_105808_ITEMS,
+  },
+  {
+    slug: "ab-105809",
+    kitchenCode: "105 809",
+    name: "AB 105809 Kitchen",
+    description: "Kitchen configuration based on frontend/public/plans/AB 105809.svg",
+    items: AB_105809_ITEMS,
   },
   {
     slug: "ab-105810",

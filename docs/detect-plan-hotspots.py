@@ -17,6 +17,7 @@ map in components/kitchen-svg-stage.jsx expects (left/top/width/height in %).
 
 The optional --overlay step draws a JSON list of boxes back onto the image so you can
 eyeball the fit. boxes.json format: [{"name","left","top","width","height"}, ...] in %.
+Polygon hotspots are also supported with {"name","points": [[x, y], ...]} in %.
 """
 import sys
 import json
@@ -72,10 +73,16 @@ def overlay(path, boxes_json, out_png):
     W, H = img.size
     d = ImageDraw.Draw(img, "RGBA")
     for b in boxes:
-        x0, y0 = b["left"] / 100 * W, b["top"] / 100 * H
-        x1 = (b["left"] + b["width"]) / 100 * W
-        y1 = (b["top"] + b["height"]) / 100 * H
-        d.rectangle([x0, y0, x1, y1], outline=(214, 40, 40, 255), width=5)
+        if b.get("points"):
+            points = [(x / 100 * W, y / 100 * H) for x, y in b["points"]]
+            d.line(points + [points[0]], fill=(214, 40, 40, 255), width=5, joint="curve")
+            x0 = min(x for x, _ in points)
+            y0 = min(y for _, y in points)
+        else:
+            x0, y0 = b["left"] / 100 * W, b["top"] / 100 * H
+            x1 = (b["left"] + b["width"]) / 100 * W
+            y1 = (b["top"] + b["height"]) / 100 * H
+            d.rectangle([x0, y0, x1, y1], outline=(214, 40, 40, 255), width=5)
         name = b.get("name", b.get("componentKey", ""))
         if name:
             d.rectangle([x0, y0, x0 + 110, y0 + 26], fill=(214, 40, 40, 220))

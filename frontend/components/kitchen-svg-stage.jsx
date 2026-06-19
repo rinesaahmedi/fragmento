@@ -26,6 +26,9 @@ const IMAGE_VIEW_BY_SLUG = {
   "ab-105806": "/plans/AB%20105806.svg",
   "ab-105807": "/plans/AB%20105807.svg",
   "ab-105808": "/plans/AB%20105808.svg",
+  // JPG (not SVG) so the stage matches the PDF/hotspot render 1:1 — the PDF-derived SVG
+  // can look different in some browsers when loaded as <img>.
+  "ab-105809": "/jpg/AB%20105809_page-0001.jpg",
   "ab-105810": "/plans/AB%20105810.svg",
   "ab-105812": "/plans/AB%20105812.svg",
   "ab-105814": "/plans/AB%20105814.svg",
@@ -86,6 +89,69 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-3", left: 36.63, top: 63.63, width: 15.68, height: 32.5 },
     { componentKey: "oven-module", left: 52.31, top: 63.63, width: 16.1, height: 32.5 },
     { componentKey: "refrigerator", left: 71.37, top: 29.54, width: 14.55, height: 66.59 },
+  ],
+  "ab-105809": [
+    {
+      componentKey: "refrigerator",
+      points: [[11.54, 29.71], [21.35, 26.82], [27.74, 31.97], [27.74, 80.87], [17.95, 83.76], [11.54, 78.61]],
+    },
+    {
+      componentKey: "wall-cabinet-1",
+      points: [[24.89, 17.11], [31.95, 15.03], [35.48, 17.85], [35.48, 37.66], [28.42, 39.73], [24.89, 29.7]],
+    },
+    {
+      componentKey: "wall-cabinet-2",
+      points: [[31.95, 15.03], [42.54, 11.9], [46.06, 14.76], [46.06, 34.55], [35.48, 37.66], [35.48, 17.85]],
+    },
+    {
+      componentKey: "extractor-hood",
+      points: [[35.48, 34.55], [46.06, 31.43], [46.06, 35.8], [35.48, 41.75]],
+    },
+    {
+      componentKey: "wall-cabinet-3",
+      points: [[42.54, 11.9], [51.37, 9.33], [54.88, 12.15], [54.88, 31.95], [46.06, 34.55], [46.06, 14.76]],
+    },
+    {
+      componentKey: "wall-cabinet-4",
+      points: [[51.37, 9.33], [60.65, 6.59], [64.89, 9.08], [64.89, 29.01], [54.88, 31.95], [54.88, 12.15]],
+    },
+    {
+      componentKey: "worktop",
+      points: [[27.74, 48.69], [50.05, 42.12], [56.45, 47.28], [28.74, 55.43]],
+    },
+    {
+      componentKey: "worktop",
+      points: [[50.05, 42.12], [60.65, 39.01], [73.03, 48.99], [73.03, 60.61], [56.45, 47.28]],
+    },
+    {
+      componentKey: "base-module-1",
+      points: [[29.03, 56.44], [36.08, 54.35], [36.08, 78.42], [29.03, 80.5]],
+    },
+    {
+      componentKey: "oven-module",
+      points: [[36.08, 54.35], [46.66, 51.26], [46.66, 75.29], [36.08, 78.42]],
+    },
+    {
+      componentKey: "base-module-2",
+      points: [[46.66, 51.26], [55.49, 48.66], [55.49, 72.71], [46.66, 75.29]],
+    },
+    {
+      componentKey: "corner-base",
+      points: [[55.49, 48.66], [62.85, 53.51], [62.85, 73.31], [56.45, 72.4], [56.45, 48.37]],
+    },
+    {
+      componentKey: "base-module-3",
+      points: [[62.85, 53.51], [69.25, 58.67], [69.25, 82.72], [62.85, 77.58]],
+    },
+    {
+      componentKey: "sink-base",
+      points: [[69.25, 58.67], [83.61, 57.51], [83.61, 82.66], [73.03, 85.76], [69.25, 82.72]],
+    },
+    {
+      componentKey: "sink-faucet",
+      points: [[56.98, 40.97], [74.88, 40.97], [74.88, 54.22], [56.98, 54.22]],
+      preserveManualSize: true,
+    },
   ],
   "ab-105808": [
     { componentKey: "refrigerator", left: 3.31, top: 28.08, width: 13.08, height: 59.98 },
@@ -419,6 +485,7 @@ const CORNER_BLENDE_EDGE_TOLERANCE = 1.2;
 const CORNER_BLENDE_VERTICAL_TOLERANCE = 0.35;
 const BASE_PLINTH_EXTENSION_DISABLED_SLUGS = new Set([
   "ab-105808",
+  "ab-105809",
   "ab-105810",
   "ab-105812",
   "ab-105816",
@@ -444,6 +511,9 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
 };
 
 function isBaseBodyHotspot(definition) {
+  if (Array.isArray(definition.points) && definition.points.length) {
+    return false;
+  }
   if (definition.preserveManualSize) {
     return false;
   }
@@ -476,6 +546,9 @@ function isCornerBlendeHotspot(definition) {
 }
 
 function canExtendToCornerBlende(definition) {
+  if (Array.isArray(definition.points) && definition.points.length) {
+    return false;
+  }
   if (definition.preserveManualSize) {
     return false;
   }
@@ -488,6 +561,56 @@ function canExtendToCornerBlende(definition) {
 
 function roundHotspotPercent(value) {
   return Math.round(value * 100) / 100;
+}
+
+function getHotspotSourceBounds(definition) {
+  const points = Array.isArray(definition.points) ? definition.points : [];
+  if (points.length) {
+    const xs = points.map((point) => Number(point[0])).filter(Number.isFinite);
+    const ys = points.map((point) => Number(point[1])).filter(Number.isFinite);
+    if (xs.length && ys.length) {
+      const left = Math.min(...xs);
+      const top = Math.min(...ys);
+      const right = Math.max(...xs);
+      const bottom = Math.max(...ys);
+      return {
+        left,
+        top,
+        right,
+        bottom,
+        width: Math.max(right - left, 0),
+        height: Math.max(bottom - top, 0),
+      };
+    }
+  }
+
+  const left = Number(definition.left || 0);
+  const top = Number(definition.top || 0);
+  const width = Number(definition.width || 0);
+  const height = Number(definition.height || 0);
+  return {
+    left,
+    top,
+    right: left + width,
+    bottom: top + height,
+    width,
+    height,
+  };
+}
+
+function withHotspotSourceBounds(definition) {
+  if (!Array.isArray(definition.points) || !definition.points.length) {
+    return definition;
+  }
+
+  const bounds = getHotspotSourceBounds(definition);
+  return {
+    ...definition,
+    left: roundHotspotPercent(bounds.left),
+    top: roundHotspotPercent(bounds.top),
+    width: roundHotspotPercent(bounds.width),
+    height: roundHotspotPercent(bounds.height),
+  };
 }
 
 function verticallyOverlapsCornerBlende(definition, blende) {
@@ -597,12 +720,15 @@ function getPlanDisplayCrop(hotspots, slug) {
   }
 
   const bounds = hotspots.reduce(
-    (current, hotspot) => ({
-      left: Math.min(current.left, hotspot.left),
-      top: Math.min(current.top, hotspot.top),
-      right: Math.max(current.right, hotspot.left + hotspot.width),
-      bottom: Math.max(current.bottom, hotspot.top + hotspot.height),
-    }),
+    (current, hotspot) => {
+      const hotspotBounds = getHotspotSourceBounds(hotspot);
+      return {
+        left: Math.min(current.left, hotspotBounds.left),
+        top: Math.min(current.top, hotspotBounds.top),
+        right: Math.max(current.right, hotspotBounds.right),
+        bottom: Math.max(current.bottom, hotspotBounds.bottom),
+      };
+    },
     { left: 100, top: 100, right: 0, bottom: 0 },
   );
 
@@ -632,6 +758,42 @@ function getPlanDisplayCrop(hotspots, slug) {
 }
 
 function cropPlanHotspot(hotspot, crop) {
+  const points = Array.isArray(hotspot.points) ? hotspot.points : [];
+  if (points.length) {
+    const croppedPoints = points.map((point) => [
+      (Number(point[0]) - crop.left) / crop.width * 100,
+      (Number(point[1]) - crop.top) / crop.height * 100,
+    ]);
+    const xs = croppedPoints.map((point) => point[0]).filter(Number.isFinite);
+    const ys = croppedPoints.map((point) => point[1]).filter(Number.isFinite);
+    if (!xs.length || !ys.length) {
+      return { ...hotspot, left: 0, top: 0, width: 0, height: 0 };
+    }
+
+    const left = Math.min(...xs);
+    const top = Math.min(...ys);
+    const right = Math.max(...xs);
+    const bottom = Math.max(...ys);
+    const width = Math.max(right - left, 0);
+    const height = Math.max(bottom - top, 0);
+    const clipPathPoints = croppedPoints
+      .map(([x, y]) => {
+        const localX = width > 0 ? (x - left) / width * 100 : 0;
+        const localY = height > 0 ? (y - top) / height * 100 : 0;
+        return `${roundHotspotPercent(localX)}% ${roundHotspotPercent(localY)}%`;
+      })
+      .join(", ");
+
+    return {
+      ...hotspot,
+      left,
+      top,
+      width,
+      height,
+      clipPath: `polygon(${clipPathPoints})`,
+    };
+  }
+
   const left = Math.max(hotspot.left, crop.left);
   const top = Math.max(hotspot.top, crop.top);
   const right = Math.min(hotspot.left + hotspot.width, crop.right);
@@ -717,10 +879,12 @@ export default function KitchenSvgStage({
     [kitchenConfig.components, kitchenSlug],
   );
   const imageHotspots = useMemo(() => {
+    const sourceDefinitions = (IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [])
+      .map(withHotspotSourceBounds);
     const definitions = withBasePlinthExtension(
       withCornerBlendeExtensions(
         withDerivedSinkFaucet(
-          IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
+          sourceDefinitions,
           kitchenConfig.components,
         ),
       ),
@@ -949,6 +1113,17 @@ export default function KitchenSvgStage({
                       const isSelected =
                         isLocked || linkedIds.some((linkedId) => selectedComponentIds.includes(linkedId));
                       const isGroupHovered = hoveredLinkedGroup.includes(hotspot.componentId);
+                      const hotspotStyle = {
+                        left: `${hotspot.left}%`,
+                        top: `${hotspot.top}%`,
+                        width: `${hotspot.width}%`,
+                        height: `${hotspot.height}%`,
+                      };
+                      if (hotspot.clipPath) {
+                        hotspotStyle.clipPath = hotspot.clipPath;
+                        hotspotStyle.WebkitClipPath = hotspot.clipPath;
+                        hotspotStyle.borderRadius = 0;
+                      }
                       return (
                         <button
                           key={`${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
@@ -962,12 +1137,7 @@ export default function KitchenSvgStage({
                           ]
                             .filter(Boolean)
                             .join(" ")}
-                          style={{
-                            left: `${hotspot.left}%`,
-                            top: `${hotspot.top}%`,
-                            width: `${hotspot.width}%`,
-                            height: `${hotspot.height}%`,
-                          }}
+                          style={hotspotStyle}
                           aria-pressed={isSelected}
                           aria-label={hotspot.label}
                           title={`${hotspot.componentKey} — left:${hotspot.left} top:${hotspot.top} width:${hotspot.width} height:${hotspot.height}`}
