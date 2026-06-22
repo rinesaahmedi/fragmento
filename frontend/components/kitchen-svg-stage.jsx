@@ -1,8 +1,8 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
-import Kitchen3DViewer from "./Kitchen3DViewer";
 import {
   componentIdForItem,
   componentIdForKey,
@@ -18,6 +18,15 @@ import {
   refreshKitchenPlanSelection,
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
+
+const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
+  ssr: false,
+  loading: () => (
+    <div className={styles.viewerLoading} role="status" aria-live="polite">
+      Loading 3D preview…
+    </div>
+  ),
+});
 
 // Vector plans (rendered from the source PDFs via docs/render-plan-svg.py) so the drawing
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged

@@ -279,6 +279,8 @@ function CatalogItem({
                     src={tooltipPreviewSrc}
                     alt=""
                     className={styles.itemInfoTooltipPreviewImage}
+                    loading="lazy"
+                    decoding="async"
                   />
                 </span>
               ) : null}
@@ -335,7 +337,7 @@ function CatalogItem({
                     onOpenProductAssistant({ ...item, name: productAssistantPublicName, productInfoDocuments });
                   }}
                 >
-                  <img src={PRODUCT_ASSISTANT_AVATAR_SRC} alt="" />
+                  <img src={PRODUCT_ASSISTANT_AVATAR_SRC} alt="" loading="lazy" decoding="async" />
                 </button>
               </span>
             </span>

@@ -5,7 +5,6 @@ import Link from "next/link";
 import KitchenCatalogPanel from "./kitchen-catalog-panel";
 import styles from "./kitchen-configurator.module.css";
 import KitchenOrderForm from "./public-kitchen-order-form";
-import { blobToBase64, generateOrderPdf } from "./kitchen-order-pdf";
 import KitchenSelectionSummary from "./kitchen-selection-summary";
 import {
   componentIdForItem,
@@ -1849,6 +1848,7 @@ function KitchenConfiguratorContent({
     setStatusTone("idle");
 
     try {
+      const { blobToBase64, generateOrderPdf } = await import("./kitchen-order-pdf");
       const paymentMethod = customer.paymentMethod || "card";
       const pdfOrderComponents = selectedComponents.map(buildOrderSubmissionItem);
       const pdfOrderAccessories = selectedAccessories.map(buildOrderSubmissionItem);
@@ -2146,6 +2146,7 @@ function KitchenConfiguratorContent({
                   src={activeProductPhotos.images[activeProductPhotos.index]}
                   alt={activeProductPhotos.title}
                   className={styles.productPhotoImage}
+                  decoding="async"
                 />
                 <button
                   type="button"

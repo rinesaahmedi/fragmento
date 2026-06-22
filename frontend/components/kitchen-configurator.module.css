@@ -245,6 +245,16 @@
   padding: 18px;
 }
 
+.viewerLoading {
+  display: grid;
+  min-height: 520px;
+  place-items: center;
+  border-radius: 8px;
+  background: #182229;
+  color: #ddfff0;
+  font-weight: 700;
+}
+
 .svgCard {
   position: relative;
   border-radius: 18px;
