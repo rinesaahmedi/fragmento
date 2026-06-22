@@ -300,13 +300,15 @@ export default function Kitchen3DViewer({
     <div className={styles.viewer3dCard}>
       <Canvas
         orthographic
+        frameloop="demand"
         camera={{
           position: [300, 230, 300],
           zoom: 2.45,
           near: -2000,
           far: 2000,
         }}
-        dpr={[1, 2]}
+        dpr={[1, 1.5]}
+        gl={{ powerPreference: "high-performance" }}
       >
         <color attach="background" args={["#182229"]} />
         <ambientLight intensity={0.9} />

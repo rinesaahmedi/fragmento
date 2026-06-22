@@ -428,7 +428,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
           {screen === "video" ? (
             <div style={contentAreaStyle}>
               <div style={videoFrameStyle}>
-                <video key={avatarSource} controls style={videoStyle}>
+                <video key={avatarSource} controls playsInline preload="metadata" style={videoStyle}>
                   <source src={avatarSource} type="video/mp4" />
                 </video>
               </div>
