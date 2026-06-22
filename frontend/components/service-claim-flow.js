@@ -1885,7 +1885,7 @@ function ServiceVideoGuide({ isOpen, copy, onClose, onFinish }) {
           controls
           autoPlay
           playsInline
-          preload="auto"
+          preload="metadata"
           onCanPlay={() => {
             const video = videoRef.current;
             if (!video || !video.paused) return;
