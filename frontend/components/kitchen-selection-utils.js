@@ -197,12 +197,12 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105834-500-R": "9",
   "CAB-WALL-AB105834-H6002-L1": "11",
   "CAB-WALL-AB105834-H6002-L2": "12",
-  "CAB-BASE-AB105837-US60-R1": "5",
-  "CAB-BASE-AB105837-500-L": "6",
+  "CAB-BASE-AB105837-US60-1": "5",
+  "CAB-BASE-AB105837-FILLER-500": "6",
   "DISH-AB105837-600": "7",
-  "CAB-BASE-AB105837-US60-R2": "8",
-  "CAB-HOOD-AB105837-600": "9",
-  "CAB-BASE-AB105837-US60-L": "10",
+  "CAB-WALL-AB105837-FILLER": "9",
+  "CAB-HOOD-AB105837-600": "10",
+  "CAB-WALL-AB105837-500-L": "11",
 };
 
 export function getLocalizedItemName(item, translate, language = "en") {
@@ -484,7 +484,6 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105809": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105834": [["component-wall-cabinet-2", "component-extractor-hood"]],
-  "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105810": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105814": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -493,6 +492,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105821": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105822": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105833": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105826": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105827": [["component-wall-cabinet-4", "component-extractor-hood"]],
@@ -541,6 +541,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "DISH-AB105833-600": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
+  "DISH-AB105837-600": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
@@ -593,6 +597,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
   "HOOD-AB105807-FH664621E": [
+    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+  ],
+  "HOOD-AB105837-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
   ],
@@ -787,7 +795,6 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "HOOD-AB105806-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-AB105807-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-AB105837-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
-  "CAB-HOOD-AB105837-600": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.png"],
   "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.png`),
