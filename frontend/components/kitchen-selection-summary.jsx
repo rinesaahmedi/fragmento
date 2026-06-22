@@ -4,6 +4,7 @@ import { useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import {
   formatCurrency,
+  getCatalogItemDetails,
   getLocalizedItemName,
   getProductInfoDocuments,
   getProductInfoHref,
@@ -37,6 +38,10 @@ function mergeStandardEquipmentItems(items) {
     id: `${sinkItem.id || "sink"}-with-${worktopItem.id || "worktop"}`,
     name: "Sink and Worktop",
     code: [sinkItem.code, worktopItem.code].filter(Boolean).join(" + "),
+    articleNumber: [sinkItem.articleNumber, worktopItem.articleNumber].filter(Boolean).join(" + "),
+    widthMm: worktopItem.widthMm ?? sinkItem.widthMm,
+    heightMm: worktopItem.heightMm ?? sinkItem.heightMm,
+    depthMm: worktopItem.depthMm ?? sinkItem.depthMm,
     price: Number(sinkItem.price || 0) + Number(worktopItem.price || 0),
   };
 
@@ -69,7 +74,8 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const { translate, language } = usePublicI18n();
   const price = getEffectiveSummaryPrice(item);
   const isLocked = item.isLocked || item.isOrderLocked;
-  const itemName = getLocalizedItemName(item, translate, language);
+  const itemName = getLocalizedItemName(item, translate, language, false);
+  const { articleNumber, dimensions: itemDimensions } = getCatalogItemDetails(item);
   const infoPdfHref = getProductInfoHref(item);
   const productInfoDocuments = getProductInfoDocuments(item);
   const priceClassName = [
@@ -81,20 +87,17 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const priceLabel = (isLocked && price <= 0)
     ? translate("configurator.summaryItemIncluded", "Included")
     : formatCurrency(price);
-  let metaLabel = translate("configurator.summaryItemStandard", "Standard equipment");
-  if (item.isOrderLocked) {
-    metaLabel = translate("configurator.summaryItemConfirmed", "Already confirmed");
-  } else if (!item.isLocked) {
-    metaLabel = translate("configurator.summaryItemSelected", "Selected");
-  } else if (price <= 0) {
-    metaLabel = translate("configurator.summaryItemInBaseModel", "Included in the base model");
-  }
 
   return (
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{itemName}</strong>
-        <span>{metaLabel}</span>
+        {articleNumber ? (
+          <span className={styles.itemCode}>
+            {translate("common.article", "Article")}: {articleNumber}
+          </span>
+        ) : null}
+        {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}
       </div>
       <strong className={priceClassName}>{priceLabel}</strong>
       {isLocked ? (

@@ -5,6 +5,7 @@ import {
   componentIdForItem,
   formatCurrency,
   getCatalogDisplayItem,
+  getCatalogItemDetails,
   getLocalizedItemInfoText,
   getLocalizedItemName,
   getProductImagePaths,
@@ -12,6 +13,7 @@ import {
   getProductInfoHref,
   isLinkedComponentSelected,
   shouldShowProductAssistantLauncher,
+  splitCatalogItemNameAndDimensions,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
 import {
@@ -128,45 +130,6 @@ function getTooltipDocumentLabels(item, translate) {
     .filter(Boolean);
 }
 
-function splitItemNameAndDimensions(name) {
-  const normalizedName = String(name || "").trim();
-  const dimensionsMatch = normalizedName.match(/\s*\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i);
-
-  if (!dimensionsMatch) {
-    return { title: normalizedName, dimensions: "" };
-  }
-
-  return {
-    title: normalizedName.replace(dimensionsMatch[0], "").replace(/\s+/g, " ").trim(),
-    dimensions: dimensionsMatch[1].replace(/\s*[x×]\s*/gi, " × "),
-  };
-}
-
-function getStructuredDimensions(item) {
-  const values = [item?.widthMm, item?.heightMm, item?.depthMm].filter(
-    (value) => value !== null && value !== undefined && value !== "",
-  );
-  if (!values.length) return "";
-  return `${values.join(" x ")} mm`;
-}
-
-function splitCatalogItemNameAndDimensions(name) {
-  const normalizedName = String(name || "").trim();
-  const dimensionValue = "(?:-|\\d+(?:[.,]\\d+)?)";
-  const dimensionsMatch = normalizedName.match(
-    new RegExp(`\\s*\\(\\s*(${dimensionValue}\\s*(?:x|\\u00d7)\\s*${dimensionValue}(?:\\s*(?:x|\\u00d7)\\s*${dimensionValue})?\\s*(?:mm|cm|m))\\s*\\)`, "i"),
-  );
-
-  if (!dimensionsMatch) {
-    return { title: normalizedName, dimensions: "" };
-  }
-
-  return {
-    title: normalizedName.replace(dimensionsMatch[0], "").replace(/\s+/g, " ").trim(),
-    dimensions: dimensionsMatch[1].replace(/\s*(?:x|\u00d7)\s*/gi, " x "),
-  };
-}
-
 function CatalogItem({
   item,
   selected,
@@ -186,7 +149,7 @@ function CatalogItem({
   const itemName = getLocalizedItemName(item, translate, language);
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
-  const itemDimensions = getStructuredDimensions(item) || itemDisplayName.dimensions;
+  const { dimensions: itemDimensions } = getCatalogItemDetails(item);
   const className = [
     styles.itemCard,
     compactIcon ? styles.itemCardCompact : "",

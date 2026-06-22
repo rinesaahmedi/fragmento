@@ -61,10 +61,42 @@ export function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
 }
 
-function getStructuredDimensions(item) {
-  const values = [item?.widthMm, item?.heightMm, item?.depthMm];
-  if (values.every((value) => value === null || value === undefined || value === "")) return "";
-  return `${values.map((value) => value ?? "-").join(" x ")} mm`;
+export function getStructuredDimensions(item) {
+  const values = [item?.widthMm, item?.heightMm, item?.depthMm].filter(
+    (value) => value !== null && value !== undefined && value !== "",
+  );
+  if (!values.length) return "";
+  if (item?.componentKey === "refrigerator") {
+    return `${values.map((value) => Number(value) / 10).join(" x ")} cm`;
+  }
+  return `${values.join(" x ")} mm`;
+}
+
+export function splitCatalogItemNameAndDimensions(name) {
+  const normalizedName = String(name || "").trim();
+  const dimensionValue = "(?:-|\\d+(?:[.,]\\d+)?)";
+  const dimensionsMatch = normalizedName.match(
+    new RegExp(
+      `\\s*\\(\\s*(${dimensionValue}\\s*(?:x|\\u00d7)\\s*${dimensionValue}(?:\\s*(?:x|\\u00d7)\\s*${dimensionValue})?\\s*(?:mm|cm|m))\\s*\\)`,
+      "i",
+    ),
+  );
+
+  if (!dimensionsMatch) {
+    return { title: normalizedName, dimensions: "" };
+  }
+
+  return {
+    title: normalizedName.replace(dimensionsMatch[0], "").replace(/\s+/g, " ").trim(),
+    dimensions: dimensionsMatch[1].replace(/\s*(?:x|\u00d7)\s*/gi, " x ").trim(),
+  };
+}
+
+export function getCatalogItemDetails(item) {
+  return {
+    articleNumber: String(item?.articleNumber || "").trim(),
+    dimensions: getStructuredDimensions(item),
+  };
 }
 
 // Element names must never carry dimensions (they are shown separately under the article as a
@@ -205,13 +237,15 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105837-500-L": "11",
 };
 
-export function getLocalizedItemName(item, translate, language = "en") {
+export function getLocalizedItemName(item, translate, language = "en", includeCalloutNumber = true) {
   const code = String(item?.code || "").trim().toUpperCase();
   const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
   const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
   const rawTitle = stripDimensionsFromName(rawName);
   const photoNumber = AB_105806_PHOTO_NUMBER_BY_CODE[code] || "";
-  const withPhotoNumber = (label) => (photoNumber ? `${photoNumber}. ${label}` : label);
+  const withPhotoNumber = (label) => (
+    includeCalloutNumber && photoNumber ? `${photoNumber}. ${label}` : label
+  );
   const withDimensions = (label) => {
     return withPhotoNumber(stripDimensionsFromName(label));
   };
