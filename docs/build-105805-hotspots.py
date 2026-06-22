@@ -1,0 +1,39 @@
+"""Build SVG-aligned hotspot polygons for AB 105805 (L-shaped isometric plan).
+
+AB 105805 is the same CAD drawing family as AB 105809; the only geometric difference is a
+~0.77% downward shift of the linework (measured via FFT phase correlation between the two
+3509x2480 renders: dx=-0.028%, dy=+0.766%). These polygons are AB 105809's measured boxes with
+that shift applied, then verified against frontend/public/jpg/AB 105805_page-0001.jpg.
+"""
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+OUT = ROOT / "frontend/public/hotspot-overlays/105805-boxes.json"
+
+boxes = [
+    {"componentKey": "refrigerator", "points": [[11.51, 30.48], [21.32, 27.59], [27.71, 32.74], [27.71, 81.64], [17.92, 84.53], [11.51, 79.38]]},
+    {"componentKey": "worktop", "points": [[27.71, 49.46], [28.71, 56.2], [29.0, 81.27], [27.71, 81.35]], "preserveManualSize": True},
+    {"componentKey": "wall-cabinet-1", "points": [[24.86, 17.88], [31.92, 15.8], [35.45, 18.62], [35.45, 38.43], [27.71, 40.5], [27.71, 32.74], [24.86, 30.47]]},
+    {"componentKey": "wall-cabinet-2", "points": [[31.92, 15.8], [42.51, 12.67], [46.03, 15.53], [46.03, 35.32], [35.45, 38.43], [35.45, 18.62]]},
+    {"componentKey": "extractor-hood", "points": [[35.45, 38.43], [46.03, 35.32], [46.03, 36.57], [35.45, 39.67]]},
+    {"componentKey": "wall-cabinet-3", "points": [[42.51, 12.67], [51.34, 10.1], [54.85, 12.92], [54.85, 32.72], [46.03, 35.32], [46.03, 15.53]]},
+    {"componentKey": "wall-cabinet-4", "points": [[51.34, 10.1], [60.62, 7.36], [64.86, 9.85], [64.86, 29.78], [54.85, 32.72], [54.85, 12.92]]},
+    {"componentKey": "worktop", "points": [[27.71, 49.46], [50.02, 42.89], [56.42, 48.05], [55.46, 49.43], [46.63, 52.03], [36.05, 55.12], [29.0, 57.21], [28.71, 56.2]]},
+    {"componentKey": "worktop", "points": [[50.02, 42.89], [60.62, 39.78], [83.58, 58.28], [73.0, 61.38], [69.22, 59.44], [62.82, 54.28], [55.46, 49.43], [56.42, 48.05]]},
+    {"componentKey": "base-module-1", "points": [[29.0, 57.21], [36.05, 55.12], [36.05, 79.19], [29.0, 81.27]]},
+    {"componentKey": "oven-module", "points": [[36.05, 55.12], [46.63, 52.03], [46.63, 76.06], [36.05, 79.19]]},
+    {"componentKey": "base-module-2", "points": [[46.63, 52.03], [55.46, 49.43], [56.42, 49.14], [56.42, 73.17], [55.46, 73.48], [46.63, 76.06]]},
+    {"componentKey": "corner-base", "points": [[56.42, 49.14], [62.82, 54.28], [62.82, 78.35], [56.42, 73.17]]},
+    {"componentKey": "base-module-3", "points": [[62.82, 54.28], [69.22, 59.44], [69.22, 83.49], [62.82, 78.35]]},
+    {"componentKey": "sink-base", "points": [[69.22, 59.44], [73.0, 61.38], [73.0, 86.53], [69.22, 83.49]]},
+    {"componentKey": "sink-base", "points": [[73.0, 62.22], [83.58, 59.12], [83.58, 83.43], [73.0, 86.53]], "preserveManualSize": True},
+    {"componentKey": "worktop", "points": [[73.0, 61.38], [83.58, 58.28], [83.58, 59.12], [73.0, 62.22]], "preserveManualSize": True},
+    {"componentKey": "sink-faucet", "left": 65.29, "top": 40.61, "width": 6.01, "height": 8.95, "preserveManualSize": True},
+]
+
+OUT.parent.mkdir(parents=True, exist_ok=True)
+OUT.write_text(json.dumps(boxes, indent=2) + "\n", encoding="utf-8")
+
+if __name__ == "__main__":
+    print(json.dumps(boxes, indent=2))

@@ -190,6 +190,8 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105809-FILLER": "9",
   "CAB-WALL-AB105809-500-L": "11",
   "CAB-WALL-AB105809-H6002-L": "12",
+  "SINKBASE-AB105805-US2A30": "8",
+  "CAB-WALL-AB105805-400-R": "9",
   "CAB-BASE-AB105834-500-R": "5",
   "CAB-BASE-AB105834-US60-L": "6",
   "CAB-BASE-AB105834-400-L": "7",
@@ -482,6 +484,7 @@ export function getLocalizedItemInfoText(item, translate) {
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105805": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105809": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105834": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],

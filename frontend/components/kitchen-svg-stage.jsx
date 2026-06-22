@@ -28,6 +28,7 @@ const IMAGE_VIEW_BY_SLUG = {
   "ab-105808": "/plans/AB%20105808.svg",
   // JPG (not SVG) so the stage matches the PDF/hotspot render 1:1 — the PDF-derived SVG
   // can look different in some browsers when loaded as <img>.
+  "ab-105805": "/jpg/AB%20105805_page-0001.jpg",
   "ab-105809": "/jpg/AB%20105809_page-0001.jpg",
   "ab-105834": "/jpg/AB%20105834_page-0001.jpg",
   "ab-105837": "/jpg/AB%20105837_page-0001.jpg",
@@ -91,6 +92,87 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-3", left: 36.63, top: 63.63, width: 15.68, height: 32.5 },
     { componentKey: "oven-module", left: 52.31, top: 63.63, width: 16.1, height: 32.5 },
     { componentKey: "refrigerator", left: 71.37, top: 29.54, width: 14.55, height: 66.59 },
+  ],
+  "ab-105805": [
+    {
+      componentKey: "refrigerator",
+      points: [[11.51, 30.48], [21.32, 27.59], [27.71, 32.74], [27.71, 81.64], [17.92, 84.53], [11.51, 79.38]],
+    },
+    {
+      componentKey: "worktop",
+      points: [[27.71, 49.46], [28.71, 56.2], [29.0, 81.27], [27.71, 81.35]],
+      preserveManualSize: true,
+    },
+    {
+      componentKey: "wall-cabinet-1",
+      points: [[24.86, 17.88], [31.92, 15.8], [35.45, 18.62], [35.45, 38.43], [27.71, 40.5], [27.71, 32.74], [24.86, 30.47]],
+    },
+    {
+      componentKey: "wall-cabinet-2",
+      points: [[31.92, 15.8], [42.51, 12.67], [46.03, 15.53], [46.03, 35.32], [35.45, 38.43], [35.45, 18.62]],
+    },
+    {
+      componentKey: "extractor-hood",
+      points: [[35.45, 38.43], [46.03, 35.32], [46.03, 36.57], [35.45, 39.67]],
+    },
+    {
+      componentKey: "wall-cabinet-3",
+      points: [[42.51, 12.67], [51.34, 10.1], [54.85, 12.92], [54.85, 32.72], [46.03, 35.32], [46.03, 15.53]],
+    },
+    {
+      componentKey: "wall-cabinet-4",
+      points: [[51.34, 10.1], [60.62, 7.36], [64.86, 9.85], [64.86, 29.78], [54.85, 32.72], [54.85, 12.92]],
+    },
+    {
+      componentKey: "worktop",
+      points: [[27.71, 49.46], [50.02, 42.89], [56.42, 48.05], [55.46, 49.43], [46.63, 52.03], [36.05, 55.12], [29.0, 57.21], [28.71, 56.2]],
+    },
+    {
+      componentKey: "worktop",
+      points: [[50.02, 42.89], [60.62, 39.78], [83.58, 58.28], [73.0, 61.38], [69.22, 59.44], [62.82, 54.28], [55.46, 49.43], [56.42, 48.05]],
+    },
+    {
+      componentKey: "base-module-1",
+      points: [[29.0, 57.21], [36.05, 55.12], [36.05, 79.19], [29.0, 81.27]],
+    },
+    {
+      componentKey: "oven-module",
+      points: [[36.05, 55.12], [46.63, 52.03], [46.63, 76.06], [36.05, 79.19]],
+    },
+    {
+      componentKey: "base-module-2",
+      points: [[46.63, 52.03], [55.46, 49.43], [56.42, 49.14], [56.42, 73.17], [55.46, 73.48], [46.63, 76.06]],
+    },
+    {
+      componentKey: "corner-base",
+      points: [[56.42, 49.14], [62.82, 54.28], [62.82, 78.35], [56.42, 73.17]],
+    },
+    {
+      componentKey: "base-module-3",
+      points: [[62.82, 54.28], [69.22, 59.44], [69.22, 83.49], [62.82, 78.35]],
+    },
+    {
+      componentKey: "sink-base",
+      points: [[69.22, 59.44], [73.0, 61.38], [73.0, 86.53], [69.22, 83.49]],
+    },
+    {
+      componentKey: "sink-base",
+      points: [[73.0, 62.22], [83.58, 59.12], [83.58, 83.43], [73.0, 86.53]],
+      preserveManualSize: true,
+    },
+    {
+      componentKey: "worktop",
+      points: [[73.0, 61.38], [83.58, 58.28], [83.58, 59.12], [73.0, 62.22]],
+      preserveManualSize: true,
+    },
+    {
+      componentKey: "sink-faucet",
+      left: 65.29,
+      top: 40.61,
+      width: 6.01,
+      height: 8.95,
+      preserveManualSize: true,
+    },
   ],
   "ab-105809": [
   {
@@ -649,6 +731,7 @@ const CORNER_BLENDE_EDGE_TOLERANCE = 1.2;
 const CORNER_BLENDE_VERTICAL_TOLERANCE = 0.35;
 const BASE_PLINTH_EXTENSION_DISABLED_SLUGS = new Set([
   "ab-105808",
+  "ab-105805",
   "ab-105809",
   "ab-105834",
   "ab-105837",
@@ -1291,12 +1374,14 @@ export default function KitchenSvgStage({
                         hotspotStyle.WebkitClipPath = hotspot.clipPath;
                         hotspotStyle.borderRadius = 0;
                       }
+                      const isPolygonHotspot = Boolean(hotspot.clipPath);
                       return (
                         <button
                           key={`${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
                           type="button"
                           className={[
                             styles.planHotspot,
+                            isPolygonHotspot ? styles.planHotspotPolygon : "",
                             isGroupHovered ? styles.planHotspotHover : "",
                             isSelected ? styles.planHotspotSelected : "",
                             isLocked ? styles.planHotspotLocked : "",

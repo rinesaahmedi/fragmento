@@ -504,6 +504,12 @@
     box-shadow 0.16s ease;
 }
 
+.planHotspotPolygon {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
 /* Hover/preview: a light green tint (previews "this becomes one of my selections"). */
 .planHotspot:hover,
 .planHotspot:focus-visible,
@@ -512,6 +518,13 @@
   background: rgba(62, 188, 116, 0.2);
   box-shadow: 0 6px 18px rgba(15, 57, 37, 0.16);
   outline: none;
+}
+
+.planHotspotPolygon:hover,
+.planHotspotPolygon:focus-visible,
+.planHotspotPolygon.planHotspotHover {
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* Selected by the user: solid green. */
@@ -523,6 +536,13 @@
   box-shadow: inset 0 0 0 1.5px rgba(42, 145, 85, 0.45);
 }
 
+.planHotspotPolygon.planHotspotSelected,
+.planHotspotPolygon.planHotspotSelected:hover,
+.planHotspotPolygon.planHotspotSelected:focus-visible {
+  border-color: transparent;
+  box-shadow: none;
+}
+
 /* Default / fixed parts that are always included: blue (overrides the green selected style). */
 .planHotspotLocked,
 .planHotspotLocked:hover {
@@ -532,11 +552,21 @@
   box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.32);
 }
 
+.planHotspotPolygon.planHotspotLocked,
+.planHotspotPolygon.planHotspotLocked:hover {
+  border-color: transparent;
+  box-shadow: none;
+}
+
 /* Calibration mode (?calibrate=1): make every hotspot visible and draw a % grid. */
 .planHotspotCalibrate {
   border-color: rgba(214, 40, 40, 0.85);
   background: rgba(214, 40, 40, 0.1);
   box-shadow: none;
+}
+
+.planHotspotPolygon.planHotspotCalibrate {
+  border: 1px solid rgba(214, 40, 40, 0.85);
 }
 
 .planHotspotTag {
