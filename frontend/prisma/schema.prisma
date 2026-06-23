@@ -38,6 +38,13 @@ model AdminUser {
   updatedAt                 DateTime  @updatedAt
 }
 
+model AppSetting {
+  key       String   @id
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Kitchen {
   id          String            @id @default(cuid())
   slug        String            @unique

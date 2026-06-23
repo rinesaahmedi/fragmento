@@ -12,6 +12,7 @@ const navItems = [
   { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
   { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon, requiresClaimsNav: true },
+  { href: "/admin/settings", labelKey: "adminShellLogin.settings", fallback: "Settings", icon: SettingsIcon },
   { href: "/admin/account", labelKey: "adminShellLogin.account", fallback: "Account", icon: AccountIcon },
   { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
 ];
@@ -710,6 +711,28 @@ function AccountIcon({ active }) {
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
         <path d="M3 13C3.5 10.5 5.1 9.25 8 9.25C10.9 9.25 12.5 10.5 13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function SettingsIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="M8 2.5V4M8 12V13.5M12.76 5.25L11.46 6M4.54 10L3.24 10.75M12.76 10.75L11.46 10M4.54 6L3.24 5.25"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+        />
+        <path
+          d="M10.9 3.8L10.15 5.1M5.85 10.9L5.1 12.2M12.2 5.1L10.9 5.85M5.1 10.15L3.8 10.9"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+        />
       </svg>
     </IconFrame>
   );

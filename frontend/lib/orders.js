@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
+import { getDirectOrderConfirmationEnabled } from "./admin-settings";
 import { MONTAGE_CABINET_CODES } from "./catalog";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
@@ -444,13 +445,21 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   }
 
   const orderForNotifications = buildOrderForNotifications(savedOrder);
+  const directOrderConfirmationEnabled = await getDirectOrderConfirmationEnabled();
   const notificationResult = await processOrderNotifications({
     order: orderForNotifications,
     pdfBase64,
     pdfFilename,
-    runEmail: false,
+    runEmail: directOrderConfirmationEnabled,
     runWebhook: true,
   });
+
+  if (directOrderConfirmationEnabled && notificationResult.emailSent) {
+    await prisma.order.update({
+      where: { id: savedOrder.id },
+      data: { status: OrderStatus.CONFIRMED },
+    });
+  }
 
   return {
     ...orderForNotifications,

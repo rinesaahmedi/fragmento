@@ -11,6 +11,7 @@
     "owners": "Housing Companies",
     "orders": "Orders",
     "claims": "Claims",
+    "settings": "Settings",
     "account": "Account",
     "publicSite": "Public Site",
     "manageKitchensCatalogAndOrders": "Manage kitchens, catalog, and orders.",
@@ -34,6 +35,15 @@
     "mobileAdminNavigation": "Mobile admin navigation",
     "sidebar": "Sidebar",
     "poweredBy": "Powered by"
+  },
+  "settingsAdmin": {
+    "settings": "Settings",
+    "orderConfirmationDescription": "Control how public kitchen orders are confirmed.",
+    "directOrderConfirmation": "Send order confirmations automatically",
+    "directOrderConfirmationHelp": "When enabled, the customer confirmation email is sent immediately after public checkout and the order is marked confirmed after the email succeeds. The agent webhook still runs.",
+    "saveSettings": "Save settings",
+    "settingsUpdated": "Settings updated.",
+    "settingsUpdateFailed": "Could not update settings."
   },
   "status": {
     "new": "New",
