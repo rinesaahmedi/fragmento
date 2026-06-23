@@ -302,6 +302,8 @@
   "kitchensAdmin": {
     "databaseBackedKitchenDefinitionsUsedByPublicConfigurator": "Database-backed kitchen definitions used by the public configurator.",
     "kitchen": "Kitchen",
+    "kitchenCode": "Kitchen code",
+    "programmId": "Programm ID",
     "slug": "Slug",
     "status": "Status",
     "items": "Items",

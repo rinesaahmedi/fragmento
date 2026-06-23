@@ -109,7 +109,6 @@ const DEMO_ORDER_FILTER = {
     endsWith: DEMO_ORDER_EMAIL_DOMAIN,
   },
 };
-const DEFAULT_OWNER_COUNT = 14;
 const DEFAULT_CONTRACT_COUNT = 30;
 const DEFAULT_ORDER_COUNT = 60;
 
@@ -172,88 +171,25 @@ function pickKitchenItems(kitchen) {
   return chosen;
 }
 
-async function ensureOwners(targetCount) {
-  const existing = await prisma.housingCompany.findMany({
-    where: { notes: { contains: DEMO_BATCH_TAG } },
-    include: { propertyObjects: true },
-    orderBy: { createdAt: "asc" },
-  });
-
-  const owners = [...existing];
-  for (let index = existing.length; index < targetCount; index += 1) {
-    const firstName = OWNER_FIRST_NAMES[index % OWNER_FIRST_NAMES.length];
-    const lastName = OWNER_LAST_NAMES[index % OWNER_LAST_NAMES.length];
-    const location = LOCATIONS[index % LOCATIONS.length];
-    const owner = await prisma.housingCompany.create({
-      data: {
-        name: `${firstName} ${lastName} Housing`,
-        email: `demo.owner.${index + 1}@fragmento.local`,
-        phone: formatPhone(index + 1),
-        notes: `${DEMO_BATCH_TAG} owner ${index + 1}`,
-        propertyObjects: {
-          create: {
-            name: `Building ${(index % 8) + 1}`,
-            country: location.country,
-            city: location.city,
-            postalCode: location.postalCode,
-            address1: `Demo Street ${index + 1}`,
-            address2: index % 3 === 0 ? `Entrance ${randomInt(1, 4)}` : null,
-          },
-        },
-      },
-      include: { propertyObjects: true },
-    });
-    owners.push(owner);
-  }
-
-  for (const [index, owner] of owners.entries()) {
-    const propertyObject = owner.propertyObjects?.[0];
-    if (!propertyObject) continue;
-
-    await prisma.project.upsert({
-      where: { propertyObjectId: propertyObject.id },
-      update: {
-        housingCompanyId: owner.id,
-        name: `Demo Project ${(index % 8) + 1}`,
-      },
-      create: {
-        propertyObjectId: propertyObject.id,
-        housingCompanyId: owner.id,
-        name: `Demo Project ${(index % 8) + 1}`,
-      },
-    });
-  }
-
-  return owners;
-}
-
-async function ensureContracts(kitchens, owners, targetCount) {
+async function ensureContracts(kitchens, targetCount) {
   const existing = await prisma.kitchenContract.findMany({
     where: { notes: { contains: DEMO_BATCH_TAG } },
-    include: { project: { include: { propertyObject: true } } },
     orderBy: { createdAt: "asc" },
   });
 
   const contracts = [...existing];
   for (let index = existing.length; index < targetCount; index += 1) {
     const kitchen = kitchens[index % kitchens.length];
-    const owner = owners[index % owners.length];
-    const propertyObject = owner.propertyObjects[0];
-    const project = propertyObject
-      ? await prisma.project.findUnique({ where: { propertyObjectId: propertyObject.id }, select: { id: true } })
-      : null;
     const contract = await prisma.kitchenContract.create({
       data: {
         contractNumber: `DM-${String(800000 + index)}`,
         kitchenId: kitchen.id,
-        projectId: project?.id,
         isActive: true,
-        building: propertyObject?.name || `B${(index % 8) + 1}`,
+        building: `B${(index % 8) + 1}`,
         floor: String((index % 5) + 1),
         unitNumber: `${(index % 12) + 1}`,
         notes: `${DEMO_BATCH_TAG} contract ${index + 1}`,
       },
-      include: { project: { include: { propertyObject: true } } },
     });
     contracts.push(contract);
   }
@@ -318,8 +254,7 @@ async function createDemoOrders(orderCount, options = {}) {
     throw new Error("No active kitchens found. Run the main seed first.");
   }
 
-  const owners = await ensureOwners(DEFAULT_OWNER_COUNT);
-  const contracts = await ensureContracts(filteredKitchens, owners, DEFAULT_CONTRACT_COUNT);
+  const contracts = await ensureContracts(filteredKitchens, DEFAULT_CONTRACT_COUNT);
   const contractsByKitchenId = new Map();
 
   for (const kitchen of filteredKitchens) {
@@ -335,15 +270,7 @@ async function createDemoOrders(orderCount, options = {}) {
     const kitchen = filteredKitchens[index % filteredKitchens.length];
     const kitchenContracts = contractsByKitchenId.get(kitchen.id) || [];
     const contract = kitchenContracts.length ? sample(kitchenContracts) : null;
-    const location = contract
-      ? {
-          country: contract.project?.propertyObject?.country || sample(LOCATIONS).country,
-          city: contract.project?.propertyObject?.city || sample(LOCATIONS).city,
-          postalCode: contract.project?.propertyObject?.postalCode || sample(LOCATIONS).postalCode,
-          address1: contract.project?.propertyObject?.address1 || `Demo Street ${index + 1}`,
-          address2: contract.project?.propertyObject?.address2 || null,
-        }
-      : { ...sample(LOCATIONS), address1: `Demo Street ${globalIndex + 1}`, address2: null };
+    const location = { ...sample(LOCATIONS), address1: `Demo Street ${globalIndex + 1}`, address2: null };
 
     const firstName = OWNER_FIRST_NAMES[(globalIndex * 3) % OWNER_FIRST_NAMES.length];
     const lastName = OWNER_LAST_NAMES[(globalIndex * 5) % OWNER_LAST_NAMES.length];
@@ -409,7 +336,7 @@ async function createDemoOrders(orderCount, options = {}) {
     created,
     removed,
     kitchens: filteredKitchens.length,
-    owners: owners.length,
+    owners: 0,
     contracts: contracts.length,
     totalDemoOrders: remaining + created,
   };
@@ -433,7 +360,7 @@ async function main() {
     excludedKitchenSlugs: [...excludedKitchenSlugs],
   });
   console.log(
-    `Synced demo orders to ${result.totalDemoOrders} (created ${result.created}, removed ${result.removed}) across ${result.kitchens} kitchens, ${result.contracts} demo contracts, and ${result.owners} demo owners.`,
+    `Synced demo orders to ${result.totalDemoOrders} (created ${result.created}, removed ${result.removed}) across ${result.kitchens} kitchens and ${result.contracts} demo contracts.`,
   );
 }
 

@@ -6,6 +6,8 @@ const SERVICE_CLAIM_TROUBLESHOOTING_DATA = require("../lib/service-claim-trouble
 
 const prisma = new PrismaClient();
 
+const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
+
 const PRODUCT_INFO_FILES = {
   dishwasher: "/product-info/a-egspv597210-product-info-eco21.pdf",
   oven: "/product-info/ebx-943-600-s-product-info.pdf",
@@ -1229,13 +1231,144 @@ const SERVICE_CLAIM_KNOWLEDGE_ENTRIES = [
   ...CLAIMS_CHATBOT_KNOWLEDGE.entries.map(mapClaimsDecisionGuideEntry),
 ];
 
-const DEFAULT_PROPERTY_OWNERS = [
-  { name: "Anna Schmidt Housing GmbH", email: "anna.schmidt@example.com", phone: "+49 30 555 0101", objectName: "Building A", country: "Germany", city: "Berlin", postalCode: "10115", address1: "Invalidenstrasse 10" },
-  { name: "Lukas Weber Wohnen", email: "lukas.weber@example.com", phone: "+49 30 555 0102", objectName: "Building B", country: "Germany", city: "Hamburg", postalCode: "20095", address1: "Demo Street 2" },
-  { name: "Sophie Muller Immobilien", email: "sophie.muller@example.com", phone: "+49 30 555 0103", objectName: "Building C", country: "Austria", city: "Vienna", postalCode: "1010", address1: "Demo Street 3" },
-  { name: "Daniel Fischer Estates", email: "daniel.fischer@example.com", phone: "+49 30 555 0104", objectName: "Building D", country: "Hungary", city: "Budapest", postalCode: "1051", address1: "Demo Street 4" },
-  { name: "Laura Becker Living", email: "laura.becker@example.com", phone: "+49 30 555 0105", objectName: "Building E", country: "Switzerland", city: "Zurich", postalCode: "8001", address1: "Demo Street 5" },
-];
+const DEFAULT_HOUSING_COMPANY = {
+  name: "ARGE Nördliche Riedsiedlung",
+  address: "Beekbreite 2-8, 49124 Georgsmarienhütte, Germany",
+  email: null,
+  phone: null,
+  notes: "c/o MBN GmbH",
+};
+
+const DEFAULT_PROPERTY_PROJECT = {
+  objectName: "Hamburg - 800",
+  projectName: "Hamburg - 800",
+  projectCode: "Hamburg - 800",
+  projectStatus: "active",
+  projectDescription: "Kitchens for Hamburg - 800 project",
+  projectManagerName: null,
+  contactPhone: null,
+  country: "Germany",
+  city: "Hamburg",
+  postalCode: "22111",
+  address1: "Hermannstal 92-114",
+  address2: null,
+};
+
+async function ensureDefaultPropertyProject() {
+  const company = DEFAULT_HOUSING_COMPANY;
+  const projectSeed = DEFAULT_PROPERTY_PROJECT;
+
+  const existingOwner = await prisma.housingCompany.findFirst({
+    where: { name: company.name },
+  });
+
+  const ownerId = existingOwner?.id || randomUUID();
+  if (existingOwner) {
+    await prisma.housingCompany.update({
+      where: { id: ownerId },
+      data: {
+        name: company.name,
+        address: company.address,
+        email: company.email,
+        phone: company.phone,
+        notes: company.notes,
+      },
+    });
+  } else {
+    await prisma.housingCompany.create({
+      data: {
+        id: ownerId,
+        name: company.name,
+        address: company.address,
+        email: company.email,
+        phone: company.phone,
+        notes: company.notes,
+      },
+    });
+  }
+
+  const existingObject = await prisma.propertyObject.findFirst({
+    where: {
+      housingCompanyId: ownerId,
+      name: projectSeed.objectName,
+    },
+  });
+
+  const objectId = existingObject?.id || randomUUID();
+  if (existingObject) {
+    await prisma.propertyObject.update({
+      where: { id: objectId },
+      data: {
+        name: projectSeed.objectName,
+        contactPhone: projectSeed.contactPhone,
+        country: projectSeed.country,
+        city: projectSeed.city,
+        postalCode: projectSeed.postalCode,
+        address1: projectSeed.address1,
+        address2: projectSeed.address2,
+      },
+    });
+  } else {
+    await prisma.propertyObject.create({
+      data: {
+        id: objectId,
+        name: projectSeed.objectName,
+        housingCompanyId: ownerId,
+        contactPhone: projectSeed.contactPhone,
+        country: projectSeed.country,
+        city: projectSeed.city,
+        postalCode: projectSeed.postalCode,
+        address1: projectSeed.address1,
+        address2: projectSeed.address2,
+      },
+    });
+  }
+
+  const project = await prisma.project.upsert({
+    where: { propertyObjectId: objectId },
+    update: {
+      name: projectSeed.projectName,
+      projectCode: projectSeed.projectCode,
+      status: projectSeed.projectStatus,
+      description: projectSeed.projectDescription,
+      managerName: projectSeed.projectManagerName,
+      housingCompanyId: ownerId,
+    },
+    create: {
+      propertyObjectId: objectId,
+      housingCompanyId: ownerId,
+      name: projectSeed.projectName,
+      projectCode: projectSeed.projectCode,
+      status: projectSeed.projectStatus,
+      description: projectSeed.projectDescription,
+      managerName: projectSeed.projectManagerName,
+    },
+  });
+
+  return project.id;
+}
+
+async function linkImplementedKitchenContracts(projectId) {
+  await prisma.kitchenContract.updateMany({
+    where: {
+      contractNumber: { not: { startsWith: "DM-" } },
+      kitchen: { status: KitchenStatus.ACTIVE },
+    },
+    data: { projectId },
+  });
+
+  const linkedContracts = await prisma.kitchenContract.findMany({
+    where: {
+      projectId,
+      contractNumber: { not: { startsWith: "DM-" } },
+      kitchen: { status: KitchenStatus.ACTIVE },
+    },
+    select: { contractNumber: true },
+    orderBy: { contractNumber: "asc" },
+  });
+
+  return linkedContracts.map((contract) => contract.contractNumber);
+}
 
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
@@ -1250,97 +1383,7 @@ async function main() {
     });
   }
 
-  const seededObjects = [];
-  for (const owner of DEFAULT_PROPERTY_OWNERS) {
-    const [existingOwner] = await prisma.$queryRaw`
-      SELECT "id"
-      FROM "HousingCompany"
-      WHERE "email" = ${owner.email}
-      LIMIT 1
-    `;
-
-    const ownerId = existingOwner?.id || randomUUID();
-    if (existingOwner) {
-      await prisma.$executeRaw`
-        UPDATE "HousingCompany"
-        SET
-          "name" = ${owner.name},
-          "email" = ${owner.email},
-          "phone" = ${owner.phone},
-          "notes" = ${owner.notes || null},
-          "updatedAt" = CURRENT_TIMESTAMP
-        WHERE "id" = ${ownerId}
-      `;
-    } else {
-      await prisma.$executeRaw`
-        INSERT INTO "HousingCompany" ("id", "name", "email", "phone", "notes", "createdAt", "updatedAt")
-        VALUES (${ownerId}, ${owner.name}, ${owner.email}, ${owner.phone}, ${owner.notes || null}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `;
-    }
-
-    const [existingObject] = await prisma.$queryRaw`
-      SELECT "id"
-      FROM "PropertyObject"
-      WHERE "housingCompanyId" = ${ownerId}
-        AND "name" = ${owner.objectName}
-      LIMIT 1
-    `;
-    const objectId = existingObject?.id || randomUUID();
-    if (existingObject) {
-      await prisma.$executeRaw`
-        UPDATE "PropertyObject"
-        SET
-          "country" = ${owner.country},
-          "city" = ${owner.city},
-          "postalCode" = ${owner.postalCode},
-          "address1" = ${owner.address1},
-          "address2" = ${owner.address2 || null},
-          "updatedAt" = CURRENT_TIMESTAMP
-        WHERE "id" = ${objectId}
-      `;
-    } else {
-      await prisma.$executeRaw`
-        INSERT INTO "PropertyObject" ("id", "name", "housingCompanyId", "country", "city", "postalCode", "address1", "address2", "createdAt", "updatedAt")
-        VALUES (${objectId}, ${owner.objectName}, ${ownerId}, ${owner.country}, ${owner.city}, ${owner.postalCode}, ${owner.address1}, ${owner.address2 || null}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-      `;
-    }
-
-    const projectName = owner.projectName || `${owner.objectName} Project`;
-    let project =
-      (await prisma.project.findUnique({ where: { propertyObjectId: objectId } })) ||
-      (await prisma.project.findFirst({
-        where: { housingCompanyId: ownerId, name: projectName },
-      }));
-
-    if (project) {
-      if (project.propertyObjectId !== objectId) {
-        project = await prisma.project.update({
-          where: { id: project.id },
-          data: { propertyObjectId: objectId },
-        });
-      }
-    } else {
-      try {
-        project = await prisma.project.create({
-          data: {
-            propertyObjectId: objectId,
-            housingCompanyId: ownerId,
-            name: projectName,
-          },
-        });
-      } catch (error) {
-        if (error.code !== "P2002") throw error;
-        project = await prisma.project.findFirstOrThrow({
-          where: { housingCompanyId: ownerId, name: projectName },
-        });
-      }
-    }
-
-    seededObjects.push({
-      id: objectId,
-      projectId: project.id,
-    });
-  }
+  const defaultProjectId = await ensureDefaultPropertyProject();
 
   for (const kitchen of DEFAULT_KITCHENS) {
     const existingKitchen = await prisma.kitchen.findUnique({
@@ -1363,6 +1406,7 @@ async function main() {
           data: {
             slug: kitchen.slug,
             kitchenCode: kitchen.kitchenCode || null,
+            programmId: DEFAULT_KITCHEN_PROGRAMM_ID,
             name: kitchen.name,
             status: KitchenStatus.ACTIVE,
             description: kitchen.description,
@@ -1461,7 +1505,7 @@ async function main() {
     }
   }
 
-  for (const [index, contract] of DEFAULT_KITCHEN_CONTRACTS.entries()) {
+  for (const contract of DEFAULT_KITCHEN_CONTRACTS) {
     const kitchen = await prisma.kitchen.findUnique({
       where: { slug: contract.kitchenSlug },
       select: { id: true },
@@ -1475,17 +1519,22 @@ async function main() {
       where: { contractNumber: contract.contractNumber },
       update: {
         kitchenId: kitchen.id,
-        projectId: seededObjects[index % seededObjects.length]?.projectId || undefined,
+        projectId: defaultProjectId,
         isActive: true,
       },
       create: {
         contractNumber: contract.contractNumber,
         kitchenId: kitchen.id,
-        projectId: seededObjects[index % seededObjects.length]?.projectId,
+        projectId: defaultProjectId,
         isActive: true,
       },
     });
   }
+
+  const linkedContractNumbers = await linkImplementedKitchenContracts(defaultProjectId);
+  console.log(
+    `Linked ${linkedContractNumbers.length} kitchen contract numbers to ${DEFAULT_PROPERTY_PROJECT.projectName}.`,
+  );
 
   for (const entry of SERVICE_CLAIM_KNOWLEDGE_ENTRIES) {
     await prisma.serviceClaimKnowledgeEntry.upsert({

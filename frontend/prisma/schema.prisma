@@ -42,6 +42,7 @@ model Kitchen {
   id          String            @id @default(cuid())
   slug        String            @unique
   kitchenCode String?
+  programmId  String            @default("IP 2200")
   name        String
   status      KitchenStatus     @default(DRAFT)
   description String?

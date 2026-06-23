@@ -21,6 +21,7 @@
     "apply:product-info-cleanup": "node scripts/apply-product-info-cleanup.js",
     "migrate:order-item-codes": "node scripts/migrate-order-item-codes.js",
     "seed:dashboard-demo": "node scripts/seed-dashboard-demo.js",
+    "cleanup:housing-seed": "node scripts/cleanup-housing-seed-data.js",
     "admin:create": "node scripts/create-admin.js"
   },
   "prisma": {

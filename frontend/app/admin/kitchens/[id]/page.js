@@ -471,6 +471,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
             <FormField label={<AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" />}>
               <input name="kitchenCode" defaultValue={kitchen.kitchenCode || ""} style={compactInputStyle} />
             </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.programmId" fallback="Programm ID" />}>
+              <input name="programmId" defaultValue={kitchen.programmId || "IP 2200"} style={compactInputStyle} />
+            </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
               <AdminSelect name="status" defaultValue={kitchen.status} style={compactInputStyle}>
                 {KITCHEN_STATUS_OPTIONS.map((status) => (

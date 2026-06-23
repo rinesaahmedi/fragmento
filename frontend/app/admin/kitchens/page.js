@@ -58,6 +58,9 @@ export default async function AdminKitchensPage({ searchParams }) {
             <FormField label={<AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" />}>
               <input name="kitchenCode" placeholder="105 807" style={inputStyle} />
             </FormField>
+            <FormField label={<AdminText i18nKey="kitchensAdmin.programmId" fallback="Programm ID" />}>
+              <input name="programmId" placeholder="IP 2200" defaultValue="IP 2200" style={inputStyle} />
+            </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
               <AdminSelect name="status" defaultValue={KitchenStatus.DRAFT} style={inputStyle}>
                 {KITCHEN_STATUS_OPTIONS.map((status) => (
@@ -95,6 +98,7 @@ export default async function AdminKitchensPage({ searchParams }) {
                 <tr>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.kitchen" fallback="Kitchen" /></th>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" /></th>
+                  <th style={thStyle}><AdminText i18nKey="kitchensAdmin.programmId" fallback="Programm ID" /></th>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.status" fallback="Status" /></th>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.items" fallback="Items" /></th>
                   <th style={thStyle}><AdminText i18nKey="kitchensAdmin.orders" fallback="Orders" /></th>
@@ -106,7 +110,7 @@ export default async function AdminKitchensPage({ searchParams }) {
               <tbody>
                 {!kitchens.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={8}><AdminText i18nKey="kitchensAdmin.noKitchensFound" fallback="No kitchens found." /></td>
+                    <td style={tdStyle} colSpan={9}><AdminText i18nKey="kitchensAdmin.noKitchensFound" fallback="No kitchens found." /></td>
                   </tr>
                 ) : null}
                 {kitchens.map((kitchen) => (
@@ -120,6 +124,7 @@ export default async function AdminKitchensPage({ searchParams }) {
                       </Link>
                     </td>
                     <td style={tdStyle}>{formatKitchenCode(kitchen)}</td>
+                    <td style={tdStyle}>{kitchen.programmId || "IP 2200"}</td>
                     <td style={tdStyle}><AdminStatusBadge status={kitchen.status} /></td>
                     <td style={tdStyle}>{kitchen._count.items}</td>
                     <td style={tdStyle}>{kitchen._count.orders}</td>
@@ -150,6 +155,7 @@ export default async function AdminKitchensPage({ searchParams }) {
                     </Link>
                     <div style={subMetaStyle}>
                       <span>{formatKitchenCode(kitchen)}</span>
+                      <span>{kitchen.programmId || "IP 2200"}</span>
                       <span><AdminDateTime value={kitchen.updatedAt.toISOString()} /></span>
                     </div>
                   </div>

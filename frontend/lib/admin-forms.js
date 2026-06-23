@@ -69,15 +69,19 @@ function validateSortOrder(value) {
   return parsed;
 }
 
+export const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
+
 export function validateKitchenInput(formData, options = {}) {
   const name = requiredString(formData.get("name"), "Kitchen name");
   const kitchenCode = optionalString(formData.get("kitchenCode"));
+  const programmId = optionalString(formData.get("programmId")) || DEFAULT_KITCHEN_PROGRAMM_ID;
   const slugSource = formData.get("slug") || options.fallbackSlug || kitchenCode || name;
 
   return {
     name,
     slug: validateSlug(slugSource),
     kitchenCode,
+    programmId,
     status: parseKitchenStatus(String(formData.get("status") || "")),
     description: optionalString(formData.get("description")),
   };
