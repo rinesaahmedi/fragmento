@@ -88,6 +88,11 @@ const DEFAULT_LOCKED_ACCESSORY_CODES_BY_SLUG = {
   "l-shaped-kitchen": [],
 };
 
+const CONFIGURATOR_DRAFT_REVISION_BY_SLUG = {
+  "ab-105814": "ab105810-view",
+  "ab-105818": "ab105810-view",
+};
+
 function buildCustomerAddressFromContract(contractAddress) {
   if (!contractAddress) return {};
 
@@ -948,7 +953,9 @@ function buildDefaultLockedAccessoryCodes(kitchenSlug, kitchenConfig) {
 }
 
 function buildConfiguratorDraftStorageKey(kitchenSlug, contractNumber) {
-  return `fragmento-configurator-draft:${String(kitchenSlug || "").trim().toLowerCase()}:${String(contractNumber || "").trim().toUpperCase() || "guest"}`;
+  const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const draftRevision = CONFIGURATOR_DRAFT_REVISION_BY_SLUG[normalizedSlug] || "default";
+  return `fragmento-configurator-draft:${normalizedSlug}:${draftRevision}:${String(contractNumber || "").trim().toUpperCase() || "guest"}`;
 }
 
 function readConfiguratorDraft(storageKey) {
