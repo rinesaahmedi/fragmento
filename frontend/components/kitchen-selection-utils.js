@@ -156,6 +156,12 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105811-1": "7",
   "CAB-WALL-AB105811-2": "8",
   "CAB-WALL-AB105811-3": "9",
+  "CAB-BASE-AB105815-US60": "4",
+  "DISH-AB105815-600": "5",
+  "REF-AB105815-KGCN388140E": "6",
+  "CAB-WALL-AB105815-1": "7",
+  "CAB-WALL-AB105815-2": "8",
+  "CAB-WALL-AB105815-3": "9",
   "CAB-BASE-AB105810-US45": "5",
   "CAB-BASE-AB105810-FILLER-400": "6",
   "CAB-WALL-AB105810-H4502": "9",
@@ -189,6 +195,8 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105826-H6002-L2": "11",
   "CAB-WALL-AB105826-H6002-L3": "12",
   "CAB-BASE-AB105827-FILLER-500": "4",
+  "DISH-AB105827-600": "5",
+  "CAB-BASE-AB105827-US30": "6",
   "CAB-WALL-AB105827-FILLER-500": "7",
   "CAB-BASE-AB105835-US60-R": "4",
   "CAB-BASE-AB105835-US60-L1": "5",
@@ -256,6 +264,16 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return translate("configurator.catalogItemNames.sinkAndWorktop", "Sink and Worktop");
   }
 
+  // General appliance naming across every kitchen: any dishwasher/refrigerator (identified by
+  // its icon) shows a single short name instead of the longer per-kitchen product description.
+  const iconKey = String(item?.iconKey || "").trim();
+  if (iconKey === "dishwasher_base") {
+    return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+  }
+  if (iconKey === "tall_refrigerator") {
+    return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
+  }
+
   switch (code) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":
@@ -315,9 +333,11 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
+    case "DISH-AB105815-600":
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
     case "DISH-AB105822-600":
+    case "DISH-AB105827-600":
     case "DISH-AB105833-600":
     case "DISH-AB105836-600":
     case "DISH-AB105842-600":
@@ -335,6 +355,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-BASE-B-STR":
     case "CAB-BASE-AB105806-US60":
     case "CAB-BASE-AB105807-US60":
+    case "CAB-BASE-AB105815-US60":
     case "CAB-BASE-AB105819-US60-R":
       return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawers", "Base Cabinet (2 Drawers)"));
     case "CAB-BASE-LS-400":
@@ -344,6 +365,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-B-545-1800-700":
     case "REF-AB105806-KGCN388140E":
     case "REF-AB105807-KGCN388140E":
+    case "REF-AB105815-KGCN388140E":
     case "REF-AB105819-KGCN388140E":
     case "REF-AB105821-KGCN388140E":
     case "REF-C-545-1800-700":
@@ -459,9 +481,11 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
+    case "DISH-AB105815-600":
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
     case "DISH-AB105822-600":
+    case "DISH-AB105827-600":
     case "DISH-AB105833-600":
     case "DISH-AB105836-600":
     case "DISH-AB105842-600":
@@ -495,6 +519,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "REF-B-545-1800-700":
     case "REF-AB105806-KGCN388140E":
     case "REF-AB105807-KGCN388140E":
+    case "REF-AB105815-KGCN388140E":
     case "REF-AB105819-KGCN388140E":
     case "REF-AB105821-KGCN388140E":
     case "REF-C-545-1800-700":
@@ -525,18 +550,28 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105814": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105816": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105818": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105815": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105819": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105821": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-105824": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105822": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105823": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105829": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105832": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105833": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105826": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105827": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-105830": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105835": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105836": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105842": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105839": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105841": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105838": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105844": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105811": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
@@ -589,6 +624,14 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
+  "DISH-AB105827-600": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
+  "DISH-AB105815-600": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
   "T3D-DISH-001": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
@@ -618,6 +661,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
   "REF-AB105811-KGCN388140E": [
+    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+  ],
+  "REF-AB105815-KGCN388140E": [
     { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
   ],
@@ -813,6 +860,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105819-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105821-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105822-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-AB105827-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105833-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105836-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105842-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -820,6 +868,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105837-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-AB105815-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "T3D-DISH-001": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "OVEN-B-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.webp`),
   "OVEN-C-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.webp`),
@@ -844,6 +893,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB105821-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105841-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105811-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
+  "REF-AB105815-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
   "T3D-WASHER-001": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
