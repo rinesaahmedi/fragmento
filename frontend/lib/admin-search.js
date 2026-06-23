@@ -72,7 +72,7 @@ function buildOrderFilterSql({ period = "", kitchenId = "", status = "" }, alias
     filters.push(Prisma.sql`${table}."kitchenId" = ${kitchenId}`);
   }
   if (ORDER_STATUSES.has(status)) {
-    filters.push(Prisma.sql`${table}."status" = ${status}`);
+    filters.push(Prisma.sql`${table}."status"::text = ${status}`);
   }
 
   return filters;

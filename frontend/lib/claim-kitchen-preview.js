@@ -182,10 +182,13 @@ export function enhanceKitchenPreviewSvgMarkup(markup) {
   });
 }
 
+const PREVIEW_HIGHLIGHT_STROKE_WIDTH = 2.5;
+
 function buildHighlightMarkup(bounds) {
+  const inset = PREVIEW_HIGHLIGHT_STROKE_WIDTH / 2;
   return [
-    `<rect x="${bounds.x - 3}" y="${bounds.y - 3}" width="${bounds.width + 6}" height="${bounds.height + 6}"`,
-    ` rx="8" ry="8" fill="rgba(176, 90, 50, 0.08)" stroke="#8f3e2c" stroke-width="2.5"`,
+    `<rect x="${bounds.x + inset}" y="${bounds.y + inset}" width="${bounds.width - PREVIEW_HIGHLIGHT_STROKE_WIDTH}" height="${bounds.height - PREVIEW_HIGHLIGHT_STROKE_WIDTH}"`,
+    ` rx="8" ry="8" fill="rgba(176, 90, 50, 0.08)" stroke="#8f3e2c" stroke-width="${PREVIEW_HIGHLIGHT_STROKE_WIDTH}"`,
     ` vector-effect="non-scaling-stroke" pointer-events="none"/>`,
   ].join("");
 }

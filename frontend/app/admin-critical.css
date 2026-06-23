@@ -677,7 +677,6 @@
     text-transform: uppercase;
   }
 
-  .analytics-dashboard .mobile-filter-form button,
   .analytics-dashboard .mobile-filter-form .toolbar-link {
     min-height: 46px;
     border-radius: 8px;

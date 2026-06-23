@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useAdminI18n } from "./admin-i18n";
 import { AdminEntitySearch } from "./admin-entity-search";
@@ -195,6 +196,8 @@ export function AdminDashboardCharts({
   projectAnalytics,
 }) {
   const { translate } = useAdminI18n();
+  const router = useRouter();
+  const pathname = usePathname();
   const [statusMode, setStatusMode] = useState("volume");
   const [isolatedSeries, setIsolatedSeries] = useState("");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
@@ -225,11 +228,21 @@ export function AdminDashboardCharts({
     { value: "housing", label: translate("dashboard.mobileTabHousing", "Housing") },
     { value: "products", label: translate("dashboard.mobileTabProducts", "Products") },
   ];
+  function handleFilterChange(event) {
+    const { name, value } = event.target;
+    const params = new URLSearchParams({
+      period: name === "period" ? value : selectedPeriod,
+      kitchenId: name === "kitchenId" ? value : (selectedKitchenId || ""),
+      status: name === "status" ? value : (selectedStatus || ""),
+    });
+    router.push(`${pathname}?${params.toString()}`);
+  }
+
   const renderFilterForm = (className = "filter-form desktop-filter-form") => (
-    <form method="get" className={className}>
+    <form className={className}>
       <label>
         {translate("dashboard.dateRange", "Date range")}
-        <AdminSelect name="period" defaultValue={selectedPeriod}>
+        <AdminSelect name="period" defaultValue={selectedPeriod} onChange={handleFilterChange}>
           {periodOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {translate(option.labelKey || "", option.fallbackLabel || option.value)}
@@ -239,7 +252,7 @@ export function AdminDashboardCharts({
       </label>
       <label>
         {translate("dashboard.kitchen", "Kitchen")}
-        <AdminSelect name="kitchenId" defaultValue={selectedKitchenId}>
+        <AdminSelect name="kitchenId" defaultValue={selectedKitchenId} onChange={handleFilterChange}>
           <option value="">{translate("dashboard.allKitchens", "All kitchens")}</option>
           {kitchens.map((kitchen) => (
             <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
@@ -248,14 +261,13 @@ export function AdminDashboardCharts({
       </label>
       <label>
         {translate("dashboard.status", "Status")}
-        <AdminSelect name="status" defaultValue={selectedStatus}>
+        <AdminSelect name="status" defaultValue={selectedStatus} onChange={handleFilterChange}>
           <option value="">{translate("dashboard.allStatuses", "All statuses")}</option>
           {statusOptions.map((status) => (
             <option key={status} value={status}>{translateStatus(status, translate)}</option>
           ))}
         </AdminSelect>
       </label>
-      <button type="submit">{translate("dashboard.apply", "Apply")}</button>
       <Link href="/admin" prefetch={false} className="toolbar-link">{translate("dashboard.clearFilters", "Clear filters")}</Link>
     </form>
   );
@@ -521,7 +533,7 @@ export function AdminDashboardCharts({
 
         .filter-form {
           display: grid;
-          grid-template-columns: repeat(5, minmax(130px, auto));
+          grid-template-columns: repeat(4, minmax(130px, auto));
           gap: 10px;
           align-items: end;
         }
@@ -789,7 +801,6 @@ export function AdminDashboardCharts({
             text-transform: uppercase;
           }
 
-          .mobile-filter-form button,
           .mobile-filter-form .toolbar-link {
             min-height: 46px;
             border-radius: 8px;

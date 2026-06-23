@@ -370,7 +370,7 @@ function buildOrderFilterConditions({ startDate, kitchenId, status }, alias = "o
   const filters = [];
   if (startDate) filters.push(Prisma.sql`${table}."createdAt" >= ${startDate}`);
   if (kitchenId) filters.push(Prisma.sql`${table}."kitchenId" = ${kitchenId}`);
-  if (status) filters.push(Prisma.sql`${table}."status" = ${status}`);
+  if (status) filters.push(Prisma.sql`${table}."status"::text = ${status}`);
   return filters;
 }
 

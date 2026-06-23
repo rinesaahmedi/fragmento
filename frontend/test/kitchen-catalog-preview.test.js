@@ -1,0 +1,103 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  getKitchenCatalogImagePreview,
+  getKitchenCatalogPreviewHotspots,
+  getKitchenCatalogPreviewSlot,
+  resolveKitchenCatalogPreviewSlug,
+} from "../lib/kitchen-catalog-preview.js";
+import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
+
+test("resolveKitchenCatalogPreviewSlug canonicalizes newly created AB kitchen slugs", () => {
+  const slug = resolveKitchenCatalogPreviewSlug({
+    slug: "105-806",
+    kitchenCode: "105 806",
+    items: [],
+  });
+
+  assert.equal(slug, "ab-105806");
+});
+
+test("resolveKitchenCatalogPreviewSlug keeps imported AB item preview association", () => {
+  const slug = resolveKitchenCatalogPreviewSlug({
+    slug: "custom-kitchen",
+    kitchenCode: "",
+    items: [{ code: "CAB-WALL-AB105807-1" }],
+  });
+
+  assert.equal(slug, "ab-105807");
+});
+
+test("getKitchenCatalogPreviewSlot resolves slots from image hotspots", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105806");
+  const slot = getKitchenCatalogPreviewSlot(preview, "wall-cabinet-6");
+
+  assert.equal(preview.imageHref, "/plans/AB%20105806.svg");
+  assert.equal(slot.componentKey, "wall-cabinet-6");
+  assert.equal(slot.label, "Wall Cabinet 6");
+});
+
+test("getKitchenCatalogPreviewSlot preserves no-preview fallback for unknown components", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105806");
+
+  assert.equal(getKitchenCatalogPreviewSlot(preview, "not-on-plan"), null);
+  assert.equal(getKitchenCatalogImagePreview("unknown-kitchen"), null);
+});
+
+test("AB 105835 uses its exact plan image and refrigerator hotspot", () => {
+  const slug = resolveKitchenCatalogPreviewSlug({
+    slug: "105-835",
+    kitchenCode: "105 835",
+    items: [],
+  });
+  const preview = getKitchenCatalogImagePreview(slug);
+  const refrigerator = preview.hotspots.find((hotspot) => hotspot.componentKey === "refrigerator");
+
+  assert.equal(slug, "ab-105835");
+  assert.equal(preview.imageHref, "/plans/AB%20105835.svg");
+  assert.ok(refrigerator.left > 80);
+});
+
+test("AB 105841 base module preview bounds exclude configurator plinth extension", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105841");
+  const source = PLAN_HOTSPOTS_BY_SLUG["ab-105841"].find((hotspot) => hotspot.componentKey === "base-module-1");
+  const baseModule = preview.hotspots.find((hotspot) => hotspot.componentKey === "base-module-1");
+  const sourceBottom = source.top + source.height;
+  const crop = preview.crop;
+  const expectedBottom = ((sourceBottom - crop.top) / crop.height) * 100;
+
+  assert.ok(baseModule);
+  assert.ok(Math.abs(baseModule.top + baseModule.height - expectedBottom) < 0.35);
+  assert.ok(baseModule.height < 33);
+});
+
+test("AB 105822 base module preview uses prepared cropped base-row coordinates", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105822", [
+    { componentKey: "base-module-3" },
+    { componentKey: "sink-base" },
+  ]);
+  const baseModule = preview.hotspots.find((hotspot) => hotspot.componentKey === "base-module-3");
+
+  assert.equal(preview.imageHref, "/plans/AB%20105822.svg");
+  assert.ok(preview.crop.width < 100);
+  assert.ok(baseModule.top > 50);
+  assert.ok(baseModule.height > 25);
+  assert.ok(baseModule.height < 33);
+});
+
+test("AB 105809 worktop preview excludes vertical corner blende strips", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105809");
+  const worktopHotspots = getKitchenCatalogPreviewHotspots(preview, "worktop");
+
+  assert.equal(worktopHotspots.length, 3);
+  assert.ok(worktopHotspots.every((hotspot) => hotspot.height < 25));
+});
+
+test("AB 105809 oven preview uses polygon outline instead of oversized bbox", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105809");
+  const ovenHotspots = getKitchenCatalogPreviewHotspots(preview, "oven-module");
+
+  assert.equal(ovenHotspots.length, 1);
+  assert.ok(Array.isArray(ovenHotspots[0].outlinePoints));
+  assert.ok(ovenHotspots[0].outlinePoints.length >= 3);
+});

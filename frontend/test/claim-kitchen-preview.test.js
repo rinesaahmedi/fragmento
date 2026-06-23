@@ -23,8 +23,8 @@ test("buildKitchenPreviewSvgMarkup injects one highlight for one selected compon
     highlightedComponentKeys: ["dishwasher-base"],
   });
 
-  assert.match(markup, /x="611"/);
-  assert.match(markup, /y="335"/);
+  assert.match(markup, /x="615.25"/);
+  assert.match(markup, /y="339.25"/);
   assert.match(markup, /stroke="#8f3e2c"/);
 });
 
@@ -36,8 +36,8 @@ test("buildKitchenPreviewSvgMarkup injects multiple highlights and ignores unkno
   });
 
   assert.equal((markup.match(/stroke="#8f3e2c"/g) || []).length, 2);
-  assert.match(markup, /x="539"/);
-  assert.match(markup, /x="611"/);
+  assert.match(markup, /x="543\.25"/);
+  assert.match(markup, /x="615\.25"/);
 });
 
 test("buildKitchenPreviewSvgMarkup falls back to the base svg when no known highlights exist", () => {

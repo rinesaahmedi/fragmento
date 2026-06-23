@@ -30,6 +30,7 @@ import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { buildKitchenPreviewSvgMarkup } from "../../../../lib/claim-kitchen-preview";
 import { LEGACY_ICON_KEYS, getKitchenById, listKitchenItemCodeOptionsForAdmin } from "../../../../lib/catalog";
+import { getKitchenCatalogImagePreview, getKitchenCatalogPreviewHotspots, getKitchenCatalogPreviewSlot, resolveKitchenCatalogPreviewSlug } from "../../../../lib/kitchen-catalog-preview";
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
 
@@ -131,14 +132,73 @@ function normalizeItemIconMarkup(iconMarkup) {
     });
 }
 
-function KitchenCatalogPreview({ markup, iconMarkup, slotLabel, itemType }) {
+function KitchenCatalogPreview({ markup, imagePreview, componentKey, iconMarkup, slotLabel, itemType }) {
   const isComponent = itemType === ItemType.COMPONENT;
   const normalizedIconMarkup = normalizeItemIconMarkup(iconMarkup);
+  const imageHotspots = getKitchenCatalogPreviewHotspots(imagePreview, componentKey);
 
   if (normalizedIconMarkup) {
     return (
       <div className="kitchen-catalog-preview--icon" style={previewIconWrapStyle} aria-label={`${itemType || "Item"} icon preview`}>
         <div style={previewIconStyle} dangerouslySetInnerHTML={{ __html: normalizedIconMarkup }} />
+      </div>
+    );
+  }
+
+  if (imagePreview?.imageHref && imageHotspots.length) {
+    return (
+      <div className="kitchen-catalog-preview" style={previewWrapStyle} aria-label={slotLabel ? `${slotLabel} preview` : "Kitchen preview"}>
+        <div style={{ ...previewImagePlanStyle, aspectRatio: imagePreview.aspectRatio || previewImagePlanStyle.aspectRatio }}>
+          <img
+            src={imagePreview.imageHref}
+            alt=""
+            style={{
+              ...previewImageStyle,
+              left: `${-(imagePreview.crop.left / imagePreview.crop.width) * 100}%`,
+              top: `${-(imagePreview.crop.top / imagePreview.crop.height) * 100}%`,
+              width: `${(100 / imagePreview.crop.width) * 100}%`,
+              height: `${(100 / imagePreview.crop.height) * 100}%`,
+            }}
+          />
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" style={previewImageOverlayStyle}>
+            <defs>
+              {imageHotspots
+                .filter((hotspot) => !hotspot.outlinePoints?.length)
+                .map((hotspot, index) => (
+                <clipPath key={`clip-${hotspot.componentKey}-${index}`} id={`catalog-preview-clip-${hotspot.componentKey}-${index}`}>
+                  <rect x={hotspot.left} y={hotspot.top} width={hotspot.width} height={hotspot.height} rx="1.2" ry="1.2" />
+                </clipPath>
+              ))}
+            </defs>
+            {imageHotspots.map((hotspot, index) => (
+              hotspot.outlinePoints?.length ? (
+                <polygon
+                  key={`${hotspot.componentKey}-${index}`}
+                  points={hotspot.outlinePoints.map(([x, y]) => `${x},${y}`).join(" ")}
+                  fill="rgba(176, 90, 50, 0.08)"
+                  stroke="#8f3e2c"
+                  strokeWidth="1.6"
+                  vectorEffect="non-scaling-stroke"
+                />
+              ) : (
+                <g key={`${hotspot.componentKey}-${index}`} clipPath={`url(#catalog-preview-clip-${hotspot.componentKey}-${index})`}>
+                  <rect
+                    x={hotspot.left}
+                    y={hotspot.top}
+                    width={hotspot.width}
+                    height={hotspot.height}
+                    rx="1.2"
+                    ry="1.2"
+                    fill="rgba(176, 90, 50, 0.08)"
+                    stroke="#8f3e2c"
+                    strokeWidth="1.6"
+                    vectorEffect="non-scaling-stroke"
+                  />
+                </g>
+              )
+            ))}
+          </svg>
+        </div>
       </div>
     );
   }
@@ -356,7 +416,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const structureSlots = getKitchenStructureSlots(kitchen.slug);
+  const previewSlug = resolveKitchenCatalogPreviewSlug(kitchen);
+  const imagePreview = getKitchenCatalogImagePreview(previewSlug, kitchen.items);
+  const structureSlots = getKitchenStructureSlots(previewSlug);
   const requestedEditId =
     typeof resolvedSearchParams.edit === "string" && resolvedSearchParams.edit.trim()
       ? resolvedSearchParams.edit.trim()
@@ -382,7 +444,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     acc[item.componentKey] = [...(acc[item.componentKey] || []), item.name];
     return acc;
   }, {});
-  const kitchenSvgMarkup = structureSlots.length ? await loadKitchenSvgMarkup(kitchen.slug).catch(() => "") : "";
+  const kitchenSvgMarkup = structureSlots.length ? await loadKitchenSvgMarkup(previewSlug).catch(() => "") : "";
   const itemCodeOptions = await listKitchenItemCodeOptionsForAdmin();
 
   return (
@@ -535,9 +597,10 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               </p>
             ) : null}
             {visibleItems.map((item) => {
-              const slot = structureSlots.find((entry) => entry.componentKey === item.componentKey);
+              const slot = structureSlots.find((entry) => entry.componentKey === item.componentKey)
+                || getKitchenCatalogPreviewSlot(imagePreview, item.componentKey);
               const isRequestedEdit = requestedEditId === item.id;
-              const previewMarkup = buildCatalogPreviewMarkup(kitchenSvgMarkup, kitchen.slug, item.componentKey);
+              const previewMarkup = imagePreview ? "" : buildCatalogPreviewMarkup(kitchenSvgMarkup, previewSlug, item.componentKey);
               const iconMarkup = item.componentKey ? "" : (ITEM_ICON_MARKUP[item.iconKey] || "");
 
               return (
@@ -555,6 +618,8 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     </div>
                     <KitchenCatalogPreview
                       markup={previewMarkup}
+                      imagePreview={imagePreview}
+                      componentKey={item.componentKey}
                       iconMarkup={iconMarkup}
                       slotLabel={slot?.label || item.name}
                       itemType={item.itemType}
@@ -1233,6 +1298,29 @@ const previewWrapStyle = {
 const previewSvgStyle = {
   width: "100%",
   lineHeight: 0,
+};
+
+const previewImagePlanStyle = {
+  position: "relative",
+  width: "100%",
+  aspectRatio: "842 / 595",
+  overflow: "hidden",
+  borderRadius: 8,
+  lineHeight: 0,
+};
+
+const previewImageStyle = {
+  position: "absolute",
+  objectFit: "contain",
+  display: "block",
+};
+
+const previewImageOverlayStyle = {
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  pointerEvents: "none",
 };
 
 const previewIconWrapStyle = {

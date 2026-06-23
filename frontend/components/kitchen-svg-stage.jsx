@@ -18,6 +18,7 @@ import {
   refreshKitchenPlanSelection,
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
+import { PLAN_HOTSPOTS_BY_SLUG as IMAGE_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG as IMAGE_VIEW_BY_SLUG } from "../lib/kitchen-plan-preview-data";
 
 const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
   ssr: false,

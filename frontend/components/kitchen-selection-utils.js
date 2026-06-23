@@ -586,6 +586,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105811": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105807": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "kitchen-model-b": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "108134-modul-1": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],
   "l-kitchen-new": [["component-top-400", "component-aspirator"]],
 };
