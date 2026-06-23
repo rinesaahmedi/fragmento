@@ -10,7 +10,7 @@ import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit
 export async function POST(request) {
   try {
     const formData = await request.formData();
-    const email = String(formData.get("email") || "").trim();
+    const email = String(formData.get("email") || "").trim().toLowerCase();
     const password = String(formData.get("password") || "");
     const clientIp = getRequestClientIp(request);
 
@@ -28,6 +28,10 @@ export async function POST(request) {
     const admin = await prisma.adminUser.findUnique({ where: { email } });
     if (!admin || !(await verifyPassword(password, admin.passwordHash))) {
       return redirectWithFlash(request, "/admin/login", "error", "Invalid email or password.");
+    }
+
+    if (admin.isActive === false) {
+      return redirectWithFlash(request, "/admin/login", "error", "This account has been deactivated.");
     }
 
     const { code } = await beginAdminLoginVerification(admin.id);

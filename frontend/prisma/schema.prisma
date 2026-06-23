@@ -27,10 +27,18 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum AdminRole {
+  SUPERADMIN
+  ADMIN
+  USER
+}
+
 model AdminUser {
   id                        String    @id @default(cuid())
   email                     String    @unique
   passwordHash                String
+  role                      AdminRole @default(ADMIN)
+  isActive                  Boolean   @default(true)
   loginVerificationCodeHash   String?
   loginVerificationExpiresAt  DateTime?
   loginVerificationAttempts Int       @default(0)
