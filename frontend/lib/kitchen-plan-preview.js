@@ -18,6 +18,8 @@ const CORNER_BLENDE_VERTICAL_TOLERANCE = 0.35;
 const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
   "ab-105833": { bottomPadding: 4, bottomLimit: 84 },
   "ab-105842": { bottomPadding: 4.8 },
+  "ab-105845": { bottomPadding: 4.8 },
+  "105845-modul-2": { bottomPadding: 4.8 },
   "ab-105836": { bottomPadding: 4.8 },
 };
 

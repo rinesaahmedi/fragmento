@@ -81,6 +81,12 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
   "ab-105842": {
     bottomPadding: 4.8,
   },
+  "ab-105845": {
+    bottomPadding: 4.8,
+  },
+  "105845-modul-2": {
+    bottomPadding: 4.8,
+  },
   "ab-105839": {
     bottomPadding: 4.8,
   },

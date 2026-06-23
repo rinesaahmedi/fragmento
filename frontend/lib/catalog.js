@@ -107,6 +107,15 @@ export const LEGACY_ICON_KEYS = [
   "pickup",
 ];
 
+const KITCHEN_SLUG_ALIASES = {
+  "105845-modul-2": "ab-105845",
+};
+
+function resolveKitchenSlugAlias(slug) {
+  const normalizedSlug = String(slug || "").trim().toLowerCase();
+  return KITCHEN_SLUG_ALIASES[normalizedSlug] || slug;
+}
+
 function isMissingKitchenItemProductImagePath(error) {
   const message = String(error?.message || "");
   return (
@@ -158,9 +167,11 @@ export async function getActiveKitchens() {
 }
 
 export async function getKitchenBySlug(slug) {
+  const resolvedSlug = resolveKitchenSlugAlias(slug);
+
   try {
     return await prisma.kitchen.findUnique({
-      where: { slug },
+      where: { slug: resolvedSlug },
       include: {
         items: {
           where: { isActive: true },
@@ -175,7 +186,7 @@ export async function getKitchenBySlug(slug) {
 
     // Compatibility fallback for databases that have not applied the productImagePath migration yet.
     return prisma.kitchen.findUnique({
-      where: { slug },
+      where: { slug: resolvedSlug },
       include: {
         items: {
           where: { isActive: true },

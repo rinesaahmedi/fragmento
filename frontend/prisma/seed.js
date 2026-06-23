@@ -164,6 +164,7 @@ PRODUCT_INFO_BY_CODE["DISH-AB105822-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"]
 PRODUCT_INFO_BY_CODE["DISH-AB105827-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105836-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105842-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["DISH-AB105845-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105834-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105837-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = {
@@ -187,6 +188,7 @@ PRODUCT_INFO_BY_CODE["REF-AB105815-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-5
 PRODUCT_INFO_BY_CODE["REF-AB105819-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105841-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105821-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["REF-AB105845-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
   ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"],
   productInfoKeyFacts: [
@@ -221,7 +223,9 @@ PRODUCT_INFO_BY_CODE["HOOD-LS-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH66462
 PRODUCT_INFO_BY_CODE["HOOD-AB105806-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105807-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105837-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105845-KHF664611S"] = PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"];
 PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
+PRODUCT_INFO_BY_CODE["WM-AB105845-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
 PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
   productImagePath: PRODUCT_IMAGE_FILES.oven,
   productInfoPdfPath: PRODUCT_INFO_FILES.oven,
@@ -281,6 +285,7 @@ const LED_LIGHTING_PRODUCT_INFO = {
 };
 PRODUCT_INFO_BY_CODE["LIGHT-B-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
 PRODUCT_INFO_BY_CODE["LIGHT-C-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
+PRODUCT_INFO_BY_CODE["LIGHT-AB105845-LED"] = LED_LIGHTING_PRODUCT_INFO;
 PRODUCT_INFO_BY_CODE["ACC-LIGHT-003"] = LED_LIGHTING_PRODUCT_INFO;
 
 const MODEL_B_ITEMS = [
@@ -752,6 +757,32 @@ const AB_105842_ITEMS = [
 
 const AB_105839_ITEMS = AB_105842_ITEMS;
 
+// AB 105845: two PDF modules combined into one plan. Module 2 contains the sink/washer/
+// dishwasher run; module 2-1 contains the fridge and cooking run with a chimney hood.
+const AB_105845_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "REF-AB105845-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "WM-AB105845-EWA34660W", name: "Washing machine + front + side panel", price: "639.00", widthMm: 600, heightMm: 830, depthMm: 540, iconKey: "washing_machine_base", colorKey: "springgreen", componentKey: "wm-base", sortOrder: 20, infoText: "EWA34660W, 8 kg, 1400 rpm", articleNumber: "EWA34660W + TGV60 + WU16" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105845-600", name: "Dishwasher", price: "579.00", widthMm: 600, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 30, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105845-US2A60", name: "Base cabinet with drawers", price: "369.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_three", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 40, infoText: "US2A60 base drawer cabinet", articleNumber: "US2A60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-COOK-AB105845-US60-L", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "cook-base-left", sortOrder: 50, infoText: "US60 base storage cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 60, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "CAB-COOK-AB105845-US60-R", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "cook-base-right", sortOrder: 70, infoText: "US60 base storage cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 80, isLocked: true, infoText: "Default sink base cabinet" },
+  { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "0.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 90, isLocked: true, infoText: "Default sink and faucet position" },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 100, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105845-US60-1", name: "Wall Cabinet", price: "219.00", widthMm: 600, heightMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 110, infoText: "600/600 mm cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105845-US60-2", name: "Wall Cabinet", price: "219.00", widthMm: 600, heightMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 120, infoText: "600/600 mm cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105845-US60-3", name: "Wall Cabinet", price: "219.00", widthMm: 600, heightMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 130, infoText: "600/600 mm cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105845-US60-4", name: "Wall Cabinet", price: "219.00", widthMm: 600, heightMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 140, infoText: "600/600 mm cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "LIGHT-AB105845-LED", name: "LED Lighting Set", price: "69.00", iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 150, infoText: "LED lighting set", articleNumber: "KALB + KA220043_S3" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105845-KHF664611S", name: "Chimney extractor hood", price: "209.00", widthMm: 600, iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 160, infoText: "Chimney hood, 60 cm", articleNumber: "KHF664611S" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220, articleNumber: "KA220043_S3" },
+  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
 // AB 105841 shares AB 105806's single-wall layout (fridge on the RIGHT). Items whose callout
 // number matches AB 105806's scheme reuse its codes (oven 1, worktop 2, sink base 3, hood 10,
 // wall cabinets 12/13/14, sink+waste); the rest get AB105841 codes so their plan numbers (4-9, 11)
@@ -1111,6 +1142,13 @@ const DEFAULT_KITCHENS = [
     name: "AB 105842 Kitchen",
     description: "Kitchen configuration based on frontend/public/plans/AB 105842.svg",
     items: AB_105842_ITEMS,
+  },
+  {
+    slug: "ab-105845",
+    kitchenCode: "105 845",
+    name: "AB 105845 Kitchen",
+    description: "Two-module kitchen configuration based on frontend/public/plans/AB 105845.svg",
+    items: AB_105845_ITEMS,
   },
   {
     slug: "ab-105839",
