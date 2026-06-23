@@ -1,5 +1,9 @@
 import { redirectWithFlash } from "../../../../lib/admin-forms";
-import { createAdminSession, verifyPassword } from "../../../../lib/auth";
+import {
+  beginAdminLoginVerification,
+  sendAdminLoginVerificationEmail,
+} from "../../../../lib/admin-login-verification";
+import { createPendingAdminLogin, verifyPassword } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 
@@ -26,15 +30,21 @@ export async function POST(request) {
       return redirectWithFlash(request, "/admin/login", "error", "Invalid email or password.");
     }
 
-    await createAdminSession(admin.id);
+    const { code } = await beginAdminLoginVerification(admin.id);
+    await sendAdminLoginVerificationEmail({ to: admin.email, code });
+    await createPendingAdminLogin(admin.id);
+
     return new Response(null, {
       status: 303,
       headers: {
-        Location: "/admin",
+        Location: "/admin/login/verify",
       },
     });
   } catch (error) {
     if (error?.status === 429) {
+      return redirectWithFlash(request, "/admin/login", "error", error.message);
+    }
+    if (error?.status === 503) {
       return redirectWithFlash(request, "/admin/login", "error", error.message);
     }
     const message =

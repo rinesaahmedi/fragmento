@@ -5,7 +5,9 @@ import { redirect } from "next/navigation";
 import { prisma } from "./prisma";
 
 const SESSION_COOKIE = "fragmento_admin_session";
+const PENDING_LOGIN_COOKIE = "fragmento_admin_login_pending";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
+const PENDING_LOGIN_TTL_SECONDS = 15 * 60;
 
 function getSessionSecret() {
   const secret = process.env.ADMIN_SESSION_SECRET;
@@ -57,21 +59,57 @@ export async function hashPassword(password) {
   return bcrypt.hash(password, 12);
 }
 
-export async function createAdminSession(adminId) {
-  const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, encodeSession({ adminId, exp }), {
+function setSignedCookie(cookieStore, name, payload, maxAgeSeconds) {
+  cookieStore.set(name, encodeSession(payload), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: SESSION_TTL_SECONDS,
+    maxAge: maxAgeSeconds,
   });
+}
+
+export async function createPendingAdminLogin(adminId) {
+  const exp = Math.floor(Date.now() / 1000) + PENDING_LOGIN_TTL_SECONDS;
+  const cookieStore = await cookies();
+  setSignedCookie(cookieStore, PENDING_LOGIN_COOKIE, { adminId, exp }, PENDING_LOGIN_TTL_SECONDS);
+}
+
+export async function getPendingAdminLogin() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(PENDING_LOGIN_COOKIE)?.value;
+  const payload = decodeSession(token);
+  if (!payload?.adminId) {
+    return null;
+  }
+
+  return prisma.adminUser.findUnique({
+    where: { id: payload.adminId },
+    select: {
+      id: true,
+      email: true,
+      loginVerificationCodeHash: true,
+      loginVerificationExpiresAt: true,
+    },
+  });
+}
+
+export async function clearPendingAdminLogin() {
+  const cookieStore = await cookies();
+  cookieStore.delete(PENDING_LOGIN_COOKIE);
+}
+
+export async function createAdminSession(adminId) {
+  const exp = Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS;
+  const cookieStore = await cookies();
+  setSignedCookie(cookieStore, SESSION_COOKIE, { adminId, exp }, SESSION_TTL_SECONDS);
+  cookieStore.delete(PENDING_LOGIN_COOKIE);
 }
 
 export async function clearAdminSession() {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE);
+  cookieStore.delete(PENDING_LOGIN_COOKIE);
 }
 
 export async function getAdminSession() {
