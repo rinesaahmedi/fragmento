@@ -146,6 +146,9 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   isLocked: true,
   isActive: true,
   sortOrder: true,
+  blendeCode: true,
+  blendeLabel: true,
+  blendePrice: true,
   createdAt: true,
   updatedAt: true,
 };
@@ -990,6 +993,9 @@ export function serializeKitchenForLegacy(kitchen) {
     componentKey: item.componentKey || "",
     isLocked: item.isLocked,
     itemType: item.itemType.toLowerCase(),
+    blendeCode: item.blendeCode || "",
+    blendeLabel: item.blendeLabel || "",
+    blendePrice: item.blendePrice != null ? Number(item.blendePrice) : null,
   });
 
   return {
