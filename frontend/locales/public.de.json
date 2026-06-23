@@ -85,6 +85,7 @@
     "productInfoTitle": "Produktinformation {title}",
     "itemNameOvenHob": "Einbaubackofen und Kochfeld",
     "catalogItemNames": {
+      "wallCabinet": "Oberschrank",
       "wallCabinetLeft": "Oberschrank links",
       "wallCabinetMidLeft": "Oberschrank mittig links",
       "wallCabinetMidRight": "Oberschrank mittig rechts",
@@ -101,6 +102,7 @@
       "sinkBaseCabinet": "Spülenunterschrank",
       "dishwasher": "Geschirrspüler",
       "worktop": "Arbeitsplatte",
+      "baseCabinet": "Unterschrank",
       "baseStorageCabinet": "Stauraum-Unterschrank",
       "refrigerator": "Kühlschrank",
       "sinkAndWasteSystem": "Spüle und Mülltrennsystem",

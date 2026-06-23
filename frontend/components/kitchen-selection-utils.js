@@ -274,6 +274,17 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
   }
 
+  const normalizedRawTitle = rawTitle.toLowerCase();
+  if (normalizedRawTitle === "base cabinet with drawer") {
+    return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawers", "Base Cabinet (2 Drawers)"));
+  }
+  if (normalizedRawTitle === "base cabinet") {
+    return withDimensions(translate("configurator.catalogItemNames.baseCabinet", "Base Cabinet"));
+  }
+  if (normalizedRawTitle === "wall cabinet") {
+    return withDimensions(translate("configurator.catalogItemNames.wallCabinet", "Wall Cabinet"));
+  }
+
   switch (code) {
     case "OVEN-B-600-HOB":
     case "OVEN-C-600-HOB":

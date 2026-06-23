@@ -146,7 +146,7 @@ function CatalogItem({
   onOpenProductAssistant,
 }) {
   const { translate, language } = usePublicI18n();
-  const itemName = getLocalizedItemName(item, translate, language);
+  const itemName = getLocalizedItemName(item, translate, language, false);
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const { dimensions: itemDimensions } = getCatalogItemDetails(item);
@@ -178,6 +178,9 @@ function CatalogItem({
   const productAssistantPublicName = item.assistantHoverExtractorHoodOnly
     ? translate("configurator.productAssistantExtractorHood", "Extractor hood")
     : itemDisplayName.title;
+  const toggleLabel = selected
+    ? `${translate("common.remove", "Remove")} -`
+    : `${translate("configurator.add", "Add")} +`;
   const handleCardKeyDown = (event) => {
     if (locked || disabled) {
       return;
@@ -218,9 +221,7 @@ function CatalogItem({
             ? translate("configurator.fixed", "Fixed")
             : disabled
               ? translate("configurator.unavailable", "Unavailable")
-              : selected
-                ? translate("common.remove", "Remove")
-                : translate("configurator.add", "Add")}
+              : toggleLabel}
         </span>
         {infoPdfHref ? (
           <span className={styles.itemInfoWrap}>

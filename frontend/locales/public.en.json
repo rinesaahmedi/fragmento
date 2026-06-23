@@ -85,6 +85,7 @@
     "productInfoTitle": "Product information {title}",
     "itemNameOvenHob": "Built-in oven and induction hob",
     "catalogItemNames": {
+      "wallCabinet": "Wall Cabinet",
       "wallCabinetLeft": "Wall Cabinet left",
       "wallCabinetMidLeft": "Wall Cabinet mid-left",
       "wallCabinetMidRight": "Wall Cabinet mid-right",
@@ -101,6 +102,7 @@
       "sinkBaseCabinet": "Sink Base Cabinet",
       "dishwasher": "Dishwasher",
       "worktop": "Worktop",
+      "baseCabinet": "Base Cabinet",
       "baseStorageCabinet": "Base Storage Cabinet",
       "refrigerator": "Refrigerator",
       "sinkAndWasteSystem": "Sink and Waste System",
