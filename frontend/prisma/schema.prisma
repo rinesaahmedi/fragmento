@@ -46,6 +46,13 @@ model AdminUser {
   updatedAt                 DateTime  @updatedAt
 }
 
+model AppSetting {
+  key       String   @id
+  value     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Kitchen {
   id          String            @id @default(cuid())
   slug        String            @unique
@@ -87,6 +94,9 @@ model KitchenItem {
   isLocked      Boolean     @default(false)
   isActive      Boolean     @default(true)
   sortOrder     Int         @default(0)
+  blendeCode    String?
+  blendeLabel   String?
+  blendePrice   Decimal?    @db.Decimal(10, 2)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   orderItems    OrderItem[]

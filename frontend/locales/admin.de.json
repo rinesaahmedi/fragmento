@@ -11,6 +11,7 @@
     "owners": "Wohnungsgesellschaften",
     "orders": "Bestellungen",
     "claims": "Reklamationen",
+    "settings": "Einstellungen",
     "users": "Benutzer",
     "account": "Konto",
     "publicSite": "Öffentliche Seite",
@@ -35,6 +36,15 @@
     "mobileAdminNavigation": "Mobile Admin-Navigation",
     "sidebar": "Seitenleiste",
     "poweredBy": "Powered by"
+  },
+  "settingsAdmin": {
+    "settings": "Einstellungen",
+    "orderConfirmationDescription": "Steuern Sie, wie oeffentliche Kuechenbestellungen bestaetigt werden.",
+    "directOrderConfirmation": "Bestellbestaetigungen automatisch senden",
+    "directOrderConfirmationHelp": "Wenn diese Option aktiv ist, wird die Kunden-E-Mail direkt nach dem oeffentlichen Checkout gesendet und die Bestellung nach erfolgreichem E-Mail-Versand als bestaetigt markiert. Der Agent-Webhook laeuft weiterhin.",
+    "saveSettings": "Einstellungen speichern",
+    "settingsUpdated": "Einstellungen gespeichert.",
+    "settingsUpdateFailed": "Einstellungen konnten nicht gespeichert werden."
   },
   "status": {
     "new": "Neu",

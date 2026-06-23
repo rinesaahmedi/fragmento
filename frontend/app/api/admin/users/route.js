@@ -7,7 +7,7 @@ import { prisma } from "../../../../lib/prisma";
 function requiredTrimmed(value, label) {
   const nextValue = String(value || "").trim();
   if (!nextValue) {
-    throw new Error(`${label} is required.");
+    throw new Error(`${label} is required.`);
   }
   return nextValue;
 }
