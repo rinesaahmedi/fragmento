@@ -14,18 +14,28 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105810": "/plans/AB%20105810.svg",
   "ab-105812": "/plans/AB%20105812.svg",
   "ab-105814": "/plans/AB%20105814.svg",
+  "ab-105815": "/plans/AB%20105815.svg",
   "ab-105816": "/plans/AB%20105816.svg",
+  "ab-105818": "/plans/AB%20105818.svg",
   "ab-105819": "/plans/AB%20105819.svg",
   "ab-105820": "/plans/AB%20105820.svg",
   "ab-105821": "/plans/AB%20105821.svg",
+  "ab-105824": "/plans/AB%20105821.svg",
   "ab-105822": "/plans/AB%20105822.svg",
+  "ab-105823": "/plans/AB%20105822.svg",
+  "ab-105829": "/plans/AB%20105822.svg",
+  "ab-105832": "/plans/AB%20105822.svg",
   "ab-105826": "/plans/AB%20105826.svg",
   "ab-105827": "/plans/AB%20105827.svg",
+  "ab-105830": "/plans/AB%20105827.svg",
   "ab-105835": "/plans/AB%20105835.svg",
   "ab-105836": "/plans/AB%20105836.svg",
   "ab-105842": "/plans/AB%20105842.svg",
+  "ab-105839": "/plans/AB%20105842.svg",
   "ab-105833": "/plans/AB%20105833.svg",
   "ab-105841": "/plans/AB%20105841.svg",
+  "ab-105838": "/plans/AB%20105841.svg",
+  "ab-105844": "/plans/AB%20105841.svg",
   "ab-105811": "/plans/AB%20105811.svg",
   "108134-modul-1": "/plans/108134%20MODUL%201.svg",
 };
@@ -717,4 +727,15 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "worktop", left: 7.34, top: 61.35, width: 0.44, height: 26.49 },
   ],
 };
+
+PLAN_HOTSPOTS_BY_SLUG["ab-105815"] = PLAN_HOTSPOTS_BY_SLUG["ab-105811"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105818"] = PLAN_HOTSPOTS_BY_SLUG["ab-105814"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105824"] = PLAN_HOTSPOTS_BY_SLUG["ab-105821"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105823"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105829"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105832"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105830"] = PLAN_HOTSPOTS_BY_SLUG["ab-105827"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105839"] = PLAN_HOTSPOTS_BY_SLUG["ab-105842"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105838"] = PLAN_HOTSPOTS_BY_SLUG["ab-105841"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105844"] = PLAN_HOTSPOTS_BY_SLUG["ab-105841"];
 
