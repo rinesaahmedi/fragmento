@@ -1,5 +1,7 @@
 import { cookies } from "next/headers";
 import { showAdminClaimsInNav } from "../lib/admin-claims-access";
+import { isSuperAdmin } from "../lib/admin-roles";
+import { getAdminSession } from "../lib/auth";
 import { AdminShellClient } from "./admin-shell-client";
 
 function normalizeLanguage(value) {
@@ -9,12 +11,15 @@ function normalizeLanguage(value) {
 export async function AdminShell({ adminEmail, children }) {
   const cookieStore = await cookies();
   const initialLanguage = normalizeLanguage(cookieStore.get("adminLanguage")?.value);
+  const session = await getAdminSession();
 
   return (
     <AdminShellClient
-      adminEmail={adminEmail}
+      adminEmail={adminEmail || session?.email || ""}
+      adminRole={session?.role || "ADMIN"}
       initialLanguage={initialLanguage}
-      showClaimsNav={showAdminClaimsInNav(adminEmail)}
+      showClaimsNav={showAdminClaimsInNav(adminEmail || session?.email)}
+      showUsersNav={isSuperAdmin(session)}
     >
       {children}
     </AdminShellClient>

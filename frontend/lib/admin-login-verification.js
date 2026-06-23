@@ -102,6 +102,11 @@ export async function sendAdminLoginVerificationEmail({ to, code }) {
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();
 
   if (!to || !smtpHost || !smtpFrom || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    if (process.env.NODE_ENV !== "production") {
+      console.info(`[admin-login] Verification code for ${to}: ${code}`);
+      return;
+    }
+
     const error = new Error("Email verification is not configured. Please contact support.");
     error.status = 503;
     throw error;
