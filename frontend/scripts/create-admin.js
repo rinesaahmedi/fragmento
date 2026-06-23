@@ -38,14 +38,14 @@ for (const envPath of [
 
 const prisma = new PrismaClient();
 
-async function syncAdminUser(email, password, label) {
+async function syncAdminUser(email, password, label, role = "ADMIN") {
   const passwordHash = await bcrypt.hash(password, 12);
   await prisma.adminUser.upsert({
     where: { email },
-    update: { passwordHash },
-    create: { email, passwordHash },
+    update: { passwordHash, role, isActive: true },
+    create: { email, passwordHash, role },
   });
-  console.log(`${label} synced for ${email}`);
+  console.log(`${label} synced for ${email} (${role})`);
 }
 
 async function main() {
@@ -60,7 +60,7 @@ async function main() {
     throw new Error("ADMIN_PASSWORD is missing in frontend/.env");
   }
 
-  await syncAdminUser(adminEmail, adminPassword, "Primary admin user");
+  await syncAdminUser(adminEmail, adminPassword, "Primary admin user", "SUPERADMIN");
 
   const claimsEmail = String(process.env.ADMIN_CLAIMS_EMAIL || "").trim();
   const claimsPassword = String(process.env.ADMIN_CLAIMS_PASSWORD || "");
@@ -73,7 +73,7 @@ async function main() {
       throw new Error("ADMIN_CLAIMS_PASSWORD is missing but ADMIN_CLAIMS_EMAIL is set in frontend/.env");
     }
 
-    await syncAdminUser(claimsEmail, claimsPassword, "Claims admin user");
+    await syncAdminUser(claimsEmail, claimsPassword, "Claims admin user", "ADMIN");
 
     const allowedClaimsEmails = String(process.env.ADMIN_CLAIMS_ACCESS_EMAILS || "")
       .split(",")

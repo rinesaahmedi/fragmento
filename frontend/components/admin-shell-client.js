@@ -12,26 +12,36 @@ const navItems = [
   { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
   { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon, requiresClaimsNav: true },
+  { href: "/admin/users", labelKey: "adminShellLogin.users", fallback: "Users", icon: UsersIcon, requiresUsersNav: true },
   { href: "/admin/account", labelKey: "adminShellLogin.account", fallback: "Account", icon: AccountIcon },
   { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
 ];
 const DESKTOP_SIDEBAR_WIDTH = "clamp(240px, 18vw, 300px)";
 
-export function AdminShellClient({ adminEmail, initialLanguage = "en", showClaimsNav = false, children }) {
+export function AdminShellClient({ adminEmail, adminRole = "ADMIN", initialLanguage = "en", showClaimsNav = false, showUsersNav = false, children }) {
   return (
     <AdminI18nProvider initialLanguage={initialLanguage}>
-      <AdminShellContent adminEmail={adminEmail} showClaimsNav={showClaimsNav}>
+      <AdminShellContent
+        adminEmail={adminEmail}
+        adminRole={adminRole}
+        showClaimsNav={showClaimsNav}
+        showUsersNav={showUsersNav}
+      >
         {children}
       </AdminShellContent>
     </AdminI18nProvider>
   );
 }
 
-function AdminShellContent({ adminEmail, showClaimsNav, children }) {
+function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav, children }) {
   const pathname = usePathname();
   const { translate } = useAdminI18n();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
-  const visibleNavItems = navItems.filter((item) => !item.requiresClaimsNav || showClaimsNav);
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.requiresClaimsNav && !showClaimsNav) return false;
+    if (item.requiresUsersNav && !showUsersNav) return false;
+    return true;
+  });
   const activeNavItem = visibleNavItems.find((item) => isActivePath(pathname, item.href)) ?? visibleNavItems[0];
 
   return (
@@ -710,6 +720,19 @@ function AccountIcon({ active }) {
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <circle cx="8" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.5" />
         <path d="M3 13C3.5 10.5 5.1 9.25 8 9.25C10.9 9.25 12.5 10.5 13 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function UsersIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="5.5" cy="5" r="2.25" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M1.5 13.5C2 11.2 3.4 9.75 5.5 9.75C6.6 9.75 7.55 10.15 8.2 10.85" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="11.25" cy="5.75" r="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M14.5 13.5C14.15 11.55 12.95 10.25 11.25 10.25C10.35 10.25 9.55 10.6 9 11.15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
       </svg>
     </IconFrame>
   );

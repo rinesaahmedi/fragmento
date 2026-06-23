@@ -83,15 +83,22 @@ export async function getPendingAdminLogin() {
     return null;
   }
 
-  return prisma.adminUser.findUnique({
+  const admin = await prisma.adminUser.findUnique({
     where: { id: payload.adminId },
     select: {
       id: true,
       email: true,
+      isActive: true,
       loginVerificationCodeHash: true,
       loginVerificationExpiresAt: true,
     },
   });
+
+  if (!admin || admin.isActive === false) {
+    return null;
+  }
+
+  return admin;
 }
 
 export async function clearPendingAdminLogin() {
@@ -118,9 +125,14 @@ export async function getAdminSession() {
   const payload = decodeSession(token);
   if (!payload) return null;
 
-  return prisma.adminUser.findUnique({
+  const admin = await prisma.adminUser.findUnique({
     where: { id: payload.adminId },
   });
+  if (!admin || admin.isActive === false) {
+    return null;
+  }
+
+  return admin;
 }
 
 export async function requireAdminPage() {
