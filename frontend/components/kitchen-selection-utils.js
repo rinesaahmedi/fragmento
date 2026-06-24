@@ -1,3 +1,5 @@
+import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
+
 export function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -284,6 +286,14 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   }
   if (iconKey === "tall_refrigerator") {
     return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
+  }
+
+  const cabinetWidthName = getCabinetWidthDisplayName({
+    ...item,
+    name: rawName,
+  }, language);
+  if (cabinetWidthName) {
+    return withPhotoNumber(cabinetWidthName);
   }
 
   const normalizedRawTitle = rawTitle.toLowerCase();
