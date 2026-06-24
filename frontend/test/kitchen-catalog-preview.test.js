@@ -101,3 +101,14 @@ test("AB 105809 oven preview uses polygon outline instead of oversized bbox", ()
   assert.ok(Array.isArray(ovenHotspots[0].outlinePoints));
   assert.ok(ovenHotspots[0].outlinePoints.length >= 3);
 });
+
+test("AB 105821 corner cabinet previews include left blende in the cabinet bounds", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105821");
+  const wallHotspots = getKitchenCatalogPreviewHotspots(preview, "wall-cabinet-1");
+  const baseHotspots = getKitchenCatalogPreviewHotspots(preview, "base-module-1");
+
+  assert.equal(wallHotspots.length, 1);
+  assert.equal(baseHotspots.length, 1);
+  assert.ok(wallHotspots[0].left < 10.34);
+  assert.ok(baseHotspots[0].left < 10.34);
+});

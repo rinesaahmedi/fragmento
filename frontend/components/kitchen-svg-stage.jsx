@@ -529,7 +529,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "refrigerator", left: 69.75, top: 31.0, width: 14.52, height: 66.43 },
   ],
   "ab-105821": [
-    { componentKey: "wall-cabinet-1", left: 10.34, top: 16.49, width: 13.09, height: 24.32 },
+    { componentKey: "wall-cabinet-1", left: 9.89, top: 16.49, width: 13.54, height: 24.32 },
     { componentKey: "wall-cabinet-2", left: 23.43, top: 16.49, width: 14.26, height: 24.32 },
     { componentKey: "wall-cabinet-3", left: 37.69, top: 16.49, width: 14.25, height: 24.32 },
     { componentKey: "wall-cabinet-4", left: 51.94, top: 16.49, width: 14.26, height: 24.32 },
@@ -538,7 +538,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "worktop", left: 10.34, top: 58.47, width: 62.99, height: 1.35 },
     { componentKey: "worktop", left: 73.33, top: 58.49, width: 0.45, height: 25.66 },
     { componentKey: "sink-faucet", left: 30.35, top: 50.1, width: 6.25, height: 9.4, preserveManualSize: true },
-    { componentKey: "base-module-1", left: 10.34, top: 58.49, width: 13.09, height: 25.66 },
+    { componentKey: "base-module-1", left: 9.89, top: 58.49, width: 13.54, height: 25.66 },
     { componentKey: "sink-base", left: 23.43, top: 58.49, width: 14.26, height: 25.66 },
     { componentKey: "base-module-3", left: 37.69, top: 58.49, width: 14.25, height: 25.66 },
     { componentKey: "oven-module", left: 51.94, top: 58.49, width: 14.26, height: 25.66 },
