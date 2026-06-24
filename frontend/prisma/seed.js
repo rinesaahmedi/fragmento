@@ -344,7 +344,7 @@ const MODUL1_108134_ITEMS = [
 ];
 
 const AB_105807_ITEMS = [
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105807-1", name: "Wall Cabinet 1", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 10, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105807-1", name: "Wall Cabinet 1", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 10, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105807-2", name: "Wall Cabinet 2", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 20, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105807-3", name: "Wall Cabinet 3", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 30, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105807-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 40, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -353,7 +353,7 @@ const AB_105807_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "DISH-AB105807-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105807", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 65, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "OVEN-AB105807-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 70, infoText: "Built-in oven + induction hob", isLocked: true },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105807-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 80, infoText: "US60 base storage cabinet", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105807-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 80, infoText: "US60 base storage cabinet", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105807-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 90, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "SINK-AB105807-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 100, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
@@ -391,10 +391,10 @@ const AB_105819_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", widthMm: 600, heightMm: 600, depthMm: 878, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", widthMm: 600, heightMm: 600, depthMm: 878, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105819-US60-R", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105819-US60-R", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105819-600", name: "Dishwasher", price: "579.00", widthMm: 600, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105819-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 60, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105819-H6002-R", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105819-H6002-R", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105819-H6002-L1", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105819-H6002-L2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -411,9 +411,11 @@ const AB_105821_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105821-FILLER-550", name: "Base cabinet", price: "25.01", widthMm: 550, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "Base cabinet filler, hinge right", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105821-FILLER-550", name: "Base cabinet", price: "25.01", widthMm: 550, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "Base cabinet filler, hinge right", blendeCode: "UPK20", blendeLabel: "UPK20 20cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105821-600", name: "Dishwasher", price: "579.00", widthMm: 600, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105821-US30", name: "Base Cabinet", price: "175.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 60, infoText: "US30 base cabinet, hinge left", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-FILLER-550", name: "Wall Cabinet", price: "35.01", widthMm: 550, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "Wall cabinet filler, hinge right", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-FILLER-550", name: "Wall Cabinet", price: "35.01", widthMm: 550, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "Wall cabinet filler, hinge right", blendeCode: "HPK2002", blendeLabel: "HPK2002 20cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-H6002-R", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-H6002-L", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
@@ -439,14 +441,14 @@ const AB_105833_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105822-FILLER-500", name: "Base cabinet", price: "0.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105822-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105833-FILLER-500-R", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105822-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105833-FILLER-500-R", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105833-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "drawer-module", sortOrder: 80, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105833-FILLER-500-L", name: "Wall Cabinet", price: "0.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105833-H6002-L1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105833-FILLER-500-R", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105833-H6002-L1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105833-FILLER-500-R", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105833-H6002-L2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 130, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105833-H6002-L3", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 140, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 150, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
@@ -462,10 +464,10 @@ const AB_105827_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105827-FILLER-500", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105827-FILLER-500", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105827-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105827-US30", name: "Base Cabinet", price: "175.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 60, infoText: "US30 base cabinet, hinge left", articleNumber: "US30" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105827-FILLER-500", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105827-FILLER-500", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-H6002-R", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-H6002-L", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -488,7 +490,7 @@ const AB_105826_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105826-US60-R", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105826-US60-R", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105826-US60-L", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 70, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105826-H6002-R", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
@@ -496,7 +498,7 @@ const AB_105826_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105826-H6002-L1", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105826-H6002-L2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105826-H6002-L3", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105826-H6002-L3", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 130, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
@@ -539,10 +541,10 @@ const AB_105823_ITEMS = AB_105822_ITEMS.map((item) => {
 // + last wall cabinet); AB 105822 doesn't have one, so this is a separate clone, not an alias.
 const AB_105829_ITEMS = AB_105822_ITEMS.map((item) => {
   if (item.code === "CAB-BASE-AB105822-FILLER-500") {
-    return { ...item, price: "25.01", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" };
+    return { ...item, price: "25.01", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" };
   }
   if (item.code === "CAB-WALL-AB105822-H6002-3") {
-    return { ...item, price: "184.00", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" };
+    return { ...item, price: "184.00", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" };
   }
   return item;
 });
@@ -558,7 +560,7 @@ const AB_105820_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105820-US60", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 50, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105806-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105806-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 75, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105820-H3002-300", name: "Wall Cabinet", price: "115.00", widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H3002, hinge right", articleNumber: "H3002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -566,7 +568,7 @@ const AB_105820_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105820-H6002", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-1", name: "Wall Cabinet 1", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-2", name: "Wall Cabinet 2", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-3", name: "Wall Cabinet 3", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-3", name: "Wall Cabinet 3", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 140, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
@@ -677,7 +679,7 @@ const AB_105810_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105810-FILLER-400", name: "Base cabinet", price: "0.01", widthMm: 400, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet filler, hinge left" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 50, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105806-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105806-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 75, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105810-H4502", name: "Wall Cabinet", price: "139.00", widthMm: 450, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H4502, hinge right, 2 adjustable shelves", articleNumber: "H4502" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -685,7 +687,7 @@ const AB_105810_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105810-FILLER-400", name: "Wall Cabinet", price: "0.01", widthMm: 400, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "Wall cabinet filler, hinge right" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-1", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-3", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-3", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 140, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "Blanco Botton 517467" },
   { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
@@ -704,12 +706,12 @@ const AB_105835_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105835-US60-R", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105835-US60-R", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105835-US60-L1", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105841-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105835-US60-L2", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105841-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 80, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105835-H6002-R", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105835-H6002-R", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105835-H6002-L", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
@@ -732,14 +734,14 @@ const AB_105836_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105836-US60-R", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105836-US60-L", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105836-FILLER-500", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105836-US60-L", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105836-FILLER-500", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105836-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "drawer-module", sortOrder: 80, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105836-H6002-R", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105836-H6002-L1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105836-FILLER-500", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105836-H6002-L1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105836-FILLER-500", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105836-H6002-L2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 130, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105836-H6002-L3", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 140, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 150, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
@@ -757,14 +759,14 @@ const AB_105842_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105842-US60-R", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105842-US60-L", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105842-FILLER-500", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105842-US60-L", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105842-FILLER-500", name: "Base cabinet", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "base cabinet filler, hinge right", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105842-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "drawer-module", sortOrder: 80, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105842-H6002-R", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105842-H6002-L1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105842-FILLER-500", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105842-H6002-L1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105842-FILLER-500", name: "Wall Cabinet", price: "35.01", widthMm: 500, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "wall cabinet filler, hinge right", articleNumber: "Oberschrank", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105842-H6002-L2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 130, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105842-H6002-L3", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 140, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "SINK-AB105806-BOTTON-45", name: "Sink and Waste System", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 150, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
@@ -808,7 +810,7 @@ const AB_105845_ITEMS = [
 // wall cabinets 12/13/14, sink+waste); the rest get AB105841 codes so their plan numbers (4-9, 11)
 // stay correct (callout numbers are keyed by code in kitchen-selection-utils.js).
 const AB_105841_ITEMS = [
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105841-US60-1", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 10, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105841-US60-1", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 10, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 20, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105841-US60-2", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 30, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 40, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
@@ -816,7 +818,7 @@ const AB_105841_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105841-US60-3", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 65, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105841-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 70, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105841-H6002-1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105841-H6002-1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105841-H6002-2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
@@ -924,10 +926,10 @@ const AB_105811_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-AB105806-600-HOB", name: "Built-in Oven and Hob", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105811-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 30mm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105811-US60", name: "Base cabinet with drawer", price: "244.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105811-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105811-KGCN388140E", name: "Refrigerator", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 60, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105811-1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 30mm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105811-1", name: "Wall Cabinet", price: "184.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105811-2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105811-3", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -1254,6 +1256,164 @@ function normalizeSeedSlug(value) {
     .slice(0, 96);
 }
 
+const LOWER_CABINET_ICON_KEYS = new Set([
+  "base_cabinet_30",
+  "drawer_base",
+  "drawer_base_two",
+  "drawer_base_three",
+  "sink_base",
+]);
+
+const UPPER_CABINET_ICON_KEYS = new Set([
+  "wall_cabinet_l",
+  "wall_cabinet_plain",
+  "wall_cabinet_r",
+  "wall_cabinet_standard",
+]);
+
+const EXCLUDED_CABINET_CODE_PREFIXES = [
+  "CAB-HOOD-",
+  "HOOD-",
+  "DISH-",
+  "LIGHT-",
+  "OVEN-",
+  "REF-",
+  "TOP-",
+  "WM-",
+];
+
+const EXCLUDED_CABINET_ICON_KEYS = new Set([
+  "dishwasher_base",
+  "extractor_hood",
+  "hood",
+  "oven_base",
+  "tall_refrigerator",
+  "under_cabinet_light",
+  "washing_machine_base",
+  "worktop",
+]);
+
+function firstPositiveNumber(values) {
+  for (const value of values) {
+    if (value === null || value === undefined || value === "") continue;
+    const number = Number(value);
+    if (Number.isFinite(number) && number > 0) {
+      return number;
+    }
+  }
+  return null;
+}
+
+function extractCabinetWidthFromText(value) {
+  const text = String(value || "").trim();
+  if (!text) return null;
+
+  const patterns = [
+    /\b(?:US|H)(?:2A)?(\d{2})(?:\d{2})?\b/i,
+    /\b(\d{3})\s*(?:x|\u00d7|\/)\s*\d{2,4}\b/i,
+    /\b(?:width|breite)\D{0,12}(\d{3})\b/i,
+    /\b(\d{3})\s*mm\b/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = text.match(pattern);
+    if (!match) continue;
+    const number = Number.parseInt(match[1], 10);
+    if (Number.isFinite(number) && number > 0) {
+      return number < 100 ? number * 10 : number;
+    }
+  }
+
+  return null;
+}
+
+function extractCabinetWidthFromCode(value) {
+  const code = String(value || "").trim().toUpperCase();
+  if (!code) return null;
+
+  const patterns = [
+    /(?:^|[-_])(?:TOP|BOTTOM)[-_]?(\d{3})(?:$|[-_])/,
+    /(?:^|[-_])(\d{3})(?:$|[-_])/,
+    /(?:^|[-_])US(?:2A)?(\d{2})(?:$|[-_])/,
+    /(?:^|[-_])H(\d{2})\d{2}(?:$|[-_])/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = code.match(pattern);
+    if (!match) continue;
+    const number = Number.parseInt(match[1], 10);
+    if (Number.isFinite(number) && number > 0) {
+      return number < 100 ? number * 10 : number;
+    }
+  }
+
+  return null;
+}
+
+function getCabinetWidthMm(item) {
+  return firstPositiveNumber([
+    item?.widthMm,
+    extractCabinetWidthFromCode(item?.code),
+    extractCabinetWidthFromText(item?.name),
+    extractCabinetWidthFromText(item?.infoText),
+    extractCabinetWidthFromText(item?.articleNumber),
+  ]);
+}
+
+function getCabinetKind(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const name = String(item?.name || "").trim().toLowerCase();
+
+  if (!code && !iconKey && !componentKey && !name) return null;
+  if (EXCLUDED_CABINET_CODE_PREFIXES.some((prefix) => code.startsWith(prefix))) return null;
+  if (EXCLUDED_CABINET_ICON_KEYS.has(iconKey)) return null;
+  if (code.startsWith("CAB-BASE-")
+    || code.startsWith("CAB-COOK-")
+    || code.startsWith("CAB-DRAWER-")
+    || code.startsWith("SINKBASE-")
+    || code.startsWith("LKNEW-BOTTOM-")
+    || code.startsWith("T3D-CAB-BASE-")
+    || code.startsWith("T3D-CAB-CORNER-")
+    || code.startsWith("T3D-CAB-DRAWERS-")
+    || code.startsWith("T3D-CAB-STORAGE-")
+    || LOWER_CABINET_ICON_KEYS.has(iconKey)) {
+    return "lower";
+  }
+
+  if (code.startsWith("CAB-WALL-")
+    || code.startsWith("LKNEW-TOP-")
+    || code.startsWith("T3D-CAB-WALL-")
+    || UPPER_CABINET_ICON_KEYS.has(iconKey)
+    || componentKey.includes("wall-cabinet")) {
+    return "upper";
+  }
+
+  if (/^(base cabinet|sink base cabinet|drawer base cabinet|return base cabinet|corner base cabinet)\b/.test(name)) {
+    return "lower";
+  }
+  if (/^wall cabinet\b/.test(name)) {
+    return "upper";
+  }
+
+  return null;
+}
+
+function getCabinetWidthDisplayName(item, language = "en") {
+  const kind = getCabinetKind(item);
+  const widthMm = getCabinetWidthMm(item);
+  if (!kind || !Number.isFinite(Number(widthMm)) || Number(widthMm) <= 0) return "";
+  const widthCm = Number(widthMm) / 10;
+  const widthLabel = Number.isInteger(widthCm)
+    ? String(widthCm)
+    : String(Number(widthCm.toFixed(2))).replace(/\.0+$/, "");
+  if (language === "de") {
+    return `${kind === "lower" ? "Unterschrank" : "Oberschrank"} ${widthLabel}`;
+  }
+  return `${kind === "lower" ? "Lower" : "Upper"} cabinet ${widthLabel}`;
+}
+
 function mapClaimsDecisionGuideEntry(entry) {
   const priorityByDecision = {
     URGENT_CLAIM_STOP_USE: 130,
@@ -1512,14 +1672,16 @@ async function main() {
     for (const item of kitchen.items) {
       const existingItem = existingByCode.get(item.code) || (item.legacyCode ? existingByCode.get(item.legacyCode) : null);
       const productInfo = PRODUCT_INFO_BY_CODE[item.code] || {};
+      const cabinetWidthName = getCabinetWidthDisplayName(item);
+      const cabinetWidthNameDe = getCabinetWidthDisplayName(item, "de");
       const data = {
         ...productInfo,
         productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
         itemType: item.itemType,
         code: item.code,
         articleNumber: item.articleNumber || null,
-        name: item.name,
-        nameDe: item.nameDe || null,
+        name: cabinetWidthName || item.name,
+        nameDe: cabinetWidthNameDe || item.nameDe || null,
         price: item.price,
         widthMm: item.widthMm ?? null,
         heightMm: item.heightMm ?? null,
