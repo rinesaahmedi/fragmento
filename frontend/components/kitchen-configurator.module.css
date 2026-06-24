@@ -885,14 +885,23 @@
   transform: translateY(2px);
 }
 
+.itemIconScaledCabinet {
+  height: 78px;
+}
+
+.itemIconScaledCabinet svg {
+  width: var(--catalog-cabinet-icon-width, 58px);
+  height: 78px;
+  max-width: none;
+  max-height: none;
+}
+
 .itemIconDrawerBase {
   height: 78px;
 }
 
 .itemIconDrawerBase svg {
-  width: 58px;
   height: 78px;
-  max-width: none;
   max-height: none;
 }
 

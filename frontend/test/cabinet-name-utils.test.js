@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { getLocalizedItemName } from "../components/kitchen-selection-utils.js";
 import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
 
 test("base cabinet width uses lower cabinet label", () => {
@@ -10,7 +11,7 @@ test("base cabinet width uses lower cabinet label", () => {
       widthMm: 300,
       iconKey: "drawer_base_two",
     }),
-    "Lower cabinet 30",
+    "Lower cabinet with drawer 30",
   );
 });
 
@@ -22,11 +23,11 @@ test("wall cabinet width uses upper cabinet label", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet 60",
+    "Upper cabinet with drawer 60",
   );
 });
 
-test("sink base cabinet is a lower cabinet", () => {
+test("sink base cabinet is not renamed as a lower cabinet", () => {
   assert.equal(
     getCabinetWidthDisplayName({
       code: "SINKBASE-TEST-600",
@@ -34,7 +35,24 @@ test("sink base cabinet is a lower cabinet", () => {
       widthMm: 600,
       iconKey: "sink_base",
     }),
-    "Lower cabinet 60",
+    "",
+  );
+});
+
+test("localized sink base name stays Sink Lower Cabinet even after stored-name migration", () => {
+  assert.equal(
+    getLocalizedItemName(
+      {
+        code: "SINKBASE-AB105806-600",
+        name: "Lower cabinet with drawer 60",
+        widthMm: 600,
+        iconKey: "sink_base",
+      },
+      (_key, fallback) => fallback,
+      "en",
+      false,
+    ),
+    "Sink Lower Cabinet",
   );
 });
 
@@ -45,7 +63,7 @@ test("wall cabinet width falls back to code", () => {
       name: "Wall Cabinet",
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet 50",
+    "Upper cabinet with drawer 50",
   );
 });
 
@@ -57,7 +75,7 @@ test("structured width wins over misleading code width", () => {
       widthMm: 500,
       iconKey: "wall_cabinet_standard",
     }),
-    "Upper cabinet 50",
+    "Upper cabinet with drawer 50",
   );
 });
 
@@ -69,7 +87,7 @@ test("cabinet labels use German names when requested", () => {
       widthMm: 600,
       iconKey: "drawer_base_two",
     }, "de"),
-    "Unterschrank 60",
+    "Unterschrank mit Schublade 60",
   );
   assert.equal(
     getCabinetWidthDisplayName({
