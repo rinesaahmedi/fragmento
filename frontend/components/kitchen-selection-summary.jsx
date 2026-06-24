@@ -92,7 +92,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{itemName}</strong>
-        {articleNumber ? (
+        {!isLocked && articleNumber ? (
           <span className={styles.itemCode}>
             {translate("common.article", "Article")}: {articleNumber}
           </span>
@@ -176,7 +176,7 @@ export default function KitchenSelectionSummary({
         ) : null}
 
         {mergedLockedSelectedComponents.length ? (
-          <div className={styles.summarySectionTitle}>{translate("configurator.summaryStandardEquipment", "Standard equipment")}</div>
+          <div className={styles.summarySectionTitle}>{translate("configurator.summaryStandardEquipment", "Default components")}</div>
         ) : null}
         {mergedLockedSelectedComponents.map((item) => (
           <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />

@@ -1254,7 +1254,6 @@ const LOWER_CABINET_ICON_KEYS = new Set([
   "drawer_base",
   "drawer_base_two",
   "drawer_base_three",
-  "sink_base",
 ]);
 
 const UPPER_CABINET_ICON_KEYS = new Set([
@@ -1271,6 +1270,7 @@ const EXCLUDED_CABINET_CODE_PREFIXES = [
   "LIGHT-",
   "OVEN-",
   "REF-",
+  "SINKBASE-",
   "TOP-",
   "WM-",
 ];
@@ -1365,7 +1365,6 @@ function getCabinetKind(item) {
   if (code.startsWith("CAB-BASE-")
     || code.startsWith("CAB-COOK-")
     || code.startsWith("CAB-DRAWER-")
-    || code.startsWith("SINKBASE-")
     || code.startsWith("LKNEW-BOTTOM-")
     || code.startsWith("T3D-CAB-BASE-")
     || code.startsWith("T3D-CAB-CORNER-")
@@ -1402,9 +1401,9 @@ function getCabinetWidthDisplayName(item, language = "en") {
     ? String(widthCm)
     : String(Number(widthCm.toFixed(2))).replace(/\.0+$/, "");
   if (language === "de") {
-    return `${kind === "lower" ? "Unterschrank" : "Oberschrank"} ${widthLabel}`;
+    return kind === "lower" ? `Unterschrank mit Schublade ${widthLabel}` : `Oberschrank ${widthLabel}`;
   }
-  return `${kind === "lower" ? "Lower" : "Upper"} cabinet ${widthLabel}`;
+  return `${kind === "lower" ? "Lower" : "Upper"} cabinet with drawer ${widthLabel}`;
 }
 
 function mapClaimsDecisionGuideEntry(entry) {
