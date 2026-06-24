@@ -1410,7 +1410,9 @@ function getCabinetWidthDisplayName(item, language = "en") {
   if (language === "de") {
     return kind === "lower" ? `Unterschrank mit Schublade ${widthLabel}` : `Oberschrank ${widthLabel}`;
   }
-  return `${kind === "lower" ? "Lower" : "Upper"} cabinet with drawer ${widthLabel}`;
+  return kind === "lower"
+    ? `Lower cabinet with drawer ${widthLabel}`
+    : `Upper cabinet ${widthLabel}`;
 }
 
 function mapClaimsDecisionGuideEntry(entry) {

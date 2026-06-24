@@ -23,7 +23,7 @@ test("wall cabinet width uses upper cabinet label", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet with drawer 60",
+    "Upper cabinet 60",
   );
 });
 
@@ -56,6 +56,23 @@ test("localized sink base name stays Sink Lower Cabinet even after stored-name m
   );
 });
 
+test("localized hood wall cabinet uses extractor hood upper cabinet label", () => {
+  assert.equal(
+    getLocalizedItemName(
+      {
+        code: "CAB-HOOD-AB105806-600",
+        name: "Hood Wall Cabinet",
+        widthMm: 600,
+        iconKey: "hood_wall_cabinet",
+      },
+      (_key, fallback) => fallback,
+      "en",
+      false,
+    ),
+    "Extractor Hood Upper Cabinet",
+  );
+});
+
 test("wall cabinet width falls back to code", () => {
   assert.equal(
     getCabinetWidthDisplayName({
@@ -63,7 +80,7 @@ test("wall cabinet width falls back to code", () => {
       name: "Wall Cabinet",
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet with drawer 50",
+    "Upper cabinet 50",
   );
 });
 
@@ -75,7 +92,7 @@ test("structured width wins over misleading code width", () => {
       widthMm: 500,
       iconKey: "wall_cabinet_standard",
     }),
-    "Upper cabinet with drawer 50",
+    "Upper cabinet 50",
   );
 });
 

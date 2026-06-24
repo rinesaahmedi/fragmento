@@ -92,9 +92,11 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{itemName}</strong>
-        {!isLocked && articleNumber ? (
+        {!isLocked && (articleNumber || item.blendeLabel) ? (
           <span className={styles.itemCode}>
-            {translate("common.article", "Article")}: {articleNumber}
+            {articleNumber ? `${translate("common.article", "Article")}: ${articleNumber}` : ""}
+            {articleNumber && item.blendeLabel ? " " : ""}
+            {item.blendeLabel ? <span className={styles.summaryInlineBlendeNote}>+ {item.blendeLabel}</span> : null}
           </span>
         ) : null}
         {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}

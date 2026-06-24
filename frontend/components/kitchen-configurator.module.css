@@ -2117,6 +2117,11 @@
   display: block;
 }
 
+.summaryMeta .summaryInlineBlendeNote {
+  display: inline;
+  font-style: italic;
+}
+
 .summaryPrice {
   color: #2f2a24;
   font-weight: 800;

@@ -142,7 +142,7 @@ WITH classified AS (
 renamed AS (
   SELECT
     "id",
-    CASE WHEN cabinet_kind = 'lower' THEN 'Lower' ELSE 'Upper' END || ' cabinet with drawer ' ||
+    CASE WHEN cabinet_kind = 'lower' THEN 'Lower cabinet with drawer ' ELSE 'Upper cabinet ' END ||
       CASE
         WHEN width_mm % 10 = 0 THEN (width_mm / 10)::text
         ELSE regexp_replace((width_mm::numeric / 10)::text, '\.?0+$', '')

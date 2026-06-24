@@ -337,7 +337,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
     case "CAB-HOOD-AB105837-600":
-      return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Extractor Hood Upper Cabinet"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-C-ML-600":
