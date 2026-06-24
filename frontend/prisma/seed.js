@@ -412,9 +412,11 @@ const AB_105821_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105806-600", name: "Sink Base Cabinet", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105821-FILLER-550", name: "Base cabinet", price: "25.01", widthMm: 550, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "Base cabinet filler, hinge right", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105821-FILLER-550", name: "Base cabinet", price: "25.01", widthMm: 550, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "Base cabinet filler, hinge right", blendeCode: "UPK20", blendeLabel: "UPK20 20cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105821-600", name: "Dishwasher", price: "579.00", widthMm: 600, heightMm: 815, depthMm: 550, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105821-US30", name: "Base Cabinet", price: "175.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 60, infoText: "US30 base cabinet, hinge left", articleNumber: "US30" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-FILLER-550", name: "Wall Cabinet", price: "35.01", widthMm: 550, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "Wall cabinet filler, hinge right", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-FILLER-550", name: "Wall Cabinet", price: "35.01", widthMm: 550, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "Wall cabinet filler, hinge right", blendeCode: "HPK2002", blendeLabel: "HPK2002 20cm", blendePrice: "35.00" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-H6002-R", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105821-H6002-L", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: "349.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -528,10 +530,15 @@ const AB_105822_ITEMS = [
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
-const AB_105823_ITEMS = AB_105822_ITEMS;
+const AB_105823_ITEMS = AB_105822_ITEMS.map((item) => {
+  if (item.code === "CAB-WALL-AB105822-H6002-3") {
+    return { ...item, price: "184.00", blendeCode: "HPK2002", blendeLabel: "HPK2002 20cm", blendePrice: "35.00" };
+  }
+  return item;
+});
 
 // AB 105829 and AB 105832 add a blende note on top of AB 105822's layout (base filler cabinet
-// + last wall cabinet); AB 105822/105823 don't have one, so this is a separate clone, not an alias.
+// + last wall cabinet); AB 105822 doesn't have one, so this is a separate clone, not an alias.
 const AB_105829_ITEMS = AB_105822_ITEMS.map((item) => {
   if (item.code === "CAB-BASE-AB105822-FILLER-500") {
     return { ...item, price: "25.01", articleNumber: "Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" };
