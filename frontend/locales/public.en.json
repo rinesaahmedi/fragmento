@@ -7,6 +7,7 @@
     "close": "Close",
     "totalPrice": "Total price",
     "code": "Code",
+    "article": "Article",
     "remove": "Remove",
     "openPdfInNewTab": "Open PDF in new tab",
     "clickForMoreInfo": "Show more information."
@@ -112,6 +113,8 @@
       "baseCabinetTwoDrawers": "Base Cabinet (2 Drawers)",
       "baseCabinetTwoDrawersLeft": "Base Cabinet (2 Drawers) Left",
       "baseCabinetTwoDrawersRight": "Base Cabinet (2 Drawers) Right",
+      "baseCabinetLeft": "Base Cabinet left",
+      "baseCabinetRight": "Base Cabinet right",
       "baseCabinetLeftLs": "Base Cabinet left",
       "baseCabinetRightLs": "Base Cabinet right",
       "baseCabinetThreeDrawers": "Base Cabinet (3 Drawers)"

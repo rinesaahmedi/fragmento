@@ -7,6 +7,7 @@
     "close": "Schließen",
     "totalPrice": "Gesamtpreis",
     "code": "Code",
+    "article": "Artikel",
     "remove": "Entfernen",
     "openPdfInNewTab": "PDF in neuem Tab öffnen",
     "clickForMoreInfo": "Mehr Informationen anzeigen"
@@ -112,6 +113,8 @@
       "baseCabinetTwoDrawers": "Unterschrank (2 Schubladen)",
       "baseCabinetTwoDrawersLeft": "Unterschrank (2 Schubladen) links",
       "baseCabinetTwoDrawersRight": "Unterschrank (2 Schubladen) rechts",
+      "baseCabinetLeft": "Unterschrank links",
+      "baseCabinetRight": "Unterschrank rechts",
       "baseCabinetLeftLs": "Unterschrank links",
       "baseCabinetRightLs": "Unterschrank rechts",
       "baseCabinetThreeDrawers": "Unterschrank (3 Schubladen)"

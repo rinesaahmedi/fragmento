@@ -290,10 +290,16 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   if (normalizedRawTitle === "base cabinet with drawer") {
     return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawers", "Base Cabinet (2 Drawers)"));
   }
+  if (normalizedRawTitle === "base cabinet left") {
+    return withDimensions(translate("configurator.catalogItemNames.baseCabinetLeft", "Base Cabinet left"));
+  }
+  if (normalizedRawTitle === "base cabinet right") {
+    return withDimensions(translate("configurator.catalogItemNames.baseCabinetRight", "Base Cabinet right"));
+  }
   if (normalizedRawTitle === "base cabinet") {
     return withDimensions(translate("configurator.catalogItemNames.baseCabinet", "Base Cabinet"));
   }
-  if (normalizedRawTitle === "wall cabinet") {
+  if (/^wall cabinet(?:\s+\d+)?$/.test(normalizedRawTitle)) {
     return withDimensions(translate("configurator.catalogItemNames.wallCabinet", "Wall Cabinet"));
   }
 
