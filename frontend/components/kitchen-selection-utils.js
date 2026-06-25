@@ -287,6 +287,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   if (iconKey === "tall_refrigerator") {
     return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Refrigerator"));
   }
+  if (code.startsWith("SINKBASE-") || code === "T3D-SINKBASE-001") {
+    return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
+  }
 
   const cabinetWidthName = getCabinetWidthDisplayName({
     ...item,
@@ -334,7 +337,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
     case "CAB-HOOD-AB105837-600":
-      return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Hood Wall Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Extractor Hood Upper Cabinet"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-C-ML-600":
@@ -369,9 +372,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "SINKBASE-AB105806-600":
     case "SINKBASE-AB105807-600":
     case "SINKBASE-C-600":
-      return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
     case "SINKBASE-LS-600":
-      return translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet");
+      return translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet");
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
@@ -442,7 +445,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "T3D-WASHER-001":
       return withDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
     case "T3D-SINKBASE-001":
-      return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Base Cabinet"));
+      return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
     case "T3D-DISH-001":
       return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
     case "T3D-CAB-STORAGE-001":

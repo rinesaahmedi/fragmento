@@ -112,3 +112,39 @@ test("AB 105821 corner cabinet previews include left blende in the cabinet bound
   assert.ok(wallHotspots[0].left < 10.34);
   assert.ok(baseHotspots[0].left < 10.34);
 });
+
+test("AB 105819 left cabinet previews include left blende in the cabinet bounds", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105819");
+  const wallHotspots = getKitchenCatalogPreviewHotspots(preview, "wall-cabinet-1");
+  const baseHotspots = getKitchenCatalogPreviewHotspots(preview, "base-module-1");
+
+  assert.equal(wallHotspots.length, 1);
+  assert.equal(baseHotspots.length, 1);
+  assert.ok(wallHotspots[0].left < 3.68);
+  assert.ok(baseHotspots[0].left < 3.68);
+});
+
+test("AB 105818 uses pixel-aligned 105810 wall cabinet and fridge hotspots", () => {
+  const wallHotspot = PLAN_HOTSPOTS_BY_SLUG["ab-105818"].find((hotspot) => hotspot.componentKey === "wall-cabinet-1");
+  const refrigeratorHotspot = PLAN_HOTSPOTS_BY_SLUG["ab-105818"].find((hotspot) => hotspot.componentKey === "refrigerator");
+
+  assert.ok(wallHotspot);
+  assert.ok(refrigeratorHotspot);
+  assert.ok(Math.abs(wallHotspot.left - 18.12) < 0.15);
+  assert.ok(Math.abs(wallHotspot.top - 15.77) < 0.15);
+  assert.ok(Math.abs(refrigeratorHotspot.left - 3.9) < 0.15);
+});
+
+test("AB 105814 uses pixel-aligned wall cabinet and fridge hotspots", () => {
+  const wallHotspot = PLAN_HOTSPOTS_BY_SLUG["ab-105814"].find((hotspot) => hotspot.componentKey === "wall-cabinet-1");
+  const rightWallHotspot = PLAN_HOTSPOTS_BY_SLUG["ab-105814"].find((hotspot) => hotspot.componentKey === "wall-cabinet-6");
+  const refrigeratorHotspot = PLAN_HOTSPOTS_BY_SLUG["ab-105814"].find((hotspot) => hotspot.componentKey === "refrigerator");
+
+  assert.ok(wallHotspot);
+  assert.ok(rightWallHotspot);
+  assert.ok(refrigeratorHotspot);
+  assert.ok(Math.abs(wallHotspot.left - 18.12) < 0.15);
+  assert.ok(Math.abs(wallHotspot.top - 15.77) < 0.15);
+  assert.ok(Math.abs(rightWallHotspot.left + rightWallHotspot.width - 94.86) < 0.15);
+  assert.ok(Math.abs(refrigeratorHotspot.left - 3.9) < 0.15);
+});

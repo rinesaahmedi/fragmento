@@ -85,6 +85,7 @@ WITH classified AS (
         OR upper(coalesce("code", '')) LIKE 'LIGHT-%'
         OR upper(coalesce("code", '')) LIKE 'OVEN-%'
         OR upper(coalesce("code", '')) LIKE 'REF-%'
+        OR upper(coalesce("code", '')) LIKE 'SINKBASE-%'
         OR upper(coalesce("code", '')) LIKE 'TOP-%'
         OR upper(coalesce("code", '')) LIKE 'WM-%'
         OR lower(coalesce("iconKey", '')) IN (
@@ -101,7 +102,6 @@ WITH classified AS (
       WHEN upper(coalesce("code", '')) LIKE 'CAB-BASE-%'
         OR upper(coalesce("code", '')) LIKE 'CAB-COOK-%'
         OR upper(coalesce("code", '')) LIKE 'CAB-DRAWER-%'
-        OR upper(coalesce("code", '')) LIKE 'SINKBASE-%'
         OR upper(coalesce("code", '')) LIKE 'LKNEW-BOTTOM-%'
         OR upper(coalesce("code", '')) LIKE 'T3D-CAB-BASE-%'
         OR upper(coalesce("code", '')) LIKE 'T3D-CAB-CORNER-%'
@@ -111,8 +111,7 @@ WITH classified AS (
           'base_cabinet_30',
           'drawer_base',
           'drawer_base_two',
-          'drawer_base_three',
-          'sink_base'
+          'drawer_base_three'
         )
         OR lower(coalesce("name", '')) ~ '^(base cabinet|sink base cabinet|drawer base cabinet|return base cabinet|corner base cabinet)\y'
         THEN 'lower'
@@ -143,16 +142,23 @@ WITH classified AS (
 renamed AS (
   SELECT
     "id",
-    CASE WHEN cabinet_kind = 'lower' THEN 'Lower' ELSE 'Upper' END || ' cabinet ' ||
+    CASE WHEN cabinet_kind = 'lower' THEN 'Lower cabinet with drawer ' ELSE 'Upper cabinet ' END ||
       CASE
         WHEN width_mm % 10 = 0 THEN (width_mm / 10)::text
         ELSE regexp_replace((width_mm::numeric / 10)::text, '\.?0+$', '')
       END AS cabinet_name,
-    CASE WHEN cabinet_kind = 'lower' THEN 'Unterschrank' ELSE 'Oberschrank' END || ' ' ||
-      CASE
-        WHEN width_mm % 10 = 0 THEN (width_mm / 10)::text
-        ELSE regexp_replace((width_mm::numeric / 10)::text, '\.?0+$', '')
-      END AS cabinet_name_de
+    CASE
+      WHEN cabinet_kind = 'lower' THEN 'Unterschrank mit Schublade ' ||
+        CASE
+          WHEN width_mm % 10 = 0 THEN (width_mm / 10)::text
+          ELSE regexp_replace((width_mm::numeric / 10)::text, '\.?0+$', '')
+        END
+      ELSE 'Oberschrank ' ||
+        CASE
+          WHEN width_mm % 10 = 0 THEN (width_mm / 10)::text
+          ELSE regexp_replace((width_mm::numeric / 10)::text, '\.?0+$', '')
+        END
+    END AS cabinet_name_de
   FROM classified
   WHERE cabinet_kind IS NOT NULL
     AND width_mm IS NOT NULL

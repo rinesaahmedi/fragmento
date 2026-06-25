@@ -21,6 +21,7 @@ import {
   SERVICE_CODE_MONTAGE,
   SERVICE_CODE_PICKUP,
 } from "../lib/service-eligibility";
+import { getCabinetWidthMm } from "../lib/cabinet-name-utils";
 import { usePublicI18n } from "./public-i18n";
 
 const DISHWASHER_BASE_MARKUP =
@@ -73,6 +74,7 @@ const ICON_MARKUP = {
   delivery_assembly:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
 };
+ICON_MARKUP.wall_cabinet_hood = ICON_MARKUP.hood_wall_cabinet;
 
 const TOOLTIP_PREVIEW_BY_CODE = {
   "DISH-B-600-STD": "/product-info-previews/dishwasher-preview.png",
@@ -89,6 +91,40 @@ const TOOLTIP_PREVIEW_BY_CODE = {
 };
 
 const PRODUCT_ASSISTANT_AVATAR_SRC = "/img/Untitled%20design%20(5).png";
+
+const WIDTH_SCALED_CABINET_ICON_KEYS = new Set([
+  "dishwasher",
+  "dishwasher_base",
+  "drawer_base",
+  "drawer_base_two",
+  "drawer_base_three",
+  "hood_wall_cabinet",
+  "wall_cabinet_hood",
+  "sink_base",
+  "wall_cabinet_plain",
+  "wall_cabinet_single_light",
+  "wall_cabinet_double_light",
+  "wall_cabinet_standard",
+]);
+
+function getCatalogCabinetIconWidthPx(item) {
+  if (!WIDTH_SCALED_CABINET_ICON_KEYS.has(String(item?.iconKey || ""))) return null;
+  const widthMm = Number(getCabinetWidthMm(item));
+  if (!Number.isFinite(widthMm) || widthMm <= 0) return null;
+
+  const clampedWidth = Math.min(Math.max(widthMm, 300), 600);
+  return Math.round(34 + ((clampedWidth - 300) / 300) * 30);
+}
+
+function getCatalogIconMarkup(item, stretchWidthOnly) {
+  const markup = ICON_MARKUP[item?.iconKey] || "";
+  if (!stretchWidthOnly || !markup.trim().startsWith("<svg")) return markup;
+
+  return markup.replace(
+    /^<svg\b(?![^>]*\bpreserveAspectRatio=)/,
+    '<svg preserveAspectRatio="none"',
+  );
+}
 
 function localizeProductInfoDocumentLabel(label, translate) {
   const normalized = String(label || "").trim().toLowerCase();
@@ -150,6 +186,7 @@ function CatalogItem({
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const { dimensions: itemDimensions } = getCatalogItemDetails(item);
+  const cabinetIconWidthPx = getCatalogCabinetIconWidthPx(item);
   const className = [
     styles.itemCard,
     compactIcon ? styles.itemCardCompact : "",
@@ -165,9 +202,14 @@ function CatalogItem({
     item.iconKey === "refrigerator" || item.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
     item.iconKey === "lighting_set" ? styles.itemIconLightingSet : "",
     String(item.iconKey || "").startsWith("drawer_base") ? styles.itemIconDrawerBase : "",
+    cabinetIconWidthPx ? styles.itemIconScaledCabinet : "",
   ]
     .filter(Boolean)
     .join(" ");
+  const iconStyle = cabinetIconWidthPx
+    ? { "--catalog-cabinet-icon-width": `${cabinetIconWidthPx}px` }
+    : undefined;
+  const iconMarkup = getCatalogIconMarkup(item, Boolean(cabinetIconWidthPx));
   const tooltipFacts = getTooltipFacts(item);
   const tooltipPreviewSrc = getTooltipPreviewSrc(item);
   const productInfoDocuments = Array.isArray(item?.productInfoDocuments) && item.productInfoDocuments.length
@@ -202,7 +244,7 @@ function CatalogItem({
       onKeyDown={handleCardKeyDown}
     >
       <div className={styles.itemTop}>
-        <span className={iconClassName} dangerouslySetInnerHTML={{ __html: ICON_MARKUP[item.iconKey] || "" }} />
+        <span className={iconClassName} style={iconStyle} dangerouslySetInnerHTML={{ __html: iconMarkup }} />
         <div className={styles.itemText}>
           <strong>{itemDisplayName.title}</strong>
           {item.articleNumber ? <span className={styles.itemCode}>{translate("common.article", "Article")}: {item.articleNumber}</span> : null}
