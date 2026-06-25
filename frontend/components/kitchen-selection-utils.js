@@ -259,6 +259,28 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105837-FILLER": "9",
   "CAB-HOOD-AB105837-600": "10",
   "CAB-WALL-AB105837-500-L": "11",
+  "SINKBASE-AB105831-DEFAULT": "3",
+  "CAB-BASE-AB105831-US30-R": "4",
+  "DISH-AB105831-600": "5",
+  "CAB-BASE-AB105831-US60-L": "6",
+  "CAB-BASE-AB105831-500-L": "7",
+  "CAB-BASE-AB105831-US30-L": "8",
+  "REF-AB105831-KGCN388140E": "9",
+  "CAB-WALL-AB105831-H6002-R": "10",
+  "CAB-HOOD-AB105831-600": "11",
+  "CAB-WALL-AB105831-500-L": "12",
+  "CAB-WALL-AB105831-H3002-L": "13",
+  "SINKBASE-AB105825-600": "3",
+  "CAB-BASE-AB105825-US30-R": "4",
+  "DISH-AB105825-600": "5",
+  "CAB-BASE-AB105825-US60-R": "6",
+  "CAB-BASE-AB105825-US60-L": "7",
+  "CAB-BASE-AB105825-US30-L": "8",
+  "REF-AB105825-KGCN388140E": "9",
+  "CAB-WALL-AB105825-H6002-R": "10",
+  "CAB-HOOD-AB105825-600": "11",
+  "CAB-WALL-AB105825-H6002-L": "12",
+  "CAB-WALL-AB105825-H3002-L": "13",
 };
 
 export function getLocalizedItemName(item, translate, language = "en", includeCalloutNumber = true) {
@@ -337,6 +359,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
     case "CAB-HOOD-AB105837-600":
+    case "CAB-HOOD-AB105831-600":
       return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Extractor Hood Upper Cabinet"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
@@ -356,6 +379,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
     case "HOOD-AB105837-FH664621E":
+    case "HOOD-AB105831-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
     case "HOOD-AB105845-KHF664611S":
@@ -371,6 +395,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "SINKBASE-B-600":
     case "SINKBASE-AB105806-600":
     case "SINKBASE-AB105807-600":
+    case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-C-600":
       return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
     case "SINKBASE-LS-600":
@@ -389,6 +414,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-AB105845-600":
     case "DISH-AB105834-600":
     case "DISH-AB105837-600":
+    case "DISH-AB105831-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
@@ -500,11 +526,13 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
     case "CAB-HOOD-AB105837-600":
+    case "CAB-HOOD-AB105831-600":
       return translate("configurator.catalogItemInfo.lightHoodSetup", "HD6002, light hood setup");
     case "HOOD-B-FH664621E":
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
     case "HOOD-AB105837-FH664621E":
+    case "HOOD-AB105831-FH664621E":
     case "T3D-HOOD-001":
       return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
     case "HOOD-C-FH664621E":
@@ -523,6 +551,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "SINKBASE-B-600":
     case "SINKBASE-AB105806-600":
     case "SINKBASE-AB105807-600":
+    case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-C-600":
     case "T3D-SINKBASE-001":
       return translate("configurator.catalogItemInfo.blancoBottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
@@ -542,6 +571,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105845-600":
     case "DISH-AB105834-600":
     case "DISH-AB105837-600":
+    case "DISH-AB105831-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "T3D-DISH-001":
@@ -613,6 +643,8 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105829": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105832": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105825": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105833": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105826": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105827": [["component-wall-cabinet-4", "component-extractor-hood"]],
@@ -920,6 +952,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105845-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105834-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105837-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-AB105825-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-AB105831-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105815-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -936,6 +970,10 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "HOOD-AB105807-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105837-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB105837-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-AB105825-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-AB105825-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-AB105831-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-AB105831-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "HOOD-AB105845-KHF664611S": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
@@ -948,6 +986,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB105821-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105841-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105845-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
+  "REF-AB105825-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
+  "REF-AB105831-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105811-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105815-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
