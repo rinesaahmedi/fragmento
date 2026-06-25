@@ -44,13 +44,18 @@ export function getServiceEligibility({
   };
 }
 
-export function getServiceDisabledReason(serviceCode, eligibility) {
+export function getServiceDisabledReason(serviceCode, eligibility, translate) {
+  const t = typeof translate === "function" ? translate : (_key, fallback) => fallback;
+
   if (serviceCode === SERVICE_CODE_MONTAGE && !eligibility.montageEligible) {
-    return `Montage ab Warenwert ${MONTAGE_MIN_MERCHANDISE_EUR.toLocaleString("de-DE")} Euro und mindestens ${MONTAGE_MIN_CABINETS} Schrank-Komponenten`;
+    return t(
+      "configurator.serviceMontageError",
+      "Assembly is available only with a merchandise value of €1,000 or more and at least 3 cabinet components.",
+    );
   }
 
   if (serviceCode === SERVICE_CODE_PICKUP && !eligibility.pickupEligible) {
-    return "Nur mit mindestens einer Komponente oder einem Zubehoer";
+    return t("configurator.servicePickupError", "Pickup can only be added once at least one item has been selected.");
   }
 
   return "";

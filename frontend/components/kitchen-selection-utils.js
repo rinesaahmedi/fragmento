@@ -168,10 +168,10 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-BASE-AB105810-FILLER-400": "6",
   "CAB-WALL-AB105810-H4502": "9",
   "CAB-WALL-AB105810-FILLER-400": "11",
-  "CAB-BASE-AB105821-FILLER-550": "4",
+  "CAB-BASE-AB105821-FILLER-500": "4",
   "DISH-AB105821-600": "5",
   "CAB-BASE-AB105821-US30": "6",
-  "CAB-WALL-AB105821-FILLER-550": "7",
+  "CAB-WALL-AB105821-FILLER-500": "7",
   "CAB-WALL-AB105821-H6002-R": "8",
   "CAB-WALL-AB105821-H6002-L": "9",
   "CAB-WALL-AB105821-H3002": "11",
@@ -454,6 +454,12 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
       return translate("configurator.catalogItemNames.wasteSeparationSystem", "Waste separation system");
     case "ACC-CUTLERY-ZB60SG":
       return translate("configurator.catalogItemNames.cutleryInsert60", "Cutlery insert ZB60SG");
+    case "ACC-LIGHT-003":
+      return translate("configurator.catalogItemNames.lightingSet3Spots", "Lighting set, 3 LED spots");
+    case "SVC-MONTAGE-001":
+      return translate("configurator.catalogItemNames.serviceMontage", "Delivery, transport, assembly and connection");
+    case "SVC-PICKUP-001":
+      return translate("configurator.catalogItemNames.servicePickup", "Pickup at logistics location");
     case "CAB-COOK-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"));
     case "CAB-COOK-C-R-600":
@@ -627,6 +633,8 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105805": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105809": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105813": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105817": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105834": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105810": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],

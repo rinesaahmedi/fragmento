@@ -444,7 +444,7 @@ export default function KitchenCatalogPanel({
           <h3>{translate("configurator.services", "Services")}</h3>
           <div className={styles.catalogGrid}>
             {kitchenConfig.services.map((item) => {
-              const disabledReason = getServiceDisabledReason(item.code, serviceEligibility);
+              const disabledReason = getServiceDisabledReason(item.code, serviceEligibility, translate);
               const disabled =
                 !selectedServiceCodes.includes(item.code) &&
                 ((item.code === SERVICE_CODE_MONTAGE && !serviceEligibility.montageEligible) ||

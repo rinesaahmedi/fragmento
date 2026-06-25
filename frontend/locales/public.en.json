@@ -118,7 +118,10 @@
       "baseCabinetRight": "Base Cabinet right",
       "baseCabinetLeftLs": "Base Cabinet left",
       "baseCabinetRightLs": "Base Cabinet right",
-      "baseCabinetThreeDrawers": "Base Cabinet (3 Drawers)"
+      "baseCabinetThreeDrawers": "Base Cabinet (3 Drawers)",
+      "lightingSet3Spots": "Lighting set, 3 LED spots",
+      "serviceMontage": "Delivery, transport, assembly and connection",
+      "servicePickup": "Pickup at logistics location"
     },
     "catalogItemInfo": {
       "adjustableShelves": "H6002, 2 adjustable shelves",
