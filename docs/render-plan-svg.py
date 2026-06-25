@@ -23,8 +23,7 @@ MINOR_STROKE_WIDTH = 4
 
 def normalize_plan_svg_strokes(svg: str) -> str:
     """Boost hairline PDF strokes so exported plans match the visual weight of thicker CAD exports."""
-    if re.search(r'stroke-width="[4-9]', svg):
-        return svg
+    svg = re.sub(r'stroke="#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})"', 'stroke="#000000"', svg)
 
     def boost_black_stroke(match: re.Match[str]) -> str:
         path = match.group(0)
