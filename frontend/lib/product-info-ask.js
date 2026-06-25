@@ -814,13 +814,24 @@ function normalizeKnownModel(value) {
   return text;
 }
 
+function getExtractorHoodGermanLabel(item, explicitModel = "") {
+  const sourceText = `${explicitModel}\n${getCombinedItemInfoText(item)}`;
+  return /KHF\s*664\s*611|kaminhaube|chimney/i.test(sourceText)
+    ? "Kamin-Dunstabzugshaube"
+    : "Flachschirmhaube";
+}
+
+function getExtractorHoodTypeLabel(item, language, explicitModel = "") {
+  return language === "de" ? getExtractorHoodGermanLabel(item, explicitModel) : "Extractor hood";
+}
+
 function getPublicTypeLabelForModel(model, item, language) {
   const sourceText = getCombinedItemInfoText(item);
   const value = `${model}\n${sourceText}`;
   const compactModel = String(model || "").replace(/\s+/g, "").toUpperCase();
 
   if (/^(?:FH664621S|KHF664611S)/.test(compactModel)) {
-    return language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+    return getExtractorHoodTypeLabel(item, language, model);
   }
   if (compactModel === "EWA34660W") {
     return language === "de" ? "Waschmaschine" : "Washing machine";
@@ -843,7 +854,7 @@ function getPublicTypeLabelForModel(model, item, language) {
   }
 
   if (/\b(?:FH|KHF)\b|FH\s*664\s*621|KHF\s*664\s*611|extractor hood|dunstabzug|haube/i.test(value)) {
-    return language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+    return getExtractorHoodTypeLabel(item, language, model);
   }
   if (/\bEWA\s*34660\s*W\b|washing machine|waschmaschine/i.test(value)) {
     return language === "de" ? "Waschmaschine" : "Washing machine";
@@ -1329,7 +1340,7 @@ function getSubProductDisplayLabel(subProduct, language) {
   const labels = {
     hob: { de: "Kochfeld", en: "hob" },
     oven: { de: "Einbaubackofen", en: "oven" },
-    hood: { de: "Dunstabzugshaube", en: "extractor hood" },
+    hood: { de: "Flachschirmhaube", en: "extractor hood" },
     dishwasher: { de: "Geschirrspüler", en: "dishwasher" },
     washing_machine: { de: "Waschmaschine", en: "washing machine" },
     refrigerator_freezer: { de: "Kühl-Gefrierkombination", en: "refrigerator-freezer" },
@@ -1346,7 +1357,7 @@ function getSubProductArticleLabel(subProduct, language) {
   const labels = {
     hob: "das Kochfeld",
     oven: "den Einbaubackofen",
-    hood: "die Dunstabzugshaube",
+    hood: "die Flachschirmhaube",
     dishwasher: "den Geschirrspüler",
     washing_machine: "die Waschmaschine",
     refrigerator_freezer: "die Kühl-Gefrierkombination",
@@ -1629,7 +1640,7 @@ function getModelAnswerItemName(item, language) {
   }
 
   if (/\b(?:FH|KHF)\b/i.test(explicitModel) || isExtractorHoodItem(item)) {
-    return language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+    return getExtractorHoodTypeLabel(item, language, explicitModel);
   }
 
   if (/washing machine|waschmaschine/i.test(sourceText) || /washing machine|waschmaschine/i.test(rawName)) {
@@ -1651,7 +1662,7 @@ function getModelAnswerItemName(item, language) {
   }
 
   if (isExtractorHoodItem(item)) {
-    return language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+    return getExtractorHoodTypeLabel(item, language, explicitModel);
   }
 
   if (/\bhob\b|kochfeld/i.test(sourceText) || /\bhob\b|kochfeld/i.test(rawName)) {
@@ -1706,7 +1717,7 @@ function isExtractorHoodItem(item) {
 
 function formatExtractorHoodAnswerName(item, language, explicitModel = "") {
   const model = explicitModel || extractKnownModel(item);
-  const baseLabel = language === "de" ? "Dunstabzugshaube" : "Extractor hood";
+  const baseLabel = getExtractorHoodTypeLabel(item, language, model);
   return model ? `${baseLabel} (${model})` : baseLabel;
 }
 
@@ -2056,7 +2067,7 @@ function getCompactComparisonItemName(item, language) {
       product: "Product",
     },
     de: {
-      hood: "Dunstabzugshaube",
+      hood: "Flachschirmhaube",
       dishwasher: "Geschirrspüler",
       washing_machine: "Waschmaschine",
       fridge_freezer: "Kühl-Gefrierkombination",
@@ -2066,7 +2077,9 @@ function getCompactComparisonItemName(item, language) {
       product: "Produkt",
     },
   };
-  const label = labels[language]?.[type] || labels.en[type] || labels[language]?.product || "Product";
+  const label = type === "hood" && language === "de"
+    ? getExtractorHoodGermanLabel(item, model)
+    : labels[language]?.[type] || labels.en[type] || labels[language]?.product || "Product";
   return model ? `${label} (${model})` : label;
 }
 
@@ -2112,7 +2125,7 @@ function getQuietRecommendationName(item, language) {
       product: "Product",
     },
     de: {
-      hood: "Dunstabzugshaube",
+      hood: "Flachschirmhaube",
       dishwasher: "Geschirrspüler",
       washing_machine: "Waschmaschine",
       fridge_freezer: "Kühl-Gefrierkombination",
@@ -2122,7 +2135,9 @@ function getQuietRecommendationName(item, language) {
       product: "Produkt",
     },
   };
-  const label = labels[language]?.[type] || labels.en[type] || labels[language]?.product || "Product";
+  const label = type === "hood" && language === "de"
+    ? getExtractorHoodGermanLabel(item, model)
+    : labels[language]?.[type] || labels.en[type] || labels[language]?.product || "Product";
   return model && !/(oven_hob|oven|hob)/.test(type) ? `${label} (${model})` : label;
 }
 
@@ -2140,7 +2155,7 @@ function getQuietRecommendationLeadName(item, language) {
       product: "product",
     },
     de: {
-      hood: "Dunstabzugshaube",
+      hood: "Flachschirmhaube",
       dishwasher: "Geschirrspüler",
       washing_machine: "Waschmaschine",
       fridge_freezer: "Kühl-Gefrierkombination",
@@ -2150,6 +2165,10 @@ function getQuietRecommendationLeadName(item, language) {
       product: "Produkt",
     },
   };
+
+  if (type === "hood" && language === "de") {
+    return getExtractorHoodGermanLabel(item);
+  }
 
   return labels[language]?.[type] || labels.en[type] || labels[language]?.product || "product";
 }
@@ -3181,7 +3200,7 @@ function buildProductOverviewEntry(item, language) {
       product: "Product: selected appliance with available product information.",
     },
     de: {
-      hood: "Dunstabzugshaube: Lüftung über dem Kochfeld.",
+      hood: "Flachschirmhaube: Lüftung über dem Kochfeld.",
       washing_machine: "Waschmaschine: Einbaugerät zum Waschen.",
       dishwasher: "Geschirrspüler: vollintegrierter 60-cm-Geschirrspüler.",
       oven_hob: "Backofen + Kochfeld: Geräte zum Backen und Kochen.",

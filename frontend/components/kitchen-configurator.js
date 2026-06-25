@@ -506,13 +506,14 @@ function isSinkSelectionItem(item) {
   return componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and waste system");
 }
 
-function getSelectedDisplayCount(lockedSelectedComponents, optionalSelectedComponents, selectedAccessories, selectedServices) {
+function getSelectedDisplayCount(defaultSelectedComponents, confirmedSelectedComponents, optionalSelectedComponents, selectedAccessories, selectedServices) {
   const standardMergeAdjustment =
-    lockedSelectedComponents.some(isWorktopSelectionItem) && lockedSelectedComponents.some(isSinkSelectionItem) ? 1 : 0;
+    defaultSelectedComponents.some(isWorktopSelectionItem) && defaultSelectedComponents.some(isSinkSelectionItem) ? 1 : 0;
 
   return (
-    lockedSelectedComponents.length -
+    defaultSelectedComponents.length -
     standardMergeAdjustment +
+    confirmedSelectedComponents.length +
     optionalSelectedComponents.length +
     selectedAccessories.length +
     selectedServices.length
@@ -1084,6 +1085,16 @@ function KitchenConfiguratorContent({
     ],
     [defaultLockedComponentIds, defaultLockedPlanComponentIds, lockedComponentIds, orderLockedComponentIds],
   );
+  const planLockedComponentIds = useMemo(
+    () => [
+      ...new Set([
+        ...lockedComponentIds,
+        ...defaultLockedComponentIds,
+        ...defaultLockedPlanComponentIds,
+      ]),
+    ],
+    [defaultLockedComponentIds, defaultLockedPlanComponentIds, lockedComponentIds],
+  );
   const draftStorageKey = useMemo(
     () => buildConfiguratorDraftStorageKey(kitchenSlug, initialContractNumber),
     [initialContractNumber, kitchenSlug],
@@ -1303,10 +1314,12 @@ function KitchenConfiguratorContent({
       text: `${item.name}: ${note}`,
     })),
   );
-  const lockedSelectedComponents = selectedComponents.filter((item) => item.isLocked || item.isOrderLocked);
+  const defaultSelectedComponents = selectedComponents.filter((item) => item.isLocked);
+  const confirmedSelectedComponents = selectedComponents.filter((item) => !item.isLocked && item.isOrderLocked);
   const optionalSelectedComponents = selectedComponents.filter((item) => !item.isLocked && !item.isOrderLocked);
   const selectedDisplayCount = getSelectedDisplayCount(
-    lockedSelectedComponents,
+    defaultSelectedComponents,
+    confirmedSelectedComponents,
     optionalSelectedComponents,
     selectedAccessories,
     selectedServices,
@@ -1989,6 +2002,7 @@ function KitchenConfiguratorContent({
               kitchenSlug={kitchenSlug}
               planViewport={planViewport}
               fixedComponentIds={fixedComponentIds}
+              planLockedComponentIds={planLockedComponentIds}
               selectedComponentIds={selectedComponentIds}
               setSelectedComponentIds={setSelectedComponentIds}
               onResetSelection={resetSelection}
@@ -1998,7 +2012,8 @@ function KitchenConfiguratorContent({
               selectedComponents={selectedComponents}
               selectedAccessories={selectedAccessories}
               selectedServices={selectedServices}
-              lockedSelectedComponents={lockedSelectedComponents}
+              defaultSelectedComponents={defaultSelectedComponents}
+              confirmedSelectedComponents={confirmedSelectedComponents}
               optionalSelectedComponents={optionalSelectedComponents}
               grandTotal={grandTotal}
               onRemoveComponent={removeComponent}

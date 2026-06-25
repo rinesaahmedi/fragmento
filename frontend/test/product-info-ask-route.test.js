@@ -456,7 +456,7 @@ test("POST keeps German consumption and energy intents aligned with English for 
     product({
       id: "hood",
       code: "FH664621S",
-      name: "Dunstabzugshaube",
+      name: "Flachschirmhaube",
       productInfoKeyFacts: ["Model: FH 664 621 S", "Energieeffizienzklasse: A", "Jährlicher Energieverbrauch: 24,8 kWh/Jahr", "Geräusch: 63 dB(A)"],
     }),
     product({
@@ -559,7 +559,7 @@ test("POST keeps German consumption and energy intents aligned with English for 
     const response = await route.POST(request({ ...basePayload, question }));
     assert.equal(response.status, 200);
     assert.match(response.body.answer, /^Hier sind die dokumentierten Verbrauchswerte für alle ausgewählten Produkte:/);
-    assert.match(response.body.answer, /Dunstabzugshaube \(FH 664 621 S\): Jährlicher Energieverbrauch: 24,8 kWh\/Jahr/);
+    assert.match(response.body.answer, /Flachschirmhaube \(FH 664 621 S\): Jährlicher Energieverbrauch: 24,8 kWh\/Jahr/);
     assert.match(response.body.answer, /Waschmaschine \(EWA 34660 W\): Energieverbrauch pro 100 Waschzyklen: 47,0 kWh; Wasserverbrauch pro Zyklus: 48 l/);
     assert.match(response.body.answer, /Geschirrspüler \(A-EGSPV597210\): Energieverbrauch pro 100 Spülgänge: 82 kWh; Wasserverbrauch pro Spülgang: 11,0 l/);
     assert.match(response.body.answer, /Einbaubackofen \(EBX 943 600 S\): Energieverbrauch konventionell \/ Heißluft: 0,99 kWh \/ 0,83 kWh/);
@@ -592,7 +592,7 @@ test("POST keeps German consumption and energy intents aligned with English for 
     const response = await route.POST(request({ ...basePayload, question }));
     assert.equal(response.status, 200);
     assert.match(response.body.answer, /^Hier sind die dokumentierten Energieeffizienzklassen der ausgewählten Produkte:/);
-    assert.match(response.body.answer, /Dunstabzugshaube \(FH 664 621 S\): Klasse A/);
+    assert.match(response.body.answer, /Flachschirmhaube \(FH 664 621 S\): Klasse A/);
     assert.match(response.body.answer, /Waschmaschine \(EWA 34660 W\): Klasse A/);
     assert.match(response.body.answer, /Geschirrspüler \(A-EGSPV597210\): Klasse D/);
     assert.match(response.body.answer, /Einbaubackofen \(EBX 943 600 S\): Klasse A/);
@@ -784,7 +784,7 @@ test("POST routes quiet-home recommendations to documented noise values", async 
     }),
     product({
       id: "hood",
-      name: "Dunstabzugshaube",
+      name: "Flachschirmhaube",
       productInfoKeyFacts: ["Model: FH 664 621 S", "Geräusch: max. 70 dB"],
     }),
     product({
@@ -839,7 +839,7 @@ test("POST routes quiet-home recommendations to documented noise values", async 
       "Dokumentierte Geräuschwerte:",
       "- Kühl-Gefrierkombination (KGC 15495 S): 41 dB",
       "- Geschirrspüler (A-EGSPV597210): 49 dB",
-      "- Dunstabzugshaube (FH 664 621 S): max. 70 dB",
+      "- Flachschirmhaube (FH 664 621 S): max. 70 dB",
       "",
       "Für das Backofen-Kochfeld-Set finde ich keinen dokumentierten Geräuschwert.",
     ].join("\n"),
@@ -850,7 +850,7 @@ test("POST treats dB and decibel wording as noise questions, not overview or not
   const selectedProducts = [
     product({
       id: "hood",
-      name: "Dunstabzugshaube",
+      name: "Flachschirmhaube",
       productInfoKeyFacts: ["Model: FH 664 621 S", "Schallleistung: max. 70 dB"],
     }),
     product({
@@ -1204,12 +1204,12 @@ test("POST scopes fuzzy product aliases and typo topics to the intended applianc
   const fridgeGermanDimensions = await route.POST(request({ ...basePayload, language: "de", question: "kühlschrank maße" }));
   assert.match(fridgeGermanDimensions.body.answer, /^Ich habe diese dokumentierten Maße für die Kühl-Gefrierkombination gefunden:/);
   assert.match(fridgeGermanDimensions.body.answer, /- Kühl-Gefrierkombination: Höhe 180 cm/);
-  assert.doesNotMatch(fridgeGermanDimensions.body.answer, /Waschmaschine|Geschirrspüler|Dunstabzugshaube/);
+  assert.doesNotMatch(fridgeGermanDimensions.body.answer, /Waschmaschine|Geschirrspüler|Flachschirmhaube|Dunstabzugshaube/);
 
   const dishwasherGermanWater = await route.POST(request({ ...basePayload, language: "de", question: "spuelmaschine wasserverbrauch" }));
   assert.match(dishwasherGermanWater.body.answer, /^Die dokumentierten Wasserverbrauchswerte sind:/);
   assert.match(dishwasherGermanWater.body.answer, /Geschirrspüler \(A-EGSPV597210\): Wasserverbrauch pro Spülgang: 11 l/);
-  assert.doesNotMatch(dishwasherGermanWater.body.answer, /Kühl-Gefrierkombination|Waschmaschine|Dunstabzugshaube/);
+  assert.doesNotMatch(dishwasherGermanWater.body.answer, /Kühl-Gefrierkombination|Waschmaschine|Flachschirmhaube|Dunstabzugshaube/);
 
   const albanianFridgeNoise = await route.POST(request({ ...basePayload, language: "en", question: "sa db ka frigoriferi" }));
   assert.match(albanianFridgeNoise.body.answer, /^The documented noise values are:/);

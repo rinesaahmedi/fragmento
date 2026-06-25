@@ -119,6 +119,11 @@ export function buildOrderForNotifications(orderRecord) {
       ? item.kitchenItem.productInfoKeyFacts
       : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
     productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
+    blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
+    blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+    blendePrice: item.kitchenItem?.blendePrice != null
+      ? Number(item.kitchenItem.blendePrice)
+      : (item.blendePrice != null ? Number(item.blendePrice) : null),
   });
   const notificationItems = mergeSinkAndWorktopItems(orderRecord.items || [], (sinkItem, worktopItem) => ({
     ...toNotificationItem(sinkItem),

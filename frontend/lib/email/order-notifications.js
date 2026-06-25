@@ -161,6 +161,46 @@ export function formatCurrency(num) {
   }).format(Number(num || 0));
 }
 
+function buildBlendeDisplayItem(item) {
+  const blendeLabel = String(item?.blendeLabel || "").trim();
+  if (!blendeLabel) return null;
+
+  const blendeCode = String(item?.blendeCode || blendeLabel).trim();
+  const blendePrice = item?.blendePrice == null ? 0 : Number(item.blendePrice || 0);
+
+  return {
+    ...item,
+    code: blendeCode || "BLENDE",
+    name: `Blende ${blendeLabel}`,
+    price: blendePrice,
+    iconKey: "blende",
+    productImagePath: "",
+    productInfoPdfPath: "",
+    productInfoSummary: "",
+    productInfoKeyFacts: [],
+    productInfoExtractedText: "",
+    blendeCode: "",
+    blendeLabel: "",
+    blendePrice: null,
+  };
+}
+
+function expandItemsWithBlende(items = []) {
+  return items.flatMap((item) => {
+    const blendeItem = buildBlendeDisplayItem(item);
+    if (!blendeItem) return [item];
+
+    const blendePrice = Number(blendeItem.price || 0);
+    const itemPrice = Number(item?.price || 0);
+    const parentItem = {
+      ...item,
+      price: Math.max(itemPrice - blendePrice, 0),
+    };
+
+    return [parentItem, blendeItem];
+  });
+}
+
 function drawItemIcon(doc, item, x, y, size = 16) {
   const iconKey = String(item.iconKey || "").toLowerCase();
   const name = String(item.name || "").toLowerCase();
@@ -183,6 +223,14 @@ function drawItemIcon(doc, item, x, y, size = 16) {
     doc.line(px(13), py(8), px(14), py(12));
     doc.circle(px(5), py(13), scaled(1.2));
     doc.circle(px(12), py(13), scaled(1.2));
+    return;
+  }
+
+  if (has("blende", "panel")) {
+    doc.line(px(4), py(4), px(12), py(4));
+    doc.line(px(4), py(7), px(12), py(7));
+    doc.line(px(4), py(10), px(12), py(10));
+    doc.line(px(4), py(13), px(12), py(13));
     return;
   }
 
@@ -338,7 +386,7 @@ export async function generateOrderConfirmationPdf(order) {
     y += 18;
     doc.setFont("helvetica", "normal").setFontSize(10);
 
-    items.forEach((item) => {
+    expandItemsWithBlende(items).forEach((item) => {
       const nameLines = doc.splitTextToSize(item.name || "", 228);
       const rowHeight = Math.max(nameLines.length * lineHeight, 30) + 6;
       ensureSpace(rowHeight);
@@ -390,7 +438,7 @@ export function buildOrderSummaryHtml(order) {
 
   const renderSection = (title, items, imageCidByAssetPath = new Map()) => {
     if (!items.length) return "";
-    const rows = items
+    const rows = expandItemsWithBlende(items)
       .map((item) => {
         const productImagePath = normalizeProductImageAssetPath(item.productImagePath);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";

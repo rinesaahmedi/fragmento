@@ -71,6 +71,42 @@ function getBadgeStyle(tone) {
   return { ...badgeStyle, ...pendingBadgeStyle };
 }
 
+function buildBlendeReceiptItem(item) {
+  const blendeLabel = String(item?.kitchenItem?.blendeLabel || item?.blendeLabel || "").trim();
+  if (!blendeLabel) return null;
+
+  const blendeCode = String(item?.kitchenItem?.blendeCode || item?.blendeCode || blendeLabel).trim();
+  const blendePrice = item?.kitchenItem?.blendePrice != null
+    ? Number(item.kitchenItem.blendePrice)
+    : Number(item?.blendePrice || 0);
+
+  return {
+    ...item,
+    id: `${item.id || item.code}-blende`,
+    code: blendeCode || "BLENDE",
+    nameSnapshot: `Blende ${blendeLabel}`,
+    priceSnapshot: blendePrice,
+    quantity: 1,
+    kitchenItem: null,
+  };
+}
+
+function expandReceiptItemsWithBlende(items = []) {
+  return items.flatMap((item) => {
+    const blendeItem = buildBlendeReceiptItem(item);
+    if (!blendeItem) return [item];
+
+    const blendePrice = Number(blendeItem.priceSnapshot || 0);
+    const itemPrice = Number(item?.priceSnapshot || 0);
+    const parentItem = {
+      ...item,
+      priceSnapshot: Math.max(itemPrice - blendePrice, 0),
+    };
+
+    return [parentItem, blendeItem];
+  });
+}
+
 async function findStripeSession({ sessionId, orderNumber }) {
   const stripe = getStripeClient();
   if (!stripe) return null;
@@ -164,9 +200,10 @@ export default async function CheckoutSuccessPage({ searchParams }) {
     priceSnapshot: Number(sinkItem.priceSnapshot || 0) + Number(worktopItem.priceSnapshot || 0),
     quantity: 1,
   }));
-  const componentItems = displayItems.filter((item) => item.itemType === ItemType.COMPONENT);
-  const accessoryItems = displayItems.filter((item) => item.itemType === ItemType.ACCESSORY);
-  const serviceItems = displayItems.filter((item) => item.itemType === ItemType.SERVICE);
+  const receiptItems = expandReceiptItemsWithBlende(displayItems);
+  const componentItems = receiptItems.filter((item) => item.itemType === ItemType.COMPONENT);
+  const accessoryItems = receiptItems.filter((item) => item.itemType === ItemType.ACCESSORY);
+  const serviceItems = receiptItems.filter((item) => item.itemType === ItemType.SERVICE);
   const kitchenHref = order?.kitchen?.slug ? `/kitchens/${order.kitchen.slug}` : "/";
   const address = order
     ? [order.address1, order.address2, `${order.postalCode} ${order.city}`.trim(), order.country].filter(Boolean).join(", ")

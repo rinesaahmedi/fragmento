@@ -53,6 +53,40 @@ async function renderLogoDataUrl() {
   return canvas.toDataURL("image/jpeg", 0.9);
 }
 
+function buildBlendeDisplayItem(item) {
+  const blendeLabel = String(item?.blendeLabel || "").trim();
+  if (!blendeLabel) return null;
+
+  const blendeCode = String(item?.blendeCode || blendeLabel).trim();
+  const blendePrice = item?.blendePrice == null ? 0 : Number(item.blendePrice || 0);
+
+  return {
+    ...item,
+    code: blendeCode || "BLENDE",
+    name: `Blende ${blendeLabel}`,
+    price: blendePrice,
+    blendeCode: "",
+    blendeLabel: "",
+    blendePrice: null,
+  };
+}
+
+function expandItemsWithBlende(items = []) {
+  return items.flatMap((item) => {
+    const blendeItem = buildBlendeDisplayItem(item);
+    if (!blendeItem) return [item];
+
+    const blendePrice = Number(blendeItem.price || 0);
+    const itemPrice = Number(item?.price || 0);
+    const parentItem = {
+      ...item,
+      price: Math.max(itemPrice - blendePrice, 0),
+    };
+
+    return [parentItem, blendeItem];
+  });
+}
+
 export async function generateOrderPdf(order) {
   const doc = new jsPDF({ unit: "pt" });
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -140,7 +174,7 @@ export async function generateOrderPdf(order) {
     y += 20;
     doc.setFont("helvetica", "normal");
 
-    items.forEach((item) => {
+    expandItemsWithBlende(items).forEach((item) => {
       const nameLines = doc.splitTextToSize(item.name || "", 230);
       const rowHeight = Math.max(nameLines.length, 1) * lineHeight + 5;
       ensureSpace(rowHeight);

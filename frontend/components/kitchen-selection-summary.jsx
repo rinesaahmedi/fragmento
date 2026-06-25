@@ -73,7 +73,9 @@ function getEffectiveSummaryPrice(item) {
 function SummaryRow({ item, onRemove, onOpenInfo }) {
   const { translate, language } = usePublicI18n();
   const price = getEffectiveSummaryPrice(item);
-  const isLocked = item.isLocked || item.isOrderLocked;
+  const isDefault = Boolean(item.isLocked);
+  const isConfirmed = !isDefault && Boolean(item.isOrderLocked);
+  const isLocked = isDefault || isConfirmed;
   const itemName = getLocalizedItemName(item, translate, language, false);
   const { articleNumber, dimensions: itemDimensions } = getCatalogItemDetails(item);
   const infoPdfHref = getProductInfoHref(item);
@@ -85,7 +87,9 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
     .filter(Boolean)
     .join(" ");
   const priceLabel = (isLocked && price <= 0)
-    ? translate("configurator.summaryItemIncluded", "Included")
+    ? isConfirmed
+      ? translate("configurator.summaryItemConfirmed", "Already confirmed")
+      : translate("configurator.summaryItemIncluded", "Included")
     : formatCurrency(price);
 
   return (
@@ -121,10 +125,10 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
               }
             >
               {translate("configurator.productInfoOpenShort", "Info")}
-            </button>
+          </button>
           ) : null}
           <span className={[styles.summaryBadge, styles.summaryBadgeLocked].join(" ")}>
-            {item.isOrderLocked
+            {isConfirmed
               ? translate("configurator.summaryBadgeConfirmed", "Confirmed")
               : translate("configurator.summaryBadgeStandard", "Standard")}
           </span>
@@ -142,7 +146,8 @@ export default function KitchenSelectionSummary({
   selectedComponents,
   selectedAccessories,
   selectedServices,
-  lockedSelectedComponents,
+  defaultSelectedComponents,
+  confirmedSelectedComponents,
   optionalSelectedComponents,
   grandTotal,
   onRemoveComponent,
@@ -153,7 +158,7 @@ export default function KitchenSelectionSummary({
 }) {
   const { translate } = usePublicI18n();
   const [isExpanded, setIsExpanded] = useState(false);
-  const mergedLockedSelectedComponents = mergeStandardEquipmentItems(lockedSelectedComponents);
+  const mergedDefaultSelectedComponents = mergeStandardEquipmentItems(defaultSelectedComponents);
   const selectedItemCount =
     selectedComponents.length + selectedAccessories.length + selectedServices.length;
   const shouldCollapseSummary = selectedItemCount > 6;
@@ -177,10 +182,17 @@ export default function KitchenSelectionSummary({
           <div className={styles.emptyState}>{translate("configurator.summaryEmpty", "No items selected yet.")}</div>
         ) : null}
 
-        {mergedLockedSelectedComponents.length ? (
+        {mergedDefaultSelectedComponents.length ? (
           <div className={styles.summarySectionTitle}>{translate("configurator.summaryStandardEquipment", "Default components")}</div>
         ) : null}
-        {mergedLockedSelectedComponents.map((item) => (
+        {mergedDefaultSelectedComponents.map((item) => (
+          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
+        ))}
+
+        {confirmedSelectedComponents.length ? (
+          <div className={styles.summarySectionTitle}>{translate("configurator.summaryConfirmedComponents", "Already confirmed components")}</div>
+        ) : null}
+        {confirmedSelectedComponents.map((item) => (
           <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
         ))}
 

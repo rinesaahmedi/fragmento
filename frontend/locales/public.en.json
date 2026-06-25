@@ -53,6 +53,7 @@
     "summaryTitle": "Your selection",
     "summaryEmpty": "No items selected yet.",
     "summaryStandardEquipment": "Default components",
+    "summaryConfirmedComponents": "Already confirmed components",
     "summaryAdditionalComponents": "Additional components",
     "summaryAccessories": "Accessories",
     "summaryServices": "Services",

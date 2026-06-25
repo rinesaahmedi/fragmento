@@ -10,7 +10,7 @@ const KITCHEN_AREA_NAMES = {
   "Wall Cabinet mid-left": "Oberschrank mittig links",
   "Wall Cabinet mid-right": "Oberschrank mittig rechts",
   "Wall Cabinet right": "Oberschrank rechts",
-  "Extractor Hood": "Dunstabzugshaube",
+  "Extractor Hood": "Flachschirmhaube",
   "Chimney Extractor Hood": "Kamin-Dunstabzugshaube",
   "Washing Machine": "Waschmaschine",
   Worktop: "Arbeitsplatte",

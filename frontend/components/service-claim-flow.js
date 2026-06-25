@@ -30,7 +30,7 @@ const CLAIM_AREA_LABELS_BY_CODE = {
     "CAB-WALL-B-ML-600": "Oberschrank mittig links",
     "CAB-WALL-B-MR-600": "Oberschrank mittig rechts",
     "CAB-WALL-B-R-600": "Oberschrank rechts",
-    "CAB-HOOD-B-600": "Oberschrank f\u00fcr Dunstabzugshaube",
+    "CAB-HOOD-B-600": "Oberschrank f\u00fcr Flachschirmhaube",
     "CAB-WALL-C-L-600": "Oberschrank links",
     "CAB-WALL-C-ML-600": "Oberschrank mittig links",
     "CAB-WALL-C-MR-600": "Oberschrank mittig rechts",

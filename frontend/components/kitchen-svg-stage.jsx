@@ -1174,6 +1174,7 @@ export default function KitchenSvgStage({
   kitchenSlug,
   planViewport,
   fixedComponentIds,
+  planLockedComponentIds = fixedComponentIds,
   selectedComponentIds,
   setSelectedComponentIds,
   onResetSelection,
@@ -1192,6 +1193,7 @@ export default function KitchenSvgStage({
     [kitchenConfig.kitchen.slug, svgMarkup],
   );
   const fixedComponentIdsKey = fixedComponentIds.join("|");
+  const planLockedComponentIdsKey = planLockedComponentIds.join("|");
   const componentIds = useMemo(
     () =>
       new Set(
@@ -1277,8 +1279,8 @@ export default function KitchenSvgStage({
       svgMarkup: resolvedSvgMarkup,
       planViewport,
       kitchenConfig,
-      selectedComponentIds: [],
-      lockedComponentIds: fixedComponentIds,
+      selectedComponentIds,
+      lockedComponentIds: planLockedComponentIds,
       componentIdForItem,
       normalizeColor,
     });
@@ -1325,12 +1327,14 @@ export default function KitchenSvgStage({
     kitchenConfig,
     kitchenSlug,
     fixedComponentIds,
+    planLockedComponentIds,
     hasImageView,
     hasPdfView,
     activeView,
     componentIds,
     planViewport,
     resolvedSvgMarkup,
+    selectedComponentIds,
     setSelectedComponentIds,
   ]);
 
@@ -1342,10 +1346,10 @@ export default function KitchenSvgStage({
     refreshKitchenPlanSelection({
       host: svgHostRef.current,
       selectedComponentIds,
-      lockedComponentIds: fixedComponentIds,
+      lockedComponentIds: planLockedComponentIds,
       kitchenSlug,
     });
-  }, [activeView, fixedComponentIdsKey, selectedComponentIds, fixedComponentIds, kitchenSlug, hasImageView, hasPdfView]);
+  }, [activeView, fixedComponentIdsKey, planLockedComponentIdsKey, selectedComponentIds, fixedComponentIds, planLockedComponentIds, kitchenSlug, hasImageView, hasPdfView]);
 
   return (
     <div className={styles.stage}>
@@ -1389,6 +1393,7 @@ export default function KitchenSvgStage({
               components={kitchenConfig.components}
               componentIds={componentIds}
               fixedComponentIds={fixedComponentIds}
+              planLockedComponentIds={planLockedComponentIds}
               selectedComponentIds={selectedComponentIds}
               onToggleComponent={(componentId) => {
                 setSelectedComponentIds((current) =>
@@ -1428,13 +1433,14 @@ export default function KitchenSvgStage({
                   />
                   <div className={styles.planHotspotLayer}>
                     {croppedImageHotspots.map((hotspot) => {
-                      const isLocked = fixedComponentIds.includes(hotspot.componentId);
+                      const isFixed = fixedComponentIds.includes(hotspot.componentId);
+                      const isDefaultLocked = planLockedComponentIds.includes(hotspot.componentId);
                       // Linked parts (e.g. the hood cabinet + its pull-out hood) toggle together,
                       // but the hidden partner isn't persisted on its own. Mirror the group's
                       // selection so both stay highlighted after a refresh.
                       const linkedIds = getLinkedComponentIds(kitchenSlug, hotspot.componentId);
                       const isSelected =
-                        isLocked || linkedIds.some((linkedId) => selectedComponentIds.includes(linkedId));
+                        isDefaultLocked || linkedIds.some((linkedId) => selectedComponentIds.includes(linkedId));
                       const isGroupHovered = hoveredLinkedGroup.includes(hotspot.componentId);
                       const hotspotStyle = {
                         left: `${hotspot.left}%`,
@@ -1458,7 +1464,7 @@ export default function KitchenSvgStage({
                             isPolygonHotspot ? styles.planHotspotPolygon : "",
                             isGroupHovered ? styles.planHotspotHover : "",
                             isSelected ? styles.planHotspotSelected : "",
-                            isLocked ? styles.planHotspotLocked : "",
+                            isDefaultLocked ? styles.planHotspotLocked : "",
                             isCalibrating ? styles.planHotspotCalibrate : "",
                           ]
                             .filter(Boolean)
@@ -1467,7 +1473,7 @@ export default function KitchenSvgStage({
                           aria-pressed={isSelected}
                           aria-label={hotspot.label}
                           title={`${hotspot.componentKey} — left:${hotspot.left} top:${hotspot.top} width:${hotspot.width} height:${hotspot.height}`}
-                          disabled={isLocked}
+                          disabled={isFixed}
                           onMouseEnter={() => setHoveredComponentId(hotspot.componentId)}
                           onMouseLeave={() =>
                             setHoveredComponentId((current) =>
