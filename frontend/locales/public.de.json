@@ -118,7 +118,10 @@
       "baseCabinetRight": "Unterschrank rechts",
       "baseCabinetLeftLs": "Unterschrank links",
       "baseCabinetRightLs": "Unterschrank rechts",
-      "baseCabinetThreeDrawers": "Unterschrank (3 Schubladen)"
+      "baseCabinetThreeDrawers": "Unterschrank (3 Schubladen)",
+      "lightingSet3Spots": "Beleuchtungsset 3 LED-Spots",
+      "serviceMontage": "Lieferung, Vertragen, Montage und Anschluss",
+      "servicePickup": "Abholung an Logistikstandort"
     },
     "catalogItemInfo": {
       "adjustableShelves": "H6002, 2 verstellbare Einlegeböden",
