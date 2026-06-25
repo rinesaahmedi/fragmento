@@ -1,9 +1,44 @@
 """Build SVG-aligned hotspot polygons for AB 105805 (L-shaped isometric plan).
 
-AB 105805 is the same CAD drawing family as AB 105809; the only geometric difference is a
-~0.77% downward shift of the linework (measured via FFT phase correlation between the two
-3509x2480 renders: dx=-0.028%, dy=+0.766%). These polygons are AB 105809's measured boxes with
-that shift applied, then verified against frontend/public/jpg/AB 105805_page-0001.jpg.
+These boxes were measured directly against frontend/public/jpg/AB 105805_page-0001.jpg
+(the corrected plan export) using sub-pixel line detection (cv2.HoughLinesP on the ink
+mask) to find each cabinet's true corners, then verified with
+docs/detect-plan-hotspots.py --overlay.
+
+Per the Corner Blende rule, the Excel's "ARTICLE NR 2" Blende codes are folded into the
+adjacent cabinet's hotspot rather than left as separate unselected strips:
+- NR 6 (base-module-2, UPK20 Blende) -> base-module-2/corner-base boundary moved from
+  54.0% to 55.57% to absorb the visible Blende panel before the corner.
+- NR 12 (wall-cabinet-4, HPK2002 Blende) -> right edge extended to 62.24% to include
+  the cabinet's own outer corner edge, in one straight line (no notch — see below).
+- NR 3 (corner filler, UPK20 Blende) is already part of the corner-base hotspot.
+
+A duct/chimney box stands between the fridge and wall-cabinet-1 (no NR, no price) at the
+left outside corner of the wall run -> folded into wall-cabinet-1's hotspot.
+
+Every wall cabinet hotspot is a hexagon, not a plain quad: each cabinet has a visible
+back-top edge (the roofline) **and** a front-top edge (where the door starts) — a thin
+lid sliver in between that's part of the same cabinet, not a separate piece. The two
+edges are parallel with a constant depth offset of (-4.39%, -1.05%) front-to-back,
+measured from the matching pair of roofline/door-line segments and verified consistent
+across the whole row (predicted vs measured front-top values matched within 0.01%).
+
+Two things to avoid, found by visual review of the rendered overlay:
+- Don't extrapolate a cabinet's own depth vector onto an attached duct/filler that has
+  no visible lid of its own (it produced a flap poking out past the duct's real left
+  edge) — just connect the duct's front-top-left point straight to the shared back-top
+  corner of the next cabinet.
+- Don't split one cabinet's hotspot into a main shape plus a separate notch/extension
+  rectangle for an absorbed Blende — a concave notch makes the polygon's border double
+  back on itself, which renders as a visible stray line across the fill. Extend the
+  affected edge to one straight line instead (wall-cabinet-4's right edge here).
+
+The worktop is ONE polygon, not several adjoining quads. Each separate piece used to
+draw its own border, and since they're all the same locked component, the borders at
+their shared edges showed up as distracting lines across what should look like a single
+continuous counter surface. The single polygon below traces the whole visible
+counter-top surface — main run, corner, and both sides of the sink — as one outline,
+so only the true outer edge gets a border.
 """
 import json
 from pathlib import Path
@@ -12,24 +47,26 @@ ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "frontend/public/hotspot-overlays/105805-boxes.json"
 
 boxes = [
-    {"componentKey": "refrigerator", "points": [[11.51, 30.48], [21.32, 27.59], [27.71, 32.74], [27.71, 81.64], [17.92, 84.53], [11.51, 79.38]]},
-    {"componentKey": "worktop", "points": [[27.71, 49.46], [28.71, 56.2], [29.0, 81.27], [27.71, 81.35]], "preserveManualSize": True},
-    {"componentKey": "wall-cabinet-1", "points": [[24.86, 17.88], [31.92, 15.8], [35.45, 18.62], [35.45, 38.43], [27.71, 40.5], [27.71, 32.74], [24.86, 30.47]]},
-    {"componentKey": "wall-cabinet-2", "points": [[31.92, 15.8], [42.51, 12.67], [46.03, 15.53], [46.03, 35.32], [35.45, 38.43], [35.45, 18.62]]},
-    {"componentKey": "extractor-hood", "points": [[35.45, 38.43], [46.03, 35.32], [46.03, 36.57], [35.45, 39.67]]},
-    {"componentKey": "wall-cabinet-3", "points": [[42.51, 12.67], [51.34, 10.1], [54.85, 12.92], [54.85, 32.72], [46.03, 35.32], [46.03, 15.53]]},
-    {"componentKey": "wall-cabinet-4", "points": [[51.34, 10.1], [60.62, 7.36], [64.86, 9.85], [64.86, 29.78], [54.85, 32.72], [54.85, 12.92]]},
-    {"componentKey": "worktop", "points": [[27.71, 49.46], [50.02, 42.89], [56.42, 48.05], [55.46, 49.43], [46.63, 52.03], [36.05, 55.12], [29.0, 57.21], [28.71, 56.2]]},
-    {"componentKey": "worktop", "points": [[50.02, 42.89], [60.62, 39.78], [83.58, 58.28], [73.0, 61.38], [69.22, 59.44], [62.82, 54.28], [55.46, 49.43], [56.42, 48.05]]},
-    {"componentKey": "base-module-1", "points": [[29.0, 57.21], [36.05, 55.12], [36.05, 79.19], [29.0, 81.27]]},
-    {"componentKey": "oven-module", "points": [[36.05, 55.12], [46.63, 52.03], [46.63, 76.06], [36.05, 79.19]]},
-    {"componentKey": "base-module-2", "points": [[46.63, 52.03], [55.46, 49.43], [56.42, 49.14], [56.42, 73.17], [55.46, 73.48], [46.63, 76.06]]},
-    {"componentKey": "corner-base", "points": [[56.42, 49.14], [62.82, 54.28], [62.82, 78.35], [56.42, 73.17]]},
-    {"componentKey": "base-module-3", "points": [[62.82, 54.28], [69.22, 59.44], [69.22, 83.49], [62.82, 78.35]]},
-    {"componentKey": "sink-base", "points": [[69.22, 59.44], [73.0, 61.38], [73.0, 86.53], [69.22, 83.49]]},
-    {"componentKey": "sink-base", "points": [[73.0, 62.22], [83.58, 59.12], [83.58, 83.43], [73.0, 86.53]], "preserveManualSize": True},
-    {"componentKey": "worktop", "points": [[73.0, 61.38], [83.58, 58.28], [83.58, 59.12], [73.0, 62.22]], "preserveManualSize": True},
-    {"componentKey": "sink-faucet", "left": 65.29, "top": 40.61, "width": 6.01, "height": 8.95, "preserveManualSize": True},
+    {"componentKey": "refrigerator", "points": [[10.6, 29.8], [20.1, 28.4], [28.3, 30.15], [28.41, 85.81], [19.07, 86.73], [10.57, 84.68]]},
+    {"componentKey": "worktop", "points": [[28.41, 58.0], [29.3, 58.55], [29.5, 85.5], [28.7, 85.77]], "preserveManualSize": True},
+    {"componentKey": "wall-cabinet-1", "points": [[19.92, 18.27], [27.11, 17.25], [31.5, 18.3], [31.5, 42.3], [24.7, 43.3], [19.9, 28.43]]},
+    {"componentKey": "wall-cabinet-2", "points": [[31.5, 18.3], [27.11, 17.25], [37.21, 15.8], [41.6, 16.85], [41.6, 40.85], [31.5, 42.3]]},
+    {"componentKey": "extractor-hood", "points": [[31.5, 42.3], [41.6, 40.85], [41.6, 42.15], [31.5, 43.6]]},
+    {"componentKey": "wall-cabinet-3", "points": [[41.6, 16.85], [37.21, 15.8], [45.66, 14.55], [50.05, 15.6], [50.05, 38.06], [41.6, 40.85]]},
+    {"componentKey": "wall-cabinet-4", "points": [[50.05, 15.6], [45.66, 14.55], [56.61, 12.94], [62.24, 13.99], [62.24, 36.49], [50.05, 38.06]]},
+    {"componentKey": "worktop", "points": [
+        [28.7, 54.44], [35.45, 53.44], [45.57, 51.94], [55.57, 50.4], [64.05, 51.89], [72.55, 53.68],
+        [76.8, 54.5], [87.17, 56.68], [87.17, 57.0], [76.8, 59.27], [72.55, 58.4], [64.05, 56.65],
+        [55.57, 54.9], [45.57, 56.13], [35.45, 57.58], [28.7, 58.55],
+    ]},
+    {"componentKey": "base-module-1", "points": [[28.7, 58.55], [35.45, 57.58], [35.45, 84.84], [28.7, 85.77]]},
+    {"componentKey": "oven-module", "points": [[35.45, 57.58], [45.57, 56.13], [45.57, 83.35], [35.45, 84.84]]},
+    {"componentKey": "base-module-2", "points": [[45.57, 56.13], [55.57, 54.9], [55.57, 82.16], [45.57, 83.35]]},
+    {"componentKey": "corner-base", "points": [[55.57, 54.9], [64.05, 56.65], [64.05, 83.91], [55.57, 82.16]]},
+    {"componentKey": "base-module-3", "points": [[64.05, 56.65], [72.55, 58.4], [72.55, 85.65], [64.05, 83.91]]},
+    {"componentKey": "sink-base", "points": [[72.55, 58.4], [76.8, 59.27], [76.8, 86.53], [72.55, 85.65]]},
+    {"componentKey": "sink-base", "points": [[76.8, 59.27], [87.17, 56.65], [87.17, 85.12], [76.8, 86.53]], "preserveManualSize": True},
+    {"componentKey": "sink-faucet", "left": 64, "top": 40, "width": 6, "height": 10.2, "preserveManualSize": True},
 ]
 
 OUT.parent.mkdir(parents=True, exist_ok=True)

@@ -8,6 +8,10 @@ export const PLAN_VIEWPORT_BY_SLUG = {
     viewBox: "60 45 600 450",
     preserveAspectRatio: "xMidYMid meet",
   },
+  "ab-105828": {
+    viewBox: "60 45 600 450",
+    preserveAspectRatio: "xMidYMid meet",
+  },
 };
 
 const BASE_PLAN_STROKE = "#8f877d";
@@ -69,6 +73,7 @@ const L_SHAPED_PLAN_COMPONENT_BOUNDS = {
   "component-wall-cabinet-2": { x: 227, y: 111, width: 102, height: 153 },
   "component-wall-cabinet-3": { x: 304, y: 98, width: 88, height: 127 },
   "component-wall-cabinet-4": { x: 368, y: 83, width: 107, height: 130 },
+  "component-wall-cabinet-5": { x: 476, y: 68, width: 54, height: 115 },
   "component-under-cabinet-light": { x: 329, y: 246, width: 70, height: 42 },
   "component-refrigerator": { x: 77, y: 183, width: 114, height: 287 },
   "component-worktop": { x: 156, y: 237, width: 459, height: 92 },
@@ -139,22 +144,26 @@ const L_SHAPED_SINK_FAUCET_DETAIL_BOUNDS = {
   maxY: 329,
 };
 
+function isLShapedPlanKitchen(slug) {
+  return slug === "l-shaped-kitchen" || slug === "ab-105828";
+}
+
 function getPlanBoundsForSlug(slug, componentId) {
-  if (slug === "l-shaped-kitchen") {
+  if (isLShapedPlanKitchen(slug)) {
     return L_SHAPED_PLAN_COMPONENT_BOUNDS[componentId] || PLAN_COMPONENT_BOUNDS[componentId] || null;
   }
   return PLAN_COMPONENT_BOUNDS[componentId] || null;
 }
 
 function getPlanShapeForSlug(slug, componentId) {
-  if (slug === "l-shaped-kitchen") {
+  if (isLShapedPlanKitchen(slug)) {
     return L_SHAPED_PLAN_COMPONENT_SHAPES[componentId] || "";
   }
   return "";
 }
 
 function getPlanSelectionOutlineShapeForSlug(slug, componentId) {
-  if (slug === "l-shaped-kitchen") {
+  if (isLShapedPlanKitchen(slug)) {
     return L_SHAPED_PLAN_COMPONENT_SELECTION_OUTLINE_SHAPES[componentId] || getPlanShapeForSlug(slug, componentId);
   }
   return getPlanShapeForSlug(slug, componentId);
@@ -165,7 +174,7 @@ function shouldUseSelectionOutline(slug, componentId, selectionMode) {
     return true;
   }
 
-  return slug === "l-shaped-kitchen" && componentId.startsWith("component-wall-cabinet-");
+  return isLShapedPlanKitchen(slug) && componentId.startsWith("component-wall-cabinet-");
 }
 
 function cleanupPlanInteractionOverlays(svg, slug) {
@@ -182,7 +191,7 @@ function cleanupPlanInteractionOverlays(svg, slug) {
     element.style.setProperty("opacity", "0", "important");
   });
 
-  if (slug !== "l-shaped-kitchen") return;
+  if (!isLShapedPlanKitchen(slug)) return;
 
   svg.querySelectorAll("[data-component-id]").forEach((group) => {
     group.style.setProperty("outline", "none", "important");
@@ -292,7 +301,7 @@ function getOrCreateLShapedSinkFaucetGroup(svg) {
 }
 
 function normalizePlanComponentOwnership(svg, slug) {
-  if (slug !== "l-shaped-kitchen") return;
+  if (!isLShapedPlanKitchen(slug)) return;
 
   const leftCabinet = svg.querySelector('[data-component-id="component-wall-cabinet-1"]');
   const hoodCabinet = svg.querySelector('[data-component-id="component-wall-cabinet-2"]');
@@ -470,7 +479,7 @@ function applyLShapedDishwasherInternalIconStyles(svg, selectedComponentIds = []
 }
 
 function bringLShapedRefrigeratorForward(svg, slug) {
-  if (slug !== "l-shaped-kitchen") return;
+  if (!isLShapedPlanKitchen(slug)) return;
 
   const refrigeratorGroup = svg?.querySelector('[data-component-id="component-refrigerator"]');
   if (refrigeratorGroup?.parentNode) {
@@ -739,7 +748,7 @@ export function syncKitchenPlan({
   const namespace = "http://www.w3.org/2000/svg";
   const byColor = new Map();
   const visibleSet = Array.isArray(visibleComponentIds) ? new Set(visibleComponentIds) : null;
-  const useColorGrouping = kitchenConfig.kitchen.slug !== "l-shaped-kitchen";
+  const useColorGrouping = !isLShapedPlanKitchen(kitchenConfig.kitchen.slug);
   if (useColorGrouping) {
     svg.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse").forEach((element) => {
       if (element.closest("[data-component-id]")) return;
@@ -790,7 +799,7 @@ export function syncKitchenPlan({
 
     group.style.removeProperty("display");
     group.classList.add("kitchen-component");
-    if (kitchenConfig.kitchen.slug === "l-shaped-kitchen") {
+    if (isLShapedPlanKitchen(kitchenConfig.kitchen.slug)) {
       group.dataset.selectionMode = "hitbox-only";
     }
     if (item.code) {
@@ -805,7 +814,7 @@ export function syncKitchenPlan({
 
     if (!existingHitbox) {
       const box =
-        kitchenConfig.kitchen.slug === "l-shaped-kitchen"
+        isLShapedPlanKitchen(kitchenConfig.kitchen.slug)
           ? getPlanBoundsForSlug(kitchenConfig.kitchen.slug, componentId)
           : getPlanBounds(group, componentId) || getPlanBoundsForSlug(kitchenConfig.kitchen.slug, componentId);
       if (box) {
