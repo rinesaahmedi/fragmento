@@ -597,6 +597,8 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105805": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105809": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105813": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105817": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105834": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105810": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105812": [["component-wall-cabinet-2", "component-extractor-hood"]],

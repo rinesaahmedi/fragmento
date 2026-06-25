@@ -38,7 +38,9 @@ const IMAGE_VIEW_BY_SLUG = {
   // JPG (not SVG) so the stage matches the PDF/hotspot render 1:1 — the PDF-derived SVG
   // can look different in some browsers when loaded as <img>.
   "ab-105805": "/jpg/AB%20105805_page-0001.jpg",
-  "ab-105809": "/jpg/AB%20105809_page-0001.jpg",
+  "ab-105809": "/jpg/AB%20105805_page-0001.jpg",
+  "ab-105813": "/jpg/AB%20105805_page-0001.jpg",
+  "ab-105817": "/jpg/AB%20105805_page-0001.jpg",
   "ab-105834": "/jpg/AB%20105834_page-0001.jpg",
   "ab-105837": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105810": "/plans/AB%20105810.svg",
@@ -756,6 +758,9 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
 };
 
 IMAGE_HOTSPOTS_BY_SLUG["ab-105815"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105811"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105809"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105813"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105817"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105818"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105810"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105824"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105821"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105823"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105822"];
@@ -790,6 +795,8 @@ const BASE_PLINTH_EXTENSION_DISABLED_SLUGS = new Set([
   "ab-105808",
   "ab-105805",
   "ab-105809",
+  "ab-105813",
+  "ab-105817",
   "ab-105834",
   "ab-105810",
   "ab-105812",
