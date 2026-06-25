@@ -85,7 +85,7 @@
   <g data-component-id="component-t3d-oven">
     <rect x="356" y="350" width="88" height="132" fill="#6f7672" stroke="#e9eeeb" stroke-width="1.25"/>
     <rect x="378" y="392" width="44" height="58" fill="#7b817d" stroke="#e9eeeb" stroke-width="1.25"/>
-    <path d="M370 372H430M384 460H416" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
+    <path d="M366 372H434M384 460H416" fill="none" stroke="#e9eeeb" stroke-width="1.25"/>
     <circle cx="388" cy="365" r="3" fill="#6f7672" stroke="#e9eeeb" stroke-width="1"/>
     <circle cx="412" cy="365" r="3" fill="#6f7672" stroke="#e9eeeb" stroke-width="1"/>
   </g>
