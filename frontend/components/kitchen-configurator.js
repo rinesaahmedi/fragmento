@@ -77,7 +77,7 @@ const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
 
 const DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG = {
   "ab-105835": ["oven-module", "worktop", "sink-base", "sink-faucet"],
-  "l-shaped-kitchen": ["worktop", "oven-base", "corner-base"],
+  "l-shaped-kitchen": ["worktop", "oven-base", "base-module-3"],
 };
 
 const DEFAULT_LOCKED_PLAN_COMPONENT_KEYS_BY_SLUG = {
@@ -89,8 +89,14 @@ const DEFAULT_LOCKED_ACCESSORY_CODES_BY_SLUG = {
 };
 
 const CONFIGURATOR_DRAFT_REVISION_BY_SLUG = {
+  "ab-105805": "default-components-v2",
+  "ab-105809": "default-components-v2",
+  "ab-105813": "default-components-v2",
   "ab-105814": "ab105810-view",
+  "ab-105817": "default-components-v2",
   "ab-105818": "ab105810-view",
+  "ab-105834": "default-components-v2",
+  "l-shaped-kitchen": "default-components-v2",
 };
 
 function buildCustomerAddressFromContract(contractAddress) {
@@ -381,7 +387,7 @@ function formatProductAssistantDisplayName(item, translate) {
   }
 
   if (isRefrigeratorProductAssistantItem(item)) {
-    return translate("configurator.catalogItemNames.refrigerator", "Refrigerator");
+    return translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm");
   }
 
   if (isDishwasherProductAssistantItem(item)) {

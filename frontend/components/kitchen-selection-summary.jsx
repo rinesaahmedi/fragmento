@@ -77,7 +77,8 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const isConfirmed = !isDefault && Boolean(item.isOrderLocked);
   const isLocked = isDefault || isConfirmed;
   const itemName = getLocalizedItemName(item, translate, language, false);
-  const { articleNumber, dimensions: itemDimensions } = getCatalogItemDetails(item);
+  const { articleNumber, dimensions } = getCatalogItemDetails(item);
+  const itemDimensions = isLocked ? "" : dimensions;
   const infoPdfHref = getProductInfoHref(item);
   const productInfoDocuments = getProductInfoDocuments(item);
   const priceClassName = [
