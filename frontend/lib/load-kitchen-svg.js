@@ -14,6 +14,7 @@ const SVG_BY_SLUG = {
   "kitchen-model-c": path.join(process.cwd(), "kitchen-svgs", "active", "kitchen-model-c.svg"),
   "l-kitchen-new": path.join(process.cwd(), "kitchen-svgs", "active", "l-kitchen-new.svg"),
   "l-shaped-kitchen": path.join(process.cwd(), "kitchen-svgs", "active", "l-shaped-kitchen.svg"),
+  "ab-105828": path.join(process.cwd(), "kitchen-svgs", "active", "l-shaped-kitchen.svg"),
   "test-3d-kitchen": path.join(process.cwd(), "kitchen-svgs", "active", "test-3d-kitchen.svg"),
 };
 
