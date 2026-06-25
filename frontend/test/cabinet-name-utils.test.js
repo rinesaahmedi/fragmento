@@ -56,7 +56,7 @@ test("localized sink base name stays Sink Lower Cabinet even after stored-name m
   );
 });
 
-test("localized hood wall cabinet uses extractor hood upper cabinet label", () => {
+test("localized hood wall cabinet uses upper cabinet with extractor hood label", () => {
   assert.equal(
     getLocalizedItemName(
       {
@@ -69,7 +69,7 @@ test("localized hood wall cabinet uses extractor hood upper cabinet label", () =
       "en",
       false,
     ),
-    "Extractor Hood Upper Cabinet",
+    "Upper Cabinet with Extractor Hood 60",
   );
 });
 
