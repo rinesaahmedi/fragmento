@@ -40,6 +40,7 @@
     "fixed": "Fixed",
     "unavailable": "Unavailable",
     "add": "Add",
+    "includesBlende": "Includes",
     "serviceHintMontage": "Assembly is available only with a merchandise value of €1,000 or more and at least 3 cabinet components",
     "serviceHintPickup": "Only available with at least one component or accessory",
     "infoForItem": "Information about {name}",

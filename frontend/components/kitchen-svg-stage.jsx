@@ -66,6 +66,8 @@ const IMAGE_VIEW_BY_SLUG = {
   "ab-105836": "/plans/AB%20105836.svg",
   "ab-105842": "/plans/AB%20105842.svg",
   "ab-105839": "/plans/AB%20105842.svg",
+  "ab-105845": "/plans/AB%20105845.svg",
+  "105845-modul-2": "/plans/AB%20105845.svg",
   "ab-105833": "/plans/AB%20105833.svg",
   "ab-105841": "/plans/AB%20105841.svg",
   "ab-105838": "/plans/AB%20105841.svg",
@@ -816,6 +818,29 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "drawer-module", left: 68.55, top: 59.9, width: 13.34, height: 27.44 },
     { componentKey: "refrigerator", left: 85.15, top: 30.75, width: 12.35, height: 56.59 },
   ],
+  "ab-105845": [
+    { componentKey: "refrigerator", left: 1.19, top: 45.04, width: 10.67, height: 48.88, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 29.84, top: 26.22, width: 3.11, height: 16.79, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 25.63, top: 43.01, width: 11.53, height: 10.97, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 25.9, top: 53.9, width: 10.9, height: 6.4, preserveManualSize: true },
+    { componentKey: "worktop", left: 13.53, top: 68.94, width: 35.69, height: 1.15, preserveManualSize: true },
+    { componentKey: "cook-base-left", left: 14.1, top: 70.09, width: 11.53, height: 23.83, preserveManualSize: true },
+    { componentKey: "oven-module", left: 25.63, top: 70.09, width: 11.53, height: 23.83, preserveManualSize: true },
+    { componentKey: "cook-base-right", left: 37.16, top: 70.09, width: 11.48, height: 23.83, preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", left: 51.64, top: 33.28, width: 11.7, height: 19.92, preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", left: 63.34, top: 33.28, width: 11.7, height: 19.92, preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", left: 75.04, top: 33.28, width: 11.67, height: 19.92, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 86.71, top: 33.28, width: 11.67, height: 19.92, preserveManualSize: true },
+    { componentKey: "under-cabinet-light", left: 60.4, top: 52.6, width: 6.0, height: 7.5, preserveManualSize: true },
+    { componentKey: "under-cabinet-light", left: 72.1, top: 52.6, width: 6.0, height: 7.5, preserveManualSize: true },
+    { componentKey: "under-cabinet-light", left: 83.8, top: 52.6, width: 6.0, height: 7.5, preserveManualSize: true },
+    { componentKey: "worktop", left: 51.31, top: 68.76, width: 47.55, height: 1.16, preserveManualSize: true },
+    { componentKey: "sink-faucet", left: 71.43, top: 63.25, width: 1.73, height: 5.57, preserveManualSize: true },
+    { componentKey: "wm-base", left: 51.64, top: 69.85, width: 11.7, height: 24.33, preserveManualSize: true },
+    { componentKey: "sink-base", left: 63.34, top: 69.85, width: 11.7, height: 24.33, preserveManualSize: true },
+    { componentKey: "dishwasher-base", left: 75.04, top: 69.85, width: 11.67, height: 24.33, preserveManualSize: true },
+    { componentKey: "drawer-module", left: 86.71, top: 69.85, width: 11.67, height: 24.33, preserveManualSize: true },
+  ],
   // AB 105811 reuses the AB 105819 plan render (same view + source PDF), so it mirrors
   // the 105819 hotspot geometry and component layout (dishwasher on base-module-3).
   "ab-105811": [
@@ -873,6 +898,7 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-105829"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105822"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105832"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105822"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105830"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105827"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105839"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105842"];
+IMAGE_HOTSPOTS_BY_SLUG["105845-modul-2"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105845"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105838"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105841"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105844"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105841"];
 

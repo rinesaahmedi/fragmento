@@ -40,6 +40,7 @@
     "fixed": "Fix",
     "unavailable": "Nicht verfügbar",
     "add": "Hinzufügen",
+    "includesBlende": "Enthält",
     "serviceHintMontage": "Montage ab Warenwert 1.000 Euro und mindestens 3 Schrank-Komponenten",
     "serviceHintPickup": "Nur mit mindestens einer Komponente oder einem Zubehör",
     "infoForItem": "Informationen zu {name}",
