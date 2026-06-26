@@ -397,15 +397,19 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
   "ab-105831": [
     {
       componentKey: "wall-cabinet-1",
-      points: [[48.02, 15.55], [57.97, 16.85], [57.97, 41.9], [48.02, 40.35]],
+      points: [[48.02, 15.85], [57.97, 17.85], [57.97, 41.9], [48.02, 40.35]],
     },
     {
       componentKey: "wall-cabinet-1",
-      points: [[48.02, 15.55], [52.05, 15.05], [61.05, 16.45], [57.97, 16.85]],
+      points: [[48.02, 15.85], [54.05, 15.05], [64.05, 16.85], [57.97, 17.85]],
     },
     {
       componentKey: "wall-cabinet-2",
-      points: [[57.97, 17.14], [67.11, 20.0], [67.11, 43.87], [57.97, 41.45]],
+      points: [[57.97, 18.14], [67.11, 20.0], [67.11, 45.87], [57.97, 43.85]],
+    },
+    {
+      componentKey: "wall-cabinet-2",
+      points: [[57.97, 18.14], [67.11, 20.0], [73.9, 19.24], [64.05, 16.85]],
     },
     {
       componentKey: "extractor-hood",
@@ -413,16 +417,21 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
       preserveManualSize: true,
     },
     {
+      componentKey: "extractor-hood",
+      points: [[66.85, 43.55], [70.55, 45.05], [66.85, 45.75]],
+      preserveManualSize: true,
+    },
+    {
       componentKey: "wall-cabinet-3",
       points: [[67.11, 20.0], [74.78, 21.25], [74.78, 45.48], [67.11, 43.87]],
     },
     {
-      componentKey: "wall-cabinet-4",
-      points: [[74.78, 21.25], [79.37, 20.52], [79.37, 36.9], [74.78, 35.32]],
+      componentKey: "wall-cabinet-3",
+      points: [[67.11, 20.0], [74.78, 21.25], [83.47, 21.18], [73.9, 19.24]],
     },
     {
       componentKey: "wall-cabinet-4",
-      points: [[79.37, 20.52], [85.58, 21.25], [85.58, 36.9], [79.37, 36.9]],
+      points: [[74.78, 21.25], [79.37, 20.52], [85.58, 21.25], [85.58, 36.9], [79.37, 36.9], [74.78, 35.32]],
     },
     {
       componentKey: "worktop",
@@ -494,7 +503,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "refrigerator",
-      points: [[74.89, 34.31], [83.39, 32.9], [94.33, 34.31], [83.39, 37.34]],
+      points: [[74.89, 34.31], [83.39, 33.45], [94.33, 34.31], [94.33, 35.65], [83.39, 37.34], [74.89, 35.45]],
     },
   ],
   "ab-105808": [
