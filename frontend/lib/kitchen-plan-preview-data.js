@@ -405,7 +405,15 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "wall-cabinet-2",
+      points: [[57.97, 17.14], [61.05, 16.45], [70.35, 18.85], [67.11, 20.0]],
+    },
+    {
+      componentKey: "wall-cabinet-2",
       points: [[57.97, 17.14], [67.11, 20.0], [67.11, 43.87], [57.97, 41.45]],
+    },
+    {
+      componentKey: "wall-cabinet-2",
+      points: [[57.97, 41.45], [67.11, 43.87], [66.85, 43.65], [60.25, 43.0]],
     },
     {
       componentKey: "extractor-hood",
@@ -414,11 +422,23 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "wall-cabinet-3",
+      points: [[67.11, 20.0], [70.35, 18.85], [78.05, 20.1], [74.78, 21.25]],
+    },
+    {
+      componentKey: "wall-cabinet-3",
       points: [[67.11, 20.0], [74.78, 21.25], [74.78, 45.48], [67.11, 43.87]],
     },
     {
       componentKey: "wall-cabinet-4",
+      points: [[74.78, 21.25], [78.05, 20.1], [82.4, 19.45], [79.37, 20.52]],
+    },
+    {
+      componentKey: "wall-cabinet-4",
       points: [[74.78, 21.25], [79.37, 20.52], [79.37, 36.9], [74.78, 35.32]],
+    },
+    {
+      componentKey: "wall-cabinet-4",
+      points: [[79.37, 20.52], [82.4, 19.45], [88.5, 20.25], [85.58, 21.25]],
     },
     {
       componentKey: "wall-cabinet-4",
