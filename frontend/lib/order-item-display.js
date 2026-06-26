@@ -35,7 +35,7 @@ export function isSinkOrderItem(item) {
   const name = getItemName(item);
   return (
     getItemType(item) === ItemType.COMPONENT &&
-    (componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and waste system"))
+    (componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and worktop") || name.includes("sink and waste system"))
   );
 }
 

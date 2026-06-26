@@ -120,8 +120,10 @@ function stripDimensionsFromName(name) {
 // kitchen-specific codes are minted when an otherwise identical item appears under a
 // different callout number.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
+  "OVEN-B-600-HOB": "1",
   "OVEN-AB105806-600-HOB": "1",
   "TOP-AB105806": "2",
+  "SINKBASE-B-600": "3",
   "SINKBASE-AB105806-600": "3",
   "REF-AB105806-KGCN388140E": "4",
   "CAB-BASE-AB105806-400-L": "5",
@@ -240,6 +242,7 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "HOOD-AB105845-KHF664611S": "7",
   "CAB-BASE-AB105809-400-R": "5",
   "CAB-BASE-AB105809-500-L": "6",
+  "SINKBASE-B-600": "8",
   "SINKBASE-AB105809-US30": "8",
   "CAB-WALL-AB105809-FILLER": "9",
   "CAB-WALL-AB105809-500-L": "11",
@@ -444,11 +447,13 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
       return withDimensions(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"));
+    case "SINK-WORKTOP":
     case "SINK-B-BOTTON-45":
     case "SINK-AB105806-BOTTON-45":
     case "SINK-AB105807-BOTTON-45":
     case "SINK-C-BOTTON-45":
-      return translate("configurator.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System");
+    case "SINK-LS-BOTTON-45":
+      return translate("configurator.catalogItemNames.sinkAndWorktop", "Sink and Worktop");
     case "ACC-WASTE-001":
     case "T3D-ACC-WASTE-001":
       return translate("configurator.catalogItemNames.wasteSeparationSystem", "Waste separation system");
@@ -612,10 +617,12 @@ export function getLocalizedItemInfoText(item, translate) {
     case "REF-AB105845-KGCN388140E":
     case "REF-C-545-1800-700":
       return translate("configurator.catalogItemInfo.fridgeFreezerNoFrost", "Fridge-freezer, 180 cm, NoFrost");
+    case "SINK-WORKTOP":
     case "SINK-B-BOTTON-45":
     case "SINK-AB105806-BOTTON-45":
     case "SINK-AB105807-BOTTON-45":
     case "SINK-C-BOTTON-45":
+    case "SINK-LS-BOTTON-45":
     case "T3D-SINK-001":
       return translate("configurator.catalogItemInfo.manualWasteSystem", "Blanco Botton Pro 45/2 manual waste system");
     case "ACC-CUTLERY-ZB60SG":

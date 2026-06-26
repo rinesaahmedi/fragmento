@@ -9,7 +9,7 @@ const DEFAULT_KITCHEN_ITEMS = [
   {
     itemType: ItemType.ACCESSORY,
     code: "ACC-WASTE-001",
-    articleNumber: "Blanco Botton 517467",
+    articleNumber: "517467",
     name: "Waste separation system",
     nameDe: "Muelltrennsystem",
     price: "89.00",

@@ -22,7 +22,7 @@ function isSinkSummaryItem(item) {
   const code = String(item?.code || "").trim().toUpperCase();
   const componentKey = String(item?.componentKey || "").trim().toLowerCase();
   const name = String(item?.name || item?.nameSnapshot || "").trim().toLowerCase();
-  return componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and waste system");
+  return componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and worktop") || name.includes("sink and waste system");
 }
 
 function mergeStandardEquipmentItems(items) {
