@@ -16,7 +16,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="de">
-      <body className={manrope.className}>
+      <body className={manrope.className} suppressHydrationWarning>
         <div className="public-app-shell">
           <div className="public-app-content">{children}</div>
           <PublicLegalFooter />
