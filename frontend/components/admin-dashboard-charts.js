@@ -146,7 +146,7 @@ const KITCHEN_ELEMENT_LABEL_KEYS = {
   "sink and waste system": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
   "spüle und mülltrennsystem": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
   "spuele und muelltrennsystem": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
-  "sink and worktop": ["dashboard.catalogItemNames.sinkAndWorktop", "Sink and Worktop"],
+  "sink and worktop": ["dashboard.catalogItemNames.sinkAndWorktop", "Worktop"],
   "cutlery insert 60": ["dashboard.catalogItemNames.cutleryInsert60", "Cutlery Insert ZB60SG"],
   "besteckeinsatz zb60sg": ["dashboard.catalogItemNames.cutleryInsert60", "Cutlery Insert ZB60SG"],
   "mülltrennsystem": ["dashboard.catalogItemNames.wasteSeparationSystem", "Waste Separation System"],

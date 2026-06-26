@@ -18,7 +18,7 @@ const KITCHEN_AREA_NAMES = {
   Refrigerator: "Standkühlschrank 178 cm",
   "Freestanding refrigerator 178cm": "Standkühlschrank 178 cm",
   "Sink and Waste System": "Spüle und Mülltrennsystem",
-  "Sink and Worktop": "Spüle und Arbeitsplatte",
+  "Sink and Worktop": "Arbeitsplatte",
 };
 
 function localizeKitchenAreaNames(text, language) {

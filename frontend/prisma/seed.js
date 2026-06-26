@@ -23,9 +23,8 @@ const DEFAULT_SINK_BASE_CATALOG_CODE = "SINKBASE-B-600";
 const DEFAULT_SINK_BASE_CATALOG_NAME_EN = "Sink Lower Cabinet";
 const DEFAULT_SINK_BASE_CATALOG_NAME_DE = "Spülenunterschrank";
 const DEFAULT_SINK_WORKTOP_CATALOG_CODE = "SINK-WORKTOP";
-const DEFAULT_SINK_WORKTOP_CATALOG_NAME_EN = "Sink and Worktop";
-const DEFAULT_SINK_WORKTOP_CATALOG_NAME_DE = "Spüle und Arbeitsplatte";
-const DEFAULT_SINK_WORKTOP_CATALOG_ARTICLE = "517467";
+const DEFAULT_WORKTOP_CATALOG_NAME_EN = "Worktop";
+const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 
 const PRODUCT_INFO_FILES = {
   dishwasher: "/product-info/a-egspv597210-product-info-eco21.pdf",
@@ -607,10 +606,10 @@ const AB_105809_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator 178cm", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-400-R", name: "Base cabinet with drawer", price: "0.01", widthMm: 400, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 20, infoText: "Base cabinet, hinge right", articleNumber: "Unterschrank" },
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 30, infoText: "Built-in oven + induction hob", isLocked: true },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-500-L", name: "Base cabinet with drawer", price: "0.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "Unterschrank" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-500-L", name: "Base cabinet with drawer", price: "50.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "Unterschrank", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: "50.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-B-600", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "springgreen", componentKey: "corner-base", sortOrder: 60, isLocked: true, infoText: "US30 sink base cabinet, hinge left", articleNumber: "US30" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-US30-L", name: "Base cabinet with drawer", price: "175.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "sink-base", sortOrder: 65, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-US30-L", name: "Base cabinet with drawer", price: "200.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "sink-base", sortOrder: 65, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 75, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105809-FILLER", name: "Wall Cabinet", price: "0.01", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "Wall cabinet filler", articleNumber: "Oberschrank" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Upper Cabinet with Extractor Hood 60", price: "349.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -635,10 +634,10 @@ const AB_105805_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator 178cm", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-400-R", name: "Base cabinet with drawer", price: "0.01", widthMm: 400, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 20, infoText: "Base cabinet, hinge right", articleNumber: "-Unterschrank" },
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 30, infoText: "Built-in oven + induction hob", isLocked: true },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105805-500-L", name: "Base cabinet with drawer", price: "25.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "-Unterschrank", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105805-500-L", name: "Base cabinet with drawer", price: "50.01", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "-Unterschrank", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: "50.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Dishwasher", price: "579.00", iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-B-600", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "200.00", widthMm: 300, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "corner-base", sortOrder: 60, isLocked: true, infoText: "US30 sink base cabinet, hinge left", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105805-US30-L", name: "Base cabinet with drawer", price: "175.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "sink-base", sortOrder: 65, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105805-US30-L", name: "Base cabinet with drawer", price: "200.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "sink-base", sortOrder: 65, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 75, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105805-400-R", name: "Wall Cabinet", price: "0.01", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "Wall cabinet, hinge right", articleNumber: "-Oberschrank" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Upper Cabinet with Extractor Hood 60", price: "349.00", iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -1399,6 +1398,23 @@ function isDefaultSinkBaseItem(item) {
   return Boolean(item?.isLocked) && code.startsWith("SINKBASE-");
 }
 
+function applyDefaultSinkBaseCatalogFields(item) {
+  return {
+    ...item,
+    code: DEFAULT_SINK_BASE_CATALOG_CODE,
+    name: DEFAULT_SINK_BASE_CATALOG_NAME_EN,
+    nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE,
+    price: "0.00",
+    widthMm: null,
+    heightMm: null,
+    depthMm: null,
+    articleNumber: null,
+    blendeCode: null,
+    blendeLabel: null,
+    blendePrice: null,
+  };
+}
+
 function isDefaultSinkWorktopItem(item) {
   const code = String(item?.code || "").trim().toUpperCase();
   return Boolean(item?.isLocked) && (
@@ -1406,6 +1422,33 @@ function isDefaultSinkWorktopItem(item) {
     /^SINK-.+BOTTON/.test(code) ||
     (code.startsWith("SINK-") && item?.iconKey === "sink_faucet")
   );
+}
+
+function isDefaultWorktopItem(item) {
+  if (isDefaultSinkWorktopItem(item)) return true;
+
+  const code = String(item?.code || "").trim().toUpperCase();
+  return Boolean(item?.isLocked) && (
+    item?.iconKey === "worktop" ||
+    item?.componentKey === "worktop" ||
+    code.startsWith("TOP-")
+  );
+}
+
+function applyDefaultWorktopCatalogFields(item) {
+  return {
+    ...item,
+    name: DEFAULT_WORKTOP_CATALOG_NAME_EN,
+    nameDe: DEFAULT_WORKTOP_CATALOG_NAME_DE,
+    price: "0.00",
+    widthMm: null,
+    heightMm: null,
+    depthMm: null,
+    articleNumber: null,
+    blendeCode: null,
+    blendeLabel: null,
+    blendePrice: null,
+  };
 }
 
 function applyDefaultCatalogItem(item) {
@@ -1420,23 +1463,18 @@ function applyDefaultCatalogItem(item) {
   }
 
   if (isDefaultSinkBaseItem(item)) {
-    return {
-      ...item,
-      code: DEFAULT_SINK_BASE_CATALOG_CODE,
-      name: DEFAULT_SINK_BASE_CATALOG_NAME_EN,
-      nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE,
-      articleNumber: null,
-    };
+    return applyDefaultSinkBaseCatalogFields(item);
   }
 
   if (isDefaultSinkWorktopItem(item)) {
-    return {
+    return applyDefaultWorktopCatalogFields({
       ...item,
       code: DEFAULT_SINK_WORKTOP_CATALOG_CODE,
-      name: DEFAULT_SINK_WORKTOP_CATALOG_NAME_EN,
-      nameDe: DEFAULT_SINK_WORKTOP_CATALOG_NAME_DE,
-      articleNumber: DEFAULT_SINK_WORKTOP_CATALOG_ARTICLE,
-    };
+    });
+  }
+
+  if (isDefaultWorktopItem(item)) {
+    return applyDefaultWorktopCatalogFields(item);
   }
 
   return item;
@@ -1882,13 +1920,13 @@ async function main() {
       const isHoodWallCabinetItem = itemCode.startsWith("CAB-HOOD-");
       const isDefaultCatalogItem = isDefaultOvenHobItem(item)
         || isDefaultSinkBaseItem(item)
-        || isDefaultSinkWorktopItem(item);
+        || isDefaultWorktopItem(item);
       const itemName = isDefaultOvenHobItem(item)
         ? DEFAULT_OVEN_HOB_CATALOG_NAME_EN
         : isDefaultSinkBaseItem(item)
           ? DEFAULT_SINK_BASE_CATALOG_NAME_EN
-          : isDefaultSinkWorktopItem(item)
-            ? DEFAULT_SINK_WORKTOP_CATALOG_NAME_EN
+          : isDefaultWorktopItem(item)
+            ? DEFAULT_WORKTOP_CATALOG_NAME_EN
             : isRefrigeratorItem
               ? REFRIGERATOR_CATALOG_NAME_EN
               : isHoodWallCabinetItem
@@ -1898,8 +1936,8 @@ async function main() {
         ? DEFAULT_OVEN_HOB_CATALOG_NAME_DE
         : isDefaultSinkBaseItem(item)
           ? DEFAULT_SINK_BASE_CATALOG_NAME_DE
-          : isDefaultSinkWorktopItem(item)
-            ? DEFAULT_SINK_WORKTOP_CATALOG_NAME_DE
+          : isDefaultWorktopItem(item)
+            ? DEFAULT_WORKTOP_CATALOG_NAME_DE
             : isRefrigeratorItem
               ? REFRIGERATOR_CATALOG_NAME_DE
               : isHoodWallCabinetItem

@@ -300,8 +300,8 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return withPhotoNumber(label);
   };
 
-  if (rawName === "Sink and Worktop") {
-    return translate("configurator.catalogItemNames.sinkAndWorktop", "Sink and Worktop");
+  if (rawName === "Sink and Worktop" || rawName === "Spüle und Arbeitsplatte") {
+    return translate("configurator.catalogItemNames.worktop", "Worktop");
   }
 
   // General appliance naming across every kitchen: any dishwasher/refrigerator (identified by
@@ -454,7 +454,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "SINK-AB105807-BOTTON-45":
     case "SINK-C-BOTTON-45":
     case "SINK-LS-BOTTON-45":
-      return translate("configurator.catalogItemNames.sinkAndWorktop", "Sink and Worktop");
+      return translate("configurator.catalogItemNames.worktop", "Worktop");
     case "ACC-WASTE-001":
     case "T3D-ACC-WASTE-001":
       return translate("configurator.catalogItemNames.wasteSeparationSystem", "Waste separation system");

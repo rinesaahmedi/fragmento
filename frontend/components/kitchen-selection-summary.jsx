@@ -36,13 +36,17 @@ function mergeStandardEquipmentItems(items) {
   const mergedItem = {
     ...sinkItem,
     id: `${sinkItem.id || "sink"}-with-${worktopItem.id || "worktop"}`,
-    name: "Sink and Worktop",
+    name: "Worktop",
+    nameDe: "Arbeitsplatte",
     code: [sinkItem.code, worktopItem.code].filter(Boolean).join(" + "),
-    articleNumber: [sinkItem.articleNumber, worktopItem.articleNumber].filter(Boolean).join(" + "),
-    widthMm: worktopItem.widthMm ?? sinkItem.widthMm,
-    heightMm: worktopItem.heightMm ?? sinkItem.heightMm,
-    depthMm: worktopItem.depthMm ?? sinkItem.depthMm,
-    price: Number(sinkItem.price || 0) + Number(worktopItem.price || 0),
+    articleNumber: "",
+    widthMm: null,
+    heightMm: null,
+    depthMm: null,
+    blendeCode: null,
+    blendeLabel: null,
+    blendePrice: null,
+    price: 0,
   };
 
   const mergedItems = [];
