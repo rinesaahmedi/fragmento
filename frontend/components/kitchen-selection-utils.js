@@ -254,8 +254,8 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "DISH-AB105834-600": "7",
   "CAB-WALL-AB105834-500-R": "8",
   "CAB-WALL-AB105834-H6002-L": "10",
-  "CAB-BASE-AB105837-US60-1": "5",
-  "CAB-BASE-AB105837-500-R2": "6",
+  "CAB-BASE-AB105837-US60-R": "5",
+  "CAB-BASE-AB105837-500-R": "6",
   "DISH-AB105837-600": "7",
   "CAB-WALL-AB105837-US60-R": "8",
   "CAB-HOOD-AB105837-600": "9",
@@ -701,6 +701,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
+  "DISH-AB105837-600": [
+    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
+    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  ],
   "DISH-AB105819-600": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
@@ -714,10 +718,6 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "DISH-AB105833-600": [
-    { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
-  ],
-  "DISH-AB105837-600": [
     { label: "E-Label PDF", href: "/product-info/a-egspv597210-elabel-eco21-2601.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],

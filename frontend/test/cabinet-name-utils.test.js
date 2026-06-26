@@ -76,8 +76,9 @@ test("localized hood wall cabinet uses upper cabinet with extractor hood label",
 test("wall cabinet width falls back to code", () => {
   assert.equal(
     getCabinetWidthDisplayName({
-      code: "CAB-WALL-AB105837-US60-L",
+      code: "CAB-WALL-TEST-600",
       name: "Wall Cabinet",
+      widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
     "Upper cabinet 60",
