@@ -1,85 +1,90 @@
-"""Build SVG-aligned hotspot polygons for AB 105834 (L-shaped isometric plan)."""
+"""Build SVG-aligned hotspot polygons for AB 105834 (L-shaped isometric plan).
+
+Measured against frontend/public/jpg/AB 105834_page-0001.jpg rendered from pdfs/AB 105834.pdf.
+Fridge-left L kitchen: main leg (500 + oven + 500), return leg (corner + sink + dishwasher).
+Three wall cabinets (500 filler, hood, H6002) above the main run only.
+"""
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "frontend/public/hotspot-overlays/105834-boxes.json"
+JPG = ROOT / "frontend/public/jpg/AB 105834_page-0001.jpg"
 
-# Traced from the black CAD paths in frontend/public/plans/AB 105834.svg.
-# The SVG and the 3509x2480 JPG share the same page aspect ratio and origin.
+DX, DY = -4.39, -1.05
+
+
+def wall_hex(x0, x1, y_top, y_bottom):
+    return [
+        [x0, y_top],
+        [x0 + DX, y_top + DY],
+        [x1 + DX, y_top + DY],
+        [x1, y_top],
+        [x1, y_bottom],
+        [x0, y_bottom],
+    ]
+
+
+def quad(x0, x1, y0, y1):
+    return [[x0, y0], [x1, y0], [x1, y1], [x0, y1]]
+
+
 boxes = [
     {
         "componentKey": "refrigerator",
-        "points": [[6.36, 34.13], [17.05, 30.98], [24.03, 36.61], [24.03, 89.92], [13.34, 93.06], [6.36, 87.44]],
+        "points": [
+            [0.85, 34.5],
+            [8.38, 32.0],
+            [18.41, 36.5],
+            [18.41, 90.5],
+            [8.38, 92.5],
+            [0.85, 88.0],
+        ],
     },
-    {
-        "componentKey": "wall-cabinet-1",
-        "points": [[20.88, 20.86], [30.5, 18.04], [34.33, 21.12], [34.33, 42.7], [24.73, 45.55], [20.88, 42.46]],
-    },
-    {
-        "componentKey": "wall-cabinet-2",
-        "points": [[30.5, 18.04], [42.03, 14.63], [45.85, 17.73], [45.85, 39.31], [34.33, 42.7], [34.33, 21.12]],
-    },
+    {"componentKey": "wall-cabinet-1", "points": wall_hex(18.41, 35.48, 18.0, 41.5)},
+    {"componentKey": "wall-cabinet-2", "points": wall_hex(35.48, 47.46, 16.5, 40.0)},
     {
         "componentKey": "extractor-hood",
-        "points": [[34.33, 42.7], [45.85, 39.31], [45.85, 40.69], [34.33, 44.07]],
+        "points": [[35.48, 39.5], [47.46, 37.0], [47.46, 38.8], [35.48, 41.3]],
     },
+    {"componentKey": "wall-cabinet-3", "points": wall_hex(47.46, 62.0, 15.0, 38.5)},
     {
-        "componentKey": "wall-cabinet-3",
-        "points": [[42.01, 14.65], [53.56, 11.24], [57.39, 14.35], [57.39, 35.93], [45.85, 39.31], [45.85, 17.73]],
-    },
-    {
-        "componentKey": "wall-cabinet-4",
-        "points": [[53.56, 11.24], [63.68, 8.26], [68.31, 11.0], [68.31, 32.72], [57.39, 35.93], [57.39, 14.35]],
+        "componentKey": "worktop",
+        "points": [
+            [18.41, 56.5],
+            [29.52, 54.0],
+            [39.81, 51.5],
+            [51.84, 49.0],
+            [62.31, 52.0],
+            [72.36, 55.0],
+            [82.42, 58.0],
+            [94.39, 61.0],
+            [94.39, 61.5],
+            [82.42, 58.5],
+            [72.36, 55.5],
+            [62.31, 52.5],
+            [51.84, 49.5],
+            [39.81, 52.0],
+            [29.52, 54.5],
+            [18.41, 57.0],
+        ],
     },
     {
         "componentKey": "worktop",
-        "points": [[24.03, 55.39], [53.02, 46.74], [64.57, 43.35], [90.53, 64.22], [90.53, 65.43], [78.98, 68.82], [60.77, 54.16], [60.0, 52.34], [25.95, 62.39], [24.03, 60.77]],
-    },
-    {
-        "componentKey": "worktop",
-        "points": [[24.03, 60.77], [26.25, 63.48], [26.25, 89.69], [25.95, 89.79], [24.03, 88.24]],
-    },
-    {
-        "componentKey": "worktop",
-        "points": [[25.95, 62.39], [60.0, 52.34], [60.77, 54.16], [60.0, 53.55], [58.95, 53.86], [47.4, 57.26], [35.87, 60.65], [26.25, 63.48]],
-    },
-    {
-        "componentKey": "base-module-1",
-        "points": [[26.25, 63.48], [35.87, 60.65], [35.87, 86.87], [26.25, 89.69]],
-    },
-    {
-        "componentKey": "oven-module",
-        "points": [[35.87, 60.65], [47.4, 57.26], [47.4, 83.48], [35.87, 86.87]],
-    },
-    {
-        "componentKey": "drawer-module",
-        "points": [[47.4, 57.26], [58.95, 53.86], [60.0, 53.55], [60.0, 79.77], [58.95, 80.07], [47.4, 83.48]],
-    },
-    {
-        "componentKey": "base-module-2",
-        "points": [[60.0, 53.55], [60.77, 54.16], [65.42, 57.91], [65.42, 84.13], [60.77, 80.38], [60.0, 79.77]],
-    },
-    {
-        "componentKey": "corner-base",
-        "points": [[65.42, 57.91], [71.81, 63.05], [71.81, 89.27], [65.42, 84.13]],
-    },
-    {
-        "componentKey": "base-module-3",
-        "points": [[71.81, 63.05], [78.8, 68.68], [78.8, 94.9], [71.81, 89.27]],
-    },
-    {
-        "componentKey": "base-module-3",
-        "points": [[78.98, 68.82], [90.53, 65.43], [90.53, 91.73], [78.98, 95.04]],
-    },
-    {
-        "componentKey": "sink-faucet",
-        "points": [[65.7, 55.75], [73.35, 53.5], [84.9, 57.3], [84.9, 61.2], [73.0, 64.45], [65.7, 59.75]],
+        "points": [[18.41, 57.0], [20.5, 59.0], [20.5, 90.0], [18.41, 88.0]],
         "preserveManualSize": True,
     },
+    {"componentKey": "base-module-1", "points": quad(18.41, 29.52, 54.0, 89.0)},
+    {"componentKey": "oven-module", "points": quad(29.52, 39.81, 51.5, 87.0)},
+    {"componentKey": "base-module-2", "points": quad(39.81, 51.84, 49.0, 85.5)},
+    {"componentKey": "corner-base", "points": quad(51.84, 62.31, 52.0, 84.0)},
+    {"componentKey": "sink-base", "points": quad(62.31, 82.42, 55.0, 83.5)},
+    {"componentKey": "base-module-3", "points": quad(82.42, 94.39, 58.0, 82.0)},
     {
         "componentKey": "sink-faucet",
-        "points": [[75.45, 49.85], [79.65, 49.85], [79.65, 58.45], [78.45, 58.45], [78.45, 52.75], [75.45, 52.75]],
+        "points": [[68.0, 52.0], [76.0, 50.5], [78.0, 56.0], [76.0, 59.0], [68.0, 60.5], [66.0, 56.0]],
         "preserveManualSize": True,
     },
 ]
@@ -88,18 +93,16 @@ OUT.parent.mkdir(parents=True, exist_ok=True)
 OUT.write_text(json.dumps(boxes, indent=2) + "\n", encoding="utf-8")
 
 if __name__ == "__main__":
-    import subprocess
-    import sys
-
+    overlay = ROOT / "frontend/public/jpg/AB 105834_hotspots-overlay.jpg"
     subprocess.run(
         [
             sys.executable,
             str(ROOT / "docs/detect-plan-hotspots.py"),
-            str(ROOT / "frontend/public/jpg/AB 105834_page-0001.jpg"),
+            str(JPG),
             "--overlay",
             str(OUT),
-            str(ROOT / "frontend/public/hotspot-overlays/105834-hotspots.png"),
+            str(overlay),
         ],
         check=True,
     )
-    print(json.dumps(boxes, indent=2))
+    print("wrote", OUT)

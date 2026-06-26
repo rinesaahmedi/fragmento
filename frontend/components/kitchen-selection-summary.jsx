@@ -101,7 +101,11 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
           <span className={styles.itemCode}>
             {articleNumber ? `${translate("common.article", "Article")}: ${articleNumber}` : ""}
             {articleNumber && item.blendeLabel ? " " : ""}
-            {item.blendeLabel ? <span className={styles.summaryInlineBlendeNote}>+ {item.blendeLabel}</span> : null}
+            {item.blendeLabel ? (
+              <span className={styles.summaryInlineBlendeNote}>
+                {translate("configurator.includesBlende", "Includes blende")}: {item.blendeLabel}
+              </span>
+            ) : null}
           </span>
         ) : null}
         {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}

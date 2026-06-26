@@ -955,12 +955,21 @@
 }
 
 .itemBlendeNote {
-  display: block;
-  margin-top: 2px;
-  color: #7d7166;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 22px;
+  margin-top: 6px;
+  padding: 3px 8px;
+  border: 1px solid #b9dbc8;
+  border-radius: 999px;
+  background: #eef8f2;
+  color: #16613c;
   font-size: 0.78rem;
-  font-style: italic;
+  font-weight: 800;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .itemText p {
@@ -2118,8 +2127,17 @@
 }
 
 .summaryMeta .summaryInlineBlendeNote {
-  display: inline;
-  font-style: italic;
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 4px;
+  padding: 3px 8px;
+  border: 1px solid #b9dbc8;
+  border-radius: 999px;
+  background: #eef8f2;
+  color: #16613c;
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .summaryPrice {
