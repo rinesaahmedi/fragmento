@@ -8,10 +8,6 @@ export const PLAN_VIEWPORT_BY_SLUG = {
     viewBox: "60 45 600 450",
     preserveAspectRatio: "xMidYMid meet",
   },
-  "ab-105828": {
-    viewBox: "60 45 600 450",
-    preserveAspectRatio: "xMidYMid meet",
-  },
 };
 
 const BASE_PLAN_STROKE = "#8f877d";
@@ -145,7 +141,7 @@ const L_SHAPED_SINK_FAUCET_DETAIL_BOUNDS = {
 };
 
 function isLShapedPlanKitchen(slug) {
-  return slug === "l-shaped-kitchen" || slug === "ab-105828";
+  return slug === "l-shaped-kitchen";
 }
 
 function getPlanBoundsForSlug(slug, componentId) {

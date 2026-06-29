@@ -216,6 +216,8 @@ PRODUCT_INFO_BY_CODE["REF-AB105821-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-5
 PRODUCT_INFO_BY_CODE["REF-AB105845-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105831-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105825-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["REF-AB105822-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["REF-AB105828-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"] = {
   ...PRODUCT_INFO_BY_CODE["HOOD-600-FLAT"],
   productInfoKeyFacts: [
@@ -254,6 +256,8 @@ PRODUCT_INFO_BY_CODE["HOOD-AB105840-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-F
 PRODUCT_INFO_BY_CODE["HOOD-AB105843-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105831-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105825-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105822-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105828-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105845-KHF664611S"] = PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"];
 PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
 PRODUCT_INFO_BY_CODE["WM-AB105845-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
@@ -533,7 +537,7 @@ const AB_105826_ITEMS = [
 ];
 
 // AB 105822: fridge-left compact run - 500 mm filler, oven, US60, dishwasher, sink (5 base bays).
-const AB_105822_ITEMS = [
+const AB_105822_LEGACY_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-B-600", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system" },
@@ -555,7 +559,7 @@ const AB_105822_ITEMS = [
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
-const AB_105823_ITEMS = AB_105822_ITEMS.map((item) => {
+const AB_105823_ITEMS = AB_105822_LEGACY_ITEMS.map((item) => {
   if (item.code === "CAB-WALL-AB105822-H6002-3") {
     return { ...item, price: "184.00", blendeCode: "HPK2002", blendeLabel: "HPK2002 20cm", blendePrice: "35.00" };
   }
@@ -564,7 +568,7 @@ const AB_105823_ITEMS = AB_105822_ITEMS.map((item) => {
 
 // AB 105829 and AB 105832 add a blende note on top of AB 105822's layout (last wall cabinet);
 // AB 105822 doesn't have one, so this is a separate clone, not an alias.
-const AB_105829_ITEMS = AB_105822_ITEMS.map((item) => {
+const AB_105829_ITEMS = AB_105822_LEGACY_ITEMS.map((item) => {
   if (item.code === "CAB-WALL-AB105822-H6002-3") {
     return { ...item, price: "184.00", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" };
   }
@@ -961,6 +965,15 @@ const AB_105825_ITEMS = [
   { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
 ];
 
+const cloneAB105825ItemsForKitchen = (kitchenNumber) =>
+  AB_105825_ITEMS.map((item) => ({
+    ...item,
+    code: item.code.replaceAll("AB105825", `AB${kitchenNumber}`),
+  }));
+
+const AB_105822_ITEMS = cloneAB105825ItemsForKitchen("105822");
+const AB_105828_ITEMS = cloneAB105825ItemsForKitchen("105828");
+
 const L_SHAPED_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-LS-400", name: "Wall Cabinet left", price: "0.01", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 10, infoText: "1 door, 2 adjustable shelves" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-LS-600", name: "Upper Cabinet with Extractor Hood 60", price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 20, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -1023,49 +1036,6 @@ const AB_105815_ITEMS = AB_105811_ITEMS.map((item) => ({
   ...item,
   code: item.code.replace("AB105811", "AB105815"),
 }));
-
-// AB 105828: L-shaped corner kitchen. Excel callouts 1–3 are DEFAULT locked items
-// (oven+hob, worktop, sink base with UPK20 blende panel). Callouts 4–9 are base
-// elements (US30 R, dishwasher, US60 R+blende, US60 L, US30 L, fridge). Callouts
-// 10–14 are upper elements (H6002 R+blende, H6002 R, hood, H6002 L, H3002 L).
-const AB_105828_ITEMS = [
-  // Callout 1: DEFAULT – Built-in Oven and Hob (locked)
-  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", price: "449.00", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-base", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
-  // Callout 2: DEFAULT – Worktop (locked)
-  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
-  // Callout 3: DEFAULT + UPK20(0.52CM)(25E) – Sink Base Cabinet (locked) with UPK20 panel
-  { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105828-600", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 600, heightMm: null, depthMm: null, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Blanco Botton Pro 45/2 waste system", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
-  // Callout 4: US30 R 300/600 mm – Base cabinet 30 cm hinge right
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105828-US30-R", name: "Base cabinet with drawer", price: "175.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US30 base storage cabinet, hinge right", articleNumber: "US30" },
-  // Callout 5: A-EGSPV597210 + TGV60 – Dishwasher
-  { itemType: ItemType.COMPONENT, code: "DISH-AB105828-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: "579.00", widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  // Callout 6: US60 R + UPK20(0.5CM)(25E) 600/600 mm – Base cabinet 60 cm hinge right with blende
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105828-US60-R", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: "25.00" },
-  // Callout 7: US60 L 600/600 mm – Base cabinet 60 cm hinge left
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105828-US60-L", name: "Base cabinet with drawer", price: "219.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
-  // Callout 8: US30 L 300/600 mm – Base cabinet 30 cm hinge left
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105828-US30-L", name: "Base cabinet with drawer", price: "175.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-base", sortOrder: 80, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30" },
-  // Callout 9: OL-KGCN388140E 178 cm - Freestanding refrigerator
-  { itemType: ItemType.COMPONENT, code: "REF-AB105828-KGCN388140E", name: "Freestanding refrigerator 178cm", price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 90, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  // Callout 10: H6002 R + HPK2002(0.5CM)(35E) 600/720/340 mm – Wall cabinet 60 cm hinge right with blende
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105828-H6002-R1", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 100, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: "35.00" },
-  // Callout 11: H6002 R 600/720/340 mm – Wall cabinet 60 cm hinge right (right of hood)
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105828-H6002-R2", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
-  // Callout 12: FH664621E + FWK124 + HD6002 - Upper cabinet with extractor hood (hood area)
-  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105828-600", name: "Upper Cabinet with Extractor Hood 60", price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_hood", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 120, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
-  { itemType: ItemType.COMPONENT, code: "HOOD-AB105828-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: null, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 122, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
-  // Callout 13: H6002 L 600/720/340 mm – Wall cabinet 60 cm hinge left (return wall)
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105828-H6002-L1", name: "Wall Cabinet", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 130, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
-  // Callout 14: H3002 L 300/720/340 mm – Wall cabinet 30 cm hinge left (end of return wall)
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105828-H3002-L", name: "Wall Cabinet", price: "115.00", widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 140, infoText: "H3002, hinge left, 2 adjustable shelves", articleNumber: "H3002" },
-  // Sink and waste system (locked)
-  { itemType: ItemType.COMPONENT, code: "SINK-WORKTOP", name: "Sink and Worktop", nameDe: "Spüle und Arbeitsplatte", price: "89.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 150, isLocked: true, infoText: "Blanco Botton Pro 45/2 manual waste system", articleNumber: "517467" },
-  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "517467" },
-  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "25.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
-  { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220, articleNumber: "KA220043_S3" },
-  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
-  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
-];
 
 const DEFAULT_KITCHENS = [
   {
@@ -1212,7 +1182,7 @@ const DEFAULT_KITCHENS = [
     slug: "ab-105828",
     kitchenCode: "105 828",
     name: "AB 105828 Kitchen",
-    description: "L-shaped corner kitchen based on KITCHENS/AB 105828.xlsx and KITCHENS/AB 105828.pdf",
+    description: "Kitchen configuration using the AB 105825 layout and element selection",
     items: AB_105828_ITEMS,
   },
   {
@@ -1240,7 +1210,7 @@ const DEFAULT_KITCHENS = [
     slug: "ab-105822",
     kitchenCode: "105 822",
     name: "AB 105822 Kitchen",
-    description: "Kitchen configuration based on frontend/public/plans/AB 105822.svg",
+    description: "Kitchen configuration using the AB 105825 layout and element selection",
     items: AB_105822_ITEMS,
   },
   {
