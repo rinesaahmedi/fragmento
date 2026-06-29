@@ -75,12 +75,12 @@ const OVERLAY_PLAN_COMPONENT_BOUNDS_BY_SLUG = {
     "component-wall-cabinet-6": boundsFromPlanPercent(81.23, 15.89, 15.07, 24.09),
     "component-worktop": boundsFromPlanPercent(17.67, 57.46, 78.63, 1.35),
     "component-sink-faucet": boundsFromPlanPercent(68.85, 50.73, 4.85, 8),
-    "component-base-module-1": boundsFromPlanPercent(17.65, 57.42, 7.07, 30.64),
-    "component-oven-module": boundsFromPlanPercent(24.72, 57.42, 14.14, 30.64),
-    "component-base-module-2": boundsFromPlanPercent(38.86, 57.42, 14.12, 30.64),
-    "component-base-module-3": boundsFromPlanPercent(52.98, 57.42, 14.12, 30.64),
-    "component-sink-base": boundsFromPlanPercent(67.1, 57.42, 14.13, 30.64),
-    "component-drawer-module": boundsFromPlanPercent(81.23, 57.42, 15.07, 30.64),
+    "component-base-module-1": boundsFromPlanPercent(17.65, 58.81, 7.07, 29.25),
+    "component-oven-module": boundsFromPlanPercent(24.72, 58.81, 14.14, 29.25),
+    "component-base-module-2": boundsFromPlanPercent(38.86, 58.81, 14.12, 29.25),
+    "component-base-module-3": boundsFromPlanPercent(52.98, 58.81, 14.12, 29.25),
+    "component-sink-base": boundsFromPlanPercent(67.1, 58.81, 14.13, 29.25),
+    "component-drawer-module": boundsFromPlanPercent(81.23, 58.81, 15.07, 29.25),
   },
 };
 
