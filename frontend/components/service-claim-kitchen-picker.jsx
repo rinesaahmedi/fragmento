@@ -31,12 +31,12 @@ const SERVICE_CLAIM_IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "worktop", left: 17.67, top: 57.46, width: 78.63, height: 1.35 },
     { componentKey: "worktop", left: 17.2, top: 57.42, width: 0.45, height: 30.64 },
     { componentKey: "sink-faucet", left: 68.85, top: 50.73, width: 4.85, height: 8 },
-    { componentKey: "base-module-1", left: 17.65, top: 57.42, width: 7.07, height: 30.64 },
-    { componentKey: "oven-module", left: 24.72, top: 57.42, width: 14.14, height: 30.64 },
-    { componentKey: "base-module-2", left: 38.86, top: 57.42, width: 14.12, height: 30.64 },
-    { componentKey: "base-module-3", left: 52.98, top: 57.42, width: 14.12, height: 30.64 },
-    { componentKey: "sink-base", left: 67.1, top: 57.42, width: 14.13, height: 30.64 },
-    { componentKey: "drawer-module", left: 81.23, top: 57.42, width: 15.07, height: 30.64 },
+    { componentKey: "base-module-1", left: 17.65, top: 58.81, width: 7.07, height: 29.25 },
+    { componentKey: "oven-module", left: 24.72, top: 58.81, width: 14.14, height: 29.25 },
+    { componentKey: "base-module-2", left: 38.86, top: 58.81, width: 14.12, height: 29.25 },
+    { componentKey: "base-module-3", left: 52.98, top: 58.81, width: 14.12, height: 29.25 },
+    { componentKey: "sink-base", left: 67.1, top: 58.81, width: 14.13, height: 29.25 },
+    { componentKey: "drawer-module", left: 81.23, top: 58.81, width: 15.07, height: 29.25 },
   ],
 };
 
