@@ -64,6 +64,13 @@ export function selectedMap(items, codes) {
 }
 
 export function getStructuredDimensions(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const name = String(item?.name || "").trim().toLowerCase();
+  if (code.startsWith("DISH-") || iconKey === "dishwasher_base" || name.includes("dishwasher")) {
+    return "";
+  }
+
   const values = [item?.widthMm, item?.heightMm, item?.depthMm].filter(
     (value) => value !== null && value !== undefined && value !== "",
   );
@@ -319,6 +326,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   const withRefrigeratorHeight = (label) => {
     return withPhotoNumber(label);
   };
+  const dishwasherName = () => translate(
+    "configurator.catalogItemNames.dishwasher",
+    language === "de" ? "Vollintegrierter Geschirrspüler" : "Fully integrated dishwasher",
+  );
 
   if (rawName === "Sink and Worktop" || rawName === "Spüle und Arbeitsplatte") {
     return translate("configurator.catalogItemNames.worktop", "Worktop");
@@ -328,7 +339,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   // its icon) shows a single short name instead of the longer per-kitchen product description.
   const iconKey = String(item?.iconKey || "").trim();
   if (iconKey === "dishwasher_base") {
-    return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+    return withDimensions(dishwasherName());
   }
   if (iconKey === "tall_refrigerator") {
     return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"));
@@ -442,7 +453,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
-      return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+      return withDimensions(dishwasherName());
     case "TOP-B-3036":
     case "TOP-AB105806":
     case "TOP-AB105807":
@@ -505,7 +516,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "T3D-SINKBASE-001":
       return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
     case "T3D-DISH-001":
-      return withDimensions(translate("configurator.catalogItemNames.dishwasher", "Dishwasher"));
+      return withDimensions(dishwasherName());
     case "T3D-CAB-STORAGE-001":
       return withDimensions(translate("configurator.catalogItemNames.baseStorageCabinet", "Base Storage Cabinet"));
     case "T3D-CAB-CORNER-001":

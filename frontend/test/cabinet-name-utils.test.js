@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getLocalizedItemName } from "../components/kitchen-selection-utils.js";
+import { getCatalogItemDetails, getLocalizedItemName } from "../components/kitchen-selection-utils.js";
 import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
 
 test("base cabinet width uses lower cabinet label", () => {
@@ -127,5 +127,37 @@ test("hood package is not renamed as a wall cabinet", () => {
       iconKey: "wall_cabinet_plain",
     }),
     "",
+  );
+});
+
+test("dishwasher catalog details do not expose dimensions", () => {
+  assert.equal(
+    getCatalogItemDetails({
+      code: "DISH-AB105822-600",
+      name: "Dishwasher",
+      widthMm: 600,
+      heightMm: null,
+      depthMm: null,
+      iconKey: "dishwasher_base",
+    }).dimensions,
+    "",
+  );
+});
+
+test("localized dishwasher names use fully integrated labels", () => {
+  const item = {
+    code: "DISH-AB105822-600",
+    name: "Dishwasher",
+    nameDe: "Geschirrspüler",
+    iconKey: "dishwasher_base",
+  };
+
+  assert.equal(
+    getLocalizedItemName(item, (_key, fallback) => fallback, "en", false),
+    "Fully integrated dishwasher",
+  );
+  assert.equal(
+    getLocalizedItemName(item, (_key, fallback) => fallback, "de", false),
+    "Vollintegrierter Geschirrspüler",
   );
 });

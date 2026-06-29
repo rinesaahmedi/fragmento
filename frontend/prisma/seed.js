@@ -1443,6 +1443,22 @@ function applyDefaultWorktopCatalogFields(item) {
   };
 }
 
+function isDishwasherItem(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const name = String(item?.name || "").trim().toLowerCase();
+  return code.startsWith("DISH-") || iconKey === "dishwasher_base" || name.includes("dishwasher");
+}
+
+function applyDishwasherCatalogFields(item) {
+  return {
+    ...item,
+    widthMm: null,
+    heightMm: null,
+    depthMm: null,
+  };
+}
+
 function applyDefaultCatalogItem(item) {
   if (isDefaultOvenHobItem(item)) {
     return {
@@ -1468,6 +1484,10 @@ function applyDefaultCatalogItem(item) {
 
   if (isDefaultWorktopItem(item)) {
     return applyDefaultWorktopCatalogFields(item);
+  }
+
+  if (isDishwasherItem(item)) {
+    return applyDishwasherCatalogFields(item);
   }
 
   return item;

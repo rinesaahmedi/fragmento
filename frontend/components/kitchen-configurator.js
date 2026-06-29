@@ -391,7 +391,7 @@ function formatProductAssistantDisplayName(item, translate) {
   }
 
   if (isDishwasherProductAssistantItem(item)) {
-    return translate("configurator.catalogItemNames.dishwasher", "Dishwasher");
+    return translate("configurator.catalogItemNames.dishwasher", "Fully integrated dishwasher");
   }
 
   if (isLedLightingProductAssistantItem(item)) {
