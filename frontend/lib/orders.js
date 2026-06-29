@@ -1,7 +1,6 @@
 import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { getDeliveryMinOrderSettings, getDirectOrderConfirmationEnabled } from "./admin-settings";
-import { MONTAGE_CABINET_CODES } from "./catalog";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
   getServiceEligibility,
@@ -314,7 +313,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       isOrderLocked: confirmedItemSets[ItemType.COMPONENT].has(item.code),
     })),
     selectedAccessories,
-    montageCabinetCodes: MONTAGE_CABINET_CODES,
   });
   const selectedServiceCodes = selectedServices.map((item) => item.code);
 
