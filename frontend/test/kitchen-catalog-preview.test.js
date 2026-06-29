@@ -71,18 +71,26 @@ test("AB 105841 base module preview bounds exclude configurator plinth extension
   assert.ok(baseModule.height < 33);
 });
 
-test("AB 105822 base module preview uses prepared cropped base-row coordinates", () => {
+test("AB 105822 catalog preview uses the AB 105825 layout", () => {
   const preview = getKitchenCatalogImagePreview("ab-105822", [
     { componentKey: "base-module-3" },
     { componentKey: "sink-base" },
   ]);
   const baseModule = preview.hotspots.find((hotspot) => hotspot.componentKey === "base-module-3");
 
-  assert.equal(preview.imageHref, "/plans/AB%20105822.svg");
+  assert.equal(preview.imageHref, "/plans/AB%20105825.svg");
+  assert.equal(PLAN_HOTSPOTS_BY_SLUG["ab-105822"], PLAN_HOTSPOTS_BY_SLUG["ab-105825"]);
   assert.ok(preview.crop.width < 100);
   assert.ok(baseModule.top > 50);
   assert.ok(baseModule.height > 25);
   assert.ok(baseModule.height < 33);
+});
+
+test("AB 105828 catalog preview uses the AB 105825 layout", () => {
+  const preview = getKitchenCatalogImagePreview("ab-105828");
+
+  assert.equal(preview.imageHref, "/plans/AB%20105825.svg");
+  assert.equal(PLAN_HOTSPOTS_BY_SLUG["ab-105828"], PLAN_HOTSPOTS_BY_SLUG["ab-105825"]);
 });
 
 test("AB 105809 worktop preview excludes vertical corner blende strips", () => {

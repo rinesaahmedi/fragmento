@@ -22,6 +22,19 @@ const CLAIM_LINKED_COMPONENT_META = {
   },
 };
 
+const CLAIM_COMPONENT_LABEL_OVERRIDES = {
+  "component-sink-faucet": "Sink",
+};
+
+function resolveServiceClaimComponentName(componentId, meta = {}) {
+  const override = CLAIM_COMPONENT_LABEL_OVERRIDES[componentId];
+  if (override) {
+    return override;
+  }
+
+  return stripProductDimensionsFromLabel(String(meta.name || meta.code || componentId).trim() || meta.code || componentId);
+}
+
 export async function getServiceClaimKitchenPlan(contractNumber) {
   const normalized = normalizeServiceClaimContractNumber(contractNumber);
   if (!normalized) {
@@ -69,7 +82,7 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       }
       componentMetaById.set(componentId, {
         code: String(item.code || "").trim(),
-        name: stripProductDimensionsFromLabel(String(item.name || item.code || "").trim() || item.code),
+        name: resolveServiceClaimComponentName(componentId, item),
       });
     }
 
@@ -80,7 +93,7 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       }
       componentMetaById.set(componentId, {
         code: String(comp.code || "").trim(),
-        name: stripProductDimensionsFromLabel(String(comp.name || comp.code || "").trim() || comp.code),
+        name: resolveServiceClaimComponentName(componentId, comp),
       });
     }
 
@@ -96,9 +109,10 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       selectableMetaIds.add(componentId);
       const resolvedMeta = componentMetaById.get(componentId) || {};
       const code = String(resolvedMeta.code || fallbackMeta.code || "").trim();
-      const name = stripProductDimensionsFromLabel(
-        String(resolvedMeta.name || fallbackMeta.name || code || componentId).trim() || code || componentId,
-      );
+      const name = resolveServiceClaimComponentName(componentId, {
+        code,
+        name: resolvedMeta.name || fallbackMeta.name,
+      });
 
       selectableMeta.push({
         componentId,
@@ -122,7 +136,7 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
     }
 
     for (const item of kitchen.items || []) {
-      if (item.itemType !== ItemType.COMPONENT || !item.isLocked) {
+      if (item.itemType !== ItemType.COMPONENT) {
         continue;
       }
 
@@ -133,26 +147,7 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
 
       addSelectableComponent(componentId, {
         code: String(item.code || "").trim(),
-        name: stripProductDimensionsFromLabel(String(item.name || item.code || "").trim() || item.code),
-      });
-    }
-
-    for (const item of kitchen.items || []) {
-      if (item.itemType !== ItemType.COMPONENT || !item.isLocked) {
-        continue;
-      }
-
-      const componentId = componentIdForItem(item);
-      if (!componentId) {
-        continue;
-      }
-
-      selectableIds.add(componentId);
-      addSelectableMeta(componentId, {
-        code: String(item.code || "").trim(),
-        name: stripProductDimensionsFromLabel(
-          String(item.name || item.code || "").trim() || item.code,
-        ),
+        name: resolveServiceClaimComponentName(componentId, item),
       });
     }
 
@@ -170,9 +165,10 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       const componentId = componentIdForItem(ki);
       const fallbackMeta = {
         code: String(normalizedCode || line.code || "").trim(),
-        name: stripProductDimensionsFromLabel(
-          String(line.nameSnapshot || ki.name || line.code || "").trim() || line.code,
-        ),
+        name: resolveServiceClaimComponentName(componentId, {
+          code: normalizedCode || line.code,
+          name: line.nameSnapshot || ki.name || line.code,
+        }),
       };
       addSelectableComponent(componentId, fallbackMeta);
     }
