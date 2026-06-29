@@ -161,3 +161,20 @@ test("localized dishwasher names use fully integrated labels", () => {
     "Vollintegrierter Geschirrspüler",
   );
 });
+
+test("localized chimney hood names use angled extractor labels", () => {
+  const item = {
+    code: "HOOD-C-FH664621E",
+    name: "Chimney extractor hood",
+    nameDe: "Kamin-Dunstabzugshaube",
+  };
+
+  assert.equal(
+    getLocalizedItemName(item, (_key, fallback) => fallback, "en", false),
+    "Angled extractor hood + Filter",
+  );
+  assert.equal(
+    getLocalizedItemName(item, (_key, fallback) => fallback, "de", false),
+    "Schrägesse + Filter",
+  );
+});

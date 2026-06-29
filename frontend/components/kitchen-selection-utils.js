@@ -418,7 +418,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
     case "HOOD-AB105845-KHF664611S":
-      return translate("configurator.catalogItemNames.chimneyExtractorHood", "Chimney extractor hood");
+      return translate(
+        "configurator.catalogItemNames.chimneyExtractorHood",
+        language === "de" ? "Schrägesse + Filter" : "Angled extractor hood + Filter",
+      );
     case "LIGHT-B-LED-001":
     case "LIGHT-C-LED-001":
     case "LIGHT-AB105845-LED":
