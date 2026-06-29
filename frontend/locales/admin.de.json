@@ -44,7 +44,12 @@
     "directOrderConfirmationHelp": "Wenn diese Option aktiv ist, wird die Kunden-E-Mail direkt nach dem oeffentlichen Checkout gesendet und die Bestellung nach erfolgreichem E-Mail-Versand als bestaetigt markiert. Der Agent-Webhook laeuft weiterhin.",
     "saveSettings": "Einstellungen speichern",
     "settingsUpdated": "Einstellungen gespeichert.",
-    "settingsUpdateFailed": "Einstellungen konnten nicht gespeichert werden."
+    "settingsUpdateFailed": "Einstellungen konnten nicht gespeichert werden.",
+    "deliveryMinOrderTitle": "Mindestbestellwert fuer Lieferung",
+    "deliveryMinOrderDescription": "Legen Sie einen Mindestbestellwert fest, der bei der Auswahl von Lieferung, Transport, Montage und Anschluss erfordert wird.",
+    "deliveryMinOrderEnabled": "Mindestbestellwert fuer Lieferung aktivieren",
+    "deliveryMinOrderEnabledHelp": "Wenn aktiviert, muessen Bestellungen mit Lieferung, Transport, Montage und Anschluss den unten angegebenen Mindestbestellwert erreichen.",
+    "deliveryMinOrderAmount": "Mindestbestellwert (€)"
   },
   "status": {
     "new": "Neu",

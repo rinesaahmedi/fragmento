@@ -44,7 +44,12 @@
     "directOrderConfirmationHelp": "When enabled, the customer confirmation email is sent immediately after public checkout and the order is marked confirmed after the email succeeds. The agent webhook still runs.",
     "saveSettings": "Save settings",
     "settingsUpdated": "Settings updated.",
-    "settingsUpdateFailed": "Could not update settings."
+    "settingsUpdateFailed": "Could not update settings.",
+    "deliveryMinOrderTitle": "Delivery minimum order value",
+    "deliveryMinOrderDescription": "Set a minimum order value required when the customer selects Delivery, transport, assembly and connection.",
+    "deliveryMinOrderEnabled": "Enable minimum order value for delivery",
+    "deliveryMinOrderEnabledHelp": "When enabled, orders that include Delivery, transport, assembly and connection must reach the minimum value below.",
+    "deliveryMinOrderAmount": "Minimum order value (€)"
   },
   "status": {
     "new": "New",

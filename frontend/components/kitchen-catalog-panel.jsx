@@ -380,6 +380,8 @@ export default function KitchenCatalogPanel({
   onOpenProductPhotos,
   onOpenProductAssistantFromItem,
   serviceEligibility,
+  deliveryMinEligible = true,
+  deliveryMinAmount = 1000,
 }) {
   const { translate } = usePublicI18n();
   return (
@@ -448,10 +450,18 @@ export default function KitchenCatalogPanel({
           <h3>{translate("configurator.services", "Services")}</h3>
           <div className={styles.catalogGrid}>
             {kitchenConfig.services.map((item) => {
-              const disabledReason = getServiceDisabledReason(item.code, serviceEligibility, translate);
+              const isMontage = item.code === SERVICE_CODE_MONTAGE;
+              const montageDeliveryMinBlocked = isMontage && !deliveryMinEligible;
+              const disabledReason = montageDeliveryMinBlocked
+                ? translate(
+                    "configurator.serviceDeliveryMinError",
+                    `Delivery, transport, assembly and connection requires a minimum order value of €${deliveryMinAmount}.`,
+                    { amount: deliveryMinAmount },
+                  )
+                : getServiceDisabledReason(item.code, serviceEligibility, translate);
               const disabled =
                 !selectedServiceCodes.includes(item.code) &&
-                ((item.code === SERVICE_CODE_MONTAGE && !serviceEligibility.montageEligible) ||
+                ((isMontage && (!serviceEligibility.montageEligible || montageDeliveryMinBlocked)) ||
                   (item.code === SERVICE_CODE_PICKUP && !serviceEligibility.pickupEligible));
 
               return (
@@ -469,7 +479,7 @@ export default function KitchenCatalogPanel({
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   hint={
                     disabledReason ||
-                    (item.code === SERVICE_CODE_MONTAGE
+                    (isMontage
                       ? translate(
                           "configurator.serviceHintMontage",
                           "Assembly is available only with a merchandise value of €1,000 or more and at least 3 cabinet components",

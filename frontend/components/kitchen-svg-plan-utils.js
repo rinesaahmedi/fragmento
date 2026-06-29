@@ -54,6 +54,44 @@ const PLAN_COMPONENT_BOUNDS = {
   "component-t3d-worktop-return": { x: 536, y: 224, width: 282, height: 46 },
 };
 
+function boundsFromPlanPercent(left, top, width, height) {
+  return {
+    x: (left / 100) * 842,
+    y: (top / 100) * 595,
+    width: (width / 100) * 842,
+    height: (height / 100) * 595,
+  };
+}
+
+const OVERLAY_PLAN_COMPONENT_BOUNDS_BY_SLUG = {
+  "ab-105808": {
+    "component-refrigerator": boundsFromPlanPercent(3.31, 28.08, 13.08, 59.98),
+    "component-wall-cabinet-1": boundsFromPlanPercent(17.67, 15.89, 7.05, 24.09),
+    "component-wall-cabinet-2": boundsFromPlanPercent(24.72, 15.89, 14.14, 24.09),
+    "component-extractor-hood": boundsFromPlanPercent(24.72, 39.98, 14.14, 7.05),
+    "component-wall-cabinet-3": boundsFromPlanPercent(38.86, 15.89, 14.12, 24.09),
+    "component-wall-cabinet-4": boundsFromPlanPercent(52.98, 15.89, 14.12, 24.09),
+    "component-wall-cabinet-5": boundsFromPlanPercent(67.1, 15.89, 14.13, 24.09),
+    "component-wall-cabinet-6": boundsFromPlanPercent(81.23, 15.89, 15.07, 24.09),
+    "component-worktop": boundsFromPlanPercent(17.67, 57.46, 78.63, 1.35),
+    "component-sink-faucet": boundsFromPlanPercent(68.85, 50.73, 4.85, 8),
+    "component-base-module-1": boundsFromPlanPercent(17.65, 57.42, 7.07, 30.64),
+    "component-oven-module": boundsFromPlanPercent(24.72, 57.42, 14.14, 30.64),
+    "component-base-module-2": boundsFromPlanPercent(38.86, 57.42, 14.12, 30.64),
+    "component-base-module-3": boundsFromPlanPercent(52.98, 57.42, 14.12, 30.64),
+    "component-sink-base": boundsFromPlanPercent(67.1, 57.42, 14.13, 30.64),
+    "component-drawer-module": boundsFromPlanPercent(81.23, 57.42, 15.07, 30.64),
+  },
+};
+
+function getOverlayPlanBoundsForSlug(slug, componentId) {
+  return OVERLAY_PLAN_COMPONENT_BOUNDS_BY_SLUG[String(slug || "").trim().toLowerCase()]?.[componentId] || null;
+}
+
+function hasOverlayPlanBounds(slug) {
+  return Boolean(OVERLAY_PLAN_COMPONENT_BOUNDS_BY_SLUG[String(slug || "").trim().toLowerCase()]);
+}
+
 function getPlanBounds(group, componentId) {
   if (group && typeof group.getBBox === "function") {
     const box = group.getBBox();
@@ -145,6 +183,10 @@ function isLShapedPlanKitchen(slug) {
 }
 
 function getPlanBoundsForSlug(slug, componentId) {
+  const overlayBounds = getOverlayPlanBoundsForSlug(slug, componentId);
+  if (overlayBounds) {
+    return overlayBounds;
+  }
   if (isLShapedPlanKitchen(slug)) {
     return L_SHAPED_PLAN_COMPONENT_BOUNDS[componentId] || PLAN_COMPONENT_BOUNDS[componentId] || null;
   }
@@ -744,7 +786,9 @@ export function syncKitchenPlan({
   const namespace = "http://www.w3.org/2000/svg";
   const byColor = new Map();
   const visibleSet = Array.isArray(visibleComponentIds) ? new Set(visibleComponentIds) : null;
-  const useColorGrouping = !isLShapedPlanKitchen(kitchenConfig.kitchen.slug);
+  const useColorGrouping =
+    !isLShapedPlanKitchen(kitchenConfig.kitchen.slug) &&
+    !hasOverlayPlanBounds(kitchenConfig.kitchen.slug);
   if (useColorGrouping) {
     svg.querySelectorAll("path,line,polyline,polygon,rect,circle,ellipse").forEach((element) => {
       if (element.closest("[data-component-id]")) return;

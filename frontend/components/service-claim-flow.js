@@ -48,11 +48,64 @@ const CLAIM_AREA_LABELS_BY_CODE = {
     "WM-C-EWA34660W": "Waschmaschine",
     "OVEN-B-600-HOB": "Einbaubackofen und Kochfeld",
     "OVEN-C-600-HOB": "Einbaubackofen und Kochfeld",
+    "SINK-WORKTOP": "Sp\u00fcle",
   },
 };
 
+function formatGermanClaimAreaName(area, fallbackName) {
+  const code = String(area?.code || "").trim().toUpperCase();
+  const componentId = String(area?.componentId || "").trim();
+  const normalizedName = String(fallbackName || area?.name || "").trim().toLowerCase();
+
+  const exactLabel = CLAIM_AREA_LABELS_BY_CODE.de?.[code];
+  if (exactLabel) {
+    return exactLabel;
+  }
+
+  if (componentId === "component-refrigerator" || code.startsWith("REF-")) {
+    return "Standk\u00fchlschrank 178 cm";
+  }
+  if (componentId === "component-sink-faucet" || code === "SINK-WORKTOP") {
+    return "Sp\u00fcle";
+  }
+  if (componentId === "component-worktop" || code.startsWith("TOP-")) {
+    return "Arbeitsplatte";
+  }
+  if (componentId === "component-sink-base" || code.startsWith("SINKBASE-")) {
+    return "Sp\u00fclenunterschrank";
+  }
+  if (componentId === "component-extractor-hood" || code.startsWith("HOOD-")) {
+    return "Flachschirmhaube";
+  }
+  if (componentId === "component-oven-module" || componentId === "component-oven-base" || code.startsWith("OVEN-")) {
+    return "Einbaubackofen und Kochfeld";
+  }
+  if (code.startsWith("DISH-") || componentId === "component-dishwasher-base" || normalizedName.includes("dishwasher")) {
+    return "Vollintegrierter Geschirrsp\u00fcler";
+  }
+  if (code.startsWith("WM-") || componentId === "component-wm-base" || normalizedName.includes("washing machine")) {
+    return "Waschmaschine";
+  }
+  if (code.startsWith("CAB-HOOD-")) {
+    return "Oberschrank f\u00fcr Flachschirmhaube 60";
+  }
+  if (code.startsWith("CAB-BASE-") || normalizedName.includes("lower cabinet with drawer")) {
+    const width = normalizedName.match(/\b(30|40|45|50|60|80)\b/)?.[1] || "";
+    return width ? `Unterschrank mit Schublade ${width}` : "Unterschrank mit Schublade";
+  }
+  if (code.startsWith("CAB-WALL-") || componentId.startsWith("component-wall-cabinet-") || normalizedName.includes("wall cabinet")) {
+    const number = normalizedName.match(/\b(\d+)\b/)?.[1] || "";
+    return number ? `Oberschrank ${number}` : "Oberschrank";
+  }
+
+  return fallbackName || code;
+}
+
 function formatClaimAreaName(area, fallbackName, language) {
   const code = String(area?.code || "").trim().toUpperCase();
+  if (language === "de") {
+    return formatGermanClaimAreaName(area, fallbackName);
+  }
   return CLAIM_AREA_LABELS_BY_CODE[language]?.[code] || fallbackName || code;
 }
 
