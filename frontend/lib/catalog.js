@@ -1020,7 +1020,14 @@ export function serializeKitchenForLegacy(kitchen) {
     services: items.filter((item) => item.itemType === ItemType.SERVICE).map(toClientItem),
     lockedBaseColors: LOCKED_BASE_COLORS,
     montageRequiredCodes: MONTAGE_REQUIRED_CODES,
-    montageCabinetCodes: MONTAGE_CABINET_CODES,
+    montageCabinetCodes: [
+      ...new Set([
+        ...MONTAGE_CABINET_CODES,
+        ...items
+          .filter((item) => item.itemType === ItemType.COMPONENT && item.code?.startsWith("CAB-"))
+          .map((item) => item.code),
+      ]),
+    ],
   };
 }
 

@@ -1341,9 +1341,8 @@ function KitchenConfiguratorContent({
       getServiceEligibility({
         selectedComponents,
         selectedAccessories,
-        montageCabinetCodes: kitchenConfig.montageCabinetCodes,
       }),
-    [kitchenConfig.montageCabinetCodes, selectedAccessories, selectedComponents],
+    [selectedAccessories, selectedComponents],
   );
   useEffect(() => {
     if (hasProductAssistantOptions || hasAnyAssistantProducts) return;
@@ -1435,12 +1434,7 @@ function KitchenConfiguratorContent({
   function toggleService(itemCode) {
     if (orderLockedServiceCodes.has(itemCode)) return;
     if (itemCode === SERVICE_CODE_MONTAGE && !serviceEligibility.montageEligible) {
-      setStatus(
-        translate(
-          "configurator.serviceMontageError",
-          "Assembly is available only with a merchandise value of €1,000 or more and at least 3 cabinet components.",
-        ),
-      );
+      setStatus(translate("configurator.servicePickupError", "Pickup can only be added once at least one item has been selected."));
       setStatusTone("error");
       return;
     }

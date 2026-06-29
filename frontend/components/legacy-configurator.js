@@ -2,8 +2,6 @@
 
 import { useEffect, useRef } from "react";
 
-import { MONTAGE_CABINET_CODES } from "../lib/catalog";
-
 const AVATAR_BASE_PATH = "/AVATAR";
 
 function loadExternalScript(src) {
@@ -144,9 +142,6 @@ function ensureLegacyCatalogRendered() {
   const lockedComponentIds = new Set(lockedColors.map(buildLegacyComponentId));
   const accessoryCodes = new Set((config.accessories || []).map((item) => item.code || item.id).filter(Boolean));
   const serviceCodes = new Set((config.services || []).map((item) => item.code || item.id).filter(Boolean));
-  const montageCabinetCodes = new Set(
-    config.montageCabinetCodes?.length ? config.montageCabinetCodes : MONTAGE_CABINET_CODES,
-  );
   const existingItems = combinedList.querySelectorAll(".component-item, .accessory-item").length;
   const expectedItems =
     (config.components?.length || 0) + (config.accessories?.length || 0) + (config.services?.length || 0);
@@ -166,48 +161,6 @@ function ensureLegacyCatalogRendered() {
       .map((item) => item.dataset.code || "")
       .filter(Boolean);
 
-  const MONTAGE_MIN_MERCHANDISE_EUR = 1000;
-  const MONTAGE_MIN_CABINETS = 3;
-
-  const getMerchandiseSubtotalFromConfig = () => {
-    const selectedCompCodes = new Set(getSelectedComponentCodes());
-    const selectedAccCodes = new Set(
-      Array.from(combinedList.querySelectorAll('.accessory-item[data-item-type="accessory"].selected'))
-        .map((li) => li.dataset.code || "")
-        .filter(Boolean),
-    );
-    let sum = 0;
-    (config.components || []).forEach((item) => {
-      if (item.isLocked) return;
-      if (item.code && selectedCompCodes.has(item.code)) {
-        sum += Number(item.price || 0);
-      }
-    });
-    (config.accessories || []).forEach((item) => {
-      if (item.isLocked) return;
-      const code = item.code || item.id;
-      if (code && selectedAccCodes.has(code)) {
-        sum += Number(item.price || 0);
-      }
-    });
-    return sum;
-  };
-
-  const getBillableMontageCabinetCount = () => {
-    const selectedCodes = new Set(getSelectedComponentCodes());
-    let count = 0;
-    (config.components || []).forEach((item) => {
-      if (item.isLocked) return;
-      if (item.code && selectedCodes.has(item.code) && montageCabinetCodes.has(item.code)) {
-        count += 1;
-      }
-    });
-    return count;
-  };
-
-  const areMontageConditionsMet = () =>
-    getMerchandiseSubtotalFromConfig() >= MONTAGE_MIN_MERCHANDISE_EUR &&
-    getBillableMontageCabinetCount() >= MONTAGE_MIN_CABINETS;
 
   const areAnyItemsSelected = () =>
     combinedList.querySelectorAll(".component-item.selected, .accessory-item[data-item-type=\"accessory\"].selected")
@@ -215,7 +168,7 @@ function ensureLegacyCatalogRendered() {
 
   const updateSelectionState = () => {
     const montageServiceItem = combinedList.querySelector(".accessory-item[data-code=\"SVC-MONTAGE-001\"]");
-    if (montageServiceItem?.classList.contains("selected") && !areMontageConditionsMet()) {
+    if (montageServiceItem?.classList.contains("selected") && !areAnyItemsSelected()) {
       montageServiceItem.classList.remove("selected");
       window.showMessage?.("Die Montage-Dienstleistung wurde automatisch entfernt.");
     }
@@ -286,11 +239,8 @@ function ensureLegacyCatalogRendered() {
 
           const code = item.dataset.code || item.id || "";
           const isCurrentlySelected = item.classList.contains("selected");
-          if (code === "SVC-MONTAGE-001" && !isCurrentlySelected && !areMontageConditionsMet()) {
-            window.showMessage?.(
-              "Für die Montage sind ein Warenwert von mindestens 1.000 Euro und mindestens 3 Schrank-Komponenten erforderlich.",
-              "error",
-            );
+          if (code === "SVC-MONTAGE-001" && !isCurrentlySelected && !areAnyItemsSelected()) {
+            window.showMessage?.("Bitte wähle zuerst einen Artikel aus.", "error");
             return;
           }
 
