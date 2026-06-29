@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
-import { getDirectOrderConfirmationEnabled } from "./admin-settings";
+import { getDeliveryMinOrderSettings, getDirectOrderConfirmationEnabled } from "./admin-settings";
 import { MONTAGE_CABINET_CODES } from "./catalog";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
@@ -331,6 +331,21 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
   if (selectedServiceCodes.includes(SERVICE_CODE_PICKUP) && !serviceEligibility.pickupEligible) {
     throw validationError("Pickup conditions are not met");
+  }
+
+  if (selectedServiceCodes.includes(SERVICE_CODE_MONTAGE)) {
+    const deliveryMinSettings = await getDeliveryMinOrderSettings();
+    if (deliveryMinSettings.enabled) {
+      const orderTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
+        (sum, item) => sum + getOrderItemEffectivePrice(item),
+        0,
+      );
+      if (orderTotal < deliveryMinSettings.amount) {
+        throw validationError(
+          `Delivery, transport, assembly and connection requires a minimum order value of €${deliveryMinSettings.amount}.`,
+        );
+      }
+    }
   }
 
   const allSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];

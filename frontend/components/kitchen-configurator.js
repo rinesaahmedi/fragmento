@@ -1053,6 +1053,7 @@ function KitchenConfiguratorContent({
   initialContractNumber = "",
   initialOrder = null,
   initialContractAddress = null,
+  deliveryMinOrderSettings = null,
 }) {
   const { translate, language } = usePublicI18n();
   const orderSectionRef = useRef(null);
@@ -1377,6 +1378,9 @@ function KitchenConfiguratorContent({
     (sum, item) => sum + getOrderItemEffectivePrice(item),
     0,
   );
+  const deliveryMinAmount = deliveryMinOrderSettings?.amount ?? 1000;
+  const deliveryMinEligible =
+    !deliveryMinOrderSettings?.enabled || grandTotal >= deliveryMinAmount;
 
   useEffect(() => {
     setSelectedComponentIds((current) => {
@@ -1400,7 +1404,7 @@ function KitchenConfiguratorContent({
 
   useEffect(() => {
     if (
-      !serviceEligibility.montageEligible &&
+      (!serviceEligibility.montageEligible || !deliveryMinEligible) &&
       selectedServiceCodes.includes(SERVICE_CODE_MONTAGE)
     ) {
       setSelectedServiceCodes((current) => current.filter((code) => code !== SERVICE_CODE_MONTAGE));
@@ -1411,7 +1415,7 @@ function KitchenConfiguratorContent({
     ) {
       setSelectedServiceCodes((current) => current.filter((code) => code !== SERVICE_CODE_PICKUP));
     }
-  }, [selectedServiceCodes, serviceEligibility]);
+  }, [selectedServiceCodes, serviceEligibility, deliveryMinEligible]);
 
   useEffect(() => {
     writeConfiguratorDraft(draftStorageKey, {
@@ -1435,6 +1439,17 @@ function KitchenConfiguratorContent({
         translate(
           "configurator.serviceMontageError",
           "Assembly is available only with a merchandise value of €1,000 or more and at least 3 cabinet components.",
+        ),
+      );
+      setStatusTone("error");
+      return;
+    }
+    if (itemCode === SERVICE_CODE_MONTAGE && !deliveryMinEligible) {
+      setStatus(
+        translate(
+          "configurator.serviceDeliveryMinError",
+          `Delivery, transport, assembly and connection requires a minimum order value of €${deliveryMinAmount}.`,
+          { amount: deliveryMinAmount },
         ),
       );
       setStatusTone("error");
@@ -2052,6 +2067,8 @@ function KitchenConfiguratorContent({
               onOpenProductPhotos={openProductPhotos}
               onOpenProductAssistantFromItem={hasAnyAssistantProducts ? openProductAssistantForCatalogItem : undefined}
               serviceEligibility={serviceEligibility}
+              deliveryMinEligible={deliveryMinEligible}
+              deliveryMinAmount={deliveryMinAmount}
             />
           </div>
         </section>

@@ -82,6 +82,7 @@
     "statusSavedSuccess": "Auftragsnummer: {orderNumber}. Deine Bestellung wurde gespeichert.",
     "serviceMontageError": "Montage ist erst ab einem Warenwert von 1.000 Euro und mindestens 3 Schrank-Komponenten möglich.",
     "servicePickupError": "Abholung kann erst hinzugefügt werden, wenn mindestens ein Artikel ausgewählt wurde.",
+    "serviceDeliveryMinError": "Lieferung, Transport, Montage und Anschluss erfordert einen Mindestbestellwert von €{amount}.",
     "productInfoCloseAria": "Produktinformation schließen",
     "productInfoOpen": "{label} öffnen",
     "productInfoOpenShort": "Details",

@@ -9,7 +9,7 @@ import {
   primaryButtonStyle,
 } from "../../../components/admin-ui";
 import { getFormMessage } from "../../../lib/admin-forms";
-import { getDirectOrderConfirmationEnabled } from "../../../lib/admin-settings";
+import { getDeliveryMinOrderSettings, getDirectOrderConfirmationEnabled } from "../../../lib/admin-settings";
 import { requireAdminPage } from "../../../lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -19,7 +19,10 @@ export default async function AdminSettingsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const directOrderConfirmationEnabled = await getDirectOrderConfirmationEnabled();
+  const [directOrderConfirmationEnabled, deliveryMinOrderSettings] = await Promise.all([
+    getDirectOrderConfirmationEnabled(),
+    getDeliveryMinOrderSettings(),
+  ]);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -50,6 +53,53 @@ export default async function AdminSettingsPage({ searchParams }) {
                   </span>
                 </span>
               </label>
+
+              <div style={actionRowStyle}>
+                <button type="submit" style={primaryButtonStyle}>
+                  <AdminText i18nKey="settingsAdmin.saveSettings" fallback="Save settings" />
+                </button>
+              </div>
+            </form>
+          </AdminSection>
+
+          <AdminSection
+            title={<AdminText i18nKey="settingsAdmin.deliveryMinOrderTitle" fallback="Delivery minimum order value" />}
+            description={<AdminText i18nKey="settingsAdmin.deliveryMinOrderDescription" fallback="Set a minimum order value required when the customer selects Delivery, transport, assembly and connection." />}
+          >
+            <form action="/api/admin/settings/delivery-min-order" method="post" style={formStyle}>
+              <label style={toggleCardStyle}>
+                <input
+                  name="deliveryMinOrderEnabled"
+                  type="checkbox"
+                  defaultChecked={deliveryMinOrderSettings.enabled}
+                  style={checkboxStyle}
+                />
+                <span style={toggleTextStyle}>
+                  <strong><AdminText i18nKey="settingsAdmin.deliveryMinOrderEnabled" fallback="Enable minimum order value for delivery" /></strong>
+                  <span style={mutedTextStyle}>
+                    <AdminText
+                      i18nKey="settingsAdmin.deliveryMinOrderEnabledHelp"
+                      fallback="When enabled, orders that include Delivery, transport, assembly and connection must reach the minimum value below."
+                    />
+                  </span>
+                </span>
+              </label>
+
+              <div style={amountRowStyle}>
+                <label style={amountLabelStyle}>
+                  <span style={amountLabelTextStyle}>
+                    <AdminText i18nKey="settingsAdmin.deliveryMinOrderAmount" fallback="Minimum order value (€)" />
+                  </span>
+                  <input
+                    name="deliveryMinOrderAmount"
+                    type="number"
+                    min="0"
+                    step="1"
+                    defaultValue={deliveryMinOrderSettings.amount}
+                    style={amountInputStyle}
+                  />
+                </label>
+              </div>
 
               <div style={actionRowStyle}>
                 <button type="submit" style={primaryButtonStyle}>
@@ -95,4 +145,30 @@ const toggleTextStyle = {
   display: "grid",
   gap: 8,
   lineHeight: 1.5,
+};
+
+const amountRowStyle = {
+  padding: "4px 0",
+};
+
+const amountLabelStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: 8,
+};
+
+const amountLabelTextStyle = {
+  fontSize: 14,
+  fontWeight: 500,
+  color: "var(--app-text)",
+};
+
+const amountInputStyle = {
+  width: 160,
+  padding: "8px 12px",
+  fontSize: 15,
+  border: "1px solid var(--app-border)",
+  borderRadius: 8,
+  background: "var(--app-surface)",
+  color: "var(--app-text)",
 };
