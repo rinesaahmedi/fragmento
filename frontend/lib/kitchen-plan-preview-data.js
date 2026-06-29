@@ -322,7 +322,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "wall-cabinet-1",
-      points: [[48.1, 12.61], [54.16, 10.92], [63.18, 12.77], [58.08, 13.78]],
+      points: [[48.1, 12.61], [54.16, 10.92], [58.08, 11.72], [58.08, 13.78]],
     },
     {
       componentKey: "wall-cabinet-2",
@@ -335,6 +335,11 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     {
       componentKey: "extractor-hood",
       points: [[58.43, 39.83], [66.75, 41.34], [66.75, 46.22], [58.43, 45.21]],
+      preserveManualSize: true,
+    },
+    {
+      componentKey: "extractor-hood",
+      points: [[66.75, 39.25], [70.95, 40.15], [66.75, 40.78]],
       preserveManualSize: true,
     },
     {
@@ -366,6 +371,11 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
       points: [[43.71, 54.45], [54.51, 51.43], [75.77, 56.13], [75.65, 61.34], [70.43, 59.83], [65.8, 58.82], [55.46, 56.64], [49.64, 55.8]],
     },
     {
+      componentKey: "worktop",
+      points: [[43.71, 54.45], [75.65, 59.55], [75.65, 61.12], [70.43, 59.83], [65.8, 58.82], [55.46, 56.64], [49.64, 55.8], [43.71, 54.95]],
+      preserveManualSize: true,
+    },
+    {
       componentKey: "sink-faucet",
       points: [[17.9, 53.95], [38.8, 52.9], [38.8, 56.75], [17.9, 58.35]],
       preserveManualSize: true,
@@ -377,11 +387,11 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "base-module-1",
-      points: [[6.65, 55.63], [15.56, 56.97], [15.56, 87.23], [6.65, 85.38]],
+      points: [[6.78, 56.85], [15.56, 58.61], [15.56, 87.16], [6.78, 85.38]],
     },
     {
       componentKey: "base-module-1",
-      points: [[15.56, 56.97], [21.62, 57.48], [21.62, 86.39], [15.56, 87.23]],
+      points: [[15.56, 58.61], [21.63, 57.78], [21.63, 86.31], [15.56, 87.16]],
     },
     {
       componentKey: "dishwasher-base",
