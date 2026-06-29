@@ -479,14 +479,9 @@ export default function KitchenCatalogPanel({
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   hint={
                     disabledReason ||
-                    (isMontage
-                      ? translate(
-                          "configurator.serviceHintMontage",
-                          "Assembly is available only with a merchandise value of €1,000 or more and at least 3 cabinet components",
-                        )
-                      : item.code === SERVICE_CODE_PICKUP
-                        ? translate("configurator.serviceHintPickup", "Only available with at least one component or accessory")
-                        : "")
+                    (item.code === SERVICE_CODE_PICKUP
+                      ? translate("configurator.serviceHintPickup", "Only available with at least one component or accessory")
+                      : "")
                   }
                   onClick={() => onToggleService(item.code)}
                 />
