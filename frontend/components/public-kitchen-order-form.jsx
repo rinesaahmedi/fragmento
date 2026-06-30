@@ -42,6 +42,180 @@ function buildAddressLines(address, translate) {
   ].filter(Boolean);
 }
 
+function getDateInputMinValue(leadTimeDays = 0) {
+  const today = new Date();
+  const parsedLeadTimeDays = Math.max(0, Math.floor(Number(leadTimeDays) || 0));
+  today.setDate(today.getDate() + parsedLeadTimeDays);
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  return today.toISOString().slice(0, 10);
+}
+
+function parseDateValue(value) {
+  if (!value) return null;
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function toDateInputValue(date) {
+  if (!date || Number.isNaN(date.getTime())) return "";
+  return date.toISOString().slice(0, 10);
+}
+
+function addUtcMonths(date, amount) {
+  return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + amount, 1));
+}
+
+function buildCalendarDays(monthDate) {
+  const firstOfMonth = new Date(Date.UTC(monthDate.getUTCFullYear(), monthDate.getUTCMonth(), 1));
+  const mondayStartOffset = (firstOfMonth.getUTCDay() + 6) % 7;
+  const firstCalendarDate = new Date(firstOfMonth);
+  firstCalendarDate.setUTCDate(firstOfMonth.getUTCDate() - mondayStartOffset);
+
+  return Array.from({ length: 42 }, (_, index) => {
+    const date = new Date(firstCalendarDate);
+    date.setUTCDate(firstCalendarDate.getUTCDate() + index);
+    return date;
+  });
+}
+
+function formatDateForDisplay(value, locale = "en-GB") {
+  if (!value) return "";
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function formatCalendarMonth(date, locale = "en-GB") {
+  return new Intl.DateTimeFormat(locale, {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
+function CustomDatePicker({
+  id,
+  value,
+  min,
+  today,
+  locale,
+  translate,
+  onChange,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const selectedDate = parseDateValue(value);
+  const minimumDate = parseDateValue(min);
+  const todayDate = parseDateValue(today);
+  const initialMonth = selectedDate || minimumDate || todayDate || new Date();
+  const [visibleMonth, setVisibleMonth] = useState(() =>
+    new Date(Date.UTC(initialMonth.getUTCFullYear(), initialMonth.getUTCMonth(), 1)),
+  );
+  const calendarDays = useMemo(() => buildCalendarDays(visibleMonth), [visibleMonth]);
+  const selectedValue = value || "";
+  const todayValue = today || "";
+  const minValue = min || "";
+  const weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+  function selectDate(date) {
+    const nextValue = toDateInputValue(date);
+    if (minValue && nextValue < minValue) return;
+    onChange(nextValue);
+    setIsOpen(false);
+  }
+
+  return (
+    <div className={styles.customDatePicker}>
+      <input id={id} name="preferred-delivery-date" type="hidden" value={selectedValue} readOnly />
+      <button
+        type="button"
+        className={styles.datePickerTrigger}
+        aria-haspopup="dialog"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <span>
+          {selectedValue
+            ? formatDateForDisplay(selectedValue, locale)
+            : translate("order.selectPreferredDeliveryDate", "Select date")}
+        </span>
+        <span aria-hidden="true" className={styles.datePickerIcon}>▾</span>
+      </button>
+
+      {isOpen ? (
+        <div className={styles.datePickerPopover} role="dialog" aria-label={translate("order.deliveryCalendar", "Delivery calendar")}>
+          <div className={styles.datePickerHeader}>
+            <button
+              type="button"
+              className={styles.datePickerNavButton}
+              onClick={() => setVisibleMonth((current) => addUtcMonths(current, -1))}
+              aria-label={translate("order.previousMonth", "Previous month")}
+            >
+              ‹
+            </button>
+            <strong>{formatCalendarMonth(visibleMonth, locale)}</strong>
+            <button
+              type="button"
+              className={styles.datePickerNavButton}
+              onClick={() => setVisibleMonth((current) => addUtcMonths(current, 1))}
+              aria-label={translate("order.nextMonth", "Next month")}
+            >
+              ›
+            </button>
+          </div>
+
+          <div className={styles.datePickerWeekdays} aria-hidden="true">
+            {weekDays.map((day) => (
+              <span key={day}>{day}</span>
+            ))}
+          </div>
+
+          <div className={styles.datePickerGrid}>
+            {calendarDays.map((date) => {
+              const dateValue = toDateInputValue(date);
+              const isOutsideMonth = date.getUTCMonth() !== visibleMonth.getUTCMonth();
+              const isDisabled = minValue && dateValue < minValue;
+              const isToday = dateValue === todayValue;
+              const isSelected = dateValue === selectedValue;
+              const className = [
+                styles.datePickerDay,
+                isOutsideMonth ? styles.datePickerDayOutside : "",
+                isDisabled ? styles.datePickerDayDisabled : "",
+                isToday ? styles.datePickerDayToday : "",
+                isSelected ? styles.datePickerDaySelected : "",
+              ].filter(Boolean).join(" ");
+
+              return (
+                <button
+                  key={dateValue}
+                  type="button"
+                  className={className}
+                  disabled={isDisabled}
+                  aria-current={isToday ? "date" : undefined}
+                  aria-pressed={isSelected}
+                  onClick={() => selectDate(date)}
+                >
+                  {date.getUTCDate()}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className={styles.datePickerLegend}>
+            <span className={styles.datePickerTodayMarker} aria-hidden="true" />
+            <span>{translate("order.today", "Today")}</span>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function PublicKitchenOrderForm({
   orderSectionRef,
   customer,
@@ -53,8 +227,9 @@ export default function PublicKitchenOrderForm({
   onSubmit,
   onUpdateCustomer,
   onToggleUseContractAddress,
+  deliveryLeadTimeDays = 0,
 }) {
-  const { translate } = usePublicI18n();
+  const { translate, language } = usePublicI18n();
   const [touchedFields, setTouchedFields] = useState({});
   const [hasTriedSubmit, setHasTriedSubmit] = useState(false);
   const [showSavedDetails, setShowSavedDetails] = useState(false);
@@ -77,6 +252,11 @@ export default function PublicKitchenOrderForm({
   const canUseContractAddress = contractAddressLines.length > 0;
   const savedAddressLines = buildAddressLines(customer, translate);
   const savedHelpText = translate("order.savedHelp", "");
+  const orderDateValue = getDateInputMinValue(0);
+  const dateInputMinValue = getDateInputMinValue(deliveryLeadTimeDays);
+  const dateLocale = language === "de" ? "de-DE" : "en-GB";
+  const formattedOrderDate = formatDateForDisplay(orderDateValue, dateLocale);
+  const formattedMinimumDeliveryDate = formatDateForDisplay(dateInputMinValue, dateLocale);
 
   function markFieldTouched(fieldKey) {
     setTouchedFields((current) => (current[fieldKey] ? current : { ...current, [fieldKey]: true }));
@@ -161,6 +341,10 @@ export default function PublicKitchenOrderForm({
                     {renderSavedDetail(
                       translate("order.addressTitle", "Order / billing address"),
                       savedAddressLines.join(", ") || (isUsingContractAddress ? translate("order.usingContractAddress", "The contract address will be used for this order.") : ""),
+                    )}
+                    {renderSavedDetail(
+                      translate("order.preferredDeliveryDate", "Preferred delivery date"),
+                      formatDateForDisplay(customer.preferredDeliveryDate),
                     )}
                     {renderSavedDetail(translate("order.notes", "Notes (optional)"), customer.notes)}
                   </dl>
@@ -374,8 +558,49 @@ export default function PublicKitchenOrderForm({
           <div className={styles.orderSectionCard}>
             <div className={styles.orderSectionHeader}>
               <div>
+                <div className={styles.deliveryHeaderTitle}>
+                  <h3>{translate("order.deliveryTitle", "Preferred delivery")}</h3>
+                  <span>{translate("order.deliveryBadge", "Recommended")}</span>
+                </div>
+                <p>
+                  {deliveryLeadTimeDays > 0
+                    ? translate(
+                      "order.deliveryLeadTimeDescription",
+                      "We need at least {days} days after your order before delivery. For an order placed today ({orderDate}), the earliest selectable delivery date is {earliestDate}.",
+                      {
+                        days: deliveryLeadTimeDays,
+                        orderDate: formattedOrderDate,
+                        earliestDate: formattedMinimumDeliveryDate,
+                      },
+                    )
+                    : translate("order.deliveryHelp", "Tell us when you would prefer the kitchen to be delivered.")}
+                </p>
+              </div>
+            </div>
+            <div className={styles.sectionFields}>
+              <div className={[styles.field, styles.deliveryDateField].join(" ")}>
+                <label htmlFor="preferredDeliveryDate">{translate("order.preferredDeliveryDate", "Preferred delivery date")}</label>
+                <CustomDatePicker
+                  id="preferredDeliveryDate"
+                  min={dateInputMinValue}
+                  today={orderDateValue}
+                  locale={dateLocale}
+                  translate={translate}
+                  value={customer.preferredDeliveryDate || ""}
+                  onChange={(value) => {
+                    markFieldTouched("preferredDeliveryDate");
+                    onUpdateCustomer("preferredDeliveryDate", value);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.orderSectionCard}>
+            <div className={styles.orderSectionHeader}>
+              <div>
                 <h3>{translate("order.paymentConsentTitle", "Order notes")}</h3>
-                <p>{translate("order.paymentConsentHelp", "Add delivery details if needed, then confirm the privacy notice.")}</p>
+                <p>{translate("order.paymentConsentHelp", "Add any special instructions, then confirm the privacy notice.")}</p>
               </div>
             </div>
             <div className={styles.sectionFields}>
@@ -387,7 +612,7 @@ export default function PublicKitchenOrderForm({
                   value={customer.notes}
                   onBlur={() => markFieldTouched("notes")}
                   onChange={(event) => onUpdateCustomer("notes", event.target.value)}
-                  placeholder={translate("order.notesPlaceholder", "Delivery notes, preferred dates, etc.")}
+                  placeholder={translate("order.notesPlaceholder", "Access instructions, contact windows, or other details.")}
                 />
               </div>
             </div>

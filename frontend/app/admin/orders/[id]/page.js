@@ -81,6 +81,19 @@ function formatPaymentMethod(value) {
   return value;
 }
 
+function formatPreferredDeliveryDate(value) {
+  if (!value) return "";
+  const date = value instanceof Date ? value : new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return "";
+
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
 function OwnerSummary({ owner }) {
   if (!owner) {
     return <AdminText i18nKey="orderDetailAdmin.noHousingCompanySelected" fallback="No housing company selected" />;
@@ -349,6 +362,10 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                     {`, ${order.postalCode} ${order.city}`}
                     {order.country ? `, ${order.country}` : ""}
                   </span>
+                </div>
+                <div>
+                  <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.preferredDeliveryDate" fallback="Preferred delivery date" /></span>
+                  <span>{formatPreferredDeliveryDate(order.preferredDeliveryDate) || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</span>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.notes" fallback="Notes" /></span>

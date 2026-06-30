@@ -8,7 +8,7 @@ import {
   normalizeContractNumber,
 } from "../../../lib/kitchen-contracts";
 import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
-import { getDeliveryMinOrderSettings } from "../../../lib/admin-settings";
+import { getDeliveryLeadTimeDays, getDeliveryMinOrderSettings } from "../../../lib/admin-settings";
 import { prisma } from "../../../lib/prisma";
 import { PUBLIC_LANGUAGE_COOKIE_NAME, normalizePublicLanguage } from "../../../lib/public-language";
 
@@ -43,6 +43,9 @@ function serializeInitialOrder(order, confirmedItems = []) {
       postalCode: order.postalCode || "",
       city: order.city || "",
       country: order.country || "",
+      preferredDeliveryDate: order.preferredDeliveryDate
+        ? order.preferredDeliveryDate.toISOString().slice(0, 10)
+        : "",
       notes: order.notes || "",
       paymentMethod: order.paymentMethod || "",
     },
@@ -118,9 +121,10 @@ export default async function KitchenPage({ params, searchParams }) {
   }
 
   const kitchenConfig = serializeKitchenForLegacy(kitchen);
-  const [svgMarkup, deliveryMinOrderSettings] = await Promise.all([
+  const [svgMarkup, deliveryMinOrderSettings, deliveryLeadTimeDays] = await Promise.all([
     loadKitchenSvgMarkup(slug),
     getDeliveryMinOrderSettings(),
+    getDeliveryLeadTimeDays(),
   ]);
   let initialContractNumber = normalizeContractNumber(resolvedSearchParams?.contractNumber);
   const returnOrderNumber = String(resolvedSearchParams?.order || "").trim();
@@ -167,6 +171,7 @@ export default async function KitchenPage({ params, searchParams }) {
       initialOrder={initialOrder}
       initialContractAddress={initialContractAddress}
       deliveryMinOrderSettings={deliveryMinOrderSettings}
+      deliveryLeadTimeDays={deliveryLeadTimeDays}
     />
   );
 }

@@ -177,6 +177,7 @@ model Order {
   postalCode              String
   city                    String
   country                 String?
+  preferredDeliveryDate   DateTime?
   notes                   String?
   paymentMethod           String?
   paymentStatus           String           @default("UNPAID")

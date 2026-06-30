@@ -49,7 +49,11 @@
     "deliveryMinOrderDescription": "Set a minimum order value required when the customer selects Delivery, transport, assembly and connection.",
     "deliveryMinOrderEnabled": "Enable minimum order value for delivery",
     "deliveryMinOrderEnabledHelp": "When enabled, orders that include Delivery, transport, assembly and connection must reach the minimum value below.",
-    "deliveryMinOrderAmount": "Minimum order value (€)"
+    "deliveryMinOrderAmount": "Minimum order value (€)",
+    "deliveryLeadTimeTitle": "Delivery lead time",
+    "deliveryLeadTimeDescription": "Set the earliest selectable preferred delivery date after an order is placed.",
+    "deliveryLeadTimeDays": "Minimum days after order",
+    "deliveryLeadTimeHelp": "Example: 14 means customers can only select delivery dates at least two weeks after ordering."
   },
   "status": {
     "new": "New",
@@ -799,6 +803,7 @@
     "payment": "Payment",
     "customer": "Customer",
     "address": "Address",
+    "preferredDeliveryDate": "Preferred delivery date",
     "notes": "Notes",
     "orderItems": "Order items",
     "snapshotOfAllItemsSavedWithThisOrder": "Snapshot of all items saved with this order.",

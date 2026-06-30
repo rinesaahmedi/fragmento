@@ -48,6 +48,7 @@ function buildInitialCustomer(contractNumber) {
     postalCode: "",
     city: "",
     country: "",
+    preferredDeliveryDate: "",
     notes: "",
     paymentMethod: "card",
     consent: false,
@@ -1054,6 +1055,7 @@ function KitchenConfiguratorContent({
   initialOrder = null,
   initialContractAddress = null,
   deliveryMinOrderSettings = null,
+  deliveryLeadTimeDays = 0,
 }) {
   const { translate, language } = usePublicI18n();
   const orderSectionRef = useRef(null);
@@ -1902,6 +1904,7 @@ function KitchenConfiguratorContent({
           postalCode: customer.postalCode,
           city: customer.city,
           country: customer.country,
+          preferredDeliveryDate: customer.preferredDeliveryDate,
           notes: customer.notes,
           paymentMethod,
         },
@@ -1930,6 +1933,7 @@ function KitchenConfiguratorContent({
               postalCode: customer.postalCode,
               city: customer.city,
               country: customer.country,
+              preferredDeliveryDate: customer.preferredDeliveryDate,
               notes: customer.notes,
               paymentMethod,
               consent: customer.consent,
@@ -2076,6 +2080,7 @@ function KitchenConfiguratorContent({
             isSubmitting={isSubmitting}
             status={status}
             statusTone={statusTone}
+            deliveryLeadTimeDays={deliveryLeadTimeDays}
             onSubmit={handleSubmit}
             onUpdateCustomer={updateCustomer}
             onToggleUseContractAddress={(nextChecked) => {

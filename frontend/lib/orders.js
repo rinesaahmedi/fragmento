@@ -1,6 +1,10 @@
 import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
-import { getDeliveryMinOrderSettings, getDirectOrderConfirmationEnabled } from "./admin-settings";
+import {
+  getDeliveryLeadTimeDays,
+  getDeliveryMinOrderSettings,
+  getDirectOrderConfirmationEnabled,
+} from "./admin-settings";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
   getServiceEligibility,
@@ -66,6 +70,37 @@ function validatePaymentMethod(value) {
     throw validationError("Payment method is invalid");
   }
   return normalizedPaymentMethod;
+}
+
+function normalizePreferredDeliveryDate(value) {
+  const normalized = value ? String(value).trim() : "";
+  if (!normalized) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    throw validationError("Preferred delivery date is invalid");
+  }
+
+  const date = new Date(`${normalized}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== normalized) {
+    throw validationError("Preferred delivery date is invalid");
+  }
+
+  return date;
+}
+
+function getMinimumPreferredDeliveryDate(leadTimeDays = 0, now = new Date()) {
+  const days = Math.max(0, Math.floor(Number(leadTimeDays) || 0));
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + days));
+}
+
+function assertPreferredDeliveryLeadTime(preferredDeliveryDate, leadTimeDays) {
+  if (!preferredDeliveryDate) return;
+
+  const minimumDeliveryDate = getMinimumPreferredDeliveryDate(leadTimeDays);
+  if (preferredDeliveryDate < minimumDeliveryDate) {
+    throw validationError(
+      `Preferred delivery date must be at least ${leadTimeDays} days after the order date.`,
+    );
+  }
 }
 
 function validateConsent(value) {
@@ -153,6 +188,9 @@ export function buildOrderForNotifications(orderRecord) {
       postalCode: orderRecord.postalCode,
       city: orderRecord.city,
       country: orderRecord.country || "",
+      preferredDeliveryDate: orderRecord.preferredDeliveryDate
+        ? orderRecord.preferredDeliveryDate.toISOString().slice(0, 10)
+        : "",
       notes: orderRecord.notes || "",
       paymentMethod: orderRecord.paymentMethod || "",
     },
@@ -271,9 +309,12 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     postalCode: requireString(customer.postalCode, "Postal code"),
     city: requireString(customer.city, "City"),
     country: customer.country ? String(customer.country).trim() : "",
+    preferredDeliveryDate: normalizePreferredDeliveryDate(customer.preferredDeliveryDate),
     notes: customer.notes ? String(customer.notes).trim() : "",
     paymentMethod: validatePaymentMethod(customer.paymentMethod),
   };
+  const deliveryLeadTimeDays = await getDeliveryLeadTimeDays();
+  assertPreferredDeliveryLeadTime(validatedCustomer.preferredDeliveryDate, deliveryLeadTimeDays);
   const submittedGroups = {
     components: normalizeSubmissionItems(orderPayload?.components),
     accessories: normalizeSubmissionItems(orderPayload?.accessories),
@@ -389,6 +430,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
                 postalCode: validatedCustomer.postalCode,
                 city: validatedCustomer.city,
                 country: validatedCustomer.country || null,
+                preferredDeliveryDate: validatedCustomer.preferredDeliveryDate,
                 notes: validatedCustomer.notes || null,
                 paymentMethod: validatedCustomer.paymentMethod,
                 totalPrice,
@@ -411,6 +453,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
                 postalCode: validatedCustomer.postalCode,
                 city: validatedCustomer.city,
                 country: validatedCustomer.country || null,
+                preferredDeliveryDate: validatedCustomer.preferredDeliveryDate,
                 notes: validatedCustomer.notes || null,
                 paymentMethod: validatedCustomer.paymentMethod,
                 totalPrice,
