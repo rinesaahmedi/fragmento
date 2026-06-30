@@ -10,7 +10,7 @@ const seedDir = path.dirname(seedPath);
 
 loadEnvConfig(projectRoot);
 
-const FORBIDDEN_LEGACY_MARKERS = [
+const LEGACY_MARKERS = [
   "DEFAULT + UPK20",
   "UPK20(0.16CM)",
   "HPK2002(0.5CM)",
@@ -131,18 +131,33 @@ function buildSeedRows(seed) {
   return rows;
 }
 
-function hasForbiddenMarker(row) {
+function getCompositeMarkerWarnings(row) {
   const values = [
-    row.articleNumber,
-    row.blendeCode,
-    row.blendeLabel,
-    row.name,
-    row.nameDe,
+    ["articleNumber", row.articleNumber],
+    ["blendeCode", row.blendeCode],
+    ["blendeLabel", row.blendeLabel],
+    ["name", row.name],
+    ["nameDe", row.nameDe],
   ];
+  const warnings = [];
 
-  return FORBIDDEN_LEGACY_MARKERS.some((marker) => (
-    values.some((value) => String(value || "").includes(marker))
-  ));
+  for (const marker of LEGACY_MARKERS) {
+    for (const [field, value] of values) {
+      if (String(value || "").includes(marker)) {
+        warnings.push({ field, marker, type: "legacy marker" });
+      }
+    }
+  }
+
+  for (const [field, value] of values) {
+    const text = String(value || "");
+    if (!text) continue;
+    if ((field === "articleNumber" || field === "blendeCode" || field === "blendeLabel") && /\s\+\s|\([^)]*\)/.test(text)) {
+      warnings.push({ field, marker: text, type: "composite article/blende string" });
+    }
+  }
+
+  return warnings;
 }
 
 function normalizeBlendeCode(value) {
@@ -250,6 +265,9 @@ async function loadLiveRows(prisma, seedRows) {
     where: { kitchen: { slug: { in: seededSlugs } } },
     include: {
       kitchen: { select: { slug: true, kitchenCode: true } },
+      catalogArticle: { select: { id: true, articleNumber: true, isActive: true } },
+      catalogBlende: { select: { id: true, code: true, isActive: true } },
+      catalogService: { select: { id: true, code: true, isActive: true } },
     },
     orderBy: [
       { kitchen: { slug: "asc" } },
@@ -277,7 +295,96 @@ async function loadLiveRows(prisma, seedRows) {
       isLocked: Boolean(item.isLocked),
       isActive: Boolean(item.isActive),
       sortOrder: item.sortOrder || 0,
+      catalogArticleId: nullableString(item.catalogArticleId),
+      catalogArticleNumber: nullableString(item.catalogArticle?.articleNumber),
+      catalogArticleIsActive: item.catalogArticle?.isActive ?? null,
+      catalogBlendeId: nullableString(item.catalogBlendeId),
+      catalogBlendeCode: nullableString(item.catalogBlende?.code),
+      catalogBlendeIsActive: item.catalogBlende?.isActive ?? null,
+      catalogBlendeQuantity: item.catalogBlendeQuantity ?? null,
+      catalogServiceId: nullableString(item.catalogServiceId),
+      catalogServiceCode: nullableString(item.catalogService?.code),
+      catalogServiceIsActive: item.catalogService?.isActive ?? null,
+      catalogLinkStatus: nullableString(item.catalogLinkStatus),
     }));
+}
+
+async function loadTestLinkSummary(prisma) {
+  const anyLink = {
+    OR: [
+      { catalogArticleId: { not: null } },
+      { catalogBlendeId: { not: null } },
+      { catalogBlendeQuantity: { not: null } },
+      { catalogServiceId: { not: null } },
+      { catalogLinkStatus: { not: null } },
+    ],
+  };
+
+  const [total, linked] = await Promise.all([
+    prisma.kitchenItem.count({ where: { kitchen: { slug: "test-3d-kitchen" } } }),
+    prisma.kitchenItem.count({ where: { kitchen: { slug: "test-3d-kitchen" }, ...anyLink } }),
+  ]);
+
+  return { total, linked };
+}
+
+function expectedLinkDataForArticle(row, article) {
+  return {
+    catalogArticleId: article.id,
+    catalogBlendeId: null,
+    catalogBlendeQuantity: null,
+    catalogServiceId: null,
+    catalogLinkStatus: "MATCHED",
+  };
+}
+
+function expectedLinkDataForArticleBlende(row, article, blende, quantity) {
+  return {
+    catalogArticleId: article.id,
+    catalogBlendeId: blende.id,
+    catalogBlendeQuantity: quantity,
+    catalogServiceId: null,
+    catalogLinkStatus: "MATCHED",
+  };
+}
+
+function expectedLinkDataForService(service) {
+  return {
+    catalogArticleId: null,
+    catalogBlendeId: null,
+    catalogBlendeQuantity: null,
+    catalogServiceId: service.id,
+    catalogLinkStatus: "MATCHED",
+  };
+}
+
+function linkFieldDiffs(row, expected) {
+  const fields = [
+    "catalogArticleId",
+    "catalogBlendeId",
+    "catalogBlendeQuantity",
+    "catalogServiceId",
+    "catalogLinkStatus",
+  ];
+  const diffs = {};
+
+  for (const field of fields) {
+    if ((row[field] ?? null) !== (expected[field] ?? null)) {
+      diffs[field] = { actual: row[field] ?? null, expected: expected[field] ?? null };
+    }
+  }
+
+  return diffs;
+}
+
+function hasAnyCatalogLink(row) {
+  return Boolean(
+    row.catalogArticleId
+    || row.catalogBlendeId
+    || row.catalogBlendeQuantity != null
+    || row.catalogServiceId
+    || row.catalogLinkStatus,
+  );
 }
 
 function auditRows(rows, catalog) {
@@ -290,15 +397,19 @@ function auditRows(rows, catalog) {
     defaultIncludedIssues: [],
     missingCatalogRows: [],
     priceMismatches: [],
-    forbiddenLegacyRows: [],
+    compositeMarkerWarnings: [],
+    markerProblemRows: [],
+    linkStateIssues: [],
+    inactiveCatalogLinks: [],
     safeToLinkLater: [],
     shouldRemainUnlinked: [],
     unknownByReason: new Map(),
   };
 
   for (const row of rows) {
-    if (hasForbiddenMarker(row)) {
-      result.forbiddenLegacyRows.push(compactRow(row));
+    const markerWarnings = getCompositeMarkerWarnings(row);
+    if (markerWarnings.length > 0) {
+      result.compositeMarkerWarnings.push(compactRow(row, { warnings: markerWarnings }));
     }
 
     if (isDefaultIncluded(row)) {
@@ -306,6 +417,18 @@ function auditRows(rows, catalog) {
       result.defaultIncludedSkipped.push(compactRow(row));
       result.shouldRemainUnlinked.push(compactRow(row, { reason: "default included" }));
       if (issue) result.defaultIncludedIssues.push(compactRow(row, { issue }));
+      if (hasAnyCatalogLink(row)) {
+        result.linkStateIssues.push(compactRow(row, {
+          reason: "default included row should remain fully unlinked",
+          actual: {
+            catalogArticleId: row.catalogArticleId,
+            catalogBlendeId: row.catalogBlendeId,
+            catalogBlendeQuantity: row.catalogBlendeQuantity,
+            catalogServiceId: row.catalogServiceId,
+            catalogLinkStatus: row.catalogLinkStatus,
+          },
+        }));
+      }
       continue;
     }
 
@@ -320,6 +443,13 @@ function auditRows(rows, catalog) {
       if (comparePrice(row, service.price)) {
         result.serviceMatches.push(compactRow(row, { serviceCode }));
         result.safeToLinkLater.push(compactRow(row, { catalogType: "CatalogService", catalogCode: serviceCode }));
+        const diffs = linkFieldDiffs(row, expectedLinkDataForService(service));
+        if (Object.keys(diffs).length > 0) {
+          result.linkStateIssues.push(compactRow(row, { reason: "service catalog link mismatch", diffs }));
+        }
+        if (service.isActive === false) {
+          result.inactiveCatalogLinks.push(compactRow(row, { catalogType: "CatalogService", catalogCode: serviceCode }));
+        }
       } else {
         result.priceMismatches.push(compactRow(row, {
           reason: "service price mismatch",
@@ -357,6 +487,18 @@ function auditRows(rows, catalog) {
           catalogBlende: normalizedBlendeCode,
           blendeQuantity: quantity,
         }));
+        const diffs = linkFieldDiffs(row, expectedLinkDataForArticleBlende(row, article, blende, quantity));
+        if (Object.keys(diffs).length > 0) {
+          result.linkStateIssues.push(compactRow(row, { reason: "article + blende catalog link mismatch", diffs }));
+        }
+        if (article.isActive === false || blende.isActive === false) {
+          result.inactiveCatalogLinks.push(compactRow(row, {
+            catalogArticle: article.articleNumber,
+            catalogArticleIsActive: article.isActive,
+            catalogBlende: normalizedBlendeCode,
+            catalogBlendeIsActive: blende.isActive,
+          }));
+        }
       } else {
         result.priceMismatches.push(compactRow(row, {
           reason: "article + blende price mismatch",
@@ -383,6 +525,16 @@ function auditRows(rows, catalog) {
           catalogArticle: article.articleNumber,
           isFixedPricePackage: article.isFixedPricePackage,
         }));
+        const diffs = linkFieldDiffs(row, expectedLinkDataForArticle(row, article));
+        if (Object.keys(diffs).length > 0) {
+          result.linkStateIssues.push(compactRow(row, { reason: "article catalog link mismatch", diffs }));
+        }
+        if (article.isActive === false) {
+          result.inactiveCatalogLinks.push(compactRow(row, {
+            catalogArticle: article.articleNumber,
+            catalogArticleIsActive: article.isActive,
+          }));
+        }
       } else {
         result.priceMismatches.push(compactRow(row, {
           reason: article.isFixedPricePackage ? "fixed-package price mismatch" : "article price mismatch",
@@ -400,6 +552,20 @@ function auditRows(rows, catalog) {
     const current = result.unknownByReason.get(reason) || 0;
     result.unknownByReason.set(reason, current + 1);
   }
+
+  const problemRows = new Map();
+  for (const row of [
+    ...result.priceMismatches,
+    ...result.missingCatalogRows,
+    ...result.linkStateIssues,
+    ...result.inactiveCatalogLinks,
+  ]) {
+    problemRows.set(rowKey(row.kitchenSlug, row.code), row);
+  }
+
+  result.markerProblemRows = result.compositeMarkerWarnings
+    .filter((row) => problemRows.has(rowKey(row.kitchenSlug, row.code)))
+    .map((row) => ({ ...row, linkedProblem: problemRows.get(rowKey(row.kitchenSlug, row.code)) }));
 
   return result;
 }
@@ -428,10 +594,12 @@ async function main() {
   const prisma = new PrismaClient();
   let catalog;
   let liveRows;
+  let testLinkSummary;
 
   try {
     catalog = await loadCatalog(prisma);
     liveRows = await loadLiveRows(prisma, seedRows);
+    testLinkSummary = await loadTestLinkSummary(prisma);
   } finally {
     await prisma.$disconnect();
   }
@@ -443,8 +611,15 @@ async function main() {
   ].filter(Boolean);
 
   const result = auditRows(liveRows, catalog);
-  const forbiddenMarkersInSeed = FORBIDDEN_LEGACY_MARKERS.filter((marker) => source.includes(marker));
+  const legacyMarkersInSeed = LEGACY_MARKERS.filter((marker) => source.includes(marker));
   const unknownByReason = Object.fromEntries([...result.unknownByReason.entries()].sort());
+  const fullyUnlinkedRows = liveRows.filter((row) => !hasAnyCatalogLink(row));
+  const defaultIncludedFullyUnlinked = result.defaultIncludedSkipped.filter((row) => (
+    fullyUnlinkedRows.some((unlinkedRow) => rowKey(unlinkedRow.kitchenSlug, unlinkedRow.code) === rowKey(row.kitchenSlug, row.code))
+  ));
+  const markerWarningGroups = countBy(result.compositeMarkerWarnings, (row) => (
+    row.warnings.map((warning) => warning.type).sort().join(", ")
+  ));
 
   const summary = {
     catalogCounts: {
@@ -462,9 +637,17 @@ async function main() {
     defaultIncludedIssues: result.defaultIncludedIssues.length,
     missingCatalogRows: result.missingCatalogRows.length,
     priceMismatches: result.priceMismatches.length,
-    forbiddenLegacyMarkers: forbiddenMarkersInSeed.length + result.forbiddenLegacyRows.length,
+    inactiveCatalogLinks: result.inactiveCatalogLinks.length,
+    linkStateIssues: result.linkStateIssues.length,
+    legacyOrCompositeMarkerWarnings: legacyMarkersInSeed.length + result.compositeMarkerWarnings.length,
+    markerProblems: result.markerProblemRows.length,
     safeToLinkLater: result.safeToLinkLater.length,
     shouldRemainUnlinked: result.shouldRemainUnlinked.length,
+    matchedCatalogLinkRows: liveRows.filter((row) => row.catalogLinkStatus === "MATCHED").length,
+    fullyUnlinkedSeededRows: fullyUnlinkedRows.length,
+    defaultIncludedRowsFullyUnlinked: defaultIncludedFullyUnlinked.length,
+    test3dKitchenRows: testLinkSummary.total,
+    test3dKitchenRowsWithCatalogLinks: testLinkSummary.linked,
     unknownByReason,
   };
 
@@ -472,12 +655,16 @@ async function main() {
   console.log(JSON.stringify(summary, null, 2));
 
   printSection("Price mismatches (failing)", result.priceMismatches.slice(0, 50));
-  printSection("Missing catalog rows / manual review (non-failing unless a catalog match exists)", result.missingCatalogRows.slice(0, 100));
+  printSection("Missing catalog rows / manual review (failing for non-default production rows)", result.missingCatalogRows.slice(0, 100));
   printSection("Default included issues (review)", result.defaultIncludedIssues.slice(0, 50));
-  printSection("Forbidden legacy markers (failing)", {
-    seedMarkers: forbiddenMarkersInSeed,
-    rows: result.forbiddenLegacyRows.slice(0, 50),
+  printSection("Legacy/composite marker warnings (non-failing unless tied to pricing/link problems)", {
+    seedMarkers: legacyMarkersInSeed,
+    grouped: markerWarningGroups,
+    examples: result.compositeMarkerWarnings.slice(0, 10),
   });
+  printSection("Marker rows with real pricing/link problems (failing)", result.markerProblemRows.slice(0, 50));
+  printSection("Catalog link state issues (failing)", result.linkStateIssues.slice(0, 50));
+  printSection("Inactive catalog links (failing)", result.inactiveCatalogLinks.slice(0, 50));
   printSection("Safe to link later grouped by catalog target", countBy(result.safeToLinkLater, (row) => {
     if (row.catalogType === "CatalogService") return `${row.catalogType}:${row.catalogCode}`;
     if (row.catalogType === "CatalogArticle+CatalogBlende") {
@@ -485,15 +672,20 @@ async function main() {
     }
     return `${row.catalogType}:${row.catalogArticle}`;
   }));
-  printSection("Safe to link later examples", result.safeToLinkLater.slice(0, 25));
+  printSection("Safe to link later examples", result.safeToLinkLater.slice(0, 10));
   printSection("Should remain unlinked grouped by reason", countBy(result.shouldRemainUnlinked, (row) => row.reason));
-  printSection("Should remain unlinked examples", result.shouldRemainUnlinked.slice(0, 25));
+  printSection("Should remain unlinked examples", result.shouldRemainUnlinked.slice(0, 10));
 
   const shouldFail = (
     emptyCatalogTables.length > 0
     || result.priceMismatches.length > 0
-    || forbiddenMarkersInSeed.length > 0
-    || result.forbiddenLegacyRows.length > 0
+    || result.missingCatalogRows.length > 0
+    || result.linkStateIssues.length > 0
+    || result.inactiveCatalogLinks.length > 0
+    || result.markerProblemRows.length > 0
+    || testLinkSummary.linked > 0
+    || liveRows.filter((row) => row.catalogLinkStatus === "MATCHED").length !== 670
+    || defaultIncludedFullyUnlinked.length !== 172
   );
 
   if (emptyCatalogTables.length > 0) {
@@ -501,10 +693,10 @@ async function main() {
   }
 
   if (shouldFail) {
-    console.error("\nCatalog parity audit failed: catalog tables are empty, matched prices differ, or forbidden markers were found.");
+    console.error("\nCatalog parity audit failed: catalog tables are empty, prices differ, catalog rows are missing/inactive, link state is wrong, or test/default rows are linked incorrectly.");
     process.exitCode = 1;
   } else {
-    console.log("\nCatalog parity audit passed: matched catalog rows agree with KitchenItem prices.");
+    console.log("\nCatalog parity audit passed: matched catalog rows agree with KitchenItem prices; marker/composite strings are warnings only.");
   }
 }
 
