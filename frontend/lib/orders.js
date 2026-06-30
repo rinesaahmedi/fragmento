@@ -1,6 +1,10 @@
 import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
-import { getDeliveryMinOrderSettings, getDirectOrderConfirmationEnabled } from "./admin-settings";
+import {
+  getDeliveryLeadTimeDays,
+  getDeliveryMinOrderSettings,
+  getDirectOrderConfirmationEnabled,
+} from "./admin-settings";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
   getServiceEligibility,
@@ -81,6 +85,22 @@ function normalizePreferredDeliveryDate(value) {
   }
 
   return date;
+}
+
+function getMinimumPreferredDeliveryDate(leadTimeDays = 0, now = new Date()) {
+  const days = Math.max(0, Math.floor(Number(leadTimeDays) || 0));
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + days));
+}
+
+function assertPreferredDeliveryLeadTime(preferredDeliveryDate, leadTimeDays) {
+  if (!preferredDeliveryDate) return;
+
+  const minimumDeliveryDate = getMinimumPreferredDeliveryDate(leadTimeDays);
+  if (preferredDeliveryDate < minimumDeliveryDate) {
+    throw validationError(
+      `Preferred delivery date must be at least ${leadTimeDays} days after the order date.`,
+    );
+  }
 }
 
 function validateConsent(value) {
@@ -293,6 +313,8 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     notes: customer.notes ? String(customer.notes).trim() : "",
     paymentMethod: validatePaymentMethod(customer.paymentMethod),
   };
+  const deliveryLeadTimeDays = await getDeliveryLeadTimeDays();
+  assertPreferredDeliveryLeadTime(validatedCustomer.preferredDeliveryDate, deliveryLeadTimeDays);
   const submittedGroups = {
     components: normalizeSubmissionItems(orderPayload?.components),
     accessories: normalizeSubmissionItems(orderPayload?.accessories),

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseBooleanSetting } from "../lib/admin-settings.js";
+import { parseBooleanSetting, parseIntegerSetting } from "../lib/admin-settings.js";
 
 test("parseBooleanSetting defaults missing settings to false", () => {
   assert.equal(parseBooleanSetting(undefined), false);
@@ -20,4 +20,11 @@ test("parseBooleanSetting accepts common true and false values", () => {
 test("parseBooleanSetting uses caller default for unknown values", () => {
   assert.equal(parseBooleanSetting("unexpected", true), true);
   assert.equal(parseBooleanSetting("unexpected", false), false);
+});
+
+test("parseIntegerSetting accepts non-negative whole day values", () => {
+  assert.equal(parseIntegerSetting("14", 0), 14);
+  assert.equal(parseIntegerSetting("14.9", 0), 14);
+  assert.equal(parseIntegerSetting("-1", 14), 14);
+  assert.equal(parseIntegerSetting("unexpected", 14), 14);
 });

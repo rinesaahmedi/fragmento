@@ -9,7 +9,11 @@ import {
   primaryButtonStyle,
 } from "../../../components/admin-ui";
 import { getFormMessage } from "../../../lib/admin-forms";
-import { getDeliveryMinOrderSettings, getDirectOrderConfirmationEnabled } from "../../../lib/admin-settings";
+import {
+  getDeliveryLeadTimeDays,
+  getDeliveryMinOrderSettings,
+  getDirectOrderConfirmationEnabled,
+} from "../../../lib/admin-settings";
 import { requireAdminPage } from "../../../lib/auth";
 
 export const dynamic = "force-dynamic";
@@ -19,9 +23,10 @@ export default async function AdminSettingsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const [directOrderConfirmationEnabled, deliveryMinOrderSettings] = await Promise.all([
+  const [directOrderConfirmationEnabled, deliveryMinOrderSettings, deliveryLeadTimeDays] = await Promise.all([
     getDirectOrderConfirmationEnabled(),
     getDeliveryMinOrderSettings(),
+    getDeliveryLeadTimeDays(),
   ]);
 
   return (
@@ -108,6 +113,41 @@ export default async function AdminSettingsPage({ searchParams }) {
               </div>
             </form>
           </AdminSection>
+
+          <AdminSection
+            title={<AdminText i18nKey="settingsAdmin.deliveryLeadTimeTitle" fallback="Delivery lead time" />}
+            description={<AdminText i18nKey="settingsAdmin.deliveryLeadTimeDescription" fallback="Set the earliest selectable preferred delivery date after an order is placed." />}
+          >
+            <form action="/api/admin/settings/delivery-lead-time" method="post" style={formStyle}>
+              <div style={amountRowStyle}>
+                <label style={amountLabelStyle}>
+                  <span style={amountLabelTextStyle}>
+                    <AdminText i18nKey="settingsAdmin.deliveryLeadTimeDays" fallback="Minimum days after order" />
+                  </span>
+                  <input
+                    name="deliveryLeadTimeDays"
+                    type="number"
+                    min="0"
+                    step="1"
+                    defaultValue={deliveryLeadTimeDays}
+                    style={amountInputStyle}
+                  />
+                </label>
+                <p style={mutedHelpStyle}>
+                  <AdminText
+                    i18nKey="settingsAdmin.deliveryLeadTimeHelp"
+                    fallback="Example: 14 means customers can only select delivery dates at least two weeks after ordering."
+                  />
+                </p>
+              </div>
+
+              <div style={actionRowStyle}>
+                <button type="submit" style={primaryButtonStyle}>
+                  <AdminText i18nKey="settingsAdmin.saveSettings" fallback="Save settings" />
+                </button>
+              </div>
+            </form>
+          </AdminSection>
         </div>
       </div>
     </AdminShell>
@@ -171,4 +211,9 @@ const amountInputStyle = {
   borderRadius: 8,
   background: "var(--app-surface)",
   color: "var(--app-text)",
+};
+
+const mutedHelpStyle = {
+  ...mutedTextStyle,
+  margin: "8px 0 0",
 };

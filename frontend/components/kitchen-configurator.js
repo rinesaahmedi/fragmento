@@ -1055,6 +1055,7 @@ function KitchenConfiguratorContent({
   initialOrder = null,
   initialContractAddress = null,
   deliveryMinOrderSettings = null,
+  deliveryLeadTimeDays = 0,
 }) {
   const { translate, language } = usePublicI18n();
   const orderSectionRef = useRef(null);
@@ -2079,6 +2080,7 @@ function KitchenConfiguratorContent({
             isSubmitting={isSubmitting}
             status={status}
             statusTone={statusTone}
+            deliveryLeadTimeDays={deliveryLeadTimeDays}
             onSubmit={handleSubmit}
             onUpdateCustomer={updateCustomer}
             onToggleUseContractAddress={(nextChecked) => {

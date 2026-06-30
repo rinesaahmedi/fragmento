@@ -49,7 +49,11 @@
     "deliveryMinOrderDescription": "Legen Sie einen Mindestbestellwert fest, der bei der Auswahl von Lieferung, Transport, Montage und Anschluss erfordert wird.",
     "deliveryMinOrderEnabled": "Mindestbestellwert fuer Lieferung aktivieren",
     "deliveryMinOrderEnabledHelp": "Wenn aktiviert, muessen Bestellungen mit Lieferung, Transport, Montage und Anschluss den unten angegebenen Mindestbestellwert erreichen.",
-    "deliveryMinOrderAmount": "Mindestbestellwert (€)"
+    "deliveryMinOrderAmount": "Mindestbestellwert (€)",
+    "deliveryLeadTimeTitle": "Liefer-Vorlaufzeit",
+    "deliveryLeadTimeDescription": "Legen Sie fest, ab wann Kunden nach der Bestellung einen Wunschliefertermin auswaehlen koennen.",
+    "deliveryLeadTimeDays": "Mindesttage nach Bestellung",
+    "deliveryLeadTimeHelp": "Beispiel: 14 bedeutet, dass Kunden nur Liefertermine fruehestens zwei Wochen nach der Bestellung auswaehlen koennen."
   },
   "status": {
     "new": "Neu",

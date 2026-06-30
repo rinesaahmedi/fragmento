@@ -4,6 +4,8 @@ export const DIRECT_ORDER_CONFIRMATION_SETTING_KEY = "directOrderConfirmationEna
 export const DELIVERY_MIN_ORDER_ENABLED_KEY = "deliveryMinOrderEnabled";
 export const DELIVERY_MIN_ORDER_AMOUNT_KEY = "deliveryMinOrderAmount";
 export const DELIVERY_MIN_ORDER_DEFAULT_AMOUNT = 1000;
+export const DELIVERY_LEAD_TIME_DAYS_KEY = "deliveryLeadTimeDays";
+export const DELIVERY_LEAD_TIME_DEFAULT_DAYS = 14;
 
 const TRUE_VALUES = new Set(["true", "1", "yes", "on"]);
 const FALSE_VALUES = new Set(["false", "0", "no", "off", ""]);
@@ -23,6 +25,11 @@ export function parseNumberSetting(value, defaultValue) {
   if (value === null || value === undefined) return defaultValue;
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed >= 0 ? parsed : defaultValue;
+}
+
+export function parseIntegerSetting(value, defaultValue) {
+  const parsed = parseNumberSetting(value, defaultValue);
+  return Math.floor(parsed);
 }
 
 export async function getDirectOrderConfirmationEnabled(client = prisma) {
@@ -78,4 +85,27 @@ export async function setDeliveryMinOrderSettings({ enabled, amount }, client = 
   ]);
 
   return { enabled, amount: Number(amountValue) };
+}
+
+export async function getDeliveryLeadTimeDays(client = prisma) {
+  const setting = await client.appSetting.findUnique({
+    where: { key: DELIVERY_LEAD_TIME_DAYS_KEY },
+  });
+
+  return parseIntegerSetting(setting?.value, DELIVERY_LEAD_TIME_DEFAULT_DAYS);
+}
+
+export async function setDeliveryLeadTimeDays(days, client = prisma) {
+  const value = String(parseIntegerSetting(days, DELIVERY_LEAD_TIME_DEFAULT_DAYS));
+
+  await client.appSetting.upsert({
+    where: { key: DELIVERY_LEAD_TIME_DAYS_KEY },
+    create: {
+      key: DELIVERY_LEAD_TIME_DAYS_KEY,
+      value,
+    },
+    update: { value },
+  });
+
+  return Number(value);
 }
