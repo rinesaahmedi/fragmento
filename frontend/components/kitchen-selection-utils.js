@@ -600,7 +600,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-C-600":
     case "T3D-SINKBASE-001":
-      return translate("configurator.catalogItemInfo.blancoBottonWasteSystem", "Blanco Botton Pro 45/2 waste system");
+      return translate("configurator.catalogItemInfo.defaultSinkBaseCabinet", "Default sink base cabinet");
     case "SINKBASE-LS-600":
       return translate("configurator.catalogItemInfo.us30SinkBaseCabinet", "US30, sink base cabinet");
     case "DISH-B-600-STD":

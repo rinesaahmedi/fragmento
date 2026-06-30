@@ -17,6 +17,10 @@
     "test:service-claims-contract-autofill": "node --test test/service-claims-contract-autofill.test.js",
     "check:contract-project-migration": "node scripts/check-contract-project-migration.js",
     "prisma:seed": "node prisma/seed.js",
+    "catalog:backfill": "node scripts/backfill-catalog-phase-b.js",
+    "catalog:link": "node scripts/backfill-kitchen-item-catalog-links.js",
+    "catalog:audit": "node scripts/audit-catalog-parity.js",
+    "db:audit": "node scripts/audit-seed-db.js",
     "extract:product-info": "node scripts/extract-product-info-pdfs.js",
     "audit:product-info": "node scripts/audit-product-info.js",
     "propose:product-info-cleanup": "node scripts/propose-product-info-cleanup.js",
@@ -25,7 +29,9 @@
     "seed:dashboard-demo": "node scripts/seed-dashboard-demo.js",
     "cleanup:housing-seed": "node scripts/cleanup-housing-seed-data.js",
     "admin:create": "node scripts/create-admin.js",
-    "export:kitchen-items": "node scripts/export-kitchen-items-excel.js"
+    "export:kitchen-items": "node scripts/export-kitchen-items-excel.js",
+    "export:ab-kitchen-items": "node scripts/export-ab-kitchen-items-deduped.js",
+    "export:other-kitchen-items": "node scripts/export-other-kitchen-items-deduped.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"
