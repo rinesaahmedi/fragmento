@@ -39,6 +39,9 @@ const ARTICLE_PRICES = {
   H4502: 139,
   H5002: 135,
   H6002: 149,
+  H8002: 200,
+  H9002: 203,
+  H10002: 209,
   KA220043_S3: 69,
   KHF664611S: 209,
   "OL-KGCN388140E": 579,
@@ -1558,8 +1561,11 @@ function applyDefaultCatalogItem(item) {
       code: DEFAULT_OVEN_HOB_CATALOG_CODE,
       name: DEFAULT_OVEN_HOB_CATALOG_NAME_EN,
       nameDe: DEFAULT_OVEN_HOB_CATALOG_NAME_DE,
-      articleNumber: DEFAULT_OVEN_HOB_CATALOG_ARTICLE,
+      articleNumber: null,
       price: DEFAULT_OVEN_HOB_CATALOG_PRICE,
+      blendeCode: null,
+      blendeLabel: null,
+      blendePrice: null,
     });
   }
 
