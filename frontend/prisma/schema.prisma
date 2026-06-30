@@ -34,16 +34,16 @@ enum AdminRole {
 }
 
 model AdminUser {
-  id                        String    @id @default(cuid())
-  email                     String    @unique
-  passwordHash                String
-  role                      AdminRole @default(ADMIN)
-  isActive                  Boolean   @default(true)
-  loginVerificationCodeHash   String?
-  loginVerificationExpiresAt  DateTime?
-  loginVerificationAttempts Int       @default(0)
-  createdAt                 DateTime  @default(now())
-  updatedAt                 DateTime  @updatedAt
+  id                         String    @id @default(cuid())
+  email                      String    @unique
+  passwordHash               String
+  role                       AdminRole @default(ADMIN)
+  isActive                   Boolean   @default(true)
+  loginVerificationCodeHash  String?
+  loginVerificationExpiresAt DateTime?
+  loginVerificationAttempts  Int       @default(0)
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
 }
 
 model AppSetting {
@@ -51,6 +51,44 @@ model AppSetting {
   value     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model CatalogArticle {
+  id                  String   @id @default(cuid())
+  articleNumber       String   @unique
+  name                String
+  nameDe              String?
+  description         String?
+  price               Decimal  @db.Decimal(10, 2)
+  itemType            ItemType
+  isFixedPricePackage Boolean  @default(false)
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model CatalogBlende {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  nameDe      String?
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CatalogService {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  nameDe      String?
+  description String?
+  price       Decimal  @db.Decimal(10, 2)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Kitchen {
@@ -69,88 +107,88 @@ model Kitchen {
 }
 
 model KitchenItem {
-  id            String      @id @default(cuid())
-  kitchenId     String
-  kitchen       Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  itemType      ItemType
-  code          String
-  articleNumber String?
-  name          String
-  nameDe        String?
-  price         Decimal     @db.Decimal(10, 2)
-  widthMm       Int?
-  heightMm      Int?
-  depthMm       Int?
-  infoText      String?
-  productImagePath String?
+  id                       String      @id @default(cuid())
+  kitchenId                String
+  kitchen                  Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  itemType                 ItemType
+  code                     String
+  articleNumber            String?
+  name                     String
+  nameDe                   String?
+  price                    Decimal     @db.Decimal(10, 2)
+  widthMm                  Int?
+  heightMm                 Int?
+  depthMm                  Int?
+  infoText                 String?
+  productImagePath         String?
   productInfoPdfPath       String?
   productInfoSummary       String?
   productInfoKeyFacts      Json?
   productInfoExtractedText String?
   productInfoUpdatedAt     DateTime?
-  iconKey       String?
-  colorKey      String?
-  componentKey  String?
-  isLocked      Boolean     @default(false)
-  isActive      Boolean     @default(true)
-  sortOrder     Int         @default(0)
-  blendeCode    String?
-  blendeLabel   String?
-  blendePrice   Decimal?    @db.Decimal(10, 2)
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-  orderItems    OrderItem[]
+  iconKey                  String?
+  colorKey                 String?
+  componentKey             String?
+  isLocked                 Boolean     @default(false)
+  isActive                 Boolean     @default(true)
+  sortOrder                Int         @default(0)
+  blendeCode               String?
+  blendeLabel              String?
+  blendePrice              Decimal?    @db.Decimal(10, 2)
+  createdAt                DateTime    @default(now())
+  updatedAt                DateTime    @updatedAt
+  orderItems               OrderItem[]
 
   @@unique([kitchenId, code])
 }
 
 model Order {
-  id                String           @id @default(cuid())
-  orderNumber       String           @unique
-  kitchenId         String
-  kitchen           Kitchen          @relation(fields: [kitchenId], references: [id], onDelete: Restrict)
-  kitchenContractId String?
-  kitchenContract   KitchenContract? @relation(fields: [kitchenContractId], references: [id], onDelete: SetNull)
-  status            OrderStatus      @default(NEW)
-  contractNumber    String?
-  firstName         String
-  lastName          String
-  email             String
-  phone             String
-  address1          String
-  address2          String?
-  postalCode        String
-  city              String
-  country           String?
-  notes             String?
-  paymentMethod     String?
-  paymentStatus     String           @default("UNPAID")
-  stripeCheckoutSessionId String?    @unique
+  id                      String           @id @default(cuid())
+  orderNumber             String           @unique
+  kitchenId               String
+  kitchen                 Kitchen          @relation(fields: [kitchenId], references: [id], onDelete: Restrict)
+  kitchenContractId       String?
+  kitchenContract         KitchenContract? @relation(fields: [kitchenContractId], references: [id], onDelete: SetNull)
+  status                  OrderStatus      @default(NEW)
+  contractNumber          String?
+  firstName               String
+  lastName                String
+  email                   String
+  phone                   String
+  address1                String
+  address2                String?
+  postalCode              String
+  city                    String
+  country                 String?
+  notes                   String?
+  paymentMethod           String?
+  paymentStatus           String           @default("UNPAID")
+  stripeCheckoutSessionId String?          @unique
   stripePaymentIntentId   String?
-  paidAt            DateTime?
-  totalPrice        Decimal          @db.Decimal(10, 2)
-  createdAt         DateTime         @default(now())
-  updatedAt         DateTime         @updatedAt
-  items             OrderItem[]
+  paidAt                  DateTime?
+  totalPrice              Decimal          @db.Decimal(10, 2)
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  items                   OrderItem[]
 
   @@index([kitchenContractId])
 }
 
 model KitchenContract {
-  id             String          @id @default(cuid())
-  contractNumber String          @unique
+  id             String                @id @default(cuid())
+  contractNumber String                @unique
   kitchenId      String
-  kitchen        Kitchen         @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  kitchen        Kitchen               @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
   projectId      String?
-  project        Project?        @relation(fields: [projectId], references: [id], onDelete: Restrict)
-  isActive       Boolean         @default(true)
+  project        Project?              @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  isActive       Boolean               @default(true)
   usedAt         DateTime?
   building       String?
   floor          String?
   unitNumber     String?
   notes          String?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
   orders         Order[]
   registrations  KitchenRegistration[]
 
@@ -159,22 +197,22 @@ model KitchenContract {
 }
 
 model KitchenRegistration {
-  id                String          @id @default(cuid())
-  kitchenContractId String
-  kitchenContract   KitchenContract @relation(fields: [kitchenContractId], references: [id], onDelete: Cascade)
-  fullName          String
-  email             String?
-  phone             String?
-  addressNote       String?
-  isActive          Boolean         @default(true)
-  verificationCodeHash String?
+  id                    String          @id @default(cuid())
+  kitchenContractId     String
+  kitchenContract       KitchenContract @relation(fields: [kitchenContractId], references: [id], onDelete: Cascade)
+  fullName              String
+  email                 String?
+  phone                 String?
+  addressNote           String?
+  isActive              Boolean         @default(true)
+  verificationCodeHash  String?
   verificationExpiresAt DateTime?
-  verificationAttempts Int          @default(0)
-  verifiedAt        DateTime?
-  registeredAt      DateTime        @default(now())
-  deactivatedAt     DateTime?
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
+  verificationAttempts  Int             @default(0)
+  verifiedAt            DateTime?
+  registeredAt          DateTime        @default(now())
+  deactivatedAt         DateTime?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
 
   @@index([kitchenContractId, isActive])
   @@index([email])
@@ -195,18 +233,18 @@ model HousingCompany {
 }
 
 model Project {
-  id               String         @id @default(cuid())
+  id               String            @id @default(cuid())
   name             String
   projectCode      String?
-  status           String         @default("active")
+  status           String            @default("active")
   description      String?
   managerName      String?
   housingCompanyId String
-  housingCompany   HousingCompany @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
-  propertyObjectId String         @unique
-  propertyObject   PropertyObject @relation(fields: [propertyObjectId], references: [id], onDelete: Cascade)
-  createdAt        DateTime       @default(now())
-  updatedAt        DateTime       @updatedAt
+  housingCompany   HousingCompany    @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
+  propertyObjectId String            @unique
+  propertyObject   PropertyObject    @relation(fields: [propertyObjectId], references: [id], onDelete: Cascade)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
   contracts        KitchenContract[]
 
   @@unique([housingCompanyId, name])
@@ -214,10 +252,10 @@ model Project {
 }
 
 model PropertyObject {
-  id               String            @id @default(cuid())
+  id               String         @id @default(cuid())
   name             String
   housingCompanyId String
-  housingCompany   HousingCompany    @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
+  housingCompany   HousingCompany @relation(fields: [housingCompanyId], references: [id], onDelete: Cascade)
   project          Project?
   contactPhone     String?
   country          String?
@@ -225,8 +263,8 @@ model PropertyObject {
   postalCode       String?
   address1         String?
   address2         String?
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   @@index([housingCompanyId])
 }
@@ -246,30 +284,30 @@ model OrderItem {
 }
 
 model ServiceClaim {
-  id                 String   @id
-  contractNumber     String
-  fullName           String
-  phone              String?
-  email              String?
-  clientAddress      String?
-  clientCountry      String?
-  clientCity         String?
-  clientPostalCode   String?
-  landlordName            String?
-  landlordCompanyPhone    String?
-  landlordCompanyEmail    String?
-  landlordPhone           String?
-  landlordEmail           String?
-  hausmeisterName    String?
-  hausmeisterPhone   String?
-  hausmeisterEmail   String?
-  landlordContact    String
-  problemDescription String
-  serialNumber       String
-  requestType        String   @default("complaint")
-  problemAreasJson   String?  @db.Text
-  attachmentsJson    String?  @db.Text
-  createdAt          DateTime @default(now())
+  id                   String   @id
+  contractNumber       String
+  fullName             String
+  phone                String?
+  email                String?
+  clientAddress        String?
+  clientCountry        String?
+  clientCity           String?
+  clientPostalCode     String?
+  landlordName         String?
+  landlordCompanyPhone String?
+  landlordCompanyEmail String?
+  landlordPhone        String?
+  landlordEmail        String?
+  hausmeisterName      String?
+  hausmeisterPhone     String?
+  hausmeisterEmail     String?
+  landlordContact      String
+  problemDescription   String
+  serialNumber         String
+  requestType          String   @default("complaint")
+  problemAreasJson     String?  @db.Text
+  attachmentsJson      String?  @db.Text
+  createdAt            DateTime @default(now())
 
   @@index([contractNumber])
   @@index([createdAt])
