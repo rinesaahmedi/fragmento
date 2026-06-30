@@ -276,6 +276,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-2", points: [[29.52, 10.06], [42.75, 8.12], [47.48, 9.4], [35.48, 11.13]] },
     { componentKey: "wall-cabinet-2", points: [[35.48, 11.13], [47.48, 9.4], [47.48, 37.86], [35.48, 39.6]] },
     { componentKey: "extractor-hood", points: [[35.48, 39.6], [47.48, 37.86], [47.48, 39.4], [35.48, 41.3]] },
+    { componentKey: "extractor-hood", points: [[35.98, 43.1], [47.0, 41.5], [47.0, 39.4], [35.98, 39.75]] },
     { componentKey: "wall-cabinet-3", points: [[42.75, 8.32], [54.83, 5.76], [60.28, 7.78], [47.48, 9.55]] },
     { componentKey: "wall-cabinet-3", points: [[47.48, 9.55], [59.48, 7.84], [59.48, 33.98], [47.48, 37.48]] },
     { componentKey: "wall-cabinet-3", points: [[59.48, 7.84], [60.28, 7.78], [60.28, 33.9], [59.48, 33.98]] },

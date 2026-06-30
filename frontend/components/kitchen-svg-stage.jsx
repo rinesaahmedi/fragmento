@@ -290,7 +290,8 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-2", points: [ [35.48, 37.86], [35.48, 39.6], [29.52, 38.55]] },
     { componentKey: "wall-cabinet-2", points: [[29.52, 10.06], [42.75, 8.12], [47.48, 9.4], [35.48, 11.13]] },
     { componentKey: "wall-cabinet-2", points: [[35.48, 11.13], [47.48, 9.4], [47.48, 37.86], [35.48, 39.6]] },
-    { componentKey: "extractor-hood", points: [[35.48, 39.6], [47.48, 37.86], [47.48, 39.4], [35.48, 41.3]] },
+    
+    { componentKey: "extractor-hood", points: [[35.98, 44.3], [47.0, 42.9], [47.0, 38.0], [35.98, 39.65]] },
     { componentKey: "wall-cabinet-3", points: [[42.75, 8.32], [54.53, 6.76], [60.28, 7.78], [47.48, 9.55]] },
     { componentKey: "wall-cabinet-3", points: [[47.48, 9.55], [59.48, 7.84], [59.48, 33.98], [47.48, 36.18]] },
     { componentKey: "wall-cabinet-3", points: [[59.48, 7.84], [60.58, 7.78], [60.58, 33.9], [59.48, 33.98]] },

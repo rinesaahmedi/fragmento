@@ -115,6 +115,10 @@ test("AB 105834 hood bottom side strip belongs to the hood cabinet", () => {
     hotspot.points?.some(([x, y]) => x === 35.48 && y === 39.6)
     && hotspot.points?.some(([x, y]) => x === 29.52 && y === 38.55)
   );
+  const hoodLedArea = PLAN_HOTSPOTS_BY_SLUG["ab-105834"].find((hotspot) =>
+    hotspot.points?.some(([x, y]) => x === 35.98 && y === 43.1)
+    && hotspot.points?.some(([x, y]) => x === 47.0 && y === 39.4)
+  );
   const wallCabinetSideFace = PLAN_HOTSPOTS_BY_SLUG["ab-105834"].find((hotspot) =>
     hotspot.points?.some(([x, y]) => x === 25.51 && y === 12.58)
     && hotspot.points?.some(([x, y]) => x === 29.52 && y === 27.34)
@@ -122,6 +126,8 @@ test("AB 105834 hood bottom side strip belongs to the hood cabinet", () => {
 
   assert.ok(hoodBottomSideStrip);
   assert.equal(hoodBottomSideStrip.componentKey, "wall-cabinet-2");
+  assert.ok(hoodLedArea);
+  assert.equal(hoodLedArea.componentKey, "extractor-hood");
   assert.ok(wallCabinetSideFace);
   assert.equal(wallCabinetSideFace.componentKey, "wall-cabinet-1");
 });
