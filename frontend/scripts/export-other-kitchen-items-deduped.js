@@ -8,14 +8,14 @@ const {
   parseArgs,
   buildRows,
   writeWorkbook,
-  abKitchenExportWhere,
+  otherKitchenExportWhere,
 } = require("./lib/kitchen-items-deduped-export");
 
 const prisma = new PrismaClient();
 
 function defaultOutputPath() {
   const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-  return path.join(process.cwd(), "exports", `ab-kitchen-items-deduped-${stamp}.xlsx`);
+  return path.join(process.cwd(), "exports", `other-kitchen-items-deduped-${stamp}.xlsx`);
 }
 
 async function main() {
@@ -26,7 +26,7 @@ async function main() {
     where: {
       itemType: { in: [ItemType.COMPONENT, ItemType.ACCESSORY] },
       ...(options.includeInactive ? {} : { isActive: true }),
-      kitchen: abKitchenExportWhere(options.includeInactive, KitchenStatus),
+      kitchen: otherKitchenExportWhere(options.includeInactive, KitchenStatus),
     },
     include: {
       kitchen: {
@@ -47,9 +47,9 @@ async function main() {
   });
 
   const rows = buildRows(items);
-  writeWorkbook(rows, outPath, "AB items");
+  writeWorkbook(rows, outPath, "Other items");
 
-  console.log(`Exported ${rows.length} unique rows from ${items.length} AB kitchen item rows.`);
+  console.log(`Exported ${rows.length} unique rows from ${items.length} non-AB kitchen item rows.`);
   console.log(outPath);
 }
 
