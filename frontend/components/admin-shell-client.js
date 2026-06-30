@@ -12,6 +12,10 @@ const navItems = [
   { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
   { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon, requiresClaimsNav: true },
+  { href: "/admin/catalog-audit", labelKey: "adminShellLogin.catalogAudit", fallback: "Catalog Audit", icon: CatalogAuditIcon },
+  { href: "/admin/catalog/articles", labelKey: "adminShellLogin.catalogArticles", fallback: "Catalog Articles", icon: CatalogAuditIcon },
+  { href: "/admin/catalog/blenden", labelKey: "adminShellLogin.catalogBlenden", fallback: "Catalog Blenden", icon: CatalogAuditIcon },
+  { href: "/admin/catalog/services", labelKey: "adminShellLogin.catalogServices", fallback: "Catalog Services", icon: CatalogAuditIcon },
   { href: "/admin/settings", labelKey: "adminShellLogin.settings", fallback: "Settings", icon: SettingsIcon },
   { href: "/admin/account", labelKey: "adminShellLogin.account", fallback: "Account", icon: AccountIcon },
   { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
@@ -742,6 +746,19 @@ function SettingsIcon({ active }) {
           strokeWidth="1.2"
           strokeLinecap="round"
         />
+      </svg>
+    </IconFrame>
+  );
+}
+
+function CatalogAuditIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="2.75" y="3" width="10.5" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M5.25 6H10.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M5.25 8.5H8.25" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M10.25 10.75L11.1 11.6L12.75 9.75" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     </IconFrame>
   );
