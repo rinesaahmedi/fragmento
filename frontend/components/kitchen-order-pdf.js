@@ -191,14 +191,17 @@ export async function generateOrderPdf(order) {
     doc.setFont("helvetica", "normal");
 
     expandItemsWithBlende(items).forEach((item) => {
-      const nameLines = doc.splitTextToSize(item.name || "", 230);
+      const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
+      const lineTotal = Number(item.price || 0) * quantity;
+      const displayName = quantity > 1 ? `${item.name || ""} (${quantity}x)` : (item.name || "");
+      const nameLines = doc.splitTextToSize(displayName, 230);
       const rowHeight = Math.max(nameLines.length, 1) * lineHeight + 5;
       ensureSpace(rowHeight);
       nameLines.forEach((line, index) => {
         doc.text(line, margin, y + index * lineHeight);
       });
       doc.text(item.code || "-", margin + 250, y);
-      doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
+      doc.text(formatCurrency(lineTotal), pageWidth - margin, y, { align: "right" });
       y += rowHeight;
     });
 

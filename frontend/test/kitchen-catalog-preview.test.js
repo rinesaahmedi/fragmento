@@ -110,6 +110,22 @@ test("AB 105809 oven preview uses polygon outline instead of oversized bbox", ()
   assert.ok(ovenHotspots[0].outlinePoints.length >= 3);
 });
 
+test("AB 105834 hood bottom side strip belongs to the hood cabinet", () => {
+  const hoodBottomSideStrip = PLAN_HOTSPOTS_BY_SLUG["ab-105834"].find((hotspot) =>
+    hotspot.points?.some(([x, y]) => x === 35.48 && y === 39.6)
+    && hotspot.points?.some(([x, y]) => x === 29.52 && y === 38.55)
+  );
+  const wallCabinetSideFace = PLAN_HOTSPOTS_BY_SLUG["ab-105834"].find((hotspot) =>
+    hotspot.points?.some(([x, y]) => x === 25.51 && y === 12.58)
+    && hotspot.points?.some(([x, y]) => x === 29.52 && y === 27.34)
+  );
+
+  assert.ok(hoodBottomSideStrip);
+  assert.equal(hoodBottomSideStrip.componentKey, "wall-cabinet-2");
+  assert.ok(wallCabinetSideFace);
+  assert.equal(wallCabinetSideFace.componentKey, "wall-cabinet-1");
+});
+
 test("AB 105821 corner cabinet previews include left blende in the cabinet bounds", () => {
   const preview = getKitchenCatalogImagePreview("ab-105821");
   const wallHotspots = getKitchenCatalogPreviewHotspots(preview, "wall-cabinet-1");

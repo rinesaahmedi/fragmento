@@ -71,12 +71,15 @@ function getEffectiveSummaryPrice(item) {
   if (item?.isLocked || item?.isOrderLocked) {
     return 0;
   }
-  return Number(item?.price || 0);
+  const unitPrice = Number(item?.price || 0);
+  const quantity = Math.max(1, Math.floor(Number(item?.quantity || 1)));
+  return unitPrice * quantity;
 }
 
 function SummaryRow({ item, onRemove, onOpenInfo }) {
   const { translate, language } = usePublicI18n();
   const price = getEffectiveSummaryPrice(item);
+  const quantity = Math.max(1, Math.floor(Number(item?.quantity || 1)));
   const isDefault = Boolean(item.isLocked);
   const isConfirmed = !isDefault && Boolean(item.isOrderLocked);
   const isLocked = isDefault || isConfirmed;
@@ -101,6 +104,11 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{itemName}</strong>
+        {!isLocked && quantity > 1 ? (
+          <span className={styles.summaryQuantity}>
+            {translate("configurator.summaryQuantity", "Quantity")}: {quantity}
+          </span>
+        ) : null}
         {!isLocked && (articleNumber || item.blendeLabel) ? (
           <span className={styles.itemCode}>
             {articleNumber ? `${translate("common.article", "Article")}: ${articleNumber}` : ""}

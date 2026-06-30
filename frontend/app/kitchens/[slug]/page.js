@@ -19,6 +19,8 @@ function serializeOrderItems(items = [], locked = false) {
     itemType: String(item.itemType || "").toLowerCase(),
     code: item.code || "",
     name: item.nameSnapshot || "",
+    articleNumber: item.kitchenItem?.articleNumber || "",
+    quantity: item.quantity || 1,
     locked,
     sourceOrderId: item.sourceOrderId || "",
     sourceOrderNumber: item.sourceOrderNumber || "",

@@ -1017,11 +1017,351 @@
 .togglePill {
   background: #eef8f1;
   color: #257147;
+  border: 0;
+  cursor: pointer;
 }
 
 .lockedPill {
   background: #efe8de;
   color: #7d6750;
+}
+
+.cutleryCard {
+  cursor: default;
+  overflow: visible;
+}
+
+.cutleryCard:has(.cutleryDropdownTriggerOpen) {
+  z-index: 5;
+}
+
+.cutleryCard:hover {
+  transform: none;
+}
+
+.cutleryPanel {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfaf7 0%, #f6f1ea 100%);
+  border: 1px solid rgba(120, 90, 64, 0.12);
+  overflow: visible;
+}
+
+.cutleryFieldLabel {
+  display: block;
+  margin: 0 0 6px;
+  color: #7d6750;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cutleryDropdownWrap {
+  position: relative;
+  z-index: 4;
+}
+
+.cutleryDropdownTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgba(120, 90, 64, 0.2);
+  border-radius: 12px;
+  background: #fff;
+  color: #3f372f;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.cutleryDropdownTrigger:hover {
+  border-color: rgba(42, 145, 85, 0.35);
+}
+
+.cutleryDropdownTriggerOpen,
+.cutleryDropdownTrigger:focus-visible {
+  outline: none;
+  border-color: #2a9155;
+  box-shadow: 0 0 0 3px rgba(42, 145, 85, 0.14);
+}
+
+.cutleryDropdownTriggerFilled .cutleryDropdownTriggerLabel {
+  color: #2f2a24;
+}
+
+.cutleryDropdownTriggerLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #7d7166;
+}
+
+.cutleryDropdownChevron {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #7d7166;
+  border-bottom: 2px solid #7d7166;
+  transform: rotate(45deg) translateY(-2px);
+  flex-shrink: 0;
+  transition: transform 0.16s ease;
+}
+
+.cutleryDropdownTriggerOpen .cutleryDropdownChevron {
+  transform: rotate(-135deg) translateY(2px);
+}
+
+.cutleryDropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 240px;
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  overflow-y: auto;
+  border: 1px solid rgba(120, 90, 64, 0.16);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 16px 32px rgba(71, 46, 20, 0.12);
+}
+
+.cutleryDropdownOption {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #3f372f;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cutleryDropdownOption:hover {
+  background: #f8f4ee;
+}
+
+.cutleryDropdownOptionSelected {
+  background: #f3faf5;
+}
+
+.cutleryDropdownOptionSelected:hover {
+  background: #eaf5ee;
+}
+
+.cutleryDropdownCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid rgba(120, 90, 64, 0.22);
+  border-radius: 5px;
+  color: #2a9155;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.cutleryDropdownOptionSelected .cutleryDropdownCheck {
+  border-color: #2a9155;
+  background: #2a9155;
+  color: #fff;
+}
+
+.cutleryDropdownOptionLabel {
+  font-weight: 600;
+}
+
+.cutleryDropdownOptionPrice {
+  color: #1874ff;
+  font-size: 0.86rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cutlerySelectionList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(120, 90, 64, 0.12);
+}
+
+.cutlerySelectionTitle {
+  margin: 0;
+  color: #7d6750;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cutlerySelectionRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(120, 90, 64, 0.12);
+}
+
+.cutlerySelectionMain {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.cutlerySelectionMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.cutlerySelectionMeta strong {
+  font-size: 0.98rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.cutlerySelectionArticle {
+  color: #7d7166;
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.cutlerySelectionQty {
+  color: #7d7166;
+  font-size: 0.92rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cutlerySelectionTotal {
+  color: #1874ff;
+  font-size: 0.98rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.cutlerySelectionEnd {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.cutleryCardFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.cutleryQuantityWrap {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.cutleryQuantityButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #5f564d;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.cutleryQuantityButton + .cutleryQuantityInput {
+  border-left: 1px solid rgba(120, 90, 64, 0.12);
+  border-right: 1px solid rgba(120, 90, 64, 0.12);
+}
+
+.cutleryQuantityButton:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cutleryQuantityInput {
+  width: 24px;
+  min-width: 24px;
+  min-height: 22px;
+  border: 0;
+  background: transparent;
+  color: #2f2a24;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 0;
+}
+
+.cutleryQuantityInput::-webkit-outer-spin-button,
+.cutleryQuantityInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cutleryLineRemove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  color: #8a7d70;
+  font-size: 1.35rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.cutleryLineRemove:hover {
+  color: #6d3829;
+}
+
+.summaryQuantity {
+  display: block;
+  color: #7d7166;
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
 .ruleHint {

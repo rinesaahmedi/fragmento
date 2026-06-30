@@ -25,6 +25,7 @@ import {
   normalizeContractNumber,
 } from "./kitchen-contracts";
 import { prisma } from "./prisma";
+import { isCutleryAccessoryCode } from "./cutlery-accessories";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -110,34 +111,60 @@ function validateConsent(value) {
 }
 
 function normalizeSubmissionItems(items = []) {
-  const seen = new Set();
-  return items
-    .map((item) => ({
-      code: item?.code ? String(item.code) : null,
-      name: item?.name ? String(item.name) : null,
-    }))
-    .filter((item) => {
-      if (!item.code && !item.name) return false;
-      const key = item.code || item.name;
-      if (seen.has(key)) return false;
-      seen.add(key);
-      return true;
+  const merged = new Map();
+
+  for (const item of items) {
+    const code = item?.code ? String(item.code) : null;
+    const name = item?.name ? String(item.name) : null;
+    if (!code && !name) continue;
+
+    const articleNumber = item?.articleNumber ? String(item.articleNumber).trim().toUpperCase() : null;
+    const quantity = Math.max(1, Math.min(99, Math.floor(Number(item?.quantity || 1))));
+    const price = item?.price != null && Number.isFinite(Number(item.price)) ? Number(item.price) : null;
+    const key = articleNumber ? `${code || ""}|${articleNumber}` : (code || name);
+
+    if (merged.has(key)) {
+      const existing = merged.get(key);
+      existing.quantity = Math.min(99, existing.quantity + quantity);
+      continue;
+    }
+
+    merged.set(key, {
+      code,
+      name,
+      articleNumber,
+      price,
+      quantity,
     });
+  }
+
+  return [...merged.values()];
 }
 
 function mapCatalogItem(catalogItems, submittedItem, itemType) {
-  return (
+  const matched =
     catalogItems.find((item) => item.itemType === itemType && item.code === submittedItem.code) ||
     catalogItems.find((item) => item.itemType === itemType && item.name === submittedItem.name) ||
-    null
-  );
+    null;
+
+  if (!matched) return null;
+
+  return {
+    ...matched,
+    name: submittedItem.name || matched.name,
+    articleNumber: submittedItem.articleNumber || matched.articleNumber,
+    price: submittedItem.price != null ? submittedItem.price : matched.price,
+    quantity: submittedItem.quantity || 1,
+  };
 }
 
 function getOrderItemEffectivePrice(item) {
   if (item?.isLocked || item?.isOrderLocked || item?.kitchenItem?.isLocked) {
     return 0;
   }
-  return Number(item?.priceSnapshot ?? item?.price ?? 0);
+  const unitPrice = Number(item?.priceSnapshot ?? item?.price ?? 0);
+  const quantity = Math.max(1, Math.floor(Number(item?.quantity || 1)));
+  return unitPrice * quantity;
 }
 
 export function buildOrderForNotifications(orderRecord) {
@@ -145,6 +172,7 @@ export function buildOrderForNotifications(orderRecord) {
     code: item.code,
     name: item.nameSnapshot || item.name || "",
     price: getOrderItemEffectivePrice(item),
+    quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
     iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
     productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
     productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
@@ -265,6 +293,10 @@ async function processOrderNotifications({ order, pdfBase64, pdfFilename, runEma
 }
 
 function itemKey(item) {
+  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+  if (articleNumber && isCutleryAccessoryCode(item.code)) {
+    return `${item.itemType}:${item.code}:${articleNumber}`;
+  }
   return `${item.itemType}:${item.code}`;
 }
 
@@ -474,8 +506,8 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
               itemType: item.itemType,
               code: item.code,
               nameSnapshot: item.name,
-              priceSnapshot: getOrderItemEffectivePrice(item),
-              quantity: 1,
+              priceSnapshot: Number(item.price),
+              quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
             })),
           });
         }

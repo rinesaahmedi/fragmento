@@ -27,7 +27,7 @@ export function getSummaryMetaLabel(item) {
   if (price <= 0) {
     return "Im Grundmodell enthalten";
   }
-  return "Standardausstattung";
+  return "Basisausstattung";
 }
 
 export function normalizeColor(value) {

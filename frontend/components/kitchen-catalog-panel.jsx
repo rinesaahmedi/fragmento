@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import {
   componentIdForItem,
@@ -16,6 +17,12 @@ import {
   splitCatalogItemNameAndDimensions,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
+import {
+  CUTLERY_VARIANTS,
+  getCutleryVariant,
+  getCutleryVariantLabel,
+  isCutleryAccessoryItem,
+} from "../lib/cutlery-accessories";
 import {
   getServiceDisabledReason,
   SERVICE_CODE_MONTAGE,
@@ -359,6 +366,247 @@ function CatalogItem({
   );
 }
 
+function CutleryInsertAccessoryCard({
+  item,
+  lines,
+  locked,
+  onToggleCutleryVariant,
+  onUpdateCutleryLineQuantity,
+  onOpenInfo,
+}) {
+  const { translate, language } = usePublicI18n();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const itemName = translate("configurator.cutleryInsertTitle", "Cutlery insert");
+  const itemInfoText = getLocalizedItemInfoText(item, translate);
+  const selectedArticleNumbers = new Set(lines.map((line) => line.articleNumber));
+  const selected = lines.length > 0;
+  const linesTotal = lines.reduce((sum, line) => {
+    const variant = getCutleryVariant(line.articleNumber);
+    return sum + (variant?.price || 0) * line.quantity;
+  }, 0);
+  const className = [
+    styles.itemCard,
+    styles.itemCardCompact,
+    styles.cutleryCard,
+    selected ? styles.itemCardSelected : "",
+    locked ? styles.itemCardLocked : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const iconMarkup = ICON_MARKUP.cutlery_insert;
+  const infoPdfHref = getProductInfoHref(item);
+
+  function clampQuantity(value) {
+    return Math.max(1, Math.min(99, Math.floor(Number(value) || 1)));
+  }
+
+  const dropdownTriggerLabel = (() => {
+    if (!lines.length) {
+      return translate("configurator.cutleryDropdownPlaceholder", "Choose widths...");
+    }
+    if (lines.length === 1) {
+      const variant = getCutleryVariant(lines[0].articleNumber);
+      return variant
+        ? `${variant.widthCm} cm`
+        : getCutleryVariantLabel(variant, translate, language) || lines[0].articleNumber;
+    }
+    return translate("configurator.cutleryDropdownSelectedCount", "{count} widths selected", {
+      count: lines.length,
+    });
+  })();
+
+  useEffect(() => {
+    if (!isDropdownOpen) return undefined;
+
+    function handlePointerDown(event) {
+      if (!dropdownRef.current?.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    return () => document.removeEventListener("mousedown", handlePointerDown);
+  }, [isDropdownOpen]);
+
+  return (
+    <div className={className}>
+      <div className={styles.itemTop}>
+        <span className={[styles.itemIcon, styles.itemIconCompact].join(" ")} dangerouslySetInnerHTML={{ __html: iconMarkup }} />
+        <div className={styles.itemText}>
+          <strong>{itemName}</strong>
+          <span className={styles.itemCode}>
+            {translate("configurator.cutleryInsertHint", "Select one or more widths")}
+          </span>
+        </div>
+        <span className={styles.itemPrice}>
+          {selected
+            ? formatCurrency(linesTotal)
+            : translate("configurator.cutleryPriceFrom", "from {price}", {
+                price: formatCurrency(CUTLERY_VARIANTS[0]?.price || item.price),
+              })}
+        </span>
+      </div>
+
+      {!locked ? (
+        <div className={styles.cutleryPanel} onClick={(event) => event.stopPropagation()}>
+          <label className={styles.cutleryFieldLabel} htmlFor="cutlery-width-dropdown">
+            {translate("configurator.cutleryDimension", "Width")}
+          </label>
+          <div className={styles.cutleryDropdownWrap} ref={dropdownRef}>
+            <button
+              id="cutlery-width-dropdown"
+              type="button"
+              className={[
+                styles.cutleryDropdownTrigger,
+                isDropdownOpen ? styles.cutleryDropdownTriggerOpen : "",
+                lines.length ? styles.cutleryDropdownTriggerFilled : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              aria-haspopup="listbox"
+              aria-expanded={isDropdownOpen}
+              onClick={() => setIsDropdownOpen((open) => !open)}
+            >
+              <span className={styles.cutleryDropdownTriggerLabel}>{dropdownTriggerLabel}</span>
+              <span className={styles.cutleryDropdownChevron} aria-hidden="true" />
+            </button>
+            {isDropdownOpen ? (
+              <ul className={styles.cutleryDropdownMenu} role="listbox" aria-multiselectable="true">
+                {CUTLERY_VARIANTS.map((variant) => {
+                  const isSelected = selectedArticleNumbers.has(variant.articleNumber);
+                  const optionClassName = [
+                    styles.cutleryDropdownOption,
+                    isSelected ? styles.cutleryDropdownOptionSelected : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ");
+
+                  return (
+                    <li key={variant.articleNumber} role="option" aria-selected={isSelected}>
+                      <button
+                        type="button"
+                        className={optionClassName}
+                        onClick={() => onToggleCutleryVariant?.(variant.articleNumber)}
+                      >
+                        <span className={styles.cutleryDropdownCheck} aria-hidden="true">
+                          {isSelected ? "✓" : ""}
+                        </span>
+                        <span className={styles.cutleryDropdownOptionLabel}>
+                          {getCutleryVariantLabel(variant, translate, language)}
+                        </span>
+                        <span className={styles.cutleryDropdownOptionPrice}>{formatCurrency(variant.price)}</span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      {lines.length ? (
+        <div className={styles.cutlerySelectionList}>
+          <p className={styles.cutlerySelectionTitle}>
+            {translate("configurator.cutlerySelectedTitle", "Selected")}
+          </p>
+          {lines.map((line) => {
+            const variant = getCutleryVariant(line.articleNumber);
+            const lineLabel = getCutleryVariantLabel(variant, translate, language);
+            const lineTotal = (variant?.price || 0) * line.quantity;
+
+            return (
+              <div key={line.id} className={styles.cutlerySelectionRow}>
+                <div className={styles.cutlerySelectionMain}>
+                  <div className={styles.cutlerySelectionMeta}>
+                    <strong>{variant?.widthCm ? `${variant.widthCm} cm` : lineLabel}</strong>
+                    <span className={styles.cutlerySelectionArticle}>{line.articleNumber}</span>
+                  </div>
+                  {!locked ? (
+                    <div className={styles.cutleryQuantityWrap}>
+                      <button
+                        type="button"
+                        className={styles.cutleryQuantityButton}
+                        aria-label={translate("configurator.cutleryDecreaseQuantity", "Decrease quantity")}
+                        disabled={line.quantity <= 1}
+                        onClick={() => onUpdateCutleryLineQuantity?.(line.articleNumber, line.quantity - 1)}
+                      >
+                        -
+                      </button>
+                      <input
+                        className={styles.cutleryQuantityInput}
+                        type="number"
+                        min="1"
+                        max="99"
+                        value={line.quantity}
+                        onChange={(event) => onUpdateCutleryLineQuantity?.(line.articleNumber, clampQuantity(event.target.value))}
+                      />
+                      <button
+                        type="button"
+                        className={styles.cutleryQuantityButton}
+                        aria-label={translate("configurator.cutleryIncreaseQuantity", "Increase quantity")}
+                        disabled={line.quantity >= 99}
+                        onClick={() => onUpdateCutleryLineQuantity?.(line.articleNumber, line.quantity + 1)}
+                      >
+                        +
+                      </button>
+                    </div>
+                  ) : (
+                    <span className={styles.cutlerySelectionQty}>
+                      × {line.quantity}
+                    </span>
+                  )}
+                </div>
+                <div className={styles.cutlerySelectionEnd}>
+                  <span className={styles.cutlerySelectionTotal}>{formatCurrency(lineTotal)}</span>
+                  {!locked ? (
+                    <button
+                      type="button"
+                      className={styles.cutleryLineRemove}
+                      aria-label={translate("common.remove", "Remove")}
+                      onClick={() => onToggleCutleryVariant?.(line.articleNumber)}
+                    >
+                      ×
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {infoPdfHref ? (
+        <div className={styles.cutleryCardFooter}>
+          <span className={styles.itemInfoWrap}>
+            <button
+              type="button"
+              className={styles.itemInfoTrigger}
+              aria-label={translate("configurator.infoForItem", "Info about {name}", { name: itemName })}
+              onClick={(event) => {
+                event.stopPropagation();
+                onOpenInfo?.({
+                  item: {
+                    ...item,
+                    name: itemName,
+                    infoText: itemInfoText,
+                    productInfoDocuments: getProductInfoDocuments(item),
+                  },
+                  price: linesTotal || CUTLERY_VARIANTS[0]?.price || item.price,
+                  infoPdfHref,
+                });
+              }}
+            >
+              i
+            </button>
+          </span>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function KitchenCatalogPanel({
   kitchenConfig,
   kitchenSlug,
@@ -376,6 +624,9 @@ export default function KitchenCatalogPanel({
   setSelectedComponentIds,
   onToggleAccessory,
   onToggleService,
+  cutleryLines = [],
+  onToggleCutleryVariant,
+  onUpdateCutleryLineQuantity,
   onOpenProductInfo,
   onOpenProductPhotos,
   onOpenProductAssistantFromItem,
@@ -428,21 +679,37 @@ export default function KitchenCatalogPanel({
         <section className={styles.catalogSection}>
           <h3>{translate("configurator.accessories", "Accessories")}</h3>
           <div className={styles.catalogGrid}>
-            {kitchenConfig.accessories.map((item) => (
-              <CatalogItem
-                key={item.id}
-                item={item}
-                selected={selectedAccessoryCodes.includes(item.code)}
-                locked={orderLockedAccessoryCodes.has(item.code)}
-                compactIcon
-                infoPdfHref={getProductInfoHref(item)}
-                onOpenInfo={onOpenProductInfo}
-                onOpenPhotos={onOpenProductPhotos}
-                productAssistantEnabled={shouldShowProductAssistantLauncher(item)}
-                onOpenProductAssistant={onOpenProductAssistantFromItem}
-                onClick={() => onToggleAccessory(item.code)}
-              />
-            ))}
+            {kitchenConfig.accessories.map((item) => {
+              if (isCutleryAccessoryItem(item)) {
+                return (
+                  <CutleryInsertAccessoryCard
+                    key={item.id}
+                    item={item}
+                    lines={cutleryLines}
+                    locked={orderLockedAccessoryCodes.has(item.code)}
+                    onToggleCutleryVariant={onToggleCutleryVariant}
+                    onUpdateCutleryLineQuantity={onUpdateCutleryLineQuantity}
+                    onOpenInfo={onOpenProductInfo}
+                  />
+                );
+              }
+
+              return (
+                <CatalogItem
+                  key={item.id}
+                  item={item}
+                  selected={selectedAccessoryCodes.includes(item.code)}
+                  locked={orderLockedAccessoryCodes.has(item.code)}
+                  compactIcon
+                  infoPdfHref={getProductInfoHref(item)}
+                  onOpenInfo={onOpenProductInfo}
+                  onOpenPhotos={onOpenProductPhotos}
+                  productAssistantEnabled={shouldShowProductAssistantLauncher(item)}
+                  onOpenProductAssistant={onOpenProductAssistantFromItem}
+                  onClick={() => onToggleAccessory(item.code)}
+                />
+              );
+            })}
           </div>
         </section>
 

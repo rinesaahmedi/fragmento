@@ -30,7 +30,14 @@ const CATALOG_ARTICLES = [
   { articleNumber: "US90", name: "Lower cabinet with drawer 90", nameDe: "Unterschrank mit Schublade 90", widthMm: 900, heightMm: 720, depthMm: 600, price: "339.00", itemType: ItemType.COMPONENT },
   { articleNumber: "US100", name: "Lower cabinet with drawer 100", nameDe: "Unterschrank mit Schublade 100", widthMm: 1000, heightMm: 720, depthMm: 600, price: "353.00", itemType: ItemType.COMPONENT },
   { articleNumber: "US120", name: "Lower cabinet with drawer 120", nameDe: "Unterschrank mit Schublade 120", widthMm: 1200, heightMm: 720, depthMm: 600, price: "403.00", itemType: ItemType.COMPONENT },
+  { articleNumber: "ZB30SG", name: "Cutlery insert 30 cm", nameDe: "Besteckeinsatz 30 cm", price: "19.00", itemType: ItemType.ACCESSORY },
+  { articleNumber: "ZB40SG", name: "Cutlery insert 40 cm", nameDe: "Besteckeinsatz 40 cm", price: "19.00", itemType: ItemType.ACCESSORY },
+  { articleNumber: "ZB45SG", name: "Cutlery insert 45 cm", nameDe: "Besteckeinsatz 45 cm", price: "22.00", itemType: ItemType.ACCESSORY },
+  { articleNumber: "ZB50SG", name: "Cutlery insert 50 cm", nameDe: "Besteckeinsatz 50 cm", price: "22.00", itemType: ItemType.ACCESSORY },
   { articleNumber: "ZB60SG", name: "Cutlery insert 60 cm", nameDe: "Besteckeinsatz 60 cm", price: "25.00", itemType: ItemType.ACCESSORY },
+  { articleNumber: "ZB80SG", name: "Cutlery insert 80 cm", nameDe: "Besteckeinsatz 80 cm", price: "31.00", itemType: ItemType.ACCESSORY },
+  { articleNumber: "ZB90SG", name: "Cutlery insert 90 cm", nameDe: "Besteckeinsatz 90 cm", price: "31.00", itemType: ItemType.ACCESSORY },
+  { articleNumber: "ZB100SG", name: "Cutlery insert 100 cm", nameDe: "Besteckeinsatz 100 cm", price: "36.00", itemType: ItemType.ACCESSORY },
 ];
 
 const CATALOG_BLENDES = [
