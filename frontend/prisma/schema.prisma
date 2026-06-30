@@ -59,6 +59,9 @@ model CatalogArticle {
   name                String
   nameDe              String?
   description         String?
+  widthMm             Int?
+  heightMm            Int?
+  depthMm             Int?
   price               Decimal       @db.Decimal(10, 2)
   itemType            ItemType
   isFixedPricePackage Boolean       @default(false)
