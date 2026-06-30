@@ -1,0 +1,4 @@
+ALTER TABLE "CatalogArticle"
+ADD COLUMN "widthMm" INTEGER,
+ADD COLUMN "heightMm" INTEGER,
+ADD COLUMN "depthMm" INTEGER;

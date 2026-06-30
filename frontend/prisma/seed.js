@@ -1029,27 +1029,6 @@ const AB_105841_ITEMS = [
 const AB_105838_ITEMS = AB_105841_ITEMS;
 const AB_105844_ITEMS = AB_105841_ITEMS;
 
-const MODEL_C_ITEMS = [
-  { itemType: ItemType.COMPONENT, code: "REF-C-545-1800-700", legacyCode: "model-c-refrigerator", name: "Freestanding refrigerator 178cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 180 cm, NoFrost", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "HOOD-C-FH664621E", legacyCode: "model-c-extractor-hood", name: "Angled extractor hood + Filter", nameDe: "Schrägesse + Filter", price: articlePrice("KHF664611S"), iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 20, infoText: "Chimney hood, 60 cm", articleNumber: "KHF664611S" },
-  { itemType: ItemType.COMPONENT, code: "CAB-COOK-C-L-600", legacyCode: "model-c-cook-base-left", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "cook-base-left", sortOrder: 30, articleNumber: "US60" },
-  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", legacyCode: "model-c-oven-base", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, heightMm: null, depthMm: null, iconKey: "oven_base", colorKey: "#00c76a", componentKey: "oven-base", sortOrder: 40, infoText: "Built-in oven + induction hob", isLocked: true },
-  { itemType: ItemType.COMPONENT, code: "CAB-COOK-C-R-600", legacyCode: "model-c-cook-base-right", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "cook-base-right", sortOrder: 50, articleNumber: "US60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-C-L-600", legacyCode: "model-c-wall-cabinet-1", name: "Wall Cabinet left", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 60, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-C-ML-600", legacyCode: "model-c-wall-cabinet-2", name: "Wall Cabinet mid-left", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_standard", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 70, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-C-MR-600", legacyCode: "model-c-wall-cabinet-3", name: "Wall Cabinet mid-right", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_standard", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 80, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-C-R-600", legacyCode: "model-c-wall-cabinet-4", name: "Wall Cabinet right", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_standard", colorKey: "#ff7f9f", componentKey: "wall-cabinet-4", sortOrder: 90, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "LIGHT-C-LED-001", legacyCode: "model-c-under-cabinet-light", name: "LED Lighting Set", price: articlePrice("KA220043_S3"), iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 100, infoText: "LED lighting set", articleNumber: "KA220043_S3" },
-  { itemType: ItemType.COMPONENT, code: "WM-C-EWA34660W", legacyCode: "model-c-wm-base", name: "Washing machine + front + side panel", nameDe: "Waschmaschine + Front + Wange", price: articlePrice("EWA34660W + TGV60 + WU16"), widthMm: 600, heightMm: null, depthMm: null, iconKey: "washing_machine_base", colorKey: "springgreen", componentKey: "wm-base", sortOrder: 110, infoText: "EWA34660W, 8 kg, 1400 rpm", articleNumber: "EWA34660W + TGV60 + WU16" },
-  { itemType: ItemType.COMPONENT, code: "SINKBASE-B-600", legacyCode: "model-c-sink-base", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 600, heightMm: null, depthMm: null, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 120, isLocked: true, infoText: "Default sink base cabinet" },
-  { itemType: ItemType.COMPONENT, code: "DISH-C-600-STD", legacyCode: "model-c-dishwasher-base", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 130, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  { itemType: ItemType.COMPONENT, code: "TOP-C-4000", legacyCode: "model-c-worktop", name: "Worktop", price: "0.00", widthMm: null, heightMm: null, depthMm: null, iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 135, isLocked: true, infoText: "PLS, concrete slate gray" },
-  { itemType: ItemType.COMPONENT, code: "CAB-DRAWER-C-3D", legacyCode: "model-c-drawer-base-3", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-base-3", sortOrder: 140, articleNumber: "US60" },
-  defaultSinkWorktop({ legacyCode: "model-c-sink-faucet", sortOrder: 150 }),
-  ...defaultAccessories(),
-  ...defaultServices(),
-];
-
 const AB_105831_ITEMS = [
 
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, heightMm: null, depthMm: null, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -1157,13 +1136,6 @@ const AB_105815_ITEMS = AB_105811_ITEMS.map((item) => ({
 }));
 
 const DEFAULT_KITCHENS = [
-  {
-    slug: "kitchen-model-c",
-    kitchenCode: "560303",
-    name: "Split Kitchen",
-    description: "Two-part layout with separated zones for flexibility",
-    items: MODEL_C_ITEMS,
-  },
   {
     slug: "ab-105806",
     kitchenCode: "105 806",
@@ -1461,7 +1433,6 @@ const DEFAULT_KITCHENS = [
 ];
 
 const DEFAULT_KITCHEN_CONTRACTS = [
-  { contractNumber: "736269", kitchenSlug: "kitchen-model-c" },
   { contractNumber: "670108134", kitchenSlug: "108134-modul-1" },
   ...DEFAULT_KITCHENS
     .filter((kitchen) => kitchen.slug.startsWith("ab-"))
@@ -1472,6 +1443,7 @@ const DEFAULT_KITCHEN_CONTRACTS = [
 ];
 
 const OBSOLETE_KITCHENS = [
+  { slug: "kitchen-model-c", contractNumbers: ["736269"] },
   { slug: "kitchen-model-b", contractNumbers: ["736268"] },
   { slug: "l-shaped-kitchen", contractNumbers: ["736270"] },
   { slug: "l-kitchen-new", contractNumbers: ["736271"] },

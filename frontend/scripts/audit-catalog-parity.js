@@ -684,8 +684,8 @@ async function main() {
     || result.inactiveCatalogLinks.length > 0
     || result.markerProblemRows.length > 0
     || testLinkSummary.linked > 0
-    || liveRows.filter((row) => row.catalogLinkStatus === "MATCHED").length !== 670
-    || defaultIncludedFullyUnlinked.length !== 172
+    || liveRows.filter((row) => row.catalogLinkStatus === "MATCHED").length !== result.safeToLinkLater.length
+    || defaultIncludedFullyUnlinked.length !== result.defaultIncludedSkipped.length
   );
 
   if (emptyCatalogTables.length > 0) {
