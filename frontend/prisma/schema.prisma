@@ -54,41 +54,44 @@ model AppSetting {
 }
 
 model CatalogArticle {
-  id                  String   @id @default(cuid())
-  articleNumber       String   @unique
+  id                  String        @id @default(cuid())
+  articleNumber       String        @unique
   name                String
   nameDe              String?
   description         String?
-  price               Decimal  @db.Decimal(10, 2)
+  price               Decimal       @db.Decimal(10, 2)
   itemType            ItemType
-  isFixedPricePackage Boolean  @default(false)
-  isActive            Boolean  @default(true)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  isFixedPricePackage Boolean       @default(false)
+  isActive            Boolean       @default(true)
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+  kitchenItems        KitchenItem[]
 }
 
 model CatalogBlende {
-  id          String   @id @default(cuid())
-  code        String   @unique
-  name        String
-  nameDe      String?
-  description String?
-  price       Decimal  @db.Decimal(10, 2)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String        @id @default(cuid())
+  code         String        @unique
+  name         String
+  nameDe       String?
+  description  String?
+  price        Decimal       @db.Decimal(10, 2)
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  kitchenItems KitchenItem[]
 }
 
 model CatalogService {
-  id          String   @id @default(cuid())
-  code        String   @unique
-  name        String
-  nameDe      String?
-  description String?
-  price       Decimal  @db.Decimal(10, 2)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String        @id @default(cuid())
+  code         String        @unique
+  name         String
+  nameDe       String?
+  description  String?
+  price        Decimal       @db.Decimal(10, 2)
+  isActive     Boolean       @default(true)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  kitchenItems KitchenItem[]
 }
 
 model Kitchen {
@@ -107,15 +110,15 @@ model Kitchen {
 }
 
 model KitchenItem {
-  id                       String      @id @default(cuid())
+  id                       String          @id @default(cuid())
   kitchenId                String
-  kitchen                  Kitchen     @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  kitchen                  Kitchen         @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
   itemType                 ItemType
   code                     String
   articleNumber            String?
   name                     String
   nameDe                   String?
-  price                    Decimal     @db.Decimal(10, 2)
+  price                    Decimal         @db.Decimal(10, 2)
   widthMm                  Int?
   heightMm                 Int?
   depthMm                  Int?
@@ -129,17 +132,28 @@ model KitchenItem {
   iconKey                  String?
   colorKey                 String?
   componentKey             String?
-  isLocked                 Boolean     @default(false)
-  isActive                 Boolean     @default(true)
-  sortOrder                Int         @default(0)
+  isLocked                 Boolean         @default(false)
+  isActive                 Boolean         @default(true)
+  sortOrder                Int             @default(0)
   blendeCode               String?
   blendeLabel              String?
-  blendePrice              Decimal?    @db.Decimal(10, 2)
-  createdAt                DateTime    @default(now())
-  updatedAt                DateTime    @updatedAt
+  blendePrice              Decimal?        @db.Decimal(10, 2)
+  catalogArticleId         String?
+  catalogArticle           CatalogArticle? @relation(fields: [catalogArticleId], references: [id], onDelete: SetNull)
+  catalogBlendeId          String?
+  catalogBlende            CatalogBlende?  @relation(fields: [catalogBlendeId], references: [id], onDelete: SetNull)
+  catalogBlendeQuantity    Int?
+  catalogServiceId         String?
+  catalogService           CatalogService? @relation(fields: [catalogServiceId], references: [id], onDelete: SetNull)
+  catalogLinkStatus        String?
+  createdAt                DateTime        @default(now())
+  updatedAt                DateTime        @updatedAt
   orderItems               OrderItem[]
 
   @@unique([kitchenId, code])
+  @@index([catalogArticleId])
+  @@index([catalogBlendeId])
+  @@index([catalogServiceId])
 }
 
 model Order {
