@@ -68,6 +68,21 @@ function validatePaymentMethod(value) {
   return normalizedPaymentMethod;
 }
 
+function normalizePreferredDeliveryDate(value) {
+  const normalized = value ? String(value).trim() : "";
+  if (!normalized) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+    throw validationError("Preferred delivery date is invalid");
+  }
+
+  const date = new Date(`${normalized}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== normalized) {
+    throw validationError("Preferred delivery date is invalid");
+  }
+
+  return date;
+}
+
 function validateConsent(value) {
   if (value !== true) {
     throw validationError("Consent is required");
@@ -153,6 +168,9 @@ export function buildOrderForNotifications(orderRecord) {
       postalCode: orderRecord.postalCode,
       city: orderRecord.city,
       country: orderRecord.country || "",
+      preferredDeliveryDate: orderRecord.preferredDeliveryDate
+        ? orderRecord.preferredDeliveryDate.toISOString().slice(0, 10)
+        : "",
       notes: orderRecord.notes || "",
       paymentMethod: orderRecord.paymentMethod || "",
     },
@@ -271,6 +289,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     postalCode: requireString(customer.postalCode, "Postal code"),
     city: requireString(customer.city, "City"),
     country: customer.country ? String(customer.country).trim() : "",
+    preferredDeliveryDate: normalizePreferredDeliveryDate(customer.preferredDeliveryDate),
     notes: customer.notes ? String(customer.notes).trim() : "",
     paymentMethod: validatePaymentMethod(customer.paymentMethod),
   };
@@ -389,6 +408,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
                 postalCode: validatedCustomer.postalCode,
                 city: validatedCustomer.city,
                 country: validatedCustomer.country || null,
+                preferredDeliveryDate: validatedCustomer.preferredDeliveryDate,
                 notes: validatedCustomer.notes || null,
                 paymentMethod: validatedCustomer.paymentMethod,
                 totalPrice,
@@ -411,6 +431,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
                 postalCode: validatedCustomer.postalCode,
                 city: validatedCustomer.city,
                 country: validatedCustomer.country || null,
+                preferredDeliveryDate: validatedCustomer.preferredDeliveryDate,
                 notes: validatedCustomer.notes || null,
                 paymentMethod: validatedCustomer.paymentMethod,
                 totalPrice,

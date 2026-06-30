@@ -799,6 +799,7 @@
     "payment": "Payment",
     "customer": "Customer",
     "address": "Address",
+    "preferredDeliveryDate": "Preferred delivery date",
     "notes": "Notes",
     "orderItems": "Order items",
     "snapshotOfAllItemsSavedWithThisOrder": "Snapshot of all items saved with this order.",

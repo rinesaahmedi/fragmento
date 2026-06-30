@@ -42,6 +42,25 @@ function buildAddressLines(address, translate) {
   ].filter(Boolean);
 }
 
+function getDateInputMinValue() {
+  const today = new Date();
+  today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  return today.toISOString().slice(0, 10);
+}
+
+function formatDateForDisplay(value, locale = "en-GB") {
+  if (!value) return "";
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat(locale, {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
 export default function PublicKitchenOrderForm({
   orderSectionRef,
   customer,
@@ -77,6 +96,7 @@ export default function PublicKitchenOrderForm({
   const canUseContractAddress = contractAddressLines.length > 0;
   const savedAddressLines = buildAddressLines(customer, translate);
   const savedHelpText = translate("order.savedHelp", "");
+  const dateInputMinValue = getDateInputMinValue();
 
   function markFieldTouched(fieldKey) {
     setTouchedFields((current) => (current[fieldKey] ? current : { ...current, [fieldKey]: true }));
@@ -161,6 +181,10 @@ export default function PublicKitchenOrderForm({
                     {renderSavedDetail(
                       translate("order.addressTitle", "Order / billing address"),
                       savedAddressLines.join(", ") || (isUsingContractAddress ? translate("order.usingContractAddress", "The contract address will be used for this order.") : ""),
+                    )}
+                    {renderSavedDetail(
+                      translate("order.preferredDeliveryDate", "Preferred delivery date"),
+                      formatDateForDisplay(customer.preferredDeliveryDate),
                     )}
                     {renderSavedDetail(translate("order.notes", "Notes (optional)"), customer.notes)}
                   </dl>
@@ -374,8 +398,37 @@ export default function PublicKitchenOrderForm({
           <div className={styles.orderSectionCard}>
             <div className={styles.orderSectionHeader}>
               <div>
+                <div className={styles.deliveryHeaderTitle}>
+                  <h3>{translate("order.deliveryTitle", "Preferred delivery")}</h3>
+                  <span>{translate("order.deliveryBadge", "Recommended")}</span>
+                </div>
+                <p>{translate("order.deliveryHelp", "Tell us when you would prefer the kitchen to be delivered.")}</p>
+              </div>
+            </div>
+            <div className={styles.sectionFields}>
+              <div className={[styles.field, styles.deliveryDateField].join(" ")}>
+                <label htmlFor="preferredDeliveryDate">{translate("order.preferredDeliveryDate", "Preferred delivery date")}</label>
+                <input
+                  id="preferredDeliveryDate"
+                  name="preferred-delivery-date"
+                  type="date"
+                  min={dateInputMinValue}
+                  value={customer.preferredDeliveryDate || ""}
+                  onBlur={() => markFieldTouched("preferredDeliveryDate")}
+                  onChange={(event) => onUpdateCustomer("preferredDeliveryDate", event.target.value)}
+                />
+                <span className={styles.fieldHelp}>
+                  {translate("order.preferredDeliveryDateHelp", "Optional. We will coordinate the final delivery slot after checking availability.")}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.orderSectionCard}>
+            <div className={styles.orderSectionHeader}>
+              <div>
                 <h3>{translate("order.paymentConsentTitle", "Order notes")}</h3>
-                <p>{translate("order.paymentConsentHelp", "Add delivery details if needed, then confirm the privacy notice.")}</p>
+                <p>{translate("order.paymentConsentHelp", "Add any special instructions, then confirm the privacy notice.")}</p>
               </div>
             </div>
             <div className={styles.sectionFields}>
@@ -387,7 +440,7 @@ export default function PublicKitchenOrderForm({
                   value={customer.notes}
                   onBlur={() => markFieldTouched("notes")}
                   onChange={(event) => onUpdateCustomer("notes", event.target.value)}
-                  placeholder={translate("order.notesPlaceholder", "Delivery notes, preferred dates, etc.")}
+                  placeholder={translate("order.notesPlaceholder", "Access instructions, contact windows, or other details.")}
                 />
               </div>
             </div>

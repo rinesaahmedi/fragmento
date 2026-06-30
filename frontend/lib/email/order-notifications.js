@@ -151,6 +151,19 @@ function formatPdfDate(value) {
   }).format(new Date(value));
 }
 
+function formatDateOnly(value) {
+  if (!value) return "";
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
 export function formatCurrency(num) {
   const hasFraction = Number(num) % 1 !== 0;
   return new Intl.NumberFormat("de-DE", {
@@ -362,6 +375,9 @@ export async function generateOrderConfirmationPdf(order) {
     order.customer.country,
     `E-Mail: ${order.customer.email}`,
     `Telefon: ${order.customer.phone}`,
+    order.customer.preferredDeliveryDate
+      ? `Gewuenschter Liefertermin: ${formatDateOnly(order.customer.preferredDeliveryDate)}`
+      : "",
   ]
     .filter(Boolean)
     .forEach((line) => {
@@ -429,6 +445,7 @@ export function buildOrderSummaryHtml(order) {
     ["Kueche", order.kitchen.name],
     ["Auftragsnummer", order.orderNumber],
     ["Vertragsnummer", order.customer.contractNumber || "-"],
+    ["Gewuenschter Liefertermin", order.customer.preferredDeliveryDate ? formatDateOnly(order.customer.preferredDeliveryDate) : "-"],
   ]
     .map(
       ([label, value]) =>

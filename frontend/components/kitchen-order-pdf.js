@@ -8,6 +8,19 @@ const PDF_COMPANY_ADDRESS = [
   "38124 Braunschweig",
 ];
 
+function formatDateOnly(value) {
+  if (!value) return "";
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("de-DE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(date);
+}
+
 export async function blobToBase64(blob) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -136,6 +149,9 @@ export async function generateOrderPdf(order) {
     order.customer.country,
     `E-Mail: ${order.customer.email}`,
     `Telefon: ${order.customer.phone}`,
+    order.customer.preferredDeliveryDate
+      ? `Gewuenschter Liefertermin: ${formatDateOnly(order.customer.preferredDeliveryDate)}`
+      : "",
   ]
     .filter(Boolean)
     .forEach((line) => {

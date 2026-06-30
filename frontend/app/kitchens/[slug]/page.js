@@ -43,6 +43,9 @@ function serializeInitialOrder(order, confirmedItems = []) {
       postalCode: order.postalCode || "",
       city: order.city || "",
       country: order.country || "",
+      preferredDeliveryDate: order.preferredDeliveryDate
+        ? order.preferredDeliveryDate.toISOString().slice(0, 10)
+        : "",
       notes: order.notes || "",
       paymentMethod: order.paymentMethod || "",
     },
