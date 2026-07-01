@@ -18,6 +18,7 @@ import {
   thStyle,
   textareaStyle,
 } from "../../../../components/admin-ui";
+import { Fragment } from "react";
 import { AdminShell } from "../../../../components/admin-shell";
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
@@ -231,28 +232,31 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Fixed package</th>
                     <th style={thStyle}>Active</th>
                     <th style={thStyle}>Linked KitchenItems</th>
-                    <th style={thStyle}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {articles.map((article) => (
-                    <tr key={article.id}>
-                      <td style={tdStyle}><span style={codePillStyle}>{article.articleNumber}</span></td>
-                      <td style={tdStyle}>{article.name}</td>
-                      <td style={tdStyle}>{article.nameDe || ""}</td>
-                      <td style={tdStyle}>{formatDimensions(article)}</td>
-                      <td style={tdStyle}>{article.itemType}</td>
-                      <td style={tdStyle}>{formatMoney(article.price)}</td>
-                      <td style={tdStyle}>{formatBoolean(article.isFixedPricePackage)}</td>
-                      <td style={tdStyle}>{formatBoolean(article.isActive)}</td>
-                      <td style={tdStyle}>{article.linkedKitchenItems}</td>
-                      <td style={tdStyle}>
-                        <details>
-                          <summary style={editSummaryStyle}>Edit</summary>
-                          <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
-                        </details>
-                      </td>
-                    </tr>
+                    <Fragment key={article.id}>
+                      <tr>
+                        <td style={tdStyle}><span style={codePillStyle}>{article.articleNumber}</span></td>
+                        <td style={tdStyle}>{article.name}</td>
+                        <td style={tdStyle}>{article.nameDe || ""}</td>
+                        <td style={tdStyle}>{formatDimensions(article)}</td>
+                        <td style={tdStyle}>{article.itemType}</td>
+                        <td style={tdStyle}>{formatMoney(article.price)}</td>
+                        <td style={tdStyle}>{formatBoolean(article.isFixedPricePackage)}</td>
+                        <td style={tdStyle}>{formatBoolean(article.isActive)}</td>
+                        <td style={tdStyle}>{article.linkedKitchenItems}</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={9} style={editRowCellStyle}>
+                          <details style={editDetailsStyle}>
+                            <summary style={editSummaryStyle}>Edit</summary>
+                            <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
+                          </details>
+                        </td>
+                      </tr>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -281,26 +285,29 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Price</th>
                     <th style={thStyle}>Active</th>
                     <th style={thStyle}>Linked KitchenItems</th>
-                    <th style={thStyle}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {blenden.map((blende) => (
-                    <tr key={blende.id}>
-                      <td style={tdStyle}><span style={codePillStyle}>{blende.code}</span></td>
-                      <td style={tdStyle}>{blende.name}</td>
-                      <td style={tdStyle}>{blende.nameDe || ""}</td>
-                      <td style={tdStyle}>{blende.description || ""}</td>
-                      <td style={tdStyle}>{formatMoney(blende.price)}</td>
-                      <td style={tdStyle}>{formatBoolean(blende.isActive)}</td>
-                      <td style={tdStyle}>{blende.linkedKitchenItems}</td>
-                      <td style={tdStyle}>
-                        <details>
-                          <summary style={editSummaryStyle}>Edit</summary>
-                          <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
-                        </details>
-                      </td>
-                    </tr>
+                    <Fragment key={blende.id}>
+                      <tr>
+                        <td style={tdStyle}><span style={codePillStyle}>{blende.code}</span></td>
+                        <td style={tdStyle}>{blende.name}</td>
+                        <td style={tdStyle}>{blende.nameDe || ""}</td>
+                        <td style={tdStyle}>{blende.description || ""}</td>
+                        <td style={tdStyle}>{formatMoney(blende.price)}</td>
+                        <td style={tdStyle}>{formatBoolean(blende.isActive)}</td>
+                        <td style={tdStyle}>{blende.linkedKitchenItems}</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={7} style={editRowCellStyle}>
+                          <details style={editDetailsStyle}>
+                            <summary style={editSummaryStyle}>Edit</summary>
+                            <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
+                          </details>
+                        </td>
+                      </tr>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -329,26 +336,29 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Price</th>
                     <th style={thStyle}>Active</th>
                     <th style={thStyle}>Linked KitchenItems</th>
-                    <th style={thStyle}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {services.map((service) => (
-                    <tr key={service.id}>
-                      <td style={tdStyle}><span style={codePillStyle}>{service.code}</span></td>
-                      <td style={tdStyle}>{service.name}</td>
-                      <td style={tdStyle}>{service.nameDe || ""}</td>
-                      <td style={tdStyle}>{service.description || ""}</td>
-                      <td style={tdStyle}>{formatMoney(service.price)}</td>
-                      <td style={tdStyle}>{formatBoolean(service.isActive)}</td>
-                      <td style={tdStyle}>{service.linkedKitchenItems}</td>
-                      <td style={tdStyle}>
-                        <details>
-                          <summary style={editSummaryStyle}>Edit</summary>
-                          <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
-                        </details>
-                      </td>
-                    </tr>
+                    <Fragment key={service.id}>
+                      <tr>
+                        <td style={tdStyle}><span style={codePillStyle}>{service.code}</span></td>
+                        <td style={tdStyle}>{service.name}</td>
+                        <td style={tdStyle}>{service.nameDe || ""}</td>
+                        <td style={tdStyle}>{service.description || ""}</td>
+                        <td style={tdStyle}>{formatMoney(service.price)}</td>
+                        <td style={tdStyle}>{formatBoolean(service.isActive)}</td>
+                        <td style={tdStyle}>{service.linkedKitchenItems}</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={7} style={editRowCellStyle}>
+                          <details style={editDetailsStyle}>
+                            <summary style={editSummaryStyle}>Edit</summary>
+                            <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
+                          </details>
+                        </td>
+                      </tr>
+                    </Fragment>
                   ))}
                 </tbody>
               </table>
@@ -380,6 +390,16 @@ const addonFormStyle = {
 const articleFormStyle = {
   ...addonFormStyle,
   minWidth: 680,
+};
+
+const editRowCellStyle = {
+  ...tdStyle,
+  paddingTop: 0,
+  background: "var(--app-surface)",
+};
+
+const editDetailsStyle = {
+  width: "100%",
 };
 
 const editSummaryStyle = {
