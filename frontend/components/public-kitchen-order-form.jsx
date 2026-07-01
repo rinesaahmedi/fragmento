@@ -268,6 +268,19 @@ export default function PublicKitchenOrderForm({
     return fieldKey === "consent" || fieldKey === "termsConsent" ? !customer[fieldKey] : !normalizeValue(customer[fieldKey]);
   }
 
+  function hasRequiredValue(fieldKey) {
+    return fieldKey === "consent" || fieldKey === "termsConsent" ? Boolean(customer[fieldKey]) : Boolean(normalizeValue(customer[fieldKey]));
+  }
+
+  function getMissingRequiredFields() {
+    const requiredFields = ["firstName", "lastName", "email", "phone", "consent", "termsConsent"];
+    if (!isUsingContractAddress) {
+      requiredFields.push("address1", "country", "city", "postalCode");
+    }
+
+    return requiredFields.filter((fieldKey) => !hasRequiredValue(fieldKey));
+  }
+
   function getFieldClassName(fieldKey, required = false, baseClassName = styles.field) {
     return [
       baseClassName,
@@ -289,6 +302,13 @@ export default function PublicKitchenOrderForm({
 
   function handleFormSubmit(event) {
     setHasTriedSubmit(true);
+    const missingRequiredFields = getMissingRequiredFields();
+    if (missingRequiredFields.length) {
+      event.preventDefault();
+      missingRequiredFields.forEach(markFieldTouched);
+      return;
+    }
+
     onSubmit(event);
   }
 
@@ -621,6 +641,7 @@ export default function PublicKitchenOrderForm({
                 <input
                   id="consent"
                   type="checkbox"
+                  required
                   checked={customer.consent}
                   onBlur={() => markFieldTouched("consent")}
                   onChange={(event) => {
@@ -644,6 +665,7 @@ export default function PublicKitchenOrderForm({
                 <input
                   id="termsConsent"
                   type="checkbox"
+                  required
                   checked={Boolean(customer.termsConsent)}
                   onBlur={() => markFieldTouched("termsConsent")}
                   onChange={(event) => {

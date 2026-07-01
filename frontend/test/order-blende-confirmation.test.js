@@ -5,7 +5,7 @@ import {
   buildOrderSummaryHtml,
 } from "../lib/email/order-notifications.js";
 
-test("order confirmation summary renders blende as a separate product row", () => {
+test("order confirmation summary renders blende as a cabinet subtitle", () => {
   const order = {
     orderNumber: "FRG-TEST-001",
     total: 244,
@@ -64,14 +64,16 @@ test("order confirmation summary renders blende as a separate product row", () =
 
   assert.equal(html.includes("Neu bestaetigte Komponenten"), false);
   assert.ok(electricalSectionIndex > -1);
-  assert.ok(cabinetSectionIndex > electricalSectionIndex);
-  assert.ok(dishwasherIndex > electricalSectionIndex && dishwasherIndex < cabinetSectionIndex);
-  assert.ok(cabinetIndex > cabinetSectionIndex);
+  assert.ok(cabinetSectionIndex > -1);
+  assert.ok(cabinetSectionIndex < electricalSectionIndex);
+  assert.ok(cabinetIndex > cabinetSectionIndex && cabinetIndex < electricalSectionIndex);
+  assert.ok(dishwasherIndex > electricalSectionIndex);
   assert.ok(cabinetIndex < html.indexOf("Blende UPK20 20 cm"));
   assert.match(html, /<th[^>]*>Nr\.<\/th>/);
-  assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Vollintegrierter Geschirrspueler/);
-  assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Unterschrank mit Schubkasten/);
-  assert.match(html, /<td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Vollintegrierter Geschirrspueler/);
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?1\.1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schubkasten[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /1\.1[\s\S]*?Blende UPK20 20 cm/);
+  assert.doesNotMatch(html, /<tr><td[^>]*>1\.1<\/td>/);
   assert.doesNotMatch(html, /Base cabinet/);
   assert.doesNotMatch(html, /Fully integrated dishwasher/);
   assert.match(html, /Vollintegrierter Geschirrspueler/);
@@ -94,7 +96,7 @@ test("order confirmation summary renders blende as a separate product row", () =
   assert.match(html, /244/);
 });
 
-test("order confirmation numbers multiple blendes under their parent cabinet", () => {
+test("order confirmation groups multiple blendes under their parent cabinet", () => {
   const order = {
     orderNumber: "FRG-TEST-003",
     total: 269,
@@ -125,12 +127,13 @@ test("order confirmation numbers multiple blendes under their parent cabinet", (
 
   const html = buildOrderSummaryHtml(order);
 
-  assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Unterschrank mit Schublade 60/);
-  assert.match(html, /<td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm/);
-  assert.match(html, /<td[^>]*>1\.2<\/td><td[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60/);
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?1\.1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60[\s\S]*?Blende UPK20 20 cm x 2/);
+  assert.match(html, /1\.1[\s\S]*?Blende UPK20 20 cm x 2/);
+  assert.doesNotMatch(html, /<tr><td[^>]*>1\.1<\/td>/);
+  assert.doesNotMatch(html, /1\.2[\s\S]*?Blende UPK20 20 cm/);
   assert.match(html, /Code: UPK20/);
   assert.doesNotMatch(html, /UPK20 x2/);
-  assert.doesNotMatch(html, /Blende UPK20 20 cm x 2/);
 });
 
 test("order confirmation product-info attachments exclude default zero-price items", async () => {

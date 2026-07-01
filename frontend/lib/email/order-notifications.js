@@ -310,22 +310,42 @@ function splitComponentItems(items = []) {
 
 function buildNumberedRows(items = []) {
   let nextMainNumber = 1;
-  let currentParentNumber = "";
+  let currentParentRow = null;
+  const rows = [];
 
-  return items.map((item) => {
-    if (item?.isBlendeDisplayItem && currentParentNumber) {
-      return {
-        item,
-        rowNumber: `${currentParentNumber}.${item.blendeDisplayIndex || 1}`,
-      };
+  items.forEach((item) => {
+    if (item?.isBlendeDisplayItem && currentParentRow) {
+      const existingBlendeItem = currentParentRow.blendeItems.find(
+        (blendeItem) => getItemDisplayCode(blendeItem) === getItemDisplayCode(item)
+          && getItemDisplayName(blendeItem) === getItemDisplayName(item),
+      );
+      if (existingBlendeItem) {
+        existingBlendeItem.price = Number(existingBlendeItem.price || 0) + Number(item.price || 0);
+        existingBlendeItem.blendeDisplayQuantity = Math.max(1, Math.floor(Number(existingBlendeItem.blendeDisplayQuantity || 1))) + 1;
+      } else {
+        const nextBlendeNumber = currentParentRow.blendeItems.length + 1;
+        currentParentRow.blendeItems.push({
+          ...item,
+          rowNumber: `${currentParentRow.rowNumber}.${nextBlendeNumber}`,
+          blendeDisplayQuantity: 1,
+        });
+      }
+      return;
     }
 
     const rowNumber = String(nextMainNumber);
-    currentParentNumber = rowNumber;
+    currentParentRow = { item, rowNumber, blendeItems: [] };
+    rows.push(currentParentRow);
     nextMainNumber += 1;
-
-    return { item, rowNumber };
   });
+
+  return rows;
+}
+
+function getBlendeDisplayNameWithQuantity(item) {
+  const name = getItemDisplayName(item);
+  const quantity = Math.max(1, Math.floor(Number(item?.blendeDisplayQuantity || item?.quantity || 1)));
+  return quantity > 1 ? `${name} x ${quantity}` : name;
 }
 
 function drawItemIcon(doc, item, x, y, size = 16) {
@@ -511,9 +531,16 @@ export async function generateOrderConfirmationPdf(order) {
     y += 18;
     doc.setFont("helvetica", "normal").setFontSize(10);
 
-    buildNumberedRows(visibleItems).forEach(({ item, rowNumber }) => {
+    buildNumberedRows(visibleItems).forEach(({ item, rowNumber, blendeItems = [] }) => {
       const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), 208);
-      const rowHeight = Math.max(nameLines.length * lineHeight, 30) + 6;
+      const blendeLineGroups = blendeItems.map((blendeItem) => ({
+        rowNumber: blendeItem.rowNumber,
+        nameLines: doc.splitTextToSize(getBlendeDisplayNameWithQuantity(blendeItem), 208),
+        code: getItemDisplayCode(blendeItem),
+        price: formatCurrency(blendeItem.price),
+      }));
+      const blendeTextHeight = blendeLineGroups.reduce((sum, group) => sum + (group.nameLines.length + 1) * lineHeight, 0);
+      const rowHeight = Math.max(nameLines.length * lineHeight + blendeTextHeight, 30) + 8;
       ensureSpace(rowHeight);
       doc.text(rowNumber, margin, y);
       drawItemIcon(doc, item, margin + 22, y - 8, 26);
@@ -522,6 +549,22 @@ export async function generateOrderConfirmationPdf(order) {
       });
       doc.text(getItemDisplayCode(item), margin + 320, y);
       doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
+      if (blendeLineGroups.length) {
+        let blendeY = y + nameLines.length * lineHeight + 4;
+        doc.setFontSize(9);
+        blendeLineGroups.forEach((group) => {
+          doc.setTextColor(90);
+          doc.text(group.rowNumber, margin, blendeY);
+          group.nameLines.forEach((line, index) => {
+            doc.text(line, margin + 58, blendeY + index * lineHeight);
+          });
+          doc.text(`Code: ${group.code}`, margin + 58, blendeY + group.nameLines.length * lineHeight);
+          doc.text(group.price, pageWidth - margin, blendeY, { align: "right" });
+          blendeY += (group.nameLines.length + 1) * lineHeight;
+        });
+        doc.setTextColor(0);
+        doc.setFontSize(10);
+      }
       y += rowHeight;
     });
 
@@ -529,8 +572,8 @@ export async function generateOrderConfirmationPdf(order) {
   };
 
   const { electricalItems, cabinetItems } = splitComponentItems(order.components);
-  drawSection("Elektrogeraete:", electricalItems, { itemsAreVisible: true });
   drawSection("Kuechenmoebel:", cabinetItems, { itemsAreVisible: true });
+  drawSection("Elektrogeraete:", electricalItems, { itemsAreVisible: true });
   drawSection("Zubehoer:", order.accessories);
   drawSection("Dienstleistungen:", order.services);
 
@@ -570,16 +613,25 @@ export function buildOrderSummaryHtml(order) {
     const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
     if (!visibleItems.length) return "";
     const rows = buildNumberedRows(visibleItems)
-      .map(({ item, rowNumber }) => {
+      .map(({ item, rowNumber, blendeItems = [] }) => {
         const productImagePath = normalizeProductImageAssetPath(item.productImagePath);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
         const imageHtml = imageCid
           ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
           : "";
+        const blendeHtml = blendeItems
+          .map((blendeItem) => `<div style="margin-top:8px;font-size:12px;color:#777;">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span>Code: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></div>`)
+          .join("");
+        const blendeNumberHtml = blendeItems
+          .map((blendeItem) => `<div style="margin-top:24px;font-size:12px;color:#777;font-weight:bold;">${escapeHtml(blendeItem.rowNumber)}</div>`)
+          .join("");
+        const blendePriceHtml = blendeItems
+          .map((blendeItem) => `<div style="margin-top:8px;font-size:12px;color:#777;">${formatCurrency(blendeItem.price)}</div>`)
+          .join("");
 
-        return `<tr><td style="${tdStyles};width:34px;font-weight:bold;">${escapeHtml(rowNumber)}</td><td style="${tdStyles}"><div style="display:flex;align-items:center;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(
+        return `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;"><div>${escapeHtml(rowNumber)}</div>${blendeNumberHtml}</td><td style="${tdStyles}"><div style="display:flex;align-items:flex-start;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span>${blendeHtml}</div></div></td><td style="${priceTdStyles}">${formatCurrency(
             item.price,
-          )}</td></tr>`;
+          )}${blendePriceHtml}</td></tr>`;
       })
       .join("");
 
@@ -594,8 +646,8 @@ export function buildOrderSummaryHtml(order) {
         ${(() => {
           const { electricalItems, cabinetItems } = splitComponentItems(order.components);
           return [
-            renderSection("Neu bestaetigte Elektrogeraete", electricalItems, order.productImageCids, { itemsAreVisible: true }),
             renderSection("Neu bestaetigte Kuechenmoebel", cabinetItems, order.productImageCids, { itemsAreVisible: true }),
+            renderSection("Neu bestaetigte Elektrogeraete", electricalItems, order.productImageCids, { itemsAreVisible: true }),
           ].join("");
         })()}
         ${renderSection("Neu bestaetigtes Zubehoer", order.accessories, order.productImageCids)}
