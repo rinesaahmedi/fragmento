@@ -49,6 +49,68 @@ function buildProductInfoFilename(item, assetPath) {
   return `Produktinformation-${baseName || "Produkt"}.pdf`;
 }
 
+const DISHWASHER_PRODUCT_INFO_DOCUMENTS = [
+  { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+];
+
+const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
+  { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+];
+
+const CHIMNEY_HOOD_PRODUCT_INFO_DOCUMENTS = [
+  { label: "Produktinfo PDF", href: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf" },
+];
+
+function getMappedProductInfoDocuments(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const displayName = String(getItemDisplayName(item)).toLowerCase();
+  const haystack = `${code} ${articleNumber} ${iconKey} ${componentKey} ${displayName}`;
+
+  if (
+    code.startsWith("DISH-") ||
+    iconKey === "dishwasher_base" ||
+    haystack.includes("dishwasher") ||
+    haystack.includes("geschirr")
+  ) {
+    return DISHWASHER_PRODUCT_INFO_DOCUMENTS;
+  }
+
+  if (
+    code.includes("KHF664611") ||
+    articleNumber.includes("KHF664611") ||
+    haystack.includes("chimney") ||
+    haystack.includes("schraeg") ||
+    haystack.includes("schrÃ¤g")
+  ) {
+    return CHIMNEY_HOOD_PRODUCT_INFO_DOCUMENTS;
+  }
+
+  if (
+    code.startsWith("HOOD-") ||
+    code.startsWith("CAB-HOOD-") ||
+    iconKey.includes("hood") ||
+    componentKey.includes("hood") ||
+    componentKey.includes("extractor") ||
+    haystack.includes("extractor") ||
+    haystack.includes("hood") ||
+    haystack.includes("dunstabzug") ||
+    haystack.includes("flachschirmhaube")
+  ) {
+    return FLAT_HOOD_PRODUCT_INFO_DOCUMENTS;
+  }
+
+  return [];
+}
+
+function getProductInfoDocumentsForEmail(item) {
+  const directPath = normalizeProductInfoAssetPath(item?.productInfoPdfPath);
+  const directDocuments = directPath ? [{ label: "Produktinfo PDF", href: directPath }] : [];
+  return directDocuments.length ? directDocuments : getMappedProductInfoDocuments(item);
+}
+
 function normalizeProductImageAssetPath(imagePath) {
   const normalized = String(imagePath || "").trim().replace(/^\/+/, "");
   return normalized || "";
@@ -142,21 +204,25 @@ async function loadProductInfoAttachments(order) {
   const labels = [];
 
   for (const item of selectedItems) {
-    const assetPath = normalizeProductInfoAssetPath(item.productInfoPdfPath);
-    if (!assetPath || seenAssetPaths.has(assetPath)) continue;
+    const documents = getProductInfoDocumentsForEmail(item);
 
-    try {
-      const absolutePath = await resolvePublicAssetPath(assetPath);
-      const content = await fs.readFile(absolutePath);
-      attachments.push({
-        filename: buildProductInfoFilename(item, assetPath),
-        content,
-        contentType: "application/pdf",
-      });
-      labels.push(getItemDisplayName(item) || path.basename(assetPath, ".pdf"));
-      seenAssetPaths.add(assetPath);
-    } catch (error) {
-      console.warn(`Could not attach product info for ${item.code}:`, error.message);
+    for (const document of documents) {
+      const assetPath = normalizeProductInfoAssetPath(document.href);
+      if (!assetPath || seenAssetPaths.has(assetPath)) continue;
+
+      try {
+        const absolutePath = await resolvePublicAssetPath(assetPath);
+        const content = await fs.readFile(absolutePath);
+        attachments.push({
+          filename: buildProductInfoFilename(item, assetPath),
+          content,
+          contentType: "application/pdf",
+        });
+        labels.push(getItemDisplayName(item) || document.label || path.basename(assetPath, ".pdf"));
+        seenAssetPaths.add(assetPath);
+      } catch (error) {
+        console.warn(`Could not attach product info for ${item.code}:`, error.message);
+      }
     }
   }
 

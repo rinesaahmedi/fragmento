@@ -199,3 +199,46 @@ test("order confirmation product-info attachments exclude default zero-price ite
   assert.equal(staticHtml.html.includes("Freestanding refrigerator 178cm"), false);
   assert.equal(staticHtml.html.includes("Built-in oven and induction hob"), false);
 });
+
+test("order confirmation product-info attachments include dishwasher and extractor hood fallbacks", async () => {
+  const order = {
+    orderNumber: "FRG-TEST-004",
+    total: 1178,
+    kitchen: {
+      name: "Demo Kitchen",
+    },
+    customer: {
+      contractNumber: "KV-103",
+      preferredDeliveryDate: "2026-07-15",
+    },
+    components: [
+      {
+        code: "DISH-AB105806-600",
+        name: "Fully integrated dishwasher",
+        nameDe: "Vollintegrierter GeschirrspÃ¼ler",
+        iconKey: "dishwasher_base",
+        price: 579,
+      },
+      {
+        code: "CAB-HOOD-AB105806-600",
+        name: "Upper Cabinet with Extractor Hood 60",
+        nameDe: "Oberschrank fÃ¼r Flachschirmhaube, 60 cm",
+        iconKey: "hood_wall_cabinet",
+        componentKey: "extractor-hood",
+        price: 599,
+      },
+    ],
+    accessories: [],
+    services: [],
+  };
+
+  const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
+
+  assert.deepEqual(staticHtml.attachmentLabels, [
+    "Vollintegrierter GeschirrspÃ¼ler",
+    "Oberschrank fÃ¼r Flachschirmhaube, 60 cm",
+  ]);
+  assert.match(staticHtml.html, /Produktinformationen im Anhang:/);
+  assert.match(staticHtml.html, /Vollintegrierter GeschirrspÃ¼ler/);
+  assert.match(staticHtml.html, /Oberschrank fÃ¼r Flachschirmhaube, 60 cm/);
+});
