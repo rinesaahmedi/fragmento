@@ -3,6 +3,10 @@ import https from "https";
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
+  if (process.env.N8N_WEBHOOK_ENABLED !== "true") {
+    return NextResponse.json({ success: true, skipped: true });
+  }
+
   const n8nUrl = new URL(
     process.env.N8N_WEBHOOK_URL || "http://localhost:5678/webhook/kitchen-order-callback",
   );

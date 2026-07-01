@@ -822,6 +822,7 @@ export function buildOrderWebhookPayload(order) {
 }
 
 export async function forwardOrderWebhook(order) {
+  if (process.env.N8N_WEBHOOK_ENABLED !== "true") return;
   if (!process.env.N8N_WEBHOOK_URL) return;
 
   const n8nUrl = new URL(process.env.N8N_WEBHOOK_URL);

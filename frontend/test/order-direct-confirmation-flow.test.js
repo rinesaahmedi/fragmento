@@ -10,10 +10,10 @@ const stripePaymentsPath = path.join(__dirname, "..", "lib", "stripe-payments.js
 const ordersSource = fs.readFileSync(ordersPath, "utf8");
 const stripePaymentsSource = fs.readFileSync(stripePaymentsPath, "utf8");
 
-test("order creation keeps webhook enabled but does not send confirmation before payment", () => {
+test("order creation does not send confirmation or webhook before payment", () => {
   assert.doesNotMatch(ordersSource, /getDirectOrderConfirmationEnabled/);
   assert.match(ordersSource, /runEmail:\s*false/);
-  assert.match(ordersSource, /runWebhook:\s*true/);
+  assert.match(ordersSource, /runWebhook:\s*false/);
 });
 
 test("paid Stripe checkout sends automatic confirmation after successful payment", () => {

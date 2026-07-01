@@ -553,7 +553,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     pdfBase64: null,
     pdfFilename: null,
     runEmail: false,
-    runWebhook: true,
+    runWebhook: false,
   });
 
   return {
