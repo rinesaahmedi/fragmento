@@ -108,6 +108,28 @@ export function getCatalogItemDetails(item) {
   };
 }
 
+export function getLocalizedBlendeLabel(item, language = "en") {
+  const legacyLabel = String(item?.blendeLabel || "").trim();
+  const localizedName = String(
+    language === "de" && item?.blendeNameDe
+      ? item.blendeNameDe
+      : item?.blendeName || "",
+  ).trim();
+
+  if (!localizedName) return legacyLabel;
+  if (!legacyLabel) return localizedName;
+
+  const code = String(item?.blendeCode || "").trim();
+  const suffixSource = code && legacyLabel.toLowerCase().startsWith(code.toLowerCase())
+    ? legacyLabel.slice(code.length)
+    : legacyLabel.toLowerCase().startsWith(localizedName.toLowerCase())
+      ? legacyLabel.slice(localizedName.length)
+      : "";
+  const suffix = suffixSource.replace(/^[\s,;:-]+/, "").trim();
+
+  return suffix ? `${localizedName}, ${suffix}` : localizedName;
+}
+
 // Element names must never carry dimensions (they are shown separately under the article as a
 // W x H x D line). Strip every common dimension format: parenthesised "(600 x 720 x 340 mm)",
 // bare "600 x 720 x 340 mm" / "600/600 mm", and a trailing single measure "178 cm" / "600 mm".

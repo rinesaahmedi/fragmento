@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ItemType } from "@prisma/client";
 import { getStripeClient } from "../../../lib/stripe";
 import { getPaymentStatusLabel, updateOrderFromCheckoutSession } from "../../../lib/stripe-payments";
@@ -199,6 +200,10 @@ export default async function CheckoutSuccessPage({ searchParams }) {
     console.error("Could not confirm Stripe checkout session:", error);
   }
 
+  if (orderNumber || sessionId) {
+    redirect("/");
+  }
+
   const order = await getOrderForReceipt({ orderNumber, sessionId });
   const effectiveStatus = order?.paymentStatus || "PENDING";
   const statusCopy = getStatusCopy(effectiveStatus);
@@ -215,7 +220,15 @@ export default async function CheckoutSuccessPage({ searchParams }) {
   const componentItems = receiptItems.filter((item) => item.itemType === ItemType.COMPONENT);
   const accessoryItems = receiptItems.filter((item) => item.itemType === ItemType.ACCESSORY);
   const serviceItems = receiptItems.filter((item) => item.itemType === ItemType.SERVICE);
-  const kitchenHref = order?.kitchen?.slug ? `/kitchens/${order.kitchen.slug}` : "/";
+  const kitchenHref = order?.kitchen?.slug
+    ? {
+        pathname: `/kitchens/${order.kitchen.slug}`,
+        query: {
+          order: order.orderNumber,
+          ...(order.contractNumber ? { contractNumber: order.contractNumber } : {}),
+        },
+      }
+    : "/";
   const address = order
     ? [order.address1, order.address2, `${order.postalCode} ${order.city}`.trim(), order.country].filter(Boolean).join(", ")
     : "";

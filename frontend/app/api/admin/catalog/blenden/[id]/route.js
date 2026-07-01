@@ -8,6 +8,23 @@ export async function POST(request, { params }) {
 
   try {
     const formData = await request.formData();
+    const intentValues = formData.getAll("_intent");
+    const intent = String(intentValues[intentValues.length - 1] || "update");
+
+    if (intent === "delete") {
+      const linkedCount = await prisma.kitchenItem.count({
+        where: { catalogBlendeId: id },
+      });
+      if (linkedCount > 0) {
+        return redirectWithFlash(request, "/admin/catalog/articles", "error", `Blende is linked to ${linkedCount} kitchen item(s). Remove those links before deleting it.`);
+      }
+
+      await prisma.catalogBlende.delete({
+        where: { id },
+      });
+      return redirectWithFlash(request, "/admin/catalog/articles", "success", "Blende deleted.");
+    }
+
     const data = validateCatalogAddonInput(formData, "Blende");
 
     await prisma.$transaction(async (tx) => {

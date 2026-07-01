@@ -139,7 +139,7 @@ export async function POST(request) {
     }
   }
 
-  if (webhook_payload) {
+  if (webhook_payload && process.env.N8N_WEBHOOK_ENABLED === "true") {
     try {
       const n8nUrl = new URL(
         process.env.N8N_WEBHOOK_URL || "http://localhost:5678/webhook/kitchen-order-callback",

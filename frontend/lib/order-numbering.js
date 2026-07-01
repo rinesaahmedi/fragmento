@@ -9,12 +9,12 @@ export function buildNextContractOrderNumber(contractNumber, existingOrderNumber
   }
 
   const suffixPattern = new RegExp(`^${escapeRegExp(baseOrderNumber)}-(\\d+)$`);
-  let highestSequence = -1;
+  let highestSequence = 0;
 
   for (const orderNumber of existingOrderNumbers) {
     const normalizedOrderNumber = String(orderNumber || "").trim();
     if (normalizedOrderNumber === baseOrderNumber) {
-      highestSequence = Math.max(highestSequence, 0);
+      highestSequence = Math.max(highestSequence, 1);
       continue;
     }
 
@@ -24,5 +24,5 @@ export function buildNextContractOrderNumber(contractNumber, existingOrderNumber
     }
   }
 
-  return highestSequence < 0 ? baseOrderNumber : `${baseOrderNumber}-${highestSequence + 1}`;
+  return `${baseOrderNumber}-${highestSequence + 1}`;
 }

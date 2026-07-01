@@ -6,20 +6,21 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ordersPath = path.join(__dirname, "..", "lib", "orders.js");
-const source = fs.readFileSync(ordersPath, "utf8");
+const stripePaymentsPath = path.join(__dirname, "..", "lib", "stripe-payments.js");
+const ordersSource = fs.readFileSync(ordersPath, "utf8");
+const stripePaymentsSource = fs.readFileSync(stripePaymentsPath, "utf8");
 
-test("order creation keeps webhook enabled while making direct email setting-controlled", () => {
-  assert.match(source, /getDirectOrderConfirmationEnabled/);
-  assert.match(source, /const directOrderConfirmationEnabled = await getDirectOrderConfirmationEnabled\(\);/);
-  assert.match(source, /runEmail:\s*directOrderConfirmationEnabled/);
-  assert.match(source, /runWebhook:\s*true/);
+test("order creation does not send confirmation or webhook before payment", () => {
+  assert.doesNotMatch(ordersSource, /getDirectOrderConfirmationEnabled/);
+  assert.match(ordersSource, /runEmail:\s*false/);
+  assert.match(ordersSource, /runWebhook:\s*false/);
 });
 
-test("direct confirmation updates order status only after email success", () => {
-  assert.match(
-    source,
-    /if \(directOrderConfirmationEnabled && notificationResult\.emailSent\) \{\s*await prisma\.order\.update\(\{/s,
-  );
-  assert.match(source, /data:\s*\{\s*status:\s*OrderStatus\.CONFIRMED\s*\}/);
-  assert.doesNotMatch(source, /data:\s*\{\s*status:\s*OrderStatus\.CONFIRMED\s*\}[\s\S]*notificationResult\.emailError/);
+test("paid Stripe checkout sends automatic confirmation after successful payment", () => {
+  assert.match(stripePaymentsSource, /getDirectOrderConfirmationEnabled/);
+  assert.match(stripePaymentsSource, /maybeSendPaidOrderConfirmation\(updatedOrder\)/);
+  assert.match(stripePaymentsSource, /paymentStatus:\s*isPaid \? "PAID"/);
+  assert.match(stripePaymentsSource, /await sendOrderConfirmationEmail\(\{\s*order\s*\}\)/);
+  assert.match(stripePaymentsSource, /data:\s*\{\s*status:\s*"CONFIRMED"\s*\}/);
+  assert.match(stripePaymentsSource, /orderStatus === "CONFIRMED" \|\| orderStatus === "EMAILED" \|\| orderStatus === "CANCELLED"/);
 });

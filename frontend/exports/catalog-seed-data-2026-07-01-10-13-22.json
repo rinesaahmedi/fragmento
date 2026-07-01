@@ -1,0 +1,348 @@
+{
+  "exportedAt": "2026-07-01T10:13:22.096Z",
+  "purpose": "Seed-ready catalog data for CatalogArticle, CatalogBlende, and CatalogService.",
+  "usage": {
+    "articlesUniqueField": "articleNumber",
+    "blendenUniqueField": "code",
+    "servicesUniqueField": "code",
+    "note": "These arrays can be used in prisma/seed.js or scripts/backfill-catalog-phase-b.js for upserts. No database ids or timestamps are included."
+  },
+  "catalogArticles": [
+    {
+      "articleNumber": "A-EGSPV597210 + TGV60",
+      "name": "Fully integrated dishwasher incl. furniture front",
+      "nameDe": "Vollintegrierter Geschirrspüler inkl. Möbelfront",
+      "price": "579.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": true,
+      "isActive": true
+    },
+    {
+      "articleNumber": "EWA34660W + TGV60 + WU16",
+      "name": "Washing machine + front + side panel",
+      "nameDe": "Waschmaschine + Front + Wange",
+      "price": "639.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": true,
+      "isActive": true
+    },
+    {
+      "articleNumber": "FH 664 621 S",
+      "name": "FH 664 621 S extractor hood",
+      "nameDe": "FH 664 621 S Flachschirmhaube",
+      "price": "349.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "FH664621E + FWK124 + HD6002",
+      "name": "Flat screen extractor hood + cabinet + filter",
+      "nameDe": "Flachschirmhaube + Schrank + Filter",
+      "price": "349.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": true,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H10002",
+      "name": "Upper cabinet 100",
+      "nameDe": "Oberschrank 100",
+      "widthMm": 1000,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "209.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H3002",
+      "name": "Upper cabinet 30",
+      "nameDe": "Oberschrank 30",
+      "widthMm": 300,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "115.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H4002",
+      "name": "Upper cabinet 40",
+      "nameDe": "Oberschrank 40",
+      "widthMm": 400,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "180.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H4502",
+      "name": "Upper cabinet 45",
+      "nameDe": "Oberschrank 45",
+      "widthMm": 450,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "139.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H5002",
+      "name": "Upper cabinet 50",
+      "nameDe": "Oberschrank 50",
+      "widthMm": 500,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "135.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H6002",
+      "name": "Upper cabinet 60",
+      "nameDe": "Oberschrank 60",
+      "widthMm": 600,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "149.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H8002",
+      "name": "Upper cabinet 80",
+      "nameDe": "Oberschrank 80",
+      "widthMm": 800,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "200.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "H9002",
+      "name": "Upper cabinet 90",
+      "nameDe": "Oberschrank 90",
+      "widthMm": 900,
+      "heightMm": 720,
+      "depthMm": 340,
+      "price": "203.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "KHF664611S + FWP18",
+      "name": "Angled extractor hood + filter",
+      "nameDe": "Schrägesse + Filter",
+      "price": "209.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": true,
+      "isActive": true
+    },
+    {
+      "articleNumber": "OL-KGCN388140E",
+      "name": "Freestanding refrigerator 178cm",
+      "nameDe": "Standkühlschrank 178 cm",
+      "price": "579.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US100",
+      "name": "Lower cabinet with drawer 100",
+      "nameDe": "Unterschrank mit Schublade 100",
+      "widthMm": 1000,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "353.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US120",
+      "name": "Lower cabinet with drawer 120",
+      "nameDe": "Unterschrank mit Schublade 120",
+      "widthMm": 1200,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "403.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US2A60",
+      "name": "Base cabinet with drawers 60",
+      "nameDe": "Unterschrank mit Auszügen 60",
+      "widthMm": 600,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "369.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US30",
+      "name": "Lower cabinet with drawer 30",
+      "nameDe": "Unterschrank mit Schublade 30",
+      "widthMm": 300,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "215.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US40",
+      "name": "Lower cabinet with drawer 40",
+      "nameDe": "Unterschrank mit Schublade 40",
+      "widthMm": 400,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "183.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US45",
+      "name": "Lower cabinet with drawer 45",
+      "nameDe": "Unterschrank mit Schublade 45",
+      "widthMm": 450,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "198.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US50",
+      "name": "Lower cabinet with drawer 50",
+      "nameDe": "Unterschrank mit Schublade 50",
+      "widthMm": 500,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "198.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US60",
+      "name": "Lower cabinet with drawer 60",
+      "nameDe": "Unterschrank mit Schublade 60",
+      "widthMm": 600,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "219.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US80",
+      "name": "Lower cabinet with drawer 80",
+      "nameDe": "Unterschrank mit Schublade 80",
+      "widthMm": 800,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "333.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "US90",
+      "name": "Lower cabinet with drawer 90",
+      "nameDe": "Unterschrank mit Schublade 90",
+      "widthMm": 900,
+      "heightMm": 720,
+      "depthMm": 600,
+      "price": "339.00",
+      "itemType": "COMPONENT",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "517467",
+      "name": "Waste separation system Blanco Botton",
+      "nameDe": "Mülltrennsystem Blanco Botton",
+      "price": "89.00",
+      "itemType": "ACCESSORY",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "KA220043_S3",
+      "name": "LED lighting set",
+      "nameDe": "LED-Beleuchtungsset",
+      "price": "69.00",
+      "itemType": "ACCESSORY",
+      "isFixedPricePackage": false,
+      "isActive": true
+    },
+    {
+      "articleNumber": "ZB60SG",
+      "name": "Cutlery insert 60 cm",
+      "nameDe": "Besteckeinsatz 60 cm",
+      "price": "25.00",
+      "itemType": "ACCESSORY",
+      "isFixedPricePackage": false,
+      "isActive": true
+    }
+  ],
+  "catalogBlenden": [
+    {
+      "code": "HPK2002",
+      "name": "HPK2002 blende",
+      "nameDe": "HPK2002 Blende",
+      "price": "35.00",
+      "isActive": true
+    },
+    {
+      "code": "UPEF65",
+      "name": "Corner filler panel for lower cabinet",
+      "nameDe": "Eckpassblende Unterschrank",
+      "price": "68.00",
+      "isActive": true
+    },
+    {
+      "code": "UPK20",
+      "name": "UPK20 blende",
+      "nameDe": "UPK20 Blende",
+      "price": "25.00",
+      "isActive": true
+    }
+  ],
+  "catalogServices": [
+    {
+      "code": "MONTAGE",
+      "name": "Lieferung, Vertragen, Montage und Anschluss",
+      "nameDe": "Lieferung, Vertragen, Montage und Anschluss",
+      "price": "349.00",
+      "isActive": true
+    },
+    {
+      "code": "PICKUP",
+      "name": "Abholung an Logistikstandort",
+      "nameDe": "Abholung an Logistikstandort",
+      "price": "0.00",
+      "isActive": true
+    }
+  ]
+}

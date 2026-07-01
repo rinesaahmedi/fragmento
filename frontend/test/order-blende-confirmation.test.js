@@ -5,7 +5,7 @@ import {
   buildOrderSummaryHtml,
 } from "../lib/email/order-notifications.js";
 
-test("order confirmation summary renders blende as a separate product row", () => {
+test("order confirmation summary renders blende as a cabinet subtitle", () => {
   const order = {
     orderNumber: "FRG-TEST-001",
     total: 244,
@@ -64,14 +64,19 @@ test("order confirmation summary renders blende as a separate product row", () =
 
   assert.equal(html.includes("Neu bestätigte Komponenten"), false);
   assert.ok(electricalSectionIndex > -1);
-  assert.ok(cabinetSectionIndex > electricalSectionIndex);
-  assert.ok(dishwasherIndex > electricalSectionIndex && dishwasherIndex < cabinetSectionIndex);
-  assert.ok(cabinetIndex > cabinetSectionIndex);
+  assert.ok(cabinetSectionIndex > -1);
+  assert.ok(cabinetSectionIndex < electricalSectionIndex);
+  assert.ok(cabinetIndex > cabinetSectionIndex && cabinetIndex < electricalSectionIndex);
+  assert.ok(dishwasherIndex > electricalSectionIndex);
   assert.ok(cabinetIndex < html.indexOf("Blende UPK20 20 cm"));
   assert.match(html, /<th[^>]*>Nr\.<\/th>/);
-  assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Vollintegrierter Geschirrspüler/);
-  assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Unterschrank mit Schubkasten/);
-  assert.match(html, /<td[^>]*>2<\/td><td[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Vollintegrierter Geschirrspüler/);
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?1\.1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schubkasten[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /1\.1[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /<div style="margin-top:8px;">Blende UPK20 20 cm/);
+  assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">Blende/);
+  assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">25/);
+  assert.doesNotMatch(html, /<tr><td[^>]*>1\.1<\/td>/);
   assert.doesNotMatch(html, /Base cabinet/);
   assert.doesNotMatch(html, /Fully integrated dishwasher/);
   assert.match(html, /Vollintegrierter Geschirrspüler/);
@@ -92,6 +97,46 @@ test("order confirmation summary renders blende as a separate product row", () =
   assert.match(html, /219/);
   assert.match(html, /25/);
   assert.match(html, /244/);
+});
+
+test("order confirmation groups multiple blendes under their parent cabinet", () => {
+  const order = {
+    orderNumber: "FRG-TEST-003",
+    total: 269,
+    kitchen: {
+      name: "Demo Kitchen",
+    },
+    customer: {
+      contractNumber: "KV-102",
+      preferredDeliveryDate: "2026-07-15",
+    },
+    components: [
+      {
+        code: "CAB-BASE-2",
+        articleNumber: "US60",
+        name: "Base cabinet with drawer",
+        nameDe: "Unterschrank mit Schublade 60",
+        iconKey: "drawer_base_two",
+        componentKey: "base-module-2",
+        price: 269,
+        blendeCode: "UPK20 x2",
+        blendeLabel: "UPK20 20 cm x 2",
+        blendePrice: 50,
+      },
+    ],
+    accessories: [],
+    services: [],
+  };
+
+  const html = buildOrderSummaryHtml(order);
+
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60/);
+  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?1\.1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60[\s\S]*?Blende UPK20 20 cm x 2/);
+  assert.match(html, /1\.1[\s\S]*?Blende UPK20 20 cm x 2/);
+  assert.doesNotMatch(html, /<tr><td[^>]*>1\.1<\/td>/);
+  assert.doesNotMatch(html, /1\.2[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /Code: UPK20/);
+  assert.doesNotMatch(html, /UPK20 x2/);
 });
 
 test("order confirmation product-info attachments exclude default zero-price items", async () => {
@@ -127,7 +172,16 @@ test("order confirmation product-info attachments exclude default zero-price ite
         productInfoPdfPath: "legal/architecto-agb-2026.pdf",
       },
     ],
-    accessories: [],
+    accessories: [
+      {
+        code: "ACC-CUTLERY-ZB60SG",
+        articleNumber: "ZB60SG",
+        name: "Cutlery insert 60 cm",
+        nameDe: "Besteckeinsatz 60 cm",
+        price: 75,
+        quantity: 3,
+      },
+    ],
     services: [],
   };
 
@@ -138,6 +192,9 @@ test("order confirmation product-info attachments exclude default zero-price ite
   assert.match(staticHtml.html, /<ul[^>]*>/);
   assert.match(staticHtml.html, /<li[^>]*>Vollintegrierter Geschirrspüler<\/li>/);
   assert.match(staticHtml.html, /<li[^>]*>Standkühlschrank 178 cm<\/li>/);
+  assert.match(staticHtml.html, /Neu bestaetigtes Zubehoer/);
+  assert.match(staticHtml.html, /Besteckeinsatz 60 cm x 3/);
+  assert.match(staticHtml.html, /Code: ZB60SG/);
   assert.equal(staticHtml.html.includes("Fully integrated dishwasher"), false);
   assert.equal(staticHtml.html.includes("Freestanding refrigerator 178cm"), false);
   assert.equal(staticHtml.html.includes("Built-in oven and induction hob"), false);

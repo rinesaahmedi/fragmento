@@ -7,6 +7,7 @@ import {
   formatCurrency,
   getCatalogDisplayItem,
   getCatalogItemDetails,
+  getLocalizedBlendeLabel,
   getLocalizedItemInfoText,
   getLocalizedItemName,
   getProductImagePaths,
@@ -190,6 +191,7 @@ function CatalogItem({
 }) {
   const { translate, language } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate, language, false);
+  const blendeLabel = getLocalizedBlendeLabel(item, language);
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const { dimensions: itemDimensions } = getCatalogItemDetails(item);
@@ -255,9 +257,9 @@ function CatalogItem({
         <div className={styles.itemText}>
           <strong>{itemDisplayName.title}</strong>
           {item.articleNumber ? <span className={styles.itemCode}>{translate("common.article", "Article")}: {item.articleNumber}</span> : null}
-          {item.blendeLabel ? (
+          {blendeLabel ? (
             <span className={styles.itemBlendeNote}>
-              {translate("configurator.includesBlende", "Includes blende")}: {item.blendeLabel}
+              {translate("configurator.includesBlende", "Includes")}: {blendeLabel}
             </span>
           ) : null}
           {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}

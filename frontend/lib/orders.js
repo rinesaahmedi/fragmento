@@ -2,7 +2,6 @@ import { ItemType, OrderStatus, Prisma } from "@prisma/client";
 import {
   getDeliveryLeadTimeWeeks,
   getDeliveryMinOrderSettings,
-  getDirectOrderConfirmationEnabled,
 } from "./admin-settings";
 import { forwardOrderWebhook, sendOrderConfirmationEmail } from "./email/order-notifications";
 import {
@@ -563,21 +562,13 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   }
 
   const orderForNotifications = buildOrderForNotifications(savedOrder);
-  const directOrderConfirmationEnabled = await getDirectOrderConfirmationEnabled();
   const notificationResult = await processOrderNotifications({
     order: orderForNotifications,
     pdfBase64: null,
     pdfFilename: null,
-    runEmail: directOrderConfirmationEnabled,
-    runWebhook: true,
+    runEmail: false,
+    runWebhook: false,
   });
-
-  if (directOrderConfirmationEnabled && notificationResult.emailSent) {
-    await prisma.order.update({
-      where: { id: savedOrder.id },
-      data: { status: OrderStatus.CONFIRMED },
-    });
-  }
 
   return {
     ...orderForNotifications,
