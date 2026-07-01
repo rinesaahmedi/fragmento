@@ -265,6 +265,7 @@ export default function PublicKitchenOrderForm({
     country: translate("order.fieldErrors.country", "Please select a country."),
     city: translate("order.fieldErrors.city", "Please select a city."),
     postalCode: translate("order.fieldErrors.postalCode", "Please select a postal code."),
+    preferredDeliveryDate: translate("order.fieldErrors.preferredDeliveryDate", "Please choose a preferred delivery week."),
     consent: translate("order.fieldErrors.consent", "Please confirm that you have read the privacy statement."),
     termsConsent: translate("order.fieldErrors.termsConsent", "Please confirm the terms and conditions."),
   }), [translate]);
@@ -304,7 +305,7 @@ export default function PublicKitchenOrderForm({
   }
 
   function getMissingRequiredFields() {
-    const requiredFields = ["firstName", "lastName", "email", "phone", "consent", "termsConsent"];
+    const requiredFields = ["firstName", "lastName", "email", "phone", "preferredDeliveryDate", "consent", "termsConsent"];
     if (!isUsingContractAddress) {
       requiredFields.push("address1", "country", "city", "postalCode");
     }
@@ -619,17 +620,19 @@ export default function PublicKitchenOrderForm({
               </div>
             </div>
             <div className={styles.sectionFields}>
-              <div className={[styles.field, styles.deliveryDateField].join(" ")}>
-                <label htmlFor="preferredDeliveryDate">{translate("order.preferredDeliveryWeek", "Preferred delivery week")}</label>
+              <div className={getFieldClassName("preferredDeliveryDate", true, [styles.field, styles.deliveryDateField].join(" "))}>
+                <label htmlFor="preferredDeliveryDate">{translate("order.preferredDeliveryWeek", "Preferred delivery week")}*</label>
                 <select
                   id="preferredDeliveryDate"
                   name="preferred-delivery-date"
+                  required
                   value={customer.preferredDeliveryDate || ""}
                   onBlur={() => markFieldTouched("preferredDeliveryDate")}
                   onChange={(event) => {
                     markFieldTouched("preferredDeliveryDate");
                     onUpdateCustomer("preferredDeliveryDate", event.target.value);
                   }}
+                  aria-invalid={hasFieldError("preferredDeliveryDate", true)}
                 >
                   <option value="">{translate("order.selectPreferredDeliveryWeek", "Select delivery week")}</option>
                   {deliveryWeekOptions.map((option) => (
@@ -638,6 +641,7 @@ export default function PublicKitchenOrderForm({
                     </option>
                   ))}
                 </select>
+                {renderFieldError("preferredDeliveryDate", true)}
               </div>
             </div>
           </div>

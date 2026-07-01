@@ -807,6 +807,18 @@ function formatEmailBodyTextAsHtml(bodyText) {
     .join("");
 }
 
+function normalizeEmailAddress(value) {
+  return String(value || "").trim();
+}
+
+export function buildOrderConfirmationRecipients(customerEmail, senderEmail) {
+  const to = normalizeEmailAddress(customerEmail);
+  const sender = normalizeEmailAddress(senderEmail);
+  const cc = sender && sender.toLowerCase() !== to.toLowerCase() ? sender : "";
+
+  return cc ? { to, cc } : { to };
+}
+
 export function buildOrderConfirmationEmailDraft(order) {
   return {
     subject: `Bestellbestätigung #${order.orderNumber}`,
@@ -827,9 +839,10 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
   const subject = String(overrides.subject || draft.subject).trim() || draft.subject;
   const bodyText = String(overrides.bodyText || draft.bodyText);
   const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
+  const recipients = buildOrderConfirmationRecipients(order.customer.email, overrides.senderEmail);
 
   return {
-    to: order.customer.email,
+    ...recipients,
     subject,
     bodyText,
     html: `
@@ -888,13 +901,14 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   const productInfo = await loadProductInfoAttachments(order);
   attachments.push(...productInfo.attachments);
 
-  const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText });
+  const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText, senderEmail: smtpFrom });
   attachments.push(...(emailPreview.productImageAttachments || []));
 
   try {
     await transporter.sendMail({
       from: `"Fragmento" <${smtpFrom}>`,
-      to: order.customer.email,
+      to: emailPreview.to,
+      cc: emailPreview.cc,
       subject: emailPreview.subject,
       html: emailPreview.html,
       attachments,

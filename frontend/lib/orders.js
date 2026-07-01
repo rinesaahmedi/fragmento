@@ -83,7 +83,10 @@ function validatePaymentMethod(value) {
 
 function normalizePreferredDeliveryDate(value) {
   const normalized = value ? String(value).trim() : "";
-  if (!normalized) return null;
+  if (!normalized) {
+    throw validationError("Preferred delivery week is required");
+  }
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
     throw validationError("Preferred delivery date is invalid");
   }

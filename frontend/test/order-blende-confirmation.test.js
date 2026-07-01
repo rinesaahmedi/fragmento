@@ -1,9 +1,21 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  buildOrderConfirmationRecipients,
   buildOrderConfirmationEmailStaticHtml,
   buildOrderSummaryHtml,
 } from "../lib/email/order-notifications.js";
+
+test("order confirmation recipients include the sender as a copy", () => {
+  assert.deepEqual(
+    buildOrderConfirmationRecipients("343@gmail.com", "315@gmail.com"),
+    { to: "343@gmail.com", cc: "315@gmail.com" },
+  );
+  assert.deepEqual(
+    buildOrderConfirmationRecipients("315@gmail.com", "315@gmail.com"),
+    { to: "315@gmail.com" },
+  );
+});
 
 test("order confirmation summary renders blende as a cabinet subtitle", () => {
   const order = {
