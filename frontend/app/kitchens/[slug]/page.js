@@ -11,15 +11,36 @@ import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
 import { getDeliveryLeadTimeDays, getDeliveryMinOrderSettings } from "../../../lib/admin-settings";
 import { prisma } from "../../../lib/prisma";
 import { PUBLIC_LANGUAGE_COOKIE_NAME, normalizePublicLanguage } from "../../../lib/public-language";
+import { CUTLERY_VARIANTS, isCutleryAccessoryCode } from "../../../lib/cutlery-accessories";
 
 export const dynamic = "force-dynamic";
+
+function getOrderItemArticleNumber(item) {
+  if (isCutleryAccessoryCode(item?.code)) {
+    const snapshotName = String(item?.nameSnapshot || "").trim();
+    const matchedVariant = CUTLERY_VARIANTS.find((variant) => {
+      const widthPattern = new RegExp(`\\b${variant.widthCm}\\s*cm\\b`, "i");
+      return widthPattern.test(snapshotName) || snapshotName.toUpperCase().includes(variant.articleNumber);
+    });
+    if (matchedVariant) return matchedVariant.articleNumber;
+  }
+
+  return item.kitchenItem?.articleNumber || "";
+}
 
 function serializeOrderItems(items = [], locked = false) {
   return items.map((item) => ({
     itemType: String(item.itemType || "").toLowerCase(),
     code: item.code || "",
     name: item.nameSnapshot || "",
-    articleNumber: item.kitchenItem?.articleNumber || "",
+    articleNumber: getOrderItemArticleNumber(item),
+    blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
+    blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+    blendeName: item.kitchenItem?.catalogBlende?.name || item.blendeName || "",
+    blendeNameDe: item.kitchenItem?.catalogBlende?.nameDe || item.blendeNameDe || "",
+    blendePrice: item.kitchenItem?.blendePrice != null
+      ? Number(item.kitchenItem.blendePrice)
+      : (item.blendePrice != null ? Number(item.blendePrice) : null),
     quantity: item.quantity || 1,
     locked,
     sourceOrderId: item.sourceOrderId || "",

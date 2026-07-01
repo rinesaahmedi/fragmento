@@ -98,7 +98,14 @@ export async function getContractOrderState(kitchenContractId, client = prisma) 
       status: OrderStatus.CONFIRMED,
     },
     include: {
-      items: { orderBy: { createdAt: "asc" } },
+      items: {
+        orderBy: { createdAt: "asc" },
+        include: {
+          kitchenItem: {
+            include: { catalogBlende: true },
+          },
+        },
+      },
     },
     orderBy: { createdAt: "asc" },
   });

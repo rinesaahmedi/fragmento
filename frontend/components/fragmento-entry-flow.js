@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { normalizeContractNumber } from "../lib/kitchen-contracts";
 
@@ -269,8 +269,42 @@ function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, d
   );
 }
 
+const ORDER_CONFIRMED_TEXT = {
+  de: {
+    title: "Bestellung bestaetigt",
+    message: "Vielen Dank. Deine Zahlung wurde bestaetigt und die Bestellbestaetigung wurde versendet.",
+    reference: "Bestellnummer",
+  },
+  en: {
+    title: "Order confirmed",
+    message: "Thank you. Your payment was confirmed and the order confirmation has been sent.",
+    reference: "Order number",
+  },
+  tr: {
+    title: "Siparis onaylandi",
+    message: "Tesekkurler. Odemeniz onaylandi ve siparis onayi gonderildi.",
+    reference: "Siparis numarasi",
+  },
+  es: {
+    title: "Pedido confirmado",
+    message: "Gracias. Tu pago ha sido confirmado y la confirmacion del pedido ha sido enviada.",
+    reference: "Numero de pedido",
+  },
+  fr: {
+    title: "Commande confirmee",
+    message: "Merci. Votre paiement a ete confirme et la confirmation de commande a ete envoyee.",
+    reference: "Numero de commande",
+  },
+  ru: {
+    title: "Zakaz podtverzhden",
+    message: "Spasibo. Oplata podtverzhdena, i podtverzhdenie zakaza otpravleno.",
+    reference: "Nomer zakaza",
+  },
+};
+
 export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [initialEntryState] = useState(() => getLegalReturnEntryState());
   const [selectedLanguage, setSelectedLanguage] = useState(
     initialEntryState?.selectedLanguage || (initialLanguage === "en" ? "en" : "de")
@@ -284,6 +318,9 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const text = SCREEN_TEXT[selectedLanguage] || SCREEN_TEXT.en;
   const instructionText = INSTRUCTION_TEXTS[selectedLanguage] || INSTRUCTION_TEXTS.en;
   const avatarSource = AVATAR_SOURCES[selectedLanguage] || AVATAR_SOURCES.en;
+  const orderConfirmed = searchParams.get("orderConfirmed") === "1";
+  const confirmedOrderNumber = String(searchParams.get("order") || "").trim();
+  const orderConfirmedText = ORDER_CONFIRMED_TEXT[selectedLanguage] || ORDER_CONFIRMED_TEXT.en;
 
   useEffect(() => {
     window.sessionStorage.setItem(
@@ -359,6 +396,18 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
           <div style={logoWrapStyle}>
             <img src="/img/fragmentologo.png" alt="Fragmento by architecto." style={logoStyle} />
           </div>
+
+          {orderConfirmed ? (
+            <div style={orderConfirmedNoticeStyle} role="status" aria-live="polite">
+              <strong style={orderConfirmedTitleStyle}>{orderConfirmedText.title}</strong>
+              <span style={orderConfirmedMessageStyle}>{orderConfirmedText.message}</span>
+              {confirmedOrderNumber ? (
+                <span style={orderConfirmedReferenceStyle}>
+                  {orderConfirmedText.reference}: {confirmedOrderNumber}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
 
           {screen === "language" ? (
             <div style={contentAreaStyle}>
@@ -566,6 +615,42 @@ const headlineStyle = {
   fontWeight: 800,
   color: "#372f29",
   letterSpacing: "0.2px",
+};
+
+const orderConfirmedNoticeStyle = {
+  display: "grid",
+  gap: 5,
+  margin: "0 auto 16px",
+  maxWidth: 620,
+  border: "1px solid rgba(63, 166, 107, 0.28)",
+  borderRadius: 8,
+  background: "linear-gradient(180deg, rgba(232, 245, 237, 0.96) 0%, rgba(248, 255, 250, 0.94) 100%)",
+  color: "#245f3d",
+  padding: "12px 14px",
+  boxShadow: "0 10px 22px rgba(47, 94, 65, 0.12)",
+};
+
+const orderConfirmedTitleStyle = {
+  display: "block",
+  fontSize: 16,
+  lineHeight: 1.25,
+  fontWeight: 900,
+};
+
+const orderConfirmedMessageStyle = {
+  display: "block",
+  fontSize: 14,
+  lineHeight: 1.45,
+  fontWeight: 700,
+};
+
+const orderConfirmedReferenceStyle = {
+  display: "block",
+  fontSize: 13,
+  lineHeight: 1.35,
+  color: "#2f6f49",
+  fontWeight: 900,
+  overflowWrap: "anywhere",
 };
 
 const subheadlineStyle = {

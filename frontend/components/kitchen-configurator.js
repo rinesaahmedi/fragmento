@@ -922,6 +922,34 @@ function lockedItemCodesByType(initialOrder, itemType) {
   );
 }
 
+function buildInitialOrderItemLookup(initialOrder) {
+  const lookup = new Map();
+  (initialOrder?.items || []).forEach((item) => {
+    const itemType = String(item?.itemType || "").trim();
+    const code = String(item?.code || "").trim();
+    if (!itemType || !code) return;
+    lookup.set(`${itemType}:${code}`, item);
+  });
+  return lookup;
+}
+
+function mergeInitialOrderItemFields(item, itemType, initialOrderItemLookup) {
+  const initialItem = initialOrderItemLookup.get(`${itemType}:${item.code}`);
+  if (!initialItem) return item;
+
+  return {
+    ...item,
+    articleNumber: initialItem.articleNumber || item.articleNumber,
+    blendeCode: initialItem.blendeCode || item.blendeCode,
+    blendeLabel: initialItem.blendeLabel || item.blendeLabel,
+    blendeName: initialItem.blendeName || item.blendeName,
+    blendeNameDe: initialItem.blendeNameDe || item.blendeNameDe,
+    blendePrice: initialItem.blendePrice ?? item.blendePrice,
+    sourceOrderId: initialItem.sourceOrderId || item.sourceOrderId,
+    sourceOrderNumber: initialItem.sourceOrderNumber || item.sourceOrderNumber,
+  };
+}
+
 function expandLinkedComponentIds(kitchenSlug, componentIds) {
   return [
     ...new Set(
@@ -1152,6 +1180,10 @@ function KitchenConfiguratorContent({
     () => buildConfiguratorDraftStorageKey(kitchenSlug, initialContractNumber),
     [initialContractNumber, kitchenSlug],
   );
+  const initialOrderItemLookup = useMemo(
+    () => buildInitialOrderItemLookup(initialOrder),
+    [initialOrder],
+  );
   const orderLockedAccessoryCodes = useMemo(
     () => lockedItemCodesByType(initialOrder, "accessory"),
     [initialOrder],
@@ -1325,11 +1357,14 @@ function KitchenConfiguratorContent({
 
   const selectedComponents = kitchenConfig.components
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
-    .map((item) => ({
-      ...item,
-      isLocked: item.isLocked || defaultLockedComponentIds.includes(componentIdForItem(item)),
-      isOrderLocked: orderLockedComponentIds.includes(componentIdForItem(item)),
-    }));
+    .map((item) => {
+      const mergedItem = mergeInitialOrderItemFields(item, "component", initialOrderItemLookup);
+      return {
+        ...mergedItem,
+        isLocked: item.isLocked || defaultLockedComponentIds.includes(componentIdForItem(item)),
+        isOrderLocked: orderLockedComponentIds.includes(componentIdForItem(item)),
+      };
+    });
   const cutleryBaseItem = useMemo(
     () => getCutleryBaseItem(kitchenConfig.accessories),
     [kitchenConfig.accessories],
@@ -1338,7 +1373,7 @@ function KitchenConfiguratorContent({
     ...selectedMap(kitchenConfig.accessories, selectedAccessoryCodes)
       .filter((item) => !isCutleryAccessoryItem(item))
       .map((item) => ({
-        ...item,
+        ...mergeInitialOrderItemFields(item, "accessory", initialOrderItemLookup),
         isLocked: item.isLocked || defaultLockedAccessoryCodes.has(item.code),
         isOrderLocked: orderLockedAccessoryCodes.has(item.code),
       })),
@@ -1349,7 +1384,7 @@ function KitchenConfiguratorContent({
     })),
   ];
   const selectedServices = selectedMap(kitchenConfig.services, selectedServiceCodes).map((item) => ({
-    ...item,
+    ...mergeInitialOrderItemFields(item, "service", initialOrderItemLookup),
     isOrderLocked: orderLockedServiceCodes.has(item.code),
   }));
   const selectedProductCount = selectedComponents.length + selectedAccessories.length + selectedServices.length;
