@@ -2,7 +2,7 @@ import ImpressumBackLink from "../../components/impressum-back-link";
 
 export const metadata = {
   title: "Impressum | Fragmento Kitchen Configurator",
-  description: "Impressum und Anbieterkennzeichnung fuer den Fragmento Kitchen Configurator.",
+  description: "Impressum und Anbieterkennzeichnung für den Fragmento Kitchen Configurator.",
 };
 
 export default function ImpressumPage() {
@@ -16,9 +16,9 @@ export default function ImpressumPage() {
         <section className="legal-page__section">
           <h2>Anbieterkennzeichnung</h2>
           <p>
-            architecto. by Kuechen Aktuell GmbH
+            architecto. by Küchen Aktuell GmbH
             <br />
-            Senefelderstrasse 2b
+            Senefelderstraße 2b
             <br />
             38124 Braunschweig
           </p>
@@ -52,7 +52,7 @@ export default function ImpressumPage() {
         </section>
 
         <section className="legal-page__section">
-          <h2>Geschaeftsfuehrer</h2>
+          <h2>Geschäftsführer</h2>
           <p>Claus Kuepers, Andreas Puchta, Christoph Fughe, Emanuel Zaby</p>
         </section>
 
@@ -62,16 +62,16 @@ export default function ImpressumPage() {
         </section>
 
         <section className="legal-page__section">
-          <h2>Verantwortlich fuer den Inhalt nach § 18 Abs. 2 MStV</h2>
+          <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
           <p>Andreas Puchta, zu erreichen wie oben angegeben</p>
         </section>
 
         <section className="legal-page__section">
-          <h2>Streitbeilegung fuer Verbraucher</h2>
+          <h2>Streitbeilegung für Verbraucher</h2>
           <p>
-            Die architecto. by KA GmbH ist grundsaetzlich nicht verpflichtet und bereit, an
+            Die architecto. by KA GmbH ist grundsätzlich nicht verpflichtet und bereit, an
             Streitbeilegungsverfahren vor einer Schlichtungsstelle teilzunehmen. Die architecto. by KA GmbH wird
-            sich jedoch nachdruecklich bemuehen, einen Streitfall aussergerichtlich zu loesen.
+            sich jedoch nachdrücklich bemühen, einen Streitfall außergerichtlich zu lösen.
           </p>
         </section>
 
@@ -84,49 +84,49 @@ export default function ImpressumPage() {
           <h2>Haftungsausschluss</h2>
           <h3>Inhalt des Onlineangebotes</h3>
           <p>
-            Die bereitgestellten Informationen auf dieser Website wurden sorgfaeltig geprueft und werden
-            regelmaessig aktualisiert. Jedoch kann keine Garantie dafuer uebernommen werden, dass alle Angaben zu
-            jeder Zeit vollstaendig, richtig und in letzter Aktualitaet dargestellt sind. Dies gilt insbesondere
-            fuer alle Links zu anderen Websites, auf die direkt oder indirekt verwiesen wird. Alle Angaben koennen
-            ohne vorherige Ankuendigung ergaenzt, entfernt oder geaendert werden.
+            Die bereitgestellten Informationen auf dieser Website wurden sorgfältig geprüft und werden
+            regelmäßig aktualisiert. Jedoch kann keine Garantie dafür übernommen werden, dass alle Angaben zu
+            jeder Zeit vollständig, richtig und in letzter Aktualität dargestellt sind. Dies gilt insbesondere
+            für alle Links zu anderen Websites, auf die direkt oder indirekt verwiesen wird. Alle Angaben können
+            ohne vorherige Ankündigung ergänzt, entfernt oder geändert werden.
           </p>
           <p>
-            Der Inhalt dieser Website ist urheberrechtlich geschuetzt. Alle Rechte, auch die der Uebersetzung, des
+            Der Inhalt dieser Website ist urheberrechtlich geschützt. Alle Rechte, auch die der Übersetzung, des
             Nachdrucks und der Vervielfaeltigung des Inhalts oder Teilen daraus, sind vorbehalten. Ohne schriftliche
             Genehmigung darf der Inhalt und das Bildmaterial dieser Seite in keiner Form reproduziert oder unter
             Verwendung elektronischer Systeme verarbeitet, vervielfaeltigt oder verbreitet werden.
           </p>
           <h3>Verweise auf unseren Seiten</h3>
           <p>
-            Fuer alle Links auf der Website der architecto. by KA GmbH gilt: Wir moechten ausdruecklich betonen,
+            Für alle Links auf der Website der architecto. by KA GmbH gilt: Wir möchten ausdrücklich betonen,
             dass wir keinerlei Einfluss auf die Gestaltung und die Inhalte der gelinkten Seiten haben. Deshalb
             distanzieren wir uns hiermit ausdruecklich von allen Inhalten aller gelinkten Seiten und machen uns ihre
             Inhalte nicht zu Eigen.
           </p>
           <p>
-            Fuer illegale, fehlerhafte oder unvollstaendige Inhalte und insbesondere fuer Schaeden, die aus der
+            Für illegale, fehlerhafte oder unvollständige Inhalte und insbesondere für Schäden, die aus der
             Nutzung oder Nichtnutzung mittels Link eingebundener Seiten entstehen, haftet allein der Anbieter der
-            Seite, auf welche verwiesen wurde, nicht derjenige, der ueber Links auf die jeweilige Veroeffentlichung
+            Seite, auf welche verwiesen wurde, nicht derjenige, der über Links auf die jeweilige Veröffentlichung
             lediglich verweist. Falls die Seite www.myarchitecto.de in Internetseiten Dritter mittels Hyperlink
-            erreichbar ist, uebernimmt die architecto. by KA GmbH fuer deren Verwendung in den Internetseiten Dritter
+            erreichbar ist, übernimmt die architecto. by KA GmbH für deren Verwendung in den Internetseiten Dritter
             keinerlei Verantwortung.
           </p>
           <h3>Bereitgestellte Downloads</h3>
           <p>
-            Um zum Download bereitgestellte Dateien als PDF lesen und ausdrucken zu koennen, wird der Adobe Reader
-            benoetigt. Das Herunterladen und die Verwendung der Dateien erfolgt auf eigene Gefahr. Die architecto.
-            by KA GmbH uebernimmt ausdruecklich keine Gewaehrleistung oder Haftung fuer etwaige Schaeden,
-            Folgeschaeden oder Ausfaelle, die durch die bereitgestellten Dateien entstehen koennen.
+            Um zum Download bereitgestellte Dateien als PDF lesen und ausdrucken zu können, wird der Adobe Reader
+            benötigt. Das Herunterladen und die Verwendung der Dateien erfolgt auf eigene Gefahr. Die architecto.
+            by KA GmbH übernimmt ausdrücklich keine Gewährleistung oder Haftung für etwaige Schäden,
+            Folgeschäden oder Ausfälle, die durch die bereitgestellten Dateien entstehen können.
           </p>
           <h3>Rechtswirksamkeit dieses Haftungsausschlusses/Nutzungsbedingungen</h3>
           <p>
             Dieser Haftungsausschluss ist als Teil des Internetangebotes zu betrachten, von dem aus auf diese Seite
             verwiesen wurde. Sofern Teile oder einzelne Formulierungen dieses Textes der geltenden Rechtslage nicht,
-            nicht mehr oder nicht vollstaendig entsprechen sollten, bleiben die uebrigen Teile des Dokumentes in
-            ihrem Inhalt und ihrer Gueltigkeit davon unberuehrt.
+            nicht mehr oder nicht vollständig entsprechen sollten, bleiben die übrigen Teile des Dokumentes in
+            ihrem Inhalt und ihrer Gültigkeit davon unberührt.
           </p>
           <p>
-            Mit dem Besuch oder der Benutzung der Website der architecto. by KA GmbH erklaeren Sie sich mit diesen
+            Mit dem Besuch oder der Benutzung der Website der architecto. by KA GmbH erklären Sie sich mit diesen
             Nutzungsbestimmungen einverstanden.
           </p>
         </section>

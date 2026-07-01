@@ -1778,7 +1778,7 @@ function KitchenConfiguratorContent({
       .replace(/\((?:[^)]*\b[A-Z]{2,}[-\s]?[A-Z0-9]{2,}[^)]*|\b[A-Z0-9]{3,}[-\s]?[A-Z0-9]{2,}[^)]*)\)/g, "")
       .replace(/\b[A-Z]{2,}[-\s]?[A-Z0-9]{3,}(?:[-\s]?[A-Z0-9]{1,})*\b/g, "")
       .replace(/\b[A-Z]-[A-Z0-9]{4,}\b/g, "")
-      .replace(/\bH\s*[\u00d7x]\s*B\s*[\u00d7x]\s*T\b/gi, isGerman ? "Hoehe, Breite, Tiefe" : "height, width, depth")
+      .replace(/\bH\s*[\u00d7x]\s*B\s*[\u00d7x]\s*T\b/gi, isGerman ? "Höhe, Breite, Tiefe" : "height, width, depth")
       .replace(/\bB\s*[\u00d7x]\s*T\b/gi, isGerman ? "Breite, Tiefe" : "width, depth")
       .replace(/([0-9]+(?:[,.][0-9]+)?)\s*[\u2013-]\s*([0-9]+(?:[,.][0-9]+)?)/g, `$1 ${isGerman ? "bis" : "to"} $2`)
       .replace(/([0-9]+(?:[,.][0-9]+)?)\s*[\u00d7x]\s*([0-9]+(?:[,.][0-9]+)?)\s*[\u00d7x]\s*([0-9]+(?:[,.][0-9]+)?)/g, `$1 ${isGerman ? "mal" : "by"} $2 ${isGerman ? "mal" : "by"} $3`)

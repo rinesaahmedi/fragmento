@@ -301,7 +301,7 @@ export function buildProductInfoDraft({ text, fileName = "" }) {
   if (productNameLine) facts.push(productNameLine);
   if (modelLine) facts.push(/^modell|^model/i.test(modelLine) ? modelLine : asFact("Modell", modelLine));
   if (energyLine) facts.push(/:/.test(energyLine) ? energyLine : asFact("Energieklasse", energyLine));
-  if (noiseLine) facts.push(/:/.test(noiseLine) ? noiseLine : asFact("Geraeusch", noiseLine));
+  if (noiseLine) facts.push(/:/.test(noiseLine) ? noiseLine : asFact("Geräusch", noiseLine));
   if (widthLine) facts.push(/:/.test(widthLine) ? widthLine : asFact("Breite", widthLine));
   if (annualEnergyLine && annualEnergyLine !== energyLine) facts.push(/:/.test(annualEnergyLine) ? annualEnergyLine : asFact("Energieverbrauch", annualEnergyLine));
   if (waterLine) facts.push(/:/.test(waterLine) ? waterLine : asFact("Wasserverbrauch", waterLine));

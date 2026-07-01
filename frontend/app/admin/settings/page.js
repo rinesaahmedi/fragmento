@@ -10,7 +10,8 @@ import {
 } from "../../../components/admin-ui";
 import { getFormMessage } from "../../../lib/admin-forms";
 import {
-  getDeliveryLeadTimeDays,
+  DELIVERY_LEAD_TIME_MIN_WEEKS,
+  getDeliveryLeadTimeWeeks,
   getDeliveryMinOrderSettings,
   getDirectOrderConfirmationEnabled,
 } from "../../../lib/admin-settings";
@@ -23,10 +24,10 @@ export default async function AdminSettingsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const [directOrderConfirmationEnabled, deliveryMinOrderSettings, deliveryLeadTimeDays] = await Promise.all([
+  const [directOrderConfirmationEnabled, deliveryMinOrderSettings, deliveryLeadTimeWeeks] = await Promise.all([
     getDirectOrderConfirmationEnabled(),
     getDeliveryMinOrderSettings(),
-    getDeliveryLeadTimeDays(),
+    getDeliveryLeadTimeWeeks(),
   ]);
 
   return (
@@ -122,21 +123,21 @@ export default async function AdminSettingsPage({ searchParams }) {
               <div style={amountRowStyle}>
                 <label style={amountLabelStyle}>
                   <span style={amountLabelTextStyle}>
-                    <AdminText i18nKey="settingsAdmin.deliveryLeadTimeDays" fallback="Minimum days after order" />
+                    <AdminText i18nKey="settingsAdmin.deliveryLeadTimeWeeks" fallback="Minimum weeks after order" />
                   </span>
                   <input
-                    name="deliveryLeadTimeDays"
+                    name="deliveryLeadTimeWeeks"
                     type="number"
-                    min="0"
+                    min={DELIVERY_LEAD_TIME_MIN_WEEKS}
                     step="1"
-                    defaultValue={deliveryLeadTimeDays}
+                    defaultValue={deliveryLeadTimeWeeks}
                     style={amountInputStyle}
                   />
                 </label>
                 <p style={mutedHelpStyle}>
                   <AdminText
                     i18nKey="settingsAdmin.deliveryLeadTimeHelp"
-                    fallback="Example: 14 means customers can only select delivery dates at least two weeks after ordering."
+                    fallback="Example: 4 means customers can choose delivery after 4, 5, or 6 weeks."
                   />
                 </p>
               </div>

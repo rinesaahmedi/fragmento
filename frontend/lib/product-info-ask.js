@@ -2960,7 +2960,7 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
       .map((item) => {
         const features = formatProgramOrFeatureEntry(item, language, question);
         const noise = extractNoiseValueStrict(item);
-        const noiseText = noise ? `${language === "de" ? "Geraeusch" : "Noise"}: ${noise}` : "";
+        const noiseText = noise ? `${language === "de" ? "Geräusch" : "Noise"}: ${noise}` : "";
         const parts = [features, noiseText].filter(Boolean);
         return parts.length ? parts.join("; ") : null;
       })
@@ -2972,7 +2972,7 @@ function answerFromExplicitMultiItemFacts(question, items, language, answeredTop
 
     return {
       answer: language === "de"
-        ? formatSectionWithBullets("Die dokumentierten Programme/Funktionen und Geraeuschwerte sind:", entries)
+        ? formatSectionWithBullets("Die dokumentierten Programme/Funktionen und Geräuschwerte sind:", entries)
         : formatSectionWithBullets("The documented programs/features and noise values are:", entries),
       found: true,
     };

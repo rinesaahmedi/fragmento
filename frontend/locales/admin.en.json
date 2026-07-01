@@ -51,9 +51,10 @@
     "deliveryMinOrderEnabledHelp": "When enabled, orders that include Delivery, transport, assembly and connection must reach the minimum value below.",
     "deliveryMinOrderAmount": "Minimum order value (€)",
     "deliveryLeadTimeTitle": "Delivery lead time",
-    "deliveryLeadTimeDescription": "Set the earliest selectable preferred delivery date after an order is placed.",
+    "deliveryLeadTimeDescription": "Set the first selectable preferred delivery week after an order is placed.",
     "deliveryLeadTimeDays": "Minimum days after order",
-    "deliveryLeadTimeHelp": "Example: 14 means customers can only select delivery dates at least two weeks after ordering."
+    "deliveryLeadTimeWeeks": "Minimum weeks after order",
+    "deliveryLeadTimeHelp": "Example: 4 means customers can choose delivery after 4, 5, or 6 weeks."
   },
   "status": {
     "new": "New",

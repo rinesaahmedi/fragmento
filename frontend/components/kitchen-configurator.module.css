@@ -499,6 +499,38 @@
   pointer-events: none;
 }
 
+.planSideLabelLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.planSideLabel {
+  position: absolute;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 86px;
+  min-height: 30px;
+  padding: 5px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: #4d4033;
+  box-shadow: none;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+.planSideLabel strong {
+  color: #2f2a24;
+  font-size: 0.82rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .planHotspot {
   position: absolute;
   margin: 0;

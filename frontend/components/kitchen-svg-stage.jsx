@@ -1011,6 +1011,15 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
     bottomPadding: 4.8,
   },
 };
+const SPLIT_SIDE_WORKTOP_GAP_PERCENT = 8;
+const SPLIT_SIDE_OVEN_KEYS = new Set(["oven-module", "oven-base"]);
+const SPLIT_SIDE_SINK_KEYS = new Set(["sink-base"]);
+const SPLIT_SIDE_LABEL_SLUGS = new Set([
+  "ab-105833",
+  "ab-105836",
+  "ab-105839",
+  "ab-105842",
+]);
 
 function isBaseBodyHotspot(definition) {
   if (Array.isArray(definition.points) && definition.points.length) {
@@ -1310,6 +1319,88 @@ function cropPlanHotspot(hotspot, crop) {
   };
 }
 
+function cropPlanBox(box, crop) {
+  const left = Math.max(box.left, crop.left);
+  const top = Math.max(box.top, crop.top);
+  const right = Math.min(box.left + box.width, crop.right);
+  const bottom = Math.min(box.top + box.height, crop.bottom);
+
+  return {
+    ...box,
+    left: (left - crop.left) / crop.width * 100,
+    top: (top - crop.top) / crop.height * 100,
+    width: Math.max(right - left, 0) / crop.width * 100,
+    height: Math.max(bottom - top, 0) / crop.height * 100,
+  };
+}
+
+function getSplitKitchenSideLabels(definitions, crop, slug, translate, language) {
+  if (!SPLIT_SIDE_LABEL_SLUGS.has(slug)) return [];
+
+  const worktopRuns = definitions
+    .filter(isHorizontalWorktopHotspot)
+    .map(getHotspotSourceBounds)
+    .filter((bounds) => bounds.width >= 8)
+    .sort((a, b) => a.left - b.left);
+  if (worktopRuns.length < 2) return [];
+
+  const separatedRuns = worktopRuns.filter((run, index) => {
+    const previous = worktopRuns[index - 1];
+    const next = worktopRuns[index + 1];
+    return (
+      (previous && run.left - previous.right >= SPLIT_SIDE_WORKTOP_GAP_PERCENT) ||
+      (next && next.left - run.right >= SPLIT_SIDE_WORKTOP_GAP_PERCENT)
+    );
+  });
+  if (separatedRuns.length < 2) return [];
+
+  const findRunForComponent = (componentKeys) => {
+    const component = definitions
+      .filter((definition) => componentKeys.has(definition.componentKey))
+      .map(getHotspotSourceBounds)
+      .sort((a, b) => b.width * b.height - a.width * a.height)[0];
+    if (!component) return null;
+
+    const centerX = component.left + component.width / 2;
+    return separatedRuns.find((run) => centerX >= run.left && centerX <= run.right) || null;
+  };
+
+  const ovenRun = findRunForComponent(SPLIT_SIDE_OVEN_KEYS);
+  const sinkRun = findRunForComponent(SPLIT_SIDE_SINK_KEYS);
+  if (!ovenRun || !sinkRun || ovenRun === sinkRun) return [];
+
+  const getRunLabelTop = (run) => {
+    const runElements = definitions
+      .map(getHotspotSourceBounds)
+      .filter((bounds) => bounds.left < run.right && bounds.right > run.left);
+    const runTop = runElements.length ? Math.min(...runElements.map((bounds) => bounds.top)) : run.top;
+    return Math.max(0, runTop - 7);
+  };
+
+  const toLabel = (run, label) =>
+    cropPlanBox(
+      {
+        label,
+        left: run.left,
+        top: getRunLabelTop(run),
+        width: run.width,
+        height: 6,
+      },
+      crop,
+    );
+
+  return [
+    toLabel(
+      ovenRun,
+      translate("configurator.splitKitchenSideA", language === "de" ? "Seite A" : "Side A"),
+    ),
+    toLabel(
+      sinkRun,
+      translate("configurator.splitKitchenSideB", language === "de" ? "Seite B" : "Side B"),
+    ),
+  ].filter((label) => label.width > 0 && label.height > 0);
+}
+
 // The sink (faucet + waste) is always part of the default configuration and usually sits on
 // the worktop directly above the sink base. Derive a consistent fallback box for those plans,
 // while allowing manually calibrated hotspots when the visible bowl/faucet is offset.
@@ -1430,6 +1521,10 @@ export default function KitchenSvgStage({
         .map((hotspot) => cropPlanHotspot(hotspot, planDisplayCrop))
         .filter((hotspot) => hotspot.width > 0 && hotspot.height > 0),
     [imageHotspots, planDisplayCrop],
+  );
+  const splitKitchenSideLabels = useMemo(
+    () => getSplitKitchenSideLabels(imageHotspots, planDisplayCrop, normalizedKitchenSlug, translate, language),
+    [imageHotspots, planDisplayCrop, normalizedKitchenSlug, translate, language],
   );
   const croppedPlanAspectRatio =
     `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
@@ -1689,6 +1784,23 @@ export default function KitchenSvgStage({
                       );
                     })}
                   </div>
+                  {splitKitchenSideLabels.length ? (
+                    <div className={styles.planSideLabelLayer} aria-hidden="true">
+                      {splitKitchenSideLabels.map((sideLabel) => (
+                        <div
+                          key={sideLabel.label}
+                          className={styles.planSideLabel}
+                          style={{
+                            left: `${sideLabel.left}%`,
+                            top: `${sideLabel.top}%`,
+                            width: `${sideLabel.width}%`,
+                          }}
+                        >
+                          <strong>{sideLabel.label}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                   {isCalibrating ? (
                     <div className={styles.planCalibrationGrid} aria-hidden="true">
                       {CALIBRATION_TICKS.map((tick) => (

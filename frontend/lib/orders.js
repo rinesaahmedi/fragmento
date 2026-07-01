@@ -1,6 +1,6 @@
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
 import {
-  getDeliveryLeadTimeDays,
+  getDeliveryLeadTimeWeeks,
   getDeliveryMinOrderSettings,
   getDirectOrderConfirmationEnabled,
 } from "./admin-settings";
@@ -35,6 +35,7 @@ const PAYMENT_METHOD_ALIASES = new Map([
   ["klarna", "card"],
 ]);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const DELIVERY_WEEK_OPTION_COUNT = 3;
 
 function validationError(message) {
   const error = new Error(message);
@@ -101,13 +102,26 @@ function getMinimumPreferredDeliveryDate(leadTimeDays = 0, now = new Date()) {
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + days));
 }
 
-function assertPreferredDeliveryLeadTime(preferredDeliveryDate, leadTimeDays) {
+function assertPreferredDeliveryWeekOption(preferredDeliveryDate, deliveryLeadTimeWeeks) {
   if (!preferredDeliveryDate) return;
 
-  const minimumDeliveryDate = getMinimumPreferredDeliveryDate(leadTimeDays);
-  if (preferredDeliveryDate < minimumDeliveryDate) {
+  const orderDate = getMinimumPreferredDeliveryDate(0);
+  const allowedDates = new Set(
+    Array.from(
+      { length: DELIVERY_WEEK_OPTION_COUNT },
+      (_, index) => deliveryLeadTimeWeeks + index,
+    ).map((weeks) =>
+      new Date(Date.UTC(
+        orderDate.getUTCFullYear(),
+        orderDate.getUTCMonth(),
+        orderDate.getUTCDate() + (weeks * 7),
+      )).toISOString().slice(0, 10),
+    ),
+  );
+
+  if (!allowedDates.has(preferredDeliveryDate.toISOString().slice(0, 10))) {
     throw validationError(
-      `Preferred delivery date must be at least ${leadTimeDays} days after the order date.`,
+      `Preferred delivery week must be after ${deliveryLeadTimeWeeks}, ${deliveryLeadTimeWeeks + 1}, or ${deliveryLeadTimeWeeks + 2} weeks.`,
     );
   }
 }
@@ -357,8 +371,8 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     notes: customer.notes ? String(customer.notes).trim() : "",
     paymentMethod: validatePaymentMethod(customer.paymentMethod),
   };
-  const deliveryLeadTimeDays = await getDeliveryLeadTimeDays();
-  assertPreferredDeliveryLeadTime(validatedCustomer.preferredDeliveryDate, deliveryLeadTimeDays);
+  const deliveryLeadTimeWeeks = await getDeliveryLeadTimeWeeks();
+  assertPreferredDeliveryWeekOption(validatedCustomer.preferredDeliveryDate, deliveryLeadTimeWeeks);
   const submittedGroups = {
     components: normalizeSubmissionItems(orderPayload?.components),
     accessories: normalizeSubmissionItems(orderPayload?.accessories),

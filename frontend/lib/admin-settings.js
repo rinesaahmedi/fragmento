@@ -5,7 +5,9 @@ export const DELIVERY_MIN_ORDER_ENABLED_KEY = "deliveryMinOrderEnabled";
 export const DELIVERY_MIN_ORDER_AMOUNT_KEY = "deliveryMinOrderAmount";
 export const DELIVERY_MIN_ORDER_DEFAULT_AMOUNT = 1000;
 export const DELIVERY_LEAD_TIME_DAYS_KEY = "deliveryLeadTimeDays";
-export const DELIVERY_LEAD_TIME_DEFAULT_DAYS = 14;
+export const DELIVERY_LEAD_TIME_DEFAULT_WEEKS = 4;
+export const DELIVERY_LEAD_TIME_DEFAULT_DAYS = DELIVERY_LEAD_TIME_DEFAULT_WEEKS * 7;
+export const DELIVERY_LEAD_TIME_MIN_WEEKS = 4;
 
 const TRUE_VALUES = new Set(["true", "1", "yes", "on"]);
 const FALSE_VALUES = new Set(["false", "0", "no", "off", ""]);
@@ -95,6 +97,11 @@ export async function getDeliveryLeadTimeDays(client = prisma) {
   return parseIntegerSetting(setting?.value, DELIVERY_LEAD_TIME_DEFAULT_DAYS);
 }
 
+export async function getDeliveryLeadTimeWeeks(client = prisma) {
+  const days = await getDeliveryLeadTimeDays(client);
+  return Math.max(DELIVERY_LEAD_TIME_MIN_WEEKS, Math.ceil(days / 7));
+}
+
 export async function setDeliveryLeadTimeDays(days, client = prisma) {
   const value = String(parseIntegerSetting(days, DELIVERY_LEAD_TIME_DEFAULT_DAYS));
 
@@ -108,4 +115,13 @@ export async function setDeliveryLeadTimeDays(days, client = prisma) {
   });
 
   return Number(value);
+}
+
+export async function setDeliveryLeadTimeWeeks(weeks, client = prisma) {
+  const parsedWeeks = Math.max(
+    DELIVERY_LEAD_TIME_MIN_WEEKS,
+    parseIntegerSetting(weeks, DELIVERY_LEAD_TIME_DEFAULT_WEEKS),
+  );
+
+  return setDeliveryLeadTimeDays(parsedWeeks * 7, client);
 }

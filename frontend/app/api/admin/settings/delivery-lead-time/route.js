@@ -1,5 +1,5 @@
 import { redirectWithFlash } from "../../../../../lib/admin-forms";
-import { setDeliveryLeadTimeDays } from "../../../../../lib/admin-settings";
+import { setDeliveryLeadTimeWeeks } from "../../../../../lib/admin-settings";
 import { requireAdminApi } from "../../../../../lib/auth";
 
 const MESSAGES = {
@@ -24,10 +24,10 @@ export async function POST(request) {
   try {
     await requireAdminApi();
     const formData = await request.formData();
-    const rawDays = formData.get("deliveryLeadTimeDays");
-    const days = Math.max(0, Math.floor(Number(rawDays) || 0));
+    const rawWeeks = formData.get("deliveryLeadTimeWeeks");
+    const weeks = Math.floor(Number(rawWeeks) || 0);
 
-    await setDeliveryLeadTimeDays(days);
+    await setDeliveryLeadTimeWeeks(weeks);
 
     return redirectWithFlash(request, "/admin/settings", "success", getMessage(request, "updated"));
   } catch (error) {

@@ -429,7 +429,7 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
   for (const entry of orphanProblemAreaAttachments) {
     const areaLabel = [entry.areaName, entry.areaCode ? `(${entry.areaCode})` : ""].filter(Boolean).join(" ").trim();
     rows.push({
-      label: areaLabel || "Kuechenteil",
+      label: areaLabel || "Küchenteil",
       detail: "",
       attachments: [entry],
     });
@@ -692,7 +692,7 @@ function buildComplaintEmailText(payload) {
     "Servicereklamation",
     "",
     `Vertragsnummer: ${payload.contractNumber}`,
-    `Kueche: ${payload.kitchenName || "-"}`,
+    `Küche: ${payload.kitchenName || "-"}`,
     `Kunde: ${payload.givenName} ${payload.surname} (${payload.genderLabel})`,
     `Adresse: ${payload.clientAddress}`,
     `Telefon: ${payload.phone || "—"}`,
@@ -708,10 +708,10 @@ function buildComplaintEmailText(payload) {
     ...(claimItemRows.length
       ? [
           "",
-          "Ausgewaehlte Kuechenteile",
+          "Ausgewählte Küchenteile",
           ...claimItemRows.flatMap((row, index) => [
             "",
-            `Kuechenteil ${index + 1}:`,
+            `Küchenteil ${index + 1}:`,
             buildClaimItemText(row),
           ]),
         ]
@@ -776,7 +776,7 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
   const generalAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "general");
   const detailRows = [
     ["Vertragsnummer", payload.contractNumber],
-    ["Kueche", payload.kitchenName || "-"],
+    ["Küche", payload.kitchenName || "-"],
     ["Vorname", payload.givenName],
     ["Nachname", payload.surname],
     ["Geschlecht", payload.genderLabel],
@@ -787,7 +787,7 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
     ...(serialNumberAttachments.length
       ? [["Seriennummer-Anhaenge", serialNumberAttachments.map(formatAttachmentMetaLine).join("\n")]]
       : []),
-    ...claimItemRows.map((row, index) => [`Kuechenteil ${index + 1}`, { html: buildClaimItemHtml(row) }]),
+    ...claimItemRows.map((row, index) => [`Küchenteil ${index + 1}`, { html: buildClaimItemHtml(row) }]),
     ["Vermieter", landlordValue],
     ["Hausmeister", hausValue],
     ["Problem", standaloneProblemText || "-"],

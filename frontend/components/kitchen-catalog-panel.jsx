@@ -36,7 +36,7 @@ const DISHWASHER_BASE_MARKUP =
 
 const ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
-  refrigerator: '<img src="/img/foto6.png" alt="Kuehlschrank">',
+  refrigerator: '<img src="/img/foto6.png" alt="Kühlschrank">',
   extractor_hood: '<img src="/img/foto5.png" alt="Dunstabzugshaube">',
   wall_cabinet_single_light:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/><g stroke="#666" stroke-width="0.75"><line x1="30" y1="60" x2="30" y2="63"/><line x1="28" y1="63" x2="32" y2="63"/><line x1="26" y1="66" x2="22" y2="74"/><line x1="30" y1="66" x2="30" y2="75"/><line x1="34" y1="66" x2="38" y2="74"/></g></svg>',

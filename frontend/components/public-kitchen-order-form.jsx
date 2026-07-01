@@ -78,6 +78,29 @@ function buildCalendarDays(monthDate) {
   });
 }
 
+const DEFAULT_DELIVERY_LEAD_TIME_WEEKS = 4;
+const DELIVERY_WEEK_OPTION_COUNT = 3;
+
+function getDateAfterWeeks(weeks) {
+  const today = new Date();
+  return new Date(Date.UTC(
+    today.getUTCFullYear(),
+    today.getUTCMonth(),
+    today.getUTCDate() + (Number(weeks) * 7),
+  )).toISOString().slice(0, 10);
+}
+
+function getDeliveryWeekLabel(weeks, translate) {
+  return translate("order.deliveryAfterWeeks", "After {weeks} weeks", { weeks });
+}
+
+function getDeliveryLeadTimeWeeks(deliveryLeadTimeDays) {
+  return Math.max(
+    DEFAULT_DELIVERY_LEAD_TIME_WEEKS,
+    Math.ceil(Math.max(0, Number(deliveryLeadTimeDays) || 0) / 7),
+  );
+}
+
 function formatDateForDisplay(value, locale = "en-GB") {
   if (!value) return "";
   const date = new Date(`${value}T00:00:00.000Z`);
@@ -252,11 +275,19 @@ export default function PublicKitchenOrderForm({
   const canUseContractAddress = contractAddressLines.length > 0;
   const savedAddressLines = buildAddressLines(customer, translate);
   const savedHelpText = translate("order.savedHelp", "");
-  const orderDateValue = getDateInputMinValue(0);
-  const dateInputMinValue = getDateInputMinValue(deliveryLeadTimeDays);
   const dateLocale = language === "de" ? "de-DE" : "en-GB";
-  const formattedOrderDate = formatDateForDisplay(orderDateValue, dateLocale);
-  const formattedMinimumDeliveryDate = formatDateForDisplay(dateInputMinValue, dateLocale);
+  const deliveryLeadTimeWeeks = getDeliveryLeadTimeWeeks(deliveryLeadTimeDays);
+  const deliveryWeekOptions = Array.from(
+    { length: DELIVERY_WEEK_OPTION_COUNT },
+    (_, index) => deliveryLeadTimeWeeks + index,
+  ).map((weeks) => ({
+    weeks,
+    value: getDateAfterWeeks(weeks),
+    label: getDeliveryWeekLabel(weeks, translate),
+  }));
+  const selectedDeliveryWeekLabel =
+    deliveryWeekOptions.find((option) => option.value === customer.preferredDeliveryDate)?.label ||
+    formatDateForDisplay(customer.preferredDeliveryDate, dateLocale);
 
   function markFieldTouched(fieldKey) {
     setTouchedFields((current) => (current[fieldKey] ? current : { ...current, [fieldKey]: true }));
@@ -343,8 +374,8 @@ export default function PublicKitchenOrderForm({
                       savedAddressLines.join(", ") || (isUsingContractAddress ? translate("order.usingContractAddress", "The contract address will be used for this order.") : ""),
                     )}
                     {renderSavedDetail(
-                      translate("order.preferredDeliveryDate", "Preferred delivery date"),
-                      formatDateForDisplay(customer.preferredDeliveryDate),
+                      translate("order.preferredDeliveryWeek", "Preferred delivery week"),
+                      selectedDeliveryWeekLabel,
                     )}
                     {renderSavedDetail(translate("order.notes", "Notes (optional)"), customer.notes)}
                   </dl>
@@ -563,35 +594,30 @@ export default function PublicKitchenOrderForm({
                   <span>{translate("order.deliveryBadge", "Recommended")}</span>
                 </div>
                 <p>
-                  {deliveryLeadTimeDays > 0
-                    ? translate(
-                      "order.deliveryLeadTimeDescription",
-                      "We need at least {days} days after your order before delivery. For an order placed today ({orderDate}), the earliest selectable delivery date is {earliestDate}.",
-                      {
-                        days: deliveryLeadTimeDays,
-                        orderDate: formattedOrderDate,
-                        earliestDate: formattedMinimumDeliveryDate,
-                      },
-                    )
-                    : translate("order.deliveryHelp", "Tell us when you would prefer the kitchen to be delivered.")}
+                  {translate("order.deliveryWeekHelp", "Choose how many weeks after your order you would prefer delivery.")}
                 </p>
               </div>
             </div>
             <div className={styles.sectionFields}>
               <div className={[styles.field, styles.deliveryDateField].join(" ")}>
-                <label htmlFor="preferredDeliveryDate">{translate("order.preferredDeliveryDate", "Preferred delivery date")}</label>
-                <CustomDatePicker
+                <label htmlFor="preferredDeliveryDate">{translate("order.preferredDeliveryWeek", "Preferred delivery week")}</label>
+                <select
                   id="preferredDeliveryDate"
-                  min={dateInputMinValue}
-                  today={orderDateValue}
-                  locale={dateLocale}
-                  translate={translate}
+                  name="preferred-delivery-date"
                   value={customer.preferredDeliveryDate || ""}
-                  onChange={(value) => {
+                  onBlur={() => markFieldTouched("preferredDeliveryDate")}
+                  onChange={(event) => {
                     markFieldTouched("preferredDeliveryDate");
-                    onUpdateCustomer("preferredDeliveryDate", value);
+                    onUpdateCustomer("preferredDeliveryDate", event.target.value);
                   }}
-                />
+                >
+                  <option value="">{translate("order.selectPreferredDeliveryWeek", "Select delivery week")}</option>
+                  {deliveryWeekOptions.map((option) => (
+                    <option key={option.weeks} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>

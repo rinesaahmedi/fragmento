@@ -105,11 +105,11 @@ export async function POST(request) {
   const mailOptions = {
     from: `"Fragmento" <${smtpFrom}>`,
     to: to_email,
-    subject: `Bestellbestaetigung #${order_number}`,
+    subject: `Bestellbestätigung #${order_number}`,
     html: `
       ${logoImgTag}
       <p>Hallo ${to_name},</p>
-      <p>vielen Dank fuer deine Bestellung!</p>
+      <p>vielen Dank für deine Bestellung!</p>
       ${order_summary_html}
       <p>Dein Fragmento-Team</p>
     `,

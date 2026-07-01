@@ -34,7 +34,7 @@ const DISHWASHER_BASE_MARKUP =
 
 const LEGACY_ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
-  refrigerator: '<img src="/img/foto6.png" alt="Kuehlschrank">',
+  refrigerator: '<img src="/img/foto6.png" alt="Kühlschrank">',
   base_cabinet_30: '<img src="/img/foto1.png" alt="Unterschrank 30cm">',
   wall_cabinet_l: '<img src="/img/foto4.png" alt="Oberschrank links">',
   wall_cabinet_r: '<img src="/img/foto2.png" alt="Oberschrank rechts">',
@@ -120,7 +120,7 @@ function renderLegacyCatalogHtml(kitchenConfig) {
 
   if (kitchenConfig.accessories?.length) {
     parts.push(`
-            <div class="list-divider"><h3>Zubehoer</h3></div>`);
+            <div class="list-divider"><h3>Zubehör</h3></div>`);
 
     for (const item of kitchenConfig.accessories) {
       parts.push(`
@@ -137,7 +137,7 @@ function renderLegacyCatalogHtml(kitchenConfig) {
 
   if (kitchenConfig.services?.length) {
     parts.push(`
-            <div class="list-divider"><h3>Dienstleistungen hinzufuegen</h3></div>`);
+            <div class="list-divider"><h3>Dienstleistungen hinzufügen</h3></div>`);
 
     for (const item of kitchenConfig.services) {
       parts.push(`

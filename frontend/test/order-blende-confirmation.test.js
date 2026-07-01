@@ -45,7 +45,7 @@ test("order confirmation summary renders blende as a separate product row", () =
         code: "DISH-AB105806-600",
         articleNumber: "A-EGSPV597210 + TGV60",
         name: "Fully integrated dishwasher",
-        nameDe: "Vollintegrierter Geschirrspueler",
+        nameDe: "Vollintegrierter Geschirrspüler",
         iconKey: "dishwasher_base",
         componentKey: "dishwasher-base",
         price: 579,
@@ -57,24 +57,24 @@ test("order confirmation summary renders blende as a separate product row", () =
   };
 
   const html = buildOrderSummaryHtml(order);
-  const electricalSectionIndex = html.indexOf("Neu bestaetigte Elektrogeraete");
-  const cabinetSectionIndex = html.indexOf("Neu bestaetigte Kuechenmoebel");
-  const dishwasherIndex = html.indexOf("Vollintegrierter Geschirrspueler");
+  const electricalSectionIndex = html.indexOf("Neu bestätigte Elektrogeräte");
+  const cabinetSectionIndex = html.indexOf("Neu bestätigte Küchenmöbel");
+  const dishwasherIndex = html.indexOf("Vollintegrierter Geschirrspüler");
   const cabinetIndex = html.indexOf("Unterschrank mit Schubkasten");
 
-  assert.equal(html.includes("Neu bestaetigte Komponenten"), false);
+  assert.equal(html.includes("Neu bestätigte Komponenten"), false);
   assert.ok(electricalSectionIndex > -1);
   assert.ok(cabinetSectionIndex > electricalSectionIndex);
   assert.ok(dishwasherIndex > electricalSectionIndex && dishwasherIndex < cabinetSectionIndex);
   assert.ok(cabinetIndex > cabinetSectionIndex);
   assert.ok(cabinetIndex < html.indexOf("Blende UPK20 20 cm"));
   assert.match(html, /<th[^>]*>Nr\.<\/th>/);
-  assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Vollintegrierter Geschirrspueler/);
+  assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Vollintegrierter Geschirrspüler/);
   assert.match(html, /<td[^>]*>1<\/td><td[\s\S]*?Unterschrank mit Schubkasten/);
   assert.match(html, /<td[^>]*>2<\/td><td[\s\S]*?Blende UPK20 20 cm/);
   assert.doesNotMatch(html, /Base cabinet/);
   assert.doesNotMatch(html, /Fully integrated dishwasher/);
-  assert.match(html, /Vollintegrierter Geschirrspueler/);
+  assert.match(html, /Vollintegrierter Geschirrspüler/);
   assert.doesNotMatch(html, /Demo Kitchen/);
   assert.doesNotMatch(html, /OVEN-B-600-HOB/);
   assert.doesNotMatch(html, /SINK-WORKTOP/);
@@ -87,8 +87,8 @@ test("order confirmation summary renders blende as a separate product row", () =
   assert.match(html, /Auftragsnummer/);
   assert.match(html, /Vertragsnummer/);
   assert.match(html, /Code: UPK20/);
-  assert.match(html, /Gewuenschter Liefertermin/);
-  assert.match(html, /15\.07\.2026/);
+  assert.match(html, /Voraussichtliche Lieferzeit/);
+  assert.match(html, /Nach 2 Wochen/);
   assert.match(html, /219/);
   assert.match(html, /25/);
   assert.match(html, /244/);
@@ -115,14 +115,14 @@ test("order confirmation product-info attachments exclude default zero-price ite
       {
         code: "DISH-AB105806-600",
         name: "Fully integrated dishwasher",
-        nameDe: "Vollintegrierter Geschirrspueler",
+        nameDe: "Vollintegrierter Geschirrspüler",
         price: 579,
         productInfoPdfPath: "legal/architecto-agb-2026-05.pdf",
       },
       {
         code: "REF-AB105806-KGCN388140E",
         name: "Freestanding refrigerator 178cm",
-        nameDe: "Standkuehlschrank 178 cm",
+        nameDe: "Standkühlschrank 178 cm",
         price: 579,
         productInfoPdfPath: "legal/architecto-agb-2026.pdf",
       },
@@ -133,11 +133,11 @@ test("order confirmation product-info attachments exclude default zero-price ite
 
   const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
 
-  assert.deepEqual(staticHtml.attachmentLabels, ["Vollintegrierter Geschirrspueler", "Standkuehlschrank 178 cm"]);
+  assert.deepEqual(staticHtml.attachmentLabels, ["Vollintegrierter Geschirrspüler", "Standkühlschrank 178 cm"]);
   assert.match(staticHtml.html, /Produktinformationen im Anhang:/);
   assert.match(staticHtml.html, /<ul[^>]*>/);
-  assert.match(staticHtml.html, /<li[^>]*>Vollintegrierter Geschirrspueler<\/li>/);
-  assert.match(staticHtml.html, /<li[^>]*>Standkuehlschrank 178 cm<\/li>/);
+  assert.match(staticHtml.html, /<li[^>]*>Vollintegrierter Geschirrspüler<\/li>/);
+  assert.match(staticHtml.html, /<li[^>]*>Standkühlschrank 178 cm<\/li>/);
   assert.equal(staticHtml.html.includes("Fully integrated dishwasher"), false);
   assert.equal(staticHtml.html.includes("Freestanding refrigerator 178cm"), false);
   assert.equal(staticHtml.html.includes("Built-in oven and induction hob"), false);

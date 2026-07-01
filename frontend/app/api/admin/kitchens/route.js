@@ -11,7 +11,7 @@ const DEFAULT_KITCHEN_ITEMS = [
     code: "ACC-WASTE-001",
     articleNumber: "517467",
     name: "Waste separation system",
-    nameDe: "Muelltrennsystem",
+    nameDe: "Mülltrennsystem",
     price: "89.00",
     iconKey: "waste_system",
     sortOrder: 200,

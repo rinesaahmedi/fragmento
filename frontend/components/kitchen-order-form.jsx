@@ -30,11 +30,11 @@ const FIELD_ERROR_MESSAGES = {
   email: "Bitte E-Mail eingeben.",
   phone: "Bitte Telefonnummer eingeben.",
   address1: "Bitte Straße und Hausnummer eingeben.",
-  country: "Bitte Land auswaehlen.",
-  city: "Bitte Stadt auswaehlen.",
-  postalCode: "Bitte PLZ auswaehlen.",
-  paymentMethod: "Bitte Zahlungsmethode auswaehlen.",
-  consent: "Bitte bestaetige, dass du die Datenschutzerklaerung gelesen hast.",
+  country: "Bitte Land auswählen.",
+  city: "Bitte Stadt auswählen.",
+  postalCode: "Bitte PLZ auswählen.",
+  paymentMethod: "Bitte Zahlungsmethode auswählen.",
+  consent: "Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.",
 };
 
 function normalizeValue(value) {
@@ -445,7 +445,7 @@ export default function KitchenOrderForm({
                     }}
                     aria-invalid={hasFieldError("country", true)}
                   >
-                    <option value="">Land auswaehlen</option>
+                    <option value="">Land auswählen</option>
                     {countryOptions.map((country) => (
                       <option key={country} value={country}>{COUNTRY_LABELS[country] || country}</option>
                     ))}
@@ -468,7 +468,7 @@ export default function KitchenOrderForm({
                     }}
                     aria-invalid={hasFieldError("city", true)}
                   >
-                    <option value="">{customer.country ? "Stadt auswaehlen" : "Zuerst Land auswaehlen"}</option>
+                    <option value="">{customer.country ? "Stadt auswählen" : "Zuerst Land auswählen"}</option>
                     {cityOptions.map((city) => (
                       <option key={city} value={city}>{city}</option>
                     ))}
@@ -488,7 +488,7 @@ export default function KitchenOrderForm({
                     onChange={(event) => onUpdateCustomer("postalCode", event.target.value)}
                     aria-invalid={hasFieldError("postalCode", true)}
                   >
-                    <option value="">{customer.city ? "PLZ auswaehlen" : "Zuerst Stadt auswaehlen"}</option>
+                    <option value="">{customer.city ? "PLZ auswählen" : "Zuerst Stadt auswählen"}</option>
                     {postalCodeOptions.map((postalCode) => (
                       <option key={postalCode} value={postalCode}>{postalCode}</option>
                     ))}
@@ -551,11 +551,11 @@ export default function KitchenOrderForm({
             <div className={styles.orderSectionHeader}>
               <div>
                 <h3>Payment + Consent</h3>
-                <p>Waehle eine Zahlungsmethode, hinterlasse optional Hinweise und bestaetige den Datenschutz.</p>
+                <p>Wähle eine Zahlungsmethode, hinterlasse optional Hinweise und bestätige den Datenschutz.</p>
               </div>
             </div>
             <div className={styles.paymentSection}>
-              <label>Zahlungsmethode auswaehlen*</label>
+              <label>Zahlungsmethode auswählen*</label>
               <div className={styles.paymentOptions} role="radiogroup" aria-label="Zahlungsmethode">
                 {PAYMENT_METHOD_OPTIONS.map((option) => {
                   const selected = customer.paymentMethod === option.value;

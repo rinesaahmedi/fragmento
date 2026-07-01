@@ -47,7 +47,7 @@ const DISHWASHER_BASE_MARKUP =
 
 const LEGACY_ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
-  refrigerator: '<img src="/img/foto6.png" alt="Kuehlschrank">',
+  refrigerator: '<img src="/img/foto6.png" alt="Kühlschrank">',
   base_cabinet_30: '<img src="/img/foto1.png" alt="Unterschrank 30cm">',
   wall_cabinet_l: '<img src="/img/foto4.png" alt="Oberschrank links">',
   wall_cabinet_r: '<img src="/img/foto2.png" alt="Oberschrank rechts">',
@@ -384,14 +384,14 @@ function ensureLegacyCatalogRendered() {
 
   if (shouldBuildCatalogItems) {
     if (config.accessories?.length) {
-      createDivider("Zubehoer");
+      createDivider("Zubehör");
       config.accessories.forEach((item) => {
         combinedList.appendChild(createAccessoryItem(item));
       });
     }
 
     if (config.services?.length) {
-      createDivider("Dienstleistungen hinzufuegen");
+      createDivider("Dienstleistungen hinzufügen");
       config.services.forEach((item) => {
         combinedList.appendChild(createAccessoryItem(item));
       });

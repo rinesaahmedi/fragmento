@@ -14,6 +14,11 @@ const LETTERHEAD = {
   templatePath: "pdfs/architecto-letterhead.pdf",
 };
 
+const PDF_SENDER_ADDRESS = [
+  "architecto by Küchen Aktuell GmbH,",
+  "Senefelderstraße 2b, 38124 Braunschweig",
+];
+
 async function resolvePublicAssetPath(relativePath) {
   const candidates = [
     path.join(process.cwd(), "public", relativePath),
@@ -62,7 +67,19 @@ function getItemDisplayCode(item) {
 }
 
 function getItemDisplayName(item) {
-  return String(item?.nameDe || item?.name || item?.code || "").trim();
+  return normalizeGermanDisplayText(item?.nameDe || item?.name || item?.code || "");
+}
+
+function normalizeGermanDisplayText(value) {
+  return String(value || "")
+    .trim()
+    .replace(/Kuehlschrank/g, "Kühlschrank")
+    .replace(/Geschirrspueler/g, "Geschirrspüler")
+    .replace(/Spuele/g, "Spüle")
+    .replace(/Zubehoer/g, "Zubehör")
+    .replace(/\bKuechenmoebel\b/g, "Küchenmöbel")
+    .replace(/\bfuer\b/g, "für")
+    .replace(/\bOberschrank für Flachschirmhaube\s*,?\s*(\d+)\b/g, "Oberschrank für Flachschirmhaube, $1 cm");
 }
 
 async function loadProductImageAttachments(order) {
@@ -190,6 +207,33 @@ function formatDateOnly(value) {
     year: "numeric",
     timeZone: "UTC",
   }).format(date);
+}
+
+function getPreferredDeliveryWeekDisplay(value, orderCreatedAt = null) {
+  if (!value) return "";
+
+  const selectedDate = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(selectedDate.getTime())) return value;
+
+  const baseDate = orderCreatedAt ? new Date(orderCreatedAt) : new Date();
+  const orderDate = Number.isNaN(baseDate.getTime()) ? new Date() : baseDate;
+  const orderDateOnly = new Date(Date.UTC(orderDate.getUTCFullYear(), orderDate.getUTCMonth(), orderDate.getUTCDate()));
+  const dayDiff = Math.round((selectedDate.getTime() - orderDateOnly.getTime()) / 86400000);
+  const weeks = dayDiff / 7;
+
+  if (Number.isInteger(weeks) && weeks >= 1) {
+    return `Nach ${weeks} Wochen`;
+  }
+
+  return formatDateOnly(value);
+}
+
+function drawSenderAddressBlock(doc, x, y) {
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  PDF_SENDER_ADDRESS.forEach((line, index) => {
+    doc.text(line, x, y + index * 13, { align: "right" });
+  });
 }
 
 export function formatCurrency(num) {
@@ -409,19 +453,16 @@ export async function generateOrderConfirmationPdf(order) {
   };
 
   doc.setTextColor(0, 0, 0);
-  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y + 4, {
+  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestätigung", pageWidth - margin, y + 4, {
     align: "right",
   });
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  ["architecto.", "by Kuechen Aktuell GmbH", "Senefelderstrasse 2b", "38124 Braunschweig"].forEach((line, index) => {
-    doc.text(line, pageWidth - margin, y + 20 + index * 12, { align: "right" });
-  });
+  drawSenderAddressBlock(doc, pageWidth - margin, y + 31);
   y += 92;
 
   doc.setFont("helvetica", "bold").setFontSize(11);
   doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
   doc.text(`Datum: ${formatPdfDate(order.createdAt)}`, pageWidth - margin, y, { align: "right" });
-  doc.text(`Kuechenvertragsnr.: ${order.customer.contractNumber || "N/A"}`, margin, y + lineHeight);
+  doc.text(`Küchenvertrags-Nr.: ${order.customer.contractNumber || "N/A"}`, margin, y + lineHeight);
   y += 45;
 
   ensureSpace(90);
@@ -437,7 +478,7 @@ export async function generateOrderConfirmationPdf(order) {
     `E-Mail: ${order.customer.email}`,
     `Telefon: ${order.customer.phone}`,
     order.customer.preferredDeliveryDate
-      ? `Gewuenschter Liefertermin: ${formatDateOnly(order.customer.preferredDeliveryDate)}`
+      ? `Voraussichtliche Lieferzeit: ${getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt)}`
       : "",
   ]
     .filter(Boolean)
@@ -467,15 +508,19 @@ export async function generateOrderConfirmationPdf(order) {
 
     visibleItems.forEach((item, index) => {
       const nameLines = doc.splitTextToSize(getItemDisplayName(item), 208);
-      const rowHeight = Math.max(nameLines.length * lineHeight, 30) + 6;
+      const rowHeight = Math.max(36, nameLines.length * lineHeight + 14);
       ensureSpace(rowHeight);
-      doc.text(String(index + 1), margin, y);
-      drawItemIcon(doc, item, margin + 22, y - 8, 26);
-      nameLines.forEach((line, index) => {
-        doc.text(line, margin + 58, y + index * lineHeight);
+      const rowTop = y;
+      const rowTextY = rowTop + 14;
+      const iconY = rowTop + (rowHeight - 26) / 2;
+
+      doc.text(String(index + 1), margin, rowTextY);
+      drawItemIcon(doc, item, margin + 22, iconY, 26);
+      nameLines.forEach((line, lineIndex) => {
+        doc.text(line, margin + 58, rowTextY + lineIndex * lineHeight);
       });
-      doc.text(getItemDisplayCode(item), margin + 320, y);
-      doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
+      doc.text(getItemDisplayCode(item), margin + 320, rowTextY);
+      doc.text(formatCurrency(item.price), pageWidth - margin, rowTextY, { align: "right" });
       y += rowHeight;
     });
 
@@ -483,9 +528,9 @@ export async function generateOrderConfirmationPdf(order) {
   };
 
   const { electricalItems, cabinetItems } = splitComponentItems(order.components);
-  drawSection("Elektrogeraete:", electricalItems, { itemsAreVisible: true });
-  drawSection("Kuechenmoebel:", cabinetItems, { itemsAreVisible: true });
-  drawSection("Zubehoer:", order.accessories);
+  drawSection("Elektrogeräte:", electricalItems, { itemsAreVisible: true });
+  drawSection("Küchenmöbel:", cabinetItems, { itemsAreVisible: true });
+  drawSection("Zubehör:", order.accessories);
   drawSection("Dienstleistungen:", order.services);
 
   ensureSpace(40);
@@ -499,7 +544,7 @@ export async function generateOrderConfirmationPdf(order) {
 
   return {
     base64: Buffer.from(pdfBytes).toString("base64"),
-    filename: `Bestellbestaetigung-${order.orderNumber}.pdf`,
+    filename: `Bestellbestätigung-${order.orderNumber}.pdf`,
   };
 }
 
@@ -512,7 +557,7 @@ export function buildOrderSummaryHtml(order) {
   const orderDetailsRows = [
     ["Auftragsnummer", order.orderNumber],
     ["Vertragsnummer", order.customer.contractNumber || "-"],
-    ["Gewuenschter Liefertermin", order.customer.preferredDeliveryDate ? formatDateOnly(order.customer.preferredDeliveryDate) : "-"],
+    ["Voraussichtliche Lieferzeit", order.customer.preferredDeliveryDate ? getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt) : "-"],
   ]
     .map(
       ([label, value]) =>
@@ -548,12 +593,12 @@ export function buildOrderSummaryHtml(order) {
         ${(() => {
           const { electricalItems, cabinetItems } = splitComponentItems(order.components);
           return [
-            renderSection("Neu bestaetigte Elektrogeraete", electricalItems, order.productImageCids, { itemsAreVisible: true }),
-            renderSection("Neu bestaetigte Kuechenmoebel", cabinetItems, order.productImageCids, { itemsAreVisible: true }),
+            renderSection("Neu bestätigte Elektrogeräte", electricalItems, order.productImageCids, { itemsAreVisible: true }),
+            renderSection("Neu bestätigte Küchenmöbel", cabinetItems, order.productImageCids, { itemsAreVisible: true }),
           ].join("");
         })()}
-        ${renderSection("Neu bestaetigtes Zubehoer", order.accessories, order.productImageCids)}
-        ${renderSection("Neu bestaetigte Dienstleistungen", order.services, order.productImageCids)}
+        ${renderSection("Neu bestätigtes Zubehör", order.accessories, order.productImageCids)}
+        ${renderSection("Neu bestätigte Dienstleistungen", order.services, order.productImageCids)}
         <table style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;">
           <tr><td style="text-align:right;font-size:1.3em;font-weight:bold;">Gesamtpreis: ${formatCurrency(
             order.total,
@@ -610,11 +655,11 @@ function formatEmailBodyTextAsHtml(bodyText) {
 
 export function buildOrderConfirmationEmailDraft(order) {
   return {
-    subject: `Bestellbestaetigung #${order.orderNumber}`,
+    subject: `Bestellbestätigung #${order.orderNumber}`,
     bodyText: [
       `Hallo ${order.customer.firstName} ${order.customer.lastName},`,
       "",
-      "deine Bestellung wurde bestaetigt.",
+      "deine Bestellung wurde bestätigt.",
       "",
       `Vertragsnummer: ${order.customer.contractNumber || order.orderNumber}.`,
       "",
@@ -680,7 +725,7 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   const attachments = [];
   if (effectivePdfBase64) {
     attachments.push({
-      filename: effectivePdfFilename || `Bestellbestaetigung-${order.orderNumber}.pdf`,
+      filename: effectivePdfFilename || `Bestellbestätigung-${order.orderNumber}.pdf`,
       content: Buffer.from(effectivePdfBase64, "base64"),
       contentType: "application/pdf",
     });

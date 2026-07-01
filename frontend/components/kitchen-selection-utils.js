@@ -19,10 +19,10 @@ export function getSummaryPriceLabel(item) {
 export function getSummaryMetaLabel(item) {
   const price = Number(item?.price || 0);
   if (item?.isOrderLocked) {
-    return "Bereits bestaetigt";
+    return "Bereits bestätigt";
   }
   if (!item?.isLocked) {
-    return "Ausgewaehlt";
+    return "Ausgewählt";
   }
   if (price <= 0) {
     return "Im Grundmodell enthalten";
@@ -413,7 +413,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105825-600":
     case "CAB-HOOD-AB105828-600":
     case "CAB-HOOD-AB105831-600":
-      return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"));
+      return withPhotoNumber(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-C-ML-600":

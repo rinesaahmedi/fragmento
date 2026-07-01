@@ -3758,7 +3758,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
       doc.setFont('helvetica', 'normal').setFontSize(11);
       doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
       doc.text(`Datum: ${order.createdAt}`, pageW - margin, y, { align: 'right' }); 
-      doc.text(`Küchenvertragsnr.: ${order.customer.contractNumber}`, margin, y + 15);
+      doc.text(`Küchenvertrags-Nr.: ${order.customer.contractNumber}`, margin, y + 15);
       y += 45;
 
       doc.setFont('helvetica', 'bold').text('Kundendaten:', margin, y); y += 15;

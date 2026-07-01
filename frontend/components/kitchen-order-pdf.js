@@ -3,10 +3,8 @@ import { PDFDocument, rgb } from "pdf-lib";
 import { formatCurrency } from "./kitchen-selection-utils";
 
 const PDF_COMPANY_ADDRESS = [
-  "architecto.",
-  "by Kuechen Aktuell GmbH",
-  "Senefelderstrasse 2b",
-  "38124 Braunschweig",
+  "architecto by Küchen Aktuell GmbH,",
+  "Senefelderstraße 2b, 38124 Braunschweig",
 ];
 
 const LETTERHEAD = {
@@ -28,6 +26,33 @@ function formatDateOnly(value) {
     year: "numeric",
     timeZone: "UTC",
   }).format(date);
+}
+
+function getPreferredDeliveryWeekDisplay(value, orderCreatedAt = null) {
+  if (!value) return "";
+
+  const selectedDate = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(selectedDate.getTime())) return value;
+
+  const baseDate = orderCreatedAt ? new Date(orderCreatedAt) : new Date();
+  const orderDate = Number.isNaN(baseDate.getTime()) ? new Date() : baseDate;
+  const orderDateOnly = new Date(Date.UTC(orderDate.getUTCFullYear(), orderDate.getUTCMonth(), orderDate.getUTCDate()));
+  const dayDiff = Math.round((selectedDate.getTime() - orderDateOnly.getTime()) / 86400000);
+  const weeks = dayDiff / 7;
+
+  if (Number.isInteger(weeks) && weeks >= 1) {
+    return `Nach ${weeks} Wochen`;
+  }
+
+  return formatDateOnly(value);
+}
+
+function drawSenderAddressBlock(doc, x, y) {
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  PDF_COMPANY_ADDRESS.forEach((line, index) => {
+    doc.text(line, x, y + index * 13, { align: "right" });
+  });
 }
 
 export async function blobToBase64(blob) {
@@ -109,7 +134,19 @@ function getItemDisplayCode(item) {
 }
 
 function getItemDisplayName(item) {
-  return String(item?.nameDe || item?.name || item?.code || "").trim();
+  return normalizeGermanDisplayText(item?.nameDe || item?.name || item?.code || "");
+}
+
+function normalizeGermanDisplayText(value) {
+  return String(value || "")
+    .trim()
+    .replace(/Kuehlschrank/g, "Kühlschrank")
+    .replace(/Geschirrspueler/g, "Geschirrspüler")
+    .replace(/Spuele/g, "Spüle")
+    .replace(/Zubehoer/g, "Zubehör")
+    .replace(/\bKuechenmoebel\b/g, "Küchenmöbel")
+    .replace(/\bfuer\b/g, "für")
+    .replace(/\bOberschrank für Flachschirmhaube\s*,?\s*(\d+)\b/g, "Oberschrank für Flachschirmhaube, $1 cm");
 }
 
 function expandItemsWithBlende(items = []) {
@@ -177,19 +214,16 @@ export async function generateOrderPdf(order) {
     y = LETTERHEAD.contentTop;
   };
 
-  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y + 4, {
+  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestätigung", pageWidth - margin, y + 4, {
     align: "right",
   });
-  doc.setFont("helvetica", "normal").setFontSize(9);
-  PDF_COMPANY_ADDRESS.forEach((line, index) => {
-    doc.text(line, pageWidth - margin, y + 20 + index * 12, { align: "right" });
-  });
+  drawSenderAddressBlock(doc, pageWidth - margin, y + 31);
   y += 92;
 
   doc.setFont("helvetica", "normal").setFontSize(11);
   doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
   doc.text(`Datum: ${order.createdAt}`, pageWidth - margin, y, { align: "right" });
-  doc.text(`Kuechenvertragsnr.: ${order.customer.contractNumber || "N/A"}`, margin, y + lineHeight);
+  doc.text(`Küchenvertrags-Nr.: ${order.customer.contractNumber || "N/A"}`, margin, y + lineHeight);
   y += 45;
 
   ensureSpace(90);
@@ -206,7 +240,7 @@ export async function generateOrderPdf(order) {
     `E-Mail: ${order.customer.email}`,
     `Telefon: ${order.customer.phone}`,
     order.customer.preferredDeliveryDate
-      ? `Gewuenschter Liefertermin: ${formatDateOnly(order.customer.preferredDeliveryDate)}`
+      ? `Voraussichtliche Lieferzeit: ${getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt)}`
       : "",
   ]
     .filter(Boolean)
@@ -254,14 +288,17 @@ export async function generateOrderPdf(order) {
       const itemName = getItemDisplayName(item);
       const displayName = quantity > 1 ? `${itemName} (${quantity}x)` : itemName;
       const nameLines = doc.splitTextToSize(displayName, 220);
-      const rowHeight = Math.max(nameLines.length, 1) * lineHeight + 5;
+      const rowHeight = Math.max(28, Math.max(nameLines.length, 1) * lineHeight + 12);
       ensureSpace(rowHeight);
-      doc.text(String(itemIndex + 1), margin, y);
+      const rowTop = y;
+      const rowTextY = rowTop + 12;
+
+      doc.text(String(itemIndex + 1), margin, rowTextY);
       nameLines.forEach((line, index) => {
-        doc.text(line, margin + 28, y + index * lineHeight);
+        doc.text(line, margin + 28, rowTextY + index * lineHeight);
       });
-      doc.text(getItemDisplayCode(item), margin + 270, y);
-      doc.text(formatCurrency(lineTotal), pageWidth - margin, y, { align: "right" });
+      doc.text(getItemDisplayCode(item), margin + 270, rowTextY);
+      doc.text(formatCurrency(lineTotal), pageWidth - margin, rowTextY, { align: "right" });
       y += rowHeight;
     });
 
@@ -269,9 +306,9 @@ export async function generateOrderPdf(order) {
   };
 
   const { electricalItems, cabinetItems } = splitComponentItems(order.components);
-  drawSection("Elektrogeraete:", electricalItems, { itemsAreVisible: true });
-  drawSection("Kuechenmoebel:", cabinetItems, { itemsAreVisible: true });
-  drawSection("Zubehoer:", order.accessories);
+  drawSection("Elektrogeräte:", electricalItems, { itemsAreVisible: true });
+  drawSection("Küchenmöbel:", cabinetItems, { itemsAreVisible: true });
+  drawSection("Zubehör:", order.accessories);
   drawSection("Dienstleistungen:", order.services);
 
   ensureSpace(40);
