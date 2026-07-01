@@ -19,6 +19,7 @@ import {
   textareaStyle,
 } from "../../../../components/admin-ui";
 import { Fragment } from "react";
+import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
 import { AdminShell } from "../../../../components/admin-shell";
 import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
@@ -126,6 +127,30 @@ function CatalogAddonForm({ action, item, submitLabel }) {
   );
 }
 
+function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems }) {
+  const linkedCount = Number(linkedKitchenItems || 0);
+  if (linkedCount > 0) {
+    return (
+      <span style={deleteUnavailableStyle}>
+        Linked to {linkedCount} KitchenItem{linkedCount === 1 ? "" : "s"}
+      </span>
+    );
+  }
+
+  return (
+    <form action={action} method="post" style={deleteFormStyle}>
+      <AdminConfirmSubmitButton
+        name="_intent"
+        value="delete"
+        style={deleteButtonStyle}
+        confirmFallback={`Delete ${entityLabel.toLowerCase()} "${itemLabel}"?\nThis action cannot be undone.`}
+      >
+        Delete
+      </AdminConfirmSubmitButton>
+    </form>
+  );
+}
+
 function formatDimensionPart(value) {
   return Number.isFinite(Number(value)) ? String(Number(value)) : "-";
 }
@@ -201,9 +226,9 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <PageHero
-          eyebrow="Read-only"
+          eyebrow="Manage"
           title="Catalog"
-          description="Reusable articles, blenden, and services. These rows are visible for audit only; checkout still uses KitchenItem.price."
+          description="Reusable articles, blenden, and services for kitchen item setup and catalog audit."
           actions={<ActionLink href="/api/admin/catalog/export" secondary>Export Excel</ActionLink>}
         />
         {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
@@ -250,10 +275,18 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       </tr>
                       <tr>
                         <td colSpan={9} style={editRowCellStyle}>
-                          <details style={editDetailsStyle}>
-                            <summary style={editSummaryStyle}>Edit</summary>
-                            <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
-                          </details>
+                          <div style={editActionRowStyle}>
+                            <details style={editDetailsStyle}>
+                              <summary style={editSummaryStyle}>Edit</summary>
+                              <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
+                            </details>
+                            <CatalogDeleteForm
+                              action={`/api/admin/catalog/articles/${article.id}`}
+                              entityLabel="Article"
+                              itemLabel={article.articleNumber}
+                              linkedKitchenItems={article.linkedKitchenItems}
+                            />
+                          </div>
                         </td>
                       </tr>
                     </Fragment>
@@ -301,10 +334,18 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       </tr>
                       <tr>
                         <td colSpan={7} style={editRowCellStyle}>
-                          <details style={editDetailsStyle}>
-                            <summary style={editSummaryStyle}>Edit</summary>
-                            <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
-                          </details>
+                          <div style={editActionRowStyle}>
+                            <details style={editDetailsStyle}>
+                              <summary style={editSummaryStyle}>Edit</summary>
+                              <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
+                            </details>
+                            <CatalogDeleteForm
+                              action={`/api/admin/catalog/blenden/${blende.id}`}
+                              entityLabel="Blende"
+                              itemLabel={blende.code}
+                              linkedKitchenItems={blende.linkedKitchenItems}
+                            />
+                          </div>
                         </td>
                       </tr>
                     </Fragment>
@@ -352,10 +393,18 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       </tr>
                       <tr>
                         <td colSpan={7} style={editRowCellStyle}>
-                          <details style={editDetailsStyle}>
-                            <summary style={editSummaryStyle}>Edit</summary>
-                            <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
-                          </details>
+                          <div style={editActionRowStyle}>
+                            <details style={editDetailsStyle}>
+                              <summary style={editSummaryStyle}>Edit</summary>
+                              <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
+                            </details>
+                            <CatalogDeleteForm
+                              action={`/api/admin/catalog/services/${service.id}`}
+                              entityLabel="Service"
+                              itemLabel={service.code}
+                              linkedKitchenItems={service.linkedKitchenItems}
+                            />
+                          </div>
                         </td>
                       </tr>
                     </Fragment>
@@ -399,7 +448,7 @@ const editRowCellStyle = {
 };
 
 const editDetailsStyle = {
-  width: "100%",
+  flex: "1 1 480px",
 };
 
 const editSummaryStyle = {
@@ -409,4 +458,43 @@ const editSummaryStyle = {
   padding: "9px 13px",
   listStyle: "none",
   cursor: "pointer",
+};
+
+const editActionRowStyle = {
+  display: "flex",
+  alignItems: "flex-start",
+  gap: 10,
+  flexWrap: "wrap",
+};
+
+const deleteFormStyle = {
+  margin: 0,
+};
+
+const deleteButtonStyle = {
+  border: "1px solid rgba(217, 92, 92, 0.24)",
+  background: "rgba(255,255,255,0.72)",
+  color: "var(--app-danger-text)",
+  minHeight: 40,
+  borderRadius: 8,
+  padding: "9px 13px",
+  fontSize: 13,
+  boxShadow: "none",
+  fontWeight: 800,
+  cursor: "pointer",
+  whiteSpace: "nowrap",
+};
+
+const deleteUnavailableStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  minHeight: 40,
+  borderRadius: 8,
+  padding: "9px 13px",
+  background: "rgba(115, 80, 55, 0.07)",
+  border: "1px solid rgba(115, 80, 55, 0.12)",
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 800,
+  whiteSpace: "nowrap",
 };

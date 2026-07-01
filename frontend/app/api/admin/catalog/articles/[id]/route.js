@@ -22,6 +22,23 @@ export async function POST(request, { params }) {
 
   try {
     const formData = await request.formData();
+    const intentValues = formData.getAll("_intent");
+    const intent = String(intentValues[intentValues.length - 1] || "update");
+
+    if (intent === "delete") {
+      const linkedCount = await prisma.kitchenItem.count({
+        where: { catalogArticleId: id },
+      });
+      if (linkedCount > 0) {
+        return redirectWithFlash(request, "/admin/catalog/articles", "error", `Article is linked to ${linkedCount} kitchen item(s). Remove those links before deleting it.`);
+      }
+
+      await prisma.catalogArticle.delete({
+        where: { id },
+      });
+      return redirectWithFlash(request, "/admin/catalog/articles", "success", "Article deleted.");
+    }
+
     const data = validateCatalogArticleInput(formData);
 
     const updatedCount = await prisma.$transaction(async (tx) => {

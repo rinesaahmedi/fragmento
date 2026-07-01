@@ -215,7 +215,15 @@ export default async function CheckoutSuccessPage({ searchParams }) {
   const componentItems = receiptItems.filter((item) => item.itemType === ItemType.COMPONENT);
   const accessoryItems = receiptItems.filter((item) => item.itemType === ItemType.ACCESSORY);
   const serviceItems = receiptItems.filter((item) => item.itemType === ItemType.SERVICE);
-  const kitchenHref = order?.kitchen?.slug ? `/kitchens/${order.kitchen.slug}` : "/";
+  const kitchenHref = order?.kitchen?.slug
+    ? {
+        pathname: `/kitchens/${order.kitchen.slug}`,
+        query: {
+          order: order.orderNumber,
+          ...(order.contractNumber ? { contractNumber: order.contractNumber } : {}),
+        },
+      }
+    : "/";
   const address = order
     ? [order.address1, order.address2, `${order.postalCode} ${order.city}`.trim(), order.country].filter(Boolean).join(", ")
     : "";

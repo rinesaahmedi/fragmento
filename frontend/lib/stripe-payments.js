@@ -1,5 +1,8 @@
 import { prisma } from "./prisma";
 import { getStripeClient } from "./stripe";
+import { getDirectOrderConfirmationEnabled } from "./admin-settings";
+import { buildOrderForNotifications } from "./orders";
+import { sendOrderConfirmationEmail } from "./email/order-notifications";
 
 export function getPaymentStatusLabel(status) {
   const value = String(status || "UNPAID").toUpperCase();
@@ -16,6 +19,29 @@ function normalizeStripeCheckoutPaymentMethod(value) {
     return "card";
   }
   return "card";
+}
+
+async function maybeSendPaidOrderConfirmation(orderRecord) {
+  if (!orderRecord || String(orderRecord.paymentStatus || "").toUpperCase() !== "PAID") {
+    return;
+  }
+
+  const orderStatus = String(orderRecord.status || "").toUpperCase();
+  if (orderStatus === "CONFIRMED" || orderStatus === "EMAILED" || orderStatus === "CANCELLED") {
+    return;
+  }
+
+  const directOrderConfirmationEnabled = await getDirectOrderConfirmationEnabled();
+  if (!directOrderConfirmationEnabled) {
+    return;
+  }
+
+  const order = buildOrderForNotifications(orderRecord);
+  await sendOrderConfirmationEmail({ order });
+  await prisma.order.update({
+    where: { id: orderRecord.id },
+    data: { status: "CONFIRMED" },
+  });
 }
 
 export async function updateOrderFromCheckoutSession(session) {
@@ -38,17 +64,31 @@ export async function updateOrderFromCheckoutSession(session) {
     paidAt: isPaid ? paidAt : null,
   };
 
+  const include = {
+    kitchen: true,
+    items: {
+      orderBy: { createdAt: "asc" },
+      include: { kitchenItem: true },
+    },
+  };
+
+  let updatedOrder;
   if (orderNumber) {
-    return prisma.order.update({
+    updatedOrder = await prisma.order.update({
       where: { orderNumber },
       data,
+      include,
+    });
+  } else {
+    updatedOrder = await prisma.order.update({
+      where: { stripeCheckoutSessionId: session.id },
+      data,
+      include,
     });
   }
 
-  return prisma.order.update({
-    where: { stripeCheckoutSessionId: session.id },
-    data,
-  });
+  await maybeSendPaidOrderConfirmation(updatedOrder);
+  return updatedOrder;
 }
 
 export async function createCheckoutSessionForOrder({ order, origin, successPath = "/checkout/success", cancelUrl }) {

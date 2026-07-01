@@ -65,6 +65,21 @@ function getItemDisplayName(item) {
   return String(item?.nameDe || item?.name || item?.code || "").trim();
 }
 
+function getItemDisplayNameWithQuantity(item) {
+  const name = getItemDisplayName(item);
+  const quantity = Math.max(1, Math.floor(Number(item?.quantity || 1)));
+  return quantity > 1 ? `${name} x ${quantity}` : name;
+}
+
+function parseTrailingQuantity(value) {
+  const match = String(value || "").match(/\bx\s*(\d+)\s*$/i);
+  return match ? Math.max(1, Math.floor(Number(match[1]) || 1)) : 1;
+}
+
+function stripTrailingQuantity(value) {
+  return String(value || "").replace(/\s*x\s*\d+\s*$/i, "").trim();
+}
+
 async function loadProductImageAttachments(order) {
   const selectedItems = getPaidConfirmationItems([...order.components, ...order.accessories, ...order.services]);
   const seenAssetPaths = new Map();
@@ -208,15 +223,21 @@ function buildBlendeDisplayItem(item) {
 
   const blendeCode = String(item?.blendeCode || blendeLabel).trim();
   const blendePrice = item?.blendePrice == null ? 0 : Number(item.blendePrice || 0);
+  const blendeQuantity = Math.max(parseTrailingQuantity(blendeLabel), parseTrailingQuantity(blendeCode));
+  const displayLabel = stripTrailingQuantity(blendeLabel);
+  const displayCode = stripTrailingQuantity(blendeCode);
 
   return {
     ...item,
-    code: blendeCode || "BLENDE",
-    articleNumber: blendeCode || "BLENDE",
-    name: `Blende ${blendeLabel}`,
-    nameDe: `Blende ${blendeLabel}`,
-    price: blendePrice,
+    code: displayCode || "BLENDE",
+    articleNumber: displayCode || "BLENDE",
+    name: `Blende ${displayLabel || blendeLabel}`,
+    nameDe: `Blende ${displayLabel || blendeLabel}`,
+    price: blendePrice / blendeQuantity,
+    quantity: 1,
     iconKey: "blende",
+    isBlendeDisplayItem: true,
+    blendeDisplayQuantity: blendeQuantity,
     productImagePath: "",
     productInfoPdfPath: "",
     productInfoSummary: "",
@@ -233,14 +254,19 @@ function expandItemsWithBlende(items = []) {
     const blendeItem = buildBlendeDisplayItem(item);
     if (!blendeItem) return [item];
 
-    const blendePrice = Number(blendeItem.price || 0);
+    const blendePrice = Number(item?.blendePrice || 0);
     const itemPrice = Number(item?.price || 0);
     const parentItem = {
       ...item,
       price: Math.max(itemPrice - blendePrice, 0),
     };
+    const blendeQuantity = Math.max(1, Math.floor(Number(blendeItem.blendeDisplayQuantity || 1)));
+    const blendeItems = Array.from({ length: blendeQuantity }, (_, index) => ({
+      ...blendeItem,
+      blendeDisplayIndex: index + 1,
+    }));
 
-    return [parentItem, blendeItem];
+    return [parentItem, ...blendeItems];
   });
 }
 
@@ -280,6 +306,26 @@ function splitComponentItems(items = []) {
     electricalItems: visibleItems.filter(isElectricalComponentItem),
     cabinetItems: visibleItems.filter((item) => !isElectricalComponentItem(item)),
   };
+}
+
+function buildNumberedRows(items = []) {
+  let nextMainNumber = 1;
+  let currentParentNumber = "";
+
+  return items.map((item) => {
+    if (item?.isBlendeDisplayItem && currentParentNumber) {
+      return {
+        item,
+        rowNumber: `${currentParentNumber}.${item.blendeDisplayIndex || 1}`,
+      };
+    }
+
+    const rowNumber = String(nextMainNumber);
+    currentParentNumber = rowNumber;
+    nextMainNumber += 1;
+
+    return { item, rowNumber };
+  });
 }
 
 function drawItemIcon(doc, item, x, y, size = 16) {
@@ -465,11 +511,11 @@ export async function generateOrderConfirmationPdf(order) {
     y += 18;
     doc.setFont("helvetica", "normal").setFontSize(10);
 
-    visibleItems.forEach((item, index) => {
-      const nameLines = doc.splitTextToSize(getItemDisplayName(item), 208);
+    buildNumberedRows(visibleItems).forEach(({ item, rowNumber }) => {
+      const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), 208);
       const rowHeight = Math.max(nameLines.length * lineHeight, 30) + 6;
       ensureSpace(rowHeight);
-      doc.text(String(index + 1), margin, y);
+      doc.text(rowNumber, margin, y);
       drawItemIcon(doc, item, margin + 22, y - 8, 26);
       nameLines.forEach((line, index) => {
         doc.text(line, margin + 58, y + index * lineHeight);
@@ -523,15 +569,15 @@ export function buildOrderSummaryHtml(order) {
   const renderSection = (title, items, imageCidByAssetPath = new Map(), options = {}) => {
     const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
     if (!visibleItems.length) return "";
-    const rows = visibleItems
-      .map((item, index) => {
+    const rows = buildNumberedRows(visibleItems)
+      .map(({ item, rowNumber }) => {
         const productImagePath = normalizeProductImageAssetPath(item.productImagePath);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
         const imageHtml = imageCid
           ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
           : "";
 
-        return `<tr><td style="${tdStyles};width:34px;font-weight:bold;">${index + 1}</td><td style="${tdStyles}"><div style="display:flex;align-items:center;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayName(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(
+        return `<tr><td style="${tdStyles};width:34px;font-weight:bold;">${escapeHtml(rowNumber)}</td><td style="${tdStyles}"><div style="display:flex;align-items:center;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(
             item.price,
           )}</td></tr>`;
       })
