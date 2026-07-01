@@ -71,12 +71,11 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   assert.ok(cabinetIndex < html.indexOf("Blende UPK20 20 cm"));
   assert.match(html, /<th[^>]*>Nr\.<\/th>/);
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Vollintegrierter Geschirrspüler/);
-  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?1\.1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schubkasten[\s\S]*?Blende UPK20 20 cm/);
-  assert.match(html, /1\.1[\s\S]*?Blende UPK20 20 cm/);
-  assert.match(html, /<div style="margin-top:8px;">Blende UPK20 20 cm/);
+  assert.match(html, /<tr><td[^>]*>1<\/td><td[\s\S]*?Unterschrank mit Schubkasten[\s\S]*?<\/td><td[\s\S]*?219/);
+  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm[\s\S]*?Code: UPK20[\s\S]*?<\/td><td[\s\S]*?25/);
+  assert.doesNotMatch(html, /<div style="margin-top:8px;">Blende UPK20 20 cm/);
   assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">Blende/);
   assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">25/);
-  assert.doesNotMatch(html, /<tr><td[^>]*>1\.1<\/td>/);
   assert.doesNotMatch(html, /Base cabinet/);
   assert.doesNotMatch(html, /Fully integrated dishwasher/);
   assert.match(html, /Vollintegrierter Geschirrspüler/);
@@ -131,9 +130,7 @@ test("order confirmation groups multiple blendes under their parent cabinet", ()
   const html = buildOrderSummaryHtml(order);
 
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60/);
-  assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?1\.1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60[\s\S]*?Blende UPK20 20 cm x 2/);
-  assert.match(html, /1\.1[\s\S]*?Blende UPK20 20 cm x 2/);
-  assert.doesNotMatch(html, /<tr><td[^>]*>1\.1<\/td>/);
+  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm x 2[\s\S]*?Code: UPK20[\s\S]*?<\/td><td[\s\S]*?50/);
   assert.doesNotMatch(html, /1\.2[\s\S]*?Blende UPK20 20 cm/);
   assert.match(html, /Code: UPK20/);
   assert.doesNotMatch(html, /UPK20 x2/);

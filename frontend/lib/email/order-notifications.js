@@ -728,19 +728,11 @@ export function buildOrderSummaryHtml(order) {
         const imageHtml = imageCid
           ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
           : "";
-        const blendeHtml = blendeItems
-          .map((blendeItem) => `<div style="margin-top:8px;">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></div>`)
+        const parentRow = `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(rowNumber)}</td><td style="${tdStyles}"><div style="display:flex;align-items:flex-start;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(item.price)}</td></tr>`;
+        const blendeRows = blendeItems
+          .map((blendeItem) => `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(blendeItem.rowNumber)}</td><td style="${tdStyles}">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></td><td style="${priceTdStyles}">${formatCurrency(blendeItem.price)}</td></tr>`)
           .join("");
-        const blendeNumberHtml = blendeItems
-          .map((blendeItem) => `<div style="margin-top:24px;">${escapeHtml(blendeItem.rowNumber)}</div>`)
-          .join("");
-        const blendePriceHtml = blendeItems
-          .map((blendeItem) => `<div style="margin-top:8px;">${formatCurrency(blendeItem.price)}</div>`)
-          .join("");
-
-        return `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;"><div>${escapeHtml(rowNumber)}</div>${blendeNumberHtml}</td><td style="${tdStyles}"><div style="display:flex;align-items:flex-start;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span>${blendeHtml}</div></div></td><td style="${priceTdStyles}">${formatCurrency(
-            item.price,
-          )}${blendePriceHtml}</td></tr>`;
+        return `${parentRow}${blendeRows}`;
       })
       .join("");
 
