@@ -785,11 +785,16 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
 
   const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText });
   attachments.push(...(emailPreview.productImageAttachments || []));
+  const customerEmail = String(order.customer.email || "").trim();
+  const copyToSender = smtpFrom && customerEmail.toLowerCase() !== smtpFrom.toLowerCase()
+    ? smtpFrom
+    : undefined;
 
   try {
     await transporter.sendMail({
       from: `"Fragmento" <${smtpFrom}>`,
-      to: order.customer.email,
+      to: customerEmail,
+      cc: copyToSender,
       subject: emailPreview.subject,
       html: emailPreview.html,
       attachments,
