@@ -314,6 +314,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const [contractNumber, setContractNumber] = useState(initialEntryState?.contractNumber || "");
   const [error, setError] = useState("");
   const [isValidatingContract, setIsValidatingContract] = useState(false);
+  const [isOrderConfirmedNoticeDismissed, setIsOrderConfirmedNoticeDismissed] = useState(false);
 
   const text = SCREEN_TEXT[selectedLanguage] || SCREEN_TEXT.en;
   const instructionText = INSTRUCTION_TEXTS[selectedLanguage] || INSTRUCTION_TEXTS.en;
@@ -321,6 +322,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const orderConfirmed = searchParams.get("orderConfirmed") === "1";
   const confirmedOrderNumber = String(searchParams.get("order") || "").trim();
   const orderConfirmedText = ORDER_CONFIRMED_TEXT[selectedLanguage] || ORDER_CONFIRMED_TEXT.en;
+  const shouldShowOrderConfirmedNotice = orderConfirmed && !isOrderConfirmedNoticeDismissed && screen === "language";
 
   useEffect(() => {
     window.sessionStorage.setItem(
@@ -335,6 +337,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   }, [contractNumber, screen, selectedLanguage, selectedMode]);
 
   function handleLanguageSelect(nextLanguage) {
+    setIsOrderConfirmedNoticeDismissed(true);
     setSelectedLanguage(nextLanguage);
     setSelectedMode("");
     setError("");
@@ -397,7 +400,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
             <img src="/img/fragmentologo.png" alt="Fragmento by architecto." style={logoStyle} />
           </div>
 
-          {orderConfirmed ? (
+          {shouldShowOrderConfirmedNotice ? (
             <div style={orderConfirmedNoticeStyle} role="status" aria-live="polite">
               <strong style={orderConfirmedTitleStyle}>{orderConfirmedText.title}</strong>
               <span style={orderConfirmedMessageStyle}>{orderConfirmedText.message}</span>
