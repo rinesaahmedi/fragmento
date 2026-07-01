@@ -760,6 +760,8 @@
     "deleteThisOrder": "Delete this order?",
     "deleteCannotBeUndone": "This action cannot be undone.",
     "deleteConfirmMessage": "Delete this order?\nThis action cannot be undone.",
+    "deleteAllOrders": "Delete all orders",
+    "deleteAllConfirmMessage": "Delete all orders?\nThis removes every order and cannot be undone.",
     "noOrdersFound": "No orders found.",
     "noArticleCodes": "No article codes",
     "openDetails": "Open details",

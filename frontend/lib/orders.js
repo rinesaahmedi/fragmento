@@ -590,6 +590,15 @@ export async function resendOrderEmail(orderId, emailOverrides = {}) {
   return order;
 }
 
+export async function deleteAllOrders() {
+  const [, deletedOrders] = await prisma.$transaction([
+    prisma.orderItem.deleteMany({}),
+    prisma.order.deleteMany({}),
+  ]);
+
+  return deletedOrders.count;
+}
+
 export async function retryOrderWebhook(orderId) {
   const orderRecord = await getOrderRecordForOperations(orderId);
   const order = buildOrderForNotifications(orderRecord);
