@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { PDFDocument, rgb } from "pdf-lib";
 import { formatCurrency } from "./kitchen-selection-utils";
 
 const PDF_COMPANY_ADDRESS = [
@@ -7,6 +8,14 @@ const PDF_COMPANY_ADDRESS = [
   "Senefelderstrasse 2b",
   "38124 Braunschweig",
 ];
+
+const LETTERHEAD = {
+  headerHeight: 74,
+  footerHeight: 66,
+  contentTop: 114,
+  contentBottomPadding: 24,
+  templateUrl: "/pdfs/architecto-letterhead.pdf",
+};
 
 function formatDateOnly(value) {
   if (!value) return "";
@@ -37,33 +46,42 @@ export async function blobToBase64(blob) {
   });
 }
 
-async function loadPdfLogoImage(url) {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.onload = () => resolve(img);
-    img.onerror = () => reject(new Error(`Failed to load image at ${url}.`));
-    img.src = url;
-  });
-}
+async function applyArchitectoLetterheadTemplate(pdfBytes) {
+  const [contentPdf, templatePdf] = await Promise.all([
+    PDFDocument.load(pdfBytes),
+    fetch(LETTERHEAD.templateUrl).then((response) => {
+      if (!response.ok) throw new Error(`Could not load letterhead template: ${response.status}`);
+      return response.arrayBuffer();
+    }).then((bytes) => PDFDocument.load(bytes)),
+  ]);
+  const templatePage = templatePdf.getPage(0);
+  const outputPdf = await PDFDocument.create();
+  const templateSize = templatePage.getSize();
 
-async function renderLogoDataUrl() {
-  const logoImage = await loadPdfLogoImage("/img/fragmentologo-cropped.jpg");
-  const scale = 2;
-  const logoWidth = 920;
-  const logoHeight = 205;
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(logoWidth * scale);
-  canvas.height = Math.round(logoHeight * scale);
-  const context = canvas.getContext("2d");
+  for (let pageIndex = 0; pageIndex < contentPdf.getPageCount(); pageIndex += 1) {
+    const [letterheadPage] = await outputPdf.copyPages(templatePdf, [0]);
+    outputPdf.addPage(letterheadPage);
+    const outputPage = outputPdf.getPage(pageIndex);
+    const { width, height } = outputPage.getSize();
+    const embeddedContentPage = await outputPdf.embedPage(contentPdf.getPage(pageIndex));
 
-  if (!context) return null;
+    outputPage.drawRectangle({
+      x: 0,
+      y: LETTERHEAD.footerHeight,
+      width,
+      height: Math.max(0, height - LETTERHEAD.footerHeight - LETTERHEAD.headerHeight),
+      color: rgb(1, 1, 1),
+      borderWidth: 0,
+    });
+    outputPage.drawPage(embeddedContentPage, {
+      x: 0,
+      y: 0,
+      width: templateSize.width,
+      height: templateSize.height,
+    });
+  }
 
-  context.fillStyle = "#ffffff";
-  context.fillRect(0, 0, canvas.width, canvas.height);
-  context.drawImage(logoImage, 0, 0, canvas.width, canvas.height);
-
-  return canvas.toDataURL("image/jpeg", 0.9);
+  return outputPdf.save();
 }
 
 function buildBlendeDisplayItem(item) {
@@ -150,29 +168,23 @@ export async function generateOrderPdf(order) {
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 40;
   const lineHeight = 15;
-  let y = margin;
+  const contentBottom = pageHeight - LETTERHEAD.footerHeight - LETTERHEAD.contentBottomPadding;
+  let y = LETTERHEAD.contentTop;
 
   const ensureSpace = (requiredHeight = 24) => {
-    if (y + requiredHeight <= pageHeight - margin) return;
+    if (y + requiredHeight <= contentBottom) return;
     doc.addPage();
-    y = margin;
+    y = LETTERHEAD.contentTop;
   };
 
-  try {
-    const imageData = await renderLogoDataUrl();
-    if (imageData) doc.addImage(imageData, "JPEG", margin, y + 4, 230, 51);
-  } catch (error) {
-    console.error("Konnte das Logo fuer das PDF nicht laden:", error);
-  }
-
-  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y, {
+  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y + 4, {
     align: "right",
   });
   doc.setFont("helvetica", "normal").setFontSize(9);
   PDF_COMPANY_ADDRESS.forEach((line, index) => {
     doc.text(line, pageWidth - margin, y + 20 + index * 12, { align: "right" });
   });
-  y += 120;
+  y += 92;
 
   doc.setFont("helvetica", "normal").setFontSize(11);
   doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
@@ -270,8 +282,9 @@ export async function generateOrderPdf(order) {
   doc.text(formatCurrency(order.total), pageWidth - margin, y, { align: "right" });
 
   const filename = `Bestellung-${order.orderNumber}.pdf`;
+  const pdfBytes = await applyArchitectoLetterheadTemplate(doc.output("arraybuffer"));
   return {
-    blob: doc.output("blob"),
+    blob: new Blob([pdfBytes], { type: "application/pdf" }),
     filename,
   };
 }

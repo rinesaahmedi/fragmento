@@ -4,6 +4,15 @@ import https from "https";
 import { jsPDF } from "jspdf";
 import nodemailer from "nodemailer";
 import path from "path";
+import { PDFDocument, rgb } from "pdf-lib";
+
+const LETTERHEAD = {
+  headerHeight: 74,
+  footerHeight: 66,
+  contentTop: 114,
+  contentBottomPadding: 24,
+  templatePath: "pdfs/architecto-letterhead.pdf",
+};
 
 async function resolvePublicAssetPath(relativePath) {
   const candidates = [
@@ -122,34 +131,45 @@ async function loadProductInfoAttachments(order) {
   return { attachments, labels };
 }
 
-function fetchBuffer(url) {
-  return new Promise((resolve, reject) => {
-    https
-      .get(url, (res) => {
-        const chunks = [];
-        res.on("data", (chunk) => chunks.push(chunk));
-        res.on("end", () => resolve(Buffer.concat(chunks)));
-        res.on("error", reject);
-      })
-      .on("error", reject);
-  });
-}
-
 async function loadLogoBuffer() {
   const logoPath = await resolvePublicAssetPath("img/fragmentologo-cropped.jpg");
   return fs.readFile(logoPath);
 }
 
-async function drawPdfLogo(doc, x, y, width) {
-  const logoBuffer = await loadLogoBuffer();
-  const imageData = `data:image/jpeg;base64,${logoBuffer.toString("base64")}`;
-  const height = (width * 205) / 920;
+async function applyArchitectoLetterheadTemplate(pdfBytes) {
+  const templatePath = await resolvePublicAssetPath(LETTERHEAD.templatePath);
+  const [contentPdf, templatePdf] = await Promise.all([
+    PDFDocument.load(pdfBytes),
+    fs.readFile(templatePath).then((bytes) => PDFDocument.load(bytes)),
+  ]);
+  const templatePage = templatePdf.getPage(0);
+  const outputPdf = await PDFDocument.create();
+  const templateSize = templatePage.getSize();
 
-  doc.setFillColor(255, 255, 255);
-  doc.rect(x, y, width, height, "F");
-  doc.addImage(imageData, "JPEG", x, y, width, height);
+  for (let pageIndex = 0; pageIndex < contentPdf.getPageCount(); pageIndex += 1) {
+    const [letterheadPage] = await outputPdf.copyPages(templatePdf, [0]);
+    outputPdf.addPage(letterheadPage);
+    const outputPage = outputPdf.getPage(pageIndex);
+    const { width, height } = outputPage.getSize();
+    const embeddedContentPage = await outputPdf.embedPage(contentPdf.getPage(pageIndex));
 
-  return height;
+    outputPage.drawRectangle({
+      x: 0,
+      y: LETTERHEAD.footerHeight,
+      width,
+      height: Math.max(0, height - LETTERHEAD.footerHeight - LETTERHEAD.headerHeight),
+      color: rgb(1, 1, 1),
+      borderWidth: 0,
+    });
+    outputPage.drawPage(embeddedContentPage, {
+      x: 0,
+      y: 0,
+      width: templateSize.width,
+      height: templateSize.height,
+    });
+  }
+
+  return outputPdf.save();
 }
 
 function formatPdfDate(value) {
@@ -379,31 +399,24 @@ export async function generateOrderConfirmationPdf(order) {
   const pageHeight = doc.internal.pageSize.getHeight();
   const margin = 40;
   const lineHeight = 15;
-  let y = margin;
+  const contentBottom = pageHeight - LETTERHEAD.footerHeight - LETTERHEAD.contentBottomPadding;
+  let y = LETTERHEAD.contentTop;
 
   const ensureSpace = (requiredHeight = 24) => {
-    if (y + requiredHeight <= pageHeight - margin) return;
+    if (y + requiredHeight <= contentBottom) return;
     doc.addPage();
-    y = margin;
+    y = LETTERHEAD.contentTop;
   };
 
-  try {
-    await drawPdfLogo(doc, margin, y + 8, 230);
-  } catch (error) {
-    console.warn("Could not draw PDF logo:", error.message);
-    doc.setFont("helvetica", "bold").setFontSize(26).setTextColor(65, 55, 48).text("fragmento.", margin, y + 42);
-    doc.setFont("helvetica", "normal").setFontSize(8).setTextColor(65, 55, 48).text("by architecto.", margin + 48, y + 56);
-  }
-
   doc.setTextColor(0, 0, 0);
-  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y, {
+  doc.setFont("helvetica", "bold").setFontSize(22).text("Bestellbestaetigung", pageWidth - margin, y + 4, {
     align: "right",
   });
   doc.setFont("helvetica", "normal").setFontSize(9);
   ["architecto.", "by Kuechen Aktuell GmbH", "Senefelderstrasse 2b", "38124 Braunschweig"].forEach((line, index) => {
     doc.text(line, pageWidth - margin, y + 20 + index * 12, { align: "right" });
   });
-  y += 105;
+  y += 92;
 
   doc.setFont("helvetica", "bold").setFontSize(11);
   doc.text(`Bestellnummer: ${order.orderNumber}`, margin, y);
@@ -482,8 +495,10 @@ export async function generateOrderConfirmationPdf(order) {
   doc.text("Gesamtpreis:", margin, y);
   doc.text(formatCurrency(order.total), pageWidth - margin, y, { align: "right" });
 
+  const pdfBytes = await applyArchitectoLetterheadTemplate(doc.output("arraybuffer"));
+
   return {
-    base64: doc.output("datauristring").split(",")[1] || "",
+    base64: Buffer.from(pdfBytes).toString("base64"),
     filename: `Bestellbestaetigung-${order.orderNumber}.pdf`,
   };
 }
