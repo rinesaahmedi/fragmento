@@ -311,6 +311,20 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105828-H3002-L": "13",
 };
 
+["105840", "105843"].forEach((targetCode) => {
+  [
+    "CAB-BASE-AB105837-US60-R",
+    "CAB-BASE-AB105837-500-R",
+    "DISH-AB105837-600",
+    "CAB-WALL-AB105837-US60-R",
+    "CAB-HOOD-AB105837-600",
+    "CAB-WALL-AB105837-US60-L",
+  ].forEach((sourceCode) => {
+    AB_105806_PHOTO_NUMBER_BY_CODE[sourceCode.replace("AB105837", `AB${targetCode}`)] =
+      AB_105806_PHOTO_NUMBER_BY_CODE[sourceCode];
+  });
+});
+
 export function getLocalizedItemName(item, translate, language = "en", includeCalloutNumber = true) {
   const code = String(item?.code || "").trim().toUpperCase();
   const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
@@ -394,6 +408,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
     case "CAB-HOOD-AB105837-600":
+    case "CAB-HOOD-AB105840-600":
+    case "CAB-HOOD-AB105843-600":
+    case "CAB-HOOD-AB105825-600":
+    case "CAB-HOOD-AB105828-600":
     case "CAB-HOOD-AB105831-600":
       return withDimensions(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"));
     case "CAB-WALL-C-L-600":
@@ -414,6 +432,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
     case "HOOD-AB105837-FH664621E":
+    case "HOOD-AB105840-FH664621E":
+    case "HOOD-AB105843-FH664621E":
+    case "HOOD-AB105825-FH664621E":
+    case "HOOD-AB105828-FH664621E":
     case "HOOD-AB105831-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
@@ -452,6 +474,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-AB105845-600":
     case "DISH-AB105834-600":
     case "DISH-AB105837-600":
+    case "DISH-AB105840-600":
+    case "DISH-AB105843-600":
+    case "DISH-AB105825-600":
+    case "DISH-AB105828-600":
     case "DISH-AB105831-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
@@ -479,6 +505,8 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-AB105819-KGCN388140E":
     case "REF-AB105821-KGCN388140E":
     case "REF-AB105845-KGCN388140E":
+    case "REF-AB105825-KGCN388140E":
+    case "REF-AB105828-KGCN388140E":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
       return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"));
@@ -572,12 +600,20 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
     case "CAB-HOOD-AB105837-600":
+    case "CAB-HOOD-AB105840-600":
+    case "CAB-HOOD-AB105843-600":
+    case "CAB-HOOD-AB105825-600":
+    case "CAB-HOOD-AB105828-600":
     case "CAB-HOOD-AB105831-600":
       return translate("configurator.catalogItemInfo.lightHoodSetup", "HD6002, light hood setup");
     case "HOOD-B-FH664621E":
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
     case "HOOD-AB105837-FH664621E":
+    case "HOOD-AB105840-FH664621E":
+    case "HOOD-AB105843-FH664621E":
+    case "HOOD-AB105825-FH664621E":
+    case "HOOD-AB105828-FH664621E":
     case "HOOD-AB105831-FH664621E":
     case "T3D-HOOD-001":
       return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
@@ -617,6 +653,10 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105845-600":
     case "DISH-AB105834-600":
     case "DISH-AB105837-600":
+    case "DISH-AB105840-600":
+    case "DISH-AB105843-600":
+    case "DISH-AB105825-600":
+    case "DISH-AB105828-600":
     case "DISH-AB105831-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
@@ -650,6 +690,8 @@ export function getLocalizedItemInfoText(item, translate) {
     case "REF-AB105819-KGCN388140E":
     case "REF-AB105821-KGCN388140E":
     case "REF-AB105845-KGCN388140E":
+    case "REF-AB105825-KGCN388140E":
+    case "REF-AB105828-KGCN388140E":
     case "REF-C-545-1800-700":
       return translate("configurator.catalogItemInfo.fridgeFreezerNoFrost", "Fridge-freezer, 180 cm, NoFrost");
     case "SINK-WORKTOP":
@@ -693,7 +735,10 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105829": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105832": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105840": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105843": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105825": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105828": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105833": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105826": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -882,6 +927,19 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   ],
 };
 
+["105840", "105843"].forEach((targetCode) => {
+  ["DISH-AB105837-600", "HOOD-AB105837-FH664621E"].forEach((sourceCode) => {
+    PRODUCT_INFO_DOCUMENTS_BY_CODE[sourceCode.replace("AB105837", `AB${targetCode}`)] =
+      PRODUCT_INFO_DOCUMENTS_BY_CODE[sourceCode];
+  });
+});
+
+["105825", "105828"].forEach((targetCode) => {
+  PRODUCT_INFO_DOCUMENTS_BY_CODE[`DISH-AB${targetCode}-600`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+  PRODUCT_INFO_DOCUMENTS_BY_CODE[`REF-AB${targetCode}-KGCN388140E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
+  PRODUCT_INFO_DOCUMENTS_BY_CODE[`HOOD-AB${targetCode}-FH664621E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+});
+
 const PRODUCT_INFO_DISPLAY_OVERRIDES_BY_CODE = {
   "WM-B-EWA34660W": {
     infoText: "Washing machine, 8 kg, 1400 rpm",
@@ -1052,6 +1110,13 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "WM-AB105845-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
   "T3D-WASHER-001": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
 };
+
+["105840", "105843"].forEach((targetCode) => {
+  ["DISH-AB105837-600", "HOOD-AB105837-FH664621E", "CAB-HOOD-AB105837-600"].forEach((sourceCode) => {
+    PRODUCT_IMAGE_GALLERIES_BY_CODE[sourceCode.replace("AB105837", `AB${targetCode}`)] =
+      PRODUCT_IMAGE_GALLERIES_BY_CODE[sourceCode];
+  });
+});
 
 export function getProductImagePaths(item) {
   const candidates = [item?.productInfoCode, item?.code, item?.tooltipPreviewCode].filter(Boolean);
