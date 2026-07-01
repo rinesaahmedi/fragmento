@@ -63,6 +63,15 @@ function validatePrice(value) {
   return rawValue;
 }
 
+function validateOptionalPrice(value, label) {
+  const rawValue = String(value ?? "").trim();
+  if (!rawValue) return null;
+  if (!/^\d+(?:\.\d{1,2})?$/.test(rawValue)) {
+    throw new Error(`${label} must be a number with up to 2 decimals.`);
+  }
+  return rawValue;
+}
+
 function validateSortOrder(value) {
   const rawValue = String(value ?? "").trim();
   if (!rawValue) return 0;
@@ -81,6 +90,17 @@ function validateOptionalPositiveInteger(value, label) {
   const parsed = Number.parseInt(rawValue, 10);
   if (!Number.isInteger(parsed) || parsed < 1) {
     throw new Error(`${label} must be a positive whole number.`);
+  }
+  return parsed;
+}
+
+function validateOptionalNonNegativeInteger(value, label) {
+  const rawValue = String(value ?? "").trim();
+  if (!rawValue) return null;
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`${label} must be a whole number.`);
   }
   return parsed;
 }
@@ -111,6 +131,7 @@ export function validateKitchenItemInput(formData) {
     name: requiredString(formData.get("name"), "Item name"),
     nameDe: optionalString(formData.get("nameDe")),
     price: validatePrice(formData.get("price")),
+    articleBasePrice: validateOptionalPrice(formData.get("articleBasePrice"), "Article price"),
     iconKey: optionalString(formData.get("iconKey")),
     colorKey: optionalString(formData.get("colorKey")),
     componentKey: optionalString(formData.get("componentKey")),
@@ -137,6 +158,22 @@ export function validateCatalogAddonInput(formData, entityLabel = "Catalog item"
     nameDe: optionalString(formData.get("nameDe")),
     description: optionalString(formData.get("description")),
     price: validatePrice(formData.get("price")),
+    isActive: formData.get("isActive") === "true",
+  };
+}
+
+export function validateCatalogArticleInput(formData) {
+  return {
+    articleNumber: requiredString(formData.get("articleNumber"), "Article number"),
+    name: requiredString(formData.get("name"), "Article name"),
+    nameDe: optionalString(formData.get("nameDe")),
+    description: optionalString(formData.get("description")),
+    widthMm: validateOptionalNonNegativeInteger(formData.get("widthMm"), "Width"),
+    heightMm: validateOptionalNonNegativeInteger(formData.get("heightMm"), "Height"),
+    depthMm: validateOptionalNonNegativeInteger(formData.get("depthMm"), "Depth"),
+    price: validatePrice(formData.get("price")),
+    itemType: parseItemType(String(formData.get("itemType") || "")),
+    isFixedPricePackage: formData.get("isFixedPricePackage") === "true",
     isActive: formData.get("isActive") === "true",
   };
 }

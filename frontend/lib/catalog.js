@@ -1131,7 +1131,10 @@ export async function getOrderById(id) {
     include: {
       kitchen: true,
       kitchenContract: true,
-      items: { orderBy: { createdAt: "asc" } },
+      items: {
+        orderBy: { createdAt: "asc" },
+        include: { kitchenItem: true },
+      },
     },
   });
 

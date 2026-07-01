@@ -23,6 +23,7 @@ import AdminSelect from "../../../../components/admin-select";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
+import { ItemType } from "@prisma/client";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,63 @@ function formatMoney(value) {
 
 function formatBoolean(value) {
   return value ? "Yes" : "No";
+}
+
+const ITEM_TYPE_OPTIONS = Object.values(ItemType);
+
+function CatalogArticleForm({ action, article, submitLabel }) {
+  return (
+    <form action={action} method="post" style={articleFormStyle}>
+      <div style={formGridStyle}>
+        <FormField label="Article number">
+          <input name="articleNumber" defaultValue={article?.articleNumber || ""} style={inputStyle} required />
+        </FormField>
+        <FormField label="Name">
+          <input name="name" defaultValue={article?.name || ""} style={inputStyle} required />
+        </FormField>
+        <FormField label="German name">
+          <input name="nameDe" defaultValue={article?.nameDe || ""} style={inputStyle} />
+        </FormField>
+        <FormField label="Item type">
+          <AdminSelect name="itemType" defaultValue={article?.itemType || ItemType.COMPONENT} style={inputStyle}>
+            {ITEM_TYPE_OPTIONS.map((itemType) => (
+              <option key={itemType} value={itemType}>{itemType}</option>
+            ))}
+          </AdminSelect>
+        </FormField>
+        <FormField label="Price">
+          <input name="price" defaultValue={article ? formatMoney(article.price) : "0.00"} style={inputStyle} required />
+        </FormField>
+        <FormField label="Width mm">
+          <input name="widthMm" defaultValue={article?.widthMm ?? ""} style={inputStyle} />
+        </FormField>
+        <FormField label="Height mm">
+          <input name="heightMm" defaultValue={article?.heightMm ?? ""} style={inputStyle} />
+        </FormField>
+        <FormField label="Depth mm">
+          <input name="depthMm" defaultValue={article?.depthMm ?? ""} style={inputStyle} />
+        </FormField>
+        <FormField label="Fixed package">
+          <AdminSelect name="isFixedPricePackage" defaultValue={article?.isFixedPricePackage ? "true" : ""} style={inputStyle}>
+            <option value="">No</option>
+            <option value="true">Yes</option>
+          </AdminSelect>
+        </FormField>
+        <FormField label="Active">
+          <AdminSelect name="isActive" defaultValue={article?.isActive === false ? "" : "true"} style={inputStyle}>
+            <option value="true">Yes</option>
+            <option value="">No</option>
+          </AdminSelect>
+        </FormField>
+        <FormField label="Description" wide>
+          <textarea name="description" defaultValue={article?.description || ""} rows={2} style={textareaStyle} />
+        </FormField>
+      </div>
+      <div style={actionRowStyle}>
+        <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
+      </div>
+    </form>
+  );
 }
 
 function CatalogAddonForm({ action, item, submitLabel }) {
@@ -92,6 +150,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
       ca."articleNumber",
       ca."name",
       ca."nameDe",
+      ca."description",
       ca."widthMm",
       ca."heightMm",
       ca."depthMm",
@@ -149,7 +208,15 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
         {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
         {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
-        <AdminSection title="Articles">
+        <AdminSection
+          title="Articles"
+          actions={(
+            <details style={addonDetailsStyle}>
+              <summary style={secondaryButtonStyle}>Add article</summary>
+              <CatalogArticleForm action="/api/admin/catalog/articles" submitLabel="Create article" />
+            </details>
+          )}
+        >
           {!articles.length ? <p style={emptyStateStyle}>No catalog articles found.</p> : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
@@ -164,6 +231,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Fixed package</th>
                     <th style={thStyle}>Active</th>
                     <th style={thStyle}>Linked KitchenItems</th>
+                    <th style={thStyle}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -178,6 +246,12 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       <td style={tdStyle}>{formatBoolean(article.isFixedPricePackage)}</td>
                       <td style={tdStyle}>{formatBoolean(article.isActive)}</td>
                       <td style={tdStyle}>{article.linkedKitchenItems}</td>
+                      <td style={tdStyle}>
+                        <details>
+                          <summary style={editSummaryStyle}>Edit</summary>
+                          <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
+                        </details>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -301,6 +375,11 @@ const addonFormStyle = {
   borderRadius: 14,
   background: "var(--color-card)",
   boxShadow: "var(--app-shadow-soft)",
+};
+
+const articleFormStyle = {
+  ...addonFormStyle,
+  minWidth: 680,
 };
 
 const editSummaryStyle = {

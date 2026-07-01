@@ -94,6 +94,28 @@ function formatPreferredDeliveryDate(value) {
   }).format(date);
 }
 
+function getOrderItemPriceParts(item) {
+  const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
+  const totalUnitPrice = Number(item.priceSnapshot || 0);
+  const blendeUnitPrice = item.kitchenItem?.blendePrice == null ? 0 : Number(item.kitchenItem.blendePrice || 0);
+  const blendeQuantity = item.kitchenItem?.catalogBlendeId
+    ? Math.max(1, Math.floor(Number(item.kitchenItem.catalogBlendeQuantity || 1)))
+    : 0;
+  const blendeUnitTotal = blendeUnitPrice * blendeQuantity;
+  const articleUnitPrice = Math.max(totalUnitPrice - blendeUnitTotal, 0);
+
+  return {
+    quantity,
+    articleUnitPrice,
+    blendeCode: item.kitchenItem?.blendeCode || "",
+    blendeUnitPrice,
+    blendeQuantity,
+    blendeUnitTotal,
+    totalUnitPrice,
+    lineTotal: totalUnitPrice * quantity,
+  };
+}
+
 function OwnerSummary({ owner }) {
   if (!owner) {
     return <AdminText i18nKey="orderDetailAdmin.noHousingCompanySelected" fallback="No housing company selected" />;
@@ -387,50 +409,74 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.type" fallback="Type" /></th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.itemCode" fallback="Item code" /></th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.quantity" fallback="Quantity" /></th>
+                  <th style={thStyle}>Article price</th>
+                  <th style={thStyle}>Blende</th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.unitPrice" fallback="Unit price" /></th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.lineTotal" fallback="Line total" /></th>
                 </tr>
               </thead>
               <tbody>
-                {displayItems.map((item) => (
-                  <tr key={item.id}>
-                    <td style={tdStyle}>
-                      <strong>{item.nameSnapshot}</strong>
-                    </td>
-                    <td style={tdStyle}><ItemTypeLabel type={item.itemType} /></td>
-                    <td style={tdStyle}>{item.code}</td>
-                    <td style={tdStyle}>{item.quantity}</td>
-                    <td style={tdStyle}>{formatCurrency(item.priceSnapshot)}</td>
-                    <td style={tdStyle}>{formatCurrency(Number(item.priceSnapshot) * Number(item.quantity || 0))}</td>
-                  </tr>
-                ))}
+                {displayItems.map((item) => {
+                  const priceParts = getOrderItemPriceParts(item);
+
+                  return (
+                    <tr key={item.id}>
+                      <td style={tdStyle}>
+                        <strong>{item.nameSnapshot}</strong>
+                      </td>
+                      <td style={tdStyle}><ItemTypeLabel type={item.itemType} /></td>
+                      <td style={tdStyle}>{item.code}</td>
+                      <td style={tdStyle}>{priceParts.quantity}</td>
+                      <td style={tdStyle}>{formatCurrency(priceParts.articleUnitPrice)}</td>
+                      <td style={tdStyle}>
+                        {priceParts.blendeCode
+                          ? `${priceParts.blendeCode}: ${formatCurrency(priceParts.blendeUnitPrice)} x ${priceParts.blendeQuantity} = ${formatCurrency(priceParts.blendeUnitTotal)}`
+                          : "-"}
+                      </td>
+                      <td style={tdStyle}>{formatCurrency(priceParts.totalUnitPrice)}</td>
+                      <td style={tdStyle}>{formatCurrency(priceParts.lineTotal)}</td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
           <div className="admin-order-items-cards" style={{ display: "none", gap: 12 }}>
-            {displayItems.map((item) => (
-              <article key={item.id} style={mobileItemCardStyle}>
-                <strong>{item.nameSnapshot}</strong>
-                <div style={subMetaStyle}>
-                  <span><ItemTypeLabel type={item.itemType} /></span>
-                  <span>{item.code}</span>
-                </div>
-                <div style={mobileItemGridStyle}>
-                  <div>
-                    <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.quantity" fallback="Quantity" /></span>
-                    <span>{item.quantity}</span>
+            {displayItems.map((item) => {
+              const priceParts = getOrderItemPriceParts(item);
+
+              return (
+                <article key={item.id} style={mobileItemCardStyle}>
+                  <strong>{item.nameSnapshot}</strong>
+                  <div style={subMetaStyle}>
+                    <span><ItemTypeLabel type={item.itemType} /></span>
+                    <span>{item.code}</span>
                   </div>
-                  <div>
-                    <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.unitPrice" fallback="Unit price" /></span>
-                    <span>{formatCurrency(item.priceSnapshot)}</span>
+                  <div style={mobileItemGridStyle}>
+                    <div>
+                      <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.quantity" fallback="Quantity" /></span>
+                      <span>{priceParts.quantity}</span>
+                    </div>
+                    <div>
+                      <span style={detailLabelStyle}>Article price</span>
+                      <span>{formatCurrency(priceParts.articleUnitPrice)}</span>
+                    </div>
+                    <div>
+                      <span style={detailLabelStyle}>Blende</span>
+                      <span>{priceParts.blendeCode ? `${priceParts.blendeCode}: ${formatCurrency(priceParts.blendeUnitTotal)}` : "-"}</span>
+                    </div>
+                    <div>
+                      <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.unitPrice" fallback="Unit price" /></span>
+                      <span>{formatCurrency(priceParts.totalUnitPrice)}</span>
+                    </div>
+                    <div>
+                      <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.lineTotal" fallback="Line total" /></span>
+                      <strong>{formatCurrency(priceParts.lineTotal)}</strong>
+                    </div>
                   </div>
-                  <div>
-                    <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.lineTotal" fallback="Line total" /></span>
-                    <strong>{formatCurrency(Number(item.priceSnapshot) * Number(item.quantity || 0))}</strong>
-                  </div>
-                </div>
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
           <style>{`
             .admin-order-items-cards {

@@ -20,18 +20,23 @@ function getBlendeTotalCents({ blendePrice, catalogBlendeQuantity, catalogBlende
 
 function applyBlendePriceDelta(input, existingItem, catalogBlende) {
   const newQuantity = catalogBlende ? (input.catalogBlendeQuantity || 1) : null;
-  const oldBlendeTotalCents = existingItem
-    ? getBlendeTotalCents({
-        blendePrice: existingItem.blendePrice,
-        catalogBlendeQuantity: existingItem.catalogBlendeQuantity,
-        catalogBlendeId: existingItem.catalogBlendeId,
-      })
-    : 0;
   const newBlendeTotalCents = catalogBlende
     ? getBlendeTotalCents({
         blendePrice: catalogBlende.price,
         catalogBlendeQuantity: newQuantity,
         catalogBlendeId: catalogBlende.id,
+      })
+    : 0;
+
+  if (input.articleBasePrice != null) {
+    return centsToMoney(moneyToCents(input.articleBasePrice) + newBlendeTotalCents);
+  }
+
+  const oldBlendeTotalCents = existingItem
+    ? getBlendeTotalCents({
+        blendePrice: existingItem.blendePrice,
+        catalogBlendeQuantity: existingItem.catalogBlendeQuantity,
+        catalogBlendeId: existingItem.catalogBlendeId,
       })
     : 0;
 
@@ -86,6 +91,7 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
   const data = {
     ...input,
     price: applyBlendePriceDelta(input, existingItem, catalogBlende),
+    articleBasePrice: undefined,
     catalogBlendeQuantity: catalogBlende ? (input.catalogBlendeQuantity || 1) : null,
     blendeCode: catalogBlende?.code || null,
     blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || null,

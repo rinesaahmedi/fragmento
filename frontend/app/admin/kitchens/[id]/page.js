@@ -23,6 +23,7 @@ import {
 import { AdminShell } from "../../../../components/admin-shell";
 import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
+import AdminBlendePriceFields from "../../../../components/admin-blende-price-fields";
 import { AdminIconKeySelect } from "../../../../components/admin-icon-key-select";
 import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
 import AdminSelect from "../../../../components/admin-select";
@@ -457,6 +458,20 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
       orderBy: { code: "asc" },
     }),
   ]);
+  const catalogBlendeOptions = catalogBlenden.map((blende) => ({
+    id: blende.id,
+    code: blende.code,
+    label: blende.nameDe || blende.name,
+    price: Number(blende.price),
+    formattedPrice: formatCurrency(blende.price),
+  }));
+  const catalogServiceOptions = catalogServices.map((service) => ({
+    id: service.id,
+    code: service.code,
+    label: service.nameDe || service.name,
+    price: Number(service.price),
+    formattedPrice: formatCurrency(service.price),
+  }));
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -671,9 +686,6 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.nameDe" fallback="Name (German)" />} wide={false}>
                         <input name="nameDe" defaultValue={item.nameDe || ""} style={compactInputStyle} />
                       </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.price" fallback="Price" />} wide={false}>
-                        <input name="price" defaultValue={String(item.price)} style={compactInputStyle} required />
-                      </FormField>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />} wide={false}>
                         <IconKeySelect defaultValue={item.iconKey || ""} style={compactInputStyle} />
                       </FormField>
@@ -685,31 +697,18 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       </FormField>
                     </div>
 
-                    <div style={catalogRelationGridStyle}>
-                      <FormField label="Blende" wide={false}>
-                        <AdminSelect name="catalogBlendeId" defaultValue={item.catalogBlendeId || ""} style={compactInputStyle}>
-                          <option value="">No blende</option>
-                          {catalogBlenden.map((blende) => (
-                            <option key={blende.id} value={blende.id}>
-                              {blende.code} - {blende.nameDe || blende.name} ({formatCurrency(blende.price)})
-                            </option>
-                          ))}
-                        </AdminSelect>
-                      </FormField>
-                      <FormField label="Blende quantity" wide={false}>
-                        <input type="number" name="catalogBlendeQuantity" defaultValue={item.catalogBlendeQuantity || (item.catalogBlendeId ? 1 : "")} min="1" step="1" style={compactInputStyle} />
-                      </FormField>
-                      <FormField label="Service catalog link" wide={false}>
-                        <AdminSelect name="catalogServiceId" defaultValue={item.catalogServiceId || ""} style={compactInputStyle}>
-                          <option value="">No service link</option>
-                          {catalogServices.map((service) => (
-                            <option key={service.id} value={service.id}>
-                              {service.code} - {service.nameDe || service.name} ({formatCurrency(service.price)})
-                            </option>
-                          ))}
-                        </AdminSelect>
-                      </FormField>
-                    </div>
+                    <AdminBlendePriceFields
+                      totalPriceDefaultValue={String(item.price)}
+                      priceStyle={compactInputStyle}
+                      selectStyle={compactInputStyle}
+                      relationGridStyle={catalogRelationGridStyle}
+                      catalogBlenden={catalogBlendeOptions}
+                      catalogServices={catalogServiceOptions}
+                      defaultBlendeId={item.catalogBlendeId || ""}
+                      defaultBlendeQuantity={item.catalogBlendeQuantity || (item.catalogBlendeId ? 1 : "")}
+                      defaultServiceId={item.catalogServiceId || ""}
+                      currentBlendePrice={item.blendePrice == null ? null : Number(item.blendePrice)}
+                    />
 
                     {item.itemType === ItemType.COMPONENT ? (
                       <div style={compactComponentRowStyle}>
