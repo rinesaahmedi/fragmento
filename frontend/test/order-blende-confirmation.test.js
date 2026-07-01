@@ -192,7 +192,7 @@ test("order confirmation product-info attachments exclude default zero-price ite
   assert.match(staticHtml.html, /<ul[^>]*>/);
   assert.match(staticHtml.html, /<li[^>]*>Vollintegrierter Geschirrspüler<\/li>/);
   assert.match(staticHtml.html, /<li[^>]*>Standkühlschrank 178 cm<\/li>/);
-  assert.match(staticHtml.html, /Neu bestaetigtes Zubehoer/);
+  assert.match(staticHtml.html, /Neu bestätigtes Zubehör/);
   assert.match(staticHtml.html, /Besteckeinsatz 60 cm x 3/);
   assert.match(staticHtml.html, /Code: ZB60SG/);
   assert.equal(staticHtml.html.includes("Fully integrated dishwasher"), false);
