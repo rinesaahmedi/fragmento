@@ -593,6 +593,8 @@ export function buildOrderSummaryHtml(order) {
   const thStyles =
     "padding:12px 15px;border-bottom:2px solid #eaeaea;background-color:#f9f9f9;text-align:left;color:#333;";
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;";
+  const priceThStyles =
+    "padding:12px 15px;border-bottom:2px solid #eaeaea;background-color:#f9f9f9;text-align:right;color:#333;";
   const priceTdStyles = `${tdStyles} text-align:right;font-weight:bold;`;
   const orderDetailsRows = [
     ["Auftragsnummer", order.orderNumber],
@@ -631,7 +633,7 @@ export function buildOrderSummaryHtml(order) {
       })
       .join("");
 
-    return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles};width:34px;">Nr.</th><th style="${thStyles}">Artikel</th><th style="${thStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles};width:34px;">Nr.</th><th style="${thStyles}">Artikel</th><th style="${priceThStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
   };
 
   return `

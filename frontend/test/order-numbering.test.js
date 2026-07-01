@@ -3,22 +3,33 @@ import test from "node:test";
 import { buildOrderConfirmationEmailDraft } from "../lib/email/order-notifications.js";
 import { buildNextContractOrderNumber } from "../lib/order-numbering.js";
 
-test("first order number is the bare contract number", () => {
-  assert.equal(buildNextContractOrderNumber("670105840", []), "670105840");
+test("first order number appends the first numeric suffix", () => {
+  assert.equal(buildNextContractOrderNumber("670105840", []), "670105840-1");
 });
 
 test("subsequent order numbers append the next numeric suffix", () => {
   assert.equal(
-    buildNextContractOrderNumber("670105840", ["670105840"]),
-    "670105840-1",
+    buildNextContractOrderNumber("670105840", ["670105840-1"]),
+    "670105840-2",
   );
   assert.equal(
-    buildNextContractOrderNumber("670105840", ["670105840", "670105840-1"]),
-    "670105840-2",
+    buildNextContractOrderNumber("670105840", ["670105840-1", "670105840-2"]),
+    "670105840-3",
   );
 });
 
 test("next suffix uses the highest existing suffix and does not fill gaps", () => {
+  assert.equal(
+    buildNextContractOrderNumber("670105840", ["670105840-1", "670105840-3"]),
+    "670105840-4",
+  );
+});
+
+test("legacy bare contract order number counts as the first order", () => {
+  assert.equal(
+    buildNextContractOrderNumber("670105840", ["670105840"]),
+    "670105840-2",
+  );
   assert.equal(
     buildNextContractOrderNumber("670105840", ["670105840", "670105840-2"]),
     "670105840-3",

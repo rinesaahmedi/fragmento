@@ -180,6 +180,9 @@ export async function getKitchenBySlug(slug) {
       include: {
         items: {
           where: { isActive: true },
+          include: {
+            catalogBlende: true,
+          },
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
         },
       },
@@ -1008,6 +1011,8 @@ export function serializeKitchenForLegacy(kitchen) {
     itemType: item.itemType.toLowerCase(),
     blendeCode: item.blendeCode || "",
     blendeLabel: item.blendeLabel || "",
+    blendeName: item.catalogBlende?.name || "",
+    blendeNameDe: item.catalogBlende?.nameDe || "",
     blendePrice: item.blendePrice != null ? Number(item.blendePrice) : null,
   });
 

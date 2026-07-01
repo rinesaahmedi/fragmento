@@ -5,6 +5,7 @@ import styles from "./kitchen-configurator.module.css";
 import {
   formatCurrency,
   getCatalogItemDetails,
+  getLocalizedBlendeLabel,
   getLocalizedItemName,
   getProductInfoDocuments,
   getProductInfoHref,
@@ -84,6 +85,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const isConfirmed = !isDefault && Boolean(item.isOrderLocked);
   const isLocked = isDefault || isConfirmed;
   const itemName = getLocalizedItemName(item, translate, language, false);
+  const blendeLabel = getLocalizedBlendeLabel(item, language);
   const { articleNumber, dimensions } = getCatalogItemDetails(item);
   const itemDimensions = isLocked ? "" : dimensions;
   const infoPdfHref = getProductInfoHref(item);
@@ -109,13 +111,13 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
             {translate("configurator.summaryQuantity", "Quantity")}: {quantity}
           </span>
         ) : null}
-        {!isLocked && (articleNumber || item.blendeLabel) ? (
+        {!isLocked && (articleNumber || blendeLabel) ? (
           <span className={styles.itemCode}>
             {articleNumber ? `${translate("common.article", "Article")}: ${articleNumber}` : ""}
-            {articleNumber && item.blendeLabel ? " " : ""}
-            {item.blendeLabel ? (
+            {articleNumber && blendeLabel ? " " : ""}
+            {blendeLabel ? (
               <span className={styles.summaryInlineBlendeNote}>
-                {translate("configurator.includesBlende", "Includes blende")}: {item.blendeLabel}
+                {translate("configurator.includesBlende", "Includes")}: {blendeLabel}
               </span>
             ) : null}
           </span>
