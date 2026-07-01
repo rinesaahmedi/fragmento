@@ -73,6 +73,9 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Vollintegrierter Geschirrspueler/);
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?1\.1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schubkasten[\s\S]*?Blende UPK20 20 cm/);
   assert.match(html, /1\.1[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /<div style="margin-top:8px;">Blende UPK20 20 cm/);
+  assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">Blende/);
+  assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">25/);
   assert.doesNotMatch(html, /<tr><td[^>]*>1\.1<\/td>/);
   assert.doesNotMatch(html, /Base cabinet/);
   assert.doesNotMatch(html, /Fully integrated dishwasher/);

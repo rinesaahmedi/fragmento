@@ -543,7 +543,7 @@ export async function generateOrderConfirmationPdf(order) {
       const rowHeight = Math.max(nameLines.length * lineHeight + blendeTextHeight, 30) + 8;
       ensureSpace(rowHeight);
       doc.text(rowNumber, margin, y);
-      drawItemIcon(doc, item, margin + 22, y - 8, 26);
+      drawItemIcon(doc, item, margin + 22, y - 12, 26);
       nameLines.forEach((line, index) => {
         doc.text(line, margin + 58, y + index * lineHeight);
       });
@@ -551,9 +551,7 @@ export async function generateOrderConfirmationPdf(order) {
       doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
       if (blendeLineGroups.length) {
         let blendeY = y + nameLines.length * lineHeight + 4;
-        doc.setFontSize(9);
         blendeLineGroups.forEach((group) => {
-          doc.setTextColor(90);
           doc.text(group.rowNumber, margin, blendeY);
           group.nameLines.forEach((line, index) => {
             doc.text(line, margin + 58, blendeY + index * lineHeight);
@@ -562,8 +560,6 @@ export async function generateOrderConfirmationPdf(order) {
           doc.text(group.price, pageWidth - margin, blendeY, { align: "right" });
           blendeY += (group.nameLines.length + 1) * lineHeight;
         });
-        doc.setTextColor(0);
-        doc.setFontSize(10);
       }
       y += rowHeight;
     });
@@ -620,13 +616,13 @@ export function buildOrderSummaryHtml(order) {
           ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
           : "";
         const blendeHtml = blendeItems
-          .map((blendeItem) => `<div style="margin-top:8px;font-size:12px;color:#777;">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span>Code: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></div>`)
+          .map((blendeItem) => `<div style="margin-top:8px;">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></div>`)
           .join("");
         const blendeNumberHtml = blendeItems
-          .map((blendeItem) => `<div style="margin-top:24px;font-size:12px;color:#777;font-weight:bold;">${escapeHtml(blendeItem.rowNumber)}</div>`)
+          .map((blendeItem) => `<div style="margin-top:24px;">${escapeHtml(blendeItem.rowNumber)}</div>`)
           .join("");
         const blendePriceHtml = blendeItems
-          .map((blendeItem) => `<div style="margin-top:8px;font-size:12px;color:#777;">${formatCurrency(blendeItem.price)}</div>`)
+          .map((blendeItem) => `<div style="margin-top:8px;">${formatCurrency(blendeItem.price)}</div>`)
           .join("");
 
         return `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;"><div>${escapeHtml(rowNumber)}</div>${blendeNumberHtml}</td><td style="${tdStyles}"><div style="display:flex;align-items:flex-start;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span>${blendeHtml}</div></div></td><td style="${priceTdStyles}">${formatCurrency(

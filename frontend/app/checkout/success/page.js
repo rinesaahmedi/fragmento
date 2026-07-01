@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { ItemType } from "@prisma/client";
 import { getStripeClient } from "../../../lib/stripe";
 import { getPaymentStatusLabel, updateOrderFromCheckoutSession } from "../../../lib/stripe-payments";
@@ -197,6 +198,10 @@ export default async function CheckoutSuccessPage({ searchParams }) {
     }
   } catch (error) {
     console.error("Could not confirm Stripe checkout session:", error);
+  }
+
+  if (orderNumber || sessionId) {
+    redirect("/");
   }
 
   const order = await getOrderForReceipt({ orderNumber, sessionId });
