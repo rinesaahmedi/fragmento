@@ -27,7 +27,7 @@ function normalizeProductInfoAssetPath(pdfPath) {
 }
 
 function buildProductInfoFilename(item, assetPath) {
-  const baseName = String(item.name || path.basename(assetPath, ".pdf") || "Produktinformation")
+  const baseName = String(getItemDisplayName(item) || path.basename(assetPath, ".pdf") || "Produktinformation")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/gi, "-")
@@ -48,8 +48,16 @@ function buildProductImageCid(item, index) {
   return `product-image-${code || index}@fragmento`;
 }
 
+function getItemDisplayCode(item) {
+  return String(item?.articleNumber || item?.code || "-").trim() || "-";
+}
+
+function getItemDisplayName(item) {
+  return String(item?.nameDe || item?.name || item?.code || "").trim();
+}
+
 async function loadProductImageAttachments(order) {
-  const selectedItems = [...order.components, ...order.accessories, ...order.services];
+  const selectedItems = getPaidConfirmationItems([...order.components, ...order.accessories, ...order.services]);
   const seenAssetPaths = new Map();
   const attachments = [];
   const cidByAssetPath = new Map();
@@ -87,7 +95,7 @@ async function loadProductImageAttachments(order) {
 }
 
 async function loadProductInfoAttachments(order) {
-  const selectedItems = [...order.components, ...order.accessories, ...order.services];
+  const selectedItems = getPaidConfirmationItems([...order.components, ...order.accessories, ...order.services]);
   const seenAssetPaths = new Set();
   const attachments = [];
   const labels = [];
@@ -104,7 +112,7 @@ async function loadProductInfoAttachments(order) {
         content,
         contentType: "application/pdf",
       });
-      labels.push(item.name || item.code || path.basename(assetPath, ".pdf"));
+      labels.push(getItemDisplayName(item) || path.basename(assetPath, ".pdf"));
       seenAssetPaths.add(assetPath);
     } catch (error) {
       console.warn(`Could not attach product info for ${item.code}:`, error.message);
@@ -184,7 +192,9 @@ function buildBlendeDisplayItem(item) {
   return {
     ...item,
     code: blendeCode || "BLENDE",
+    articleNumber: blendeCode || "BLENDE",
     name: `Blende ${blendeLabel}`,
+    nameDe: `Blende ${blendeLabel}`,
     price: blendePrice,
     iconKey: "blende",
     productImagePath: "",
@@ -214,9 +224,47 @@ function expandItemsWithBlende(items = []) {
   });
 }
 
+function getPaidConfirmationItems(items = []) {
+  return items.filter((item) => Number(item?.price || 0) > 0);
+}
+
+function getVisibleConfirmationItems(items = []) {
+  return expandItemsWithBlende(items).filter((item) => Number(item?.price || 0) > 0);
+}
+
+function isElectricalComponentItem(item) {
+  const code = String(item?.code || "").toLowerCase();
+  const iconKey = String(item?.iconKey || "").toLowerCase();
+  const componentKey = String(item?.componentKey || "").toLowerCase();
+  const name = String(getItemDisplayName(item)).toLowerCase();
+  const haystack = `${code} ${iconKey} ${componentKey} ${name}`;
+  return /\b(ref|dish|wm|oven|hob|hood)\b/.test(code)
+    || haystack.includes("refrigerator")
+    || haystack.includes("kuehlschrank")
+    || haystack.includes("dishwasher")
+    || haystack.includes("geschirr")
+    || haystack.includes("washing")
+    || haystack.includes("wasch")
+    || haystack.includes("oven")
+    || haystack.includes("backofen")
+    || haystack.includes("hob")
+    || haystack.includes("kochfeld")
+    || haystack.includes("hood")
+    || haystack.includes("extractor")
+    || haystack.includes("dunstabzug");
+}
+
+function splitComponentItems(items = []) {
+  const visibleItems = getVisibleConfirmationItems(items);
+  return {
+    electricalItems: visibleItems.filter(isElectricalComponentItem),
+    cabinetItems: visibleItems.filter((item) => !isElectricalComponentItem(item)),
+  };
+}
+
 function drawItemIcon(doc, item, x, y, size = 16) {
   const iconKey = String(item.iconKey || "").toLowerCase();
-  const name = String(item.name || "").toLowerCase();
+  const name = String(getItemDisplayName(item)).toLowerCase();
   const code = String(item.code || "").toLowerCase();
   const has = (...terms) => terms.some((term) => iconKey.includes(term) || name.includes(term) || code.includes(term));
   const unit = size / 16;
@@ -322,7 +370,7 @@ function drawItemIcon(doc, item, x, y, size = 16) {
   }
 
   doc.setFont("helvetica", "bold").setFontSize(scaled(7));
-  doc.text(String(item.name || item.code || "?").slice(0, 2).toUpperCase(), midX, midY + 2, { align: "center" });
+  doc.text(String(getItemDisplayName(item) || "?").slice(0, 2).toUpperCase(), midX, midY + 2, { align: "center" });
 }
 
 export async function generateOrderConfirmationPdf(order) {
@@ -388,29 +436,32 @@ export async function generateOrderConfirmationPdf(order) {
 
   y += 15;
 
-  const drawSection = (title, items) => {
-    if (!items?.length) return;
+  const drawSection = (title, items, options = {}) => {
+    const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
+    if (!visibleItems.length) return;
 
     ensureSpace(60);
     doc.setFont("helvetica", "bold").setFontSize(11).text(title, margin, y);
     y += 10;
     doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
     y += 20;
-    doc.text("Artikel", margin + 36, y);
-    doc.text("Item Code", margin + 300, y);
+    doc.text("Nr.", margin, y);
+    doc.text("Artikel", margin + 58, y);
+    doc.text("Item Code", margin + 320, y);
     doc.text("Preis", pageWidth - margin, y, { align: "right" });
     y += 18;
     doc.setFont("helvetica", "normal").setFontSize(10);
 
-    expandItemsWithBlende(items).forEach((item) => {
-      const nameLines = doc.splitTextToSize(item.name || "", 228);
+    visibleItems.forEach((item, index) => {
+      const nameLines = doc.splitTextToSize(getItemDisplayName(item), 208);
       const rowHeight = Math.max(nameLines.length * lineHeight, 30) + 6;
       ensureSpace(rowHeight);
-      drawItemIcon(doc, item, margin, y - 8, 26);
+      doc.text(String(index + 1), margin, y);
+      drawItemIcon(doc, item, margin + 22, y - 8, 26);
       nameLines.forEach((line, index) => {
-        doc.text(line, margin + 36, y + index * lineHeight);
+        doc.text(line, margin + 58, y + index * lineHeight);
       });
-      doc.text(item.code || "-", margin + 300, y);
+      doc.text(getItemDisplayCode(item), margin + 320, y);
       doc.text(formatCurrency(item.price), pageWidth - margin, y, { align: "right" });
       y += rowHeight;
     });
@@ -418,7 +469,9 @@ export async function generateOrderConfirmationPdf(order) {
     y += 10;
   };
 
-  drawSection("Komponenten:", order.components);
+  const { electricalItems, cabinetItems } = splitComponentItems(order.components);
+  drawSection("Elektrogeraete:", electricalItems, { itemsAreVisible: true });
+  drawSection("Kuechenmoebel:", cabinetItems, { itemsAreVisible: true });
   drawSection("Zubehoer:", order.accessories);
   drawSection("Dienstleistungen:", order.services);
 
@@ -442,7 +495,6 @@ export function buildOrderSummaryHtml(order) {
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;";
   const priceTdStyles = `${tdStyles} text-align:right;font-weight:bold;`;
   const orderDetailsRows = [
-    ["Kueche", order.kitchen.name],
     ["Auftragsnummer", order.orderNumber],
     ["Vertragsnummer", order.customer.contractNumber || "-"],
     ["Gewuenschter Liefertermin", order.customer.preferredDeliveryDate ? formatDateOnly(order.customer.preferredDeliveryDate) : "-"],
@@ -453,23 +505,24 @@ export function buildOrderSummaryHtml(order) {
     )
     .join("");
 
-  const renderSection = (title, items, imageCidByAssetPath = new Map()) => {
-    if (!items.length) return "";
-    const rows = expandItemsWithBlende(items)
-      .map((item) => {
+  const renderSection = (title, items, imageCidByAssetPath = new Map(), options = {}) => {
+    const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
+    if (!visibleItems.length) return "";
+    const rows = visibleItems
+      .map((item, index) => {
         const productImagePath = normalizeProductImageAssetPath(item.productImagePath);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
         const imageHtml = imageCid
-          ? `<img src="cid:${imageCid}" alt="${escapeHtml(item.name || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
+          ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
           : "";
 
-        return `<tr><td style="${tdStyles}"><div style="display:flex;align-items:center;gap:12px;">${imageHtml}<div>${escapeHtml(item.name)}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(item.code || "-")}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(
+        return `<tr><td style="${tdStyles};width:34px;font-weight:bold;">${index + 1}</td><td style="${tdStyles}"><div style="display:flex;align-items:center;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayName(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(
             item.price,
           )}</td></tr>`;
       })
       .join("");
 
-    return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles}">Artikel</th><th style="${thStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles};width:34px;">Nr.</th><th style="${thStyles}">Artikel</th><th style="${thStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
   };
 
   return `
@@ -477,7 +530,13 @@ export function buildOrderSummaryHtml(order) {
       <div style="padding:20px;border:1px solid #ddd;border-radius:8px;">
         <h4 style="margin-top:0;">Bestelldaten</h4>
         <table style="${tableStyles}"><tbody>${orderDetailsRows}</tbody></table>
-        ${renderSection("Neu bestaetigte Komponenten", order.components, order.productImageCids)}
+        ${(() => {
+          const { electricalItems, cabinetItems } = splitComponentItems(order.components);
+          return [
+            renderSection("Neu bestaetigte Elektrogeraete", electricalItems, order.productImageCids, { itemsAreVisible: true }),
+            renderSection("Neu bestaetigte Kuechenmoebel", cabinetItems, order.productImageCids, { itemsAreVisible: true }),
+          ].join("");
+        })()}
         ${renderSection("Neu bestaetigtes Zubehoer", order.accessories, order.productImageCids)}
         ${renderSection("Neu bestaetigte Dienstleistungen", order.services, order.productImageCids)}
         <table style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;">
@@ -498,7 +557,12 @@ export async function buildOrderConfirmationEmailStaticHtml(order) {
     productImageCids: productImages.cidByAssetPath,
   };
   const productInfoHtml = productInfo.labels.length
-    ? `<p>Produktinformationen im Anhang: ${productInfo.labels.join(", ")}.</p>`
+    ? `<div style="margin:16px 0 0;font-family:Arial,sans-serif;color:#333;">
+        <p style="margin:0 0 6px;">Produktinformationen im Anhang:</p>
+        <ul style="margin:0;padding-left:20px;">
+          ${productInfo.labels.map((label) => `<li style="margin:0 0 4px;">${escapeHtml(label)}</li>`).join("")}
+        </ul>
+      </div>`
     : "";
 
   return {
@@ -537,7 +601,7 @@ export function buildOrderConfirmationEmailDraft(order) {
       "",
       "deine Bestellung wurde bestaetigt.",
       "",
-      `Bestellte Kueche: ${order.kitchen.name}.`,
+      `Vertragsnummer: ${order.customer.contractNumber || order.orderNumber}.`,
       "",
       "Dein Fragmento-Team",
     ].join("\n"),
@@ -590,13 +654,6 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     },
   });
 
-  let logoBuffer = null;
-  try {
-    logoBuffer = await loadLogoBuffer();
-  } catch (error) {
-    console.warn("Could not fetch logo:", error.message);
-  }
-
   let effectivePdfBase64 = pdfBase64;
   let effectivePdfFilename = pdfFilename;
   if (!effectivePdfBase64) {
@@ -606,16 +663,6 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   }
 
   const attachments = [];
-  if (logoBuffer) {
-    attachments.push({
-      filename: "fragmentologo.jpg",
-      content: logoBuffer,
-      cid: "logo@fragmento",
-      contentType: "image/jpeg",
-      contentDisposition: "inline",
-    });
-  }
-
   if (effectivePdfBase64) {
     attachments.push({
       filename: effectivePdfFilename || `Bestellbestaetigung-${order.orderNumber}.pdf`,
@@ -627,9 +674,6 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   const productInfo = await loadProductInfoAttachments(order);
   attachments.push(...productInfo.attachments);
 
-  const logoHtml = logoBuffer
-    ? '<div style="margin-bottom:16px"><img src="cid:logo@fragmento" alt="Fragmento" style="height:70px;object-fit:contain" /></div>'
-    : "";
   const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText });
   attachments.push(...(emailPreview.productImageAttachments || []));
 
@@ -638,10 +682,7 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
       from: `"Fragmento" <${smtpFrom}>`,
       to: order.customer.email,
       subject: emailPreview.subject,
-      html: `
-        ${logoHtml}
-        ${emailPreview.html}
-      `,
+      html: emailPreview.html,
       attachments,
     });
   } catch (error) {

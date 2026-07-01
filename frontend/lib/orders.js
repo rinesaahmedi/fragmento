@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import { ItemType, OrderStatus, Prisma } from "@prisma/client";
 import {
   getDeliveryLeadTimeDays,
@@ -14,8 +13,8 @@ import {
 import {
   mergeSinkAndWorktopItems,
   SINK_AND_WORKTOP_CODE,
-  SINK_AND_WORKTOP_NAME,
 } from "./order-item-display";
+import { buildNextContractOrderNumber } from "./order-numbering";
 import {
   CONTRACT_ERRORS,
   assertUsableKitchenContract,
@@ -50,10 +49,19 @@ function requireString(value, label) {
   return String(value).trim();
 }
 
-function buildOrderNumber() {
-  const timestamp = new Date().toISOString().replaceAll(/[-:.TZ]/g, "").slice(0, 17);
-  const suffix = crypto.randomBytes(3).toString("hex").toUpperCase();
-  return `FRG-${timestamp}-${suffix}`;
+async function buildNextOrderNumberForContract(tx, kitchenContract) {
+  const orders = await tx.order.findMany({
+    where: {
+      kitchenContractId: kitchenContract.id,
+      orderNumber: { startsWith: kitchenContract.contractNumber },
+    },
+    select: { orderNumber: true },
+  });
+
+  return buildNextContractOrderNumber(
+    kitchenContract.contractNumber,
+    orders.map((order) => order.orderNumber),
+  );
 }
 
 function validateEmail(value) {
@@ -170,10 +178,13 @@ function getOrderItemEffectivePrice(item) {
 export function buildOrderForNotifications(orderRecord) {
   const toNotificationItem = (item) => ({
     code: item.code,
-    name: item.nameSnapshot || item.name || "",
+    articleNumber: item.kitchenItem?.articleNumber || item.articleNumber || "",
+    name: item.kitchenItem?.nameDe || item.nameDe || item.nameSnapshot || item.name || "",
+    nameDe: item.kitchenItem?.nameDe || item.nameDe || "",
     price: getOrderItemEffectivePrice(item),
     quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
     iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
+    componentKey: item.kitchenItem?.componentKey || item.componentKey || "",
     productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
     productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
     productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
@@ -191,7 +202,8 @@ export function buildOrderForNotifications(orderRecord) {
     ...toNotificationItem(sinkItem),
     itemType: sinkItem.itemType,
     code: SINK_AND_WORKTOP_CODE,
-    name: SINK_AND_WORKTOP_NAME,
+    name: "Arbeitsplatte",
+    nameDe: "Arbeitsplatte",
     price: getOrderItemEffectivePrice(sinkItem) + getOrderItemEffectivePrice(worktopItem),
   }));
 
@@ -428,7 +440,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   let savedNewItems = [];
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
-      const orderNumber = buildOrderNumber();
       savedOrder = await prisma.$transaction(async (tx) => {
         const contractOrderState = await getContractOrderState(kitchenContract.id, tx);
         const existingEditableOrder = contractOrderState.editableOrder;
@@ -471,7 +482,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
             })
           : await tx.order.create({
               data: {
-                orderNumber,
+                orderNumber: await buildNextOrderNumberForContract(tx, kitchenContract),
                 kitchenId: kitchen.id,
                 kitchenContractId: kitchenContract.id,
                 status: OrderStatus.NEW,
@@ -541,8 +552,8 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   const directOrderConfirmationEnabled = await getDirectOrderConfirmationEnabled();
   const notificationResult = await processOrderNotifications({
     order: orderForNotifications,
-    pdfBase64,
-    pdfFilename,
+    pdfBase64: null,
+    pdfFilename: null,
     runEmail: directOrderConfirmationEnabled,
     runWebhook: true,
   });

@@ -76,12 +76,22 @@ function buildBlendeDisplayItem(item) {
   return {
     ...item,
     code: blendeCode || "BLENDE",
+    articleNumber: blendeCode || "BLENDE",
     name: `Blende ${blendeLabel}`,
+    nameDe: `Blende ${blendeLabel}`,
     price: blendePrice,
     blendeCode: "",
     blendeLabel: "",
     blendePrice: null,
   };
+}
+
+function getItemDisplayCode(item) {
+  return String(item?.articleNumber || item?.code || "-").trim() || "-";
+}
+
+function getItemDisplayName(item) {
+  return String(item?.nameDe || item?.name || item?.code || "").trim();
 }
 
 function expandItemsWithBlende(items = []) {
@@ -98,6 +108,40 @@ function expandItemsWithBlende(items = []) {
 
     return [parentItem, blendeItem];
   });
+}
+
+function getVisibleConfirmationItems(items = []) {
+  return expandItemsWithBlende(items).filter((item) => Number(item?.price || 0) > 0);
+}
+
+function isElectricalComponentItem(item) {
+  const code = String(item?.code || "").toLowerCase();
+  const iconKey = String(item?.iconKey || "").toLowerCase();
+  const componentKey = String(item?.componentKey || "").toLowerCase();
+  const name = getItemDisplayName(item).toLowerCase();
+  const haystack = `${code} ${iconKey} ${componentKey} ${name}`;
+  return /\b(ref|dish|wm|oven|hob|hood)\b/.test(code)
+    || haystack.includes("refrigerator")
+    || haystack.includes("kuehlschrank")
+    || haystack.includes("dishwasher")
+    || haystack.includes("geschirr")
+    || haystack.includes("washing")
+    || haystack.includes("wasch")
+    || haystack.includes("oven")
+    || haystack.includes("backofen")
+    || haystack.includes("hob")
+    || haystack.includes("kochfeld")
+    || haystack.includes("hood")
+    || haystack.includes("extractor")
+    || haystack.includes("dunstabzug");
+}
+
+function splitComponentItems(items = []) {
+  const visibleItems = getVisibleConfirmationItems(items);
+  return {
+    electricalItems: visibleItems.filter(isElectricalComponentItem),
+    cabinetItems: visibleItems.filter((item) => !isElectricalComponentItem(item)),
+  };
 }
 
 export async function generateOrderPdf(order) {
@@ -176,31 +220,35 @@ export async function generateOrderPdf(order) {
 
   y += 15;
 
-  const drawSection = (title, items) => {
-    if (!items?.length) return;
+  const drawSection = (title, items, options = {}) => {
+    const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
+    if (!visibleItems.length) return;
 
     ensureSpace(55);
     doc.setFont("helvetica", "bold").text(title, margin, y);
     y += 10;
     doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
     y += 20;
-    doc.text("Artikel", margin, y);
-    doc.text("Item Code", margin + 250, y);
+    doc.text("Nr.", margin, y);
+    doc.text("Artikel", margin + 28, y);
+    doc.text("Item Code", margin + 270, y);
     doc.text("Preis", pageWidth - margin, y, { align: "right" });
     y += 20;
     doc.setFont("helvetica", "normal");
 
-    expandItemsWithBlende(items).forEach((item) => {
+    visibleItems.forEach((item, itemIndex) => {
       const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
       const lineTotal = Number(item.price || 0) * quantity;
-      const displayName = quantity > 1 ? `${item.name || ""} (${quantity}x)` : (item.name || "");
-      const nameLines = doc.splitTextToSize(displayName, 230);
+      const itemName = getItemDisplayName(item);
+      const displayName = quantity > 1 ? `${itemName} (${quantity}x)` : itemName;
+      const nameLines = doc.splitTextToSize(displayName, 220);
       const rowHeight = Math.max(nameLines.length, 1) * lineHeight + 5;
       ensureSpace(rowHeight);
+      doc.text(String(itemIndex + 1), margin, y);
       nameLines.forEach((line, index) => {
-        doc.text(line, margin, y + index * lineHeight);
+        doc.text(line, margin + 28, y + index * lineHeight);
       });
-      doc.text(item.code || "-", margin + 250, y);
+      doc.text(getItemDisplayCode(item), margin + 270, y);
       doc.text(formatCurrency(lineTotal), pageWidth - margin, y, { align: "right" });
       y += rowHeight;
     });
@@ -208,7 +256,9 @@ export async function generateOrderPdf(order) {
     y += 10;
   };
 
-  drawSection("Komponenten:", order.components);
+  const { electricalItems, cabinetItems } = splitComponentItems(order.components);
+  drawSection("Elektrogeraete:", electricalItems, { itemsAreVisible: true });
+  drawSection("Kuechenmoebel:", cabinetItems, { itemsAreVisible: true });
   drawSection("Zubehoer:", order.accessories);
   drawSection("Dienstleistungen:", order.services);
 
