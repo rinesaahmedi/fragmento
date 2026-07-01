@@ -7,6 +7,12 @@ import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME 
 
 export const dynamic = "force-dynamic";
 
+const HIDDEN_RECEIPT_COMPONENT_CODES = new Set([
+  "OVEN-B-600-HOB",
+  SINK_AND_WORKTOP_CODE,
+  "SINKBASE-B-600",
+]);
+
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -107,6 +113,11 @@ function expandReceiptItemsWithBlende(items = []) {
   });
 }
 
+function isVisibleReceiptItem(item) {
+  if (item?.itemType !== ItemType.COMPONENT) return true;
+  return !HIDDEN_RECEIPT_COMPONENT_CODES.has(String(item?.code || "").trim().toUpperCase());
+}
+
 async function findStripeSession({ sessionId, orderNumber }) {
   const stripe = getStripeClient();
   if (!stripe) return null;
@@ -200,7 +211,7 @@ export default async function CheckoutSuccessPage({ searchParams }) {
     priceSnapshot: Number(sinkItem.priceSnapshot || 0) + Number(worktopItem.priceSnapshot || 0),
     quantity: 1,
   }));
-  const receiptItems = expandReceiptItemsWithBlende(displayItems);
+  const receiptItems = expandReceiptItemsWithBlende(displayItems).filter(isVisibleReceiptItem);
   const componentItems = receiptItems.filter((item) => item.itemType === ItemType.COMPONENT);
   const accessoryItems = receiptItems.filter((item) => item.itemType === ItemType.ACCESSORY);
   const serviceItems = receiptItems.filter((item) => item.itemType === ItemType.SERVICE);

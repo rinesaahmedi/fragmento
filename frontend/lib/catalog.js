@@ -157,6 +157,9 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   blendeCode: true,
   blendeLabel: true,
   blendePrice: true,
+  catalogBlendeId: true,
+  catalogBlendeQuantity: true,
+  catalogServiceId: true,
   createdAt: true,
   updatedAt: true,
 };

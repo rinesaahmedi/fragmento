@@ -13,6 +13,11 @@ function optionalString(value) {
   return nextValue || null;
 }
 
+function optionalId(value) {
+  const nextValue = String(value || "").trim();
+  return nextValue || null;
+}
+
 function optionalStringList(value) {
   const items = String(value || "")
     .split(/\r?\n/)
@@ -69,6 +74,17 @@ function validateSortOrder(value) {
   return parsed;
 }
 
+function validateOptionalPositiveInteger(value, label) {
+  const rawValue = String(value ?? "").trim();
+  if (!rawValue) return null;
+
+  const parsed = Number.parseInt(rawValue, 10);
+  if (!Number.isInteger(parsed) || parsed < 1) {
+    throw new Error(`${label} must be a positive whole number.`);
+  }
+  return parsed;
+}
+
 export const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
 
 export function validateKitchenInput(formData, options = {}) {
@@ -106,7 +122,21 @@ export function validateKitchenItemInput(formData) {
     productInfoKeyFacts: optionalStringList(formData.get("productInfoKeyFacts")),
     productInfoExtractedText: optionalString(formData.get("productInfoExtractedText")),
     productInfoUpdatedAt: optionalString(formData.get("productInfoPdfPath")) ? new Date() : null,
+    catalogBlendeId: optionalId(formData.get("catalogBlendeId")),
+    catalogBlendeQuantity: validateOptionalPositiveInteger(formData.get("catalogBlendeQuantity"), "Blende quantity"),
+    catalogServiceId: optionalId(formData.get("catalogServiceId")),
     isLocked: formData.get("isLocked") === "true",
+    isActive: formData.get("isActive") === "true",
+  };
+}
+
+export function validateCatalogAddonInput(formData, entityLabel = "Catalog item") {
+  return {
+    code: requiredString(formData.get("code"), `${entityLabel} code`),
+    name: requiredString(formData.get("name"), `${entityLabel} name`),
+    nameDe: optionalString(formData.get("nameDe")),
+    description: optionalString(formData.get("description")),
+    price: validatePrice(formData.get("price")),
     isActive: formData.get("isActive") === "true",
   };
 }

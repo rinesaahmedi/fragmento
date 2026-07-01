@@ -1,16 +1,26 @@
 import {
   ActionLink,
   AdminSection,
+  FlashMessage,
+  FormField,
   PageHero,
+  actionRowStyle,
   codePillStyle,
   emptyStateStyle,
+  formGridStyle,
+  inputStyle,
   pageGridStyle,
+  primaryButtonStyle,
+  secondaryButtonStyle,
   tableStyle,
   tableWrapStyle,
   tdStyle,
   thStyle,
+  textareaStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
+import AdminSelect from "../../../../components/admin-select";
+import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 
@@ -22,6 +32,39 @@ function formatMoney(value) {
 
 function formatBoolean(value) {
   return value ? "Yes" : "No";
+}
+
+function CatalogAddonForm({ action, item, submitLabel }) {
+  return (
+    <form action={action} method="post" style={addonFormStyle}>
+      <div style={formGridStyle}>
+        <FormField label="Code">
+          <input name="code" defaultValue={item?.code || ""} style={inputStyle} required />
+        </FormField>
+        <FormField label="Name">
+          <input name="name" defaultValue={item?.name || ""} style={inputStyle} required />
+        </FormField>
+        <FormField label="German name">
+          <input name="nameDe" defaultValue={item?.nameDe || ""} style={inputStyle} />
+        </FormField>
+        <FormField label="Price">
+          <input name="price" defaultValue={item ? formatMoney(item.price) : "0.00"} style={inputStyle} required />
+        </FormField>
+        <FormField label="Active">
+          <AdminSelect name="isActive" defaultValue={item?.isActive === false ? "" : "true"} style={inputStyle}>
+            <option value="true">Yes</option>
+            <option value="">No</option>
+          </AdminSelect>
+        </FormField>
+        <FormField label="Description" wide>
+          <textarea name="description" defaultValue={item?.description || ""} rows={2} style={textareaStyle} />
+        </FormField>
+      </div>
+      <div style={actionRowStyle}>
+        <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
+      </div>
+    </form>
+  );
 }
 
 function formatDimensionPart(value) {
@@ -37,8 +80,11 @@ function formatDimensions(article) {
   ].join(" x ") + " mm";
 }
 
-export default async function AdminCatalogArticlesPage() {
+export default async function AdminCatalogArticlesPage({ searchParams }) {
   const admin = await requireAdminPage();
+  const resolvedSearchParams = await searchParams;
+  const successMessage = getFormMessage(resolvedSearchParams, "success");
+  const errorMessage = getFormMessage(resolvedSearchParams, "error");
   const [articles, blenden, services] = await Promise.all([
     prisma.$queryRaw`
     SELECT
@@ -100,6 +146,8 @@ export default async function AdminCatalogArticlesPage() {
           description="Reusable articles, blenden, and services. These rows are visible for audit only; checkout still uses KitchenItem.price."
           actions={<ActionLink href="/api/admin/catalog/export" secondary>Export Excel</ActionLink>}
         />
+        {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
+        {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
         <AdminSection title="Articles">
           {!articles.length ? <p style={emptyStateStyle}>No catalog articles found.</p> : (
@@ -138,7 +186,15 @@ export default async function AdminCatalogArticlesPage() {
           )}
         </AdminSection>
 
-        <AdminSection title="Blenden">
+        <AdminSection
+          title="Blenden"
+          actions={(
+            <details style={addonDetailsStyle}>
+              <summary style={secondaryButtonStyle}>Add blende</summary>
+              <CatalogAddonForm action="/api/admin/catalog/blenden" submitLabel="Create blende" />
+            </details>
+          )}
+        >
           {!blenden.length ? <p style={emptyStateStyle}>No catalog blenden found.</p> : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
@@ -151,6 +207,7 @@ export default async function AdminCatalogArticlesPage() {
                     <th style={thStyle}>Price</th>
                     <th style={thStyle}>Active</th>
                     <th style={thStyle}>Linked KitchenItems</th>
+                    <th style={thStyle}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -163,6 +220,12 @@ export default async function AdminCatalogArticlesPage() {
                       <td style={tdStyle}>{formatMoney(blende.price)}</td>
                       <td style={tdStyle}>{formatBoolean(blende.isActive)}</td>
                       <td style={tdStyle}>{blende.linkedKitchenItems}</td>
+                      <td style={tdStyle}>
+                        <details>
+                          <summary style={editSummaryStyle}>Edit</summary>
+                          <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
+                        </details>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -171,7 +234,15 @@ export default async function AdminCatalogArticlesPage() {
           )}
         </AdminSection>
 
-        <AdminSection title="Services">
+        <AdminSection
+          title="Services"
+          actions={(
+            <details style={addonDetailsStyle}>
+              <summary style={secondaryButtonStyle}>Add service</summary>
+              <CatalogAddonForm action="/api/admin/catalog/services" submitLabel="Create service" />
+            </details>
+          )}
+        >
           {!services.length ? <p style={emptyStateStyle}>No catalog services found.</p> : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
@@ -184,6 +255,7 @@ export default async function AdminCatalogArticlesPage() {
                     <th style={thStyle}>Price</th>
                     <th style={thStyle}>Active</th>
                     <th style={thStyle}>Linked KitchenItems</th>
+                    <th style={thStyle}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -196,6 +268,12 @@ export default async function AdminCatalogArticlesPage() {
                       <td style={tdStyle}>{formatMoney(service.price)}</td>
                       <td style={tdStyle}>{formatBoolean(service.isActive)}</td>
                       <td style={tdStyle}>{service.linkedKitchenItems}</td>
+                      <td style={tdStyle}>
+                        <details>
+                          <summary style={editSummaryStyle}>Edit</summary>
+                          <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
+                        </details>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -207,3 +285,29 @@ export default async function AdminCatalogArticlesPage() {
     </AdminShell>
   );
 }
+
+const addonDetailsStyle = {
+  position: "relative",
+};
+
+const addonFormStyle = {
+  display: "grid",
+  gap: 14,
+  minWidth: 520,
+  maxWidth: 760,
+  marginTop: 10,
+  padding: 16,
+  border: "1px solid var(--app-border)",
+  borderRadius: 14,
+  background: "var(--color-card)",
+  boxShadow: "var(--app-shadow-soft)",
+};
+
+const editSummaryStyle = {
+  ...secondaryButtonStyle,
+  width: "fit-content",
+  minHeight: 40,
+  padding: "9px 13px",
+  listStyle: "none",
+  cursor: "pointer",
+};

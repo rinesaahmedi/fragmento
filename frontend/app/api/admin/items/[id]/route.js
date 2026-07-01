@@ -17,6 +17,10 @@ export async function POST(request, { params }) {
       where: { id },
       select: {
         kitchenId: true,
+        price: true,
+        blendePrice: true,
+        catalogBlendeId: true,
+        catalogBlendeQuantity: true,
         kitchen: {
           select: {
             id: true,
@@ -43,6 +47,7 @@ export async function POST(request, { params }) {
       formData,
       kitchen: existingItem.kitchen,
       excludeItemId: id,
+      existingItem,
     });
 
     const item = await prisma.kitchenItem.update({

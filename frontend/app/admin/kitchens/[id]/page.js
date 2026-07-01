@@ -33,6 +33,7 @@ import { LEGACY_ICON_KEYS, getKitchenById, listKitchenItemCodeOptionsForAdmin } 
 import { getKitchenCatalogImagePreview, getKitchenCatalogPreviewHotspots, getKitchenCatalogPreviewSlot, resolveKitchenCatalogPreviewSlug } from "../../../../lib/kitchen-catalog-preview";
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
+import { prisma } from "../../../../lib/prisma";
 
 export const dynamic = "force-dynamic";
 
@@ -445,7 +446,17 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     return acc;
   }, {});
   const kitchenSvgMarkup = structureSlots.length ? await loadKitchenSvgMarkup(previewSlug).catch(() => "") : "";
-  const itemCodeOptions = await listKitchenItemCodeOptionsForAdmin();
+  const [itemCodeOptions, catalogBlenden, catalogServices] = await Promise.all([
+    listKitchenItemCodeOptionsForAdmin(),
+    prisma.catalogBlende.findMany({
+      where: { isActive: true },
+      orderBy: { code: "asc" },
+    }),
+    prisma.catalogService.findMany({
+      where: { isActive: true },
+      orderBy: { code: "asc" },
+    }),
+  ]);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -615,6 +626,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                         <TypeBadge label={item.itemType} />
                         <span><AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />: {item.code}</span>
                         <span><AdminText i18nKey="kitchenDetailAdmin.articleNo" fallback="Article No" />: {item.articleNumber || "-"}</span>
+                        {item.blendeCode ? <span>Blende: {item.blendeCode}</span> : null}
                         <span>{formatCurrency(item.price)}</span>
                         <span>{slot ? slot.label : <AdminText i18nKey="kitchenDetailAdmin.noSlot" fallback="No slot" />}</span>
                       </div>
@@ -670,6 +682,32 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       </FormField>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />} wide={false}>
                         <input name="sortOrder" defaultValue={String(item.sortOrder)} style={compactInputStyle} />
+                      </FormField>
+                    </div>
+
+                    <div style={catalogRelationGridStyle}>
+                      <FormField label="Blende" wide={false}>
+                        <AdminSelect name="catalogBlendeId" defaultValue={item.catalogBlendeId || ""} style={compactInputStyle}>
+                          <option value="">No blende</option>
+                          {catalogBlenden.map((blende) => (
+                            <option key={blende.id} value={blende.id}>
+                              {blende.code} - {blende.nameDe || blende.name} ({formatCurrency(blende.price)})
+                            </option>
+                          ))}
+                        </AdminSelect>
+                      </FormField>
+                      <FormField label="Blende quantity" wide={false}>
+                        <input type="number" name="catalogBlendeQuantity" defaultValue={item.catalogBlendeQuantity || (item.catalogBlendeId ? 1 : "")} min="1" step="1" style={compactInputStyle} />
+                      </FormField>
+                      <FormField label="Service catalog link" wide={false}>
+                        <AdminSelect name="catalogServiceId" defaultValue={item.catalogServiceId || ""} style={compactInputStyle}>
+                          <option value="">No service link</option>
+                          {catalogServices.map((service) => (
+                            <option key={service.id} value={service.id}>
+                              {service.code} - {service.nameDe || service.name} ({formatCurrency(service.price)})
+                            </option>
+                          ))}
+                        </AdminSelect>
                       </FormField>
                     </div>
 
@@ -764,6 +802,35 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     <input type="checkbox" name="isActive" value="true" defaultChecked />
                     <span><AdminText i18nKey="kitchenDetailAdmin.activeItem" fallback="Active" /></span>
                   </label>
+                </div>
+              </fieldset>
+
+              <fieldset style={formGroupStyle}>
+                <legend style={formGroupLegendStyle}>Catalog Links</legend>
+                <div style={formGridStyle}>
+                  <FormField label="Blende">
+                    <AdminSelect name="catalogBlendeId" defaultValue="" style={inputStyle}>
+                      <option value="">No blende</option>
+                      {catalogBlenden.map((blende) => (
+                        <option key={blende.id} value={blende.id}>
+                          {blende.code} - {blende.nameDe || blende.name} ({formatCurrency(blende.price)})
+                        </option>
+                      ))}
+                    </AdminSelect>
+                  </FormField>
+                  <FormField label="Blende quantity">
+                    <input type="number" name="catalogBlendeQuantity" min="1" step="1" placeholder="1" style={inputStyle} />
+                  </FormField>
+                  <FormField label="Service catalog link">
+                    <AdminSelect name="catalogServiceId" defaultValue="" style={inputStyle}>
+                      <option value="">No service link</option>
+                      {catalogServices.map((service) => (
+                        <option key={service.id} value={service.id}>
+                          {service.code} - {service.nameDe || service.name} ({formatCurrency(service.price)})
+                        </option>
+                      ))}
+                    </AdminSelect>
+                  </FormField>
                 </div>
               </fieldset>
 
@@ -1252,6 +1319,13 @@ const compactTopGridStyle = {
   display: "grid",
   gap: 8,
   gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  alignItems: "start",
+};
+
+const catalogRelationGridStyle = {
+  display: "grid",
+  gap: 8,
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   alignItems: "start",
 };
 
