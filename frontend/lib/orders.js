@@ -196,11 +196,13 @@ export function buildOrderForNotifications(orderRecord) {
       quantity: item.quantity,
     });
 
+    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+
     return {
       code: item.code,
       articleNumber: cutleryLine?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
-      name: item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "",
-      nameDe: item.nameDe || item.kitchenItem?.nameDe || "",
+      name: displayName,
+      nameDe: cutleryLine ? displayName : item.nameDe || item.kitchenItem?.nameDe || "",
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
