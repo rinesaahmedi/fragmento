@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { getCatalogItemDetails, getLocalizedItemName } from "../components/kitchen-selection-utils.js";
 import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
-import { buildCutleryLineItems } from "../lib/cutlery-accessories.js";
+import { buildCutleryLineItems, parseCutleryLineFromOrderItem } from "../lib/cutlery-accessories.js";
 
 test("base cabinet width uses lower cabinet label", () => {
   assert.equal(
@@ -136,6 +136,18 @@ test("cutlery variant line items use catalog article data", () => {
   assert.equal(lineItem.name, "Catalog 40 cm insert");
   assert.equal(lineItem.price, 21);
   assert.equal(lineItem.quantity, 2);
+});
+
+test("cutlery order item parser recovers article number from saved German name", () => {
+  assert.deepEqual(
+    parseCutleryLineFromOrderItem({
+      code: "ACC-CUTLERY-ZB60SG",
+      articleNumber: "",
+      nameSnapshot: "Besteckeinsatz 45 cm",
+      quantity: 1,
+    }),
+    { articleNumber: "ZB45SG", quantity: 1 },
+  );
 });
 
 test("wall cabinet width falls back to code", () => {

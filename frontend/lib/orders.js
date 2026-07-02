@@ -24,7 +24,7 @@ import {
   normalizeContractNumber,
 } from "./kitchen-contracts";
 import { prisma } from "./prisma";
-import { isCutleryAccessoryCode } from "./cutlery-accessories";
+import { isCutleryAccessoryCode, parseCutleryLineFromOrderItem } from "./cutlery-accessories";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -187,28 +187,38 @@ function getOrderItemEffectivePrice(item) {
 }
 
 export function buildOrderForNotifications(orderRecord) {
-  const toNotificationItem = (item) => ({
-    code: item.code,
-    articleNumber: item.kitchenItem?.articleNumber || item.articleNumber || "",
-    name: item.kitchenItem?.nameDe || item.nameDe || item.nameSnapshot || item.name || "",
-    nameDe: item.kitchenItem?.nameDe || item.nameDe || "",
-    price: getOrderItemEffectivePrice(item),
-    quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
-    iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
-    componentKey: item.kitchenItem?.componentKey || item.componentKey || "",
-    productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
-    productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
-    productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
-    productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts)
-      ? item.kitchenItem.productInfoKeyFacts
-      : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
-    productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
-    blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
-    blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
-    blendePrice: item.kitchenItem?.blendePrice != null
-      ? Number(item.kitchenItem.blendePrice)
-      : (item.blendePrice != null ? Number(item.blendePrice) : null),
-  });
+  const toNotificationItem = (item) => {
+    const cutleryLine = parseCutleryLineFromOrderItem({
+      code: item.code,
+      articleNumber: item.articleNumber,
+      name: item.nameSnapshot || item.name,
+      nameSnapshot: item.nameSnapshot,
+      quantity: item.quantity,
+    });
+
+    return {
+      code: item.code,
+      articleNumber: cutleryLine?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
+      name: item.nameSnapshot || item.nameDe || item.name || item.kitchenItem?.nameDe || item.kitchenItem?.name || "",
+      nameDe: item.nameSnapshot || item.nameDe || item.kitchenItem?.nameDe || "",
+      price: getOrderItemEffectivePrice(item),
+      quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
+      iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
+      componentKey: item.kitchenItem?.componentKey || item.componentKey || "",
+      productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
+      productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
+      productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
+      productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts)
+        ? item.kitchenItem.productInfoKeyFacts
+        : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+      productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
+      blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
+      blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+      blendePrice: item.kitchenItem?.blendePrice != null
+        ? Number(item.kitchenItem.blendePrice)
+        : (item.blendePrice != null ? Number(item.blendePrice) : null),
+    };
+  };
   const notificationItems = mergeSinkAndWorktopItems(orderRecord.items || [], (sinkItem, worktopItem) => ({
     ...toNotificationItem(sinkItem),
     itemType: sinkItem.itemType,
