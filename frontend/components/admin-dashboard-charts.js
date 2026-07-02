@@ -983,7 +983,7 @@ function MobileTopItems({ topItemsByQuantity, topItemsByRevenue }) {
       displayName: formatTopItemLabel(item, translate),
       value: Number(item[mode] || 0),
     }))
-    .sort(compareItemsByArticleCode)
+    .sort(compareItemsByMetric)
     .slice(0, 5);
   const maxValue = Math.max(1, ...rows.map((item) => item.value));
   const formatter = mode === "quantity"
@@ -1548,7 +1548,7 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       }
     : {
         formatter: formatCurrency,
@@ -1560,7 +1560,7 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       };
   const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
   const hasCompanyData = Boolean(selectedCompany);
@@ -1887,8 +1887,10 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
         }
 
         .top-items-scroll {
-          overflow: visible;
+          max-height: 280px;
+          overflow-y: auto;
           overflow-x: hidden;
+          padding-right: 4px;
         }
 
         .segmented-control {
@@ -2045,7 +2047,7 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       }
     : {
         formatter: formatCurrency,
@@ -2057,7 +2059,7 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       };
   const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
   const topItemsChartHeight = Math.max(240, topItemChartData.length * TOP_ITEM_ROW_HEIGHT + 42);
@@ -2685,13 +2687,13 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const config = mode === "quantity"
     ? {
         title: translate("dashboard.topItems", "Top items"),
-        detail: translate("dashboard.topItemsSortedByArticleCode", "Items grouped and sorted by article code."),
+        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
         data: topItemsByQuantity,
         formatter: (value) => translateText("dashboard.itemCountValue", "{count} item(s)", { count: String(value) }),
       }
     : {
         title: translate("dashboard.topItems", "Top items"),
-        detail: translate("dashboard.topItemsSortedByArticleCode", "Items grouped and sorted by article code."),
+        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
         data: topItemsByRevenue,
         formatter: formatCurrency,
       };
@@ -2706,7 +2708,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
     }))
-    .sort(compareItemsByArticleCode), [config.data, mode, translate]);
+    .sort(compareItemsByMetric), [config.data, mode, translate]);
   const data = fullData;
 
   const chartHeight = Math.max(260, data.length * TOP_ITEM_ROW_HEIGHT + 44);
@@ -3231,7 +3233,10 @@ function formatTopItemLabel(item, translate) {
   return String(translatedName || item?.name || "").trim();
 }
 
-function compareItemsByArticleCode(a, b) {
+function compareItemsByMetric(a, b) {
+  const metricCompare = Number(b?.chartValue || b?.value || 0) - Number(a?.chartValue || a?.value || 0);
+  if (metricCompare) return metricCompare;
+
   const leftArticle = String(a?.articleNumber || a?.code || "").trim();
   const rightArticle = String(b?.articleNumber || b?.code || "").trim();
   const articleCompare = leftArticle.localeCompare(rightArticle, undefined, { numeric: true, sensitivity: "base" });

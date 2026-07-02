@@ -344,6 +344,16 @@ function compareTopItemsByArticleCode(a, b) {
   return String(a.code || "").localeCompare(String(b.code || ""), undefined, { numeric: true, sensitivity: "base" });
 }
 
+function compareTopItemsByQuantity(a, b) {
+  const quantityCompare = Number(b.quantity || 0) - Number(a.quantity || 0);
+  return quantityCompare || compareTopItemsByArticleCode(a, b);
+}
+
+function compareTopItemsByRevenue(a, b) {
+  const revenueCompare = Number(b.revenue || 0) - Number(a.revenue || 0);
+  return revenueCompare || compareTopItemsByArticleCode(a, b);
+}
+
 function choosePreferredText(currentValue, nextValue) {
   const current = String(currentValue || "").trim();
   const next = String(nextValue || "").trim();
@@ -1106,8 +1116,8 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     name: item.canonicalName || item.fallbackName || item.code || "",
     articleNumber: item.canonicalArticleNumber || null,
   }));
-  const topItemsByQuantity = resolvedItemStats.slice().sort(compareTopItemsByArticleCode);
-  const topItemsByRevenue = resolvedItemStats.slice().sort(compareTopItemsByArticleCode);
+  const topItemsByQuantity = resolvedItemStats.slice().sort(compareTopItemsByQuantity);
+  const topItemsByRevenue = resolvedItemStats.slice().sort(compareTopItemsByRevenue);
   const itemTypeData = Array.from(typeSplit.values()).sort((a, b) => b.value - a.value);
   const paymentData = paymentRows
     .map((row) => ({ label: row.label, value: Number(row.value || 0) }))
@@ -1216,7 +1226,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         name: item.canonicalName || item.fallbackName || item.code || "",
         articleNumber: item.canonicalArticleNumber || null,
       }))
-      .sort(compareTopItemsByArticleCode);
+      .sort(compareTopItemsByQuantity);
     return acc;
   }, {});
 
@@ -1379,7 +1389,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         name: item.canonicalName || item.fallbackName || item.code || "",
         articleNumber: item.canonicalArticleNumber || null,
       }))
-      .sort(compareTopItemsByArticleCode);
+      .sort(compareTopItemsByQuantity);
     return acc;
   }, {});
 
