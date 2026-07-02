@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { PDFDocument, rgb } from "pdf-lib";
 import { formatCurrency } from "./kitchen-selection-utils";
+import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../lib/preferred-delivery.js";
 
 const PDF_COMPANY_ADDRESS = [
@@ -103,7 +104,8 @@ function getItemDisplayCode(item) {
 }
 
 function getItemDisplayName(item) {
-  return normalizeGermanDisplayText(item?.nameDe || item?.name || item?.code || "");
+  const cabinetName = getCabinetWidthDisplayName(item, "de");
+  return normalizeGermanDisplayText(item?.nameDe || cabinetName || item?.name || item?.code || "");
 }
 
 function normalizeGermanDisplayText(value) {
