@@ -20,6 +20,7 @@ test("order confirmation recipients include the sender as a copy", () => {
 test("order confirmation summary renders blende as a cabinet subtitle", () => {
   const order = {
     orderNumber: "FRG-TEST-001",
+    createdAt: "2026-07-01T00:00:00.000Z",
     total: 244,
     kitchen: {
       name: "Demo Kitchen",
@@ -84,7 +85,7 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   assert.match(html, /<th[^>]*>Nr\.<\/th>/);
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Vollintegrierter Geschirrspüler/);
   assert.match(html, /<tr><td[^>]*>1<\/td><td[\s\S]*?Unterschrank mit Schubkasten[\s\S]*?<\/td><td[\s\S]*?219/);
-  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm[\s\S]*?Code: UPK20[\s\S]*?<\/td><td[\s\S]*?25/);
+  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[\s\S]*?25/);
   assert.doesNotMatch(html, /<div style="margin-top:8px;">Blende UPK20 20 cm/);
   assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">Blende/);
   assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">25/);
@@ -96,13 +97,13 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   assert.doesNotMatch(html, /SINK-WORKTOP/);
   assert.doesNotMatch(html, /Built-in oven and induction hob/);
   assert.doesNotMatch(html, /Worktop/);
-  assert.match(html, /Code: US50/);
-  assert.match(html, /Code: A-EGSPV597210 \+ TGV60/);
-  assert.doesNotMatch(html, /Code: CAB-BASE-1/);
-  assert.doesNotMatch(html, /Code: DISH-AB105806-600/);
+  assert.match(html, /Typen-Nr\.: US50/);
+  assert.match(html, /Typen-Nr\.: A-EGSPV597210 \+ TGV60/);
+  assert.doesNotMatch(html, /Typen-Nr\.: CAB-BASE-1/);
+  assert.doesNotMatch(html, /Typen-Nr\.: DISH-AB105806-600/);
   assert.match(html, /Auftragsnummer/);
   assert.match(html, /Vertragsnummer/);
-  assert.match(html, /Code: UPK20/);
+  assert.match(html, /Typen-Nr\.: UPK20/);
   assert.match(html, /Voraussichtliche Lieferzeit/);
   assert.match(html, /Nach 2 Wochen/);
   assert.match(html, /219/);
@@ -142,9 +143,9 @@ test("order confirmation groups multiple blendes under their parent cabinet", ()
   const html = buildOrderSummaryHtml(order);
 
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60/);
-  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm x 2[\s\S]*?Code: UPK20[\s\S]*?<\/td><td[\s\S]*?50/);
+  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm x 2[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[\s\S]*?50/);
   assert.doesNotMatch(html, /1\.2[\s\S]*?Blende UPK20 20 cm/);
-  assert.match(html, /Code: UPK20/);
+  assert.match(html, /Typen-Nr\.: UPK20/);
   assert.doesNotMatch(html, /UPK20 x2/);
 });
 
@@ -203,7 +204,7 @@ test("order confirmation product-info attachments exclude default zero-price ite
   assert.match(staticHtml.html, /<li[^>]*>Standkühlschrank 178 cm<\/li>/);
   assert.match(staticHtml.html, /Neu bestätigtes Zubehör/);
   assert.match(staticHtml.html, /Besteckeinsatz 60 cm x 3/);
-  assert.match(staticHtml.html, /Code: ZB60SG/);
+  assert.match(staticHtml.html, /Typen-Nr\.: ZB60SG/);
   assert.equal(staticHtml.html.includes("Fully integrated dishwasher"), false);
   assert.equal(staticHtml.html.includes("Freestanding refrigerator 178cm"), false);
   assert.equal(staticHtml.html.includes("Built-in oven and induction hob"), false);

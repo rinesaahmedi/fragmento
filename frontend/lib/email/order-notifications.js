@@ -484,10 +484,9 @@ function drawItemIcon(doc, item, x, y, size = 16) {
   }
 
   if (has("blende", "panel")) {
-    doc.line(px(4), py(4), px(12), py(4));
-    doc.line(px(4), py(7), px(12), py(7));
-    doc.line(px(4), py(10), px(12), py(10));
-    doc.line(px(4), py(13), px(12), py(13));
+    doc.setLineWidth(1.2);
+    doc.rect(px(6.3), py(1.8), scaled(3.4), scaled(12.5));
+    doc.setLineWidth(1);
     return;
   }
 
@@ -557,7 +556,13 @@ function drawItemIcon(doc, item, x, y, size = 16) {
     return;
   }
 
-  if (has("drawer", "cabinet", "schrank", "base", "wall")) {
+  if (has("wall", "upper", "oberschrank")) {
+    doc.rect(px(3.5), py(3), scaled(9), scaled(10));
+    doc.line(px(11), py(6), px(11), py(10));
+    return;
+  }
+
+  if (has("drawer", "cabinet", "schrank", "base", "unterschrank")) {
     doc.rect(px(4), py(3), scaled(8), scaled(10));
     doc.line(px(4), py(7), px(12), py(7));
     doc.line(px(6.5), py(5), px(9.5), py(5));
@@ -632,46 +637,58 @@ export async function generateOrderConfirmationPdf(order) {
     doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
     y += 20;
     doc.text("Nr.", margin, y);
-    doc.text("Artikel", margin + 58, y);
-    doc.text("Item Code", margin + 320, y);
+    doc.text("Type", margin + 68, y);
+    doc.text("Typen-Nr.", margin + 320, y);
     doc.text("Preis", pageWidth - margin, y, { align: "right" });
     y += 18;
     doc.setFont("helvetica", "normal").setFontSize(10);
 
+    const drawPdfDivider = (dividerY, color = 234) => {
+      doc.setDrawColor(color, color, color);
+      doc.line(margin, dividerY, pageWidth - margin, dividerY);
+      doc.setDrawColor(40, 40, 40);
+    };
+
     buildNumberedRows(visibleItems).forEach(({ item, rowNumber, blendeItems = [] }) => {
       const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), 208);
       const blendeLineGroups = blendeItems.map((blendeItem) => ({
+        item: blendeItem,
         rowNumber: blendeItem.rowNumber,
         nameLines: doc.splitTextToSize(getBlendeDisplayNameWithQuantity(blendeItem), 208),
         code: getItemDisplayCode(blendeItem),
         price: formatCurrency(blendeItem.price),
       }));
-      const blendeTextHeight = blendeLineGroups.reduce((sum, group) => sum + (group.nameLines.length + 1) * lineHeight, 0);
-      const rowHeight = Math.max(36, nameLines.length * lineHeight + blendeTextHeight + 14);
+      const parentBandHeight = Math.max(36, nameLines.length * lineHeight + 21);
+      const blendeBandHeights = blendeLineGroups.map((group) => Math.max(36, group.nameLines.length * lineHeight + 21));
+      const rowHeight = parentBandHeight + blendeBandHeights.reduce((sum, height) => sum + height, 0);
       ensureSpace(rowHeight);
       const rowTop = y;
-      const rowTextY = rowTop + 14;
-      const iconY = rowTop + (rowHeight - 26) / 2;
+      const rowTextY = rowTop + 18;
+      const iconY = rowTextY - 14;
 
       doc.text(rowNumber, margin, rowTextY);
       drawItemIcon(doc, item, margin + 22, iconY, 26);
       nameLines.forEach((line, lineIndex) => {
-        doc.text(line, margin + 58, rowTextY + lineIndex * lineHeight);
+        doc.text(line, margin + 68, rowTextY + lineIndex * lineHeight);
       });
       doc.text(getItemDisplayCode(item), margin + 320, rowTextY);
       doc.text(formatCurrency(item.price), pageWidth - margin, rowTextY, { align: "right" });
       if (blendeLineGroups.length) {
-        let blendeY = rowTextY + nameLines.length * lineHeight + 4;
-        blendeLineGroups.forEach((group) => {
+        let blendeRowTop = rowTop + parentBandHeight;
+        drawPdfDivider(blendeRowTop, 247);
+        blendeLineGroups.forEach((group, groupIndex) => {
+          const blendeY = blendeRowTop + 18;
           doc.text(group.rowNumber, margin, blendeY);
+          drawItemIcon(doc, group.item, margin + 25, blendeY - 12, 22);
           group.nameLines.forEach((line, lineIndex) => {
-            doc.text(line, margin + 58, blendeY + lineIndex * lineHeight);
+            doc.text(line, margin + 68, blendeY + lineIndex * lineHeight);
           });
-          doc.text(`Code: ${group.code}`, margin + 58, blendeY + group.nameLines.length * lineHeight);
+          doc.text(group.code, margin + 320, blendeY);
           doc.text(group.price, pageWidth - margin, blendeY, { align: "right" });
-          blendeY += (group.nameLines.length + 1) * lineHeight;
+          blendeRowTop += blendeBandHeights[groupIndex];
         });
       }
+      drawPdfDivider(rowTop + rowHeight);
       y += rowHeight;
     });
 
@@ -704,6 +721,7 @@ export function buildOrderSummaryHtml(order) {
   const thStyles =
     "padding:12px 15px;border-bottom:2px solid #eaeaea;background-color:#f9f9f9;text-align:left;color:#333;";
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;";
+  const subtleDividerTdStyles = "padding:12px 15px;border-bottom:1px solid #f7f7f7;color:#555;";
   const priceColumnStyles = "width:96px;text-align:right;";
   const priceThStyles = `${thStyles}${priceColumnStyles}`;
   const priceTdStyles = `${tdStyles}${priceColumnStyles}font-weight:bold;vertical-align:top;`;
@@ -728,15 +746,17 @@ export function buildOrderSummaryHtml(order) {
         const imageHtml = imageCid
           ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
           : "";
-        const parentRow = `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(rowNumber)}</td><td style="${tdStyles}"><div style="display:flex;align-items:flex-start;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${priceTdStyles}">${formatCurrency(item.price)}</td></tr>`;
+        const parentTdStyles = blendeItems.length ? subtleDividerTdStyles : tdStyles;
+        const parentPriceTdStyles = `${parentTdStyles}${priceColumnStyles}font-weight:bold;vertical-align:top;`;
+        const parentRow = `<tr><td style="${parentTdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(rowNumber)}</td><td style="${parentTdStyles}"><div style="display:flex;align-items:flex-start;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Typen-Nr.: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${parentPriceTdStyles}">${formatCurrency(item.price)}</td></tr>`;
         const blendeRows = blendeItems
-          .map((blendeItem) => `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(blendeItem.rowNumber)}</td><td style="${tdStyles}">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span style="font-size:12px;color:#777;">Code: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></td><td style="${priceTdStyles}">${formatCurrency(blendeItem.price)}</td></tr>`)
+          .map((blendeItem) => `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(blendeItem.rowNumber)}</td><td style="${tdStyles}">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span style="font-size:12px;color:#777;">Typen-Nr.: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></td><td style="${priceTdStyles}">${formatCurrency(blendeItem.price)}</td></tr>`)
           .join("");
         return `${parentRow}${blendeRows}`;
       })
       .join("");
 
-    return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles};width:34px;">Nr.</th><th style="${thStyles}">Artikel</th><th style="${priceThStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles};width:34px;">Nr.</th><th style="${thStyles}">Type</th><th style="${priceThStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
   };
 
   return `
