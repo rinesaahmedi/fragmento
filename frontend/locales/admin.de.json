@@ -247,6 +247,7 @@
       "deliveryAssemblyConnection": "Lieferung, Vertragen, Montage und Anschluss"
     },
     "topItemsSortedBySelectedPerformanceMetric": "Top-Artikel sortiert nach der ausgewählten Kennzahl.",
+    "topItemsSortedByArticleCode": "Artikel gruppiert und nach Artikelcode sortiert.",
     "topItemsShowingTopCount": "Es werden die Top {count} Artikel nach der ausgewählten Kennzahl angezeigt.",
     "byQuantity": "Nach Menge",
     "byRevenue": "Nach Umsatz",

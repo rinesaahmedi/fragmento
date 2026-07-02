@@ -247,6 +247,7 @@
       "deliveryAssemblyConnection": "Delivery, Carrying, Assembly and Connection"
     },
     "topItemsSortedBySelectedPerformanceMetric": "Top items sorted by the selected performance metric.",
+    "topItemsSortedByArticleCode": "Items grouped and sorted by article code.",
     "topItemsShowingTopCount": "Showing the top {count} items by the selected metric.",
     "byQuantity": "By quantity",
     "byRevenue": "By revenue",

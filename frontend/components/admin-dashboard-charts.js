@@ -33,6 +33,8 @@ const SERIES_COLORS = ["#6C8AE4", "#58BFA6", "#F08A5D", "#9B6EF3", "#E07A5F", "#
 const DISTRIBUTION_COLORS = ["#6C8AE4", "#58BFA6", "#F08A5D", "#9B6EF3", "#E07A5F", "#5B8DEF", "#5FBF8F", "#F2A65A"];
 const ORDER_STATUSES = ["NEW", "EMAILED", "CONFIRMED", "CANCELLED"];
 const MAX_TOP_ITEMS = 12;
+const TOP_ITEM_AXIS_WIDTH = 420;
+const TOP_ITEM_ROW_HEIGHT = 44;
 const CHART_GRID = "#E5E1DC";
 const CHART_TEXT = "#2B2B2B";
 const CHART_MUTED = "#6F6F6F";
@@ -167,10 +169,6 @@ export const EXAMPLE_DASHBOARD_MOCK_DATA = {
     { date: "Apr 01", NEW: 4, EMAILED: 8, CONFIRMED: 2, CANCELLED: 1 },
     { date: "Apr 02", NEW: 2, EMAILED: 5, CONFIRMED: 6, CANCELLED: 0 },
   ],
-  kitchenTimeline: [
-    { date: "Apr 01", "Kitchen A": 5, "Kitchen B": 3 },
-    { date: "Apr 02", "Kitchen A": 2, "Kitchen B": 7 },
-  ],
   geography: [
     { country: "Germany", orders: 86, revenue: 54200, orderShare: 67 },
     { country: "Austria", orders: 22, revenue: 14800, orderShare: 17 },
@@ -190,8 +188,6 @@ export function AdminDashboardCharts({
   dailyStatusData,
   claimElementData,
   claimCityData,
-  kitchenTimelineData,
-  kitchenSeries,
   topItemsByQuantity,
   topItemsByRevenue,
   itemTypeData,
@@ -204,7 +200,6 @@ export function AdminDashboardCharts({
   const router = useRouter();
   const pathname = usePathname();
   const [statusMode, setStatusMode] = useState("volume");
-  const [isolatedSeries, setIsolatedSeries] = useState("");
   const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
   const [mobileSection, setMobileSection] = useState("overview");
   const translateText = (key, fallback, values) => interpolateText(translate(key, fallback), values);
@@ -224,7 +219,6 @@ export function AdminDashboardCharts({
     });
   }, [dailyStatusData, statusMode]);
 
-  const visibleKitchenSeries = isolatedSeries ? kitchenSeries.filter((name) => name === isolatedSeries) : kitchenSeries;
   const mobileKpis = kpis.slice(0, 4);
   const mobileTabs = [
     { value: "overview", label: translate("dashboard.mobileTabOverview", "Overview") },
@@ -358,7 +352,6 @@ export function AdminDashboardCharts({
           {mobileSection === "overview" ? (
             <>
               <MobileStatusBars data={dailyStatusData} />
-              <MobileKitchenActivity data={kitchenTimelineData} kitchenSeries={kitchenSeries} />
             </>
           ) : null}
 
@@ -469,40 +462,6 @@ export function AdminDashboardCharts({
             </ResponsiveContainer>
           ) : (
             <EmptyChart label={translate("dashboard.noStatusDataForSelectedFilters", "No status data for the selected filters.")} />
-          )}
-        </div>
-      </section>
-
-      <section className="chart-card chart-card--compact desktop-dashboard-section">
-        <ChartHeader
-          eyebrow={translate("dashboard.kitchenTimeline", "Kitchen timeline")}
-          title={translate("dashboard.orderActivityByKitchen", "Order activity by kitchen")}
-          detail={translate("dashboard.clickLegendItemToIsolateIt", "Click a legend item to isolate it.")}
-        />
-        <div className="chart-frame">
-          {kitchenTimelineData.length && kitchenSeries.length ? (
-            <ResponsiveContainer width="100%" height={280}>
-              <LineChart data={kitchenTimelineData} margin={{ top: 10, right: 18, left: -12, bottom: 0 }}>
-                <CartesianGrid stroke={CHART_GRID} vertical={false} />
-                <XAxis dataKey="label" tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
-                <YAxis allowDecimals={false} tickLine={false} axisLine={false} fontSize={12} tick={{ fill: CHART_MUTED }} />
-                <Tooltip />
-                <Legend wrapperStyle={{ color: CHART_TEXT }} onClick={(event) => setIsolatedSeries((current) => current === event.dataKey ? "" : event.dataKey)} />
-                {visibleKitchenSeries.map((name, index) => (
-                  <Line
-                    key={name}
-                    type="monotone"
-                    dataKey={name}
-                    stroke={SERIES_COLORS[index % SERIES_COLORS.length]}
-                    strokeWidth={3}
-                    dot={{ r: 3 }}
-                    activeDot={{ r: 6 }}
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <EmptyChart label={translate("dashboard.noKitchenTimelineDataForSelectedFilters", "No kitchen timeline data for the selected filters.")} />
           )}
         </div>
       </section>
@@ -1014,44 +973,6 @@ function MobileStatusBars({ data }) {
   );
 }
 
-function MobileKitchenActivity({ data, kitchenSeries }) {
-  const { translate } = useAdminI18n();
-  const totals = kitchenSeries
-    .map((name) => ({
-      label: name,
-      value: data.reduce((sum, row) => sum + Number(row[name] || 0), 0),
-    }))
-    .filter((item) => item.value > 0)
-    .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
-  const maxValue = Math.max(1, ...totals.map((item) => item.value));
-
-  return (
-    <section className="mobile-chart-card">
-      <ChartHeader
-        eyebrow={translate("dashboard.kitchenTimeline", "Kitchen timeline")}
-        title={translate("dashboard.orderActivityByKitchen", "Order activity by kitchen")}
-      />
-      {totals.length ? (
-        <div className="mobile-bar-list">
-          {totals.map((item, index) => (
-            <div key={item.label} className="mobile-bar-row">
-              <div>
-                <strong>{item.label}</strong>
-                <span>{item.value}</span>
-              </div>
-              <i style={{ "--bar-width": `${Math.max(4, (item.value / maxValue) * 100)}%`, "--bar-color": SERIES_COLORS[index % SERIES_COLORS.length] }} />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <EmptyChart label={translate("dashboard.noKitchenTimelineDataForSelectedFilters", "No kitchen timeline data for the selected filters.")} />
-      )}
-      <style jsx>{mobileBarStyles}</style>
-    </section>
-  );
-}
-
 function MobileTopItems({ topItemsByQuantity, topItemsByRevenue }) {
   const { translate } = useAdminI18n();
   const [mode, setMode] = useState("quantity");
@@ -1062,7 +983,7 @@ function MobileTopItems({ topItemsByQuantity, topItemsByRevenue }) {
       displayName: formatTopItemLabel(item, translate),
       value: Number(item[mode] || 0),
     }))
-    .sort((a, b) => b.value - a.value)
+    .sort(compareItemsByArticleCode)
     .slice(0, 5);
   const maxValue = Math.max(1, ...rows.map((item) => item.value));
   const formatter = mode === "quantity"
@@ -1625,9 +1546,9 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
             chartValue: Number(item.quantity || 0),
             displayName: formatTopItemLabel(item, translate),
             axisLabel: buildTopItemAxisLabel(item, translate),
-            displayIdentifier: item.code || "",
+            displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort((a, b) => b.chartValue - a.chartValue),
+          .sort(compareItemsByArticleCode),
       }
     : {
         formatter: formatCurrency,
@@ -1637,13 +1558,13 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
             chartValue: Number(item.revenue || 0),
             displayName: formatTopItemLabel(item, translate),
             axisLabel: buildTopItemAxisLabel(item, translate),
-            displayIdentifier: item.code || "",
+            displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort((a, b) => b.chartValue - a.chartValue),
+          .sort(compareItemsByArticleCode),
       };
   const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
   const hasCompanyData = Boolean(selectedCompany);
-  const topItemsChartHeight = Math.max(250, topItemChartData.length * 34 + 42);
+  const topItemsChartHeight = Math.max(250, topItemChartData.length * TOP_ITEM_ROW_HEIGHT + 42);
   const topItemsMaxValue = topItemChartData.reduce((max, item) => Math.max(max, item.chartValue), 0);
   const topItemsXAxisMax = itemMode === "quantity"
     ? Math.max(1, Math.ceil(topItemsMaxValue * 1.12))
@@ -1764,7 +1685,8 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
                           <YAxis
                             type="category"
                             dataKey="axisLabel"
-                            width={320}
+                            width={TOP_ITEM_AXIS_WIDTH}
+                            interval={0}
                             tickLine={false}
                             axisLine={false}
                             fontSize={12}
@@ -1965,10 +1887,8 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
         }
 
         .top-items-scroll {
-          max-height: 280px;
-          overflow-y: auto;
+          overflow: visible;
           overflow-x: hidden;
-          padding-right: 4px;
         }
 
         .segmented-control {
@@ -2123,9 +2043,9 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             chartValue: Number(item.quantity || 0),
             displayName: formatTopItemLabel(item, translate),
             axisLabel: buildTopItemAxisLabel(item, translate),
-            displayIdentifier: item.code || "",
+            displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort((a, b) => b.chartValue - a.chartValue),
+          .sort(compareItemsByArticleCode),
       }
     : {
         formatter: formatCurrency,
@@ -2135,12 +2055,12 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             chartValue: Number(item.revenue || 0),
             displayName: formatTopItemLabel(item, translate),
             axisLabel: buildTopItemAxisLabel(item, translate),
-            displayIdentifier: item.code || "",
+            displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort((a, b) => b.chartValue - a.chartValue),
+          .sort(compareItemsByArticleCode),
       };
   const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
-  const topItemsChartHeight = Math.max(240, topItemChartData.length * 34 + 42);
+  const topItemsChartHeight = Math.max(240, topItemChartData.length * TOP_ITEM_ROW_HEIGHT + 42);
   const topItemsMaxValue = topItemChartData.reduce((max, item) => Math.max(max, item.chartValue), 0);
   const topItemsXAxisMax = itemMode === "quantity"
     ? Math.max(1, Math.ceil(topItemsMaxValue * 1.12))
@@ -2309,7 +2229,8 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
                         <YAxis
                           type="category"
                           dataKey="axisLabel"
-                          width={320}
+                          width={TOP_ITEM_AXIS_WIDTH}
+                          interval={0}
                           tickLine={false}
                           axisLine={false}
                           fontSize={12}
@@ -2764,13 +2685,13 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const config = mode === "quantity"
     ? {
         title: translate("dashboard.topItems", "Top items"),
-        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
+        detail: translate("dashboard.topItemsSortedByArticleCode", "Items grouped and sorted by article code."),
         data: topItemsByQuantity,
         formatter: (value) => translateText("dashboard.itemCountValue", "{count} item(s)", { count: String(value) }),
       }
     : {
         title: translate("dashboard.topItems", "Top items"),
-        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
+        detail: translate("dashboard.topItemsSortedByArticleCode", "Items grouped and sorted by article code."),
         data: topItemsByRevenue,
         formatter: formatCurrency,
       };
@@ -2780,16 +2701,15 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       ...item,
       displayName: formatTopItemLabel(item, translate),
       axisLabel: buildTopItemAxisLabel(item, translate),
-      displayIdentifier: item.code || "",
+      displayIdentifier: item.articleNumber || item.code || "",
       chartValue: Number(item[mode] || 0),
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
     }))
-    .sort((a, b) => b.chartValue - a.chartValue), [config.data, mode, translate]);
-  const data = fullData.slice(0, MAX_TOP_ITEMS);
-  const hasMoreItems = fullData.length > MAX_TOP_ITEMS;
+    .sort(compareItemsByArticleCode), [config.data, mode, translate]);
+  const data = fullData;
 
-  const chartHeight = Math.max(280, data.length * 34 + 52);
+  const chartHeight = Math.max(260, data.length * TOP_ITEM_ROW_HEIGHT + 44);
   const maxChartValue = data.reduce((max, item) => Math.max(max, item.chartValue), 0);
   const xAxisMax = mode === "quantity"
     ? Math.max(1, Math.ceil(maxChartValue * 1.12))
@@ -2800,9 +2720,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       <ChartHeader
         eyebrow={translate("dashboard.topItems", "Top items")}
         title={config.title}
-        detail={hasMoreItems
-          ? translateText("dashboard.topItemsShowingTopCount", "Showing the top {count} items by the selected metric.", { count: String(MAX_TOP_ITEMS) })
-          : config.detail}
+        detail={config.detail}
         actions={(
           <div className="segmented-control" aria-label="Top items mode">
             <button className={mode === "quantity" ? "is-active" : ""} type="button" onClick={() => setMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
@@ -2832,7 +2750,8 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
               <YAxis
                 type="category"
                 dataKey="axisLabel"
-                width={320}
+                width={TOP_ITEM_AXIS_WIDTH}
+                interval={0}
                 tickLine={false}
                 axisLine={false}
                 fontSize={12}
@@ -2853,7 +2772,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
                 }}
               >
                 {data.map((item, index) => (
-                  <Cell key={`${mode}-${item.code || item.name}-${item.name}`} fill={SERIES_COLORS[index % SERIES_COLORS.length]} />
+                  <Cell key={`${mode}-${item.articleNumber || item.code || item.name}-${item.name}`} fill={SERIES_COLORS[index % SERIES_COLORS.length]} />
                 ))}
               </Bar>
             </BarChart>
@@ -2875,7 +2794,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
 
         .top-items-frame {
           min-width: 0;
-          min-height: 280px;
+          min-height: 260px;
           transition: opacity 180ms ease, transform 180ms ease;
         }
 
@@ -2925,14 +2844,47 @@ function TopItemsAxisTick({ x, y, payload }) {
 
   return (
     <g transform={`translate(${x},${y})`}>
-      <text x={-8} y={-5} textAnchor="end" fill={CHART_TEXT} fontSize={12} fontWeight={700}>
-        {truncateLabel(name, 42)}
-      </text>
-      {identifier ? (
-        <text x={-8} y={11} textAnchor="end" fill={CHART_MUTED} fontSize={10}>
-          {truncateLabel(identifier, 34)}
-        </text>
-      ) : null}
+      <foreignObject x={-(TOP_ITEM_AXIS_WIDTH - 12)} y={-20} width={TOP_ITEM_AXIS_WIDTH - 20} height={40}>
+        <div
+          xmlns="http://www.w3.org/1999/xhtml"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            gap: "3px",
+            width: "100%",
+            height: "100%",
+            textAlign: "right",
+            lineHeight: 1.2,
+          }}
+        >
+          <span
+            style={{
+              color: CHART_TEXT,
+              fontSize: "12px",
+              fontWeight: 800,
+              whiteSpace: "normal",
+              overflowWrap: "anywhere",
+            }}
+          >
+            {name}
+          </span>
+          {identifier ? (
+            <span
+              style={{
+                color: CHART_MUTED,
+                fontSize: "10px",
+                fontWeight: 700,
+                whiteSpace: "normal",
+                overflowWrap: "anywhere",
+              }}
+            >
+              {identifier}
+            </span>
+          ) : null}
+        </div>
+      </foreignObject>
     </g>
   );
 }
@@ -3279,8 +3231,24 @@ function formatTopItemLabel(item, translate) {
   return String(translatedName || item?.name || "").trim();
 }
 
+function compareItemsByArticleCode(a, b) {
+  const leftArticle = String(a?.articleNumber || a?.code || "").trim();
+  const rightArticle = String(b?.articleNumber || b?.code || "").trim();
+  const articleCompare = leftArticle.localeCompare(rightArticle, undefined, { numeric: true, sensitivity: "base" });
+  if (articleCompare) return articleCompare;
+
+  const nameCompare = String(a?.displayName || a?.name || "").localeCompare(
+    String(b?.displayName || b?.name || ""),
+    undefined,
+    { numeric: true, sensitivity: "base" },
+  );
+  if (nameCompare) return nameCompare;
+
+  return Number(b?.chartValue || b?.quantity || 0) - Number(a?.chartValue || a?.quantity || 0);
+}
+
 function buildTopItemAxisLabel(item, translate) {
-  return [formatTopItemLabel(item, translate), String(item?.code || "").trim()]
+  return [formatTopItemLabel(item, translate), String(item?.articleNumber || item?.code || "").trim()]
     .filter(Boolean)
     .join("\n");
 }
