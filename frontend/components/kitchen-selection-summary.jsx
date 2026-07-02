@@ -107,7 +107,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{itemName}</strong>
-        {!isLocked && quantity > 1 ? (
+        {quantity > 1 ? (
           <span className={styles.summaryQuantity}>
             {translate("configurator.summaryQuantity", "Quantity")}: {quantity}
           </span>
