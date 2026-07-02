@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { PDFDocument, rgb } from "pdf-lib";
 import { formatCurrency } from "./kitchen-selection-utils";
+import { getPreferredDeliveryWeekDisplay } from "../lib/preferred-delivery.js";
 
 const PDF_COMPANY_ADDRESS = [
   "architecto by Küchen Aktuell GmbH,",
@@ -14,38 +15,6 @@ const LETTERHEAD = {
   contentBottomPadding: 24,
   templateUrl: "/pdfs/architecto-letterhead.pdf",
 };
-
-function formatDateOnly(value) {
-  if (!value) return "";
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-}
-
-function getPreferredDeliveryWeekDisplay(value, orderCreatedAt = null) {
-  if (!value) return "";
-
-  const selectedDate = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(selectedDate.getTime())) return value;
-
-  const baseDate = orderCreatedAt ? new Date(orderCreatedAt) : new Date();
-  const orderDate = Number.isNaN(baseDate.getTime()) ? new Date() : baseDate;
-  const orderDateOnly = new Date(Date.UTC(orderDate.getUTCFullYear(), orderDate.getUTCMonth(), orderDate.getUTCDate()));
-  const dayDiff = Math.round((selectedDate.getTime() - orderDateOnly.getTime()) / 86400000);
-  const weeks = dayDiff / 7;
-
-  if (Number.isInteger(weeks) && weeks >= 1) {
-    return `Nach ${weeks} Wochen`;
-  }
-
-  return formatDateOnly(value);
-}
 
 function drawSenderAddressBlock(doc, x, y) {
   doc.setTextColor(0, 0, 0);
@@ -240,7 +209,7 @@ export async function generateOrderPdf(order) {
     `E-Mail: ${order.customer.email}`,
     `Telefon: ${order.customer.phone}`,
     order.customer.preferredDeliveryDate
-      ? `Voraussichtliche Lieferzeit: ${getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt)}`
+      ? `Wunschlieferwoche: ${getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt)}`
       : "",
   ]
     .filter(Boolean)

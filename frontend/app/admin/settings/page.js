@@ -117,7 +117,7 @@ export default async function AdminSettingsPage({ searchParams }) {
 
           <AdminSection
             title={<AdminText i18nKey="settingsAdmin.deliveryLeadTimeTitle" fallback="Delivery lead time" />}
-            description={<AdminText i18nKey="settingsAdmin.deliveryLeadTimeDescription" fallback="Set the earliest selectable preferred delivery date after an order is placed." />}
+            description={<AdminText i18nKey="settingsAdmin.deliveryLeadTimeDescription" fallback="Set how many weeks after an order the first available delivery week becomes." />}
           >
             <form action="/api/admin/settings/delivery-lead-time" method="post" style={formStyle}>
               <div style={amountRowStyle}>

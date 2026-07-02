@@ -805,7 +805,7 @@
     "payment": "Zahlung",
     "customer": "Kunde",
     "address": "Adresse",
-    "preferredDeliveryDate": "Wunschlieferdatum",
+    "preferredDeliveryDate": "Wunschlieferwoche",
     "notes": "Notizen",
     "orderItems": "Bestellartikel",
     "snapshotOfAllItemsSavedWithThisOrder": "Momentaufnahme aller mit dieser Bestellung gespeicherten Artikel.",

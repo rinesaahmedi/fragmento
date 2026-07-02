@@ -4,10 +4,16 @@ import {
   buildOrderConfirmationEmailStaticHtml,
   buildOrderSummaryHtml,
 } from "../lib/email/order-notifications.js";
+import { getPreferredDeliveryDateAfterWeeks } from "../lib/preferred-delivery.js";
+
+test("preferred delivery week dates move weekends to Monday", () => {
+  assert.equal(getPreferredDeliveryDateAfterWeeks(4, "2026-07-05"), "2026-08-03");
+});
 
 test("order confirmation summary renders blende as a cabinet subtitle", () => {
   const order = {
     orderNumber: "FRG-TEST-001",
+    createdAt: "2026-07-01T10:00:00.000Z",
     total: 244,
     kitchen: {
       name: "Demo Kitchen",
@@ -92,8 +98,8 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   assert.match(html, /Auftragsnummer/);
   assert.match(html, /Vertragsnummer/);
   assert.match(html, /Code: UPK20/);
-  assert.match(html, /Voraussichtliche Lieferzeit/);
-  assert.match(html, /Nach 2 Wochen/);
+  assert.match(html, /Wunschlieferwoche/);
+  assert.match(html, /Nach 2 Wochen \(15\.07\.2026\)/);
   assert.match(html, /219/);
   assert.match(html, /25/);
   assert.match(html, /244/);
