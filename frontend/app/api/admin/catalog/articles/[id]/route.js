@@ -61,6 +61,8 @@ export async function POST(request, { params }) {
         tx.kitchenItem.update({
           where: { id: item.id },
           data: {
+            name: article.name,
+            nameDe: article.nameDe || null,
             price: centsToMoney(articlePriceCents + getBlendeTotalCents(item)),
           },
         })
@@ -69,7 +71,7 @@ export async function POST(request, { params }) {
       return linkedItems.length;
     });
 
-    return redirectWithFlash(request, "/admin/catalog/articles", "success", `Article updated. ${updatedCount} linked kitchen item(s) repriced.`);
+    return redirectWithFlash(request, "/admin/catalog/articles", "success", `Article updated. ${updatedCount} linked kitchen item(s) synced.`);
   } catch (error) {
     return redirectWithFlash(request, "/admin/catalog/articles", "error", mapAdminMutationError(error, "Article"));
   }

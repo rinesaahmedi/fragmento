@@ -644,8 +644,8 @@ export async function generateOrderConfirmationPdf(order) {
     y += 16;
     const headerTop = y;
     const headerHeight = 32;
-    const headerX = margin + 10;
-    const headerRight = pageWidth - margin - 10;
+    const headerX = margin;
+    const headerRight = pageWidth - margin;
     const numberX = margin + 15;
     const iconX = margin + 38;
     const typeX = margin + 68;
