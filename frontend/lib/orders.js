@@ -24,7 +24,7 @@ import {
   normalizeContractNumber,
 } from "./kitchen-contracts";
 import { prisma } from "./prisma";
-import { isCutleryAccessoryCode, parseCutleryLineFromOrderItem } from "./cutlery-accessories";
+import { getCutleryVariant, isCutleryAccessoryCode, parseCutleryLineFromOrderItem } from "./cutlery-accessories";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -195,6 +195,7 @@ export function buildOrderForNotifications(orderRecord) {
       nameSnapshot: item.nameSnapshot,
       quantity: item.quantity,
     });
+    const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
 
     const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "";
 
@@ -202,7 +203,7 @@ export function buildOrderForNotifications(orderRecord) {
       code: item.code,
       articleNumber: cutleryLine?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
       name: displayName,
-      nameDe: cutleryLine ? displayName : item.nameDe || item.kitchenItem?.nameDe || "",
+      nameDe: cutleryLine ? cutleryVariant?.nameDe || displayName : item.nameDe || item.kitchenItem?.nameDe || "",
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
