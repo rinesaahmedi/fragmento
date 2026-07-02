@@ -4,6 +4,7 @@ import { ItemType } from "@prisma/client";
 import { getStripeClient } from "../../../lib/stripe";
 import { getPaymentStatusLabel, updateOrderFromCheckoutSession } from "../../../lib/stripe-payments";
 import { prisma } from "../../../lib/prisma";
+import { getOrderDelegate, getOrderKindForContractNumber, isTestOrderKind } from "../../../lib/order-kind";
 import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../lib/order-item-display";
 
 export const dynamic = "force-dynamic";
@@ -119,8 +120,8 @@ function isVisibleReceiptItem(item) {
   return !HIDDEN_RECEIPT_COMPONENT_CODES.has(String(item?.code || "").trim().toUpperCase());
 }
 
-async function findStripeSession({ sessionId, orderNumber }) {
-  const stripe = getStripeClient();
+async function findStripeSession({ sessionId, orderNumber, stripeMode }) {
+  const stripe = getStripeClient(stripeMode);
   if (!stripe) return null;
 
   if (sessionId && sessionId !== "{CHECKOUT_SESSION_ID}") {
@@ -136,13 +137,13 @@ async function findStripeSession({ sessionId, orderNumber }) {
   ) || null;
 }
 
-async function getOrderForReceipt({ orderNumber, sessionId }) {
+async function getOrderForReceipt({ orderNumber, sessionId, orderKind }) {
   const filters = [];
   if (orderNumber) filters.push({ orderNumber });
   if (sessionId && sessionId !== "{CHECKOUT_SESSION_ID}") filters.push({ stripeCheckoutSessionId: sessionId });
   if (!filters.length) return null;
 
-  return prisma.order.findFirst({
+  return getOrderDelegate(prisma, orderKind).findFirst({
     where: { OR: filters },
     include: {
       kitchen: true,
@@ -190,11 +191,13 @@ export default async function CheckoutSuccessPage({ searchParams }) {
   const params = (await searchParams) || {};
   const orderNumber = String(params.order || "").trim();
   const sessionId = String(params.session_id || "").trim();
+  const orderKind = getOrderKindForContractNumber(orderNumber);
+  const stripeMode = isTestOrderKind(orderKind) ? "test" : "live";
 
   try {
-    const session = await findStripeSession({ sessionId, orderNumber });
+    const session = await findStripeSession({ sessionId, orderNumber, stripeMode });
     if (session) {
-      await updateOrderFromCheckoutSession(session);
+      await updateOrderFromCheckoutSession(session, { orderKind });
     }
   } catch (error) {
     console.error("Could not confirm Stripe checkout session:", error);
@@ -206,7 +209,7 @@ export default async function CheckoutSuccessPage({ searchParams }) {
     redirect(`/?${redirectParams.toString()}`);
   }
 
-  const order = await getOrderForReceipt({ orderNumber, sessionId });
+  const order = await getOrderForReceipt({ orderNumber, sessionId, orderKind });
   const effectiveStatus = order?.paymentStatus || "PENDING";
   const statusCopy = getStatusCopy(effectiveStatus);
   const totalLabel = String(effectiveStatus || "").toUpperCase() === "PAID" ? "Total paid" : "Order total";

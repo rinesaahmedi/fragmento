@@ -1,4 +1,5 @@
 import { ItemType, KitchenStatus, OrderStatus } from "@prisma/client";
+import { getOrderDelegate } from "./order-kind";
 import { prisma } from "./prisma";
 
 export const CONTRACT_ERRORS = {
@@ -60,10 +61,10 @@ export async function getKitchenContractForAccess(contractNumber) {
   return contract;
 }
 
-export async function getEditableOrderForContract(kitchenContractId, client = prisma, includeItems = false) {
+export async function getEditableOrderForContract(kitchenContractId, client = prisma, includeItems = false, orderKind = "live") {
   if (!kitchenContractId) return null;
 
-  const editableOrders = await client.order.findMany({
+  const editableOrders = await getOrderDelegate(client, orderKind).findMany({
     where: {
       kitchenContractId,
       status: { in: [...EDITABLE_ORDER_STATUSES] },
@@ -82,7 +83,7 @@ export async function getEditableOrderForContract(kitchenContractId, client = pr
   return editableOrders[0] || null;
 }
 
-export async function getContractOrderState(kitchenContractId, client = prisma) {
+export async function getContractOrderState(kitchenContractId, client = prisma, orderKind = "live") {
   if (!kitchenContractId) {
     return {
       editableOrder: null,
@@ -91,8 +92,8 @@ export async function getContractOrderState(kitchenContractId, client = prisma) 
     };
   }
 
-  const editableOrder = await getEditableOrderForContract(kitchenContractId, client, true);
-  const confirmedOrders = await client.order.findMany({
+  const editableOrder = await getEditableOrderForContract(kitchenContractId, client, true, orderKind);
+  const confirmedOrders = await getOrderDelegate(client, orderKind).findMany({
     where: {
       kitchenContractId,
       status: OrderStatus.CONFIRMED,

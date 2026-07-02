@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { createOrderFromSubmission } from "../../../lib/orders";
+import { isTestOrderKind } from "../../../lib/order-kind";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 import { createCheckoutSessionForOrder } from "../../../lib/stripe-payments";
+import { isStripeConfigured } from "../../../lib/stripe";
 
 function getRequestOrigin(request) {
   const forwardedProto = request.headers.get("x-forwarded-proto");
@@ -45,8 +47,9 @@ function buildCheckoutCancelUrl({ request, origin, order, kitchenSlug }) {
 async function createCheckoutSession({ request, order, kitchenSlug }) {
   const origin = getRequestOrigin(request);
   const cancelUrl = buildCheckoutCancelUrl({ request, origin, order, kitchenSlug });
+  const stripeMode = isTestOrderKind(order.orderKind) ? "test" : "live";
 
-  if (!process.env.STRIPE_SECRET_KEY) {
+  if (!isStripeConfigured(stripeMode)) {
     return null;
   }
 
@@ -59,6 +62,8 @@ async function createCheckoutSession({ request, order, kitchenSlug }) {
     },
     origin,
     cancelUrl,
+    stripeMode,
+    orderKind: order.orderKind,
   });
 }
 
@@ -86,6 +91,7 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       orderNumber: order.orderNumber,
+      orderKind: order.orderKind,
       checkoutUrl: checkoutSession?.url || null,
       notifications: order.notifications || null,
     });

@@ -1,5 +1,6 @@
 import { KitchenStatus, ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma.js";
+import { ORDER_KIND_LIVE, ORDER_KIND_TEST, getOrderDelegate } from "./order-kind.js";
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
 import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
 
@@ -1133,6 +1134,14 @@ function buildOrderAdminSearch(query) {
 }
 
 export async function getOrdersForAdmin(filters = {}) {
+  return getOrdersForAdminByKind(filters, ORDER_KIND_LIVE);
+}
+
+export async function getTestOrdersForAdmin(filters = {}) {
+  return getOrdersForAdminByKind(filters, ORDER_KIND_TEST);
+}
+
+async function getOrdersForAdminByKind(filters = {}, orderKind = ORDER_KIND_LIVE) {
   const where = {};
 
   if (filters.kitchenId) where.kitchenId = filters.kitchenId;
@@ -1153,7 +1162,7 @@ export async function getOrdersForAdmin(filters = {}) {
     where.OR = buildOrderAdminSearch(query);
   }
 
-  const orders = await prisma.order.findMany({
+  const orders = await getOrderDelegate(prisma, orderKind).findMany({
     where,
     include: {
       kitchen: true,
@@ -1163,11 +1172,19 @@ export async function getOrdersForAdmin(filters = {}) {
     orderBy: { createdAt: "desc" },
   });
 
-  return addContractOrderSequence(await attachHousingCompaniesToOrderContracts(orders));
+  return addContractOrderSequence(await attachHousingCompaniesToOrderContracts(orders), orderKind);
 }
 
 export async function getOrderById(id) {
-  const order = await prisma.order.findUnique({
+  return getOrderByIdByKind(id, ORDER_KIND_LIVE);
+}
+
+export async function getTestOrderById(id) {
+  return getOrderByIdByKind(id, ORDER_KIND_TEST);
+}
+
+async function getOrderByIdByKind(id, orderKind = ORDER_KIND_LIVE) {
+  const order = await getOrderDelegate(prisma, orderKind).findUnique({
     where: { id },
     include: {
       kitchen: true,
@@ -1180,7 +1197,7 @@ export async function getOrderById(id) {
   });
 
   if (!order) return null;
-  const [sequencedOrder] = await addContractOrderSequence(await attachHousingCompaniesToOrderContracts([order]));
+  const [sequencedOrder] = await addContractOrderSequence(await attachHousingCompaniesToOrderContracts([order]), orderKind);
   return sequencedOrder;
 }
 
@@ -1195,7 +1212,7 @@ async function attachHousingCompaniesToOrderContracts(orders) {
   }));
 }
 
-async function addContractOrderSequence(orders) {
+async function addContractOrderSequence(orders, orderKind = ORDER_KIND_LIVE) {
   const contractIds = [...new Set(orders.map((order) => order.kitchenContractId).filter(Boolean))];
   if (!contractIds.length) {
     return orders.map((order) => ({
@@ -1205,7 +1222,7 @@ async function addContractOrderSequence(orders) {
     }));
   }
 
-  const allContractOrders = await prisma.order.findMany({
+  const allContractOrders = await getOrderDelegate(prisma, orderKind).findMany({
     where: {
       kitchenContractId: { in: contractIds },
     },

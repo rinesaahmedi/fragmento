@@ -18,9 +18,16 @@ test("order creation does not send confirmation or webhook before payment", () =
 
 test("paid Stripe checkout sends automatic confirmation after successful payment", () => {
   assert.match(stripePaymentsSource, /getDirectOrderConfirmationEnabled/);
-  assert.match(stripePaymentsSource, /maybeSendPaidOrderConfirmation\(updatedOrder\)/);
+  assert.match(stripePaymentsSource, /maybeSendPaidOrderConfirmation\(updatedOrder,\s*\{\s*orderKind\s*\}\)/);
   assert.match(stripePaymentsSource, /paymentStatus:\s*isPaid \? "PAID"/);
   assert.match(stripePaymentsSource, /await sendOrderConfirmationEmail\(\{\s*order\s*\}\)/);
   assert.match(stripePaymentsSource, /data:\s*\{\s*status:\s*"CONFIRMED"\s*\}/);
   assert.match(stripePaymentsSource, /orderStatus === "CONFIRMED" \|\| orderStatus === "EMAILED" \|\| orderStatus === "CANCELLED"/);
+});
+
+test("PX test checkout uses test order table and test Stripe metadata", () => {
+  assert.match(stripePaymentsSource, /session\.metadata\?\.orderKind/);
+  assert.match(stripePaymentsSource, /getOrderDelegate\(prisma,\s*orderKind\)/);
+  assert.match(stripePaymentsSource, /orderKind,/);
+  assert.match(stripePaymentsSource, /stripeMode,/);
 });

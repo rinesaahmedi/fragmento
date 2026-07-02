@@ -23,6 +23,12 @@ import {
   getContractOrderState,
   normalizeContractNumber,
 } from "./kitchen-contracts";
+import {
+  ORDER_KIND_LIVE,
+  getOrderDelegate,
+  getOrderItemDelegate,
+  getOrderKindForContractNumber,
+} from "./order-kind";
 import { prisma } from "./prisma";
 import { getCutleryVariant, isCutleryAccessoryCode, parseCutleryLineFromOrderItem } from "./cutlery-accessories";
 
@@ -50,8 +56,8 @@ function requireString(value, label) {
   return String(value).trim();
 }
 
-async function buildNextOrderNumberForContract(tx, kitchenContract) {
-  const orders = await tx.order.findMany({
+async function buildNextOrderNumberForContract(tx, kitchenContract, orderKind = ORDER_KIND_LIVE) {
+  const orders = await getOrderDelegate(tx, orderKind).findMany({
     where: {
       kitchenContractId: kitchenContract.id,
       orderNumber: { startsWith: kitchenContract.contractNumber },
@@ -280,8 +286,8 @@ function readEmailOverrides(input = {}) {
   };
 }
 
-async function getOrderRecordForOperations(id) {
-  const order = await prisma.order.findUnique({
+async function getOrderRecordForOperations(id, orderKind = ORDER_KIND_LIVE) {
+  const order = await getOrderDelegate(prisma, orderKind).findUnique({
     where: { id },
     include: {
       kitchen: true,
@@ -412,8 +418,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   if (kitchenContract.kitchenId !== kitchen.id) {
     throw contractValidationError(CONTRACT_ERRORS.KITCHEN_MISMATCH);
   }
+  const orderKind = getOrderKindForContractNumber(kitchenContract.contractNumber);
 
-  const contractOrderState = await getContractOrderState(kitchenContract.id);
+  const contractOrderState = await getContractOrderState(kitchenContract.id, prisma, orderKind);
   const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
   const serviceEligibility = getServiceEligibility({
     selectedComponents: selectedComponents.map((item) => ({
@@ -465,7 +472,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       savedOrder = await prisma.$transaction(async (tx) => {
-        const contractOrderState = await getContractOrderState(kitchenContract.id, tx);
+        const orderDelegate = getOrderDelegate(tx, orderKind);
+        const orderItemDelegate = getOrderItemDelegate(tx, orderKind);
+        const contractOrderState = await getContractOrderState(kitchenContract.id, tx, orderKind);
         const existingEditableOrder = contractOrderState.editableOrder;
         const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
         const newSelectedItems = withoutConfirmedBaseline(allSelected, confirmedItemSets);
@@ -485,7 +494,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
         const totalPrice = newSelectedItems.reduce((sum, item) => sum + getOrderItemEffectivePrice(item), 0);
         const order = existingEditableOrder
-          ? await tx.order.update({
+          ? await orderDelegate.update({
               where: { id: existingEditableOrder.id },
               data: {
                 firstName: validatedCustomer.firstName,
@@ -504,9 +513,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
                 status: OrderStatus.NEW,
               },
             })
-          : await tx.order.create({
+          : await orderDelegate.create({
               data: {
-                orderNumber: await buildNextOrderNumberForContract(tx, kitchenContract),
+                orderNumber: await buildNextOrderNumberForContract(tx, kitchenContract, orderKind),
                 kitchenId: kitchen.id,
                 kitchenContractId: kitchenContract.id,
                 status: OrderStatus.NEW,
@@ -528,13 +537,13 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
             });
 
         if (existingEditableOrder) {
-          await tx.orderItem.deleteMany({
+          await orderItemDelegate.deleteMany({
             where: { orderId: order.id },
           });
         }
 
         if (newSelectedItems.length) {
-          await tx.orderItem.createMany({
+          await orderItemDelegate.createMany({
             data: newSelectedItems.map((item) => ({
               orderId: order.id,
               kitchenItemId: item.id,
@@ -549,7 +558,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
         savedNewItems = newSelectedItems.filter((item) => newSelectionKeys.has(itemKey(item)));
 
-        return tx.order.findUnique({
+        return orderDelegate.findUnique({
           where: { id: order.id },
           include: {
             kitchen: true,
@@ -583,13 +592,14 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
   return {
     ...orderForNotifications,
+    orderKind,
     newItemCount: savedNewItems.length,
     notifications: notificationResult,
   };
 }
 
 export async function resendOrderEmail(orderId, emailOverrides = {}) {
-  const orderRecord = await getOrderRecordForOperations(orderId);
+  const orderRecord = await getOrderRecordForOperations(orderId, emailOverrides.orderKind || ORDER_KIND_LIVE);
   const order = buildOrderForNotifications(orderRecord);
   const { subject, bodyText } = readEmailOverrides(emailOverrides);
 
@@ -607,6 +617,15 @@ export async function deleteAllOrders() {
   return deletedOrders.count;
 }
 
+export async function deleteAllTestOrders() {
+  const [, deletedOrders] = await prisma.$transaction([
+    prisma.testOrderItem.deleteMany({}),
+    prisma.testOrder.deleteMany({}),
+  ]);
+
+  return deletedOrders.count;
+}
+
 export async function retryOrderWebhook(orderId) {
   const orderRecord = await getOrderRecordForOperations(orderId);
   const order = buildOrderForNotifications(orderRecord);
@@ -614,22 +633,23 @@ export async function retryOrderWebhook(orderId) {
   return order;
 }
 
-export async function updateOrderStatus(orderId, status) {
+export async function updateOrderStatus(orderId, status, orderKind = ORDER_KIND_LIVE) {
   const nextStatus = Object.values(OrderStatus).includes(status) ? status : OrderStatus.NEW;
-  return prisma.order.update({
+  return getOrderDelegate(prisma, orderKind).update({
     where: { id: orderId },
     data: { status: nextStatus },
   });
 }
 
-export async function deleteOrder(orderId) {
-  return prisma.order.delete({
+export async function deleteOrder(orderId, orderKind = ORDER_KIND_LIVE) {
+  return getOrderDelegate(prisma, orderKind).delete({
     where: { id: orderId },
   });
 }
 
 export async function confirmOrder(orderId, emailOverrides = {}) {
-  const orderRecord = await getOrderRecordForOperations(orderId);
+  const orderKind = emailOverrides.orderKind || ORDER_KIND_LIVE;
+  const orderRecord = await getOrderRecordForOperations(orderId, orderKind);
   if (orderRecord.status === OrderStatus.CONFIRMED) {
     return buildOrderForNotifications(orderRecord);
   }
@@ -641,7 +661,7 @@ export async function confirmOrder(orderId, emailOverrides = {}) {
   const { subject, bodyText } = readEmailOverrides(emailOverrides);
   await sendOrderConfirmationEmail({ order, subject, bodyText });
 
-  await prisma.order.update({
+  await getOrderDelegate(prisma, orderKind).update({
     where: { id: orderId },
     data: { status: OrderStatus.CONFIRMED },
   });

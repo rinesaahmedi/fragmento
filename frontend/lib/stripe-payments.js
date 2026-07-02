@@ -3,6 +3,7 @@ import { getStripeClient } from "./stripe";
 import { getDirectOrderConfirmationEnabled } from "./admin-settings";
 import { buildOrderForNotifications } from "./orders";
 import { sendOrderConfirmationEmail } from "./email/order-notifications";
+import { ORDER_KIND_LIVE, getOrderDelegate, isTestOrderKind } from "./order-kind";
 
 export function getPaymentStatusLabel(status) {
   const value = String(status || "UNPAID").toUpperCase();
@@ -21,7 +22,7 @@ function normalizeStripeCheckoutPaymentMethod(value) {
   return "card";
 }
 
-async function maybeSendPaidOrderConfirmation(orderRecord) {
+async function maybeSendPaidOrderConfirmation(orderRecord, { orderKind = ORDER_KIND_LIVE } = {}) {
   if (!orderRecord || String(orderRecord.paymentStatus || "").toUpperCase() !== "PAID") {
     return;
   }
@@ -31,24 +32,28 @@ async function maybeSendPaidOrderConfirmation(orderRecord) {
     return;
   }
 
-  const directOrderConfirmationEnabled = await getDirectOrderConfirmationEnabled();
+  const directOrderConfirmationEnabled = isTestOrderKind(orderKind)
+    ? true
+    : await getDirectOrderConfirmationEnabled();
   if (!directOrderConfirmationEnabled) {
     return;
   }
 
   const order = buildOrderForNotifications(orderRecord);
   await sendOrderConfirmationEmail({ order });
-  await prisma.order.update({
+  await getOrderDelegate(prisma, orderKind).update({
     where: { id: orderRecord.id },
     data: { status: "CONFIRMED" },
   });
 }
 
-export async function updateOrderFromCheckoutSession(session) {
+export async function updateOrderFromCheckoutSession(session, options = {}) {
   if (!session?.id) {
     return null;
   }
 
+  const orderKind = options.orderKind || session.metadata?.orderKind || ORDER_KIND_LIVE;
+  const orderDelegate = getOrderDelegate(prisma, orderKind);
   const orderNumber = session.client_reference_id || session.metadata?.orderNumber || "";
   const paymentIntentId = typeof session.payment_intent === "string"
     ? session.payment_intent
@@ -74,28 +79,28 @@ export async function updateOrderFromCheckoutSession(session) {
 
   let updatedOrder;
   if (orderNumber) {
-    updatedOrder = await prisma.order.update({
+    updatedOrder = await orderDelegate.update({
       where: { orderNumber },
       data,
       include,
     });
   } else {
-    updatedOrder = await prisma.order.update({
+    updatedOrder = await orderDelegate.update({
       where: { stripeCheckoutSessionId: session.id },
       data,
       include,
     });
   }
 
-  await maybeSendPaidOrderConfirmation(updatedOrder);
+  await maybeSendPaidOrderConfirmation(updatedOrder, { orderKind });
   return updatedOrder;
 }
 
-export async function createCheckoutSessionForOrder({ order, origin, successPath = "/checkout/success", cancelUrl }) {
-  const stripe = getStripeClient();
+export async function createCheckoutSessionForOrder({ order, origin, successPath = "/checkout/success", cancelUrl, stripeMode = "live", orderKind = ORDER_KIND_LIVE }) {
+  const stripe = getStripeClient(stripeMode);
 
   if (!stripe) {
-    throw new Error("Stripe is not configured.");
+    throw new Error(`${stripeMode === "test" ? "Stripe test mode" : "Stripe"} is not configured.`);
   }
 
   const amount = Math.round(Number(order.totalPrice ?? order.total ?? 0) * 100);
@@ -134,6 +139,8 @@ export async function createCheckoutSessionForOrder({ order, origin, successPath
     metadata: {
       orderId: order.id,
       orderNumber,
+      orderKind,
+      stripeMode,
       kitchenSlug,
       paymentMethod,
     },
@@ -141,7 +148,7 @@ export async function createCheckoutSessionForOrder({ order, origin, successPath
     cancel_url: cancelUrl,
   });
 
-  await prisma.order.update({
+  await getOrderDelegate(prisma, orderKind).update({
     where: { id: order.id },
     data: {
       paymentStatus: "PENDING",
@@ -155,8 +162,9 @@ export async function createCheckoutSessionForOrder({ order, origin, successPath
   return session;
 }
 
-export async function cancelOrderPayment(orderId) {
-  const order = await prisma.order.findUnique({
+export async function cancelOrderPayment(orderId, { orderKind = ORDER_KIND_LIVE, stripeMode = "live" } = {}) {
+  const orderDelegate = getOrderDelegate(prisma, orderKind);
+  const order = await orderDelegate.findUnique({
     where: { id: orderId },
     select: {
       id: true,
@@ -172,7 +180,7 @@ export async function cancelOrderPayment(orderId) {
   const currentPaymentStatus = String(order.paymentStatus || "UNPAID").toUpperCase();
 
   if (currentPaymentStatus !== "PAID" && order.stripeCheckoutSessionId) {
-    const stripe = getStripeClient();
+      const stripe = getStripeClient(stripeMode);
     if (stripe) {
       try {
         await stripe.checkout.sessions.expire(order.stripeCheckoutSessionId);
@@ -185,13 +193,13 @@ export async function cancelOrderPayment(orderId) {
   }
 
   if (currentPaymentStatus === "PAID") {
-    return prisma.order.update({
+    return orderDelegate.update({
       where: { id: orderId },
       data: { status: "CANCELLED" },
     });
   }
 
-  return prisma.order.update({
+  return orderDelegate.update({
     where: { id: orderId },
     data: {
       status: "CANCELLED",
