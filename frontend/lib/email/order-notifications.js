@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import nodemailer from "nodemailer";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
+import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
 
 const LETTERHEAD = {
   headerHeight: 74,
@@ -275,38 +276,6 @@ function formatPdfDate(value) {
     dateStyle: "short",
     timeStyle: "short",
   }).format(new Date(value));
-}
-
-function formatDateOnly(value) {
-  if (!value) return "";
-  const date = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat("de-DE", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-}
-
-function getPreferredDeliveryWeekDisplay(value, orderCreatedAt = null) {
-  if (!value) return "";
-
-  const selectedDate = new Date(`${value}T00:00:00.000Z`);
-  if (Number.isNaN(selectedDate.getTime())) return value;
-
-  const baseDate = orderCreatedAt ? new Date(orderCreatedAt) : new Date();
-  const orderDate = Number.isNaN(baseDate.getTime()) ? new Date() : baseDate;
-  const orderDateOnly = new Date(Date.UTC(orderDate.getUTCFullYear(), orderDate.getUTCMonth(), orderDate.getUTCDate()));
-  const dayDiff = Math.round((selectedDate.getTime() - orderDateOnly.getTime()) / 86400000);
-  const weeks = dayDiff / 7;
-
-  if (Number.isInteger(weeks) && weeks >= 1) {
-    return `Nach ${weeks} Wochen`;
-  }
-
-  return formatDateOnly(value);
 }
 
 function drawSenderAddressBlock(doc, x, y) {
@@ -615,7 +584,7 @@ export async function generateOrderConfirmationPdf(order) {
     `E-Mail: ${order.customer.email}`,
     `Telefon: ${order.customer.phone}`,
     order.customer.preferredDeliveryDate
-      ? `Voraussichtliche Lieferzeit: ${getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt)}`
+      ? `Wunschlieferwoche: ${getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt)}`
       : "",
   ]
     .filter(Boolean)
@@ -728,7 +697,7 @@ export function buildOrderSummaryHtml(order) {
   const orderDetailsRows = [
     ["Auftragsnummer", order.orderNumber],
     ["Vertragsnummer", order.customer.contractNumber || "-"],
-    ["Voraussichtliche Lieferzeit", order.customer.preferredDeliveryDate ? getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt) : "-"],
+    ["Wunschlieferwoche", order.customer.preferredDeliveryDate ? getPreferredDeliveryWeekDisplay(order.customer.preferredDeliveryDate, order.createdAt) : "-"],
   ]
     .map(
       ([label, value]) =>

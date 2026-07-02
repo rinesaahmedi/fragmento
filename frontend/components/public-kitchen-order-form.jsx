@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import { usePublicI18n } from "./public-i18n";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
+import { getPreferredDeliveryDateAfterWeeks } from "../lib/preferred-delivery.js";
 
 const COUNTRY_LABELS = {
   Deutschland: "Germany",
@@ -82,12 +83,7 @@ const DEFAULT_DELIVERY_LEAD_TIME_WEEKS = 4;
 const DELIVERY_WEEK_OPTION_COUNT = 3;
 
 function getDateAfterWeeks(weeks) {
-  const today = new Date();
-  return new Date(Date.UTC(
-    today.getUTCFullYear(),
-    today.getUTCMonth(),
-    today.getUTCDate() + (Number(weeks) * 7),
-  )).toISOString().slice(0, 10);
+  return getPreferredDeliveryDateAfterWeeks(weeks);
 }
 
 function getDeliveryWeekLabel(weeks, translate) {

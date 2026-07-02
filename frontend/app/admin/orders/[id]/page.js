@@ -386,7 +386,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                   </span>
                 </div>
                 <div>
-                  <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.preferredDeliveryDate" fallback="Preferred delivery date" /></span>
+                  <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.preferredDeliveryDate" fallback="Preferred delivery week" /></span>
                   <span>{formatPreferredDeliveryDate(order.preferredDeliveryDate) || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</span>
                 </div>
                 <div>

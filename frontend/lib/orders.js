@@ -14,6 +14,7 @@ import {
   SINK_AND_WORKTOP_CODE,
 } from "./order-item-display";
 import { buildNextContractOrderNumber } from "./order-numbering";
+import { getPreferredDeliveryDateAfterWeeks } from "./preferred-delivery.js";
 import {
   CONTRACT_ERRORS,
   assertUsableKitchenContract,
@@ -88,12 +89,12 @@ function normalizePreferredDeliveryDate(value) {
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
-    throw validationError("Preferred delivery date is invalid");
+    throw validationError("Selected delivery week is invalid.");
   }
 
   const date = new Date(`${normalized}T00:00:00.000Z`);
   if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== normalized) {
-    throw validationError("Preferred delivery date is invalid");
+    throw validationError("Selected delivery week is invalid.");
   }
 
   return date;
@@ -112,13 +113,7 @@ function assertPreferredDeliveryWeekOption(preferredDeliveryDate, deliveryLeadTi
     Array.from(
       { length: DELIVERY_WEEK_OPTION_COUNT },
       (_, index) => deliveryLeadTimeWeeks + index,
-    ).map((weeks) =>
-      new Date(Date.UTC(
-        orderDate.getUTCFullYear(),
-        orderDate.getUTCMonth(),
-        orderDate.getUTCDate() + (weeks * 7),
-      )).toISOString().slice(0, 10),
-    ),
+    ).map((weeks) => getPreferredDeliveryDateAfterWeeks(weeks, orderDate)),
   );
 
   if (!allowedDates.has(preferredDeliveryDate.toISOString().slice(0, 10))) {

@@ -251,7 +251,7 @@
     "deliveryHelp": "Tell us when you would prefer the kitchen to be delivered.",
     "deliveryWeekHelp": "Choose how many weeks after your order you would prefer delivery.",
     "deliveryLeadTimeDescription": "We need at least {days} days after your order before delivery. For an order placed today ({orderDate}), the earliest selectable delivery date is {earliestDate}.",
-    "preferredDeliveryDate": "Preferred delivery date",
+    "preferredDeliveryDate": "Preferred delivery week",
     "preferredDeliveryWeek": "Preferred delivery week",
     "selectPreferredDeliveryWeek": "Select delivery week",
     "deliveryAfterWeeks": "After {weeks} weeks",
