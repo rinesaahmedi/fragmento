@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import nodemailer from "nodemailer";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
+import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
 
 const LETTERHEAD = {
@@ -169,7 +170,8 @@ function getItemDisplayCode(item) {
 }
 
 function getItemDisplayName(item) {
-  return normalizeGermanDisplayText(item?.nameDe || item?.name || item?.code || "");
+  const cabinetName = getCabinetWidthDisplayName(item, "de");
+  return normalizeGermanDisplayText(item?.nameDe || cabinetName || item?.name || item?.code || "");
 }
 
 function getItemDisplayNameWithQuantity(item) {
@@ -651,6 +653,7 @@ export async function generateOrderConfirmationPdf(order) {
     const typeX = margin + 68;
     const codeX = margin + 320;
     const priceX = pageWidth - margin - 15;
+    const codeColumnWidth = priceX - codeX - 58;
     doc.setFillColor(249, 249, 249);
     doc.rect(headerX, headerTop, headerRight - headerX, headerHeight, "F");
     doc.setDrawColor(234, 234, 234);
@@ -672,15 +675,18 @@ export async function generateOrderConfirmationPdf(order) {
 
     buildNumberedRows(visibleItems).forEach(({ item, rowNumber, blendeItems = [] }) => {
       const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), 208);
+      const codeLines = doc.splitTextToSize(getItemDisplayCode(item), codeColumnWidth);
       const blendeLineGroups = blendeItems.map((blendeItem) => ({
         item: blendeItem,
         rowNumber: blendeItem.rowNumber,
         nameLines: doc.splitTextToSize(getBlendeDisplayNameWithQuantity(blendeItem), 208),
-        code: getItemDisplayCode(blendeItem),
+        codeLines: doc.splitTextToSize(getItemDisplayCode(blendeItem), codeColumnWidth),
         price: formatCurrency(blendeItem.price),
       }));
-      const parentBandHeight = Math.max(36, nameLines.length * lineHeight + 21);
-      const blendeBandHeights = blendeLineGroups.map((group) => Math.max(36, group.nameLines.length * lineHeight + 21));
+      const parentBandHeight = Math.max(36, Math.max(nameLines.length, codeLines.length) * lineHeight + 21);
+      const blendeBandHeights = blendeLineGroups.map((group) =>
+        Math.max(36, Math.max(group.nameLines.length, group.codeLines.length) * lineHeight + 21)
+      );
       const rowHeight = parentBandHeight + blendeBandHeights.reduce((sum, height) => sum + height, 0);
       ensureSpace(rowHeight);
       const rowTop = y;
@@ -692,7 +698,9 @@ export async function generateOrderConfirmationPdf(order) {
       nameLines.forEach((line, lineIndex) => {
         doc.text(line, typeX, rowTextY + lineIndex * lineHeight);
       });
-      doc.text(getItemDisplayCode(item), codeX, rowTextY);
+      codeLines.forEach((line, lineIndex) => {
+        doc.text(line, codeX, rowTextY + lineIndex * lineHeight);
+      });
       doc.text(formatCurrency(item.price), priceX, rowTextY, { align: "right" });
       if (blendeLineGroups.length) {
         let blendeRowTop = rowTop + parentBandHeight;
@@ -704,7 +712,9 @@ export async function generateOrderConfirmationPdf(order) {
           group.nameLines.forEach((line, lineIndex) => {
             doc.text(line, typeX, blendeY + lineIndex * lineHeight);
           });
-          doc.text(group.code, codeX, blendeY);
+          group.codeLines.forEach((line, lineIndex) => {
+            doc.text(line, codeX, blendeY + lineIndex * lineHeight);
+          });
           doc.text(group.price, priceX, blendeY, { align: "right" });
           blendeRowTop += blendeBandHeights[groupIndex];
         });
@@ -713,7 +723,7 @@ export async function generateOrderConfirmationPdf(order) {
       y += rowHeight;
     });
 
-    y += 10;
+    y += 24;
   };
 
   const { electricalItems, cabinetItems } = splitComponentItems(order.components);

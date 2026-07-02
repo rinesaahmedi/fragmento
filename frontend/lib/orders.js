@@ -199,8 +199,8 @@ export function buildOrderForNotifications(orderRecord) {
     return {
       code: item.code,
       articleNumber: cutleryLine?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
-      name: item.nameSnapshot || item.nameDe || item.name || item.kitchenItem?.nameDe || item.kitchenItem?.name || "",
-      nameDe: item.nameSnapshot || item.nameDe || item.kitchenItem?.nameDe || "",
+      name: item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "",
+      nameDe: item.nameDe || item.kitchenItem?.nameDe || "",
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
