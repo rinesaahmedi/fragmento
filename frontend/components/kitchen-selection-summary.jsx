@@ -90,6 +90,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const itemDimensions = isLocked ? "" : dimensions;
   const infoPdfHref = getProductInfoHref(item);
   const productInfoDocuments = getProductInfoDocuments(item);
+  const shouldShowCatalogMeta = !isLocked || isConfirmed;
   const priceClassName = [
     styles.summaryPrice,
     isLocked && price <= 0 ? styles.summaryPriceIncluded : "",
@@ -111,7 +112,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
             {translate("configurator.summaryQuantity", "Quantity")}: {quantity}
           </span>
         ) : null}
-        {!isLocked && (articleNumber || blendeLabel) ? (
+        {shouldShowCatalogMeta && (articleNumber || blendeLabel) ? (
           <span className={styles.itemCode}>
             {articleNumber ? `${translate("common.article", "Article")}: ${articleNumber}` : ""}
             {articleNumber && blendeLabel ? " " : ""}

@@ -300,6 +300,7 @@
       "city": "Please select a city.",
       "postalCode": "Please select a postal code.",
       "paymentMethod": "Please choose a payment method.",
+      "preferredDeliveryDate": "Please choose a preferred delivery week.",
       "consent": "Please confirm that you have read the privacy statement.",
       "termsConsent": "Please confirm the terms and conditions."
     }

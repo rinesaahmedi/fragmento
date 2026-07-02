@@ -84,7 +84,10 @@ function validatePaymentMethod(value) {
 
 function normalizePreferredDeliveryDate(value) {
   const normalized = value ? String(value).trim() : "";
-  if (!normalized) return null;
+  if (!normalized) {
+    throw validationError("Preferred delivery week is required");
+  }
+
   if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
     throw validationError("Selected delivery week is invalid.");
   }
@@ -580,6 +583,15 @@ export async function resendOrderEmail(orderId, emailOverrides = {}) {
   await sendOrderConfirmationEmail({ order, subject, bodyText });
 
   return order;
+}
+
+export async function deleteAllOrders() {
+  const [, deletedOrders] = await prisma.$transaction([
+    prisma.orderItem.deleteMany({}),
+    prisma.order.deleteMany({}),
+  ]);
+
+  return deletedOrders.count;
 }
 
 export async function retryOrderWebhook(orderId) {

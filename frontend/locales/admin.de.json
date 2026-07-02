@@ -247,6 +247,7 @@
       "deliveryAssemblyConnection": "Lieferung, Vertragen, Montage und Anschluss"
     },
     "topItemsSortedBySelectedPerformanceMetric": "Top-Artikel sortiert nach der ausgewählten Kennzahl.",
+    "topItemsSortedByArticleCode": "Artikel gruppiert und nach Artikelcode sortiert.",
     "topItemsShowingTopCount": "Es werden die Top {count} Artikel nach der ausgewählten Kennzahl angezeigt.",
     "byQuantity": "Nach Menge",
     "byRevenue": "Nach Umsatz",
@@ -761,6 +762,8 @@
     "deleteThisOrder": "Diese Bestellung löschen?",
     "deleteCannotBeUndone": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "deleteConfirmMessage": "Diese Bestellung löschen?\nDiese Aktion kann nicht rückgängig gemacht werden.",
+    "deleteAllOrders": "Alle Bestellungen löschen",
+    "deleteAllConfirmMessage": "Alle Bestellungen löschen?\nDadurch werden alle Bestellungen entfernt. Diese Aktion kann nicht rückgängig gemacht werden.",
     "noOrdersFound": "Keine Bestellungen gefunden.",
     "noArticleCodes": "Keine Artikelcodes",
     "openDetails": "Details öffnen",

@@ -146,6 +146,22 @@ function DeleteOrderAction({ orderId, compact = false }) {
   );
 }
 
+function DeleteAllOrdersAction() {
+  return (
+    <form action="/api/admin/orders" method="post" style={deleteFormStyle}>
+      <AdminConfirmSubmitButton
+        name="_intent"
+        value="delete-all"
+        style={deleteAllButtonStyle}
+        confirmKey="ordersAdmin.deleteAllConfirmMessage"
+        confirmFallback={"Delete all orders?\nThis removes every order and cannot be undone."}
+      >
+        <AdminText i18nKey="ordersAdmin.deleteAllOrders" fallback="Delete all orders" />
+      </AdminConfirmSubmitButton>
+    </form>
+  );
+}
+
 export default async function AdminOrdersPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
@@ -185,6 +201,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
               pluralFallback="{count} orders match the current filters."
             />
           )}
+          actions={<DeleteAllOrdersAction />}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
@@ -568,6 +585,14 @@ const deleteButtonStyle = {
   fontWeight: 800,
   cursor: "pointer",
   whiteSpace: "nowrap",
+};
+
+const deleteAllButtonStyle = {
+  ...deleteButtonStyle,
+  minHeight: 42,
+  padding: "10px 14px",
+  background: "rgba(217, 92, 92, 0.1)",
+  borderColor: "rgba(217, 92, 92, 0.34)",
 };
 
 const cardActionRowStyle = {

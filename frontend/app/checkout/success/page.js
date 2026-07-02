@@ -201,7 +201,9 @@ export default async function CheckoutSuccessPage({ searchParams }) {
   }
 
   if (orderNumber || sessionId) {
-    redirect("/");
+    const redirectParams = new URLSearchParams({ orderConfirmed: "1" });
+    if (orderNumber) redirectParams.set("order", orderNumber);
+    redirect(`/?${redirectParams.toString()}`);
   }
 
   const order = await getOrderForReceipt({ orderNumber, sessionId });

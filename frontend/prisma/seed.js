@@ -1939,41 +1939,26 @@ async function main() {
   for (const kitchen of DEFAULT_KITCHENS) {
     const existingKitchen = await prisma.kitchen.findUnique({
       where: { slug: kitchen.slug },
-      include: { items: true },
+      select: { id: true },
     });
 
-    const kitchenRecord = existingKitchen
-      ? await prisma.kitchen.update({
-          where: { slug: kitchen.slug },
-          data: {
-            name: kitchen.name,
-            kitchenCode: kitchen.kitchenCode || null,
-            status: KitchenStatus.ACTIVE,
-            description: kitchen.description,
-          },
-          include: { items: true },
-        })
-      : await prisma.kitchen.create({
-          data: {
-            slug: kitchen.slug,
-            kitchenCode: kitchen.kitchenCode || null,
-            programmId: DEFAULT_KITCHEN_PROGRAMM_ID,
-            name: kitchen.name,
-            status: KitchenStatus.ACTIVE,
-            description: kitchen.description,
-          },
-          include: { items: true },
-        });
+    if (existingKitchen) {
+      continue;
+    }
 
-    const existingByCode = new Map(kitchenRecord.items.map((item) => [item.code, item]));
-    const normalizedKitchenItems = kitchen.items.map(applyDefaultCatalogItem);
-    const targetCodes = new Set(normalizedKitchenItems.map((item) => item.code));
+    const kitchenRecord = await prisma.kitchen.create({
+      data: {
+        slug: kitchen.slug,
+        kitchenCode: kitchen.kitchenCode || null,
+        programmId: DEFAULT_KITCHEN_PROGRAMM_ID,
+        name: kitchen.name,
+        status: KitchenStatus.ACTIVE,
+        description: kitchen.description,
+      },
+    });
 
     for (const rawItem of kitchen.items) {
       const item = applyDefaultCatalogItem(rawItem);
-      const existingItem = existingByCode.get(item.code)
-        || existingByCode.get(rawItem.code)
-        || (rawItem.legacyCode ? existingByCode.get(rawItem.legacyCode) : null);
       const productInfo = PRODUCT_INFO_BY_CODE[item.code] || PRODUCT_INFO_BY_CODE[rawItem.code] || {};
       const cabinetWidthName = getCabinetWidthDisplayName(item);
       const cabinetWidthNameDe = getCabinetWidthDisplayName(item, "de");
@@ -2031,27 +2016,13 @@ async function main() {
         blendePrice: item.blendePrice ?? null,
       };
 
-      if (existingItem) {
-        await prisma.kitchenItem.update({
-          where: { id: existingItem.id },
-          data,
-        });
-      } else {
-        await prisma.kitchenItem.create({
-          data: {
-            kitchenId: kitchenRecord.id,
-            ...data,
-          },
-        });
-      }
+      await prisma.kitchenItem.create({
+        data: {
+          kitchenId: kitchenRecord.id,
+          ...data,
+        },
+      });
     }
-
-    await prisma.kitchenItem.deleteMany({
-      where: {
-        kitchenId: kitchenRecord.id,
-        code: { notIn: [...targetCodes] },
-      },
-    });
   }
 
   for (const obsolete of OBSOLETE_KITCHENS) {

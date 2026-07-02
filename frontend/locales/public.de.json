@@ -300,6 +300,7 @@
       "city": "Bitte Stadt auswählen.",
       "postalCode": "Bitte PLZ auswählen.",
       "paymentMethod": "Bitte Zahlungsmethode auswählen.",
+      "preferredDeliveryDate": "Bitte Wunschlieferwoche auswählen.",
       "consent": "Bitte bestätige, dass du die Datenschutzerklärung gelesen hast.",
       "termsConsent": "Bitte bestätige die AGB."
     }

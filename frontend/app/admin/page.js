@@ -68,9 +68,9 @@ const TOP_ITEM_GROUP_METADATA_BY_ARTICLE_NUMBER = {
     preferredItemType: "COMPONENT",
   },
   "517467": {
-    preferredCode: "SINK-B-BOTTON-45",
-    preferredName: "Sink and Waste System",
-    preferredItemType: "COMPONENT",
+    preferredCode: "ACC-WASTE-001",
+    preferredName: "Waste separation system Blanco Botton",
+    preferredItemType: "ACCESSORY",
   },
 };
 const TOP_ITEM_GROUP_METADATA_BY_CODE = {
@@ -291,6 +291,59 @@ function getItemKey(item) {
   return [item.itemType, item.nameSnapshot].join("::");
 }
 
+function deriveArticleNumberFromCode(code) {
+  const normalizedCode = String(code || "").trim();
+  if (!normalizedCode) return null;
+
+  if (/^DISH-/i.test(normalizedCode)) return "A-EGSPV597210 + TGV60";
+  if (/^REF-/i.test(normalizedCode)) return "OL-KGCN388140E";
+  if (/^OVEN-/i.test(normalizedCode)) return "EBX943600S + OL-KMI754000E";
+  if (/^CAB-HOOD-/i.test(normalizedCode)) return "FH664621E + FWK124 + HD6002";
+  if (/^HOOD-/i.test(normalizedCode)) return normalizedCode.includes("KHF") ? "KHF664611S + FWP18" : "FH 664 621 S";
+  if (/^LIGHT-/i.test(normalizedCode)) return "KA220043_S3";
+  if (/CUTLERY/i.test(normalizedCode)) return "ZB60SG";
+  if (/WASTE|BOTTON/i.test(normalizedCode)) return "517467";
+
+  const articleMatch = normalizedCode.match(/(?:^|[-_ ])(US\d{2,3}|H\d{4}|HD\d{4}|HPK\d{4}|UPK\d{2}|ZB60SG|KA220043_S3|OL-KGCN388140E|KGCN388140E|EWA34660W|TGV60|WU16|EGSPV597210|EBX943600S|KMI754000E|FH664621E|KHF664611S|FWK124|FWP18)(?:$|[-_ ])/i);
+  return articleMatch ? articleMatch[1].toUpperCase() : null;
+}
+
+function resolveTopItemArticleNumber(row) {
+  const code = String(row?.code || "").trim();
+  return String(row?.articleNumber || "").trim()
+    || ARTICLE_NUMBER_BY_CODE[code]
+    || deriveArticleNumberFromCode(code)
+    || null;
+}
+
+function isDefaultDashboardItem(row) {
+  const code = String(row?.code || "").trim().toUpperCase();
+  const name = String(row?.nameSnapshot || row?.canonicalName || "").trim().toLowerCase();
+
+  return code === "OVEN-B-600-HOB"
+    || code === "SINKBASE-B-600"
+    || code === "SINK-WORKTOP"
+    || code.startsWith("TOP-")
+    || name === "worktop"
+    || name === "sink lower cabinet";
+}
+
+function compareTopItemsByArticleCode(a, b) {
+  const leftArticle = String(a.articleNumber || a.canonicalArticleNumber || a.code || "").trim();
+  const rightArticle = String(b.articleNumber || b.canonicalArticleNumber || b.code || "").trim();
+  const articleCompare = leftArticle.localeCompare(rightArticle, undefined, { numeric: true, sensitivity: "base" });
+  if (articleCompare) return articleCompare;
+
+  const nameCompare = String(a.name || a.canonicalName || a.fallbackName || "").localeCompare(
+    String(b.name || b.canonicalName || b.fallbackName || ""),
+    undefined,
+    { numeric: true, sensitivity: "base" },
+  );
+  if (nameCompare) return nameCompare;
+
+  return String(a.code || "").localeCompare(String(b.code || ""), undefined, { numeric: true, sensitivity: "base" });
+}
+
 function choosePreferredText(currentValue, nextValue) {
   const current = String(currentValue || "").trim();
   const next = String(nextValue || "").trim();
@@ -499,21 +552,6 @@ async function loadDailyStatusRows(filters) {
       o."status"::text AS "status",
       COUNT(*)::int AS "count"
     FROM "Order" o
-    ${whereClause}
-    GROUP BY 1, 2
-    ORDER BY 1 ASC, 2 ASC
-  `;
-}
-
-async function loadKitchenTimelineRows(filters) {
-  const whereClause = buildOrderWhereClause(filters, "o");
-  return prisma.$queryRaw`
-    SELECT
-      DATE_TRUNC('day', o."createdAt")::date AS "date",
-      k."name" AS "kitchen",
-      COUNT(*)::int AS "count"
-    FROM "Order" o
-    JOIN "Kitchen" k ON k."id" = o."kitchenId"
     ${whereClause}
     GROUP BY 1, 2
     ORDER BY 1 ASC, 2 ASC
@@ -910,7 +948,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     projectAnalyticsRaw,
     summary,
     dailyStatusRows,
-    kitchenTimelineRows,
     paymentRows,
     geographyRows,
     groupedItemRows,
@@ -922,7 +959,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     loadProjectAnalytics({ startDate, kitchenId, status: validStatus }),
     loadDashboardSummary(dashboardFilters),
     loadDailyStatusRows(dashboardFilters),
-    loadKitchenTimelineRows(dashboardFilters),
     loadPaymentRows(dashboardFilters),
     loadGeographyRows(dashboardFilters),
     loadGroupedItemRows(dashboardFilters),
@@ -952,20 +988,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       },
     ]),
   );
-  const kitchenSeries = kitchens.map((kitchen) => kitchen.name);
-  const timelineByDate = new Map(
-    dateKeys.map((date) => [
-      date,
-      kitchens.reduce(
-        (row, kitchen) => {
-          row[kitchen.name] = 0;
-          return row;
-        },
-        { date, label: formatDateLabel(date) },
-      ),
-    ]),
-  );
-
   for (const row of dailyStatusRows) {
     const dateKey = toDateKey(row.date);
     if (!dailyStatusByDate.has(dateKey)) {
@@ -981,29 +1003,17 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     dailyStatusByDate.get(dateKey)[row.status] = Number(row.count || 0);
   }
 
-  for (const row of kitchenTimelineRows) {
-    const dateKey = toDateKey(row.date);
-    if (!timelineByDate.has(dateKey)) {
-      timelineByDate.set(dateKey, kitchens.reduce(
-        (row, kitchen) => {
-          row[kitchen.name] = 0;
-          return row;
-        },
-        { date: dateKey, label: formatDateLabel(dateKey) },
-      ));
-    }
-    timelineByDate.get(dateKey)[row.kitchen] = Number(row.count || 0);
-  }
-
   const itemStats = new Map();
   const typeSplit = new Map();
   for (const row of groupedItemRows) {
+    if (isDefaultDashboardItem(row)) continue;
+
     const quantity = Number(row.quantity || 0);
     const revenue = Number(row.revenue || 0);
     const code = String(row.code || "").trim();
     const canonicalName = String(row.canonicalName || "").trim() || null;
     const fallbackName = String(row.nameSnapshot || "").trim() || "";
-    const canonicalArticleNumber = String(row.articleNumber || "").trim() || ARTICLE_NUMBER_BY_CODE[code] || null;
+    const canonicalArticleNumber = resolveTopItemArticleNumber(row);
     const grouping = getTopItemGrouping({ code, itemType: row.itemType, nameSnapshot: row.nameSnapshot }, canonicalArticleNumber);
     const existingItem = itemStats.get(grouping.groupKey) || {
       itemType: grouping.preferredItemType || row.itemType,
@@ -1049,7 +1059,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
   }
 
   const dailyStatusData = Array.from(dailyStatusByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
-  const kitchenTimelineData = Array.from(timelineByDate.values()).sort((a, b) => a.date.localeCompare(b.date));
   const claimElementStats = new Map();
   const claimCityStats = new Map();
   for (const row of claimElementRows) {
@@ -1097,8 +1106,8 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     name: item.canonicalName || item.fallbackName || item.code || "",
     articleNumber: item.canonicalArticleNumber || null,
   }));
-  const topItemsByQuantity = resolvedItemStats.slice().sort((a, b) => b.quantity - a.quantity);
-  const topItemsByRevenue = resolvedItemStats.slice().sort((a, b) => b.revenue - a.revenue);
+  const topItemsByQuantity = resolvedItemStats.slice().sort(compareTopItemsByArticleCode);
+  const topItemsByRevenue = resolvedItemStats.slice().sort(compareTopItemsByArticleCode);
   const itemTypeData = Array.from(typeSplit.values()).sort((a, b) => b.value - a.value);
   const paymentData = paymentRows
     .map((row) => ({ label: row.label, value: Number(row.value || 0) }))
@@ -1166,6 +1175,8 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
 
   const topItemsByCompanyMap = new Map();
   for (const row of propertyOwnerAnalyticsRaw.itemRows) {
+    if (isDefaultDashboardItem(row)) continue;
+
     const ownerId = row.ownerId;
     if (!topItemsByCompanyMap.has(ownerId)) {
       topItemsByCompanyMap.set(ownerId, new Map());
@@ -1177,7 +1188,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     const code = String(row.code || "").trim();
     const canonicalName = String(row.canonicalName || "").trim() || null;
     const fallbackName = String(row.nameSnapshot || "").trim() || "";
-    const canonicalArticleNumber = String(row.articleNumber || "").trim() || ARTICLE_NUMBER_BY_CODE[code] || null;
+    const canonicalArticleNumber = resolveTopItemArticleNumber(row);
     const grouping = getTopItemGrouping({ code, itemType: row.itemType, nameSnapshot: row.nameSnapshot }, canonicalArticleNumber);
     const existingItem = ownerItems.get(grouping.groupKey) || {
       itemType: grouping.preferredItemType || row.itemType,
@@ -1205,10 +1216,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         name: item.canonicalName || item.fallbackName || item.code || "",
         articleNumber: item.canonicalArticleNumber || null,
       }))
-      .sort((a, b) => {
-        if (b.revenue !== a.revenue) return b.revenue - a.revenue;
-        return b.quantity - a.quantity;
-      });
+      .sort(compareTopItemsByArticleCode);
     return acc;
   }, {});
 
@@ -1330,6 +1338,8 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
 
   const topItemsByProjectMap = new Map();
   for (const row of projectAnalyticsRaw.itemRows) {
+    if (isDefaultDashboardItem(row)) continue;
+
     const projectId = row.projectId;
     if (!topItemsByProjectMap.has(projectId)) {
       topItemsByProjectMap.set(projectId, new Map());
@@ -1341,7 +1351,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
     const code = String(row.code || "").trim();
     const canonicalName = String(row.canonicalName || "").trim() || null;
     const fallbackName = String(row.nameSnapshot || "").trim() || "";
-    const canonicalArticleNumber = String(row.articleNumber || "").trim() || ARTICLE_NUMBER_BY_CODE[code] || null;
+    const canonicalArticleNumber = resolveTopItemArticleNumber(row);
     const grouping = getTopItemGrouping({ code, itemType: row.itemType, nameSnapshot: row.nameSnapshot }, canonicalArticleNumber);
     const existingItem = projectItems.get(grouping.groupKey) || {
       itemType: grouping.preferredItemType || row.itemType,
@@ -1369,10 +1379,7 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         name: item.canonicalName || item.fallbackName || item.code || "",
         articleNumber: item.canonicalArticleNumber || null,
       }))
-      .sort((a, b) => {
-        if (b.revenue !== a.revenue) return b.revenue - a.revenue;
-        return b.quantity - a.quantity;
-      });
+      .sort(compareTopItemsByArticleCode);
     return acc;
   }, {});
 
@@ -1473,8 +1480,6 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
         dailyStatusData={dailyStatusData}
         claimElementData={claimElementData}
         claimCityData={claimCityData}
-        kitchenTimelineData={kitchenTimelineData}
-        kitchenSeries={kitchenSeries}
         topItemsByQuantity={topItemsByQuantity}
         topItemsByRevenue={topItemsByRevenue}
         itemTypeData={itemTypeData}
