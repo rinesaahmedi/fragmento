@@ -367,6 +367,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     language === "de" ? "Vollintegrierter Geschirrspüler" : "Fully integrated dishwasher",
   );
 
+  if (item?.catalogArticleId && rawName) {
+    return withPhotoNumber(rawName);
+  }
+
   if (item?.isCutleryLine && rawName) {
     return withPhotoNumber(rawName);
   }

@@ -158,6 +158,7 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   blendeCode: true,
   blendeLabel: true,
   blendePrice: true,
+  catalogArticleId: true,
   catalogBlendeId: true,
   catalogBlendeQuantity: true,
   catalogServiceId: true,
@@ -1022,6 +1023,7 @@ export function serializeKitchenForLegacy(kitchen) {
   const items = kitchen.items || [];
   const toClientItem = (item) => ({
     id: item.id,
+    catalogArticleId: item.catalogArticleId || "",
     code: item.code,
     articleNumber: item.articleNumber || "",
     name: item.name,

@@ -12,7 +12,7 @@ test("base cabinet width uses lower cabinet label", () => {
       widthMm: 300,
       iconKey: "drawer_base_two",
     }),
-    "Lower cabinet with drawer 30",
+    "Lower Cabinet with Drawer 30",
   );
 });
 
@@ -24,7 +24,7 @@ test("wall cabinet width uses upper cabinet label", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet 60",
+    "Upper Cabinet 60",
   );
 });
 
@@ -45,7 +45,7 @@ test("localized sink base name stays Sink Lower Cabinet even after stored-name m
     getLocalizedItemName(
       {
         code: "SINKBASE-AB105806-600",
-        name: "Lower cabinet with drawer 60",
+        name: "Lower Cabinet with Drawer 60",
         widthMm: 600,
         iconKey: "sink_base",
       },
@@ -54,6 +54,27 @@ test("localized sink base name stays Sink Lower Cabinet even after stored-name m
       false,
     ),
     "Sink Lower Cabinet",
+  );
+});
+
+test("localized catalog-linked cabinet name matches catalog label exactly", () => {
+  assert.equal(
+    getLocalizedItemName(
+      {
+        catalogArticleId: "catalog-us40",
+        code: "CAB-BASE-AB105817-US40",
+        articleNumber: "US40",
+        name: "Lower Cabinet with Drawer 40",
+        nameDe: "Unterschrank mit Schublade 40",
+        widthMm: 400,
+        depthMm: 600,
+        iconKey: "drawer_base_two",
+      },
+      (_key, fallback) => fallback,
+      "en",
+      false,
+    ),
+    "Lower Cabinet with Drawer 40",
   );
 });
 
@@ -158,7 +179,7 @@ test("wall cabinet width falls back to code", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet 60",
+    "Upper Cabinet 60",
   );
 });
 
@@ -170,7 +191,7 @@ test("structured width wins over misleading code width", () => {
       widthMm: 500,
       iconKey: "wall_cabinet_standard",
     }),
-    "Upper cabinet 50",
+    "Upper Cabinet 50",
   );
 });
 

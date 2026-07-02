@@ -161,8 +161,8 @@ export function formatCabinetWidthLabel(kind, widthMm, language = "en") {
     return kind === "lower" ? `Unterschrank mit Schublade ${widthLabel}` : `Oberschrank ${widthLabel}`;
   }
   return kind === "lower"
-    ? `Lower cabinet with drawer ${widthLabel}`
-    : `Upper cabinet ${widthLabel}`;
+    ? `Lower Cabinet with Drawer ${widthLabel}`
+    : `Upper Cabinet ${widthLabel}`;
 }
 
 export function getCabinetWidthDisplayName(item, language = "en") {
