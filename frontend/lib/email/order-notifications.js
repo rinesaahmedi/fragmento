@@ -600,16 +600,24 @@ export async function generateOrderConfirmationPdf(order) {
     const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
     if (!visibleItems.length) return;
 
-    ensureSpace(60);
+    ensureSpace(78);
     doc.setFont("helvetica", "bold").setFontSize(11).text(title, margin, y);
-    y += 10;
-    doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
-    y += 20;
-    doc.text("Nr.", margin, y);
-    doc.text("Type", margin + 68, y);
-    doc.text("Typen-Nr.", margin + 320, y);
-    doc.text("Preis", pageWidth - margin, y, { align: "right" });
-    y += 18;
+    y += 16;
+    const headerTop = y;
+    const headerHeight = 32;
+    const headerX = margin + 10;
+    const headerRight = pageWidth - margin - 10;
+    doc.setFillColor(249, 249, 249);
+    doc.rect(headerX, headerTop, headerRight - headerX, headerHeight, "F");
+    doc.setDrawColor(234, 234, 234);
+    doc.line(headerX, headerTop + headerHeight, headerRight, headerTop + headerHeight);
+    doc.setTextColor(51, 51, 51);
+    doc.text("Nr.", margin + 15, headerTop + 20);
+    doc.text("Type", margin + 68, headerTop + 20);
+    doc.text("Typen-Nr.", margin + 320, headerTop + 20);
+    doc.text("Preis", pageWidth - margin - 15, headerTop + 20, { align: "right" });
+    doc.setTextColor(0, 0, 0);
+    y = headerTop + headerHeight + 8;
     doc.setFont("helvetica", "normal").setFontSize(10);
 
     const drawPdfDivider = (dividerY, color = 234) => {

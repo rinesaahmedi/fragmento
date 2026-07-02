@@ -490,6 +490,7 @@
     "createExtraItem": "Artikel erstellen",
     "excelCatalog": "Katalog importieren / exportieren",
     "exportKitchenToExcelThenImportBack": "Diese Küche nach Excel exportieren, Preise oder andere Artikelfelder aktualisieren und die Datei anschließend wieder importieren, um die passenden Küchenartikel zu aktualisieren.",
+    "showImportExport": "Import / Export anzeigen",
     "exportCurrentKitchenData": "Aktuelle Küchendaten exportieren",
     "downloadAllCatalogRowsForKitchenIncludingCurrentPricesShownInAdmin": "Alle Katalogzeilen für diese Küche herunterladen, einschließlich der aktuellen Preise im Adminbereich.",
     "exportExcel": "Excel exportieren",

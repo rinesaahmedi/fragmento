@@ -489,6 +489,7 @@
     "createExtraItem": "Create Item",
     "excelCatalog": "Import / Export Catalog",
     "exportKitchenToExcelThenImportBack": "Export this kitchen to Excel, update prices or other item fields, then import the file back to update matching kitchen items.",
+    "showImportExport": "Show import / export",
     "exportCurrentKitchenData": "Export current kitchen data",
     "downloadAllCatalogRowsForKitchenIncludingCurrentPricesShownInAdmin": "Download all catalog rows for this kitchen, including current prices shown in admin.",
     "exportExcel": "Export Excel",

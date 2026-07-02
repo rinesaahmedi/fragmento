@@ -532,54 +532,66 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
           <ActionLink href={`/admin/contracts?kitchenId=${kitchen.id}`}><AdminText i18nKey="kitchenDetailAdmin.manageContracts" fallback="Manage contracts" /></ActionLink>
         </div>
 
-        <AdminSection
-          title={<AdminText i18nKey="kitchenDetailAdmin.excelCatalog" fallback="Import / Export Catalog" />}
-          description={<AdminText i18nKey="kitchenDetailAdmin.exportKitchenToExcelThenImportBack" fallback="Export this kitchen to Excel, update prices or other item fields, then import the file back to update matching kitchen items." />}
-        >
-          <div style={splitGridStyle}>
-            <div style={catalogPanelStyle}>
-              <div style={{ display: "grid", gap: 8 }}>
-                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.exportCurrentKitchenData" fallback="Export current kitchen data" /></strong>
-                <p style={mutedTextStyle}>
-                  <AdminText i18nKey="kitchenDetailAdmin.downloadAllCatalogRowsForKitchenIncludingCurrentPricesShownInAdmin" fallback="Download all catalog rows for this kitchen, including current prices shown in admin." />
-                </p>
-              </div>
-              <a
-                href={`/api/admin/kitchens/${kitchen.id}/catalog`}
-                style={catalogDownloadLinkStyle}
-              >
-                <AdminText i18nKey="kitchenDetailAdmin.exportExcel" fallback="Export Excel" />
-              </a>
+        <details style={catalogDisclosureStyle}>
+          <summary style={catalogDisclosureSummaryStyle}>
+            <div style={{ display: "grid", gap: 6 }}>
+              <strong style={{ fontSize: "1.08rem", color: "var(--app-text)" }}>
+                <AdminText i18nKey="kitchenDetailAdmin.excelCatalog" fallback="Import / Export Catalog" />
+              </strong>
+              <span style={mutedTextStyle}>
+                <AdminText i18nKey="kitchenDetailAdmin.exportKitchenToExcelThenImportBack" fallback="Export this kitchen to Excel, update prices or other item fields, then import the file back to update matching kitchen items." />
+              </span>
             </div>
+            <span style={catalogDisclosureButtonStyle}>
+              <AdminText i18nKey="kitchenDetailAdmin.showImportExport" fallback="Show import / export" />
+            </span>
+          </summary>
+          <div style={catalogDisclosureBodyStyle}>
+            <div style={splitGridStyle}>
+              <div style={catalogPanelStyle}>
+                <div style={{ display: "grid", gap: 8 }}>
+                  <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.exportCurrentKitchenData" fallback="Export current kitchen data" /></strong>
+                  <p style={mutedTextStyle}>
+                    <AdminText i18nKey="kitchenDetailAdmin.downloadAllCatalogRowsForKitchenIncludingCurrentPricesShownInAdmin" fallback="Download all catalog rows for this kitchen, including current prices shown in admin." />
+                  </p>
+                </div>
+                <a
+                  href={`/api/admin/kitchens/${kitchen.id}/catalog`}
+                  style={catalogDownloadLinkStyle}
+                >
+                  <AdminText i18nKey="kitchenDetailAdmin.exportExcel" fallback="Export Excel" />
+                </a>
+              </div>
 
-            <form
-              action={`/api/admin/kitchens/${kitchen.id}/catalog`}
-              method="post"
-              encType="multipart/form-data"
-              style={catalogPanelStyle}
-            >
-              <div style={{ display: "grid", gap: 8 }}>
-                <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.importEditedFile" fallback="Import edited file" /></strong>
-                <p style={mutedTextStyle}>
-                  <AdminText i18nKey="kitchenDetailAdmin.changePricesInExportedSheetThenUpload" fallback="Change prices in the exported sheet, save it, then upload it here. Matching items will be updated." />
-                </p>
-              </div>
-              <FormField label={<AdminText i18nKey="kitchenDetailAdmin.catalogFile" fallback="Catalog file" />}>
-                <input
-                  type="file"
-                  name="catalogFile"
-                  accept=".xlsx,.csv"
-                  style={inputStyle}
-                  required
-                />
-              </FormField>
-              <div style={actionRowStyle}>
-                <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.importCatalog" fallback="Import catalog" /></button>
-                <span style={catalogHelpTextStyle}><AdminText i18nKey="kitchenDetailAdmin.supportedFormatsXlsxAndCsv" fallback="Supported formats: .xlsx and .csv" /></span>
-              </div>
-            </form>
+              <form
+                action={`/api/admin/kitchens/${kitchen.id}/catalog`}
+                method="post"
+                encType="multipart/form-data"
+                style={catalogPanelStyle}
+              >
+                <div style={{ display: "grid", gap: 8 }}>
+                  <strong style={{ fontSize: "1.05rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenDetailAdmin.importEditedFile" fallback="Import edited file" /></strong>
+                  <p style={mutedTextStyle}>
+                    <AdminText i18nKey="kitchenDetailAdmin.changePricesInExportedSheetThenUpload" fallback="Change prices in the exported sheet, save it, then upload it here. Matching items will be updated." />
+                  </p>
+                </div>
+                <FormField label={<AdminText i18nKey="kitchenDetailAdmin.catalogFile" fallback="Catalog file" />}>
+                  <input
+                    type="file"
+                    name="catalogFile"
+                    accept=".xlsx,.csv"
+                    style={inputStyle}
+                    required
+                  />
+                </FormField>
+                <div style={actionRowStyle}>
+                  <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.importCatalog" fallback="Import catalog" /></button>
+                  <span style={catalogHelpTextStyle}><AdminText i18nKey="kitchenDetailAdmin.supportedFormatsXlsxAndCsv" fallback="Supported formats: .xlsx and .csv" /></span>
+                </div>
+              </form>
+            </div>
           </div>
-        </AdminSection>
+        </details>
 
         <AdminSection
           title={<AdminText i18nKey="kitchenDetailAdmin.catalogItems" fallback="Catalog Items" />}
@@ -1259,6 +1271,34 @@ const catalogPanelStyle = {
   ...itemCardStyle,
   gap: 14,
   alignContent: "start",
+};
+
+const catalogDisclosureStyle = {
+  border: "1px solid var(--app-border)",
+  borderRadius: 16,
+  background: "var(--app-surface)",
+  boxShadow: "var(--app-shadow-soft)",
+  overflow: "hidden",
+};
+
+const catalogDisclosureSummaryStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  gap: 16,
+  padding: "16px 24px",
+  cursor: "pointer",
+  listStyle: "none",
+};
+
+const catalogDisclosureButtonStyle = {
+  ...secondaryButtonStyle,
+  flex: "0 0 auto",
+};
+
+const catalogDisclosureBodyStyle = {
+  borderTop: "1px solid var(--app-border)",
+  padding: 24,
 };
 
 const catalogDownloadLinkStyle = {
