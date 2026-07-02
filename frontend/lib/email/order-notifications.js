@@ -117,6 +117,45 @@ function normalizeProductImageAssetPath(imagePath) {
   return normalized || "";
 }
 
+function getMappedProductImagePath(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const displayName = String(getItemDisplayName(item)).toLowerCase();
+  const haystack = `${code} ${articleNumber} ${iconKey} ${componentKey} ${displayName}`;
+
+  if (
+    code.includes("KHF664611") ||
+    articleNumber.includes("KHF664611") ||
+    haystack.includes("chimney") ||
+    haystack.includes("schraeg") ||
+    haystack.includes("schräg")
+  ) {
+    return "product-images/email/khf664611s-chimney-hood.jpg";
+  }
+
+  if (
+    code.startsWith("HOOD-") ||
+    code.startsWith("CAB-HOOD-") ||
+    iconKey.includes("hood") ||
+    componentKey.includes("hood") ||
+    componentKey.includes("extractor") ||
+    haystack.includes("extractor") ||
+    haystack.includes("hood") ||
+    haystack.includes("dunstabzug") ||
+    haystack.includes("flachschirmhaube")
+  ) {
+    return "product-images/email/fh664621s-flat-hood.jpg";
+  }
+
+  return "";
+}
+
+function getProductImagePathForEmail(item) {
+  return normalizeProductImageAssetPath(item?.productImagePath) || getMappedProductImagePath(item);
+}
+
 function buildProductImageCid(item, index) {
   const code = String(item.code || item.name || `product-${index}`)
     .toLowerCase()
@@ -167,7 +206,7 @@ async function loadProductImageAttachments(order) {
   const cidByAssetPath = new Map();
 
   for (const [index, item] of selectedItems.entries()) {
-    const assetPath = normalizeProductImageAssetPath(item.productImagePath);
+    const assetPath = getProductImagePathForEmail(item);
     if (!assetPath) continue;
 
     if (seenAssetPaths.has(assetPath)) {
@@ -607,15 +646,20 @@ export async function generateOrderConfirmationPdf(order) {
     const headerHeight = 32;
     const headerX = margin + 10;
     const headerRight = pageWidth - margin - 10;
+    const numberX = margin + 15;
+    const iconX = margin + 38;
+    const typeX = margin + 68;
+    const codeX = margin + 320;
+    const priceX = pageWidth - margin - 15;
     doc.setFillColor(249, 249, 249);
     doc.rect(headerX, headerTop, headerRight - headerX, headerHeight, "F");
     doc.setDrawColor(234, 234, 234);
     doc.line(headerX, headerTop + headerHeight, headerRight, headerTop + headerHeight);
     doc.setTextColor(51, 51, 51);
-    doc.text("Nr.", margin + 15, headerTop + 20);
-    doc.text("Type", margin + 68, headerTop + 20);
-    doc.text("Typen-Nr.", margin + 320, headerTop + 20);
-    doc.text("Preis", pageWidth - margin - 15, headerTop + 20, { align: "right" });
+    doc.text("Nr.", numberX, headerTop + 20, { align: "center" });
+    doc.text("Type", typeX, headerTop + 20);
+    doc.text("Typen-Nr.", codeX, headerTop + 20);
+    doc.text("Preis", priceX, headerTop + 20, { align: "right" });
     doc.setTextColor(0, 0, 0);
     y = headerTop + headerHeight + 8;
     doc.setFont("helvetica", "normal").setFontSize(10);
@@ -643,25 +687,25 @@ export async function generateOrderConfirmationPdf(order) {
       const rowTextY = rowTop + 18;
       const iconY = rowTextY - 14;
 
-      doc.text(rowNumber, margin, rowTextY);
-      drawItemIcon(doc, item, margin + 22, iconY, 26);
+      doc.text(rowNumber, numberX, rowTextY, { align: "center" });
+      drawItemIcon(doc, item, iconX, iconY, 26);
       nameLines.forEach((line, lineIndex) => {
-        doc.text(line, margin + 68, rowTextY + lineIndex * lineHeight);
+        doc.text(line, typeX, rowTextY + lineIndex * lineHeight);
       });
-      doc.text(getItemDisplayCode(item), margin + 320, rowTextY);
-      doc.text(formatCurrency(item.price), pageWidth - margin, rowTextY, { align: "right" });
+      doc.text(getItemDisplayCode(item), codeX, rowTextY);
+      doc.text(formatCurrency(item.price), priceX, rowTextY, { align: "right" });
       if (blendeLineGroups.length) {
         let blendeRowTop = rowTop + parentBandHeight;
         drawPdfDivider(blendeRowTop, 247);
         blendeLineGroups.forEach((group, groupIndex) => {
           const blendeY = blendeRowTop + 18;
-          doc.text(group.rowNumber, margin, blendeY);
-          drawItemIcon(doc, group.item, margin + 25, blendeY - 12, 22);
+          doc.text(group.rowNumber, numberX, blendeY, { align: "center" });
+          drawItemIcon(doc, group.item, iconX + 3, blendeY - 12, 22);
           group.nameLines.forEach((line, lineIndex) => {
-            doc.text(line, margin + 68, blendeY + lineIndex * lineHeight);
+            doc.text(line, typeX, blendeY + lineIndex * lineHeight);
           });
-          doc.text(group.code, margin + 320, blendeY);
-          doc.text(group.price, pageWidth - margin, blendeY, { align: "right" });
+          doc.text(group.code, codeX, blendeY);
+          doc.text(group.price, priceX, blendeY, { align: "right" });
           blendeRowTop += blendeBandHeights[groupIndex];
         });
       }
@@ -718,7 +762,7 @@ export function buildOrderSummaryHtml(order) {
     if (!visibleItems.length) return "";
     const rows = buildNumberedRows(visibleItems)
       .map(({ item, rowNumber, blendeItems = [] }) => {
-        const productImagePath = normalizeProductImageAssetPath(item.productImagePath);
+        const productImagePath = getProductImagePathForEmail(item);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
         const imageHtml = imageCid
           ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`

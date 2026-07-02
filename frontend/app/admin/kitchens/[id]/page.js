@@ -722,19 +722,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       currentBlendePrice={item.blendePrice == null ? null : Number(item.blendePrice)}
                     />
 
-                    {item.itemType === ItemType.COMPONENT ? (
-                      <div style={compactComponentRowStyle}>
-                        <AdminComponentSlotPicker
-                          name="componentKey"
-                          slots={structureSlots}
-                          defaultValue={item.componentKey || ""}
-                          occupiedByKey={occupiedByKey}
-                          allowOccupiedKey={item.componentKey || ""}
-                          helperText="Use the compact slot selector to remap the component."
-                          compact
-                        />
-                      </div>
-                    ) : null}
+                    <input type="hidden" name="componentKey" value={item.componentKey || ""} />
 
                     <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
                       <textarea name="infoText" defaultValue={item.infoText || ""} rows={2} style={compactTextareaStyle} />
