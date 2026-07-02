@@ -1,6 +1,7 @@
 import { KitchenStatus, ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma.js";
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
+import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
@@ -175,7 +176,7 @@ export async function getKitchenBySlug(slug) {
   const resolvedSlug = resolveKitchenSlugAlias(slug);
 
   try {
-    return await prisma.kitchen.findUnique({
+    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         items: {
@@ -186,14 +187,14 @@ export async function getKitchenBySlug(slug) {
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
         },
       },
-    });
+    }));
   } catch (error) {
     if (!isMissingKitchenItemProductImagePath(error) && !isMissingKitchenItemNameDe(error)) {
       throw error;
     }
 
     // Compatibility fallback for databases that have not applied the productImagePath migration yet.
-    return prisma.kitchen.findUnique({
+    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         items: {
@@ -202,7 +203,39 @@ export async function getKitchenBySlug(slug) {
           select: KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH,
         },
       },
+    }));
+  }
+}
+
+async function attachCutleryCatalogVariants(kitchen) {
+  if (!kitchen) return kitchen;
+
+  try {
+    const articles = await prisma.catalogArticle.findMany({
+      where: {
+        itemType: ItemType.ACCESSORY,
+        isActive: true,
+        articleNumber: {
+          in: CUTLERY_VARIANTS.map((variant) => variant.articleNumber),
+        },
+      },
+      orderBy: [{ widthMm: "asc" }, { articleNumber: "asc" }],
     });
+
+    return {
+      ...kitchen,
+      cutleryVariants: normalizeCutleryVariants(
+        articles.map((article) => ({
+          articleNumber: article.articleNumber,
+          name: article.name,
+          nameDe: article.nameDe || "",
+          widthCm: article.widthMm ? Number(article.widthMm) / 10 : null,
+          price: Number(article.price),
+        })),
+      ),
+    };
+  } catch {
+    return kitchen;
   }
 }
 
@@ -1026,6 +1059,7 @@ export function serializeKitchenForLegacy(kitchen) {
     components: items.filter((item) => item.itemType === ItemType.COMPONENT).map(toClientItem),
     accessories: items.filter((item) => item.itemType === ItemType.ACCESSORY).map(toClientItem),
     services: items.filter((item) => item.itemType === ItemType.SERVICE).map(toClientItem),
+    cutleryVariants: normalizeCutleryVariants(kitchen.cutleryVariants || []),
     lockedBaseColors: LOCKED_BASE_COLORS,
     montageRequiredCodes: MONTAGE_REQUIRED_CODES,
     montageCabinetCodes: [

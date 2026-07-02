@@ -9,11 +9,42 @@ export const CUTLERY_VARIANTS = [
   { articleNumber: "ZB100SG", widthCm: 100, price: 36 },
 ];
 
-const CUTLERY_VARIANT_BY_ARTICLE = new Map(
-  CUTLERY_VARIANTS.map((variant) => [variant.articleNumber, variant]),
-);
-
 export const DEFAULT_CUTLERY_ARTICLE_NUMBER = "ZB60SG";
+
+function normalizeArticleNumber(articleNumber) {
+  return String(articleNumber || "").trim().toUpperCase();
+}
+
+function inferCutleryWidthCm(articleNumber, fallbackName = "") {
+  const articleMatch = normalizeArticleNumber(articleNumber).match(/^ZB(\d{2,3})SG$/);
+  if (articleMatch) return Number(articleMatch[1]);
+
+  const nameMatch = String(fallbackName || "").match(/\b(\d{2,3})\s*cm\b/i);
+  return nameMatch ? Number(nameMatch[1]) : null;
+}
+
+export function normalizeCutleryVariants(variants = []) {
+  const merged = new Map();
+
+  for (const variant of [...CUTLERY_VARIANTS, ...variants]) {
+    const articleNumber = normalizeArticleNumber(variant?.articleNumber);
+    if (!articleNumber) continue;
+
+    const widthCm = Number(variant?.widthCm || inferCutleryWidthCm(articleNumber, variant?.name || variant?.nameDe));
+    if (!Number.isFinite(widthCm) || widthCm <= 0) continue;
+
+    merged.set(articleNumber, {
+      ...variant,
+      articleNumber,
+      widthCm,
+      price: Number(variant?.price || 0),
+      name: String(variant?.name || `Cutlery insert ${widthCm} cm`).trim(),
+      nameDe: String(variant?.nameDe || `Besteckeinsatz ${widthCm} cm`).trim(),
+    });
+  }
+
+  return [...merged.values()].sort((left, right) => left.widthCm - right.widthCm);
+}
 
 export function isCutleryAccessoryCode(code) {
   return String(code || "").trim().toUpperCase().startsWith("ACC-CUTLERY");
@@ -28,12 +59,16 @@ export function getCutleryBaseItem(accessories = []) {
   return accessories.find((item) => isCutleryAccessoryItem(item)) || null;
 }
 
-export function getCutleryVariant(articleNumber) {
-  return CUTLERY_VARIANT_BY_ARTICLE.get(String(articleNumber || "").trim().toUpperCase()) || null;
+export function getCutleryVariant(articleNumber, variants = CUTLERY_VARIANTS) {
+  const normalizedArticleNumber = normalizeArticleNumber(articleNumber);
+  return normalizeCutleryVariants(variants).find((variant) => variant.articleNumber === normalizedArticleNumber) || null;
 }
 
 export function getCutleryVariantLabel(variant, translate, language = "en") {
   if (!variant) return "";
+  const catalogName = String(language === "de" && variant.nameDe ? variant.nameDe : variant.name || "").trim();
+  if (catalogName) return catalogName;
+
   const key = `configurator.cutleryInsert${variant.widthCm}`;
   const fallbackEn = `Cutlery insert ${variant.widthCm} cm`;
   const fallbackDe = `Besteckeinsatz ${variant.widthCm} cm`;
@@ -41,15 +76,16 @@ export function getCutleryVariantLabel(variant, translate, language = "en") {
 }
 
 export function createCutleryLineId(articleNumber) {
-  return `cutlery-${String(articleNumber || "").trim().toUpperCase()}`;
+  return `cutlery-${normalizeArticleNumber(articleNumber)}`;
 }
 
-export function normalizeCutleryLines(lines = []) {
+export function normalizeCutleryLines(lines = [], variants = CUTLERY_VARIANTS) {
   const merged = new Map();
+  const normalizedVariants = normalizeCutleryVariants(variants);
 
   for (const line of lines) {
-    const articleNumber = String(line?.articleNumber || "").trim().toUpperCase();
-    const variant = getCutleryVariant(articleNumber);
+    const articleNumber = normalizeArticleNumber(line?.articleNumber);
+    const variant = getCutleryVariant(articleNumber, normalizedVariants);
     if (!variant) continue;
 
     const quantity = Math.max(1, Math.min(99, Math.floor(Number(line?.quantity || 1))));
@@ -66,16 +102,16 @@ export function normalizeCutleryLines(lines = []) {
     });
   }
 
-  return CUTLERY_VARIANTS
+  return normalizedVariants
     .map((variant) => merged.get(variant.articleNumber))
     .filter(Boolean);
 }
 
-export function buildCutleryLineItems(baseItem, lines, translate, language = "en") {
+export function buildCutleryLineItems(baseItem, lines, translate, language = "en", variants = CUTLERY_VARIANTS) {
   if (!baseItem) return [];
 
-  return normalizeCutleryLines(lines).map((line) => {
-    const variant = getCutleryVariant(line.articleNumber);
+  return normalizeCutleryLines(lines, variants).map((line) => {
+    const variant = getCutleryVariant(line.articleNumber, variants);
     const name = getCutleryVariantLabel(variant, translate, language);
 
     return {
@@ -85,6 +121,7 @@ export function buildCutleryLineItems(baseItem, lines, translate, language = "en
       articleNumber: line.articleNumber,
       name,
       nameDe: getCutleryVariantLabel(variant, translate, "de"),
+      widthMm: variant?.widthCm ? variant.widthCm * 10 : baseItem.widthMm,
       price: variant?.price ?? Number(baseItem.price || 0),
       quantity: line.quantity,
       isCutleryLine: true,
@@ -97,7 +134,7 @@ export function parseCutleryLineFromOrderItem(orderItem) {
   if (!isCutleryAccessoryCode(code)) return null;
 
   const quantity = Math.max(1, Math.floor(Number(orderItem?.quantity || 1)));
-  const articleNumber = String(orderItem?.articleNumber || "").trim().toUpperCase();
+  const articleNumber = normalizeArticleNumber(orderItem?.articleNumber);
   if (articleNumber && getCutleryVariant(articleNumber)) {
     return { articleNumber, quantity };
   }

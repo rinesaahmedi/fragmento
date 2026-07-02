@@ -40,6 +40,7 @@ import {
   getCutleryBaseItem,
   isCutleryAccessoryCode,
   isCutleryAccessoryItem,
+  normalizeCutleryVariants,
   normalizeCutleryLines,
 } from "../lib/cutlery-accessories";
 import { PublicI18nProvider, PublicLanguageSwitcher, usePublicI18n } from "./public-i18n";
@@ -1369,6 +1370,10 @@ function KitchenConfiguratorContent({
     () => getCutleryBaseItem(kitchenConfig.accessories),
     [kitchenConfig.accessories],
   );
+  const cutleryVariants = useMemo(
+    () => normalizeCutleryVariants(kitchenConfig.cutleryVariants || []),
+    [kitchenConfig.cutleryVariants],
+  );
   const selectedAccessories = [
     ...selectedMap(kitchenConfig.accessories, selectedAccessoryCodes)
       .filter((item) => !isCutleryAccessoryItem(item))
@@ -1377,7 +1382,7 @@ function KitchenConfiguratorContent({
         isLocked: item.isLocked || defaultLockedAccessoryCodes.has(item.code),
         isOrderLocked: orderLockedAccessoryCodes.has(item.code),
       })),
-    ...buildCutleryLineItems(cutleryBaseItem, cutleryLines, translate, language).map((item) => ({
+    ...buildCutleryLineItems(cutleryBaseItem, cutleryLines, translate, language, cutleryVariants).map((item) => ({
       ...item,
       isLocked: false,
       isOrderLocked: orderLockedAccessoryCodes.has(item.code),
@@ -1543,7 +1548,7 @@ function KitchenConfiguratorContent({
       if (exists) {
         return current.filter((line) => line.articleNumber !== normalizedArticleNumber);
       }
-      return normalizeCutleryLines([...current, { articleNumber: normalizedArticleNumber, quantity: 1 }]);
+      return normalizeCutleryLines([...current, { articleNumber: normalizedArticleNumber, quantity: 1 }], cutleryVariants);
     });
     setStatus("");
     setStatusTone("idle");
@@ -1559,6 +1564,7 @@ function KitchenConfiguratorContent({
         current.map((line) =>
           line.articleNumber === normalizedArticleNumber ? { ...line, quantity: nextQuantity } : line,
         ),
+        cutleryVariants,
       ),
     );
   }
@@ -2201,6 +2207,7 @@ function KitchenConfiguratorContent({
               orderLockedServiceCodes={orderLockedServiceCodes}
               setSelectedComponentIds={setSelectedComponentIds}
               onToggleAccessory={toggleAccessory}
+              cutleryVariants={cutleryVariants}
               cutleryLines={cutleryLines}
               onToggleCutleryVariant={toggleCutleryVariant}
               onUpdateCutleryLineQuantity={updateCutleryLineQuantity}

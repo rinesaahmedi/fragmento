@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { getCatalogItemDetails, getLocalizedItemName } from "../components/kitchen-selection-utils.js";
 import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
+import { buildCutleryLineItems } from "../lib/cutlery-accessories.js";
 
 test("base cabinet width uses lower cabinet label", () => {
   assert.equal(
@@ -71,6 +72,70 @@ test("localized hood wall cabinet uses upper cabinet with extractor hood label",
     ),
     "Upper Cabinet with Extractor Hood 60",
   );
+});
+
+test("cutlery variant summary keeps selected width name instead of base catalog code", () => {
+  assert.equal(
+    getLocalizedItemName(
+      {
+        code: "ACC-CUTLERY-ZB60SG",
+        articleNumber: "ZB40SG",
+        name: "Cutlery insert 40 cm",
+        nameDe: "Besteckeinsatz 40 cm",
+        iconKey: "cutlery_insert",
+        isCutleryLine: true,
+      },
+      (_key, fallback) => fallback,
+      "en",
+      false,
+    ),
+    "Cutlery insert 40 cm",
+  );
+  assert.equal(
+    getLocalizedItemName(
+      {
+        code: "ACC-CUTLERY-ZB60SG",
+        articleNumber: "ZB40SG",
+        name: "Cutlery insert 40 cm",
+        nameDe: "Besteckeinsatz 40 cm",
+        iconKey: "cutlery_insert",
+        isCutleryLine: true,
+      },
+      (_key, fallback) => fallback,
+      "de",
+      false,
+    ),
+    "Besteckeinsatz 40 cm",
+  );
+});
+
+test("cutlery variant line items use catalog article data", () => {
+  const [lineItem] = buildCutleryLineItems(
+    {
+      code: "ACC-CUTLERY-ZB60SG",
+      name: "Cutlery insert 60 cm",
+      price: 25,
+      iconKey: "cutlery_insert",
+    },
+    [{ articleNumber: "ZB40SG", quantity: 2 }],
+    (_key, fallback) => fallback,
+    "en",
+    [
+      {
+        articleNumber: "ZB40SG",
+        name: "Catalog 40 cm insert",
+        nameDe: "Katalog 40 cm Einsatz",
+        widthCm: 40,
+        price: 21,
+      },
+    ],
+  );
+
+  assert.equal(lineItem.code, "ACC-CUTLERY-ZB60SG");
+  assert.equal(lineItem.articleNumber, "ZB40SG");
+  assert.equal(lineItem.name, "Catalog 40 cm insert");
+  assert.equal(lineItem.price, 21);
+  assert.equal(lineItem.quantity, 2);
 });
 
 test("wall cabinet width falls back to code", () => {
