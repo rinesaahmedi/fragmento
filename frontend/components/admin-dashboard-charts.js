@@ -288,7 +288,15 @@ export function AdminDashboardCharts({
           <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="kpi-card">
             <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
             <strong>{kpi.value}</strong>
-            <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+            {kpi.breakdown ? (
+              kpi.breakdown.map((line) => (
+                <small key={line.labelKey}>
+                  {translate(line.labelKey || "", line.fallbackLabel || "")}: {line.value}
+                </small>
+              ))
+            ) : (
+              <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+            )}
           </article>
         ))}
       </section>
@@ -303,7 +311,15 @@ export function AdminDashboardCharts({
             <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="mobile-kpi-card">
               <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
               <strong>{kpi.value}</strong>
-              <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+              {kpi.breakdown ? (
+                kpi.breakdown.map((line) => (
+                  <small key={line.labelKey}>
+                    {translate(line.labelKey || "", line.fallbackLabel || "")}: {line.value}
+                  </small>
+                ))
+              ) : (
+                <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+              )}
             </article>
           ))}
         </div>

@@ -8,6 +8,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 import sharp from "sharp";
 import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
+import { getPriceBreakdown } from "../price-utils.js";
 
 const LETTERHEAD = {
   headerHeight: 74,
@@ -1255,12 +1256,20 @@ export async function generateOrderConfirmationPdf(order) {
   drawSection("Zubehör:", order.accessories);
   drawSection("Dienstleistungen:", order.services);
 
-  ensureSpace(40);
+  ensureSpace(70);
   doc.setDrawColor(150).line(margin, y, pageWidth - margin, y);
+  y += 18;
+  const { net, vat, total } = getPriceBreakdown(order.total);
+  doc.setFont("helvetica", "normal").setFontSize(11);
+  doc.text("Preis:", margin, y);
+  doc.text(formatCurrency(net), pageWidth - margin, y, { align: "right" });
+  y += 16;
+  doc.text("MwSt. (19%):", margin, y);
+  doc.text(formatCurrency(vat), pageWidth - margin, y, { align: "right" });
   y += 20;
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.text("Gesamtpreis:", margin, y);
-  doc.text(formatCurrency(order.total), pageWidth - margin, y, { align: "right" });
+  doc.text(formatCurrency(total), pageWidth - margin, y, { align: "right" });
 
   const pdfBytes = await applyArchitectoLetterheadTemplate(doc.output("arraybuffer"));
 
@@ -1437,6 +1446,12 @@ export function buildOrderSummaryHtml(order) {
         ${renderSection("Neu bestätigtes Zubehör", order.accessories, order.productImageCids)}
         ${renderSection("Neu bestätigte Dienstleistungen", order.services, order.productImageCids)}
         <table style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;">
+          <tr><td style="text-align:right;font-size:0.95em;color:#555;">Preis: ${formatCurrency(
+            getPriceBreakdown(order.total).net,
+          )}</td></tr>
+          <tr><td style="text-align:right;font-size:0.95em;color:#555;">MwSt. (19%): ${formatCurrency(
+            getPriceBreakdown(order.total).vat,
+          )}</td></tr>
           <tr><td style="text-align:right;font-size:1.3em;font-weight:bold;">Gesamtpreis: ${formatCurrency(
             order.total,
           )}</td></tr>

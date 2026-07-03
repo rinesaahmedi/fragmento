@@ -2689,6 +2689,13 @@
   font-size: clamp(1.15rem, 2vw, 1.5rem);
 }
 
+.summaryTotalLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
 .orderSectionWrap {
   width: 100%;
   margin: 18px 0 0;
