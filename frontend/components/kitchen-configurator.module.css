@@ -140,11 +140,19 @@
 .contentGrid {
   display: grid;
   grid-template-columns: minmax(0, 1.65fr) minmax(360px, 430px);
+  grid-template-areas:
+    "plan side"
+    "legend side"
+    "summary side";
   gap: 24px;
   align-items: start;
 }
 
-.mainColumn,
+.planCatalogGroup {
+  display: contents;
+}
+
+.planColumn,
 .sideColumn {
   display: flex;
   flex-direction: column;
@@ -152,14 +160,41 @@
   min-width: 0;
 }
 
+.planColumn {
+  grid-area: plan;
+}
+
+.planLegendColumn {
+  grid-area: legend;
+  min-width: 0;
+}
+
+.sideColumn {
+  grid-area: side;
+}
+
+.summaryColumn {
+  grid-area: summary;
+  min-width: 0;
+}
+
+.planStickyPrice {
+  display: none;
+}
+
 .stage,
 .sidebar,
 .panel,
-.orderPanel {
+.orderPanel,
+.planLegendColumn {
   border: 1px solid rgba(120, 90, 64, 0.16);
   border-radius: 24px;
   background: rgba(255, 255, 255, 0.92);
   box-shadow: 0 18px 40px rgba(74, 47, 20, 0.08);
+}
+
+.planLegendColumn {
+  padding: 18px;
 }
 
 .stage {
@@ -746,7 +781,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 14px;
 }
 
 .legendChip {
@@ -3550,6 +3584,44 @@
 @media (max-width: 1100px) {
   .contentGrid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "plan"
+      "legend"
+      "side"
+      "summary";
+  }
+
+  .planCatalogGroup {
+    display: block;
+  }
+
+  .planColumn {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: #f5efe7;
+    padding-bottom: 12px;
+  }
+
+  .planStickyPrice {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border: 1px solid rgba(120, 90, 64, 0.16);
+    border-radius: 14px;
+    background: #fffcf7;
+    box-shadow: 0 12px 26px rgba(74, 47, 20, 0.08);
+  }
+
+  .planStickyPrice span {
+    color: #7d7166;
+    font-size: 0.85rem;
+  }
+
+  .planStickyPrice strong {
+    color: #289356;
+    font-size: 1.15rem;
   }
 
   .sidebar {

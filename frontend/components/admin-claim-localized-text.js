@@ -16,6 +16,7 @@ const KITCHEN_AREA_NAMES = {
   "Washing Machine": "Waschmaschine",
   Worktop: "Arbeitsplatte",
   Refrigerator: "Standkühlschrank 178 cm",
+  "Freestanding refrigerator 178 cm": "Standkühlschrank 178 cm",
   "Freestanding refrigerator 178cm": "Standkühlschrank 178 cm",
   "Sink and Waste System": "Spüle und Mülltrennsystem",
   "Sink and Worktop": "Arbeitsplatte",
