@@ -20,6 +20,7 @@
     "prisma:seed": "node prisma/seed.js",
     "catalog:backfill": "node scripts/backfill-catalog-phase-b.js",
     "catalog:link": "node scripts/backfill-kitchen-item-catalog-links.js",
+    "sync:cabinet-cm-names": "node scripts/sync-kitchen-item-cabinet-cm-names.js",
     "catalog:audit": "node scripts/audit-catalog-parity.js",
     "db:audit": "node scripts/audit-seed-db.js",
     "extract:product-info": "node scripts/extract-product-info-pdfs.js",

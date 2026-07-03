@@ -372,10 +372,6 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     language === "de" ? "Vollintegrierter Geschirrspüler" : "Fully integrated dishwasher",
   );
 
-  if (item?.catalogArticleId && rawName) {
-    return withPhotoNumber(rawName);
-  }
-
   if (item?.isCutleryLine && rawName) {
     return withPhotoNumber(rawName);
   }
@@ -403,6 +399,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   }, language);
   if (cabinetWidthName) {
     return withPhotoNumber(cabinetWidthName);
+  }
+
+  if (item?.catalogArticleId && rawName) {
+    return withPhotoNumber(rawName);
   }
 
   const normalizedRawTitle = rawTitle.toLowerCase();
