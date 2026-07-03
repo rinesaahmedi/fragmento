@@ -55,7 +55,7 @@ export function normalizeCutleryVariants(variants = []) {
     });
   }
 
-  return [...merged.values()].sort((left, right) => left.widthCm - right.widthCm);
+  return [...merged.values()].sort((left, right) => right.widthCm - left.widthCm);
 }
 
 export function getAvailableCutleryVariantsForComponents(components = [], variants = CUTLERY_VARIANTS) {
