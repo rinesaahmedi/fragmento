@@ -835,8 +835,8 @@
 .catalog {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 18px;
+  gap: 14px;
+  padding: 14px;
   max-height: calc(100vh - 180px);
   overflow: auto;
 }
@@ -844,7 +844,7 @@
 .catalogSection {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .catalogSection h3 {
@@ -856,7 +856,7 @@
 .catalogGrid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .itemCard {
@@ -864,10 +864,10 @@
   z-index: 0;
   width: 100%;
   text-align: left;
-  border-radius: 18px;
+  border-radius: 14px;
   border: 1px solid rgba(120, 90, 64, 0.14);
   background: #fff;
-  padding: 14px;
+  padding: 10px 12px;
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
 }
@@ -913,8 +913,8 @@
 
 .itemTop {
   display: grid;
-  grid-template-columns: 66px minmax(0, 1fr) auto;
-  gap: 12px;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  gap: 10px;
   align-items: start;
 }
 
@@ -922,8 +922,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 66px;
-  height: 66px;
+  width: 56px;
+  height: 56px;
   color: #000;
   transform: none;
 }
@@ -946,28 +946,28 @@
 }
 
 .itemIconLightingSet svg {
-  width: 42px;
-  height: 42px;
+  width: 36px;
+  height: 36px;
   transform: translateY(2px);
 }
 
 .itemIconScaledCabinet {
-  height: 78px;
+  height: 64px;
 }
 
 .itemIconScaledCabinet svg {
-  width: var(--catalog-cabinet-icon-width, 58px);
-  height: 78px;
+  width: var(--catalog-cabinet-icon-width, 49px);
+  height: 64px;
   max-width: none;
   max-height: none;
 }
 
 .itemIconDrawerBase {
-  height: 78px;
+  height: 64px;
 }
 
 .itemIconDrawerBase svg {
-  height: 78px;
+  height: 64px;
   max-height: none;
 }
 
@@ -983,39 +983,39 @@
 .itemText strong {
   display: block;
   overflow-wrap: anywhere;
-  font-size: 0.98rem;
+  font-size: 0.9rem;
   color: #2f2a24;
-  line-height: 1.18;
+  line-height: 1.12;
 }
 
 .itemDimensions {
   display: block;
-  margin-top: 3px;
+  margin-top: 2px;
   color: #5f554c;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.2;
 }
 
 .itemCode {
   display: block;
-  margin-top: 4px;
+  margin-top: 2px;
   color: #7d7166;
-  font-size: 0.78rem;
-  line-height: 1.35;
+  font-size: 0.72rem;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 
 .itemLinkedBadge {
   display: inline-flex;
   align-items: center;
-  min-height: 24px;
-  margin-top: 6px;
-  padding: 0 10px;
+  min-height: 20px;
+  margin-top: 4px;
+  padding: 0 8px;
   border-radius: 999px;
   background: #f6eadb;
   color: #7a4d27;
-  font-size: 0.75rem;
+  font-size: 0.69rem;
   font-weight: 800;
   line-height: 1;
 }
@@ -1025,29 +1025,29 @@
   align-items: center;
   width: fit-content;
   max-width: 100%;
-  min-height: 22px;
-  margin-top: 6px;
-  padding: 3px 8px;
+  min-height: 20px;
+  margin-top: 4px;
+  padding: 2px 7px;
   border: 1px solid #b9dbc8;
   border-radius: 999px;
   background: #eef8f2;
   color: #16613c;
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 800;
-  line-height: 1.35;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 
 .itemText p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: #7d7166;
-  font-size: 0.86rem;
-  line-height: 1.4;
+  font-size: 0.78rem;
+  line-height: 1.25;
 }
 
 .itemPrice {
   color: #1874ff;
-  font-size: clamp(1rem, 2.7vw, 1.2rem);
+  font-size: clamp(0.92rem, 2.1vw, 1.06rem);
   font-weight: 800;
   white-space: nowrap;
 }
@@ -1056,14 +1056,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .itemMetaAside {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
   margin-left: auto;
 }
 
@@ -1072,12 +1072,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 96px;
-  height: 34px;
-  padding: 0 12px;
+  min-width: 86px;
+  height: 28px;
+  padding: 0 10px;
   border-radius: 999px;
   font-weight: 800;
-  font-size: 0.88rem;
+  font-size: 0.78rem;
 }
 
 .togglePill {
@@ -1106,9 +1106,9 @@
 }
 
 .cutleryPanel {
-  margin-top: 10px;
-  padding: 10px 12px;
-  border-radius: 14px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
   background: linear-gradient(180deg, #fbfaf7 0%, #f6f1ea 100%);
   border: 1px solid rgba(120, 90, 64, 0.12);
   overflow: visible;
@@ -1116,9 +1116,9 @@
 
 .cutleryFieldLabel {
   display: block;
-  margin: 0 0 6px;
+  margin: 0 0 5px;
   color: #7d6750;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -1133,16 +1133,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
-  min-height: 38px;
-  padding: 0 12px;
+  min-height: 32px;
+  padding: 0 10px;
   border: 1px solid rgba(120, 90, 64, 0.2);
-  border-radius: 12px;
+  border-radius: 10px;
   background: #fff;
   color: #3f372f;
   font: inherit;
-  font-size: 0.92rem;
+  font-size: 0.82rem;
   font-weight: 600;
   text-align: left;
   cursor: pointer;
@@ -1189,34 +1189,34 @@
 
 .cutleryDropdownMenu {
   position: absolute;
-  top: calc(100% + 6px);
+  top: calc(100% + 5px);
   left: 0;
   right: 0;
   z-index: 30;
   max-height: 240px;
   margin: 0;
-  padding: 6px;
+  padding: 5px;
   list-style: none;
   overflow-y: auto;
   border: 1px solid rgba(120, 90, 64, 0.16);
-  border-radius: 14px;
+  border-radius: 12px;
   background: #fff;
   box-shadow: 0 16px 32px rgba(71, 46, 20, 0.12);
 }
 
 .cutleryDropdownOption {
   display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) auto;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
-  padding: 10px 10px;
+  padding: 8px;
   border: 0;
-  border-radius: 10px;
+  border-radius: 8px;
   background: transparent;
   color: #3f372f;
   font: inherit;
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   text-align: left;
   cursor: pointer;
 }
@@ -1442,22 +1442,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-left: 6px;
+  margin-left: 4px;
 }
 
 .itemAssistantWrap {
   position: relative;
   display: inline-flex;
   align-items: center;
-  width: 52px;
-  height: 34px;
+  width: 46px;
+  height: 30px;
   isolation: isolate;
 }
 
 .itemInfoActions {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .itemAssistantTrigger {
@@ -1548,15 +1548,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border-radius: 999px;
   border: 1px solid rgba(120, 90, 64, 0.18);
   background: #fff8f0;
   color: #2563eb;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.08rem;
+  font-size: 0.96rem;
   font-style: italic;
   font-weight: 700;
   line-height: 1;
@@ -1728,10 +1728,10 @@
 
 .itemPhotoTrigger {
   min-width: 0;
-  min-height: 30px;
-  padding: 0 8px;
+  min-height: 24px;
+  padding: 0 7px;
   border-radius: 999px;
-  font-size: 0.68rem;
+  font-size: 0.64rem;
   line-height: 1;
 }
 
