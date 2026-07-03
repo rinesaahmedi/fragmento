@@ -5,6 +5,7 @@ import { jsPDF } from "jspdf";
 import nodemailer from "nodemailer";
 import path from "path";
 import { PDFDocument, rgb } from "pdf-lib";
+import sharp from "sharp";
 import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
 
@@ -116,6 +117,477 @@ function getProductInfoDocumentsForEmail(item) {
 function normalizeProductImageAssetPath(imagePath) {
   const normalized = String(imagePath || "").trim().replace(/^\/+/, "");
   return normalized || "";
+}
+
+function normalizeKitchenSlug(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function deriveAbKitchenPlanCode(slug) {
+  const normalizedSlug = normalizeKitchenSlug(slug);
+  const aliasBySlug = {
+    "ab-105813": "105805",
+    "ab-105817": "105805",
+    "ab-105840": "105837",
+    "ab-105843": "105837",
+    "ab-105814": "105810",
+    "ab-105828": "105825",
+    "ab-105824": "105821",
+    "ab-105823": "105822",
+    "ab-105829": "105822",
+    "ab-105832": "105822",
+    "ab-105830": "105827",
+    "ab-105839": "105842",
+    "ab-105838": "105841",
+    "ab-105844": "105841",
+  };
+  const aliasedCode = aliasBySlug[normalizedSlug];
+  if (aliasedCode) return aliasedCode;
+
+  const match = normalizedSlug.match(/^ab-(\d{6})$/);
+  return match?.[1] || "";
+}
+
+function formatAbKitchenPlanName(code) {
+  return code ? `AB ${code.slice(0, 3)}${code.slice(3)}` : "";
+}
+
+async function resolveWorkspaceAssetPath(relativePath) {
+  const normalized = String(relativePath || "").replace(/^\/+/, "");
+  if (!normalized) return "";
+
+  const candidates = [
+    path.join(process.cwd(), normalized),
+    path.join(process.cwd(), "frontend", normalized),
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      await fs.access(candidate);
+      return candidate;
+    } catch {}
+  }
+
+  return "";
+}
+
+function decodePublicAssetHref(href) {
+  const normalized = String(href || "").trim().replace(/^\/+/, "");
+  return normalized ? `public/${decodeURIComponent(normalized)}` : "";
+}
+
+function findBalancedObjectLiteral(source, assignmentName) {
+  const assignmentIndex = source.indexOf(`const ${assignmentName} =`);
+  if (assignmentIndex < 0) return "";
+
+  const startIndex = source.indexOf("{", assignmentIndex);
+  if (startIndex < 0) return "";
+
+  let depth = 0;
+  let quote = "";
+  let escaped = false;
+  let lineComment = false;
+  let blockComment = false;
+
+  for (let index = startIndex; index < source.length; index += 1) {
+    const char = source[index];
+    const next = source[index + 1];
+
+    if (lineComment) {
+      if (char === "\n") lineComment = false;
+      continue;
+    }
+
+    if (blockComment) {
+      if (char === "*" && next === "/") {
+        blockComment = false;
+        index += 1;
+      }
+      continue;
+    }
+
+    if (quote) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === "\\") {
+        escaped = true;
+      } else if (char === quote) {
+        quote = "";
+      }
+      continue;
+    }
+
+    if (char === "/" && next === "/") {
+      lineComment = true;
+      index += 1;
+      continue;
+    }
+
+    if (char === "/" && next === "*") {
+      blockComment = true;
+      index += 1;
+      continue;
+    }
+
+    if (char === '"' || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+
+    if (char === "{") depth += 1;
+    if (char === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return source.slice(startIndex, index + 1);
+      }
+    }
+  }
+
+  return "";
+}
+
+let kitchenPlanPreviewDataPromise = null;
+
+async function loadKitchenPlanPreviewData() {
+  if (kitchenPlanPreviewDataPromise) return kitchenPlanPreviewDataPromise;
+
+  kitchenPlanPreviewDataPromise = (async () => {
+    const sourcePath = path.join(process.cwd(), "components", "kitchen-svg-stage.jsx");
+    const source = await fs.readFile(sourcePath, "utf8");
+    const imageViewsLiteral = findBalancedObjectLiteral(source, "IMAGE_VIEW_BY_SLUG");
+    const hotspotsLiteral = findBalancedObjectLiteral(source, "IMAGE_HOTSPOTS_BY_SLUG");
+    const imageViews = imageViewsLiteral ? Function(`"use strict"; return (${imageViewsLiteral});`)() : {};
+    const hotspotsBySlug = hotspotsLiteral ? Function(`"use strict"; return (${hotspotsLiteral});`)() : {};
+
+    source.replace(
+      /IMAGE_HOTSPOTS_BY_SLUG\["([^"]+)"\]\s*=\s*IMAGE_HOTSPOTS_BY_SLUG\["([^"]+)"\]/g,
+      (match, target, sourceSlug) => {
+        hotspotsBySlug[target] = hotspotsBySlug[sourceSlug] || [];
+        return match;
+      },
+    );
+
+    return { imageViews, hotspotsBySlug };
+  })();
+
+  return kitchenPlanPreviewDataPromise;
+}
+
+async function resolvePurchasedKitchenSketchPath(order) {
+  const slug = normalizeKitchenSlug(order?.kitchen?.slug);
+  const candidates = [];
+  const previewData = await loadKitchenPlanPreviewData().catch(() => null);
+  const imageViewHref = previewData?.imageViews?.[slug] || "";
+
+  if (imageViewHref) {
+    candidates.push(decodePublicAssetHref(imageViewHref));
+  }
+
+  if (slug === "108134-modul-1") {
+    candidates.push(
+      "public/plans/108134 MODUL 1.svg",
+      "public/jpg/108134 MODUL 1_page-0001.jpg",
+    );
+  }
+
+  if (slug === "kitchen-model-b" || slug === "kitchen-model-c" || slug === "l-kitchen-new" || slug === "l-shaped-kitchen") {
+    candidates.push(`kitchen-svgs/active/${slug}.svg`);
+  }
+
+  const abPlanCode = deriveAbKitchenPlanCode(slug);
+  const abPlanName = formatAbKitchenPlanName(abPlanCode);
+  if (abPlanName) {
+    candidates.push(
+      `public/plans/${abPlanName}.svg`,
+      `public/jpg/${abPlanName}_page-0001.jpg`,
+    );
+  }
+
+  for (const candidate of candidates) {
+    const resolved = await resolveWorkspaceAssetPath(candidate);
+    if (resolved) return resolved;
+  }
+
+  return "";
+}
+
+function componentIdForPdfItem(item) {
+  const componentKey = String(item?.componentKey || "").trim();
+  if (!componentKey) return "";
+  return `component-${componentKey.replace(/[^a-z0-9#-]/gi, "").toLowerCase()}`;
+}
+
+function escapeRegExp(value) {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function addClassToSvgTag(tag, className) {
+  if (/\bclass\s*=/i.test(tag)) {
+    return tag.replace(/\bclass=(["'])(.*?)\1/i, (match, quote, value) => {
+      const classes = new Set(String(value || "").split(/\s+/).filter(Boolean));
+      classes.add(className);
+      return `class=${quote}${[...classes].join(" ")}${quote}`;
+    });
+  }
+
+  return tag.replace(/>$/, ` class="${className}">`);
+}
+
+function markSvgComponentGroup(markup, componentId, className) {
+  if (!componentId) return markup;
+  const pattern = new RegExp(
+    `<g\\b([^>]*\\bdata-component-id=(["'])${escapeRegExp(componentId)}\\2[^>]*)>`,
+    "i",
+  );
+
+  return String(markup || "").replace(pattern, (match) => addClassToSvgTag(match, className));
+}
+
+function buildPurchasedKitchenPdfSelectionState(order) {
+  const selectedComponentIds = new Set();
+  const lockedComponentIds = new Set();
+  const selectedComponentKeys = new Set();
+  const lockedComponentKeys = new Set();
+
+  for (const item of order?.components || []) {
+    const componentId = componentIdForPdfItem(item);
+    if (!componentId) continue;
+    const componentKey = String(item?.componentKey || "").trim();
+
+    if (item?.isLocked) {
+      lockedComponentIds.add(componentId);
+      if (componentKey) lockedComponentKeys.add(componentKey);
+    } else {
+      selectedComponentIds.add(componentId);
+      if (componentKey) selectedComponentKeys.add(componentKey);
+    }
+  }
+
+  return { selectedComponentIds, lockedComponentIds, selectedComponentKeys, lockedComponentKeys };
+}
+
+function injectPurchasedKitchenPdfStyles(markup) {
+  const styles = `
+    <style>
+      .fragmento-pdf-selected path,
+      .fragmento-pdf-selected polygon,
+      .fragmento-pdf-selected rect,
+      .fragmento-pdf-selected circle,
+      .fragmento-pdf-selected ellipse {
+        fill: #bfe9cf !important;
+        stroke: #2a9155 !important;
+        stroke-width: 1.6px !important;
+        vector-effect: non-scaling-stroke;
+      }
+      .fragmento-pdf-locked path,
+      .fragmento-pdf-locked polygon,
+      .fragmento-pdf-locked rect,
+      .fragmento-pdf-locked circle,
+      .fragmento-pdf-locked ellipse {
+        fill: #c8d9ff !important;
+        stroke: #2563eb !important;
+        stroke-width: 1.5px !important;
+        vector-effect: non-scaling-stroke;
+      }
+      .fragmento-pdf-selected text,
+      .fragmento-pdf-locked text {
+        fill: #111827 !important;
+      }
+      .component-hitbox {
+        fill: transparent !important;
+        stroke: transparent !important;
+        opacity: 0 !important;
+      }
+    </style>
+  `.trim();
+
+  return String(markup || "").replace(/<svg\b([^>]*)>/i, (match, attrs) => {
+    const nextAttrs = /\bxmlns=/.test(attrs)
+      ? attrs
+      : `${attrs} xmlns="http://www.w3.org/2000/svg"`;
+    return `<svg${nextAttrs}>${styles}`;
+  });
+}
+
+function applyPurchasedKitchenSelectionToSvg(markup, order) {
+  const { selectedComponentIds, lockedComponentIds } = buildPurchasedKitchenPdfSelectionState(order);
+  let nextMarkup = injectPurchasedKitchenPdfStyles(markup);
+
+  for (const componentId of selectedComponentIds) {
+    nextMarkup = markSvgComponentGroup(nextMarkup, componentId, "fragmento-pdf-selected");
+  }
+
+  for (const componentId of lockedComponentIds) {
+    nextMarkup = markSvgComponentGroup(nextMarkup, componentId, "fragmento-pdf-locked");
+  }
+
+  return nextMarkup;
+}
+
+function hotspotBounds(definition) {
+  const points = Array.isArray(definition?.points) ? definition.points : [];
+  if (points.length) {
+    const xs = points.map((point) => Number(point[0])).filter(Number.isFinite);
+    const ys = points.map((point) => Number(point[1])).filter(Number.isFinite);
+    return {
+      left: Math.min(...xs),
+      top: Math.min(...ys),
+      right: Math.max(...xs),
+      bottom: Math.max(...ys),
+    };
+  }
+
+  const left = Number(definition?.left || 0);
+  const top = Number(definition?.top || 0);
+  return {
+    left,
+    top,
+    right: left + Number(definition?.width || 0),
+    bottom: top + Number(definition?.height || 0),
+  };
+}
+
+function getKitchenPlanDisplayCrop(hotspots = []) {
+  if (!hotspots.length) return { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 };
+
+  const bounds = hotspots.reduce(
+    (current, hotspot) => {
+      const box = hotspotBounds(hotspot);
+      return {
+        left: Math.min(current.left, box.left),
+        top: Math.min(current.top, box.top),
+        right: Math.max(current.right, box.right),
+        bottom: Math.max(current.bottom, box.bottom),
+      };
+    },
+    { left: 100, top: 100, right: 0, bottom: 0 },
+  );
+  const trailingX = 100 - bounds.right;
+  const trailingY = 100 - bounds.bottom;
+  const left = Math.max(0, bounds.left - Math.max(2.6, bounds.left * 0.6));
+  const top = Math.max(0, bounds.top - Math.max(4, bounds.top * 0.5));
+  const right = Math.min(99.5, bounds.right + Math.max(3.2, trailingX * 0.92));
+  const bottom = Math.min(99.5, bounds.bottom + Math.max(1, trailingY * 0.85));
+
+  return {
+    left,
+    top,
+    right,
+    bottom,
+    width: Math.max(right - left, 1),
+    height: Math.max(bottom - top, 1),
+  };
+}
+
+function pointsToOverlayPolygon(points, crop, width, height) {
+  return points
+    .map(([x, y]) => {
+      const px = ((Number(x) - crop.left) / crop.width) * width;
+      const py = ((Number(y) - crop.top) / crop.height) * height;
+      return `${Math.round(px * 100) / 100},${Math.round(py * 100) / 100}`;
+    })
+    .join(" ");
+}
+
+function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height }) {
+  const { selectedComponentKeys, lockedComponentKeys } = buildPurchasedKitchenPdfSelectionState(order);
+  const shapes = [];
+
+  for (const hotspot of hotspots) {
+    const componentKey = String(hotspot?.componentKey || "").trim();
+    const isLocked = lockedComponentKeys.has(componentKey);
+    const isSelected = isLocked || selectedComponentKeys.has(componentKey);
+    if (!isSelected) continue;
+
+    const fill = isLocked ? "rgba(37,99,235,0.26)" : "rgba(62,188,116,0.34)";
+    const stroke = isLocked ? "rgba(37,99,235,0.9)" : "rgba(42,145,85,1)";
+    const points = Array.isArray(hotspot.points) ? hotspot.points : [];
+
+    if (points.length) {
+      shapes.push(
+        `<polygon points="${pointsToOverlayPolygon(points, crop, width, height)}" fill="${fill}" stroke="${stroke}" stroke-width="2.2"/>`,
+      );
+      continue;
+    }
+
+    const x = ((Number(hotspot.left || 0) - crop.left) / crop.width) * width;
+    const y = ((Number(hotspot.top || 0) - crop.top) / crop.height) * height;
+    const rectWidth = (Number(hotspot.width || 0) / crop.width) * width;
+    const rectHeight = (Number(hotspot.height || 0) / crop.height) * height;
+    shapes.push(
+      `<rect x="${x}" y="${y}" width="${rectWidth}" height="${rectHeight}" rx="8" ry="8" fill="${fill}" stroke="${stroke}" stroke-width="2.2"/>`,
+    );
+  }
+
+  if (!shapes.length) return null;
+  return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes.join("")}</svg>`);
+}
+
+async function renderPurchasedKitchenImagePlanPng(order, source) {
+  const slug = normalizeKitchenSlug(order?.kitchen?.slug);
+  const previewData = await loadKitchenPlanPreviewData().catch(() => null);
+  const hotspots = previewData?.hotspotsBySlug?.[slug] || [];
+  if (!hotspots.length) return null;
+
+  const rendered = await sharp(source).png().toBuffer({ resolveWithObject: true });
+  const crop = getKitchenPlanDisplayCrop(hotspots);
+  const extractLeft = Math.max(0, Math.floor((crop.left / 100) * rendered.info.width));
+  const extractTop = Math.max(0, Math.floor((crop.top / 100) * rendered.info.height));
+  const extractWidth = Math.min(rendered.info.width - extractLeft, Math.ceil((crop.width / 100) * rendered.info.width));
+  const extractHeight = Math.min(rendered.info.height - extractTop, Math.ceil((crop.height / 100) * rendered.info.height));
+  const finalWidth = 1400;
+  const finalHeight = Math.round(finalWidth * (extractHeight / extractWidth));
+  const overlay = buildPurchasedKitchenOverlaySvg({
+    order,
+    hotspots,
+    crop,
+    width: finalWidth,
+    height: finalHeight,
+  });
+
+  const pipeline = sharp(rendered.data)
+    .extract({ left: extractLeft, top: extractTop, width: extractWidth, height: extractHeight })
+    .resize({ width: finalWidth })
+    .png();
+
+  const output = overlay
+    ? await pipeline.composite([{ input: overlay, left: 0, top: 0 }]).toBuffer({ resolveWithObject: true })
+    : await pipeline.toBuffer({ resolveWithObject: true });
+
+  return {
+    content: output.data,
+    width: output.info.width,
+    height: output.info.height,
+  };
+}
+
+async function loadPurchasedKitchenSketchPng(order) {
+  const sketchPath = await resolvePurchasedKitchenSketchPath(order);
+  if (!sketchPath) return null;
+
+  const isSvg = path.extname(sketchPath).toLowerCase() === ".svg";
+  const rawSource = isSvg
+    ? Buffer.from(applyPurchasedKitchenSelectionToSvg(await fs.readFile(sketchPath, "utf8"), order))
+    : await fs.readFile(sketchPath);
+  const imagePlan = await renderPurchasedKitchenImagePlanPng(order, rawSource);
+  if (imagePlan) {
+    return {
+      ...imagePlan,
+      sourcePath: sketchPath,
+    };
+  }
+
+  const { data, info } = await sharp(rawSource)
+    .resize({ width: 1400, withoutEnlargement: true })
+    .png()
+    .toBuffer({ resolveWithObject: true });
+
+  return {
+    content: data,
+    width: info.width,
+    height: info.height,
+    sourcePath: sketchPath,
+  };
 }
 
 function getMappedProductImagePath(item) {
@@ -747,6 +1219,115 @@ export async function generateOrderConfirmationPdf(order) {
   };
 }
 
+function buildPurchasedKitchenFilename(order) {
+  const orderNumber = String(order?.orderNumber || "").trim();
+  return `Gekaufte-Kueche${orderNumber ? `-${orderNumber}` : ""}.pdf`;
+}
+
+function drawWrappedPdfText(doc, text, x, y, maxWidth, lineHeight) {
+  const lines = doc.splitTextToSize(String(text || ""), maxWidth);
+  lines.forEach((line, index) => {
+    doc.text(line, x, y + index * lineHeight);
+  });
+  return y + lines.length * lineHeight;
+}
+
+export async function generatePurchasedKitchenPdf(order) {
+  const sketch = await loadPurchasedKitchenSketchPng(order);
+  if (!sketch?.content?.length) {
+    return null;
+  }
+
+  const doc = new jsPDF({ unit: "pt" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const margin = 40;
+  const contentBottom = pageHeight - LETTERHEAD.footerHeight - LETTERHEAD.contentBottomPadding;
+  let y = LETTERHEAD.contentTop;
+
+  doc.setTextColor(0, 0, 0);
+  doc.setFont("helvetica", "bold").setFontSize(22);
+  doc.text("Ihre gekaufte Küche", pageWidth - margin, y + 4, { align: "right" });
+  drawSenderAddressBlock(doc, pageWidth - margin, y + 31);
+  y += 92;
+
+  doc.setFont("helvetica", "bold").setFontSize(13);
+  doc.text(order?.kitchen?.name || "Küche", margin, y);
+  y += 22;
+
+  doc.setFont("helvetica", "normal").setFontSize(10);
+  const details = [
+    ["Bestellnummer", order.orderNumber || "-"],
+    ["Küchenvertrags-Nr.", order.customer?.contractNumber || "-"],
+    ["Datum", formatPdfDate(order.createdAt || new Date())],
+  ];
+  details.forEach(([label, value]) => {
+    doc.setFont("helvetica", "bold");
+    doc.text(`${label}:`, margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(value), margin + 110, y);
+    y += 14;
+  });
+
+  y += 14;
+  doc.setFont("helvetica", "normal").setFontSize(11);
+  y = drawWrappedPdfText(
+    doc,
+    "Vielen Dank für Ihre Bestellung. Die untenstehende Skizze zeigt die von Ihnen gekaufte Küche gemäß Ihrer Auswahl und der Bestellbestätigung.",
+    margin,
+    y,
+    pageWidth - margin * 2,
+    15,
+  );
+  y += 22;
+
+  doc.setFont("helvetica", "bold").setFontSize(12);
+  doc.text("Küchenskizze", margin, y);
+  y += 12;
+
+  const boxX = margin;
+  const boxY = y;
+  const boxWidth = pageWidth - margin * 2;
+  const boxHeight = Math.max(160, contentBottom - boxY - 52);
+  const imageRatio = sketch.width / sketch.height;
+  const boxRatio = boxWidth / boxHeight;
+  const imageWidth = imageRatio > boxRatio ? boxWidth : boxHeight * imageRatio;
+  const imageHeight = imageRatio > boxRatio ? boxWidth / imageRatio : boxHeight;
+  const imageX = boxX + (boxWidth - imageWidth) / 2;
+  const imageY = boxY + (boxHeight - imageHeight) / 2;
+
+  doc.setDrawColor(224, 224, 224);
+  doc.setFillColor(255, 255, 255);
+  doc.rect(boxX, boxY, boxWidth, boxHeight, "FD");
+  doc.addImage(
+    `data:image/png;base64,${sketch.content.toString("base64")}`,
+    "PNG",
+    imageX,
+    imageY,
+    imageWidth,
+    imageHeight,
+  );
+
+  y = boxY + boxHeight + 18;
+  doc.setFont("helvetica", "normal").setFontSize(9);
+  doc.setTextColor(90, 90, 90);
+  drawWrappedPdfText(
+    doc,
+    "Diese Unterlage dient als Übersicht zur gekauften Küche. Maßgeblich sind die Bestellbestätigung sowie die vereinbarten Vertrags- und Lieferunterlagen.",
+    margin,
+    y,
+    pageWidth - margin * 2,
+    12,
+  );
+
+  const pdfBytes = await applyArchitectoLetterheadTemplate(doc.output("arraybuffer"));
+
+  return {
+    base64: Buffer.from(pdfBytes).toString("base64"),
+    filename: buildPurchasedKitchenFilename(order),
+  };
+}
+
 export function buildOrderSummaryHtml(order) {
   const tableStyles = "width:100%;border-collapse:collapse;font-family:Arial,sans-serif;margin-bottom:25px;";
   const thStyles =
@@ -947,6 +1528,19 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
       content: Buffer.from(effectivePdfBase64, "base64"),
       contentType: "application/pdf",
     });
+  }
+
+  try {
+    const purchasedKitchenPdf = await generatePurchasedKitchenPdf(order);
+    if (purchasedKitchenPdf?.base64) {
+      attachments.push({
+        filename: purchasedKitchenPdf.filename,
+        content: Buffer.from(purchasedKitchenPdf.base64, "base64"),
+        contentType: "application/pdf",
+      });
+    }
+  } catch (error) {
+    console.warn(`Could not attach purchased kitchen PDF for ${order.orderNumber}:`, error.message);
   }
 
   const productInfo = await loadProductInfoAttachments(order);

@@ -212,6 +212,7 @@ export function buildOrderForNotifications(orderRecord) {
       nameDe: cutleryLine ? cutleryVariant?.nameDe || displayName : item.nameDe || item.kitchenItem?.nameDe || "",
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
+      isLocked: Boolean(item.kitchenItem?.isLocked || item.isLocked),
       iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
       componentKey: item.kitchenItem?.componentKey || item.componentKey || "",
       productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
