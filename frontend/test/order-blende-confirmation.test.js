@@ -4,6 +4,7 @@ import {
   buildOrderConfirmationRecipients,
   buildOrderConfirmationEmailStaticHtml,
   buildOrderSummaryHtml,
+  generatePurchasedKitchenPdf,
 } from "../lib/email/order-notifications.js";
 
 test("order confirmation recipients include the sender as a copy", () => {
@@ -20,6 +21,26 @@ import { getPreferredDeliveryDateAfterWeeks } from "../lib/preferred-delivery.js
 
 test("preferred delivery week dates move weekends to Monday", () => {
   assert.equal(getPreferredDeliveryDateAfterWeeks(4, "2026-07-05"), "2026-08-03");
+});
+
+test("order confirmation can generate purchased kitchen sketch attachment", async () => {
+  const pdf = await generatePurchasedKitchenPdf({
+    orderNumber: "FRG-TEST-005",
+    createdAt: "2026-07-01T10:00:00.000Z",
+    kitchen: {
+      slug: "ab-105806",
+      name: "AB 105806 Kitchen",
+    },
+    customer: {
+      contractNumber: "670105806",
+    },
+  });
+
+  assert.ok(pdf);
+  assert.equal(pdf.filename, "Gekaufte-Kueche-FRG-TEST-005.pdf");
+  const bytes = Buffer.from(pdf.base64, "base64");
+  assert.equal(bytes.subarray(0, 4).toString("utf8"), "%PDF");
+  assert.ok(bytes.length > 10000);
 });
 
 test("order confirmation summary renders blende as a cabinet subtitle", () => {
