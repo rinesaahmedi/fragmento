@@ -39,6 +39,14 @@ function formatBoolean(value) {
 
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
 
+function formatDimensionInputValue(value) {
+  const cm = Number(value) / 10;
+  if (!Number.isFinite(cm)) return "";
+  return Number.isInteger(cm)
+    ? String(cm)
+    : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
+}
+
 function CatalogArticleForm({ action, article, submitLabel }) {
   return (
     <form action={action} method="post" style={articleFormStyle}>
@@ -62,14 +70,14 @@ function CatalogArticleForm({ action, article, submitLabel }) {
         <FormField label="Price">
           <input name="price" defaultValue={article ? formatMoney(article.price) : "0.00"} style={inputStyle} required />
         </FormField>
-        <FormField label="Width mm">
-          <input name="widthMm" defaultValue={article?.widthMm ?? ""} style={inputStyle} />
+        <FormField label="Width cm">
+          <input name="widthMm" defaultValue={formatDimensionInputValue(article?.widthMm)} style={inputStyle} />
         </FormField>
-        <FormField label="Height mm">
-          <input name="heightMm" defaultValue={article?.heightMm ?? ""} style={inputStyle} />
+        <FormField label="Height cm">
+          <input name="heightMm" defaultValue={formatDimensionInputValue(article?.heightMm)} style={inputStyle} />
         </FormField>
-        <FormField label="Depth mm">
-          <input name="depthMm" defaultValue={article?.depthMm ?? ""} style={inputStyle} />
+        <FormField label="Depth cm">
+          <input name="depthMm" defaultValue={formatDimensionInputValue(article?.depthMm)} style={inputStyle} />
         </FormField>
         <FormField label="Fixed package">
           <AdminSelect name="isFixedPricePackage" defaultValue={article?.isFixedPricePackage ? "true" : ""} style={inputStyle}>
@@ -152,7 +160,11 @@ function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems 
 }
 
 function formatDimensionPart(value) {
-  return Number.isFinite(Number(value)) ? String(Number(value)) : "-";
+  const cm = Number(value) / 10;
+  if (!Number.isFinite(cm)) return "-";
+  return Number.isInteger(cm)
+    ? String(cm)
+    : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
 function formatDimensions(article) {
@@ -161,7 +173,7 @@ function formatDimensions(article) {
     formatDimensionPart(article.widthMm),
     formatDimensionPart(article.heightMm),
     formatDimensionPart(article.depthMm),
-  ].join(" x ") + " mm";
+  ].join(" x ") + " cm";
 }
 
 export default async function AdminCatalogArticlesPage({ searchParams }) {

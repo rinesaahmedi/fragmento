@@ -12,7 +12,11 @@ function formatBoolean(value) {
 }
 
 function formatDimensionPart(value) {
-  return Number.isFinite(Number(value)) ? String(Number(value)) : "";
+  const cm = Number(value) / 10;
+  if (!Number.isFinite(cm)) return "";
+  return Number.isInteger(cm)
+    ? String(cm)
+    : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
 function formatDimensions(row) {
@@ -21,7 +25,7 @@ function formatDimensions(row) {
     formatDimensionPart(row.widthMm),
     formatDimensionPart(row.heightMm),
     formatDimensionPart(row.depthMm),
-  ].join(" x ") + " mm";
+  ].join(" x ") + " cm";
 }
 
 function appendSheet(workbook, sheetName, rows, widths) {
@@ -95,15 +99,15 @@ export async function GET() {
     workbook,
     "Articles",
     [
-      ["Article number", "Name", "German name", "Description", "Width mm", "Height mm", "Depth mm", "Dimensions W x H x D", "Item type", "Price", "Fixed package", "Active", "Linked KitchenItems"],
+      ["Article number", "Name", "German name", "Description", "Width cm", "Height cm", "Depth cm", "Dimensions W x H x D", "Item type", "Price", "Fixed package", "Active", "Linked KitchenItems"],
       ...articles.map((article) => [
         article.articleNumber,
         article.name,
         article.nameDe || "",
         article.description || "",
-        article.widthMm ?? "",
-        article.heightMm ?? "",
-        article.depthMm ?? "",
+        formatDimensionPart(article.widthMm),
+        formatDimensionPart(article.heightMm),
+        formatDimensionPart(article.depthMm),
         formatDimensions(article),
         article.itemType,
         formatMoney(article.price),

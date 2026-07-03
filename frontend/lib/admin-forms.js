@@ -105,6 +105,19 @@ function validateOptionalNonNegativeInteger(value, label) {
   return parsed;
 }
 
+function validateOptionalNonNegativeCentimetersAsMillimeters(value, label) {
+  const rawValue = String(value ?? "").trim().replace(",", ".");
+  if (!rawValue) return null;
+  if (!/^\d+(?:\.\d{1,2})?$/.test(rawValue)) {
+    throw new Error(`${label} must be a number in centimeters.`);
+  }
+  const centimeters = Number(rawValue);
+  if (!Number.isFinite(centimeters) || centimeters < 0) {
+    throw new Error(`${label} must be a number in centimeters.`);
+  }
+  return Math.round(centimeters * 10);
+}
+
 export const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
 
 export function validateKitchenInput(formData, options = {}) {
@@ -168,9 +181,9 @@ export function validateCatalogArticleInput(formData) {
     name: requiredString(formData.get("name"), "Article name"),
     nameDe: optionalString(formData.get("nameDe")),
     description: optionalString(formData.get("description")),
-    widthMm: validateOptionalNonNegativeInteger(formData.get("widthMm"), "Width"),
-    heightMm: validateOptionalNonNegativeInteger(formData.get("heightMm"), "Height"),
-    depthMm: validateOptionalNonNegativeInteger(formData.get("depthMm"), "Depth"),
+    widthMm: validateOptionalNonNegativeCentimetersAsMillimeters(formData.get("widthMm"), "Width"),
+    heightMm: validateOptionalNonNegativeCentimetersAsMillimeters(formData.get("heightMm"), "Height"),
+    depthMm: validateOptionalNonNegativeCentimetersAsMillimeters(formData.get("depthMm"), "Depth"),
     price: validatePrice(formData.get("price")),
     itemType: parseItemType(String(formData.get("itemType") || "")),
     isFixedPricePackage: formData.get("isFixedPricePackage") === "true",

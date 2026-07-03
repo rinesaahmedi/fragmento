@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -110,9 +110,9 @@ const KITCHEN_ELEMENT_LABEL_KEYS = {
   "oberschrank (mittig links)": ["dashboard.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"],
   "oberschrank (mittig rechts)": ["dashboard.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"],
   "oberschrank (rechts)": ["dashboard.catalogItemNames.wallCabinetRight", "Wall Cabinet right"],
-  "hood wall cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"],
-  "extractor hood upper cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"],
-  "upper cabinet with extractor hood 60": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"],
+  "hood wall cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"],
+  "extractor hood upper cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"],
+  "upper cabinet with extractor hood 60 cm": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"],
   "extractor hood": ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
   dunstabzugshaube: ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
   "fh664621e extractor hood": ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],

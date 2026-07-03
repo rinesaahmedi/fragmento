@@ -158,11 +158,11 @@ export function formatCabinetWidthLabel(kind, widthMm, language = "en") {
     ? String(widthCm)
     : String(Number(widthCm.toFixed(2))).replace(/\.0+$/, "");
   if (language === "de") {
-    return kind === "lower" ? `Unterschrank mit Schublade ${widthLabel}` : `Oberschrank ${widthLabel}`;
+    return kind === "lower" ? `Unterschrank mit Schublade ${widthLabel} cm` : `Oberschrank ${widthLabel} cm`;
   }
   return kind === "lower"
-    ? `Lower Cabinet with Drawer ${widthLabel}`
-    : `Upper Cabinet ${widthLabel}`;
+    ? `Lower Cabinet with Drawer ${widthLabel} cm`
+    : `Upper Cabinet ${widthLabel} cm`;
 }
 
 export function getCabinetWidthDisplayName(item, language = "en") {

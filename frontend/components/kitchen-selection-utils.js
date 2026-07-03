@@ -75,10 +75,15 @@ export function getStructuredDimensions(item) {
     (value) => value !== null && value !== undefined && value !== "",
   );
   if (!values.length) return "";
-  if (item?.componentKey === "refrigerator") {
-    return `${values.map((value) => Number(value) / 10).join(" x ")} cm`;
-  }
-  return `${values.join(" x ")} mm`;
+  return `${values.map(formatDimensionCmPart).join(" x ")} cm`;
+}
+
+export function formatDimensionCmPart(value) {
+  const cm = Number(value) / 10;
+  if (!Number.isFinite(cm)) return "-";
+  return Number.isInteger(cm)
+    ? String(cm)
+    : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
 export function splitCatalogItemNameAndDimensions(name) {
@@ -443,7 +448,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105825-600":
     case "CAB-HOOD-AB105828-600":
     case "CAB-HOOD-AB105831-600":
-      return withPhotoNumber(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"));
+      return withPhotoNumber(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-C-ML-600":
