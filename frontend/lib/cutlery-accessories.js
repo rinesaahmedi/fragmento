@@ -1,3 +1,5 @@
+import { getCabinetKind, getCabinetWidthMm } from "./cabinet-name-utils.js";
+
 export const CUTLERY_VARIANTS = [
   { articleNumber: "ZB30SG", widthCm: 30, price: 19 },
   { articleNumber: "ZB40SG", widthCm: 40, price: 19 },
@@ -25,25 +27,61 @@ function inferCutleryWidthCm(articleNumber, fallbackName = "") {
 
 export function normalizeCutleryVariants(variants = []) {
   const merged = new Map();
+  const defaultsByArticleNumber = new Map(
+    CUTLERY_VARIANTS.map((variant) => [normalizeArticleNumber(variant.articleNumber), variant]),
+  );
 
-  for (const variant of [...CUTLERY_VARIANTS, ...variants]) {
+  for (const variant of variants) {
     const articleNumber = normalizeArticleNumber(variant?.articleNumber);
     if (!articleNumber) continue;
 
-    const widthCm = Number(variant?.widthCm || inferCutleryWidthCm(articleNumber, variant?.name || variant?.nameDe));
+    const fallback = defaultsByArticleNumber.get(articleNumber);
+    const widthCm = Number(
+      variant?.widthCm || fallback?.widthCm || inferCutleryWidthCm(articleNumber, variant?.name || variant?.nameDe),
+    );
     if (!Number.isFinite(widthCm) || widthCm <= 0) continue;
 
     merged.set(articleNumber, {
+      ...fallback,
       ...variant,
       articleNumber,
       widthCm,
-      price: Number(variant?.price || 0),
-      name: String(variant?.name || `Cutlery insert ${widthCm} cm`).trim(),
-      nameDe: String(variant?.nameDe || `Besteckeinsatz ${widthCm} cm`).trim(),
+      price: Number(variant?.price || fallback?.price || 0),
+      maxQuantity: Number.isFinite(Number(variant?.maxQuantity)) && Number(variant.maxQuantity) > 0
+        ? Math.floor(Number(variant.maxQuantity))
+        : null,
+      name: String(variant?.name || fallback?.name || `Cutlery insert ${widthCm} cm`).trim(),
+      nameDe: String(variant?.nameDe || fallback?.nameDe || `Besteckeinsatz ${widthCm} cm`).trim(),
     });
   }
 
   return [...merged.values()].sort((left, right) => left.widthCm - right.widthCm);
+}
+
+export function getAvailableCutleryVariantsForComponents(components = [], variants = CUTLERY_VARIANTS) {
+  const widthCounts = new Map();
+
+  for (const item of components || []) {
+    if (getCabinetKind(item) !== "lower") continue;
+
+    const widthMm = getCabinetWidthMm(item);
+    const widthCm = Number(widthMm) / 10;
+    if (!Number.isFinite(widthCm) || widthCm <= 0) continue;
+
+    const key = Number.isInteger(widthCm)
+      ? String(widthCm)
+      : String(Number(widthCm.toFixed(2))).replace(/\.0+$/, "");
+    widthCounts.set(key, (widthCounts.get(key) || 0) + 1);
+  }
+
+  const available = normalizeCutleryVariants(variants)
+    .filter((variant) => widthCounts.has(String(variant.widthCm)))
+    .map((variant) => ({
+      ...variant,
+      maxQuantity: widthCounts.get(String(variant.widthCm)) || 1,
+    }));
+
+  return available.length ? available : [];
 }
 
 export function isCutleryAccessoryCode(code) {
@@ -88,10 +126,11 @@ export function normalizeCutleryLines(lines = [], variants = CUTLERY_VARIANTS) {
     const variant = getCutleryVariant(articleNumber, normalizedVariants);
     if (!variant) continue;
 
-    const quantity = Math.max(1, Math.min(99, Math.floor(Number(line?.quantity || 1))));
+    const maxQuantity = Math.max(1, Math.floor(Number(variant.maxQuantity || 99)));
+    const quantity = Math.max(1, Math.min(maxQuantity, Math.floor(Number(line?.quantity || 1))));
     const existing = merged.get(articleNumber);
     if (existing) {
-      existing.quantity = Math.min(99, existing.quantity + quantity);
+      existing.quantity = Math.min(maxQuantity, existing.quantity + quantity);
       continue;
     }
 

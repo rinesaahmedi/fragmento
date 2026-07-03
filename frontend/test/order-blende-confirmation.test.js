@@ -182,7 +182,7 @@ test("order confirmation product-info attachments exclude default zero-price ite
       },
       {
         code: "REF-AB105806-KGCN388140E",
-        name: "Freestanding refrigerator 178cm",
+        name: "Freestanding refrigerator 178 cm",
         nameDe: "Standkühlschrank 178 cm",
         price: 579,
         productInfoPdfPath: "legal/architecto-agb-2026.pdf",
@@ -212,7 +212,7 @@ test("order confirmation product-info attachments exclude default zero-price ite
   assert.match(staticHtml.html, /Besteckeinsatz 60 cm x 3/);
   assert.match(staticHtml.html, /Typen-Nr\.: ZB60SG/);
   assert.equal(staticHtml.html.includes("Fully integrated dishwasher"), false);
-  assert.equal(staticHtml.html.includes("Freestanding refrigerator 178cm"), false);
+  assert.equal(staticHtml.html.includes("Freestanding refrigerator 178 cm"), false);
   assert.equal(staticHtml.html.includes("Built-in oven and induction hob"), false);
 });
 

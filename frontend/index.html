@@ -3261,7 +3261,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
     const icons = {
         dishwasher: `<img src="img/foto3.png" alt="Spülmaschine">`,
         refrigerator: `<img src="img/foto6.png" alt="Kühlschrank">`,
-        base_cabinet_30: `<img src="img/foto1.png" alt="Unterschrank 30cm">`,
+        base_cabinet_30: `<img src="img/foto1.png" alt="Unterschrank 30 cm">`,
         wall_cabinet_l: `<img src="img/foto4.png" alt="Oberschrank links">`,
         wall_cabinet_r: `<img src="img/foto2.png" alt="Oberschrank rechts">`,
         extractor_hood: `<img src="img/foto5.png" alt="Dunstabzugshaube">`,
@@ -3276,7 +3276,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
         const dataMap = {
             "#001f7f": { name: "Spülmaschine", icon: icons.dishwasher, price: 579, infoText: "Amica by architecto" },
             "black": { name: "Kühlschrank", icon: icons.refrigerator, price: 579, infoText: "Amica by architecto" },
-            "#ffbf00": { name: "Unterschrank 30cm", icon: icons.base_cabinet_30, price: 175 },
+            "#ffbf00": { name: "Unterschrank 30 cm", icon: icons.base_cabinet_30, price: 175 },
             "#00ffbf": { name: "Oberschrank (links)", icon: icons.wall_cabinet_l, price: 115 },
             "#394c00": { name: "Oberschrank (rechts)", icon: icons.wall_cabinet_r, price: 115 },
             "#ff7f9f": { name: "Dunstabzugshaube", icon: icons.extractor_hood, price: 349, infoText: "Amica by architecto"},
@@ -3348,7 +3348,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
 
     const accessories = [
         { id: 'acc-waste', name: 'Mülltrennsystem', price: 89, icon: icons.waste_system },
-        { id: 'acc-cutlery', name: 'Besteckeinsatz 30cm', price: 19, icon: icons.cutlery_insert },
+        { id: 'acc-cutlery', name: 'Besteckeinsatz 30 cm', price: 19, icon: icons.cutlery_insert },
         { id: 'acc-lighting', name: 'Beleuchtungsset 3 LED-Spots', price: 69, icon: icons.lighting_set },
     ];
     const services = [
@@ -3386,7 +3386,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
     // --- HELPER FUNCTIONS FOR VALIDATION ---
 
     function areMontageConditionsMet() {
-        const cabinetNames = ["Unterschrank 30cm", "Oberschrank (links)", "Oberschrank (rechts)"];
+        const cabinetNames = ["Unterschrank 30 cm", "Oberschrank (links)", "Oberschrank (rechts)"];
         const selectedComponents = document.querySelectorAll('#combined-list .component-item.selected');
         let cabinetCount = 0;
         let merchandise = 0;
@@ -3890,7 +3890,7 @@ Entdecke passende Schränke und Elektrogeräte, mit Transport bis zu deiner Wohn
       const montageService = orderSelections.services.find(s => s.name.includes('Montage'));
       
       if (montageService) {
-          const cabinetNames = ["Unterschrank 30cm", "Oberschrank (links)", "Oberschrank (rechts)"];
+          const cabinetNames = ["Unterschrank 30 cm", "Oberschrank (links)", "Oberschrank (rechts)"];
           const { components, accessories } = orderSelections;
           const merchandise = [...components, ...accessories]
             .filter((i) => !i.merchandiseLocked)
