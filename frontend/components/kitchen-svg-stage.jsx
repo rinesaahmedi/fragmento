@@ -1751,7 +1751,11 @@ export default function KitchenSvgStage({
                           style={hotspotStyle}
                           aria-pressed={isSelected}
                           aria-label={hotspot.label}
-                          title={`${hotspot.componentKey} — left:${hotspot.left} top:${hotspot.top} width:${hotspot.width} height:${hotspot.height}`}
+                          title={
+                            isCalibrating
+                              ? `${hotspot.componentKey} — left:${hotspot.left} top:${hotspot.top} width:${hotspot.width} height:${hotspot.height}`
+                              : hotspot.label
+                          }
                           disabled={isFixed}
                           onMouseEnter={() => setHoveredComponentId(hotspot.componentId)}
                           onMouseLeave={() =>

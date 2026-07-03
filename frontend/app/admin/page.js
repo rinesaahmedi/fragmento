@@ -1,4 +1,4 @@
-import { AdminShell } from "../../components/admin-shell";
+﻿import { AdminShell } from "../../components/admin-shell";
 import { AdminDashboardCharts } from "../../components/admin-dashboard-charts";
 import { listKitchensForAdmin } from "../../lib/catalog";
 import { showAdminClaimsInNav } from "../../lib/admin-claims-access";
@@ -39,17 +39,17 @@ const ARTICLE_NUMBER_BY_CODE = {
 const TOP_ITEM_GROUP_METADATA_BY_ARTICLE_NUMBER = {
   EWA34660W: {
     preferredCode: "WM-B-EWA34660W",
-    preferredName: "Washing Machine (600 x 600 x 878 mm)",
+    preferredName: "Washing Machine (60 x 60 x 87.8 cm)",
     preferredItemType: "COMPONENT",
   },
   "A-EGSPV597210": {
     preferredCode: "DISH-B-600-STD",
-    preferredName: "Dishwasher (600 x 600 x 878 mm)",
+    preferredName: "Dishwasher (60 x 60 x 87.8 cm)",
     preferredItemType: "COMPONENT",
   },
   "KGC 15495 S": {
     preferredCode: "REF-B-545-1800-700",
-    preferredName: "Refrigerator (545 x 1800 x 700 mm)",
+    preferredName: "Refrigerator (54.5 x 180 x 70 cm)",
     preferredItemType: "COMPONENT",
   },
   FH664621E: {
@@ -77,73 +77,73 @@ const TOP_ITEM_GROUP_METADATA_BY_CODE = {
   "OVEN-B-600-HOB": {
     groupKey: "mapped:oven-600-hob",
     preferredCode: "OVEN-B-600-HOB",
-    preferredName: "Built-in Oven and Hob (600 x 600 x 878 mm)",
+    preferredName: "Built-in Oven and Hob (60 x 60 x 87.8 cm)",
     preferredItemType: "COMPONENT",
   },
   "OVEN-C-600-HOB": {
     groupKey: "mapped:oven-600-hob",
     preferredCode: "OVEN-B-600-HOB",
-    preferredName: "Built-in Oven and Hob (600 x 600 x 878 mm)",
+    preferredName: "Built-in Oven and Hob (60 x 60 x 87.8 cm)",
     preferredItemType: "COMPONENT",
   },
   "SINKBASE-B-600": {
     groupKey: "mapped:sinkbase-600",
     preferredCode: "SINKBASE-B-600",
-    preferredName: "Sink Base Cabinet (600 x 600 x 878 mm)",
+    preferredName: "Sink Base Cabinet (60 x 60 x 87.8 cm)",
     preferredItemType: "COMPONENT",
   },
   "SINKBASE-C-600": {
     groupKey: "mapped:sinkbase-600",
     preferredCode: "SINKBASE-B-600",
-    preferredName: "Sink Base Cabinet (600 x 600 x 878 mm)",
+    preferredName: "Sink Base Cabinet (60 x 60 x 87.8 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-B-L-600": {
     groupKey: "mapped:cab-wall-left-600",
     preferredCode: "CAB-WALL-B-L-600",
-    preferredName: "Wall Cabinet left (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet left (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-C-L-600": {
     groupKey: "mapped:cab-wall-left-600",
     preferredCode: "CAB-WALL-B-L-600",
-    preferredName: "Wall Cabinet left (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet left (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-B-ML-600": {
     groupKey: "mapped:cab-wall-mid-left-600",
     preferredCode: "CAB-WALL-B-ML-600",
-    preferredName: "Wall Cabinet mid-left (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet mid-left (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-C-ML-600": {
     groupKey: "mapped:cab-wall-mid-left-600",
     preferredCode: "CAB-WALL-B-ML-600",
-    preferredName: "Wall Cabinet mid-left (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet mid-left (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-B-MR-600": {
     groupKey: "mapped:cab-wall-mid-right-600",
     preferredCode: "CAB-WALL-B-MR-600",
-    preferredName: "Wall Cabinet mid-right (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet mid-right (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-C-MR-600": {
     groupKey: "mapped:cab-wall-mid-right-600",
     preferredCode: "CAB-WALL-B-MR-600",
-    preferredName: "Wall Cabinet mid-right (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet mid-right (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-B-R-600": {
     groupKey: "mapped:cab-wall-right-600",
     preferredCode: "CAB-WALL-B-R-600",
-    preferredName: "Wall Cabinet right (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet right (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
   "CAB-WALL-C-R-600": {
     groupKey: "mapped:cab-wall-right-600",
     preferredCode: "CAB-WALL-B-R-600",
-    preferredName: "Wall Cabinet right (600 x 723 x 320 mm)",
+    preferredName: "Wall Cabinet right (60 x 72.3 x 32 cm)",
     preferredItemType: "COMPONENT",
   },
 };

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAdminI18n } from "./admin-i18n";
 
@@ -10,7 +10,7 @@ const KITCHEN_AREA_NAMES = {
   "Wall Cabinet mid-left": "Oberschrank mittig links",
   "Wall Cabinet mid-right": "Oberschrank mittig rechts",
   "Wall Cabinet right": "Oberschrank rechts",
-  "Upper Cabinet with Extractor Hood 60": "Oberschrank für Flachschirmhaube 60",
+  "Upper Cabinet with Extractor Hood 60 cm": "Oberschrank für Flachschirmhaube 60 cm",
   "Extractor Hood": "Flachschirmhaube",
   "Chimney Extractor Hood": "Kamin-Dunstabzugshaube",
   "Washing Machine": "Waschmaschine",
