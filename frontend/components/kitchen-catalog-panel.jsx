@@ -122,7 +122,7 @@ function getCatalogCabinetIconWidthPx(item) {
   if (!Number.isFinite(widthMm) || widthMm <= 0) return null;
 
   const clampedWidth = Math.min(Math.max(widthMm, 300), 600);
-  return Math.round(34 + ((clampedWidth - 300) / 300) * 30);
+  return Math.round(29 + ((clampedWidth - 300) / 300) * 25);
 }
 
 function getCatalogIconMarkup(item, stretchWidthOnly) {
