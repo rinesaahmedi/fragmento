@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { normalizeContractNumber } from "../lib/kitchen-contracts";
 
 const LANGUAGE_OPTIONS = [
@@ -341,6 +341,7 @@ const ORDER_CONFIRMED_TEXT = {
 export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pageOpenTrackedRef = useRef(false);
   const [initialEntryState] = useState(() => getLegalReturnEntryState());
   const [selectedLanguage, setSelectedLanguage] = useState(
     initialEntryState?.selectedLanguage || (initialLanguage === "en" ? "en" : "de")
@@ -359,6 +360,31 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const confirmedOrderNumber = String(searchParams.get("order") || "").trim();
   const orderConfirmedText = ORDER_CONFIRMED_TEXT[selectedLanguage] || ORDER_CONFIRMED_TEXT.en;
   const shouldShowOrderConfirmedNotice = orderConfirmed && !isOrderConfirmedNoticeDismissed && screen === "language";
+
+  useEffect(() => {
+    if (pageOpenTrackedRef.current) {
+      return;
+    }
+
+    pageOpenTrackedRef.current = true;
+    const payload = JSON.stringify({
+      eventType: "PAGE_OPENED",
+      source: searchParams.get("source") || searchParams.get("utm_source") || "",
+      path: window.location.pathname,
+    });
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon("/api/public-visit-events", new Blob([payload], { type: "application/json" }));
+      return;
+    }
+
+    fetch("/api/public-visit-events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {});
+  }, [searchParams]);
 
   useEffect(() => {
     window.sessionStorage.setItem(
