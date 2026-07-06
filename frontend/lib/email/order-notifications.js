@@ -935,7 +935,8 @@ function buildNumberedRows(items = []) {
 }
 
 function getBlendeDisplayNameWithQuantity(item) {
-  const name = getItemDisplayName(item);
+  const rawName = getItemDisplayName(item);
+  const name = /^blende\b/i.test(rawName) ? rawName : `Blende ${rawName}`;
   const quantity = Math.max(1, Math.floor(Number(item?.blendeDisplayQuantity || item?.quantity || 1)));
   return quantity > 1 ? `${name} x ${quantity}` : name;
 }
@@ -1329,14 +1330,19 @@ export async function generatePurchasedKitchenPdf(order) {
 }
 
 export function buildOrderSummaryHtml(order) {
-  const tableStyles = "width:100%;border-collapse:collapse;font-family:Arial,sans-serif;margin-bottom:25px;";
+  const tableStyles = "width:100%;border-collapse:collapse;table-layout:fixed;font-family:Arial,sans-serif;margin-bottom:25px;background-color:#ffffff;";
   const thStyles =
-    "padding:12px 15px;border-bottom:2px solid #eaeaea;background-color:#f9f9f9;text-align:left;color:#333;";
-  const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;";
-  const subtleDividerTdStyles = "padding:12px 15px;border-bottom:1px solid #f7f7f7;color:#555;";
-  const priceColumnStyles = "width:96px;text-align:right;";
+    "padding:10px 8px;border-bottom:2px solid #eaeaea;background-color:#f9f9f9;text-align:left;color:#333;";
+  const tdStyles = "padding:10px 8px;border-bottom:1px solid #eaeaea;color:#555;background-color:#ffffff;";
+  const subtleDividerTdStyles = "padding:10px 8px;border-bottom:1px solid #f7f7f7;color:#555;background-color:#ffffff;";
+  const numberColumnStyles = "width:24px;";
+  const priceColumnStyles = "width:64px;text-align:right;";
   const priceThStyles = `${thStyles}${priceColumnStyles}`;
-  const priceTdStyles = `${tdStyles}${priceColumnStyles}font-weight:bold;vertical-align:top;`;
+  const priceTdStyles = `${tdStyles}${priceColumnStyles}font-weight:bold;vertical-align:top;white-space:nowrap;`;
+  const typeCellStyles = `${tdStyles}vertical-align:top;word-break:break-word;overflow-wrap:anywhere;`;
+  const subtleTypeCellStyles = `${subtleDividerTdStyles}vertical-align:top;word-break:break-word;overflow-wrap:anywhere;`;
+  const itemNameStyles = "font-size:14px;line-height:1.35;color:#555;word-break:break-word;overflow-wrap:anywhere;";
+  const itemCodeStyles = "font-size:12px;line-height:1.35;color:#777;word-break:break-word;overflow-wrap:anywhere;";
   const orderDetailsRows = [
     ["Auftragsnummer", order.orderNumber],
     ["Vertragsnummer", order.customer.contractNumber || "-"],
@@ -1356,26 +1362,28 @@ export function buildOrderSummaryHtml(order) {
         const productImagePath = getProductImagePathForEmail(item);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
         const imageHtml = imageCid
-          ? `<img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" style="width:72px;max-height:64px;object-fit:contain;border:1px solid #eaeaea;border-radius:6px;background:#fff;margin-right:12px;vertical-align:middle;" />`
+          ? `<td width="50" valign="top" bgcolor="#ffffff" style="width:50px;padding:0 6px 0 0;background-color:#ffffff;"><img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" width="46" style="display:block;width:46px;max-width:46px;max-height:46px;height:auto;object-fit:contain;border:1px solid #eaeaea;border-radius:5px;background-color:#ffffff;" /></td>`
           : "";
         const parentTdStyles = blendeItems.length ? subtleDividerTdStyles : tdStyles;
+        const parentTypeTdStyles = blendeItems.length ? subtleTypeCellStyles : typeCellStyles;
         const parentPriceTdStyles = `${parentTdStyles}${priceColumnStyles}font-weight:bold;vertical-align:top;`;
-        const parentRow = `<tr><td style="${parentTdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(rowNumber)}</td><td style="${parentTdStyles}"><div style="display:flex;align-items:flex-start;gap:12px;">${imageHtml}<div>${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="font-size:12px;color:#777;">Typen-Nr.: ${escapeHtml(getItemDisplayCode(item))}</span></div></div></td><td style="${parentPriceTdStyles}">${formatCurrency(item.price)}</td></tr>`;
+        const itemDetailsHtml = `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#ffffff" style="width:100%;border-collapse:collapse;table-layout:fixed;background-color:#ffffff;"><tr>${imageHtml}<td valign="top" bgcolor="#ffffff" style="padding:0;background-color:#ffffff;${itemNameStyles}">${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="${itemCodeStyles}">Typen-Nr.: ${escapeHtml(getItemDisplayCode(item))}</span></td></tr></table>`;
+        const parentRow = `<tr><td style="${parentTdStyles}${numberColumnStyles}font-weight:bold;vertical-align:top;">${escapeHtml(rowNumber)}</td><td style="${parentTypeTdStyles}">${itemDetailsHtml}</td><td style="${parentPriceTdStyles}white-space:nowrap;">${formatCurrency(item.price)}</td></tr>`;
         const blendeRows = blendeItems
-          .map((blendeItem) => `<tr><td style="${tdStyles};width:34px;font-weight:bold;vertical-align:top;">${escapeHtml(blendeItem.rowNumber)}</td><td style="${tdStyles}">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}<br><span style="font-size:12px;color:#777;">Typen-Nr.: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></td><td style="${priceTdStyles}">${formatCurrency(blendeItem.price)}</td></tr>`)
+          .map((blendeItem) => `<tr><td style="${tdStyles}${numberColumnStyles}font-weight:bold;vertical-align:top;">${escapeHtml(blendeItem.rowNumber)}</td><td style="${typeCellStyles}"><span style="${itemNameStyles}">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}</span><br><span style="${itemCodeStyles}">Typen-Nr.: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></td><td style="${priceTdStyles}">${formatCurrency(blendeItem.price)}</td></tr>`)
           .join("");
         return `${parentRow}${blendeRows}`;
       })
       .join("");
 
-    return `<h4 style="margin-top:0;">${title}</h4><table style="${tableStyles}"><thead><tr><th style="${thStyles};width:34px;">Nr.</th><th style="${thStyles}">Type</th><th style="${priceThStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
+    return `<h4 style="margin-top:0;">${title}</h4><table role="presentation" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="${tableStyles}"><thead><tr><th bgcolor="#f9f9f9" style="${thStyles}${numberColumnStyles}">Nr.</th><th bgcolor="#f9f9f9" style="${thStyles}">Type</th><th bgcolor="#f9f9f9" style="${priceThStyles}">Preis</th></tr></thead><tbody>${rows}</tbody></table>`;
   };
 
   return `
-    <div style="max-width:600px;margin:20px 0;font-family:Arial,sans-serif;color:#333;">
-      <div style="padding:20px;border:1px solid #ddd;border-radius:8px;">
+    <div bgcolor="#ffffff" style="max-width:600px;margin:20px 0;font-family:Arial,sans-serif;color:#333;background-color:#ffffff;">
+      <div bgcolor="#ffffff" style="padding:20px;border:1px solid #ddd;border-radius:8px;background-color:#ffffff;">
         <h4 style="margin-top:0;">Bestelldaten</h4>
-        <table style="${tableStyles}"><tbody>${orderDetailsRows}</tbody></table>
+        <table bgcolor="#ffffff" style="${tableStyles}"><tbody>${orderDetailsRows}</tbody></table>
         ${(() => {
           const { electricalItems, cabinetItems } = splitComponentItems(order.components);
           return [
@@ -1385,8 +1393,8 @@ export function buildOrderSummaryHtml(order) {
         })()}
         ${renderSection("Neu bestätigtes Zubehör", order.accessories, order.productImageCids)}
         ${renderSection("Neu bestätigte Dienstleistungen", order.services, order.productImageCids)}
-        <table style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;">
-          <tr><td style="text-align:right;font-size:1.3em;font-weight:bold;">Gesamtpreis: ${formatCurrency(
+        <table bgcolor="#ffffff" style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;background-color:#ffffff;">
+          <tr><td bgcolor="#ffffff" style="text-align:right;font-size:1.3em;font-weight:bold;background-color:#ffffff;color:#333;">Gesamtpreis: ${formatCurrency(
             order.total,
           )}</td></tr>
         </table>
@@ -1443,9 +1451,20 @@ function normalizeEmailAddress(value) {
   return String(value || "").trim();
 }
 
-export function buildOrderConfirmationRecipients(customerEmail, senderEmail) {
+function isTestOrderNumber(value) {
+  return String(value || "").trim().replace(/\s+/g, "").startsWith("111");
+}
+
+function shouldSuppressOrderSenderCopy(order) {
+  return isTestOrderNumber(order?.customer?.contractNumber) || isTestOrderNumber(order?.orderNumber);
+}
+
+export function buildOrderConfirmationRecipients(customerEmail, senderEmail, options = {}) {
   const to = normalizeEmailAddress(customerEmail);
   const sender = normalizeEmailAddress(senderEmail);
+  if (options.suppressSenderCopy) {
+    return { to };
+  }
   const cc = sender && sender.toLowerCase() !== to.toLowerCase() ? sender : "";
 
   return cc ? { to, cc } : { to };
@@ -1471,7 +1490,9 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
   const subject = String(overrides.subject || draft.subject).trim() || draft.subject;
   const bodyText = String(overrides.bodyText || draft.bodyText);
   const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
-  const recipients = buildOrderConfirmationRecipients(order.customer.email, overrides.senderEmail);
+  const recipients = buildOrderConfirmationRecipients(order.customer.email, overrides.senderEmail, {
+    suppressSenderCopy: shouldSuppressOrderSenderCopy(order),
+  });
 
   return {
     ...recipients,

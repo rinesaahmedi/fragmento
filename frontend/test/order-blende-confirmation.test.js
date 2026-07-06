@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildOrderConfirmationRecipients,
+  buildOrderConfirmationEmailPreview,
   buildOrderConfirmationEmailStaticHtml,
   buildOrderSummaryHtml,
   generatePurchasedKitchenPdf,
@@ -16,6 +17,40 @@ test("order confirmation recipients include the sender as a copy", () => {
     buildOrderConfirmationRecipients("315@gmail.com", "315@gmail.com"),
     { to: "315@gmail.com" },
   );
+});
+
+test("test order confirmation recipients do not include the sender copy", () => {
+  assert.deepEqual(
+    buildOrderConfirmationRecipients("343@gmail.com", "315@gmail.com", { suppressSenderCopy: true }),
+    { to: "343@gmail.com" },
+  );
+});
+
+test("test order confirmation preview does not include the sender copy", async () => {
+  const preview = await buildOrderConfirmationEmailPreview(
+    {
+      orderNumber: "111123456-1",
+      total: 0,
+      createdAt: "2026-07-01T10:00:00.000Z",
+      kitchen: {
+        name: "PX Test Kitchen",
+      },
+      customer: {
+        contractNumber: "111123456",
+        firstName: "Test",
+        lastName: "Customer",
+        email: "customer@example.com",
+        preferredDeliveryDate: "2026-07-15",
+      },
+      components: [],
+      accessories: [],
+      services: [],
+    },
+    { senderEmail: "sender@example.com" },
+  );
+
+  assert.equal(preview.to, "customer@example.com");
+  assert.equal(preview.cc, undefined);
 });
 import { getPreferredDeliveryDateAfterWeeks } from "../lib/preferred-delivery.js";
 
@@ -49,6 +84,9 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
     createdAt: "2026-07-01T00:00:00.000Z",
     createdAt: "2026-07-01T10:00:00.000Z",
     total: 244,
+    productImageCids: new Map([
+      ["product-images/email/a-egspv597210-dishwasher.jpg", "dishwasher-image"],
+    ]),
     kitchen: {
       name: "Demo Kitchen",
     },
@@ -89,6 +127,7 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
         iconKey: "dishwasher_base",
         componentKey: "dishwasher-base",
         price: 579,
+        productImagePath: "/product-images/email/a-egspv597210-dishwasher.jpg",
         productInfoPdfPath: "legal/architecto-agb-2026-05.pdf",
       },
     ],
@@ -102,6 +141,13 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   const dishwasherIndex = html.indexOf("Vollintegrierter Geschirrspüler");
   const cabinetIndex = html.indexOf("Unterschrank mit Schubkasten");
 
+  assert.doesNotMatch(html, /display:flex/);
+  assert.match(html, /table-layout:fixed/);
+  assert.match(html, /bgcolor="#ffffff"/);
+  assert.match(html, /background-color:#ffffff/);
+  assert.match(html, /width:24px/);
+  assert.match(html, /width:50px;padding:0 6px 0 0/);
+  assert.match(html, /width:46px;max-width:46px/);
   assert.equal(html.includes("Neu bestätigte Komponenten"), false);
   assert.ok(electricalSectionIndex > -1);
   assert.ok(cabinetSectionIndex > -1);

@@ -335,8 +335,11 @@ async function processOrderNotifications({ order, pdfBase64, pdfFilename, runEma
   return results;
 }
 
-function itemKey(item) {
-  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+export function buildOrderItemSelectionKey(item) {
+  const cutleryLine = isCutleryAccessoryCode(item?.code)
+    ? parseCutleryLineFromOrderItem(item)
+    : null;
+  const articleNumber = String(cutleryLine?.articleNumber || item?.articleNumber || "").trim().toUpperCase();
   if (articleNumber && isCutleryAccessoryCode(item.code)) {
     return `${item.itemType}:${item.code}:${articleNumber}`;
   }
@@ -345,6 +348,34 @@ function itemKey(item) {
 
 function withoutConfirmedBaseline(items, confirmedItemSets) {
   return items.filter((item) => !confirmedItemSets[item.itemType]?.has(item.code));
+}
+
+function buildConfirmedBaselineSelectionItem(item) {
+  const kitchenItem = item?.kitchenItem || {};
+
+  return {
+    ...kitchenItem,
+    id: kitchenItem.id || item.kitchenItemId,
+    kitchenItemId: item.kitchenItemId,
+    itemType: item.itemType,
+    code: item.code,
+    name: item.nameSnapshot || kitchenItem.name || item.code,
+    articleNumber: kitchenItem.articleNumber || item.articleNumber || "",
+    price: Number(item.priceSnapshot || 0),
+    priceSnapshot: Number(item.priceSnapshot || 0),
+    quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
+    isOrderLocked: true,
+    kitchenItem,
+  };
+}
+
+function withConfirmedBaselineSelection(selectedItems, confirmedItems) {
+  const selectedKeys = new Set(selectedItems.map(buildOrderItemSelectionKey));
+  const baselineItems = confirmedItems
+    .map(buildConfirmedBaselineSelectionItem)
+    .filter((item) => item.code && !selectedKeys.has(buildOrderItemSelectionKey(item)));
+
+  return [...selectedItems, ...baselineItems];
 }
 
 export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdfBase64, pdfFilename }) {
@@ -423,15 +454,20 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
   const contractOrderState = await getContractOrderState(kitchenContract.id, prisma, orderKind);
   const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
+  const submittedSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];
+  const allSelected = withConfirmedBaselineSelection(submittedSelected, contractOrderState.confirmedItems);
+  const allSelectedComponents = allSelected.filter((item) => item.itemType === ItemType.COMPONENT);
+  const allSelectedAccessories = allSelected.filter((item) => item.itemType === ItemType.ACCESSORY);
+  const allSelectedServices = allSelected.filter((item) => item.itemType === ItemType.SERVICE);
   const serviceEligibility = getServiceEligibility({
-    selectedComponents: selectedComponents.map((item) => ({
+    selectedComponents: allSelectedComponents.map((item) => ({
       ...item,
       isLocked: Boolean(item.isLocked),
       isOrderLocked: confirmedItemSets[ItemType.COMPONENT].has(item.code),
     })),
-    selectedAccessories,
+    selectedAccessories: allSelectedAccessories,
   });
-  const selectedServiceCodes = selectedServices.map((item) => item.code);
+  const selectedServiceCodes = allSelectedServices.map((item) => item.code);
 
   if (
     selectedServiceCodes.includes(SERVICE_CODE_MONTAGE) &&
@@ -451,7 +487,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   if (selectedServiceCodes.includes(SERVICE_CODE_MONTAGE)) {
     const deliveryMinSettings = await getDeliveryMinOrderSettings();
     if (deliveryMinSettings.enabled) {
-      const orderTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
+      const orderTotal = allSelected.reduce(
         (sum, item) => sum + getOrderItemEffectivePrice(item),
         0,
       );
@@ -463,7 +499,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     }
   }
 
-  const allSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];
   if (!allSelected.length) {
     throw validationError("At least one item must be selected");
   }
@@ -479,10 +514,10 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
         const existingEditableOrder = contractOrderState.editableOrder;
         const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
         const newSelectedItems = withoutConfirmedBaseline(allSelected, confirmedItemSets);
-        const newSelectionKeys = new Set(newSelectedItems.map(itemKey));
-        const submittedKeys = new Set(allSelected.map(itemKey));
+        const newSelectionKeys = new Set(newSelectedItems.map(buildOrderItemSelectionKey));
+        const submittedKeys = new Set(allSelected.map(buildOrderItemSelectionKey));
         const missingBaselineItems = contractOrderState.confirmedItems.filter(
-          (item) => !submittedKeys.has(itemKey(item)),
+          (item) => !submittedKeys.has(buildOrderItemSelectionKey(item)),
         );
 
         if (missingBaselineItems.length) {
@@ -557,7 +592,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
           });
         }
 
-        savedNewItems = newSelectedItems.filter((item) => newSelectionKeys.has(itemKey(item)));
+        savedNewItems = newSelectedItems.filter((item) => newSelectionKeys.has(buildOrderItemSelectionKey(item)));
 
         return orderDelegate.findUnique({
           where: { id: order.id },

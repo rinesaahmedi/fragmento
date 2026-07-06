@@ -272,32 +272,32 @@ function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, d
 const ORDER_CONFIRMED_TEXT = {
   de: {
     title: "Bestellung bestaetigt",
-    message: "Vielen Dank. Deine Zahlung wurde bestaetigt und die Bestellbestaetigung wurde versendet.",
+    message: "Vielen Dank. Deine Zahlung wurde bestaetigt und die Bestellbestaetigung wurde versendet. Bitte pruefe auch deinen Spam-Ordner.",
     reference: "Bestellnummer",
   },
   en: {
     title: "Order confirmed",
-    message: "Thank you. Your payment was confirmed and the order confirmation has been sent.",
+    message: "Thank you. Your payment was confirmed and the order confirmation has been sent. Please also check your spam or junk folder.",
     reference: "Order number",
   },
   tr: {
     title: "Siparis onaylandi",
-    message: "Tesekkurler. Odemeniz onaylandi ve siparis onayi gonderildi.",
+    message: "Tesekkurler. Odemeniz onaylandi ve siparis onayi gonderildi. Lutfen spam veya gereksiz posta klasorunu de kontrol edin.",
     reference: "Siparis numarasi",
   },
   es: {
     title: "Pedido confirmado",
-    message: "Gracias. Tu pago ha sido confirmado y la confirmacion del pedido ha sido enviada.",
+    message: "Gracias. Tu pago ha sido confirmado y la confirmacion del pedido ha sido enviada. Revisa tambien tu carpeta de spam o correo no deseado.",
     reference: "Numero de pedido",
   },
   fr: {
     title: "Commande confirmee",
-    message: "Merci. Votre paiement a ete confirme et la confirmation de commande a ete envoyee.",
+    message: "Merci. Votre paiement a ete confirme et la confirmation de commande a ete envoyee. Verifiez aussi votre dossier spam ou courrier indesirable.",
     reference: "Numero de commande",
   },
   ru: {
     title: "Zakaz podtverzhden",
-    message: "Spasibo. Oplata podtverzhdena, i podtverzhdenie zakaza otpravleno.",
+    message: "Spasibo. Oplata podtverzhdena, i podtverzhdenie zakaza otpravleno. Proverte takzhe papku spam ili nezhelatelnuyu pochtu.",
     reference: "Nomer zakaza",
   },
 };

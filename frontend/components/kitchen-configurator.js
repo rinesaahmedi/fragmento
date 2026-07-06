@@ -1095,16 +1095,23 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
     selectedComponentIds: [
       ...new Set([
         ...fixedComponentIds,
+        ...baseComponentIds,
         ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
       ]),
     ],
     selectedAccessoryCodes: [
       ...new Set([
         ...fixedAccessoryCodes,
+        ...baseAccessoryCodes,
         ...filterRegularAccessoryCodes(draft.selectedAccessoryCodes, kitchenConfig.accessories).filter((code) => validAccessoryCodes.has(code)),
       ]),
     ],
-    selectedServiceCodes: draft.selectedServiceCodes.filter((code) => validServiceCodes.has(code)),
+    selectedServiceCodes: [
+      ...new Set([
+        ...baseServiceCodes,
+        ...draft.selectedServiceCodes.filter((code) => validServiceCodes.has(code)),
+      ]),
+    ],
     cutleryLines: buildInitialCutleryLines({
       initialOrder,
       draft,
