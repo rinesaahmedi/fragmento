@@ -11,6 +11,7 @@ import {
 import { getFormMessage } from "../../../lib/admin-forms";
 import {
   DELIVERY_LEAD_TIME_MIN_WEEKS,
+  getAdminLoginVerificationEnabled,
   getDeliveryLeadTimeWeeks,
   getDeliveryMinOrderSettings,
   getDirectOrderConfirmationEnabled,
@@ -24,8 +25,14 @@ export default async function AdminSettingsPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const [directOrderConfirmationEnabled, deliveryMinOrderSettings, deliveryLeadTimeWeeks] = await Promise.all([
+  const [
+    directOrderConfirmationEnabled,
+    loginVerificationEnabled,
+    deliveryMinOrderSettings,
+    deliveryLeadTimeWeeks,
+  ] = await Promise.all([
     getDirectOrderConfirmationEnabled(),
+    getAdminLoginVerificationEnabled(),
     getDeliveryMinOrderSettings(),
     getDeliveryLeadTimeWeeks(),
   ]);
@@ -55,6 +62,37 @@ export default async function AdminSettingsPage({ searchParams }) {
                     <AdminText
                       i18nKey="settingsAdmin.directOrderConfirmationHelp"
                       fallback="When enabled, the customer confirmation email is sent immediately after public checkout and the order is marked confirmed after the email succeeds. The agent webhook still runs."
+                    />
+                  </span>
+                </span>
+              </label>
+
+              <div style={actionRowStyle}>
+                <button type="submit" style={primaryButtonStyle}>
+                  <AdminText i18nKey="settingsAdmin.saveSettings" fallback="Save settings" />
+                </button>
+              </div>
+            </form>
+          </AdminSection>
+
+          <AdminSection
+            title={<AdminText i18nKey="settingsAdmin.loginVerificationTitle" fallback="Login verification" />}
+            description={<AdminText i18nKey="settingsAdmin.loginVerificationDescription" fallback="Control whether admin sign-in requires an emailed verification code after the password step." />}
+          >
+            <form action="/api/admin/settings/login-verification" method="post" style={formStyle}>
+              <label style={toggleCardStyle}>
+                <input
+                  name="adminLoginVerificationEnabled"
+                  type="checkbox"
+                  defaultChecked={loginVerificationEnabled}
+                  style={checkboxStyle}
+                />
+                <span style={toggleTextStyle}>
+                  <strong><AdminText i18nKey="settingsAdmin.loginVerificationEnabled" fallback="Require verification code for admin login" /></strong>
+                  <span style={mutedTextStyle}>
+                    <AdminText
+                      i18nKey="settingsAdmin.loginVerificationEnabledHelp"
+                      fallback="When enabled, admins must enter the 6-digit code emailed after a valid password. When disabled, a valid password signs in directly."
                     />
                   </span>
                 </span>

@@ -1,9 +1,11 @@
 import { redirectWithFlash } from "../../../../lib/admin-forms";
 import {
   beginAdminLoginVerification,
+  clearAdminLoginVerification,
   sendAdminLoginVerificationEmail,
 } from "../../../../lib/admin-login-verification";
-import { createPendingAdminLogin, verifyPassword } from "../../../../lib/auth";
+import { getAdminLoginVerificationEnabled } from "../../../../lib/admin-settings";
+import { createAdminSession, createPendingAdminLogin, verifyPassword } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 
@@ -32,6 +34,19 @@ export async function POST(request) {
 
     if (admin.isActive === false) {
       return redirectWithFlash(request, "/admin/login", "error", "This account has been deactivated.");
+    }
+
+    const loginVerificationEnabled = await getAdminLoginVerificationEnabled();
+    if (!loginVerificationEnabled) {
+      await clearAdminLoginVerification(admin.id);
+      await createAdminSession(admin.id);
+
+      return new Response(null, {
+        status: 303,
+        headers: {
+          Location: "/admin",
+        },
+      });
     }
 
     const { code } = await beginAdminLoginVerification(admin.id);
