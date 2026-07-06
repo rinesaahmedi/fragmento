@@ -387,7 +387,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return withDimensions(dishwasherName());
   }
   if (iconKey === "tall_refrigerator") {
-    return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"));
+    return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"));
   }
   if (code.startsWith("SINKBASE-") || code === "T3D-SINKBASE-001") {
     return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
@@ -544,7 +544,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-AB105828-KGCN388140E":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
-      return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"));
+      return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"));
     case "SINK-WORKTOP":
     case "SINK-B-BOTTON-45":
     case "SINK-AB105806-BOTTON-45":

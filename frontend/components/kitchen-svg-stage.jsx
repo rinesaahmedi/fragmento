@@ -1438,7 +1438,7 @@ function withDerivedSinkFaucet(definitions, components) {
   ];
 }
 
-export default function KitchenSvgStage({
+export default function useKitchenSvgStage({
   svgMarkup,
   kitchenConfig,
   kitchenSlug,
@@ -1511,6 +1511,17 @@ export default function KitchenSvgStage({
       .filter(Boolean);
   }, [kitchenConfig.components, normalizedKitchenSlug, translate, language]);
   const hasImageHotspots = imageHotspots.length > 0;
+  const legendFixedText = translate("configurator.stageLegendFixed", "Fixed parts always remain active");
+  const legendPrimaryText =
+    has3dModel && activeView === "3d"
+      ? "Click parts in the 3D preview or choose on the right"
+      : hasImageView
+        ? hasImageHotspots
+          ? translate("configurator.stageLegendClick", "Click in the plan or choose on the right")
+          : translate("configurator.stageLegendChooseRight", "Choose elements on the right")
+        : hasPdfView
+          ? translate("configurator.stageLegendChooseRight", "Choose elements on the right")
+          : translate("configurator.stageLegendClick", "Click in the plan or choose on the right");
   const planDisplayCrop = useMemo(
     () => getPlanDisplayCrop(imageHotspots, normalizedKitchenSlug),
     [imageHotspots, normalizedKitchenSlug],
@@ -1625,7 +1636,7 @@ export default function KitchenSvgStage({
     });
   }, [activeView, fixedComponentIdsKey, planLockedComponentIdsKey, selectedComponentIds, fixedComponentIds, planLockedComponentIds, kitchenSlug, hasImageView, hasPdfView]);
 
-  return (
+  const stageNode = (
     <div className={styles.stage}>
       <div className={styles.stageHeader}>
         <div>
@@ -1662,32 +1673,19 @@ export default function KitchenSvgStage({
       </div>
       <div className={styles.stageBody}>
         {has3dModel && activeView === "3d" ? (
-          <>
-            <Kitchen3DViewer
-              components={kitchenConfig.components}
-              componentIds={componentIds}
-              fixedComponentIds={fixedComponentIds}
-              planLockedComponentIds={planLockedComponentIds}
-              selectedComponentIds={selectedComponentIds}
-              onToggleComponent={(componentId) => {
-                setSelectedComponentIds((current) =>
-                  toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
-                );
-              }}
-            />
-            <div className={styles.stageLegend}>
-              <span className={styles.legendChip}>
-                <span className={styles.legendSwatch} />
-                Click parts in the 3D preview or choose on the right
-              </span>
-              <span className={styles.legendChip}>
-                <span className={styles.legendDot} />
-                Fixed parts always remain active
-              </span>
-            </div>
-          </>
+          <Kitchen3DViewer
+            components={kitchenConfig.components}
+            componentIds={componentIds}
+            fixedComponentIds={fixedComponentIds}
+            planLockedComponentIds={planLockedComponentIds}
+            selectedComponentIds={selectedComponentIds}
+            onToggleComponent={(componentId) => {
+              setSelectedComponentIds((current) =>
+                toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
+              );
+            }}
+          />
         ) : hasImageView ? (
-          <>
             <div className={styles.pdfCard}>
               {hasImageHotspots ? (
                 <div
@@ -1836,21 +1834,7 @@ export default function KitchenSvgStage({
                 />
               )}
             </div>
-            <div className={styles.stageLegend}>
-              <span className={styles.legendChip}>
-                <span className={styles.legendSwatch} />
-                {hasImageHotspots
-                  ? translate("configurator.stageLegendClick", "Click in the plan or choose on the right")
-                  : translate("configurator.stageLegendChooseRight", "Choose elements on the right")}
-              </span>
-              <span className={styles.legendChip}>
-                <span className={styles.legendDot} />
-                {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
-              </span>
-            </div>
-          </>
         ) : hasPdfView ? (
-          <>
             <div className={styles.pdfCard}>
               <iframe
                 src={pdfViewHref}
@@ -1858,19 +1842,7 @@ export default function KitchenSvgStage({
                 className={styles.pdfFrame}
               />
             </div>
-            <div className={styles.stageLegend}>
-              <span className={styles.legendChip}>
-                <span className={styles.legendSwatch} />
-                {translate("configurator.stageLegendChooseRight", "Choose elements on the right")}
-              </span>
-              <span className={styles.legendChip}>
-                <span className={styles.legendDot} />
-                {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
-              </span>
-            </div>
-          </>
         ) : (
-          <>
             <div className={styles.svgCard}>
               <div
                 ref={svgHostRef}
@@ -1882,19 +1854,23 @@ export default function KitchenSvgStage({
                   .join(" ")}
               />
             </div>
-            <div className={styles.stageLegend}>
-              <span className={styles.legendChip}>
-                <span className={styles.legendSwatch} />
-                {translate("configurator.stageLegendClick", "Click in the plan or choose on the right")}
-              </span>
-              <span className={styles.legendChip}>
-                <span className={styles.legendDot} />
-                {translate("configurator.stageLegendFixed", "Fixed parts always remain active")}
-              </span>
-            </div>
-          </>
         )}
       </div>
     </div>
   );
+
+  const legendNode = (
+    <div className={styles.stageLegend}>
+      <span className={styles.legendChip}>
+        <span className={styles.legendSwatch} />
+        {legendPrimaryText}
+      </span>
+      <span className={styles.legendChip}>
+        <span className={styles.legendDot} />
+        {legendFixedText}
+      </span>
+    </div>
+  );
+
+  return { stage: stageNode, legend: legendNode };
 }

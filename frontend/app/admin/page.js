@@ -1,4 +1,5 @@
-﻿import { AdminShell } from "../../components/admin-shell";
+﻿import { getPriceBreakdown } from "../../lib/price-utils";
+import { AdminShell } from "../../components/admin-shell";
 import { AdminDashboardCharts } from "../../components/admin-dashboard-charts";
 import { listKitchensForAdmin } from "../../lib/catalog";
 import { showAdminClaimsInNav } from "../../lib/admin-claims-access";
@@ -1456,8 +1457,18 @@ export default async function AdminDashboardPage({ searchParams = {} }) {
       labelKey: "dashboard.totalRevenue",
       fallbackLabel: "Total revenue",
       value: formatCurrency(totalRevenue),
-      trendKey: "dashboard.grossOrderValue",
-      trendFallback: "Gross order value",
+      breakdown: [
+        {
+          labelKey: "dashboard.priceExclVat",
+          fallbackLabel: "Price",
+          value: formatCurrency(getPriceBreakdown(totalRevenue).net),
+        },
+        {
+          labelKey: "dashboard.vatAmount",
+          fallbackLabel: "VAT (19%)",
+          value: formatCurrency(getPriceBreakdown(totalRevenue).vat),
+        },
+      ],
     },
     {
       labelKey: "dashboard.averageOrderValue",

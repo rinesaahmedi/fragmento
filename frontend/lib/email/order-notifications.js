@@ -8,6 +8,7 @@ import { PDFDocument, rgb } from "pdf-lib";
 import sharp from "sharp";
 import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
+import { getPriceBreakdown } from "../price-utils.js";
 
 const LETTERHEAD = {
   headerHeight: 74,
@@ -258,6 +259,14 @@ async function loadKitchenPlanPreviewData() {
     const hotspotsLiteral = findBalancedObjectLiteral(source, "IMAGE_HOTSPOTS_BY_SLUG");
     const imageViews = imageViewsLiteral ? Function(`"use strict"; return (${imageViewsLiteral});`)() : {};
     const hotspotsBySlug = hotspotsLiteral ? Function(`"use strict"; return (${hotspotsLiteral});`)() : {};
+    const selectionUtilsPath = path.join(process.cwd(), "components", "kitchen-selection-utils.js");
+    const selectionUtilsSource = await fs.readFile(selectionUtilsPath, "utf8").catch(() => "");
+    const linkedGroupsLiteral = selectionUtilsSource
+      ? findBalancedObjectLiteral(selectionUtilsSource, "LINKED_COMPONENT_GROUPS_BY_SLUG")
+      : "";
+    const linkedGroupsBySlug = linkedGroupsLiteral
+      ? Function(`"use strict"; return (${linkedGroupsLiteral});`)()
+      : {};
 
     source.replace(
       /IMAGE_HOTSPOTS_BY_SLUG\["([^"]+)"\]\s*=\s*IMAGE_HOTSPOTS_BY_SLUG\["([^"]+)"\]/g,
@@ -267,7 +276,7 @@ async function loadKitchenPlanPreviewData() {
       },
     );
 
-    return { imageViews, hotspotsBySlug };
+    return { imageViews, hotspotsBySlug, linkedGroupsBySlug };
   })();
 
   return kitchenPlanPreviewDataPromise;
@@ -343,7 +352,24 @@ function markSvgComponentGroup(markup, componentId, className) {
   return String(markup || "").replace(pattern, (match) => addClassToSvgTag(match, className));
 }
 
-function buildPurchasedKitchenPdfSelectionState(order) {
+function expandLinkedComponentKeys(componentKeys, linkedGroups = []) {
+  const expanded = new Set(componentKeys);
+
+  for (const group of linkedGroups || []) {
+    const groupKeys = (Array.isArray(group) ? group : [])
+      .map((componentId) => String(componentId || "").replace(/^component-/, "").trim())
+      .filter(Boolean);
+    if (groupKeys.some((componentKey) => expanded.has(componentKey))) {
+      groupKeys.forEach((componentKey) => expanded.add(componentKey));
+    }
+  }
+
+  return expanded;
+}
+
+function buildPurchasedKitchenPdfSelectionState(order, options = {}) {
+  const linkedGroups = options.linkedGroups || [];
+  const defaultLockedComponentKeys = options.defaultLockedComponentKeys || [];
   const selectedComponentIds = new Set();
   const lockedComponentIds = new Set();
   const selectedComponentKeys = new Set();
@@ -363,7 +389,25 @@ function buildPurchasedKitchenPdfSelectionState(order) {
     }
   }
 
-  return { selectedComponentIds, lockedComponentIds, selectedComponentKeys, lockedComponentKeys };
+  defaultLockedComponentKeys.forEach((componentKey) => {
+    const normalizedKey = String(componentKey || "").trim();
+    if (!normalizedKey || selectedComponentKeys.has(normalizedKey)) return;
+    lockedComponentKeys.add(normalizedKey);
+    lockedComponentIds.add(`component-${normalizedKey}`);
+  });
+
+  const expandedSelectedComponentKeys = expandLinkedComponentKeys(selectedComponentKeys, linkedGroups);
+  const expandedLockedComponentKeys = expandLinkedComponentKeys(lockedComponentKeys, linkedGroups);
+
+  expandedSelectedComponentKeys.forEach((componentKey) => selectedComponentIds.add(`component-${componentKey}`));
+  expandedLockedComponentKeys.forEach((componentKey) => lockedComponentIds.add(`component-${componentKey}`));
+
+  return {
+    selectedComponentIds,
+    lockedComponentIds,
+    selectedComponentKeys: expandedSelectedComponentKeys,
+    lockedComponentKeys: expandedLockedComponentKeys,
+  };
 }
 
 function injectPurchasedKitchenPdfStyles(markup) {
@@ -410,7 +454,9 @@ function injectPurchasedKitchenPdfStyles(markup) {
 }
 
 function applyPurchasedKitchenSelectionToSvg(markup, order) {
-  const { selectedComponentIds, lockedComponentIds } = buildPurchasedKitchenPdfSelectionState(order);
+  const { selectedComponentIds, lockedComponentIds } = buildPurchasedKitchenPdfSelectionState(order, {
+    defaultLockedComponentKeys: ["worktop"],
+  });
   let nextMarkup = injectPurchasedKitchenPdfStyles(markup);
 
   for (const componentId of selectedComponentIds) {
@@ -489,8 +535,12 @@ function pointsToOverlayPolygon(points, crop, width, height) {
     .join(" ");
 }
 
-function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height }) {
-  const { selectedComponentKeys, lockedComponentKeys } = buildPurchasedKitchenPdfSelectionState(order);
+function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height, linkedGroups = [] }) {
+  const hasWorktop = hotspots.some((hotspot) => String(hotspot?.componentKey || "").trim() === "worktop");
+  const { selectedComponentKeys, lockedComponentKeys } = buildPurchasedKitchenPdfSelectionState(order, {
+    linkedGroups,
+    defaultLockedComponentKeys: hasWorktop ? ["worktop"] : [],
+  });
   const shapes = [];
 
   for (const hotspot of hotspots) {
@@ -527,6 +577,7 @@ async function renderPurchasedKitchenImagePlanPng(order, source) {
   const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const previewData = await loadKitchenPlanPreviewData().catch(() => null);
   const hotspots = previewData?.hotspotsBySlug?.[slug] || [];
+  const linkedGroups = previewData?.linkedGroupsBySlug?.[slug] || [];
   if (!hotspots.length) return null;
 
   const rendered = await sharp(source).png().toBuffer({ resolveWithObject: true });
@@ -543,6 +594,7 @@ async function renderPurchasedKitchenImagePlanPng(order, source) {
     crop,
     width: finalWidth,
     height: finalHeight,
+    linkedGroups,
   });
 
   const pipeline = sharp(rendered.data)
@@ -1205,12 +1257,20 @@ export async function generateOrderConfirmationPdf(order) {
   drawSection("Zubehör:", order.accessories);
   drawSection("Dienstleistungen:", order.services);
 
-  ensureSpace(40);
+  ensureSpace(70);
   doc.setDrawColor(150).line(margin, y, pageWidth - margin, y);
+  y += 18;
+  const { net, vat, total } = getPriceBreakdown(order.total);
+  doc.setFont("helvetica", "normal").setFontSize(11);
+  doc.text("Preis:", margin, y);
+  doc.text(formatCurrency(net), pageWidth - margin, y, { align: "right" });
+  y += 16;
+  doc.text("MwSt. (19%):", margin, y);
+  doc.text(formatCurrency(vat), pageWidth - margin, y, { align: "right" });
   y += 20;
   doc.setFont("helvetica", "bold").setFontSize(14);
   doc.text("Gesamtpreis:", margin, y);
-  doc.text(formatCurrency(order.total), pageWidth - margin, y, { align: "right" });
+  doc.text(formatCurrency(total), pageWidth - margin, y, { align: "right" });
 
   const pdfBytes = await applyArchitectoLetterheadTemplate(doc.output("arraybuffer"));
 
@@ -1394,6 +1454,12 @@ export function buildOrderSummaryHtml(order) {
         ${renderSection("Neu bestätigtes Zubehör", order.accessories, order.productImageCids)}
         ${renderSection("Neu bestätigte Dienstleistungen", order.services, order.productImageCids)}
         <table bgcolor="#ffffff" style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;background-color:#ffffff;">
+          <tr><td style="text-align:right;font-size:0.95em;color:#555;">Preis: ${formatCurrency(
+            getPriceBreakdown(order.total).net,
+          )}</td></tr>
+          <tr><td style="text-align:right;font-size:0.95em;color:#555;">MwSt. (19%): ${formatCurrency(
+            getPriceBreakdown(order.total).vat,
+          )}</td></tr>
           <tr><td bgcolor="#ffffff" style="text-align:right;font-size:1.3em;font-weight:bold;background-color:#ffffff;color:#333;">Gesamtpreis: ${formatCurrency(
             order.total,
           )}</td></tr>

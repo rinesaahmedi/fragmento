@@ -226,15 +226,17 @@ async function attachCutleryCatalogVariants(kitchen) {
 
     return {
       ...kitchen,
-      cutleryVariants: normalizeCutleryVariants(
-        articles.map((article) => ({
-          articleNumber: article.articleNumber,
-          name: article.name,
-          nameDe: article.nameDe || "",
-          widthCm: article.widthMm ? Number(article.widthMm) / 10 : null,
-          price: Number(article.price),
-        })),
-      ),
+      cutleryVariants: articles.length
+        ? normalizeCutleryVariants(
+          articles.map((article) => ({
+            articleNumber: article.articleNumber,
+            name: article.name,
+            nameDe: article.nameDe || "",
+            widthCm: article.widthMm ? Number(article.widthMm) / 10 : null,
+            price: Number(article.price),
+          })),
+        )
+        : normalizeCutleryVariants(CUTLERY_VARIANTS),
     };
   } catch {
     return kitchen;

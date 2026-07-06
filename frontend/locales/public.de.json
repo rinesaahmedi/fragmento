@@ -6,6 +6,8 @@
     "back": "Zurück",
     "close": "Schließen",
     "totalPrice": "Gesamtpreis",
+    "priceExclVat": "Preis",
+    "vatAmount": "MwSt. (19%)",
     "code": "Code",
     "article": "Artikel",
     "remove": "Entfernen",

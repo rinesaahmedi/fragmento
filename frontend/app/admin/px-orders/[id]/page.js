@@ -21,6 +21,7 @@ import { OrderEmailReviewModal } from "../../../../components/order-email-review
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getTestOrderById } from "../../../../lib/catalog";
+import { getPriceBreakdown } from "../../../../lib/price-utils";
 import { buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
 import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../../lib/order-item-display";
 import { buildOrderForNotifications } from "../../../../lib/orders";
@@ -128,7 +129,11 @@ export default async function AdminPxOrderDetailPage({ params, searchParams }) {
               </div>
               <div style={metricStyle}>
                 <span style={labelStyle}>Total</span>
-                <strong>{formatCurrency(order.totalPrice)}</strong>
+                <div style={{ display: "grid", gap: 2 }}>
+                  <span style={{ fontSize: 12, opacity: 0.7 }}>Price: {formatCurrency(getPriceBreakdown(order.totalPrice).net)}</span>
+                  <span style={{ fontSize: 12, opacity: 0.7 }}>VAT (19%): {formatCurrency(getPriceBreakdown(order.totalPrice).vat)}</span>
+                  <strong>{formatCurrency(order.totalPrice)}</strong>
+                </div>
               </div>
               <div style={metricStyle}>
                 <span style={labelStyle}>Contract</span>

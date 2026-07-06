@@ -20,7 +20,7 @@ import {
   shouldShowProductAssistantLauncher,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
-import KitchenSvgStage from "./kitchen-svg-stage";
+import useKitchenSvgStage from "./kitchen-svg-stage";
 import { PLAN_VIEWPORT_BY_SLUG } from "./kitchen-svg-plan-utils";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import {
@@ -37,6 +37,7 @@ import {
 import {
   buildCutleryLineItems,
   buildInitialCutleryLines,
+  getAvailableCutleryVariantsForComponents,
   getCutleryBaseItem,
   isCutleryAccessoryCode,
   isCutleryAccessoryItem,
@@ -405,7 +406,7 @@ function formatProductAssistantDisplayName(item, translate) {
   }
 
   if (isRefrigeratorProductAssistantItem(item)) {
-    return translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm");
+    return translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm");
   }
 
   if (isDishwasherProductAssistantItem(item)) {
@@ -1378,9 +1379,27 @@ function KitchenConfiguratorContent({
     [kitchenConfig.accessories],
   );
   const cutleryVariants = useMemo(
-    () => normalizeCutleryVariants(kitchenConfig.cutleryVariants || []),
-    [kitchenConfig.cutleryVariants],
+    () => getAvailableCutleryVariantsForComponents(
+      kitchenConfig.components.filter((item) => selectedComponentIds.includes(componentIdForItem(item))),
+      kitchenConfig.cutleryVariants || [],
+    ),
+    [kitchenConfig.components, kitchenConfig.cutleryVariants, selectedComponentIds],
   );
+  useEffect(() => {
+    setCutleryLines((current) => {
+      const next = normalizeCutleryLines(current, cutleryVariants);
+      if (
+        next.length === current.length &&
+        next.every((line, index) =>
+          line.articleNumber === current[index]?.articleNumber &&
+          line.quantity === current[index]?.quantity
+        )
+      ) {
+        return current;
+      }
+      return next;
+    });
+  }, [cutleryVariants]);
   const selectedAccessories = [
     ...selectedMap(kitchenConfig.accessories, selectedAccessoryCodes)
       .filter((item) => !isCutleryAccessoryItem(item))
@@ -2144,6 +2163,18 @@ function KitchenConfiguratorContent({
     }
   }
 
+  const { stage: planStageNode, legend: planLegendNode } = useKitchenSvgStage({
+    svgMarkup,
+    kitchenConfig,
+    kitchenSlug,
+    planViewport,
+    fixedComponentIds,
+    planLockedComponentIds,
+    selectedComponentIds,
+    setSelectedComponentIds,
+    onResetSelection: resetSelection,
+  });
+
   return (
     <div className={styles.page}>
       <div className={styles.shell}>
@@ -2171,19 +2202,50 @@ function KitchenConfiguratorContent({
         </header>
 
         <section className={styles.contentGrid}>
-          <div className={styles.mainColumn}>
-            <KitchenSvgStage
-              svgMarkup={svgMarkup}
-              kitchenConfig={kitchenConfig}
-              kitchenSlug={kitchenSlug}
-              planViewport={planViewport}
-              fixedComponentIds={fixedComponentIds}
-              planLockedComponentIds={planLockedComponentIds}
-              selectedComponentIds={selectedComponentIds}
-              setSelectedComponentIds={setSelectedComponentIds}
-              onResetSelection={resetSelection}
-            />
+          <div className={styles.planCatalogGroup}>
+            <div className={styles.planColumn}>
+              <div className={styles.planStickyPrice}>
+                <span>{translate("common.totalPrice", "Total price")}</span>
+                <strong>{formatCurrency(grandTotal)}</strong>
+              </div>
+              {planStageNode}
+            </div>
 
+            <div className={styles.planLegendColumn}>{planLegendNode}</div>
+
+            <div className={styles.sideColumn}>
+              <KitchenCatalogPanel
+                kitchenConfig={kitchenConfig}
+                kitchenSlug={kitchenSlug}
+                visibleComponents={visibleComponents}
+                selectedComponents={selectedComponents}
+                selectedAccessories={selectedAccessories}
+                selectedServices={selectedServices}
+                selectedComponentIds={selectedComponentIds}
+                selectedAccessoryCodes={selectedAccessoryCodes}
+                selectedServiceCodes={selectedServiceCodes}
+                selectedDisplayCount={selectedDisplayCount}
+                fixedComponentIds={fixedComponentIds}
+                orderLockedAccessoryCodes={fixedAccessoryCodes}
+                orderLockedServiceCodes={orderLockedServiceCodes}
+                setSelectedComponentIds={setSelectedComponentIds}
+                onToggleAccessory={toggleAccessory}
+                cutleryVariants={cutleryVariants}
+                cutleryLines={cutleryLines}
+                onToggleCutleryVariant={toggleCutleryVariant}
+                onUpdateCutleryLineQuantity={updateCutleryLineQuantity}
+                onToggleService={toggleService}
+                onOpenProductInfo={openProductInfo}
+                onOpenProductPhotos={openProductPhotos}
+                onOpenProductAssistantFromItem={hasAnyAssistantProducts ? openProductAssistantForCatalogItem : undefined}
+                serviceEligibility={serviceEligibility}
+                deliveryMinEligible={deliveryMinEligible}
+                deliveryMinAmount={deliveryMinAmount}
+              />
+            </div>
+          </div>
+
+          <div className={styles.summaryColumn}>
             <KitchenSelectionSummary
               selectedComponents={selectedComponents}
               selectedAccessories={selectedAccessories}
@@ -2197,37 +2259,6 @@ function KitchenConfiguratorContent({
               onRemoveService={removeService}
               onOpenOrderSection={openOrderSection}
               onOpenProductInfo={openProductInfo}
-            />
-          </div>
-
-          <div className={styles.sideColumn}>
-            <KitchenCatalogPanel
-              kitchenConfig={kitchenConfig}
-              kitchenSlug={kitchenSlug}
-              visibleComponents={visibleComponents}
-              selectedComponents={selectedComponents}
-              selectedAccessories={selectedAccessories}
-              selectedServices={selectedServices}
-              selectedComponentIds={selectedComponentIds}
-              selectedAccessoryCodes={selectedAccessoryCodes}
-              selectedServiceCodes={selectedServiceCodes}
-              selectedDisplayCount={selectedDisplayCount}
-              fixedComponentIds={fixedComponentIds}
-              orderLockedAccessoryCodes={fixedAccessoryCodes}
-              orderLockedServiceCodes={orderLockedServiceCodes}
-              setSelectedComponentIds={setSelectedComponentIds}
-              onToggleAccessory={toggleAccessory}
-              cutleryVariants={cutleryVariants}
-              cutleryLines={cutleryLines}
-              onToggleCutleryVariant={toggleCutleryVariant}
-              onUpdateCutleryLineQuantity={updateCutleryLineQuantity}
-              onToggleService={toggleService}
-              onOpenProductInfo={openProductInfo}
-              onOpenProductPhotos={openProductPhotos}
-              onOpenProductAssistantFromItem={hasAnyAssistantProducts ? openProductAssistantForCatalogItem : undefined}
-              serviceEligibility={serviceEligibility}
-              deliveryMinEligible={deliveryMinEligible}
-              deliveryMinAmount={deliveryMinAmount}
             />
           </div>
         </section>

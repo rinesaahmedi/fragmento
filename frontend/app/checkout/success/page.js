@@ -6,6 +6,7 @@ import { getPaymentStatusLabel, updateOrderFromCheckoutSession } from "../../../
 import { prisma } from "../../../lib/prisma";
 import { getOrderDelegate, getOrderKindForContractNumber, isTestOrderKind } from "../../../lib/order-kind";
 import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../lib/order-item-display";
+import { getPriceBreakdown } from "../../../lib/price-utils";
 
 export const dynamic = "force-dynamic";
 
@@ -285,9 +286,19 @@ export default async function CheckoutSuccessPage({ searchParams }) {
               <ItemSection title="Components" items={componentItems} />
               <ItemSection title="Accessories" items={accessoryItems} />
               <ItemSection title="Services" items={serviceItems} />
-              <div style={totalRowStyle}>
-                <span>Total</span>
-                <strong>{formatCurrency(order.totalPrice)}</strong>
+              <div style={{ ...totalRowStyle, flexDirection: "column", alignItems: "stretch", gap: 4 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 400, fontSize: "0.9rem" }}>
+                  <span>Price</span>
+                  <span>{formatCurrency(getPriceBreakdown(order.totalPrice).net)}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontWeight: 400, fontSize: "0.9rem" }}>
+                  <span>VAT (19%)</span>
+                  <span>{formatCurrency(getPriceBreakdown(order.totalPrice).vat)}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span>Total</span>
+                  <strong>{formatCurrency(order.totalPrice)}</strong>
+                </div>
               </div>
             </section>
           </>

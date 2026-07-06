@@ -122,7 +122,7 @@ function getCatalogCabinetIconWidthPx(item) {
   if (!Number.isFinite(widthMm) || widthMm <= 0) return null;
 
   const clampedWidth = Math.min(Math.max(widthMm, 300), 600);
-  return Math.round(34 + ((clampedWidth - 300) / 300) * 30);
+  return Math.round(29 + ((clampedWidth - 300) / 300) * 25);
 }
 
 function getCatalogIconMarkup(item, stretchWidthOnly) {
@@ -520,6 +520,8 @@ function CutleryInsertAccessoryCard({
             const variant = getCutleryVariant(line.articleNumber, variants);
             const lineLabel = getCutleryVariantLabel(variant, translate, language);
             const lineTotal = (variant?.price || 0) * line.quantity;
+            const maxQuantity = Math.max(1, Math.floor(Number(variant?.maxQuantity || 99)));
+            const clampLineQuantity = (value) => Math.max(1, Math.min(maxQuantity, clampQuantity(value)));
 
             return (
               <div key={line.id} className={styles.cutlerySelectionRow}>
@@ -543,16 +545,16 @@ function CutleryInsertAccessoryCard({
                         className={styles.cutleryQuantityInput}
                         type="number"
                         min="1"
-                        max="99"
+                        max={maxQuantity}
                         value={line.quantity}
-                        onChange={(event) => onUpdateCutleryLineQuantity?.(line.articleNumber, clampQuantity(event.target.value))}
+                        onChange={(event) => onUpdateCutleryLineQuantity?.(line.articleNumber, clampLineQuantity(event.target.value))}
                       />
                       <button
                         type="button"
                         className={styles.cutleryQuantityButton}
                         aria-label={translate("configurator.cutleryIncreaseQuantity", "Increase quantity")}
-                        disabled={line.quantity >= 99}
-                        onClick={() => onUpdateCutleryLineQuantity?.(line.articleNumber, line.quantity + 1)}
+                        disabled={line.quantity >= maxQuantity}
+                        onClick={() => onUpdateCutleryLineQuantity?.(line.articleNumber, clampLineQuantity(line.quantity + 1))}
                       >
                         +
                       </button>
