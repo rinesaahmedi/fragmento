@@ -689,6 +689,20 @@ function buildProductImageCid(item, index) {
   return `product-image-${code || index}@fragmento`;
 }
 
+async function buildWhiteBackedProductImage(content) {
+  return sharp(content)
+    .resize({
+      width: 96,
+      height: 96,
+      fit: "contain",
+      background: "#ffffff",
+      withoutEnlargement: true,
+    })
+    .flatten({ background: "#ffffff" })
+    .jpeg({ quality: 92, mozjpeg: true })
+    .toBuffer();
+}
+
 function getItemDisplayCode(item) {
   return String(item?.articleNumber || item?.code || "-").trim() || "-";
 }
@@ -743,14 +757,13 @@ async function loadProductImageAttachments(order) {
     try {
       const absolutePath = await resolvePublicAssetPath(assetPath);
       const content = await fs.readFile(absolutePath);
-      const ext = path.extname(assetPath).toLowerCase();
-      const contentType = ext === ".png" ? "image/png" : "image/jpeg";
+      const whiteBackedContent = await buildWhiteBackedProductImage(content);
       const cid = buildProductImageCid(item, index);
       attachments.push({
-        filename: path.basename(assetPath),
-        content,
+        filename: `${path.basename(assetPath, path.extname(assetPath))}-email.jpg`,
+        content: whiteBackedContent,
         cid,
-        contentType,
+        contentType: "image/jpeg",
         contentDisposition: "inline",
       });
       seenAssetPaths.set(assetPath, cid);

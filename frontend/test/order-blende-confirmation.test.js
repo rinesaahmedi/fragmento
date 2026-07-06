@@ -245,6 +245,7 @@ test("order confirmation product-info attachments exclude default zero-price ite
         name: "Fully integrated dishwasher",
         nameDe: "Vollintegrierter Geschirrspüler",
         price: 579,
+        productImagePath: "/product-images/email/a-egspv597210-dishwasher.jpg",
         productInfoPdfPath: "legal/architecto-agb-2026-05.pdf",
       },
       {
@@ -252,6 +253,7 @@ test("order confirmation product-info attachments exclude default zero-price ite
         name: "Freestanding refrigerator 178 cm",
         nameDe: "Standkühlschrank 178 cm",
         price: 579,
+        productImagePath: "/product-images/email/kgc15495s-fridge.jpg",
         productInfoPdfPath: "legal/architecto-agb-2026.pdf",
       },
     ],
@@ -271,6 +273,9 @@ test("order confirmation product-info attachments exclude default zero-price ite
   const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
 
   assert.deepEqual(staticHtml.attachmentLabels, ["Vollintegrierter Geschirrspüler", "Standkühlschrank 178 cm"]);
+  assert.ok(staticHtml.productImageAttachments.length >= 2);
+  assert.ok(staticHtml.productImageAttachments.every((attachment) => attachment.contentType === "image/jpeg"));
+  assert.ok(staticHtml.productImageAttachments.every((attachment) => attachment.filename.endsWith("-email.jpg")));
   assert.match(staticHtml.html, /Produktinformationen im Anhang:/);
   assert.match(staticHtml.html, /<ul[^>]*>/);
   assert.match(staticHtml.html, /<li[^>]*>Vollintegrierter Geschirrspüler<\/li>/);
