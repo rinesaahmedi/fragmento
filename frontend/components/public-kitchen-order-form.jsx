@@ -714,6 +714,12 @@ export default function PublicKitchenOrderForm({
                 {isSubmitting ? translate("order.submitSaving", "Saving...") : translate("order.submit", "Complete paid order")}
               </button>
             </div>
+            <small className={styles.orderHelp}>
+              {translate(
+                "order.stripeRedirectHint",
+                "After payment, please wait until Stripe redirects you back to Fragmento. Your order is complete when you see the confirmation screen.",
+              )}
+            </small>
             <small className={styles.orderHelp}>{translate("order.requiredHint", "Fields marked with * are required.")}</small>
           </div>
           </form>

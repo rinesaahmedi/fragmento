@@ -2112,7 +2112,10 @@ function KitchenConfiguratorContent({
       const webhookIssue = payload.notifications?.webhookError;
 
       if (payload.checkoutUrl) {
-        setStatus(translate("configurator.statusRedirectingToPayment", "Redirecting to secure payment..."));
+        setStatus(translate(
+          "configurator.statusRedirectingToPayment",
+          "Redirecting to secure payment. After payment, please wait until Stripe sends you back to Fragmento.",
+        ));
         clearConfiguratorDraft(draftStorageKey);
         window.location.assign(payload.checkoutUrl);
         return;
