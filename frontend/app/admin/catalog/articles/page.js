@@ -40,8 +40,9 @@ function formatBoolean(value) {
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
 
 function formatDimensionInputValue(value) {
+  if (value === null || value === undefined || value === "") return "";
   const cm = Number(value) / 10;
-  if (!Number.isFinite(cm)) return "";
+  if (!Number.isFinite(cm) || cm <= 0) return "";
   return Number.isInteger(cm)
     ? String(cm)
     : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
@@ -160,20 +161,21 @@ function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems 
 }
 
 function formatDimensionPart(value) {
+  if (value === null || value === undefined || value === "") return "";
   const cm = Number(value) / 10;
-  if (!Number.isFinite(cm)) return "-";
+  if (!Number.isFinite(cm) || cm <= 0) return "";
   return Number.isInteger(cm)
     ? String(cm)
     : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
 function formatDimensions(article) {
-  if (!article.widthMm && !article.heightMm && !article.depthMm) return "";
-  return [
+  const parts = [
     formatDimensionPart(article.widthMm),
     formatDimensionPart(article.heightMm),
     formatDimensionPart(article.depthMm),
-  ].join(" x ") + " cm";
+  ].filter(Boolean);
+  return parts.length ? `${parts.join(" x ")} cm` : "";
 }
 
 export default async function AdminCatalogArticlesPage({ searchParams }) {
@@ -268,7 +270,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Article number</th>
                     <th style={thStyle}>Name</th>
                     <th style={thStyle}>German name</th>
-                    <th style={thStyle}>Dimensions (W x H x D)</th>
+                    <th style={thStyle}>Dimensions</th>
                     <th style={thStyle}>Item type</th>
                     <th style={thStyle}>Price</th>
                     <th style={thStyle}>Fixed package</th>
