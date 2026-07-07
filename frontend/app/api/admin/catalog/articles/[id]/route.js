@@ -29,7 +29,7 @@ export async function POST(request, { params }) {
     const data = validateCatalogArticleInput(formData);
 
     const updatedCount = await prisma.$transaction(async (tx) => {
-      await tx.catalogArticle.update({
+      const article = await tx.catalogArticle.update({
         where: { id },
         data,
       });
@@ -50,7 +50,11 @@ export async function POST(request, { params }) {
         if (price == null) continue;
         await tx.kitchenItem.update({
           where: { id: item.id },
-          data: { price },
+          data: {
+            name: article.name,
+            nameDe: article.nameDe || null,
+            price,
+          },
         });
         syncedCount += 1;
       }

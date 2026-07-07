@@ -48,7 +48,7 @@ const DISHWASHER_BASE_MARKUP =
 const LEGACY_ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
   refrigerator: '<img src="/img/foto6.png" alt="Kühlschrank">',
-  base_cabinet_30: '<img src="/img/foto1.png" alt="Unterschrank 30cm">',
+  base_cabinet_30: '<img src="/img/foto1.png" alt="Unterschrank 30 cm">',
   wall_cabinet_l: '<img src="/img/foto4.png" alt="Oberschrank links">',
   wall_cabinet_r: '<img src="/img/foto2.png" alt="Oberschrank rechts">',
   extractor_hood: '<img src="/img/foto5.png" alt="Dunstabzugshaube">',

@@ -1,7 +1,9 @@
 import { KitchenStatus, ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma.js";
+import { ORDER_KIND_LIVE, ORDER_KIND_TEST, getOrderDelegate } from "./order-kind.js";
 import { applyDueScheduledCatalogPriceListImports } from "./catalog-price-list-import.js";
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
+import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
@@ -179,7 +181,7 @@ export async function getKitchenBySlug(slug) {
   await applyDueScheduledCatalogPriceListImports(prisma);
 
   try {
-    return await prisma.kitchen.findUnique({
+    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         items: {
@@ -190,14 +192,14 @@ export async function getKitchenBySlug(slug) {
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
         },
       },
-    });
+    }));
   } catch (error) {
     if (!isMissingKitchenItemProductImagePath(error) && !isMissingKitchenItemNameDe(error)) {
       throw error;
     }
 
     // Compatibility fallback for databases that have not applied the productImagePath migration yet.
-    return prisma.kitchen.findUnique({
+    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         items: {
@@ -206,7 +208,41 @@ export async function getKitchenBySlug(slug) {
           select: KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH,
         },
       },
+    }));
+  }
+}
+
+async function attachCutleryCatalogVariants(kitchen) {
+  if (!kitchen) return kitchen;
+
+  try {
+    const articles = await prisma.catalogArticle.findMany({
+      where: {
+        itemType: ItemType.ACCESSORY,
+        isActive: true,
+        articleNumber: {
+          in: CUTLERY_VARIANTS.map((variant) => variant.articleNumber),
+        },
+      },
+      orderBy: [{ widthMm: "asc" }, { articleNumber: "asc" }],
     });
+
+    return {
+      ...kitchen,
+      cutleryVariants: articles.length
+        ? normalizeCutleryVariants(
+          articles.map((article) => ({
+            articleNumber: article.articleNumber,
+            name: article.name,
+            nameDe: article.nameDe || "",
+            widthCm: article.widthMm ? Number(article.widthMm) / 10 : null,
+            price: Number(article.price),
+          })),
+        )
+        : normalizeCutleryVariants(CUTLERY_VARIANTS),
+    };
+  } catch {
+    return kitchen;
   }
 }
 
@@ -993,6 +1029,7 @@ export function serializeKitchenForLegacy(kitchen) {
   const items = kitchen.items || [];
   const toClientItem = (item) => ({
     id: item.id,
+    catalogArticleId: item.catalogArticleId || "",
     code: item.code,
     articleNumber: item.articleNumber || "",
     name: item.name,
@@ -1030,6 +1067,7 @@ export function serializeKitchenForLegacy(kitchen) {
     components: items.filter((item) => item.itemType === ItemType.COMPONENT).map(toClientItem),
     accessories: items.filter((item) => item.itemType === ItemType.ACCESSORY).map(toClientItem),
     services: items.filter((item) => item.itemType === ItemType.SERVICE).map(toClientItem),
+    cutleryVariants: normalizeCutleryVariants(kitchen.cutleryVariants || []),
     lockedBaseColors: LOCKED_BASE_COLORS,
     montageRequiredCodes: MONTAGE_REQUIRED_CODES,
     montageCabinetCodes: [
@@ -1101,6 +1139,14 @@ function buildOrderAdminSearch(query) {
 }
 
 export async function getOrdersForAdmin(filters = {}) {
+  return getOrdersForAdminByKind(filters, ORDER_KIND_LIVE);
+}
+
+export async function getTestOrdersForAdmin(filters = {}) {
+  return getOrdersForAdminByKind(filters, ORDER_KIND_TEST);
+}
+
+async function getOrdersForAdminByKind(filters = {}, orderKind = ORDER_KIND_LIVE) {
   const where = {};
 
   if (filters.kitchenId) where.kitchenId = filters.kitchenId;
@@ -1121,7 +1167,7 @@ export async function getOrdersForAdmin(filters = {}) {
     where.OR = buildOrderAdminSearch(query);
   }
 
-  const orders = await prisma.order.findMany({
+  const orders = await getOrderDelegate(prisma, orderKind).findMany({
     where,
     include: {
       kitchen: true,
@@ -1131,11 +1177,19 @@ export async function getOrdersForAdmin(filters = {}) {
     orderBy: { createdAt: "desc" },
   });
 
-  return addContractOrderSequence(await attachHousingCompaniesToOrderContracts(orders));
+  return addContractOrderSequence(await attachHousingCompaniesToOrderContracts(orders), orderKind);
 }
 
 export async function getOrderById(id) {
-  const order = await prisma.order.findUnique({
+  return getOrderByIdByKind(id, ORDER_KIND_LIVE);
+}
+
+export async function getTestOrderById(id) {
+  return getOrderByIdByKind(id, ORDER_KIND_TEST);
+}
+
+async function getOrderByIdByKind(id, orderKind = ORDER_KIND_LIVE) {
+  const order = await getOrderDelegate(prisma, orderKind).findUnique({
     where: { id },
     include: {
       kitchen: true,
@@ -1148,7 +1202,7 @@ export async function getOrderById(id) {
   });
 
   if (!order) return null;
-  const [sequencedOrder] = await addContractOrderSequence(await attachHousingCompaniesToOrderContracts([order]));
+  const [sequencedOrder] = await addContractOrderSequence(await attachHousingCompaniesToOrderContracts([order]), orderKind);
   return sequencedOrder;
 }
 
@@ -1163,7 +1217,7 @@ async function attachHousingCompaniesToOrderContracts(orders) {
   }));
 }
 
-async function addContractOrderSequence(orders) {
+async function addContractOrderSequence(orders, orderKind = ORDER_KIND_LIVE) {
   const contractIds = [...new Set(orders.map((order) => order.kitchenContractId).filter(Boolean))];
   if (!contractIds.length) {
     return orders.map((order) => ({
@@ -1173,7 +1227,7 @@ async function addContractOrderSequence(orders) {
     }));
   }
 
-  const allContractOrders = await prisma.order.findMany({
+  const allContractOrders = await getOrderDelegate(prisma, orderKind).findMany({
     where: {
       kitchenContractId: { in: contractIds },
     },

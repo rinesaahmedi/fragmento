@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { normalizeContractNumber } from "../lib/kitchen-contracts";
 
 const LANGUAGE_OPTIONS = [
@@ -204,6 +204,15 @@ const INSTRUCTION_TEXTS = {
     "Adım 2: Satın alma sözleşme numaranı gir. Evyenin alt dolabının iç kısmına bak.",
     "Adım 3: Eklemek istediğin bileşenleri seç.",
     "Adım 4: Kişisel bilgilerini gir ve siparişini tamamla.",
+    "",
+    "Ek olarak sunduklar\u0131m\u0131z:",
+    "Profesyonel ta\u015f\u0131ma ve montaj.",
+    "Gerekirse te\u015fvik ba\u015fvurular\u0131nda destek.",
+    "",
+    "Sipari\u015finden sonra yapay zeka sesli asistanlar\u0131m\u0131zdan biri seni arayarak t\u00fcm ayr\u0131nt\u0131lar\u0131 onaylar.",
+    "",
+    "Basit. H\u0131zl\u0131. G\u00fcvenilir.",
+    "Ba\u015flayal\u0131m!",
   ].join("\n"),
   es: [
     "¡Bienvenido a Fragmento by Architecto!",
@@ -216,6 +225,15 @@ const INSTRUCTION_TEXTS = {
     "Paso 2: Introduce tu número de contrato de compra.",
     "Paso 3: Elige los componentes que quieres añadir.",
     "Paso 4: Introduce tus datos personales y completa tu pedido.",
+    "",
+    "Adem\u00e1s ofrecemos:",
+    "Transporte y montaje profesional.",
+    "Apoyo con solicitudes de subvenci\u00f3n si es necesario.",
+    "",
+    "Despu\u00e9s de tu pedido, uno de nuestros asistentes de voz con IA te llamar\u00e1 para confirmar todos los detalles.",
+    "",
+    "Simple. R\u00e1pido. Fiable.",
+    "\u00a1Empecemos!",
   ].join("\n"),
   fr: [
     "Bienvenue chez Fragmento by Architecto !",
@@ -228,6 +246,15 @@ const INSTRUCTION_TEXTS = {
     "Étape 2 : Saisissez votre numéro de contrat d'achat.",
     "Étape 3 : Choisissez les composants à ajouter.",
     "Étape 4 : Saisissez vos informations personnelles et finalisez la commande.",
+    "",
+    "Nous proposons aussi :",
+    "Transport et montage professionnels.",
+    "Aide pour les demandes de subvention si n\u00e9cessaire.",
+    "",
+    "Apr\u00e8s votre commande, l'un de nos assistants vocaux IA vous appelle pour confirmer tous les d\u00e9tails.",
+    "",
+    "Simple. Rapide. Fiable.",
+    "C'est parti !",
   ].join("\n"),
   ru: [
     "Добро пожаловать в Fragmento by Architecto!",
@@ -240,6 +267,15 @@ const INSTRUCTION_TEXTS = {
     "Шаг 2: Введите номер договора покупки.",
     "Шаг 3: Выберите компоненты для добавления.",
     "Шаг 4: Введите личные данные и завершите заказ.",
+    "",
+    "\u0414\u043e\u043f\u043e\u043b\u043d\u0438\u0442\u0435\u043b\u044c\u043d\u043e \u043c\u044b \u043f\u0440\u0435\u0434\u043b\u0430\u0433\u0430\u0435\u043c:",
+    "\u041f\u0440\u043e\u0444\u0435\u0441\u0441\u0438\u043e\u043d\u0430\u043b\u044c\u043d\u0443\u044e \u0434\u043e\u0441\u0442\u0430\u0432\u043a\u0443 \u0438 \u043c\u043e\u043d\u0442\u0430\u0436.",
+    "\u041f\u043e\u043c\u043e\u0449\u044c \u043f\u0440\u0438 \u043f\u043e\u0434\u0430\u0447\u0435 \u0437\u0430\u044f\u0432\u043e\u043a \u043d\u0430 \u0441\u0443\u0431\u0441\u0438\u0434\u0438\u0438 \u043f\u0440\u0438 \u043d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u043e\u0441\u0442\u0438.",
+    "",
+    "\u041f\u043e\u0441\u043b\u0435 \u0437\u0430\u043a\u0430\u0437\u0430 \u043e\u0434\u0438\u043d \u0438\u0437 \u043d\u0430\u0448\u0438\u0445 \u0433\u043e\u043b\u043e\u0441\u043e\u0432\u044b\u0445 AI-\u0430\u0441\u0441\u0438\u0441\u0442\u0435\u043d\u0442\u043e\u0432 \u0441\u0432\u044f\u0436\u0435\u0442\u0441\u044f \u0441 \u0432\u0430\u043c\u0438 \u0434\u043b\u044f \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0435\u043d\u0438\u044f \u0432\u0441\u0435\u0445 \u0434\u0435\u0442\u0430\u043b\u0435\u0439.",
+    "",
+    "\u041f\u0440\u043e\u0441\u0442\u043e. \u0411\u044b\u0441\u0442\u0440\u043e. \u041d\u0430\u0434\u0435\u0436\u043d\u043e.",
+    "\u041d\u0430\u0447\u0438\u043d\u0430\u0435\u043c!",
   ].join("\n"),
 };
 
@@ -272,32 +308,32 @@ function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, d
 const ORDER_CONFIRMED_TEXT = {
   de: {
     title: "Bestellung bestaetigt",
-    message: "Vielen Dank. Deine Zahlung wurde bestaetigt und die Bestellbestaetigung wurde versendet.",
+    message: "Vielen Dank. Deine Zahlung wurde bestaetigt und die Bestellbestaetigung wurde versendet. Bitte pruefe auch deinen Spam-Ordner.",
     reference: "Bestellnummer",
   },
   en: {
     title: "Order confirmed",
-    message: "Thank you. Your payment was confirmed and the order confirmation has been sent.",
+    message: "Thank you. Your payment was confirmed and the order confirmation has been sent. Please also check your spam or junk folder.",
     reference: "Order number",
   },
   tr: {
     title: "Siparis onaylandi",
-    message: "Tesekkurler. Odemeniz onaylandi ve siparis onayi gonderildi.",
+    message: "Tesekkurler. Odemeniz onaylandi ve siparis onayi gonderildi. Lutfen spam veya gereksiz posta klasorunu de kontrol edin.",
     reference: "Siparis numarasi",
   },
   es: {
     title: "Pedido confirmado",
-    message: "Gracias. Tu pago ha sido confirmado y la confirmacion del pedido ha sido enviada.",
+    message: "Gracias. Tu pago ha sido confirmado y la confirmacion del pedido ha sido enviada. Revisa tambien tu carpeta de spam o correo no deseado.",
     reference: "Numero de pedido",
   },
   fr: {
     title: "Commande confirmee",
-    message: "Merci. Votre paiement a ete confirme et la confirmation de commande a ete envoyee.",
+    message: "Merci. Votre paiement a ete confirme et la confirmation de commande a ete envoyee. Verifiez aussi votre dossier spam ou courrier indesirable.",
     reference: "Numero de commande",
   },
   ru: {
     title: "Zakaz podtverzhden",
-    message: "Spasibo. Oplata podtverzhdena, i podtverzhdenie zakaza otpravleno.",
+    message: "Spasibo. Oplata podtverzhdena, i podtverzhdenie zakaza otpravleno. Proverte takzhe papku spam ili nezhelatelnuyu pochtu.",
     reference: "Nomer zakaza",
   },
 };
@@ -305,6 +341,7 @@ const ORDER_CONFIRMED_TEXT = {
 export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pageOpenTrackedRef = useRef(false);
   const [initialEntryState] = useState(() => getLegalReturnEntryState());
   const [selectedLanguage, setSelectedLanguage] = useState(
     initialEntryState?.selectedLanguage || (initialLanguage === "en" ? "en" : "de")
@@ -323,6 +360,31 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const confirmedOrderNumber = String(searchParams.get("order") || "").trim();
   const orderConfirmedText = ORDER_CONFIRMED_TEXT[selectedLanguage] || ORDER_CONFIRMED_TEXT.en;
   const shouldShowOrderConfirmedNotice = orderConfirmed && !isOrderConfirmedNoticeDismissed && screen === "language";
+
+  useEffect(() => {
+    if (pageOpenTrackedRef.current) {
+      return;
+    }
+
+    pageOpenTrackedRef.current = true;
+    const payload = JSON.stringify({
+      eventType: "PAGE_OPENED",
+      source: searchParams.get("source") || searchParams.get("utm_source") || "",
+      path: window.location.pathname,
+    });
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon("/api/public-visit-events", new Blob([payload], { type: "application/json" }));
+      return;
+    }
+
+    fetch("/api/public-visit-events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: payload,
+      keepalive: true,
+    }).catch(() => {});
+  }, [searchParams]);
 
   useEffect(() => {
     window.sessionStorage.setItem(

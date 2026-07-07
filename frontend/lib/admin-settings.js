@@ -8,6 +8,7 @@ export const DELIVERY_LEAD_TIME_DAYS_KEY = "deliveryLeadTimeDays";
 export const DELIVERY_LEAD_TIME_DEFAULT_WEEKS = 4;
 export const DELIVERY_LEAD_TIME_DEFAULT_DAYS = DELIVERY_LEAD_TIME_DEFAULT_WEEKS * 7;
 export const DELIVERY_LEAD_TIME_MIN_WEEKS = 4;
+export const ADMIN_LOGIN_VERIFICATION_ENABLED_KEY = "adminLoginVerificationEnabled";
 
 const TRUE_VALUES = new Set(["true", "1", "yes", "on"]);
 const FALSE_VALUES = new Set(["false", "0", "no", "off", ""]);
@@ -49,6 +50,29 @@ export async function setDirectOrderConfirmationEnabled(enabled, client = prisma
     where: { key: DIRECT_ORDER_CONFIRMATION_SETTING_KEY },
     create: {
       key: DIRECT_ORDER_CONFIRMATION_SETTING_KEY,
+      value,
+    },
+    update: { value },
+  });
+
+  return enabled;
+}
+
+export async function getAdminLoginVerificationEnabled(client = prisma) {
+  const setting = await client.appSetting.findUnique({
+    where: { key: ADMIN_LOGIN_VERIFICATION_ENABLED_KEY },
+  });
+
+  return parseBooleanSetting(setting?.value, true);
+}
+
+export async function setAdminLoginVerificationEnabled(enabled, client = prisma) {
+  const value = enabled ? "true" : "false";
+
+  await client.appSetting.upsert({
+    where: { key: ADMIN_LOGIN_VERIFICATION_ENABLED_KEY },
+    create: {
+      key: ADMIN_LOGIN_VERIFICATION_ENABLED_KEY,
       value,
     },
     update: { value },

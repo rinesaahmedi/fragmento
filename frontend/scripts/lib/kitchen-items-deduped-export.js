@@ -48,7 +48,15 @@ function dimensionsLabel(item) {
   const values = [item.widthMm, item.heightMm, item.depthMm].filter(
     (value) => value !== null && value !== undefined && value !== "",
   );
-  return values.length ? `${values.join(" x ")} mm` : "";
+  return values.length ? `${values.map(formatDimensionCmPart).join(" x ")} cm` : "";
+}
+
+function formatDimensionCmPart(value) {
+  const cm = Number(value) / 10;
+  if (!Number.isFinite(cm)) return "";
+  return Number.isInteger(cm)
+    ? String(cm)
+    : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
 function addUnique(list, value) {

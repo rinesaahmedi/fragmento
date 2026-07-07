@@ -30,7 +30,7 @@ const CLAIM_AREA_LABELS_BY_CODE = {
     "CAB-WALL-B-ML-600": "Oberschrank mittig links",
     "CAB-WALL-B-MR-600": "Oberschrank mittig rechts",
     "CAB-WALL-B-R-600": "Oberschrank rechts",
-    "CAB-HOOD-B-600": "Oberschrank f\u00fcr Flachschirmhaube 60",
+    "CAB-HOOD-B-600": "Oberschrank f\u00fcr Flachschirmhaube 60 cm",
     "CAB-WALL-C-L-600": "Oberschrank links",
     "CAB-WALL-C-ML-600": "Oberschrank mittig links",
     "CAB-WALL-C-MR-600": "Oberschrank mittig rechts",
@@ -87,15 +87,15 @@ function formatGermanClaimAreaName(area, fallbackName) {
     return "Waschmaschine";
   }
   if (code.startsWith("CAB-HOOD-")) {
-    return "Oberschrank f\u00fcr Flachschirmhaube 60";
+    return "Oberschrank f\u00fcr Flachschirmhaube 60 cm";
   }
   if (code.startsWith("CAB-BASE-") || normalizedName.includes("lower cabinet with drawer")) {
     const width = normalizedName.match(/\b(30|40|45|50|60|80)\b/)?.[1] || "";
-    return width ? `Unterschrank mit Schublade ${width}` : "Unterschrank mit Schublade";
+    return width ? `Unterschrank mit Schublade ${width} cm` : "Unterschrank mit Schublade";
   }
   if (code.startsWith("CAB-WALL-") || componentId.startsWith("component-wall-cabinet-") || normalizedName.includes("wall cabinet")) {
     const number = normalizedName.match(/\b(\d+)\b/)?.[1] || "";
-    return number ? `Oberschrank ${number}` : "Oberschrank";
+    return number ? `Oberschrank ${number} cm` : "Oberschrank";
   }
 
   return fallbackName || code;

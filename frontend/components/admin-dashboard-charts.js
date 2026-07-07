@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -110,9 +110,9 @@ const KITCHEN_ELEMENT_LABEL_KEYS = {
   "oberschrank (mittig links)": ["dashboard.catalogItemNames.wallCabinetMidLeft", "Wall Cabinet mid-left"],
   "oberschrank (mittig rechts)": ["dashboard.catalogItemNames.wallCabinetMidRight", "Wall Cabinet mid-right"],
   "oberschrank (rechts)": ["dashboard.catalogItemNames.wallCabinetRight", "Wall Cabinet right"],
-  "hood wall cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"],
-  "extractor hood upper cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"],
-  "upper cabinet with extractor hood 60": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"],
+  "hood wall cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"],
+  "extractor hood upper cabinet": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"],
+  "upper cabinet with extractor hood 60 cm": ["dashboard.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"],
   "extractor hood": ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
   dunstabzugshaube: ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
   "fh664621e extractor hood": ["dashboard.catalogItemNames.extractorHood", "Extractor Hood"],
@@ -139,12 +139,13 @@ const KITCHEN_ELEMENT_LABEL_KEYS = {
   "unterschrank (2 schubladen) links": ["dashboard.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"],
   "unterschrank (2 schubladen) rechts": ["dashboard.catalogItemNames.baseCabinetTwoDrawersRight", "Base Cabinet (2 Drawers) Right"],
   "unterschrank (3 schubladen)": ["dashboard.catalogItemNames.baseCabinetThreeDrawers", "Base Cabinet (3 Drawers)"],
-  refrigerator: ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"],
-  "freestanding refrigerator 178cm": ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"],
-  kühlschrank: ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"],
-  kuehlschrank: ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"],
-  "standkühlschrank 178 cm": ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"],
-  "standkuehlschrank 178 cm": ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"],
+  refrigerator: ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"],
+  "freestanding refrigerator 178cm": ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"],
+  "freestanding refrigerator 178 cm": ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"],
+  kühlschrank: ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"],
+  kuehlschrank: ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"],
+  "standkühlschrank 178 cm": ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"],
+  "standkuehlschrank 178 cm": ["dashboard.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"],
   "sink and waste system": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
   "spüle und mülltrennsystem": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
   "spuele und muelltrennsystem": ["dashboard.catalogItemNames.sinkAndWasteSystem", "Sink and Waste System"],
@@ -275,8 +276,8 @@ export function AdminDashboardCharts({
     <div className="analytics-dashboard">
       <section className="dashboard-toolbar">
         <div>
-          <p className="eyebrow">{translate("dashboard.analyticsOverview", "Analytics overview")}</p>
-          <h1>{translate("dashboard.orderDashboard", "Order dashboard")}</h1>
+          <p className="eyebrow deploy-test-heading">{translate("dashboard.analyticsOverview", "Analytics overview").toUpperCase()}</p>
+          <h1 className="deploy-test-heading">{translate("dashboard.orderDashboard", "Order dashboard").toUpperCase()}</h1>
           <p>{translate("dashboard.monitorSalesWorkflowMovementKitchenDemandAndItemPerformance", "Track orders, workflow, kitchens, and item performance.")}</p>
         </div>
         {renderFilterForm()}
@@ -287,7 +288,15 @@ export function AdminDashboardCharts({
           <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="kpi-card">
             <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
             <strong>{kpi.value}</strong>
-            <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+            {kpi.breakdown ? (
+              kpi.breakdown.map((line) => (
+                <small key={line.labelKey}>
+                  {translate(line.labelKey || "", line.fallbackLabel || "")}: {line.value}
+                </small>
+              ))
+            ) : (
+              <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+            )}
           </article>
         ))}
       </section>
@@ -302,7 +311,15 @@ export function AdminDashboardCharts({
             <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="mobile-kpi-card">
               <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
               <strong>{kpi.value}</strong>
-              <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+              {kpi.breakdown ? (
+                kpi.breakdown.map((line) => (
+                  <small key={line.labelKey}>
+                    {translate(line.labelKey || "", line.fallbackLabel || "")}: {line.value}
+                  </small>
+                ))
+              ) : (
+                <small>{translateText(kpi.trendKey || "", kpi.trendFallback || "", kpi.trendValues)}</small>
+              )}
             </article>
           ))}
         </div>
@@ -983,7 +1000,7 @@ function MobileTopItems({ topItemsByQuantity, topItemsByRevenue }) {
       displayName: formatTopItemLabel(item, translate),
       value: Number(item[mode] || 0),
     }))
-    .sort(compareItemsByArticleCode)
+    .sort(compareItemsByMetric)
     .slice(0, 5);
   const maxValue = Math.max(1, ...rows.map((item) => item.value));
   const formatter = mode === "quantity"
@@ -1548,7 +1565,7 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       }
     : {
         formatter: formatCurrency,
@@ -1560,7 +1577,7 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       };
   const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
   const hasCompanyData = Boolean(selectedCompany);
@@ -1887,8 +1904,10 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
         }
 
         .top-items-scroll {
-          overflow: visible;
+          max-height: 280px;
+          overflow-y: auto;
           overflow-x: hidden;
+          padding-right: 4px;
         }
 
         .segmented-control {
@@ -2045,7 +2064,7 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       }
     : {
         formatter: formatCurrency,
@@ -2057,7 +2076,7 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             axisLabel: buildTopItemAxisLabel(item, translate),
             displayIdentifier: item.articleNumber || item.code || "",
           }))
-          .sort(compareItemsByArticleCode),
+          .sort(compareItemsByMetric),
       };
   const topItemChartData = itemConfig.data.slice(0, MAX_TOP_ITEMS);
   const topItemsChartHeight = Math.max(240, topItemChartData.length * TOP_ITEM_ROW_HEIGHT + 42);
@@ -2685,13 +2704,13 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
   const config = mode === "quantity"
     ? {
         title: translate("dashboard.topItems", "Top items"),
-        detail: translate("dashboard.topItemsSortedByArticleCode", "Items grouped and sorted by article code."),
+        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
         data: topItemsByQuantity,
         formatter: (value) => translateText("dashboard.itemCountValue", "{count} item(s)", { count: String(value) }),
       }
     : {
         title: translate("dashboard.topItems", "Top items"),
-        detail: translate("dashboard.topItemsSortedByArticleCode", "Items grouped and sorted by article code."),
+        detail: translate("dashboard.topItemsSortedBySelectedPerformanceMetric", "Top items sorted by the selected performance metric."),
         data: topItemsByRevenue,
         formatter: formatCurrency,
       };
@@ -2706,7 +2725,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
       quantity: Number(item.quantity || 0),
       revenue: Number(item.revenue || 0),
     }))
-    .sort(compareItemsByArticleCode), [config.data, mode, translate]);
+    .sort(compareItemsByMetric), [config.data, mode, translate]);
   const data = fullData;
 
   const chartHeight = Math.max(260, data.length * TOP_ITEM_ROW_HEIGHT + 44);
@@ -3231,7 +3250,10 @@ function formatTopItemLabel(item, translate) {
   return String(translatedName || item?.name || "").trim();
 }
 
-function compareItemsByArticleCode(a, b) {
+function compareItemsByMetric(a, b) {
+  const metricCompare = Number(b?.chartValue || b?.value || 0) - Number(a?.chartValue || a?.value || 0);
+  if (metricCompare) return metricCompare;
+
   const leftArticle = String(a?.articleNumber || a?.code || "").trim();
   const rightArticle = String(b?.articleNumber || b?.code || "").trim();
   const articleCompare = leftArticle.localeCompare(rightArticle, undefined, { numeric: true, sensitivity: "base" });

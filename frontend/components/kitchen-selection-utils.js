@@ -75,10 +75,15 @@ export function getStructuredDimensions(item) {
     (value) => value !== null && value !== undefined && value !== "",
   );
   if (!values.length) return "";
-  if (item?.componentKey === "refrigerator") {
-    return `${values.map((value) => Number(value) / 10).join(" x ")} cm`;
-  }
-  return `${values.join(" x ")} mm`;
+  return `${values.map(formatDimensionCmPart).join(" x ")} cm`;
+}
+
+export function formatDimensionCmPart(value) {
+  const cm = Number(value) / 10;
+  if (!Number.isFinite(cm)) return "-";
+  return Number.isInteger(cm)
+    ? String(cm)
+    : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
 export function splitCatalogItemNameAndDimensions(name) {
@@ -367,6 +372,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     language === "de" ? "Vollintegrierter Geschirrspüler" : "Fully integrated dishwasher",
   );
 
+  if (item?.isCutleryLine && rawName) {
+    return withPhotoNumber(rawName);
+  }
+
   if (rawName === "Sink and Worktop" || rawName === "Spüle und Arbeitsplatte") {
     return translate("configurator.catalogItemNames.worktop", "Worktop");
   }
@@ -378,7 +387,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return withDimensions(dishwasherName());
   }
   if (iconKey === "tall_refrigerator") {
-    return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"));
+    return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"));
   }
   if (code.startsWith("SINKBASE-") || code === "T3D-SINKBASE-001") {
     return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
@@ -390,6 +399,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   }, language);
   if (cabinetWidthName) {
     return withPhotoNumber(cabinetWidthName);
+  }
+
+  if (item?.catalogArticleId && rawName) {
+    return withPhotoNumber(rawName);
   }
 
   const normalizedRawTitle = rawTitle.toLowerCase();
@@ -435,7 +448,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105825-600":
     case "CAB-HOOD-AB105828-600":
     case "CAB-HOOD-AB105831-600":
-      return withPhotoNumber(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60"));
+      return withPhotoNumber(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
     case "CAB-WALL-C-ML-600":
@@ -531,7 +544,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-AB105828-KGCN388140E":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
-      return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm"));
+      return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"));
     case "SINK-WORKTOP":
     case "SINK-B-BOTTON-45":
     case "SINK-AB105806-BOTTON-45":

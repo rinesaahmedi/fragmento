@@ -11,6 +11,7 @@ import {
   getProductInfoHref,
 } from "./kitchen-selection-utils";
 import { usePublicI18n } from "./public-i18n";
+import { getPriceBreakdown } from "../lib/price-utils";
 
 function isWorktopSummaryItem(item) {
   const code = String(item?.code || "").trim().toUpperCase();
@@ -107,7 +108,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
     <div className={styles.summaryRow}>
       <div className={styles.summaryMeta}>
         <strong>{itemName}</strong>
-        {!isLocked && quantity > 1 ? (
+        {quantity > 1 ? (
           <span className={styles.summaryQuantity}>
             {translate("configurator.summaryQuantity", "Quantity")}: {quantity}
           </span>
@@ -248,8 +249,25 @@ export default function KitchenSelectionSummary({
       ) : null}
       <div className={styles.summaryActions}>
         <div className={styles.summaryTotal}>
-          <span>{translate("common.totalPrice", "Total price")}</span>
-          <strong>{formatCurrency(grandTotal)}</strong>
+          {(() => {
+            const { net, vat, total } = getPriceBreakdown(grandTotal);
+            return (
+              <>
+                <div className={styles.summaryTotalLine}>
+                  <span>{translate("common.priceExclVat", "Price")}</span>
+                  <span>{formatCurrency(net)}</span>
+                </div>
+                <div className={styles.summaryTotalLine}>
+                  <span>{translate("common.vatAmount", "VAT (19%)")}</span>
+                  <span>{formatCurrency(vat)}</span>
+                </div>
+                <div className={styles.summaryTotalLine}>
+                  <span>{translate("common.totalPrice", "Total price")}</span>
+                  <strong>{formatCurrency(total)}</strong>
+                </div>
+              </>
+            );
+          })()}
         </div>
         <button type="button" className={styles.primaryButton} onClick={onOpenOrderSection}>
           {translate("configurator.summaryContinueToOrder", "Continue to order")}

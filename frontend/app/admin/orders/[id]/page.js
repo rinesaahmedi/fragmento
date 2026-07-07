@@ -26,7 +26,8 @@ import { OrderEmailReviewModal } from "../../../../components/order-email-review
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getOrderById } from "../../../../lib/catalog";
-import { buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
+import { getPriceBreakdown } from "../../../../lib/price-utils";
+import { buildOrderConfirmationAttachmentLabels, buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
 import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../../lib/order-item-display";
 import { buildOrderForNotifications } from "../../../../lib/orders";
 
@@ -207,6 +208,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
   }));
   const emailDraft = buildOrderConfirmationEmailDraft(notificationOrder);
   const emailStatic = await buildOrderConfirmationEmailStaticHtml(notificationOrder);
+  const emailAttachmentLabels = await buildOrderConfirmationAttachmentLabels(notificationOrder, emailStatic.attachmentLinks);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -232,18 +234,28 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
           ) : null}
 
           <form action={`/api/admin/orders/${order.id}`} method="post" style={actionPanelStyle}>
-            <div style={actionSummaryStyle}>
-              <div style={actionMetricStyle}>
-                <span style={detailLabelStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></span>
+            <div style={statusRowStyle}>
+              <div style={statusItemStyle}>
+                <span style={compactLabelStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></span>
                 <AdminStatusBadge status={order.status} />
               </div>
-              <div style={actionMetricStyle}>
-                <span style={detailLabelStyle}>Payment status</span>
+              <div style={statusItemStyle}>
+                <span style={compactLabelStyle}>Payment</span>
                 <PaymentStatusBadge status={order.paymentStatus} />
               </div>
+            </div>
+            <div style={actionSummaryStyle}>
               <div style={actionMetricStyle}>
                 <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.total" fallback="Total" /></span>
-                <strong>{formatCurrency(order.totalPrice)}</strong>
+                <div style={{ display: "grid", gap: 2 }}>
+                  <span style={{ fontSize: 12, color: "var(--app-text-muted)" }}>
+                    <AdminText i18nKey="orderDetailAdmin.priceExclVat" fallback="Price" />: {formatCurrency(getPriceBreakdown(order.totalPrice).net)}
+                  </span>
+                  <span style={{ fontSize: 12, color: "var(--app-text-muted)" }}>
+                    <AdminText i18nKey="orderDetailAdmin.vatAmount" fallback="VAT (19%)" />: {formatCurrency(getPriceBreakdown(order.totalPrice).vat)}
+                  </span>
+                  <strong>{formatCurrency(order.totalPrice)}</strong>
+                </div>
               </div>
               <div style={actionMetricStyle}>
                 <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.contractNumber" fallback="Contract number" /></span>
@@ -259,6 +271,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 defaultSubject={emailDraft.subject}
                 defaultBody={emailDraft.bodyText}
                 staticHtml={emailStatic.html}
+                attachmentLabels={emailAttachmentLabels}
                 canConfirm={canConfirm}
                 canResendEmail={canResendEmail}
               />
@@ -584,9 +597,31 @@ const actionPanelStyle = {
   padding: 18,
 };
 
+const statusRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+  flexWrap: "wrap",
+};
+
+const statusItemStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  minWidth: 0,
+};
+
+const compactLabelStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 800,
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+};
+
 const actionSummaryStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: 12,
 };
 

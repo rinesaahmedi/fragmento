@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useAdminI18n } from "./admin-i18n";
 
@@ -10,12 +10,13 @@ const KITCHEN_AREA_NAMES = {
   "Wall Cabinet mid-left": "Oberschrank mittig links",
   "Wall Cabinet mid-right": "Oberschrank mittig rechts",
   "Wall Cabinet right": "Oberschrank rechts",
-  "Upper Cabinet with Extractor Hood 60": "Oberschrank für Flachschirmhaube 60",
+  "Upper Cabinet with Extractor Hood 60 cm": "Oberschrank für Flachschirmhaube 60 cm",
   "Extractor Hood": "Flachschirmhaube",
   "Chimney Extractor Hood": "Kamin-Dunstabzugshaube",
   "Washing Machine": "Waschmaschine",
   Worktop: "Arbeitsplatte",
   Refrigerator: "Standkühlschrank 178 cm",
+  "Freestanding refrigerator 178 cm": "Standkühlschrank 178 cm",
   "Freestanding refrigerator 178cm": "Standkühlschrank 178 cm",
   "Sink and Waste System": "Spüle und Mülltrennsystem",
   "Sink and Worktop": "Arbeitsplatte",

@@ -20,7 +20,7 @@ import {
   shouldShowProductAssistantLauncher,
   toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
-import KitchenSvgStage from "./kitchen-svg-stage";
+import useKitchenSvgStage from "./kitchen-svg-stage";
 import { PLAN_VIEWPORT_BY_SLUG } from "./kitchen-svg-plan-utils";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import {
@@ -37,9 +37,11 @@ import {
 import {
   buildCutleryLineItems,
   buildInitialCutleryLines,
+  getAvailableCutleryVariantsForComponents,
   getCutleryBaseItem,
   isCutleryAccessoryCode,
   isCutleryAccessoryItem,
+  normalizeCutleryVariants,
   normalizeCutleryLines,
 } from "../lib/cutlery-accessories";
 import { PublicI18nProvider, PublicLanguageSwitcher, usePublicI18n } from "./public-i18n";
@@ -404,7 +406,7 @@ function formatProductAssistantDisplayName(item, translate) {
   }
 
   if (isRefrigeratorProductAssistantItem(item)) {
-    return translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178cm");
+    return translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm");
   }
 
   if (isDishwasherProductAssistantItem(item)) {
@@ -1094,16 +1096,23 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
     selectedComponentIds: [
       ...new Set([
         ...fixedComponentIds,
+        ...baseComponentIds,
         ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
       ]),
     ],
     selectedAccessoryCodes: [
       ...new Set([
         ...fixedAccessoryCodes,
+        ...baseAccessoryCodes,
         ...filterRegularAccessoryCodes(draft.selectedAccessoryCodes, kitchenConfig.accessories).filter((code) => validAccessoryCodes.has(code)),
       ]),
     ],
-    selectedServiceCodes: draft.selectedServiceCodes.filter((code) => validServiceCodes.has(code)),
+    selectedServiceCodes: [
+      ...new Set([
+        ...baseServiceCodes,
+        ...draft.selectedServiceCodes.filter((code) => validServiceCodes.has(code)),
+      ]),
+    ],
     cutleryLines: buildInitialCutleryLines({
       initialOrder,
       draft,
@@ -1369,6 +1378,28 @@ function KitchenConfiguratorContent({
     () => getCutleryBaseItem(kitchenConfig.accessories),
     [kitchenConfig.accessories],
   );
+  const cutleryVariants = useMemo(
+    () => getAvailableCutleryVariantsForComponents(
+      kitchenConfig.components.filter((item) => selectedComponentIds.includes(componentIdForItem(item))),
+      kitchenConfig.cutleryVariants || [],
+    ),
+    [kitchenConfig.components, kitchenConfig.cutleryVariants, selectedComponentIds],
+  );
+  useEffect(() => {
+    setCutleryLines((current) => {
+      const next = normalizeCutleryLines(current, cutleryVariants);
+      if (
+        next.length === current.length &&
+        next.every((line, index) =>
+          line.articleNumber === current[index]?.articleNumber &&
+          line.quantity === current[index]?.quantity
+        )
+      ) {
+        return current;
+      }
+      return next;
+    });
+  }, [cutleryVariants]);
   const selectedAccessories = [
     ...selectedMap(kitchenConfig.accessories, selectedAccessoryCodes)
       .filter((item) => !isCutleryAccessoryItem(item))
@@ -1377,7 +1408,7 @@ function KitchenConfiguratorContent({
         isLocked: item.isLocked || defaultLockedAccessoryCodes.has(item.code),
         isOrderLocked: orderLockedAccessoryCodes.has(item.code),
       })),
-    ...buildCutleryLineItems(cutleryBaseItem, cutleryLines, translate, language).map((item) => ({
+    ...buildCutleryLineItems(cutleryBaseItem, cutleryLines, translate, language, cutleryVariants).map((item) => ({
       ...item,
       isLocked: false,
       isOrderLocked: orderLockedAccessoryCodes.has(item.code),
@@ -1543,7 +1574,7 @@ function KitchenConfiguratorContent({
       if (exists) {
         return current.filter((line) => line.articleNumber !== normalizedArticleNumber);
       }
-      return normalizeCutleryLines([...current, { articleNumber: normalizedArticleNumber, quantity: 1 }]);
+      return normalizeCutleryLines([...current, { articleNumber: normalizedArticleNumber, quantity: 1 }], cutleryVariants);
     });
     setStatus("");
     setStatusTone("idle");
@@ -1559,6 +1590,7 @@ function KitchenConfiguratorContent({
         current.map((line) =>
           line.articleNumber === normalizedArticleNumber ? { ...line, quantity: nextQuantity } : line,
         ),
+        cutleryVariants,
       ),
     );
   }
@@ -2099,7 +2131,10 @@ function KitchenConfiguratorContent({
       const webhookIssue = payload.notifications?.webhookError;
 
       if (payload.checkoutUrl) {
-        setStatus(translate("configurator.statusRedirectingToPayment", "Redirecting to secure payment..."));
+        setStatus(translate(
+          "configurator.statusRedirectingToPayment",
+          "Redirecting to secure payment. After payment, please wait until Stripe sends you back to Fragmento.",
+        ));
         clearConfiguratorDraft(draftStorageKey);
         window.location.assign(payload.checkoutUrl);
         return;
@@ -2128,6 +2163,18 @@ function KitchenConfiguratorContent({
     }
   }
 
+  const { stage: planStageNode, legend: planLegendNode } = useKitchenSvgStage({
+    svgMarkup,
+    kitchenConfig,
+    kitchenSlug,
+    planViewport,
+    fixedComponentIds,
+    planLockedComponentIds,
+    selectedComponentIds,
+    setSelectedComponentIds,
+    onResetSelection: resetSelection,
+  });
+
   return (
     <div className={styles.page}>
       <div className={styles.shell}>
@@ -2155,19 +2202,50 @@ function KitchenConfiguratorContent({
         </header>
 
         <section className={styles.contentGrid}>
-          <div className={styles.mainColumn}>
-            <KitchenSvgStage
-              svgMarkup={svgMarkup}
-              kitchenConfig={kitchenConfig}
-              kitchenSlug={kitchenSlug}
-              planViewport={planViewport}
-              fixedComponentIds={fixedComponentIds}
-              planLockedComponentIds={planLockedComponentIds}
-              selectedComponentIds={selectedComponentIds}
-              setSelectedComponentIds={setSelectedComponentIds}
-              onResetSelection={resetSelection}
-            />
+          <div className={styles.planCatalogGroup}>
+            <div className={styles.planColumn}>
+              <div className={styles.planStickyPrice}>
+                <span>{translate("common.totalPrice", "Total price")}</span>
+                <strong>{formatCurrency(grandTotal)}</strong>
+              </div>
+              {planStageNode}
+            </div>
 
+            <div className={styles.planLegendColumn}>{planLegendNode}</div>
+
+            <div className={styles.sideColumn}>
+              <KitchenCatalogPanel
+                kitchenConfig={kitchenConfig}
+                kitchenSlug={kitchenSlug}
+                visibleComponents={visibleComponents}
+                selectedComponents={selectedComponents}
+                selectedAccessories={selectedAccessories}
+                selectedServices={selectedServices}
+                selectedComponentIds={selectedComponentIds}
+                selectedAccessoryCodes={selectedAccessoryCodes}
+                selectedServiceCodes={selectedServiceCodes}
+                selectedDisplayCount={selectedDisplayCount}
+                fixedComponentIds={fixedComponentIds}
+                orderLockedAccessoryCodes={fixedAccessoryCodes}
+                orderLockedServiceCodes={orderLockedServiceCodes}
+                setSelectedComponentIds={setSelectedComponentIds}
+                onToggleAccessory={toggleAccessory}
+                cutleryVariants={cutleryVariants}
+                cutleryLines={cutleryLines}
+                onToggleCutleryVariant={toggleCutleryVariant}
+                onUpdateCutleryLineQuantity={updateCutleryLineQuantity}
+                onToggleService={toggleService}
+                onOpenProductInfo={openProductInfo}
+                onOpenProductPhotos={openProductPhotos}
+                onOpenProductAssistantFromItem={hasAnyAssistantProducts ? openProductAssistantForCatalogItem : undefined}
+                serviceEligibility={serviceEligibility}
+                deliveryMinEligible={deliveryMinEligible}
+                deliveryMinAmount={deliveryMinAmount}
+              />
+            </div>
+          </div>
+
+          <div className={styles.summaryColumn}>
             <KitchenSelectionSummary
               selectedComponents={selectedComponents}
               selectedAccessories={selectedAccessories}
@@ -2181,36 +2259,6 @@ function KitchenConfiguratorContent({
               onRemoveService={removeService}
               onOpenOrderSection={openOrderSection}
               onOpenProductInfo={openProductInfo}
-            />
-          </div>
-
-          <div className={styles.sideColumn}>
-            <KitchenCatalogPanel
-              kitchenConfig={kitchenConfig}
-              kitchenSlug={kitchenSlug}
-              visibleComponents={visibleComponents}
-              selectedComponents={selectedComponents}
-              selectedAccessories={selectedAccessories}
-              selectedServices={selectedServices}
-              selectedComponentIds={selectedComponentIds}
-              selectedAccessoryCodes={selectedAccessoryCodes}
-              selectedServiceCodes={selectedServiceCodes}
-              selectedDisplayCount={selectedDisplayCount}
-              fixedComponentIds={fixedComponentIds}
-              orderLockedAccessoryCodes={fixedAccessoryCodes}
-              orderLockedServiceCodes={orderLockedServiceCodes}
-              setSelectedComponentIds={setSelectedComponentIds}
-              onToggleAccessory={toggleAccessory}
-              cutleryLines={cutleryLines}
-              onToggleCutleryVariant={toggleCutleryVariant}
-              onUpdateCutleryLineQuantity={updateCutleryLineQuantity}
-              onToggleService={toggleService}
-              onOpenProductInfo={openProductInfo}
-              onOpenProductPhotos={openProductPhotos}
-              onOpenProductAssistantFromItem={hasAnyAssistantProducts ? openProductAssistantForCatalogItem : undefined}
-              serviceEligibility={serviceEligibility}
-              deliveryMinEligible={deliveryMinEligible}
-              deliveryMinAmount={deliveryMinAmount}
             />
           </div>
         </section>

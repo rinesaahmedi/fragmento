@@ -23,6 +23,7 @@ import {
   getCutleryVariant,
   getCutleryVariantLabel,
   isCutleryAccessoryItem,
+  normalizeCutleryVariants,
 } from "../lib/cutlery-accessories";
 import {
   getServiceDisabledReason,
@@ -121,7 +122,7 @@ function getCatalogCabinetIconWidthPx(item) {
   if (!Number.isFinite(widthMm) || widthMm <= 0) return null;
 
   const clampedWidth = Math.min(Math.max(widthMm, 300), 600);
-  return Math.round(34 + ((clampedWidth - 300) / 300) * 30);
+  return Math.round(29 + ((clampedWidth - 300) / 300) * 25);
 }
 
 function getCatalogIconMarkup(item, stretchWidthOnly) {
@@ -370,6 +371,7 @@ function CatalogItem({
 
 function CutleryInsertAccessoryCard({
   item,
+  cutleryVariants = CUTLERY_VARIANTS,
   lines,
   locked,
   onToggleCutleryVariant,
@@ -379,12 +381,13 @@ function CutleryInsertAccessoryCard({
   const { translate, language } = usePublicI18n();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const variants = normalizeCutleryVariants(cutleryVariants);
   const itemName = translate("configurator.cutleryInsertTitle", "Cutlery insert");
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const selectedArticleNumbers = new Set(lines.map((line) => line.articleNumber));
   const selected = lines.length > 0;
   const linesTotal = lines.reduce((sum, line) => {
-    const variant = getCutleryVariant(line.articleNumber);
+    const variant = getCutleryVariant(line.articleNumber, variants);
     return sum + (variant?.price || 0) * line.quantity;
   }, 0);
   const className = [
@@ -408,7 +411,7 @@ function CutleryInsertAccessoryCard({
       return translate("configurator.cutleryDropdownPlaceholder", "Choose widths...");
     }
     if (lines.length === 1) {
-      const variant = getCutleryVariant(lines[0].articleNumber);
+      const variant = getCutleryVariant(lines[0].articleNumber, variants);
       return variant
         ? `${variant.widthCm} cm`
         : getCutleryVariantLabel(variant, translate, language) || lines[0].articleNumber;
@@ -445,7 +448,7 @@ function CutleryInsertAccessoryCard({
           {selected
             ? formatCurrency(linesTotal)
             : translate("configurator.cutleryPriceFrom", "from {price}", {
-                price: formatCurrency(CUTLERY_VARIANTS[0]?.price || item.price),
+                price: formatCurrency(variants[0]?.price || item.price),
               })}
         </span>
       </div>
@@ -475,7 +478,7 @@ function CutleryInsertAccessoryCard({
             </button>
             {isDropdownOpen ? (
               <ul className={styles.cutleryDropdownMenu} role="listbox" aria-multiselectable="true">
-                {CUTLERY_VARIANTS.map((variant) => {
+                {variants.map((variant) => {
                   const isSelected = selectedArticleNumbers.has(variant.articleNumber);
                   const optionClassName = [
                     styles.cutleryDropdownOption,
@@ -514,9 +517,11 @@ function CutleryInsertAccessoryCard({
             {translate("configurator.cutlerySelectedTitle", "Selected")}
           </p>
           {lines.map((line) => {
-            const variant = getCutleryVariant(line.articleNumber);
+            const variant = getCutleryVariant(line.articleNumber, variants);
             const lineLabel = getCutleryVariantLabel(variant, translate, language);
             const lineTotal = (variant?.price || 0) * line.quantity;
+            const maxQuantity = Math.max(1, Math.floor(Number(variant?.maxQuantity || 99)));
+            const clampLineQuantity = (value) => Math.max(1, Math.min(maxQuantity, clampQuantity(value)));
 
             return (
               <div key={line.id} className={styles.cutlerySelectionRow}>
@@ -540,16 +545,16 @@ function CutleryInsertAccessoryCard({
                         className={styles.cutleryQuantityInput}
                         type="number"
                         min="1"
-                        max="99"
+                        max={maxQuantity}
                         value={line.quantity}
-                        onChange={(event) => onUpdateCutleryLineQuantity?.(line.articleNumber, clampQuantity(event.target.value))}
+                        onChange={(event) => onUpdateCutleryLineQuantity?.(line.articleNumber, clampLineQuantity(event.target.value))}
                       />
                       <button
                         type="button"
                         className={styles.cutleryQuantityButton}
                         aria-label={translate("configurator.cutleryIncreaseQuantity", "Increase quantity")}
-                        disabled={line.quantity >= 99}
-                        onClick={() => onUpdateCutleryLineQuantity?.(line.articleNumber, line.quantity + 1)}
+                        disabled={line.quantity >= maxQuantity}
+                        onClick={() => onUpdateCutleryLineQuantity?.(line.articleNumber, clampLineQuantity(line.quantity + 1))}
                       >
                         +
                       </button>
@@ -626,6 +631,7 @@ export default function KitchenCatalogPanel({
   setSelectedComponentIds,
   onToggleAccessory,
   onToggleService,
+  cutleryVariants = CUTLERY_VARIANTS,
   cutleryLines = [],
   onToggleCutleryVariant,
   onUpdateCutleryLineQuantity,
@@ -687,6 +693,7 @@ export default function KitchenCatalogPanel({
                   <CutleryInsertAccessoryCard
                     key={item.id}
                     item={item}
+                    cutleryVariants={cutleryVariants}
                     lines={cutleryLines}
                     locked={orderLockedAccessoryCodes.has(item.code)}
                     onToggleCutleryVariant={onToggleCutleryVariant}

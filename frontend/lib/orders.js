@@ -23,8 +23,19 @@ import {
   getContractOrderState,
   normalizeContractNumber,
 } from "./kitchen-contracts";
+import {
+  ORDER_KIND_LIVE,
+  getOrderDelegate,
+  getOrderItemDelegate,
+  getOrderKindForContractNumber,
+} from "./order-kind";
 import { prisma } from "./prisma";
-import { isCutleryAccessoryCode } from "./cutlery-accessories";
+import {
+  getAvailableCutleryVariantsForComponents,
+  getCutleryVariant,
+  isCutleryAccessoryCode,
+  parseCutleryLineFromOrderItem,
+} from "./cutlery-accessories";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -50,8 +61,8 @@ function requireString(value, label) {
   return String(value).trim();
 }
 
-async function buildNextOrderNumberForContract(tx, kitchenContract) {
-  const orders = await tx.order.findMany({
+async function buildNextOrderNumberForContract(tx, kitchenContract, orderKind = ORDER_KIND_LIVE) {
+  const orders = await getOrderDelegate(tx, orderKind).findMany({
     where: {
       kitchenContractId: kitchenContract.id,
       orderNumber: { startsWith: kitchenContract.contractNumber },
@@ -187,28 +198,42 @@ function getOrderItemEffectivePrice(item) {
 }
 
 export function buildOrderForNotifications(orderRecord) {
-  const toNotificationItem = (item) => ({
-    code: item.code,
-    articleNumber: item.kitchenItem?.articleNumber || item.articleNumber || "",
-    name: item.kitchenItem?.nameDe || item.nameDe || item.nameSnapshot || item.name || "",
-    nameDe: item.kitchenItem?.nameDe || item.nameDe || "",
-    price: getOrderItemEffectivePrice(item),
-    quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
-    iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
-    componentKey: item.kitchenItem?.componentKey || item.componentKey || "",
-    productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
-    productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
-    productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
-    productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts)
-      ? item.kitchenItem.productInfoKeyFacts
-      : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
-    productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
-    blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
-    blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
-    blendePrice: item.kitchenItem?.blendePrice != null
-      ? Number(item.kitchenItem.blendePrice)
-      : (item.blendePrice != null ? Number(item.blendePrice) : null),
-  });
+  const toNotificationItem = (item) => {
+    const cutleryLine = parseCutleryLineFromOrderItem({
+      code: item.code,
+      articleNumber: item.articleNumber,
+      name: item.nameSnapshot || item.name,
+      nameSnapshot: item.nameSnapshot,
+      quantity: item.quantity,
+    });
+    const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
+
+    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+
+    return {
+      code: item.code,
+      articleNumber: cutleryLine?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
+      name: displayName,
+      nameDe: cutleryLine ? cutleryVariant?.nameDe || displayName : item.nameDe || item.kitchenItem?.nameDe || "",
+      price: getOrderItemEffectivePrice(item),
+      quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
+      isLocked: Boolean(item.kitchenItem?.isLocked || item.isLocked),
+      iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
+      componentKey: item.kitchenItem?.componentKey || item.componentKey || "",
+      productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
+      productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
+      productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
+      productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts)
+        ? item.kitchenItem.productInfoKeyFacts
+        : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
+      productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
+      blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
+      blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+      blendePrice: item.kitchenItem?.blendePrice != null
+        ? Number(item.kitchenItem.blendePrice)
+        : (item.blendePrice != null ? Number(item.blendePrice) : null),
+    };
+  };
   const notificationItems = mergeSinkAndWorktopItems(orderRecord.items || [], (sinkItem, worktopItem) => ({
     ...toNotificationItem(sinkItem),
     itemType: sinkItem.itemType,
@@ -260,15 +285,19 @@ export function buildOrderForNotifications(orderRecord) {
 function readEmailOverrides(input = {}) {
   const subject = input?.subject ? String(input.subject).trim() : "";
   const bodyText = input?.bodyText ? String(input.bodyText) : "";
+  const excludedAttachmentKeys = Array.isArray(input?.excludedAttachmentKeys)
+    ? input.excludedAttachmentKeys.map((value) => String(value || "").trim()).filter(Boolean)
+    : [];
 
   return {
     subject,
     bodyText,
+    excludedAttachmentKeys,
   };
 }
 
-async function getOrderRecordForOperations(id) {
-  const order = await prisma.order.findUnique({
+async function getOrderRecordForOperations(id, orderKind = ORDER_KIND_LIVE) {
+  const order = await getOrderDelegate(prisma, orderKind).findUnique({
     where: { id },
     include: {
       kitchen: true,
@@ -315,8 +344,11 @@ async function processOrderNotifications({ order, pdfBase64, pdfFilename, runEma
   return results;
 }
 
-function itemKey(item) {
-  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+export function buildOrderItemSelectionKey(item) {
+  const cutleryLine = isCutleryAccessoryCode(item?.code)
+    ? parseCutleryLineFromOrderItem(item)
+    : null;
+  const articleNumber = String(cutleryLine?.articleNumber || item?.articleNumber || "").trim().toUpperCase();
   if (articleNumber && isCutleryAccessoryCode(item.code)) {
     return `${item.itemType}:${item.code}:${articleNumber}`;
   }
@@ -325,6 +357,34 @@ function itemKey(item) {
 
 function withoutConfirmedBaseline(items, confirmedItemSets) {
   return items.filter((item) => !confirmedItemSets[item.itemType]?.has(item.code));
+}
+
+function buildConfirmedBaselineSelectionItem(item) {
+  const kitchenItem = item?.kitchenItem || {};
+
+  return {
+    ...kitchenItem,
+    id: kitchenItem.id || item.kitchenItemId,
+    kitchenItemId: item.kitchenItemId,
+    itemType: item.itemType,
+    code: item.code,
+    name: item.nameSnapshot || kitchenItem.name || item.code,
+    articleNumber: kitchenItem.articleNumber || item.articleNumber || "",
+    price: Number(item.priceSnapshot || 0),
+    priceSnapshot: Number(item.priceSnapshot || 0),
+    quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
+    isOrderLocked: true,
+    kitchenItem,
+  };
+}
+
+function withConfirmedBaselineSelection(selectedItems, confirmedItems) {
+  const selectedKeys = new Set(selectedItems.map(buildOrderItemSelectionKey));
+  const baselineItems = confirmedItems
+    .map(buildConfirmedBaselineSelectionItem)
+    .filter((item) => item.code && !selectedKeys.has(buildOrderItemSelectionKey(item)));
+
+  return [...selectedItems, ...baselineItems];
 }
 
 export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdfBase64, pdfFilename }) {
@@ -390,6 +450,25 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw validationError("One or more selected items are invalid or inactive");
   }
 
+  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(selectedComponents);
+  const availableCutleryByArticle = new Map(
+    availableCutleryVariants.map((variant) => [variant.articleNumber, variant]),
+  );
+  for (const item of selectedAccessories) {
+    if (!isCutleryAccessoryCode(item?.code)) continue;
+
+    const cutleryLine = parseCutleryLineFromOrderItem(item);
+    const variant = cutleryLine ? availableCutleryByArticle.get(cutleryLine.articleNumber) : null;
+    if (!variant) {
+      throw validationError("Selected cutlery insert width is not available for this kitchen.");
+    }
+
+    const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
+    if (quantity > Math.max(1, Math.floor(Number(variant.maxQuantity || 1)))) {
+      throw validationError("Selected cutlery insert quantity is not available for this kitchen.");
+    }
+  }
+
   const kitchenContract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: validatedCustomer.contractNumber },
     include: { kitchen: true },
@@ -399,18 +478,24 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   if (kitchenContract.kitchenId !== kitchen.id) {
     throw contractValidationError(CONTRACT_ERRORS.KITCHEN_MISMATCH);
   }
+  const orderKind = getOrderKindForContractNumber(kitchenContract.contractNumber);
 
-  const contractOrderState = await getContractOrderState(kitchenContract.id);
+  const contractOrderState = await getContractOrderState(kitchenContract.id, prisma, orderKind);
   const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
+  const submittedSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];
+  const allSelected = withConfirmedBaselineSelection(submittedSelected, contractOrderState.confirmedItems);
+  const allSelectedComponents = allSelected.filter((item) => item.itemType === ItemType.COMPONENT);
+  const allSelectedAccessories = allSelected.filter((item) => item.itemType === ItemType.ACCESSORY);
+  const allSelectedServices = allSelected.filter((item) => item.itemType === ItemType.SERVICE);
   const serviceEligibility = getServiceEligibility({
-    selectedComponents: selectedComponents.map((item) => ({
+    selectedComponents: allSelectedComponents.map((item) => ({
       ...item,
       isLocked: Boolean(item.isLocked),
       isOrderLocked: confirmedItemSets[ItemType.COMPONENT].has(item.code),
     })),
-    selectedAccessories,
+    selectedAccessories: allSelectedAccessories,
   });
-  const selectedServiceCodes = selectedServices.map((item) => item.code);
+  const selectedServiceCodes = allSelectedServices.map((item) => item.code);
 
   if (
     selectedServiceCodes.includes(SERVICE_CODE_MONTAGE) &&
@@ -430,7 +515,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   if (selectedServiceCodes.includes(SERVICE_CODE_MONTAGE)) {
     const deliveryMinSettings = await getDeliveryMinOrderSettings();
     if (deliveryMinSettings.enabled) {
-      const orderTotal = [...selectedComponents, ...selectedAccessories, ...selectedServices].reduce(
+      const orderTotal = allSelected.reduce(
         (sum, item) => sum + getOrderItemEffectivePrice(item),
         0,
       );
@@ -442,7 +527,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     }
   }
 
-  const allSelected = [...selectedComponents, ...selectedAccessories, ...selectedServices];
   if (!allSelected.length) {
     throw validationError("At least one item must be selected");
   }
@@ -452,14 +536,16 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       savedOrder = await prisma.$transaction(async (tx) => {
-        const contractOrderState = await getContractOrderState(kitchenContract.id, tx);
+        const orderDelegate = getOrderDelegate(tx, orderKind);
+        const orderItemDelegate = getOrderItemDelegate(tx, orderKind);
+        const contractOrderState = await getContractOrderState(kitchenContract.id, tx, orderKind);
         const existingEditableOrder = contractOrderState.editableOrder;
         const confirmedItemSets = buildConfirmedItemCodeSets(contractOrderState.confirmedItems);
         const newSelectedItems = withoutConfirmedBaseline(allSelected, confirmedItemSets);
-        const newSelectionKeys = new Set(newSelectedItems.map(itemKey));
-        const submittedKeys = new Set(allSelected.map(itemKey));
+        const newSelectionKeys = new Set(newSelectedItems.map(buildOrderItemSelectionKey));
+        const submittedKeys = new Set(allSelected.map(buildOrderItemSelectionKey));
         const missingBaselineItems = contractOrderState.confirmedItems.filter(
-          (item) => !submittedKeys.has(itemKey(item)),
+          (item) => !submittedKeys.has(buildOrderItemSelectionKey(item)),
         );
 
         if (missingBaselineItems.length) {
@@ -472,7 +558,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
         const totalPrice = newSelectedItems.reduce((sum, item) => sum + getOrderItemEffectivePrice(item), 0);
         const order = existingEditableOrder
-          ? await tx.order.update({
+          ? await orderDelegate.update({
               where: { id: existingEditableOrder.id },
               data: {
                 firstName: validatedCustomer.firstName,
@@ -491,9 +577,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
                 status: OrderStatus.NEW,
               },
             })
-          : await tx.order.create({
+          : await orderDelegate.create({
               data: {
-                orderNumber: await buildNextOrderNumberForContract(tx, kitchenContract),
+                orderNumber: await buildNextOrderNumberForContract(tx, kitchenContract, orderKind),
                 kitchenId: kitchen.id,
                 kitchenContractId: kitchenContract.id,
                 status: OrderStatus.NEW,
@@ -515,13 +601,13 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
             });
 
         if (existingEditableOrder) {
-          await tx.orderItem.deleteMany({
+          await orderItemDelegate.deleteMany({
             where: { orderId: order.id },
           });
         }
 
         if (newSelectedItems.length) {
-          await tx.orderItem.createMany({
+          await orderItemDelegate.createMany({
             data: newSelectedItems.map((item) => ({
               orderId: order.id,
               kitchenItemId: item.id,
@@ -534,9 +620,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
           });
         }
 
-        savedNewItems = newSelectedItems.filter((item) => newSelectionKeys.has(itemKey(item)));
+        savedNewItems = newSelectedItems.filter((item) => newSelectionKeys.has(buildOrderItemSelectionKey(item)));
 
-        return tx.order.findUnique({
+        return orderDelegate.findUnique({
           where: { id: order.id },
           include: {
             kitchen: true,
@@ -570,17 +656,18 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 
   return {
     ...orderForNotifications,
+    orderKind,
     newItemCount: savedNewItems.length,
     notifications: notificationResult,
   };
 }
 
 export async function resendOrderEmail(orderId, emailOverrides = {}) {
-  const orderRecord = await getOrderRecordForOperations(orderId);
+  const orderRecord = await getOrderRecordForOperations(orderId, emailOverrides.orderKind || ORDER_KIND_LIVE);
   const order = buildOrderForNotifications(orderRecord);
-  const { subject, bodyText } = readEmailOverrides(emailOverrides);
+  const { subject, bodyText, excludedAttachmentKeys } = readEmailOverrides(emailOverrides);
 
-  await sendOrderConfirmationEmail({ order, subject, bodyText });
+  await sendOrderConfirmationEmail({ order, subject, bodyText, excludedAttachmentKeys });
 
   return order;
 }
@@ -594,6 +681,15 @@ export async function deleteAllOrders() {
   return deletedOrders.count;
 }
 
+export async function deleteAllTestOrders() {
+  const [, deletedOrders] = await prisma.$transaction([
+    prisma.testOrderItem.deleteMany({}),
+    prisma.testOrder.deleteMany({}),
+  ]);
+
+  return deletedOrders.count;
+}
+
 export async function retryOrderWebhook(orderId) {
   const orderRecord = await getOrderRecordForOperations(orderId);
   const order = buildOrderForNotifications(orderRecord);
@@ -601,22 +697,23 @@ export async function retryOrderWebhook(orderId) {
   return order;
 }
 
-export async function updateOrderStatus(orderId, status) {
+export async function updateOrderStatus(orderId, status, orderKind = ORDER_KIND_LIVE) {
   const nextStatus = Object.values(OrderStatus).includes(status) ? status : OrderStatus.NEW;
-  return prisma.order.update({
+  return getOrderDelegate(prisma, orderKind).update({
     where: { id: orderId },
     data: { status: nextStatus },
   });
 }
 
-export async function deleteOrder(orderId) {
-  return prisma.order.delete({
+export async function deleteOrder(orderId, orderKind = ORDER_KIND_LIVE) {
+  return getOrderDelegate(prisma, orderKind).delete({
     where: { id: orderId },
   });
 }
 
 export async function confirmOrder(orderId, emailOverrides = {}) {
-  const orderRecord = await getOrderRecordForOperations(orderId);
+  const orderKind = emailOverrides.orderKind || ORDER_KIND_LIVE;
+  const orderRecord = await getOrderRecordForOperations(orderId, orderKind);
   if (orderRecord.status === OrderStatus.CONFIRMED) {
     return buildOrderForNotifications(orderRecord);
   }
@@ -625,10 +722,10 @@ export async function confirmOrder(orderId, emailOverrides = {}) {
   }
 
   const order = buildOrderForNotifications(orderRecord);
-  const { subject, bodyText } = readEmailOverrides(emailOverrides);
-  await sendOrderConfirmationEmail({ order, subject, bodyText });
+  const { subject, bodyText, excludedAttachmentKeys } = readEmailOverrides(emailOverrides);
+  await sendOrderConfirmationEmail({ order, subject, bodyText, excludedAttachmentKeys });
 
-  await prisma.order.update({
+  await getOrderDelegate(prisma, orderKind).update({
     where: { id: orderId },
     data: { status: OrderStatus.CONFIRMED },
   });

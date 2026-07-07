@@ -272,6 +272,7 @@ model Kitchen {
   updatedAt   DateTime          @updatedAt
   items       KitchenItem[]
   orders      Order[]
+  testOrders  TestOrder[]
   contracts   KitchenContract[]
 }
 
@@ -316,6 +317,7 @@ model KitchenItem {
   createdAt                DateTime        @default(now())
   updatedAt                DateTime        @updatedAt
   orderItems               OrderItem[]
+  testOrderItems           TestOrderItem[]
 
   @@unique([kitchenId, code])
   @@index([catalogArticleId])
@@ -356,6 +358,39 @@ model Order {
   @@index([kitchenContractId])
 }
 
+model TestOrder {
+  id                      String           @id @default(cuid())
+  orderNumber             String           @unique
+  kitchenId               String
+  kitchen                 Kitchen          @relation(fields: [kitchenId], references: [id], onDelete: Restrict)
+  kitchenContractId       String?
+  kitchenContract         KitchenContract? @relation(fields: [kitchenContractId], references: [id], onDelete: SetNull)
+  status                  OrderStatus      @default(NEW)
+  contractNumber          String?
+  firstName               String
+  lastName                String
+  email                   String
+  phone                   String
+  address1                String
+  address2                String?
+  postalCode              String
+  city                    String
+  country                 String?
+  preferredDeliveryDate   DateTime?
+  notes                   String?
+  paymentMethod           String?
+  paymentStatus           String           @default("UNPAID")
+  stripeCheckoutSessionId String?          @unique
+  stripePaymentIntentId   String?
+  paidAt                  DateTime?
+  totalPrice              Decimal          @db.Decimal(10, 2)
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+  items                   TestOrderItem[]
+
+  @@index([kitchenContractId])
+}
+
 model KitchenContract {
   id             String                @id @default(cuid())
   contractNumber String                @unique
@@ -372,6 +407,7 @@ model KitchenContract {
   createdAt      DateTime              @default(now())
   updatedAt      DateTime              @updatedAt
   orders         Order[]
+  testOrders     TestOrder[]
   registrations  KitchenRegistration[]
 
   @@index([kitchenId])
@@ -465,6 +501,20 @@ model OrderItem {
   createdAt     DateTime     @default(now())
 }
 
+model TestOrderItem {
+  id            String       @id @default(cuid())
+  orderId       String
+  order         TestOrder    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kitchenItemId String?
+  kitchenItem   KitchenItem? @relation(fields: [kitchenItemId], references: [id], onDelete: SetNull)
+  itemType      ItemType
+  code          String
+  nameSnapshot  String
+  priceSnapshot Decimal      @db.Decimal(10, 2)
+  quantity      Int          @default(1)
+  createdAt     DateTime     @default(now())
+}
+
 model ServiceClaim {
   id                   String   @id
   contractNumber       String
@@ -493,6 +543,23 @@ model ServiceClaim {
 
   @@index([contractNumber])
   @@index([createdAt])
+}
+
+model PublicVisitEvent {
+  id                  String   @id @default(cuid())
+  eventType           String
+  source              String?
+  path                String?
+  contractNumberHash  String?
+  contractNumberLast4 String?
+  ipHash              String?
+  userAgentHash       String?
+  metadata            Json?
+  createdAt           DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([eventType, createdAt])
+  @@index([contractNumberHash])
 }
 
 model ServiceClaimKnowledgeEntry {

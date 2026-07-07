@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { getCatalogItemDetails, getLocalizedItemName } from "../components/kitchen-selection-utils.js";
 import { getCabinetWidthDisplayName } from "../lib/cabinet-name-utils.js";
+import { buildCutleryLineItems, parseCutleryLineFromOrderItem } from "../lib/cutlery-accessories.js";
 
 test("base cabinet width uses lower cabinet label", () => {
   assert.equal(
@@ -11,7 +12,7 @@ test("base cabinet width uses lower cabinet label", () => {
       widthMm: 300,
       iconKey: "drawer_base_two",
     }),
-    "Lower cabinet with drawer 30",
+    "Lower Cabinet with Drawer 30",
   );
 });
 
@@ -23,7 +24,7 @@ test("wall cabinet width uses upper cabinet label", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet 60",
+    "Upper Cabinet 60",
   );
 });
 
@@ -44,7 +45,7 @@ test("localized sink base name stays Sink Lower Cabinet even after stored-name m
     getLocalizedItemName(
       {
         code: "SINKBASE-AB105806-600",
-        name: "Lower cabinet with drawer 60",
+        name: "Lower Cabinet with Drawer 60",
         widthMm: 600,
         iconKey: "sink_base",
       },
@@ -53,6 +54,27 @@ test("localized sink base name stays Sink Lower Cabinet even after stored-name m
       false,
     ),
     "Sink Lower Cabinet",
+  );
+});
+
+test("localized catalog-linked cabinet name matches catalog label exactly", () => {
+  assert.equal(
+    getLocalizedItemName(
+      {
+        catalogArticleId: "catalog-us40",
+        code: "CAB-BASE-AB105817-US40",
+        articleNumber: "US40",
+        name: "Lower Cabinet with Drawer 40",
+        nameDe: "Unterschrank mit Schublade 40",
+        widthMm: 400,
+        depthMm: 600,
+        iconKey: "drawer_base_two",
+      },
+      (_key, fallback) => fallback,
+      "en",
+      false,
+    ),
+    "Lower Cabinet with Drawer 40",
   );
 });
 
@@ -73,6 +95,82 @@ test("localized hood wall cabinet uses upper cabinet with extractor hood label",
   );
 });
 
+test("cutlery variant summary keeps selected width name instead of base catalog code", () => {
+  assert.equal(
+    getLocalizedItemName(
+      {
+        code: "ACC-CUTLERY-ZB60SG",
+        articleNumber: "ZB40SG",
+        name: "Cutlery insert 40 cm",
+        nameDe: "Besteckeinsatz 40 cm",
+        iconKey: "cutlery_insert",
+        isCutleryLine: true,
+      },
+      (_key, fallback) => fallback,
+      "en",
+      false,
+    ),
+    "Cutlery insert 40 cm",
+  );
+  assert.equal(
+    getLocalizedItemName(
+      {
+        code: "ACC-CUTLERY-ZB60SG",
+        articleNumber: "ZB40SG",
+        name: "Cutlery insert 40 cm",
+        nameDe: "Besteckeinsatz 40 cm",
+        iconKey: "cutlery_insert",
+        isCutleryLine: true,
+      },
+      (_key, fallback) => fallback,
+      "de",
+      false,
+    ),
+    "Besteckeinsatz 40 cm",
+  );
+});
+
+test("cutlery variant line items use catalog article data", () => {
+  const [lineItem] = buildCutleryLineItems(
+    {
+      code: "ACC-CUTLERY-ZB60SG",
+      name: "Cutlery insert 60 cm",
+      price: 25,
+      iconKey: "cutlery_insert",
+    },
+    [{ articleNumber: "ZB40SG", quantity: 2 }],
+    (_key, fallback) => fallback,
+    "en",
+    [
+      {
+        articleNumber: "ZB40SG",
+        name: "Catalog 40 cm insert",
+        nameDe: "Katalog 40 cm Einsatz",
+        widthCm: 40,
+        price: 21,
+      },
+    ],
+  );
+
+  assert.equal(lineItem.code, "ACC-CUTLERY-ZB60SG");
+  assert.equal(lineItem.articleNumber, "ZB40SG");
+  assert.equal(lineItem.name, "Catalog 40 cm insert");
+  assert.equal(lineItem.price, 21);
+  assert.equal(lineItem.quantity, 2);
+});
+
+test("cutlery order item parser recovers article number from saved German name", () => {
+  assert.deepEqual(
+    parseCutleryLineFromOrderItem({
+      code: "ACC-CUTLERY-ZB60SG",
+      articleNumber: "",
+      nameSnapshot: "Besteckeinsatz 45 cm",
+      quantity: 1,
+    }),
+    { articleNumber: "ZB45SG", quantity: 1 },
+  );
+});
+
 test("wall cabinet width falls back to code", () => {
   assert.equal(
     getCabinetWidthDisplayName({
@@ -81,7 +179,7 @@ test("wall cabinet width falls back to code", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper cabinet 60",
+    "Upper Cabinet 60",
   );
 });
 
@@ -93,7 +191,7 @@ test("structured width wins over misleading code width", () => {
       widthMm: 500,
       iconKey: "wall_cabinet_standard",
     }),
-    "Upper cabinet 50",
+    "Upper Cabinet 50",
   );
 });
 
