@@ -163,6 +163,9 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   catalogArticleId: true,
   catalogArticle: {
     select: {
+      articleNumber: true,
+      name: true,
+      nameDe: true,
       widthMm: true,
       heightMm: true,
       depthMm: true,
@@ -196,6 +199,9 @@ export async function getKitchenBySlug(slug) {
           include: {
             catalogArticle: {
               select: {
+                articleNumber: true,
+                name: true,
+                nameDe: true,
                 widthMm: true,
                 heightMm: true,
                 depthMm: true,
@@ -1042,19 +1048,19 @@ async function attachHousingCompaniesToContracts(contracts) {
 export function serializeKitchenForLegacy(kitchen) {
   const items = kitchen.items || [];
   const toClientItem = (item) => {
-    const catalogDimensions = item.catalogArticleId ? item.catalogArticle : null;
+    const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
 
     return {
       id: item.id,
       catalogArticleId: item.catalogArticleId || "",
       code: item.code,
-      articleNumber: item.articleNumber || "",
+      articleNumber: catalogArticle?.articleNumber || item.articleNumber || "",
       name: item.name,
       nameDe: item.nameDe || "",
       price: Number(item.price),
-      widthMm: catalogDimensions ? catalogDimensions.widthMm ?? null : item.widthMm ?? null,
-      heightMm: catalogDimensions ? catalogDimensions.heightMm ?? null : item.heightMm ?? null,
-      depthMm: catalogDimensions ? catalogDimensions.depthMm ?? null : item.depthMm ?? null,
+      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
+      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
+      depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: item.productImagePath || "",
       productInfoPdfPath: item.productInfoPdfPath || "",
