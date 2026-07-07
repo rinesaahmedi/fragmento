@@ -1,0 +1,49 @@
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-hetzner
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 62.238.24.170
+          username: root
+          password: ${{ secrets.HETZNER_SSH_PASSWORD }}
+          port: 22
+          script_stop: true
+          script: |
+            set -e
+
+            APP_DIR="/var/www/fragmento"
+            FRONTEND_DIR="$APP_DIR/frontend"
+
+            cd "$APP_DIR"
+            git config --global --add safe.directory "$APP_DIR"
+            git fetch origin main
+            git reset --hard origin/main
+
+            cd "$FRONTEND_DIR"
+            npm ci
+            npm run prisma:deploy
+            npm run build
+
+            if command -v pm2 >/dev/null 2>&1; then
+              pm2 reload fragmento || pm2 start npm --name fragmento -- start
+              pm2 save
+            else
+              npm install -g pm2
+              pm2 start npm --name fragmento -- start
+              pm2 save
+            fi
