@@ -5,7 +5,7 @@ import styles from "./kitchen-configurator.module.css";
 import {
   formatCurrency,
   getCatalogItemDetails,
-  getLocalizedBlendeLabel,
+  getLocalizedBlendeDisplayLabel,
   getLocalizedItemName,
   getProductInfoDocuments,
   getProductInfoHref,
@@ -86,7 +86,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const isConfirmed = !isDefault && Boolean(item.isOrderLocked);
   const isLocked = isDefault || isConfirmed;
   const itemName = getLocalizedItemName(item, translate, language, false);
-  const blendeLabel = getLocalizedBlendeLabel(item, language);
+  const blendeLabel = getLocalizedBlendeDisplayLabel(item, language);
   const { articleNumber, dimensions } = getCatalogItemDetails(item);
   const itemDimensions = isLocked ? "" : dimensions;
   const infoPdfHref = getProductInfoHref(item);

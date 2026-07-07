@@ -69,7 +69,22 @@ export async function getEditableOrderForContract(kitchenContractId, client = pr
       kitchenContractId,
       status: { in: [...EDITABLE_ORDER_STATUSES] },
     },
-    include: includeItems ? { items: { orderBy: { createdAt: "asc" } } } : undefined,
+    include: includeItems
+      ? {
+          items: {
+            orderBy: { createdAt: "asc" },
+            include: {
+              kitchenItem: {
+                include: {
+                  catalogArticle: true,
+                  catalogBlende: true,
+                  catalogService: true,
+                },
+              },
+            },
+          },
+        }
+      : undefined,
     orderBy: { createdAt: "desc" },
     take: 2,
   });
@@ -103,7 +118,11 @@ export async function getContractOrderState(kitchenContractId, client = prisma, 
         orderBy: { createdAt: "asc" },
         include: {
           kitchenItem: {
-            include: { catalogBlende: true },
+            include: {
+              catalogArticle: true,
+              catalogBlende: true,
+              catalogService: true,
+            },
           },
         },
       },

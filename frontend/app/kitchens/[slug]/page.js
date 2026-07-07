@@ -25,27 +25,36 @@ function getOrderItemArticleNumber(item) {
     if (matchedVariant) return matchedVariant.articleNumber;
   }
 
-  return item.kitchenItem?.articleNumber || "";
+  return item.kitchenItem?.catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || "";
 }
 
 function serializeOrderItems(items = [], locked = false) {
-  return items.map((item) => ({
-    itemType: String(item.itemType || "").toLowerCase(),
-    code: item.code || "",
-    name: item.nameSnapshot || "",
-    articleNumber: getOrderItemArticleNumber(item),
-    blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
-    blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
-    blendeName: item.kitchenItem?.catalogBlende?.name || item.blendeName || "",
-    blendeNameDe: item.kitchenItem?.catalogBlende?.nameDe || item.blendeNameDe || "",
-    blendePrice: item.kitchenItem?.blendePrice != null
-      ? Number(item.kitchenItem.blendePrice)
-      : (item.blendePrice != null ? Number(item.blendePrice) : null),
-    quantity: item.quantity || 1,
-    locked,
-    sourceOrderId: item.sourceOrderId || "",
-    sourceOrderNumber: item.sourceOrderNumber || "",
-  }));
+  return items.map((item) => {
+    const catalogArticle = item.kitchenItem?.catalogArticleId ? item.kitchenItem.catalogArticle : null;
+    const catalogService = item.kitchenItem?.catalogServiceId ? item.kitchenItem.catalogService : null;
+    const catalogBlende = item.kitchenItem?.catalogBlendeId ? item.kitchenItem.catalogBlende : null;
+
+    return {
+      itemType: String(item.itemType || "").toLowerCase(),
+      code: item.code || "",
+      name: catalogArticle?.name || catalogService?.name || item.nameSnapshot || "",
+      nameDe: catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || "",
+      articleNumber: getOrderItemArticleNumber(item),
+      blendeCode: catalogBlende?.code || item.kitchenItem?.blendeCode || item.blendeCode || "",
+      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+      blendeName: catalogBlende?.name || item.blendeName || "",
+      blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
+      blendePrice: catalogBlende?.price != null
+        ? Number(catalogBlende.price)
+        : item.kitchenItem?.blendePrice != null
+          ? Number(item.kitchenItem.blendePrice)
+          : (item.blendePrice != null ? Number(item.blendePrice) : null),
+      quantity: item.quantity || 1,
+      locked,
+      sourceOrderId: item.sourceOrderId || "",
+      sourceOrderNumber: item.sourceOrderNumber || "",
+    };
+  });
 }
 
 function serializeInitialOrder(order, confirmedItems = []) {

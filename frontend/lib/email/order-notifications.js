@@ -727,6 +727,10 @@ function stripTrailingQuantity(value) {
   return String(value || "").replace(/\s*x\s*\d+\s*$/i, "").trim();
 }
 
+function stripLeadingBlendePrefix(value) {
+  return String(value || "").replace(/^blende\s+/i, "").trim();
+}
+
 function normalizeGermanDisplayText(value) {
   return String(value || "")
     .trim()
@@ -895,7 +899,7 @@ function buildBlendeDisplayItem(item) {
   const blendeCode = String(item?.blendeCode || blendeLabel).trim();
   const blendePrice = item?.blendePrice == null ? 0 : Number(item.blendePrice || 0);
   const blendeQuantity = Math.max(parseTrailingQuantity(blendeLabel), parseTrailingQuantity(blendeCode));
-  const displayLabel = stripTrailingQuantity(blendeLabel);
+  const displayLabel = stripLeadingBlendePrefix(stripTrailingQuantity(blendeLabel));
   const displayCode = stripTrailingQuantity(blendeCode);
 
   return {
@@ -1014,8 +1018,7 @@ function buildNumberedRows(items = []) {
 }
 
 function getBlendeDisplayNameWithQuantity(item) {
-  const rawName = getItemDisplayName(item);
-  const name = /^blende\b/i.test(rawName) ? rawName : `Blende ${rawName}`;
+  const name = stripLeadingBlendePrefix(getItemDisplayName(item));
   const quantity = Math.max(1, Math.floor(Number(item?.blendeDisplayQuantity || item?.quantity || 1)));
   return quantity > 1 ? `${name} x ${quantity}` : name;
 }

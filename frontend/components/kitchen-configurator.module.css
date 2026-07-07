@@ -1046,6 +1046,10 @@
 }
 
 .itemPrice {
+  position: relative;
+  z-index: 3;
+  border-radius: 6px;
+  background: #fff;
   color: #1874ff;
   font-size: clamp(0.92rem, 2.1vw, 1.06rem);
   font-weight: 800;
@@ -1449,8 +1453,8 @@
   position: relative;
   display: inline-flex;
   align-items: center;
-  width: 46px;
-  height: 30px;
+  width: 54px;
+  height: 34px;
   isolation: isolate;
 }
 
@@ -1463,14 +1467,14 @@
 .itemAssistantTrigger {
   appearance: none;
   position: absolute;
-  right: -12px;
-  bottom: -14px;
+  right: -2px;
+  bottom: -2px;
   z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 76px;
-  height: 88px;
+  width: 54px;
+  height: 62px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -1482,8 +1486,8 @@
 
 .itemAssistantTrigger img {
   display: block;
-  width: 76px;
-  height: 88px;
+  width: 54px;
+  height: 62px;
   object-fit: contain;
   filter: drop-shadow(0 6px 8px rgba(74, 47, 20, 0.14));
 }
@@ -1500,11 +1504,11 @@
 
 .itemAssistantPromptCloud {
   position: absolute;
-  right: 24px;
-  bottom: 60px;
+  right: 34px;
+  bottom: 44px;
   z-index: 1;
-  width: 34px;
-  height: 22px;
+  width: 32px;
+  height: 20px;
   border: 1px solid rgba(42, 145, 85, 0.28);
   border-radius: 999px;
   background: #fffdf9;

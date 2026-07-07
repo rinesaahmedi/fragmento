@@ -51,6 +51,7 @@ export async function POST(request, { params }) {
         await tx.kitchenItem.update({
           where: { id: item.id },
           data: {
+            articleNumber: article.articleNumber,
             name: article.name,
             nameDe: article.nameDe || null,
             widthMm: article.widthMm ?? null,

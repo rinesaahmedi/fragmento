@@ -34,7 +34,8 @@
     "export:kitchen-items": "node scripts/export-kitchen-items-excel.js",
     "export:ab-kitchen-items": "node scripts/export-ab-kitchen-items-deduped.js",
     "export:other-kitchen-items": "node scripts/export-other-kitchen-items-deduped.js",
-    "export:catalog": "node scripts/export-catalog.js"
+    "export:catalog": "node scripts/export-catalog.js",
+    "catalog:json": "node scripts/export-catalog.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

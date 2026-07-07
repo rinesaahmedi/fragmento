@@ -115,25 +115,23 @@ export function getCatalogItemDetails(item) {
 }
 
 export function getLocalizedBlendeLabel(item, language = "en") {
-  const legacyLabel = String(item?.blendeLabel || "").trim();
   const localizedName = String(
     language === "de" && item?.blendeNameDe
       ? item.blendeNameDe
       : item?.blendeName || "",
   ).trim();
 
-  if (!localizedName) return legacyLabel;
-  if (!legacyLabel) return localizedName;
+  return localizedName || String(item?.blendeLabel || "").trim();
+}
 
+export function getLocalizedBlendeDisplayLabel(item, language = "en") {
+  const label = getLocalizedBlendeLabel(item, language);
   const code = String(item?.blendeCode || "").trim();
-  const suffixSource = code && legacyLabel.toLowerCase().startsWith(code.toLowerCase())
-    ? legacyLabel.slice(code.length)
-    : legacyLabel.toLowerCase().startsWith(localizedName.toLowerCase())
-      ? legacyLabel.slice(localizedName.length)
-      : "";
-  const suffix = suffixSource.replace(/^[\s,;:-]+/, "").trim();
 
-  return suffix ? `${localizedName}, ${suffix}` : localizedName;
+  if (!label) return code;
+  if (!code || label.toLowerCase().includes(code.toLowerCase())) return label;
+
+  return `${label}, ${code}`;
 }
 
 // Element names must never carry dimensions (they are shown separately under the article as a
@@ -175,6 +173,13 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-BASE-AB105820-US60": "6",
   "CAB-WALL-AB105820-H3002-300": "9",
   "CAB-WALL-AB105820-H6002": "11",
+  "CAB-BASE-AB105732-US40-R": "5",
+  "DISH-AB105732-600": "6",
+  "CAB-WALL-AB105732-H4002-R": "7",
+  "CAB-HOOD-AB105732-600": "8",
+  "HOOD-AB105732-FH664621E": "8",
+  "CAB-WALL-AB105732-H6002-R": "9",
+  "CAB-WALL-AB105732-H6002-L-FILLER": "10",
   "CAB-WALL-AB105816-H6002-L": "11",
   "CAB-BASE-AB105819-US60-R": "4",
   "DISH-AB105819-600": "5",
@@ -377,6 +382,10 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return withPhotoNumber(rawName);
   }
 
+  if ((item?.catalogArticleId || item?.catalogServiceId) && rawName) {
+    return withPhotoNumber(rawName);
+  }
+
   if (rawName === "Sink and Worktop" || rawName === "Spüle und Arbeitsplatte") {
     return translate("configurator.catalogItemNames.worktop", "Worktop");
   }
@@ -388,7 +397,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return withDimensions(dishwasherName());
   }
   if (iconKey === "tall_refrigerator") {
-    return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"));
+    return withRefrigeratorHeight(rawName || translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator"));
   }
   if (code.startsWith("SINKBASE-") || code === "T3D-SINKBASE-001") {
     return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
@@ -400,10 +409,6 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   }, language);
   if (cabinetWidthName) {
     return withPhotoNumber(cabinetWidthName);
-  }
-
-  if (item?.catalogArticleId && rawName) {
-    return withPhotoNumber(rawName);
   }
 
   const normalizedRawTitle = rawTitle.toLowerCase();
@@ -443,6 +448,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-B-600":
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
+    case "CAB-HOOD-AB105732-600":
     case "CAB-HOOD-AB105837-600":
     case "CAB-HOOD-AB105840-600":
     case "CAB-HOOD-AB105843-600":
@@ -467,6 +473,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-B-FH664621E":
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
+    case "HOOD-AB105732-FH664621E":
     case "HOOD-AB105837-FH664621E":
     case "HOOD-AB105840-FH664621E":
     case "HOOD-AB105843-FH664621E":
@@ -499,6 +506,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
+    case "DISH-AB105732-600":
     case "DISH-AB105815-600":
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
@@ -545,7 +553,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-AB105828-KGCN388140E":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
-      return withRefrigeratorHeight(translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm"));
+      return withRefrigeratorHeight(rawName || translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator"));
     case "SINK-WORKTOP":
     case "SINK-B-BOTTON-45":
     case "SINK-AB105806-BOTTON-45":
@@ -635,6 +643,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-HOOD-B-600":
     case "CAB-HOOD-AB105806-600":
     case "CAB-HOOD-AB105807-600":
+    case "CAB-HOOD-AB105732-600":
     case "CAB-HOOD-AB105837-600":
     case "CAB-HOOD-AB105840-600":
     case "CAB-HOOD-AB105843-600":
@@ -645,6 +654,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "HOOD-B-FH664621E":
     case "HOOD-AB105806-FH664621E":
     case "HOOD-AB105807-FH664621E":
+    case "HOOD-AB105732-FH664621E":
     case "HOOD-AB105837-FH664621E":
     case "HOOD-AB105840-FH664621E":
     case "HOOD-AB105843-FH664621E":
@@ -678,6 +688,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
+    case "DISH-AB105732-600":
     case "DISH-AB105815-600":
     case "DISH-AB105819-600":
     case "DISH-AB105821-600":
@@ -764,6 +775,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105815": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105819": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105732": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105821": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105824": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105822": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -976,6 +988,9 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   PRODUCT_INFO_DOCUMENTS_BY_CODE[`HOOD-AB${targetCode}-FH664621E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 });
 
+PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+
 const PRODUCT_INFO_DISPLAY_OVERRIDES_BY_CODE = {
   "WM-B-EWA34660W": {
     infoText: "Washing machine, 8 kg, 1400 rpm",
@@ -1153,6 +1168,10 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
       PRODUCT_IMAGE_GALLERIES_BY_CODE[sourceCode];
   });
 });
+
+PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-AB105732-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-B-600-STD"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["CAB-HOOD-AB105732-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
 
 export function getProductImagePaths(item) {
   const candidates = [item?.productInfoCode, item?.code, item?.tooltipPreviewCode].filter(Boolean);

@@ -396,6 +396,10 @@ function isLedLightingProductAssistantItem(item) {
 function formatProductAssistantDisplayName(item, translate) {
   if (!item) return "";
 
+  if ((item.catalogArticleId || item.catalogServiceId) && item.name) {
+    return item.name;
+  }
+
   if (isExtractorHoodProductAssistantItem(item)) {
     const baseLabel = translate("configurator.productAssistantExtractorHood", "Extractor hood");
     return baseLabel;
@@ -406,7 +410,7 @@ function formatProductAssistantDisplayName(item, translate) {
   }
 
   if (isRefrigeratorProductAssistantItem(item)) {
-    return translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator 178 cm");
+    return item.name || item.productAssistantName || translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator");
   }
 
   if (isDishwasherProductAssistantItem(item)) {
