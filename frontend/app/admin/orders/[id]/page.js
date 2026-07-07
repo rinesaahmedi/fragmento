@@ -233,15 +233,17 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
           ) : null}
 
           <form action={`/api/admin/orders/${order.id}`} method="post" style={actionPanelStyle}>
-            <div style={actionSummaryStyle}>
-              <div style={actionMetricStyle}>
-                <span style={detailLabelStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></span>
+            <div style={statusRowStyle}>
+              <div style={statusItemStyle}>
+                <span style={compactLabelStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></span>
                 <AdminStatusBadge status={order.status} />
               </div>
-              <div style={actionMetricStyle}>
-                <span style={detailLabelStyle}>Payment status</span>
+              <div style={statusItemStyle}>
+                <span style={compactLabelStyle}>Payment</span>
                 <PaymentStatusBadge status={order.paymentStatus} />
               </div>
+            </div>
+            <div style={actionSummaryStyle}>
               <div style={actionMetricStyle}>
                 <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.total" fallback="Total" /></span>
                 <div style={{ display: "grid", gap: 2 }}>
@@ -593,9 +595,31 @@ const actionPanelStyle = {
   padding: 18,
 };
 
+const statusRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+  flexWrap: "wrap",
+};
+
+const statusItemStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  minWidth: 0,
+};
+
+const compactLabelStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 800,
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+};
+
 const actionSummaryStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: 12,
 };
 

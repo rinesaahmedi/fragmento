@@ -118,15 +118,17 @@ export default async function AdminPxOrderDetailPage({ params, searchParams }) {
           ) : null}
 
           <form action={`/api/admin/px-orders/${order.id}`} method="post" style={actionPanelStyle}>
-            <div style={metricGridStyle}>
-              <div style={metricStyle}>
-                <span style={labelStyle}>Status</span>
+            <div style={statusRowStyle}>
+              <div style={statusItemStyle}>
+                <span style={compactLabelStyle}>Status</span>
                 <AdminStatusBadge status={order.status} />
               </div>
-              <div style={metricStyle}>
-                <span style={labelStyle}>Payment</span>
+              <div style={statusItemStyle}>
+                <span style={compactLabelStyle}>Payment</span>
                 <PaymentStatusBadge status={order.paymentStatus} />
               </div>
+            </div>
+            <div style={metricGridStyle}>
               <div style={metricStyle}>
                 <span style={labelStyle}>Total</span>
                 <div style={{ display: "grid", gap: 2 }}>
@@ -242,9 +244,31 @@ const actionPanelStyle = {
   padding: 18,
 };
 
+const statusRowStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 16,
+  flexWrap: "wrap",
+};
+
+const statusItemStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 8,
+  minWidth: 0,
+};
+
+const compactLabelStyle = {
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 800,
+  textTransform: "uppercase",
+  letterSpacing: "0.06em",
+};
+
 const metricGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   gap: 12,
 };
 

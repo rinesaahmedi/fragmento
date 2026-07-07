@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+﻿const bcrypt = require("bcryptjs");
 const { randomUUID } = require("crypto");
 const { loadEnvConfig } = require("@next/env");
 

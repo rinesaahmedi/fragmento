@@ -14,7 +14,6 @@ const navItems = [
   { href: "/admin/reports", labelKey: "adminShellLogin.reports", fallback: "Reports", icon: ReportsIcon },
   { href: "/admin/px-orders", labelKey: "adminShellLogin.pxOrders", fallback: "PX orders", icon: OrdersIcon },
   { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon, requiresClaimsNav: true },
-  { href: "/admin/catalog-audit", labelKey: "adminShellLogin.catalogAudit", fallback: "Catalog Audit", icon: CatalogAuditIcon },
   { href: "/admin/catalog/articles", labelKey: "adminShellLogin.catalogArticles", fallback: "Catalog", icon: CatalogAuditIcon },
   { href: "/admin/settings", labelKey: "adminShellLogin.settings", fallback: "Settings", icon: SettingsIcon },
   { href: "/admin/account", labelKey: "adminShellLogin.account", fallback: "Account", icon: AccountIcon },
