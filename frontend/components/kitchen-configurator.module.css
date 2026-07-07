@@ -1046,6 +1046,10 @@
 }
 
 .itemPrice {
+  position: relative;
+  z-index: 3;
+  border-radius: 6px;
+  background: #fff;
   color: #1874ff;
   font-size: clamp(0.92rem, 2.1vw, 1.06rem);
   font-weight: 800;
