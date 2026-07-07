@@ -35,7 +35,8 @@ jobs:
             git rev-parse --short HEAD
             git log -1 --oneline --no-decorate
 
-            git pull --ff-only https://github.com/rinesaahmedi/fragmento.git main
+            git fetch https://github.com/rinesaahmedi/fragmento.git main
+            git merge --ff-only FETCH_HEAD
 
             echo "After deploy:"
             git rev-parse --short HEAD
