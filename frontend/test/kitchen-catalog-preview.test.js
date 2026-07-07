@@ -157,14 +157,14 @@ test("AB 105809 oven preview uses polygon outline instead of oversized bbox", ()
   assert.ok(ovenHotspots[0].outlinePoints.length >= 3);
 });
 
-test("AB 105834 hood bottom side strip belongs to the hood cabinet", () => {
+test("AB 105834 hood bottom side strip belongs to the extractor hood", () => {
   const hoodBottomSideStrip = PLAN_HOTSPOTS_BY_SLUG["ab-105834"].find((hotspot) =>
-    hotspot.points?.some(([x, y]) => x === 35.48 && y === 39.6)
-    && hotspot.points?.some(([x, y]) => x === 29.52 && y === 38.55)
+    hotspot.points?.some(([x, y]) => x === 35.49 && y === 39.62)
+    && hotspot.points?.some(([x, y]) => x === 30.0 && y === 38.62)
   );
   const hoodLedArea = PLAN_HOTSPOTS_BY_SLUG["ab-105834"].find((hotspot) =>
-    hotspot.points?.some(([x, y]) => x === 35.98 && y === 43.1)
-    && hotspot.points?.some(([x, y]) => x === 47.0 && y === 39.4)
+    hotspot.points?.some(([x, y]) => x === 36.58 && y === 44.08)
+    && hotspot.points?.some(([x, y]) => x === 46.38 && y === 38.11)
   );
   const wallCabinetSideFace = PLAN_HOTSPOTS_BY_SLUG["ab-105834"].find((hotspot) =>
     hotspot.points?.some(([x, y]) => x === 25.51 && y === 12.58)
@@ -172,7 +172,7 @@ test("AB 105834 hood bottom side strip belongs to the hood cabinet", () => {
   );
 
   assert.ok(hoodBottomSideStrip);
-  assert.equal(hoodBottomSideStrip.componentKey, "wall-cabinet-2");
+  assert.equal(hoodBottomSideStrip.componentKey, "extractor-hood");
   assert.ok(hoodLedArea);
   assert.equal(hoodLedArea.componentKey, "extractor-hood");
   assert.ok(wallCabinetSideFace);
