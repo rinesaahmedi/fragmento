@@ -9,8 +9,11 @@ const manrope = Manrope({
 });
 
 export const metadata = {
-  title: "Fragmento Kitchen Configurator",
+  title: "Fragmento",
   description: "Next.js frontend for the Fragmento kitchen configurator.",
+  icons: {
+    icon: "/img/architecto-favicon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
