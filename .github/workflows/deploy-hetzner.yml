@@ -30,6 +30,7 @@ jobs:
 
             cd "$APP_DIR"
             git config --global --add safe.directory "$APP_DIR"
+            git remote set-url origin https://github.com/rinesaahmedi/fragmento.git
             git fetch origin main
             git reset --hard origin/main
 
