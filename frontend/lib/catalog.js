@@ -160,6 +160,13 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   blendeLabel: true,
   blendePrice: true,
   catalogArticleId: true,
+  catalogArticle: {
+    select: {
+      widthMm: true,
+      heightMm: true,
+      depthMm: true,
+    },
+  },
   catalogBlendeId: true,
   catalogBlendeQuantity: true,
   catalogServiceId: true,
@@ -184,6 +191,13 @@ export async function getKitchenBySlug(slug) {
         items: {
           where: { isActive: true },
           include: {
+            catalogArticle: {
+              select: {
+                widthMm: true,
+                heightMm: true,
+                depthMm: true,
+              },
+            },
             catalogBlende: true,
           },
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
@@ -1024,35 +1038,39 @@ async function attachHousingCompaniesToContracts(contracts) {
 
 export function serializeKitchenForLegacy(kitchen) {
   const items = kitchen.items || [];
-  const toClientItem = (item) => ({
-    id: item.id,
-    catalogArticleId: item.catalogArticleId || "",
-    code: item.code,
-    articleNumber: item.articleNumber || "",
-    name: item.name,
-    nameDe: item.nameDe || "",
-    price: Number(item.price),
-    widthMm: item.widthMm ?? null,
-    heightMm: item.heightMm ?? null,
-    depthMm: item.depthMm ?? null,
-    infoText: item.infoText || "",
-    productImagePath: item.productImagePath || "",
-    productInfoPdfPath: item.productInfoPdfPath || "",
-    productInfoSummary: item.productInfoSummary || "",
-    productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],
-    productInfoExtractedText: item.productInfoExtractedText || "",
-    productInfoUpdatedAt: item.productInfoUpdatedAt instanceof Date ? item.productInfoUpdatedAt.toISOString() : "",
-    iconKey: item.iconKey || "",
-    colorKey: item.colorKey || "",
-    componentKey: item.componentKey || "",
-    isLocked: item.isLocked,
-    itemType: item.itemType.toLowerCase(),
-    blendeCode: item.blendeCode || "",
-    blendeLabel: item.blendeLabel || "",
-    blendeName: item.catalogBlende?.name || "",
-    blendeNameDe: item.catalogBlende?.nameDe || "",
-    blendePrice: item.blendePrice != null ? Number(item.blendePrice) : null,
-  });
+  const toClientItem = (item) => {
+    const catalogDimensions = item.catalogArticleId ? item.catalogArticle : null;
+
+    return {
+      id: item.id,
+      catalogArticleId: item.catalogArticleId || "",
+      code: item.code,
+      articleNumber: item.articleNumber || "",
+      name: item.name,
+      nameDe: item.nameDe || "",
+      price: Number(item.price),
+      widthMm: catalogDimensions ? catalogDimensions.widthMm ?? null : item.widthMm ?? null,
+      heightMm: catalogDimensions ? catalogDimensions.heightMm ?? null : item.heightMm ?? null,
+      depthMm: catalogDimensions ? catalogDimensions.depthMm ?? null : item.depthMm ?? null,
+      infoText: item.infoText || "",
+      productImagePath: item.productImagePath || "",
+      productInfoPdfPath: item.productInfoPdfPath || "",
+      productInfoSummary: item.productInfoSummary || "",
+      productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],
+      productInfoExtractedText: item.productInfoExtractedText || "",
+      productInfoUpdatedAt: item.productInfoUpdatedAt instanceof Date ? item.productInfoUpdatedAt.toISOString() : "",
+      iconKey: item.iconKey || "",
+      colorKey: item.colorKey || "",
+      componentKey: item.componentKey || "",
+      isLocked: item.isLocked,
+      itemType: item.itemType.toLowerCase(),
+      blendeCode: item.blendeCode || "",
+      blendeLabel: item.blendeLabel || "",
+      blendeName: item.catalogBlende?.name || "",
+      blendeNameDe: item.catalogBlende?.nameDe || "",
+      blendePrice: item.blendePrice != null ? Number(item.blendePrice) : null,
+    };
+  };
 
   return {
     kitchen: {

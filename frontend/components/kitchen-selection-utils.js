@@ -72,15 +72,16 @@ export function getStructuredDimensions(item) {
   }
 
   const values = [item?.widthMm, item?.heightMm, item?.depthMm].filter(
-    (value) => value !== null && value !== undefined && value !== "",
+    (value) => value !== null && value !== undefined && value !== "" && Number(value) > 0,
   );
   if (!values.length) return "";
   return `${values.map(formatDimensionCmPart).join(" x ")} cm`;
 }
 
 export function formatDimensionCmPart(value) {
+  if (value === null || value === undefined || value === "") return "";
   const cm = Number(value) / 10;
-  if (!Number.isFinite(cm)) return "-";
+  if (!Number.isFinite(cm) || cm <= 0) return "";
   return Number.isInteger(cm)
     ? String(cm)
     : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");

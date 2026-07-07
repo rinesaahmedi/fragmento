@@ -63,6 +63,9 @@ export async function POST(request, { params }) {
           data: {
             name: article.name,
             nameDe: article.nameDe || null,
+            widthMm: article.widthMm ?? null,
+            heightMm: article.heightMm ?? null,
+            depthMm: article.depthMm ?? null,
             price: centsToMoney(articlePriceCents + getBlendeTotalCents(item)),
           },
         })

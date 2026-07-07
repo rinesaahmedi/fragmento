@@ -12,20 +12,21 @@ function formatBoolean(value) {
 }
 
 function formatDimensionPart(value) {
+  if (value === null || value === undefined || value === "") return "";
   const cm = Number(value) / 10;
-  if (!Number.isFinite(cm)) return "";
+  if (!Number.isFinite(cm) || cm <= 0) return "";
   return Number.isInteger(cm)
     ? String(cm)
     : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
 function formatDimensions(row) {
-  if (!row.widthMm && !row.heightMm && !row.depthMm) return "";
-  return [
+  const parts = [
     formatDimensionPart(row.widthMm),
     formatDimensionPart(row.heightMm),
     formatDimensionPart(row.depthMm),
-  ].join(" x ") + " cm";
+  ].filter(Boolean);
+  return parts.length ? `${parts.join(" x ")} cm` : "";
 }
 
 function appendSheet(workbook, sheetName, rows, widths) {
