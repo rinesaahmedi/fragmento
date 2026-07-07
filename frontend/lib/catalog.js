@@ -166,6 +166,7 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
       articleNumber: true,
       name: true,
       nameDe: true,
+      price: true,
       widthMm: true,
       heightMm: true,
       depthMm: true,
@@ -174,6 +175,14 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   catalogBlendeId: true,
   catalogBlendeQuantity: true,
   catalogServiceId: true,
+  catalogService: {
+    select: {
+      code: true,
+      name: true,
+      nameDe: true,
+      price: true,
+    },
+  },
   catalogPriceSyncMode: true,
   createdAt: true,
   updatedAt: true,
@@ -202,12 +211,21 @@ export async function getKitchenBySlug(slug) {
                 articleNumber: true,
                 name: true,
                 nameDe: true,
+                price: true,
                 widthMm: true,
                 heightMm: true,
                 depthMm: true,
               },
             },
             catalogBlende: true,
+            catalogService: {
+              select: {
+                code: true,
+                name: true,
+                nameDe: true,
+                price: true,
+              },
+            },
           },
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
         },
@@ -1049,18 +1067,31 @@ export function serializeKitchenForLegacy(kitchen) {
   const items = kitchen.items || [];
   const toClientItem = (item) => {
     const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
+    const catalogService = item.catalogServiceId ? item.catalogService : null;
+    const catalogBlende = item.catalogBlendeId ? item.catalogBlende : null;
+    const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
+    const catalogPrice = (() => {
+      if (catalogService?.price != null) {
+        return Number(catalogService.price);
+      }
+      if (catalogArticle?.price == null) {
+        return Number(item.price);
+      }
+      const blendeTotal = catalogBlende?.price != null ? Number(catalogBlende.price) * catalogBlendeQuantity : 0;
+      return Number(catalogArticle.price) + blendeTotal;
+    })();
 
     return {
       id: item.id,
       catalogArticleId: item.catalogArticleId || "",
       code: item.code,
       articleNumber: catalogArticle?.articleNumber || item.articleNumber || "",
-      name: item.name,
-      nameDe: item.nameDe || "",
-      price: Number(item.price),
-      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
-      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
-      depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
+      name: catalogArticle?.name || catalogService?.name || item.name,
+      nameDe: catalogArticle?.nameDe || catalogService?.nameDe || item.nameDe || "",
+      price: catalogPrice,
+      widthMm: catalogArticle?.widthMm ?? item.widthMm ?? null,
+      heightMm: catalogArticle?.heightMm ?? item.heightMm ?? null,
+      depthMm: catalogArticle?.depthMm ?? item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: item.productImagePath || "",
       productInfoPdfPath: item.productInfoPdfPath || "",
@@ -1073,11 +1104,11 @@ export function serializeKitchenForLegacy(kitchen) {
       componentKey: item.componentKey || "",
       isLocked: item.isLocked,
       itemType: item.itemType.toLowerCase(),
-      blendeCode: item.blendeCode || "",
-      blendeLabel: item.blendeLabel || "",
-      blendeName: item.catalogBlende?.name || "",
-      blendeNameDe: item.catalogBlende?.nameDe || "",
-      blendePrice: item.blendePrice != null ? Number(item.blendePrice) : null,
+      blendeCode: catalogBlende?.code || item.blendeCode || "",
+      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.blendeLabel || "",
+      blendeName: catalogBlende?.name || "",
+      blendeNameDe: catalogBlende?.nameDe || "",
+      blendePrice: catalogBlende?.price != null ? Number(catalogBlende.price) : item.blendePrice != null ? Number(item.blendePrice) : null,
     };
   };
 

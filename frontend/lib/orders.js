@@ -178,12 +178,23 @@ function mapCatalogItem(catalogItems, submittedItem, itemType) {
     null;
 
   if (!matched) return null;
+  const catalogArticle = matched.catalogArticleId ? matched.catalogArticle : null;
+  const catalogService = matched.catalogServiceId ? matched.catalogService : null;
+  const catalogBlende = matched.catalogBlendeId ? matched.catalogBlende : null;
+  const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(matched.catalogBlendeQuantity || 1), 10) || 1);
+  const catalogPrice = (() => {
+    if (catalogService?.price != null) return Number(catalogService.price);
+    if (catalogArticle?.price == null) return submittedItem.price != null ? submittedItem.price : matched.price;
+    const blendeTotal = catalogBlende?.price != null ? Number(catalogBlende.price) * catalogBlendeQuantity : 0;
+    return Number(catalogArticle.price) + blendeTotal;
+  })();
 
   return {
     ...matched,
-    name: submittedItem.name || matched.name,
-    articleNumber: submittedItem.articleNumber || matched.articleNumber,
-    price: submittedItem.price != null ? submittedItem.price : matched.price,
+    name: catalogArticle?.name || catalogService?.name || submittedItem.name || matched.name,
+    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || matched.nameDe || "",
+    articleNumber: catalogArticle?.articleNumber || submittedItem.articleNumber || matched.articleNumber,
+    price: catalogPrice,
     quantity: submittedItem.quantity || 1,
   };
 }
@@ -199,6 +210,9 @@ function getOrderItemEffectivePrice(item) {
 
 export function buildOrderForNotifications(orderRecord) {
   const toNotificationItem = (item) => {
+    const catalogArticle = item.kitchenItem?.catalogArticleId ? item.kitchenItem.catalogArticle : null;
+    const catalogService = item.kitchenItem?.catalogServiceId ? item.kitchenItem.catalogService : null;
+    const catalogBlende = item.kitchenItem?.catalogBlendeId ? item.kitchenItem.catalogBlende : null;
     const cutleryLine = parseCutleryLineFromOrderItem({
       code: item.code,
       articleNumber: item.articleNumber,
@@ -208,13 +222,13 @@ export function buildOrderForNotifications(orderRecord) {
     });
     const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
 
-    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const displayName = catalogArticle?.name || catalogService?.name || item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "";
 
     return {
       code: item.code,
-      articleNumber: cutleryLine?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
+      articleNumber: cutleryLine?.articleNumber || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
       name: displayName,
-      nameDe: cutleryLine ? cutleryVariant?.nameDe || displayName : item.nameDe || item.kitchenItem?.nameDe || "",
+      nameDe: cutleryLine ? cutleryVariant?.nameDe || displayName : catalogArticle?.nameDe || catalogService?.nameDe || item.nameDe || item.kitchenItem?.nameDe || "",
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       isLocked: Boolean(item.kitchenItem?.isLocked || item.isLocked),
@@ -227,10 +241,12 @@ export function buildOrderForNotifications(orderRecord) {
         ? item.kitchenItem.productInfoKeyFacts
         : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
       productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
-      blendeCode: item.kitchenItem?.blendeCode || item.blendeCode || "",
-      blendeLabel: item.kitchenItem?.blendeLabel || item.blendeLabel || "",
-      blendePrice: item.kitchenItem?.blendePrice != null
-        ? Number(item.kitchenItem.blendePrice)
+      blendeCode: catalogBlende?.code || item.kitchenItem?.blendeCode || item.blendeCode || "",
+      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+      blendePrice: catalogBlende?.price != null
+        ? Number(catalogBlende.price)
+        : item.kitchenItem?.blendePrice != null
+          ? Number(item.kitchenItem.blendePrice)
         : (item.blendePrice != null ? Number(item.blendePrice) : null),
     };
   };
@@ -303,7 +319,15 @@ async function getOrderRecordForOperations(id, orderKind = ORDER_KIND_LIVE) {
       kitchen: true,
       items: {
         orderBy: { createdAt: "asc" },
-        include: { kitchenItem: true },
+        include: {
+          kitchenItem: {
+            include: {
+              catalogArticle: true,
+              catalogBlende: true,
+              catalogService: true,
+            },
+          },
+        },
       },
     },
   });
@@ -361,6 +385,8 @@ function withoutConfirmedBaseline(items, confirmedItemSets) {
 
 function buildConfirmedBaselineSelectionItem(item) {
   const kitchenItem = item?.kitchenItem || {};
+  const catalogArticle = kitchenItem.catalogArticleId ? kitchenItem.catalogArticle : null;
+  const catalogService = kitchenItem.catalogServiceId ? kitchenItem.catalogService : null;
 
   return {
     ...kitchenItem,
@@ -368,8 +394,9 @@ function buildConfirmedBaselineSelectionItem(item) {
     kitchenItemId: item.kitchenItemId,
     itemType: item.itemType,
     code: item.code,
-    name: item.nameSnapshot || kitchenItem.name || item.code,
-    articleNumber: kitchenItem.articleNumber || item.articleNumber || "",
+    name: catalogArticle?.name || catalogService?.name || item.nameSnapshot || kitchenItem.name || item.code,
+    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || "",
+    articleNumber: catalogArticle?.articleNumber || kitchenItem.articleNumber || item.articleNumber || "",
     price: Number(item.priceSnapshot || 0),
     priceSnapshot: Number(item.priceSnapshot || 0),
     quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
@@ -397,6 +424,11 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     include: {
       items: {
         where: { isActive: true },
+        include: {
+          catalogArticle: true,
+          catalogBlende: true,
+          catalogService: true,
+        },
         orderBy: { sortOrder: "asc" },
       },
     },
@@ -627,7 +659,15 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
           include: {
             kitchen: true,
             items: {
-              include: { kitchenItem: true },
+              include: {
+                kitchenItem: {
+                  include: {
+                    catalogArticle: true,
+                    catalogBlende: true,
+                    catalogService: true,
+                  },
+                },
+              },
             },
           },
         });
