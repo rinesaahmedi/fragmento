@@ -285,10 +285,14 @@ export function buildOrderForNotifications(orderRecord) {
 function readEmailOverrides(input = {}) {
   const subject = input?.subject ? String(input.subject).trim() : "";
   const bodyText = input?.bodyText ? String(input.bodyText) : "";
+  const excludedAttachmentKeys = Array.isArray(input?.excludedAttachmentKeys)
+    ? input.excludedAttachmentKeys.map((value) => String(value || "").trim()).filter(Boolean)
+    : [];
 
   return {
     subject,
     bodyText,
+    excludedAttachmentKeys,
   };
 }
 
@@ -661,9 +665,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 export async function resendOrderEmail(orderId, emailOverrides = {}) {
   const orderRecord = await getOrderRecordForOperations(orderId, emailOverrides.orderKind || ORDER_KIND_LIVE);
   const order = buildOrderForNotifications(orderRecord);
-  const { subject, bodyText } = readEmailOverrides(emailOverrides);
+  const { subject, bodyText, excludedAttachmentKeys } = readEmailOverrides(emailOverrides);
 
-  await sendOrderConfirmationEmail({ order, subject, bodyText });
+  await sendOrderConfirmationEmail({ order, subject, bodyText, excludedAttachmentKeys });
 
   return order;
 }
@@ -718,8 +722,8 @@ export async function confirmOrder(orderId, emailOverrides = {}) {
   }
 
   const order = buildOrderForNotifications(orderRecord);
-  const { subject, bodyText } = readEmailOverrides(emailOverrides);
-  await sendOrderConfirmationEmail({ order, subject, bodyText });
+  const { subject, bodyText, excludedAttachmentKeys } = readEmailOverrides(emailOverrides);
+  await sendOrderConfirmationEmail({ order, subject, bodyText, excludedAttachmentKeys });
 
   await getOrderDelegate(prisma, orderKind).update({
     where: { id: orderId },

@@ -27,7 +27,7 @@ import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getOrderById } from "../../../../lib/catalog";
 import { getPriceBreakdown } from "../../../../lib/price-utils";
-import { buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
+import { buildOrderConfirmationAttachmentLabels, buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
 import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../../lib/order-item-display";
 import { buildOrderForNotifications } from "../../../../lib/orders";
 
@@ -208,6 +208,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
   }));
   const emailDraft = buildOrderConfirmationEmailDraft(notificationOrder);
   const emailStatic = await buildOrderConfirmationEmailStaticHtml(notificationOrder);
+  const emailAttachmentLabels = await buildOrderConfirmationAttachmentLabels(notificationOrder, emailStatic.attachmentLinks);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -270,6 +271,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 defaultSubject={emailDraft.subject}
                 defaultBody={emailDraft.bodyText}
                 staticHtml={emailStatic.html}
+                attachmentLabels={emailAttachmentLabels}
                 canConfirm={canConfirm}
                 canResendEmail={canResendEmail}
               />

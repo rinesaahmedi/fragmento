@@ -776,11 +776,21 @@ async function loadProductImageAttachments(order) {
   return { attachments, cidByAssetPath };
 }
 
-async function loadProductInfoAttachments(order) {
+function normalizeExcludedAttachmentKeys(input = []) {
+  if (input instanceof Set) return input;
+  if (Array.isArray(input)) {
+    return new Set(input.map((value) => String(value || "").trim()).filter(Boolean));
+  }
+  return new Set();
+}
+
+async function loadProductInfoAttachments(order, options = {}) {
   const selectedItems = getPaidConfirmationItems([...order.components, ...order.accessories, ...order.services]);
+  const excludedAttachmentKeys = normalizeExcludedAttachmentKeys(options.excludedAttachmentKeys);
   const seenAssetPaths = new Set();
   const attachments = [];
   const labels = [];
+  const links = [];
 
   for (const item of selectedItems) {
     const documents = getProductInfoDocumentsForEmail(item);
@@ -788,6 +798,8 @@ async function loadProductInfoAttachments(order) {
     for (const document of documents) {
       const assetPath = normalizeProductInfoAssetPath(document.href);
       if (!assetPath || seenAssetPaths.has(assetPath)) continue;
+      const attachmentKey = `product-info:${assetPath}`;
+      if (excludedAttachmentKeys.has(attachmentKey)) continue;
 
       try {
         const absolutePath = await resolvePublicAssetPath(assetPath);
@@ -797,7 +809,9 @@ async function loadProductInfoAttachments(order) {
           content,
           contentType: "application/pdf",
         });
-        labels.push(getItemDisplayName(item) || document.label || path.basename(assetPath, ".pdf"));
+        const label = getItemDisplayName(item) || document.label || path.basename(assetPath, ".pdf");
+        labels.push(label);
+        links.push({ key: attachmentKey, label, href: `/${assetPath}` });
         seenAssetPaths.add(assetPath);
       } catch (error) {
         console.warn(`Could not attach product info for ${item.code}:`, error.message);
@@ -805,7 +819,7 @@ async function loadProductInfoAttachments(order) {
     }
   }
 
-  return { attachments, labels };
+  return { attachments, labels, links };
 }
 
 async function loadLogoBuffer() {
@@ -1298,6 +1312,48 @@ function buildPurchasedKitchenFilename(order) {
   return `Gekaufte-Kueche${orderNumber ? `-${orderNumber}` : ""}.pdf`;
 }
 
+export async function buildOrderConfirmationAttachmentLabels(order, productInfoAttachments = [], options = {}) {
+  const orderNumber = String(order?.orderNumber || "").trim();
+  const orderId = encodeURIComponent(String(order?.id || ""));
+  const orderApiPath = String(options.orderApiPath || `/api/admin/orders/${orderId}`).replace(/\/$/, "");
+  const labels = [{
+    key: "order-confirmation",
+    label: `Bestellbestätigung${orderNumber ? `-${orderNumber}` : ""}.pdf`,
+    href: `${orderApiPath}/attachments/order-confirmation?view=1`,
+  }];
+  const purchasedKitchenSketchPath = await resolvePurchasedKitchenSketchPath(order).catch(() => "");
+
+  if (purchasedKitchenSketchPath) {
+    labels.push({
+      key: "purchased-kitchen",
+      label: buildPurchasedKitchenFilename(order),
+      href: `${orderApiPath}/attachments/purchased-kitchen?view=1`,
+    });
+  }
+
+  labels.push(
+    ...productInfoAttachments
+      .map((attachment) => {
+        if (typeof attachment === "string") {
+          const label = attachment.trim();
+          return label ? { label: `Produktinformation: ${label}`, href: "" } : null;
+        }
+        const label = String(attachment?.label || "").trim();
+        const key = String(attachment?.key || "").trim();
+        return label
+          ? {
+              key,
+              label: `Produktinformation: ${label}`,
+              href: String(attachment?.href || ""),
+            }
+          : null;
+      })
+      .filter(Boolean),
+  );
+
+  return labels;
+}
+
 function drawWrappedPdfText(doc, text, x, y, maxWidth, lineHeight) {
   const lines = doc.splitTextToSize(String(text || ""), maxWidth);
   lines.forEach((line, index) => {
@@ -1482,8 +1538,10 @@ export function buildOrderSummaryHtml(order) {
   `;
 }
 
-export async function buildOrderConfirmationEmailStaticHtml(order) {
-  const productInfo = await loadProductInfoAttachments(order);
+export async function buildOrderConfirmationEmailStaticHtml(order, options = {}) {
+  const productInfo = await loadProductInfoAttachments(order, {
+    excludedAttachmentKeys: options.excludedAttachmentKeys,
+  });
   const productImages = await loadProductImageAttachments(order);
   const orderWithProductImages = {
     ...order,
@@ -1504,6 +1562,7 @@ export async function buildOrderConfirmationEmailStaticHtml(order) {
       ${productInfoHtml}
     `,
     attachmentLabels: productInfo.labels,
+    attachmentLinks: productInfo.links,
     productImageAttachments: productImages.attachments,
   };
 }
@@ -1568,7 +1627,9 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
   const draft = buildOrderConfirmationEmailDraft(order);
   const subject = String(overrides.subject || draft.subject).trim() || draft.subject;
   const bodyText = String(overrides.bodyText || draft.bodyText);
-  const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
+  const staticHtml = await buildOrderConfirmationEmailStaticHtml(order, {
+    excludedAttachmentKeys: overrides.excludedAttachmentKeys,
+  });
   const recipients = buildOrderConfirmationRecipients(order.customer.email, overrides.senderEmail, {
     suppressSenderCopy: shouldSuppressOrderSenderCopy(order),
   });
@@ -1586,7 +1647,7 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
   };
 }
 
-export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText }) {
+export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText, excludedAttachmentKeys = [] }) {
   const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
   const smtpUser = String(process.env.SMTP_USER || "").trim();
@@ -1613,16 +1674,17 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     },
   });
 
-  let effectivePdfBase64 = pdfBase64;
-  let effectivePdfFilename = pdfFilename;
-  if (!effectivePdfBase64) {
-    const generatedPdf = await generateOrderConfirmationPdf(order);
-    effectivePdfBase64 = generatedPdf.base64;
-    effectivePdfFilename = generatedPdf.filename;
-  }
-
+  const excludedAttachments = normalizeExcludedAttachmentKeys(excludedAttachmentKeys);
   const attachments = [];
-  if (effectivePdfBase64) {
+  if (!excludedAttachments.has("order-confirmation")) {
+    let effectivePdfBase64 = pdfBase64;
+    let effectivePdfFilename = pdfFilename;
+    if (!effectivePdfBase64) {
+      const generatedPdf = await generateOrderConfirmationPdf(order);
+      effectivePdfBase64 = generatedPdf.base64;
+      effectivePdfFilename = generatedPdf.filename;
+    }
+
     attachments.push({
       filename: effectivePdfFilename || `Bestellbestätigung-${order.orderNumber}.pdf`,
       content: Buffer.from(effectivePdfBase64, "base64"),
@@ -1630,23 +1692,32 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     });
   }
 
-  try {
-    const purchasedKitchenPdf = await generatePurchasedKitchenPdf(order);
-    if (purchasedKitchenPdf?.base64) {
-      attachments.push({
-        filename: purchasedKitchenPdf.filename,
-        content: Buffer.from(purchasedKitchenPdf.base64, "base64"),
-        contentType: "application/pdf",
-      });
+  if (!excludedAttachments.has("purchased-kitchen")) {
+    try {
+      const purchasedKitchenPdf = await generatePurchasedKitchenPdf(order);
+      if (purchasedKitchenPdf?.base64) {
+        attachments.push({
+          filename: purchasedKitchenPdf.filename,
+          content: Buffer.from(purchasedKitchenPdf.base64, "base64"),
+          contentType: "application/pdf",
+        });
+      }
+    } catch (error) {
+      console.warn(`Could not attach purchased kitchen PDF for ${order.orderNumber}:`, error.message);
     }
-  } catch (error) {
-    console.warn(`Could not attach purchased kitchen PDF for ${order.orderNumber}:`, error.message);
   }
 
-  const productInfo = await loadProductInfoAttachments(order);
+  const productInfo = await loadProductInfoAttachments(order, {
+    excludedAttachmentKeys: excludedAttachments,
+  });
   attachments.push(...productInfo.attachments);
 
-  const emailPreview = await buildOrderConfirmationEmailPreview(order, { subject, bodyText, senderEmail: smtpFrom });
+  const emailPreview = await buildOrderConfirmationEmailPreview(order, {
+    subject,
+    bodyText,
+    senderEmail: smtpFrom,
+    excludedAttachmentKeys: excludedAttachments,
+  });
   attachments.push(...(emailPreview.productImageAttachments || []));
 
   try {

@@ -30,6 +30,17 @@ function buildAdminPaymentCancelUrl({ request, order }) {
   return cancelUrl.toString();
 }
 
+function parseEmailExcludedAttachments(value) {
+  try {
+    const parsed = JSON.parse(String(value || "[]"));
+    return Array.isArray(parsed)
+      ? parsed.map((item) => String(item || "").trim()).filter(Boolean)
+      : [];
+  } catch {
+    return [];
+  }
+}
+
 export async function GET(_request, { params }) {
   await requireAdminApi();
   const { id } = await params;
@@ -50,7 +61,8 @@ export async function POST(request, { params }) {
     const status = String(formData.get("status") || "");
     const emailSubject = String(formData.get("emailSubject") || "");
     const emailBody = String(formData.get("emailBody") || "");
-    const emailOverrides = { subject: emailSubject, bodyText: emailBody, orderKind: TEST_ORDER_KIND };
+    const excludedAttachmentKeys = parseEmailExcludedAttachments(formData.get("emailExcludedAttachments"));
+    const emailOverrides = { subject: emailSubject, bodyText: emailBody, excludedAttachmentKeys, orderKind: TEST_ORDER_KIND };
 
     if (intent === "resend-email") {
       await resendOrderEmail(id, emailOverrides);

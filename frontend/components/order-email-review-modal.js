@@ -32,6 +32,7 @@ export function OrderEmailReviewModal({
   defaultSubject,
   defaultBody,
   staticHtml,
+  attachmentLabels = [],
   canConfirm,
   canResendEmail,
 }) {
@@ -39,10 +40,36 @@ export function OrderEmailReviewModal({
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState(defaultSubject);
   const [body, setBody] = useState(defaultBody);
+  const [excludedAttachmentKeys, setExcludedAttachmentKeys] = useState([]);
 
   const previewHtml = useMemo(() => {
     return `${formatBodyTextAsHtml(body)}${staticHtml}`;
   }, [body, staticHtml]);
+  const visibleAttachmentLabels = useMemo(
+    () => {
+      const seen = new Set();
+      return attachmentLabels
+        .map((attachment) => {
+          if (typeof attachment === "string") {
+            return { label: attachment.trim(), href: "" };
+          }
+          return {
+            key: String(attachment?.key || "").trim(),
+            label: String(attachment?.label || "").trim(),
+            href: String(attachment?.href || "").trim(),
+          };
+        })
+        .filter((attachment) => {
+          if (!attachment.label) return false;
+          const dedupeKey = `${attachment.key}\n${attachment.label}\n${attachment.href}`;
+          if (seen.has(dedupeKey)) return false;
+          seen.add(dedupeKey);
+          return true;
+        })
+        .filter((attachment) => !attachment.key || !excludedAttachmentKeys.includes(attachment.key));
+    },
+    [attachmentLabels, excludedAttachmentKeys],
+  );
 
   if (!canConfirm && !canResendEmail) {
     return null;
@@ -70,6 +97,7 @@ export function OrderEmailReviewModal({
 
       <input type="hidden" name="emailSubject" value={subject} />
       <input type="hidden" name="emailBody" value={body} />
+      <input type="hidden" name="emailExcludedAttachments" value={JSON.stringify(excludedAttachmentKeys)} />
 
       {open ? (
         <div
@@ -110,6 +138,61 @@ export function OrderEmailReviewModal({
                   <span style={labelStyle}><AdminText i18nKey="orderDetailAdmin.emailBody" fallback="Body" /></span>
                   <textarea value={body} onChange={(event) => setBody(event.target.value)} rows={10} style={textareaStyle} />
                 </label>
+                <div style={attachmentsPanelStyle}>
+                  <span style={labelStyle}><AdminText i18nKey="orderDetailAdmin.emailAttachments" fallback="Attachments" /></span>
+                  {visibleAttachmentLabels.length ? (
+                    <ul style={attachmentListStyle}>
+                      {visibleAttachmentLabels.map((attachment) => (
+                        <li key={`${attachment.key}-${attachment.label}-${attachment.href}`} style={attachmentListItemStyle}>
+                          {attachment.href ? (
+                            <div style={attachmentOpenableItemStyle}>
+                              <span style={attachmentLabelTextStyle}>{attachment.label}</span>
+                              <span style={attachmentActionRowStyle}>
+                                <a href={attachment.href} target="_blank" rel="noreferrer" style={attachmentViewButtonStyle}>
+                                  <AdminText i18nKey="orderDetailAdmin.viewAttachment" fallback="View" />
+                                </a>
+                                {attachment.key ? (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setExcludedAttachmentKeys((current) =>
+                                        current.includes(attachment.key) ? current : [...current, attachment.key],
+                                      )
+                                    }
+                                    style={attachmentRemoveButtonStyle}
+                                  >
+                                    <AdminText i18nKey="orderDetailAdmin.removeAttachment" fallback="Remove" />
+                                  </button>
+                                ) : null}
+                              </span>
+                            </div>
+                          ) : (
+                            <div style={attachmentOpenableItemStyle}>
+                              <span style={attachmentLabelTextStyle}>{attachment.label}</span>
+                              {attachment.key ? (
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setExcludedAttachmentKeys((current) =>
+                                      current.includes(attachment.key) ? current : [...current, attachment.key],
+                                    )
+                                  }
+                                  style={attachmentRemoveButtonStyle}
+                                >
+                                  <AdminText i18nKey="orderDetailAdmin.removeAttachment" fallback="Remove" />
+                                </button>
+                              ) : null}
+                            </div>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <span style={mutedStyle}>
+                      <AdminText i18nKey="orderDetailAdmin.noEmailAttachments" fallback="No attachments" />
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div style={previewPaneStyle}>
@@ -300,6 +383,82 @@ const textareaStyle = {
   padding: 12,
   font: "inherit",
   lineHeight: 1.5,
+};
+
+const attachmentsPanelStyle = {
+  display: "grid",
+  gap: 8,
+  border: "1px solid var(--app-border)",
+  borderRadius: 12,
+  background: "rgba(255,255,255,0.72)",
+  padding: 12,
+};
+
+const attachmentListStyle = {
+  display: "grid",
+  gap: 6,
+  margin: 0,
+  padding: 0,
+  listStyle: "none",
+};
+
+const attachmentListItemStyle = {
+  margin: 0,
+};
+
+const attachmentItemStyle = {
+  display: "block",
+  border: "1px solid var(--app-border)",
+  borderRadius: 8,
+  background: "#fff",
+  padding: "8px 10px",
+  color: "var(--app-text)",
+  fontSize: 14,
+  overflowWrap: "anywhere",
+};
+
+const attachmentOpenableItemStyle = {
+  ...attachmentItemStyle,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 10,
+};
+
+const attachmentLabelTextStyle = {
+  minWidth: 0,
+  overflowWrap: "anywhere",
+};
+
+const attachmentActionRowStyle = {
+  flex: "0 0 auto",
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 6,
+};
+
+const attachmentViewButtonStyle = {
+  flex: "0 0 auto",
+  border: "1px solid var(--app-border-strong)",
+  borderRadius: 8,
+  background: "var(--color-card)",
+  color: "var(--app-accent)",
+  textDecoration: "none",
+  padding: "6px 10px",
+  fontWeight: 700,
+  fontSize: 13,
+};
+
+const attachmentRemoveButtonStyle = {
+  flex: "0 0 auto",
+  border: "1px solid rgba(217, 92, 92, 0.24)",
+  borderRadius: 8,
+  background: "rgba(255,255,255,0.82)",
+  color: "var(--app-danger-text)",
+  padding: "6px 10px",
+  fontWeight: 700,
+  fontSize: 13,
+  cursor: "pointer",
 };
 
 const mutedStyle = {

@@ -22,7 +22,7 @@ import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getTestOrderById } from "../../../../lib/catalog";
 import { getPriceBreakdown } from "../../../../lib/price-utils";
-import { buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
+import { buildOrderConfirmationAttachmentLabels, buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
 import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../../lib/order-item-display";
 import { buildOrderForNotifications } from "../../../../lib/orders";
 
@@ -87,6 +87,9 @@ export default async function AdminPxOrderDetailPage({ params, searchParams }) {
   const notificationOrder = buildOrderForNotifications(order);
   const emailDraft = buildOrderConfirmationEmailDraft(notificationOrder);
   const emailStatic = await buildOrderConfirmationEmailStaticHtml(notificationOrder);
+  const emailAttachmentLabels = await buildOrderConfirmationAttachmentLabels(notificationOrder, emailStatic.attachmentLinks, {
+    orderApiPath: `/api/admin/px-orders/${encodeURIComponent(order.id)}`,
+  });
   const displayItems = mergeSinkAndWorktopItems(order.items || [], (sinkItem, worktopItem) => ({
     ...sinkItem,
     id: `${sinkItem.id}-with-${worktopItem.id}`,
@@ -149,6 +152,7 @@ export default async function AdminPxOrderDetailPage({ params, searchParams }) {
                 defaultSubject={emailDraft.subject}
                 defaultBody={emailDraft.bodyText}
                 staticHtml={emailStatic.html}
+                attachmentLabels={emailAttachmentLabels}
                 canConfirm={canConfirm}
                 canResendEmail={canResendEmail}
               />
