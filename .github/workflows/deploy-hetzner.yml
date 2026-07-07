@@ -30,20 +30,30 @@ jobs:
 
             cd "$APP_DIR"
             git config --global --add safe.directory "$APP_DIR"
-            git remote set-url origin https://github.com/rinesaahmedi/fragmento.git
-            git fetch origin main
-            git reset --hard origin/main
+
+            echo "Before deploy:"
+            git rev-parse --short HEAD
+            git log -1 --oneline --no-decorate
+
+            git pull --ff-only https://github.com/rinesaahmedi/fragmento.git main
+
+            echo "After deploy:"
+            git rev-parse --short HEAD
+            git log -1 --oneline --no-decorate
+
+            chown -R deploy:deploy "$FRONTEND_DIR"
 
             cd "$FRONTEND_DIR"
-            npm ci
-            npm run prisma:deploy
-            npm run build
+            sudo -u deploy npm install
+            sudo -u deploy npm run prisma:deploy
+            sudo -u deploy npm run prisma:generate
+            sudo -u deploy npm run build
 
-            if command -v pm2 >/dev/null 2>&1; then
-              pm2 reload fragmento || pm2 start npm --name fragmento -- start
-              pm2 save
-            else
-              npm install -g pm2
-              pm2 start npm --name fragmento -- start
-              pm2 save
-            fi
+            systemctl restart fragmento.service
+            systemctl is-active fragmento.service
+            systemctl --no-pager --full status fragmento.service | head -n 20
+
+            curl -I --max-time 20 http://127.0.0.1:5300/kitchens/ab-105806
+
+            cd "$APP_DIR"
+            git status --short --branch
