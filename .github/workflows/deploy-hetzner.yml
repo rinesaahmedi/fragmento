@@ -22,7 +22,6 @@ jobs:
           username: root
           password: ${{ secrets.HETZNER_SSH_PASSWORD }}
           port: 22
-          script_stop: true
           script: |
             set -e
 
