@@ -1,0 +1,59 @@
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-hetzner
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    name: Deploy production
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: 62.238.24.170
+          username: root
+          password: ${{ secrets.HETZNER_SSH_PASSWORD }}
+          port: 22
+          script: |
+            set -e
+
+            APP_DIR="/var/www/fragmento"
+            FRONTEND_DIR="$APP_DIR/frontend"
+
+            cd "$APP_DIR"
+            git config --global --add safe.directory "$APP_DIR"
+
+            echo "Before deploy:"
+            git rev-parse --short HEAD
+            git log -1 --oneline --no-decorate
+
+            git pull --ff-only https://github.com/rinesaahmedi/fragmento.git main
+
+            echo "After deploy:"
+            git rev-parse --short HEAD
+            git log -1 --oneline --no-decorate
+
+            chown -R deploy:deploy "$FRONTEND_DIR"
+
+            cd "$FRONTEND_DIR"
+            sudo -u deploy npm install
+            sudo -u deploy npm run prisma:deploy
+            sudo -u deploy npm run prisma:generate
+            sudo -u deploy npm run build
+
+            systemctl restart fragmento.service
+            systemctl is-active fragmento.service
+            systemctl --no-pager --full status fragmento.service | head -n 20
+
+            curl -I --max-time 20 http://127.0.0.1:5300/kitchens/ab-105806
+
+            cd "$APP_DIR"
+            git status --short --branch
