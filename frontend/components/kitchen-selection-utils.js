@@ -124,6 +124,16 @@ export function getLocalizedBlendeLabel(item, language = "en") {
   return localizedName || String(item?.blendeLabel || "").trim();
 }
 
+export function getLocalizedBlendeDisplayLabel(item, language = "en") {
+  const label = getLocalizedBlendeLabel(item, language);
+  const code = String(item?.blendeCode || "").trim();
+
+  if (!label) return code;
+  if (!code || label.toLowerCase().includes(code.toLowerCase())) return label;
+
+  return `${label}, ${code}`;
+}
+
 // Element names must never carry dimensions (they are shown separately under the article as a
 // W x H x D line). Strip every common dimension format: parenthesised "(600 x 720 x 340 mm)",
 // bare "600 x 720 x 340 mm" / "600/600 mm", and a trailing single measure "178 cm" / "600 mm".

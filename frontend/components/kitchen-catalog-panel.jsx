@@ -7,7 +7,7 @@ import {
   formatCurrency,
   getCatalogDisplayItem,
   getCatalogItemDetails,
-  getLocalizedBlendeLabel,
+  getLocalizedBlendeDisplayLabel,
   getLocalizedItemInfoText,
   getLocalizedItemName,
   getProductImagePaths,
@@ -192,7 +192,7 @@ function CatalogItem({
 }) {
   const { translate, language } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate, language, false);
-  const blendeLabel = getLocalizedBlendeLabel(item, language);
+  const blendeLabel = getLocalizedBlendeDisplayLabel(item, language);
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const { dimensions: itemDimensions } = getCatalogItemDetails(item);

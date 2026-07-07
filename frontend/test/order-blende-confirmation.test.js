@@ -110,7 +110,7 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
         componentKey: "base-module-1",
         price: 244,
         blendeCode: "UPK20",
-        blendeLabel: "UPK20 20 cm",
+        blendeLabel: "Blende Passblende",
         blendePrice: 25,
       },
       {
@@ -154,12 +154,12 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   assert.ok(cabinetSectionIndex < electricalSectionIndex);
   assert.ok(cabinetIndex > cabinetSectionIndex && cabinetIndex < electricalSectionIndex);
   assert.ok(dishwasherIndex > electricalSectionIndex);
-  assert.ok(cabinetIndex < html.indexOf("Blende UPK20 20 cm"));
+  assert.ok(cabinetIndex < html.indexOf("Passblende"));
   assert.match(html, /<th[^>]*>Nr\.<\/th>/);
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Vollintegrierter Geschirrspüler/);
   assert.match(html, /<tr><td[^>]*>1<\/td><td[\s\S]*?Unterschrank mit Schubkasten[\s\S]*?<\/td><td[\s\S]*?219/);
-  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[\s\S]*?25/);
-  assert.doesNotMatch(html, /<div style="margin-top:8px;">Blende UPK20 20 cm/);
+  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Passblende[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[\s\S]*?25/);
+  assert.doesNotMatch(html, /Blende Passblende/);
   assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">Blende/);
   assert.doesNotMatch(html, /margin-top:8px;font-size:12px;color:#777;">25/);
   assert.doesNotMatch(html, /Base cabinet/);
@@ -216,8 +216,9 @@ test("order confirmation groups multiple blendes under their parent cabinet", ()
   const html = buildOrderSummaryHtml(order);
 
   assert.match(html, /<td[^>]*>[\s\S]*?1[\s\S]*?<\/td><td[\s\S]*?Unterschrank mit Schublade 60/);
-  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?Blende UPK20 20 cm x 2[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[\s\S]*?50/);
-  assert.doesNotMatch(html, /1\.2[\s\S]*?Blende UPK20 20 cm/);
+  assert.match(html, /<tr><td[^>]*>1\.1<\/td><td[\s\S]*?UPK20 20 cm x 2[\s\S]*?Typen-Nr\.: UPK20[\s\S]*?<\/td><td[\s\S]*?50/);
+  assert.doesNotMatch(html, /1\.2[\s\S]*?UPK20 20 cm/);
+  assert.doesNotMatch(html, /Blende UPK20 20 cm/);
   assert.match(html, /Typen-Nr\.: UPK20/);
   assert.doesNotMatch(html, /UPK20 x2/);
 });

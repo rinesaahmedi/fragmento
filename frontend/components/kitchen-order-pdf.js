@@ -86,13 +86,14 @@ function buildBlendeDisplayItem(item) {
 
   const blendeCode = String(item?.blendeCode || blendeLabel).trim();
   const blendePrice = item?.blendePrice == null ? 0 : Number(item.blendePrice || 0);
+  const displayLabel = stripLeadingBlendePrefix(blendeLabel);
 
   return {
     ...item,
     code: blendeCode || "BLENDE",
     articleNumber: blendeCode || "BLENDE",
-    name: `Blende ${blendeLabel}`,
-    nameDe: `Blende ${blendeLabel}`,
+    name: displayLabel || blendeLabel,
+    nameDe: displayLabel || blendeLabel,
     price: blendePrice,
     blendeCode: "",
     blendeLabel: "",
@@ -107,6 +108,10 @@ function getItemDisplayCode(item) {
 function getItemDisplayName(item) {
   const cabinetName = getCabinetWidthDisplayName(item, "de");
   return normalizeGermanDisplayText(item?.nameDe || cabinetName || item?.name || item?.code || "");
+}
+
+function stripLeadingBlendePrefix(value) {
+  return String(value || "").replace(/^blende\s+/i, "").trim();
 }
 
 function normalizeGermanDisplayText(value) {
