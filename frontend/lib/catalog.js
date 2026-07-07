@@ -1084,6 +1084,8 @@ export function serializeKitchenForLegacy(kitchen) {
     return {
       id: item.id,
       catalogArticleId: item.catalogArticleId || "",
+      catalogServiceId: item.catalogServiceId || "",
+      catalogBlendeId: item.catalogBlendeId || "",
       code: item.code,
       articleNumber: catalogArticle?.articleNumber || item.articleNumber || "",
       name: catalogArticle?.name || catalogService?.name || item.name,
