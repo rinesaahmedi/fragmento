@@ -276,8 +276,8 @@ export function AdminDashboardCharts({
     <div className="analytics-dashboard">
       <section className="dashboard-toolbar">
         <div>
-          <p className="eyebrow">{translate("dashboard.analyticsOverview", "Analytics overview")}</p>
-          <h1>{translate("dashboard.orderDashboard", "Order dashboard")}</h1>
+          <p className="eyebrow deploy-test-heading">{translate("dashboard.analyticsOverview", "Analytics overview").toUpperCase()}</p>
+          <h1 className="deploy-test-heading">{translate("dashboard.orderDashboard", "Order dashboard").toUpperCase()}</h1>
           <p>{translate("dashboard.monitorSalesWorkflowMovementKitchenDemandAndItemPerformance", "Track orders, workflow, kitchens, and item performance.")}</p>
         </div>
         {renderFilterForm()}
