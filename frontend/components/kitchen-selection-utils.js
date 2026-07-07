@@ -115,25 +115,13 @@ export function getCatalogItemDetails(item) {
 }
 
 export function getLocalizedBlendeLabel(item, language = "en") {
-  const legacyLabel = String(item?.blendeLabel || "").trim();
   const localizedName = String(
     language === "de" && item?.blendeNameDe
       ? item.blendeNameDe
       : item?.blendeName || "",
   ).trim();
 
-  if (!localizedName) return legacyLabel;
-  if (!legacyLabel) return localizedName;
-
-  const code = String(item?.blendeCode || "").trim();
-  const suffixSource = code && legacyLabel.toLowerCase().startsWith(code.toLowerCase())
-    ? legacyLabel.slice(code.length)
-    : legacyLabel.toLowerCase().startsWith(localizedName.toLowerCase())
-      ? legacyLabel.slice(localizedName.length)
-      : "";
-  const suffix = suffixSource.replace(/^[\s,;:-]+/, "").trim();
-
-  return suffix ? `${localizedName}, ${suffix}` : localizedName;
+  return localizedName || String(item?.blendeLabel || "").trim();
 }
 
 // Element names must never carry dimensions (they are shown separately under the article as a
