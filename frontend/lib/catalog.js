@@ -1,5 +1,6 @@
 import { KitchenStatus, ItemType, OrderStatus, Prisma } from "@prisma/client";
 import { prisma } from "./prisma.js";
+import { applyDueScheduledCatalogPriceListImports } from "./catalog-price-list-import.js";
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
@@ -157,9 +158,11 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   blendeCode: true,
   blendeLabel: true,
   blendePrice: true,
+  catalogArticleId: true,
   catalogBlendeId: true,
   catalogBlendeQuantity: true,
   catalogServiceId: true,
+  catalogPriceSyncMode: true,
   createdAt: true,
   updatedAt: true,
 };
@@ -173,6 +176,7 @@ export async function getActiveKitchens() {
 
 export async function getKitchenBySlug(slug) {
   const resolvedSlug = resolveKitchenSlugAlias(slug);
+  await applyDueScheduledCatalogPriceListImports(prisma);
 
   try {
     return await prisma.kitchen.findUnique({

@@ -204,6 +204,7 @@ test("order confirmation product-info attachments exclude default zero-price ite
   const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
 
   assert.deepEqual(staticHtml.attachmentLabels, ["Vollintegrierter Geschirrspüler", "Standkühlschrank 178 cm"]);
+  assert.deepEqual(staticHtml.productImageAttachments, []);
   assert.match(staticHtml.html, /Produktinformationen im Anhang:/);
   assert.match(staticHtml.html, /<ul[^>]*>/);
   assert.match(staticHtml.html, /<li[^>]*>Vollintegrierter Geschirrspüler<\/li>/);

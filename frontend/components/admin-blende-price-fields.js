@@ -30,6 +30,8 @@ export default function AdminBlendePriceFields({
   relationGridStyle,
   catalogBlenden = [],
   catalogServices = [],
+  catalogArticles = [],
+  defaultArticleId = "",
   defaultBlendeId = "",
   defaultBlendeQuantity = "",
   defaultServiceId = "",
@@ -38,6 +40,9 @@ export default function AdminBlendePriceFields({
   const blendenById = useMemo(() => {
     return new Map(catalogBlenden.map((blende) => [blende.id, blende]));
   }, [catalogBlenden]);
+  const articlesById = useMemo(() => {
+    return new Map(catalogArticles.map((article) => [article.id, article]));
+  }, [catalogArticles]);
   const initialHasBlende = Boolean(defaultBlendeId);
   const initialQuantity = quantityValue(defaultBlendeQuantity, initialHasBlende);
   const initialBlendeTotalCents = currentBlendePrice == null
@@ -46,6 +51,7 @@ export default function AdminBlendePriceFields({
   const initialArticlePrice = centsToMoney(moneyToCents(totalPriceDefaultValue) - initialBlendeTotalCents);
 
   const [articlePrice, setArticlePrice] = useState(initialArticlePrice);
+  const [articleId, setArticleId] = useState(defaultArticleId || "");
   const [blendeId, setBlendeId] = useState(defaultBlendeId || "");
   const [quantity, setQuantity] = useState(initialQuantity);
 
@@ -78,6 +84,28 @@ export default function AdminBlendePriceFields({
       </div>
 
       <div style={relationGridStyle}>
+        <FormField label="Catalog article" wide={false}>
+          <AdminSelect
+            name="catalogArticleId"
+            value={articleId}
+            onChange={(event) => {
+              const nextArticleId = event.target.value;
+              setArticleId(nextArticleId);
+              const nextArticle = articlesById.get(nextArticleId);
+              if (nextArticle) {
+                setArticlePrice(centsToMoney(moneyToCents(nextArticle.price)));
+              }
+            }}
+            style={selectStyle}
+          >
+            <option value="">No article link</option>
+            {catalogArticles.map((article) => (
+              <option key={article.id} value={article.id}>
+                {article.articleNumber} - {article.label} ({article.formattedPrice})
+              </option>
+            ))}
+          </AdminSelect>
+        </FormField>
         <FormField label="Blende" wide={false}>
           <AdminSelect
             name="catalogBlendeId"

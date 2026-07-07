@@ -31,6 +31,7 @@ import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { buildKitchenPreviewSvgMarkup } from "../../../../lib/claim-kitchen-preview";
 import { LEGACY_ICON_KEYS, getKitchenById, listKitchenItemCodeOptionsForAdmin } from "../../../../lib/catalog";
+import { listCatalogPrograms } from "../../../../lib/catalog-programs";
 import { getKitchenCatalogImagePreview, getKitchenCatalogPreviewHotspots, getKitchenCatalogPreviewSlot, resolveKitchenCatalogPreviewSlug } from "../../../../lib/kitchen-catalog-preview";
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
@@ -447,8 +448,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     return acc;
   }, {});
   const kitchenSvgMarkup = structureSlots.length ? await loadKitchenSvgMarkup(previewSlug).catch(() => "") : "";
-  const [itemCodeOptions, catalogBlenden, catalogServices] = await Promise.all([
+  const [itemCodeOptions, catalogPrograms, catalogArticles, catalogBlenden, catalogServices] = await Promise.all([
     listKitchenItemCodeOptionsForAdmin(),
+    listCatalogPrograms(),
+    prisma.catalogArticle.findMany({
+      where: { isActive: true },
+      orderBy: [{ itemType: "asc" }, { articleNumber: "asc" }],
+    }),
     prisma.catalogBlende.findMany({
       where: { isActive: true },
       orderBy: { code: "asc" },
@@ -468,9 +474,16 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
   const catalogServiceOptions = catalogServices.map((service) => ({
     id: service.id,
     code: service.code,
-    label: service.nameDe || service.name,
-    price: Number(service.price),
-    formattedPrice: formatCurrency(service.price),
+      label: service.nameDe || service.name,
+      price: Number(service.price),
+      formattedPrice: formatCurrency(service.price),
+    }));
+  const catalogArticleOptions = catalogArticles.map((article) => ({
+    id: article.id,
+    articleNumber: article.articleNumber,
+    label: article.nameDe || article.name,
+    price: Number(article.price),
+    formattedPrice: formatCurrency(article.price),
   }));
 
   return (
@@ -498,7 +511,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <input name="kitchenCode" defaultValue={kitchen.kitchenCode || ""} style={compactInputStyle} />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.programmId" fallback="Programm ID" />}>
-              <input name="programmId" defaultValue={kitchen.programmId || "IP 2200"} style={compactInputStyle} />
+              <AdminSelect name="programmId" defaultValue={kitchen.programmId || "IP 2200"} style={compactInputStyle}>
+                {catalogPrograms.map((program) => (
+                  <option key={program.programmId} value={program.programmId}>
+                    {program.programmId}{program.name && program.name !== program.programmId ? ` - ${program.name}` : ""}
+                  </option>
+                ))}
+              </AdminSelect>
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
               <AdminSelect name="status" defaultValue={kitchen.status} style={compactInputStyle}>
@@ -702,8 +721,10 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       priceStyle={compactInputStyle}
                       selectStyle={compactInputStyle}
                       relationGridStyle={catalogRelationGridStyle}
+                      catalogArticles={catalogArticleOptions}
                       catalogBlenden={catalogBlendeOptions}
                       catalogServices={catalogServiceOptions}
+                      defaultArticleId={item.catalogArticleId || ""}
                       defaultBlendeId={item.catalogBlendeId || ""}
                       defaultBlendeQuantity={item.catalogBlendeQuantity || (item.catalogBlendeId ? 1 : "")}
                       defaultServiceId={item.catalogServiceId || ""}
@@ -807,6 +828,16 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <fieldset style={formGroupStyle}>
                 <legend style={formGroupLegendStyle}>Catalog Links</legend>
                 <div style={formGridStyle}>
+                  <FormField label="Catalog article">
+                    <AdminSelect name="catalogArticleId" defaultValue="" style={inputStyle}>
+                      <option value="">No article link</option>
+                      {catalogArticles.map((article) => (
+                        <option key={article.id} value={article.id}>
+                          {article.articleNumber} - {article.nameDe || article.name} ({formatCurrency(article.price)})
+                        </option>
+                      ))}
+                    </AdminSelect>
+                  </FormField>
                   <FormField label="Blende">
                     <AdminSelect name="catalogBlendeId" defaultValue="" style={inputStyle}>
                       <option value="">No blende</option>

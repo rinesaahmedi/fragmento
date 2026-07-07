@@ -69,6 +69,8 @@ model CatalogArticle {
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
   kitchenItems        KitchenItem[]
+  priceHistory        CatalogArticlePriceHistory[]
+  programPrices       CatalogArticleProgramPrice[]
 }
 
 model CatalogBlende {
@@ -82,6 +84,8 @@ model CatalogBlende {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   kitchenItems KitchenItem[]
+  priceHistory CatalogBlendePriceHistory[]
+  programPrices CatalogBlendeProgramPrice[]
 }
 
 model CatalogService {
@@ -95,6 +99,165 @@ model CatalogService {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   kitchenItems KitchenItem[]
+  priceHistory CatalogServicePriceHistory[]
+  programPrices CatalogServiceProgramPrice[]
+}
+
+model CatalogProgram {
+  id          String   @id @default(cuid())
+  programmId  String   @unique
+  name        String?
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CatalogPriceListImport {
+  id            String                       @id @default(cuid())
+  label         String?
+  sourceName    String?
+  programmId    String?
+  status        String                       @default("APPLIED")
+  notes         String?
+  importedBy    String?
+  createdCount  Int                          @default(0)
+  updatedCount  Int                          @default(0)
+  unchangedCount Int                         @default(0)
+  failedCount   Int                          @default(0)
+  syncedKitchenItemCount Int                  @default(0)
+  effectiveFrom DateTime?
+  syncLinkedKitchenItemsRequested Boolean     @default(false)
+  syncAppliedAt  DateTime?
+  createdAt     DateTime                     @default(now())
+  appliedAt     DateTime?
+  articleHistory CatalogArticlePriceHistory[]
+  blendeHistory  CatalogBlendePriceHistory[]
+  serviceHistory CatalogServicePriceHistory[]
+  rows           CatalogPriceListImportRow[]
+
+  @@index([status, effectiveFrom])
+}
+
+model CatalogPriceListImportRow {
+  id                  String                  @id @default(cuid())
+  importId            String
+  import              CatalogPriceListImport  @relation(fields: [importId], references: [id], onDelete: Cascade)
+  itemKind            String
+  identifier          String
+  articleNumber       String?
+  code                String?
+  name                String
+  nameDe              String?
+  description         String?
+  widthMm             Int?
+  heightMm            Int?
+  depthMm             Int?
+  itemType            ItemType?
+  price               Decimal                 @db.Decimal(10, 2)
+  isFixedPricePackage Boolean?
+  isActive            Boolean                 @default(true)
+  createdAt           DateTime                @default(now())
+
+  @@index([importId])
+  @@index([itemKind])
+  @@index([identifier])
+}
+
+model CatalogArticleProgramPrice {
+  id               String         @id @default(cuid())
+  programmId       String
+  catalogArticleId String
+  catalogArticle   CatalogArticle @relation(fields: [catalogArticleId], references: [id], onDelete: Cascade)
+  articleNumber    String
+  price            Decimal        @db.Decimal(10, 2)
+  isActive         Boolean        @default(true)
+  updatedAt        DateTime       @updatedAt
+  createdAt        DateTime       @default(now())
+
+  @@unique([programmId, catalogArticleId])
+  @@index([programmId])
+  @@index([articleNumber])
+}
+
+model CatalogBlendeProgramPrice {
+  id              String        @id @default(cuid())
+  programmId      String
+  catalogBlendeId String
+  catalogBlende   CatalogBlende @relation(fields: [catalogBlendeId], references: [id], onDelete: Cascade)
+  code            String
+  price           Decimal       @db.Decimal(10, 2)
+  isActive        Boolean       @default(true)
+  updatedAt       DateTime      @updatedAt
+  createdAt       DateTime      @default(now())
+
+  @@unique([programmId, catalogBlendeId])
+  @@index([programmId])
+  @@index([code])
+}
+
+model CatalogServiceProgramPrice {
+  id               String         @id @default(cuid())
+  programmId       String
+  catalogServiceId String
+  catalogService   CatalogService @relation(fields: [catalogServiceId], references: [id], onDelete: Cascade)
+  code             String
+  price            Decimal        @db.Decimal(10, 2)
+  isActive         Boolean        @default(true)
+  updatedAt        DateTime       @updatedAt
+  createdAt        DateTime       @default(now())
+
+  @@unique([programmId, catalogServiceId])
+  @@index([programmId])
+  @@index([code])
+}
+
+model CatalogArticlePriceHistory {
+  id               String                  @id @default(cuid())
+  importId         String?
+  import           CatalogPriceListImport? @relation(fields: [importId], references: [id], onDelete: SetNull)
+  catalogArticleId String?
+  catalogArticle   CatalogArticle?         @relation(fields: [catalogArticleId], references: [id], onDelete: SetNull)
+  articleNumber    String
+  oldPrice         Decimal?                @db.Decimal(10, 2)
+  newPrice         Decimal                 @db.Decimal(10, 2)
+  changedAt        DateTime                @default(now())
+
+  @@index([importId])
+  @@index([catalogArticleId])
+  @@index([articleNumber])
+}
+
+model CatalogBlendePriceHistory {
+  id              String                  @id @default(cuid())
+  importId        String?
+  import          CatalogPriceListImport? @relation(fields: [importId], references: [id], onDelete: SetNull)
+  catalogBlendeId String?
+  catalogBlende   CatalogBlende?          @relation(fields: [catalogBlendeId], references: [id], onDelete: SetNull)
+  code            String
+  oldPrice        Decimal?                @db.Decimal(10, 2)
+  newPrice        Decimal                 @db.Decimal(10, 2)
+  changedAt       DateTime                @default(now())
+
+  @@index([importId])
+  @@index([catalogBlendeId])
+  @@index([code])
+}
+
+model CatalogServicePriceHistory {
+  id               String                  @id @default(cuid())
+  importId         String?
+  import           CatalogPriceListImport? @relation(fields: [importId], references: [id], onDelete: SetNull)
+  catalogServiceId String?
+  catalogService   CatalogService?         @relation(fields: [catalogServiceId], references: [id], onDelete: SetNull)
+  code             String
+  oldPrice         Decimal?                @db.Decimal(10, 2)
+  newPrice         Decimal                 @db.Decimal(10, 2)
+  changedAt        DateTime                @default(now())
+
+  @@index([importId])
+  @@index([catalogServiceId])
+  @@index([code])
 }
 
 model Kitchen {
@@ -149,6 +312,7 @@ model KitchenItem {
   catalogServiceId         String?
   catalogService           CatalogService? @relation(fields: [catalogServiceId], references: [id], onDelete: SetNull)
   catalogLinkStatus        String?
+  catalogPriceSyncMode     String          @default("AUTO")
   createdAt                DateTime        @default(now())
   updatedAt                DateTime        @updatedAt
   orderItems               OrderItem[]

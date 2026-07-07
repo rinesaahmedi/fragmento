@@ -1,5 +1,6 @@
 import { mapAdminMutationError, redirectWithFlash, validateCatalogAddonInput } from "../../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../../lib/auth";
+import { buildSyncedKitchenItemPrice, shouldSyncKitchenItemPrice } from "../../../../../../lib/catalog-pricing";
 import { prisma } from "../../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
@@ -27,12 +28,38 @@ export async function POST(request, { params }) {
 
     const data = validateCatalogAddonInput(formData, "Service");
 
-    await prisma.catalogService.update({
-      where: { id },
-      data,
+    const syncedCount = await prisma.$transaction(async (tx) => {
+      await tx.catalogService.update({
+        where: { id },
+        data,
+      });
+
+      const linkedItems = await tx.kitchenItem.findMany({
+        where: { catalogServiceId: id },
+        include: {
+          kitchen: { select: { slug: true } },
+          catalogArticle: true,
+          catalogBlende: true,
+          catalogService: true,
+        },
+      });
+
+      let count = 0;
+      for (const item of linkedItems) {
+        if (!shouldSyncKitchenItemPrice(item, { requireMatched: false })) continue;
+        const price = buildSyncedKitchenItemPrice(item);
+        if (price == null) continue;
+        await tx.kitchenItem.update({
+          where: { id: item.id },
+          data: { price },
+        });
+        count += 1;
+      }
+
+      return count;
     });
 
-    return redirectWithFlash(request, "/admin/catalog/articles", "success", "Service updated.");
+    return redirectWithFlash(request, "/admin/catalog/articles", "success", `Service updated. ${syncedCount} linked kitchen item(s) synced.`);
   } catch (error) {
     return redirectWithFlash(request, "/admin/catalog/articles", "error", mapAdminMutationError(error, "Service"));
   }

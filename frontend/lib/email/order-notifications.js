@@ -754,11 +754,6 @@ export function buildOrderSummaryHtml(order) {
 
 export async function buildOrderConfirmationEmailStaticHtml(order) {
   const productInfo = await loadProductInfoAttachments(order);
-  const productImages = await loadProductImageAttachments(order);
-  const orderWithProductImages = {
-    ...order,
-    productImageCids: productImages.cidByAssetPath,
-  };
   const productInfoHtml = productInfo.labels.length
     ? `<div style="margin:16px 0 0;font-family:Arial,sans-serif;color:#333;">
         <p style="margin:0 0 6px;">Produktinformationen im Anhang:</p>
@@ -770,11 +765,11 @@ export async function buildOrderConfirmationEmailStaticHtml(order) {
 
   return {
     html: `
-      ${buildOrderSummaryHtml(orderWithProductImages)}
+      ${buildOrderSummaryHtml(order)}
       ${productInfoHtml}
     `,
     attachmentLabels: productInfo.labels,
-    productImageAttachments: productImages.attachments,
+    productImageAttachments: [],
   };
 }
 

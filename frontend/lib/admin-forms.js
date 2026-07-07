@@ -143,6 +143,7 @@ export function validateKitchenItemInput(formData) {
     productInfoKeyFacts: optionalStringList(formData.get("productInfoKeyFacts")),
     productInfoExtractedText: optionalString(formData.get("productInfoExtractedText")),
     productInfoUpdatedAt: optionalString(formData.get("productInfoPdfPath")) ? new Date() : null,
+    catalogArticleId: optionalId(formData.get("catalogArticleId")),
     catalogBlendeId: optionalId(formData.get("catalogBlendeId")),
     catalogBlendeQuantity: validateOptionalPositiveInteger(formData.get("catalogBlendeQuantity"), "Blende quantity"),
     catalogServiceId: optionalId(formData.get("catalogServiceId")),

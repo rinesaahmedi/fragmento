@@ -23,6 +23,7 @@ import { AdminShell } from "../../../components/admin-shell";
 import { AdminDateTime, AdminKitchenDisplayName, AdminPluralText, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
 import AdminSelect from "../../../components/admin-select";
 import { listKitchensForAdmin } from "../../../lib/catalog";
+import { listCatalogPrograms } from "../../../lib/catalog-programs";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 
@@ -39,7 +40,10 @@ export default async function AdminKitchensPage({ searchParams }) {
   const resolvedSearchParams = (await searchParams) || {};
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const kitchens = await listKitchensForAdmin();
+  const [kitchens, programs] = await Promise.all([
+    listKitchensForAdmin(),
+    listCatalogPrograms(),
+  ]);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -59,7 +63,13 @@ export default async function AdminKitchensPage({ searchParams }) {
               <input name="kitchenCode" placeholder="105 807" style={inputStyle} />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.programmId" fallback="Programm ID" />}>
-              <input name="programmId" placeholder="IP 2200" defaultValue="IP 2200" style={inputStyle} />
+              <AdminSelect name="programmId" defaultValue="IP 2200" style={inputStyle}>
+                {programs.map((program) => (
+                  <option key={program.programmId} value={program.programmId}>
+                    {program.programmId}{program.name && program.name !== program.programmId ? ` - ${program.name}` : ""}
+                  </option>
+                ))}
+              </AdminSelect>
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.status" fallback="Status" />}>
               <AdminSelect name="status" defaultValue={KitchenStatus.DRAFT} style={inputStyle}>

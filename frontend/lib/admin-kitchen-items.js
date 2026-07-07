@@ -71,7 +71,10 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     throw new Error(`Item code "${input.code}" is already used by "${duplicateCode.name}". Article numbers must be unique.`);
   }
 
-  const [catalogBlende, catalogService] = await Promise.all([
+  const [catalogArticle, catalogBlende, catalogService] = await Promise.all([
+    input.catalogArticleId
+      ? prisma.catalogArticle.findUnique({ where: { id: input.catalogArticleId } })
+      : null,
     input.catalogBlendeId
       ? prisma.catalogBlende.findUnique({ where: { id: input.catalogBlendeId } })
       : null,
@@ -80,12 +83,24 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
       : null,
   ]);
 
+  if (input.catalogArticleId && !catalogArticle) {
+    throw new Error("Selected catalog article was not found.");
+  }
+
   if (input.catalogBlendeId && !catalogBlende) {
     throw new Error("Selected blende was not found.");
   }
 
   if (input.catalogServiceId && !catalogService) {
     throw new Error("Selected service was not found.");
+  }
+
+  if (catalogArticle && input.articleBasePrice == null && moneyToCents(input.price) === 0) {
+    input.articleBasePrice = String(catalogArticle.price);
+  }
+
+  if (catalogService && !catalogArticle && !catalogBlende && moneyToCents(input.price) === 0) {
+    input.price = String(catalogService.price);
   }
 
   const data = {
@@ -96,6 +111,7 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     blendeCode: catalogBlende?.code || null,
     blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || null,
     blendePrice: catalogBlende ? catalogBlende.price : null,
+    catalogArticleId: catalogArticle?.id || null,
     catalogServiceId: catalogService?.id || null,
   };
 

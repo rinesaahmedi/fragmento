@@ -1,20 +1,7 @@
 import { mapAdminMutationError, redirectWithFlash, validateCatalogArticleInput } from "../../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../../lib/auth";
+import { buildSyncedKitchenItemPrice, shouldSyncKitchenItemPrice } from "../../../../../../lib/catalog-pricing";
 import { prisma } from "../../../../../../lib/prisma";
-
-function moneyToCents(value) {
-  return Math.round(Number(value || 0) * 100);
-}
-
-function centsToMoney(cents) {
-  return (Math.max(0, cents) / 100).toFixed(2);
-}
-
-function getBlendeTotalCents(item) {
-  if (item.blendePrice == null || !item.catalogBlendeId) return 0;
-  const quantity = Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
-  return moneyToCents(item.blendePrice) * quantity;
-}
 
 export async function POST(request, { params }) {
   await requireAdminApi();
@@ -42,34 +29,36 @@ export async function POST(request, { params }) {
     const data = validateCatalogArticleInput(formData);
 
     const updatedCount = await prisma.$transaction(async (tx) => {
-      const article = await tx.catalogArticle.update({
+      await tx.catalogArticle.update({
         where: { id },
         data,
       });
       const linkedItems = await tx.kitchenItem.findMany({
         where: { catalogArticleId: id },
-        select: {
-          id: true,
-          blendePrice: true,
-          catalogBlendeId: true,
-          catalogBlendeQuantity: true,
+        include: {
+          kitchen: { select: { slug: true } },
+          catalogArticle: true,
+          catalogBlende: true,
+          catalogService: true,
         },
       });
-      const articlePriceCents = moneyToCents(article.price);
 
-      await Promise.all(linkedItems.map((item) => (
-        tx.kitchenItem.update({
+      let syncedCount = 0;
+      for (const item of linkedItems) {
+        if (!shouldSyncKitchenItemPrice(item, { requireMatched: false })) continue;
+        const price = buildSyncedKitchenItemPrice(item);
+        if (price == null) continue;
+        await tx.kitchenItem.update({
           where: { id: item.id },
-          data: {
-            price: centsToMoney(articlePriceCents + getBlendeTotalCents(item)),
-          },
-        })
-      )));
+          data: { price },
+        });
+        syncedCount += 1;
+      }
 
-      return linkedItems.length;
+      return syncedCount;
     });
 
-    return redirectWithFlash(request, "/admin/catalog/articles", "success", `Article updated. ${updatedCount} linked kitchen item(s) repriced.`);
+    return redirectWithFlash(request, "/admin/catalog/articles", "success", `Article updated. ${updatedCount} linked kitchen item(s) synced.`);
   } catch (error) {
     return redirectWithFlash(request, "/admin/catalog/articles", "error", mapAdminMutationError(error, "Article"));
   }

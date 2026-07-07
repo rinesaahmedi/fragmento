@@ -229,7 +229,12 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
           eyebrow="Manage"
           title="Catalog"
           description="Reusable articles, blenden, and services for kitchen item setup and catalog audit."
-          actions={<ActionLink href="/api/admin/catalog/export" secondary>Export Excel</ActionLink>}
+          actions={(
+            <div style={actionRowStyle}>
+              <ActionLink href="/api/admin/catalog/export" secondary>Export Excel</ActionLink>
+              <ActionLink href="/admin/catalog/imports">Price imports</ActionLink>
+            </div>
+          )}
         />
         {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
         {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
