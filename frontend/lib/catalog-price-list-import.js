@@ -8,6 +8,11 @@ import {
   shouldSyncKitchenItemPrice,
 } from "./catalog-pricing.js";
 
+function getCatalogPriceListImportDelegate(prisma) {
+  const delegate = prisma?.catalogPriceListImport;
+  return delegate && typeof delegate.findMany === "function" ? delegate : null;
+}
+
 const ARTICLE_COLUMNS = {
   articleNumber: ["articleNumber", "Article number", "Article Number"],
   name: ["name", "Name"],
@@ -767,7 +772,12 @@ export async function applyCatalogPriceListImport(prisma, parsed, options = {}) 
 }
 
 export async function applyDueScheduledCatalogPriceListImports(prisma, now = new Date()) {
-  const dueImports = await prisma.catalogPriceListImport.findMany({
+  const catalogPriceListImport = getCatalogPriceListImportDelegate(prisma);
+  if (!catalogPriceListImport) {
+    return [];
+  }
+
+  const dueImports = await catalogPriceListImport.findMany({
     where: {
       status: "SCHEDULED",
       effectiveFrom: { lte: now },

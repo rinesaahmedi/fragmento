@@ -6,6 +6,7 @@ import {
   shouldSyncKitchenItemPrice,
 } from "../lib/catalog-pricing.js";
 import {
+  applyDueScheduledCatalogPriceListImports,
   parseCatalogPriceListFile,
   previewCatalogPriceListImport,
 } from "../lib/catalog-price-list-import.js";
@@ -94,4 +95,10 @@ test("previewCatalogPriceListImport summarizes create update and unchanged rows"
   assert.equal(preview.summary.updated, 1);
   assert.equal(preview.summary.unchanged, 2);
   assert.equal(preview.summary.failed, 0);
+});
+
+test("applyDueScheduledCatalogPriceListImports ignores stale Prisma clients without import delegate", async () => {
+  const result = await applyDueScheduledCatalogPriceListImports({});
+
+  assert.deepEqual(result, []);
 });

@@ -31,9 +31,11 @@ const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kit
 
 const ARTICLE_PRICES = {
   "517467": 89,
+  "A-EGSPV594400 + TGV60": 680,
   "A-EGSPV597210 + TGV60": 579,
   "EWA34660W + TGV60 + WU16": 639,
   "FH 664 621 S": 349,
+  "FH664621E + FWK124 + HD6002": 349,
   H3002: 115,
   H4002: 130,
   H4502: 139,
@@ -43,18 +45,41 @@ const ARTICLE_PRICES = {
   H9002: 203,
   H10002: 209,
   KA220043_S3: 69,
+  "KALB KA220043_S3": 69,
   KHF664611S: 209,
+  "KHF664611S + FWP18": 209,
   "OL-KGCN388140E": 579,
+  US100: 353,
+  US120: 403,
+  US2A30: 298,
+  US2A40: 305,
+  US2A45: 316,
+  US2A50: 324,
+  US2A60: 369,
+  US2A80: 466,
+  US2A90: 471,
+  US2A100: 514,
   US30: 175,
   US40: 183,
   US45: 198,
   US50: 198,
   US60: 219,
+  US80: 333,
+  US90: 339,
+  ZB30SG: 19,
+  ZB40SG: 19,
+  ZB45SG: 22,
+  ZB50SG: 22,
   ZB60SG: 25,
+  ZB80SG: 31,
+  ZB90SG: 31,
+  ZB100SG: 36,
 };
 
 const BLENDE_PRICES = {
+  HPEF4302: 150,
   HPK2002: 35,
+  UPEF65: 68,
   UPK20: 25,
 };
 
@@ -67,6 +92,65 @@ const BUNDLE_PRICES = {
   "FH664621E + FWK124 + HD6002": 349,
   "KHF664611S + FWP18": 209,
 };
+
+const CATALOG_ARTICLES = [
+  { articleNumber: "A-EGSPV594400 + TGV60", name: "Fully Integrated Dishwasher incl. Furniture Front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", widthMm: 600, depthMm: 600, price: "680.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "A-EGSPV597210 + TGV60", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
+  { articleNumber: "EWA34660W + TGV60 + WU16", name: "Washing machine + front + side panel", nameDe: "Waschmaschine + Front + Wange", price: "639.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
+  { articleNumber: "FH664621E + FWK124 + HD6002", name: "Flat screen extractor hood + cabinet + filter", nameDe: "Flachschirmhaube + Schrank + Filter", price: "349.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
+  { articleNumber: "FH 664 621 S", name: "FH 664 621 S extractor hood", nameDe: "FH 664 621 S Flachschirmhaube", price: "349.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H10002", name: "Upper cabinet 100 cm", nameDe: "Oberschrank 100 cm", widthMm: 1000, heightMm: 720, price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H3002", name: "Upper cabinet 30 cm", nameDe: "Oberschrank 30 cm", widthMm: 300, heightMm: 720, price: "115.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H4002", name: "Upper cabinet 40 cm", nameDe: "Oberschrank 40 cm", widthMm: 400, heightMm: 720, price: "130.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H4502", name: "Upper cabinet 45 cm", nameDe: "Oberschrank 45 cm", widthMm: 450, heightMm: 720, price: "139.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H5002", name: "Upper cabinet 50 cm", nameDe: "Oberschrank 50 cm", widthMm: 500, heightMm: 720, price: "135.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H6002", name: "Upper cabinet 60 cm", nameDe: "Oberschrank 60 cm", widthMm: 600, heightMm: 720, price: "149.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H8002", name: "Upper cabinet 80 cm", nameDe: "Oberschrank 80 cm", widthMm: 800, heightMm: 720, price: "200.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H9002", name: "Upper cabinet 90 cm", nameDe: "Oberschrank 90 cm", widthMm: 900, heightMm: 720, price: "203.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "KHF664611S", name: "Angled extractor hood", nameDe: "Schrägesse", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "KHF664611S + FWP18", name: "Angled extractor hood + filter", nameDe: "Schrägesse + Filter", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
+  { articleNumber: "OL-KGCN388140E", name: "Freestanding refrigerator 178cm", nameDe: "Standkühlschrank 178 cm", widthMm: 0, heightMm: 0, depthMm: 0, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US100", name: "Lower cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US120", name: "Lower cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A100", name: "Lower cabinet with Drawer/Soft-close 100", nameDe: "Unterschrank mit Schublade/Auszug 100", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A30", name: "Lower cabinet with Drawer/Soft-close 30", nameDe: "Unterschrank mit Schublade/Auszug 30", widthMm: 300, price: "298.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A40", name: "Lower cabinet with Drawer/Soft-close 40", nameDe: "Unterschrank mit Schublade/Auszug 40", widthMm: 400, price: "305.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A45", name: "Lower cabinet with Drawer/Soft-close 45", nameDe: "Unterschrank mit Schublade/Auszug 45", widthMm: 450, price: "316.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A50", name: "Lower cabinet with Drawer/Soft-close 50", nameDe: "Unterschrank mit Schublade/Auszug 50", widthMm: 500, price: "324.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A60", name: "Base cabinet with drawers 60 cm", nameDe: "Unterschrank mit Auszügen 60 cm", widthMm: 600, price: "369.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A80", name: "Lower cabinet with Drawer/Soft-close 80", nameDe: "Unterschrank mit Schublade/Auszug 80", widthMm: 800, price: "466.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A90", name: "Lower cabinet with Drawer/Soft-close 90", nameDe: "Unterschrank mit Schublade/Auszug 90", widthMm: 900, price: "471.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US30", name: "Lower cabinet with drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300, price: "175.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US40", name: "Lower cabinet with drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", widthMm: 400, price: "183.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US45", name: "Lower cabinet with drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", widthMm: 450, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US50", name: "Lower cabinet with drawer 50 cm", nameDe: "Unterschrank mit Schublade 50 cm", widthMm: 500, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US60", name: "Lower cabinet with drawer 60 cm", nameDe: "Unterschrank mit Schublade 60 cm", widthMm: 600, price: "219.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US80", name: "Lower cabinet with drawer 80 cm", nameDe: "Unterschrank mit Schublade 80 cm", widthMm: 800, price: "333.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US90", name: "Lower cabinet with drawer 90 cm", nameDe: "Unterschrank mit Schublade 90 cm", widthMm: 900, price: "339.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "517467", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "KA220043_S3", name: "LED lighting set", nameDe: "LED-Beleuchtungsset", price: "69.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "KALB KA220043_S3", name: "Lighting set with 3 LED spotlights", nameDe: "Beleuchtungsset 3 LED-Spots", price: "69.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB100SG", name: "Cutlery insert 100 cm", nameDe: "Besteckeinsatz 100 cm", price: "36.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB30SG", name: "Cutlery insert 30 cm", nameDe: "Besteckeinsatz 30 cm", price: "19.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB40SG", name: "Cutlery insert 40 cm", nameDe: "Besteckeinsatz 40 cm", price: "19.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB45SG", name: "Cutlery insert 45 cm", nameDe: "Besteckeinsatz 45 cm", price: "22.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB50SG", name: "Cutlery insert 50 cm", nameDe: "Besteckeinsatz 50 cm", price: "22.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB60SG", name: "Cutlery insert 60 cm", nameDe: "Besteckeinsatz 60 cm", price: "25.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB80SG", name: "Cutlery insert 80 cm", nameDe: "Besteckeinsatz 80 cm", price: "31.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "ZB90SG", name: "Cutlery insert 90 cm", nameDe: "Besteckeinsatz 90 cm", price: "31.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
+];
+
+const CATALOG_BLENDEN = [
+  { code: "HPEF4302", name: "Corner filler panel for Upper cabinet", nameDe: "Eckpassblende Hängeschrank", price: "150.00", isActive: true },
+  { code: "HPK2002", name: "HPK2002 Filler Panel", nameDe: "HPK2002 Passblende", price: "35.00", isActive: true },
+  { code: "UPEF65", name: "Corner filler panel for Lower cabinet", nameDe: "Eckpassblende Unterschrank", price: "68.00", isActive: true },
+  { code: "UPK20", name: "UPK20 Filler Panel", nameDe: "UPK20 Passblende", price: "25.00", isActive: true },
+];
+
+const CATALOG_SERVICES = [
+  { code: "MONTAGE", name: "Lieferung, Vertragen, Montage und Anschluss", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", isActive: true },
+  { code: "PICKUP", name: "Abholung an Logistikstandort", nameDe: "Abholung an Logistikstandort", price: "0.00", isActive: true },
+];
 
 function formatSeedPrice(value) {
   return Number(value || 0).toFixed(2);
@@ -1914,6 +1998,74 @@ async function linkImplementedKitchenContracts(projectId) {
   return linkedContracts.map((contract) => contract.contractNumber);
 }
 
+function compactSeedRecord(record) {
+  return Object.fromEntries(
+    Object.entries(record).filter(([, value]) => value !== undefined),
+  );
+}
+
+async function seedCatalogMasterData() {
+  for (const article of CATALOG_ARTICLES) {
+    const data = compactSeedRecord({
+      articleNumber: article.articleNumber,
+      name: article.name,
+      nameDe: article.nameDe ?? null,
+      description: article.description ?? null,
+      widthMm: article.widthMm ?? null,
+      heightMm: article.heightMm ?? null,
+      depthMm: article.depthMm ?? null,
+      price: article.price,
+      itemType: article.itemType,
+      isFixedPricePackage: Boolean(article.isFixedPricePackage),
+      isActive: article.isActive !== false,
+    });
+
+    await prisma.catalogArticle.upsert({
+      where: { articleNumber: article.articleNumber },
+      update: data,
+      create: data,
+    });
+  }
+
+  for (const blende of CATALOG_BLENDEN) {
+    const data = compactSeedRecord({
+      code: blende.code,
+      name: blende.name,
+      nameDe: blende.nameDe ?? null,
+      description: blende.description ?? null,
+      price: blende.price,
+      isActive: blende.isActive !== false,
+    });
+
+    await prisma.catalogBlende.upsert({
+      where: { code: blende.code },
+      update: data,
+      create: data,
+    });
+  }
+
+  for (const service of CATALOG_SERVICES) {
+    const data = compactSeedRecord({
+      code: service.code,
+      name: service.name,
+      nameDe: service.nameDe ?? null,
+      description: service.description ?? null,
+      price: service.price,
+      isActive: service.isActive !== false,
+    });
+
+    await prisma.catalogService.upsert({
+      where: { code: service.code },
+      update: data,
+      create: data,
+    });
+  }
+
+  console.log(
+    `Seeded ${CATALOG_ARTICLES.length} catalog articles, ${CATALOG_BLENDEN.length} blenden, and ${CATALOG_SERVICES.length} services.`,
+  );
+}
+
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -1926,6 +2078,8 @@ async function main() {
       create: { email: adminEmail, passwordHash, role: "SUPERADMIN" },
     });
   }
+
+  await seedCatalogMasterData();
 
   const housingCompanyCleanup = await pruneNonDefaultHousingCompanies();
   if (housingCompanyCleanup.deletedHousingCompanies || housingCompanyCleanup.unlinkedContracts) {

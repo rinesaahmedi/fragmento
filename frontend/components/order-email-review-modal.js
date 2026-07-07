@@ -27,6 +27,66 @@ function formatBodyTextAsHtml(bodyText) {
     .join("");
 }
 
+const previewResponsiveCss = `
+  .order-email-preview-html {
+    width: 100%;
+    max-width: 100%;
+    color: #333;
+    overflow-wrap: anywhere;
+  }
+
+  .order-email-preview-html,
+  .order-email-preview-html * {
+    box-sizing: border-box;
+  }
+
+  .order-email-preview-html > div {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .order-email-preview-html table {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    table-layout: auto !important;
+  }
+
+  .order-email-preview-html th,
+  .order-email-preview-html td {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow-wrap: anywhere !important;
+    word-break: normal !important;
+  }
+
+  .order-email-preview-html img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  @media (max-width: 560px) {
+    .order-email-preview-html {
+      font-size: 14px;
+    }
+
+    .order-email-preview-html > div > div {
+      padding: 14px !important;
+    }
+
+    .order-email-preview-html h4 {
+      margin-bottom: 10px !important;
+    }
+
+    .order-email-preview-html th,
+    .order-email-preview-html td {
+      padding: 8px 6px !important;
+    }
+  }
+`;
+
 export function OrderEmailReviewModal({
   to,
   defaultSubject,
@@ -43,7 +103,7 @@ export function OrderEmailReviewModal({
   const [excludedAttachmentKeys, setExcludedAttachmentKeys] = useState([]);
 
   const previewHtml = useMemo(() => {
-    return `${formatBodyTextAsHtml(body)}${staticHtml}`;
+    return `<style>${previewResponsiveCss}</style><div class="order-email-preview-html">${formatBodyTextAsHtml(body)}${staticHtml}</div>`;
   }, [body, staticHtml]);
   const visibleAttachmentLabels = useMemo(
     () => {
@@ -298,7 +358,7 @@ const modalHeaderStyle = {
 
 const modalGridStyle = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 440px), 1fr))",
   gap: 20,
   alignItems: "start",
 };
@@ -333,11 +393,13 @@ const previewBodyWrapStyle = {
   borderRadius: 18,
   background: "#fff",
   minHeight: 500,
-  overflow: "auto",
+  overflowX: "hidden",
+  overflowY: "auto",
 };
 
 const previewBodyStyle = {
-  padding: 20,
+  padding: "clamp(12px, 2vw, 20px)",
+  minWidth: 0,
 };
 
 const footerStyle = {
