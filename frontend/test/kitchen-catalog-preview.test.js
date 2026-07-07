@@ -86,11 +86,58 @@ test("AB 105822 catalog preview uses the AB 105825 layout", () => {
   assert.ok(baseModule.height < 33);
 });
 
+test("AB 105822 hood underside belongs to extractor hood instead of cabinet", () => {
+  const cabinetFace = PLAN_HOTSPOTS_BY_SLUG["ab-105822"].find((hotspot) =>
+    hotspot.componentKey === "wall-cabinet-2"
+    && hotspot.points?.some(([x, y]) => x === 66.98 && y === 39.25)
+  );
+  const hoodUnderside = PLAN_HOTSPOTS_BY_SLUG["ab-105822"].find((hotspot) =>
+    hotspot.componentKey === "extractor-hood"
+    && hotspot.points?.some(([x, y]) => x === 58.08 && y === 37.42)
+  );
+
+  assert.ok(cabinetFace);
+  assert.ok(cabinetFace.points.every(([, y]) => y < 40));
+  assert.ok(hoodUnderside);
+  assert.ok(Math.min(...hoodUnderside.points.map(([, y]) => y)) < 38);
+});
+
 test("AB 105828 catalog preview uses the AB 105825 layout", () => {
   const preview = getKitchenCatalogImagePreview("ab-105828");
 
   assert.equal(preview.imageHref, "/plans/AB%20105825.svg");
   assert.equal(PLAN_HOTSPOTS_BY_SLUG["ab-105828"], PLAN_HOTSPOTS_BY_SLUG["ab-105825"]);
+});
+
+test("AB 105831 hood underside belongs to extractor hood instead of cabinet", () => {
+  const cabinetFace = PLAN_HOTSPOTS_BY_SLUG["ab-105831"].find((hotspot) =>
+    hotspot.componentKey === "wall-cabinet-2"
+    && hotspot.points?.some(([x, y]) => x === 67.11 && y === 43.65)
+  );
+  const hoodUndersides = PLAN_HOTSPOTS_BY_SLUG["ab-105831"].filter((hotspot) =>
+    hotspot.componentKey === "extractor-hood"
+    && hotspot.points?.some(([x, y]) => x === 57.97 && y === 41.45)
+  );
+
+  assert.ok(cabinetFace);
+  assert.ok(cabinetFace.points.every(([, y]) => y < 44));
+  assert.ok(hoodUndersides.length >= 1);
+});
+
+test("AB 105837 hood LED strip belongs to extractor hood instead of cabinet", () => {
+  const cabinetFace = PLAN_HOTSPOTS_BY_SLUG["ab-105837"].find((hotspot) =>
+    hotspot.componentKey === "wall-cabinet-2"
+    && hotspot.points?.some(([x, y]) => x === 48.02 && y === 38.69)
+  );
+  const hoodLedStrip = PLAN_HOTSPOTS_BY_SLUG["ab-105837"].find((hotspot) =>
+    hotspot.componentKey === "extractor-hood"
+    && hotspot.points?.some(([x, y]) => x === 37.08 && y === 40.38)
+    && hotspot.points?.some(([x, y]) => x === 48.02 && y === 39.78)
+  );
+
+  assert.ok(cabinetFace);
+  assert.ok(cabinetFace.points.every(([, y]) => y <= 40.38));
+  assert.ok(hoodLedStrip);
 });
 
 test("AB 105809 worktop preview excludes vertical corner blende strips", () => {

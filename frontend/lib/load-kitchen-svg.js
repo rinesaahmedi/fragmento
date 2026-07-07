@@ -20,6 +20,15 @@ const SVG_BY_SLUG = {
   "test-3d-kitchen": path.join(process.cwd(), "kitchen-svgs", "active", "test-3d-kitchen.svg"),
 };
 
+function resolveAbPlanSvgPath(slug) {
+  const match = String(slug || "").trim().toLowerCase().match(/^ab-(\d{6})$/);
+  if (!match) {
+    return "";
+  }
+
+  return path.join(process.cwd(), "public", "plans", `AB ${match[1]}.svg`);
+}
+
 async function loadSvgFromFile(filePath) {
   return normalizeAssetPaths((await fs.readFile(filePath, "utf8")).trim());
 }
@@ -37,9 +46,20 @@ async function loadLegacySvgMarkup() {
 }
 
 export async function loadKitchenSvgMarkup(slug) {
-  const svgPath = SVG_BY_SLUG[String(slug || "").trim().toLowerCase()];
+  const normalizedSlug = String(slug || "").trim().toLowerCase();
+  const svgPath = SVG_BY_SLUG[normalizedSlug];
   if (svgPath) {
     return loadSvgFromFile(svgPath);
+  }
+
+  const abPlanSvgPath = resolveAbPlanSvgPath(normalizedSlug);
+  if (abPlanSvgPath) {
+    try {
+      await fs.access(abPlanSvgPath);
+      return loadSvgFromFile(abPlanSvgPath);
+    } catch {
+      // Fall back to the legacy drawing for older slugs that do not have a plan asset.
+    }
   }
 
   return loadLegacySvgMarkup();

@@ -2009,6 +2009,8 @@ export default function ServiceClaimFlow() {
   const preferredContactTimeFromRef = useRef(null);
   const preferredContactTimeToRef = useRef(null);
   const contractNumberStickySentinelRef = useRef(null);
+  const selectedServicePanelRef = useRef(null);
+  const shouldScrollToSelectedPanelRef = useRef(false);
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
@@ -2431,12 +2433,40 @@ export default function ServiceClaimFlow() {
     setProblemAreaDetailsByComponentId({});
   }, [contractLookup.contractNumber]);
 
+  useEffect(() => {
+    if (!mode || mode === "registered-next" || !shouldScrollToSelectedPanelRef.current) {
+      return undefined;
+    }
+
+    shouldScrollToSelectedPanelRef.current = false;
+    const animationFrameId = window.requestAnimationFrame(() => {
+      selectedServicePanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(animationFrameId);
+    };
+  }, [mode]);
+
+  function scrollToSelectedServicePanel() {
+    const animationFrameId = window.requestAnimationFrame(() => {
+      selectedServicePanelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return animationFrameId;
+  }
+
   function handleModeSelect(nextMode) {
+    shouldScrollToSelectedPanelRef.current = true;
     setMode(nextMode);
     setError("");
     setSuccessMessage("");
     setPendingRegistration(null);
     setCompletedRegistration(null);
+
+    if (mode === nextMode) {
+      shouldScrollToSelectedPanelRef.current = false;
+      scrollToSelectedServicePanel();
+    }
   }
 
   function handleRegisteredClaimSelect() {
@@ -3618,7 +3648,7 @@ export default function ServiceClaimFlow() {
       ) : null}
 
       {mode === "nachkauf" ? (
-        <section className="service-panel">
+        <section ref={selectedServicePanelRef} className="service-panel">
           <div className="service-panel__header">
             <p className="service-panel__eyebrow">{copy.purchaseBrand}</p>
             <h2>{copy.purchasePanelTitle}</h2>
@@ -3680,7 +3710,7 @@ export default function ServiceClaimFlow() {
       ) : null}
 
       {isRegisterMode ? (
-        <section className="service-panel">
+        <section ref={selectedServicePanelRef} className="service-panel">
           <div className="service-panel__header">
             <p className="service-panel__eyebrow">{copy.registerBrand}</p>
             <h2>{copy.registerPanelTitle}</h2>
@@ -3857,7 +3887,7 @@ export default function ServiceClaimFlow() {
       ) : null}
 
       {isComplaintMode ? (
-        <section className="service-panel">
+        <section ref={selectedServicePanelRef} className="service-panel">
           <div className="service-panel__header">
             <p className="service-panel__eyebrow">{copy.complaintBrand}</p>
             <h2>{copy.formTitle}</h2>

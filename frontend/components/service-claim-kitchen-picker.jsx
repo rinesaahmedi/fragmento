@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   componentIdForItem,
   componentIdForKey,
@@ -12,33 +12,20 @@ import {
   refreshKitchenPlanSelection,
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
+import {
+  IMAGE_HOTSPOTS_BY_SLUG,
+  IMAGE_VIEW_BY_SLUG,
+  PLAN_IMAGE_SOURCE_HEIGHT,
+  PLAN_IMAGE_SOURCE_WIDTH,
+  cropPlanHotspot,
+  getPlanDisplayCrop,
+  withBasePlinthExtension,
+  withCornerBlendeExtensions,
+  withDerivedSinkFaucet,
+  withHotspotSourceBounds,
+} from "./kitchen-svg-stage";
+import { getServiceClaimLinkedComponentIds } from "../lib/service-claim-kitchen-plan-selection";
 import styles from "./kitchen-configurator.module.css";
-
-const SERVICE_CLAIM_IMAGE_VIEW_BY_SLUG = {
-  "ab-105808": "/plans/AB%20105808.svg",
-};
-
-const SERVICE_CLAIM_IMAGE_HOTSPOTS_BY_SLUG = {
-  "ab-105808": [
-    { componentKey: "refrigerator", left: 3.31, top: 28.08, width: 13.08, height: 59.98 },
-    { componentKey: "wall-cabinet-1", left: 17.67, top: 15.89, width: 7.05, height: 24.09 },
-    { componentKey: "wall-cabinet-2", left: 24.72, top: 15.89, width: 14.14, height: 24.09 },
-    { componentKey: "extractor-hood", left: 24.72, top: 39.98, width: 14.14, height: 7.05 },
-    { componentKey: "wall-cabinet-3", left: 38.86, top: 15.89, width: 14.12, height: 24.09 },
-    { componentKey: "wall-cabinet-4", left: 52.98, top: 15.89, width: 14.12, height: 24.09 },
-    { componentKey: "wall-cabinet-5", left: 67.1, top: 15.89, width: 14.13, height: 24.09 },
-    { componentKey: "wall-cabinet-6", left: 81.23, top: 15.89, width: 15.07, height: 24.09 },
-    { componentKey: "worktop", left: 17.67, top: 57.46, width: 78.63, height: 1.35 },
-    { componentKey: "worktop", left: 17.2, top: 57.42, width: 0.45, height: 30.64 },
-    { componentKey: "sink-faucet", left: 68.85, top: 50.73, width: 4.85, height: 8 },
-    { componentKey: "base-module-1", left: 17.65, top: 58.81, width: 7.07, height: 29.25 },
-    { componentKey: "oven-module", left: 24.72, top: 58.81, width: 14.14, height: 29.25 },
-    { componentKey: "base-module-2", left: 38.86, top: 58.81, width: 14.12, height: 29.25 },
-    { componentKey: "base-module-3", left: 52.98, top: 58.81, width: 14.12, height: 29.25 },
-    { componentKey: "sink-base", left: 67.1, top: 58.81, width: 14.13, height: 29.25 },
-    { componentKey: "drawer-module", left: 81.23, top: 58.81, width: 15.07, height: 29.25 },
-  ],
-};
 
 const SERVICE_CLAIM_CLICK_BOUNDS_BY_SLUG = {
   "kitchen-model-b": [
@@ -85,11 +72,11 @@ function resolveClaimClickComponentId({ svg, event, kitchenSlug, selectableCompo
   return group?.dataset?.componentId || "";
 }
 
-function toggleClaimComponentSelection({ currentIds, componentId, selectableComponentIds }) {
+function toggleClaimComponentSelection({ currentIds, componentId, selectableComponentIds, kitchenSlug }) {
   const selectable = new Set(selectableComponentIds || []);
-  const ids = selectable.has(componentId) ? [componentId] : [];
+  const ids = getServiceClaimLinkedComponentIds(kitchenSlug, componentId).filter((id) => selectable.has(id));
   const current = new Set(currentIds);
-  const shouldRemove = current.has(componentId);
+  const shouldRemove = ids.some((id) => current.has(id));
 
   ids.forEach((id) => {
     if (shouldRemove) {
@@ -104,10 +91,11 @@ function toggleClaimComponentSelection({ currentIds, componentId, selectableComp
 
 export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange, labels, contractNumber }) {
   const svgHostRef = useRef(null);
+  const [hoveredComponentId, setHoveredComponentId] = useState(null);
   const { kitchenConfig, svgMarkup, kitchenSlug, selectableComponentIds } = kitchenPlan;
 
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenSlug] || null;
-  const imageViewHref = SERVICE_CLAIM_IMAGE_VIEW_BY_SLUG[kitchenSlug] || "";
+  const imageViewHref = IMAGE_VIEW_BY_SLUG[kitchenSlug] || "";
 
   const resolvedSvgMarkup = useMemo(
     () => applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug),
@@ -125,15 +113,33 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   const fixedKey = fixedComponentIds.join("|");
   const selectableKey = (selectableComponentIds || []).join("|");
   const visibleKey = visibleComponentIds.join("|");
+  const sourceImageHotspots = useMemo(() => {
+    const definitions = (IMAGE_HOTSPOTS_BY_SLUG[kitchenSlug] || []).map(withHotspotSourceBounds);
+    return withBasePlinthExtension(
+      withCornerBlendeExtensions(
+        withDerivedSinkFaucet(definitions, kitchenConfig.components),
+      ),
+      kitchenSlug,
+    );
+  }, [kitchenConfig.components, kitchenSlug]);
+  const planDisplayCrop = useMemo(
+    () => getPlanDisplayCrop(sourceImageHotspots, kitchenSlug),
+    [sourceImageHotspots, kitchenSlug],
+  );
+  const croppedPlanAspectRatio =
+    `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
   const imageHotspots = useMemo(() => {
     const selectable = new Set(selectableComponentIds || []);
-    return (SERVICE_CLAIM_IMAGE_HOTSPOTS_BY_SLUG[kitchenSlug] || [])
-      .map((hotspot) => ({
-        ...hotspot,
-        componentId: componentIdForKey(hotspot.componentKey),
-      }))
-      .filter((hotspot) => selectable.has(hotspot.componentId));
-  }, [kitchenSlug, selectableComponentIds, selectableKey]);
+    return sourceImageHotspots
+      .map((hotspot) => cropPlanHotspot(hotspot, planDisplayCrop))
+      .map((hotspot) => {
+        return {
+          ...hotspot,
+          componentId: componentIdForKey(hotspot.componentKey),
+        };
+      })
+      .filter((hotspot) => hotspot && selectable.has(hotspot.componentId));
+  }, [planDisplayCrop, selectableComponentIds, selectableKey, sourceImageHotspots]);
   const shouldUseImagePlan = Boolean(imageViewHref && imageHotspots.length);
 
   useEffect(() => {
@@ -182,6 +188,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
           currentIds: current,
           componentId,
           selectableComponentIds,
+          kitchenSlug,
         });
       });
     };
@@ -240,22 +247,35 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
       {shouldUseImagePlan ? (
         <div className={`${styles.stageBody} service-claim-kitchen__plan`}>
           <div className={`${styles.pdfCard} service-claim-kitchen__image-card`}>
-            <div className={`${styles.planImageWrap} service-claim-kitchen__image-wrap`}>
+            <div
+              className={`${styles.planImageWrap} service-claim-kitchen__image-wrap`}
+              style={{ aspectRatio: croppedPlanAspectRatio }}
+            >
               <img
                 src={imageViewHref}
                 alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
                 className={styles.planImageInteractive}
+                style={{
+                  left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
+                  top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
+                  width: `${(100 / planDisplayCrop.width) * 100}%`,
+                  height: `${(100 / planDisplayCrop.height) * 100}%`,
+                }}
                 draggable={false}
               />
               <div className={styles.planHotspotLayer}>
                 {imageHotspots.map((hotspot) => {
                   const isSelected = selectedIds.has(hotspot.componentId);
+                  const isHovered = getServiceClaimLinkedComponentIds(kitchenSlug, hotspot.componentId)
+                    .includes(hoveredComponentId);
                   return (
                     <button
                       key={`${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
                       type="button"
                       className={[
                         styles.planHotspot,
+                        hotspot.clipPath ? styles.planHotspotPolygon : "",
+                        isHovered ? styles.planHotspotHover : "",
                         isSelected ? styles.planHotspotSelected : "",
                       ]
                         .filter(Boolean)
@@ -265,6 +285,8 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                         top: `${hotspot.top}%`,
                         width: `${hotspot.width}%`,
                         height: `${hotspot.height}%`,
+                        clipPath: hotspot.clipPath || undefined,
+                        WebkitClipPath: hotspot.clipPath || undefined,
                         zIndex:
                           hotspot.componentKey === "sink-faucet"
                             ? 10
@@ -274,12 +296,25 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                       }}
                       aria-pressed={isSelected}
                       aria-label={hotspot.componentKey}
+                      onMouseEnter={() => setHoveredComponentId(hotspot.componentId)}
+                      onMouseLeave={() =>
+                        setHoveredComponentId((current) =>
+                          current === hotspot.componentId ? null : current,
+                        )
+                      }
+                      onFocus={() => setHoveredComponentId(hotspot.componentId)}
+                      onBlur={() =>
+                        setHoveredComponentId((current) =>
+                          current === hotspot.componentId ? null : current,
+                        )
+                      }
                       onClick={() => {
                         onChange((current) =>
                           toggleClaimComponentSelection({
                             currentIds: current,
                             componentId: hotspot.componentId,
                             selectableComponentIds,
+                            kitchenSlug,
                           }),
                         );
                       }}

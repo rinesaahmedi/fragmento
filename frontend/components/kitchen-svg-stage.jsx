@@ -31,7 +31,7 @@ const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
 // Vector plans (rendered from the source PDFs via docs/render-plan-svg.py) so the drawing
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
-const IMAGE_VIEW_BY_SLUG = {
+export const IMAGE_VIEW_BY_SLUG = {
   "ab-105806": "/plans/AB%20105806.svg",
   "ab-105807": "/plans/AB%20105807.svg",
   "ab-105808": "/plans/AB%20105808.svg",
@@ -87,7 +87,7 @@ const IMAGE_VIEW_BY_SLUG = {
 // Coordinates auto-detected from the 3509x2480 plan render by edge-detecting the CAD
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
-const IMAGE_HOTSPOTS_BY_SLUG = {
+export const IMAGE_HOTSPOTS_BY_SLUG = {
   "ab-105806": [
     { componentKey: "refrigerator", left: 3.59, top: 31.83, width: 13.82, height: 63.35 },
     { componentKey: "wall-cabinet-1", left: 18.35, top: 18.91, width: 9.95, height: 25.47 },
@@ -136,7 +136,11 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "extractor-hood",
-      points: [[31.5, 40.75], [41.6, 39.3], [41.6, 40.85], [31.5, 42.3]],
+      points: [[31.5, 40.75], [41.6, 39.3], [41.6, 44.45], [31.5, 45.9]],
+    },
+    {
+      componentKey: "under-cabinet-light",
+      points: [[31.5, 42.3], [41.6, 40.85], [41.6, 44.45], [31.5, 45.9]],
     },
     {
       componentKey: "wall-cabinet-3",
@@ -307,7 +311,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-2", points: [[51.92, 57.31], [62.3, 59.31], [62.3, 91.55], [51.92, 89.52]] },
     { componentKey: "base-module-3", points: [[72.33, 61.34], [82.67, 63.36], [82.67, 95.55], [72.33, 93.56]] },
     { componentKey: "base-module-3", points: [[82.67, 63.46], [94.54, 62.03], [94.54, 93.74], [82.67, 95.55]] },
-    { componentKey: "sink-faucet", points: [[62.31, 59.71], [72.3, 61.25], [72.41, 93.32], [62.22, 91.82]], preserveManualSize: true },
+    { componentKey: "corner-base", points: [[62.31, 59.71], [72.3, 61.25], [72.41, 93.32], [62.22, 91.82]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[69.95, 45.98], [76.1, 45.98], [76.1, 58.89], [69.95, 58.89]], preserveManualSize: true },
   ],
   "ab-105837": [
@@ -318,8 +322,9 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-1", points: [[20.92, 15.50], [26.1, 16.5], [26.1, 29.25], [20.8, 28.3]] },
     { componentKey: "wall-cabinet-1", points: [[26.1, 16.70], [37.08, 15.07], [37.08, 39.28], [30.09, 40.45], [30.09, 30.25], [26.1, 29.15]] },
     { componentKey: "wall-cabinet-2", points: [[37.10, 15.17], [48.07, 13.6], [43.02, 12.29], [32.08, 13.87]] },
-    { componentKey: "wall-cabinet-2", points: [[37.08, 15.17], [48.02, 13.59], [48.02, 39.29], [37.08, 41.08]] },
+    { componentKey: "wall-cabinet-2", points: [[37.08, 15.17], [48.02, 13.59], [48.02, 37.69], [37.08, 39.38]] },
     { componentKey: "extractor-hood", points: [[37.09, 41.05], [37.08, 39.28], [32.08, 40.08]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[37.08, 39.38], [48.02, 37.69], [48.02, 39.38], [37.08, 41.0]], preserveManualSize: true },
     { componentKey: "extractor-hood", points: [[38.08, 45.38], [47.02, 44.09], [47.02, 39.58], [38.08, 41.0]] },
     { componentKey: "wall-cabinet-3", points: [[43.1, 12.22], [53.55, 10.85], [58.76, 11.9], [48.02, 13.75]] },
     { componentKey: "wall-cabinet-3", points: [[48.02, 13.55], [60.02, 11.80], [60.02, 36.0], [48.02, 37.85]] },
@@ -348,7 +353,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "wall-cabinet-2",
-      points: [[57.9, 13.98], [66.98, 16.1], [66.98, 41.18], [57.98, 39.33]],
+      points: [[57.9, 13.98], [66.98, 16.1], [66.98, 39.25], [57.98, 37.42]],
     },
     {
       componentKey: "wall-cabinet-2",
@@ -356,7 +361,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "extractor-hood",
-      points: [[58.43, 39.83], [66.75, 41.34], [66.75, 46.22], [58.43, 45.21]],
+      points: [[57.98, 37.42], [66.98, 39.25], [66.75, 46.22], [58.43, 45.21]],
       preserveManualSize: true,
     },
     {
@@ -459,7 +464,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "wall-cabinet-2",
-      points: [[57.97, 18.14], [67.11, 20.0], [67.11, 45.87], [57.97, 43.85]],
+      points: [[57.97, 18.14], [67.11, 20.0], [67.11, 43.85], [57.97, 42.45]],
     },
     {
       componentKey: "wall-cabinet-2",
@@ -467,7 +472,7 @@ const IMAGE_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "extractor-hood",
-      points: [[58.25, 44.0], [66.95, 45.65], [66.85, 49.85], [58.25, 48.0]],
+      points: [[57.97, 42.05], [67.11, 43.85], [66.85, 49.85], [58.25, 48.0]],
       preserveManualSize: true,
     },
     {
@@ -944,8 +949,8 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-105844"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105841"];
 const PDF_VIEW_BY_SLUG = {};
 
 const CALIBRATION_TICKS = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-const PLAN_IMAGE_SOURCE_WIDTH = 842;
-const PLAN_IMAGE_SOURCE_HEIGHT = 595;
+export const PLAN_IMAGE_SOURCE_WIDTH = 842;
+export const PLAN_IMAGE_SOURCE_HEIGHT = 595;
 const PLAN_DIMENSION_LINE_PERCENT = 98.43;
 const WALL_CABINET_COMPONENT_KEY_PATTERN = /^wall-cabinet-\d+$/;
 const BASE_BODY_COMPONENT_KEYS = new Set([
@@ -1109,7 +1114,7 @@ function getHotspotSourceBounds(definition) {
   };
 }
 
-function withHotspotSourceBounds(definition) {
+export function withHotspotSourceBounds(definition) {
   if (!Array.isArray(definition.points) || !definition.points.length) {
     return definition;
   }
@@ -1136,7 +1141,7 @@ function verticallyOverlapsCornerBlende(definition, blende) {
   );
 }
 
-function withCornerBlendeExtensions(definitions) {
+export function withCornerBlendeExtensions(definitions) {
   const cornerBlenden = definitions.filter(isCornerBlendeHotspot);
   if (!cornerBlenden.length) return definitions;
 
@@ -1187,7 +1192,7 @@ function withCornerBlendeExtensions(definitions) {
 // Base hotspots are measured from the door top down to the cabinet bottom, which sits above
 // the plinth/toe-kick. Extend them downward so the whole drawn cabinet—including the kick
 // board—is clickable, without re-measuring every kitchen.
-function withBasePlinthExtension(definitions, slug) {
+export function withBasePlinthExtension(definitions, slug) {
   if (BASE_PLINTH_EXTENSION_DISABLED_SLUGS.has(slug)) {
     return definitions;
   }
@@ -1225,7 +1230,7 @@ function clampPercent(value) {
   return Math.max(0, Math.min(100, value));
 }
 
-function getPlanDisplayCrop(hotspots, slug) {
+export function getPlanDisplayCrop(hotspots, slug) {
   if (!hotspots.length) {
     return { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 };
   }
@@ -1268,7 +1273,7 @@ function getPlanDisplayCrop(hotspots, slug) {
   };
 }
 
-function cropPlanHotspot(hotspot, crop) {
+export function cropPlanHotspot(hotspot, crop) {
   const points = Array.isArray(hotspot.points) ? hotspot.points : [];
   if (points.length) {
     const croppedPoints = points.map((point) => [
@@ -1404,7 +1409,7 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
 // The sink (faucet + waste) is always part of the default configuration and usually sits on
 // the worktop directly above the sink base. Derive a consistent fallback box for those plans,
 // while allowing manually calibrated hotspots when the visible bowl/faucet is offset.
-function withDerivedSinkFaucet(definitions, components) {
+export function withDerivedSinkFaucet(definitions, components) {
   if (!definitions.length) return definitions;
   const hasFaucetComponent = components.some(
     (item) => String(item?.componentKey || "").toLowerCase() === "sink-faucet",
