@@ -3607,8 +3607,6 @@
   }
 
   .planColumn {
-    position: sticky;
-    top: 0;
     z-index: 5;
     background: #f5efe7;
     padding-bottom: 12px;
@@ -3641,6 +3639,13 @@
 
   .catalog {
     max-height: none;
+  }
+}
+
+@media (max-width: 1100px) and (min-height: 760px) {
+  .planColumn {
+    position: sticky;
+    top: 0;
   }
 }
 

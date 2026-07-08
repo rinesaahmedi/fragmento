@@ -474,6 +474,7 @@ PRODUCT_INFO_BY_CODE["DISH-AB105837-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"]
 PRODUCT_INFO_BY_CODE["DISH-AB105840-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105843-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105831-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["DISH-AB104968-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105825-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105828-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["REF-AB105828-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
@@ -501,6 +502,7 @@ PRODUCT_INFO_BY_CODE["REF-AB105841-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-5
 PRODUCT_INFO_BY_CODE["REF-AB105821-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105845-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105831-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["REF-AB104968-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105825-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105822-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105828-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
@@ -542,6 +544,7 @@ PRODUCT_INFO_BY_CODE["HOOD-AB105837-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-F
 PRODUCT_INFO_BY_CODE["HOOD-AB105840-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105843-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105831-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB104968-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105825-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105822-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105828-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
@@ -833,6 +836,28 @@ const AB_105820_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-2", name: "Wall Cabinet 2", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105806-3", name: "Wall Cabinet 3", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
   defaultSinkWorktop({ sortOrder: 140 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
+// AB 104968: L-shaped isometric plan — US50 + oven + US40 on the main leg, US60 corner +
+// dishwasher + locked sink on the return, tall fridge on the far right; H5002 + hood + H4002 +
+// H6002 wall run above the main leg (Excel NR 1–12).
+const AB_104968_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  defaultSinkBase({ sortOrder: 30, code: "SINKBASE-AB104968-DEFAULT", widthMm: 600 }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104968-US50-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPK20", 1), widthMm: 500, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US50 base storage cabinet, hinge right", articleNumber: "US50", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104968-US40-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US40", "UPK20", 2), widthMm: 400, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "US40 base storage cabinet, hinge left", articleNumber: "US40", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB104968-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104968-US60-L", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#00ffbf", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB104968-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 80, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104968-H5002-R", name: "Wall Cabinet", price: articlePrice("H5002"), widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H5002, hinge right", articleNumber: "H5002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB104968-600", name: "Upper Cabinet with Extractor Hood 60 cm", price: bundlePrice("FH664621E + FWK124 + HD6002"), iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB104968-FH664621E", name: "FH664621E Extractor Hood", price: articlePrice("FH 664 621 S"), widthMm: 599, heightMm: null, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104968-H4002-L", name: "Wall Cabinet", price: articlePrice("H4002"), widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H4002, hinge left", articleNumber: "H4002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104968-H6002-L", name: "Wall Cabinet", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ sortOrder: 130 }),
   ...defaultAccessories(),
   ...defaultServices(),
 ];
@@ -1334,6 +1359,13 @@ const DEFAULT_KITCHENS = [
     name: "AB 105820 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105820_page-0001.jpg",
     items: AB_105820_ITEMS,
+  },
+  {
+    slug: "ab-104968",
+    kitchenCode: "104 968",
+    name: "AB 104968 Kitchen",
+    description: "L-shaped kitchen configuration based on frontend/public/jpg/AB 104968_page-0001.jpg",
+    items: AB_104968_ITEMS,
   },
   {
     slug: "ab-105732",
