@@ -44,7 +44,6 @@ const ARTICLE_PRICES = {
   H8002: 200,
   H9002: 203,
   H10002: 209,
-  KA220043_S3: 69,
   "KALB KA220043_S3": 69,
   KHF664611S: 209,
   "KHF664611S + FWP18": 209,
@@ -128,7 +127,6 @@ const CATALOG_ARTICLES = [
   { articleNumber: "US80", name: "Lower cabinet with drawer 80 cm", nameDe: "Unterschrank mit Schublade 80 cm", widthMm: 800, price: "333.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US90", name: "Lower cabinet with drawer 90 cm", nameDe: "Unterschrank mit Schublade 90 cm", widthMm: 900, price: "339.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "517467", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "KA220043_S3", name: "LED lighting set", nameDe: "LED-Beleuchtungsset", price: "69.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KALB KA220043_S3", name: "Lighting set with 3 LED spotlights", nameDe: "Beleuchtungsset 3 LED-Spots", price: "69.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
   { articleNumber: "ZB100SG", name: "Cutlery insert 100 cm", nameDe: "Besteckeinsatz 100 cm", price: "36.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
   { articleNumber: "ZB30SG", name: "Cutlery insert 30 cm", nameDe: "Besteckeinsatz 30 cm", price: "19.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
@@ -182,7 +180,7 @@ function defaultAccessories() {
   return [
     { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: articlePrice("517467"), iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "517467" },
     { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: articlePrice("ZB60SG"), iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
-    { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: articlePrice("KA220043_S3"), iconKey: "lighting_set", sortOrder: 220, articleNumber: "KA220043_S3" },
+    { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: articlePrice("KALB KA220043_S3"), iconKey: "lighting_set", sortOrder: 220, articleNumber: "KALB KA220043_S3" },
   ];
 }
 
@@ -636,7 +634,7 @@ const MODUL1_108134_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-B-600", name: "Upper Cabinet with Extractor Hood 60 cm", price: bundlePrice("FH664621E + FWK124 + HD6002"), iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-B-FH664621E", name: "FH664621E Extractor Hood", price: articlePrice("FH 664 621 S"), widthMm: 599, heightMm: null, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 112, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-B-R-600", name: "Wall Cabinet right (600 x 723 x 320 mm)", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#ff7f9f", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "LIGHT-B-LED-001", name: "LED Lighting Set", price: articlePrice("KA220043_S3"), iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 130, infoText: "LED lighting set", articleNumber: "KA220043_S3" },
+  { itemType: ItemType.COMPONENT, code: "LIGHT-B-LED-001", name: "LED Lighting Set", price: articlePrice("KALB KA220043_S3"), iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 130, infoText: "LED lighting set", articleNumber: "KALB KA220043_S3" },
   ...defaultAccessories(),
   ...defaultServices(),
 ];
@@ -1128,7 +1126,7 @@ const AB_105845_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105845-US60-2", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 120, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105845-US60-3", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 130, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105845-US60-4", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 140, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
-  { itemType: ItemType.COMPONENT, code: "LIGHT-AB105845-LED", name: "LED Lighting Set", price: articlePrice("KA220043_S3"), iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 150, infoText: "LED lighting set", articleNumber: "KA220043_S3" },
+  { itemType: ItemType.COMPONENT, code: "LIGHT-AB105845-LED", name: "LED Lighting Set", price: articlePrice("KALB KA220043_S3"), iconKey: "under_cabinet_light", colorKey: "#666666", componentKey: "under-cabinet-light", sortOrder: 150, infoText: "LED lighting set", articleNumber: "KALB KA220043_S3" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105845-KHF664611S", name: "Angled extractor hood + Filter", nameDe: "Schrägesse + Filter", price: bundlePrice("KHF664611S + FWP18"), widthMm: 600, iconKey: "extractor_hood_chimney", colorKey: "#8a6b34", componentKey: "extractor-hood", sortOrder: 160, infoText: "Chimney hood, 60 cm", articleNumber: "KHF664611S + FWP18" },
   ...defaultAccessories(),
   ...defaultServices(),
@@ -2113,6 +2111,15 @@ function compactSeedRecord(record) {
 }
 
 async function seedCatalogMasterData() {
+  const result = {
+    articlesCreated: 0,
+    articlesExisting: 0,
+    blendenCreated: 0,
+    blendenExisting: 0,
+    servicesCreated: 0,
+    servicesExisting: 0,
+  };
+
   for (const article of CATALOG_ARTICLES) {
     const data = compactSeedRecord({
       articleNumber: article.articleNumber,
@@ -2128,11 +2135,17 @@ async function seedCatalogMasterData() {
       isActive: article.isActive !== false,
     });
 
-    await prisma.catalogArticle.upsert({
+    const existingArticle = await prisma.catalogArticle.findUnique({
       where: { articleNumber: article.articleNumber },
-      update: data,
-      create: data,
+      select: { id: true },
     });
+    if (existingArticle) {
+      result.articlesExisting += 1;
+      continue;
+    }
+
+    await prisma.catalogArticle.create({ data });
+    result.articlesCreated += 1;
   }
 
   for (const blende of CATALOG_BLENDEN) {
@@ -2145,11 +2158,17 @@ async function seedCatalogMasterData() {
       isActive: blende.isActive !== false,
     });
 
-    await prisma.catalogBlende.upsert({
+    const existingBlende = await prisma.catalogBlende.findUnique({
       where: { code: blende.code },
-      update: data,
-      create: data,
+      select: { id: true },
     });
+    if (existingBlende) {
+      result.blendenExisting += 1;
+      continue;
+    }
+
+    await prisma.catalogBlende.create({ data });
+    result.blendenCreated += 1;
   }
 
   for (const service of CATALOG_SERVICES) {
@@ -2162,15 +2181,21 @@ async function seedCatalogMasterData() {
       isActive: service.isActive !== false,
     });
 
-    await prisma.catalogService.upsert({
+    const existingService = await prisma.catalogService.findUnique({
       where: { code: service.code },
-      update: data,
-      create: data,
+      select: { id: true },
     });
+    if (existingService) {
+      result.servicesExisting += 1;
+      continue;
+    }
+
+    await prisma.catalogService.create({ data });
+    result.servicesCreated += 1;
   }
 
   console.log(
-    `Seeded ${CATALOG_ARTICLES.length} catalog articles, ${CATALOG_BLENDEN.length} blenden, and ${CATALOG_SERVICES.length} services.`,
+    `Catalog seed created ${result.articlesCreated}/${CATALOG_ARTICLES.length} articles, ${result.blendenCreated}/${CATALOG_BLENDEN.length} blenden, and ${result.servicesCreated}/${CATALOG_SERVICES.length} services; existing rows were left unchanged.`,
   );
 }
 

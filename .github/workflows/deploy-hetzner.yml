@@ -46,7 +46,7 @@ jobs:
             chown -R deploy:deploy "$FRONTEND_DIR"
 
             cd "$FRONTEND_DIR"
-            sudo -u deploy npm ci
+            sudo -u deploy npm install
             sudo -u deploy npm run prisma:deploy
             sudo -u deploy npm run prisma:generate
             sudo -u deploy npm run build
