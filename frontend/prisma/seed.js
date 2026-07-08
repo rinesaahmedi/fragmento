@@ -1397,6 +1397,27 @@ const DEFAULT_KITCHENS = [
     items: AB_105732_ITEMS,
   },
   {
+    slug: "ab-105735",
+    kitchenCode: "105 735",
+    name: "AB 105735 Kitchen",
+    description: "Kitchen configuration using the AB 105732 layout and element selection",
+    items: AB_105732_ITEMS,
+  },
+  {
+    slug: "ab-105738",
+    kitchenCode: "105 738",
+    name: "AB 105738 Kitchen",
+    description: "Kitchen configuration using the AB 105732 layout and element selection",
+    items: AB_105732_ITEMS,
+  },
+  {
+    slug: "ab-105741",
+    kitchenCode: "105 741",
+    name: "AB 105741 Kitchen",
+    description: "Kitchen configuration using the AB 105732 layout and element selection",
+    items: AB_105732_ITEMS,
+  },
+  {
     slug: "ab-105733",
     kitchenCode: "105 733",
     name: "AB 105733 Kitchen",

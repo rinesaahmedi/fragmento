@@ -58,6 +58,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105819": "/plans/AB%20105819.svg",
   "ab-105820": "/plans/AB%20105820.svg",
   "ab-105732": "/plans/AB%20105732.svg",
+  "ab-105735": "/plans/AB%20105732.svg",
+  "ab-105738": "/plans/AB%20105732.svg",
+  "ab-105741": "/plans/AB%20105732.svg",
   "ab-105733": "/plans/AB%20105733.svg",
   "ab-105821": "/plans/AB%20105821.svg",
   "ab-105824": "/plans/AB%20105821.svg",
@@ -1458,6 +1461,10 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
     ),
   ].filter((label) => label.width > 0 && label.height > 0);
 }
+
+["ab-105735", "ab-105738", "ab-105741"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105732"];
+});
 
 // The sink (faucet + waste) is always part of the default configuration and usually sits on
 // the worktop directly above the sink base. Derive a consistent fallback box for those plans,
