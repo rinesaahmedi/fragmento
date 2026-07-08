@@ -462,6 +462,7 @@ PRODUCT_INFO_BY_CODE["DISH-AB105819-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"]
 PRODUCT_INFO_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105733-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105841-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["DISH-AB105744-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105821-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105822-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105827-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
@@ -499,6 +500,7 @@ PRODUCT_INFO_BY_CODE["REF-AB105815-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-5
 PRODUCT_INFO_BY_CODE["REF-AB105819-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105733-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105841-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["REF-AB105744-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105821-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105845-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105831-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
@@ -1160,6 +1162,33 @@ const AB_105841_ITEMS = [
 const AB_105838_ITEMS = AB_105841_ITEMS;
 const AB_105844_ITEMS = AB_105841_ITEMS;
 
+// AB 105744: single-wall run with the fridge tall unit on the RIGHT (same drawing family as
+// AB 105841). Base run (L->R): US60, oven (default), US60, sink (default), dishwasher, US40, then
+// the fridge. Wall run (L->R): H6002, hood, H6002, H6002, H6002, H4002. DEFAULT rows (oven,
+// worktop, sink) reuse the shared default codes; the hood package reuses AB105806's codes so it
+// inherits its gallery/product info (its "10" callout also matches). Every other cabinet and
+// appliance gets an AB105744 code so its plan number (4-9, 11-14) is correct.
+const AB_105744_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105744-US60-1", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 10, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
+  defaultOvenHob({ sortOrder: 20 }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105744-US60-2", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 30, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
+  defaultSinkBase({ sortOrder: 40, widthMm: 600 }),
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105744-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105744-US40", name: "Base cabinet with drawer", price: articlePrice("US40"), widthMm: 400, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 60, infoText: "US40 base storage cabinet, hinge left", articleNumber: "US40" },
+  defaultWorktop({ sortOrder: 65 }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB105744-KGCN388140E", name: "Freestanding refrigerator 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 70, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105744-H6002-1", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: "Upper Cabinet with Extractor Hood 60 cm", price: bundlePrice("FH664621E + FWK124 + HD6002"), iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: articlePrice("FH 664 621 S"), widthMm: 599, heightMm: null, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 S", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105744-H6002-3", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105744-H6002-4", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105744-H6002-5", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105744-H4002", name: "Wall Cabinet", price: articlePrice("H4002"), widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H4002, 40 cm", articleNumber: "H4002" },
+  defaultSinkWorktop({ sortOrder: 140 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 const AB_105831_ITEMS = [
 
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, heightMm: null, depthMm: null, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -1568,6 +1597,13 @@ const DEFAULT_KITCHENS = [
     name: "AB 105844 Kitchen",
     description: "Kitchen configuration based on the AB 105841 kitchen layout",
     items: AB_105844_ITEMS,
+  },
+  {
+    slug: "ab-105744",
+    kitchenCode: "105 744",
+    name: "AB 105744 Kitchen",
+    description: "Kitchen configuration based on frontend/public/jpg/AB 105744_page-0001.jpg",
+    items: AB_105744_ITEMS,
   },
 ];
 
@@ -2199,6 +2235,32 @@ async function seedCatalogMasterData() {
   );
 }
 
+// A kitchen item stores its own W/H/D snapshot. To keep those in sync with the catalog that
+// actually lives in the target database, we prefer the catalog article's dimension whenever it
+// specifies a positive value, and fall back to the item's seeded value otherwise (e.g. appliance
+// packages whose catalog rows carry no dimensions).
+function pickCatalogDimension(catalogValue, itemValue) {
+  const catalogNumber = Number(catalogValue);
+  if (Number.isFinite(catalogNumber) && catalogNumber > 0) {
+    return catalogNumber;
+  }
+  return itemValue ?? null;
+}
+
+async function loadCatalogArticleDimensions() {
+  const byArticleNumber = new Map();
+  const articles = await prisma.catalogArticle.findMany({
+    select: { articleNumber: true, widthMm: true, heightMm: true, depthMm: true },
+  });
+  for (const article of articles) {
+    const key = String(article.articleNumber || "").trim();
+    if (key) {
+      byArticleNumber.set(key, article);
+    }
+  }
+  return byArticleNumber;
+}
+
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -2222,6 +2284,10 @@ async function main() {
   }
 
   const defaultProjectId = await ensureDefaultPropertyProject();
+
+  // Read the catalog dimensions that exist in *this* database so newly seeded kitchen items
+  // inherit them (option 2: kitchen item W/H/D follows the catalog article by articleNumber).
+  const catalogArticleDimsByNumber = await loadCatalogArticleDimensions();
 
   for (const kitchen of DEFAULT_KITCHENS) {
     const existingKitchen = await prisma.kitchen.findUnique({
@@ -2247,8 +2313,17 @@ async function main() {
     for (const rawItem of kitchen.items) {
       const item = applyDefaultCatalogItem(rawItem);
       const productInfo = PRODUCT_INFO_BY_CODE[item.code] || PRODUCT_INFO_BY_CODE[rawItem.code] || {};
-      const cabinetWidthName = getCabinetWidthDisplayName(item);
-      const cabinetWidthNameDe = getCabinetWidthDisplayName(item, "de");
+      // Resolve the item's stored dimensions against the catalog that exists in this database, so
+      // the width-based display name (e.g. "Upper Cabinet 60 cm") stays consistent with the dims.
+      const catalogDims = item.articleNumber
+        ? catalogArticleDimsByNumber.get(String(item.articleNumber).trim())
+        : null;
+      const resolvedWidthMm = pickCatalogDimension(catalogDims?.widthMm, item.widthMm);
+      const resolvedHeightMm = pickCatalogDimension(catalogDims?.heightMm, item.heightMm);
+      const resolvedDepthMm = pickCatalogDimension(catalogDims?.depthMm, item.depthMm);
+      const itemForName = { ...item, widthMm: resolvedWidthMm };
+      const cabinetWidthName = getCabinetWidthDisplayName(itemForName);
+      const cabinetWidthNameDe = getCabinetWidthDisplayName(itemForName, "de");
       const itemCode = String(item.code || "").trim().toUpperCase();
       const isRefrigeratorItem = itemCode.startsWith("REF-")
         || itemCode === "LKNEW-REFRIGERATOR"
@@ -2288,9 +2363,9 @@ async function main() {
         name: itemName,
         nameDe: itemNameDe,
         price: item.price,
-        widthMm: item.widthMm ?? null,
-        heightMm: item.heightMm ?? null,
-        depthMm: item.depthMm ?? null,
+        widthMm: resolvedWidthMm,
+        heightMm: resolvedHeightMm,
+        depthMm: resolvedDepthMm,
         infoText: item.infoText || null,
         iconKey: item.iconKey || null,
         colorKey: item.colorKey || null,

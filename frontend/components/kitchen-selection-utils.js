@@ -360,6 +360,16 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-HOOD-AB105828-600": "11",
   "CAB-WALL-AB105828-H6002-L": "12",
   "CAB-WALL-AB105828-H3002-L": "13",
+  "CAB-BASE-AB105744-US60-1": "4",
+  "CAB-BASE-AB105744-US60-2": "5",
+  "DISH-AB105744-600": "6",
+  "CAB-BASE-AB105744-US40": "7",
+  "REF-AB105744-KGCN388140E": "8",
+  "CAB-WALL-AB105744-H6002-1": "9",
+  "CAB-WALL-AB105744-H6002-3": "11",
+  "CAB-WALL-AB105744-H6002-4": "12",
+  "CAB-WALL-AB105744-H6002-5": "13",
+  "CAB-WALL-AB105744-H4002": "14",
 };
 
 ["105840", "105843"].forEach((targetCode) => {
@@ -788,6 +798,7 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-105744": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105805": [["component-wall-cabinet-2", "component-extractor-hood"]],
