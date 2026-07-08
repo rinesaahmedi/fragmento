@@ -19,7 +19,7 @@ const CATALOG_ARTICLES = [
   { articleNumber: "H8002", name: "Upper cabinet 80 cm", nameDe: "Oberschrank 80 cm", widthMm: 800, heightMm: 720, depthMm: 340, price: "200.00", itemType: ItemType.COMPONENT },
   { articleNumber: "H9002", name: "Upper cabinet 90 cm", nameDe: "Oberschrank 90 cm", widthMm: 900, heightMm: 720, depthMm: 340, price: "203.00", itemType: ItemType.COMPONENT },
   { articleNumber: "H10002", name: "Upper cabinet 100 cm", nameDe: "Oberschrank 100 cm", widthMm: 1000, heightMm: 720, depthMm: 340, price: "209.00", itemType: ItemType.COMPONENT },
-  { articleNumber: "KALB KA220043_S3", name: "Lighting set with 3 LED spotlights", nameDe: "Beleuchtungsset 3 LED-Spots", price: "69.00", itemType: ItemType.ACCESSORY },
+  { articleNumber: "KALB KA220043_S3", name: "LED lighting set", nameDe: "LED-Beleuchtungsset", price: "69.00", itemType: ItemType.ACCESSORY },
   { articleNumber: "KHF664611S", name: "Angled extractor hood", nameDe: "Schrägesse", price: "209.00", itemType: ItemType.COMPONENT },
   { articleNumber: "KHF664611S + FWP18", name: "Angled extractor hood + filter", nameDe: "Schrägesse + Filter", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true },
   { articleNumber: "OL-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", price: "579.00", itemType: ItemType.COMPONENT },
