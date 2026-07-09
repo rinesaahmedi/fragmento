@@ -819,6 +819,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105738": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105741": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105733": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-105736": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-105739": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-105742": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105821": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105824": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105822": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -832,6 +835,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105828": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-104968": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105734": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105737": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105740": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105833": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105826": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105827": [["component-wall-cabinet-4", "component-extractor-hood"]],
@@ -850,6 +856,17 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "l-shaped-kitchen": [["component-wall-cabinet-2", "component-under-cabinet-light"]],
   "l-kitchen-new": [["component-top-400", "component-aspirator"]],
 };
+
+const FLAT_HOOD_PRODUCT_INFO_PDF_HREF = "/product-info/fh-664-621-s-product-info.pdf";
+const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
+  { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
+  { label: "Produktinfo PDF", href: FLAT_HOOD_PRODUCT_INFO_PDF_HREF },
+];
+const FRIDGE_PRODUCT_INFO_PDF_HREF = "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf";
+const FRIDGE_PRODUCT_INFO_DOCUMENTS = [
+  { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
+  { label: "Produktinfo PDF", href: FRIDGE_PRODUCT_INFO_PDF_HREF },
+];
 
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   "DISH-B-600-STD": [
@@ -909,64 +926,50 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
     { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
   ],
   "REF-B-545-1800-700": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "REF-C-545-1800-700": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "REF-AB105806-KGCN388140E": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "REF-AB105807-KGCN388140E": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "REF-AB105819-KGCN388140E": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "REF-AB105821-KGCN388140E": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "REF-AB105811-KGCN388140E": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "REF-AB105815-KGCN388140E": [
-    { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/kgc-15495-s-product-info-eco21.pdf" },
+    ...FRIDGE_PRODUCT_INFO_DOCUMENTS,
   ],
   "HOOD-B-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+    ...FLAT_HOOD_PRODUCT_INFO_DOCUMENTS,
   ],
   "HOOD-LS-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+    ...FLAT_HOOD_PRODUCT_INFO_DOCUMENTS,
   ],
   "HOOD-AB105806-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+    ...FLAT_HOOD_PRODUCT_INFO_DOCUMENTS,
   ],
   "HOOD-AB105807-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+    ...FLAT_HOOD_PRODUCT_INFO_DOCUMENTS,
   ],
   "HOOD-AB105837-FH664621E": [
-    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+    ...FLAT_HOOD_PRODUCT_INFO_DOCUMENTS,
   ],
   "HOOD-C-FH664621E": [
     { label: "E-Label PDF", href: "/product-info/khf-664-611-s-elabel-eco21-2407.pdf" },
     { label: "Produktinfo PDF", href: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf" },
   ],
   "T3D-HOOD-001": [
-    { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
-    { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+    ...FLAT_HOOD_PRODUCT_INFO_DOCUMENTS,
   ],
   "WM-B-EWA34660W": [
     { label: "E-Label PDF", href: "/product-info/ewa-34660-w-elabel-eco21-2601.pdf" },
@@ -1087,13 +1090,69 @@ function applyProductInfoDisplayOverrides(item) {
 }
 
 export function getProductInfoHref(item) {
-  return item?.productInfoPdfPath || "";
+  const mappedDocuments = PRODUCT_INFO_DOCUMENTS_BY_CODE[item?.code];
+  const documents = Array.isArray(mappedDocuments) && mappedDocuments.length
+    ? mappedDocuments
+    : getMappedProductInfoDocuments(item);
+  const defaultDocument =
+    documents.find((document) => String(document?.label || "").toLowerCase().includes("produktinfo")) ||
+    documents[0];
+
+  return defaultDocument?.href || item?.productInfoPdfPath || "";
+}
+
+function getMappedProductInfoDocuments(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const name = `${item?.name || ""} ${item?.nameDe || ""}`.toLowerCase();
+  const haystack = `${code} ${articleNumber} ${iconKey} ${componentKey} ${name}`;
+
+  if (
+    code.startsWith("REF-") ||
+    articleNumber.includes("KGCN388140E") ||
+    articleNumber.includes("KGC15495") ||
+    iconKey.includes("refrigerator") ||
+    iconKey.includes("fridge") ||
+    componentKey.includes("refrigerator") ||
+    haystack.includes("refrigerator") ||
+    haystack.includes("fridge") ||
+    haystack.includes("kuehlschrank") ||
+    haystack.includes("kühlschrank")
+  ) {
+    return FRIDGE_PRODUCT_INFO_DOCUMENTS;
+  }
+
+  if (
+    articleNumber.includes("FH664621E + FWK124 + HD6002") ||
+    articleNumber.includes("FH664621E + HD6002") ||
+    articleNumber.includes("FH 664 621 S") ||
+    code.includes("FH664621E") ||
+    code.startsWith("CAB-HOOD-") ||
+    code === "HOOD-B-FH664621E" ||
+    code === "HOOD-LS-FH664621E" ||
+    code === "T3D-HOOD-001" ||
+    iconKey.includes("hood") ||
+    componentKey.includes("extractor") ||
+    haystack.includes("flachschirmhaube") ||
+    haystack.includes("flat screen extractor hood")
+  ) {
+    return FLAT_HOOD_PRODUCT_INFO_DOCUMENTS;
+  }
+
+  return [];
 }
 
 export function getProductInfoDocuments(item) {
   const mappedDocuments = PRODUCT_INFO_DOCUMENTS_BY_CODE[item?.code];
   if (Array.isArray(mappedDocuments) && mappedDocuments.length) {
     return mappedDocuments;
+  }
+
+  const inferredDocuments = getMappedProductInfoDocuments(item);
+  if (inferredDocuments.length) {
+    return inferredDocuments;
   }
 
   const href = getProductInfoHref(item);

@@ -43,6 +43,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105817": "/jpg/AB%20105805_page-0001.jpg",
   "ab-105834": "/jpg/AB%20105834_page-0001.jpg",
   "ab-104968": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105734": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105737": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105740": "/jpg/AB%20104968_page-0001.jpg",
   "ab-105837": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105840": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105843": "/jpg/AB%20105837_page-0001.jpg",
@@ -62,6 +65,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105738": "/plans/AB%20105732.svg",
   "ab-105741": "/plans/AB%20105732.svg",
   "ab-105733": "/plans/AB%20105733.svg",
+  "ab-105736": "/plans/AB%20105733.svg",
+  "ab-105739": "/plans/AB%20105733.svg",
+  "ab-105742": "/plans/AB%20105733.svg",
   "ab-105821": "/plans/AB%20105821.svg",
   "ab-105824": "/plans/AB%20105821.svg",
   "ab-105822": "/plans/AB%20105825.svg",
@@ -984,22 +990,26 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
   // 3509x2480 render (docs/detect-plan-hotspots.py) and overlay-verified. Wall + base columns
   // share dividers at 1.31/15.65/29.98/44.33/58.66/73.00/82.56% of width.
   "ab-105744": [
-    { componentKey: "wall-cabinet-1", left: 1.31, top: 19.8, width: 14.34, height: 24.45 },
+    { componentKey: "wall-cabinet-1", left: 0.85, top: 19.8, width: 14.8, height: 24.45 },
     { componentKey: "wall-cabinet-2", left: 15.65, top: 19.8, width: 14.33, height: 24.45 },
     { componentKey: "extractor-hood", left: 15.65, top: 44.25, width: 14.33, height: 7.77 },
     { componentKey: "wall-cabinet-3", left: 29.98, top: 19.8, width: 14.35, height: 24.45 },
     { componentKey: "wall-cabinet-4", left: 44.33, top: 19.8, width: 14.33, height: 24.45 },
     { componentKey: "wall-cabinet-5", left: 58.66, top: 19.8, width: 14.34, height: 24.45 },
     { componentKey: "wall-cabinet-6", left: 73.0, top: 19.8, width: 9.56, height: 24.45 },
-    { componentKey: "worktop", left: 1.31, top: 62.02, width: 81.25, height: 1.35 },
-    { componentKey: "sink-faucet", left: 48.5, top: 55.0, width: 2.5, height: 7.5 },
-    { componentKey: "base-module-1", left: 1.31, top: 63.35, width: 14.34, height: 29.71 },
+    { componentKey: "worktop", left: 0.85, top: 62.02, width: 81.71, height: 1.35 },
+    { componentKey: "sink-faucet", left: 46.5, top: 55.0, width: 2.5, height: 7.5 },
+    { componentKey: "base-module-1", left: 0.85, top: 63.35, width: 14.8, height: 29.71 },
     { componentKey: "oven-module", left: 15.65, top: 63.35, width: 14.33, height: 29.71 },
     { componentKey: "base-module-2", left: 29.98, top: 63.35, width: 14.35, height: 29.71 },
     { componentKey: "sink-base", left: 44.33, top: 63.35, width: 14.33, height: 29.71 },
     { componentKey: "base-module-3", left: 58.66, top: 63.35, width: 14.34, height: 29.71 },
     { componentKey: "drawer-module", left: 73.0, top: 63.35, width: 9.56, height: 29.71 },
-    { componentKey: "refrigerator", left: 82.56, top: 32.3, width: 13.93, height: 60.2 },
+    { componentKey: "worktop", left: 82.56, top: 62.02, width: 0.66, height: 31.04 },
+    {
+      componentKey: "refrigerator",
+      points: [[83.22, 32.19], [96.5, 32.19], [96.5, 93.08], [83.22, 93.08]],
+    },
   ],
 };
 
@@ -1064,6 +1074,9 @@ const BASE_PLINTH_EXTENSION_DISABLED_SLUGS = new Set([
   "ab-105843",
   "ab-105831",
   "ab-104968",
+  "ab-105734",
+  "ab-105737",
+  "ab-105740",
   "ab-105816",
 ]);
 // Typical toe-kick height on the 3509×2480 CAD renders (~5.2–5.3% of image height).
@@ -1488,6 +1501,14 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105732"];
 });
 
+["ab-105736", "ab-105739", "ab-105742"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105733"];
+});
+
+["ab-105734", "ab-105737", "ab-105740"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-104968"];
+});
+
 // The sink (faucet + waste) is always part of the default configuration and usually sits on
 // the worktop directly above the sink base. Derive a consistent fallback box for those plans,
 // while allowing manually calibrated hotspots when the visible bowl/faucet is offset.
@@ -1538,6 +1559,8 @@ export default function useKitchenSvgStage({
 }) {
   const { translate, language } = usePublicI18n();
   const svgHostRef = useRef(null);
+  const planTraceImageRef = useRef(null);
+  const polygonTraceLayerRef = useRef(null);
   const has3dModel = kitchenSlug === "test-3d-kitchen";
   const normalizedKitchenSlug = String(kitchenSlug || "").trim().toLowerCase();
   const imageViewHref = IMAGE_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
@@ -1626,8 +1649,54 @@ export default function useKitchenSvgStage({
   );
   const croppedPlanAspectRatio =
     `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
+  const planImageInteractiveStyle = {
+    left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
+    top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
+    width: `${(100 / planDisplayCrop.width) * 100}%`,
+    height: `${(100 / planDisplayCrop.height) * 100}%`,
+  };
+  const planLineBoostStyle =
+    ["ab-104968", "ab-105734", "ab-105737", "ab-105740"].includes(normalizedKitchenSlug)
+      ? {
+          ...planImageInteractiveStyle,
+          mixBlendMode: "multiply",
+          opacity: 1,
+          pointerEvents: "none",
+        }
+      : null;
   const [isCalibrating, setIsCalibrating] = useState(false);
+  const [isTracePolygonRequested, setIsTracePolygonRequested] = useState(false);
+  const [isTracingPolygon, setIsTracingPolygon] = useState(false);
+  const [polygonTracePoints, setPolygonTracePoints] = useState([]);
+  const [polygonTraceCursorPoint, setPolygonTraceCursorPoint] = useState(null);
   const [hoveredComponentId, setHoveredComponentId] = useState(null);
+  const canTracePolygon =
+    process.env.NODE_ENV === "development" &&
+    hasImageView &&
+    isTracePolygonRequested;
+  const formattedPolygonTracePoints = useMemo(
+    () =>
+      `points: [${polygonTracePoints
+        .map((point) => `[${point[0].toFixed(2)}, ${point[1].toFixed(2)}]`)
+        .join(", ")}]`,
+    [polygonTracePoints],
+  );
+  const visiblePolygonTracePoints = useMemo(
+    () =>
+      polygonTracePoints.map(([x, y]) => ({
+        x: ((x - planDisplayCrop.left) / planDisplayCrop.width) * 100,
+        y: ((y - planDisplayCrop.top) / planDisplayCrop.height) * 100,
+      })),
+    [planDisplayCrop, polygonTracePoints],
+  );
+  const visiblePolygonTraceCursorPoint = useMemo(() => {
+    if (!polygonTraceCursorPoint) return null;
+    return {
+      x: ((polygonTraceCursorPoint[0] - planDisplayCrop.left) / planDisplayCrop.width) * 100,
+      y: ((polygonTraceCursorPoint[1] - planDisplayCrop.top) / planDisplayCrop.height) * 100,
+    };
+  }, [planDisplayCrop, polygonTraceCursorPoint]);
+  const lastPolygonTracePoint = polygonTracePoints[polygonTracePoints.length - 1] || null;
   // Linked parts (e.g. the hood wall cabinet + its pull-out extractor hood) should react as
   // one unit, so hovering either hotspot highlights the whole group.
   const hoveredLinkedGroup = useMemo(
@@ -1639,6 +1708,82 @@ export default function useKitchenSvgStage({
     const value = new URLSearchParams(window.location.search).get("calibrate");
     setIsCalibrating(value === "1" || value === "true");
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const value = new URLSearchParams(window.location.search).get("tracePolygon");
+    setIsTracePolygonRequested(value === "1" || value === "true");
+  }, []);
+
+  useEffect(() => {
+    if (canTracePolygon) return;
+    setIsTracingPolygon(false);
+    setPolygonTracePoints([]);
+    setPolygonTraceCursorPoint(null);
+  }, [canTracePolygon]);
+
+  useEffect(() => {
+    if (!isTracingPolygon) {
+      setPolygonTraceCursorPoint(null);
+      return;
+    }
+    polygonTraceLayerRef.current?.focus();
+  }, [isTracingPolygon]);
+
+  const copyPolygonTracePoints = () => {
+    if (!polygonTracePoints.length || typeof navigator === "undefined") return;
+    navigator.clipboard?.writeText(formattedPolygonTracePoints).catch(() => {});
+  };
+
+  const getPolygonTracePointFromEvent = (event) => {
+    const planRect = planTraceImageRef.current?.getBoundingClientRect();
+    if (!planRect || !planRect.width || !planRect.height) return null;
+
+    return [
+      Math.round(((event.clientX - planRect.left) / planRect.width) * 10000) / 100,
+      Math.round(((event.clientY - planRect.top) / planRect.height) * 10000) / 100,
+    ];
+  };
+
+  const handlePolygonTraceMove = (event) => {
+    if (!canTracePolygon || !isTracingPolygon) return;
+    const point = getPolygonTracePointFromEvent(event);
+    if (point) setPolygonTraceCursorPoint(point);
+  };
+
+  const handlePolygonTraceClick = (event) => {
+    if (!canTracePolygon || !isTracingPolygon) return;
+    const point = getPolygonTracePointFromEvent(event);
+    if (!point) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    setPolygonTracePoints((current) => [...current, point]);
+  };
+
+  const handlePolygonTraceKeyDown = (event) => {
+    if (!canTracePolygon || !isTracingPolygon || !polygonTracePoints.length) return;
+    const directionByKey = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
+    const direction = directionByKey[event.key];
+    if (!direction) return;
+
+    event.preventDefault();
+    const step = event.shiftKey ? 0.01 : event.altKey ? 0.25 : 0.05;
+    setPolygonTracePoints((current) =>
+      current.map((point, index) => {
+        if (index !== current.length - 1) return point;
+        return [
+          Math.round((point[0] + direction[0] * step) * 100) / 100,
+          Math.round((point[1] + direction[1] * step) * 100) / 100,
+        ];
+      }),
+    );
+  };
 
   useEffect(() => {
     if (activeView !== "2d" || hasImageView || hasPdfView) {
@@ -1774,22 +1919,90 @@ export default function useKitchenSvgStage({
           />
         ) : hasImageView ? (
             <div className={styles.pdfCard}>
+              {canTracePolygon ? (
+                <div className={styles.polygonTracePanel}>
+                  <label className={styles.polygonTraceToggle}>
+                    <input
+                      type="checkbox"
+                      checked={isTracingPolygon}
+                      onChange={(event) => setIsTracingPolygon(event.target.checked)}
+                    />
+                    Trace polygon
+                  </label>
+                  <div className={styles.polygonTraceActions}>
+                    <button
+                      type="button"
+                      onClick={copyPolygonTracePoints}
+                      disabled={!polygonTracePoints.length}
+                    >
+                      Copy points array
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPolygonTracePoints((current) => current.slice(0, -1))}
+                      disabled={!polygonTracePoints.length}
+                    >
+                      Undo last point
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPolygonTracePoints([])}
+                      disabled={!polygonTracePoints.length}
+                    >
+                      Clear points
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        copyPolygonTracePoints();
+                        setIsTracingPolygon(false);
+                      }}
+                      disabled={polygonTracePoints.length < 3}
+                    >
+                      Finish polygon
+                    </button>
+                  </div>
+                  <div className={styles.polygonTraceReadout}>
+                    <span>
+                      Cursor:{" "}
+                      {polygonTraceCursorPoint
+                        ? `${polygonTraceCursorPoint[0].toFixed(2)}, ${polygonTraceCursorPoint[1].toFixed(2)}`
+                        : "-"}
+                    </span>
+                    <span>
+                      Last:{" "}
+                      {lastPolygonTracePoint
+                        ? `${lastPolygonTracePoint[0].toFixed(2)}, ${lastPolygonTracePoint[1].toFixed(2)}`
+                        : "-"}
+                    </span>
+                    <span>Arrow keys nudge last point. Shift = 0.01, Alt = 0.25.</span>
+                  </div>
+                  <output className={styles.polygonTraceOutput}>
+                    {formattedPolygonTracePoints}
+                  </output>
+                </div>
+              ) : null}
               {hasImageHotspots ? (
                 <div
                   className={styles.planImageWrap}
                   style={{ aspectRatio: croppedPlanAspectRatio }}
                 >
                   <img
+                    ref={planTraceImageRef}
                     src={imageViewHref}
                     alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
                     className={styles.planImageInteractive}
-                    style={{
-                      left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
-                      top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
-                      width: `${(100 / planDisplayCrop.width) * 100}%`,
-                      height: `${(100 / planDisplayCrop.height) * 100}%`,
-                    }}
+                    style={planImageInteractiveStyle}
                   />
+                  {planLineBoostStyle ? (
+                    <img
+                      src={imageViewHref}
+                      alt=""
+                      aria-hidden="true"
+                      className={styles.planImageInteractive}
+                      style={planLineBoostStyle}
+                    />
+                  ) : null}
                   <div className={styles.planHotspotLayer}>
                     {croppedImageHotspots.map((hotspot) => {
                       const isFixed = fixedComponentIds.includes(hotspot.componentId);
@@ -1909,6 +2122,55 @@ export default function useKitchenSvgStage({
                         >
                           <span className={styles.planCalibrationLabelH}>{tick}</span>
                         </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  {canTracePolygon ? (
+                    <div
+                      ref={polygonTraceLayerRef}
+                      className={[
+                        styles.polygonTraceLayer,
+                        isTracingPolygon ? styles.polygonTraceLayerActive : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      tabIndex={isTracingPolygon ? 0 : -1}
+                      onClick={handlePolygonTraceClick}
+                      onMouseMove={handlePolygonTraceMove}
+                      onMouseLeave={() => setPolygonTraceCursorPoint(null)}
+                      onKeyDown={handlePolygonTraceKeyDown}
+                      aria-hidden={!isTracingPolygon}
+                    >
+                      {visiblePolygonTraceCursorPoint ? (
+                        <>
+                          <span
+                            className={styles.polygonTraceCursorLineV}
+                            style={{ left: `${visiblePolygonTraceCursorPoint.x}%` }}
+                          />
+                          <span
+                            className={styles.polygonTraceCursorLineH}
+                            style={{ top: `${visiblePolygonTraceCursorPoint.y}%` }}
+                          />
+                        </>
+                      ) : null}
+                      {visiblePolygonTracePoints.length ? (
+                        <svg className={styles.polygonTraceSvg} viewBox="0 0 100 100" preserveAspectRatio="none">
+                          <polyline
+                            points={visiblePolygonTracePoints
+                              .map((point) => `${point.x},${point.y}`)
+                              .join(" ")}
+                            className={styles.polygonTraceLine}
+                          />
+                        </svg>
+                      ) : null}
+                      {visiblePolygonTracePoints.map((point, index) => (
+                        <span
+                          key={`${point.x}-${point.y}-${index}`}
+                          className={styles.polygonTracePoint}
+                          style={{ left: `${point.x}%`, top: `${point.y}%` }}
+                        >
+                          {index + 1}
+                        </span>
                       ))}
                     </div>
                   ) : null}

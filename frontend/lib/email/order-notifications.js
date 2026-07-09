@@ -65,6 +65,10 @@ const CHIMNEY_HOOD_PRODUCT_INFO_DOCUMENTS = [
   { label: "Produktinfo PDF", href: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf" },
 ];
 
+const FRIDGE_PRODUCT_INFO_DOCUMENTS = [
+  { label: "Produktinfo PDF", href: "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf" },
+];
+
 function getMappedProductInfoDocuments(item) {
   const code = String(item?.code || "").trim().toUpperCase();
   const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
@@ -80,6 +84,21 @@ function getMappedProductInfoDocuments(item) {
     haystack.includes("geschirr")
   ) {
     return DISHWASHER_PRODUCT_INFO_DOCUMENTS;
+  }
+
+  if (
+    code.startsWith("REF-") ||
+    articleNumber.includes("KGCN388140E") ||
+    articleNumber.includes("KGC15495") ||
+    iconKey.includes("refrigerator") ||
+    iconKey.includes("fridge") ||
+    componentKey.includes("refrigerator") ||
+    haystack.includes("refrigerator") ||
+    haystack.includes("fridge") ||
+    haystack.includes("kuehlschrank") ||
+    haystack.includes("kühlschrank")
+  ) {
+    return FRIDGE_PRODUCT_INFO_DOCUMENTS;
   }
 
   if (
@@ -109,10 +128,43 @@ function getMappedProductInfoDocuments(item) {
   return [];
 }
 
+function shouldPreferMappedProductInfoDocuments(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const displayName = String(getItemDisplayName(item)).toLowerCase();
+  const haystack = `${code} ${articleNumber} ${iconKey} ${componentKey} ${displayName}`;
+
+  return (
+    code.startsWith("REF-") ||
+    articleNumber.includes("KGCN388140E") ||
+    articleNumber.includes("KGC15495") ||
+    articleNumber.includes("FH664621E + FWK124 + HD6002") ||
+    articleNumber.includes("FH664621E + HD6002") ||
+    articleNumber.includes("FH 664 621 S") ||
+    code.startsWith("CAB-HOOD-") ||
+    iconKey.includes("refrigerator") ||
+    iconKey.includes("fridge") ||
+    componentKey.includes("refrigerator") ||
+    haystack.includes("refrigerator") ||
+    haystack.includes("fridge") ||
+    haystack.includes("kuehlschrank") ||
+    haystack.includes("kÃ¼hlschrank") ||
+    haystack.includes("flat screen extractor hood") ||
+    haystack.includes("flachschirmhaube")
+  );
+}
+
 function getProductInfoDocumentsForEmail(item) {
+  const mappedDocuments = getMappedProductInfoDocuments(item);
+  if (mappedDocuments.length && shouldPreferMappedProductInfoDocuments(item)) {
+    return mappedDocuments;
+  }
+
   const directPath = normalizeProductInfoAssetPath(item?.productInfoPdfPath);
   const directDocuments = directPath ? [{ label: "Produktinfo PDF", href: directPath }] : [];
-  return directDocuments.length ? directDocuments : getMappedProductInfoDocuments(item);
+  return directDocuments.length ? directDocuments : mappedDocuments;
 }
 
 function normalizeProductImageAssetPath(imagePath) {
@@ -740,7 +792,7 @@ function normalizeGermanDisplayText(value) {
     .replace(/Zubehoer/g, "Zubehör")
     .replace(/\bKuechenmoebel\b/g, "Küchenmöbel")
     .replace(/\bfuer\b/g, "für")
-    .replace(/\bOberschrank für Flachschirmhaube\s*,?\s*(\d+)\b/g, "Oberschrank für Flachschirmhaube, $1 cm");
+    .replace(/\bOberschrank für Flachschirmhaube\s*,?\s*(\d+)(?:\s*cm)?\b/g, "Oberschrank für Flachschirmhaube, $1 cm");
 }
 
 async function loadProductImageAttachments(order) {
@@ -899,7 +951,8 @@ function buildBlendeDisplayItem(item) {
   const blendeCode = String(item?.blendeCode || blendeLabel).trim();
   const blendePrice = item?.blendePrice == null ? 0 : Number(item.blendePrice || 0);
   const blendeQuantity = Math.max(parseTrailingQuantity(blendeLabel), parseTrailingQuantity(blendeCode));
-  const displayLabel = stripLeadingBlendePrefix(stripTrailingQuantity(blendeLabel));
+  const catalogDisplayName = String(item?.blendeNameDe || item?.blendeName || "").trim();
+  const displayLabel = catalogDisplayName || stripLeadingBlendePrefix(stripTrailingQuantity(blendeLabel));
   const displayCode = stripTrailingQuantity(blendeCode);
 
   return {

@@ -222,13 +222,16 @@ export function buildOrderForNotifications(orderRecord) {
     });
     const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
 
-    const displayName = catalogArticle?.name || catalogService?.name || item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const displayNameDe = cutleryLine
+      ? cutleryVariant?.nameDe || displayName
+      : catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || item.nameDe || "";
 
     return {
       code: item.code,
       articleNumber: cutleryLine?.articleNumber || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
       name: displayName,
-      nameDe: cutleryLine ? cutleryVariant?.nameDe || displayName : catalogArticle?.nameDe || catalogService?.nameDe || item.nameDe || item.kitchenItem?.nameDe || "",
+      nameDe: displayNameDe,
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       isLocked: Boolean(item.kitchenItem?.isLocked || item.isLocked),
@@ -243,6 +246,8 @@ export function buildOrderForNotifications(orderRecord) {
       productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
       blendeCode: catalogBlende?.code || item.kitchenItem?.blendeCode || item.blendeCode || "",
       blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+      blendeName: catalogBlende?.name || item.blendeName || "",
+      blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
       blendePrice: catalogBlende?.price != null
         ? Number(catalogBlende.price)
         : item.kitchenItem?.blendePrice != null
@@ -387,6 +392,7 @@ function buildConfirmedBaselineSelectionItem(item) {
   const kitchenItem = item?.kitchenItem || {};
   const catalogArticle = kitchenItem.catalogArticleId ? kitchenItem.catalogArticle : null;
   const catalogService = kitchenItem.catalogServiceId ? kitchenItem.catalogService : null;
+  const catalogBlende = kitchenItem.catalogBlendeId ? kitchenItem.catalogBlende : null;
 
   return {
     ...kitchenItem,
@@ -394,9 +400,13 @@ function buildConfirmedBaselineSelectionItem(item) {
     kitchenItemId: item.kitchenItemId,
     itemType: item.itemType,
     code: item.code,
-    name: catalogArticle?.name || catalogService?.name || item.nameSnapshot || kitchenItem.name || item.code,
-    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || "",
+    name: item.nameSnapshot || kitchenItem.name || catalogArticle?.name || catalogService?.name || item.code,
+    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || item.nameDe || "",
     articleNumber: catalogArticle?.articleNumber || kitchenItem.articleNumber || item.articleNumber || "",
+    blendeCode: catalogBlende?.code || kitchenItem.blendeCode || item.blendeCode || "",
+    blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || kitchenItem.blendeLabel || item.blendeLabel || "",
+    blendeName: catalogBlende?.name || item.blendeName || "",
+    blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
     price: Number(item.priceSnapshot || 0),
     priceSnapshot: Number(item.priceSnapshot || 0),
     quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
@@ -482,25 +492,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw validationError("One or more selected items are invalid or inactive");
   }
 
-  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(selectedComponents);
-  const availableCutleryByArticle = new Map(
-    availableCutleryVariants.map((variant) => [variant.articleNumber, variant]),
-  );
-  for (const item of selectedAccessories) {
-    if (!isCutleryAccessoryCode(item?.code)) continue;
-
-    const cutleryLine = parseCutleryLineFromOrderItem(item);
-    const variant = cutleryLine ? availableCutleryByArticle.get(cutleryLine.articleNumber) : null;
-    if (!variant) {
-      throw validationError("Selected cutlery insert width is not available for this kitchen.");
-    }
-
-    const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
-    if (quantity > Math.max(1, Math.floor(Number(variant.maxQuantity || 1)))) {
-      throw validationError("Selected cutlery insert quantity is not available for this kitchen.");
-    }
-  }
-
   const kitchenContract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: validatedCustomer.contractNumber },
     include: { kitchen: true },
@@ -519,6 +510,24 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   const allSelectedComponents = allSelected.filter((item) => item.itemType === ItemType.COMPONENT);
   const allSelectedAccessories = allSelected.filter((item) => item.itemType === ItemType.ACCESSORY);
   const allSelectedServices = allSelected.filter((item) => item.itemType === ItemType.SERVICE);
+  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(allSelectedComponents);
+  const availableCutleryByArticle = new Map(
+    availableCutleryVariants.map((variant) => [variant.articleNumber, variant]),
+  );
+  for (const item of allSelectedAccessories) {
+    if (!isCutleryAccessoryCode(item?.code)) continue;
+
+    const cutleryLine = parseCutleryLineFromOrderItem(item);
+    const variant = cutleryLine ? availableCutleryByArticle.get(cutleryLine.articleNumber) : null;
+    if (!variant) {
+      throw validationError("Selected cutlery insert width is not available for this kitchen.");
+    }
+
+    const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
+    if (quantity > Math.max(1, Math.floor(Number(variant.maxQuantity || 1)))) {
+      throw validationError("Selected cutlery insert quantity is not available for this kitchen.");
+    }
+  }
   const serviceEligibility = getServiceEligibility({
     selectedComponents: allSelectedComponents.map((item) => ({
       ...item,
