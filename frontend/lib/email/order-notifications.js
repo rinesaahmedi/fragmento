@@ -740,7 +740,7 @@ function normalizeGermanDisplayText(value) {
     .replace(/Zubehoer/g, "Zubehör")
     .replace(/\bKuechenmoebel\b/g, "Küchenmöbel")
     .replace(/\bfuer\b/g, "für")
-    .replace(/\bOberschrank für Flachschirmhaube\s*,?\s*(\d+)\b/g, "Oberschrank für Flachschirmhaube, $1 cm");
+    .replace(/\bOberschrank für Flachschirmhaube\s*,?\s*(\d+)(?:\s*cm)?\b/g, "Oberschrank für Flachschirmhaube, $1 cm");
 }
 
 async function loadProductImageAttachments(order) {

@@ -9,7 +9,6 @@ const CATALOG_ARTICLES = [
   { articleNumber: "517467", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", itemType: ItemType.ACCESSORY },
   { articleNumber: "A-EGSPV597210 + TGV60", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true },
   { articleNumber: "EWA34660W + TGV60 + WU16", name: "Washing machine + front + side panel", nameDe: "Waschmaschine + Front + Wange", price: "639.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true },
-  { articleNumber: "FH 664 621 S", name: "FH 664 621 S extractor hood", nameDe: "FH 664 621 S Flachschirmhaube", price: "349.00", itemType: ItemType.COMPONENT },
   { articleNumber: "FH664621E + FWK124 + HD6002", name: "Flat screen extractor hood + cabinet + filter", nameDe: "Flachschirmhaube + Schrank + Filter", price: "349.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true },
   { articleNumber: "H3002", name: "Upper cabinet 30 cm", nameDe: "Oberschrank 30 cm", widthMm: 300, heightMm: 720, depthMm: 340, price: "115.00", itemType: ItemType.COMPONENT },
   { articleNumber: "H4002", name: "Upper cabinet 40 cm", nameDe: "Oberschrank 40 cm", widthMm: 400, heightMm: 720, depthMm: 340, price: "130.00", itemType: ItemType.COMPONENT },

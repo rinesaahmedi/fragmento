@@ -222,13 +222,16 @@ export function buildOrderForNotifications(orderRecord) {
     });
     const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
 
-    const displayName = catalogArticle?.name || catalogService?.name || item.nameSnapshot || item.name || item.kitchenItem?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const displayNameDe = cutleryLine
+      ? cutleryVariant?.nameDe || displayName
+      : catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || item.nameDe || "";
 
     return {
       code: item.code,
       articleNumber: cutleryLine?.articleNumber || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
       name: displayName,
-      nameDe: cutleryLine ? cutleryVariant?.nameDe || displayName : catalogArticle?.nameDe || catalogService?.nameDe || item.nameDe || item.kitchenItem?.nameDe || "",
+      nameDe: displayNameDe,
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       isLocked: Boolean(item.kitchenItem?.isLocked || item.isLocked),
@@ -394,8 +397,8 @@ function buildConfirmedBaselineSelectionItem(item) {
     kitchenItemId: item.kitchenItemId,
     itemType: item.itemType,
     code: item.code,
-    name: catalogArticle?.name || catalogService?.name || item.nameSnapshot || kitchenItem.name || item.code,
-    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || "",
+    name: item.nameSnapshot || kitchenItem.name || catalogArticle?.name || catalogService?.name || item.code,
+    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || item.nameDe || "",
     articleNumber: catalogArticle?.articleNumber || kitchenItem.articleNumber || item.articleNumber || "",
     price: Number(item.priceSnapshot || 0),
     priceSnapshot: Number(item.priceSnapshot || 0),
