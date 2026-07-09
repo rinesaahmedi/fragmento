@@ -315,7 +315,7 @@ const PRODUCT_INFO_FILES = {
   oven: "/product-info/ebx-943-600-s-product-info.pdf",
   hood: "/product-info/fh-664-621-s-product-info.pdf",
   hoodChimney: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf",
-  fridge: "/product-info/kgc-15495-s-product-info-eco21.pdf",
+  fridge: "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf",
   ledLightingLabel: "/product-info/led-lighting-set-elabel.pdf",
 };
 
@@ -555,6 +555,14 @@ PRODUCT_INFO_BY_CODE["HOOD-AB105828-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-F
 PRODUCT_INFO_BY_CODE["HOOD-AB105845-KHF664611S"] = PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"];
 PRODUCT_INFO_BY_CODE["WM-C-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
 PRODUCT_INFO_BY_CODE["WM-AB105845-EWA34660W"] = PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"];
+
+const PRODUCT_INFO_BY_ARTICLE_NUMBER = {
+  "OL-KGCN388140E": PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"],
+  "FH 664 621 S": PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"],
+  "FH664621E + HD6002": PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"],
+  "FH664621E + FWK124 + HD6002": PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"],
+};
+
 PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
   productImagePath: PRODUCT_IMAGE_FILES.oven,
   productInfoPdfPath: PRODUCT_INFO_FILES.oven,
@@ -2361,7 +2369,11 @@ async function main() {
 
     for (const rawItem of kitchen.items) {
       const item = applyDefaultCatalogItem(rawItem);
-      const productInfo = PRODUCT_INFO_BY_CODE[item.code] || PRODUCT_INFO_BY_CODE[rawItem.code] || {};
+      const productInfo =
+        PRODUCT_INFO_BY_CODE[item.code] ||
+        PRODUCT_INFO_BY_CODE[rawItem.code] ||
+        PRODUCT_INFO_BY_ARTICLE_NUMBER[String(item.articleNumber || "").trim()] ||
+        {};
       // Resolve the item's stored dimensions against the catalog that exists in this database, so
       // the width-based display name (e.g. "Upper Cabinet 60 cm") stays consistent with the dims.
       const catalogDims = item.articleNumber
