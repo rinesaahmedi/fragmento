@@ -492,25 +492,6 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw validationError("One or more selected items are invalid or inactive");
   }
 
-  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(selectedComponents);
-  const availableCutleryByArticle = new Map(
-    availableCutleryVariants.map((variant) => [variant.articleNumber, variant]),
-  );
-  for (const item of selectedAccessories) {
-    if (!isCutleryAccessoryCode(item?.code)) continue;
-
-    const cutleryLine = parseCutleryLineFromOrderItem(item);
-    const variant = cutleryLine ? availableCutleryByArticle.get(cutleryLine.articleNumber) : null;
-    if (!variant) {
-      throw validationError("Selected cutlery insert width is not available for this kitchen.");
-    }
-
-    const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
-    if (quantity > Math.max(1, Math.floor(Number(variant.maxQuantity || 1)))) {
-      throw validationError("Selected cutlery insert quantity is not available for this kitchen.");
-    }
-  }
-
   const kitchenContract = await prisma.kitchenContract.findUnique({
     where: { contractNumber: validatedCustomer.contractNumber },
     include: { kitchen: true },
@@ -529,6 +510,24 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   const allSelectedComponents = allSelected.filter((item) => item.itemType === ItemType.COMPONENT);
   const allSelectedAccessories = allSelected.filter((item) => item.itemType === ItemType.ACCESSORY);
   const allSelectedServices = allSelected.filter((item) => item.itemType === ItemType.SERVICE);
+  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(allSelectedComponents);
+  const availableCutleryByArticle = new Map(
+    availableCutleryVariants.map((variant) => [variant.articleNumber, variant]),
+  );
+  for (const item of allSelectedAccessories) {
+    if (!isCutleryAccessoryCode(item?.code)) continue;
+
+    const cutleryLine = parseCutleryLineFromOrderItem(item);
+    const variant = cutleryLine ? availableCutleryByArticle.get(cutleryLine.articleNumber) : null;
+    if (!variant) {
+      throw validationError("Selected cutlery insert width is not available for this kitchen.");
+    }
+
+    const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
+    if (quantity > Math.max(1, Math.floor(Number(variant.maxQuantity || 1)))) {
+      throw validationError("Selected cutlery insert quantity is not available for this kitchen.");
+    }
+  }
   const serviceEligibility = getServiceEligibility({
     selectedComponents: allSelectedComponents.map((item) => ({
       ...item,
