@@ -62,6 +62,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105738": "/plans/AB%20105732.svg",
   "ab-105741": "/plans/AB%20105732.svg",
   "ab-105733": "/plans/AB%20105733.svg",
+  "ab-105736": "/plans/AB%20105733.svg",
+  "ab-105739": "/plans/AB%20105733.svg",
+  "ab-105742": "/plans/AB%20105733.svg",
   "ab-105821": "/plans/AB%20105821.svg",
   "ab-105824": "/plans/AB%20105821.svg",
   "ab-105822": "/plans/AB%20105825.svg",
@@ -1490,6 +1493,10 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
 
 ["ab-105735", "ab-105738", "ab-105741"].forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105732"];
+});
+
+["ab-105736", "ab-105739", "ab-105742"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105733"];
 });
 
 // The sink (faucet + waste) is always part of the default configuration and usually sits on

@@ -887,11 +887,11 @@ const AB_105733_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "SINKBASE-B-600", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Default sink base cabinet" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105733-US30-R", name: "Base cabinet with drawer", price: articlePrice("US30"), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US30 base storage cabinet, hinge right, with UPK20 filler panel", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105733-US30-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US30 base storage cabinet, hinge right, with UPK20 filler panel", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105733-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105820-US60", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105733-KGCN388140E", name: "Freestanding refrigerator 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 70, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105733-H3002-R", name: "Wall Cabinet", price: articlePrice("H3002"), widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H3002, hinge right, with HPK2002 filler panel", articleNumber: "H3002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105733-H3002-R", name: "Wall Cabinet", price: articlePriceWithBlende("H3002", "HPK2002", 1), widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H3002, hinge right, with HPK2002 filler panel", articleNumber: "H3002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105733-H6002-R1", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105733-H6002-R2", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105733-600", name: "Upper Cabinet with Extractor Hood 60 cm", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
@@ -1453,6 +1453,27 @@ const DEFAULT_KITCHENS = [
     items: AB_105733_ITEMS,
   },
   {
+    slug: "ab-105736",
+    kitchenCode: "105 736",
+    name: "AB 105736 Kitchen",
+    description: "Kitchen configuration using the AB 105733 layout and element selection",
+    items: AB_105733_ITEMS,
+  },
+  {
+    slug: "ab-105739",
+    kitchenCode: "105 739",
+    name: "AB 105739 Kitchen",
+    description: "Kitchen configuration using the AB 105733 layout and element selection",
+    items: AB_105733_ITEMS,
+  },
+  {
+    slug: "ab-105742",
+    kitchenCode: "105 742",
+    name: "AB 105742 Kitchen",
+    description: "Kitchen configuration using the AB 105733 layout and element selection",
+    items: AB_105733_ITEMS,
+  },
+  {
     slug: "ab-105821",
     kitchenCode: "105 821",
     name: "AB 105821 Kitchen",
@@ -1612,10 +1633,16 @@ const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "670108134", kitchenSlug: "108134-modul-1" },
   ...DEFAULT_KITCHENS
     .filter((kitchen) => kitchen.slug.startsWith("ab-"))
-    .map((kitchen) => ({
-      contractNumber: buildAbKitchenContractNumber(kitchen),
-      kitchenSlug: kitchen.slug,
-    })),
+    .flatMap((kitchen) => [
+      {
+        contractNumber: buildKitchenContractNumber(kitchen, "670"),
+        kitchenSlug: kitchen.slug,
+      },
+      {
+        contractNumber: buildKitchenContractNumber(kitchen, "111"),
+        kitchenSlug: kitchen.slug,
+      },
+    ]),
 ];
 
 const OBSOLETE_KITCHENS = [
@@ -1625,14 +1652,14 @@ const OBSOLETE_KITCHENS = [
   { slug: "l-kitchen-new", contractNumbers: ["736271"] },
 ];
 
-function buildAbKitchenContractNumber(kitchen) {
+function buildKitchenContractNumber(kitchen, prefix) {
   const code = String(kitchen.kitchenCode || kitchen.slug).replace(/\D/g, "");
 
   if (!code) {
-    throw new Error(`Cannot build AB kitchen contract number without a code: ${kitchen.slug}`);
+    throw new Error(`Cannot build kitchen contract number without a code: ${kitchen.slug}`);
   }
 
-  return `670${code}`;
+  return `${prefix}${code}`;
 }
 
 function normalizeSeedSlug(value) {
