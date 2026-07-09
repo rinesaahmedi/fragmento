@@ -43,6 +43,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105817": "/jpg/AB%20105805_page-0001.jpg",
   "ab-105834": "/jpg/AB%20105834_page-0001.jpg",
   "ab-104968": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105734": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105737": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105740": "/jpg/AB%20104968_page-0001.jpg",
   "ab-105837": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105840": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105843": "/jpg/AB%20105837_page-0001.jpg",
@@ -1071,6 +1074,9 @@ const BASE_PLINTH_EXTENSION_DISABLED_SLUGS = new Set([
   "ab-105843",
   "ab-105831",
   "ab-104968",
+  "ab-105734",
+  "ab-105737",
+  "ab-105740",
   "ab-105816",
 ]);
 // Typical toe-kick height on the 3509×2480 CAD renders (~5.2–5.3% of image height).
@@ -1499,6 +1505,10 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105733"];
 });
 
+["ab-105734", "ab-105737", "ab-105740"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-104968"];
+});
+
 // The sink (faucet + waste) is always part of the default configuration and usually sits on
 // the worktop directly above the sink base. Derive a consistent fallback box for those plans,
 // while allowing manually calibrated hotspots when the visible bowl/faucet is offset.
@@ -1646,7 +1656,7 @@ export default function useKitchenSvgStage({
     height: `${(100 / planDisplayCrop.height) * 100}%`,
   };
   const planLineBoostStyle =
-    normalizedKitchenSlug === "ab-104968"
+    ["ab-104968", "ab-105734", "ab-105737", "ab-105740"].includes(normalizedKitchenSlug)
       ? {
           ...planImageInteractiveStyle,
           mixBlendMode: "multiply",
