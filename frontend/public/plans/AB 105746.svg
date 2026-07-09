@@ -1,0 +1,1003 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="842" height="595" viewBox="0 0 842 595">
+<defs>
+<clipPath id="clip_1">
+<path transform="matrix(.12,0,0,-.12,0,595)" d="M0 78H6978V4868H0V78"/>
+</clipPath>
+<clipPath id="clip_2">
+<path transform="matrix(.12,0,0,-.12,0,595)" d="M0 78H6978V4868H0V78"/>
+</clipPath>
+<path id="font_3_42" d="M.41210938 .28222657V.36523438L.71533206 .36572267V.10058594C.66878256 .063313808 .62076827 .03527832 .57128909 .016479493 .5218099-.002319336 .47102867-.01171875 .4189453-.01171875 .3486328-.01171875 .28474937 .0033365887 .22729492 .033447267 .1698405 .063557948 .12646485 .10709635 .09716797 .1640625 .067871097 .22102864 .053222658 .28466798 .053222658 .35498048 .053222658 .42464195 .06778971 .4896647 .09692383 .5500488 .12605794 .6104329 .16796875 .65527346 .22265625 .6845703 .27734376 .7138672 .34033204 .7285156 .4116211 .7285156 .4633789 .7285156 .51017257 .7201538 .55200198 .7034302 .59383139 .68670657 .6266276 .6634013 .6503906 .6335144 .6741536 .6036377 .69222006 .56466677 .70458987 .51660159L.6191406 .49316407C.60839846 .5296224 .59505209 .55826827 .57910159 .57910159 .56315109 .5999349 .54036459 .61661788 .5107422 .6291504 .48111979 .6416829 .4482422 .6479492 .41210938 .6479492 .3688151 .6479492 .33138023 .64135238 .2998047 .62815859 .26822917 .6149648 .24275716 .59761556 .22338867 .57611086 .20402019 .55460616 .18896485 .53098556 .17822266 .505249 .15999349 .4609375 .1508789 .41288249 .1508789 .36108399 .1508789 .29723106 .16186524 .24379985 .18383789 .2007904 .20581055 .15778096 .23779297 .12584941 .27978517 .10499573 .32177735 .08415222 .3663737 .07373047 .41357423 .07373047 .45458985 .07373047 .4946289 .08167521 .5336914 .0975647 .5727539 .113454189 .6023763 .13041179 .6225586 .1484375V.28222657H.41210938Z"/>
+<path id="font_3_54" d="M.044921876 .23046875 .13427735 .23828125C.13850911 .20247396 .14835613 .1730957 .16381836 .15014649 .1792806 .12719727 .20328777 .10864258 .23583985 .09448242 .26839195 .080322269 .30501304 .07324219 .34570313 .07324219 .38183595 .07324219 .41373698 .07861328 .44140626 .08935547 .46907554 .100097659 .4896647 .11482748 .5031738 .13354492 .5166829 .15226238 .5234375 .1726888 .5234375 .19482422 .5234375 .21728516 .51692709 .23689778 .50390627 .2536621 .4908854 .27042643 .46940104 .28450523 .43945313 .29589845 .4202474 .3033854 .37776695 .3150228 .31201173 .33081056 .24625652 .3465983 .20019531 .36149089 .17382813 .37548829 .13964844 .39339195 .11417643 .41560874 .09741211 .44213868 .08064779 .4686686 .072265628 .4983724 .072265628 .53125 .072265628 .5673828 .08251953 .6011556 .103027347 .63256838 .123535159 .66398116 .15348308 .6878255 .1928711 .70410159 .23225911 .7203776 .27604167 .7285156 .32421876 .7285156 .37727867 .7285156 .42407228 .7199707 .4645996 .70288088 .50512698 .685791 .5362956 .66064456 .55810549 .6274414 .57991537 .5942383 .5916341 .5566406 .5932617 .51464846L.5024414 .5078125C.4975586 .55322268 .48103843 .5875244 .45288087 .6107178 .4247233 .63391116 .38313804 .6455078 .328125 .6455078 .27083335 .6455078 .22908528 .6349996 .20288086 .61398318 .17667644 .59297689 .16357422 .5676524 .16357422 .53800967 .16357422 .51227316 .17285156 .49109904 .19140625 .4744873 .20963542 .4578654 .25724284 .44084168 .33422853 .42341615 .4112142 .4059906 .46402995 .39076234 .49267579 .37773133 .53434249 .3585154 .5651042 .33416239 .58496096 .30467225 .6048177 .27519227 .6147461 .24123128 .6147461 .2027893 .6147461 .16468303 .6038411 .12876892 .58203127 .095047 .5602214 .061335248 .52888998 .035110475 .4880371 .01637268 .44718424-.0023549398 .40120445-.01171875 .35009767-.01171875 .285319-.01171875 .2310384-.0022786458 .18725586 .016601563 .14347331 .03548177 .10913086 .06388346 .084228519 .10180664 .059326173 .13972982 .046223958 .18261719 .044921876 .23046875Z"/>
+<clipPath id="clip_4">
+<path transform="matrix(.12,0,0,-.12,0,595)" d="M0 78H6978V4868H0V78"/>
+</clipPath>
+<clipPath id="clip_5">
+<path transform="matrix(.9999899,0,0,-1.0000004,401.3096,412.29823)" d="M0 0H11.2517V22.1343H0Z"/>
+</clipPath>
+<path id="font_6_20" d="M.3725586 0H.28466798V.5600586C.26350913 .5398763 .23575847 .51969406 .20141602 .49951173 .16707357 .47932945 .13623047 .46419273 .10888672 .45410157V.5390625C.15804036 .5621745 .20100911 .59016928 .23779297 .6230469 .2745768 .6559245 .3006185 .6878255 .31591798 .71875H.3725586V0Z"/>
+<clipPath id="clip_7">
+<path transform="matrix(.99999877,0,0,-1.0000004,483.4468,375.5328)" d="M0 0H10.8766V22.1343H0Z"/>
+</clipPath>
+<path id="font_6_21" d="M.50341799 .084472659V0H.030273438C.029622397 .021148682 .033040365 .041483564 .040527345 .06100464 .052571615 .09321085 .07185873 .124928798 .09838867 .15615845 .12491862 .1873881 .1632487 .22350057 .2133789 .26449586 .29117839 .3282369 .34375 .37872825 .37109376 .41596986 .3984375 .45321147 .41210938 .48841859 .41210938 .5215912 .41210938 .5563914 .3996582 .5857442 .37475587 .60964968 .34985353 .6335551 .3173828 .6455078 .27734376 .6455078 .23502605 .6455078 .20117188 .6328125 .17578125 .6074219 .15039063 .58203127 .13753255 .546875 .13720703 .5019531L.046875 .5112457C.053059896 .5787811 .07633463 .630249 .11669922 .6656494 .1570638 .7010498 .21126302 .71875 .27929688 .71875 .34798179 .71875 .40234376 .69970199 .4423828 .66160586 .48242188 .6235097 .5024414 .57629397 .5024414 .5199585 .5024414 .4913025 .49658204 .46313478 .48486329 .43545533 .47314454 .40777589 .45369468 .3786316 .42651368 .34802247 .39933268 .3174235 .35416667 .27542115 .29101563 .22201538 .23828125 .17779541 .20442708 .14779663 .18945313 .13201905 .17447917 .116251628 .16210938 .10040283 .15234375 .084472659H.50341799Z"/>
+<clipPath id="clip_8">
+<path transform="matrix(.99999877,0,0,-.99999967,694.2281,446.81269)" d="M0 0H10.8766V22.1343H0Z"/>
+</clipPath>
+<path id="font_6_22" d="M.041992189 .19042969 .12988281 .20214844C.13997396 .15234375 .15714519 .11645508 .18139649 .09448242 .20564778 .072509769 .2351888 .061523439 .27001954 .061523439 .3113607 .061523439 .3462728 .07582092 .37475587 .10441589 .40323893 .13301087 .41748048 .1684316 .41748048 .2106781 .41748048 .25098167 .40429688 .2842102 .3779297 .31036378 .3515625 .3365275 .31803385 .34960938 .27734376 .34960938 .2607422 .34960938 .24007161 .34635417 .21533203 .33984376L.22509766 .4169922C.23095703 .41634117 .23567708 .41601563 .23925781 .41601563 .27669273 .41601563 .31038413 .42569987 .34033204 .44506837 .37027995 .46443687 .3852539 .4942932 .3852539 .53463748 .3852539 .56658938 .37434898 .59305319 .35253907 .61402896 .33072917 .63501486 .30257163 .6455078 .2680664 .6455078 .23388672 .6455078 .20540364 .6347656 .18261719 .61328127 .15983074 .5917969 .1451823 .5595703 .13867188 .51660159L.05078125 .53222659C.061523439 .591451 .0859375 .63734439 .12402344 .6699066 .16210938 .7024689 .20947266 .71875 .26611329 .71875 .30517579 .71875 .34114585 .71039327 .37402345 .6936798 .40690104 .67696639 .43204753 .6541646 .4494629 .62527468 .46687828 .59639486 .47558595 .5657247 .47558595 .53326418 .47558595 .5024312 .46728517 .47435508 .4506836 .44903565 .43408204 .4237264 .40950523 .40360514 .37695313 .38867188 .41927085 .37890626 .45214845 .35864259 .47558595 .32788087 .49902345 .29711915 .5107422 .2586263 .5107422 .21240235 .5107422 .14990235 .48795573 .09692383 .4423828 .053466798 .3968099 .010009766 .33919273-.01171875 .26953126-.01171875 .20670574-.01171875 .15454102 .007044474 .11303711 .044570924 .0715332 .082097377 .047851564 .13071697 .041992189 .19042969Z"/>
+<clipPath id="clip_9">
+<path transform="matrix(.9999994,0,0,-1.0000005,160.5238,309.0325)" d="M0 0H11.2517V22.5024H0Z"/>
+</clipPath>
+<path id="font_6_23" d="M.3232422 0V.17138672H.0126953129V.25195313L.33935548 .7158203H.4111328V.25195313H.5078125V.17138672H.4111328V0H.3232422M.3232422 .25195313V.57470706L.099121097 .25195313H.3232422Z"/>
+<clipPath id="clip_10">
+<path transform="matrix(.9999988,0,0,-.99999949,270.2276,462.0485)" d="M0 0H11.0641V22.3148H0Z"/>
+</clipPath>
+<path id="font_6_24" d="M.041503908 .18847656 .13378906 .19628906C.140625 .15151978 .15649414 .117863979 .18139649 .095321658 .20629883 .07278951 .23632813 .061523439 .27148438 .061523439 .3138021 .061523439 .34960938 .077448528 .37890626 .109298709 .40820313 .14115906 .42285157 .18341573 .42285157 .23606873 .42285157 .28612773 .4087728 .32562257 .38061524 .35455323 .35245768 .3834839 .31559245 .39794923 .27001954 .39794923 .24169922 .39794923 .21614583 .39156596 .19335938 .37879945 .17057292 .36603294 .15266927 .34946696 .13964844 .32910157L.057128908 .33984376 .12646485 .70703127H.48242188V.62402346H.19677735L.15820313 .43115235C.20117188 .46077476 .24625652 .47558595 .29345704 .47558595 .35595704 .47558595 .4086914 .45391337 .45166017 .41056825 .4946289 .36723329 .5161133 .31151835 .5161133 .24342346 .5161133 .17857361 .49723307 .122528079 .45947267 .075286868 .41357423 .017283122 .35091148-.01171875 .27148438-.01171875 .2063802-.01171875 .15323894 .006556193 .11206055 .04310608 .070882167 .07965597 .04736328 .1281128 .041503908 .18847656Z"/>
+<clipPath id="clip_11">
+<path transform="matrix(.99998757,0,0,-1.0000004,547.9564,439.3096)" d="M0 0H10.8766V22.1343H0Z"/>
+</clipPath>
+<path id="font_6_25" d="M.4975586 .5400543 .41015626 .5332031C.40234376 .5675557 .39127604 .59251406 .37695313 .608078 .3531901 .6330312 .32389323 .6455078 .2890625 .6455078 .26106773 .6455078 .23649089 .637736 .21533203 .6221924 .18766277 .602122 .16585286 .57282 .14990235 .5342865 .13395183 .49575297 .12565105 .4408671 .125 .3696289 .14615886 .40185548 .17203777 .42578126 .20263672 .44140626 .23323567 .45703126 .26529948 .46484376 .29882813 .46484376 .35742188 .46484376 .40730796 .44327799 .44848634 .40014649 .4896647 .35701499 .5102539 .30126954 .5102539 .23291016 .5102539 .18798828 .50056967 .14624024 .48120118 .107666019 .46183268 .0690918 .43522135 .03955078 .4013672 .019042969 .36751304-.0014648438 .32910157-.01171875 .2861328-.01171875 .21289063-.01171875 .15315755 .015197754 .106933597 .06903076 .060709638 .12287394 .037597658 .2116038 .037597658 .33522035 .037597658 .47347514 .06315104 .57399496 .11425781 .6367798 .15885417 .6914266 .21891277 .71875 .2944336 .71875 .3507487 .71875 .39689128 .70292159 .43286134 .67126467 .4688314 .6396077 .49039714 .595871 .4975586 .5400543M.13867188 .23287964C.13867188 .20269776 .1451009 .17381287 .15795899 .14622498 .17081706 .118637088 .18880208 .09762064 .21191406 .08317566 .23502605 .068740848 .25927735 .061523439 .28466798 .061523439 .32177735 .061523439 .35367839 .07645162 .3803711 .10630798 .4070638 .13616435 .42041017 .17673238 .42041017 .22801209 .42041017 .27734886 .40722657 .31621299 .38085938 .3446045 .3544922 .3730062 .32128907 .38720704 .28125 .38720704 .24153646 .38720704 .20784505 .3730062 .18017578 .3446045 .15250652 .31621299 .13867188 .27897135 .13867188 .23287964Z"/>
+<clipPath id="clip_12">
+<path transform="matrix(1,0,0,-1,281.5,183)" d="M0 0H11V22.5H0Z"/>
+</clipPath>
+<path id="font_6_26" d="M.04736328 .6225586V.70703127H.5107422V.6386719C.46516929 .5901286 .42000328 .5256246 .37524415 .4451599 .33048503 .36469523 .29589845 .2819519 .27148438 .19692993 .25390626 .13698323 .24267578 .07133993 .23779297 0H.14746094C.1484375 .056355794 .1595052 .12444051 .18066406 .20425415 .20182292 .28407798 .23217774 .3610433 .27172853 .43515016 .3112793 .50926718 .35335288 .57173666 .39794923 .6225586H.04736328Z"/>
+<clipPath id="clip_13">
+<path transform="matrix(1.0000007,0,0,-1.0000004,412.5612,182.70182)" d="M0 0H11.2517V22.1343H0Z"/>
+</clipPath>
+<path id="font_6_27" d="M.17675781 .38916017C.14029949 .40246583 .11328125 .42145286 .095703128 .44612123 .078125 .47078959 .06933594 .5003255 .06933594 .534729 .06933594 .5866597 .08805338 .63031008 .12548828 .66567996 .16292317 .70106 .21272786 .71875 .27490235 .71875 .33740235 .71875 .3876953 .7006531 .42578126 .6644592 .4638672 .6282756 .48291017 .5842183 .48291017 .5322876 .48291017 .4991862 .47420249 .4703827 .4567871 .44587709 .43937174 .42137147 .4129232 .40246583 .3774414 .38916017 .42138673 .3748169 .45483399 .3516744 .4777832 .31973268 .5007324 .28780113 .51220706 .24966939 .51220706 .20533753 .51220706 .1440684 .4905599 .09257507 .44726563 .050857545 .40397135 .009140015 .34700523-.01171875 .2763672-.01171875 .20572917-.01171875 .14876302 .009221395 .10546875 .051101686 .06217448 .09298197 .040527345 .14521282 .040527345 .20779419 .040527345 .25439454 .052327474 .29342143 .075927738 .32487489 .09952799 .35632835 .13313802 .37775675 .17675781 .38916017M.15917969 .53707888C.15917969 .5035197 .17008464 .47608949 .19189453 .4547882 .21370442 .4334971 .24202474 .42285157 .27685548 .42285157 .31070964 .42285157 .3384603 .4334208 .36010743 .45455934 .38175456 .47569786 .39257813 .501592 .39257813 .5322418 .39257813 .5641937 .38142906 .5910594 .35913087 .61283877 .33683268 .6346181 .30908204 .6455078 .2758789 .6455078 .24235027 .6455078 .21451824 .6348572 .19238281 .6135559 .17024739 .59226486 .15917969 .56677249 .15917969 .53707888M.13085938 .20776367C.13085938 .18273926 .13680013 .15852864 .14868164 .13513184 .16056316 .11173502 .17822266 .09361776 .20166016 .08078003 .22509766 .0679423 .25032554 .061523439 .27734376 .061523439 .31933595 .061523439 .3540039 .07500712 .38134767 .10197449 .4086914 .12895203 .42236329 .16323853 .42236329 .20483399 .42236329 .24708049 .40828453 .28201295 .38012696 .30963136 .3519694 .33725993 .31673179 .35107423 .27441407 .35107423 .23307292 .35107423 .19881185 .3374227 .17163086 .31011964 .14444988 .28282676 .13085938 .24870809 .13085938 .20776367Z"/>
+<clipPath id="clip_14">
+<path transform="matrix(.99999877,0,0,-1.0000004,565.959,193.2062)" d="M0 0H10.8766V22.1343H0Z"/>
+</clipPath>
+<path id="font_6_28" d="M.0546875 .16694641 .13916016 .17480469C.14632161 .13509114 .15999349 .106282558 .18017578 .088378909 .20035808 .07047526 .22623699 .061523439 .2578125 .061523439 .28483073 .061523439 .30851237 .067708339 .32885743 .080078128 .34920249 .092447917 .3658854 .1089681 .37890626 .12963867 .3919271 .15030925 .40283204 .17822266 .4116211 .2133789 .42041017 .24853516 .4248047 .28434245 .4248047 .32080079 .4248047 .32470704 .42464195 .3305664 .4243164 .3383789 .40673829 .31038413 .3827311 .28767906 .35229493 .27026368 .32185874 .2528483 .28889976 .24414063 .25341798 .24414063 .19417317 .24414063 .14404297 .26555888 .103027347 .3083954 .06201172 .3512319 .041503908 .40769959 .041503908 .47779847 .041503908 .55016586 .0629069 .6084137 .10571289 .6525421 .14851888 .6966807 .20214844 .71875 .26660157 .71875 .31315104 .71875 .3557129 .70622256 .3942871 .6811676 .43286134 .65612289 .4621582 .62042239 .48217774 .57406619 .50219729 .52770999 .51220706 .46061708 .51220706 .37278749 .51220706 .28137718 .5022786 .20858765 .48242188 .15441895 .4625651 .100260417 .43302409 .05903117 .39379884 .030731202 .35457359 .0024312337 .30859376-.01171875 .25585938-.01171875 .1998698-.01171875 .15413411 .00390625 .118652347 .03515625 .08317057 .06640625 .061848958 .1103363 .0546875 .16694641M.41455079 .48194886C.41455079 .5320994 .40112306 .57189437 .37426759 .6013336 .3474121 .6307831 .31510417 .6455078 .27734376 .6455078 .23828125 .6455078 .20426433 .62965396 .17529297 .59794619 .14632161 .5662384 .13183594 .5251465 .13183594 .4746704 .13183594 .42936198 .14558919 .3925527 .1730957 .36424256 .20060222 .3359324 .23453777 .32177735 .27490235 .32177735 .31559245 .32177735 .3490397 .3359324 .37524415 .36424256 .40144859 .3925527 .41455079 .43178813 .41455079 .48194886Z"/>
+<clipPath id="clip_15">
+<path transform="matrix(1,0,0,-1,654,160)" d="M0 0H22V22H0Z"/>
+</clipPath>
+<path id="font_6_19" d="M.041503908 .35327149C.041503908 .43784587 .05021159 .50591537 .06762695 .55747988 .08504232 .6090444 .11092123 .6488139 .14526367 .67678835 .17960613 .70476278 .22281902 .71875 .27490235 .71875 .3133138 .71875 .34700523 .711024 .37597657 .6955719 .4049479 .6801198 .4288737 .6578369 .4477539 .62872317 .46663413 .5996094 .4814453 .56414797 .4921875 .52233889 .5029297 .48053996 .5083008 .42418418 .5083008 .35327149 .5083008 .26934815 .49967448 .2016042 .48242188 .15003968 .46516929 .098475139 .43937174 .058624269 .4050293 .03048706 .37068687 .0023498536 .3273112-.01171875 .27490235-.01171875 .20589192-.01171875 .1516927 .013005574 .11230469 .062454225 .065104167 .12198385 .041503908 .21892293 .041503908 .35327149M.13183594 .35351563C.13183594 .23639934 .14558919 .15845235 .1730957 .11967468 .20060222 .08090719 .23453777 .061523439 .27490235 .061523439 .31526695 .061523439 .34920249 .08098856 .37670899 .11991882 .40421549 .15884908 .41796876 .23671468 .41796876 .35351563 .41796876 .47095744 .40421549 .5489807 .37670899 .58758547 .34920249 .6262004 .3149414 .6455078 .27392579 .6455078 .2335612 .6455078 .20133464 .62847396 .1772461 .5944061 .14697266 .5509288 .13183594 .47063194 .13183594 .35351563Z"/>
+</defs>
+<g clip-path="url(#clip_1)">
+<g inkscape:groupmode="layer" inkscape:label="0">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M6373 4808V138H604V4808H6373"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M1857 138V1746H1886V138"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2985 138V1746"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4084 1746V138"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5183 138V1746"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M6281 1746V138"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M1857 1746H6373V1819H1857V1746"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="BASE">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5183 1746H6281V422H5183V1746"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5279 1642H5295V1412H5279V1642"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="0">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5183 422H6281V138H5183V422"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="BASE">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5409 1832H5458"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5430 2170V1843 1841H5432V1839H5434 5436L5438 1837 5440 1839H5442L5448 1841H5452 5458"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5483 2147V2153"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5487 2170V1843 1841H5485V1839H5483 5481L5479 1837 5477 1839H5475L5469 1841H5465 5458"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5458 1832H5508"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5510 1828V1830H5508V1832H5458 5409V1830H5407V1828 1819H5510V1828"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5508 2018V2020 2022 2024L5506 2028V2030L5504 2032V2034H5502L5499 2036 5497 2038 5495 2040 5493 2042 5491 2044 5489 2048 5487 2051V1976H5508V2018"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5430 2051 5427 2048 5425 2044 5423 2042 5421 2040 5419 2038 5417 2036 5415 2034H5413V2032L5411 2030V2028L5409 2024V2022 2020 2018 1976H5430V2051"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5485 2178H5483L5481 2180 5479 2182 5477 2184 5475 2186H5471L5469 2188H5465 5462 5458 5454 5452 5448L5446 2186H5442L5440 2184 5438 2182 5436 2180 5434 2178H5432L5430 2174V2172 2170 2155H5432L5434 2158H5436L5440 2160H5444L5448 2162H5454 5458 5462 5469L5473 2160H5477L5481 2158H5483L5485 2155H5487V2170 2172 2174L5485 2178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5483 2155 5481 2158H5479 5477L5475 2160H5473 5469 5467 5465 5460 5458 5456 5452 5450 5448 5444 5442L5440 2158H5438 5436L5434 2155V2153 2147H5436V2141H5438L5440 2143H5442 5444 5446 5448 5450L5452 2145H5456 5458 5460 5465L5467 2143H5469 5471 5473 5475 5477L5479 2141H5481V2147H5483V2153 2155"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5487 2151H5485L5483 2149V2147 2145 2143H5481V2135H5479L5477 2133H5473L5469 2131H5465 5460 5458 5456 5452 5448L5444 2133H5440L5438 2135H5436V2143H5434V2145 2147 2149L5432 2151H5430V1970H5415V1832H5458 5502V1970H5487V2151"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="DISHWASHER">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5135 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5135 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5135 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5135 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5112 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5135 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5135 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M5112 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5118 1205H5117"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1166V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1201 5112 1200"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1200V1199"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5116 1204H5115"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1199V1198"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5114 1203 5113 1202"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1202V1201"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1163V1165"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1198V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5117 1205 5116 1204"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5115 1204 5114 1203"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5120 1205H5118"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1206 5120 1205"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5129 1158H5130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1163V1165"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1200V1199"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1198V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5130 1158 5131 1159"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1162 5135 1163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5132 1160H5133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1165V1166"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1166V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5131 1159 5132 1160"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5127 1158H5129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5126 1158H5127"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1161V1162"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5133 1160 5134 1161"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1130V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1126 5090 1125"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5085 1130 5087 1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4189 1130 4188 1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1129V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1130H4189"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1130H5085"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1127V1126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4186 1127 4185 1126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4185 1126V1125"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1130V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4192 1130H4191"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4363 1119H4433"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4436 1119H4506"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4510 1119H4580"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 1119H4695"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4699 1119H4769"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4772 1119H4842"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4846 1119H4916"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4186 1122 4185 1123"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4185 1123V1125"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5087 1120 5088 1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5085 1119 5087 1120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1119H5085"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4189 1119 4188 1120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1119H4189"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1122V1123"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1123 5090 1125"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4989 811H4988"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4987 810 4986 811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1176V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1119V1084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1063V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 1176V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 1104V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 813V812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 814V813"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 812 4989 811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4985 811H4984"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4984 811V812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4984 812 4983 813"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4986 811H4985"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 813V814"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 814V815"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 815V814"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4989 811V811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4639 811H4638"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4637 810 4636 811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 816V815"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 1176V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 1119V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4638 811 4637 810"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 813V812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 814V813"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 812 4640 811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4636 811H4635"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4635 811 4634 812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 812V813"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4636 811V811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 1176V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 813V814"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 814V815"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 815V816"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4640 811H4639"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1176V1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1180 5090 1182"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5085 1176 5087 1177"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4189 1176 4188 1177"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1176H4189"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1176H5085"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1179V1180"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4186 1179 4185 1180"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4185 1180V1182"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1176V1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4186 1184 4185 1183"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4188 1186H4187"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4185 1183V1182"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5087 1186H5088"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5085 1187 5087 1186"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1187H5085"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1186V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4189 1187 4188 1186"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1187H4189"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1184V1183"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5089 1183 5090 1182"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4236 850 4241 837"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1178V1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4188 1120 4236 850"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4194 1176V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5014 818 5025 826"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5033 837 5039 850"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5025 826 5033 837"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4261 818 4274 812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5001 812 5014 818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5039 850 5087 1120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5080 1130V1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1129V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4241 837 4250 826"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4250 826 4261 818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1162 5112 1163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5117 1158 5116 1159"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1161V1162"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5120 1158H5118"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1158H5120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5116 1159 5115 1160"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1206H5126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5118 1158H5117"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5115 1160H5114"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1165V1166"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5114 1160 5113 1161"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1158H5126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5131 1204H5132"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5127 1205H5129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5129 1205H5130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5132 1204 5133 1203"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1202V1201"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1201 5135 1200"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5133 1203 5134 1202"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5126 1206 5127 1205"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1199V1198"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5130 1205 5131 1204"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1162 4140 1163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4146 1205H4145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1166V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4145 1158 4144 1159"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1201 4140 1200"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1200V1199"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1161V1162"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4144 1204H4143"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1199 4139 1198"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4142 1203 4141 1202"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1202V1201"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4147 1158H4146"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1158H4147"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1163V1165"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4144 1159 4143 1160"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1206H4154"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1198V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4145 1205 4144 1204"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4146 1158H4145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4143 1204 4142 1203"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4147 1205H4146"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4143 1160H4142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1206 4147 1205"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1165 4139 1166"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4142 1160 4141 1161"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1158H4154"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4156 1158H4158"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4159 1204H4160"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4155 1205H4156"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4156 1205H4158"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1163V1165"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1200V1199"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4160 1204 4161 1203"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1202 4162 1201"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4162 1201 4163 1200"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1198V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4158 1158 4159 1159"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4162 1162 4163 1163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4160 1160H4161"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1165V1166"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1166V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4159 1159 4160 1160"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4155 1158H4156"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1196V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4154 1158H4155"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1203V1202"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4154 1206 4155 1205"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1161 4162 1162"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1199V1198"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1160V1161"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4158 1205 4159 1204"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4290 811H4289"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 1176V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 1119V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1176V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1119V1105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1084V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4289 811 4288 810"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 813 4291 812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 814V813"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4291 812V811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4286 811V811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4286 811 4285 812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4285 812V813"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4287 811H4286"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4285 813 4284 814"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 814 4285 815"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 815V814"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4291 811H4290"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1105 5112 1106"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5118 1148H5117"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1109V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5117 1101 5116 1102"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1144 5112 1143"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1143V1142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1104V1105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5116 1147H5115"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1142V1141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5114 1146 5113 1145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5113 1145V1144"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5120 1101H5118"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1101H5120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1106V1108"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5116 1102 5115 1103"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1149H5126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1141V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5117 1148 5116 1147"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5118 1101H5117"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5115 1147 5114 1146"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5120 1149 5118 1148"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5115 1103H5114"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1149H5120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1108V1109"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5114 1103 5113 1104"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1101H5126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5129 1101H5130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5131 1147H5132"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5127 1149 5129 1148"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5129 1148H5130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1106V1108"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1143V1142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5132 1147 5133 1146"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1145V1144"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1144 5135 1143"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1141V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5130 1101 5131 1102"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1105 5135 1106"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5132 1103H5133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1108V1109"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1109V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5131 1102 5132 1103"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5127 1101H5129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5126 1101H5127"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5133 1146 5134 1145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5126 1149H5127"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5134 1104V1105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1142V1141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5133 1103 5134 1104"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5130 1148 5131 1147"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4146 1148H4145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1109V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1144 4140 1143"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1143V1142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4144 1147H4143"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1142 4139 1141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4142 1146 4141 1145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1145V1144"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1106V1108"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1141V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4145 1148 4144 1147"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4143 1147 4142 1146"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4147 1149 4146 1148"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1149H4147"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1101H4154"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4156 1101H4158"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1106V1108"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1143V1142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1141V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4158 1101 4159 1102"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4162 1105 4163 1106"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4160 1103H4161"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1108V1109"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1109V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4159 1102 4160 1103"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4155 1101H4156"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1110V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4154 1101H4155"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1104 4162 1105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1103V1104"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1105 4140 1106"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4145 1101 4144 1102"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4141 1104V1105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4147 1101H4146"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1101H4147"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4144 1102 4143 1103"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1149H4154"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4146 1101H4145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4143 1103H4142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4140 1108 4139 1109"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4142 1103 4141 1104"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4159 1147H4160"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4155 1149 4156 1148"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4156 1148H4158"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4160 1147 4161 1146"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1145 4162 1144"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4162 1144 4163 1143"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4161 1146V1145"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4154 1149H4155"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1142V1141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4158 1148 4159 1147"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4999 819 5010 824"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4255 831 4265 824"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5010 824 5020 831"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4265 824 4276 819"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4248 841 4255 831"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 818V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5020 831 5027 841"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4406 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4872 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4868 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4916 1119 4869 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4410 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4363 1119 4410 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4259 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4725 854H4795"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5019 854H5032"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4872 854H4942"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4799 854H4869"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4557 854H4627"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4483 854H4553"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4410 854H4480"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4336 854H4406"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4243 854H4259"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 849V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4333 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5019 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4336 854H4337"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4721 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5016 854H5015"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4946 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4725 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4216 1119 4263 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4842 1119 4795 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4795 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4942 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5063 1119 5016 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4263 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4769 1119 4721 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4483 854H4484"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4436 1119 4483 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4480 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4799 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4510 1119 4557 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4557 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4553 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4695 1119 4648 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4648 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4652 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4627 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4631 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4583 1119 4631 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 854H4648"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4652 854H4721"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5106 1130 5105 1131"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5138 1123V1124"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1129 5135 1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1128V1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1127V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1126V1127"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5137 1125 5136 1126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5138 1124 5137 1125"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5139 1122 5138 1123"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5140 1122H5139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5141 1121 5140 1122"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5142 1121H5141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5143 1121H5142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5143 1121V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5143 1185H5142"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5142 1185H5141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5141 1185H5140"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5140 1185 5139 1184"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5139 1184 5138 1183"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5138 1183V1183"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5138 1183 5137 1182"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5137 1182 5136 1181"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1181V1180"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1180V1179"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1179V1177"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1177 5135 1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1172 5111 1173"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5111 1173V1174"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5111 1174 5110 1175"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5110 1175 5109 1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5109 1176H5108"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5108 1176H5107"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5107 1176H5106"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5106 1176H5105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5105 1176 5104 1175"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5104 1175 5103 1174"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5103 1174V1173"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5103 1173 5102 1172"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5102 1172V1135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5103 1134 5102 1135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5103 1133V1134"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5104 1132 5103 1133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5105 1131 5104 1132"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5107 1130H5106"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5108 1130H5107"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5109 1131 5108 1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5110 1132 5109 1131"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5111 1133 5110 1132"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5111 1134V1133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1135 5111 1134"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4167 1176H4168"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4170 1176 4171 1175"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4136 1183H4137"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4137 1183 4138 1182"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4133 1185H4134"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1135V1134"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1134 4164 1133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4164 1133 4165 1132"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4165 1132 4166 1131"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4166 1131 4167 1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4167 1130H4168"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4168 1130H4169"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4169 1130 4170 1131"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4170 1131 4171 1132"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4171 1132 4172 1133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4172 1133V1134"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4172 1134V1135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4172 1172V1135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4172 1173V1172"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4172 1174V1173"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4171 1175 4172 1174"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4169 1176H4170"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4168 1176H4169"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4166 1176H4167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4165 1175 4166 1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4164 1174 4165 1175"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1173 4164 1174"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1172V1173"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1177V1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1179V1177"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1180V1179"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4138 1181 4139 1180"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4138 1182V1181"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4136 1184V1183"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4135 1185 4136 1184"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4134 1185H4135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4132 1185H4133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4132 1121H4133"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4133 1121H4134"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4134 1121 4135 1122"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4135 1122H4136"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4136 1122V1123"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4136 1123 4137 1124"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4137 1124 4138 1125"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4138 1125V1126"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4138 1126 4139 1127"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1127V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1128V1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1129V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1185H5088"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1178H5088"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1177 5135 1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1128H5088"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121H5088"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1128H4163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1130V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5087 1129H5088"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1129V1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1129V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1128 5089 1127"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1129V1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1128 4186 1127"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1130V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4195 1130H4194"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4194 1130H4192"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1119H4359"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4919 1119H4983"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4188 1120V1120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4188 1120 4187 1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1121 4186 1122"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5087 1120V1120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1121 5089 1122"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1130H4290"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4286 1130H4284"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 1130H4989"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 1130H4639"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4635 1130H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4988 811 4987 810"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4987 810V810"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1185H4163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1178H4163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1121H4163"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 1119V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1176V1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 1176H4983"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1178 5089 1179"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4194 1176V1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4194 1176H4195"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1178 4186 1179"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1176V1176"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4188 1177 4187 1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1185 4186 1184"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1186V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1185 5089 1184"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4288 810V810"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4274 812 4287 811"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4287 811 4288 810"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4988 811 5001 812"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1178V1177"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5136 1129 5135 1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1128V1129"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4196 1119 4243 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4243 854V852"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4243 852 4245 849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4245 849 4248 841"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4276 819 4284 818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 818H4285"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 818V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 818 4999 819"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5027 841 5030 849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5030 849 5032 852"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 818V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 818H4983"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 818V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5032 852V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5032 854 5079 1119"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4946 854H4983"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 854H5016"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4263 854H4284"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 854H4285"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 854H4333"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4245 849H4284"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 849H4285"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 849V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 849H4983"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 849V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 849V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 849H5030"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1085V1084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1105V1105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1105 4336 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1085V1084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1084 4942 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4993 1119 4990 1104"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 1104V1104"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1064V1063"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4631 854H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 854V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1141V1149"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1166V1158"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5127 1158H5135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1158V1166"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4147 1149H4139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1158H4155"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4147 1158H4139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4985 1130H4983"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1130H4641"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 1119V1104"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4288 810H4637"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1105V1084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1121V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 818H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 818V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 849H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 849V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1149H5120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1167V1166"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1149V1141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1158V1166"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4132 1199V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4132 1185V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1084V1063"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4637 810H4987"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5127 1149H5135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1149H4155"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1141V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1166V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1166V1158"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1178V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4363 1119H4359"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1158H5120"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1139V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1167V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1149V1141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1141V1149"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4699 1119H4695"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4436 1119H4433"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4510 1119H4506"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4846 1119H4842"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4772 1119H4769"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4583 1119H4580"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4919 1119H4916"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4993 1119H4990"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1178V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1178V1172"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1185V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1167V1172"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1185V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1176V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1128V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1128V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4187 1129H4188"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1130H5080"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 1130H5080"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5063 1119H5067"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 1119H4216"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1119H4284"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 1119H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1119H4990"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5067 1119H5079"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4993 1119H5063"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4583 1119H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4212 1119H4196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4216 1119H4212"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5079 1119H5084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4196 1119H4191"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 1130H4195"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1130H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 849V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 849V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 818V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 814V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 814V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 849V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1185V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 849V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 849V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 814V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 814V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 849V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 818V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5088 1178 5087 1177"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 1176H4286"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 1176H4290"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4635 1176H4634"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4641 1176H4639"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4983 1176H4985"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4990 1176H4989"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5080 1176H4990"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4191 1176H4194"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 1176H4195"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5080 1176H5084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5084 1187H4191"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4634 1176H4292"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1178V1185"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1158V1206"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5126 1158V1206"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1185V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1176V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1158V1206"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1196"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1172V1167"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1178V1172"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1185V1178"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4154 1158V1206"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 849V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 849V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 818V849"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 814V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4284 814V818"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4292 849V854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1139V1135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1128V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1135V1128"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5112 1121V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5121 1101V1149"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1121V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5135 1139V1130"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5126 1101V1149"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1130V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4139 1121V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1135V1139"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1135"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1121V1110"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4149 1101V1149"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4163 1128V1121"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4154 1101V1149"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4359 1119 4406 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4919 1119 4872 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4946 854 4983 1063"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4259 854 4212 1119"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4333 854 4292 1084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4799 854 4846 1119"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4725 854 4772 1119"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5067 1119 5019 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4433 1119 4480 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4506 1119 4553 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4699 1119 4652 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4580 1119 4627 854"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M4543 636H4744V452H4543V636"/>
+</g>
+</g>
+<g clip-path="url(#clip_2)">
+<g inkscape:groupmode="layer" inkscape:label="DISHWASHER">
+<use data-text="G" xlink:href="#font_3_42" transform="matrix(12.28068,0,0,-12.28068,548.04,534.4)"/>
+<use data-text="S" xlink:href="#font_3_54" transform="matrix(12.28068,0,0,-12.28068,557.59439,534.4)"/>
+</g>
+</g>
+<g clip-path="url(#clip_4)">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4084 1746H5183V422H4084V1746"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4084 422H5183V138H4084V422"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4450 1557H4816V1539H4450V1557"/>
+<g inkscape:groupmode="layer" inkscape:label="BOTTOM - 600_3">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M1886 1746H2985V422H1886V1746"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M1886 1452H2985"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M1886 422H2985V138H1886V422"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2321 1607H2551V1590H2321V1607"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2852 1375H2869V1145H2852V1375"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="BASE">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2985 1746H4084V422H2985V1746"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2985 422H4084V138H2985V422"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M3112 1381H3967V1341H3112V1381"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M3800 1630H3858V1572H3800V1630"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M3920 1630H3978V1572H3920V1630"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M3150 1271H3927V865H3150V1271"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M3411 609H3641V593H3411V609"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2985 1469H4084"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2985 683H4084"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="TOP  - 600_4">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2984 4105H1885V2781H2984V4105"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="ASPIRATOR">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3279 2625V2471"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3326 2625 3386 2471"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3233 2625 3172 2471"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3836 2625V2471"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3882 2625 3943 2471"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3789 2625 3729 2471"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2984 4105H4083V2781H2984V4105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2984 2781H4083V2689H2984V2781"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="TOP - 600_5">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5181 4105H4083V2781H5181V4105"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M6280 4105H5181V2781H6280V4105"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="0">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M6280 4105H6373"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M6280 2781H6373"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="REFRIGERATOR">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M808 165V3434"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M808 165H1826V3434"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M1826 1512H808"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M1826 1493H808"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M991 1493 1045 1460H1590L1644 1493"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M955 165V138H991V165"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M1680 165V138H1643V165"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M808 3434H1826"/>
+</g>
+<g inkscape:groupmode="layer" inkscape:label="BOTTOM - 600_3">
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M2841 3141H2858V2911H2841V3141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M3927 3141H3944V2911H3927V3141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4175 3141H4191V2911H4175V3141"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5273 3141H5290V2911H5273V3141"/>
+</g>
+</g>
+<g clip-path="url(#clip_5)">
+<use data-text="1" xlink:href="#font_6_20" transform="matrix(19.999798,0,0,-20.000008,401.48844,408.26393)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_7)">
+<use data-text="2" xlink:href="#font_6_21" transform="matrix(19.999976,0,0,-20.000008,483.28703,371.4985)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_8)">
+<use data-text="3" xlink:href="#font_6_22" transform="matrix(19.999976,0,0,-19.999993,694.16226,442.77839)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_9)">
+<use data-text="4" xlink:href="#font_6_23" transform="matrix(19.999989,0,0,-20.00001,160.59534,304.72047)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_10)">
+<use data-text="5" xlink:href="#font_6_24" transform="matrix(19.999978,0,0,-19.999989,270.1604,457.7847)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_11)">
+<use data-text="6" xlink:href="#font_6_25" transform="matrix(19.99975,0,0,-20.000008,547.8254,435.2753)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_12)">
+<use data-text="7" xlink:href="#font_6_26" transform="matrix(20,0,0,-20,281.4171,178.66748)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_13)">
+<use data-text="8" xlink:href="#font_6_27" transform="matrix(20.000016,0,0,-20.000008,412.74504,178.66753)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_14)">
+<use data-text="9" xlink:href="#font_6_28" transform="matrix(19.999976,0,0,-20.000008,565.83596,189.17189)" fill="#ffffff"/>
+</g>
+<g clip-path="url(#clip_15)">
+<use data-text="1" xlink:href="#font_6_20" transform="matrix(20,0,0,-20,653.6381,156.15802)" fill="#ffffff"/>
+<use data-text="0" xlink:href="#font_6_19" transform="matrix(20,0,0,-20,664.7581,156.15802)" fill="#ffffff"/>
+</g>
+</svg>
