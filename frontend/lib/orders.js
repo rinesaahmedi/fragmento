@@ -246,6 +246,8 @@ export function buildOrderForNotifications(orderRecord) {
       productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
       blendeCode: catalogBlende?.code || item.kitchenItem?.blendeCode || item.blendeCode || "",
       blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+      blendeName: catalogBlende?.name || item.blendeName || "",
+      blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
       blendePrice: catalogBlende?.price != null
         ? Number(catalogBlende.price)
         : item.kitchenItem?.blendePrice != null
@@ -390,6 +392,7 @@ function buildConfirmedBaselineSelectionItem(item) {
   const kitchenItem = item?.kitchenItem || {};
   const catalogArticle = kitchenItem.catalogArticleId ? kitchenItem.catalogArticle : null;
   const catalogService = kitchenItem.catalogServiceId ? kitchenItem.catalogService : null;
+  const catalogBlende = kitchenItem.catalogBlendeId ? kitchenItem.catalogBlende : null;
 
   return {
     ...kitchenItem,
@@ -400,6 +403,10 @@ function buildConfirmedBaselineSelectionItem(item) {
     name: item.nameSnapshot || kitchenItem.name || catalogArticle?.name || catalogService?.name || item.code,
     nameDe: catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || item.nameDe || "",
     articleNumber: catalogArticle?.articleNumber || kitchenItem.articleNumber || item.articleNumber || "",
+    blendeCode: catalogBlende?.code || kitchenItem.blendeCode || item.blendeCode || "",
+    blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || kitchenItem.blendeLabel || item.blendeLabel || "",
+    blendeName: catalogBlende?.name || item.blendeName || "",
+    blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
     price: Number(item.priceSnapshot || 0),
     priceSnapshot: Number(item.priceSnapshot || 0),
     quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
