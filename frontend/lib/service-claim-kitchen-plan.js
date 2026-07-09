@@ -1,5 +1,6 @@
 import { KitchenStatus } from "@prisma/client";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "./catalog.js";
+import { getContractOrderState } from "./kitchen-contracts.js";
 import { loadKitchenSvgMarkup } from "./load-kitchen-svg.js";
 import { prisma } from "./prisma.js";
 import { buildServiceClaimSelectableComponents } from "./service-claim-kitchen-plan-selection.js";
@@ -37,10 +38,12 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
 
     const kitchenConfig = serializeKitchenForLegacy(kitchen);
     const svgMarkup = await loadKitchenSvgMarkup(slug);
+    const contractOrderState = await getContractOrderState(contract.id);
     const selectable = buildServiceClaimSelectableComponents({
       kitchen,
       kitchenConfig,
       kitchenSlug: slug,
+      confirmedItems: contractOrderState.confirmedItems,
     });
 
     return {

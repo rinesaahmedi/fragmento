@@ -128,8 +128,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   );
   const croppedPlanAspectRatio =
     `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
-  const imageHotspots = useMemo(() => {
-    const selectable = new Set(selectableComponentIds || []);
+  const croppedImageHotspots = useMemo(() => {
     return sourceImageHotspots
       .map((hotspot) => cropPlanHotspot(hotspot, planDisplayCrop))
       .map((hotspot) => {
@@ -137,9 +136,16 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
           ...hotspot,
           componentId: componentIdForKey(hotspot.componentKey),
         };
-      })
-      .filter((hotspot) => hotspot && selectable.has(hotspot.componentId));
-  }, [planDisplayCrop, selectableComponentIds, selectableKey, sourceImageHotspots]);
+      });
+  }, [planDisplayCrop, sourceImageHotspots]);
+  const imageHotspots = useMemo(() => {
+    const selectable = new Set(selectableComponentIds || []);
+    return croppedImageHotspots.filter((hotspot) => hotspot && selectable.has(hotspot.componentId));
+  }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
+  const hiddenImageHotspots = useMemo(() => {
+    const selectable = new Set(selectableComponentIds || []);
+    return croppedImageHotspots.filter((hotspot) => hotspot && !selectable.has(hotspot.componentId));
+  }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
   const shouldUseImagePlan = Boolean(imageViewHref && imageHotspots.length);
 
   useEffect(() => {
@@ -264,6 +270,21 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                 draggable={false}
               />
               <div className={styles.planHotspotLayer}>
+                {hiddenImageHotspots.map((hotspot) => (
+                  <div
+                    key={`hidden-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
+                    className={styles.planHiddenHotspot}
+                    style={{
+                      left: `${hotspot.left}%`,
+                      top: `${hotspot.top}%`,
+                      width: `${hotspot.width}%`,
+                      height: `${hotspot.height}%`,
+                      clipPath: hotspot.clipPath || undefined,
+                      WebkitClipPath: hotspot.clipPath || undefined,
+                    }}
+                    aria-hidden="true"
+                  />
+                ))}
                 {imageHotspots.map((hotspot) => {
                   const isSelected = selectedIds.has(hotspot.componentId);
                   const isHovered = getServiceClaimLinkedComponentIds(kitchenSlug, hotspot.componentId)

@@ -8,11 +8,12 @@ import { buildServiceClaimSelectableComponents } from "../lib/service-claim-kitc
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(__dirname, "..");
-const component = (code, componentKey, name = code) => ({
+const component = (code, componentKey, name = code, overrides = {}) => ({
   itemType: "COMPONENT",
   code,
   componentKey,
   name,
+  ...overrides,
 });
 
 test("service kitchen svg loader uses the AB 105808 plan asset", async () => {
@@ -38,9 +39,10 @@ test("AB 105808 service plan uses overlay bounds instead of color grouping", () 
   assert.match(source, /!\s*hasOverlayPlanBounds\(kitchenConfig\.kitchen\.slug\)/);
 });
 
-test("service claim kitchen plan keeps the full assigned kitchen selectable when orders exist", () => {
+test("service claim kitchen plan keeps only defaults and confirmed components selectable", () => {
   const kitchen = {
     items: [
+      component("CAB-BASE-DEFAULT", "base-module-0", "Default base", { isLocked: true }),
       component("CAB-BASE-ORDERED", "base-module-1", "Ordered base"),
       component("CAB-BASE-NOT-ORDERED", "base-module-2", "Not ordered base"),
     ],
@@ -54,15 +56,15 @@ test("service claim kitchen plan keeps the full assigned kitchen selectable when
     ],
   });
 
-  assert.deepEqual(result.selectableComponentIds, ["component-base-module-1", "component-base-module-2"]);
-  assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["CAB-BASE-ORDERED", "CAB-BASE-NOT-ORDERED"]);
+  assert.deepEqual(result.selectableComponentIds, ["component-base-module-0", "component-base-module-1"]);
+  assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["CAB-BASE-DEFAULT", "CAB-BASE-ORDERED"]);
   assert.equal(result.source, "kitchen");
 });
 
-test("service claim kitchen plan falls back to the assigned kitchen before any confirmed order", () => {
+test("service claim kitchen plan falls back to default components before any confirmed order", () => {
   const kitchen = {
     items: [
-      component("CAB-BASE-A", "base-module-1", "Base A"),
+      component("CAB-BASE-A", "base-module-1", "Base A", { isLocked: true }),
       component("CAB-BASE-B", "base-module-2", "Base B"),
       { itemType: "ACCESSORY", code: "ACC-1", componentKey: "ignored", name: "Accessory" },
     ],
@@ -74,8 +76,8 @@ test("service claim kitchen plan falls back to the assigned kitchen before any c
     confirmedItems: [],
   });
 
-  assert.deepEqual(result.selectableComponentIds, ["component-base-module-1", "component-base-module-2"]);
-  assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["CAB-BASE-A", "CAB-BASE-B"]);
+  assert.deepEqual(result.selectableComponentIds, ["component-base-module-1"]);
+  assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["CAB-BASE-A"]);
   assert.equal(result.source, "kitchen");
 });
 
@@ -90,6 +92,9 @@ test("AB 105805 service claim plan links extractor hood claims to the LED set", 
     kitchen,
     kitchenConfig: { components: kitchen.items },
     kitchenSlug: "ab-105805",
+    confirmedItems: [
+      { itemType: "COMPONENT", code: "CAB-HOOD-AB105806-600", nameSnapshot: "Upper Cabinet with Extractor Hood 60 cm" },
+    ],
   });
 
   assert.ok(result.selectableComponentIds.includes("component-extractor-hood"));
@@ -113,6 +118,8 @@ test("service claim picker toggles claim-linked hood and LED together", () => {
   assert.match(source, /getPlanDisplayCrop/);
   assert.match(source, /cropPlanHotspot/);
   assert.match(source, /croppedPlanAspectRatio/);
+  assert.match(source, /hiddenImageHotspots/);
+  assert.match(source, /styles\.planHiddenHotspot/);
   assert.match(source, /getServiceClaimLinkedComponentIds\(kitchenSlug,\s*hotspot\.componentId\)[\s\S]*\.includes\(hoveredComponentId\)/);
   assert.match(source, /styles\.planHotspotHover/);
   assert.match(source, /const isSelected = selectedIds\.has\(hotspot\.componentId\);/);

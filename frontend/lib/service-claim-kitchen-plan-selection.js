@@ -75,11 +75,43 @@ export function buildServiceClaimSelectableComponents({
   kitchen,
   kitchenConfig,
   kitchenSlug,
+  confirmedItems = [],
 }) {
   const componentMetaById = buildServiceClaimComponentMetaById(kitchen, kitchenConfig);
   const selectableIds = new Set();
   const selectableMetaIds = new Set();
   const selectableMeta = [];
+  const confirmedComponentCodes = new Set();
+  const confirmedKitchenItemIds = new Set();
+
+  for (const item of confirmedItems || []) {
+    if (item?.itemType !== ItemType.COMPONENT) {
+      continue;
+    }
+
+    const code = String(item.code || "").trim();
+    if (code) {
+      confirmedComponentCodes.add(code);
+    }
+    if (item.kitchenItemId) {
+      confirmedKitchenItemIds.add(item.kitchenItemId);
+    }
+    if (item.kitchenItem?.id) {
+      confirmedKitchenItemIds.add(item.kitchenItem.id);
+    }
+  }
+
+  function isDefaultOrConfirmedComponent(item) {
+    if (item?.itemType !== ItemType.COMPONENT) {
+      return false;
+    }
+    if (item.isLocked) {
+      return true;
+    }
+
+    const code = String(item.code || "").trim();
+    return (code && confirmedComponentCodes.has(code)) || confirmedKitchenItemIds.has(item.id);
+  }
 
   function addSelectableMeta(componentId, fallbackMeta = {}) {
     if (!componentId || selectableMetaIds.has(componentId)) {
@@ -122,7 +154,7 @@ export function buildServiceClaimSelectableComponents({
   }
 
   const sourceItems = (kitchen?.items || [])
-    .filter((item) => item.itemType === ItemType.COMPONENT)
+    .filter(isDefaultOrConfirmedComponent)
     .map((item) => ({
       item,
       fallbackMeta: {
