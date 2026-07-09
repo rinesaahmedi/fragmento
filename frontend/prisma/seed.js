@@ -11,6 +11,8 @@ const SERVICE_CLAIM_TROUBLESHOOTING_DATA = require("../lib/service-claim-trouble
 const prisma = new PrismaClient();
 
 const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
+const DISHWASHER_CATALOG_NAME_EN = "Fully integrated dishwasher incl. furniture front";
+const DISHWASHER_CATALOG_NAME_DE = "Vollintegrierter Geschirrspüler inkl. Möbelfront";
 const REFRIGERATOR_CATALOG_NAME_EN = "Freestanding refrigerator 181 cm";
 const REFRIGERATOR_CATALOG_NAME_DE = "Standkühlschrank 181 cm";
 const HOOD_WALL_CABINET_CATALOG_NAME_EN = "Flat screen extractor hood + cabinet + filter 60 cm";
@@ -2324,6 +2326,8 @@ async function main() {
       const cabinetWidthName = getCabinetWidthDisplayName(itemForName);
       const cabinetWidthNameDe = getCabinetWidthDisplayName(itemForName, "de");
       const itemCode = String(item.code || "").trim().toUpperCase();
+      const isDishwasherItem = itemCode.startsWith("DISH-")
+        || item.iconKey === "dishwasher_base";
       const isRefrigeratorItem = itemCode.startsWith("REF-")
         || itemCode === "LKNEW-REFRIGERATOR"
         || item.iconKey === "tall_refrigerator";
@@ -2337,6 +2341,8 @@ async function main() {
           ? DEFAULT_SINK_BASE_CATALOG_NAME_EN
           : isDefaultWorktopItem(item)
             ? DEFAULT_WORKTOP_CATALOG_NAME_EN
+            : isDishwasherItem
+              ? DISHWASHER_CATALOG_NAME_EN
             : isRefrigeratorItem
               ? REFRIGERATOR_CATALOG_NAME_EN
               : isHoodWallCabinetItem
@@ -2348,6 +2354,8 @@ async function main() {
           ? DEFAULT_SINK_BASE_CATALOG_NAME_DE
           : isDefaultWorktopItem(item)
             ? DEFAULT_WORKTOP_CATALOG_NAME_DE
+            : isDishwasherItem
+              ? DISHWASHER_CATALOG_NAME_DE
             : isRefrigeratorItem
               ? REFRIGERATOR_CATALOG_NAME_DE
               : isHoodWallCabinetItem
