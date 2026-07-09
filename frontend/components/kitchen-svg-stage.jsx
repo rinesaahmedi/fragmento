@@ -984,22 +984,26 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
   // 3509x2480 render (docs/detect-plan-hotspots.py) and overlay-verified. Wall + base columns
   // share dividers at 1.31/15.65/29.98/44.33/58.66/73.00/82.56% of width.
   "ab-105744": [
-    { componentKey: "wall-cabinet-1", left: 1.31, top: 19.8, width: 14.34, height: 24.45 },
+    { componentKey: "wall-cabinet-1", left: 0.85, top: 19.8, width: 14.8, height: 24.45 },
     { componentKey: "wall-cabinet-2", left: 15.65, top: 19.8, width: 14.33, height: 24.45 },
     { componentKey: "extractor-hood", left: 15.65, top: 44.25, width: 14.33, height: 7.77 },
     { componentKey: "wall-cabinet-3", left: 29.98, top: 19.8, width: 14.35, height: 24.45 },
     { componentKey: "wall-cabinet-4", left: 44.33, top: 19.8, width: 14.33, height: 24.45 },
     { componentKey: "wall-cabinet-5", left: 58.66, top: 19.8, width: 14.34, height: 24.45 },
     { componentKey: "wall-cabinet-6", left: 73.0, top: 19.8, width: 9.56, height: 24.45 },
-    { componentKey: "worktop", left: 1.31, top: 62.02, width: 81.25, height: 1.35 },
-    { componentKey: "sink-faucet", left: 48.5, top: 55.0, width: 2.5, height: 7.5 },
-    { componentKey: "base-module-1", left: 1.31, top: 63.35, width: 14.34, height: 29.71 },
+    { componentKey: "worktop", left: 0.85, top: 62.02, width: 81.71, height: 1.35 },
+    { componentKey: "sink-faucet", left: 46.5, top: 55.0, width: 2.5, height: 7.5 },
+    { componentKey: "base-module-1", left: 0.85, top: 63.35, width: 14.8, height: 29.71 },
     { componentKey: "oven-module", left: 15.65, top: 63.35, width: 14.33, height: 29.71 },
     { componentKey: "base-module-2", left: 29.98, top: 63.35, width: 14.35, height: 29.71 },
     { componentKey: "sink-base", left: 44.33, top: 63.35, width: 14.33, height: 29.71 },
     { componentKey: "base-module-3", left: 58.66, top: 63.35, width: 14.34, height: 29.71 },
     { componentKey: "drawer-module", left: 73.0, top: 63.35, width: 9.56, height: 29.71 },
-    { componentKey: "refrigerator", left: 82.56, top: 32.3, width: 13.93, height: 60.2 },
+    { componentKey: "worktop", left: 82.56, top: 62.02, width: 0.66, height: 31.04 },
+    {
+      componentKey: "refrigerator",
+      points: [[83.22, 32.19], [96.5, 32.19], [96.5, 93.08], [83.22, 93.08]],
+    },
   ],
 };
 
