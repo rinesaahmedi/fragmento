@@ -1542,6 +1542,8 @@ export default function useKitchenSvgStage({
 }) {
   const { translate, language } = usePublicI18n();
   const svgHostRef = useRef(null);
+  const planTraceImageRef = useRef(null);
+  const polygonTraceLayerRef = useRef(null);
   const has3dModel = kitchenSlug === "test-3d-kitchen";
   const normalizedKitchenSlug = String(kitchenSlug || "").trim().toLowerCase();
   const imageViewHref = IMAGE_VIEW_BY_SLUG[normalizedKitchenSlug] || "";
@@ -1646,7 +1648,38 @@ export default function useKitchenSvgStage({
         }
       : null;
   const [isCalibrating, setIsCalibrating] = useState(false);
+  const [isTracePolygonRequested, setIsTracePolygonRequested] = useState(false);
+  const [isTracingPolygon, setIsTracingPolygon] = useState(false);
+  const [polygonTracePoints, setPolygonTracePoints] = useState([]);
+  const [polygonTraceCursorPoint, setPolygonTraceCursorPoint] = useState(null);
   const [hoveredComponentId, setHoveredComponentId] = useState(null);
+  const canTracePolygon =
+    process.env.NODE_ENV === "development" &&
+    hasImageView &&
+    isTracePolygonRequested;
+  const formattedPolygonTracePoints = useMemo(
+    () =>
+      `points: [${polygonTracePoints
+        .map((point) => `[${point[0].toFixed(2)}, ${point[1].toFixed(2)}]`)
+        .join(", ")}]`,
+    [polygonTracePoints],
+  );
+  const visiblePolygonTracePoints = useMemo(
+    () =>
+      polygonTracePoints.map(([x, y]) => ({
+        x: ((x - planDisplayCrop.left) / planDisplayCrop.width) * 100,
+        y: ((y - planDisplayCrop.top) / planDisplayCrop.height) * 100,
+      })),
+    [planDisplayCrop, polygonTracePoints],
+  );
+  const visiblePolygonTraceCursorPoint = useMemo(() => {
+    if (!polygonTraceCursorPoint) return null;
+    return {
+      x: ((polygonTraceCursorPoint[0] - planDisplayCrop.left) / planDisplayCrop.width) * 100,
+      y: ((polygonTraceCursorPoint[1] - planDisplayCrop.top) / planDisplayCrop.height) * 100,
+    };
+  }, [planDisplayCrop, polygonTraceCursorPoint]);
+  const lastPolygonTracePoint = polygonTracePoints[polygonTracePoints.length - 1] || null;
   // Linked parts (e.g. the hood wall cabinet + its pull-out extractor hood) should react as
   // one unit, so hovering either hotspot highlights the whole group.
   const hoveredLinkedGroup = useMemo(
@@ -1658,6 +1691,82 @@ export default function useKitchenSvgStage({
     const value = new URLSearchParams(window.location.search).get("calibrate");
     setIsCalibrating(value === "1" || value === "true");
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const value = new URLSearchParams(window.location.search).get("tracePolygon");
+    setIsTracePolygonRequested(value === "1" || value === "true");
+  }, []);
+
+  useEffect(() => {
+    if (canTracePolygon) return;
+    setIsTracingPolygon(false);
+    setPolygonTracePoints([]);
+    setPolygonTraceCursorPoint(null);
+  }, [canTracePolygon]);
+
+  useEffect(() => {
+    if (!isTracingPolygon) {
+      setPolygonTraceCursorPoint(null);
+      return;
+    }
+    polygonTraceLayerRef.current?.focus();
+  }, [isTracingPolygon]);
+
+  const copyPolygonTracePoints = () => {
+    if (!polygonTracePoints.length || typeof navigator === "undefined") return;
+    navigator.clipboard?.writeText(formattedPolygonTracePoints).catch(() => {});
+  };
+
+  const getPolygonTracePointFromEvent = (event) => {
+    const planRect = planTraceImageRef.current?.getBoundingClientRect();
+    if (!planRect || !planRect.width || !planRect.height) return null;
+
+    return [
+      Math.round(((event.clientX - planRect.left) / planRect.width) * 10000) / 100,
+      Math.round(((event.clientY - planRect.top) / planRect.height) * 10000) / 100,
+    ];
+  };
+
+  const handlePolygonTraceMove = (event) => {
+    if (!canTracePolygon || !isTracingPolygon) return;
+    const point = getPolygonTracePointFromEvent(event);
+    if (point) setPolygonTraceCursorPoint(point);
+  };
+
+  const handlePolygonTraceClick = (event) => {
+    if (!canTracePolygon || !isTracingPolygon) return;
+    const point = getPolygonTracePointFromEvent(event);
+    if (!point) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    setPolygonTracePoints((current) => [...current, point]);
+  };
+
+  const handlePolygonTraceKeyDown = (event) => {
+    if (!canTracePolygon || !isTracingPolygon || !polygonTracePoints.length) return;
+    const directionByKey = {
+      ArrowLeft: [-1, 0],
+      ArrowRight: [1, 0],
+      ArrowUp: [0, -1],
+      ArrowDown: [0, 1],
+    };
+    const direction = directionByKey[event.key];
+    if (!direction) return;
+
+    event.preventDefault();
+    const step = event.shiftKey ? 0.01 : event.altKey ? 0.25 : 0.05;
+    setPolygonTracePoints((current) =>
+      current.map((point, index) => {
+        if (index !== current.length - 1) return point;
+        return [
+          Math.round((point[0] + direction[0] * step) * 100) / 100,
+          Math.round((point[1] + direction[1] * step) * 100) / 100,
+        ];
+      }),
+    );
+  };
 
   useEffect(() => {
     if (activeView !== "2d" || hasImageView || hasPdfView) {
@@ -1793,12 +1902,76 @@ export default function useKitchenSvgStage({
           />
         ) : hasImageView ? (
             <div className={styles.pdfCard}>
+              {canTracePolygon ? (
+                <div className={styles.polygonTracePanel}>
+                  <label className={styles.polygonTraceToggle}>
+                    <input
+                      type="checkbox"
+                      checked={isTracingPolygon}
+                      onChange={(event) => setIsTracingPolygon(event.target.checked)}
+                    />
+                    Trace polygon
+                  </label>
+                  <div className={styles.polygonTraceActions}>
+                    <button
+                      type="button"
+                      onClick={copyPolygonTracePoints}
+                      disabled={!polygonTracePoints.length}
+                    >
+                      Copy points array
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPolygonTracePoints((current) => current.slice(0, -1))}
+                      disabled={!polygonTracePoints.length}
+                    >
+                      Undo last point
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPolygonTracePoints([])}
+                      disabled={!polygonTracePoints.length}
+                    >
+                      Clear points
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        copyPolygonTracePoints();
+                        setIsTracingPolygon(false);
+                      }}
+                      disabled={polygonTracePoints.length < 3}
+                    >
+                      Finish polygon
+                    </button>
+                  </div>
+                  <div className={styles.polygonTraceReadout}>
+                    <span>
+                      Cursor:{" "}
+                      {polygonTraceCursorPoint
+                        ? `${polygonTraceCursorPoint[0].toFixed(2)}, ${polygonTraceCursorPoint[1].toFixed(2)}`
+                        : "-"}
+                    </span>
+                    <span>
+                      Last:{" "}
+                      {lastPolygonTracePoint
+                        ? `${lastPolygonTracePoint[0].toFixed(2)}, ${lastPolygonTracePoint[1].toFixed(2)}`
+                        : "-"}
+                    </span>
+                    <span>Arrow keys nudge last point. Shift = 0.01, Alt = 0.25.</span>
+                  </div>
+                  <output className={styles.polygonTraceOutput}>
+                    {formattedPolygonTracePoints}
+                  </output>
+                </div>
+              ) : null}
               {hasImageHotspots ? (
                 <div
                   className={styles.planImageWrap}
                   style={{ aspectRatio: croppedPlanAspectRatio }}
                 >
                   <img
+                    ref={planTraceImageRef}
                     src={imageViewHref}
                     alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
                     className={styles.planImageInteractive}
@@ -1932,6 +2105,55 @@ export default function useKitchenSvgStage({
                         >
                           <span className={styles.planCalibrationLabelH}>{tick}</span>
                         </div>
+                      ))}
+                    </div>
+                  ) : null}
+                  {canTracePolygon ? (
+                    <div
+                      ref={polygonTraceLayerRef}
+                      className={[
+                        styles.polygonTraceLayer,
+                        isTracingPolygon ? styles.polygonTraceLayerActive : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      tabIndex={isTracingPolygon ? 0 : -1}
+                      onClick={handlePolygonTraceClick}
+                      onMouseMove={handlePolygonTraceMove}
+                      onMouseLeave={() => setPolygonTraceCursorPoint(null)}
+                      onKeyDown={handlePolygonTraceKeyDown}
+                      aria-hidden={!isTracingPolygon}
+                    >
+                      {visiblePolygonTraceCursorPoint ? (
+                        <>
+                          <span
+                            className={styles.polygonTraceCursorLineV}
+                            style={{ left: `${visiblePolygonTraceCursorPoint.x}%` }}
+                          />
+                          <span
+                            className={styles.polygonTraceCursorLineH}
+                            style={{ top: `${visiblePolygonTraceCursorPoint.y}%` }}
+                          />
+                        </>
+                      ) : null}
+                      {visiblePolygonTracePoints.length ? (
+                        <svg className={styles.polygonTraceSvg} viewBox="0 0 100 100" preserveAspectRatio="none">
+                          <polyline
+                            points={visiblePolygonTracePoints
+                              .map((point) => `${point.x},${point.y}`)
+                              .join(" ")}
+                            className={styles.polygonTraceLine}
+                          />
+                        </svg>
+                      ) : null}
+                      {visiblePolygonTracePoints.map((point, index) => (
+                        <span
+                          key={`${point.x}-${point.y}-${index}`}
+                          className={styles.polygonTracePoint}
+                          style={{ left: `${point.x}%`, top: `${point.y}%` }}
+                        >
+                          {index + 1}
+                        </span>
                       ))}
                     </div>
                   ) : null}

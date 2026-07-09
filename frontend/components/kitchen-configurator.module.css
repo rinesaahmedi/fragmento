@@ -662,6 +662,142 @@
   pointer-events: none;
 }
 
+.polygonTracePanel {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid rgba(47, 42, 36, 0.16);
+  border-radius: 8px;
+  background: #fffaf2;
+  color: #2f2a24;
+}
+
+.polygonTraceToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.polygonTraceActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.polygonTraceActions button {
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid rgba(47, 42, 36, 0.18);
+  border-radius: 6px;
+  background: #fff;
+  color: #2f2a24;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.polygonTraceActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.polygonTraceReadout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  color: rgba(47, 42, 36, 0.78);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.polygonTraceOutput {
+  overflow-x: auto;
+  padding: 7px 8px;
+  border-radius: 6px;
+  background: rgba(47, 42, 36, 0.08);
+  color: #1f2933;
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.polygonTraceLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.polygonTraceLayerActive {
+  cursor: crosshair;
+  pointer-events: auto;
+}
+
+.polygonTraceLayerActive:focus {
+  outline: none;
+}
+
+.polygonTraceSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.polygonTraceLine {
+  fill: none;
+  stroke: #ef233c;
+  stroke-width: 0.22;
+  vector-effect: non-scaling-stroke;
+}
+
+.polygonTracePoint {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: #ef233c;
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 2px 8px rgba(31, 41, 51, 0.28);
+}
+
+.polygonTraceCursorLineV,
+.polygonTraceCursorLineH {
+  position: absolute;
+  z-index: 2;
+  background: rgba(239, 35, 60, 0.56);
+  pointer-events: none;
+}
+
+.polygonTraceCursorLineV {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.polygonTraceCursorLineH {
+  left: 0;
+  right: 0;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
 .planCalibrationGrid {
   position: absolute;
   inset: 0;
