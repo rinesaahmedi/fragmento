@@ -1630,6 +1630,21 @@ export default function useKitchenSvgStage({
   );
   const croppedPlanAspectRatio =
     `${planDisplayCrop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${planDisplayCrop.height * PLAN_IMAGE_SOURCE_HEIGHT}`;
+  const planImageInteractiveStyle = {
+    left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
+    top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
+    width: `${(100 / planDisplayCrop.width) * 100}%`,
+    height: `${(100 / planDisplayCrop.height) * 100}%`,
+  };
+  const planLineBoostStyle =
+    normalizedKitchenSlug === "ab-104968"
+      ? {
+          ...planImageInteractiveStyle,
+          mixBlendMode: "multiply",
+          opacity: 1,
+          pointerEvents: "none",
+        }
+      : null;
   const [isCalibrating, setIsCalibrating] = useState(false);
   const [hoveredComponentId, setHoveredComponentId] = useState(null);
   // Linked parts (e.g. the hood wall cabinet + its pull-out extractor hood) should react as
@@ -1787,13 +1802,17 @@ export default function useKitchenSvgStage({
                     src={imageViewHref}
                     alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
                     className={styles.planImageInteractive}
-                    style={{
-                      left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
-                      top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
-                      width: `${(100 / planDisplayCrop.width) * 100}%`,
-                      height: `${(100 / planDisplayCrop.height) * 100}%`,
-                    }}
+                    style={planImageInteractiveStyle}
                   />
+                  {planLineBoostStyle ? (
+                    <img
+                      src={imageViewHref}
+                      alt=""
+                      aria-hidden="true"
+                      className={styles.planImageInteractive}
+                      style={planLineBoostStyle}
+                    />
+                  ) : null}
                   <div className={styles.planHotspotLayer}>
                     {croppedImageHotspots.map((hotspot) => {
                       const isFixed = fixedComponentIds.includes(hotspot.componentId);
