@@ -127,6 +127,13 @@ test("service claim picker toggles claim-linked hood and LED together", () => {
   assert.match(source, /const shouldRemove = ids\.some\(\(id\) => current\.has\(id\)\);/);
 });
 
+test("service claim kitchen plan uses test order state for 111 contracts", () => {
+  const source = fs.readFileSync(path.join(repoRoot, "lib", "service-claim-kitchen-plan.js"), "utf8");
+
+  assert.match(source, /getOrderKindForContractNumber\(contract\.contractNumber\)/);
+  assert.match(source, /getContractOrderState\(contract\.id,\s*prisma,\s*orderKind\)/);
+});
+
 test("AB 105834 claim hotspots keep sink and sink cabinet separate", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
 
