@@ -118,8 +118,8 @@ test("service claim picker toggles claim-linked hood and LED together", () => {
   assert.match(source, /getPlanDisplayCrop/);
   assert.match(source, /cropPlanHotspot/);
   assert.match(source, /croppedPlanAspectRatio/);
-  assert.match(source, /hiddenImageHotspots/);
-  assert.match(source, /styles\.planHiddenHotspot/);
+  assert.match(source, /clipPath id=\{imageClipPathId\}/);
+  assert.match(source, /getHotspotSvgPolygonPoints/);
   assert.match(source, /getServiceClaimLinkedComponentIds\(kitchenSlug,\s*hotspot\.componentId\)[\s\S]*\.includes\(hoveredComponentId\)/);
   assert.match(source, /styles\.planHotspotHover/);
   assert.match(source, /const isSelected = selectedIds\.has\(hotspot\.componentId\);/);

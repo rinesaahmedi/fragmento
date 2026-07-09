@@ -534,13 +534,6 @@
   pointer-events: none;
 }
 
-.planHiddenHotspot {
-  position: absolute;
-  box-sizing: border-box;
-  background: #fff;
-  pointer-events: none;
-}
-
 .planSideLabelLayer {
   position: absolute;
   inset: 0;

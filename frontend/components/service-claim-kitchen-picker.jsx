@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   componentIdForItem,
   componentIdForKey,
@@ -89,8 +89,37 @@ function toggleClaimComponentSelection({ currentIds, componentId, selectableComp
   return [...current].filter((id) => selectable.has(id));
 }
 
+function toSvgClipPathId(value) {
+  return `service-claim-plan-clip-${String(value || "").replace(/[^a-zA-Z0-9_-]/g, "")}`;
+}
+
+function getHotspotSvgPolygonPoints(hotspot) {
+  const match = String(hotspot?.clipPath || "").match(/^polygon\((.*)\)$/);
+  if (!match) {
+    return "";
+  }
+
+  return match[1]
+    .split(",")
+    .map((point) => {
+      const [rawX, rawY] = point.trim().split(/\s+/);
+      const localX = Number.parseFloat(String(rawX || "").replace("%", ""));
+      const localY = Number.parseFloat(String(rawY || "").replace("%", ""));
+      if (!Number.isFinite(localX) || !Number.isFinite(localY)) {
+        return "";
+      }
+
+      const x = Number(hotspot.left || 0) + (localX / 100) * Number(hotspot.width || 0);
+      const y = Number(hotspot.top || 0) + (localY / 100) * Number(hotspot.height || 0);
+      return `${x},${y}`;
+    })
+    .filter(Boolean)
+    .join(" ");
+}
+
 export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange, labels, contractNumber }) {
   const svgHostRef = useRef(null);
+  const rawImageClipPathId = useId();
   const [hoveredComponentId, setHoveredComponentId] = useState(null);
   const { kitchenConfig, svgMarkup, kitchenSlug, selectableComponentIds } = kitchenPlan;
 
@@ -142,11 +171,11 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     const selectable = new Set(selectableComponentIds || []);
     return croppedImageHotspots.filter((hotspot) => hotspot && selectable.has(hotspot.componentId));
   }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
-  const hiddenImageHotspots = useMemo(() => {
-    const selectable = new Set(selectableComponentIds || []);
-    return croppedImageHotspots.filter((hotspot) => hotspot && !selectable.has(hotspot.componentId));
-  }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
   const shouldUseImagePlan = Boolean(imageViewHref && imageHotspots.length);
+  const imageClipPathId = useMemo(
+    () => toSvgClipPathId(rawImageClipPathId),
+    [rawImageClipPathId],
+  );
 
   useEffect(() => {
     const selectable = new Set(selectableComponentIds || []);
@@ -257,34 +286,81 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
               className={`${styles.planImageWrap} service-claim-kitchen__image-wrap`}
               style={{ aspectRatio: croppedPlanAspectRatio }}
             >
-              <img
-                src={imageViewHref}
-                alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
+              <svg
+                role="img"
+                aria-label={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
                 className={styles.planImageInteractive}
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
                 style={{
-                  left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
-                  top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
-                  width: `${(100 / planDisplayCrop.width) * 100}%`,
-                  height: `${(100 / planDisplayCrop.height) * 100}%`,
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
                 }}
-                draggable={false}
-              />
+              >
+                <defs>
+                  <clipPath id={imageClipPathId} clipPathUnits="userSpaceOnUse">
+                    {imageHotspots.map((hotspot) => {
+                      const polygonPoints = getHotspotSvgPolygonPoints(hotspot);
+                      if (polygonPoints) {
+                        return (
+                          <polygon
+                            key={`clip-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
+                            points={polygonPoints}
+                          />
+                        );
+                      }
+
+                      return (
+                        <rect
+                          key={`clip-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
+                          x={hotspot.left}
+                          y={hotspot.top}
+                          width={hotspot.width}
+                          height={hotspot.height}
+                        />
+                      );
+                    })}
+                  </clipPath>
+                </defs>
+                <image
+                  href={imageViewHref}
+                  x={-(planDisplayCrop.left / planDisplayCrop.width) * 100}
+                  y={-(planDisplayCrop.top / planDisplayCrop.height) * 100}
+                  width={(100 / planDisplayCrop.width) * 100}
+                  height={(100 / planDisplayCrop.height) * 100}
+                  preserveAspectRatio="none"
+                  clipPath={`url(#${imageClipPathId})`}
+                />
+                {imageHotspots.map((hotspot) => {
+                  const polygonPoints = getHotspotSvgPolygonPoints(hotspot);
+                  const outlineKey = `outline-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`;
+                  const outlineProps = {
+                    fill: "none",
+                    stroke: "#2f2a24",
+                    strokeOpacity: 0.28,
+                    strokeWidth: 0.75,
+                    vectorEffect: "non-scaling-stroke",
+                    pointerEvents: "none",
+                  };
+
+                  if (polygonPoints) {
+                    return <polygon key={outlineKey} points={polygonPoints} {...outlineProps} />;
+                  }
+
+                  return (
+                    <rect
+                      key={outlineKey}
+                      x={hotspot.left}
+                      y={hotspot.top}
+                      width={hotspot.width}
+                      height={hotspot.height}
+                      {...outlineProps}
+                    />
+                  );
+                })}
+              </svg>
               <div className={styles.planHotspotLayer}>
-                {hiddenImageHotspots.map((hotspot) => (
-                  <div
-                    key={`hidden-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`}
-                    className={styles.planHiddenHotspot}
-                    style={{
-                      left: `${hotspot.left}%`,
-                      top: `${hotspot.top}%`,
-                      width: `${hotspot.width}%`,
-                      height: `${hotspot.height}%`,
-                      clipPath: hotspot.clipPath || undefined,
-                      WebkitClipPath: hotspot.clipPath || undefined,
-                    }}
-                    aria-hidden="true"
-                  />
-                ))}
                 {imageHotspots.map((hotspot) => {
                   const isSelected = selectedIds.has(hotspot.componentId);
                   const isHovered = getServiceClaimLinkedComponentIds(kitchenSlug, hotspot.componentId)
