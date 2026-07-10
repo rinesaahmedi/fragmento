@@ -1736,7 +1736,7 @@
 .itemInfoTooltip {
   position: absolute;
   left: 50%;
-  bottom: calc(100% + 10px);
+  top: calc(100% + 10px);
   z-index: 6;
   display: grid;
   gap: 8px;
@@ -1748,7 +1748,7 @@
   box-shadow: 0 18px 32px rgba(39, 26, 14, 0.22);
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, 8px);
+  transform: translate(-50%, -8px);
   transition: opacity 0.16s ease, transform 0.16s ease;
 }
 
