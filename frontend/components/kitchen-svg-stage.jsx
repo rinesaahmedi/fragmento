@@ -907,7 +907,7 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-base", left: 73.84, top: 64.76, width: 16.99, height: 32.44 },
   ],
   // AB 105757: 500/600/600/600/600/600 run with refrigerator right; hood in wall slot 2.
-  // Grid measured from the rendered PDF; base overlays begin at the cabinet door top.
+  // Grid measured from the rendered PDF; base overlays begin immediately below the worktop.
   "ab-105757": [
     { componentKey: "wall-cabinet-1", left: 0.37, top: 20.56, width: 12.75, height: 23.98 },
     { componentKey: "wall-cabinet-2", left: 13.12, top: 20.56, width: 14.05, height: 23.98 },
@@ -917,13 +917,14 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-5", left: 55.31, top: 20.56, width: 14.05, height: 23.98 },
     { componentKey: "wall-cabinet-6", left: 69.36, top: 20.56, width: 14.07, height: 23.98 },
     { componentKey: "worktop", left: 0.37, top: 61.94, width: 83.06, height: 1.45 },
+    { componentKey: "worktop", left: 83.43, top: 61.94, width: 0.42, height: 25.32, separateLockedSidePanel: true },
     { componentKey: "sink-faucet", left: 43.1, top: 55.0, width: 3.35, height: 6.94 },
-    { componentKey: "base-module-1", left: 0.37, top: 61.92, width: 12.75, height: 25.34 },
-    { componentKey: "oven-module", left: 13.12, top: 61.92, width: 14.05, height: 25.34 },
-    { componentKey: "base-module-2", left: 27.17, top: 61.92, width: 14.08, height: 25.34 },
-    { componentKey: "sink-base", left: 41.25, top: 61.92, width: 14.06, height: 25.34 },
-    { componentKey: "base-module-3", left: 55.31, top: 61.92, width: 14.05, height: 25.34 },
-    { componentKey: "drawer-module", left: 69.36, top: 61.92, width: 14.07, height: 25.34 },
+    { componentKey: "base-module-1", left: 0.37, top: 63.4, width: 12.75, height: 23.86 },
+    { componentKey: "oven-module", left: 13.12, top: 63.4, width: 14.05, height: 23.86 },
+    { componentKey: "base-module-2", left: 27.17, top: 63.4, width: 14.08, height: 23.86 },
+    { componentKey: "sink-base", left: 41.25, top: 63.4, width: 14.06, height: 23.86 },
+    { componentKey: "base-module-3", left: 55.31, top: 63.4, width: 14.05, height: 23.86 },
+    { componentKey: "drawer-module", left: 69.36, top: 63.4, width: 14.07, height: 23.86 },
     { componentKey: "refrigerator", left: 84.07, top: 32.7, width: 13.02, height: 59.2 },
   ],
   "ab-105733": [
@@ -1191,6 +1192,7 @@ function isHorizontalWorktopHotspot(definition) {
 
 function isCornerBlendeHotspot(definition) {
   return (
+    !definition.separateLockedSidePanel &&
     definition.componentKey === "worktop" &&
     definition.width > 0 &&
     definition.width <= CORNER_BLENDE_MAX_WIDTH &&
