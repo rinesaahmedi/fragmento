@@ -108,7 +108,7 @@ export default async function AdminSettingsPage({ searchParams }) {
 
           <AdminSection
             title={<AdminText i18nKey="settingsAdmin.deliveryMinOrderTitle" fallback="Delivery minimum order value" />}
-            description={<AdminText i18nKey="settingsAdmin.deliveryMinOrderDescription" fallback="Set a minimum order value required when the customer selects Delivery, transport, assembly and connection." />}
+            description={<AdminText i18nKey="settingsAdmin.deliveryMinOrderDescription" fallback="Set a minimum order value required when the customer selects Delivery, Carry-in, Assembly and Installation." />}
           >
             <form action="/api/admin/settings/delivery-min-order" method="post" style={formStyle}>
               <label style={toggleCardStyle}>
@@ -123,7 +123,7 @@ export default async function AdminSettingsPage({ searchParams }) {
                   <span style={mutedTextStyle}>
                     <AdminText
                       i18nKey="settingsAdmin.deliveryMinOrderEnabledHelp"
-                      fallback="When enabled, orders that include Delivery, transport, assembly and connection must reach the minimum value below."
+                      fallback="When enabled, orders that include Delivery, Carry-in, Assembly and Installation must reach the minimum value below."
                     />
                   </span>
                 </span>

@@ -147,8 +147,8 @@ const CATALOG_BLENDEN = [
 ];
 
 const CATALOG_SERVICES = [
-  { code: "MONTAGE", name: "Lieferung, Vertragen, Montage und Anschluss", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", isActive: true },
-  { code: "PICKUP", name: "Abholung an Logistikstandort", nameDe: "Abholung an Logistikstandort", price: "0.00", isActive: true },
+  { code: "MONTAGE", name: "Delivery, Carry-in, Assembly and Installation", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", isActive: true },
+  { code: "PICKUP", name: "Pickup at logistics location", nameDe: "Abholung an Logistikstandort", price: "0.00", isActive: true },
 ];
 
 function formatSeedPrice(value) {
@@ -187,8 +187,8 @@ function defaultAccessories() {
 
 function defaultServices() {
   return [
-    { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Lieferung, Vertragen, Montage und Anschluss", price: servicePrice("MONTAGE"), iconKey: "delivery_assembly", sortOrder: 300 },
-    { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Abholung an Logistikstandort", price: servicePrice("PICKUP"), iconKey: "pickup", sortOrder: 310 },
+    { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Delivery, Carry-in, Assembly and Installation", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: servicePrice("MONTAGE"), iconKey: "delivery_assembly", sortOrder: 300 },
+    { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Pickup at logistics location", nameDe: "Abholung an Logistikstandort", price: servicePrice("PICKUP"), iconKey: "pickup", sortOrder: 310 },
   ];
 }
 

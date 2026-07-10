@@ -330,7 +330,7 @@ export async function listKitchenItemCodeOptionsForAdmin() {
     { code: "ACC-WASTE-001", label: "ACCESSORY - Waste separation system" },
     { code: "ACC-CUTLERY-ZB60SG", label: "ACCESSORY - Cutlery insert 60 cm" },
     { code: "ACC-LIGHT-003", label: "ACCESSORY - LED lighting set" },
-    { code: "SVC-MONTAGE-001", label: "SERVICE - Delivery, carrying, assembly and connection" },
+    { code: "SVC-MONTAGE-001", label: "SERVICE - Delivery, Carry-in, Assembly and Installation" },
     { code: "SVC-PICKUP-001", label: "SERVICE - Pickup at logistics location" },
   ];
 }

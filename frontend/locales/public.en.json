@@ -104,7 +104,7 @@
     "statusSavedSuccess": "Order number: {orderNumber}. Your order has been saved.",
     "statusRedirectingToPayment": "Redirecting to secure payment. After payment, please wait until Stripe sends you back to Fragmento.",
     "servicePickupError": "Pickup can only be added once at least one item has been selected.",
-    "serviceDeliveryMinError": "Delivery, transport, assembly and connection requires a minimum order value of €{amount}.",
+    "serviceDeliveryMinError": "Delivery, Carry-in, Assembly and Installation requires a minimum order value of €{amount}.",
     "productInfoCloseAria": "Close product information",
     "productInfoOpen": "Open {label}",
     "productInfoOpenShort": "Info",
@@ -144,7 +144,7 @@
       "baseCabinetRightLs": "Base Cabinet right",
       "baseCabinetThreeDrawers": "Base Cabinet (3 Drawers)",
       "lightingSet3Spots": "Lighting set, 3 LED spots",
-      "serviceMontage": "Delivery, transport, assembly and connection",
+      "serviceMontage": "Delivery, Carry-in, Assembly and Installation",
       "servicePickup": "Pickup at logistics location"
     },
     "catalogItemInfo": {

@@ -562,7 +562,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       );
       if (orderTotal < deliveryMinSettings.amount) {
         throw validationError(
-          `Delivery, transport, assembly and connection requires a minimum order value of €${deliveryMinSettings.amount}.`,
+          `Delivery, Carry-in, Assembly and Installation requires a minimum order value of €${deliveryMinSettings.amount}.`,
         );
       }
     }

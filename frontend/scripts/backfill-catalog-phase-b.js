@@ -48,8 +48,8 @@ const CATALOG_BLENDES = [
 ];
 
 const CATALOG_SERVICES = [
-  { code: "MONTAGE", name: "Lieferung, Vertragen, Montage und Anschluss", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00" },
-  { code: "PICKUP", name: "Abholung an Logistikstandort", nameDe: "Abholung an Logistikstandort", price: "0.00" },
+  { code: "MONTAGE", name: "Delivery, Carry-in, Assembly and Installation", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00" },
+  { code: "PICKUP", name: "Pickup at logistics location", nameDe: "Abholung an Logistikstandort", price: "0.00" },
 ];
 
 function sameDecimal(left, right) {

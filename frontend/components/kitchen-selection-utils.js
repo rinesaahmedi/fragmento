@@ -426,6 +426,13 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     return withPhotoNumber(rawName);
   }
 
+  if (code === "SVC-MONTAGE-001") {
+    return translate("configurator.catalogItemNames.serviceMontage", "Delivery, Carry-in, Assembly and Installation");
+  }
+  if (code === "SVC-PICKUP-001") {
+    return translate("configurator.catalogItemNames.servicePickup", "Pickup at logistics location");
+  }
+
   if ((item?.catalogArticleId || item?.catalogServiceId) && rawName) {
     return withPhotoNumber(rawName);
   }
@@ -637,10 +644,6 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
       return translate("configurator.catalogItemNames.cutleryInsert60", "Cutlery insert ZB60SG");
     case "ACC-LIGHT-003":
       return translate("configurator.catalogItemNames.lightingSet3Spots", "Lighting set, 3 LED spots");
-    case "SVC-MONTAGE-001":
-      return translate("configurator.catalogItemNames.serviceMontage", "Delivery, transport, assembly and connection");
-    case "SVC-PICKUP-001":
-      return translate("configurator.catalogItemNames.servicePickup", "Pickup at logistics location");
     case "CAB-COOK-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.baseCabinetTwoDrawersLeft", "Base Cabinet (2 Drawers) Left"));
     case "CAB-COOK-C-R-600":

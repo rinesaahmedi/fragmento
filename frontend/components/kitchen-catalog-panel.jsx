@@ -731,7 +731,7 @@ export default function KitchenCatalogPanel({
               const disabledReason = montageDeliveryMinBlocked
                 ? translate(
                     "configurator.serviceDeliveryMinError",
-                    `Delivery, transport, assembly and connection requires a minimum order value of €${deliveryMinAmount}.`,
+                    `Delivery, Carry-in, Assembly and Installation requires a minimum order value of €${deliveryMinAmount}.`,
                     { amount: deliveryMinAmount },
                   )
                 : getServiceDisabledReason(item.code, serviceEligibility, translate);
