@@ -394,6 +394,14 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   });
 });
 
+["105749", "105752", "105755"].forEach((targetCode) => {
+  Object.entries(AB_105806_PHOTO_NUMBER_BY_CODE)
+    .filter(([sourceCode]) => sourceCode.includes("AB105746"))
+    .forEach(([sourceCode, photoNumber]) => {
+      AB_105806_PHOTO_NUMBER_BY_CODE[sourceCode.replace("AB105746", `AB${targetCode}`)] = photoNumber;
+    });
+});
+
 export function getLocalizedItemName(item, translate, language = "en", includeCalloutNumber = true) {
   const code = String(item?.code || "").trim().toUpperCase();
   const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
@@ -493,6 +501,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105831-600":
     case "CAB-HOOD-AB104968-600":
     case "CAB-HOOD-AB105746-600":
+    case "CAB-HOOD-AB105749-600":
+    case "CAB-HOOD-AB105752-600":
+    case "CAB-HOOD-AB105755-600":
       return withPhotoNumber(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
@@ -520,6 +531,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-AB105831-FH664621E":
     case "HOOD-AB104968-FH664621E":
     case "HOOD-AB105746-FH664621E":
+    case "HOOD-AB105749-FH664621E":
+    case "HOOD-AB105752-FH664621E":
+    case "HOOD-AB105755-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
     case "HOOD-AB105845-KHF664611S":
@@ -541,6 +555,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-AB104968-DEFAULT":
     case "SINKBASE-AB105746-DEFAULT":
+    case "SINKBASE-AB105749-DEFAULT":
+    case "SINKBASE-AB105752-DEFAULT":
+    case "SINKBASE-AB105755-DEFAULT":
     case "SINKBASE-C-600":
       return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
     case "SINKBASE-LS-600":
@@ -567,6 +584,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-AB105831-600":
     case "DISH-AB104968-600":
     case "DISH-AB105746-600":
+    case "DISH-AB105749-600":
+    case "DISH-AB105752-600":
+    case "DISH-AB105755-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "DISH-600-STD":
@@ -597,6 +617,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-AB105828-KGCN388140E":
     case "REF-AB104968-KGCN388140E":
     case "REF-AB105746-KGCN388140E":
+    case "REF-AB105749-KGCN388140E":
+    case "REF-AB105752-KGCN388140E":
+    case "REF-AB105755-KGCN388140E":
     case "REF-C-545-1800-700":
     case "REF-545-1800-700":
       return withRefrigeratorHeight(rawName || translate("configurator.catalogItemNames.refrigerator", "Freestanding refrigerator"));
@@ -854,6 +877,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-104968": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105746": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105749": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105752": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105755": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105734": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105737": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105740": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1295,6 +1321,18 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
 ["105840", "105843"].forEach((targetCode) => {
   ["DISH-AB105837-600", "HOOD-AB105837-FH664621E", "CAB-HOOD-AB105837-600"].forEach((sourceCode) => {
     PRODUCT_IMAGE_GALLERIES_BY_CODE[sourceCode.replace("AB105837", `AB${targetCode}`)] =
+      PRODUCT_IMAGE_GALLERIES_BY_CODE[sourceCode];
+  });
+});
+
+["105749", "105752", "105755"].forEach((targetCode) => {
+  [
+    "DISH-AB105746-600",
+    "REF-AB105746-KGCN388140E",
+    "HOOD-AB105746-FH664621E",
+    "CAB-HOOD-AB105746-600",
+  ].forEach((sourceCode) => {
+    PRODUCT_IMAGE_GALLERIES_BY_CODE[sourceCode.replace("AB105746", `AB${targetCode}`)] =
       PRODUCT_IMAGE_GALLERIES_BY_CODE[sourceCode];
   });
 });

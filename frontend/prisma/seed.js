@@ -896,6 +896,19 @@ const AB_105746_ITEMS = [
   ...defaultServices(),
 ];
 
+// These kitchens use the identical AB 105746 element plan. Keep the source
+// configuration in one place while giving every kitchen its own item codes.
+function createAB105746Items(kitchenCode) {
+  return AB_105746_ITEMS.map((item) => ({
+    ...item,
+    code: item.code.replaceAll("AB105746", `AB${kitchenCode}`),
+  }));
+}
+
+const AB_105749_ITEMS = createAB105746Items("105749");
+const AB_105752_ITEMS = createAB105746Items("105752");
+const AB_105755_ITEMS = createAB105746Items("105755");
+
 const AB_105732_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
@@ -1446,6 +1459,27 @@ const DEFAULT_KITCHENS = [
     name: "AB 105746 Kitchen",
     description: "Straight kitchen configuration based on frontend/public/jpg/AB 105746_page-0001.jpg",
     items: AB_105746_ITEMS,
+  },
+  {
+    slug: "ab-105749",
+    kitchenCode: "105 749",
+    name: "AB 105749 Kitchen",
+    description: "Kitchen configuration using the AB 105746 layout and element selection",
+    items: AB_105749_ITEMS,
+  },
+  {
+    slug: "ab-105752",
+    kitchenCode: "105 752",
+    name: "AB 105752 Kitchen",
+    description: "Kitchen configuration using the AB 105746 layout and element selection",
+    items: AB_105752_ITEMS,
+  },
+  {
+    slug: "ab-105755",
+    kitchenCode: "105 755",
+    name: "AB 105755 Kitchen",
+    description: "Kitchen configuration using the AB 105746 layout and element selection",
+    items: AB_105755_ITEMS,
   },
   {
     slug: "ab-104968",
