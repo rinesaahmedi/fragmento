@@ -321,6 +321,7 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105831-H3002-L": "13",
   "SINKBASE-AB104968-DEFAULT": "3",
   "SINKBASE-AB105746-DEFAULT": "3",
+  "SINKBASE-AB105757-DEFAULT": "3",
   "CAB-BASE-AB104968-US50-R": "4",
   "CAB-BASE-AB104968-US40-L": "5",
   "DISH-AB104968-600": "6",
@@ -337,6 +338,17 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-HOOD-AB105746-600": "8",
   "CAB-WALL-AB105746-H6002-L1": "9",
   "CAB-WALL-AB105746-H6002-L2": "10",
+  "CAB-BASE-AB105757-US50": "4",
+  "CAB-BASE-AB105757-US60-1": "5",
+  "DISH-AB105757-600": "6",
+  "CAB-BASE-AB105757-US60-2": "7",
+  "REF-AB105757-KGCN388140E": "8",
+  "CAB-WALL-AB105757-H5002": "9",
+  "CAB-HOOD-AB105757-600": "10",
+  "CAB-WALL-AB105757-H6002-1": "11",
+  "CAB-WALL-AB105757-H6002-2": "12",
+  "CAB-WALL-AB105757-H6002-3": "13",
+  "CAB-WALL-AB105757-H6002-4": "14",
   "SINKBASE-AB105825-600": "3",
   "CAB-BASE-AB105825-US30-R": "4",
   "DISH-AB105825-600": "5",
@@ -432,7 +444,6 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   if (code === "SVC-PICKUP-001") {
     return translate("configurator.catalogItemNames.servicePickup", "Pickup at logistics location");
   }
-
   if ((item?.catalogArticleId || item?.catalogServiceId) && rawName) {
     return withPhotoNumber(rawName);
   }
@@ -511,6 +522,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105749-600":
     case "CAB-HOOD-AB105752-600":
     case "CAB-HOOD-AB105755-600":
+    case "CAB-HOOD-AB105757-600":
       return withPhotoNumber(translate("configurator.catalogItemNames.hoodWallCabinet", "Upper Cabinet with Extractor Hood 60 cm"));
     case "CAB-WALL-C-L-600":
       return withDimensions(translate("configurator.catalogItemNames.wallCabinetLeft", "Wall Cabinet left"));
@@ -541,6 +553,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-AB105749-FH664621E":
     case "HOOD-AB105752-FH664621E":
     case "HOOD-AB105755-FH664621E":
+    case "HOOD-AB105757-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
     case "HOOD-AB105845-KHF664611S":
@@ -724,6 +737,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-HOOD-AB105831-600":
     case "CAB-HOOD-AB104968-600":
     case "CAB-HOOD-AB105746-600":
+    case "CAB-HOOD-AB105757-600":
       return translate("configurator.catalogItemInfo.lightHoodSetup", "HD6002, light hood setup");
     case "HOOD-B-FH664621E":
     case "HOOD-AB105806-FH664621E":
@@ -737,6 +751,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "HOOD-AB105831-FH664621E":
     case "HOOD-AB104968-FH664621E":
     case "HOOD-AB105746-FH664621E":
+    case "HOOD-AB105757-FH664621E":
     case "T3D-HOOD-001":
       return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
     case "HOOD-C-FH664621E":
@@ -758,6 +773,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-AB104968-DEFAULT":
     case "SINKBASE-AB105746-DEFAULT":
+    case "SINKBASE-AB105757-DEFAULT":
     case "SINKBASE-C-600":
     case "T3D-SINKBASE-001":
       return translate("configurator.catalogItemInfo.defaultSinkBaseCabinet", "Default sink base cabinet");
@@ -785,6 +801,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105831-600":
     case "DISH-AB104968-600":
     case "DISH-AB105746-600":
+    case "DISH-AB105757-600":
     case "DISH-C-600-STD":
     case "DISH-LS-600-STD":
     case "T3D-DISH-001":
@@ -821,6 +838,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "REF-AB105828-KGCN388140E":
     case "REF-AB104968-KGCN388140E":
     case "REF-AB105746-KGCN388140E":
+    case "REF-AB105757-KGCN388140E":
     case "REF-C-545-1800-700":
       return translate("configurator.catalogItemInfo.fridgeFreezerNoFrost", "Fridge-freezer, 180 cm, NoFrost");
     case "SINK-WORKTOP":
@@ -880,6 +898,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-104968": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105746": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105757": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105749": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105752": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105755": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1267,6 +1286,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105831-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB104968-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105746-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-AB105757-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105815-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -1295,6 +1315,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "CAB-HOOD-AB104968-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105746-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB105746-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-AB105757-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-AB105757-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "HOOD-AB105845-KHF664611S": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
@@ -1313,6 +1335,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB105831-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB104968-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105746-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
+  "REF-AB105757-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105811-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105815-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),

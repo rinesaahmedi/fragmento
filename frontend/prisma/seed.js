@@ -13,8 +13,8 @@ const prisma = new PrismaClient();
 const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
 const DISHWASHER_CATALOG_NAME_EN = "Fully integrated dishwasher incl. furniture front";
 const DISHWASHER_CATALOG_NAME_DE = "Vollintegrierter Geschirrspüler inkl. Möbelfront";
-const REFRIGERATOR_CATALOG_NAME_EN = "Freestanding refrigerator 181 cm";
-const REFRIGERATOR_CATALOG_NAME_DE = "Standkühlschrank 181 cm";
+const REFRIGERATOR_CATALOG_NAME_EN = "Freestanding refrigerator 178 cm";
+const REFRIGERATOR_CATALOG_NAME_DE = "Standkühlschrank 178 cm";
 const HOOD_WALL_CABINET_CATALOG_NAME_EN = "Flat screen extractor hood + cabinet + filter 60 cm";
 const HOOD_WALL_CABINET_CATALOG_NAME_DE = "Flachschirmhaube + Schrank + Filter 60 cm";
 const DEFAULT_OVEN_HOB_CATALOG_CODE = "OVEN-B-600-HOB";
@@ -109,7 +109,7 @@ const CATALOG_ARTICLES = [
   { articleNumber: "H9002", name: "Upper cabinet 90 cm", nameDe: "Oberschrank 90 cm", widthMm: 900, heightMm: 720, price: "203.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KHF664611S", name: "Angled extractor hood", nameDe: "Schrägesse", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KHF664611S + FWP18", name: "Angled extractor hood + filter", nameDe: "Schrägesse + Filter", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
-  { articleNumber: "OL-KGCN388140E", name: "Freestanding refrigerator 181 cm", nameDe: "Standkühlschrank 181 cm", widthMm: 0, heightMm: 1810, depthMm: 0, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "OL-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", widthMm: 0, heightMm: 1780, depthMm: 0, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US100", name: "Lower cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US120", name: "Lower cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US2A100", name: "Lower cabinet with Drawer/Soft-close 100", nameDe: "Unterschrank mit Schublade/Auszug 100", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -123,8 +123,8 @@ const CATALOG_ARTICLES = [
   { articleNumber: "US30", name: "Lower cabinet with drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300, price: "175.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US40", name: "Lower cabinet with drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", widthMm: 400, price: "183.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US45", name: "Lower cabinet with drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", widthMm: 450, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US50", name: "Lower cabinet with drawer 50 cm", nameDe: "Unterschrank mit Schublade 50 cm", widthMm: 500, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US60", name: "Lower cabinet with drawer 60 cm", nameDe: "Unterschrank mit Schublade 60 cm", widthMm: 600, price: "219.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US50", name: "Lower cabinet with drawer 50 cm", nameDe: "Unterschrank mit Schublade 50 cm", widthMm: 500, depthMm: 600, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US60", name: "Lower cabinet with drawer 60 cm", nameDe: "Unterschrank mit Schublade 60 cm", widthMm: 600, depthMm: 600, price: "219.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US80", name: "Lower cabinet with drawer 80 cm", nameDe: "Unterschrank mit Schublade 80 cm", widthMm: 800, price: "333.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US90", name: "Lower cabinet with drawer 90 cm", nameDe: "Unterschrank mit Schublade 90 cm", widthMm: 900, price: "339.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "517467", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
@@ -477,6 +477,7 @@ PRODUCT_INFO_BY_CODE["DISH-AB105843-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"]
 PRODUCT_INFO_BY_CODE["DISH-AB105831-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB104968-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105746-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
+PRODUCT_INFO_BY_CODE["DISH-AB105757-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105825-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["DISH-AB105828-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["REF-AB105828-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
@@ -508,6 +509,7 @@ PRODUCT_INFO_BY_CODE["REF-AB105845-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-5
 PRODUCT_INFO_BY_CODE["REF-AB105831-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB104968-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105746-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_BY_CODE["REF-AB105757-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105825-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105822-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105828-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
@@ -552,6 +554,7 @@ PRODUCT_INFO_BY_CODE["HOOD-AB105843-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-F
 PRODUCT_INFO_BY_CODE["HOOD-AB105831-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB104968-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105746-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105757-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105825-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105822-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105828-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
@@ -908,6 +911,29 @@ function createAB105746Items(kitchenCode) {
 const AB_105749_ITEMS = createAB105746Items("105749");
 const AB_105752_ITEMS = createAB105746Items("105752");
 const AB_105755_ITEMS = createAB105746Items("105755");
+
+// AB 105757: straight elevation — US50 (UPK20) + oven + US60 + locked sink + dishwasher + US60;
+// fridge right; wall run is H5002 (HPK2002) + hood + four H6002 cabinets. Excel NR 1–14.
+const AB_105757_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "SINKBASE-AB105757-DEFAULT", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Default sink base cabinet" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105757-US50", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPK20", 1), widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US50 base storage cabinet", articleNumber: "US50", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105757-US60-1", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "US60 base storage cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105757-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105757-US60-2", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105757-KGCN388140E", name: "Freestanding refrigerator", nameDe: "Standkühlschrank", price: articlePrice("OL-KGCN388140E"), widthMm: 710, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 80, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105757-H5002", name: "Wall Cabinet", price: articlePriceWithBlende("H5002", "HPK2002", 1), widthMm: 500, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H5002 wall cabinet", articleNumber: "H5002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105757-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: bundlePrice("FH664621E + FWK124 + HD6002"), iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105757-FH664621E", name: "FH664621E Extractor Hood", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105757-H6002-1", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002 wall cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105757-H6002-2", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "H6002 wall cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105757-H6002-3", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 130, infoText: "H6002 wall cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105757-H6002-4", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 140, infoText: "H6002 wall cabinet", articleNumber: "H6002" },
+  defaultSinkWorktop({ sortOrder: 150 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
 
 const AB_105732_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -1452,6 +1478,14 @@ const DEFAULT_KITCHENS = [
     name: "AB 105820 Kitchen",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105820_page-0001.jpg",
     items: AB_105820_ITEMS,
+  },
+  {
+    slug: "ab-105757",
+    kitchenCode: "105 757",
+    name: "AB 105757 Kitchen",
+    description: "Straight kitchen configuration based on frontend/public/jpg/AB 105757_page-0001.jpg",
+    items: AB_105757_ITEMS,
+    reconcileExisting: true,
   },
   {
     slug: "ab-105746",
@@ -2395,6 +2429,21 @@ async function main() {
   }
 
   await seedCatalogMasterData();
+  await prisma.catalogArticle.updateMany({
+    where: { articleNumber: "OL-KGCN388140E" },
+    data: {
+      name: REFRIGERATOR_CATALOG_NAME_EN,
+      nameDe: REFRIGERATOR_CATALOG_NAME_DE,
+      heightMm: 1780,
+    },
+  });
+  await prisma.catalogArticle.updateMany({
+    where: { articleNumber: { in: ["US50", "US60"] } },
+    data: {
+      heightMm: null,
+      depthMm: 600,
+    },
+  });
 
   const housingCompanyCleanup = await pruneNonDefaultHousingCompanies();
   if (housingCompanyCleanup.deletedHousingCompanies || housingCompanyCleanup.unlinkedContracts) {
@@ -2415,23 +2464,34 @@ async function main() {
       select: { id: true },
     });
 
-    if (existingKitchen) {
+    const reconcileExisting = Boolean(existingKitchen && kitchen.reconcileExisting);
+    if (existingKitchen && !reconcileExisting) {
       continue;
     }
 
-    const kitchenRecord = await prisma.kitchen.create({
-      data: {
-        slug: kitchen.slug,
-        kitchenCode: kitchen.kitchenCode || null,
-        programmId: DEFAULT_KITCHEN_PROGRAMM_ID,
-        name: kitchen.name,
-        status: KitchenStatus.ACTIVE,
-        description: kitchen.description,
-      },
-    });
+    const kitchenData = {
+      kitchenCode: kitchen.kitchenCode || null,
+      programmId: DEFAULT_KITCHEN_PROGRAMM_ID,
+      name: kitchen.name,
+      status: KitchenStatus.ACTIVE,
+      description: kitchen.description,
+    };
+    const kitchenRecord = existingKitchen
+      ? await prisma.kitchen.update({
+        where: { id: existingKitchen.id },
+        data: kitchenData,
+      })
+      : await prisma.kitchen.create({
+        data: {
+          slug: kitchen.slug,
+          ...kitchenData,
+        },
+      });
+    const seededItemCodes = [];
 
     for (const rawItem of kitchen.items) {
       const item = applyDefaultCatalogItem(rawItem);
+      seededItemCodes.push(item.code);
       const productInfo =
         PRODUCT_INFO_BY_CODE[item.code] ||
         PRODUCT_INFO_BY_CODE[rawItem.code] ||
@@ -2508,11 +2568,38 @@ async function main() {
         blendePrice: item.blendePrice ?? null,
       };
 
-      await prisma.kitchenItem.create({
-        data: {
+      if (reconcileExisting) {
+        await prisma.kitchenItem.upsert({
+          where: {
+            kitchenId_code: {
+              kitchenId: kitchenRecord.id,
+              code: item.code,
+            },
+          },
+          update: data,
+          create: {
+            kitchenId: kitchenRecord.id,
+            ...data,
+          },
+        });
+      } else {
+        await prisma.kitchenItem.create({
+          data: {
+            kitchenId: kitchenRecord.id,
+            ...data,
+          },
+        });
+      }
+    }
+
+    if (reconcileExisting) {
+      await prisma.kitchenItem.updateMany({
+        where: {
           kitchenId: kitchenRecord.id,
-          ...data,
+          code: { notIn: seededItemCodes },
+          isActive: true,
         },
+        data: { isActive: false },
       });
     }
   }
