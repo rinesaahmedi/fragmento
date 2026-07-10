@@ -43,12 +43,17 @@ jobs:
             git rev-parse --short HEAD
             git log -1 --oneline --no-decorate
 
-            chown -R deploy:deploy "$FRONTEND_DIR"
+            # npm owns node_modules and can replace entries while installing. Do not
+            # recurse into it here: dangling/stale package paths made chown fail and
+            # stopped deployments before the database seed could run.
+            find "$FRONTEND_DIR" -path "$FRONTEND_DIR/node_modules" -prune -o -exec chown deploy:deploy {} +
 
             cd "$FRONTEND_DIR"
             sudo -u deploy npm install
             sudo -u deploy npm run prisma:deploy
             sudo -u deploy npm run prisma:generate
+            sudo -u deploy npm run prisma:seed
+            sudo -u deploy npm run catalog:link
             sudo -u deploy npm run build
 
             systemctl restart fragmento.service
