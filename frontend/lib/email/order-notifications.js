@@ -1248,6 +1248,7 @@ export async function generateOrderConfirmationPdf(order) {
   const drawSection = (title, items, options = {}) => {
     const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
     if (!visibleItems.length) return;
+    const showCodeColumn = options.showCodeColumn !== false;
 
     ensureSpace(78);
     doc.setFont("helvetica", "bold").setFontSize(11).text(title, margin, y);
@@ -1261,7 +1262,8 @@ export async function generateOrderConfirmationPdf(order) {
     const typeX = margin + 68;
     const codeX = margin + 320;
     const priceX = pageWidth - margin - 15;
-    const codeColumnWidth = priceX - codeX - 58;
+    const typeColumnWidth = showCodeColumn ? 208 : priceX - typeX - 30;
+    const codeColumnWidth = showCodeColumn ? priceX - codeX - 58 : 0;
     doc.setFillColor(249, 249, 249);
     doc.rect(headerX, headerTop, headerRight - headerX, headerHeight, "F");
     doc.setDrawColor(234, 234, 234);
@@ -1269,7 +1271,9 @@ export async function generateOrderConfirmationPdf(order) {
     doc.setTextColor(51, 51, 51);
     doc.text("Nr.", numberX, headerTop + 20, { align: "center" });
     doc.text("Type", typeX, headerTop + 20);
-    doc.text("Typen-Nr.", codeX, headerTop + 20);
+    if (showCodeColumn) {
+      doc.text("Typen-Nr.", codeX, headerTop + 20);
+    }
     doc.text("Preis", priceX, headerTop + 20, { align: "right" });
     doc.setTextColor(0, 0, 0);
     y = headerTop + headerHeight + 8;
@@ -1282,18 +1286,18 @@ export async function generateOrderConfirmationPdf(order) {
     };
 
     buildNumberedRows(visibleItems).forEach(({ item, rowNumber, blendeItems = [] }) => {
-      const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), 208);
-      const codeLines = doc.splitTextToSize(getItemDisplayCode(item), codeColumnWidth);
+      const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), typeColumnWidth);
+      const codeLines = showCodeColumn ? doc.splitTextToSize(getItemDisplayCode(item), codeColumnWidth) : [];
       const blendeLineGroups = blendeItems.map((blendeItem) => ({
         item: blendeItem,
         rowNumber: blendeItem.rowNumber,
-        nameLines: doc.splitTextToSize(getBlendeDisplayNameWithQuantity(blendeItem), 208),
-        codeLines: doc.splitTextToSize(getItemDisplayCode(blendeItem), codeColumnWidth),
+        nameLines: doc.splitTextToSize(getBlendeDisplayNameWithQuantity(blendeItem), typeColumnWidth),
+        codeLines: showCodeColumn ? doc.splitTextToSize(getItemDisplayCode(blendeItem), codeColumnWidth) : [],
         price: formatCurrency(blendeItem.price),
       }));
-      const parentBandHeight = Math.max(36, Math.max(nameLines.length, codeLines.length) * lineHeight + 21);
+      const parentBandHeight = Math.max(36, Math.max(nameLines.length, codeLines.length || 1) * lineHeight + 21);
       const blendeBandHeights = blendeLineGroups.map((group) =>
-        Math.max(36, Math.max(group.nameLines.length, group.codeLines.length) * lineHeight + 21)
+        Math.max(36, Math.max(group.nameLines.length, group.codeLines.length || 1) * lineHeight + 21)
       );
       const rowHeight = parentBandHeight + blendeBandHeights.reduce((sum, height) => sum + height, 0);
       ensureSpace(rowHeight);
@@ -1306,9 +1310,11 @@ export async function generateOrderConfirmationPdf(order) {
       nameLines.forEach((line, lineIndex) => {
         doc.text(line, typeX, rowTextY + lineIndex * lineHeight);
       });
-      codeLines.forEach((line, lineIndex) => {
-        doc.text(line, codeX, rowTextY + lineIndex * lineHeight);
-      });
+      if (showCodeColumn) {
+        codeLines.forEach((line, lineIndex) => {
+          doc.text(line, codeX, rowTextY + lineIndex * lineHeight);
+        });
+      }
       doc.text(formatCurrency(item.price), priceX, rowTextY, { align: "right" });
       if (blendeLineGroups.length) {
         let blendeRowTop = rowTop + parentBandHeight;
@@ -1320,9 +1326,11 @@ export async function generateOrderConfirmationPdf(order) {
           group.nameLines.forEach((line, lineIndex) => {
             doc.text(line, typeX, blendeY + lineIndex * lineHeight);
           });
-          group.codeLines.forEach((line, lineIndex) => {
-            doc.text(line, codeX, blendeY + lineIndex * lineHeight);
-          });
+          if (showCodeColumn) {
+            group.codeLines.forEach((line, lineIndex) => {
+              doc.text(line, codeX, blendeY + lineIndex * lineHeight);
+            });
+          }
           doc.text(group.price, priceX, blendeY, { align: "right" });
           blendeRowTop += blendeBandHeights[groupIndex];
         });
@@ -1338,7 +1346,7 @@ export async function generateOrderConfirmationPdf(order) {
   drawSection("Küchenmöbel:", cabinetItems, { itemsAreVisible: true });
   drawSection("Elektrogeräte:", electricalItems, { itemsAreVisible: true });
   drawSection("Zubehör:", order.accessories);
-  drawSection("Dienstleistungen:", order.services);
+  drawSection("Dienstleistungen:", order.services, { showCodeColumn: false });
 
   ensureSpace(70);
   doc.setDrawColor(150).line(margin, y, pageWidth - margin, y);
@@ -1436,10 +1444,6 @@ export async function generatePurchasedKitchenPdf(order) {
   doc.text("Ihre gekaufte Küche", pageWidth - margin, y + 4, { align: "right" });
   drawSenderAddressBlock(doc, pageWidth - margin, y + 31);
   y += 92;
-
-  doc.setFont("helvetica", "bold").setFontSize(13);
-  doc.text(order?.kitchen?.name || "Küche", margin, y);
-  y += 22;
 
   doc.setFont("helvetica", "normal").setFontSize(10);
   const details = [

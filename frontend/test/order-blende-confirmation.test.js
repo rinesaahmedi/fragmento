@@ -5,8 +5,21 @@ import {
   buildOrderConfirmationEmailPreview,
   buildOrderConfirmationEmailStaticHtml,
   buildOrderSummaryHtml,
+  generateOrderConfirmationPdf,
   generatePurchasedKitchenPdf,
 } from "../lib/email/order-notifications.js";
+
+async function extractPdfText(base64) {
+  const { PDFParse } = await import("pdf-parse");
+  const parser = new PDFParse({ data: Buffer.from(base64, "base64") });
+
+  try {
+    const result = await parser.getText();
+    return result.text;
+  } finally {
+    await parser.destroy();
+  }
+}
 
 test("order confirmation recipients include the sender as a copy", () => {
   assert.deepEqual(
@@ -76,6 +89,57 @@ test("order confirmation can generate purchased kitchen sketch attachment", asyn
   const bytes = Buffer.from(pdf.base64, "base64");
   assert.equal(bytes.subarray(0, 4).toString("utf8"), "%PDF");
   assert.ok(bytes.length > 10000);
+
+  const text = await extractPdfText(pdf.base64);
+  assert.doesNotMatch(text, /AB 105806 Kitchen/);
+  assert.match(text, /Bestellnummer/);
+});
+
+test("order confirmation PDF hides type numbers for services", async () => {
+  const pdf = await generateOrderConfirmationPdf({
+    orderNumber: "FRG-TEST-007",
+    createdAt: "2026-07-01T10:00:00.000Z",
+    total: 438,
+    kitchen: {
+      name: "Demo Kitchen",
+    },
+    customer: {
+      contractNumber: "KV-106",
+      firstName: "Test",
+      lastName: "Customer",
+      address1: "Example Street 1",
+      postalCode: "38124",
+      city: "Braunschweig",
+      country: "Deutschland",
+      email: "customer@example.com",
+      phone: "+49 531 000000",
+      preferredDeliveryDate: "2026-07-15",
+    },
+    components: [],
+    accessories: [
+      {
+        code: "ACC-CUTLERY-ZB60SG",
+        articleNumber: "ZB60SG",
+        name: "Cutlery insert 60 cm",
+        nameDe: "Besteckeinsatz 60 cm",
+        price: 89,
+      },
+    ],
+    services: [
+      {
+        code: "SVC-MONTAGE-001",
+        name: "Delivery, Carry-in, Assembly and Installation",
+        price: 349,
+      },
+    ],
+  });
+
+  const text = await extractPdfText(pdf.base64);
+  assert.match(text, /Besteckeinsatz 60 cm/);
+  assert.match(text, /ZB60SG/);
+  assert.match(text, /Dienstleistungen/);
+  assert.match(text, /Delivery, Carry-in, Assembly and Installation/);
+  assert.doesNotMatch(text, /SVC-MONTAGE-001/);
 });
 
 test("order confirmation summary renders blende as a cabinet subtitle", () => {

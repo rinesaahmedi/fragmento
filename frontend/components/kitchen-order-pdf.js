@@ -246,6 +246,8 @@ export async function generateOrderPdf(order) {
   const drawSection = (title, items, options = {}) => {
     const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
     if (!visibleItems.length) return;
+    const showCodeColumn = options.showCodeColumn !== false;
+    const nameColumnWidth = showCodeColumn ? 220 : pageWidth - margin * 2 - 110;
 
     ensureSpace(55);
     doc.setFont("helvetica", "bold").text(title, margin, y);
@@ -254,7 +256,9 @@ export async function generateOrderPdf(order) {
     y += 20;
     doc.text("Nr.", margin, y);
     doc.text("Artikel", margin + 28, y);
-    doc.text("Item Code", margin + 270, y);
+    if (showCodeColumn) {
+      doc.text("Item Code", margin + 270, y);
+    }
     doc.text("Preis", pageWidth - margin, y, { align: "right" });
     y += 20;
     doc.setFont("helvetica", "normal");
@@ -264,7 +268,7 @@ export async function generateOrderPdf(order) {
       const lineTotal = Number(item.price || 0) * quantity;
       const itemName = getItemDisplayName(item);
       const displayName = quantity > 1 ? `${itemName} (${quantity}x)` : itemName;
-      const nameLines = doc.splitTextToSize(displayName, 220);
+      const nameLines = doc.splitTextToSize(displayName, nameColumnWidth);
       const rowHeight = Math.max(28, Math.max(nameLines.length, 1) * lineHeight + 12);
       ensureSpace(rowHeight);
       const rowTop = y;
@@ -274,7 +278,9 @@ export async function generateOrderPdf(order) {
       nameLines.forEach((line, index) => {
         doc.text(line, margin + 28, rowTextY + index * lineHeight);
       });
-      doc.text(getItemDisplayCode(item), margin + 270, rowTextY);
+      if (showCodeColumn) {
+        doc.text(getItemDisplayCode(item), margin + 270, rowTextY);
+      }
       doc.text(formatCurrency(lineTotal), pageWidth - margin, rowTextY, { align: "right" });
       y += rowHeight;
     });
@@ -286,7 +292,7 @@ export async function generateOrderPdf(order) {
   drawSection("Elektrogeräte:", electricalItems, { itemsAreVisible: true });
   drawSection("Küchenmöbel:", cabinetItems, { itemsAreVisible: true });
   drawSection("Zubehör:", order.accessories);
-  drawSection("Dienstleistungen:", order.services);
+  drawSection("Dienstleistungen:", order.services, { showCodeColumn: false });
 
   ensureSpace(70);
   doc.setDrawColor(150).line(margin, y, pageWidth - margin, y);
