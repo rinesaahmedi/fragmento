@@ -1546,6 +1546,7 @@ export function buildOrderSummaryHtml(order) {
   const renderSection = (title, items, imageCidByAssetPath = new Map(), options = {}) => {
     const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
     if (!visibleItems.length) return "";
+    const showCodeLine = options.showCodeLine !== false;
     const rows = buildNumberedRows(visibleItems)
       .map(({ item, rowNumber, blendeItems = [] }) => {
         const productImagePath = getProductImagePathForEmail(item);
@@ -1556,10 +1557,14 @@ export function buildOrderSummaryHtml(order) {
         const parentTdStyles = blendeItems.length ? subtleDividerTdStyles : tdStyles;
         const parentTypeTdStyles = blendeItems.length ? subtleTypeCellStyles : typeCellStyles;
         const parentPriceTdStyles = `${parentTdStyles}${priceColumnStyles}font-weight:bold;vertical-align:top;`;
-        const itemDetailsHtml = `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#ffffff" style="width:100%;border-collapse:collapse;table-layout:fixed;background-color:#ffffff;"><tr>${imageHtml}<td valign="top" bgcolor="#ffffff" style="padding:0;background-color:#ffffff;${itemNameStyles}">${escapeHtml(getItemDisplayNameWithQuantity(item))}<br><span style="${itemCodeStyles}">Typen-Nr.: ${escapeHtml(getItemDisplayCode(item))}</span></td></tr></table>`;
+        const itemCodeHtml = showCodeLine ? `<br><span style="${itemCodeStyles}">Typen-Nr.: ${escapeHtml(getItemDisplayCode(item))}</span>` : "";
+        const itemDetailsHtml = `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="#ffffff" style="width:100%;border-collapse:collapse;table-layout:fixed;background-color:#ffffff;"><tr>${imageHtml}<td valign="top" bgcolor="#ffffff" style="padding:0;background-color:#ffffff;${itemNameStyles}">${escapeHtml(getItemDisplayNameWithQuantity(item))}${itemCodeHtml}</td></tr></table>`;
         const parentRow = `<tr><td style="${parentTdStyles}${numberColumnStyles}font-weight:bold;vertical-align:top;">${escapeHtml(rowNumber)}</td><td style="${parentTypeTdStyles}">${itemDetailsHtml}</td><td style="${parentPriceTdStyles}white-space:nowrap;">${formatCurrency(item.price)}</td></tr>`;
         const blendeRows = blendeItems
-          .map((blendeItem) => `<tr><td style="${tdStyles}${numberColumnStyles}font-weight:bold;vertical-align:top;">${escapeHtml(blendeItem.rowNumber)}</td><td style="${typeCellStyles}"><span style="${itemNameStyles}">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}</span><br><span style="${itemCodeStyles}">Typen-Nr.: ${escapeHtml(getItemDisplayCode(blendeItem))}</span></td><td style="${priceTdStyles}">${formatCurrency(blendeItem.price)}</td></tr>`)
+          .map((blendeItem) => {
+            const blendeCodeHtml = showCodeLine ? `<br><span style="${itemCodeStyles}">Typen-Nr.: ${escapeHtml(getItemDisplayCode(blendeItem))}</span>` : "";
+            return `<tr><td style="${tdStyles}${numberColumnStyles}font-weight:bold;vertical-align:top;">${escapeHtml(blendeItem.rowNumber)}</td><td style="${typeCellStyles}"><span style="${itemNameStyles}">${escapeHtml(getBlendeDisplayNameWithQuantity(blendeItem))}</span>${blendeCodeHtml}</td><td style="${priceTdStyles}">${formatCurrency(blendeItem.price)}</td></tr>`;
+          })
           .join("");
         return `${parentRow}${blendeRows}`;
       })
@@ -1581,7 +1586,7 @@ export function buildOrderSummaryHtml(order) {
           ].join("");
         })()}
         ${renderSection("Neu bestätigtes Zubehör", order.accessories, order.productImageCids)}
-        ${renderSection("Neu bestätigte Dienstleistungen", order.services, order.productImageCids)}
+        ${renderSection("Neu bestätigte Dienstleistungen", order.services, order.productImageCids, { showCodeLine: false })}
         <table bgcolor="#ffffff" style="width:100%;margin-top:20px;border-top:2px solid #333;padding-top:15px;background-color:#ffffff;">
           <tr><td style="text-align:right;font-size:0.95em;color:#555;">Preis: ${formatCurrency(
             getPriceBreakdown(order.total).net,

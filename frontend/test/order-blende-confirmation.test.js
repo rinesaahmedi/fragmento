@@ -96,7 +96,7 @@ test("order confirmation can generate purchased kitchen sketch attachment", asyn
 });
 
 test("order confirmation PDF hides type numbers for services", async () => {
-  const pdf = await generateOrderConfirmationPdf({
+  const order = {
     orderNumber: "FRG-TEST-007",
     createdAt: "2026-07-01T10:00:00.000Z",
     total: 438,
@@ -132,7 +132,9 @@ test("order confirmation PDF hides type numbers for services", async () => {
         price: 349,
       },
     ],
-  });
+  };
+
+  const pdf = await generateOrderConfirmationPdf(order);
 
   const text = await extractPdfText(pdf.base64);
   assert.match(text, /Besteckeinsatz 60 cm/);
@@ -140,6 +142,12 @@ test("order confirmation PDF hides type numbers for services", async () => {
   assert.match(text, /Dienstleistungen/);
   assert.match(text, /Delivery, Carry-in, Assembly and Installation/);
   assert.doesNotMatch(text, /SVC-MONTAGE-001/);
+
+  const html = buildOrderSummaryHtml(order);
+  assert.match(html, /Besteckeinsatz 60 cm[\s\S]*?Typen-Nr\.: ZB60SG/);
+  assert.match(html, /Neu best.tigte Dienstleistungen/);
+  assert.match(html, /Delivery, Carry-in, Assembly and Installation/);
+  assert.doesNotMatch(html, /Typen-Nr\.: SVC-MONTAGE-001/);
 });
 
 test("order confirmation summary renders blende as a cabinet subtitle", () => {
