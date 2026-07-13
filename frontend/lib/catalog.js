@@ -4,6 +4,7 @@ import { ORDER_KIND_LIVE, ORDER_KIND_TEST, getOrderDelegate } from "./order-kind
 import { applyDueScheduledCatalogPriceListImports } from "./catalog-price-list-import.js";
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
 import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
+import { buildAuszugVariantMetadata } from "./auszug-variants.js";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
@@ -254,22 +255,32 @@ async function attachCutleryCatalogVariants(kitchen) {
   if (!kitchen) return kitchen;
 
   try {
-    const articles = await prisma.catalogArticle.findMany({
-      where: {
-        itemType: ItemType.ACCESSORY,
-        isActive: true,
-        articleNumber: {
-          in: CUTLERY_VARIANTS.map((variant) => variant.articleNumber),
+    const [cutleryArticles, auszugVariantArticles] = await Promise.all([
+      prisma.catalogArticle.findMany({
+        where: {
+          itemType: ItemType.ACCESSORY,
+          isActive: true,
+          articleNumber: {
+            in: CUTLERY_VARIANTS.map((variant) => variant.articleNumber),
+          },
         },
-      },
-      orderBy: [{ widthMm: "asc" }, { articleNumber: "asc" }],
-    });
+        orderBy: [{ widthMm: "asc" }, { articleNumber: "asc" }],
+      }),
+      prisma.catalogArticle.findMany({
+        where: {
+          itemType: ItemType.COMPONENT,
+          isActive: true,
+          articleNumber: { startsWith: "US2A" },
+        },
+        orderBy: [{ widthMm: "asc" }, { articleNumber: "asc" }],
+      }),
+    ]);
 
     return {
       ...kitchen,
-      cutleryVariants: articles.length
+      cutleryVariants: cutleryArticles.length
         ? normalizeCutleryVariants(
-          articles.map((article) => ({
+          cutleryArticles.map((article) => ({
             articleNumber: article.articleNumber,
             name: article.name,
             nameDe: article.nameDe || "",
@@ -278,6 +289,7 @@ async function attachCutleryCatalogVariants(kitchen) {
           })),
         )
         : normalizeCutleryVariants(CUTLERY_VARIANTS),
+      auszugVariantArticles,
     };
   } catch {
     return kitchen;
@@ -1065,6 +1077,7 @@ async function attachHousingCompaniesToContracts(contracts) {
 
 export function serializeKitchenForLegacy(kitchen) {
   const items = kitchen.items || [];
+  const auszugVariantArticles = kitchen.auszugVariantArticles || [];
   const toClientItem = (item) => {
     const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
     const catalogService = item.catalogServiceId ? item.catalogService : null;
@@ -1080,6 +1093,14 @@ export function serializeKitchenForLegacy(kitchen) {
       const blendeTotal = catalogBlende?.price != null ? Number(catalogBlende.price) * catalogBlendeQuantity : 0;
       return Number(catalogArticle.price) + blendeTotal;
     })();
+
+    const articleVariants = {};
+    const auszugVariant = item.itemType === ItemType.COMPONENT
+      ? buildAuszugVariantMetadata(item, auszugVariantArticles)
+      : null;
+    if (auszugVariant) {
+      articleVariants[auszugVariant.key] = auszugVariant;
+    }
 
     return {
       id: item.id,
@@ -1111,6 +1132,7 @@ export function serializeKitchenForLegacy(kitchen) {
       blendeName: catalogBlende?.name || "",
       blendeNameDe: catalogBlende?.nameDe || "",
       blendePrice: catalogBlende?.price != null ? Number(catalogBlende.price) : item.blendePrice != null ? Number(item.blendePrice) : null,
+      articleVariants,
     };
   };
 

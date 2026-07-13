@@ -25,6 +25,7 @@ import {
   isCutleryAccessoryItem,
   normalizeCutleryVariants,
 } from "../lib/cutlery-accessories";
+import { applyArticleVariantSelection, findAuszugVariantOption } from "../lib/auszug-variants";
 import {
   getServiceDisabledReason,
   SERVICE_CODE_MONTAGE,
@@ -189,6 +190,8 @@ function CatalogItem({
   onOpenPhotos,
   productAssistantEnabled,
   onOpenProductAssistant,
+  articleVariant,
+  onSelectArticleVariant,
 }) {
   const { translate, language } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate, language, false);
@@ -243,6 +246,14 @@ function CatalogItem({
       onClick?.();
     }
   };
+  const auszugVariant = articleVariant || item.articleVariants?.auszug || null;
+  const auszugOptions = auszugVariant?.options || [];
+  const selectedAuszugOption = findAuszugVariantOption({ articleVariants: { auszug: auszugVariant } }, item.articleNumber);
+  const yesAuszugOption = auszugOptions.find((option) => option.key === "yes") || null;
+  const noAuszugOption = auszugOptions.find((option) => option.key === "no") || null;
+  const isAuszugSelected = selectedAuszugOption?.key === "yes";
+  const auszugUpgradePrice = Math.max(0, Number(yesAuszugOption?.price || 0) - Number(noAuszugOption?.price || 0));
+  const showAuszugOption = Boolean(selected && yesAuszugOption && !locked && !disabled);
 
   return (
     <div
@@ -365,6 +376,29 @@ function CatalogItem({
           ) : null}
         </div>
       </div>
+      {showAuszugOption ? (
+        <button
+          type="button"
+          className={isAuszugSelected ? styles.articleVariantRowActive : styles.articleVariantRow}
+          aria-pressed={isAuszugSelected}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelectArticleVariant?.(isAuszugSelected ? noAuszugOption?.articleNumber : yesAuszugOption.articleNumber);
+          }}
+        >
+          <span className={styles.articleVariantDetails}>
+            <span className={styles.articleVariantLabel}>{translate("configurator.auszugOptionLabel", "Soft close")}</span>
+            <strong className={styles.articleVariantPrice}>
+              {isAuszugSelected
+                ? translate("configurator.auszugIncluded", "included")
+                : `+${formatCurrency(auszugUpgradePrice)}`}
+            </strong>
+          </span>
+          <span className={isAuszugSelected ? styles.articleVariantSwitchActive : styles.articleVariantSwitch} aria-hidden="true">
+            <span />
+          </span>
+        </button>
+      ) : null}
     </div>
   );
 }
@@ -619,6 +653,7 @@ export default function KitchenCatalogPanel({
   kitchenSlug,
   visibleComponents,
   selectedComponents,
+  selectedArticleVariants = {},
   selectedAccessories,
   selectedServices,
   selectedComponentIds,
@@ -629,6 +664,7 @@ export default function KitchenCatalogPanel({
   orderLockedAccessoryCodes,
   orderLockedServiceCodes,
   setSelectedComponentIds,
+  onSelectArticleVariant,
   onToggleAccessory,
   onToggleService,
   cutleryVariants = CUTLERY_VARIANTS,
@@ -660,12 +696,19 @@ export default function KitchenCatalogPanel({
           <div className={styles.catalogGrid}>
             {visibleComponents.map((item) => {
               const componentId = componentIdForItem(item);
-              const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, item);
+              const selectedArticleNumber = selectedArticleVariants[componentId] || "";
+              const variantSourceItem = applyArticleVariantSelection(item, selectedArticleNumber);
+              const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, variantSourceItem);
+              const articleVariant = item.articleVariants?.auszug || null;
+              const cardItem = {
+                ...displayItem.item,
+                articleVariants: item.articleVariants,
+              };
 
               return (
                 <CatalogItem
                   key={item.id}
-                  item={displayItem.item}
+                  item={cardItem}
                   selected={isLinkedComponentSelected(kitchenSlug, selectedComponentIds, componentId)}
                   price={displayItem.price}
                   infoPdfHref={displayItem.infoPdfHref}
@@ -673,6 +716,8 @@ export default function KitchenCatalogPanel({
                   onOpenPhotos={onOpenProductPhotos}
                   productAssistantEnabled={shouldShowProductAssistantLauncher(displayItem.item)}
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
+                  articleVariant={articleVariant}
+                  onSelectArticleVariant={(articleNumber) => onSelectArticleVariant?.(componentId, articleNumber)}
                   onClick={() =>
                     setSelectedComponentIds((current) =>
                       toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
