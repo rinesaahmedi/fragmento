@@ -488,31 +488,35 @@ model PropertyObject {
 }
 
 model OrderItem {
-  id            String       @id @default(cuid())
-  orderId       String
-  order         Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  kitchenItemId String?
-  kitchenItem   KitchenItem? @relation(fields: [kitchenItemId], references: [id], onDelete: SetNull)
-  itemType      ItemType
-  code          String
-  nameSnapshot  String
-  priceSnapshot Decimal      @db.Decimal(10, 2)
-  quantity      Int          @default(1)
-  createdAt     DateTime     @default(now())
+  id                    String       @id @default(cuid())
+  orderId               String
+  order                 Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kitchenItemId         String?
+  kitchenItem           KitchenItem? @relation(fields: [kitchenItemId], references: [id], onDelete: SetNull)
+  itemType              ItemType
+  code                  String
+  nameSnapshot          String
+  nameDeSnapshot        String?
+  articleNumberSnapshot String?
+  priceSnapshot         Decimal      @db.Decimal(10, 2)
+  quantity              Int          @default(1)
+  createdAt             DateTime     @default(now())
 }
 
 model TestOrderItem {
-  id            String       @id @default(cuid())
-  orderId       String
-  order         TestOrder    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  kitchenItemId String?
-  kitchenItem   KitchenItem? @relation(fields: [kitchenItemId], references: [id], onDelete: SetNull)
-  itemType      ItemType
-  code          String
-  nameSnapshot  String
-  priceSnapshot Decimal      @db.Decimal(10, 2)
-  quantity      Int          @default(1)
-  createdAt     DateTime     @default(now())
+  id                    String       @id @default(cuid())
+  orderId               String
+  order                 TestOrder    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  kitchenItemId         String?
+  kitchenItem           KitchenItem? @relation(fields: [kitchenItemId], references: [id], onDelete: SetNull)
+  itemType              ItemType
+  code                  String
+  nameSnapshot          String
+  nameDeSnapshot        String?
+  articleNumberSnapshot String?
+  priceSnapshot         Decimal      @db.Decimal(10, 2)
+  quantity              Int          @default(1)
+  createdAt             DateTime     @default(now())
 }
 
 model ServiceClaim {

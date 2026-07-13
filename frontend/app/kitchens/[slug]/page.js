@@ -25,7 +25,7 @@ function getOrderItemArticleNumber(item) {
     if (matchedVariant) return matchedVariant.articleNumber;
   }
 
-  return item.kitchenItem?.catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || "";
+  return item.articleNumberSnapshot || item.kitchenItem?.catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || "";
 }
 
 function serializeOrderItems(items = [], locked = false) {
@@ -37,8 +37,8 @@ function serializeOrderItems(items = [], locked = false) {
     return {
       itemType: String(item.itemType || "").toLowerCase(),
       code: item.code || "",
-      name: catalogArticle?.name || catalogService?.name || item.nameSnapshot || "",
-      nameDe: catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || "",
+      name: item.nameSnapshot || catalogArticle?.name || catalogService?.name || "",
+      nameDe: item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || "",
       articleNumber: getOrderItemArticleNumber(item),
       blendeCode: catalogBlende?.code || item.kitchenItem?.blendeCode || item.blendeCode || "",
       blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.kitchenItem?.blendeLabel || item.blendeLabel || "",

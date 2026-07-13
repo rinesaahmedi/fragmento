@@ -44,6 +44,7 @@ import {
   normalizeCutleryVariants,
   normalizeCutleryLines,
 } from "../lib/cutlery-accessories";
+import { applyArticleVariantSelection, findAuszugVariantOption } from "../lib/auszug-variants";
 import { PublicI18nProvider, PublicLanguageSwitcher, usePublicI18n } from "./public-i18n";
 
 function buildInitialCustomer(contractNumber) {
@@ -978,6 +979,20 @@ function buildInitialCodes(kitchenConfig, initialOrder, itemType, configKey) {
   return kitchenConfig[configKey].filter((item) => itemCodes.has(item.code)).map((item) => item.code);
 }
 
+function buildInitialArticleVariants(kitchenConfig, initialOrder) {
+  const variants = {};
+  for (const initialItem of initialOrder?.items || []) {
+    if (initialItem.itemType !== "component") continue;
+    const item = kitchenConfig.components.find((candidate) => candidate.code === initialItem.code);
+    if (!item) continue;
+    const selectedOption = findAuszugVariantOption(item, initialItem.articleNumber);
+    if (selectedOption?.key === "yes") {
+      variants[componentIdForItem(item)] = selectedOption.articleNumber;
+    }
+  }
+  return variants;
+}
+
 function buildOrderLockedComponentIds(kitchenConfig, initialOrder, kitchenSlug) {
   const componentCodes = lockedItemCodesByType(initialOrder, "component");
   const componentIds = kitchenConfig.components
@@ -1028,6 +1043,9 @@ function readConfiguratorDraft(storageKey) {
 
     return {
       selectedComponentIds: Array.isArray(parsed.selectedComponentIds) ? parsed.selectedComponentIds : [],
+      selectedArticleVariants: parsed.selectedArticleVariants && typeof parsed.selectedArticleVariants === "object"
+        ? parsed.selectedArticleVariants
+        : {},
       selectedAccessoryCodes: Array.isArray(parsed.selectedAccessoryCodes) ? parsed.selectedAccessoryCodes : [],
       selectedServiceCodes: Array.isArray(parsed.selectedServiceCodes) ? parsed.selectedServiceCodes : [],
       cutleryLines: Array.isArray(parsed.cutleryLines) ? parsed.cutleryLines : [],
@@ -1067,6 +1085,7 @@ function filterRegularAccessoryCodes(accessoryCodes = [], accessories = []) {
 
 function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAccessoryCodes, initialOrder, draft, kitchenSlug) {
   const baseComponentIds = buildInitialComponentIds(kitchenConfig, fixedComponentIds, initialOrder, kitchenSlug);
+  const baseArticleVariants = buildInitialArticleVariants(kitchenConfig, initialOrder);
   const baseAccessoryCodes = filterRegularAccessoryCodes(
     [...new Set([...fixedAccessoryCodes, ...buildInitialCodes(kitchenConfig, initialOrder, "accessory", "accessories")])],
     kitchenConfig.accessories,
@@ -1081,6 +1100,7 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
   if (!draft) {
     return {
       selectedComponentIds: baseComponentIds,
+      selectedArticleVariants: baseArticleVariants,
       selectedAccessoryCodes: baseAccessoryCodes,
       selectedServiceCodes: baseServiceCodes,
       cutleryLines,
@@ -1104,6 +1124,13 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
         ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
       ]),
     ],
+    selectedArticleVariants: Object.fromEntries(
+      Object.entries({ ...baseArticleVariants, ...(draft.selectedArticleVariants || {}) }).filter(([componentId, articleNumber]) => {
+        if (!validComponentIds.has(componentId)) return false;
+        const item = kitchenConfig.components.find((candidate) => componentIdForItem(candidate) === componentId);
+        return Boolean(item && findAuszugVariantOption(item, articleNumber)?.key === "yes");
+      }),
+    ),
     selectedAccessoryCodes: [
       ...new Set([
         ...fixedAccessoryCodes,
@@ -1219,6 +1246,7 @@ function KitchenConfiguratorContent({
   );
 
   const [selectedComponentIds, setSelectedComponentIds] = useState(initialSelection.selectedComponentIds);
+  const [selectedArticleVariants, setSelectedArticleVariants] = useState(initialSelection.selectedArticleVariants);
   const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState(initialSelection.selectedAccessoryCodes);
   const [selectedServiceCodes, setSelectedServiceCodes] = useState(initialSelection.selectedServiceCodes);
   const [cutleryLines, setCutleryLines] = useState(initialSelection.cutleryLines);
@@ -1266,6 +1294,7 @@ function KitchenConfiguratorContent({
       setUseContractAddressForOrder(customerUsesContractAddress(nextCustomer, initialContractAddress));
       setAddressVerification(buildAddressVerificationState());
       setSelectedComponentIds(nextSelection.selectedComponentIds);
+      setSelectedArticleVariants(nextSelection.selectedArticleVariants);
       setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
       setSelectedServiceCodes(nextSelection.selectedServiceCodes);
       setCutleryLines(nextSelection.cutleryLines);
@@ -1283,6 +1312,7 @@ function KitchenConfiguratorContent({
       setUseContractAddressForOrder(true);
       setAddressVerification(buildAddressVerificationState());
       setSelectedComponentIds(nextSelection.selectedComponentIds);
+      setSelectedArticleVariants(nextSelection.selectedArticleVariants);
       setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
       setSelectedServiceCodes(nextSelection.selectedServiceCodes);
       setCutleryLines(nextSelection.cutleryLines);
@@ -1299,6 +1329,7 @@ function KitchenConfiguratorContent({
     setUseContractAddressForOrder(false);
     setAddressVerification(buildAddressVerificationState());
     setSelectedComponentIds(nextSelection.selectedComponentIds);
+    setSelectedArticleVariants(nextSelection.selectedArticleVariants);
     setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
     setSelectedServiceCodes(nextSelection.selectedServiceCodes);
     setCutleryLines(nextSelection.cutleryLines);
@@ -1371,11 +1402,13 @@ function KitchenConfiguratorContent({
   const selectedComponents = kitchenConfig.components
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
     .map((item) => {
-      const mergedItem = mergeInitialOrderItemFields(item, "component", initialOrderItemLookup);
+      const componentId = componentIdForItem(item);
+      const variantItem = applyArticleVariantSelection(item, selectedArticleVariants[componentId]);
+      const mergedItem = mergeInitialOrderItemFields(variantItem, "component", initialOrderItemLookup);
       return {
         ...mergedItem,
-        isLocked: item.isLocked || defaultLockedComponentIds.includes(componentIdForItem(item)),
-        isOrderLocked: orderLockedComponentIds.includes(componentIdForItem(item)),
+        isLocked: item.isLocked || defaultLockedComponentIds.includes(componentId),
+        isOrderLocked: orderLockedComponentIds.includes(componentId),
       };
     });
   const cutleryBaseItem = useMemo(
@@ -1525,6 +1558,19 @@ function KitchenConfiguratorContent({
   }, [fixedComponentIds, fixedComponentIdsKey]);
 
   useEffect(() => {
+    const selectedSet = new Set(selectedComponentIds);
+    setSelectedArticleVariants((current) => {
+      const next = Object.fromEntries(
+        Object.entries(current).filter(([componentId]) => selectedSet.has(componentId)),
+      );
+      if (Object.keys(next).length === Object.keys(current).length) {
+        return current;
+      }
+      return next;
+    });
+  }, [selectedComponentIds]);
+
+  useEffect(() => {
     setSelectedAccessoryCodes((current) => {
       const next = [...new Set([...fixedAccessoryCodes, ...current])].filter(
         (code) => !isCutleryAccessoryCode(code),
@@ -1554,11 +1600,12 @@ function KitchenConfiguratorContent({
   useEffect(() => {
     writeConfiguratorDraft(draftStorageKey, {
       selectedComponentIds,
+      selectedArticleVariants,
       selectedAccessoryCodes,
       selectedServiceCodes,
       cutleryLines,
     });
-  }, [cutleryLines, draftStorageKey, selectedAccessoryCodes, selectedComponentIds, selectedServiceCodes]);
+  }, [cutleryLines, draftStorageKey, selectedAccessoryCodes, selectedArticleVariants, selectedComponentIds, selectedServiceCodes]);
 
   function toggleAccessory(itemCode) {
     const accessoryItem = kitchenConfig.accessories.find((item) => item.code === itemCode);
@@ -1683,6 +1730,31 @@ function KitchenConfiguratorContent({
     setUseContractAddressForOrder(false);
   }
 
+  function selectArticleVariant(componentId, articleNumber) {
+    const item = kitchenConfig.components.find((candidate) => componentIdForItem(candidate) === componentId);
+    const selectedOption = findAuszugVariantOption(item, articleNumber);
+    if (!item || !selectedOption) return;
+
+    setSelectedArticleVariants((current) => {
+      const next = { ...current };
+      if (selectedOption.key === "yes") {
+        next[componentId] = selectedOption.articleNumber;
+      } else {
+        delete next[componentId];
+      }
+      return next;
+    });
+
+    setSelectedComponentIds((current) => {
+      if (current.includes(componentId)) return current;
+      const currentSet = new Set(current);
+      getLinkedComponentIds(kitchenSlug, componentId).forEach((linkedId) => {
+        currentSet.add(linkedId);
+      });
+      return [...currentSet];
+    });
+  }
+
   function removeComponent(item) {
     const componentId = componentIdForItem(item);
     if (fixedComponentIds.includes(componentId)) {
@@ -1718,6 +1790,7 @@ function KitchenConfiguratorContent({
     setCutleryLines([]);
     setSelectedServiceCodes([...orderLockedServiceCodes]);
     setSelectedComponentIds(fixedComponentIds);
+    setSelectedArticleVariants({});
     setStatus("");
     setStatusTone("idle");
   }
@@ -2226,6 +2299,7 @@ function KitchenConfiguratorContent({
                 selectedAccessories={selectedAccessories}
                 selectedServices={selectedServices}
                 selectedComponentIds={selectedComponentIds}
+                selectedArticleVariants={selectedArticleVariants}
                 selectedAccessoryCodes={selectedAccessoryCodes}
                 selectedServiceCodes={selectedServiceCodes}
                 selectedDisplayCount={selectedDisplayCount}
@@ -2233,6 +2307,7 @@ function KitchenConfiguratorContent({
                 orderLockedAccessoryCodes={fixedAccessoryCodes}
                 orderLockedServiceCodes={orderLockedServiceCodes}
                 setSelectedComponentIds={setSelectedComponentIds}
+                onSelectArticleVariant={selectArticleVariant}
                 onToggleAccessory={toggleAccessory}
                 cutleryVariants={cutleryVariants}
                 cutleryLines={cutleryLines}

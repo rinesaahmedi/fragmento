@@ -36,6 +36,7 @@ import {
   isCutleryAccessoryCode,
   parseCutleryLineFromOrderItem,
 } from "./cutlery-accessories";
+import { normalizeArticleNumber, resolveAuszugVariantSelection } from "./auszug-variants";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -171,7 +172,7 @@ function normalizeSubmissionItems(items = []) {
   return [...merged.values()];
 }
 
-function mapCatalogItem(catalogItems, submittedItem, itemType) {
+export function mapCatalogItem(catalogItems, submittedItem, itemType, options = {}) {
   const matched =
     catalogItems.find((item) => item.itemType === itemType && item.code === submittedItem.code) ||
     catalogItems.find((item) => item.itemType === itemType && item.name === submittedItem.name) ||
@@ -182,18 +183,34 @@ function mapCatalogItem(catalogItems, submittedItem, itemType) {
   const catalogService = matched.catalogServiceId ? matched.catalogService : null;
   const catalogBlende = matched.catalogBlendeId ? matched.catalogBlende : null;
   const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(matched.catalogBlendeQuantity || 1), 10) || 1);
+  const submittedArticleNumber = normalizeArticleNumber(submittedItem.articleNumber);
+  const matchedArticleNumber = normalizeArticleNumber(catalogArticle?.articleNumber || matched.articleNumber);
+  let selectedArticle = catalogArticle;
+
+  if (
+    itemType === ItemType.COMPONENT &&
+    submittedArticleNumber &&
+    submittedArticleNumber !== matchedArticleNumber
+  ) {
+    const selectedVariant = resolveAuszugVariantSelection(matched, submittedArticleNumber, options.auszugVariantArticles || []);
+    if (selectedVariant.status !== "variant") {
+      return null;
+    }
+    selectedArticle = selectedVariant.article;
+  }
+
   const catalogPrice = (() => {
     if (catalogService?.price != null) return Number(catalogService.price);
-    if (catalogArticle?.price == null) return submittedItem.price != null ? submittedItem.price : matched.price;
+    if (selectedArticle?.price == null) return submittedItem.price != null ? submittedItem.price : matched.price;
     const blendeTotal = catalogBlende?.price != null ? Number(catalogBlende.price) * catalogBlendeQuantity : 0;
-    return Number(catalogArticle.price) + blendeTotal;
+    return Number(selectedArticle.price) + blendeTotal;
   })();
 
   return {
     ...matched,
-    name: catalogArticle?.name || catalogService?.name || submittedItem.name || matched.name,
-    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || matched.nameDe || "",
-    articleNumber: catalogArticle?.articleNumber || submittedItem.articleNumber || matched.articleNumber,
+    name: selectedArticle?.name || catalogService?.name || submittedItem.name || matched.name,
+    nameDe: selectedArticle?.nameDe || catalogService?.nameDe || matched.nameDe || "",
+    articleNumber: selectedArticle?.articleNumber || submittedItem.articleNumber || matched.articleNumber,
     price: catalogPrice,
     quantity: submittedItem.quantity || 1,
   };
@@ -225,11 +242,11 @@ export function buildOrderForNotifications(orderRecord) {
     const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
     const displayNameDe = cutleryLine
       ? cutleryVariant?.nameDe || displayName
-      : catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || item.nameDe || "";
+      : item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || item.nameDe || "";
 
     return {
       code: item.code,
-      articleNumber: cutleryLine?.articleNumber || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
+      articleNumber: cutleryLine?.articleNumber || item.articleNumberSnapshot || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
       name: displayName,
       nameDe: displayNameDe,
       price: getOrderItemEffectivePrice(item),
@@ -401,8 +418,8 @@ function buildConfirmedBaselineSelectionItem(item) {
     itemType: item.itemType,
     code: item.code,
     name: item.nameSnapshot || kitchenItem.name || catalogArticle?.name || catalogService?.name || item.code,
-    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || item.nameDe || "",
-    articleNumber: catalogArticle?.articleNumber || kitchenItem.articleNumber || item.articleNumber || "",
+    nameDe: item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || kitchenItem.nameDe || item.nameDe || "",
+    articleNumber: item.articleNumberSnapshot || catalogArticle?.articleNumber || kitchenItem.articleNumber || item.articleNumber || "",
     blendeCode: catalogBlende?.code || kitchenItem.blendeCode || item.blendeCode || "",
     blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || kitchenItem.blendeLabel || item.blendeLabel || "",
     blendeName: catalogBlende?.name || item.blendeName || "",
@@ -448,6 +465,14 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw new Error("Kitchen not found");
   }
 
+  const auszugVariantArticles = await prisma.catalogArticle.findMany({
+    where: {
+      itemType: ItemType.COMPONENT,
+      isActive: true,
+      articleNumber: { startsWith: "US2A" },
+    },
+  });
+
   const customer = orderPayload?.customer || {};
   validateConsent(customer.consent);
   validateConsent(customer.termsConsent);
@@ -479,7 +504,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   };
 
   const selectedComponents = submittedGroups.components.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.COMPONENT),
+    mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, { auszugVariantArticles }),
   );
   const selectedAccessories = submittedGroups.accessories.map((item) =>
     mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY),
@@ -655,6 +680,8 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
               itemType: item.itemType,
               code: item.code,
               nameSnapshot: item.name,
+              nameDeSnapshot: item.nameDe || null,
+              articleNumberSnapshot: item.articleNumber || null,
               priceSnapshot: Number(item.price),
               quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
             })),
