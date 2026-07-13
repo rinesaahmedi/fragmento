@@ -3307,12 +3307,21 @@ textarea {
 }
 
 .service-field__problem-area-label-text {
-  display: inline-flex;
-  align-items: baseline;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   justify-content: flex-start;
   width: fit-content;
   max-width: 100%;
-  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.service-field__problem-area-article-code {
+  color: var(--app-muted, #7b7068);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
 }
 
 .service-field__problem-area-stack {
@@ -3411,6 +3420,39 @@ textarea {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.service-claim-kitchen__manual-options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 10px 8px;
+}
+
+.service-claim-kitchen__manual-option {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(107, 79, 58, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.service-claim-kitchen__manual-option:hover,
+.service-claim-kitchen__manual-option:focus-visible {
+  border-color: rgba(107, 79, 58, 0.5);
+  background: rgba(107, 79, 58, 0.08);
+}
+
+.service-claim-kitchen__manual-option--selected {
+  border-color: rgba(180, 80, 48, 0.72);
+  background: rgba(180, 80, 48, 0.12);
+  color: #8f3f2b;
 }
 
 .service-claim-kitchen__svg-host {

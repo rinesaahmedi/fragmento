@@ -17,6 +17,17 @@ const CLAIM_COMPONENT_LABEL_OVERRIDES = {
   "component-sink-faucet": "Sink",
 };
 
+export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
+  sink: "component-claim-sink",
+  "sink-cabinet": "component-claim-sink-cabinet",
+  faucet: "component-claim-faucet",
+  oven: "component-claim-oven",
+  "oven-drawer": "component-claim-oven-drawer",
+  cooktop: "component-claim-cooktop",
+  "worktop-left": "component-claim-worktop-left",
+  "worktop-right": "component-claim-worktop-right",
+};
+
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105805": [["component-extractor-hood", "component-under-cabinet-light"]],
   "ab-105809": [["component-extractor-hood", "component-under-cabinet-light"]],
@@ -76,6 +87,7 @@ export function buildServiceClaimSelectableComponents({
   kitchenConfig,
   kitchenSlug,
   confirmedItems = [],
+  claimParts = [],
 }) {
   const componentMetaById = buildServiceClaimComponentMetaById(kitchen, kitchenConfig);
   const selectableIds = new Set();
@@ -171,9 +183,46 @@ export function buildServiceClaimSelectableComponents({
     addSelectableComponent(componentId, entry.fallbackMeta);
   }
 
+  const separatedSourceComponentIds = new Set(
+    (claimParts || [])
+      .map((part) => componentIdForItem({ componentKey: part?.sourceComponentKey }))
+      .filter(Boolean),
+  );
+  const separatedClaimParts = (claimParts || [])
+    .map((part) => {
+      const partKey = String(part?.partKey || "").trim();
+      const componentId = SERVICE_CLAIM_PART_COMPONENT_IDS[partKey];
+      if (!componentId) {
+        return null;
+      }
+
+      return {
+        componentId,
+        code: String(part?.articleCode || part?.sourceKitchenItemCode || "").trim(),
+        articleCode: String(part?.articleCode || "").trim(),
+        sourceKitchenItemCode: String(part?.sourceKitchenItemCode || "").trim(),
+        name: String(part?.name || partKey).trim(),
+        nameDe: String(part?.nameDe || "").trim(),
+        componentKey: String(part?.sourceComponentKey || "").trim(),
+        claimPartKey: partKey,
+      };
+    })
+    .filter(Boolean);
+
+  const separatedClaimPartIds = new Set(separatedClaimParts.map((part) => part.componentId));
+  const resolvedSelectableIds = [
+    ...[...selectableIds].filter((componentId) => !separatedSourceComponentIds.has(componentId)),
+    ...separatedClaimParts.map((part) => part.componentId),
+  ];
+  const resolvedSelectableMeta = [
+    ...selectableMeta.filter((entry) => !separatedSourceComponentIds.has(entry.componentId)),
+    ...separatedClaimParts,
+  ].filter((entry) => resolvedSelectableIds.includes(entry.componentId) || separatedClaimPartIds.has(entry.componentId));
+
   return {
-    selectableComponentIds: [...selectableIds],
-    selectableComponents: selectableMeta,
+    selectableComponentIds: resolvedSelectableIds,
+    selectableComponents: resolvedSelectableMeta,
+    visibleComponentIds: [...selectableIds],
     source: "kitchen",
   };
 }

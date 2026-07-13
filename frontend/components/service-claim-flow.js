@@ -56,6 +56,36 @@ function formatGermanClaimAreaName(area, fallbackName) {
   const code = String(area?.code || "").trim().toUpperCase();
   const componentId = String(area?.componentId || "").trim();
   const normalizedName = String(fallbackName || area?.name || "").trim().toLowerCase();
+  const claimPartNameDe = String(area?.nameDe || "").trim();
+
+  if ((area?.claimPartKey || componentId.startsWith("component-claim-")) && claimPartNameDe) {
+    return claimPartNameDe;
+  }
+
+  if (componentId === "component-claim-sink") {
+    return "Sp\u00fcle";
+  }
+  if (componentId === "component-claim-sink-cabinet") {
+    return "Sp\u00fclenunterschrank";
+  }
+  if (componentId === "component-claim-faucet") {
+    return "Armatur";
+  }
+  if (componentId === "component-claim-oven") {
+    return "Backofen";
+  }
+  if (componentId === "component-claim-oven-drawer") {
+    return "Schublade unter Backofen";
+  }
+  if (componentId === "component-claim-cooktop") {
+    return "Kochfeld";
+  }
+  if (componentId === "component-claim-worktop-left") {
+    return "Arbeitsplatte links";
+  }
+  if (componentId === "component-claim-worktop-right") {
+    return "Arbeitsplatte rechts";
+  }
 
   const exactLabel = CLAIM_AREA_LABELS_BY_CODE.de?.[code];
   if (exactLabel) {
@@ -551,6 +581,8 @@ const COPY = {
     kitchenPlanEyebrow: "K\u00fcchenmodell",
     kitchenPlanTitle: "Problemstelle in der K\u00fcche markieren",
     kitchenPlanReset: "Auswahl zur\u00fccksetzen",
+    kitchenPlanSinkOption: "Sp\u00fcle",
+    kitchenPlanCooktopOption: "Kochfeld",
     kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
     kitchenPlanSelectedNone: "Noch keine Bereiche ausgew\u00e4hlt.",
     kitchenAreasLinePrefix: "K\u00fcchenbereiche:",
@@ -776,6 +808,8 @@ const COPY = {
     kitchenPlanEyebrow: "Kitchen model",
     kitchenPlanTitle: "Mark where the problem is",
     kitchenPlanReset: "Clear selection",
+    kitchenPlanSinkOption: "Sink",
+    kitchenPlanCooktopOption: "Cooktop",
     kitchenPlanSelectedLabel: "Selected",
     kitchenPlanSelectedNone: "No areas selected yet.",
     kitchenAreasLinePrefix: "Kitchen areas:",
@@ -4595,6 +4629,8 @@ export default function ServiceClaimFlow() {
                       title: contractLookup.kitchenPlan.kitchenName || t("kitchenPlanTitle"),
                       contractLabel: copy.contractNumber,
                       reset: t("kitchenPlanReset"),
+                      sinkOption: t("kitchenPlanSinkOption"),
+                      cooktopOption: t("kitchenPlanCooktopOption"),
                     }}
                   />
                 </>
@@ -4605,8 +4641,15 @@ export default function ServiceClaimFlow() {
                     <div key={area.componentId} className="service-field service-field--problem-area-row">
                       <label className="service-field__problem-area-label">
                         <span className="service-field__problem-area-label-text">
-                          {area.label}
-                          <RequiredFieldMark title={requiredFieldTitle} />
+                          <span>
+                            {area.label}
+                            <RequiredFieldMark title={requiredFieldTitle} />
+                          </span>
+                          {area.articleCode ? (
+                            <small className="service-field__problem-area-article-code">
+                              {area.articleCode}
+                            </small>
+                          ) : null}
                         </span>
                       </label>
                       <div className="service-field__problem-area-stack">

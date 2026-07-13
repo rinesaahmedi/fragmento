@@ -30,6 +30,12 @@ const DEFAULT_SINK_WORKTOP_CATALOG_CODE = "SINK-WORKTOP";
 const DEFAULT_WORKTOP_CATALOG_NAME_EN = "Worktop";
 const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
+const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-104968", "ab-105734", "ab-105737", "ab-105740",
+  "ab-105805", "ab-105809", "ab-105813", "ab-105817",
+  "ab-105822", "ab-105825", "ab-105828", "ab-105831",
+  "ab-105834", "ab-105837", "ab-105840", "ab-105843",
+]);
 
 const ARTICLE_PRICES = {
   "517467": 89,
@@ -2602,6 +2608,144 @@ async function main() {
         data: { isActive: false },
       });
     }
+
+    const claimSourceItems = kitchen.items.map(applyDefaultCatalogItem);
+    const sinkCabinet = claimSourceItems.find((item) => (
+      item?.isActive !== false
+      && (
+        String(item?.code || "").toUpperCase().startsWith("SINKBASE-")
+        || String(item?.componentKey || "").toLowerCase() === "sink-base"
+      )
+    ));
+    const sinkFixture = claimSourceItems.find((item) => (
+      item?.isActive !== false
+      && String(item?.componentKey || "").toLowerCase() === "sink-faucet"
+    ));
+    for (const part of [
+      { partKey: "sink", articleCode: "526335", name: "Built-in Sink BLANCO TIPO 45 S", nameDe: "Einbau-Spüle BLANCO TIPO 45 S", source: sinkFixture, sortOrder: 10 },
+      { partKey: "sink-cabinet", articleCode: "SP60", name: "Sink Lower Cabinet", nameDe: "Spülen-Unterschrank", source: sinkCabinet, sortOrder: 20 },
+      { partKey: "faucet", articleCode: "517720", name: "Kitchen Faucet BLANCO DARAS HD", nameDe: "Küchenarmatur BLANCO DARAS HD", source: sinkFixture, sortOrder: 30 },
+    ]) {
+      if (!part.source) continue;
+      const { source, ...claimPart } = part;
+      await prisma.kitchenClaimPart.upsert({
+        where: {
+          kitchenId_partKey: {
+            kitchenId: kitchenRecord.id,
+            partKey: claimPart.partKey,
+          },
+        },
+        update: {
+          ...claimPart,
+          sourceKitchenItemCode: source.code,
+          sourceComponentKey: source.componentKey,
+          isActive: true,
+        },
+        create: {
+          kitchenId: kitchenRecord.id,
+          ...claimPart,
+          sourceKitchenItemCode: source.code,
+          sourceComponentKey: source.componentKey,
+          isActive: true,
+        },
+      });
+    }
+
+    const ovenBundle = claimSourceItems
+      .find((item) => (
+        item?.isActive !== false
+        && ["oven-module", "oven-base"].includes(String(item?.componentKey || "").toLowerCase())
+        && String(item?.code || "").toUpperCase().startsWith("OVEN-")
+      ));
+    if (ovenBundle) {
+      for (const part of [
+        { partKey: "oven", articleCode: "EH92364E-A", name: "Built-in Oven", nameDe: "Einbauherd", sortOrder: 40 },
+        { partKey: "oven-drawer", articleCode: "UHK", name: "Lower Cabinet for Built-in Oven", nameDe: "Unterschrank für Einbauherde", sortOrder: 45 },
+        { partKey: "cooktop", articleCode: "9EC744100C", name: "Ceramic Cooktop 60cm", nameDe: "Glaskeramikkochfeld 60 cm", sortOrder: 50 },
+      ]) {
+        await prisma.kitchenClaimPart.upsert({
+          where: {
+            kitchenId_partKey: {
+              kitchenId: kitchenRecord.id,
+              partKey: part.partKey,
+            },
+          },
+          update: {
+            ...part,
+            sourceKitchenItemCode: ovenBundle.code,
+            sourceComponentKey: ovenBundle.componentKey,
+            isActive: true,
+          },
+          create: {
+            kitchenId: kitchenRecord.id,
+            ...part,
+            sourceKitchenItemCode: ovenBundle.code,
+            sourceComponentKey: ovenBundle.componentKey,
+            isActive: true,
+          },
+        });
+      }
+    }
+
+    const normalizedKitchenSlug = String(kitchen.slug || "").trim().toLowerCase();
+    const worktop = claimSourceItems
+      .find((item) => (
+        item?.isActive !== false
+        && String(item?.componentKey || "").toLowerCase() === "worktop"
+      ));
+    if (worktop && L_SHAPED_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)) {
+      for (const part of [
+        { partKey: "worktop-left", articleCode: "PLR60-1", name: "Left Worktop", nameDe: "Arbeitsplatte links", sortOrder: 60 },
+        { partKey: "worktop-right", articleCode: "PLR60-2", name: "Right Worktop", nameDe: "Arbeitsplatte rechts", sortOrder: 70 },
+      ]) {
+        await prisma.kitchenClaimPart.upsert({
+          where: {
+            kitchenId_partKey: {
+              kitchenId: kitchenRecord.id,
+              partKey: part.partKey,
+            },
+          },
+          update: {
+            ...part,
+            sourceKitchenItemCode: worktop.code,
+            sourceComponentKey: worktop.componentKey,
+            isActive: true,
+          },
+          create: {
+            kitchenId: kitchenRecord.id,
+            ...part,
+            sourceKitchenItemCode: worktop.code,
+            sourceComponentKey: worktop.componentKey,
+            isActive: true,
+          },
+        });
+      }
+    }
+
+    await prisma.kitchenClaimPart.upsert({
+      where: {
+        kitchenId_partKey: {
+          kitchenId: kitchenRecord.id,
+          partKey: "cabinet-side-panel",
+        },
+      },
+      update: {
+        articleCode: "WU16",
+        name: "Cabinet side panel",
+        nameDe: "Unterschrank-Wange",
+        isActive: false,
+        sortOrder: 80,
+      },
+      create: {
+        kitchenId: kitchenRecord.id,
+        partKey: "cabinet-side-panel",
+        articleCode: "WU16",
+        name: "Cabinet side panel",
+        nameDe: "Unterschrank-Wange",
+        isActive: false,
+        sortOrder: 80,
+      },
+    });
   }
 
   for (const obsolete of OBSOLETE_KITCHENS) {

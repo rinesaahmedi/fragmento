@@ -534,6 +534,15 @@
   pointer-events: none;
 }
 
+.planApplianceCutouts {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 8;
+  pointer-events: none;
+}
+
 .planSideLabelLayer {
   position: absolute;
   inset: 0;
@@ -619,6 +628,19 @@
 .planHotspotPolygon.planHotspotSelected:focus-visible {
   border-color: rgba(42, 145, 85, 0.96);
   box-shadow: inset 0 0 0 1.5px rgba(42, 145, 85, 0.52);
+}
+
+/* Split worktops already contain the PDF's real edge lines. Avoid drawing the
+   hotspot polygons on top of them, which creates artificial seams. */
+.planHotspotWorktop,
+.planHotspotWorktop:hover,
+.planHotspotWorktop:focus-visible,
+.planHotspotWorktop.planHotspotHover,
+.planHotspotWorktop.planHotspotSelected,
+.planHotspotWorktop.planHotspotSelected:hover,
+.planHotspotWorktop.planHotspotSelected:focus-visible {
+  border-color: transparent;
+  box-shadow: none;
 }
 
 /* Default / fixed parts that are always included: blue (overrides the green selected style). */

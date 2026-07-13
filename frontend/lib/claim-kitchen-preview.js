@@ -164,8 +164,11 @@ export async function resolveVisibleComponentIdsForContract(contractNumber, kitc
     return null;
   }
 
-  const visibleComponentIds = Array.isArray(plan.selectableComponentIds)
-    ? plan.selectableComponentIds.filter(Boolean)
+  const planVisibleComponentIds = Array.isArray(plan.visibleComponentIds)
+    ? plan.visibleComponentIds
+    : plan.selectableComponentIds;
+  const visibleComponentIds = Array.isArray(planVisibleComponentIds)
+    ? planVisibleComponentIds.filter(Boolean)
     : [];
   return visibleComponentIds.length ? visibleComponentIds : null;
 }

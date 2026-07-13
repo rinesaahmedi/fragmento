@@ -261,19 +261,39 @@ model CatalogServicePriceHistory {
 }
 
 model Kitchen {
-  id          String            @id @default(cuid())
-  slug        String            @unique
-  kitchenCode String?
-  programmId  String            @default("IP 2200")
-  name        String
-  status      KitchenStatus     @default(DRAFT)
-  description String?
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
-  items       KitchenItem[]
-  orders      Order[]
-  testOrders  TestOrder[]
-  contracts   KitchenContract[]
+  id              String             @id @default(cuid())
+  slug            String             @unique
+  kitchenCode     String?
+  programmId      String             @default("IP 2200")
+  name            String
+  status          KitchenStatus      @default(DRAFT)
+  description     String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  items           KitchenItem[]
+  claimParts      KitchenClaimPart[]
+  orders          Order[]
+  testOrders      TestOrder[]
+  contracts       KitchenContract[]
+}
+
+model KitchenClaimPart {
+  id                    String   @id @default(cuid())
+  kitchenId             String
+  kitchen               Kitchen  @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  partKey               String
+  name                  String
+  nameDe                String?
+  articleCode           String?
+  sourceKitchenItemCode String?
+  sourceComponentKey    String?
+  isActive              Boolean  @default(true)
+  sortOrder             Int      @default(0)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@unique([kitchenId, partKey])
+  @@index([kitchenId, isActive])
 }
 
 model KitchenItem {

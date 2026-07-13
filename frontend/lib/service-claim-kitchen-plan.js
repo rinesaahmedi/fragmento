@@ -7,6 +7,31 @@ import { prisma } from "./prisma.js";
 import { buildServiceClaimSelectableComponents } from "./service-claim-kitchen-plan-selection.js";
 import { normalizeServiceClaimContractNumber } from "./service-claims.js";
 
+async function loadKitchenClaimParts(kitchenId) {
+  try {
+    return await prisma.$queryRaw`
+      SELECT
+        "partKey",
+        "name",
+        "nameDe",
+        "articleCode",
+        "sourceKitchenItemCode",
+        "sourceComponentKey",
+        "sortOrder"
+      FROM "KitchenClaimPart"
+      WHERE "kitchenId" = ${kitchenId}
+        AND "isActive" = true
+      ORDER BY "sortOrder" ASC, "partKey" ASC
+    `;
+  } catch (error) {
+    const message = String(error?.message || "");
+    if (error?.code === "P2010" || /KitchenClaimPart.*does not exist/i.test(message)) {
+      return [];
+    }
+    throw error;
+  }
+}
+
 /**
  * Loads kitchen SVG + config for a contract so the service form can show an interactive plan.
  * Selectable components match the assigned kitchen's order/configurator component surface.
@@ -41,11 +66,13 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
     const svgMarkup = await loadKitchenSvgMarkup(slug);
     const orderKind = getOrderKindForContractNumber(contract.contractNumber);
     const contractOrderState = await getContractOrderState(contract.id, prisma, orderKind);
+    const claimParts = await loadKitchenClaimParts(contract.kitchen.id);
     const selectable = buildServiceClaimSelectableComponents({
       kitchen,
       kitchenConfig,
       kitchenSlug: slug,
       confirmedItems: contractOrderState.confirmedItems,
+      claimParts,
     });
 
     return {
@@ -55,6 +82,8 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       svgMarkup,
       selectableComponentIds: selectable.selectableComponentIds,
       selectableComponents: selectable.selectableComponents,
+      visibleComponentIds: selectable.visibleComponentIds,
+      claimParts,
     };
   } catch (error) {
     console.warn("Service claim kitchen plan:", error?.message || error);
