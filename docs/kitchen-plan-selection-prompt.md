@@ -190,6 +190,115 @@ Hidden linked rows (`extractor-hood`, `isActive: false`) must stay selected when
 
 ---
 
+## Service claims: split bundled items (mandatory)
+
+The configurator/order catalog and the service-claim selector intentionally use different levels
+of detail. A catalog row can be one priced bundle, while a claim must identify the exact physical
+part that failed. Keep the catalog/order rows unchanged and describe the smaller claim-only parts
+with `KitchenClaimPart` records.
+
+Current claim-only parts and official article metadata:
+
+| `partKey` | Article | Source catalog component | Applies to |
+| --- | --- | --- | --- |
+| `sink` | `526335` | `sink-faucet` | Linear + L-shaped |
+| `sink-cabinet` | `SP60` | `sink-base` | Linear + L-shaped |
+| `faucet` | `517720` | `sink-faucet` | Linear + L-shaped |
+| `oven` | `EH92364E-A` | `oven-module` or `oven-base` | Linear + L-shaped |
+| `oven-drawer` | `UHK` | `oven-module` or `oven-base` | Linear + L-shaped |
+| `cooktop` | `9EC744100C` | `oven-module` or `oven-base` | Linear + L-shaped |
+| `worktop-left` | `PLR60-1` | `worktop` | L-shaped only |
+| `worktop-right` | `PLR60-2` | `worktop` | L-shaped only |
+| `cabinet-side-panel` | `WU16` | none | Metadata only; inactive until a dedicated hotspot exists |
+
+`frontend/prisma/seed.js` creates/upserts these records from the normal kitchen items. The source
+item must therefore use the expected `componentKey`; an oven source must also have a code starting
+with `OVEN-`. Never split the corresponding `KitchenItem`, change its price, or add the claim-only
+parts to an order. When claim parts are loaded, the service-claim selector replaces the bundled
+source component with `component-claim-*` choices while the configurator continues to use the
+original component.
+
+When changing this model, create a new Prisma migration and keep the seed upsert in sync. Never
+edit an already-applied migration. The production-safe order is `prisma migrate deploy`,
+`prisma generate`, then `prisma db seed`.
+
+### Adding an L-shaped kitchen
+
+An L-shaped kitchen needs claim geometry in addition to the normal `IMAGE_HOTSPOTS_BY_SLUG`
+hotspots. Complete every item below:
+
+1. Add the normalized slug to `L_SHAPED_CLAIM_KITCHEN_SLUGS` in both
+   `frontend/prisma/seed.js` and `frontend/lib/service-claim-kitchen-hotspots.js`.
+2. Ensure the seed contains active source components for `sink-base`, `sink-faucet`,
+   `oven-module`/`oven-base`, and `worktop`. The seed will then create all common claim parts plus
+   `worktop-left` and `worktop-right`.
+3. In `L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG`, add the four outer sink-bowl points
+   measured from the full-resolution plan. Store each point relative to the faucet hotspot:
+   `[(pointX - faucet.left) / faucet.width, (pointY - faucet.top) / faucet.height]`. Every slug in
+   the L-shaped set must have an entry, otherwise the claim plan cannot build the sink polygon.
+4. In `COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG`, add the four outside cooktop strokes relative to
+   the oven hotspot using the same formula. The generic left/right-leg shapes are only a fallback;
+   use measured points for a new plan.
+5. Add a `L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG` entry:
+   - If the plan has one combined L worktop polygon, call `splitWorktopDefinition()` with the
+     source bounds and separate absolute point arrays for the left and right physical pieces. Both
+     arrays must meet at the actual corner seam.
+   - If the plan already has separate surface/front-edge polygons, use `indexPartKeys` in the exact
+     order of the plan's `worktop` hotspots, for example
+     `["worktop-left", "worktop-right", "worktop-left", "worktop-right"]`.
+   - Use `null` for a `worktop`-keyed side/end panel that is not a physical worktop claim area. Do
+     not let a floor-height blende become part of either worktop selector.
+   - Reuse another slug's definition only when the rendered geometry and hotspot order are
+     identical.
+6. Keep the oven cabinet as one normal plan hotspot. Claims split its top `66%` into the oven and
+   its lower `34%` into `oven-drawer`; the cooktop is a separate measured polygon projected from
+   the same source hotspot.
+7. Verify sink versus faucet, oven versus drawer versus cooktop, and left versus right worktop can
+   all be selected independently. Selecting a worktop must not paint over the sink/cooktop cutout.
+
+Use the L-shaped families already registered in
+`frontend/lib/service-claim-kitchen-hotspots.js` as geometry references. Similar article numbers do
+not prove that two plans share geometry; compare their rendered linework before aliasing points.
+
+### Adding a linear kitchen
+
+Linear kitchens use the common claim parts, but do **not** get left/right worktop parts and must
+not be added to `L_SHAPED_CLAIM_KITCHEN_SLUGS`.
+
+- Provide the same source component keys: `sink-base`, `sink-faucet`, and
+  `oven-module`/`oven-base` with an `OVEN-` code. The seed creates sink, sink cabinet, faucet,
+  oven, oven drawer, and cooktop claim records automatically.
+- The original worktop remains one claim area. Do not create `PLR60-1`/`PLR60-2` for a straight
+  run.
+- The oven/drawer split uses the same `66%` seam. Rectangle hotspots work for a front elevation;
+  if the oven source is a polygon, keep its points ordered top-left, top-right, bottom-right,
+  bottom-left so both slices follow the cabinet edges.
+- The default linear cooktop outline uses the four elevation points relative to the oven source:
+  `[[0.04, -0.04], [0.96, -0.04], [0.96, 0.02], [0.04, 0.02]]`. Check that this hugs the drawn
+  cooktop after cropping; add a slug-specific measured entry to
+  `COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG` when it does not.
+- A front elevation often does not expose a reliable sink-bowl polygon. The sink and cooktop
+  buttons below the plan are therefore intentional linear-layout selectors; keep them available
+  even when the cooktop is also clickable on the drawing. The faucet and sink cabinet remain
+  selectable on their plan hotspots.
+
+### Claim verification
+
+Run:
+
+```bash
+cd frontend
+npx prisma migrate deploy
+npx prisma generate
+node --test test/service-claim-kitchen-plan.test.js
+```
+
+Then load a contract for the new kitchen in the service-claim flow and check both DE and EN labels
+plus the article code shown under every split item. Submit independent test claims for each split
+part and confirm the saved problem-area ids use `component-claim-*`.
+
+---
+
 ## Standard component slots
 
 ### Layout A — fridge left, 6 wall + 6 base (most AB plans)
@@ -259,6 +368,7 @@ When adding a kitchen similar to an existing one, **reuse identical item codes**
 | `frontend/prisma/seed.js` | `<PLAN>_ITEMS`, `DEFAULT_KITCHENS`, `DEFAULT_KITCHEN_CONTRACTS` |
 | `frontend/components/kitchen-svg-stage.jsx` | `IMAGE_VIEW_BY_SLUG` + `IMAGE_HOTSPOTS_BY_SLUG` |
 | `frontend/components/kitchen-selection-utils.js` | Callout numbers for new codes, `LINKED_COMPONENT_GROUPS_BY_SLUG` |
+| `frontend/lib/service-claim-kitchen-hotspots.js` | L-shaped registration + sink/cooktop/worktop claim polygons; linear cooktop overrides when needed |
 
 ---
 
@@ -273,6 +383,11 @@ When adding a kitchen similar to an existing one, **reuse identical item codes**
 - [ ] Hood cabinet + aspirator highlight together on hover and after refresh.
 - [ ] Locked items (blue): oven, worktop, sink base, sink+faucet.
 - [ ] Catalog shows dimensions under article (not in name).
+- [ ] Claim source keys exist for sink cabinet, sink/faucet, and oven bundle.
+- [ ] L-shaped only: slug registered in both claim sets; sink, cooktop, and left/right worktop points measured and verified.
+- [ ] Linear only: worktop remains one area; manual sink/cooktop selectors and oven/drawer split verified.
+- [ ] Split claim labels and official article codes are correct in DE and EN.
+- [ ] `npx prisma migrate deploy` and `npx prisma generate` succeed.
 - [ ] `npx prisma db seed` succeeds.
 - [ ] `/kitchens/<slug>?contractNumber=<contract>` loads and selections sync plan ↔ catalog.
 
