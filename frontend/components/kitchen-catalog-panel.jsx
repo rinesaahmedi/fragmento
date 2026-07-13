@@ -25,7 +25,7 @@ import {
   isCutleryAccessoryItem,
   normalizeCutleryVariants,
 } from "../lib/cutlery-accessories";
-import { applyArticleVariantSelection, findAuszugVariantOption } from "../lib/auszug-variants";
+import { applyArticleVariantSelectionForDisplay, findAuszugVariantOption } from "../lib/auszug-variants";
 import {
   getServiceDisabledReason,
   SERVICE_CODE_MONTAGE,
@@ -697,7 +697,7 @@ export default function KitchenCatalogPanel({
             {visibleComponents.map((item) => {
               const componentId = componentIdForItem(item);
               const selectedArticleNumber = selectedArticleVariants[componentId] || "";
-              const variantSourceItem = applyArticleVariantSelection(item, selectedArticleNumber);
+              const variantSourceItem = applyArticleVariantSelectionForDisplay(item, selectedArticleNumber);
               const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, variantSourceItem);
               const articleVariant = item.articleVariants?.auszug || null;
               const cardItem = {
