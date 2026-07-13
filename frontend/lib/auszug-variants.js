@@ -113,19 +113,6 @@ export function applyArticleVariantSelection(item, articleNumber) {
   };
 }
 
-export function applyArticleVariantSelectionForDisplay(item, articleNumber) {
-  const selectedItem = applyArticleVariantSelection(item, articleNumber);
-  if (selectedItem === item) {
-    return item;
-  }
-
-  return {
-    ...selectedItem,
-    name: item?.name || selectedItem.name,
-    nameDe: item?.nameDe || selectedItem.nameDe || "",
-  };
-}
-
 export function isValidAuszugVariantSelection(item, articleNumber) {
   const option = findAuszugVariantOption(item, articleNumber);
   return Boolean(option && option.key === "yes");

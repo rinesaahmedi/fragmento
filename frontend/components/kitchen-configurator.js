@@ -44,7 +44,7 @@ import {
   normalizeCutleryVariants,
   normalizeCutleryLines,
 } from "../lib/cutlery-accessories";
-import { applyArticleVariantSelectionForDisplay, findAuszugVariantOption } from "../lib/auszug-variants";
+import { applyArticleVariantSelection, findAuszugVariantOption } from "../lib/auszug-variants";
 import { PublicI18nProvider, PublicLanguageSwitcher, usePublicI18n } from "./public-i18n";
 
 function buildInitialCustomer(contractNumber) {
@@ -1403,7 +1403,7 @@ function KitchenConfiguratorContent({
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
     .map((item) => {
       const componentId = componentIdForItem(item);
-      const variantItem = applyArticleVariantSelectionForDisplay(item, selectedArticleVariants[componentId]);
+      const variantItem = applyArticleVariantSelection(item, selectedArticleVariants[componentId]);
       const mergedItem = mergeInitialOrderItemFields(variantItem, "component", initialOrderItemLookup);
       return {
         ...mergedItem,
