@@ -3,6 +3,7 @@ import test from "node:test";
 import { ItemType } from "@prisma/client";
 import {
   applyArticleVariantSelection,
+  applyArticleVariantSelectionForDisplay,
   buildAuszugVariantMetadata,
   getAuszugVariantArticleNumber,
   resolveAuszugVariantSelection,
@@ -109,6 +110,21 @@ test("client variant application replaces the displayed article and total price"
   const selected = applyArticleVariantSelection(item, "US2A60");
   assert.equal(selected.articleNumber, "US2A60");
   assert.equal(selected.name, "Base cabinet with drawers 60 cm");
+  assert.equal(selected.price, 369);
+});
+
+test("display variant application keeps the base cabinet title stable", () => {
+  const item = {
+    ...kitchenItem(),
+    articleVariants: {
+      auszug: buildAuszugVariantMetadata(kitchenItem(), [us2a60Article]),
+    },
+  };
+
+  const selected = applyArticleVariantSelectionForDisplay(item, "US2A60");
+  assert.equal(selected.articleNumber, "US2A60");
+  assert.equal(selected.name, "Base cabinet with drawer");
+  assert.equal(selected.nameDe, "Unterschrank mit Schublade");
   assert.equal(selected.price, 369);
 });
 

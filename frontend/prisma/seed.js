@@ -35,11 +35,13 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
   "ab-105822", "ab-105825", "ab-105828", "ab-105831",
   "ab-105834", "ab-105837", "ab-105840", "ab-105843",
+  "ab-105747",
 ]);
 
 const ARTICLE_PRICES = {
   "517467": 89,
   "A-EGSPV594400 + TGV60": 680,
+  "A-EGSPV587915 + TGV45": 498,
   "A-EGSPV597210 + TGV60": 579,
   "EWA34660W + TGV60 + WU16": 639,
   "FH 664 621 S": 349,
@@ -102,6 +104,7 @@ const BUNDLE_PRICES = {
 
 const CATALOG_ARTICLES = [
   { articleNumber: "A-EGSPV594400 + TGV60", name: "Fully Integrated Dishwasher incl. Furniture Front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", widthMm: 600, depthMm: 600, price: "680.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "A-EGSPV587915 + TGV45", name: "Fully Integrated Dishwasher incl. Furniture Front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", widthMm: 450, price: "498.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "A-EGSPV597210 + TGV60", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "EWA34660W + TGV60 + WU16", name: "Washing machine + front + side panel", nameDe: "Waschmaschine + Front + Wange", price: "639.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "FH664621E + FWK124 + HD6002", name: "Flat screen extractor hood + cabinet + filter", nameDe: "Flachschirmhaube + Schrank + Filter", price: "349.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
@@ -1078,6 +1081,27 @@ const cloneAb105837Items = (targetCode) =>
 const AB_105840_ITEMS = cloneAb105837Items("105840");
 const AB_105843_ITEMS = cloneAb105837Items("105843");
 
+// AB 105747: L-shaped perspective plan — US60 R + oven + US60 L on the main leg,
+// locked sink base + dishwasher + US30 cabinet on the return, and three H6002 wall units with the
+// flat-screen hood in the centre. Prices and filler-panel totals come from the catalog.
+const AB_105747_ITEMS = [
+  defaultOvenHob({ sortOrder: 10 }),
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: DEFAULT_WORKTOP_CATALOG_INFO_TEXT },
+  defaultSinkBase({ componentKey: "sink-base", sortOrder: 30, widthMm: 600, depthMm: 600 }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105837-US60-R", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-US60-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPK20", 2), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105747-450", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV587915 + TGV45"), widthMm: 450, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 70, infoText: "Fully integrated dishwasher incl. furniture front, 45 cm", articleNumber: "A-EGSPV587915 + TGV45" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105747-US30", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 75, infoText: "US30 base storage cabinet with UPK20 filler panel", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105747-H6002-R", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105806-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105806-FH664621E", name: "FH664621E Extractor Hood", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105747-H6002-L", name: "Wall Cabinet", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ sortOrder: 110 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // AB 105816 matches AB 105820 except callout 11 is an H6002 with left hinge.
 const AB_105816_ITEMS = AB_105820_ITEMS.map((item) =>
   item.code === "CAB-WALL-AB105820-H6002"
@@ -1414,6 +1438,14 @@ const DEFAULT_KITCHENS = [
     name: "AB 105843 Kitchen",
     description: "Kitchen configuration using the AB 105837 layout",
     items: AB_105843_ITEMS,
+  },
+  {
+    slug: "ab-105747",
+    kitchenCode: "105 747",
+    name: "AB 105747 Kitchen",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105747.svg",
+    items: AB_105747_ITEMS,
+    reconcileExisting: true,
   },
   {
     slug: "ab-105810",

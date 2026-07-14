@@ -149,6 +149,21 @@ test("AB 105834 claim hotspots keep sink and sink cabinet separate", () => {
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"sink-faucet"[\s\S]*\[\[69\.95,\s*45\.98\]/);
 });
 
+test("AB 105747 keeps the 45 cm dishwasher and US30 cabinet independently selectable", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  assert.match(stageSource, /"ab-105747":\s*\[[\s\S]*componentKey:\s*"base-module-3"[\s\S]*\[\[65\.957,\s*59\.886\],\s*\[71\.635,\s*61\.06\]/);
+  assert.match(stageSource, /"ab-105747":\s*\[[\s\S]*componentKey:\s*"drawer-module"[\s\S]*\[\[71\.635,\s*61\.06\]/);
+  assert.match(stageSource, /"ab-105747":\s*\[[\s\S]*componentKey:\s*"drawer-module"[\s\S]*\[\[76\.233,\s*61\.903\]/);
+  assert.match(selectionSource, /"DISH-AB105747-450":\s*"7"/);
+  assert.match(selectionSource, /"CAB-BASE-AB105747-US30":\s*"8"/);
+  assert.match(seedSource, /articleNumber:\s*"A-EGSPV587915 \+ TGV45"[\s\S]*isFixedPricePackage:\s*true/);
+  assert.match(seedSource, /code:\s*"DISH-AB105747-450"[\s\S]*price:\s*articlePrice\("A-EGSPV587915 \+ TGV45"\)/);
+  assert.match(seedSource, /code:\s*"CAB-BASE-AB105747-US30"[\s\S]*componentKey:\s*"drawer-module"/);
+});
+
 test("AB 105837 claim hotspot maps the hood LED strip to extractor hood", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
 

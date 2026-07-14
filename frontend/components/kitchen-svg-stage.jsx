@@ -49,6 +49,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105837": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105840": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105843": "/jpg/AB%20105837_page-0001.jpg",
+  "ab-105747": "/plans/AB%20105747.svg",
   "ab-105825": "/plans/AB%20105825.svg",
   "ab-105828": "/plans/AB%20105825.svg",
   "ab-105831": "/plans/AB%20105831.svg",
@@ -331,6 +332,36 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-3", points: [[82.67, 63.46], [94.54, 62.03], [94.54, 93.74], [82.67, 95.55]] },
     { componentKey: "corner-base", points: [[62.31, 59.71], [72.3, 61.25], [72.41, 93.32], [62.22, 91.82]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[69.95, 45.98], [76.1, 45.98], [76.1, 58.89], [69.95, 58.89]], preserveManualSize: true },
+  ],
+  // AB 105747: exact CAD endpoints from the 842 x 595 vector PDF. Separate polygons retain
+  // the visible top/side faces and include the lower/upper corner filler panels with their cabinet.
+  "ab-105747": [
+    { componentKey: "refrigerator", points: [[13.682, 36.773], [22.048, 35.563], [29.615, 37.116], [21.249, 38.326]] },
+    { componentKey: "refrigerator", points: [[13.682, 36.773], [21.249, 38.326], [21.249, 87.294], [13.682, 85.721]] },
+    { componentKey: "refrigerator", points: [[21.249, 38.326], [29.615, 37.116], [29.615, 86.084], [21.249, 87.294]] },
+    { componentKey: "wall-cabinet-1", points: [[22.048, 25.197], [31.069, 23.886], [35.359, 24.773], [26.337, 26.084]] },
+    { componentKey: "wall-cabinet-1", points: [[22.048, 25.197], [26.337, 26.084], [26.337, 36.45], [22.048, 35.563]] },
+    { componentKey: "wall-cabinet-1", points: [[26.337, 26.084], [35.359, 24.773], [35.359, 44.719], [29.615, 45.546], [29.615, 37.116], [26.337, 36.45]] },
+    { componentKey: "wall-cabinet-2", points: [[31.069, 23.886], [40.09, 22.595], [44.38, 23.462], [35.359, 24.773]] },
+    { componentKey: "wall-cabinet-2", points: [[35.359, 24.773], [44.38, 23.462], [44.38, 43.408], [35.359, 44.719]] },
+    { componentKey: "extractor-hood", points: [[35.359, 46.091], [35.359, 44.719], [29.615, 45.546]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[35.359, 44.719], [44.38, 43.408], [44.38, 44.78], [35.359, 46.091]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[40.09, 22.595], [49.112, 21.284], [53.401, 22.171], [44.38, 23.462]] },
+    { componentKey: "wall-cabinet-3", points: [[44.38, 23.462], [53.401, 22.171], [54.157, 22.05], [54.157, 41.997], [53.401, 42.097], [44.38, 43.408]] },
+    {
+      componentKey: "worktop",
+      points: [[29.615, 58.514], [50.181, 55.55], [57.762, 57.103], [66.784, 55.792], [84.955, 59.523], [84.955, 60.632], [75.933, 61.943], [57.762, 58.212], [29.615, 62.266]],
+    },
+    { componentKey: "base-module-1", points: [[29.857, 62.245], [38.879, 60.934], [38.879, 85.156], [29.857, 86.447]] },
+    { componentKey: "oven-module", points: [[38.879, 60.934], [47.9, 59.624], [47.9, 83.845], [38.879, 85.156]] },
+    { componentKey: "base-module-2", points: [[47.9, 59.624], [56.936, 58.313], [58.39, 58.279], [58.39, 82.555], [56.936, 82.534], [47.9, 83.845]] },
+    { componentKey: "sink-base", points: [[58.39, 58.279], [65.957, 59.832], [65.957, 84.108], [58.39, 82.555]], preserveManualSize: true },
+    // Callout 7: the 45 cm dishwasher front ends at the photographed 45/30 cm seam.
+    { componentKey: "base-module-3", points: [[65.957, 59.886], [71.635, 61.06], [71.635, 85.27], [65.957, 84.108]] },
+    // Callout 8: the US30 owns its front, the thin end-panel strip, and the visible side face.
+    { componentKey: "drawer-module", points: [[71.635, 61.06], [75.42, 61.842], [76.233, 61.903], [76.233, 86.084], [75.42, 86.044], [71.635, 85.27]] },
+    { componentKey: "drawer-module", points: [[76.233, 61.903], [84.456, 60.713], [84.456, 84.733], [76.233, 86.084]], preserveManualSize: true },
+    { componentKey: "sink-faucet", points: [[67.097, 49.277], [70.903, 49.277], [70.903, 57.506], [67.097, 57.506]], preserveManualSize: true },
   ],
   "ab-105837": [
     { componentKey: "refrigerator", points: [[10.74, 29.62], [20.82, 28.18], [29.74, 30.02], [19.92, 31.56]] },
