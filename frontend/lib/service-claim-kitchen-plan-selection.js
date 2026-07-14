@@ -20,6 +20,12 @@ const CLAIM_COMPONENT_LABEL_OVERRIDES = {
 };
 
 const CLAIM_BLENDE_COMPONENT_PREFIX = "component-claim-blende-";
+const CLAIM_BLENDE_LABELS_BY_CODE = {
+  UPK20: {
+    name: "Filler Panel up to 20 cm",
+    nameDe: "Passblende bis 20 cm",
+  },
+};
 // These Blenden belong to the sink-cabinet claim in the plan. They remain a
 // separate form row so a customer can describe the panel issue, but they must
 // not split the cabinet into an additional clickable surface.
@@ -169,13 +175,14 @@ function buildClaimBlendeMeta(item = {}) {
   const code = normalizeClaimBlendeCode(item.catalogBlende?.code || item.blendeCode);
   const componentId = claimBlendeComponentId(componentKey);
   if (!componentId || !code) return null;
+  const defaultLabels = CLAIM_BLENDE_LABELS_BY_CODE[code] || {};
 
   return {
     componentId,
     code,
     articleCode: code,
-    name: String(item.catalogBlende?.name || item.blendeLabel || `${code} Filler Panel`).trim(),
-    nameDe: String(item.catalogBlende?.nameDe || item.blendeLabel || `${code} Passblende`).trim(),
+    name: String(item.catalogBlende?.name || defaultLabels.name || item.blendeLabel || `${code} Filler Panel`).trim(),
+    nameDe: String(item.catalogBlende?.nameDe || defaultLabels.nameDe || item.blendeLabel || `${code} Passblende`).trim(),
     componentKey: `claim-blende-${componentKey}`,
     sourceComponentKey: componentKey,
     sourceKitchenItemCode: String(item.code || "").trim(),

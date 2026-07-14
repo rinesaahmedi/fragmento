@@ -290,7 +290,8 @@ test("AB 105805 perspective variants expose the sink-base Blende separately", ()
       (entry) => entry.sourceComponentKey === "sink-base" && entry.claimPartKey === "blende",
     );
     assert.equal(sinkBlende.articleCode, "UPK20");
-    assert.equal(sinkBlende.nameDe, "UPK20 Passblende");
+    assert.equal(sinkBlende.name, "Filler Panel up to 20 cm");
+    assert.equal(sinkBlende.nameDe, "Passblende bis 20 cm");
     assert.equal(sinkBlende.isCompanionOption, true);
     assert.ok(result.selectableComponentIds.includes("component-base-module-2"));
     assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-2"));
@@ -1667,6 +1668,65 @@ test("worktop end-panel migration adds PLR60-3 only to the claims table", () => 
   assert.match(migration, /lower\(kitchen\."slug"\) = 'ab-105807'/);
   assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
   assert.doesNotMatch(migration, /ALTER TABLE\s+"KitchenItem"/i);
+});
+
+test("UPK20 filler panels retain their shared catalog identity in service claims", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-L-600", "base-module-1", "Base cabinet", {
+        isLocked: true,
+        blendeCode: "UPK20",
+        blendeLabel: "UPK20 20 cm",
+      }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105805",
+  });
+
+  const fillerPanel = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+  assert.deepEqual(
+    {
+      code: fillerPanel?.code,
+      articleCode: fillerPanel?.articleCode,
+      name: fillerPanel?.name,
+      nameDe: fillerPanel?.nameDe,
+    },
+    {
+      code: "UPK20",
+      articleCode: "UPK20",
+      name: "Filler Panel up to 20 cm",
+      nameDe: "Passblende bis 20 cm",
+    },
+  );
+});
+
+test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260714160000_replace_l_upk20_double_blenden_with_upef65", "migration.sql"),
+    "utf8",
+  );
+
+  assert.doesNotMatch(seed, /blendeCode:\s*"UPK20 x2"/i);
+  assert.match(seed, /CAB-BASE-AB105805-500-L[\s\S]*blendeCode:\s*"UPEF65"/);
+  assert.match(seed, /CAB-BASE-AB105825-US60-R[\s\S]*blendeCode:\s*"UPEF65"/);
+  assert.match(migration, /"blendeCode"\s*=\s*'UPEF65'/);
+  assert.match(migration, /"catalogBlendeQuantity"\s*=\s*1/);
+  assert.doesNotMatch(seed, /reconcileExisting:\s*true/);
+});
+
+test("catalog linking honors Blende changes saved in Admin", () => {
+  const source = fs.readFileSync(
+    path.join(repoRoot, "scripts", "backfill-kitchen-item-catalog-links.js"),
+    "utf8",
+  );
+
+  assert.match(source, /blendeCode:\s*nullableString\(item\.blendeCode\)/);
+  assert.match(source, /blendePrice:\s*formatMoney\(item\.blendePrice\)/);
+  assert.match(source, /price:\s*formatMoney\(item\.price\)/);
 });
 
 test("missing worktop end-panel backfill covers AB 105837, 105840, and 105843", () => {

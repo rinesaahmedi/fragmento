@@ -163,6 +163,7 @@ function getCompositeMarkerWarnings(row) {
 function normalizeBlendeCode(value) {
   const code = String(value || "").trim().toUpperCase();
   if (code.startsWith("UPK20")) return "UPK20";
+  if (code.startsWith("UPEF65")) return "UPEF65";
   if (code.startsWith("HPK2002")) return "HPK2002";
   return "";
 }
