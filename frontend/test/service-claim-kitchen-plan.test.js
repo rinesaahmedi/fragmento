@@ -440,6 +440,7 @@ test("hood cabinet, extractor, and FWK124 filter use separate claim identities",
   assert.equal(cabinetMeta.name, "Cabinet");
   assert.equal(cabinetMeta.articleCode, "HD6002");
   assert.equal(extractorMeta.name, "Extractor Hood");
+  assert.equal(extractorMeta.articleCode, "FH 664 621 E");
   assert.deepEqual(filterMeta, {
     componentId: "component-claim-filter",
     code: "FWK124",
@@ -477,6 +478,10 @@ test("legacy and future FWK124 kitchen slugs also expose the extractor separatel
   assert.equal(
     result.selectableComponents.find((entry) => entry.componentId === "component-wall-cabinet-4").articleCode,
     "HD6002",
+  );
+  assert.equal(
+    result.selectableComponents.find((entry) => entry.componentId === "component-extractor-hood").articleCode,
+    "FH 664 621 E",
   );
 });
 
@@ -1177,7 +1182,7 @@ test("service claim kitchen plan falls back to default components before any con
   assert.equal(result.source, "kitchen");
 });
 
-test("AB 105805 service claim plan links extractor hood claims to the LED set", () => {
+test("AB 105805 service claim plan keeps the extractor hood separate from the LED set", () => {
   const kitchen = {
     items: [
       component("CAB-HOOD-AB105806-600", "wall-cabinet-2", "Upper Cabinet with Extractor Hood 60 cm"),
@@ -1194,15 +1199,27 @@ test("AB 105805 service claim plan links extractor hood claims to the LED set", 
   });
 
   assert.ok(result.selectableComponentIds.includes("component-extractor-hood"));
-  assert.ok(result.selectableComponentIds.includes("component-under-cabinet-light"));
-  assert.ok(result.selectableComponents.some((entry) =>
-    entry.componentId === "component-under-cabinet-light"
-    && entry.code === "ACC-LIGHT-003"
-    && entry.name === "LED Lighting Set"
-  ));
+  assert.ok(!result.selectableComponentIds.includes("component-under-cabinet-light"));
+  assert.ok(!result.selectableComponents.some((entry) => entry.code === "ACC-LIGHT-003"));
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-105805", "component-extractor-hood"),
+    ["component-extractor-hood"],
+  );
 });
 
-test("service claim picker toggles claim-linked hood and LED together", () => {
+test("all seeded standalone FH664621E hoods use the E article number", () => {
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const flatHoodRows = seedSource
+    .split("\n")
+    .filter((line) => line.includes('componentKey: "extractor-hood"') && line.includes("FH664621E"));
+
+  assert.ok(flatHoodRows.length > 0);
+  flatHoodRows.forEach((line) => {
+    assert.match(line, /articleNumber:\s*"FH 664 621 E"/);
+  });
+});
+
+test("service claim picker toggles the selected claim component", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"), "utf8");
 
   assert.match(source, /getServiceClaimLinkedComponentIds/);

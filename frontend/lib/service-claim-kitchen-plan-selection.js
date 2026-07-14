@@ -5,11 +5,8 @@ import { stripProductDimensionsFromLabel } from "./product-label-format.js";
 const CLAIM_LINKED_COMPONENT_META = {
   "component-extractor-hood": {
     code: "HOOD-B-FH664621E",
+    articleCode: "FH 664 621 E",
     name: "Extractor Hood",
-  },
-  "component-under-cabinet-light": {
-    code: "ACC-LIGHT-003",
-    name: "LED Lighting Set",
   },
 };
 
@@ -253,15 +250,8 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   "furniture-front",
 ]);
 
-const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
-  "ab-105805": [["component-extractor-hood", "component-under-cabinet-light"]],
-};
-
-export function getServiceClaimLinkedComponentIds(kitchenSlug, componentId) {
-  const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
-  const linkedGroups = SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG[normalizedSlug] || [];
-  const linkedGroup = linkedGroups.find((group) => group.includes(componentId));
-  return linkedGroup || [componentId];
+export function getServiceClaimLinkedComponentIds(_kitchenSlug, componentId) {
+  return [componentId];
 }
 
 function resolveServiceClaimComponentName(componentId, meta = {}) {
