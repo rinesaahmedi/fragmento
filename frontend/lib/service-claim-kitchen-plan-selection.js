@@ -18,9 +18,10 @@ const CLAIM_COMPONENT_LABEL_OVERRIDES = {
 };
 
 const CLAIM_BLENDE_COMPONENT_PREFIX = "component-claim-blende-";
-const CLAIM_BLENDE_EXCLUDED_SOURCE_KEYS_BY_SLUG = {
-  // In this shared perspective plan the sink front and visible side panel are
-  // one cabinet selection. The legacy item-level UPK20 must not split claims.
+// These Blenden belong to the sink-cabinet claim in the plan. They remain a
+// separate form row so a customer can describe the panel issue, but they must
+// not split the cabinet into an additional clickable surface.
+const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-105805": new Set(["sink-base"]),
   "ab-105809": new Set(["sink-base"]),
   "ab-105813": new Set(["sink-base"]),
@@ -164,9 +165,6 @@ export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
 
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105805": [["component-extractor-hood", "component-under-cabinet-light"]],
-  "ab-105809": [["component-extractor-hood", "component-under-cabinet-light"]],
-  "ab-105813": [["component-extractor-hood", "component-under-cabinet-light"]],
-  "ab-105817": [["component-extractor-hood", "component-under-cabinet-light"]],
 };
 
 export function getServiceClaimLinkedComponentIds(kitchenSlug, componentId) {
@@ -331,22 +329,27 @@ export function buildServiceClaimSelectableComponents({
       },
     }));
 
-  const excludedBlendeSourceKeys = CLAIM_BLENDE_EXCLUDED_SOURCE_KEYS_BY_SLUG[
-    String(kitchenSlug || "").toLowerCase()
-  ] || new Set();
   const blendeQuantityOverrides = CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
   const independentBlendeQuantities = CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
+  const companionBlendeSourceKeys = CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || new Set();
   const claimBlenden = sourceItems
     .map(({ item }) => buildClaimBlendeMeta(item))
-    .filter((entry) => entry && !excludedBlendeSourceKeys.has(entry.sourceComponentKey))
+    .filter(Boolean)
     .map((entry) => {
       const quantity = Number(blendeQuantityOverrides[entry.sourceComponentKey] || 0);
       return quantity > 0 ? { ...entry, blendeQuantity: quantity } : entry;
     })
+    .map((entry) => (
+      companionBlendeSourceKeys.has(entry.sourceComponentKey)
+        ? { ...entry, isCompanionOption: true }
+        : entry
+    ))
     .flatMap((entry) => {
       const quantity = Number(independentBlendeQuantities[entry.sourceComponentKey] || 0);
       if (quantity <= 1) return [entry];

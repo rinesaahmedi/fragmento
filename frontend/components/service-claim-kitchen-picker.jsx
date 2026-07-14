@@ -309,6 +309,9 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     isNonLShapedKitchen
     && claimParts.some((part) => String(part?.partKey || "").trim() === "cooktop")
     && selectableComponentIds.includes(cooktopComponentId);
+  const formOnlyClaimOptions = selectableComponents.filter((component) =>
+    component?.isCompanionOption && selectableComponentIds.includes(component.componentId),
+  );
   const isManualSinkSelected = selectedIds.has(sinkComponentId);
   const isManualCooktopSelected = selectedIds.has(cooktopComponentId);
 
@@ -567,7 +570,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
           </div>
         </div>
       )}
-      {showManualSinkOption || showManualCooktopOption ? (
+      {showManualSinkOption || showManualCooktopOption || formOnlyClaimOptions.length ? (
         <div className="service-claim-kitchen__manual-options">
           {showManualSinkOption ? (
             <button
@@ -609,6 +612,32 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
               {labels?.cooktopOption || "Cooktop"}
             </button>
           ) : null}
+          {formOnlyClaimOptions.map((option) => {
+            const isSelected = selectedIds.has(option.componentId);
+            const label = option.nameDe || option.name || option.articleCode || option.code;
+
+            return (
+              <button
+                key={option.componentId}
+                type="button"
+                className={[
+                  "service-claim-kitchen__manual-option",
+                  isSelected ? "service-claim-kitchen__manual-option--selected" : "",
+                ].filter(Boolean).join(" ")}
+                aria-pressed={isSelected}
+                onClick={() => {
+                  onChange((current) => toggleClaimComponentSelection({
+                    currentIds: current,
+                    componentId: option.componentId,
+                    selectableComponentIds,
+                    kitchenSlug,
+                  }));
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
       ) : null}
     </div>

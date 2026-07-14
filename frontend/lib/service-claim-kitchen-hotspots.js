@@ -776,7 +776,7 @@ function resolveClaimBlendeWidth(sourceKey, sourceBounds, blende, boundsByKey, c
 /** Split commercially attached cabinet Blenden into claims-only selectable areas. */
 export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = [], components = [], kitchenSlug = "") {
   const blenden = (claimBlenden || []).filter((entry) =>
-    entry?.claimPartKey === "blende" && entry.sourceComponentKey && entry.componentId,
+    entry?.claimPartKey === "blende" && !entry.isCompanionOption && entry.sourceComponentKey && entry.componentId,
   );
   if (!blenden.length) return hotspots;
 
