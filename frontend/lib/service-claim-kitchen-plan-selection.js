@@ -27,7 +27,10 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-105813": new Set(["sink-base"]),
   "ab-105817": new Set(["sink-base"]),
   "ab-105822": new Set(["base-module-1"]),
+  "ab-105825": new Set(["base-module-1"]),
   "ab-105828": new Set(["base-module-1"]),
+  "ab-105831": new Set(["base-module-1"]),
+  "ab-105834": new Set(["base-module-3"]),
 };
 const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   // Both adjacent right-hand strips are independently drawn in this shared plan.
@@ -54,6 +57,14 @@ const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
   // The left end panel beside the US30 is drawn in this shared layout, but
   // legacy KitchenItem data did not retain its commercial UPK20 reference.
   "ab-105822": [
+    {
+      sourceComponentKey: "base-module-1",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
+  "ab-105825": [
     {
       sourceComponentKey: "base-module-1",
       code: "UPK20",

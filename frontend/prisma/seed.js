@@ -45,7 +45,7 @@ const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105815", "ab-105816", "ab-105819", "ab-105820",
   "ab-105821", "ab-105824", "ab-105823", "ab-105829", "ab-105832",
   "ab-105826", "ab-105827", "ab-105830", "ab-105833", "ab-105835",
-  "ab-105836", "ab-105838", "ab-105841", "ab-105844",
+  "ab-105836", "ab-105837", "ab-105838", "ab-105840", "ab-105841", "ab-105843", "ab-105844",
   "ab-105839", "ab-105842",
   "ab-105732", "ab-105735", "ab-105738", "ab-105741",
   "ab-105733", "ab-105736", "ab-105739", "ab-105742",
@@ -2795,9 +2795,9 @@ async function main() {
     if (worktop && WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)) {
       const part = {
         partKey: "worktop-end-panel",
-        articleCode: "PLR60-3",
-        name: "Worktop End Panel",
-        nameDe: "Arbeitsplatten-Seitenwange",
+        articleCode: "WU16",
+        name: "Cabinet side panel",
+        nameDe: "Unterschrank-Wange",
         sortOrder: 80,
       };
       await prisma.kitchenClaimPart.upsert({
