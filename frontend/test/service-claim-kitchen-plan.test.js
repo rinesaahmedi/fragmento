@@ -157,6 +157,81 @@ test("plan-only lower Blenden are exposed separately from their sink cabinets", 
   });
 });
 
+test("AB 105822 and AB 105825 expose the left US30 Blende as a form-only option", () => {
+  ["ab-105822", "ab-105825", "ab-105828"].forEach((kitchenSlug) => {
+    const kitchen = {
+      items: [
+        component("CAB-BASE-US30", "base-module-1", "Base cabinet with drawer", {
+          articleNumber: "US30",
+          widthMm: 300,
+          isLocked: true,
+        }),
+      ],
+    };
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+    const blende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+    assert.ok(result.selectableComponentIds.includes("component-base-module-1"));
+    assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-1"));
+    assert.equal(blende.articleCode, "UPK20");
+    assert.equal(blende.isCompanionOption, true);
+  });
+});
+
+test("AB 105831 exposes its left US30 Blende as a form-only option", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-US30", "base-module-1", "Base cabinet with drawer", {
+        articleNumber: "US30",
+        widthMm: 300,
+        isLocked: true,
+        blendeCode: "UPK20",
+        blendeLabel: "UPK20 Passblende",
+      }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105831",
+  });
+  const blende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+  assert.ok(result.selectableComponentIds.includes("component-base-module-1"));
+  assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-1"));
+  assert.equal(blende.articleCode, "UPK20");
+  assert.equal(blende.isCompanionOption, true);
+});
+
+test("AB 105834 exposes the dishwasher Blende as a form-only option", () => {
+  const kitchen = {
+    items: [
+      component("DISH-AB105834-600", "base-module-3", "Fully integrated dishwasher", {
+        articleNumber: "A-EGSPV597210 + TGV60",
+        widthMm: 600,
+        isLocked: true,
+        blendeCode: "UPK20",
+        blendeLabel: "UPK20 Passblende",
+      }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105834",
+  });
+  const blende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+  assert.ok(result.selectableComponentIds.includes("component-base-module-3"));
+  assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-3"));
+  assert.equal(blende.articleCode, "UPK20");
+  assert.equal(blende.isCompanionOption, true);
+});
+
 test("AB 105837 perspective variants expose the plan-only upper Blende", () => {
   ["ab-105837", "ab-105840", "ab-105843"].forEach((kitchenSlug) => {
     const kitchen = {
@@ -183,7 +258,7 @@ test("AB 105837 perspective variants expose the plan-only upper Blende", () => {
   });
 });
 
-test("AB 105805 perspective variants group both lower corner Blenden into one selection", () => {
+test("AB 105805 perspective variants expose the sink-base Blende separately", () => {
   ["ab-105805", "ab-105809", "ab-105813", "ab-105817"].forEach((kitchenSlug) => {
     const kitchen = {
       items: [
@@ -217,7 +292,13 @@ test("AB 105805 perspective variants group both lower corner Blenden into one se
     });
 
     assert.ok(result.selectableComponentIds.includes("component-sink-base"));
-    assert.ok(!result.selectableComponentIds.includes("component-claim-blende-sink-base"));
+    assert.ok(result.selectableComponentIds.includes("component-claim-blende-sink-base"));
+    const sinkBlende = result.selectableComponents.find(
+      (entry) => entry.sourceComponentKey === "sink-base" && entry.claimPartKey === "blende",
+    );
+    assert.equal(sinkBlende.articleCode, "UPK20");
+    assert.equal(sinkBlende.nameDe, "UPK20 Passblende");
+    assert.equal(sinkBlende.isCompanionOption, true);
     assert.ok(result.selectableComponentIds.includes("component-base-module-2"));
     assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-2"));
     const baseBlenden = result.selectableComponents.filter(
@@ -230,6 +311,27 @@ test("AB 105805 perspective variants group both lower corner Blenden into one se
     assert.ok(result.selectableComponentIds.includes("component-wall-cabinet-4"));
     assert.ok(result.selectableComponentIds.includes("component-claim-blende-wall-cabinet-4"));
   });
+});
+
+test("AB 105805 keeps the sink-base Blende as a form-only companion option", () => {
+  const sidePanel = [[70.15, 59.65], [73, 61.38], [73, 86.53], [70.15, 84.75]];
+  const cabinetFront = [[73, 62.22], [83.58, 59.12], [83.58, 83.43], [73, 86.53]];
+  const result = buildServiceClaimBlendeHotspots([
+    { componentKey: "sink-base", points: sidePanel },
+    { componentKey: "sink-base", points: cabinetFront },
+  ], [{
+    componentId: "component-claim-blende-sink-base",
+    componentKey: "claim-blende-sink-base",
+    sourceComponentKey: "sink-base",
+    sourceWidthMm: 300,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+    isCompanionOption: true,
+  }], [
+    { componentKey: "sink-base", widthMm: 300, blendeCode: "UPK20" },
+  ], "ab-105805");
+
+  assert.deepEqual(result.map((entry) => entry.points), [sidePanel, cabinetFront]);
 });
 
 test("AB 105805 splits the right Blende from the last upper cabinet", () => {
@@ -1125,6 +1227,12 @@ test("service claim picker toggles claim-linked hood and LED together", () => {
   assert.match(source, /service-claim-kitchen__manual-option/);
   assert.match(source, /componentId:\s*sinkComponentId/);
   assert.match(source, /showManualCooktopOption/);
+  assert.match(source, /const formOnlyClaimOptions = selectableComponents\.filter/);
+  assert.match(source, /component\?\.isCompanionOption/);
+  assert.match(source, /formOnlyClaimOptions\.map\(\(option\)/);
+  assert.match(source, /hasManualWorktopEndPanelOption/);
+  assert.match(source, /componentId: worktopEndPanelComponentId/);
+  assert.match(source, /worktopEndPanelOption/);
   assert.match(source, /componentId:\s*cooktopComponentId/);
   assert.match(source, /labels\?\.sinkOption\s*\|\|\s*"Sink"/);
   assert.match(source, /labels\?\.cooktopOption\s*\|\|\s*"Cooktop"/);
@@ -1995,6 +2103,36 @@ test("worktop end-panel migration adds PLR60-3 only to the claims table", () => 
   assert.match(migration, /lower\(kitchen\."slug"\) = 'ab-105807'/);
   assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
   assert.doesNotMatch(migration, /ALTER TABLE\s+"KitchenItem"/i);
+});
+
+test("missing worktop end-panel backfill covers AB 105837, 105840, and 105843", () => {
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260714150000_add_missing_worktop_end_panel_claim_parts", "migration.sql"),
+    "utf8",
+  );
+
+  assert.match(migration, /'ab-105837'/);
+  assert.match(migration, /'ab-105840'/);
+  assert.match(migration, /'ab-105843'/);
+  assert.match(migration, /'worktop-end-panel'/);
+  assert.match(migration, /'PLR60-3'/);
+  assert.match(migration, /ON CONFLICT \("kitchenId", "partKey"\) DO UPDATE/);
+  assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
+  assert.doesNotMatch(migration, /ALTER TABLE\s+"KitchenItem"/i);
+});
+
+test("worktop end-panel claims use the shared WU16 cabinet-side-panel metadata", () => {
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260714151000_correct_worktop_end_panel_claim_metadata", "migration.sql"),
+    "utf8",
+  );
+
+  assert.match(migration, /UPDATE "KitchenClaimPart"/);
+  assert.match(migration, /'worktop-end-panel'/);
+  assert.match(migration, /'WU16'/);
+  assert.match(migration, /'Cabinet side panel'/);
+  assert.match(migration, /'Unterschrank-Wange'/);
+  assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
 });
 
 test("filter migration adds FWK124 only to the claims table", () => {

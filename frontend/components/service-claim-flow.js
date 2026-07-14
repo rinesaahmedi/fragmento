@@ -88,7 +88,7 @@ function formatGermanClaimAreaName(area, fallbackName) {
     return "Arbeitsplatte rechts";
   }
   if (componentId === "component-claim-worktop-end-panel") {
-    return "Arbeitsplatten-Seitenwange";
+    return "Unterschrank-Wange";
   }
 
   const exactLabel = CLAIM_AREA_LABELS_BY_CODE.de?.[code];
@@ -588,6 +588,7 @@ const COPY = {
     removeProblemAreaAria: "{label} entfernen",
     kitchenPlanSinkOption: "Sp\u00fcle",
     kitchenPlanCooktopOption: "Kochfeld",
+    kitchenPlanWorktopEndPanelOption: "Unterschrank-Wange",
     kitchenPlanFilterOption: "Filter f\u00fcr Dunstabzugshaube",
     kitchenPlanFurnitureFrontOption: "M\u00f6belfront (Geschirrsp\u00fcler)",
     kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
@@ -819,6 +820,7 @@ const COPY = {
     removeProblemAreaAria: "Remove {label}",
     kitchenPlanSinkOption: "Sink",
     kitchenPlanCooktopOption: "Cooktop",
+    kitchenPlanWorktopEndPanelOption: "Cabinet side panel",
     kitchenPlanFilterOption: "Extractor Hood Filter",
     kitchenPlanFurnitureFrontOption: "Furniture Front (Dishwasher)",
     kitchenPlanSelectedLabel: "Selected",
@@ -4652,6 +4654,7 @@ export default function ServiceClaimFlow() {
                       reset: t("kitchenPlanReset"),
                       sinkOption: t("kitchenPlanSinkOption"),
                       cooktopOption: t("kitchenPlanCooktopOption"),
+                      worktopEndPanelOption: t("kitchenPlanWorktopEndPanelOption"),
                       filterOption: t("kitchenPlanFilterOption"),
                       furnitureFrontOption: t("kitchenPlanFurnitureFrontOption"),
                     }}

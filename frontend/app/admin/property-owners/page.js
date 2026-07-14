@@ -122,6 +122,14 @@ function filterOwners(owners, filters) {
   });
 }
 
+function getExportHref(filters) {
+  const query = new URLSearchParams();
+  if (filters.query) query.set("q", filters.query);
+  if (filters.location) query.set("location", filters.location);
+  const search = query.toString();
+  return search ? `/api/admin/property-owners/export?${search}` : "/api/admin/property-owners/export";
+}
+
 export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
@@ -132,6 +140,7 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
   };
   const owners = await listPropertyOwnersForAdmin();
   const filteredOwners = filterOwners(owners, filters);
+  const exportHref = getExportHref(filters);
   const availableLocations = [...new Set(
     owners.flatMap((owner) => (owner.propertyObjects || []).map((object) => String(object.country || "").trim()).filter(Boolean)),
   )].sort((left, right) => left.localeCompare(right));
@@ -199,6 +208,11 @@ export default async function AdminPropertyOwnersPage({ searchParams = {} }) {
               singularFallback="{count} housing company matches the current filters."
               pluralFallback="{count} housing companies match the current filters."
             />
+          )}
+          actions={(
+            <Link href={exportHref} prefetch={false} style={exportButtonStyle}>
+              <AdminText i18nKey="propertyOwnersAdmin.exportExcel" fallback="Export Excel" />
+            </Link>
           )}
         >
           <form action="/admin/property-owners" method="get" style={filterPanelStyle}>
@@ -534,6 +548,18 @@ const createOwnerCtaStyle = {
   textDecoration: "none",
   display: "inline-flex",
   alignItems: "center",
+};
+
+const exportButtonStyle = {
+  ...secondaryButtonStyle,
+  minHeight: 42,
+  borderRadius: 8,
+  padding: "9px 14px",
+  fontSize: "0.92rem",
+  textDecoration: "none",
+  display: "inline-flex",
+  alignItems: "center",
+  whiteSpace: "nowrap",
 };
 
 const compactMutedTextStyle = {

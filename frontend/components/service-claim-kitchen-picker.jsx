@@ -140,6 +140,10 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     claimParts = [],
   } = kitchenPlan;
 
+  const worktopEndPanelComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS["worktop-end-panel"];
+  const hasManualWorktopEndPanelOption =
+    claimParts.some((part) => String(part?.partKey || "").trim() === "worktop-end-panel")
+    && selectableComponentIds.includes(worktopEndPanelComponentId);
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenSlug] || null;
   const imageViewHref = IMAGE_VIEW_BY_SLUG[kitchenSlug] || "";
 
@@ -311,6 +315,12 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     isNonLShapedKitchen
     && claimParts.some((part) => String(part?.partKey || "").trim() === "cooktop")
     && selectableComponentIds.includes(cooktopComponentId);
+  const formOnlyClaimOptions = selectableComponents.filter((component) =>
+    component?.isCompanionOption && selectableComponentIds.includes(component.componentId),
+  );
+  const worktopEndPanelOption = selectableComponents.find(
+    (component) => component.componentId === worktopEndPanelComponentId,
+  );
   const showManualFilterOption =
     claimParts.some((part) => String(part?.partKey || "").trim() === "filter")
     && selectableComponentIds.includes(filterComponentId);
@@ -584,7 +594,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
           </div>
         </div>
       )}
-      {showManualSinkOption || showManualCooktopOption || showManualFilterOption || showManualFurnitureFrontOption ? (
+      {showManualSinkOption || showManualCooktopOption || hasManualWorktopEndPanelOption || formOnlyClaimOptions.length || showManualFilterOption || showManualFurnitureFrontOption ? (
         <div className="service-claim-kitchen__manual-options">
           {showManualSinkOption ? (
             <button
@@ -626,6 +636,54 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
               {labels?.cooktopOption || "Cooktop"}
             </button>
           ) : null}
+          {hasManualWorktopEndPanelOption ? (
+            <button
+              type="button"
+              className={[
+                "service-claim-kitchen__manual-option",
+                selectedIds.has(worktopEndPanelComponentId)
+                  ? "service-claim-kitchen__manual-option--selected"
+                  : "",
+              ].filter(Boolean).join(" ")}
+              aria-pressed={selectedIds.has(worktopEndPanelComponentId)}
+              onClick={() => {
+                onChange((current) => toggleClaimComponentSelection({
+                  currentIds: current,
+                  componentId: worktopEndPanelComponentId,
+                  selectableComponentIds,
+                  kitchenSlug,
+                }));
+              }}
+            >
+              {labels?.worktopEndPanelOption || worktopEndPanelOption?.nameDe || "Worktop End Panel"}
+            </button>
+          ) : null}
+          {formOnlyClaimOptions.map((option) => {
+            const isSelected = selectedIds.has(option.componentId);
+            const label = option.nameDe || option.name || option.articleCode || option.code;
+
+            return (
+              <button
+                key={option.componentId}
+                type="button"
+                className={[
+                  "service-claim-kitchen__manual-option",
+                  isSelected ? "service-claim-kitchen__manual-option--selected" : "",
+                ].filter(Boolean).join(" ")}
+                aria-pressed={isSelected}
+                onClick={() => {
+                  onChange((current) => toggleClaimComponentSelection({
+                    currentIds: current,
+                    componentId: option.componentId,
+                    selectableComponentIds,
+                    kitchenSlug,
+                  }));
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
           {showManualFilterOption ? (
             <button
               type="button"

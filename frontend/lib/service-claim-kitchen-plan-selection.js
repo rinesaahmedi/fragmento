@@ -18,20 +18,26 @@ const CLAIM_COMPONENT_LABEL_OVERRIDES = {
 };
 
 const CLAIM_BLENDE_COMPONENT_PREFIX = "component-claim-blende-";
+// These Blenden belong to the sink-cabinet claim in the plan. They remain a
+// separate form row so a customer can describe the panel issue, but they must
+// not split the cabinet into an additional clickable surface.
 const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
-const CLAIM_BLENDE_EXCLUDED_SOURCE_KEYS_BY_SLUG = {
+const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   // The exposed left side and front are two perspective faces of one US50
   // cabinet in this shared plan, not an independently claimable Blende.
   "ab-104968": new Set(["base-module-1"]),
   "ab-105734": new Set(["base-module-1"]),
   "ab-105737": new Set(["base-module-1"]),
   "ab-105740": new Set(["base-module-1"]),
-  // In this shared perspective plan the sink front and visible side panel are
-  // one cabinet selection. The legacy item-level UPK20 must not split claims.
   "ab-105805": new Set(["sink-base"]),
   "ab-105809": new Set(["sink-base"]),
   "ab-105813": new Set(["sink-base"]),
   "ab-105817": new Set(["sink-base"]),
+  "ab-105822": new Set(["base-module-1"]),
+  "ab-105825": new Set(["base-module-1"]),
+  "ab-105828": new Set(["base-module-1"]),
+  "ab-105831": new Set(["base-module-1"]),
+  "ab-105834": new Set(["base-module-3"]),
 };
 const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   // Both adjacent right-hand strips are independently drawn in this shared plan.
@@ -62,6 +68,32 @@ const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
   "ab-105756": { "base-module-2": 2 },
 };
 const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
+  // The left end panel beside the US30 is drawn in this shared layout, but
+  // legacy KitchenItem data did not retain its commercial UPK20 reference.
+  "ab-105822": [
+    {
+      sourceComponentKey: "base-module-1",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
+  "ab-105825": [
+    {
+      sourceComponentKey: "base-module-1",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
+  "ab-105828": [
+    {
+      sourceComponentKey: "base-module-1",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
   // These lower-right UPK20 strips are drawn in the plans but are not attached
   // to the locked sink cabinet in the commercial kitchen item data.
   "ab-105823": [
@@ -223,9 +255,6 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
 
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105805": [["component-extractor-hood", "component-under-cabinet-light"]],
-  "ab-105809": [["component-extractor-hood", "component-under-cabinet-light"]],
-  "ab-105813": [["component-extractor-hood", "component-under-cabinet-light"]],
-  "ab-105817": [["component-extractor-hood", "component-under-cabinet-light"]],
 };
 
 export function getServiceClaimLinkedComponentIds(kitchenSlug, componentId) {
@@ -407,25 +436,30 @@ export function buildServiceClaimSelectableComponents({
       },
     }));
 
-  const excludedBlendeSourceKeys = CLAIM_BLENDE_EXCLUDED_SOURCE_KEYS_BY_SLUG[
-    String(kitchenSlug || "").toLowerCase()
-  ] || new Set();
   const blendeQuantityOverrides = CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
   const independentBlendeQuantities = CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
+  const companionBlendeSourceKeys = CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || new Set();
   const blendeMetaOverrides = CLAIM_BLENDE_META_OVERRIDES_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
   const claimBlenden = sourceItems
     .map(({ item }) => buildClaimBlendeMeta(item))
-    .filter((entry) => entry && !excludedBlendeSourceKeys.has(entry.sourceComponentKey))
+    .filter(Boolean)
     .map((entry) => {
       const quantity = Number(blendeQuantityOverrides[entry.sourceComponentKey] || 0);
       return quantity > 0 ? { ...entry, blendeQuantity: quantity } : entry;
     })
+    .map((entry) => (
+      companionBlendeSourceKeys.has(entry.sourceComponentKey)
+        ? { ...entry, isCompanionOption: true }
+        : entry
+    ))
     .flatMap((entry) => {
       const quantity = Number(independentBlendeQuantities[entry.sourceComponentKey] || 0);
       if (quantity <= 1) return [entry];
@@ -460,8 +494,11 @@ export function buildServiceClaimSelectableComponents({
       },
     });
     if (meta) {
-      claimBlenden.push(meta);
-      claimBlendeSourceKeys.add(meta.sourceComponentKey);
+      const resolvedMeta = companionBlendeSourceKeys.has(meta.sourceComponentKey)
+        ? { ...meta, isCompanionOption: true }
+        : meta;
+      claimBlenden.push(resolvedMeta);
+      claimBlendeSourceKeys.add(resolvedMeta.sourceComponentKey);
     }
   });
 
