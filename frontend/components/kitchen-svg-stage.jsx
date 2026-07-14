@@ -620,11 +620,18 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-2", points: [[16.59, 39.64], [20.88, 40.51], [31.82, 38.92], [31.82, 13.31], [26.91, 12.16], [16.08, 13.75], [20.99, 15.05], [20.99, 38.92], [16.9, 39.64]], preserveManualSize: true },
     { componentKey: "extractor-hood", points: [[20.83, 45.69], [20.88, 40.51], [31.82, 38.92], [31.7, 45.11]], preserveManualSize: true },
     { componentKey: "wall-cabinet-3", points: [[31.82, 13.31], [26.81, 12.01], [34.17, 11.14], [39.18, 12.16], [39.08, 36.32], [31.82, 37.33], [31.82, 13.46]] },
-    { componentKey: "wall-cabinet-4", points: [[39.28, 12.16], [34.17, 11.14], [44.7, 9.7], [49.92, 10.57], [50.94, 10.71], [50.84, 34.73], [39.18, 36.17], [39.18, 12.3]] },
+    // Exact cabinet outline plus its narrow HPK2002 side face. The claims
+    // splitter uses the PDF divider at x=49.995249 to keep them independent.
+    { componentKey: "wall-cabinet-4", points: [[39.092637, 12.208403], [33.904988, 11.139496], [44.807601, 9.566387], [49.995249, 10.635294], [50.893112, 10.494118], [50.893112, 34.47395], [49.995249, 34.715966], [39.092637, 36.289076]] },
     { componentKey: "worktop", points: [[14.7, 59.97], [5.57, 58.11], [5.57, 56.64], [45.69, 50.91], [72.34, 56.36], [72.34, 60.09], [72.34, 61.55], [43.9, 55.82], [14.61, 59.96]] },
-    { componentKey: "base-module-1", points: [[6.69, 87.24], [6.59, 58.41], [14.44, 60.01], [24.75, 58.68], [24.75, 87.79], [14.44, 89.13], [14.53, 88.96], [6.78, 87.22]], preserveManualSize: true },
+    // The exposed side and front are separate perspective faces of one US50
+    // cabinet. Keeping the same source key selects both faces together.
+    { componentKey: "base-module-1", points: [[6.655582, 58.373109], [15.805226, 59.865546], [15.805226, 89.109244], [6.655582, 87.233613]], preserveManualSize: true },
+    { componentKey: "base-module-1", points: [[15.805226, 59.865546], [24.88361, 58.554622], [24.88361, 87.798319], [15.805226, 89.109244]], preserveManualSize: true },
     { componentKey: "oven-module", points: [[24.84, 58.62], [35.72, 57.01], [35.72, 86.09], [24.84, 87.83], [24.84, 58.47]] },
-    { componentKey: "base-module-2", points: [[35.72, 56.94], [43.76, 55.87], [44.8, 55.87], [44.7, 85.04], [43.95, 85.04], [35.72, 86.11], [35.72, 56.8]] },
+    // US40 front followed by its two projected UPK20 corner faces. The three
+    // seams use the vector-PDF coordinates so claims can select each strip.
+    { componentKey: "base-module-2", points: [[35.786223, 56.981513], [43.054632, 55.912605], [43.966746, 55.791597], [44.72209, 55.952941], [44.72209, 85.196639], [43.966746, 85.035294], [43.054632, 85.156303], [35.786223, 86.22521]] },
     { componentKey: "sink-base", points: [[44.73, 55.83], [44.7, 85.31], [53.78, 86.92], [53.97, 57.87]], preserveManualSize: true },
     { componentKey: "base-module-3", points: [[53.88, 57.72], [53.88, 87.07], [62.96, 88.94], [62.96, 59.63], [53.78, 57.76]], preserveManualSize: true },
     { componentKey: "drawer-module", points: [[63.05, 59.73], [62.96, 88.9], [72.13, 90.91], [72.04, 61.6], [63.05, 59.6]], preserveManualSize: true },

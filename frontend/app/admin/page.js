@@ -300,7 +300,7 @@ function deriveArticleNumberFromCode(code) {
   if (/^REF-/i.test(normalizedCode)) return "OL-KGCN388140E";
   if (/^OVEN-/i.test(normalizedCode)) return "EBX943600S + OL-KMI754000E";
   if (/^CAB-HOOD-/i.test(normalizedCode)) return "FH664621E + FWK124 + HD6002";
-  if (/^HOOD-/i.test(normalizedCode)) return normalizedCode.includes("KHF") ? "KHF664611S + FWP18" : "FH 664 621 S";
+  if (/^HOOD-/i.test(normalizedCode)) return normalizedCode.includes("KHF") ? "KHF664611S + FWP18" : "FH 664 621 E";
   if (/^LIGHT-/i.test(normalizedCode)) return "KA220043_S3";
   if (/CUTLERY/i.test(normalizedCode)) return "ZB60SG";
   if (/WASTE|BOTTON/i.test(normalizedCode)) return "517467";

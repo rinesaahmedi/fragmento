@@ -1202,7 +1202,7 @@ function getMappedProductInfoDocuments(item) {
   if (
     articleNumber.includes("FH664621E + FWK124 + HD6002") ||
     articleNumber.includes("FH664621E + HD6002") ||
-    articleNumber.includes("FH 664 621 S") ||
+    /FH 664 621 [SE]/.test(articleNumber) ||
     code.includes("FH664621E") ||
     code.startsWith("CAB-HOOD-") ||
     code === "HOOD-B-FH664621E" ||

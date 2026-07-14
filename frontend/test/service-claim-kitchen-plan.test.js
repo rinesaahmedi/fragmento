@@ -4,7 +4,10 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadKitchenSvgMarkup } from "../lib/load-kitchen-svg.js";
-import { buildServiceClaimSelectableComponents } from "../lib/service-claim-kitchen-plan-selection.js";
+import {
+  buildServiceClaimSelectableComponents,
+  getServiceClaimLinkedComponentIds,
+} from "../lib/service-claim-kitchen-plan-selection.js";
 import {
   buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
@@ -126,7 +129,11 @@ test("service claims expose a cabinet blende as its own selectable component", (
 });
 
 test("plan-only lower Blenden are exposed separately from their sink cabinets", () => {
-  ["ab-105823", "ab-105826", "ab-105829", "ab-105832"].forEach((kitchenSlug) => {
+  [
+    "ab-105732", "ab-105735", "ab-105738", "ab-105741",
+    "ab-105746", "ab-105749", "ab-105752", "ab-105755",
+    "ab-105823", "ab-105826", "ab-105829", "ab-105832",
+  ].forEach((kitchenSlug) => {
     const kitchen = {
       items: [
         component("SINKBASE-B-600", "sink-base", "Sink Lower Cabinet", {
@@ -298,9 +305,10 @@ test("AB 105805 perspective variants expose the sink-base Blende separately", ()
     const baseBlenden = result.selectableComponents.filter(
       (entry) => entry.sourceComponentKey === "base-module-2" && entry.claimPartKey === "blende",
     );
-    assert.equal(baseBlenden.length, 2);
-    assert.deepEqual(baseBlenden.map((entry) => entry.blendeIndex), [1, 2]);
-    assert.notEqual(baseBlenden[0].componentId, baseBlenden[1].componentId);
+    assert.equal(baseBlenden.length, 1);
+    assert.equal(baseBlenden[0].componentId, "component-claim-blende-base-module-2");
+    assert.equal(baseBlenden[0].blendeQuantity, 2);
+    assert.equal(baseBlenden[0].blendeIndex, undefined);
     assert.ok(result.selectableComponentIds.includes("component-wall-cabinet-4"));
     assert.ok(result.selectableComponentIds.includes("component-claim-blende-wall-cabinet-4"));
   });
@@ -357,7 +365,7 @@ test("AB 105805 splits the right Blende from the last upper cabinet", () => {
   assert.ok(Math.abs(strip.left + strip.width - 61.014534) < 0.000001);
 });
 
-test("AB 105805 splits both right-side Blenden from the US50 cabinet and from each other", () => {
+test("AB 105805 groups both right-side Blenden into one corner-face selection", () => {
   const hotspots = [
     { componentKey: "oven-module", points: [[35.45, 57.58], [45.57, 56.13], [45.57, 83.35], [35.45, 84.84]] },
     { componentKey: "base-module-2", points: [[45.57, 56.13], [55.52, 54.98], [55.52, 82.23], [45.57, 83.35]] },
@@ -370,15 +378,8 @@ test("AB 105805 splits both right-side Blenden from the US50 cabinet and from ea
     sourceWidthMm: 500,
     claimPartKey: "blende",
     blendeQuantity: 2,
-    blendeIndex: 1,
   };
-  const secondBlende = {
-    ...blende,
-    componentId: "component-claim-blende-base-module-2-2",
-    componentKey: "claim-blende-base-module-2-2",
-    blendeIndex: 2,
-  };
-  const result = buildServiceClaimBlendeHotspots(hotspots, [blende, secondBlende], [
+  const result = buildServiceClaimBlendeHotspots(hotspots, [blende], [
     { componentKey: "oven-module", widthMm: 600 },
     { componentKey: "base-module-2", widthMm: 500, blendeCode: "UPK20 x2" },
     { componentKey: "corner-base", widthMm: 300 },
@@ -387,19 +388,225 @@ test("AB 105805 splits both right-side Blenden from the US50 cabinet and from ea
   const strips = result.filter((entry) => entry.claimPartKey === "blende");
 
   assert.equal(cabinets.length, 1);
-  assert.equal(strips.length, 2);
+  assert.equal(strips.length, 1);
   assert.deepEqual([...new Set(strips.map((entry) => entry.componentId))], [
     "component-claim-blende-base-module-2",
-    "component-claim-blende-base-module-2-2",
   ]);
-  assert.deepEqual([...new Set(strips.map((entry) => entry.blendeIndex))], [1, 2]);
   assert.ok(Math.abs(cabinets[0].left + cabinets[0].width - 54.003333) < 0.000001);
-  const firstStrip = strips.find((entry) => entry.blendeIndex === 1);
-  const secondStrip = strips.find((entry) => entry.blendeIndex === 2);
-  assert.ok(Math.abs(firstStrip.left - 54.003333) < 0.000001);
-  assert.ok(Math.abs(firstStrip.left + firstStrip.width - secondStrip.left) < 0.000001);
-  assert.ok(Math.abs(secondStrip.left - 54.761667) < 0.000001);
-  assert.ok(Math.abs(secondStrip.left + secondStrip.width - 55.52) < 0.000001);
+  assert.ok(Math.abs(strips[0].left - 54.003333) < 0.000001);
+  assert.ok(Math.abs(strips[0].left + strips[0].width - 55.52) < 0.000001);
+});
+
+test("hood cabinet, extractor, and FWK124 filter use separate claim identities", () => {
+  const cabinet = component(
+    "CAB-HOOD-B-600",
+    "wall-cabinet-2",
+    "Flat screen extractor hood + cabinet + filter 60 cm",
+    {
+      articleNumber: "FH664621E + FWK124 + HD6002",
+      isLocked: true,
+    },
+  );
+  const claimParts = [{
+    partKey: "filter",
+    articleCode: "FWK124",
+    name: "Extractor Hood Filter",
+    nameDe: "Filter für Dunstabzugshaube",
+    sourceKitchenItemCode: cabinet.code,
+    sourceComponentKey: cabinet.componentKey,
+  }];
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [cabinet] },
+    kitchenConfig: { components: [cabinet] },
+    kitchenSlug: "ab-105805",
+    claimParts,
+  });
+  const cabinetMeta = result.selectableComponents.find(
+    (entry) => entry.componentId === "component-wall-cabinet-2",
+  );
+  const filterMeta = result.selectableComponents.find(
+    (entry) => entry.componentId === "component-claim-filter",
+  );
+  const extractorMeta = result.selectableComponents.find(
+    (entry) => entry.componentId === "component-extractor-hood",
+  );
+
+  assert.ok(result.selectableComponentIds.includes("component-wall-cabinet-2"));
+  assert.ok(result.selectableComponentIds.includes("component-extractor-hood"));
+  assert.ok(result.selectableComponentIds.includes("component-claim-filter"));
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-105805", "component-claim-filter"),
+    ["component-claim-filter"],
+  );
+  assert.equal(cabinetMeta.name, "Cabinet");
+  assert.equal(cabinetMeta.articleCode, "HD6002");
+  assert.equal(extractorMeta.name, "Extractor Hood");
+  assert.equal(extractorMeta.articleCode, "FH 664 621 E");
+  assert.deepEqual(filterMeta, {
+    componentId: "component-claim-filter",
+    code: "FWK124",
+    articleCode: "FWK124",
+    sourceKitchenItemCode: "CAB-HOOD-B-600",
+    name: "Extractor Hood Filter",
+    nameDe: "Filter für Dunstabzugshaube",
+    componentKey: "wall-cabinet-2",
+    claimPartKey: "filter",
+  });
+});
+
+test("legacy and future FWK124 kitchen slugs also expose the extractor separately", () => {
+  const cabinet = component("CAB-HOOD-LEGACY-600", "wall-cabinet-4", "Hood bundle", {
+    articleNumber: "FH664621E + FWK124 + HD6002",
+    isLocked: true,
+  });
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [cabinet] },
+    kitchenConfig: { components: [cabinet] },
+    kitchenSlug: "legacy-kitchen-not-in-linked-map",
+    claimParts: [{
+      partKey: "filter",
+      articleCode: "FWK124",
+      name: "Extractor Hood Filter",
+      nameDe: "Filter für Dunstabzugshaube",
+      sourceKitchenItemCode: cabinet.code,
+      sourceComponentKey: cabinet.componentKey,
+    }],
+  });
+
+  assert.ok(result.selectableComponentIds.includes("component-wall-cabinet-4"));
+  assert.ok(result.selectableComponentIds.includes("component-extractor-hood"));
+  assert.ok(result.selectableComponentIds.includes("component-claim-filter"));
+  assert.equal(
+    result.selectableComponents.find((entry) => entry.componentId === "component-wall-cabinet-4").articleCode,
+    "HD6002",
+  );
+  assert.equal(
+    result.selectableComponents.find((entry) => entry.componentId === "component-extractor-hood").articleCode,
+    "FH 664 621 E",
+  );
+});
+
+test("manual filter claims do not replace the hood cabinet hotspot", () => {
+  const sourceHotspot = {
+    componentId: "component-wall-cabinet-2",
+    componentKey: "wall-cabinet-2",
+    left: 20,
+    top: 10,
+    width: 15,
+    height: 25,
+  };
+  const result = buildServiceClaimPartHotspots([sourceHotspot], [{
+    partKey: "filter",
+    articleCode: "FWK124",
+    sourceComponentKey: "wall-cabinet-2",
+  }], "ab-105805");
+
+  assert.deepEqual(result, [sourceHotspot]);
+});
+
+test("60 cm dishwasher bundles split into price-list dishwasher and furniture-front claims", () => {
+  const dishwasherBundle = component(
+    "DISH-AB105806-600",
+    "base-module-3",
+    "Fully integrated dishwasher incl. furniture front",
+    {
+      articleNumber: "A-EGSPV597210 + TGV60",
+      isLocked: true,
+    },
+  );
+  const claimParts = [
+    {
+      partKey: "dishwasher",
+      articleCode: "A-EGSPV594400",
+      name: "Fully Integrated Dishwasher",
+      nameDe: "Vollintegrierter Geschirrspüler",
+      sourceKitchenItemCode: dishwasherBundle.code,
+      sourceComponentKey: dishwasherBundle.componentKey,
+    },
+    {
+      partKey: "furniture-front",
+      articleCode: "TGV60",
+      name: "Furniture Front (Dishwasher)",
+      nameDe: "Möbelfront (Geschirrspüler)",
+      sourceKitchenItemCode: dishwasherBundle.code,
+      sourceComponentKey: dishwasherBundle.componentKey,
+    },
+  ];
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [dishwasherBundle] },
+    kitchenConfig: { components: [dishwasherBundle] },
+    kitchenSlug: "ab-105805",
+    claimParts,
+  });
+
+  assert.ok(!result.selectableComponentIds.includes("component-base-module-3"));
+  assert.deepEqual(result.selectableComponentIds, [
+    "component-claim-dishwasher",
+    "component-claim-furniture-front",
+  ]);
+  assert.deepEqual(
+    result.selectableComponents.map(({ componentId, articleCode, name, nameDe }) => ({
+      componentId,
+      articleCode,
+      name,
+      nameDe,
+    })),
+    [
+      {
+        componentId: "component-claim-dishwasher",
+        articleCode: "A-EGSPV594400",
+        name: "Fully Integrated Dishwasher",
+        nameDe: "Vollintegrierter Geschirrspüler",
+      },
+      {
+        componentId: "component-claim-furniture-front",
+        articleCode: "TGV60",
+        name: "Furniture Front (Dishwasher)",
+        nameDe: "Möbelfront (Geschirrspüler)",
+      },
+    ],
+  );
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-105805", "component-claim-furniture-front"),
+    ["component-claim-furniture-front"],
+  );
+});
+
+test("dishwasher owns the plan hotspot while the furniture front stays manual", () => {
+  const sourceHotspot = {
+    componentId: "component-base-module-3",
+    componentKey: "base-module-3",
+    left: 60,
+    top: 55,
+    width: 12,
+    height: 30,
+  };
+  const result = buildServiceClaimPartHotspots([sourceHotspot], [
+    { partKey: "dishwasher", sourceComponentKey: "base-module-3" },
+    { partKey: "furniture-front", sourceComponentKey: "base-module-3" },
+  ], "ab-105805");
+
+  assert.equal(result.length, 1);
+  assert.equal(result[0].componentId, "component-claim-dishwasher");
+  assert.equal(result[0].claimPartKey, "dishwasher");
+  assert.equal(result[0].left, sourceHotspot.left);
+  assert.equal(result[0].width, sourceHotspot.width);
+});
+
+test("45 cm dishwasher bundles remain unchanged without 60 cm claim parts", () => {
+  const dishwasherBundle = component("DISH-AB105747-450", "base-module-3", "Dishwasher 45 cm", {
+    articleNumber: "A-EGSPV587915 + TGV45",
+    isLocked: true,
+  });
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [dishwasherBundle] },
+    kitchenConfig: { components: [dishwasherBundle] },
+    kitchenSlug: "ab-105747",
+    claimParts: [],
+  });
+
+  assert.deepEqual(result.selectableComponentIds, ["component-base-module-3"]);
+  assert.equal(result.selectableComponents[0].articleCode, "A-EGSPV587915 + TGV45");
 });
 
 test("L-kitchen quantity-two Blenden are exposed as independent claim selections", () => {
@@ -646,6 +853,50 @@ test("AB 105810 claim Blenden use the exact PDF divider pixels", () => {
 
 test("additional claim Blenden use their exact source-plan divider pixels", () => {
   const kitchens = [
+    {
+      slug: "ab-105732",
+      hotspots: [
+        { componentKey: "wall-cabinet-4", left: 70.73, top: 17.18, width: 16.94, height: 26.71 },
+        { componentKey: "sink-base", left: 70.73, top: 64.76, width: 16.94, height: 32.44 },
+      ],
+      expected: {
+        "wall-cabinet-4": { side: "right", outer: 87.691211, inner: 86.394299 },
+        "sink-base": { side: "right", outer: 87.691211, inner: 86.394299 },
+      },
+    },
+    {
+      slug: "ab-105733",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 4.82, top: 17.18, width: 9.22, height: 26.71 },
+        { componentKey: "base-module-1", left: 4.82, top: 64.76, width: 9.13, height: 32.44 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 4.831354, inner: 6.213777 },
+        "base-module-1": { side: "left", outer: 4.831354, inner: 6.142518 },
+      },
+    },
+    {
+      slug: "ab-105744",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 0.85, top: 19.8, width: 14.8, height: 24.45 },
+        { componentKey: "base-module-1", left: 0.85, top: 63.35, width: 14.8, height: 29.71 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 0.855107, inner: 1.325416 },
+        "base-module-1": { side: "left", outer: 0.855107, inner: 1.325416 },
+      },
+    },
+    {
+      slug: "ab-105746",
+      hotspots: [
+        { componentKey: "wall-cabinet-4", left: 73.84, top: 17.18, width: 16.99, height: 26.71 },
+        { componentKey: "sink-base", left: 73.84, top: 64.76, width: 16.99, height: 32.44 },
+      ],
+      expected: {
+        "wall-cabinet-4": { side: "right", outer: 90.826603, inner: 89.501188 },
+        "sink-base": { side: "right", outer: 90.826603, inner: 89.515439 },
+      },
+    },
     {
       slug: "ab-105807",
       hotspots: [
@@ -932,7 +1183,7 @@ test("service claim kitchen plan falls back to default components before any con
   assert.equal(result.source, "kitchen");
 });
 
-test("AB 105805 service claim plan links extractor hood claims to the LED set", () => {
+test("AB 105805 service claim plan keeps the extractor hood separate from the LED set", () => {
   const kitchen = {
     items: [
       component("CAB-HOOD-AB105806-600", "wall-cabinet-2", "Upper Cabinet with Extractor Hood 60 cm"),
@@ -949,15 +1200,27 @@ test("AB 105805 service claim plan links extractor hood claims to the LED set", 
   });
 
   assert.ok(result.selectableComponentIds.includes("component-extractor-hood"));
-  assert.ok(result.selectableComponentIds.includes("component-under-cabinet-light"));
-  assert.ok(result.selectableComponents.some((entry) =>
-    entry.componentId === "component-under-cabinet-light"
-    && entry.code === "ACC-LIGHT-003"
-    && entry.name === "LED Lighting Set"
-  ));
+  assert.ok(!result.selectableComponentIds.includes("component-under-cabinet-light"));
+  assert.ok(!result.selectableComponents.some((entry) => entry.code === "ACC-LIGHT-003"));
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-105805", "component-extractor-hood"),
+    ["component-extractor-hood"],
+  );
 });
 
-test("service claim picker toggles claim-linked hood and LED together", () => {
+test("all seeded standalone FH664621E hoods use the E article number", () => {
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const flatHoodRows = seedSource
+    .split("\n")
+    .filter((line) => line.includes('componentKey: "extractor-hood"') && line.includes("FH664621E"));
+
+  assert.ok(flatHoodRows.length > 0);
+  flatHoodRows.forEach((line) => {
+    assert.match(line, /articleNumber:\s*"FH 664 621 E"/);
+  });
+});
+
+test("service claim picker toggles the selected claim component", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"), "utf8");
 
   assert.match(source, /getServiceClaimLinkedComponentIds/);
@@ -991,6 +1254,12 @@ test("service claim picker toggles claim-linked hood and LED together", () => {
   assert.match(source, /componentId:\s*cooktopComponentId/);
   assert.match(source, /labels\?\.sinkOption\s*\|\|\s*"Sink"/);
   assert.match(source, /labels\?\.cooktopOption\s*\|\|\s*"Cooktop"/);
+  assert.match(source, /showManualFilterOption/);
+  assert.match(source, /componentId:\s*filterComponentId/);
+  assert.match(source, /labels\?\.filterOption\s*\|\|\s*"Extractor Hood Filter"/);
+  assert.match(source, /showManualFurnitureFrontOption/);
+  assert.match(source, /componentId:\s*furnitureFrontComponentId/);
+  assert.match(source, /labels\?\.furnitureFrontOption\s*\|\|\s*"Furniture Front \(Dishwasher\)"/);
 });
 
 test("service claim kitchen plan uses test order state for 111 contracts", () => {
@@ -1145,6 +1414,68 @@ test("L kitchen claim plan replaces one worktop item with independent left and r
   assert.deepEqual(result.visibleComponentIds, ["component-worktop"]);
   assert.deepEqual(result.selectableComponents.map((entry) => entry.name), ["Left Worktop", "Right Worktop"]);
   assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["PLR60-1", "PLR60-2"]);
+});
+
+test("AB 105734 keeps the upper hood cabinet and extractor independently selectable", () => {
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-105734", "component-wall-cabinet-2"),
+    ["component-wall-cabinet-2"],
+  );
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-105734", "component-extractor-hood"),
+    ["component-extractor-hood"],
+  );
+});
+
+test("AB 104968 perspective variants expose both lower corner Blenden independently", () => {
+  ["ab-104968", "ab-105734", "ab-105737", "ab-105740"].forEach((kitchenSlug) => {
+    const item = component("CAB-BASE-AB104968-US40", "base-module-2", "Base Cabinet", {
+      articleNumber: "US40",
+      widthMm: 400,
+      isLocked: true,
+      blendeCode: "UPK20 x2",
+      blendeLabel: "UPK20 Passblende x 2",
+    });
+    const result = buildServiceClaimSelectableComponents({
+      kitchen: { items: [item] },
+      kitchenConfig: { components: [item] },
+      kitchenSlug,
+    });
+    const blenden = result.selectableComponents.filter((entry) => (
+      entry.sourceComponentKey === "base-module-2" && entry.claimPartKey === "blende"
+    ));
+
+    assert.equal(blenden.length, 2, `${kitchenSlug} exposes both corner Blenden`);
+    assert.deepEqual(blenden.map((entry) => entry.blendeIndex), [1, 2]);
+    assert.notEqual(blenden[0].componentId, blenden[1].componentId);
+  });
+});
+
+test("AB 105747 variants expose both corner Blenden independently", () => {
+  ["ab-105747", "ab-105750", "ab-105753", "ab-105756"].forEach((kitchenSlug) => {
+    const kitchen = {
+      items: [
+        component("CAB-BASE-AB105747-US60-L", "base-module-2", "Base Cabinet", {
+          articleNumber: "US60",
+          widthMm: 600,
+          isLocked: true,
+          blendeCode: "UPK20 x2",
+          blendeLabel: "UPK20 Passblende x 2",
+        }),
+      ],
+    };
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+    const blenden = result.selectableComponents.filter(
+      (entry) => entry.sourceComponentKey === "base-module-2" && entry.claimPartKey === "blende",
+    );
+
+    assert.equal(blenden.length, 2);
+    assert.deepEqual(blenden.map((entry) => entry.blendeIndex), [1, 2]);
+  });
 });
 
 test("AB 105807 adds the worktop end panel without replacing the horizontal worktop", () => {
@@ -1501,6 +1832,128 @@ test("AB 105805 uses separate PDF surface and front-edge seam points through the
   assert.match(right.clipPath, /^polygon\(/);
 });
 
+test("AB 104968 independent claim Blenden follow their PDF end faces", () => {
+  const hotspots = [
+    { componentKey: "base-module-2", left: 35.72, top: 55.87, width: 9.08, height: 30.24 },
+    { componentKey: "wall-cabinet-4", points: [[39.092637, 12.208403], [33.904988, 11.139496], [44.807601, 9.566387], [49.995249, 10.635294], [50.893112, 10.494118], [50.893112, 34.47395], [49.995249, 34.715966], [39.092637, 36.289076]] },
+  ];
+  const claimBlenden = [
+    { componentId: "component-claim-blende-base-module-2", componentKey: "claim-blende-base-module-2", claimPartKey: "blende", sourceComponentKey: "base-module-2", blendeQuantity: 2, blendeIndex: 1 },
+    { componentId: "component-claim-blende-base-module-2-2", componentKey: "claim-blende-base-module-2-2", claimPartKey: "blende", sourceComponentKey: "base-module-2", blendeQuantity: 2, blendeIndex: 2 },
+    { componentId: "component-claim-blende-wall-cabinet-4", componentKey: "claim-blende-wall-cabinet-4", claimPartKey: "blende", sourceComponentKey: "wall-cabinet-4", blendeQuantity: 1 },
+  ];
+  const result = buildServiceClaimBlendeHotspots(hotspots, claimBlenden, [], "ab-104968");
+  const blendeFor = (sourceKey) => result.find((entry) => (
+    entry.claimPartKey === "blende" && entry.sourceComponentKey === sourceKey
+  ));
+
+  const baseBlenden = result.filter((entry) => (
+    entry.claimPartKey === "blende" && entry.sourceComponentKey === "base-module-2"
+  ));
+  assert.deepEqual(baseBlenden.map((entry) => [entry.left, entry.width]), [
+    [43.054632, 43.966746 - 43.054632],
+    [43.966746, 44.72209 - 43.966746],
+  ]);
+  assert.ok(Math.abs(blendeFor("wall-cabinet-4").left - 49.995249) < 0.000001);
+  assert.ok(Math.abs(blendeFor("wall-cabinet-4").width - (50.893112 - 49.995249)) < 0.000001);
+});
+
+test("AB 105747 claim Blenden follow each vector-PDF divider", () => {
+  const hotspots = [
+    { componentKey: "base-module-2", points: [[47.9, 59.624], [56.936, 58.313], [58.39, 58.279], [58.39, 82.555], [56.936, 82.534], [47.9, 83.845]] },
+    { componentKey: "drawer-module", points: [[71.635, 61.06], [75.42, 61.842], [76.233, 61.903], [76.233, 86.084], [75.42, 86.044], [71.635, 85.27]] },
+    { componentKey: "wall-cabinet-3", points: [[44.38, 23.462], [53.401, 22.171], [54.157, 22.05], [54.157, 41.997], [53.401, 42.097], [44.38, 43.408]] },
+  ];
+  const claimBlenden = [
+    { componentId: "component-claim-blende-base-module-2", componentKey: "claim-blende-base-module-2", claimPartKey: "blende", sourceComponentKey: "base-module-2", blendeQuantity: 2 },
+    { componentId: "component-claim-blende-base-module-2-2", componentKey: "claim-blende-base-module-2-2", claimPartKey: "blende", sourceComponentKey: "base-module-2", blendeQuantity: 2 },
+    { componentId: "component-claim-blende-drawer-module", componentKey: "claim-blende-drawer-module", claimPartKey: "blende", sourceComponentKey: "drawer-module", blendeQuantity: 1 },
+    { componentId: "component-claim-blende-wall-cabinet-3", componentKey: "claim-blende-wall-cabinet-3", claimPartKey: "blende", sourceComponentKey: "wall-cabinet-3", blendeQuantity: 1 },
+  ];
+  const result = buildServiceClaimBlendeHotspots(hotspots, claimBlenden, [], "ab-105747");
+  const baseBlenden = result.filter((entry) => (
+    entry.claimPartKey === "blende" && entry.sourceComponentKey === "base-module-2"
+  ));
+  const blendeFor = (sourceKey) => result.find((entry) => (
+    entry.claimPartKey === "blende" && entry.sourceComponentKey === sourceKey
+  ));
+
+  assert.deepEqual(
+    baseBlenden.map((entry) => [entry.left, entry.width]),
+    [
+      [56.935867, 57.76247 - 56.935867],
+      [57.76247, 58.389549 - 57.76247],
+    ],
+  );
+  assert.ok(Math.abs(blendeFor("drawer-module").left - 75.420428) < 0.000001);
+  assert.ok(Math.abs(blendeFor("drawer-module").width - (76.232779 - 75.420428)) < 0.000001);
+  assert.ok(Math.abs(blendeFor("wall-cabinet-3").left - 53.401425) < 0.000001);
+  assert.ok(Math.abs(blendeFor("wall-cabinet-3").width - (54.15677 - 53.401425)) < 0.000001);
+});
+
+test("AB 104968 worktops include each side's PDF front fascia", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentKey: "worktop", left: 5.57, top: 50.91, width: 66.77, height: 10.64 },
+  ], [
+    { partKey: "worktop-left", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceComponentKey: "worktop" },
+  ], "ab-104968");
+  const left = result.find((entry) => entry.claimPartKey === "worktop-left");
+  const right = result.find((entry) => entry.claimPartKey === "worktop-right");
+
+  assert.ok(Math.abs(left.left - 5.572447) < 0.000001);
+  assert.ok(Math.abs(left.left + left.width - 43.966746) < 0.000001);
+  assert.ok(Math.abs(left.top - 52.584874) < 0.000001);
+  assert.ok(Math.abs(left.top + left.height - 60.026891) < 0.000001);
+  assert.ok(Math.abs(right.left - 34.817102) < 0.000001);
+  assert.ok(Math.abs(right.left + right.width - 72.39905) < 0.000001);
+  assert.ok(Math.abs(right.top - 51.011765) < 0.000001);
+  assert.ok(Math.abs(right.top + right.height - 61.640336) < 0.000001);
+  assert.match(left.clipPath, /^polygon\(/);
+  assert.match(right.clipPath, /^polygon\(/);
+});
+
+test("AB 104968 variants keep the US50 front and exposed side as one cabinet", () => {
+  ["ab-104968", "ab-105734", "ab-105737", "ab-105740"].forEach((kitchenSlug) => {
+    const kitchen = {
+      items: [
+        component("CAB-BASE-US40", "base-module-1", "Base Cabinet", {
+          articleNumber: "US40",
+          widthMm: 400,
+          isLocked: true,
+          blendeCode: "UPK20",
+          blendeLabel: "UPK20 Passblende",
+        }),
+      ],
+    };
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+    const blenden = result.selectableComponents.filter((entry) => (
+      entry.claimPartKey === "blende" && entry.sourceComponentKey === "base-module-1"
+    ));
+
+    assert.ok(result.selectableComponentIds.includes("component-base-module-1"));
+    assert.equal(blenden.length, 0);
+    assert.ok(!result.selectableComponentIds.includes("component-claim-blende-base-module-1"));
+  });
+});
+
+test("AB 104968 cooktop uses the four outside vector-PDF strokes", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentKey: "oven-module", left: 24.84, top: 57.01, width: 10.88, height: 30.82 },
+  ], [{ partKey: "cooktop", sourceComponentKey: "oven-module" }], "ab-104968");
+  const cooktop = result.find((entry) => entry.claimPartKey === "cooktop");
+
+  assert.ok(Math.abs(cooktop.left - 17.57244656) < 0.000001);
+  assert.ok(Math.abs(cooktop.top - 53.63361345) < 0.000001);
+  assert.ok(Math.abs(cooktop.left + cooktop.width - 36.04275534) < 0.000001);
+  assert.ok(Math.abs(cooktop.top + cooktop.height - 57.00168067) < 0.000001);
+  assert.match(cooktop.clipPath, /^polygon\(/);
+});
+
 test("selected service claim components have accessible per-row remove buttons", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
 
@@ -1757,6 +2210,40 @@ test("worktop end-panel claims use the shared WU16 cabinet-side-panel metadata",
   assert.match(migration, /'Cabinet side panel'/);
   assert.match(migration, /'Unterschrank-Wange'/);
   assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
+});
+
+test("filter migration adds FWK124 only to the claims table", () => {
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260714150000_add_filter_claim_part", "migration.sql"),
+    "utf8",
+  );
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  assert.match(migration, /INSERT INTO "KitchenClaimPart"/);
+  assert.match(migration, /'filter'/);
+  assert.match(migration, /'FWK124'/);
+  assert.match(migration, /upper\(coalesce\(item\."articleNumber", ''\)\) LIKE '%FWK124%'/);
+  assert.match(migration, /ON CONFLICT \("kitchenId", "partKey"\) DO UPDATE/);
+  assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
+  assert.doesNotMatch(migration, /ALTER TABLE\s+"KitchenItem"/i);
+  assert.match(seed, /partKey:\s*"filter"[\s\S]*articleCode:\s*"FWK124"/);
+});
+
+test("dishwasher migration stores the exact price-list claim identities", () => {
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260714160000_add_dishwasher_claim_parts", "migration.sql"),
+    "utf8",
+  );
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  assert.match(migration, /INSERT INTO "KitchenClaimPart"/);
+  assert.match(migration, /'dishwasher', 'Fully Integrated Dishwasher', 'Vollintegrierter Geschirrspüler', 'A-EGSPV594400'/);
+  assert.match(migration, /'furniture-front', 'Furniture Front \(Dishwasher\)', 'Möbelfront \(Geschirrspüler\)', 'TGV60'/);
+  assert.match(migration, /LIKE '%TGV60%'/);
+  assert.doesNotMatch(migration, /TGV45|A-EGSPV587915/);
+  assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
+  assert.match(seed, /partKey:\s*"dishwasher"[\s\S]*articleCode:\s*"A-EGSPV594400"/);
+  assert.match(seed, /partKey:\s*"furniture-front"[\s\S]*articleCode:\s*"TGV60"/);
 });
 
 test("AB 105825 claim sink follows the calibrated bowl polygon", () => {

@@ -19,6 +19,7 @@ import {
 } from "../../../lib/service-claims";
 import { formatServiceClaimProblemAreaForEmail, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
+import { countElectricalApplianceProblemAreas } from "../../../lib/service-claim-serial-number";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 
 function descriptionHasClientKitchenAreasLine(text) {
@@ -1124,15 +1125,10 @@ export async function POST(request) {
     const rawSerialNumber = optionalString(body.serialNumber);
     const hasSerialNumberImage = serialNumberImageParts.length > 0 || booleanFromFormValue(body.hasSerialNumberImage);
     const serialEvidenceCount = parseSerialNumberEntries(rawSerialNumber).length + serialNumberImageParts.length;
-    if (parsedProblemAreas.length > 0 && serialEvidenceCount < parsedProblemAreas.length) {
+    const requiredSerialNumberCount = countElectricalApplianceProblemAreas(parsedProblemAreas);
+    if (requiredSerialNumberCount > 0 && serialEvidenceCount < requiredSerialNumberCount) {
       return NextResponse.json(
-        { error: `Please provide at least ${parsedProblemAreas.length} serial number(s) for the selected kitchen item(s).` },
-        { status: 400 },
-      );
-    }
-    if (!rawSerialNumber && !hasSerialNumberImage) {
-      return NextResponse.json(
-        { error: "Please provide a serial number or upload a serial number photo." },
+        { error: `Please provide at least ${requiredSerialNumberCount} serial number(s) for the selected electrical appliance(s).` },
         { status: 400 },
       );
     }
@@ -1184,7 +1180,7 @@ export async function POST(request) {
       ].join("\n"),
       problemDescription,
       problemAreasJson,
-      serialNumber: rawSerialNumber || "See serial number photo in attachments.",
+      serialNumber: rawSerialNumber || (hasSerialNumberImage ? "See serial number photo in attachments." : "Not applicable"),
       requestType: "complaint",
       hasSerialNumberImage,
       attachmentsMeta: attachmentParts.map(({ filename, contentType, size, role, areaComponentId, areaName, areaCode }) => ({

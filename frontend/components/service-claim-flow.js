@@ -9,6 +9,7 @@ import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts"
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
 import { getServiceClaimLinkedComponentIds } from "../lib/service-claim-kitchen-plan-selection";
 import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
+import { countElectricalApplianceProblemAreas } from "../lib/service-claim-serial-number";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
 
 const LANGUAGE_OPTIONS = [
@@ -589,6 +590,8 @@ const COPY = {
     kitchenPlanSinkOption: "Sp\u00fcle",
     kitchenPlanCooktopOption: "Kochfeld",
     kitchenPlanWorktopEndPanelOption: "Unterschrank-Wange",
+    kitchenPlanFilterOption: "Filter f\u00fcr Dunstabzugshaube",
+    kitchenPlanFurnitureFrontOption: "M\u00f6belfront (Geschirrsp\u00fcler)",
     kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
     kitchenPlanSelectedNone: "Noch keine Bereiche ausgew\u00e4hlt.",
     kitchenAreasLinePrefix: "K\u00fcchenbereiche:",
@@ -819,6 +822,8 @@ const COPY = {
     kitchenPlanSinkOption: "Sink",
     kitchenPlanCooktopOption: "Cooktop",
     kitchenPlanWorktopEndPanelOption: "Cabinet side panel",
+    kitchenPlanFilterOption: "Extractor Hood Filter",
+    kitchenPlanFurnitureFrontOption: "Furniture Front (Dishwasher)",
     kitchenPlanSelectedLabel: "Selected",
     kitchenPlanSelectedNone: "No areas selected yet.",
     kitchenAreasLinePrefix: "Kitchen areas:",
@@ -2166,7 +2171,12 @@ export default function ServiceClaimFlow() {
     () => parseSerialNumberList(formValues.serialNumber),
     [formValues.serialNumber],
   );
-  const requiredSelectedSerialNumberCount = selectedProblemAreas.length;
+  const requiredSelectedSerialNumberCount = useMemo(
+    () => countElectricalApplianceProblemAreas(selectedProblemAreas),
+    [selectedProblemAreas],
+  );
+  const hasSelectedElectricalAppliances = requiredSelectedSerialNumberCount > 0;
+  const applicableSerialNumberImages = hasSelectedElectricalAppliances ? serialNumberImages : [];
   const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
   const selectedProblemAreasWithDetails = useMemo(() => {
     return selectedProblemAreas.map((area) => ({
@@ -2713,7 +2723,7 @@ export default function ServiceClaimFlow() {
         }
         return sum + (Array.isArray(files) ? files.length : 0);
       }, 0);
-      const fixedAttachmentCount = attachments.length + serialNumberImages.length + otherProblemAreaFileCount;
+      const fixedAttachmentCount = attachments.length + applicableSerialNumberImages.length + otherProblemAreaFileCount;
       let message = "";
 
       for (const file of picked) {
@@ -2799,7 +2809,7 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
-        const currentCount = next.length + serialNumberImages.length + problemAreaAttachmentCount;
+        const currentCount = next.length + applicableSerialNumberImages.length + problemAreaAttachmentCount;
         if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
           break;
@@ -3131,8 +3141,8 @@ export default function ServiceClaimFlow() {
             contractNumber: normalizedContractNumber,
             problemDescription: buildSubmittedProblemDescription(latestFormValues),
             serialNumber: String(latestFormValues.serialNumber || "").trim(),
-            hasSerialNumberImage: serialNumberImages.length > 0,
-            attachmentCount: attachments.length + serialNumberImages.length + problemAreaAttachmentCount,
+            hasSerialNumberImage: applicableSerialNumberImages.length > 0,
+            attachmentCount: attachments.length + applicableSerialNumberImages.length + problemAreaAttachmentCount,
             preferredContactDate: String(latestFormValues.preferredContactDate || "").trim(),
             preferredContactTimeWindow: String(latestFormValues.preferredContactTimeWindow || "").trim(),
             preferredContactTimeFrom: String(latestFormValues.preferredContactTimeFrom || "").trim(),
@@ -3312,21 +3322,18 @@ export default function ServiceClaimFlow() {
 
     try {
       const formData = new FormData();
-      const normalizedSerialNumbers = normalizeSerialNumberList(
-        [formValues.serialNumber, serialNumberDraft].filter(Boolean).join("\n"),
-      );
+      const normalizedSerialNumbers = hasSelectedElectricalAppliances
+        ? normalizeSerialNumberList(
+            [formValues.serialNumber, serialNumberDraft].filter(Boolean).join("\n"),
+          )
+        : "";
       const submittedSerialNumberCount = parseSerialNumberList(normalizedSerialNumbers).length;
-      const submittedSerialEvidenceCount = submittedSerialNumberCount + serialNumberImages.length;
+      const submittedSerialEvidenceCount = submittedSerialNumberCount + applicableSerialNumberImages.length;
       if (
         requiredSelectedSerialNumberCount > 0
         && submittedSerialEvidenceCount < requiredSelectedSerialNumberCount
       ) {
         setError(t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount)));
-        setIsSubmitting(false);
-        return;
-      }
-      if (!normalizedSerialNumbers && serialNumberImages.length === 0) {
-        setError(t("serialNumberRequired"));
         setIsSubmitting(false);
         return;
       }
@@ -3340,7 +3347,7 @@ export default function ServiceClaimFlow() {
         clientPostalCode: formValues.clientPostalCode.trim(),
         problemDescription: buildSubmittedProblemDescription(),
         serialNumber: normalizedSerialNumbers,
-        hasSerialNumberImage: serialNumberImages.length > 0 ? "true" : "false",
+        hasSerialNumberImage: applicableSerialNumberImages.length > 0 ? "true" : "false",
         language,
         ...(includeHausmeister ? {} : EMPTY_HAUSMEISTER_FIELDS),
       };
@@ -3366,8 +3373,10 @@ export default function ServiceClaimFlow() {
       } else {
         formData.append("problemAreasJson", "[]");
       }
-      for (const file of serialNumberImages) {
-        formData.append("serialNumberImages", file);
+      if (hasSelectedElectricalAppliances) {
+        for (const file of serialNumberImages) {
+          formData.append("serialNumberImages", file);
+        }
       }
       for (const file of attachments) {
         formData.append("generalAttachments", file);
@@ -4651,6 +4660,8 @@ export default function ServiceClaimFlow() {
                       sinkOption: t("kitchenPlanSinkOption"),
                       cooktopOption: t("kitchenPlanCooktopOption"),
                       worktopEndPanelOption: t("kitchenPlanWorktopEndPanelOption"),
+                      filterOption: t("kitchenPlanFilterOption"),
+                      furnitureFrontOption: t("kitchenPlanFurnitureFrontOption"),
                     }}
                   />
                 </>
@@ -4767,75 +4778,73 @@ export default function ServiceClaimFlow() {
 
             <div className="service-serial-section">
               <div className="service-serial-section__column service-serial-section__column--left">
-                <label className="service-field service-field--serial-number">
-                  <span className="service-field__label-row service-field__label-row--serial">
-                    <span className="service-field__label-main">
-                      {copy.serialNumber}
-                      {requiredSelectedSerialNumberCount > 0 ? (
+                {hasSelectedElectricalAppliances ? (
+                  <label className="service-field service-field--serial-number">
+                    <span className="service-field__label-row service-field__label-row--serial">
+                      <span className="service-field__label-main">
+                        {copy.serialNumber}
                         <RequiredFieldMark title={requiredFieldTitle} />
-                      ) : null}
+                      </span>
+                      <button
+                        type="button"
+                        className="service-field__help-badge"
+                        aria-expanded={isSerialNumberHelpOpen}
+                        aria-controls="service-serial-help-title"
+                        aria-label={t("serialNumberHelpAria")}
+                        onClick={() => {
+                          setSerialHelpSlide(0);
+                          setIsSerialNumberHelpOpen(true);
+                        }}
+                      >
+                        {t("serialNumberHelpTrigger")}
+                      </button>
                     </span>
-                    <button
-                      type="button"
-                      className="service-field__help-badge"
-                      aria-expanded={isSerialNumberHelpOpen}
-                      aria-controls="service-serial-help-title"
-                      aria-label={t("serialNumberHelpAria")}
-                      onClick={() => {
-                        setSerialHelpSlide(0);
-                        setIsSerialNumberHelpOpen(true);
-                      }}
-                    >
-                      {t("serialNumberHelpTrigger")}
-                    </button>
-                  </span>
-                  {requiredSelectedSerialNumberCount > 0 ? (
                     <p className="service-form__hint">
                       {t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount))}
                     </p>
-                  ) : null}
-                  <div className="service-serial-field">
-                    <div className="service-serial-field__input-row">
-                      <input
-                        type="text"
-                        value={serialNumberDraft}
-                        onChange={(event) => setSerialNumberDraft(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter") {
-                            event.preventDefault();
-                            addSerialNumberEntry();
-                          }
-                        }}
-                        placeholder={copy.serialPlaceholder}
-                      />
-                      <button
-                        type="button"
-                        className="service-serial-field__add"
-                        onClick={() => addSerialNumberEntry()}
-                        disabled={!serialNumberDraft.trim()}
-                      >
-                        {t("serialNumberAdd")}
-                      </button>
+                    <div className="service-serial-field">
+                      <div className="service-serial-field__input-row">
+                        <input
+                          type="text"
+                          value={serialNumberDraft}
+                          onChange={(event) => setSerialNumberDraft(event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.preventDefault();
+                              addSerialNumberEntry();
+                            }
+                          }}
+                          placeholder={copy.serialPlaceholder}
+                        />
+                        <button
+                          type="button"
+                          className="service-serial-field__add"
+                          onClick={() => addSerialNumberEntry()}
+                          disabled={!serialNumberDraft.trim()}
+                        >
+                          {t("serialNumberAdd")}
+                        </button>
+                      </div>
+                      {serialNumberEntries.length ? (
+                        <ul className="service-serial-field__list">
+                          {serialNumberEntries.map((entry, index) => (
+                            <li key={`${entry}-${index}`} className="service-serial-field__item">
+                              <span className="service-serial-field__value">{entry}</span>
+                              <button
+                                type="button"
+                                className="service-serial-field__remove"
+                                onClick={() => removeSerialNumberEntry(index)}
+                                aria-label={t("removeSerialNumberAria")}
+                              >
+                                &times;
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </div>
-                    {serialNumberEntries.length ? (
-                      <ul className="service-serial-field__list">
-                        {serialNumberEntries.map((entry, index) => (
-                          <li key={`${entry}-${index}`} className="service-serial-field__item">
-                            <span className="service-serial-field__value">{entry}</span>
-                            <button
-                              type="button"
-                              className="service-serial-field__remove"
-                              onClick={() => removeSerialNumberEntry(index)}
-                              aria-label={t("removeSerialNumberAria")}
-                            >
-                              &times;
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                </label>
+                  </label>
+                ) : null}
 
                 <div className="service-field service-field--attachments service-field--claim-attachments">
                   <span>{copy.attachments}</span>
@@ -4866,36 +4875,38 @@ export default function ServiceClaimFlow() {
                 </div>
               </div>
 
-              <div className="service-serial-section__column service-serial-section__column--right">
-                <div className="service-field service-field--attachments service-field--serial-image-upload">
-                  <span>
-                    {t("serialNumberImage")}
-                  </span>
-                  <input
-                    key={serialNumberImageFieldKey}
-                    type="file"
-                    className="service-field__file"
-                    accept={SERIAL_NUMBER_IMAGE_ACCEPT}
-                    multiple
-                    onChange={handleSerialNumberImageSelected}
-                  />
-                  {serialNumberImages.length ? (
-                    <ServiceAttachmentChips
-                      files={serialNumberImages}
-                      summary={copy.attachmentsSelected.replace("{count}", String(serialNumberImages.length))}
-                      maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
-                      onRemove={removeSerialNumberImage}
-                      viewLabel={t("viewFile")}
-                      viewAriaLabel={t("viewFileAria")}
-                      closePreviewLabel={t("closeFilePreview")}
-                      previewUnavailableText={t("filePreviewUnavailable")}
-                      removeLabel={t("removeFileAria")}
-                      expandLabel={copy.attachmentsViewMore}
-                      collapseLabel={copy.attachmentsViewLess}
+              {hasSelectedElectricalAppliances ? (
+                <div className="service-serial-section__column service-serial-section__column--right">
+                  <div className="service-field service-field--attachments service-field--serial-image-upload">
+                    <span>
+                      {t("serialNumberImage")}
+                    </span>
+                    <input
+                      key={serialNumberImageFieldKey}
+                      type="file"
+                      className="service-field__file"
+                      accept={SERIAL_NUMBER_IMAGE_ACCEPT}
+                      multiple
+                      onChange={handleSerialNumberImageSelected}
                     />
-                  ) : null}
+                    {serialNumberImages.length ? (
+                      <ServiceAttachmentChips
+                        files={serialNumberImages}
+                        summary={copy.attachmentsSelected.replace("{count}", String(serialNumberImages.length))}
+                        maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
+                        onRemove={removeSerialNumberImage}
+                        viewLabel={t("viewFile")}
+                        viewAriaLabel={t("viewFileAria")}
+                        closePreviewLabel={t("closeFilePreview")}
+                        previewUnavailableText={t("filePreviewUnavailable")}
+                        removeLabel={t("removeFileAria")}
+                        expandLabel={copy.attachmentsViewMore}
+                        collapseLabel={copy.attachmentsViewLess}
+                      />
+                    ) : null}
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
 
             {error ? <p className="service-form__error">{error}</p> : null}

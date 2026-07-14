@@ -5,6 +5,7 @@ import { stripProductDimensionsFromLabel } from "./product-label-format.js";
 const CLAIM_LINKED_COMPONENT_META = {
   "component-extractor-hood": {
     code: "HOOD-B-FH664621E",
+    articleCode: "FH 664 621 E",
     name: "Extractor Hood",
     nameDe: "Flachschirmhaube",
   },
@@ -29,7 +30,14 @@ const CLAIM_BLENDE_LABELS_BY_CODE = {
 // These Blenden belong to the sink-cabinet claim in the plan. They remain a
 // separate form row so a customer can describe the panel issue, but they must
 // not split the cabinet into an additional clickable surface.
+const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
 const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
+  // The exposed left side and front are two perspective faces of one US50
+  // cabinet in this shared plan, not an independently claimable Blende.
+  "ab-104968": new Set(["base-module-1"]),
+  "ab-105734": new Set(["base-module-1"]),
+  "ab-105737": new Set(["base-module-1"]),
+  "ab-105740": new Set(["base-module-1"]),
   "ab-105805": new Set(["sink-base"]),
   "ab-105809": new Set(["sink-base"]),
   "ab-105813": new Set(["sink-base"]),
@@ -47,11 +55,14 @@ const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   "ab-105813": { "base-module-2": 2 },
   "ab-105817": { "base-module-2": 2 },
 };
+const CLAIM_BLENDE_META_OVERRIDES_BY_SLUG = {};
 const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
-  "ab-105805": { "base-module-2": 2 },
-  "ab-105809": { "base-module-2": 2 },
-  "ab-105813": { "base-module-2": 2 },
-  "ab-105817": { "base-module-2": 2 },
+  "ab-104968": { "base-module-2": 2 },
+  "ab-105734": { "base-module-2": 2 },
+  "ab-105737": { "base-module-2": 2 },
+  "ab-105740": { "base-module-2": 2 },
+  // AB 105805 and its perspective variants are intentionally not listed:
+  // their two supplied UPK20 pieces form one quantity-two corner-face target.
   "ab-105822": { "base-module-2": 2 },
   "ab-105825": { "base-module-2": 2 },
   "ab-105828": { "base-module-2": 2 },
@@ -60,6 +71,10 @@ const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
   "ab-105837": { "base-module-2": 2 },
   "ab-105840": { "base-module-2": 2 },
   "ab-105843": { "base-module-2": 2 },
+  "ab-105747": { "base-module-2": 2 },
+  "ab-105750": { "base-module-2": 2 },
+  "ab-105753": { "base-module-2": 2 },
+  "ab-105756": { "base-module-2": 2 },
 };
 const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
   // The left end panel beside the US30 is drawn in this shared layout, but
@@ -150,8 +165,37 @@ const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
   ],
 };
 
+// These PDF families draw a lower UPK20 beside the locked sink cabinet, but
+// the legacy database rows predate the Blende metadata. Expose the drawn part
+// only in claims, leaving the commercial kitchen item unchanged.
+for (const slug of [
+  "ab-105732", "ab-105735", "ab-105738", "ab-105741",
+  "ab-105746", "ab-105749", "ab-105752", "ab-105755",
+]) {
+  CLAIM_BLENDE_OVERRIDES_BY_SLUG[slug] = [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ];
+}
+
 function normalizeClaimBlendeCode(value) {
   return String(value || "").trim().replace(/\s+x\s*\d+$/i, "").trim();
+}
+
+function isFlatScreenHoodCabinet(item = {}) {
+  if (!String(item.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
+    return false;
+  }
+  const articleCodes = String(item.articleNumber || item.articleCode || "")
+    .split("+")
+    .map((part) => part.trim().toUpperCase());
+  return articleCodes.includes("FH664621E")
+    && articleCodes.includes(SERVICE_CLAIM_FILTER_ARTICLE_CODE)
+    && articleCodes.includes("HD6002");
 }
 
 function getClaimBlendeQuantity(item = {}) {
@@ -199,6 +243,9 @@ export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
   oven: "component-claim-oven",
   "oven-drawer": "component-claim-oven-drawer",
   cooktop: "component-claim-cooktop",
+  dishwasher: "component-claim-dishwasher",
+  "furniture-front": "component-claim-furniture-front",
+  filter: "component-claim-filter",
   "worktop-left": "component-claim-worktop-left",
   "worktop-right": "component-claim-worktop-right",
   "worktop-end-panel": "component-claim-worktop-end-panel",
@@ -208,17 +255,16 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   // This panel is sold with the worktop but remains independently selectable
   // in claims. It must not replace the existing horizontal worktop selector.
   "worktop-end-panel",
+  // The filter is physically inside the hood cabinet and has no useful plan
+  // hotspot. It is selected manually without replacing the cabinet target.
+  "filter",
+  // The integrated dishwasher's furniture front is selected manually without
+  // replacing the appliance hotspot.
+  "furniture-front",
 ]);
 
-const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
-  "ab-105805": [["component-extractor-hood", "component-under-cabinet-light"]],
-};
-
-export function getServiceClaimLinkedComponentIds(kitchenSlug, componentId) {
-  const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
-  const linkedGroups = SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG[normalizedSlug] || [];
-  const linkedGroup = linkedGroups.find((group) => group.includes(componentId));
-  return linkedGroup || [componentId];
+export function getServiceClaimLinkedComponentIds(_kitchenSlug, componentId) {
+  return [componentId];
 }
 
 function resolveServiceClaimComponentName(componentId, meta = {}) {
@@ -227,7 +273,16 @@ function resolveServiceClaimComponentName(componentId, meta = {}) {
     return override;
   }
 
-  return stripProductDimensionsFromLabel(String(meta.name || meta.code || componentId).trim() || meta.code || componentId);
+  if (String(meta.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
+    return "Cabinet";
+  }
+
+  const name = String(meta.name || meta.code || componentId).trim() || meta.code || componentId;
+  const articleNumber = String(meta.articleNumber || meta.articleCode || "").toUpperCase();
+  const claimName = articleNumber.includes(SERVICE_CLAIM_FILTER_ARTICLE_CODE)
+    ? name.replace(/\s*\+\s*filter\b/gi, "").replace(/\s{2,}/g, " ").trim()
+    : name;
+  return stripProductDimensionsFromLabel(claimName);
 }
 
 function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
@@ -239,7 +294,15 @@ function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
 function resolveServiceClaimArticleCode(meta = {}) {
   const articleNumber = String(meta.articleNumber || meta.articleCode || "").trim();
   if (articleNumber) {
-    return articleNumber;
+    const articleParts = articleNumber.split("+").map((part) => part.trim()).filter(Boolean);
+    if (String(meta.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
+      const cabinetArticle = articleParts.find((part) => /^HD\d+/i.test(part));
+      if (cabinetArticle) return cabinetArticle;
+    }
+    const withoutFilter = articleParts.filter(
+      (part) => part.toUpperCase() !== SERVICE_CLAIM_FILTER_ARTICLE_CODE,
+    );
+    return withoutFilter.length ? withoutFilter.join(" + ") : articleNumber;
   }
 
   if (String(meta.componentKey || "").trim().toLowerCase() === "worktop") {
@@ -400,6 +463,9 @@ export function buildServiceClaimSelectableComponents({
   const companionBlendeSourceKeys = CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || new Set();
+  const blendeMetaOverrides = CLAIM_BLENDE_META_OVERRIDES_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || {};
   const claimBlenden = sourceItems
     .map(({ item }) => buildClaimBlendeMeta(item))
     .filter(Boolean)
@@ -421,6 +487,12 @@ export function buildServiceClaimSelectableComponents({
         componentKey: index === 0 ? entry.componentKey : `${entry.componentKey}-${index + 1}`,
         blendeIndex: index + 1,
       }));
+    })
+    .map((entry) => {
+      const override = blendeMetaOverrides[entry.sourceComponentKey];
+      return override
+        ? { ...entry, ...override, articleCode: override.code }
+        : entry;
     });
   const claimBlendeSourceKeys = new Set(claimBlenden.map((entry) => entry.sourceComponentKey));
   const sourceItemByComponentKey = new Map(
@@ -454,6 +526,15 @@ export function buildServiceClaimSelectableComponents({
       continue;
     }
     addSelectableComponent(componentId, entry.fallbackMeta);
+    // Older and newly imported kitchen slugs are not all present in the
+    // configurator's static linked-component map. Detect the commercial hood
+    // bundle itself so its extractor is always available as a separate claim.
+    if (isFlatScreenHoodCabinet(entry.item)) {
+      addSelectableComponent(
+        "component-extractor-hood",
+        CLAIM_LINKED_COMPONENT_META["component-extractor-hood"],
+      );
+    }
   }
 
   const separatedSourceComponentIds = new Set(

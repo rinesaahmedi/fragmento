@@ -72,6 +72,13 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 // source plan render. Keeping the values relative to the oven hotspot
 // preserves their alignment when the claim picker applies its display crop.
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
+  // Four outside cooktop strokes from the AB 104968 vector PDF.
+  "ab-104968": [
+    [-0.667973662, -0.049348617],
+    [0.29873725, -0.109551803],
+    [1.029665013, -0.056546824],
+    [0.011867752, -0.000269933],
+  ],
   "ab-105805": [
     [-0.692275, -0.051067],
     [0.1879, -0.103753],
@@ -194,6 +201,17 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  // AB 104968 uses complete perspective end faces. The US40 includes two
+  // commercially supplied UPK20 pieces on the same narrow corner face.
+  "ab-104968": {
+    "base-module-2": {
+      side: "right",
+      inner: 43.054632,
+      outer: 44.72209,
+      bands: [[43.054632, 43.966746], [43.966746, 44.72209]],
+    },
+    "wall-cabinet-4": { side: "right", inner: 49.995249, outer: 50.893112 },
+  },
   "ab-105807": {
     "drawer-module": { side: "left", outer: 4.502707, inner: 5.272157 },
     "wall-cabinet-1": { side: "left", outer: 4.502707, inner: 5.272157 },
@@ -391,12 +409,56 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     "base-module-1": { side: "left", outer: 0.883443, inner: 1.5389 },
     "wall-cabinet-1": { side: "left", outer: 0.883443, inner: 1.5389 },
   },
+  // Exact vertical divider strokes from the 842 x 595 vector PDFs. These
+  // older plans place the Blende on different source cabinets, so inference
+  // from the outside whitespace would choose the wrong edge.
+  "ab-105732": {
+    "sink-base": { side: "right", inner: 86.394299, outer: 87.691211 },
+    "wall-cabinet-4": { side: "right", inner: 86.394299, outer: 87.691211 },
+  },
+  "ab-105733": {
+    "base-module-1": { side: "left", outer: 4.831354, inner: 6.142518 },
+    "wall-cabinet-1": { side: "left", outer: 4.831354, inner: 6.213777 },
+  },
+  "ab-105744": {
+    "base-module-1": { side: "left", outer: 0.855107, inner: 1.325416 },
+    "wall-cabinet-1": { side: "left", outer: 0.855107, inner: 1.325416 },
+  },
+  "ab-105746": {
+    "sink-base": { side: "right", inner: 89.515439, outer: 90.826603 },
+    "wall-cabinet-4": { side: "right", inner: 89.501188, outer: 90.826603 },
+  },
+  // AB 105747 draws two adjacent UPK20 strips at the inside corner, one
+  // lower-return Blende, and one upper end Blende. Keep all visible faces
+  // independent from their source cabinets in claims.
+  "ab-105747": {
+    "base-module-2": {
+      side: "right",
+      inner: 56.935867,
+      outer: 58.389549,
+      bands: [[56.935867, 57.76247], [57.76247, 58.389549]],
+    },
+    "drawer-module": { side: "right", inner: 75.420428, outer: 76.232779 },
+    "wall-cabinet-3": { side: "right", inner: 53.401425, outer: 54.15677 },
+  },
 };
 for (const alias of ["ab-105822", "ab-105828"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105825"];
 }
 for (const alias of ["ab-105840", "ab-105843"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105837"];
+}
+for (const alias of ["ab-105735", "ab-105738", "ab-105741"]) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105732"];
+}
+for (const alias of ["ab-105736", "ab-105739", "ab-105742"]) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105733"];
+}
+for (const alias of ["ab-105749", "ab-105752", "ab-105755"]) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105746"];
+}
+for (const alias of ["ab-105750", "ab-105753", "ab-105756"]) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105747"];
 }
 const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   // PDF-measured seam between the oven and the drawer below it. The oven ends
@@ -469,13 +531,18 @@ const L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG = {
   ),
   "ab-104968": splitWorktopDefinition(
     { left: 5.57, top: 50.91, width: 66.77, height: 10.64 },
+    // Each polygon includes the horizontal surface and its thin front fascia.
+    // The shared corner ends at the PDF seam x=43.966746, so selecting one
+    // worktop leg cannot spill into the fascia belonging to the other leg.
     [
-      [14.7, 59.97], [5.57, 58.11], [5.57, 56.64], [45.69, 50.91],
-      [43.9, 55.82], [14.61, 59.96],
+      [5.572447, 56.820168], [34.817102, 52.584874],
+      [43.966746, 54.460504], [43.966746, 55.791597],
+      [14.72209, 60.026891], [5.572447, 58.151261],
     ],
     [
-      [45.69, 50.91], [72.34, 56.36], [72.34, 60.09], [72.34, 61.55],
-      [43.9, 55.82],
+      [34.817102, 52.584874], [45.719715, 51.011765],
+      [72.39905, 56.477311], [72.39905, 61.640336],
+      [43.966746, 55.791597],
     ],
   ),
   "ab-105825": {
@@ -522,6 +589,8 @@ for (const alias of ["ab-105840", "ab-105843"]) {
 }
 for (const alias of ["ab-105734", "ab-105737", "ab-105740"]) {
   L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-104968"];
+  COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG[alias] = COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG["ab-104968"];
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-104968"];
 }
 for (const alias of ["ab-105750", "ab-105753", "ab-105756"]) {
   L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105747"];
@@ -1048,7 +1117,11 @@ function splitWorktopEndPanelHotspots(hotspot, part, definition) {
 }
 
 export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], kitchenSlug = "") {
-  const normalizedParts = (claimParts || []).map(normalizeClaimPart).filter(Boolean);
+  // Parts without a meaningful independent drawing are manual options below
+  // the plan. They must not take over their source component's visible hotspot.
+  const normalizedParts = (claimParts || [])
+    .map(normalizeClaimPart)
+    .filter((part) => part && !["filter", "furniture-front"].includes(part.partKey));
   if (!normalizedParts.length) {
     return hotspots;
   }
