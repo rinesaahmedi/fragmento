@@ -2171,6 +2171,47 @@ test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
   assert.doesNotMatch(seed, /reconcileExisting:\s*true/);
 });
 
+test("service claims prefer the saved corner Blende over a stale catalog link", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-L-500", "base-module-2", "Lower cabinet", {
+        isLocked: true,
+        blendeCode: "UPEF65",
+        blendeLabel: "Eckpassblende Unterschrank",
+        catalogBlendeQuantity: 2,
+        catalogBlende: {
+          code: "UPK20",
+          name: "Filler Panel up to 20 cm",
+          nameDe: "Passblende bis 20 cm",
+        },
+      }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105805",
+  });
+  const cornerBlende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+  assert.deepEqual(
+    {
+      code: cornerBlende?.code,
+      articleCode: cornerBlende?.articleCode,
+      name: cornerBlende?.name,
+      nameDe: cornerBlende?.nameDe,
+      blendeQuantity: cornerBlende?.blendeQuantity,
+    },
+    {
+      code: "UPEF65",
+      articleCode: "UPEF65",
+      name: "Corner filler panel for Lower cabinet",
+      nameDe: "Eckpassblende Unterschrank",
+      blendeQuantity: 1,
+    },
+  );
+});
+
 test("catalog linking honors Blende changes saved in Admin", () => {
   const source = fs.readFileSync(
     path.join(repoRoot, "scripts", "backfill-kitchen-item-catalog-links.js"),
