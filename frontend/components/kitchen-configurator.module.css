@@ -528,6 +528,16 @@
   background: #fff;
 }
 
+/* Keep the complete plan as context while purchased parts remain fully legible. */
+.planImageUnavailable {
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.planImagePurchased {
+  pointer-events: none;
+}
+
 .planHotspotLayer {
   position: absolute;
   inset: 0;
@@ -640,6 +650,21 @@
 .planHotspotWorktop.planHotspotSelected:hover,
 .planHotspotWorktop.planHotspotSelected:focus-visible {
   border-color: transparent;
+  box-shadow: none;
+}
+
+/* Claims split cabinet Blenden into independent invisible hit areas. The source
+   plan already contains the real cabinet/Blende edges, so never draw derived seams. */
+.planHotspotBlendeSplit,
+.planHotspotBlendeSplit:hover,
+.planHotspotBlendeSplit:focus-visible,
+.planHotspotBlendeSplit.planHotspotHover,
+.planHotspotBlendeSplit.planHotspotSelected,
+.planHotspotBlendeSplit.planHotspotSelected:hover,
+.planHotspotBlendeSplit.planHotspotSelected:focus-visible {
+  border: 0;
+  border-radius: 0;
+  background-clip: border-box;
   box-shadow: none;
 }
 

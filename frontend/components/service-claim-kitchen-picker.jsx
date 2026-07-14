@@ -29,6 +29,7 @@ import {
   SERVICE_CLAIM_PART_COMPONENT_IDS,
 } from "../lib/service-claim-kitchen-plan-selection";
 import {
+  buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
   isLShapedClaimKitchen,
 } from "../lib/service-claim-kitchen-hotspots";
@@ -134,6 +135,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     svgMarkup,
     kitchenSlug,
     selectableComponentIds,
+    selectableComponents = [],
     visibleComponentIds: planVisibleComponentIds = selectableComponentIds,
     claimParts = [],
   } = kitchenPlan;
@@ -159,13 +161,14 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   const visibleKey = visibleComponentIds.join("|");
   const sourceImageHotspots = useMemo(() => {
     const definitions = (IMAGE_HOTSPOTS_BY_SLUG[kitchenSlug] || []).map(withHotspotSourceBounds);
-    return withBasePlinthExtension(
+    const prepared = withBasePlinthExtension(
       withCornerBlendeExtensions(
         withDerivedSinkFaucet(definitions, kitchenConfig.components),
       ),
       kitchenSlug,
     );
-  }, [kitchenConfig.components, kitchenSlug]);
+    return buildServiceClaimBlendeHotspots(prepared, selectableComponents, kitchenConfig.components, kitchenSlug);
+  }, [kitchenConfig.components, kitchenSlug, selectableComponents]);
   const planDisplayCrop = useMemo(
     () => getPlanDisplayCrop(sourceImageHotspots, kitchenSlug),
     [sourceImageHotspots, kitchenSlug],
@@ -369,6 +372,17 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                   </clipPath>
                 </defs>
                 <image
+                  aria-hidden="true"
+                  className={styles.planImageUnavailable}
+                  href={imageViewHref}
+                  x={-(planDisplayCrop.left / planDisplayCrop.width) * 100}
+                  y={-(planDisplayCrop.top / planDisplayCrop.height) * 100}
+                  width={(100 / planDisplayCrop.width) * 100}
+                  height={(100 / planDisplayCrop.height) * 100}
+                  preserveAspectRatio="none"
+                />
+                <image
+                  className={styles.planImagePurchased}
                   href={imageViewHref}
                   x={-(planDisplayCrop.left / planDisplayCrop.width) * 100}
                   y={-(planDisplayCrop.top / planDisplayCrop.height) * 100}
@@ -378,6 +392,9 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                   clipPath={`url(#${imageClipPathId})`}
                 />
                 {imageHotspots.map((hotspot) => {
+                  if (hotspot.claimBlendeSplit) {
+                    return null;
+                  }
                   if (
                     (
                       hotspot.claimPartKey === "worktop-left"
@@ -473,6 +490,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                         || hotspot.claimPartKey === "worktop-right"
                           ? styles.planHotspotWorktop
                           : "",
+                        hotspot.claimBlendeSplit ? styles.planHotspotBlendeSplit : "",
                         isHovered ? styles.planHotspotHover : "",
                         isSelected ? styles.planHotspotSelected : "",
                       ]
@@ -488,6 +506,8 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                         zIndex:
                           hotspot.claimPartKey === "cooktop"
                             ? 12
+                            : hotspot.claimPartKey === "blende"
+                            ? 14
                             : hotspot.claimPartKey === "sink"
                             ? 11
                             : hotspot.componentKey === "sink-faucet"

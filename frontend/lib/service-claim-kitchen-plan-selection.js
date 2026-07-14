@@ -17,6 +17,140 @@ const CLAIM_COMPONENT_LABEL_OVERRIDES = {
   "component-sink-faucet": "Sink",
 };
 
+const CLAIM_BLENDE_COMPONENT_PREFIX = "component-claim-blende-";
+const CLAIM_BLENDE_EXCLUDED_SOURCE_KEYS_BY_SLUG = {
+  // In this shared perspective plan the sink front and visible side panel are
+  // one cabinet selection. The legacy item-level UPK20 must not split claims.
+  "ab-105805": new Set(["sink-base"]),
+  "ab-105809": new Set(["sink-base"]),
+  "ab-105813": new Set(["sink-base"]),
+  "ab-105817": new Set(["sink-base"]),
+};
+const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
+  // Both adjacent right-hand strips are independently drawn in this shared plan.
+  "ab-105805": { "base-module-2": 2 },
+  "ab-105809": { "base-module-2": 2 },
+  "ab-105813": { "base-module-2": 2 },
+  "ab-105817": { "base-module-2": 2 },
+};
+const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
+  "ab-105805": { "base-module-2": 2 },
+  "ab-105809": { "base-module-2": 2 },
+  "ab-105813": { "base-module-2": 2 },
+  "ab-105817": { "base-module-2": 2 },
+  "ab-105822": { "base-module-2": 2 },
+  "ab-105825": { "base-module-2": 2 },
+  "ab-105828": { "base-module-2": 2 },
+  "ab-105831": { "base-module-2": 2 },
+  "ab-105834": { "base-module-2": 2 },
+  "ab-105837": { "base-module-2": 2 },
+  "ab-105840": { "base-module-2": 2 },
+  "ab-105843": { "base-module-2": 2 },
+};
+const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
+  // These lower-right UPK20 strips are drawn in the plans but are not attached
+  // to the locked sink cabinet in the commercial kitchen item data.
+  "ab-105823": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
+  "ab-105826": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
+  "ab-105829": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
+  "ab-105832": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPK20",
+      name: "UPK20 Filler Panel",
+      nameDe: "UPK20 Passblende",
+    },
+  ],
+  // This separately drawn upper-right HPK2002 face is present in the shared
+  // perspective plan even though the legacy kitchen item has no Blende fields.
+  "ab-105837": [
+    {
+      sourceComponentKey: "wall-cabinet-3",
+      code: "HPK2002",
+      name: "HPK2002 Filler Panel",
+      nameDe: "HPK2002 Passblende",
+    },
+  ],
+  "ab-105840": [
+    {
+      sourceComponentKey: "wall-cabinet-3",
+      code: "HPK2002",
+      name: "HPK2002 Filler Panel",
+      nameDe: "HPK2002 Passblende",
+    },
+  ],
+  "ab-105843": [
+    {
+      sourceComponentKey: "wall-cabinet-3",
+      code: "HPK2002",
+      name: "HPK2002 Filler Panel",
+      nameDe: "HPK2002 Passblende",
+    },
+  ],
+};
+
+function normalizeClaimBlendeCode(value) {
+  return String(value || "").trim().replace(/\s+x\s*\d+$/i, "").trim();
+}
+
+function getClaimBlendeQuantity(item = {}) {
+  const explicit = Number.parseInt(String(item.catalogBlendeQuantity || ""), 10);
+  if (Number.isFinite(explicit) && explicit > 0) return explicit;
+  const match = `${item.blendeCode || ""} ${item.blendeLabel || ""}`.match(/\bx\s*(\d+)\b/i);
+  return Math.max(1, Number.parseInt(match?.[1] || "1", 10) || 1);
+}
+
+function claimBlendeComponentId(componentKey) {
+  const normalizedKey = String(componentKey || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return normalizedKey ? `${CLAIM_BLENDE_COMPONENT_PREFIX}${normalizedKey}` : "";
+}
+
+function buildClaimBlendeMeta(item = {}) {
+  const componentKey = String(item.componentKey || "").trim();
+  const code = normalizeClaimBlendeCode(item.catalogBlende?.code || item.blendeCode);
+  const componentId = claimBlendeComponentId(componentKey);
+  if (!componentId || !code) return null;
+
+  return {
+    componentId,
+    code,
+    articleCode: code,
+    name: String(item.catalogBlende?.name || item.blendeLabel || `${code} Filler Panel`).trim(),
+    nameDe: String(item.catalogBlende?.nameDe || item.blendeLabel || `${code} Passblende`).trim(),
+    componentKey: `claim-blende-${componentKey}`,
+    sourceComponentKey: componentKey,
+    sourceKitchenItemCode: String(item.code || "").trim(),
+    sourceWidthMm: Number(item.widthMm) || null,
+    claimPartKey: "blende",
+    blendeQuantity: getClaimBlendeQuantity(item),
+  };
+}
+
 export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
   sink: "component-claim-sink",
   "sink-cabinet": "component-claim-sink-cabinet",
@@ -51,6 +185,19 @@ function resolveServiceClaimComponentName(componentId, meta = {}) {
   return stripProductDimensionsFromLabel(String(meta.name || meta.code || componentId).trim() || meta.code || componentId);
 }
 
+function resolveServiceClaimArticleCode(meta = {}) {
+  const articleNumber = String(meta.articleNumber || meta.articleCode || "").trim();
+  if (articleNumber) {
+    return articleNumber;
+  }
+
+  if (String(meta.componentKey || "").trim().toLowerCase() === "worktop") {
+    return "PLR60";
+  }
+
+  return String(meta.code || "").trim();
+}
+
 export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
   const componentMetaById = new Map();
 
@@ -64,6 +211,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
     }
     componentMetaById.set(componentId, {
       code: String(item.code || "").trim(),
+      articleCode: resolveServiceClaimArticleCode(item),
       name: resolveServiceClaimComponentName(componentId, item),
     });
   }
@@ -75,6 +223,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
     }
     componentMetaById.set(componentId, {
       code: String(comp.code || "").trim(),
+      articleCode: resolveServiceClaimArticleCode(comp),
       name: resolveServiceClaimComponentName(componentId, comp),
     });
   }
@@ -133,6 +282,11 @@ export function buildServiceClaimSelectableComponents({
     selectableMetaIds.add(componentId);
     const resolvedMeta = componentMetaById.get(componentId) || {};
     const code = String(resolvedMeta.code || fallbackMeta.code || "").trim();
+    const articleCode = String(
+      resolvedMeta.articleCode
+      || fallbackMeta.articleCode
+      || code,
+    ).trim();
     const name = resolveServiceClaimComponentName(componentId, {
       code,
       name: resolvedMeta.name || fallbackMeta.name,
@@ -141,6 +295,7 @@ export function buildServiceClaimSelectableComponents({
     selectableMeta.push({
       componentId,
       code,
+      articleCode,
       name,
     });
   }
@@ -171,9 +326,59 @@ export function buildServiceClaimSelectableComponents({
       item,
       fallbackMeta: {
         code: String(item.code || "").trim(),
+        articleCode: resolveServiceClaimArticleCode(item),
         name: resolveServiceClaimComponentName(componentIdForItem(item), item),
       },
     }));
+
+  const excludedBlendeSourceKeys = CLAIM_BLENDE_EXCLUDED_SOURCE_KEYS_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || new Set();
+  const blendeQuantityOverrides = CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || {};
+  const independentBlendeQuantities = CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || {};
+  const claimBlenden = sourceItems
+    .map(({ item }) => buildClaimBlendeMeta(item))
+    .filter((entry) => entry && !excludedBlendeSourceKeys.has(entry.sourceComponentKey))
+    .map((entry) => {
+      const quantity = Number(blendeQuantityOverrides[entry.sourceComponentKey] || 0);
+      return quantity > 0 ? { ...entry, blendeQuantity: quantity } : entry;
+    })
+    .flatMap((entry) => {
+      const quantity = Number(independentBlendeQuantities[entry.sourceComponentKey] || 0);
+      if (quantity <= 1) return [entry];
+      return Array.from({ length: quantity }, (_, index) => ({
+        ...entry,
+        componentId: index === 0 ? entry.componentId : `${entry.componentId}-${index + 1}`,
+        componentKey: index === 0 ? entry.componentKey : `${entry.componentKey}-${index + 1}`,
+        blendeIndex: index + 1,
+      }));
+    });
+  const claimBlendeSourceKeys = new Set(claimBlenden.map((entry) => entry.sourceComponentKey));
+  const sourceItemByComponentKey = new Map(
+    sourceItems.map(({ item }) => [String(item.componentKey || "").trim(), item]),
+  );
+  (CLAIM_BLENDE_OVERRIDES_BY_SLUG[String(kitchenSlug || "").toLowerCase()] || []).forEach((override) => {
+    const sourceItem = sourceItemByComponentKey.get(override.sourceComponentKey);
+    if (!sourceItem || claimBlendeSourceKeys.has(override.sourceComponentKey)) return;
+    const meta = buildClaimBlendeMeta({
+      ...sourceItem,
+      blendeCode: override.code,
+      blendeLabel: override.name,
+      catalogBlende: {
+        code: override.code,
+        name: override.name,
+        nameDe: override.nameDe,
+      },
+    });
+    if (meta) {
+      claimBlenden.push(meta);
+      claimBlendeSourceKeys.add(meta.sourceComponentKey);
+    }
+  });
 
   for (const entry of sourceItems) {
     const componentId = componentIdForItem(entry.item);
@@ -213,10 +418,12 @@ export function buildServiceClaimSelectableComponents({
   const resolvedSelectableIds = [
     ...[...selectableIds].filter((componentId) => !separatedSourceComponentIds.has(componentId)),
     ...separatedClaimParts.map((part) => part.componentId),
+    ...claimBlenden.map((blende) => blende.componentId),
   ];
   const resolvedSelectableMeta = [
     ...selectableMeta.filter((entry) => !separatedSourceComponentIds.has(entry.componentId)),
     ...separatedClaimParts,
+    ...claimBlenden,
   ].filter((entry) => resolvedSelectableIds.includes(entry.componentId) || separatedClaimPartIds.has(entry.componentId));
 
   return {

@@ -7,6 +7,10 @@ import { prisma } from "./prisma.js";
 import { buildServiceClaimSelectableComponents } from "./service-claim-kitchen-plan-selection.js";
 import { normalizeServiceClaimContractNumber } from "./service-claims.js";
 
+// TEMPORARY: expose every component as ordered while testing service claims.
+// Delete this flag and the conditional below to restore real confirmed-order filtering.
+const SHOW_FULL_KITCHEN_IN_SERVICE_CLAIMS = true;
+
 async function loadKitchenClaimParts(kitchenId) {
   try {
     return await prisma.$queryRaw`
@@ -71,7 +75,9 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       kitchen,
       kitchenConfig,
       kitchenSlug: slug,
-      confirmedItems: contractOrderState.confirmedItems,
+      confirmedItems: SHOW_FULL_KITCHEN_IN_SERVICE_CLAIMS
+        ? kitchen.items
+        : contractOrderState.confirmedItems,
       claimParts,
     });
 

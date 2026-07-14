@@ -5,7 +5,10 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadKitchenSvgMarkup } from "../lib/load-kitchen-svg.js";
 import { buildServiceClaimSelectableComponents } from "../lib/service-claim-kitchen-plan-selection.js";
-import { buildServiceClaimPartHotspots } from "../lib/service-claim-kitchen-hotspots.js";
+import {
+  buildServiceClaimBlendeHotspots,
+  buildServiceClaimPartHotspots,
+} from "../lib/service-claim-kitchen-hotspots.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(__dirname, "..");
@@ -43,8 +46,8 @@ test("AB 105808 service plan uses overlay bounds instead of color grouping", () 
 test("service claim kitchen plan keeps only defaults and confirmed components selectable", () => {
   const kitchen = {
     items: [
-      component("CAB-BASE-DEFAULT", "base-module-0", "Default base", { isLocked: true }),
-      component("CAB-BASE-ORDERED", "base-module-1", "Ordered base"),
+      component("CAB-BASE-DEFAULT", "base-module-0", "Default base", { articleNumber: "US60", isLocked: true }),
+      component("CAB-BASE-ORDERED", "base-module-1", "Ordered base", { articleNumber: "US40" }),
       component("CAB-BASE-NOT-ORDERED", "base-module-2", "Not ordered base"),
     ],
   };
@@ -59,7 +62,751 @@ test("service claim kitchen plan keeps only defaults and confirmed components se
 
   assert.deepEqual(result.selectableComponentIds, ["component-base-module-0", "component-base-module-1"]);
   assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["CAB-BASE-DEFAULT", "CAB-BASE-ORDERED"]);
+  assert.deepEqual(result.selectableComponents.map((entry) => entry.articleCode), ["US60", "US40"]);
   assert.equal(result.source, "kitchen");
+});
+
+test("service claim components show a code when no catalog article number exists", () => {
+  const kitchen = {
+    items: [
+      component("TOP-AB105806", "worktop", "Worktop", { isLocked: true }),
+      component("CAB-BASE-CUSTOM", "base-module-1", "Custom base", { isLocked: true }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105806",
+  });
+
+  assert.deepEqual(result.selectableComponents.map((entry) => entry.articleCode), ["PLR60", "CAB-BASE-CUSTOM"]);
+});
+
+test("service claims expose a cabinet blende as its own selectable component", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-WITH-BLENDE", "base-module-3", "Lower cabinet 50", {
+        articleNumber: "US50",
+        widthMm: 500,
+        isLocked: true,
+        blendeCode: "UPK20",
+        blendeLabel: "UPK20 Passblende",
+        catalogBlendeQuantity: 1,
+        catalogBlende: {
+          code: "UPK20",
+          name: "UPK20 Filler Panel",
+          nameDe: "UPK20 Passblende",
+        },
+      }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105833",
+  });
+
+  assert.deepEqual(result.selectableComponentIds, [
+    "component-base-module-3",
+    "component-claim-blende-base-module-3",
+  ]);
+  assert.deepEqual(result.selectableComponents[1], {
+    componentId: "component-claim-blende-base-module-3",
+    code: "UPK20",
+    articleCode: "UPK20",
+    name: "UPK20 Filler Panel",
+    nameDe: "UPK20 Passblende",
+    componentKey: "claim-blende-base-module-3",
+    sourceComponentKey: "base-module-3",
+    sourceKitchenItemCode: "CAB-BASE-WITH-BLENDE",
+    sourceWidthMm: 500,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  });
+});
+
+test("plan-only lower Blenden are exposed separately from their sink cabinets", () => {
+  ["ab-105823", "ab-105826", "ab-105829", "ab-105832"].forEach((kitchenSlug) => {
+    const kitchen = {
+      items: [
+        component("SINKBASE-B-600", "sink-base", "Sink Lower Cabinet", {
+          articleNumber: "SP60",
+          widthMm: 600,
+          isLocked: true,
+        }),
+      ],
+    };
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+    const blende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+    assert.ok(result.selectableComponentIds.includes("component-claim-blende-sink-base"));
+    assert.equal(blende.sourceComponentKey, "sink-base");
+    assert.equal(blende.articleCode, "UPK20");
+    assert.equal(blende.name, "UPK20 Filler Panel");
+  });
+});
+
+test("AB 105837 perspective variants expose the plan-only upper Blende", () => {
+  ["ab-105837", "ab-105840", "ab-105843"].forEach((kitchenSlug) => {
+    const kitchen = {
+      items: [
+        component("CAB-WALL-H6002-L", "wall-cabinet-3", "Wall Cabinet", {
+          articleNumber: "H6002",
+          widthMm: 600,
+          isLocked: true,
+        }),
+      ],
+    };
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+    const blende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+    assert.ok(result.selectableComponentIds.includes("component-wall-cabinet-3"));
+    assert.ok(result.selectableComponentIds.includes("component-claim-blende-wall-cabinet-3"));
+    assert.equal(blende.sourceComponentKey, "wall-cabinet-3");
+    assert.equal(blende.articleCode, "HPK2002");
+    assert.equal(blende.name, "HPK2002 Filler Panel");
+  });
+});
+
+test("AB 105805 perspective variants keep complete cabinet polygons intact", () => {
+  ["ab-105805", "ab-105809", "ab-105813", "ab-105817"].forEach((kitchenSlug) => {
+    const kitchen = {
+      items: [
+        component("SINKBASE-B-300", "sink-base", "Sink Lower Cabinet", {
+          articleNumber: "SP30",
+          widthMm: 300,
+          isLocked: true,
+          blendeCode: "UPK20",
+          blendeLabel: "UPK20 Passblende",
+        }),
+        component("CAB-BASE-WITH-BLENDE", "base-module-2", "Base Cabinet", {
+          articleNumber: "US50",
+          widthMm: 500,
+          isLocked: true,
+          blendeCode: "UPK20 x2",
+          blendeLabel: "UPK20 Passblende x 2",
+        }),
+        component("CAB-WALL-WITH-BLENDE", "wall-cabinet-4", "Wall Cabinet", {
+          articleNumber: "H6002",
+          widthMm: 600,
+          isLocked: true,
+          blendeCode: "HPK2002",
+          blendeLabel: "HPK2002 Passblende",
+        }),
+      ],
+    };
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+
+    assert.ok(result.selectableComponentIds.includes("component-sink-base"));
+    assert.ok(!result.selectableComponentIds.includes("component-claim-blende-sink-base"));
+    assert.ok(result.selectableComponentIds.includes("component-base-module-2"));
+    assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-2"));
+    const baseBlenden = result.selectableComponents.filter(
+      (entry) => entry.sourceComponentKey === "base-module-2" && entry.claimPartKey === "blende",
+    );
+    assert.equal(baseBlenden.length, 2);
+    assert.deepEqual(baseBlenden.map((entry) => entry.blendeIndex), [1, 2]);
+    assert.notEqual(baseBlenden[0].componentId, baseBlenden[1].componentId);
+    assert.ok(result.selectableComponentIds.includes("component-wall-cabinet-4"));
+    assert.ok(result.selectableComponentIds.includes("component-claim-blende-wall-cabinet-4"));
+  });
+});
+
+test("AB 105805 splits the right Blende from the last upper cabinet", () => {
+  const hotspots = [
+    {
+      componentKey: "wall-cabinet-4",
+      points: [[50.05, 15.6], [45.66, 14.55], [56.61, 12.94], [61.02, 13.76], [61.02, 36.65], [50.05, 38.06]],
+    },
+  ];
+  const blende = {
+    componentId: "component-claim-blende-wall-cabinet-4",
+    componentKey: "claim-blende-wall-cabinet-4",
+    sourceComponentKey: "wall-cabinet-4",
+    sourceWidthMm: 600,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const result = buildServiceClaimBlendeHotspots(hotspots, [blende], [
+    { componentKey: "wall-cabinet-4", widthMm: 600, blendeCode: "HPK2002" },
+  ], "ab-105805");
+  const cabinet = result.find((entry) => entry.componentKey === "wall-cabinet-4");
+  const strip = result.find((entry) => entry.claimPartKey === "blende");
+
+  assert.ok(cabinet);
+  assert.ok(strip);
+  assert.equal(strip.blendeSide, "right");
+  assert.notEqual(cabinet.componentId, strip.componentId);
+  assert.ok(Math.abs(cabinet.left + cabinet.width - 60.15959) < 0.000001);
+  assert.ok(Math.abs(strip.left - 60.15959) < 0.000001);
+  assert.ok(Math.abs(strip.left + strip.width - 61.014534) < 0.000001);
+});
+
+test("AB 105805 splits both right-side Blenden from the US50 cabinet and from each other", () => {
+  const hotspots = [
+    { componentKey: "oven-module", points: [[35.45, 57.58], [45.57, 56.13], [45.57, 83.35], [35.45, 84.84]] },
+    { componentKey: "base-module-2", points: [[45.57, 56.13], [55.52, 54.98], [55.52, 82.23], [45.57, 83.35]] },
+    { componentKey: "corner-base", points: [[55.55, 55.05], [64.05, 56.65], [64.05, 83.91], [55.55, 82.25]] },
+  ];
+  const blende = {
+    componentId: "component-claim-blende-base-module-2",
+    componentKey: "claim-blende-base-module-2",
+    sourceComponentKey: "base-module-2",
+    sourceWidthMm: 500,
+    claimPartKey: "blende",
+    blendeQuantity: 2,
+    blendeIndex: 1,
+  };
+  const secondBlende = {
+    ...blende,
+    componentId: "component-claim-blende-base-module-2-2",
+    componentKey: "claim-blende-base-module-2-2",
+    blendeIndex: 2,
+  };
+  const result = buildServiceClaimBlendeHotspots(hotspots, [blende, secondBlende], [
+    { componentKey: "oven-module", widthMm: 600 },
+    { componentKey: "base-module-2", widthMm: 500, blendeCode: "UPK20 x2" },
+    { componentKey: "corner-base", widthMm: 300 },
+  ], "ab-105805");
+  const cabinets = result.filter((entry) => entry.componentKey === "base-module-2");
+  const strips = result.filter((entry) => entry.claimPartKey === "blende");
+
+  assert.equal(cabinets.length, 1);
+  assert.equal(strips.length, 2);
+  assert.deepEqual([...new Set(strips.map((entry) => entry.componentId))], [
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]);
+  assert.deepEqual([...new Set(strips.map((entry) => entry.blendeIndex))], [1, 2]);
+  assert.ok(Math.abs(cabinets[0].left + cabinets[0].width - 54.003333) < 0.000001);
+  const firstStrip = strips.find((entry) => entry.blendeIndex === 1);
+  const secondStrip = strips.find((entry) => entry.blendeIndex === 2);
+  assert.ok(Math.abs(firstStrip.left - 54.003333) < 0.000001);
+  assert.ok(Math.abs(firstStrip.left + firstStrip.width - secondStrip.left) < 0.000001);
+  assert.ok(Math.abs(secondStrip.left - 54.761667) < 0.000001);
+  assert.ok(Math.abs(secondStrip.left + secondStrip.width - 55.52) < 0.000001);
+});
+
+test("L-kitchen quantity-two Blenden are exposed as independent claim selections", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-WITH-TWO-BLENDEN", "base-module-2", "Base Cabinet", {
+        articleNumber: "US50",
+        widthMm: 500,
+        isLocked: true,
+        blendeCode: "UPK20 x2",
+        blendeLabel: "UPK20 Passblende x 2",
+      }),
+    ],
+  };
+
+  [
+    "ab-105822", "ab-105825", "ab-105828", "ab-105831",
+    "ab-105834", "ab-105837", "ab-105840", "ab-105843",
+  ].forEach((kitchenSlug) => {
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+    const blenden = result.selectableComponents.filter((entry) => entry.claimPartKey === "blende");
+
+    assert.equal(blenden.length, 2, `${kitchenSlug} exposes both Blenden`);
+    assert.deepEqual(blenden.map((entry) => entry.blendeIndex), [1, 2]);
+    assert.deepEqual(blenden.map((entry) => entry.componentId), [
+      "component-claim-blende-base-module-2",
+      "component-claim-blende-base-module-2-2",
+    ]);
+  });
+});
+
+test("L-kitchen double Blenden follow the two adjacent PDF corner seams", () => {
+  const families = [
+    {
+      slugs: ["ab-105822", "ab-105825", "ab-105828"],
+      outer: 42.661727,
+      divider: 43.54517,
+      inner: 44.286121,
+      right: 53.44,
+    },
+    {
+      slugs: ["ab-105831"],
+      outer: 42.376746,
+      divider: 43.288686,
+      inner: 44.029638,
+      right: 53.25,
+    },
+    {
+      slugs: ["ab-105834"],
+      outer: 51.809632,
+      divider: 52.807068,
+      inner: 53.918495,
+      right: 62.3,
+    },
+    {
+      slugs: ["ab-105837", "ab-105840", "ab-105843"],
+      outer: 52.037618,
+      divider: 52.949558,
+      inner: 53.975492,
+      right: 61.64,
+    },
+  ];
+  const firstBlende = {
+    componentId: "component-claim-blende-base-module-2",
+    componentKey: "claim-blende-base-module-2",
+    sourceComponentKey: "base-module-2",
+    claimPartKey: "blende",
+    blendeQuantity: 2,
+    blendeIndex: 1,
+  };
+  const secondBlende = {
+    ...firstBlende,
+    componentId: "component-claim-blende-base-module-2-2",
+    componentKey: "claim-blende-base-module-2-2",
+    blendeIndex: 2,
+  };
+
+  families.forEach(({ slugs, outer, divider, inner, right }) => {
+    slugs.forEach((kitchenSlug) => {
+      const result = buildServiceClaimBlendeHotspots([
+        { componentKey: "base-module-2", left: outer, top: 55, width: right - outer, height: 30 },
+      ], [firstBlende, secondBlende], [], kitchenSlug);
+      const cabinet = result.find((entry) => entry.componentKey === "base-module-2");
+      const strips = result.filter((entry) => entry.claimPartKey === "blende");
+
+      assert.equal(strips.length, 2);
+      assert.ok(Math.abs(cabinet.left - inner) < 0.000001);
+      assert.ok(Math.abs(strips[0].left - outer) < 0.000001);
+      assert.ok(Math.abs(strips[0].left + strips[0].width - divider) < 0.000001);
+      assert.ok(Math.abs(strips[1].left - divider) < 0.000001);
+      assert.ok(Math.abs(strips[1].left + strips[1].width - inner) < 0.000001);
+      assert.deepEqual(strips.map((entry) => entry.blendeSide), ["left", "left"]);
+    });
+  });
+});
+
+test("L-kitchen single Blenden use their complete PDF-drawn end faces", () => {
+  const cases = [
+    ["ab-105825", "wall-cabinet-1", 48.161869, 48.902821, "left"],
+    ["ab-105831", "wall-cabinet-1", 47.990881, 48.760331, "left"],
+    ["ab-105831", "base-module-1", 14.55, 20.45, "right"],
+    ["ab-105834", "wall-cabinet-3", 59.447136, 60.444571, "right"],
+    ["ab-105834", "base-module-3", 82.67, 94.54, "right"],
+    ["ab-105837", "wall-cabinet-3", 58.991166, 59.931604, "right"],
+    ["ab-105840", "wall-cabinet-3", 58.991166, 59.931604, "right"],
+    ["ab-105843", "wall-cabinet-3", 58.991166, 59.931604, "right"],
+  ];
+
+  cases.forEach(([kitchenSlug, sourceComponentKey, outer, inner, side]) => {
+    const left = Math.min(outer, inner);
+    const right = Math.max(outer, inner);
+    const sourceLeft = side === "left" ? left : Math.max(0, left - 10);
+    const sourceRight = side === "right" ? right : Math.min(100, right + 10);
+    const result = buildServiceClaimBlendeHotspots([
+      { componentKey: sourceComponentKey, left: sourceLeft, top: 10, width: sourceRight - sourceLeft, height: 30 },
+    ], [{
+      componentId: `component-claim-blende-${sourceComponentKey}`,
+      componentKey: `claim-blende-${sourceComponentKey}`,
+      sourceComponentKey,
+      claimPartKey: "blende",
+      blendeQuantity: 1,
+    }], [], kitchenSlug);
+    const blende = result.find((entry) => entry.claimPartKey === "blende");
+
+    assert.ok(blende, `${kitchenSlug} ${sourceComponentKey} exposes its Blende`);
+    assert.ok(Math.abs(blende.left - left) < 0.000001);
+    assert.ok(Math.abs(blende.width - (right - left)) < 0.000001);
+    assert.equal(blende.blendeSide, side);
+  });
+});
+
+test("service claim blende hotspot is split from the cabinet outer edge", () => {
+  const hotspots = [
+    { componentKey: "base-module-2", left: 37.09, top: 55.6, width: 11.8, height: 22.57 },
+    { componentKey: "base-module-3", left: 64.21, top: 55.6, width: 10.44, height: 22.57 },
+    { componentKey: "sink-base", left: 74.65, top: 55.6, width: 10.89, height: 22.57 },
+  ];
+  const result = buildServiceClaimBlendeHotspots(hotspots, [{
+    componentId: "component-claim-blende-base-module-3",
+    componentKey: "claim-blende-base-module-3",
+    sourceComponentKey: "base-module-3",
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  }]);
+  const cabinet = result.find((hotspot) => hotspot.componentKey === "base-module-3");
+  const blende = result.find((hotspot) => hotspot.claimPartKey === "blende");
+
+  assert.ok(Math.abs(cabinet.left - 64.65) < 0.000001);
+  assert.ok(Math.abs(cabinet.width - 10) < 0.000001);
+  assert.equal(cabinet.claimBlendeSplit, true);
+  assert.equal(blende.left, 64.21);
+  assert.ok(Math.abs(blende.width - 0.44) < 0.000001);
+  assert.equal(blende.componentId, "component-claim-blende-base-module-3");
+  assert.equal(blende.blendeSide, "left");
+  assert.equal(blende.claimBlendeSplit, true);
+});
+
+test("service claim blende split follows the measured cabinet scale", () => {
+  const hotspots = [
+    { componentKey: "base-module-1", left: 18.24, top: 64.25, width: 9.94, height: 30.91 },
+    { componentKey: "base-module-2", left: 43.12, top: 64.25, width: 9.94, height: 30.91 },
+    { componentKey: "base-module-3", left: 53.06, top: 64.25, width: 14.92, height: 30.91 },
+    { componentKey: "sink-base", left: 67.98, top: 64.25, width: 14.94, height: 30.91 },
+    { componentKey: "drawer-module", left: 82.92, top: 64.25, width: 15.67, height: 30.91 },
+  ];
+  const components = [
+    { componentKey: "base-module-1", widthMm: 400 },
+    { componentKey: "base-module-2", widthMm: 400 },
+    { componentKey: "drawer-module", widthMm: 600, blendeCode: "UPK20" },
+  ];
+  const result = buildServiceClaimBlendeHotspots(hotspots, [{
+    componentId: "component-claim-blende-drawer-module",
+    componentKey: "claim-blende-drawer-module",
+    sourceComponentKey: "drawer-module",
+    sourceWidthMm: 600,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  }], components, "ab-105806");
+  const cabinet = result.find((hotspot) => hotspot.componentKey === "drawer-module");
+  const blende = result.find((hotspot) => hotspot.claimPartKey === "blende");
+
+  assert.ok(Math.abs(blende.width - (98.575093 - 97.834141)) < 0.000001);
+  assert.ok(Math.abs(cabinet.left + cabinet.width - blende.left) < 0.000001);
+  assert.ok(Math.abs(blende.left - 97.834141) < 0.000001);
+  assert.ok(Math.abs(blende.left + blende.width - 98.575093) < 0.000001);
+});
+
+test("AB 105808 claim Blenden use the exact PDF divider pixels", () => {
+  const hotspots = [
+    { componentKey: "wall-cabinet-6", left: 81.23, top: 15.89, width: 15.07, height: 24.09 },
+    { componentKey: "drawer-module", left: 81.23, top: 58.81, width: 15.07, height: 29.25 },
+  ];
+  const blenden = [
+    {
+      componentId: "component-claim-blende-wall-cabinet-6",
+      componentKey: "claim-blende-wall-cabinet-6",
+      sourceComponentKey: "wall-cabinet-6",
+      claimPartKey: "blende",
+      blendeQuantity: 1,
+    },
+    {
+      componentId: "component-claim-blende-drawer-module",
+      componentKey: "claim-blende-drawer-module",
+      sourceComponentKey: "drawer-module",
+      claimPartKey: "blende",
+      blendeQuantity: 1,
+    },
+  ];
+  const result = buildServiceClaimBlendeHotspots(hotspots, blenden, [], "ab-105808");
+  const calibrated = result.filter((hotspot) => hotspot.claimPartKey === "blende");
+
+  assert.equal(calibrated.length, 2);
+  calibrated.forEach((hotspot) => {
+    assert.ok(Math.abs(hotspot.left - 95.354802) < 0.000001);
+    assert.ok(Math.abs(hotspot.width - (96.295241 - 95.354802)) < 0.000001);
+  });
+});
+
+test("AB 105810 claim Blenden use the exact PDF divider pixels", () => {
+  const hotspots = [
+    { componentKey: "wall-cabinet-6", left: 80.01, top: 15.77, width: 14.85, height: 23.91 },
+    { componentKey: "drawer-module", left: 80.01, top: 58.37, width: 14.85, height: 28.99 },
+  ];
+  const blenden = ["wall-cabinet-6", "drawer-module"].map((sourceComponentKey) => ({
+    componentId: `component-claim-blende-${sourceComponentKey}`,
+    componentKey: `claim-blende-${sourceComponentKey}`,
+    sourceComponentKey,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  }));
+  const result = buildServiceClaimBlendeHotspots(hotspots, blenden, [], "ab-105810");
+  const calibrated = result.filter((hotspot) => hotspot.claimPartKey === "blende");
+
+  assert.equal(calibrated.length, 2);
+  calibrated.forEach((hotspot) => {
+    assert.ok(Math.abs(hotspot.left - 94.015389) < 0.000001);
+    assert.ok(Math.abs(hotspot.width - (94.727843 - 94.015389)) < 0.000001);
+  });
+});
+
+test("additional claim Blenden use their exact source-plan divider pixels", () => {
+  const kitchens = [
+    {
+      slug: "ab-105807",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 4.49, top: 16.01, width: 16.46, height: 26.73 },
+        { componentKey: "drawer-module", left: 4.49, top: 63.63, width: 16.46, height: 32.5 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 4.502707, inner: 5.272157 },
+        "drawer-module": { side: "left", outer: 4.502707, inner: 5.272157 },
+      },
+    },
+    {
+      slug: "ab-105811",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 2.8, top: 17.34, width: 16.54, height: 26.73 },
+        { componentKey: "base-module-1", left: 2.8, top: 64.92, width: 16.54, height: 32.52 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 2.878313, inner: 3.676261 },
+        "base-module-1": { side: "left", outer: 2.878313, inner: 3.676261 },
+      },
+    },
+    {
+      slug: "ab-105812",
+      hotspots: [
+        { componentKey: "wall-cabinet-6", left: 81.23, top: 16.85, width: 15.17, height: 24.32 },
+        { componentKey: "drawer-module", left: 81.23, top: 60.16, width: 15.17, height: 29.54 },
+      ],
+      expected: {
+        "wall-cabinet-6": { side: "right", outer: 96.46623, inner: 95.497293 },
+        "drawer-module": { side: "right", outer: 96.46623, inner: 95.497293 },
+      },
+    },
+    {
+      slug: "ab-105815",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 3, top: 17.34, width: 16.51, height: 26.73 },
+        { componentKey: "base-module-1", left: 3, top: 64.82, width: 16.51, height: 32.62 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 2.878313, inner: 3.676261 },
+        "base-module-1": { side: "left", outer: 2.878313, inner: 3.676261 },
+      },
+    },
+    {
+      slug: "ab-105814",
+      hotspots: [
+        { componentKey: "wall-cabinet-6", left: 80.01, top: 15.77, width: 14.85, height: 23.91 },
+        { componentKey: "drawer-module", left: 80.02, top: 58.37, width: 14.71, height: 29 },
+      ],
+      expected: {
+        "wall-cabinet-6": { side: "right", outer: 94.727843, inner: 94.015389 },
+        "drawer-module": { side: "right", outer: 94.727843, inner: 94.015389 },
+      },
+    },
+    {
+      slug: "ab-105820",
+      hotspots: [
+        { componentKey: "wall-cabinet-6", left: 81.26, top: 17.5, width: 15.04, height: 24.27 },
+        { componentKey: "drawer-module", left: 81.26, top: 60.88, width: 15.04, height: 29.42 },
+      ],
+      expected: {
+        "wall-cabinet-6": { side: "right", outer: 96.46623, inner: 95.497293 },
+        "drawer-module": { side: "right", outer: 96.46623, inner: 95.497293 },
+      },
+    },
+    {
+      slug: "ab-105816",
+      hotspots: [
+        { componentKey: "wall-cabinet-6", left: 81.23, top: 15.97, width: 15.21, height: 24.27 },
+        { componentKey: "drawer-module", left: 81.23, top: 59.25, width: 15.21, height: 29.5 },
+      ],
+      expected: {
+        "wall-cabinet-6": { side: "right", outer: 96.46623, inner: 95.497293 },
+        "drawer-module": { side: "right", outer: 96.46623, inner: 95.497293 },
+      },
+    },
+    {
+      slug: "ab-105818",
+      hotspots: [
+        { componentKey: "wall-cabinet-6", left: 80.01, top: 15.77, width: 14.85, height: 23.91 },
+        { componentKey: "drawer-module", left: 80.01, top: 58.37, width: 14.85, height: 28.99 },
+      ],
+      expected: {
+        "wall-cabinet-6": { side: "right", outer: 94.727843, inner: 94.015389 },
+        "drawer-module": { side: "right", outer: 94.727843, inner: 94.015389 },
+      },
+    },
+    {
+      slug: "ab-105819",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 3, top: 17.34, width: 16.51, height: 26.73 },
+        { componentKey: "base-module-1", left: 3, top: 64.82, width: 16.51, height: 32.62 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 2.878313, inner: 3.676261 },
+        "base-module-1": { side: "left", outer: 2.878313, inner: 3.676261 },
+      },
+    },
+    {
+      slug: "ab-105827",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 12.11, top: 15.85, width: 12.28, height: 22.88 },
+        { componentKey: "base-module-1", left: 12.11, top: 56.61, width: 12.28, height: 22.87 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 12.111713, inner: 13.22314 },
+        "base-module-1": { side: "left", outer: 12.111713, inner: 13.22314 },
+      },
+    },
+    {
+      slug: "ab-105830",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 12.11, top: 15.85, width: 12.28, height: 22.88 },
+        { componentKey: "base-module-1", left: 12.11, top: 56.61, width: 12.28, height: 22.87 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 12.111713, inner: 13.22314 },
+        "base-module-1": { side: "left", outer: 12.111713, inner: 13.22314 },
+      },
+    },
+    {
+      slug: "ab-105836",
+      hotspots: [
+        { componentKey: "wall-cabinet-3", left: 35.79, top: 22.3, width: 14, height: 18.71 },
+        { componentKey: "base-module-2", left: 35.79, top: 55.83, width: 14, height: 22.89 },
+        { componentKey: "wall-cabinet-4", left: 63.66, top: 22.94, width: 10.55, height: 18.71 },
+        { componentKey: "base-module-3", left: 63.66, top: 55.83, width: 10.55, height: 22.89 },
+        { componentKey: "wall-cabinet-6", left: 85.27, top: 22.94, width: 11.75, height: 18.71 },
+        { componentKey: "drawer-module", left: 85.27, top: 55.83, width: 11.76, height: 22.89 },
+      ],
+      expected: {
+        "wall-cabinet-3": { side: "right", outer: 49.615275, inner: 46.822457 },
+        "base-module-2": { side: "right", outer: 49.615275, inner: 46.822457 },
+        "wall-cabinet-4": { side: "left", outer: 63.721858, inner: 65.004275 },
+        "base-module-3": { side: "left", outer: 63.721858, inner: 65.004275 },
+        "wall-cabinet-6": { side: "right", outer: 97.007694, inner: 96.323739 },
+        "drawer-module": { side: "right", outer: 97.007694, inner: 96.323739 },
+      },
+    },
+    {
+      slug: "ab-105835",
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 0.9, top: 18.87, width: 14.46, height: 22.8 },
+        { componentKey: "base-module-1", left: 0.9, top: 59.48, width: 14.46, height: 22.82 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 0.883443, inner: 1.99487 },
+        "base-module-1": { side: "left", outer: 0.883443, inner: 1.99487 },
+      },
+    },
+    ...["ab-105838", "ab-105841", "ab-105844"].map((slug) => ({
+      slug,
+      hotspots: [
+        { componentKey: "wall-cabinet-1", left: 0.9, top: 19.23, width: 13.98, height: 22.73 },
+        { componentKey: "base-module-1", left: 0.9, top: 59.9, width: 13.98, height: 27.44 },
+      ],
+      expected: {
+        "wall-cabinet-1": { side: "left", outer: 0.883443, inner: 1.5389 },
+        "base-module-1": { side: "left", outer: 0.883443, inner: 1.5389 },
+      },
+    })),
+    {
+      slug: "ab-105823",
+      hotspots: [
+        { componentKey: "wall-cabinet-5", left: 77.93, top: 16.41, width: 15.81, height: 24.19 },
+        { componentKey: "sink-base", left: 77.94, top: 59.5, width: 15.8, height: 24.16 },
+      ],
+      expected: {
+        "wall-cabinet-5": { side: "right", outer: 93.986891, inner: 92.077515 },
+        "sink-base": { side: "right", outer: 93.986891, inner: 92.077515 },
+      },
+    },
+    {
+      slug: "ab-105829",
+      hotspots: [
+        { componentKey: "wall-cabinet-5", left: 77.93, top: 16.41, width: 15.81, height: 24.19 },
+        { componentKey: "sink-base", left: 77.94, top: 59.5, width: 15.8, height: 24.16 },
+      ],
+      expected: {
+        "wall-cabinet-5": { side: "right", outer: 93.986891, inner: 92.077515 },
+        "sink-base": { side: "right", outer: 93.986891, inner: 92.077515 },
+      },
+    },
+    {
+      slug: "ab-105832",
+      hotspots: [
+        { componentKey: "wall-cabinet-5", left: 77.93, top: 16.41, width: 15.81, height: 24.19 },
+        { componentKey: "sink-base", left: 77.94, top: 59.5, width: 15.8, height: 24.16 },
+      ],
+      expected: {
+        "wall-cabinet-5": { side: "right", outer: 93.986891, inner: 92.077515 },
+        "sink-base": { side: "right", outer: 93.986891, inner: 92.077515 },
+      },
+    },
+    {
+      slug: "ab-105826",
+      hotspots: [
+        { componentKey: "base-module-1", left: 20.8, top: 59.15, width: 14.05, height: 24.04 },
+        { componentKey: "sink-base", left: 77.09, top: 59.15, width: 15.73, height: 24.04 },
+        { componentKey: "wall-cabinet-5", left: 77.09, top: 16.45, width: 15.73, height: 23.99 },
+      ],
+      expected: {
+        "base-module-1": { side: "left", outer: 20.404674, inner: 20.789399 },
+        "sink-base": { side: "right", outer: 92.818467, inner: 91.165574 },
+        "wall-cabinet-5": { side: "right", outer: 92.818467, inner: 91.165574 },
+      },
+    },
+  ];
+
+  kitchens.forEach(({ slug, hotspots, expected }) => {
+    const blenden = Object.keys(expected).map((sourceComponentKey) => ({
+      componentId: `component-claim-blende-${sourceComponentKey}`,
+      componentKey: `claim-blende-${sourceComponentKey}`,
+      sourceComponentKey,
+      claimPartKey: "blende",
+      blendeQuantity: 1,
+    }));
+    const result = buildServiceClaimBlendeHotspots(hotspots, blenden, [], slug);
+
+    Object.entries(expected).forEach(([sourceComponentKey, bounds]) => {
+      const cabinet = result.find((hotspot) => hotspot.componentKey === sourceComponentKey);
+      const blende = result.find((hotspot) =>
+        hotspot.claimPartKey === "blende" && hotspot.sourceComponentKey === sourceComponentKey,
+      );
+      const left = Math.min(bounds.inner, bounds.outer);
+      const right = Math.max(bounds.inner, bounds.outer);
+
+      assert.ok(blende, `${slug} ${sourceComponentKey} exposes a Blende hotspot`);
+      assert.ok(Math.abs(blende.left - left) < 0.000001);
+      assert.ok(Math.abs(blende.width - (right - left)) < 0.000001);
+      if (bounds.side === "left") {
+        assert.ok(Math.abs(cabinet.left - right) < 0.000001);
+      } else {
+        assert.ok(Math.abs(cabinet.left + cabinet.width - left) < 0.000001);
+      }
+    });
+  });
+});
+
+test("claims-only blende hit areas do not render artificial plan seams", () => {
+  const pickerSource = fs.readFileSync(path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"), "utf8");
+  const styleSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-configurator.module.css"), "utf8");
+
+  assert.match(pickerSource, /if \(hotspot\.claimBlendeSplit\) \{\s*return null;/);
+  assert.match(pickerSource, /hotspot\.claimBlendeSplit \? styles\.planHotspotBlendeSplit/);
+  assert.match(styleSource, /\.planHotspotBlendeSplit[\s\S]*border:\s*0;[\s\S]*border-radius:\s*0;[\s\S]*background-clip:\s*border-box;[\s\S]*box-shadow:\s*none;/);
+});
+
+test("a two-quantity cabinet blende exposes both outer strips under one claim area", () => {
+  const result = buildServiceClaimBlendeHotspots([
+    { componentKey: "base-module-2", left: 40, top: 50, width: 10, height: 25 },
+  ], [{
+    componentId: "component-claim-blende-base-module-2",
+    componentKey: "claim-blende-base-module-2",
+    sourceComponentKey: "base-module-2",
+    claimPartKey: "blende",
+    blendeQuantity: 2,
+  }]);
+
+  assert.deepEqual(
+    result.filter((hotspot) => hotspot.claimPartKey === "blende").map((hotspot) => hotspot.blendeSide),
+    ["left", "right"],
+  );
 });
 
 test("service claim kitchen plan falls back to default components before any confirmed order", () => {
@@ -120,6 +867,8 @@ test("service claim picker toggles claim-linked hood and LED together", () => {
   assert.match(source, /cropPlanHotspot/);
   assert.match(source, /croppedPlanAspectRatio/);
   assert.match(source, /clipPath id=\{imageClipPathId\}/);
+  assert.match(source, /className=\{styles\.planImageUnavailable\}[\s\S]*href=\{imageViewHref\}[\s\S]*preserveAspectRatio="none"/);
+  assert.match(source, /className=\{styles\.planImagePurchased\}[\s\S]*clipPath=\{`url\(#\$\{imageClipPathId\}\)`\}/);
   assert.match(source, /getHotspotSvgPolygonPoints/);
   assert.match(source, /getServiceClaimLinkedComponentIds\(kitchenSlug,\s*hotspot\.componentId\)[\s\S]*\.includes\(hoveredComponentId\)/);
   assert.match(source, /styles\.planHotspotHover/);
@@ -310,6 +1059,38 @@ test("oven, drawer, and cooktop use independent claim hotspots", () => {
   assert.ok(cooktop.height < oven.height);
   assert.match(cooktop.clipPath, /^polygon\(/);
 
+  for (const kitchen of [
+    { slug: "ab-105808", left: 24.72, top: 58.81, width: 14.14, height: 29.25, ratio: 0.681 },
+    { slug: "ab-105816", left: 24.29, top: 59.25, width: 14.25, height: 29.5, ratio: 0.6813 },
+    { slug: "ab-105820", left: 24.28, top: 60.88, width: 14.24, height: 29.42, ratio: 0.6806 },
+    { slug: "ab-105821", left: 52.01, top: 65.12, width: 15.5, height: 32.1, ratio: 0.6808 },
+    { slug: "ab-105824", left: 52.01, top: 65.12, width: 15.5, height: 32.1, ratio: 0.6808 },
+    { slug: "ab-105823", left: 35.43, top: 59.5, width: 14.16, height: 24.16, ratio: 0.82765 },
+    { slug: "ab-105829", left: 35.43, top: 59.5, width: 14.16, height: 24.16, ratio: 0.82765 },
+    { slug: "ab-105832", left: 35.43, top: 59.5, width: 14.16, height: 24.16, ratio: 0.82765 },
+    { slug: "ab-105826", left: 34.85, top: 59.15, width: 14.1, height: 24.04, ratio: 0.828 },
+    { slug: "ab-105827", left: 51.24, top: 56.61, width: 13.42, height: 22.87, ratio: 0.8289 },
+    { slug: "ab-105830", left: 51.24, top: 56.61, width: 13.42, height: 22.87, ratio: 0.8289 },
+    { slug: "ab-105833", left: 26.18, top: 55.6, width: 10.91, height: 22.57, ratio: 0.6818 },
+    { slug: "ab-105835", left: 15.36, top: 59.48, width: 13.38, height: 22.82, ratio: 0.8274 },
+    { slug: "ab-105836", left: 24.73, top: 55.83, width: 11.06, height: 22.89, ratio: 0.6805 },
+    { slug: "ab-105838", left: 14.88, top: 59.9, width: 13.32, height: 27.44, ratio: 0.6797 },
+    { slug: "ab-105841", left: 14.88, top: 59.9, width: 13.32, height: 27.44, ratio: 0.6797 },
+    { slug: "ab-105844", left: 14.88, top: 59.9, width: 13.32, height: 27.44, ratio: 0.6797 },
+    { slug: "ab-105839", left: 25.51, top: 56.56, width: 10.62, height: 21.98, ratio: 0.6812 },
+    { slug: "ab-105842", left: 25.51, top: 56.56, width: 10.62, height: 21.98, ratio: 0.6812 },
+  ]) {
+    const result = buildServiceClaimPartHotspots([
+      { componentKey: "oven-module", left: kitchen.left, top: kitchen.top, width: kitchen.width, height: kitchen.height },
+    ], claimParts, kitchen.slug);
+    const oven = result.find((entry) => entry.claimPartKey === "oven");
+    const drawer = result.find((entry) => entry.claimPartKey === "oven-drawer");
+    const expectedSeam = kitchen.top + kitchen.height * kitchen.ratio;
+    assert.ok(Math.abs(oven.top + oven.height - expectedSeam) < 0.001);
+    assert.ok(Math.abs(drawer.top - expectedSeam) < 0.001);
+    assert.ok(Math.abs(oven.top + oven.height - drawer.top) < 0.000001);
+  }
+
   const lShaped = buildServiceClaimPartHotspots(source, claimParts, "ab-105834");
   const lShapedCooktop = lShaped.find((entry) => entry.claimPartKey === "cooktop");
   assert.ok(lShapedCooktop.left < oven.left);
@@ -435,7 +1216,7 @@ test("L worktop split excludes floor-height end panels from the worktop selectio
   assert.ok(result.every((entry) => entry.height < 10));
 });
 
-test("AB 105805 uses separate PDF surface and front-edge seam points", () => {
+test("AB 105805 uses separate PDF surface and front-edge seam points through the right end", () => {
   const result = buildServiceClaimPartHotspots([
     { componentKey: "worktop", left: 28.4, top: 50.4, width: 58.77, height: 8.87 },
   ], [
@@ -447,9 +1228,19 @@ test("AB 105805 uses separate PDF surface and front-edge seam points", () => {
 
   assert.ok(Math.abs(left.left + left.width - 54.9) < 0.001);
   assert.ok(Math.abs(right.left - 45.57) < 0.001);
-  assert.ok(Math.abs(right.left + right.width - 76.8) < 0.001);
+  assert.ok(Math.abs(right.left + right.width - 87.17) < 0.001);
   assert.match(left.clipPath, /^polygon\(/);
   assert.match(right.clipPath, /^polygon\(/);
+});
+
+test("selected service claim components have accessible per-row remove buttons", () => {
+  const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
+
+  assert.match(source, /function removeProblemArea\(componentId\)/);
+  assert.match(source, /getServiceClaimLinkedComponentIds\(activeKitchenPlan\?\.kitchenSlug,\s*componentId\)/);
+  assert.match(source, /className="service-field__problem-area-remove"/);
+  assert.match(source, /aria-label=\{t\("removeProblemAreaAria"\)\.replace\("\{label\}",\s*area\.label\)\}/);
+  assert.match(source, /onClick=\{\(\) => removeProblemArea\(area\.componentId\)\}/);
 });
 
 test("segmented L worktop surfaces and front edges stay assigned to their side", () => {
@@ -657,6 +1448,29 @@ test("all L-shaped claim plans separate the complete faucet from the sink bowl",
     assert.equal(faucet.width, 8, kitchenSlug);
     assert.equal(faucet.height, 14, kitchenSlug);
   }
+});
+
+test("oven seams stay fixed when the picker extends a cabinet hotspot through the plinth", () => {
+  const originalHeight = 24.16;
+  const extendedHeight = 29.41;
+  const result = buildServiceClaimPartHotspots([{
+    componentKey: "oven-module",
+    left: 35.43,
+    top: 59.5,
+    width: 14.16,
+    height: extendedHeight,
+    claimOriginalBodyHeightRatio: originalHeight / extendedHeight,
+  }], [
+    { partKey: "oven", sourceComponentKey: "oven-module" },
+    { partKey: "oven-drawer", sourceComponentKey: "oven-module" },
+  ], "ab-105829");
+  const oven = result.find((entry) => entry.claimPartKey === "oven");
+  const drawer = result.find((entry) => entry.claimPartKey === "oven-drawer");
+  const pdfSeam = 59.5 + originalHeight * 0.82765;
+
+  assert.ok(Math.abs(oven.top + oven.height - pdfSeam) < 0.000001);
+  assert.ok(Math.abs(drawer.top - pdfSeam) < 0.000001);
+  assert.ok(drawer.height > extendedHeight - originalHeight);
 });
 
 test("AB 105822 reuses the pixel-matched AB 105825 sink polygon", () => {

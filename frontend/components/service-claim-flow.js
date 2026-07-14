@@ -7,6 +7,7 @@ import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
+import { getServiceClaimLinkedComponentIds } from "../lib/service-claim-kitchen-plan-selection";
 import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
 
@@ -581,6 +582,7 @@ const COPY = {
     kitchenPlanEyebrow: "K\u00fcchenmodell",
     kitchenPlanTitle: "Problemstelle in der K\u00fcche markieren",
     kitchenPlanReset: "Auswahl zur\u00fccksetzen",
+    removeProblemAreaAria: "{label} entfernen",
     kitchenPlanSinkOption: "Sp\u00fcle",
     kitchenPlanCooktopOption: "Kochfeld",
     kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
@@ -808,6 +810,7 @@ const COPY = {
     kitchenPlanEyebrow: "Kitchen model",
     kitchenPlanTitle: "Mark where the problem is",
     kitchenPlanReset: "Clear selection",
+    removeProblemAreaAria: "Remove {label}",
     kitchenPlanSinkOption: "Sink",
     kitchenPlanCooktopOption: "Cooktop",
     kitchenPlanSelectedLabel: "Selected",
@@ -2676,6 +2679,15 @@ export default function ServiceClaimFlow() {
     if (error) {
       setError("");
     }
+  }
+
+  function removeProblemArea(componentId) {
+    const linkedComponentIds = new Set(
+      getServiceClaimLinkedComponentIds(activeKitchenPlan?.kitchenSlug, componentId),
+    );
+    setProblemComponentIds((current) =>
+      current.filter((currentComponentId) => !linkedComponentIds.has(currentComponentId)),
+    );
   }
 
   function handleProblemAreaAttachmentsSelected(componentId, event) {
@@ -4681,6 +4693,15 @@ export default function ServiceClaimFlow() {
                         >
                           {t("uploadFile")}
                         </label>
+                        <button
+                          type="button"
+                          className="service-field__problem-area-remove"
+                          aria-label={t("removeProblemAreaAria").replace("{label}", area.label)}
+                          title={t("removeProblemAreaAria").replace("{label}", area.label)}
+                          onClick={() => removeProblemArea(area.componentId)}
+                        >
+                          <span aria-hidden="true">&times;</span>
+                        </button>
                         {area.attachments.length ? (
                           <ServiceAttachmentChips
                             files={area.attachments}

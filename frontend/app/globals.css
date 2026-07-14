@@ -3326,7 +3326,7 @@ textarea {
 
 .service-field__problem-area-stack {
   display: grid;
-  grid-template-columns: minmax(280px, min(620px, 100%)) auto;
+  grid-template-columns: minmax(280px, min(620px, 100%)) auto 32px;
   gap: 6px;
   align-items: start;
   justify-content: start;
@@ -3382,6 +3382,36 @@ textarea {
 
 .service-field__problem-area-upload-button:focus-visible {
   outline: 2px solid rgba(217, 122, 38, 0.55);
+  outline-offset: 2px;
+}
+
+.service-field__problem-area-remove {
+  width: 32px;
+  height: 32px;
+  align-self: center;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid rgba(181, 59, 48, 0.24);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.98);
+  color: #a64238;
+  font: inherit;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.service-field__problem-area-remove:hover,
+.service-field__problem-area-remove:focus-visible {
+  border-color: rgba(181, 59, 48, 0.48);
+  background: rgba(181, 59, 48, 0.08);
+  transform: translateY(-1px);
+}
+
+.service-field__problem-area-remove:focus-visible {
+  outline: 2px solid rgba(181, 59, 48, 0.38);
   outline-offset: 2px;
 }
 
@@ -3966,7 +3996,11 @@ textarea {
   }
 
   .service-field__problem-area-stack {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) 32px;
+  }
+
+  .service-field__problem-area-input {
+    grid-column: 1 / -1;
   }
 
   .service-field__problem-area-upload-button {

@@ -986,8 +986,8 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "dishwasher-base", left: 75.04, top: 69.85, width: 11.67, height: 24.33, preserveManualSize: true },
     { componentKey: "drawer-module", left: 86.71, top: 69.85, width: 11.67, height: 24.33, preserveManualSize: true },
   ],
-  // AB 105811 reuses the AB 105819 plan render (same view + source PDF), so it mirrors
-  // the 105819 hotspot geometry and component layout (dishwasher on base-module-3).
+  // AB 105811 uses the AB 105819 vector-plan geometry in the service picker.
+  // Keep these bounds in that rendered coordinate system.
   "ab-105811": [
     { componentKey: "wall-cabinet-1", left: 2.8, top: 17.34, width: 16.54, height: 26.73 },
     { componentKey: "wall-cabinet-2", left: 19.34, top: 17.34, width: 15.67, height: 26.73 },
@@ -1057,7 +1057,7 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
   ],
 };
 
-IMAGE_HOTSPOTS_BY_SLUG["ab-105815"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105811"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105815"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105819"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105809"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105813"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105817"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];
@@ -1361,6 +1361,8 @@ export function withBasePlinthExtension(definitions, slug) {
     return {
       ...definition,
       height: targetBottom - definition.top,
+      claimOriginalBodyHeightRatio:
+        definition.height / Math.max(targetBottom - definition.top, 0.0001),
     };
   });
 }
