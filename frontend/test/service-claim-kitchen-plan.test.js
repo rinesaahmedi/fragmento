@@ -150,6 +150,31 @@ test("plan-only lower Blenden are exposed separately from their sink cabinets", 
   });
 });
 
+test("AB 105822 exposes the left US30 Blende as a form-only option", () => {
+  ["ab-105822", "ab-105828"].forEach((kitchenSlug) => {
+    const kitchen = {
+      items: [
+        component("CAB-BASE-US30", "base-module-1", "Base cabinet with drawer", {
+          articleNumber: "US30",
+          widthMm: 300,
+          isLocked: true,
+        }),
+      ],
+    };
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+    });
+    const blende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+    assert.ok(result.selectableComponentIds.includes("component-base-module-1"));
+    assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-1"));
+    assert.equal(blende.articleCode, "UPK20");
+    assert.equal(blende.isCompanionOption, true);
+  });
+});
+
 test("AB 105837 perspective variants expose the plan-only upper Blende", () => {
   ["ab-105837", "ab-105840", "ab-105843"].forEach((kitchenSlug) => {
     const kitchen = {
