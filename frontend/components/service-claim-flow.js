@@ -87,6 +87,9 @@ function formatGermanClaimAreaName(area, fallbackName) {
   if (componentId === "component-claim-worktop-right") {
     return "Arbeitsplatte rechts";
   }
+  if (componentId === "component-claim-worktop-end-panel") {
+    return "Arbeitsplatten-Seitenwange";
+  }
 
   const exactLabel = CLAIM_AREA_LABELS_BY_CODE.de?.[code];
   if (exactLabel) {
@@ -479,8 +482,8 @@ const COPY = {
     surnamePlaceholder: "Nachname",
     gender: "Anrede",
     genderPlaceholder: "Bitte w\u00e4hlen",
-    genderFemale: "Weiblich",
-    genderMale: "M\u00e4nnlich",
+    salutationMr: "Herr",
+    salutationMrs: "Frau",
     genderPreferNot: "Keine Angabe",
     phone: "Telefonnummer",
     phonePlaceholder: "+49 ...",
@@ -709,10 +712,11 @@ const COPY = {
     givenNamePlaceholder: "Name",
     surname: "Surname",
     surnamePlaceholder: "Surname",
-    gender: "Gender",
+    gender: "Salutation",
     genderPlaceholder: "Select\u2026",
-    genderFemale: "Female",
-    genderMale: "Male",
+    salutationMr: "Mr",
+    salutationMs: "Ms",
+    salutationMrs: "Mrs",
     genderPreferNot: "Prefer not to say",
     phone: "Phone number",
     phonePlaceholder: "+49 ...",
@@ -941,10 +945,10 @@ const COPY = {
     givenNamePlaceholder: "Ad",
     surname: "Soyad",
     surnamePlaceholder: "Soyad",
-    gender: "Cinsiyet",
+    gender: "Hitap",
     genderPlaceholder: "Se\u00e7in",
-    genderFemale: "Kad\u0131n",
-    genderMale: "Erkek",
+    salutationMr: "Bay",
+    salutationMrs: "Bayan",
     genderPreferNot: "Belirtmek istemiyorum",
     phone: "Telefon numaras\u0131",
     phonePlaceholder: "+49 ...",
@@ -1139,10 +1143,10 @@ const COPY = {
     givenNamePlaceholder: "Nombre",
     surname: "Apellidos",
     surnamePlaceholder: "Apellidos",
-    gender: "Sexo",
+    gender: "Tratamiento",
     genderPlaceholder: "Seleccione",
-    genderFemale: "Mujer",
-    genderMale: "Hombre",
+    salutationMr: "Sr.",
+    salutationMrs: "Sra.",
     genderPreferNot: "Prefiero no decirlo",
     phone: "N\u00famero de tel\u00e9fono",
     phonePlaceholder: "+49 ...",
@@ -1337,10 +1341,10 @@ const COPY = {
     givenNamePlaceholder: "Pr\u00e9nom",
     surname: "Nom",
     surnamePlaceholder: "Nom",
-    gender: "Genre",
+    gender: "Civilit\u00e9",
     genderPlaceholder: "S\u00e9lectionnez",
-    genderFemale: "Femme",
-    genderMale: "Homme",
+    salutationMr: "M.",
+    salutationMrs: "Mme",
     genderPreferNot: "Je pr\u00e9f\u00e8re ne pas r\u00e9pondre",
     phone: "Num\u00e9ro de t\u00e9l\u00e9phone",
     phonePlaceholder: "+49 ...",
@@ -1535,10 +1539,10 @@ const COPY = {
     givenNamePlaceholder: "\u0418\u043c\u044f",
     surname: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
     surnamePlaceholder: "\u0424\u0430\u043c\u0438\u043b\u0438\u044f",
-    gender: "\u041f\u043e\u043b",
+    gender: "\u041e\u0431\u0440\u0430\u0449\u0435\u043d\u0438\u0435",
     genderPlaceholder: "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435",
-    genderFemale: "\u0416\u0435\u043d\u0441\u043a\u0438\u0439",
-    genderMale: "\u041c\u0443\u0436\u0441\u043a\u043e\u0439",
+    salutationMr: "\u0413-\u043d",
+    salutationMrs: "\u0413-\u0436\u0430",
     genderPreferNot: "\u041f\u0440\u0435\u0434\u043f\u043e\u0447\u0438\u0442\u0430\u044e \u043d\u0435 \u0443\u043a\u0430\u0437\u044b\u0432\u0430\u0442\u044c",
     phone: "\u041d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430",
     phonePlaceholder: "+49 ...",
@@ -4043,8 +4047,9 @@ export default function ServiceClaimFlow() {
                   required
                 >
                   <option value="">{copy.genderPlaceholder}</option>
-                  <option value="female">{copy.genderFemale}</option>
-                  <option value="male">{copy.genderMale}</option>
+                  <option value="male">{copy.salutationMr}</option>
+                  {language === "en" ? <option value="ms">{copy.salutationMs}</option> : null}
+                  <option value="female">{copy.salutationMrs}</option>
                   <option value="prefer_not_to_say">{copy.genderPreferNot}</option>
                 </AdminSelect>
               </label>

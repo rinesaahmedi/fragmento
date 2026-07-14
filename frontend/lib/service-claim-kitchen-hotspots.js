@@ -500,6 +500,17 @@ const L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG = {
   ),
 };
 
+// The AB 105807 PDF draws a narrow floor-height return at the right end of the
+// horizontal worktop. Coordinates are measured from the 3509 x 2480 render.
+// They are converted relative to the cropped horizontal hotspot below so the
+// claims overlay stays aligned with the responsive plan crop.
+const WORKTOP_END_PANEL_DEFINITIONS_BY_SLUG = {
+  "ab-105807": {
+    source: { left: 4.49, top: 62.14, width: 63.92, height: 1.49 },
+    panel: { left: 67.99658, top: 62.14, right: 68.395554, bottom: 96.13 },
+  },
+};
+
 for (const alias of ["ab-105809", "ab-105813", "ab-105817"]) {
   L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105805"];
 }
@@ -929,6 +940,73 @@ function existingClaimPartHotspot(hotspot, part) {
   };
 }
 
+function isFloorHeightWorktopEndPanel(hotspot) {
+  const width = Number(hotspot?.width || 0);
+  const height = Number(hotspot?.height || 0);
+  return height >= 10 && height > width * 3;
+}
+
+function projectedWorktopEndPanelBounds(hotspot, definition) {
+  const source = definition.source;
+  const panel = definition.panel;
+  const scaleX = Number(hotspot.width || 0) / source.width;
+  const scaleY = Number(hotspot.height || 0) / source.height;
+  const left = Number(hotspot.left || 0) + (panel.left - source.left) * scaleX;
+  const top = Number(hotspot.top || 0) + (panel.top - source.top) * scaleY;
+  return {
+    left,
+    top,
+    width: (panel.right - panel.left) * scaleX,
+    height: (panel.bottom - panel.top) * scaleY,
+  };
+}
+
+function trimCabinetAtWorktopEndPanel(hotspot, panels) {
+  if (
+    String(hotspot?.componentKey || "").trim() === "worktop"
+    || hotspot?.clipPath
+  ) {
+    return hotspot;
+  }
+
+  return panels.reduce((current, panel) => {
+    const left = Number(current.left || 0);
+    const top = Number(current.top || 0);
+    const width = Number(current.width || 0);
+    const height = Number(current.height || 0);
+    const right = left + width;
+    const bottom = top + height;
+    const panelRight = panel.left + panel.width;
+    const panelBottom = panel.top + panel.height;
+    const overlapY = Math.min(bottom, panelBottom) - Math.max(top, panel.top);
+
+    if (
+      width <= panel.width * 2
+      || overlapY < Math.min(height, panel.height) * 0.5
+      || right <= panel.left
+      || left >= panelRight
+    ) {
+      return current;
+    }
+
+    const hotspotCenter = left + width / 2;
+    const panelCenter = panel.left + panel.width / 2;
+    if (hotspotCenter < panelCenter) {
+      return {
+        ...current,
+        width: Math.max(0, panel.left - left),
+        claimWorktopEndPanelAdjacentTrim: true,
+      };
+    }
+    return {
+      ...current,
+      left: panelRight,
+      width: Math.max(0, right - panelRight),
+      claimWorktopEndPanelAdjacentTrim: true,
+    };
+  }, hotspot);
+}
+
 function splitFirstWorktopHotspots(hotspot, partsByPartKey, definition) {
   return Object.entries(definition.splitFirst || []).map(([partKey, relativePoints]) => {
     const part = partsByPartKey.get(partKey);
@@ -939,6 +1017,34 @@ function splitFirstWorktopHotspots(hotspot, partsByPartKey, definition) {
     ]);
     return hotspotFromDisplayPoints(hotspot, part, points);
   }).filter(Boolean);
+}
+
+function splitWorktopEndPanelHotspots(hotspot, part, definition) {
+  const panelBounds = projectedWorktopEndPanelBounds(hotspot, definition);
+  const panelLeft = panelBounds.left;
+  const panelTop = panelBounds.top;
+  const panelWidth = panelBounds.width;
+  const panelHeight = panelBounds.height;
+  const mainWidth = Math.max(0, panelLeft - Number(hotspot.left || 0));
+
+  const mainWorktop = {
+    ...hotspot,
+    width: mainWidth,
+  };
+  const endPanel = {
+    ...hotspot,
+    componentId: part.componentId,
+    componentKey: `claim-${part.partKey}`,
+    claimPartKey: part.partKey,
+    left: panelLeft,
+    top: panelTop,
+    width: panelWidth,
+    height: panelHeight,
+    claimWorktopEndPanelSplit: true,
+  };
+  delete endPanel.clipPath;
+  delete endPanel.points;
+  return [mainWorktop, endPanel];
 }
 
 export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], kitchenSlug = "") {
@@ -957,17 +1063,54 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
   const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
   const hasVisibleSink = isLShapedClaimKitchen(normalizedSlug);
   const worktopDefinition = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[normalizedSlug];
+  const worktopEndPanelDefinition = WORKTOP_END_PANEL_DEFINITIONS_BY_SLUG[normalizedSlug];
   const worktopParts = new Map(
     (partsBySourceKey.get("worktop") || []).map((part) => [part.partKey, part]),
   );
+  const worktopEndPanelPart = worktopParts.get("worktop-end-panel");
   const hasSplitWorktopParts = worktopParts.has("worktop-left") && worktopParts.has("worktop-right");
+  const worktopEndPanels = worktopEndPanelPart
+    ? (hotspots || [])
+      .filter((hotspot) => (
+        String(hotspot?.componentKey || "").trim() === "worktop"
+        && isFloorHeightWorktopEndPanel(hotspot)
+      ))
+      .map((hotspot) => ({
+        left: Number(hotspot.left || 0),
+        top: Number(hotspot.top || 0),
+        width: Number(hotspot.width || 0),
+        height: Number(hotspot.height || 0),
+      }))
+    : [];
+  if (worktopEndPanelPart && worktopEndPanelDefinition && !worktopEndPanels.length) {
+    const horizontalWorktop = (hotspots || []).find((hotspot) => (
+      String(hotspot?.componentKey || "").trim() === "worktop"
+      && !isFloorHeightWorktopEndPanel(hotspot)
+    ));
+    if (horizontalWorktop) {
+      worktopEndPanels.push(
+        projectedWorktopEndPanelBounds(horizontalWorktop, worktopEndPanelDefinition),
+      );
+    }
+  }
   let worktopIndex = -1;
 
-  return (hotspots || []).flatMap((hotspot) => {
+  return (hotspots || []).flatMap((sourceHotspot) => {
+    const hotspot = trimCabinetAtWorktopEndPanel(sourceHotspot, worktopEndPanels);
     const sourceComponentKey = String(hotspot?.componentKey || "").trim();
     const sourceParts = partsBySourceKey.get(sourceComponentKey) || [];
     if (!sourceParts.length) {
       return [hotspot];
+    }
+    if (
+      sourceComponentKey === "worktop"
+      && worktopEndPanelPart
+      && isFloorHeightWorktopEndPanel(hotspot)
+    ) {
+      return [{
+        ...existingClaimPartHotspot(hotspot, worktopEndPanelPart),
+        claimWorktopEndPanelSplit: true,
+      }];
     }
     if (sourceComponentKey === "worktop" && worktopDefinition && hasSplitWorktopParts) {
       worktopIndex += 1;
@@ -977,6 +1120,17 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
       const partKey = worktopDefinition.indexPartKeys?.[worktopIndex];
       const part = worktopParts.get(partKey);
       return part ? [existingClaimPartHotspot(hotspot, part)] : [];
+    }
+    if (sourceComponentKey === "worktop" && worktopEndPanelDefinition) {
+      if (worktopEndPanelPart) {
+        return splitWorktopEndPanelHotspots(hotspot, worktopEndPanelPart, worktopEndPanelDefinition);
+      }
+    }
+    // Existing horizontal worktops remain the original selectable item. The
+    // end panel is additive and is represented either by its own tall source
+    // hotspot above or by a PDF-derived definition such as AB 105807.
+    if (sourceComponentKey === "worktop" && worktopEndPanelPart) {
+      return [hotspot];
     }
     const visibleSourceParts = hasVisibleSink
       ? sourceParts
