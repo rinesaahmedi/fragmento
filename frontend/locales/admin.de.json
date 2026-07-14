@@ -654,6 +654,7 @@
     "configuredCompanies": "Angelegte Wohnungsgesellschaften",
     "overviewOnlyManageToOpenWorkspace": "Nur Übersicht. Öffnen Sie den Arbeitsbereich einer Gesellschaft über Verwalten, um Details und Objekte zu bearbeiten.",
     "addHousingCompany": "Wohnungsgesellschaft hinzufügen",
+    "exportExcel": "Excel exportieren",
     "createOwnerPanelDescription": "Fügen Sie eine neue Wohnungsgesellschaft hinzu und erstellen Sie optional Objekte.",
     "companyMatchesFilters": "{count} Wohnungsgesellschaft entspricht den aktuellen Filtern.",
     "companiesMatchFilters": "{count} Wohnungsgesellschaften entsprechen den aktuellen Filtern.",

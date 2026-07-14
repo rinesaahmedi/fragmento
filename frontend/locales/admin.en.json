@@ -653,6 +653,7 @@
     "configuredCompanies": "Housing Companies",
     "overviewOnlyManageToOpenWorkspace": "Overview only. Open a company workspace from Manage to edit details and objects.",
     "addHousingCompany": "Add Housing Company",
+    "exportExcel": "Export Excel",
     "createOwnerPanelDescription": "Add a new housing company and optionally create objects.",
     "companyMatchesFilters": "{count} housing company matches the current filters.",
     "companiesMatchFilters": "{count} housing companies match the current filters.",
