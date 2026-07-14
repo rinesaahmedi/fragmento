@@ -269,12 +269,12 @@ function CatalogItem({
         <div className={styles.itemText}>
           <strong>{itemDisplayName.title}</strong>
           {item.articleNumber ? <span className={styles.itemCode}>{translate("common.article", "Article")}: {item.articleNumber}</span> : null}
+          {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}
           {blendeLabel ? (
             <span className={styles.itemBlendeNote}>
               {translate("configurator.includesBlende", "Includes")}: {blendeLabel}
             </span>
           ) : null}
-          {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}
           {item.linkedInfoBadge ? (
             <span className={styles.itemLinkedBadge}>
               {translate("configurator.catalogItemInfo.includesExtractorHood", item.linkedInfoBadge)}

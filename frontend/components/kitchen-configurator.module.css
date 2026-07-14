@@ -1186,10 +1186,10 @@
   min-height: 20px;
   margin-top: 4px;
   padding: 2px 7px;
-  border: 1px solid #b9dbc8;
-  border-radius: 999px;
-  background: #eef8f2;
-  color: #16613c;
+  border: 1px solid rgba(42, 145, 85, 0.42);
+  border-radius: 3px;
+  background: #fbfaf7;
+  color: #3f372f;
   font-size: 0.7rem;
   font-weight: 800;
   line-height: 1.2;

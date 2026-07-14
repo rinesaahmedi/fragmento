@@ -50,6 +50,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105840": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105843": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105747": "/plans/AB%20105747.svg",
+  "ab-105750": "/plans/AB%20105747.svg",
+  "ab-105753": "/plans/AB%20105747.svg",
+  "ab-105756": "/plans/AB%20105747.svg",
   "ab-105825": "/plans/AB%20105825.svg",
   "ab-105828": "/plans/AB%20105825.svg",
   "ab-105831": "/plans/AB%20105831.svg",
@@ -346,6 +349,7 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-2", points: [[35.359, 24.773], [44.38, 23.462], [44.38, 43.408], [35.359, 44.719]] },
     { componentKey: "extractor-hood", points: [[35.359, 46.091], [35.359, 44.719], [29.615, 45.546]], preserveManualSize: true },
     { componentKey: "extractor-hood", points: [[35.359, 44.719], [44.38, 43.408], [44.38, 44.78], [35.359, 46.091]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[35.35, 50.03], [44.22, 48.76], [44.22, 44.8], [35.35, 46.13]], preserveManualSize: true },
     { componentKey: "wall-cabinet-3", points: [[40.09, 22.595], [49.112, 21.284], [53.401, 22.171], [44.38, 23.462]] },
     { componentKey: "wall-cabinet-3", points: [[44.38, 23.462], [53.401, 22.171], [54.157, 22.05], [54.157, 41.997], [53.401, 42.097], [44.38, 43.408]] },
     {
@@ -1109,6 +1113,9 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-105844"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105841"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105749"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105746"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105752"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105746"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105755"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105746"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105750"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105747"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105753"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105747"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105756"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105747"];
 
 
 const PDF_VIEW_BY_SLUG = {};

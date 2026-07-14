@@ -35,12 +35,11 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
   "ab-105822", "ab-105825", "ab-105828", "ab-105831",
   "ab-105834", "ab-105837", "ab-105840", "ab-105843",
-  "ab-105747",
+  "ab-105747", "ab-105750", "ab-105753", "ab-105756",
 ]);
 
 const ARTICLE_PRICES = {
   "517467": 89,
-  "A-EGSPV594400 + TGV60": 680,
   "A-EGSPV587915 + TGV45": 498,
   "A-EGSPV597210 + TGV60": 579,
   "EWA34660W + TGV60 + WU16": 639,
@@ -103,7 +102,6 @@ const BUNDLE_PRICES = {
 };
 
 const CATALOG_ARTICLES = [
-  { articleNumber: "A-EGSPV594400 + TGV60", name: "Fully Integrated Dishwasher incl. Furniture Front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", widthMm: 600, depthMm: 600, price: "680.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "A-EGSPV587915 + TGV45", name: "Fully Integrated Dishwasher incl. Furniture Front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", widthMm: 450, price: "498.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "A-EGSPV597210 + TGV60", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "EWA34660W + TGV60 + WU16", name: "Washing machine + front + side panel", nameDe: "Waschmaschine + Front + Wange", price: "639.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
@@ -1102,6 +1100,10 @@ const AB_105747_ITEMS = [
   ...defaultServices(),
 ];
 
+const AB_105750_ITEMS = AB_105747_ITEMS;
+const AB_105753_ITEMS = AB_105747_ITEMS;
+const AB_105756_ITEMS = AB_105747_ITEMS;
+
 // AB 105816 matches AB 105820 except callout 11 is an H6002 with left hinge.
 const AB_105816_ITEMS = AB_105820_ITEMS.map((item) =>
   item.code === "CAB-WALL-AB105820-H6002"
@@ -1446,6 +1448,27 @@ const DEFAULT_KITCHENS = [
     description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105747.svg",
     items: AB_105747_ITEMS,
     reconcileExisting: true,
+  },
+  {
+    slug: "ab-105750",
+    kitchenCode: "105 750",
+    name: "AB 105750 Kitchen",
+    description: "L-shaped kitchen configuration using the AB 105747 layout and element selection",
+    items: AB_105750_ITEMS,
+  },
+  {
+    slug: "ab-105753",
+    kitchenCode: "105 753",
+    name: "AB 105753 Kitchen",
+    description: "L-shaped kitchen configuration using the AB 105747 layout and element selection",
+    items: AB_105753_ITEMS,
+  },
+  {
+    slug: "ab-105756",
+    kitchenCode: "105 756",
+    name: "AB 105756 Kitchen",
+    description: "L-shaped kitchen configuration using the AB 105747 layout and element selection",
+    items: AB_105756_ITEMS,
   },
   {
     slug: "ab-105810",

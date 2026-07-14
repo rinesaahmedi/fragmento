@@ -164,6 +164,22 @@ test("AB 105747 keeps the 45 cm dishwasher and US30 cabinet independently select
   assert.match(seedSource, /code:\s*"CAB-BASE-AB105747-US30"[\s\S]*componentKey:\s*"drawer-module"/);
 });
 
+test("AB 105750, AB 105753, and AB 105756 reuse the AB 105747 kitchen setup", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
+  const claimSource = fs.readFileSync(path.join(repoRoot, "lib", "service-claim-kitchen-hotspots.js"), "utf8");
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  for (const planNumber of ["105750", "105753", "105756"]) {
+    const slug = `ab-${planNumber}`;
+    assert.match(seedSource, new RegExp(`slug:\\s*"${slug}"[\\s\\S]*items:\\s*AB_${planNumber}_ITEMS`));
+    assert.match(stageSource, new RegExp(`"${slug}":\\s*"/plans/AB%20105747\\.svg"`));
+    assert.match(stageSource, new RegExp(`IMAGE_HOTSPOTS_BY_SLUG\\["${slug}"\\]\\s*=\\s*IMAGE_HOTSPOTS_BY_SLUG\\["ab-105747"\\]`));
+    assert.match(selectionSource, new RegExp(`"${slug}":\\s*\\[\\["component-wall-cabinet-2",\\s*"component-extractor-hood"\\]\\]`));
+    assert.match(claimSource, new RegExp(`"${slug}"`));
+  }
+});
+
 test("AB 105837 claim hotspot maps the hood LED strip to extractor hood", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
 
