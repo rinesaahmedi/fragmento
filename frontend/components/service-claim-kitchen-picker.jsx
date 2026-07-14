@@ -300,6 +300,8 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   );
   const sinkComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.sink;
   const cooktopComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.cooktop;
+  const filterComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.filter;
+  const furnitureFrontComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS["furniture-front"];
   const isNonLShapedKitchen = !isLShapedClaimKitchen(kitchenSlug);
   const showManualSinkOption =
     isNonLShapedKitchen
@@ -309,8 +311,16 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     isNonLShapedKitchen
     && claimParts.some((part) => String(part?.partKey || "").trim() === "cooktop")
     && selectableComponentIds.includes(cooktopComponentId);
+  const showManualFilterOption =
+    claimParts.some((part) => String(part?.partKey || "").trim() === "filter")
+    && selectableComponentIds.includes(filterComponentId);
+  const showManualFurnitureFrontOption =
+    claimParts.some((part) => String(part?.partKey || "").trim() === "furniture-front")
+    && selectableComponentIds.includes(furnitureFrontComponentId);
   const isManualSinkSelected = selectedIds.has(sinkComponentId);
   const isManualCooktopSelected = selectedIds.has(cooktopComponentId);
+  const isManualFilterSelected = selectedIds.has(filterComponentId);
+  const isManualFurnitureFrontSelected = selectedIds.has(furnitureFrontComponentId);
 
   return (
     <div className="service-claim-kitchen">
@@ -574,7 +584,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
           </div>
         </div>
       )}
-      {showManualSinkOption || showManualCooktopOption ? (
+      {showManualSinkOption || showManualCooktopOption || showManualFilterOption || showManualFurnitureFrontOption ? (
         <div className="service-claim-kitchen__manual-options">
           {showManualSinkOption ? (
             <button
@@ -614,6 +624,46 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
               }}
             >
               {labels?.cooktopOption || "Cooktop"}
+            </button>
+          ) : null}
+          {showManualFilterOption ? (
+            <button
+              type="button"
+              className={[
+                "service-claim-kitchen__manual-option",
+                isManualFilterSelected ? "service-claim-kitchen__manual-option--selected" : "",
+              ].filter(Boolean).join(" ")}
+              aria-pressed={isManualFilterSelected}
+              onClick={() => {
+                onChange((current) => toggleClaimComponentSelection({
+                  currentIds: current,
+                  componentId: filterComponentId,
+                  selectableComponentIds,
+                  kitchenSlug,
+                }));
+              }}
+            >
+              {labels?.filterOption || "Extractor Hood Filter"}
+            </button>
+          ) : null}
+          {showManualFurnitureFrontOption ? (
+            <button
+              type="button"
+              className={[
+                "service-claim-kitchen__manual-option",
+                isManualFurnitureFrontSelected ? "service-claim-kitchen__manual-option--selected" : "",
+              ].filter(Boolean).join(" ")}
+              aria-pressed={isManualFurnitureFrontSelected}
+              onClick={() => {
+                onChange((current) => toggleClaimComponentSelection({
+                  currentIds: current,
+                  componentId: furnitureFrontComponentId,
+                  selectableComponentIds,
+                  kitchenSlug,
+                }));
+              }}
+            >
+              {labels?.furnitureFrontOption || "Furniture Front (Dishwasher)"}
             </button>
           ) : null}
         </div>

@@ -588,6 +588,8 @@ const COPY = {
     removeProblemAreaAria: "{label} entfernen",
     kitchenPlanSinkOption: "Sp\u00fcle",
     kitchenPlanCooktopOption: "Kochfeld",
+    kitchenPlanFilterOption: "Filter f\u00fcr Dunstabzugshaube",
+    kitchenPlanFurnitureFrontOption: "M\u00f6belfront (Geschirrsp\u00fcler)",
     kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
     kitchenPlanSelectedNone: "Noch keine Bereiche ausgew\u00e4hlt.",
     kitchenAreasLinePrefix: "K\u00fcchenbereiche:",
@@ -817,6 +819,8 @@ const COPY = {
     removeProblemAreaAria: "Remove {label}",
     kitchenPlanSinkOption: "Sink",
     kitchenPlanCooktopOption: "Cooktop",
+    kitchenPlanFilterOption: "Extractor Hood Filter",
+    kitchenPlanFurnitureFrontOption: "Furniture Front (Dishwasher)",
     kitchenPlanSelectedLabel: "Selected",
     kitchenPlanSelectedNone: "No areas selected yet.",
     kitchenAreasLinePrefix: "Kitchen areas:",
@@ -4648,6 +4652,8 @@ export default function ServiceClaimFlow() {
                       reset: t("kitchenPlanReset"),
                       sinkOption: t("kitchenPlanSinkOption"),
                       cooktopOption: t("kitchenPlanCooktopOption"),
+                      filterOption: t("kitchenPlanFilterOption"),
+                      furnitureFrontOption: t("kitchenPlanFurnitureFrontOption"),
                     }}
                   />
                 </>

@@ -2721,6 +2721,89 @@ async function main() {
       });
     }
 
+    const filterSources = claimSourceItems.filter((item) => (
+      item?.isActive !== false
+      && String(item?.articleNumber || "")
+        .split("+")
+        .some((articleCode) => articleCode.trim().toUpperCase() === "FWK124")
+    ));
+    const filterSource = filterSources.find((item) => (
+      String(item?.componentKey || "").toLowerCase().startsWith("wall-cabinet-")
+    )) || filterSources[0];
+    if (filterSource) {
+      const filterPart = {
+        partKey: "filter",
+        articleCode: "FWK124",
+        name: "Extractor Hood Filter",
+        nameDe: "Filter für Dunstabzugshaube",
+        sortOrder: 35,
+        sourceKitchenItemCode: filterSource.code,
+        sourceComponentKey: filterSource.componentKey,
+        isActive: true,
+      };
+      await prisma.kitchenClaimPart.upsert({
+        where: {
+          kitchenId_partKey: {
+            kitchenId: kitchenRecord.id,
+            partKey: filterPart.partKey,
+          },
+        },
+        update: filterPart,
+        create: {
+          kitchenId: kitchenRecord.id,
+          ...filterPart,
+        },
+      });
+    }
+
+    const dishwasher60Source = claimSourceItems.find((item) => (
+      item?.isActive !== false
+      && String(item?.code || "").toUpperCase().startsWith("DISH-")
+      && String(item?.articleNumber || "")
+        .split("+")
+        .some((articleCode) => articleCode.trim().toUpperCase() === "TGV60")
+    ));
+    if (dishwasher60Source) {
+      for (const part of [
+        {
+          partKey: "dishwasher",
+          articleCode: "A-EGSPV594400",
+          name: "Fully Integrated Dishwasher",
+          nameDe: "Vollintegrierter Geschirrspüler",
+          sortOrder: 32,
+        },
+        {
+          partKey: "furniture-front",
+          articleCode: "TGV60",
+          name: "Furniture Front (Dishwasher)",
+          nameDe: "Möbelfront (Geschirrspüler)",
+          sortOrder: 34,
+        },
+      ]) {
+        await prisma.kitchenClaimPart.upsert({
+          where: {
+            kitchenId_partKey: {
+              kitchenId: kitchenRecord.id,
+              partKey: part.partKey,
+            },
+          },
+          update: {
+            ...part,
+            sourceKitchenItemCode: dishwasher60Source.code,
+            sourceComponentKey: dishwasher60Source.componentKey,
+            isActive: true,
+          },
+          create: {
+            kitchenId: kitchenRecord.id,
+            ...part,
+            sourceKitchenItemCode: dishwasher60Source.code,
+            sourceComponentKey: dishwasher60Source.componentKey,
+            isActive: true,
+          },
+        });
+      }
+    }
+
     const ovenBundle = claimSourceItems
       .find((item) => (
         item?.isActive !== false
