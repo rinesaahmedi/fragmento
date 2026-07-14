@@ -5,9 +5,10 @@ Hand this file to a coding agent **together with**:
 1. the kitchen **plan PDF** (e.g. `AB 105820.pdf`), and
 2. the **Excel/CSV item list** (one row per item, with article numbers, dimensions, L/R, price).
 
-For a focused brief on **plan selection boxes (hotspots) and catalog dimensions**, also attach
-`docs/kitchen-plan-selection-prompt.md` — it documents measurement rules, layout types, and every
-implemented AB kitchen.
+For a focused brief on **plan selection boxes, claims geometry, and catalog dimensions**, also
+attach `docs/kitchen-plan-selection-prompt.md`. This guide is self-contained for both linear and
+L-shaped kitchens; the focused brief contains the longer reference tables and implemented AB
+kitchen families.
 
 The agent's job: add the kitchen to the Fragmento configurator so that it **looks exactly like the
 plan, is razor-sharp (vector), and every cabinet is clickable/selectable** and wired to its data.
@@ -69,9 +70,18 @@ proportioned differently and a band misses dividers, edit those fractions in the
 ## 4. Understanding the inputs
 
 ### 4.1 The plan
-A single-wall elevation: a tall unit (fridge), a row of **wall** cabinets up top, a **worktop**
-band, and a row of **base** cabinets below, usually with **numbered callouts** (`①②③…`) that match
-the Excel `NR` column. The callouts make mapping unambiguous — always use them.
+
+First classify the plan:
+
+- **Linear kitchen:** a single-wall front elevation with a tall unit, wall cabinets, one worktop
+  run, and base cabinets. Rectangle hotspots are usually sufficient.
+- **L-shaped kitchen:** a perspective/isometric drawing with two legs meeting at a corner. Use
+  polygon `points`, not guessed axis-aligned boxes, for the visible cabinets and worktop pieces.
+  Its service-claim plan also needs separate sink, cooktop, and left/right worktop geometry; see
+  **Step 5A**.
+
+Both plan types normally contain numbered callouts (`①②③…`) matching the Excel `NR` column. Use
+those callouts for item mapping; visual similarity alone is not enough.
 
 If the PDF is **vector** (test: it has path operators, no embedded raster), use the SVG plan.
 If it is a **scan/raster**, skip the SVG and use the JPG as the plan instead.
@@ -226,6 +236,10 @@ From the output build a box per visible component (`left`, `top`, `width`, `heig
   `sink-base`; in `ab-105827`, the left Blende is included in `wall-cabinet-1` and `base-module-1`.
 - Fridge / tall unit: detect its own left/right/top/bottom (it sits left of the run).
 
+For an L-shaped perspective plan, the detector is only a starting aid. Trace the actual outside
+linework as percentage `points: [[x1, y1], ...]` in clockwise order and verify it with
+`?calibrate=1`. Do not flatten a sloped cabinet, worktop edge, or corner into a rectangle.
+
 ### Step 3 — Map Excel rows → components
 For each Excel `NR`, decide the `componentKey` from its position on the plan. The standard
 single-wall layout uses these keys (left→right):
@@ -266,6 +280,71 @@ only for items that differ.
    the hood/aspirator drawing under the wall cabinet. This helper component is hidden from the
    catalog, but the stage resolves the hotspot through the linked visible cabinet.
 
+### Step 5A — Add the service-claim plan (linear versus L-shaped)
+
+The order catalog can contain bundled items, but a service claim must identify the physical part.
+`KitchenClaimPart` provides this claim-only split without changing `KitchenItem`, prices, or order
+contents.
+
+Every kitchen must seed these source components:
+
+| Source component | Claim choices created by `frontend/prisma/seed.js` |
+| --- | --- |
+| `sink-faucet` | Sink `526335`, faucet `517720` |
+| `sink-base` | Sink cabinet `SP60` |
+| `oven-module` or `oven-base`, with an `OVEN-` code | Oven `EH92364E-A`, drawer `UHK`, cooktop `9EC744100C` |
+
+#### Linear kitchen claims
+
+- Do not add the slug to an L-shaped claims set.
+- Keep the worktop as one claim area.
+- The oven hotspot is automatically divided at `66%`: oven above, drawer below.
+- The default cooktop polygon is projected from the oven with relative points
+  `[[0.04, -0.04], [0.96, -0.04], [0.96, 0.02], [0.04, 0.02]]`. If it misses the PDF linework,
+  add measured points for the slug to `COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG` in
+  `frontend/lib/service-claim-kitchen-hotspots.js`.
+- The Sink and Cooktop buttons below a linear claim plan are intentional. A front elevation often
+  has no trustworthy sink-bowl outline; keep these controls even if the cooktop is also clickable.
+
+#### L-shaped kitchen claims
+
+Complete all of the following. The normal `IMAGE_HOTSPOTS_BY_SLUG` entry alone is not enough.
+
+1. Add the normalized slug to `L_SHAPED_CLAIM_KITCHEN_SLUGS` in both
+   `frontend/prisma/seed.js` and `frontend/lib/service-claim-kitchen-hotspots.js`. This makes the
+   seed create `worktop-left` (`PLR60-1`) and `worktop-right` (`PLR60-2`).
+2. Add four sink-bowl points to `L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG`. Convert each
+   measured plan point to faucet-relative coordinates:
+
+   ```text
+   relativeX = (pointX - faucet.left) / faucet.width
+   relativeY = (pointY - faucet.top) / faucet.height
+   ```
+
+   Every registered L-shaped slug must have a sink entry. The faucet keeps the complete original
+   `sink-faucet` hotspot; the sink receives only the measured bowl polygon.
+3. Add four outside cooktop strokes to `COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG`, converted with
+   the same formula relative to the oven hotspot. Use another slug's points only when both plans
+   use identical rendered geometry.
+4. Add the worktop seam to `L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG`:
+
+   - For one combined L outline, use `splitWorktopDefinition(sourceBounds, leftPoints,
+     rightPoints)`. The two point arrays must meet at the physical corner seam.
+   - If the plan already contains separate surface/front-edge hotspots, assign every hotspot in
+     order with `indexPartKeys`, for example
+     `["worktop-left", "worktop-right", "worktop-left", "worktop-right"]`.
+   - Assign `null` to a `worktop`-keyed floor-height side/end panel so it does not become a
+     worktop claim area.
+
+The oven/drawer `66%` split is shared with linear kitchens, but L-shaped sink, cooktop, and
+worktop polygons must follow the perspective linework. Selecting either worktop must preserve the
+sink/cooktop cutouts instead of painting over them.
+
+Reference implementations are grouped by identical geometry in
+`frontend/lib/service-claim-kitchen-hotspots.js`. The full article table and point-measurement
+rules are also in `docs/kitchen-plan-selection-prompt.md` under **Service claims: split bundled
+items**.
+
 ### Step 6 — Wire interactivity (`frontend/components/kitchen-selection-utils.js`)
 1. Add callout numbers for any **new** codes to `AB_105806_PHOTO_NUMBER_BY_CODE` (reused codes
    already have theirs). Map `code → "<NR>"`.
@@ -294,6 +373,9 @@ Verifications:
 - **In the browser** — hovering a cabinet highlights it; clicking toggles it and the matching
   catalog row + total update; locked items show as included and don't toggle; the hood cabinet
   also pulls in the hidden hood.
+- **In the service-claim flow** — load the kitchen through a contract and select sink versus
+  faucet, oven versus drawer versus cooktop, and (for L-shaped plans) left versus right worktop.
+  Confirm DE/EN labels and article codes are shown for each split part.
 
 ---
 
@@ -374,6 +456,9 @@ flagged to the user).
 - [ ] `IMAGE_VIEW_BY_SLUG` + `IMAGE_HOTSPOTS_BY_SLUG` updated, including a linked
       `extractor-hood` hotspot under every hood wall cabinet shown in the drawing.
 - [ ] Callout numbers added for new codes; hood link added to `LINKED_COMPONENT_GROUPS_BY_SLUG`.
+- [ ] Claim source keys exist for `sink-faucet`, `sink-base`, and the `OVEN-` oven component.
+- [ ] Linear: one worktop area, oven/drawer split, cooktop points, and manual Sink/Cooktop controls verified.
+- [ ] L-shaped: slug registered in both claim sets; sink/cooktop polygons and left/right worktop seam verified.
 - [ ] `prisma db seed` ok, `next build` ok, page verified in the browser (hover/click/lock/link).
 
 ---
@@ -386,6 +471,8 @@ flagged to the user).
 | `frontend/prisma/schema.prisma` | `KitchenItem` model; `@@unique([kitchenId, code])` |
 | `frontend/components/kitchen-svg-stage.jsx` | Plan stage: `IMAGE_VIEW_BY_SLUG` + `IMAGE_HOTSPOTS_BY_SLUG` + `?calibrate=1` grid |
 | `frontend/components/kitchen-selection-utils.js` | component ids, callout numbers, names/info, linked groups, product info, galleries |
+| `frontend/lib/service-claim-kitchen-hotspots.js` | Linear cooktop projection and L-shaped sink/cooktop/worktop claim polygons |
+| `frontend/lib/service-claim-kitchen-plan-selection.js` | Replaces bundled source components with independent claim choices |
 | `frontend/components/kitchen-catalog-panel.jsx` | Right-hand selectable list; renders name → `Article: …` → `W x H x D mm` dimension line (`getStructuredDimensions`) |
 | `frontend/components/kitchen-configurator.js` | Orchestrates selection state, locking, order |
 | `docs/render-plan-svg.py` | PDF → vector SVG plan |

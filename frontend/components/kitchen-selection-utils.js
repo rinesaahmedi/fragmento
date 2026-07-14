@@ -300,6 +300,8 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-BASE-AB105834-500-R": "5",
   "CAB-BASE-AB105834-500-R2": "6",
   "DISH-AB105834-600": "7",
+  "DISH-AB105747-450": "7",
+  "CAB-BASE-AB105747-US30": "8",
   "CAB-WALL-AB105834-500-R": "8",
   "CAB-WALL-AB105834-H6002-L": "10",
   "CAB-BASE-AB105837-US60-R": "5",
@@ -308,6 +310,8 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105837-US60-R": "8",
   "CAB-HOOD-AB105837-600": "9",
   "CAB-WALL-AB105837-US60-L": "10",
+  "CAB-WALL-AB105747-H6002-R": "9",
+  "CAB-WALL-AB105747-H6002-L": "11",
   "SINKBASE-AB105831-DEFAULT": "3",
   "CAB-BASE-AB105831-US30-R": "4",
   "DISH-AB105831-600": "5",
@@ -893,6 +897,10 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105837": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105840": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105843": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105747": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105750": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105753": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105756": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105825": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105828": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1241,7 +1249,10 @@ export function isHiddenLinkedComponent(slug, componentId) {
 }
 
 export function isLinkedComponentSelected(slug, selectedIds, componentId) {
-  return getLinkedComponentIds(slug, componentId).every((id) => selectedIds.includes(id));
+  // The stage and toggle behavior treat a linked group as selected as soon as one member is
+  // present. Matching that rule here prevents a stale draft with only the visible hood cabinet
+  // from rendering selected in the plan but unselected in the catalog.
+  return getLinkedComponentIds(slug, componentId).some((id) => selectedIds.includes(id));
 }
 
 export function toggleLinkedComponentSelection(slug, currentIds, componentId, lockedIds = []) {

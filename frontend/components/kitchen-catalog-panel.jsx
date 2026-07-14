@@ -25,7 +25,7 @@ import {
   isCutleryAccessoryItem,
   normalizeCutleryVariants,
 } from "../lib/cutlery-accessories";
-import { applyArticleVariantSelection, findAuszugVariantOption } from "../lib/auszug-variants";
+import { applyArticleVariantSelectionForDisplay, findAuszugVariantOption } from "../lib/auszug-variants";
 import {
   getServiceDisabledReason,
   SERVICE_CODE_MONTAGE,
@@ -269,12 +269,12 @@ function CatalogItem({
         <div className={styles.itemText}>
           <strong>{itemDisplayName.title}</strong>
           {item.articleNumber ? <span className={styles.itemCode}>{translate("common.article", "Article")}: {item.articleNumber}</span> : null}
+          {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}
           {blendeLabel ? (
             <span className={styles.itemBlendeNote}>
               {translate("configurator.includesBlende", "Includes")}: {blendeLabel}
             </span>
           ) : null}
-          {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}
           {item.linkedInfoBadge ? (
             <span className={styles.itemLinkedBadge}>
               {translate("configurator.catalogItemInfo.includesExtractorHood", item.linkedInfoBadge)}
@@ -389,9 +389,7 @@ function CatalogItem({
           <span className={styles.articleVariantDetails}>
             <span className={styles.articleVariantLabel}>{translate("configurator.auszugOptionLabel", "Soft close")}</span>
             <strong className={styles.articleVariantPrice}>
-              {isAuszugSelected
-                ? translate("configurator.auszugIncluded", "included")
-                : `+${formatCurrency(auszugUpgradePrice)}`}
+              +{formatCurrency(auszugUpgradePrice)}
             </strong>
           </span>
           <span className={isAuszugSelected ? styles.articleVariantSwitchActive : styles.articleVariantSwitch} aria-hidden="true">
@@ -697,7 +695,7 @@ export default function KitchenCatalogPanel({
             {visibleComponents.map((item) => {
               const componentId = componentIdForItem(item);
               const selectedArticleNumber = selectedArticleVariants[componentId] || "";
-              const variantSourceItem = applyArticleVariantSelection(item, selectedArticleNumber);
+              const variantSourceItem = applyArticleVariantSelectionForDisplay(item, selectedArticleNumber);
               const displayItem = getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, variantSourceItem);
               const articleVariant = item.articleVariants?.auszug || null;
               const cardItem = {

@@ -898,6 +898,37 @@ test("AB 105834 claim hotspots keep sink and sink cabinet separate", () => {
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"sink-faucet"[\s\S]*\[\[69\.95,\s*45\.98\]/);
 });
 
+test("AB 105747 keeps the 45 cm dishwasher and US30 cabinet independently selectable", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  assert.match(stageSource, /"ab-105747":\s*\[[\s\S]*componentKey:\s*"base-module-3"[\s\S]*\[\[65\.957,\s*59\.886\],\s*\[71\.635,\s*61\.06\]/);
+  assert.match(stageSource, /"ab-105747":\s*\[[\s\S]*componentKey:\s*"drawer-module"[\s\S]*\[\[71\.635,\s*61\.06\]/);
+  assert.match(stageSource, /"ab-105747":\s*\[[\s\S]*componentKey:\s*"drawer-module"[\s\S]*\[\[76\.233,\s*61\.903\]/);
+  assert.match(selectionSource, /"DISH-AB105747-450":\s*"7"/);
+  assert.match(selectionSource, /"CAB-BASE-AB105747-US30":\s*"8"/);
+  assert.match(seedSource, /articleNumber:\s*"A-EGSPV587915 \+ TGV45"[\s\S]*isFixedPricePackage:\s*true/);
+  assert.match(seedSource, /code:\s*"DISH-AB105747-450"[\s\S]*price:\s*articlePrice\("A-EGSPV587915 \+ TGV45"\)/);
+  assert.match(seedSource, /code:\s*"CAB-BASE-AB105747-US30"[\s\S]*componentKey:\s*"drawer-module"/);
+});
+
+test("AB 105750, AB 105753, and AB 105756 reuse the AB 105747 kitchen setup", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
+  const claimSource = fs.readFileSync(path.join(repoRoot, "lib", "service-claim-kitchen-hotspots.js"), "utf8");
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  for (const planNumber of ["105750", "105753", "105756"]) {
+    const slug = `ab-${planNumber}`;
+    assert.match(seedSource, new RegExp(`slug:\\s*"${slug}"[\\s\\S]*items:\\s*AB_${planNumber}_ITEMS`));
+    assert.match(stageSource, new RegExp(`"${slug}":\\s*"/plans/AB%20105747\\.svg"`));
+    assert.match(stageSource, new RegExp(`IMAGE_HOTSPOTS_BY_SLUG\\["${slug}"\\]\\s*=\\s*IMAGE_HOTSPOTS_BY_SLUG\\["ab-105747"\\]`));
+    assert.match(selectionSource, new RegExp(`"${slug}":\\s*\\[\\["component-wall-cabinet-2",\\s*"component-extractor-hood"\\]\\]`));
+    assert.match(claimSource, new RegExp(`"${slug}"`));
+  }
+});
+
 test("AB 105837 claim hotspot maps the hood LED strip to extractor hood", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
 
@@ -908,7 +939,7 @@ test("AB 105837 claim hotspot maps the hood LED strip to extractor hood", () => 
 test("AB 105834 claim hotspot maps the hood LED strip to extractor hood", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
 
-  assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"wall-cabinet-2"[\s\S]*\[\[35\.48,\s*11\.13\],\s*\[47\.48,\s*9\.4\],\s*\[47\.48,\s*37\.86\],\s*\[35\.48,\s*39\.6\]\]/);
+  assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"wall-cabinet-2"[\s\S]*\[\[35\.48,\s*11\.13\],\s*\[47\.48,\s*9\.4\],\s*\[47\.48,\s*35\.86\],\s*\[35\.48,\s*37\.6\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[35\.49,\s*39\.62\],\s*\[35\.48,\s*37\.8\],\s*\[30\.0,\s*38\.62\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[35\.48,\s*37\.9\],\s*\[47\.48,\s*36\.16\],\s*\[47\.48,\s*37\.9\],\s*\[35\.48,\s*39\.57\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[36\.58,\s*44\.08\],\s*\[46\.38,\s*42\.75\],\s*\[46\.38,\s*38\.11\],\s*\[36\.58,\s*39\.57\]\]/);

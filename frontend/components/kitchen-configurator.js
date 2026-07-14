@@ -44,7 +44,7 @@ import {
   normalizeCutleryVariants,
   normalizeCutleryLines,
 } from "../lib/cutlery-accessories";
-import { applyArticleVariantSelection, findAuszugVariantOption } from "../lib/auszug-variants";
+import { applyArticleVariantSelectionForDisplay, findAuszugVariantOption } from "../lib/auszug-variants";
 import { PublicI18nProvider, PublicLanguageSwitcher, usePublicI18n } from "./public-i18n";
 
 function buildInitialCustomer(contractNumber) {
@@ -1117,13 +1117,14 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
   const validServiceCodes = new Set(kitchenConfig.services.map((item) => item.code).filter(Boolean));
 
   return {
-    selectedComponentIds: [
-      ...new Set([
+    selectedComponentIds: expandLinkedComponentIds(
+      kitchenSlug,
+      [
         ...fixedComponentIds,
         ...baseComponentIds,
         ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
-      ]),
-    ],
+      ],
+    ),
     selectedArticleVariants: Object.fromEntries(
       Object.entries({ ...baseArticleVariants, ...(draft.selectedArticleVariants || {}) }).filter(([componentId, articleNumber]) => {
         if (!validComponentIds.has(componentId)) return false;
@@ -1403,7 +1404,7 @@ function KitchenConfiguratorContent({
     .filter((item) => selectedComponentIds.includes(componentIdForItem(item)))
     .map((item) => {
       const componentId = componentIdForItem(item);
-      const variantItem = applyArticleVariantSelection(item, selectedArticleVariants[componentId]);
+      const variantItem = applyArticleVariantSelectionForDisplay(item, selectedArticleVariants[componentId]);
       const mergedItem = mergeInitialOrderItemFields(variantItem, "component", initialOrderItemLookup);
       return {
         ...mergedItem,
@@ -1497,7 +1498,7 @@ function KitchenConfiguratorContent({
     selectedAccessories,
     selectedServices,
   );
-  const fixedComponentIdsKey = fixedComponentIds.join("|");
+  const fixedComponentIdsKey = [kitchenSlug, ...fixedComponentIds].join("|");
   const visibleComponents = kitchenConfig.components.filter((item) => {
     const componentId = componentIdForItem(item);
     return !fixedComponentIds.includes(componentId) && !isHiddenLinkedComponent(kitchenSlug, componentId);
@@ -1549,7 +1550,7 @@ function KitchenConfiguratorContent({
 
   useEffect(() => {
     setSelectedComponentIds((current) => {
-      const next = [...new Set([...fixedComponentIds, ...current])];
+      const next = expandLinkedComponentIds(kitchenSlug, [...fixedComponentIds, ...current]);
       if (next.length === current.length && next.every((item, index) => item === current[index])) {
         return current;
       }
