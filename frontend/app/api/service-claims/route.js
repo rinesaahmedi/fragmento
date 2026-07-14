@@ -114,22 +114,22 @@ function formatAttachmentLabel(entry) {
 
 function requiredGender(value) {
   const normalized = String(value || "").trim().toLowerCase();
-  if (normalized !== "female" && normalized !== "male" && normalized !== "prefer_not_to_say") {
-    throw new Error("Gender is required.");
+  if (normalized !== "female" && normalized !== "male" && normalized !== "ms" && normalized !== "prefer_not_to_say") {
+    throw new Error("Salutation is required.");
   }
   return normalized;
 }
 
 function genderDisplayLabel(gender) {
-  if (gender === "male") return "Male";
-  if (gender === "female") return "Female";
-  if (gender === "prefer_not_to_say") return "Prefer not to say";
+  if (gender === "male") return "Herr";
+  if (gender === "female" || gender === "ms") return "Frau";
+  if (gender === "prefer_not_to_say") return "Keine Angabe";
   return String(gender || "-");
 }
 
 function optionalGender(value) {
   const normalized = String(value || "").trim().toLowerCase();
-  if (normalized === "female" || normalized === "male" || normalized === "prefer_not_to_say") {
+  if (normalized === "female" || normalized === "male" || normalized === "ms" || normalized === "prefer_not_to_say") {
     return normalized;
   }
   return "";
@@ -141,16 +141,16 @@ function formatContactPersonName({ gender, givenName, surname, legacyName = "" }
   if (!person) {
     return "";
   }
-  if (gender === "female" || gender === "male") {
-    return `${person} (${genderDisplayLabel(gender)})`;
+  if (gender === "female" || gender === "male" || gender === "ms") {
+    return `${genderDisplayLabel(gender)} ${person}`;
   }
   return person;
 }
 
 function buildCustomerFullName({ givenName, surname, gender }) {
   const combined = [givenName, surname].filter(Boolean).join(" ").trim();
-  if (gender === "female" || gender === "male") {
-    return `${combined} (${gender})`;
+  if (gender === "female" || gender === "male" || gender === "ms") {
+    return `${genderDisplayLabel(gender)} ${combined}`;
   }
   return combined;
 }
@@ -693,7 +693,7 @@ function buildComplaintEmailText(payload) {
     "",
     `Vertragsnummer: ${payload.contractNumber}`,
     `Küche: ${payload.kitchenName || "-"}`,
-    `Kunde: ${payload.givenName} ${payload.surname} (${payload.genderLabel})`,
+    `Kunde: ${payload.genderLabel === "Keine Angabe" ? "" : `${payload.genderLabel} `}${payload.givenName} ${payload.surname}`,
     `Adresse: ${payload.clientAddress}`,
     `Telefon: ${payload.phone || "—"}`,
     `E-Mail: ${payload.email || "—"}`,
@@ -779,7 +779,7 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
     ["Küche", payload.kitchenName || "-"],
     ["Vorname", payload.givenName],
     ["Nachname", payload.surname],
-    ["Geschlecht", payload.genderLabel],
+    ["Anrede", payload.genderLabel],
     ["Kundenadresse", payload.clientAddress],
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],

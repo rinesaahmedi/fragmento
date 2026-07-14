@@ -160,7 +160,14 @@ export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
   cooktop: "component-claim-cooktop",
   "worktop-left": "component-claim-worktop-left",
   "worktop-right": "component-claim-worktop-right",
+  "worktop-end-panel": "component-claim-worktop-end-panel",
 };
+
+const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
+  // This panel is sold with the worktop but remains independently selectable
+  // in claims. It must not replace the existing horizontal worktop selector.
+  "worktop-end-panel",
+]);
 
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105805": [["component-extractor-hood", "component-under-cabinet-light"]],
@@ -390,6 +397,7 @@ export function buildServiceClaimSelectableComponents({
 
   const separatedSourceComponentIds = new Set(
     (claimParts || [])
+      .filter((part) => !ADDITIVE_SERVICE_CLAIM_PART_KEYS.has(String(part?.partKey || "").trim()))
       .map((part) => componentIdForItem({ componentKey: part?.sourceComponentKey }))
       .filter(Boolean),
   );

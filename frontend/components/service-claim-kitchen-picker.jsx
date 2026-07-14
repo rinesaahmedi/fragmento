@@ -395,10 +395,14 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                   if (hotspot.claimBlendeSplit) {
                     return null;
                   }
+                  if (hotspot.claimWorktopEndPanelSplit) {
+                    return null;
+                  }
                   if (
                     (
                       hotspot.claimPartKey === "worktop-left"
                       || hotspot.claimPartKey === "worktop-right"
+                      || hotspot.claimPartKey === "worktop-end-panel"
                     )
                     && hotspot.preserveManualSize
                   ) {
@@ -409,7 +413,8 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                   const outlineKey = `outline-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`;
                   const isSplitWorktop =
                     hotspot.claimPartKey === "worktop-left"
-                    || hotspot.claimPartKey === "worktop-right";
+                    || hotspot.claimPartKey === "worktop-right"
+                    || hotspot.claimPartKey === "worktop-end-panel";
                   const outlineProps = {
                     fill: "none",
                     stroke: "#2f2a24",
@@ -488,6 +493,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                         hotspot.clipPath ? styles.planHotspotPolygon : "",
                         hotspot.claimPartKey === "worktop-left"
                         || hotspot.claimPartKey === "worktop-right"
+                        || hotspot.claimPartKey === "worktop-end-panel"
                           ? styles.planHotspotWorktop
                           : "",
                         hotspot.claimBlendeSplit ? styles.planHotspotBlendeSplit : "",
@@ -516,6 +522,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                             : hotspot.componentKey === "worktop"
                             || hotspot.claimPartKey === "worktop-left"
                             || hotspot.claimPartKey === "worktop-right"
+                            || hotspot.claimPartKey === "worktop-end-panel"
                               ? 4
                               : 1,
                       }}

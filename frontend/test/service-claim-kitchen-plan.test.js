@@ -1038,6 +1038,61 @@ test("L kitchen claim plan replaces one worktop item with independent left and r
   assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["PLR60-1", "PLR60-2"]);
 });
 
+test("AB 105807 adds the worktop end panel without replacing the horizontal worktop", () => {
+  const kitchen = {
+    items: [
+      component("TOP-AB105806", "worktop", "Worktop", {
+        articleNumber: "PLR60",
+        isLocked: true,
+      }),
+    ],
+  };
+  const claimParts = [{
+    partKey: "worktop-end-panel",
+    articleCode: "PLR60-3",
+    name: "Worktop End Panel",
+    nameDe: "Arbeitsplatten-Seitenwange",
+    sourceKitchenItemCode: "TOP-AB105806",
+    sourceComponentKey: "worktop",
+  }];
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105807",
+    claimParts,
+  });
+
+  assert.deepEqual(result.selectableComponentIds, [
+    "component-worktop",
+    "component-claim-worktop-end-panel",
+  ]);
+  assert.deepEqual(result.selectableComponents.map((entry) => entry.articleCode), [
+    "PLR60",
+    "PLR60-3",
+  ]);
+  assert.deepEqual(result.visibleComponentIds, ["component-worktop"]);
+});
+
+test("AB 105807 worktop and end panel use independent PDF-matched hotspots", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentId: "component-worktop", componentKey: "worktop", left: 4.49, top: 62.14, width: 63.92, height: 1.49 },
+  ], [{
+    partKey: "worktop-end-panel",
+    sourceComponentKey: "worktop",
+  }], "ab-105807");
+  const worktop = result.find((entry) => entry.componentId === "component-worktop");
+  const endPanel = result.find((entry) => entry.claimPartKey === "worktop-end-panel");
+
+  assert.equal(result.length, 2);
+  assert.ok(Math.abs(worktop.left + worktop.width - 67.99658) < 0.000001);
+  assert.equal(endPanel.componentId, "component-claim-worktop-end-panel");
+  assert.ok(Math.abs(endPanel.left - 67.99658) < 0.000001);
+  assert.ok(Math.abs(endPanel.width - (68.395554 - 67.99658)) < 0.000001);
+  assert.ok(Math.abs(endPanel.top - 62.14) < 0.000001);
+  assert.ok(Math.abs(endPanel.height - (96.13 - 62.14)) < 0.000001);
+  assert.equal(endPanel.claimWorktopEndPanelSplit, true);
+});
+
 test("non-L claim plans omit the invisible sink hotspot but keep cabinet and faucet", () => {
   const hotspots = [
     { componentKey: "sink-base", left: 10, top: 50, width: 20, height: 30 },
@@ -1247,6 +1302,79 @@ test("L worktop split excludes floor-height end panels from the worktop selectio
   assert.ok(result.every((entry) => entry.height < 10));
 });
 
+test("existing floor-height worktop end panels become their own claims item", () => {
+  const claimParts = [
+    { partKey: "worktop-left", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceComponentKey: "worktop" },
+    { partKey: "worktop-end-panel", sourceComponentKey: "worktop" },
+  ];
+  const result = buildServiceClaimPartHotspots([
+    { componentKey: "worktop", left: 28.4, top: 50.4, width: 58.77, height: 8.87 },
+    { componentKey: "worktop", left: 28.28, top: 58.5, width: 0.44, height: 27.52 },
+  ], claimParts, "ab-105805");
+  const endPanel = result.find((entry) => entry.claimPartKey === "worktop-end-panel");
+
+  assert.deepEqual(result.map((entry) => entry.claimPartKey).sort(), [
+    "worktop-end-panel",
+    "worktop-left",
+    "worktop-right",
+  ]);
+  assert.equal(endPanel.componentId, "component-claim-worktop-end-panel");
+  assert.equal(endPanel.left, 28.28);
+  assert.equal(endPanel.top, 58.5);
+  assert.equal(endPanel.width, 0.44);
+  assert.equal(endPanel.height, 27.52);
+  assert.equal(endPanel.claimWorktopEndPanelSplit, true);
+});
+
+test("straight kitchens keep the horizontal worktop and separate its existing end panel", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentId: "component-worktop", componentKey: "worktop", left: 17.86, top: 62.86, width: 80.73, height: 1.39 },
+    { componentId: "component-worktop", componentKey: "worktop", left: 17.86, top: 62.86, width: 0.4, height: 32.3 },
+  ], [{
+    partKey: "worktop-end-panel",
+    sourceComponentKey: "worktop",
+  }], "ab-105806");
+
+  assert.equal(result.length, 2);
+  assert.equal(result[0].componentId, "component-worktop");
+  assert.equal(result[0].width, 80.73);
+  assert.equal(result[1].componentId, "component-claim-worktop-end-panel");
+  assert.equal(result[1].width, 0.4);
+  assert.equal(result[1].height, 32.3);
+});
+
+test("the adjacent cabinet selection stops at the worktop end-panel line", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentId: "component-worktop", componentKey: "worktop", left: 0.9, top: 58.47, width: 80.98, height: 1.4 },
+    { componentId: "component-worktop", componentKey: "worktop", left: 81.88, top: 59.9, width: 0.45, height: 27.44 },
+    { componentId: "component-drawer-module", componentKey: "drawer-module", left: 68.55, top: 59.9, width: 13.34, height: 27.44 },
+  ], [{
+    partKey: "worktop-end-panel",
+    sourceComponentKey: "worktop",
+  }], "ab-105844");
+  const cabinet = result.find((entry) => entry.componentKey === "drawer-module");
+  const endPanel = result.find((entry) => entry.claimPartKey === "worktop-end-panel");
+
+  assert.ok(Math.abs(cabinet.left + cabinet.width - endPanel.left) < 0.000001);
+  assert.equal(cabinet.claimWorktopEndPanelAdjacentTrim, true);
+});
+
+test("the AB 105807 adjacent cabinet stops at its PDF-derived end-panel line", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentId: "component-worktop", componentKey: "worktop", left: 4.49, top: 62.14, width: 63.92, height: 1.49 },
+    { componentId: "component-oven-module", componentKey: "oven-module", left: 58, top: 63.63, width: 10.41, height: 32.5 },
+  ], [{
+    partKey: "worktop-end-panel",
+    sourceComponentKey: "worktop",
+  }], "ab-105807");
+  const cabinet = result.find((entry) => entry.componentKey === "oven-module");
+  const endPanel = result.find((entry) => entry.claimPartKey === "worktop-end-panel");
+
+  assert.ok(Math.abs(cabinet.left + cabinet.width - endPanel.left) < 0.000001);
+  assert.equal(cabinet.claimWorktopEndPanelAdjacentTrim, true);
+});
+
 test("AB 105805 uses separate PDF surface and front-edge seam points through the right end", () => {
   const result = buildServiceClaimPartHotspots([
     { componentKey: "worktop", left: 28.4, top: 50.4, width: 58.77, height: 8.87 },
@@ -1413,6 +1541,22 @@ test("L worktop migration adds two claim-only parts without changing kitchen ite
   assert.match(migration, /'worktop-right', 'Right Worktop', 'Arbeitsplatte rechts', 70/);
   assert.match(migration, /'ab-105840'/);
   assert.match(migration, /ON CONFLICT \("kitchenId", "partKey"\) DO UPDATE/);
+  assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
+  assert.doesNotMatch(migration, /ALTER TABLE\s+"KitchenItem"/i);
+});
+
+test("worktop end-panel migration adds PLR60-3 only to the claims table", () => {
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260714140000_add_worktop_end_panel_claim_part", "migration.sql"),
+    "utf8",
+  );
+
+  assert.match(migration, /INSERT INTO "KitchenClaimPart"/);
+  assert.match(migration, /'worktop-end-panel'/);
+  assert.match(migration, /'PLR60-3'/);
+  assert.match(migration, /'Worktop End Panel'/);
+  assert.match(migration, /'Arbeitsplatten-Seitenwange'/);
+  assert.match(migration, /lower\(kitchen\."slug"\) = 'ab-105807'/);
   assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
   assert.doesNotMatch(migration, /ALTER TABLE\s+"KitchenItem"/i);
 });
