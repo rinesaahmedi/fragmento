@@ -17,7 +17,7 @@ import {
   getServiceClaimContractDetails,
   normalizeServiceClaimContractNumber,
 } from "../../../lib/service-claims";
-import { formatServiceClaimProblemArea, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
+import { formatServiceClaimProblemAreaForEmail, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 
@@ -420,7 +420,7 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
   const rows = parseServiceClaimProblemAreas(problemAreasJson).map((area) => {
     const componentId = String(area.componentId || "").trim();
     return {
-      label: formatServiceClaimProblemArea(area),
+      label: formatServiceClaimProblemAreaForEmail(area),
       detail: String(area.detail || "").trim(),
       attachments: componentId ? attachmentsByComponentId.get(componentId) || [] : [],
     };

@@ -6,10 +6,12 @@ const CLAIM_LINKED_COMPONENT_META = {
   "component-extractor-hood": {
     code: "HOOD-B-FH664621E",
     name: "Extractor Hood",
+    nameDe: "Flachschirmhaube",
   },
   "component-under-cabinet-light": {
     code: "ACC-LIGHT-003",
     name: "LED Lighting Set",
+    nameDe: "LED-Beleuchtungsset",
   },
 };
 
@@ -221,6 +223,12 @@ function resolveServiceClaimComponentName(componentId, meta = {}) {
   return stripProductDimensionsFromLabel(String(meta.name || meta.code || componentId).trim() || meta.code || componentId);
 }
 
+function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
+  return stripProductDimensionsFromLabel(
+    String(meta.nameDe || meta.name || meta.code || componentId).trim(),
+  ) || meta.code || componentId;
+}
+
 function resolveServiceClaimArticleCode(meta = {}) {
   const articleNumber = String(meta.articleNumber || meta.articleCode || "").trim();
   if (articleNumber) {
@@ -249,6 +257,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       code: String(item.code || "").trim(),
       articleCode: resolveServiceClaimArticleCode(item),
       name: resolveServiceClaimComponentName(componentId, item),
+      nameDe: resolveServiceClaimComponentNameDe(componentId, item),
     });
   }
 
@@ -261,6 +270,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       code: String(comp.code || "").trim(),
       articleCode: resolveServiceClaimArticleCode(comp),
       name: resolveServiceClaimComponentName(componentId, comp),
+      nameDe: resolveServiceClaimComponentNameDe(componentId, comp),
     });
   }
 
@@ -327,12 +337,18 @@ export function buildServiceClaimSelectableComponents({
       code,
       name: resolvedMeta.name || fallbackMeta.name,
     });
+    const nameDe = resolveServiceClaimComponentNameDe(componentId, {
+      code,
+      name: resolvedMeta.name || fallbackMeta.name,
+      nameDe: resolvedMeta.nameDe || fallbackMeta.nameDe,
+    });
 
     selectableMeta.push({
       componentId,
       code,
       articleCode,
       name,
+      nameDe,
     });
   }
 
@@ -364,6 +380,7 @@ export function buildServiceClaimSelectableComponents({
         code: String(item.code || "").trim(),
         articleCode: resolveServiceClaimArticleCode(item),
         name: resolveServiceClaimComponentName(componentIdForItem(item), item),
+        nameDe: resolveServiceClaimComponentNameDe(componentIdForItem(item), item),
       },
     }));
 
