@@ -10,6 +10,7 @@ import {
 import { loadKitchenSvgMarkup } from "../../../lib/load-kitchen-svg";
 import { getDeliveryLeadTimeDays, getDeliveryMinOrderSettings } from "../../../lib/admin-settings";
 import { prisma } from "../../../lib/prisma";
+import { getOrderDelegate, getOrderKindForContractNumber } from "../../../lib/order-kind";
 import { PUBLIC_LANGUAGE_COOKIE_NAME, normalizePublicLanguage } from "../../../lib/public-language";
 import { CUTLERY_VARIANTS, isCutleryAccessoryCode } from "../../../lib/cutlery-accessories";
 
@@ -167,7 +168,8 @@ export default async function KitchenPage({ params, searchParams }) {
   let initialContractAddress = null;
 
   if (!initialContractNumber && returnOrderNumber) {
-    const returnOrder = await prisma.order.findUnique({
+    const returnOrderKind = getOrderKindForContractNumber(returnOrderNumber);
+    const returnOrder = await getOrderDelegate(prisma, returnOrderKind).findUnique({
       where: { orderNumber: returnOrderNumber },
       select: {
         contractNumber: true,
@@ -183,7 +185,8 @@ export default async function KitchenPage({ params, searchParams }) {
     try {
       const contract = await getKitchenContractForAccess(initialContractNumber);
       if (contract.kitchenId === kitchen.id) {
-        const contractOrderState = await getContractOrderState(contract.id);
+        const orderKind = getOrderKindForContractNumber(contract.contractNumber);
+        const contractOrderState = await getContractOrderState(contract.id, prisma, orderKind);
         initialOrder = contractOrderState.editableOrder
           ? serializeInitialOrder(contractOrderState.editableOrder, contractOrderState.confirmedItems)
           : serializeConfirmedBaseline(contractOrderState.confirmedItems);

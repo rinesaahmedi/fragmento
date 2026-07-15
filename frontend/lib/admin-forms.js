@@ -192,6 +192,19 @@ export function validateCatalogArticleInput(formData) {
   };
 }
 
+export function validateClaimProductInput(formData) {
+  return {
+    partKey: requiredString(formData.get("partKey"), "Part key"),
+    articleCode: optionalString(formData.get("articleCode")),
+    name: requiredString(formData.get("name"), "Claim product name"),
+    nameDe: optionalString(formData.get("nameDe")),
+    sourceKitchenItemCode: optionalString(formData.get("sourceKitchenItemCode")),
+    sourceComponentKey: optionalString(formData.get("sourceComponentKey")),
+    sortOrder: validateSortOrder(formData.get("sortOrder")),
+    isActive: formData.get("isActive") === "true",
+  };
+}
+
 export function validateKitchenContractInput(formData, options = {}) {
   const contractNumber = requiredString(formData.get("contractNumber"), "Contract number");
   const housingCompanyId = optionalString(formData.get("housingCompanyId"));
