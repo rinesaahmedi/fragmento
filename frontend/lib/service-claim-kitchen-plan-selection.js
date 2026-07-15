@@ -13,7 +13,6 @@ const CLAIM_LINKED_COMPONENT_META = {
     code: "ACC-LIGHT-003",
     name: "LED Lighting Set",
     nameDe: "LED-Beleuchtungsset",
-    nameDe: "Dunstabzugshaube",
   },
 };
 
@@ -404,7 +403,6 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       articleCode: resolveServiceClaimArticleCode(item),
       name: resolveServiceClaimComponentName(componentId, item),
       nameDe: resolveServiceClaimComponentNameDe(componentId, item),
-      nameDe: stripProductDimensionsFromLabel(String(item.nameDe || "").trim()),
     });
   }
 
@@ -418,7 +416,6 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       articleCode: resolveServiceClaimArticleCode(comp),
       name: resolveServiceClaimComponentName(componentId, comp),
       nameDe: resolveServiceClaimComponentNameDe(componentId, comp),
-      nameDe: stripProductDimensionsFromLabel(String(comp.nameDe || "").trim()),
     });
   }
 
@@ -490,9 +487,6 @@ export function buildServiceClaimSelectableComponents({
       name: resolvedMeta.name || fallbackMeta.name,
       nameDe: resolvedMeta.nameDe || fallbackMeta.nameDe,
     });
-    const nameDe = stripProductDimensionsFromLabel(String(
-      resolvedMeta.nameDe || fallbackMeta.nameDe || "",
-    ).trim());
 
     selectableMeta.push({
       componentId,
@@ -532,7 +526,6 @@ export function buildServiceClaimSelectableComponents({
         articleCode: resolveServiceClaimArticleCode(item),
         name: resolveServiceClaimComponentName(componentIdForItem(item), item),
         nameDe: resolveServiceClaimComponentNameDe(componentIdForItem(item), item),
-        nameDe: stripProductDimensionsFromLabel(String(item.nameDe || "").trim()),
       },
     }));
 
