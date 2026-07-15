@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import test from "node:test";
 import {
   applyVisibleComponentsToSvgMarkup,
@@ -6,6 +7,7 @@ import {
   inferKitchenSlugFromSelectedAreas,
   resolveClaimPreviewComponentKeys,
 } from "../lib/claim-kitchen-preview.js";
+import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
 
 const SAMPLE_SVG = '<svg viewBox="0 0 900 600"></svg>';
 const SAMPLE_KITCHEN_SVG = `
@@ -51,16 +53,16 @@ test("buildKitchenPreviewSvgMarkup falls back to the base svg when no known high
   assert.match(markup, /<svg\b/);
 });
 
-test("applyVisibleComponentsToSvgMarkup hides components that are not on the contract order", () => {
+test("applyVisibleComponentsToSvgMarkup fades components that are not on the contract order", () => {
   const markup = applyVisibleComponentsToSvgMarkup(SAMPLE_KITCHEN_SVG, [
     "component-oven-base",
     "component-refrigerator",
   ]);
 
   assert.match(markup, /data-component-id="component-oven-base"/);
-  assert.doesNotMatch(markup, /data-component-id="component-oven-base"[^>]*style="display:none"/);
+  assert.doesNotMatch(markup, /data-component-id="component-oven-base"[^>]*opacity:0\.3/);
   assert.match(markup, /data-component-id="component-refrigerator"/);
-  assert.match(markup, /data-component-id="component-sink-base"[^>]*style="display:none"/);
+  assert.match(markup, /data-component-id="component-sink-base"[^>]*style="opacity:0\.3"/);
 });
 
 test("buildKitchenPreviewSvgMarkup applies visible component filtering before highlights", () => {
@@ -71,7 +73,7 @@ test("buildKitchenPreviewSvgMarkup applies visible component filtering before hi
     visibleComponentIds: ["component-oven-base", "component-refrigerator"],
   });
 
-  assert.match(markup, /data-component-id="component-sink-base"[^>]*style="display:none"/);
+  assert.match(markup, /data-component-id="component-sink-base"[^>]*style="opacity:0\.3"/);
   assert.match(markup, /stroke="#8f3e2c"/);
 });
 
@@ -109,4 +111,29 @@ test("inferKitchenSlugFromSelectedAreas does not guess when areas conflict", () 
   ]);
 
   assert.equal(slug, "");
+});
+
+test("AB 105805 email preview uses the claim picker's current PDF coordinates", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105805"];
+  const baseModule2 = hotspots.find((hotspot) => hotspot.componentKey === "base-module-2");
+
+  assert.deepEqual(baseModule2.points, [
+    [45.57, 56.13],
+    [55.52, 54.98],
+    [55.52, 82.23],
+    [45.57, 83.35],
+  ]);
+  assert.deepEqual(hotspots[0].points[0], [10.6, 29.8]);
+});
+
+test("email preview selection overlay uses claim hotspot clip polygons", () => {
+  const source = fs.readFileSync(
+    new URL("../lib/claim-kitchen-preview.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /function getClaimPlanClipPathPoints/);
+  assert.match(source, /\.match\(\/\^polygon\\\(/);
+  assert.match(source, /Number\(hotspot\.left \|\| 0\) \+ \(localX \/ 100\) \* Number\(hotspot\.width \|\| 0\)/);
+  assert.match(source, /Array\.isArray\(hotspot\?\.points\) && hotspot\.points\.length[\s\S]*getClaimPlanClipPathPoints\(hotspot\)/);
 });

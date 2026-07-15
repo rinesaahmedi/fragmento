@@ -7,7 +7,10 @@ import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
-import { getServiceClaimLinkedComponentIds } from "../lib/service-claim-kitchen-plan-selection";
+import {
+  collapseServiceClaimLinkedComponents,
+  getServiceClaimLinkedComponentIds,
+} from "../lib/service-claim-kitchen-plan-selection";
 import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
 import { countElectricalApplianceProblemAreas } from "../lib/service-claim-serial-number";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
@@ -25,6 +28,15 @@ const MAX_CLAIM_ATTACHMENT_COUNT = 20;
 const MAX_CLAIM_ATTACHMENT_BYTES = 4 * 1024 * 1024;
 const CLAIM_ATTACHMENT_ACCEPT = "image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx";
 const SERIAL_NUMBER_IMAGE_ACCEPT = "image/*";
+const CLIENT_ADDRESS_REQUIRED_FIELDS = [
+  "clientCountry",
+  "clientCity",
+  "clientPostalCode",
+  "clientFloor",
+  "clientAddressLine1",
+];
+const CLIENT_CONTACT_REQUIRED_FIELDS = ["gender", "givenName", "surname", "phone", "email"];
+const CLAIM_REQUIRED_FIELDS = [...CLIENT_CONTACT_REQUIRED_FIELDS, ...CLIENT_ADDRESS_REQUIRED_FIELDS];
 
 const CLAIM_AREA_LABELS_BY_CODE = {
   de: {
@@ -463,6 +475,10 @@ const COPY = {
     formTitle: "KD Formular",
     formIntro: "F\u00fclle unten die wichtigsten Reklamationsdaten aus.",
     requiredFieldTitle: "Pflichtfeld",
+    requiredFieldMissing: "Bitte f\u00fclle dieses Pflichtfeld aus.",
+    requiredFieldsAlertTitle: "Pflichtfeld fehlt",
+    requiredFieldsAlertText: "Bitte erg\u00e4nze die markierten Pflichtfelder.",
+    requiredFieldsAlertAction: "Zum Feld",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Kaufvertragsnummer",
     contractPlaceholder: "e.g. 670123456",
@@ -558,8 +574,9 @@ const COPY = {
     serialNumber: "Seriennummer(n) des E-Ger\u00e4tes",
     serialPlaceholder: "Seriennummer eingeben",
     serialNumberAdd: "Hinzuf\u00fcgen",
-    serialNumberRequired: "Bitte gib mindestens eine Seriennummer ein oder lade ein Foto der Seriennummer hoch.",
-    serialNumberCountRequired: "Bitte gib f\u00fcr die ausgew\u00e4hlten K\u00fcchenteile mindestens {count} Seriennummer(n) ein oder lade Foto(s) der Seriennummer(n) hoch.",
+    serialNumberRequired: "Bitte gib genau eine Seriennummer ein oder lade genau ein Foto der Seriennummer hoch.",
+    serialNumberCountRequired: "Bitte gib genau {count} Seriennummer(n) f\u00fcr die ausgew\u00e4hlten Elektroger\u00e4te ein oder lade entsprechend viele Seriennummern-Fotos hoch.",
+    serialNumberEvidenceLimitReached: "Du hast bereits alle {count} erforderlichen Seriennummern-Nachweise angegeben. Um ein Foto hochzuladen, entferne zuerst eine eingegebene Seriennummer oder ein vorhandenes Seriennummern-Foto.",
     serialNumberImage: "Foto der Seriennummer(n)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
@@ -569,6 +586,7 @@ const COPY = {
     serialNumberHelpAlt2: "Beispiel: Seriennummer im K\u00fchlschrank",
     attachments: "Anh\u00e4nge (optional)",
     uploadFile: "Datei hochladen",
+    problemAreaAttachmentRequired: "Bitte lade mindestens eine Datei f\u00fcr diesen K\u00fcchenteil hoch.",
     attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 20 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
     attachmentsViewMore: "Mehr anzeigen",
@@ -698,6 +716,10 @@ const COPY = {
     formTitle: "Complaint Form",
     formIntro: "Fill in the main complaint details below.",
     requiredFieldTitle: "Required field",
+    requiredFieldMissing: "Please complete this required field.",
+    requiredFieldsAlertTitle: "Required field missing",
+    requiredFieldsAlertText: "Please complete the highlighted required fields.",
+    requiredFieldsAlertAction: "Go to field",
     fieldOptionalSuffix: " (optional)",
     contractNumber: "Purchase contract number",
     contractPlaceholder: "e.g. 670123456",
@@ -794,8 +816,9 @@ const COPY = {
     serialNumber: "Serial number(s) of the appliance",
     serialPlaceholder: "Enter a serial number",
     serialNumberAdd: "Add",
-    serialNumberRequired: "Please enter at least one serial number or upload a photo of the serial number.",
-    serialNumberCountRequired: "Please enter at least {count} serial number(s) for the selected kitchen item(s), or upload serial number photo(s).",
+    serialNumberRequired: "Please enter exactly one serial number or upload exactly one photo of the serial number.",
+    serialNumberCountRequired: "Please provide exactly {count} serial number(s) for the selected electrical appliance(s), using typed numbers and/or serial number photos.",
+    serialNumberEvidenceLimitReached: "You have already provided all {count} required serial number entries. To upload a photo, first remove a typed serial number or an existing serial number photo.",
     serialNumberImage: "Photo of the serial number(s)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Help: where to find the serial number",
@@ -805,6 +828,7 @@ const COPY = {
     serialNumberHelpAlt2: "Example: serial number inside the fridge",
     attachments: "Attachments (optional)",
     uploadFile: "Upload file",
+    problemAreaAttachmentRequired: "Please upload at least one file for this kitchen component.",
     attachmentsHint: "PDFs, images, or office files \u2014 up to 20 files, 4 MB each.",
     attachmentsClear: "Remove all",
     attachmentsViewMore: "View more",
@@ -934,6 +958,10 @@ const COPY = {
     formTitle: "Servis Formu",
     formIntro: "Ana \u015fikayet bilgilerini a\u015fa\u011f\u0131ya girin.",
     requiredFieldTitle: "Zorunlu alan",
+    requiredFieldMissing: "L\u00fctfen bu zorunlu alan\u0131 doldurun.",
+    requiredFieldsAlertTitle: "Zorunlu alan eksik",
+    requiredFieldsAlertText: "L\u00fctfen i\u015faretli zorunlu alanlar\u0131 doldurun.",
+    requiredFieldsAlertAction: "Alana git",
     fieldOptionalSuffix: " (iste\u011fe ba\u011fl\u0131)",
     contractNumber: "Sat\u0131n alma s\u00f6zle\u015fme numaras\u0131",
     contractPlaceholder: "\u00f6rn. 736272",
@@ -1132,6 +1160,10 @@ const COPY = {
     formTitle: "Formulario de servicio",
     formIntro: "Complete a continuaci\u00f3n los datos principales de la reclamaci\u00f3n.",
     requiredFieldTitle: "Campo obligatorio",
+    requiredFieldMissing: "Complete este campo obligatorio.",
+    requiredFieldsAlertTitle: "Falta un campo obligatorio",
+    requiredFieldsAlertText: "Complete los campos obligatorios marcados.",
+    requiredFieldsAlertAction: "Ir al campo",
     fieldOptionalSuffix: " (opcional)",
     contractNumber: "N\u00famero de contrato de compra",
     contractPlaceholder: "p. ej. 736272",
@@ -1330,6 +1362,10 @@ const COPY = {
     formTitle: "Formulaire SAV",
     formIntro: "Renseignez ci-dessous les principales informations de r\u00e9clamation.",
     requiredFieldTitle: "Champ obligatoire",
+    requiredFieldMissing: "Veuillez remplir ce champ obligatoire.",
+    requiredFieldsAlertTitle: "Champ obligatoire manquant",
+    requiredFieldsAlertText: "Veuillez compl\u00e9ter les champs obligatoires signal\u00e9s.",
+    requiredFieldsAlertAction: "Aller au champ",
     fieldOptionalSuffix: " (facultatif)",
     contractNumber: "Num\u00e9ro de contrat d'achat",
     contractPlaceholder: "ex. 736272",
@@ -1528,6 +1564,10 @@ const COPY = {
     formTitle: "\u0421\u0435\u0440\u0432\u0438\u0441\u043d\u0430\u044f \u0444\u043e\u0440\u043c\u0430",
     formIntro: "\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u043d\u0438\u0436\u0435 \u043e\u0441\u043d\u043e\u0432\u043d\u044b\u0435 \u0434\u0430\u043d\u043d\u044b\u0435 \u043f\u043e \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u0438.",
     requiredFieldTitle: "\u041e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435",
+    requiredFieldMissing: "\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u044d\u0442\u043e \u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435.",
+    requiredFieldsAlertTitle: "\u041d\u0435 \u0437\u0430\u043f\u043e\u043b\u043d\u0435\u043d\u043e \u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e\u0435 \u043f\u043e\u043b\u0435",
+    requiredFieldsAlertText: "\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u043e\u0442\u043c\u0435\u0447\u0435\u043d\u043d\u044b\u0435 \u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0435 \u043f\u043e\u043b\u044f.",
+    requiredFieldsAlertAction: "\u041a \u043f\u043e\u043b\u044e",
     fieldOptionalSuffix: " (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
     contractNumber: "\u041d\u043e\u043c\u0435\u0440 \u0434\u043e\u0433\u043e\u0432\u043e\u0440\u0430 \u043f\u043e\u043a\u0443\u043f\u043a\u0438",
     contractPlaceholder: "\u043d\u0430\u043f\u0440\u0438\u043c\u0435\u0440 736272",
@@ -2039,6 +2079,9 @@ export default function ServiceClaimFlow() {
   const [selectedClaimAssistantContextKey, setSelectedClaimAssistantContextKey] = useState("claim");
   const [serialNumberDraft, setSerialNumberDraft] = useState("");
   const [isTourOpen, setIsTourOpen] = useState(false);
+  const [showClaimRequiredErrors, setShowClaimRequiredErrors] = useState(false);
+  const [isClaimRequiredAlertDismissed, setIsClaimRequiredAlertDismissed] = useState(false);
+  const [showProblemAreaAttachmentErrors, setShowProblemAreaAttachmentErrors] = useState(false);
   const [isPreferredContactCalendarOpen, setIsPreferredContactCalendarOpen] = useState(false);
   const [preferredContactCalendarMonth, setPreferredContactCalendarMonth] = useState(() =>
     startOfCalendarMonth(new Date()),
@@ -2057,6 +2100,8 @@ export default function ServiceClaimFlow() {
   const preferredContactTimeFromRef = useRef(null);
   const preferredContactTimeToRef = useRef(null);
   const contractNumberStickySentinelRef = useRef(null);
+  const clientAddressSectionRef = useRef(null);
+  const hasSeenClientAddressSectionRef = useRef(false);
   const selectedServicePanelRef = useRef(null);
   const shouldScrollToSelectedPanelRef = useRef(false);
 
@@ -2092,10 +2137,35 @@ export default function ServiceClaimFlow() {
     () => Boolean(formValues.phone.trim() && formValues.email.trim()),
     [formValues.email, formValues.phone],
   );
+  const hasMissingClaimRequiredFields = useMemo(
+    () => CLAIM_REQUIRED_FIELDS.some((fieldName) => !String(formValues[fieldName] || "").trim()),
+    [
+      formValues.clientAddressLine1,
+      formValues.clientCity,
+      formValues.clientCountry,
+      formValues.clientFloor,
+      formValues.clientPostalCode,
+      formValues.email,
+      formValues.gender,
+      formValues.givenName,
+      formValues.phone,
+      formValues.surname,
+    ],
+  );
+  const shouldShowClaimRequiredAlert =
+    showClaimRequiredErrors
+    && hasMissingClaimRequiredFields
+    && !isClaimRequiredAlertDismissed;
 
   useEffect(() => {
     latestFormRef.current = formValues;
   }, [formValues]);
+
+  useEffect(() => {
+    if (!hasMissingClaimRequiredFields) {
+      setIsClaimRequiredAlertDismissed(false);
+    }
+  }, [hasMissingClaimRequiredFields]);
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -2142,8 +2212,10 @@ export default function ServiceClaimFlow() {
       return [];
     }
     const selectedIds = new Set(problemComponentIds);
-    return activeKitchenPlan.selectableComponents
-      .filter((entry) => selectedIds.has(entry.componentId))
+    return collapseServiceClaimLinkedComponents(
+      activeKitchenPlan.kitchenSlug,
+      activeKitchenPlan.selectableComponents.filter((entry) => selectedIds.has(entry.componentId)),
+    )
       .map((entry) => ({
         ...entry,
         label: formatClaimAreaName(entry, entry.name, language),
@@ -2177,6 +2249,9 @@ export default function ServiceClaimFlow() {
   );
   const hasSelectedElectricalAppliances = requiredSelectedSerialNumberCount > 0;
   const applicableSerialNumberImages = hasSelectedElectricalAppliances ? serialNumberImages : [];
+  const hasReachedRequiredSerialEvidenceCount =
+    hasSelectedElectricalAppliances
+    && serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount;
   const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
   const selectedProblemAreasWithDetails = useMemo(() => {
     return selectedProblemAreas.map((area) => ({
@@ -2191,6 +2266,20 @@ export default function ServiceClaimFlow() {
     problemAreaDetailsByComponentId,
     selectedProblemAreas,
   ]);
+  const missingProblemAreaAttachmentIds = useMemo(
+    () =>
+      selectedProblemAreasWithDetails
+        .filter((area) => !area.attachments.length)
+        .map((area) => area.componentId),
+    [selectedProblemAreasWithDetails],
+  );
+  const hasMissingProblemAreaAttachments = missingProblemAreaAttachmentIds.length > 0;
+  useEffect(() => {
+    if (!hasMissingProblemAreaAttachments) {
+      setShowProblemAreaAttachmentErrors(false);
+    }
+  }, [hasMissingProblemAreaAttachments]);
+
   const problemAreaAttachmentCount = useMemo(
     () =>
       Object.values(problemAreaAttachmentsByComponentId).reduce(
@@ -2222,6 +2311,43 @@ export default function ServiceClaimFlow() {
 
   const requiredFieldTitle = t("requiredFieldTitle");
   const fieldOptionalSuffix = t("fieldOptionalSuffix");
+
+  function shouldShowClaimRequiredError(fieldName) {
+    return showClaimRequiredErrors && !String(formValues[fieldName] || "").trim();
+  }
+
+  function getClaimRequiredErrorId(fieldName) {
+    return `service-claim-${fieldName}-required`;
+  }
+
+  function handleClaimRequiredGroupBlur(event) {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setIsClaimRequiredAlertDismissed(false);
+      setShowClaimRequiredErrors(true);
+    }
+  }
+
+  function handleClaimFormInvalid(event) {
+    if (event.target?.closest?.("[data-claim-required-group]")) {
+      setIsClaimRequiredAlertDismissed(false);
+      setShowClaimRequiredErrors(true);
+    }
+  }
+
+  function focusFirstMissingClaimRequiredField() {
+    setIsClaimRequiredAlertDismissed(false);
+    setShowClaimRequiredErrors(true);
+    window.requestAnimationFrame(() => {
+      const firstMissingField = selectedServicePanelRef.current?.querySelector(
+        '[data-claim-required-field][aria-invalid="true"]',
+      );
+      if (!firstMissingField) {
+        return;
+      }
+      firstMissingField.scrollIntoView({ behavior: "smooth", block: "center" });
+      firstMissingField.focus({ preventScroll: true });
+    });
+  }
 
   function getPreferredContactWindowLabel(windowValue) {
     if (windowValue === "morning") return t("preferredContactTimeWindowMorning");
@@ -2298,7 +2424,38 @@ export default function ServiceClaimFlow() {
       setIsContractNumberHelpOpen(false);
       setIsContractNumberStickyEnabled(true);
       setIsContractNumberCurrentlyStuck(false);
+      hasSeenClientAddressSectionRef.current = false;
+      setIsClaimRequiredAlertDismissed(false);
+      setShowClaimRequiredErrors(false);
     }
+  }, [isComplaintMode]);
+
+  useEffect(() => {
+    if (!isComplaintMode) {
+      return undefined;
+    }
+
+    const section = clientAddressSectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          hasSeenClientAddressSectionRef.current = true;
+          return;
+        }
+        if (hasSeenClientAddressSectionRef.current && entry.boundingClientRect.top < 0) {
+          setIsClaimRequiredAlertDismissed(false);
+          setShowClaimRequiredErrors(true);
+        }
+      },
+      { threshold: 0.12 },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
   }, [isComplaintMode]);
 
   useEffect(() => {
@@ -2843,6 +3000,10 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
+        if (serialNumberEntries.length + next.length >= requiredSelectedSerialNumberCount) {
+          message = t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount));
+          break;
+        }
         const currentCount = attachments.length + next.length + problemAreaAttachmentCount;
         if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
@@ -2924,6 +3085,10 @@ export default function ServiceClaimFlow() {
   function addSerialNumberEntry(rawValue = serialNumberDraft) {
     const nextEntry = String(rawValue || "").trim();
     if (!nextEntry) {
+      return;
+    }
+    if (serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount) {
+      setError(t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount)));
       return;
     }
 
@@ -3316,6 +3481,19 @@ export default function ServiceClaimFlow() {
       }
     }
 
+    if (hasMissingProblemAreaAttachments) {
+      setShowProblemAreaAttachmentErrors(true);
+      setError(t("problemAreaAttachmentRequired"));
+      window.requestAnimationFrame(() => {
+        const firstMissingUpload = selectedServicePanelRef.current?.querySelector(
+          '[data-problem-area-upload-required="true"]',
+        );
+        firstMissingUpload?.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstMissingUpload?.focus?.({ preventScroll: true });
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setError("");
     setSuccessMessage("");
@@ -3329,10 +3507,7 @@ export default function ServiceClaimFlow() {
         : "";
       const submittedSerialNumberCount = parseSerialNumberList(normalizedSerialNumbers).length;
       const submittedSerialEvidenceCount = submittedSerialNumberCount + applicableSerialNumberImages.length;
-      if (
-        requiredSelectedSerialNumberCount > 0
-        && submittedSerialEvidenceCount < requiredSelectedSerialNumberCount
-      ) {
+      if (submittedSerialEvidenceCount !== requiredSelectedSerialNumberCount) {
         setError(t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount)));
         setIsSubmitting(false);
         return;
@@ -3399,6 +3574,9 @@ export default function ServiceClaimFlow() {
       }
 
       setSuccessMessage(payloadResponse.message || copy.submitSuccess);
+      setShowClaimRequiredErrors(false);
+      setIsClaimRequiredAlertDismissed(false);
+      setShowProblemAreaAttachmentErrors(false);
       setForm(INITIAL_FORM);
       setSerialNumberDraft("");
       setAttachments([]);
@@ -3955,7 +4133,7 @@ export default function ServiceClaimFlow() {
             <p>{copy.formIntro}</p>
           </div>
 
-          <form className="service-form" onSubmit={handleSubmit}>
+          <form className="service-form" onSubmit={handleSubmit} onInvalidCapture={handleClaimFormInvalid}>
             <div
               ref={contractNumberStickySentinelRef}
               className="service-field__sticky-sentinel"
@@ -4042,7 +4220,11 @@ export default function ServiceClaimFlow() {
               </p>
             ) : null}
 
-            <div className="service-field-grid service-field-grid--3">
+            <div
+              className="service-field-grid service-field-grid--3"
+              data-claim-required-group
+              onBlur={handleClaimRequiredGroupBlur}
+            >
               <label className="service-field">
                 <span>
                   {copy.gender}
@@ -4055,6 +4237,11 @@ export default function ServiceClaimFlow() {
                   placeholder={copy.genderPlaceholder}
                   aria-label={copy.gender}
                   className="service-select service-select--gender"
+                  data-claim-required-field
+                  aria-invalid={shouldShowClaimRequiredError("gender")}
+                  aria-describedby={
+                    shouldShowClaimRequiredError("gender") ? getClaimRequiredErrorId("gender") : undefined
+                  }
                   required
                 >
                   <option value="">{copy.genderPlaceholder}</option>
@@ -4063,6 +4250,11 @@ export default function ServiceClaimFlow() {
                   <option value="female">{copy.salutationMrs}</option>
                   <option value="prefer_not_to_say">{copy.genderPreferNot}</option>
                 </AdminSelect>
+                {shouldShowClaimRequiredError("gender") ? (
+                  <span id={getClaimRequiredErrorId("gender")} className="service-field__error" role="alert">
+                    {t("requiredFieldMissing")}
+                  </span>
+                ) : null}
               </label>
 
               <label className="service-field">
@@ -4072,11 +4264,21 @@ export default function ServiceClaimFlow() {
                 </span>
                 <input
                   type="text"
+                  data-claim-required-field
                   value={formValues.givenName}
                   onChange={(event) => handleFieldChange("givenName", event.target.value)}
                   placeholder={copy.givenNamePlaceholder}
+                  aria-invalid={shouldShowClaimRequiredError("givenName")}
+                  aria-describedby={
+                    shouldShowClaimRequiredError("givenName") ? getClaimRequiredErrorId("givenName") : undefined
+                  }
                   required
                 />
+                {shouldShowClaimRequiredError("givenName") ? (
+                  <span id={getClaimRequiredErrorId("givenName")} className="service-field__error" role="alert">
+                    {t("requiredFieldMissing")}
+                  </span>
+                ) : null}
               </label>
 
               <label className="service-field">
@@ -4086,15 +4288,29 @@ export default function ServiceClaimFlow() {
                 </span>
                 <input
                   type="text"
+                  data-claim-required-field
                   value={formValues.surname}
                   onChange={(event) => handleFieldChange("surname", event.target.value)}
                   placeholder={copy.surnamePlaceholder}
+                  aria-invalid={shouldShowClaimRequiredError("surname")}
+                  aria-describedby={
+                    shouldShowClaimRequiredError("surname") ? getClaimRequiredErrorId("surname") : undefined
+                  }
                   required
                 />
+                {shouldShowClaimRequiredError("surname") ? (
+                  <span id={getClaimRequiredErrorId("surname")} className="service-field__error" role="alert">
+                    {t("requiredFieldMissing")}
+                  </span>
+                ) : null}
               </label>
             </div>
 
-            <div className="service-field-grid service-field-grid--claim-serial-row">
+            <div
+              className="service-field-grid service-field-grid--claim-serial-row"
+              data-claim-required-group
+              onBlur={handleClaimRequiredGroupBlur}
+            >
               <label className="service-field">
                 <span>
                   {copy.phone}
@@ -4102,11 +4318,21 @@ export default function ServiceClaimFlow() {
                 </span>
                 <input
                   type="tel"
+                  data-claim-required-field
                   value={formValues.phone}
                   onChange={(event) => handleFieldChange("phone", event.target.value)}
                   placeholder={copy.phonePlaceholder}
+                  aria-invalid={shouldShowClaimRequiredError("phone")}
+                  aria-describedby={
+                    shouldShowClaimRequiredError("phone") ? getClaimRequiredErrorId("phone") : undefined
+                  }
                   required
                 />
+                {shouldShowClaimRequiredError("phone") ? (
+                  <span id={getClaimRequiredErrorId("phone")} className="service-field__error" role="alert">
+                    {t("requiredFieldMissing")}
+                  </span>
+                ) : null}
               </label>
 
               <label className="service-field">
@@ -4116,11 +4342,21 @@ export default function ServiceClaimFlow() {
                 </span>
                 <input
                   type="email"
+                  data-claim-required-field
                   value={formValues.email}
                   onChange={(event) => handleFieldChange("email", event.target.value)}
                   placeholder={copy.emailPlaceholder}
+                  aria-invalid={shouldShowClaimRequiredError("email")}
+                  aria-describedby={
+                    shouldShowClaimRequiredError("email") ? getClaimRequiredErrorId("email") : undefined
+                  }
                   required
                 />
+                {shouldShowClaimRequiredError("email") ? (
+                  <span id={getClaimRequiredErrorId("email")} className="service-field__error" role="alert">
+                    {t("requiredFieldMissing")}
+                  </span>
+                ) : null}
               </label>
             </div>
 
@@ -4386,7 +4622,12 @@ export default function ServiceClaimFlow() {
               </div>
             </section>
 
-            <section className="service-form__section">
+            <section
+              ref={clientAddressSectionRef}
+              className="service-form__section"
+              data-claim-required-group
+              onBlur={handleClaimRequiredGroupBlur}
+            >
               <p className="service-form__section-title">{copy.clientAddress}</p>
               <div className="service-field-grid service-field-grid--client-location">
                 <label className="service-field">
@@ -4396,11 +4637,27 @@ export default function ServiceClaimFlow() {
                   </span>
                   <input
                     type="text"
+                    data-claim-required-field
                     value={formValues.clientCountry}
                     onChange={(event) => handleFieldChange("clientCountry", event.target.value)}
                     placeholder={copy.clientCountryPlaceholder}
+                    aria-invalid={shouldShowClaimRequiredError("clientCountry")}
+                    aria-describedby={
+                      shouldShowClaimRequiredError("clientCountry")
+                        ? getClaimRequiredErrorId("clientCountry")
+                        : undefined
+                    }
                     required
                   />
+                  {shouldShowClaimRequiredError("clientCountry") ? (
+                    <span
+                      id={getClaimRequiredErrorId("clientCountry")}
+                      className="service-field__error"
+                      role="alert"
+                    >
+                      {t("requiredFieldMissing")}
+                    </span>
+                  ) : null}
                 </label>
 
                 <label className="service-field">
@@ -4410,11 +4667,27 @@ export default function ServiceClaimFlow() {
                   </span>
                   <input
                     type="text"
+                    data-claim-required-field
                     value={formValues.clientCity}
                     onChange={(event) => handleFieldChange("clientCity", event.target.value)}
                     placeholder={copy.clientCityPlaceholder}
+                    aria-invalid={shouldShowClaimRequiredError("clientCity")}
+                    aria-describedby={
+                      shouldShowClaimRequiredError("clientCity")
+                        ? getClaimRequiredErrorId("clientCity")
+                        : undefined
+                    }
                     required
                   />
+                  {shouldShowClaimRequiredError("clientCity") ? (
+                    <span
+                      id={getClaimRequiredErrorId("clientCity")}
+                      className="service-field__error"
+                      role="alert"
+                    >
+                      {t("requiredFieldMissing")}
+                    </span>
+                  ) : null}
                 </label>
 
                 <label className="service-field">
@@ -4424,11 +4697,27 @@ export default function ServiceClaimFlow() {
                   </span>
                   <input
                     type="text"
+                    data-claim-required-field
                     value={formValues.clientPostalCode}
                     onChange={(event) => handleFieldChange("clientPostalCode", event.target.value)}
                     placeholder={copy.clientPostalCodePlaceholder}
+                    aria-invalid={shouldShowClaimRequiredError("clientPostalCode")}
+                    aria-describedby={
+                      shouldShowClaimRequiredError("clientPostalCode")
+                        ? getClaimRequiredErrorId("clientPostalCode")
+                        : undefined
+                    }
                     required
                   />
+                  {shouldShowClaimRequiredError("clientPostalCode") ? (
+                    <span
+                      id={getClaimRequiredErrorId("clientPostalCode")}
+                      className="service-field__error"
+                      role="alert"
+                    >
+                      {t("requiredFieldMissing")}
+                    </span>
+                  ) : null}
                 </label>
               </div>
 
@@ -4440,11 +4729,27 @@ export default function ServiceClaimFlow() {
                   </span>
                   <input
                     type="text"
+                    data-claim-required-field
                     value={formValues.clientFloor}
                     onChange={(event) => handleFieldChange("clientFloor", event.target.value)}
                     placeholder={copy.clientFloorPlaceholder}
+                    aria-invalid={shouldShowClaimRequiredError("clientFloor")}
+                    aria-describedby={
+                      shouldShowClaimRequiredError("clientFloor")
+                        ? getClaimRequiredErrorId("clientFloor")
+                        : undefined
+                    }
                     required
                   />
+                  {shouldShowClaimRequiredError("clientFloor") ? (
+                    <span
+                      id={getClaimRequiredErrorId("clientFloor")}
+                      className="service-field__error"
+                      role="alert"
+                    >
+                      {t("requiredFieldMissing")}
+                    </span>
+                  ) : null}
                 </label>
 
                 <label className="service-field">
@@ -4468,11 +4773,27 @@ export default function ServiceClaimFlow() {
                 </span>
                 <input
                   type="text"
+                  data-claim-required-field
                   value={formValues.clientAddressLine1}
                   onChange={(event) => handleFieldChange("clientAddressLine1", event.target.value)}
                   placeholder={copy.clientAddressLine1Placeholder}
+                  aria-invalid={shouldShowClaimRequiredError("clientAddressLine1")}
+                  aria-describedby={
+                    shouldShowClaimRequiredError("clientAddressLine1")
+                      ? getClaimRequiredErrorId("clientAddressLine1")
+                      : undefined
+                  }
                   required
                 />
+                {shouldShowClaimRequiredError("clientAddressLine1") ? (
+                  <span
+                    id={getClaimRequiredErrorId("clientAddressLine1")}
+                    className="service-field__error"
+                    role="alert"
+                  >
+                    {t("requiredFieldMissing")}
+                  </span>
+                ) : null}
               </label>
 
               <label className="service-field">
@@ -4668,7 +4989,10 @@ export default function ServiceClaimFlow() {
               ) : null}
               {selectedProblemAreasWithDetails.length ? (
                 <>
-                  {selectedProblemAreasWithDetails.map((area) => (
+                  {selectedProblemAreasWithDetails.map((area) => {
+                    const isProblemAreaAttachmentMissing =
+                      showProblemAreaAttachmentErrors && !area.attachments.length;
+                    return (
                     <div key={area.componentId} className="service-field service-field--problem-area-row">
                       <label className="service-field__problem-area-label">
                         <span className="service-field__problem-area-label-text">
@@ -4707,8 +5031,13 @@ export default function ServiceClaimFlow() {
                         />
                         <label
                           htmlFor={`problem-area-upload-${area.componentId}`}
-                          className="service-field__problem-area-upload-button"
+                          className={[
+                            "service-field__problem-area-upload-button",
+                            isProblemAreaAttachmentMissing ? "is-required-missing" : "",
+                          ].filter(Boolean).join(" ")}
                           title={copy.attachments}
+                          data-problem-area-upload-required={isProblemAreaAttachmentMissing ? "true" : undefined}
+                          aria-invalid={isProblemAreaAttachmentMissing ? "true" : undefined}
                         >
                           {t("uploadFile")}
                         </label>
@@ -4739,9 +5068,15 @@ export default function ServiceClaimFlow() {
                             inlineExpandToggle
                           />
                         ) : null}
+                        {isProblemAreaAttachmentMissing ? (
+                          <span className="service-field__problem-area-error" role="alert">
+                            {t("problemAreaAttachmentRequired")}
+                          </span>
+                        ) : null}
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                   <label className="service-field">
                     <span>
                       {t("problemDescriptionFieldLabel")}
@@ -4815,12 +5150,16 @@ export default function ServiceClaimFlow() {
                             }
                           }}
                           placeholder={copy.serialPlaceholder}
+                          disabled={serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount}
                         />
                         <button
                           type="button"
                           className="service-serial-field__add"
                           onClick={() => addSerialNumberEntry()}
-                          disabled={!serialNumberDraft.trim()}
+                          disabled={
+                            !serialNumberDraft.trim()
+                            || serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount
+                          }
                         >
                           {t("serialNumberAdd")}
                         </button>
@@ -4888,7 +5227,16 @@ export default function ServiceClaimFlow() {
                       accept={SERIAL_NUMBER_IMAGE_ACCEPT}
                       multiple
                       onChange={handleSerialNumberImageSelected}
+                      disabled={hasReachedRequiredSerialEvidenceCount}
                     />
+                    {hasReachedRequiredSerialEvidenceCount ? (
+                      <p className="service-form__hint service-form__hint--serial-limit" role="status">
+                        {t("serialNumberEvidenceLimitReached").replace(
+                          "{count}",
+                          String(requiredSelectedSerialNumberCount),
+                        )}
+                      </p>
+                    ) : null}
                     {serialNumberImages.length ? (
                       <ServiceAttachmentChips
                         files={serialNumberImages}
@@ -4929,6 +5277,29 @@ export default function ServiceClaimFlow() {
         </section>
       ) : null}
     </main>
+      {isComplaintMode && shouldShowClaimRequiredAlert ? (
+        <div className="service-required-alert" role="alert" aria-live="assertive">
+          <div className="service-required-alert__content">
+            <strong>{t("requiredFieldsAlertTitle")}</strong>
+            <span>{t("requiredFieldsAlertText")}</span>
+          </div>
+          <button
+            type="button"
+            className="service-required-alert__action"
+            onClick={focusFirstMissingClaimRequiredField}
+          >
+            {t("requiredFieldsAlertAction")}
+          </button>
+          <button
+            type="button"
+            className="service-required-alert__close"
+            aria-label={t("contractNumberHelpClose") || "Close"}
+            onClick={() => setIsClaimRequiredAlertDismissed(true)}
+          >
+            &times;
+          </button>
+        </div>
+      ) : null}
       {isComplaintMode ? (
         <div className={`service-claim-agent${isClaimAssistantOpen ? " is-open" : ""}`}>
           {isClaimAssistantOpen ? (
