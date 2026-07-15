@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getContractOrderState, getKitchenContractForAccess } from "../../../lib/kitchen-contracts";
 import { getOrderKindForContractNumber, ORDER_KIND_TEST } from "../../../lib/order-kind";
+import { prisma } from "../../../lib/prisma";
 import {
   PUBLIC_VISIT_EVENT_TYPES,
   safelyTrackPublicVisitEvent,
@@ -27,8 +28,8 @@ export async function POST(request) {
     });
 
     const contract = await getKitchenContractForAccess(submittedContractNumber);
-    const contractOrderState = await getContractOrderState(contract.id);
     const orderKind = getOrderKindForContractNumber(contract.contractNumber);
+    const contractOrderState = await getContractOrderState(contract.id, prisma, orderKind);
     await safelyTrackPublicVisitEvent({
       request,
       eventType: orderKind === ORDER_KIND_TEST
