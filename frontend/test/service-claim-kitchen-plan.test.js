@@ -574,6 +574,52 @@ test("60 cm dishwasher bundles split into price-list dishwasher and furniture-fr
   );
 });
 
+test("optional dishwasher claim parts stay hidden until the dishwasher is ordered", () => {
+  const defaultCabinet = component("CAB-BASE-DEFAULT", "base-module-1", "Default base", {
+    isLocked: true,
+  });
+  const dishwasherBundle = component(
+    "DISH-AB105806-600",
+    "base-module-3",
+    "Fully integrated dishwasher incl. furniture front",
+    {
+      articleNumber: "A-EGSPV597210 + TGV60",
+    },
+  );
+  const claimParts = [
+    {
+      partKey: "dishwasher",
+      articleCode: "A-EGSPV594400",
+      name: "Fully Integrated Dishwasher",
+      nameDe: "Vollintegrierter Geschirrspüler",
+      sourceKitchenItemCode: dishwasherBundle.code,
+      sourceComponentKey: dishwasherBundle.componentKey,
+    },
+    {
+      partKey: "furniture-front",
+      articleCode: "TGV60",
+      name: "Furniture Front (Dishwasher)",
+      nameDe: "Möbelfront (Geschirrspüler)",
+      sourceKitchenItemCode: dishwasherBundle.code,
+      sourceComponentKey: dishwasherBundle.componentKey,
+    },
+  ];
+
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [defaultCabinet, dishwasherBundle] },
+    kitchenConfig: { components: [defaultCabinet, dishwasherBundle] },
+    kitchenSlug: "ab-105805",
+    confirmedItems: [],
+    claimParts,
+  });
+
+  assert.deepEqual(result.selectableComponentIds, ["component-base-module-1"]);
+  assert.ok(!result.selectableComponentIds.includes("component-claim-dishwasher"));
+  assert.ok(!result.selectableComponentIds.includes("component-claim-furniture-front"));
+  assert.ok(!result.selectableComponents.some((entry) => entry.code === "A-EGSPV594400"));
+  assert.ok(!result.selectableComponents.some((entry) => entry.code === "TGV60"));
+});
+
 test("dishwasher owns the plan hotspot while the furniture front stays manual", () => {
   const sourceHotspot = {
     componentId: "component-base-module-3",

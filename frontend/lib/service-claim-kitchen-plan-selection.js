@@ -528,6 +528,26 @@ export function buildServiceClaimSelectableComponents({
         nameDe: resolveServiceClaimComponentNameDe(componentIdForItem(item), item),
       },
     }));
+  const sourceItemCodes = new Set(
+    sourceItems.map(({ item }) => String(item.code || "").trim()).filter(Boolean),
+  );
+  const sourceComponentKeys = new Set(
+    sourceItems.map(({ item }) => String(item.componentKey || "").trim()).filter(Boolean),
+  );
+
+  function isClaimPartSourceSelectable(part = {}) {
+    const sourceKitchenItemCode = String(part?.sourceKitchenItemCode || "").trim();
+    const sourceComponentKey = String(part?.sourceComponentKey || "").trim();
+    if (sourceKitchenItemCode) {
+      return sourceItemCodes.has(sourceKitchenItemCode);
+    }
+    if (sourceComponentKey && sourceComponentKeys.has(sourceComponentKey)) {
+      return true;
+    }
+    return !sourceKitchenItemCode && !sourceComponentKey;
+  }
+
+  const eligibleClaimParts = (claimParts || []).filter(isClaimPartSourceSelectable);
 
   const blendeQuantityOverrides = CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
@@ -617,12 +637,12 @@ export function buildServiceClaimSelectableComponents({
   }
 
   const separatedSourceComponentIds = new Set(
-    (claimParts || [])
+    eligibleClaimParts
       .filter((part) => !ADDITIVE_SERVICE_CLAIM_PART_KEYS.has(String(part?.partKey || "").trim()))
       .map((part) => componentIdForItem({ componentKey: part?.sourceComponentKey }))
       .filter(Boolean),
   );
-  const separatedClaimParts = (claimParts || [])
+  const separatedClaimParts = eligibleClaimParts
     .map((part) => {
       const partKey = String(part?.partKey || "").trim();
       const componentId = SERVICE_CLAIM_PART_COMPONENT_IDS[partKey];
