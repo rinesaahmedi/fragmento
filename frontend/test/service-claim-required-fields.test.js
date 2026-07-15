@@ -60,7 +60,17 @@ test("claim form requires an upload for every selected problem component", () =>
   assert.match(flowSource, /data-problem-area-upload-required/);
   assert.match(flowSource, /setShowProblemAreaAttachmentErrors\(true\)/);
   assert.match(flowSource, /firstMissingUpload\?\.scrollIntoView/);
-  assert.match(flowSource, /formData\.append\(`problemAreaAttachment:\$\{area\.componentId\}`/);
+  assert.match(flowSource, /formData\.append\(`problemAreaAttachment:\$\{resolvedArea\.componentId\}`/);
   assert.match(cssSource, /\.service-field__problem-area-upload-button\.is-required-missing/);
   assert.match(cssSource, /\.service-field__problem-area-error/);
+});
+
+test("preferred contact time picker closes after a time is selected", () => {
+  const flowSource = fs.readFileSync(flowPath, "utf8");
+
+  assert.match(
+    flowSource,
+    /function handlePreferredContactTimeSelect[\s\S]*handleFieldChange\(field, nextTime\);\s*setOpenPreferredContactTimeField\(null\);/,
+  );
+  assert.match(flowSource, /handlePreferredContactTimeToggle/);
 });
