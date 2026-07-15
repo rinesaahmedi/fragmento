@@ -2023,8 +2023,11 @@ test("service claim picker preserves sink and cooktop cutouts over a selected wo
     source,
     /hotspot\.claimPartKey === "sink"\s*\|\|\s*hotspot\.claimPartKey === "cooktop"/,
   );
+  assert.match(source, /hotspot\.componentKey === "worktop"/);
   assert.match(source, /hasSelectedWorktop\s*&&\s*visibleApplianceImageHotspots\.length/);
   assert.match(source, /className=\{styles\.planApplianceCutouts\}/);
+  assert.match(source, /className=\{styles\.planApplianceCutoutBacking\}[\s\S]*clipPath=\{`url\(#\$\{applianceClipPathId\}\)`\}/);
+  assert.match(styles, /\.planApplianceCutoutBacking[\s\S]*fill:\s*#fff;/);
   assert.match(
     styles,
     /\.planApplianceCutouts[\s\S]*z-index:\s*999;[\s\S]*pointer-events:\s*none;/,

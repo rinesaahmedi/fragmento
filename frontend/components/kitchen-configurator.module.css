@@ -556,6 +556,10 @@
   pointer-events: none;
 }
 
+.planApplianceCutoutBacking {
+  fill: #fff;
+}
+
 .planSideLabelLayer {
   position: absolute;
   inset: 0;

@@ -306,8 +306,10 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
   );
   const hasSelectedWorktop = imageHotspots.some(
     (hotspot) => (
-      hotspot.claimPartKey === "worktop-left"
+      hotspot.componentKey === "worktop"
+      || hotspot.claimPartKey === "worktop-left"
       || hotspot.claimPartKey === "worktop-right"
+      || hotspot.claimPartKey === "worktop-end-panel"
     ) && selectedIds.has(hotspot.componentId),
   );
   const sinkComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.sink;
@@ -497,6 +499,14 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                         })}
                       </clipPath>
                     </defs>
+                    <rect
+                      className={styles.planApplianceCutoutBacking}
+                      x={0}
+                      y={0}
+                      width={100}
+                      height={100}
+                      clipPath={`url(#${applianceClipPathId})`}
+                    />
                     <image
                       href={imageViewHref}
                       x={-(planDisplayCrop.left / planDisplayCrop.width) * 100}
