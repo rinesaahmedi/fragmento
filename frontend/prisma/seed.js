@@ -1116,9 +1116,23 @@ const AB_105747_ITEMS = [
   ...defaultServices(),
 ];
 
-const AB_105750_ITEMS = AB_105747_ITEMS;
-const AB_105753_ITEMS = AB_105747_ITEMS;
-const AB_105756_ITEMS = AB_105747_ITEMS;
+// These three variants need two corner filler panels on the US30 return cabinet.
+// Keep this separate from AB 105747, which retains its own single UPK20 filler.
+const AB_105750_105753_105756_ITEMS = AB_105747_ITEMS.map((item) => (
+  item.code === "CAB-BASE-AB105747-US30"
+    ? {
+        ...item,
+        price: articlePriceWithBlende("US30", "UPEF65", 2),
+        infoText: "US30 base storage cabinet with two UPEF65 corner filler panels",
+        blendeCode: "UPEF65 x2",
+        blendeLabel: "UPEF65 Corner filler panel x 2",
+        blendePrice: blendePrice("UPEF65", 2),
+      }
+    : item
+));
+const AB_105750_ITEMS = AB_105750_105753_105756_ITEMS;
+const AB_105753_ITEMS = AB_105750_105753_105756_ITEMS;
+const AB_105756_ITEMS = AB_105750_105753_105756_ITEMS;
 
 // AB 105816 matches AB 105820 except callout 11 is an H6002 with left hinge.
 const AB_105816_ITEMS = AB_105820_ITEMS.map((item) =>

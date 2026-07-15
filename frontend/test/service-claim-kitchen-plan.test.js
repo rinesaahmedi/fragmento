@@ -2171,6 +2171,49 @@ test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
   assert.doesNotMatch(seed, /reconcileExisting:\s*true/);
 });
 
+test("AB 105750, AB 105753 and AB 105756 retain two UPEF65 corner panels", () => {
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260715090000_set_double_upef65_for_l_kitchen_105750_105753_105756", "migration.sql"),
+    "utf8",
+  );
+
+  assert.match(seed, /AB_105750_105753_105756_ITEMS[\s\S]*blendeCode:\s*"UPEF65 x2"/);
+  assert.match(seed, /blendePrice:\s*blendePrice\("UPEF65", 2\)/);
+  assert.match(migration, /'ab-105750', 'ab-105753', 'ab-105756'/);
+  assert.match(migration, /"catalogBlendeQuantity"\s*=\s*2/);
+  assert.match(migration, /upper\(COALESCE\(item\."blendeCode", ''\)\) LIKE 'UPK20%'/i);
+});
+
+test("two matching UPEF65 panels remain one ASC article with quantity two", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-AB105747-US30", "drawer-module", "Lower cabinet", {
+        isLocked: true,
+        blendeCode: "UPEF65 x2",
+        blendeLabel: "Eckpassblende Unterschrank x 2",
+        catalogBlendeQuantity: 2,
+        catalogBlende: {
+          code: "UPEF65",
+          name: "Corner filler panel for Lower cabinet",
+          nameDe: "Eckpassblende Unterschrank",
+        },
+      }),
+    ],
+  };
+
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105750",
+  });
+  const blenden = result.selectableComponents.filter((entry) => entry.claimPartKey === "blende");
+
+  assert.equal(blenden.length, 1);
+  assert.equal(blenden[0].articleCode, "UPEF65");
+  assert.equal(blenden[0].blendeQuantity, 2);
+});
+
 test("service claims prefer the saved corner Blende over a stale catalog link", () => {
   const kitchen = {
     items: [
