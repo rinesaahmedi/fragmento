@@ -39,6 +39,59 @@ function formatBoolean(value) {
 
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
 
+function uniqueValues(values) {
+  return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))];
+}
+
+function getClaimProductGroupKey(claimProduct) {
+  const productCode = String(claimProduct.articleCode || claimProduct.partKey || "").trim().toLowerCase();
+  const partKey = String(claimProduct.partKey || "").trim().toLowerCase();
+  const name = String(claimProduct.name || "").trim().toLowerCase();
+  const nameDe = String(claimProduct.nameDe || "").trim().toLowerCase();
+  return [productCode, partKey, name, nameDe].join("|");
+}
+
+function groupClaimProducts(claimProducts) {
+  const groups = new Map();
+
+  for (const claimProduct of claimProducts) {
+    const key = getClaimProductGroupKey(claimProduct);
+    const group = groups.get(key) || {
+      ...claimProduct,
+      ids: [],
+      linkedKitchens: [],
+      sourceKitchenItemCodes: [],
+      sourceComponentKeys: [],
+      sourceKitchenItemNames: [],
+    };
+
+    group.ids.push(claimProduct.id);
+    group.linkedKitchens.push(
+      [claimProduct.kitchenCode, claimProduct.kitchenSlug].filter(Boolean).join(" / ")
+        || claimProduct.kitchenName,
+    );
+    group.sourceKitchenItemCodes.push(claimProduct.sourceKitchenItemCode);
+    group.sourceComponentKeys.push(claimProduct.sourceComponentKey);
+    group.sourceKitchenItemNames.push(claimProduct.sourceKitchenItemName);
+    group.isActive = group.isActive || claimProduct.isActive;
+    group.sortOrder = Math.min(Number(group.sortOrder || 0), Number(claimProduct.sortOrder || 0));
+    groups.set(key, group);
+  }
+
+  return [...groups.values()].map((group) => ({
+    ...group,
+    linkedKitchens: uniqueValues(group.linkedKitchens),
+    sourceKitchenItemCodes: uniqueValues(group.sourceKitchenItemCodes),
+    sourceComponentKeys: uniqueValues(group.sourceComponentKeys),
+    sourceKitchenItemNames: uniqueValues(group.sourceKitchenItemNames),
+  }));
+}
+
+function formatJoinedValues(values) {
+  const items = uniqueValues(values);
+  return items.length <= 2 ? items.join(", ") : `${items.slice(0, 2).join(", ")} + ${items.length - 2} more`;
+}
+
 function formatDimensionInputValue(value) {
   if (value === null || value === undefined || value === "") return "";
   const cm = Number(value) / 10;
@@ -136,6 +189,54 @@ function CatalogAddonForm({ action, item, submitLabel }) {
   );
 }
 
+function ClaimProductForm({ action, claimProduct, submitLabel }) {
+  return (
+    <form action={action} method="post" style={claimProductFormStyle}>
+      <input type="hidden" name="claimProductIds" value={(claimProduct?.ids || [claimProduct?.id]).filter(Boolean).join(",")} />
+      <div style={formGridStyle}>
+        <FormField label="Part key">
+          <input name="partKey" defaultValue={claimProduct?.partKey || ""} style={inputStyle} required />
+        </FormField>
+        <FormField label="Article code">
+          <input name="articleCode" defaultValue={claimProduct?.articleCode || ""} style={inputStyle} />
+        </FormField>
+        <FormField label="Name">
+          <input name="name" defaultValue={claimProduct?.name || ""} style={inputStyle} required />
+        </FormField>
+        <FormField label="German name">
+          <input name="nameDe" defaultValue={claimProduct?.nameDe || ""} style={inputStyle} />
+        </FormField>
+        <FormField label="Source item code">
+          <input
+            name="sourceKitchenItemCode"
+            defaultValue={claimProduct?.sourceKitchenItemCodes?.length === 1 ? claimProduct.sourceKitchenItemCodes[0] : (claimProduct?.sourceKitchenItemCode || "")}
+            style={inputStyle}
+          />
+        </FormField>
+        <FormField label="Source component">
+          <input
+            name="sourceComponentKey"
+            defaultValue={claimProduct?.sourceComponentKeys?.length === 1 ? claimProduct.sourceComponentKeys[0] : (claimProduct?.sourceComponentKey || "")}
+            style={inputStyle}
+          />
+        </FormField>
+        <FormField label="Sort order">
+          <input name="sortOrder" defaultValue={claimProduct?.sortOrder ?? 0} style={inputStyle} />
+        </FormField>
+        <FormField label="Active">
+          <AdminSelect name="isActive" defaultValue={claimProduct?.isActive === false ? "" : "true"} style={inputStyle}>
+            <option value="true">Yes</option>
+            <option value="">No</option>
+          </AdminSelect>
+        </FormField>
+      </div>
+      <div style={actionRowStyle}>
+        <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
+      </div>
+    </form>
+  );
+}
+
 function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems }) {
   const linkedCount = Number(linkedKitchenItems || 0);
   if (linkedCount > 0) {
@@ -183,7 +284,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const [articles, blenden, services] = await Promise.all([
+  const [articles, blenden, services, claimProducts] = await Promise.all([
     prisma.$queryRaw`
     SELECT
       ca."id",
@@ -234,7 +335,30 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
     GROUP BY cs."id"
     ORDER BY cs."code" ASC
     `,
+    prisma.$queryRaw`
+    SELECT
+      kcp."id",
+      kcp."kitchenId",
+      kcp."partKey",
+      kcp."name",
+      kcp."nameDe",
+      kcp."articleCode",
+      kcp."sourceKitchenItemCode",
+      kcp."sourceComponentKey",
+      kcp."isActive",
+      kcp."sortOrder",
+      k."name" AS "kitchenName",
+      k."slug" AS "kitchenSlug",
+      k."kitchenCode" AS "kitchenCode",
+      ki."name" AS "sourceKitchenItemName"
+    FROM "KitchenClaimPart" kcp
+    INNER JOIN "Kitchen" k ON k."id" = kcp."kitchenId"
+    LEFT JOIN "KitchenItem" ki ON ki."kitchenId" = kcp."kitchenId"
+      AND ki."code" = kcp."sourceKitchenItemCode"
+    ORDER BY k."name" ASC, kcp."sortOrder" ASC, kcp."partKey" ASC
+    `,
   ]);
+  const claimProductGroups = groupClaimProducts(claimProducts);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -433,6 +557,67 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
             </div>
           )}
         </AdminSection>
+
+        <AdminSection
+          title="Claim products"
+          actions={<ActionLink href="/api/admin/catalog/claim-products/export">Export claim products</ActionLink>}
+        >
+          {!claimProductGroups.length ? <p style={emptyStateStyle}>No claim products found.</p> : (
+            <div style={tableWrapStyle}>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Linked kitchens</th>
+                    <th style={thStyle}>Part key</th>
+                    <th style={thStyle}>Article code</th>
+                    <th style={thStyle}>Name</th>
+                    <th style={thStyle}>German name</th>
+                    <th style={thStyle}>Source item code</th>
+                    <th style={thStyle}>Source component</th>
+                    <th style={thStyle}>Sort order</th>
+                    <th style={thStyle}>Active</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {claimProductGroups.map((claimProduct) => (
+                    <Fragment key={claimProduct.id}>
+                      <tr>
+                        <td style={tdStyle} title={claimProduct.linkedKitchens.join(", ")}>
+                          {claimProduct.linkedKitchens.length} kitchen{claimProduct.linkedKitchens.length === 1 ? "" : "s"}
+                          {claimProduct.linkedKitchens.length ? `: ${formatJoinedValues(claimProduct.linkedKitchens)}` : ""}
+                        </td>
+                        <td style={tdStyle}><span style={codePillStyle}>{claimProduct.partKey}</span></td>
+                        <td style={tdStyle}>{claimProduct.articleCode || ""}</td>
+                        <td style={tdStyle}>{claimProduct.name}</td>
+                        <td style={tdStyle}>{claimProduct.nameDe || ""}</td>
+                        <td style={tdStyle} title={claimProduct.sourceKitchenItemNames.join(", ")}>
+                          {formatJoinedValues(claimProduct.sourceKitchenItemCodes)}
+                        </td>
+                        <td style={tdStyle}>{formatJoinedValues(claimProduct.sourceComponentKeys)}</td>
+                        <td style={tdStyle}>{claimProduct.sortOrder}</td>
+                        <td style={tdStyle}>{formatBoolean(claimProduct.isActive)}</td>
+                      </tr>
+                      <tr>
+                        <td colSpan={9} style={editRowCellStyle}>
+                          <div style={editActionRowStyle}>
+                            <details style={editDetailsStyle}>
+                              <summary style={editSummaryStyle}>Edit</summary>
+                              <ClaimProductForm
+                                action={`/api/admin/catalog/claim-products/${claimProduct.id}`}
+                                claimProduct={claimProduct}
+                                submitLabel="Save claim product"
+                              />
+                            </details>
+                          </div>
+                        </td>
+                      </tr>
+                    </Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </AdminSection>
       </div>
     </AdminShell>
   );
@@ -456,6 +641,11 @@ const addonFormStyle = {
 };
 
 const articleFormStyle = {
+  ...addonFormStyle,
+  minWidth: 680,
+};
+
+const claimProductFormStyle = {
   ...addonFormStyle,
   minWidth: 680,
 };
