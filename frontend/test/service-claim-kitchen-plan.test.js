@@ -2023,11 +2023,11 @@ test("service claim picker preserves sink and cooktop cutouts over a selected wo
     source,
     /hotspot\.claimPartKey === "sink"\s*\|\|\s*hotspot\.claimPartKey === "cooktop"/,
   );
-  assert.match(source, /hasSelectedWorktop\s*&&\s*applianceImageHotspots\.length/);
+  assert.match(source, /hasSelectedWorktop\s*&&\s*visibleApplianceImageHotspots\.length/);
   assert.match(source, /className=\{styles\.planApplianceCutouts\}/);
   assert.match(
     styles,
-    /\.planApplianceCutouts[\s\S]*z-index:\s*8;[\s\S]*pointer-events:\s*none;/,
+    /\.planApplianceCutouts[\s\S]*z-index:\s*999;[\s\S]*pointer-events:\s*none;/,
   );
 });
 
@@ -2169,6 +2169,24 @@ test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
   assert.match(migration, /"blendeCode"\s*=\s*'UPEF65'/);
   assert.match(migration, /"catalogBlendeQuantity"\s*=\s*1/);
   assert.doesNotMatch(seed, /reconcileExisting:\s*true/);
+});
+
+test("AB 105743 uses its measured vector plan and exact Excel selection mapping", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
+  const claimSource = fs.readFileSync(path.join(repoRoot, "lib", "service-claim-kitchen-hotspots.js"), "utf8");
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  assert.match(stageSource, /"ab-105743":\s*"\/plans\/AB%20105743\.svg"/);
+  assert.match(stageSource, /"ab-105743":\s*\[[\s\S]*componentKey:\s*"base-module-1"[\s\S]*componentKey:\s*"base-module-2"[\s\S]*componentKey:\s*"sink-base"[\s\S]*componentKey:\s*"base-module-3"[\s\S]*componentKey:\s*"oven-module"[\s\S]*componentKey:\s*"drawer-module"/);
+  assert.match(stageSource, /componentKey:\s*"wall-cabinet-3"[\s\S]*\[70\.56057,\s*21\.788235\][\s\S]*\[75\.648456,\s*31\.428571\]/);
+  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[59\.900238,\s*52\.020168\][\s\S]*\[66\.88361,\s*56\.598319\][\s\S]*\[50\.935867,\s*53\.310924\]/);
+  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[20\.294537,\s*57\.747899\][\s\S]*\[50\.935867,\s*54\.420168\][\s\S]*\[20\.294537,\s*58\.857143\]/);
+  assert.match(seedSource, /code:\s*"DISH-AB105743-600"[\s\S]*articlePriceWithBlende\("A-EGSPV597210 \+ TGV60",\s*"UPEF65",\s*1\)/);
+  assert.match(seedSource, /code:\s*"CAB-BASE-AB105743-US30-R"[\s\S]*articlePriceWithBlende\("US30",\s*"UPK20",\s*1\)/);
+  assert.match(seedSource, /slug:\s*"ab-105743"[\s\S]*items:\s*AB_105743_ITEMS/);
+  assert.match(selectionSource, /"ab-105743":\s*\[\["component-wall-cabinet-2",\s*"component-extractor-hood"\]\]/);
+  assert.match(claimSource, /"ab-105743":\s*\{[\s\S]*"base-module-3"[\s\S]*bands:\s*\[\[50\.194774,\s*50\.935867\],\s*\[50\.935867,\s*51\.562945\]\]/);
 });
 
 test("AB 105750, AB 105753 and AB 105756 retain two UPEF65 corner panels", () => {
@@ -2355,6 +2373,7 @@ test("AB 105825 claim sink follows the calibrated bowl polygon", () => {
 
 test("all L-shaped claim plans separate the complete faucet from the sink bowl", () => {
   const lShapedSlugs = [
+    "ab-105743",
     "ab-104968",
     "ab-105734",
     "ab-105737",

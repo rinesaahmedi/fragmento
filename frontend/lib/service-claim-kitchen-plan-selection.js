@@ -36,6 +36,9 @@ const CLAIM_BLENDE_LABELS_BY_CODE = {
 // not split the cabinet into an additional clickable surface.
 const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
 const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
+  // AB 105743's exposed left end face is part of the US30 cabinet, not an
+  // independently selectable filler-panel claim surface.
+  "ab-105743": new Set(["base-module-1"]),
   // The exposed left side and front are two perspective faces of one US50
   // cabinet in this shared plan, not an independently claimable Blende.
   "ab-104968": new Set(["base-module-1"]),
