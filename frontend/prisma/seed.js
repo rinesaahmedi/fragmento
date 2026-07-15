@@ -31,6 +31,7 @@ const DEFAULT_WORKTOP_CATALOG_NAME_EN = "Worktop";
 const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105743",
   "ab-104968", "ab-105734", "ab-105737", "ab-105740",
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
   "ab-105822", "ab-105825", "ab-105828", "ab-105831",
@@ -38,6 +39,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105747", "ab-105750", "ab-105753", "ab-105756",
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105743",
   "ab-104968", "ab-105734", "ab-105737", "ab-105740",
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
   "ab-105806", "ab-105807", "ab-105808",
@@ -285,6 +287,7 @@ function defaultSinkWorktop(overrides = {}) {
 function normalizeBlendeCode(value) {
   const code = String(value || "").trim().toUpperCase();
   if (code.startsWith("UPK20")) return "UPK20";
+  if (code.startsWith("UPEF65")) return "UPEF65";
   if (code.startsWith("HPK2002")) return "HPK2002";
   return "";
 }
@@ -888,7 +891,7 @@ const AB_104968_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   defaultSinkBase({ sortOrder: 30, code: "SINKBASE-AB104968-DEFAULT", widthMm: 600 }),
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104968-US50-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPK20", 1), widthMm: 500, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US50 base storage cabinet, hinge right", articleNumber: "US50", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104968-US40-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US40", "UPK20", 2), widthMm: 400, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "US40 base storage cabinet, hinge left", articleNumber: "US40", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104968-US40-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US40", "UPEF65", 1), widthMm: 400, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "US40 base storage cabinet, hinge left", articleNumber: "US40", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB104968-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104968-US60-L", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#00ffbf", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "REF-AB104968-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 80, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
@@ -1004,7 +1007,7 @@ const AB_105809_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-400-R", name: "Base cabinet with drawer", price: articlePrice("US40"), widthMm: 400, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 20, infoText: "Base cabinet, hinge right", articleNumber: "US40" },
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 30, infoText: "Built-in oven + induction hob", isLocked: true },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-500-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPK20", 2), widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "US50", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-500-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPEF65", 1), widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "US50", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   defaultSinkBase({ componentKey: "corner-base", sortOrder: 60, widthMm: 300, depthMm: 600, iconKey: "drawer_base_two" }),
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-US30-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "sink-base", sortOrder: 65, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
@@ -1029,7 +1032,7 @@ const AB_105805_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105809-400-R", name: "Base cabinet with drawer", price: articlePrice("US40"), widthMm: 400, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 20, infoText: "Base cabinet, hinge right", articleNumber: "US40" },
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 30, infoText: "Built-in oven + induction hob", isLocked: true },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105805-500-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPK20", 2), widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "US50", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105805-500-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPEF65", 1), widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 40, infoText: "Base cabinet, hinge left", articleNumber: "US50", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105806-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   defaultSinkBase({ componentKey: "corner-base", sortOrder: 60, widthMm: 300 }),
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105805-US30-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "sink-base", sortOrder: 65, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
@@ -1053,7 +1056,7 @@ const AB_105834_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 10, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105834-500-R", name: "Base cabinet with drawer", price: articlePrice("US50"), widthMm: 500, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 20, infoText: "Base cabinet, hinge right", articleNumber: "US50" },
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 30, infoText: "Built-in oven + induction hob", isLocked: true },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105834-400-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US40", "UPK20", 2), widthMm: 400, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "Base cabinet, hinge left", articleNumber: "US40", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105834-400-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US40", "UPEF65", 1), widthMm: 400, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "Base cabinet, hinge left", articleNumber: "US40", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105834-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePriceWithBlende("A-EGSPV597210 + TGV60", "UPK20", 1), widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 75, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105834-500-R", name: "Wall Cabinet", price: articlePrice("H5002"), widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "Wall cabinet, hinge right", articleNumber: "H5002" },
@@ -1074,7 +1077,7 @@ const AB_105837_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "SINKBASE-B-600", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 600, heightMm: null, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "base-module-4", sortOrder: 30, isLocked: true, infoText: "Default sink base cabinet" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105837-US60-R", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105837-500-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPK20", 2), widthMm: 500, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "Base cabinet, hinge right", articleNumber: "US50", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105837-500-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US50", "UPEF65", 1), widthMm: 500, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "Base cabinet, hinge right", articleNumber: "US50", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105837-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 70, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105837-600", name: "Upper Cabinet with Extractor Hood 60 cm", price: bundlePrice("FH664621E + FWK124 + HD6002"), iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB105837-FH664621E", name: "FH664621E Extractor Hood", price: articlePrice("FH 664 621 E"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 E", isActive: false },
@@ -1103,7 +1106,7 @@ const AB_105747_ITEMS = [
   defaultSinkBase({ componentKey: "sink-base", sortOrder: 30, widthMm: 600, depthMm: 600 }),
   { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105837-US60-R", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-US60-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPK20", 2), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-US60-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPEF65", 1), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105747-450", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV587915 + TGV45"), widthMm: 450, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 70, infoText: "Fully integrated dishwasher incl. furniture front, 45 cm", articleNumber: "A-EGSPV587915 + TGV45" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105747-US30", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 75, infoText: "US30 base storage cabinet with UPK20 filler panel", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105747-H6002-R", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002" },
@@ -1115,9 +1118,23 @@ const AB_105747_ITEMS = [
   ...defaultServices(),
 ];
 
-const AB_105750_ITEMS = AB_105747_ITEMS;
-const AB_105753_ITEMS = AB_105747_ITEMS;
-const AB_105756_ITEMS = AB_105747_ITEMS;
+// These three variants need two corner filler panels on the US30 return cabinet.
+// Keep this separate from AB 105747, which retains its own single UPK20 filler.
+const AB_105750_105753_105756_ITEMS = AB_105747_ITEMS.map((item) => (
+  item.code === "CAB-BASE-AB105747-US30"
+    ? {
+        ...item,
+        price: articlePriceWithBlende("US30", "UPEF65", 2),
+        infoText: "US30 base storage cabinet with two UPEF65 corner filler panels",
+        blendeCode: "UPEF65 x2",
+        blendeLabel: "UPEF65 Corner filler panel x 2",
+        blendePrice: blendePrice("UPEF65", 2),
+      }
+    : item
+));
+const AB_105750_ITEMS = AB_105750_105753_105756_ITEMS;
+const AB_105753_ITEMS = AB_105750_105753_105756_ITEMS;
+const AB_105756_ITEMS = AB_105750_105753_105756_ITEMS;
 
 // AB 105816 matches AB 105820 except callout 11 is an H6002 with left hinge.
 const AB_105816_ITEMS = AB_105820_ITEMS.map((item) =>
@@ -1306,6 +1323,27 @@ const AB_105744_ITEMS = [
   ...defaultServices(),
 ];
 
+// AB 105743: PDF-measured L-shaped plan. The left return contains US30 +
+// UPK20, US40, the locked sink base, and the dishwasher + UPEF65 corner
+// filler. The right return contains the locked oven and US60 beside the fridge.
+const AB_105743_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, heightMm: null, depthMm: null, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  defaultSinkBase({ sortOrder: 30, widthMm: 600 }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105743-US30-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US30 base storage cabinet, hinge right", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105743-US40-R", name: "Base cabinet with drawer", price: articlePrice("US40"), widthMm: 400, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 50, infoText: "US40 base storage cabinet, hinge right", articleNumber: "US40" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105743-600", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: articlePriceWithBlende("A-EGSPV597210 + TGV60", "UPEF65", 1), widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher with UPEF65 corner filler panel", articleNumber: "A-EGSPV597210 + TGV60", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105743-US60", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#00ffbf", componentKey: "drawer-module", sortOrder: 70, infoText: "US60 base storage cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105743-KGCN388140E", name: "Freestanding refrigerator", nameDe: "Standkühlschrank", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 80, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105743-H6002-R", name: "Wall Cabinet", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105743-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: bundlePrice("FH664621E + FWK124 + HD6002"), iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105743-FH664621E", name: "FH664621E Extractor Hood", price: articlePrice("FH 664 621 E"), widthMm: 599, heightMm: null, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 E", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105743-H6002-L", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002, hinge left, 2 adjustable shelves", articleNumber: "H6002" },
+  defaultSinkWorktop({ sortOrder: 120 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 const AB_105831_ITEMS = [
 
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, heightMm: null, depthMm: null, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -1313,7 +1351,7 @@ const AB_105831_ITEMS = [
   defaultSinkBase({ sortOrder: 30, widthMm: 600 }),
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-US30-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US30 base storage cabinet, hinge right", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105831-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-US60-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPK20", 2), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-US60-L", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPEF65", 1), widthMm: 600, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-500-L", name: "Base cabinet with drawer", price: articlePrice("US50"), widthMm: 500, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "Base cabinet, hinge left", articleNumber: "US50" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105831-US30-L", name: "Base cabinet with drawer", price: articlePrice("US30"), widthMm: 300, heightMm: null, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-4", sortOrder: 80, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105831-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 90, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
@@ -1333,7 +1371,7 @@ const AB_105825_ITEMS = [
   defaultSinkBase({ sortOrder: 30, widthMm: 600 }),
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105825-US30-R", name: "Base cabinet with drawer", price: articlePrice("US30"), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US30 base storage cabinet, hinge right", articleNumber: "US30" },
   { itemType: ItemType.COMPONENT, code: "DISH-AB105825-600", name: "Fully integrated dishwasher", nameDe: "Vollintegrierter Geschirrspüler", price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: null, depthMm: null, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105825-US60-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPK20", 2), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPK20 x2", blendeLabel: "UPK20 20 cm x 2", blendePrice: blendePrice("UPK20", 2) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105825-US60-R", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPEF65", 1), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base storage cabinet, hinge right", articleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105825-US60-L", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "US60 base storage cabinet, hinge left", articleNumber: "US60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105825-US30-L", name: "Base cabinet with drawer", price: articlePrice("US30"), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-base", sortOrder: 80, infoText: "US30 base storage cabinet, hinge left", articleNumber: "US30" },
   { itemType: ItemType.COMPONENT, code: "REF-AB105825-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 90, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
@@ -1457,12 +1495,18 @@ const DEFAULT_KITCHENS = [
     items: AB_105843_ITEMS,
   },
   {
+    slug: "ab-105743",
+    kitchenCode: "105 743",
+    name: "AB 105743 Kitchen",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105743.svg",
+    items: AB_105743_ITEMS,
+  },
+  {
     slug: "ab-105747",
     kitchenCode: "105 747",
     name: "AB 105747 Kitchen",
     description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105747.svg",
     items: AB_105747_ITEMS,
-    reconcileExisting: true,
   },
   {
     slug: "ab-105750",
@@ -1561,7 +1605,6 @@ const DEFAULT_KITCHENS = [
     name: "AB 105757 Kitchen",
     description: "Straight kitchen configuration based on frontend/public/jpg/AB 105757_page-0001.jpg",
     items: AB_105757_ITEMS,
-    reconcileExisting: true,
   },
   {
     slug: "ab-105746",

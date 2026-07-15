@@ -299,7 +299,8 @@ test("AB 105805 perspective variants expose the sink-base Blende separately", ()
       (entry) => entry.sourceComponentKey === "sink-base" && entry.claimPartKey === "blende",
     );
     assert.equal(sinkBlende.articleCode, "UPK20");
-    assert.equal(sinkBlende.nameDe, "UPK20 Passblende");
+    assert.equal(sinkBlende.name, "Filler Panel up to 20 cm");
+    assert.equal(sinkBlende.nameDe, "Passblende bis 20 cm");
     assert.equal(sinkBlende.isCompanionOption, true);
     assert.ok(result.selectableComponentIds.includes("component-base-module-2"));
     assert.ok(result.selectableComponentIds.includes("component-claim-blende-base-module-2"));
@@ -2065,11 +2066,14 @@ test("service claim picker preserves sink and cooktop cutouts over a selected wo
     source,
     /hotspot\.claimPartKey === "sink"\s*\|\|\s*hotspot\.claimPartKey === "cooktop"/,
   );
-  assert.match(source, /hasSelectedWorktop\s*&&\s*applianceImageHotspots\.length/);
+  assert.match(source, /hotspot\.componentKey === "worktop"/);
+  assert.match(source, /hasSelectedWorktop\s*&&\s*visibleApplianceImageHotspots\.length/);
   assert.match(source, /className=\{styles\.planApplianceCutouts\}/);
+  assert.match(source, /className=\{styles\.planApplianceCutoutBacking\}[\s\S]*clipPath=\{`url\(#\$\{applianceClipPathId\}\)`\}/);
+  assert.match(styles, /\.planApplianceCutoutBacking[\s\S]*fill:\s*#fff;/);
   assert.match(
     styles,
-    /\.planApplianceCutouts[\s\S]*z-index:\s*8;[\s\S]*pointer-events:\s*none;/,
+    /\.planApplianceCutouts[\s\S]*z-index:\s*999;[\s\S]*pointer-events:\s*none;/,
   );
 });
 
@@ -2165,6 +2169,167 @@ test("worktop end-panel migration adds PLR60-3 only to the claims table", () => 
   assert.doesNotMatch(migration, /ALTER TABLE\s+"KitchenItem"/i);
 });
 
+test("UPK20 filler panels retain their shared catalog identity in service claims", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-L-600", "base-module-1", "Base cabinet", {
+        isLocked: true,
+        blendeCode: "UPK20",
+        blendeLabel: "UPK20 20 cm",
+      }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105805",
+  });
+
+  const fillerPanel = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+  assert.deepEqual(
+    {
+      code: fillerPanel?.code,
+      articleCode: fillerPanel?.articleCode,
+      name: fillerPanel?.name,
+      nameDe: fillerPanel?.nameDe,
+    },
+    {
+      code: "UPK20",
+      articleCode: "UPK20",
+      name: "Filler Panel up to 20 cm",
+      nameDe: "Passblende bis 20 cm",
+    },
+  );
+});
+
+test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260714160000_replace_l_upk20_double_blenden_with_upef65", "migration.sql"),
+    "utf8",
+  );
+
+  assert.doesNotMatch(seed, /blendeCode:\s*"UPK20 x2"/i);
+  assert.match(seed, /CAB-BASE-AB105805-500-L[\s\S]*blendeCode:\s*"UPEF65"/);
+  assert.match(seed, /CAB-BASE-AB105825-US60-R[\s\S]*blendeCode:\s*"UPEF65"/);
+  assert.match(migration, /"blendeCode"\s*=\s*'UPEF65'/);
+  assert.match(migration, /"catalogBlendeQuantity"\s*=\s*1/);
+  assert.doesNotMatch(seed, /reconcileExisting:\s*true/);
+});
+
+test("AB 105743 uses its measured vector plan and exact Excel selection mapping", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
+  const claimSource = fs.readFileSync(path.join(repoRoot, "lib", "service-claim-kitchen-hotspots.js"), "utf8");
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  assert.match(stageSource, /"ab-105743":\s*"\/plans\/AB%20105743\.svg"/);
+  assert.match(stageSource, /"ab-105743":\s*\[[\s\S]*componentKey:\s*"base-module-1"[\s\S]*componentKey:\s*"base-module-2"[\s\S]*componentKey:\s*"sink-base"[\s\S]*componentKey:\s*"base-module-3"[\s\S]*componentKey:\s*"oven-module"[\s\S]*componentKey:\s*"drawer-module"/);
+  assert.match(stageSource, /componentKey:\s*"wall-cabinet-3"[\s\S]*\[70\.56057,\s*21\.788235\][\s\S]*\[75\.648456,\s*31\.428571\]/);
+  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[59\.900238,\s*52\.020168\][\s\S]*\[66\.88361,\s*56\.598319\][\s\S]*\[50\.935867,\s*53\.310924\]/);
+  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[20\.294537,\s*57\.747899\][\s\S]*\[50\.935867,\s*54\.420168\][\s\S]*\[20\.294537,\s*58\.857143\]/);
+  assert.match(seedSource, /code:\s*"DISH-AB105743-600"[\s\S]*articlePriceWithBlende\("A-EGSPV597210 \+ TGV60",\s*"UPEF65",\s*1\)/);
+  assert.match(seedSource, /code:\s*"CAB-BASE-AB105743-US30-R"[\s\S]*articlePriceWithBlende\("US30",\s*"UPK20",\s*1\)/);
+  assert.match(seedSource, /slug:\s*"ab-105743"[\s\S]*items:\s*AB_105743_ITEMS/);
+  assert.match(selectionSource, /"ab-105743":\s*\[\["component-wall-cabinet-2",\s*"component-extractor-hood"\]\]/);
+  assert.match(claimSource, /"ab-105743":\s*\{[\s\S]*"base-module-3"[\s\S]*bands:\s*\[\[50\.194774,\s*50\.935867\],\s*\[50\.935867,\s*51\.562945\]\]/);
+});
+
+test("AB 105750, AB 105753 and AB 105756 retain two UPEF65 corner panels", () => {
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260715090000_set_double_upef65_for_l_kitchen_105750_105753_105756", "migration.sql"),
+    "utf8",
+  );
+
+  assert.match(seed, /AB_105750_105753_105756_ITEMS[\s\S]*blendeCode:\s*"UPEF65 x2"/);
+  assert.match(seed, /blendePrice:\s*blendePrice\("UPEF65", 2\)/);
+  assert.match(migration, /'ab-105750', 'ab-105753', 'ab-105756'/);
+  assert.match(migration, /"catalogBlendeQuantity"\s*=\s*2/);
+  assert.match(migration, /upper\(COALESCE\(item\."blendeCode", ''\)\) LIKE 'UPK20%'/i);
+});
+
+test("two matching UPEF65 panels remain one ASC article with quantity two", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-AB105747-US30", "drawer-module", "Lower cabinet", {
+        isLocked: true,
+        blendeCode: "UPEF65 x2",
+        blendeLabel: "Eckpassblende Unterschrank x 2",
+        catalogBlendeQuantity: 2,
+        catalogBlende: {
+          code: "UPEF65",
+          name: "Corner filler panel for Lower cabinet",
+          nameDe: "Eckpassblende Unterschrank",
+        },
+      }),
+    ],
+  };
+
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105750",
+  });
+  const blenden = result.selectableComponents.filter((entry) => entry.claimPartKey === "blende");
+
+  assert.equal(blenden.length, 1);
+  assert.equal(blenden[0].articleCode, "UPEF65");
+  assert.equal(blenden[0].blendeQuantity, 2);
+});
+
+test("service claims prefer the saved corner Blende over a stale catalog link", () => {
+  const kitchen = {
+    items: [
+      component("CAB-BASE-L-500", "base-module-2", "Lower cabinet", {
+        isLocked: true,
+        blendeCode: "UPEF65",
+        blendeLabel: "Eckpassblende Unterschrank",
+        catalogBlendeQuantity: 2,
+        catalogBlende: {
+          code: "UPK20",
+          name: "Filler Panel up to 20 cm",
+          nameDe: "Passblende bis 20 cm",
+        },
+      }),
+    ],
+  };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105805",
+  });
+  const cornerBlende = result.selectableComponents.find((entry) => entry.claimPartKey === "blende");
+
+  assert.deepEqual(
+    {
+      code: cornerBlende?.code,
+      articleCode: cornerBlende?.articleCode,
+      name: cornerBlende?.name,
+      nameDe: cornerBlende?.nameDe,
+      blendeQuantity: cornerBlende?.blendeQuantity,
+    },
+    {
+      code: "UPEF65",
+      articleCode: "UPEF65",
+      name: "Corner filler panel for Lower cabinet",
+      nameDe: "Eckpassblende Unterschrank",
+      blendeQuantity: 1,
+    },
+  );
+});
+
+test("catalog linking honors Blende changes saved in Admin", () => {
+  const source = fs.readFileSync(
+    path.join(repoRoot, "scripts", "backfill-kitchen-item-catalog-links.js"),
+    "utf8",
+  );
+
+  assert.match(source, /blendeCode:\s*nullableString\(item\.blendeCode\)/);
+  assert.match(source, /blendePrice:\s*formatMoney\(item\.blendePrice\)/);
+  assert.match(source, /price:\s*formatMoney\(item\.price\)/);
+});
+
 test("missing worktop end-panel backfill covers AB 105837, 105840, and 105843", () => {
   const migration = fs.readFileSync(
     path.join(repoRoot, "prisma", "migrations", "20260714150000_add_missing_worktop_end_panel_claim_parts", "migration.sql"),
@@ -2254,6 +2419,7 @@ test("AB 105825 claim sink follows the calibrated bowl polygon", () => {
 
 test("all L-shaped claim plans separate the complete faucet from the sink bowl", () => {
   const lShapedSlugs = [
+    "ab-105743",
     "ab-104968",
     "ab-105734",
     "ab-105737",

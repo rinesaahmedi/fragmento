@@ -296,10 +296,20 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
 
   const normalizedContractNumber = String(contractNumber || "").trim();
   const selectedIds = new Set(value || []);
+  // When a worktop is selected, restore the source-plan pixels for appliances
+  // that are still unselected. This keeps the sink/cooktop white instead of
+  // letting the selected worktop tint show through their transparent hitboxes.
+  // Once an appliance is selected itself, it is removed from this cutout layer
+  // so its green selection state remains visible.
+  const visibleApplianceImageHotspots = applianceImageHotspots.filter(
+    (hotspot) => !selectedIds.has(hotspot.componentId),
+  );
   const hasSelectedWorktop = imageHotspots.some(
     (hotspot) => (
-      hotspot.claimPartKey === "worktop-left"
+      hotspot.componentKey === "worktop"
+      || hotspot.claimPartKey === "worktop-left"
       || hotspot.claimPartKey === "worktop-right"
+      || hotspot.claimPartKey === "worktop-end-panel"
     ) && selectedIds.has(hotspot.componentId),
   );
   const sinkComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.sink;
@@ -461,7 +471,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                 })}
               </svg>
               <div className={styles.planHotspotLayer}>
-                {hasSelectedWorktop && applianceImageHotspots.length ? (
+                {hasSelectedWorktop && visibleApplianceImageHotspots.length ? (
                   <svg
                     aria-hidden="true"
                     className={styles.planApplianceCutouts}
@@ -470,7 +480,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                   >
                     <defs>
                       <clipPath id={applianceClipPathId} clipPathUnits="userSpaceOnUse">
-                        {applianceImageHotspots.map((hotspot) => {
+                        {visibleApplianceImageHotspots.map((hotspot) => {
                           const polygonPoints = getHotspotSvgPolygonPoints(hotspot);
                           const clipKey = `appliance-clip-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`;
                           if (polygonPoints) {
@@ -489,6 +499,14 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                         })}
                       </clipPath>
                     </defs>
+                    <rect
+                      className={styles.planApplianceCutoutBacking}
+                      x={0}
+                      y={0}
+                      width={100}
+                      height={100}
+                      clipPath={`url(#${applianceClipPathId})`}
+                    />
                     <image
                       href={imageViewHref}
                       x={-(planDisplayCrop.left / planDisplayCrop.width) * 100}

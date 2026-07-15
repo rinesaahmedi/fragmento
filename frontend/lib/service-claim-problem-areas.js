@@ -16,7 +16,9 @@ export function parseServiceClaimProblemAreas(raw) {
       .map((area) => {
         const componentId = String(area?.componentId || "").trim();
         const name = stripProductDimensionsFromLabel(String(area?.name || "").trim());
+        const nameDe = stripProductDimensionsFromLabel(String(area?.nameDe || "").trim());
         const code = String(area?.code || "").trim();
+        const articleCode = String(area?.articleCode || "").trim();
         const detail = String(area?.detail || "").trim();
         const attachments = Array.isArray(area?.attachments)
           ? area.attachments
@@ -45,7 +47,9 @@ export function parseServiceClaimProblemAreas(raw) {
         return {
           componentId,
           name,
+          ...(nameDe ? { nameDe } : {}),
           code,
+          ...(articleCode ? { articleCode } : {}),
           ...(detail ? { detail } : {}),
           ...(attachments.length ? { attachments } : {}),
         };
@@ -64,6 +68,16 @@ export function formatServiceClaimProblemArea(area) {
     return `${name} (${code})`;
   }
   return name || code || "";
+}
+
+export function formatServiceClaimProblemAreaForEmail(area) {
+  const name = stripProductDimensionsFromLabel(String(area?.nameDe || area?.name || "").trim());
+  const articleCode = String(area?.articleCode || "").trim();
+
+  if (name && articleCode) {
+    return `${name} (${articleCode})`;
+  }
+  return name || "";
 }
 
 export function formatServiceClaimProblemAreaList(raw) {

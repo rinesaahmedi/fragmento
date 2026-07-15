@@ -127,6 +127,7 @@ function buildSeedRows(seed) {
 function normalizeBlendeCode(value) {
   const code = String(value || "").trim().toUpperCase();
   if (code.startsWith("UPK20")) return "UPK20";
+  if (code.startsWith("UPEF65")) return "UPEF65";
   if (code.startsWith("HPK2002")) return "HPK2002";
   return "";
 }
@@ -274,7 +275,29 @@ async function loadLiveSeededItems(seedRows) {
   });
 
   return items
-    .map((item) => ({ item, seedRow: seedByKey.get(rowKey(item.kitchen.slug, item.code)) || null }))
+    .map((item) => {
+      const seedRow = seedByKey.get(rowKey(item.kitchen.slug, item.code)) || null;
+      if (!seedRow) return { item, seedRow: null };
+
+      // The seed identifies which standard kitchen item this is. Its current
+      // catalog fields must come from the database, so an admin change to an
+      // article or Blende remains authoritative after the next deployment.
+      return {
+        item,
+        seedRow: {
+          ...seedRow,
+          itemType: item.itemType,
+          articleNumber: nullableString(item.articleNumber),
+          price: formatMoney(item.price),
+          blendeCode: nullableString(item.blendeCode),
+          blendeLabel: nullableString(item.blendeLabel),
+          blendePrice: formatMoney(item.blendePrice),
+          iconKey: nullableString(item.iconKey),
+          componentKey: nullableString(item.componentKey),
+          isLocked: Boolean(item.isLocked),
+        },
+      };
+    })
     .filter((entry) => entry.seedRow);
 }
 

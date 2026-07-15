@@ -312,6 +312,15 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105837-US60-L": "10",
   "CAB-WALL-AB105747-H6002-R": "9",
   "CAB-WALL-AB105747-H6002-L": "11",
+  "CAB-BASE-AB105743-US30-R": "4",
+  "CAB-BASE-AB105743-US40-R": "5",
+  "DISH-AB105743-600": "6",
+  "CAB-BASE-AB105743-US60": "7",
+  "REF-AB105743-KGCN388140E": "8",
+  "CAB-WALL-AB105743-H6002-R": "9",
+  "CAB-HOOD-AB105743-600": "10",
+  "HOOD-AB105743-FH664621E": "10",
+  "CAB-WALL-AB105743-H6002-L": "11",
   "SINKBASE-AB105831-DEFAULT": "3",
   "CAB-BASE-AB105831-US30-R": "4",
   "DISH-AB105831-600": "5",
@@ -521,6 +530,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "CAB-HOOD-AB105825-600":
     case "CAB-HOOD-AB105828-600":
     case "CAB-HOOD-AB105831-600":
+    case "CAB-HOOD-AB105743-600":
     case "CAB-HOOD-AB104968-600":
     case "CAB-HOOD-AB105746-600":
     case "CAB-HOOD-AB105749-600":
@@ -552,6 +562,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-AB105825-FH664621E":
     case "HOOD-AB105828-FH664621E":
     case "HOOD-AB105831-FH664621E":
+    case "HOOD-AB105743-FH664621E":
     case "HOOD-AB104968-FH664621E":
     case "HOOD-AB105746-FH664621E":
     case "HOOD-AB105749-FH664621E":
@@ -606,6 +617,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-AB105825-600":
     case "DISH-AB105828-600":
     case "DISH-AB105831-600":
+    case "DISH-AB105743-600":
     case "DISH-AB104968-600":
     case "DISH-AB105746-600":
     case "DISH-AB105749-600":
@@ -739,6 +751,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "CAB-HOOD-AB105825-600":
     case "CAB-HOOD-AB105828-600":
     case "CAB-HOOD-AB105831-600":
+    case "CAB-HOOD-AB105743-600":
     case "CAB-HOOD-AB104968-600":
     case "CAB-HOOD-AB105746-600":
     case "CAB-HOOD-AB105757-600":
@@ -753,6 +766,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "HOOD-AB105825-FH664621E":
     case "HOOD-AB105828-FH664621E":
     case "HOOD-AB105831-FH664621E":
+    case "HOOD-AB105743-FH664621E":
     case "HOOD-AB104968-FH664621E":
     case "HOOD-AB105746-FH664621E":
     case "HOOD-AB105757-FH664621E":
@@ -803,6 +817,7 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105825-600":
     case "DISH-AB105828-600":
     case "DISH-AB105831-600":
+    case "DISH-AB105743-600":
     case "DISH-AB104968-600":
     case "DISH-AB105746-600":
     case "DISH-AB105757-600":
@@ -904,6 +919,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105825": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105828": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105743": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-104968": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105746": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105757": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1110,6 +1126,10 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   PRODUCT_INFO_DOCUMENTS_BY_CODE[`HOOD-AB${targetCode}-FH664621E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 });
 
+PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105743-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-AB105743-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105743-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 
@@ -1276,6 +1296,7 @@ export function toggleLinkedComponentSelection(slug, currentIds, componentId, lo
 }
 
 const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
+  "DISH-AB105743-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-C-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -1322,6 +1343,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "CAB-HOOD-AB105828-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105831-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB105831-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-AB105743-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-AB105743-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB104968-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB104968-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105746-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
@@ -1344,6 +1367,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB105822-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105828-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105831-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
+  "REF-AB105743-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB104968-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105746-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105757-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),

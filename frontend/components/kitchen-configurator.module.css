@@ -541,6 +541,7 @@
 .planHotspotLayer {
   position: absolute;
   inset: 0;
+  isolation: isolate;
   pointer-events: none;
 }
 
@@ -549,8 +550,14 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  z-index: 8;
+  /* Sit above the selected worktop tint, while pointer-events:none keeps the
+     underlying sink/cooktop hitboxes independently clickable. */
+  z-index: 999;
   pointer-events: none;
+}
+
+.planApplianceCutoutBacking {
+  fill: #fff;
 }
 
 .planSideLabelLayer {

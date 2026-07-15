@@ -1,6 +1,7 @@
 import { SERVICE_CLAIM_PART_COMPONENT_IDS } from "./service-claim-kitchen-plan-selection.js";
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105743",
   "ab-104968",
   "ab-105734",
   "ab-105737",
@@ -32,6 +33,8 @@ export function isLShapedClaimKitchen(kitchenSlug = "") {
 // Measured from the full-resolution PDF renders. Coordinates are relative to each plan's
 // faucet hotspot so the polygons remain aligned after the plan is cropped for display.
 const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
+  // Four outside sink strokes measured from AB 105743's vector PDF.
+  "ab-105743": [[-0.166065, 0.89234], [2.617329, 0.730849], [3.895307, 0.836439], [1.111913, 1]],
   "ab-104968": [[-0.99, 1], [0.08, 0.91], [1.86, 1.13], [0.97, 1.22]],
   "ab-105734": [[-0.99, 1], [0.08, 0.91], [1.86, 1.13], [0.97, 1.22]],
   "ab-105737": [[-0.99, 1], [0.08, 0.91], [1.86, 1.13], [0.97, 1.22]],
@@ -55,6 +58,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 };
 
 const RIGHT_LEG_COOKTOP_SLUGS = new Set([
+  "ab-105743",
   "ab-105822",
   "ab-105825",
   "ab-105828",
@@ -72,6 +76,13 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 // source plan render. Keeping the values relative to the oven hotspot
 // preserves their alignment when the claim picker applies its display crop.
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
+  // Four outside cooktop strokes measured from AB 105743's vector PDF.
+  "ab-105743": [
+    [0.003788, -0.049606],
+    [1.066288, -0.094488],
+    [2.024621, -0.037008],
+    [0.998106, 0.007087],
+  ],
   // Four outside cooktop strokes from the AB 104968 vector PDF.
   "ab-104968": [
     [-0.667973662, -0.049348617],
@@ -201,6 +212,17 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  // Exact perspective divider strokes from the 842 x 595 AB 105743 PDF.
+  "ab-105743": {
+    "base-module-1": { side: "left", outer: 21.192399, inner: 21.790974 },
+    "base-module-3": {
+      side: "right",
+      inner: 50.194774,
+      outer: 51.562945,
+      bands: [[50.194774, 50.935867], [50.935867, 51.562945]],
+    },
+    "wall-cabinet-1": { side: "left", outer: 47.301663, inner: 47.985748 },
+  },
   // AB 104968 uses complete perspective end faces. The US40 includes two
   // commercially supplied UPK20 pieces on the same narrow corner face.
   "ab-104968": {
@@ -463,6 +485,7 @@ for (const alias of ["ab-105750", "ab-105753", "ab-105756"]) {
 const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   // PDF-measured seam between the oven and the drawer below it. The oven ends
   // on this line and the independently selectable drawer starts on the same line.
+  "ab-105743": 0.661358,
   "ab-105808": 0.681,
   "ab-105816": 0.6813,
   "ab-105820": 0.6806,
@@ -550,6 +573,10 @@ const L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG = {
   },
   "ab-105831": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
+  },
+  "ab-105743": {
+    // Top surfaces, front fascias, then the floor-height end panel.
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel"],
   },
   "ab-105837": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],

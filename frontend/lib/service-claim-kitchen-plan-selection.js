@@ -7,6 +7,12 @@ const CLAIM_LINKED_COMPONENT_META = {
     code: "HOOD-B-FH664621E",
     articleCode: "FH 664 621 E",
     name: "Extractor Hood",
+    nameDe: "Flachschirmhaube",
+  },
+  "component-under-cabinet-light": {
+    code: "ACC-LIGHT-003",
+    name: "LED Lighting Set",
+    nameDe: "LED-Beleuchtungsset",
     nameDe: "Dunstabzugshaube",
   },
 };
@@ -16,11 +22,24 @@ const CLAIM_COMPONENT_LABEL_OVERRIDES = {
 };
 
 const CLAIM_BLENDE_COMPONENT_PREFIX = "component-claim-blende-";
+const CLAIM_BLENDE_LABELS_BY_CODE = {
+  UPK20: {
+    name: "Filler Panel up to 20 cm",
+    nameDe: "Passblende bis 20 cm",
+  },
+  UPEF65: {
+    name: "Corner filler panel for Lower cabinet",
+    nameDe: "Eckpassblende Unterschrank",
+  },
+};
 // These Blenden belong to the sink-cabinet claim in the plan. They remain a
 // separate form row so a customer can describe the panel issue, but they must
 // not split the cabinet into an additional clickable surface.
 const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
 const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
+  // AB 105743's exposed left end face is part of the US30 cabinet, not an
+  // independently selectable filler-panel claim surface.
+  "ab-105743": new Set(["base-module-1"]),
   // The exposed left side and front are two perspective faces of one US50
   // cabinet in this shared plan, not an independently claimable Blende.
   "ab-104968": new Set(["base-module-1"]),
@@ -187,9 +206,18 @@ function isFlatScreenHoodCabinet(item = {}) {
     && articleCodes.includes("HD6002");
 }
 
-function getClaimBlendeQuantity(item = {}) {
+function getClaimBlendeQuantity(item = {}, resolvedCode = "") {
   const explicit = Number.parseInt(String(item.catalogBlendeQuantity || ""), 10);
-  if (Number.isFinite(explicit) && explicit > 0) return explicit;
+  const rawCode = normalizeClaimBlendeCode(item.blendeCode).toUpperCase();
+  const catalogCode = normalizeClaimBlendeCode(item.catalogBlende?.code).toUpperCase();
+  const normalizedResolvedCode = String(resolvedCode || "").trim().toUpperCase();
+  const catalogMatchesSavedBlende = !rawCode || !catalogCode || rawCode === catalogCode;
+  if (
+    Number.isFinite(explicit)
+    && explicit > 0
+    && catalogMatchesSavedBlende
+    && (!normalizedResolvedCode || catalogCode === normalizedResolvedCode)
+  ) return explicit;
   const match = `${item.blendeCode || ""} ${item.blendeLabel || ""}`.match(/\bx\s*(\d+)\b/i);
   return Math.max(1, Number.parseInt(match?.[1] || "1", 10) || 1);
 }
@@ -205,22 +233,27 @@ function claimBlendeComponentId(componentKey) {
 
 function buildClaimBlendeMeta(item = {}) {
   const componentKey = String(item.componentKey || "").trim();
-  const code = normalizeClaimBlendeCode(item.catalogBlende?.code || item.blendeCode);
+  const savedCode = normalizeClaimBlendeCode(item.blendeCode);
+  const catalogCode = normalizeClaimBlendeCode(item.catalogBlende?.code);
+  const code = savedCode || catalogCode;
   const componentId = claimBlendeComponentId(componentKey);
   if (!componentId || !code) return null;
+  const defaultLabels = CLAIM_BLENDE_LABELS_BY_CODE[code] || {};
+  const catalogMatchesSavedBlende = !savedCode || !catalogCode
+    || savedCode.toUpperCase() === catalogCode.toUpperCase();
 
   return {
     componentId,
     code,
     articleCode: code,
-    name: String(item.catalogBlende?.name || item.blendeLabel || `${code} Filler Panel`).trim(),
-    nameDe: String(item.catalogBlende?.nameDe || item.blendeLabel || `${code} Passblende`).trim(),
+    name: String((catalogMatchesSavedBlende && item.catalogBlende?.name) || defaultLabels.name || item.blendeLabel || `${code} Filler Panel`).trim(),
+    nameDe: String((catalogMatchesSavedBlende && item.catalogBlende?.nameDe) || defaultLabels.nameDe || item.blendeLabel || `${code} Passblende`).trim(),
     componentKey: `claim-blende-${componentKey}`,
     sourceComponentKey: componentKey,
     sourceKitchenItemCode: String(item.code || "").trim(),
     sourceWidthMm: Number(item.widthMm) || null,
     claimPartKey: "blende",
-    blendeQuantity: getClaimBlendeQuantity(item),
+    blendeQuantity: getClaimBlendeQuantity(item, code),
   };
 }
 
@@ -328,6 +361,12 @@ function resolveServiceClaimComponentName(componentId, meta = {}) {
   return stripProductDimensionsFromLabel(claimName);
 }
 
+function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
+  return stripProductDimensionsFromLabel(
+    String(meta.nameDe || meta.name || meta.code || componentId).trim(),
+  ) || meta.code || componentId;
+}
+
 function resolveServiceClaimArticleCode(meta = {}) {
   const articleNumber = String(meta.articleNumber || meta.articleCode || "").trim();
   if (articleNumber) {
@@ -364,6 +403,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       code: String(item.code || "").trim(),
       articleCode: resolveServiceClaimArticleCode(item),
       name: resolveServiceClaimComponentName(componentId, item),
+      nameDe: resolveServiceClaimComponentNameDe(componentId, item),
       nameDe: stripProductDimensionsFromLabel(String(item.nameDe || "").trim()),
     });
   }
@@ -377,6 +417,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       code: String(comp.code || "").trim(),
       articleCode: resolveServiceClaimArticleCode(comp),
       name: resolveServiceClaimComponentName(componentId, comp),
+      nameDe: resolveServiceClaimComponentNameDe(componentId, comp),
       nameDe: stripProductDimensionsFromLabel(String(comp.nameDe || "").trim()),
     });
   }
@@ -444,6 +485,11 @@ export function buildServiceClaimSelectableComponents({
       code,
       name: resolvedMeta.name || fallbackMeta.name,
     });
+    const nameDe = resolveServiceClaimComponentNameDe(componentId, {
+      code,
+      name: resolvedMeta.name || fallbackMeta.name,
+      nameDe: resolvedMeta.nameDe || fallbackMeta.nameDe,
+    });
     const nameDe = stripProductDimensionsFromLabel(String(
       resolvedMeta.nameDe || fallbackMeta.nameDe || "",
     ).trim());
@@ -485,6 +531,7 @@ export function buildServiceClaimSelectableComponents({
         code: String(item.code || "").trim(),
         articleCode: resolveServiceClaimArticleCode(item),
         name: resolveServiceClaimComponentName(componentIdForItem(item), item),
+        nameDe: resolveServiceClaimComponentNameDe(componentIdForItem(item), item),
         nameDe: stripProductDimensionsFromLabel(String(item.nameDe || "").trim()),
       },
     }));
@@ -506,7 +553,9 @@ export function buildServiceClaimSelectableComponents({
     .filter(Boolean)
     .map((entry) => {
       const quantity = Number(blendeQuantityOverrides[entry.sourceComponentKey] || 0);
-      return quantity > 0 ? { ...entry, blendeQuantity: quantity } : entry;
+      return quantity > 0 && entry.code.toUpperCase() === "UPK20"
+        ? { ...entry, blendeQuantity: quantity }
+        : entry;
     })
     .map((entry) => (
       companionBlendeSourceKeys.has(entry.sourceComponentKey)
@@ -514,7 +563,9 @@ export function buildServiceClaimSelectableComponents({
         : entry
     ))
     .flatMap((entry) => {
-      const quantity = Number(independentBlendeQuantities[entry.sourceComponentKey] || 0);
+      const quantity = entry.code.toUpperCase() === "UPK20"
+        ? Number(independentBlendeQuantities[entry.sourceComponentKey] || 0)
+        : 1;
       if (quantity <= 1) return [entry];
       return Array.from({ length: quantity }, (_, index) => ({
         ...entry,

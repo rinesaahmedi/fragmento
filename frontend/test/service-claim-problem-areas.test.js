@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  formatServiceClaimProblemAreaForEmail,
   formatServiceClaimProblemAreaList,
   parseServiceClaimProblemAreas,
 } from "../lib/service-claim-problem-areas.js";
@@ -41,4 +42,18 @@ test("formatServiceClaimProblemAreaList returns display-ready labels", () => {
     "Dishwasher (DISH-C-600-STD)",
     "Sink Base Cabinet",
   ]);
+});
+
+test("service claim email labels use German names and article codes, not component codes", () => {
+  const [area] = parseServiceClaimProblemAreas(JSON.stringify([
+    {
+      componentId: "ref-1",
+      name: "Freestanding Refrigerator 181 cm",
+      nameDe: "Standkühlschrank 181 cm",
+      code: "REF-AB105806-KGCN388140E",
+      articleCode: "KGCN388140E",
+    },
+  ]));
+
+  assert.equal(formatServiceClaimProblemAreaForEmail(area), "Standkühlschrank 181 cm (KGCN388140E)");
 });

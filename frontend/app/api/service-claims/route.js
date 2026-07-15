@@ -15,7 +15,7 @@ import {
   getServiceClaimContractDetails,
   normalizeServiceClaimContractNumber,
 } from "../../../lib/service-claims";
-import { parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
+import { formatServiceClaimProblemAreaForEmail, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
 import { countElectricalApplianceProblemAreas } from "../../../lib/service-claim-serial-number";
 import { getServiceClaimKitchenPlan } from "../../../lib/service-claim-kitchen-plan";
@@ -423,7 +423,7 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
     const componentId = String(area.componentId || "").trim();
     return {
       name: String(area.name || "").trim(),
-      articleCode: String(area.code || "").trim(),
+      articleCode: StringForEmail(area.code || "").trim(),
       detail: String(area.detail || "").trim(),
       attachments: componentId ? attachmentsByComponentId.get(componentId) || [] : [],
     };
