@@ -1,8 +1,15 @@
+import fs from "fs/promises";
+import path from "path";
 import sharp from "sharp";
 import { componentIdForItem } from "../components/kitchen-selection-utils.js";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "./catalog.js";
+import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "./kitchen-plan-preview-data.js";
 import { loadKitchenSvgMarkup } from "./load-kitchen-svg.js";
 import { parseServiceClaimProblemAreas } from "./service-claim-problem-areas.js";
+import {
+  buildServiceClaimBlendeHotspots,
+  buildServiceClaimPartHotspots,
+} from "./service-claim-kitchen-hotspots.js";
 
 export const PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG = {
   "kitchen-model-b": {
@@ -123,9 +130,7 @@ export function inferKitchenSlugFromSelectedAreas(selectedAreas = []) {
   return slugs.size === 1 ? [...slugs][0] : "";
 }
 
-/**
- * Hides SVG component groups that are not part of the client's order (same rule as the service form picker).
- */
+/** Keeps the full kitchen as context while fading components that are not part of the client's order. */
 export function applyVisibleComponentsToSvgMarkup(markup, visibleComponentIds) {
   if (!markup || !Array.isArray(visibleComponentIds) || !visibleComponentIds.length) {
     return markup || "";
@@ -139,14 +144,16 @@ export function applyVisibleComponentsToSvgMarkup(markup, visibleComponentIds) {
 
     if (/style\s*=/i.test(attrs)) {
       const nextAttrs = attrs.replace(/style=(["'])(.*?)\1/i, (_, quote, value) => {
-        const cleaned = value.replace(/display\s*:\s*none\s*!?important?;?/gi, "").trim();
-        const displayRule = "display:none";
-        return `style=${quote}${cleaned ? `${cleaned};` : ""}${displayRule}${quote}`;
+        const cleaned = value
+          .replace(/display\s*:\s*none\s*!?important?;?/gi, "")
+          .replace(/opacity\s*:\s*[^;]+;?/gi, "")
+          .trim();
+        return `style=${quote}${cleaned ? `${cleaned};` : ""}opacity:0.3${quote}`;
       });
       return `<g${nextAttrs}>`;
     }
 
-    return `<g${attrs} style="display:none">`;
+    return `<g${attrs} style="opacity:0.3">`;
   });
 }
 
@@ -316,12 +323,253 @@ export async function renderClaimKitchenPreviewSvg({
     : null;
 }
 
+const PDF_PLAN_SOURCE_WIDTH = 842;
+const PDF_PLAN_SOURCE_HEIGHT = 595;
+
+function getClaimPlanHotspotBounds(hotspot) {
+  const points = Array.isArray(hotspot?.points) ? hotspot.points : [];
+  if (points.length) {
+    const xs = points.map(([x]) => Number(x)).filter(Number.isFinite);
+    const ys = points.map(([, y]) => Number(y)).filter(Number.isFinite);
+    if (xs.length && ys.length) {
+      const left = Math.min(...xs);
+      const top = Math.min(...ys);
+      const right = Math.max(...xs);
+      const bottom = Math.max(...ys);
+      return { left, top, right, bottom, width: right - left, height: bottom - top };
+    }
+  }
+
+  const left = Number(hotspot?.left || 0);
+  const top = Number(hotspot?.top || 0);
+  const width = Number(hotspot?.width || 0);
+  const height = Number(hotspot?.height || 0);
+  return { left, top, right: left + width, bottom: top + height, width, height };
+}
+
+function getClaimPlanCrop(hotspots) {
+  if (!hotspots.length) {
+    return { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 };
+  }
+
+  const bounds = hotspots.reduce((current, hotspot) => {
+    const next = getClaimPlanHotspotBounds(hotspot);
+    return {
+      left: Math.min(current.left, next.left),
+      top: Math.min(current.top, next.top),
+      right: Math.max(current.right, next.right),
+      bottom: Math.max(current.bottom, next.bottom),
+    };
+  }, { left: 100, top: 100, right: 0, bottom: 0 });
+  const trailingX = 100 - bounds.right;
+  const trailingY = 100 - bounds.bottom;
+  const left = Math.max(0, bounds.left - Math.max(2.6, bounds.left * 0.6));
+  const top = Math.max(0, bounds.top - Math.max(4, bounds.top * 0.5));
+  const right = Math.min(99.5, bounds.right + Math.max(3.2, trailingX * 0.92));
+  const bottom = Math.min(99.5, bounds.bottom + Math.max(1, trailingY * 0.85));
+  return { left, top, right, bottom, width: right - left, height: bottom - top };
+}
+
+function cropClaimPlanHotspot(hotspot, crop) {
+  const points = Array.isArray(hotspot?.points) ? hotspot.points : [];
+  if (points.length) {
+    const croppedPoints = points.map(([x, y]) => [
+      ((Number(x) - crop.left) / crop.width) * 100,
+      ((Number(y) - crop.top) / crop.height) * 100,
+    ]);
+    const xs = croppedPoints.map(([x]) => x).filter(Number.isFinite);
+    const ys = croppedPoints.map(([, y]) => y).filter(Number.isFinite);
+    return {
+      ...hotspot,
+      points: croppedPoints,
+      left: Math.min(...xs),
+      top: Math.min(...ys),
+      width: Math.max(...xs) - Math.min(...xs),
+      height: Math.max(...ys) - Math.min(...ys),
+    };
+  }
+
+  return {
+    ...hotspot,
+    left: ((Number(hotspot.left || 0) - crop.left) / crop.width) * 100,
+    top: ((Number(hotspot.top || 0) - crop.top) / crop.height) * 100,
+    width: (Number(hotspot.width || 0) / crop.width) * 100,
+    height: (Number(hotspot.height || 0) / crop.height) * 100,
+  };
+}
+
+function claimPlanComponentId(hotspot) {
+  return String(hotspot?.componentId || (hotspot?.componentKey ? `component-${hotspot.componentKey}` : "")).trim();
+}
+
+function getClaimPlanClipPathPoints(hotspot) {
+  const match = String(hotspot?.clipPath || "").match(/^polygon\((.*)\)$/);
+  if (!match) {
+    return [];
+  }
+
+  return match[1]
+    .split(",")
+    .map((point) => {
+      const [rawX, rawY] = point.trim().split(/\s+/);
+      const localX = Number.parseFloat(String(rawX || "").replace("%", ""));
+      const localY = Number.parseFloat(String(rawY || "").replace("%", ""));
+      if (!Number.isFinite(localX) || !Number.isFinite(localY)) {
+        return null;
+      }
+
+      return [
+        Number(hotspot.left || 0) + (localX / 100) * Number(hotspot.width || 0),
+        Number(hotspot.top || 0) + (localY / 100) * Number(hotspot.height || 0),
+      ];
+    })
+    .filter(Boolean);
+}
+
+function claimPlanShapeMarkup(hotspot, width, height, attributes) {
+  const points = Array.isArray(hotspot?.points) && hotspot.points.length
+    ? hotspot.points
+    : getClaimPlanClipPathPoints(hotspot);
+  if (points.length) {
+    const renderedPoints = points
+      .map(([x, y]) => `${(Number(x) / 100) * width},${(Number(y) / 100) * height}`)
+      .join(" ");
+    return `<polygon points="${renderedPoints}" ${attributes}/>`;
+  }
+
+  return `<rect x="${(Number(hotspot.left || 0) / 100) * width}" y="${(Number(hotspot.top || 0) / 100) * height}" width="${(Number(hotspot.width || 0) / 100) * width}" height="${(Number(hotspot.height || 0) / 100) * height}" rx="5" ry="5" ${attributes}/>`;
+}
+
+function buildClaimPlanMask(hotspots, width, height) {
+  const shapes = hotspots.map((hotspot) => claimPlanShapeMarkup(hotspot, width, height, 'fill="#ffffff"')).join("");
+  return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`);
+}
+
+function buildClaimPlanSelectionOverlay(hotspots, width, height) {
+  const shapes = hotspots.map((hotspot) => claimPlanShapeMarkup(
+    hotspot,
+    width,
+    height,
+    'fill="rgba(62,188,116,0.34)" stroke="#2a9155" stroke-width="2.2"',
+  )).join("");
+  return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`);
+}
+
+async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contractNumber, width }) {
+  const normalizedSlug = normalizeKitchenSlug(kitchenSlug);
+  const sourceHref = PLAN_IMAGE_BY_SLUG[normalizedSlug];
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG[normalizedSlug] || [];
+  if (!sourceHref || !sourceHotspots.length || !contractNumber) {
+    return null;
+  }
+
+  const plan = await import("./service-claim-kitchen-plan.js")
+    .then(({ getServiceClaimKitchenPlan }) => getServiceClaimKitchenPlan(contractNumber))
+    .catch(() => null);
+  if (!plan || normalizeKitchenSlug(plan.kitchenSlug) !== normalizedSlug) {
+    return null;
+  }
+
+  const preparedHotspots = buildServiceClaimBlendeHotspots(
+    sourceHotspots,
+    plan.selectableComponents,
+    plan.kitchenConfig?.components,
+    normalizedSlug,
+  );
+  const crop = getClaimPlanCrop(preparedHotspots);
+  const croppedSourceHotspots = preparedHotspots.map((hotspot) => cropClaimPlanHotspot(hotspot, crop));
+  const claimHotspots = buildServiceClaimPartHotspots(croppedSourceHotspots, plan.claimParts, normalizedSlug);
+  const visibleIds = new Set(plan.visibleComponentIds || []);
+  const selectedIds = new Set((selectedAreas || []).map((area) => String(area?.componentId || "").trim()));
+  const purchasedHotspots = croppedSourceHotspots.filter((hotspot) => visibleIds.has(claimPlanComponentId(hotspot)));
+  const selectedHotspots = claimHotspots.filter((hotspot) => selectedIds.has(claimPlanComponentId(hotspot)));
+
+  const sourcePath = path.join(process.cwd(), "public", decodeURIComponent(sourceHref).replace(/^[/\\]+/, ""));
+  const sourceBytes = await fs.readFile(sourcePath).catch(() => null);
+  if (!sourceBytes) {
+    return null;
+  }
+
+  const canonical = await sharp(sourceBytes)
+    .resize(PDF_PLAN_SOURCE_WIDTH, PDF_PLAN_SOURCE_HEIGHT, { fit: "fill" })
+    .png()
+    .toBuffer();
+  const cropLeft = Math.max(0, Math.floor((crop.left / 100) * PDF_PLAN_SOURCE_WIDTH));
+  const cropTop = Math.max(0, Math.floor((crop.top / 100) * PDF_PLAN_SOURCE_HEIGHT));
+  const cropWidth = Math.min(PDF_PLAN_SOURCE_WIDTH - cropLeft, Math.ceil((crop.width / 100) * PDF_PLAN_SOURCE_WIDTH));
+  const cropHeight = Math.min(PDF_PLAN_SOURCE_HEIGHT - cropTop, Math.ceil((crop.height / 100) * PDF_PLAN_SOURCE_HEIGHT));
+  const outputWidth = Math.max(320, Number(width) || 900);
+  const outputHeight = Math.max(1, Math.round(outputWidth * cropHeight / cropWidth));
+  const original = await sharp(canonical)
+    .extract({ left: cropLeft, top: cropTop, width: cropWidth, height: cropHeight })
+    .resize(outputWidth, outputHeight, { fit: "fill" })
+    .png()
+    .toBuffer();
+  const faintPlan = await sharp(original)
+    .composite([{
+      input: {
+        create: {
+          width: outputWidth,
+          height: outputHeight,
+          channels: 4,
+          background: { r: 255, g: 255, b: 255, alpha: 0.72 },
+        },
+      },
+      blend: "over",
+    }])
+    .png()
+    .toBuffer();
+  const purchasedLayer = purchasedHotspots.length
+    ? await sharp(original)
+      .ensureAlpha()
+      .composite([{ input: buildClaimPlanMask(purchasedHotspots, outputWidth, outputHeight), blend: "dest-in" }])
+      .png()
+      .toBuffer()
+    : null;
+  const layers = [
+    { input: faintPlan },
+    ...(purchasedLayer ? [{ input: purchasedLayer }] : []),
+    ...(selectedHotspots.length
+      ? [{ input: buildClaimPlanSelectionOverlay(selectedHotspots, outputWidth, outputHeight) }]
+      : []),
+  ];
+  const content = await sharp({
+    create: { width: outputWidth, height: outputHeight, channels: 4, background: "#ffffff" },
+  }).composite(layers).png().toBuffer();
+
+  return {
+    content,
+    contentType: "image/png",
+    highlightedComponentKeys: selectedHotspots.map((hotspot) => hotspot.componentKey).filter(Boolean),
+    visibleComponentIds: [...visibleIds],
+    kitchenName: plan.kitchenName || "",
+    kitchenSlug: normalizedSlug,
+    source: "pdf-plan",
+  };
+}
+
 export async function renderClaimKitchenPreviewPng({
   kitchenSlug,
   selectedAreas = [],
   contractNumber = null,
   width = 900,
 }) {
+  const normalizedAreas = Array.isArray(selectedAreas)
+    ? selectedAreas
+    : parseServiceClaimProblemAreas(selectedAreas);
+  const pdfPlanPreview = await renderClaimPdfPlanPreviewPng({
+    kitchenSlug,
+    selectedAreas: normalizedAreas,
+    contractNumber,
+    width,
+  }).catch((error) => {
+    console.warn("Claim PDF-plan preview rendering failed:", error?.message || error);
+    return null;
+  });
+  if (pdfPlanPreview?.content) {
+    return pdfPlanPreview;
+  }
+
   const preview = await renderClaimKitchenPreviewSvg({ kitchenSlug, selectedAreas, contractNumber });
   if (!preview?.markup) {
     return null;

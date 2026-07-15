@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { loadKitchenSvgMarkup } from "../lib/load-kitchen-svg.js";
 import {
   buildServiceClaimSelectableComponents,
+  collapseServiceClaimLinkedComponents,
   getServiceClaimLinkedComponentIds,
 } from "../lib/service-claim-kitchen-plan-selection.js";
 import {
@@ -49,8 +50,8 @@ test("AB 105808 service plan uses overlay bounds instead of color grouping", () 
 test("service claim kitchen plan keeps only defaults and confirmed components selectable", () => {
   const kitchen = {
     items: [
-      component("CAB-BASE-DEFAULT", "base-module-0", "Default base", { articleNumber: "US60", isLocked: true }),
-      component("CAB-BASE-ORDERED", "base-module-1", "Ordered base", { articleNumber: "US40" }),
+      component("CAB-BASE-DEFAULT", "base-module-0", "Default base", { articleNumber: "US60", nameDe: "Standard-Unterschrank", isLocked: true }),
+      component("CAB-BASE-ORDERED", "base-module-1", "Ordered base", { articleNumber: "US40", nameDe: "Bestellter Unterschrank" }),
       component("CAB-BASE-NOT-ORDERED", "base-module-2", "Not ordered base"),
     ],
   };
@@ -66,6 +67,7 @@ test("service claim kitchen plan keeps only defaults and confirmed components se
   assert.deepEqual(result.selectableComponentIds, ["component-base-module-0", "component-base-module-1"]);
   assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["CAB-BASE-DEFAULT", "CAB-BASE-ORDERED"]);
   assert.deepEqual(result.selectableComponents.map((entry) => entry.articleCode), ["US60", "US40"]);
+  assert.deepEqual(result.selectableComponents.map((entry) => entry.nameDe), ["Standard-Unterschrank", "Bestellter Unterschrank"]);
   assert.equal(result.source, "kitchen");
 });
 
@@ -1425,6 +1427,47 @@ test("AB 105734 keeps the upper hood cabinet and extractor independently selecta
     getServiceClaimLinkedComponentIds("ab-105734", "component-extractor-hood"),
     ["component-extractor-hood"],
   );
+});
+
+test("specified L kitchens select both adjacent corner Blenden together", () => {
+  const firstBlende = "component-claim-blende-base-module-2";
+  const secondBlende = "component-claim-blende-base-module-2-2";
+
+  [
+    "ab-105822",
+    "ab-105825",
+    "ab-105828",
+    "ab-105831",
+    "ab-105834",
+    "ab-105837",
+    "ab-105840",
+    "ab-105843",
+  ].forEach((kitchenSlug) => {
+    assert.deepEqual(
+      getServiceClaimLinkedComponentIds(kitchenSlug, firstBlende),
+      [firstBlende, secondBlende],
+    );
+    assert.deepEqual(
+      getServiceClaimLinkedComponentIds(kitchenSlug.toUpperCase(), secondBlende),
+      [firstBlende, secondBlende],
+    );
+    assert.deepEqual(
+      collapseServiceClaimLinkedComponents(kitchenSlug, [
+        { componentId: firstBlende, name: "UPK20 Filler Panel" },
+        { componentId: secondBlende, name: "UPK20 Filler Panel" },
+      ]),
+      [{ componentId: firstBlende, name: "UPK20 Filler Panel" }],
+    );
+  });
+});
+
+test("unlinked claim components keep separate problem-area rows", () => {
+  const components = [
+    { componentId: "component-claim-blende-base-module-2" },
+    { componentId: "component-claim-blende-base-module-2-2" },
+  ];
+
+  assert.deepEqual(collapseServiceClaimLinkedComponents("ab-105805", components), components);
 });
 
 test("AB 104968 perspective variants expose both lower corner Blenden independently", () => {

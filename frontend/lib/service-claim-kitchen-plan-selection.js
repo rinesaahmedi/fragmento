@@ -283,8 +283,63 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   "furniture-front",
 ]);
 
-export function getServiceClaimLinkedComponentIds(_kitchenSlug, componentId) {
-  return [componentId];
+const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  // These kitchens share two adjacent UPK20 strips at the same inside corner.
+  // Keep their individual PDF-matched hotspots, but treat each pair as one
+  // interaction so clicking either strip selects both.
+  "ab-105822": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+  "ab-105825": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+  "ab-105828": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+  "ab-105831": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+  "ab-105834": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+  "ab-105837": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+  "ab-105840": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+  "ab-105843": [[
+    "component-claim-blende-base-module-2",
+    "component-claim-blende-base-module-2-2",
+  ]],
+};
+
+export function getServiceClaimLinkedComponentIds(kitchenSlug, componentId) {
+  const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const normalizedComponentId = String(componentId || "").trim();
+  const linkedGroup = (SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG[normalizedSlug] || [])
+    .find((group) => group.includes(normalizedComponentId));
+
+  return linkedGroup ? [...linkedGroup] : [componentId];
+}
+
+export function collapseServiceClaimLinkedComponents(kitchenSlug, components = []) {
+  const seenGroups = new Set();
+
+  return (components || []).filter((component) => {
+    const linkedIds = getServiceClaimLinkedComponentIds(kitchenSlug, component?.componentId);
+    const groupKey = linkedIds.join("\u0000");
+    if (seenGroups.has(groupKey)) return false;
+    seenGroups.add(groupKey);
+    return true;
+  });
 }
 
 function resolveServiceClaimComponentName(componentId, meta = {}) {
