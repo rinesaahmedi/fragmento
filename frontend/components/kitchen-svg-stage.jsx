@@ -51,6 +51,10 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105843": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105747": "/plans/AB%20105747.svg",
   "ab-105743": "/plans/AB%20105743.svg",
+  "ab-105748": "/plans/AB%20105748.svg",
+  "ab-105751": "/plans/AB%20105748.svg",
+  "ab-105754": "/plans/AB%20105748.svg",
+  "ab-105745": "/plans/AB%20105748.svg",
   "ab-105758": "/plans/AB%20105758.svg",
   "ab-105750": "/plans/AB%20105747.svg",
   "ab-105753": "/plans/AB%20105747.svg",
@@ -588,6 +592,43 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "refrigerator", points: [[66.88361, 32.69916], [73.852732, 34.131092], [73.852732, 82.776471], [66.88361, 81.344538]], preserveManualSize: true },
     { componentKey: "refrigerator", points: [[73.852732, 34.131092], [82.817102, 32.820168], [82.817102, 81.485714], [73.852732, 82.776471]], preserveManualSize: true },
     { componentKey: "refrigerator", points: [[66.88361, 32.69916], [75.847981, 31.388235], [82.817102, 32.820168], [73.852732, 34.131092]], preserveManualSize: true },
+  ],
+  "ab-105748": [
+    // Exact perspective faces traced from the 842 x 595 vector PDF.
+    { componentKey: "refrigerator", points: [[13.467933, 29.25042], [23.087886, 27.858824], [31.795724, 29.653782], [22.175772, 31.045378]], preserveManualSize: true },
+    { componentKey: "refrigerator", points: [[13.467933, 29.25042], [22.175772, 31.045378], [22.175772, 87.37479], [13.467933, 85.579832]], preserveManualSize: true },
+    { componentKey: "refrigerator", points: [[22.175772, 31.045378], [31.795724, 29.653782], [31.795724, 85.983193], [22.175772, 87.37479]], preserveManualSize: true },
+
+    // H4502: top, exposed left side and the visible front around the refrigerator.
+    { componentKey: "wall-cabinet-1", points: [[30.869359, 14.789916], [23.087886, 15.919328], [28.019002, 16.947899], [35.814727, 15.818487]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", points: [[28.019002, 16.947899], [23.087886, 15.919328], [23.087886, 27.858824], [28.019002, 28.867227]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", points: [[28.019002, 16.947899], [35.814727, 15.818487], [35.814727, 38.769748], [31.795724, 39.334454], [31.795724, 29.653782], [28.019002, 28.867227]], preserveManualSize: true },
+    // The two following top planes belong to their respective cabinet fronts.
+    { componentKey: "wall-cabinet-2", points: [[41.258907, 13.297479], [30.869359, 14.789916], [35.814727, 15.818487], [46.204276, 14.305882]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", points: [[35.814727, 15.818487], [46.204276, 14.305882], [46.204276, 37.257143], [35.814727, 38.769748]], preserveManualSize: true },
+    // FH664621E/FWK124/HD6002 fascia follows the same perspective as the cabinet.
+    { componentKey: "extractor-hood", points: [[31.795724, 39.515966], [35.814727, 40.342857], [35.814727, 38.769748]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[35.814727, 38.769748], [46.204276, 37.257143], [46.204276, 38.85042], [35.814727, 40.342857]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[51.648456, 11.784874], [41.258907, 13.297479], [46.204276, 14.305882], [56.579572, 12.813445]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[46.204276, 14.305882], [56.579572, 12.813445], [56.579572, 35.764706], [46.204276, 37.257143]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[56.579572, 12.813445], [57.448931, 12.692437], [57.448931, 35.643697], [56.579572, 35.764706]], preserveManualSize: true },
+
+    // Each worktop leg includes its top face and front fascia; the last polygon
+    // is the floor-height WU16 end panel at the right edge.
+    { componentKey: "worktop", points: [[31.795724, 54.278992], [52.874109, 51.233613], [61.5962, 53.008403], [51.206651, 54.521008], [51.206651, 55.791597], [31.795724, 58.594958]], preserveManualSize: true },
+    { componentKey: "worktop", points: [[51.206651, 54.521008], [61.5962, 53.008403], [82.95962, 57.405042], [82.95962, 58.67563], [72.570071, 60.188235], [51.206651, 55.791597]], preserveManualSize: true },
+    { componentKey: "worktop", points: [[72.342043, 60.127731], [72.570071, 60.188235], [82.95962, 58.67563], [82.95962, 86.547899], [72.570071, 88.040336], [72.342043, 88]], preserveManualSize: true },
+
+    // One complete faucet hotspot, matching the interaction used by other kitchens.
+    { componentKey: "sink-faucet", points: [[60.897862, 45.344538], [65.273159, 45.344538], [65.273159, 54.763025], [60.897862, 54.763025]], preserveManualSize: true },
+    { componentKey: "base-module-1", points: [[32.08076, 58.554622], [39.862233, 57.42521], [39.862233, 85.297479], [32.08076, 86.426891]], preserveManualSize: true },
+    { componentKey: "oven-module", points: [[39.862233, 57.42521], [50.251781, 55.932773], [50.251781, 83.805042], [39.862233, 85.297479]], preserveManualSize: true },
+    // The UPEF65 corner face and sink cabinet are one physical default unit.
+    { componentKey: "sink-base", points: [[50.251781, 55.932773], [51.933492, 55.932773], [51.933492, 83.805042], [50.251781, 83.805042]], preserveManualSize: true },
+    { componentKey: "sink-base", points: [[51.933492, 55.932773], [60.64133, 57.727731], [60.64133, 85.6], [51.933492, 83.805042]], preserveManualSize: true },
+    { componentKey: "base-module-3", points: [[60.64133, 57.727731], [67.182898, 59.078992], [67.182898, 86.931092], [60.64133, 85.6]], preserveManualSize: true },
+    { componentKey: "drawer-module", points: [[67.182898, 59.078992], [71.543943, 59.966387], [71.543943, 87.838655], [67.182898, 86.931092]], preserveManualSize: true },
+    { componentKey: "drawer-module", points: [[71.543943, 59.966387], [72.342043, 60.127731], [72.342043, 88], [71.543943, 87.838655]], preserveManualSize: true },
   ],
   "ab-105831": [
     {
@@ -1677,6 +1718,9 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
 
 ["ab-105735", "ab-105738", "ab-105741"].forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105732"];
+});
+["ab-105751", "ab-105754", "ab-105745"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105748"];
 });
 
 ["ab-105736", "ab-105739", "ab-105742"].forEach((slug) => {

@@ -1358,7 +1358,7 @@ test("AB 105805 service claim plan keeps the extractor hood separate from the LE
   );
 });
 
-test("all seeded standalone FH664621E hoods use the E article number", () => {
+test("all seeded FH664621E hoods use a supported catalog article number", () => {
   const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
   const flatHoodRows = seedSource
     .split("\n")
@@ -1366,7 +1366,7 @@ test("all seeded standalone FH664621E hoods use the E article number", () => {
 
   assert.ok(flatHoodRows.length > 0);
   flatHoodRows.forEach((line) => {
-    assert.match(line, /articleNumber:\s*"FH 664 621 E"/);
+    assert.match(line, /articleNumber:\s*"(?:FH 664 621 E|FH664621E \+ FWK124 \+ HD6002)"/);
   });
 });
 
@@ -2461,6 +2461,32 @@ test("AB 105743 uses its measured vector plan and exact Excel selection mapping"
   assert.match(seedSource, /slug:\s*"ab-105743"[\s\S]*items:\s*AB_105743_ITEMS/);
   assert.match(selectionSource, /"ab-105743":\s*\[\["component-wall-cabinet-2",\s*"component-extractor-hood"\]\]/);
   assert.match(claimSource, /"ab-105743":\s*\{[\s\S]*"base-module-3"[\s\S]*bands:\s*\[\[50\.194774,\s*50\.935867\],\s*\[50\.935867,\s*51\.562945\]\]/);
+});
+
+test("AB 105748 uses its measured vector plan, Excel articles, and split claim geometry", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
+  const claimSource = fs.readFileSync(path.join(repoRoot, "lib", "service-claim-kitchen-hotspots.js"), "utf8");
+  const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const planSvg = fs.readFileSync(path.join(repoRoot, "public", "plans", "AB 105748.svg"), "utf8");
+
+  assert.match(stageSource, /"ab-105748":\s*"\/plans\/AB%20105748\.svg"/);
+  assert.match(planSvg, /stroke="#f0f0f0"/);
+  assert.match(stageSource, /"ab-105748":\s*\[[\s\S]*componentKey:\s*"refrigerator"[\s\S]*componentKey:\s*"wall-cabinet-1"[\s\S]*componentKey:\s*"worktop"[\s\S]*componentKey:\s*"sink-base"[\s\S]*componentKey:\s*"base-module-3"[\s\S]*componentKey:\s*"drawer-module"/);
+  assert.match(stageSource, /componentKey:\s*"wall-cabinet-1",\s*points:\s*\[\[28\.019002,\s*16\.947899\],\s*\[23\.087886,\s*15\.919328\],\s*\[23\.087886,\s*27\.858824\],\s*\[28\.019002,\s*28\.867227\]\]/);
+  assert.match(stageSource, /componentKey:\s*"wall-cabinet-2",\s*points:\s*\[\[41\.258907,\s*13\.297479\][\s\S]*\[46\.204276,\s*14\.305882\]\]/);
+  assert.match(stageSource, /componentKey:\s*"extractor-hood",\s*points:\s*\[\[31\.795724,\s*39\.515966\],\s*\[35\.814727,\s*40\.342857\],\s*\[35\.814727,\s*38\.769748\]\]/);
+  assert.match(stageSource, /componentKey:\s*"extractor-hood",\s*points:\s*\[\[35\.814727,\s*38\.769748\],\s*\[46\.204276,\s*37\.257143\],\s*\[46\.204276,\s*38\.85042\],\s*\[35\.814727,\s*40\.342857\]\]/);
+  assert.match(stageSource, /componentKey:\s*"wall-cabinet-3",\s*points:\s*\[\[51\.648456,\s*11\.784874\][\s\S]*\[56\.579572,\s*12\.813445\]\]/);
+  assert.match(stageSource, /componentKey:\s*"sink-faucet",\s*points:\s*\[\[60\.897862,\s*45\.344538\],\s*\[65\.273159,\s*45\.344538\],\s*\[65\.273159,\s*54\.763025\],\s*\[60\.897862,\s*54\.763025\]\]/);
+  assert.match(stageSource, /componentKey:\s*"worktop",\s*points:\s*\[\[72\.342043,\s*60\.127731\][\s\S]*\[82\.95962,\s*86\.547899\]/);
+  assert.match(seedSource, /const AB_105748_ITEMS[\s\S]*code:\s*"DISH-AB105748-450"[\s\S]*articleNumber:\s*"A-EGSPV597210 \+ TGV60"/);
+  assert.match(seedSource, /code:\s*"CAB-BASE-AB105748-US30"[\s\S]*articlePriceWithBlende\("US30",\s*"UPK20",\s*1\)/);
+  assert.match(seedSource, /code:\s*"CAB-WALL-AB105748-H6002"[\s\S]*articlePriceWithBlende\("H6002",\s*"HPK2002",\s*1\)/);
+  assert.match(seedSource, /slug:\s*"ab-105748"[\s\S]*items:\s*AB_105748_ITEMS/);
+  assert.match(selectionSource, /"ab-105748":\s*\[\["component-wall-cabinet-2",\s*"component-extractor-hood"\]\]/);
+  assert.match(claimSource, /"ab-105748":\s*\[\[-2\.13834,\s*0\.978923\]/);
+  assert.match(claimSource, /"ab-105748":\s*\{[\s\S]*indexPartKeys:\s*\["worktop-left",\s*"worktop-right",\s*"worktop-end-panel"\]/);
 });
 
 test("AB 105750, AB 105753 and AB 105756 retain two UPEF65 corner panels", () => {

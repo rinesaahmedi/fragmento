@@ -14,6 +14,9 @@ export async function POST(request, { params }) {
       .map((value) => value.trim())
       .filter(Boolean);
     const ids = submittedIds.includes(id) ? submittedIds : [id];
+    if (ids.length > 1) {
+      delete data.partKey;
+    }
 
     const result = await prisma.kitchenClaimPart.updateMany({
       where: { id: { in: ids } },

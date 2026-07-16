@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+﻿const bcrypt = require("bcryptjs");
 const { randomUUID } = require("crypto");
 const { loadEnvConfig } = require("@next/env");
 
@@ -32,6 +32,8 @@ const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
+  "ab-105748",
+  "ab-105751", "ab-105754", "ab-105745",
   "ab-105758",
   "ab-104968", "ab-105734", "ab-105737", "ab-105740",
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
@@ -41,6 +43,8 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
+  "ab-105748",
+  "ab-105751", "ab-105754", "ab-105745",
   "ab-105758",
   "ab-104968", "ab-105734", "ab-105737", "ab-105740",
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
@@ -582,6 +586,10 @@ PRODUCT_INFO_BY_CODE["HOOD-AB105831-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-F
 PRODUCT_INFO_BY_CODE["HOOD-AB104968-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105746-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105757-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105748-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105751-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105754-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_BY_CODE["HOOD-AB105745-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105825-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105822-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105828-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
@@ -1346,6 +1354,47 @@ const AB_105743_ITEMS = [
   ...defaultServices(),
 ];
 
+// AB 105748: PDF-measured L-shaped plan. The main leg contains a US45 and
+// locked oven; the return contains the locked sink base with UPEF65, a 45 cm
+// dishwasher, US30 with UPK20, and the WU16 end panel. Article numbers,
+// dimensions, and prices follow the supplied Excel schedule.
+const AB_105748_ITEMS = [
+  defaultOvenHob({ sortOrder: 10 }),
+  defaultWorktop({ sortOrder: 20 }),
+  defaultSinkBase({
+    sortOrder: 30,
+    widthMm: 600,
+    depthMm: 600,
+    blendeCode: "UPEF65",
+    blendeLabel: "UPEF65 Corner filler panel",
+    blendePrice: blendePrice("UPEF65", 1),
+  }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB105806-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105748-US45", name: "Base cabinet with drawer", price: articlePrice("US45"), widthMm: 450, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US45 base storage cabinet, hinge right", articleNumber: "US45" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105748-450", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 450, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 60, infoText: "Fully integrated dishwasher incl. furniture front, Excel width 45 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105748-US30", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "drawer-module", sortOrder: 70, infoText: "US30 base storage cabinet with UPK20 filler panel", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105748-H4502", name: "Wall Cabinet", price: articlePrice("H4502"), widthMm: 450, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H4502, 2 adjustable shelves", articleNumber: "H4502" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105748-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105748-FH664621E", name: "FH664621E Extractor Hood", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105748-H6002", name: "Wall Cabinet", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002, 2 adjustable shelves with HPK2002 filler panel", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ sortOrder: 110 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
+// These kitchens use the identical AB 105748 L-shaped element plan. Keep the
+// item definition central while ensuring kitchen-specific element codes.
+function createAB105748Items(kitchenCode) {
+  return AB_105748_ITEMS.map((item) => ({
+    ...item,
+    code: item.code.replaceAll("AB105748", `AB${kitchenCode}`),
+  }));
+}
+
+const AB_105751_ITEMS = createAB105748Items("105751");
+const AB_105754_ITEMS = createAB105748Items("105754");
+const AB_105745_ITEMS = createAB105748Items("105745");
+
 // AB 105758: compact L-shaped plan. The left return contains the locked sink
 // base + UPK20 and the dishwasher + UPEF65 corner filler. The right return
 // contains the locked oven and a US30 beside the refrigerator; the second US30
@@ -1525,6 +1574,34 @@ const DEFAULT_KITCHENS = [
     name: "AB 105743 Kitchen",
     description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105743.svg",
     items: AB_105743_ITEMS,
+  },
+  {
+    slug: "ab-105748",
+    kitchenCode: "105 748",
+    name: "AB 105748 Kitchen",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105748.svg",
+    items: AB_105748_ITEMS,
+  },
+  {
+    slug: "ab-105751",
+    kitchenCode: "105 751",
+    name: "AB 105751 Kitchen",
+    description: "Kitchen configuration using the AB 105748 layout and element selection",
+    items: AB_105751_ITEMS,
+  },
+  {
+    slug: "ab-105754",
+    kitchenCode: "105 754",
+    name: "AB 105754 Kitchen",
+    description: "Kitchen configuration using the AB 105748 layout and element selection",
+    items: AB_105754_ITEMS,
+  },
+  {
+    slug: "ab-105745",
+    kitchenCode: "105 745",
+    name: "AB 105745 Kitchen",
+    description: "Kitchen configuration using the AB 105748 layout and element selection",
+    items: AB_105745_ITEMS,
   },
   {
     slug: "ab-105758",

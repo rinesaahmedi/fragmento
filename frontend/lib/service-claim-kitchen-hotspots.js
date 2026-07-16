@@ -2,6 +2,8 @@ import { SERVICE_CLAIM_PART_COMPONENT_IDS } from "./service-claim-kitchen-plan-s
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
+  "ab-105748",
+  "ab-105751", "ab-105754", "ab-105745",
   "ab-105758",
   "ab-104968",
   "ab-105734",
@@ -36,6 +38,8 @@ export function isLShapedClaimKitchen(kitchenSlug = "") {
 const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   // Four outside sink strokes measured from AB 105743's vector PDF.
   "ab-105743": [[-0.166065, 0.89234], [2.617329, 0.730849], [3.895307, 0.836439], [1.111913, 1]],
+  // Outside sink strokes measured from the AB 105748 vector PDF.
+  "ab-105748": [[-2.13834, 0.978923], [-0.217391, 0.864169], [2.743083, 1.119438], [0.841897, 1.234192]],
   // Four outside sink strokes measured from AB 105758's 842 x 595 PDF.
   "ab-105758": [[-0.21021, 0.826421], [3, 0.677419], [4.126126, 0.763441], [1.162162, 0.930876]],
   "ab-104968": [[-0.99, 1], [0.08, 0.91], [1.86, 1.13], [0.97, 1.22]],
@@ -102,6 +106,13 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
     [1.066288, -0.094488],
     [2.024621, -0.037008],
     [0.998106, 0.007087],
+  ],
+  // Outside cooktop strokes measured from the AB 105748 vector PDF.
+  "ab-105748": [
+    [-0.670782, -0.0625],
+    [0.293553, -0.114011],
+    [1.02332, -0.061126],
+    [0.074074, -0.006868],
   ],
   "ab-105758": [
     [0, -0.049592],
@@ -258,6 +269,12 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       bands: [[50.194774, 50.935867], [50.935867, 51.562945]],
     },
     "wall-cabinet-1": { side: "left", outer: 47.301663, inner: 47.985748 },
+  },
+  // Exact UPEF65, UPK20, and HPK2002 divider strokes from AB 105748.
+  "ab-105748": {
+    "sink-base": { side: "left", outer: 50.251781, inner: 51.933492 },
+    "drawer-module": { side: "right", inner: 71.543943, outer: 72.342043 },
+    "wall-cabinet-3": { side: "right", inner: 56.579572, outer: 57.448931 },
   },
   // The sink UPK20 and dishwasher UPEF65 are distinct vector-PDF faces.
   "ab-105758": {
@@ -538,6 +555,7 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   // PDF-measured seam between the oven and the drawer below it. The oven ends
   // on this line and the independently selectable drawer starts on the same line.
   "ab-105743": 0.661358,
+  "ab-105748": 0.66065,
   // Exact seam joining the oven quad to the drawer quad in the vector PDF.
   "ab-105758": 0.8229792919171677,
   "ab-105808": 0.681,
@@ -653,6 +671,10 @@ const L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG = {
     // Top surfaces, front fascias, then the floor-height end panel.
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel"],
   },
+  "ab-105748": {
+    // Left leg, right leg, then the WU16 floor-height end panel.
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-end-panel"],
+  },
   "ab-105837": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
   },
@@ -696,6 +718,13 @@ for (const alias of ["ab-105734", "ab-105737", "ab-105740"]) {
 }
 for (const alias of ["ab-105750", "ab-105753", "ab-105756"]) {
   L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105747"];
+}
+for (const alias of ["ab-105751", "ab-105754", "ab-105745"]) {
+  L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG[alias] = L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG["ab-105748"];
+  COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG[alias] = COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG["ab-105748"];
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105748"];
+  OVEN_DRAWER_TOP_RATIO_BY_SLUG[alias] = OVEN_DRAWER_TOP_RATIO_BY_SLUG["ab-105748"];
+  L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105748"];
 }
 
 function normalizeClaimPart(part) {
