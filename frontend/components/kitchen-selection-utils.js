@@ -403,6 +403,14 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105744-H6002-4": "12",
   "CAB-WALL-AB105744-H6002-5": "13",
   "CAB-WALL-AB105744-H4002": "14",
+  "CAB-SINK-AB105758-DEFAULT": "3",
+  "DISH-AB105758-600": "4",
+  "CAB-BASE-AB105758-US30-R": "5",
+  "REF-AB105758-KGCN388140E": "6",
+  "CAB-WALL-AB105758-H6002-R": "7",
+  "CAB-HOOD-AB105758-600": "8",
+  "HOOD-AB105758-FH664621E": "8",
+  "CAB-WALL-AB105758-US30": "9",
 };
 
 ["105840", "105843"].forEach((targetCode) => {
@@ -920,6 +928,11 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105828": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105743": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105758": [[
+    "component-wall-cabinet-2",
+    "component-extractor-hood",
+    "component-under-cabinet-light",
+  ]],
   "ab-104968": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105746": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105757": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1129,6 +1142,9 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105743-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-AB105743-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105743-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105758-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-AB105758-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105758-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
@@ -1263,6 +1279,17 @@ export function getLinkedComponentIds(slug, componentId) {
   return linkedGroup || [componentId];
 }
 
+export function getAutoLinkedAccessoryCodes(slug, selectedComponentIds = []) {
+  const normalizedSlug = String(slug || "").trim().toLowerCase();
+  if (
+    normalizedSlug === "ab-105758"
+    && selectedComponentIds.includes("component-extractor-hood")
+  ) {
+    return ["ACC-LIGHT-003"];
+  }
+  return [];
+}
+
 export function isHiddenLinkedComponent(slug, componentId) {
   const linkedIds = getLinkedComponentIds(slug, componentId);
   return linkedIds.length > 1 && linkedIds[0] !== componentId;
@@ -1345,6 +1372,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "CAB-HOOD-AB105831-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105743-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB105743-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-AB105758-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-AB105758-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB104968-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB104968-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105746-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
@@ -1368,6 +1397,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB105828-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105831-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105743-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
+  "REF-AB105758-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB104968-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105746-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
   "REF-AB105757-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),

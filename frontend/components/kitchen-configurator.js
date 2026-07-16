@@ -10,6 +10,7 @@ import {
   componentIdForItem,
   componentIdForKey,
   formatCurrency,
+  getAutoLinkedAccessoryCodes,
   getCatalogDisplayItem,
   getLinkedComponentIds,
   getLocalizedItemName,
@@ -1271,6 +1272,7 @@ function KitchenConfiguratorContent({
   const productAssistantAudioRef = useRef(null);
   const productAssistantTtsAbortControllerRef = useRef(null);
   const productAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
+  const autoLinkedLedWasSelectedRef = useRef(null);
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
   );
@@ -1335,6 +1337,21 @@ function KitchenConfiguratorContent({
     setSelectedServiceCodes(nextSelection.selectedServiceCodes);
     setCutleryLines(nextSelection.cutleryLines);
   }, [draftStorageKey, fixedAccessoryCodes, fixedComponentIds, initialContractAddress, initialContractNumber, initialOrder, kitchenConfig, kitchenSlug]);
+
+  useEffect(() => {
+    const autoLinkedAccessoryCodes = getAutoLinkedAccessoryCodes(kitchenSlug, selectedComponentIds);
+    const shouldSelectLed = autoLinkedAccessoryCodes.includes("ACC-LIGHT-003");
+    const wasSelected = autoLinkedLedWasSelectedRef.current;
+
+    if (shouldSelectLed && wasSelected !== true) {
+      setSelectedAccessoryCodes((current) => (
+        current.includes("ACC-LIGHT-003") ? current : [...current, "ACC-LIGHT-003"]
+      ));
+    } else if (!shouldSelectLed && wasSelected === true) {
+      setSelectedAccessoryCodes((current) => current.filter((code) => code !== "ACC-LIGHT-003"));
+    }
+    autoLinkedLedWasSelectedRef.current = shouldSelectLed;
+  }, [kitchenSlug, selectedComponentIds]);
 
   useEffect(() => {
     const verifiedSnapshotKey = addressVerification?.verification?.snapshot
@@ -2241,6 +2258,9 @@ function KitchenConfiguratorContent({
     }
   }
 
+  const planSelectedComponentIds = selectedAccessoryCodes.includes("ACC-LIGHT-003")
+    ? [...new Set([...selectedComponentIds, "component-under-cabinet-light"])]
+    : selectedComponentIds;
   const { stage: planStageNode, legend: planLegendNode } = useKitchenSvgStage({
     svgMarkup,
     kitchenConfig,
@@ -2248,7 +2268,7 @@ function KitchenConfiguratorContent({
     planViewport,
     fixedComponentIds,
     planLockedComponentIds,
-    selectedComponentIds,
+    selectedComponentIds: planSelectedComponentIds,
     setSelectedComponentIds,
     onResetSelection: resetSelection,
   });
