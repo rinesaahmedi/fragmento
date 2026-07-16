@@ -62,6 +62,12 @@ test("service-claim item email uses the component name as its heading and keeps 
   assert.match(source, /padding-left:20px/);
   assert.match(source, /formatAttachmentHtml\(entry, \{ includeItemContext: false \}\)/);
   assert.match(source, /function formatAttachmentFileMetaLine/);
+  assert.match(source, /serialAttachmentsByComponentId/);
+  assert.match(source, /isElectricalAppliance: isElectricalApplianceProblemArea\(area\)/);
+  assert.match(source, /row\.isElectricalAppliance/);
+  assert.match(source, />Seriennummer</);
+  assert.match(source, />Seriennummer-Foto</);
+  assert.doesNotMatch(source, /\["Seriennummer",\s*payload\.serialNumber\]/);
 });
 
 test("service-claim email requests the PDF-derived ordered-component kitchen preview", () => {

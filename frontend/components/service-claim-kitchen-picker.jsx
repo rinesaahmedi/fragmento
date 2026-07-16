@@ -131,6 +131,7 @@ export default function ServiceClaimKitchenPicker({
   value,
   visualValue = value,
   onChange,
+  onComponentToggle,
   labels,
   contractNumber,
 }) {
@@ -168,10 +169,8 @@ export default function ServiceClaimKitchenPicker({
     [planVisibleComponentIds],
   );
   const componentChoiceGroups = useMemo(
-    () => buildServiceClaimComponentChoiceGroups(selectableComponents, {
-      includeLinearSharedParts: !isLShapedClaimKitchen(kitchenSlug),
-    }),
-    [kitchenSlug, selectableComponents],
+    () => buildServiceClaimComponentChoiceGroups(selectableComponents),
+    [selectableComponents],
   );
   const componentChoiceGroupByTriggerId = useMemo(
     () => new Map(componentChoiceGroups.map((group) => [group.triggerComponentId, group])),
@@ -186,13 +185,23 @@ export default function ServiceClaimKitchenPicker({
     [componentChoiceGroups],
   );
   const togglePlanComponent = useCallback((componentId) => {
-    const choiceGroup = componentChoiceGroupByTriggerId.get(componentId);
+    if (typeof onComponentToggle === "function") {
+      onComponentToggle(componentId);
+      return;
+    }
+    const choiceGroup = componentChoiceGroupByOptionId.get(componentId);
     onChange((current) => {
       if (choiceGroup) {
         const optionIds = new Set(choiceGroup.options.map((option) => option.componentId));
         if (current.some((id) => optionIds.has(id))) {
           return current.filter((id) => !optionIds.has(id));
         }
+        return toggleClaimComponentSelection({
+          currentIds: current,
+          componentId: choiceGroup.triggerComponentId,
+          selectableComponentIds,
+          kitchenSlug,
+        });
       }
       return toggleClaimComponentSelection({
         currentIds: current,
@@ -201,7 +210,7 @@ export default function ServiceClaimKitchenPicker({
         kitchenSlug,
       });
     });
-  }, [componentChoiceGroupByTriggerId, kitchenSlug, onChange, selectableComponentIds]);
+  }, [componentChoiceGroupByOptionId, kitchenSlug, onChange, onComponentToggle, selectableComponentIds]);
 
   const fixedKey = fixedComponentIds.join("|");
   const selectableKey = (selectableComponentIds || []).join("|");
@@ -649,14 +658,7 @@ export default function ServiceClaimKitchenPicker({
                 isManualSinkSelected ? "service-claim-kitchen__manual-option--selected" : "",
               ].filter(Boolean).join(" ")}
               aria-pressed={isManualSinkSelected}
-              onClick={() => {
-                onChange((current) => toggleClaimComponentSelection({
-                  currentIds: current,
-                  componentId: sinkComponentId,
-                  selectableComponentIds,
-                  kitchenSlug,
-                }));
-              }}
+              onClick={() => togglePlanComponent(sinkComponentId)}
             >
               {labels?.sinkOption || "Sink"}
             </button>
@@ -669,14 +671,7 @@ export default function ServiceClaimKitchenPicker({
                 isManualCooktopSelected ? "service-claim-kitchen__manual-option--selected" : "",
               ].filter(Boolean).join(" ")}
               aria-pressed={isManualCooktopSelected}
-              onClick={() => {
-                onChange((current) => toggleClaimComponentSelection({
-                  currentIds: current,
-                  componentId: cooktopComponentId,
-                  selectableComponentIds,
-                  kitchenSlug,
-                }));
-              }}
+              onClick={() => togglePlanComponent(cooktopComponentId)}
             >
               {labels?.cooktopOption || "Cooktop"}
             </button>
@@ -691,14 +686,7 @@ export default function ServiceClaimKitchenPicker({
                   : "",
               ].filter(Boolean).join(" ")}
               aria-pressed={selectedIds.has(worktopEndPanelComponentId)}
-              onClick={() => {
-                onChange((current) => toggleClaimComponentSelection({
-                  currentIds: current,
-                  componentId: worktopEndPanelComponentId,
-                  selectableComponentIds,
-                  kitchenSlug,
-                }));
-              }}
+              onClick={() => togglePlanComponent(worktopEndPanelComponentId)}
             >
               {labels?.worktopEndPanelOption || worktopEndPanelOption?.nameDe || "Worktop End Panel"}
             </button>

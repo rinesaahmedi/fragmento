@@ -3307,7 +3307,7 @@ textarea {
 
 .service-field--problem-area-row {
   grid-template-columns: minmax(120px, 180px) minmax(180px, 220px) minmax(0, 1fr);
-  align-items: center;
+  align-items: start;
   gap: 10px 10px;
   margin-inline: 18px;
   padding: 10px 0;
@@ -3321,9 +3321,10 @@ textarea {
   align-items: flex-start;
   gap: 6px;
   justify-self: start;
-  align-self: center;
+  align-self: start;
   max-width: 100%;
   min-height: 54px;
+  padding-top: 10px;
   line-height: 1.3;
 }
 
@@ -3366,6 +3367,7 @@ textarea {
 
 .service-field__problem-area-part-choice {
   min-width: 0;
+  align-self: start;
 }
 
 .service-field__problem-area-part-choice.is-empty {
@@ -3409,7 +3411,9 @@ textarea {
   z-index: 20;
   top: calc(100% + 6px);
   left: 0;
-  right: 0;
+  width: max-content;
+  min-width: 100%;
+  max-width: min(340px, calc(100vw - 32px));
   padding: 7px;
   display: grid;
   gap: 4px;
@@ -3426,6 +3430,29 @@ textarea {
   gap: 8px;
   border-radius: 7px;
   cursor: pointer;
+}
+
+.service-field__problem-area-part-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 32px;
+  border: 1px solid rgba(107, 79, 58, 0.18);
+  border-radius: 8px;
+  background: rgba(217, 122, 38, 0.08);
+  color: var(--app-accent);
+}
+
+.service-field__problem-area-part-icon svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.service-field__problem-area-part-option-label {
+  min-width: 0;
+  line-height: 1.25;
 }
 
 .service-field__problem-area-part-options label:hover {
@@ -3503,6 +3530,78 @@ textarea {
 
 .service-field--problem-area-row .service-attachments {
   grid-column: 1 / -1;
+}
+
+.service-field__problem-area-serial {
+  grid-column: 2 / 4;
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  align-items: start;
+  gap: 7px 10px;
+  min-width: 0;
+  padding: 10px 0 0;
+  border-top: 1px solid rgba(107, 79, 58, 0.14);
+}
+
+.service-field__problem-area-serial-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--app-accent);
+  font-size: 0.84rem;
+  font-weight: 800;
+  min-height: 42px;
+}
+
+.service-field__problem-area-serial-controls {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) auto minmax(150px, auto);
+  align-items: center;
+  gap: 8px;
+}
+
+.service-field__problem-area-serial-controls input[type="text"] {
+  min-height: 42px;
+  padding: 9px 12px;
+}
+
+.service-field__problem-area-serial-or {
+  color: var(--app-muted, #7b7068);
+  font-weight: 800;
+}
+
+.service-field__problem-area-serial-upload {
+  min-height: 42px;
+  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(107, 79, 58, 0.24);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--app-accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.service-field__problem-area-serial-upload[aria-disabled="true"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.service-field__problem-area-serial-controls input[aria-invalid="true"] {
+  border-color: rgba(179, 38, 30, 0.72);
+  box-shadow: 0 0 0 4px rgba(179, 38, 30, 0.08);
+}
+
+.service-field__problem-area-serial > .service-attachments,
+.service-field__problem-area-serial > .service-field__problem-area-error {
+  grid-column: 2;
+}
+
+.service-serial-section--attachments-only {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .service-field__problem-area-upload-button:hover,
@@ -4241,6 +4340,7 @@ textarea {
 
   .service-field--problem-area-row > .service-field__problem-area-label {
     min-height: 0;
+    padding-top: 0;
   }
 
   .service-field__problem-area-stack {
@@ -4249,6 +4349,24 @@ textarea {
 
   .service-field__problem-area-input {
     grid-column: 1 / -1;
+  }
+
+  .service-field__problem-area-serial {
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-field__problem-area-serial-controls {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-field__problem-area-serial > .service-attachments,
+  .service-field__problem-area-serial > .service-field__problem-area-error {
+    grid-column: 1;
+  }
+
+  .service-field__problem-area-serial-or {
+    display: none;
   }
 
   .service-field__problem-area-upload-button {
