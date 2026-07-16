@@ -11,6 +11,7 @@
     "owners": "Housing Companies",
     "orders": "Orders",
     "reports": "Reports",
+    "contractAccess": "Contract access",
     "claims": "Claims",
     "settings": "Settings",
     "users": "Users",
@@ -836,6 +837,22 @@
     "accessTest": "Test",
     "accessRejected": "Rejected",
     "noContractAccess": "No contract access events found."
+  },
+  "contractAccessAdmin": {
+    "title": "Contract access",
+    "description": "The latest successful, test, and failed contract access attempts for the selected date range.",
+    "accessTime": "Time",
+    "source": "Source",
+    "device": "Device",
+    "contract": "Contract",
+    "project": "Project",
+    "result": "Result",
+    "accessAccepted": "Accepted",
+    "accessTest": "Test",
+    "accessRejected": "Access failed",
+    "noContractAccess": "No contract access events found.",
+    "directVisit": "Direct visit",
+    "notCaptured": "Not captured"
   },
   "orderDetailAdmin": {
     "orderNotFound": "Order not found",

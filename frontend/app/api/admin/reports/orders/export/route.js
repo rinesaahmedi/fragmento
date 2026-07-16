@@ -23,11 +23,6 @@ function formatDateTime(value) {
   return date.toISOString();
 }
 
-function safeSpreadsheetText(value) {
-  const text = String(value || "");
-  return /^[=+\-@]/.test(text) ? `'${text}` : text;
-}
-
 function appendSheet(workbook, sheetName, rows, widths, autoFilterStartRow = 0) {
   const worksheet = XLSX.utils.aoa_to_sheet(rows);
   const headerWidth = rows[autoFilterStartRow]?.length || rows[0]?.length || 1;
@@ -115,46 +110,6 @@ export async function GET(request) {
     ],
     [18, 26, 14, 16, 26, 34, 20, 18, 16, 12, 14, 16, 14],
     20,
-  );
-
-  appendSheet(
-    workbook,
-    "Visitor events",
-    [
-      [
-        "Created at",
-        "Event",
-        "Country",
-        "Source",
-        "UTM medium",
-        "UTM campaign",
-        "Referrer domain",
-        "Device",
-        "Browser",
-        "Operating system",
-        "Contract",
-        "Kitchen",
-        "Project",
-        "Housing company",
-      ],
-      ...visitReport.events.map((event) => [
-        formatDateTime(event.createdAt),
-        safeSpreadsheetText(event.eventType),
-        safeSpreadsheetText(event.countryCode),
-        safeSpreadsheetText(event.source),
-        safeSpreadsheetText(event.utmMedium),
-        safeSpreadsheetText(event.utmCampaign),
-        safeSpreadsheetText(event.referrerHost),
-        safeSpreadsheetText(event.deviceType),
-        safeSpreadsheetText(event.browserFamily),
-        safeSpreadsheetText(event.operatingSystem),
-        event.kitchenContract?.contractNumber || (event.contractNumberLast4 ? `••••${event.contractNumberLast4}` : ""),
-        event.kitchenContract?.kitchen?.name || "",
-        event.kitchenContract?.project?.name || "",
-        event.kitchenContract?.project?.housingCompany?.name || "",
-      ]),
-    ],
-    [24, 24, 10, 20, 18, 24, 28, 14, 18, 18, 20, 26, 26, 28],
   );
 
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });

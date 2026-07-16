@@ -1,6 +1,24 @@
 import { prisma } from "./prisma.js";
 import { PUBLIC_VISIT_EVENT_TYPES } from "./public-visit-tracking.js";
 
+const CONTRACT_ACCESS_EVENT_TYPES = [
+  PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED,
+  PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED,
+  PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED,
+];
+
+function normalizeDateFilter(value) {
+  const normalized = String(value || "").trim();
+  return /^\d{4}-\d{2}-\d{2}$/.test(normalized) ? normalized : "";
+}
+
+export function normalizePublicVisitReportFilters(input = {}) {
+  return {
+    dateFrom: normalizeDateFilter(input.dateFrom),
+    dateTo: normalizeDateFilter(input.dateTo),
+  };
+}
+
 function getVisitReportWhere(filters = {}) {
   const where = {};
 
@@ -86,11 +104,7 @@ export function calculatePublicVisitBreakdowns(events = []) {
     incrementCount(devices, event.deviceType);
   }
 
-  const contractEventTypes = new Set([
-    PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED,
-    PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED,
-    PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED,
-  ]);
+  const contractEventTypes = new Set(CONTRACT_ACCESS_EVENT_TYPES);
 
   return {
     countries: countRows(countries, "countryCode"),
@@ -98,6 +112,33 @@ export function calculatePublicVisitBreakdowns(events = []) {
     devices: countRows(devices, "deviceType"),
     recentContractEvents: events.filter((event) => contractEventTypes.has(event.eventType)).slice(0, 100),
   };
+}
+
+export async function loadRecentContractAccessData(filters = {}) {
+  return prisma.publicVisitEvent.findMany({
+    where: {
+      ...getVisitReportWhere(filters),
+      eventType: { in: CONTRACT_ACCESS_EVENT_TYPES },
+    },
+    include: {
+      kitchenContract: {
+        select: {
+          id: true,
+          contractNumber: true,
+          kitchen: { select: { id: true, name: true, slug: true } },
+          project: {
+            select: {
+              id: true,
+              name: true,
+              housingCompany: { select: { id: true, name: true } },
+            },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
 }
 
 export async function loadPublicVisitReportData(filters = {}) {

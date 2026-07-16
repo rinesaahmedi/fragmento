@@ -113,19 +113,6 @@ function BreakdownPanel({ title, rows, renderLabel }) {
   );
 }
 
-function VisitResultBadge({ eventType }) {
-  const isAccepted = eventType === "CONTRACT_ACCEPTED";
-  const isTest = eventType === "CONTRACT_TEST_ACCEPTED";
-  const style = isAccepted ? visitAcceptedStyle : isTest ? visitTestStyle : visitRejectedStyle;
-  const key = isAccepted
-    ? "reportsAdmin.accessAccepted"
-    : isTest
-      ? "reportsAdmin.accessTest"
-      : "reportsAdmin.accessRejected";
-  const fallback = isAccepted ? "Accepted" : isTest ? "Test" : "Rejected";
-  return <span style={style}><AdminText i18nKey={key} fallback={fallback} /></span>;
-}
-
 export default async function AdminReportsPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
@@ -139,7 +126,6 @@ export default async function AdminReportsPage({ searchParams = {} }) {
     countries: visitCountries,
     sources: visitSources,
     devices: visitDevices,
-    recentContractEvents,
   } = visitReport;
   const exportHref = getExportHref(filters);
 
@@ -296,63 +282,6 @@ export default async function AdminReportsPage({ searchParams = {} }) {
               }
             }
           `}</style>
-        </AdminSection>
-
-        <AdminSection
-          title={<AdminText i18nKey="reportsAdmin.recentContractAccess" fallback="Recent contract access" />}
-          description={<AdminText i18nKey="reportsAdmin.recentContractAccessDescription" fallback="The latest accepted and rejected contract checks for the selected date range." />}
-        >
-          <div className="admin-reports-table" style={tableWrapStyle}>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.accessTime" fallback="Time" /></th>
-                  <th style={thStyle}><AdminText i18nKey="contractAddressFields.country" fallback="Country" /></th>
-                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.source" fallback="Source" /></th>
-                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.device" fallback="Device" /></th>
-                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.contract" fallback="Contract" /></th>
-                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.project" fallback="Project" /></th>
-                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.result" fallback="Result" /></th>
-                </tr>
-              </thead>
-              <tbody>
-                {!recentContractEvents.length ? (
-                  <tr>
-                    <td style={tdStyle} colSpan={7}><AdminText i18nKey="reportsAdmin.noContractAccess" fallback="No contract access events found." /></td>
-                  </tr>
-                ) : null}
-                {recentContractEvents.map((event) => {
-                  const contract = event.kitchenContract;
-                  const source = event.source || event.referrerHost || "direct";
-                  return (
-                    <tr key={event.id}>
-                      <td style={tdStyle}><AdminDateTime value={event.createdAt} /></td>
-                      <td style={tdStyle}><AdminCountryName code={event.countryCode} /></td>
-                      <td style={tdStyle}>
-                        <strong>{source === "direct" ? <AdminText i18nKey="reportsAdmin.directVisit" fallback="Direct visit" /> : source}</strong>
-                        {event.utmCampaign ? <span style={mutedLineStyle}>{event.utmCampaign}</span> : null}
-                      </td>
-                      <td style={tdStyle}>
-                        {event.deviceType || <AdminText i18nKey="reportsAdmin.notCaptured" fallback="Not captured" />}
-                        {event.browserFamily ? <span style={mutedLineStyle}>{event.browserFamily} · {event.operatingSystem}</span> : null}
-                      </td>
-                      <td style={tdStyle}>
-                        {contract ? (
-                          <Link href={`/admin/contracts/${contract.id}`} style={orderLinkStyle}>{contract.contractNumber}</Link>
-                        ) : event.contractNumberLast4 ? `••••${event.contractNumberLast4}` : "-"}
-                        {contract?.kitchen?.name ? <span style={mutedLineStyle}>{contract.kitchen.name}</span> : null}
-                      </td>
-                      <td style={tdStyle}>
-                        {contract?.project?.name || "-"}
-                        {contract?.project?.housingCompany?.name ? <span style={mutedLineStyle}>{contract.project.housingCompany.name}</span> : null}
-                      </td>
-                      <td style={tdStyle}><VisitResultBadge eventType={event.eventType} /></td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
         </AdminSection>
 
         <AdminSection
@@ -541,38 +470,6 @@ const privacyNoteStyle = {
   color: "var(--app-text-muted)",
   fontSize: 12,
   lineHeight: 1.6,
-};
-
-const visitBadgeBaseStyle = {
-  display: "inline-flex",
-  borderRadius: 999,
-  padding: "6px 9px",
-  fontSize: 11,
-  fontWeight: 900,
-  textTransform: "uppercase",
-  border: "1px solid transparent",
-  whiteSpace: "nowrap",
-};
-
-const visitAcceptedStyle = {
-  ...visitBadgeBaseStyle,
-  color: "#1f6f43",
-  background: "rgba(42, 145, 85, 0.12)",
-  borderColor: "rgba(42, 145, 85, 0.22)",
-};
-
-const visitTestStyle = {
-  ...visitBadgeBaseStyle,
-  color: "#7b5a11",
-  background: "rgba(207, 145, 36, 0.12)",
-  borderColor: "rgba(207, 145, 36, 0.22)",
-};
-
-const visitRejectedStyle = {
-  ...visitBadgeBaseStyle,
-  color: "var(--app-danger-text)",
-  background: "rgba(217, 92, 92, 0.12)",
-  borderColor: "rgba(217, 92, 92, 0.22)",
 };
 
 const orderCountCardStyle = {

@@ -11,6 +11,7 @@
     "owners": "Wohnungsgesellschaften",
     "orders": "Bestellungen",
     "reports": "Berichte",
+    "contractAccess": "Vertragszugriffe",
     "claims": "Reklamationen",
     "settings": "Einstellungen",
     "users": "Benutzer",
@@ -837,6 +838,22 @@
     "accessTest": "Test",
     "accessRejected": "Abgelehnt",
     "noContractAccess": "Keine Vertragszugriffe gefunden."
+  },
+  "contractAccessAdmin": {
+    "title": "Vertragszugriffe",
+    "description": "Die neuesten erfolgreichen, Test- und fehlgeschlagenen Vertragszugriffe im ausgewählten Zeitraum.",
+    "accessTime": "Zeitpunkt",
+    "source": "Quelle",
+    "device": "Gerät",
+    "contract": "Vertrag",
+    "project": "Projekt",
+    "result": "Ergebnis",
+    "accessAccepted": "Akzeptiert",
+    "accessTest": "Test",
+    "accessRejected": "Zugriff fehlgeschlagen",
+    "noContractAccess": "Keine Vertragszugriffe gefunden.",
+    "directVisit": "Direkter Besuch",
+    "notCaptured": "Nicht erfasst"
   },
   "orderDetailAdmin": {
     "orderNotFound": "Bestellung nicht gefunden",
