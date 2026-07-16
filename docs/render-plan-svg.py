@@ -23,7 +23,20 @@ MINOR_STROKE_WIDTH = 4
 
 def normalize_plan_svg_strokes(svg: str) -> str:
     """Boost hairline PDF strokes so exported plans match the visual weight of thicker CAD exports."""
-    svg = re.sub(r'stroke="#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})"', 'stroke="#000000"', svg)
+    # Appliance symbols can intentionally use a pale CAD gray. Keep that source
+    # distinction instead of flattening every stroke to black (for example, the
+    # integrated-dishwasher basket in AB 105748 is RGB 240/240/240).
+    def normalize_stroke_color(match: re.Match[str]) -> str:
+        color = match.group(1).lower()
+        if color == "#f0f0f0":
+            return 'stroke="#f0f0f0"'
+        return 'stroke="#000000"'
+
+    svg = re.sub(
+        r'stroke="(#[0-9a-fA-F]{3}|#[0-9a-fA-F]{6})"',
+        normalize_stroke_color,
+        svg,
+    )
 
     def boost_black_stroke(match: re.Match[str]) -> str:
         path = match.group(0)
