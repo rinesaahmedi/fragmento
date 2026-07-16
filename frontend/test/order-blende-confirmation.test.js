@@ -295,6 +295,40 @@ test("order confirmation groups multiple blendes under their parent cabinet", ()
   assert.doesNotMatch(html, /UPK20 x2/);
 });
 
+test("order confirmation keeps a dishwasher corner filler with electrical appliances", () => {
+  const order = {
+    orderNumber: "FRG-TEST-008",
+    total: 647,
+    kitchen: { name: "Demo Kitchen" },
+    customer: { contractNumber: "KV-108", preferredDeliveryDate: "2026-07-15" },
+    components: [
+      {
+        code: "DISH-AB105758-600",
+        articleNumber: "A-EGSPV597210 + TGV60",
+        name: "Fully integrated dishwasher incl. furniture front",
+        nameDe: "Vollintegrierter Geschirrspuler inkl. Mobelfront",
+        iconKey: "dishwasher_base",
+        componentKey: "base-module-3",
+        price: 647,
+        blendeCode: "UPEF65",
+        blendeLabel: "UPEF65, Corner filler panel",
+        blendePrice: 68,
+      },
+    ],
+    accessories: [],
+    services: [],
+  };
+
+  const html = buildOrderSummaryHtml(order);
+  const electricalSectionIndex = html.indexOf("Neu bestätigte Elektrogeräte");
+  const dishwasherIndex = html.indexOf("Vollintegrierter Geschirrspuler");
+  const cornerFillerIndex = html.indexOf("UPEF65, Corner filler panel");
+
+  assert.ok(electricalSectionIndex > -1);
+  assert.ok(dishwasherIndex > electricalSectionIndex);
+  assert.ok(cornerFillerIndex > dishwasherIndex);
+});
+
 test("order confirmation product-info attachments exclude default zero-price items", async () => {
   const order = {
     orderNumber: "FRG-TEST-002",
