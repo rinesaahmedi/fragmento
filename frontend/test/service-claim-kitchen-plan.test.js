@@ -13,6 +13,7 @@ import {
   buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
 } from "../lib/service-claim-kitchen-hotspots.js";
+import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(__dirname, "..");
@@ -441,6 +442,7 @@ test("hood cabinet, extractor, and FWK124 filter use separate claim identities",
     ["component-claim-filter"],
   );
   assert.equal(cabinetMeta.name, "Cabinet");
+  assert.equal(cabinetMeta.nameDe, "Schrank");
   assert.equal(cabinetMeta.articleCode, "HD6002");
   assert.equal(extractorMeta.name, "Extractor Hood");
   assert.equal(extractorMeta.articleCode, "FH 664 621 E");
@@ -505,6 +507,82 @@ test("manual filter claims do not replace the hood cabinet hotspot", () => {
 
   assert.deepEqual(result, [sourceHotspot]);
 });
+
+test("shared hood, dishwasher, and cabinet areas expose contextual part choices", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-wall-cabinet-2", componentKey: "wall-cabinet-2", name: "Cabinet" },
+    { componentId: "component-claim-filter", componentKey: "wall-cabinet-2", claimPartKey: "filter", name: "Extractor Hood Filter" },
+    { componentId: "component-claim-dishwasher", componentKey: "base-module-3", claimPartKey: "dishwasher", name: "Dishwasher" },
+    { componentId: "component-claim-furniture-front", componentKey: "base-module-3", claimPartKey: "furniture-front", name: "Furniture Front" },
+    { componentId: "component-base-module-1", componentKey: "base-module-1", name: "Corner Cabinet" },
+    { componentId: "component-claim-blende-base-module-1", sourceComponentKey: "base-module-1", claimPartKey: "blende", isCompanionOption: true, name: "UPK20 Filler Panel" },
+    { componentId: "component-claim-sink-cabinet", componentKey: "sink-base", claimPartKey: "sink-cabinet", name: "Sink Cabinet" },
+    { componentId: "component-claim-sink", componentKey: "sink-base", claimPartKey: "sink", name: "Sink" },
+    { componentId: "component-claim-blende-sink-base", sourceComponentKey: "sink-base", claimPartKey: "blende", isCompanionOption: true, name: "UPK20 Filler Panel" },
+  ]);
+
+  assert.deepEqual(
+    groups.map((group) => ({
+      triggerComponentId: group.triggerComponentId,
+      optionIds: group.options.map((option) => option.componentId),
+    })),
+    [
+      {
+        triggerComponentId: "component-wall-cabinet-2",
+        optionIds: ["component-wall-cabinet-2", "component-claim-filter"],
+      },
+      {
+        triggerComponentId: "component-claim-dishwasher",
+        optionIds: ["component-claim-dishwasher", "component-claim-furniture-front"],
+      },
+      {
+        triggerComponentId: "component-base-module-1",
+        optionIds: ["component-base-module-1", "component-claim-blende-base-module-1"],
+      },
+      {
+        triggerComponentId: "component-claim-sink-cabinet",
+        optionIds: ["component-claim-sink-cabinet", "component-claim-blende-sink-base"],
+      },
+    ],
+  );
+});
+
+test("linear kitchens expose oven/cooktop and sink-cabinet/sink choices", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-claim-oven", claimPartKey: "oven", name: "Built-in Oven" },
+    { componentId: "component-claim-oven-drawer", claimPartKey: "oven-drawer", name: "Oven Drawer" },
+    { componentId: "component-claim-cooktop", claimPartKey: "cooktop", name: "Cooktop" },
+    { componentId: "component-claim-sink", claimPartKey: "sink", name: "Sink" },
+    { componentId: "component-claim-sink-cabinet", claimPartKey: "sink-cabinet", name: "Sink Cabinet" },
+    { componentId: "component-claim-faucet", claimPartKey: "faucet", name: "Faucet" },
+  ], { includeLinearSharedParts: true });
+
+  assert.deepEqual(
+    groups.map((group) => ({
+      triggerComponentId: group.triggerComponentId,
+      optionIds: group.options.map((option) => option.componentId),
+    })),
+    [
+      {
+        triggerComponentId: "component-claim-oven",
+        optionIds: ["component-claim-oven", "component-claim-cooktop"],
+      },
+      {
+        triggerComponentId: "component-claim-sink-cabinet",
+        optionIds: ["component-claim-sink-cabinet", "component-claim-sink"],
+      },
+    ],
+  );
+
+  assert.deepEqual(
+    buildServiceClaimComponentChoiceGroups([
+      { componentId: "component-claim-oven", claimPartKey: "oven" },
+      { componentId: "component-claim-cooktop", claimPartKey: "cooktop" },
+    ]),
+    [],
+  );
+});
+
 
 test("60 cm dishwasher bundles split into price-list dishwasher and furniture-front claims", () => {
   const dishwasherBundle = component(
@@ -1270,6 +1348,7 @@ test("all seeded standalone FH664621E hoods use the E article number", () => {
 
 test("service claim picker toggles the selected claim component", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"), "utf8");
+  const flowSource = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
 
   assert.match(source, /getServiceClaimLinkedComponentIds/);
   assert.match(source, /IMAGE_HOTSPOTS_BY_SLUG/);
@@ -1286,28 +1365,45 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(source, /getHotspotSvgPolygonPoints/);
   assert.match(source, /getServiceClaimLinkedComponentIds\(kitchenSlug,\s*hotspot\.componentId\)[\s\S]*\.includes\(hoveredComponentId\)/);
   assert.match(source, /styles\.planHotspotHover/);
-  assert.match(source, /const isSelected = selectedIds\.has\(hotspot\.componentId\);/);
+  assert.match(source, /const isSelected = displaySelectedIds\.has\(hotspot\.componentId\);/);
   assert.match(source, /getServiceClaimLinkedComponentIds\(kitchenSlug,\s*componentId\)\.filter\(\(id\) => selectable\.has\(id\)\)/);
   assert.match(source, /const shouldRemove = ids\.some\(\(id\) => current\.has\(id\)\);/);
   assert.match(source, /!isLShapedClaimKitchen\(kitchenSlug\)/);
   assert.match(source, /service-claim-kitchen__manual-option/);
   assert.match(source, /componentId:\s*sinkComponentId/);
   assert.match(source, /showManualCooktopOption/);
-  assert.match(source, /const formOnlyClaimOptions = selectableComponents\.filter/);
-  assert.match(source, /component\?\.isCompanionOption/);
-  assert.match(source, /formOnlyClaimOptions\.map\(\(option\)/);
+  assert.match(source, /buildServiceClaimComponentChoiceGroups/);
+  assert.match(source, /togglePlanComponent\(hotspot\.componentId\)/);
+  assert.doesNotMatch(source, /service-claim-kitchen__part-choices--floating/);
+  assert.match(flowSource, /service-field__problem-area-part-select/);
+  assert.match(flowSource, /handleProblemAreaPartChoice/);
+  assert.match(flowSource, /area\.choiceGroup\.options\.map\(\(option\)/);
+  assert.match(flowSource, /area\.selectedPartComponentIds\.includes\(option\.componentId\)/);
+  assert.match(flowSource, /type="checkbox"/);
+  assert.match(flowSource, /data-problem-area-part-choice-required/);
+  assert.match(flowSource, /service-field--problem-area-row-has-part-choice/);
+  assert.match(flowSource, /Array\.isArray\(storedPartChoices\)/);
+  assert.match(flowSource, /area\.resolvedAreas\.map\(\(resolvedArea\)/);
+  assert.match(flowSource, /\{area\.resolvedLabel\}/);
+  assert.match(flowSource, /\{area\.resolvedArticleCode\}/);
+  assert.match(flowSource, /resolvedArticleCode: displayedParts[\s\S]*\.join\(" \/ "\)/);
+  assert.match(flowSource, /return rowParts\.map\(\(selectedPart, rowIndex\)/);
+  assert.match(flowSource, /rowKey: `\$\{area\.componentId\}:\$\{rowComponentId\}`/);
+  assert.match(flowSource, /closest\("details"\)\?\.removeAttribute\("open"\)/);
+  assert.match(flowSource, /kitchenPlanPartChoiceSelectedCount/);
+  assert.match(flowSource, /singleSelectedPart[\s\S]*formatClaimAreaName\(singleSelectedPart, singleSelectedPart\.name, language\)/);
+  assert.match(flowSource, /keptEntries\.length === entries\.length \? current : Object\.fromEntries\(keptEntries\)/);
+  assert.match(flowSource, /visualValue=\{problemPlanDisplayComponentIds\}/);
+  assert.match(source, /if \(hotspotIds\.has\(componentId\)\) return componentId/);
+  assert.match(source, /componentChoiceGroupByOptionId\.get\(componentId\)\?\.triggerComponentId/);
+  assert.match(flowSource, /problemComponentIds[\s\S]*\.map\(\(componentId\) => componentById\.get\(componentId\)\)/);
+  assert.match(flowSource, /collapseServiceClaimLinkedComponents\([\s\S]*selectedComponentsInSelectionOrder/);
   assert.match(source, /hasManualWorktopEndPanelOption/);
   assert.match(source, /componentId: worktopEndPanelComponentId/);
   assert.match(source, /worktopEndPanelOption/);
   assert.match(source, /componentId:\s*cooktopComponentId/);
   assert.match(source, /labels\?\.sinkOption\s*\|\|\s*"Sink"/);
   assert.match(source, /labels\?\.cooktopOption\s*\|\|\s*"Cooktop"/);
-  assert.match(source, /showManualFilterOption/);
-  assert.match(source, /componentId:\s*filterComponentId/);
-  assert.match(source, /labels\?\.filterOption\s*\|\|\s*"Extractor Hood Filter"/);
-  assert.match(source, /showManualFurnitureFrontOption/);
-  assert.match(source, /componentId:\s*furnitureFrontComponentId/);
-  assert.match(source, /labels\?\.furnitureFrontOption\s*\|\|\s*"Furniture Front \(Dishwasher\)"/);
 });
 
 test("service claim kitchen plan uses test order state for 111 contracts", () => {
@@ -2046,11 +2142,11 @@ test("AB 104968 cooktop uses the four outside vector-PDF strokes", () => {
 test("selected service claim components have accessible per-row remove buttons", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
 
-  assert.match(source, /function removeProblemArea\(componentId\)/);
+  assert.match(source, /function removeProblemArea\(componentId, rowComponentId = componentId, selectedPartComponentIds = \[\]\)/);
   assert.match(source, /getServiceClaimLinkedComponentIds\(activeKitchenPlan\?\.kitchenSlug,\s*componentId\)/);
   assert.match(source, /className="service-field__problem-area-remove"/);
-  assert.match(source, /aria-label=\{t\("removeProblemAreaAria"\)\.replace\("\{label\}",\s*area\.label\)\}/);
-  assert.match(source, /onClick=\{\(\) => removeProblemArea\(area\.componentId\)\}/);
+  assert.match(source, /aria-label=\{t\("removeProblemAreaAria"\)\.replace\("\{label\}",\s*area\.resolvedLabel\)\}/);
+  assert.match(source, /onClick=\{\(\) => removeProblemArea\([\s\S]*area\.rowComponentId/);
 });
 
 test("segmented L worktop surfaces and front edges stay assigned to their side", () => {
@@ -2098,7 +2194,7 @@ test("service claim picker outlines worktop surfaces but not separate front-edge
   assert.match(styles, /\.planHotspotWorktop[\s\S]*border-color:\s*transparent;[\s\S]*box-shadow:\s*none;/);
 });
 
-test("service claim picker preserves sink and cooktop cutouts over a selected worktop", () => {
+test("service claim picker preserves unselected sink and cooktop cutouts in a selected worktop", () => {
   const source = fs.readFileSync(
     path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"),
     "utf8",
@@ -2108,11 +2204,10 @@ test("service claim picker preserves sink and cooktop cutouts over a selected wo
     "utf8",
   );
 
-  assert.match(
-    source,
-    /hotspot\.claimPartKey === "sink"\s*\|\|\s*hotspot\.claimPartKey === "cooktop"/,
-  );
+  assert.match(source, /hotspot\.claimPartKey === "sink"\s*\|\|\s*hotspot\.claimPartKey === "cooktop"/);
   assert.match(source, /hotspot\.componentKey === "worktop"/);
+  assert.match(source, /\(hotspot\) => !displaySelectedIds\.has\(hotspot\.componentId\)/);
+  assert.doesNotMatch(source, /hasSelectedWorktop\s*&&\s*hotspot\.claimPartKey === "cooktop"/);
   assert.match(source, /hasSelectedWorktop\s*&&\s*visibleApplianceImageHotspots\.length/);
   assert.match(source, /className=\{styles\.planApplianceCutouts\}/);
   assert.match(source, /className=\{styles\.planApplianceCutoutBacking\}[\s\S]*clipPath=\{`url\(#\$\{applianceClipPathId\}\)`\}/);
@@ -2545,7 +2640,8 @@ test("German service claim labels do not fall back to English catalog names", ()
 
   assert.match(source, /function formatGermanClaimAreaName/);
   assert.match(source, /claimPartNameDe[\s\S]*return claimPartNameDe/);
-  assert.match(source, /service-field__problem-area-article-code[\s\S]*area\.articleCode/);
+  assert.match(source, /formatClaimAreaName\(option, option\.name, language\)/);
+  assert.match(source, /service-field__problem-area-article-code[\s\S]*area\.resolvedArticleCode/);
   assert.match(source, /component-claim-oven"\) \{[\s\S]*return "Backofen"/);
   assert.match(source, /component-claim-oven-drawer"\) \{[\s\S]*return "Schublade unter Backofen"/);
   assert.match(source, /component-claim-cooktop"\) \{[\s\S]*return "Kochfeld"/);

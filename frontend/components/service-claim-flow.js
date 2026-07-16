@@ -11,6 +11,8 @@ import {
   collapseServiceClaimLinkedComponents,
   getServiceClaimLinkedComponentIds,
 } from "../lib/service-claim-kitchen-plan-selection";
+import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices";
+import { isLShapedClaimKitchen } from "../lib/service-claim-kitchen-hotspots";
 import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
 import { countElectricalApplianceProblemAreas } from "../lib/service-claim-serial-number";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
@@ -72,7 +74,9 @@ function formatGermanClaimAreaName(area, fallbackName) {
   const normalizedName = String(fallbackName || area?.name || "").trim().toLowerCase();
   const claimPartNameDe = String(area?.nameDe || "").trim();
 
-  if ((area?.claimPartKey || componentId.startsWith("component-claim-")) && claimPartNameDe) {
+  // German names come from KitchenItem/KitchenClaimPart in the database.
+  // The rules below remain only as fallbacks for legacy rows without nameDe.
+  if (claimPartNameDe) {
     return claimPartNameDe;
   }
 
@@ -610,6 +614,8 @@ const COPY = {
     kitchenPlanWorktopEndPanelOption: "Unterschrank-Wange",
     kitchenPlanFilterOption: "Filter f\u00fcr Dunstabzugshaube",
     kitchenPlanFurnitureFrontOption: "M\u00f6belfront (Geschirrsp\u00fcler)",
+    kitchenPlanPartChoicePlaceholder: "Betroffenes Teil ausw\u00e4hlen\u2026",
+    kitchenPlanPartChoiceSelectedCount: "Auswahl \u00e4ndern ({count})",
     kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
     kitchenPlanSelectedNone: "Noch keine Bereiche ausgew\u00e4hlt.",
     kitchenAreasLinePrefix: "K\u00fcchenbereiche:",
@@ -848,6 +854,8 @@ const COPY = {
     kitchenPlanWorktopEndPanelOption: "Cabinet side panel",
     kitchenPlanFilterOption: "Extractor Hood Filter",
     kitchenPlanFurnitureFrontOption: "Furniture Front (Dishwasher)",
+    kitchenPlanPartChoicePlaceholder: "Choose affected part\u2026",
+    kitchenPlanPartChoiceSelectedCount: "Change selection ({count})",
     kitchenPlanSelectedLabel: "Selected",
     kitchenPlanSelectedNone: "No areas selected yet.",
     kitchenAreasLinePrefix: "Kitchen areas:",
@@ -2056,6 +2064,7 @@ export default function ServiceClaimFlow() {
   const [completedRegistration, setCompletedRegistration] = useState(null);
   const [contractLookup, setContractLookup] = useState(EMPTY_CONTRACT_LOOKUP);
   const [problemComponentIds, setProblemComponentIds] = useState([]);
+  const [problemAreaPartChoiceByGroupKey, setProblemAreaPartChoiceByGroupKey] = useState({});
   const [problemAreaDetailsByComponentId, setProblemAreaDetailsByComponentId] = useState({});
   const [problemAreaAttachmentsByComponentId, setProblemAreaAttachmentsByComponentId] = useState({});
   const [attachments, setAttachments] = useState([]);
@@ -2207,14 +2216,38 @@ export default function ServiceClaimFlow() {
     contractLookup.kitchenPlan,
     normalizedContractNumber,
   ]);
+  const problemAreaChoiceGroupByComponentId = useMemo(() => {
+    if (!activeKitchenPlan?.selectableComponents?.length) return new Map();
+    const groups = buildServiceClaimComponentChoiceGroups(
+      activeKitchenPlan.selectableComponents,
+      { includeLinearSharedParts: !isLShapedClaimKitchen(activeKitchenPlan.kitchenSlug) },
+    );
+    return new Map(
+      groups.flatMap((group) => group.options.map((option) => [option.componentId, group])),
+    );
+  }, [activeKitchenPlan]);
+  const problemPlanDisplayComponentIds = useMemo(() => problemComponentIds.flatMap((componentId) => {
+    const choiceGroup = problemAreaChoiceGroupByComponentId.get(componentId);
+    if (!choiceGroup) return [componentId];
+    const storedChoices = problemAreaPartChoiceByGroupKey[choiceGroup.sourceComponentKey];
+    const selectedChoiceIds = Array.isArray(storedChoices)
+      ? storedChoices
+      : storedChoices ? [storedChoices] : [];
+    return selectedChoiceIds.length ? selectedChoiceIds : [componentId];
+  }), [problemAreaChoiceGroupByComponentId, problemAreaPartChoiceByGroupKey, problemComponentIds]);
   const selectedProblemAreas = useMemo(() => {
     if (!activeKitchenPlan?.selectableComponents?.length || !problemComponentIds.length) {
       return [];
     }
-    const selectedIds = new Set(problemComponentIds);
+    const componentById = new Map(
+      activeKitchenPlan.selectableComponents.map((entry) => [entry.componentId, entry]),
+    );
+    const selectedComponentsInSelectionOrder = problemComponentIds
+      .map((componentId) => componentById.get(componentId))
+      .filter(Boolean);
     return collapseServiceClaimLinkedComponents(
       activeKitchenPlan.kitchenSlug,
-      activeKitchenPlan.selectableComponents.filter((entry) => selectedIds.has(entry.componentId)),
+      selectedComponentsInSelectionOrder,
     )
       .map((entry) => ({
         ...entry,
@@ -2243,34 +2276,82 @@ export default function ServiceClaimFlow() {
     () => parseSerialNumberList(formValues.serialNumber),
     [formValues.serialNumber],
   );
+  const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
+  const selectedProblemAreasWithDetails = useMemo(() => {
+    return selectedProblemAreas.flatMap((area) => {
+      const choiceGroup = problemAreaChoiceGroupByComponentId.get(area.componentId) || null;
+      const storedPartChoices = choiceGroup
+        ? problemAreaPartChoiceByGroupKey[choiceGroup.sourceComponentKey]
+        : null;
+      const selectedPartComponentIds = choiceGroup
+        ? (Array.isArray(storedPartChoices) ? storedPartChoices : storedPartChoices ? [storedPartChoices] : [])
+        : [area.componentId];
+      const optionById = new Map(choiceGroup?.options.map((option) => [option.componentId, option]) || []);
+      const selectedParts = choiceGroup
+        ? selectedPartComponentIds.map((componentId) => optionById.get(componentId)).filter(Boolean)
+        : [area];
+      const rowParts = selectedParts.length ? selectedParts : [null];
+
+      return rowParts.map((selectedPart, rowIndex) => {
+        const displayedParts = selectedPart ? [selectedPart] : choiceGroup?.options || [area];
+        const rowComponentId = selectedPart?.componentId || area.componentId;
+        return {
+          ...area,
+          rowKey: `${area.componentId}:${rowComponentId}`,
+          rowComponentId,
+          choiceGroup,
+          showPartChoiceControl: !choiceGroup || rowIndex === 0,
+          selectedPartComponentIds,
+          resolvedAreas: selectedPart ? [selectedPart] : choiceGroup ? [] : [area],
+          resolvedLabel: displayedParts
+            .map((part) => formatClaimAreaName(part, part.name, language))
+            .filter(Boolean)
+            .join(" / "),
+          resolvedArticleCode: displayedParts
+            .map((part) => part.articleCode || part.articleNumber || "")
+            .filter(Boolean)
+            .join(" / "),
+          detail: problemAreaDetailsByComponentId[rowComponentId] || "",
+          attachments: problemAreaAttachmentsByComponentId[rowComponentId] || [],
+          attachmentFieldKey: problemAreaAttachmentFieldKeysByComponentId[rowComponentId] || 0,
+        };
+      });
+    });
+  }, [
+    language,
+    problemAreaAttachmentsByComponentId,
+    problemAreaAttachmentFieldKeysByComponentId,
+    problemAreaDetailsByComponentId,
+    problemAreaChoiceGroupByComponentId,
+    problemAreaPartChoiceByGroupKey,
+    selectedProblemAreas,
+  ]);
+  const resolvedProblemAreas = useMemo(
+    () => selectedProblemAreasWithDetails
+      .flatMap((area) => area.resolvedAreas.map((resolvedArea) => ({
+        componentId: resolvedArea.componentId,
+        code: resolvedArea.code,
+        name: resolvedArea.name,
+      }))),
+    [selectedProblemAreasWithDetails],
+  );
   const requiredSelectedSerialNumberCount = useMemo(
-    () => countElectricalApplianceProblemAreas(selectedProblemAreas),
-    [selectedProblemAreas],
+    () => countElectricalApplianceProblemAreas(resolvedProblemAreas),
+    [resolvedProblemAreas],
   );
   const hasSelectedElectricalAppliances = requiredSelectedSerialNumberCount > 0;
   const applicableSerialNumberImages = hasSelectedElectricalAppliances ? serialNumberImages : [];
   const hasReachedRequiredSerialEvidenceCount =
     hasSelectedElectricalAppliances
     && serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount;
-  const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
-  const selectedProblemAreasWithDetails = useMemo(() => {
-    return selectedProblemAreas.map((area) => ({
-      ...area,
-      detail: problemAreaDetailsByComponentId[area.componentId] || "",
-      attachments: problemAreaAttachmentsByComponentId[area.componentId] || [],
-      attachmentFieldKey: problemAreaAttachmentFieldKeysByComponentId[area.componentId] || 0,
-    }));
-  }, [
-    problemAreaAttachmentsByComponentId,
-    problemAreaAttachmentFieldKeysByComponentId,
-    problemAreaDetailsByComponentId,
-    selectedProblemAreas,
-  ]);
+  const hasMissingProblemAreaPartChoices = selectedProblemAreasWithDetails.some(
+    (area) => area.choiceGroup && !area.selectedPartComponentIds.length,
+  );
   const missingProblemAreaAttachmentIds = useMemo(
     () =>
       selectedProblemAreasWithDetails
         .filter((area) => !area.attachments.length)
-        .map((area) => area.componentId),
+        .map((area) => area.rowComponentId),
     [selectedProblemAreasWithDetails],
   );
   const hasMissingProblemAreaAttachments = missingProblemAreaAttachmentIds.length > 0;
@@ -2431,34 +2512,6 @@ export default function ServiceClaimFlow() {
   }, [isComplaintMode]);
 
   useEffect(() => {
-    if (!isComplaintMode) {
-      return undefined;
-    }
-
-    const section = clientAddressSectionRef.current;
-    if (!section || typeof IntersectionObserver === "undefined") {
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          hasSeenClientAddressSectionRef.current = true;
-          return;
-        }
-        if (hasSeenClientAddressSectionRef.current && entry.boundingClientRect.top < 0) {
-          setIsClaimRequiredAlertDismissed(false);
-          setShowClaimRequiredErrors(true);
-        }
-      },
-      { threshold: 0.12 },
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [isComplaintMode]);
-
-  useEffect(() => {
     if (!isComplaintMode || !isContractNumberStickyEnabled) {
       setIsContractNumberCurrentlyStuck(false);
       return undefined;
@@ -2510,24 +2563,70 @@ export default function ServiceClaimFlow() {
   }, [isComplaintMode, isContractNumberStickyEnabled]);
 
   useEffect(() => {
-    const selectedIds = new Set(selectedProblemAreas.map((area) => area.componentId));
+    if (!isComplaintMode) {
+      return undefined;
+    }
+
+    const section = clientAddressSectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") {
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          hasSeenClientAddressSectionRef.current = true;
+          return;
+        }
+        if (hasSeenClientAddressSectionRef.current && entry.boundingClientRect.top < 0) {
+          setIsClaimRequiredAlertDismissed(false);
+          setShowClaimRequiredErrors(true);
+        }
+      },
+      { threshold: 0.12 },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [isComplaintMode]);
+
+  useEffect(() => {
+    const selectedIds = new Set(
+      selectedProblemAreas.flatMap((area) => {
+        const group = problemAreaChoiceGroupByComponentId.get(area.componentId);
+        if (!group) return [area.componentId];
+        const storedChoices = problemAreaPartChoiceByGroupKey[group.sourceComponentKey];
+        const choiceIds = Array.isArray(storedChoices)
+          ? storedChoices
+          : storedChoices ? [storedChoices] : [];
+        return choiceIds.length ? choiceIds : [area.componentId];
+      }),
+    );
+    const selectedGroupKeys = new Set(
+      selectedProblemAreas
+        .map((area) => problemAreaChoiceGroupByComponentId.get(area.componentId)?.sourceComponentKey)
+        .filter(Boolean),
+    );
+
+    function keepAllowedRecordKeys(current, allowedKeys) {
+      const entries = Object.entries(current);
+      const keptEntries = entries.filter(([key]) => allowedKeys.has(key));
+      return keptEntries.length === entries.length ? current : Object.fromEntries(keptEntries);
+    }
 
     setProblemAreaDetailsByComponentId((current) =>
-      Object.fromEntries(
-        Object.entries(current).filter(([componentId]) => selectedIds.has(componentId)),
-      ),
+      keepAllowedRecordKeys(current, selectedIds),
     );
     setProblemAreaAttachmentsByComponentId((current) =>
-      Object.fromEntries(
-        Object.entries(current).filter(([componentId]) => selectedIds.has(componentId)),
-      ),
+      keepAllowedRecordKeys(current, selectedIds),
     );
     setProblemAreaAttachmentFieldKeysByComponentId((current) =>
-      Object.fromEntries(
-        Object.entries(current).filter(([componentId]) => selectedIds.has(componentId)),
-      ),
+      keepAllowedRecordKeys(current, selectedIds),
     );
-  }, [selectedProblemAreas]);
+    setProblemAreaPartChoiceByGroupKey((current) =>
+      keepAllowedRecordKeys(current, selectedGroupKeys),
+    );
+  }, [problemAreaChoiceGroupByComponentId, problemAreaPartChoiceByGroupKey, selectedProblemAreas]);
 
   useEffect(() => {
     if (!isComplaintMode) {
@@ -2640,6 +2739,7 @@ export default function ServiceClaimFlow() {
 
   useEffect(() => {
     setProblemComponentIds([]);
+    setProblemAreaPartChoiceByGroupKey({});
     setProblemAreaDetailsByComponentId({});
   }, [contractLookup.contractNumber]);
 
@@ -2740,6 +2840,7 @@ export default function ServiceClaimFlow() {
       return;
     }
     handleFieldChange(field, nextTime);
+    setOpenPreferredContactTimeField(null);
   }
 
   function handlePreferredContactTimeClear(field) {
@@ -2854,7 +2955,59 @@ export default function ServiceClaimFlow() {
     }
   }
 
-  function removeProblemArea(componentId) {
+  function moveProblemAreaRowState(fromComponentId, toComponentId = "") {
+    for (const setter of [
+      setProblemAreaDetailsByComponentId,
+      setProblemAreaAttachmentsByComponentId,
+      setProblemAreaAttachmentFieldKeysByComponentId,
+    ]) {
+      setter((current) => {
+        if (!Object.prototype.hasOwnProperty.call(current, fromComponentId)) return current;
+        const next = { ...current };
+        if (toComponentId && !Object.prototype.hasOwnProperty.call(next, toComponentId)) {
+          next[toComponentId] = next[fromComponentId];
+        }
+        delete next[fromComponentId];
+        return next;
+      });
+    }
+  }
+
+  function handleProblemAreaPartChoice(componentId, nextComponentId, isSelected, currentSelectedIds = []) {
+    const choiceGroup = problemAreaChoiceGroupByComponentId.get(componentId);
+    if (!choiceGroup) return;
+
+    const selectedIds = Array.isArray(currentSelectedIds) ? currentSelectedIds : [];
+    const nextSelectedIds = isSelected
+      ? [...selectedIds.filter((id) => id !== nextComponentId), nextComponentId]
+      : selectedIds.filter((id) => id !== nextComponentId);
+    setProblemAreaPartChoiceByGroupKey((current) => ({
+      ...current,
+      [choiceGroup.sourceComponentKey]: nextSelectedIds,
+    }));
+
+    if (isSelected && !selectedIds.length) {
+      moveProblemAreaRowState(componentId, nextComponentId);
+    } else if (!isSelected && !nextSelectedIds.length) {
+      moveProblemAreaRowState(nextComponentId, componentId);
+    } else if (!isSelected) {
+      moveProblemAreaRowState(nextComponentId);
+    }
+    setIsClaimRequiredAlertDismissed(false);
+    if (error) setError("");
+  }
+
+  function removeProblemArea(componentId, rowComponentId = componentId, selectedPartComponentIds = []) {
+    if (selectedPartComponentIds.length > 1) {
+      handleProblemAreaPartChoice(
+        componentId,
+        rowComponentId,
+        false,
+        selectedPartComponentIds,
+      );
+      return;
+    }
+
     const linkedComponentIds = new Set(
       getServiceClaimLinkedComponentIds(activeKitchenPlan?.kitchenSlug, componentId),
     );
@@ -3201,7 +3354,7 @@ export default function ServiceClaimFlow() {
       ? [
           kitchenAreasLinePrefix,
           ...selectedProblemAreasWithDetails.map(
-            (area) => `${area.label}: ${String(area.detail || "").trim()}`,
+            (area) => `${area.resolvedLabel}: ${String(area.detail || "").trim()}`,
           ),
         ].join("\n")
       : "";
@@ -3217,12 +3370,13 @@ export default function ServiceClaimFlow() {
   }
 
   function buildProblemAreasPayload() {
-    return selectedProblemAreasWithDetails.map((area) => ({
-      componentId: area.componentId,
-      code: area.code,
-      name: area.name,
-      detail: String(area.detail || "").trim(),
-    }));
+    return selectedProblemAreasWithDetails
+      .flatMap((area) => area.resolvedAreas.map((resolvedArea) => ({
+        componentId: resolvedArea.componentId,
+        code: resolvedArea.code,
+        name: resolvedArea.name,
+        detail: String(area.detail || "").trim(),
+      })));
   }
 
   function getClaimAssistantSpeechLanguage() {
@@ -3481,6 +3635,20 @@ export default function ServiceClaimFlow() {
       }
     }
 
+    if (hasMissingProblemAreaPartChoices) {
+      setIsClaimRequiredAlertDismissed(false);
+      setShowClaimRequiredErrors(true);
+      setError(t("requiredFieldMissing"));
+      window.requestAnimationFrame(() => {
+        const firstMissingPartChoice = selectedServicePanelRef.current?.querySelector(
+          '[data-problem-area-part-choice-required="true"]',
+        );
+        firstMissingPartChoice?.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstMissingPartChoice?.focus?.({ preventScroll: true });
+      });
+      return;
+    }
+
     if (hasMissingProblemAreaAttachments) {
       setShowProblemAreaAttachmentErrors(true);
       setError(t("problemAreaAttachmentRequired"));
@@ -3558,7 +3726,9 @@ export default function ServiceClaimFlow() {
       }
       for (const area of selectedProblemAreasWithDetails) {
         for (const file of area.attachments) {
-          formData.append(`problemAreaAttachment:${area.componentId}`, file);
+          for (const resolvedArea of area.resolvedAreas) {
+            formData.append(`problemAreaAttachment:${resolvedArea.componentId}`, file);
+          }
         }
       }
 
@@ -3582,6 +3752,7 @@ export default function ServiceClaimFlow() {
       setAttachments([]);
       setSerialNumberImages([]);
       setProblemComponentIds([]);
+      setProblemAreaPartChoiceByGroupKey({});
       setProblemAreaDetailsByComponentId({});
       setProblemAreaAttachmentsByComponentId({});
       setProblemAreaAttachmentFieldKeysByComponentId({});
@@ -4971,6 +5142,7 @@ export default function ServiceClaimFlow() {
                   <ServiceClaimKitchenPicker
                     kitchenPlan={contractLookup.kitchenPlan}
                     value={problemComponentIds}
+                    visualValue={problemPlanDisplayComponentIds}
                     onChange={setProblemComponentIds}
                     contractNumber={normalizedContractNumber}
                     labels={{
@@ -4992,28 +5164,100 @@ export default function ServiceClaimFlow() {
                   {selectedProblemAreasWithDetails.map((area) => {
                     const isProblemAreaAttachmentMissing =
                       showProblemAreaAttachmentErrors && !area.attachments.length;
+                    const singleSelectedPart = area.selectedPartComponentIds.length === 1
+                      ? area.choiceGroup?.options.find(
+                          (option) => option.componentId === area.selectedPartComponentIds[0],
+                        )
+                      : null;
+                    const selectedPartChoiceLabel = singleSelectedPart
+                      ? formatClaimAreaName(singleSelectedPart, singleSelectedPart.name, language)
+                      : area.selectedPartComponentIds.length > 1
+                        ? t("kitchenPlanPartChoiceSelectedCount").replace(
+                          "{count}",
+                          String(area.selectedPartComponentIds.length),
+                        )
+                        : "";
                     return (
-                    <div key={area.componentId} className="service-field service-field--problem-area-row">
+                    <div
+                      key={area.rowKey}
+                      className={[
+                        "service-field",
+                        "service-field--problem-area-row",
+                        area.choiceGroup ? "service-field--problem-area-row-has-part-choice" : "",
+                      ].filter(Boolean).join(" ")}
+                    >
                       <label className="service-field__problem-area-label">
                         <span className="service-field__problem-area-label-text">
                           <span>
-                            {area.label}
+                            {area.resolvedLabel}
                             <RequiredFieldMark title={requiredFieldTitle} />
                           </span>
-                          {area.articleCode ? (
+                          {area.resolvedArticleCode ? (
                             <small className="service-field__problem-area-article-code">
-                              {area.articleCode}
+                              {area.resolvedArticleCode}
                             </small>
                           ) : null}
                         </span>
                       </label>
+                      <div
+                        className={[
+                          "service-field__problem-area-part-choice",
+                          area.choiceGroup && area.showPartChoiceControl ? "" : "is-empty",
+                        ].filter(Boolean).join(" ")}
+                        data-claim-required-group={area.choiceGroup && area.showPartChoiceControl ? "true" : undefined}
+                        aria-hidden={area.choiceGroup && area.showPartChoiceControl ? undefined : "true"}
+                      >
+                        {area.choiceGroup && area.showPartChoiceControl ? (
+                          <details
+                            className="service-field__problem-area-part-select"
+                          >
+                            <summary
+                              aria-label={t("kitchenPlanPartChoicePlaceholder")}
+                              aria-invalid={showClaimRequiredErrors && !area.selectedPartComponentIds.length}
+                              data-claim-required-field
+                              data-problem-area-part-choice-required={
+                                !area.selectedPartComponentIds.length ? "true" : undefined
+                              }
+                            >
+                              {selectedPartChoiceLabel || t("kitchenPlanPartChoicePlaceholder")}
+                            </summary>
+                            <div
+                              className="service-field__problem-area-part-options"
+                              role="group"
+                              aria-label={t("kitchenPlanPartChoicePlaceholder")}
+                            >
+                              {area.choiceGroup.options.map((option) => {
+                                const isSelected = area.selectedPartComponentIds.includes(option.componentId);
+                                return (
+                                  <label key={option.componentId}>
+                                    <input
+                                      type="checkbox"
+                                      checked={isSelected}
+                                      onChange={(event) => {
+                                        handleProblemAreaPartChoice(
+                                          area.componentId,
+                                          option.componentId,
+                                          event.target.checked,
+                                          area.selectedPartComponentIds,
+                                        );
+                                        event.currentTarget.closest("details")?.removeAttribute("open");
+                                      }}
+                                    />
+                                    <span>{formatClaimAreaName(option, option.name, language)}</span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </details>
+                        ) : null}
+                      </div>
                       <div className="service-field__problem-area-stack">
                         <textarea
                           className="service-field__problem-area-input"
                           value={area.detail}
                           onChange={(event) => {
                             autoResizeTextarea(event.target);
-                            handleProblemAreaDetailChange(area.componentId, event.target.value);
+                            handleProblemAreaDetailChange(area.rowComponentId, event.target.value);
                           }}
                           ref={(element) => autoResizeTextarea(element)}
                           placeholder={copy.problemPlaceholder}
@@ -5026,11 +5270,11 @@ export default function ServiceClaimFlow() {
                           className="service-field__problem-area-file"
                           accept={CLAIM_ATTACHMENT_ACCEPT}
                           multiple
-                          onChange={(event) => handleProblemAreaAttachmentsSelected(area.componentId, event)}
-                          id={`problem-area-upload-${area.componentId}`}
+                          onChange={(event) => handleProblemAreaAttachmentsSelected(area.rowComponentId, event)}
+                          id={`problem-area-upload-${area.rowComponentId}`}
                         />
                         <label
-                          htmlFor={`problem-area-upload-${area.componentId}`}
+                          htmlFor={`problem-area-upload-${area.rowComponentId}`}
                           className={[
                             "service-field__problem-area-upload-button",
                             isProblemAreaAttachmentMissing ? "is-required-missing" : "",
@@ -5044,9 +5288,13 @@ export default function ServiceClaimFlow() {
                         <button
                           type="button"
                           className="service-field__problem-area-remove"
-                          aria-label={t("removeProblemAreaAria").replace("{label}", area.label)}
-                          title={t("removeProblemAreaAria").replace("{label}", area.label)}
-                          onClick={() => removeProblemArea(area.componentId)}
+                          aria-label={t("removeProblemAreaAria").replace("{label}", area.resolvedLabel)}
+                          title={t("removeProblemAreaAria").replace("{label}", area.resolvedLabel)}
+                          onClick={() => removeProblemArea(
+                            area.componentId,
+                            area.rowComponentId,
+                            area.selectedPartComponentIds,
+                          )}
                         >
                           <span aria-hidden="true">&times;</span>
                         </button>
@@ -5056,8 +5304,8 @@ export default function ServiceClaimFlow() {
                             summary={copy.attachmentsSelected.replace("{count}", String(area.attachments.length))}
                             maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
                             clearLabel={copy.attachmentsClear}
-                            onRemove={(index) => removeProblemAreaAttachment(area.componentId, index)}
-                            onClearAll={() => clearProblemAreaAttachments(area.componentId)}
+                            onRemove={(index) => removeProblemAreaAttachment(area.rowComponentId, index)}
+                            onClearAll={() => clearProblemAreaAttachments(area.rowComponentId)}
                             viewLabel={t("viewFile")}
                             viewAriaLabel={t("viewFileAria")}
                             closePreviewLabel={t("closeFilePreview")}
@@ -5277,7 +5525,10 @@ export default function ServiceClaimFlow() {
         </section>
       ) : null}
     </main>
-      {isComplaintMode && shouldShowClaimRequiredAlert ? (
+      {isComplaintMode && (
+        shouldShowClaimRequiredAlert
+        || (showClaimRequiredErrors && hasMissingProblemAreaPartChoices && !isClaimRequiredAlertDismissed)
+      ) ? (
         <div className="service-required-alert" role="alert" aria-live="assertive">
           <div className="service-required-alert__content">
             <strong>{t("requiredFieldsAlertTitle")}</strong>

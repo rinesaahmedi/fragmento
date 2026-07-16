@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import {
   componentIdForItem,
   componentIdForKey,
@@ -33,6 +33,7 @@ import {
   buildServiceClaimPartHotspots,
   isLShapedClaimKitchen,
 } from "../lib/service-claim-kitchen-hotspots";
+import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices";
 import styles from "./kitchen-configurator.module.css";
 
 const SERVICE_CLAIM_CLICK_BOUNDS_BY_SLUG = {
@@ -125,7 +126,14 @@ function getHotspotSvgPolygonPoints(hotspot) {
     .join(" ");
 }
 
-export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange, labels, contractNumber }) {
+export default function ServiceClaimKitchenPicker({
+  kitchenPlan,
+  value,
+  visualValue = value,
+  onChange,
+  labels,
+  contractNumber,
+}) {
   const svgHostRef = useRef(null);
   const rawImageClipPathId = useId();
   const rawApplianceClipPathId = useId();
@@ -159,6 +167,41 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     () => [...new Set(planVisibleComponentIds || [])],
     [planVisibleComponentIds],
   );
+  const componentChoiceGroups = useMemo(
+    () => buildServiceClaimComponentChoiceGroups(selectableComponents, {
+      includeLinearSharedParts: !isLShapedClaimKitchen(kitchenSlug),
+    }),
+    [kitchenSlug, selectableComponents],
+  );
+  const componentChoiceGroupByTriggerId = useMemo(
+    () => new Map(componentChoiceGroups.map((group) => [group.triggerComponentId, group])),
+    [componentChoiceGroups],
+  );
+  const componentChoiceGroupByOptionId = useMemo(
+    () => new Map(
+      componentChoiceGroups.flatMap((group) => (
+        group.options.map((option) => [option.componentId, group])
+      )),
+    ),
+    [componentChoiceGroups],
+  );
+  const togglePlanComponent = useCallback((componentId) => {
+    const choiceGroup = componentChoiceGroupByTriggerId.get(componentId);
+    onChange((current) => {
+      if (choiceGroup) {
+        const optionIds = new Set(choiceGroup.options.map((option) => option.componentId));
+        if (current.some((id) => optionIds.has(id))) {
+          return current.filter((id) => !optionIds.has(id));
+        }
+      }
+      return toggleClaimComponentSelection({
+        currentIds: current,
+        componentId,
+        selectableComponentIds,
+        kitchenSlug,
+      });
+    });
+  }, [componentChoiceGroupByTriggerId, kitchenSlug, onChange, selectableComponentIds]);
 
   const fixedKey = fixedComponentIds.join("|");
   const selectableKey = (selectableComponentIds || []).join("|");
@@ -194,6 +237,13 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     const selectable = new Set(selectableComponentIds || []);
     return croppedImageHotspots.filter((hotspot) => hotspot && selectable.has(hotspot.componentId));
   }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
+  const displaySelectedComponentIds = useMemo(() => {
+    const hotspotIds = new Set(croppedImageHotspots.map((hotspot) => hotspot?.componentId).filter(Boolean));
+    return [...new Set((visualValue || []).map((componentId) => {
+      if (hotspotIds.has(componentId)) return componentId;
+      return componentChoiceGroupByOptionId.get(componentId)?.triggerComponentId || componentId;
+    }))];
+  }, [componentChoiceGroupByOptionId, croppedImageHotspots, visualValue]);
   const shouldUseImagePlan = Boolean(imageViewHref && imageHotspots.length);
   const imageClipPathId = useMemo(
     () => toSvgClipPathId(rawImageClipPathId),
@@ -229,7 +279,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
       svgMarkup: resolvedSvgMarkup,
       planViewport,
       kitchenConfig,
-      selectedComponentIds: value,
+      selectedComponentIds: displaySelectedComponentIds,
       lockedComponentIds: fixedComponentIds,
       visibleComponentIds,
       componentIdForItem,
@@ -251,14 +301,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
         return;
       }
 
-      onChange((current) => {
-        return toggleClaimComponentSelection({
-          currentIds: current,
-          componentId,
-          selectableComponentIds,
-          kitchenSlug,
-        });
-      });
+      togglePlanComponent(componentId);
     };
 
     host.addEventListener("click", onClick, true);
@@ -277,8 +320,9 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
     selectableKey,
     visibleComponentIds,
     visibleKey,
-    value,
+    displaySelectedComponentIds,
     shouldUseImagePlan,
+    togglePlanComponent,
   ]);
 
   useEffect(() => {
@@ -288,22 +332,15 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
 
     refreshKitchenPlanSelection({
       host: svgHostRef.current,
-      selectedComponentIds: value,
+      selectedComponentIds: displaySelectedComponentIds,
       lockedComponentIds: fixedComponentIds,
       kitchenSlug,
     });
-  }, [fixedKey, value, fixedComponentIds, kitchenSlug, shouldUseImagePlan]);
+  }, [displaySelectedComponentIds, fixedKey, fixedComponentIds, kitchenSlug, shouldUseImagePlan]);
 
   const normalizedContractNumber = String(contractNumber || "").trim();
   const selectedIds = new Set(value || []);
-  // When a worktop is selected, restore the source-plan pixels for appliances
-  // that are still unselected. This keeps the sink/cooktop white instead of
-  // letting the selected worktop tint show through their transparent hitboxes.
-  // Once an appliance is selected itself, it is removed from this cutout layer
-  // so its green selection state remains visible.
-  const visibleApplianceImageHotspots = applianceImageHotspots.filter(
-    (hotspot) => !selectedIds.has(hotspot.componentId),
-  );
+  const displaySelectedIds = new Set(displaySelectedComponentIds);
   const hasSelectedWorktop = imageHotspots.some(
     (hotspot) => (
       hotspot.componentKey === "worktop"
@@ -312,35 +349,34 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
       || hotspot.claimPartKey === "worktop-end-panel"
     ) && selectedIds.has(hotspot.componentId),
   );
+  // Keep unselected appliances visually cut out of a selected worktop. Sink
+  // and cooktop are independent claim articles and should only be tinted when
+  // the user explicitly selects them.
+  const visibleApplianceImageHotspots = applianceImageHotspots.filter(
+    (hotspot) => !displaySelectedIds.has(hotspot.componentId),
+  );
   const sinkComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.sink;
+  const sinkCabinetComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS["sink-cabinet"];
+  const ovenComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.oven;
   const cooktopComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.cooktop;
-  const filterComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.filter;
-  const furnitureFrontComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS["furniture-front"];
   const isNonLShapedKitchen = !isLShapedClaimKitchen(kitchenSlug);
+  const hasContextualSinkChoice = componentChoiceGroupByTriggerId.has(sinkCabinetComponentId);
+  const hasContextualCooktopChoice = componentChoiceGroupByTriggerId.has(ovenComponentId);
   const showManualSinkOption =
     isNonLShapedKitchen
+    && !hasContextualSinkChoice
     && claimParts.some((part) => String(part?.partKey || "").trim() === "sink")
     && selectableComponentIds.includes(sinkComponentId);
   const showManualCooktopOption =
     isNonLShapedKitchen
+    && !hasContextualCooktopChoice
     && claimParts.some((part) => String(part?.partKey || "").trim() === "cooktop")
     && selectableComponentIds.includes(cooktopComponentId);
-  const formOnlyClaimOptions = selectableComponents.filter((component) =>
-    component?.isCompanionOption && selectableComponentIds.includes(component.componentId),
-  );
   const worktopEndPanelOption = selectableComponents.find(
     (component) => component.componentId === worktopEndPanelComponentId,
   );
-  const showManualFilterOption =
-    claimParts.some((part) => String(part?.partKey || "").trim() === "filter")
-    && selectableComponentIds.includes(filterComponentId);
-  const showManualFurnitureFrontOption =
-    claimParts.some((part) => String(part?.partKey || "").trim() === "furniture-front")
-    && selectableComponentIds.includes(furnitureFrontComponentId);
   const isManualSinkSelected = selectedIds.has(sinkComponentId);
   const isManualCooktopSelected = selectedIds.has(cooktopComponentId);
-  const isManualFilterSelected = selectedIds.has(filterComponentId);
-  const isManualFurnitureFrontSelected = selectedIds.has(furnitureFrontComponentId);
 
   return (
     <div className="service-claim-kitchen">
@@ -519,7 +555,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                   </svg>
                 ) : null}
                 {imageHotspots.map((hotspot) => {
-                  const isSelected = selectedIds.has(hotspot.componentId);
+                  const isSelected = displaySelectedIds.has(hotspot.componentId);
                   const isHovered = getServiceClaimLinkedComponentIds(kitchenSlug, hotspot.componentId)
                     .includes(hoveredComponentId);
                   return (
@@ -578,16 +614,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
                           current === hotspot.componentId ? null : current,
                         )
                       }
-                      onClick={() => {
-                        onChange((current) =>
-                          toggleClaimComponentSelection({
-                            currentIds: current,
-                            componentId: hotspot.componentId,
-                            selectableComponentIds,
-                            kitchenSlug,
-                          }),
-                        );
-                      }}
+                      onClick={() => togglePlanComponent(hotspot.componentId)}
                     />
                   );
                 })}
@@ -612,7 +639,7 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
           </div>
         </div>
       )}
-      {showManualSinkOption || showManualCooktopOption || hasManualWorktopEndPanelOption || formOnlyClaimOptions.length || showManualFilterOption || showManualFurnitureFrontOption ? (
+      {showManualSinkOption || showManualCooktopOption || hasManualWorktopEndPanelOption ? (
         <div className="service-claim-kitchen__manual-options">
           {showManualSinkOption ? (
             <button
@@ -674,72 +701,6 @@ export default function ServiceClaimKitchenPicker({ kitchenPlan, value, onChange
               }}
             >
               {labels?.worktopEndPanelOption || worktopEndPanelOption?.nameDe || "Worktop End Panel"}
-            </button>
-          ) : null}
-          {formOnlyClaimOptions.map((option) => {
-            const isSelected = selectedIds.has(option.componentId);
-            const label = option.nameDe || option.name || option.articleCode || option.code;
-
-            return (
-              <button
-                key={option.componentId}
-                type="button"
-                className={[
-                  "service-claim-kitchen__manual-option",
-                  isSelected ? "service-claim-kitchen__manual-option--selected" : "",
-                ].filter(Boolean).join(" ")}
-                aria-pressed={isSelected}
-                onClick={() => {
-                  onChange((current) => toggleClaimComponentSelection({
-                    currentIds: current,
-                    componentId: option.componentId,
-                    selectableComponentIds,
-                    kitchenSlug,
-                  }));
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
-          {showManualFilterOption ? (
-            <button
-              type="button"
-              className={[
-                "service-claim-kitchen__manual-option",
-                isManualFilterSelected ? "service-claim-kitchen__manual-option--selected" : "",
-              ].filter(Boolean).join(" ")}
-              aria-pressed={isManualFilterSelected}
-              onClick={() => {
-                onChange((current) => toggleClaimComponentSelection({
-                  currentIds: current,
-                  componentId: filterComponentId,
-                  selectableComponentIds,
-                  kitchenSlug,
-                }));
-              }}
-            >
-              {labels?.filterOption || "Extractor Hood Filter"}
-            </button>
-          ) : null}
-          {showManualFurnitureFrontOption ? (
-            <button
-              type="button"
-              className={[
-                "service-claim-kitchen__manual-option",
-                isManualFurnitureFrontSelected ? "service-claim-kitchen__manual-option--selected" : "",
-              ].filter(Boolean).join(" ")}
-              aria-pressed={isManualFurnitureFrontSelected}
-              onClick={() => {
-                onChange((current) => toggleClaimComponentSelection({
-                  currentIds: current,
-                  componentId: furnitureFrontComponentId,
-                  selectableComponentIds,
-                  kitchenSlug,
-                }));
-              }}
-            >
-              {labels?.furnitureFrontOption || "Furniture Front (Dishwasher)"}
             </button>
           ) : null}
         </div>

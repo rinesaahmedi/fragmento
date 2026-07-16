@@ -361,6 +361,10 @@ function resolveServiceClaimComponentName(componentId, meta = {}) {
 }
 
 function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
+  if (String(meta.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
+    return "Schrank";
+  }
+
   return stripProductDimensionsFromLabel(
     String(meta.nameDe || meta.name || meta.code || componentId).trim(),
   ) || meta.code || componentId;
@@ -403,6 +407,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       articleCode: resolveServiceClaimArticleCode(item),
       name: resolveServiceClaimComponentName(componentId, item),
       nameDe: resolveServiceClaimComponentNameDe(componentId, item),
+      componentKey: String(item.componentKey || "").trim(),
     });
   }
 
@@ -416,6 +421,7 @@ export function buildServiceClaimComponentMetaById(kitchen, kitchenConfig) {
       articleCode: resolveServiceClaimArticleCode(comp),
       name: resolveServiceClaimComponentName(componentId, comp),
       nameDe: resolveServiceClaimComponentNameDe(componentId, comp),
+      componentKey: String(comp.componentKey || "").trim(),
     });
   }
 
@@ -494,6 +500,7 @@ export function buildServiceClaimSelectableComponents({
       articleCode,
       name,
       nameDe,
+      componentKey: String(resolvedMeta.componentKey || fallbackMeta.componentKey || "").trim(),
     });
   }
 
@@ -526,6 +533,7 @@ export function buildServiceClaimSelectableComponents({
         articleCode: resolveServiceClaimArticleCode(item),
         name: resolveServiceClaimComponentName(componentIdForItem(item), item),
         nameDe: resolveServiceClaimComponentNameDe(componentIdForItem(item), item),
+        componentKey: String(item.componentKey || "").trim(),
       },
     }));
   const sourceItemCodes = new Set(

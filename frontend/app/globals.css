@@ -3306,14 +3306,20 @@ textarea {
 }
 
 .service-field--problem-area-row {
-  grid-template-columns: minmax(120px, 180px) minmax(0, 1fr);
+  grid-template-columns: minmax(120px, 180px) minmax(180px, 220px) minmax(0, 1fr);
   align-items: center;
   gap: 10px 10px;
+  margin-inline: 18px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(107, 79, 58, 0.16);
+  border-bottom: 1px solid rgba(107, 79, 58, 0.16);
 }
 
 .service-field--problem-area-row > .service-field__problem-area-label {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
   justify-self: start;
   align-self: center;
   max-width: 100%;
@@ -3331,6 +3337,10 @@ textarea {
   gap: 2px;
 }
 
+.service-field--problem-area-row-has-part-choice {
+  grid-template-columns: minmax(120px, 180px) minmax(180px, 220px) minmax(0, 1fr);
+}
+
 .service-field__problem-area-article-code {
   color: var(--app-muted, #7b7068);
   font-size: 0.78rem;
@@ -3339,9 +3349,116 @@ textarea {
   letter-spacing: 0.02em;
 }
 
+.service-field__problem-area-part-select {
+  position: relative;
+  width: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid rgba(107, 79, 58, 0.28);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--app-accent);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.service-field__problem-area-part-choice {
+  min-width: 0;
+}
+
+.service-field__problem-area-part-choice.is-empty {
+  display: none;
+}
+
+.service-field__problem-area-part-select summary {
+  min-height: 42px;
+  padding: 10px 34px 10px 12px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  list-style: none;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.service-field__problem-area-part-select summary::-webkit-details-marker {
+  display: none;
+}
+
+.service-field__problem-area-part-select summary::after {
+  content: "";
+  position: absolute;
+  right: 13px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid rgba(107, 79, 58, 0.62);
+}
+
+.service-field__problem-area-part-select summary[aria-invalid="true"] {
+  border-color: rgba(179, 38, 30, 0.72);
+  box-shadow: 0 0 0 4px rgba(179, 38, 30, 0.08);
+  border-radius: 10px;
+}
+
+.service-field__problem-area-part-options {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  padding: 7px;
+  display: grid;
+  gap: 4px;
+  border: 1px solid rgba(107, 79, 58, 0.24);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 14px 30px rgba(56, 38, 25, 0.16);
+}
+
+.service-field__problem-area-part-options label {
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 7px;
+  cursor: pointer;
+}
+
+.service-field__problem-area-part-options label:hover {
+  background: rgba(217, 122, 38, 0.1);
+}
+
+.service-field__problem-area-part-options input {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  flex: 0 0 auto;
+  accent-color: var(--app-accent);
+  box-shadow: none;
+}
+
+.service-field--problem-area-row > .service-field__problem-area-stack {
+  grid-column: 3;
+}
+
+.service-field--problem-area-row:not(.service-field--problem-area-row-has-part-choice)
+  > .service-field__problem-area-stack {
+  grid-column: 2 / 4;
+}
+
+.service-field__problem-area-part-select summary:focus-visible {
+  outline: 2px solid rgba(217, 122, 38, 0.45);
+  outline-offset: 2px;
+}
+
 .service-field__problem-area-stack {
   display: grid;
-  grid-template-columns: minmax(280px, min(620px, 100%)) auto 32px;
+  grid-template-columns: minmax(0, 1fr) auto 32px;
   gap: 6px;
   align-items: start;
   justify-content: start;
@@ -3453,6 +3570,7 @@ textarea {
 
 /* Service claim: compact kitchen plan (configurator SVG uses large min-heights) */
 .service-claim-kitchen__plan {
+  position: relative;
   padding: 0 10px 12px;
 }
 
@@ -3618,18 +3736,19 @@ textarea {
 
 .service-required-alert {
   position: fixed;
-  top: 18px;
+  right: auto;
+  bottom: 24px;
   left: 50%;
   z-index: 3400;
   display: flex;
   align-items: center;
   gap: 16px;
-  width: min(700px, calc(100vw - 32px));
-  padding: 14px 52px 14px 16px;
+  width: min(560px, calc(100vw - 48px));
+  padding: 12px 48px 12px 14px;
   border: 1px solid rgba(179, 38, 30, 0.26);
   border-radius: 16px;
   background: rgba(255, 249, 246, 0.98);
-  box-shadow: 0 18px 42px rgba(51, 35, 22, 0.18);
+  box-shadow: 0 14px 34px rgba(51, 35, 22, 0.16);
   color: #5b211c;
   transform: translateX(-50%);
 }
@@ -4044,15 +4163,12 @@ textarea {
 
 @media (max-width: 900px) {
   .service-required-alert {
-    top: 12px;
-    align-items: stretch;
-    flex-direction: column;
-    gap: 10px;
+    bottom: 14px;
   }
 
   .service-required-alert__action {
-    width: 100%;
-    margin-left: 0;
+    width: auto;
+    margin-left: auto;
   }
 
   .service-hero__top,
@@ -4111,6 +4227,16 @@ textarea {
 
   .service-field--problem-area-row {
     grid-template-columns: 1fr;
+    margin-inline: 0;
+  }
+
+  .service-field--problem-area-row > .service-field__problem-area-stack {
+    grid-column: auto;
+  }
+
+  .service-field--problem-area-row:not(.service-field--problem-area-row-has-part-choice)
+    > .service-field__problem-area-stack {
+    grid-column: auto;
   }
 
   .service-field--problem-area-row > .service-field__problem-area-label {
@@ -4147,6 +4273,18 @@ textarea {
 }
 
 @media (max-width: 700px) {
+  .service-required-alert {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+    width: calc(100vw - 24px);
+  }
+
+  .service-required-alert__action {
+    width: 100%;
+    margin-left: 0;
+  }
+
   .service-page {
     width: min(100% - 20px, 1120px);
     padding: 14px 0 28px;
