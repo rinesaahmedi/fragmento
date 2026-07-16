@@ -928,6 +928,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105743": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105748": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105751": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105754": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105745": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-104968": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105746": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105757": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1132,6 +1135,14 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   PRODUCT_INFO_DOCUMENTS_BY_CODE[`DISH-AB${targetCode}-600`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
   PRODUCT_INFO_DOCUMENTS_BY_CODE[`REF-AB${targetCode}-KGCN388140E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
   PRODUCT_INFO_DOCUMENTS_BY_CODE[`HOOD-AB${targetCode}-FH664621E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+});
+
+["105751", "105754", "105745"].forEach((targetCode) => {
+  Object.entries(AB_105806_PHOTO_NUMBER_BY_CODE)
+    .filter(([sourceCode]) => sourceCode.includes("AB105748"))
+    .forEach(([sourceCode, photoNumber]) => {
+      AB_105806_PHOTO_NUMBER_BY_CODE[sourceCode.replace("AB105748", `AB${targetCode}`)] = photoNumber;
+    });
 });
 
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105743-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];

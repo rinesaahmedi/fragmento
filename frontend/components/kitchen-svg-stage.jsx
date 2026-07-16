@@ -52,6 +52,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105747": "/plans/AB%20105747.svg",
   "ab-105743": "/plans/AB%20105743.svg",
   "ab-105748": "/plans/AB%20105748.svg",
+  "ab-105751": "/plans/AB%20105748.svg",
+  "ab-105754": "/plans/AB%20105748.svg",
+  "ab-105745": "/plans/AB%20105748.svg",
   "ab-105750": "/plans/AB%20105747.svg",
   "ab-105753": "/plans/AB%20105747.svg",
   "ab-105756": "/plans/AB%20105747.svg",
@@ -1668,6 +1671,9 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
 
 ["ab-105735", "ab-105738", "ab-105741"].forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105732"];
+});
+["ab-105751", "ab-105754", "ab-105745"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105748"];
 });
 
 ["ab-105736", "ab-105739", "ab-105742"].forEach((slug) => {

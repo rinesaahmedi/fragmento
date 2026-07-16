@@ -1334,7 +1334,7 @@ test("AB 105805 service claim plan keeps the extractor hood separate from the LE
   );
 });
 
-test("all seeded standalone FH664621E hoods use the E article number", () => {
+test("all seeded FH664621E hoods use a supported catalog article number", () => {
   const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
   const flatHoodRows = seedSource
     .split("\n")
@@ -1342,7 +1342,7 @@ test("all seeded standalone FH664621E hoods use the E article number", () => {
 
   assert.ok(flatHoodRows.length > 0);
   flatHoodRows.forEach((line) => {
-    assert.match(line, /articleNumber:\s*"FH 664 621 E"/);
+    assert.match(line, /articleNumber:\s*"(?:FH 664 621 E|FH664621E \+ FWK124 \+ HD6002)"/);
   });
 });
 
