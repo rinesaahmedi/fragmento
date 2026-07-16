@@ -17,12 +17,19 @@ export function AdminFormSubmitButton({
   return (
     <button
       type="submit"
-      disabled={isDisabled}
+      disabled={disabled}
+      aria-disabled={isDisabled}
       title={title}
-      onClick={() => {
-        if (!isDisabled) {
-          setIsPending(true);
+      onClick={(event) => {
+        if (isPending) {
+          event.preventDefault();
+          return;
         }
+
+        const form = event.currentTarget.form;
+        if (form && !form.checkValidity()) return;
+
+        window.setTimeout(() => setIsPending(true), 0);
       }}
       style={{
         ...(secondary ? secondaryButtonStyle : primaryButtonStyle),

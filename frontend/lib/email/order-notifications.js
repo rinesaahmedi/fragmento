@@ -957,6 +957,10 @@ function buildBlendeDisplayItem(item) {
 
   return {
     ...item,
+    parentCode: item.code,
+    parentIconKey: item.iconKey,
+    parentComponentKey: item.componentKey,
+    parentName: getItemDisplayName(item),
     code: displayCode || "BLENDE",
     articleNumber: displayCode || "BLENDE",
     name: displayLabel || blendeLabel,
@@ -1011,7 +1015,11 @@ function isElectricalComponentItem(item) {
   const iconKey = String(item?.iconKey || "").toLowerCase();
   const componentKey = String(item?.componentKey || "").toLowerCase();
   const name = String(getItemDisplayName(item)).toLowerCase();
-  const haystack = `${code} ${iconKey} ${componentKey} ${name}`;
+  const parentCode = String(item?.parentCode || "").toLowerCase();
+  const parentIconKey = String(item?.parentIconKey || "").toLowerCase();
+  const parentComponentKey = String(item?.parentComponentKey || "").toLowerCase();
+  const parentName = String(item?.parentName || "").toLowerCase();
+  const haystack = `${code} ${iconKey} ${componentKey} ${name} ${parentCode} ${parentIconKey} ${parentComponentKey} ${parentName}`;
   return /\b(ref|dish|wm|oven|hob|hood)\b/.test(code)
     || haystack.includes("refrigerator")
     || haystack.includes("kuehlschrank")

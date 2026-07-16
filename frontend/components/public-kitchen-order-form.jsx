@@ -677,12 +677,9 @@ export default function PublicKitchenOrderForm({
                 />
                 <label htmlFor="consent">
                   {translate("order.consentShortPrefix", "I have read the ")}
-                  <span
-                    className={styles.pendingLegalText}
-                    title={translate("order.privacyPolicyPending", "Privacy policy will be available soon.")}
-                  >
+                  <a href="/datenschutz" target="_blank" rel="noreferrer">
                     {translate("order.privacyPolicy", "privacy policy")}
-                  </span>
+                  </a>
                   {translate("order.consentShortSuffix", ".*")}
                 </label>
               </div>

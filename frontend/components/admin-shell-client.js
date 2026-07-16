@@ -12,11 +12,13 @@ const navItems = [
   { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
   { href: "/admin/reports", labelKey: "adminShellLogin.reports", fallback: "Reports", icon: ReportsIcon },
+  { href: "/admin/contract-access", labelKey: "adminShellLogin.contractAccess", fallback: "Contract access", icon: ContractsIcon, requiresSuperAdmin: true },
   { href: "/admin/px-orders", labelKey: "adminShellLogin.pxOrders", fallback: "PX orders", icon: OrdersIcon },
   { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon, requiresClaimsNav: true },
   { href: "/admin/catalog/articles", labelKey: "adminShellLogin.catalogArticles", fallback: "Catalog", icon: CatalogAuditIcon },
   { href: "/admin/catalog/imports", labelKey: "adminShellLogin.catalogImports", fallback: "Price Imports", icon: CatalogAuditIcon },
   { href: "/admin/settings", labelKey: "adminShellLogin.settings", fallback: "Settings", icon: SettingsIcon },
+  { href: "/admin/users", labelKey: "adminShellLogin.users", fallback: "Users", icon: UsersIcon, requiresUsersNav: true },
   { href: "/admin/account", labelKey: "adminShellLogin.account", fallback: "Account", icon: AccountIcon },
   { href: "/", labelKey: "adminShellLogin.publicSite", fallback: "Public site", icon: GlobeIcon },
 ];
@@ -44,6 +46,7 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
   const visibleNavItems = navItems.filter((item) => {
     if (item.requiresClaimsNav && !showClaimsNav) return false;
     if (item.requiresUsersNav && !showUsersNav) return false;
+    if (item.requiresSuperAdmin && adminRole !== "SUPERADMIN") return false;
     return true;
   });
   const activeNavItem = visibleNavItems.find((item) => isActivePath(pathname, item.href)) ?? visibleNavItems[0];

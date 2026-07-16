@@ -50,6 +50,7 @@ jobs:
 
             cd "$FRONTEND_DIR"
             sudo -u deploy npm ci
+            sudo -u deploy npm run geoip:update
             sudo -u deploy npm run prisma:deploy
             sudo -u deploy npm run prisma:generate
             sudo -u deploy npm run prisma:seed

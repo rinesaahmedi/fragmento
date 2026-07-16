@@ -22,7 +22,6 @@ import {
   loadOrderReportData,
   normalizeOrderReportFilters,
 } from "../../../lib/admin-order-reports";
-import { loadPublicVisitReportData } from "../../../lib/public-visit-reports";
 import { requireAdminPage } from "../../../lib/auth";
 import { getPriceBreakdown } from "../../../lib/price-utils";
 
@@ -34,10 +33,6 @@ function formatCurrency(value) {
     currency: "EUR",
     minimumFractionDigits: 2,
   }).format(Number(value || 0));
-}
-
-function formatPercent(value) {
-  return `${Number(value || 0).toFixed(1)}%`;
 }
 
 function getExportHref(filters) {
@@ -101,10 +96,7 @@ export default async function AdminReportsPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
   const filters = normalizeOrderReportFilters(resolvedSearchParams);
-  const [{ orders, summary }, { summary: visitSummary }] = await Promise.all([
-    loadOrderReportData(filters),
-    loadPublicVisitReportData(filters),
-  ]);
+  const { orders, summary } = await loadOrderReportData(filters);
   const exportHref = getExportHref(filters);
 
   return (
@@ -168,44 +160,6 @@ export default async function AdminReportsPage({ searchParams = {} }) {
             />
           </div>
 
-          <div style={visitReportBlockStyle}>
-            <h3 style={subsectionTitleStyle}>
-              <AdminText i18nKey="reportsAdmin.siteVisits" fallback="Site visits" />
-            </h3>
-            <div className="admin-reports-visit-grid" style={visitGridStyle}>
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.uniqueVisitors" fallback="Unique visitors" />}
-                value={visitSummary.uniqueVisitors}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.openedSite" fallback="Opened site" />}
-                value={visitSummary.opened}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.enteredContract" fallback="Entered contract" />}
-                value={visitSummary.submitted}
-              />
-              <KpiCard
-                tone="success"
-                label={<AdminText i18nKey="reportsAdmin.contractWorked" fallback="Worked" />}
-                value={visitSummary.accepted}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.contractTest" fallback="Test" />}
-                value={visitSummary.testAccepted}
-              />
-              <KpiCard
-                tone="warning"
-                label={<AdminText i18nKey="reportsAdmin.contractDidNotWork" fallback="Did not work" />}
-                value={visitSummary.rejected}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.contractSuccessRate" fallback="Success rate" />}
-                value={formatPercent(visitSummary.successRate)}
-              />
-            </div>
-          </div>
-
           <style>{`
             @media (max-width: 1180px) {
               .admin-reports-kpi-grid {
@@ -220,12 +174,6 @@ export default async function AdminReportsPage({ searchParams = {} }) {
             @media (max-width: 640px) {
               .admin-reports-order-count-card {
                 grid-template-columns: 1fr !important;
-              }
-            }
-
-            @media (max-width: 900px) {
-              .admin-reports-visit-grid {
-                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
               }
             }
           `}</style>
@@ -359,25 +307,6 @@ const exportButtonStyle = {
 const kpiGridStyle = {
   display: "grid",
   gridTemplateColumns: "minmax(360px, 1.35fr) repeat(3, minmax(190px, 1fr))",
-  gap: 12,
-};
-
-const visitReportBlockStyle = {
-  display: "grid",
-  gap: 12,
-  marginTop: 4,
-};
-
-const subsectionTitleStyle = {
-  margin: "0",
-  fontSize: 18,
-  fontWeight: 900,
-  color: "var(--app-text)",
-};
-
-const visitGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(7, minmax(130px, 1fr))",
   gap: 12,
 };
 

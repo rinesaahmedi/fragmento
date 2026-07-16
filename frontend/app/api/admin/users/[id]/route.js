@@ -80,7 +80,7 @@ export async function POST(request, { params }) {
     }
 
     if (targetUser.role === "SUPERADMIN" && role !== "SUPERADMIN" && targetUser.isActive) {
-      const remainingSuperadmins = await countActiveSuperadmins(targetUser.id);
+      const remainingSuperadmins = await countActiveSuperadminsInDb(targetUser.id);
       if (remainingSuperadmins === 0) {
         return redirectWithFlash(request, returnPath, "error", "At least one active superadmin is required.");
       }

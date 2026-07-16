@@ -45,10 +45,11 @@ export async function GET(request) {
   await requireAdminApi();
 
   const filters = normalizeOrderReportFilters(Object.fromEntries(request.nextUrl.searchParams.entries()));
-  const [{ orders, summary }, { summary: visitSummary }] = await Promise.all([
+  const [{ orders, summary }, visitReport] = await Promise.all([
     loadOrderReportData(filters),
     loadPublicVisitReportData(filters),
   ]);
+  const { summary: visitSummary } = visitReport;
   const orderRows = getOrderReportExportRows(orders);
   const workbook = XLSX.utils.book_new();
 
@@ -60,7 +61,7 @@ export async function GET(request) {
       ["Date from", filters.dateFrom || "All"],
       ["Date to", filters.dateTo || "All"],
       ["Status", filters.status || "All"],
-      ["Unique visitors", visitSummary.uniqueVisitors],
+      ["Estimated daily visitors", visitSummary.uniqueVisitors],
       ["Opened site", visitSummary.opened],
       ["Entered contract", visitSummary.submitted],
       ["Worked", visitSummary.accepted],

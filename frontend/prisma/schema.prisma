@@ -429,6 +429,7 @@ model KitchenContract {
   orders         Order[]
   testOrders     TestOrder[]
   registrations  KitchenRegistration[]
+  visitEvents    PublicVisitEvent[]
 
   @@index([kitchenId])
   @@index([projectId])
@@ -570,20 +571,34 @@ model ServiceClaim {
 }
 
 model PublicVisitEvent {
-  id                  String   @id @default(cuid())
+  id                  String           @id @default(cuid())
   eventType           String
   source              String?
+  utmMedium           String?
+  utmCampaign         String?
+  referrerHost        String?
   path                String?
+  countryCode         String?          @db.VarChar(2)
+  deviceType          String?
+  browserFamily       String?
+  operatingSystem     String?
+  visitorKey          String?
+  kitchenContractId   String?
+  kitchenContract     KitchenContract? @relation(fields: [kitchenContractId], references: [id], onDelete: SetNull)
   contractNumberHash  String?
   contractNumberLast4 String?
   ipHash              String?
   userAgentHash       String?
   metadata            Json?
-  createdAt           DateTime @default(now())
+  createdAt           DateTime         @default(now())
 
   @@index([createdAt])
   @@index([eventType, createdAt])
   @@index([contractNumberHash])
+  @@index([countryCode, createdAt])
+  @@index([source, createdAt])
+  @@index([visitorKey, createdAt])
+  @@index([kitchenContractId, createdAt])
 }
 
 model ServiceClaimKnowledgeEntry {
