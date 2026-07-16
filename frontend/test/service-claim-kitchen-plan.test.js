@@ -338,6 +338,30 @@ test("AB 105805 keeps the sink-base Blende as a form-only companion option", () 
   assert.deepEqual(result.map((entry) => entry.points), [sidePanel, cabinetFront]);
 });
 
+test("AB 105758 selecting the UPK20 Blende also highlights the exposed side face", () => {
+  const exposedSide = [[12.299, 56.679], [20.038, 58.272], [19.724, 88.383], [12.299, 86.266]];
+  const fillerStrip = [[20.038, 58.272], [21.734, 58.030], [21.734, 88.202], [19.724, 88.383]];
+  const cabinetFront = [[21.734, 58.030], [32.979, 56.397], [32.979, 86.588], [21.734, 88.202]];
+  const result = buildServiceClaimBlendeHotspots([
+    { componentKey: "sink-base", points: exposedSide },
+    { componentKey: "sink-base", points: fillerStrip },
+    { componentKey: "sink-base", points: cabinetFront },
+  ], [{
+    componentId: "component-claim-blende-sink-base",
+    componentKey: "claim-blende-sink-base",
+    sourceComponentKey: "sink-base",
+    claimPartKey: "blende",
+  }], [{ componentKey: "sink-base", widthMm: 600, blendeCode: "UPK20" }], "ab-105758");
+  const blendeHotspots = result.filter((entry) => entry.claimPartKey === "blende");
+  const outerFace = blendeHotspots.find((entry) => entry.claimBlendeOuterFace);
+
+  assert.equal(blendeHotspots.length, 2);
+  assert.deepEqual(outerFace.points, exposedSide);
+  assert.ok(blendeHotspots.every(
+    (entry) => entry.componentId === "component-claim-blende-sink-base",
+  ));
+});
+
 test("AB 105805 splits the right Blende from the last upper cabinet", () => {
   const hotspots = [
     {
@@ -2137,6 +2161,69 @@ test("AB 104968 cooktop uses the four outside vector-PDF strokes", () => {
   assert.ok(Math.abs(cooktop.left + cooktop.width - 36.04275534) < 0.000001);
   assert.ok(Math.abs(cooktop.top + cooktop.height - 57.00168067) < 0.000001);
   assert.match(cooktop.clipPath, /^polygon\(/);
+});
+
+test("AB 105758 ASC uses the exact sink, cooktop, oven, and drawer vector faces", () => {
+  const hotspots = [
+    {
+      componentKey: "sink-faucet",
+      points: [[16.261, 48.450], [16.318, 47.724], [20.309, 44.800]],
+      left: 16.261,
+      top: 44.800,
+      width: 4.048,
+      height: 3.650,
+    },
+    {
+      componentKey: "sink-faucet",
+      points: [[16.261, 48.450], [16.789, 48.390], [16.860, 55.106], [16.375, 55.166]],
+      left: 16.261,
+      top: 48.390,
+      width: 0.599,
+      height: 6.776,
+    },
+    {
+      componentKey: "sink-faucet",
+      points: [[20.337, 43.771], [20.993, 43.852], [20.793, 47.462], [20.109, 47.361]],
+      left: 20.109,
+      top: 43.771,
+      width: 0.884,
+      height: 3.691,
+    },
+    {
+      componentKey: "oven-module",
+      points: [[46.218527, 54.783193], [55.653207, 56.739496], [55.653207, 86.910924], [46.218527, 84.974790]],
+      left: 46.218527,
+      top: 54.783193,
+      width: 9.434680,
+      height: 32.127731,
+    },
+  ];
+  const claimParts = [
+    { partKey: "sink", sourceComponentKey: "sink-faucet" },
+    { partKey: "faucet", sourceComponentKey: "sink-faucet" },
+    { partKey: "oven", sourceComponentKey: "oven-module" },
+    { partKey: "oven-drawer", sourceComponentKey: "oven-module" },
+    { partKey: "cooktop", sourceComponentKey: "oven-module" },
+  ];
+  const result = buildServiceClaimPartHotspots(hotspots, claimParts, "ab-105758");
+  const sink = result.filter((entry) => entry.claimPartKey === "sink");
+  const oven = result.find((entry) => entry.claimPartKey === "oven");
+  const drawer = result.find((entry) => entry.claimPartKey === "oven-drawer");
+  const cooktop = result.find((entry) => entry.claimPartKey === "cooktop");
+
+  assert.equal(sink.length, 1);
+  assert.ok(Math.abs(sink[0].left - 15.149644) < 0.000001);
+  assert.ok(Math.abs(sink[0].width - 20.693586) < 0.000001);
+  assert.ok(Math.abs(oven.top + oven.height - 76.685714) < 0.000001);
+  assert.ok(Math.abs(drawer.top - 74.749580) < 0.000001);
+  assert.ok(Math.abs(drawer.top + drawer.height - 86.910924) < 0.000001);
+  assert.ok(Math.abs(cooktop.left - 46.218527) < 0.000001);
+  assert.ok(Math.abs(cooktop.top - 51.737815) < 0.000001);
+  assert.ok(Math.abs(cooktop.width - 14.394300) < 0.000001);
+  assert.ok(Math.abs(cooktop.top + cooktop.height - 54.984874) < 0.000001);
+  assert.match(sink[0].clipPath, /^polygon\(/);
+  assert.match(cooktop.clipPath, /^polygon\(/);
+  assert.equal((cooktop.clipPath.match(/,/g) || []).length, 4);
 });
 
 test("selected service claim components have accessible per-row remove buttons", () => {

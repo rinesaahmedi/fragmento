@@ -1,4 +1,4 @@
-const bcrypt = require("bcryptjs");
+﻿const bcrypt = require("bcryptjs");
 const { randomUUID } = require("crypto");
 const { loadEnvConfig } = require("@next/env");
 
@@ -34,6 +34,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
+  "ab-105758",
   "ab-104968", "ab-105734", "ab-105737", "ab-105740",
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
   "ab-105822", "ab-105825", "ab-105828", "ab-105831",
@@ -44,6 +45,7 @@ const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
+  "ab-105758",
   "ab-104968", "ab-105734", "ab-105737", "ab-105740",
   "ab-105805", "ab-105809", "ab-105813", "ab-105817",
   "ab-105806", "ab-105807", "ab-105808",
@@ -1393,6 +1395,29 @@ const AB_105751_ITEMS = createAB105748Items("105751");
 const AB_105754_ITEMS = createAB105748Items("105754");
 const AB_105745_ITEMS = createAB105748Items("105745");
 
+// AB 105758: compact L-shaped plan. The left return contains the locked sink
+// base + UPK20 and the dishwasher + UPEF65 corner filler. The right return
+// contains the locked oven and a US30 beside the refrigerator; the second US30
+// is the third upper cabinet above the refrigerator. H6002 + HPK2002 and the
+// hood cabinet complete the wall run.
+const AB_105758_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
+  { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
+  // CAB-SINK deliberately avoids the generic SINKBASE-* canonicalizer: this
+  // Excel row includes its own UPK20 face and must retain that metadata.
+  { itemType: ItemType.COMPONENT, code: "CAB-SINK-AB105758-DEFAULT", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Default sink base cabinet with UPK20 filler panel", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105758-600", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: articlePriceWithBlende("A-EGSPV597210 + TGV60", "UPEF65", 1), widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 40, infoText: "Fully integrated dishwasher with UPEF65 corner filler panel", articleNumber: "A-EGSPV597210 + TGV60", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105758-US30-R", name: "Base cabinet with drawer", price: articlePrice("US30"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 50, infoText: "US30 base storage cabinet, right return", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105758-KGCN388140E", name: "Freestanding refrigerator", nameDe: "Standkühlschrank", price: articlePrice("OL-KGCN388140E"), widthMm: 710, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 60, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105758-H6002-R", name: "Wall Cabinet", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002, hinge right, 2 adjustable shelves", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105758-600", name: "Flat Screen Extractor Hood + Cabinet + Filter", price: bundlePrice("FH664621E + FWK124 + HD6002"), iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "HD6002, light hood setup", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105758-FH664621E", name: "FH664621E Extractor Hood", price: articlePrice("FH 664 621 E"), widthMm: 599, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 82, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 E", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105758-US30", name: "Upper Cabinet", price: articlePrice("US30"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#ffbf00", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "US30 upper cabinet above the refrigerator", articleNumber: "US30" },
+  defaultSinkWorktop({ sortOrder: 100 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 const AB_105831_ITEMS = [
 
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, heightMm: null, depthMm: null, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -1577,6 +1602,14 @@ const DEFAULT_KITCHENS = [
     name: "AB 105745 Kitchen",
     description: "Kitchen configuration using the AB 105748 layout and element selection",
     items: AB_105745_ITEMS,
+  },
+  {
+    slug: "ab-105758",
+    kitchenCode: "105 758",
+    name: "AB 105758 Kitchen",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105758.svg",
+    items: AB_105758_ITEMS,
+    reconcileExisting: true,
   },
   {
     slug: "ab-105747",

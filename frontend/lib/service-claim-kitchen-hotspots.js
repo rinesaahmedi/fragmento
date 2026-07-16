@@ -4,6 +4,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
+  "ab-105758",
   "ab-104968",
   "ab-105734",
   "ab-105737",
@@ -39,6 +40,8 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "ab-105743": [[-0.166065, 0.89234], [2.617329, 0.730849], [3.895307, 0.836439], [1.111913, 1]],
   // Outside sink strokes measured from the AB 105748 vector PDF.
   "ab-105748": [[-2.13834, 0.978923], [-0.217391, 0.864169], [2.743083, 1.119438], [0.841897, 1.234192]],
+  // Four outside sink strokes measured from AB 105758's 842 x 595 PDF.
+  "ab-105758": [[-0.21021, 0.826421], [3, 0.677419], [4.126126, 0.763441], [1.162162, 0.930876]],
   "ab-104968": [[-0.99, 1], [0.08, 0.91], [1.86, 1.13], [0.97, 1.22]],
   "ab-105734": [[-0.99, 1], [0.08, 0.91], [1.86, 1.13], [0.97, 1.22]],
   "ab-105737": [[-0.99, 1], [0.08, 0.91], [1.86, 1.13], [0.97, 1.22]],
@@ -61,8 +64,25 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "ab-105756": [[-1.595113, 0.977883], [-0.291908, 0.862681], [1.089858, 1.017135], [-0.359432, 1.115202]],
 };
 
+// Absolute vector-plan outlines are preferable when one fixture is represented
+// by several narrow hotspots. These coordinates remain in the uncropped source
+// plan system and are projected into the ASC display crop below.
+const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
+  "ab-105758": [
+    [15.263658, 54.621849],
+    [29.045131, 52.625210],
+    [30.498812, 52.665546],
+    [35.843230, 53.794958],
+    [35.529691, 54.036975],
+    [21.748219, 56.033613],
+    [20.494062, 56.013445],
+    [15.149644, 54.904202],
+  ],
+};
+
 const RIGHT_LEG_COOKTOP_SLUGS = new Set([
   "ab-105743",
+  "ab-105758",
   "ab-105822",
   "ab-105825",
   "ab-105828",
@@ -93,6 +113,12 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
     [0.293553, -0.114011],
     [1.02332, -0.061126],
     [0.074074, -0.006868],
+  ],
+  "ab-105758": [
+    [0, -0.049592],
+    [1.061934, -0.09479],
+    [1.52568, -0.067169],
+    [0.993958, 0.011927],
   ],
   // Four outside cooktop strokes from the AB 104968 vector PDF.
   "ab-104968": [
@@ -199,6 +225,16 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
   ],
 };
 
+const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  "ab-105758": [
+    [46.218527, 53.189916],
+    [56.237530, 51.737815],
+    [60.612827, 52.625210],
+    [60.612827, 54.258824],
+    [55.596200, 54.984874],
+  ],
+};
+
 const RIGHT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
   [0, -0.08],
   [1, -0.12],
@@ -239,6 +275,22 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     "sink-base": { side: "left", outer: 50.251781, inner: 51.933492 },
     "drawer-module": { side: "right", inner: 71.543943, outer: 72.342043 },
     "wall-cabinet-3": { side: "right", inner: 56.579572, outer: 57.448931 },
+  },
+  // The sink UPK20 and dishwasher UPEF65 are distinct vector-PDF faces.
+  "ab-105758": {
+    "sink-base": {
+      side: "left",
+      outer: 20.038005,
+      inner: 21.733967,
+      includeOuterFace: true,
+    },
+    "base-module-3": {
+      side: "right",
+      inner: 44.223278,
+      outer: 46.218527,
+      bands: [[44.223278, 45.349169], [45.349169, 46.218527]],
+    },
+    "wall-cabinet-1": { side: "left", outer: 40.859857, inner: 41.643705 },
   },
   // AB 104968 uses complete perspective end faces. The US40 includes two
   // commercially supplied UPK20 pieces on the same narrow corner face.
@@ -504,6 +556,8 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   // on this line and the independently selectable drawer starts on the same line.
   "ab-105743": 0.661358,
   "ab-105748": 0.66065,
+  // Exact seam joining the oven quad to the drawer quad in the vector PDF.
+  "ab-105758": 0.8229792919171677,
   "ab-105808": 0.681,
   "ab-105816": 0.6813,
   "ab-105820": 0.6806,
@@ -524,6 +578,23 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   "ab-105844": 0.6797,
   "ab-105839": 0.6812,
   "ab-105842": 0.6812,
+};
+
+const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105758": {
+    oven: [
+      [46.218527, 54.783193],
+      [55.653207, 56.739496],
+      [55.653207, 76.685714],
+      [46.218527, 74.749580],
+    ],
+    "oven-drawer": [
+      [46.218527, 74.749580],
+      [55.653207, 76.685714],
+      [55.653207, 86.910924],
+      [46.218527, 84.974790],
+    ],
+  },
 };
 
 function pointsRelativeToBounds(points, bounds) {
@@ -588,6 +659,10 @@ const L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG = {
   ),
   "ab-105825": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-right"],
+  },
+  "ab-105758": {
+    // Left/right top surfaces, left/right fascias, then the floor-height end panel.
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel"],
   },
   "ab-105831": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
@@ -753,6 +828,14 @@ function ovenModuleDisplayCorners(hotspot) {
 }
 
 function ovenPartHotspots(hotspot, part, kitchenSlug) {
+  const exactSourcePoints = OVEN_PART_SOURCE_POINTS_BY_SLUG[kitchenSlug]?.[part.partKey];
+  const exactDisplayPoints = exactSourcePoints
+    ? sourcePlanPointsToDisplay(hotspot, exactSourcePoints)
+    : null;
+  if (exactDisplayPoints) {
+    return [hotspotFromDisplayPoints(hotspot, part, exactDisplayPoints)];
+  }
+
   const [topLeft, topRight, bottomRight, bottomLeft] = ovenModuleDisplayCorners(hotspot);
   const isDrawer = part.partKey === "oven-drawer";
   const measuredBodyRatio = OVEN_DRAWER_TOP_RATIO_BY_SLUG[kitchenSlug] || OVEN_DRAWER_TOP_RATIO;
@@ -940,6 +1023,25 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
     if (!blende || !sourceBounds || sourceBounds.width <= 0) return [hotspot];
 
     const calibration = CLAIM_BLENDE_CALIBRATION_BY_SLUG[String(kitchenSlug || "").toLowerCase()]?.[sourceKey];
+    if (calibration?.includeOuterFace) {
+      const bounds = hotspotBounds(hotspot);
+      const outer = Number(calibration.outer);
+      const isExposedOuterFace = calibration.side === "left"
+        ? bounds.right <= outer + 0.001
+        : bounds.left >= outer - 0.001;
+      if (isExposedOuterFace) {
+        return [{
+          ...hotspot,
+          componentId: blende.componentId,
+          componentKey: blende.componentKey || `claim-blende-${sourceKey}`,
+          claimPartKey: "blende",
+          claimBlendeSplit: true,
+          sourceComponentKey: sourceKey,
+          blendeSide: calibration.side,
+          claimBlendeOuterFace: true,
+        }];
+      }
+    }
     const calibratedBands = Array.isArray(calibration?.bands) ? calibration.bands : null;
     if (calibratedBands?.length && sourceBlenden.length > 1) {
       const bandSide = calibration?.side === "left" ? "left" : "right";
@@ -1025,7 +1127,36 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
   });
 }
 
+function sourcePlanPointsToDisplay(hotspot, sourcePlanPoints) {
+  const sourcePoints = Array.isArray(hotspot?.points) ? hotspot.points : [];
+  const sourceXs = sourcePoints.map(([x]) => Number(x)).filter(Number.isFinite);
+  const sourceYs = sourcePoints.map(([, y]) => Number(y)).filter(Number.isFinite);
+  if (!sourceXs.length || !sourceYs.length) return null;
+
+  const sourceLeft = Math.min(...sourceXs);
+  const sourceTop = Math.min(...sourceYs);
+  const sourceWidth = Math.max(Math.max(...sourceXs) - sourceLeft, 0.000001);
+  const sourceHeight = Math.max(Math.max(...sourceYs) - sourceTop, 0.000001);
+  const displayLeft = Number(hotspot.left || 0);
+  const displayTop = Number(hotspot.top || 0);
+  const displayWidth = Number(hotspot.width || 0);
+  const displayHeight = Number(hotspot.height || 0);
+
+  return sourcePlanPoints.map(([x, y]) => [
+    displayLeft + ((Number(x) - sourceLeft) / sourceWidth) * displayWidth,
+    displayTop + ((Number(y) - sourceTop) / sourceHeight) * displayHeight,
+  ]);
+}
+
 function lShapedSinkHotspot(hotspot, part, kitchenSlug) {
+  const sourcePlanPoints = L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[kitchenSlug];
+  const exactDisplayPoints = sourcePlanPoints
+    ? sourcePlanPointsToDisplay(hotspot, sourcePlanPoints)
+    : null;
+  if (exactDisplayPoints) {
+    return hotspotFromDisplayPoints(hotspot, part, exactDisplayPoints);
+  }
+
   const left = Number(hotspot.left || 0);
   const top = Number(hotspot.top || 0);
   const width = Number(hotspot.width || 0);
@@ -1039,6 +1170,14 @@ function lShapedSinkHotspot(hotspot, part, kitchenSlug) {
 }
 
 function cooktopHotspot(hotspot, part, kitchenSlug) {
+  const sourcePlanPoints = COOKTOP_SOURCE_POINTS_BY_SLUG[kitchenSlug];
+  const exactDisplayPoints = sourcePlanPoints
+    ? sourcePlanPointsToDisplay(hotspot, sourcePlanPoints)
+    : null;
+  if (exactDisplayPoints) {
+    return hotspotFromDisplayPoints(hotspot, part, exactDisplayPoints);
+  }
+
   const left = Number(hotspot.left || 0);
   const top = Number(hotspot.top || 0);
   const width = Number(hotspot.width || 0);
@@ -1223,8 +1362,11 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     }
   }
   let worktopIndex = -1;
+  const primarySinkFixtureIndex = (hotspots || []).findIndex(
+    (hotspot) => String(hotspot?.componentKey || "").trim() === "sink-faucet",
+  );
 
-  return (hotspots || []).flatMap((sourceHotspot) => {
+  return (hotspots || []).flatMap((sourceHotspot, hotspotIndex) => {
     const hotspot = trimCabinetAtWorktopEndPanel(sourceHotspot, worktopEndPanels);
     const sourceComponentKey = String(hotspot?.componentKey || "").trim();
     const sourceParts = partsBySourceKey.get(sourceComponentKey) || [];
@@ -1275,6 +1417,14 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
         };
       }
       if (hasVisibleSink && part.partKey === "sink") {
+        // AB 105758 traces the faucet as three independently clickable
+        // silhouettes. Emit its separately traced sink bowl only once.
+        if (
+          L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[normalizedSlug]
+          && hotspotIndex !== primarySinkFixtureIndex
+        ) {
+          return [];
+        }
         return lShapedSinkHotspot(hotspot, part, normalizedSlug);
       }
       if (part.partKey === "oven" || part.partKey === "oven-drawer") {

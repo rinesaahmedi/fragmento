@@ -55,6 +55,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105751": "/plans/AB%20105748.svg",
   "ab-105754": "/plans/AB%20105748.svg",
   "ab-105745": "/plans/AB%20105748.svg",
+  "ab-105758": "/plans/AB%20105758.svg",
   "ab-105750": "/plans/AB%20105747.svg",
   "ab-105753": "/plans/AB%20105747.svg",
   "ab-105756": "/plans/AB%20105747.svg",
@@ -115,6 +116,52 @@ export const IMAGE_VIEW_BY_SLUG = {
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const IMAGE_HOTSPOTS_BY_SLUG = {
+  "ab-105758": [
+    // Exact faces traced from the 842 x 595 vector PDF. Repeated keys keep
+    // every visible perspective face of one physical article synchronized.
+    { componentKey: "wall-cabinet-1", points: [[40.860, 7.711], [41.644, 7.872], [41.644, 32.719], [40.860, 32.558]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", points: [[41.644, 7.872], [48.029, 6.965], [57.463, 8.901], [51.093, 9.829]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", points: [[41.644, 7.872], [51.093, 9.829], [51.093, 34.676], [41.644, 32.719]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", points: [[51.093, 9.829], [57.463, 8.901], [66.898, 10.837], [60.527, 11.765]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", points: [[51.093, 9.829], [60.527, 11.765], [60.527, 36.612], [51.093, 34.676]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[51.093, 34.676], [60.527, 36.612], [60.527, 38.326], [51.093, 36.390]], preserveManualSize: true },
+    // The two visible symbols represent the three-spot LED accessory set.
+    // Their five-point envelopes follow the outer PDF rays exactly.
+    { componentKey: "under-cabinet-light", points: [[53.216152, 38.023529], [54.028504, 38.205042], [54.541568, 41.189916], [53.629454, 40.988235], [52.703088, 40.806723]], preserveManualSize: true },
+    { componentKey: "under-cabinet-light", points: [[58.004751, 39.011765], [58.802850, 39.173109], [59.315914, 42.157983], [58.403800, 41.976471], [57.491686, 41.794958]], preserveManualSize: true },
+    // NR 9 (US30) is the third upper cabinet above the refrigerator. Its
+    // top, left face, and right face follow the PDF's six outer strokes.
+    { componentKey: "wall-cabinet-3", points: [[60.527, 11.765], [66.898, 10.837], [71.615, 11.805], [65.245, 12.733]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[60.527, 11.765], [65.245, 12.733], [65.245, 25.741], [60.613, 26.407]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[65.245, 12.733], [71.615, 11.805], [71.615, 24.733], [65.245, 25.741]], preserveManualSize: true },
+
+    { componentKey: "worktop", points: [[10.603, 54.965], [47.159, 49.681], [56.594, 51.617], [20.038, 56.901]], preserveManualSize: true },
+    { componentKey: "worktop", points: [[56.594, 51.617], [60.613, 52.444], [60.613, 56.376], [45.349, 53.230]], preserveManualSize: true },
+    { componentKey: "worktop", points: [[10.603, 54.965], [20.038, 56.901], [45.349, 53.230], [45.349, 54.622], [20.038, 58.272], [10.603, 56.336]], preserveManualSize: true },
+    { componentKey: "worktop", points: [[45.349, 53.230], [60.613, 56.376], [60.613, 57.748], [45.349, 54.622]], preserveManualSize: true },
+    { componentKey: "worktop", points: [[60.371, 57.708], [60.613, 57.748], [60.613, 87.919], [60.371, 87.879]], preserveManualSize: true },
+
+    // Trace the faucet as three narrow PDF-vector silhouettes instead of one
+    // bounding polygon, which used to fill the empty area beneath the spout.
+    { componentKey: "sink-faucet", points: [[16.261, 48.450], [16.318, 47.724], [16.575, 46.756], [17.002, 45.970], [17.658, 45.506], [20.309, 44.800], [20.252, 45.768], [17.686, 46.474], [17.359, 46.676], [17.045, 47.119], [16.846, 47.745], [16.789, 48.390]], preserveManualSize: true },
+    { componentKey: "sink-faucet", points: [[16.261, 48.450], [16.789, 48.390], [16.860, 55.106], [16.375, 55.166]], preserveManualSize: true },
+    { componentKey: "sink-faucet", points: [[20.337, 43.771], [20.993, 43.852], [20.793, 47.462], [20.109, 47.361]], preserveManualSize: true },
+    { componentKey: "sink-base", points: [[12.299, 56.679], [20.038, 58.272], [19.724, 88.383], [12.299, 86.266]], preserveManualSize: true },
+    // The locked sink package owns its separately supplied UPK20 face and
+    // the complete sink cabinet front, with the shared seam left uncovered.
+    { componentKey: "sink-base", points: [[20.038, 58.272], [21.734, 58.030], [21.734, 88.202], [19.724, 88.383]], preserveManualSize: true },
+    { componentKey: "sink-base", points: [[21.734, 58.030], [32.979, 56.397], [32.979, 86.588], [21.734, 88.202]], preserveManualSize: true },
+    { componentKey: "base-module-3", points: [[32.979, 56.397], [44.223, 54.783], [44.223, 84.955], [32.979, 86.588]], preserveManualSize: true },
+    // The dishwasher's UPEF65 is drawn as two adjacent projected bands.
+    { componentKey: "base-module-3", points: [[44.223, 54.783], [45.349, 54.622], [45.349, 84.793], [44.223, 84.955]], preserveManualSize: true },
+    { componentKey: "base-module-3", points: [[45.349, 54.622], [46.219, 54.783], [46.219, 84.975], [45.349, 84.793]], preserveManualSize: true },
+    { componentKey: "oven-module", points: [[46.219, 54.783], [55.653, 56.739], [55.653, 86.911], [46.219, 84.975]], preserveManualSize: true },
+    { componentKey: "drawer-module", points: [[55.653, 56.739], [60.371, 57.708], [60.371, 87.879], [55.653, 86.911]], preserveManualSize: true },
+
+    { componentKey: "refrigerator", points: [[60.613, 26.407], [69.363, 28.202], [69.363, 89.210], [60.613, 87.415]], preserveManualSize: true },
+    { componentKey: "refrigerator", points: [[69.363, 28.202], [80.608, 26.568], [80.608, 87.576], [69.363, 89.210]], preserveManualSize: true },
+    { componentKey: "refrigerator", points: [[60.613, 26.407], [71.872, 24.773], [80.608, 26.568], [69.363, 28.202]], preserveManualSize: true },
+  ],
   "ab-105806": [
     { componentKey: "refrigerator", left: 3.59, top: 31.83, width: 13.82, height: 63.35 },
     { componentKey: "wall-cabinet-1", left: 18.35, top: 18.91, width: 9.95, height: 25.47 },

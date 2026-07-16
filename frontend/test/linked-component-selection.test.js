@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  getAutoLinkedAccessoryCodes,
+  getLinkedComponentIds,
   isLinkedComponentSelected,
   toggleLinkedComponentSelection,
 } from "../components/kitchen-selection-utils.js";
@@ -26,4 +28,14 @@ test("toggling a restored partial hood selection removes and restores the full l
 
   assert.deepEqual(removed, []);
   assert.deepEqual(new Set(restored), new Set([HOOD_CABINET, EXTRACTOR_HOOD]));
+});
+
+test("AB 105758 links the hood cabinet, extractor, and LED lighting accessory", () => {
+  const slug = "ab-105758";
+  const ledPlanComponent = "component-under-cabinet-light";
+  const linkedIds = getLinkedComponentIds(slug, EXTRACTOR_HOOD);
+
+  assert.deepEqual(linkedIds, [HOOD_CABINET, EXTRACTOR_HOOD, ledPlanComponent]);
+  assert.deepEqual(getAutoLinkedAccessoryCodes(slug, linkedIds), ["ACC-LIGHT-003"]);
+  assert.deepEqual(getAutoLinkedAccessoryCodes(slug, []), []);
 });
