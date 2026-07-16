@@ -11,6 +11,7 @@ import {
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import {
+  AdminCountryName,
   AdminDateTime,
   AdminStatusBadge,
   AdminText,
@@ -97,14 +98,49 @@ function PaymentStatusBadge({ status }) {
   return <span style={style}>{value}</span>;
 }
 
+function BreakdownPanel({ title, rows, renderLabel }) {
+  return (
+    <div style={breakdownPanelStyle}>
+      <strong style={breakdownTitleStyle}>{title}</strong>
+      {!rows.length ? <span style={mutedLineStyle}>-</span> : null}
+      {rows.slice(0, 8).map((row, index) => (
+        <div key={`${JSON.stringify(row)}-${index}`} style={breakdownRowStyle}>
+          <span>{renderLabel(row)}</span>
+          <strong>{row.count}</strong>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function VisitResultBadge({ eventType }) {
+  const isAccepted = eventType === "CONTRACT_ACCEPTED";
+  const isTest = eventType === "CONTRACT_TEST_ACCEPTED";
+  const style = isAccepted ? visitAcceptedStyle : isTest ? visitTestStyle : visitRejectedStyle;
+  const key = isAccepted
+    ? "reportsAdmin.accessAccepted"
+    : isTest
+      ? "reportsAdmin.accessTest"
+      : "reportsAdmin.accessRejected";
+  const fallback = isAccepted ? "Accepted" : isTest ? "Test" : "Rejected";
+  return <span style={style}><AdminText i18nKey={key} fallback={fallback} /></span>;
+}
+
 export default async function AdminReportsPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
   const filters = normalizeOrderReportFilters(resolvedSearchParams);
-  const [{ orders, summary }, { summary: visitSummary }] = await Promise.all([
+  const [{ orders, summary }, visitReport] = await Promise.all([
     loadOrderReportData(filters),
     loadPublicVisitReportData(filters),
   ]);
+  const {
+    summary: visitSummary,
+    countries: visitCountries,
+    sources: visitSources,
+    devices: visitDevices,
+    recentContractEvents,
+  } = visitReport;
   const exportHref = getExportHref(filters);
 
   return (
@@ -174,7 +210,7 @@ export default async function AdminReportsPage({ searchParams = {} }) {
             </h3>
             <div className="admin-reports-visit-grid" style={visitGridStyle}>
               <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.uniqueVisitors" fallback="Unique visitors" />}
+                label={<AdminText i18nKey="reportsAdmin.uniqueVisitors" fallback="Estimated daily visitors" />}
                 value={visitSummary.uniqueVisitors}
               />
               <KpiCard
@@ -204,6 +240,33 @@ export default async function AdminReportsPage({ searchParams = {} }) {
                 value={formatPercent(visitSummary.successRate)}
               />
             </div>
+            <div className="admin-reports-breakdown-grid" style={breakdownGridStyle}>
+              <BreakdownPanel
+                title={<AdminText i18nKey="reportsAdmin.visitsByCountry" fallback="Visits by country" />}
+                rows={visitCountries}
+                renderLabel={(row) => <AdminCountryName code={row.countryCode} />}
+              />
+              <BreakdownPanel
+                title={<AdminText i18nKey="reportsAdmin.visitsBySource" fallback="Visits by source" />}
+                rows={visitSources}
+                renderLabel={(row) => row.source === "direct"
+                  ? <AdminText i18nKey="reportsAdmin.directVisit" fallback="Direct visit" />
+                  : row.source}
+              />
+              <BreakdownPanel
+                title={<AdminText i18nKey="reportsAdmin.visitsByDevice" fallback="Visits by device" />}
+                rows={visitDevices}
+                renderLabel={(row) => row.deviceType === "unknown"
+                  ? <AdminText i18nKey="reportsAdmin.notCaptured" fallback="Not captured" />
+                  : row.deviceType}
+              />
+            </div>
+            <p style={privacyNoteStyle}>
+              <AdminText
+                i18nKey="reportsAdmin.privacyNote"
+                fallback="Privacy-first analytics: country only; raw IP addresses, exact locations and full user-agent strings are not stored. Detailed events are retained for 90 days by default."
+              />
+            </p>
           </div>
 
           <style>{`
@@ -227,8 +290,69 @@ export default async function AdminReportsPage({ searchParams = {} }) {
               .admin-reports-visit-grid {
                 grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
               }
+
+              .admin-reports-breakdown-grid {
+                grid-template-columns: 1fr !important;
+              }
             }
           `}</style>
+        </AdminSection>
+
+        <AdminSection
+          title={<AdminText i18nKey="reportsAdmin.recentContractAccess" fallback="Recent contract access" />}
+          description={<AdminText i18nKey="reportsAdmin.recentContractAccessDescription" fallback="The latest accepted and rejected contract checks for the selected date range." />}
+        >
+          <div className="admin-reports-table" style={tableWrapStyle}>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.accessTime" fallback="Time" /></th>
+                  <th style={thStyle}><AdminText i18nKey="contractAddressFields.country" fallback="Country" /></th>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.source" fallback="Source" /></th>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.device" fallback="Device" /></th>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.contract" fallback="Contract" /></th>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.project" fallback="Project" /></th>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.result" fallback="Result" /></th>
+                </tr>
+              </thead>
+              <tbody>
+                {!recentContractEvents.length ? (
+                  <tr>
+                    <td style={tdStyle} colSpan={7}><AdminText i18nKey="reportsAdmin.noContractAccess" fallback="No contract access events found." /></td>
+                  </tr>
+                ) : null}
+                {recentContractEvents.map((event) => {
+                  const contract = event.kitchenContract;
+                  const source = event.source || event.referrerHost || "direct";
+                  return (
+                    <tr key={event.id}>
+                      <td style={tdStyle}><AdminDateTime value={event.createdAt} /></td>
+                      <td style={tdStyle}><AdminCountryName code={event.countryCode} /></td>
+                      <td style={tdStyle}>
+                        <strong>{source === "direct" ? <AdminText i18nKey="reportsAdmin.directVisit" fallback="Direct visit" /> : source}</strong>
+                        {event.utmCampaign ? <span style={mutedLineStyle}>{event.utmCampaign}</span> : null}
+                      </td>
+                      <td style={tdStyle}>
+                        {event.deviceType || <AdminText i18nKey="reportsAdmin.notCaptured" fallback="Not captured" />}
+                        {event.browserFamily ? <span style={mutedLineStyle}>{event.browserFamily} · {event.operatingSystem}</span> : null}
+                      </td>
+                      <td style={tdStyle}>
+                        {contract ? (
+                          <Link href={`/admin/contracts/${contract.id}`} style={orderLinkStyle}>{contract.contractNumber}</Link>
+                        ) : event.contractNumberLast4 ? `••••${event.contractNumberLast4}` : "-"}
+                        {contract?.kitchen?.name ? <span style={mutedLineStyle}>{contract.kitchen.name}</span> : null}
+                      </td>
+                      <td style={tdStyle}>
+                        {contract?.project?.name || "-"}
+                        {contract?.project?.housingCompany?.name ? <span style={mutedLineStyle}>{contract.project.housingCompany.name}</span> : null}
+                      </td>
+                      <td style={tdStyle}><VisitResultBadge eventType={event.eventType} /></td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </AdminSection>
 
         <AdminSection
@@ -379,6 +503,76 @@ const visitGridStyle = {
   display: "grid",
   gridTemplateColumns: "repeat(7, minmax(130px, 1fr))",
   gap: 12,
+};
+
+const breakdownGridStyle = {
+  display: "grid",
+  gridTemplateColumns: "repeat(3, minmax(220px, 1fr))",
+  gap: 12,
+};
+
+const breakdownPanelStyle = {
+  display: "grid",
+  alignContent: "start",
+  gap: 9,
+  borderRadius: 8,
+  border: "1px solid var(--app-border)",
+  background: "rgba(255,255,255,0.84)",
+  padding: "14px 16px",
+};
+
+const breakdownTitleStyle = {
+  fontSize: 13,
+  fontWeight: 900,
+  color: "var(--app-text)",
+  marginBottom: 2,
+};
+
+const breakdownRowStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  gap: 12,
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+};
+
+const privacyNoteStyle = {
+  margin: 0,
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  lineHeight: 1.6,
+};
+
+const visitBadgeBaseStyle = {
+  display: "inline-flex",
+  borderRadius: 999,
+  padding: "6px 9px",
+  fontSize: 11,
+  fontWeight: 900,
+  textTransform: "uppercase",
+  border: "1px solid transparent",
+  whiteSpace: "nowrap",
+};
+
+const visitAcceptedStyle = {
+  ...visitBadgeBaseStyle,
+  color: "#1f6f43",
+  background: "rgba(42, 145, 85, 0.12)",
+  borderColor: "rgba(42, 145, 85, 0.22)",
+};
+
+const visitTestStyle = {
+  ...visitBadgeBaseStyle,
+  color: "#7b5a11",
+  background: "rgba(207, 145, 36, 0.12)",
+  borderColor: "rgba(207, 145, 36, 0.22)",
+};
+
+const visitRejectedStyle = {
+  ...visitBadgeBaseStyle,
+  color: "var(--app-danger-text)",
+  background: "rgba(217, 92, 92, 0.12)",
+  borderColor: "rgba(217, 92, 92, 0.22)",
 };
 
 const orderCountCardStyle = {

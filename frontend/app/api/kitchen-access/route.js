@@ -10,6 +10,7 @@ import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 
 export async function POST(request) {
   let submittedContractNumber = "";
+  let trackingContext = {};
 
   try {
     const clientIp = getRequestClientIp(request);
@@ -20,11 +21,18 @@ export async function POST(request) {
 
     const body = await request.json();
     submittedContractNumber = body?.contractNumber || "";
+    trackingContext = {
+      source: body?.source,
+      utmMedium: body?.utmMedium,
+      utmCampaign: body?.utmCampaign,
+      referrerHost: body?.referrerHost,
+    };
     await safelyTrackPublicVisitEvent({
       request,
       eventType: PUBLIC_VISIT_EVENT_TYPES.CONTRACT_SUBMITTED,
       contractNumber: submittedContractNumber,
       path: "/api/kitchen-access",
+      ...trackingContext,
     });
 
     const contract = await getKitchenContractForAccess(submittedContractNumber);
@@ -36,8 +44,10 @@ export async function POST(request) {
         ? PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED
         : PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED,
       contractNumber: contract.contractNumber,
+      kitchenContractId: contract.id,
       path: "/api/kitchen-access",
       metadata: { orderKind },
+      ...trackingContext,
     });
 
     return NextResponse.json({
@@ -55,6 +65,7 @@ export async function POST(request) {
       contractNumber: submittedContractNumber,
       path: "/api/kitchen-access",
       metadata: { status: error.status || 400 },
+      ...trackingContext,
     });
 
     return NextResponse.json(

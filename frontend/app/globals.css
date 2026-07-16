@@ -124,9 +124,16 @@ body {
   object-fit: contain;
 }
 
-.public-legal-footer__link {
+.public-legal-footer__links {
   margin-left: auto;
   margin-right: clamp(140px, 16vw, 260px);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.public-legal-footer__link {
   flex: 0 0 auto;
   color: var(--app-accent);
   font-size: 0.95rem;
@@ -734,8 +741,12 @@ textarea {
   }
 
   .public-legal-footer__link {
-    margin-left: 0;
-    margin-right: 0;
+    margin: 0;
+  }
+
+  .public-legal-footer__links {
+    margin: 0;
+    gap: 14px;
   }
 
   .legal-page {

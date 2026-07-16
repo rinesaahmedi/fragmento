@@ -305,6 +305,27 @@ function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, d
   );
 }
 
+function getExternalReferrerHost() {
+  if (typeof document === "undefined" || !document.referrer) return "";
+
+  try {
+    const referrer = new URL(document.referrer);
+    return referrer.origin === window.location.origin ? "" : referrer.hostname;
+  } catch {
+    return "";
+  }
+}
+
+function getPublicTrackingContext(searchParams) {
+  const utmSource = searchParams.get("utm_source") || "";
+  return {
+    source: searchParams.get("source") || utmSource,
+    utmMedium: searchParams.get("utm_medium") || "",
+    utmCampaign: searchParams.get("utm_campaign") || "",
+    referrerHost: getExternalReferrerHost(),
+  };
+}
+
 const ORDER_CONFIRMED_TEXT = {
   de: {
     title: "Bestellung bestaetigt",
@@ -367,10 +388,11 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
     }
 
     pageOpenTrackedRef.current = true;
+    const trackingContext = getPublicTrackingContext(searchParams);
     const payload = JSON.stringify({
       eventType: "PAGE_OPENED",
-      source: searchParams.get("source") || searchParams.get("utm_source") || "",
       path: window.location.pathname,
+      ...trackingContext,
     });
 
     if (navigator.sendBeacon) {
@@ -427,7 +449,10 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
       const response = await fetch("/api/kitchen-access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contractNumber: normalizedContractNumber }),
+        body: JSON.stringify({
+          contractNumber: normalizedContractNumber,
+          ...getPublicTrackingContext(searchParams),
+        }),
       });
       const payload = await response.json();
 

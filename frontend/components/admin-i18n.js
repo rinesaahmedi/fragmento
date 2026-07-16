@@ -214,6 +214,22 @@ export function AdminDateTime({ value }) {
   return <span suppressHydrationWarning>{isMounted ? formatAdminDate(value, language) : ""}</span>;
 }
 
+export function AdminCountryName({ code }) {
+  const { language } = useAdminI18n();
+  const normalizedCode = String(code || "").trim().toUpperCase();
+
+  if (!/^[A-Z]{2}$/.test(normalizedCode)) {
+    return <span>{language === "de" ? "Nicht erfasst" : "Not captured"}</span>;
+  }
+
+  try {
+    const names = new Intl.DisplayNames([language === "de" ? "de" : "en"], { type: "region" });
+    return <span>{names.of(normalizedCode) || normalizedCode}</span>;
+  } catch {
+    return <span>{normalizedCode}</span>;
+  }
+}
+
 export function AdminKitchenDisplayName({ slug, name }) {
   const { language } = useAdminI18n();
 

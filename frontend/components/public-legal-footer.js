@@ -24,23 +24,34 @@ export default function PublicLegalFooter() {
             className="public-legal-footer__partner-logo"
           />
         </div>
-        <Link
-          href="/impressum"
-          className="public-legal-footer__link"
-          onClick={() => {
-            const returnPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-            window.sessionStorage.setItem(LEGAL_RETURN_PATH_KEY, returnPath);
-
-            if (window.location.pathname === "/") {
-              window.sessionStorage.setItem(LEGAL_RETURN_REQUEST_KEY, "1");
-            } else {
-              window.sessionStorage.removeItem(LEGAL_RETURN_REQUEST_KEY);
-            }
-          }}
-        >
-          Impressum
-        </Link>
+        <div className="public-legal-footer__links">
+          <Link
+            href="/impressum"
+            className="public-legal-footer__link"
+            onClick={() => rememberLegalReturnPath()}
+          >
+            Impressum
+          </Link>
+          <Link
+            href="/datenschutz"
+            className="public-legal-footer__link"
+            onClick={() => rememberLegalReturnPath()}
+          >
+            Datenschutz
+          </Link>
+        </div>
       </div>
     </footer>
   );
+}
+
+function rememberLegalReturnPath() {
+  const returnPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+  window.sessionStorage.setItem(LEGAL_RETURN_PATH_KEY, returnPath);
+
+  if (window.location.pathname === "/") {
+    window.sessionStorage.setItem(LEGAL_RETURN_REQUEST_KEY, "1");
+  } else {
+    window.sessionStorage.removeItem(LEGAL_RETURN_REQUEST_KEY);
+  }
 }

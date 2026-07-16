@@ -4,6 +4,7 @@ export default function nextConfig(phase) {
   return {
     distDir: phase === PHASE_DEVELOPMENT_SERVER ? ".next-dev" : ".next",
     devIndicators: false,
+    serverExternalPackages: ["ip-location-api"],
     async headers() {
       return [
         {
