@@ -13,10 +13,9 @@ function uniqueValues(values) {
 
 function getClaimProductGroupKey(claimProduct) {
   const productCode = String(claimProduct.articleCode || claimProduct.partKey || "").trim().toLowerCase();
-  const partKey = String(claimProduct.partKey || "").trim().toLowerCase();
   const name = String(claimProduct.name || "").trim().toLowerCase();
   const nameDe = String(claimProduct.nameDe || "").trim().toLowerCase();
-  return [productCode, partKey, name, nameDe].join("|");
+  return [productCode, name, nameDe].join("|");
 }
 
 function groupClaimProducts(claimProducts) {
@@ -26,12 +25,14 @@ function groupClaimProducts(claimProducts) {
     const key = getClaimProductGroupKey(claimProduct);
     const group = groups.get(key) || {
       ...claimProduct,
+      partKeys: [],
       linkedKitchens: [],
       sourceKitchenItemCodes: [],
       sourceKitchenItemNames: [],
       sourceComponentKeys: [],
     };
 
+    group.partKeys.push(claimProduct.partKey);
     group.linkedKitchens.push(
       [claimProduct.kitchenCode, claimProduct.kitchenSlug].filter(Boolean).join(" / ")
         || claimProduct.kitchenName,
@@ -46,6 +47,7 @@ function groupClaimProducts(claimProducts) {
 
   return [...groups.values()].map((group) => ({
     ...group,
+    partKeys: uniqueValues(group.partKeys),
     linkedKitchens: uniqueValues(group.linkedKitchens),
     sourceKitchenItemCodes: uniqueValues(group.sourceKitchenItemCodes),
     sourceKitchenItemNames: uniqueValues(group.sourceKitchenItemNames),
@@ -98,7 +100,7 @@ export async function GET() {
       ...groupClaimProducts(claimProducts).map((claimProduct) => [
         claimProduct.linkedKitchens.length,
         claimProduct.linkedKitchens.join(", "),
-        claimProduct.partKey,
+        claimProduct.partKeys.join(", "),
         claimProduct.articleCode || "",
         claimProduct.name,
         claimProduct.nameDe || "",

@@ -45,10 +45,9 @@ function uniqueValues(values) {
 
 function getClaimProductGroupKey(claimProduct) {
   const productCode = String(claimProduct.articleCode || claimProduct.partKey || "").trim().toLowerCase();
-  const partKey = String(claimProduct.partKey || "").trim().toLowerCase();
   const name = String(claimProduct.name || "").trim().toLowerCase();
   const nameDe = String(claimProduct.nameDe || "").trim().toLowerCase();
-  return [productCode, partKey, name, nameDe].join("|");
+  return [productCode, name, nameDe].join("|");
 }
 
 function groupClaimProducts(claimProducts) {
@@ -59,6 +58,7 @@ function groupClaimProducts(claimProducts) {
     const group = groups.get(key) || {
       ...claimProduct,
       ids: [],
+      partKeys: [],
       linkedKitchens: [],
       sourceKitchenItemCodes: [],
       sourceComponentKeys: [],
@@ -66,6 +66,7 @@ function groupClaimProducts(claimProducts) {
     };
 
     group.ids.push(claimProduct.id);
+    group.partKeys.push(claimProduct.partKey);
     group.linkedKitchens.push(
       [claimProduct.kitchenCode, claimProduct.kitchenSlug].filter(Boolean).join(" / ")
         || claimProduct.kitchenName,
@@ -81,6 +82,7 @@ function groupClaimProducts(claimProducts) {
   return [...groups.values()].map((group) => ({
     ...group,
     linkedKitchens: uniqueValues(group.linkedKitchens),
+    partKeys: uniqueValues(group.partKeys),
     sourceKitchenItemCodes: uniqueValues(group.sourceKitchenItemCodes),
     sourceComponentKeys: uniqueValues(group.sourceComponentKeys),
     sourceKitchenItemNames: uniqueValues(group.sourceKitchenItemNames),
@@ -193,10 +195,8 @@ function ClaimProductForm({ action, claimProduct, submitLabel }) {
   return (
     <form action={action} method="post" style={claimProductFormStyle}>
       <input type="hidden" name="claimProductIds" value={(claimProduct?.ids || [claimProduct?.id]).filter(Boolean).join(",")} />
+      <input type="hidden" name="partKey" value={claimProduct?.partKey || ""} />
       <div style={formGridStyle}>
-        <FormField label="Part key">
-          <input name="partKey" defaultValue={claimProduct?.partKey || ""} style={inputStyle} required />
-        </FormField>
         <FormField label="Article code">
           <input name="articleCode" defaultValue={claimProduct?.articleCode || ""} style={inputStyle} />
         </FormField>
@@ -205,20 +205,6 @@ function ClaimProductForm({ action, claimProduct, submitLabel }) {
         </FormField>
         <FormField label="German name">
           <input name="nameDe" defaultValue={claimProduct?.nameDe || ""} style={inputStyle} />
-        </FormField>
-        <FormField label="Source item code">
-          <input
-            name="sourceKitchenItemCode"
-            defaultValue={claimProduct?.sourceKitchenItemCodes?.length === 1 ? claimProduct.sourceKitchenItemCodes[0] : (claimProduct?.sourceKitchenItemCode || "")}
-            style={inputStyle}
-          />
-        </FormField>
-        <FormField label="Source component">
-          <input
-            name="sourceComponentKey"
-            defaultValue={claimProduct?.sourceComponentKeys?.length === 1 ? claimProduct.sourceComponentKeys[0] : (claimProduct?.sourceComponentKey || "")}
-            style={inputStyle}
-          />
         </FormField>
         <FormField label="Sort order">
           <input name="sortOrder" defaultValue={claimProduct?.sortOrder ?? 0} style={inputStyle} />
@@ -572,8 +558,6 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Article code</th>
                     <th style={thStyle}>Name</th>
                     <th style={thStyle}>German name</th>
-                    <th style={thStyle}>Source item code</th>
-                    <th style={thStyle}>Source component</th>
                     <th style={thStyle}>Sort order</th>
                     <th style={thStyle}>Active</th>
                   </tr>
@@ -586,19 +570,17 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                           {claimProduct.linkedKitchens.length} kitchen{claimProduct.linkedKitchens.length === 1 ? "" : "s"}
                           {claimProduct.linkedKitchens.length ? `: ${formatJoinedValues(claimProduct.linkedKitchens)}` : ""}
                         </td>
-                        <td style={tdStyle}><span style={codePillStyle}>{claimProduct.partKey}</span></td>
+                        <td style={tdStyle}>
+                          <span style={codePillStyle}>{formatJoinedValues(claimProduct.partKeys || [claimProduct.partKey])}</span>
+                        </td>
                         <td style={tdStyle}>{claimProduct.articleCode || ""}</td>
                         <td style={tdStyle}>{claimProduct.name}</td>
                         <td style={tdStyle}>{claimProduct.nameDe || ""}</td>
-                        <td style={tdStyle} title={claimProduct.sourceKitchenItemNames.join(", ")}>
-                          {formatJoinedValues(claimProduct.sourceKitchenItemCodes)}
-                        </td>
-                        <td style={tdStyle}>{formatJoinedValues(claimProduct.sourceComponentKeys)}</td>
                         <td style={tdStyle}>{claimProduct.sortOrder}</td>
                         <td style={tdStyle}>{formatBoolean(claimProduct.isActive)}</td>
                       </tr>
                       <tr>
-                        <td colSpan={9} style={editRowCellStyle}>
+                        <td colSpan={7} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
                             <details style={editDetailsStyle}>
                               <summary style={editSummaryStyle}>Edit</summary>
