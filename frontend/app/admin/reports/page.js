@@ -11,7 +11,6 @@ import {
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import {
-  AdminCountryName,
   AdminDateTime,
   AdminStatusBadge,
   AdminText,
@@ -23,7 +22,6 @@ import {
   loadOrderReportData,
   normalizeOrderReportFilters,
 } from "../../../lib/admin-order-reports";
-import { loadPublicVisitReportData } from "../../../lib/public-visit-reports";
 import { requireAdminPage } from "../../../lib/auth";
 import { getPriceBreakdown } from "../../../lib/price-utils";
 
@@ -35,10 +33,6 @@ function formatCurrency(value) {
     currency: "EUR",
     minimumFractionDigits: 2,
   }).format(Number(value || 0));
-}
-
-function formatPercent(value) {
-  return `${Number(value || 0).toFixed(1)}%`;
 }
 
 function getExportHref(filters) {
@@ -98,35 +92,11 @@ function PaymentStatusBadge({ status }) {
   return <span style={style}>{value}</span>;
 }
 
-function BreakdownPanel({ title, rows, renderLabel }) {
-  return (
-    <div style={breakdownPanelStyle}>
-      <strong style={breakdownTitleStyle}>{title}</strong>
-      {!rows.length ? <span style={mutedLineStyle}>-</span> : null}
-      {rows.slice(0, 8).map((row, index) => (
-        <div key={`${JSON.stringify(row)}-${index}`} style={breakdownRowStyle}>
-          <span>{renderLabel(row)}</span>
-          <strong>{row.count}</strong>
-        </div>
-      ))}
-    </div>
-  );
-}
-
 export default async function AdminReportsPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
   const filters = normalizeOrderReportFilters(resolvedSearchParams);
-  const [{ orders, summary }, visitReport] = await Promise.all([
-    loadOrderReportData(filters),
-    loadPublicVisitReportData(filters),
-  ]);
-  const {
-    summary: visitSummary,
-    countries: visitCountries,
-    sources: visitSources,
-    devices: visitDevices,
-  } = visitReport;
+  const { orders, summary } = await loadOrderReportData(filters);
   const exportHref = getExportHref(filters);
 
   return (
@@ -190,71 +160,6 @@ export default async function AdminReportsPage({ searchParams = {} }) {
             />
           </div>
 
-          <div style={visitReportBlockStyle}>
-            <h3 style={subsectionTitleStyle}>
-              <AdminText i18nKey="reportsAdmin.siteVisits" fallback="Site visits" />
-            </h3>
-            <div className="admin-reports-visit-grid" style={visitGridStyle}>
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.uniqueVisitors" fallback="Estimated daily visitors" />}
-                value={visitSummary.uniqueVisitors}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.openedSite" fallback="Opened site" />}
-                value={visitSummary.opened}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.enteredContract" fallback="Entered contract" />}
-                value={visitSummary.submitted}
-              />
-              <KpiCard
-                tone="success"
-                label={<AdminText i18nKey="reportsAdmin.contractWorked" fallback="Worked" />}
-                value={visitSummary.accepted}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.contractTest" fallback="Test" />}
-                value={visitSummary.testAccepted}
-              />
-              <KpiCard
-                tone="warning"
-                label={<AdminText i18nKey="reportsAdmin.contractDidNotWork" fallback="Did not work" />}
-                value={visitSummary.rejected}
-              />
-              <KpiCard
-                label={<AdminText i18nKey="reportsAdmin.contractSuccessRate" fallback="Success rate" />}
-                value={formatPercent(visitSummary.successRate)}
-              />
-            </div>
-            <div className="admin-reports-breakdown-grid" style={breakdownGridStyle}>
-              <BreakdownPanel
-                title={<AdminText i18nKey="reportsAdmin.visitsByCountry" fallback="Visits by country" />}
-                rows={visitCountries}
-                renderLabel={(row) => <AdminCountryName code={row.countryCode} />}
-              />
-              <BreakdownPanel
-                title={<AdminText i18nKey="reportsAdmin.visitsBySource" fallback="Visits by source" />}
-                rows={visitSources}
-                renderLabel={(row) => row.source === "direct"
-                  ? <AdminText i18nKey="reportsAdmin.directVisit" fallback="Direct visit" />
-                  : row.source}
-              />
-              <BreakdownPanel
-                title={<AdminText i18nKey="reportsAdmin.visitsByDevice" fallback="Visits by device" />}
-                rows={visitDevices}
-                renderLabel={(row) => row.deviceType === "unknown"
-                  ? <AdminText i18nKey="reportsAdmin.notCaptured" fallback="Not captured" />
-                  : row.deviceType}
-              />
-            </div>
-            <p style={privacyNoteStyle}>
-              <AdminText
-                i18nKey="reportsAdmin.privacyNote"
-                fallback="Privacy-first analytics: country only; raw IP addresses, exact locations and full user-agent strings are not stored. Detailed events are retained for 90 days by default."
-              />
-            </p>
-          </div>
-
           <style>{`
             @media (max-width: 1180px) {
               .admin-reports-kpi-grid {
@@ -268,16 +173,6 @@ export default async function AdminReportsPage({ searchParams = {} }) {
 
             @media (max-width: 640px) {
               .admin-reports-order-count-card {
-                grid-template-columns: 1fr !important;
-              }
-            }
-
-            @media (max-width: 900px) {
-              .admin-reports-visit-grid {
-                grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)) !important;
-              }
-
-              .admin-reports-breakdown-grid {
                 grid-template-columns: 1fr !important;
               }
             }
@@ -413,63 +308,6 @@ const kpiGridStyle = {
   display: "grid",
   gridTemplateColumns: "minmax(360px, 1.35fr) repeat(3, minmax(190px, 1fr))",
   gap: 12,
-};
-
-const visitReportBlockStyle = {
-  display: "grid",
-  gap: 12,
-  marginTop: 4,
-};
-
-const subsectionTitleStyle = {
-  margin: "0",
-  fontSize: 18,
-  fontWeight: 900,
-  color: "var(--app-text)",
-};
-
-const visitGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(7, minmax(130px, 1fr))",
-  gap: 12,
-};
-
-const breakdownGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3, minmax(220px, 1fr))",
-  gap: 12,
-};
-
-const breakdownPanelStyle = {
-  display: "grid",
-  alignContent: "start",
-  gap: 9,
-  borderRadius: 8,
-  border: "1px solid var(--app-border)",
-  background: "rgba(255,255,255,0.84)",
-  padding: "14px 16px",
-};
-
-const breakdownTitleStyle = {
-  fontSize: 13,
-  fontWeight: 900,
-  color: "var(--app-text)",
-  marginBottom: 2,
-};
-
-const breakdownRowStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: 12,
-  color: "var(--app-text-muted)",
-  fontSize: 13,
-};
-
-const privacyNoteStyle = {
-  margin: 0,
-  color: "var(--app-text-muted)",
-  fontSize: 12,
-  lineHeight: 1.6,
 };
 
 const orderCountCardStyle = {
