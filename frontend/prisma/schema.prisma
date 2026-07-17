@@ -543,6 +543,7 @@ model TestOrderItem {
 model ServiceClaim {
   id                   String   @id
   contractNumber       String
+  claimSequence        Int
   fullName             String
   phone                String?
   email                String?
@@ -567,6 +568,7 @@ model ServiceClaim {
   createdAt            DateTime @default(now())
 
   @@index([contractNumber])
+  @@unique([contractNumber, claimSequence])
   @@index([createdAt])
 }
 
