@@ -218,7 +218,9 @@
     "productAssistantVoiceError": "Voice input could not start. Please try again.",
     "productAssistantSend": "Send",
     "productAssistantLauncher": "Product assistant",
-    "productAssistantLauncherPrompt": "Ask a question"
+    "productAssistantLauncherPrompt": "Ask a question",
+    "productAssistantLauncherSwipeHint": "Swipe to hide",
+    "productAssistantRestore": "Show assistant"
   },
   "order": {
     "title": "Complete order",

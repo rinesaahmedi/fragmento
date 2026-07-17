@@ -171,6 +171,9 @@
 
 .sideColumn {
   grid-area: side;
+  position: sticky;
+  top: 12px;
+  max-height: calc(100vh - 24px);
 }
 
 .summaryColumn {
@@ -1008,7 +1011,12 @@
 }
 
 .sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: min(720px, calc(100vh - 24px));
+  max-height: calc(100vh - 24px);
   padding: 0 0 18px;
+  overflow: hidden;
 }
 
 .sidebarHeader {
@@ -1031,10 +1039,13 @@
 .catalog {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 14px;
   padding: 14px;
-  max-height: calc(100vh - 180px);
   overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 
 .catalogSection {
@@ -2596,6 +2607,51 @@
   background: transparent;
   box-shadow: none;
   pointer-events: auto;
+  touch-action: none;
+  cursor: grab;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.productAssistantLauncher:active {
+  cursor: grabbing;
+  transition: none;
+}
+
+.productAssistantRestore {
+  min-height: 42px;
+  padding: 9px 14px 9px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(42, 145, 85, 0.28);
+  border-radius: 999px;
+  background: #fffdf9;
+  color: #3d352d;
+  font-size: 0.78rem;
+  font-weight: 850;
+  box-shadow: 0 8px 22px rgba(36, 24, 13, 0.12);
+  pointer-events: auto;
+}
+
+.productAssistantRestore span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #2a9155;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.productAssistantRestore:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(36, 24, 13, 0.16);
+}
+
+.productAssistantRestore:focus-visible {
+  outline: 2px solid rgba(42, 145, 85, 0.38);
+  outline-offset: 2px;
 }
 
 .productAssistantLauncher:hover {
@@ -2626,6 +2682,29 @@
     0 18px 36px rgba(74, 47, 20, 0.2),
     0 0 0 3px rgba(42, 145, 85, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.productAssistantLauncherBubble strong {
+  display: block;
+}
+
+.productAssistantLauncherSwipeHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  color: #76695d;
+  font-size: 0.7rem;
+  font-weight: 750;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.productAssistantLauncherSwipeHint span {
+  color: #2a9155;
+  font-size: 0.88rem;
+  line-height: 1;
 }
 
 .productAssistantLauncherBubble::after {
@@ -3891,6 +3970,11 @@
     display: block;
   }
 
+  .sideColumn {
+    position: static;
+    max-height: none;
+  }
+
   .planColumn {
     z-index: 5;
     background: #f5efe7;
@@ -3920,6 +4004,9 @@
 
   .sidebar {
     position: static;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
   }
 
   .catalog {
@@ -4026,6 +4113,10 @@
   .productAssistantLauncherAvatar img {
     width: 100%;
     height: 100%;
+  }
+
+  .productAssistantRestore {
+    margin: 0 12px 12px auto;
   }
 
   .productInfoFrame {

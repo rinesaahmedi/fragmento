@@ -1259,6 +1259,9 @@ function KitchenConfiguratorContent({
   const [activeProductInfo, setActiveProductInfo] = useState(null);
   const [activeProductPhotos, setActiveProductPhotos] = useState(null);
   const [isProductAssistantOpen, setIsProductAssistantOpen] = useState(false);
+  const [isProductAssistantLauncherDismissed, setIsProductAssistantLauncherDismissed] = useState(false);
+  const [productAssistantLauncherDragX, setProductAssistantLauncherDragX] = useState(0);
+  const [productAssistantLauncherDragY, setProductAssistantLauncherDragY] = useState(0);
   const [productAssistantMessages, setProductAssistantMessages] = useState([]);
   const [selectedProductAssistantContext, setSelectedProductAssistantContext] = useState(null);
   const [productInfoQuestion, setProductInfoQuestion] = useState("");
@@ -1272,6 +1275,8 @@ function KitchenConfiguratorContent({
   const productAssistantAudioRef = useRef(null);
   const productAssistantTtsAbortControllerRef = useRef(null);
   const productAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
+  const productAssistantLauncherSwipeRef = useRef(null);
+  const suppressProductAssistantLauncherClickRef = useRef(false);
   const autoLinkedLedWasSelectedRef = useRef(null);
   const [customer, setCustomer] = useState(() =>
     buildInitialCustomerState(initialOrder, initialContractNumber, initialContractAddress),
@@ -1906,6 +1911,7 @@ function KitchenConfiguratorContent({
 
   function openProductAssistant() {
     if (!hasAnyAssistantProducts) return;
+    setIsProductAssistantLauncherDismissed(false);
     productAssistantSkipOptionsResetRef.current = true;
     if (hasProductAssistantOptions) {
       resetProductAssistantContext(productAssistantSuggestedContext);
@@ -1917,6 +1923,7 @@ function KitchenConfiguratorContent({
 
   function openProductAssistantForCatalogItem(catalogItem) {
     if (!hasAnyAssistantProducts || !shouldShowProductAssistantLauncher(catalogItem)) return;
+    setIsProductAssistantLauncherDismissed(false);
     if (!hasProductAssistantOptions) {
       openProductAssistant();
       return;
@@ -1926,6 +1933,46 @@ function KitchenConfiguratorContent({
     productAssistantSkipOptionsResetRef.current = true;
     resetProductAssistantContext(option);
     setIsProductAssistantOpen(true);
+  }
+
+  function startProductAssistantLauncherSwipe(event) {
+    if (isProductAssistantOpen) return;
+    productAssistantLauncherSwipeRef.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+    };
+    suppressProductAssistantLauncherClickRef.current = false;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  }
+
+  function moveProductAssistantLauncherSwipe(event) {
+    const swipe = productAssistantLauncherSwipeRef.current;
+    if (!swipe || swipe.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - swipe.startX;
+    const deltaY = event.clientY - swipe.startY;
+    if (Math.abs(deltaX) > 8 || Math.abs(deltaY) > 8) {
+      suppressProductAssistantLauncherClickRef.current = true;
+    }
+    setProductAssistantLauncherDragX(Math.max(0, deltaX));
+    setProductAssistantLauncherDragY(Math.max(0, deltaY));
+  }
+
+  function finishProductAssistantLauncherSwipe(event) {
+    const swipe = productAssistantLauncherSwipeRef.current;
+    if (!swipe || swipe.pointerId !== event.pointerId) return;
+    const deltaX = event.clientX - swipe.startX;
+    const deltaY = event.clientY - swipe.startY;
+    productAssistantLauncherSwipeRef.current = null;
+    setProductAssistantLauncherDragX(0);
+    setProductAssistantLauncherDragY(0);
+    const swipedRight = deltaX >= 70 && Math.abs(deltaX) > Math.abs(deltaY);
+    const swipedDown = deltaY >= 70 && Math.abs(deltaY) >= Math.abs(deltaX);
+    if (swipedRight || swipedDown) {
+      suppressProductAssistantLauncherClickRef.current = true;
+      closeProductAssistant();
+      setIsProductAssistantLauncherDismissed(true);
+    }
   }
 
   function getProductAssistantSpeechLanguage() {
@@ -2671,12 +2718,38 @@ function KitchenConfiguratorContent({
               </div>
             ) : null}
 
+            {isProductAssistantLauncherDismissed && !isProductAssistantOpen ? (
+              <button
+                type="button"
+                className={styles.productAssistantRestore}
+                onClick={() => setIsProductAssistantLauncherDismissed(false)}
+                aria-label={translate("configurator.productAssistantRestore", "Show assistant")}
+              >
+                <span aria-hidden="true">?</span>
+                {translate("configurator.productAssistantRestore", "Show assistant")}
+              </button>
+            ) : (
             <button
               type="button"
               className={styles.productAssistantLauncher}
+              style={productAssistantLauncherDragX || productAssistantLauncherDragY
+                ? { transform: `translate(${productAssistantLauncherDragX}px, ${productAssistantLauncherDragY}px)` }
+                : undefined}
               aria-expanded={isProductAssistantOpen}
               aria-label={translate("configurator.productAssistantLauncher", "Product assistant")}
+              onPointerDown={startProductAssistantLauncherSwipe}
+              onPointerMove={moveProductAssistantLauncherSwipe}
+              onPointerUp={finishProductAssistantLauncherSwipe}
+              onPointerCancel={() => {
+                productAssistantLauncherSwipeRef.current = null;
+                setProductAssistantLauncherDragX(0);
+                setProductAssistantLauncherDragY(0);
+              }}
               onClick={() => {
+                if (suppressProductAssistantLauncherClickRef.current) {
+                  suppressProductAssistantLauncherClickRef.current = false;
+                  return;
+                }
                 if (isProductAssistantOpen) {
                   closeProductAssistant();
                   return;
@@ -2685,12 +2758,17 @@ function KitchenConfiguratorContent({
               }}
             >
               <span className={styles.productAssistantLauncherBubble}>
-                {translate("configurator.productAssistantLauncherPrompt", "Ask a question")}
+                <strong>{translate("configurator.productAssistantLauncherPrompt", "Ask a question")}</strong>
+                <small className={styles.productAssistantLauncherSwipeHint}>
+                  <span aria-hidden="true">→ ↓</span>
+                  {translate("configurator.productAssistantLauncherSwipeHint", "Swipe to hide")}
+                </small>
               </span>
               <span className={styles.productAssistantLauncherAvatar} aria-hidden="true">
                 <img src="/img/Untitled%20design%20(4).png" alt="" />
               </span>
             </button>
+            )}
           </div>
         ) : null}
       </div>

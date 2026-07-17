@@ -218,7 +218,9 @@
     "productAssistantVoiceError": "Die Spracheingabe konnte nicht starten. Bitte versuche es erneut.",
     "productAssistantSend": "Senden",
     "productAssistantLauncher": "Produktberater",
-    "productAssistantLauncherPrompt": "Frage stellen"
+    "productAssistantLauncherPrompt": "Frage stellen",
+    "productAssistantLauncherSwipeHint": "Zum Ausblenden wischen",
+    "productAssistantRestore": "Berater anzeigen"
   },
   "order": {
     "title": "Bestellung abschließen",
