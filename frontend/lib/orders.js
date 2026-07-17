@@ -234,9 +234,20 @@ function getOrderItemEffectivePrice(item) {
 
 export function buildOrderForNotifications(orderRecord) {
   const toNotificationItem = (item) => {
-    const catalogArticle = item.kitchenItem?.catalogArticleId ? item.kitchenItem.catalogArticle : null;
-    const catalogService = item.kitchenItem?.catalogServiceId ? item.kitchenItem.catalogService : null;
-    const catalogBlende = item.kitchenItem?.catalogBlendeId ? item.kitchenItem.catalogBlende : null;
+    // Old orders can outlive a reseeded KitchenItem row (the relation uses
+    // onDelete: SetNull). Resolve its current catalog equivalent so plan PDFs
+    // still have the componentKey needed to highlight the purchased element.
+    const snapshotArticleNumber = normalizeArticleNumber(item.articleNumberSnapshot || item.articleNumber);
+    const currentKitchenItem = (orderRecord.kitchen?.items || []).find((candidate) =>
+      candidate.code === item.code || (
+        snapshotArticleNumber &&
+        normalizeArticleNumber(candidate.articleNumber || candidate.catalogArticle?.articleNumber) === snapshotArticleNumber
+      ),
+    ) || null;
+    const kitchenItem = item.kitchenItem || currentKitchenItem;
+    const catalogArticle = kitchenItem?.catalogArticleId ? kitchenItem.catalogArticle : null;
+    const catalogService = kitchenItem?.catalogServiceId ? kitchenItem.catalogService : null;
+    const catalogBlende = kitchenItem?.catalogBlendeId ? kitchenItem.catalogBlende : null;
     const cutleryLine = parseCutleryLineFromOrderItem({
       code: item.code,
       articleNumber: item.articleNumber,
@@ -258,24 +269,24 @@ export function buildOrderForNotifications(orderRecord) {
       nameDe: displayNameDe,
       price: getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
-      isLocked: Boolean(item.kitchenItem?.isLocked || item.isLocked),
-      iconKey: item.kitchenItem?.iconKey || item.iconKey || "",
-      componentKey: item.kitchenItem?.componentKey || item.componentKey || "",
-      productImagePath: item.kitchenItem?.productImagePath || item.productImagePath || "",
-      productInfoPdfPath: item.kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
-      productInfoSummary: item.kitchenItem?.productInfoSummary || item.productInfoSummary || "",
-      productInfoKeyFacts: Array.isArray(item.kitchenItem?.productInfoKeyFacts)
-        ? item.kitchenItem.productInfoKeyFacts
+      isLocked: Boolean(kitchenItem?.isLocked || item.isLocked),
+      iconKey: kitchenItem?.iconKey || item.iconKey || "",
+      componentKey: kitchenItem?.componentKey || item.componentKey || "",
+      productImagePath: kitchenItem?.productImagePath || item.productImagePath || "",
+      productInfoPdfPath: kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
+      productInfoSummary: kitchenItem?.productInfoSummary || item.productInfoSummary || "",
+      productInfoKeyFacts: Array.isArray(kitchenItem?.productInfoKeyFacts)
+        ? kitchenItem.productInfoKeyFacts
         : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
-      productInfoExtractedText: item.kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
-      blendeCode: catalogBlende?.code || item.kitchenItem?.blendeCode || item.blendeCode || "",
-      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.kitchenItem?.blendeLabel || item.blendeLabel || "",
+      productInfoExtractedText: kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
+      blendeCode: catalogBlende?.code || kitchenItem?.blendeCode || item.blendeCode || "",
+      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || kitchenItem?.blendeLabel || item.blendeLabel || "",
       blendeName: catalogBlende?.name || item.blendeName || "",
       blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
       blendePrice: catalogBlende?.price != null
         ? Number(catalogBlende.price)
-        : item.kitchenItem?.blendePrice != null
-          ? Number(item.kitchenItem.blendePrice)
+        : kitchenItem?.blendePrice != null
+          ? Number(kitchenItem.blendePrice)
         : (item.blendePrice != null ? Number(item.blendePrice) : null),
     };
   };
@@ -345,7 +356,13 @@ async function getOrderRecordForOperations(id, orderKind = ORDER_KIND_LIVE) {
   const order = await getOrderDelegate(prisma, orderKind).findUnique({
     where: { id },
     include: {
-      kitchen: true,
+      kitchen: {
+        include: {
+          items: {
+            include: { catalogArticle: true, catalogBlende: true, catalogService: true },
+          },
+        },
+      },
       items: {
         orderBy: { createdAt: "asc" },
         include: {

@@ -386,9 +386,21 @@ export default function ServiceClaimKitchenPicker({
   );
   const isManualSinkSelected = selectedIds.has(sinkComponentId);
   const isManualCooktopSelected = selectedIds.has(cooktopComponentId);
+  const selectedCount = selectedIds.size;
 
   return (
     <div className="service-claim-kitchen">
+      <div className="service-claim-kitchen__instruction">
+        <span className="service-claim-kitchen__instruction-icon" aria-hidden="true">✓</span>
+        <div className="service-claim-kitchen__instruction-copy">
+          <p className="service-claim-kitchen__instruction-title">
+            {labels?.instructionTitle || "Which elements are affected?"}
+          </p>
+          <p className="service-claim-kitchen__instruction-text">
+            {labels?.instruction || "Click every affected cabinet or appliance in the drawing."}
+          </p>
+        </div>
+      </div>
       <div className="service-claim-kitchen__header">
         {normalizedContractNumber ? (
           <div className="service-claim-kitchen__meta">
@@ -398,7 +410,12 @@ export default function ServiceClaimKitchenPicker({
             <p className="service-claim-kitchen__contract">{normalizedContractNumber}</p>
           </div>
         ) : null}
-        <button type="button" className="service-claim-kitchen__reset" onClick={() => onChange([])}>
+        <button
+          type="button"
+          className="service-claim-kitchen__reset"
+          onClick={() => onChange([])}
+          disabled={!selectedCount}
+        >
           {labels?.reset || "Reset"}
         </button>
       </div>
