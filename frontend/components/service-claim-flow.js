@@ -18,6 +18,7 @@ import {
 } from "../lib/service-claim-component-choices";
 import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
 import { isElectricalApplianceProblemArea } from "../lib/service-claim-serial-number";
+import { getSerialNumberHelpImages } from "../lib/serial-number-help";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
 
 const LANGUAGE_OPTIONS = [
@@ -172,11 +173,6 @@ const CONTRACT_NUMBER_HELP_IMAGES = [
   { src: "/img/CONTRACT%20NR%20IMG.png", altKey: "contractNumberHelpAlt3" },
 ];
 const CONTRACT_HELP_SLIDE_COUNT = CONTRACT_NUMBER_HELP_IMAGES.length;
-const SERIAL_NUMBER_HELP_IMAGES = [
-  { src: "/img/AMICA%20SR%20NR.webp", altKey: "serialNumberHelpAlt1" },
-  { src: "/img/AMICA%20FRIDGE.webp", altKey: "serialNumberHelpAlt2" },
-];
-const SERIAL_HELP_SLIDE_COUNT = SERIAL_NUMBER_HELP_IMAGES.length;
 
 function isClientAllowedAttachment(file) {
   const mime = (file.type || "").toLowerCase();
@@ -612,6 +608,8 @@ const COPY = {
     kitchenPlanEyebrow: "K\u00fcchenmodell",
     kitchenPlanTitle: "Problemstelle in der K\u00fcche markieren",
     kitchenPlanReset: "Auswahl zur\u00fccksetzen",
+    kitchenPlanInstructionTitle: "Welche Elemente sind betroffen?",
+    kitchenPlanInstruction: "Klicke auf alle betroffenen Schr\u00e4nke oder Ger\u00e4te in der Zeichnung.",
     removeProblemAreaAria: "{label} entfernen",
     kitchenPlanSinkOption: "Sp\u00fcle",
     kitchenPlanCooktopOption: "Kochfeld",
@@ -852,6 +850,8 @@ const COPY = {
     kitchenPlanEyebrow: "Kitchen model",
     kitchenPlanTitle: "Mark where the problem is",
     kitchenPlanReset: "Clear selection",
+    kitchenPlanInstructionTitle: "Which elements are affected?",
+    kitchenPlanInstruction: "Click every affected cabinet or appliance in the drawing.",
     removeProblemAreaAria: "Remove {label}",
     kitchenPlanSinkOption: "Sink",
     kitchenPlanCooktopOption: "Cooktop",
@@ -2067,8 +2067,14 @@ export default function ServiceClaimFlow() {
   const [isContractNumberCurrentlyStuck, setIsContractNumberCurrentlyStuck] = useState(false);
   const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
   const [isSerialNumberHelpOpen, setIsSerialNumberHelpOpen] = useState(false);
+  const [serialNumberHelpProduct, setSerialNumberHelpProduct] = useState(null);
   const [contractHelpSlide, setContractHelpSlide] = useState(0);
   const [serialHelpSlide, setSerialHelpSlide] = useState(0);
+  const serialNumberHelpImages = useMemo(
+    () => getSerialNumberHelpImages(serialNumberHelpProduct),
+    [serialNumberHelpProduct],
+  );
+  const serialHelpSlideCount = serialNumberHelpImages.length;
   const [isClaimAssistantOpen, setIsClaimAssistantOpen] = useState(false);
   const [claimAssistantMessages, setClaimAssistantMessages] = useState(EMPTY_CLAIM_ASSISTANT_MESSAGES);
   const [claimAssistantQuestion, setClaimAssistantQuestion] = useState("");
@@ -3042,6 +3048,7 @@ export default function ServiceClaimFlow() {
         activeKitchenPlan?.kitchenSlug,
         componentId,
       ).filter((id) => selectableIds.has(id));
+      const isAddingComponent = !linkedComponentIds.some((id) => problemComponentIds.includes(id));
       setProblemComponentIds((current) => {
         const shouldRemove = linkedComponentIds.some((id) => current.includes(id));
         const next = new Set(current);
@@ -3052,6 +3059,10 @@ export default function ServiceClaimFlow() {
         return [...next].filter((id) => selectableIds.has(id));
       });
       setIsClaimRequiredAlertDismissed(false);
+      if (isAddingComponent) {
+        setShowClaimRequiredErrors(false);
+        setShowProblemAreaAttachmentErrors(false);
+      }
       if (error) setError("");
       return;
     }
@@ -3078,6 +3089,9 @@ export default function ServiceClaimFlow() {
 
     if (groupIsSelected) {
       choiceGroup.options.forEach((option) => moveProblemAreaRowState(option.componentId));
+    } else {
+      setShowClaimRequiredErrors(false);
+      setShowProblemAreaAttachmentErrors(false);
     }
     setIsClaimRequiredAlertDismissed(false);
     if (error) setError("");
@@ -3367,7 +3381,7 @@ export default function ServiceClaimFlow() {
   }
 
   function goSerialHelpNext() {
-    setSerialHelpSlide((s) => Math.min(SERIAL_HELP_SLIDE_COUNT - 1, s + 1));
+    setSerialHelpSlide((s) => Math.min(serialHelpSlideCount - 1, s + 1));
   }
 
   function onContractHelpTouchStart(event) {
@@ -3425,7 +3439,7 @@ export default function ServiceClaimFlow() {
   function serialHelpSlideAriaLabel(index) {
     return t("contractNumberHelpSlideDot")
       .replace("{n}", String(index + 1))
-      .replace("{total}", String(SERIAL_HELP_SLIDE_COUNT));
+      .replace("{total}", String(serialHelpSlideCount));
   }
 
   function buildClientAddress() {
@@ -5262,6 +5276,8 @@ export default function ServiceClaimFlow() {
                       title: contractLookup.kitchenPlan.kitchenName || t("kitchenPlanTitle"),
                       contractLabel: copy.contractNumber,
                       reset: t("kitchenPlanReset"),
+                      instructionTitle: t("kitchenPlanInstructionTitle"),
+                      instruction: t("kitchenPlanInstruction"),
                       sinkOption: t("kitchenPlanSinkOption"),
                       cooktopOption: t("kitchenPlanCooktopOption"),
                       worktopEndPanelOption: t("kitchenPlanWorktopEndPanelOption"),
@@ -5455,6 +5471,7 @@ export default function ServiceClaimFlow() {
                               className="service-field__help-badge"
                               aria-label={t("serialNumberHelpAria")}
                               onClick={() => {
+                                setSerialNumberHelpProduct(area);
                                 setSerialHelpSlide(0);
                                 setIsSerialNumberHelpOpen(true);
                               }}
@@ -5866,7 +5883,7 @@ export default function ServiceClaimFlow() {
                     >
                       <img
                         src={entry.src}
-                        alt={t(entry.altKey)}
+                        alt={entry.alt || t(entry.altKey)}
                         className="service-contract-help__img"
                         loading="lazy"
                         decoding="async"
@@ -5940,6 +5957,9 @@ export default function ServiceClaimFlow() {
                 &times;
               </button>
             </div>
+            {serialNumberHelpProduct?.resolvedLabel ? (
+              <p className="service-contract-help__eyebrow">{serialNumberHelpProduct.resolvedLabel}</p>
+            ) : null}
             <p className="service-contract-help__intro">{t("serialNumberHelpBody")}</p>
             <p className="service-contract-help__sr" aria-live="polite">
               {serialHelpSlideAriaLabel(serialHelpSlide)}
@@ -5962,19 +5982,19 @@ export default function ServiceClaimFlow() {
                 <div
                   className="service-contract-help__track"
                   style={{
-                    width: `${SERIAL_HELP_SLIDE_COUNT * 100}%`,
-                    transform: `translateX(-${(100 * serialHelpSlide) / SERIAL_HELP_SLIDE_COUNT}%)`,
+                    width: `${serialHelpSlideCount * 100}%`,
+                    transform: `translateX(-${(100 * serialHelpSlide) / serialHelpSlideCount}%)`,
                   }}
                 >
-                  {SERIAL_NUMBER_HELP_IMAGES.map((entry) => (
+                  {serialNumberHelpImages.map((entry) => (
                     <figure
                       key={entry.src}
                       className="service-contract-help__figure service-contract-help__slide"
-                      style={{ flex: `0 0 ${100 / SERIAL_HELP_SLIDE_COUNT}%` }}
+                      style={{ flex: `0 0 ${100 / serialHelpSlideCount}%` }}
                     >
                       <img
                         src={entry.src}
-                        alt={t(entry.altKey)}
+                        alt={entry.alt || t(entry.altKey)}
                         className="service-contract-help__img"
                         loading="lazy"
                         decoding="async"
@@ -5988,14 +6008,14 @@ export default function ServiceClaimFlow() {
                 type="button"
                 className="service-contract-help__arrow service-contract-help__arrow--next"
                 onClick={goSerialHelpNext}
-                disabled={serialHelpSlide >= SERIAL_HELP_SLIDE_COUNT - 1}
+                disabled={serialHelpSlide >= serialHelpSlideCount - 1}
                 aria-label={t("contractNumberHelpNext")}
               >
                 &#8250;
               </button>
             </div>
             <div className="service-contract-help__dots" role="tablist" aria-label={t("serialNumberHelpTitle")}>
-              {SERIAL_NUMBER_HELP_IMAGES.map((_, index) => (
+              {serialNumberHelpImages.map((_, index) => (
                 <button
                   key={String(index)}
                   type="button"

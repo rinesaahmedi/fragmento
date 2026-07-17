@@ -1249,7 +1249,13 @@ async function getOrdersForAdminByKind(filters = {}, orderKind = ORDER_KIND_LIVE
   const orders = await getOrderDelegate(prisma, orderKind).findMany({
     where,
     include: {
-      kitchen: true,
+      kitchen: {
+        include: {
+          items: {
+            include: { catalogArticle: true, catalogBlende: true, catalogService: true },
+          },
+        },
+      },
       kitchenContract: true,
       items: true,
     },

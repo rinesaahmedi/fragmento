@@ -628,7 +628,21 @@ function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height,
 async function renderPurchasedKitchenImagePlanPng(order, source) {
   const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const previewData = await loadKitchenPlanPreviewData().catch(() => null);
-  const hotspots = previewData?.hotspotsBySlug?.[slug] || [];
+  const directHotspots = previewData?.hotspotsBySlug?.[slug] || [];
+  const planHref = previewData?.imageViews?.[slug] || "";
+  // Several kitchen numbers intentionally share one drawing. Some of those
+  // hotspot aliases are assigned dynamically in the React module and are not
+  // part of its object literal, so inherit the regions from another slug that
+  // points at the exact same plan asset.
+  const sharedPlanSlug = !directHotspots.length && planHref
+    ? Object.keys(previewData?.hotspotsBySlug || {}).find((candidateSlug) =>
+        previewData.imageViews?.[candidateSlug] === planHref &&
+        previewData.hotspotsBySlug?.[candidateSlug]?.length,
+      )
+    : "";
+  const hotspots = directHotspots.length
+    ? directHotspots
+    : (previewData?.hotspotsBySlug?.[sharedPlanSlug] || []);
   const linkedGroups = previewData?.linkedGroupsBySlug?.[slug] || [];
   if (!hotspots.length) return null;
 
