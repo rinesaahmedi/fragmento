@@ -20,6 +20,23 @@ test("service-claims route retries inserts when landlord company columns are mis
   assert.match(source, /await insertServiceClaimRecord\(prisma,\s*payload\)/);
 });
 
+test("service-claims route recovers when a running server cached the pre-sequence schema", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /isClaimSequenceNotNullViolation/);
+  assert.match(source, /code === "23502"/);
+  assert.match(source, /!options\.includeClaimSequence/);
+  assert.match(source, /options\.includeClaimSequence = true/);
+});
+
+test("service-claims route returns the actual email delivery error", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /let emailError = ""/);
+  assert.match(source, /email delivery failed: \$\{emailError\}/);
+  assert.match(source, /emailError: emailError \|\| null/);
+});
+
 test("service-claims route embeds a kitchen preview png in notification emails when available", () => {
   const source = fs.readFileSync(routePath, "utf8");
 
@@ -52,6 +69,7 @@ test("service-claim notification email separates every item field into German ro
   assert.match(source, /Hochgeladenes Bild/);
   assert.match(source, /Siehe Seriennummernfoto in den Anhängen/);
   assert.doesNotMatch(source, /Uploaded image|Kitchen preview with selected claim area highlighted|See serial number photo|Not applicable/);
+  assert.doesNotMatch(source, /StringForEmail/);
 });
 
 test("service-claim item email uses the component name as its heading and keeps upload labels compact", () => {

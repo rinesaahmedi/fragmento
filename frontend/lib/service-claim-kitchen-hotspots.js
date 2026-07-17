@@ -617,7 +617,7 @@ function splitWorktopDefinition(bounds, leftPoints, rightPoints, remainingPartKe
 // The claim overlay uses the existing PDF-matched worktop polygons. Some plan
 // families already have one polygon per leg; the three combined outlines are
 // divided at their actual corner seam below.
-const L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG = {
+const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
   "ab-105805": splitWorktopDefinition(
     { left: 28.4, top: 50.4, width: 58.77, height: 8.87 },
     [
@@ -678,6 +678,18 @@ const L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG = {
   "ab-105837": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
   },
+  "ab-105833": {
+    indexPartKeys: ["worktop-left", "worktop-right"],
+  },
+  "ab-105836": {
+    indexPartKeys: ["worktop-left", "worktop-right"],
+  },
+  "ab-105842": {
+    indexPartKeys: ["worktop-left", "worktop-right"],
+  },
+  "ab-105845": {
+    indexPartKeys: ["worktop-left", "worktop-right"],
+  },
   "ab-105747": splitWorktopDefinition(
     { left: 29.615, top: 55.55, width: 55.34, height: 6.716 },
     [
@@ -703,29 +715,31 @@ const WORKTOP_END_PANEL_DEFINITIONS_BY_SLUG = {
 };
 
 for (const alias of ["ab-105809", "ab-105813", "ab-105817"]) {
-  L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105805"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105805"];
 }
 for (const alias of ["ab-105822", "ab-105828"]) {
-  L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105825"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105825"];
 }
 for (const alias of ["ab-105840", "ab-105843"]) {
-  L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105837"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105837"];
 }
 for (const alias of ["ab-105734", "ab-105737", "ab-105740"]) {
-  L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-104968"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-104968"];
   COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG[alias] = COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG["ab-104968"];
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-104968"];
 }
 for (const alias of ["ab-105750", "ab-105753", "ab-105756"]) {
-  L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105747"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105747"];
 }
 for (const alias of ["ab-105751", "ab-105754", "ab-105745"]) {
   L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG[alias] = L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG["ab-105748"];
   COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG[alias] = COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG["ab-105748"];
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105748"];
   OVEN_DRAWER_TOP_RATIO_BY_SLUG[alias] = OVEN_DRAWER_TOP_RATIO_BY_SLUG["ab-105748"];
-  L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105748"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105748"];
 }
+SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105839"] =
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105842"];
 
 function normalizeClaimPart(part) {
   const partKey = String(part?.partKey || "").trim();
@@ -1330,7 +1344,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
 
   const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
   const hasVisibleSink = isLShapedClaimKitchen(normalizedSlug);
-  const worktopDefinition = L_SHAPED_WORKTOP_DEFINITIONS_BY_SLUG[normalizedSlug];
+  const worktopDefinition = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[normalizedSlug];
   const worktopEndPanelDefinition = WORKTOP_END_PANEL_DEFINITIONS_BY_SLUG[normalizedSlug];
   const worktopParts = new Map(
     (partsBySourceKey.get("worktop") || []).map((part) => [part.partKey, part]),

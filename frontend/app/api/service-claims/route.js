@@ -18,6 +18,7 @@ import {
 import { formatServiceClaimProblemAreaForEmail, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
 import { isElectricalApplianceProblemArea } from "../../../lib/service-claim-serial-number";
+import { formatServiceClaimEmailSubject } from "../../../lib/service-claim-email-subject";
 import { getServiceClaimKitchenPlan } from "../../../lib/service-claim-kitchen-plan";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 
@@ -293,7 +294,7 @@ async function sendComplaintEmail(payload, attachmentParts = []) {
   await transporter.sendMail({
     from: `"Fragmento" <${smtpFrom}>`,
     to: recipient,
-    subject: `Reklamation ${payload.contractNumber} - ${payload.customerDisplayName}`,
+    subject: formatServiceClaimEmailSubject(payload.contractNumber, payload.claimSequence),
     replyTo: payload.email || undefined,
     text: buildComplaintEmailText(emailPayload),
     html: buildComplaintEmailHtml(emailPayload, kitchenPreviewAttachment?.cid || ""),
@@ -601,6 +602,7 @@ async function getServiceClaimInsertColumnSupport(prismaClient) {
         return {
           includeAttachmentsJson: availableColumns.has("attachmentsJson"),
           includeProblemAreasJson: availableColumns.has("problemAreasJson"),
+          includeClaimSequence: availableColumns.has("claimSequence"),
           includeLandlordCompanyPhone: availableColumns.has("landlordCompanyPhone"),
           includeLandlordCompanyEmail: availableColumns.has("landlordCompanyEmail"),
         };
@@ -608,6 +610,7 @@ async function getServiceClaimInsertColumnSupport(prismaClient) {
       .catch(() => ({
         includeAttachmentsJson: true,
         includeProblemAreasJson: true,
+        includeClaimSequence: true,
         includeLandlordCompanyPhone: true,
         includeLandlordCompanyEmail: true,
       }));
@@ -626,6 +629,12 @@ function isMissingServiceClaimInsertColumnError(error, columnName) {
   );
 }
 
+function isClaimSequenceNotNullViolation(error) {
+  const code = String(error?.code || error?.meta?.code || "");
+  const message = `${String(error?.message || "")} ${String(error?.meta?.message || "")}`;
+  return code === "23502" || message.includes("23502");
+}
+
 export function getMissingOptionalInsertColumns(error, options) {
   const missing = [];
   if (options.includeAttachmentsJson && isMissingAttachmentsJsonColumnError(error)) {
@@ -633,6 +642,9 @@ export function getMissingOptionalInsertColumns(error, options) {
   }
   if (options.includeProblemAreasJson && isMissingProblemAreasJsonColumnError(error)) {
     missing.push("problemAreasJson");
+  }
+  if (options.includeClaimSequence && isMissingServiceClaimInsertColumnError(error, "claimSequence")) {
+    missing.push("claimSequence");
   }
   if (options.includeLandlordCompanyPhone && isMissingServiceClaimInsertColumnError(error, "landlordCompanyPhone")) {
     missing.push("landlordCompanyPhone");
@@ -647,6 +659,7 @@ function buildServiceClaimInsertSql(payload, options) {
   const columns = [
     Prisma.raw(`"id"`),
     Prisma.raw(`"contractNumber"`),
+    ...(options.includeClaimSequence ? [Prisma.raw(`"claimSequence"`)] : []),
     Prisma.raw(`"fullName"`),
     Prisma.raw(`"phone"`),
     Prisma.raw(`"email"`),
@@ -673,6 +686,7 @@ function buildServiceClaimInsertSql(payload, options) {
   const values = [
     payload.id,
     payload.contractNumber,
+    ...(options.includeClaimSequence ? [payload.claimSequence] : []),
     payload.fullName,
     payload.phone || null,
     payload.email || null,
@@ -707,9 +721,46 @@ async function insertServiceClaimRecord(prismaClient, payload) {
 
   while (true) {
     try {
-      await prismaClient.$executeRaw(buildServiceClaimInsertSql(payload, options));
-      return;
+      const claimSequence = await prismaClient.$transaction(async (transaction) => {
+        // Serialize sequence allocation per contract so simultaneous submissions
+        // cannot receive the same KD number.
+        await transaction.$queryRaw`
+          SELECT "id"
+          FROM "KitchenContract"
+          WHERE "contractNumber" = ${payload.contractNumber}
+          FOR UPDATE
+        `;
+
+        const rows = options.includeClaimSequence
+          ? await transaction.$queryRaw`
+              SELECT COALESCE(MAX("claimSequence"), 0) + 1 AS "nextSequence"
+              FROM "ServiceClaim"
+              WHERE "contractNumber" = ${payload.contractNumber}
+            `
+          : await transaction.$queryRaw`
+              SELECT COUNT(*) + 1 AS "nextSequence"
+              FROM "ServiceClaim"
+              WHERE "contractNumber" = ${payload.contractNumber}
+            `;
+        const nextSequence = Number(rows?.[0]?.nextSequence || 1);
+
+        await transaction.$executeRaw(buildServiceClaimInsertSql(
+          { ...payload, claimSequence: nextSequence },
+          options,
+        ));
+        return nextSequence;
+      });
+
+      payload.claimSequence = claimSequence;
+      return claimSequence;
     } catch (error) {
+      // The column-support result can be cached by a dev server that was already
+      // running when the migration added the required claimSequence column.
+      if (!options.includeClaimSequence && isClaimSequenceNotNullViolation(error)) {
+        options.includeClaimSequence = true;
+        continue;
+      }
+
       const missingColumns = getMissingOptionalInsertColumns(error, options);
       if (!missingColumns.length) {
         throw error;
@@ -721,6 +772,9 @@ async function insertServiceClaimRecord(prismaClient, payload) {
         }
         if (columnName === "problemAreasJson") {
           options.includeProblemAreasJson = false;
+        }
+        if (columnName === "claimSequence") {
+          options.includeClaimSequence = false;
         }
         if (columnName === "landlordCompanyPhone") {
           options.includeLandlordCompanyPhone = false;
@@ -1375,9 +1429,11 @@ export async function POST(request) {
       }
     }
 
+    let emailError = "";
     const [emailSent, webhookSent] = await Promise.all([
       sendComplaintEmail(payload, attachmentParts).catch((error) => {
-        console.warn("Service claim email delivery failed:", formatServiceClaimErrorMessage(error));
+        emailError = formatServiceClaimErrorMessage(error);
+        console.warn("Service claim email delivery failed:", emailError);
         return false;
       }),
       postWebhook(payload),
@@ -1388,9 +1444,12 @@ export async function POST(request) {
       message:
         emailSent || webhookSent
           ? "Your complaint has been sent successfully."
+          : emailError
+            ? `Your complaint has been recorded, but email delivery failed: ${emailError}`
           : "Your complaint has been recorded successfully. Email or webhook delivery is not configured yet.",
       notifications: {
         emailSent,
+        emailError: emailError || null,
         webhookSent,
       },
     });
