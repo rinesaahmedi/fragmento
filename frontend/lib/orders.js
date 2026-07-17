@@ -199,6 +199,13 @@ export function mapCatalogItem(catalogItems, submittedItem, itemType, options = 
     selectedArticle = selectedVariant.article;
   }
 
+  if (itemType === ItemType.ACCESSORY && isCutleryAccessoryCode(matched.code) && submittedArticleNumber) {
+    selectedArticle = (options.cutleryVariantArticles || []).find(
+      (article) => normalizeArticleNumber(article.articleNumber) === submittedArticleNumber,
+    ) || null;
+    if (!selectedArticle) return null;
+  }
+
   const catalogPrice = (() => {
     if (catalogService?.price != null) return Number(catalogService.price);
     if (selectedArticle?.price == null) return submittedItem.price != null ? submittedItem.price : matched.price;
@@ -465,13 +472,22 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw new Error("Kitchen not found");
   }
 
-  const auszugVariantArticles = await prisma.catalogArticle.findMany({
-    where: {
-      itemType: ItemType.COMPONENT,
-      isActive: true,
-      articleNumber: { startsWith: "US2A" },
-    },
-  });
+  const [auszugVariantArticles, cutleryVariantArticles] = await Promise.all([
+    prisma.catalogArticle.findMany({
+      where: {
+        itemType: ItemType.COMPONENT,
+        isActive: true,
+        articleNumber: { startsWith: "US2A" },
+      },
+    }),
+    prisma.catalogArticle.findMany({
+      where: {
+        itemType: ItemType.ACCESSORY,
+        isActive: true,
+        articleNumber: { startsWith: "ZB", endsWith: "SG" },
+      },
+    }),
+  ]);
 
   const customer = orderPayload?.customer || {};
   validateConsent(customer.consent);
@@ -507,7 +523,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, { auszugVariantArticles }),
   );
   const selectedAccessories = submittedGroups.accessories.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY),
+    mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, { cutleryVariantArticles }),
   );
   const selectedServices = submittedGroups.services.map((item) =>
     mapCatalogItem(kitchen.items, item, ItemType.SERVICE),
