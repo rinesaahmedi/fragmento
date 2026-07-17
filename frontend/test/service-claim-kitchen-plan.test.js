@@ -4,6 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadKitchenSvgMarkup } from "../lib/load-kitchen-svg.js";
+import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
 import {
   buildServiceClaimSelectableComponents,
   collapseServiceClaimLinkedComponents,
@@ -1756,6 +1757,10 @@ test("cabinet side panels share a choice with the adjacent worktop leg", () => {
   for (const [kitchenSlug, expectedWorktopPartKey] of [
     ["ab-105805", "worktop-left"],
     ["ab-105834", "worktop-right"],
+    ["ab-105833", "worktop-left"],
+    ["ab-105836", "worktop-left"],
+    ["ab-105839", "worktop-left"],
+    ["ab-105842", "worktop-left"],
   ]) {
     const result = buildServiceClaimSelectableComponents({
       kitchen,
@@ -2458,6 +2463,52 @@ test("segmented L worktop surfaces and front edges stay assigned to their side",
     "component-claim-worktop-left",
     "component-claim-worktop-right",
   ]);
+});
+
+test("two-part kitchen worktop runs become independent left and right claim hotspots", () => {
+  const splitClaimParts = [
+    { partKey: "worktop-left", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceComponentKey: "worktop" },
+  ];
+
+  for (const slug of ["ab-105833", "ab-105836", "ab-105839", "ab-105842", "ab-105845"]) {
+    const claimParts = slug === "ab-105845"
+      ? splitClaimParts
+      : [
+        ...splitClaimParts,
+        { partKey: "worktop-end-panel", sourceComponentKey: "worktop" },
+      ];
+    const worktopHotspots = PLAN_HOTSPOTS_BY_SLUG[slug]
+      .filter((hotspot) => hotspot.componentKey === "worktop");
+    const result = buildServiceClaimPartHotspots(worktopHotspots, claimParts, slug);
+    const left = result.filter((entry) => entry.claimPartKey === "worktop-left");
+    const right = result.filter((entry) => entry.claimPartKey === "worktop-right");
+
+    assert.equal(left.length, 1, `${slug} should expose one left worktop run`);
+    assert.equal(right.length, 1, `${slug} should expose one right worktop run`);
+    assert.ok(left[0].left < right[0].left, `${slug} worktop claims should retain their visual sides`);
+    assert.equal(left[0].componentId, "component-claim-worktop-left");
+    assert.equal(right[0].componentId, "component-claim-worktop-right");
+  }
+});
+
+test("two-part worktop claim migration backfills every active split kitchen", () => {
+  const migration = fs.readFileSync(
+    path.join(
+      repoRoot,
+      "prisma",
+      "migrations",
+      "20260717130000_add_two_part_worktop_claim_parts",
+      "migration.sql",
+    ),
+    "utf8",
+  );
+
+  for (const slug of ["ab-105833", "ab-105836", "ab-105839", "ab-105842", "ab-105845"]) {
+    assert.match(migration, new RegExp(`'${slug}'`));
+  }
+  assert.match(migration, /'worktop-left', 'PLR60-1', 'Left Worktop', 'Arbeitsplatte links'/);
+  assert.match(migration, /'worktop-right', 'PLR60-2', 'Right Worktop', 'Arbeitsplatte rechts'/);
 });
 
 test("service claim picker outlines worktop surfaces but not separate front-edge polygons", () => {

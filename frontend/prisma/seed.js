@@ -41,6 +41,13 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105834", "ab-105837", "ab-105840", "ab-105843",
   "ab-105747", "ab-105750", "ab-105753", "ab-105756",
 ]);
+const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-105833",
+  "ab-105836",
+  "ab-105839",
+  "ab-105842",
+  "ab-105845",
+]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
   "ab-105748",
@@ -2999,7 +3006,11 @@ async function main() {
         item?.isActive !== false
         && String(item?.componentKey || "").toLowerCase() === "worktop"
       ));
-    if (worktop && L_SHAPED_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)) {
+    const hasSeparatedWorktops = (
+      L_SHAPED_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)
+      || TWO_PART_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)
+    );
+    if (worktop && hasSeparatedWorktops) {
       for (const part of [
         { partKey: "worktop-left", articleCode: "PLR60-1", name: "Left Worktop", nameDe: "Arbeitsplatte links", sortOrder: 60 },
         { partKey: "worktop-right", articleCode: "PLR60-2", name: "Right Worktop", nameDe: "Arbeitsplatte rechts", sortOrder: 70 },

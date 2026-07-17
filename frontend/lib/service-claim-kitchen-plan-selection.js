@@ -283,13 +283,17 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   "furniture-front",
 ]);
 
-// In this perspective family the floor-height WU16 panel closes the left
-// worktop leg. Other split L-kitchen plans place it at the right-hand end.
+// These plans place the floor-height WU16 panel at the left worktop run.
+// Other split L-kitchen plans place it at the right-hand end.
 const LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS = new Set([
   "ab-105805",
   "ab-105809",
   "ab-105813",
   "ab-105817",
+  "ab-105833",
+  "ab-105836",
+  "ab-105839",
+  "ab-105842",
 ]);
 
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
