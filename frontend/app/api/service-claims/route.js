@@ -17,7 +17,7 @@ import {
 } from "../../../lib/service-claims";
 import { formatServiceClaimProblemAreaForEmail, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../lib/service-claim-problem-areas";
 import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-problem-description";
-import { countElectricalApplianceProblemAreas } from "../../../lib/service-claim-serial-number";
+import { isElectricalApplianceProblemArea } from "../../../lib/service-claim-serial-number";
 import { getServiceClaimKitchenPlan } from "../../../lib/service-claim-kitchen-plan";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 
@@ -403,10 +403,11 @@ function formatAttachmentFileMetaLine(entry) {
 
 function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
   const attachmentsByComponentId = new Map();
+  const serialAttachmentsByComponentId = new Map();
   const orphanProblemAreaAttachments = [];
 
   for (const entry of attachmentsMeta || []) {
-    if (entry?.role !== "problem_area") {
+    if (entry?.role !== "problem_area" && entry?.role !== "serial_number") {
       continue;
     }
     const componentId = String(entry.areaComponentId || "").trim();
@@ -414,26 +415,35 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
       orphanProblemAreaAttachments.push(entry);
       continue;
     }
-    const list = attachmentsByComponentId.get(componentId) || [];
+    const targetMap = entry.role === "serial_number"
+      ? serialAttachmentsByComponentId
+      : attachmentsByComponentId;
+    const list = targetMap.get(componentId) || [];
     list.push(entry);
-    attachmentsByComponentId.set(componentId, list);
+    targetMap.set(componentId, list);
   }
 
   const rows = parseServiceClaimProblemAreas(problemAreasJson).map((area) => {
     const componentId = String(area.componentId || "").trim();
     return {
+      isElectricalAppliance: isElectricalApplianceProblemArea(area),
       name: String(area.name || "").trim(),
       articleCode: StringForEmail(area.code || "").trim(),
       detail: String(area.detail || "").trim(),
+      serialNumber: String(area.serialNumber || "").trim(),
+      serialAttachments: componentId ? serialAttachmentsByComponentId.get(componentId) || [] : [],
       attachments: componentId ? attachmentsByComponentId.get(componentId) || [] : [],
     };
   });
 
   for (const entry of orphanProblemAreaAttachments) {
     rows.push({
+      isElectricalAppliance: false,
       name: String(entry.areaName || "").trim() || "Küchenteil",
       articleCode: String(entry.areaCode || "").trim(),
       detail: "",
+      serialNumber: "",
+      serialAttachments: [],
       attachments: [entry],
     });
   }
@@ -446,6 +456,17 @@ function buildClaimItemText(row) {
     `Type: ${row.name || "-"}`,
     `Typen - NR: ${row.articleCode || "-"}`,
     `Problembeschreibung: ${row.detail || "-"}`,
+    ...(row.isElectricalAppliance
+      ? [
+          `Seriennummer: ${row.serialNumber || (row.serialAttachments?.length ? "Siehe Seriennummernfoto" : "-")}`,
+          row.serialAttachments?.length
+            ? [
+                "Seriennummer-Foto:",
+                ...row.serialAttachments.map((entry) => `  - ${formatAttachmentFileMetaLine(entry)}`),
+              ].join("\n")
+            : "Seriennummer-Foto: -",
+        ]
+      : []),
     row.attachments?.length
       ? [
           "Anhänge:",
@@ -462,6 +483,15 @@ function buildClaimItemHtml(row) {
   const uploads = row.attachments?.length
     ? row.attachments.map((entry) => formatAttachmentHtml(entry, { includeItemContext: false })).join("")
     : "-";
+  const serialUploads = row.serialAttachments?.length
+    ? row.serialAttachments.map((entry) => formatAttachmentHtml(entry, { includeItemContext: false })).join("")
+    : "-";
+  const serialRows = row.isElectricalAppliance
+    ? `
+        <tr><td style="${itemLabelStyles}">Seriennummer</td><td style="${itemValueStyles}">${formatMultiline(row.serialNumber || (row.serialAttachments?.length ? "Siehe Seriennummernfoto" : "-"))}</td></tr>
+        <tr><td style="${itemLabelStyles}">Seriennummer-Foto</td><td style="${itemValueStyles}">${serialUploads}</td></tr>
+      `
+    : "";
 
   return `
     <table role="presentation" style="width:100%;border-collapse:collapse;">
@@ -469,6 +499,7 @@ function buildClaimItemHtml(row) {
         <tr><td style="${itemLabelStyles}">Type</td><td style="${itemValueStyles}">${formatMultiline(row.name || "-")}</td></tr>
         <tr><td style="${itemLabelStyles}">Typen - NR</td><td style="${itemValueStyles}">${formatMultiline(row.articleCode || "-")}</td></tr>
         <tr><td style="${itemLabelStyles}">Problembeschreibung</td><td style="${itemValueStyles}">${formatMultiline(row.detail || "-")}</td></tr>
+        ${serialRows}
         <tr><td style="${itemLabelStyles}border-bottom:0;">Anhänge</td><td style="${itemValueStyles}border-bottom:0;">${uploads}</td></tr>
       </tbody>
     </table>
@@ -541,6 +572,7 @@ async function resolveProblemAreasFromDatabase(contractNumber, rawProblemAreasJs
       name: databaseGermanName,
       code: String(databaseArea.articleCode || databaseArea.code || "").trim(),
       ...(submittedArea.detail ? { detail: submittedArea.detail } : {}),
+      ...(submittedArea.serialNumber ? { serialNumber: submittedArea.serialNumber } : {}),
     };
   });
 
@@ -764,7 +796,6 @@ function buildComplaintEmailText(payload) {
   const availabilityDate = payload.preferredContactDate || legacyAvailability.date;
   const availabilityTime = payload.preferredContactTime || legacyAvailability.time;
   const claimItemRows = buildClaimItemRows(payload.problemAreasJson, payload.attachmentsMeta);
-  const serialNumberAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "serial_number");
   const generalAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "general");
   return [
     "Servicereklamation",
@@ -775,14 +806,6 @@ function buildComplaintEmailText(payload) {
     `Adresse: ${payload.clientAddress}`,
     `Telefon: ${payload.phone || "—"}`,
     `E-Mail: ${payload.email || "—"}`,
-    `Seriennummer: ${payload.serialNumber}`,
-    ...(serialNumberAttachments.length
-      ? [
-          "",
-          "Seriennummer-Anhänge",
-          ...serialNumberAttachments.map((entry) => `- ${formatAttachmentMetaLine(entry)}`),
-        ]
-      : []),
     ...(claimItemRows.length
       ? [
           "",
@@ -853,7 +876,6 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
   const availabilityDate = payload.preferredContactDate || legacyAvailability.date;
   const availabilityTime = payload.preferredContactTime || legacyAvailability.time;
   const claimItemRows = buildClaimItemRows(payload.problemAreasJson, payload.attachmentsMeta);
-  const serialNumberAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "serial_number");
   const generalAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "general");
   const detailRows = [
     ["Vertragsnummer", payload.contractNumber],
@@ -864,10 +886,6 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
     ["Kundenadresse", payload.clientAddress],
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],
-    ["Seriennummer", payload.serialNumber],
-    ...(serialNumberAttachments.length
-      ? [["Seriennummer-Anhänge", serialNumberAttachments.map(formatAttachmentMetaLine).join("\n")]]
-      : []),
     ...claimItemRows.map((row, index) => [row.name || `Küchenteil ${index + 1}`, { html: buildClaimItemHtml(row) }]),
     ["Vermieter", { html: landlordHtml }],
     ...(hasHausmeisterDetails ? [["Hausmeister", { html: hausmeisterHtml }]] : []),
@@ -1055,6 +1073,7 @@ async function parseServiceClaimRequest(request) {
     const body = {};
     const generalAttachmentFiles = [];
     const serialNumberImageFiles = [];
+    const serialNumberImageFilesByComponentId = {};
     const problemAreaAttachmentFilesByComponentId = {};
     for (const [key, value] of formData.entries()) {
       if (value instanceof File) {
@@ -1064,6 +1083,16 @@ async function parseServiceClaimRequest(request) {
         }
         if (key === "serialNumberImages") {
           serialNumberImageFiles.push(value);
+          continue;
+        }
+        if (key.startsWith("serialNumberImage:")) {
+          const componentId = key.slice("serialNumberImage:".length).trim();
+          if (componentId) {
+            if (!Array.isArray(serialNumberImageFilesByComponentId[componentId])) {
+              serialNumberImageFilesByComponentId[componentId] = [];
+            }
+            serialNumberImageFilesByComponentId[componentId].push(value);
+          }
           continue;
         }
         if (key.startsWith("problemAreaAttachment:")) {
@@ -1086,6 +1115,7 @@ async function parseServiceClaimRequest(request) {
       body,
       generalAttachmentFiles,
       serialNumberImageFiles,
+      serialNumberImageFilesByComponentId,
       problemAreaAttachmentFilesByComponentId,
     };
   }
@@ -1095,6 +1125,7 @@ async function parseServiceClaimRequest(request) {
     body,
     generalAttachmentFiles: [],
     serialNumberImageFiles: [],
+    serialNumberImageFilesByComponentId: {},
     problemAreaAttachmentFilesByComponentId: {},
   };
 }
@@ -1111,6 +1142,7 @@ export async function POST(request) {
       body,
       generalAttachmentFiles,
       serialNumberImageFiles,
+      serialNumberImageFilesByComponentId,
       problemAreaAttachmentFilesByComponentId,
     } = await parseServiceClaimRequest(request);
     const contractNumber = normalizeServiceClaimContractNumber(
@@ -1182,6 +1214,15 @@ export async function POST(request) {
     );
     const generalAttachmentParts = await normalizeServiceClaimUploads(generalAttachmentFiles);
     const serialNumberImageParts = await normalizeServiceClaimUploads(serialNumberImageFiles);
+    const serialNumberImagePartsByComponentId = new Map();
+    for (const [componentId, files] of Object.entries(serialNumberImageFilesByComponentId)) {
+      const normalizedComponentId = String(componentId || "").trim();
+      if (!normalizedComponentId || !problemAreasByComponentId.has(normalizedComponentId)) continue;
+      serialNumberImagePartsByComponentId.set(
+        normalizedComponentId,
+        await normalizeServiceClaimUploads(files),
+      );
+    }
     const problemAreaAttachmentParts = [];
     for (const [componentId, files] of Object.entries(problemAreaAttachmentFilesByComponentId)) {
       const normalizedComponentId = String(componentId || "").trim();
@@ -1205,6 +1246,16 @@ export async function POST(request) {
     }
     const attachmentParts = [
       ...serialNumberImageParts.map((part) => ({ ...part, role: "serial_number" })),
+      ...[...serialNumberImagePartsByComponentId.entries()].flatMap(([componentId, parts]) => {
+        const area = problemAreasByComponentId.get(componentId) || {};
+        return parts.map((part) => ({
+          ...part,
+          role: "serial_number",
+          areaComponentId: componentId,
+          areaName: String(area.name || "").trim(),
+          areaCode: String(area.code || "").trim(),
+        }));
+      }),
       ...generalAttachmentParts.map((part) => ({ ...part, role: "general" })),
       ...problemAreaAttachmentParts,
     ];
@@ -1215,15 +1266,31 @@ export async function POST(request) {
       throw new Error("Problem description is required.");
     }
     const rawSerialNumber = optionalString(body.serialNumber);
-    const hasSerialNumberImage = serialNumberImageParts.length > 0 || booleanFromFormValue(body.hasSerialNumberImage);
-    const serialEvidenceCount = parseSerialNumberEntries(rawSerialNumber).length + serialNumberImageParts.length;
-    const requiredSerialNumberCount = countElectricalApplianceProblemAreas(parsedProblemAreas);
-    if (serialEvidenceCount !== requiredSerialNumberCount) {
+    const electricalProblemAreas = parsedProblemAreas.filter(isElectricalApplianceProblemArea);
+    const usesPerAreaSerialEvidence = electricalProblemAreas.some((area) => (
+      String(area.serialNumber || "").trim()
+      || (serialNumberImagePartsByComponentId.get(String(area.componentId || "").trim()) || []).length
+    ));
+    const hasInvalidPerAreaSerialEvidence = electricalProblemAreas.some((area) => {
+      const componentId = String(area.componentId || "").trim();
+      const typedCount = String(area.serialNumber || "").trim() ? 1 : 0;
+      const imageCount = (serialNumberImagePartsByComponentId.get(componentId) || []).length;
+      return typedCount + imageCount !== 1;
+    });
+    const legacySerialEvidenceCount = parseSerialNumberEntries(rawSerialNumber).length + serialNumberImageParts.length;
+    const hasInvalidLegacySerialEvidence = legacySerialEvidenceCount !== electricalProblemAreas.length;
+    if (
+      (usesPerAreaSerialEvidence && hasInvalidPerAreaSerialEvidence)
+      || (!usesPerAreaSerialEvidence && hasInvalidLegacySerialEvidence)
+    ) {
       return NextResponse.json(
-        { error: `Please provide exactly ${requiredSerialNumberCount} serial number(s) for the selected electrical appliance(s), using typed numbers and/or serial number photos.` },
+        { error: "Please provide exactly one serial number or one serial-number photo for each selected electrical appliance." },
         { status: 400 },
       );
     }
+    const hasSerialNumberImage = serialNumberImageParts.length > 0
+      || serialNumberImagePartsByComponentId.size > 0
+      || booleanFromFormValue(body.hasSerialNumberImage);
 
     const payload = {
       id: crypto.randomUUID(),

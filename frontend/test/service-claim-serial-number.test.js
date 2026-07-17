@@ -32,7 +32,7 @@ test("legacy appliance components are recognized without treating their cabinets
   assert.equal(isElectricalApplianceProblemArea({ componentId: "component-claim-oven-drawer", name: "Lower Cabinet for Built-in Oven" }), false);
 });
 
-test("the claim form and API enforce the selected appliance count as both minimum and maximum", async () => {
+test("the claim form and API require exactly one serial-number source per electrical appliance", async () => {
   const fs = await import("node:fs");
   const path = await import("node:path");
   const { fileURLToPath } = await import("node:url");
@@ -40,10 +40,13 @@ test("the claim form and API enforce the selected appliance count as both minimu
   const flowSource = fs.readFileSync(path.join(testDir, "..", "components", "service-claim-flow.js"), "utf8");
   const routeSource = fs.readFileSync(path.join(testDir, "..", "app", "api", "service-claims", "route.js"), "utf8");
 
-  assert.match(flowSource, /submittedSerialEvidenceCount !== requiredSelectedSerialNumberCount/);
-  assert.match(flowSource, /serialNumberEntries\.length \+ applicableSerialNumberImages\.length >= requiredSelectedSerialNumberCount/);
-  assert.match(flowSource, /serialNumberEvidenceLimitReached/);
-  assert.match(flowSource, /hasReachedRequiredSerialEvidenceCount \? \(/);
-  assert.match(routeSource, /serialEvidenceCount !== requiredSerialNumberCount/);
-  assert.match(routeSource, /Please provide exactly/);
+  assert.match(flowSource, /hasMissingProblemAreaSerialEvidence/);
+  assert.match(flowSource, /data-problem-area-serial-required/);
+  assert.match(flowSource, /serialNumberByComponentId/);
+  assert.match(flowSource, /serialNumberImageByComponentId/);
+  assert.match(flowSource, /formData\.append\(`serialNumberImage:\$\{area\.rowComponentId\}`/);
+  assert.match(routeSource, /serialNumberImageFilesByComponentId/);
+  assert.match(routeSource, /hasInvalidPerAreaSerialEvidence/);
+  assert.match(routeSource, /typedCount \+ imageCount !== 1/);
+  assert.match(routeSource, /exactly one serial number or one serial-number photo for each/);
 });

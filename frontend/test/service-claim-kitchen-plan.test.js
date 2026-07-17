@@ -13,7 +13,10 @@ import {
   buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
 } from "../lib/service-claim-kitchen-hotspots.js";
-import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices.js";
+import {
+  buildServiceClaimComponentChoiceGroups,
+  normalizeServiceClaimComponentChoiceSelection,
+} from "../lib/service-claim-component-choices.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(__dirname, "..");
@@ -480,6 +483,18 @@ test("hood cabinet, extractor, and FWK124 filter use separate claim identities",
     componentKey: "wall-cabinet-2",
     claimPartKey: "filter",
   });
+  const hoodChoiceGroup = buildServiceClaimComponentChoiceGroups(result.selectableComponents)
+    .find((group) => group.options.some(
+      (option) => option.componentId === "component-extractor-hood",
+    ));
+  assert.deepEqual(
+    hoodChoiceGroup.options.map((option) => option.componentId),
+    [
+      "component-wall-cabinet-2",
+      "component-extractor-hood",
+      "component-claim-filter",
+    ],
+  );
 });
 
 test("legacy and future FWK124 kitchen slugs also expose the extractor separately", () => {
@@ -535,6 +550,7 @@ test("manual filter claims do not replace the hood cabinet hotspot", () => {
 test("shared hood, dishwasher, and cabinet areas expose contextual part choices", () => {
   const groups = buildServiceClaimComponentChoiceGroups([
     { componentId: "component-wall-cabinet-2", componentKey: "wall-cabinet-2", name: "Cabinet" },
+    { componentId: "component-extractor-hood", name: "Extractor Hood" },
     { componentId: "component-claim-filter", componentKey: "wall-cabinet-2", claimPartKey: "filter", name: "Extractor Hood Filter" },
     { componentId: "component-claim-dishwasher", componentKey: "base-module-3", claimPartKey: "dishwasher", name: "Dishwasher" },
     { componentId: "component-claim-furniture-front", componentKey: "base-module-3", claimPartKey: "furniture-front", name: "Furniture Front" },
@@ -553,7 +569,11 @@ test("shared hood, dishwasher, and cabinet areas expose contextual part choices"
     [
       {
         triggerComponentId: "component-wall-cabinet-2",
-        optionIds: ["component-wall-cabinet-2", "component-claim-filter"],
+        optionIds: [
+          "component-wall-cabinet-2",
+          "component-extractor-hood",
+          "component-claim-filter",
+        ],
       },
       {
         triggerComponentId: "component-claim-dishwasher",
@@ -571,7 +591,34 @@ test("shared hood, dishwasher, and cabinet areas expose contextual part choices"
   );
 });
 
-test("linear kitchens expose oven/cooktop and sink-cabinet/sink choices", () => {
+test("every cabinet Blende is offered as a contextual choice with its source cabinet", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    {
+      componentId: "component-wall-cabinet-4",
+      componentKey: "wall-cabinet-4",
+      name: "Upper Cabinet 60",
+    },
+    {
+      componentId: "component-claim-blende-wall-cabinet-4",
+      sourceComponentKey: "wall-cabinet-4",
+      claimPartKey: "blende",
+      name: "HPK2002 Filler Panel",
+    },
+  ]);
+
+  assert.deepEqual(groups.map((group) => ({
+    triggerComponentId: group.triggerComponentId,
+    optionIds: group.options.map((option) => option.componentId),
+  })), [{
+    triggerComponentId: "component-wall-cabinet-4",
+    optionIds: [
+      "component-wall-cabinet-4",
+      "component-claim-blende-wall-cabinet-4",
+    ],
+  }]);
+});
+
+test("kitchens expose oven/cooktop/drawer and sink-cabinet/sink/faucet choices", () => {
   const groups = buildServiceClaimComponentChoiceGroups([
     { componentId: "component-claim-oven", claimPartKey: "oven", name: "Built-in Oven" },
     { componentId: "component-claim-oven-drawer", claimPartKey: "oven-drawer", name: "Oven Drawer" },
@@ -579,7 +626,7 @@ test("linear kitchens expose oven/cooktop and sink-cabinet/sink choices", () => 
     { componentId: "component-claim-sink", claimPartKey: "sink", name: "Sink" },
     { componentId: "component-claim-sink-cabinet", claimPartKey: "sink-cabinet", name: "Sink Cabinet" },
     { componentId: "component-claim-faucet", claimPartKey: "faucet", name: "Faucet" },
-  ], { includeLinearSharedParts: true });
+  ]);
 
   assert.deepEqual(
     groups.map((group) => ({
@@ -589,21 +636,129 @@ test("linear kitchens expose oven/cooktop and sink-cabinet/sink choices", () => 
     [
       {
         triggerComponentId: "component-claim-oven",
-        optionIds: ["component-claim-oven", "component-claim-cooktop"],
+        optionIds: [
+          "component-claim-oven",
+          "component-claim-cooktop",
+          "component-claim-oven-drawer",
+        ],
       },
       {
         triggerComponentId: "component-claim-sink-cabinet",
-        optionIds: ["component-claim-sink-cabinet", "component-claim-sink"],
+        optionIds: [
+          "component-claim-sink-cabinet",
+          "component-claim-sink",
+          "component-claim-faucet",
+        ],
       },
     ],
   );
 
+  assert.deepEqual(buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-claim-oven", claimPartKey: "oven" },
+    { componentId: "component-claim-cooktop", claimPartKey: "cooktop" },
+  ]), []);
+});
+
+test("oven, cooktop, and oven-drawer selections collapse to one choice group", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-claim-oven", claimPartKey: "oven", name: "Oven" },
+    { componentId: "component-claim-cooktop", claimPartKey: "cooktop", name: "Cooktop" },
+    { componentId: "component-claim-oven-drawer", claimPartKey: "oven-drawer", name: "Oven Drawer" },
+  ]);
+
   assert.deepEqual(
-    buildServiceClaimComponentChoiceGroups([
-      { componentId: "component-claim-oven", claimPartKey: "oven" },
-      { componentId: "component-claim-cooktop", claimPartKey: "cooktop" },
-    ]),
-    [],
+    normalizeServiceClaimComponentChoiceSelection([
+      "component-claim-cooktop",
+      "component-claim-oven-drawer",
+      "component-claim-oven",
+    ], groups),
+    ["component-claim-oven"],
+  );
+});
+
+test("hood cabinet, extractor, and filter selections collapse to one choice group", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-wall-cabinet-2", componentKey: "wall-cabinet-2", name: "Cabinet" },
+    { componentId: "component-extractor-hood", name: "Extractor Hood" },
+    { componentId: "component-claim-filter", componentKey: "wall-cabinet-2", claimPartKey: "filter", name: "Extractor Hood Filter" },
+  ]);
+
+  assert.deepEqual(
+    normalizeServiceClaimComponentChoiceSelection([
+      "component-extractor-hood",
+      "component-claim-filter",
+      "component-wall-cabinet-2",
+    ], groups),
+    ["component-wall-cabinet-2"],
+  );
+});
+
+test("L-shaped kitchens share sink-cabinet, sink, and faucet choices", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-claim-sink", claimPartKey: "sink", name: "Sink" },
+    { componentId: "component-claim-sink-cabinet", claimPartKey: "sink-cabinet", name: "Sink Cabinet" },
+    { componentId: "component-claim-faucet", claimPartKey: "faucet", name: "Faucet" },
+  ]);
+
+  assert.deepEqual(
+    groups.map((group) => ({
+      triggerComponentId: group.triggerComponentId,
+      optionIds: group.options.map((option) => option.componentId),
+    })),
+    [
+      {
+        triggerComponentId: "component-claim-sink-cabinet",
+        optionIds: [
+          "component-claim-sink-cabinet",
+          "component-claim-sink",
+          "component-claim-faucet",
+        ],
+      },
+    ],
+  );
+});
+
+test("sink fixture choices merge with an existing sink-cabinet companion group", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-claim-sink", componentKey: "sink-faucet", claimPartKey: "sink", name: "Sink" },
+    { componentId: "component-claim-faucet", componentKey: "sink-faucet", claimPartKey: "faucet", name: "Faucet" },
+    { componentId: "component-claim-sink-cabinet", componentKey: "sink-base", claimPartKey: "sink-cabinet", name: "Sink Cabinet" },
+    { componentId: "component-claim-blende-sink-base", sourceComponentKey: "sink-base", claimPartKey: "blende", isCompanionOption: true, name: "UPK20 Filler Panel" },
+  ]);
+
+  assert.deepEqual(
+    groups.map((group) => ({
+      triggerComponentId: group.triggerComponentId,
+      optionIds: group.options.map((option) => option.componentId),
+    })),
+    [
+      {
+        triggerComponentId: "component-claim-sink-cabinet",
+        optionIds: [
+          "component-claim-sink-cabinet",
+          "component-claim-sink",
+          "component-claim-faucet",
+          "component-claim-blende-sink-base",
+        ],
+      },
+    ],
+  );
+});
+
+test("sink, faucet, and sink-cabinet selections collapse to one choice group", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-claim-sink", claimPartKey: "sink", name: "Sink" },
+    { componentId: "component-claim-sink-cabinet", claimPartKey: "sink-cabinet", name: "Sink Cabinet" },
+    { componentId: "component-claim-faucet", claimPartKey: "faucet", name: "Faucet" },
+  ]);
+
+  assert.deepEqual(
+    normalizeServiceClaimComponentChoiceSelection([
+      "component-claim-sink",
+      "component-claim-faucet",
+      "component-claim-sink-cabinet",
+    ], groups),
+    ["component-claim-sink-cabinet"],
   );
 });
 
@@ -1394,7 +1549,7 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(source, /const shouldRemove = ids\.some\(\(id\) => current\.has\(id\)\);/);
   assert.match(source, /!isLShapedClaimKitchen\(kitchenSlug\)/);
   assert.match(source, /service-claim-kitchen__manual-option/);
-  assert.match(source, /componentId:\s*sinkComponentId/);
+  assert.match(source, /togglePlanComponent\(sinkComponentId\)/);
   assert.match(source, /showManualCooktopOption/);
   assert.match(source, /buildServiceClaimComponentChoiceGroups/);
   assert.match(source, /togglePlanComponent\(hotspot\.componentId\)/);
@@ -1402,6 +1557,8 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(flowSource, /service-field__problem-area-part-select/);
   assert.match(flowSource, /handleProblemAreaPartChoice/);
   assert.match(flowSource, /area\.choiceGroup\.options\.map\(\(option\)/);
+  assert.match(flowSource, /<ServiceClaimPartIcon[\s\S]*option=\{option\}[\s\S]*choiceGroup=\{area\.choiceGroup\}/);
+  assert.match(flowSource, /service-field__problem-area-part-option-label/);
   assert.match(flowSource, /area\.selectedPartComponentIds\.includes\(option\.componentId\)/);
   assert.match(flowSource, /type="checkbox"/);
   assert.match(flowSource, /data-problem-area-part-choice-required/);
@@ -1418,14 +1575,16 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(flowSource, /singleSelectedPart[\s\S]*formatClaimAreaName\(singleSelectedPart, singleSelectedPart\.name, language\)/);
   assert.match(flowSource, /keptEntries\.length === entries\.length \? current : Object\.fromEntries\(keptEntries\)/);
   assert.match(flowSource, /visualValue=\{problemPlanDisplayComponentIds\}/);
+  assert.match(flowSource, /onComponentToggle=\{handleProblemPlanComponentToggle\}/);
+  assert.match(flowSource, /const nextChoiceIds = isSelected[\s\S]*effectiveChoiceIds\.filter[\s\S]*\[\.\.\.effectiveChoiceIds, componentId\]/);
   assert.match(source, /if \(hotspotIds\.has\(componentId\)\) return componentId/);
   assert.match(source, /componentChoiceGroupByOptionId\.get\(componentId\)\?\.triggerComponentId/);
   assert.match(flowSource, /problemComponentIds[\s\S]*\.map\(\(componentId\) => componentById\.get\(componentId\)\)/);
   assert.match(flowSource, /collapseServiceClaimLinkedComponents\([\s\S]*selectedComponentsInSelectionOrder/);
   assert.match(source, /hasManualWorktopEndPanelOption/);
-  assert.match(source, /componentId: worktopEndPanelComponentId/);
+  assert.match(source, /togglePlanComponent\(worktopEndPanelComponentId\)/);
   assert.match(source, /worktopEndPanelOption/);
-  assert.match(source, /componentId:\s*cooktopComponentId/);
+  assert.match(source, /togglePlanComponent\(cooktopComponentId\)/);
   assert.match(source, /labels\?\.sinkOption\s*\|\|\s*"Sink"/);
   assert.match(source, /labels\?\.cooktopOption\s*\|\|\s*"Cooktop"/);
 });
@@ -1584,6 +1743,39 @@ test("L kitchen claim plan replaces one worktop item with independent left and r
   assert.deepEqual(result.selectableComponents.map((entry) => entry.code), ["PLR60-1", "PLR60-2"]);
 });
 
+test("cabinet side panels share a choice with the adjacent worktop leg", () => {
+  const kitchen = {
+    items: [component("TOP-L", "worktop", "Worktop", { isLocked: true })],
+  };
+  const claimParts = [
+    { partKey: "worktop-left", sourceKitchenItemCode: "TOP-L", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceKitchenItemCode: "TOP-L", sourceComponentKey: "worktop" },
+    { partKey: "worktop-end-panel", sourceKitchenItemCode: "TOP-L", sourceComponentKey: "worktop" },
+  ];
+
+  for (const [kitchenSlug, expectedWorktopPartKey] of [
+    ["ab-105805", "worktop-left"],
+    ["ab-105834", "worktop-right"],
+  ]) {
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+      claimParts,
+    });
+    const groups = buildServiceClaimComponentChoiceGroups(result.selectableComponents);
+    const panelGroup = groups.find((group) => (
+      group.options.some((option) => option.claimPartKey === "worktop-end-panel")
+    ));
+
+    assert.deepEqual(
+      panelGroup.options.map((option) => option.claimPartKey),
+      [expectedWorktopPartKey, "worktop-end-panel"],
+      kitchenSlug,
+    );
+  }
+});
+
 test("AB 105734 keeps the upper hood cabinet and extractor independently selectable", () => {
   assert.deepEqual(
     getServiceClaimLinkedComponentIds("ab-105734", "component-wall-cabinet-2"),
@@ -1720,6 +1912,12 @@ test("AB 105807 adds the worktop end panel without replacing the horizontal work
     "PLR60-3",
   ]);
   assert.deepEqual(result.visibleComponentIds, ["component-worktop"]);
+  assert.equal(
+    result.selectableComponents.find(
+      (entry) => entry.claimPartKey === "worktop-end-panel",
+    ).contextualChoiceTriggerPartKey,
+    "worktop",
+  );
 });
 
 test("AB 105807 worktop and end panel use independent PDF-matched hotspots", () => {

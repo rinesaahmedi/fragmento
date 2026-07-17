@@ -5,16 +5,19 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
+import ServiceClaimPartIcon from "./service-claim-part-icon";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
 import {
   collapseServiceClaimLinkedComponents,
   getServiceClaimLinkedComponentIds,
 } from "../lib/service-claim-kitchen-plan-selection";
-import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices";
-import { isLShapedClaimKitchen } from "../lib/service-claim-kitchen-hotspots";
+import {
+  buildServiceClaimComponentChoiceGroups,
+  normalizeServiceClaimComponentChoiceSelection,
+} from "../lib/service-claim-component-choices";
 import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
-import { countElectricalApplianceProblemAreas } from "../lib/service-claim-serial-number";
+import { isElectricalApplianceProblemArea } from "../lib/service-claim-serial-number";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
 
 const LANGUAGE_OPTIONS = [
@@ -589,7 +592,7 @@ const COPY = {
     serialNumberHelpAlt1: "Beispiel: Seriennummer auf dem Typenschild",
     serialNumberHelpAlt2: "Beispiel: Seriennummer im K\u00fchlschrank",
     attachments: "Anh\u00e4nge (optional)",
-    uploadFile: "Datei hochladen",
+    uploadFile: "Fotos hochladen",
     problemAreaAttachmentRequired: "Bitte lade mindestens eine Datei f\u00fcr diesen K\u00fcchenteil hoch.",
     attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 20 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
@@ -833,7 +836,7 @@ const COPY = {
     serialNumberHelpAlt1: "Example: serial number on the appliance label",
     serialNumberHelpAlt2: "Example: serial number inside the fridge",
     attachments: "Attachments (optional)",
-    uploadFile: "Upload file",
+    uploadFile: "Upload photos",
     problemAreaAttachmentRequired: "Please upload at least one file for this kitchen component.",
     attachmentsHint: "PDFs, images, or office files \u2014 up to 20 files, 4 MB each.",
     attachmentsClear: "Remove all",
@@ -1775,21 +1778,6 @@ const EMPTY_CONTRACT_LOOKUP = {
 const EMPTY_CLAIM_ASSISTANT_MESSAGES = [];
 const PREFERRED_CONTACT_TIME_OPTIONS = buildTimeOptions();
 
-function normalizeSerialNumberList(value) {
-  return String(value || "")
-    .split(/\r?\n|,|;/)
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .join(", ");
-}
-
-function parseSerialNumberList(value) {
-  return String(value || "")
-    .split(/\r?\n|,|;/)
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-}
-
 function autoResizeTextarea(element) {
   if (!element) {
     return;
@@ -2068,9 +2056,10 @@ export default function ServiceClaimFlow() {
   const [problemAreaDetailsByComponentId, setProblemAreaDetailsByComponentId] = useState({});
   const [problemAreaAttachmentsByComponentId, setProblemAreaAttachmentsByComponentId] = useState({});
   const [attachments, setAttachments] = useState([]);
-  const [serialNumberImages, setSerialNumberImages] = useState([]);
+  const [serialNumberByComponentId, setSerialNumberByComponentId] = useState({});
+  const [serialNumberImageByComponentId, setSerialNumberImageByComponentId] = useState({});
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
-  const [serialNumberImageFieldKey, setSerialNumberImageFieldKey] = useState(0);
+  const [serialNumberImageFieldKeysByComponentId, setSerialNumberImageFieldKeysByComponentId] = useState({});
   const [problemAreaAttachmentFieldKeysByComponentId, setProblemAreaAttachmentFieldKeysByComponentId] = useState({});
   const [isContractNumberStickyEnabled, setIsContractNumberStickyEnabled] = useState(true);
   const [isContractNumberCurrentlyStuck, setIsContractNumberCurrentlyStuck] = useState(false);
@@ -2086,7 +2075,6 @@ export default function ServiceClaimFlow() {
   const [isClaimAssistantListening, setIsClaimAssistantListening] = useState(false);
   const [claimAssistantVoiceError, setClaimAssistantVoiceError] = useState("");
   const [selectedClaimAssistantContextKey, setSelectedClaimAssistantContextKey] = useState("claim");
-  const [serialNumberDraft, setSerialNumberDraft] = useState("");
   const [isTourOpen, setIsTourOpen] = useState(false);
   const [showClaimRequiredErrors, setShowClaimRequiredErrors] = useState(false);
   const [isClaimRequiredAlertDismissed, setIsClaimRequiredAlertDismissed] = useState(false);
@@ -2216,16 +2204,29 @@ export default function ServiceClaimFlow() {
     contractLookup.kitchenPlan,
     normalizedContractNumber,
   ]);
-  const problemAreaChoiceGroupByComponentId = useMemo(() => {
-    if (!activeKitchenPlan?.selectableComponents?.length) return new Map();
-    const groups = buildServiceClaimComponentChoiceGroups(
-      activeKitchenPlan.selectableComponents,
-      { includeLinearSharedParts: !isLShapedClaimKitchen(activeKitchenPlan.kitchenSlug) },
-    );
-    return new Map(
-      groups.flatMap((group) => group.options.map((option) => [option.componentId, group])),
-    );
+  const problemAreaChoiceGroups = useMemo(() => {
+    if (!activeKitchenPlan?.selectableComponents?.length) return [];
+    return buildServiceClaimComponentChoiceGroups(activeKitchenPlan.selectableComponents);
   }, [activeKitchenPlan]);
+  const problemAreaChoiceGroupByComponentId = useMemo(() => {
+    return new Map(
+      problemAreaChoiceGroups.flatMap((group) => (
+        group.options.map((option) => [option.componentId, group])
+      )),
+    );
+  }, [problemAreaChoiceGroups]);
+  useEffect(() => {
+    setProblemComponentIds((current) => {
+      const normalized = normalizeServiceClaimComponentChoiceSelection(
+        current,
+        problemAreaChoiceGroups,
+      );
+      return normalized.length === current.length
+        && normalized.every((componentId, index) => componentId === current[index])
+        ? current
+        : normalized;
+    });
+  }, [problemAreaChoiceGroups]);
   const problemPlanDisplayComponentIds = useMemo(() => problemComponentIds.flatMap((componentId) => {
     const choiceGroup = problemAreaChoiceGroupByComponentId.get(componentId);
     if (!choiceGroup) return [componentId];
@@ -2272,9 +2273,9 @@ export default function ServiceClaimFlow() {
     selectedClaimAssistantContext?.type === "area"
       ? t("claimAssistantIntroSelected").replace("{label}", selectedClaimAssistantContext.label)
       : t("claimAssistantIntro");
-  const serialNumberEntries = useMemo(
-    () => parseSerialNumberList(formValues.serialNumber),
-    [formValues.serialNumber],
+  const serialNumberImages = useMemo(
+    () => Object.values(serialNumberImageByComponentId).filter(Boolean),
+    [serialNumberImageByComponentId],
   );
   const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
   const selectedProblemAreasWithDetails = useMemo(() => {
@@ -2295,6 +2296,7 @@ export default function ServiceClaimFlow() {
       return rowParts.map((selectedPart, rowIndex) => {
         const displayedParts = selectedPart ? [selectedPart] : choiceGroup?.options || [area];
         const rowComponentId = selectedPart?.componentId || area.componentId;
+        const resolvedPart = selectedPart || (!choiceGroup ? area : null);
         return {
           ...area,
           rowKey: `${area.componentId}:${rowComponentId}`,
@@ -2314,6 +2316,10 @@ export default function ServiceClaimFlow() {
           detail: problemAreaDetailsByComponentId[rowComponentId] || "",
           attachments: problemAreaAttachmentsByComponentId[rowComponentId] || [],
           attachmentFieldKey: problemAreaAttachmentFieldKeysByComponentId[rowComponentId] || 0,
+          requiresSerialNumber: resolvedPart ? isElectricalApplianceProblemArea(resolvedPart) : false,
+          serialNumber: serialNumberByComponentId[rowComponentId] || "",
+          serialNumberImage: serialNumberImageByComponentId[rowComponentId] || null,
+          serialNumberImageFieldKey: serialNumberImageFieldKeysByComponentId[rowComponentId] || 0,
         };
       });
     });
@@ -2324,26 +2330,18 @@ export default function ServiceClaimFlow() {
     problemAreaDetailsByComponentId,
     problemAreaChoiceGroupByComponentId,
     problemAreaPartChoiceByGroupKey,
+    serialNumberByComponentId,
+    serialNumberImageByComponentId,
+    serialNumberImageFieldKeysByComponentId,
     selectedProblemAreas,
   ]);
-  const resolvedProblemAreas = useMemo(
-    () => selectedProblemAreasWithDetails
-      .flatMap((area) => area.resolvedAreas.map((resolvedArea) => ({
-        componentId: resolvedArea.componentId,
-        code: resolvedArea.code,
-        name: resolvedArea.name,
-      }))),
+  const electricalProblemAreas = useMemo(
+    () => selectedProblemAreasWithDetails.filter((area) => area.requiresSerialNumber),
     [selectedProblemAreasWithDetails],
   );
-  const requiredSelectedSerialNumberCount = useMemo(
-    () => countElectricalApplianceProblemAreas(resolvedProblemAreas),
-    [resolvedProblemAreas],
+  const hasMissingProblemAreaSerialEvidence = electricalProblemAreas.some(
+    (area) => !String(area.serialNumber || "").trim() && !area.serialNumberImage,
   );
-  const hasSelectedElectricalAppliances = requiredSelectedSerialNumberCount > 0;
-  const applicableSerialNumberImages = hasSelectedElectricalAppliances ? serialNumberImages : [];
-  const hasReachedRequiredSerialEvidenceCount =
-    hasSelectedElectricalAppliances
-    && serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount;
   const hasMissingProblemAreaPartChoices = selectedProblemAreasWithDetails.some(
     (area) => area.choiceGroup && !area.selectedPartComponentIds.length,
   );
@@ -2621,6 +2619,15 @@ export default function ServiceClaimFlow() {
       keepAllowedRecordKeys(current, selectedIds),
     );
     setProblemAreaAttachmentFieldKeysByComponentId((current) =>
+      keepAllowedRecordKeys(current, selectedIds),
+    );
+    setSerialNumberByComponentId((current) =>
+      keepAllowedRecordKeys(current, selectedIds),
+    );
+    setSerialNumberImageByComponentId((current) =>
+      keepAllowedRecordKeys(current, selectedIds),
+    );
+    setSerialNumberImageFieldKeysByComponentId((current) =>
       keepAllowedRecordKeys(current, selectedIds),
     );
     setProblemAreaPartChoiceByGroupKey((current) =>
@@ -2960,6 +2967,9 @@ export default function ServiceClaimFlow() {
       setProblemAreaDetailsByComponentId,
       setProblemAreaAttachmentsByComponentId,
       setProblemAreaAttachmentFieldKeysByComponentId,
+      setSerialNumberByComponentId,
+      setSerialNumberImageByComponentId,
+      setSerialNumberImageFieldKeysByComponentId,
     ]) {
       setter((current) => {
         if (!Object.prototype.hasOwnProperty.call(current, fromComponentId)) return current;
@@ -2971,6 +2981,60 @@ export default function ServiceClaimFlow() {
         return next;
       });
     }
+  }
+
+  function handleProblemPlanComponentToggle(componentId) {
+    const choiceGroup = problemAreaChoiceGroupByComponentId.get(componentId);
+    if (!choiceGroup) {
+      const selectableIds = new Set(activeKitchenPlan?.selectableComponentIds || []);
+      const linkedComponentIds = getServiceClaimLinkedComponentIds(
+        activeKitchenPlan?.kitchenSlug,
+        componentId,
+      ).filter((id) => selectableIds.has(id));
+      setProblemComponentIds((current) => {
+        const shouldRemove = linkedComponentIds.some((id) => current.includes(id));
+        const next = new Set(current);
+        linkedComponentIds.forEach((id) => {
+          if (shouldRemove) next.delete(id);
+          else next.add(id);
+        });
+        return [...next].filter((id) => selectableIds.has(id));
+      });
+      setIsClaimRequiredAlertDismissed(false);
+      if (error) setError("");
+      return;
+    }
+
+    const groupOptionIds = new Set(choiceGroup.options.map((option) => option.componentId));
+    const groupIsSelected = problemComponentIds.some((id) => groupOptionIds.has(id));
+    const storedChoices = problemAreaPartChoiceByGroupKey[choiceGroup.sourceComponentKey];
+    const selectedChoiceIds = Array.isArray(storedChoices)
+      ? storedChoices
+      : storedChoices ? [storedChoices] : [];
+    const effectiveChoiceIds = selectedChoiceIds.length
+      ? selectedChoiceIds
+      : groupIsSelected ? [choiceGroup.triggerComponentId] : [];
+    const isSelected = effectiveChoiceIds.includes(componentId);
+    const nextChoiceIds = isSelected
+      ? effectiveChoiceIds.filter((id) => id !== componentId)
+      : [...effectiveChoiceIds, componentId];
+
+    setProblemAreaPartChoiceByGroupKey((current) => ({
+      ...current,
+      [choiceGroup.sourceComponentKey]: nextChoiceIds,
+    }));
+    setProblemComponentIds((current) => {
+      const withoutGroup = current.filter((id) => !groupOptionIds.has(id));
+      return nextChoiceIds.length
+        ? [...withoutGroup, choiceGroup.triggerComponentId]
+        : withoutGroup;
+    });
+
+    if (isSelected) {
+      moveProblemAreaRowState(componentId);
+    }
+    setIsClaimRequiredAlertDismissed(false);
+    if (error) setError("");
   }
 
   function handleProblemAreaPartChoice(componentId, nextComponentId, isSelected, currentSelectedIds = []) {
@@ -3033,7 +3097,7 @@ export default function ServiceClaimFlow() {
         }
         return sum + (Array.isArray(files) ? files.length : 0);
       }, 0);
-      const fixedAttachmentCount = attachments.length + applicableSerialNumberImages.length + otherProblemAreaFileCount;
+      const fixedAttachmentCount = attachments.length + serialNumberImages.length + otherProblemAreaFileCount;
       let message = "";
 
       for (const file of picked) {
@@ -3119,7 +3183,7 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
-        const currentCount = next.length + applicableSerialNumberImages.length + problemAreaAttachmentCount;
+        const currentCount = next.length + serialNumberImages.length + problemAreaAttachmentCount;
         if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
           break;
@@ -3141,7 +3205,7 @@ export default function ServiceClaimFlow() {
     });
   }
 
-  function handleSerialNumberImageSelected(event) {
+  function handleProblemAreaSerialNumberImageSelected(componentId, event) {
     const picked = Array.from(event.target.files || []);
     event.target.value = "";
     if (!picked.length) {
@@ -3149,34 +3213,21 @@ export default function ServiceClaimFlow() {
     }
 
     setError("");
-    setSerialNumberImages((prev) => {
-      const next = [...prev];
-      let message = "";
-      for (const file of picked) {
-        if (serialNumberEntries.length + next.length >= requiredSelectedSerialNumberCount) {
-          message = t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount));
-          break;
-        }
-        const currentCount = attachments.length + next.length + problemAreaAttachmentCount;
-        if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
-          message = copy.attachmentsErrorTooMany;
-          break;
-        }
-        if (file.size > MAX_CLAIM_ATTACHMENT_BYTES) {
-          message = copy.attachmentsErrorFileTooLarge;
-          continue;
-        }
-        if (!file.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(file)) {
-          message = copy.attachmentsErrorType;
-          continue;
-        }
-        next.push(file);
-      }
-      if (message) {
-        queueMicrotask(() => setError(message));
-      }
-      return next;
-    });
+    const file = picked[0];
+    if (attachments.length + serialNumberImages.length + problemAreaAttachmentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
+      setError(copy.attachmentsErrorTooMany);
+      return;
+    }
+    if (file.size > MAX_CLAIM_ATTACHMENT_BYTES) {
+      setError(copy.attachmentsErrorFileTooLarge);
+      return;
+    }
+    if (!file.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(file)) {
+      setError(copy.attachmentsErrorType);
+      return;
+    }
+    setSerialNumberImageByComponentId((current) => ({ ...current, [componentId]: file }));
+    setSerialNumberByComponentId((current) => ({ ...current, [componentId]: "" }));
   }
 
   function removeAttachment(index) {
@@ -3203,9 +3254,16 @@ export default function ServiceClaimFlow() {
     setError("");
   }
 
-  function removeSerialNumberImage(index) {
-    setSerialNumberImages((prev) => prev.filter((_, itemIndex) => itemIndex !== index));
-    setSerialNumberImageFieldKey((key) => key + 1);
+  function removeProblemAreaSerialNumberImage(componentId) {
+    setSerialNumberImageByComponentId((current) => {
+      const next = { ...current };
+      delete next[componentId];
+      return next;
+    });
+    setSerialNumberImageFieldKeysByComponentId((current) => ({
+      ...current,
+      [componentId]: (current[componentId] || 0) + 1,
+    }));
     setError("");
   }
 
@@ -3231,34 +3289,12 @@ export default function ServiceClaimFlow() {
     setError("");
   }
 
-  function syncSerialNumberEntries(entries) {
-    handleFieldChange("serialNumber", normalizeSerialNumberList(entries.join("\n")));
-  }
-
-  function addSerialNumberEntry(rawValue = serialNumberDraft) {
-    const nextEntry = String(rawValue || "").trim();
-    if (!nextEntry) {
-      return;
+  function handleProblemAreaSerialNumberChange(componentId, value) {
+    setSerialNumberByComponentId((current) => ({ ...current, [componentId]: value }));
+    if (String(value || "").trim()) {
+      removeProblemAreaSerialNumberImage(componentId);
     }
-    if (serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount) {
-      setError(t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount)));
-      return;
-    }
-
-    const alreadyExists = serialNumberEntries.some(
-      (entry) => entry.toLowerCase() === nextEntry.toLowerCase(),
-    );
-    if (alreadyExists) {
-      setSerialNumberDraft("");
-      return;
-    }
-
-    syncSerialNumberEntries([...serialNumberEntries, nextEntry]);
-    setSerialNumberDraft("");
-  }
-
-  function removeSerialNumberEntry(index) {
-    syncSerialNumberEntries(serialNumberEntries.filter((_, entryIndex) => entryIndex !== index));
+    if (error) setError("");
   }
 
   function goContractHelpPrev() {
@@ -3376,6 +3412,9 @@ export default function ServiceClaimFlow() {
         code: resolvedArea.code,
         name: resolvedArea.name,
         detail: String(area.detail || "").trim(),
+        ...(area.requiresSerialNumber
+          ? { serialNumber: String(area.serialNumber || "").trim() }
+          : {}),
       })));
   }
 
@@ -3459,9 +3498,9 @@ export default function ServiceClaimFlow() {
           claim: {
             contractNumber: normalizedContractNumber,
             problemDescription: buildSubmittedProblemDescription(latestFormValues),
-            serialNumber: String(latestFormValues.serialNumber || "").trim(),
-            hasSerialNumberImage: applicableSerialNumberImages.length > 0,
-            attachmentCount: attachments.length + applicableSerialNumberImages.length + problemAreaAttachmentCount,
+            serialNumber: Object.values(serialNumberByComponentId).map((value) => String(value || "").trim()).filter(Boolean).join("\n"),
+            hasSerialNumberImage: serialNumberImages.length > 0,
+            attachmentCount: attachments.length + serialNumberImages.length + problemAreaAttachmentCount,
             preferredContactDate: String(latestFormValues.preferredContactDate || "").trim(),
             preferredContactTimeWindow: String(latestFormValues.preferredContactTimeWindow || "").trim(),
             preferredContactTimeFrom: String(latestFormValues.preferredContactTimeFrom || "").trim(),
@@ -3662,24 +3701,29 @@ export default function ServiceClaimFlow() {
       return;
     }
 
+    if (hasMissingProblemAreaSerialEvidence) {
+      setShowClaimRequiredErrors(true);
+      setError(t("serialNumberRequired"));
+      window.requestAnimationFrame(() => {
+        const firstMissingSerial = selectedServicePanelRef.current?.querySelector(
+          '[data-problem-area-serial-required="true"]',
+        );
+        firstMissingSerial?.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstMissingSerial?.focus?.({ preventScroll: true });
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setError("");
     setSuccessMessage("");
 
     try {
       const formData = new FormData();
-      const normalizedSerialNumbers = hasSelectedElectricalAppliances
-        ? normalizeSerialNumberList(
-            [formValues.serialNumber, serialNumberDraft].filter(Boolean).join("\n"),
-          )
-        : "";
-      const submittedSerialNumberCount = parseSerialNumberList(normalizedSerialNumbers).length;
-      const submittedSerialEvidenceCount = submittedSerialNumberCount + applicableSerialNumberImages.length;
-      if (submittedSerialEvidenceCount !== requiredSelectedSerialNumberCount) {
-        setError(t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount)));
-        setIsSubmitting(false);
-        return;
-      }
+      const normalizedSerialNumbers = electricalProblemAreas
+        .map((area) => String(area.serialNumber || "").trim())
+        .filter(Boolean)
+        .join("\n");
       const includeHausmeister = formValues.hausmeisterInvolved === "yes";
       const payload = {
         ...form,
@@ -3690,7 +3734,7 @@ export default function ServiceClaimFlow() {
         clientPostalCode: formValues.clientPostalCode.trim(),
         problemDescription: buildSubmittedProblemDescription(),
         serialNumber: normalizedSerialNumbers,
-        hasSerialNumberImage: applicableSerialNumberImages.length > 0 ? "true" : "false",
+        hasSerialNumberImage: serialNumberImages.length > 0 ? "true" : "false",
         language,
         ...(includeHausmeister ? {} : EMPTY_HAUSMEISTER_FIELDS),
       };
@@ -3710,15 +3754,16 @@ export default function ServiceClaimFlow() {
           .map((area) => ({
             ...metaById.get(area.componentId),
             detail: area.detail,
+            ...(area.serialNumber ? { serialNumber: area.serialNumber } : {}),
           }))
           .filter(Boolean);
         formData.append("problemAreasJson", JSON.stringify(problemAreas));
       } else {
         formData.append("problemAreasJson", "[]");
       }
-      if (hasSelectedElectricalAppliances) {
-        for (const file of serialNumberImages) {
-          formData.append("serialNumberImages", file);
+      for (const area of electricalProblemAreas) {
+        if (area.serialNumberImage) {
+          formData.append(`serialNumberImage:${area.rowComponentId}`, area.serialNumberImage);
         }
       }
       for (const file of attachments) {
@@ -3748,16 +3793,16 @@ export default function ServiceClaimFlow() {
       setIsClaimRequiredAlertDismissed(false);
       setShowProblemAreaAttachmentErrors(false);
       setForm(INITIAL_FORM);
-      setSerialNumberDraft("");
       setAttachments([]);
-      setSerialNumberImages([]);
+      setSerialNumberByComponentId({});
+      setSerialNumberImageByComponentId({});
       setProblemComponentIds([]);
       setProblemAreaPartChoiceByGroupKey({});
       setProblemAreaDetailsByComponentId({});
       setProblemAreaAttachmentsByComponentId({});
       setProblemAreaAttachmentFieldKeysByComponentId({});
       setAttachmentFieldKey((key) => key + 1);
-      setSerialNumberImageFieldKey((key) => key + 1);
+      setSerialNumberImageFieldKeysByComponentId({});
       setContractLookup(EMPTY_CONTRACT_LOOKUP);
     } catch (submitError) {
       setError(submitError.message || copy.submitError);
@@ -5144,6 +5189,7 @@ export default function ServiceClaimFlow() {
                     value={problemComponentIds}
                     visualValue={problemPlanDisplayComponentIds}
                     onChange={setProblemComponentIds}
+                    onComponentToggle={handleProblemPlanComponentToggle}
                     contractNumber={normalizedContractNumber}
                     labels={{
                       eyebrow: t("kitchenPlanEyebrow"),
@@ -5243,7 +5289,13 @@ export default function ServiceClaimFlow() {
                                         event.currentTarget.closest("details")?.removeAttribute("open");
                                       }}
                                     />
-                                    <span>{formatClaimAreaName(option, option.name, language)}</span>
+                                    <ServiceClaimPartIcon
+                                      option={option}
+                                      choiceGroup={area.choiceGroup}
+                                    />
+                                    <span className="service-field__problem-area-part-option-label">
+                                      {formatClaimAreaName(option, option.name, language)}
+                                    </span>
                                   </label>
                                 );
                               })}
@@ -5322,6 +5374,85 @@ export default function ServiceClaimFlow() {
                           </span>
                         ) : null}
                       </div>
+                      {area.requiresSerialNumber ? (
+                        <div className="service-field__problem-area-serial">
+                          <div className="service-field__problem-area-serial-heading">
+                            <span>
+                              {copy.serialNumber}
+                              <RequiredFieldMark title={requiredFieldTitle} />
+                            </span>
+                            <button
+                              type="button"
+                              className="service-field__help-badge"
+                              aria-label={t("serialNumberHelpAria")}
+                              onClick={() => {
+                                setSerialHelpSlide(0);
+                                setIsSerialNumberHelpOpen(true);
+                              }}
+                            >
+                              {t("serialNumberHelpTrigger")}
+                            </button>
+                          </div>
+                          <div className="service-field__problem-area-serial-controls">
+                            <input
+                              type="text"
+                              value={area.serialNumber}
+                              onChange={(event) => handleProblemAreaSerialNumberChange(
+                                area.rowComponentId,
+                                event.target.value,
+                              )}
+                              placeholder={copy.serialPlaceholder}
+                              disabled={Boolean(area.serialNumberImage)}
+                              aria-invalid={showClaimRequiredErrors && !area.serialNumber && !area.serialNumberImage}
+                              data-problem-area-serial-required={
+                                showClaimRequiredErrors && !area.serialNumber && !area.serialNumberImage
+                                  ? "true"
+                                  : undefined
+                              }
+                            />
+                            <span className="service-field__problem-area-serial-or" aria-hidden="true">/</span>
+                            <input
+                              key={area.serialNumberImageFieldKey}
+                              id={`problem-area-serial-image-${area.rowComponentId}`}
+                              type="file"
+                              className="service-field__problem-area-file"
+                              accept={SERIAL_NUMBER_IMAGE_ACCEPT}
+                              onChange={(event) => handleProblemAreaSerialNumberImageSelected(
+                                area.rowComponentId,
+                                event,
+                              )}
+                              disabled={Boolean(String(area.serialNumber || "").trim())}
+                            />
+                            <label
+                              htmlFor={`problem-area-serial-image-${area.rowComponentId}`}
+                              className="service-field__problem-area-serial-upload"
+                              aria-disabled={Boolean(String(area.serialNumber || "").trim())}
+                            >
+                              {t("serialNumberImage")}
+                            </label>
+                          </div>
+                          {area.serialNumberImage ? (
+                            <ServiceAttachmentChips
+                              files={[area.serialNumberImage]}
+                              summary={area.serialNumberImage.name}
+                              maxCount={1}
+                              onRemove={() => removeProblemAreaSerialNumberImage(area.rowComponentId)}
+                              viewLabel={t("viewFile")}
+                              viewAriaLabel={t("viewFileAria")}
+                              closePreviewLabel={t("closeFilePreview")}
+                              previewUnavailableText={t("filePreviewUnavailable")}
+                              removeLabel={t("removeFileAria")}
+                              expandLabel={copy.attachmentsViewMore}
+                              collapseLabel={copy.attachmentsViewLess}
+                            />
+                          ) : null}
+                          {showClaimRequiredErrors && !area.serialNumber && !area.serialNumberImage ? (
+                            <span className="service-field__problem-area-error" role="alert">
+                              {t("serialNumberRequired")}
+                            </span>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
                     );
                   })}
@@ -5359,80 +5490,8 @@ export default function ServiceClaimFlow() {
               )}
             </section>
 
-            <div className="service-serial-section">
+            <div className="service-serial-section service-serial-section--attachments-only">
               <div className="service-serial-section__column service-serial-section__column--left">
-                {hasSelectedElectricalAppliances ? (
-                  <label className="service-field service-field--serial-number">
-                    <span className="service-field__label-row service-field__label-row--serial">
-                      <span className="service-field__label-main">
-                        {copy.serialNumber}
-                        <RequiredFieldMark title={requiredFieldTitle} />
-                      </span>
-                      <button
-                        type="button"
-                        className="service-field__help-badge"
-                        aria-expanded={isSerialNumberHelpOpen}
-                        aria-controls="service-serial-help-title"
-                        aria-label={t("serialNumberHelpAria")}
-                        onClick={() => {
-                          setSerialHelpSlide(0);
-                          setIsSerialNumberHelpOpen(true);
-                        }}
-                      >
-                        {t("serialNumberHelpTrigger")}
-                      </button>
-                    </span>
-                    <p className="service-form__hint">
-                      {t("serialNumberCountRequired").replace("{count}", String(requiredSelectedSerialNumberCount))}
-                    </p>
-                    <div className="service-serial-field">
-                      <div className="service-serial-field__input-row">
-                        <input
-                          type="text"
-                          value={serialNumberDraft}
-                          onChange={(event) => setSerialNumberDraft(event.target.value)}
-                          onKeyDown={(event) => {
-                            if (event.key === "Enter") {
-                              event.preventDefault();
-                              addSerialNumberEntry();
-                            }
-                          }}
-                          placeholder={copy.serialPlaceholder}
-                          disabled={serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount}
-                        />
-                        <button
-                          type="button"
-                          className="service-serial-field__add"
-                          onClick={() => addSerialNumberEntry()}
-                          disabled={
-                            !serialNumberDraft.trim()
-                            || serialNumberEntries.length + applicableSerialNumberImages.length >= requiredSelectedSerialNumberCount
-                          }
-                        >
-                          {t("serialNumberAdd")}
-                        </button>
-                      </div>
-                      {serialNumberEntries.length ? (
-                        <ul className="service-serial-field__list">
-                          {serialNumberEntries.map((entry, index) => (
-                            <li key={`${entry}-${index}`} className="service-serial-field__item">
-                              <span className="service-serial-field__value">{entry}</span>
-                              <button
-                                type="button"
-                                className="service-serial-field__remove"
-                                onClick={() => removeSerialNumberEntry(index)}
-                                aria-label={t("removeSerialNumberAria")}
-                              >
-                                &times;
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </div>
-                  </label>
-                ) : null}
-
                 <div className="service-field service-field--attachments service-field--claim-attachments">
                   <span>{copy.attachments}</span>
                   <p className="service-form__hint service-form__hint--attachments">{copy.attachmentsHint}</p>
@@ -5461,48 +5520,6 @@ export default function ServiceClaimFlow() {
                   />
                 </div>
               </div>
-
-              {hasSelectedElectricalAppliances ? (
-                <div className="service-serial-section__column service-serial-section__column--right">
-                  <div className="service-field service-field--attachments service-field--serial-image-upload">
-                    <span>
-                      {t("serialNumberImage")}
-                    </span>
-                    <input
-                      key={serialNumberImageFieldKey}
-                      type="file"
-                      className="service-field__file"
-                      accept={SERIAL_NUMBER_IMAGE_ACCEPT}
-                      multiple
-                      onChange={handleSerialNumberImageSelected}
-                      disabled={hasReachedRequiredSerialEvidenceCount}
-                    />
-                    {hasReachedRequiredSerialEvidenceCount ? (
-                      <p className="service-form__hint service-form__hint--serial-limit" role="status">
-                        {t("serialNumberEvidenceLimitReached").replace(
-                          "{count}",
-                          String(requiredSelectedSerialNumberCount),
-                        )}
-                      </p>
-                    ) : null}
-                    {serialNumberImages.length ? (
-                      <ServiceAttachmentChips
-                        files={serialNumberImages}
-                        summary={copy.attachmentsSelected.replace("{count}", String(serialNumberImages.length))}
-                        maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
-                        onRemove={removeSerialNumberImage}
-                        viewLabel={t("viewFile")}
-                        viewAriaLabel={t("viewFileAria")}
-                        closePreviewLabel={t("closeFilePreview")}
-                        previewUnavailableText={t("filePreviewUnavailable")}
-                        removeLabel={t("removeFileAria")}
-                        expandLabel={copy.attachmentsViewMore}
-                        collapseLabel={copy.attachmentsViewLess}
-                      />
-                    ) : null}
-                  </div>
-                </div>
-              ) : null}
             </div>
 
             {error ? <p className="service-form__error">{error}</p> : null}

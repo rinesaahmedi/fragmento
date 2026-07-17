@@ -20,6 +20,7 @@ export function parseServiceClaimProblemAreas(raw) {
         const code = String(area?.code || "").trim();
         const articleCode = String(area?.articleCode || "").trim();
         const detail = String(area?.detail || "").trim();
+        const serialNumber = String(area?.serialNumber || "").trim();
         const attachments = Array.isArray(area?.attachments)
           ? area.attachments
               .map((attachment) => {
@@ -51,6 +52,7 @@ export function parseServiceClaimProblemAreas(raw) {
           code,
           ...(articleCode ? { articleCode } : {}),
           ...(detail ? { detail } : {}),
+          ...(serialNumber ? { serialNumber } : {}),
           ...(attachments.length ? { attachments } : {}),
         };
       })

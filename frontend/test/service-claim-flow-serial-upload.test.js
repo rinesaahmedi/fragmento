@@ -5,15 +5,14 @@ const test = require("node:test");
 
 const sourcePath = path.join(__dirname, "..", "components", "service-claim-flow.js");
 
-test("serial number photo field accepts multiple files and submits them all as attachments", () => {
+test("each electrical appliance can submit its own serial-number photo", () => {
   const source = fs.readFileSync(sourcePath, "utf8");
 
-  assert.match(
-    source,
-    /accept=\{SERIAL_NUMBER_IMAGE_ACCEPT\}[\s\S]*?multiple[\s\S]*?onChange=\{handleSerialNumberImageSelected\}/,
-  );
-  assert.match(source, /const \[serialNumberImages,\s*setSerialNumberImages\] = useState\(\[\]\)/);
-  assert.match(source, /for \(const file of serialNumberImages\) \{\s*formData\.append\("serialNumberImages", file\);/);
+  assert.match(source, /const \[serialNumberImageByComponentId,\s*setSerialNumberImageByComponentId\] = useState\(\{\}\)/);
+  assert.match(source, /function handleProblemAreaSerialNumberImageSelected\(componentId, event\)/);
+  assert.match(source, /accept=\{SERIAL_NUMBER_IMAGE_ACCEPT\}[\s\S]*?handleProblemAreaSerialNumberImageSelected\([\s\S]*?area\.rowComponentId/);
+  assert.match(source, /formData\.append\(`serialNumberImage:\$\{area\.rowComponentId\}`, area\.serialNumberImage\)/);
+  assert.doesNotMatch(source, /accept=\{SERIAL_NUMBER_IMAGE_ACCEPT\}\s+multiple/);
   assert.match(source, /URL\.createObjectURL\(previewFile\)/);
   assert.doesNotMatch(source, /window\.open\(/);
   assert.match(source, /className="service-attachments__view"/);

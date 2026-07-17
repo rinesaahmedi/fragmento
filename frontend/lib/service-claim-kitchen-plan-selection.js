@@ -283,6 +283,15 @@ const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   "furniture-front",
 ]);
 
+// In this perspective family the floor-height WU16 panel closes the left
+// worktop leg. Other split L-kitchen plans place it at the right-hand end.
+const LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS = new Set([
+  "ab-105805",
+  "ab-105809",
+  "ab-105813",
+  "ab-105817",
+]);
+
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
   // These kitchens share two adjacent UPK20 strips at the same inside corner.
   // Keep their individual PDF-matched hotspots, but treat each pair as one
@@ -650,6 +659,17 @@ export function buildServiceClaimSelectableComponents({
       .map((part) => componentIdForItem({ componentKey: part?.sourceComponentKey }))
       .filter(Boolean),
   );
+  const hasSplitWorktopClaimParts = eligibleClaimParts.some(
+    (part) => String(part?.partKey || "").trim() === "worktop-left",
+  ) && eligibleClaimParts.some(
+    (part) => String(part?.partKey || "").trim() === "worktop-right",
+  );
+  const normalizedKitchenSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const worktopEndPanelChoicePartKey = hasSplitWorktopClaimParts
+    ? LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS.has(normalizedKitchenSlug)
+      ? "worktop-left"
+      : "worktop-right"
+    : "worktop";
   const separatedClaimParts = eligibleClaimParts
     .map((part) => {
       const partKey = String(part?.partKey || "").trim();
@@ -667,6 +687,9 @@ export function buildServiceClaimSelectableComponents({
         nameDe: String(part?.nameDe || "").trim(),
         componentKey: String(part?.sourceComponentKey || "").trim(),
         claimPartKey: partKey,
+        contextualChoiceTriggerPartKey: partKey === "worktop-end-panel"
+          ? worktopEndPanelChoicePartKey
+          : "",
       };
     })
     .filter(Boolean);
