@@ -149,10 +149,6 @@ export default function ServiceClaimKitchenPicker({
     claimParts = [],
   } = kitchenPlan;
 
-  const worktopEndPanelComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS["worktop-end-panel"];
-  const hasManualWorktopEndPanelOption =
-    claimParts.some((part) => String(part?.partKey || "").trim() === "worktop-end-panel")
-    && selectableComponentIds.includes(worktopEndPanelComponentId);
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenSlug] || null;
   const imageViewHref = IMAGE_VIEW_BY_SLUG[kitchenSlug] || "";
 
@@ -196,12 +192,10 @@ export default function ServiceClaimKitchenPicker({
         if (current.some((id) => optionIds.has(id))) {
           return current.filter((id) => !optionIds.has(id));
         }
-        return toggleClaimComponentSelection({
-          currentIds: current,
-          componentId: choiceGroup.triggerComponentId,
-          selectableComponentIds,
-          kitchenSlug,
-        });
+        return [
+          ...current.filter((id) => !optionIds.has(id)),
+          choiceGroup.triggerComponentId,
+        ];
       }
       return toggleClaimComponentSelection({
         currentIds: current,
@@ -381,9 +375,6 @@ export default function ServiceClaimKitchenPicker({
     && !hasContextualCooktopChoice
     && claimParts.some((part) => String(part?.partKey || "").trim() === "cooktop")
     && selectableComponentIds.includes(cooktopComponentId);
-  const worktopEndPanelOption = selectableComponents.find(
-    (component) => component.componentId === worktopEndPanelComponentId,
-  );
   const isManualSinkSelected = selectedIds.has(sinkComponentId);
   const isManualCooktopSelected = selectedIds.has(cooktopComponentId);
 
@@ -648,7 +639,7 @@ export default function ServiceClaimKitchenPicker({
           </div>
         </div>
       )}
-      {showManualSinkOption || showManualCooktopOption || hasManualWorktopEndPanelOption ? (
+      {showManualSinkOption || showManualCooktopOption ? (
         <div className="service-claim-kitchen__manual-options">
           {showManualSinkOption ? (
             <button
@@ -674,21 +665,6 @@ export default function ServiceClaimKitchenPicker({
               onClick={() => togglePlanComponent(cooktopComponentId)}
             >
               {labels?.cooktopOption || "Cooktop"}
-            </button>
-          ) : null}
-          {hasManualWorktopEndPanelOption ? (
-            <button
-              type="button"
-              className={[
-                "service-claim-kitchen__manual-option",
-                selectedIds.has(worktopEndPanelComponentId)
-                  ? "service-claim-kitchen__manual-option--selected"
-                  : "",
-              ].filter(Boolean).join(" ")}
-              aria-pressed={selectedIds.has(worktopEndPanelComponentId)}
-              onClick={() => togglePlanComponent(worktopEndPanelComponentId)}
-            >
-              {labels?.worktopEndPanelOption || worktopEndPanelOption?.nameDe || "Worktop End Panel"}
             </button>
           ) : null}
         </div>
