@@ -37,6 +37,15 @@ test("service-claims route returns the actual email delivery error", () => {
   assert.match(source, /emailError: emailError \|\| null/);
 });
 
+test("service-claims route requires explicit confirmation for grouped kitchen parts", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /buildServiceClaimComponentChoiceGroups/);
+  assert.match(source, /parseConfirmedChoiceGroupKeys/);
+  assert.match(source, /confirmedChoiceGroupKeys\.has\(choiceGroup\.sourceComponentKey\)/);
+  assert.match(source, /body\.confirmedChoiceGroupsJson/);
+});
+
 test("service-claims route embeds a kitchen preview png in notification emails when available", () => {
   const source = fs.readFileSync(routePath, "utf8");
 

@@ -20,6 +20,7 @@ import { KITCHEN_AREA_FIRST_LINE_PREFIXES } from "../../../lib/service-claim-pro
 import { isElectricalApplianceProblemArea } from "../../../lib/service-claim-serial-number";
 import { formatServiceClaimEmailSubject } from "../../../lib/service-claim-email-subject";
 import { getServiceClaimKitchenPlan } from "../../../lib/service-claim-kitchen-plan";
+import { buildServiceClaimComponentChoiceGroups } from "../../../lib/service-claim-component-choices";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 
 function descriptionHasClientKitchenAreasLine(text) {
@@ -543,7 +544,24 @@ function formatAttachmentHtml(entry, { includeItemContext = true } = {}) {
   `;
 }
 
-async function resolveProblemAreasFromDatabase(contractNumber, rawProblemAreasJson) {
+function parseConfirmedChoiceGroupKeys(raw) {
+  try {
+    const keys = JSON.parse(String(raw || "[]"));
+    return new Set(
+      Array.isArray(keys)
+        ? keys.map((key) => String(key || "").trim()).filter(Boolean)
+        : [],
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+async function resolveProblemAreasFromDatabase(
+  contractNumber,
+  rawProblemAreasJson,
+  rawConfirmedChoiceGroupsJson = "[]",
+) {
   const submittedAreas = parseServiceClaimProblemAreas(rawProblemAreasJson);
   if (!submittedAreas.length) {
     return null;
@@ -557,11 +575,20 @@ async function resolveProblemAreasFromDatabase(contractNumber, rawProblemAreasJs
   const databaseAreasByComponentId = new Map(
     kitchenPlan.selectableComponents.map((area) => [String(area?.componentId || "").trim(), area]),
   );
+  const confirmedChoiceGroupKeys = parseConfirmedChoiceGroupKeys(rawConfirmedChoiceGroupsJson);
+  const choiceGroupByOptionId = new Map(
+    buildServiceClaimComponentChoiceGroups(kitchenPlan.selectableComponents)
+      .flatMap((group) => group.options.map((option) => [option.componentId, group])),
+  );
   const resolvedAreas = submittedAreas.map((submittedArea) => {
     const componentId = String(submittedArea.componentId || "").trim();
     const databaseArea = databaseAreasByComponentId.get(componentId);
     if (!databaseArea) {
       throw new Error("Ein ausgewähltes Küchenteil gehört nicht zur Küche dieses Vertrags.");
+    }
+    const choiceGroup = choiceGroupByOptionId.get(componentId);
+    if (choiceGroup && !confirmedChoiceGroupKeys.has(choiceGroup.sourceComponentKey)) {
+      throw new Error("Please select at least one affected kitchen component.");
     }
     const databaseGermanName = String(databaseArea.nameDe || "").trim();
     if (!databaseGermanName) {
@@ -1257,6 +1284,7 @@ export async function POST(request) {
     const problemAreasJson = await resolveProblemAreasFromDatabase(
       contractNumber,
       normalizeProblemAreasJson(body.problemAreasJson),
+      body.confirmedChoiceGroupsJson,
     );
     const problemDescription = mergeProblemAreasIntoDescription(
       optionalString(body.problemDescription),
