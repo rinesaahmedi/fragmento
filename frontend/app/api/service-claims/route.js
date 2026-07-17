@@ -428,7 +428,7 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
     return {
       isElectricalAppliance: isElectricalApplianceProblemArea(area),
       name: String(area.name || "").trim(),
-      articleCode: StringForEmail(area.code || "").trim(),
+      articleCode: String(area.code || "").trim(),
       detail: String(area.detail || "").trim(),
       serialNumber: String(area.serialNumber || "").trim(),
       serialAttachments: componentId ? serialAttachmentsByComponentId.get(componentId) || [] : [],
