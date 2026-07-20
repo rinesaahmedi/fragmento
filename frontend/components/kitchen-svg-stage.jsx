@@ -1854,6 +1854,12 @@ export default function useKitchenSvgStage({
         : hasPdfView
           ? translate("configurator.stageLegendChooseRight", "Choose elements on the right")
           : translate("configurator.stageLegendClick", "Click in the plan or choose on the right");
+  const legendPrimaryMobileText =
+    has3dModel && activeView === "3d"
+      ? translate("configurator.stageLegend3dMobile", "Tap parts in the 3D preview or choose below")
+      : hasImageView && hasImageHotspots
+        ? translate("configurator.stageLegendClickMobile", "Tap the plan or choose below")
+        : translate("configurator.stageLegendChooseBelow", "Choose elements below");
   const planDisplayCrop = useMemo(
     () => getPlanDisplayCrop(imageHotspots, normalizedKitchenSlug),
     [imageHotspots, normalizedKitchenSlug],
@@ -2121,7 +2127,8 @@ export default function useKitchenSvgStage({
             </div>
           ) : null}
           <button type="button" className={styles.ghostButton} onClick={onResetSelection}>
-            {translate("configurator.resetSelection", "Reset selection")}
+            <span className={styles.resetDesktopText}>{translate("configurator.resetSelection", "Reset selection")}</span>
+            <span className={styles.resetMobileText}>{translate("configurator.resetSelectionMobile", "Reset")}</span>
           </button>
         </div>
       </div>
@@ -2277,20 +2284,18 @@ export default function useKitchenSvgStage({
                               : hotspot.label
                           }
                           disabled={isFixed}
-                          onMouseEnter={() => setHoveredComponentId(hotspot.componentId)}
-                          onMouseLeave={() =>
+                          onPointerEnter={(event) => {
+                            if (event.pointerType === "mouse") setHoveredComponentId(hotspot.componentId);
+                          }}
+                          onPointerLeave={(event) => {
+                            if (event.pointerType !== "mouse") return;
                             setHoveredComponentId((current) =>
                               current === hotspot.componentId ? null : current,
-                            )
-                          }
-                          onFocus={() => setHoveredComponentId(hotspot.componentId)}
-                          onBlur={() =>
-                            setHoveredComponentId((current) =>
-                              current === hotspot.componentId ? null : current,
-                            )
-                          }
+                            );
+                          }}
                           onClick={() => {
                             if (fixedComponentIds.includes(hotspot.componentId)) return;
+                            setHoveredComponentId(null);
                             setSelectedComponentIds((current) =>
                               toggleLinkedComponentSelection(
                                 kitchenSlug,
@@ -2434,7 +2439,8 @@ export default function useKitchenSvgStage({
     <div className={styles.stageLegend}>
       <span className={styles.legendChip}>
         <span className={styles.legendSwatch} />
-        {legendPrimaryText}
+        <span className={styles.legendDesktopText}>{legendPrimaryText}</span>
+        <span className={styles.legendMobileText}>{legendPrimaryMobileText}</span>
       </span>
       <span className={styles.legendChip}>
         <span className={styles.legendDot} />

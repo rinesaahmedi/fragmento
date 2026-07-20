@@ -619,19 +619,19 @@ export default function ServiceClaimKitchenPicker({
                       }}
                       aria-pressed={isSelected}
                       aria-label={hotspot.componentKey}
-                      onMouseEnter={() => setHoveredComponentId(hotspot.componentId)}
-                      onMouseLeave={() =>
+                      onPointerEnter={(event) => {
+                        if (event.pointerType === "mouse") setHoveredComponentId(hotspot.componentId);
+                      }}
+                      onPointerLeave={(event) => {
+                        if (event.pointerType !== "mouse") return;
                         setHoveredComponentId((current) =>
                           current === hotspot.componentId ? null : current,
-                        )
-                      }
-                      onFocus={() => setHoveredComponentId(hotspot.componentId)}
-                      onBlur={() =>
-                        setHoveredComponentId((current) =>
-                          current === hotspot.componentId ? null : current,
-                        )
-                      }
-                      onClick={() => togglePlanComponent(hotspot.componentId)}
+                        );
+                      }}
+                      onClick={() => {
+                        setHoveredComponentId(null);
+                        togglePlanComponent(hotspot.componentId);
+                      }}
                     />
                   );
                 })}

@@ -72,6 +72,9 @@ const SCREEN_TEXT = {
     contractLabel: "Bitte gib deine Vertragsnummer ein:*",
     contractAction: "Bestätigen",
     contractError: "Die eingegebene Vertragsnummer passt zu keiner aktiven Küche.",
+    contractPrivacyPrefix: "Wir verwenden deine Vertragsnummer zur Zugangsprüfung sowie für Sicherheits- und Analysezwecke. Weitere Informationen findest du in unserer ",
+    contractPrivacyLink: "Datenschutzerklärung",
+    contractPrivacySuffix: ".",
   },
   en: {
     languageTitle: "Select your language",
@@ -87,6 +90,9 @@ const SCREEN_TEXT = {
     contractLabel: "Please enter your contract number:*",
     contractAction: "Confirm",
     contractError: "The entered contract number does not match any active kitchen.",
+    contractPrivacyPrefix: "We use your contract number for access verification, security, and analytics. Learn more in our ",
+    contractPrivacyLink: "privacy policy",
+    contractPrivacySuffix: ".",
   },
   tr: {
     languageTitle: "Dilini seç",
@@ -102,6 +108,9 @@ const SCREEN_TEXT = {
     contractLabel: "Lütfen sözleşme numaranı gir:*",
     contractAction: "Onayla",
     contractError: "Girilen sözleşme numarası aktif bir mutfakla eşleşmiyor.",
+    contractPrivacyPrefix: "Sözleşme numaranızı erişim doğrulaması, güvenlik ve analiz için kullanıyoruz. Ayrıntılı bilgi için ",
+    contractPrivacyLink: "gizlilik politikamızı",
+    contractPrivacySuffix: " inceleyin.",
   },
   es: {
     languageTitle: "Elige tu idioma",
@@ -117,6 +126,9 @@ const SCREEN_TEXT = {
     contractLabel: "Introduce tu número de contrato:*",
     contractAction: "Confirmar",
     contractError: "El número introducido no coincide con ninguna cocina activa.",
+    contractPrivacyPrefix: "Utilizamos tu número de contrato para verificar el acceso, garantizar la seguridad y realizar análisis. Consulta nuestra ",
+    contractPrivacyLink: "política de privacidad",
+    contractPrivacySuffix: " para obtener más información.",
   },
   fr: {
     languageTitle: "Choisis ta langue",
@@ -132,6 +144,9 @@ const SCREEN_TEXT = {
     contractLabel: "Veuillez saisir votre numéro de contrat :*",
     contractAction: "Confirmer",
     contractError: "Le numéro saisi ne correspond à aucune cuisine active.",
+    contractPrivacyPrefix: "Nous utilisons votre numéro de contrat pour la vérification de l'accès, la sécurité et l'analyse. Consultez notre ",
+    contractPrivacyLink: "politique de confidentialité",
+    contractPrivacySuffix: " pour en savoir plus.",
   },
   ru: {
     languageTitle: "Выберите язык",
@@ -147,6 +162,9 @@ const SCREEN_TEXT = {
     contractLabel: "Пожалуйста, введите номер договора:*",
     contractAction: "Подтвердить",
     contractError: "Введенный номер не соответствует активной кухне.",
+    contractPrivacyPrefix: "Мы используем номер вашего договора для проверки доступа, обеспечения безопасности и аналитики. Подробнее читайте в нашей ",
+    contractPrivacyLink: "политике конфиденциальности",
+    contractPrivacySuffix: ".",
   },
 };
 
@@ -326,6 +344,13 @@ function getPublicTrackingContext(searchParams) {
   };
 }
 
+function formatVideoTime(value) {
+  const totalSeconds = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return `${minutes}:${seconds}`;
+}
+
 const ORDER_CONFIRMED_TEXT = {
   de: {
     title: "Bestellung bestaetigt",
@@ -363,6 +388,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageOpenTrackedRef = useRef(false);
+  const videoRef = useRef(null);
   const [initialEntryState] = useState(() => getLegalReturnEntryState());
   const [selectedLanguage, setSelectedLanguage] = useState(
     initialEntryState?.selectedLanguage || (initialLanguage === "en" ? "en" : "de")
@@ -373,6 +399,9 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const [error, setError] = useState("");
   const [isValidatingContract, setIsValidatingContract] = useState(false);
   const [isOrderConfirmedNoticeDismissed, setIsOrderConfirmedNoticeDismissed] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [videoCurrentTime, setVideoCurrentTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
 
   const text = SCREEN_TEXT[selectedLanguage] || SCREEN_TEXT.en;
   const instructionText = INSTRUCTION_TEXTS[selectedLanguage] || INSTRUCTION_TEXTS.en;
@@ -381,6 +410,19 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const confirmedOrderNumber = String(searchParams.get("order") || "").trim();
   const orderConfirmedText = ORDER_CONFIRMED_TEXT[selectedLanguage] || ORDER_CONFIRMED_TEXT.en;
   const shouldShowOrderConfirmedNotice = orderConfirmed && !isOrderConfirmedNoticeDismissed && screen === "language";
+
+  useEffect(() => {
+    if (screen !== "video" || !videoRef.current) {
+      return;
+    }
+
+    const video = videoRef.current;
+    video.currentTime = 0;
+    setVideoCurrentTime(0);
+    video.play().catch(() => {
+      setIsVideoPlaying(false);
+    });
+  }, [avatarSource, screen]);
 
   useEffect(() => {
     if (pageOpenTrackedRef.current) {
@@ -432,6 +474,31 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
     setSelectedMode(mode);
     setError("");
     setScreen(mode);
+  }
+
+  function toggleVideoPlayback() {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    if (video.paused) {
+      video.play().catch(() => setIsVideoPlaying(false));
+      return;
+    }
+
+    video.pause();
+  }
+
+  function handleVideoSeek(event) {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    const nextTime = Number(event.target.value);
+    video.currentTime = nextTime;
+    setVideoCurrentTime(nextTime);
   }
 
   async function handleContractSubmit(event) {
@@ -566,10 +633,49 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
 
           {screen === "video" ? (
             <div style={contentAreaStyle}>
-              <div style={videoFrameStyle}>
-                <video key={avatarSource} controls playsInline preload="metadata" style={videoStyle}>
+              <div className="fragmento-entry-video-frame" style={videoFrameStyle}>
+                <video
+                  key={avatarSource}
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  preload="auto"
+                  style={videoStyle}
+                  onPlay={() => setIsVideoPlaying(true)}
+                  onPause={() => setIsVideoPlaying(false)}
+                  onEnded={() => setIsVideoPlaying(false)}
+                  onLoadedMetadata={(event) => setVideoDuration(event.currentTarget.duration || 0)}
+                  onDurationChange={(event) => setVideoDuration(event.currentTarget.duration || 0)}
+                  onTimeUpdate={(event) => setVideoCurrentTime(event.currentTarget.currentTime)}
+                  onClick={toggleVideoPlayback}
+                >
                   <source src={avatarSource} type="video/mp4" />
                 </video>
+                <button
+                  type="button"
+                  style={videoPlaybackButtonStyle}
+                  onClick={toggleVideoPlayback}
+                  aria-label={isVideoPlaying ? "Pause video" : "Play video"}
+                >
+                  <span
+                    aria-hidden="true"
+                    style={isVideoPlaying ? videoPauseIconStyle : videoPlayIconStyle}
+                  />
+                </button>
+                <div style={videoTimelineStyle}>
+                  <span style={videoTimeStyle}>{formatVideoTime(videoCurrentTime)}</span>
+                  <input
+                    type="range"
+                    min="0"
+                    max={videoDuration || 0}
+                    step="0.1"
+                    value={Math.min(videoCurrentTime, videoDuration || 0)}
+                    onChange={handleVideoSeek}
+                    aria-label="Video timeline"
+                    style={videoSeekStyle}
+                  />
+                  <span style={videoTimeStyle}>{formatVideoTime(videoDuration)}</span>
+                </div>
               </div>
               <ActionRow
                 backLabel={text.backLabel}
@@ -609,6 +715,13 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
                 placeholder="e.g. 670123456"
                 style={contractInputStyle}
               />
+              <p style={contractPrivacyNoticeStyle}>
+                {text.contractPrivacyPrefix}
+                <Link href="/datenschutz" target="_blank" rel="noreferrer" style={contractPrivacyLinkStyle}>
+                  {text.contractPrivacyLink}
+                </Link>
+                {text.contractPrivacySuffix}
+              </p>
               {error ? <p style={errorStyle}>{error}</p> : null}
               <ActionRow
                 backLabel={text.backLabel}
@@ -619,7 +732,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
               />
             </form>
           ) : null}
-          {screen === "mode" || screen === "text" || screen === "video" || screen === "contract" ? (
+          {screen === "mode" || screen === "text" || screen === "contract" ? (
             <img
               className={`fragmento-entry-figure fragmento-entry-figure--${screen}`}
               src="/img/FIGURA.png"
@@ -833,6 +946,7 @@ const textBlankLineStyle = {
 };
 
 const videoFrameStyle = {
+  position: "relative",
   width: "100%",
   minHeight: 340,
   borderRadius: 12,
@@ -844,6 +958,68 @@ const videoStyle = {
   width: "100%",
   display: "block",
   maxHeight: 360,
+  cursor: "pointer",
+};
+
+const videoPlaybackButtonStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 64,
+  height: 64,
+  display: "grid",
+  placeItems: "center",
+  border: "1px solid rgba(255, 255, 255, 0.72)",
+  borderRadius: "50%",
+  background: "rgba(31, 24, 18, 0.7)",
+  color: "#ffffff",
+  cursor: "pointer",
+  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.28)",
+};
+
+const videoPlayIconStyle = {
+  width: 0,
+  height: 0,
+  marginLeft: 5,
+  borderTop: "11px solid transparent",
+  borderBottom: "11px solid transparent",
+  borderLeft: "17px solid #ffffff",
+};
+
+const videoPauseIconStyle = {
+  width: 17,
+  height: 22,
+  borderLeft: "6px solid #ffffff",
+  borderRight: "6px solid #ffffff",
+};
+
+const videoTimelineStyle = {
+  position: "absolute",
+  right: 14,
+  bottom: 12,
+  left: 14,
+  display: "grid",
+  gridTemplateColumns: "36px minmax(0, 1fr) 36px",
+  alignItems: "center",
+  gap: 8,
+  padding: "7px 10px",
+  borderRadius: 10,
+  background: "rgba(31, 24, 18, 0.72)",
+};
+
+const videoSeekStyle = {
+  width: "100%",
+  margin: 0,
+  cursor: "pointer",
+  accentColor: "#c18a45",
+};
+
+const videoTimeStyle = {
+  color: "#ffffff",
+  fontSize: 12,
+  fontVariantNumeric: "tabular-nums",
+  textAlign: "center",
 };
 
 const contractInfoCardStyle = {
@@ -896,6 +1072,20 @@ const contractInputStyle = {
   padding: "14px 12px",
   fontSize: 16,
   color: "#2f2924",
+};
+
+const contractPrivacyNoticeStyle = {
+  margin: "9px 0 0",
+  color: "#6a625a",
+  fontSize: 13,
+  lineHeight: 1.45,
+};
+
+const contractPrivacyLinkStyle = {
+  color: "#76552f",
+  fontWeight: 700,
+  textDecoration: "underline",
+  textUnderlineOffset: 2,
 };
 
 const footerRowStyle = {
@@ -1001,6 +1191,10 @@ const responsivePanelMedia = `
 
     .fragmento-entry-language-footer {
       margin-top: 12px !important;
+    }
+
+    .fragmento-entry-video-frame {
+      min-height: 0 !important;
     }
 
     .fragmento-entry-figure--text,

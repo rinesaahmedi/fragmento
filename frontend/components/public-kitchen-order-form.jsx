@@ -357,6 +357,11 @@ export default function PublicKitchenOrderForm({
         <div className={styles.panelHeader}>
           <div>
             <h2>{translate("order.title", "Complete order")}</h2>
+            {!isOrderSaved ? (
+              <small className={styles.orderHelp}>
+                {translate("order.requiredHint", "Fields marked with * are required.")}
+              </small>
+            ) : null}
           </div>
         </div>
         {isOrderSaved ? (
@@ -409,7 +414,6 @@ export default function PublicKitchenOrderForm({
             onInvalidCapture={() => setHasTriedSubmit(true)}
           >
             <input id="contractNumber" type="hidden" value={customer.contractNumber} readOnly />
-
             <div className={styles.orderSectionCard}>
               <div className={styles.orderSectionHeader}>
                 <div>
@@ -717,7 +721,6 @@ export default function PublicKitchenOrderForm({
                 "After payment, please wait until Stripe redirects you back to Fragmento. Your order is complete when you see the confirmation screen.",
               )}
             </small>
-            <small className={styles.orderHelp}>{translate("order.requiredHint", "Fields marked with * are required.")}</small>
           </div>
           </form>
         )}

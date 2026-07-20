@@ -618,8 +618,6 @@
 }
 
 /* Hover/preview: a light green tint (previews "this becomes one of my selections"). */
-.planHotspot:hover,
-.planHotspot:focus-visible,
 .planHotspotHover {
   border-color: rgba(42, 145, 85, 0.8);
   background: rgba(62, 188, 116, 0.2);
@@ -627,11 +625,27 @@
   outline: none;
 }
 
-.planHotspotPolygon:hover,
-.planHotspotPolygon:focus-visible,
 .planHotspotPolygon.planHotspotHover {
   border-color: rgba(42, 145, 85, 0.82);
   box-shadow: inset 0 0 0 1px rgba(42, 145, 85, 0.34);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .planHotspot:hover {
+    border-color: rgba(42, 145, 85, 0.8);
+    background: rgba(62, 188, 116, 0.2);
+    box-shadow: 0 6px 18px rgba(15, 57, 37, 0.16);
+  }
+
+  .planHotspotPolygon:hover {
+    border-color: rgba(42, 145, 85, 0.82);
+    box-shadow: inset 0 0 0 1px rgba(42, 145, 85, 0.34);
+  }
+}
+
+.planHotspot:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.72);
+  outline-offset: 2px;
 }
 
 /* Selected by the user: solid green. */
@@ -1017,6 +1031,14 @@
   max-height: calc(100vh - 24px);
   padding: 0 0 18px;
   overflow: hidden;
+}
+
+.legendMobileText {
+  display: none;
+}
+
+.resetMobileText {
+  display: none;
 }
 
 .sidebarHeader {
@@ -3977,7 +3999,7 @@
 
   .planColumn {
     z-index: 5;
-    background: #f5efe7;
+    background: transparent;
     padding-bottom: 12px;
   }
 
@@ -4015,9 +4037,10 @@
 }
 
 @media (max-width: 1100px) and (min-height: 760px) {
-  .planColumn {
+  .planStickyPrice {
     position: sticky;
     top: 0;
+    z-index: 6;
   }
 }
 
@@ -4091,28 +4114,34 @@
   }
 
   .productAssistantLauncher {
-    min-width: 108px;
-    min-height: 116px;
+    width: 58px;
+    min-width: 58px;
+    height: 58px;
+    min-height: 58px;
     margin: 0 12px 12px auto;
+    border: 1px solid rgba(42, 145, 85, 0.28);
+    border-radius: 50%;
+    background: #fffdf9;
+    box-shadow: 0 8px 22px rgba(36, 24, 13, 0.16);
+    overflow: hidden;
     pointer-events: auto;
   }
 
   .productAssistantLauncherBubble {
-    right: 78px;
-    bottom: 72px;
-    max-width: min(170px, calc(100vw - 96px));
-    font-size: 0.86rem;
+    display: none;
   }
 
   .productAssistantLauncherAvatar {
-    width: 86px;
-    height: 104px;
-    bottom: 8px;
+    inset: 3px;
+    width: 52px;
+    height: 52px;
+    filter: none;
   }
 
   .productAssistantLauncherAvatar img {
     width: 100%;
     height: 100%;
+    transform: none;
   }
 
   .productAssistantRestore {
@@ -4130,24 +4159,69 @@
 
   .header {
     grid-template-columns: 1fr;
-    grid-template-areas:
-      "brand"
-      "price";
+    grid-template-areas: "brand";
     justify-items: start;
   }
 
   .topNavControls {
+    width: 100%;
+    justify-content: space-between;
     flex-wrap: wrap;
+  }
+
+  .planColumn {
+    gap: 12px;
+    padding-bottom: 8px;
+  }
+
+  .stageHeader {
+    gap: 8px;
+    padding: 14px 14px 0;
+  }
+
+  .stageHeaderActions {
+    gap: 6px;
+  }
+
+  .stageHeader .ghostButton {
+    min-height: 44px;
+    padding: 7px 11px;
+    font-size: 0.84rem;
+    line-height: 1.15;
+  }
+
+  .resetDesktopText {
+    display: none;
+  }
+
+  .resetMobileText {
+    display: inline;
+  }
+
+  .stageBody {
+    padding: 12px;
+  }
+
+  .legendDesktopText {
+    display: none;
+  }
+
+  .legendMobileText {
+    display: inline;
   }
 
   .brand {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .logoMark {
+    margin-inline: auto;
   }
 
   .pricePill {
-    justify-items: start;
-    text-align: left;
+    display: none;
   }
 
   .orderForm {
