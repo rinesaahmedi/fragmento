@@ -1,4 +1,5 @@
 import { ItemType, KitchenStatus } from "@prisma/client";
+import Link from "next/link";
 import {
   ActionLink,
   AdminSection,
@@ -662,10 +663,16 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               const isRequestedEdit = requestedEditId === item.id;
               const previewMarkup = imagePreview ? "" : buildCatalogPreviewMarkup(kitchenSvgMarkup, previewSlug, item.componentKey);
               const iconMarkup = item.componentKey ? "" : (ITEM_ICON_MARKUP[item.iconKey] || "");
+              const editParams = new URLSearchParams();
+              if (itemSearchQuery) editParams.set("itemSearch", itemSearchQuery);
+              if (itemTypeFilter) editParams.set("itemType", itemTypeFilter);
+              if (itemStatusFilter) editParams.set("itemStatus", itemStatusFilter);
+              editParams.set("edit", item.id);
+              const editHref = `/admin/kitchens/${kitchen.id}?${editParams.toString()}#item-${item.id}`;
 
               return (
-                <details key={item.id} id={`item-${item.id}`} open={isRequestedEdit} className="kitchen-catalog-item-card" style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
-                  <summary className="kitchen-catalog-item-card__summary" style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
+                <article key={item.id} id={`item-${item.id}`} className="kitchen-catalog-item-card" style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
+                  <div className="kitchen-catalog-item-card__summary" style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
                     <div className="kitchen-catalog-item-card__main" style={compactSummaryMainStyle}>
                       <strong className="kitchen-catalog-item-card__title" style={{ fontSize: "1.05rem" }}>{item.name}</strong>
                       <div className="kitchen-catalog-item-card__meta" style={subMetaStyle}>
@@ -687,10 +694,13 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     />
                     <div className="kitchen-catalog-item-card__actions" style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
                       <AdminStatusBadge status={item.isActive ? "ACTIVE" : "ARCHIVED"} />
-                      <span style={editHintStyle}><AdminText i18nKey="kitchenDetailAdmin.edit" fallback="Edit" /></span>
+                      <Link href={editHref} scroll={false} style={editHintStyle}>
+                        <AdminText i18nKey="kitchenDetailAdmin.edit" fallback="Edit" />
+                      </Link>
                     </div>
-                  </summary>
+                  </div>
 
+                  {isRequestedEdit ? (
                   <form action={`/api/admin/items/${item.id}`} method="post" style={compactFormStyle}>
                     <div style={compactTopGridStyle}>
                       <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />} wide={false}>
@@ -774,7 +784,8 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       </div>
                     </div>
                   </form>
-                </details>
+                  ) : null}
+                </article>
               );
             })}
           </div>

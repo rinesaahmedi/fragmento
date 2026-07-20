@@ -653,6 +653,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
                 </video>
                 <button
                   type="button"
+                  className="fragmento-entry-video-control"
                   style={videoPlaybackButtonStyle}
                   onClick={toggleVideoPlayback}
                   aria-label={isVideoPlaying ? "Pause video" : "Play video"}
@@ -662,7 +663,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
                     style={isVideoPlaying ? videoPauseIconStyle : videoPlayIconStyle}
                   />
                 </button>
-                <div style={videoTimelineStyle}>
+                <div className="fragmento-entry-video-control" style={videoTimelineStyle}>
                   <span style={videoTimeStyle}>{formatVideoTime(videoCurrentTime)}</span>
                   <input
                     type="range"
@@ -1178,6 +1179,18 @@ const languageFigureStyle = {
 };
 
 const responsivePanelMedia = `
+  .fragmento-entry-video-control {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease, background-color 160ms ease;
+  }
+
+  .fragmento-entry-video-frame:hover .fragmento-entry-video-control,
+  .fragmento-entry-video-frame:focus-within .fragmento-entry-video-control {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
   @media (max-width: 720px) {
     .fragmento-entry-panel-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;

@@ -22,6 +22,7 @@ import {
   AdminText,
 } from "../../../../components/admin-i18n";
 import { OrderActionButton, OrderActionFeedback } from "../../../../components/admin-order-action-buttons";
+import { AdminOrderAs400Form } from "../../../../components/admin-order-as400-form";
 import { OrderEmailReviewModal } from "../../../../components/order-email-review-modal";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -191,6 +192,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
   const paymentLink = getFormMessage(resolvedSearchParams, "paymentLink");
+  const as400Saved = resolvedSearchParams.as400Saved === "1";
   const canConfirm = order.status === OrderStatus.NEW;
   const canResendEmail = order.status === OrderStatus.CONFIRMED || order.status === OrderStatus.EMAILED;
   const canCancel = order.status !== OrderStatus.CANCELLED;
@@ -222,28 +224,11 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
             </div>
           }
         >
-          <form action={`/api/admin/orders/${order.id}`} method="post" style={as400HeaderFormStyle}>
-            <label htmlFor="as400Number" style={detailLabelStyle}>
-              <AdminText i18nKey="orderDetailAdmin.as400Number" fallback="AS 400" />
-            </label>
-            <div style={as400EditorStyle}>
-              <input
-                id="as400Number"
-                name="as400Number"
-                type="text"
-                inputMode="numeric"
-                pattern="[0-9]*"
-                maxLength={50}
-                defaultValue={order.as400Number || ""}
-                placeholder="123456"
-                aria-label="AS 400"
-                style={as400InputStyle}
-              />
-              <button type="submit" name="_intent" value="update-as400" style={as400SaveButtonStyle}>
-                <AdminText i18nKey="orderDetailAdmin.saveAs400" fallback="Save" />
-              </button>
-            </div>
-          </form>
+          <AdminOrderAs400Form
+            orderId={order.id}
+            initialValue={order.as400Number || ""}
+            initialSaved={as400Saved}
+          />
 
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
@@ -656,40 +641,6 @@ const actionMetricStyle = {
   borderRadius: 10,
   background: "rgba(255,255,255,0.78)",
   padding: "12px 14px",
-};
-
-const as400EditorStyle = {
-  display: "flex",
-  gap: 8,
-  alignItems: "stretch",
-};
-
-const as400HeaderFormStyle = {
-  display: "grid",
-  gap: 2,
-  width: "min(100%, 420px)",
-  margin: "-8px 0 4px",
-};
-
-const as400InputStyle = {
-  minWidth: 0,
-  flex: 1,
-  border: "1px solid var(--app-border-strong)",
-  borderRadius: 9,
-  background: "#fff",
-  color: "var(--app-text)",
-  padding: "10px 12px",
-  font: "inherit",
-};
-
-const as400SaveButtonStyle = {
-  border: "1px solid var(--app-accent)",
-  borderRadius: 9,
-  background: "var(--app-accent)",
-  color: "#fff",
-  padding: "10px 14px",
-  fontWeight: 800,
-  cursor: "pointer",
 };
 
 const actionButtonsStyle = {

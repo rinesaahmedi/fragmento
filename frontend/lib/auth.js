@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { cache } from "react";
 import { prisma } from "./prisma";
 
 const SESSION_COOKIE = "fragmento_admin_session";
@@ -119,7 +120,7 @@ export async function clearAdminSession() {
   cookieStore.delete(PENDING_LOGIN_COOKIE);
 }
 
-export async function getAdminSession() {
+export const getAdminSession = cache(async function getAdminSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get(SESSION_COOKIE)?.value;
   const payload = decodeSession(token);
@@ -133,7 +134,7 @@ export async function getAdminSession() {
   }
 
   return admin;
-}
+});
 
 export async function requireAdminPage() {
   try {

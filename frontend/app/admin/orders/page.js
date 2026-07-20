@@ -13,6 +13,7 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminPagination } from "../../../components/admin-pagination";
 import {
   AdminDateTime,
   AdminKitchenDisplayName,
@@ -26,6 +27,7 @@ import AdminConfirmSubmitButton from "../../../components/admin-confirm-submit-b
 import { getFormMessage } from "../../../lib/admin-forms";
 import { getOrdersForAdmin, listKitchensForAdmin } from "../../../lib/catalog";
 import { requireAdminPage } from "../../../lib/auth";
+import { paginateAdminItems } from "../../../lib/admin-pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -172,13 +174,15 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
     dateFrom: normalizeParam(resolvedSearchParams.dateFrom).trim(),
     dateTo: normalizeParam(resolvedSearchParams.dateTo).trim(),
   };
-  const [orders, kitchens] = await Promise.all([
+  const [allOrders, kitchens] = await Promise.all([
     getOrdersForAdmin(filters),
     listKitchensForAdmin(),
   ]);
+  const pagination = paginateAdminItems(allOrders, resolvedSearchParams.page);
+  const orders = pagination.items;
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
-  const summary = getOrderSummary(orders);
+  const summary = getOrderSummary(allOrders);
   const statusFilters = [
     { status: "", key: "ordersAdmin.all", fallback: "All" },
     { status: "NEW", key: "dashboard.statusNew", fallback: "New" },
@@ -438,6 +442,8 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
               );
             })}
           </div>
+
+          <AdminPagination basePath="/admin/orders" searchParams={resolvedSearchParams} {...pagination} />
 
           <style>{`
             .admin-list-cards {

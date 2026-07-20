@@ -63,7 +63,7 @@ export async function POST(request, { params }) {
 
     if (intent === "update-as400") {
       await updateOrderAs400Number(id, formData.get("as400Number"));
-      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "AS 400 number saved.");
+      return NextResponse.redirect(new URL(`/admin/orders/${id}?as400Saved=1`, request.url), 303);
     }
 
     if (intent === "resend-email") {

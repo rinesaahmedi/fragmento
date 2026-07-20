@@ -297,26 +297,12 @@ async function attachCutleryCatalogVariants(kitchen) {
 }
 
 export async function listKitchensForAdmin() {
-  const kitchens = await prisma.kitchen.findMany({
+  return prisma.kitchen.findMany({
     include: {
       _count: { select: { items: true, orders: true, contracts: true } },
     },
     orderBy: { createdAt: "desc" },
   });
-
-  try {
-    const codes = await prisma.$queryRaw`
-      SELECT "id", "kitchenCode"
-      FROM "Kitchen"
-    `;
-    const codeById = new Map(codes.map((row) => [row.id, row.kitchenCode || null]));
-    return kitchens.map((kitchen) => ({
-      ...kitchen,
-      kitchenCode: codeById.get(kitchen.id) || null,
-    }));
-  } catch {
-    return kitchens;
-  }
 }
 
 export async function listKitchenItemCodeOptionsForAdmin() {
@@ -1250,19 +1236,15 @@ async function getOrdersForAdminByKind(filters = {}, orderKind = ORDER_KIND_LIVE
     where,
     include: {
       kitchen: {
-        include: {
-          items: {
-            include: { catalogArticle: true, catalogBlende: true, catalogService: true },
-          },
-        },
+        select: { id: true, slug: true, name: true },
       },
-      kitchenContract: true,
-      items: true,
+      kitchenContract: { select: { id: true, contractNumber: true } },
+      items: { select: { id: true, code: true } },
     },
     orderBy: { createdAt: "desc" },
   });
 
-  return addContractOrderSequence(await attachHousingCompaniesToOrderContracts(orders), orderKind);
+  return addContractOrderSequence(orders, orderKind);
 }
 
 export async function getOrderById(id) {

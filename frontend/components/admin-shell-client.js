@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { AdminI18nProvider, AdminLanguageSwitcher, AdminText, useAdminI18n } from "./admin-i18n";
 
 const navItems = [
@@ -41,8 +41,22 @@ export function AdminShellClient({ adminEmail, adminRole = "ADMIN", initialLangu
 
 function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav, children }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { translate } = useAdminI18n();
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [pendingHref, setPendingHref] = useState("");
+
+  useEffect(() => {
+    setPendingHref("");
+  }, [pathname]);
+
+  function prepareNavigation(href) {
+    if (href.startsWith("/admin")) router.prefetch(href);
+  }
+
+  function startNavigation(href) {
+    if (href !== pathname) setPendingHref(href);
+  }
   const visibleNavItems = navItems.filter((item) => {
     if (item.requiresClaimsNav && !showClaimsNav) return false;
     if (item.requiresUsersNav && !showUsersNav) return false;
@@ -65,6 +79,7 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
         fontFamily: "Manrope, sans-serif",
       }}
     >
+      {pendingHref ? <div className="admin-navigation-progress" aria-label="Loading" /> : null}
       <div
         aria-hidden="true"
         style={{
@@ -187,8 +202,13 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
                   <Link
                     key={`mobile-${item.href}`}
                     href={item.href}
-                    prefetch={false}
-                    onClick={() => setIsMobileNavOpen(false)}
+                    prefetch
+                    onMouseEnter={() => prepareNavigation(item.href)}
+                    onFocus={() => prepareNavigation(item.href)}
+                    onClick={() => {
+                      startNavigation(item.href);
+                      setIsMobileNavOpen(false);
+                    }}
                     style={{
                       ...mobileSidebarLinkStyle,
                       background: active ? "var(--color-primary-soft)" : "transparent",
@@ -284,7 +304,10 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
                 <Link
                   key={item.href}
                   href={item.href}
-                  prefetch={false}
+                  prefetch
+                  onMouseEnter={() => prepareNavigation(item.href)}
+                  onFocus={() => prepareNavigation(item.href)}
+                  onClick={() => startNavigation(item.href)}
                   style={{
                     textDecoration: "none",
                     display: "flex",
@@ -437,6 +460,25 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
         </div>
 
         <style>{`
+          .admin-navigation-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 120;
+            width: 38%;
+            height: 3px;
+            border-radius: 0 999px 999px 0;
+            background: var(--app-accent);
+            box-shadow: 0 0 14px rgba(143, 62, 44, 0.48);
+            animation: admin-navigation-progress 900ms ease-in-out infinite;
+          }
+
+          @keyframes admin-navigation-progress {
+            0% { transform: translateX(-105%); }
+            55% { transform: translateX(125%); }
+            100% { transform: translateX(265%); }
+          }
+
           @media (max-width: 960px) {
             .admin-shell__mobile-nav {
               display: flex !important;

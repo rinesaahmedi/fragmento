@@ -11,6 +11,7 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminPagination } from "../../../components/admin-pagination";
 import { AdminDateTime, AdminPluralText, AdminText, AdminTranslatedInput } from "../../../components/admin-i18n";
 import AdminSelect from "../../../components/admin-select";
 import AdminConfirmSubmitButton from "../../../components/admin-confirm-submit-button";
@@ -20,6 +21,7 @@ import { requireAdminClaimsPage } from "../../../lib/admin-claims-access";
 import { prisma } from "../../../lib/prisma";
 import { formatServiceClaimProblemAreaList } from "../../../lib/service-claim-problem-areas";
 import { queryServiceClaimsList } from "../../../lib/service-claim-admin-query";
+import { paginateAdminItems } from "../../../lib/admin-pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -63,10 +65,12 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
-  const [claims, cityOptions] = await Promise.all([
+  const [allClaims, cityOptions] = await Promise.all([
     queryServiceClaimsList(prisma, filters),
     listClaimCities(),
   ]);
+  const pagination = paginateAdminItems(allClaims, resolvedSearchParams.page);
+  const claims = pagination.items;
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -212,6 +216,8 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
               </article>
             ))}
           </div>
+
+          <AdminPagination basePath="/admin/claims" searchParams={resolvedSearchParams} {...pagination} />
 
           <style>{`
             .admin-claims-cards {

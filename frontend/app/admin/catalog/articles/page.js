@@ -26,6 +26,7 @@ import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
 import { ItemType } from "@prisma/client";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +39,18 @@ function formatBoolean(value) {
 }
 
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
+const CATALOG_EDIT_PARAMS = ["editArticle", "editBlende", "editService", "editClaimProduct"];
+
+function buildCatalogEditHref(searchParams, key, id) {
+  const params = new URLSearchParams();
+  Object.entries(searchParams || {}).forEach(([paramKey, rawValue]) => {
+    if (CATALOG_EDIT_PARAMS.includes(paramKey)) return;
+    const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+    if (value != null && String(value).trim()) params.set(paramKey, String(value));
+  });
+  params.set(key, id);
+  return `/admin/catalog/articles?${params.toString()}`;
+}
 
 function uniqueValues(values) {
   return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))];
@@ -270,6 +283,10 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
   const resolvedSearchParams = await searchParams;
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
+  const editArticleId = String(resolvedSearchParams?.editArticle || "");
+  const editBlendeId = String(resolvedSearchParams?.editBlende || "");
+  const editServiceId = String(resolvedSearchParams?.editService || "");
+  const editClaimProductId = String(resolvedSearchParams?.editClaimProduct || "");
   const [articles, blenden, services, claimProducts] = await Promise.all([
     prisma.$queryRaw`
     SELECT
@@ -405,10 +422,14 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       <tr>
                         <td colSpan={9} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
-                            <details style={editDetailsStyle}>
-                              <summary style={editSummaryStyle}>Edit</summary>
-                              <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
-                            </details>
+                            {editArticleId === article.id ? (
+                              <details open style={editDetailsStyle}>
+                                <summary style={editSummaryStyle}>Editing</summary>
+                                <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
+                              </details>
+                            ) : (
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editArticle", article.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                            )}
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/articles/${article.id}`}
                               entityLabel="Article"
@@ -464,10 +485,14 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       <tr>
                         <td colSpan={7} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
-                            <details style={editDetailsStyle}>
-                              <summary style={editSummaryStyle}>Edit</summary>
-                              <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
-                            </details>
+                            {editBlendeId === blende.id ? (
+                              <details open style={editDetailsStyle}>
+                                <summary style={editSummaryStyle}>Editing</summary>
+                                <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
+                              </details>
+                            ) : (
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editBlende", blende.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                            )}
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/blenden/${blende.id}`}
                               entityLabel="Blende"
@@ -523,10 +548,14 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       <tr>
                         <td colSpan={7} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
-                            <details style={editDetailsStyle}>
-                              <summary style={editSummaryStyle}>Edit</summary>
-                              <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
-                            </details>
+                            {editServiceId === service.id ? (
+                              <details open style={editDetailsStyle}>
+                                <summary style={editSummaryStyle}>Editing</summary>
+                                <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
+                              </details>
+                            ) : (
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editService", service.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                            )}
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/services/${service.id}`}
                               entityLabel="Service"
@@ -582,14 +611,18 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                       <tr>
                         <td colSpan={7} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
-                            <details style={editDetailsStyle}>
-                              <summary style={editSummaryStyle}>Edit</summary>
-                              <ClaimProductForm
-                                action={`/api/admin/catalog/claim-products/${claimProduct.id}`}
-                                claimProduct={claimProduct}
-                                submitLabel="Save claim product"
-                              />
-                            </details>
+                            {editClaimProductId === claimProduct.id ? (
+                              <details open style={editDetailsStyle}>
+                                <summary style={editSummaryStyle}>Editing</summary>
+                                <ClaimProductForm
+                                  action={`/api/admin/catalog/claim-products/${claimProduct.id}`}
+                                  claimProduct={claimProduct}
+                                  submitLabel="Save claim product"
+                                />
+                              </details>
+                            ) : (
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editClaimProduct", claimProduct.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                            )}
                           </div>
                         </td>
                       </tr>

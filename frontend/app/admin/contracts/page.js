@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { Fragment } from "react";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminPagination } from "../../../components/admin-pagination";
 import AdminContractsFilters from "../../../components/admin-contracts-filters";
 import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
 import AdminContractLinkFields from "../../../components/admin-contract-link-fields";
@@ -19,6 +20,7 @@ import AdminSelect from "../../../components/admin-select";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listKitchenContractsForAdmin, listKitchensForAdmin, listProjectsForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
+import { paginateAdminItems } from "../../../lib/admin-pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -262,12 +264,14 @@ export default async function AdminContractsPage({ searchParams = {} }) {
   };
   const returnTo = `/admin/contracts?${new URLSearchParams(Object.entries(filters).filter(([, value]) => value)).toString()}`;
 
-  const [kitchens, owners, projects, contracts] = await Promise.all([
+  const [kitchens, owners, projects, allContracts] = await Promise.all([
     listKitchensForAdmin(),
     listPropertyOwnersForAdmin(),
     listProjectsForAdmin(),
     listKitchenContractsForAdmin(filters),
   ]);
+  const pagination = paginateAdminItems(allContracts, resolvedSearchParams.page);
+  const contracts = pagination.items;
   const successMessage = getFormMessage(resolvedSearchParams, "success");
   const errorMessage = getFormMessage(resolvedSearchParams, "error");
 
@@ -324,7 +328,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
 
         <AdminSection
           title={<AdminText i18nKey="contractsAdmin.configuredContracts" fallback="Contract Numbers" />}
-          description={<AdminText i18nKey="contractsAdmin.contractNumbersMatchCurrentFilters" fallback="{count} contract numbers match the current filters." values={{ count: String(contracts.length) }} />}
+          description={<AdminText i18nKey="contractsAdmin.contractNumbersMatchCurrentFilters" fallback="{count} contract numbers match the current filters." values={{ count: String(pagination.totalItems) }} />}
         >
           <div className="contract-card-list" style={contractCardListStyle}>
             {!contracts.length ? <p style={mutedTextStyle}><AdminText i18nKey="contractsAdmin.noContractNumbersMatchCurrentFilters" fallback="No contract numbers match the current filters." /></p> : null}
@@ -395,6 +399,8 @@ export default async function AdminContractsPage({ searchParams = {} }) {
               </article>
             ))}
           </div>
+
+          <AdminPagination basePath="/admin/contracts" searchParams={resolvedSearchParams} {...pagination} />
 
           <style>{`
             .create-contract-summary::-webkit-details-marker {

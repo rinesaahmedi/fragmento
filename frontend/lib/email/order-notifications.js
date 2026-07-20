@@ -857,6 +857,7 @@ function normalizeExcludedAttachmentKeys(input = []) {
 async function loadProductInfoAttachments(order, options = {}) {
   const selectedItems = getPaidConfirmationItems([...order.components, ...order.accessories, ...order.services]);
   const excludedAttachmentKeys = normalizeExcludedAttachmentKeys(options.excludedAttachmentKeys);
+  const includeContent = options.includeContent !== false;
   const seenAssetPaths = new Set();
   const attachments = [];
   const labels = [];
@@ -873,12 +874,16 @@ async function loadProductInfoAttachments(order, options = {}) {
 
       try {
         const absolutePath = await resolvePublicAssetPath(assetPath);
-        const content = await fs.readFile(absolutePath);
-        attachments.push({
-          filename: buildProductInfoFilename(item, assetPath),
-          content,
-          contentType: "application/pdf",
-        });
+        if (includeContent) {
+          const content = await fs.readFile(absolutePath);
+          attachments.push({
+            filename: buildProductInfoFilename(item, assetPath),
+            content,
+            contentType: "application/pdf",
+          });
+        } else {
+          await fs.access(absolutePath);
+        }
         const label = getItemDisplayName(item) || document.label || path.basename(assetPath, ".pdf");
         labels.push(label);
         links.push({ key: attachmentKey, label, href: `/${assetPath}` });
@@ -1628,6 +1633,7 @@ export function buildOrderSummaryHtml(order) {
 export async function buildOrderConfirmationEmailStaticHtml(order, options = {}) {
   const productInfo = await loadProductInfoAttachments(order, {
     excludedAttachmentKeys: options.excludedAttachmentKeys,
+    includeContent: false,
   });
   const productInfoHtml = productInfo.labels.length
     ? `<div style="margin:16px 0 0;font-family:Arial,sans-serif;color:#333;">

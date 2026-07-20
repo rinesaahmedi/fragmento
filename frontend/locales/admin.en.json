@@ -875,6 +875,8 @@
     "contractNumber": "Contract number",
     "as400Number": "AS 400",
     "saveAs400": "Save",
+    "savingAs400": "Saving...",
+    "as400Saved": "Saved",
     "notProvided": "Not provided",
     "noHousingCompanySelected": "No housing company selected",
     "noProjectSelected": "No project selected",

@@ -377,6 +377,9 @@ model Order {
   items                   OrderItem[]
 
   @@index([kitchenContractId])
+  @@index([kitchenContractId, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
 }
 
 model TestOrder {
@@ -410,6 +413,9 @@ model TestOrder {
   items                   TestOrderItem[]
 
   @@index([kitchenContractId])
+  @@index([kitchenContractId, createdAt])
+  @@index([status, createdAt])
+  @@index([createdAt])
 }
 
 model KitchenContract {
@@ -523,6 +529,8 @@ model OrderItem {
   priceSnapshot         Decimal      @db.Decimal(10, 2)
   quantity              Int          @default(1)
   createdAt             DateTime     @default(now())
+
+  @@index([orderId])
 }
 
 model TestOrderItem {
@@ -539,6 +547,8 @@ model TestOrderItem {
   priceSnapshot         Decimal      @db.Decimal(10, 2)
   quantity              Int          @default(1)
   createdAt             DateTime     @default(now())
+
+  @@index([orderId])
 }
 
 model ServiceClaim {
