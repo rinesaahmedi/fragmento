@@ -969,7 +969,8 @@ function buildBlendeDisplayItem(item) {
 
   const blendeCode = String(item?.blendeCode || blendeLabel).trim();
   const blendePrice = item?.blendePrice == null ? 0 : Number(item.blendePrice || 0);
-  const blendeQuantity = Math.max(parseTrailingQuantity(blendeLabel), parseTrailingQuantity(blendeCode));
+  const storedQuantity = Math.max(1, Math.floor(Number(item?.catalogBlendeQuantity || 1)));
+  const blendeQuantity = Math.max(storedQuantity, parseTrailingQuantity(blendeLabel), parseTrailingQuantity(blendeCode));
   const catalogDisplayName = String(item?.blendeNameDe || item?.blendeName || "").trim();
   const displayLabel = catalogDisplayName || stripLeadingBlendePrefix(stripTrailingQuantity(blendeLabel));
   const displayCode = stripTrailingQuantity(blendeCode);

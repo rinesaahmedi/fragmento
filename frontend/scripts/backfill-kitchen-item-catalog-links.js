@@ -126,6 +126,7 @@ function buildSeedRows(seed) {
 
 function normalizeBlendeCode(value) {
   const code = String(value || "").trim().toUpperCase();
+  if (code.startsWith("HPEF4302")) return "HPEF4302";
   if (code.startsWith("UPK20")) return "UPK20";
   if (code.startsWith("UPEF65")) return "UPEF65";
   if (code.startsWith("HPK2002")) return "HPK2002";

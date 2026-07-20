@@ -70,7 +70,7 @@ const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
 
 const ARTICLE_PRICES = {
   "517467": 89,
-  "A-EGSPV587915 + TGV45": 498,
+  "A-EGSPV587915 + TGV45": 450,
   "A-EGSPV597210 + TGV60": 579,
   "EWA34660W + TGV60 + WU16": 639,
   "FH 664 621 E": 349,
@@ -176,11 +176,56 @@ const CATALOG_ARTICLES = [
   { articleNumber: "ZB90SG", name: "Cutlery insert 90 cm", nameDe: "Besteckeinsatz 90 cm", price: "31.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
 ];
 
+// Canonical catalog values exported from the live Fragmento server. Seeded
+// kitchen items must reference these records instead of carrying an independent
+// article definition.
+const LIVE_CATALOG_ARTICLE_OVERRIDES = {
+  "A-EGSPV587915 + TGV45": { price: "450.00" },
+  "A-EGSPV597210 + TGV60": { name: "Fully Integrated Dishwasher incl. Furniture Front", widthMm: 600 },
+  "EWA34660W + TGV60 + WU16": { name: "Washing machine + Front + Side Panel" },
+  "FH664621E + FWK124 + HD6002": {
+    name: "Flat screen Extractor hood + Cabinet + Filter 60 cm",
+    nameDe: "Flachschirmhaube + Schrank + Filter 60 cm",
+    widthMm: 600,
+  },
+  H10002: { heightMm: 723 },
+  H3002: { heightMm: 723 },
+  H4002: { heightMm: 723 },
+  H4502: { heightMm: 723 },
+  H5002: { heightMm: 723 },
+  H6002: { heightMm: 723 },
+  H8002: { heightMm: 723 },
+  H9002: { heightMm: 723 },
+  "KHF664611S + FWP18": { name: "Angled Extractor Hood + filter" },
+  "OL-KGCN388140E": { widthMm: 540, depthMm: null },
+  US30: { name: "Lower cabinet with Drawer 30 cm" },
+  US40: { name: "Lower cabinet with Drawer 40 cm" },
+  US45: { name: "Lower cabinet with Drawer 45 cm" },
+  US50: { name: "Lower cabinet with Drawer 50 cm" },
+  US60: { name: "Lower cabinet with Drawer 60 cm" },
+  US80: { name: "Lower cabinet with Drawer 80 cm" },
+  US90: { name: "Lower cabinet with Drawer 90 cm" },
+  US100: { name: "Lower cabinet with Drawer 100 cm" },
+  US120: { name: "Lower cabinet with Drawer 120 cm" },
+  ZB30SG: { widthMm: 300 },
+  ZB40SG: { widthMm: 400 },
+  ZB45SG: { widthMm: 450 },
+  ZB50SG: { widthMm: 500 },
+  ZB60SG: { widthMm: 600 },
+  ZB80SG: { widthMm: 800 },
+  ZB90SG: { widthMm: 900 },
+  ZB100SG: { widthMm: 1000 },
+};
+
+for (const article of CATALOG_ARTICLES) {
+  Object.assign(article, LIVE_CATALOG_ARTICLE_OVERRIDES[article.articleNumber] || {});
+}
+
 const CATALOG_BLENDEN = [
   { code: "HPEF4302", name: "Corner filler panel for Upper cabinet", nameDe: "Eckpassblende Hängeschrank", price: "150.00", isActive: true },
-  { code: "HPK2002", name: "HPK2002 Filler Panel", nameDe: "HPK2002 Passblende", price: "35.00", isActive: true },
+  { code: "HPK2002", name: "Filler Panel up to 20 cm", nameDe: "Passblende bis 20 cm", price: "35.00", isActive: true },
   { code: "UPEF65", name: "Corner filler panel for Lower cabinet", nameDe: "Eckpassblende Unterschrank", price: "68.00", isActive: true },
-  { code: "UPK20", name: "UPK20 Filler Panel", nameDe: "UPK20 Passblende", price: "25.00", isActive: true },
+  { code: "UPK20", name: "Filler Panel up to 20 cm", nameDe: "Passblende bis 20 cm", price: "25.00", isActive: true },
 ];
 
 const CATALOG_SERVICES = [
@@ -299,6 +344,7 @@ function defaultSinkWorktop(overrides = {}) {
 
 function normalizeBlendeCode(value) {
   const code = String(value || "").trim().toUpperCase();
+  if (code.startsWith("HPEF4302")) return "HPEF4302";
   if (code.startsWith("UPK20")) return "UPK20";
   if (code.startsWith("UPEF65")) return "UPEF65";
   if (code.startsWith("HPK2002")) return "HPK2002";
@@ -1135,17 +1181,17 @@ const AB_105747_ITEMS = [
   ...defaultServices(),
 ];
 
-// These three variants need two corner filler panels on the US30 return cabinet.
-// Keep this separate from AB 105747, which retains its own single UPK20 filler.
+// These three variants use one UPEF65 corner filler panel on the US30 return
+// cabinet. Two UPK20 panels must never be used to represent this corner.
 const AB_105750_105753_105756_ITEMS = AB_105747_ITEMS.map((item) => (
   item.code === "CAB-BASE-AB105747-US30"
     ? {
         ...item,
-        price: articlePriceWithBlende("US30", "UPEF65", 2),
-        infoText: "US30 base storage cabinet with two UPEF65 corner filler panels",
-        blendeCode: "UPEF65 x2",
-        blendeLabel: "UPEF65 Corner filler panel x 2",
-        blendePrice: blendePrice("UPEF65", 2),
+        price: articlePriceWithBlende("US30", "UPEF65", 1),
+        infoText: "US30 base storage cabinet with one UPEF65 corner filler panel",
+        blendeCode: "UPEF65",
+        blendeLabel: "UPEF65 Corner filler panel",
+        blendePrice: blendePrice("UPEF65", 1),
       }
     : item
 ));
@@ -2665,6 +2711,15 @@ async function main() {
   }
 
   await seedCatalogMasterData();
+  const catalogArticleByNumber = new Map(
+    (await prisma.catalogArticle.findMany()).map((article) => [article.articleNumber, article]),
+  );
+  const catalogBlendeByCode = new Map(
+    (await prisma.catalogBlende.findMany()).map((blende) => [blende.code, blende]),
+  );
+  const catalogServiceByCode = new Map(
+    (await prisma.catalogService.findMany()).map((service) => [service.code, service]),
+  );
   await prisma.catalogArticle.updateMany({
     where: { articleNumber: "OL-KGCN388140E" },
     data: {
@@ -2728,6 +2783,15 @@ async function main() {
     for (const rawItem of kitchen.items) {
       const item = applyDefaultCatalogItem(rawItem);
       seededItemCodes.push(item.code);
+      const itemCode = String(item.code || "").trim().toUpperCase();
+      const catalogArticleNumber = item.isActive === false
+        && itemCode.startsWith("HOOD-")
+        && String(item.articleNumber || "").trim() === "FH 664 621 E"
+        ? "FH664621E + FWK124 + HD6002"
+        : String(item.articleNumber || "").trim();
+      const catalogArticle = catalogArticleNumber
+        ? catalogArticleByNumber.get(catalogArticleNumber)
+        : null;
       const productInfo =
         PRODUCT_INFO_BY_CODE[item.code] ||
         PRODUCT_INFO_BY_CODE[rawItem.code] ||
@@ -2735,8 +2799,8 @@ async function main() {
         {};
       // Resolve the item's stored dimensions against the catalog that exists in this database, so
       // the width-based display name (e.g. "Upper Cabinet 60 cm") stays consistent with the dims.
-      const catalogDims = item.articleNumber
-        ? catalogArticleDimsByNumber.get(String(item.articleNumber).trim())
+      const catalogDims = catalogArticleNumber
+        ? catalogArticleDimsByNumber.get(catalogArticleNumber)
         : null;
       const resolvedWidthMm = pickCatalogDimension(catalogDims?.widthMm, item.widthMm);
       const resolvedHeightMm = pickCatalogDimension(catalogDims?.heightMm, item.heightMm);
@@ -2744,7 +2808,6 @@ async function main() {
       const itemForName = { ...item, widthMm: resolvedWidthMm };
       const cabinetWidthName = getCabinetWidthDisplayName(itemForName);
       const cabinetWidthNameDe = getCabinetWidthDisplayName(itemForName, "de");
-      const itemCode = String(item.code || "").trim().toUpperCase();
       const isDishwasherItem = itemCode.startsWith("DISH-")
         || item.iconKey === "dishwasher_base";
       const isRefrigeratorItem = itemCode.startsWith("REF-")
@@ -2780,14 +2843,27 @@ async function main() {
               : isHoodWallCabinetItem
                 ? HOOD_WALL_CABINET_CATALOG_NAME_DE
                 : cabinetWidthNameDe || item.nameDe || null;
+      const normalizedBlendeCode = normalizeBlendeCode(item.blendeCode);
+      const catalogBlende = normalizedBlendeCode
+        ? catalogBlendeByCode.get(normalizedBlendeCode)
+        : null;
+      const catalogServiceCode = item.code === "SVC-MONTAGE-001"
+        ? "MONTAGE"
+        : item.code === "SVC-PICKUP-001"
+          ? "PICKUP"
+          : "";
+      const catalogService = catalogServiceCode
+        ? catalogServiceByCode.get(catalogServiceCode)
+        : null;
+      const catalogBlendeQuantity = catalogBlende ? 1 : null;
       const data = {
         ...productInfo,
         productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
         itemType: item.itemType,
         code: item.code,
-        articleNumber: item.articleNumber || null,
-        name: itemName,
-        nameDe: itemNameDe,
+        articleNumber: catalogArticle?.articleNumber || item.articleNumber || null,
+        name: catalogArticle?.name || itemName,
+        nameDe: catalogArticle?.nameDe || itemNameDe,
         price: item.price,
         widthMm: resolvedWidthMm,
         heightMm: resolvedHeightMm,
@@ -2799,9 +2875,14 @@ async function main() {
         sortOrder: item.sortOrder || 0,
         isLocked: Boolean(item.isLocked),
         isActive: item.isActive !== false,
-        blendeCode: item.blendeCode || null,
-        blendeLabel: formatBlendeLabel(item.blendeLabel),
+        blendeCode: catalogBlende?.code || item.blendeCode || null,
+        blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || formatBlendeLabel(item.blendeLabel),
         blendePrice: item.blendePrice ?? null,
+        catalogArticleId: catalogArticle?.id || null,
+        catalogBlendeId: catalogBlende?.id || null,
+        catalogBlendeQuantity,
+        catalogServiceId: catalogService?.id || null,
+        catalogLinkStatus: catalogArticle || catalogBlende || catalogService ? "MATCHED" : null,
       };
 
       if (reconcileExisting) {

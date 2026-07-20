@@ -2702,7 +2702,7 @@ test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
   assert.match(seed, /CAB-BASE-AB105825-US60-R[\s\S]*blendeCode:\s*"UPEF65"/);
   assert.match(migration, /"blendeCode"\s*=\s*'UPEF65'/);
   assert.match(migration, /"catalogBlendeQuantity"\s*=\s*1/);
-  assert.doesNotMatch(seed, /reconcileExisting:\s*true/);
+  assert.match(seed, /const catalogBlendeQuantity = catalogBlende \? 1 : null/);
 });
 
 test("AB 105743 uses its measured vector plan and exact Excel selection mapping", () => {
@@ -2749,18 +2749,18 @@ test("AB 105748 uses its measured vector plan, Excel articles, and split claim g
   assert.match(claimSource, /"ab-105748":\s*\{[\s\S]*indexPartKeys:\s*\["worktop-left",\s*"worktop-right",\s*"worktop-end-panel"\]/);
 });
 
-test("AB 105750, AB 105753 and AB 105756 retain two UPEF65 corner panels", () => {
+test("AB 105750, AB 105753 and AB 105756 use one UPEF65 corner panel", () => {
   const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
   const migration = fs.readFileSync(
-    path.join(repoRoot, "prisma", "migrations", "20260715090000_set_double_upef65_for_l_kitchen_105750_105753_105756", "migration.sql"),
+    path.join(repoRoot, "prisma", "migrations", "20260720170000_link_and_sync_catalog_blenden", "migration.sql"),
     "utf8",
   );
 
-  assert.match(seed, /AB_105750_105753_105756_ITEMS[\s\S]*blendeCode:\s*"UPEF65 x2"/);
-  assert.match(seed, /blendePrice:\s*blendePrice\("UPEF65", 2\)/);
-  assert.match(migration, /'ab-105750', 'ab-105753', 'ab-105756'/);
-  assert.match(migration, /"catalogBlendeQuantity"\s*=\s*2/);
-  assert.match(migration, /upper\(COALESCE\(item\."blendeCode", ''\)\) LIKE 'UPK20%'/i);
+  assert.match(seed, /AB_105750_105753_105756_ITEMS[\s\S]*blendeCode:\s*"UPEF65"/);
+  assert.match(seed, /blendePrice:\s*blendePrice\("UPEF65", 1\)/);
+  assert.doesNotMatch(seed, /AB_105750_105753_105756_ITEMS[\s\S]*blendeCode:\s*"UPEF65 x2"/);
+  assert.match(migration, /"catalogBlendeQuantity"\s*=\s*1/);
+  assert.match(migration, /upef65\."code"\s*=\s*'UPEF65'/i);
 });
 
 test("two matching UPEF65 panels remain one ASC article with quantity two", () => {

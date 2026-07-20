@@ -295,6 +295,40 @@ test("order confirmation groups multiple blendes under their parent cabinet", ()
   assert.doesNotMatch(html, /UPK20 x2/);
 });
 
+test("order confirmation uses one linked catalog corner blende", () => {
+  const order = {
+    orderNumber: "FRG-TEST-CATALOG-BLENDE",
+    createdAt: "2026-07-20T10:00:00.000Z",
+    total: 269,
+    kitchen: { slug: "ab-105740", name: "105740" },
+    customer: { contractNumber: "KV-105740", preferredDeliveryDate: "2026-08-03" },
+    components: [
+      {
+        code: "CAB-BASE-AB104968-US40-L",
+        name: "Base cabinet with drawer",
+        nameDe: "Unterschrank mit Schublade 40 cm",
+        articleNumber: "US40",
+        price: 269,
+        quantity: 1,
+        blendeCode: "UPEF65",
+        blendeLabel: "stale code-based label",
+        blendeNameDe: "Eckpassblende Unterschrank",
+        catalogBlendeQuantity: 1,
+        blendePrice: 68,
+      },
+    ],
+    accessories: [],
+    services: [],
+  };
+
+  const html = buildOrderSummaryHtml(order);
+  assert.match(html, /Eckpassblende Unterschrank/);
+  assert.match(html, /Typen-Nr\.: UPEF65/);
+  assert.doesNotMatch(html, /x 2/);
+  assert.doesNotMatch(html, /UPK20 Passblende/);
+  assert.doesNotMatch(html, /stale code-based label/);
+});
+
 test("order confirmation keeps a dishwasher corner filler with electrical appliances", () => {
   const order = {
     orderNumber: "FRG-TEST-008",

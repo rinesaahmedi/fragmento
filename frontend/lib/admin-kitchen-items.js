@@ -95,7 +95,29 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     throw new Error("Selected service was not found.");
   }
 
-  if (catalogArticle && input.articleBasePrice == null && moneyToCents(input.price) === 0) {
+  if (catalogBlende && !catalogArticle) {
+    throw new Error("A blende can only be attached to a linked catalog article.");
+  }
+
+  if (input.itemType === ItemType.SERVICE && !catalogService) {
+    throw new Error("Choose a service from the catalog.");
+  }
+
+  if (input.itemType !== ItemType.SERVICE && input.isActive && !input.isLocked && !catalogArticle) {
+    throw new Error("Choose an article from the catalog. Active kitchen items cannot use free-text article data.");
+  }
+
+  if (input.itemType !== ItemType.SERVICE && catalogService) {
+    throw new Error("Only service items can use a service catalog link.");
+  }
+
+  // Two UPK20 panels represent one lower-cabinet corner panel. The catalog
+  // model therefore permits exactly one linked blende per kitchen item.
+  if (catalogBlende) {
+    input.catalogBlendeQuantity = 1;
+  }
+
+  if (catalogArticle) {
     input.articleBasePrice = String(catalogArticle.price);
   }
 
@@ -105,6 +127,9 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
 
   const data = {
     ...input,
+    articleNumber: catalogArticle?.articleNumber || null,
+    name: catalogArticle?.name || catalogService?.name || input.name,
+    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || input.nameDe || null,
     price: applyBlendePriceDelta(input, existingItem, catalogBlende),
     articleBasePrice: undefined,
     catalogBlendeQuantity: catalogBlende ? (input.catalogBlendeQuantity || 1) : null,
@@ -113,6 +138,7 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     blendePrice: catalogBlende ? catalogBlende.price : null,
     catalogArticleId: catalogArticle?.id || null,
     catalogServiceId: catalogService?.id || null,
+    catalogLinkStatus: catalogArticle || catalogBlende || catalogService ? "MATCHED" : null,
   };
 
   if (data.itemType !== ItemType.COMPONENT) {
