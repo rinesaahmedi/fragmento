@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { getOrderById } from "../../../../../lib/catalog";
-import { confirmOrder, deleteOrder, resendOrderEmail, retryOrderWebhook, updateOrderStatus } from "../../../../../lib/orders";
+import { confirmOrder, deleteOrder, resendOrderEmail, retryOrderWebhook, updateOrderAs400Number, updateOrderStatus } from "../../../../../lib/orders";
 import { cancelOrderPayment, createCheckoutSessionForOrder } from "../../../../../lib/stripe-payments";
 
 function getRequestOrigin(request) {
@@ -60,6 +60,11 @@ export async function POST(request, { params }) {
     const emailBody = String(formData.get("emailBody") || "");
     const excludedAttachmentKeys = parseEmailExcludedAttachments(formData.get("emailExcludedAttachments"));
     const emailOverrides = { subject: emailSubject, bodyText: emailBody, excludedAttachmentKeys };
+
+    if (intent === "update-as400") {
+      await updateOrderAs400Number(id, formData.get("as400Number"));
+      return redirectWithFlash(request, `/admin/orders/${id}`, "success", "AS 400 number saved.");
+    }
 
     if (intent === "resend-email") {
       await resendOrderEmail(id, emailOverrides);

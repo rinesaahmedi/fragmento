@@ -56,7 +56,7 @@ test("email confirmation subject uses the server order number", () => {
     },
   });
 
-  assert.equal(draft.subject, "Bestellbestätigung #670105840-1");
+  assert.equal(draft.subject, "NK 670105840-1");
   assert.match(draft.bodyText, /Vertragsnummer: 670105840\./);
   assert.doesNotMatch(draft.bodyText, /Bestellte Küche:/);
 });

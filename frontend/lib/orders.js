@@ -814,6 +814,21 @@ export async function updateOrderStatus(orderId, status, orderKind = ORDER_KIND_
   });
 }
 
+export async function updateOrderAs400Number(orderId, value) {
+  const as400Number = String(value || "").trim();
+  if (as400Number && !/^\d+$/.test(as400Number)) {
+    throw validationError("AS 400 must contain numbers only.");
+  }
+  if (as400Number.length > 50) {
+    throw validationError("AS 400 must be 50 digits or fewer.");
+  }
+
+  return prisma.order.update({
+    where: { id: orderId },
+    data: { as400Number: as400Number || null },
+  });
+}
+
 export async function deleteOrder(orderId, orderKind = ORDER_KIND_LIVE) {
   return getOrderDelegate(prisma, orderKind).delete({
     where: { id: orderId },

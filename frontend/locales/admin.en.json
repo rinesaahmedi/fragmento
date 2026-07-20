@@ -873,6 +873,8 @@
     "priceExclVat": "Price",
     "vatAmount": "VAT (19%)",
     "contractNumber": "Contract number",
+    "as400Number": "AS 400",
+    "saveAs400": "Save",
     "notProvided": "Not provided",
     "noHousingCompanySelected": "No housing company selected",
     "noProjectSelected": "No project selected",

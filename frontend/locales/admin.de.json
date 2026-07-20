@@ -874,6 +874,8 @@
     "priceExclVat": "Preis",
     "vatAmount": "MwSt. (19%)",
     "contractNumber": "Vertragsnummer",
+    "as400Number": "AS 400",
+    "saveAs400": "Speichern",
     "notProvided": "Nicht angegeben",
     "noHousingCompanySelected": "Keine Wohnungsgesellschaft ausgewählt",
     "noProjectSelected": "Kein Projekt ausgewählt",

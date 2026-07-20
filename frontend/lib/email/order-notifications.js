@@ -1692,7 +1692,7 @@ export function buildOrderConfirmationRecipients(customerEmail, senderEmail, opt
 
 export function buildOrderConfirmationEmailDraft(order) {
   return {
-    subject: `Bestellbestätigung #${order.orderNumber}`,
+    subject: `NK ${order.orderNumber}`,
     bodyText: [
       `Hallo ${order.customer.firstName} ${order.customer.lastName},`,
       "",
