@@ -2855,7 +2855,7 @@ async function main() {
       const catalogService = catalogServiceCode
         ? catalogServiceByCode.get(catalogServiceCode)
         : null;
-      const catalogBlendeQuantity = catalogBlende ? 1 : null;
+      const catalogBlendeQuantity = catalogBlende ? Math.max(1, getBlendeQuantity(item)) : null;
       const data = {
         ...productInfo,
         productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,

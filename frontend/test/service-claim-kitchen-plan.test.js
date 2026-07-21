@@ -2702,7 +2702,7 @@ test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
   assert.match(seed, /CAB-BASE-AB105825-US60-R[\s\S]*blendeCode:\s*"UPEF65"/);
   assert.match(migration, /"blendeCode"\s*=\s*'UPEF65'/);
   assert.match(migration, /"catalogBlendeQuantity"\s*=\s*1/);
-  assert.match(seed, /const catalogBlendeQuantity = catalogBlende \? 1 : null/);
+  assert.match(seed, /const catalogBlendeQuantity = catalogBlende \? Math\.max\(1, getBlendeQuantity\(item\)\) : null/);
 });
 
 test("AB 105743 uses its measured vector plan and exact Excel selection mapping", () => {

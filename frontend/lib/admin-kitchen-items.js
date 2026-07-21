@@ -111,12 +111,6 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     throw new Error("Only service items can use a service catalog link.");
   }
 
-  // Two UPK20 panels represent one lower-cabinet corner panel. The catalog
-  // model therefore permits exactly one linked blende per kitchen item.
-  if (catalogBlende) {
-    input.catalogBlendeQuantity = 1;
-  }
-
   if (catalogArticle) {
     input.articleBasePrice = String(catalogArticle.price);
   }
