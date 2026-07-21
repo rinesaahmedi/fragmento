@@ -6,6 +6,7 @@ import {
   buildKitchenPreviewSvgMarkup,
   inferKitchenSlugFromSelectedAreas,
   resolveClaimPreviewComponentKeys,
+  resolveSelectedClaimPlanHotspots,
 } from "../lib/claim-kitchen-preview.js";
 import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
 
@@ -136,4 +137,37 @@ test("email preview selection overlay uses claim hotspot clip polygons", () => {
   assert.match(source, /\.match\(\/\^polygon\\\(/);
   assert.match(source, /Number\(hotspot\.left \|\| 0\) \+ \(localX \/ 100\) \* Number\(hotspot\.width \|\| 0\)/);
   assert.match(source, /Array\.isArray\(hotspot\?\.points\) && hotspot\.points\.length[\s\S]*getClaimPlanClipPathPoints\(hotspot\)/);
+});
+
+test("email preview falls back from a selected claim part to its actual kitchen element", () => {
+  const sourceHotspot = {
+    componentId: "component-dishwasher-base",
+    componentKey: "dishwasher-base",
+    left: 20,
+    top: 30,
+    width: 10,
+    height: 20,
+  };
+  const selected = resolveSelectedClaimPlanHotspots({
+    selectedAreas: [{ componentId: "component-claim-dishwasher", code: "A-EGSPV594400" }],
+    claimHotspots: [],
+    sourceHotspots: [sourceHotspot],
+    selectableComponents: [{
+      componentId: "component-claim-dishwasher",
+      articleCode: "A-EGSPV594400",
+      sourceComponentKey: "dishwasher-base",
+    }],
+  });
+
+  assert.deepEqual(selected, [sourceHotspot]);
+});
+
+test("email preview selection overlay is strong enough to remain visible after email resizing", () => {
+  const source = fs.readFileSync(
+    new URL("../lib/claim-kitchen-preview.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /fill="rgba\(62,188,116,0\.48\)"/);
+  assert.match(source, /stroke="#137a3d" stroke-width="5"/);
 });

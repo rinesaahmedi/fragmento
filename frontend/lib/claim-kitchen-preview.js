@@ -450,9 +450,70 @@ function buildClaimPlanSelectionOverlay(hotspots, width, height) {
     hotspot,
     width,
     height,
-    'fill="rgba(62,188,116,0.34)" stroke="#2a9155" stroke-width="2.2"',
+    'fill="rgba(62,188,116,0.48)" stroke="#137a3d" stroke-width="5"',
   )).join("");
   return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`);
+}
+
+function normalizedClaimPreviewValue(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+export function resolveSelectedClaimPlanHotspots({
+  selectedAreas = [],
+  claimHotspots = [],
+  sourceHotspots = [],
+  selectableComponents = [],
+}) {
+  const selectableById = new Map(
+    selectableComponents
+      .map((component) => [normalizedClaimPreviewValue(component?.componentId), component])
+      .filter(([componentId]) => componentId),
+  );
+  const selectableByCode = new Map(
+    selectableComponents
+      .flatMap((component) => [component?.articleCode, component?.code]
+        .map((code) => [normalizedClaimPreviewValue(code), component]))
+      .filter(([code]) => code),
+  );
+  const used = new Set();
+
+  return selectedAreas.flatMap((area) => {
+    const componentId = normalizedClaimPreviewValue(area?.componentId);
+    const exact = claimHotspots.filter(
+      (hotspot) => normalizedClaimPreviewValue(claimPlanComponentId(hotspot)) === componentId,
+    );
+    let matches = exact;
+
+    if (!matches.length) {
+      const selectedComponent = selectableById.get(componentId)
+        || selectableByCode.get(normalizedClaimPreviewValue(area?.code));
+      const fallbackKeys = new Set([
+        selectedComponent?.componentKey,
+        selectedComponent?.sourceComponentKey,
+      ].map(normalizedClaimPreviewValue).filter(Boolean));
+      matches = claimHotspots.filter((hotspot) => (
+        fallbackKeys.has(normalizedClaimPreviewValue(hotspot?.componentKey))
+      ));
+      if (!matches.length) {
+        matches = sourceHotspots.filter((hotspot) => (
+          fallbackKeys.has(normalizedClaimPreviewValue(hotspot?.componentKey))
+        ));
+      }
+    }
+
+    return matches.filter((hotspot) => {
+      const key = [
+        claimPlanComponentId(hotspot),
+        hotspot?.componentKey,
+        hotspot?.left,
+        hotspot?.top,
+      ].join("|");
+      if (used.has(key)) return false;
+      used.add(key);
+      return true;
+    });
+  });
 }
 
 async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contractNumber, width }) {
@@ -480,9 +541,13 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
   const croppedSourceHotspots = preparedHotspots.map((hotspot) => cropClaimPlanHotspot(hotspot, crop));
   const claimHotspots = buildServiceClaimPartHotspots(croppedSourceHotspots, plan.claimParts, normalizedSlug);
   const visibleIds = new Set(plan.visibleComponentIds || []);
-  const selectedIds = new Set((selectedAreas || []).map((area) => String(area?.componentId || "").trim()));
   const purchasedHotspots = croppedSourceHotspots.filter((hotspot) => visibleIds.has(claimPlanComponentId(hotspot)));
-  const selectedHotspots = claimHotspots.filter((hotspot) => selectedIds.has(claimPlanComponentId(hotspot)));
+  const selectedHotspots = resolveSelectedClaimPlanHotspots({
+    selectedAreas,
+    claimHotspots,
+    sourceHotspots: croppedSourceHotspots,
+    selectableComponents: plan.selectableComponents,
+  });
 
   const sourcePath = path.join(process.cwd(), "public", decodeURIComponent(sourceHref).replace(/^[/\\]+/, ""));
   const sourceBytes = await fs.readFile(sourcePath).catch(() => null);
