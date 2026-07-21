@@ -771,10 +771,41 @@ textarea {
 
 .service-page {
   width: min(1120px, calc(100% - 32px));
+  min-width: 0;
   margin: 0 auto;
   padding: 40px 0 56px;
   display: grid;
   gap: 24px;
+}
+
+/*
+ * Claim data and plan variants can contain long intrinsic controls (notably
+ * file inputs and serial-number rows). Keep those intrinsic widths from
+ * widening the public service page at intermediate viewport sizes.
+ */
+.service-page,
+.service-panel,
+.service-form,
+.service-form__section,
+.service-field-grid,
+.service-field,
+.service-claim-kitchen,
+.service-claim-kitchen__plan,
+.service-claim-kitchen__svg-card,
+.service-claim-kitchen__image-card,
+.service-field--problem-area-row,
+.service-field__problem-area-stack,
+.service-field__problem-area-serial,
+.service-field__problem-area-serial-controls {
+  min-width: 0;
+}
+
+.service-page img,
+.service-page svg,
+.service-page input,
+.service-page select,
+.service-page textarea {
+  max-width: 100%;
 }
 
 .service-hero,
@@ -3556,12 +3587,20 @@ textarea {
   padding: 12px 14px !important;
 }
 
-.service-field__problem-area-file {
+.service-field input.service-field__problem-area-file {
   position: absolute;
+  width: 1px;
+  min-width: 1px;
+  max-width: 1px;
+  height: 1px;
+  min-height: 1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
   opacity: 0;
   pointer-events: none;
-  width: 1px;
-  height: 1px;
 }
 
 .service-field__problem-area-upload-button {

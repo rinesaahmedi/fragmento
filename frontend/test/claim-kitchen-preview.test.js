@@ -4,11 +4,13 @@ import test from "node:test";
 import {
   applyVisibleComponentsToSvgMarkup,
   buildKitchenPreviewSvgMarkup,
+  cropClaimPlanHotspot,
   inferKitchenSlugFromSelectedAreas,
   resolveClaimPreviewComponentKeys,
   resolveSelectedClaimPlanHotspots,
 } from "../lib/claim-kitchen-preview.js";
-import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
+import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
+import { buildServiceClaimPartHotspots } from "../lib/service-claim-kitchen-hotspots.js";
 
 const SAMPLE_SVG = '<svg viewBox="0 0 900 600"></svg>';
 const SAMPLE_KITCHEN_SVG = `
@@ -136,7 +138,17 @@ test("email preview selection overlay uses claim hotspot clip polygons", () => {
   assert.match(source, /function getClaimPlanClipPathPoints/);
   assert.match(source, /\.match\(\/\^polygon\\\(/);
   assert.match(source, /Number\(hotspot\.left \|\| 0\) \+ \(localX \/ 100\) \* Number\(hotspot\.width \|\| 0\)/);
-  assert.match(source, /Array\.isArray\(hotspot\?\.points\) && hotspot\.points\.length[\s\S]*getClaimPlanClipPathPoints\(hotspot\)/);
+  assert.match(source, /const clipPathPoints = getClaimPlanClipPathPoints\(hotspot\)/);
+  assert.match(source, /const points = clipPathPoints\.length[\s\S]*Array\.isArray\(hotspot\?\.points\)/);
+});
+
+test("AB 105758 email preview uses the same actual-element plan as the service picker", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105758"];
+
+  assert.equal(PLAN_IMAGE_BY_SLUG["ab-105758"], "/plans/AB%20105758.svg");
+  assert.ok(hotspots.some((hotspot) => hotspot.componentKey === "base-module-3"));
+  assert.ok(hotspots.some((hotspot) => hotspot.componentKey === "drawer-module"));
+  assert.ok(hotspots.some((hotspot) => hotspot.componentKey === "oven-module"));
 });
 
 test("email preview falls back from a selected claim part to its actual kitchen element", () => {
@@ -168,6 +180,24 @@ test("email preview selection overlay is strong enough to remain visible after e
     "utf8",
   );
 
-  assert.match(source, /fill="rgba\(62,188,116,0\.48\)"/);
-  assert.match(source, /stroke="#137a3d" stroke-width="5"/);
+  assert.match(source, /fill="rgba\(62,188,116,0\.34\)" stroke="none"/);
+});
+
+test("AB 105758 email oven polygon uses the exact service-view coordinates after cropping", () => {
+  const sourceOven = PLAN_HOTSPOTS_BY_SLUG["ab-105758"]
+    .find((hotspot) => hotspot.componentKey === "oven-module");
+  const crop = { left: 8, top: 4, right: 90, bottom: 94, width: 82, height: 90 };
+  const croppedOven = cropClaimPlanHotspot(sourceOven, crop);
+  const [emailOven] = buildServiceClaimPartHotspots(
+    [croppedOven],
+    [{ partKey: "oven", sourceComponentKey: "oven-module" }],
+    "ab-105758",
+  );
+
+  assert.deepEqual(croppedOven.points, sourceOven.points);
+  assert.ok(croppedOven.clipPath.startsWith("polygon("));
+  assert.ok(Math.abs(emailOven.left - ((46.218527 - crop.left) / crop.width) * 100) < 0.0001);
+  assert.ok(Math.abs(emailOven.top - ((54.783193 - crop.top) / crop.height) * 100) < 0.0001);
+  assert.ok(Math.abs(emailOven.width - ((55.653207 - 46.218527) / crop.width) * 100) < 0.0001);
+  assert.ok(Math.abs(emailOven.height - ((76.685714 - 54.783193) / crop.height) * 100) < 0.0001);
 });

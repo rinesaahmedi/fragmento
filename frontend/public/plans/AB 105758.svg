@@ -1,5 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" width="842" height="595" viewBox="0 0 842 595">
 <defs>
+<style>
+#dishwasher-basket-icon path { stroke: rgb(240, 240, 240) !important; }
+</style>
 <clipPath id="clip_1">
 <path transform="matrix(.12,0,0,-.12,0,595)" d="M92 135H6851V4878H92V135"/>
 </clipPath>
@@ -80,7 +83,7 @@
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M2314 2162 1525 2081 2314 2162V930L1525 849V2081"/>
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M2314 2162V930L1525 849"/>
 </g>
-<g inkscape:groupmode="layer" inkscape:label="0">
+<g id="dishwasher-basket-icon" inkscape:groupmode="layer" inkscape:label="0">
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3069 1717V1717"/>
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3069 1710V1711"/>
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke="#000000" d="M3069 1717V1717"/>

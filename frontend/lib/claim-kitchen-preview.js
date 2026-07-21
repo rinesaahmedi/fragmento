@@ -370,7 +370,7 @@ function getClaimPlanCrop(hotspots) {
   return { left, top, right, bottom, width: right - left, height: bottom - top };
 }
 
-function cropClaimPlanHotspot(hotspot, crop) {
+export function cropClaimPlanHotspot(hotspot, crop) {
   const points = Array.isArray(hotspot?.points) ? hotspot.points : [];
   if (points.length) {
     const croppedPoints = points.map(([x, y]) => [
@@ -379,13 +379,22 @@ function cropClaimPlanHotspot(hotspot, crop) {
     ]);
     const xs = croppedPoints.map(([x]) => x).filter(Number.isFinite);
     const ys = croppedPoints.map(([, y]) => y).filter(Number.isFinite);
+    const left = Math.min(...xs);
+    const top = Math.min(...ys);
+    const right = Math.max(...xs);
+    const bottom = Math.max(...ys);
+    const width = right - left;
+    const height = bottom - top;
+    const clipPath = croppedPoints
+      .map(([x, y]) => `${width > 0 ? ((x - left) / width) * 100 : 0}% ${height > 0 ? ((y - top) / height) * 100 : 0}%`)
+      .join(", ");
     return {
       ...hotspot,
-      points: croppedPoints,
-      left: Math.min(...xs),
-      top: Math.min(...ys),
-      width: Math.max(...xs) - Math.min(...xs),
-      height: Math.max(...ys) - Math.min(...ys),
+      left,
+      top,
+      width,
+      height,
+      clipPath: `polygon(${clipPath})`,
     };
   }
 
@@ -427,9 +436,10 @@ function getClaimPlanClipPathPoints(hotspot) {
 }
 
 function claimPlanShapeMarkup(hotspot, width, height, attributes) {
-  const points = Array.isArray(hotspot?.points) && hotspot.points.length
-    ? hotspot.points
-    : getClaimPlanClipPathPoints(hotspot);
+  const clipPathPoints = getClaimPlanClipPathPoints(hotspot);
+  const points = clipPathPoints.length
+    ? clipPathPoints
+    : Array.isArray(hotspot?.points) ? hotspot.points : [];
   if (points.length) {
     const renderedPoints = points
       .map(([x, y]) => `${(Number(x) / 100) * width},${(Number(y) / 100) * height}`)
@@ -450,7 +460,7 @@ function buildClaimPlanSelectionOverlay(hotspots, width, height) {
     hotspot,
     width,
     height,
-    'fill="rgba(62,188,116,0.48)" stroke="#137a3d" stroke-width="5"',
+    'fill="rgba(62,188,116,0.34)" stroke="none"',
   )).join("");
   return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`);
 }
