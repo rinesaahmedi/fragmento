@@ -1108,7 +1108,13 @@ function drawItemIcon(doc, item, x, y, size = 16) {
   const iconKey = String(item.iconKey || "").toLowerCase();
   const name = String(getItemDisplayName(item)).toLowerCase();
   const code = String(item.code || "").toLowerCase();
+  const articleNumber = String(item.articleNumber || "").trim().toUpperCase();
   const has = (...terms) => terms.some((term) => iconKey.includes(term) || name.includes(term) || code.includes(term));
+  const isThreeDrawerCabinet = /^US2A\d+$/.test(articleNumber)
+    || iconKey.includes("drawer_base_three")
+    || code.includes("drawer-base-3")
+    || name.includes("3 drawers")
+    || name.includes("3 schubladen");
   const unit = size / 16;
   const px = (value) => x + value * unit;
   const py = (value) => y + value * unit;
@@ -1205,6 +1211,16 @@ function drawItemIcon(doc, item, x, y, size = 16) {
   if (has("wall", "upper", "oberschrank")) {
     doc.rect(px(3.5), py(3), scaled(9), scaled(10));
     doc.line(px(11), py(6), px(11), py(10));
+    return;
+  }
+
+  if (isThreeDrawerCabinet) {
+    doc.rect(px(4), py(3), scaled(8), scaled(10));
+    doc.line(px(4), py(6.3), px(12), py(6.3));
+    doc.line(px(4), py(9.65), px(12), py(9.65));
+    doc.line(px(6.5), py(4.7), px(9.5), py(4.7));
+    doc.line(px(6.5), py(8), px(9.5), py(8));
+    doc.line(px(6.5), py(11.35), px(9.5), py(11.35));
     return;
   }
 

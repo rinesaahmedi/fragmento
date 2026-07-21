@@ -63,7 +63,7 @@ const ICON_MARKUP = {
   drawer_base_two:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="18" x2="60" y2="18"/><line x1="21.5" y1="10" x2="38.5" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>',
   drawer_base_three:
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><line x1="0" y1="44" x2="60" y2="44"/><line x1="21.5" y1="9" x2="38.5" y2="9" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="23.5" x2="50" y2="40.5" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="49.5" x2="50" y2="66.5" stroke-linecap="round" stroke-width="1.5"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><line x1="0" y1="44" x2="60" y2="44"/><line x1="21.5" y1="9" x2="38.5" y2="9" stroke-linecap="round" stroke-width="1.5"/><line x1="21.5" y1="30" x2="38.5" y2="30" stroke-linecap="round" stroke-width="1.5"/><line x1="21.5" y1="58" x2="38.5" y2="58" stroke-linecap="round" stroke-width="1.5"/></svg>',
   tall_refrigerator:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 190" fill="none" stroke="currentColor" stroke-width="1"><line x1="3" y1="1" x2="57" y2="1"/><line x1="3" y1="1" x2="3" y2="186"/><line x1="57" y1="1" x2="57" y2="186"/><line x1="3" y1="186" x2="57" y2="186"/><line x1="8" y1="186" x2="8" y2="189" stroke-width="1.5"/><line x1="52" y1="186" x2="52" y2="189" stroke-width="1.5"/><line x1="3" y1="110" x2="57" y2="110"/><line x1="12" y1="108" x2="48" y2="108" stroke-linecap="round" stroke-width="1.5"/><line x1="12" y1="112" x2="48" y2="112" stroke-linecap="round" stroke-width="1.5"/></svg>',
   extractor_hood_chimney:
@@ -199,7 +199,14 @@ function CatalogItem({
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const { dimensions: itemDimensions } = getCatalogItemDetails(item);
-  const cabinetIconWidthPx = getCatalogCabinetIconWidthPx(item);
+  const auszugVariant = articleVariant || item.articleVariants?.auszug || null;
+  const auszugOptions = auszugVariant?.options || [];
+  const selectedAuszugOption = findAuszugVariantOption({ articleVariants: { auszug: auszugVariant } }, item.articleNumber);
+  const yesAuszugOption = auszugOptions.find((option) => option.key === "yes") || null;
+  const noAuszugOption = auszugOptions.find((option) => option.key === "no") || null;
+  const isAuszugSelected = selectedAuszugOption?.key === "yes";
+  const iconItem = isAuszugSelected ? { ...item, iconKey: "drawer_base_three" } : item;
+  const cabinetIconWidthPx = getCatalogCabinetIconWidthPx(iconItem);
   const className = [
     styles.itemCard,
     compactIcon ? styles.itemCardCompact : "",
@@ -212,9 +219,9 @@ function CatalogItem({
   const iconClassName = [
     styles.itemIcon,
     compactIcon ? styles.itemIconCompact : "",
-    item.iconKey === "refrigerator" || item.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
-    item.iconKey === "lighting_set" ? styles.itemIconLightingSet : "",
-    String(item.iconKey || "").startsWith("drawer_base") ? styles.itemIconDrawerBase : "",
+    iconItem.iconKey === "refrigerator" || iconItem.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
+    iconItem.iconKey === "lighting_set" ? styles.itemIconLightingSet : "",
+    String(iconItem.iconKey || "").startsWith("drawer_base") ? styles.itemIconDrawerBase : "",
     cabinetIconWidthPx ? styles.itemIconScaledCabinet : "",
   ]
     .filter(Boolean)
@@ -222,7 +229,7 @@ function CatalogItem({
   const iconStyle = cabinetIconWidthPx
     ? { "--catalog-cabinet-icon-width": `${cabinetIconWidthPx}px` }
     : undefined;
-  const iconMarkup = getCatalogIconMarkup(item, Boolean(cabinetIconWidthPx));
+  const iconMarkup = getCatalogIconMarkup(iconItem, Boolean(cabinetIconWidthPx));
   const tooltipFacts = getTooltipFacts(item);
   const tooltipPreviewSrc = getTooltipPreviewSrc(item);
   const productInfoDocuments = Array.isArray(item?.productInfoDocuments) && item.productInfoDocuments.length
@@ -246,12 +253,6 @@ function CatalogItem({
       onClick?.();
     }
   };
-  const auszugVariant = articleVariant || item.articleVariants?.auszug || null;
-  const auszugOptions = auszugVariant?.options || [];
-  const selectedAuszugOption = findAuszugVariantOption({ articleVariants: { auszug: auszugVariant } }, item.articleNumber);
-  const yesAuszugOption = auszugOptions.find((option) => option.key === "yes") || null;
-  const noAuszugOption = auszugOptions.find((option) => option.key === "no") || null;
-  const isAuszugSelected = selectedAuszugOption?.key === "yes";
   const auszugUpgradePrice = Math.max(0, Number(yesAuszugOption?.price || 0) - Number(noAuszugOption?.price || 0));
   const showAuszugOption = Boolean(selected && yesAuszugOption && !locked && !disabled);
 
@@ -377,25 +378,56 @@ function CatalogItem({
         </div>
       </div>
       {showAuszugOption ? (
-        <button
-          type="button"
-          className={isAuszugSelected ? styles.articleVariantRowActive : styles.articleVariantRow}
-          aria-pressed={isAuszugSelected}
-          onClick={(event) => {
-            event.stopPropagation();
-            onSelectArticleVariant?.(isAuszugSelected ? noAuszugOption?.articleNumber : yesAuszugOption.articleNumber);
-          }}
-        >
-          <span className={styles.articleVariantDetails}>
-            <span className={styles.articleVariantLabel}>{translate("configurator.auszugOptionLabel", "Soft close")}</span>
-            <strong className={styles.articleVariantPrice}>
-              +{formatCurrency(auszugUpgradePrice)}
-            </strong>
-          </span>
-          <span className={isAuszugSelected ? styles.articleVariantSwitchActive : styles.articleVariantSwitch} aria-hidden="true">
-            <span />
-          </span>
-        </button>
+        <div className={styles.articleVariantGroup}>
+          {[
+            {
+              option: noAuszugOption,
+              label: translate("configurator.auszugBaseOptionLabel", "Drawers"),
+              iconMarkup: ICON_MARKUP.drawer_base_two,
+              upgradePrice: 0,
+            },
+            {
+              option: yesAuszugOption,
+              label: translate("configurator.auszugOptionLabel", "Drawers with Pull-Out"),
+              iconMarkup: ICON_MARKUP.drawer_base_three,
+              upgradePrice: auszugUpgradePrice,
+            },
+          ].map(({ option, label, iconMarkup: variantIconMarkup, upgradePrice }) => {
+            const isSelected = selectedAuszugOption?.key === option?.key;
+
+            return (
+              <button
+                key={option.key}
+                type="button"
+                className={isSelected ? styles.articleVariantRowActive : styles.articleVariantRow}
+                aria-pressed={isSelected}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onSelectArticleVariant?.(option.articleNumber);
+                }}
+              >
+                <span className={styles.articleVariantDetails}>
+                  <span
+                    className={styles.articleVariantIcon}
+                    aria-hidden="true"
+                    dangerouslySetInnerHTML={{ __html: variantIconMarkup }}
+                  />
+                  <span className={styles.articleVariantCopy}>
+                    <span className={styles.articleVariantLabel}>
+                      {label}
+                      {upgradePrice > 0 ? (
+                        <strong className={styles.articleVariantPrice}> (+{formatCurrency(upgradePrice)})</strong>
+                      ) : null}
+                    </span>
+                  </span>
+                </span>
+                <span className={isSelected ? styles.articleVariantSwitchActive : styles.articleVariantSwitch} aria-hidden="true">
+                  <span />
+                </span>
+              </button>
+            );
+          })}
+        </div>
       ) : null}
     </div>
   );

@@ -1326,6 +1326,12 @@
   color: #7d6750;
 }
 
+.articleVariantGroup {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
 .articleVariantRow,
 .articleVariantRowActive {
   display: flex;
@@ -1333,7 +1339,7 @@
   justify-content: space-between;
   width: 100%;
   min-height: 38px;
-  margin-top: 8px;
+  margin-top: 0;
   padding: 6px 8px;
   border: 1px solid rgba(120, 90, 64, 0.14);
   border-radius: 10px;
@@ -1358,10 +1364,32 @@
 }
 
 .articleVariantDetails {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  text-align: left;
+}
+
+.articleVariantIcon {
+  display: flex;
+  flex: 0 0 24px;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 30px;
+  color: #2f2a24;
+}
+
+.articleVariantIcon svg {
+  width: 22px;
+  height: 30px;
+}
+
+.articleVariantCopy {
   display: grid;
   gap: 2px;
   min-width: 0;
-  text-align: left;
 }
 
 .articleVariantLabel {
@@ -1375,7 +1403,7 @@
   color: #1874ff;
   font-size: 0.72rem;
   font-weight: 800;
-  line-height: 1;
+  line-height: inherit;
 }
 
 .articleVariantRowActive .articleVariantPrice {
