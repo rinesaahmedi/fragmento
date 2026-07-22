@@ -241,12 +241,8 @@ export default function ServiceClaimKitchenPicker({
     return croppedImageHotspots.filter((hotspot) => hotspot && selectable.has(hotspot.componentId));
   }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
   const displaySelectedComponentIds = useMemo(() => {
-    const hotspotIds = new Set(croppedImageHotspots.map((hotspot) => hotspot?.componentId).filter(Boolean));
-    return [...new Set((visualValue || []).map((componentId) => {
-      if (hotspotIds.has(componentId)) return componentId;
-      return componentChoiceGroupByOptionId.get(componentId)?.triggerComponentId || componentId;
-    }))];
-  }, [componentChoiceGroupByOptionId, croppedImageHotspots, visualValue]);
+    return [...new Set(visualValue || [])];
+  }, [visualValue]);
   const shouldUseImagePlan = Boolean(imageViewHref && imageHotspots.length);
   const imageClipPathId = useMemo(
     () => toSvgClipPathId(rawImageClipPathId),

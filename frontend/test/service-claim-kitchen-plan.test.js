@@ -1589,8 +1589,7 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(flowSource, /nextSelectedIds\.length[\s\S]*\[choiceGroup\.sourceComponentKey\]: true/);
   assert.match(flowSource, /!area\.selectedPartComponentIds\.length \|\| !area\.isPartChoiceConfirmed/);
   assert.match(flowSource, /confirmedChoiceGroupsJson/);
-  assert.match(source, /if \(hotspotIds\.has\(componentId\)\) return componentId/);
-  assert.match(source, /componentChoiceGroupByOptionId\.get\(componentId\)\?\.triggerComponentId/);
+  assert.match(source, /return \[\.\.\.new Set\(visualValue \|\| \[\]\)\]/);
   assert.match(flowSource, /problemComponentIds[\s\S]*\.map\(\(componentId\) => componentById\.get\(componentId\)\)/);
   assert.match(flowSource, /collapseServiceClaimLinkedComponents\([\s\S]*selectedComponentsInSelectionOrder/);
   assert.doesNotMatch(source, /hasManualWorktopEndPanelOption/);
@@ -1956,7 +1955,7 @@ test("AB 105807 worktop and end panel use independent PDF-matched hotspots", () 
   assert.equal(endPanel.claimWorktopEndPanelSplit, true);
 });
 
-test("non-L claim plans omit the invisible sink hotspot but keep cabinet and faucet", () => {
+test("non-L claim plans keep a compact sink hotspot separate from cabinet and faucet", () => {
   const hotspots = [
     { componentKey: "sink-base", left: 10, top: 50, width: 20, height: 30 },
     { componentKey: "sink-faucet", left: 14, top: 40, width: 8, height: 10 },
@@ -1969,11 +1968,15 @@ test("non-L claim plans omit the invisible sink hotspot but keep cabinet and fau
 
   assert.deepEqual(result.map((entry) => entry.componentId), [
     "component-claim-sink-cabinet",
+    "component-claim-sink",
     "component-claim-faucet",
   ]);
   const sink = result.find((entry) => entry.claimPartKey === "sink");
   const faucet = result.find((entry) => entry.claimPartKey === "faucet");
-  assert.equal(sink, undefined);
+  assert.equal(sink.left, 10);
+  assert.equal(sink.top, 48.8);
+  assert.equal(sink.width, 20);
+  assert.equal(sink.height, 1.2);
   assert.equal(faucet.top, 40);
   assert.equal(faucet.width, 8);
   assert.equal(faucet.height, 10);

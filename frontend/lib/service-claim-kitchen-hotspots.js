@@ -771,6 +771,23 @@ function splitSinkFixtureHotspot(hotspot, part) {
   return separated;
 }
 
+function elevationSinkHotspot(hotspots, part) {
+  const sinkBase = hotspots.find((hotspot) => hotspot?.componentKey === "sink-base");
+  if (!sinkBase) return null;
+
+  const stripHeight = 1.2;
+  return {
+    componentId: part.componentId,
+    componentKey: `claim-${part.partKey}`,
+    claimPartKey: part.partKey,
+    left: Number(sinkBase.left || 0),
+    top: Number(sinkBase.top || 0) - stripHeight,
+    width: Number(sinkBase.width || 0),
+    height: stripHeight,
+    preserveManualSize: true,
+  };
+}
+
 function hotspotFromDisplayPoints(hotspot, part, points) {
   const xs = points.map(([x]) => Number(x)).filter(Number.isFinite);
   const ys = points.map(([, y]) => Number(y)).filter(Number.isFinite);
@@ -1417,11 +1434,14 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     if (sourceComponentKey === "worktop" && worktopEndPanelPart) {
       return [hotspot];
     }
-    const visibleSourceParts = hasVisibleSink
-      ? sourceParts
-      : sourceParts.filter((part) => part.partKey !== "sink");
+    const visibleSourceParts = sourceParts;
 
     return visibleSourceParts.flatMap((part) => {
+      if (!hasVisibleSink && part.partKey === "sink") {
+        return hotspotIndex === primarySinkFixtureIndex
+          ? elevationSinkHotspot(hotspots, part) || []
+          : [];
+      }
       if (part.partKey === "faucet") {
         return {
           ...hotspot,
