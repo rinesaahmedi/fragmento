@@ -2288,7 +2288,6 @@ export default function ServiceClaimFlow() {
   const preferredContactTimeToRef = useRef(null);
   const contractNumberStickySentinelRef = useRef(null);
   const clientAddressSectionRef = useRef(null);
-  const hasSeenClientAddressSectionRef = useRef(false);
   const selectedServicePanelRef = useRef(null);
   const shouldScrollToSelectedPanelRef = useRef(false);
 
@@ -2644,20 +2643,6 @@ export default function ServiceClaimFlow() {
     return `service-claim-${fieldName}-required`;
   }
 
-  function handleClaimRequiredGroupBlur(event) {
-    if (!event.currentTarget.contains(event.relatedTarget)) {
-      setIsClaimRequiredAlertDismissed(false);
-      setShowClaimRequiredErrors(true);
-    }
-  }
-
-  function handleClaimFormInvalid(event) {
-    if (event.target?.closest?.("[data-claim-required-group]")) {
-      setIsClaimRequiredAlertDismissed(false);
-      setShowClaimRequiredErrors(true);
-    }
-  }
-
   function focusFirstMissingClaimRequiredField() {
     setIsClaimRequiredAlertDismissed(false);
     setShowClaimRequiredErrors(true);
@@ -2782,7 +2767,6 @@ export default function ServiceClaimFlow() {
       setIsContractNumberHelpOpen(false);
       setIsContractNumberStickyEnabled(true);
       setIsContractNumberCurrentlyStuck(false);
-      hasSeenClientAddressSectionRef.current = false;
       setIsClaimRequiredAlertDismissed(false);
       setShowClaimRequiredErrors(false);
     }
@@ -2838,34 +2822,6 @@ export default function ServiceClaimFlow() {
       window.removeEventListener("resize", queueStickyStateUpdate);
     };
   }, [isComplaintMode, isContractNumberStickyEnabled]);
-
-  useEffect(() => {
-    if (!isComplaintMode) {
-      return undefined;
-    }
-
-    const section = clientAddressSectionRef.current;
-    if (!section || typeof IntersectionObserver === "undefined") {
-      return undefined;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          hasSeenClientAddressSectionRef.current = true;
-          return;
-        }
-        if (hasSeenClientAddressSectionRef.current && entry.boundingClientRect.top < 0) {
-          setIsClaimRequiredAlertDismissed(false);
-          setShowClaimRequiredErrors(true);
-        }
-      },
-      { threshold: 0.12 },
-    );
-
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [isComplaintMode]);
 
   useEffect(() => {
     const selectedIds = new Set(
@@ -4173,6 +4129,17 @@ export default function ServiceClaimFlow() {
   async function handleSubmit(event) {
     event.preventDefault();
 
+    const submitter = event.nativeEvent?.submitter;
+    if (!submitter?.hasAttribute?.("data-service-claim-submit")) {
+      return;
+    }
+
+    if (hasMissingClaimRequiredFields) {
+      setError(t("requiredFieldMissing"));
+      focusFirstMissingClaimRequiredField();
+      return;
+    }
+
     if (
       contractLookup.status === "missing"
       && contractLookup.contractNumber === normalizedContractNumber
@@ -4945,7 +4912,7 @@ export default function ServiceClaimFlow() {
             <p>{copy.formIntro}</p>
           </div>
 
-          <form className="service-form" onSubmit={handleSubmit} onInvalidCapture={handleClaimFormInvalid}>
+          <form className="service-form" onSubmit={handleSubmit} noValidate>
             <div
               ref={contractNumberStickySentinelRef}
               className="service-field__sticky-sentinel"
@@ -5035,7 +5002,6 @@ export default function ServiceClaimFlow() {
             <div
               className="service-field-grid service-field-grid--3"
               data-claim-required-group
-              onBlur={handleClaimRequiredGroupBlur}
             >
               <label className="service-field">
                 <span>
@@ -5121,7 +5087,6 @@ export default function ServiceClaimFlow() {
             <div
               className="service-field-grid service-field-grid--claim-serial-row"
               data-claim-required-group
-              onBlur={handleClaimRequiredGroupBlur}
             >
               <label className="service-field">
                 <span>
@@ -5438,7 +5403,6 @@ export default function ServiceClaimFlow() {
               ref={clientAddressSectionRef}
               className="service-form__section"
               data-claim-required-group
-              onBlur={handleClaimRequiredGroupBlur}
             >
               <p className="service-form__section-title">{copy.clientAddress}</p>
               <div className="service-field-grid service-field-grid--client-location">
@@ -6472,7 +6436,12 @@ export default function ServiceClaimFlow() {
               >
                 {copy.back}
               </button>
-              <button type="submit" className="service-button service-button--primary" disabled={isSubmitting}>
+              <button
+                type="submit"
+                className="service-button service-button--primary"
+                data-service-claim-submit
+                disabled={isSubmitting}
+              >
                 {isSubmitting ? copy.submitting : copy.submit}
               </button>
             </div>
