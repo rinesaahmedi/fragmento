@@ -6,6 +6,7 @@ import { getOrderKindForContractNumber } from "./order-kind.js";
 import { prisma } from "./prisma.js";
 import { buildServiceClaimSelectableComponents } from "./service-claim-kitchen-plan-selection.js";
 import { normalizeServiceClaimContractNumber } from "./service-claims.js";
+import { buildServiceClaimReferencePlan } from "./service-claim-reference-plan.js";
 
 async function loadKitchenClaimParts(kitchenId) {
   try {
@@ -48,7 +49,42 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       include: { kitchen: true },
     });
 
-    if (!contract?.isActive || !contract.kitchen || contract.kitchen.status !== KitchenStatus.ACTIVE) {
+    if (!contract?.isActive) {
+      return null;
+    }
+
+    // Read reference assets explicitly so a running dev server can pick up a
+    // newly migrated optional column without requiring a Prisma engine restart.
+    const [referenceAssets] = await prisma.$queryRaw`
+      SELECT
+        contract."claimPlanPdfPath",
+        contract."claimPlanPreviewPath",
+        asset."previewBytes" IS NOT NULL AS "hasUploadedPreview",
+        asset."pdfBytes" IS NOT NULL AS "hasUploadedPdf"
+      FROM "KitchenContract" contract
+      LEFT JOIN "KitchenContractClaimPlanAsset" asset
+        ON asset."kitchenContractId" = contract."id"
+      WHERE contract."id" = ${contract.id}
+      LIMIT 1
+    `;
+    const publicAssetBase = `/api/service-claims/contracts/${encodeURIComponent(contract.contractNumber)}/plan-assets`;
+    const referencePlan = buildServiceClaimReferencePlan({
+      ...contract,
+      claimPlanPdfPath: referenceAssets?.hasUploadedPdf
+        ? `${publicAssetBase}/pdf`
+        : referenceAssets?.claimPlanPdfPath || contract.claimPlanPdfPath,
+      claimPlanPreviewPath: referenceAssets?.hasUploadedPreview
+        ? `${publicAssetBase}/preview`
+        : referenceAssets?.claimPlanPreviewPath || "",
+    });
+    if (referencePlan) {
+      return {
+        ...referencePlan,
+        contractType: contract.contractType,
+      };
+    }
+
+    if (!contract.kitchen || contract.kitchen.status !== KitchenStatus.ACTIVE) {
       return null;
     }
 
@@ -78,6 +114,7 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
     return {
       kitchenName: kitchen.name,
       kitchenSlug: slug,
+      contractType: contract.contractType,
       kitchenConfig,
       svgMarkup,
       selectableComponentIds: selectable.selectableComponentIds,

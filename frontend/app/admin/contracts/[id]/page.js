@@ -172,6 +172,7 @@ export default async function AdminContractDetailPage({ params }) {
   }
 
   const returnTo = `/admin/contracts/${contract.id}`;
+  const claimPlanAssetBase = `/api/service-claims/contracts/${encodeURIComponent(contract.contractNumber)}/plan-assets`;
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -189,6 +190,7 @@ export default async function AdminContractDetailPage({ params }) {
           }
         >
           <div style={summaryGridStyle}>
+            <DetailField label="Type">{contract.contractType}</DetailField>
             <DetailField label="Status"><AdminStatusBadge status={contract.isActive ? "ACTIVE" : "INACTIVE"} /></DetailField>
             <DetailField label="Housing company">{contract.owner?.name || "No housing company selected"}</DetailField>
             <DetailField label="Created"><AdminDateTime value={contract.createdAt} /></DetailField>
@@ -202,6 +204,20 @@ export default async function AdminContractDetailPage({ params }) {
             <DetailField label="Billing address"><AddressLines lines={billingAddressLines(contract)} /></DetailField>
             <DetailField label="Registered owner"><AddressLines lines={contactLines(contract.activeRegistration)} /></DetailField>
             <DetailField label="Notes">{contract.notes || "-"}</DetailField>
+            <DetailField label="Claim plan">
+              <AddressLines lines={[
+                contract.hasUploadedClaimPlanPreview
+                  ? <a href={`${claimPlanAssetBase}/preview`} target="_blank" rel="noreferrer">Open uploaded sketch</a>
+                  : contract.claimPlanPreviewPath
+                    ? <a href={contract.claimPlanPreviewPath} target="_blank" rel="noreferrer">Open sketch</a>
+                    : "",
+                contract.hasUploadedClaimPlanPdf
+                  ? <a href={`${claimPlanAssetBase}/pdf`} target="_blank" rel="noreferrer">Open uploaded PDF</a>
+                  : contract.claimPlanPdfPath
+                    ? <a href={contract.claimPlanPdfPath} target="_blank" rel="noreferrer">Open PDF plan</a>
+                    : "",
+              ]} />
+            </DetailField>
           </div>
         </AdminSection>
 
@@ -217,28 +233,61 @@ export default async function AdminContractDetailPage({ params }) {
 
         <AdminSection title="Edit contract">
           <div id="edit-contract" />
-          <form action={`/api/admin/contracts/${contract.id}`} method="post" style={editFormStyle}>
+          <form action={`/api/admin/contracts/${contract.id}`} method="post" encType="multipart/form-data" style={editFormStyle}>
             <input type="hidden" name="_intent" value="update" />
             <input type="hidden" name="returnTo" value={returnTo} />
+            <input type="hidden" name="contractType" value={contract.contractType} />
             <FormField label="Contract number">
               <input name="contractNumber" defaultValue={contract.contractNumber} style={inputStyle} required />
             </FormField>
-            <FormField label="Kitchen">
-              <select name="kitchenId" defaultValue={contract.kitchenId} style={inputStyle} required>
-                {kitchens.map((kitchen) => (
-                  <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
-                ))}
-              </select>
-            </FormField>
-            <AdminContractLinkFields
-              owners={owners}
-              projects={projects}
-              defaultHousingCompanyId={contract.housingCompanyId || ""}
-              defaultProjectId={contract.projectId || ""}
-              contract={contract}
-            />
+            {contract.contractType === "ARC" ? (
+              <FormField label="Replace kitchen sketch (JPG, PNG, or WebP)">
+                <input
+                  type="file"
+                  name="claimPlanPreviewFile"
+                  accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                  style={inputStyle}
+                />
+              </FormField>
+            ) : (
+              <>
+                <FormField label="Kitchen">
+                  <select name="kitchenId" defaultValue={contract.kitchenId} style={inputStyle}>
+                    <option value="">PDF-only kitchen (automatic)</option>
+                    {kitchens.map((kitchen) => (
+                      <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
+                    ))}
+                  </select>
+                </FormField>
+                <input type="hidden" name="claimPlanPdfPath" value={contract.claimPlanPdfPath || ""} />
+                <input type="hidden" name="claimPlanPreviewPath" value={contract.claimPlanPreviewPath || ""} />
+                <FormField label="Replace/add kitchen sketch (JPG, PNG, or WebP)">
+                  <input
+                    type="file"
+                    name="claimPlanPreviewFile"
+                    accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                    style={inputStyle}
+                  />
+                </FormField>
+                <FormField label="Replace/add original kitchen plan (PDF)">
+                  <input
+                    type="file"
+                    name="claimPlanPdfFile"
+                    accept="application/pdf,.pdf"
+                    style={inputStyle}
+                  />
+                </FormField>
+                <AdminContractLinkFields
+                  owners={owners}
+                  projects={projects}
+                  defaultHousingCompanyId={contract.housingCompanyId || ""}
+                  defaultProjectId={contract.projectId || ""}
+                  contract={contract}
+                />
+              </>
+            )}
             <div style={editActionsStyle}>
-              <button type="submit" style={primaryButtonStyle}>Save contract</button>
+              <button type="submit" style={primaryButtonStyle}>Save {contract.contractType} contract</button>
             </div>
           </form>
 

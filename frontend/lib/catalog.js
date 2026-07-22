@@ -653,8 +653,11 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     SELECT
       kc."id",
       kc."contractNumber",
+      kc."contractType",
       kc."kitchenId",
       kc."projectId",
+      kc."claimPlanPdfPath",
+      kc."claimPlanPreviewPath",
       kc."isActive",
       kc."usedAt",
       kc."building",
@@ -692,6 +695,10 @@ export async function listKitchenContractsForAdmin(filters = {}) {
       latest_order."city" AS "latestOrderCity",
       latest_order."country" AS "latestOrderCountry",
       latest_order."createdAt" AS "latestOrderCreatedAt",
+      asset."previewBytes" IS NOT NULL AS "hasUploadedClaimPlanPreview",
+      asset."pdfBytes" IS NOT NULL AS "hasUploadedClaimPlanPdf",
+      asset."previewFileName" AS "uploadedClaimPlanPreviewFileName",
+      asset."pdfFileName" AS "uploadedClaimPlanPdfFileName",
       COUNT(o."id")::int AS "orderCount"
     FROM "KitchenContract" kc
     JOIN "Kitchen" k ON k."id" = kc."kitchenId"
@@ -699,6 +706,7 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     LEFT JOIN "PropertyObject" pobj ON pobj."id" = prj."propertyObjectId"
     LEFT JOIN "HousingCompany" hc ON hc."id" = prj."housingCompanyId"
     LEFT JOIN "Order" o ON o."kitchenContractId" = kc."id"
+    LEFT JOIN "KitchenContractClaimPlanAsset" asset ON asset."kitchenContractId" = kc."id"
     LEFT JOIN LATERAL (
       SELECT
         oo."firstName",
@@ -721,6 +729,7 @@ export async function listKitchenContractsForAdmin(filters = {}) {
       k."id",
       pobj."id",
       hc."id",
+      asset."id",
       latest_order."firstName",
       latest_order."lastName",
       latest_order."address1",
@@ -736,6 +745,7 @@ export async function listKitchenContractsForAdmin(filters = {}) {
   const contracts = rows.map((row) => ({
     id: row.id,
     contractNumber: row.contractNumber,
+    contractType: row.contractType === "ARC" ? "ARC" : "FRG",
     kitchenId: row.kitchenId,
     projectId: row.projectId || null,
     projectName: row.projectName || null,
@@ -743,6 +753,12 @@ export async function listKitchenContractsForAdmin(filters = {}) {
     projectStatus: row.projectStatus || "active",
     projectDescription: row.projectDescription || null,
     projectManagerName: row.projectManagerName || null,
+    claimPlanPdfPath: row.claimPlanPdfPath || null,
+    claimPlanPreviewPath: row.claimPlanPreviewPath || null,
+    hasUploadedClaimPlanPreview: Boolean(row.hasUploadedClaimPlanPreview),
+    hasUploadedClaimPlanPdf: Boolean(row.hasUploadedClaimPlanPdf),
+    uploadedClaimPlanPreviewFileName: row.uploadedClaimPlanPreviewFileName || null,
+    uploadedClaimPlanPdfFileName: row.uploadedClaimPlanPdfFileName || null,
     housingCompanyId: row.housingCompanyRecordId,
     ownerId: row.housingCompanyRecordId,
     isActive: row.isActive,

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import AdminSelect from "./admin-select";
 import ServiceClaimKitchenPicker from "./service-claim-kitchen-picker";
+import ServiceClaimReferencePlan from "./service-claim-reference-plan";
 import ServiceClaimPartIcon from "./service-claim-part-icon";
 import { speakAssistantTextWithTts, stopAssistantSpeech } from "./assistant-tts";
 import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-contract-autofill";
@@ -384,7 +385,7 @@ function ServiceAttachmentChips({
 
 function ServiceYesNoChoice({ question, value, yesLabel, noLabel, onChange }) {
   const isYes = value === "yes";
-  const isNo = value === "no" || !value;
+  const isNo = value === "no";
 
   return (
     <div className="service-yes-no-field">
@@ -411,12 +412,110 @@ function ServiceYesNoChoice({ question, value, yesLabel, noLabel, onChange }) {
   );
 }
 
+function ReferenceDamagePhotosField({
+  issue,
+  kind,
+  isMissing,
+  labels,
+  onSelect,
+  onRemove,
+  onClear,
+}) {
+  const inputId = `reference-damage-photos-${kind}-${issue.id}`;
+  return (
+    <div className="service-reference-flow__damage-photos">
+      <p>
+        {labels.title}
+        <RequiredFieldMark title={labels.requiredTitle} />
+      </p>
+      <span className="service-reference-flow__damage-hint">{labels.hint}</span>
+      <input
+        key={issue.damagePhotoFieldKey}
+        id={inputId}
+        type="file"
+        className="service-field__problem-area-file"
+        accept="image/*"
+        multiple
+        onChange={(event) => onSelect(kind, issue.id, event)}
+      />
+      <label
+        htmlFor={inputId}
+        className={[
+          "service-field__problem-area-upload-button",
+          isMissing ? "is-required-missing" : "",
+        ].filter(Boolean).join(" ")}
+        data-reference-required-field
+        data-reference-damage-upload-required={isMissing ? "true" : undefined}
+        aria-invalid={isMissing}
+      >
+        {labels.upload}
+      </label>
+      {issue.damagePhotos.length ? (
+        <ServiceAttachmentChips
+          files={issue.damagePhotos}
+          summary={labels.selected.replace("{count}", String(issue.damagePhotos.length))}
+          maxCount={MAX_CLAIM_ATTACHMENT_COUNT}
+          clearLabel={labels.clear}
+          onRemove={(index) => onRemove(kind, issue.id, index)}
+          onClearAll={() => onClear(kind, issue.id)}
+          viewLabel={labels.view}
+          viewAriaLabel={labels.viewAria}
+          closePreviewLabel={labels.closePreview}
+          previewUnavailableText={labels.previewUnavailable}
+          removeLabel={labels.remove}
+          expandLabel={labels.expand}
+          collapseLabel={labels.collapse}
+          inlineExpandToggle
+        />
+      ) : null}
+      {isMissing ? (
+        <span className="service-field__problem-area-error" role="alert">
+          {labels.required}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 const EMPTY_HAUSMEISTER_FIELDS = {
   hausmeisterGivenName: "",
   hausmeisterSurname: "",
   hausmeisterPhone: "",
   hausmeisterEmail: "",
 };
+
+const EMPTY_LANDLORD_FIELDS = {
+  landlordCompanyName: "",
+  landlordCompanyPhone: "",
+  landlordCompanyEmail: "",
+  landlordContactGivenName: "",
+  landlordContactSurname: "",
+  landlordPhone: "",
+  landlordEmail: "",
+};
+
+function createReferenceElectricalIssue(id) {
+  return {
+    id,
+    component: "",
+    problem: "",
+    serialNumber: "",
+    serialNumberImage: null,
+    serialNumberImageFieldKey: 0,
+    damagePhotos: [],
+    damagePhotoFieldKey: 0,
+  };
+}
+
+function createReferenceFurnitureIssue(id) {
+  return {
+    id,
+    component: "",
+    problem: "",
+    damagePhotos: [],
+    damagePhotoFieldKey: 0,
+  };
+}
 
 const COPY = {
   de: {
@@ -578,9 +677,7 @@ const COPY = {
     serialNumber: "Seriennummer(n) des E-Ger\u00e4tes",
     serialPlaceholder: "Seriennummer eingeben",
     serialNumberAdd: "Hinzuf\u00fcgen",
-    serialNumberRequired: "Bitte gib genau eine Seriennummer ein oder lade genau ein Foto der Seriennummer hoch.",
-    serialNumberCountRequired: "Bitte gib genau {count} Seriennummer(n) f\u00fcr die ausgew\u00e4hlten Elektroger\u00e4te ein oder lade entsprechend viele Seriennummern-Fotos hoch.",
-    serialNumberEvidenceLimitReached: "Du hast bereits alle {count} erforderlichen Seriennummern-Nachweise angegeben. Um ein Foto hochzuladen, entferne zuerst eine eingegebene Seriennummer oder ein vorhandenes Seriennummern-Foto.",
+    serialNumberRequired: "Seriennummer und Foto erforderlich.",
     serialNumberImage: "Foto der Seriennummer(n)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
@@ -589,9 +686,9 @@ const COPY = {
     serialNumberHelpAlt1: "Beispiel: Seriennummer auf dem Typenschild",
     serialNumberHelpAlt2: "Beispiel: Seriennummer im K\u00fchlschrank",
     attachments: "Anh\u00e4nge (optional)",
-    uploadFile: "Fotos hochladen",
+    uploadFile: "Zus\u00e4tzliche Dateien ausw\u00e4hlen",
     problemAreaAttachmentRequired: "Bitte lade mindestens eine Datei f\u00fcr diesen K\u00fcchenteil hoch.",
-    attachmentsHint: "PDF, Bilder oder Office-Dateien \u2014 bis zu 20 Dateien, je max. 4 MB.",
+    attachmentsHint: "Zus\u00e4tzliche Fotos, PDFs oder Office-Dateien \u2014 bis zu 20 Dateien, je max. 4 MB.",
     attachmentsClear: "Alle entfernen",
     attachmentsViewMore: "Mehr anzeigen",
     attachmentsViewLess: "Weniger anzeigen",
@@ -604,6 +701,7 @@ const COPY = {
     contactError: "Bitte gib Telefonnummer und E-Mail-Adresse an.",
     contractLookupLoading: "Vertragsnummer wird gepr\u00fcft...",
     contractLookupSuccess: "Adresse und Vermieterdaten aus den hinterlegten Vertragsdaten eingef\u00fcllt. Du kannst die Felder weiter bearbeiten.",
+    referencePlanLookupSuccess: "Vertrag gefunden. Die hinterlegte K\u00fcchenskizze wurde geladen.",
     contractLookupError: "Die Vertragsnummer wurde nicht gefunden.",
     kitchenPlanEyebrow: "K\u00fcchenmodell",
     kitchenPlanTitle: "Problemstelle in der K\u00fcche markieren",
@@ -621,6 +719,43 @@ const COPY = {
     kitchenPlanSelectedLabel: "Ausgew\u00e4hlt",
     kitchenPlanSelectedNone: "Noch keine Bereiche ausgew\u00e4hlt.",
     kitchenAreasLinePrefix: "K\u00fcchenbereiche:",
+    referencePlanEyebrow: "K\u00fcchenplan zum Vertrag",
+    referencePlanTitle: "K\u00fcchenskizze",
+    referencePlanOpen: "PDF-Plan \u00f6ffnen",
+    referencePlanFallback: "Der PDF-Plan kann in diesem Browser nicht direkt angezeigt werden.",
+    referencePlanPdfAria: "PDF-K\u00fcchenplan zum Vertrag",
+    referencePlanPreviewAlt: "K\u00fcchenskizze zum Vertrag",
+    referencePlanPreviewUnavailable: "F\u00fcr diesen Plan ist noch keine Bildvorschau hinterlegt. Du kannst den PDF-Plan separat \u00f6ffnen.",
+    referencePlanAffectedArea: "Betroffenes Teil oder Bereich",
+    referencePlanAffectedAreaPlaceholder: "z. B. Unterschrank unter der Sp\u00fcle, Arbeitsplatte links, K\u00fchlschrank",
+    referencePlanPhotoHint: "Tipp: Lade zus\u00e4tzlich ein \u00dcbersichtsbild und ein Detailfoto des betroffenen Bereichs hoch.",
+    referenceElectricalQuestion: "Elektroger\u00e4t betroffen?",
+    referenceElectricalTitle: "Elektrische Komponenten",
+    referenceElectricalComponent: "Elektroger\u00e4t",
+    referenceElectricalComponentPlaceholder: "z. B. K\u00fchlschrank, Backofen, Geschirrsp\u00fcler",
+    referenceElectricalProblem: "Problem",
+    referenceElectricalProblemPlaceholder: "Beschreibe das Problem mit dieser Komponente",
+    referenceElectricalAdd: "Weiteres Ger\u00e4t hinzuf\u00fcgen",
+    referenceElectricalRemove: "Elektroger\u00e4t entfernen",
+    referenceElectricalItemTitle: "Elektroger\u00e4t {number}",
+    referenceSerialEvidence: "Seriennummer + Foto",
+    referenceDamagePhotos: "Schadensfoto",
+    referenceDamagePhotosHint: "Lade ein klares Foto des Schadens hoch.",
+    referenceDamagePhotosRequired: "Schadensfoto erforderlich.",
+    referenceDamageUpload: "Hochladen",
+    serialEvidenceAnd: "und",
+    referenceSerialTypedOption: "Seriennummer eingeben",
+    referenceSerialPhotoOption: "Foto hochladen",
+    referenceFurnitureQuestion: "M\u00f6bel betroffen?",
+    referenceFurnitureTitle: "M\u00f6bel",
+    referenceFurnitureComponent: "M\u00f6belteil",
+    referenceFurnitureComponentPlaceholder: "z. B. Unterschrank, Arbeitsplatte, Sp\u00fcle, Front",
+    referenceFurnitureProblem: "Problem",
+    referenceFurnitureProblemPlaceholder: "Beschreibe das Problem mit dieser Komponente",
+    referenceFurnitureAdd: "Weiteres M\u00f6belteil hinzuf\u00fcgen",
+    referenceFurnitureRemove: "Teil entfernen",
+    referenceFurnitureItemTitle: "Teil {number}",
+    referenceIssueRequired: "Bitte gib mindestens eine betroffene elektrische oder nicht-elektrische Komponente an.",
     problemDescriptionFieldLabel: "Weitere Details",
     submitError: "Deine Reklamation konnte nicht gesendet werden.",
     submitSuccess: "Deine Reklamation wurde erfolgreich \u00fcbermittelt.",
@@ -824,9 +959,7 @@ const COPY = {
     serialNumber: "Serial number(s) of the appliance",
     serialPlaceholder: "Enter a serial number",
     serialNumberAdd: "Add",
-    serialNumberRequired: "Please enter exactly one serial number or upload exactly one photo of the serial number.",
-    serialNumberCountRequired: "Please provide exactly {count} serial number(s) for the selected electrical appliance(s), using typed numbers and/or serial number photos.",
-    serialNumberEvidenceLimitReached: "You have already provided all {count} required serial number entries. To upload a photo, first remove a typed serial number or an existing serial number photo.",
+    serialNumberRequired: "Serial number and photo required.",
     serialNumberImage: "Photo of the serial number(s)",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Help: where to find the serial number",
@@ -835,9 +968,9 @@ const COPY = {
     serialNumberHelpAlt1: "Example: serial number on the appliance label",
     serialNumberHelpAlt2: "Example: serial number inside the fridge",
     attachments: "Attachments (optional)",
-    uploadFile: "Upload photos",
+    uploadFile: "Choose additional files",
     problemAreaAttachmentRequired: "Please upload at least one file for this kitchen component.",
-    attachmentsHint: "PDFs, images, or office files \u2014 up to 20 files, 4 MB each.",
+    attachmentsHint: "Extra photos, PDFs, or office files \u2014 up to 20 files, 4 MB each.",
     attachmentsClear: "Remove all",
     attachmentsViewMore: "View more",
     attachmentsViewLess: "View less",
@@ -847,6 +980,7 @@ const COPY = {
     attachmentsErrorType: "This file type is not allowed. Use PDF, images, or common office formats.",
     contractLookupLoading: "Checking contract number...",
     contractLookupSuccess: "Address and landlord details autofilled from the saved contract data. You can still edit the fields.",
+    referencePlanLookupSuccess: "Contract found. The saved kitchen sketch has been loaded.",
     kitchenPlanEyebrow: "Kitchen model",
     kitchenPlanTitle: "Mark where the problem is",
     kitchenPlanReset: "Clear selection",
@@ -863,6 +997,43 @@ const COPY = {
     kitchenPlanSelectedLabel: "Selected",
     kitchenPlanSelectedNone: "No areas selected yet.",
     kitchenAreasLinePrefix: "Kitchen areas:",
+    referencePlanEyebrow: "Kitchen plan for this contract",
+    referencePlanTitle: "Kitchen sketch",
+    referencePlanOpen: "Open PDF plan",
+    referencePlanFallback: "This browser cannot display the PDF plan directly.",
+    referencePlanPdfAria: "PDF kitchen plan for this contract",
+    referencePlanPreviewAlt: "Kitchen sketch for this contract",
+    referencePlanPreviewUnavailable: "An image preview is not available for this plan yet. You can open the PDF plan separately.",
+    referencePlanAffectedArea: "Affected part or area",
+    referencePlanAffectedAreaPlaceholder: "e.g. cabinet below the sink, left worktop, refrigerator",
+    referencePlanPhotoHint: "Tip: upload one overview photo and one close-up of the affected area.",
+    referenceElectricalQuestion: "Electrical appliance affected?",
+    referenceElectricalTitle: "Electrical components",
+    referenceElectricalComponent: "Appliance",
+    referenceElectricalComponentPlaceholder: "e.g. refrigerator, oven, dishwasher",
+    referenceElectricalProblem: "Problem",
+    referenceElectricalProblemPlaceholder: "Describe the issue with this component",
+    referenceElectricalAdd: "Add another appliance",
+    referenceElectricalRemove: "Remove appliance",
+    referenceElectricalItemTitle: "Appliance {number}",
+    referenceSerialEvidence: "Serial number + photo",
+    referenceDamagePhotos: "Damage photo",
+    referenceDamagePhotosHint: "Upload a clear photo of the damage.",
+    referenceDamagePhotosRequired: "Damage photo required.",
+    referenceDamageUpload: "Upload",
+    serialEvidenceAnd: "and",
+    referenceSerialTypedOption: "Enter serial number",
+    referenceSerialPhotoOption: "Upload photo",
+    referenceFurnitureQuestion: "Furniture affected?",
+    referenceFurnitureTitle: "Furniture",
+    referenceFurnitureComponent: "Furniture item",
+    referenceFurnitureComponentPlaceholder: "e.g. cabinet, worktop, sink, front",
+    referenceFurnitureProblem: "Problem",
+    referenceFurnitureProblemPlaceholder: "Describe the issue with this component",
+    referenceFurnitureAdd: "Add another item",
+    referenceFurnitureRemove: "Remove item",
+    referenceFurnitureItemTitle: "Item {number}",
+    referenceIssueRequired: "Please add at least one affected electrical or non-electrical component.",
     problemDescriptionFieldLabel: "Additional details",
     contractLookupError: "Contract number was not found.",
     submit: "Send complaint",
@@ -1052,7 +1223,7 @@ const COPY = {
     serialNumber: "Cihaz seri numaras\u0131 / numaralar\u0131",
     serialPlaceholder: "Bir seri numaras\u0131 girin",
     serialNumberAdd: "Ekle",
-    serialNumberRequired: "L\u00fctfen en az bir seri numaras\u0131 girin veya seri numaras\u0131n\u0131n foto\u011fraf\u0131n\u0131 y\u00fckleyin.",
+    serialNumberRequired: "Seri numaras\u0131 ve foto\u011fraf gereklidir.",
     serialNumberImage: "Seri numaras\u0131 / numaralar\u0131 foto\u011fraf\u0131",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Yard\u0131m: seri numaras\u0131 nerede bulunur?",
@@ -1254,7 +1425,7 @@ const COPY = {
     serialNumber: "N\u00famero(s) de serie del electrodom\u00e9stico",
     serialPlaceholder: "Introduzca un n\u00famero de serie",
     serialNumberAdd: "A\u00f1adir",
-    serialNumberRequired: "Introduzca al menos un n\u00famero de serie o suba una foto del n\u00famero de serie.",
+    serialNumberRequired: "Se requieren el n\u00famero de serie y la foto.",
     serialNumberImage: "Foto del n\u00famero o de los n\u00fameros de serie",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Ayuda: d\u00f3nde encontrar el n\u00famero de serie",
@@ -1456,7 +1627,7 @@ const COPY = {
     serialNumber: "Num\u00e9ro(s) de s\u00e9rie de l'appareil",
     serialPlaceholder: "Saisissez un num\u00e9ro de s\u00e9rie",
     serialNumberAdd: "Ajouter",
-    serialNumberRequired: "Veuillez saisir au moins un num\u00e9ro de s\u00e9rie ou envoyer une photo du num\u00e9ro de s\u00e9rie.",
+    serialNumberRequired: "Num\u00e9ro de s\u00e9rie et photo requis.",
     serialNumberImage: "Photo du ou des num\u00e9ros de s\u00e9rie",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "Aide : o\u00f9 trouver le num\u00e9ro de s\u00e9rie",
@@ -1657,7 +1828,7 @@ const COPY = {
     serialNumber: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 / \u043d\u043e\u043c\u0435\u0440\u0430 \u0443\u0441\u0442\u0440\u043e\u0439\u0441\u0442\u0432\u0430",
     serialPlaceholder: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
     serialNumberAdd: "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c",
-    serialNumberRequired: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0445\u043e\u0442\u044f \u0431\u044b \u043e\u0434\u0438\u043d \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0438\u043b\u0438 \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0444\u043e\u0442\u043e \u0448\u0438\u043b\u044c\u0434\u0438\u043a\u0430.",
+    serialNumberRequired: "\u0422\u0440\u0435\u0431\u0443\u044e\u0442\u0441\u044f \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0438 \u0444\u043e\u0442\u043e.",
     serialNumberImage: "\u0424\u043e\u0442\u043e \u0441\u0435\u0440\u0438\u0439\u043d\u043e\u0433\u043e \u043d\u043e\u043c\u0435\u0440\u0430 / \u043d\u043e\u043c\u0435\u0440\u043e\u0432",
     serialNumberHelpTrigger: "i",
     serialNumberHelpAria: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430: \u0433\u0434\u0435 \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
@@ -1772,6 +1943,7 @@ const INITIAL_FORM = {
 const EMPTY_CONTRACT_LOOKUP = {
   status: "idle",
   contractNumber: "",
+  contractType: "",
   message: "",
   kitchenPlan: null,
 };
@@ -2060,6 +2232,10 @@ export default function ServiceClaimFlow() {
   const [attachments, setAttachments] = useState([]);
   const [serialNumberByComponentId, setSerialNumberByComponentId] = useState({});
   const [serialNumberImageByComponentId, setSerialNumberImageByComponentId] = useState({});
+  const [referenceElectricalInvolved, setReferenceElectricalInvolved] = useState("no");
+  const [referenceFurnitureInvolved, setReferenceFurnitureInvolved] = useState("no");
+  const [referenceElectricalIssues, setReferenceElectricalIssues] = useState([]);
+  const [referenceFurnitureIssues, setReferenceFurnitureIssues] = useState([]);
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
   const [serialNumberImageFieldKeysByComponentId, setSerialNumberImageFieldKeysByComponentId] = useState({});
   const [problemAreaAttachmentFieldKeysByComponentId, setProblemAreaAttachmentFieldKeysByComponentId] = useState({});
@@ -2101,6 +2277,7 @@ export default function ServiceClaimFlow() {
   const claimAssistantTtsAbortControllerRef = useRef(null);
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
   const latestFormRef = useRef(INITIAL_FORM);
+  const referenceIssueIdRef = useRef(0);
   const preferredContactCalendarRef = useRef(null);
   const preferredContactTimeFromRef = useRef(null);
   const preferredContactTimeToRef = useRef(null);
@@ -2212,6 +2389,14 @@ export default function ServiceClaimFlow() {
     contractLookup.kitchenPlan,
     normalizedContractNumber,
   ]);
+  const isReferenceOnlyPlan = activeKitchenPlan?.selectionMode === "reference-pdf";
+  const activeContractType = (
+    contractLookup.status === "found" &&
+    contractLookup.contractNumber === normalizedContractNumber
+  )
+    ? String(contractLookup.contractType || activeKitchenPlan?.contractType || "").trim().toUpperCase()
+    : "";
+  const shouldShowLandlordSection = activeContractType !== "ARC";
   const problemAreaChoiceGroups = useMemo(() => {
     if (!activeKitchenPlan?.selectableComponents?.length) return [];
     return buildServiceClaimComponentChoiceGroups(activeKitchenPlan.selectableComponents);
@@ -2287,6 +2472,14 @@ export default function ServiceClaimFlow() {
     () => Object.values(serialNumberImageByComponentId).filter(Boolean),
     [serialNumberImageByComponentId],
   );
+  const referenceSerialNumberImages = useMemo(
+    () => referenceElectricalIssues.map((issue) => issue.serialNumberImage).filter(Boolean),
+    [referenceElectricalIssues],
+  );
+  const allSerialNumberImages = useMemo(
+    () => [...serialNumberImages, ...referenceSerialNumberImages],
+    [referenceSerialNumberImages, serialNumberImages],
+  );
   const isPreferredContactCustomTime = isPreferredContactCustom(formValues.preferredContactTimeWindow);
   const selectedProblemAreasWithDetails = useMemo(() => {
     return selectedProblemAreas.flatMap((area) => {
@@ -2357,7 +2550,28 @@ export default function ServiceClaimFlow() {
     [selectedProblemAreasWithDetails],
   );
   const hasMissingProblemAreaSerialEvidence = electricalProblemAreas.some(
-    (area) => !String(area.serialNumber || "").trim() && !area.serialNumberImage,
+    (area) => !String(area.serialNumber || "").trim() || !area.serialNumberImage,
+  );
+  const hasReferenceElectricalIssues = referenceElectricalInvolved === "yes";
+  const hasReferenceFurnitureIssues = referenceFurnitureInvolved === "yes";
+  const hasMissingReferenceIssueChoice = isReferenceOnlyPlan && !hasReferenceElectricalIssues && !hasReferenceFurnitureIssues;
+  const hasMissingReferenceElectricalDetails = isReferenceOnlyPlan && hasReferenceElectricalIssues && (
+    !referenceElectricalIssues.length ||
+    referenceElectricalIssues.some((issue) => (
+      !String(issue.component || "").trim() ||
+      !String(issue.problem || "").trim() ||
+      !String(issue.serialNumber || "").trim() ||
+      !issue.serialNumberImage ||
+      !issue.damagePhotos.length
+    ))
+  );
+  const hasMissingReferenceFurnitureDetails = isReferenceOnlyPlan && hasReferenceFurnitureIssues && (
+    !referenceFurnitureIssues.length ||
+    referenceFurnitureIssues.some((issue) => (
+      !String(issue.component || "").trim() ||
+      !String(issue.problem || "").trim() ||
+      !issue.damagePhotos.length
+    ))
   );
   const hasMissingProblemAreaPartChoices = selectedProblemAreasWithDetails.some(
     (area) => area.choiceGroup && (
@@ -2385,6 +2599,13 @@ export default function ServiceClaimFlow() {
         0,
       ),
     [problemAreaAttachmentsByComponentId],
+  );
+  const referenceDamagePhotoCount = useMemo(
+    () => [...referenceElectricalIssues, ...referenceFurnitureIssues].reduce(
+      (sum, issue) => sum + issue.damagePhotos.length,
+      0,
+    ),
+    [referenceElectricalIssues, referenceFurnitureIssues],
   );
 
   function isPreferredContactToTimeDisabled(nextValue) {
@@ -2939,6 +3160,10 @@ export default function ServiceClaimFlow() {
     if (field === "contractNumber") {
       const nextContractNumber = normalizeServiceClaimContractNumber(value);
       contractLookupRequestIdRef.current += 1;
+      setReferenceElectricalInvolved("no");
+      setReferenceFurnitureInvolved("no");
+      setReferenceElectricalIssues([]);
+      setReferenceFurnitureIssues([]);
 
       if (contractLookupTimeoutRef.current) {
         window.clearTimeout(contractLookupTimeoutRef.current);
@@ -2950,6 +3175,7 @@ export default function ServiceClaimFlow() {
         setContractLookup({
           status: "loading",
           contractNumber: nextContractNumber,
+          contractType: "",
           message: "",
           kitchenPlan: null,
         });
@@ -2968,16 +3194,19 @@ export default function ServiceClaimFlow() {
               throw new Error(payload.error || t("contractLookupError"));
             }
 
+            const isArcContract = String(payload.contract?.contractType || "").trim().toUpperCase() === "ARC";
             setForm((current) => {
               if (normalizeServiceClaimContractNumber(current.contractNumber) !== nextContractNumber) {
                 return current;
               }
 
+              const autofill = buildServiceClaimAutofillFromContract(payload.contract);
               return {
                 ...current,
+                ...(isArcContract ? EMPTY_LANDLORD_FIELDS : {}),
                 ...mergeNonEmptyAutofillValues(
                   current,
-                  buildServiceClaimAutofillFromContract(payload.contract),
+                  isArcContract ? { ...autofill, ...EMPTY_LANDLORD_FIELDS } : autofill,
                 ),
               };
             });
@@ -2985,6 +3214,7 @@ export default function ServiceClaimFlow() {
             setContractLookup({
               status: "found",
               contractNumber: nextContractNumber,
+              contractType: payload.contract?.contractType || payload.kitchenPlan?.contractType || "",
               message: "",
               kitchenPlan: payload.kitchenPlan || null,
             });
@@ -2996,6 +3226,7 @@ export default function ServiceClaimFlow() {
             setContractLookup({
               status: "missing",
               contractNumber: nextContractNumber,
+              contractType: "",
               message: lookupError.message || t("contractLookupError"),
               kitchenPlan: null,
             });
@@ -3168,7 +3399,7 @@ export default function ServiceClaimFlow() {
         }
         return sum + (Array.isArray(files) ? files.length : 0);
       }, 0);
-      const fixedAttachmentCount = attachments.length + serialNumberImages.length + otherProblemAreaFileCount;
+      const fixedAttachmentCount = attachments.length + allSerialNumberImages.length + referenceDamagePhotoCount + otherProblemAreaFileCount;
       let message = "";
 
       for (const file of picked) {
@@ -3181,7 +3412,7 @@ export default function ServiceClaimFlow() {
           message = copy.attachmentsErrorFileTooLarge;
           continue;
         }
-        if (!isClientAllowedAttachment(file)) {
+        if (!file.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(file)) {
           message = copy.attachmentsErrorType;
           continue;
         }
@@ -3254,7 +3485,7 @@ export default function ServiceClaimFlow() {
       const next = [...prev];
       let message = "";
       for (const file of picked) {
-        const currentCount = next.length + serialNumberImages.length + problemAreaAttachmentCount;
+        const currentCount = next.length + allSerialNumberImages.length + problemAreaAttachmentCount + referenceDamagePhotoCount;
         if (currentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
           message = copy.attachmentsErrorTooMany;
           break;
@@ -3285,7 +3516,7 @@ export default function ServiceClaimFlow() {
 
     setError("");
     const file = picked[0];
-    if (attachments.length + serialNumberImages.length + problemAreaAttachmentCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
+    if (attachments.length + allSerialNumberImages.length + problemAreaAttachmentCount + referenceDamagePhotoCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
       setError(copy.attachmentsErrorTooMany);
       return;
     }
@@ -3298,7 +3529,6 @@ export default function ServiceClaimFlow() {
       return;
     }
     setSerialNumberImageByComponentId((current) => ({ ...current, [componentId]: file }));
-    setSerialNumberByComponentId((current) => ({ ...current, [componentId]: "" }));
   }
 
   function removeAttachment(index) {
@@ -3362,10 +3592,199 @@ export default function ServiceClaimFlow() {
 
   function handleProblemAreaSerialNumberChange(componentId, value) {
     setSerialNumberByComponentId((current) => ({ ...current, [componentId]: value }));
-    if (String(value || "").trim()) {
-      removeProblemAreaSerialNumberImage(componentId);
-    }
     if (error) setError("");
+  }
+
+  function getNextReferenceIssueId(prefix) {
+    referenceIssueIdRef.current += 1;
+    return `${prefix}-${Date.now()}-${referenceIssueIdRef.current}`;
+  }
+
+  function handleReferenceElectricalInvolvedChange(value) {
+    setReferenceElectricalInvolved(value);
+    setReferenceElectricalIssues((current) => (
+      value === "yes"
+        ? current.length ? current : [createReferenceElectricalIssue(getNextReferenceIssueId("electrical"))]
+        : []
+    ));
+    setIsClaimRequiredAlertDismissed(false);
+    if (error) setError("");
+  }
+
+  function handleReferenceFurnitureInvolvedChange(value) {
+    setReferenceFurnitureInvolved(value);
+    setReferenceFurnitureIssues((current) => (
+      value === "yes"
+        ? current.length ? current : [createReferenceFurnitureIssue(getNextReferenceIssueId("furniture"))]
+        : []
+    ));
+    setIsClaimRequiredAlertDismissed(false);
+    if (error) setError("");
+  }
+
+  function addReferenceElectricalIssue() {
+    setReferenceElectricalInvolved("yes");
+    setReferenceElectricalIssues((current) => [
+      ...current,
+      createReferenceElectricalIssue(getNextReferenceIssueId("electrical")),
+    ]);
+    if (error) setError("");
+  }
+
+  function addReferenceFurnitureIssue() {
+    setReferenceFurnitureInvolved("yes");
+    setReferenceFurnitureIssues((current) => [
+      ...current,
+      createReferenceFurnitureIssue(getNextReferenceIssueId("furniture")),
+    ]);
+    if (error) setError("");
+  }
+
+  function updateReferenceElectricalIssue(issueId, field, value) {
+    setReferenceElectricalIssues((current) =>
+      current.map((issue) => {
+        if (issue.id !== issueId) {
+          return issue;
+        }
+        return {
+          ...issue,
+          [field]: value,
+        };
+      }),
+    );
+    if (error) setError("");
+  }
+
+  function updateReferenceFurnitureIssue(issueId, field, value) {
+    setReferenceFurnitureIssues((current) =>
+      current.map((issue) => issue.id === issueId ? { ...issue, [field]: value } : issue),
+    );
+    if (error) setError("");
+  }
+
+  function removeReferenceElectricalIssue(issueId) {
+    setReferenceElectricalIssues((current) => {
+      const next = current.filter((issue) => issue.id !== issueId);
+      return next.length ? next : [createReferenceElectricalIssue(getNextReferenceIssueId("electrical"))];
+    });
+    if (error) setError("");
+  }
+
+  function removeReferenceFurnitureIssue(issueId) {
+    setReferenceFurnitureIssues((current) => {
+      const next = current.filter((issue) => issue.id !== issueId);
+      return next.length ? next : [createReferenceFurnitureIssue(getNextReferenceIssueId("furniture"))];
+    });
+    if (error) setError("");
+  }
+
+  function handleReferenceSerialNumberImageSelected(issueId, event) {
+    const picked = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (!picked.length) {
+      return;
+    }
+
+    setError("");
+    const file = picked[0];
+    if (attachments.length + allSerialNumberImages.length + problemAreaAttachmentCount + referenceDamagePhotoCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
+      setError(copy.attachmentsErrorTooMany);
+      return;
+    }
+    if (file.size > MAX_CLAIM_ATTACHMENT_BYTES) {
+      setError(copy.attachmentsErrorFileTooLarge);
+      return;
+    }
+    if (!file.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(file)) {
+      setError(copy.attachmentsErrorType);
+      return;
+    }
+    setReferenceElectricalIssues((current) =>
+      current.map((issue) => issue.id === issueId
+        ? {
+            ...issue,
+            serialNumberImage: file,
+          }
+        : issue),
+    );
+  }
+
+  function removeReferenceSerialNumberImage(issueId) {
+    setReferenceElectricalIssues((current) =>
+      current.map((issue) => issue.id === issueId
+        ? {
+            ...issue,
+            serialNumberImage: null,
+            serialNumberImageFieldKey: issue.serialNumberImageFieldKey + 1,
+          }
+        : issue),
+    );
+    setError("");
+  }
+
+  function handleReferenceDamagePhotosSelected(kind, issueId, event) {
+    const picked = Array.from(event.target.files || []);
+    event.target.value = "";
+    if (!picked.length) return;
+
+    const setIssues = kind === "electrical" ? setReferenceElectricalIssues : setReferenceFurnitureIssues;
+    setError("");
+    setIssues((current) => {
+      const currentDamagePhotoCount = current.reduce(
+        (sum, issue) => sum + (issue.id === issueId ? 0 : issue.damagePhotos.length),
+        0,
+      );
+      const otherKindDamagePhotoCount = (kind === "electrical" ? referenceFurnitureIssues : referenceElectricalIssues)
+        .reduce((sum, issue) => sum + issue.damagePhotos.length, 0);
+      const targetIssue = current.find((issue) => issue.id === issueId);
+      const nextPhotos = [...(targetIssue?.damagePhotos || [])];
+      let message = "";
+
+      for (const file of picked) {
+        const totalCount = attachments.length
+          + allSerialNumberImages.length
+          + problemAreaAttachmentCount
+          + currentDamagePhotoCount
+          + otherKindDamagePhotoCount
+          + nextPhotos.length;
+        if (totalCount >= MAX_CLAIM_ATTACHMENT_COUNT) {
+          message = copy.attachmentsErrorTooMany;
+          break;
+        }
+        if (file.size > MAX_CLAIM_ATTACHMENT_BYTES) {
+          message = copy.attachmentsErrorFileTooLarge;
+          continue;
+        }
+        if (!file.type?.toLowerCase().startsWith("image/") || !isClientAllowedAttachment(file)) {
+          message = copy.attachmentsErrorType;
+          continue;
+        }
+        nextPhotos.push(file);
+      }
+
+      if (message) queueMicrotask(() => setError(message));
+      return current.map((issue) => issue.id === issueId ? { ...issue, damagePhotos: nextPhotos } : issue);
+    });
+  }
+
+  function removeReferenceDamagePhoto(kind, issueId, index) {
+    const setIssues = kind === "electrical" ? setReferenceElectricalIssues : setReferenceFurnitureIssues;
+    setIssues((current) => current.map((issue) => issue.id === issueId
+      ? {
+          ...issue,
+          damagePhotos: issue.damagePhotos.filter((_, photoIndex) => photoIndex !== index),
+          damagePhotoFieldKey: issue.damagePhotoFieldKey + 1,
+        }
+      : issue));
+    setError("");
+  }
+
+  function clearReferenceDamagePhotos(kind, issueId) {
+    const setIssues = kind === "electrical" ? setReferenceElectricalIssues : setReferenceFurnitureIssues;
+    setIssues((current) => current.map((issue) => issue.id === issueId
+      ? { ...issue, damagePhotos: [], damagePhotoFieldKey: issue.damagePhotoFieldKey + 1 }
+      : issue));
+    setError("");
   }
 
   function goContractHelpPrev() {
@@ -3457,6 +3876,33 @@ export default function ServiceClaimFlow() {
 
   function buildSubmittedProblemDescription(formState = formValues) {
     const userDescription = String(formState.problemDescription || "").trim();
+    const referenceElectricalBlock = isReferenceOnlyPlan && referenceElectricalInvolved === "yes" && referenceElectricalIssues.length
+      ? [
+          "Elektrische Komponenten:",
+          ...referenceElectricalIssues.map((issue, index) => {
+            const serialNumber = String(issue.serialNumber || "").trim();
+            const serialEvidence = serialNumber
+              ? `Seriennummer: ${serialNumber}`
+              : issue.serialNumberImage
+                ? `Seriennummer-Foto: ${issue.serialNumberImage.name}`
+                : "Seriennummer: -";
+            return [
+              `${index + 1}. ${String(issue.component || "").trim() || "-"}`,
+              `Problem: ${String(issue.problem || "").trim() || "-"}`,
+              serialEvidence,
+            ].join("\n");
+          }),
+        ].join("\n")
+      : "";
+    const referenceFurnitureBlock = isReferenceOnlyPlan && referenceFurnitureInvolved === "yes" && referenceFurnitureIssues.length
+      ? [
+          "Moebel / nicht-elektrische Komponenten:",
+          ...referenceFurnitureIssues.map((issue, index) => [
+            `${index + 1}. ${String(issue.component || "").trim() || "-"}`,
+            `Problem: ${String(issue.problem || "").trim() || "-"}`,
+          ].join("\n")),
+        ].join("\n")
+      : "";
     const selectedAreasBlock = selectedProblemAreasWithDetails.length
       ? [
           kitchenAreasLinePrefix,
@@ -3465,7 +3911,10 @@ export default function ServiceClaimFlow() {
           ),
         ].join("\n")
       : "";
-    const description = [selectedAreasBlock, userDescription].filter(Boolean).join("\n\n").trim();
+    const description = [referenceElectricalBlock, referenceFurnitureBlock, selectedAreasBlock, userDescription]
+      .filter(Boolean)
+      .join("\n\n")
+      .trim();
     const preferredContact = buildPreferredContactSummary();
     if (!preferredContact) {
       return description;
@@ -3570,8 +4019,8 @@ export default function ServiceClaimFlow() {
             contractNumber: normalizedContractNumber,
             problemDescription: buildSubmittedProblemDescription(latestFormValues),
             serialNumber: Object.values(serialNumberByComponentId).map((value) => String(value || "").trim()).filter(Boolean).join("\n"),
-            hasSerialNumberImage: serialNumberImages.length > 0,
-            attachmentCount: attachments.length + serialNumberImages.length + problemAreaAttachmentCount,
+            hasSerialNumberImage: allSerialNumberImages.length > 0,
+            attachmentCount: attachments.length + allSerialNumberImages.length + problemAreaAttachmentCount + referenceDamagePhotoCount,
             preferredContactDate: String(latestFormValues.preferredContactDate || "").trim(),
             preferredContactTimeWindow: String(latestFormValues.preferredContactTimeWindow || "").trim(),
             preferredContactTimeFrom: String(latestFormValues.preferredContactTimeFrom || "").trim(),
@@ -3785,6 +4234,34 @@ export default function ServiceClaimFlow() {
       return;
     }
 
+    if (hasMissingReferenceIssueChoice) {
+      setShowClaimRequiredErrors(true);
+      setIsClaimRequiredAlertDismissed(false);
+      setError(t("referenceIssueRequired"));
+      window.requestAnimationFrame(() => {
+        const firstReferenceQuestion = selectedServicePanelRef.current?.querySelector(
+          '[data-reference-issue-choice="true"]',
+        );
+        firstReferenceQuestion?.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstReferenceQuestion?.focus?.({ preventScroll: true });
+      });
+      return;
+    }
+
+    if (hasMissingReferenceElectricalDetails || hasMissingReferenceFurnitureDetails) {
+      setShowClaimRequiredErrors(true);
+      setIsClaimRequiredAlertDismissed(false);
+      setError(t("requiredFieldMissing"));
+      window.requestAnimationFrame(() => {
+        const firstMissingReferenceField = selectedServicePanelRef.current?.querySelector(
+          '[data-reference-required-field][aria-invalid="true"]',
+        );
+        firstMissingReferenceField?.scrollIntoView({ behavior: "smooth", block: "center" });
+        firstMissingReferenceField?.focus?.({ preventScroll: true });
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setError("");
     setSuccessMessage("");
@@ -3793,6 +4270,7 @@ export default function ServiceClaimFlow() {
       const formData = new FormData();
       const normalizedSerialNumbers = electricalProblemAreas
         .map((area) => String(area.serialNumber || "").trim())
+        .concat(referenceElectricalIssues.map((issue) => String(issue.serialNumber || "").trim()))
         .filter(Boolean)
         .join("\n");
       const includeHausmeister = formValues.hausmeisterInvolved === "yes";
@@ -3805,7 +4283,7 @@ export default function ServiceClaimFlow() {
         clientPostalCode: formValues.clientPostalCode.trim(),
         problemDescription: buildSubmittedProblemDescription(),
         serialNumber: normalizedSerialNumbers,
-        hasSerialNumberImage: serialNumberImages.length > 0 ? "true" : "false",
+        hasSerialNumberImage: allSerialNumberImages.length > 0 ? "true" : "false",
         language,
         ...(includeHausmeister ? {} : EMPTY_HAUSMEISTER_FIELDS),
       };
@@ -3840,9 +4318,38 @@ export default function ServiceClaimFlow() {
       } else {
         formData.append("problemAreasJson", "[]");
       }
+      const referenceIssues = [
+        ...referenceElectricalIssues.map((issue) => ({
+          componentId: `reference-electrical-${issue.id}`,
+          name: String(issue.component || "").trim(),
+          code: "REFERENCE-ELECTRICAL",
+          detail: String(issue.problem || "").trim(),
+          serialNumber: String(issue.serialNumber || "").trim(),
+        })),
+        ...referenceFurnitureIssues.map((issue) => ({
+          componentId: `reference-furniture-${issue.id}`,
+          name: String(issue.component || "").trim(),
+          code: "REFERENCE-FURNITURE",
+          detail: String(issue.problem || "").trim(),
+        })),
+      ];
+      formData.append("referenceIssuesJson", JSON.stringify(referenceIssues));
       for (const area of electricalProblemAreas) {
         if (area.serialNumberImage) {
           formData.append(`serialNumberImage:${area.rowComponentId}`, area.serialNumberImage);
+        }
+      }
+      for (const issue of referenceElectricalIssues) {
+        if (issue.serialNumberImage) {
+          formData.append(`serialNumberImage:reference-electrical-${issue.id}`, issue.serialNumberImage);
+        }
+        for (const file of issue.damagePhotos) {
+          formData.append(`problemAreaAttachment:reference-electrical-${issue.id}`, file);
+        }
+      }
+      for (const issue of referenceFurnitureIssues) {
+        for (const file of issue.damagePhotos) {
+          formData.append(`problemAreaAttachment:reference-furniture-${issue.id}`, file);
         }
       }
       for (const file of attachments) {
@@ -3875,6 +4382,10 @@ export default function ServiceClaimFlow() {
       setAttachments([]);
       setSerialNumberByComponentId({});
       setSerialNumberImageByComponentId({});
+      setReferenceElectricalInvolved("no");
+      setReferenceFurnitureInvolved("no");
+      setReferenceElectricalIssues([]);
+      setReferenceFurnitureIssues([]);
       setProblemComponentIds([]);
       setProblemAreaPartChoiceByGroupKey({});
       setConfirmedProblemAreaChoiceByGroupKey({});
@@ -4285,7 +4796,7 @@ export default function ServiceClaimFlow() {
             ) : null}
             {contractLookup.status === "found" && isCurrentContractLookupResult ? (
               <p className="service-form__success service-form__success--contract-status">
-                {t("contractLookupSuccess")}
+                {isReferenceOnlyPlan ? t("referencePlanLookupSuccess") : t("contractLookupSuccess")}
               </p>
             ) : null}
             {contractLookup.status === "missing" && isCurrentContractLookupResult ? (
@@ -4501,7 +5012,7 @@ export default function ServiceClaimFlow() {
                 ].filter(Boolean).join(" ")}
                 aria-hidden={shouldHideContractLookupFeedback ? "true" : undefined}
               >
-                {t("contractLookupSuccess")}
+                {isReferenceOnlyPlan ? t("referencePlanLookupSuccess") : t("contractLookupSuccess")}
               </p>
             ) : null}
             {contractLookup.status === "missing" && isCurrentContractLookupResult ? (
@@ -5106,86 +5617,88 @@ export default function ServiceClaimFlow() {
               </label>
             </section>
 
-            <section className="service-form__section">
-              <p className="service-form__section-title">{copy.landlordSection}</p>
+            {shouldShowLandlordSection ? (
+              <section className="service-form__section">
+                <p className="service-form__section-title">{copy.landlordSection}</p>
 
-              <div className="service-field-grid service-field-grid--landlord-company">
-                <label className="service-field">
-                  <span>{t("landlordCompanyName")}</span>
-                  <input
-                    type="text"
-                    value={formValues.landlordCompanyName}
-                    onChange={(event) => handleFieldChange("landlordCompanyName", event.target.value)}
-                    placeholder={t("landlordCompanyNamePlaceholder")}
-                  />
-                </label>
+                <div className="service-field-grid service-field-grid--landlord-company">
+                  <label className="service-field">
+                    <span>{t("landlordCompanyName")}</span>
+                    <input
+                      type="text"
+                      value={formValues.landlordCompanyName}
+                      onChange={(event) => handleFieldChange("landlordCompanyName", event.target.value)}
+                      placeholder={t("landlordCompanyNamePlaceholder")}
+                    />
+                  </label>
 
-                <label className="service-field">
-                  <span>{t("landlordCompanyPhone")}</span>
-                  <input
-                    type="tel"
-                    value={formValues.landlordCompanyPhone}
-                    onChange={(event) => handleFieldChange("landlordCompanyPhone", event.target.value)}
-                    placeholder={t("landlordCompanyPhonePlaceholder")}
-                  />
-                </label>
+                  <label className="service-field">
+                    <span>{t("landlordCompanyPhone")}</span>
+                    <input
+                      type="tel"
+                      value={formValues.landlordCompanyPhone}
+                      onChange={(event) => handleFieldChange("landlordCompanyPhone", event.target.value)}
+                      placeholder={t("landlordCompanyPhonePlaceholder")}
+                    />
+                  </label>
 
-                <label className="service-field">
-                  <span>{t("landlordCompanyEmail")}</span>
-                  <input
-                    type="email"
-                    value={formValues.landlordCompanyEmail}
-                    onChange={(event) => handleFieldChange("landlordCompanyEmail", event.target.value)}
-                    placeholder={t("landlordCompanyEmailPlaceholder")}
-                  />
-                </label>
-              </div>
+                  <label className="service-field">
+                    <span>{t("landlordCompanyEmail")}</span>
+                    <input
+                      type="email"
+                      value={formValues.landlordCompanyEmail}
+                      onChange={(event) => handleFieldChange("landlordCompanyEmail", event.target.value)}
+                      placeholder={t("landlordCompanyEmailPlaceholder")}
+                    />
+                  </label>
+                </div>
 
-              <p className="service-form__field-group-label">{t("landlordContactPersonGroup")}</p>
-              <div className="service-field-grid">
-                <label className="service-field">
-                  <span>{t("landlordContactGivenName")}</span>
-                  <input
-                    type="text"
-                    value={formValues.landlordContactGivenName}
-                    onChange={(event) => handleFieldChange("landlordContactGivenName", event.target.value)}
-                    placeholder={t("landlordContactGivenNamePlaceholder")}
-                  />
-                </label>
+                <p className="service-form__field-group-label">{t("landlordContactPersonGroup")}</p>
+                <div className="service-field-grid">
+                  <label className="service-field">
+                    <span>{t("landlordContactGivenName")}</span>
+                    <input
+                      type="text"
+                      value={formValues.landlordContactGivenName}
+                      onChange={(event) => handleFieldChange("landlordContactGivenName", event.target.value)}
+                      placeholder={t("landlordContactGivenNamePlaceholder")}
+                    />
+                  </label>
 
-                <label className="service-field">
-                  <span>{t("landlordContactSurname")}</span>
-                  <input
-                    type="text"
-                    value={formValues.landlordContactSurname}
-                    onChange={(event) => handleFieldChange("landlordContactSurname", event.target.value)}
-                    placeholder={t("landlordContactSurnamePlaceholder")}
-                  />
-                </label>
-              </div>
+                  <label className="service-field">
+                    <span>{t("landlordContactSurname")}</span>
+                    <input
+                      type="text"
+                      value={formValues.landlordContactSurname}
+                      onChange={(event) => handleFieldChange("landlordContactSurname", event.target.value)}
+                      placeholder={t("landlordContactSurnamePlaceholder")}
+                    />
+                  </label>
+                </div>
 
-              <div className="service-field-grid service-field-grid--phone-email">
-                <label className="service-field">
-                  <span>{copy.landlordPhone}</span>
-                  <input
-                    type="tel"
-                    value={formValues.landlordPhone}
-                    onChange={(event) => handleFieldChange("landlordPhone", event.target.value)}
-                    placeholder={copy.landlordPhonePlaceholder}
-                  />
-                </label>
+                <div className="service-field-grid service-field-grid--phone-email">
+                  <label className="service-field">
+                    <span>{copy.landlordPhone}</span>
+                    <input
+                      type="tel"
+                      value={formValues.landlordPhone}
+                      onChange={(event) => handleFieldChange("landlordPhone", event.target.value)}
+                      placeholder={copy.landlordPhonePlaceholder}
+                    />
+                  </label>
 
-                <label className="service-field">
-                  <span>{copy.landlordEmail}</span>
-                  <input
-                    type="email"
-                    value={formValues.landlordEmail}
-                    onChange={(event) => handleFieldChange("landlordEmail", event.target.value)}
-                    placeholder={copy.landlordEmailPlaceholder}
-                  />
-                </label>
-              </div>
-            </section>
+                  <label className="service-field">
+                    <span>{copy.landlordEmail}</span>
+                    <input
+                      type="email"
+                      value={formValues.landlordEmail}
+                      onChange={(event) => handleFieldChange("landlordEmail", event.target.value)}
+                      placeholder={copy.landlordEmailPlaceholder}
+                    />
+                  </label>
+                </div>
+              </section>
+            ) : null}
 
             <section className="service-form__section service-form__section--hausmeister">
               <p className="service-form__section-title">{copy.hausmeisterSection}</p>
@@ -5261,7 +5774,8 @@ export default function ServiceClaimFlow() {
             <section className="service-form__section service-form__section--problem-kitchen">
               {contractLookup.status === "found" &&
               contractLookup.contractNumber === normalizedContractNumber &&
-              contractLookup.kitchenPlan ? (
+              contractLookup.kitchenPlan &&
+              contractLookup.kitchenPlan.selectionMode !== "reference-pdf" ? (
                 <>
                   <p className="service-form__section-title">{copy.problemDescription}</p>
                   <ServiceClaimKitchenPicker
@@ -5285,6 +5799,302 @@ export default function ServiceClaimFlow() {
                       furnitureFrontOption: t("kitchenPlanFurnitureFrontOption"),
                     }}
                   />
+                </>
+              ) : null}
+              {isReferenceOnlyPlan ? (
+                <>
+                  <p className="service-form__section-title">{copy.problemDescription}</p>
+                  <ServiceClaimReferencePlan
+                    kitchenPlan={activeKitchenPlan}
+                    contractNumber={normalizedContractNumber}
+                    labels={{
+                      eyebrow: t("referencePlanEyebrow"),
+                      title: t("referencePlanTitle"),
+                      contractLabel: copy.contractNumber,
+                      open: t("referencePlanOpen"),
+                      previewAlt: t("referencePlanPreviewAlt"),
+                      previewUnavailable: t("referencePlanPreviewUnavailable"),
+                    }}
+                  />
+                  <div className="service-reference-flow">
+                    <div
+                      className="service-reference-flow__question"
+                      data-reference-issue-choice="true"
+                      tabIndex={-1}
+                    >
+                      <ServiceYesNoChoice
+                        question={t("referenceElectricalQuestion")}
+                        value={referenceElectricalInvolved}
+                        yesLabel={t("hausmeisterYes")}
+                        noLabel={t("hausmeisterNo")}
+                        onChange={handleReferenceElectricalInvolvedChange}
+                      />
+                    </div>
+
+                    {referenceElectricalInvolved === "yes" ? (
+                      <div className="service-reference-flow__group service-reference-flow__group--issues">
+                        {referenceElectricalIssues.map((issue, index) => {
+                          const isComponentMissing = showClaimRequiredErrors && !String(issue.component || "").trim();
+                          const isProblemMissing = showClaimRequiredErrors && !String(issue.problem || "").trim();
+                          const isSerialMissing = showClaimRequiredErrors
+                            && (!String(issue.serialNumber || "").trim() || !issue.serialNumberImage);
+                          const isDamagePhotoMissing = showClaimRequiredErrors && !issue.damagePhotos.length;
+                          return (
+                            <div key={issue.id} className="service-reference-flow__row">
+                              <div className="service-reference-flow__item-head">
+                                <p className="service-reference-flow__item-title">
+                                  {t("referenceElectricalItemTitle").replace("{number}", String(index + 1))}
+                                </p>
+                                {referenceElectricalIssues.length > 1 ? (
+                                  <button
+                                    type="button"
+                                    className="service-field__problem-area-remove service-reference-flow__remove"
+                                    aria-label={t("referenceElectricalRemove")}
+                                    title={t("referenceElectricalRemove")}
+                                    onClick={() => removeReferenceElectricalIssue(issue.id)}
+                                  >
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                ) : null}
+                              </div>
+                              <label className="service-field">
+                                <span>
+                                  {t("referenceElectricalComponent")}
+                                  <RequiredFieldMark title={requiredFieldTitle} />
+                                </span>
+                                <input
+                                  type="text"
+                                  value={issue.component}
+                                  onChange={(event) => updateReferenceElectricalIssue(issue.id, "component", event.target.value)}
+                                  placeholder={t("referenceElectricalComponentPlaceholder")}
+                                  aria-invalid={isComponentMissing}
+                                  data-reference-required-field
+                                />
+                              </label>
+                              <label className="service-field service-reference-flow__problem">
+                                <span>
+                                  {t("referenceElectricalProblem")}
+                                  <RequiredFieldMark title={requiredFieldTitle} />
+                                </span>
+                                <textarea
+                                  value={issue.problem}
+                                  onChange={(event) => updateReferenceElectricalIssue(issue.id, "problem", event.target.value)}
+                                  placeholder={t("referenceElectricalProblemPlaceholder")}
+                                  rows={2}
+                                  aria-invalid={isProblemMissing}
+                                  data-reference-required-field
+                                />
+                              </label>
+                              <div className="service-reference-flow__serial">
+                                <div className="service-reference-flow__serial-head">
+                                  <p>
+                                    {t("referenceSerialEvidence")}
+                                    <RequiredFieldMark title={requiredFieldTitle} />
+                                  </p>
+                                  <button
+                                    type="button"
+                                    className="service-field__help-badge"
+                                    aria-label={t("serialNumberHelpAria")}
+                                    onClick={() => {
+                                      setSerialNumberHelpProduct({ resolvedLabel: issue.component || t("referenceElectricalComponent") });
+                                      setSerialHelpSlide(0);
+                                      setIsSerialNumberHelpOpen(true);
+                                    }}
+                                  >
+                                    {t("serialNumberHelpTrigger")}
+                                  </button>
+                                </div>
+                                <div className="service-reference-flow__serial-options">
+                                  <input
+                                    type="text"
+                                    value={issue.serialNumber}
+                                    onChange={(event) => updateReferenceElectricalIssue(issue.id, "serialNumber", event.target.value)}
+                                    placeholder={copy.serialPlaceholder}
+                                    aria-label={t("referenceSerialTypedOption")}
+                                    aria-invalid={isSerialMissing}
+                                    data-reference-required-field
+                                  />
+                                  <div className="service-reference-flow__serial-divider">{t("serialEvidenceAnd")}</div>
+                                  <div className="service-reference-flow__serial-upload">
+                                    <input
+                                      key={issue.serialNumberImageFieldKey}
+                                      id={`reference-serial-image-${issue.id}`}
+                                      type="file"
+                                      className="service-field__problem-area-file"
+                                      accept={SERIAL_NUMBER_IMAGE_ACCEPT}
+                                      onChange={(event) => handleReferenceSerialNumberImageSelected(issue.id, event)}
+                                    />
+                                    <label
+                                      htmlFor={`reference-serial-image-${issue.id}`}
+                                      className="service-field__problem-area-serial-upload"
+                                    >
+                                      {t("referenceSerialPhotoOption")}
+                                    </label>
+                                  </div>
+                                </div>
+                                {issue.serialNumberImage ? (
+                                  <ServiceAttachmentChips
+                                    files={[issue.serialNumberImage]}
+                                    summary={issue.serialNumberImage.name}
+                                    maxCount={1}
+                                    onRemove={() => removeReferenceSerialNumberImage(issue.id)}
+                                    viewLabel={t("viewFile")}
+                                    viewAriaLabel={t("viewFileAria")}
+                                    closePreviewLabel={t("closeFilePreview")}
+                                    previewUnavailableText={t("filePreviewUnavailable")}
+                                    removeLabel={t("removeFileAria")}
+                                    expandLabel={copy.attachmentsViewMore}
+                                    collapseLabel={copy.attachmentsViewLess}
+                                  />
+                                ) : null}
+                                {isSerialMissing ? (
+                                  <span className="service-field__problem-area-error" role="alert">
+                                    {t("serialNumberRequired")}
+                                  </span>
+                                ) : null}
+                              </div>
+                              <ReferenceDamagePhotosField
+                                issue={issue}
+                                kind="electrical"
+                                isMissing={isDamagePhotoMissing}
+                                labels={{
+                                  title: t("referenceDamagePhotos"),
+                                  hint: t("referenceDamagePhotosHint"),
+                                  required: t("referenceDamagePhotosRequired"),
+                                  requiredTitle: requiredFieldTitle,
+                                  upload: t("referenceDamageUpload"),
+                                  selected: copy.attachmentsSelected,
+                                  clear: copy.attachmentsClear,
+                                  view: t("viewFile"),
+                                  viewAria: t("viewFileAria"),
+                                  closePreview: t("closeFilePreview"),
+                                  previewUnavailable: t("filePreviewUnavailable"),
+                                  remove: t("removeFileAria"),
+                                  expand: copy.attachmentsViewMore,
+                                  collapse: copy.attachmentsViewLess,
+                                }}
+                                onSelect={handleReferenceDamagePhotosSelected}
+                                onRemove={removeReferenceDamagePhoto}
+                                onClear={clearReferenceDamagePhotos}
+                              />
+                            </div>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          className="service-reference-flow__add service-reference-flow__add--footer"
+                          onClick={addReferenceElectricalIssue}
+                        >
+                          <span aria-hidden="true">+</span>
+                          {t("referenceElectricalAdd")}
+                        </button>
+                      </div>
+                    ) : null}
+
+                    <div
+                      className="service-reference-flow__question"
+                      data-reference-issue-choice="true"
+                      tabIndex={-1}
+                    >
+                      <ServiceYesNoChoice
+                        question={t("referenceFurnitureQuestion")}
+                        value={referenceFurnitureInvolved}
+                        yesLabel={t("hausmeisterYes")}
+                        noLabel={t("hausmeisterNo")}
+                        onChange={handleReferenceFurnitureInvolvedChange}
+                      />
+                    </div>
+
+                    {referenceFurnitureInvolved === "yes" ? (
+                      <div className="service-reference-flow__group service-reference-flow__group--issues">
+                        {referenceFurnitureIssues.map((issue, index) => {
+                          const isComponentMissing = showClaimRequiredErrors && !String(issue.component || "").trim();
+                          const isProblemMissing = showClaimRequiredErrors && !String(issue.problem || "").trim();
+                          const isDamagePhotoMissing = showClaimRequiredErrors && !issue.damagePhotos.length;
+                          return (
+                            <div key={issue.id} className="service-reference-flow__row service-reference-flow__row--furniture">
+                              <div className="service-reference-flow__item-head">
+                                <p className="service-reference-flow__item-title">
+                                  {t("referenceFurnitureItemTitle").replace("{number}", String(index + 1))}
+                                </p>
+                                {referenceFurnitureIssues.length > 1 ? (
+                                  <button
+                                    type="button"
+                                    className="service-field__problem-area-remove service-reference-flow__remove"
+                                    aria-label={t("referenceFurnitureRemove")}
+                                    title={t("referenceFurnitureRemove")}
+                                    onClick={() => removeReferenceFurnitureIssue(issue.id)}
+                                  >
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                                ) : null}
+                              </div>
+                              <label className="service-field">
+                                <span>
+                                  {t("referenceFurnitureComponent")}
+                                  <RequiredFieldMark title={requiredFieldTitle} />
+                                </span>
+                                <input
+                                  type="text"
+                                  value={issue.component}
+                                  onChange={(event) => updateReferenceFurnitureIssue(issue.id, "component", event.target.value)}
+                                  placeholder={t("referenceFurnitureComponentPlaceholder")}
+                                  aria-invalid={isComponentMissing}
+                                  data-reference-required-field
+                                />
+                              </label>
+                              <label className="service-field service-reference-flow__problem">
+                                <span>
+                                  {t("referenceFurnitureProblem")}
+                                  <RequiredFieldMark title={requiredFieldTitle} />
+                                </span>
+                                <textarea
+                                  value={issue.problem}
+                                  onChange={(event) => updateReferenceFurnitureIssue(issue.id, "problem", event.target.value)}
+                                  placeholder={t("referenceFurnitureProblemPlaceholder")}
+                                  rows={2}
+                                  aria-invalid={isProblemMissing}
+                                  data-reference-required-field
+                                />
+                              </label>
+                              <ReferenceDamagePhotosField
+                                issue={issue}
+                                kind="furniture"
+                                isMissing={isDamagePhotoMissing}
+                                labels={{
+                                  title: t("referenceDamagePhotos"),
+                                  hint: t("referenceDamagePhotosHint"),
+                                  required: t("referenceDamagePhotosRequired"),
+                                  requiredTitle: requiredFieldTitle,
+                                  upload: t("referenceDamageUpload"),
+                                  selected: copy.attachmentsSelected,
+                                  clear: copy.attachmentsClear,
+                                  view: t("viewFile"),
+                                  viewAria: t("viewFileAria"),
+                                  closePreview: t("closeFilePreview"),
+                                  previewUnavailable: t("filePreviewUnavailable"),
+                                  remove: t("removeFileAria"),
+                                  expand: copy.attachmentsViewMore,
+                                  collapse: copy.attachmentsViewLess,
+                                }}
+                                onSelect={handleReferenceDamagePhotosSelected}
+                                onRemove={removeReferenceDamagePhoto}
+                                onClear={clearReferenceDamagePhotos}
+                              />
+                            </div>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          className="service-reference-flow__add service-reference-flow__add--footer"
+                          onClick={addReferenceFurnitureIssue}
+                        >
+                          <span aria-hidden="true">+</span>
+                          {t("referenceFurnitureAdd")}
+                        </button>
+                      </div>
+                    ) : null}
+                  </div>
                 </>
               ) : null}
               {selectedProblemAreasWithDetails.length ? (
@@ -5405,7 +6215,7 @@ export default function ServiceClaimFlow() {
                           key={area.attachmentFieldKey}
                           type="file"
                           className="service-field__problem-area-file"
-                          accept={CLAIM_ATTACHMENT_ACCEPT}
+                          accept="image/*"
                           multiple
                           onChange={(event) => handleProblemAreaAttachmentsSelected(area.rowComponentId, event)}
                           id={`problem-area-upload-${area.rowComponentId}`}
@@ -5488,15 +6298,14 @@ export default function ServiceClaimFlow() {
                                 event.target.value,
                               )}
                               placeholder={copy.serialPlaceholder}
-                              disabled={Boolean(area.serialNumberImage)}
-                              aria-invalid={showClaimRequiredErrors && !area.serialNumber && !area.serialNumberImage}
+                              aria-invalid={showClaimRequiredErrors && (!area.serialNumber || !area.serialNumberImage)}
                               data-problem-area-serial-required={
-                                showClaimRequiredErrors && !area.serialNumber && !area.serialNumberImage
+                                showClaimRequiredErrors && (!area.serialNumber || !area.serialNumberImage)
                                   ? "true"
                                   : undefined
                               }
                             />
-                            <span className="service-field__problem-area-serial-or" aria-hidden="true">/</span>
+                            <span className="service-field__problem-area-serial-or">{t("serialEvidenceAnd")}</span>
                             <input
                               key={area.serialNumberImageFieldKey}
                               id={`problem-area-serial-image-${area.rowComponentId}`}
@@ -5507,12 +6316,10 @@ export default function ServiceClaimFlow() {
                                 area.rowComponentId,
                                 event,
                               )}
-                              disabled={Boolean(String(area.serialNumber || "").trim())}
                             />
                             <label
                               htmlFor={`problem-area-serial-image-${area.rowComponentId}`}
                               className="service-field__problem-area-serial-upload"
-                              aria-disabled={Boolean(String(area.serialNumber || "").trim())}
                             >
                               {t("serialNumberImage")}
                             </label>
@@ -5532,7 +6339,7 @@ export default function ServiceClaimFlow() {
                               collapseLabel={copy.attachmentsViewLess}
                             />
                           ) : null}
-                          {showClaimRequiredErrors && !area.serialNumber && !area.serialNumberImage ? (
+                          {showClaimRequiredErrors && (!area.serialNumber || !area.serialNumberImage) ? (
                             <span className="service-field__problem-area-error" role="alert">
                               {t("serialNumberRequired")}
                             </span>
@@ -5555,12 +6362,13 @@ export default function ServiceClaimFlow() {
                     />
                   </label>
                 </>
-              ) : (
+              ) : !isReferenceOnlyPlan ? (
                 <label className="service-field">
                   <span>
                     {contractLookup.status === "found" &&
                     contractLookup.contractNumber === normalizedContractNumber &&
-                    contractLookup.kitchenPlan
+                    contractLookup.kitchenPlan &&
+                    contractLookup.kitchenPlan.selectionMode !== "reference-pdf"
                       ? t("problemDescriptionFieldLabel")
                       : copy.problemDescription}
                     <RequiredFieldMark title={requiredFieldTitle} />
@@ -5573,20 +6381,33 @@ export default function ServiceClaimFlow() {
                     required
                   />
                 </label>
-              )}
+              ) : null}
             </section>
 
             <div className="service-serial-section service-serial-section--attachments-only">
               <div className="service-serial-section__column service-serial-section__column--left">
                 <div className="service-field service-field--attachments service-field--claim-attachments">
-                  <span>{copy.attachments}</span>
-                  <p className="service-form__hint service-form__hint--attachments">{copy.attachmentsHint}</p>
+                  <div className="service-additional-attachments__head">
+                    <div className="service-additional-attachments__copy">
+                      <span>{copy.attachments}</span>
+                      <p className="service-additional-attachments__hint">{copy.attachmentsHint}</p>
+                    </div>
+                    <label
+                      htmlFor="service-additional-attachments-input"
+                      className="service-additional-attachments__upload"
+                    >
+                      <span aria-hidden="true">+</span>
+                      {copy.uploadFile}
+                    </label>
+                  </div>
                   <input
                     key={attachmentFieldKey}
+                    id="service-additional-attachments-input"
                     type="file"
-                    className="service-field__file"
+                    className="service-additional-attachments__input"
                     accept={CLAIM_ATTACHMENT_ACCEPT}
                     multiple
+                    hidden
                     onChange={handleAttachmentsSelected}
                   />
                   <ServiceAttachmentChips

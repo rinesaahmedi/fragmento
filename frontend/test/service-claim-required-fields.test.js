@@ -63,6 +63,10 @@ test("claim form requires an upload for every selected problem component", () =>
   assert.match(flowSource, /formData\.append\(`problemAreaAttachment:\$\{resolvedArea\.componentId\}`/);
   assert.match(cssSource, /\.service-field__problem-area-upload-button\.is-required-missing/);
   assert.match(cssSource, /\.service-field__problem-area-error/);
+  assert.match(flowSource, /referenceDamagePhotos/);
+  assert.match(flowSource, /data-reference-damage-upload-required/);
+  assert.match(flowSource, /problemAreaAttachment:reference-electrical-/);
+  assert.match(flowSource, /problemAreaAttachment:reference-furniture-/);
 });
 
 test("preferred contact time picker closes after a time is selected", () => {

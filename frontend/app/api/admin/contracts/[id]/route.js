@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { mapAdminMutationError, redirectWithFlash, validateKitchenContractInput } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
+import { ensurePdfOnlyKitchen } from "../../../../../lib/service-claim-reference-plan";
+import {
+  readContractClaimPlanUploads,
+  upsertContractClaimPlanUploads,
+} from "../../../../../lib/contract-claim-plan-assets";
 
 function getReturnPath(formData, fallback) {
   const rawPath = String(formData.get("returnTo") || "").trim();
@@ -119,10 +124,16 @@ export async function POST(request, { params }) {
 
   try {
     const formData = await request.formData();
+    const claimPlanUploads = await readContractClaimPlanUploads(formData);
     const intent = String(formData.get("_intent") || "").trim();
     const contract = await prisma.kitchenContract.findUnique({
       where: { id },
-      select: { id: true, kitchenId: true },
+      select: {
+        id: true,
+        kitchenId: true,
+        contractType: true,
+        claimPlanPreviewPath: true,
+      },
     });
 
     if (!contract) {
@@ -133,6 +144,56 @@ export async function POST(request, { params }) {
 
     if (intent === "update") {
       const data = validateKitchenContractInput(formData);
+      const requestedKitchenId = String(formData.get("kitchenId") || "").trim();
+      const isArcContract = contract.contractType === "ARC";
+
+      if (isArcContract) {
+        const [existingPlan] = await prisma.$queryRaw`
+          SELECT asset."previewBytes" IS NOT NULL AS "hasUploadedPreview"
+          FROM "KitchenContract" kitchen_contract
+          LEFT JOIN "KitchenContractClaimPlanAsset" asset
+            ON asset."kitchenContractId" = kitchen_contract."id"
+          WHERE kitchen_contract."id" = ${id}
+          LIMIT 1
+        `;
+        if (
+          !claimPlanUploads.preview
+          && !contract.claimPlanPreviewPath
+          && !existingPlan?.hasUploadedPreview
+        ) {
+          throw new Error("Upload a kitchen sketch for the ARC contract.");
+        }
+
+        await prisma.$transaction(async (tx) => {
+          const referenceKitchen = await ensurePdfOnlyKitchen(tx);
+          await tx.kitchenContract.update({
+            where: { id },
+            data: {
+              contractNumber: data.contractNumber,
+              kitchenId: referenceKitchen.id,
+              projectId: null,
+              building: null,
+              floor: null,
+              unitNumber: null,
+              notes: null,
+            },
+          });
+          await upsertContractClaimPlanUploads(tx, id, {
+            preview: claimPlanUploads.preview,
+            pdf: null,
+          });
+        });
+
+        return redirectWithFlash(request, returnPath, "success", "ARC contract updated.");
+      }
+
+      if (
+        !requestedKitchenId
+        && !data.claimPlanPreviewPath
+        && !claimPlanUploads.preview
+      ) {
+        throw new Error("Select a kitchen or upload a kitchen sketch.");
+      }
       if (data.housingCompanyId && data.projectId) {
         const [project] = await prisma.$queryRaw`
           SELECT "id"
@@ -156,16 +217,23 @@ export async function POST(request, { params }) {
         }
       }
 
-      await prisma.kitchenContract.update({
-        where: { id },
-        data: {
-          contractNumber: data.contractNumber,
-          projectId: data.projectId,
-          building: data.building,
-          floor: data.floor,
-          unitNumber: data.unitNumber,
-          notes: data.notes,
-        },
+      await prisma.$transaction(async (tx) => {
+        const resolvedKitchenId = requestedKitchenId || (await ensurePdfOnlyKitchen(tx)).id;
+        await tx.kitchenContract.update({
+          where: { id },
+          data: {
+            contractNumber: data.contractNumber,
+            kitchenId: resolvedKitchenId,
+            projectId: data.projectId,
+            claimPlanPdfPath: data.claimPlanPdfPath,
+            claimPlanPreviewPath: data.claimPlanPreviewPath,
+            building: data.building,
+            floor: data.floor,
+            unitNumber: data.unitNumber,
+            notes: data.notes,
+          },
+        });
+        await upsertContractClaimPlanUploads(tx, id, claimPlanUploads);
       });
 
       return redirectWithFlash(request, returnPath, "success", "Contract number updated.");

@@ -2,8 +2,6 @@ import {
   ActionLink,
   AdminSection,
   FlashMessage,
-  FormField,
-  inputStyle,
   mutedTextStyle,
   pageGridStyle,
   primaryButtonStyle,
@@ -14,9 +12,8 @@ import { Fragment } from "react";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminPagination } from "../../../components/admin-pagination";
 import AdminContractsFilters from "../../../components/admin-contracts-filters";
+import AdminContractCreateForm from "../../../components/admin-contract-create-form";
 import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
-import AdminContractLinkFields from "../../../components/admin-contract-link-fields";
-import AdminSelect from "../../../components/admin-select";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
 import { listKitchenContractsForAdmin, listKitchensForAdmin, listProjectsForAdmin, listPropertyOwnersForAdmin } from "../../../lib/catalog";
@@ -236,21 +233,6 @@ function ContractOrders({ contract }) {
   );
 }
 
-function KitchenSelect({ kitchens, defaultValue = "", compact = false, required = true }) {
-  return (
-    <FormField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
-      <AdminSelect name="kitchenId" defaultValue={defaultValue || ""} style={compact ? compactInputStyle : inputStyle} required={required}>
-        <option value=""><AdminText i18nKey="contractsAdmin.selectKitchen" fallback="Select kitchen" /></option>
-        {kitchens.map((kitchen) => (
-          <option key={kitchen.id} value={kitchen.id}>
-            <AdminKitchenDisplayName slug={kitchen.slug} name={kitchen.name} />
-          </option>
-        ))}
-      </AdminSelect>
-    </FormField>
-  );
-}
-
 export default async function AdminContractsPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
@@ -300,28 +282,15 @@ export default async function AdminContractsPage({ searchParams = {} }) {
               <AdminText i18nKey="contractsAdmin.addContractNumber" fallback="Add Contract Number" />
             </summary>
             <div style={createContractBodyStyle}>
-              <p style={createContractDescriptionStyle}>
-                <AdminText i18nKey="contractsAdmin.selectKitchenCompanyObjectAndUnit" fallback="Select the kitchen, housing company, project, object, and unit details." />
-              </p>
-              <form action="/api/admin/contracts" method="post" style={compactCreateContractFormStyle}>
-                <input type="hidden" name="returnTo" value={returnTo} />
-                <KitchenSelect kitchens={kitchens} defaultValue={filters.kitchenId} compact />
-                <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
-                  <input name="contractNumber" placeholder="670123456" style={compactInputStyle} required />
-                </FormField>
-                <AdminContractLinkFields
-                  owners={owners}
-                  projects={projects}
-                  defaultHousingCompanyId={filters.housingCompanyId}
-                  defaultProjectId={filters.projectId}
-                  allowInlineObjectCreate
-                  compact
-                  contract={{}}
-                />
-                <div style={compactCreateActionStyle}>
-                  <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="contractsAdmin.createContract" fallback="Create contract" /></button>
-                </div>
-              </form>
+              <AdminContractCreateForm
+                kitchens={kitchens}
+                owners={owners}
+                projects={projects}
+                defaultKitchenId={filters.kitchenId}
+                defaultHousingCompanyId={filters.housingCompanyId}
+                defaultProjectId={filters.projectId}
+                returnTo={returnTo}
+              />
             </div>
           </details>
         </AdminSection>
@@ -338,6 +307,9 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                   <div style={contractCardIdentityStyle}>
                     <div style={contractTitleRowStyle}>
                       <strong style={contractTitleStyle}>{contract.contractNumber}</strong>
+                      <span style={contract.contractType === "ARC" ? arcTypeBadgeStyle : frgTypeBadgeStyle}>
+                        {contract.contractType}
+                      </span>
                       <span style={badgeWrapStyle}><AdminStatusBadge status={contract.isActive ? "ACTIVE" : "INACTIVE"} /></span>
                     </div>
                     <span style={contractKitchenStyle}><AdminKitchenDisplayName slug={contract.kitchen.slug} name={contract.kitchen.name} /></span>
@@ -475,25 +447,6 @@ const createContractBodyStyle = {
   paddingTop: 6,
 };
 
-const createContractDescriptionStyle = {
-  ...mutedTextStyle,
-  margin: 0,
-  fontSize: 14,
-  lineHeight: 1.45,
-};
-
-const compactCreateContractFormStyle = {
-  display: "grid",
-  gap: 10,
-  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-  alignItems: "start",
-};
-
-const compactCreateActionStyle = {
-  gridColumn: "1 / -1",
-  paddingTop: 2,
-};
-
 const contractCardListStyle = {
   display: "grid",
   gap: 14,
@@ -532,6 +485,31 @@ const contractTitleRowStyle = {
 const badgeWrapStyle = {
   display: "inline-flex",
   whiteSpace: "nowrap",
+};
+
+const contractTypeBadgeStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  minHeight: 26,
+  padding: "4px 9px",
+  borderRadius: 999,
+  fontSize: 11,
+  fontWeight: 900,
+  letterSpacing: "0.08em",
+};
+
+const arcTypeBadgeStyle = {
+  ...contractTypeBadgeStyle,
+  color: "#7a3f24",
+  background: "rgba(181, 119, 74, 0.13)",
+  border: "1px solid rgba(181, 119, 74, 0.24)",
+};
+
+const frgTypeBadgeStyle = {
+  ...contractTypeBadgeStyle,
+  color: "var(--app-info-text)",
+  background: "var(--app-info-bg)",
+  border: "1px solid rgba(45, 108, 121, 0.18)",
 };
 
 const contractTitleStyle = {
@@ -833,11 +811,4 @@ const addressLinesStyle = {
 const emptyAddressStyle = {
   ...addressLinesStyle,
   color: "var(--app-text-muted)",
-};
-
-const compactInputStyle = {
-  ...inputStyle,
-  minHeight: 38,
-  padding: "6px 10px",
-  fontSize: "0.92rem",
 };

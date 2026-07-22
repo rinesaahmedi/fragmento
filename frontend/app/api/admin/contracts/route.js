@@ -6,6 +6,11 @@ import { requireAdminApi } from "../../../../lib/auth";
 import { listKitchenContractsForAdmin } from "../../../../lib/catalog";
 import { upsertProjectForObject } from "../../../../lib/property-projects";
 import { prisma } from "../../../../lib/prisma";
+import { ensurePdfOnlyKitchen } from "../../../../lib/service-claim-reference-plan";
+import {
+  readContractClaimPlanUploads,
+  upsertContractClaimPlanUploads,
+} from "../../../../lib/contract-claim-plan-assets";
 
 export async function GET(request) {
   await requireAdminApi();
@@ -30,6 +35,10 @@ function appendQueryParam(pathname, key, value) {
   const searchParams = new URLSearchParams(existingQuery);
   searchParams.set(key, value);
   return `${basePath || "/"}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`;
+}
+
+function normalizeContractType(value) {
+  return String(value || "").trim().toUpperCase() === "ARC" ? "ARC" : "FRG";
 }
 
 function parseAddressVerificationRecord(rawValue) {
@@ -98,20 +107,35 @@ export async function POST(request) {
   try {
     const formData = await request.formData();
     returnPath = getReturnPath(formData, "/admin/contracts");
-    const kitchenId = String(formData.get("kitchenId") || "").trim();
-    if (!kitchenId) {
-      throw new Error("Kitchen is required.");
-    }
+    const contractType = normalizeContractType(formData.get("contractType"));
+    const isArcContract = contractType === "ARC";
+    const requestedKitchenId = String(formData.get("kitchenId") || "").trim();
+    const claimPlanUploads = await readContractClaimPlanUploads(formData);
 
-    const inlineObject = validateInlineObjectInput(formData);
+    const inlineObject = isArcContract ? null : validateInlineObjectInput(formData);
     const data = validateKitchenContractInput(formData, {
       allowInlineObject: true,
       hasInlineObject: Boolean(inlineObject),
     });
+    if (isArcContract && !claimPlanUploads.preview) {
+      throw new Error("Upload a kitchen sketch for the ARC contract.");
+    }
+    if (
+      !isArcContract
+      &&
+      !requestedKitchenId
+      && !data.claimPlanPreviewPath
+      && !claimPlanUploads.preview
+    ) {
+      throw new Error("Select a kitchen or upload a kitchen sketch.");
+    }
 
-    let projectId = data.projectId;
+    let projectId = isArcContract ? null : data.projectId;
     await prisma.$transaction(async (tx) => {
-      if (data.housingCompanyId) {
+      const kitchenId = isArcContract
+        ? (await ensurePdfOnlyKitchen(tx)).id
+        : requestedKitchenId || (await ensurePdfOnlyKitchen(tx)).id;
+      if (!isArcContract && data.housingCompanyId) {
         if (inlineObject) {
           const propertyObjectId = randomUUID();
           await tx.$executeRaw`
@@ -140,7 +164,7 @@ export async function POST(request) {
             throw new Error("Select a valid project for the housing company.");
           }
         }
-      } else if (projectId) {
+      } else if (!isArcContract && projectId) {
         const [project] = await tx.$queryRaw`
           SELECT "id"
           FROM "Project"
@@ -152,18 +176,26 @@ export async function POST(request) {
         }
       }
 
-      await tx.kitchenContract.create({
+      const createdContract = await tx.kitchenContract.create({
         data: {
           contractNumber: data.contractNumber,
+          contractType,
           kitchenId,
           projectId,
+          claimPlanPdfPath: isArcContract ? null : data.claimPlanPdfPath,
+          claimPlanPreviewPath: isArcContract ? null : data.claimPlanPreviewPath,
           isActive: true,
-          building: data.building,
-          floor: data.floor,
-          unitNumber: data.unitNumber,
-          notes: data.notes,
+          building: isArcContract ? null : data.building,
+          floor: isArcContract ? null : data.floor,
+          unitNumber: isArcContract ? null : data.unitNumber,
+          notes: isArcContract ? null : data.notes,
         },
       });
+      await upsertContractClaimPlanUploads(
+        tx,
+        createdContract.id,
+        isArcContract ? { preview: claimPlanUploads.preview, pdf: null } : claimPlanUploads,
+      );
     });
 
     return redirectWithFlash(request, returnPath, "success", "Contract number created.");

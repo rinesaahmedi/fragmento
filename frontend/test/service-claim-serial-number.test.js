@@ -30,9 +30,11 @@ test("legacy appliance components are recognized without treating their cabinets
   assert.equal(isElectricalApplianceProblemArea({ componentId: "component-oven-module", code: "OVEN-B-600-HOB" }), true);
   assert.equal(isElectricalApplianceProblemArea({ componentId: "component-wall-cabinet-2", code: "CAB-HOOD-B-600", name: "Cabinet" }), false);
   assert.equal(isElectricalApplianceProblemArea({ componentId: "component-claim-oven-drawer", name: "Lower Cabinet for Built-in Oven" }), false);
+  assert.equal(isElectricalApplianceProblemArea({ componentId: "reference-electrical-1" }), true);
+  assert.equal(isElectricalApplianceProblemArea({ componentId: "reference-furniture-1" }), false);
 });
 
-test("the claim form and API require exactly one serial-number source per electrical appliance", async () => {
+test("the claim form and API require both serial-number sources per electrical appliance", async () => {
   const fs = await import("node:fs");
   const path = await import("node:path");
   const { fileURLToPath } = await import("node:url");
@@ -46,7 +48,7 @@ test("the claim form and API require exactly one serial-number source per electr
   assert.match(flowSource, /serialNumberImageByComponentId/);
   assert.match(flowSource, /formData\.append\(`serialNumberImage:\$\{area\.rowComponentId\}`/);
   assert.match(routeSource, /serialNumberImageFilesByComponentId/);
-  assert.match(routeSource, /hasInvalidPerAreaSerialEvidence/);
-  assert.match(routeSource, /typedCount \+ imageCount !== 1/);
-  assert.match(routeSource, /exactly one serial number or one serial-number photo for each/);
+  assert.match(routeSource, /hasMissingPerAreaSerialEvidence/);
+  assert.match(routeSource, /typedCount !== 1 \|\| imageCount !== 1/);
+  assert.match(routeSource, /a serial number and one serial-number photo for each/);
 });

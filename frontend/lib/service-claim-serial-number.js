@@ -37,6 +37,12 @@ export function isElectricalApplianceProblemArea(area = {}) {
   }
 
   const componentId = String(area.componentId || "").trim().toLowerCase();
+  if (componentId.startsWith("reference-electrical-")) {
+    return true;
+  }
+  if (componentId.startsWith("reference-furniture-")) {
+    return false;
+  }
   if (ELECTRICAL_APPLIANCE_COMPONENT_IDS.has(componentId)) {
     return true;
   }

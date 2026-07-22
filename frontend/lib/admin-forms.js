@@ -1,4 +1,8 @@
 import { ItemType, KitchenStatus, Prisma } from "@prisma/client";
+import {
+  normalizeServiceClaimPlanPdfPath,
+  normalizeServiceClaimPlanPreviewPath,
+} from "./service-claim-reference-plan";
 
 function requiredString(value, label) {
   const nextValue = String(value || "").trim();
@@ -209,11 +213,23 @@ export function validateKitchenContractInput(formData, options = {}) {
   const contractNumber = requiredString(formData.get("contractNumber"), "Contract number");
   const housingCompanyId = optionalString(formData.get("housingCompanyId"));
   const projectId = optionalString(formData.get("projectId"));
+  const rawClaimPlanPdfPath = String(formData.get("claimPlanPdfPath") || "").trim();
+  const claimPlanPdfPath = normalizeServiceClaimPlanPdfPath(rawClaimPlanPdfPath) || null;
+  if (rawClaimPlanPdfPath && !claimPlanPdfPath) {
+    throw new Error("Claim plan must be a local PDF path below /pdfs/.");
+  }
+  const rawClaimPlanPreviewPath = String(formData.get("claimPlanPreviewPath") || "").trim();
+  const claimPlanPreviewPath = normalizeServiceClaimPlanPreviewPath(rawClaimPlanPreviewPath) || null;
+  if (rawClaimPlanPreviewPath && !claimPlanPreviewPath) {
+    throw new Error("Claim plan preview must be a local JPG, PNG, or WebP path below /jpg/ or /img/.");
+  }
 
   return {
     contractNumber,
     housingCompanyId,
     projectId,
+    claimPlanPdfPath,
+    claimPlanPreviewPath,
     building: optionalString(formData.get("building")),
     floor: optionalString(formData.get("floor")),
     unitNumber: optionalString(formData.get("unitNumber")),

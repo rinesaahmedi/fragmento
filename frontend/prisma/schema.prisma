@@ -54,52 +54,52 @@ model AppSetting {
 }
 
 model CatalogArticle {
-  id                  String        @id @default(cuid())
-  articleNumber       String        @unique
+  id                  String                       @id @default(cuid())
+  articleNumber       String                       @unique
   name                String
   nameDe              String?
   description         String?
   widthMm             Int?
   heightMm            Int?
   depthMm             Int?
-  price               Decimal       @db.Decimal(10, 2)
+  price               Decimal                      @db.Decimal(10, 2)
   itemType            ItemType
-  isFixedPricePackage Boolean       @default(false)
-  isActive            Boolean       @default(true)
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  isFixedPricePackage Boolean                      @default(false)
+  isActive            Boolean                      @default(true)
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
   kitchenItems        KitchenItem[]
   priceHistory        CatalogArticlePriceHistory[]
   programPrices       CatalogArticleProgramPrice[]
 }
 
 model CatalogBlende {
-  id           String        @id @default(cuid())
-  code         String        @unique
-  name         String
-  nameDe       String?
-  description  String?
-  price        Decimal       @db.Decimal(10, 2)
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  kitchenItems KitchenItem[]
-  priceHistory CatalogBlendePriceHistory[]
+  id            String                      @id @default(cuid())
+  code          String                      @unique
+  name          String
+  nameDe        String?
+  description   String?
+  price         Decimal                     @db.Decimal(10, 2)
+  isActive      Boolean                     @default(true)
+  createdAt     DateTime                    @default(now())
+  updatedAt     DateTime                    @updatedAt
+  kitchenItems  KitchenItem[]
+  priceHistory  CatalogBlendePriceHistory[]
   programPrices CatalogBlendeProgramPrice[]
 }
 
 model CatalogService {
-  id           String        @id @default(cuid())
-  code         String        @unique
-  name         String
-  nameDe       String?
-  description  String?
-  price        Decimal       @db.Decimal(10, 2)
-  isActive     Boolean       @default(true)
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  kitchenItems KitchenItem[]
-  priceHistory CatalogServicePriceHistory[]
+  id            String                       @id @default(cuid())
+  code          String                       @unique
+  name          String
+  nameDe        String?
+  description   String?
+  price         Decimal                      @db.Decimal(10, 2)
+  isActive      Boolean                      @default(true)
+  createdAt     DateTime                     @default(now())
+  updatedAt     DateTime                     @updatedAt
+  kitchenItems  KitchenItem[]
+  priceHistory  CatalogServicePriceHistory[]
   programPrices CatalogServiceProgramPrice[]
 }
 
@@ -114,35 +114,35 @@ model CatalogProgram {
 }
 
 model CatalogPriceListImport {
-  id            String                       @id @default(cuid())
-  label         String?
-  sourceName    String?
-  programmId    String?
-  status        String                       @default("APPLIED")
-  notes         String?
-  importedBy    String?
-  createdCount  Int                          @default(0)
-  updatedCount  Int                          @default(0)
-  unchangedCount Int                         @default(0)
-  failedCount   Int                          @default(0)
-  syncedKitchenItemCount Int                  @default(0)
-  effectiveFrom DateTime?
-  syncLinkedKitchenItemsRequested Boolean     @default(false)
-  syncAppliedAt  DateTime?
-  createdAt     DateTime                     @default(now())
-  appliedAt     DateTime?
-  articleHistory CatalogArticlePriceHistory[]
-  blendeHistory  CatalogBlendePriceHistory[]
-  serviceHistory CatalogServicePriceHistory[]
-  rows           CatalogPriceListImportRow[]
+  id                              String                       @id @default(cuid())
+  label                           String?
+  sourceName                      String?
+  programmId                      String?
+  status                          String                       @default("APPLIED")
+  notes                           String?
+  importedBy                      String?
+  createdCount                    Int                          @default(0)
+  updatedCount                    Int                          @default(0)
+  unchangedCount                  Int                          @default(0)
+  failedCount                     Int                          @default(0)
+  syncedKitchenItemCount          Int                          @default(0)
+  effectiveFrom                   DateTime?
+  syncLinkedKitchenItemsRequested Boolean                      @default(false)
+  syncAppliedAt                   DateTime?
+  createdAt                       DateTime                     @default(now())
+  appliedAt                       DateTime?
+  articleHistory                  CatalogArticlePriceHistory[]
+  blendeHistory                   CatalogBlendePriceHistory[]
+  serviceHistory                  CatalogServicePriceHistory[]
+  rows                            CatalogPriceListImportRow[]
 
   @@index([status, effectiveFrom])
 }
 
 model CatalogPriceListImportRow {
-  id                  String                  @id @default(cuid())
+  id                  String                 @id @default(cuid())
   importId            String
-  import              CatalogPriceListImport  @relation(fields: [importId], references: [id], onDelete: Cascade)
+  import              CatalogPriceListImport @relation(fields: [importId], references: [id], onDelete: Cascade)
   itemKind            String
   identifier          String
   articleNumber       String?
@@ -154,10 +154,10 @@ model CatalogPriceListImportRow {
   heightMm            Int?
   depthMm             Int?
   itemType            ItemType?
-  price               Decimal                 @db.Decimal(10, 2)
+  price               Decimal                @db.Decimal(10, 2)
   isFixedPricePackage Boolean?
-  isActive            Boolean                 @default(true)
-  createdAt           DateTime                @default(now())
+  isActive            Boolean                @default(true)
+  createdAt           DateTime               @default(now())
 
   @@index([importId])
   @@index([itemKind])
@@ -261,20 +261,20 @@ model CatalogServicePriceHistory {
 }
 
 model Kitchen {
-  id              String             @id @default(cuid())
-  slug            String             @unique
-  kitchenCode     String?
-  programmId      String             @default("IP 2200")
-  name            String
-  status          KitchenStatus      @default(DRAFT)
-  description     String?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  items           KitchenItem[]
-  claimParts      KitchenClaimPart[]
-  orders          Order[]
-  testOrders      TestOrder[]
-  contracts       KitchenContract[]
+  id          String             @id @default(cuid())
+  slug        String             @unique
+  kitchenCode String?
+  programmId  String             @default("IP 2200")
+  name        String
+  status      KitchenStatus      @default(DRAFT)
+  description String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  items       KitchenItem[]
+  claimParts  KitchenClaimPart[]
+  orders      Order[]
+  testOrders  TestOrder[]
+  contracts   KitchenContract[]
 }
 
 model KitchenClaimPart {
@@ -419,27 +419,48 @@ model TestOrder {
 }
 
 model KitchenContract {
-  id             String                @id @default(cuid())
-  contractNumber String                @unique
-  kitchenId      String
-  kitchen        Kitchen               @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  projectId      String?
-  project        Project?              @relation(fields: [projectId], references: [id], onDelete: Restrict)
-  isActive       Boolean               @default(true)
-  usedAt         DateTime?
-  building       String?
-  floor          String?
-  unitNumber     String?
-  notes          String?
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  orders         Order[]
-  testOrders     TestOrder[]
-  registrations  KitchenRegistration[]
-  visitEvents    PublicVisitEvent[]
+  id                   String                         @id @default(cuid())
+  contractNumber       String                         @unique
+  contractType         String                         @default("FRG")
+  kitchenId            String
+  kitchen              Kitchen                        @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  projectId            String?
+  project              Project?                       @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  claimPlanPdfPath     String?
+  claimPlanPreviewPath String?
+  isActive             Boolean                        @default(true)
+  usedAt               DateTime?
+  building             String?
+  floor                String?
+  unitNumber           String?
+  notes                String?
+  createdAt            DateTime                       @default(now())
+  updatedAt            DateTime                       @updatedAt
+  orders               Order[]
+  testOrders           TestOrder[]
+  registrations        KitchenRegistration[]
+  visitEvents          PublicVisitEvent[]
+  claimPlanAsset       KitchenContractClaimPlanAsset?
 
   @@index([kitchenId])
   @@index([projectId])
+  @@index([contractType])
+}
+
+model KitchenContractClaimPlanAsset {
+  id                String          @id @default(cuid())
+  kitchenContractId String          @unique
+  kitchenContract   KitchenContract @relation(fields: [kitchenContractId], references: [id], onDelete: Cascade)
+  previewBytes      Bytes?
+  previewMimeType   String?
+  previewFileName   String?
+  pdfBytes          Bytes?
+  pdfMimeType       String?
+  pdfFileName       String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([kitchenContractId])
 }
 
 model KitchenRegistration {
@@ -578,8 +599,8 @@ model ServiceClaim {
   attachmentsJson      String?  @db.Text
   createdAt            DateTime @default(now())
 
-  @@index([contractNumber])
   @@unique([contractNumber, claimSequence])
+  @@index([contractNumber])
   @@index([createdAt])
 }
 

@@ -80,6 +80,7 @@ export async function getServiceClaimContractDetails(contractNumber) {
   return {
     id: contract.id,
     contractNumber: contract.contractNumber,
+    contractType: contract.contractType,
     isActive: contract.isActive,
     kitchenId: contract.kitchenId,
     kitchenName: contract.kitchen?.name || "",

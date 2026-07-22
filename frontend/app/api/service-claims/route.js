@@ -1,8 +1,11 @@
+import { readFile } from "fs/promises";
 import http from "http";
+import path from "path";
 import https from "https";
 import nodemailer from "nodemailer";
 import { Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
+import { getPublicContractClaimPlanAsset } from "../../../lib/contract-claim-plan-assets";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 import { prisma } from "../../../lib/prisma";
 import {
@@ -95,6 +98,26 @@ function mergeProblemAreasIntoDescription(problemDescription, problemAreasJsonRa
 function normalizeProblemAreasJson(problemAreasJsonRaw) {
   const normalized = parseServiceClaimProblemAreas(problemAreasJsonRaw);
   return normalized.length ? JSON.stringify(normalized) : null;
+}
+
+function normalizeReferenceIssuesJson(referenceIssuesJsonRaw) {
+  return parseServiceClaimProblemAreas(referenceIssuesJsonRaw).map((area) => {
+    const componentId = String(area.componentId || "").trim();
+    const isElectrical = componentId.startsWith("reference-electrical-");
+    const isFurniture = componentId.startsWith("reference-furniture-");
+    if (!isElectrical && !isFurniture) {
+      throw new Error("Invalid reference-plan component.");
+    }
+    const name = requiredString(area.name, "Affected component");
+    const detail = requiredString(area.detail, "Problem description");
+    return {
+      componentId,
+      name,
+      code: isElectrical ? "REFERENCE-ELECTRICAL" : "REFERENCE-FURNITURE",
+      detail,
+      ...(isElectrical ? { serialNumber: requiredString(area.serialNumber, "Serial number") } : {}),
+    };
+  });
 }
 
 function formatAttachmentLabel(entry) {
@@ -298,7 +321,7 @@ async function sendComplaintEmail(payload, attachmentParts = []) {
     subject: formatServiceClaimEmailSubject(payload.contractNumber, payload.claimSequence),
     replyTo: payload.email || undefined,
     text: buildComplaintEmailText(emailPayload),
-    html: buildComplaintEmailHtml(emailPayload, kitchenPreviewAttachment?.cid || ""),
+    html: buildComplaintEmailHtml(emailPayload, kitchenPreviewAttachment),
     attachments,
   });
 
@@ -814,7 +837,104 @@ async function insertServiceClaimRecord(prismaClient, payload) {
   }
 }
 
+function getReferencePlanAssetContentType(assetPath, fallback = "application/octet-stream") {
+  const extension = path.extname(String(assetPath || "")).toLowerCase();
+  if (extension === ".png") return "image/png";
+  if (extension === ".jpg" || extension === ".jpeg") return "image/jpeg";
+  if (extension === ".webp") return "image/webp";
+  if (extension === ".pdf") return "application/pdf";
+  return fallback;
+}
+
+async function readPublicReferencePlanAsset(assetPath) {
+  let decodedPath = "";
+  try {
+    decodedPath = decodeURIComponent(String(assetPath || "").trim());
+  } catch {
+    return null;
+  }
+  if (!/^\/(?:jpg|img|pdfs)\//.test(decodedPath) || decodedPath.includes("..")) {
+    return null;
+  }
+
+  const publicRoot = path.resolve(process.cwd(), "public");
+  const resolvedPath = path.resolve(publicRoot, decodedPath.replace(/^\/+/, ""));
+  if (!resolvedPath.startsWith(`${publicRoot}${path.sep}`)) {
+    return null;
+  }
+  const content = await readFile(resolvedPath).catch(() => null);
+  if (!content?.length) {
+    return null;
+  }
+  return {
+    content,
+    contentType: getReferencePlanAssetContentType(decodedPath),
+    filename: sanitizeServiceClaimFilename(path.basename(decodedPath)),
+  };
+}
+
+async function loadReferencePlanAsset(contractNumber, assetPath, kind) {
+  const normalizedPath = String(assetPath || "").trim();
+  if (!normalizedPath) return null;
+
+  if (/^\/api\/service-claims\/contracts\/[^/]+\/plan-assets\/(?:preview|pdf)$/.test(normalizedPath)) {
+    const storedAsset = await getPublicContractClaimPlanAsset(prisma, contractNumber, kind).catch(() => null);
+    if (!storedAsset?.bytes) return null;
+    return {
+      content: Buffer.from(storedAsset.bytes),
+      contentType: storedAsset.mimeType || (kind === "preview" ? "image/jpeg" : "application/pdf"),
+      filename: sanitizeServiceClaimFilename(
+        storedAsset.fileName || (kind === "preview" ? "kitchen-sketch.jpg" : "kitchen-plan.pdf"),
+      ),
+    };
+  }
+
+  return readPublicReferencePlanAsset(normalizedPath);
+}
+
+async function buildArcReferencePlanEmailAttachment(payload) {
+  if (payload?.contractType !== "ARC") return null;
+
+  const kitchenPlan = await getServiceClaimKitchenPlan(payload.contractNumber).catch(() => null);
+  if (kitchenPlan?.selectionMode !== "reference-pdf") return null;
+
+  const previewAsset = await loadReferencePlanAsset(
+    payload.contractNumber,
+    kitchenPlan.previewImagePath,
+    "preview",
+  );
+  if (previewAsset?.content?.length && previewAsset.contentType.startsWith("image/")) {
+    return {
+      filename: previewAsset.filename || `arc-kitchen-sketch-${payload.contractNumber}.jpg`,
+      content: previewAsset.content,
+      cid: "arc-kitchen-sketch@fragmento",
+      contentType: previewAsset.contentType,
+      contentDisposition: "inline",
+      emailLabel: "ARC-Küchenskizze",
+      emailAlt: `ARC-Küchenskizze für Vertrag ${payload.contractNumber}`,
+      isReferencePdf: false,
+    };
+  }
+
+  const pdfAsset = await loadReferencePlanAsset(payload.contractNumber, kitchenPlan.pdfPath, "pdf");
+  if (!pdfAsset?.content?.length) return null;
+  return {
+    filename: pdfAsset.filename || `arc-kitchen-plan-${payload.contractNumber}.pdf`,
+    content: pdfAsset.content,
+    contentType: "application/pdf",
+    contentDisposition: "attachment",
+    emailLabel: "ARC-Küchenskizze",
+    emailAlt: "",
+    isReferencePdf: true,
+  };
+}
+
 async function buildClaimKitchenPreviewAttachment(payload) {
+  const arcReferenceAttachment = await buildArcReferencePlanEmailAttachment(payload);
+  if (arcReferenceAttachment) {
+    return arcReferenceAttachment;
+  }
+
   if (!String(payload?.kitchenSlug || "").trim()) {
     return null;
   }
@@ -841,9 +961,11 @@ async function buildClaimKitchenPreviewAttachment(payload) {
     cid: "claim-kitchen-preview@fragmento",
     contentType: preview.contentType || "image/png",
     contentDisposition: "inline",
+    emailLabel: "Küche / ausgewählte Komponenten",
+    emailAlt: "Küchenplan mit hervorgehobenen Reklamationskomponenten",
+    isReferencePdf: false,
   };
 }
-
 function buildComplaintEmailText(payload) {
   const landlordBlock = buildPartyContactBlock({
     companyName: payload.landlordCompanyName,
@@ -919,7 +1041,7 @@ function buildComplaintEmailText(payload) {
   ].join("\n");
 }
 
-function buildComplaintEmailHtml(payload, previewCid = "") {
+function buildComplaintEmailHtml(payload, previewAttachment = null) {
   const tableStyles = "width:100%;border-collapse:collapse;font-family:Arial,sans-serif;";
   const tdStyles = "padding:12px 15px;border-bottom:1px solid #eaeaea;color:#555;vertical-align:top;";
   const customerName = escapeHtml(`${payload.givenName} ${payload.surname}`.trim());
@@ -991,17 +1113,26 @@ function buildComplaintEmailHtml(payload, previewCid = "") {
           .map(formatAttachmentHtml)
           .join("")}</td></tr>`
       : "";
+  const previewCid = String(previewAttachment?.cid || "").trim();
+  const previewLabel = previewAttachment?.emailLabel || "Küche / ausgewählte Komponenten";
+  const previewAlt = previewAttachment?.emailAlt || "Küchenplan mit hervorgehobenen Reklamationskomponenten";
   const previewBlock = previewCid
     ? `
       <div style="margin:0 0 18px;">
-        <div style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#777;">Küche / ausgewählte Komponenten</div>
+        <div style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#777;">${escapeHtml(previewLabel)}</div>
         <div style="padding:12px;border:1px solid #eaeaea;border-radius:10px;background:#fffaf5;">
-          <img src="cid:${escapeHtml(previewCid)}" alt="Küchenplan mit hervorgehobenen Reklamationskomponenten" style="display:block;width:100%;max-width:540px;height:auto;border:0;" />
+          <img src="cid:${escapeHtml(previewCid)}" alt="${escapeHtml(previewAlt)}" style="display:block;width:100%;max-width:540px;height:auto;border:0;" />
         </div>
       </div>
     `
-    : "";
-
+    : previewAttachment?.isReferencePdf
+      ? `
+        <div style="margin:0 0 18px;padding:12px;border:1px solid #eaeaea;border-radius:10px;background:#fffaf5;">
+          <div style="margin:0 0 4px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#777;">${escapeHtml(previewLabel)}</div>
+          <div style="font-size:14px;color:#555;">Küchenskizze als PDF im Anhang.</div>
+        </div>
+      `
+      : "";
   return `
     <div style="max-width:600px;margin:20px 0;font-family:Arial,sans-serif;color:#333;">
       <p style="margin:0 0 16px;line-height:1.5;">
@@ -1281,11 +1412,23 @@ export async function POST(request) {
     const genderLabel = genderDisplayLabel(gender);
     const customerDisplayName = [givenName, surname].filter(Boolean).join(" ").trim();
     const fullName = buildCustomerFullName({ givenName, surname, gender });
-    const problemAreasJson = await resolveProblemAreasFromDatabase(
+    const resolvedProblemAreasJson = await resolveProblemAreasFromDatabase(
       contractNumber,
       normalizeProblemAreasJson(body.problemAreasJson),
       body.confirmedChoiceGroupsJson,
     );
+    const referenceIssues = normalizeReferenceIssuesJson(body.referenceIssuesJson);
+    if (referenceIssues.length) {
+      const kitchenPlan = await getServiceClaimKitchenPlan(contractNumber);
+      if (kitchenPlan?.selectionMode !== "reference-pdf") {
+        throw new Error("Reference-plan components are not allowed for this contract.");
+      }
+    }
+    const allProblemAreas = [
+      ...parseServiceClaimProblemAreas(resolvedProblemAreasJson),
+      ...referenceIssues,
+    ];
+    const problemAreasJson = allProblemAreas.length ? JSON.stringify(allProblemAreas) : null;
     const problemDescription = mergeProblemAreasIntoDescription(
       optionalString(body.problemDescription),
       problemAreasJson,
@@ -1306,6 +1449,7 @@ export async function POST(request) {
       );
     }
     const problemAreaAttachmentParts = [];
+    const problemAreaAttachmentPartsByComponentId = new Map();
     for (const [componentId, files] of Object.entries(problemAreaAttachmentFilesByComponentId)) {
       const normalizedComponentId = String(componentId || "").trim();
       if (!normalizedComponentId || !files?.length) {
@@ -1316,6 +1460,10 @@ export async function POST(request) {
         continue;
       }
       const parts = await normalizeServiceClaimUploads(files);
+      if (parts.some((part) => !part.contentType.startsWith("image/"))) {
+        throw new Error("Damage attachments must be image files.");
+      }
+      problemAreaAttachmentPartsByComponentId.set(normalizedComponentId, parts);
       for (const part of parts) {
         problemAreaAttachmentParts.push({
           ...part,
@@ -1324,6 +1472,21 @@ export async function POST(request) {
           areaName: String(area?.name || "").trim(),
           areaCode: String(area?.code || "").trim(),
         });
+      }
+    }
+    for (const area of parsedProblemAreas) {
+      const componentId = String(area.componentId || "").trim();
+      if (!problemAreaAttachmentPartsByComponentId.get(componentId)?.length) {
+        throw new Error(`Upload at least one damage photo for ${area.name || "each affected component"}.`);
+      }
+      if (isElectricalApplianceProblemArea(area)) {
+        if (!String(area.serialNumber || "").trim()) {
+          throw new Error(`Enter the serial number for ${area.name || "each electrical component"}.`);
+        }
+        const serialPhotos = serialNumberImagePartsByComponentId.get(componentId) || [];
+        if (!serialPhotos.length || serialPhotos.some((part) => !part.contentType.startsWith("image/"))) {
+          throw new Error(`Upload a serial-number photo for ${area.name || "each electrical component"}.`);
+        }
       }
     }
     const attachmentParts = [
@@ -1353,20 +1516,20 @@ export async function POST(request) {
       String(area.serialNumber || "").trim()
       || (serialNumberImagePartsByComponentId.get(String(area.componentId || "").trim()) || []).length
     ));
-    const hasInvalidPerAreaSerialEvidence = electricalProblemAreas.some((area) => {
+    const hasMissingPerAreaSerialEvidence = electricalProblemAreas.some((area) => {
       const componentId = String(area.componentId || "").trim();
       const typedCount = String(area.serialNumber || "").trim() ? 1 : 0;
       const imageCount = (serialNumberImagePartsByComponentId.get(componentId) || []).length;
-      return typedCount + imageCount !== 1;
+      return typedCount !== 1 || imageCount !== 1;
     });
-    const legacySerialEvidenceCount = parseSerialNumberEntries(rawSerialNumber).length + serialNumberImageParts.length;
-    const hasInvalidLegacySerialEvidence = legacySerialEvidenceCount !== electricalProblemAreas.length;
+    const hasMissingLegacySerialEvidence = parseSerialNumberEntries(rawSerialNumber).length !== electricalProblemAreas.length
+      || serialNumberImageParts.length !== electricalProblemAreas.length;
     if (
-      (usesPerAreaSerialEvidence && hasInvalidPerAreaSerialEvidence)
-      || (!usesPerAreaSerialEvidence && hasInvalidLegacySerialEvidence)
+      (usesPerAreaSerialEvidence && hasMissingPerAreaSerialEvidence)
+      || (!usesPerAreaSerialEvidence && hasMissingLegacySerialEvidence)
     ) {
       return NextResponse.json(
-        { error: "Please provide exactly one serial number or one serial-number photo for each selected electrical appliance." },
+        { error: "Please provide a serial number and one serial-number photo for each selected electrical appliance." },
         { status: 400 },
       );
     }
@@ -1383,6 +1546,7 @@ export async function POST(request) {
       genderLabel,
       customerDisplayName,
       fullName,
+      contractType: contract.contractType,
       kitchenName: contract.kitchenName || "",
       kitchenSlug: contract.kitchenSlug || "",
       phone: optionalString(body.phone),

@@ -2859,27 +2859,90 @@ textarea {
     filter 160ms ease;
 }
 
-.service-form__hint--attachments {
-  background: rgba(255, 255, 255, 0.72);
-  color: rgba(43, 43, 43, 0.88);
-  border: 1px solid rgba(107, 79, 58, 0.12);
-  font-weight: 600;
-}
-
 .service-field--claim-attachments {
-  width: fit-content;
-  max-width: min(100%, 30rem);
+  width: 100%;
+  max-width: none;
+  gap: 12px;
 }
 
-.service-field--claim-attachments .service-form__hint--attachments,
-.service-field--claim-attachments .service-field__file,
-.service-field--claim-attachments input[type="file"],
+.service-additional-attachments__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.service-additional-attachments__copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.service-additional-attachments__hint {
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: rgba(56, 38, 25, 0.68);
+  font-size: 0.82rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.service-additional-attachments__upload {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 9px 14px;
+  border: 1px solid rgba(107, 79, 58, 0.26);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--app-accent);
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background-color 160ms ease, border-color 160ms ease;
+}
+
+.service-additional-attachments__upload:hover,
+.service-additional-attachments__upload:focus-visible {
+  border-color: rgba(107, 79, 58, 0.42);
+  background: rgba(107, 79, 58, 0.06);
+}
+
+.service-additional-attachments__upload:focus-visible {
+  outline: 2px solid rgba(107, 79, 58, 0.28);
+  outline-offset: 2px;
+}
+
+.service-additional-attachments__upload > span {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.service-additional-attachments__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .service-field--claim-attachments .service-attachments {
   width: 100%;
-  max-width: 30rem;
+  max-width: none;
   box-sizing: border-box;
 }
-
 .service-attachments {
   width: 100%;
   display: flex;
@@ -3391,6 +3454,387 @@ textarea {
   background: transparent;
 }
 
+.service-claim-reference-plan {
+  display: grid;
+  gap: 16px;
+  margin-top: 0;
+  padding: 20px;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.service-claim-reference-plan__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.service-claim-reference-plan__eyebrow,
+.service-claim-reference-plan__title {
+  margin: 0;
+}
+
+.service-claim-reference-plan__eyebrow {
+  color: rgba(43, 43, 43, 0.55);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.service-claim-reference-plan__title {
+  margin-top: 4px;
+  color: var(--app-text);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.service-claim-reference-plan__contract {
+  display: grid;
+  gap: 2px;
+  text-align: right;
+}
+
+.service-claim-reference-plan__contract span {
+  color: var(--app-text-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.service-claim-reference-plan__contract strong {
+  color: var(--app-text);
+  font-size: 1.05rem;
+}
+
+.service-claim-reference-plan__preview {
+  overflow: hidden;
+  margin: 0;
+  width: 100%;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.service-claim-reference-plan__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #fff;
+}
+
+.service-claim-reference-plan__preview-unavailable {
+  display: grid;
+  place-items: center;
+  min-height: 220px;
+  padding: 24px;
+  border: 1px dashed rgba(107, 79, 58, 0.28);
+  border-radius: 12px;
+  background: rgba(250, 248, 245, 0.78);
+  color: var(--app-text-muted);
+  text-align: center;
+}
+
+.service-claim-reference-plan__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-self: start;
+  padding: 10px 14px;
+  border: 1px solid rgba(107, 79, 58, 0.22);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--app-accent);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.service-claim-reference-plan__open:hover,
+.service-claim-reference-plan__open:focus-visible {
+  background: rgba(107, 79, 58, 0.08);
+}
+
+.service-field--reference-area {
+  margin-top: 18px;
+}
+
+.service-form__hint--reference-photo {
+  color: #24583b;
+  font-weight: 700;
+}
+
+.service-reference-flow {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.service-reference-flow__question {
+  padding: 16px;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.service-reference-flow__question .service-yes-no-field__option.is-active {
+  background: var(--app-accent);
+  color: #fff;
+}
+
+.service-reference-flow__group {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border: 1px solid rgba(107, 79, 58, 0.18);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.service-reference-flow__group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.service-reference-flow__group-title {
+  margin: 0;
+  color: var(--app-accent);
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.service-reference-flow__add {
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid rgba(107, 79, 58, 0.24);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--app-accent);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.service-reference-flow__add:hover,
+.service-reference-flow__add:focus-visible {
+  background: rgba(107, 79, 58, 0.07);
+}
+
+.service-reference-flow__add--footer {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.service-reference-flow__add--footer > span {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.service-reference-flow__row {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.82fr) minmax(280px, 1.18fr);
+  gap: 12px;
+  align-items: start;
+  padding: 14px 0 0;
+  border-top: 1px solid rgba(107, 79, 58, 0.14);
+}
+
+.service-reference-flow__group--issues .service-reference-flow__row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.service-reference-flow__group--issues .service-reference-flow__row + .service-reference-flow__row {
+  margin-top: 8px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(107, 79, 58, 0.16);
+}
+
+.service-reference-flow__row--furniture {
+  grid-template-columns: minmax(210px, 0.82fr) minmax(280px, 1.18fr);
+}
+
+.service-reference-flow__item-head {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.service-reference-flow__item-title {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.service-reference-flow__row .service-field input,
+.service-reference-flow__row .service-field textarea {
+  border-radius: 8px;
+}
+
+.service-reference-flow__problem textarea {
+  min-height: 78px;
+}
+
+.service-reference-flow__serial {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.service-reference-flow__serial-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.service-reference-flow__serial-head p {
+  margin: 0;
+  color: var(--app-text);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.service-reference-flow__serial-options {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto minmax(160px, 0.45fr);
+  gap: 10px;
+  align-items: center;
+}
+
+.service-reference-flow__serial-options > input {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid rgba(107, 79, 58, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  color: var(--app-text);
+  font: inherit;
+}
+
+.service-reference-flow__serial-options > input:focus {
+  outline: none;
+  border-color: rgba(107, 79, 58, 0.34);
+  box-shadow: 0 0 0 4px rgba(107, 79, 58, 0.08);
+}
+
+.service-reference-flow__serial-options > input[aria-invalid="true"] {
+  border-color: rgba(179, 38, 30, 0.72);
+  box-shadow: 0 0 0 4px rgba(179, 38, 30, 0.08);
+}
+
+.service-reference-flow__serial-divider {
+  color: rgba(69, 52, 39, 0.62);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.service-reference-flow__serial-upload {
+  min-width: 0;
+}
+
+.service-reference-flow__serial-upload .service-field__problem-area-serial-upload {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 8px;
+}
+
+.service-reference-flow__damage-photos {
+  grid-column: 1 / -1;
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.service-reference-flow__damage-photos > p {
+  margin: 0;
+}
+
+.service-reference-flow__damage-photos > p {
+  color: var(--app-text);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.service-reference-flow__damage-hint {
+  margin-top: -3px;
+  color: rgba(56, 38, 25, 0.66);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.service-reference-flow input.service-field__problem-area-file {
+  position: absolute;
+  width: 1px;
+  min-width: 1px;
+  max-width: 1px;
+  height: 1px;
+  min-height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.service-reference-flow__remove {
+  flex: 0 0 auto;
+}
+@media (max-width: 768px) {
+  .service-claim-reference-plan {
+    margin-inline: -20px;
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  .service-claim-reference-plan__contract {
+    text-align: left;
+  }
+
+  .service-reference-flow__group-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .service-reference-flow__row,
+  .service-reference-flow__row--furniture {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-reference-flow__row > .service-field,
+  .service-reference-flow__serial {
+    grid-column: 1;
+  }
+
+  .service-reference-flow__serial-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-reference-flow__serial-divider {
+    display: none;
+  }
+
+}
+
 .service-field--problem-area-row {
   grid-template-columns: minmax(120px, 180px) minmax(180px, 220px) minmax(0, 1fr);
   align-items: start;
@@ -3696,6 +4140,9 @@ textarea {
 
 .service-serial-section--attachments-only {
   grid-template-columns: minmax(0, 1fr);
+  margin-top: 4px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(107, 79, 58, 0.16);
 }
 
 .service-field__problem-area-upload-button:hover,
@@ -4440,13 +4887,19 @@ textarea {
     max-width: none;
   }
 
-  .service-field--claim-attachments .service-form__hint--attachments,
-  .service-field--claim-attachments .service-field__file,
-  .service-field--claim-attachments input[type="file"],
+  .service-additional-attachments__head {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .service-additional-attachments__upload {
+    width: 100%;
+  }
+
   .service-field--claim-attachments .service-attachments {
     max-width: none;
   }
-
   .service-field--problem-area-row {
     grid-template-columns: 1fr;
     gap: 10px;

@@ -46,6 +46,17 @@ test("service-claims route requires explicit confirmation for grouped kitchen pa
   assert.match(source, /body\.confirmedChoiceGroupsJson/);
 });
 
+test("service-claims route requires serial evidence and damage photos for every affected component", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /normalizeReferenceIssuesJson/);
+  assert.match(source, /Reference-plan components are not allowed for this contract/);
+  assert.match(source, /problemAreaAttachmentPartsByComponentId/);
+  assert.match(source, /Upload at least one damage photo/);
+  assert.match(source, /Upload a serial-number photo/);
+  assert.match(source, /typedCount !== 1 \|\| imageCount !== 1/);
+});
+
 test("service-claims route embeds a kitchen preview png in notification emails when available", () => {
   const source = fs.readFileSync(routePath, "utf8");
 
@@ -53,9 +64,20 @@ test("service-claims route embeds a kitchen preview png in notification emails w
   assert.match(source, /buildClaimKitchenPreviewAttachment/);
   assert.match(source, /claim-kitchen-preview@fragmento/);
   assert.match(source, /contentDisposition:\s*"inline"/);
-  assert.match(source, /buildComplaintEmailHtml\(emailPayload,\s*kitchenPreviewAttachment\?\.cid \|\| ""\)/);
+  assert.match(source, /buildComplaintEmailHtml\(emailPayload,\s*kitchenPreviewAttachment\)/);
 });
 
+test("service-claims route embeds the ARC contract sketch or attaches its PDF fallback", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /getPublicContractClaimPlanAsset/);
+  assert.match(source, /buildArcReferencePlanEmailAttachment/);
+  assert.match(source, /payload\?\.contractType !== "ARC"/);
+  assert.match(source, /arc-kitchen-sketch@fragmento/);
+  assert.match(source, /ARC-Küchenskizze/);
+  assert.match(source, /Küchenskizze als PDF im Anhang/);
+  assert.match(source, /contractType:\s*contract\.contractType/);
+});
 test("service-claims route resolves item names and article numbers from the contract kitchen database", () => {
   const source = fs.readFileSync(routePath, "utf8");
 
@@ -65,7 +87,7 @@ test("service-claims route resolves item names and article numbers from the cont
   assert.match(source, /name:\s*databaseGermanName/);
   assert.doesNotMatch(source, /databaseArea\.nameDe \|\| databaseArea\.name/);
   assert.match(source, /code:\s*String\(databaseArea\.articleCode \|\| databaseArea\.code/);
-  assert.match(source, /const problemAreasJson = await resolveProblemAreasFromDatabase/);
+  assert.match(source, /const resolvedProblemAreasJson = await resolveProblemAreasFromDatabase/);
 });
 
 test("service-claim notification email separates every item field into German rows", () => {
