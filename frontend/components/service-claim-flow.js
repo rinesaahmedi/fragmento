@@ -33,6 +33,7 @@ const LANGUAGE_OPTIONS = [
 
 const MAX_CLAIM_ATTACHMENT_COUNT = 20;
 const MAX_CLAIM_ATTACHMENT_BYTES = 4 * 1024 * 1024;
+const MIN_REFERENCE_PROBLEM_LENGTH = 20;
 const CLAIM_ATTACHMENT_ACCEPT = "image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx";
 const SERIAL_NUMBER_IMAGE_ACCEPT = "image/*";
 const PROBLEM_AREA_PART_SELECT_SELECTOR = "details.service-field__problem-area-part-select[open]";
@@ -679,7 +680,7 @@ const COPY = {
     serialNumberAdd: "Hinzuf\u00fcgen",
     serialNumberRequired: "Seriennummer und Foto erforderlich.",
     serialNumberImage: "Foto der Seriennummer(n)",
-    serialNumberHelpTrigger: "i",
+    serialNumberHelpTrigger: "Wo finde ich sie?",
     serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
     serialNumberHelpTitle: "Seriennummer finden",
     serialNumberHelpBody: "Die Seriennummer finden Sie meist auf dem Typenschild im Ger\u00e4t oder an der Innenwand. Die Beispiele unten zeigen typische Positionen.",
@@ -734,7 +735,9 @@ const COPY = {
     referenceElectricalComponent: "Elektroger\u00e4t",
     referenceElectricalComponentPlaceholder: "z. B. K\u00fchlschrank, Backofen, Geschirrsp\u00fcler",
     referenceElectricalProblem: "Problem",
-    referenceElectricalProblemPlaceholder: "Beschreibe das Problem mit dieser Komponente",
+    referenceElectricalProblemPlaceholder: "z. B. Gerät startet nicht und zeigt Fehler E15",
+    referenceProblemHint: "Beschreibe, was passiert, wann es auftritt und wo der Schaden sichtbar ist (mind. 20 Zeichen).",
+    referenceProblemTooShort: "Bitte beschreibe das Problem mit mindestens 20 Zeichen.",
     referenceElectricalAdd: "Weiteres Ger\u00e4t hinzuf\u00fcgen",
     referenceElectricalRemove: "Elektroger\u00e4t entfernen",
     referenceElectricalItemTitle: "Elektroger\u00e4t {number}",
@@ -751,7 +754,7 @@ const COPY = {
     referenceFurnitureComponent: "M\u00f6belteil",
     referenceFurnitureComponentPlaceholder: "z. B. Unterschrank, Arbeitsplatte, Sp\u00fcle, Front",
     referenceFurnitureProblem: "Problem",
-    referenceFurnitureProblemPlaceholder: "Beschreibe das Problem mit dieser Komponente",
+    referenceFurnitureProblemPlaceholder: "z. B. T\u00fcr schlie\u00dft nicht und h\u00e4ngt auf der linken Seite",
     referenceFurnitureAdd: "Weiteres M\u00f6belteil hinzuf\u00fcgen",
     referenceFurnitureRemove: "Teil entfernen",
     referenceFurnitureItemTitle: "Teil {number}",
@@ -961,7 +964,7 @@ const COPY = {
     serialNumberAdd: "Add",
     serialNumberRequired: "Serial number and photo required.",
     serialNumberImage: "Photo of the serial number(s)",
-    serialNumberHelpTrigger: "i",
+    serialNumberHelpTrigger: "Where to find it?",
     serialNumberHelpAria: "Help: where to find the serial number",
     serialNumberHelpTitle: "Finding the serial number",
     serialNumberHelpBody: "You can usually find the serial number on the appliance rating plate or on an inside wall. The examples below show typical locations.",
@@ -1012,7 +1015,9 @@ const COPY = {
     referenceElectricalComponent: "Appliance",
     referenceElectricalComponentPlaceholder: "e.g. refrigerator, oven, dishwasher",
     referenceElectricalProblem: "Problem",
-    referenceElectricalProblemPlaceholder: "Describe the issue with this component",
+    referenceElectricalProblemPlaceholder: "e.g. appliance does not start and shows error E15",
+    referenceProblemHint: "Describe what happens, when it occurs, and where the damage is visible (at least 20 characters).",
+    referenceProblemTooShort: "Please describe the problem using at least 20 characters.",
     referenceElectricalAdd: "Add another appliance",
     referenceElectricalRemove: "Remove appliance",
     referenceElectricalItemTitle: "Appliance {number}",
@@ -1029,7 +1034,7 @@ const COPY = {
     referenceFurnitureComponent: "Furniture item",
     referenceFurnitureComponentPlaceholder: "e.g. cabinet, worktop, sink, front",
     referenceFurnitureProblem: "Problem",
-    referenceFurnitureProblemPlaceholder: "Describe the issue with this component",
+    referenceFurnitureProblemPlaceholder: "e.g. door does not close and hangs on the left side",
     referenceFurnitureAdd: "Add another item",
     referenceFurnitureRemove: "Remove item",
     referenceFurnitureItemTitle: "Item {number}",
@@ -1225,7 +1230,7 @@ const COPY = {
     serialNumberAdd: "Ekle",
     serialNumberRequired: "Seri numaras\u0131 ve foto\u011fraf gereklidir.",
     serialNumberImage: "Seri numaras\u0131 / numaralar\u0131 foto\u011fraf\u0131",
-    serialNumberHelpTrigger: "i",
+    serialNumberHelpTrigger: "Nerede bulunur?",
     serialNumberHelpAria: "Yard\u0131m: seri numaras\u0131 nerede bulunur?",
     serialNumberHelpTitle: "Seri numaras\u0131n\u0131 bulma",
     serialNumberHelpBody: "Seri numaras\u0131n\u0131 genelde cihaz etiketinde veya i\u00e7 taraftaki bir y\u00fczeyde bulabilirsiniz. A\u015fa\u011f\u0131daki \u00f6rnekler tipik konumlar\u0131 g\u00f6sterir.",
@@ -1427,7 +1432,7 @@ const COPY = {
     serialNumberAdd: "A\u00f1adir",
     serialNumberRequired: "Se requieren el n\u00famero de serie y la foto.",
     serialNumberImage: "Foto del n\u00famero o de los n\u00fameros de serie",
-    serialNumberHelpTrigger: "i",
+    serialNumberHelpTrigger: "\u00bfD\u00f3nde encontrarlo?",
     serialNumberHelpAria: "Ayuda: d\u00f3nde encontrar el n\u00famero de serie",
     serialNumberHelpTitle: "Encontrar el n\u00famero de serie",
     serialNumberHelpBody: "Normalmente puede encontrar el n\u00famero de serie en la placa del aparato o en una pared interior. Los ejemplos siguientes muestran ubicaciones t\u00edpicas.",
@@ -1629,7 +1634,7 @@ const COPY = {
     serialNumberAdd: "Ajouter",
     serialNumberRequired: "Num\u00e9ro de s\u00e9rie et photo requis.",
     serialNumberImage: "Photo du ou des num\u00e9ros de s\u00e9rie",
-    serialNumberHelpTrigger: "i",
+    serialNumberHelpTrigger: "O\u00f9 le trouver ?",
     serialNumberHelpAria: "Aide : o\u00f9 trouver le num\u00e9ro de s\u00e9rie",
     serialNumberHelpTitle: "Trouver le num\u00e9ro de s\u00e9rie",
     serialNumberHelpBody: "Vous trouverez g\u00e9n\u00e9ralement le num\u00e9ro de s\u00e9rie sur la plaque signal\u00e9tique de l'appareil ou sur une paroi int\u00e9rieure. Les exemples ci-dessous montrent les emplacements les plus courants.",
@@ -1830,7 +1835,7 @@ const COPY = {
     serialNumberAdd: "\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c",
     serialNumberRequired: "\u0422\u0440\u0435\u0431\u0443\u044e\u0442\u0441\u044f \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0438 \u0444\u043e\u0442\u043e.",
     serialNumberImage: "\u0424\u043e\u0442\u043e \u0441\u0435\u0440\u0438\u0439\u043d\u043e\u0433\u043e \u043d\u043e\u043c\u0435\u0440\u0430 / \u043d\u043e\u043c\u0435\u0440\u043e\u0432",
-    serialNumberHelpTrigger: "i",
+    serialNumberHelpTrigger: "\u0413\u0434\u0435 \u043d\u0430\u0439\u0442\u0438?",
     serialNumberHelpAria: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430: \u0433\u0434\u0435 \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
     serialNumberHelpTitle: "\u041a\u0430\u043a \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
     serialNumberHelpBody: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043e\u0431\u044b\u0447\u043d\u043e \u0443\u043a\u0430\u0437\u0430\u043d \u043d\u0430 \u0437\u0430\u0432\u043e\u0434\u0441\u043a\u043e\u0439 \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0435 \u043f\u0440\u0438\u0431\u043e\u0440\u0430 \u0438\u043b\u0438 \u043d\u0430 \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0435\u0439 \u0441\u0442\u0435\u043d\u043a\u0435. \u041d\u0438\u0436\u0435 \u043f\u043e\u043a\u0430\u0437\u0430\u043d\u044b \u0442\u0438\u043f\u0438\u0447\u043d\u044b\u0435 \u043c\u0435\u0441\u0442\u0430.",
@@ -2559,7 +2564,7 @@ export default function ServiceClaimFlow() {
     !referenceElectricalIssues.length ||
     referenceElectricalIssues.some((issue) => (
       !String(issue.component || "").trim() ||
-      !String(issue.problem || "").trim() ||
+      String(issue.problem || "").trim().length < MIN_REFERENCE_PROBLEM_LENGTH ||
       !String(issue.serialNumber || "").trim() ||
       !issue.serialNumberImage ||
       !issue.damagePhotos.length
@@ -2569,7 +2574,7 @@ export default function ServiceClaimFlow() {
     !referenceFurnitureIssues.length ||
     referenceFurnitureIssues.some((issue) => (
       !String(issue.component || "").trim() ||
-      !String(issue.problem || "").trim() ||
+      String(issue.problem || "").trim().length < MIN_REFERENCE_PROBLEM_LENGTH ||
       !issue.damagePhotos.length
     ))
   );
@@ -5835,7 +5840,7 @@ export default function ServiceClaimFlow() {
                       <div className="service-reference-flow__group service-reference-flow__group--issues">
                         {referenceElectricalIssues.map((issue, index) => {
                           const isComponentMissing = showClaimRequiredErrors && !String(issue.component || "").trim();
-                          const isProblemMissing = showClaimRequiredErrors && !String(issue.problem || "").trim();
+                          const isProblemMissing = showClaimRequiredErrors && String(issue.problem || "").trim().length < MIN_REFERENCE_PROBLEM_LENGTH;
                           const isSerialMissing = showClaimRequiredErrors
                             && (!String(issue.serialNumber || "").trim() || !issue.serialNumberImage);
                           const isDamagePhotoMissing = showClaimRequiredErrors && !issue.damagePhotos.length;
@@ -5880,10 +5885,23 @@ export default function ServiceClaimFlow() {
                                   value={issue.problem}
                                   onChange={(event) => updateReferenceElectricalIssue(issue.id, "problem", event.target.value)}
                                   placeholder={t("referenceElectricalProblemPlaceholder")}
-                                  rows={2}
+                                  rows={3}
+                                  minLength={MIN_REFERENCE_PROBLEM_LENGTH}
                                   aria-invalid={isProblemMissing}
+                                  aria-describedby={`reference-electrical-problem-help-${issue.id}`}
                                   data-reference-required-field
                                 />
+                                <span
+                                  id={`reference-electrical-problem-help-${issue.id}`}
+                                  className="service-reference-flow__problem-hint"
+                                >
+                                  {t("referenceProblemHint")}
+                                </span>
+                                {isProblemMissing ? (
+                                  <span className="service-field__error" role="alert">
+                                    {t("referenceProblemTooShort")}
+                                  </span>
+                                ) : null}
                               </label>
                               <div className="service-reference-flow__serial">
                                 <div className="service-reference-flow__serial-head">
@@ -5893,7 +5911,7 @@ export default function ServiceClaimFlow() {
                                   </p>
                                   <button
                                     type="button"
-                                    className="service-field__help-badge"
+                                    className="service-field__help-badge service-field__help-badge--serial"
                                     aria-label={t("serialNumberHelpAria")}
                                     onClick={() => {
                                       setSerialNumberHelpProduct({ resolvedLabel: issue.component || t("referenceElectricalComponent") });
@@ -6009,7 +6027,7 @@ export default function ServiceClaimFlow() {
                       <div className="service-reference-flow__group service-reference-flow__group--issues">
                         {referenceFurnitureIssues.map((issue, index) => {
                           const isComponentMissing = showClaimRequiredErrors && !String(issue.component || "").trim();
-                          const isProblemMissing = showClaimRequiredErrors && !String(issue.problem || "").trim();
+                          const isProblemMissing = showClaimRequiredErrors && String(issue.problem || "").trim().length < MIN_REFERENCE_PROBLEM_LENGTH;
                           const isDamagePhotoMissing = showClaimRequiredErrors && !issue.damagePhotos.length;
                           return (
                             <div key={issue.id} className="service-reference-flow__row service-reference-flow__row--furniture">
@@ -6052,10 +6070,23 @@ export default function ServiceClaimFlow() {
                                   value={issue.problem}
                                   onChange={(event) => updateReferenceFurnitureIssue(issue.id, "problem", event.target.value)}
                                   placeholder={t("referenceFurnitureProblemPlaceholder")}
-                                  rows={2}
+                                  rows={3}
+                                  minLength={MIN_REFERENCE_PROBLEM_LENGTH}
                                   aria-invalid={isProblemMissing}
+                                  aria-describedby={`reference-furniture-problem-help-${issue.id}`}
                                   data-reference-required-field
                                 />
+                                <span
+                                  id={`reference-furniture-problem-help-${issue.id}`}
+                                  className="service-reference-flow__problem-hint"
+                                >
+                                  {t("referenceProblemHint")}
+                                </span>
+                                {isProblemMissing ? (
+                                  <span className="service-field__error" role="alert">
+                                    {t("referenceProblemTooShort")}
+                                  </span>
+                                ) : null}
                               </label>
                               <ReferenceDamagePhotosField
                                 issue={issue}
@@ -6278,7 +6309,7 @@ export default function ServiceClaimFlow() {
                             </span>
                             <button
                               type="button"
-                              className="service-field__help-badge"
+                              className="service-field__help-badge service-field__help-badge--serial"
                               aria-label={t("serialNumberHelpAria")}
                               onClick={() => {
                                 setSerialNumberHelpProduct(area);

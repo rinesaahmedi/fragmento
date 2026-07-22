@@ -103,12 +103,17 @@ test("service-claim notification email separates every item field into German ro
   assert.doesNotMatch(source, /StringForEmail/);
 });
 
-test("service-claim item email uses the component name as its heading and keeps upload labels compact", () => {
+test("service-claim item email uses full-width rows and hides article codes for ARC", () => {
   const source = fs.readFileSync(routePath, "utf8");
 
-  assert.match(source, /\[row\.name \|\| `Küchenteil \$\{index \+ 1\}`/);
-  assert.match(source, /padding-right:24px/);
-  assert.match(source, /padding-left:20px/);
+  assert.match(source, /payload\.contractType !== "ARC"/);
+  assert.match(source, /showArticleCode: showClaimItemArticleCode/);
+  assert.match(source, /fullWidth: true/);
+  assert.match(source, /colspan="2"/);
+  assert.match(source, /Problem \$\{itemNumber\}/);
+  assert.match(source, /Elektrogerät.*Möbelteil/);
+  assert.match(source, /width:35%/);
+  assert.match(source, /itemNumber: index \+ 1/);
   assert.match(source, /formatAttachmentHtml\(entry, \{ includeItemContext: false \}\)/);
   assert.match(source, /function formatAttachmentFileMetaLine/);
   assert.match(source, /serialAttachmentsByComponentId/);
@@ -118,7 +123,6 @@ test("service-claim item email uses the component name as its heading and keeps 
   assert.match(source, />Seriennummer-Foto</);
   assert.doesNotMatch(source, /\["Seriennummer",\s*payload\.serialNumber\]/);
 });
-
 test("service-claim email requests the PDF-derived ordered-component kitchen preview", () => {
   const previewSource = fs.readFileSync(
     path.join(__dirname, "..", "lib", "claim-kitchen-preview.js"),
@@ -154,8 +158,9 @@ test("service-claim email separates landlord and caretaker contact details into 
 
   assert.match(source, /function buildEmailDetailSubtable/);
   assert.match(source, /function hasPartyContactDetails/);
-  assert.match(source, /\["Vermieter", \{ html: landlordHtml \}\]/);
-  assert.match(source, /hasHausmeisterDetails \? \[\["Hausmeister", \{ html: hausmeisterHtml \}\]\] : \[\]/);
+  assert.match(source, /border-top:2px solid #d9c7b8/);
+  assert.match(source, /html: landlordHtml, fullWidth: true, sectionTitle: "Vermieter"/);
+  assert.match(source, /html: hausmeisterHtml, fullWidth: true, sectionTitle: "Hausmeister"/);
   assert.match(source, /hasHausmeisterDetails \? \["", "Hausmeister", hausBlock\] : \[\]/);
   assert.match(source, /\["Firma", payload\.landlordCompanyName\]/);
   assert.match(source, /\["Telefon Firma", payload\.landlordCompanyPhone\]/);

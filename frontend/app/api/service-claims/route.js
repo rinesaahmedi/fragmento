@@ -476,10 +476,10 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
   return rows;
 }
 
-function buildClaimItemText(row) {
+function buildClaimItemText(row, { showArticleCode = true } = {}) {
   return [
     `Type: ${row.name || "-"}`,
-    `Typen - NR: ${row.articleCode || "-"}`,
+    ...(showArticleCode ? [`Typen - NR: ${row.articleCode || "-"}`] : []),
     `Problembeschreibung: ${row.detail || "-"}`,
     ...(row.isElectricalAppliance
       ? [
@@ -501,10 +501,11 @@ function buildClaimItemText(row) {
   ].join("\n");
 }
 
-function buildClaimItemHtml(row) {
+function buildClaimItemHtml(row, { showArticleCode = true, itemNumber = 1 } = {}) {
   const itemTdStyles = "padding:8px 0;border-bottom:1px solid #eeeeee;vertical-align:top;";
-  const itemLabelStyles = `${itemTdStyles}box-sizing:border-box;font-weight:bold;width:45%;padding-right:24px;line-height:1.45;`;
-  const itemValueStyles = `${itemTdStyles}box-sizing:border-box;padding-left:20px;line-height:1.45;`;
+  const itemLabelStyles = `${itemTdStyles}box-sizing:border-box;font-weight:bold;width:35%;padding-left:15px;padding-right:15px;line-height:1.45;`;
+  const itemValueStyles = `${itemTdStyles}box-sizing:border-box;padding-left:15px;padding-right:15px;line-height:1.45;`;
+  const itemKind = row.isElectricalAppliance ? "Elektrogerät" : "Möbelteil";
   const uploads = row.attachments?.length
     ? row.attachments.map((entry) => formatAttachmentHtml(entry, { includeItemContext: false })).join("")
     : "-";
@@ -521,8 +522,13 @@ function buildClaimItemHtml(row) {
   return `
     <table role="presentation" style="width:100%;border-collapse:collapse;">
       <tbody>
+        <tr>
+          <td colspan="2" style="padding:10px 15px;border-bottom:2px solid #d9c7b8;font-size:14px;font-weight:bold;color:#5f4634;">
+            Problem ${itemNumber} &middot; ${itemKind}
+          </td>
+        </tr>
         <tr><td style="${itemLabelStyles}">Type</td><td style="${itemValueStyles}">${formatMultiline(row.name || "-")}</td></tr>
-        <tr><td style="${itemLabelStyles}">Typen - NR</td><td style="${itemValueStyles}">${formatMultiline(row.articleCode || "-")}</td></tr>
+        ${showArticleCode ? `<tr><td style="${itemLabelStyles}">Typen - NR</td><td style="${itemValueStyles}">${formatMultiline(row.articleCode || "-")}</td></tr>` : ""}
         <tr><td style="${itemLabelStyles}">Problembeschreibung</td><td style="${itemValueStyles}">${formatMultiline(row.detail || "-")}</td></tr>
         ${serialRows}
         <tr><td style="${itemLabelStyles}border-bottom:0;">Anhänge</td><td style="${itemValueStyles}border-bottom:0;">${uploads}</td></tr>
@@ -532,8 +538,8 @@ function buildClaimItemHtml(row) {
 }
 
 function buildEmailDetailSubtable(rows) {
-  const labelStyles = "padding:8px 24px 8px 0;border-bottom:1px solid #eeeeee;box-sizing:border-box;font-weight:bold;width:45%;vertical-align:top;line-height:1.45;";
-  const valueStyles = "padding:8px 0 8px 20px;border-bottom:1px solid #eeeeee;box-sizing:border-box;vertical-align:top;line-height:1.45;";
+  const labelStyles = "padding:8px 15px;border-bottom:1px solid #eeeeee;box-sizing:border-box;font-weight:bold;width:35%;vertical-align:top;line-height:1.45;";
+  const valueStyles = "padding:8px 15px;border-bottom:1px solid #eeeeee;box-sizing:border-box;vertical-align:top;line-height:1.45;";
   return `
     <table role="presentation" style="width:100%;border-collapse:collapse;">
       <tbody>
@@ -999,6 +1005,7 @@ function buildComplaintEmailText(payload) {
   const availabilityDate = payload.preferredContactDate || legacyAvailability.date;
   const availabilityTime = payload.preferredContactTime || legacyAvailability.time;
   const claimItemRows = buildClaimItemRows(payload.problemAreasJson, payload.attachmentsMeta);
+  const showClaimItemArticleCode = payload.contractType !== "ARC";
   const generalAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "general");
   return [
     "Servicereklamation",
@@ -1016,7 +1023,7 @@ function buildComplaintEmailText(payload) {
           ...claimItemRows.flatMap((row, index) => [
             "",
             `${row.name || `Küchenteil ${index + 1}`}:`,
-            buildClaimItemText(row),
+            buildClaimItemText(row, { showArticleCode: showClaimItemArticleCode }),
           ]),
         ]
       : []),
@@ -1079,6 +1086,7 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
   const availabilityDate = payload.preferredContactDate || legacyAvailability.date;
   const availabilityTime = payload.preferredContactTime || legacyAvailability.time;
   const claimItemRows = buildClaimItemRows(payload.problemAreasJson, payload.attachmentsMeta);
+  const showClaimItemArticleCode = payload.contractType !== "ARC";
   const generalAttachments = (payload.attachmentsMeta || []).filter((entry) => entry.role === "general");
   const detailRows = [
     ["Vertragsnummer", payload.contractNumber],
@@ -1089,9 +1097,9 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
     ["Kundenadresse", payload.clientAddress],
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],
-    ...claimItemRows.map((row, index) => [row.name || `Küchenteil ${index + 1}`, { html: buildClaimItemHtml(row) }]),
-    ["Vermieter", { html: landlordHtml }],
-    ...(hasHausmeisterDetails ? [["Hausmeister", { html: hausmeisterHtml }]] : []),
+    ...claimItemRows.map((row, index) => ["", { html: buildClaimItemHtml(row, { showArticleCode: showClaimItemArticleCode, itemNumber: index + 1 }), fullWidth: true }]),
+    ["", { html: landlordHtml, fullWidth: true, sectionTitle: "Vermieter" }],
+    ...(hasHausmeisterDetails ? [["", { html: hausmeisterHtml, fullWidth: true, sectionTitle: "Hausmeister" }]] : []),
     ...(availabilityDate ? [["Gewünschtes Kontaktdatum", availabilityDate]] : []),
     ...(availabilityTime ? [["Gewünschte Kontaktzeit", availabilityTime]] : []),
   ];
@@ -1102,6 +1110,12 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
         const renderedValue = value && typeof value === "object" && "html" in value
           ? value.html
           : formatMultiline(value);
+        if (value && typeof value === "object" && value.fullWidth) {
+          const sectionTitle = value.sectionTitle
+            ? `<div style="padding:10px 15px;border-top:2px solid #d9c7b8;border-bottom:1px solid #e5d9cf;background:#faf7f4;font-size:14px;font-weight:bold;color:#5f4634;">${escapeHtml(value.sectionTitle)}</div>`
+            : "";
+          return `<tr><td colspan="2" style="${tdStyles}padding-left:0;padding-right:0;">${sectionTitle}${renderedValue}</td></tr>`;
+        }
         return `<tr><td style="${tdStyles}font-weight:bold;width:35%;">${escapeHtml(label)}</td><td style="${tdStyles}">${renderedValue}</td></tr>`;
       },
     )

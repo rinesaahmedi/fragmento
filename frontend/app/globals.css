@@ -1628,6 +1628,11 @@ textarea {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+  align-items: start;
+}
+
+.service-field-grid > .service-field {
+  align-self: start;
 }
 
 .service-field-grid--claim-serial-row {
@@ -1876,6 +1881,49 @@ textarea {
   outline-offset: 2px;
 }
 
+.service-field__help-badge--serial {
+  width: auto;
+  min-width: 0;
+  height: 32px;
+  padding: 4px 10px 4px 6px;
+  gap: 7px;
+  border-radius: 8px;
+  border-color: rgba(37, 99, 235, 0.32);
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.service-field__help-badge--serial::before {
+  content: "i";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #2563eb;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.84rem;
+  font-style: italic;
+  line-height: 1;
+}
+
+.service-field__help-badge--serial:hover {
+  border-color: rgba(37, 99, 235, 0.5);
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.service-field-grid--3 .service-field input:focus {
+  border-color: rgba(107, 79, 58, 0.34);
+  box-shadow: 0 0 0 2px rgba(107, 79, 58, 0.08);
+}
 .service-contract-help {
   position: fixed;
   inset: 0;
@@ -2088,6 +2136,9 @@ textarea {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.94);
   color: var(--app-text);
+  font: inherit;
+  font-weight: 400;
+  line-height: 1.35;
   transition:
     border-color 160ms ease,
     box-shadow 160ms ease,
@@ -3685,7 +3736,14 @@ textarea {
 }
 
 .service-reference-flow__problem textarea {
-  min-height: 78px;
+  min-height: 96px;
+}
+
+.service-reference-flow__problem-hint {
+  color: #75695f;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
 .service-reference-flow__serial {
@@ -3697,6 +3755,7 @@ textarea {
 
 .service-reference-flow__serial-head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
 }
@@ -4083,6 +4142,7 @@ textarea {
 
 .service-field__problem-area-serial-heading {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 7px;
   color: var(--app-accent);
