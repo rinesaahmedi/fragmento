@@ -2544,7 +2544,7 @@ test("service claim picker outlines worktop surfaces but not separate front-edge
   assert.match(styles, /\.planHotspotWorktop[\s\S]*border-color:\s*transparent;[\s\S]*box-shadow:\s*none;/);
 });
 
-test("service claim picker preserves unselected sink and cooktop cutouts in a selected worktop", () => {
+test("service claim picker preserves cooktop and calibrated sink cutouts while linear worktops stay continuous", () => {
   const source = fs.readFileSync(
     path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"),
     "utf8",
@@ -2554,7 +2554,8 @@ test("service claim picker preserves unselected sink and cooktop cutouts in a se
     "utf8",
   );
 
-  assert.match(source, /hotspot\.claimPartKey === "sink"\s*\|\|\s*hotspot\.claimPartKey === "cooktop"/);
+  assert.match(source, /hotspot\.claimPartKey === "cooktop"/);
+  assert.match(source, /hotspot\.claimPartKey === "sink" && !hotspot\.preserveManualSize/);
   assert.match(source, /hotspot\.componentKey === "worktop"/);
   assert.match(source, /\(hotspot\) => !displaySelectedIds\.has\(hotspot\.componentId\)/);
   assert.doesNotMatch(source, /hasSelectedWorktop\s*&&\s*hotspot\.claimPartKey === "cooktop"/);

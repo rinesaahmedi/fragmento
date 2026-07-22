@@ -254,7 +254,10 @@ export default function ServiceClaimKitchenPicker({
   );
   const applianceImageHotspots = useMemo(
     () => imageHotspots.filter(
-      (hotspot) => hotspot.claimPartKey === "sink" || hotspot.claimPartKey === "cooktop",
+      (hotspot) => (
+        hotspot.claimPartKey === "cooktop"
+        || (hotspot.claimPartKey === "sink" && !hotspot.preserveManualSize)
+      ),
     ),
     [imageHotspots],
   );
