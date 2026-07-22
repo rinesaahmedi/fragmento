@@ -16,6 +16,7 @@ export default function AdminSelect({
   className = "",
   "aria-label": ariaLabel,
   label,
+  ...triggerProps
 }) {
   const generatedId = useId();
   const listboxId = `${id || generatedId}-listbox`;
@@ -144,6 +145,7 @@ export default function AdminSelect({
     <span className={`admin-select ${open ? "is-open" : ""} ${disabled ? "is-disabled" : ""} ${className}`} ref={menuRef}>
       <input type="hidden" name={name} value={selectedValue} disabled={disabled} required={required} />
       <button
+        {...triggerProps}
         ref={buttonRef}
         id={id}
         type="button"
