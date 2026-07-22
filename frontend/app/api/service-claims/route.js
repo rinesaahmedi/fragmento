@@ -2,7 +2,7 @@ import http from "http";
 import https from "https";
 import nodemailer from "nodemailer";
 import { Prisma } from "@prisma/client";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../lib/rate-limit";
 import { prisma } from "../../../lib/prisma";
 import {
@@ -1449,36 +1449,29 @@ export async function POST(request) {
 
     await insertServiceClaimRecord(prisma, payload);
 
-    if (attachmentParts.length) {
-      try {
-        await persistServiceClaimAttachments(payload.id, attachmentParts);
-      } catch (persistError) {
-        console.error("Service claim attachment persist error:", persistError);
-      }
-    }
-
-    let emailError = "";
-    const [emailSent, webhookSent] = await Promise.all([
-      sendComplaintEmail(payload, attachmentParts).catch((error) => {
-        emailError = formatServiceClaimErrorMessage(error);
-        console.warn("Service claim email delivery failed:", emailError);
-        return false;
-      }),
-      postWebhook(payload),
-    ]);
+    // The complaint is durable at this point. Do not keep the browser waiting
+    // for file storage, image rendering, SMTP, or the external webhook.
+    after(async () => {
+      await Promise.all([
+        attachmentParts.length
+          ? persistServiceClaimAttachments(payload.id, attachmentParts).catch((persistError) => {
+              console.error("Service claim attachment persist error:", persistError);
+              return false;
+            })
+          : Promise.resolve(true),
+        sendComplaintEmail(payload, attachmentParts).catch((error) => {
+          console.warn("Service claim email delivery failed:", formatServiceClaimErrorMessage(error));
+          return false;
+        }),
+        postWebhook(payload),
+      ]);
+    });
 
     return NextResponse.json({
       success: true,
-      message:
-        emailSent || webhookSent
-          ? "Your complaint has been sent successfully."
-          : emailError
-            ? `Your complaint has been recorded, but email delivery failed: ${emailError}`
-          : "Your complaint has been recorded successfully. Email or webhook delivery is not configured yet.",
+      message: "Your complaint has been recorded successfully and is being sent.",
       notifications: {
-        emailSent,
-        emailError: emailError || null,
-        webhookSent,
+        pending: true,
       },
     });
   } catch (error) {
