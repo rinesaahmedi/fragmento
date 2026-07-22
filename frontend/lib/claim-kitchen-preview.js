@@ -370,6 +370,34 @@ function getClaimPlanCrop(hotspots) {
   return { left, top, right, bottom, width: right - left, height: bottom - top };
 }
 
+function withClaimPreviewDerivedSinkFaucet(hotspots, components) {
+  const hasFaucetComponent = (components || []).some(
+    (item) => normalizedClaimPreviewValue(item?.componentKey) === "sink-faucet",
+  );
+  if (!hasFaucetComponent) return hotspots;
+
+  const sinkBase = hotspots.find((hotspot) => hotspot?.componentKey === "sink-base");
+  const worktop = hotspots.find((hotspot) => hotspot?.componentKey === "worktop");
+  const existingFaucet = hotspots.find((hotspot) => hotspot?.componentKey === "sink-faucet");
+  if (!sinkBase || !worktop || existingFaucet?.preserveManualSize) return hotspots;
+
+  const width = Math.max(4.6, Math.min(Number(sinkBase.width || 0) * 0.34, 5.1));
+  const height = 8;
+  const center = existingFaucet
+    ? Number(existingFaucet.left || 0) + Number(existingFaucet.width || 0) / 2
+    : Number(sinkBase.left || 0) + Number(sinkBase.width || 0) / 2;
+  return [
+    ...hotspots.filter((hotspot) => hotspot?.componentKey !== "sink-faucet"),
+    {
+      componentKey: "sink-faucet",
+      left: center - width / 2,
+      top: Number(worktop.top || 0) - height,
+      width,
+      height,
+    },
+  ];
+}
+
 export function cropClaimPlanHotspot(hotspot, crop) {
   const points = Array.isArray(hotspot?.points) ? hotspot.points : [];
   if (points.length) {
@@ -541,8 +569,12 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     return null;
   }
 
-  const preparedHotspots = buildServiceClaimBlendeHotspots(
+  const displayHotspots = withClaimPreviewDerivedSinkFaucet(
     sourceHotspots,
+    plan.kitchenConfig?.components,
+  );
+  const preparedHotspots = buildServiceClaimBlendeHotspots(
+    displayHotspots,
     plan.selectableComponents,
     plan.kitchenConfig?.components,
     normalizedSlug,
@@ -558,6 +590,19 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     sourceHotspots: croppedSourceHotspots,
     selectableComponents: plan.selectableComponents,
   });
+  const selectedHotspotIds = new Set(selectedHotspots.map(claimPlanComponentId));
+  const hasSelectedWorktop = selectedHotspots.some((hotspot) => (
+    hotspot?.componentKey === "worktop"
+    || hotspot?.claimPartKey === "worktop-left"
+    || hotspot?.claimPartKey === "worktop-right"
+    || hotspot?.claimPartKey === "worktop-end-panel"
+  ));
+  const unselectedApplianceHotspots = hasSelectedWorktop
+    ? claimHotspots.filter((hotspot) => (
+        (hotspot?.claimPartKey === "sink" || hotspot?.claimPartKey === "cooktop")
+        && !selectedHotspotIds.has(claimPlanComponentId(hotspot))
+      ))
+    : [];
 
   const sourcePath = path.join(process.cwd(), "public", decodeURIComponent(sourceHref).replace(/^[/\\]+/, ""));
   const sourceBytes = await fs.readFile(sourcePath).catch(() => null);
@@ -601,11 +646,27 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
       .png()
       .toBuffer()
     : null;
+  const applianceCutoutLayer = unselectedApplianceHotspots.length
+    ? await sharp(original)
+      .ensureAlpha()
+      .composite([{
+        input: buildClaimPlanMask(unselectedApplianceHotspots, outputWidth, outputHeight),
+        blend: "dest-in",
+      }])
+      .png()
+      .toBuffer()
+    : null;
   const layers = [
     { input: faintPlan },
     ...(purchasedLayer ? [{ input: purchasedLayer }] : []),
     ...(selectedHotspots.length
       ? [{ input: buildClaimPlanSelectionOverlay(selectedHotspots, outputWidth, outputHeight) }]
+      : []),
+    ...(applianceCutoutLayer
+      ? [
+          { input: buildClaimPlanMask(unselectedApplianceHotspots, outputWidth, outputHeight) },
+          { input: applianceCutoutLayer },
+        ]
       : []),
   ];
   const content = await sharp({

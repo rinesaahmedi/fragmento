@@ -29,12 +29,12 @@ test("service-claims route recovers when a running server cached the pre-sequenc
   assert.match(source, /options\.includeClaimSequence = true/);
 });
 
-test("service-claims route returns the actual email delivery error", () => {
+test("service-claims route sends notifications after returning the durable success response", () => {
   const source = fs.readFileSync(routePath, "utf8");
 
-  assert.match(source, /let emailError = ""/);
-  assert.match(source, /email delivery failed: \$\{emailError\}/);
-  assert.match(source, /emailError: emailError \|\| null/);
+  assert.match(source, /import \{ after, NextResponse \} from "next\/server"/);
+  assert.match(source, /await insertServiceClaimRecord\(prisma, payload\);[\s\S]*after\(async \(\) =>/);
+  assert.match(source, /pending: true/);
 });
 
 test("service-claims route requires explicit confirmation for grouped kitchen parts", () => {
