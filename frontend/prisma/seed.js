@@ -397,7 +397,8 @@ function applyCentralizedArticlePricing(item) {
 const PRODUCT_INFO_FILES = {
   dishwasher: "/product-info/a-egspv597210-product-info-eco21.pdf",
   oven: "/product-info/ebx-943-600-s-product-info.pdf",
-  hood: "/product-info/fh-664-621-s-product-info.pdf",
+  cooktop: "/product-info/ol-kmi-754-000-e-product-info.pdf",
+  hood: "/product-info/extractor-hood-flat-product-info.pdf",
   hoodChimney: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf",
   fridge: "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf",
   ledLightingLabel: "/product-info/led-lighting-set-elabel.pdf",
@@ -450,43 +451,60 @@ const PRODUCT_INFO_BY_CODE = {
   "REF-545-1800-700": {
     productImagePath: PRODUCT_IMAGE_FILES.fridge,
     productInfoPdfPath: PRODUCT_INFO_FILES.fridge,
-    productInfoSummary: "Freistehende Kühl-Gefrierkombination KGC 15495 S für die Küchenplanung. Die aktuelle Produktinformation nennt NoFrost, 180 cm Bauhöhe und Energieklasse E.",
+    productInfoSummary: "Kühl-/Gefrierkombination KGCN 388 140 E, 180 cm, mit NoFrost, Inverter-Kompressor und 250 l Nutzinhalt. Die Produktinformation nennt Energieeffizienzklasse D, 174,1 kWh/Jahr und 39 dB.",
     productInfoKeyFacts: [
-      "Energieklasse: E",
-      "Geräusch: 41 dB",
-      "Höhe: 180 cm",
-      "Nutzinhalt: 250 l",
-      "NoFrost: Kühlen und Gefrieren",
+      "Modell: KGCN 388 140 E",
+      "Produkttyp: Kühl-/Gefrierkombination, 180 cm",
+      "Energieeffizienzklasse: D",
+      "Energieverbrauch: 174,1 kWh/Jahr",
+      "Luftschallemission: 39 dB(A), Klasse C",
+      "Nutzinhalt gesamt: 250 l",
+      "Nutzinhalt Kühlen / Gefrieren: 180 / 70 l",
+      "Gerätemaße H x B x T: 1810 x 540 x 576 mm",
+      "NoFrost: Kühl- und Gefrierteil",
+      "Gefrierleistung: 3,2 kg/24 h",
+      "Temperaturanstiegszeit: 9 h",
+      "Türanschlag: rechts, wechselbar",
     ],
     productInfoExtractedText: [
-      "Produktname: AMICA KGC 15495 S Kühl-/Gefrierkombination, 180 cm.",
+      "Produktname: AMICA KGCN 388 140 E Kühl-/Gefrierkombination, 180 cm.",
       "Wichtige Punkte:",
-      "- Freistehendes Kühl-Gefriergeraet mit NoFrost und automatischer Abtauung.",
-      "- Energieklasse E, Jahresverbrauch 219 kWh, Geräusch 41 dB(A), Klasse C.",
-      "- Kühlen 180 l, Gefrieren 70 l, 4-Sterne-Gefrierteil.",
-      "- Ausstattung: FreshZone, VitControl Plus, LED-Licht, Flaschenregal, 3 Gefrierschubladen.",
+      "- NoFrost-Standgerät mit elektronischer Steuerung und Inverter-Kompressor.",
+      "- Energieeffizienzklasse D, 174,1 kWh/Jahr und 39 dB(A), Klasse C.",
+      "- Nutzinhalt 250 l: Kühlen 180 l, Gefrieren 70 l.",
+      "- Gerätemaße H x B x T: 1810 x 540 x 576 mm.",
+      "- Ausstattung: FreshZone, VitControl Plus, LED-Licht, Tür-Offen-Alarm.",
       "Auswahlhinweise:",
-      "- Vor der Bestellung Gerätemaß, Türanschlag und Belüftung im Küchenplan prüfen.",
+      "- Vor der Bestellung Gerätemaß und wechselbaren Türanschlag im Küchenplan prüfen.",
     ].join("\n"),
   },
   "HOOD-600-FLAT": {
     productImagePath: PRODUCT_IMAGE_FILES.hood,
     productInfoPdfPath: PRODUCT_INFO_FILES.hood,
-    productInfoSummary: "Flachschirmhaube FH 664 621 S für eine 60-cm-Küchenlösung. Die aktuelle Produktinformation nennt Energieklasse A und bis zu 70 dB Betriebsgeräusch.",
+    productInfoSummary: "Flachschirmhaube FH 664 621 E, 60 cm, für Abluft- oder Umluftbetrieb. Die Produktinformation nennt Energieeffizienzklasse A, 170–415 m³/h Luftleistung und 49–70 dB.",
     productInfoKeyFacts: [
-      "Energieklasse: A",
-      "Geräusch: max. 70 dB",
+      "Modell: FH 664 621 E",
+      "Produkttyp: Flachschirmhaube / Teleskophaube",
+      "Energieeffizienzklasse: A",
+      "Energieverbrauch: 24,8 kWh/Jahr",
+      "Geräusch: 49–70 dB",
       "Breite: 60 cm",
-      "Luftleistung: 170-415 m3/h",
+      "Luftleistung: 170–415 m³/h",
+      "Leistungsstufen: 3",
       "Betriebsart: Abluft / Umluft",
+      "Gerätemaße H x B x T: 173 x 599 x 303 mm",
+      "Montageabstand über Kochfeld / Gaskochfeld: 450 / 650 mm",
+      "Kohlefilter für Umluftbetrieb: FWK 124, 2 Stück",
     ],
     productInfoExtractedText: [
-      "Produktname: AMICA FH 664 621 S Flachschirmhaube, 60 cm.",
+      "Produktname: AMICA FH 664 621 E Flachschirmhaube, 60 cm.",
       "Wichtige Punkte:",
-      "- Teleskophaube / Flachschirmhaube in Schwarz mit mechanischen Schaltern.",
-      "- Energieklasse A, Jahresverbrauch 24.8 kWh, Fluid-Dynamic-Effizienzklasse B.",
-      "- 3 Leistungsstufen, Luftleistung 170-415 m3/h, Geräusch 49-70 dB.",
-      "- 2 LED-Leuchten, 2 spülmaschinengeeignete Aluminium-Fettfilter.",
+      "- Teleskophaube / Flachschirmhaube in Edelstahl mit Kippschalter.",
+      "- Energieeffizienzklasse A, Jahresverbrauch 24,8 kWh.",
+      "- 3 Leistungsstufen, Luftleistung 170–415 m³/h, Geräusch 49–70 dB.",
+      "- 2 LED-Leuchten und 2 spülmaschinengeeignete Aluminium-Fettfilter.",
+      "- Gerätemaße H x B x T: 173 x 599 x 303 mm.",
+      "- Montageabstand über Kochfeld / Gaskochfeld: 450 / 650 mm.",
       "Auswahlhinweise:",
       "- Vor der Bestellung Einbauposition und Luftführung prüfen.",
     ].join("\n"),
@@ -566,20 +584,7 @@ PRODUCT_INFO_BY_CODE["DISH-AB105825-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"]
 PRODUCT_INFO_BY_CODE["DISH-AB105828-600"] = PRODUCT_INFO_BY_CODE["DISH-600-STD"];
 PRODUCT_INFO_BY_CODE["REF-AB105828-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["HOOD-AB105828-FH664621E"] = PRODUCT_INFO_BY_CODE["HOOD-B-FH664621E"];
-PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = {
-  ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"],
-  productInfoKeyFacts: [
-    ...PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoKeyFacts,
-    "Jahresverbrauch: 219 kWh/Jahr.",
-    "Gerätemaße H x B x T (mm): 1800 x 545 x 590.",
-  ],
-  productInfoExtractedText: PRODUCT_INFO_BY_CODE["REF-545-1800-700"].productInfoExtractedText
-    .replace("Produktname: AMICA KGC 15495 S Kühl-/Gefrierkombination, 180 cm.", "Produktname: AMICA KGC 15495 S Kühl-/Gefrierkombination, 180 cm.")
-    .replace(
-      "- Freistehendes Kühl-Gefriergeraet mit NoFrost und automatischer Abtauung.",
-      "- Modell: KGC 15495 S.\n- Freistehendes Kühl-Gefriergeraet mit NoFrost und automatischer Abtauung.\n- Gerätemaße H x B x T (mm): 1800 x 545 x 590.",
-    ),
-};
+PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"] = PRODUCT_INFO_BY_CODE["REF-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-C-545-1800-700"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105806-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_BY_CODE["REF-AB105807-KGCN388140E"] = PRODUCT_INFO_BY_CODE["REF-B-545-1800-700"];
@@ -689,6 +694,38 @@ PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"] = {
     "- Vor der Bestellung Nischenmaß, Anschlusswert und Elektroanschluss prüfen.",
   ].join("\n"),
 };
+const OVEN_CLAIM_PRODUCT_INFO = {
+  productImagePath: PRODUCT_IMAGE_FILES.oven,
+  productInfoPdfPath: PRODUCT_INFO_FILES.oven,
+  productInfoSummary: "Einbaubackofen mit 77 l Garraum, Energieeffizienzklasse A und 9 Backofenfunktionen.",
+  productInfoKeyFacts: [
+    "Produkttyp: Einbaubackofen",
+    "Modell der Produktinformation: EBX 943 600 S",
+    "Energieeffizienzklasse: A",
+    "Energieverbrauch: 0,99 kWh konventionell / 0,83 kWh Heißluft",
+    "Garraumvolumen: 77 l",
+    "Backofenfunktionen: 9",
+    "Gerätemaße H x B x T: 595 x 595 x 575 mm",
+    "Einbaumaße H x B x T: 595 x 560 x 560 mm",
+  ],
+  productInfoExtractedText: "Produktinformation für den Einbaubackofen EBX 943 600 S. Energieeffizienzklasse A, 77 l Garraum und 9 Backofenfunktionen. Energieverbrauch 0,99 kWh im konventionellen Betrieb und 0,83 kWh mit Heißluft. Gerätemaße H x B x T 595 x 595 x 575 mm. Einbaumaße H x B x T 595 x 560 x 560 mm.",
+};
+const COOKTOP_CLAIM_PRODUCT_INFO = {
+  productImagePath: PRODUCT_IMAGE_FILES.hob,
+  productInfoPdfPath: PRODUCT_INFO_FILES.cooktop,
+  productInfoSummary: "Autarkes 60-cm-Induktionskochfeld mit 4 Kochzonen, Booster und 9 Leistungsstufen.",
+  productInfoKeyFacts: [
+    "Produkttyp: Induktionskochfeld",
+    "Modell der Produktinformation: OL-KMI 754 000 E",
+    "Breite: 60 cm",
+    "Kochzonen: 4",
+    "Leistungsstufen: 9",
+    "Gerätemaße B x T: 590 x 520 mm",
+    "Ausschnittmaße B x T: 560 x 490 mm",
+    "Funktionen: Booster, Timer, Restwärmeanzeige, Topferkennung und Kindersicherung",
+  ],
+  productInfoExtractedText: "Produktinformation für das autarke Induktionskochfeld OL-KMI 754 000 E. Breite 60 cm, 4 Kochzonen mit Booster und 9 Leistungsstufen. Gerätemaße B x T 590 x 520 mm. Ausschnittmaße B x T 560 x 490 mm. Timer, Restwärmeanzeige, Topferkennung und Kindersicherung.",
+};
 PRODUCT_INFO_BY_CODE["OVEN-C-600-HOB"] = PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"];
 PRODUCT_INFO_BY_CODE["OVEN-AB105806-600-HOB"] = PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"];
 PRODUCT_INFO_BY_CODE["OVEN-AB105807-600-HOB"] = PRODUCT_INFO_BY_CODE["OVEN-B-600-HOB"];
@@ -718,6 +755,22 @@ PRODUCT_INFO_BY_CODE["LIGHT-B-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
 PRODUCT_INFO_BY_CODE["LIGHT-C-LED-001"] = LED_LIGHTING_PRODUCT_INFO;
 PRODUCT_INFO_BY_CODE["LIGHT-AB105845-LED"] = LED_LIGHTING_PRODUCT_INFO;
 PRODUCT_INFO_BY_CODE["ACC-LIGHT-003"] = LED_LIGHTING_PRODUCT_INFO;
+
+Object.assign(PRODUCT_INFO_BY_ARTICLE_NUMBER, {
+  "A-EGSPV597210 + TGV60": PRODUCT_INFO_BY_CODE["DISH-600-STD"],
+  "EWA34660W + TGV60 + WU16": PRODUCT_INFO_BY_CODE["WM-B-EWA34660W"],
+  "KALB KA220043_S3": LED_LIGHTING_PRODUCT_INFO,
+  "KHF664611S + FWP18": PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"],
+});
+
+for (const article of CATALOG_ARTICLES) {
+  const productInfo = PRODUCT_INFO_BY_ARTICLE_NUMBER[article.articleNumber];
+  if (productInfo) {
+    Object.assign(article, productInfo, {
+      productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
+    });
+  }
+}
 
 // 108134 MODUL 1: single-wall plan (frontend/public/pdfs/108134 MODUL 1_10.03.2026_OH.pdf).
 // Same component/article/price set as the legacy single-wall layout, so it reuses
@@ -2603,6 +2656,12 @@ async function seedCatalogMasterData() {
       depthMm: article.depthMm ?? null,
       price: article.price,
       itemType: article.itemType,
+      productImagePath: article.productImagePath ?? null,
+      productInfoPdfPath: article.productInfoPdfPath ?? null,
+      productInfoSummary: article.productInfoSummary ?? null,
+      productInfoKeyFacts: article.productInfoKeyFacts ?? null,
+      productInfoExtractedText: article.productInfoExtractedText ?? null,
+      productInfoUpdatedAt: article.productInfoUpdatedAt ?? null,
       isFixedPricePackage: Boolean(article.isFixedPricePackage),
       isActive: article.isActive !== false,
     });
@@ -2787,8 +2846,8 @@ async function main() {
       const catalogArticleNumber = item.isActive === false
         && itemCode.startsWith("HOOD-")
         && String(item.articleNumber || "").trim() === "FH 664 621 E"
-        ? "FH664621E + FWK124 + HD6002"
-        : String(item.articleNumber || "").trim();
+          ? "FH664621E + FWK124 + HD6002"
+          : String(item.articleNumber || "").trim();
       const catalogArticle = catalogArticleNumber
         ? catalogArticleByNumber.get(catalogArticleNumber)
         : null;
@@ -3053,9 +3112,9 @@ async function main() {
       ));
     if (ovenBundle) {
       for (const part of [
-        { partKey: "oven", articleCode: "EH92364E-A", name: "Built-in Oven", nameDe: "Einbauherd", sortOrder: 40 },
+        { partKey: "oven", articleCode: "EH92364E-A", name: "Built-in Oven", nameDe: "Einbauherd", sortOrder: 40, ...OVEN_CLAIM_PRODUCT_INFO },
         { partKey: "oven-drawer", articleCode: "UHK", name: "Lower Cabinet for Built-in Oven", nameDe: "Unterschrank für Einbauherde", sortOrder: 45 },
-        { partKey: "cooktop", articleCode: "9EC744100C", name: "Ceramic Cooktop 60cm", nameDe: "Glaskeramikkochfeld 60 cm", sortOrder: 50 },
+        { partKey: "cooktop", articleCode: "9EC744100C", name: "Ceramic Cooktop 60cm", nameDe: "Glaskeramikkochfeld 60 cm", sortOrder: 50, ...COOKTOP_CLAIM_PRODUCT_INFO },
       ]) {
         await prisma.kitchenClaimPart.upsert({
           where: {
@@ -3068,6 +3127,7 @@ async function main() {
             ...part,
             sourceKitchenItemCode: ovenBundle.code,
             sourceComponentKey: ovenBundle.componentKey,
+            productInfoUpdatedAt: part.productInfoPdfPath ? new Date() : null,
             isActive: true,
           },
           create: {
@@ -3075,6 +3135,7 @@ async function main() {
             ...part,
             sourceKitchenItemCode: ovenBundle.code,
             sourceComponentKey: ovenBundle.componentKey,
+            productInfoUpdatedAt: part.productInfoPdfPath ? new Date() : null,
             isActive: true,
           },
         });

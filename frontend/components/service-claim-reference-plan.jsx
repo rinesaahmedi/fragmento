@@ -25,20 +25,42 @@ export default function ServiceClaimReferencePlan({
       </div>
 
       {previewImagePath ? (
-        <figure className="service-claim-reference-plan__preview">
-          <img
-            className="service-claim-reference-plan__image"
-            src={previewImagePath}
-            alt={labels.previewAlt}
-          />
-        </figure>
+        pdfPath ? (
+          <a
+            className="service-claim-reference-plan__preview-link"
+            href={pdfPath}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={labels.open}
+          >
+            <figure className="service-claim-reference-plan__preview">
+              <img
+                className="service-claim-reference-plan__image"
+                src={previewImagePath}
+                alt={labels.previewAlt}
+              />
+              <span className="service-claim-reference-plan__preview-action" aria-hidden="true">
+                <span>↗</span>
+                {labels.open}
+              </span>
+            </figure>
+          </a>
+        ) : (
+          <figure className="service-claim-reference-plan__preview">
+            <img
+              className="service-claim-reference-plan__image"
+              src={previewImagePath}
+              alt={labels.previewAlt}
+            />
+          </figure>
+        )
       ) : (
         <div className="service-claim-reference-plan__preview-unavailable">
           {labels.previewUnavailable}
         </div>
       )}
 
-      {pdfPath ? (
+      {pdfPath && !previewImagePath ? (
         <a
           className="service-claim-reference-plan__open"
           href={pdfPath}

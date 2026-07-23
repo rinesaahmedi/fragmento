@@ -2,6 +2,61 @@ import { mapAdminMutationError, redirectWithFlash, validateClaimProductInput } f
 import { requireAdminApi } from "../../../../../../lib/auth";
 import { prisma } from "../../../../../../lib/prisma";
 
+function asKeyFacts(value) {
+  return Array.isArray(value) ? value.map((entry) => String(entry || "").trim()).filter(Boolean) : [];
+}
+
+async function syncClaimProductInformationToKitchenItems(claimProducts) {
+  const sources = [
+    ...new Map(
+      claimProducts
+        .filter((part) => part.kitchenId && part.sourceKitchenItemCode)
+        .map((part) => [`${part.kitchenId}:${part.sourceKitchenItemCode}`, {
+          kitchenId: part.kitchenId,
+          code: part.sourceKitchenItemCode,
+        }]),
+    ).values(),
+  ];
+  if (!sources.length) return;
+
+  const parts = await prisma.kitchenClaimPart.findMany({
+    where: {
+      isActive: true,
+      OR: sources.map((source) => ({
+        kitchenId: source.kitchenId,
+        sourceKitchenItemCode: source.code,
+      })),
+    },
+    orderBy: [{ sortOrder: "asc" }, { partKey: "asc" }],
+  });
+
+  await Promise.all(sources.map((source) => {
+    const sourceParts = parts.filter(
+      (part) => part.kitchenId === source.kitchenId && part.sourceKitchenItemCode === source.code,
+    );
+    const infoParts = sourceParts.filter((part) => (
+      part.productInfoPdfPath
+      || part.productInfoSummary
+      || asKeyFacts(part.productInfoKeyFacts).length
+      || part.productInfoExtractedText
+    ));
+    const firstImage = infoParts.find((part) => part.productImagePath)?.productImagePath || null;
+    const firstPdf = infoParts.find((part) => part.productInfoPdfPath)?.productInfoPdfPath || null;
+
+    return prisma.kitchenItem.updateMany({
+      where: { kitchenId: source.kitchenId, code: source.code },
+      data: {
+        productImagePath: firstImage,
+        productInfoPdfPath: firstPdf,
+        productInfoSummary: infoParts.map((part) => part.productInfoSummary).filter(Boolean).join("\n\n") || null,
+        productInfoKeyFacts: infoParts.flatMap((part) => asKeyFacts(part.productInfoKeyFacts)),
+        productInfoExtractedText: infoParts.map((part) => part.productInfoExtractedText).filter(Boolean).join("\n\n---\n\n") || null,
+        productInfoUpdatedAt: infoParts.length ? new Date() : null,
+      },
+    });
+  }));
+}
+
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
@@ -26,6 +81,14 @@ export async function POST(request, { params }) {
     if (!result.count) {
       throw new Error("Claim product was not found.");
     }
+    const updatedClaimProducts = await prisma.kitchenClaimPart.findMany({
+      where: { id: { in: ids } },
+      select: {
+        kitchenId: true,
+        sourceKitchenItemCode: true,
+      },
+    });
+    await syncClaimProductInformationToKitchenItems(updatedClaimProducts);
 
     return redirectWithFlash(
       request,

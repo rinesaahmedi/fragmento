@@ -5,7 +5,7 @@ import { buildOrderConfirmationEmailStaticHtml } from "../lib/email/order-notifi
 
 const CURRENT_FRIDGE_PRODUCT_INFO_PDF =
   "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf";
-const CURRENT_FLAT_HOOD_PRODUCT_INFO_PDF = "/product-info/fh-664-621-s-product-info.pdf";
+const CURRENT_FLAT_HOOD_PRODUCT_INFO_PDF = "/product-info/extractor-hood-flat-product-info.pdf";
 
 test("product info button maps unlisted fridge codes to the current PDF", () => {
   const documents = getProductInfoDocuments({

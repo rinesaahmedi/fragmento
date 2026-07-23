@@ -30,6 +30,7 @@ import {
   getOrderKindForContractNumber,
 } from "./order-kind";
 import { prisma } from "./prisma";
+import { resolveProductInformation } from "./product-information";
 import {
   getAvailableCutleryVariantsForComponents,
   getCutleryVariant,
@@ -248,6 +249,19 @@ export function buildOrderForNotifications(orderRecord) {
     const catalogArticle = kitchenItem?.catalogArticleId ? kitchenItem.catalogArticle : null;
     const catalogService = kitchenItem?.catalogServiceId ? kitchenItem.catalogService : null;
     const catalogBlende = kitchenItem?.catalogBlendeId ? kitchenItem.catalogBlende : null;
+    const productInformation = resolveProductInformation({
+      catalogArticleId: kitchenItem?.catalogArticleId || null,
+      catalogArticle,
+      productImagePath: kitchenItem?.productImagePath || item.productImagePath || "",
+      productInfoPdfPath: kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
+      productInfoSummary: kitchenItem?.productInfoSummary || item.productInfoSummary || "",
+      productInfoKeyFacts: Array.isArray(kitchenItem?.productInfoKeyFacts)
+        ? kitchenItem.productInfoKeyFacts
+        : item.productInfoKeyFacts,
+      productInfoExtractedText:
+        kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
+      productInfoUpdatedAt: kitchenItem?.productInfoUpdatedAt || null,
+    });
     const catalogBlendeQuantity = catalogBlende
       ? Math.max(1, Number.parseInt(String(kitchenItem?.catalogBlendeQuantity || 1), 10) || 1)
       : Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
@@ -275,13 +289,11 @@ export function buildOrderForNotifications(orderRecord) {
       isLocked: Boolean(kitchenItem?.isLocked || item.isLocked),
       iconKey: kitchenItem?.iconKey || item.iconKey || "",
       componentKey: kitchenItem?.componentKey || item.componentKey || "",
-      productImagePath: kitchenItem?.productImagePath || item.productImagePath || "",
-      productInfoPdfPath: kitchenItem?.productInfoPdfPath || item.productInfoPdfPath || "",
-      productInfoSummary: kitchenItem?.productInfoSummary || item.productInfoSummary || "",
-      productInfoKeyFacts: Array.isArray(kitchenItem?.productInfoKeyFacts)
-        ? kitchenItem.productInfoKeyFacts
-        : (Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : []),
-      productInfoExtractedText: kitchenItem?.productInfoExtractedText || item.productInfoExtractedText || "",
+      productImagePath: productInformation.productImagePath,
+      productInfoPdfPath: productInformation.productInfoPdfPath,
+      productInfoSummary: productInformation.productInfoSummary,
+      productInfoKeyFacts: productInformation.productInfoKeyFacts,
+      productInfoExtractedText: productInformation.productInfoExtractedText,
       blendeCode: catalogBlende?.code || kitchenItem?.blendeCode || item.blendeCode || "",
       blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || kitchenItem?.blendeLabel || item.blendeLabel || "",
       blendeName: catalogBlende?.name || item.blendeName || "",

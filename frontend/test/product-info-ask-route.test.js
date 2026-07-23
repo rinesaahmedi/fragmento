@@ -5,6 +5,7 @@ const test = require("node:test");
 
 const routePath = path.join(__dirname, "..", "app", "api", "product-info", "ask", "route.js");
 const routeCorePath = path.join(__dirname, "..", "lib", "product-info-ask.js");
+const productInformationPath = path.join(__dirname, "..", "lib", "product-information.js");
 const configuratorPath = path.join(__dirname, "..", "components", "kitchen-configurator.js");
 const publicEnPath = path.join(__dirname, "..", "locales", "public.en.json");
 
@@ -13,11 +14,12 @@ function loadModuleSource(filePath) {
     .readFileSync(filePath, "utf8")
     .replace(/^import[\s\S]*?;\r?\n/gm, "")
     .replace(/export\s+\{[\s\S]*?\};\r?\n?/g, "")
+    .replace(/^export\s+(?=(?:const|function)\s)/gm, "")
     .replace("export async function POST", "async function POST");
 }
 
 function loadRoute(overrides = {}) {
-  const source = `${loadModuleSource(routeCorePath)}\n${loadModuleSource(routePath)}`;
+  const source = `${loadModuleSource(productInformationPath)}\n${loadModuleSource(routeCorePath)}\n${loadModuleSource(routePath)}`;
 
   const NextResponse = overrides.NextResponse || {
     json(body, init = {}) {
@@ -125,7 +127,7 @@ test("all-products UI copy uses plural wording", () => {
   assert.match(configuratorSource, /productAssistantContextConfirmedAll/);
   assert.equal(
     publicEn.configurator.productAssistantContextConfirmedAll,
-    "You're now viewing all selected products. Ask me anything from their product information.",
+    "You're now viewing all selected products. Ask a question about their product information.",
   );
 });
 

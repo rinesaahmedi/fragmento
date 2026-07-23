@@ -22,6 +22,7 @@ import { Fragment } from "react";
 import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
 import { AdminShell } from "../../../../components/admin-shell";
 import AdminSelect from "../../../../components/admin-select";
+import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { prisma } from "../../../../lib/prisma";
@@ -164,6 +165,28 @@ function CatalogArticleForm({ action, article, submitLabel }) {
           <textarea name="description" defaultValue={article?.description || ""} rows={2} style={textareaStyle} />
         </FormField>
       </div>
+      <details style={productInfoDetailsStyle}>
+        <summary style={productInfoSummaryStyle}>
+          Product Information
+          {article?.productInfoPdfPath ? <span style={productInfoReadyStyle}>Ready</span> : null}
+        </summary>
+        <div style={productInfoBodyStyle}>
+          <FormField label="Product image path" wide>
+            <input
+              name="productImagePath"
+              defaultValue={article?.productImagePath || ""}
+              placeholder="/product-images/email/example.jpg"
+              style={inputStyle}
+            />
+          </FormField>
+          <AdminProductInfoPdfManager
+            initialPdfPath={article?.productInfoPdfPath || ""}
+            initialSummary={article?.productInfoSummary || ""}
+            initialKeyFacts={Array.isArray(article?.productInfoKeyFacts) ? article.productInfoKeyFacts : []}
+            initialExtractedText={article?.productInfoExtractedText || ""}
+          />
+        </div>
+      </details>
       <div style={actionRowStyle}>
         <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
       </div>
@@ -229,6 +252,26 @@ function ClaimProductForm({ action, claimProduct, submitLabel }) {
           </AdminSelect>
         </FormField>
       </div>
+      <details style={productInfoDetailsStyle}>
+        <summary style={productInfoSummaryStyle}>Product Information</summary>
+        <div style={productInfoBodyStyle}>
+          <FormField label="Product image path" wide>
+            <input
+              name="productImagePath"
+              defaultValue={claimProduct?.productImagePath || ""}
+              placeholder="/product-images/email/example.jpg"
+              style={inputStyle}
+            />
+          </FormField>
+          <AdminProductInfoPdfManager
+            initialPdfPath={claimProduct?.productInfoPdfPath || ""}
+            initialSummary={claimProduct?.productInfoSummary || ""}
+            initialKeyFacts={claimProduct?.productInfoKeyFacts || []}
+            initialExtractedText={claimProduct?.productInfoExtractedText || ""}
+            compact
+          />
+        </div>
+      </details>
       <div style={actionRowStyle}>
         <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
       </div>
@@ -300,6 +343,12 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
       ca."depthMm",
       ca."price",
       ca."itemType",
+      ca."productImagePath",
+      ca."productInfoPdfPath",
+      ca."productInfoSummary",
+      ca."productInfoKeyFacts",
+      ca."productInfoExtractedText",
+      ca."productInfoUpdatedAt",
       ca."isFixedPricePackage",
       ca."isActive",
       COUNT(ki."id")::int AS "linkedKitchenItems"
@@ -348,6 +397,12 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
       kcp."articleCode",
       kcp."sourceKitchenItemCode",
       kcp."sourceComponentKey",
+      kcp."productImagePath",
+      kcp."productInfoPdfPath",
+      kcp."productInfoSummary",
+      kcp."productInfoKeyFacts",
+      kcp."productInfoExtractedText",
+      kcp."productInfoUpdatedAt",
       kcp."isActive",
       kcp."sortOrder",
       k."name" AS "kitchenName",
@@ -402,6 +457,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Price</th>
                     <th style={thStyle}>Fixed package</th>
                     <th style={thStyle}>Active</th>
+                    <th style={thStyle}>Product info</th>
                     <th style={thStyle}>Linked KitchenItems</th>
                   </tr>
                 </thead>
@@ -417,10 +473,15 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                         <td style={tdStyle}>{formatMoney(article.price)}</td>
                         <td style={tdStyle}>{formatBoolean(article.isFixedPricePackage)}</td>
                         <td style={tdStyle}>{formatBoolean(article.isActive)}</td>
+                        <td style={tdStyle}>
+                          <span style={article.productInfoPdfPath ? productInfoReadyStyle : productInfoMissingStyle}>
+                            {article.productInfoPdfPath ? "Ready" : "Missing"}
+                          </span>
+                        </td>
                         <td style={tdStyle}>{article.linkedKitchenItems}</td>
                       </tr>
                       <tr>
-                        <td colSpan={9} style={editRowCellStyle}>
+                        <td colSpan={10} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
                             {editArticleId === article.id ? (
                               <details open style={editDetailsStyle}>
@@ -588,6 +649,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}>Name</th>
                     <th style={thStyle}>German name</th>
                     <th style={thStyle}>Sort order</th>
+                    <th style={thStyle}>Product info</th>
                     <th style={thStyle}>Active</th>
                   </tr>
                 </thead>
@@ -606,10 +668,17 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                         <td style={tdStyle}>{claimProduct.name}</td>
                         <td style={tdStyle}>{claimProduct.nameDe || ""}</td>
                         <td style={tdStyle}>{claimProduct.sortOrder}</td>
+                        <td style={tdStyle}>
+                          {claimProduct.productInfoPdfPath ? (
+                            <span style={{ color: "var(--app-success-text)", fontWeight: 800 }}>Ready</span>
+                          ) : (
+                            <span style={{ color: "var(--app-text-muted)" }}>Missing</span>
+                          )}
+                        </td>
                         <td style={tdStyle}>{formatBoolean(claimProduct.isActive)}</td>
                       </tr>
                       <tr>
-                        <td colSpan={7} style={editRowCellStyle}>
+                        <td colSpan={8} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
                             {editClaimProductId === claimProduct.id ? (
                               <details open style={editDetailsStyle}>
@@ -658,6 +727,44 @@ const addonFormStyle = {
 const articleFormStyle = {
   ...addonFormStyle,
   minWidth: 680,
+};
+
+const productInfoDetailsStyle = {
+  border: "1px solid var(--app-border)",
+  borderRadius: 12,
+  background: "rgba(255,255,255,0.62)",
+  overflow: "hidden",
+};
+
+const productInfoSummaryStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 12,
+  padding: "12px 14px",
+  color: "var(--app-accent)",
+  fontWeight: 900,
+  cursor: "pointer",
+};
+
+const productInfoReadyStyle = {
+  padding: "4px 8px",
+  borderRadius: 999,
+  background: "#edf8f1",
+  color: "#237246",
+  fontSize: 12,
+};
+
+const productInfoMissingStyle = {
+  ...productInfoReadyStyle,
+  background: "#f6f1eb",
+  color: "var(--app-text-muted)",
+};
+
+const productInfoBodyStyle = {
+  display: "grid",
+  gap: 12,
+  padding: "0 14px 14px",
 };
 
 const claimProductFormStyle = {

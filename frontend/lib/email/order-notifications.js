@@ -58,7 +58,7 @@ const DISHWASHER_PRODUCT_INFO_DOCUMENTS = [
 ];
 
 const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
-  { label: "Produktinfo PDF", href: "/product-info/fh-664-621-s-product-info.pdf" },
+  { label: "Produktinfo PDF", href: "/product-info/extractor-hood-flat-product-info.pdf" },
 ];
 
 const CHIMNEY_HOOD_PRODUCT_INFO_DOCUMENTS = [
