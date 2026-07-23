@@ -698,6 +698,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               if (itemStatusFilter) editParams.set("itemStatus", itemStatusFilter);
               editParams.set("edit", item.id);
               const editHref = `/admin/kitchens/${kitchen.id}?${editParams.toString()}#item-${item.id}`;
+              editParams.delete("edit");
+              const closeQuery = editParams.toString();
+              const closeHref = `/admin/kitchens/${kitchen.id}${closeQuery ? `?${closeQuery}` : ""}#item-${item.id}`;
 
               return (
                 <article key={item.id} id={`item-${item.id}`} className="kitchen-catalog-item-card" style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
@@ -715,7 +718,6 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                         <span><AdminText i18nKey="kitchenDetailAdmin.articleNo" fallback="Article No" />: {item.articleNumber || "-"}</span>
                         {item.blendeCode ? <span>Blende: {item.blendeCode}</span> : null}
                         <span>{formatCurrency(item.price)}</span>
-                        <span>{slot ? slot.label : <AdminText i18nKey="kitchenDetailAdmin.noSlot" fallback="No slot" />}</span>
                       </div>
                     </div>
                     <KitchenCatalogPreview
@@ -728,8 +730,10 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     />
                     <div className="kitchen-catalog-item-card__actions" style={{ ...actionRowStyle, justifyContent: "flex-end" }}>
                       <AdminStatusBadge status={item.isActive ? "ACTIVE" : "ARCHIVED"} />
-                      <Link href={editHref} scroll={false} style={editHintStyle}>
-                        <AdminText i18nKey="kitchenDetailAdmin.edit" fallback="Edit" />
+                      <Link href={isRequestedEdit ? closeHref : editHref} scroll={false} style={editHintStyle}>
+                        {isRequestedEdit
+                          ? <AdminText i18nKey="kitchenDetailAdmin.close" fallback="Close" />
+                          : <AdminText i18nKey="kitchenDetailAdmin.edit" fallback="Edit" />}
                       </Link>
                     </div>
                   </div>
