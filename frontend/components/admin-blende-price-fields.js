@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { FormField } from "./admin-ui";
+import { useAdminI18n } from "./admin-i18n";
 import AdminSelect from "./admin-select";
 
 function moneyToCents(value) {
@@ -43,6 +44,12 @@ export default function AdminBlendePriceFields({
   defaultServiceId = "",
   currentBlendePrice = null,
 }) {
+  const { language } = useAdminI18n();
+  const localizedName = (entry) => {
+    const englishName = String(entry?.name || entry?.label || "").trim();
+    const germanName = String(entry?.nameDe || "").trim();
+    return language === "de" ? (germanName || englishName) : (englishName || germanName);
+  };
   const blendenById = useMemo(() => {
     return new Map(catalogBlenden.map((blende) => [blende.id, blende]));
   }, [catalogBlenden]);
@@ -96,7 +103,7 @@ export default function AdminBlendePriceFields({
             <option value="">No article link</option>
             {catalogArticles.map((article) => (
               <option key={article.id} value={article.id}>
-                {article.articleNumber} - {article.label} ({article.formattedPrice})
+                {article.articleNumber} - {localizedName(article)} ({article.formattedPrice})
               </option>
             ))}
           </AdminSelect>
@@ -116,7 +123,7 @@ export default function AdminBlendePriceFields({
             <option value="">No included Blende</option>
             {catalogBlenden.map((blende) => (
               <option key={blende.id} value={blende.id}>
-                {blende.code} - {blende.label} ({blende.formattedPrice})
+                {blende.code} - {localizedName(blende)} ({blende.formattedPrice})
               </option>
             ))}
           </AdminSelect>
@@ -179,7 +186,7 @@ export default function AdminBlendePriceFields({
               <option value="">No service link</option>
               {catalogServices.map((service) => (
                 <option key={service.id} value={service.id}>
-                  {service.code} - {service.label} ({service.formattedPrice})
+                  {service.code} - {localizedName(service)} ({service.formattedPrice})
                 </option>
               ))}
             </AdminSelect>

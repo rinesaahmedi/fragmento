@@ -22,7 +22,7 @@ import {
   textareaStyle,
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
-import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
+import { AdminKitchenDisplayName, AdminKitchenNameInput, AdminLocalizedName, AdminStatusBadge, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { AdminComponentSlotPicker } from "../../../../components/admin-component-slot-picker";
 import AdminBlendePriceFields from "../../../../components/admin-blende-price-fields";
 import { AdminIconKeySelect } from "../../../../components/admin-icon-key-select";
@@ -41,6 +41,20 @@ import { prisma } from "../../../../lib/prisma";
 export const dynamic = "force-dynamic";
 
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
+const ITEM_TYPE_FILTER_LABELS = {
+  [ItemType.COMPONENT]: {
+    key: "kitchenDetailAdmin.typeComponents",
+    fallback: "Components",
+  },
+  [ItemType.ACCESSORY]: {
+    key: "kitchenDetailAdmin.typeAccessories",
+    fallback: "Accessories",
+  },
+  [ItemType.SERVICE]: {
+    key: "kitchenDetailAdmin.typeServices",
+    fallback: "Services",
+  },
+};
 const KITCHEN_STATUS_OPTIONS = Object.values(KitchenStatus);
 const DISHWASHER_BASE_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 10 24 L 14 44 H 46 L 50 24 Z"/><line x1="18" y1="26" x2="20" y2="44"/><line x1="26" y1="26" x2="26" y2="44"/><line x1="34" y1="26" x2="34" y2="44"/><line x1="42" y1="26" x2="40" y2="44"/><line x1="12" y1="32" x2="48" y2="32"/><line x1="13" y1="38" x2="47" y2="38"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">GS</text></svg>';
@@ -428,13 +442,20 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
       ? resolvedSearchParams.edit.trim()
       : "";
   const itemSearchQuery = typeof resolvedSearchParams.itemSearch === "string" ? resolvedSearchParams.itemSearch.trim() : "";
-  const itemTypeFilter = typeof resolvedSearchParams.itemType === "string" ? resolvedSearchParams.itemType.trim() : "";
-  const itemStatusFilter = typeof resolvedSearchParams.itemStatus === "string" ? resolvedSearchParams.itemStatus.trim() : "";
+  const requestedItemType = typeof resolvedSearchParams.itemType === "string"
+    ? resolvedSearchParams.itemType.trim().toUpperCase()
+    : "";
+  const itemTypeFilter = ITEM_TYPE_OPTIONS.includes(requestedItemType) ? requestedItemType : "";
+  const requestedItemStatus = typeof resolvedSearchParams.itemStatus === "string"
+    ? resolvedSearchParams.itemStatus.trim().toLowerCase()
+    : "";
+  const itemStatusFilter = ["active", "inactive"].includes(requestedItemStatus) ? requestedItemStatus : "";
   const normalizedItemSearch = itemSearchQuery.toLowerCase();
   const hasItemFilters = Boolean(itemSearchQuery || itemTypeFilter || itemStatusFilter);
   const visibleItems = kitchen.items.filter((item) => {
     const matchesSearch = !normalizedItemSearch
-      || item.name.toLowerCase().includes(normalizedItemSearch)
+      || String(item.catalogArticle?.name || item.catalogService?.name || item.name || "").toLowerCase().includes(normalizedItemSearch)
+      || String(item.catalogArticle?.nameDe || item.catalogService?.nameDe || item.nameDe || "").toLowerCase().includes(normalizedItemSearch)
       || item.code.toLowerCase().includes(normalizedItemSearch);
     const matchesType = !itemTypeFilter || item.itemType === itemTypeFilter;
     const matchesStatus = !itemStatusFilter
@@ -468,21 +489,24 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
   const catalogBlendeOptions = catalogBlenden.map((blende) => ({
     id: blende.id,
     code: blende.code,
-    label: blende.nameDe || blende.name,
+    name: blende.name,
+    nameDe: blende.nameDe,
     price: Number(blende.price),
     formattedPrice: formatCurrency(blende.price),
   }));
   const catalogServiceOptions = catalogServices.map((service) => ({
     id: service.id,
     code: service.code,
-      label: service.nameDe || service.name,
+      name: service.name,
+      nameDe: service.nameDe,
       price: Number(service.price),
       formattedPrice: formatCurrency(service.price),
     }));
   const catalogArticleOptions = catalogArticles.map((article) => ({
     id: article.id,
     articleNumber: article.articleNumber,
-    label: article.nameDe || article.name,
+    name: article.name,
+    nameDe: article.nameDe,
     price: Number(article.price),
     formattedPrice: formatCurrency(article.price),
   }));
@@ -627,17 +651,20 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.filterType" fallback="Type" />}>
-              <AdminSelect name="itemType" defaultValue={itemTypeFilter} style={compactInputStyle}>
+              <AdminSelect key={`item-type-${itemTypeFilter || "all"}`} name="itemType" defaultValue={itemTypeFilter} style={compactInputStyle}>
                 <option value=""><AdminText i18nKey="kitchenDetailAdmin.allTypes" fallback="All types" /></option>
                 {ITEM_TYPE_OPTIONS.map((itemType) => (
                   <option key={itemType} value={itemType}>
-                    {itemType}
+                    <AdminText
+                      i18nKey={ITEM_TYPE_FILTER_LABELS[itemType]?.key}
+                      fallback={ITEM_TYPE_FILTER_LABELS[itemType]?.fallback || itemType}
+                    />
                   </option>
                 ))}
               </AdminSelect>
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.filterStatus" fallback="Status" />}>
-              <AdminSelect name="itemStatus" defaultValue={itemStatusFilter} style={compactInputStyle}>
+              <AdminSelect key={`item-status-${itemStatusFilter || "all"}`} name="itemStatus" defaultValue={itemStatusFilter} style={compactInputStyle}>
                 <option value=""><AdminText i18nKey="kitchenDetailAdmin.allStatuses" fallback="All statuses" /></option>
                 <option value="active"><AdminText i18nKey="kitchenDetailAdmin.active" fallback="Active" /></option>
                 <option value="inactive"><AdminText i18nKey="kitchenDetailAdmin.inactive" fallback="Inactive" /></option>
@@ -676,7 +703,12 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 <article key={item.id} id={`item-${item.id}`} className="kitchen-catalog-item-card" style={isRequestedEdit ? highlightedCompactItemCardStyle : compactItemCardStyle}>
                   <div className="kitchen-catalog-item-card__summary" style={item.itemType === ItemType.COMPONENT ? compactSummaryStyle : compactSummaryCompactPreviewStyle}>
                     <div className="kitchen-catalog-item-card__main" style={compactSummaryMainStyle}>
-                      <strong className="kitchen-catalog-item-card__title" style={{ fontSize: "1.05rem" }}>{item.name}</strong>
+                      <strong className="kitchen-catalog-item-card__title" style={{ fontSize: "1.05rem" }}>
+                        <AdminLocalizedName
+                          name={item.catalogArticle?.name || item.catalogService?.name || item.name}
+                          nameDe={item.catalogArticle?.nameDe || item.catalogService?.nameDe || item.nameDe}
+                        />
+                      </strong>
                       <div className="kitchen-catalog-item-card__meta" style={subMetaStyle}>
                         <TypeBadge label={item.itemType} />
                         <span><AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />: {item.code}</span>
@@ -718,106 +750,104 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       currentBlendePrice={item.blendePrice == null ? null : Number(item.blendePrice)}
                     />
 
-                    <input type="hidden" name="componentKey" value={item.componentKey || ""} />
-                    <details style={advancedDetailsStyle} className="admin-kitchen-item-technical">
-                      <summary style={advancedSummaryStyle}>Overrides &amp; technical settings</summary>
-                      <div style={advancedFieldsStyle}>
-                        <p className="admin-kitchen-item-technical__hint">
-                          These values control internal identity and display. Catalog-linked names,
-                          article numbers and prices are applied automatically when you save.
-                        </p>
-                        <div style={compactTopGridStyle}>
-                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />} wide={false}>
-                            <AdminSelect name="itemType" defaultValue={item.itemType} style={compactInputStyle}>
-                              {ITEM_TYPE_OPTIONS.map((itemType) => (
-                                <option key={itemType} value={itemType}>
-                                  {itemType}
-                                </option>
-                              ))}
-                            </AdminSelect>
-                          </FormField>
-                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Internal item code" />} wide={false}>
-                            <div style={fieldWithHelpStyle}>
-                              <input name="code" defaultValue={item.code} list="admin-kitchen-item-code-options" style={compactInputStyle} required />
-                              <span style={fieldHelpTextStyle}>Use templates; add -01, -02 for repeated cabinets.</span>
-                            </div>
-                          </FormField>
-                          <FormField label="Fallback article number" wide={false}>
-                            <input name="articleNumber" defaultValue={item.articleNumber || ""} placeholder="Used without a catalog link" style={compactInputStyle} />
-                          </FormField>
-                          <FormField label="Fallback name (English)" wide={false}>
-                            <input name="name" defaultValue={item.name} style={compactInputStyle} required />
-                          </FormField>
-                          <FormField label="Fallback name (German)" wide={false}>
-                            <input name="nameDe" defaultValue={item.nameDe || ""} style={compactInputStyle} />
-                          </FormField>
-                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />} wide={false}>
-                            <IconKeySelect defaultValue={item.iconKey || ""} style={compactInputStyle} />
-                          </FormField>
-                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.colorKey" fallback="Color key" />} wide={false}>
-                            <input name="colorKey" defaultValue={item.colorKey || ""} style={compactInputStyle} />
-                          </FormField>
-                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />} wide={false}>
-                            <input name="sortOrder" defaultValue={String(item.sortOrder)} style={compactInputStyle} />
-                          </FormField>
+                    <input type="hidden" name="itemType" value={item.itemType} />
+                    <input type="hidden" name="code" value={item.code} />
+                    <input type="hidden" name="articleNumber" value={item.articleNumber || ""} />
+                    <input type="hidden" name="name" value={item.name} />
+                    <input type="hidden" name="nameDe" value={item.nameDe || ""} />
+                    <input type="hidden" name="iconKey" value={item.iconKey || ""} />
+                    <input type="hidden" name="colorKey" value={item.colorKey || ""} />
+                    <input type="hidden" name="sortOrder" value={String(item.sortOrder)} />
+                    <input type="hidden" name="infoText" value={item.infoText || ""} />
+
+                    <section className="admin-kitchen-item-settings" aria-labelledby={`kitchen-settings-${item.id}`}>
+                      <div className="admin-kitchen-item-settings__heading">
+                        <div>
+                          <h3 id={`kitchen-settings-${item.id}`}>Kitchen-specific settings</h3>
+                          <p>These values belong to this kitchen layout, not to the catalog article.</p>
                         </div>
-
-                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
-                          <textarea name="infoText" defaultValue={item.infoText || ""} rows={2} style={compactTextareaStyle} />
-                        </FormField>
-
-                        {isClaimProductManaged ? (
-                          <div className="admin-kitchen-product-info-source">
-                            <div>
-                              <strong>Product Information is managed in Claim products</strong>
-                              <span>The default oven and cooktop are maintained separately in the Catalog.</span>
-                            </div>
-                            <Link
-                              href="/admin/catalog/articles"
-                              className="admin-kitchen-product-info-source__link"
-                            >
-                              Open Claim products
-                            </Link>
-                          </div>
-                        ) : item.catalogArticleId ? (
-                          <div className="admin-kitchen-product-info-source">
-                            <div>
-                              <strong>Product Information is managed in Catalog</strong>
-                              <span>
-                                {item.catalogArticle?.productInfoPdfPath
-                                  ? "Catalog document ready"
-                                  : "No Product Information has been added to this catalog article yet"}
-                              </span>
-                            </div>
-                            <Link
-                              href={`/admin/catalog/articles?editArticle=${encodeURIComponent(item.catalogArticleId)}`}
-                              className="admin-kitchen-product-info-source__link"
-                            >
-                              Open catalog article
-                            </Link>
-                          </div>
-                        ) : (
-                          <details style={advancedDetailsStyle}>
-                            <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
-                            <div style={advancedFieldsStyle}>
-                              <ProductInformationFields item={item} compact />
-                            </div>
-                          </details>
-                        )}
                       </div>
-                    </details>
+
+                      {item.itemType === ItemType.COMPONENT && structureSlots.length ? (
+                        <AdminComponentSlotPicker
+                          name="componentKey"
+                          label="Kitchen position"
+                          slots={structureSlots}
+                          defaultValue={item.componentKey || ""}
+                          occupiedByKey={occupiedByKey}
+                          allowOccupiedKey={item.componentKey || ""}
+                          helperText="Choose where this component appears in the kitchen plan."
+                          compact
+                          allowEmpty={false}
+                        />
+                      ) : (
+                        <input type="hidden" name="componentKey" value={item.componentKey || ""} />
+                      )}
+
+                      <div className="admin-kitchen-item-settings__toggles">
+                        <label className="admin-kitchen-item-setting-toggle">
+                          <input type="checkbox" name="isLocked" value="true" defaultChecked={item.isLocked} />
+                          <span>
+                            <strong><AdminText i18nKey="kitchenDetailAdmin.lockedItem" fallback="Locked" /></strong>
+                            <small>Always included and cannot be removed by the customer.</small>
+                          </span>
+                        </label>
+                        <label className="admin-kitchen-item-setting-toggle">
+                          <input type="checkbox" name="isActive" value="true" defaultChecked={item.isActive} />
+                          <span>
+                            <strong><AdminText i18nKey="kitchenDetailAdmin.activeItem" fallback="Active" /></strong>
+                            <small>Available in this kitchen configuration.</small>
+                          </span>
+                        </label>
+                      </div>
+                    </section>
+
+                    {isClaimProductManaged ? (
+                      <div className="admin-kitchen-product-info-source">
+                        <div>
+                          <strong>Product Information is managed in Claim products</strong>
+                          <span>The default oven and cooktop are maintained separately in the Catalog.</span>
+                        </div>
+                        <Link
+                          href="/admin/catalog/articles"
+                          className="admin-kitchen-product-info-source__link"
+                        >
+                          Open Claim products
+                        </Link>
+                      </div>
+                    ) : item.catalogArticleId ? (
+                      <div className="admin-kitchen-product-info-source">
+                        <div>
+                          <strong>Product Information is managed in Catalog</strong>
+                          <span>
+                            {item.catalogArticle?.productInfoPdfPath
+                              ? "Catalog document ready"
+                              : "No Product Information has been added to this catalog article yet"}
+                          </span>
+                        </div>
+                        <Link
+                          href={`/admin/catalog/articles?editArticle=${encodeURIComponent(item.catalogArticleId)}`}
+                          className="admin-kitchen-product-info-source__link"
+                        >
+                          Open catalog article
+                        </Link>
+                      </div>
+                    ) : (
+                      <div className="admin-kitchen-product-info-source admin-kitchen-product-info-source--warning">
+                        <div>
+                          <strong>Catalog link required</strong>
+                          <span>Select an article or service from Catalog before saving this item.</span>
+                        </div>
+                        <Link
+                          href="/admin/catalog/articles"
+                          className="admin-kitchen-product-info-source__link"
+                        >
+                          Open Catalog
+                        </Link>
+                      </div>
+                    )}
 
                     <div style={compactFooterStyle}>
-                      <div style={checkboxRowStyle}>
-                        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <input type="checkbox" name="isLocked" value="true" defaultChecked={item.isLocked} />
-                          <span><AdminText i18nKey="kitchenDetailAdmin.lockedItem" fallback="Locked" /></span>
-                        </label>
-                        <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
-                          <input type="checkbox" name="isActive" value="true" defaultChecked={item.isActive} />
-                          <span><AdminText i18nKey="kitchenDetailAdmin.activeItem" fallback="Active" /></span>
-                        </label>
-                      </div>
                       <div style={actionRowStyle}>
                         <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.saveItem" fallback="Save item" /></button>
                         <button type="submit" name="_intent" value="delete" style={secondaryButtonStyle}>
@@ -1462,7 +1492,7 @@ const compactTextareaStyle = {
 
 const compactFooterStyle = {
   ...checkboxRowStyle,
-  justifyContent: "space-between",
+  justifyContent: "flex-end",
   gap: 10,
 };
 

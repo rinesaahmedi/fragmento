@@ -12,6 +12,7 @@ export function AdminComponentSlotPicker({
   allowOccupiedKey = "",
   helperText = "Select a kitchen slot for this component.",
   compact = false,
+  allowEmpty = true,
 }) {
   const [selectedKey, setSelectedKey] = useState(defaultValue || "");
   const selectedSlot = slots.find((slot) => slot.componentKey === selectedKey) || null;
@@ -54,7 +55,7 @@ export function AdminComponentSlotPicker({
             style={compactSelectStyle}
             aria-label={label}
           >
-            <option value="">None</option>
+            <option value="" disabled={!allowEmpty}>{allowEmpty ? "None" : "Choose position"}</option>
             {slots.map((slot) => {
               const occupiedLabels = occupiedByKey[slot.componentKey] || [];
               const isOccupied = occupiedLabels.length > 0 && slot.componentKey !== allowOccupiedKey;
@@ -69,22 +70,24 @@ export function AdminComponentSlotPicker({
         </div>
       ) : (
       <div style={gridStyle}>
-        <button
-          type="button"
-          onClick={() => setSelectedKey("")}
-          style={{
-            ...cardStyle,
-            ...(selectedKey === "" ? selectedCardStyle : null),
-          }}
-        >
-          <span style={iconWrapStyle}>
-            <NoneIcon />
-          </span>
-          <div style={textWrapStyle}>
-            <strong style={{ fontSize: 13 }}>None</strong>
-            <span style={metaStyle}>No slot assigned</span>
-          </div>
-        </button>
+        {allowEmpty ? (
+          <button
+            type="button"
+            onClick={() => setSelectedKey("")}
+            style={{
+              ...cardStyle,
+              ...(selectedKey === "" ? selectedCardStyle : null),
+            }}
+          >
+            <span style={iconWrapStyle}>
+              <NoneIcon />
+            </span>
+            <div style={textWrapStyle}>
+              <strong style={{ fontSize: 13 }}>None</strong>
+              <span style={metaStyle}>No slot assigned</span>
+            </div>
+          </button>
+        ) : null}
 
         {slots.map((slot) => {
           const occupiedLabels = occupiedByKey[slot.componentKey] || [];

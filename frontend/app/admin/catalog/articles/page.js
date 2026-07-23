@@ -53,6 +53,17 @@ function buildCatalogEditHref(searchParams, key, id) {
   return `/admin/catalog/articles?${params.toString()}`;
 }
 
+function buildCatalogListHref(searchParams) {
+  const params = new URLSearchParams();
+  Object.entries(searchParams || {}).forEach(([paramKey, rawValue]) => {
+    if (CATALOG_EDIT_PARAMS.includes(paramKey)) return;
+    const value = Array.isArray(rawValue) ? rawValue[0] : rawValue;
+    if (value != null && String(value).trim()) params.set(paramKey, String(value));
+  });
+  const query = params.toString();
+  return `/admin/catalog/articles${query ? `?${query}` : ""}`;
+}
+
 function uniqueValues(values) {
   return [...new Set(values.map((value) => String(value || "").trim()).filter(Boolean))];
 }
@@ -117,79 +128,120 @@ function formatDimensionInputValue(value) {
     : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
-function CatalogArticleForm({ action, article, submitLabel }) {
+function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
+  const isEditing = Boolean(article);
+
   return (
-    <form action={action} method="post" style={articleFormStyle}>
-      <div style={formGridStyle}>
-        <FormField label="Article number">
-          <input name="articleNumber" defaultValue={article?.articleNumber || ""} style={inputStyle} required />
-        </FormField>
-        <FormField label="Name">
-          <input name="name" defaultValue={article?.name || ""} style={inputStyle} required />
-        </FormField>
-        <FormField label="German name">
-          <input name="nameDe" defaultValue={article?.nameDe || ""} style={inputStyle} />
-        </FormField>
-        <FormField label="Item type">
-          <AdminSelect name="itemType" defaultValue={article?.itemType || ItemType.COMPONENT} style={inputStyle}>
-            {ITEM_TYPE_OPTIONS.map((itemType) => (
-              <option key={itemType} value={itemType}>{itemType}</option>
-            ))}
-          </AdminSelect>
-        </FormField>
-        <FormField label="Price">
-          <input name="price" defaultValue={article ? formatMoney(article.price) : "0.00"} style={inputStyle} required />
-        </FormField>
-        <FormField label="Width cm">
-          <input name="widthMm" defaultValue={formatDimensionInputValue(article?.widthMm)} style={inputStyle} />
-        </FormField>
-        <FormField label="Height cm">
-          <input name="heightMm" defaultValue={formatDimensionInputValue(article?.heightMm)} style={inputStyle} />
-        </FormField>
-        <FormField label="Depth cm">
-          <input name="depthMm" defaultValue={formatDimensionInputValue(article?.depthMm)} style={inputStyle} />
-        </FormField>
-        <FormField label="Fixed package">
-          <AdminSelect name="isFixedPricePackage" defaultValue={article?.isFixedPricePackage ? "true" : ""} style={inputStyle}>
-            <option value="">No</option>
-            <option value="true">Yes</option>
-          </AdminSelect>
-        </FormField>
-        <FormField label="Active">
-          <AdminSelect name="isActive" defaultValue={article?.isActive === false ? "" : "true"} style={inputStyle}>
-            <option value="true">Yes</option>
-            <option value="">No</option>
-          </AdminSelect>
-        </FormField>
-        <FormField label="Description" wide>
-          <textarea name="description" defaultValue={article?.description || ""} rows={2} style={textareaStyle} />
-        </FormField>
-      </div>
-      <details style={productInfoDetailsStyle}>
-        <summary style={productInfoSummaryStyle}>
-          Product Information
-          {article?.productInfoPdfPath ? <span style={productInfoReadyStyle}>Ready</span> : null}
-        </summary>
-        <div style={productInfoBodyStyle}>
-          <FormField label="Product image path" wide>
-            <input
-              name="productImagePath"
-              defaultValue={article?.productImagePath || ""}
-              placeholder="/product-images/email/example.jpg"
-              style={inputStyle}
-            />
-          </FormField>
-          <AdminProductInfoPdfManager
-            initialPdfPath={article?.productInfoPdfPath || ""}
-            initialSummary={article?.productInfoSummary || ""}
-            initialKeyFacts={Array.isArray(article?.productInfoKeyFacts) ? article.productInfoKeyFacts : []}
-            initialExtractedText={article?.productInfoExtractedText || ""}
-          />
+    <form action={action} method="post" className={`catalog-article-form ${isEditing ? "is-editing" : "is-creating"}`} style={articleFormStyle}>
+      <header className="catalog-article-form__header">
+        <div>
+          <h3>{article?.articleNumber || "Create a new article"}</h3>
         </div>
-      </details>
-      <div style={actionRowStyle}>
-        <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
+        <span className={`catalog-article-form__status${article?.isActive === false ? " is-inactive" : ""}`}>
+          {article?.isActive === false ? "Inactive" : "Active"}
+        </span>
+      </header>
+
+      <div className="catalog-article-form__layout">
+        <section className="catalog-article-form__panel" aria-labelledby={`article-details-${article?.id || "new"}`}>
+          <div className="catalog-article-form__section-heading">
+            <h4 id={`article-details-${article?.id || "new"}`}>Article details</h4>
+          </div>
+
+          <div className="catalog-article-form__group">
+            <div className="catalog-article-form__grid catalog-article-form__grid--identity">
+              <FormField label="Article number">
+                <input name="articleNumber" defaultValue={article?.articleNumber || ""} style={inputStyle} required />
+              </FormField>
+              <FormField label="Item type">
+                <AdminSelect name="itemType" defaultValue={article?.itemType || ItemType.COMPONENT} style={inputStyle}>
+                  {ITEM_TYPE_OPTIONS.map((itemType) => (
+                    <option key={itemType} value={itemType}>{itemType}</option>
+                  ))}
+                </AdminSelect>
+              </FormField>
+              <FormField label="English name">
+                <input name="name" defaultValue={article?.name || ""} style={inputStyle} required />
+              </FormField>
+              <FormField label="German name">
+                <input name="nameDe" defaultValue={article?.nameDe || ""} style={inputStyle} />
+              </FormField>
+              <FormField label="Description" wide>
+                <textarea name="description" defaultValue={article?.description || ""} rows={3} style={textareaStyle} />
+              </FormField>
+            </div>
+          </div>
+
+          <div className="catalog-article-form__group">
+            <div className="catalog-article-form__grid catalog-article-form__grid--commercial">
+              <FormField label="Price (€)">
+                <input name="price" type="number" min="0" step="0.01" defaultValue={article ? formatMoney(article.price) : "0.00"} style={inputStyle} required />
+              </FormField>
+              <FormField label="Fixed-price package">
+                <AdminSelect name="isFixedPricePackage" defaultValue={article?.isFixedPricePackage ? "true" : ""} style={inputStyle}>
+                  <option value="">No</option>
+                  <option value="true">Yes</option>
+                </AdminSelect>
+              </FormField>
+              <FormField label="Status">
+                <AdminSelect name="isActive" defaultValue={article?.isActive === false ? "" : "true"} style={inputStyle}>
+                  <option value="true">Active</option>
+                  <option value="">Inactive</option>
+                </AdminSelect>
+              </FormField>
+            </div>
+          </div>
+
+          <div className="catalog-article-form__group">
+            <div className="catalog-article-form__grid catalog-article-form__grid--dimensions">
+              <FormField label="Width">
+                <input name="widthMm" type="number" min="0" step="0.1" defaultValue={formatDimensionInputValue(article?.widthMm)} style={inputStyle} />
+              </FormField>
+              <FormField label="Height">
+                <input name="heightMm" type="number" min="0" step="0.1" defaultValue={formatDimensionInputValue(article?.heightMm)} style={inputStyle} />
+              </FormField>
+              <FormField label="Depth">
+                <input name="depthMm" type="number" min="0" step="0.1" defaultValue={formatDimensionInputValue(article?.depthMm)} style={inputStyle} />
+              </FormField>
+            </div>
+          </div>
+        </section>
+
+        <details
+          key={`product-information-${article?.id || "new"}`}
+          className="catalog-article-form__panel catalog-article-form__panel--product-info"
+        >
+          <summary className="catalog-article-form__section-heading catalog-article-form__product-info-summary">
+            <h4 id={`product-information-${article?.id || "new"}`}>Product Information</h4>
+            <div className="catalog-article-form__product-info-status">
+              <span style={article?.productInfoPdfPath ? productInfoReadyStyle : productInfoMissingStyle}>
+                {article?.productInfoPdfPath ? "Ready" : "Missing PDF"}
+              </span>
+              <span className="catalog-article-form__product-info-chevron" aria-hidden="true" />
+            </div>
+          </summary>
+
+          <div className="catalog-article-form__product-info-body" style={productInfoBodyStyle}>
+            <FormField label="Product image path" wide>
+              <input name="productImagePath" defaultValue={article?.productImagePath || ""} placeholder="/product-images/email/example.jpg" style={inputStyle} />
+            </FormField>
+            <AdminProductInfoPdfManager
+              initialPdfPath={article?.productInfoPdfPath || ""}
+              initialSummary={article?.productInfoSummary || ""}
+              initialKeyFacts={Array.isArray(article?.productInfoKeyFacts) ? article.productInfoKeyFacts : []}
+              initialExtractedText={article?.productInfoExtractedText || ""}
+              compact
+            />
+          </div>
+        </details>
       </div>
+
+      <footer className="catalog-article-form__footer">
+        <div style={actionRowStyle}>
+          {cancelHref ? <Link href={cancelHref} scroll={false} style={secondaryButtonStyle}>Cancel</Link> : null}
+          <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
+        </div>
+      </footer>
     </form>
   );
 }
@@ -486,7 +538,12 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                             {editArticleId === article.id ? (
                               <details open style={editDetailsStyle}>
                                 <summary style={editSummaryStyle}>Editing</summary>
-                                <CatalogArticleForm action={`/api/admin/catalog/articles/${article.id}`} article={article} submitLabel="Save article" />
+                                <CatalogArticleForm
+                                  action={`/api/admin/catalog/articles/${article.id}`}
+                                  article={article}
+                                  submitLabel="Save article"
+                                  cancelHref={buildCatalogListHref(resolvedSearchParams)}
+                                />
                               </details>
                             ) : (
                               <Link href={buildCatalogEditHref(resolvedSearchParams, "editArticle", article.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
@@ -725,8 +782,7 @@ const addonFormStyle = {
 };
 
 const articleFormStyle = {
-  ...addonFormStyle,
-  minWidth: 680,
+  width: "100%",
 };
 
 const productInfoDetailsStyle = {
@@ -779,7 +835,8 @@ const editRowCellStyle = {
 };
 
 const editDetailsStyle = {
-  flex: "1 1 480px",
+  flex: "1 1 100%",
+  minWidth: 0,
 };
 
 const editSummaryStyle = {
