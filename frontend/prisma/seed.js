@@ -395,13 +395,13 @@ function applyCentralizedArticlePricing(item) {
 }
 
 const PRODUCT_INFO_FILES = {
-  dishwasher: "/product-info/a-egspv597210-product-info-eco21.pdf",
-  oven: "/product-info/ebx-943-600-s-product-info.pdf",
-  cooktop: "/product-info/ol-kmi-754-000-e-product-info.pdf",
-  hood: "/product-info/extractor-hood-flat-product-info.pdf",
-  hoodChimney: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf",
-  fridge: "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf",
-  ledLightingLabel: "/product-info/led-lighting-set-elabel.pdf",
+  dishwasher: "/product-info/dishwashers/a-egspv597210/a-egspv597210-product-info.pdf",
+  oven: "/product-info/ovens/ebx943600s/ebx943600s-product-info.pdf",
+  cooktop: "/product-info/hobs/ol-kmi754000e/ol-kmi754000e-product-info.pdf",
+  hood: "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf",
+  hoodChimney: "/product-info/extractor-hoods/khf664611s/khf664611s-product-info.pdf",
+  fridge: "/product-info/refrigerators/kgcn388140e/kgcn388140e-product-info.pdf",
+  ledLightingLabel: "/product-info/lighting/led-set/led-set-elabel.pdf",
 };
 
 const PRODUCT_IMAGE_FILES = {
@@ -511,7 +511,7 @@ const PRODUCT_INFO_BY_CODE = {
   },
   "WM-B-EWA34660W": {
     productImagePath: PRODUCT_IMAGE_FILES.washingMachine,
-    productInfoPdfPath: "/product-info/ewa-34660-w-product-info.pdf",
+    productInfoPdfPath: "/product-info/washing-machines/ewa34660w/ewa34660w-product-info.pdf",
     productInfoSummary: "Waschmaschine EWA34660W für die Küchenkonfiguration. Die Produktinformation nennt Energieeffizienzklasse A, 47 kWh / 100 Zyklen, 48 l/Zyklus, 8 kg Fassungsvermögen, 1400 U/min, 72 dB(A) und Gerätemaße 830 x 600 x 540 mm.",
     productInfoKeyFacts: [
       "Produkttyp: Waschmaschine.",

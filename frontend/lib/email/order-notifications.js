@@ -54,19 +54,19 @@ function buildProductInfoFilename(item, assetPath) {
 }
 
 const DISHWASHER_PRODUCT_INFO_DOCUMENTS = [
-  { label: "Produktinfo PDF", href: "/product-info/a-egspv597210-product-info-eco21.pdf" },
+  { label: "Produktinfo PDF", href: "/product-info/dishwashers/a-egspv597210/a-egspv597210-product-info.pdf" },
 ];
 
 const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
-  { label: "Produktinfo PDF", href: "/product-info/extractor-hood-flat-product-info.pdf" },
+  { label: "Produktinfo PDF", href: "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf" },
 ];
 
 const CHIMNEY_HOOD_PRODUCT_INFO_DOCUMENTS = [
-  { label: "Produktinfo PDF", href: "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf" },
+  { label: "Produktinfo PDF", href: "/product-info/extractor-hoods/khf664611s/khf664611s-product-info.pdf" },
 ];
 
 const FRIDGE_PRODUCT_INFO_DOCUMENTS = [
-  { label: "Produktinfo PDF", href: "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf" },
+  { label: "Produktinfo PDF", href: "/product-info/refrigerators/kgcn388140e/kgcn388140e-product-info.pdf" },
 ];
 
 function getMappedProductInfoDocuments(item) {

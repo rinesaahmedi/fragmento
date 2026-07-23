@@ -4,8 +4,9 @@ import { getProductInfoDocuments } from "../components/kitchen-selection-utils.j
 import { buildOrderConfirmationEmailStaticHtml } from "../lib/email/order-notifications.js";
 
 const CURRENT_FRIDGE_PRODUCT_INFO_PDF =
-  "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf";
-const CURRENT_FLAT_HOOD_PRODUCT_INFO_PDF = "/product-info/extractor-hood-flat-product-info.pdf";
+  "/product-info/refrigerators/kgcn388140e/kgcn388140e-product-info.pdf";
+const CURRENT_FLAT_HOOD_PRODUCT_INFO_PDF =
+  "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf";
 
 test("product info button maps unlisted fridge codes to the current PDF", () => {
   const documents = getProductInfoDocuments({

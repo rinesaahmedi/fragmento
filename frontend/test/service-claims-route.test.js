@@ -190,8 +190,13 @@ test("service-claim email separates landlord and caretaker contact details into 
   const source = fs.readFileSync(routePath, "utf8");
 
   assert.match(source, /function buildEmailDetailSubtable/);
+  assert.match(source, /const populatedRows = rows\.filter/);
+  assert.match(source, /populatedRows\.map/);
+  assert.doesNotMatch(source, /formatMultiline\(value \|\| "—"\)/);
   assert.match(source, /function hasPartyContactDetails/);
   assert.match(source, /border-top:2px solid #d9c7b8/);
+  assert.match(source, /hasLandlordDetails \? \[\["", \{ html: landlordHtml/);
+  assert.match(source, /hasLandlordDetails \? \["", "Vermieter", landlordBlock\] : \[\]/);
   assert.match(source, /html: landlordHtml, fullWidth: true, sectionTitle: "Vermieter"/);
   assert.match(source, /html: hausmeisterHtml, fullWidth: true, sectionTitle: "Hausmeister"/);
   assert.match(source, /hasHausmeisterDetails \? \["", "Hausmeister", hausBlock\] : \[\]/);

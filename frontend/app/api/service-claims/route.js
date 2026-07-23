@@ -263,16 +263,19 @@ function buildPartyContactBlock(contact) {
       givenName: contact?.contactGivenName || givenName,
       surname: contact?.contactSurname || surname,
       legacyName: contactPerson,
-    }) || "—";
+    });
 
   return [
-    `Firma: ${companyName || "—"}`,
-    `Firma Telefon: ${companyPhone || "—"}`,
-    `Firma E-Mail: ${companyEmail || "—"}`,
-    `Ansprechperson: ${resolvedContactPerson}`,
-    `Telefon Ansprechperson: ${phone || "—"}`,
-    `E-Mail Ansprechperson: ${email || "—"}`,
-  ].join("\n");
+    ["Firma", companyName],
+    ["Firma Telefon", companyPhone],
+    ["Firma E-Mail", companyEmail],
+    ["Ansprechperson", resolvedContactPerson],
+    ["Telefon Ansprechperson", phone],
+    ["E-Mail Ansprechperson", email],
+  ]
+    .filter(([, value]) => String(value || "").trim())
+    .map(([label, value]) => `${label}: ${value}`)
+    .join("\n");
 }
 
 function formatServiceClaimErrorMessage(error) {
@@ -608,13 +611,14 @@ function buildClaimItemHtml(row, { showArticleCode = true, itemNumber = 1 } = {}
 function buildEmailDetailSubtable(rows) {
   const labelStyles = "padding:8px 15px;border-bottom:1px solid #eeeeee;box-sizing:border-box;font-weight:bold;width:35%;vertical-align:top;line-height:1.45;";
   const valueStyles = "padding:8px 15px;border-bottom:1px solid #eeeeee;box-sizing:border-box;vertical-align:top;line-height:1.45;";
+  const populatedRows = rows.filter(([, value]) => String(value || "").trim());
   return `
     <table role="presentation" style="width:100%;border-collapse:collapse;">
       <tbody>
-        ${rows.map(([label, value], index) => {
-          const isLast = index === rows.length - 1;
+        ${populatedRows.map(([label, value], index) => {
+          const isLast = index === populatedRows.length - 1;
           const borderOverride = isLast ? "border-bottom:0;" : "";
-          return `<tr><td style="${labelStyles}${borderOverride}">${escapeHtml(label)}</td><td style="${valueStyles}${borderOverride}">${formatMultiline(value || "—")}</td></tr>`;
+          return `<tr><td style="${labelStyles}${borderOverride}">${escapeHtml(label)}</td><td style="${valueStyles}${borderOverride}">${formatMultiline(value)}</td></tr>`;
         }).join("")}
       </tbody>
     </table>
@@ -1087,6 +1091,7 @@ function buildComplaintEmailText(payload) {
     payload.hausmeisterPhone,
     payload.hausmeisterEmail,
   ]);
+  const hasLandlordDetails = Boolean(landlordBlock);
   const { availability } = extractAvailabilityFromDescription(
     payload.problemDescription,
   );
@@ -1116,9 +1121,7 @@ function buildComplaintEmailText(payload) {
           ]),
         ]
       : []),
-    "",
-    "Vermieter",
-    landlordBlock,
+    ...(hasLandlordDetails ? ["", "Vermieter", landlordBlock] : []),
     ...(hasHausmeisterDetails ? ["", "Hausmeister", hausBlock] : []),
     ...(availabilityDate || availabilityTime
       ? [
@@ -1148,6 +1151,15 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
     legacyName: payload.landlordContactPerson,
   });
   const landlordFallbackContact = `${payload.landlordGivenName} ${payload.landlordSurname}`.trim();
+  const hasLandlordDetails = hasPartyContactDetails([
+    payload.landlordCompanyName,
+    payload.landlordCompanyPhone,
+    payload.landlordCompanyEmail,
+    landlordContactDisplay,
+    landlordFallbackContact,
+    payload.landlordPhone,
+    payload.landlordEmail,
+  ]);
   const landlordHtml = buildEmailDetailSubtable([
     ["Firma", payload.landlordCompanyName],
     ["Telefon Firma", payload.landlordCompanyPhone],
@@ -1187,7 +1199,7 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
     ["Telefon", payload.phone || "—"],
     ["E-Mail", payload.email || "—"],
     ...claimItemRows.map((row, index) => ["", { html: buildClaimItemHtml(row, { showArticleCode: showClaimItemArticleCode, itemNumber: index + 1 }), fullWidth: true }]),
-    ["", { html: landlordHtml, fullWidth: true, sectionTitle: "Vermieter" }],
+    ...(hasLandlordDetails ? [["", { html: landlordHtml, fullWidth: true, sectionTitle: "Vermieter" }]] : []),
     ...(hasHausmeisterDetails ? [["", { html: hausmeisterHtml, fullWidth: true, sectionTitle: "Hausmeister" }]] : []),
     ...(availabilityDate ? [["Gewünschtes Kontaktdatum", availabilityDate]] : []),
     ...(availabilityTime ? [["Gewünschte Kontaktzeit", availabilityTime]] : []),
