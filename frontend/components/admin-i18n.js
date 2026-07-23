@@ -236,6 +236,17 @@ export function AdminKitchenDisplayName({ slug, name }) {
   return getLocalizedKitchenDisplayName({ slug, name }, language);
 }
 
+export function AdminLocalizedName({ name, nameDe, as: Component = Fragment }) {
+  const { language } = useAdminI18n();
+  const englishName = String(name || "").trim();
+  const germanName = String(nameDe || "").trim();
+  const localizedName = language === "de"
+    ? (germanName || englishName)
+    : (englishName || germanName);
+
+  return <Component>{localizedName}</Component>;
+}
+
 export function AdminKitchenNameInput({ slug, name, style, required = false }) {
   const { language } = useAdminI18n();
   const localizedName = getLocalizedKitchenDisplayName({ slug, name }, language);

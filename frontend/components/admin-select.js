@@ -44,6 +44,12 @@ export default function AdminSelect({
   const displayLabel = selectedOption?.label || placeholder || options[0]?.label || "";
 
   useEffect(() => {
+    if (!controlled) {
+      setInternalValue(String(defaultValue || ""));
+    }
+  }, [controlled, defaultValue]);
+
+  useEffect(() => {
     if (!open) return;
 
     function handlePointerDown(event) {

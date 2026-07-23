@@ -360,6 +360,30 @@ export async function getKitchenById(id) {
           orderBy: [{ createdAt: "desc" }, { contractNumber: "asc" }],
         },
         items: {
+          include: {
+            catalogArticle: {
+              select: {
+                id: true,
+                articleNumber: true,
+                name: true,
+                nameDe: true,
+                price: true,
+                widthMm: true,
+                heightMm: true,
+                depthMm: true,
+                ...CATALOG_PRODUCT_INFORMATION_SELECT,
+              },
+            },
+            catalogBlende: true,
+            catalogService: {
+              select: {
+                code: true,
+                name: true,
+                nameDe: true,
+                price: true,
+              },
+            },
+          },
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
         },
       },
