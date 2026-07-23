@@ -256,7 +256,7 @@ export default function ServiceClaimKitchenPicker({
     () => imageHotspots.filter(
       (hotspot) => (
         hotspot.claimPartKey === "cooktop"
-        || (hotspot.claimPartKey === "sink" && !hotspot.preserveManualSize)
+        || hotspot.claimPartKey === "sink"
       ),
     ),
     [imageHotspots],

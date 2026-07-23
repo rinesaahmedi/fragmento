@@ -1033,7 +1033,7 @@ async function buildClaimKitchenPreviewAttachment(payload) {
     kitchenSlug: payload.kitchenSlug,
     selectedAreas,
     contractNumber: payload.contractNumber,
-    width: 960,
+    width: 600,
   }).catch(() => null);
 
   if (!preview?.content?.length) {
@@ -1048,6 +1048,8 @@ async function buildClaimKitchenPreviewAttachment(payload) {
     contentDisposition: "inline",
     emailLabel: "Küche / ausgewählte Komponenten",
     emailAlt: "Küchenplan mit hervorgehobenen Reklamationskomponenten",
+    width: preview.width || 600,
+    height: preview.height || null,
     isReferencePdf: false,
   };
 }
@@ -1209,12 +1211,19 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
   const previewCid = String(previewAttachment?.cid || "").trim();
   const previewLabel = previewAttachment?.emailLabel || "Küche / ausgewählte Komponenten";
   const previewAlt = previewAttachment?.emailAlt || "Küchenplan mit hervorgehobenen Reklamationskomponenten";
+  const previewDisplayWidth = 540;
+  const previewDisplayHeight = previewAttachment?.height && previewAttachment?.width
+    ? Math.max(1, Math.round(previewAttachment.height * previewDisplayWidth / previewAttachment.width))
+    : null;
+  const previewDimensions = previewDisplayHeight
+    ? ` width="${previewDisplayWidth}" height="${previewDisplayHeight}"`
+    : ` width="${previewDisplayWidth}"`;
   const previewBlock = previewCid
     ? `
       <div style="margin:0 0 18px;">
         <div style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#777;">${escapeHtml(previewLabel)}</div>
         <div style="padding:12px;border:1px solid #eaeaea;border-radius:10px;background:#fffaf5;">
-          <img src="cid:${escapeHtml(previewCid)}" alt="${escapeHtml(previewAlt)}" style="display:block;width:100%;max-width:540px;height:auto;border:0;" />
+          <img src="cid:${escapeHtml(previewCid)}" alt="${escapeHtml(previewAlt)}"${previewDimensions} loading="eager" fetchpriority="high" decoding="sync" style="display:block;width:100%;max-width:540px;height:auto;border:0;" />
         </div>
       </div>
     `
