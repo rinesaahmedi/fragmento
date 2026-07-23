@@ -601,7 +601,7 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     ? claimHotspots.filter((hotspot) => (
         (
           hotspot?.claimPartKey === "cooktop"
-          || (hotspot?.claimPartKey === "sink" && !hotspot?.preserveManualSize)
+          || hotspot?.claimPartKey === "sink"
         )
         && !selectedHotspotIds.has(claimPlanComponentId(hotspot))
       ))
@@ -679,6 +679,8 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
   return {
     content,
     contentType: "image/png",
+    width: outputWidth,
+    height: outputHeight,
     highlightedComponentKeys: selectedHotspots.map((hotspot) => hotspot.componentKey).filter(Boolean),
     visibleComponentIds: [...visibleIds],
     kitchenName: plan.kitchenName || "",
@@ -715,9 +717,12 @@ export async function renderClaimKitchenPreviewPng({
   }
 
   const content = await sharp(Buffer.from(preview.markup)).resize({ width }).png().toBuffer();
+  const metadata = await sharp(content).metadata();
   return {
     ...preview,
     content,
     contentType: "image/png",
+    width: metadata.width || width,
+    height: metadata.height || null,
   };
 }

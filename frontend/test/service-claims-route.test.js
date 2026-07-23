@@ -72,6 +72,9 @@ test("service-claims route embeds a kitchen preview png in notification emails w
   assert.match(source, /claim-kitchen-preview@fragmento/);
   assert.match(source, /contentDisposition:\s*"inline"/);
   assert.match(source, /buildComplaintEmailHtml\(emailPayload,\s*kitchenPreviewAttachment\)/);
+  assert.match(source, /width:\s*600/);
+  assert.match(source, /loading="eager" fetchpriority="high" decoding="sync"/);
+  assert.match(source, /previewDimensions/);
 });
 
 test("service-claims route embeds the ARC contract sketch or attaches its PDF fallback", () => {

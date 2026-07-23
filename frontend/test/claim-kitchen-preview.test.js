@@ -183,6 +183,19 @@ test("email preview selection overlay is strong enough to remain visible after e
   assert.match(source, /fill="rgba\(62,188,116,0\.34\)" stroke="none"/);
 });
 
+test("email preview cuts calibrated sinks out of a selected worktop", () => {
+  const source = fs.readFileSync(
+    new URL("../lib/claim-kitchen-preview.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(source, /\|\| hotspot\?\.claimPartKey === "sink"/);
+  assert.doesNotMatch(
+    source,
+    /hotspot\?\.claimPartKey === "sink" && !hotspot\?\.preserveManualSize/,
+  );
+});
+
 test("AB 105758 email oven polygon uses the exact service-view coordinates after cropping", () => {
   const sourceOven = PLAN_HOTSPOTS_BY_SLUG["ab-105758"]
     .find((hotspot) => hotspot.componentKey === "oven-module");
