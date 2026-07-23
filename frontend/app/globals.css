@@ -3563,12 +3563,50 @@ textarea {
 }
 
 .service-claim-reference-plan__preview {
+  position: relative;
   overflow: hidden;
   margin: 0;
   width: 100%;
   border: 1px solid rgba(107, 79, 58, 0.16);
   border-radius: 12px;
   background: #fff;
+}
+
+.service-claim-reference-plan__preview-link {
+  display: block;
+  border-radius: 12px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.service-claim-reference-plan__preview-link:focus-visible {
+  outline: 3px solid rgba(107, 79, 58, 0.3);
+  outline-offset: 3px;
+}
+
+.service-claim-reference-plan__preview-action {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 7px 11px;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 22px rgba(51, 35, 22, 0.14);
+  color: var(--app-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.service-claim-reference-plan__preview-link:hover .service-claim-reference-plan__preview-action,
+.service-claim-reference-plan__preview-link:focus-visible .service-claim-reference-plan__preview-action {
+  background: #fff;
+  transform: translateY(-2px);
 }
 
 .service-claim-reference-plan__image {
@@ -3860,13 +3898,57 @@ textarea {
 }
 @media (max-width: 768px) {
   .service-claim-reference-plan {
-    margin-inline: -20px;
-    padding: 16px;
-    border-radius: 14px;
+    gap: 12px;
+    margin-inline: 0;
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .service-claim-reference-plan__header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 10px;
   }
 
   .service-claim-reference-plan__contract {
-    text-align: left;
+    text-align: right;
+  }
+
+  .service-claim-reference-plan__title {
+    font-size: 1.05rem;
+  }
+
+  .service-claim-reference-plan__preview {
+    max-height: 240px;
+  }
+
+  .service-claim-reference-plan__image {
+    width: 100%;
+    height: min(46vw, 220px);
+    object-fit: contain;
+  }
+
+  .service-claim-reference-plan__preview-action {
+    right: 8px;
+    bottom: 8px;
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+
+  .service-reference-flow {
+    gap: 10px;
+    margin-top: 12px;
+  }
+
+  .service-reference-flow__question {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .service-reference-flow__question .service-yes-no-field__option {
+    min-height: 48px;
   }
 
   .service-reference-flow__group-head {
@@ -5329,6 +5411,16 @@ textarea {
 }
 
 @media (max-width: 767px) {
+  .service-page {
+    padding-bottom: max(96px, calc(76px + env(safe-area-inset-bottom)));
+  }
+
+  .service-field--contract-number-stuck {
+    top: 6px;
+    padding: 10px 12px 12px;
+    border-radius: 16px;
+  }
+
   .service-claim-agent {
     right: 12px;
     bottom: max(12px, env(safe-area-inset-bottom));
@@ -5338,21 +5430,43 @@ textarea {
   }
 
   .service-claim-agent__launcher {
-    min-width: 150px;
-    min-height: 150px;
+    width: 64px;
+    min-width: 64px;
+    height: 64px;
+    min-height: 64px;
+    overflow: hidden;
+    border: 1px solid rgba(107, 79, 58, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 26px rgba(51, 35, 22, 0.2);
   }
 
   .service-claim-agent__launcher-bubble {
-    right: 106px;
-    bottom: 108px;
-    max-width: 170px;
-    padding: 10px 14px;
-    font-size: 0.9rem;
+    display: none;
   }
 
   .service-claim-agent__launcher-avatar {
-    width: 132px;
-    height: 150px;
+    inset: 4px;
+    width: auto;
+    height: auto;
+    filter: none;
+  }
+
+  .service-claim-agent__launcher-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(1.22) translateY(5px);
+    transform-origin: center top;
+  }
+
+  .service-claim-agent__launcher:hover,
+  .service-claim-agent__launcher:focus-visible {
+    border-color: rgba(42, 145, 85, 0.38);
+    box-shadow:
+      0 12px 28px rgba(51, 35, 22, 0.22),
+      0 0 0 4px rgba(42, 145, 85, 0.1);
+    outline: none;
   }
 
   .service-claim-agent.is-open {
