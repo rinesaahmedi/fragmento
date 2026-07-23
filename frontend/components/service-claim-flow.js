@@ -6110,6 +6110,11 @@ export default function ServiceClaimFlow() {
                           String(area.selectedPartComponentIds.length),
                         )
                         : "";
+                    const isProblemAreaDetailDisabled = Boolean(
+                      area.choiceGroup
+                      && area.showPartChoiceControl
+                      && (!area.isPartChoiceConfirmed || !area.selectedPartComponentIds.length),
+                    );
                     return (
                     <div
                       key={area.rowKey}
@@ -6205,6 +6210,7 @@ export default function ServiceClaimFlow() {
                           placeholder={copy.problemPlaceholder}
                           rows={1}
                           required
+                          disabled={isProblemAreaDetailDisabled}
                         />
                         <input
                           key={area.attachmentFieldKey}

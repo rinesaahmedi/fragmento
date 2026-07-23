@@ -4172,6 +4172,13 @@ textarea {
   padding: 12px 14px !important;
 }
 
+.service-field__problem-area-input:disabled {
+  cursor: not-allowed;
+  background: #f4f1ed;
+  color: #99918a;
+  opacity: 0.72;
+}
+
 .service-field input.service-field__problem-area-file {
   position: absolute;
   width: 1px;
