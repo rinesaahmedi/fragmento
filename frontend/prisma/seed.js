@@ -2759,6 +2759,14 @@ async function loadCatalogArticleDimensions() {
 async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
+  const onlyKitchenSlug = String(process.env.SEED_ONLY_KITCHEN_SLUG || "").trim().toLowerCase();
+  const kitchensToSeed = onlyKitchenSlug
+    ? DEFAULT_KITCHENS.filter((kitchen) => kitchen.slug === onlyKitchenSlug)
+    : DEFAULT_KITCHENS;
+
+  if (onlyKitchenSlug && !kitchensToSeed.length) {
+    throw new Error(`Unknown kitchen seed slug: ${onlyKitchenSlug}`);
+  }
 
   if (adminEmail && adminPassword) {
     const passwordHash = await bcrypt.hash(adminPassword, 12);
@@ -2795,11 +2803,13 @@ async function main() {
     },
   });
 
-  const housingCompanyCleanup = await pruneNonDefaultHousingCompanies();
-  if (housingCompanyCleanup.deletedHousingCompanies || housingCompanyCleanup.unlinkedContracts) {
-    console.log(
-      `Removed ${housingCompanyCleanup.deletedHousingCompanies} non-ARGE housing companies and unlinked ${housingCompanyCleanup.unlinkedContracts} contracts.`,
-    );
+  if (!onlyKitchenSlug) {
+    const housingCompanyCleanup = await pruneNonDefaultHousingCompanies();
+    if (housingCompanyCleanup.deletedHousingCompanies || housingCompanyCleanup.unlinkedContracts) {
+      console.log(
+        `Removed ${housingCompanyCleanup.deletedHousingCompanies} non-ARGE housing companies and unlinked ${housingCompanyCleanup.unlinkedContracts} contracts.`,
+      );
+    }
   }
 
   const defaultProjectId = await ensureDefaultPropertyProject();
@@ -2808,7 +2818,7 @@ async function main() {
   // inherit them (option 2: kitchen item W/H/D follows the catalog article by articleNumber).
   const catalogArticleDimsByNumber = await loadCatalogArticleDimensions();
 
-  for (const kitchen of DEFAULT_KITCHENS) {
+  for (const kitchen of kitchensToSeed) {
     const existingKitchen = await prisma.kitchen.findUnique({
       where: { slug: kitchen.slug },
       select: { id: true },
@@ -3236,6 +3246,11 @@ async function main() {
         sortOrder: 80,
       },
     });
+  }
+
+  if (onlyKitchenSlug) {
+    console.log(`Seeded kitchen ${onlyKitchenSlug}.`);
+    return;
   }
 
   for (const obsolete of OBSOLETE_KITCHENS) {
