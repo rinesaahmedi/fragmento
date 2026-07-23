@@ -50,6 +50,13 @@ export default function AdminContractsFilters({
             style={filterInputStyle}
           />
         </FilterField>
+        <FilterField label={<AdminText i18nKey="contractsAdmin.contractType" fallback="Contract type" />}>
+          <AdminSelect name="contractType" defaultValue={filters.contractType || ""} style={filterInputStyle}>
+            <option value=""><AdminText i18nKey="contractsAdmin.allContractTypes" fallback="All contract types" /></option>
+            <option value="ARC">ARC</option>
+            <option value="FRG">FRG</option>
+          </AdminSelect>
+        </FilterField>
         <FilterField label={<AdminText i18nKey="dashboard.kitchen" fallback="Kitchen" />}>
           <AdminSelect name="kitchenId" defaultValue={filters.kitchenId || ""} style={filterInputStyle}>
             <option value=""><AdminText i18nKey="dashboard.allKitchens" fallback="All kitchens" /></option>

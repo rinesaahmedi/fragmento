@@ -638,6 +638,8 @@
     "narrowTheContractListBelow": "Liste der Vertragsnummern eingrenzen",
     "search": "Suche",
     "contractKitchenOwnerCityPlaceholder": "Vertragsnummer, Küche, Wohnungsgesellschaft, Stadt ...",
+    "contractType": "Vertragstyp",
+    "allContractTypes": "Alle Vertragstypen",
     "owner": "Wohnungsgesellschaft",
     "allOwners": "Alle Wohnungsgesellschaften",
     "active": "Aktiv",

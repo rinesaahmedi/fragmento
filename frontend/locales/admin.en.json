@@ -637,6 +637,8 @@
     "narrowTheContractListBelow": "Refine the contract number list below",
     "search": "Search",
     "contractKitchenOwnerCityPlaceholder": "Contract, kitchen, housing company, city...",
+    "contractType": "Contract type",
+    "allContractTypes": "All contract types",
     "owner": "Housing company",
     "allOwners": "All housing companies",
     "active": "Active",

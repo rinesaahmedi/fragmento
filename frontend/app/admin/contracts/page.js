@@ -26,6 +26,11 @@ function normalizeParam(value) {
   return value || "";
 }
 
+function normalizeContractTypeFilter(value) {
+  const normalized = String(normalizeParam(value)).trim().toUpperCase();
+  return normalized === "ARC" || normalized === "FRG" ? normalized : "";
+}
+
 function formatCurrency(value) {
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
@@ -237,6 +242,7 @@ export default async function AdminContractsPage({ searchParams = {} }) {
   const admin = await requireAdminPage();
   const resolvedSearchParams = (await searchParams) || {};
   const filters = {
+    contractType: normalizeContractTypeFilter(resolvedSearchParams.contractType),
     kitchenId: normalizeParam(resolvedSearchParams.kitchenId),
     housingCompanyId: normalizeParam(resolvedSearchParams.housingCompanyId || resolvedSearchParams.ownerId),
     projectId: normalizeParam(resolvedSearchParams.projectId),

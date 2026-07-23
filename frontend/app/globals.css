@@ -3564,12 +3564,24 @@ textarea {
 
 .service-claim-reference-plan__preview {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   margin: 0;
   width: 100%;
+  min-height: 260px;
+  padding: 14px;
   border: 1px solid rgba(107, 79, 58, 0.16);
   border-radius: 12px;
-  background: #fff;
+  background:
+    linear-gradient(45deg, rgba(107, 79, 58, 0.035) 25%, transparent 25%),
+    linear-gradient(-45deg, rgba(107, 79, 58, 0.035) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, rgba(107, 79, 58, 0.035) 75%),
+    linear-gradient(-45deg, transparent 75%, rgba(107, 79, 58, 0.035) 75%),
+    #fbfaf8;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-size: 16px 16px;
 }
 
 .service-claim-reference-plan__preview-link {
@@ -3611,13 +3623,25 @@ textarea {
 
 .service-claim-reference-plan__image {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: min(520px, 58vh);
   height: auto;
+  object-fit: contain;
   background: #fff;
 }
 
 .service-claim-reference-plan__image-stage {
   position: relative;
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(107, 79, 58, 0.12);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(51, 35, 22, 0.1);
+  line-height: 0;
 }
 
 .service-claim-reference-plan__image-stage.is-interactive {
@@ -4270,11 +4294,14 @@ textarea {
   }
 
   .service-claim-reference-plan__preview {
-    max-height: none;
+    min-height: 220px;
+    padding: 8px;
   }
 
   .service-claim-reference-plan__image {
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    max-height: min(420px, 52vh);
     height: auto;
   }
 

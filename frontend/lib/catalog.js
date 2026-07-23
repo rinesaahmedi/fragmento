@@ -659,6 +659,9 @@ export async function listKitchenContractsForAdmin(filters = {}) {
   const whereParts = [];
   const havingParts = [];
   if (filters.contractId) whereParts.push(Prisma.sql`kc."id" = ${filters.contractId}`);
+  if (filters.contractType === "ARC" || filters.contractType === "FRG") {
+    whereParts.push(Prisma.sql`kc."contractType" = ${filters.contractType}`);
+  }
   if (filters.kitchenId) whereParts.push(Prisma.sql`kc."kitchenId" = ${filters.kitchenId}`);
   if (filters.housingCompanyId || filters.ownerId) whereParts.push(Prisma.sql`hc."id" = ${filters.housingCompanyId || filters.ownerId}`);
   if (filters.projectId) whereParts.push(Prisma.sql`prj."id" = ${filters.projectId}`);

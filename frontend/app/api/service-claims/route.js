@@ -636,7 +636,15 @@ function formatAttachmentHtml(entry, { includeItemContext = true } = {}) {
   return `
     <div style="margin-top:8px;">
       <div style="margin-bottom:6px;">${label}</div>
-      <img src="cid:${escapeHtml(entry.cid)}" alt="${escapeHtml(entry.filename || "Hochgeladenes Bild")}" style="display:block;width:100%;max-width:220px;height:auto;border:1px solid #e5e5e5;border-radius:6px;" />
+      <table role="presentation" width="150" cellspacing="0" cellpadding="0" border="0" style="width:150px;border-collapse:separate;">
+        <tbody>
+          <tr>
+            <td width="148" height="148" align="center" valign="middle" style="box-sizing:border-box;width:148px;height:148px;padding:4px;border:1px solid #e5e5e5;border-radius:6px;background:#fafafa;text-align:center;vertical-align:middle;">
+              <img src="cid:${escapeHtml(entry.cid)}" alt="${escapeHtml(entry.filename || "Hochgeladenes Bild")}" width="140" height="140" style="display:block;width:140px;height:140px;max-width:140px;max-height:140px;object-fit:contain;border:0;" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   `;
 }

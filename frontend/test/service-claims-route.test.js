@@ -144,6 +144,18 @@ test("service-claim item email uses full-width rows and hides article codes for 
   assert.match(source, />Seriennummer-Foto</);
   assert.doesNotMatch(source, /\["Seriennummer",\s*payload\.serialNumber\]/);
 });
+
+test("service-claim email keeps uploaded photos inside small thumbnail containers", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /<table role="presentation" width="150"/);
+  assert.match(source, /<td width="148" height="148"/);
+  assert.match(source, /<img src="cid:\$\{escapeHtml\(entry\.cid\)\}"/);
+  assert.match(source, /width="140" height="140"/);
+  assert.match(source, /object-fit:contain/);
+  assert.doesNotMatch(source, /max-width:220px/);
+});
+
 test("service-claim email requests the PDF-derived ordered-component kitchen preview", () => {
   const previewSource = fs.readFileSync(
     path.join(__dirname, "..", "lib", "claim-kitchen-preview.js"),
