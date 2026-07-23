@@ -13,7 +13,10 @@ import {
   isMissingProblemAreasJsonColumnError,
 } from "../../../lib/service-claim-admin-query";
 import { persistServiceClaimAttachments } from "../../../lib/service-claim-attachments-storage";
-import { renderClaimKitchenPreviewPng } from "../../../lib/claim-kitchen-preview";
+import {
+  renderClaimKitchenPreviewPng,
+  renderReferencePlanMarkersPng,
+} from "../../../lib/claim-kitchen-preview";
 import {
   getServiceClaimContractDetails,
   normalizeServiceClaimContractNumber,
@@ -104,6 +107,34 @@ function normalizeProblemAreasJson(problemAreasJsonRaw) {
 }
 
 function normalizeReferenceIssuesJson(referenceIssuesJsonRaw) {
+  let submittedIssues;
+  try {
+    submittedIssues = JSON.parse(String(referenceIssuesJsonRaw || "[]"));
+  } catch {
+    throw new Error("Invalid reference-plan components.");
+  }
+  if (!Array.isArray(submittedIssues)) {
+    throw new Error("Invalid reference-plan components.");
+  }
+  for (const issue of submittedIssues) {
+    if (!Object.prototype.hasOwnProperty.call(issue || {}, "planMarker")) continue;
+    if (issue.planMarker == null) continue;
+    const x = issue.planMarker?.x;
+    const y = issue.planMarker?.y;
+    if (
+      typeof x !== "number"
+      || typeof y !== "number"
+      || !Number.isFinite(x)
+      || x < 0
+      || x > 100
+      || !Number.isFinite(y)
+      || y < 0
+      || y > 100
+    ) {
+      throw new Error("Invalid kitchen-sketch marker coordinates.");
+    }
+  }
+
   return parseServiceClaimProblemAreas(referenceIssuesJsonRaw).map((area) => {
     const componentId = String(area.componentId || "").trim();
     const isElectrical = componentId.startsWith("reference-electrical-");
@@ -119,7 +150,37 @@ function normalizeReferenceIssuesJson(referenceIssuesJsonRaw) {
       code: isElectrical ? "REFERENCE-ELECTRICAL" : "REFERENCE-FURNITURE",
       detail,
       ...(isElectrical ? { serialNumber: requiredString(area.serialNumber, "Serial number") } : {}),
+      ...(area.planMarker ? { planMarker: area.planMarker } : {}),
     };
+  });
+}
+
+function normalizeSketchMarkersJson(sketchMarkersJsonRaw) {
+  let submittedMarkers;
+  try {
+    submittedMarkers = JSON.parse(String(sketchMarkersJsonRaw || "[]"));
+  } catch {
+    throw new Error("Invalid kitchen-sketch markers.");
+  }
+  if (!Array.isArray(submittedMarkers) || submittedMarkers.length > 30) {
+    throw new Error("Invalid kitchen-sketch markers.");
+  }
+  return submittedMarkers.map((marker) => {
+    const x = marker?.x;
+    const y = marker?.y;
+    if (
+      typeof x !== "number"
+      || typeof y !== "number"
+      || !Number.isFinite(x)
+      || !Number.isFinite(y)
+      || x < 0
+      || x > 100
+      || y < 0
+      || y > 100
+    ) {
+      throw new Error("Invalid kitchen-sketch marker coordinates.");
+    }
+    return { x, y };
   });
 }
 
@@ -451,7 +512,7 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
     targetMap.set(componentId, list);
   }
 
-  const rows = parseServiceClaimProblemAreas(problemAreasJson).map((area) => {
+  const rows = parseServiceClaimProblemAreas(problemAreasJson).map((area, index) => {
     const componentId = String(area.componentId || "").trim();
     return {
       isElectricalAppliance: isElectricalApplianceProblemArea(area),
@@ -459,6 +520,8 @@ function buildClaimItemRows(problemAreasJson, attachmentsMeta = []) {
       articleCode: String(area.code || "").trim(),
       detail: String(area.detail || "").trim(),
       serialNumber: String(area.serialNumber || "").trim(),
+      planMarker: area.planMarker || null,
+      markerNumber: area.planMarker ? index + 1 : null,
       serialAttachments: componentId ? serialAttachmentsByComponentId.get(componentId) || [] : [],
       attachments: componentId ? attachmentsByComponentId.get(componentId) || [] : [],
     };
@@ -484,6 +547,7 @@ function buildClaimItemText(row, { showArticleCode = true } = {}) {
     `Type: ${row.name || "-"}`,
     ...(showArticleCode ? [`Typen - NR: ${row.articleCode || "-"}`] : []),
     `Problembeschreibung: ${row.detail || "-"}`,
+    ...(row.markerNumber ? [`Skizzenposition: X${row.markerNumber}`] : []),
     ...(row.isElectricalAppliance
       ? [
           `Seriennummer: ${row.serialNumber || (row.serialAttachments?.length ? "Siehe Seriennummernfoto" : "-")}`,
@@ -533,6 +597,7 @@ function buildClaimItemHtml(row, { showArticleCode = true, itemNumber = 1 } = {}
         <tr><td style="${itemLabelStyles}">Type</td><td style="${itemValueStyles}">${formatMultiline(row.name || "-")}</td></tr>
         ${showArticleCode ? `<tr><td style="${itemLabelStyles}">Typen - NR</td><td style="${itemValueStyles}">${formatMultiline(row.articleCode || "-")}</td></tr>` : ""}
         <tr><td style="${itemLabelStyles}">Problembeschreibung</td><td style="${itemValueStyles}">${formatMultiline(row.detail || "-")}</td></tr>
+        ${row.markerNumber ? `<tr><td style="${itemLabelStyles}">Skizzenposition</td><td style="${itemValueStyles}">X${row.markerNumber}</td></tr>` : ""}
         ${serialRows}
         <tr><td style="${itemLabelStyles}border-bottom:0;">Anhänge</td><td style="${itemValueStyles}border-bottom:0;">${uploads}</td></tr>
       </tbody>
@@ -913,11 +978,22 @@ async function buildArcReferencePlanEmailAttachment(payload) {
     "preview",
   );
   if (previewAsset?.content?.length && previewAsset.contentType.startsWith("image/")) {
+    const markers = Array.isArray(payload.sketchMarkers)
+      ? payload.sketchMarkers
+      : [];
+    const annotatedContent = markers.length
+      ? await renderReferencePlanMarkersPng({
+          content: previewAsset.content,
+          markers,
+        }).catch(() => null)
+      : null;
     return {
-      filename: previewAsset.filename || `arc-kitchen-sketch-${payload.contractNumber}.jpg`,
-      content: previewAsset.content,
+      filename: annotatedContent
+        ? `arc-kitchen-sketch-marked-${payload.contractNumber}.png`
+        : previewAsset.filename || `arc-kitchen-sketch-${payload.contractNumber}.jpg`,
+      content: annotatedContent || previewAsset.content,
       cid: "arc-kitchen-sketch@fragmento",
-      contentType: previewAsset.contentType,
+      contentType: annotatedContent ? "image/png" : previewAsset.contentType,
       contentDisposition: "inline",
       emailLabel: "ARC-Küchenskizze",
       emailAlt: `ARC-Küchenskizze für Vertrag ${payload.contractNumber}`,
@@ -1553,6 +1629,9 @@ export async function POST(request) {
     const hasSerialNumberImage = serialNumberImageParts.length > 0
       || serialNumberImagePartsByComponentId.size > 0
       || booleanFromFormValue(body.hasSerialNumberImage);
+    const sketchMarkers = contract.contractType === "ARC"
+      ? normalizeSketchMarkersJson(body.sketchMarkersJson)
+      : [];
 
     const payload = {
       id: crypto.randomUUID(),
@@ -1604,6 +1683,7 @@ export async function POST(request) {
       ].join("\n"),
       problemDescription,
       problemAreasJson,
+      sketchMarkers,
       serialNumber: rawSerialNumber || (hasSerialNumberImage ? "Siehe Seriennummernfoto in den Anhängen." : "Nicht zutreffend"),
       requestType: "complaint",
       hasSerialNumberImage,

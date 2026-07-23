@@ -57,3 +57,33 @@ test("service claim email labels use German names and article codes, not compone
 
   assert.equal(formatServiceClaimProblemAreaForEmail(area), "Standkühlschrank 181 cm (KGCN388140E)");
 });
+
+test("service claim problem areas preserve valid optional sketch markers", () => {
+  const [area] = parseServiceClaimProblemAreas(JSON.stringify([{
+    componentId: "reference-furniture-1",
+    name: "Worktop",
+    code: "REFERENCE-FURNITURE",
+    planMarker: { x: 25.123456, y: 80.5 },
+  }]));
+
+  assert.deepEqual(area.planMarker, { x: 25.1235, y: 80.5 });
+});
+
+test("service claim problem areas omit malformed or out-of-range sketch markers", () => {
+  const result = parseServiceClaimProblemAreas(JSON.stringify([
+    {
+      componentId: "reference-furniture-1",
+      name: "Worktop",
+      code: "REFERENCE-FURNITURE",
+      planMarker: { x: -1, y: 50 },
+    },
+    {
+      componentId: "reference-furniture-2",
+      name: "Cabinet",
+      code: "REFERENCE-FURNITURE",
+    },
+  ]));
+
+  assert.equal("planMarker" in result[0], false);
+  assert.equal("planMarker" in result[1], false);
+});

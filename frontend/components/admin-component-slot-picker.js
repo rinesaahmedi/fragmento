@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import AdminSelect from "./admin-select";
+import { useAdminI18n } from "./admin-i18n";
 
 export function AdminComponentSlotPicker({
   name,
-  label = "Component slot",
+  label = "",
+  labelI18nKey = "componentSlotPicker.componentSlot",
+  labelFallback = "Component slot",
   slots,
   defaultValue = "",
   occupiedByKey = {},
@@ -14,13 +17,15 @@ export function AdminComponentSlotPicker({
   compact = false,
   allowEmpty = true,
 }) {
+  const { translate } = useAdminI18n();
+  const resolvedLabel = label || translate(labelI18nKey, labelFallback);
   const [selectedKey, setSelectedKey] = useState(defaultValue || "");
   const selectedSlot = slots.find((slot) => slot.componentKey === selectedKey) || null;
 
   return (
     <div style={rootStyle}>
       <div style={headerStyle}>
-        <strong style={{ fontSize: 14 }}>{label}</strong>
+        <strong style={{ fontSize: 14 }}>{resolvedLabel}</strong>
         {!compact ? (
           <span style={helperStyle}>
             {selectedSlot ? `${selectedSlot.label} (${selectedSlot.zone})` : helperText}
@@ -42,9 +47,13 @@ export function AdminComponentSlotPicker({
               {selectedSlot ? <SlotIcon componentKey={selectedSlot.componentKey} /> : <NoneIcon />}
             </span>
             <div style={textWrapStyle}>
-              <strong style={{ fontSize: 13 }}>{selectedSlot ? selectedSlot.label : "No slot selected"}</strong>
+              <strong style={{ fontSize: 13 }}>
+                {selectedSlot ? selectedSlot.label : translate("componentSlotPicker.noSlotSelected", "No slot selected")}
+              </strong>
               <span style={metaStyle}>
-                {selectedSlot ? `${selectedSlot.zone} • Selected slot` : "Assign this component to a kitchen slot"}
+                {selectedSlot
+                  ? `${selectedSlot.zone} • ${translate("componentSlotPicker.selectedSlot", "Selected slot")}`
+                  : translate("componentSlotPicker.assignThisComponentToKitchenSlot", "Assign this component to a kitchen slot")}
               </span>
             </div>
           </div>
@@ -53,16 +62,20 @@ export function AdminComponentSlotPicker({
             value={selectedKey}
             onChange={(event) => setSelectedKey(event.target.value)}
             style={compactSelectStyle}
-            aria-label={label}
+            aria-label={resolvedLabel}
           >
-            <option value="" disabled={!allowEmpty}>{allowEmpty ? "None" : "Choose position"}</option>
+            <option value="" disabled={!allowEmpty}>
+              {allowEmpty
+                ? translate("componentSlotPicker.none", "None")
+                : translate("componentSlotPicker.choosePosition", "Choose position")}
+            </option>
             {slots.map((slot) => {
               const occupiedLabels = occupiedByKey[slot.componentKey] || [];
               const isOccupied = occupiedLabels.length > 0 && slot.componentKey !== allowOccupiedKey;
 
               return (
                 <option key={slot.componentKey} value={slot.componentKey} disabled={isOccupied}>
-                  {slot.label} ({slot.zone}){isOccupied ? " - occupied" : ""}
+                  {slot.label} ({slot.zone}){isOccupied ? ` - ${translate("componentSlotPicker.occupied", "occupied")}` : ""}
                 </option>
               );
             })}
@@ -83,8 +96,8 @@ export function AdminComponentSlotPicker({
               <NoneIcon />
             </span>
             <div style={textWrapStyle}>
-              <strong style={{ fontSize: 13 }}>None</strong>
-              <span style={metaStyle}>No slot assigned</span>
+              <strong style={{ fontSize: 13 }}>{translate("componentSlotPicker.none", "None")}</strong>
+              <span style={metaStyle}>{translate("componentSlotPicker.noSlotAssigned", "No slot assigned")}</span>
             </div>
           </button>
         ) : null}
@@ -118,10 +131,16 @@ export function AdminComponentSlotPicker({
                 <span style={metaStyle}>{slot.zone}</span>
                 {isOccupied ? (
                   <span style={occupiedTextStyle}>
-                    {occupiedLabels.length > 1 ? `${occupiedLabels.length} items assigned` : occupiedLabels[0]}
+                    {occupiedLabels.length > 1
+                      ? `${occupiedLabels.length} ${translate("componentSlotPicker.itemsAssigned", "items assigned")}`
+                      : occupiedLabels[0]}
                   </span>
                 ) : (
-                  <span style={availableTextStyle}>{isSelected ? "Selected" : "Available"}</span>
+                  <span style={availableTextStyle}>
+                    {isSelected
+                      ? translate("componentSlotPicker.selected", "Selected")
+                      : translate("componentSlotPicker.available", "Available")}
+                  </span>
                 )}
               </div>
             </button>

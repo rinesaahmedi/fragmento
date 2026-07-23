@@ -44,7 +44,7 @@ export default function AdminBlendePriceFields({
   defaultServiceId = "",
   currentBlendePrice = null,
 }) {
-  const { language } = useAdminI18n();
+  const { language, translate } = useAdminI18n();
   const localizedName = (entry) => {
     const englishName = String(entry?.name || entry?.label || "").trim();
     const germanName = String(entry?.nameDe || "").trim();
@@ -77,16 +77,17 @@ export default function AdminBlendePriceFields({
     <section className="admin-catalog-editor" aria-labelledby="admin-catalog-editor-title">
       <div className="admin-catalog-editor__heading">
         <div>
-          <h3 id="admin-catalog-editor-title">Catalog &amp; pricing</h3>
-          <p>Catalog values are used automatically for the article number, names and prices.</p>
+          <h3 id="admin-catalog-editor-title">{translate("kitchenDetailAdmin.catalogAndPricing", "Catalog & pricing")}</h3>
         </div>
         <span className={`admin-catalog-editor__status${articleId ? " is-linked" : ""}`}>
-          {articleId ? "Catalog linked" : "Not linked"}
+          {articleId
+            ? translate("kitchenDetailAdmin.catalogLinked", "Catalog linked")
+            : translate("kitchenDetailAdmin.notLinked", "Not linked")}
         </span>
       </div>
 
       <div className="admin-catalog-editor__relations">
-        <FormField label="Catalog article" wide={false}>
+        <FormField label={translate("kitchenDetailAdmin.catalogArticle", "Catalog article")} wide={false}>
           <AdminSelect
             name="catalogArticleId"
             value={articleId}
@@ -100,7 +101,7 @@ export default function AdminBlendePriceFields({
             }}
             style={selectStyle}
           >
-            <option value="">No article link</option>
+            <option value="">{translate("kitchenDetailAdmin.noArticleLink", "No article link")}</option>
             {catalogArticles.map((article) => (
               <option key={article.id} value={article.id}>
                 {article.articleNumber} - {localizedName(article)} ({article.formattedPrice})
@@ -109,7 +110,7 @@ export default function AdminBlendePriceFields({
           </AdminSelect>
         </FormField>
 
-        <FormField label="Included Blende" wide={false}>
+        <FormField label={translate("kitchenDetailAdmin.includedBlende", "Included Blende")} wide={false}>
           <AdminSelect
             name="catalogBlendeId"
             value={blendeId}
@@ -120,7 +121,7 @@ export default function AdminBlendePriceFields({
             }}
             style={selectStyle}
           >
-            <option value="">No included Blende</option>
+            <option value="">{translate("kitchenDetailAdmin.noIncludedBlende", "No included Blende")}</option>
             {catalogBlenden.map((blende) => (
               <option key={blende.id} value={blende.id}>
                 {blende.code} - {localizedName(blende)} ({blende.formattedPrice})
@@ -129,7 +130,7 @@ export default function AdminBlendePriceFields({
           </AdminSelect>
         </FormField>
 
-        <FormField label="Quantity" wide={false}>
+        <FormField label={translate("kitchenDetailAdmin.quantity", "Quantity")} wide={false}>
           <input
             type="number"
             name="catalogBlendeQuantity"
@@ -145,7 +146,7 @@ export default function AdminBlendePriceFields({
 
       {!articleId ? (
         <div className="admin-catalog-editor__manual-price">
-          <FormField label="Manual article price" wide={false}>
+          <FormField label={translate("kitchenDetailAdmin.manualArticlePrice", "Manual article price")} wide={false}>
             <input
               name="articleBasePrice"
               value={articlePrice}
@@ -160,30 +161,33 @@ export default function AdminBlendePriceFields({
       )}
       <input type="hidden" name="price" value={totalPrice} />
 
-      <div className="admin-catalog-editor__price" aria-label="Price calculation">
+      <div
+        className="admin-catalog-editor__price"
+        aria-label={translate("kitchenDetailAdmin.priceCalculation", "Price calculation")}
+      >
         <div>
-          <span>Article</span>
+          <span>{translate("kitchenDetailAdmin.article", "Article")}</span>
           <strong>{formatCurrency(articlePrice)}</strong>
         </div>
         <span className="admin-catalog-editor__operator" aria-hidden="true">+</span>
         <div>
           <span>Blende{blendeId ? ` × ${quantity || 1}` : ""}</span>
           <strong>{formatCurrency(selectedBlendeTotal)}</strong>
-          {blendeId ? <small>{formatCurrency(selectedBlendeUnitPrice)} each</small> : null}
+          {blendeId ? <small>{formatCurrency(selectedBlendeUnitPrice)} {translate("kitchenDetailAdmin.each", "each")}</small> : null}
         </div>
         <span className="admin-catalog-editor__operator" aria-hidden="true">=</span>
         <div className="admin-catalog-editor__price-total">
-          <span>Total</span>
+          <span>{translate("kitchenDetailAdmin.total", "Total")}</span>
           <strong>{formatCurrency(totalPrice)}</strong>
         </div>
       </div>
 
       <details className="admin-catalog-editor__service-link">
-        <summary>Service catalog link</summary>
+        <summary>{translate("kitchenDetailAdmin.serviceCatalogLink", "Service catalog link")}</summary>
         <div>
-          <FormField label="Linked service" wide={false}>
+          <FormField label={translate("kitchenDetailAdmin.linkedService", "Linked service")} wide={false}>
             <AdminSelect name="catalogServiceId" defaultValue={defaultServiceId || ""} style={selectStyle}>
-              <option value="">No service link</option>
+              <option value="">{translate("kitchenDetailAdmin.noServiceLink", "No service link")}</option>
               {catalogServices.map((service) => (
                 <option key={service.id} value={service.id}>
                   {service.code} - {localizedName(service)} ({service.formattedPrice})
@@ -191,7 +195,7 @@ export default function AdminBlendePriceFields({
               ))}
             </AdminSelect>
           </FormField>
-          <p>Only service-type items need this connection.</p>
+          <p>{translate("kitchenDetailAdmin.serviceLinkOnlyForServices", "Only service-type items need this connection.")}</p>
         </div>
       </details>
     </section>

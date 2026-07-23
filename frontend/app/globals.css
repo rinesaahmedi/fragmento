@@ -3616,6 +3616,257 @@ textarea {
   background: #fff;
 }
 
+.service-claim-reference-plan__image-stage {
+  position: relative;
+}
+
+.service-claim-reference-plan__image-stage.is-interactive {
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+.service-claim-reference-plan__image-stage.is-interactive:focus-visible {
+  outline: 3px solid rgba(107, 79, 58, 0.32);
+  outline-offset: -3px;
+}
+
+.service-claim-reference-plan__tap-hint {
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.service-claim-reference-plan__marker-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--app-text-muted);
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.service-claim-reference-plan__marker-actions button {
+  min-height: 40px;
+  padding: 8px 13px;
+  border: 1px solid rgba(107, 79, 58, 0.22);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--app-accent);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.service-claim-plan-markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.service-claim-plan-marker {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 7px;
+  border: 3px solid #fff;
+  border-radius: 999px;
+  background: #b42318;
+  box-shadow: 0 2px 8px rgba(49, 17, 12, 0.42);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+}
+
+.service-claim-plan-marker.is-active {
+  box-shadow: 0 0 0 5px rgba(180, 35, 24, 0.25), 0 2px 8px rgba(49, 17, 12, 0.42);
+}
+
+.service-claim-marker-editor {
+  position: fixed;
+  z-index: 2200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(30, 23, 18, 0.72);
+}
+
+.service-claim-marker-editor__panel {
+  display: grid;
+  gap: 14px;
+  width: min(1100px, 100%);
+  max-height: calc(100vh - 40px);
+  padding: 18px;
+  overflow: auto;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(18, 12, 8, 0.36);
+}
+
+.service-claim-marker-editor__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.service-claim-marker-editor__header h3,
+.service-claim-marker-editor__header p {
+  margin: 0;
+}
+
+.service-claim-marker-editor__header p {
+  margin-top: 4px;
+  color: var(--app-text-muted);
+  line-height: 1.45;
+}
+
+.service-claim-marker-editor__close {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(107, 79, 58, 0.2);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--app-text);
+  font: inherit;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.service-claim-marker-editor__stage {
+  position: relative;
+  width: fit-content;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid rgba(107, 79, 58, 0.2);
+  border-radius: 10px;
+  background: #fff;
+  cursor: crosshair;
+  touch-action: manipulation;
+}
+
+.service-claim-marker-editor__stage:focus-visible {
+  outline: 3px solid rgba(107, 79, 58, 0.32);
+  outline-offset: 3px;
+}
+
+.service-claim-marker-editor__stage > img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: min(42vh, 420px);
+  user-select: none;
+}
+
+.service-claim-marker-editor__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.service-claim-marker-editor__content {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 12px;
+  background: #fffdfa;
+}
+
+.service-direct-problem-editor {
+  display: grid;
+  gap: 14px;
+}
+
+.service-direct-problem-editor__kind {
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(107, 79, 58, 0.1);
+  color: var(--app-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.service-direct-problem-editor__type-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.service-direct-problem-editor__type-options button {
+  min-height: 56px;
+  padding: 12px;
+  border: 1px solid rgba(107, 79, 58, 0.24);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--app-accent);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.service-direct-problem-editor__type-options button:hover,
+.service-direct-problem-editor__type-options button:focus-visible {
+  background: rgba(107, 79, 58, 0.08);
+}
+
+.service-direct-problem-editor__evidence {
+  display: grid;
+  gap: 8px;
+}
+
+.service-direct-problem-editor input.service-field__problem-area-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.service-direct-problem-editor .service-field__problem-area-upload-button,
+.service-direct-problem-editor .service-field__problem-area-serial-upload {
+  width: 100%;
+  min-height: 46px;
+}
+
+.service-claim-marker-editor__actions button,
+.service-reference-flow__marker button {
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 9px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.service-claim-marker-editor__remove {
+  border: 1px solid rgba(180, 35, 24, 0.3);
+  background: #fff;
+  color: #9c2017;
+}
+
+.service-claim-marker-editor__done {
+  border: 1px solid var(--app-accent);
+  background: var(--app-accent);
+  color: #fff;
+}
+
 .service-claim-reference-plan__preview-unavailable {
   display: grid;
   place-items: center;
@@ -3784,6 +4035,106 @@ textarea {
   line-height: 1.4;
 }
 
+.service-reference-flow--legacy {
+  display: none;
+}
+
+.service-reference-problem-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.service-reference-problem-list > h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.service-reference-problem-list__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.service-reference-problem-list__number {
+  display: grid;
+  place-items: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: #b42318;
+  color: #fff;
+  font-weight: 900;
+}
+
+.service-reference-problem-list__copy {
+  min-width: 0;
+}
+
+.service-reference-problem-list__copy p {
+  margin: 3px 0 0;
+  overflow: hidden;
+  color: var(--app-text-muted);
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.service-reference-problem-list__item button {
+  min-height: 38px;
+  padding: 8px 11px;
+  border: 1px solid rgba(107, 79, 58, 0.2);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--app-accent);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.service-reference-problem-list__item button.is-remove {
+  width: 38px;
+  padding: 0;
+  color: #9c2017;
+  font-size: 1.25rem;
+}
+
+.service-reference-problem-list__empty {
+  margin: 0;
+  padding: 14px;
+  border: 1px dashed rgba(107, 79, 58, 0.26);
+  border-radius: 10px;
+  color: var(--app-text-muted);
+  text-align: center;
+}
+
+.service-reference-flow__marker {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  border: 1px dashed rgba(107, 79, 58, 0.28);
+  border-radius: 9px;
+  background: rgba(250, 248, 245, 0.72);
+  color: var(--app-text);
+  font-size: 0.86rem;
+}
+
+.service-reference-flow__marker button {
+  flex: 0 0 auto;
+  border: 1px solid rgba(107, 79, 58, 0.24);
+  background: #fff;
+  color: var(--app-accent);
+}
+
 .service-reference-flow__serial {
   grid-column: 1 / -1;
   display: grid;
@@ -3906,13 +4257,12 @@ textarea {
 
   .service-claim-reference-plan__header {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
+    grid-template-columns: 1fr;
     gap: 10px;
   }
 
   .service-claim-reference-plan__contract {
-    text-align: right;
+    text-align: left;
   }
 
   .service-claim-reference-plan__title {
@@ -3920,13 +4270,20 @@ textarea {
   }
 
   .service-claim-reference-plan__preview {
-    max-height: 240px;
+    max-height: none;
   }
 
   .service-claim-reference-plan__image {
     width: 100%;
-    height: min(46vw, 220px);
-    object-fit: contain;
+    height: auto;
+  }
+
+  .service-claim-plan-marker {
+    min-width: 28px;
+    height: 28px;
+    padding: 0 5px;
+    border-width: 2px;
+    font-size: 0.72rem;
   }
 
   .service-claim-reference-plan__preview-action {
@@ -3972,6 +4329,41 @@ textarea {
 
   .service-reference-flow__serial-divider {
     display: none;
+  }
+
+  .service-claim-marker-editor {
+    padding: 8px;
+  }
+
+  .service-claim-marker-editor__panel {
+    max-height: calc(100vh - 16px);
+    padding: 12px;
+  }
+
+  .service-claim-marker-editor__stage > img {
+    max-height: 34vh;
+  }
+
+  .service-reference-flow__marker {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .service-reference-flow__marker button {
+    width: 100%;
+  }
+
+  .service-direct-problem-editor__type-options {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-reference-problem-list__item {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .service-reference-problem-list__item > button:not(.is-remove) {
+    grid-column: 1 / -1;
+    width: 100%;
   }
 
 }

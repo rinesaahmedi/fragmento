@@ -21,6 +21,7 @@ import {
 import { Fragment } from "react";
 import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
 import { AdminShell } from "../../../../components/admin-shell";
+import { AdminText } from "../../../../components/admin-i18n";
 import AdminSelect from "../../../../components/admin-select";
 import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
 import { getFormMessage } from "../../../../lib/admin-forms";
@@ -35,11 +36,12 @@ function formatMoney(value) {
   return Number(value || 0).toFixed(2);
 }
 
-function formatBoolean(value) {
-  return value ? "Yes" : "No";
-}
-
 const ITEM_TYPE_OPTIONS = Object.values(ItemType);
+const ITEM_TYPE_LABELS = {
+  [ItemType.COMPONENT]: { key: "kitchenDetailAdmin.typeComponents", fallback: "Components" },
+  [ItemType.ACCESSORY]: { key: "kitchenDetailAdmin.typeAccessories", fallback: "Accessories" },
+  [ItemType.SERVICE]: { key: "kitchenDetailAdmin.typeServices", fallback: "Services" },
+};
 const CATALOG_EDIT_PARAMS = ["editArticle", "editBlende", "editService", "editClaimProduct"];
 
 function buildCatalogEditHref(searchParams, key, id) {
@@ -138,35 +140,44 @@ function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
           <h3>{article?.articleNumber || "Create a new article"}</h3>
         </div>
         <span className={`catalog-article-form__status${article?.isActive === false ? " is-inactive" : ""}`}>
-          {article?.isActive === false ? "Inactive" : "Active"}
+          {article?.isActive === false
+            ? <AdminText i18nKey="catalogAdmin.inactive" fallback="Inactive" />
+            : <AdminText i18nKey="catalogAdmin.active" fallback="Active" />}
         </span>
       </header>
 
       <div className="catalog-article-form__layout">
         <section className="catalog-article-form__panel" aria-labelledby={`article-details-${article?.id || "new"}`}>
           <div className="catalog-article-form__section-heading">
-            <h4 id={`article-details-${article?.id || "new"}`}>Article details</h4>
+            <h4 id={`article-details-${article?.id || "new"}`}>
+              <AdminText i18nKey="catalogAdmin.articleDetails" fallback="Article details" />
+            </h4>
           </div>
 
           <div className="catalog-article-form__group">
             <div className="catalog-article-form__grid catalog-article-form__grid--identity">
-              <FormField label="Article number">
+              <FormField label={<AdminText i18nKey="catalogAdmin.articleNumber" fallback="Article number" />}>
                 <input name="articleNumber" defaultValue={article?.articleNumber || ""} style={inputStyle} required />
               </FormField>
-              <FormField label="Item type">
+              <FormField label={<AdminText i18nKey="catalogAdmin.itemType" fallback="Item type" />}>
                 <AdminSelect name="itemType" defaultValue={article?.itemType || ItemType.COMPONENT} style={inputStyle}>
                   {ITEM_TYPE_OPTIONS.map((itemType) => (
-                    <option key={itemType} value={itemType}>{itemType}</option>
+                    <option key={itemType} value={itemType}>
+                      <AdminText
+                        i18nKey={ITEM_TYPE_LABELS[itemType]?.key}
+                        fallback={ITEM_TYPE_LABELS[itemType]?.fallback || itemType}
+                      />
+                    </option>
                   ))}
                 </AdminSelect>
               </FormField>
-              <FormField label="English name">
+              <FormField label={<AdminText i18nKey="catalogAdmin.englishName" fallback="English name" />}>
                 <input name="name" defaultValue={article?.name || ""} style={inputStyle} required />
               </FormField>
-              <FormField label="German name">
+              <FormField label={<AdminText i18nKey="catalogAdmin.germanName" fallback="German name" />}>
                 <input name="nameDe" defaultValue={article?.nameDe || ""} style={inputStyle} />
               </FormField>
-              <FormField label="Description" wide>
+              <FormField label={<AdminText i18nKey="catalogAdmin.description" fallback="Description" />} wide>
                 <textarea name="description" defaultValue={article?.description || ""} rows={3} style={textareaStyle} />
               </FormField>
             </div>
@@ -174,19 +185,19 @@ function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
 
           <div className="catalog-article-form__group">
             <div className="catalog-article-form__grid catalog-article-form__grid--commercial">
-              <FormField label="Price (€)">
+              <FormField label={<AdminText i18nKey="catalogAdmin.price" fallback="Price (€)" />}>
                 <input name="price" type="number" min="0" step="0.01" defaultValue={article ? formatMoney(article.price) : "0.00"} style={inputStyle} required />
               </FormField>
-              <FormField label="Fixed-price package">
+              <FormField label={<AdminText i18nKey="catalogAdmin.fixedPricePackage" fallback="Fixed-price package" />}>
                 <AdminSelect name="isFixedPricePackage" defaultValue={article?.isFixedPricePackage ? "true" : ""} style={inputStyle}>
-                  <option value="">No</option>
-                  <option value="true">Yes</option>
+                  <option value=""><AdminText i18nKey="catalogAdmin.no" fallback="No" /></option>
+                  <option value="true"><AdminText i18nKey="catalogAdmin.yes" fallback="Yes" /></option>
                 </AdminSelect>
               </FormField>
-              <FormField label="Status">
+              <FormField label={<AdminText i18nKey="catalogAdmin.status" fallback="Status" />}>
                 <AdminSelect name="isActive" defaultValue={article?.isActive === false ? "" : "true"} style={inputStyle}>
-                  <option value="true">Active</option>
-                  <option value="">Inactive</option>
+                  <option value="true"><AdminText i18nKey="catalogAdmin.active" fallback="Active" /></option>
+                  <option value=""><AdminText i18nKey="catalogAdmin.inactive" fallback="Inactive" /></option>
                 </AdminSelect>
               </FormField>
             </div>
@@ -194,13 +205,13 @@ function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
 
           <div className="catalog-article-form__group">
             <div className="catalog-article-form__grid catalog-article-form__grid--dimensions">
-              <FormField label="Width">
+              <FormField label={<AdminText i18nKey="catalogAdmin.width" fallback="Width" />}>
                 <input name="widthMm" type="number" min="0" step="0.1" defaultValue={formatDimensionInputValue(article?.widthMm)} style={inputStyle} />
               </FormField>
-              <FormField label="Height">
+              <FormField label={<AdminText i18nKey="catalogAdmin.height" fallback="Height" />}>
                 <input name="heightMm" type="number" min="0" step="0.1" defaultValue={formatDimensionInputValue(article?.heightMm)} style={inputStyle} />
               </FormField>
-              <FormField label="Depth">
+              <FormField label={<AdminText i18nKey="catalogAdmin.depth" fallback="Depth" />}>
                 <input name="depthMm" type="number" min="0" step="0.1" defaultValue={formatDimensionInputValue(article?.depthMm)} style={inputStyle} />
               </FormField>
             </div>
@@ -212,17 +223,21 @@ function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
           className="catalog-article-form__panel catalog-article-form__panel--product-info"
         >
           <summary className="catalog-article-form__section-heading catalog-article-form__product-info-summary">
-            <h4 id={`product-information-${article?.id || "new"}`}>Product Information</h4>
+              <h4 id={`product-information-${article?.id || "new"}`}>
+                <AdminText i18nKey="catalogAdmin.productInformation" fallback="Product Information" />
+              </h4>
             <div className="catalog-article-form__product-info-status">
               <span style={article?.productInfoPdfPath ? productInfoReadyStyle : productInfoMissingStyle}>
-                {article?.productInfoPdfPath ? "Ready" : "Missing PDF"}
+                {article?.productInfoPdfPath
+                  ? <AdminText i18nKey="catalogAdmin.ready" fallback="Ready" />
+                  : <AdminText i18nKey="catalogAdmin.missingPdf" fallback="Missing PDF" />}
               </span>
               <span className="catalog-article-form__product-info-chevron" aria-hidden="true" />
             </div>
           </summary>
 
           <div className="catalog-article-form__product-info-body" style={productInfoBodyStyle}>
-            <FormField label="Product image path" wide>
+            <FormField label={<AdminText i18nKey="catalogAdmin.productImagePath" fallback="Product image path" />} wide>
               <input name="productImagePath" defaultValue={article?.productImagePath || ""} placeholder="/product-images/email/example.jpg" style={inputStyle} />
             </FormField>
             <AdminProductInfoPdfManager
@@ -238,7 +253,11 @@ function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
 
       <footer className="catalog-article-form__footer">
         <div style={actionRowStyle}>
-          {cancelHref ? <Link href={cancelHref} scroll={false} style={secondaryButtonStyle}>Cancel</Link> : null}
+          {cancelHref ? (
+            <Link href={cancelHref} scroll={false} style={secondaryButtonStyle}>
+              <AdminText i18nKey="catalogAdmin.cancel" fallback="Cancel" />
+            </Link>
+          ) : null}
           <button type="submit" style={primaryButtonStyle}>{submitLabel}</button>
         </div>
       </footer>
@@ -250,25 +269,25 @@ function CatalogAddonForm({ action, item, submitLabel }) {
   return (
     <form action={action} method="post" style={addonFormStyle}>
       <div style={formGridStyle}>
-        <FormField label="Code">
+        <FormField label={<AdminText i18nKey="catalogAdmin.code" fallback="Code" />}>
           <input name="code" defaultValue={item?.code || ""} style={inputStyle} required />
         </FormField>
-        <FormField label="Name">
+        <FormField label={<AdminText i18nKey="catalogAdmin.englishName" fallback="English name" />}>
           <input name="name" defaultValue={item?.name || ""} style={inputStyle} required />
         </FormField>
-        <FormField label="German name">
+        <FormField label={<AdminText i18nKey="catalogAdmin.germanName" fallback="German name" />}>
           <input name="nameDe" defaultValue={item?.nameDe || ""} style={inputStyle} />
         </FormField>
-        <FormField label="Price">
+        <FormField label={<AdminText i18nKey="catalogAdmin.price" fallback="Price" />}>
           <input name="price" defaultValue={item ? formatMoney(item.price) : "0.00"} style={inputStyle} required />
         </FormField>
-        <FormField label="Active">
+        <FormField label={<AdminText i18nKey="catalogAdmin.active" fallback="Active" />}>
           <AdminSelect name="isActive" defaultValue={item?.isActive === false ? "" : "true"} style={inputStyle}>
-            <option value="true">Yes</option>
-            <option value="">No</option>
+            <option value="true"><AdminText i18nKey="catalogAdmin.yes" fallback="Yes" /></option>
+            <option value=""><AdminText i18nKey="catalogAdmin.no" fallback="No" /></option>
           </AdminSelect>
         </FormField>
-        <FormField label="Description" wide>
+        <FormField label={<AdminText i18nKey="catalogAdmin.description" fallback="Description" />} wide>
           <textarea name="description" defaultValue={item?.description || ""} rows={2} style={textareaStyle} />
         </FormField>
       </div>
@@ -285,29 +304,29 @@ function ClaimProductForm({ action, claimProduct, submitLabel }) {
       <input type="hidden" name="claimProductIds" value={(claimProduct?.ids || [claimProduct?.id]).filter(Boolean).join(",")} />
       <input type="hidden" name="partKey" value={claimProduct?.partKey || ""} />
       <div style={formGridStyle}>
-        <FormField label="Article code">
+        <FormField label={<AdminText i18nKey="catalogAdmin.articleCode" fallback="Article code" />}>
           <input name="articleCode" defaultValue={claimProduct?.articleCode || ""} style={inputStyle} />
         </FormField>
-        <FormField label="Name">
+        <FormField label={<AdminText i18nKey="catalogAdmin.englishName" fallback="English name" />}>
           <input name="name" defaultValue={claimProduct?.name || ""} style={inputStyle} required />
         </FormField>
-        <FormField label="German name">
+        <FormField label={<AdminText i18nKey="catalogAdmin.germanName" fallback="German name" />}>
           <input name="nameDe" defaultValue={claimProduct?.nameDe || ""} style={inputStyle} />
         </FormField>
-        <FormField label="Sort order">
+        <FormField label={<AdminText i18nKey="catalogAdmin.sortOrder" fallback="Sort order" />}>
           <input name="sortOrder" defaultValue={claimProduct?.sortOrder ?? 0} style={inputStyle} />
         </FormField>
-        <FormField label="Active">
+        <FormField label={<AdminText i18nKey="catalogAdmin.active" fallback="Active" />}>
           <AdminSelect name="isActive" defaultValue={claimProduct?.isActive === false ? "" : "true"} style={inputStyle}>
-            <option value="true">Yes</option>
-            <option value="">No</option>
+            <option value="true"><AdminText i18nKey="catalogAdmin.yes" fallback="Yes" /></option>
+            <option value=""><AdminText i18nKey="catalogAdmin.no" fallback="No" /></option>
           </AdminSelect>
         </FormField>
       </div>
       <details style={productInfoDetailsStyle}>
-        <summary style={productInfoSummaryStyle}>Product Information</summary>
+        <summary style={productInfoSummaryStyle}><AdminText i18nKey="catalogAdmin.productInformation" fallback="Product Information" /></summary>
         <div style={productInfoBodyStyle}>
-          <FormField label="Product image path" wide>
+          <FormField label={<AdminText i18nKey="catalogAdmin.productImagePath" fallback="Product image path" />} wide>
             <input
               name="productImagePath"
               defaultValue={claimProduct?.productImagePath || ""}
@@ -336,7 +355,11 @@ function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems 
   if (linkedCount > 0) {
     return (
       <span style={deleteUnavailableStyle}>
-        Linked to {linkedCount} KitchenItem{linkedCount === 1 ? "" : "s"}
+        <AdminText
+          i18nKey={linkedCount === 1 ? "catalogAdmin.linkedToKitchenItem" : "catalogAdmin.linkedToKitchenItems"}
+          fallback={linkedCount === 1 ? "Linked to {count} kitchen item" : "Linked to {count} kitchen items"}
+          values={{ count: linkedCount }}
+        />
       </span>
     );
   }
@@ -349,7 +372,7 @@ function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems 
         style={deleteButtonStyle}
         confirmFallback={`Delete ${entityLabel.toLowerCase()} "${itemLabel}"?\nThis action cannot be undone.`}
       >
-        Delete
+        <AdminText i18nKey="catalogAdmin.delete" fallback="Delete" />
       </AdminConfirmSubmitButton>
     </form>
   );
@@ -474,13 +497,17 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <PageHero
-          eyebrow="Manage"
-          title="Catalog"
-          description="Reusable articles, blenden, and services for kitchen item setup and catalog audit."
+          eyebrow={<AdminText i18nKey="catalogAdmin.manage" fallback="Manage" />}
+          title={<AdminText i18nKey="catalogAdmin.catalog" fallback="Catalog" />}
+          description={<AdminText i18nKey="catalogAdmin.catalogDescription" fallback="Reusable articles, blenden, and services." />}
           actions={(
             <div style={actionRowStyle}>
-              <ActionLink href="/api/admin/catalog/export" secondary>Export Excel</ActionLink>
-              <ActionLink href="/admin/catalog/imports">Price imports</ActionLink>
+              <ActionLink href="/api/admin/catalog/export" secondary>
+                <AdminText i18nKey="catalogAdmin.exportExcel" fallback="Export Excel" />
+              </ActionLink>
+              <ActionLink href="/admin/catalog/imports">
+                <AdminText i18nKey="catalogAdmin.priceImports" fallback="Price imports" />
+              </ActionLink>
             </div>
           )}
         />
@@ -488,29 +515,32 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
         {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
         <AdminSection
-          title="Articles"
+          title={<AdminText i18nKey="catalogAdmin.articles" fallback="Articles" />}
           actions={(
             <details style={addonDetailsStyle}>
-              <summary style={secondaryButtonStyle}>Add article</summary>
-              <CatalogArticleForm action="/api/admin/catalog/articles" submitLabel="Create article" />
+              <summary style={secondaryButtonStyle}><AdminText i18nKey="catalogAdmin.addArticle" fallback="Add article" /></summary>
+              <CatalogArticleForm
+                action="/api/admin/catalog/articles"
+                submitLabel={<AdminText i18nKey="catalogAdmin.createArticle" fallback="Create article" />}
+              />
             </details>
           )}
         >
-          {!articles.length ? <p style={emptyStateStyle}>No catalog articles found.</p> : (
+          {!articles.length ? <p style={emptyStateStyle}><AdminText i18nKey="catalogAdmin.noArticles" fallback="No catalog articles found." /></p> : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Article number</th>
-                    <th style={thStyle}>Name</th>
-                    <th style={thStyle}>German name</th>
-                    <th style={thStyle}>Dimensions</th>
-                    <th style={thStyle}>Item type</th>
-                    <th style={thStyle}>Price</th>
-                    <th style={thStyle}>Fixed package</th>
-                    <th style={thStyle}>Active</th>
-                    <th style={thStyle}>Product info</th>
-                    <th style={thStyle}>Linked KitchenItems</th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.articleNumber" fallback="Article number" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.englishName" fallback="English name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.germanName" fallback="German name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.dimensions" fallback="Dimensions" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.itemType" fallback="Item type" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.price" fallback="Price" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.fixedPackage" fallback="Fixed package" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.active" fallback="Active" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.productInformation" fallback="Product info" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.linkedKitchenItems" fallback="Linked kitchen items" /></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -521,13 +551,24 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                         <td style={tdStyle}>{article.name}</td>
                         <td style={tdStyle}>{article.nameDe || ""}</td>
                         <td style={tdStyle}>{formatDimensions(article)}</td>
-                        <td style={tdStyle}>{article.itemType}</td>
+                        <td style={tdStyle}>
+                          <AdminText
+                            i18nKey={ITEM_TYPE_LABELS[article.itemType]?.key}
+                            fallback={ITEM_TYPE_LABELS[article.itemType]?.fallback || article.itemType}
+                          />
+                        </td>
                         <td style={tdStyle}>{formatMoney(article.price)}</td>
-                        <td style={tdStyle}>{formatBoolean(article.isFixedPricePackage)}</td>
-                        <td style={tdStyle}>{formatBoolean(article.isActive)}</td>
+                        <td style={tdStyle}>{article.isFixedPricePackage
+                          ? <AdminText i18nKey="catalogAdmin.yes" fallback="Yes" />
+                          : <AdminText i18nKey="catalogAdmin.no" fallback="No" />}</td>
+                        <td style={tdStyle}>{article.isActive
+                          ? <AdminText i18nKey="catalogAdmin.yes" fallback="Yes" />
+                          : <AdminText i18nKey="catalogAdmin.no" fallback="No" />}</td>
                         <td style={tdStyle}>
                           <span style={article.productInfoPdfPath ? productInfoReadyStyle : productInfoMissingStyle}>
-                            {article.productInfoPdfPath ? "Ready" : "Missing"}
+                            {article.productInfoPdfPath
+                              ? <AdminText i18nKey="catalogAdmin.ready" fallback="Ready" />
+                              : <AdminText i18nKey="catalogAdmin.missing" fallback="Missing" />}
                           </span>
                         </td>
                         <td style={tdStyle}>{article.linkedKitchenItems}</td>
@@ -537,16 +578,18 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                           <div style={editActionRowStyle}>
                             {editArticleId === article.id ? (
                               <details open style={editDetailsStyle}>
-                                <summary style={editSummaryStyle}>Editing</summary>
+                                <summary style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.editing" fallback="Editing" /></summary>
                                 <CatalogArticleForm
                                   action={`/api/admin/catalog/articles/${article.id}`}
                                   article={article}
-                                  submitLabel="Save article"
+                                  submitLabel={<AdminText i18nKey="catalogAdmin.saveArticle" fallback="Save article" />}
                                   cancelHref={buildCatalogListHref(resolvedSearchParams)}
                                 />
                               </details>
                             ) : (
-                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editArticle", article.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editArticle", article.id)} scroll={false} style={editSummaryStyle}>
+                                <AdminText i18nKey="catalogAdmin.edit" fallback="Edit" />
+                              </Link>
                             )}
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/articles/${article.id}`}
@@ -566,26 +609,26 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
         </AdminSection>
 
         <AdminSection
-          title="Blenden"
+          title={<AdminText i18nKey="catalogAdmin.blenden" fallback="Blenden" />}
           actions={(
             <details style={addonDetailsStyle}>
-              <summary style={secondaryButtonStyle}>Add blende</summary>
-              <CatalogAddonForm action="/api/admin/catalog/blenden" submitLabel="Create blende" />
+              <summary style={secondaryButtonStyle}><AdminText i18nKey="catalogAdmin.addBlende" fallback="Add blende" /></summary>
+              <CatalogAddonForm action="/api/admin/catalog/blenden" submitLabel={<AdminText i18nKey="catalogAdmin.createBlende" fallback="Create blende" />} />
             </details>
           )}
         >
-          {!blenden.length ? <p style={emptyStateStyle}>No catalog blenden found.</p> : (
+          {!blenden.length ? <p style={emptyStateStyle}><AdminText i18nKey="catalogAdmin.noBlenden" fallback="No catalog blenden found." /></p> : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Code</th>
-                    <th style={thStyle}>Name</th>
-                    <th style={thStyle}>German name</th>
-                    <th style={thStyle}>Description</th>
-                    <th style={thStyle}>Price</th>
-                    <th style={thStyle}>Active</th>
-                    <th style={thStyle}>Linked KitchenItems</th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.code" fallback="Code" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.englishName" fallback="English name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.germanName" fallback="German name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.description" fallback="Description" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.price" fallback="Price" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.active" fallback="Active" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.linkedKitchenItems" fallback="Linked kitchen items" /></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -597,7 +640,9 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                         <td style={tdStyle}>{blende.nameDe || ""}</td>
                         <td style={tdStyle}>{blende.description || ""}</td>
                         <td style={tdStyle}>{formatMoney(blende.price)}</td>
-                        <td style={tdStyle}>{formatBoolean(blende.isActive)}</td>
+                        <td style={tdStyle}>{blende.isActive
+                          ? <AdminText i18nKey="catalogAdmin.yes" fallback="Yes" />
+                          : <AdminText i18nKey="catalogAdmin.no" fallback="No" />}</td>
                         <td style={tdStyle}>{blende.linkedKitchenItems}</td>
                       </tr>
                       <tr>
@@ -605,11 +650,11 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                           <div style={editActionRowStyle}>
                             {editBlendeId === blende.id ? (
                               <details open style={editDetailsStyle}>
-                                <summary style={editSummaryStyle}>Editing</summary>
-                                <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel="Save blende" />
+                                <summary style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.editing" fallback="Editing" /></summary>
+                                <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel={<AdminText i18nKey="catalogAdmin.saveBlende" fallback="Save blende" />} />
                               </details>
                             ) : (
-                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editBlende", blende.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editBlende", blende.id)} scroll={false} style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.edit" fallback="Edit" /></Link>
                             )}
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/blenden/${blende.id}`}
@@ -629,26 +674,26 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
         </AdminSection>
 
         <AdminSection
-          title="Services"
+          title={<AdminText i18nKey="catalogAdmin.services" fallback="Services" />}
           actions={(
             <details style={addonDetailsStyle}>
-              <summary style={secondaryButtonStyle}>Add service</summary>
-              <CatalogAddonForm action="/api/admin/catalog/services" submitLabel="Create service" />
+              <summary style={secondaryButtonStyle}><AdminText i18nKey="catalogAdmin.addService" fallback="Add service" /></summary>
+              <CatalogAddonForm action="/api/admin/catalog/services" submitLabel={<AdminText i18nKey="catalogAdmin.createService" fallback="Create service" />} />
             </details>
           )}
         >
-          {!services.length ? <p style={emptyStateStyle}>No catalog services found.</p> : (
+          {!services.length ? <p style={emptyStateStyle}><AdminText i18nKey="catalogAdmin.noServices" fallback="No catalog services found." /></p> : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Code</th>
-                    <th style={thStyle}>Name</th>
-                    <th style={thStyle}>German name</th>
-                    <th style={thStyle}>Description</th>
-                    <th style={thStyle}>Price</th>
-                    <th style={thStyle}>Active</th>
-                    <th style={thStyle}>Linked KitchenItems</th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.code" fallback="Code" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.englishName" fallback="English name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.germanName" fallback="German name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.description" fallback="Description" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.price" fallback="Price" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.active" fallback="Active" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.linkedKitchenItems" fallback="Linked kitchen items" /></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -660,7 +705,9 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                         <td style={tdStyle}>{service.nameDe || ""}</td>
                         <td style={tdStyle}>{service.description || ""}</td>
                         <td style={tdStyle}>{formatMoney(service.price)}</td>
-                        <td style={tdStyle}>{formatBoolean(service.isActive)}</td>
+                        <td style={tdStyle}>{service.isActive
+                          ? <AdminText i18nKey="catalogAdmin.yes" fallback="Yes" />
+                          : <AdminText i18nKey="catalogAdmin.no" fallback="No" />}</td>
                         <td style={tdStyle}>{service.linkedKitchenItems}</td>
                       </tr>
                       <tr>
@@ -668,11 +715,11 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                           <div style={editActionRowStyle}>
                             {editServiceId === service.id ? (
                               <details open style={editDetailsStyle}>
-                                <summary style={editSummaryStyle}>Editing</summary>
-                                <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel="Save service" />
+                                <summary style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.editing" fallback="Editing" /></summary>
+                                <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel={<AdminText i18nKey="catalogAdmin.saveService" fallback="Save service" />} />
                               </details>
                             ) : (
-                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editService", service.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editService", service.id)} scroll={false} style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.edit" fallback="Edit" /></Link>
                             )}
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/services/${service.id}`}
@@ -692,22 +739,22 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
         </AdminSection>
 
         <AdminSection
-          title="Claim products"
-          actions={<ActionLink href="/api/admin/catalog/claim-products/export">Export claim products</ActionLink>}
+          title={<AdminText i18nKey="catalogAdmin.claimProducts" fallback="Claim products" />}
+          actions={<ActionLink href="/api/admin/catalog/claim-products/export"><AdminText i18nKey="catalogAdmin.exportClaimProducts" fallback="Export claim products" /></ActionLink>}
         >
-          {!claimProductGroups.length ? <p style={emptyStateStyle}>No claim products found.</p> : (
+          {!claimProductGroups.length ? <p style={emptyStateStyle}><AdminText i18nKey="catalogAdmin.noClaimProducts" fallback="No claim products found." /></p> : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Linked kitchens</th>
-                    <th style={thStyle}>Part key</th>
-                    <th style={thStyle}>Article code</th>
-                    <th style={thStyle}>Name</th>
-                    <th style={thStyle}>German name</th>
-                    <th style={thStyle}>Sort order</th>
-                    <th style={thStyle}>Product info</th>
-                    <th style={thStyle}>Active</th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.linkedKitchens" fallback="Linked kitchens" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.partKey" fallback="Part key" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.articleCode" fallback="Article code" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.englishName" fallback="English name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.germanName" fallback="German name" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.sortOrder" fallback="Sort order" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.productInformation" fallback="Product info" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.active" fallback="Active" /></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -727,27 +774,29 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                         <td style={tdStyle}>{claimProduct.sortOrder}</td>
                         <td style={tdStyle}>
                           {claimProduct.productInfoPdfPath ? (
-                            <span style={{ color: "var(--app-success-text)", fontWeight: 800 }}>Ready</span>
+                            <span style={{ color: "var(--app-success-text)", fontWeight: 800 }}><AdminText i18nKey="catalogAdmin.ready" fallback="Ready" /></span>
                           ) : (
-                            <span style={{ color: "var(--app-text-muted)" }}>Missing</span>
+                            <span style={{ color: "var(--app-text-muted)" }}><AdminText i18nKey="catalogAdmin.missing" fallback="Missing" /></span>
                           )}
                         </td>
-                        <td style={tdStyle}>{formatBoolean(claimProduct.isActive)}</td>
+                        <td style={tdStyle}>{claimProduct.isActive
+                          ? <AdminText i18nKey="catalogAdmin.yes" fallback="Yes" />
+                          : <AdminText i18nKey="catalogAdmin.no" fallback="No" />}</td>
                       </tr>
                       <tr>
                         <td colSpan={8} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
                             {editClaimProductId === claimProduct.id ? (
                               <details open style={editDetailsStyle}>
-                                <summary style={editSummaryStyle}>Editing</summary>
+                                <summary style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.editing" fallback="Editing" /></summary>
                                 <ClaimProductForm
                                   action={`/api/admin/catalog/claim-products/${claimProduct.id}`}
                                   claimProduct={claimProduct}
-                                  submitLabel="Save claim product"
+                                  submitLabel={<AdminText i18nKey="catalogAdmin.saveClaimProduct" fallback="Save claim product" />}
                                 />
                               </details>
                             ) : (
-                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editClaimProduct", claimProduct.id)} scroll={false} style={editSummaryStyle}>Edit</Link>
+                              <Link href={buildCatalogEditHref(resolvedSearchParams, "editClaimProduct", claimProduct.id)} scroll={false} style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.edit" fallback="Edit" /></Link>
                             )}
                           </div>
                         </td>

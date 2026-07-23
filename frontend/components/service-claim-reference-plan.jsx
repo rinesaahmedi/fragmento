@@ -1,9 +1,23 @@
 "use client";
 
+function getRelativePosition(event) {
+  const bounds = event.currentTarget.getBoundingClientRect();
+  if (!bounds.width || !bounds.height) return null;
+  const x = Math.max(0, Math.min(100, ((event.clientX - bounds.left) / bounds.width) * 100));
+  const y = Math.max(0, Math.min(100, ((event.clientY - bounds.top) / bounds.height) * 100));
+  return {
+    x: Math.round(x * 10000) / 10000,
+    y: Math.round(y * 10000) / 10000,
+  };
+}
+
 export default function ServiceClaimReferencePlan({
   kitchenPlan,
   contractNumber,
   labels,
+  markers = [],
+  onAddMarker,
+  onUndoMarker,
 }) {
   const pdfPath = String(kitchenPlan?.pdfPath || "").trim();
   const previewImagePath = String(kitchenPlan?.previewImagePath || "").trim();
@@ -13,7 +27,6 @@ export default function ServiceClaimReferencePlan({
     <div className="service-claim-reference-plan">
       <div className="service-claim-reference-plan__header">
         <div>
-          <p className="service-claim-reference-plan__eyebrow">{labels.eyebrow}</p>
           <h3 className="service-claim-reference-plan__title">
             {kitchenPlan.kitchenName || labels.title}
           </h3>
@@ -25,42 +38,56 @@ export default function ServiceClaimReferencePlan({
       </div>
 
       {previewImagePath ? (
-        pdfPath ? (
-          <a
-            className="service-claim-reference-plan__preview-link"
-            href={pdfPath}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={labels.open}
-          >
-            <figure className="service-claim-reference-plan__preview">
+        <>
+          <p className="service-claim-reference-plan__tap-hint">
+            {labels.addMarker}
+          </p>
+          <figure className="service-claim-reference-plan__preview">
+            <div
+              className="service-claim-reference-plan__image-stage is-interactive"
+              onClick={(event) => {
+                const position = getRelativePosition(event);
+                if (position) onAddMarker?.(position);
+              }}
+              role="button"
+              tabIndex={0}
+              aria-label={labels.addMarker}
+            >
               <img
                 className="service-claim-reference-plan__image"
                 src={previewImagePath}
                 alt={labels.previewAlt}
+                draggable="false"
               />
-              <span className="service-claim-reference-plan__preview-action" aria-hidden="true">
-                <span>↗</span>
-                {labels.open}
-              </span>
-            </figure>
-          </a>
-        ) : (
-          <figure className="service-claim-reference-plan__preview">
-            <img
-              className="service-claim-reference-plan__image"
-              src={previewImagePath}
-              alt={labels.previewAlt}
-            />
+              <div className="service-claim-plan-markers" aria-hidden="true">
+                {markers.map((marker, index) => (
+                  <span
+                    key={marker.id}
+                    className="service-claim-plan-marker"
+                    style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
+                  >
+                    X
+                  </span>
+                ))}
+              </div>
+            </div>
           </figure>
-        )
+          {markers.length ? (
+            <div className="service-claim-reference-plan__marker-actions">
+              <span>{labels.markerCount.replace("{count}", String(markers.length))}</span>
+              <button type="button" onClick={onUndoMarker}>
+                {labels.undoMarker}
+              </button>
+            </div>
+          ) : null}
+        </>
       ) : (
         <div className="service-claim-reference-plan__preview-unavailable">
           {labels.previewUnavailable}
         </div>
       )}
 
-      {pdfPath && !previewImagePath ? (
+      {pdfPath ? (
         <a
           className="service-claim-reference-plan__open"
           href={pdfPath}

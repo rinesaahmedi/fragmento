@@ -721,3 +721,63 @@ export async function renderClaimKitchenPreviewPng({
     contentType: "image/png",
   };
 }
+
+export async function renderReferencePlanMarkersPng({
+  content,
+  markers = [],
+}) {
+  const normalizedMarkers = markers
+    .map((marker) => ({
+      x: Number(marker?.x),
+      y: Number(marker?.y),
+    }))
+    .filter((marker) => (
+      Number.isFinite(marker.x)
+      && marker.x >= 0
+      && marker.x <= 100
+      && Number.isFinite(marker.y)
+      && marker.y >= 0
+      && marker.y <= 100
+    ));
+  if (!content?.length || !normalizedMarkers.length) return null;
+
+  const canonical = await sharp(content)
+    .rotate()
+    .png()
+    .toBuffer({ resolveWithObject: true });
+  const width = Number(canonical.info?.width || 0);
+  const height = Number(canonical.info?.height || 0);
+  if (!width || !height) return null;
+
+  const markerDiameter = Math.max(30, Math.min(64, Math.round(width * 0.045)));
+  const fontSize = Math.max(13, Math.round(markerDiameter * 0.42));
+  const strokeWidth = Math.max(3, Math.round(markerDiameter * 0.08));
+  const markerMarkup = normalizedMarkers.map((marker) => {
+    const cx = (marker.x / 100) * width;
+    const cy = (marker.y / 100) * height;
+    return `
+      <g transform="translate(${cx} ${cy})">
+        <circle r="${markerDiameter / 2}" fill="#b42318" stroke="#ffffff" stroke-width="${strokeWidth}" />
+        <text
+          x="0"
+          y="${fontSize * 0.35}"
+          text-anchor="middle"
+          fill="#ffffff"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="${fontSize}"
+          font-weight="700"
+        >X</text>
+      </g>
+    `;
+  }).join("");
+  const overlay = Buffer.from(`
+    <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
+      ${markerMarkup}
+    </svg>
+  `);
+
+  return sharp(canonical.data)
+    .composite([{ input: overlay, left: 0, top: 0 }])
+    .png()
+    .toBuffer();
+}

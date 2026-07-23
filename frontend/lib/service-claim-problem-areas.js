@@ -21,6 +21,21 @@ export function parseServiceClaimProblemAreas(raw) {
         const articleCode = String(area?.articleCode || "").trim();
         const detail = String(area?.detail || "").trim();
         const serialNumber = String(area?.serialNumber || "").trim();
+        const markerX = Number(area?.planMarker?.x);
+        const markerY = Number(area?.planMarker?.y);
+        const planMarker = (
+          Number.isFinite(markerX)
+          && Number.isFinite(markerY)
+          && markerX >= 0
+          && markerX <= 100
+          && markerY >= 0
+          && markerY <= 100
+        )
+          ? {
+              x: Math.round(markerX * 10000) / 10000,
+              y: Math.round(markerY * 10000) / 10000,
+            }
+          : null;
         const attachments = Array.isArray(area?.attachments)
           ? area.attachments
               .map((attachment) => {
@@ -53,6 +68,7 @@ export function parseServiceClaimProblemAreas(raw) {
           ...(articleCode ? { articleCode } : {}),
           ...(detail ? { detail } : {}),
           ...(serialNumber ? { serialNumber } : {}),
+          ...(planMarker ? { planMarker } : {}),
           ...(attachments.length ? { attachments } : {}),
         };
       })

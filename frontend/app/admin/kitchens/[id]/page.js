@@ -713,7 +713,14 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                         />
                       </strong>
                       <div className="kitchen-catalog-item-card__meta" style={subMetaStyle}>
-                        <TypeBadge label={item.itemType} />
+                        <TypeBadge
+                          label={(
+                            <AdminText
+                              i18nKey={ITEM_TYPE_FILTER_LABELS[item.itemType]?.key}
+                              fallback={ITEM_TYPE_FILTER_LABELS[item.itemType]?.fallback || item.itemType}
+                            />
+                          )}
+                        />
                         <span><AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />: {item.code}</span>
                         <span><AdminText i18nKey="kitchenDetailAdmin.articleNo" fallback="Article No" />: {item.articleNumber || "-"}</span>
                         {item.blendeCode ? <span>Blende: {item.blendeCode}</span> : null}
@@ -766,21 +773,20 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
                     <section className="admin-kitchen-item-settings" aria-labelledby={`kitchen-settings-${item.id}`}>
                       <div className="admin-kitchen-item-settings__heading">
-                        <div>
-                          <h3 id={`kitchen-settings-${item.id}`}>Kitchen-specific settings</h3>
-                          <p>These values belong to this kitchen layout, not to the catalog article.</p>
-                        </div>
+                        <h3 id={`kitchen-settings-${item.id}`}>
+                          <AdminText i18nKey="kitchenDetailAdmin.kitchenSpecificSettings" fallback="Kitchen-specific settings" />
+                        </h3>
                       </div>
 
                       {item.itemType === ItemType.COMPONENT && structureSlots.length ? (
                         <AdminComponentSlotPicker
                           name="componentKey"
-                          label="Kitchen position"
+                          labelI18nKey="kitchenDetailAdmin.kitchenPosition"
+                          labelFallback="Kitchen position"
                           slots={structureSlots}
                           defaultValue={item.componentKey || ""}
                           occupiedByKey={occupiedByKey}
                           allowOccupiedKey={item.componentKey || ""}
-                          helperText="Choose where this component appears in the kitchen plan."
                           compact
                           allowEmpty={false}
                         />
@@ -793,14 +799,12 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                           <input type="checkbox" name="isLocked" value="true" defaultChecked={item.isLocked} />
                           <span>
                             <strong><AdminText i18nKey="kitchenDetailAdmin.lockedItem" fallback="Locked" /></strong>
-                            <small>Always included and cannot be removed by the customer.</small>
                           </span>
                         </label>
                         <label className="admin-kitchen-item-setting-toggle">
                           <input type="checkbox" name="isActive" value="true" defaultChecked={item.isActive} />
                           <span>
                             <strong><AdminText i18nKey="kitchenDetailAdmin.activeItem" fallback="Active" /></strong>
-                            <small>Available in this kitchen configuration.</small>
                           </span>
                         </label>
                       </div>
@@ -809,44 +813,44 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     {isClaimProductManaged ? (
                       <div className="admin-kitchen-product-info-source">
                         <div>
-                          <strong>Product Information is managed in Claim products</strong>
-                          <span>The default oven and cooktop are maintained separately in the Catalog.</span>
+                          <strong><AdminText i18nKey="kitchenDetailAdmin.productInfoManagedInClaimProducts" fallback="Product Information is managed in Claim products" /></strong>
+                          <span><AdminText i18nKey="kitchenDetailAdmin.defaultOvenCooktopManagedSeparately" fallback="The default oven and cooktop are maintained separately in the Catalog." /></span>
                         </div>
                         <Link
                           href="/admin/catalog/articles"
                           className="admin-kitchen-product-info-source__link"
                         >
-                          Open Claim products
+                          <AdminText i18nKey="kitchenDetailAdmin.openClaimProducts" fallback="Open Claim products" />
                         </Link>
                       </div>
                     ) : item.catalogArticleId ? (
                       <div className="admin-kitchen-product-info-source">
                         <div>
-                          <strong>Product Information is managed in Catalog</strong>
+                          <strong><AdminText i18nKey="kitchenDetailAdmin.productInfoManagedInCatalog" fallback="Product Information is managed in Catalog" /></strong>
                           <span>
                             {item.catalogArticle?.productInfoPdfPath
-                              ? "Catalog document ready"
-                              : "No Product Information has been added to this catalog article yet"}
+                              ? <AdminText i18nKey="kitchenDetailAdmin.catalogDocumentReady" fallback="Catalog document ready" />
+                              : <AdminText i18nKey="kitchenDetailAdmin.noProductInfoForCatalogArticle" fallback="No Product Information has been added to this catalog article yet" />}
                           </span>
                         </div>
                         <Link
                           href={`/admin/catalog/articles?editArticle=${encodeURIComponent(item.catalogArticleId)}`}
                           className="admin-kitchen-product-info-source__link"
                         >
-                          Open catalog article
+                          <AdminText i18nKey="kitchenDetailAdmin.openCatalogArticle" fallback="Open catalog article" />
                         </Link>
                       </div>
                     ) : (
                       <div className="admin-kitchen-product-info-source admin-kitchen-product-info-source--warning">
                         <div>
-                          <strong>Catalog link required</strong>
-                          <span>Select an article or service from Catalog before saving this item.</span>
+                          <strong><AdminText i18nKey="kitchenDetailAdmin.catalogLinkRequired" fallback="Catalog link required" /></strong>
+                          <span><AdminText i18nKey="kitchenDetailAdmin.selectCatalogBeforeSaving" fallback="Select an article or service from Catalog before saving this item." /></span>
                         </div>
                         <Link
                           href="/admin/catalog/articles"
                           className="admin-kitchen-product-info-source__link"
                         >
-                          Open Catalog
+                          <AdminText i18nKey="kitchenDetailAdmin.openCatalog" fallback="Open Catalog" />
                         </Link>
                       </div>
                     )}
@@ -913,11 +917,11 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               </fieldset>
 
               <fieldset style={formGroupStyle}>
-                <legend style={formGroupLegendStyle}>Catalog Links</legend>
+                <legend style={formGroupLegendStyle}><AdminText i18nKey="kitchenDetailAdmin.catalogLinks" fallback="Catalog links" /></legend>
                 <div style={formGridStyle}>
-                  <FormField label="Catalog article">
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.catalogArticle" fallback="Catalog article" />}>
                     <AdminSelect name="catalogArticleId" defaultValue="" style={inputStyle}>
-                      <option value="">No article link</option>
+                      <option value=""><AdminText i18nKey="kitchenDetailAdmin.noArticleLink" fallback="No article link" /></option>
                       {catalogArticles.map((article) => (
                         <option key={article.id} value={article.id}>
                           {article.articleNumber} - {article.nameDe || article.name} ({formatCurrency(article.price)})
@@ -925,9 +929,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       ))}
                     </AdminSelect>
                   </FormField>
-                  <FormField label="Blende">
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.blende" fallback="Blende" />}>
                     <AdminSelect name="catalogBlendeId" defaultValue="" style={inputStyle}>
-                      <option value="">No blende</option>
+                      <option value=""><AdminText i18nKey="kitchenDetailAdmin.noIncludedBlende" fallback="No blende" /></option>
                       {catalogBlenden.map((blende) => (
                         <option key={blende.id} value={blende.id}>
                           {blende.code} - {blende.nameDe || blende.name} ({formatCurrency(blende.price)})
@@ -935,12 +939,12 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                       ))}
                     </AdminSelect>
                   </FormField>
-                  <FormField label="Blende quantity">
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.quantity" fallback="Quantity" />}>
                     <input type="number" name="catalogBlendeQuantity" min="1" step="1" placeholder="1" style={inputStyle} />
                   </FormField>
-                  <FormField label="Service catalog link">
+                  <FormField label={<AdminText i18nKey="kitchenDetailAdmin.serviceCatalogLink" fallback="Service catalog link" />}>
                     <AdminSelect name="catalogServiceId" defaultValue="" style={inputStyle}>
-                      <option value="">No service link</option>
+                      <option value=""><AdminText i18nKey="kitchenDetailAdmin.noServiceLink" fallback="No service link" /></option>
                       {catalogServices.map((service) => (
                         <option key={service.id} value={service.id}>
                           {service.code} - {service.nameDe || service.name} ({formatCurrency(service.price)})
@@ -989,14 +993,14 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
               <div className="admin-kitchen-product-info-source">
                 <div>
-                  <strong>Product Information is managed in Catalog</strong>
-                  <span>Choose a catalog article, then add or edit its PDF and chatbot data in Catalog.</span>
+                  <strong><AdminText i18nKey="kitchenDetailAdmin.productInfoManagedInCatalog" fallback="Product Information is managed in Catalog" /></strong>
+                  <span><AdminText i18nKey="kitchenDetailAdmin.chooseCatalogThenEditProductInfo" fallback="Choose a catalog article, then add or edit its PDF and chatbot data in Catalog." /></span>
                 </div>
                 <Link
                   href="/admin/catalog/articles"
                   className="admin-kitchen-product-info-source__link"
                 >
-                  Open Catalog
+                  <AdminText i18nKey="kitchenDetailAdmin.openCatalog" fallback="Open Catalog" />
                 </Link>
               </div>
 

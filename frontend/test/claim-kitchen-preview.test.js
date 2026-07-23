@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import test from "node:test";
+import sharp from "sharp";
 import {
   applyVisibleComponentsToSvgMarkup,
   buildKitchenPreviewSvgMarkup,
@@ -8,6 +9,7 @@ import {
   inferKitchenSlugFromSelectedAreas,
   resolveClaimPreviewComponentKeys,
   resolveSelectedClaimPlanHotspots,
+  renderReferencePlanMarkersPng,
 } from "../lib/claim-kitchen-preview.js";
 import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
 import { buildServiceClaimPartHotspots } from "../lib/service-claim-kitchen-hotspots.js";
@@ -200,4 +202,31 @@ test("AB 105758 email oven polygon uses the exact service-view coordinates after
   assert.ok(Math.abs(emailOven.top - ((54.783193 - crop.top) / crop.height) * 100) < 0.0001);
   assert.ok(Math.abs(emailOven.width - ((55.653207 - 46.218527) / crop.width) * 100) < 0.0001);
   assert.ok(Math.abs(emailOven.height - ((76.685714 - 54.783193) / crop.height) * 100) < 0.0001);
+});
+
+test("reference-plan email renderer composites numbered markers without changing dimensions", async () => {
+  const source = await sharp({
+    create: {
+      width: 240,
+      height: 120,
+      channels: 4,
+      background: "#ffffff",
+    },
+  }).png().toBuffer();
+
+  const rendered = await renderReferencePlanMarkersPng({
+    content: source,
+    markers: [{ markerNumber: 2, x: 50, y: 50 }],
+  });
+  const { data, info } = await sharp(rendered).raw().toBuffer({ resolveWithObject: true });
+  let redPixelCount = 0;
+  for (let offset = 0; offset < data.length; offset += info.channels) {
+    if (data[offset] > 120 && data[offset + 1] < 90 && data[offset + 2] < 90) {
+      redPixelCount += 1;
+    }
+  }
+
+  assert.equal(info.width, 240);
+  assert.equal(info.height, 120);
+  assert.ok(redPixelCount > 100);
 });

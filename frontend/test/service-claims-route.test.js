@@ -85,6 +85,17 @@ test("service-claims route embeds the ARC contract sketch or attaches its PDF fa
   assert.match(source, /Küchenskizze als PDF im Anhang/);
   assert.match(source, /contractType:\s*contract\.contractType/);
 });
+
+test("service-claims route validates optional ARC sketch markers and renders them into the email image", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /Invalid kitchen-sketch marker coordinates/);
+  assert.match(source, /renderReferencePlanMarkersPng/);
+  assert.match(source, /arc-kitchen-sketch-marked-/);
+  assert.match(source, /annotatedContent \|\| previewAsset\.content/);
+  assert.match(source, />Skizzenposition</);
+  assert.match(source, /markerNumber:\s*area\.planMarker \? index \+ 1 : null/);
+});
 test("service-claims route resolves item names and article numbers from the contract kitchen database", () => {
   const source = fs.readFileSync(routePath, "utf8");
 

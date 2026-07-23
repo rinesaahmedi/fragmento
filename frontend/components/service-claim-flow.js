@@ -728,6 +728,20 @@ const COPY = {
     referencePlanPdfAria: "PDF-K\u00fcchenplan zum Vertrag",
     referencePlanPreviewAlt: "K\u00fcchenskizze zum Vertrag",
     referencePlanPreviewUnavailable: "F\u00fcr diesen Plan ist noch keine Bildvorschau hinterlegt. Du kannst den PDF-Plan separat \u00f6ffnen.",
+    referenceMarkerAdd: "Klicken Sie auf die Stelle mit dem Problem (optional)",
+    referenceMarkerUndo: "Letztes X entfernen",
+    referenceMarkerCount: "{count} Markierung(en)",
+    referenceMarkerChange: "Markierung \u00e4ndern",
+    referenceMarkerPlaced: "Skizzenposition: X{number}",
+    referenceMarkerTitle: "Position X{number} markieren",
+    referenceMarkerInstruction: "Klicke oder tippe auf die betroffene Stelle in der K\u00fcchenskizze.",
+    referenceMarkerRemove: "Markierung entfernen",
+    referenceMarkerDone: "Fertig",
+    referenceMarkerClose: "Markierungseditor schlie\u00dfen",
+    referenceMarkerChooseType: "Was ist betroffen?",
+    referenceMarkerProblems: "Markierte Probleme",
+    referenceMarkerEmpty: "Tippe direkt auf die K\u00fcchenskizze, um ein Problem hinzuzuf\u00fcgen.",
+    referenceMarkerEdit: "Problem bearbeiten",
     referencePlanAffectedArea: "Betroffenes Teil oder Bereich",
     referencePlanAffectedAreaPlaceholder: "z. B. Unterschrank unter der Sp\u00fcle, Arbeitsplatte links, K\u00fchlschrank",
     referencePlanPhotoHint: "Tipp: Lade zus\u00e4tzlich ein \u00dcbersichtsbild und ein Detailfoto des betroffenen Bereichs hoch.",
@@ -1008,6 +1022,20 @@ const COPY = {
     referencePlanPdfAria: "PDF kitchen plan for this contract",
     referencePlanPreviewAlt: "Kitchen sketch for this contract",
     referencePlanPreviewUnavailable: "An image preview is not available for this plan yet. You can open the PDF plan separately.",
+    referenceMarkerAdd: "Click the part where the problem is (optional)",
+    referenceMarkerUndo: "Remove last X",
+    referenceMarkerCount: "{count} marker(s)",
+    referenceMarkerChange: "Change marker",
+    referenceMarkerPlaced: "Sketch position: X{number}",
+    referenceMarkerTitle: "Mark position X{number}",
+    referenceMarkerInstruction: "Click or tap the affected position on the kitchen sketch.",
+    referenceMarkerRemove: "Remove marker",
+    referenceMarkerDone: "Done",
+    referenceMarkerClose: "Close marker editor",
+    referenceMarkerChooseType: "What is affected?",
+    referenceMarkerProblems: "Marked problems",
+    referenceMarkerEmpty: "Tap directly on the kitchen sketch to add a problem.",
+    referenceMarkerEdit: "Edit problem",
     referencePlanAffectedArea: "Affected part or area",
     referencePlanAffectedAreaPlaceholder: "e.g. cabinet below the sink, left worktop, refrigerator",
     referencePlanPhotoHint: "Tip: upload one overview photo and one close-up of the affected area.",
@@ -1091,6 +1119,20 @@ const COPY = {
   },
   tr: {
     eyebrow: "Fragmento Servis",
+    referenceMarkerAdd: "Sorunun oldu\u011fu yere t\u0131klay\u0131n (iste\u011fe ba\u011fl\u0131)",
+    referenceMarkerUndo: "Son X i\u015faretini kald\u0131r",
+    referenceMarkerCount: "{count} i\u015faret",
+    referenceMarkerChange: "\u0130\u015fareti de\u011fi\u015ftir",
+    referenceMarkerPlaced: "Kroki konumu: X{number}",
+    referenceMarkerTitle: "X{number} konumunu i\u015faretle",
+    referenceMarkerInstruction: "Mutfak krokisinde etkilenen yere t\u0131klay\u0131n veya dokunun.",
+    referenceMarkerRemove: "\u0130\u015fareti kald\u0131r",
+    referenceMarkerDone: "Bitti",
+    referenceMarkerClose: "\u0130\u015faretleme d\u00fczenleyicisini kapat",
+    referenceMarkerChooseType: "Etkilenen nedir?",
+    referenceMarkerProblems: "\u0130\u015faretli sorunlar",
+    referenceMarkerEmpty: "Sorun eklemek i\u00e7in do\u011frudan mutfak krokisine dokunun.",
+    referenceMarkerEdit: "Sorunu d\u00fczenle",
     title: "architecto'ya Ho\u015f Geldiniz",
     intro:
       "Talebinize uygun yolu se\u00e7in. Sipari\u015f veya ek sat\u0131n alma ile devam edebilir ya da do\u011frudan destek ekibine \u015fikayet g\u00f6nderebilirsiniz.",
@@ -1293,6 +1335,20 @@ const COPY = {
   },
   es: {
     eyebrow: "Servicio Fragmento",
+    referenceMarkerAdd: "Haz clic donde se encuentra el problema (opcional)",
+    referenceMarkerUndo: "Quitar la \u00faltima X",
+    referenceMarkerCount: "{count} marca(s)",
+    referenceMarkerChange: "Cambiar marcador",
+    referenceMarkerPlaced: "Posici\u00f3n en el croquis: X{number}",
+    referenceMarkerTitle: "Marcar posici\u00f3n X{number}",
+    referenceMarkerInstruction: "Haga clic o toque la zona afectada en el croquis de la cocina.",
+    referenceMarkerRemove: "Quitar marcador",
+    referenceMarkerDone: "Listo",
+    referenceMarkerClose: "Cerrar editor de marcadores",
+    referenceMarkerChooseType: "\u00bfQu\u00e9 est\u00e1 afectado?",
+    referenceMarkerProblems: "Problemas marcados",
+    referenceMarkerEmpty: "Toque directamente el croquis de la cocina para a\u00f1adir un problema.",
+    referenceMarkerEdit: "Editar problema",
     title: "Bienvenido a architecto",
     intro:
       "Elige la opci\u00f3n adecuada para tu solicitud. Puedes continuar con un pedido o una compra adicional, o enviar una reclamaci\u00f3n al equipo de soporte.",
@@ -1495,6 +1551,20 @@ const COPY = {
   },
   fr: {
     eyebrow: "Service Fragmento",
+    referenceMarkerAdd: "Cliquez sur l\u2019endroit o\u00f9 se trouve le probl\u00e8me (facultatif)",
+    referenceMarkerUndo: "Supprimer le dernier X",
+    referenceMarkerCount: "{count} rep\u00e8re(s)",
+    referenceMarkerChange: "Modifier le rep\u00e8re",
+    referenceMarkerPlaced: "Position sur le croquis : X{number}",
+    referenceMarkerTitle: "Marquer la position X{number}",
+    referenceMarkerInstruction: "Cliquez ou touchez la zone concern\u00e9e sur le croquis de la cuisine.",
+    referenceMarkerRemove: "Supprimer le rep\u00e8re",
+    referenceMarkerDone: "Termin\u00e9",
+    referenceMarkerClose: "Fermer l\u2019\u00e9diteur de rep\u00e8res",
+    referenceMarkerChooseType: "Qu\u2019est-ce qui est concern\u00e9 ?",
+    referenceMarkerProblems: "Probl\u00e8mes rep\u00e9r\u00e9s",
+    referenceMarkerEmpty: "Touchez directement le croquis de la cuisine pour ajouter un probl\u00e8me.",
+    referenceMarkerEdit: "Modifier le probl\u00e8me",
     title: "Bienvenue chez architecto",
     intro:
       "Choisissez le parcours adapt\u00e9 \u00e0 votre demande. Vous pouvez poursuivre une commande ou un achat compl\u00e9mentaire, ou envoyer une r\u00e9clamation \u00e0 notre \u00e9quipe de support.",
@@ -1697,6 +1767,20 @@ const COPY = {
   },
   ru: {
     eyebrow: "\u0421\u0435\u0440\u0432\u0438\u0441 Fragmento",
+    referenceMarkerAdd: "\u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u043d\u0430 \u043c\u0435\u0441\u0442\u043e, \u0433\u0434\u0435 \u0435\u0441\u0442\u044c \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0430 (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
+    referenceMarkerUndo: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0439 X",
+    referenceMarkerCount: "\u041c\u0435\u0442\u043e\u043a: {count}",
+    referenceMarkerChange: "\u0418\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u043c\u0435\u0442\u043a\u0443",
+    referenceMarkerPlaced: "\u041f\u043e\u0437\u0438\u0446\u0438\u044f \u043d\u0430 \u044d\u0441\u043a\u0438\u0437\u0435: X{number}",
+    referenceMarkerTitle: "\u041e\u0442\u043c\u0435\u0442\u0438\u0442\u044c \u043f\u043e\u0437\u0438\u0446\u0438\u044e X{number}",
+    referenceMarkerInstruction: "\u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u0438\u043b\u0438 \u043a\u043e\u0441\u043d\u0438\u0442\u0435\u0441\u044c \u043d\u0443\u0436\u043d\u043e\u0433\u043e \u043c\u0435\u0441\u0442\u0430 \u043d\u0430 \u044d\u0441\u043a\u0438\u0437\u0435 \u043a\u0443\u0445\u043d\u0438.",
+    referenceMarkerRemove: "\u0423\u0434\u0430\u043b\u0438\u0442\u044c \u043c\u0435\u0442\u043a\u0443",
+    referenceMarkerDone: "\u0413\u043e\u0442\u043e\u0432\u043e",
+    referenceMarkerClose: "\u0417\u0430\u043a\u0440\u044b\u0442\u044c \u0440\u0435\u0434\u0430\u043a\u0442\u043e\u0440 \u043c\u0435\u0442\u043e\u043a",
+    referenceMarkerChooseType: "\u0427\u0442\u043e \u043f\u043e\u0432\u0440\u0435\u0436\u0434\u0435\u043d\u043e?",
+    referenceMarkerProblems: "\u041e\u0442\u043c\u0435\u0447\u0435\u043d\u043d\u044b\u0435 \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u044b",
+    referenceMarkerEmpty: "\u041d\u0430\u0436\u043c\u0438\u0442\u0435 \u043f\u0440\u044f\u043c\u043e \u043d\u0430 \u044d\u0441\u043a\u0438\u0437 \u043a\u0443\u0445\u043d\u0438, \u0447\u0442\u043e\u0431\u044b \u0434\u043e\u0431\u0430\u0432\u0438\u0442\u044c \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0443.",
+    referenceMarkerEdit: "\u0418\u0437\u043c\u0435\u043d\u0438\u0442\u044c \u043f\u0440\u043e\u0431\u043b\u0435\u043c\u0443",
     title: "\u0414\u043e\u0431\u0440\u043e \u043f\u043e\u0436\u0430\u043b\u043e\u0432\u0430\u0442\u044c \u0432 architecto",
     intro:
       "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u043f\u043e\u0434\u0445\u043e\u0434\u044f\u0449\u0438\u0439 \u043f\u0443\u0442\u044c \u0434\u043b\u044f \u0432\u0430\u0448\u0435\u0433\u043e \u0437\u0430\u043f\u0440\u043e\u0441\u0430. \u0412\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u043f\u0440\u043e\u0434\u043e\u043b\u0436\u0438\u0442\u044c \u0437\u0430\u043a\u0430\u0437 \u0438\u043b\u0438 \u0434\u043e\u043f\u043e\u043a\u0443\u043f\u043a\u0443, \u0438\u043b\u0438 \u043e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0440\u0435\u043a\u043b\u0430\u043c\u0430\u0446\u0438\u044e \u0432 \u0441\u043b\u0443\u0436\u0431\u0443 \u043f\u043e\u0434\u0434\u0435\u0440\u0436\u043a\u0438.",
@@ -2242,6 +2326,7 @@ export default function ServiceClaimFlow() {
   const [referenceFurnitureInvolved, setReferenceFurnitureInvolved] = useState("no");
   const [referenceElectricalIssues, setReferenceElectricalIssues] = useState([]);
   const [referenceFurnitureIssues, setReferenceFurnitureIssues] = useState([]);
+  const [referenceSketchMarkers, setReferenceSketchMarkers] = useState([]);
   const [attachmentFieldKey, setAttachmentFieldKey] = useState(0);
   const [serialNumberImageFieldKeysByComponentId, setSerialNumberImageFieldKeysByComponentId] = useState({});
   const [problemAreaAttachmentFieldKeysByComponentId, setProblemAreaAttachmentFieldKeysByComponentId] = useState({});
@@ -2284,6 +2369,7 @@ export default function ServiceClaimFlow() {
   const claimAssistantLastVoiceSubmitRef = useRef({ text: "", submittedAt: 0 });
   const latestFormRef = useRef(INITIAL_FORM);
   const referenceIssueIdRef = useRef(0);
+  const referenceSketchMarkerIdRef = useRef(0);
   const preferredContactCalendarRef = useRef(null);
   const preferredContactTimeFromRef = useRef(null);
   const preferredContactTimeToRef = useRef(null);
@@ -2612,7 +2698,6 @@ export default function ServiceClaimFlow() {
     ),
     [referenceElectricalIssues, referenceFurnitureIssues],
   );
-
   function isPreferredContactToTimeDisabled(nextValue) {
     if (!formValues.preferredContactTimeFrom) {
       return false;
@@ -3126,6 +3211,7 @@ export default function ServiceClaimFlow() {
       setReferenceFurnitureInvolved("no");
       setReferenceElectricalIssues([]);
       setReferenceFurnitureIssues([]);
+      setReferenceSketchMarkers([]);
 
       if (contractLookupTimeoutRef.current) {
         window.clearTimeout(contractLookupTimeoutRef.current);
@@ -3560,6 +3646,24 @@ export default function ServiceClaimFlow() {
   function getNextReferenceIssueId(prefix) {
     referenceIssueIdRef.current += 1;
     return `${prefix}-${Date.now()}-${referenceIssueIdRef.current}`;
+  }
+
+  function addReferenceSketchMarker(position) {
+    referenceSketchMarkerIdRef.current += 1;
+    setReferenceSketchMarkers((current) => [
+      ...current,
+      {
+        id: `sketch-marker-${referenceSketchMarkerIdRef.current}`,
+        x: position.x,
+        y: position.y,
+      },
+    ]);
+    if (error) setError("");
+  }
+
+  function undoReferenceSketchMarker() {
+    setReferenceSketchMarkers((current) => current.slice(0, -1));
+    if (error) setError("");
   }
 
   function handleReferenceElectricalInvolvedChange(value) {
@@ -4307,6 +4411,10 @@ export default function ServiceClaimFlow() {
         })),
       ];
       formData.append("referenceIssuesJson", JSON.stringify(referenceIssues));
+      formData.append(
+        "sketchMarkersJson",
+        JSON.stringify(referenceSketchMarkers.map(({ x, y }) => ({ x, y }))),
+      );
       for (const area of electricalProblemAreas) {
         if (area.serialNumberImage) {
           formData.append(`serialNumberImage:${area.rowComponentId}`, area.serialNumberImage);
@@ -4359,6 +4467,7 @@ export default function ServiceClaimFlow() {
       setReferenceFurnitureInvolved("no");
       setReferenceElectricalIssues([]);
       setReferenceFurnitureIssues([]);
+      setReferenceSketchMarkers([]);
       setProblemComponentIds([]);
       setProblemAreaPartChoiceByGroupKey({});
       setConfirmedProblemAreaChoiceByGroupKey({});
@@ -5778,6 +5887,9 @@ export default function ServiceClaimFlow() {
                   <ServiceClaimReferencePlan
                     kitchenPlan={activeKitchenPlan}
                     contractNumber={normalizedContractNumber}
+                    markers={referenceSketchMarkers}
+                    onAddMarker={addReferenceSketchMarker}
+                    onUndoMarker={undoReferenceSketchMarker}
                     labels={{
                       eyebrow: t("referencePlanEyebrow"),
                       title: t("referencePlanTitle"),
@@ -5785,6 +5897,9 @@ export default function ServiceClaimFlow() {
                       open: t("referencePlanOpen"),
                       previewAlt: t("referencePlanPreviewAlt"),
                       previewUnavailable: t("referencePlanPreviewUnavailable"),
+                      addMarker: t("referenceMarkerAdd"),
+                      undoMarker: t("referenceMarkerUndo"),
+                      markerCount: t("referenceMarkerCount"),
                     }}
                   />
                   <div className="service-reference-flow">
