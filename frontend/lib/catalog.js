@@ -5,6 +5,10 @@ import { applyDueScheduledCatalogPriceListImports } from "./catalog-price-list-i
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
 import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
 import { buildAuszugVariantMetadata } from "./auszug-variants.js";
+import {
+  CATALOG_PRODUCT_INFORMATION_SELECT,
+  resolveProductInformation,
+} from "./product-information.js";
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
@@ -164,6 +168,7 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
   catalogArticleId: true,
   catalogArticle: {
     select: {
+      id: true,
       articleNumber: true,
       name: true,
       nameDe: true,
@@ -171,6 +176,7 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
       widthMm: true,
       heightMm: true,
       depthMm: true,
+      ...CATALOG_PRODUCT_INFORMATION_SELECT,
     },
   },
   catalogBlendeId: true,
@@ -204,11 +210,16 @@ export async function getKitchenBySlug(slug) {
     return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
+        claimParts: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { partKey: "asc" }],
+        },
         items: {
           where: { isActive: true },
           include: {
             catalogArticle: {
               select: {
+                id: true,
                 articleNumber: true,
                 name: true,
                 nameDe: true,
@@ -216,6 +227,7 @@ export async function getKitchenBySlug(slug) {
                 widthMm: true,
                 heightMm: true,
                 depthMm: true,
+                ...CATALOG_PRODUCT_INFORMATION_SELECT,
               },
             },
             catalogBlende: true,
@@ -241,6 +253,10 @@ export async function getKitchenBySlug(slug) {
     return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
+        claimParts: {
+          where: { isActive: true },
+          orderBy: [{ sortOrder: "asc" }, { partKey: "asc" }],
+        },
         items: {
           where: { isActive: true },
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
@@ -1079,11 +1095,16 @@ async function attachHousingCompaniesToContracts(contracts) {
 
 export function serializeKitchenForLegacy(kitchen) {
   const items = kitchen.items || [];
+  const claimParts = kitchen.claimParts || [];
   const auszugVariantArticles = kitchen.auszugVariantArticles || [];
   const toClientItem = (item) => {
     const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
     const catalogService = item.catalogServiceId ? item.catalogService : null;
     const catalogBlende = item.catalogBlendeId ? item.catalogBlende : null;
+    const claimProducts = claimParts.filter(
+      (part) => String(part?.sourceKitchenItemCode || "") === String(item.code || ""),
+    );
+    const productInformation = resolveProductInformation({ ...item, claimProducts });
     const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
     const catalogPrice = (() => {
       if (catalogService?.price != null) {
@@ -1118,12 +1139,14 @@ export function serializeKitchenForLegacy(kitchen) {
       heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
       depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
-      productImagePath: item.productImagePath || "",
-      productInfoPdfPath: item.productInfoPdfPath || "",
-      productInfoSummary: item.productInfoSummary || "",
-      productInfoKeyFacts: Array.isArray(item.productInfoKeyFacts) ? item.productInfoKeyFacts : [],
-      productInfoExtractedText: item.productInfoExtractedText || "",
-      productInfoUpdatedAt: item.productInfoUpdatedAt instanceof Date ? item.productInfoUpdatedAt.toISOString() : "",
+      productImagePath: productInformation.productImagePath,
+      productInfoPdfPath: productInformation.productInfoPdfPath,
+      productInfoSummary: productInformation.productInfoSummary,
+      productInfoKeyFacts: productInformation.productInfoKeyFacts,
+      productInfoExtractedText: productInformation.productInfoExtractedText,
+      productInfoUpdatedAt: productInformation.productInfoUpdatedAt instanceof Date
+        ? productInformation.productInfoUpdatedAt.toISOString()
+        : "",
       iconKey: item.iconKey || "",
       colorKey: item.colorKey || "",
       componentKey: item.componentKey || "",

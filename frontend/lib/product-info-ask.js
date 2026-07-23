@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { prisma } from "./prisma";
 import { getKitchenContractForAccess } from "./kitchen-contracts";
 import { getProductInfoDocuments } from "../components/kitchen-selection-utils";
+import {
+  CATALOG_PRODUCT_INFORMATION_SELECT,
+  resolveProductInformation,
+} from "./product-information";
 
 
 const LANGUAGE_LABELS = {
@@ -3426,7 +3430,7 @@ async function loadAuthorizedProductInfoItems({ itemIds, contractNumber, kitchen
     throw routeError("Contract number does not match the selected kitchen.", 403);
   }
 
-  const items = await prisma.kitchenItem.findMany({
+  const itemRows = await prisma.kitchenItem.findMany({
     where: {
       id: { in: itemIds },
       isActive: true,
@@ -3436,6 +3440,10 @@ async function loadAuthorizedProductInfoItems({ itemIds, contractNumber, kitchen
       id: true,
       code: true,
       name: true,
+      catalogArticleId: true,
+      catalogArticle: {
+        select: CATALOG_PRODUCT_INFORMATION_SELECT,
+      },
       productInfoPdfPath: true,
       productInfoSummary: true,
       productInfoKeyFacts: true,
@@ -3444,6 +3452,35 @@ async function loadAuthorizedProductInfoItems({ itemIds, contractNumber, kitchen
     },
     orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
   });
+  const claimProducts = prisma.kitchenClaimPart?.findMany
+    ? await prisma.kitchenClaimPart.findMany({
+      where: {
+        kitchenId: contract.kitchenId,
+        isActive: true,
+        sourceKitchenItemCode: { in: itemRows.map((item) => item.code) },
+      },
+      select: {
+        sourceKitchenItemCode: true,
+        productImagePath: true,
+        productInfoPdfPath: true,
+        productInfoSummary: true,
+        productInfoKeyFacts: true,
+        productInfoExtractedText: true,
+        productInfoUpdatedAt: true,
+        sortOrder: true,
+      },
+      orderBy: [{ sortOrder: "asc" }, { partKey: "asc" }],
+    })
+    : [];
+  const items = itemRows.map((item) => ({
+    ...item,
+    ...resolveProductInformation({
+      ...item,
+      claimProducts: claimProducts.filter(
+        (part) => String(part.sourceKitchenItemCode || "") === String(item.code || ""),
+      ),
+    }),
+  }));
 
   if (!items.length) {
     throw routeError("No authorized active product items were found.", 404);

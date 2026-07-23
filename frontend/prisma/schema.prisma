@@ -64,6 +64,12 @@ model CatalogArticle {
   depthMm             Int?
   price               Decimal                      @db.Decimal(10, 2)
   itemType            ItemType
+  productImagePath         String?
+  productInfoPdfPath       String?
+  productInfoSummary       String?
+  productInfoKeyFacts      Json?
+  productInfoExtractedText String?
+  productInfoUpdatedAt     DateTime?
   isFixedPricePackage Boolean                      @default(false)
   isActive            Boolean                      @default(true)
   createdAt           DateTime                     @default(now())
@@ -278,19 +284,25 @@ model Kitchen {
 }
 
 model KitchenClaimPart {
-  id                    String   @id @default(cuid())
-  kitchenId             String
-  kitchen               Kitchen  @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
-  partKey               String
-  name                  String
-  nameDe                String?
-  articleCode           String?
-  sourceKitchenItemCode String?
-  sourceComponentKey    String?
-  isActive              Boolean  @default(true)
-  sortOrder             Int      @default(0)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                       String   @id @default(cuid())
+  kitchenId                String
+  kitchen                  Kitchen  @relation(fields: [kitchenId], references: [id], onDelete: Cascade)
+  partKey                  String
+  name                     String
+  nameDe                   String?
+  articleCode              String?
+  sourceKitchenItemCode    String?
+  sourceComponentKey       String?
+  productImagePath         String?
+  productInfoPdfPath       String?
+  productInfoSummary       String?
+  productInfoKeyFacts      Json?
+  productInfoExtractedText String?
+  productInfoUpdatedAt     DateTime?
+  isActive                 Boolean  @default(true)
+  sortOrder                Int      @default(0)
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
 
   @@unique([kitchenId, partKey])
   @@index([kitchenId, isActive])

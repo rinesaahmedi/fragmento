@@ -972,14 +972,12 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "l-kitchen-new": [["component-top-400", "component-aspirator"]],
 };
 
-const FLAT_HOOD_PRODUCT_INFO_PDF_HREF = "/product-info/fh-664-621-s-product-info.pdf";
+const FLAT_HOOD_PRODUCT_INFO_PDF_HREF = "/product-info/extractor-hood-flat-product-info.pdf";
 const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
-  { label: "E-Label PDF", href: "/product-info/fh-664-621-s-elabel-eco21-2512.pdf" },
   { label: "Produktinfo PDF", href: FLAT_HOOD_PRODUCT_INFO_PDF_HREF },
 ];
 const FRIDGE_PRODUCT_INFO_PDF_HREF = "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf";
 const FRIDGE_PRODUCT_INFO_DOCUMENTS = [
-  { label: "E-Label PDF", href: "/product-info/kgc-15495-s-elabel-eco21-2602.pdf" },
   { label: "Produktinfo PDF", href: FRIDGE_PRODUCT_INFO_PDF_HREF },
 ];
 

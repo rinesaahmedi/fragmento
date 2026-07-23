@@ -23,11 +23,17 @@ function blendeTotalCents(blende, quantity) {
   return moneyToCents(blende.price) * (Number.parseInt(String(quantity || 1), 10) || 1);
 }
 
+function formatCurrency(value) {
+  return new Intl.NumberFormat("de-DE", {
+    style: "currency",
+    currency: "EUR",
+  }).format(Number(value || 0));
+}
+
 export default function AdminBlendePriceFields({
   totalPriceDefaultValue = "0.00",
   priceStyle,
   selectStyle,
-  relationGridStyle,
   catalogBlenden = [],
   catalogServices = [],
   catalogArticles = [],
@@ -61,29 +67,18 @@ export default function AdminBlendePriceFields({
   const totalPrice = centsToMoney(moneyToCents(articlePrice) + blendeTotalCents(selectedBlende, quantity));
 
   return (
-    <>
-      <div style={relationGridStyle}>
-        <FormField label="Article price" wide={false}>
-          <input
-            name="articleBasePrice"
-            value={articlePrice}
-            onChange={(event) => setArticlePrice(event.target.value)}
-            style={priceStyle}
-            required
-          />
-        </FormField>
-        <FormField label="Blende unit price" wide={false}>
-          <input value={selectedBlendeUnitPrice} style={priceStyle} readOnly />
-        </FormField>
-        <FormField label="Blende total" wide={false}>
-          <input value={selectedBlendeTotal} style={priceStyle} readOnly />
-        </FormField>
-        <FormField label="Total price" wide={false}>
-          <input name="price" value={totalPrice} style={priceStyle} readOnly required />
-        </FormField>
+    <section className="admin-catalog-editor" aria-labelledby="admin-catalog-editor-title">
+      <div className="admin-catalog-editor__heading">
+        <div>
+          <h3 id="admin-catalog-editor-title">Catalog &amp; pricing</h3>
+          <p>Catalog values are used automatically for the article number, names and prices.</p>
+        </div>
+        <span className={`admin-catalog-editor__status${articleId ? " is-linked" : ""}`}>
+          {articleId ? "Catalog linked" : "Not linked"}
+        </span>
       </div>
 
-      <div style={relationGridStyle}>
+      <div className="admin-catalog-editor__relations">
         <FormField label="Catalog article" wide={false}>
           <AdminSelect
             name="catalogArticleId"
@@ -106,7 +101,8 @@ export default function AdminBlendePriceFields({
             ))}
           </AdminSelect>
         </FormField>
-        <FormField label="Blende" wide={false}>
+
+        <FormField label="Included Blende" wide={false}>
           <AdminSelect
             name="catalogBlendeId"
             value={blendeId}
@@ -117,7 +113,7 @@ export default function AdminBlendePriceFields({
             }}
             style={selectStyle}
           >
-            <option value="">No blende</option>
+            <option value="">No included Blende</option>
             {catalogBlenden.map((blende) => (
               <option key={blende.id} value={blende.id}>
                 {blende.code} - {blende.label} ({blende.formattedPrice})
@@ -125,7 +121,8 @@ export default function AdminBlendePriceFields({
             ))}
           </AdminSelect>
         </FormField>
-        <FormField label="Blende quantity" wide={false}>
+
+        <FormField label="Quantity" wide={false}>
           <input
             type="number"
             name="catalogBlendeQuantity"
@@ -133,20 +130,63 @@ export default function AdminBlendePriceFields({
             onChange={(event) => setQuantity(event.target.value)}
             min="1"
             step="1"
+            disabled={!blendeId}
             style={selectStyle}
           />
         </FormField>
-        <FormField label="Service catalog link" wide={false}>
-          <AdminSelect name="catalogServiceId" defaultValue={defaultServiceId || ""} style={selectStyle}>
-            <option value="">No service link</option>
-            {catalogServices.map((service) => (
-              <option key={service.id} value={service.id}>
-                {service.code} - {service.label} ({service.formattedPrice})
-              </option>
-            ))}
-          </AdminSelect>
-        </FormField>
       </div>
-    </>
+
+      {!articleId ? (
+        <div className="admin-catalog-editor__manual-price">
+          <FormField label="Manual article price" wide={false}>
+            <input
+              name="articleBasePrice"
+              value={articlePrice}
+              onChange={(event) => setArticlePrice(event.target.value)}
+              style={priceStyle}
+              required
+            />
+          </FormField>
+        </div>
+      ) : (
+        <input type="hidden" name="articleBasePrice" value={articlePrice} />
+      )}
+      <input type="hidden" name="price" value={totalPrice} />
+
+      <div className="admin-catalog-editor__price" aria-label="Price calculation">
+        <div>
+          <span>Article</span>
+          <strong>{formatCurrency(articlePrice)}</strong>
+        </div>
+        <span className="admin-catalog-editor__operator" aria-hidden="true">+</span>
+        <div>
+          <span>Blende{blendeId ? ` × ${quantity || 1}` : ""}</span>
+          <strong>{formatCurrency(selectedBlendeTotal)}</strong>
+          {blendeId ? <small>{formatCurrency(selectedBlendeUnitPrice)} each</small> : null}
+        </div>
+        <span className="admin-catalog-editor__operator" aria-hidden="true">=</span>
+        <div className="admin-catalog-editor__price-total">
+          <span>Total</span>
+          <strong>{formatCurrency(totalPrice)}</strong>
+        </div>
+      </div>
+
+      <details className="admin-catalog-editor__service-link">
+        <summary>Service catalog link</summary>
+        <div>
+          <FormField label="Linked service" wide={false}>
+            <AdminSelect name="catalogServiceId" defaultValue={defaultServiceId || ""} style={selectStyle}>
+              <option value="">No service link</option>
+              {catalogServices.map((service) => (
+                <option key={service.id} value={service.id}>
+                  {service.code} - {service.label} ({service.formattedPrice})
+                </option>
+              ))}
+            </AdminSelect>
+          </FormField>
+          <p>Only service-type items need this connection.</p>
+        </div>
+      </details>
+    </section>
   );
 }

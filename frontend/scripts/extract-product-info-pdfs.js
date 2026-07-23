@@ -6,6 +6,7 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const ADDITIONAL_PRODUCT_INFO_PDF_PATHS_BY_CODE = {
+  "EBX943600S + OL-KMI754000E": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
   "OVEN-B-600-HOB": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
   "OVEN-C-600-HOB": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
 };
@@ -51,25 +52,92 @@ async function extractPdfText(absolutePath) {
 }
 
 async function main() {
-  const items = await prisma.kitchenItem.findMany({
-    where: {
-      productInfoPdfPath: { not: null },
-    },
-    select: {
-      id: true,
-      code: true,
-      name: true,
-      productInfoPdfPath: true,
-    },
-    orderBy: [{ productInfoPdfPath: "asc" }, { code: "asc" }],
-  });
+  const [catalogArticles, allClaimProducts, allLegacyItems] = await Promise.all([
+    prisma.catalogArticle.findMany({
+      where: {
+        productInfoPdfPath: { not: null },
+      },
+      select: {
+        id: true,
+        articleNumber: true,
+        name: true,
+        productInfoPdfPath: true,
+      },
+      orderBy: [{ productInfoPdfPath: "asc" }, { articleNumber: "asc" }],
+    }),
+    prisma.kitchenClaimPart.findMany({
+      where: {
+        isActive: true,
+        productInfoPdfPath: { not: null },
+      },
+      select: {
+        id: true,
+        kitchenId: true,
+        partKey: true,
+        articleCode: true,
+        name: true,
+        sourceKitchenItemCode: true,
+        productInfoPdfPath: true,
+      },
+      orderBy: [{ articleCode: "asc" }, { partKey: "asc" }],
+    }),
+    prisma.kitchenItem.findMany({
+      where: {
+        catalogArticleId: null,
+        productInfoPdfPath: { not: null },
+      },
+      select: {
+        id: true,
+        kitchenId: true,
+        code: true,
+        name: true,
+        productInfoPdfPath: true,
+      },
+      orderBy: [{ productInfoPdfPath: "asc" }, { code: "asc" }],
+    }),
+  ]);
+  const claimProducts = [
+    ...new Map(
+      allClaimProducts.map((product) => [
+        `${product.partKey}:${product.articleCode || ""}`,
+        product,
+      ]),
+    ).values(),
+  ];
+  const claimManagedSources = new Set(
+    allClaimProducts.map(
+      (product) => `${product.kitchenId}:${product.sourceKitchenItemCode || ""}`,
+    ),
+  );
+  const legacyItems = allLegacyItems.filter(
+    (item) => !claimManagedSources.has(`${item.kitchenId}:${item.code}`),
+  );
+
+  const items = [
+    ...catalogArticles.map((article) => ({
+      ...article,
+      code: article.articleNumber,
+      source: "catalog",
+    })),
+    ...claimProducts.map((product) => ({
+      ...product,
+      code: product.articleCode || product.partKey,
+      source: "claim-product",
+    })),
+    ...legacyItems.map((item) => ({
+      ...item,
+      source: "kitchen-item",
+    })),
+  ];
 
   const itemsWithPdf = items.filter((item) => normalizePdfPath(item.productInfoPdfPath));
   const textByPdfPath = new Map();
   let updatedCount = 0;
   let skippedCount = 0;
 
-  console.log(`Found ${itemsWithPdf.length} kitchen item(s) with productInfoPdfPath.`);
+  console.log(
+    `Found ${catalogArticles.length} catalog article(s), ${claimProducts.length} claim product(s), and ${legacyItems.length} unlinked legacy item(s) with productInfoPdfPath.`,
+  );
 
   for (const item of itemsWithPdf) {
     const pdfPaths = buildPdfPathsForItem(item);
@@ -123,13 +191,30 @@ async function main() {
         continue;
       }
 
-      await prisma.kitchenItem.update({
-        where: { id: item.id },
-        data: {
-          productInfoExtractedText: text,
-          productInfoUpdatedAt: new Date(),
-        },
-      });
+      const data = {
+        productInfoExtractedText: text,
+        productInfoUpdatedAt: new Date(),
+      };
+
+      if (item.source === "catalog") {
+        await prisma.catalogArticle.update({
+          where: { id: item.id },
+          data,
+        });
+      } else if (item.source === "claim-product") {
+        await prisma.kitchenClaimPart.updateMany({
+          where: {
+            partKey: item.partKey,
+            articleCode: item.articleCode,
+          },
+          data,
+        });
+      } else {
+        await prisma.kitchenItem.update({
+          where: { id: item.id },
+          data,
+        });
+      }
       updatedCount += 1;
       console.log(`[update] ${item.code} ${item.name}`);
     } catch (error) {

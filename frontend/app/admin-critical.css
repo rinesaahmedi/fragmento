@@ -828,3 +828,245 @@
     grid-template-columns: 1fr;
   }
 }
+
+.admin-catalog-editor {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px solid rgba(107, 79, 58, 0.16);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.admin-catalog-editor__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-catalog-editor__heading h3,
+.admin-catalog-editor__heading p {
+  margin: 0;
+}
+
+.admin-catalog-editor__heading h3 {
+  color: var(--app-text);
+  font-size: 1rem;
+}
+
+.admin-catalog-editor__heading p {
+  margin-top: 4px;
+  color: var(--app-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.admin-catalog-editor__status {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid rgba(107, 79, 58, 0.14);
+  border-radius: 999px;
+  background: #f6f1eb;
+  color: var(--app-text-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.admin-catalog-editor__status.is-linked {
+  border-color: rgba(42, 145, 85, 0.24);
+  background: #edf8f1;
+  color: #237246;
+}
+
+.admin-catalog-editor__relations {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.6fr) minmax(240px, 1.25fr) minmax(90px, 0.35fr);
+  gap: 10px;
+  align-items: end;
+}
+
+.admin-catalog-editor__manual-price {
+  max-width: 280px;
+}
+
+.admin-catalog-editor__price {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr) auto minmax(140px, 1.1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(107, 79, 58, 0.12);
+  border-radius: 12px;
+  background: #fbf8f4;
+}
+
+.admin-catalog-editor__price > div {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-catalog-editor__price span,
+.admin-catalog-editor__price small {
+  color: var(--app-text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.admin-catalog-editor__price strong {
+  color: var(--app-text);
+  font-size: 0.98rem;
+}
+
+.admin-catalog-editor__price .admin-catalog-editor__operator {
+  color: rgba(107, 79, 58, 0.48);
+  font-size: 1rem;
+}
+
+.admin-catalog-editor__price-total {
+  padding-left: 14px;
+  border-left: 1px solid rgba(107, 79, 58, 0.16);
+}
+
+.admin-catalog-editor__price-total strong {
+  color: #237246;
+  font-size: 1.08rem;
+}
+
+.admin-catalog-editor__service-link,
+.admin-kitchen-item-technical {
+  border: 1px solid rgba(107, 79, 58, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.62);
+}
+
+.admin-catalog-editor__service-link summary {
+  padding: 10px 12px;
+  color: var(--app-accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-catalog-editor__service-link > div {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(180px, auto);
+  align-items: end;
+  gap: 14px;
+  padding: 0 12px 12px;
+}
+
+.admin-catalog-editor__service-link p,
+.admin-kitchen-item-technical__hint {
+  margin: 0;
+  color: var(--app-text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.admin-kitchen-item-technical {
+  margin-top: 2px;
+}
+
+.admin-kitchen-item-technical__hint {
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(107, 79, 58, 0.12);
+}
+
+.admin-kitchen-product-info-source {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(42, 145, 85, 0.2);
+  border-radius: 12px;
+  background: #f2faf5;
+}
+
+.admin-kitchen-product-info-source > div {
+  display: grid;
+  gap: 3px;
+}
+
+.admin-kitchen-product-info-source strong {
+  color: #24583b;
+  font-size: 0.86rem;
+}
+
+.admin-kitchen-product-info-source span {
+  color: var(--app-text-muted);
+  font-size: 0.76rem;
+}
+
+.admin-kitchen-product-info-source__link {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  border: 1px solid rgba(42, 145, 85, 0.24);
+  border-radius: 10px;
+  background: #fff;
+  color: #24583b;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@media (max-width: 1050px) {
+  .admin-catalog-editor__relations {
+    grid-template-columns: minmax(240px, 1fr) minmax(220px, 1fr) 100px;
+  }
+}
+
+@media (max-width: 760px) {
+  .admin-catalog-editor {
+    padding: 14px;
+  }
+
+  .admin-catalog-editor__heading,
+  .admin-catalog-editor__service-link > div {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-catalog-editor__heading {
+    display: grid;
+  }
+
+  .admin-kitchen-product-info-source {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .admin-kitchen-product-info-source__link {
+    text-align: center;
+  }
+
+  .admin-catalog-editor__status {
+    justify-self: start;
+  }
+
+  .admin-catalog-editor__relations {
+    grid-template-columns: minmax(0, 1fr) 96px;
+  }
+
+  .admin-catalog-editor__relations > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .admin-catalog-editor__price {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .admin-catalog-editor__price > .admin-catalog-editor__operator:last-of-type {
+    display: none;
+  }
+
+  .admin-catalog-editor__price-total {
+    grid-column: 1 / -1;
+    padding: 10px 0 0;
+    border-top: 1px solid rgba(107, 79, 58, 0.16);
+    border-left: 0;
+  }
+}

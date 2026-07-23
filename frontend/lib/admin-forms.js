@@ -181,6 +181,7 @@ export function validateCatalogAddonInput(formData, entityLabel = "Catalog item"
 }
 
 export function validateCatalogArticleInput(formData) {
+  const productInfoPdfPath = optionalString(formData.get("productInfoPdfPath"));
   return {
     articleNumber: requiredString(formData.get("articleNumber"), "Article number"),
     name: requiredString(formData.get("name"), "Article name"),
@@ -191,12 +192,20 @@ export function validateCatalogArticleInput(formData) {
     depthMm: validateOptionalNonNegativeCentimetersAsMillimeters(formData.get("depthMm"), "Depth"),
     price: validatePrice(formData.get("price")),
     itemType: parseItemType(String(formData.get("itemType") || "")),
+    productImagePath: optionalString(formData.get("productImagePath")),
+    productInfoPdfPath,
+    productInfoSummary: optionalString(formData.get("productInfoSummary")),
+    productInfoKeyFacts: optionalStringList(formData.get("productInfoKeyFacts")),
+    productInfoExtractedText: optionalString(formData.get("productInfoExtractedText")),
+    productInfoUpdatedAt: productInfoPdfPath ? new Date() : null,
     isFixedPricePackage: formData.get("isFixedPricePackage") === "true",
     isActive: formData.get("isActive") === "true",
   };
 }
 
 export function validateClaimProductInput(formData) {
+  const productInfoPdfPath = optionalString(formData.get("productInfoPdfPath"));
+
   return {
     partKey: requiredString(formData.get("partKey"), "Part key"),
     articleCode: optionalString(formData.get("articleCode")),
@@ -204,6 +213,12 @@ export function validateClaimProductInput(formData) {
     nameDe: optionalString(formData.get("nameDe")),
     sourceKitchenItemCode: optionalString(formData.get("sourceKitchenItemCode")),
     sourceComponentKey: optionalString(formData.get("sourceComponentKey")),
+    productImagePath: optionalString(formData.get("productImagePath")),
+    productInfoPdfPath,
+    productInfoSummary: optionalString(formData.get("productInfoSummary")),
+    productInfoKeyFacts: optionalStringList(formData.get("productInfoKeyFacts")),
+    productInfoExtractedText: optionalString(formData.get("productInfoExtractedText")),
+    productInfoUpdatedAt: productInfoPdfPath ? new Date() : null,
     sortOrder: validateSortOrder(formData.get("sortOrder")),
     isActive: formData.get("isActive") === "true",
   };

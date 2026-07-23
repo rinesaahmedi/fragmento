@@ -202,28 +202,105 @@ function productInfoWhereClause() {
 }
 
 async function loadItems() {
-  return prisma.kitchenItem.findMany({
-    where: productInfoWhereClause(),
-    select: {
-      id: true,
-      code: true,
-      name: true,
-      itemType: true,
-      componentKey: true,
-      iconKey: true,
-      productInfoPdfPath: true,
-      productInfoSummary: true,
-      productInfoKeyFacts: true,
-      productInfoExtractedText: true,
-      kitchen: {
-        select: {
-          slug: true,
-          name: true,
+  const [catalogArticles, allClaimProducts, allLegacyItems] = await Promise.all([
+    prisma.catalogArticle.findMany({
+      where: productInfoWhereClause(),
+      select: {
+        id: true,
+        articleNumber: true,
+        name: true,
+        itemType: true,
+        productInfoPdfPath: true,
+        productInfoSummary: true,
+        productInfoKeyFacts: true,
+        productInfoExtractedText: true,
+      },
+      orderBy: [{ articleNumber: "asc" }],
+    }),
+    prisma.kitchenClaimPart.findMany({
+      where: productInfoWhereClause(),
+      select: {
+        id: true,
+        kitchenId: true,
+        partKey: true,
+        articleCode: true,
+        name: true,
+        sourceKitchenItemCode: true,
+        productInfoPdfPath: true,
+        productInfoSummary: true,
+        productInfoKeyFacts: true,
+        productInfoExtractedText: true,
+      },
+      orderBy: [{ articleCode: "asc" }, { partKey: "asc" }],
+    }),
+    prisma.kitchenItem.findMany({
+      where: {
+        ...productInfoWhereClause(),
+        catalogArticleId: null,
+      },
+      select: {
+        id: true,
+        kitchenId: true,
+        code: true,
+        name: true,
+        itemType: true,
+        componentKey: true,
+        iconKey: true,
+        productInfoPdfPath: true,
+        productInfoSummary: true,
+        productInfoKeyFacts: true,
+        productInfoExtractedText: true,
+        kitchen: {
+          select: {
+            slug: true,
+            name: true,
+          },
         },
       },
-    },
-    orderBy: [{ kitchen: { slug: "asc" } }, { sortOrder: "asc" }, { code: "asc" }],
-  });
+      orderBy: [{ kitchen: { slug: "asc" } }, { sortOrder: "asc" }, { code: "asc" }],
+    }),
+  ]);
+  const claimProducts = [
+    ...new Map(
+      allClaimProducts.map((product) => [
+        `${product.partKey}:${product.articleCode || ""}`,
+        product,
+      ]),
+    ).values(),
+  ];
+  const claimManagedSources = new Set(
+    allClaimProducts.map(
+      (product) => `${product.kitchenId}:${product.sourceKitchenItemCode || ""}`,
+    ),
+  );
+  const legacyItems = allLegacyItems.filter(
+    (item) => !claimManagedSources.has(`${item.kitchenId}:${item.code}`),
+  );
+
+  return [
+    ...catalogArticles.map((article) => ({
+      ...article,
+      code: article.articleNumber,
+      componentKey: "",
+      iconKey: "",
+      kitchen: {
+        slug: "catalog",
+        name: "Catalog",
+      },
+    })),
+    ...claimProducts.map((product) => ({
+      ...product,
+      code: product.articleCode || product.partKey,
+      itemType: ItemType.COMPONENT,
+      componentKey: product.partKey,
+      iconKey: "",
+      kitchen: {
+        slug: "claim-products",
+        name: "Claim products",
+      },
+    })),
+    ...legacyItems,
+  ];
 }
 
 function auditItem(item) {

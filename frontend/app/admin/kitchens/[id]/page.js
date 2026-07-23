@@ -658,6 +658,8 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               </p>
             ) : null}
             {visibleItems.map((item) => {
+              const isClaimProductManaged = Boolean(item.isLocked)
+                && /^OVEN-.+-HOB$/i.test(String(item.code || ""));
               const slot = structureSlots.find((entry) => entry.componentKey === item.componentKey)
                 || getKitchenCatalogPreviewSlot(imagePreview, item.componentKey);
               const isRequestedEdit = requestedEditId === item.id;
@@ -702,47 +704,10 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
 
                   {isRequestedEdit ? (
                   <form action={`/api/admin/items/${item.id}`} method="post" style={compactFormStyle}>
-                    <div style={compactTopGridStyle}>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />} wide={false}>
-                        <AdminSelect name="itemType" defaultValue={item.itemType} style={compactInputStyle}>
-                          {ITEM_TYPE_OPTIONS.map((itemType) => (
-                            <option key={itemType} value={itemType}>
-                              {itemType}
-                            </option>
-                          ))}
-                        </AdminSelect>
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />} wide={false}>
-                        <div style={fieldWithHelpStyle}>
-                          <input name="code" defaultValue={item.code} list="admin-kitchen-item-code-options" style={compactInputStyle} required />
-                          <span style={fieldHelpTextStyle}>Use templates; add -01, -02 for repeated cabinets.</span>
-                        </div>
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number(s)" />} wide={false}>
-                        <input name="articleNumber" defaultValue={item.articleNumber || ""} placeholder="CODE-1 + CODE-2" style={compactInputStyle} />
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name (English)" />} wide={false}>
-                        <input name="name" defaultValue={item.name} style={compactInputStyle} required />
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.nameDe" fallback="Name (German)" />} wide={false}>
-                        <input name="nameDe" defaultValue={item.nameDe || ""} style={compactInputStyle} />
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />} wide={false}>
-                        <IconKeySelect defaultValue={item.iconKey || ""} style={compactInputStyle} />
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.colorKey" fallback="Color key" />} wide={false}>
-                        <input name="colorKey" defaultValue={item.colorKey || ""} style={compactInputStyle} />
-                      </FormField>
-                      <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />} wide={false}>
-                        <input name="sortOrder" defaultValue={String(item.sortOrder)} style={compactInputStyle} />
-                      </FormField>
-                    </div>
-
                     <AdminBlendePriceFields
                       totalPriceDefaultValue={String(item.price)}
                       priceStyle={compactInputStyle}
                       selectStyle={compactInputStyle}
-                      relationGridStyle={catalogRelationGridStyle}
                       catalogArticles={catalogArticleOptions}
                       catalogBlenden={catalogBlendeOptions}
                       catalogServices={catalogServiceOptions}
@@ -754,14 +719,91 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                     />
 
                     <input type="hidden" name="componentKey" value={item.componentKey || ""} />
-
-                    <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
-                      <textarea name="infoText" defaultValue={item.infoText || ""} rows={2} style={compactTextareaStyle} />
-                    </FormField>
-                    <details style={advancedDetailsStyle}>
-                      <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
+                    <details style={advancedDetailsStyle} className="admin-kitchen-item-technical">
+                      <summary style={advancedSummaryStyle}>Overrides &amp; technical settings</summary>
                       <div style={advancedFieldsStyle}>
-                        <ProductInformationFields item={item} compact />
+                        <p className="admin-kitchen-item-technical__hint">
+                          These values control internal identity and display. Catalog-linked names,
+                          article numbers and prices are applied automatically when you save.
+                        </p>
+                        <div style={compactTopGridStyle}>
+                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemType" fallback="Item type" />} wide={false}>
+                            <AdminSelect name="itemType" defaultValue={item.itemType} style={compactInputStyle}>
+                              {ITEM_TYPE_OPTIONS.map((itemType) => (
+                                <option key={itemType} value={itemType}>
+                                  {itemType}
+                                </option>
+                              ))}
+                            </AdminSelect>
+                          </FormField>
+                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Internal item code" />} wide={false}>
+                            <div style={fieldWithHelpStyle}>
+                              <input name="code" defaultValue={item.code} list="admin-kitchen-item-code-options" style={compactInputStyle} required />
+                              <span style={fieldHelpTextStyle}>Use templates; add -01, -02 for repeated cabinets.</span>
+                            </div>
+                          </FormField>
+                          <FormField label="Fallback article number" wide={false}>
+                            <input name="articleNumber" defaultValue={item.articleNumber || ""} placeholder="Used without a catalog link" style={compactInputStyle} />
+                          </FormField>
+                          <FormField label="Fallback name (English)" wide={false}>
+                            <input name="name" defaultValue={item.name} style={compactInputStyle} required />
+                          </FormField>
+                          <FormField label="Fallback name (German)" wide={false}>
+                            <input name="nameDe" defaultValue={item.nameDe || ""} style={compactInputStyle} />
+                          </FormField>
+                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.iconKey" fallback="Icon key" />} wide={false}>
+                            <IconKeySelect defaultValue={item.iconKey || ""} style={compactInputStyle} />
+                          </FormField>
+                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.colorKey" fallback="Color key" />} wide={false}>
+                            <input name="colorKey" defaultValue={item.colorKey || ""} style={compactInputStyle} />
+                          </FormField>
+                          <FormField label={<AdminText i18nKey="kitchenDetailAdmin.sortOrder" fallback="Sort order" />} wide={false}>
+                            <input name="sortOrder" defaultValue={String(item.sortOrder)} style={compactInputStyle} />
+                          </FormField>
+                        </div>
+
+                        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.infoText" fallback="Info text" />} wide>
+                          <textarea name="infoText" defaultValue={item.infoText || ""} rows={2} style={compactTextareaStyle} />
+                        </FormField>
+
+                        {isClaimProductManaged ? (
+                          <div className="admin-kitchen-product-info-source">
+                            <div>
+                              <strong>Product Information is managed in Claim products</strong>
+                              <span>The default oven and cooktop are maintained separately in the Catalog.</span>
+                            </div>
+                            <Link
+                              href="/admin/catalog/articles"
+                              className="admin-kitchen-product-info-source__link"
+                            >
+                              Open Claim products
+                            </Link>
+                          </div>
+                        ) : item.catalogArticleId ? (
+                          <div className="admin-kitchen-product-info-source">
+                            <div>
+                              <strong>Product Information is managed in Catalog</strong>
+                              <span>
+                                {item.catalogArticle?.productInfoPdfPath
+                                  ? "Catalog document ready"
+                                  : "No Product Information has been added to this catalog article yet"}
+                              </span>
+                            </div>
+                            <Link
+                              href={`/admin/catalog/articles?editArticle=${encodeURIComponent(item.catalogArticleId)}`}
+                              className="admin-kitchen-product-info-source__link"
+                            >
+                              Open catalog article
+                            </Link>
+                          </div>
+                        ) : (
+                          <details style={advancedDetailsStyle}>
+                            <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
+                            <div style={advancedFieldsStyle}>
+                              <ProductInformationFields item={item} compact />
+                            </div>
+                          </details>
+                        )}
                       </div>
                     </details>
 
@@ -911,12 +953,18 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                 )}
               </fieldset>
 
-              <details style={advancedDetailsStyle}>
-                <summary style={advancedSummaryStyle}><AdminText i18nKey="kitchenDetailAdmin.productInformation" fallback="Product Information" /></summary>
-                <div style={advancedFieldsStyle}>
-                  <ProductInformationFields placeholders />
+              <div className="admin-kitchen-product-info-source">
+                <div>
+                  <strong>Product Information is managed in Catalog</strong>
+                  <span>Choose a catalog article, then add or edit its PDF and chatbot data in Catalog.</span>
                 </div>
-              </details>
+                <Link
+                  href="/admin/catalog/articles"
+                  className="admin-kitchen-product-info-source__link"
+                >
+                  Open Catalog
+                </Link>
+              </div>
 
               <div>
                 <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenDetailAdmin.createExtraItem" fallback="Create Item" /></button>
@@ -1388,13 +1436,6 @@ const compactTopGridStyle = {
   display: "grid",
   gap: 8,
   gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
-  alignItems: "start",
-};
-
-const catalogRelationGridStyle = {
-  display: "grid",
-  gap: 8,
-  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
   alignItems: "start",
 };
 
