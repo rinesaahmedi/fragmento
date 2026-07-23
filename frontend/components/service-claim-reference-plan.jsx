@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 function getRelativePosition(event) {
   const bounds = event.currentTarget.getBoundingClientRect();
   if (!bounds.width || !bounds.height) return null;
@@ -19,6 +21,7 @@ export default function ServiceClaimReferencePlan({
   onAddMarker,
   onUndoMarker,
 }) {
+  const [previewOrientation, setPreviewOrientation] = useState("");
   const pdfPath = String(kitchenPlan?.pdfPath || "").trim();
   const previewImagePath = String(kitchenPlan?.previewImagePath || "").trim();
   if (!pdfPath && !previewImagePath) return null;
@@ -44,7 +47,7 @@ export default function ServiceClaimReferencePlan({
           </p>
           <figure className="service-claim-reference-plan__preview">
             <div
-              className="service-claim-reference-plan__image-stage is-interactive"
+              className={`service-claim-reference-plan__image-stage is-interactive${previewOrientation ? ` is-${previewOrientation}` : ""}`}
               onClick={(event) => {
                 const position = getRelativePosition(event);
                 if (position) onAddMarker?.(position);
@@ -58,6 +61,10 @@ export default function ServiceClaimReferencePlan({
                 src={previewImagePath}
                 alt={labels.previewAlt}
                 draggable="false"
+                onLoad={(event) => {
+                  const image = event.currentTarget;
+                  setPreviewOrientation(image.naturalWidth >= image.naturalHeight ? "landscape" : "portrait");
+                }}
               />
               <div className="service-claim-plan-markers" aria-hidden="true">
                 {markers.map((marker, index) => (
