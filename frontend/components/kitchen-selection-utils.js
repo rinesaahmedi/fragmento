@@ -972,14 +972,42 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "l-kitchen-new": [["component-top-400", "component-aspirator"]],
 };
 
-const FLAT_HOOD_PRODUCT_INFO_PDF_HREF = "/product-info/extractor-hood-flat-product-info.pdf";
+const FLAT_HOOD_PRODUCT_INFO_PDF_HREF = "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf";
 const FLAT_HOOD_PRODUCT_INFO_DOCUMENTS = [
   { label: "Produktinfo PDF", href: FLAT_HOOD_PRODUCT_INFO_PDF_HREF },
 ];
-const FRIDGE_PRODUCT_INFO_PDF_HREF = "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf";
+const FRIDGE_PRODUCT_INFO_PDF_HREF = "/product-info/refrigerators/kgcn388140e/kgcn388140e-product-info.pdf";
 const FRIDGE_PRODUCT_INFO_DOCUMENTS = [
   { label: "Produktinfo PDF", href: FRIDGE_PRODUCT_INFO_PDF_HREF },
 ];
+
+const STRUCTURED_PRODUCT_INFO_PATHS = {
+  "/product-info/a-egspv597210-elabel-eco21-2601.pdf": "/product-info/dishwashers/a-egspv597210/a-egspv597210-elabel.pdf",
+  "/product-info/a-egspv597210-product-info-eco21.pdf": "/product-info/dishwashers/a-egspv597210/a-egspv597210-product-info.pdf",
+  "/product-info/dishwasher-product-info.pdf": "/product-info/dishwashers/a-egspv597210/a-egspv597210-product-info.pdf",
+  "/product-info/FRIDGE - 87b07181872a0fb7e8a15b39de13a7b78a22ad1c_1193783_Produktinformation.pdf": "/product-info/refrigerators/kgcn388140e/kgcn388140e-product-info.pdf",
+  "/product-info/fridge-product-info.pdf": "/product-info/refrigerators/kgcn388140e/kgcn388140e-product-info.pdf",
+  "/product-info/kgc-15495-s-product-info-eco21.pdf": "/product-info/refrigerators/kgcn388140e/kgcn388140e-product-info.pdf",
+  "/product-info/extractor-hood-flat-product-info.pdf": "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf",
+  "/product-info/extractor-hoods/fh664621s/extractor-hood-flat-product-info.pdf": "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf",
+  "/product-info/fh-664-621-s-elabel-eco21-2512.pdf": "/product-info/extractor-hoods/fh664621s/fh664621s-elabel.pdf",
+  "/product-info/fh-664-621-s-product-info.pdf": "/product-info/extractor-hoods/fh664621s/fh664621s-product-info.pdf",
+  "/product-info/khf-664-611-s-chimney-extractor-hood-product-info.pdf": "/product-info/extractor-hoods/khf664611s/khf664611s-product-info.pdf",
+  "/product-info/khf-664-611-s-elabel-eco21-2407.pdf": "/product-info/extractor-hoods/khf664611s/khf664611s-elabel.pdf",
+  "/product-info/ewa-34660-w-elabel-eco21-2601.pdf": "/product-info/washing-machines/ewa34660w/ewa34660w-elabel.pdf",
+  "/product-info/ewa-34660-w-product-info.pdf": "/product-info/washing-machines/ewa34660w/ewa34660w-product-info.pdf",
+  "/product-info/ebx-943-600-s-elabel-1901.pdf": "/product-info/ovens/ebx943600s/ebx943600s-elabel.pdf",
+  "/product-info/ebx-943-600-s-product-info.pdf": "/product-info/ovens/ebx943600s/ebx943600s-product-info.pdf",
+  "/product-info/ol-kmi-754-000-e-product-info.pdf": "/product-info/hobs/ol-kmi754000e/ol-kmi754000e-product-info.pdf",
+  "/product-info/led-lighting-set-elabel.pdf": "/product-info/lighting/led-set/led-set-elabel.pdf",
+};
+
+function getStructuredProductInfoPath(href) {
+  const value = String(href || "");
+  const [assetPath, fragment] = value.split("#", 2);
+  const structuredPath = STRUCTURED_PRODUCT_INFO_PATHS[assetPath] || assetPath;
+  return fragment ? `${structuredPath}#${fragment}` : structuredPath;
+}
 
 const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   "DISH-B-600-STD": [
@@ -1166,6 +1194,12 @@ PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105758-FH664621E"] = PRODUCT_INFO_DOCUMEN
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 
+Object.values(PRODUCT_INFO_DOCUMENTS_BY_CODE).forEach((documents) => {
+  documents.forEach((document) => {
+    document.href = getStructuredProductInfoPath(document.href);
+  });
+});
+
 const PRODUCT_INFO_DISPLAY_OVERRIDES_BY_CODE = {
   "WM-B-EWA34660W": {
     infoText: "Washing machine, 8 kg, 1400 rpm",
@@ -1226,7 +1260,7 @@ export function getProductInfoHref(item) {
     documents.find((document) => String(document?.label || "").toLowerCase().includes("produktinfo")) ||
     documents[0];
 
-  return defaultDocument?.href || item?.productInfoPdfPath || "";
+  return defaultDocument?.href || getStructuredProductInfoPath(item?.productInfoPdfPath) || "";
 }
 
 function getMappedProductInfoDocuments(item) {
@@ -1339,6 +1373,11 @@ export function toggleLinkedComponentSelection(slug, currentIds, componentId, lo
   return [...currentSet];
 }
 
+const KGCN388140E_GALLERY = Array.from(
+  { length: 7 },
+  (_, index) => `/product-images/gallery/kgcn388140e/kgcn388140e-${String(index + 1).padStart(2, "0")}.webp?v=1193783`,
+);
+
 const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105743-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -1400,26 +1439,26 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "HOOD-AB105845-KHF664611S": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
-  "REF-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-B-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-C-545-1800-700": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105806-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105807-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105819-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105821-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105841-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105845-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105825-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105822-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105828-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105831-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105743-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105758-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB104968-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105746-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105757-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105811-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
-  "REF-AB105815-KGCN388140E": Array.from({ length: 10 }, (_, index) => `/product-images/gallery/kgc15495s-fridge/${String(index + 1).padStart(2, "0")}.webp`),
+  "REF-545-1800-700": KGCN388140E_GALLERY,
+  "REF-B-545-1800-700": KGCN388140E_GALLERY,
+  "REF-C-545-1800-700": KGCN388140E_GALLERY,
+  "REF-AB105806-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105807-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105819-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105821-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105841-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105845-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105825-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105822-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105828-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105831-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105743-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105758-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB104968-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105746-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105757-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105811-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105815-KGCN388140E": KGCN388140E_GALLERY,
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
   "WM-AB105845-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),

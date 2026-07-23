@@ -49,14 +49,14 @@ export async function POST(request) {
       return NextResponse.json({ error: "No readable text was found in this PDF." }, { status: 400 });
     }
 
-    const publicDirectory = path.join(process.cwd(), "public", "product-info");
+    const publicDirectory = path.join(process.cwd(), "public", "product-info", "uploads");
     await fs.mkdir(publicDirectory, { recursive: true });
 
     const storedName = `${randomUUID().slice(0, 8)}-${originalName}`;
     const absolutePath = path.join(publicDirectory, storedName);
     await fs.writeFile(absolutePath, buffer);
 
-    const publicPath = `/product-info/${storedName}`;
+    const publicPath = `/product-info/uploads/${storedName}`;
     const fallbackDraft = buildProductInfoDraft({ text: extractedText, fileName: file.name });
     const draft = await buildAiEnhancedProductInfoDraft({
       text: extractedText,

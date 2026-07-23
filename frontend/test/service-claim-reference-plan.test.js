@@ -63,6 +63,7 @@ test("a PDF-only contract produces a reference plan with no selectable component
 test("service form renders the reference sketch and requires affected component details", () => {
   const flow = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
   const viewer = fs.readFileSync(path.join(repoRoot, "components", "service-claim-reference-plan.jsx"), "utf8");
+  const styles = fs.readFileSync(path.join(repoRoot, "app", "globals.css"), "utf8");
 
   assert.match(flow, /selectionMode === "reference-pdf"/);
   assert.match(flow, /referenceElectricalQuestion/);
@@ -72,6 +73,9 @@ test("service form renders the reference sketch and requires affected component 
   assert.doesNotMatch(viewer, /type="application\/pdf"/);
   assert.doesNotMatch(viewer, /service-claim-reference-plan__notice/);
   assert.match(viewer, /target="_blank"/);
+  assert.match(viewer, /naturalWidth >= image\.naturalHeight \? "landscape" : "portrait"/);
+  assert.match(styles, /\.service-claim-reference-plan__image-stage\.is-landscape/);
+  assert.match(styles, /max-height: min\(580px, 64vh\)/);
   assert.match(flow, /referencePlanTitle: "Kitchen sketch"/);
   assert.doesNotMatch(flow, /Selectable article data is not available/);
 });

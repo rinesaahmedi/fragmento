@@ -3644,6 +3644,10 @@ textarea {
   line-height: 0;
 }
 
+.service-claim-reference-plan__image-stage.is-landscape .service-claim-reference-plan__image {
+  max-height: min(580px, 64vh);
+}
+
 .service-claim-reference-plan__image-stage.is-interactive {
   cursor: crosshair;
   touch-action: manipulation;
@@ -4303,6 +4307,10 @@ textarea {
     max-width: 100%;
     max-height: min(420px, 52vh);
     height: auto;
+  }
+
+  .service-claim-reference-plan__image-stage.is-landscape .service-claim-reference-plan__image {
+    max-height: min(460px, 58vh);
   }
 
   .service-claim-plan-marker {

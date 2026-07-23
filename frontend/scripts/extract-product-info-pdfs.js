@@ -6,9 +6,9 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 const ADDITIONAL_PRODUCT_INFO_PDF_PATHS_BY_CODE = {
-  "EBX943600S + OL-KMI754000E": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
-  "OVEN-B-600-HOB": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
-  "OVEN-C-600-HOB": ["/product-info/ol-kmi-754-000-e-product-info.pdf"],
+  "EBX943600S + OL-KMI754000E": ["/product-info/hobs/ol-kmi754000e/ol-kmi754000e-product-info.pdf"],
+  "OVEN-B-600-HOB": ["/product-info/hobs/ol-kmi754000e/ol-kmi754000e-product-info.pdf"],
+  "OVEN-C-600-HOB": ["/product-info/hobs/ol-kmi754000e/ol-kmi754000e-product-info.pdf"],
 };
 
 function normalizePdfPath(value) {
