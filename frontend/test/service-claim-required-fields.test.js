@@ -40,6 +40,13 @@ test("claim form reports missing required contact and address fields before subm
   assert.match(cssSource, /\.service-required-alert__close/);
 });
 
+test("claim form limits floor values to 20 characters", () => {
+  const flowSource = fs.readFileSync(flowPath, "utf8");
+
+  assert.match(flowSource, /const CLIENT_FLOOR_MAX_LENGTH = 20/);
+  assert.match(flowSource, /maxLength=\{CLIENT_FLOOR_MAX_LENGTH\}/);
+});
+
 test("claim form clears validation alerts after successful submit reset", () => {
   const flowSource = fs.readFileSync(flowPath, "utf8");
 

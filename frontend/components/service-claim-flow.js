@@ -34,6 +34,7 @@ const LANGUAGE_OPTIONS = [
 const MAX_CLAIM_ATTACHMENT_COUNT = 20;
 const MAX_CLAIM_ATTACHMENT_BYTES = 4 * 1024 * 1024;
 const MIN_REFERENCE_PROBLEM_LENGTH = 20;
+const CLIENT_FLOOR_MAX_LENGTH = 20;
 const CLAIM_ATTACHMENT_ACCEPT = "image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx";
 const SERIAL_NUMBER_IMAGE_ACCEPT = "image/*";
 const PROBLEM_AREA_PART_SELECT_SELECTOR = "details.service-field__problem-area-part-select[open]";
@@ -5509,6 +5510,7 @@ export default function ServiceClaimFlow() {
                     value={formValues.clientFloor}
                     onChange={(event) => handleFieldChange("clientFloor", event.target.value)}
                     placeholder={copy.clientFloorPlaceholder}
+                    maxLength={CLIENT_FLOOR_MAX_LENGTH}
                     aria-invalid={shouldShowClaimRequiredError("clientFloor")}
                     aria-describedby={
                       shouldShowClaimRequiredError("clientFloor")

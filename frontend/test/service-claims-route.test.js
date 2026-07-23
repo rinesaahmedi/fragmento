@@ -7,6 +7,13 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const routePath = path.join(__dirname, "..", "app", "api", "service-claims", "route.js");
 
+test("service-claims route limits floor values to 20 characters", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /requiredString\(body\.clientFloor,\s*"Floor",\s*20\)/);
+  assert.match(source, /normalized\.length > maxLength/);
+});
+
 test("service-claims route retries inserts when landlord company columns are missing", () => {
   const source = fs.readFileSync(routePath, "utf8");
 

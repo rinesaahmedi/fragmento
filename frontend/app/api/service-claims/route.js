@@ -31,10 +31,13 @@ function descriptionHasClientKitchenAreasLine(text) {
   return KITCHEN_AREA_FIRST_LINE_PREFIXES.some((p) => first.startsWith(p));
 }
 
-function requiredString(value, fieldName) {
+function requiredString(value, fieldName, maxLength) {
   const normalized = String(value || "").trim();
   if (!normalized) {
     throw new Error(`${fieldName} is required.`);
+  }
+  if (Number.isInteger(maxLength) && normalized.length > maxLength) {
+    throw new Error(`${fieldName} must be ${maxLength} characters or fewer.`);
   }
   return normalized;
 }
@@ -1421,7 +1424,7 @@ export async function POST(request) {
     });
     const givenName = requiredString(body.givenName, "Name");
     const surname = requiredString(body.surname, "Surname");
-    requiredString(body.clientFloor, "Floor");
+    requiredString(body.clientFloor, "Floor", 20);
     const gender = requiredGender(body.gender);
     const genderLabel = genderDisplayLabel(gender);
     const customerDisplayName = [givenName, surname].filter(Boolean).join(" ").trim();
