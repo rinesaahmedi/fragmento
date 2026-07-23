@@ -2557,6 +2557,7 @@ test("service claim picker preserves cooktop and calibrated sink cutouts while l
   assert.match(source, /hotspot\.claimPartKey === "cooktop"/);
   assert.match(source, /\|\| hotspot\.claimPartKey === "sink"/);
   assert.doesNotMatch(source, /hotspot\.claimPartKey === "sink" && !hotspot\.preserveManualSize/);
+  assert.match(source, /\(\) => isNonLShapedKitchen\s*\?\s*\[\]\s*:\s*croppedImageHotspots\.filter/);
   assert.match(source, /hotspot\.componentKey === "worktop"/);
   assert.match(source, /\(hotspot\) => !displaySelectedIds\.has\(hotspot\.componentId\)/);
   assert.doesNotMatch(source, /hasSelectedWorktop\s*&&\s*hotspot\.claimPartKey === "cooktop"/);

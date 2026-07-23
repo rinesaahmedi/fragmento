@@ -1041,7 +1041,7 @@ async function buildClaimKitchenPreviewAttachment(payload) {
     kitchenSlug: payload.kitchenSlug,
     selectedAreas,
     contractNumber: payload.contractNumber,
-    width: 600,
+    width: 480,
   }).catch(() => null);
 
   if (!preview?.content?.length) {
@@ -1056,7 +1056,7 @@ async function buildClaimKitchenPreviewAttachment(payload) {
     contentDisposition: "inline",
     emailLabel: "Küche / ausgewählte Komponenten",
     emailAlt: "Küchenplan mit hervorgehobenen Reklamationskomponenten",
-    width: preview.width || 600,
+    width: preview.width || 480,
     height: preview.height || null,
     isReferencePdf: false,
   };
@@ -1219,7 +1219,7 @@ function buildComplaintEmailHtml(payload, previewAttachment = null) {
   const previewCid = String(previewAttachment?.cid || "").trim();
   const previewLabel = previewAttachment?.emailLabel || "Küche / ausgewählte Komponenten";
   const previewAlt = previewAttachment?.emailAlt || "Küchenplan mit hervorgehobenen Reklamationskomponenten";
-  const previewDisplayWidth = 540;
+  const previewDisplayWidth = 480;
   const previewDisplayHeight = previewAttachment?.height && previewAttachment?.width
     ? Math.max(1, Math.round(previewAttachment.height * previewDisplayWidth / previewAttachment.width))
     : null;

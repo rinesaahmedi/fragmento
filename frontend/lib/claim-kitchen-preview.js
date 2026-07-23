@@ -9,6 +9,7 @@ import { parseServiceClaimProblemAreas } from "./service-claim-problem-areas.js"
 import {
   buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
+  isLShapedClaimKitchen,
 } from "./service-claim-kitchen-hotspots.js";
 
 export const PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG = {
@@ -597,7 +598,7 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     || hotspot?.claimPartKey === "worktop-right"
     || hotspot?.claimPartKey === "worktop-end-panel"
   ));
-  const unselectedApplianceHotspots = hasSelectedWorktop
+  const unselectedApplianceHotspots = hasSelectedWorktop && isLShapedClaimKitchen(normalizedSlug)
     ? claimHotspots.filter((hotspot) => (
         (
           hotspot?.claimPartKey === "cooktop"
@@ -674,7 +675,10 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
   ];
   const content = await sharp({
     create: { width: outputWidth, height: outputHeight, channels: 4, background: "#ffffff" },
-  }).composite(layers).png().toBuffer();
+  })
+    .composite(layers)
+    .png({ compressionLevel: 9, palette: true, quality: 90 })
+    .toBuffer();
 
   return {
     content,
@@ -716,7 +720,10 @@ export async function renderClaimKitchenPreviewPng({
     return null;
   }
 
-  const content = await sharp(Buffer.from(preview.markup)).resize({ width }).png().toBuffer();
+  const content = await sharp(Buffer.from(preview.markup))
+    .resize({ width })
+    .png({ compressionLevel: 9, palette: true, quality: 90 })
+    .toBuffer();
   const metadata = await sharp(content).metadata();
   return {
     ...preview,

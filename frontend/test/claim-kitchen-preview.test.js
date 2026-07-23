@@ -183,6 +183,7 @@ test("email preview selection overlay is strong enough to remain visible after e
   );
 
   assert.match(source, /fill="rgba\(62,188,116,0\.34\)" stroke="none"/);
+  assert.match(source, /png\(\{ compressionLevel: 9, palette: true, quality: 90 \}\)/);
 });
 
 test("email preview cuts calibrated sinks out of a selected worktop", () => {
@@ -192,6 +193,7 @@ test("email preview cuts calibrated sinks out of a selected worktop", () => {
   );
 
   assert.match(source, /\|\| hotspot\?\.claimPartKey === "sink"/);
+  assert.match(source, /hasSelectedWorktop && isLShapedClaimKitchen\(normalizedSlug\)/);
   assert.doesNotMatch(
     source,
     /hotspot\?\.claimPartKey === "sink" && !hotspot\?\.preserveManualSize/,

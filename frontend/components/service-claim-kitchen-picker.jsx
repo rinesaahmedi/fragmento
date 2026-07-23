@@ -240,6 +240,7 @@ export default function ServiceClaimKitchenPicker({
     const selectable = new Set(selectableComponentIds || []);
     return croppedImageHotspots.filter((hotspot) => hotspot && selectable.has(hotspot.componentId));
   }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
+  const isNonLShapedKitchen = !isLShapedClaimKitchen(kitchenSlug);
   const displaySelectedComponentIds = useMemo(() => {
     return [...new Set(visualValue || [])];
   }, [visualValue]);
@@ -253,13 +254,15 @@ export default function ServiceClaimKitchenPicker({
     [rawApplianceClipPathId],
   );
   const applianceImageHotspots = useMemo(
-    () => imageHotspots.filter(
-      (hotspot) => (
-        hotspot.claimPartKey === "cooktop"
-        || hotspot.claimPartKey === "sink"
+    () => isNonLShapedKitchen
+      ? []
+      : croppedImageHotspots.filter(
+        (hotspot) => (
+          hotspot.claimPartKey === "cooktop"
+          || hotspot.claimPartKey === "sink"
+        ),
       ),
-    ),
-    [imageHotspots],
+    [croppedImageHotspots, isNonLShapedKitchen],
   );
 
   useEffect(() => {
@@ -361,7 +364,6 @@ export default function ServiceClaimKitchenPicker({
   const sinkCabinetComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS["sink-cabinet"];
   const ovenComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.oven;
   const cooktopComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.cooktop;
-  const isNonLShapedKitchen = !isLShapedClaimKitchen(kitchenSlug);
   const hasContextualSinkChoice = componentChoiceGroupByTriggerId.has(sinkCabinetComponentId);
   const hasContextualCooktopChoice = componentChoiceGroupByTriggerId.has(ovenComponentId);
   const showManualSinkOption =
