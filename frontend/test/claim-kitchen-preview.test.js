@@ -180,6 +180,17 @@ test("AB 105814 email oven uses the dashboard selection coordinates", () => {
   });
 });
 
+test("AB 105815 email uses the same oven layout as the dashboard", () => {
+  const emailOven = PLAN_HOTSPOTS_BY_SLUG["ab-105815"]
+    .find((hotspot) => hotspot.componentKey === "oven-module");
+  const dashboardLayoutOven = PLAN_HOTSPOTS_BY_SLUG["ab-105819"]
+    .find((hotspot) => hotspot.componentKey === "oven-module");
+
+  assert.deepEqual(emailOven, dashboardLayoutOven);
+  assert.equal(emailOven.left, 50.68);
+  assert.equal(emailOven.top, 64.82);
+});
+
 test("email preview falls back from a selected claim part to its actual kitchen element", () => {
   const sourceHotspot = {
     componentId: "component-dishwasher-base",
