@@ -1209,7 +1209,25 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105824"] = PLAN_HOTSPOTS_BY_SLUG["ab-105821"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105823"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105829"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105832"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
-PLAN_HOTSPOTS_BY_SLUG["ab-105822"] = PLAN_HOTSPOTS_BY_SLUG["ab-105825"];
+// AB 105822 uses the AB 105825 drawing, but its email preview must use the
+// same calibrated sink sources as the interactive dashboard.
+PLAN_HOTSPOTS_BY_SLUG["ab-105822"] = PLAN_HOTSPOTS_BY_SLUG["ab-105825"].flatMap((hotspot) => {
+  if (hotspot.componentKey === "sink-faucet") {
+    return [];
+  }
+  if (hotspot.componentKey === "sink-base") {
+    return [{
+      ...hotspot,
+      points: [[32.19, 56.37], [42.67, 54.78], [42.67, 83.36], [32.19, 84.87]],
+    }];
+  }
+  return [hotspot];
+});
+PLAN_HOTSPOTS_BY_SLUG["ab-105822"].push({
+  componentKey: "sink-faucet",
+  points: [[22.35, 42.85], [29.5, 42.85], [29.5, 54.3], [22.35, 55.2]],
+  preserveManualSize: true,
+});
 PLAN_HOTSPOTS_BY_SLUG["ab-105828"] = PLAN_HOTSPOTS_BY_SLUG["ab-105825"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105830"] = PLAN_HOTSPOTS_BY_SLUG["ab-105827"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105839"] = PLAN_HOTSPOTS_BY_SLUG["ab-105842"];

@@ -191,6 +191,26 @@ test("AB 105815 email uses the same oven layout as the dashboard", () => {
   assert.equal(emailOven.top, 64.82);
 });
 
+test("AB 105822 email uses the dashboard sink and faucet sources", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
+  const sinkBase = hotspots.find((hotspot) => hotspot.componentKey === "sink-base");
+  const faucets = hotspots.filter((hotspot) => hotspot.componentKey === "sink-faucet");
+
+  assert.deepEqual(sinkBase.points, [
+    [32.19, 56.37],
+    [42.67, 54.78],
+    [42.67, 83.36],
+    [32.19, 84.87],
+  ]);
+  assert.equal(faucets.length, 1);
+  assert.deepEqual(faucets[0].points, [
+    [22.35, 42.85],
+    [29.5, 42.85],
+    [29.5, 54.3],
+    [22.35, 55.2],
+  ]);
+});
+
 test("email preview falls back from a selected claim part to its actual kitchen element", () => {
   const sourceHotspot = {
     componentId: "component-dishwasher-base",
