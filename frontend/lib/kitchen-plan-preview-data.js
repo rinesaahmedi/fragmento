@@ -601,12 +601,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "sink-faucet",
-      points: [[17.8, 57.5], [38.05, 56.9], [38.05, 59.35], [17.8, 60.25]],
-      preserveManualSize: true,
-    },
-    {
-      componentKey: "sink-faucet",
-      points: [[25.05, 49.15], [30.8, 48.45], [30.8, 58.15], [25.05, 58.65]],
+      points: [[25.05, 47.15], [30.8, 47.15], [30.8, 58.15], [25.05, 58.65]],
       preserveManualSize: true,
     },
     {
@@ -623,7 +618,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "sink-base",
-      points: [[31.45, 60.55], [42.25, 59.8], [42.25, 88.75], [31.45, 90.1]],
+      points: [[31.45, 61.55], [42.55, 59.8], [42.25, 89.25], [31.45, 90.8]],
     },
     {
       componentKey: "base-module-2",

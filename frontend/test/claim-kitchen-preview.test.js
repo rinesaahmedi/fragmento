@@ -232,6 +232,26 @@ test("AB 105828 email reuses the dashboard-matched AB 105822 sink geometry", () 
   );
 });
 
+test("AB 105831 email uses the dashboard sink and faucet geometry", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105831"];
+  const sinkBase = hotspots.find((hotspot) => hotspot.componentKey === "sink-base");
+  const faucets = hotspots.filter((hotspot) => hotspot.componentKey === "sink-faucet");
+
+  assert.deepEqual(sinkBase.points, [
+    [31.45, 61.55],
+    [42.55, 59.8],
+    [42.25, 89.25],
+    [31.45, 90.8],
+  ]);
+  assert.equal(faucets.length, 1);
+  assert.deepEqual(faucets[0].points, [
+    [25.05, 47.15],
+    [30.8, 47.15],
+    [30.8, 58.15],
+    [25.05, 58.65],
+  ]);
+});
+
 test("email preview falls back from a selected claim part to its actual kitchen element", () => {
   const sourceHotspot = {
     componentId: "component-dishwasher-base",
