@@ -3,6 +3,7 @@ import http from "http";
 import path from "path";
 import https from "https";
 import nodemailer from "nodemailer";
+import { resolveServiceClaimEmailRecipient } from "../../../lib/service-claim-email-recipient";
 import { Prisma } from "@prisma/client";
 import { after, NextResponse } from "next/server";
 import { getPublicContractClaimPlanAsset } from "../../../lib/contract-claim-plan-assets";
@@ -340,7 +341,7 @@ async function postWebhook(payload) {
 }
 
 async function sendComplaintEmail(payload, attachmentParts = []) {
-  const recipient = String(process.env.SERVICE_REQUEST_EMAIL || process.env.ADMIN_EMAIL || "").trim();
+  const recipient = resolveServiceClaimEmailRecipient(payload.contractNumber);
   const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();
 
