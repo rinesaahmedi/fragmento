@@ -1982,6 +1982,23 @@ test("non-L claim plans keep a compact sink hotspot separate from cabinet and fa
   assert.equal(faucet.height, 10);
 });
 
+test("AB 105807 uses its configured sink cabinet for the elevation sink band", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentKey: "sink-faucet", left: 30.7, top: 54.5, width: 4.4, height: 8 },
+    { componentKey: "base-module-2", left: 20.95, top: 63.63, width: 15.68, height: 32.5 },
+  ], [
+    { partKey: "sink", sourceComponentKey: "sink-faucet" },
+    { partKey: "sink-cabinet", sourceComponentKey: "base-module-2" },
+    { partKey: "faucet", sourceComponentKey: "sink-faucet" },
+  ], "ab-105807");
+  const sink = result.find((entry) => entry.claimPartKey === "sink");
+
+  assert.equal(sink.left, 20.95);
+  assert.equal(sink.top, 62.43);
+  assert.equal(sink.width, 15.68);
+  assert.equal(sink.height, 1.2);
+});
+
 test("oven, drawer, and cooktop use independent claim hotspots", () => {
   const claimParts = [
     { partKey: "oven", sourceComponentKey: "oven-module" },

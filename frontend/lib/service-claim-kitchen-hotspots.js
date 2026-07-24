@@ -771,8 +771,10 @@ function splitSinkFixtureHotspot(hotspot, part) {
   return separated;
 }
 
-function elevationSinkHotspot(hotspots, part) {
-  const sinkBase = hotspots.find((hotspot) => hotspot?.componentKey === "sink-base");
+function elevationSinkHotspot(hotspots, part, sinkCabinetSourceKey = "sink-base") {
+  const sinkBase = hotspots.find(
+    (hotspot) => hotspot?.componentKey === sinkCabinetSourceKey,
+  );
   if (!sinkBase) return null;
 
   const stripHeight = 1.2;
@@ -1361,6 +1363,9 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
 
   const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
   const hasVisibleSink = isLShapedClaimKitchen(normalizedSlug);
+  const elevationSinkCabinetSourceKey = normalizedParts.find(
+    (part) => part.partKey === "sink-cabinet",
+  )?.sourceComponentKey || "sink-base";
   const worktopDefinition = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[normalizedSlug];
   const worktopEndPanelDefinition = WORKTOP_END_PANEL_DEFINITIONS_BY_SLUG[normalizedSlug];
   const worktopParts = new Map(
@@ -1439,7 +1444,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     return visibleSourceParts.flatMap((part) => {
       if (!hasVisibleSink && part.partKey === "sink") {
         return hotspotIndex === primarySinkFixtureIndex
-          ? elevationSinkHotspot(hotspots, part) || []
+          ? elevationSinkHotspot(hotspots, part, elevationSinkCabinetSourceKey) || []
           : [];
       }
       if (part.partKey === "faucet") {
