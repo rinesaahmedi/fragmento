@@ -180,6 +180,16 @@ test("AB 105814 email oven uses the dashboard selection coordinates", () => {
   });
 });
 
+test("AB 105814 email worktop uses the dashboard selection coordinates", () => {
+  const worktops = PLAN_HOTSPOTS_BY_SLUG["ab-105814"]
+    .filter((hotspot) => hotspot.componentKey === "worktop");
+
+  assert.deepEqual(worktops, [
+    { componentKey: "worktop", left: 17.77, top: 57.04, width: 76.96, height: 1.33 },
+    { componentKey: "worktop", left: 17.77, top: 57.04, width: 0.37, height: 30.33 },
+  ]);
+});
+
 test("AB 105815 email uses the same oven layout as the dashboard", () => {
   const emailOven = PLAN_HOTSPOTS_BY_SLUG["ab-105815"]
     .find((hotspot) => hotspot.componentKey === "oven-module");
