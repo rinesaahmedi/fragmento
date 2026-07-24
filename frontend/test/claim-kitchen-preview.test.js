@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 import sharp from "sharp";
 import {
+  applyClaimPreviewSourceHotspotOverrides,
   applyVisibleComponentsToSvgMarkup,
   buildKitchenPreviewSvgMarkup,
   cropClaimPlanHotspot,
@@ -151,6 +152,19 @@ test("AB 105758 email preview uses the same actual-element plan as the service p
   assert.ok(hotspots.some((hotspot) => hotspot.componentKey === "base-module-3"));
   assert.ok(hotspots.some((hotspot) => hotspot.componentKey === "drawer-module"));
   assert.ok(hotspots.some((hotspot) => hotspot.componentKey === "oven-module"));
+});
+
+test("AB 105811 email preview translates the oven to the original SVG coordinates", () => {
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105811"];
+  const corrected = applyClaimPreviewSourceHotspotOverrides("ab-105811", sourceHotspots);
+  const originalOven = sourceHotspots.find((hotspot) => hotspot.componentKey === "oven-module");
+  const correctedOven = corrected.find((hotspot) => hotspot.componentKey === "oven-module");
+
+  assert.equal(originalOven.left, 34.84);
+  assert.ok(Math.abs(correctedOven.left - 50.69358669833729) < 0.000001);
+  assert.ok(Math.abs(correctedOven.top - 65.00840336134453) < 0.000001);
+  assert.ok(Math.abs(correctedOven.width - 15.676959619952495) < 0.000001);
+  assert.ok(Math.abs(correctedOven.height - 32.45042016806723) < 0.000001);
 });
 
 test("email preview falls back from a selected claim part to its actual kitchen element", () => {

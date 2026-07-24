@@ -327,6 +327,31 @@ export async function renderClaimKitchenPreviewSvg({
 const PDF_PLAN_SOURCE_WIDTH = 842;
 const PDF_PLAN_SOURCE_HEIGHT = 595;
 
+const CLAIM_PREVIEW_SOURCE_HOTSPOT_OVERRIDES = {
+  // AB 105811's legacy picker coordinates are based on its cropped display
+  // canvas. The email compositor renders the original 842 x 595 SVG, where
+  // the oven face is the fourth base unit: x=3557..4657 and y=126..1735 in
+  // the SVG's inverted 1/12-unit coordinate system.
+  "ab-105811": {
+    "oven-module": {
+      left: (3557 * 0.12 / PDF_PLAN_SOURCE_WIDTH) * 100,
+      top: ((PDF_PLAN_SOURCE_HEIGHT - 1735 * 0.12) / PDF_PLAN_SOURCE_HEIGHT) * 100,
+      width: ((4657 - 3557) * 0.12 / PDF_PLAN_SOURCE_WIDTH) * 100,
+      height: ((1735 - 126) * 0.12 / PDF_PLAN_SOURCE_HEIGHT) * 100,
+    },
+  },
+};
+
+export function applyClaimPreviewSourceHotspotOverrides(kitchenSlug, hotspots = []) {
+  const overrides = CLAIM_PREVIEW_SOURCE_HOTSPOT_OVERRIDES[normalizeKitchenSlug(kitchenSlug)];
+  if (!overrides) return hotspots;
+
+  return hotspots.map((hotspot) => {
+    const override = overrides[String(hotspot?.componentKey || "").trim()];
+    return override ? { ...hotspot, ...override } : hotspot;
+  });
+}
+
 function getClaimPlanHotspotBounds(hotspot) {
   const points = Array.isArray(hotspot?.points) ? hotspot.points : [];
   if (points.length) {
@@ -571,7 +596,7 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
   }
 
   const displayHotspots = withClaimPreviewDerivedSinkFaucet(
-    sourceHotspots,
+    applyClaimPreviewSourceHotspotOverrides(normalizedSlug, sourceHotspots),
     plan.kitchenConfig?.components,
   );
   const preparedHotspots = buildServiceClaimBlendeHotspots(
