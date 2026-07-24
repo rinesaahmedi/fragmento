@@ -3031,6 +3031,25 @@ test("AB 105822 reuses the pixel-matched AB 105825 sink polygon", () => {
   assert.deepEqual(sinkFor("ab-105822"), sinkFor("ab-105825"));
 });
 
+test("AB 105822 exposes one clean claim hotspot for each worktop run", () => {
+  const worktopHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105822"]
+    .filter((hotspot) => hotspot.componentKey === "worktop");
+  const result = buildServiceClaimPartHotspots(worktopHotspots, [
+    { partKey: "worktop-left", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceComponentKey: "worktop" },
+  ], "ab-105822");
+
+  assert.deepEqual(result.map((hotspot) => hotspot.claimPartKey), [
+    "worktop-left",
+    "worktop-right",
+  ]);
+  assert.deepEqual(result.map((hotspot) => hotspot.componentId), [
+    "component-claim-worktop-left",
+    "component-claim-worktop-right",
+  ]);
+  assert.notDeepEqual(result[0].points, result[1].points);
+});
+
 test("German service claim labels do not fall back to English catalog names", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
 
