@@ -741,7 +741,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "worktop", left: 17.06, top: 58.15, width: 0.45, height: 31.09 },
     { componentKey: "sink-faucet", left: 68.2, top: 51.95, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.51, top: 59.54, width: 10.73, height: 29.7 },
-    { componentKey: "oven-module", left: 28.24, top: 59.54, width: 14.32, height: 29.7 },
+    { componentKey: "oven-module", left: 28.65, top: 58.37, width: 14.01, height: 29.0 },
     { componentKey: "base-module-2", left: 42.56, top: 59.54, width: 9.53, height: 29.7 },
     { componentKey: "base-module-3", left: 52.09, top: 59.54, width: 14.31, height: 29.7 },
     { componentKey: "sink-base", left: 66.4, top: 59.54, width: 14.31, height: 29.7 },

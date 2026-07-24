@@ -167,6 +167,19 @@ test("AB 105811 email preview translates the oven to the original SVG coordinate
   assert.ok(Math.abs(correctedOven.height - 32.45042016806723) < 0.000001);
 });
 
+test("AB 105814 email oven uses the dashboard selection coordinates", () => {
+  const oven = PLAN_HOTSPOTS_BY_SLUG["ab-105814"]
+    .find((hotspot) => hotspot.componentKey === "oven-module");
+
+  assert.deepEqual(oven, {
+    componentKey: "oven-module",
+    left: 28.65,
+    top: 58.37,
+    width: 14.01,
+    height: 29.0,
+  });
+});
+
 test("email preview falls back from a selected claim part to its actual kitchen element", () => {
   const sourceHotspot = {
     componentId: "component-dishwasher-base",
