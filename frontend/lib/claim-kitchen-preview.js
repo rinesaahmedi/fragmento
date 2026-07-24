@@ -509,12 +509,17 @@ function buildClaimPlanMask(hotspots, width, height) {
   return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`);
 }
 
-function buildClaimPlanSelectionOverlay(hotspots, width, height) {
+function buildClaimPlanSelectionOverlay(
+  hotspots,
+  width,
+  height,
+  attributes = 'fill="rgba(62,188,116,0.34)" stroke="none"',
+) {
   const shapes = hotspots.map((hotspot) => claimPlanShapeMarkup(
     hotspot,
     width,
     height,
-    'fill="rgba(62,188,116,0.34)" stroke="none"',
+    attributes,
   )).join("");
   return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes}</svg>`);
 }
@@ -689,7 +694,16 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     { input: faintPlan },
     ...(purchasedLayer ? [{ input: purchasedLayer }] : []),
     ...(selectedHotspots.length
-      ? [{ input: buildClaimPlanSelectionOverlay(selectedHotspots, outputWidth, outputHeight) }]
+      ? [{
+          input: buildClaimPlanSelectionOverlay(
+            selectedHotspots,
+            outputWidth,
+            outputHeight,
+            normalizedSlug === "ab-105824"
+              ? 'fill="rgba(62,188,116,0.58)" stroke="none"'
+              : undefined,
+          ),
+        }]
       : []),
     ...(applianceCutoutLayer
       ? [

@@ -251,6 +251,8 @@ test("email preview selection overlay is strong enough to remain visible after e
   );
 
   assert.match(source, /fill="rgba\(62,188,116,0\.34\)" stroke="none"/);
+  assert.match(source, /normalizedSlug === "ab-105824"/);
+  assert.match(source, /fill="rgba\(62,188,116,0\.58\)" stroke="none"/);
   assert.match(source, /png\(\{ compressionLevel: 9, palette: true, quality: 90 \}\)/);
 });
 
