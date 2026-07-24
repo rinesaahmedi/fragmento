@@ -77,9 +77,20 @@ test("AB 105822 catalog preview uses the AB 105825 layout", () => {
     { componentKey: "sink-base" },
   ]);
   const baseModule = preview.hotspots.find((hotspot) => hotspot.componentKey === "base-module-3");
+  const worktops = PLAN_HOTSPOTS_BY_SLUG["ab-105822"]
+    .filter((hotspot) => hotspot.componentKey === "worktop");
 
   assert.equal(preview.imageHref, "/plans/AB%20105825.svg");
-  assert.equal(PLAN_HOTSPOTS_BY_SLUG["ab-105822"], PLAN_HOTSPOTS_BY_SLUG["ab-105825"]);
+  assert.notEqual(PLAN_HOTSPOTS_BY_SLUG["ab-105822"], PLAN_HOTSPOTS_BY_SLUG["ab-105825"]);
+  assert.equal(worktops.length, 2);
+  assert.ok(worktops.every((hotspot) => !hotspot.preserveManualSize));
+  assert.ok(worktops.every((hotspot) =>
+    hotspot.points.some(([x, y]) => x === 43.467933 && y === 53.277311)
+    && hotspot.points.some(([x, y]) => x === 44.299287 && y === 54.621849)
+  ));
+  assert.ok(worktops.every((hotspot) =>
+    !hotspot.points.some(([x, y]) => x === 43.71 && y === 54.45)
+  ));
   assert.ok(preview.crop.width < 100);
   assert.ok(baseModule.top > 50);
   assert.ok(baseModule.height > 25);
