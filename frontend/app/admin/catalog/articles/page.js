@@ -350,7 +350,7 @@ function ClaimProductForm({ action, claimProduct, submitLabel }) {
   );
 }
 
-function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems }) {
+function CatalogDeleteForm({ action, itemLabel, entityLabel, confirmKey, linkedKitchenItems }) {
   const linkedCount = Number(linkedKitchenItems || 0);
   if (linkedCount > 0) {
     return (
@@ -370,6 +370,8 @@ function CatalogDeleteForm({ action, itemLabel, entityLabel, linkedKitchenItems 
         name="_intent"
         value="delete"
         style={deleteButtonStyle}
+        confirmKey={confirmKey}
+        confirmValues={{ item: itemLabel }}
         confirmFallback={`Delete ${entityLabel.toLowerCase()} "${itemLabel}"?\nThis action cannot be undone.`}
       >
         <AdminText i18nKey="catalogAdmin.delete" fallback="Delete" />
@@ -528,7 +530,18 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
         >
           {!articles.length ? <p style={emptyStateStyle}><AdminText i18nKey="catalogAdmin.noArticles" fallback="No catalog articles found." /></p> : (
             <div style={tableWrapStyle}>
-              <table style={tableStyle}>
+              <table style={catalogArticlesTableStyle}>
+                <colgroup>
+                  <col style={{ width: "12.5%" }} />
+                  <col style={{ width: "20%" }} />
+                  <col style={{ width: "20%" }} />
+                  <col style={{ width: "9%" }} />
+                  <col style={{ width: "10%" }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "8.5%" }} />
+                  <col style={{ width: "6%" }} />
+                  <col style={{ width: "6%" }} />
+                </colgroup>
                 <thead>
                   <tr>
                     <th style={thStyle}><AdminText i18nKey="catalogAdmin.articleNumber" fallback="Article number" /></th>
@@ -539,7 +552,6 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                     <th style={thStyle}><AdminText i18nKey="catalogAdmin.price" fallback="Price" /></th>
                     <th style={thStyle}><AdminText i18nKey="catalogAdmin.fixedPackage" fallback="Fixed package" /></th>
                     <th style={thStyle}><AdminText i18nKey="catalogAdmin.active" fallback="Active" /></th>
-                    <th style={thStyle}><AdminText i18nKey="catalogAdmin.productInformation" fallback="Product info" /></th>
                     <th style={thStyle}><AdminText i18nKey="catalogAdmin.linkedKitchenItems" fallback="Linked kitchen items" /></th>
                   </tr>
                 </thead>
@@ -564,17 +576,10 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                         <td style={tdStyle}>{article.isActive
                           ? <AdminText i18nKey="catalogAdmin.yes" fallback="Yes" />
                           : <AdminText i18nKey="catalogAdmin.no" fallback="No" />}</td>
-                        <td style={tdStyle}>
-                          <span style={article.productInfoPdfPath ? productInfoReadyStyle : productInfoMissingStyle}>
-                            {article.productInfoPdfPath
-                              ? <AdminText i18nKey="catalogAdmin.ready" fallback="Ready" />
-                              : <AdminText i18nKey="catalogAdmin.missing" fallback="Missing" />}
-                          </span>
-                        </td>
                         <td style={tdStyle}>{article.linkedKitchenItems}</td>
                       </tr>
                       <tr>
-                        <td colSpan={10} style={editRowCellStyle}>
+                        <td colSpan={9} style={editRowCellStyle}>
                           <div style={editActionRowStyle}>
                             {editArticleId === article.id ? (
                               <details open style={editDetailsStyle}>
@@ -594,6 +599,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/articles/${article.id}`}
                               entityLabel="Article"
+                              confirmKey="catalogAdmin.deleteArticleConfirm"
                               itemLabel={article.articleNumber}
                               linkedKitchenItems={article.linkedKitchenItems}
                             />
@@ -659,6 +665,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/blenden/${blende.id}`}
                               entityLabel="Blende"
+                              confirmKey="catalogAdmin.deleteBlendeConfirm"
                               itemLabel={blende.code}
                               linkedKitchenItems={blende.linkedKitchenItems}
                             />
@@ -724,6 +731,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                             <CatalogDeleteForm
                               action={`/api/admin/catalog/services/${service.id}`}
                               entityLabel="Service"
+                              confirmKey="catalogAdmin.deleteServiceConfirm"
                               itemLabel={service.code}
                               linkedKitchenItems={service.linkedKitchenItems}
                             />
@@ -832,6 +840,11 @@ const addonFormStyle = {
 
 const articleFormStyle = {
   width: "100%",
+};
+
+const catalogArticlesTableStyle = {
+  ...tableStyle,
+  minWidth: 1180,
 };
 
 const productInfoDetailsStyle = {

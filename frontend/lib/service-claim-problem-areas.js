@@ -78,11 +78,11 @@ export function parseServiceClaimProblemAreas(raw) {
   }
 }
 
-export function formatServiceClaimProblemArea(area) {
+export function formatServiceClaimProblemArea(area, { includeCode = true } = {}) {
   const name = stripProductDimensionsFromLabel(String(area?.name || "").trim());
   const code = String(area?.code || "").trim();
 
-  if (name && code) {
+  if (includeCode && name && code) {
     return `${name} (${code})`;
   }
   return name || code || "";
@@ -98,8 +98,8 @@ export function formatServiceClaimProblemAreaForEmail(area) {
   return name || "";
 }
 
-export function formatServiceClaimProblemAreaList(raw) {
+export function formatServiceClaimProblemAreaList(raw, options) {
   return parseServiceClaimProblemAreas(raw)
-    .map(formatServiceClaimProblemArea)
+    .map((area) => formatServiceClaimProblemArea(area, options))
     .filter(Boolean);
 }

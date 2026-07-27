@@ -9,7 +9,14 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
-import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
+import {
+  AdminDateTime,
+  AdminKitchenDisplayName,
+  AdminPluralText,
+  AdminStatusBadge,
+  AdminText,
+  AdminTranslatedInput,
+} from "../../../components/admin-i18n";
 import AdminConfirmSubmitButton from "../../../components/admin-confirm-submit-button";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
@@ -32,9 +39,12 @@ function formatCurrency(value) {
 
 function PaymentStatusBadge({ status }) {
   const value = String(status || "UNPAID").toUpperCase();
-  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : value === "CANCELLED" ? "Cancelled" : "Unpaid";
   const tone = value === "PAID" ? "#1f6f43" : value === "PENDING" ? "#8a5a13" : value === "UNPAID" ? "var(--app-text-muted)" : "var(--app-danger-text)";
-  return <span style={{ ...badgeStyle, color: tone }}>{label}</span>;
+  return (
+    <span style={{ ...badgeStyle, color: tone }}>
+      <AdminText i18nKey={`reportsAdmin.paymentStatus.${value.toLowerCase()}`} fallback={value} />
+    </span>
+  );
 }
 
 function DeleteAllPxOrdersAction() {
@@ -44,9 +54,10 @@ function DeleteAllPxOrdersAction() {
         name="_intent"
         value="delete-all"
         style={deleteButtonStyle}
+        confirmKey="pxOrdersAdmin.deleteAllConfirm"
         confirmFallback={"Delete all PX orders?\nThis removes every test order and cannot be undone."}
       >
-        Delete all PX orders
+        <AdminText i18nKey="pxOrdersAdmin.deleteAll" fallback="Delete all PX orders" />
       </AdminConfirmSubmitButton>
     </form>
   );
@@ -69,53 +80,75 @@ export default async function AdminPxOrdersPage({ searchParams = {} }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title="PX orders"
-          description={`${orders.length} test order${orders.length === 1 ? "" : "s"} match the current filters.`}
+          title={<AdminText i18nKey="pxOrdersAdmin.title" fallback="PX orders" />}
+          description={(
+            <AdminPluralText
+              count={orders.length}
+              singularKey="pxOrdersAdmin.matchingOrder"
+              pluralKey="pxOrdersAdmin.matchingOrders"
+              singularFallback="{count} test order matches the current filters."
+              pluralFallback="{count} test orders match the current filters."
+            />
+          )}
           actions={<DeleteAllPxOrdersAction />}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
           <form action="/admin/px-orders" method="get" style={filterPanelStyle}>
-            <input name="q" defaultValue={filters.q} placeholder="Order, customer, contract, city..." style={filterInputStyle} />
+            <AdminTranslatedInput
+              name="q"
+              defaultValue={filters.q}
+              placeholderKey="ordersAdmin.searchPlaceholder"
+              placeholderFallback="Order, customer, contract, city..."
+              style={filterInputStyle}
+            />
             <select name="status" defaultValue={filters.status} style={filterInputStyle}>
-              <option value="">All statuses</option>
-              <option value="NEW">New</option>
-              <option value="EMAILED">Emailed</option>
-              <option value="CONFIRMED">Confirmed</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value=""><AdminText i18nKey="dashboard.allStatuses" fallback="All statuses" /></option>
+              <option value="NEW"><AdminText i18nKey="status.new" fallback="New" /></option>
+              <option value="EMAILED"><AdminText i18nKey="status.emailed" fallback="Emailed" /></option>
+              <option value="CONFIRMED"><AdminText i18nKey="status.confirmed" fallback="Confirmed" /></option>
+              <option value="CANCELLED"><AdminText i18nKey="status.cancelled" fallback="Cancelled" /></option>
             </select>
             <input name="dateFrom" type="date" defaultValue={filters.dateFrom} style={filterInputStyle} />
             <input name="dateTo" type="date" defaultValue={filters.dateTo} style={filterInputStyle} />
-            <button type="submit" style={filterButtonStyle}>Apply filters</button>
-            <Link href="/admin/px-orders" style={clearLinkStyle}>Clear</Link>
+            <button type="submit" style={filterButtonStyle}>
+              <AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" />
+            </button>
+            <Link href="/admin/px-orders" style={clearLinkStyle}>
+              <AdminText i18nKey="contractsAdmin.clear" fallback="Clear" />
+            </Link>
           </form>
 
           <div style={tableWrapStyle}>
             <table style={tableStyle}>
               <thead>
                 <tr>
-                  <th style={thStyle}>Order</th>
-                  <th style={thStyle}>Customer</th>
-                  <th style={thStyle}>Kitchen</th>
-                  <th style={thStyle}>Status</th>
-                  <th style={thStyle}>Payment</th>
-                  <th style={thStyle}>Total</th>
-                  <th style={thStyle}>Created</th>
-                  <th style={thStyle}>Action</th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.order" fallback="Order" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.customer" fallback="Customer" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.kitchen" fallback="Kitchen" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.payment" fallback="Payment" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
+                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
                 {!orders.length ? (
                   <tr>
-                    <td style={tdStyle} colSpan={8}>No PX orders found.</td>
+                    <td style={tdStyle} colSpan={8}>
+                      <AdminText i18nKey="pxOrdersAdmin.noOrders" fallback="No PX orders found." />
+                    </td>
                   </tr>
                 ) : null}
                 {orders.map((order) => (
                   <tr key={order.id}>
                     <td style={tdStyle}>
                       <Link href={`/admin/px-orders/${order.id}`} style={orderLinkStyle}>{order.orderNumber}</Link>
-                      <div style={metaStyle}>Contract <strong>{order.contractNumber || "-"}</strong></div>
+                      <div style={metaStyle}>
+                        <AdminText i18nKey="contractsAdmin.contract" fallback="Contract" /> <strong>{order.contractNumber || "-"}</strong>
+                      </div>
                     </td>
                     <td style={tdStyle}>
                       <strong>{order.firstName} {order.lastName}</strong>

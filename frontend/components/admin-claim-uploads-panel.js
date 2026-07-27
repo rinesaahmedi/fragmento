@@ -56,6 +56,9 @@ export function AdminClaimUploadsPanel({ claimId, files }) {
   const [textError, setTextError] = useState("");
   const [textLoading, setTextLoading] = useState(false);
   const [mediaError, setMediaError] = useState(false);
+  const localizeMeta = (meta) => String(meta || "")
+    .replace(/^file(?=\s|$)/, translate("claimsAdmin.file", "File"))
+    .replace(/\bserial number\b/g, translate("claimsAdmin.serialNumber", "Serial number"));
 
   const close = useCallback(() => {
     setPreview(null);
@@ -162,7 +165,7 @@ export function AdminClaimUploadsPanel({ claimId, files }) {
                 </a>
               </span>
             </div>
-            <span style={attachmentMetaStyle}>{file.meta}</span>
+            <span style={attachmentMetaStyle}>{localizeMeta(file.meta)}</span>
           </li>
         ))}
       </ul>

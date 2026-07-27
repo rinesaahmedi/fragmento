@@ -1,6 +1,7 @@
 "use client";
 
 import { Children, isValidElement, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useAdminI18n } from "./admin-i18n";
 
 export default function AdminSelect({
   name,
@@ -15,9 +16,12 @@ export default function AdminSelect({
   style,
   className = "",
   "aria-label": ariaLabel,
+  ariaLabelKey,
+  ariaLabelValues,
   label,
   ...triggerProps
 }) {
+  const { translate } = useAdminI18n();
   const generatedId = useId();
   const listboxId = `${id || generatedId}-listbox`;
   const buttonRef = useRef(null);
@@ -42,6 +46,10 @@ export default function AdminSelect({
 
   const selectedOption = options.find((option) => option.value === selectedValue) || null;
   const displayLabel = selectedOption?.label || placeholder || options[0]?.label || "";
+  let translatedAriaLabel = translate(ariaLabelKey || "", ariaLabel || "");
+  Object.entries(ariaLabelValues || {}).forEach(([key, replacement]) => {
+    translatedAriaLabel = translatedAriaLabel.replaceAll(`{${key}}`, replacement);
+  });
 
   useEffect(() => {
     if (!controlled) {
@@ -161,7 +169,7 @@ export default function AdminSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listboxId}
-        aria-label={ariaLabel || (typeof label === "string" ? label : undefined)}
+        aria-label={translatedAriaLabel || (typeof label === "string" ? label : undefined)}
         onClick={() => setOpen((current) => !current)}
         onKeyDown={handleKeyDown}
       >
@@ -169,7 +177,7 @@ export default function AdminSelect({
         <span className="admin-select__chevron" aria-hidden="true" />
       </button>
       {open ? (
-        <span className="admin-select__menu" id={listboxId} role="listbox" aria-label={ariaLabel || (typeof label === "string" ? label : undefined)}>
+        <span className="admin-select__menu" id={listboxId} role="listbox" aria-label={translatedAriaLabel || (typeof label === "string" ? label : undefined)}>
           {options.map((option, index) => {
             const selected = option.value === selectedValue;
             const active = index === activeIndex;

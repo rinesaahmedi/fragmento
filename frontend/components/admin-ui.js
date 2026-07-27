@@ -147,7 +147,12 @@ export const tableWrapStyle = {
   background: "var(--color-card)",
   boxShadow: "var(--app-shadow-soft)",
 };
-export const tableStyle = { width: "100%", borderCollapse: "collapse", background: "var(--app-surface)" };
+export const tableStyle = {
+  width: "100%",
+  borderCollapse: "collapse",
+  background: "var(--app-surface)",
+  tableLayout: "fixed",
+};
 export const thStyle = {
   textAlign: "left",
   padding: "16px 20px",
@@ -158,12 +163,14 @@ export const thStyle = {
   borderBottom: "1px solid var(--app-border)",
   background: "var(--app-surface-muted)",
   fontWeight: 700,
+  overflowWrap: "anywhere",
 };
 export const tdStyle = {
   padding: "20px",
   borderBottom: "1px solid var(--app-border)",
   color: "var(--app-text)",
   verticalAlign: "top",
+  overflowWrap: "anywhere",
 };
 export const inputStyle = {
   width: "100%",
@@ -333,6 +340,7 @@ function statusPill(status) {
     fontSize: 12,
     fontWeight: 700,
     letterSpacing: "0.06em",
+    whiteSpace: "nowrap",
   };
 
   if (status === "ACTIVE" || status === "CONFIRMED") {

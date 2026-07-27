@@ -11,6 +11,7 @@ import {
   thStyle,
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
+import { AdminText } from "../../../components/admin-i18n";
 import { requireAdminPage } from "../../../lib/auth";
 import { prisma } from "../../../lib/prisma";
 
@@ -260,13 +261,15 @@ async function loadCatalogAuditData() {
 function SampleTable({ title, rows, columns }) {
   return (
     <AdminSection title={title}>
-      {!rows.length ? <p style={emptyStateStyle}>No rows.</p> : (
+      {!rows.length ? <p style={emptyStateStyle}><AdminText i18nKey="catalogAuditAdmin.noRows" fallback="No rows." /></p> : (
         <div style={tableWrapStyle}>
           <table style={tableStyle}>
             <thead>
               <tr>
                 {columns.map((column) => (
-                  <th key={column.key} style={thStyle}>{column.label}</th>
+                  <th key={column.key} style={thStyle}>
+                    <AdminText i18nKey={column.labelKey} fallback={column.label} />
+                  </th>
                 ))}
               </tr>
             </thead>
@@ -289,12 +292,25 @@ function SampleTable({ title, rows, columns }) {
 }
 
 const rowColumns = [
-  { key: "kitchenSlug", label: "Kitchen" },
-  { key: "code", label: "Code", render: (row) => <span style={codePillStyle}>{row.code}</span> },
-  { key: "name", label: "Name" },
-  { key: "articleNumber", label: "Article" },
-  { key: "price", label: "Price" },
+  { key: "kitchenSlug", labelKey: "ordersAdmin.kitchen", label: "Kitchen" },
+  { key: "code", labelKey: "catalogAdmin.code", label: "Code", render: (row) => <span style={codePillStyle}>{row.code}</span> },
+  { key: "name", labelKey: "kitchenDetailAdmin.name", label: "Name" },
+  { key: "articleNumber", labelKey: "catalogAuditAdmin.article", label: "Article" },
+  { key: "price", labelKey: "catalogAdmin.price", label: "Price" },
 ];
+
+function AuditWarningText({ warnings = [] }) {
+  return warnings.map((warning, index) => {
+    const [field, detail] = String(warning).split(": ");
+    return (
+      <span key={`${warning}-${index}`}>
+        {index ? "; " : ""}{field}: {detail === "composite article/blende string"
+          ? <AdminText i18nKey="catalogAuditAdmin.compositeArticleBlendeString" fallback="composite article/blende string" />
+          : detail}
+      </span>
+    );
+  });
+}
 
 export default async function AdminCatalogAuditPage() {
   const admin = await requireAdminPage();
@@ -304,67 +320,72 @@ export default async function AdminCatalogAuditPage() {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <PageHero
-          eyebrow="Read-only"
-          title="Catalog Audit"
-          description="Catalog visibility for linked kitchen items. This page does not edit catalog records, KitchenItem prices, checkout, or order data."
+          eyebrow={<AdminText i18nKey="catalogAuditAdmin.readOnly" fallback="Read-only" />}
+          title={<AdminText i18nKey="catalogAuditAdmin.title" fallback="Catalog Audit" />}
+          description={<AdminText i18nKey="catalogAuditAdmin.description" fallback="Catalog visibility for linked kitchen items. This page does not edit catalog records, KitchenItem prices, checkout, or order data." />}
           stats={[
-            <MetricCard key="articles" label="CatalogArticle" value={counts.catalogArticles} detail="Reusable articles" />,
-            <MetricCard key="matched" label="MATCHED rows" value={counts.matchedRows} detail="Linked KitchenItems" />,
-            <MetricCard key="defaults" label="Default unlinked" value={counts.defaultIncludedUnlinkedRows} detail="Intentionally no catalog link" />,
-            <MetricCard key="warnings" label="Composite warnings" value={counts.compositeMarkerWarnings} detail={`${counts.compositeMarkerProblems} real problems`} />,
+            <MetricCard key="articles" label="CatalogArticle" value={counts.catalogArticles} detail={<AdminText i18nKey="catalogAuditAdmin.reusableArticles" fallback="Reusable articles" />} />,
+            <MetricCard key="matched" label={<AdminText i18nKey="catalogAuditAdmin.matchedRows" fallback="MATCHED rows" />} value={counts.matchedRows} detail={<AdminText i18nKey="catalogAuditAdmin.linkedKitchenItems" fallback="Linked kitchen items" />} />,
+            <MetricCard key="defaults" label={<AdminText i18nKey="catalogAuditAdmin.defaultUnlinked" fallback="Default unlinked" />} value={counts.defaultIncludedUnlinkedRows} detail={<AdminText i18nKey="catalogAuditAdmin.intentionallyNoLink" fallback="Intentionally no catalog link" />} />,
+            <MetricCard key="warnings" label={<AdminText i18nKey="catalogAuditAdmin.compositeWarnings" fallback="Composite warnings" />} value={counts.compositeMarkerWarnings} detail={<AdminText i18nKey="catalogAuditAdmin.realProblems" fallback="{count} real problems" values={{ count: counts.compositeMarkerProblems }} />} />,
           ]}
         />
 
-        <AdminSection title="Status Summary" description="Counts are read from the live database. KitchenItem.price remains the checkout source of truth.">
+        <AdminSection
+          title={<AdminText i18nKey="catalogAuditAdmin.statusSummary" fallback="Status Summary" />}
+          description={<AdminText i18nKey="catalogAuditAdmin.statusDescription" fallback="Counts are read from the live database. KitchenItem.price remains the checkout source of truth." />}
+        >
           <div style={summaryGridStyle}>
             <SummaryItem label="CatalogBlende" value={counts.catalogBlenden} />
             <SummaryItem label="CatalogService" value={counts.catalogServices} />
-            <SummaryItem label="Total KitchenItem rows" value={counts.totalKitchenItems} />
-            <SummaryItem label="Seeded KitchenItem rows" value={counts.seededKitchenItems} />
-            <SummaryItem label="test-3d-kitchen unlinked rows" value={counts.testUnlinkedRows} />
-            <SummaryItem label="Price mismatches" value={counts.priceMismatches} tone={counts.priceMismatches ? "bad" : "good"} />
-            <SummaryItem label="Missing catalog rows" value={counts.missingCatalogRows} tone={counts.missingCatalogRows ? "bad" : "good"} />
-            <SummaryItem label="Inactive catalog links" value={counts.inactiveCatalogLinks} tone={counts.inactiveCatalogLinks ? "bad" : "good"} />
-            <SummaryItem label="Catalog link state issues" value={counts.catalogLinkStateIssues} tone={counts.catalogLinkStateIssues ? "bad" : "good"} />
-            <SummaryItem label="Composite marker real problems" value={counts.compositeMarkerProblems} tone={counts.compositeMarkerProblems ? "bad" : "good"} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.totalKitchenRows" fallback="Total kitchen item rows" />} value={counts.totalKitchenItems} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.seededKitchenRows" fallback="Seeded kitchen item rows" />} value={counts.seededKitchenItems} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.testUnlinkedRows" fallback="test-3d-kitchen unlinked rows" />} value={counts.testUnlinkedRows} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.priceMismatches" fallback="Price mismatches" />} value={counts.priceMismatches} tone={counts.priceMismatches ? "bad" : "good"} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.missingCatalogRows" fallback="Missing catalog rows" />} value={counts.missingCatalogRows} tone={counts.missingCatalogRows ? "bad" : "good"} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.inactiveCatalogLinks" fallback="Inactive catalog links" />} value={counts.inactiveCatalogLinks} tone={counts.inactiveCatalogLinks ? "bad" : "good"} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.linkStateIssues" fallback="Catalog link state issues" />} value={counts.catalogLinkStateIssues} tone={counts.catalogLinkStateIssues ? "bad" : "good"} />
+            <SummaryItem label={<AdminText i18nKey="catalogAuditAdmin.compositeMarkerProblems" fallback="Composite marker real problems" />} value={counts.compositeMarkerProblems} tone={counts.compositeMarkerProblems ? "bad" : "good"} />
           </div>
         </AdminSection>
 
         <SampleTable
-          title="MATCHED Article-Only Rows"
+          title={<AdminText i18nKey="catalogAuditAdmin.matchedArticleOnly" fallback="MATCHED Article-Only Rows" />}
           rows={audit.matchedArticleOnlyRows.map((item) => compactItem(item, { articleNumber: item.catalogArticle?.articleNumber || item.articleNumber }))}
           columns={rowColumns}
         />
         <SampleTable
-          title="MATCHED Article + Blende Rows"
+          title={<AdminText i18nKey="catalogAuditAdmin.matchedArticleBlende" fallback="MATCHED Article + Blende Rows" />}
           rows={audit.matchedArticleBlendeRows.map((item) => compactItem(item, {
             articleNumber: item.catalogArticle?.articleNumber || item.articleNumber,
             blendeCode: normalizeBlendeCode(item.blendeCode),
           }))}
-          columns={[...rowColumns, { key: "blendeCode", label: "Blende" }]}
+          columns={[...rowColumns, { key: "blendeCode", labelKey: "orderDetailAdmin.blende", label: "Blende" }]}
         />
         <SampleTable
-          title="MATCHED Service Rows"
+          title={<AdminText i18nKey="catalogAuditAdmin.matchedService" fallback="MATCHED Service Rows" />}
           rows={audit.matchedServiceRows.map((item) => compactItem(item, { articleNumber: item.catalogService?.code || item.code }))}
           columns={rowColumns}
         />
         <SampleTable
-          title="Fixed-Price Package Rows"
+          title={<AdminText i18nKey="catalogAuditAdmin.fixedPriceRows" fallback="Fixed-Price Package Rows" />}
           rows={audit.fixedPackageRows.map((item) => compactItem(item, { articleNumber: item.catalogArticle?.articleNumber || item.articleNumber }))}
           columns={rowColumns}
         />
         <SampleTable
-          title="Default Included Rows Intentionally Unlinked"
+          title={<AdminText i18nKey="catalogAuditAdmin.defaultIncludedRows" fallback="Default Included Rows Intentionally Unlinked" />}
           rows={audit.defaultIncludedUnlinkedRows.map((item) => compactItem(item))}
           columns={rowColumns}
         />
         <SampleTable
-          title="Composite Marker Warning Examples"
-          rows={audit.markerWarnings.map((row) => ({
-            ...row,
-            warningText: row.warnings.join("; "),
-          }))}
-          columns={[...rowColumns, { key: "warningText", label: "Warning" }]}
+          title={<AdminText i18nKey="catalogAuditAdmin.warningExamples" fallback="Composite Marker Warning Examples" />}
+          rows={audit.markerWarnings}
+          columns={[...rowColumns, {
+            key: "warningText",
+            labelKey: "catalogAuditAdmin.warning",
+            label: "Warning",
+            render: (row) => <AuditWarningText warnings={row.warnings} />,
+          }]}
         />
       </div>
     </AdminShell>

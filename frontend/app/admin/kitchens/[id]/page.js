@@ -548,7 +548,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <AdminSelect name="status" defaultValue={kitchen.status} style={compactInputStyle}>
                 {KITCHEN_STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
-                    {status}
+                    <AdminText i18nKey={`status.${status.toLowerCase()}`} fallback={status} />
                   </option>
                 ))}
               </AdminSelect>
@@ -900,7 +900,12 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.itemCode" fallback="Item code" />}>
                     <div style={fieldWithHelpStyle}>
                       <input name="code" placeholder="DISH-600-STD" list="admin-kitchen-item-code-options" style={inputStyle} required />
-                      <span style={fieldHelpTextStyle}>Use templates; add -01, -02 for repeated cabinets. Article numbers go in the article field.</span>
+                      <span style={fieldHelpTextStyle}>
+                        <AdminText
+                          i18nKey="kitchenDetailAdmin.itemCodeHelp"
+                          fallback="Use templates; add -01, -02 for repeated cabinets. Article numbers go in the article field."
+                        />
+                      </span>
                     </div>
                   </FormField>
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.articleNumber" fallback="Article number(s)" />}>

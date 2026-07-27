@@ -79,7 +79,7 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
         fontFamily: "Manrope, sans-serif",
       }}
     >
-      {pendingHref ? <div className="admin-navigation-progress" aria-label="Loading" /> : null}
+      {pendingHref ? <div className="admin-navigation-progress" aria-label={translate("adminShellLogin.loading", "Loading")} /> : null}
       <div
         aria-hidden="true"
         style={{
@@ -791,19 +791,12 @@ function SettingsIcon({ active }) {
   return (
     <IconFrame active={active}>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <circle cx="8" cy="8" r="2.1" stroke="currentColor" strokeWidth="1.5" />
-        <path
-          d="M8 2.5V4M8 12V13.5M12.76 5.25L11.46 6M4.54 10L3.24 10.75M12.76 10.75L11.46 10M4.54 6L3.24 5.25"
-          stroke="currentColor"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-        <path
-          d="M10.9 3.8L10.15 5.1M5.85 10.9L5.1 12.2M12.2 5.1L10.9 5.85M5.1 10.15L3.8 10.9"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-        />
+        <path d="M2.5 4H6M10 4H13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="8" cy="4" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2.5 8H9M13 8H13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="11" cy="8" r="1.5" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M2.5 12H4M8 12H13.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx="6" cy="12" r="1.5" stroke="currentColor" strokeWidth="1.5" />
       </svg>
     </IconFrame>
   );

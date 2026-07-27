@@ -94,21 +94,12 @@ function buildAttachmentMetaText(file) {
     const areaLabel = formatServiceClaimProblemArea({
       name: file.areaName,
       code: file.areaCode,
-    });
+    }, { includeCode: false });
     if (areaLabel) {
       parts.push(areaLabel);
     }
   }
   return parts.filter(Boolean).join(" · ");
-}
-
-function formatClaimKitchenSummaryLines(claim) {
-  const kitchenName = String(claim.kitchenName || "").trim();
-  const selectedAreas = formatServiceClaimProblemAreaList(claim.problemAreasJson);
-  return [
-    kitchenName ? `Kitchen: ${kitchenName}` : "",
-    selectedAreas.length ? `Selected part: ${selectedAreas.join(", ")}` : "",
-  ].filter(Boolean);
 }
 
 export default async function AdminClaimDetailPage({ params, searchParams }) {
@@ -140,7 +131,8 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
   const rawUploadedAttachments = parseClaimAttachments(claim.attachmentsJson);
   const parsedProblemAreas = parseClaimProblemAreas(claim.problemAreasJson);
   const customerGender = getClaimCustomerGender(claim.fullName);
-  const claimKitchenSummaryLines = formatClaimKitchenSummaryLines(claim);
+  const claimKitchenName = String(claim.kitchenName || "").trim();
+  const claimSelectedAreas = formatServiceClaimProblemAreaList(claim.problemAreasJson, { includeCode: false });
   const claimKitchenPreview = await renderClaimKitchenPreviewSvg({
     kitchenSlug: claim.kitchenSlug,
     selectedAreas: claim.problemAreasJson,
@@ -161,7 +153,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
   const uploadedAttachments = generalUploadedAttachments;
   const problemAreaSections = parsedProblemAreas.map((area) => ({
     ...area,
-    label: formatServiceClaimProblemArea(area),
+    label: formatServiceClaimProblemArea(area, { includeCode: false }),
     files: uploadedAttachmentFiles.filter(
       (file) => file.role === "problem_area" && file.areaComponentId === area.componentId,
     ),
@@ -230,14 +222,27 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   <div style={claimKitchenSectionStyle}>
                     {claimKitchenPreview?.markup ? (
                       <div style={claimKitchenPreviewCardStyle}>
+                        <span id={`claim-kitchen-preview-${claim.id}`} style={visuallyHiddenStyle}>
+                          <AdminText i18nKey="claimsAdmin.kitchenPreview" fallback="Kitchen preview" />
+                        </span>
                         <div
-                          aria-label="Kitchen preview"
+                          role="img"
+                          aria-labelledby={`claim-kitchen-preview-${claim.id}`}
                           style={claimKitchenPreviewWrapStyle}
                           dangerouslySetInnerHTML={{ __html: claimKitchenPreview.markup }}
                         />
                       </div>
                     ) : null}
-                    <p style={detailTextStyle}>{claimKitchenSummaryLines.join("\n") || "-"}</p>
+                    <p style={detailTextStyle}>
+                      {claimKitchenName ? (
+                        <><AdminText i18nKey="claimsAdmin.kitchen" fallback="Kitchen" />: {claimKitchenName}</>
+                      ) : null}
+                      {claimKitchenName && claimSelectedAreas.length ? "\n" : null}
+                      {claimSelectedAreas.length ? (
+                        <><AdminText i18nKey="claimsAdmin.selectedPartSingular" fallback="Selected part" />: {claimSelectedAreas.join(", ")}</>
+                      ) : null}
+                      {!claimKitchenName && !claimSelectedAreas.length ? "-" : null}
+                    </p>
                   </div>
                 </div>
                 <div>
@@ -260,15 +265,13 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.landlord" fallback="Landlord" /></span>
-                  <p style={detailTextStyle}>
-                    {[
-                      claim.landlordName || "-",
-                      claim.landlordCompanyPhone ? `Company phone: ${claim.landlordCompanyPhone}` : null,
-                      claim.landlordCompanyEmail ? `Company email: ${claim.landlordCompanyEmail}` : null,
-                      claim.landlordPhone ? `Contact phone: ${claim.landlordPhone}` : null,
-                      claim.landlordEmail ? `Contact email: ${claim.landlordEmail}` : null,
-                    ].filter(Boolean).join("\n")}
-                  </p>
+                  <div style={detailTextStyle}>
+                    <div>{claim.landlordName || "-"}</div>
+                    {claim.landlordCompanyPhone ? <div><AdminText i18nKey="claimsAdmin.companyPhone" fallback="Company phone" />: {claim.landlordCompanyPhone}</div> : null}
+                    {claim.landlordCompanyEmail ? <div><AdminText i18nKey="claimsAdmin.companyEmail" fallback="Company email" />: {claim.landlordCompanyEmail}</div> : null}
+                    {claim.landlordPhone ? <div><AdminText i18nKey="claimsAdmin.contactPhone" fallback="Contact phone" />: {claim.landlordPhone}</div> : null}
+                    {claim.landlordEmail ? <div><AdminText i18nKey="claimsAdmin.contactEmail" fallback="Contact email" />: {claim.landlordEmail}</div> : null}
+                  </div>
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.hausmeister" fallback="Hausmeister" /></span>
@@ -292,12 +295,12 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                         <article key={area.componentId || area.label} style={problemAreaCardStyle}>
                           <strong style={problemAreaTitleStyle}>{area.label || "-"}</strong>
                           <p style={detailTextStyle}>
-                            {area.detail ? <AdminClaimLocalizedText text={area.detail} /> : "No item-specific description provided."}
+                            {area.detail ? <AdminClaimLocalizedText text={area.detail} /> : <AdminText i18nKey="claimsAdmin.noItemDescription" fallback="No item-specific description provided." />}
                           </p>
                           {area.files.length ? (
                             <AdminClaimUploadsPanel claimId={claim.id} files={area.files} />
                           ) : (
-                            <p style={detailTextStyle}>No item-specific files uploaded.</p>
+                            <p style={detailTextStyle}><AdminText i18nKey="claimsAdmin.noItemFiles" fallback="No item-specific files uploaded." /></p>
                           )}
                         </article>
                       ))}
@@ -403,6 +406,18 @@ const detailTextStyle = {
   color: "var(--app-text)",
   lineHeight: 1.6,
   whiteSpace: "pre-wrap",
+};
+
+const visuallyHiddenStyle = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0,
 };
 
 const claimKitchenSectionStyle = {

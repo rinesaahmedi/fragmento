@@ -17,6 +17,7 @@ import { AdminShell } from "../../../../components/admin-shell";
 import {
   AdminDateTime,
   AdminKitchenDisplayName,
+  AdminLocalizedName,
   AdminPluralText,
   AdminStatusBadge,
   AdminText,
@@ -29,7 +30,7 @@ import { requireAdminPage } from "../../../../lib/auth";
 import { getOrderById } from "../../../../lib/catalog";
 import { getPriceBreakdown } from "../../../../lib/price-utils";
 import { buildOrderConfirmationAttachmentLabels, buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
-import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME } from "../../../../lib/order-item-display";
+import { mergeSinkAndWorktopItems, SINK_AND_WORKTOP_CODE, SINK_AND_WORKTOP_NAME, SINK_AND_WORKTOP_NAME_DE } from "../../../../lib/order-item-display";
 import { buildOrderForNotifications } from "../../../../lib/orders";
 
 export const dynamic = "force-dynamic";
@@ -74,10 +75,12 @@ function getStatusHintFallback(status) {
   return "Next step: confirm the order and send the customer email.";
 }
 
-function formatPaymentMethod(value) {
+function PaymentMethodText({ value }) {
   const normalized = String(value || "").trim().toLowerCase();
-  if (!normalized) return "";
-  if (normalized === "card" || normalized === "visa" || normalized === "mastercard") return "Card";
+  if (!normalized) return null;
+  if (normalized === "card" || normalized === "visa" || normalized === "mastercard") {
+    return <AdminText i18nKey="orderDetailAdmin.card" fallback="Card" />;
+  }
   if (normalized === "paypal") return "PayPal";
   if (normalized === "klarna") return "Klarna";
   return value;
@@ -115,6 +118,13 @@ function getOrderItemPriceParts(item) {
     blendeUnitTotal,
     totalUnitPrice,
     lineTotal: totalUnitPrice * quantity,
+  };
+}
+
+function getOrderItemNameFields(item) {
+  return {
+    name: item.nameSnapshot || item.name || item.kitchenItem?.name || item.code || "",
+    nameDe: item.nameDeSnapshot || item.nameDe || item.kitchenItem?.nameDe || "",
   };
 }
 
@@ -205,6 +215,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
     id: `${sinkItem.id}-with-${worktopItem.id}`,
     code: SINK_AND_WORKTOP_CODE,
     nameSnapshot: SINK_AND_WORKTOP_NAME,
+    nameDeSnapshot: SINK_AND_WORKTOP_NAME_DE,
     priceSnapshot: Number(sinkItem.priceSnapshot || 0) + Number(worktopItem.priceSnapshot || 0),
     quantity: 1,
   }));
@@ -234,7 +245,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
           {paymentLink ? (
             <div style={paymentLinkPanelStyle}>
-              <strong>Payment link</strong>
+              <strong><AdminText i18nKey="orderDetailAdmin.paymentLink" fallback="Payment link" /></strong>
               <a href={paymentLink} target="_blank" rel="noreferrer" style={paymentLinkAnchorStyle}>
                 {paymentLink}
               </a>
@@ -248,7 +259,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 <AdminStatusBadge status={order.status} />
               </div>
               <div style={statusItemStyle}>
-                <span style={compactLabelStyle}>Payment</span>
+                <span style={compactLabelStyle}><AdminText i18nKey="reportsAdmin.payment" fallback="Payment" /></span>
                 <PaymentStatusBadge status={order.paymentStatus} />
               </div>
             </div>
@@ -305,9 +316,10 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 <OrderActionButton
                   intent="create-payment-link"
                   style={paymentLinkButtonStyle}
+                  pendingKey="orderDetailAdmin.creatingPaymentLink"
                   pendingFallback="Creating payment link..."
                 >
-                  Create payment link
+                  <AdminText i18nKey="orderDetailAdmin.createPaymentLink" fallback="Create payment link" />
                 </OrderActionButton>
               ) : null}
             </div>
@@ -373,10 +385,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                 </div>
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.payment" fallback="Payment" /></span>
-                  <span>{formatPaymentMethod(order.paymentMethod) || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</span>
+                  <span>
+                    {order.paymentMethod
+                      ? <PaymentMethodText value={order.paymentMethod} />
+                      : <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}
+                  </span>
                   <div style={{ marginTop: 8 }}><PaymentStatusBadge status={order.paymentStatus} /></div>
                   {order.stripeCheckoutSessionId ? (
-                    <span style={stripeMetaStyle}>Stripe session: {order.stripeCheckoutSessionId}</span>
+                    <span style={stripeMetaStyle}><AdminText i18nKey="orderDetailAdmin.stripeSession" fallback="Stripe session" />: {order.stripeCheckoutSessionId}</span>
                   ) : null}
                 </div>
               </div>
@@ -430,8 +446,8 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.type" fallback="Type" /></th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.itemCode" fallback="Item code" /></th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.quantity" fallback="Quantity" /></th>
-                  <th style={thStyle}>Article price</th>
-                  <th style={thStyle}>Blende</th>
+                  <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.articlePrice" fallback="Article price" /></th>
+                  <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.blende" fallback="Blende" /></th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.unitPrice" fallback="Unit price" /></th>
                   <th style={thStyle}><AdminText i18nKey="orderDetailAdmin.lineTotal" fallback="Line total" /></th>
                 </tr>
@@ -439,11 +455,12 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
               <tbody>
                 {displayItems.map((item) => {
                   const priceParts = getOrderItemPriceParts(item);
+                  const itemName = getOrderItemNameFields(item);
 
                   return (
                     <tr key={item.id}>
                       <td style={tdStyle}>
-                        <strong>{item.nameSnapshot}</strong>
+                        <AdminLocalizedName name={itemName.name} nameDe={itemName.nameDe} as="strong" />
                       </td>
                       <td style={tdStyle}><ItemTypeLabel type={item.itemType} /></td>
                       <td style={tdStyle}>{item.code}</td>
@@ -465,10 +482,11 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
           <div className="admin-order-items-cards" style={{ display: "none", gap: 12 }}>
             {displayItems.map((item) => {
               const priceParts = getOrderItemPriceParts(item);
+              const itemName = getOrderItemNameFields(item);
 
               return (
                 <article key={item.id} style={mobileItemCardStyle}>
-                  <strong>{item.nameSnapshot}</strong>
+                  <AdminLocalizedName name={itemName.name} nameDe={itemName.nameDe} as="strong" />
                   <div style={subMetaStyle}>
                     <span><ItemTypeLabel type={item.itemType} /></span>
                     <span>{item.code}</span>
@@ -479,11 +497,11 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
                       <span>{priceParts.quantity}</span>
                     </div>
                     <div>
-                      <span style={detailLabelStyle}>Article price</span>
+                      <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.articlePrice" fallback="Article price" /></span>
                       <span>{formatCurrency(priceParts.articleUnitPrice)}</span>
                     </div>
                     <div>
-                      <span style={detailLabelStyle}>Blende</span>
+                      <span style={detailLabelStyle}><AdminText i18nKey="orderDetailAdmin.blende" fallback="Blende" /></span>
                       <span>{priceParts.blendeCode ? `${priceParts.blendeCode}: ${formatCurrency(priceParts.blendeUnitTotal)}` : "-"}</span>
                     </div>
                     <div>

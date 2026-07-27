@@ -12,6 +12,7 @@ import {
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
 import AdminContractLinkFields from "../../../../components/admin-contract-link-fields";
+import AdminFileInput from "../../../../components/admin-file-input";
 import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../../components/admin-i18n";
 import { requireAdminPage } from "../../../../lib/auth";
 import { getKitchenContractForAdmin, listKitchensForAdmin, listProjectsForAdmin, listPropertyOwnersForAdmin } from "../../../../lib/catalog";
@@ -60,13 +61,21 @@ function AddressLines({ lines }) {
 
 function contractAddressLines(contract) {
   return [
-    contract.projectName ? `Project: ${contract.projectCode ? `${contract.projectCode} - ` : ""}${contract.projectName}` : "",
-    contract.projectStatus ? <>Status: <ProjectStatusText status={contract.projectStatus} /></> : "",
-    contract.propertyObject?.name ? `Object / Building: ${contract.propertyObject.name}` : "",
+    contract.projectName ? <><AdminText i18nKey="contractsAdmin.project" fallback="Project" />: {contract.projectCode ? `${contract.projectCode} - ` : ""}{contract.projectName}</> : "",
+    contract.projectStatus ? <><AdminText i18nKey="contractsAdmin.status" fallback="Status" />: <ProjectStatusText status={contract.projectStatus} /></> : "",
+    contract.propertyObject?.name ? <><AdminText i18nKey="contractsAdmin.propertyObject" fallback="Object / Building" />: {contract.propertyObject.name}</> : "",
     [contract.address1, contract.address2].filter(Boolean).join(", "),
     [contract.postalCode, contract.city].filter(Boolean).join(" "),
     contract.country ? <CountryName country={contract.country} /> : "",
-    [contract.building ? `Building ${contract.building}` : "", contract.floor ? `Floor ${contract.floor}` : "", contract.unitNumber ? `Unit ${contract.unitNumber}` : ""].filter(Boolean).join(" | "),
+    contract.building || contract.floor || contract.unitNumber ? (
+      <>
+        {contract.building ? <><AdminText i18nKey="contractsAdmin.building" fallback="Building" /> {contract.building}</> : null}
+        {contract.building && (contract.floor || contract.unitNumber) ? " | " : ""}
+        {contract.floor ? <><AdminText i18nKey="contractsAdmin.floor" fallback="Floor" /> {contract.floor}</> : null}
+        {contract.floor && contract.unitNumber ? " | " : ""}
+        {contract.unitNumber ? <><AdminText i18nKey="contractsAdmin.unit" fallback="Unit" /> {contract.unitNumber}</> : null}
+      </>
+    ) : "",
   ];
 }
 
@@ -88,13 +97,13 @@ function contactLines(registration) {
     registration.email,
     registration.phone,
     registration.addressNote,
-    registration.verifiedAt ? <>Verified: <AdminDateTime value={registration.verifiedAt} /></> : "",
+    registration.verifiedAt ? <><AdminText i18nKey="contractsAdmin.verified" fallback="Verified" />: <AdminDateTime value={registration.verifiedAt} /></> : "",
   ];
 }
 
 function OrderList({ orders }) {
   if (!orders?.length) {
-    return <p style={mutedTextStyle}>No orders for this contract number yet.</p>;
+    return <p style={mutedTextStyle}><AdminText i18nKey="contractsAdmin.noOrdersForThisContract" fallback="No orders for this contract number yet." /></p>;
   }
   return (
     <div style={listStyle}>
@@ -118,13 +127,13 @@ function RegistrationHistory({ contract }) {
   const pending = contract.pendingRegistrations || [];
   const previous = contract.previousRegistrations || [];
   const entries = [
-    ...active.map((entry) => ({ ...entry, statusLabel: "Active owner" })),
-    ...pending.map((entry) => ({ ...entry, statusLabel: "Pending email verification" })),
-    ...previous.map((entry) => ({ ...entry, statusLabel: "Previous owner" })),
+    ...active.map((entry) => ({ ...entry, statusKey: "activeOwner", statusFallback: "Active owner" })),
+    ...pending.map((entry) => ({ ...entry, statusKey: "pendingEmailVerification", statusFallback: "Pending email verification" })),
+    ...previous.map((entry) => ({ ...entry, statusKey: "previousOwner", statusFallback: "Previous owner" })),
   ];
 
   if (!entries.length) {
-    return <p style={mutedTextStyle}>No registration history yet.</p>;
+    return <p style={mutedTextStyle}><AdminText i18nKey="contractDetailAdmin.noRegistrationHistory" fallback="No registration history yet." /></p>;
   }
 
   return (
@@ -133,15 +142,17 @@ function RegistrationHistory({ contract }) {
         <div key={entry.id} style={historyItemStyle}>
           <div style={historyHeaderStyle}>
             <strong>{entry.fullName || "-"}</strong>
-            <span style={historyStatusStyle}>{entry.statusLabel}</span>
+            <span style={historyStatusStyle}>
+              <AdminText i18nKey={`contractDetailAdmin.${entry.statusKey}`} fallback={entry.statusFallback} />
+            </span>
           </div>
           <AddressLines lines={[
             entry.email,
             entry.phone,
             entry.addressNote,
-            entry.verifiedAt ? <>Verified: <AdminDateTime value={entry.verifiedAt} /></> : "",
-            entry.deactivatedAt ? <>Deactivated: <AdminDateTime value={entry.deactivatedAt} /></> : "",
-            entry.verificationExpiresAt && !entry.verifiedAt ? <>Code expires: <AdminDateTime value={entry.verificationExpiresAt} /></> : "",
+            entry.verifiedAt ? <><AdminText i18nKey="contractsAdmin.verified" fallback="Verified" />: <AdminDateTime value={entry.verifiedAt} /></> : "",
+            entry.deactivatedAt ? <><AdminText i18nKey="contractsAdmin.deactivated" fallback="Deactivated" />: <AdminDateTime value={entry.deactivatedAt} /></> : "",
+            entry.verificationExpiresAt && !entry.verifiedAt ? <><AdminText i18nKey="contractsAdmin.codeExpires" fallback="Code expires" />: <AdminDateTime value={entry.verificationExpiresAt} /></> : "",
           ]} />
         </div>
       ))}
@@ -163,8 +174,8 @@ export default async function AdminContractDetailPage({ params }) {
     return (
       <AdminShell adminEmail={admin.email}>
         <div style={pageGridStyle}>
-          <AdminSection title="Contract not found">
-            <ActionLink href="/admin/contracts">Back to contract numbers</ActionLink>
+          <AdminSection title={<AdminText i18nKey="contractDetailAdmin.contractNotFound" fallback="Contract not found" />}>
+            <ActionLink href="/admin/contracts"><AdminText i18nKey="contractDetailAdmin.backToContracts" fallback="Back to contract numbers" /></ActionLink>
           </AdminSection>
         </div>
       </AdminShell>
@@ -178,82 +189,87 @@ export default async function AdminContractDetailPage({ params }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title={`Contract ${contract.contractNumber}`}
+          title={<AdminText i18nKey="contractDetailAdmin.contractTitle" fallback="Contract {contractNumber}" values={{ contractNumber: contract.contractNumber }} />}
           description={<AdminKitchenDisplayName slug={contract.kitchen.slug} name={contract.kitchen.name} />}
           actions={
             <div style={actionRowStyle}>
-              <ActionLink href="/admin/contracts">Back to contract numbers</ActionLink>
-              <ActionLink href="#orders">Orders</ActionLink>
-              <ActionLink href="#registration-history">Registration history</ActionLink>
-              <ActionLink href="#edit-contract">Edit contract</ActionLink>
+              <ActionLink href="/admin/contracts"><AdminText i18nKey="contractDetailAdmin.backToContracts" fallback="Back to contract numbers" /></ActionLink>
+              <ActionLink href="#orders"><AdminText i18nKey="adminShellLogin.orders" fallback="Orders" /></ActionLink>
+              <ActionLink href="#registration-history"><AdminText i18nKey="contractDetailAdmin.registrationHistory" fallback="Registration history" /></ActionLink>
+              <ActionLink href="#edit-contract"><AdminText i18nKey="contractDetailAdmin.editContract" fallback="Edit contract" /></ActionLink>
             </div>
           }
         >
           <div style={summaryGridStyle}>
-            <DetailField label="Type">{contract.contractType}</DetailField>
-            <DetailField label="Status"><AdminStatusBadge status={contract.isActive ? "ACTIVE" : "INACTIVE"} /></DetailField>
-            <DetailField label="Housing company">{contract.owner?.name || "No housing company selected"}</DetailField>
-            <DetailField label="Created"><AdminDateTime value={contract.createdAt} /></DetailField>
-            <DetailField label="Usage">{contract._count.orders ? `${contract._count.orders} order(s)` : "Unused"}</DetailField>
+            <DetailField label={<AdminText i18nKey="contractDetailAdmin.type" fallback="Type" />}>{contract.contractType}</DetailField>
+            <DetailField label={<AdminText i18nKey="contractsAdmin.status" fallback="Status" />}><AdminStatusBadge status={contract.isActive ? "ACTIVE" : "INACTIVE"} /></DetailField>
+            <DetailField label={<AdminText i18nKey="contractsAdmin.owner" fallback="Housing company" />}>{contract.owner?.name || <AdminText i18nKey="contractsAdmin.noOwnerSelected" fallback="No housing company selected" />}</DetailField>
+            <DetailField label={<AdminText i18nKey="contractsAdmin.created" fallback="Created" />}><AdminDateTime value={contract.createdAt} /></DetailField>
+            <DetailField label={<AdminText i18nKey="contractsAdmin.usage" fallback="Usage" />}>
+              {contract._count.orders
+                ? <AdminText i18nKey="contractDetailAdmin.orderCount" fallback="{count} order(s)" values={{ count: contract._count.orders }} />
+                : <AdminText i18nKey="contractsAdmin.unused" fallback="Unused" />}
+            </DetailField>
           </div>
         </AdminSection>
 
-        <AdminSection title="Overview">
+        <AdminSection title={<AdminText i18nKey="contractDetailAdmin.overview" fallback="Overview" />}>
           <div style={overviewGridStyle}>
-            <DetailField label="Contract address"><AddressLines lines={contractAddressLines(contract)} /></DetailField>
-            <DetailField label="Billing address"><AddressLines lines={billingAddressLines(contract)} /></DetailField>
-            <DetailField label="Registered owner"><AddressLines lines={contactLines(contract.activeRegistration)} /></DetailField>
-            <DetailField label="Notes">{contract.notes || "-"}</DetailField>
-            <DetailField label="Claim plan">
+            <DetailField label={<AdminText i18nKey="contractsAdmin.contractAddress" fallback="Contract address" />}><AddressLines lines={contractAddressLines(contract)} /></DetailField>
+            <DetailField label={<AdminText i18nKey="contractsAdmin.paymentAddress" fallback="Billing address" />}><AddressLines lines={billingAddressLines(contract)} /></DetailField>
+            <DetailField label={<AdminText i18nKey="contractsAdmin.registeredOwner" fallback="Registered owner" />}><AddressLines lines={contactLines(contract.activeRegistration)} /></DetailField>
+            <DetailField label={<AdminText i18nKey="contractsAdmin.notes" fallback="Notes" />}>{contract.notes || "-"}</DetailField>
+            <DetailField label={<AdminText i18nKey="contractDetailAdmin.claimPlan" fallback="Claim plan" />}>
               <AddressLines lines={[
                 contract.hasUploadedClaimPlanPreview
-                  ? <a href={`${claimPlanAssetBase}/preview`} target="_blank" rel="noreferrer">Open uploaded sketch</a>
+                  ? <a href={`${claimPlanAssetBase}/preview`} target="_blank" rel="noreferrer"><AdminText i18nKey="contractDetailAdmin.openUploadedSketch" fallback="Open uploaded sketch" /></a>
                   : contract.claimPlanPreviewPath
-                    ? <a href={contract.claimPlanPreviewPath} target="_blank" rel="noreferrer">Open sketch</a>
+                    ? <a href={contract.claimPlanPreviewPath} target="_blank" rel="noreferrer"><AdminText i18nKey="contractDetailAdmin.openSketch" fallback="Open sketch" /></a>
                     : "",
                 contract.hasUploadedClaimPlanPdf
-                  ? <a href={`${claimPlanAssetBase}/pdf`} target="_blank" rel="noreferrer">Open uploaded PDF</a>
+                  ? <a href={`${claimPlanAssetBase}/pdf`} target="_blank" rel="noreferrer"><AdminText i18nKey="contractDetailAdmin.openUploadedPdf" fallback="Open uploaded PDF" /></a>
                   : contract.claimPlanPdfPath
-                    ? <a href={contract.claimPlanPdfPath} target="_blank" rel="noreferrer">Open PDF plan</a>
+                    ? <a href={contract.claimPlanPdfPath} target="_blank" rel="noreferrer"><AdminText i18nKey="contractDetailAdmin.openPdfPlan" fallback="Open PDF plan" /></a>
                     : "",
               ]} />
             </DetailField>
           </div>
         </AdminSection>
 
-        <AdminSection id="orders" title="Orders">
+        <AdminSection id="orders" title={<AdminText i18nKey="adminShellLogin.orders" fallback="Orders" />}>
           <div id="orders" />
           <OrderList orders={contract.orders || []} />
         </AdminSection>
 
-        <AdminSection title="Registration history">
+        <AdminSection title={<AdminText i18nKey="contractDetailAdmin.registrationHistory" fallback="Registration history" />}>
           <div id="registration-history" />
           <RegistrationHistory contract={contract} />
         </AdminSection>
 
-        <AdminSection title="Edit contract">
+        <AdminSection title={<AdminText i18nKey="contractDetailAdmin.editContract" fallback="Edit contract" />}>
           <div id="edit-contract" />
           <form action={`/api/admin/contracts/${contract.id}`} method="post" encType="multipart/form-data" style={editFormStyle}>
             <input type="hidden" name="_intent" value="update" />
             <input type="hidden" name="returnTo" value={returnTo} />
             <input type="hidden" name="contractType" value={contract.contractType} />
-            <FormField label="Contract number">
+            <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
               <input name="contractNumber" defaultValue={contract.contractNumber} style={inputStyle} required />
             </FormField>
             {contract.contractType === "ARC" ? (
-              <FormField label="Replace kitchen sketch (JPG, PNG, or WebP)">
-                <input
-                  type="file"
+              <FormField label={<AdminText i18nKey="contractDetailAdmin.replaceKitchenSketch" fallback="Replace kitchen sketch (JPG, PNG, or WebP)" />}>
+                <AdminFileInput
                   name="claimPlanPreviewFile"
                   accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                  chooseFileKey="contractsAdmin.chooseFile"
+                  noFileChosenKey="contractsAdmin.noFileChosen"
                   style={inputStyle}
                 />
               </FormField>
             ) : (
               <>
-                <FormField label="Kitchen">
+                <FormField label={<AdminText i18nKey="kitchensAdmin.kitchen" fallback="Kitchen" />}>
                   <select name="kitchenId" defaultValue={contract.kitchenId} style={inputStyle}>
-                    <option value="">PDF-only kitchen (automatic)</option>
+                    <option value=""><AdminText i18nKey="contractDetailAdmin.pdfOnlyKitchen" fallback="PDF-only kitchen (automatic)" /></option>
                     {kitchens.map((kitchen) => (
                       <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
                     ))}
@@ -261,19 +277,21 @@ export default async function AdminContractDetailPage({ params }) {
                 </FormField>
                 <input type="hidden" name="claimPlanPdfPath" value={contract.claimPlanPdfPath || ""} />
                 <input type="hidden" name="claimPlanPreviewPath" value={contract.claimPlanPreviewPath || ""} />
-                <FormField label="Replace/add kitchen sketch (JPG, PNG, or WebP)">
-                  <input
-                    type="file"
+                <FormField label={<AdminText i18nKey="contractDetailAdmin.replaceOrAddKitchenSketch" fallback="Replace/add kitchen sketch (JPG, PNG, or WebP)" />}>
+                  <AdminFileInput
                     name="claimPlanPreviewFile"
                     accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+                    chooseFileKey="contractsAdmin.chooseFile"
+                    noFileChosenKey="contractsAdmin.noFileChosen"
                     style={inputStyle}
                   />
                 </FormField>
-                <FormField label="Replace/add original kitchen plan (PDF)">
-                  <input
-                    type="file"
+                <FormField label={<AdminText i18nKey="contractDetailAdmin.replaceOrAddPdf" fallback="Replace/add original kitchen plan (PDF)" />}>
+                  <AdminFileInput
                     name="claimPlanPdfFile"
                     accept="application/pdf,.pdf"
+                    chooseFileKey="contractsAdmin.chooseFile"
+                    noFileChosenKey="contractsAdmin.noFileChosen"
                     style={inputStyle}
                   />
                 </FormField>
@@ -287,7 +305,9 @@ export default async function AdminContractDetailPage({ params }) {
               </>
             )}
             <div style={editActionsStyle}>
-              <button type="submit" style={primaryButtonStyle}>Save {contract.contractType} contract</button>
+              <button type="submit" style={primaryButtonStyle}>
+                <AdminText i18nKey="contractDetailAdmin.saveContractType" fallback="Save {type} contract" values={{ type: contract.contractType }} />
+              </button>
             </div>
           </form>
 
@@ -300,7 +320,9 @@ export default async function AdminContractDetailPage({ params }) {
                 value={contract.isActive ? "deactivate" : "reactivate"}
                 style={secondaryButtonStyle}
               >
-                {contract.isActive ? "Deactivate" : "Reactivate"}
+                {contract.isActive
+                  ? <AdminText i18nKey="contractsAdmin.deactivate" fallback="Deactivate" />
+                  : <AdminText i18nKey="contractsAdmin.reactivate" fallback="Reactivate" />}
               </button>
             </form>
           </div>

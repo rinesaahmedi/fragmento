@@ -6,12 +6,16 @@ export default function AdminConfirmSubmitButton({
   children,
   confirmKey,
   confirmFallback,
+  confirmValues,
   name,
   value,
   style,
 }) {
   const { translate } = useAdminI18n();
-  const confirmMessage = confirmKey ? translate(confirmKey, confirmFallback || "") : confirmFallback;
+  let confirmMessage = confirmKey ? translate(confirmKey, confirmFallback || "") : confirmFallback;
+  Object.entries(confirmValues || {}).forEach(([key, replacement]) => {
+    confirmMessage = confirmMessage.replaceAll(`{${key}}`, replacement);
+  });
 
   return (
     <button

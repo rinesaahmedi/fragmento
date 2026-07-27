@@ -11,6 +11,7 @@ import {
   textareaStyle,
 } from "./admin-ui";
 import AdminSelect from "./admin-select";
+import { AdminText, useAdminI18n } from "./admin-i18n";
 
 const ITEM_TYPES = ["COMPONENT", "ACCESSORY", "SERVICE"];
 
@@ -47,6 +48,7 @@ export default function AdminKitchenItemBuilder({
   const svgHostRef = useRef(null);
   const [itemType, setItemType] = useState("COMPONENT");
   const [selectedSlotKey, setSelectedSlotKey] = useState("");
+  const { translate } = useAdminI18n();
 
   const slotUsage = useMemo(() => {
     const usage = new Map();
@@ -177,9 +179,9 @@ export default function AdminKitchenItemBuilder({
         <div style={structureGridStyle}>
           <div style={structurePreviewStyle}>
             <div style={{ display: "grid", gap: 6 }}>
-              <strong style={{ fontSize: "1rem", color: "var(--app-text)" }}>Kitchen structure</strong>
+              <strong style={{ fontSize: "1rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenEditorAdmin.structure" fallback="Kitchen structure" /></strong>
               <p style={mutedTextStyle}>
-                Click an empty position in the plan, or choose it from the slot list. Occupied positions should be edited below instead of created again.
+                <AdminText i18nKey="kitchenEditorAdmin.structureHelp" fallback="Click an empty position in the plan, or choose it from the slot list. Occupied positions should be edited below instead of created again." />
               </p>
             </div>
             <div style={structureCanvasStyle}>
@@ -189,8 +191,8 @@ export default function AdminKitchenItemBuilder({
 
           <div style={slotListWrapStyle}>
             <div style={{ display: "grid", gap: 6 }}>
-              <strong style={{ fontSize: "1rem", color: "var(--app-text)" }}>Available slots</strong>
-              <span style={helperPillStyle}>{availableSlotCount} open</span>
+              <strong style={{ fontSize: "1rem", color: "var(--app-text)" }}><AdminText i18nKey="kitchenEditorAdmin.availableSlots" fallback="Available slots" /></strong>
+              <span style={helperPillStyle}><AdminText i18nKey="kitchenEditorAdmin.openCount" fallback="{count} open" values={{ count: availableSlotCount }} /></span>
             </div>
 
             <div style={slotListStyle}>
@@ -218,11 +220,11 @@ export default function AdminKitchenItemBuilder({
                     <span style={slotStatusStyle}>
                       {isOccupied
                         ? assignedItems.length > 1
-                          ? `${assignedItems.length} items assigned`
+                          ? translate("kitchenEditorAdmin.itemsAssigned", "{count} items assigned").replace("{count}", assignedItems.length)
                           : assignedItems[0].name
                         : isSelected
-                          ? "Selected"
-                          : "Select slot"}
+                          ? translate("componentSlotPicker.selected", "Selected")
+                          : translate("kitchenEditorAdmin.selectSlot", "Select slot")}
                     </span>
                   </button>
                 );
@@ -233,71 +235,75 @@ export default function AdminKitchenItemBuilder({
       ) : null}
 
       <div style={formGridStyle}>
-        <FormField label="Type">
+        <FormField label={<AdminText i18nKey="orderDetailAdmin.type" fallback="Type" />}>
           <AdminSelect name="itemType" value={itemType} onChange={(event) => setItemType(event.target.value)} style={inputStyle}>
             {ITEM_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type}
+                <AdminText i18nKey={`orderDetailAdmin.itemType${type.charAt(0)}${type.slice(1).toLowerCase()}`} fallback={type} />
               </option>
             ))}
           </AdminSelect>
         </FormField>
-        <FormField label="Item Code">
+        <FormField label={<AdminText i18nKey="orderDetailAdmin.itemCode" fallback="Item code" />}>
           <input name="code" placeholder="DISH-600-STD" required style={inputStyle} />
         </FormField>
-        <FormField label="Name">
-          <input name="name" placeholder="Display name" required style={inputStyle} />
+        <FormField label={<AdminText i18nKey="kitchenDetailAdmin.name" fallback="Name" />}>
+          <input name="name" placeholder={translate("kitchenEditorAdmin.displayName", "Display name")} required style={inputStyle} />
         </FormField>
-        <FormField label="Price">
+        <FormField label={<AdminText i18nKey="catalogAdmin.price" fallback="Price" />}>
           <input name="price" placeholder="349.00" required style={inputStyle} />
         </FormField>
-        <FormField label="Icon key">
+        <FormField label={<AdminText i18nKey="kitchenEditorAdmin.iconKey" fallback="Icon key" />}>
           <input name="iconKey" placeholder="dishwasher" list="legacy-icon-keys" style={inputStyle} />
         </FormField>
-        <FormField label="Color key">
+        <FormField label={<AdminText i18nKey="kitchenEditorAdmin.colorKey" fallback="Color key" />}>
           <input name="colorKey" placeholder="#001f7f" style={inputStyle} />
         </FormField>
-        <FormField label="Component slot">
+        <FormField label={<AdminText i18nKey="componentSlotPicker.componentSlot" fallback="Component slot" />}>
           <input
             name="componentKey"
             value={isComponentType ? selectedSlotKey : ""}
             readOnly
-            placeholder={hasStructuredSlots ? "Choose a position from the structure" : "Optional future mapping"}
+            placeholder={hasStructuredSlots
+              ? translate("kitchenEditorAdmin.chooseStructurePosition", "Choose a position from the structure")
+              : translate("kitchenEditorAdmin.optionalFutureMapping", "Optional future mapping")}
             style={{
               ...inputStyle,
               background: hasStructuredSlots ? "rgba(248, 243, 236, 0.92)" : inputStyle.background,
             }}
           />
         </FormField>
-        <FormField label="Sort order">
+        <FormField label={<AdminText i18nKey="catalogAdmin.sortOrder" fallback="Sort order" />}>
           <input name="sortOrder" type="number" defaultValue={0} style={inputStyle} />
         </FormField>
-        <FormField label="Info text" wide>
-          <textarea name="infoText" rows={3} placeholder="Optional product info" style={textareaStyle} />
+        <FormField label={<AdminText i18nKey="kitchenEditorAdmin.infoText" fallback="Info text" />} wide>
+          <textarea name="infoText" rows={3} placeholder={translate("kitchenEditorAdmin.optionalProductInfo", "Optional product info")} style={textareaStyle} />
         </FormField>
       </div>
 
       {hasStructuredSlots && isComponentType ? (
         <div style={selectionSummaryStyle}>
           <strong style={{ fontSize: 14, color: "var(--app-text)" }}>
-            {selectedSlot ? `Selected position: ${selectedSlot.label}` : "No kitchen position selected yet"}
+            {selectedSlot
+              ? <AdminText i18nKey="kitchenEditorAdmin.selectedPosition" fallback="Selected position: {position}" values={{ position: selectedSlot.label }} />
+              : <AdminText i18nKey="kitchenEditorAdmin.noPositionSelected" fallback="No kitchen position selected yet" />}
           </strong>
           <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>
             {selectedSlot
               ? selectedSlotItems.length
-                ? "This slot is already occupied and cannot be created again."
-                : `${selectedSlot.zone} • saved as ${selectedSlot.componentKey}`
-              : "For structured kitchens, components should be placed on a real slot instead of using a free-text catalog entry."}
+                ? <AdminText i18nKey="kitchenEditorAdmin.slotOccupied" fallback="This slot is already occupied and cannot be created again." />
+                : <AdminText i18nKey="kitchenEditorAdmin.savedAs" fallback="{zone} • saved as {key}" values={{ zone: selectedSlot.zone, key: selectedSlot.componentKey }} />
+              : <AdminText i18nKey="kitchenEditorAdmin.structuredKitchenHelp" fallback="For structured kitchens, components should be placed on a real slot instead of using a free-text catalog entry." />}
           </span>
         </div>
       ) : null}
 
       <div style={checkboxRowStyle}>
-        <label><input name="isLocked" type="checkbox" value="true" /> Locked</label>
-        <label><input name="isActive" type="checkbox" value="true" defaultChecked /> Active</label>
+        <label><input name="isLocked" type="checkbox" value="true" /> <AdminText i18nKey="kitchenEditorAdmin.locked" fallback="Locked" /></label>
+        <label><input name="isActive" type="checkbox" value="true" defaultChecked /> <AdminText i18nKey="catalogAdmin.active" fallback="Active" /></label>
       </div>
 
-      <button type="submit" style={primaryButtonStyle}>Add item</button>
+      <button type="submit" style={primaryButtonStyle}><AdminText i18nKey="kitchenEditorAdmin.addItem" fallback="Add item" /></button>
       <datalist id="legacy-icon-keys">
         {legacyIconKeys.map((iconKey) => (
           <option key={iconKey} value={iconKey} />

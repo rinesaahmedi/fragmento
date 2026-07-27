@@ -283,7 +283,7 @@ export function AdminDashboardCharts({
         {renderFilterForm()}
       </section>
 
-      <section className="kpi-grid desktop-dashboard-section" aria-label="Dashboard KPIs">
+      <section className="kpi-grid desktop-dashboard-section" aria-label={translate("dashboard.dashboardKpis", "Dashboard KPIs")}>
         {kpis.map((kpi) => (
           <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="kpi-card">
             <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
@@ -306,7 +306,7 @@ export function AdminDashboardCharts({
       </div>
 
       <section className="mobile-dashboard">
-        <div className="mobile-kpi-grid" aria-label="Dashboard KPIs">
+        <div className="mobile-kpi-grid" aria-label={translate("dashboard.dashboardKpis", "Dashboard KPIs")}>
           {mobileKpis.map((kpi) => (
             <article key={kpi.labelKey || kpi.fallbackLabel || kpi.value} className="mobile-kpi-card">
               <span>{translate(kpi.labelKey || "", kpi.fallbackLabel || "")}</span>
@@ -457,7 +457,7 @@ export function AdminDashboardCharts({
           title={translate("dashboard.ordersByStatus", "Orders by status")}
           detail={translate("dashboard.stackedByWorkflowStateUsingOrderCreationDate", "Stacked by workflow state using order creation date.")}
           actions={(
-            <div className="segmented-control" aria-label="Status chart mode">
+            <div className="segmented-control" aria-label={translate("dashboard.statusChartMode", "Status chart mode")}>
               <button className={statusMode === "volume" ? "is-active" : ""} type="button" onClick={() => setStatusMode("volume")}>{translate("dashboard.volumeView", "Volume View")}</button>
               <button className={statusMode === "percentage" ? "is-active" : ""} type="button" onClick={() => setStatusMode("percentage")}>{translate("dashboard.percentageView", "Percentage View")}</button>
             </div>
@@ -1013,7 +1013,7 @@ function MobileTopItems({ topItemsByQuantity, topItemsByRevenue }) {
         eyebrow={translate("dashboard.topItems", "Top items")}
         title={translate("dashboard.topItems", "Top items")}
         actions={(
-          <div className="segmented-control" aria-label="Top items mode">
+          <div className="segmented-control" aria-label={translate("dashboard.topItemsMode", "Top items mode")}>
             <button className={mode === "quantity" ? "is-active" : ""} type="button" onClick={() => setMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
             <button className={mode === "revenue" ? "is-active" : ""} type="button" onClick={() => setMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
           </div>
@@ -1680,7 +1680,7 @@ function PropertyOwnerAnalyticsSection({ analytics, modeSwitcher = null }) {
                   <div>
                     <strong>{translate("dashboard.companyTopItems", "Top items for selected housing company")}</strong>
                   </div>
-                  <div className="segmented-control" aria-label="Selected company top items mode">
+          <div className="segmented-control" aria-label={translate("dashboard.selectedCompanyTopItemsMode", "Selected company top items mode")}>
                     <button className={itemMode === "quantity" ? "is-active" : ""} type="button" onClick={() => setItemMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
                     <button className={itemMode === "revenue" ? "is-active" : ""} type="button" onClick={() => setItemMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
                   </div>
@@ -2226,7 +2226,7 @@ function ProjectAnalyticsSection({ analytics, modeSwitcher = null }) {
             <div className="project-chart-card">
               <div className="project-chart-heading">
                 <strong>{translate("dashboard.projectTopItems", "Top items for selected project")}</strong>
-                <div className="segmented-control" aria-label="Selected project top items mode">
+          <div className="segmented-control" aria-label={translate("dashboard.selectedProjectTopItemsMode", "Selected project top items mode")}>
                   <button className={itemMode === "quantity" ? "is-active" : ""} type="button" onClick={() => setItemMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
                   <button className={itemMode === "revenue" ? "is-active" : ""} type="button" onClick={() => setItemMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
                 </div>
@@ -2741,7 +2741,7 @@ function TopItemsSection({ topItemsByQuantity, topItemsByRevenue }) {
         title={config.title}
         detail={config.detail}
         actions={(
-          <div className="segmented-control" aria-label="Top items mode">
+          <div className="segmented-control" aria-label={translate("dashboard.topItemsMode", "Top items mode")}>
             <button className={mode === "quantity" ? "is-active" : ""} type="button" onClick={() => setMode("quantity")}>{translate("dashboard.byQuantity", "By Quantity")}</button>
             <button className={mode === "revenue" ? "is-active" : ""} type="button" onClick={() => setMode("revenue")}>{translate("dashboard.byRevenue", "By Revenue")}</button>
           </div>
@@ -2975,7 +2975,7 @@ function DistributionSection({ itemTypeData, paymentData }) {
         title={config.title}
         detail={config.detail}
         actions={(
-          <div className="segmented-control" aria-label="Distribution mode">
+          <div className="segmented-control" aria-label={translate("dashboard.distributionMode", "Distribution mode")}>
             <button className={mode === "itemTypes" ? "is-active" : ""} type="button" onClick={() => setMode("itemTypes")}>{translate("dashboard.itemTypes", "Item Types")}</button>
             <button className={mode === "paymentMethods" ? "is-active" : ""} type="button" onClick={() => setMode("paymentMethods")}>{translate("dashboard.paymentMethods", "Payment Methods")}</button>
           </div>

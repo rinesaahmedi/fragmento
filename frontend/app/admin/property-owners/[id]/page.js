@@ -16,7 +16,7 @@ import {
 } from "../../../../components/admin-ui";
 import Link from "next/link";
 import { AdminShell } from "../../../../components/admin-shell";
-import { AdminDateTime, AdminPluralText, AdminText } from "../../../../components/admin-i18n";
+import { AdminDateTime, AdminPluralText, AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
 import AdminContractAddressFields from "../../../../components/admin-contract-address-fields";
 import AdminSelect from "../../../../components/admin-select";
@@ -226,10 +226,10 @@ export default async function AdminPropertyOwnerDetailPage({ params, searchParam
               <section style={compactCreateObjectCardStyle}>
                 <form action={`/api/admin/property-owners/${owner.id}/objects`} method="post" style={denseObjectFormStyle}>
                   <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object / building name" />} wide>
-                    <input name="name" placeholder="Building A" style={compactInputStyle} required />
+                    <AdminTranslatedInput name="name" placeholderKey="propertyOwnersAdmin.objectNamePlaceholder" placeholderFallback="Building A" style={compactInputStyle} required />
                   </FormField>
                   <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectName" fallback="Project name" />}>
-                    <input name="projectName" placeholder="Project A" style={compactInputStyle} required />
+                    <AdminTranslatedInput name="projectName" placeholderKey="propertyOwnersAdmin.projectNamePlaceholder" placeholderFallback="Project A" style={compactInputStyle} required />
                   </FormField>
                   <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectCode" fallback="Project code" />}>
                     <input name="projectCode" placeholder="PRJ-204" style={compactInputStyle} />

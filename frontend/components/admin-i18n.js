@@ -135,6 +135,12 @@ export function AdminTranslatedInput({ placeholderKey, placeholderFallback = "",
   return <input {...props} placeholder={translate(placeholderKey, placeholderFallback)} />;
 }
 
+export function AdminTranslatedTextarea({ placeholderKey, placeholderFallback = "", ...props }) {
+  const { translate } = useAdminI18n();
+
+  return <textarea {...props} placeholder={translate(placeholderKey, placeholderFallback)} />;
+}
+
 export function AdminStatusBadge({ status }) {
   const { translate } = useAdminI18n();
   const statusKey = String(status || "").toLowerCase();
@@ -167,6 +173,7 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
   const normalizedSlug = String(slug || "").toLowerCase();
   const displayName = String(name || "").trim();
   const normalizedName = displayName.toLowerCase();
+  const isArchivedKitchenPlan = normalizedName === "archived kitchen plan";
   const isTwoPartKitchen =
     normalizedSlug === "kitchen-model-c" ||
     ["two-part kitchen", "split kitchen", "zweiteilige küche", "zweiteilige kÃ¼che"].includes(normalizedName);
@@ -175,9 +182,11 @@ function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {
     ["standard kitchen", "linear kitchen", "standardküche", "standardkÃ¼che"].includes(normalizedName);
 
   if (language === "de") {
+    if (isArchivedKitchenPlan) return "Küchenplan";
     if (isTwoPartKitchen) return "Zweiteilige Küche";
     if (isStandardKitchen) return "Standardküche";
   } else {
+    if (isArchivedKitchenPlan) return "Kitchen plan";
     if (isTwoPartKitchen) return "Two-Part Kitchen";
     if (isStandardKitchen) return "Standard Kitchen";
   }

@@ -156,7 +156,7 @@ export default async function AdminAccountPage({ searchParams }) {
               </FormField>
 
               <div style={{ ...actionRowStyle, gridColumn: "1 / -1" }}>
-                <AdminFormSubmitButton pendingLabel="Saving email...">
+                <AdminFormSubmitButton pendingKey="accountAdmin.savingEmail" pendingLabel="Saving email...">
                   <AdminText i18nKey="accountAdmin.saveEmail" fallback="Save email" />
                 </AdminFormSubmitButton>
               </div>
@@ -209,7 +209,7 @@ export default async function AdminAccountPage({ searchParams }) {
               </FormField>
 
               <div style={{ ...actionRowStyle, gridColumn: "1 / -1" }}>
-                <AdminFormSubmitButton pendingLabel="Saving password...">
+                <AdminFormSubmitButton pendingKey="accountAdmin.savingPassword" pendingLabel="Saving password...">
                   <AdminText i18nKey="accountAdmin.savePassword" fallback="Save password" />
                 </AdminFormSubmitButton>
               </div>

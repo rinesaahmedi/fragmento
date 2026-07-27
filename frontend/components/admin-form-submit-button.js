@@ -1,16 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { useAdminI18n } from "./admin-i18n";
 import { primaryButtonStyle, secondaryButtonStyle } from "./admin-ui";
 
 export function AdminFormSubmitButton({
   children,
   pendingLabel,
+  pendingKey,
   secondary = false,
   style,
   disabled = false,
   title,
 }) {
+  const { translate } = useAdminI18n();
   const [isPending, setIsPending] = useState(false);
   const isDisabled = disabled || isPending;
 
@@ -38,7 +41,7 @@ export function AdminFormSubmitButton({
         ...style,
       }}
     >
-      {isPending ? pendingLabel || children : children}
+      {isPending ? translate(pendingKey || "", pendingLabel || "") || children : children}
     </button>
   );
 }

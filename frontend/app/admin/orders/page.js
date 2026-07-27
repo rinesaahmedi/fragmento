@@ -118,7 +118,6 @@ function ItemCount({ count }) {
 
 function PaymentStatusBadge({ status }) {
   const value = String(status || "UNPAID").toUpperCase();
-  const label = value === "PAID" ? "Paid" : value === "PENDING" ? "Pending" : value === "FAILED" ? "Failed" : value === "CANCELLED" ? "Cancelled" : "Unpaid";
   const style = value === "PAID"
     ? paymentStatusPaidStyle
     : value === "PENDING"
@@ -129,7 +128,11 @@ function PaymentStatusBadge({ status }) {
           ? paymentStatusFailedStyle
         : paymentStatusUnpaidStyle;
 
-  return <span style={style}>{label}</span>;
+  return (
+    <span style={style}>
+      <AdminText i18nKey={`reportsAdmin.paymentStatus.${value.toLowerCase()}`} fallback={value} />
+    </span>
+  );
 }
 
 function DeleteOrderAction({ orderId, compact = false }) {
@@ -291,19 +294,31 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
           </div>
 
           <div className="admin-list-table" style={tableWrapStyle}>
-            <table style={tableStyle}>
+            <table style={ordersTableStyle}>
+              <colgroup>
+                <col style={{ width: "13%" }} />
+                <col style={{ width: "14.5%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "6%" }} />
+                <col style={{ width: "9.5%" }} />
+                <col style={{ width: "7%" }} />
+                <col style={{ width: "9%" }} />
+                <col className="orders-table-optional" style={{ width: "8%" }} />
+                <col className="orders-table-date" style={{ width: "12%" }} />
+                <col style={{ width: "14%" }} />
+              </colgroup>
               <thead>
                 <tr>
-                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.order" fallback="Order" /></th>
-                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.customer" fallback="Customer" /></th>
-                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.kitchen" fallback="Kitchen" /></th>
-                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.items" fallback="Items" /></th>
-                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
-                  <th style={thStyle}>Payment</th>
-                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
-                  <th className="orders-table-optional" style={thStyle}><AdminText i18nKey="contractAddressFields.city" fallback="City" /></th>
-                  <th className="orders-table-date" style={thStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
-                  <th style={thStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.order" fallback="Order" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.customer" fallback="Customer" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.kitchen" fallback="Kitchen" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.items" fallback="Items" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="reportsAdmin.payment" fallback="Payment" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.total" fallback="Total" /></th>
+                  <th className="orders-table-optional" style={ordersThStyle}><AdminText i18nKey="contractAddressFields.city" fallback="City" /></th>
+                  <th className="orders-table-date" style={ordersThStyle}><AdminText i18nKey="ordersAdmin.created" fallback="Created" /></th>
+                  <th style={ordersThStyle}><AdminText i18nKey="ordersAdmin.action" fallback="Action" /></th>
                 </tr>
               </thead>
               <tbody>
@@ -317,7 +332,7 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                   const articleCodes = getArticleCodes(order.items);
                   return (
                   <tr key={order.id} className="orders-table-row" style={orderRowStyle}>
-                    <td style={tdStyle}>
+                    <td style={ordersTdStyle}>
                       <Link href={`/admin/orders/${order.id}`} style={orderLinkStyle}>
                         <strong>{order.orderNumber}</strong>
                       </Link>
@@ -340,22 +355,22 @@ export default async function AdminOrdersPage({ searchParams = {} }) {
                         </div>
                       ) : null}
                     </td>
-                    <td style={tdStyle}>
+                    <td style={ordersTdStyle}>
                       <div style={customerNameStyle}>{order.firstName} {order.lastName}</div>
                       <div style={customerEmailStyle}>{order.email}</div>
                     </td>
-                    <td style={tdStyle}><AdminKitchenDisplayName slug={order.kitchen.slug} name={order.kitchen.name} /></td>
-                    <td style={tdStyle}>
+                    <td style={ordersTdStyle}><AdminKitchenDisplayName slug={order.kitchen.slug} name={order.kitchen.name} /></td>
+                    <td style={ordersTdStyle}>
                       <span style={articleCountStyle} title={articleCodes.join(", ")}>
                         <ItemCount count={order.items.length} />
                       </span>
                     </td>
-                    <td style={tdStyle}><AdminStatusBadge status={order.status} /></td>
-                    <td style={tdStyle}><PaymentStatusBadge status={order.paymentStatus} /></td>
-                    <td style={tdStyle}><strong style={totalStyle}>{formatCurrency(order.totalPrice)}</strong></td>
-                    <td className="orders-table-optional" style={tdStyle}>{order.city || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</td>
-                    <td className="orders-table-date" style={tdStyle}><AdminDateTime value={order.createdAt} /></td>
-                    <td style={{ ...tdStyle, width: 148 }}>
+                    <td style={ordersTdStyle}><AdminStatusBadge status={order.status} /></td>
+                    <td style={ordersTdStyle}><PaymentStatusBadge status={order.paymentStatus} /></td>
+                    <td style={ordersTdStyle}><strong style={totalStyle}>{formatCurrency(order.totalPrice)}</strong></td>
+                    <td className="orders-table-optional" style={ordersTdStyle}>{order.city || <AdminText i18nKey="orderDetailAdmin.notProvided" fallback="Not provided" />}</td>
+                    <td className="orders-table-date" style={ordersTdStyle}><AdminDateTime value={order.createdAt} /></td>
+                    <td style={ordersActionTdStyle}>
                       <div style={rowActionStyle}>
                         <Link href={`/admin/orders/${order.id}`} style={viewButtonStyle}>
                           <AdminText i18nKey="ordersAdmin.view" fallback="View" />
@@ -496,6 +511,28 @@ const orderLinkStyle = {
   fontWeight: 800,
 };
 
+const ordersTableStyle = {
+  ...tableStyle,
+  minWidth: 1040,
+};
+
+const ordersThStyle = {
+  ...thStyle,
+  padding: "14px 12px",
+  fontSize: 11,
+  letterSpacing: "0.11em",
+};
+
+const ordersTdStyle = {
+  ...tdStyle,
+  padding: "16px 12px",
+};
+
+const ordersActionTdStyle = {
+  ...ordersTdStyle,
+  whiteSpace: "nowrap",
+};
+
 const orderRowStyle = {
   transition: "background 160ms ease",
 };
@@ -503,11 +540,11 @@ const orderRowStyle = {
 const articleCountStyle = {
   display: "inline-flex",
   borderRadius: 999,
-  padding: "7px 10px",
+  padding: "6px 8px",
   background: "rgba(115, 80, 55, 0.08)",
   border: "1px solid rgba(115, 80, 55, 0.12)",
   color: "var(--app-accent)",
-  fontSize: 13,
+  fontSize: 12,
   fontWeight: 800,
   whiteSpace: "nowrap",
 };
@@ -516,9 +553,9 @@ const paymentStatusBaseStyle = {
   display: "inline-flex",
   width: "fit-content",
   borderRadius: 999,
-  padding: "7px 10px",
+  padding: "6px 8px",
   border: "1px solid transparent",
-  fontSize: 12,
+  fontSize: 11,
   fontWeight: 900,
   textTransform: "uppercase",
   letterSpacing: "0.04em",

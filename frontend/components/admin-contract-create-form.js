@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import AdminContractLinkFields from "./admin-contract-link-fields";
+import AdminFileInput from "./admin-file-input";
 import AdminSelect from "./admin-select";
+import { AdminText, useAdminI18n } from "./admin-i18n";
 import { FormField, inputStyle, primaryButtonStyle } from "./admin-ui";
 
 export default function AdminContractCreateForm({
@@ -15,10 +17,11 @@ export default function AdminContractCreateForm({
   returnTo = "/admin/contracts",
 }) {
   const [contractType, setContractType] = useState("");
+  const { translate } = useAdminI18n();
 
   return (
     <div style={rootStyle}>
-      <div role="group" aria-label="Contract type" style={typeGridStyle}>
+      <div role="group" aria-label={translate("contractsAdmin.contractType", "Contract type")} style={typeGridStyle}>
         <button
           type="button"
           aria-pressed={contractType === "ARC"}
@@ -26,7 +29,9 @@ export default function AdminContractCreateForm({
           style={contractType === "ARC" ? selectedTypeButtonStyle : typeButtonStyle}
         >
           <strong style={typeTitleStyle}>ARC</strong>
-          <span style={typeDescriptionStyle}>Contract number and kitchen sketch only</span>
+          <span style={typeDescriptionStyle}>
+            <AdminText i18nKey="contractsAdmin.arcDescription" fallback="Contract number and kitchen sketch only" />
+          </span>
         </button>
         <button
           type="button"
@@ -35,12 +40,16 @@ export default function AdminContractCreateForm({
           style={contractType === "FRG" ? selectedTypeButtonStyle : typeButtonStyle}
         >
           <strong style={typeTitleStyle}>FRG</strong>
-          <span style={typeDescriptionStyle}>Kitchen, project and housing-company contract</span>
+          <span style={typeDescriptionStyle}>
+            <AdminText i18nKey="contractsAdmin.frgDescription" fallback="Kitchen, project and housing-company contract" />
+          </span>
         </button>
       </div>
 
       {!contractType ? (
-        <p style={choiceHintStyle}>Choose ARC or FRG to continue.</p>
+        <p style={choiceHintStyle}>
+          <AdminText i18nKey="contractsAdmin.chooseContractType" fallback="Choose ARC or FRG to continue." />
+        </p>
       ) : null}
 
       {contractType === "ARC" ? (
@@ -53,20 +62,23 @@ export default function AdminContractCreateForm({
         >
           <input type="hidden" name="returnTo" value={returnTo} />
           <input type="hidden" name="contractType" value="ARC" />
-          <FormField label="Contract number">
+          <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
             <input name="contractNumber" placeholder="222" style={compactInputStyle} required />
           </FormField>
-          <FormField label="Kitchen sketch (JPG, PNG, or WebP)">
-            <input
-              type="file"
+          <FormField label={<AdminText i18nKey="contractsAdmin.kitchenSketch" fallback="Kitchen sketch (JPG, PNG, or WebP)" />}>
+            <AdminFileInput
               name="claimPlanPreviewFile"
               accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+              chooseFileKey="contractsAdmin.chooseFile"
+              noFileChosenKey="contractsAdmin.noFileChosen"
               style={compactInputStyle}
               required
             />
           </FormField>
           <div style={actionStyle}>
-            <button type="submit" style={primaryButtonStyle}>Create ARC contract</button>
+            <button type="submit" style={primaryButtonStyle}>
+              <AdminText i18nKey="contractsAdmin.createArcContract" fallback="Create ARC contract" />
+            </button>
           </div>
         </form>
       ) : null}
@@ -81,30 +93,32 @@ export default function AdminContractCreateForm({
         >
           <input type="hidden" name="returnTo" value={returnTo} />
           <input type="hidden" name="contractType" value="FRG" />
-          <FormField label="Kitchen">
+          <FormField label={<AdminText i18nKey="kitchensAdmin.kitchen" fallback="Kitchen" />}>
             <AdminSelect name="kitchenId" defaultValue={defaultKitchenId || ""} style={compactInputStyle}>
-              <option value="">Select kitchen</option>
+              <option value=""><AdminText i18nKey="contractsAdmin.selectKitchen" fallback="Select kitchen" /></option>
               {kitchens.map((kitchen) => (
                 <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
               ))}
             </AdminSelect>
           </FormField>
-          <FormField label="Contract number">
+          <FormField label={<AdminText i18nKey="contractsAdmin.contractNumber" fallback="Contract number" />}>
             <input name="contractNumber" placeholder="670123456" style={compactInputStyle} required />
           </FormField>
-          <FormField label="Kitchen sketch (JPG, PNG, or WebP)">
-            <input
-              type="file"
+          <FormField label={<AdminText i18nKey="contractsAdmin.kitchenSketch" fallback="Kitchen sketch (JPG, PNG, or WebP)" />}>
+            <AdminFileInput
               name="claimPlanPreviewFile"
               accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp"
+              chooseFileKey="contractsAdmin.chooseFile"
+              noFileChosenKey="contractsAdmin.noFileChosen"
               style={compactInputStyle}
             />
           </FormField>
-          <FormField label="Original kitchen plan (PDF, optional)">
-            <input
-              type="file"
+          <FormField label={<AdminText i18nKey="contractsAdmin.originalKitchenPlanOptional" fallback="Original kitchen plan (PDF, optional)" />}>
+            <AdminFileInput
               name="claimPlanPdfFile"
               accept="application/pdf,.pdf"
+              chooseFileKey="contractsAdmin.chooseFile"
+              noFileChosenKey="contractsAdmin.noFileChosen"
               style={compactInputStyle}
             />
           </FormField>
@@ -118,7 +132,9 @@ export default function AdminContractCreateForm({
             contract={{}}
           />
           <div style={actionStyle}>
-            <button type="submit" style={primaryButtonStyle}>Create FRG contract</button>
+            <button type="submit" style={primaryButtonStyle}>
+              <AdminText i18nKey="contractsAdmin.createFrgContract" fallback="Create FRG contract" />
+            </button>
           </div>
         </form>
       ) : null}

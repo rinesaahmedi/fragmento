@@ -20,7 +20,7 @@ import {
 import AdminCreateUserForm from "../../../components/admin-create-user-form";
 import { AdminFormSubmitButton } from "../../../components/admin-form-submit-button";
 import { AdminShell } from "../../../components/admin-shell";
-import { AdminDateTime, AdminText } from "../../../components/admin-i18n";
+import { AdminDateTime, AdminText, AdminTranslatedInput } from "../../../components/admin-i18n";
 import AdminSelect from "../../../components/admin-select";
 import { ADMIN_ROLES, formatAdminRoleLabel } from "../../../lib/admin-roles";
 import { requireSuperAdminPage } from "../../../lib/admin-role-guards";
@@ -154,11 +154,12 @@ export default async function AdminUsersPage({ searchParams }) {
             </div>
             <div className="users-filter-grid" style={filterGridStyle}>
               <FilterField label={<AdminText i18nKey="usersAdmin.search" fallback="Search" />}>
-                <input
+                <AdminTranslatedInput
                   name="q"
                   type="search"
                   defaultValue={filters.query}
-                  placeholder="Search by email..."
+                  placeholderKey="usersAdmin.searchPlaceholder"
+                  placeholderFallback="Search by email..."
                   style={filterInputStyle}
                 />
               </FilterField>
@@ -242,7 +243,7 @@ export default async function AdminUsersPage({ searchParams }) {
                         <strong>{user.email}</strong>
                         {isSelf ? (
                           <div style={{ marginTop: 6 }}>
-                            <TypeBadge label="You" />
+                            <TypeBadge label={<AdminText i18nKey="usersAdmin.you" fallback="You" />} />
                           </div>
                         ) : null}
                       </td>
@@ -253,6 +254,8 @@ export default async function AdminUsersPage({ searchParams }) {
                             name="role"
                             defaultValue={user.role}
                             disabled={!restrictions.canChangeRole}
+                            ariaLabelKey="usersAdmin.roleFor"
+                            ariaLabelValues={{ email: user.email }}
                             aria-label={`Role for ${user.email}`}
                             title={
                               restrictions.changeRoleReasonKey
@@ -267,7 +270,7 @@ export default async function AdminUsersPage({ searchParams }) {
                             ))}
                           </AdminSelect>
                           {restrictions.canChangeRole ? (
-                            <AdminFormSubmitButton secondary pendingLabel="Saving..." style={compactButtonStyle}>
+                            <AdminFormSubmitButton secondary pendingKey="usersAdmin.saving" pendingLabel="Saving..." style={compactButtonStyle}>
                               <AdminText i18nKey="usersAdmin.saveRole" fallback="Save role" />
                             </AdminFormSubmitButton>
                           ) : restrictions.changeRoleReasonKey ? (
@@ -300,7 +303,7 @@ export default async function AdminUsersPage({ searchParams }) {
                           {restrictions.canReactivate ? (
                             <form action={`/api/admin/users/${user.id}`} method="post" style={{ margin: 0 }}>
                               <input type="hidden" name="intent" value="reactivate" />
-                              <AdminFormSubmitButton secondary pendingLabel="Reactivating..." style={compactButtonStyle}>
+                              <AdminFormSubmitButton secondary pendingKey="usersAdmin.reactivating" pendingLabel="Reactivating..." style={compactButtonStyle}>
                                 <AdminText i18nKey="usersAdmin.reactivate" fallback="Reactivate" />
                               </AdminFormSubmitButton>
                             </form>
@@ -312,6 +315,7 @@ export default async function AdminUsersPage({ searchParams }) {
                                 <input type="hidden" name="intent" value="deactivate" />
                                 <AdminFormSubmitButton
                                   secondary
+                                  pendingKey="usersAdmin.deactivating"
                                   pendingLabel="Deactivating..."
                                   style={{ ...compactButtonStyle, ...secondaryButtonStyle }}
                                 >
@@ -327,6 +331,7 @@ export default async function AdminUsersPage({ searchParams }) {
                             <form action={`/api/admin/users/${user.id}`} method="post" style={{ margin: 0 }}>
                               <input type="hidden" name="intent" value="delete" />
                               <AdminFormSubmitButton
+                                pendingKey="usersAdmin.deleting"
                                 pendingLabel="Deleting..."
                                 style={{ ...compactButtonStyle, ...dangerButtonStyle }}
                               >

@@ -2,7 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { codePillStyle, mutedTextStyle, primaryButtonStyle } from "./admin-ui";
-import { getCompatibilityMessage, isItemCompatibleWithSlot } from "../lib/kitchen-slot-compatibility";
+import { AdminLocalizedName, AdminPluralText, AdminText, useAdminI18n } from "./admin-i18n";
+import {
+  getCompatibleKindsForSlot,
+  inferItemKind,
+  isItemCompatibleWithSlot,
+} from "../lib/kitchen-slot-compatibility";
 
 const PLAN_BOUNDS_BY_SLUG = {
   "kitchen-model-b": {
@@ -143,6 +148,7 @@ function applyAdminGroupVisualState(group, { selected }) {
 }
 
 export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, kitchenSlug = "", requestedEditId = "" }) {
+  const { translate } = useAdminI18n();
   const hostRef = useRef(null);
   const [selectedSlotKey, setSelectedSlotKey] = useState("");
   const [slotTargets, setSlotTargets] = useState([]);
@@ -223,13 +229,17 @@ export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, kit
     <div style={layoutGridStyle}>
       <section style={canvasPanelStyle}>
         <div style={{ display: "grid", gap: 6 }}>
-          <strong style={{ fontSize: "1rem" }}>Kitchen plan</strong>
-          <p style={mutedTextStyle}>Click a slot to inspect it, then edit the assigned component from the item card below.</p>
+          <strong style={{ fontSize: "1rem" }}><AdminText i18nKey="kitchenEditorAdmin.kitchenPlan" fallback="Kitchen plan" /></strong>
+          <p style={mutedTextStyle}><AdminText i18nKey="kitchenEditorAdmin.planHelp" fallback="Click a slot to inspect it, then edit the assigned component from the item card below." /></p>
         </div>
         <div style={metricsRowStyle}>
-          <span style={pillStyle}>{structureSlots.length} slots</span>
-          <span style={pillStyle}>{openSlotCount} open</span>
-          <span style={pillStyle}>{items.filter((item) => item.itemType === "COMPONENT").length} components</span>
+          <span style={pillStyle}>
+            <AdminPluralText count={structureSlots.length} singularKey="kitchenEditorAdmin.slotCount" pluralKey="kitchenEditorAdmin.slotsCount" singularFallback="{count} slot" pluralFallback="{count} slots" />
+          </span>
+          <span style={pillStyle}><AdminText i18nKey="kitchenEditorAdmin.openCount" fallback="{count} open" values={{ count: openSlotCount }} /></span>
+          <span style={pillStyle}>
+            <AdminPluralText count={items.filter((item) => item.itemType === "COMPONENT").length} singularKey="kitchenEditorAdmin.componentCount" pluralKey="kitchenEditorAdmin.componentsCount" singularFallback="{count} component" pluralFallback="{count} components" />
+          </span>
         </div>
         <div style={svgCanvasStyle}>
           <div style={svgWrapStyle}>
@@ -278,15 +288,15 @@ export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, kit
 
       <aside style={inspectorStyle}>
         <div style={{ display: "grid", gap: 6 }}>
-          <strong style={{ fontSize: "1rem" }}>Selected slot</strong>
+          <strong style={{ fontSize: "1rem" }}><AdminText i18nKey="componentSlotPicker.selectedSlot" fallback="Selected slot" /></strong>
           {selectedSlot ? (
             <>
               <span style={codePillStyle}>{selectedSlot.label}</span>
               <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>{selectedSlot.zone}</span>
-              {selectedPrimaryItem ? <span style={selectedHintStyle}>Selected in the plan</span> : null}
+              {selectedPrimaryItem ? <span style={selectedHintStyle}><AdminText i18nKey="kitchenEditorAdmin.selectedInPlan" fallback="Selected in the plan" /></span> : null}
             </>
           ) : (
-            <p style={mutedTextStyle}>No slot selected yet. Click a slot in the plan to inspect it.</p>
+            <p style={mutedTextStyle}><AdminText i18nKey="kitchenEditorAdmin.noSlotSelectedHelp" fallback="No slot selected yet. Click a slot in the plan to inspect it." /></p>
           )}
         </div>
 
@@ -294,23 +304,32 @@ export function AdminKitchenLayoutEditor({ items, structureSlots, svgMarkup, kit
           <div style={itemSummaryStyle}>
             {selectedPrimaryItem ? (
               <>
-                <strong style={{ fontSize: "1.05rem" }}>{selectedPrimaryItem.name}</strong>
-                <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>Item Code: {selectedPrimaryItem.code}</span>
+                <AdminLocalizedName name={selectedPrimaryItem.name} nameDe={selectedPrimaryItem.nameDe || ""} as="strong" />
+                <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}><AdminText i18nKey="orderDetailAdmin.itemCode" fallback="Item code" />: {selectedPrimaryItem.code}</span>
                 <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>{formatCurrency(selectedPrimaryItem.price)}</span>
                 {!isItemCompatibleWithSlot(selectedPrimaryItem, selectedSlot) ? (
                   <span style={{ color: "var(--app-danger-text)", fontSize: 13 }}>
-                    {getCompatibilityMessage(selectedPrimaryItem, selectedSlot)}
+                    {(() => {
+                      const compatibleKinds = getCompatibleKindsForSlot(selectedSlot);
+                      const itemKind = inferItemKind(selectedPrimaryItem);
+                      return itemKind
+                        ? translate("kitchenEditorAdmin.incompatibleItem", "This {kind} component cannot be placed in {slot}.")
+                            .replace("{kind}", translate(`kitchenEditorAdmin.kind.${itemKind}`, itemKind))
+                            .replace("{slot}", selectedSlot.label)
+                        : translate("kitchenEditorAdmin.slotAcceptsKinds", "This slot only accepts {kinds} type components.")
+                            .replace("{kinds}", compatibleKinds.map((kind) => translate(`kitchenEditorAdmin.kind.${kind}`, kind)).join(", "));
+                    })()}
                   </span>
                 ) : null}
                 <a href={`?edit=${encodeURIComponent(selectedPrimaryItem.id)}#item-${selectedPrimaryItem.id}`} style={primaryMiniLinkStyle}>
-                  Edit item below
+                  <AdminText i18nKey="kitchenEditorAdmin.editItemBelow" fallback="Edit item below" />
                 </a>
               </>
             ) : (
               <>
-                <strong style={{ fontSize: "1.05rem" }}>Empty slot</strong>
+                <strong style={{ fontSize: "1.05rem" }}><AdminText i18nKey="kitchenEditorAdmin.emptySlot" fallback="Empty slot" /></strong>
                 <span style={{ color: "var(--app-text-muted)", fontSize: 13 }}>
-                  No component is assigned here. Components can only be edited from existing item cards below.
+                  <AdminText i18nKey="kitchenEditorAdmin.emptySlotHelp" fallback="No component is assigned here. Components can only be edited from existing item cards below." />
                 </span>
               </>
             )}

@@ -19,7 +19,6 @@ import { AdminClaimLocalizedText } from "../../../components/admin-claim-localiz
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminClaimsPage } from "../../../lib/admin-claims-access";
 import { prisma } from "../../../lib/prisma";
-import { formatServiceClaimProblemAreaList } from "../../../lib/service-claim-problem-areas";
 import { queryServiceClaimsList } from "../../../lib/service-claim-admin-query";
 import { paginateAdminItems } from "../../../lib/admin-pagination";
 
@@ -42,15 +41,6 @@ function truncate(value, max = 140) {
   const text = String(value || "").trim();
   if (text.length <= max) return text;
   return `${text.slice(0, max - 3)}...`;
-}
-
-function formatClaimKitchenSummary(claim) {
-  const kitchenName = String(claim.kitchenName || "").trim();
-  const selectedAreas = formatServiceClaimProblemAreaList(claim.problemAreasJson);
-  if (!kitchenName && !selectedAreas.length) return "";
-  if (!kitchenName) return selectedAreas.join(", ");
-  if (!selectedAreas.length) return kitchenName;
-  return `${kitchenName} - ${selectedAreas.join(", ")}`;
 }
 
 export default async function AdminClaimsPage({ searchParams = {} }) {
@@ -161,7 +151,6 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                     <td style={tdStyle}>
                       <strong>{claim.contractNumber}</strong>
                       <div style={rowMetaStyle}><ClaimRequestTypeText requestType={claim.requestType} /></div>
-                      {formatClaimKitchenSummary(claim) ? <div style={rowMetaStyle}>{formatClaimKitchenSummary(claim)}</div> : null}
                     </td>
                     <td style={tdStyle}>
                       <div style={customerNameStyle}>{formatClaimCustomerName(claim.fullName)}</div>
@@ -203,7 +192,6 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                   <div>
                     <div style={customerNameStyle}>{formatClaimCustomerName(claim.fullName)}</div>
                     <div style={rowMetaStyle}><AdminText i18nKey="claimsAdmin.contractNumber" fallback="Contract" /> {claim.contractNumber}</div>
-                    {formatClaimKitchenSummary(claim) ? <div style={rowMetaStyle}>{formatClaimKitchenSummary(claim)}</div> : null}
                   </div>
                   <AdminClaimLocalizedText text={truncate(claim.problemDescription, 160)} style={issueClampStyle} />
                   <div style={actionCellStyle}>

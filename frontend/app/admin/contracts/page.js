@@ -157,7 +157,7 @@ function registrationContactLines(registration) {
     registration.email,
     registration.phone,
     registration.addressNote,
-    registration.verifiedAt ? <>Verified: <AdminDateTime value={registration.verifiedAt} /></> : "",
+    registration.verifiedAt ? <><AdminText i18nKey="contractsAdmin.verified" fallback="Verified" />: <AdminDateTime value={registration.verifiedAt} /></> : "",
   ].filter(Boolean);
 }
 

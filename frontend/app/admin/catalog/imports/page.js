@@ -21,7 +21,9 @@ import {
 import { Fragment } from "react";
 import { AdminShell } from "../../../../components/admin-shell";
 import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
+import AdminFileInput from "../../../../components/admin-file-input";
 import AdminSelect from "../../../../components/admin-select";
+import { AdminText, AdminTranslatedInput } from "../../../../components/admin-i18n";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
 import { applyDueScheduledCatalogPriceListImports } from "../../../../lib/catalog-price-list-import";
@@ -126,13 +128,17 @@ export default async function AdminCatalogImportsPage({ searchParams }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <PageHero
-          eyebrow="Catalog"
-          title="Price List Imports"
-          description="Upload supplier price lists, preserve price history, and optionally sync linked kitchen item prices."
+          eyebrow={<AdminText i18nKey="catalogAdmin.catalog" fallback="Catalog" />}
+          title={<AdminText i18nKey="catalogImportsAdmin.title" fallback="Price list imports" />}
+          description={<AdminText i18nKey="catalogImportsAdmin.description" fallback="Upload supplier price lists, preserve price history, and optionally sync linked kitchen item prices." />}
           actions={(
             <div style={actionRowStyle}>
-              <ActionLink href="/api/admin/catalog/export" secondary>Export Excel</ActionLink>
-              <ActionLink href="/admin/catalog/articles">Back to catalog</ActionLink>
+              <ActionLink href="/api/admin/catalog/export" secondary>
+                <AdminText i18nKey="catalogAdmin.exportExcel" fallback="Export Excel" />
+              </ActionLink>
+              <ActionLink href="/admin/catalog/articles">
+                <AdminText i18nKey="catalogImportsAdmin.backToCatalog" fallback="Back to catalog" />
+              </ActionLink>
             </div>
           )}
         />
@@ -141,126 +147,157 @@ export default async function AdminCatalogImportsPage({ searchParams }) {
         {migrationMissing ? (
           <FlashMessage
             tone="error"
-            message="Catalog price-list import tables are not available yet. Run prisma migrate deploy before using this page."
+            message={<AdminText i18nKey="catalogImportsAdmin.migrationMissing" fallback="Catalog price-list import tables are not available yet. Run prisma migrate deploy before using this page." />}
           />
         ) : null}
 
         <AdminSection
-          title="Import master price list"
-          description="Use the exported workbook format with Articles, Blenden, and Services sheets. Records are matched by article number or code."
+          title={<AdminText i18nKey="catalogImportsAdmin.importTitle" fallback="Import master price list" />}
+          description={<AdminText i18nKey="catalogImportsAdmin.importDescription" fallback="Use the exported workbook format with Articles, Blenden, and Services sheets. Records are matched by article number or code." />}
         >
           <form action="/api/admin/catalog/import" method="post" encType="multipart/form-data" style={importFormStyle}>
             <div style={formGridStyle}>
-              <FormField label="Import label">
-                <input name="label" placeholder="Supplier July 2026" style={inputStyle} />
+              <FormField label={<AdminText i18nKey="catalogImportsAdmin.importLabel" fallback="Import label" />}>
+                <AdminTranslatedInput
+                  name="label"
+                  placeholderKey="catalogImportsAdmin.importLabelPlaceholder"
+                  placeholderFallback="Supplier July 2026"
+                  style={inputStyle}
+                />
               </FormField>
-              <FormField label="Programm ID">
+              <FormField label={<AdminText i18nKey="catalogImportsAdmin.programmId" fallback="Program ID" />}>
                 <AdminSelect name="programmId" defaultValue={programs[0]?.programmId || "IP 2200"} required style={inputStyle}>
                   {programs.map((program) => (
                     <option key={program.programmId} value={program.programmId}>
-                      {program.programmId}{program.name && program.name !== program.programmId ? ` - ${program.name}` : ""} ({program.kitchenCount} kitchen{program.kitchenCount === 1 ? "" : "s"})
+                      {program.programmId}{program.name && program.name !== program.programmId ? ` - ${program.name}` : ""} ({program.kitchenCount})
                     </option>
                   ))}
                 </AdminSelect>
               </FormField>
-              <FormField label="Start date">
+              <FormField label={<AdminText i18nKey="catalogImportsAdmin.startDate" fallback="Start date" />}>
                 <input name="effectiveFrom" type="date" defaultValue={todayInputValue()} required style={inputStyle} />
               </FormField>
-              <FormField label="Price list file">
-                <input name="catalogFile" type="file" accept=".xlsx" required style={inputStyle} />
+              <FormField label={<AdminText i18nKey="catalogImportsAdmin.priceListFile" fallback="Price list file" />}>
+                <AdminFileInput name="catalogFile" accept=".xlsx" required style={inputStyle} />
               </FormField>
-              <FormField label="Notes" wide>
+              <FormField label={<AdminText i18nKey="catalogImportsAdmin.notes" fallback="Notes" />} wide>
                 <textarea name="notes" rows={2} style={textareaStyle} />
               </FormField>
             </div>
 
             <div style={optionPanelStyle}>
-              <strong>What should happen after import?</strong>
-              <p style={mutedTextStyle}>
-                The uploaded file always updates the master price list. Choose whether those new prices should also be copied to the kitchen items customers can order.
+              <strong><AdminText i18nKey="catalogImportsAdmin.afterImportTitle" fallback="What should happen after import?" /></strong>
+              <p style={optionHelpStyle}>
+                <AdminText
+                  i18nKey="catalogImportsAdmin.afterImportDescription"
+                  fallback="The uploaded file always updates the master price list. Choose whether those new prices should also be copied to the kitchen items customers can order."
+                />
               </p>
-              <p style={syncRecommendationStyle}>
-                The start date controls when customer-visible kitchen item prices may be updated. Future-dated imports are stored as scheduled until that date.
+              <p style={optionHelpStyle}>
+                <AdminText
+                  i18nKey="catalogImportsAdmin.startDateHelp"
+                  fallback="The start date controls when customer-visible kitchen item prices may be updated. Future-dated imports are stored as scheduled until that date."
+                />
               </p>
-              <p style={syncRecommendationStyle}>
-                Prices are applied only to kitchens with the same Programm ID. A list for IP 2200 will not update kitchens from another program.
+              <p style={optionHelpStyle}>
+                <AdminText
+                  i18nKey="catalogImportsAdmin.programmIdHelp"
+                  fallback="Prices are applied only to kitchens with the same Program ID. A list for IP 2200 will not update kitchens from another program."
+                />
               </p>
               <div style={syncOptionGridStyle}>
                 <label style={syncOptionStyle}>
                   <input type="checkbox" name="syncLinkedKitchenItems" value="true" style={syncOptionCheckboxStyle} />
                   <span style={syncOptionContentStyle}>
-                    <strong>Update prices shown to customers</strong>
+                    <strong><AdminText i18nKey="catalogImportsAdmin.updateCustomerPrices" fallback="Update prices shown to customers" /></strong>
                     <span style={syncOptionHelpStyle}>
-                      Copies the imported supplier prices to matching products in kitchen configurators with this Programm ID. New customer orders use the new prices; existing orders stay unchanged.
+                      <AdminText
+                        i18nKey="catalogImportsAdmin.updateCustomerPricesHelp"
+                        fallback="Copies the imported supplier prices to matching products in kitchen configurators with this Program ID. New customer orders use the new prices; existing orders stay unchanged."
+                      />
                     </span>
                   </span>
                 </label>
               </div>
-              <p style={syncRecommendationStyle}>
-                Fixed included kitchen items are not changed by price-list imports. If a fixed item should become price-managed later, unlock it first and then apply the new customer prices.
+              <p style={optionHelpStyle}>
+                <AdminText
+                  i18nKey="catalogImportsAdmin.fixedItemsHelp"
+                  fallback="Fixed included kitchen items are not changed by price-list imports. If a fixed item should become price-managed later, unlock it first and then apply the new customer prices."
+                />
               </p>
             </div>
 
             <div style={actionRowStyle}>
               <button type="submit" name="_intent" value="preview" formTarget="_blank" style={secondaryButtonStyle}>
-                Preview JSON
+                <AdminText i18nKey="catalogImportsAdmin.previewJson" fallback="Preview JSON" />
               </button>
               <AdminConfirmSubmitButton
                 name="_intent"
                 value="apply"
                 style={primaryButtonStyle}
+                confirmKey="catalogImportsAdmin.applyConfirm"
                 confirmFallback="Apply this catalog price list import? Existing orders will not be recalculated."
               >
-                Apply import
+                <AdminText i18nKey="catalogImportsAdmin.applyImport" fallback="Apply import" />
               </AdminConfirmSubmitButton>
             </div>
           </form>
         </AdminSection>
 
         <AdminSection
-          title="Programm IDs"
-          description="Create a Programm ID first, then assign kitchens to it from the kitchen create/edit pages. Price lists are imported against one Programm ID."
+          title={<AdminText i18nKey="catalogImportsAdmin.programmIds" fallback="Program IDs" />}
+          description={<AdminText i18nKey="catalogImportsAdmin.programmIdsDescription" fallback="Create a Program ID first, then assign kitchens to it from the kitchen create/edit pages. Price lists are imported against one Program ID." />}
         >
           <form action="/api/admin/catalog/programs" method="post" style={programFormStyle}>
             <input type="hidden" name="returnTo" value="/admin/catalog/imports" />
-            <FormField label="New Programm ID">
+            <FormField label={<AdminText i18nKey="catalogImportsAdmin.newProgrammId" fallback="New program ID" />}>
               <input name="programmId" placeholder="IP 2400" style={programInputStyle} required />
             </FormField>
             <div style={{ alignSelf: "end" }}>
-              <button type="submit" style={secondaryButtonStyle}>Save Programm ID</button>
+              <button type="submit" style={secondaryButtonStyle}>
+                <AdminText i18nKey="catalogImportsAdmin.saveProgrammId" fallback="Save program ID" />
+              </button>
             </div>
           </form>
           <div style={programListStyle}>
             {programs.map((program) => (
               <span key={program.programmId} style={programPillStyle}>
                 {program.programmId}
-                <span style={programPillMetaStyle}>{program.kitchenCount} kitchen{program.kitchenCount === 1 ? "" : "s"}</span>
+                <span style={programPillMetaStyle}>
+                  <AdminText
+                    i18nKey={program.kitchenCount === 1 ? "catalogImportsAdmin.kitchenCount" : "catalogImportsAdmin.kitchensCount"}
+                    fallback={program.kitchenCount === 1 ? "{count} kitchen" : "{count} kitchens"}
+                    values={{ count: program.kitchenCount }}
+                  />
+                </span>
               </span>
             ))}
           </div>
         </AdminSection>
 
         <AdminSection
-          title="Price list history"
-          description="Every applied price-list import is kept here. Existing order prices are not recalculated when a new list is imported."
+          title={<AdminText i18nKey="catalogImportsAdmin.historyTitle" fallback="Price list history" />}
+          description={<AdminText i18nKey="catalogImportsAdmin.historyDescription" fallback="Every applied price-list import is kept here. Existing order prices are not recalculated when a new list is imported." />}
         >
-          {!imports.length ? <p style={emptyStateStyle}>No price list imports yet.</p> : (
+          {!imports.length ? (
+            <p style={emptyStateStyle}><AdminText i18nKey="catalogImportsAdmin.noImports" fallback="No price list imports yet." /></p>
+          ) : (
             <div style={tableWrapStyle}>
               <table style={tableStyle}>
                 <thead>
                   <tr>
-                    <th style={thStyle}>Date</th>
-                    <th style={thStyle}>Starts</th>
-                    <th style={thStyle}>Status</th>
-                    <th style={thStyle}>Label</th>
-                    <th style={thStyle}>Source</th>
-                    <th style={thStyle}>Programm ID</th>
-                    <th style={thStyle}>By</th>
-                    <th style={thStyle}>Created</th>
-                    <th style={thStyle}>Updated</th>
-                    <th style={thStyle}>Unchanged</th>
-                    <th style={thStyle}>Synced KitchenItems</th>
-                    <th style={thStyle}>Actions</th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.date" fallback="Date" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.starts" fallback="Starts" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.status" fallback="Status" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.label" fallback="Label" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.source" fallback="Source" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.programmId" fallback="Program ID" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.by" fallback="By" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.created" fallback="Created" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.updated" fallback="Updated" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.unchanged" fallback="Unchanged" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.syncedItems" fallback="Synced items" /></th>
+                    <th style={thStyle}><AdminText i18nKey="catalogImportsAdmin.actions" fallback="Actions" /></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -271,7 +308,12 @@ export default async function AdminCatalogImportsPage({ searchParams }) {
                         <tr>
                           <td style={tdStyle}>{formatDate(entry.appliedAt || entry.createdAt)}</td>
                           <td style={tdStyle}>{formatDateOnly(entry.effectiveFrom || entry.appliedAt || entry.createdAt)}</td>
-                          <td style={tdStyle}>{entry.status || "APPLIED"}</td>
+                          <td style={tdStyle}>
+                            <AdminText
+                              i18nKey={`catalogImportsAdmin.importStatus.${String(entry.status || "APPLIED").toLowerCase()}`}
+                              fallback={entry.status || "Applied"}
+                            />
+                          </td>
                           <td style={tdStyle}>{entry.label || "-"}</td>
                           <td style={tdStyle}>{entry.sourceName || "-"}</td>
                           <td style={tdStyle}>{entry.programmId || "-"}</td>
@@ -282,7 +324,7 @@ export default async function AdminCatalogImportsPage({ searchParams }) {
                           <td style={tdStyle}>{entry.syncedKitchenItemCount}</td>
                           <td style={tdStyle}>
                             <a href={`/api/admin/catalog/imports/${entry.id}/export`} style={historyDownloadLinkStyle}>
-                              Download list
+                              <AdminText i18nKey="catalogImportsAdmin.downloadList" fallback="Download list" />
                             </a>
                           </td>
                         </tr>
@@ -290,22 +332,36 @@ export default async function AdminCatalogImportsPage({ searchParams }) {
                           <td colSpan={12} style={historyDetailCellStyle}>
                             <details>
                               <summary style={historySummaryStyle}>
-                                View price-list changes ({changeRows.length})
+                                <AdminText
+                                  i18nKey="catalogImportsAdmin.viewChanges"
+                                  fallback="View price-list changes ({count})"
+                                  values={{ count: changeRows.length }}
+                                />
                               </summary>
                               <p style={historySnapshotNoteStyle}>
-                                Use Download list to export a full price-list workbook for this import.
+                                <AdminText
+                                  i18nKey="catalogImportsAdmin.downloadHelp"
+                                  fallback="Use Download list to export a full price-list workbook for this import."
+                                />
                               </p>
                               {!changeRows.length ? (
-                                <p style={historyEmptyStyle}>No price changes were recorded for this import.</p>
+                                <p style={historyEmptyStyle}>
+                                  <AdminText i18nKey="catalogImportsAdmin.noChanges" fallback="No price changes were recorded for this import." />
+                                </p>
                               ) : (
                                 <div style={historyChangeGridStyle}>
-                                  <div style={historyHeaderStyle}>Type</div>
-                                  <div style={historyHeaderStyle}>Identifier</div>
-                                  <div style={historyHeaderStyle}>Old price</div>
-                                  <div style={historyHeaderStyle}>New price</div>
+                                  <div style={historyHeaderStyle}><AdminText i18nKey="catalogImportsAdmin.type" fallback="Type" /></div>
+                                  <div style={historyHeaderStyle}><AdminText i18nKey="catalogImportsAdmin.identifier" fallback="Identifier" /></div>
+                                  <div style={historyHeaderStyle}><AdminText i18nKey="catalogImportsAdmin.oldPrice" fallback="Old price" /></div>
+                                  <div style={historyHeaderStyle}><AdminText i18nKey="catalogImportsAdmin.newPrice" fallback="New price" /></div>
                                   {changeRows.map((row, index) => (
                                     <Fragment key={`${row.type}-${row.identifier}-${index}`}>
-                                      <div style={historyCellStyle}>{row.type}</div>
+                                      <div style={historyCellStyle}>
+                                        <AdminText
+                                          i18nKey={`catalogImportsAdmin.itemType.${row.type.toLowerCase()}`}
+                                          fallback={row.type}
+                                        />
+                                      </div>
                                       <div style={historyCellStyle}>{row.identifier}</div>
                                       <div style={historyCellStyle}>{formatMoney(row.oldPrice)}</div>
                                       <div style={historyCellStyle}>{formatMoney(row.newPrice)}</div>
@@ -378,7 +434,7 @@ const syncOptionHelpStyle = {
   fontWeight: 600,
 };
 
-const syncRecommendationStyle = {
+const optionHelpStyle = {
   ...mutedTextStyle,
   margin: 0,
   fontSize: 13,

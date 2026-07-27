@@ -89,7 +89,11 @@ function PaymentStatusBadge({ status }) {
         ? paymentFailedStyle
         : paymentUnpaidStyle;
 
-  return <span style={style}>{value}</span>;
+  return (
+    <span style={style}>
+      <AdminText i18nKey={`reportsAdmin.paymentStatus.${value.toLowerCase()}`} fallback={value} />
+    </span>
+  );
 }
 
 export default async function AdminReportsPage({ searchParams = {} }) {
@@ -190,7 +194,7 @@ export default async function AdminReportsPage({ searchParams = {} }) {
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.customer" fallback="Customer" /></th>
                   <th style={thStyle}><AdminText i18nKey="reportsAdmin.orderDate" fallback="Order date" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.status" fallback="Status" /></th>
-                  <th style={thStyle}>Payment</th>
+                  <th style={thStyle}><AdminText i18nKey="reportsAdmin.payment" fallback="Payment" /></th>
                   <th style={thStyle}><AdminText i18nKey="ordersAdmin.items" fallback="Items" /></th>
                   <th style={thStyle}><AdminText i18nKey="reportsAdmin.netWithoutVat" fallback="Net without VAT" /></th>
                   <th style={thStyle}><AdminText i18nKey="reportsAdmin.totalWithVat" fallback="Total with VAT" /></th>

@@ -1,15 +1,18 @@
+"use client";
+
 import Link from "next/link";
 import { buildAdminPageHref } from "../lib/admin-pagination";
-import { AdminText } from "./admin-i18n";
+import { AdminText, useAdminI18n } from "./admin-i18n";
 
 export function AdminPagination({ basePath, searchParams = {}, page, pageSize, totalItems, totalPages }) {
+  const { translate } = useAdminI18n();
   if (totalPages <= 1) return null;
 
   const firstItem = (page - 1) * pageSize + 1;
   const lastItem = Math.min(page * pageSize, totalItems);
 
   return (
-    <nav aria-label="Pagination" style={paginationStyle}>
+    <nav aria-label={translate("pagination.label", "Pagination")} style={paginationStyle}>
       <span style={summaryStyle}>{firstItem}-{lastItem} / {totalItems}</span>
       <div style={actionsStyle}>
         {page > 1 ? (

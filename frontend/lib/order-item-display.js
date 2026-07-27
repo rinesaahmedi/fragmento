@@ -1,6 +1,7 @@
 import { ItemType } from "@prisma/client";
 
 export const SINK_AND_WORKTOP_NAME = "Worktop";
+export const SINK_AND_WORKTOP_NAME_DE = "Arbeitsplatte";
 export const SINK_AND_WORKTOP_CODE = "SINK-WORKTOP";
 
 function getItemName(item) {

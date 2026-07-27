@@ -128,10 +128,10 @@ export default function AdminContractLinkFields({
           {createObjectOpen ? (
             <div style={inlineObjectBodyStyle}>
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.objectName" fallback="Object/building name" />} wide>
-                <input name={objectFieldNames.name} placeholder="Building A" style={fieldStyle} required />
+                <input name={objectFieldNames.name} placeholder={translate("propertyOwnersAdmin.objectNamePlaceholder", "Building A")} style={fieldStyle} required />
               </FormField>
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectName" fallback="Project name" />}>
-                <input name={objectFieldNames.projectName} placeholder="Project A" style={fieldStyle} required />
+                <input name={objectFieldNames.projectName} placeholder={translate("propertyOwnersAdmin.projectNamePlaceholder", "Project A")} style={fieldStyle} required />
               </FormField>
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectCode" fallback="Project code" />}>
                 <input name={objectFieldNames.projectCode} placeholder="PRJ-204" style={fieldStyle} />
@@ -154,7 +154,7 @@ export default function AdminContractLinkFields({
               <FormField label={<AdminText i18nKey="propertyOwnersAdmin.projectDescription" fallback="Project description" />} wide>
                 <textarea
                   name={objectFieldNames.projectDescription}
-                  placeholder="Internal notes about this project"
+                  placeholder={translate("propertyOwnersAdmin.projectDescriptionPlaceholder", "Internal notes about this project")}
                   rows={compact ? 2 : 3}
                   style={compact ? compactTextareaStyle : defaultTextareaStyle}
                 />

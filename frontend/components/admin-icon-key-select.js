@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AdminText, useAdminI18n } from "./admin-i18n";
 
 export function AdminIconKeySelect({
   name = "iconKey",
@@ -9,6 +10,7 @@ export function AdminIconKeySelect({
   iconMarkupByKey = {},
   selectStyle = {},
 }) {
+  const { translate } = useAdminI18n();
   const [value, setValue] = useState(String(defaultValue || "").trim());
   const options = useMemo(() => {
     const currentValue = String(defaultValue || "").trim();
@@ -26,14 +28,19 @@ export function AdminIconKeySelect({
         onChange={(event) => setValue(event.target.value)}
         style={selectStyle}
       >
-        <option value="">No icon</option>
+        <option value=""><AdminText i18nKey="kitchenEditorAdmin.noIcon" fallback="No icon" /></option>
         {options.map((iconKey) => (
           <option key={iconKey} value={iconKey}>
             {iconKey}
           </option>
         ))}
       </select>
-      <span style={previewStyle} aria-label={value ? `${value} icon preview` : "No icon selected"}>
+      <span
+        style={previewStyle}
+        aria-label={value
+          ? translate("kitchenEditorAdmin.iconPreview", "{value} icon preview").replace("{value}", value)
+          : translate("kitchenEditorAdmin.noIconSelected", "No icon selected")}
+      >
         {iconMarkup ? (
           <span style={iconStyle} dangerouslySetInnerHTML={{ __html: normalizeIconMarkup(iconMarkup) }} />
         ) : (

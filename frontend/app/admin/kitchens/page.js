@@ -21,7 +21,7 @@ import {
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminPagination } from "../../../components/admin-pagination";
-import { AdminDateTime, AdminKitchenDisplayName, AdminPluralText, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
+import { AdminDateTime, AdminKitchenDisplayName, AdminPluralText, AdminStatusBadge, AdminText, AdminTranslatedTextarea } from "../../../components/admin-i18n";
 import AdminSelect from "../../../components/admin-select";
 import { listKitchensForAdmin } from "../../../lib/catalog";
 import { listCatalogPrograms } from "../../../lib/catalog-programs";
@@ -61,7 +61,7 @@ export default async function AdminKitchensPage({ searchParams }) {
 
           <form action="/api/admin/kitchens" method="post" style={formGridStyle}>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.kitchenName" fallback="Kitchen name" />}>
-              <input name="name" placeholder="AB 105807 Kitchen" style={inputStyle} required />
+              <input name="name" placeholder="105807" style={inputStyle} required />
             </FormField>
             <FormField label={<AdminText i18nKey="kitchensAdmin.kitchenCode" fallback="Kitchen code" />}>
               <input name="kitchenCode" placeholder="105 807" style={inputStyle} />
@@ -79,15 +79,16 @@ export default async function AdminKitchensPage({ searchParams }) {
               <AdminSelect name="status" defaultValue={KitchenStatus.DRAFT} style={inputStyle}>
                 {KITCHEN_STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>
-                    {status}
+                    <AdminText i18nKey={`status.${status.toLowerCase()}`} fallback={status} />
                   </option>
                 ))}
               </AdminSelect>
             </FormField>
             <FormField label={<AdminText i18nKey="kitchenDetailAdmin.description" fallback="Description" />} wide>
-              <textarea
+              <AdminTranslatedTextarea
                 name="description"
-                placeholder="Kitchen configuration based on frontend/public/pdfs/AB 105807.pdf"
+                placeholderKey="kitchensAdmin.descriptionPlaceholder"
+                placeholderFallback="Kitchen configuration based on the plan file"
                 rows={2}
                 style={textareaStyle}
               />
@@ -96,9 +97,6 @@ export default async function AdminKitchensPage({ searchParams }) {
               <button type="submit" style={primaryButtonStyle}>
                 <AdminText i18nKey="kitchensAdmin.createKitchen" fallback="Create kitchen" />
               </button>
-              <span style={defaultItemsHintStyle}>
-                <AdminText i18nKey="kitchensAdmin.defaultItemsHint" fallback="Defaults added: waste separation, cutlery insert, LED lighting." />
-              </span>
             </div>
           </form>
         </AdminSection>
@@ -220,8 +218,3 @@ export default async function AdminKitchensPage({ searchParams }) {
   );
 }
 
-const defaultItemsHintStyle = {
-  color: "var(--app-text-muted)",
-  fontSize: 13,
-  fontWeight: 700,
-};
