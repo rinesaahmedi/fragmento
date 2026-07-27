@@ -180,6 +180,16 @@ test("AB 105814 email oven uses the dashboard selection coordinates", () => {
   });
 });
 
+test("AB 105814 email worktop uses the dashboard selection coordinates", () => {
+  const worktops = PLAN_HOTSPOTS_BY_SLUG["ab-105814"]
+    .filter((hotspot) => hotspot.componentKey === "worktop");
+
+  assert.deepEqual(worktops, [
+    { componentKey: "worktop", left: 17.77, top: 57.04, width: 76.96, height: 1.33 },
+    { componentKey: "worktop", left: 17.77, top: 57.04, width: 0.37, height: 30.33 },
+  ]);
+});
+
 test("AB 105815 email uses the same oven layout as the dashboard", () => {
   const emailOven = PLAN_HOTSPOTS_BY_SLUG["ab-105815"]
     .find((hotspot) => hotspot.componentKey === "oven-module");
@@ -208,6 +218,37 @@ test("AB 105822 email uses the dashboard sink and faucet sources", () => {
     [29.5, 42.85],
     [29.5, 54.3],
     [22.35, 55.2],
+  ]);
+});
+
+test("AB 105828 email reuses the dashboard-matched AB 105822 sink geometry", () => {
+  const kitchen105828 = PLAN_HOTSPOTS_BY_SLUG["ab-105828"];
+  const kitchen105822 = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
+
+  assert.equal(kitchen105828, kitchen105822);
+  assert.equal(
+    kitchen105828.filter((hotspot) => hotspot.componentKey === "sink-faucet").length,
+    1,
+  );
+});
+
+test("AB 105831 email uses the dashboard sink and faucet geometry", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105831"];
+  const sinkBase = hotspots.find((hotspot) => hotspot.componentKey === "sink-base");
+  const faucets = hotspots.filter((hotspot) => hotspot.componentKey === "sink-faucet");
+
+  assert.deepEqual(sinkBase.points, [
+    [31.45, 61.55],
+    [42.55, 59.8],
+    [42.25, 89.25],
+    [31.45, 90.8],
+  ]);
+  assert.equal(faucets.length, 1);
+  assert.deepEqual(faucets[0].points, [
+    [25.05, 47.15],
+    [30.8, 47.15],
+    [30.8, 58.15],
+    [25.05, 58.65],
   ]);
 });
 
@@ -241,6 +282,8 @@ test("email preview selection overlay is strong enough to remain visible after e
   );
 
   assert.match(source, /fill="rgba\(62,188,116,0\.34\)" stroke="none"/);
+  assert.match(source, /normalizedSlug === "ab-105824"/);
+  assert.match(source, /fill="rgba\(62,188,116,0\.58\)" stroke="none"/);
   assert.match(source, /png\(\{ compressionLevel: 9, palette: true, quality: 90 \}\)/);
 });
 

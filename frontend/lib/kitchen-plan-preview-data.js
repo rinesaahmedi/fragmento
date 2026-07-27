@@ -601,12 +601,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "sink-faucet",
-      points: [[17.8, 57.5], [38.05, 56.9], [38.05, 59.35], [17.8, 60.25]],
-      preserveManualSize: true,
-    },
-    {
-      componentKey: "sink-faucet",
-      points: [[25.05, 49.15], [30.8, 48.45], [30.8, 58.15], [25.05, 58.65]],
+      points: [[25.05, 47.15], [30.8, 47.15], [30.8, 58.15], [25.05, 58.65]],
       preserveManualSize: true,
     },
     {
@@ -623,7 +618,7 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "sink-base",
-      points: [[31.45, 60.55], [42.25, 59.8], [42.25, 88.75], [31.45, 90.1]],
+      points: [[31.45, 61.55], [42.55, 59.8], [42.25, 89.25], [31.45, 90.8]],
     },
     {
       componentKey: "base-module-2",
@@ -737,8 +732,8 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-4", left: 51.99, top: 15.77, width: 14.01, height: 23.91 },
     { componentKey: "wall-cabinet-5", left: 66, top: 15.77, width: 14.01, height: 23.91 },
     { componentKey: "wall-cabinet-6", left: 80.01, top: 15.77, width: 14.85, height: 23.91 },
-    { componentKey: "worktop", left: 17.51, top: 58.19, width: 77.5, height: 1.35 },
-    { componentKey: "worktop", left: 17.06, top: 58.15, width: 0.45, height: 31.09 },
+    { componentKey: "worktop", left: 17.77, top: 57.04, width: 76.96, height: 1.33 },
+    { componentKey: "worktop", left: 17.77, top: 57.04, width: 0.37, height: 30.33 },
     { componentKey: "sink-faucet", left: 68.2, top: 51.95, width: 4.85, height: 8 },
     { componentKey: "base-module-1", left: 17.51, top: 59.54, width: 10.73, height: 29.7 },
     { componentKey: "oven-module", left: 28.65, top: 58.37, width: 14.01, height: 29.0 },
@@ -1248,7 +1243,7 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105822"].push({
   points: [[22.35, 42.85], [29.5, 42.85], [29.5, 54.3], [22.35, 55.2]],
   preserveManualSize: true,
 });
-PLAN_HOTSPOTS_BY_SLUG["ab-105828"] = PLAN_HOTSPOTS_BY_SLUG["ab-105825"];
+PLAN_HOTSPOTS_BY_SLUG["ab-105828"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105830"] = PLAN_HOTSPOTS_BY_SLUG["ab-105827"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105839"] = PLAN_HOTSPOTS_BY_SLUG["ab-105842"];
 PLAN_HOTSPOTS_BY_SLUG["105845-modul-2"] = PLAN_HOTSPOTS_BY_SLUG["ab-105845"];
