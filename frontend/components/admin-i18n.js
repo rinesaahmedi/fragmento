@@ -81,6 +81,10 @@ export function useAdminI18n() {
   return value;
 }
 
+export function useOptionalAdminI18n() {
+  return useContext(AdminI18nContext);
+}
+
 export function AdminText({ i18nKey, fallback = "", as: Component = Fragment, values }) {
   const { translate } = useAdminI18n();
   let text = translate(i18nKey, fallback);

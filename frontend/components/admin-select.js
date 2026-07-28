@@ -1,7 +1,7 @@
 "use client";
 
 import { Children, isValidElement, useEffect, useId, useMemo, useRef, useState } from "react";
-import { useAdminI18n } from "./admin-i18n";
+import { useOptionalAdminI18n } from "./admin-i18n";
 
 export default function AdminSelect({
   name,
@@ -21,7 +21,7 @@ export default function AdminSelect({
   label,
   ...triggerProps
 }) {
-  const { translate } = useAdminI18n();
+  const adminI18n = useOptionalAdminI18n();
   const generatedId = useId();
   const listboxId = `${id || generatedId}-listbox`;
   const buttonRef = useRef(null);
@@ -46,7 +46,7 @@ export default function AdminSelect({
 
   const selectedOption = options.find((option) => option.value === selectedValue) || null;
   const displayLabel = selectedOption?.label || placeholder || options[0]?.label || "";
-  let translatedAriaLabel = translate(ariaLabelKey || "", ariaLabel || "");
+  let translatedAriaLabel = adminI18n?.translate(ariaLabelKey || "", ariaLabel || "") || ariaLabel || "";
   Object.entries(ariaLabelValues || {}).forEach(([key, replacement]) => {
     translatedAriaLabel = translatedAriaLabel.replaceAll(`{${key}}`, replacement);
   });
