@@ -3688,6 +3688,36 @@ textarea {
   cursor: pointer;
 }
 
+.service-claim-reference-plan__marker-actions .service-claim-reference-plan__undo-button {
+  border-color: #a9150b;
+  background: #c41d0f;
+  color: #fff;
+  box-shadow: 0 3px 10px rgba(196, 29, 15, 0.3);
+}
+
+.service-claim-reference-plan__marker-actions .service-claim-reference-plan__undo-button:hover,
+.service-claim-reference-plan__marker-actions .service-claim-reference-plan__undo-button:focus-visible {
+  border-color: #8f1008;
+  background: #a9150b;
+  box-shadow: 0 4px 14px rgba(196, 29, 15, 0.42);
+}
+
+.service-claim-reference-plan__undo-x {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-inline: 4px 0;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  background: rgba(117, 9, 3, 0.35);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+  vertical-align: middle;
+}
+
 .service-claim-plan-markers {
   position: absolute;
   inset: 0;
@@ -4300,6 +4330,19 @@ textarea {
   .service-claim-reference-plan__preview {
     min-height: 220px;
     padding: 8px;
+  }
+
+  .service-claim-reference-plan__marker-actions .service-claim-reference-plan__undo-button {
+    min-height: 38px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .service-claim-reference-plan__undo-x {
+    width: 19px;
+    height: 19px;
+    margin-inline-start: 3px;
+    font-size: 0.86rem;
   }
 
   .service-claim-reference-plan__image {

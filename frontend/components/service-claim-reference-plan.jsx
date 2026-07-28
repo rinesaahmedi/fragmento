@@ -2,6 +2,21 @@
 
 import { useState } from "react";
 
+function MarkerUndoLabel({ label }) {
+  const text = String(label || "");
+  const markerIndex = text.lastIndexOf("X");
+
+  if (markerIndex < 0) return text;
+
+  return (
+    <>
+      {text.slice(0, markerIndex)}
+      <span className="service-claim-reference-plan__undo-x">X</span>
+      {text.slice(markerIndex + 1)}
+    </>
+  );
+}
+
 function getRelativePosition(event) {
   const bounds = event.currentTarget.getBoundingClientRect();
   if (!bounds.width || !bounds.height) return null;
@@ -82,8 +97,12 @@ export default function ServiceClaimReferencePlan({
           {markers.length ? (
             <div className="service-claim-reference-plan__marker-actions">
               <span>{labels.markerCount.replace("{count}", String(markers.length))}</span>
-              <button type="button" onClick={onUndoMarker}>
-                {labels.undoMarker}
+              <button
+                type="button"
+                className="service-claim-reference-plan__undo-button"
+                onClick={onUndoMarker}
+              >
+                <MarkerUndoLabel label={labels.undoMarker} />
               </button>
             </div>
           ) : null}
