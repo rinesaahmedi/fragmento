@@ -96,7 +96,17 @@ export default function ServiceClaimReferencePlan({
           </figure>
           {markers.length ? (
             <div className="service-claim-reference-plan__marker-actions">
-              <span>{labels.markerCount.replace("{count}", String(markers.length))}</span>
+              <div className="service-claim-reference-plan__marker-summary">
+                <span className="service-claim-reference-plan__marker-count">
+                  {labels.markerCount.replace("{count}", String(markers.length))}
+                </span>
+                <span className="service-claim-reference-plan__marker-count-icons" aria-hidden="true">
+                  {markers.slice(0, 5).map((marker) => (
+                    <span key={marker.id}>X</span>
+                  ))}
+                  {markers.length > 5 ? <strong>+{markers.length - 5}</strong> : null}
+                </span>
+              </div>
               <button
                 type="button"
                 className="service-claim-reference-plan__undo-button"

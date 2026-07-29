@@ -3667,13 +3667,54 @@ textarea {
 }
 
 .service-claim-reference-plan__marker-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   color: var(--app-text-muted);
   font-size: 0.84rem;
   font-weight: 800;
+}
+
+.service-claim-reference-plan__marker-summary {
+  grid-column: 2;
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.service-claim-reference-plan__marker-actions > button {
+  grid-column: 3;
+  justify-self: center;
+}
+
+.service-claim-reference-plan__marker-count-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.service-claim-reference-plan__marker-count-icons > span {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #c41d0f;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(196, 29, 15, 0.3);
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.service-claim-reference-plan__marker-count-icons > strong {
+  margin-inline-start: 2px;
+  color: #c41d0f;
+  font-size: 0.76rem;
+  font-weight: 900;
 }
 
 .service-claim-reference-plan__marker-actions button {
@@ -4338,6 +4379,20 @@ textarea {
     font-size: 0.78rem;
   }
 
+  .service-claim-reference-plan__marker-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .service-claim-reference-plan__marker-summary {
+    grid-column: 1;
+    justify-self: center;
+  }
+
+  .service-claim-reference-plan__marker-actions > button {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
   .service-claim-reference-plan__undo-x {
     width: 19px;
     height: 19px;
@@ -4357,11 +4412,11 @@ textarea {
   }
 
   .service-claim-plan-marker {
-    min-width: 28px;
-    height: 28px;
-    padding: 0 5px;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 4px;
     border-width: 2px;
-    font-size: 0.72rem;
+    font-size: 0.64rem;
   }
 
   .service-claim-reference-plan__preview-action {
