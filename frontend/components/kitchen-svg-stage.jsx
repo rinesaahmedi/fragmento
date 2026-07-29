@@ -434,16 +434,22 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-3", points: [[43.1, 12.22], [53.55, 10.85], [58.76, 11.9], [48.02, 13.75]] },
     { componentKey: "wall-cabinet-3", points: [[48.02, 13.55], [60.02, 11.80], [60.02, 36.0], [48.02, 37.85]] },
    
-    { componentKey: "worktop", points: [[30.34, 56.08], [33.07, 55.93], [43.76, 54.03], [52.97, 55.84], [52.05, 55.82], [41.07, 58.02], [30.34, 60.02]] },
-    { componentKey: "worktop", points: [[43.76, 54.03], [52.05, 53.0], [53.98, 52.7], [61.64, 53.95], [70.85, 55.88], [80.05, 57.72], [91.22, 59.92], [91.22, 60.48], [80.05, 61.82], [70.85, 59.38], [61.64, 57.48], [53.98, 55.95], [52.97, 55.84]] },
-    { componentKey: "worktop", points: [[30.34, 60.02], [41.07, 58.02], [52.05, 55.82], [52.05, 57.45], [41.07, 59.05], [30.09, 60.73]], preserveManualSize: true },
-    { componentKey: "worktop", points: [[52.05, 55.82], [53.98, 55.95], [61.64, 57.48], [70.85, 59.38], [80.05, 61.82], [91.22, 60.48], [91.22, 61.3], [80.05, 63.02], [70.85, 61.08], [61.64, 59.08], [52.05, 57.25]], preserveManualSize: true },
+    // Pixel-traced split on the red-marked wall line: source pixels
+    // (1919, 1300) to (1858, 1386) in the 3509 x 2480 plan render.
+    { componentKey: "worktop", points: [[30.34, 56.08], [33.07, 55.93], [43.76, 54.03], [52.05, 53.0], [53.98, 52.7], [54.687945, 52.419355], [52.949558, 55.887097], [52.05, 55.82], [41.07, 58.02], [30.34, 60.02]] },
+    { componentKey: "worktop", points: [[54.687945, 52.419355], [61.64, 53.95], [70.85, 55.88], [80.05, 57.72], [91.22, 59.92], [91.22, 60.48], [80.05, 61.82], [70.85, 59.38], [61.64, 57.48], [53.98, 55.95], [52.949558, 55.887097]] },
+    // Split the short inside-corner fascia exactly in half. Both runs meet on
+    // the midpoint line from (53.015, 55.885) to (53.015, 57.4343).
+    { componentKey: "worktop", points: [[30.34, 60.02], [41.07, 58.02], [52.05, 55.82], [53.015, 55.885], [53.015, 57.4343], [52.05, 57.45], [41.07, 59.05], [30.09, 60.73]], preserveManualSize: true },
+    { componentKey: "worktop", points: [[53.015, 55.885], [53.98, 55.95], [61.64, 57.48], [70.85, 59.38], [80.05, 61.82], [91.22, 60.48], [91.22, 61.3], [80.05, 63.02], [70.85, 61.08], [61.64, 59.08], [53.015, 57.4343]], preserveManualSize: true },
     { componentKey: "base-module-1", points: [[30.09, 60.73], [41.07, 59.05], [41.07, 88.51], [30.09, 89.90]] },
     { componentKey: "oven-module", points: [[41.07, 59.05], [52.05, 57.45], [52.05, 86.80], [41.07, 88.51]] },
     { componentKey: "base-module-2", points: [[52.05, 57.25], [61.64, 58.92], [61.64, 88.5], [52.05, 86.62]] },
     { componentKey: "base-module-4", points: [[61.64, 59.08], [70.85, 60.88], [70.85, 90.69], [61.64, 88.69]] },
     { componentKey: "base-module-3", points: [[70.85, 61.08], [80.05, 62.82], [80.05, 92.25], [70.85, 90.55]] },
-    { componentKey: "base-module-3", points: [[80.05, 63.02], [91.22, 61.30], [91.22, 91.1], [80.05, 92.25]] },
+    // The broad face at the far right is the separately claimable WU16 cabinet
+    // side panel, not a second face of base-module-3.
+    { componentKey: "worktop", points: [[80.05, 63.02], [91.22, 61.30], [91.22, 91.1], [80.05, 92.25]], preserveManualSize: true },
     
     { componentKey: "sink-faucet", points: [[68.6, 46.7], [75.1, 46.7], [75.1, 56.5], [68.6, 56.75]], preserveManualSize: true },
   ],

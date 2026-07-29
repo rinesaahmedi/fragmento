@@ -2588,7 +2588,7 @@ test("service claim picker preserves cooktop and calibrated sink cutouts while l
   );
 });
 
-test("AB 105837 right worktop meets the calibrated cooktop edge without a surface gap", () => {
+test("AB 105837 worktop surfaces split on the pixel-traced wall junction", () => {
   const source = fs.readFileSync(
     path.join(repoRoot, "components", "kitchen-svg-stage.jsx"),
     "utf8",
@@ -2596,7 +2596,23 @@ test("AB 105837 right worktop meets the calibrated cooktop edge without a surfac
 
   assert.match(
     source,
-    /"ab-105837":\s*\[[\s\S]*componentKey:\s*"worktop",\s*points:\s*\[\[43\.76,\s*54\.03\],\s*\[52\.05,\s*53\.0\][\s\S]*\[52\.97,\s*55\.84\]\]/,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[30\.34,\s*56\.08\][\s\S]*\[54\.687945,\s*52\.419355\],\s*\[52\.949558,\s*55\.887097\]/,
+  );
+  assert.match(
+    source,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[54\.687945,\s*52\.419355\],\s*\[61\.64,\s*53\.95\][\s\S]*\[52\.949558,\s*55\.887097\]\]/,
+  );
+  assert.doesNotMatch(
+    source,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[53\.98,\s*52\.7\],\s*\[61\.64,\s*53\.95\]/,
+  );
+  assert.match(
+    source,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[30\.34,\s*60\.02\][\s\S]*\[52\.05,\s*55\.82\],\s*\[53\.015,\s*55\.885\],\s*\[53\.015,\s*57\.4343\]/,
+  );
+  assert.match(
+    source,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[53\.015,\s*55\.885\],\s*\[53\.98,\s*55\.95\],\s*\[61\.64,\s*57\.48\][\s\S]*\[53\.015,\s*57\.4343\]\]/,
   );
 });
 
@@ -3029,6 +3045,40 @@ test("AB 105822 reuses the pixel-matched AB 105825 sink polygon", () => {
     .find((entry) => entry.claimPartKey === "sink");
 
   assert.deepEqual(sinkFor("ab-105822"), sinkFor("ab-105825"));
+});
+
+test("AB 105837 family maps the tall right face to the cabinet side-panel claim", () => {
+  const pickerSource = fs.readFileSync(
+    path.join(repoRoot, "components", "kitchen-svg-stage.jsx"),
+    "utf8",
+  );
+  const claimParts = [
+    { partKey: "worktop-left", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceComponentKey: "worktop" },
+    { partKey: "worktop-end-panel", sourceComponentKey: "worktop" },
+  ];
+
+  assert.match(
+    pickerSource,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[80\.05,\s*63\.02\],\s*\[91\.22,\s*61\.30\],\s*\[91\.22,\s*91\.1\],\s*\[80\.05,\s*92\.25\]\]/,
+  );
+
+  for (const slug of ["ab-105837", "ab-105840", "ab-105843"]) {
+    const result = buildServiceClaimPartHotspots(
+      PLAN_HOTSPOTS_BY_SLUG[slug],
+      claimParts,
+      slug,
+    );
+    const sidePanels = result.filter((hotspot) => hotspot.claimPartKey === "worktop-end-panel");
+
+    assert.equal(sidePanels.length, 1, `${slug} should expose one side-panel hotspot`);
+    assert.equal(sidePanels[0].componentId, "component-claim-worktop-end-panel");
+    const panelYValues = sidePanels[0].points.map(([, y]) => y);
+    assert.ok(
+      Math.max(...panelYValues) - Math.min(...panelYValues) > 20,
+      `${slug} side-panel hotspot should cover the tall face`,
+    );
+  }
 });
 
 test("AB 105822 exposes one clean claim hotspot for each worktop run", () => {

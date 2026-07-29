@@ -676,7 +676,8 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-end-panel"],
   },
   "ab-105837": {
-    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
+    // Left/right surfaces, left/right fascias, then the WU16 cabinet side panel.
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel"],
   },
   "ab-105833": {
     indexPartKeys: ["worktop-left", "worktop-right"],
