@@ -382,13 +382,13 @@ function CatalogItem({
           {[
             {
               option: noAuszugOption,
-              label: translate("configurator.auszugBaseOptionLabel", "Drawers"),
+              label: translate("configurator.auszugBaseOptionLabel", "1 Drawer"),
               iconMarkup: ICON_MARKUP.drawer_base_two,
               upgradePrice: 0,
             },
             {
               option: yesAuszugOption,
-              label: translate("configurator.auszugOptionLabel", "Drawers with Pull-Out"),
+              label: translate("configurator.auszugOptionLabel", "3 Drawers"),
               iconMarkup: ICON_MARKUP.drawer_base_three,
               upgradePrice: auszugUpgradePrice,
             },
