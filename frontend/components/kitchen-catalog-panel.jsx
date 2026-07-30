@@ -46,9 +46,9 @@ const ICON_MARKUP = {
   wall_cabinet_double_light:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/><rect x="0.5" y="60" width="59" height="2"/><g stroke="#666" stroke-width="0.75"><line x1="20" y1="62" x2="20" y2="64"/><line x1="18" y1="64" x2="22" y2="64"/><line x1="17" y1="67" x2="14" y2="73"/><line x1="20" y1="67" x2="20" y2="74"/><line x1="23" y1="67" x2="26" y2="73"/><line x1="40" y1="62" x2="40" y2="64"/><line x1="38" y1="64" x2="42" y2="64"/><line x1="37" y1="67" x2="34" y2="73"/><line x1="40" y1="67" x2="40" y2="74"/><line x1="43" y1="67" x2="46" y2="73"/></g></svg>',
   wall_cabinet_plain:
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 72.3" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="71.3"/><line x1="50" y1="36.5" x2="50" y2="53.5" stroke-linecap="round" stroke-width="1.5"/></svg>',
   hood_wall_cabinet:
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/><rect x="8" y="60.5" width="44" height="5"/><line x1="8" y1="65.5" x2="52" y2="65.5"/><g stroke="#666" stroke-width="0.75"><line x1="20" y1="70" x2="17" y2="79"/><line x1="30" y1="70" x2="30" y2="80"/><line x1="40" y1="70" x2="43" y2="79"/></g></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 94" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="71.3"/><line x1="50" y1="36.5" x2="50" y2="53.5" stroke-linecap="round" stroke-width="1.5"/><rect x="8" y="72.8" width="44" height="5"/><line x1="8" y1="77.8" x2="52" y2="77.8"/><g stroke="#666" stroke-width="0.75"><line x1="20" y1="82" x2="17" y2="91"/><line x1="30" y1="82" x2="30" y2="92"/><line x1="40" y1="82" x2="43" y2="91"/></g></svg>',
   washing_machine_base:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="14" x2="60" y2="14"/><line x1="10" y1="8" x2="25" y2="8" stroke-width="0.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 16 26 C 12 26 12 46 16 46 Z"/><circle cx="30" cy="36" r="14"/><circle cx="30" cy="36" r="10"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">WM</text></svg>',
   sink_base:
@@ -69,7 +69,7 @@ const ICON_MARKUP = {
   extractor_hood_chimney:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="1"><rect x="24" y="0.5" width="12" height="39"/><line x1="24" y1="20" x2="36" y2="20"/><rect x="10" y="40" width="40" height="12"/><g stroke="#666" stroke-width="0.75"><line x1="18" y1="55" x2="15" y2="62"/><line x1="22" y1="55" x2="22" y2="63"/><line x1="26" y1="55" x2="29" y2="62"/><line x1="34" y1="55" x2="31" y2="62"/><line x1="38" y1="55" x2="38" y2="63"/><line x1="42" y1="55" x2="45" y2="62"/></g></svg>',
   wall_cabinet_standard:
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="59"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 72.3" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="71.3"/><line x1="50" y1="36.5" x2="50" y2="53.5" stroke-linecap="round" stroke-width="1.5"/></svg>',
   under_cabinet_light:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="#666" stroke-width="0.75"><line x1="8" y1="0" x2="12" y2="0" stroke="currentColor" stroke-width="1"/><line x1="6" y1="4" x2="2" y2="14"/><line x1="10" y1="4" x2="10" y2="15"/><line x1="14" y1="4" x2="18" y2="14"/></svg>',
   sink_faucet:
@@ -117,13 +117,30 @@ const WIDTH_SCALED_CABINET_ICON_KEYS = new Set([
   "wall_cabinet_standard",
 ]);
 
-function getCatalogCabinetIconWidthPx(item) {
+function getCatalogCabinetIconSizePx(item) {
   if (!WIDTH_SCALED_CABINET_ICON_KEYS.has(String(item?.iconKey || ""))) return null;
   const widthMm = Number(getCabinetWidthMm(item));
   if (!Number.isFinite(widthMm) || widthMm <= 0) return null;
 
-  const clampedWidth = Math.min(Math.max(widthMm, 300), 600);
-  return Math.round(29 + ((clampedWidth - 300) / 300) * 25);
+  const iconKey = String(item?.iconKey || "");
+  const suppliedHeightMm = Number(item?.heightMm);
+  const isUpperCabinet = iconKey.startsWith("wall_cabinet") || iconKey === "hood_wall_cabinet";
+  const isHoodWallCabinet = iconKey === "hood_wall_cabinet" || iconKey === "wall_cabinet_hood";
+  const fallbackHeightMm = isUpperCabinet ? 723 : 820;
+  const heightMm = Number.isFinite(suppliedHeightMm) && suppliedHeightMm > 0
+    ? suppliedHeightMm
+    : fallbackHeightMm;
+  const maxWidthPx = isUpperCabinet ? 46 : 54;
+  const maxHeightPx = isUpperCabinet ? 50 : 64;
+  const scale = Math.min(maxWidthPx / widthMm, maxHeightPx / heightMm);
+  const artworkHeightRatio = isHoodWallCabinet ? 94 / 72.3 : 1;
+
+  return {
+    width: Math.max(16, Math.round(widthMm * scale)),
+    height: Math.max(28, Math.round(heightMm * scale * artworkHeightRatio)),
+    slotHeight: Math.round(maxHeightPx * artworkHeightRatio),
+    offsetY: isHoodWallCabinet ? 2 : -4,
+  };
 }
 
 function getCatalogIconMarkup(item, stretchWidthOnly) {
@@ -206,7 +223,7 @@ function CatalogItem({
   const noAuszugOption = auszugOptions.find((option) => option.key === "no") || null;
   const isAuszugSelected = selectedAuszugOption?.key === "yes";
   const iconItem = isAuszugSelected ? { ...item, iconKey: "drawer_base_three" } : item;
-  const cabinetIconWidthPx = getCatalogCabinetIconWidthPx(iconItem);
+  const cabinetIconSizePx = getCatalogCabinetIconSizePx(iconItem);
   const className = [
     styles.itemCard,
     compactIcon ? styles.itemCardCompact : "",
@@ -222,14 +239,19 @@ function CatalogItem({
     iconItem.iconKey === "refrigerator" || iconItem.iconKey === "tall_refrigerator" ? styles.itemIconTall : "",
     iconItem.iconKey === "lighting_set" ? styles.itemIconLightingSet : "",
     String(iconItem.iconKey || "").startsWith("drawer_base") ? styles.itemIconDrawerBase : "",
-    cabinetIconWidthPx ? styles.itemIconScaledCabinet : "",
+    cabinetIconSizePx ? styles.itemIconScaledCabinet : "",
   ]
     .filter(Boolean)
     .join(" ");
-  const iconStyle = cabinetIconWidthPx
-    ? { "--catalog-cabinet-icon-width": `${cabinetIconWidthPx}px` }
+  const iconStyle = cabinetIconSizePx
+    ? {
+        "--catalog-cabinet-icon-width": `${cabinetIconSizePx.width}px`,
+        "--catalog-cabinet-icon-height": `${cabinetIconSizePx.height}px`,
+        "--catalog-cabinet-icon-slot-height": `${cabinetIconSizePx.slotHeight}px`,
+        "--catalog-cabinet-icon-offset-y": `${cabinetIconSizePx.offsetY}px`,
+      }
     : undefined;
-  const iconMarkup = getCatalogIconMarkup(iconItem, Boolean(cabinetIconWidthPx));
+  const iconMarkup = getCatalogIconMarkup(iconItem, Boolean(cabinetIconSizePx));
   const tooltipFacts = getTooltipFacts(item);
   const tooltipPreviewSrc = getTooltipPreviewSrc(item);
   const productInfoDocuments = Array.isArray(item?.productInfoDocuments) && item.productInfoDocuments.length

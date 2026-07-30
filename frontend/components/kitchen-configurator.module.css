@@ -1149,12 +1149,13 @@
 
 .itemIcon {
   display: flex;
+  align-self: center;
   align-items: center;
   justify-content: center;
   width: 56px;
   height: 56px;
   color: #000;
-  transform: none;
+  transform: translateY(-4px);
 }
 
 .itemIcon img,
@@ -1171,7 +1172,6 @@
 
 .itemIconCompact {
   align-self: center;
-  transform: none;
 }
 
 .itemIconLightingSet svg {
@@ -1181,12 +1181,13 @@
 }
 
 .itemIconScaledCabinet {
-  height: 64px;
+  height: var(--catalog-cabinet-icon-slot-height, 64px);
+  transform: translateY(var(--catalog-cabinet-icon-offset-y, -4px));
 }
 
 .itemIconScaledCabinet svg {
   width: var(--catalog-cabinet-icon-width, 49px);
-  height: 64px;
+  height: var(--catalog-cabinet-icon-height, 64px);
   max-width: none;
   max-height: none;
 }
@@ -1195,7 +1196,7 @@
   height: 64px;
 }
 
-.itemIconDrawerBase svg {
+.itemIconDrawerBase:not(.itemIconScaledCabinet) svg {
   height: 64px;
   max-height: none;
 }
