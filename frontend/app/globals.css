@@ -2091,6 +2091,11 @@ textarea {
   user-select: none;
 }
 
+.service-contract-help__img--serial {
+  transform: scale(1.18);
+  transform-origin: center;
+}
+
 .service-contract-help__dots {
   display: flex;
   justify-content: center;

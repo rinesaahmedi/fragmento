@@ -6912,7 +6912,7 @@ export default function ServiceClaimFlow() {
                       <img
                         src={entry.src}
                         alt={entry.alt || t(entry.altKey)}
-                        className="service-contract-help__img"
+                        className="service-contract-help__img service-contract-help__img--serial"
                         loading="lazy"
                         decoding="async"
                         draggable={false}
