@@ -17,7 +17,10 @@ import {
   buildServiceClaimComponentChoiceGroups,
   normalizeServiceClaimComponentChoiceSelection,
 } from "../lib/service-claim-component-choices";
-import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
+import {
+  isServiceClaimContractLookupReady,
+  normalizeServiceClaimContractNumber,
+} from "../lib/service-claim-lookup";
 import { isElectricalApplianceProblemArea } from "../lib/service-claim-serial-number";
 import { getSerialNumberHelpImages } from "../lib/serial-number-help";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
@@ -3313,6 +3316,8 @@ export default function ServiceClaimFlow() {
       }
 
       if (!nextContractNumber) {
+        setContractLookup({ ...EMPTY_CONTRACT_LOOKUP });
+      } else if (!isServiceClaimContractLookupReady(nextContractNumber)) {
         setContractLookup({ ...EMPTY_CONTRACT_LOOKUP });
       } else {
         setContractLookup({

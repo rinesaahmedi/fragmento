@@ -1,10 +1,14 @@
 import { prisma } from "./prisma";
+import { normalizeServiceClaimContractNumber } from "./service-claim-lookup.js";
 
 export { buildServiceClaimAutofillFromContract, splitPersonName } from "./service-claim-contract-autofill";
-
-export function normalizeServiceClaimContractNumber(value) {
-  return String(value || "").trim().replace(/\s+/g, "");
-}
+export {
+  isJunkServiceClaimVisitEvent,
+  isServiceClaimContractLookupReady,
+  normalizeServiceClaimContractNumber,
+  SERVICE_CLAIM_JUNK_CONTRACT_LAST4,
+  SERVICE_CLAIM_LOOKUP_MIN_LENGTH,
+} from "./service-claim-lookup.js";
 
 export async function getServiceClaimContractDetails(contractNumber) {
   const normalizedContractNumber = normalizeServiceClaimContractNumber(contractNumber);

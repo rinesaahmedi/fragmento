@@ -4,6 +4,10 @@ import {
   SERVICE_PAGE_PATH,
 } from "./public-visit-tracking.js";
 import { ORDER_KIND_TEST } from "./order-kind.js";
+import {
+  isJunkServiceClaimVisitEvent,
+  SERVICE_CLAIM_JUNK_CONTRACT_LAST4,
+} from "./service-claim-lookup.js";
 
 const CONTRACT_ACCESS_EVENT_TYPES = [
   PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED,
@@ -133,6 +137,8 @@ export function calculateServiceVisitSummary(events = []) {
   const visitorKeys = new Set();
 
   for (const event of events) {
+    if (isJunkServiceClaimVisitEvent(event)) continue;
+
     if (
       event.eventType === PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED
       && event.path === SERVICE_PAGE_PATH
@@ -212,15 +218,27 @@ export async function loadRecentContractAccessData(filters = {}) {
 }
 
 export async function loadRecentServiceVisitData(filters = {}) {
-  return prisma.publicVisitEvent.findMany({
+  const events = await prisma.publicVisitEvent.findMany({
     where: {
       ...getVisitReportWhere(filters),
       eventType: { in: SERVICE_VISIT_OUTCOME_EVENT_TYPES },
+      NOT: {
+        AND: [
+          { kitchenContractId: null },
+          {
+            contractNumberLast4: {
+              in: [...SERVICE_CLAIM_JUNK_CONTRACT_LAST4],
+            },
+          },
+        ],
+      },
     },
     include: kitchenContractInclude,
     orderBy: { createdAt: "desc" },
     take: 100,
   });
+
+  return events.filter((event) => !isJunkServiceClaimVisitEvent(event));
 }
 
 export async function loadServiceVisitSummary(filters = {}) {
@@ -245,6 +263,8 @@ export async function loadServiceVisitSummary(filters = {}) {
       ipHash: true,
       userAgentHash: true,
       metadata: true,
+      kitchenContractId: true,
+      contractNumberLast4: true,
     },
   });
 

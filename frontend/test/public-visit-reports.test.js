@@ -101,15 +101,26 @@ test("service visit summary is path-scoped and counts claim funnel", () => {
   assert.equal(summary.testLookups, 1);
 });
 
-test("service visit unique visitors ignore home page opens", () => {
+test("service visit summary ignores junk placeholder lookups", () => {
   const summary = calculateServiceVisitSummary([
-    event(PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED, "home-only", { path: "/" }),
-    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP),
+    event(PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED, "visitor-a", { path: SERVICE_PAGE_PATH }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP, "visitor-a", {
+      contractNumberLast4: "ined",
+      kitchenContractId: null,
+    }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND, "visitor-a", {
+      contractNumberLast4: "ined",
+      kitchenContractId: null,
+    }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND, "visitor-a", {
+      contractNumberLast4: "8888",
+      kitchenContractId: null,
+    }),
   ]);
 
-  assert.equal(summary.opened, 0);
-  assert.equal(summary.uniqueVisitors, 0);
-  assert.equal(summary.lookups, 1);
+  assert.equal(summary.opened, 1);
+  assert.equal(summary.lookups, 0);
+  assert.equal(summary.notFound, 1);
 });
 
 test("tracking helpers keep only coarse and validated values", () => {
