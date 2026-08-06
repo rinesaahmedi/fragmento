@@ -1,11 +1,43 @@
 import { prisma } from "./prisma.js";
-import { PUBLIC_VISIT_EVENT_TYPES } from "./public-visit-tracking.js";
+import {
+  PUBLIC_VISIT_EVENT_TYPES,
+  SERVICE_PAGE_PATH,
+} from "./public-visit-tracking.js";
+import { ORDER_KIND_TEST } from "./order-kind.js";
 
 const CONTRACT_ACCESS_EVENT_TYPES = [
   PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED,
   PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED,
   PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED,
 ];
+
+const SERVICE_VISIT_OUTCOME_EVENT_TYPES = [
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND,
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND,
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CLAIM_SUBMITTED,
+];
+
+const SERVICE_VISIT_FUNNEL_EVENT_TYPES = [
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP,
+  ...SERVICE_VISIT_OUTCOME_EVENT_TYPES,
+];
+
+const kitchenContractInclude = {
+  kitchenContract: {
+    select: {
+      id: true,
+      contractNumber: true,
+      kitchen: { select: { id: true, name: true, slug: true } },
+      project: {
+        select: {
+          id: true,
+          name: true,
+          housingCompany: { select: { id: true, name: true } },
+        },
+      },
+    },
+  },
+};
 
 function normalizeDateFilter(value) {
   const normalized = String(value || "").trim();
@@ -35,6 +67,14 @@ function getVisitReportWhere(filters = {}) {
   return where;
 }
 
+function getVisitorIdentity(event) {
+  return event.visitorKey || [event.ipHash, event.userAgentHash].filter(Boolean).join(":");
+}
+
+function isTestServiceEvent(event) {
+  return event?.metadata?.orderKind === ORDER_KIND_TEST;
+}
+
 export function calculatePublicVisitSummary(events = []) {
   const summary = {
     uniqueVisitors: 0,
@@ -48,7 +88,7 @@ export function calculatePublicVisitSummary(events = []) {
   const visitorKeys = new Set();
 
   for (const event of events) {
-    const visitorKey = event.visitorKey || [event.ipHash, event.userAgentHash].filter(Boolean).join(":");
+    const visitorKey = getVisitorIdentity(event);
     if (visitorKey) visitorKeys.add(visitorKey);
 
     switch (event.eventType) {
@@ -77,6 +117,51 @@ export function calculatePublicVisitSummary(events = []) {
     : 0;
   summary.uniqueVisitors = visitorKeys.size;
 
+  return summary;
+}
+
+export function calculateServiceVisitSummary(events = []) {
+  const summary = {
+    uniqueVisitors: 0,
+    opened: 0,
+    lookups: 0,
+    found: 0,
+    notFound: 0,
+    claimsSubmitted: 0,
+    testLookups: 0,
+  };
+  const visitorKeys = new Set();
+
+  for (const event of events) {
+    if (
+      event.eventType === PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED
+      && event.path === SERVICE_PAGE_PATH
+    ) {
+      summary.opened += 1;
+      const visitorKey = getVisitorIdentity(event);
+      if (visitorKey) visitorKeys.add(visitorKey);
+    }
+
+    switch (event.eventType) {
+      case PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP:
+        summary.lookups += 1;
+        break;
+      case PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND:
+        summary.found += 1;
+        if (isTestServiceEvent(event)) summary.testLookups += 1;
+        break;
+      case PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND:
+        summary.notFound += 1;
+        break;
+      case PUBLIC_VISIT_EVENT_TYPES.SERVICE_CLAIM_SUBMITTED:
+        summary.claimsSubmitted += 1;
+        break;
+      default:
+        break;
+    }
+  }
+
+  summary.uniqueVisitors = visitorKeys.size;
   return summary;
 }
 
@@ -120,46 +205,56 @@ export async function loadRecentContractAccessData(filters = {}) {
       ...getVisitReportWhere(filters),
       eventType: { in: CONTRACT_ACCESS_EVENT_TYPES },
     },
-    include: {
-      kitchenContract: {
-        select: {
-          id: true,
-          contractNumber: true,
-          kitchen: { select: { id: true, name: true, slug: true } },
-          project: {
-            select: {
-              id: true,
-              name: true,
-              housingCompany: { select: { id: true, name: true } },
-            },
-          },
-        },
-      },
-    },
+    include: kitchenContractInclude,
     orderBy: { createdAt: "desc" },
     take: 100,
   });
 }
 
+export async function loadRecentServiceVisitData(filters = {}) {
+  return prisma.publicVisitEvent.findMany({
+    where: {
+      ...getVisitReportWhere(filters),
+      eventType: { in: SERVICE_VISIT_OUTCOME_EVENT_TYPES },
+    },
+    include: kitchenContractInclude,
+    orderBy: { createdAt: "desc" },
+    take: 100,
+  });
+}
+
+export async function loadServiceVisitSummary(filters = {}) {
+  const dateWhere = getVisitReportWhere(filters);
+  const events = await prisma.publicVisitEvent.findMany({
+    where: {
+      ...dateWhere,
+      OR: [
+        {
+          eventType: PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED,
+          path: SERVICE_PAGE_PATH,
+        },
+        {
+          eventType: { in: SERVICE_VISIT_FUNNEL_EVENT_TYPES },
+        },
+      ],
+    },
+    select: {
+      eventType: true,
+      path: true,
+      visitorKey: true,
+      ipHash: true,
+      userAgentHash: true,
+      metadata: true,
+    },
+  });
+
+  return calculateServiceVisitSummary(events);
+}
+
 export async function loadPublicVisitReportData(filters = {}) {
   const events = await prisma.publicVisitEvent.findMany({
     where: getVisitReportWhere(filters),
-    include: {
-      kitchenContract: {
-        select: {
-          id: true,
-          contractNumber: true,
-          kitchen: { select: { id: true, name: true, slug: true } },
-          project: {
-            select: {
-              id: true,
-              name: true,
-              housingCompany: { select: { id: true, name: true } },
-            },
-          },
-        },
-      },
-    },
+    include: kitchenContractInclude,
     orderBy: { createdAt: "desc" },
   });
 

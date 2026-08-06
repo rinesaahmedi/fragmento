@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { normalizeContractNumber } from "../lib/kitchen-contracts";
+import {
+  getPublicTrackingContext,
+  trackPublicPageOpened,
+} from "../lib/public-page-open-tracking";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -323,27 +327,6 @@ function ActionRow({ backLabel, onBack, actionLabel, onAction, submit = false, d
   );
 }
 
-function getExternalReferrerHost() {
-  if (typeof document === "undefined" || !document.referrer) return "";
-
-  try {
-    const referrer = new URL(document.referrer);
-    return referrer.origin === window.location.origin ? "" : referrer.hostname;
-  } catch {
-    return "";
-  }
-}
-
-function getPublicTrackingContext(searchParams) {
-  const utmSource = searchParams.get("utm_source") || "";
-  return {
-    source: searchParams.get("source") || utmSource,
-    utmMedium: searchParams.get("utm_medium") || "",
-    utmCampaign: searchParams.get("utm_campaign") || "",
-    referrerHost: getExternalReferrerHost(),
-  };
-}
-
 function formatVideoTime(value) {
   const totalSeconds = Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
   const minutes = Math.floor(totalSeconds / 60);
@@ -430,24 +413,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
     }
 
     pageOpenTrackedRef.current = true;
-    const trackingContext = getPublicTrackingContext(searchParams);
-    const payload = JSON.stringify({
-      eventType: "PAGE_OPENED",
-      path: window.location.pathname,
-      ...trackingContext,
-    });
-
-    if (navigator.sendBeacon) {
-      navigator.sendBeacon("/api/public-visit-events", new Blob([payload], { type: "application/json" }));
-      return;
-    }
-
-    fetch("/api/public-visit-events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: payload,
-      keepalive: true,
-    }).catch(() => {});
+    trackPublicPageOpened(searchParams);
   }, [searchParams]);
 
   useEffect(() => {

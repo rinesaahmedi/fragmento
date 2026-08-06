@@ -21,6 +21,7 @@ import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
 import { isElectricalApplianceProblemArea } from "../lib/service-claim-serial-number";
 import { getSerialNumberHelpImages } from "../lib/serial-number-help";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
+import { trackPublicPageOpened } from "../lib/public-page-open-tracking";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -2388,6 +2389,7 @@ function ServiceVideoGuide({ isOpen, copy, onClose, onFinish }) {
 }
 
 export default function ServiceClaimFlow() {
+  const pageOpenTrackedRef = useRef(false);
   const [language, setLanguage] = useState("de");
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [mode, setMode] = useState("");
@@ -2461,6 +2463,15 @@ export default function ServiceClaimFlow() {
   const clientAddressSectionRef = useRef(null);
   const selectedServicePanelRef = useRef(null);
   const shouldScrollToSelectedPanelRef = useRef(false);
+
+  useEffect(() => {
+    if (pageOpenTrackedRef.current) {
+      return;
+    }
+
+    pageOpenTrackedRef.current = true;
+    trackPublicPageOpened(new URLSearchParams(window.location.search), "/service");
+  }, []);
 
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;

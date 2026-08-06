@@ -13,6 +13,7 @@ const navItems = [
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
   { href: "/admin/reports", labelKey: "adminShellLogin.reports", fallback: "Reports", icon: ReportsIcon },
   { href: "/admin/contract-access", labelKey: "adminShellLogin.contractAccess", fallback: "Contract access", icon: ContractsIcon, requiresSuperAdmin: true },
+  { href: "/admin/claim-activity", labelKey: "adminShellLogin.claimActivity", fallback: "Claim activity", icon: ClaimsIcon, requiresSuperAdmin: true },
   { href: "/admin/px-orders", labelKey: "adminShellLogin.pxOrders", fallback: "PX orders", icon: OrdersIcon },
   { href: "/admin/claims", labelKey: "adminShellLogin.claims", fallback: "Claims", icon: ClaimsIcon, requiresClaimsNav: true },
   { href: "/admin/catalog/articles", labelKey: "adminShellLogin.catalogArticles", fallback: "Catalog", icon: CatalogAuditIcon },

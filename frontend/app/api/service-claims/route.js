@@ -29,6 +29,12 @@ import { formatServiceClaimEmailSubject } from "../../../lib/service-claim-email
 import { getServiceClaimKitchenPlan } from "../../../lib/service-claim-kitchen-plan";
 import { buildServiceClaimComponentChoiceGroups } from "../../../lib/service-claim-component-choices";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
+import { getOrderKindForContractNumber } from "../../../lib/order-kind";
+import {
+  PUBLIC_VISIT_EVENT_TYPES,
+  SERVICE_PAGE_PATH,
+  safelyTrackPublicVisitEvent,
+} from "../../../lib/public-visit-tracking";
 
 function descriptionHasClientKitchenAreasLine(text) {
   const first = String(text || "").split("\n")[0] || "";
@@ -1739,6 +1745,20 @@ export async function POST(request) {
       payload.attachmentsMeta.length > 0 ? JSON.stringify(payload.attachmentsMeta) : null;
 
     await insertServiceClaimRecord(prisma, payload);
+
+    const orderKind = getOrderKindForContractNumber(contractNumber);
+    await safelyTrackPublicVisitEvent({
+      request,
+      eventType: PUBLIC_VISIT_EVENT_TYPES.SERVICE_CLAIM_SUBMITTED,
+      contractNumber,
+      kitchenContractId: contract.id,
+      path: SERVICE_PAGE_PATH,
+      metadata: {
+        orderKind,
+        claimId: payload.id,
+        claimSequence: payload.claimSequence ?? null,
+      },
+    });
 
     // The complaint is durable at this point. Do not keep the browser waiting
     // for file storage, image rendering, SMTP, or the external webhook.
