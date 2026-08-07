@@ -17,8 +17,10 @@ test("lookup readiness rejects placeholders and short input", () => {
   assert.equal(isServiceClaimContractLookupReady("null"), false);
   assert.equal(isServiceClaimContractLookupReady("670"), false);
   assert.equal(isServiceClaimContractLookupReady("67088"), false);
-  assert.equal(SERVICE_CLAIM_LOOKUP_MIN_LENGTH, 6);
-  assert.equal(isServiceClaimContractLookupReady("670888"), true);
+  assert.equal(isServiceClaimContractLookupReady("670888"), false);
+  assert.equal(isServiceClaimContractLookupReady("6708888"), false);
+  assert.equal(SERVICE_CLAIM_LOOKUP_MIN_LENGTH, 8);
+  assert.equal(isServiceClaimContractLookupReady("67088888"), true);
   assert.equal(isServiceClaimContractLookupReady("670888888"), true);
   assert.equal(isServiceClaimContractLookupReady("111000001"), true);
 });

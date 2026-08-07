@@ -21,6 +21,12 @@ const SERVICE_VISIT_OUTCOME_EVENT_TYPES = [
   PUBLIC_VISIT_EVENT_TYPES.SERVICE_CLAIM_SUBMITTED,
 ];
 
+/** Rows shown in Claim activity — successful lookups and submitted claims only. */
+const SERVICE_VISIT_TABLE_EVENT_TYPES = [
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND,
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CLAIM_SUBMITTED,
+];
+
 const SERVICE_VISIT_FUNNEL_EVENT_TYPES = [
   PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP,
   ...SERVICE_VISIT_OUTCOME_EVENT_TYPES,
@@ -217,21 +223,30 @@ export async function loadRecentContractAccessData(filters = {}) {
   });
 }
 
+async function purgeJunkServiceClaimVisitEvents() {
+  const junkLast4 = [...SERVICE_CLAIM_JUNK_CONTRACT_LAST4];
+  if (!junkLast4.length) return;
+
+  try {
+    await prisma.publicVisitEvent.deleteMany({
+      where: {
+        kitchenContractId: null,
+        contractNumberLast4: { in: junkLast4 },
+        eventType: { in: SERVICE_VISIT_FUNNEL_EVENT_TYPES },
+      },
+    });
+  } catch (error) {
+    console.warn("Junk claim-activity cleanup failed:", error?.message || error);
+  }
+}
+
 export async function loadRecentServiceVisitData(filters = {}) {
+  await purgeJunkServiceClaimVisitEvents();
+
   const events = await prisma.publicVisitEvent.findMany({
     where: {
       ...getVisitReportWhere(filters),
-      eventType: { in: SERVICE_VISIT_OUTCOME_EVENT_TYPES },
-      NOT: {
-        AND: [
-          { kitchenContractId: null },
-          {
-            contractNumberLast4: {
-              in: [...SERVICE_CLAIM_JUNK_CONTRACT_LAST4],
-            },
-          },
-        ],
-      },
+      eventType: { in: SERVICE_VISIT_TABLE_EVENT_TYPES },
     },
     include: kitchenContractInclude,
     orderBy: { createdAt: "desc" },
@@ -242,6 +257,8 @@ export async function loadRecentServiceVisitData(filters = {}) {
 }
 
 export async function loadServiceVisitSummary(filters = {}) {
+  await purgeJunkServiceClaimVisitEvents();
+
   const dateWhere = getVisitReportWhere(filters);
   const events = await prisma.publicVisitEvent.findMany({
     where: {

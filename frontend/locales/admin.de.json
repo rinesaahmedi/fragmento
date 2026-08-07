@@ -1217,7 +1217,7 @@
   },
   "claimActivityAdmin": {
     "title": "Reklamationsaktivität",
-    "description": "Besucher und Reklamationsaktivität auf der öffentlichen /service-Seite für den ausgewählten Zeitraum.",
+    "description": "Erfolgreiche Vertragsabfragen und eingereichte Reklamationen auf der öffentlichen /service-Seite für den ausgewählten Zeitraum.",
     "uniqueVisitors": "Geschätzte tägliche Besucher",
     "pageOpens": "Seitenaufrufe",
     "lookups": "Vertragsabfragen",

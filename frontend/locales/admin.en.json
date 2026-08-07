@@ -1217,7 +1217,7 @@
   },
   "claimActivityAdmin": {
     "title": "Claim activity",
-    "description": "Visitors and claim activity on the public /service page for the selected date range.",
+    "description": "Successful contract lookups and submitted claims on the public /service page for the selected date range.",
     "uniqueVisitors": "Estimated daily visitors",
     "pageOpens": "Page opens",
     "lookups": "Contract lookups",

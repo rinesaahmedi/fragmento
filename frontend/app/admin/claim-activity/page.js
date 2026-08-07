@@ -85,7 +85,7 @@ export default async function AdminClaimActivityPage({ searchParams = {} }) {
           description={(
             <AdminText
               i18nKey="claimActivityAdmin.description"
-              fallback="Visitors and claim activity on the public /service page for the selected date range."
+              fallback="Successful contract lookups and submitted claims on the public /service page for the selected date range."
             />
           )}
         >
