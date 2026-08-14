@@ -36,7 +36,7 @@ In dem vertraglich vereinbarten Lieferumfang und im Preis enthaltene Leistungen,
 
 Die vorstehenden Regelungen gelten nicht, soweit es sich um Abholware handelt. In diesen Fällen ist der Preis bei Abholung der Ware vollständig zu entrichten. Lieferung, Montage und sonstige Leistungen sind in diesem Falle im Preis nicht enthalten.
 
-Verschiebt der Kunde seinen ursprünglich vereinbarten Liefertermin (Lieferwoche) oder Leistungstermin um mehr als 6 Monate, ist der Unternehmer berechtigt, dem Kunden dadurch nachweislich entstandene Kosten, wie z. B. Lagerungs-, Bearbeitungs- oder höhere Materialkosten, in Rechnung zu stellen.`),
+Verschiebt der Kunde seinen ursprünglich vereinbarten Liefertermin (Lieferwoche) oder Leistungstermin um mehr als 6 Monate, ist der Unternehmer berechtigt, dem Kunden dadurch nachweislich entstandene Kosten, wie z.B. Lagerungs-, Bearbeitungs- oder höhere Materialkosten, in Rechnung zu stellen.`),
     },
     {
       title: "Zahlungsbedingungen",
@@ -44,7 +44,7 @@ Verschiebt der Kunde seinen ursprünglich vereinbarten Liefertermin (Lieferwoche
 
 Zur Durchführung der Zahlung kann architecto Zahlungsdienstleister einsetzen. Hierzu gehört insbesondere die Stripe Technology Company Limited (STC), One Wilton Park, Wilton Place, Dublin 2, D02 FX04, Irland. Die Zahlungsabwicklung erfolgt entsprechend dem vom Kunden ausgewählten Zahlungsmittel über den jeweils hierfür eingesetzten Zahlungsdienstleister.
 
-Der Unternehmer ist berechtigt, die Zahlung des Preises bzw. Restpreises in bar Zug um Zug gegen Lieferung der Ware oder Durchführung der vereinbarten Leistung zu verlangen. Die Auslieferungsmonteure des Unternehmers sind inkassoberechtigt.`),
+Der Unternehmer ist berechtigt, die Zahlung des Preises bzw. Restpreises in bar Zug, um Zug gegen Lieferung der Ware oder Durchführung der vereinbarten Leistung zu verlangen. Die Auslieferungsmonteure des Unternehmers sind inkassoberechtigt.`),
     },
     {
       title: "Widerruf des Kunden (Verbraucher nach § 13 BGB beim Erwerb standardisierter Ware)",
@@ -57,27 +57,37 @@ Um das Widerrufsrecht auszuüben, muss der Kunde den Unternehmer,
 architecto.by Küchen Aktuell GmbH
 Senefelderstraße 2b
 38124 Braunschweig
-Telefon: +49 (0)531 261 34 - 6700
-E-Mail: info@myarchitecto.de
-mittels einer eindeutigen Erklärung (z. B. ein mit der Post versandter Brief, Telefax oder E-Mail) über seinen Entschluss, diesen Vertrag zu widerrufen, informieren. Der Kunde kann dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.
+Telefon:+49 (0)531 261 34 - 6700
+E-Mail:info@myarchitecto.de
+mittels einer eindeutigen Erklärung (z.B. ein mit der Post versandter Brief, Telefax oder E-Mail) über seinen Entschluss, diesen Vertrag zu widerrufen, informieren. Der Kunde kann dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.
 
-Wenn der Kunde den Vertrag widerruft, hat der Unternehmer alle Zahlungen, die er vom Kunden erhalten hat, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass der Kunde eine andere Art der Lieferung als die vom Unternehmer angebotene, günstigste Standardlieferung gewählt hat), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über den Widerruf dieses Vertrages bei dem Unternehmer eingegangen ist. Für diese Rückzahlung verwendet der Unternehmer dasselbe Zahlungsmittel, das der Kunde bei der ursprünglichen Transaktion eingesetzt hat, es sei denn, mit dem Kunden wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden dem Kunden wegen dieser Rückzahlung Entgelte berechnet.
+Der Kunde kann sein Widerrufsrecht auch online unter [Internetadresse/URL oder anderen geeigneten Hinweis darüber eingeben, wo die Widerrufsfunktion verfügbar ist] ausüben. Wenn der Kunde diese Online-Funktion nutzt, übermittelt der Unternehmer dem Kunden auf einem dauerhaften Datenträger (z. B. durch eine E-Mail) unverzüglich eine Eingangsbestätigung mit Informationen zum Inhalt der Widerrufserklärung sowie dem Datum und der Uhrzeit ihres Eingangs.
+
+Wenn der Kunde den Vertrag widerruft, hat der Unternehmer alle Zahlungen, die er vom Kunden erhalten hat, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass der Kunde eine andere Art der Lieferung als die vom Unternehmer angebotene, günstigste Standardlieferung gewählt haben), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über den Widerruf dieses Vertrages bei dem Unternehmer eingegangen ist. Für diese Rückzahlung verwendet der Unternehmer dasselbe Zahlungsmittel, das der Kunde bei der ursprünglichen Transaktion eingesetzt hat, es sei denn, mit dem Kunden wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden dem Kunden wegen dieser Rückzahlung Entgelte berechnet.
 
 Der Unternehmer kann die Rückzahlung verweigern, bis er die Waren wieder zurückerhalten hat oder bis der Kunde den Nachweis erbracht hat, dass der Kunde die Waren zurückgesandt hat, je nachdem, welches der frühere Zeitpunkt ist. Der Kunde hat die Waren unverzüglich und in jedem Fall spätestens binnen vierzehn Tagen ab dem Tag, an dem der Kunde den Unternehmer über den Widerruf dieses Vertrages unterrichtet, an den Unternehmer zurückzusenden oder zu übergeben. Die Frist ist gewahrt, wenn der Kunde die Ware vor Ablauf der Frist von vierzehn Tagen absendet.
 
-Der Kunde trägt die Kosten der Rücksendung der Waren. Die Kosten werden auf höchstens etwa EUR 250 geschätzt. Der Kunde muss für einen etwaigen Wertverlust der Waren nur aufkommen, wenn dieser Wertverlust auf einen zur Prüfung der Beschaffenheit, Eigenschaften und Funktionsweise der Waren nicht notwendigen Umgang ihnen zurückzuführen ist.`),
+Der Kunde trägt die Kosten der Rücksendung der Waren. Die Kosten werden auf höchstens etwa EUR 250 geschätzt. Der Kunde muss für einen etwaigen Wertverlust der Waren nur aufkommen, wenn dieser Wertverlust auf einen zur Prüfung der Beschaffenheit, Eigenschaften und Funktionsweise der Waren nicht notwendigen Umgang ihnen zurückzuführen ist.
+
+Muster-Widerrufsformular
+
+Das Muster-Widerrufsformular ist hier als PDF zum Downloaden und Ausdrucken verfügbar:
+
+[BITTE HIER URL EINFÜGEN]
+
+ENDE DER WIDERRUFSBELEHRUNG`),
       },
-      note: "Hinweis: Das Widerrufsrecht gilt nicht für Waren, die individuell an die Bedürfnisse des Kunden angepasst werden, wie z. B. zugeschnittene Küchenplatten.",
+      note: "Hinweis: Das Widerrufsrecht gilt nicht für Waren, die individuell an die Bedürfnisse des Kunden angepasst werden, wie z.B. zugeschnittene Küchenplatten.",
     },
     {
-      title: "Vertragsrücktritt des Kunden / Abnahmeverzug des Kunden",
-      paragraphs: text(`Der Unternehmer gewährt dem Kunden zusätzlich ein vertragliches Rücktrittsrecht, das bis zu 3 Wochen nach dem auf dem Formular notierten Bestelldatum ausgeübt werden kann. Bei vertraglichem Rücktritt des Kunden ist der Unternehmer berechtigt, einen pauschalen Ersatzanspruch in Höhe von 25 % des vertraglich vereinbarten Preises von dem Kunden zu verlangen. Den Vertragsparteien bleibt nachgelassen, nachzuweisen, dass ein Schaden überhaupt nicht, wesentlich niedriger oder höher entstanden ist. Gesetzliche Widerrufs- und Rücktrittsrechte des Kunden bleiben hiervon unberührt.
+      title: "Vertragsrücktritt des Kunden/Abnahmeverzug des Kunden",
+      paragraphs: text(`Der Unternehmer gewährt dem Kunden zusätzlich ein vertragliches Rücktrittsrecht, das bis zu 3 Wochen nach dem auf dem Formular notierten Bestelldatum ausgeübt werden kann. Bei vertraglichem Rücktritt des Kunden ist der Unternehmer berechtigt, einen pauschalen Ersatzanspruch in Höhe von 25% des vertraglich vereinbarten Preises von dem Kunden zu verlangen. Den Vertragsparteien bleibt nachgelassen, nachzuweisen, dass ein Schaden überhaupt nicht, wesentlich niedriger oder höher entstanden ist. Gesetzliche Widerrufs- und Rücktrittsrechte des Kunden bleiben hiervon unberührt.
 
 Verweigert oder verzögert der Kunde schuldhaft, nachdem ihm der Unternehmer eine angemessene Nachfrist gesetzt hat, die Abnahme der Ware oder der Dienstleistung oder hat er bereits zuvor ausdrücklich die Abnahme ernsthaft und endgültig verweigert, ist der Unternehmer berechtigt, nach seiner Wahl vom Vertrag zurückzutreten oder Schadensersatz statt Erfüllung zu verlangen. Außerdem ist der Unternehmer alternativ berechtigt, die Vorauszahlung der bereits durch den Unternehmer erbrachten Leistungen zu verlangen.
 
 Soweit der Abnahmeverzug länger als einen Monat dauert, hat der Kunde die tatsächlich entstehenden Lagerkosten zu erstatten. Der Unternehmer ist berechtigt, sich zur Lagerung einer Spedition zu bedienen.
 
-Als Schadenersatz statt Erfüllung bei Abnahmeverzug kann der Unternehmer 25 % des Bestellpreises ohne Abzüge verlangen. Im Übrigen bleibt dem Unternehmer die Geltendmachung eines höheren nachgewiesenen Schadens vorbehalten, etwa bei Sonderanfertigung auf individuellen Wunsch des Kunden. Dem Kunden ist der Nachweis gestattet, dass dem Unternehmer tatsächlich kein Schaden oder ein erheblich niedrigerer Schaden als der pauschal veranschlagte entstanden ist.
+Als Schadenersatz statt Erfüllung bei Abnahmeverzug kann der Unternehmer 25% des Bestellpreises ohne Abzüge verlangen. Im Übrigen bleibt dem Unternehmer die Geltendmachung eines höheren nachgewiesenen Schadens vorbehalten, etwa bei Sonderanfertigung auf individuellen Wunsch des Kunden. Dem Kunden ist der Nachweis gestattet, dass dem Unternehmer tatsächlich kein Schaden oder ein erheblich niedrigerer Schaden als der pauschal veranschlagte entstanden ist.
 
 Der Kunde hat dafür Sorge zu tragen, dass zu dem vereinbarten Termin eine Anlieferung mit den üblichen Transportmitteln (Möbelwagen, Verbringen der einzelnen Warenteile in das Haus / die Wohnung) ohne größere Hürden möglich ist. Bei einer vereinbarten Montage muss sich der Kunde vergewissern und dafür Sorge tragen, dass der hierfür vorgesehene Bereich und das Mauerwerk geeignet, frei und sicher zugänglich und die erforderlichen Anschlüsse vorhanden sind.`),
     },
@@ -85,13 +95,13 @@ Der Kunde hat dafür Sorge zu tragen, dass zu dem vereinbarten Termin eine Anlie
       title: "Rücktrittsrecht des Unternehmers",
       paragraphs: text(`Der Unternehmer wird von der Liefer- oder Leistungsverpflichtung frei, wenn die Lieferung oder Leistung dadurch unmöglich wird, dass der Vorlieferant der bestellten Ware die Produktion einstellt und eine anderweitige Ersatzbeschaffung nur mit unverhältnismäßigem und unzumutbarem Aufwand möglich wäre und der Unternehmer die Unmöglichkeit nicht zu vertreten hat. Über diese Umstände hat der Unternehmer den Kunden unverzüglich zu benachrichtigen. Etwaige bereits geleistete Zahlungen des Kunden wird der Unternehmer erstatten.
 
-Der Unternehmer ist berechtigt, die Lieferung oder Leistung zu verweigern, wenn ihm nach Vertragsabschluss Umstände bekannt werden, welche die Leistungsfähigkeit des Kunden zur Zahlung des Kaufpreises objektiv gefährdet erscheinen lassen, insbesondere der Erlass von Mahnbescheiden oder Vollstreckungsmaßnahmen gegen den Kunden oder die Einleitung des Insolvenzverfahrens, es sei denn der Kunde leistet unverzüglich eine Vorauszahlung und/oder erbringt eine werthaltige Sicherheit.
+Der Unternehmer ist berechtigt, die Lieferung oder Leistung zu verweigern, wenn ihm nach Vertragsabschluss Umstände bekannt werden, welche die Leistungsfähigkeit des Kunden zur Zahlung des Kaufpreises objektiv gefährdet, erscheinen lassen, insbesondere der Erlass von Mahnbescheiden oder Vollstreckungsmaßnahmen gegen den Kunden oder die Einleitung des Insolvenzverfahrens, es sei denn der Kunde leistet unverzüglich eine Vorauszahlung und/oder erbringt eine werthaltige Sicherheit.
 
-Zahlt der Kunde nach Fälligkeit und fruchtlosem Ablauf einer gesetzten angemessenen Zahlungsfrist den Preis nicht, ist der Unternehmer nach seiner Wahl berechtigt, vom Vertrag zurückzutreten oder Schadensersatz statt Erfüllung zu verlangen. Im Falle des Rücktrittes gelten die Regelungen gemäß nachstehender Ziffer 8.2.`),
+Zahlt der Kunde nach Fälligkeit und fruchtlosem Ablauf einer gesetzten angemessenen Zahlungsfrist den Preis nicht, ist der Unternehmer nach seiner Wahl berechtigt, vom Vertrag zurückzutreten oder Schadenersatz, statt Erfüllung zu verlangen. Im Falle des Rücktrittes gelten die Regelungen gemäß nachstehender Ziffer 8.2.`),
     },
     {
       title: "Warenrücknahme",
-      paragraphs: text(`Soweit der Kunde in Ausübung von Gewährleistungsrechten berechtigt ist, die Ware zurückzugeben, kann die Rückgabe in dem Einrichtungshaus des Subunternehmers erfolgen, das den Auftrag ausgeführt hat. Auf Wunsch kann die Rückgabe auch an einer anderen, für den Kunden zumutbaren Stelle erfolgen, oder die Abholung durch den Unternehmer organisiert werden.
+      paragraphs: text(`Soweit der Kunde in Ausübung von Gewährleistungsrechten berechtigt ist, die Ware zurückzugeben, kann die Rückgabe in dem Einrichtungshaus des Subunternehmers  erfolgen, das den Auftrag ausgeführt hat. Auf Wunsch kann die Rückgabe auch an einer anderen, für den Kunden zumutbaren Stelle erfolgen, oder die Abholung durch den Unternehmer organisiert werden.
 
 Im Falle eines Rücktritts und der Rücknahme der gelieferten Ware nach Zahlungsverzug des Kunden hat der Unternehmer Anspruch auf Ausgleich für Aufwendungen, Gebrauchsüberlassung und Wertminderung wie folgt: Für Aufwendungen anlässlich der Rücknahme der Waren die Rücktransportkosten und Demontagekosten etc. in Höhe der tatsächlich entstandenen Kosten. Für die Gebrauchsüberlassung der gelieferten Waren kann der Unternehmer eine angemessene Nutzungsentschädigung geltend machen. Im Falle einer etwaigen eingetretenen Wertminderung ist der Unternehmer berechtigt, diese in der tatsächlich entstandenen Höhe zu beanspruchen.`),
     },
@@ -99,11 +109,11 @@ Im Falle eines Rücktritts und der Rücknahme der gelieferten Ware nach Zahlungs
       title: "Eigentumsvorbehalt",
       paragraphs: text(`Die gelieferte Ware bleibt bis zur vollständigen Erfüllung der Zahlungsforderung Eigentum des Unternehmers. An Kostenvoranschlägen, Zeichnungen und anderen Unterlagen, die dem Kunden überlassen werden, behält sich der Unternehmer Eigentums- und Urheberrechte vor; diese Unterlagen dürfen nicht für andere als die vom Unternehmer angegebenen Zwecke verwendet oder Dritten zugänglich gemacht werden.
 
-Wenn der Kunde Kaufmann im Sinne von § 14 BGB ist, verpflichtet er sich, das Eigentum des Unternehmers auch dann entsprechend zu wahren, wenn die gelieferten Waren nicht unmittelbar für den Kunden, sondern für Dritte bestimmt sind und hat den Empfänger auf diesen Eigentumsvorbehalt ausdrücklich hinzuweisen.
+Wenn der Kunde Kaufmann im Sinne von § 14 BGB ist verpflichtet er sich, das Eigentum des Unternehmers auch dann entsprechend zu wahren, wenn die gelieferten Waren nicht unmittelbar für den Kunden, sondern für Dritte bestimmt sind und hat den Empfänger auf diesen Eigentumsvorbehalt ausdrücklich hinzuweisen.
 
 Der Kunde hat die unter Eigentumsvorbehalt stehenden Waren pfleglich zu behandeln. Jeder Standortwechsel und Eingriffe Dritter, insbesondere Pfändungen, sind dem Unternehmer unverzüglich schriftlich mitzuteilen, bei Pfändungen unter Beifügung des Pfändungsprotokolls.
 
-Bei schuldhafter Verletzung der vorgenannten Pflichten durch den Kunden ist der Unternehmer berechtigt, vom Vertrag zurückzutreten bzw. Schadensersatz zu verlangen.`),
+Bei schuldhafter Verletzung der vorgenannten Pflichten durch den Kunden ist der Unternehmer berechtigt, vom Vertrag zurückzutreten bzw. Schadenersatz zu verlangen.`),
     },
     {
       title: "Gefahrübergang",
@@ -121,7 +131,7 @@ Der Unternehmer behält sich ausdrücklich geringe optische und fabrikationstech
     },
     {
       title: "Teillieferungen oder Teilleistungen",
-      paragraphs: text(`Der Unternehmer ist zu Teillieferungen oder Teilleistungen berechtigt, soweit die Teillieferungen oder Teilleistungen im Interesse des Kunden und ihm zumutbar sind. Erfüllt der Unternehmer nach Teillieferung oder Teilleistung die Restleistungen trotz Aufforderung durch den Kunden nicht, kann der Kunde Schadensersatz statt Erfüllung der ganzen Leistung nur verlangen oder vom gesamten Vertrag zurücktreten, wenn er an der teilweisen Erfüllung des Vertrages kein Interesse hat.`),
+      paragraphs: text(`Der Unternehmer ist zu Teillieferungen oder Teilleistungen berechtigt, soweit die Teillieferungen oder Teilleistungen im Interesse des Kunden und ihm zumutbar sind. Erfüllt der Unternehmer nach Teillieferung oder Teilleistung die Restleistungen trotz Aufforderung durch den Kunden nicht, kann der Kunde Schadenersatz statt Erfüllung der ganzen Leistung nur verlangen oder vom gesamten Vertrag zurücktreten, wenn er an der teilweisen Erfüllung des Vertrages kein Interesse hat.`),
     },
     {
       title: "Gewährleistungsrechte und Haftung",
@@ -147,7 +157,7 @@ Einem Kunden, der Verbraucher nach § 13 BGB ist, stehen unabhängig von den Vor
     },
     {
       title: "Verzögerungsschaden",
-      paragraphs: text(`Gerät der Kunde mit der Zahlung in Verzug, so hat er diese mit 9 % über dem Basiszinssatz, sofern er Kaufmann ist und mit 5 % über dem Basiszinssatz, sofern der Kunde Verbraucher ist, zu verzinsen.
+      paragraphs: text(`Gerät der Kunde mit der Zahlung in Verzug, so hat er diese mit 9% über dem Basiszinssatz, sofern er Kaufmann ist und mit 5% über dem Basiszinssatz, sofern der Kunde Verbraucher ist, zu verzinsen.
 
 Die Geltendmachung eines weitergehenden Verzögerungsschadens bleibt unberührt.`),
     },

@@ -19,12 +19,12 @@ export default async function TermsAndConditionsPage({ searchParams }) {
   const language = supportedLanguages.includes(params?.lang) ? params.lang : "de";
   const { title, subtitle, effectiveDate, sections } = getTermsAndConditions(language);
   const pageCopy = {
-    de: { eyebrow: "Rechtliche Angaben", back: "Zurück", contents: "Inhalt" },
-    en: { eyebrow: "Legal information", back: "Back", contents: "Contents" },
-    es: { eyebrow: "Información legal", back: "Volver", contents: "Contenido" },
-    fr: { eyebrow: "Informations juridiques", back: "Retour", contents: "Sommaire" },
-    ru: { eyebrow: "Правовая информация", back: "Назад", contents: "Содержание" },
-    tr: { eyebrow: "Yasal bilgiler", back: "Geri", contents: "İçindekiler" },
+    de: { eyebrow: "Rechtliche Angaben", back: "Zurück" },
+    en: { eyebrow: "Legal information", back: "Back" },
+    es: { eyebrow: "Información legal", back: "Volver" },
+    fr: { eyebrow: "Informations juridiques", back: "Retour" },
+    ru: { eyebrow: "Правовая информация", back: "Назад" },
+    tr: { eyebrow: "Yasal bilgiler", back: "Geri" },
   };
   const copy = pageCopy[language];
 
@@ -38,15 +38,6 @@ export default async function TermsAndConditionsPage({ searchParams }) {
           <p className="terms-page__subtitle">{subtitle}</p>
           <p className="terms-page__date">{effectiveDate}</p>
         </header>
-
-        <nav className="terms-page__contents" aria-label={copy.contents}>
-          <span>{copy.contents}</span>
-          <ol>
-            {sections.map((section, index) => (
-              <li key={section.title}><a href={`#agb-${index + 1}`}>{section.title}</a></li>
-            ))}
-          </ol>
-        </nav>
 
         <div className="terms-page__body">
           {sections.map((section, index) => (
