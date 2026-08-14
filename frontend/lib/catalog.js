@@ -1184,6 +1184,7 @@ export function serializeKitchenForLegacy(kitchen) {
       blendeName: catalogBlende?.name || "",
       blendeNameDe: catalogBlende?.nameDe || "",
       blendePrice: catalogBlende?.price != null ? Number(catalogBlende.price) : item.blendePrice != null ? Number(item.blendePrice) : null,
+      catalogBlendeQuantity: catalogBlende ? catalogBlendeQuantity : (item.catalogBlendeQuantity || null),
       articleVariants,
     };
   };

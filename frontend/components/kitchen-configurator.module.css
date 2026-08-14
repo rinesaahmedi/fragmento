@@ -1252,6 +1252,7 @@
 .itemBlendeNote {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   width: fit-content;
   max-width: 100%;
   min-height: 20px;
@@ -1267,6 +1268,11 @@
   overflow-wrap: anywhere;
 }
 
+.itemBlendePrice {
+  font-weight: 800;
+  color: #16613c;
+}
+
 .itemText p {
   margin: 4px 0 0;
   color: #7d7166;
@@ -1277,12 +1283,66 @@
 .itemPrice {
   position: relative;
   z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
   border-radius: 6px;
   background: #fff;
   color: #1874ff;
   font-size: clamp(0.92rem, 2.1vw, 1.06rem);
   font-weight: 800;
   white-space: nowrap;
+}
+
+.itemPriceWithBlende {
+  align-self: end;
+}
+
+.itemPriceDetails {
+  display: grid;
+  width: 100%;
+  min-width: 9.25rem;
+  gap: 3px;
+  color: #5d5349;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.itemPriceLine {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.itemPriceLine strong {
+  color: #3f372f;
+  font-size: inherit;
+}
+
+.itemPriceTotal {
+  margin-top: 2px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(120, 90, 64, 0.22);
+  color: #2f2a24;
+  font-weight: 800;
+}
+
+.itemPriceTotal strong {
+  color: #1874ff;
+  font-size: clamp(0.92rem, 2.1vw, 1.06rem);
+}
+
+.itemPriceBreakdown {
+  color: #5d5349;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: normal;
+  text-align: right;
+  max-width: 11rem;
 }
 
 .itemMeta {
@@ -2034,6 +2094,126 @@
   padding: 24px;
   background: rgba(31, 23, 15, 0.42);
   backdrop-filter: blur(6px);
+}
+
+.blendeConfirmOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(31, 23, 15, 0.5);
+  backdrop-filter: blur(6px);
+}
+
+.blendeConfirmDialog {
+  width: min(440px, 100%);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 8px;
+  background: #fffdf9;
+  box-shadow: 0 32px 80px rgba(36, 24, 13, 0.24);
+}
+
+.blendeConfirmHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.blendeConfirmHeader h2 {
+  margin: 0;
+  color: #2f2a24;
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.blendeConfirmBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.blendeConfirmLead,
+.blendeConfirmAsk {
+  margin: 0;
+  color: #4a433c;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.blendeConfirmItemName {
+  margin: 0;
+  color: #2f2a24;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.blendeConfirmDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e5ddd2;
+  border-radius: 6px;
+  background: #faf7f2;
+}
+
+.blendeConfirmRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  color: #3f372f;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.blendeConfirmRow strong {
+  white-space: nowrap;
+}
+
+.blendeConfirmTotalRow {
+  padding-top: 8px;
+  border-top: 1px solid #e5ddd2;
+  font-weight: 800;
+}
+
+.blendeConfirmActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.blendeConfirmCancel,
+.blendeConfirmAdd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.blendeConfirmCancel {
+  border: 1px solid #d7cdc0;
+  background: #fff;
+  color: #3f372f;
+}
+
+.blendeConfirmAdd {
+  border: 1px solid #16613c;
+  background: #16613c;
+  color: #fff;
 }
 
 .productInfoDialog {
@@ -2962,6 +3142,12 @@
   color: #16613c;
   font-weight: 800;
   overflow-wrap: anywhere;
+}
+
+.summaryBlendeBreakdown {
+  color: #5d5349;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .summaryPrice {

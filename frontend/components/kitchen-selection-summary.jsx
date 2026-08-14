@@ -5,6 +5,8 @@ import styles from "./kitchen-configurator.module.css";
 import {
   formatCurrency,
   getCatalogItemDetails,
+  getItemBlendeTotal,
+  getItemPriceWithoutBlende,
   getLocalizedBlendeDisplayLabel,
   getLocalizedItemName,
   getProductInfoDocuments,
@@ -87,6 +89,8 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const isLocked = isDefault || isConfirmed;
   const itemName = getLocalizedItemName(item, translate, language, false);
   const blendeLabel = getLocalizedBlendeDisplayLabel(item, language);
+  const blendeTotal = getItemBlendeTotal(item);
+  const cabinetOnlyPrice = getItemPriceWithoutBlende(item);
   const { articleNumber, dimensions } = getCatalogItemDetails(item);
   const itemDimensions = isLocked ? "" : dimensions;
   const infoPdfHref = getProductInfoHref(item);
@@ -120,8 +124,17 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
             {blendeLabel ? (
               <span className={styles.summaryInlineBlendeNote}>
                 {translate("configurator.includesBlende", "Includes")}: {blendeLabel}
+                {blendeTotal > 0 ? ` (${formatCurrency(blendeTotal)})` : ""}
               </span>
             ) : null}
+          </span>
+        ) : null}
+        {shouldShowCatalogMeta && blendeTotal > 0 && !(isLocked && price <= 0) ? (
+          <span className={styles.summaryBlendeBreakdown}>
+            {translate("configurator.blendePriceBreakdown", "{cabinetPrice} + {blendePrice} filler", {
+              cabinetPrice: formatCurrency(cabinetOnlyPrice * quantity),
+              blendePrice: formatCurrency(blendeTotal * quantity),
+            })}
           </span>
         ) : null}
         {itemDimensions ? <span className={styles.itemDimensions}>{itemDimensions}</span> : null}

@@ -7,6 +7,8 @@ import {
   formatCurrency,
   getCatalogDisplayItem,
   getCatalogItemDetails,
+  getItemBlendeTotal,
+  getItemPriceWithoutBlende,
   getLocalizedBlendeDisplayLabel,
   getLocalizedItemInfoText,
   getLocalizedItemName,
@@ -16,7 +18,6 @@ import {
   isLinkedComponentSelected,
   shouldShowProductAssistantLauncher,
   splitCatalogItemNameAndDimensions,
-  toggleLinkedComponentSelection,
 } from "./kitchen-selection-utils";
 import {
   CUTLERY_VARIANTS,
@@ -60,6 +61,8 @@ const ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="18" x2="60" y2="18"/><line x1="21.5" y1="10" x2="38.5" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>',
   worktop:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 20" fill="none" stroke="currentColor" stroke-width="1"><line x1="2" y1="7" x2="118" y2="7"/><line x1="2" y1="13" x2="118" y2="13"/><line x1="118" y1="7" x2="118" y2="13"/></svg>',
+  blende:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="5.5" y="0.5" width="19" height="71"/><rect x="5.5" y="72.5" width="19" height="9"/></svg>',
   drawer_base_two:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="18" x2="60" y2="18"/><line x1="21.5" y1="10" x2="38.5" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>',
   drawer_base_three:
@@ -196,6 +199,11 @@ function CatalogItem({
   const { translate, language } = usePublicI18n();
   const itemName = getLocalizedItemName(item, translate, language, false);
   const blendeLabel = getLocalizedBlendeDisplayLabel(item, language);
+  const blendeTotal = getItemBlendeTotal(item);
+  const displayTotalPrice = Number(price ?? item.price ?? 0);
+  const cabinetOnlyPrice = blendeTotal > 0
+    ? Math.max(0, displayTotalPrice - blendeTotal)
+    : getItemPriceWithoutBlende({ ...item, price: displayTotalPrice });
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
   const { dimensions: itemDimensions } = getCatalogItemDetails(item);
@@ -274,6 +282,14 @@ function CatalogItem({
           {blendeLabel ? (
             <span className={styles.itemBlendeNote}>
               {translate("configurator.includesBlende", "Includes")}: {blendeLabel}
+              {blendeTotal > 0 ? (
+                <span className={styles.itemBlendePrice}>
+                  {" "}
+                  ({translate("configurator.blendePricePlus", "+ {price} filler", {
+                    price: formatCurrency(blendeTotal),
+                  })})
+                </span>
+              ) : null}
             </span>
           ) : null}
           {item.linkedInfoBadge ? (
@@ -282,7 +298,26 @@ function CatalogItem({
             </span>
           ) : null}
         </div>
-        <span className={styles.itemPrice}>{formatCurrency(price ?? item.price)}</span>
+        <span className={`${styles.itemPrice} ${blendeTotal > 0 ? styles.itemPriceWithBlende : ""}`.trim()}>
+          {blendeTotal > 0 ? (
+            <span className={styles.itemPriceDetails}>
+              <span className={styles.itemPriceLine}>
+                <span>{translate("configurator.catalogCabinetPrice", "Cabinet")}</span>
+                <strong>{formatCurrency(cabinetOnlyPrice)}</strong>
+              </span>
+              <span className={styles.itemPriceLine}>
+                <span>{translate("configurator.catalogFillerPrice", "Filler strip")}</span>
+                <strong>{formatCurrency(blendeTotal)}</strong>
+              </span>
+              <span className={`${styles.itemPriceLine} ${styles.itemPriceTotal}`}>
+                <span>{translate("configurator.catalogItemTotal", "Total")}</span>
+                <strong>{formatCurrency(displayTotalPrice)}</strong>
+              </span>
+            </span>
+          ) : (
+            formatCurrency(displayTotalPrice)
+          )}
+        </span>
       </div>
       <div className={styles.itemMeta}>
         <span className={locked ? styles.lockedPill : styles.togglePill}>
@@ -690,10 +725,9 @@ export default function KitchenCatalogPanel({
   selectedAccessoryCodes,
   selectedServiceCodes,
   selectedDisplayCount,
-  fixedComponentIds,
   orderLockedAccessoryCodes,
   orderLockedServiceCodes,
-  setSelectedComponentIds,
+  onToggleComponent,
   onSelectArticleVariant,
   onToggleAccessory,
   onToggleService,
@@ -748,11 +782,7 @@ export default function KitchenCatalogPanel({
                   onOpenProductAssistant={onOpenProductAssistantFromItem}
                   articleVariant={articleVariant}
                   onSelectArticleVariant={(articleNumber) => onSelectArticleVariant?.(componentId, articleNumber)}
-                  onClick={() =>
-                    setSelectedComponentIds((current) =>
-                      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
-                    )
-                  }
+                  onClick={() => onToggleComponent?.(componentId)}
                 />
               );
             })}

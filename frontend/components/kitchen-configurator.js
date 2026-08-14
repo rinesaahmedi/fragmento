@@ -12,10 +12,15 @@ import {
   formatCurrency,
   getAutoLinkedAccessoryCodes,
   getCatalogDisplayItem,
+  getItemBlendeTotal,
+  getItemPriceWithoutBlende,
   getLinkedComponentIds,
+  getLocalizedBlendeDisplayLabel,
   getLocalizedItemName,
   hasAssistantProductInfo,
   isHiddenLinkedComponent,
+  isLinkedComponentSelected,
+  itemRequiresBlendeConfirmation,
   normalizeColor,
   selectedMap,
   shouldShowProductAssistantLauncher,
@@ -1050,6 +1055,9 @@ function readConfiguratorDraft(storageKey) {
       selectedAccessoryCodes: Array.isArray(parsed.selectedAccessoryCodes) ? parsed.selectedAccessoryCodes : [],
       selectedServiceCodes: Array.isArray(parsed.selectedServiceCodes) ? parsed.selectedServiceCodes : [],
       cutleryLines: Array.isArray(parsed.cutleryLines) ? parsed.cutleryLines : [],
+      acknowledgedBlendeComponentIds: Array.isArray(parsed.acknowledgedBlendeComponentIds)
+        ? parsed.acknowledgedBlendeComponentIds
+        : [],
     };
   } catch {
     return null;
@@ -1105,6 +1113,7 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
       selectedAccessoryCodes: baseAccessoryCodes,
       selectedServiceCodes: baseServiceCodes,
       cutleryLines,
+      acknowledgedBlendeComponentIds: [],
     };
   }
 
@@ -1117,15 +1126,27 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
   );
   const validServiceCodes = new Set(kitchenConfig.services.map((item) => item.code).filter(Boolean));
 
+  const selectedComponentIds = expandLinkedComponentIds(
+    kitchenSlug,
+    [
+      ...fixedComponentIds,
+      ...baseComponentIds,
+      ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
+    ],
+  );
+
+  const acknowledgedFromDraft = (draft.acknowledgedBlendeComponentIds || []).filter((itemId) =>
+    validComponentIds.has(itemId),
+  );
+  const acknowledgedFromSelection = kitchenConfig.components
+    .filter((item) => {
+      const componentId = componentIdForItem(item);
+      return selectedComponentIds.includes(componentId) && itemRequiresBlendeConfirmation(item);
+    })
+    .map((item) => componentIdForItem(item));
+
   return {
-    selectedComponentIds: expandLinkedComponentIds(
-      kitchenSlug,
-      [
-        ...fixedComponentIds,
-        ...baseComponentIds,
-        ...draft.selectedComponentIds.filter((itemId) => validComponentIds.has(itemId)),
-      ],
-    ),
+    selectedComponentIds,
     selectedArticleVariants: Object.fromEntries(
       Object.entries({ ...baseArticleVariants, ...(draft.selectedArticleVariants || {}) }).filter(([componentId, articleNumber]) => {
         if (!validComponentIds.has(componentId)) return false;
@@ -1151,6 +1172,7 @@ function buildInitialSelectionState(kitchenConfig, fixedComponentIds, fixedAcces
       draft,
       accessoryCodes: draft.selectedAccessoryCodes,
     }),
+    acknowledgedBlendeComponentIds: [...new Set([...acknowledgedFromDraft, ...acknowledgedFromSelection])],
   };
 }
 
@@ -1252,6 +1274,10 @@ function KitchenConfiguratorContent({
   const [selectedAccessoryCodes, setSelectedAccessoryCodes] = useState(initialSelection.selectedAccessoryCodes);
   const [selectedServiceCodes, setSelectedServiceCodes] = useState(initialSelection.selectedServiceCodes);
   const [cutleryLines, setCutleryLines] = useState(initialSelection.cutleryLines);
+  const [acknowledgedBlendeComponentIds, setAcknowledgedBlendeComponentIds] = useState(
+    () => initialSelection.acknowledgedBlendeComponentIds || [],
+  );
+  const [pendingBlendeConfirmation, setPendingBlendeConfirmation] = useState(null);
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState("idle");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -1306,6 +1332,8 @@ function KitchenConfiguratorContent({
       setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
       setSelectedServiceCodes(nextSelection.selectedServiceCodes);
       setCutleryLines(nextSelection.cutleryLines);
+      setAcknowledgedBlendeComponentIds(nextSelection.acknowledgedBlendeComponentIds || []);
+      setPendingBlendeConfirmation(null);
       return;
     }
 
@@ -1324,6 +1352,8 @@ function KitchenConfiguratorContent({
       setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
       setSelectedServiceCodes(nextSelection.selectedServiceCodes);
       setCutleryLines(nextSelection.cutleryLines);
+      setAcknowledgedBlendeComponentIds(nextSelection.acknowledgedBlendeComponentIds || []);
+      setPendingBlendeConfirmation(null);
       return;
     }
 
@@ -1341,7 +1371,23 @@ function KitchenConfiguratorContent({
     setSelectedAccessoryCodes(nextSelection.selectedAccessoryCodes);
     setSelectedServiceCodes(nextSelection.selectedServiceCodes);
     setCutleryLines(nextSelection.cutleryLines);
+    setAcknowledgedBlendeComponentIds(nextSelection.acknowledgedBlendeComponentIds || []);
+    setPendingBlendeConfirmation(null);
   }, [draftStorageKey, fixedAccessoryCodes, fixedComponentIds, initialContractAddress, initialContractNumber, initialOrder, kitchenConfig, kitchenSlug]);
+
+  useEffect(() => {
+    if (!pendingBlendeConfirmation) return undefined;
+
+    function onKeyDown(event) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setPendingBlendeConfirmation(null);
+      }
+    }
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [pendingBlendeConfirmation]);
 
   useEffect(() => {
     const autoLinkedAccessoryCodes = getAutoLinkedAccessoryCodes(kitchenSlug, selectedComponentIds);
@@ -1627,8 +1673,17 @@ function KitchenConfiguratorContent({
       selectedAccessoryCodes,
       selectedServiceCodes,
       cutleryLines,
+      acknowledgedBlendeComponentIds,
     });
-  }, [cutleryLines, draftStorageKey, selectedAccessoryCodes, selectedArticleVariants, selectedComponentIds, selectedServiceCodes]);
+  }, [
+    acknowledgedBlendeComponentIds,
+    cutleryLines,
+    draftStorageKey,
+    selectedAccessoryCodes,
+    selectedArticleVariants,
+    selectedComponentIds,
+    selectedServiceCodes,
+  ]);
 
   function toggleAccessory(itemCode) {
     const accessoryItem = kitchenConfig.accessories.find((item) => item.code === itemCode);
@@ -1778,14 +1833,82 @@ function KitchenConfiguratorContent({
     });
   }
 
+  function applyComponentToggle(componentId) {
+    setSelectedComponentIds((current) =>
+      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
+    );
+  }
+
+  function getBlendeItemsForComponent(componentId) {
+    return getLinkedComponentIds(kitchenSlug, componentId)
+      .map((linkedId) => kitchenConfig.components.find((item) => componentIdForItem(item) === linkedId))
+      .filter((item) => item && itemRequiresBlendeConfirmation(item, language));
+  }
+
+  function toggleComponentSelection(componentId) {
+    if (fixedComponentIds.includes(componentId)) return;
+
+    if (isLinkedComponentSelected(kitchenSlug, selectedComponentIds, componentId)) {
+      applyComponentToggle(componentId);
+      return;
+    }
+
+    const blendeItems = getBlendeItemsForComponent(componentId);
+    const needsConfirmation = blendeItems.some((item) => {
+      const id = componentIdForItem(item);
+      return !acknowledgedBlendeComponentIds.includes(id);
+    });
+
+    if (!needsConfirmation) {
+      applyComponentToggle(componentId);
+      return;
+    }
+
+    const primaryBlendeItem = blendeItems.find((item) => {
+      const id = componentIdForItem(item);
+      return !acknowledgedBlendeComponentIds.includes(id);
+    }) || blendeItems[0];
+    const displaySource = primaryBlendeItem
+      || kitchenConfig.components.find((item) => componentIdForItem(item) === componentId);
+    const displayItem = displaySource
+      ? getCatalogDisplayItem(kitchenConfig.components, kitchenSlug, displaySource).item
+      : null;
+    const blendeTotal = getItemBlendeTotal(primaryBlendeItem || displaySource);
+    const itemTotal = Number((primaryBlendeItem || displaySource)?.price || 0);
+    const cabinetTotal = getItemPriceWithoutBlende(primaryBlendeItem || displaySource);
+
+    setPendingBlendeConfirmation({
+      componentId,
+      itemName: displayItem
+        ? getLocalizedItemName(displayItem, translate, language, false)
+        : getLocalizedItemName(displaySource, translate, language, false),
+      blendeLabel: getLocalizedBlendeDisplayLabel(primaryBlendeItem || displaySource, language),
+      blendeCode: String((primaryBlendeItem || displaySource)?.blendeCode || "").trim(),
+      blendeTotal,
+      cabinetTotal,
+      itemTotal,
+      acknowledgeIds: blendeItems.map((item) => componentIdForItem(item)),
+    });
+  }
+
+  function cancelBlendeConfirmation() {
+    setPendingBlendeConfirmation(null);
+  }
+
+  function confirmBlendeConfirmation() {
+    if (!pendingBlendeConfirmation) return;
+    const { componentId, acknowledgeIds } = pendingBlendeConfirmation;
+    setAcknowledgedBlendeComponentIds((current) => [...new Set([...current, ...acknowledgeIds])]);
+    setPendingBlendeConfirmation(null);
+    applyComponentToggle(componentId);
+  }
+
   function removeComponent(item) {
     const componentId = componentIdForItem(item);
     if (fixedComponentIds.includes(componentId)) {
       return;
     }
-    setSelectedComponentIds((current) =>
-      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
-    );
+    applyComponentToggle(componentId);
   }
 
   function removeAccessory(item) {
@@ -1814,6 +1937,8 @@ function KitchenConfiguratorContent({
     setSelectedServiceCodes([...orderLockedServiceCodes]);
     setSelectedComponentIds(fixedComponentIds);
     setSelectedArticleVariants({});
+    setAcknowledgedBlendeComponentIds([]);
+    setPendingBlendeConfirmation(null);
     setStatus("");
     setStatusTone("idle");
   }
@@ -2317,6 +2442,7 @@ function KitchenConfiguratorContent({
     planLockedComponentIds,
     selectedComponentIds: planSelectedComponentIds,
     setSelectedComponentIds,
+    onToggleComponent: toggleComponentSelection,
     onResetSelection: resetSelection,
   });
 
@@ -2371,10 +2497,9 @@ function KitchenConfiguratorContent({
                 selectedAccessoryCodes={selectedAccessoryCodes}
                 selectedServiceCodes={selectedServiceCodes}
                 selectedDisplayCount={selectedDisplayCount}
-                fixedComponentIds={fixedComponentIds}
                 orderLockedAccessoryCodes={fixedAccessoryCodes}
                 orderLockedServiceCodes={orderLockedServiceCodes}
-                setSelectedComponentIds={setSelectedComponentIds}
+                onToggleComponent={toggleComponentSelection}
                 onSelectArticleVariant={selectArticleVariant}
                 onToggleAccessory={toggleAccessory}
                 cutleryVariants={cutleryVariants}
@@ -2430,6 +2555,83 @@ function KitchenConfiguratorContent({
               editOrderAddress();
             }}
           />
+        ) : null}
+
+        {pendingBlendeConfirmation ? (
+          <div className={styles.blendeConfirmOverlay} role="presentation">
+            <div
+              className={styles.blendeConfirmDialog}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="blende-confirm-title"
+            >
+              <div className={styles.blendeConfirmHeader}>
+                <h2 id="blende-confirm-title">
+                  {translate("configurator.blendeConfirmTitle", "Filler strip required")}
+                </h2>
+                <button
+                  type="button"
+                  className={styles.productInfoClose}
+                  aria-label={translate("configurator.blendeConfirmCloseAria", "Close filler strip confirmation")}
+                  onClick={cancelBlendeConfirmation}
+                >
+                  {translate("common.close", "Close")}
+                </button>
+              </div>
+
+              <div className={styles.blendeConfirmBody}>
+                <p className={styles.blendeConfirmLead}>
+                  {translate(
+                    "configurator.blendeConfirmLead",
+                    "Attention: a filler strip is required for this cabinet. It is charged in addition to the cabinet price.",
+                  )}
+                </p>
+                <p className={styles.blendeConfirmItemName}>{pendingBlendeConfirmation.itemName}</p>
+                <div className={styles.blendeConfirmDetails}>
+                  <div className={styles.blendeConfirmRow}>
+                    <span>{translate("configurator.blendeConfirmCabinetPrice", "Cabinet")}</span>
+                    <strong>{formatCurrency(pendingBlendeConfirmation.cabinetTotal)}</strong>
+                  </div>
+                  <div className={styles.blendeConfirmRow}>
+                    <span>
+                      {translate("configurator.blendeConfirmFillerPrice", "Filler strip")}
+                      {pendingBlendeConfirmation.blendeLabel
+                        ? `: ${pendingBlendeConfirmation.blendeLabel}`
+                        : ""}
+                    </span>
+                    <strong>{formatCurrency(pendingBlendeConfirmation.blendeTotal)}</strong>
+                  </div>
+                  <div className={`${styles.blendeConfirmRow} ${styles.blendeConfirmTotalRow}`}>
+                    <span>{translate("configurator.blendeConfirmTotal", "Total for this item")}</span>
+                    <strong>{formatCurrency(pendingBlendeConfirmation.itemTotal)}</strong>
+                  </div>
+                </div>
+                <p className={styles.blendeConfirmAsk}>
+                  {translate(
+                    "configurator.blendeConfirmAsk",
+                    "Please confirm that you would like to add the filler strip.",
+                  )}
+                </p>
+              </div>
+
+              <div className={styles.blendeConfirmActions}>
+                <button
+                  type="button"
+                  className={styles.blendeConfirmCancel}
+                  onClick={cancelBlendeConfirmation}
+                >
+                  {translate("configurator.blendeConfirmCancel", "Cancel")}
+                </button>
+                <button
+                  type="button"
+                  className={styles.blendeConfirmAdd}
+                  onClick={confirmBlendeConfirmation}
+                >
+                  {translate("configurator.blendeConfirmAdd", "Confirm and add")}
+                </button>
+              </div>
+            </div>
+          </div>
         ) : null}
 
         {activeProductInfo ? (

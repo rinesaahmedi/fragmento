@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 const LEGAL_RETURN_PATH_KEY = "fragmentoLegalReturnPath";
 
-export default function ImpressumBackLink() {
+export default function ImpressumBackLink({ label = "Zur\u00fcck" }) {
   const router = useRouter();
 
   function handleClick() {
@@ -38,7 +38,7 @@ export default function ImpressumBackLink() {
       <span aria-hidden="true" className="legal-page__back-icon">
         ←
       </span>
-      <span>Zurueck</span>
+      <span>{label}</span>
     </button>
   );
 }

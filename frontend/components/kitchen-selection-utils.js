@@ -134,6 +134,35 @@ export function getLocalizedBlendeDisplayLabel(item, language = "en") {
   return `${label}, ${code}`;
 }
 
+/** True when this kitchen slot bundles a mandatory filler panel (Blende / Passleiste). */
+export function itemRequiresBlendeConfirmation(item, language = "en") {
+  return Boolean(
+    String(item?.catalogBlendeId || "").trim()
+    || String(item?.blendeCode || "").trim()
+    || getLocalizedBlendeDisplayLabel(item, language),
+  );
+}
+
+/** Blende amount included in item.price (unit × quantity when quantity is known). */
+export function getItemBlendeTotal(item) {
+  const unit = Number(item?.blendePrice);
+  if (!Number.isFinite(unit) || unit <= 0) return 0;
+
+  const hasCatalogLink = Boolean(String(item?.catalogBlendeId || "").trim());
+  const quantity = Math.max(1, Number.parseInt(String(item?.catalogBlendeQuantity || 1), 10) || 1);
+
+  // Catalog-linked items store unit price; KitchenItem.blendePrice snapshots are often totals.
+  if (hasCatalogLink || item?.catalogBlendeQuantity != null) {
+    return unit * quantity;
+  }
+
+  return unit;
+}
+
+export function getItemPriceWithoutBlende(item) {
+  return Math.max(0, Number(item?.price || 0) - getItemBlendeTotal(item));
+}
+
 // Element names must never carry dimensions (they are shown separately under the article as a
 // W x H x D line). Strip every common dimension format: parenthesised "(600 x 720 x 340 mm)",
 // bare "600 x 720 x 340 mm" / "600/600 mm", and a trailing single measure "178 cm" / "600 mm".

@@ -8,6 +8,9 @@ import {
   getPublicTrackingContext,
   trackPublicPageOpened,
 } from "../lib/public-page-open-tracking";
+import { normalizeFragmentoLanguage, persistFragmentoLanguage } from "../lib/fragmento-language";
+import { activatePublicLanguage } from "../lib/public-language-state";
+import CookieConsentBanner from "./cookie-consent-banner";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -374,7 +377,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const videoRef = useRef(null);
   const [initialEntryState] = useState(() => getLegalReturnEntryState());
   const [selectedLanguage, setSelectedLanguage] = useState(
-    initialEntryState?.selectedLanguage || (initialLanguage === "en" ? "en" : "de")
+    initialEntryState?.selectedLanguage || normalizeFragmentoLanguage(initialLanguage)
   );
   const [selectedMode, setSelectedMode] = useState(initialEntryState?.selectedMode || "");
   const [screen, setScreen] = useState(initialEntryState?.screen || "language");
@@ -393,6 +396,10 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   const confirmedOrderNumber = String(searchParams.get("order") || "").trim();
   const orderConfirmedText = ORDER_CONFIRMED_TEXT[selectedLanguage] || ORDER_CONFIRMED_TEXT.en;
   const shouldShowOrderConfirmedNotice = orderConfirmed && !isOrderConfirmedNoticeDismissed && screen === "language";
+
+  useEffect(() => {
+    activatePublicLanguage(selectedLanguage);
+  }, [selectedLanguage]);
 
   useEffect(() => {
     if (screen !== "video" || !videoRef.current) {
@@ -429,6 +436,7 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   }, [contractNumber, screen, selectedLanguage, selectedMode]);
 
   function handleLanguageSelect(nextLanguage) {
+    persistFragmentoLanguage(nextLanguage);
     setIsOrderConfirmedNoticeDismissed(true);
     setSelectedLanguage(nextLanguage);
     setSelectedMode("");
@@ -508,9 +516,10 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
   }
 
   return (
-    <main style={pageStyle}>
-      <style>{responsivePanelMedia}</style>
-      <div style={centerWrapStyle}>
+    <>
+      <main style={pageStyle}>
+        <style>{responsivePanelMedia}</style>
+        <div style={centerWrapStyle}>
         <section style={panelStyle}>
           <Link href="/admin" prefetch={false} style={adminLinkStyle}>
             Admin
@@ -717,8 +726,15 @@ export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
             />
           ) : null}
         </section>
-      </div>
-    </main>
+        </div>
+      </main>
+      <CookieConsentBanner
+        language={selectedLanguage}
+        onConsentSaved={({ functional }) => {
+          if (functional) persistFragmentoLanguage(selectedLanguage);
+        }}
+      />
+    </>
   );
 }
 
