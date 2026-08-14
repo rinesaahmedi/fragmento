@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   calculatePublicVisitBreakdowns,
   calculatePublicVisitSummary,
+  calculateServiceVisitSummary,
 } from "../lib/public-visit-reports.js";
 import {
   getCoarseDeviceData,
@@ -10,13 +11,15 @@ import {
   normalizeCountryCode,
   normalizeReferrerHost,
   PUBLIC_VISIT_EVENT_TYPES,
+  SERVICE_PAGE_PATH,
 } from "../lib/public-visit-tracking.js";
 
-function event(eventType, visitor = "visitor-a") {
+function event(eventType, visitor = "visitor-a", extra = {}) {
   return {
     eventType,
     ipHash: visitor,
     userAgentHash: "browser",
+    ...extra,
   };
 }
 
@@ -73,6 +76,51 @@ test("privacy-first visit breakdowns use page opens only", () => {
     { source: "qr", count: 1 },
   ]);
   assert.equal(breakdowns.recentContractEvents.length, 1);
+});
+
+test("service visit summary is path-scoped and counts claim funnel", () => {
+  const summary = calculateServiceVisitSummary([
+    event(PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED, "visitor-a", { path: SERVICE_PAGE_PATH }),
+    event(PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED, "visitor-b", { path: SERVICE_PAGE_PATH }),
+    event(PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED, "visitor-home", { path: "/" }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND, "visitor-a", { metadata: { orderKind: "test" } }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CLAIM_SUBMITTED),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CLAIM_SUBMITTED, "visitor-a", { metadata: { orderKind: "test" } }),
+  ]);
+
+  assert.equal(summary.opened, 2);
+  assert.equal(summary.uniqueVisitors, 2);
+  assert.equal(summary.lookups, 2);
+  assert.equal(summary.found, 2);
+  assert.equal(summary.notFound, 1);
+  assert.equal(summary.claimsSubmitted, 2);
+  assert.equal(summary.testLookups, 1);
+});
+
+test("service visit summary ignores junk placeholder lookups", () => {
+  const summary = calculateServiceVisitSummary([
+    event(PUBLIC_VISIT_EVENT_TYPES.PAGE_OPENED, "visitor-a", { path: SERVICE_PAGE_PATH }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_LOOKUP, "visitor-a", {
+      contractNumberLast4: "ined",
+      kitchenContractId: null,
+    }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND, "visitor-a", {
+      contractNumberLast4: "ined",
+      kitchenContractId: null,
+    }),
+    event(PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND, "visitor-a", {
+      contractNumberLast4: "8888",
+      kitchenContractId: null,
+    }),
+  ]);
+
+  assert.equal(summary.opened, 1);
+  assert.equal(summary.lookups, 0);
+  assert.equal(summary.notFound, 1);
 });
 
 test("tracking helpers keep only coarse and validated values", () => {

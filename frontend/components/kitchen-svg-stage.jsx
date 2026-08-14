@@ -146,10 +146,9 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-faucet", points: [[16.261, 48.450], [16.318, 47.724], [16.575, 46.756], [17.002, 45.970], [17.658, 45.506], [20.309, 44.800], [20.252, 45.768], [17.686, 46.474], [17.359, 46.676], [17.045, 47.119], [16.846, 47.745], [16.789, 48.390]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[16.261, 48.450], [16.789, 48.390], [16.860, 55.106], [16.375, 55.166]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[20.337, 43.771], [20.993, 43.852], [20.793, 47.462], [20.109, 47.361]], preserveManualSize: true },
-    { componentKey: "sink-base", points: [[12.299, 56.679], [20.038, 58.272], [19.724, 88.383], [12.299, 86.266]], preserveManualSize: true },
-    // The locked sink package owns its separately supplied UPK20 face and
-    // the complete sink cabinet front, with the shared seam left uncovered.
-    { componentKey: "sink-base", points: [[20.038, 58.272], [21.734, 58.030], [21.734, 88.202], [19.724, 88.383]], preserveManualSize: true },
+    // The exposed outer side of the fixed end sink belongs to the optional UPK20.
+    { componentKey: "sink-end-blende", points: [[12.299, 56.679], [20.038, 58.272], [19.724, 88.383], [12.299, 86.266]], preserveManualSize: true },
+    { componentKey: "sink-end-blende", points: [[20.038, 58.272], [21.734, 58.030], [21.734, 88.202], [19.724, 88.383]], preserveManualSize: true },
     { componentKey: "sink-base", points: [[21.734, 58.030], [32.979, 56.397], [32.979, 86.588], [21.734, 88.202]], preserveManualSize: true },
     { componentKey: "base-module-3", points: [[32.979, 56.397], [44.223, 54.783], [44.223, 84.955], [32.979, 86.588]], preserveManualSize: true },
     // The dishwasher's UPEF65 is drawn as two adjacent projected bands.
@@ -1273,6 +1272,36 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-105844"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105841"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105749"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105746"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105752"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105746"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105755"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105746"];
+
+// These UPK20 boundaries are traced directly from each source SVG's CAD lines
+// (all source drawings are 842 px wide at a 0.12 scale). They must not be
+// inferred from the sink width: the end panel is a separately drawn face.
+const SINK_END_BLENDE_BOUNDS_BY_SLUG = {
+  "ab-105732": { left: 86.394299, width: 1.296912 },
+  "ab-105746": { left: 89.501188, width: 1.325416 },
+  "ab-105749": { left: 89.501188, width: 1.325416 },
+  "ab-105752": { left: 89.501188, width: 1.325416 },
+  "ab-105755": { left: 89.501188, width: 1.325416 },
+  "ab-105823": { left: 92.109264, width: 1.895487 },
+  "ab-105826": { left: 91.182898, width: 1.638955 },
+  "ab-105829": { left: 92.109264, width: 1.895487 },
+  "ab-105832": { left: 92.109264, width: 1.895487 },
+};
+Object.entries(SINK_END_BLENDE_BOUNDS_BY_SLUG).forEach(([slug, sourceBounds]) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG[slug].flatMap((hotspot) => {
+    if (hotspot.componentKey !== "sink-base" || hotspot.width == null) return [hotspot];
+
+    return [
+      { ...hotspot, width: sourceBounds.left - hotspot.left },
+      {
+        ...hotspot,
+        componentKey: "sink-end-blende",
+        left: sourceBounds.left,
+        width: sourceBounds.width,
+      },
+    ];
+  });
+});
 IMAGE_HOTSPOTS_BY_SLUG["ab-105750"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105747"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105753"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105747"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105756"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105747"];
@@ -1291,6 +1320,8 @@ const BASE_BODY_COMPONENT_KEYS = new Set([
   "base-module-3",
   "oven-module",
   "sink-base",
+  // A separately selectable sink-end UPK20 shares the cabinet's toe-kick.
+  "sink-end-blende",
   "drawer-module",
 ]);
 const CORNER_BLENDE_MAX_WIDTH = 1.25;
@@ -1752,6 +1783,21 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105748"];
 });
 
+// The narrow face between the fixed oven and sink is a visual-only corner
+// blende in these plans. It remains white and cannot be selected by customers.
+["ab-105745", "ab-105748", "ab-105751", "ab-105754"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG[slug].map((hotspot) => {
+    const isCornerBlende =
+      hotspot.componentKey === "sink-base" &&
+      hotspot.points?.[0]?.[0] === 50.251781 &&
+      hotspot.points?.[0]?.[1] === 55.932773;
+
+    return isCornerBlende
+      ? { ...hotspot, componentKey: "static-corner-blende" }
+      : hotspot;
+  });
+});
+
 ["ab-105736", "ab-105739", "ab-105742"].forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105733"];
 });
@@ -1806,6 +1852,7 @@ export default function useKitchenSvgStage({
   planLockedComponentIds = fixedComponentIds,
   selectedComponentIds,
   setSelectedComponentIds,
+  onToggleComponent,
   onResetSelection,
 }) {
   const { translate, language } = usePublicI18n();
@@ -1834,6 +1881,17 @@ export default function useKitchenSvgStage({
       ),
     [kitchenConfig.components, kitchenSlug],
   );
+
+  function toggleComponentSelection(componentId) {
+    if (typeof onToggleComponent === "function") {
+      onToggleComponent(componentId);
+      return;
+    }
+    setSelectedComponentIds((current) =>
+      toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
+    );
+  }
+
   const imageHotspots = useMemo(() => {
     const sourceDefinitions = (IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [])
       .map(withHotspotSourceBounds);
@@ -2088,9 +2146,7 @@ export default function useKitchenSvgStage({
       const componentId = group.dataset.componentId;
       if (fixedComponentIds.includes(componentId)) return;
 
-      setSelectedComponentIds((current) =>
-        toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
-      );
+      toggleComponentSelection(componentId);
     };
 
     host.addEventListener("click", onClick, true);
@@ -2110,6 +2166,7 @@ export default function useKitchenSvgStage({
     resolvedSvgMarkup,
     selectedComponentIds,
     setSelectedComponentIds,
+    onToggleComponent,
   ]);
 
   useEffect(() => {
@@ -2170,9 +2227,7 @@ export default function useKitchenSvgStage({
             planLockedComponentIds={planLockedComponentIds}
             selectedComponentIds={selectedComponentIds}
             onToggleComponent={(componentId) => {
-              setSelectedComponentIds((current) =>
-                toggleLinkedComponentSelection(kitchenSlug, current, componentId, fixedComponentIds),
-              );
+              toggleComponentSelection(componentId);
             }}
           />
         ) : hasImageView ? (
@@ -2325,14 +2380,7 @@ export default function useKitchenSvgStage({
                           onClick={() => {
                             if (fixedComponentIds.includes(hotspot.componentId)) return;
                             setHoveredComponentId(null);
-                            setSelectedComponentIds((current) =>
-                              toggleLinkedComponentSelection(
-                                kitchenSlug,
-                                current,
-                                hotspot.componentId,
-                                fixedComponentIds,
-                              ),
-                            );
+                            toggleComponentSelection(hotspot.componentId);
                           }}
                         >
                           {isCalibrating ? (

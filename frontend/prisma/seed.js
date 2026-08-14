@@ -325,6 +325,42 @@ function defaultSinkBase(overrides = {}) {
   };
 }
 
+// A sink at the outside end of a run needs its UPK20 panel to remain an
+// independent customer choice. It must never be included with the fixed sink.
+function sinkEndBlende(kitchenCode) {
+  return {
+    itemType: ItemType.COMPONENT,
+    code: `BLENDE-AB${kitchenCode}-SINK-END`,
+    articleNumber: "UPK20",
+    name: "Filler Panel up to 20 cm",
+    nameDe: "Passblende bis 20 cm",
+    price: blendePrice("UPK20", 1),
+    widthMm: 200,
+    iconKey: "blende",
+    colorKey: "#f0a500",
+    componentKey: "sink-end-blende",
+    sortOrder: 35,
+    infoText: "Optional UPK20 filler panel for the fixed end sink",
+  };
+}
+
+function withSinkEndBlende(items, kitchenCode) {
+  return [
+    ...items.map((item) => (
+      item.componentKey === "sink-base" && item.isLocked
+        ? {
+          ...item,
+          infoText: DEFAULT_SINK_BASE_CATALOG_INFO_TEXT,
+          blendeCode: null,
+          blendeLabel: null,
+          blendePrice: null,
+        }
+        : item
+    )),
+    sinkEndBlende(kitchenCode),
+  ];
+}
+
 function defaultSinkWorktop(overrides = {}) {
   return {
     itemType: ItemType.COMPONENT,
@@ -938,6 +974,8 @@ const AB_105826_ITEMS = [
   ...defaultServices(),
 ];
 
+const AB_105826_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105826_ITEMS, "105826");
+
 // AB 105822: fridge-left compact run - 500 mm filler, oven, US60, dishwasher, sink (5 base bays).
 const AB_105822_LEGACY_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -958,22 +996,27 @@ const AB_105822_LEGACY_ITEMS = [
   ...defaultServices(),
 ];
 
-const AB_105823_ITEMS = AB_105822_LEGACY_ITEMS.map((item) => {
+const AB_105823_ITEMS = withSinkEndBlende(AB_105822_LEGACY_ITEMS.map((item) => {
   if (item.code === "CAB-WALL-AB105822-H6002-3") {
     return { ...item, price: articlePriceWithBlende("H6002", "HPK2002", 1), blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) };
   }
   return item;
-});
+}), "105823");
 
 // AB 105829 and AB 105832 add a blende note on top of AB 105822's layout (last wall cabinet);
 // AB 105822 doesn't have one, so this is a separate clone, not an alias.
-const AB_105829_ITEMS = AB_105822_LEGACY_ITEMS.map((item) => {
+const AB_105829_ITEMS = withSinkEndBlende(AB_105822_LEGACY_ITEMS.map((item) => {
   if (item.code === "CAB-WALL-AB105822-H6002-3") {
     return { ...item, price: articlePriceWithBlende("H6002", "HPK2002", 1), articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) };
   }
   return item;
-});
-const AB_105832_ITEMS = AB_105829_ITEMS;
+}), "105829");
+const AB_105832_ITEMS = withSinkEndBlende(AB_105822_LEGACY_ITEMS.map((item) => {
+  if (item.code === "CAB-WALL-AB105822-H6002-3") {
+    return { ...item, price: articlePriceWithBlende("H6002", "HPK2002", 1), articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) };
+  }
+  return item;
+}), "105832");
 
 // AB 105820 shares AB 105806's layout and appliances; identical items reuse the AB105806
 // codes (per-kitchen unique, so a separate KitchenItem row is created) to inherit their
@@ -1039,11 +1082,12 @@ const AB_105746_ITEMS = [
   ...defaultAccessories(),
   ...defaultServices(),
 ];
+const AB_105746_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105746_ITEMS, "105746");
 
 // These kitchens use the identical AB 105746 element plan. Keep the source
 // configuration in one place while giving every kitchen its own item codes.
 function createAB105746Items(kitchenCode) {
-  return AB_105746_ITEMS.map((item) => ({
+  return AB_105746_ITEMS_WITH_SINK_END_BLENDE.map((item) => ({
     ...item,
     code: item.code.replaceAll("AB105746", `AB${kitchenCode}`),
   }));
@@ -1092,6 +1136,7 @@ const AB_105732_ITEMS = [
   ...defaultAccessories(),
   ...defaultServices(),
 ];
+const AB_105732_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105732_ITEMS, "105732");
 
 const AB_105733_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -1523,6 +1568,7 @@ const AB_105758_ITEMS = [
   ...defaultAccessories(),
   ...defaultServices(),
 ];
+const AB_105758_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105758_ITEMS, "105758");
 
 const AB_105831_ITEMS = [
 
@@ -1565,13 +1611,35 @@ const AB_105825_ITEMS = [
   ...defaultServices(),
 ];
 
+const AB_105825_ITEMS_WITH_US30_BLENDE = AB_105825_ITEMS.map((item) => (
+  item.code === "CAB-BASE-AB105825-US30-R"
+    ? {
+      ...item,
+      price: articlePriceWithBlende("US30", "UPK20", 1),
+      blendeCode: "UPK20",
+      blendeLabel: "UPK20 20 cm",
+      blendePrice: blendePrice("UPK20", 1),
+    }
+    : item
+));
+
 const cloneAB105825ItemsForKitchen = (kitchenNumber) =>
   AB_105825_ITEMS.map((item) => ({
     ...item,
     code: item.code.replaceAll("AB105825", `AB${kitchenNumber}`),
   }));
 
-const AB_105822_ITEMS = cloneAB105825ItemsForKitchen("105822");
+const AB_105822_ITEMS = cloneAB105825ItemsForKitchen("105822").map((item) => (
+  item.code === "CAB-BASE-AB105822-US30-R"
+    ? {
+      ...item,
+      price: articlePriceWithBlende("US30", "UPK20", 1),
+      blendeCode: "UPK20",
+      blendeLabel: "UPK20 20 cm",
+      blendePrice: blendePrice("UPK20", 1),
+    }
+    : item
+));
 const AB_105828_ITEMS = cloneAB105825ItemsForKitchen("105828");
 
 const AB_105811_ITEMS = [
@@ -1714,7 +1782,7 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 758",
     name: "105758",
     description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105758.svg",
-    items: AB_105758_ITEMS,
+    items: AB_105758_ITEMS_WITH_SINK_END_BLENDE,
     reconcileExisting: true,
   },
   {
@@ -1827,7 +1895,7 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 746",
     name: "105746",
     description: "Straight kitchen configuration based on frontend/public/jpg/AB 105746_page-0001.jpg",
-    items: AB_105746_ITEMS,
+    items: AB_105746_ITEMS_WITH_SINK_END_BLENDE,
   },
   {
     slug: "ab-105749",
@@ -1883,7 +1951,7 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 732",
     name: "105732",
     description: "Kitchen configuration based on frontend/public/plans/AB 105732.svg",
-    items: AB_105732_ITEMS,
+    items: AB_105732_ITEMS_WITH_SINK_END_BLENDE,
   },
   {
     slug: "ab-105735",
@@ -1981,7 +2049,7 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 825",
     name: "105825",
     description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105825.svg",
-    items: AB_105825_ITEMS,
+    items: AB_105825_ITEMS_WITH_US30_BLENDE,
   },
   {
     slug: "ab-105831",
@@ -2002,7 +2070,7 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 826",
     name: "105826",
     description: "Kitchen configuration based on frontend/public/plans/AB 105826.svg",
-    items: AB_105826_ITEMS,
+    items: AB_105826_ITEMS_WITH_SINK_END_BLENDE,
   },
   {
     slug: "ab-105827",

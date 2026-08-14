@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 import { prisma } from "../../../../lib/prisma";
+import { getServiceClaimKitchenPlan } from "../../../../lib/service-claim-kitchen-plan";
 import CLAIMS_CHATBOT_KNOWLEDGE from "../../../../lib/claims-chatbot-knowledge.json";
 import SERVICE_CLAIM_TROUBLESHOOTING_DATA from "../../../../lib/service-claim-troubleshooting-data.json";
 
@@ -1814,6 +1815,36 @@ function detectTextCategories(text) {
 
 function isApplianceCategory(category) {
   return ["dishwasher", "washing-machine", "oven-hob", "fridge", "hood"].includes(category);
+}
+
+function buildOrderEligibilityAnswer(language) {
+  const messages = {
+    en: "I can’t provide claim guidance or create a claim for that component because it is not part of this order. Please choose a component shown in the kitchen plan.",
+    de: "Ich kann zu dieser Komponente keine Reklamationsauskunft geben oder eine Reklamation erstellen, da sie nicht Teil dieser Bestellung ist. Bitte wählen Sie eine Komponente aus dem angezeigten Küchenplan.",
+    tr: "Bu bileşen bu siparişin parçası olmadığı için bu bileşen hakkında talep bilgisi veremem veya talep oluşturamam. Lütfen mutfak planında gösterilen bir bileşeni seçin.",
+    es: "No puedo ofrecer información ni crear una reclamación para ese componente porque no forma parte de este pedido. Seleccione un componente que aparezca en el plano de la cocina.",
+    fr: "Je ne peux pas fournir de conseils ni créer de réclamation pour ce composant, car il ne fait pas partie de cette commande. Veuillez choisir un composant affiché sur le plan de la cuisine.",
+    ru: "Я не могу предоставить информацию или оформить рекламацию по этому компоненту, поскольку он не входит в данный заказ. Выберите компонент, показанный на плане кухни.",
+  };
+  return messages[language] || messages.en;
+}
+
+async function findIneligibleOrderedComponent({ language, question, claim }) {
+  const contractNumber = normalizeText(claim?.contractNumber);
+  if (!contractNumber) return null;
+
+  const requestedCategories = detectTextCategories(question);
+  if (!requestedCategories.length) return null;
+
+  const kitchenPlan = await getServiceClaimKitchenPlan(contractNumber);
+  if (!kitchenPlan?.selectableComponents?.length) return null;
+
+  const eligibleAreas = kitchenPlan.selectableComponents;
+  const eligibleCategories = new Set(eligibleAreas.map(detectAreaCategory));
+  const ineligibleCategories = requestedCategories.filter((category) => !eligibleCategories.has(category));
+  if (!ineligibleCategories.length) return null;
+
+  return buildOrderEligibilityAnswer(language);
 }
 
 function detectKnowledgeApplianceTypes(text, selectedAreas = []) {
@@ -3905,6 +3936,11 @@ export async function POST(request) {
       selectedAreas: Array.isArray(body?.selectedAreas) ? body.selectedAreas : [],
       claim: body?.claim || {},
     };
+
+    const orderEligibilityAnswer = await findIneligibleOrderedComponent(assistantInput);
+    if (orderEligibilityAnswer) {
+      return NextResponse.json({ answer: orderEligibilityAnswer, language });
+    }
 
     const built = normalizeAssistantReturn(
       await (process.env.OPENAI_API_KEY

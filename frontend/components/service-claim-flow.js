@@ -17,10 +17,17 @@ import {
   buildServiceClaimComponentChoiceGroups,
   normalizeServiceClaimComponentChoiceSelection,
 } from "../lib/service-claim-component-choices";
-import { normalizeServiceClaimContractNumber } from "../lib/service-claims";
+import {
+  isServiceClaimContractLookupReady,
+  normalizeServiceClaimContractNumber,
+} from "../lib/service-claim-lookup";
 import { isElectricalApplianceProblemArea } from "../lib/service-claim-serial-number";
 import { getSerialNumberHelpImages } from "../lib/serial-number-help";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
+import { trackPublicPageOpened } from "../lib/public-page-open-tracking";
+import { normalizeServiceLanguage, persistServiceLanguage } from "../lib/service-language";
+import { activatePublicLanguage } from "../lib/public-language-state";
+import CookieConsentBanner from "./cookie-consent-banner";
 
 const LANGUAGE_OPTIONS = [
   { code: "de", label: "Deutsch", flagSrc: "https://flagcdn.com/w40/de.png" },
@@ -2387,8 +2394,9 @@ function ServiceVideoGuide({ isOpen, copy, onClose, onFinish }) {
   );
 }
 
-export default function ServiceClaimFlow() {
-  const [language, setLanguage] = useState("de");
+export default function ServiceClaimFlow({ initialLanguage = "de" }) {
+  const pageOpenTrackedRef = useRef(false);
+  const [language, setLanguage] = useState(() => normalizeServiceLanguage(initialLanguage));
   const [isLanguageMenuOpen, setIsLanguageMenuOpen] = useState(false);
   const [mode, setMode] = useState("");
   const [form, setForm] = useState(INITIAL_FORM);
@@ -2462,6 +2470,15 @@ export default function ServiceClaimFlow() {
   const selectedServicePanelRef = useRef(null);
   const shouldScrollToSelectedPanelRef = useRef(false);
 
+  useEffect(() => {
+    if (pageOpenTrackedRef.current) {
+      return;
+    }
+
+    pageOpenTrackedRef.current = true;
+    trackPublicPageOpened(new URLSearchParams(window.location.search), "/service");
+  }, []);
+
   const copy = COPY[language] || COPY.en;
   const fallbackCopy = COPY.en;
   const formValues = { ...INITIAL_FORM, ...form };
@@ -2469,6 +2486,10 @@ export default function ServiceClaimFlow() {
   const isComplaintMode = mode === "complaint";
   const isRegisterMode = mode === "register";
   const isRegisteredNextMode = mode === "registered-next";
+
+  useEffect(() => {
+    activatePublicLanguage(language);
+  }, [language]);
   const selectedPreferredContactDate = useMemo(
     () => parseShortDate(formValues.preferredContactDate),
     [formValues.preferredContactDate],
@@ -3302,6 +3323,8 @@ export default function ServiceClaimFlow() {
       }
 
       if (!nextContractNumber) {
+        setContractLookup({ ...EMPTY_CONTRACT_LOOKUP });
+      } else if (!isServiceClaimContractLookupReady(nextContractNumber)) {
         setContractLookup({ ...EMPTY_CONTRACT_LOOKUP });
       } else {
         setContractLookup({
@@ -4742,6 +4765,7 @@ export default function ServiceClaimFlow() {
             aria-selected={language === option.code}
             className={`service-language-switcher__option${language === option.code ? " is-active" : ""}`}
             onClick={() => {
+              persistServiceLanguage(option.code);
               setLanguage(option.code);
               setIsLanguageMenuOpen(false);
             }}
@@ -6912,7 +6936,7 @@ export default function ServiceClaimFlow() {
                       <img
                         src={entry.src}
                         alt={entry.alt || t(entry.altKey)}
-                        className="service-contract-help__img"
+                        className="service-contract-help__img service-contract-help__img--serial"
                         loading="lazy"
                         decoding="async"
                         draggable={false}
@@ -7072,6 +7096,12 @@ export default function ServiceClaimFlow() {
         copy={copy}
         onClose={completeTour}
         onFinish={completeTour}
+      />
+      <CookieConsentBanner
+        language={language}
+        onConsentSaved={({ functional }) => {
+          if (functional) persistServiceLanguage(language);
+        }}
       />
     </>
   );

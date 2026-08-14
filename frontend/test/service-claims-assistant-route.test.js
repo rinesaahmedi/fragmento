@@ -45,6 +45,7 @@ function loadRoute(overrides = {}) {
     "getRequestClientIp",
     "CLAIMS_CHATBOT_KNOWLEDGE",
     "SERVICE_CLAIM_TROUBLESHOOTING_DATA",
+    "getServiceClaimKitchenPlan",
     `${source}
 return {
   POST,
@@ -61,6 +62,7 @@ return {
     overrides.getRequestClientIp || (() => "127.0.0.1"),
     CLAIMS_CHATBOT_KNOWLEDGE,
     SERVICE_CLAIM_TROUBLESHOOTING_DATA,
+    overrides.getServiceClaimKitchenPlan || (async () => null),
   );
 }
 
@@ -306,6 +308,49 @@ test("known fridge cooling issue uses claims knowledge and offers claim-form hel
   assert.match(response.body.answer, /temperature setting/i);
   assert.ok(Array.isArray(response.body.actions));
   assert.match(response.body.actions[0].prompt, /fridge/i);
+});
+
+test("order-aware assistant refuses guidance for a component that was not purchased", async () => {
+  const route = loadRoute({
+    getServiceClaimKitchenPlan: async () => ({
+      selectableComponents: [
+        { componentId: "component-claim-oven", code: "EH92364E-A", name: "Built-in Oven" },
+        { componentId: "component-claim-cabinet", code: "CAB-BASE-600", name: "Base Cabinet" },
+      ],
+    }),
+  });
+  const claim = { ...emptyClaim(), contractNumber: "670105842" };
+  const response = await route.POST(request({
+    language: "en",
+    question: "The fridge is damaged.",
+    selectedAreas: [],
+    claim,
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /not part of this order/i);
+  assert.match(response.body.answer, /choose a component shown in the kitchen plan/i);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("order-aware assistant continues for a purchased component", async () => {
+  const route = loadRoute({
+    getServiceClaimKitchenPlan: async () => ({
+      selectableComponents: [
+        { componentId: "component-refrigerator", code: "REF-B-545", name: "Fridge-freezer" },
+      ],
+    }),
+  });
+  const response = await route.POST(request({
+    language: "en",
+    question: "The fridge is not cooling.",
+    selectedAreas: [],
+    claim: { ...emptyClaim(), contractNumber: "670105842" },
+  }));
+
+  assert.equal(response.status, 200);
+  assert.doesNotMatch(response.body.answer, /not part of this order/i);
+  assert.match(response.body.answer, /cooling problem/i);
 });
 
 test("gas smell issue returns urgent gas-hob claims guidance", async () => {
