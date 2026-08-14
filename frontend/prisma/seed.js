@@ -1137,6 +1137,11 @@ const AB_105732_ITEMS = [
   ...defaultServices(),
 ];
 const AB_105732_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105732_ITEMS, "105732");
+// AB 105735, 105738, and 105741 reuse the same elevation. Their exposed sink-end
+// UPK20 panel is an optional, independent customer selection just like AB 105732.
+const AB_105735_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105732_ITEMS, "105735");
+const AB_105738_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105732_ITEMS, "105738");
+const AB_105741_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105732_ITEMS, "105741");
 
 const AB_105733_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
@@ -1958,21 +1963,21 @@ const DEFAULT_KITCHENS = [
     kitchenCode: "105 735",
     name: "105735",
     description: "Kitchen configuration using the AB 105732 layout and element selection",
-    items: AB_105732_ITEMS,
+    items: AB_105735_ITEMS_WITH_SINK_END_BLENDE,
   },
   {
     slug: "ab-105738",
     kitchenCode: "105 738",
     name: "105738",
     description: "Kitchen configuration using the AB 105732 layout and element selection",
-    items: AB_105732_ITEMS,
+    items: AB_105738_ITEMS_WITH_SINK_END_BLENDE,
   },
   {
     slug: "ab-105741",
     kitchenCode: "105 741",
     name: "105741",
     description: "Kitchen configuration using the AB 105732 layout and element selection",
-    items: AB_105732_ITEMS,
+    items: AB_105741_ITEMS_WITH_SINK_END_BLENDE,
   },
   {
     slug: "ab-105733",
