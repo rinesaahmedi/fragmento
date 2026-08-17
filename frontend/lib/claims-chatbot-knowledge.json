@@ -965,15 +965,15 @@
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
       "problem": "Appliance does not work",
-      "possibleCause": "Electric circuit interrupted; plug not inserted; power cable damaged; no socket voltage; thermostat set to 0.",
-      "safeUserCheck": "Check plug/socket/fuse only, test socket with another appliance, and set thermostat above 0.",
-      "claimTrigger": "Create claim if power is available but appliance still does not work. Stop using if cable is damaged.",
-      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "possibleCause": "The plug is not inserted correctly, the socket has no voltage, the household circuit is interrupted, or the thermostat is set to 0.",
+      "safeUserCheck": "Check that the plug is fully inserted, test the socket with another small appliance, check the household fuse, and set the thermostat above 0. If the supply cord is visibly damaged, do not plug in or use the appliance.",
+      "claimTrigger": "Create a claim if power is available and the appliance still does not work. Use the separate urgent damaged-cord guidance if the cord is damaged.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "product model/serial number",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, p. 54 - Trouble-shooting",
       "matchTerms": [
         "Appliance does not work",
         "not working",
@@ -994,21 +994,20 @@
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
       "problem": "Interior light does not work",
-      "possibleCause": "Bulb loose/fused or LED lighting issue, depending on model.",
-      "safeUserCheck": "Check whether cooling still works. For bulb type only, replace if user manual allows.",
-      "claimTrigger": "Create claim/service if LED module/light remains off or cannot be safely replaced.",
+      "possibleCause": "The interior lighting or its power supply may have a fault.",
+      "safeUserCheck": "Check whether the appliance has power and whether cooling still works. Do not remove covers or attempt an internal lighting repair.",
+      "claimTrigger": "Create a service claim if the interior light remains off while the appliance has power.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "photo of display/error code",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, p. 54 - Trouble-shooting; lighting remedy is model-dependent",
       "matchTerms": [
         "Interior light does not work",
-        "not working",
-        "not turn on",
-        "no power",
-        "dead"
+        "fridge light not working",
+        "refrigerator light off",
+        "inside light off"
       ]
     },
     {
@@ -1023,16 +1022,19 @@
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
       "problem": "Appliance works continuously",
-      "possibleCause": "Temperature setting too low or appliance not cold enough due to other cause.",
-      "safeUserCheck": "Set adjustment knob to a lower/correct position and check door/ventilation.",
-      "claimTrigger": "Create claim if compressor runs continuously and temperature remains wrong.",
+      "possibleCause": "The temperature setting is too cold, the door is opened often or does not close fully, airflow is blocked, or the room is warm.",
+      "safeUserCheck": "Select a warmer/correct temperature setting, make sure food does not block the door or touch the rear wall, and check the wall clearance and room temperature.",
+      "claimTrigger": "Create a claim if the compressor still runs continuously after the temperature, door, airflow, and placement checks.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, pp. 54-55 - Trouble-shooting",
       "matchTerms": [
-        "Appliance works continuously"
+        "Appliance works continuously",
+        "compressor runs continuously",
+        "fridge never stops running",
+        "refrigerator always running"
       ]
     },
     {
@@ -1048,15 +1050,18 @@
       "model": "KGC 15495 S / KGCN 388 140 E",
       "problem": "Water collects in lower part",
       "possibleCause": "Water discharge opening clogged, or internal air circulation obstructed by food touching rear wall.",
-      "safeUserCheck": "Clean discharge opening using manual method; place food so it does not touch rear wall.",
-      "claimTrigger": "Create claim if water returns after cleaning or drain cannot be cleared safely.",
+      "safeUserCheck": "Place food and containers so they do not touch the rear wall. If the model has an accessible discharge opening, clean it only as described in the manual.",
+      "claimTrigger": "Create a claim if water returns after the obstruction is removed or the drain cannot be cleared safely.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, pp. 52 and 54 - Defrosting and Trouble-shooting",
       "matchTerms": [
-        "Water collects in lower part"
+        "Water collects in lower part",
+        "water inside fridge bottom",
+        "water under vegetable drawer",
+        "fridge drain blocked"
       ]
     },
     {
@@ -1079,7 +1084,7 @@
         "video for noise/vibration",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, pp. 54-55 - Trouble-shooting and normal sounds",
       "matchTerms": [
         "Unusual noise",
         "noise",
@@ -1098,20 +1103,25 @@
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
       "problem": "Temperature too low or too high",
-      "possibleCause": "Wrong temperature setting.",
-      "safeUserCheck": "Reset knob higher/lower as needed and wait several hours.",
-      "claimTrigger": "Create claim if temperature remains incorrect after normal waiting period.",
+      "possibleCause": "The temperature setting may be wrong; the room may be outside the climate range; the appliance may be near heat or sunlight; airflow may be blocked; the door may be opened often or not close fully; or too much warm food may have been loaded.",
+      "safeUserCheck": "Correct the temperature setting, keep at least 30 mm clearance behind the appliance, remove airflow and door obstructions, reduce door opening, and check the room temperature. After loading a large amount of warm food, allow up to 72 hours for the required temperature to return.",
+      "claimTrigger": "Create a claim if the temperature remains incorrect after these checks and the normal waiting period.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, p. 55 - Temperature inside the appliance is not low enough or too high",
       "matchTerms": [
-        "Temperature too low or too high"
+        "Temperature too low or too high",
+        "fridge warm",
+        "fridge not cooling",
+        "freezer not cold enough",
+        "refrigerator too cold",
+        "food freezing in fridge"
       ]
     },
     {
-      "id": "kgc-15495-s-temperature-too-low-high",
+      "id": "kgc-15495-s-door-open-alarm",
       "productCode": "KGC 15495 S",
       "aliases": [
         "KGC 15495 S",
@@ -1121,21 +1131,22 @@
       ],
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
-      "problem": "Temperature too low/high",
-      "possibleCause": "Ambient temperature outside appliance climate range.",
-      "safeUserCheck": "Check room temperature is suitable for the climate class.",
-      "claimTrigger": "Create claim only if environment is suitable but temperature remains wrong.",
-      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
-      "evidenceToRequest": [
-        "short description of what the user already checked"
-      ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "problem": "Door-open alarm sounds after about 3 minutes",
+      "possibleCause": "The refrigerator door has remained open for more than 3 minutes.",
+      "safeUserCheck": "Close the refrigerator door. Pressing a button can silence the buzzer temporarily, but it will sound again after about 3 minutes if the door remains open.",
+      "claimTrigger": "No claim is needed when the alarm stops after the door is closed. Create a claim if it continues with the door fully closed.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, pp. 45-46 - Refrigerator door opening alarm",
       "matchTerms": [
-        "Temperature too low/high"
+        "door open alarm",
+        "door alarm beeping",
+        "fridge beeps after 3 minutes",
+        "refrigerator buzzer"
       ]
     },
     {
-      "id": "kgc-15495-s-temperature-too-high",
+      "id": "kgc-15495-s-first-startup-cooling-time",
       "productCode": "KGC 15495 S",
       "aliases": [
         "KGC 15495 S",
@@ -1145,17 +1156,19 @@
       ],
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
-      "problem": "Temperature too high",
-      "possibleCause": "Appliance in sunlight/near heat source or rear air circulation blocked.",
-      "safeUserCheck": "Move away from heat/sun if possible and keep at least 30 mm wall clearance.",
-      "claimTrigger": "Create claim if placement/clearance is correct but cooling remains poor.",
-      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
-      "evidenceToRequest": [
-        "short description of what the user already checked"
-      ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "problem": "Newly switched-on appliance has not reached temperature yet",
+      "possibleCause": "At first startup, the appliance needs time to reach its operating temperature.",
+      "safeUserCheck": "Run the appliance empty for at least 4 hours before loading food.",
+      "claimTrigger": "No claim is needed during the initial 4-hour cooling period. Create a claim if it still does not cool after enough time and the normal checks.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 47 - Storage of food in the fridge-freezer",
       "matchTerms": [
-        "Temperature too high"
+        "first startup not cold",
+        "new fridge not cold yet",
+        "just switched on fridge",
+        "initial cooling time",
+        "wait 4 hours"
       ]
     },
     {
@@ -1177,13 +1190,17 @@
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, p. 55 - Too much warm food loaded at one time",
       "matchTerms": [
-        "Temperature too high after loading food"
+        "Temperature too high after loading food",
+        "warm after loading food",
+        "loaded too much food",
+        "temperature rose after groceries",
+        "wait 72 hours"
       ]
     },
     {
-      "id": "kgc-15495-s-temperature-too-high",
+      "id": "kgc-15495-s-temporary-temperature-change",
       "productCode": "KGC 15495 S",
       "aliases": [
         "KGC 15495 S",
@@ -1193,17 +1210,18 @@
       ],
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
-      "problem": "Temperature too high",
-      "possibleCause": "Door opened too often/too long or door does not close completely.",
-      "safeUserCheck": "Reduce door openings; rearrange food so it does not block the door.",
-      "claimTrigger": "Create claim if door/seal remains faulty or deformed.",
-      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
-      "evidenceToRequest": [
-        "short description of what the user already checked"
-      ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "problem": "Temporary temperature changes or longer compressor operation",
+      "possibleCause": "Putting fresh food inside, opening the door, or a warmer room can temporarily change the internal temperature and make the compressor run longer.",
+      "safeUserCheck": "Keep the door closed and allow the temperature to stabilize. Check that the room is within the appliance climate range.",
+      "claimTrigger": "No claim is needed for a temporary change. Create a claim if the temperature does not recover or the compressor never cycles off after conditions stabilize.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 47 - Operating efficiency and temperature variation",
       "matchTerms": [
-        "Temperature too high"
+        "slight temperature changes",
+        "temporary temperature change",
+        "compressor runs longer when warm",
+        "fridge runs longer in hot weather"
       ]
     },
     {
@@ -1218,17 +1236,21 @@
       "itemType": "fridge_freezer",
       "model": "KGC 15495 S / KGCN 388 140 E",
       "problem": "Door gasket issue",
-      "possibleCause": "Door gasket inserted incorrectly, loose, torn, or deformed.",
-      "safeUserCheck": "Press gasket in and keep seal clean.",
-      "claimTrigger": "Create claim with photo if gasket is damaged or will not seat correctly.",
+      "possibleCause": "Food or containers may block the door, or the door gasket may be inserted incorrectly, loose, torn, or deformed.",
+      "safeUserCheck": "Rearrange food so the door closes completely, press a displaced gasket back into place, and keep the seal clean.",
+      "claimTrigger": "Create a claim with a photo if the gasket is damaged, will not seat correctly, or the door still will not close.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "photo of leak/damage",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, p. 55 - Door closure and gasket checks",
       "matchTerms": [
-        "Door gasket issue"
+        "Door gasket issue",
+        "door does not close",
+        "fridge door not sealing",
+        "freezer door not closing",
+        "door seal loose"
       ]
     },
     {
@@ -1250,13 +1272,203 @@
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer",
+      "sourceSection": "OL-KGCN388140E manual, pp. 38 and 55 - Normal refrigerator sounds",
       "matchTerms": [
         "Normal refrigerator sounds",
         "fridge making noise",
         "fridge noise",
         "refrigerator sounds",
-        "normal sounds"
+        "normal sounds",
+        "cracking sound",
+        "popping sound",
+        "compressor clicking",
+        "refrigerant flowing"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-food-touches-rear-wall",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Food becomes frosted or wet where it touches the rear wall",
+      "possibleCause": "Food or packaging is touching the cold rear wall of the refrigerator compartment.",
+      "safeUserCheck": "Move food and containers away from the rear wall so air can circulate around them.",
+      "claimTrigger": "No claim is needed if the issue stops after moving the food. Create a claim if items freeze or become wet without touching the rear wall.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 48 - Food storage in the refrigerator",
+      "matchTerms": [
+        "food frosted at rear wall",
+        "food wet at back of fridge",
+        "food touching rear wall",
+        "food freezes against back wall"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-vegetable-container-condensation",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Condensation in the vegetable container",
+      "possibleCause": "Vegetables with high water content release moisture inside the container.",
+      "safeUserCheck": "Dry wet vegetables before storage and remove excess moisture from the container.",
+      "claimTrigger": "This is normally not a fault. Create a claim only if there is broader uncontrolled water leakage.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 48 - Food storage in the refrigerator",
+      "matchTerms": [
+        "condensation in vegetable container",
+        "water in vegetable drawer",
+        "vegetable box wet",
+        "moisture in crisper drawer"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-freezer-door-hard-to-reopen",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Freezer door is difficult to reopen immediately after closing",
+      "possibleCause": "Temporary negative pressure forms inside the freezer after the door is closed.",
+      "safeUserCheck": "Wait 1 to 2 minutes, then open the door again without forcing it.",
+      "claimTrigger": "No claim is needed if the door opens normally after 1 to 2 minutes. Create a claim if it remains stuck or the seal is damaged.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 49 - Freezing food",
+      "matchTerms": [
+        "freezer door hard to open",
+        "freezer door is hard to open",
+        "hard to reopen freezer door immediately after closing",
+        "freezer door stuck after closing",
+        "cannot reopen freezer door",
+        "negative pressure freezer door"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-rear-wall-frost-water",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Frost or water droplets appear on the refrigerator rear wall",
+      "possibleCause": "This can occur during normal automatic defrosting of the refrigerator compartment.",
+      "safeUserCheck": "Keep food away from the rear wall and make sure the discharge opening is not obstructed. Do not scrape the cooling surface.",
+      "claimTrigger": "No claim is needed for temporary rear-wall frost or droplets. Create a claim if water collects in the bottom or heavy ice persists.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 52 - Defrosting the fridge",
+      "matchTerms": [
+        "frost on rear wall",
+        "water drops on back wall",
+        "fridge back wall wet",
+        "ice on refrigerator rear wall"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-switched-on-after-tilting",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Appliance was tilted more than 40 degrees during transport",
+      "possibleCause": "Oil and refrigerant need time to settle after the appliance is returned upright.",
+      "safeUserCheck": "Keep the appliance upright and wait at least 2 hours before switching it on.",
+      "claimTrigger": "No claim is needed if the appliance works normally after the waiting period. Create a claim if cooling does not start afterward.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 38 - Transport and positioning",
+      "matchTerms": [
+        "fridge tilted during transport",
+        "fridge transported on side",
+        "wait after moving fridge",
+        "when can I switch on after transport"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-damaged-supply-cord",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Supply cord is damaged, trapped, or crushed",
+      "possibleCause": "A damaged supply cord can create an electric shock or fire hazard.",
+      "safeUserCheck": "Stop using the appliance. Do not plug it in, touch damaged conductors, tape the cord, or attempt a repair.",
+      "claimTrigger": "Create an urgent service claim. The cord must be replaced by the manufacturer, service agent, or a similarly qualified person.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of the damaged or trapped cord without touching it",
+        "product model/serial number"
+      ],
+      "sourceSection": "OL-KGCN388140E manual, pp. 38 and 40 - Supply cord safety",
+      "matchTerms": [
+        "damaged supply cord",
+        "damaged power cord",
+        "fridge cable damaged",
+        "power cable trapped",
+        "power cable crushed"
+      ]
+    },
+    {
+      "id": "kgc-15495-s-damaged-refrigerant-circuit",
+      "productCode": "KGC 15495 S",
+      "aliases": [
+        "KGC 15495 S",
+        "KGC15495S",
+        "OL-KGCN388140E",
+        "KGCN 388 140 E"
+      ],
+      "itemType": "fridge_freezer",
+      "model": "KGC 15495 S / KGCN 388 140 E",
+      "problem": "Refrigerant pipe is punctured, broken, or leaking",
+      "possibleCause": "A punctured or broken refrigerant pipe can release flammable refrigerant.",
+      "safeUserCheck": "Stop using the appliance, avoid flames and ignition sources, ventilate the room for several minutes, and do not touch or repair the damaged pipe. If refrigerant contacts the eyes, rinse with clean water and seek medical help immediately.",
+      "claimTrigger": "Create an urgent service claim and keep the appliance out of use until checked by qualified service personnel.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of visible damage only if it can be taken safely",
+        "product model/serial number",
+        "short description of how the damage occurred"
+      ],
+      "sourceSection": "OL-KGCN388140E manual, pp. 38-39 and 42 - Refrigerant circuit safety",
+      "matchTerms": [
+        "refrigerant circuit damaged",
+        "refrigerant pipe punctured",
+        "refrigerant leak",
+        "refrigerant pipe broken",
+        "capillary tube damaged"
       ]
     },
     {
@@ -1588,16 +1800,21 @@
       "itemType": "washing_machine",
       "model": "EWA 34660 W",
       "problem": "Load has not been spun",
-      "possibleCause": "Load uneven or pump filter dirty.",
-      "safeUserCheck": "Redistribute load and clean pump filter if accessible.",
-      "claimTrigger": "Create claim if spin still fails.",
+      "possibleCause": "Load is uneven or the user-accessible pump filter needs cleaning. The balance-control system can reduce or skip spinning when it cannot distribute the load.",
+      "safeUserCheck": "Redistribute the laundry, select spinning again, and clean the user-accessible pump filter if needed.",
+      "claimTrigger": "Create claim if spinning repeatedly fails with a correctly distributed load and a clean filter.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W - Washing Machine",
+      "sourceSection": "EWA 34660 W manual, p. 29 - Lösen von Betriebsproblemen; p. 34 - Kontrolle der Verteilung des Waschguts",
       "matchTerms": [
-        "Load has not been spun"
+        "Load has not been spun",
+        "spin speed reduced",
+        "spin cycle skipped",
+        "washing machine does not spin",
+        "laundry still wet",
+        "unbalanced load"
       ]
     },
     {
@@ -1721,13 +1938,13 @@
       "model": "EWA 34660 W",
       "problem": "Simultaneous water intake and draining",
       "possibleCause": "Drain hose end too low.",
-      "safeUserCheck": "Check drain hose end is higher than appliance water level, approx. 0-100 cm guidance from manual.",
+      "safeUserCheck": "Check that the drain-hose end is above the water level in the appliance and that the hose is positioned 0.6-1 m above the floor.",
       "claimTrigger": "Create claim if installation is correct but issue continues.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W - Washing Machine",
+      "sourceSection": "EWA 34660 W manual, p. 29 - Lösen von Betriebsproblemen",
       "matchTerms": [
         "Simultaneous water intake and draining"
       ]
@@ -1888,7 +2105,7 @@
         "photo of display/error code",
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W - Washing Machine",
+      "sourceSection": "EWA 34660 W manual, p. 30 - Anzeigen der Fehler-Codes",
       "matchTerms": [
         "Error E10",
         "e10",
@@ -1913,7 +2130,7 @@
         "photo of display/error code",
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W - Washing Machine",
+      "sourceSection": "EWA 34660 W manual, p. 30 - Anzeigen der Fehler-Codes",
       "matchTerms": [
         "Error E21",
         "e21",
@@ -1938,11 +2155,263 @@
         "photo of display/error code",
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W - Washing Machine",
+      "sourceSection": "EWA 34660 W manual, p. 30 - Anzeigen der Fehler-Codes",
       "matchTerms": [
         "Error E30",
         "e30",
         "error e30"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-error-e12",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Error E12 / overfilling",
+      "possibleCause": "The washing machine detected overfilling.",
+      "safeUserCheck": "Restart the appliance once.",
+      "claimTrigger": "Create a claim if E12 returns after the restart.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "product model/serial number",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W manual, p. 30 - Anzeigen der Fehler-Codes",
+      "matchTerms": [
+        "Error E12",
+        "e12",
+        "error e12",
+        "overfilling",
+        "overfill error"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-overload-ovl",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Display shows OVL / washing machine is overloaded",
+      "possibleCause": "The laundry load exceeds the permitted amount for the programme.",
+      "safeUserCheck": "Remove excess laundry and restart the washing machine.",
+      "claimTrigger": "Create a claim if OVL remains with a load within the programme limit.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/error code",
+        "product model/serial number",
+        "short description of the laundry load"
+      ],
+      "sourceSection": "EWA 34660 W manual, p. 34 - Befüllung",
+      "matchTerms": [
+        "OVL",
+        "overload",
+        "overloaded",
+        "too much laundry",
+        "excessive laundry load"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-door-cannot-open",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Washing-machine door cannot be opened",
+      "possibleCause": "The programme is still running, water remains in the drum, or the temperature is too high.",
+      "safeUserCheck": "Do not force the door. Wait for the programme to finish and for the appliance to unlock the door automatically.",
+      "claimTrigger": "Create a claim if the door stays locked after the programme has ended, the water has drained, and the appliance has cooled.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/door-lock symbol",
+        "product model/serial number",
+        "short description of whether water remains in the drum"
+      ],
+      "sourceSection": "EWA 34660 W manual, p. 35 - Türsperre",
+      "matchTerms": [
+        "door cannot open",
+        "door is locked",
+        "door will not unlock",
+        "door stuck closed",
+        "door-lock symbol"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-child-lock-active",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Function buttons are blocked / Child Lock is active",
+      "possibleCause": "Child Lock is enabled and remains enabled after the wash ends until it is switched off.",
+      "safeUserCheck": "Press and hold Start Delay and Spin Speed together for about 3 seconds to switch Child Lock off.",
+      "claimTrigger": "Create a claim if the controls remain blocked after Child Lock is switched off as documented.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of display/Child Lock symbol",
+        "short description of what the user already checked"
+      ],
+      "sourceSection": "EWA 34660 W manual, p. 27 - Kindersicherung",
+      "matchTerms": [
+        "child lock",
+        "controls locked",
+        "buttons blocked",
+        "buttons do not respond",
+        "lock symbol",
+        "function buttons blocked"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-start-delay-active",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Washing machine waits before starting",
+      "possibleCause": "Start Delay is selected.",
+      "safeUserCheck": "Check the Start Delay setting. The wash starts automatically when the selected delay expires.",
+      "claimTrigger": "No claim is needed when Start Delay is active.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "EWA 34660 W manual, p. 28 - Einstellung der Startverzögerung",
+      "matchTerms": [
+        "waiting to start",
+        "does not start immediately",
+        "start delay",
+        "delayed start",
+        "0h to 24h"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-remaining-time-changes",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Remaining-time display temporarily freezes or jumps",
+      "possibleCause": "The displayed time is a forecast that updates according to temperature, water pressure, load size, and detergent amount.",
+      "safeUserCheck": "Allow the programme to continue; temporary pauses and time changes are documented behaviour.",
+      "claimTrigger": "No claim is needed for temporary time changes by themselves.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "EWA 34660 W manual, p. 25 - Display",
+      "matchTerms": [
+        "remaining time frozen",
+        "remaining time jumps",
+        "display time changes",
+        "timer stuck",
+        "wash time changes"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-zero-spin-selected",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Display shows 0 spin speed",
+      "possibleCause": "Spinning is switched off in the selected programme settings.",
+      "safeUserCheck": "Select an available spin speed if spinning is required.",
+      "claimTrigger": "No claim is needed when 0 spin speed is selected.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "EWA 34660 W manual, pp. 25-26 - Schleuderumdrehungen",
+      "matchTerms": [
+        "display shows 0",
+        "0 spin",
+        "spin switched off",
+        "no spin selected"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-cold-water-selected",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Display shows --°C",
+      "possibleCause": "Cold-water washing without preheating is selected.",
+      "safeUserCheck": "Select another available wash temperature if heated washing is required.",
+      "claimTrigger": "No claim is needed when the cold-water setting is selected.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "EWA 34660 W manual, pp. 25-26 - Temperaturwahl",
+      "matchTerms": [
+        "--°C",
+        "cold water",
+        "cold wash",
+        "no heating selected"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-programme-knob-no-change",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Programme knob does not change the active wash programme",
+      "possibleCause": "Moving the programme knob after a programme starts does not change the active programme parameters.",
+      "safeUserCheck": "Use Standby to cancel the programme, then select the desired programme and press Start/Pause.",
+      "claimTrigger": "No claim is needed when the active programme behaves as documented.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "EWA 34660 W manual, p. 25 - Programmknopf; p. 28 - Abbrechen und Wechsel des Waschprogramms",
+      "matchTerms": [
+        "programme knob does nothing",
+        "programme cannot change",
+        "cannot change programme during cycle",
+        "program selector not changing cycle"
+      ]
+    },
+    {
+      "id": "ewa-34660-w-programme-resumes-after-power-loss",
+      "productCode": "EWA 34660 W",
+      "aliases": [
+        "EWA 34660 W",
+        "EWA34660W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Wash programme resumes after a power interruption",
+      "possibleCause": "The programme memory retains the started programme during a power interruption.",
+      "safeUserCheck": "Do not open the door during the power interruption. Allow the stored programme to resume after power returns.",
+      "claimTrigger": "No claim is needed if the programme resumes as documented.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "EWA 34660 W manual, p. 34 - Spannungsschwund (Memory des Waschprogramms)",
+      "matchTerms": [
+        "programme resumes after power failure",
+        "power cut memory",
+        "power interruption",
+        "cycle continues after power returns"
       ]
     },
     {
@@ -1963,7 +2432,7 @@
         "photo of display/error code",
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W - Washing Machine",
+      "sourceSection": "EWA 34660 W manual, p. 30 - Anzeigen der Fehler-Codes",
       "matchTerms": [
         "Other error code"
       ]
@@ -1972,19 +2441,23 @@
       "id": "ebx-943-600-s-appliance-does-not-work",
       "productCode": "EBX 943 600 S",
       "aliases": [
-        "EBX 943 600 S"
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
       ],
       "itemType": "oven",
       "model": "EBX 943 600 S",
       "problem": "Appliance does not work",
       "possibleCause": "Break in power supply.",
-      "safeUserCheck": "Check household fuse/power supply only.",
-      "claimTrigger": "Create claim if power is available but oven still does not work.",
+      "safeUserCheck": "Make sure an oven function and temperature are selected, then check the household fuse/power supply. Do not open or repair internal electrical parts.",
+      "claimTrigger": "Create a claim if power is available and the oven still does not work after the documented control check.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "EBX 943 600 S - Oven",
+      "sourceSection": "A-EBX943600S manual, pp. 67 and 79 - Operation / Operation in case of emergency",
       "matchTerms": [
         "Appliance does not work",
         "not working",
@@ -1997,48 +2470,414 @@
       "id": "ebx-943-600-s-programmer-display-shows-0-00",
       "productCode": "EBX 943 600 S",
       "aliases": [
-        "EBX 943 600 S"
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
       ],
       "itemType": "oven",
       "model": "EBX 943 600 S",
-      "problem": "Programmer display shows “0.00”",
-      "possibleCause": "Appliance disconnected from mains or temporary power cut.",
-      "safeUserCheck": "Set the current time.",
-      "claimTrigger": "No claim unless display cannot be set or keeps resetting.",
+      "problem": "Programmer display shows flashing 0.00 after connection or a power cut",
+      "possibleCause": "The appliance was disconnected from the mains, power was interrupted, or the current time has not been set. This is a clock indication, not a fault code.",
+      "safeUserCheck": "This is a clock indication, not a fault code. For an oven fitted with the optional electronic timer, set the current time using MENU and the < / > sensors. The oven cannot operate until the time is set.",
+      "claimTrigger": "No claim is needed if operation returns after setting the clock. Create a claim if the clock cannot be set or repeatedly resets while household power is stable.",
       "chatbotDecision": "NO_CLAIM_NORMAL",
-      "evidenceToRequest": [
-        "photo of display/error code",
-        "short description of what the user already checked"
-      ],
-      "sourceSection": "EBX 943 600 S - Oven",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, pp. 64-65 and 79 - Electronic timer / Operation in case of emergency",
       "matchTerms": [
-        "Programmer display shows “0.00”"
+        "programmer display shows 0.00",
+        "flashing 0.00",
+        "oven clock flashing zero",
+        "oven does not work after power cut",
+        "set current time"
       ]
     },
     {
       "id": "ebx-943-600-s-oven-lighting-does-not-work",
       "productCode": "EBX 943 600 S",
       "aliases": [
-        "EBX 943 600 S"
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
       ],
       "itemType": "oven",
       "model": "EBX 943 600 S",
       "problem": "Oven lighting does not work",
       "possibleCause": "Bulb loose or damaged.",
-      "safeUserCheck": "Ask whether oven heating still works. If manual allows safe bulb replacement, user may replace/tighten bulb.",
-      "claimTrigger": "Create claim if light still does not work or is not user-accessible.",
+      "safeUserCheck": "Switch off and unplug the oven, allow it to cool completely, then tighten or replace the 230 V / 25 W halogen bulb using the documented lamp procedure. Do not work on the lamp while power is connected.",
+      "claimTrigger": "Create a claim if the light still does not work after the documented bulb check or the lamp cannot be accessed safely.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
-        "photo of display/error code",
-        "short description of what the user already checked"
+        "short description of whether oven heating still works and what was checked"
       ],
-      "sourceSection": "EBX 943 600 S - Oven",
+      "sourceSection": "A-EBX943600S manual, pp. 75 and 79 - Replacing the halogen bulb / Operation in case of emergency",
       "matchTerms": [
         "Oven lighting does not work",
-        "not working",
-        "not turn on",
-        "no power",
-        "dead"
+        "oven light not working",
+        "oven bulb loose",
+        "oven bulb damaged",
+        "oven lamp off"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-oven-does-not-heat",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Oven function is selected but the oven does not heat",
+      "possibleCause": "The temperature regulator may still be set to zero. On applicable functions, only the fan operates when no temperature is selected.",
+      "safeUserCheck": "Select the intended oven function and set the required temperature. Allow normal preheating time; do not open or repair internal parts.",
+      "claimTrigger": "Create a claim if the oven still does not heat after both the function and temperature are correctly selected.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the selected function and temperature knob positions",
+        "short description of whether the fan or indicator lights operate"
+      ],
+      "sourceSection": "A-EBX943600S manual, pp. 67-68 - Oven functions and operation",
+      "matchTerms": [
+        "oven does not heat",
+        "oven not heating",
+        "only fan runs no heat",
+        "fan only and no heat",
+        "temperature knob zero"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-defrost-fan-without-heat",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Fan runs without heat in Defrost mode",
+      "possibleCause": "This is the documented Defrost function: only the fan operates and all heaters remain off.",
+      "safeUserCheck": "In Defrost mode only the fan operates and all heaters remain off, so no corrective action is needed. Choose a heating function and temperature if heating is intended.",
+      "claimTrigger": "No claim is needed for fan-only operation in Defrost mode.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, p. 67 - Defrosting",
+      "matchTerms": [
+        "defrost mode no heat",
+        "defrost fan only",
+        "fan runs without heat in defrost",
+        "heaters off in defrost"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-temperature-light-cycles",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Temperature-regulator light L goes out or cycles on and off",
+      "possibleCause": "The light goes out when the selected temperature is reached and cycles during cooking while the thermostat maintains that temperature.",
+      "safeUserCheck": "No action is required when heating is otherwise normal. Wait for light L to go out the first time before placing food in a preheated oven.",
+      "claimTrigger": "No claim is needed for normal thermostat-light cycling. Create a claim if the oven does not heat or the light never behaves consistently with heating.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, p. 68 - Signal lights R and L",
+      "matchTerms": [
+        "temperature light turns on and off",
+        "L light goes out",
+        "L light on and off",
+        "thermostat light cycling",
+        "oven temperature light"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-kitchen-timer-alarm",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Kitchen Timer alarm sounds and its symbol flashes",
+      "possibleCause": "On an oven fitted with the optional electronic timer, the programmed Kitchen Timer has elapsed.",
+      "safeUserCheck": "Touch and hold MENU, or hold the < / > sensors together, to mute the alarm. If untouched, it stops automatically after approximately 7 minutes.",
+      "claimTrigger": "No claim is needed when the alarm corresponds to an elapsed Kitchen Timer.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, p. 65 - Kitchen Timer",
+      "matchTerms": [
+        "kitchen timer alarm",
+        "kitchen timer symbol flashes",
+        "timer alarm after cooking",
+        "alarm stops after 7 minutes"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-timed-operation-ended",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Oven switches off automatically and an alarm sounds after timed operation",
+      "possibleCause": "On an oven fitted with the optional electronic timer, the programmed Duration has elapsed.",
+      "safeUserCheck": "Set the function and temperature knobs to off, then hold MENU or the < / > sensors together to mute the alarm.",
+      "claimTrigger": "No claim is needed when a programmed Duration has elapsed. Create a claim if the oven switches off unexpectedly without timed operation.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, pp. 65-66 - Timed operation",
+      "matchTerms": [
+        "oven switches off automatically",
+        "timed operation ended",
+        "duration elapsed",
+        "duration symbol flashing"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-display-menu-indicators",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Display briefly shows dur, ton, or bri",
+      "possibleCause": "These are programmer menu indicators: dur means Duration, ton means beep-tone adjustment, and bri means display-brightness adjustment. They are not fault codes.",
+      "safeUserCheck": "These are programmer menu indicators, not fault codes: dur is Duration, ton is tone, and bri is brightness. Continue or exit the setting using MENU and the < / > sensors as documented.",
+      "claimTrigger": "No claim is needed for these menu indicators by themselves.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, pp. 65-66 - Timed operation / Tone / Brightness",
+      "matchTerms": [
+        "display shows dur",
+        "display shows ton",
+        "display shows bri",
+        "dur ton bri",
+        "oven display menu code"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-night-mode-dim-display",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Programmer display becomes dim at night",
+      "possibleCause": "On ovens fitted with the optional electronic timer, Night Mode dims the display from 22:00 to 06:00.",
+      "safeUserCheck": "No action is required. Display brightness can also be adjusted from 1 to 9 in the bri menu.",
+      "claimTrigger": "No claim is needed for normal Night Mode dimming.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, p. 66 - Adjust display brightness / Night Mode",
+      "matchTerms": [
+        "oven display dim at night",
+        "night mode display",
+        "display dim 22:00 06:00",
+        "oven clock darker at night"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-eco-heating-light-off",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Oven interior light is off during ECO Heating",
+      "possibleCause": "The oven lighting remains off by design in ECO Heating mode.",
+      "safeUserCheck": "No action is required if the oven heats normally in ECO mode. Select independent oven lighting only when needed.",
+      "claimTrigger": "No claim is needed for the light being off only in ECO Heating. Use the lighting-fault guidance if it stays off in other modes.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, p. 68 - ECO Heating",
+      "matchTerms": [
+        "oven light off in eco",
+        "eco heating light off",
+        "no oven lighting in eco",
+        "eco mode dark"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-door-seal-heat-loss",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Heat escapes around the oven door",
+      "possibleCause": "The door may not be fully closed, or spillages and dirt may prevent the door seal from sealing correctly.",
+      "safeUserCheck": "Let the oven cool, make sure the door closes fully, and clean spillages from the door seal without using abrasive tools.",
+      "claimTrigger": "Create a claim if heat still escapes because the door or seal is damaged or does not close correctly after cleaning.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the cooled door and seal",
+        "short description of what was cleaned or checked"
+      ],
+      "sourceSection": "A-EBX943600S manual, p. 58 - How to save energy",
+      "matchTerms": [
+        "heat escapes oven door",
+        "oven door not sealing",
+        "door seal dirty",
+        "oven heat leak",
+        "oven door does not close"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-hot-steam-at-door",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Hot steam escapes when the oven door is opened",
+      "possibleCause": "Hot, sometimes invisible steam can normally escape when the door is opened during or after cooking.",
+      "safeUserCheck": "Open the door carefully, keep your face and body back, and do not lean over the open door.",
+      "claimTrigger": "No claim is needed for normal steam when opening the door. Create a claim if there is uncontrolled leakage while the door is closed or visible door damage.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, p. 57 - Danger of burns",
+      "matchTerms": [
+        "steam from oven door",
+        "hot steam when opening oven",
+        "oven steam",
+        "steam escapes when door opened"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-damaged-power-cable",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Fixed oven power supply cable is damaged",
+      "possibleCause": "A damaged fixed power cable creates an electrical safety hazard.",
+      "safeUserCheck": "Stop using the oven and disconnect power only if this can be done safely. Do not repair, tape, or replace the cable yourself.",
+      "claimTrigger": "Create an urgent service claim. The cable must be replaced by the manufacturer, an authorised service outlet, or a qualified person.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of the damaged cable only if it can be taken without touching it",
+        "product model/serial number"
+      ],
+      "sourceSection": "A-EBX943600S manual, p. 63 - Electrical connection",
+      "matchTerms": [
+        "oven power cable damaged",
+        "fixed power supply cable damaged",
+        "oven cord damaged",
+        "damaged oven cable"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-cracked-door-glass",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Oven door glass is cracked or shattered",
+      "possibleCause": "Scratched or damaged door glass can crack or shatter, including after abrasive cleaners or sharp metal scrapers are used.",
+      "safeUserCheck": "Stop using the oven. Do not touch, press, clean, or continue using damaged door glass.",
+      "claimTrigger": "Create an urgent service claim for cracked or shattered oven-door glass.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of the damaged glass from a safe distance",
+        "product model/serial number"
+      ],
+      "sourceSection": "A-EBX943600S manual, pp. 56-57 - Door glass safety",
+      "matchTerms": [
+        "oven door glass cracked",
+        "cracked oven glass",
+        "shattered oven glass",
+        "glass cracked",
+        "glass shattering"
+      ]
+    },
+    {
+      "id": "ebx-943-600-s-technical-fault",
+      "productCode": "EBX 943 600 S",
+      "aliases": [
+        "EBX 943 600 S",
+        "EBX943600S",
+        "A-EBX943600S",
+        "12262.3eETsDHbVlS",
+        "EH92364E-A"
+      ],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "Technical oven fault remains after documented checks",
+      "possibleCause": "An internal technical or operational fault requires qualified service.",
+      "safeUserCheck": "Stop using the oven, switch both controls off, and disconnect power if safe. Do not open the appliance or attempt an internal repair.",
+      "claimTrigger": "Create a service claim when a technical fault remains after the documented safe checks.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "product model/serial number",
+        "short description of the symptom and checks already completed"
+      ],
+      "sourceSection": "A-EBX943600S manual, pp. 57, 78-79 - Technical faults / Service",
+      "matchTerms": [
+        "technical oven fault",
+        "operational fault requiring repair",
+        "oven internal fault",
+        "oven fault after checks"
       ]
     }
   ]

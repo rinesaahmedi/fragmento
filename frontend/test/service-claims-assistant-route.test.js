@@ -310,6 +310,83 @@ test("known fridge cooling issue uses claims knowledge and offers claim-form hel
   assert.match(response.body.actions[0].prompt, /fridge/i);
 });
 
+test("KGCN door alarm is explained as normal after three minutes", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My KGCN 388 140 E fridge door alarm is beeping after 3 minutes.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /Door-open alarm sounds after about 3 minutes/i);
+  assert.match(response.body.answer, /close the refrigerator door/i);
+  assert.match(response.body.answer, /normal behaviour/i);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("KGCN freezer door pressure guidance tells the user to wait", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "The freezer door is hard to open immediately after I close it.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /difficult to reopen immediately after closing/i);
+  assert.match(response.body.answer, /wait 1 to 2 minutes/i);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("KGCN damaged supply cord is handled as an urgent stop-use case", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "The power cable on my KGCN 388 140 E fridge is damaged.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /urgent claim handling/i);
+  assert.match(response.body.answer, /stop using the appliance/i);
+  assert.ok(Array.isArray(response.body.actions));
+  assert.equal(response.body.actions[0].id, "claim_form_help");
+});
+
+test("KGCN refrigerant circuit damage is handled as an urgent stop-use case", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "The fridge refrigerant pipe is punctured and leaking.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /urgent claim handling/i);
+  assert.match(response.body.answer, /avoid flames and ignition sources/i);
+  assert.match(response.body.answer, /ventilate the room/i);
+  assert.ok(Array.isArray(response.body.actions));
+});
+
+test("KGC refrigerator knowledge has unique IDs and model aliases", () => {
+  const entries = CLAIMS_CHATBOT_KNOWLEDGE.entries.filter((entry) => entry.productCode === "KGC 15495 S");
+  const ids = entries.map((entry) => entry.id);
+
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(entries.length >= 19);
+  assert.ok(entries.every((entry) => entry.itemType === "fridge_freezer"));
+  assert.ok(entries.every((entry) => entry.aliases.includes("KGCN 388 140 E")));
+});
+
 test("order-aware assistant refuses guidance for a component that was not purchased", async () => {
   const route = loadRoute({
     getServiceClaimKitchenPlan: async () => ({
@@ -525,6 +602,117 @@ test("oven not working gives only safe checks then direct claim description", as
   assert.match(response.body.suggestedProblemDescription, /EBX 943 600 S/);
 });
 
+test("oven flashing 0.00 after a power cut is treated as a clock reset", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My A-EBX943600S oven shows flashing 0.00 after a power cut.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /not a fault code/i);
+  assert.match(response.body.answer, /set the current time/i);
+  assert.match(response.body.answer, /normal behaviour/i);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("oven not heating checks both the function and temperature", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My EBX 943 600 S oven fan runs but the oven does not heat.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /oven does not heat/i);
+  assert.match(response.body.answer, /Select the intended oven function and set the required temperature/i);
+  assert.match(response.body.answer, /safe self-check first/i);
+});
+
+test("oven Defrost mode explains fan-only operation as normal", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "The oven is in Defrost mode but only the fan runs and there is no heat.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /Fan runs without heat in Defrost mode/i);
+  assert.match(response.body.answer, /all heaters remain off/i);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("oven programmer menu indicators are not treated as fault codes", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+
+  for (const indicator of ["dur", "ton", "bri"]) {
+    const response = await route.POST(request({
+      language: "en",
+      question: `My EBX943600S oven display shows ${indicator}.`,
+      selectedAreas: [],
+      claim: emptyClaim(),
+    }));
+
+    assert.equal(response.status, 200);
+    assert.match(response.body.answer, /not fault codes/i);
+    assert.equal(response.body.actions, undefined);
+  }
+});
+
+test("oven damaged cable is handled as an urgent stop-use case", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "The fixed power supply cable on my EBX943600S oven is damaged.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /urgent claim handling/i);
+  assert.match(response.body.answer, /Do not repair, tape, or replace the cable yourself/i);
+  assert.ok(Array.isArray(response.body.actions));
+  assert.equal(response.body.actions[0].id, "claim_form_help");
+});
+
+test("oven cracked door glass uses the Claims article-code alias and stops use", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My EH92364E-A oven door glass is cracked.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /urgent claim handling/i);
+  assert.match(response.body.answer, /Do not touch, press, clean, or continue using damaged door glass/i);
+  assert.ok(Array.isArray(response.body.actions));
+});
+
+test("EBX oven knowledge has unique IDs and complete model aliases", () => {
+  const entries = CLAIMS_CHATBOT_KNOWLEDGE.entries.filter((entry) => entry.productCode === "EBX 943 600 S");
+  const ids = entries.map((entry) => entry.id);
+
+  assert.equal(entries.length, 16);
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(entries.every((entry) => entry.itemType === "oven"));
+  assert.ok(entries.every((entry) => entry.aliases.includes("12262.3eETsDHbVlS")));
+  assert.ok(entries.every((entry) => entry.aliases.includes("EH92364E-A")));
+});
+
 test("dishwasher E3 gives direct service guidance and suggested claim description", async () => {
   const route = loadRoute();
   const response = await route.POST(request({
@@ -576,6 +764,68 @@ test("washing machine E10 final step is direct if unresolved", async () => {
   assert.match(response.body.answer, /There is no further safe self-check/i);
   assert.ok(Array.isArray(response.body.actions));
   assert.equal(response.body.actions[0].id, "claim_form_help");
+});
+
+test("washing machine E12 uses the manual overfill guidance", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My EWA 34660 W washing machine shows E12.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /E12.*overfilling/i);
+  assert.match(response.body.answer, /Restart the appliance once/i);
+  assert.doesNotMatch(response.body.answer, /urgent claim handling/i);
+});
+
+test("washing machine OVL explains overload and the safe correction", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My washing machine shows OVL.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /OVL.*overloaded/i);
+  assert.match(response.body.answer, /Remove excess laundry and restart/i);
+});
+
+test("washing machine time jumps are explained as documented normal behaviour", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "The remaining time on my washing machine freezes and jumps.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /Remaining-time display temporarily freezes or jumps/i);
+  assert.match(response.body.answer, /normal behaviour/i);
+  assert.equal(response.body.actions, undefined);
+});
+
+test("washing machine locked door guidance says not to force it", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My EWA 34660 W washing machine door will not unlock.",
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /door cannot be opened/i);
+  assert.match(response.body.answer, /Do not force the door/i);
 });
 
 test("washing machine not working then E10 combines context in claim summary when unresolved", async () => {
