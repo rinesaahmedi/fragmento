@@ -564,8 +564,10 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   },
   // AB 105846's US50 front ends at the x=3517 vector stroke. UPEF65 then
   // occupies the two narrow right-hand corner faces up to the oven boundary.
+  // Its first upper cabinet also has a separately drawn left filler face.
   "ab-105846": {
     "base-module-1": { side: "right", inner: 50.123515, outer: 52.033254 },
+    "wall-cabinet-1": { side: "left", outer: 46.118765, inner: 46.988124 },
   },
 };
 for (const alias of ["ab-105822", "ab-105828"]) {

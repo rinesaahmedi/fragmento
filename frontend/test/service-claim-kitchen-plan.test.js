@@ -3230,6 +3230,52 @@ test("AB 105846 places UPEF65 on the US50 right-hand corner faces", () => {
   }
 });
 
+test("AB 105846 variants keep the first upper filler separate from H4502", () => {
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"]
+    .filter((hotspot) => hotspot.componentKey === "wall-cabinet-1");
+  const blende = {
+    componentId: "component-claim-blende-wall-cabinet-1",
+    componentKey: "claim-blende-wall-cabinet-1",
+    sourceComponentKey: "wall-cabinet-1",
+    sourceWidthMm: 450,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const components = [{
+    componentKey: "wall-cabinet-1",
+    widthMm: 450,
+    blendeCode: "HPK2002",
+  }];
+  const expectedFillerFace = [
+    [46.118765, 3.717647],
+    [46.988124, 3.89916],
+    [46.988124, 31.347899],
+    [46.118765, 31.166387],
+  ];
+
+  for (const slug of ["ab-105846", ...AB_105846_LAYOUT_ALIAS_SLUGS]) {
+    const result = buildServiceClaimBlendeHotspots(
+      sourceHotspots,
+      [blende],
+      components,
+      slug,
+    );
+    const cabinetHotspots = result.filter(
+      (hotspot) => hotspot.componentKey === "wall-cabinet-1",
+    );
+    const fillerHotspots = result.filter((hotspot) => hotspot.claimPartKey === "blende");
+
+    assert.equal(fillerHotspots.length, 1, `${slug} exposes one upper filler face`);
+    assert.equal(fillerHotspots[0].blendeSide, "left");
+    assert.deepEqual(fillerHotspots[0].points, expectedFillerFace);
+    assert.ok(cabinetHotspots.length >= 2, `${slug} keeps the H4502 door and top`);
+    assert.ok(cabinetHotspots.every((hotspot) => {
+      const xs = hotspot.points.map(([x]) => x);
+      return Math.min(...xs) >= 46.988124;
+    }), `${slug} removes the filler face from H4502 selection`);
+  }
+});
+
 test("AB 105846 exposes the UPK20 Blende separately from the fixed sink", () => {
   const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"];
   const blendeHotspots = hotspots.filter((hotspot) => hotspot.componentKey === "sink-end-blende");
