@@ -39,3 +39,9 @@ test("AB 105758 links the hood cabinet, extractor, and LED lighting accessory", 
   assert.deepEqual(getAutoLinkedAccessoryCodes(slug, linkedIds), ["ACC-LIGHT-003"]);
   assert.deepEqual(getAutoLinkedAccessoryCodes(slug, []), []);
 });
+
+test("AB 105846 layout aliases preserve the linked hood package", () => {
+  for (const slug of ["ab-105849", "ab-105852", "ab-105855", "ab-105858", "ab-105861"]) {
+    assert.deepEqual(getLinkedComponentIds(slug, EXTRACTOR_HOOD), [HOOD_CABINET, EXTRACTOR_HOOD]);
+  }
+});

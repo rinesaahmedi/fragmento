@@ -161,6 +161,12 @@ function isDefaultIncluded(row) {
   );
 }
 
+function isStandaloneBlende(row) {
+  const iconKey = String(row.iconKey || "").trim().toLowerCase();
+  const componentKey = String(row.componentKey || "").trim().toLowerCase();
+  return iconKey === "blende" || componentKey.endsWith("-blende");
+}
+
 function sameNullable(left, right) {
   return (left ?? null) === (right ?? null);
 }
@@ -193,6 +199,26 @@ function buildLinkData(row, catalog) {
         catalogBlendeId: null,
         catalogBlendeQuantity: null,
         catalogServiceId: service.id,
+        catalogLinkStatus: LINK_STATUS_MATCHED,
+      },
+    };
+  }
+
+  if (isStandaloneBlende(row)) {
+    const normalizedBlendeCode = normalizeBlendeCode(row.articleNumber || row.code);
+    const blende = catalog.blendeByCode.get(normalizedBlendeCode);
+    if (!blende) return { kind: "missing catalog blende", normalizedBlendeCode };
+    if (row.price !== formatMoney(blende.price)) {
+      return { kind: "price mismatch", expectedPrice: formatMoney(blende.price) };
+    }
+
+    return {
+      kind: "standalone blende",
+      data: {
+        catalogArticleId: null,
+        catalogBlendeId: blende.id,
+        catalogBlendeQuantity: 1,
+        catalogServiceId: null,
         catalogLinkStatus: LINK_STATUS_MATCHED,
       },
     };

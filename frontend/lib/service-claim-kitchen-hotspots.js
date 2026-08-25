@@ -1,5 +1,13 @@
 import { SERVICE_CLAIM_PART_COMPONENT_IDS } from "./service-claim-kitchen-plan-selection.js";
 
+const AB_105846_LAYOUT_ALIAS_SLUGS = [
+  "ab-105849",
+  "ab-105852",
+  "ab-105855",
+  "ab-105858",
+  "ab-105861",
+];
+
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
   "ab-105748",
@@ -25,6 +33,8 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105750",
   "ab-105753",
   "ab-105756",
+  "ab-105846",
+  ...AB_105846_LAYOUT_ALIAS_SLUGS,
 ]);
 
 export function isLShapedClaimKitchen(kitchenSlug = "") {
@@ -56,6 +66,8 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "ab-105831": [[-1.33, 1.04], [1.14, 0.85], [2.26, 0.96], [-0.22, 1.16]],
   "ab-105834": [[-1.26, 0.85], [-0.05, 0.75], [2.19, 0.96], [0.87, 1.06]],
   "ab-105837": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
+  // Four outside sink-bowl strokes measured from AB 105846's vector PDF.
+  "ab-105846": [[-0.411949686, 0.97810219], [3.13836478, 0.768248175], [4.600628931, 0.894160584], [1.116352201, 1.138686131]],
   "ab-105840": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105843": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105747": [[-1.595113, 0.977883], [-0.291908, 0.862681], [1.089858, 1.017135], [-0.359432, 1.115202]],
@@ -68,6 +80,14 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 // by several narrow hotspots. These coordinates remain in the uncropped source
 // plan system and are projected into the ASC display crop below.
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
+  // Four outside sink-bowl strokes in AB 105846's vector-plan coordinates.
+  // The separate faucet silhouettes below remain clickable as one fixture.
+  "ab-105846": [
+    [11.258907, 58.534454],
+    [27.349169, 56.215126],
+    [33.976247, 57.606723],
+    [18.185273, 60.309244],
+  ],
   "ab-105758": [
     [15.263658, 54.621849],
     [29.045131, 52.625210],
@@ -180,6 +200,16 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
     [0.245432, -0.109993],
     [1.083709, -0.051824],
     [0.161605, 0.002286],
+  ],
+  // Six outer vertices preserve the kinked perspective outline of AB 105846's
+  // cooktop instead of flattening it into an axis-aligned quadrilateral.
+  "ab-105846": [
+    [0.017759563, -0.041500853],
+    [1.047814208, -0.085275725],
+    [1.525956284, -0.059124503],
+    [1.525956284, -0.005685048],
+    [1.039617486, 0.014781126],
+    [0.046448087, -0.040932348],
   ],
   "ab-105840": [
     [-0.768612, -0.055883],
@@ -532,6 +562,11 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     "drawer-module": { side: "right", inner: 75.420428, outer: 76.232779 },
     "wall-cabinet-3": { side: "right", inner: 53.401425, outer: 54.15677 },
   },
+  // AB 105846's US50 front ends at the x=3517 vector stroke. UPEF65 then
+  // occupies the two narrow right-hand corner faces up to the oven boundary.
+  "ab-105846": {
+    "base-module-1": { side: "right", inner: 50.123515, outer: 52.033254 },
+  },
 };
 for (const alias of ["ab-105822", "ab-105828"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105825"];
@@ -550,6 +585,9 @@ for (const alias of ["ab-105749", "ab-105752", "ab-105755"]) {
 }
 for (const alias of ["ab-105750", "ab-105753", "ab-105756"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105747"];
+}
+for (const alias of AB_105846_LAYOUT_ALIAS_SLUGS) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105846"];
 }
 const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   // PDF-measured seam between the oven and the drawer below it. The oven ends
@@ -639,6 +677,20 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     [
       [42.41, 53.83], [46.4, 53.29], [54.81, 52.08], [67.92, 54.79], [94.73, 60.3], [94.82, 61.69],
       [82.83, 63.47], [67.92, 60.45], [53.81, 57.42], [52.61, 55.89],
+    ],
+  ),
+  "ab-105846": splitWorktopDefinition(
+    { left: 6.783848, top: 51.979832, width: 61.168646, height: 10.366387 },
+    // The top-surface joint follows the worktop depth in perspective, from the
+    // back edge to the inner L corner. The thin fascia then drops vertically.
+    [
+      [6.783848, 58.695798], [42.41, 53.536499], [51.163895, 55.912605],
+      [51.163895, 57.42521], [17.2019, 62.346218], [6.783848, 60.208403],
+    ],
+    [
+      [42.41, 53.536499], [53.159145, 51.979832],
+      [67.952494, 55.005042], [67.952494, 60.894118],
+      [51.163895, 57.42521], [51.163895, 55.912605],
     ],
   ),
   "ab-104968": splitWorktopDefinition(
@@ -738,6 +790,16 @@ for (const alias of ["ab-105751", "ab-105754", "ab-105745"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105748"];
   OVEN_DRAWER_TOP_RATIO_BY_SLUG[alias] = OVEN_DRAWER_TOP_RATIO_BY_SLUG["ab-105748"];
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105748"];
+}
+for (const alias of AB_105846_LAYOUT_ALIAS_SLUGS) {
+  L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG[alias] =
+    L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG["ab-105846"];
+  L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[alias] =
+    L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG["ab-105846"];
+  COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG[alias] =
+    COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG["ab-105846"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] =
+    SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105846"];
 }
 SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105839"] =
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105842"];

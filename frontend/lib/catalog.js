@@ -5,6 +5,7 @@ import { applyDueScheduledCatalogPriceListImports } from "./catalog-price-list-i
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
 import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
 import { buildAuszugVariantMetadata } from "./auszug-variants.js";
+import { isStandaloneCatalogBlendeItem } from "./catalog-pricing.js";
 import {
   CATALOG_PRODUCT_INFORMATION_SELECT,
   resolveProductInformation,
@@ -180,6 +181,7 @@ const KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH = {
     },
   },
   catalogBlendeId: true,
+  catalogBlende: true,
   catalogBlendeQuantity: true,
   catalogServiceId: true,
   catalogService: {
@@ -1128,6 +1130,11 @@ export function serializeKitchenForLegacy(kitchen) {
     const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
     const catalogService = item.catalogServiceId ? item.catalogService : null;
     const catalogBlende = item.catalogBlendeId ? item.catalogBlende : null;
+    const standaloneCatalogBlende = isStandaloneCatalogBlendeItem({
+      ...item,
+      catalogArticle,
+      catalogBlende,
+    });
     const claimProducts = claimParts.filter(
       (part) => String(part?.sourceKitchenItemCode || "") === String(item.code || ""),
     );
@@ -1136,6 +1143,9 @@ export function serializeKitchenForLegacy(kitchen) {
     const catalogPrice = (() => {
       if (catalogService?.price != null) {
         return Number(catalogService.price);
+      }
+      if (standaloneCatalogBlende && catalogBlende?.price != null) {
+        return Number(catalogBlende.price);
       }
       if (catalogArticle?.price == null) {
         return Number(item.price);
@@ -1158,9 +1168,16 @@ export function serializeKitchenForLegacy(kitchen) {
       catalogServiceId: item.catalogServiceId || "",
       catalogBlendeId: item.catalogBlendeId || "",
       code: item.code,
-      articleNumber: catalogArticle?.articleNumber || item.articleNumber || "",
-      name: catalogArticle?.name || catalogService?.name || item.name,
-      nameDe: catalogArticle?.nameDe || catalogService?.nameDe || item.nameDe || "",
+      articleNumber: catalogArticle?.articleNumber
+        || (standaloneCatalogBlende ? catalogBlende?.code : item.articleNumber)
+        || "",
+      name: catalogArticle?.name
+        || catalogService?.name
+        || (standaloneCatalogBlende ? catalogBlende?.name : item.name),
+      nameDe: catalogArticle?.nameDe
+        || catalogService?.nameDe
+        || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
+        || "",
       price: catalogPrice,
       widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
       heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
@@ -1179,12 +1196,22 @@ export function serializeKitchenForLegacy(kitchen) {
       componentKey: item.componentKey || "",
       isLocked: item.isLocked,
       itemType: item.itemType.toLowerCase(),
-      blendeCode: catalogBlende?.code || item.blendeCode || "",
-      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.blendeLabel || "",
-      blendeName: catalogBlende?.name || "",
-      blendeNameDe: catalogBlende?.nameDe || "",
-      blendePrice: catalogBlende?.price != null ? Number(catalogBlende.price) : item.blendePrice != null ? Number(item.blendePrice) : null,
-      catalogBlendeQuantity: catalogBlende ? catalogBlendeQuantity : (item.catalogBlendeQuantity || null),
+      blendeCode: standaloneCatalogBlende ? "" : catalogBlende?.code || item.blendeCode || "",
+      blendeLabel: standaloneCatalogBlende
+        ? ""
+        : catalogBlende?.nameDe || catalogBlende?.name || item.blendeLabel || "",
+      blendeName: standaloneCatalogBlende ? "" : catalogBlende?.name || "",
+      blendeNameDe: standaloneCatalogBlende ? "" : catalogBlende?.nameDe || "",
+      blendePrice: standaloneCatalogBlende
+        ? null
+        : catalogBlende?.price != null
+          ? Number(catalogBlende.price)
+          : item.blendePrice != null
+            ? Number(item.blendePrice)
+            : null,
+      catalogBlendeQuantity: standaloneCatalogBlende
+        ? null
+        : catalogBlende ? catalogBlendeQuantity : (item.catalogBlendeQuantity || null),
       articleVariants,
     };
   };

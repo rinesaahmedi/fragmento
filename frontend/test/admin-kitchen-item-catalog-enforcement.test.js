@@ -12,6 +12,7 @@ test("admin kitchen item writes require catalog links and preserve valid blende 
   assert.match(source, /Active kitchen items cannot use free-text article data/);
   assert.match(source, /Choose a service from the catalog/);
   assert.match(source, /A blende can only be attached to a linked catalog article/);
+  assert.match(source, /standaloneCatalogBlende/);
   assert.doesNotMatch(source, /input\.catalogBlendeQuantity = 1/);
   assert.match(source, /const newQuantity = catalogBlende \? \(input\.catalogBlendeQuantity \|\| 1\) : null/);
   assert.match(source, /name:\s*catalogArticle\?\.name/);

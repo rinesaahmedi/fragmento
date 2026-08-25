@@ -11,6 +11,11 @@ test("itemRequiresBlendeConfirmation detects blende metadata", () => {
   assert.equal(itemRequiresBlendeConfirmation({ catalogBlendeId: "abc" }), true);
   assert.equal(itemRequiresBlendeConfirmation({ blendeLabel: "Corner filler panel" }), true);
   assert.equal(itemRequiresBlendeConfirmation({ articleNumber: "US60" }), false);
+  assert.equal(itemRequiresBlendeConfirmation({
+    catalogBlendeId: "blende-upk20",
+    iconKey: "blende",
+    componentKey: "sink-end-blende",
+  }), false);
 });
 
 test("getItemBlendeTotal and cabinet-only price split the bundled amount", () => {

@@ -43,9 +43,24 @@ export function isDefaultIncludedKitchenItem(item) {
   );
 }
 
+export function isStandaloneCatalogBlendeItem(item) {
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const hasBlendeLink = Boolean(item?.catalogBlende || item?.catalogBlendeId);
+  const hasArticleLink = Boolean(item?.catalogArticle || item?.catalogArticleId);
+
+  return hasBlendeLink
+    && !hasArticleLink
+    && (iconKey === "blende" || componentKey.endsWith("-blende"));
+}
+
 export function getCatalogExpectedPriceCents(item) {
   if (item?.catalogService) {
     return moneyToCents(item.catalogServiceProgramPrice?.price ?? item.catalogService.price);
+  }
+
+  if (isStandaloneCatalogBlendeItem(item) && item?.catalogBlende) {
+    return moneyToCents(item.catalogBlendeProgramPrice?.price ?? item.catalogBlende.price);
   }
 
   if (!item?.catalogArticle) {
@@ -80,7 +95,11 @@ export function shouldSyncKitchenItemPrice(item, options = {}) {
   if (item.catalogPriceSyncMode === CATALOG_PRICE_SYNC_MODES.TEST_DATA && !options.includeTestKitchens) return false;
   if (item.isLocked && !options.includeLocked) return false;
   if (options.requireMatched !== false && item.catalogLinkStatus !== "MATCHED") return false;
-  return Boolean(item.catalogArticle || item.catalogService);
+  return Boolean(
+    item.catalogArticle
+    || item.catalogService
+    || isStandaloneCatalogBlendeItem(item),
+  );
 }
 
 export function buildSyncedKitchenItemPrice(item) {

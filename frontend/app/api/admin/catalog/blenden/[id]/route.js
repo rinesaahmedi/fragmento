@@ -51,7 +51,30 @@ export async function POST(request, { params }) {
       });
 
       await tx.kitchenItem.updateMany({
-        where: { catalogBlendeId: id },
+        where: {
+          catalogBlendeId: id,
+          catalogArticleId: null,
+          iconKey: "blende",
+        },
+        data: {
+          articleNumber: blende.code,
+          name: blende.name,
+          nameDe: blende.nameDe,
+          price: blende.price,
+          blendeCode: null,
+          blendeLabel: null,
+          blendePrice: null,
+          catalogBlendeQuantity: 1,
+        },
+      });
+      await tx.kitchenItem.updateMany({
+        where: {
+          catalogBlendeId: id,
+          NOT: {
+            catalogArticleId: null,
+            iconKey: "blende",
+          },
+        },
         data: {
           blendeCode: blende.code,
           blendeLabel: blende.nameDe || blende.name,

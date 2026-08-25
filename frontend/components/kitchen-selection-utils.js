@@ -136,6 +136,12 @@ export function getLocalizedBlendeDisplayLabel(item, language = "en") {
 
 /** True when this kitchen slot bundles a mandatory filler panel (Blende / Passleiste). */
 export function itemRequiresBlendeConfirmation(item, language = "en") {
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  if (iconKey === "blende" || componentKey.endsWith("-blende")) {
+    return false;
+  }
+
   return Boolean(
     String(item?.catalogBlendeId || "").trim()
     || String(item?.blendeCode || "").trim()
@@ -362,6 +368,16 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-HOOD-AB105748-600": "9",
   "HOOD-AB105748-FH664621E": "9",
   "CAB-WALL-AB105748-H6002": "10",
+  "SINK-BASE-AB105846-DEFAULT": "3",
+  "BLENDE-AB105846-SINK-END": "3",
+  "DISH-AB105846-600": "4",
+  "CAB-BASE-AB105846-US50": "5",
+  "CAB-BASE-AB105846-US30": "6",
+  "REF-AB105846-KGCN388140E": "7",
+  "CAB-WALL-AB105846-H4502": "8",
+  "CAB-HOOD-AB105846-600": "9",
+  "HOOD-AB105846-FH664621E": "9",
+  "CAB-WALL-AB105846-H3002": "10",
   "SINKBASE-AB105831-DEFAULT": "3",
   "CAB-BASE-AB105831-US30-R": "4",
   "DISH-AB105831-600": "5",
@@ -975,6 +991,12 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105831": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105743": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105748": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105846": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105849": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105852": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105855": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105858": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105861": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105751": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105754": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105745": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1229,6 +1251,9 @@ PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105743-FH664621E"] = PRODUCT_INFO_DOCUMEN
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105758-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-AB105758-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105758-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105846-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-AB105846-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105846-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
@@ -1526,6 +1551,10 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
 PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-AB105732-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-B-600-STD"];
 PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_IMAGE_GALLERIES_BY_CODE["CAB-HOOD-AB105732-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-AB105846-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-B-600-STD"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["REF-AB105846-KGCN388140E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-AB105846-FH664621E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["CAB-HOOD-AB105846-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
 
 export function getProductImagePaths(item) {
   const candidates = [item?.productInfoCode, item?.code, item?.tooltipPreviewCode].filter(Boolean);

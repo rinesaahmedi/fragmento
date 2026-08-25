@@ -57,6 +57,21 @@ test("localized sink base name stays Sink Lower Cabinet even after stored-name m
   );
 });
 
+test("AB 105846 default sink keeps plan callout 3", () => {
+  assert.equal(
+    getLocalizedItemName(
+      {
+        code: "SINK-BASE-AB105846-DEFAULT",
+        name: "Sink Lower Cabinet",
+        iconKey: "sink_base",
+      },
+      (_key, fallback) => fallback,
+      "en",
+    ),
+    "3. Sink Lower Cabinet",
+  );
+});
+
 test("localized catalog-linked cabinet name matches catalog label exactly", () => {
   assert.equal(
     getLocalizedItemName(
