@@ -1,5 +1,14 @@
 import { SERVICE_CLAIM_PART_COMPONENT_IDS } from "./service-claim-kitchen-plan-selection.js";
 
+const AB_105845_LAYOUT_ALIAS_SLUGS = [
+  "105845-modul-2",
+  "ab-105848",
+  "ab-105851",
+  "ab-105854",
+  "ab-105857",
+  "ab-105860",
+];
+
 const AB_105846_LAYOUT_ALIAS_SLUGS = [
   "ab-105849",
   "ab-105852",
@@ -562,6 +571,11 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     "drawer-module": { side: "right", inner: 75.420428, outer: 76.232779 },
     "wall-cabinet-3": { side: "right", inner: 53.401425, outer: 54.15677 },
   },
+  // The UPK20 is the narrow strip on the US30's right side. The thinner
+  // strip beyond x=99.7175 is the wall edge and must remain unselectable.
+  "ab-105845": {
+    "drawer-module": { side: "right", inner: 99.129375, outer: 99.7175 },
+  },
   // AB 105846's US50 front ends at the x=3517 vector stroke. UPEF65 then
   // occupies the two narrow right-hand corner faces up to the oven boundary.
   "ab-105846": {
@@ -585,6 +599,9 @@ for (const alias of ["ab-105749", "ab-105752", "ab-105755"]) {
 }
 for (const alias of ["ab-105750", "ab-105753", "ab-105756"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105747"];
+}
+for (const alias of AB_105845_LAYOUT_ALIAS_SLUGS) {
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105845"];
 }
 for (const alias of AB_105846_LAYOUT_ALIAS_SLUGS) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105846"];

@@ -546,7 +546,7 @@
 .planPersistentLightDetail {
   z-index: 15;
   background: transparent;
-  filter: brightness(0) saturate(100%) invert(72%);
+  filter: brightness(0) saturate(100%) invert(92%);
   pointer-events: none;
 }
 

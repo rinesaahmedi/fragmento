@@ -98,8 +98,8 @@ export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
 // Tight source-image clips for appliance details that must remain light grey above
 // selection tints. Keep cabinet outlines, doors, handles, and seams outside these clips.
 const AB_105845_DISHWASHER_LIGHT_DETAILS = [
-  { key: "dishwasher-basket", left: 87.0625, top: 65.83333, width: 6.5, height: 3.53334 },
-  { key: "dishwasher-gs-mark", left: 89.3375, top: 72.11667, width: 1.9375, height: 2.38333 },
+  { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 87.0625, top: 65.83333, width: 6.5, height: 3.53334 },
+  { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 89.3375, top: 72.11667, width: 1.9375, height: 2.38333 },
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
