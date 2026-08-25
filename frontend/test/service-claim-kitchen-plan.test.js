@@ -4,7 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadKitchenSvgMarkup } from "../lib/load-kitchen-svg.js";
-import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
+import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
 import {
   buildServiceClaimSelectableComponents,
   collapseServiceClaimLinkedComponents,
@@ -28,6 +28,13 @@ const component = (code, componentKey, name = code, overrides = {}) => ({
   name,
   ...overrides,
 });
+const AB_105846_LAYOUT_ALIAS_SLUGS = [
+  "ab-105849",
+  "ab-105852",
+  "ab-105855",
+  "ab-105858",
+  "ab-105861",
+];
 
 test("service kitchen svg loader uses the AB 105808 plan asset", async () => {
   const markup = await loadKitchenSvgMarkup("ab-105808");
@@ -2989,6 +2996,8 @@ test("all L-shaped claim plans separate the complete faucet from the sink bowl",
     "ab-105837",
     "ab-105840",
     "ab-105843",
+    "ab-105846",
+    ...AB_105846_LAYOUT_ALIAS_SLUGS,
   ];
 
   for (const kitchenSlug of lShapedSlugs) {
@@ -3098,6 +3107,195 @@ test("AB 105822 exposes one clean claim hotspot for each worktop run", () => {
     "component-claim-worktop-right",
   ]);
   assert.notDeepEqual(result[0].points, result[1].points);
+});
+
+test("AB 105846 follows the marked depth seam across the worktop surface", () => {
+  const worktopHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"]
+    .filter((hotspot) => hotspot.componentKey === "worktop");
+  const source = worktopHotspots[0];
+  const xs = source.points.map(([x]) => x);
+  const ys = source.points.map(([, y]) => y);
+  const prepared = [{
+    ...source,
+    left: Math.min(...xs),
+    top: Math.min(...ys),
+    width: Math.max(...xs) - Math.min(...xs),
+    height: Math.max(...ys) - Math.min(...ys),
+  }];
+  const result = buildServiceClaimPartHotspots(prepared, [
+    { partKey: "worktop-left", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceComponentKey: "worktop" },
+  ], "ab-105846");
+
+  assert.deepEqual(result.map((hotspot) => hotspot.claimPartKey), [
+    "worktop-left",
+    "worktop-right",
+  ]);
+  assert.notEqual(result[0].clipPath, result[1].clipPath);
+  assert.ok(result.every((hotspot) => /^polygon\(/.test(hotspot.clipPath)));
+  assert.ok(result.every((hotspot) => !hotspot.clipPath.includes("NaN")));
+
+  const absoluteClipPoints = (hotspot) => [...hotspot.clipPath.matchAll(
+    /([\d.-]+)%\s+([\d.-]+)%/g,
+  )].map((match) => [
+    hotspot.left + (Number(match[1]) / 100) * hotspot.width,
+    hotspot.top + (Number(match[2]) / 100) * hotspot.height,
+  ]);
+  const leftPoints = absoluteClipPoints(result[0]);
+  const rightPoints = absoluteClipPoints(result[1]);
+  const sharedPoints = leftPoints.filter(([leftX, leftY]) => rightPoints.some(
+    ([rightX, rightY]) => Math.abs(leftX - rightX) < 0.000001
+      && Math.abs(leftY - rightY) < 0.000001,
+  ));
+  assert.equal(sharedPoints.length, 3);
+  assert.ok(Math.abs(sharedPoints[0][0] - 42.41) < 0.000001);
+  assert.ok(Math.abs(sharedPoints[0][1] - 53.536499) < 0.000001);
+  assert.ok(Math.abs(sharedPoints[1][0] - 51.163895) < 0.000001);
+  assert.ok(Math.abs(sharedPoints[1][1] - 55.912605) < 0.000001);
+  assert.ok(Math.abs(sharedPoints[2][0] - 51.163895) < 0.000001);
+  assert.ok(Math.abs(sharedPoints[2][1] - 57.42521) < 0.000001);
+  assert.ok(sharedPoints[0][0] < sharedPoints[1][0]);
+  assert.equal(sharedPoints[1][0], sharedPoints[2][0]);
+});
+
+test("AB 105846 layout aliases reuse its exact plan and claims geometry", () => {
+  const sourceImage = PLAN_IMAGE_BY_SLUG["ab-105846"];
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"];
+  const sourceWorktop = sourceHotspots.filter((hotspot) => hotspot.componentKey === "worktop");
+  const claimParts = [
+    { partKey: "worktop-left", sourceComponentKey: "worktop" },
+    { partKey: "worktop-right", sourceComponentKey: "worktop" },
+  ];
+  const prepare = (hotspots) => hotspots.map((hotspot) => {
+    const xs = hotspot.points.map(([x]) => x);
+    const ys = hotspot.points.map(([, y]) => y);
+    return {
+      ...hotspot,
+      left: Math.min(...xs),
+      top: Math.min(...ys),
+      width: Math.max(...xs) - Math.min(...xs),
+      height: Math.max(...ys) - Math.min(...ys),
+    };
+  });
+  const sourceClaims = buildServiceClaimPartHotspots(
+    prepare(sourceWorktop),
+    claimParts,
+    "ab-105846",
+  );
+
+  for (const slug of AB_105846_LAYOUT_ALIAS_SLUGS) {
+    assert.equal(PLAN_IMAGE_BY_SLUG[slug], sourceImage);
+    assert.equal(PLAN_HOTSPOTS_BY_SLUG[slug], sourceHotspots);
+    assert.deepEqual(
+      buildServiceClaimPartHotspots(prepare(sourceWorktop), claimParts, slug),
+      sourceClaims,
+    );
+  }
+});
+
+test("AB 105846 places UPEF65 on the US50 right-hand corner faces", () => {
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"]
+    .filter((hotspot) => hotspot.componentKey === "base-module-1");
+  const blende = {
+    componentId: "component-claim-blende-base-module-1",
+    componentKey: "claim-blende-base-module-1",
+    sourceComponentKey: "base-module-1",
+    sourceWidthMm: 500,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const components = [{
+    componentKey: "base-module-1",
+    widthMm: 500,
+    blendeCode: "UPEF65",
+  }];
+
+  for (const slug of ["ab-105846", ...AB_105846_LAYOUT_ALIAS_SLUGS]) {
+    const result = buildServiceClaimBlendeHotspots(
+      sourceHotspots,
+      [blende],
+      components,
+      slug,
+    );
+    const cabinet = result.find((hotspot) => hotspot.componentKey === "base-module-1");
+    const filler = result.find((hotspot) => hotspot.claimPartKey === "blende");
+
+    assert.ok(cabinet, `${slug} keeps the US50 cabinet selectable`);
+    assert.ok(filler, `${slug} exposes the UPEF65 filler`);
+    assert.equal(filler.blendeSide, "right");
+    assert.ok(Math.abs(cabinet.left + cabinet.width - 50.123515) < 0.000001);
+    assert.ok(Math.abs(filler.left - 50.123515) < 0.000001);
+    assert.ok(Math.abs(filler.left + filler.width - 52.033254) < 0.000001);
+  }
+});
+
+test("AB 105846 exposes the UPK20 Blende separately from the fixed sink", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"];
+  const blendeHotspots = hotspots.filter((hotspot) => hotspot.componentKey === "sink-end-blende");
+  const sinkHotspots = hotspots.filter((hotspot) => hotspot.componentKey === "sink-base");
+
+  assert.equal(blendeHotspots.length, 1);
+  assert.equal(sinkHotspots.length, 1);
+  assert.deepEqual(blendeHotspots[0].points, [
+    [7.610451, 60.087395],
+    [18.028504, 62.22521],
+    [18.028504, 95.563025],
+    [7.610451, 93.42521],
+  ]);
+});
+
+test("AB 105846 selected UPK20 remains independently selectable in service claims", () => {
+  const sink = component("SINK-BASE-AB105846-DEFAULT", "sink-base", "Sink Lower Cabinet", {
+    isLocked: true,
+  });
+  const blende = component(
+    "BLENDE-AB105846-SINK-END",
+    "sink-end-blende",
+    "Filler Panel up to 20 cm",
+    { articleNumber: "UPK20", nameDe: "Passblende bis 20 cm" },
+  );
+  const kitchen = { items: [sink, blende] };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105846",
+    confirmedItems: [blende],
+  });
+  const blendeMeta = result.selectableComponents.find(
+    (entry) => entry.componentId === "component-sink-end-blende",
+  );
+
+  assert.ok(result.selectableComponentIds.includes("component-sink-base"));
+  assert.ok(result.selectableComponentIds.includes("component-sink-end-blende"));
+  assert.equal(blendeMeta.articleCode, "UPK20");
+  assert.equal(blendeMeta.componentKey, "sink-end-blende");
+  assert.equal(blendeMeta.name, "Filler Panel up to 20 cm");
+  assert.equal(blendeMeta.nameDe, "Passblende bis 20 cm");
+});
+
+test("AB 105846 keeps all three faucet silhouettes but emits one sink bowl", () => {
+  const faucetHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"]
+    .filter((hotspot) => hotspot.componentKey === "sink-faucet")
+    .map((hotspot) => {
+      const xs = hotspot.points.map(([x]) => x);
+      const ys = hotspot.points.map(([, y]) => y);
+      return {
+        ...hotspot,
+        left: Math.min(...xs),
+        top: Math.min(...ys),
+        width: Math.max(...xs) - Math.min(...xs),
+        height: Math.max(...ys) - Math.min(...ys),
+      };
+    });
+  const result = buildServiceClaimPartHotspots(faucetHotspots, [
+    { partKey: "sink", sourceComponentKey: "sink-faucet" },
+    { partKey: "faucet", sourceComponentKey: "sink-faucet" },
+  ], "ab-105846");
+
+  assert.equal(faucetHotspots.length, 3);
+  assert.equal(result.filter((hotspot) => hotspot.claimPartKey === "sink").length, 1);
+  assert.equal(result.filter((hotspot) => hotspot.claimPartKey === "faucet").length, 3);
+  assert.ok(result.every((hotspot) => !String(hotspot.clipPath || "").includes("NaN")));
 });
 
 test("German service claim labels do not fall back to English catalog names", () => {

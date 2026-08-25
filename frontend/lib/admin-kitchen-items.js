@@ -2,6 +2,7 @@ import { ItemType } from "@prisma/client";
 import { validateKitchenItemInput } from "./admin-forms";
 import { findKitchenStructureSlot, getKitchenStructureSlots } from "./kitchen-structure";
 import { getCompatibilityMessage, isItemCompatibleWithSlot } from "./kitchen-slot-compatibility";
+import { isStandaloneCatalogBlendeItem } from "./catalog-pricing";
 import { prisma } from "./prisma";
 
 function moneyToCents(value) {
@@ -95,7 +96,13 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     throw new Error("Selected service was not found.");
   }
 
-  if (catalogBlende && !catalogArticle) {
+  const standaloneCatalogBlende = isStandaloneCatalogBlendeItem({
+    ...input,
+    catalogArticle,
+    catalogBlende,
+  });
+
+  if (catalogBlende && !catalogArticle && !standaloneCatalogBlende) {
     throw new Error("A blende can only be attached to a linked catalog article.");
   }
 
@@ -103,7 +110,13 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     throw new Error("Choose a service from the catalog.");
   }
 
-  if (input.itemType !== ItemType.SERVICE && input.isActive && !input.isLocked && !catalogArticle) {
+  if (
+    input.itemType !== ItemType.SERVICE
+    && input.isActive
+    && !input.isLocked
+    && !catalogArticle
+    && !standaloneCatalogBlende
+  ) {
     throw new Error("Choose an article from the catalog. Active kitchen items cannot use free-text article data.");
   }
 
@@ -121,15 +134,27 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
 
   const data = {
     ...input,
-    articleNumber: catalogArticle?.articleNumber || null,
-    name: catalogArticle?.name || catalogService?.name || input.name,
-    nameDe: catalogArticle?.nameDe || catalogService?.nameDe || input.nameDe || null,
-    price: applyBlendePriceDelta(input, existingItem, catalogBlende),
+    articleNumber: catalogArticle?.articleNumber
+      || (standaloneCatalogBlende ? catalogBlende?.code : null),
+    name: catalogArticle?.name
+      || catalogService?.name
+      || (standaloneCatalogBlende ? catalogBlende?.name : input.name),
+    nameDe: catalogArticle?.nameDe
+      || catalogService?.nameDe
+      || (standaloneCatalogBlende ? catalogBlende?.nameDe : input.nameDe)
+      || null,
+    price: standaloneCatalogBlende
+      ? String(catalogBlende.price)
+      : applyBlendePriceDelta(input, existingItem, catalogBlende),
     articleBasePrice: undefined,
-    catalogBlendeQuantity: catalogBlende ? (input.catalogBlendeQuantity || 1) : null,
-    blendeCode: catalogBlende?.code || null,
-    blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || null,
-    blendePrice: catalogBlende ? catalogBlende.price : null,
+    catalogBlendeQuantity: catalogBlende
+      ? standaloneCatalogBlende ? 1 : (input.catalogBlendeQuantity || 1)
+      : null,
+    blendeCode: standaloneCatalogBlende ? null : catalogBlende?.code || null,
+    blendeLabel: standaloneCatalogBlende
+      ? null
+      : catalogBlende?.nameDe || catalogBlende?.name || null,
+    blendePrice: standaloneCatalogBlende ? null : catalogBlende?.price || null,
     catalogArticleId: catalogArticle?.id || null,
     catalogServiceId: catalogService?.id || null,
     catalogLinkStatus: catalogArticle || catalogBlende || catalogService ? "MATCHED" : null,

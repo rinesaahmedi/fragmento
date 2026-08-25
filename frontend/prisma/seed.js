@@ -30,6 +30,7 @@ const DEFAULT_SINK_WORKTOP_CATALOG_CODE = "SINK-WORKTOP";
 const DEFAULT_WORKTOP_CATALOG_NAME_EN = "Worktop";
 const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
+const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
   "ab-105748",
@@ -40,6 +41,8 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105822", "ab-105825", "ab-105828", "ab-105831",
   "ab-105834", "ab-105837", "ab-105840", "ab-105843",
   "ab-105747", "ab-105750", "ab-105753", "ab-105756",
+  "ab-105846",
+  ...AB_105846_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
 ]);
 const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105833",
@@ -325,9 +328,9 @@ function defaultSinkBase(overrides = {}) {
   };
 }
 
-// A sink at the outside end of a run needs its UPK20 panel to remain an
+// A sink at the outside end of a run needs its filler panel to remain an
 // independent customer choice. It must never be included with the fixed sink.
-function sinkEndBlende(kitchenCode) {
+function sinkEndBlende(kitchenCode, overrides = {}) {
   return {
     itemType: ItemType.COMPONENT,
     code: `BLENDE-AB${kitchenCode}-SINK-END`,
@@ -341,10 +344,11 @@ function sinkEndBlende(kitchenCode) {
     componentKey: "sink-end-blende",
     sortOrder: 35,
     infoText: "Optional UPK20 filler panel for the fixed end sink",
+    ...overrides,
   };
 }
 
-function withSinkEndBlende(items, kitchenCode) {
+function withSinkEndBlende(items, kitchenCode, blendeOverrides = {}) {
   return [
     ...items.map((item) => (
       item.componentKey === "sink-base" && item.isLocked
@@ -357,7 +361,7 @@ function withSinkEndBlende(items, kitchenCode) {
         }
         : item
     )),
-    sinkEndBlende(kitchenCode),
+    sinkEndBlende(kitchenCode, blendeOverrides),
   ];
 }
 
@@ -1573,6 +1577,49 @@ const AB_105758_ITEMS = [
   ...defaultAccessories(),
   ...defaultServices(),
 ];
+
+// AB 105846: mirrored L-shaped vector plan with the sink on the left run and
+// refrigerator on the right.  Rows 1-3 are the locked default package; rows
+// 4-10 follow the supplied Excel schedule and keep their kitchen-specific
+// codes because plan callout numbers are keyed by code in the configurator.
+const AB_105846_ITEMS = [
+  defaultOvenHob({ sortOrder: 10, widthMm: 600 }),
+  defaultWorktop({ sortOrder: 20 }),
+  defaultSinkBase({
+    // Keep a kitchen-specific code: the shared normalized sink code is also
+    // used as callout 8 in older L plans, while this drawing labels it 3.
+    code: "SINK-BASE-AB105846-DEFAULT",
+    sortOrder: 30,
+    widthMm: 600,
+    depthMm: 600,
+  }),
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105846-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-3", sortOrder: 40, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105846-US50", name: "Base cabinet with drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US50", "UPEF65", 1), widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US50 base storage cabinet with UPEF65 corner filler panel", articleNumber: "US50", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105846-US30", name: "Base cabinet with drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US30"), widthMm: 300, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US30 base storage cabinet", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105846-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), widthMm: 540, heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 70, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105846-H4502", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H4502", "UPK20", 1), widthMm: 600, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H4502 wall cabinet with UPK20 filler panel; combined Excel width 60 cm", articleNumber: "H4502", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105846-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002 cabinet, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105846-FH664621E", name: "FH664621E Extractor Hood", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105846-H3002", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H3002"), widthMm: 300, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H3002 wall cabinet, 30 cm", articleNumber: "H3002" },
+  defaultSinkWorktop({ sortOrder: 110 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+const AB_105846_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105846_ITEMS, "105846", {
+  catalogBlendeCode: "UPK20",
+});
+const AB_105846_LAYOUT_ALIAS_ITEMS = AB_105846_ITEMS_WITH_SINK_END_BLENDE.map((item) => (
+  item.code === "CAB-WALL-AB105846-H4502"
+    ? {
+      ...item,
+      price: articlePriceWithBlende("H4502", "HPK2002", 1),
+      infoText: "H4502 wall cabinet with HPK2002 filler panel; combined layout width 60 cm",
+      blendeCode: "HPK2002",
+      blendeLabel: "HPK2002 20 cm",
+      blendePrice: blendePrice("HPK2002", 1),
+    }
+    : item
+));
 const AB_105758_ITEMS_WITH_SINK_END_BLENDE = withSinkEndBlende(AB_105758_ITEMS, "105758");
 
 const AB_105831_ITEMS = [
@@ -2119,6 +2166,22 @@ const DEFAULT_KITCHENS = [
     description: "Two-module kitchen configuration based on frontend/public/plans/AB 105845.svg",
     items: AB_105845_ITEMS,
   },
+  {
+    slug: "ab-105846",
+    kitchenCode: "105 846",
+    name: "105846",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105846.svg",
+    items: AB_105846_ITEMS_WITH_SINK_END_BLENDE,
+    reconcileExisting: true,
+  },
+  ...AB_105846_LAYOUT_ALIAS_CODES.map((code) => ({
+    slug: `ab-${code}`,
+    kitchenCode: `${code.slice(0, 3)} ${code.slice(3)}`,
+    name: code,
+    description: "L-shaped kitchen configuration based on the AB 105846 layout",
+    items: AB_105846_LAYOUT_ALIAS_ITEMS,
+    reconcileExisting: true,
+  })),
   {
     slug: "ab-105839",
     kitchenCode: "105 839",
@@ -2985,7 +3048,12 @@ async function main() {
               : isHoodWallCabinetItem
                 ? HOOD_WALL_CABINET_CATALOG_NAME_DE
                 : cabinetWidthNameDe || item.nameDe || null;
-      const normalizedBlendeCode = normalizeBlendeCode(item.blendeCode);
+      const normalizedAttachedBlendeCode = normalizeBlendeCode(item.blendeCode);
+      const normalizedStandaloneBlendeCode = normalizeBlendeCode(item.catalogBlendeCode);
+      const normalizedBlendeCode = normalizedAttachedBlendeCode || normalizedStandaloneBlendeCode;
+      const isStandaloneCatalogBlende = Boolean(
+        normalizedStandaloneBlendeCode && !normalizedAttachedBlendeCode,
+      );
       const catalogBlende = normalizedBlendeCode
         ? catalogBlendeByCode.get(normalizedBlendeCode)
         : null;
@@ -2997,16 +3065,23 @@ async function main() {
       const catalogService = catalogServiceCode
         ? catalogServiceByCode.get(catalogServiceCode)
         : null;
-      const catalogBlendeQuantity = catalogBlende ? Math.max(1, getBlendeQuantity(item)) : null;
+      const catalogBlendeQuantity = catalogBlende
+        ? isStandaloneCatalogBlende ? 1 : Math.max(1, getBlendeQuantity(item))
+        : null;
       const data = {
         ...productInfo,
         productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
         itemType: item.itemType,
         code: item.code,
-        articleNumber: catalogArticle?.articleNumber || item.articleNumber || null,
-        name: catalogArticle?.name || itemName,
-        nameDe: catalogArticle?.nameDe || itemNameDe,
-        price: item.price,
+        articleNumber: catalogArticle?.articleNumber
+          || (isStandaloneCatalogBlende ? catalogBlende?.code : item.articleNumber)
+          || null,
+        name: catalogArticle?.name
+          || (isStandaloneCatalogBlende ? catalogBlende?.name : itemName),
+        nameDe: catalogArticle?.nameDe
+          || (isStandaloneCatalogBlende ? catalogBlende?.nameDe : itemNameDe)
+          || null,
+        price: isStandaloneCatalogBlende && catalogBlende ? catalogBlende.price : item.price,
         widthMm: resolvedWidthMm,
         heightMm: resolvedHeightMm,
         depthMm: resolvedDepthMm,
@@ -3017,9 +3092,13 @@ async function main() {
         sortOrder: item.sortOrder || 0,
         isLocked: Boolean(item.isLocked),
         isActive: item.isActive !== false,
-        blendeCode: catalogBlende?.code || item.blendeCode || null,
-        blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || formatBlendeLabel(item.blendeLabel),
-        blendePrice: item.blendePrice ?? null,
+        blendeCode: isStandaloneCatalogBlende
+          ? null
+          : catalogBlende?.code || item.blendeCode || null,
+        blendeLabel: isStandaloneCatalogBlende
+          ? null
+          : catalogBlende?.nameDe || catalogBlende?.name || formatBlendeLabel(item.blendeLabel),
+        blendePrice: isStandaloneCatalogBlende ? null : item.blendePrice ?? null,
         catalogArticleId: catalogArticle?.id || null,
         catalogBlendeId: catalogBlende?.id || null,
         catalogBlendeQuantity,

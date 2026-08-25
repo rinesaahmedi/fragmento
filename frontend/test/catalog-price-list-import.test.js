@@ -40,6 +40,25 @@ test("buildSyncedKitchenItemPrice includes catalog blende quantity", () => {
   assert.equal(price, "287.00");
 });
 
+test("standalone catalog Blenden sync directly to the catalog Blende price", () => {
+  const item = {
+    catalogArticle: null,
+    catalogArticleId: null,
+    catalogBlende: { price: "25.00" },
+    catalogBlendeId: "blende-upk20",
+    catalogBlendeQuantity: 1,
+    catalogLinkStatus: "MATCHED",
+    catalogPriceSyncMode: "AUTO",
+    iconKey: "blende",
+    componentKey: "sink-end-blende",
+    isLocked: false,
+    kitchen: { slug: "ab-105846" },
+  };
+
+  assert.equal(shouldSyncKitchenItemPrice(item), true);
+  assert.equal(buildSyncedKitchenItemPrice(item), "25.00");
+});
+
 test("shouldSyncKitchenItemPrice skips manual, default included, and test rows by default", () => {
   const base = {
     catalogLinkStatus: "MATCHED",
