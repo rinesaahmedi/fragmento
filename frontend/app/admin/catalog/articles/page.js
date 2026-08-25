@@ -26,6 +26,7 @@ import AdminSelect from "../../../../components/admin-select";
 import { AdminProductInfoPdfManager } from "../../../../components/admin-product-info-pdf-manager";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
+import { listCatalogPrograms } from "../../../../lib/catalog-programs";
 import { prisma } from "../../../../lib/prisma";
 import { ItemType } from "@prisma/client";
 import Link from "next/link";
@@ -130,11 +131,12 @@ function formatDimensionInputValue(value) {
     : String(Number(cm.toFixed(2))).replace(/\.0+$/, "");
 }
 
-function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
+function CatalogArticleForm({ action, article, programmId, submitLabel, cancelHref = "" }) {
   const isEditing = Boolean(article);
 
   return (
     <form action={action} method="post" className={`catalog-article-form ${isEditing ? "is-editing" : "is-creating"}`} style={articleFormStyle}>
+      <input type="hidden" name="programmId" value={programmId} />
       <header className="catalog-article-form__header">
         <div>
           <h3>{article?.articleNumber || "Create a new article"}</h3>
@@ -265,9 +267,10 @@ function CatalogArticleForm({ action, article, submitLabel, cancelHref = "" }) {
   );
 }
 
-function CatalogAddonForm({ action, item, submitLabel }) {
+function CatalogAddonForm({ action, item, programmId, submitLabel }) {
   return (
     <form action={action} method="post" style={addonFormStyle}>
+      <input type="hidden" name="programmId" value={programmId} />
       <div style={formGridStyle}>
         <FormField label={<AdminText i18nKey="catalogAdmin.code" fallback="Code" />}>
           <input name="code" defaultValue={item?.code || ""} style={inputStyle} required />
@@ -350,7 +353,7 @@ function ClaimProductForm({ action, claimProduct, submitLabel }) {
   );
 }
 
-function CatalogDeleteForm({ action, itemLabel, entityLabel, confirmKey, linkedKitchenItems }) {
+function CatalogDeleteForm({ action, itemLabel, entityLabel, confirmKey, linkedKitchenItems, programmId }) {
   const linkedCount = Number(linkedKitchenItems || 0);
   if (linkedCount > 0) {
     return (
@@ -366,6 +369,7 @@ function CatalogDeleteForm({ action, itemLabel, entityLabel, confirmKey, linkedK
 
   return (
     <form action={action} method="post" style={deleteFormStyle}>
+      <input type="hidden" name="programmId" value={programmId} />
       <AdminConfirmSubmitButton
         name="_intent"
         value="delete"
@@ -407,6 +411,10 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
   const editBlendeId = String(resolvedSearchParams?.editBlende || "");
   const editServiceId = String(resolvedSearchParams?.editService || "");
   const editClaimProductId = String(resolvedSearchParams?.editClaimProduct || "");
+  const catalogPrograms = await listCatalogPrograms();
+  const requestedProgramId = String(resolvedSearchParams?.programmId || "").trim();
+  const selectedProgram = catalogPrograms.find((program) => program.programmId === requestedProgramId) || catalogPrograms[0];
+  const selectedProgramId = selectedProgram?.programmId || "IP 2200";
   const [articles, blenden, services, claimProducts] = await Promise.all([
     prisma.$queryRaw`
     SELECT
@@ -418,7 +426,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
       ca."widthMm",
       ca."heightMm",
       ca."depthMm",
-      ca."price",
+      capp."price",
       ca."itemType",
       ca."productImagePath",
       ca."productInfoPdfPath",
@@ -427,11 +435,19 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
       ca."productInfoExtractedText",
       ca."productInfoUpdatedAt",
       ca."isFixedPricePackage",
-      ca."isActive",
+      capp."isActive",
       COUNT(ki."id")::int AS "linkedKitchenItems"
     FROM "CatalogArticle" ca
+    INNER JOIN "CatalogArticleProgramPrice" capp
+      ON capp."catalogArticleId" = ca."id"
+      AND capp."programmId" = ${selectedProgramId}
     LEFT JOIN "KitchenItem" ki ON ki."catalogArticleId" = ca."id"
-    GROUP BY ca."id"
+      AND EXISTS (
+        SELECT 1 FROM "Kitchen" linked_kitchen
+        WHERE linked_kitchen."id" = ki."kitchenId"
+          AND linked_kitchen."programmId" = ${selectedProgramId}
+      )
+    GROUP BY ca."id", capp."price", capp."isActive"
     ORDER BY ca."itemType" ASC, ca."articleNumber" ASC
     `,
     prisma.$queryRaw`
@@ -441,12 +457,20 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
       cb."name",
       cb."nameDe",
       cb."description",
-      cb."price",
-      cb."isActive",
+      cbp."price",
+      cbp."isActive",
       COUNT(ki."id")::int AS "linkedKitchenItems"
     FROM "CatalogBlende" cb
+    INNER JOIN "CatalogBlendeProgramPrice" cbp
+      ON cbp."catalogBlendeId" = cb."id"
+      AND cbp."programmId" = ${selectedProgramId}
     LEFT JOIN "KitchenItem" ki ON ki."catalogBlendeId" = cb."id"
-    GROUP BY cb."id"
+      AND EXISTS (
+        SELECT 1 FROM "Kitchen" linked_kitchen
+        WHERE linked_kitchen."id" = ki."kitchenId"
+          AND linked_kitchen."programmId" = ${selectedProgramId}
+      )
+    GROUP BY cb."id", cbp."price", cbp."isActive"
     ORDER BY cb."code" ASC
     `,
     prisma.$queryRaw`
@@ -456,12 +480,20 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
       cs."name",
       cs."nameDe",
       cs."description",
-      cs."price",
-      cs."isActive",
+      csp."price",
+      csp."isActive",
       COUNT(ki."id")::int AS "linkedKitchenItems"
     FROM "CatalogService" cs
+    INNER JOIN "CatalogServiceProgramPrice" csp
+      ON csp."catalogServiceId" = cs."id"
+      AND csp."programmId" = ${selectedProgramId}
     LEFT JOIN "KitchenItem" ki ON ki."catalogServiceId" = cs."id"
-    GROUP BY cs."id"
+      AND EXISTS (
+        SELECT 1 FROM "Kitchen" linked_kitchen
+        WHERE linked_kitchen."id" = ki."kitchenId"
+          AND linked_kitchen."programmId" = ${selectedProgramId}
+      )
+    GROUP BY cs."id", csp."price", csp."isActive"
     ORDER BY cs."code" ASC
     `,
     prisma.$queryRaw`
@@ -490,6 +522,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
     INNER JOIN "Kitchen" k ON k."id" = kcp."kitchenId"
     LEFT JOIN "KitchenItem" ki ON ki."kitchenId" = kcp."kitchenId"
       AND ki."code" = kcp."sourceKitchenItemCode"
+    WHERE k."programmId" = ${selectedProgramId}
     ORDER BY k."name" ASC, kcp."sortOrder" ASC, kcp."partKey" ASC
     `,
   ]);
@@ -504,7 +537,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
           description={<AdminText i18nKey="catalogAdmin.catalogDescription" fallback="Reusable articles, blenden, and services." />}
           actions={(
             <div style={actionRowStyle}>
-              <ActionLink href="/api/admin/catalog/export" secondary>
+              <ActionLink href={`/api/admin/catalog/export?programmId=${encodeURIComponent(selectedProgramId)}`} secondary>
                 <AdminText i18nKey="catalogAdmin.exportExcel" fallback="Export Excel" />
               </ActionLink>
               <ActionLink href="/admin/catalog/imports">
@@ -516,6 +549,33 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
         {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
         {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
+        <nav style={programCatalogNavStyle} aria-label="Catalog program">
+          <div>
+            <strong style={programCatalogTitleStyle}>
+              <AdminText i18nKey="catalogAdmin.programCatalogs" fallback="Program catalogs" />
+            </strong>
+            <p style={programCatalogHelpStyle}>
+              <AdminText i18nKey="catalogAdmin.programCatalogsDescription" fallback="Impuls and Burger articles and prices are managed separately." />
+            </p>
+          </div>
+          <div style={programCatalogTabsStyle}>
+            {catalogPrograms.map((program) => {
+              const isSelected = program.programmId === selectedProgramId;
+              return (
+                <Link
+                  key={program.programmId}
+                  href={`/admin/catalog/articles?programmId=${encodeURIComponent(program.programmId)}`}
+                  style={isSelected ? programCatalogTabActiveStyle : programCatalogTabStyle}
+                  aria-current={isSelected ? "page" : undefined}
+                >
+                  <span>{program.name || program.programmId}</span>
+                  <small style={programCatalogTabMetaStyle}>{program.programmId}</small>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
+
         <AdminSection
           title={<AdminText i18nKey="catalogAdmin.articles" fallback="Articles" />}
           actions={(
@@ -523,6 +583,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
               <summary style={secondaryButtonStyle}><AdminText i18nKey="catalogAdmin.addArticle" fallback="Add article" /></summary>
               <CatalogArticleForm
                 action="/api/admin/catalog/articles"
+                programmId={selectedProgramId}
                 submitLabel={<AdminText i18nKey="catalogAdmin.createArticle" fallback="Create article" />}
               />
             </details>
@@ -587,6 +648,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                                 <CatalogArticleForm
                                   action={`/api/admin/catalog/articles/${article.id}`}
                                   article={article}
+                                  programmId={selectedProgramId}
                                   submitLabel={<AdminText i18nKey="catalogAdmin.saveArticle" fallback="Save article" />}
                                   cancelHref={buildCatalogListHref(resolvedSearchParams)}
                                 />
@@ -602,6 +664,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                               confirmKey="catalogAdmin.deleteArticleConfirm"
                               itemLabel={article.articleNumber}
                               linkedKitchenItems={article.linkedKitchenItems}
+                              programmId={selectedProgramId}
                             />
                           </div>
                         </td>
@@ -619,7 +682,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
           actions={(
             <details style={addonDetailsStyle}>
               <summary style={secondaryButtonStyle}><AdminText i18nKey="catalogAdmin.addBlende" fallback="Add blende" /></summary>
-              <CatalogAddonForm action="/api/admin/catalog/blenden" submitLabel={<AdminText i18nKey="catalogAdmin.createBlende" fallback="Create blende" />} />
+              <CatalogAddonForm action="/api/admin/catalog/blenden" programmId={selectedProgramId} submitLabel={<AdminText i18nKey="catalogAdmin.createBlende" fallback="Create blende" />} />
             </details>
           )}
         >
@@ -657,7 +720,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                             {editBlendeId === blende.id ? (
                               <details open style={editDetailsStyle}>
                                 <summary style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.editing" fallback="Editing" /></summary>
-                                <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} submitLabel={<AdminText i18nKey="catalogAdmin.saveBlende" fallback="Save blende" />} />
+                                <CatalogAddonForm action={`/api/admin/catalog/blenden/${blende.id}`} item={blende} programmId={selectedProgramId} submitLabel={<AdminText i18nKey="catalogAdmin.saveBlende" fallback="Save blende" />} />
                               </details>
                             ) : (
                               <Link href={buildCatalogEditHref(resolvedSearchParams, "editBlende", blende.id)} scroll={false} style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.edit" fallback="Edit" /></Link>
@@ -668,6 +731,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                               confirmKey="catalogAdmin.deleteBlendeConfirm"
                               itemLabel={blende.code}
                               linkedKitchenItems={blende.linkedKitchenItems}
+                              programmId={selectedProgramId}
                             />
                           </div>
                         </td>
@@ -685,7 +749,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
           actions={(
             <details style={addonDetailsStyle}>
               <summary style={secondaryButtonStyle}><AdminText i18nKey="catalogAdmin.addService" fallback="Add service" /></summary>
-              <CatalogAddonForm action="/api/admin/catalog/services" submitLabel={<AdminText i18nKey="catalogAdmin.createService" fallback="Create service" />} />
+              <CatalogAddonForm action="/api/admin/catalog/services" programmId={selectedProgramId} submitLabel={<AdminText i18nKey="catalogAdmin.createService" fallback="Create service" />} />
             </details>
           )}
         >
@@ -723,7 +787,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                             {editServiceId === service.id ? (
                               <details open style={editDetailsStyle}>
                                 <summary style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.editing" fallback="Editing" /></summary>
-                                <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} submitLabel={<AdminText i18nKey="catalogAdmin.saveService" fallback="Save service" />} />
+                                <CatalogAddonForm action={`/api/admin/catalog/services/${service.id}`} item={service} programmId={selectedProgramId} submitLabel={<AdminText i18nKey="catalogAdmin.saveService" fallback="Save service" />} />
                               </details>
                             ) : (
                               <Link href={buildCatalogEditHref(resolvedSearchParams, "editService", service.id)} scroll={false} style={editSummaryStyle}><AdminText i18nKey="catalogAdmin.edit" fallback="Edit" /></Link>
@@ -734,6 +798,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
                               confirmKey="catalogAdmin.deleteServiceConfirm"
                               itemLabel={service.code}
                               linkedKitchenItems={service.linkedKitchenItems}
+                              programmId={selectedProgramId}
                             />
                           </div>
                         </td>
@@ -823,6 +888,68 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
 
 const addonDetailsStyle = {
   position: "relative",
+};
+
+const programCatalogNavStyle = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: 18,
+  flexWrap: "wrap",
+  padding: 18,
+  border: "1px solid var(--app-border)",
+  borderRadius: 16,
+  background: "var(--color-card)",
+  boxShadow: "var(--app-shadow-soft)",
+};
+
+const programCatalogTitleStyle = {
+  color: "var(--app-text)",
+  fontSize: 17,
+  fontWeight: 900,
+};
+
+const programCatalogHelpStyle = {
+  margin: "4px 0 0",
+  color: "var(--app-text-muted)",
+  fontSize: 13,
+  fontWeight: 650,
+};
+
+const programCatalogTabsStyle = {
+  display: "flex",
+  alignItems: "stretch",
+  gap: 10,
+  flexWrap: "wrap",
+};
+
+const programCatalogTabStyle = {
+  display: "grid",
+  gap: 2,
+  minWidth: 150,
+  padding: "11px 16px",
+  border: "1px solid var(--app-border)",
+  borderRadius: 12,
+  background: "var(--app-surface)",
+  color: "var(--app-text)",
+  textDecoration: "none",
+  fontSize: 14,
+  fontWeight: 850,
+};
+
+const programCatalogTabActiveStyle = {
+  ...programCatalogTabStyle,
+  border: "1px solid var(--app-accent)",
+  background: "var(--app-accent)",
+  color: "white",
+  boxShadow: "0 8px 20px rgba(115, 80, 55, 0.18)",
+};
+
+const programCatalogTabMetaStyle = {
+  opacity: 0.75,
+  fontSize: 11,
+  fontWeight: 750,
+  letterSpacing: "0.04em",
 };
 
 const addonFormStyle = {

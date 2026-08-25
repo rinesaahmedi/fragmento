@@ -16,6 +16,11 @@ const SVG_BY_SLUG = {
   "l-shaped-kitchen": path.join(process.cwd(), "kitchen-svgs", "active", "l-shaped-kitchen.svg"),
   "ab-105808": path.join(process.cwd(), "public", "plans", "AB 105808.svg"),
   "ab-105845": path.join(process.cwd(), "public", "plans", "AB 105845.svg"),
+  "ab-105848": path.join(process.cwd(), "public", "plans", "AB 105845.svg"),
+  "ab-105851": path.join(process.cwd(), "public", "plans", "AB 105845.svg"),
+  "ab-105854": path.join(process.cwd(), "public", "plans", "AB 105845.svg"),
+  "ab-105857": path.join(process.cwd(), "public", "plans", "AB 105845.svg"),
+  "ab-105860": path.join(process.cwd(), "public", "plans", "AB 105845.svg"),
   "105845-modul-2": path.join(process.cwd(), "public", "plans", "AB 105845.svg"),
   "test-3d-kitchen": path.join(process.cwd(), "kitchen-svgs", "active", "test-3d-kitchen.svg"),
 };

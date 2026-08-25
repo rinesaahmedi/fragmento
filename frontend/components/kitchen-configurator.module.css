@@ -541,6 +541,15 @@
   pointer-events: none;
 }
 
+/* Appliance internals are technical details, not selectable furniture surfaces.
+   Repaint their source linework above every selection tint in a stable light grey. */
+.planPersistentLightDetail {
+  z-index: 15;
+  background: transparent;
+  filter: brightness(0) saturate(100%) invert(72%);
+  pointer-events: none;
+}
+
 .planHotspotLayer {
   position: absolute;
   inset: 0;

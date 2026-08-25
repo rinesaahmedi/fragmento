@@ -1,6 +1,9 @@
 {
   "sourceDocument": "Amica_Claims_Chatbot_Knowledge_Tables_DECISION_GUIDE.docx",
   "scope": "claims_page_chatbot",
+  "disabledProductCodes": [
+    "OL-KMI754000E"
+  ],
   "productAliasMap": [
     {
       "alias": "A-EGSPV597210",
@@ -44,15 +47,19 @@
     },
     {
       "alias": "OL-KMI 754 000 E",
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob"
+      "sourceSection": "OL-KMI754000E catalog mapping; manual model KMI 754 000 C / DI 6402 B"
     },
     {
       "alias": "KMI 754 000 E",
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob"
+      "sourceSection": "OL-KMI754000E catalog mapping; manual model KMI 754 000 C / DI 6402 B"
     },
     {
-      "alias": "KMI 754 600 C",
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob"
+      "alias": "KMI 754 000 C",
+      "sourceSection": "OL-KMI754000E manual model KMI 754 000 C / DI 6402 B"
+    },
+    {
+      "alias": "DI 6402 B",
+      "sourceSection": "OL-KMI754000E manual model KMI 754 000 C / DI 6402 B"
     },
     {
       "alias": "EWA 34660 W",
@@ -1473,23 +1480,28 @@
     },
     {
       "id": "kmi-754-600-c-appliance-does-not-work",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Appliance does not work",
       "possibleCause": "No power.",
-      "safeUserCheck": "Check fuse/power supply only.",
-      "claimTrigger": "Create claim if power is available but hob still does not work.",
+      "safeUserCheck": "Check the household fuse and replace it if blown. Do not open the hob or alter its electrical connection.",
+      "claimTrigger": "Create a claim if household power and the fuse are OK but the hob still does not work.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, p. 46 - Troubleshooting",
       "matchTerms": [
         "Appliance does not work",
         "not working",
@@ -1500,14 +1512,19 @@
     },
     {
       "id": "kmi-754-600-c-sensor-fields-do-not-respond-when-touched",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Sensor fields do not respond when touched",
       "possibleCause": "Appliance not turned on, sensor touched too briefly, or multiple sensors touched at same time.",
       "safeUserCheck": "Turn on appliance. Touch one sensor field longer; use only one sensor at a time except when switching off a zone.",
@@ -1516,67 +1533,91 @@
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, p. 46 - Troubleshooting",
       "matchTerms": [
-        "Sensor fields do not respond when touched"
+        "Sensor fields do not respond when touched",
+        "hob touch controls not working",
+        "controls unresponsive",
+        "sensor touched too briefly"
       ]
     },
     {
       "id": "kmi-754-600-c-appliance-does-not-respond-and-emits-extended-beep",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Appliance does not respond and emits extended beep",
       "possibleCause": "Wrong sensor touched, sensors touched too briefly, or sensor fields covered/dirty.",
-      "safeUserCheck": "Reconnect/reset the hob; uncover or clean sensor fields.",
-      "claimTrigger": "Create claim if repeated after reset/cleaning.",
+      "safeUserCheck": "Reconnect or restart the hob, then uncover and clean the sensor fields. Touch the intended sensor for at least one second.",
+      "claimTrigger": "Create a claim if the extended beep and unresponsive controls return after cleaning and restart.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, p. 46 - Troubleshooting",
       "matchTerms": [
-        "Appliance does not respond and emits extended beep"
+        "Appliance does not respond and emits extended beep",
+        "hob long beep no response",
+        "extended beep",
+        "touch controls covered"
       ]
     },
     {
       "id": "kmi-754-600-c-appliance-switches-itself-off",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Appliance switches itself off",
-      "possibleCause": "No sensor touched for 10 seconds after activation, or sensor fields covered/dirty.",
-      "safeUserCheck": "Switch on and set heat without delay; clean/uncover sensor fields.",
-      "claimTrigger": "Create claim if it happens during normal use.",
+      "possibleCause": "No sensor was touched for 10 seconds after activation, no heat setting was selected within 1 minute, or the sensor fields are covered or dirty.",
+      "safeUserCheck": "Switch the hob on and select a cooking zone and heat setting without delay. Uncover and clean the sensor fields.",
+      "claimTrigger": "No claim is needed when no setting was selected in time. Create a claim if it switches off again during correctly configured normal use.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, pp. 44 and 46 - Operation / Troubleshooting",
       "matchTerms": [
-        "Appliance switches itself off"
+        "Appliance switches itself off",
+        "hob turns off after 10 seconds",
+        "hob turns off after 1 minute",
+        "hob switches off after activation"
       ]
     },
     {
       "id": "kmi-754-600-c-single-cooking-zone-switches-off-and-residual-heat-h-is-shown",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Single cooking zone switches off and residual heat “H” is shown",
       "possibleCause": "Limited cook time, sensor fields covered/dirty, or electronic components overheated.",
       "safeUserCheck": "Switch on zone again; clean sensors; let appliance cool and check ventilation is not blocked.",
@@ -1585,73 +1626,92 @@
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, p. 46 - Troubleshooting",
       "matchTerms": [
-        "Single cooking zone switches off and residual heat “H” is shown"
+        "Single cooking zone switches off and residual heat “H” is shown",
+        "cooking zone switches off H",
+        "one zone turns off and H appears",
+        "zone overheated"
       ]
     },
     {
       "id": "kmi-754-600-c-residual-heat-indicator-disappears-although-zones-are-hot",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Residual heat indicator disappears although zones are hot",
       "possibleCause": "Power outage or appliance disconnected.",
-      "safeUserCheck": "Warn user not to touch hot zones. Indicator may show again after appliance is switched on/off.",
+      "safeUserCheck": "Treat every recently used cooking zone as hot and do not touch it. After a power outage, H may be absent until the appliance is switched on and off again.",
       "claimTrigger": "No claim unless indicator repeatedly fails.",
       "chatbotDecision": "NO_CLAIM_NORMAL",
-      "evidenceToRequest": [
-        "photo of display/error code",
-        "short description of what the user already checked"
-      ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KMI754000E manual, pp. 42 and 46 - Residual heat / Troubleshooting",
       "matchTerms": [
-        "Residual heat indicator disappears although zones are hot"
+        "Residual heat indicator disappears although zones are hot",
+        "H not displayed after power outage",
+        "hot zone no H indicator"
       ]
     },
     {
       "id": "kmi-754-600-c-hob-cooking-surface-is-cracked",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
-      "problem": "Hob cooking surface is cracked",
-      "possibleCause": "Glass/ceramic surface damaged.",
-      "safeUserCheck": "Stop using immediately and disconnect power/switch off circuit breaker.",
-      "claimTrigger": "Urgent claim/service case.",
+      "model": "OL-KMI754000E",
+      "problem": "Hob cooking surface is cracked, chipped, or broken",
+      "possibleCause": "The glass-ceramic cooking surface is physically damaged and can expose an electric-shock hazard.",
+      "safeUserCheck": "Stop using the hob immediately. Unplug it or switch off the main circuit breaker; do not touch or continue using the damaged surface.",
+      "claimTrigger": "Create an urgent service claim immediately.",
       "chatbotDecision": "URGENT_CLAIM_STOP_USE",
       "evidenceToRequest": [
         "photo of leak/damage",
         "product model/serial number",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, pp. 32-33, 46 and 49 - Cracked cooking surface safety",
       "matchTerms": [
         "Hob cooking surface is cracked",
         "cracked hob glass",
         "hob glass cracked",
-        "cracked glass"
+        "cracked glass",
+        "chipped hob",
+        "broken cooking surface"
       ]
     },
     {
       "id": "kmi-754-600-c-problem-still-not-remedied",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Problem still not remedied",
       "possibleCause": "Fault remains after basic user checks.",
       "safeUserCheck": "Disconnect power or switch off circuit breaker/fuse.",
@@ -1661,31 +1721,36 @@
         "product model/serial number",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, pp. 46 and 49-50 - Unresolved fault / Qualified service",
       "matchTerms": [
         "Problem still not remedied"
       ]
     },
     {
       "id": "kmi-754-600-c-buzzing-sound",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Buzzing sound",
       "possibleCause": "Cooling fan operating to cool internal electronics.",
-      "safeUserCheck": "Explain this can be normal.",
+      "safeUserCheck": "This can be normal because the cooling fan operates to cool internal electronics. No action is needed if the hob otherwise works normally.",
       "claimTrigger": "No claim unless sound is unusually loud, new, or continuous.",
       "chatbotDecision": "NO_CLAIM_NORMAL",
       "evidenceToRequest": [
         "video for noise/vibration",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, p. 46 - Normal induction-hob sounds",
       "matchTerms": [
         "Buzzing sound",
         "buzzing",
@@ -1694,24 +1759,29 @@
     },
     {
       "id": "kmi-754-600-c-hissing-whistling-sounds",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Hissing/whistling sounds",
       "possibleCause": "Several cooking zones at full power; frequency noise from coils.",
-      "safeUserCheck": "Explain this can be normal.",
+      "safeUserCheck": "This can be normal when several zones operate at full power. Cookware can also cause a distinctive whiz; confirm that induction-compatible cookware is being used.",
       "claimTrigger": "No claim unless abnormal or accompanied by malfunction.",
       "chatbotDecision": "NO_CLAIM_NORMAL",
       "evidenceToRequest": [
         "video for noise/vibration",
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, pp. 40 and 46 - Normal induction-hob sounds",
       "matchTerms": [
         "Hissing/whistling sounds",
         "hissing",
@@ -1720,25 +1790,302 @@
     },
     {
       "id": "kmi-754-600-c-hob-cooking-zones-will-not-operate",
-      "productCode": "KMI 754 600 C",
+      "productCode": "OL-KMI754000E",
       "aliases": [
+        "OL-KMI754000E",
         "OL-KMI 754 000 E",
         "KMI 754 000 E",
-        "KMI 754 600 C"
+        "KMI754000E",
+        "KMI 754 000 C",
+        "KMI754000C",
+        "DI 6402 B",
+        "DI6402B"
       ],
       "itemType": "induction_hob",
-      "model": "KMI 754 600 C / KMI 754 000 E",
+      "model": "OL-KMI754000E",
       "problem": "Hob/cooking zones will not operate",
       "possibleCause": "Faulty electronics.",
-      "safeUserCheck": "Reset by unplugging/disconnecting fuse for a few minutes.",
+      "safeUserCheck": "Reset the hob by unplugging it or disconnecting its fuse for a few minutes, then restore power. Do not open the appliance.",
       "claimTrigger": "Create claim if reset does not solve it.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KMI 754 600 C / KMI 754 000 E - Induction Hob",
+      "sourceSection": "OL-KMI754000E manual, p. 46 - Troubleshooting",
       "matchTerms": [
-        "Hob/cooking zones will not operate"
+        "Hob/cooking zones will not operate",
+        "cooking zones cannot be operated",
+        "hob faulty electronics",
+        "hob reset fuse"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-error-e4-e5",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Error E4 or E5 - temperature sensor damaged",
+      "possibleCause": "The manual identifies E4/E5 as a damaged temperature sensor.",
+      "safeUserCheck": "Stop using the affected cooking zone. Do not open the hob or attempt to inspect or replace the sensor.",
+      "claimTrigger": "Create a service claim when E4 or E5 is displayed.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo of the displayed error code",
+        "product model/serial number"
+      ],
+      "sourceSection": "OL-KMI754000E manual, p. 47 - Error codes",
+      "matchTerms": [
+        "hob error E4",
+        "hob error E5",
+        "E4 temperature sensor",
+        "E5 temperature sensor"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-error-e7-e8",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Error E7 or E8 - IGBT temperature sensor damaged",
+      "possibleCause": "The manual identifies E7/E8 as a damaged IGBT temperature sensor.",
+      "safeUserCheck": "Stop using the hob. Do not open it or attempt to inspect or replace the internal sensor.",
+      "claimTrigger": "Create a service claim when E7 or E8 is displayed.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo of the displayed error code",
+        "product model/serial number"
+      ],
+      "sourceSection": "OL-KMI754000E manual, p. 47 - Error codes",
+      "matchTerms": [
+        "hob error E7",
+        "hob error E8",
+        "E7 IGBT sensor",
+        "E8 IGBT sensor"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-error-e2-e3",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Error E2 or E3 - incorrect supply voltage",
+      "possibleCause": "The hob detects an incorrect electrical supply voltage.",
+      "safeUserCheck": "Stop using the hob and do not open, rewire, or alter it. The supply and installation voltage must be checked by qualified service or a certified installer.",
+      "claimTrigger": "Create a service claim for E2 or E3 so the electrical supply and installation can be checked safely.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo of the displayed error code",
+        "product model/serial number"
+      ],
+      "sourceSection": "OL-KMI754000E manual, pp. 38 and 47 - Qualified electrical connection / Error codes",
+      "matchTerms": [
+        "hob error E2",
+        "hob error E3",
+        "E2 incorrect supply voltage",
+        "E3 incorrect supply voltage"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-error-e6-e9",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Error E6 or E9 - hob overheated",
+      "possibleCause": "The hob has overheated.",
+      "safeUserCheck": "Switch the hob off and allow it to cool completely before using it again. Do not open the appliance.",
+      "claimTrigger": "Create a claim if E6 or E9 returns after the hob has fully cooled during normal use.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the displayed error code",
+        "short description of the cooking zones and heat settings in use"
+      ],
+      "sourceSection": "OL-KMI754000E manual, p. 47 - Error codes",
+      "matchTerms": [
+        "hob error E6",
+        "hob error E9",
+        "E6 hob overheated",
+        "E9 hob overheated"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-residual-heat-h",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "H is shown on a cooking-zone display after use",
+      "possibleCause": "H is the residual-heat warning, not a fault code. The glass in that zone is still hot.",
+      "safeUserCheck": "Do not touch the cooking zone or place heat-sensitive objects on it until H disappears after cooling.",
+      "claimTrigger": "No claim is needed for the normal residual-heat H indication.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KMI754000E manual, p. 42 - Residual heat indicator H",
+      "matchTerms": [
+        "residual heat H",
+        "H shown after cooking",
+        "hob shows H after cooking",
+        "shows H after cooking",
+        "hob display H",
+        "hot cooking zone H"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-cookware-not-detected",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Cookware is not detected and the cooking zone does not heat",
+      "possibleCause": "The pan may be missing, unsuitable for induction, too small, or have an inadequate ferromagnetic base.",
+      "safeUserCheck": "Try a flat, induction-compatible pan whose magnetic base matches the cooking-zone size. If appropriate, test it on a smaller zone.",
+      "claimTrigger": "Create a claim if known-compatible cookware is not detected on any cooking zone.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the cookware marking and base",
+        "short description of which zones and pans were tested"
+      ],
+      "sourceSection": "OL-KMI754000E manual, pp. 40-42 - Cookware and pan detection",
+      "matchTerms": [
+        "cookware not detected",
+        "pan not detected",
+        "hob does not recognize pan",
+        "unsuitable induction cookware",
+        "zone does not heat pan"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-child-lock-active",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Touch controls are disabled because Child Lock is active",
+      "possibleCause": "Child Lock disables all touch controls except the main on/off control.",
+      "safeUserCheck": "With the hob on, touch and hold the Child Lock sensor for 3 seconds until the lock indication disappears.",
+      "claimTrigger": "No claim is needed if the controls work after unlocking. Create a claim if Child Lock cannot be deactivated.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KMI754000E manual, p. 44 - Child Lock",
+      "matchTerms": [
+        "hob child lock",
+        "touch controls locked",
+        "cannot use hob controls lock",
+        "deactivate child lock"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-booster-reduces-to-nine",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Booster automatically reduces from P to level 9",
+      "possibleCause": "Booster is limited to a maximum of 5 minutes and then automatically reduces to heat setting 9.",
+      "safeUserCheck": "No action is required; continue at level 9 or select another setting.",
+      "claimTrigger": "No claim is needed for the documented Booster time limit.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KMI754000E manual, p. 44 - Booster function",
+      "matchTerms": [
+        "booster reduces from P to 9",
+        "booster drops to level 9",
+        "P changes to 9",
+        "booster lasts 5 minutes"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-cooking-zone-auto-off",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Cooking zone switches off after prolonged operation",
+      "possibleCause": "The automatic safety shutoff activates after 8 hours at levels 1-3, 4 hours at levels 4-6, or 2 hours at levels 7-9.",
+      "safeUserCheck": "This safety feature cannot be disabled. Switch the zone on again only if continued cooking is safe and intended.",
+      "claimTrigger": "No claim is needed when the zone stops at the documented safety limit. Create a claim if it switches off much earlier during normal use.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KMI754000E manual, p. 45 - Cooking zone auto off",
+      "matchTerms": [
+        "cooking zone auto off",
+        "zone turns off after 8 hours",
+        "zone turns off after 4 hours",
+        "zone turns off after 2 hours",
+        "hob safety shutoff"
+      ]
+    },
+    {
+      "id": "ol-kmi754000e-kitchen-timer-beep",
+      "productCode": "OL-KMI754000E",
+      "aliases": [
+        "OL-KMI754000E",
+        "OL-KMI 754 000 E",
+        "KMI 754 000 C",
+        "DI 6402 B"
+      ],
+      "itemType": "induction_hob",
+      "model": "OL-KMI754000E",
+      "problem": "Kitchen Timer beeps for about 30 seconds when time expires",
+      "possibleCause": "The programmed Kitchen Timer has reached zero.",
+      "safeUserCheck": "Touch any sensor to mute the beeping. Otherwise it stops after about 30 seconds.",
+      "claimTrigger": "No claim is needed for the normal Kitchen Timer completion beep.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KMI754000E manual, p. 45 - Kitchen Timer",
+      "matchTerms": [
+        "hob kitchen timer beep",
+        "timer beeps 30 seconds",
+        "timer alarm after countdown",
+        "mute hob timer"
       ]
     },
     {

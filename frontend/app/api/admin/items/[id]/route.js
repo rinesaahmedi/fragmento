@@ -25,6 +25,7 @@ export async function POST(request, { params }) {
           select: {
             id: true,
             slug: true,
+            programmId: true,
           },
         },
       },

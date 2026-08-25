@@ -1,66 +1,66 @@
 import { mapAdminMutationError, redirectWithFlash, validateCatalogAddonInput } from "../../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../../lib/auth";
-import { buildSyncedKitchenItemPrice, shouldSyncKitchenItemPrice } from "../../../../../../lib/catalog-pricing";
+import {
+  catalogProgramPath,
+  deleteProgramPriceOrMaster,
+  requireCatalogProgramId,
+  splitProgramPrice,
+  syncCatalogProgramKitchenItemPrices,
+} from "../../../../../../lib/catalog-program-admin";
 import { prisma } from "../../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
+  let programmId = "IP 2200";
 
   try {
     const formData = await request.formData();
+    programmId = requireCatalogProgramId(formData);
     const intentValues = formData.getAll("_intent");
     const intent = String(intentValues[intentValues.length - 1] || "update");
 
     if (intent === "delete") {
-      const linkedCount = await prisma.kitchenItem.count({
-        where: { catalogServiceId: id },
-      });
-      if (linkedCount > 0) {
-        return redirectWithFlash(request, "/admin/catalog/articles", "error", `Service is linked to ${linkedCount} kitchen item(s). Remove those links before deleting it.`);
+      const result = await prisma.$transaction((tx) => deleteProgramPriceOrMaster(tx, {
+        programmId,
+        entityId: id,
+        programPriceDelegate: tx.catalogServiceProgramPrice,
+        programPriceDeleteWhere: { programmId, catalogServiceId: id },
+        programPriceEntityWhere: { catalogServiceId: id },
+        masterDelegate: tx.catalogService,
+        linkedItemWhere: { catalogServiceId: id },
+      }));
+      if (result.linkedCount > 0) {
+        return redirectWithFlash(request, catalogProgramPath(programmId), "error", `Service is linked to ${result.linkedCount} kitchen item(s) in this program. Remove those links before deleting it.`);
       }
-
-      await prisma.catalogService.delete({
-        where: { id },
-      });
-      return redirectWithFlash(request, "/admin/catalog/articles", "success", "Service deleted.");
+      return redirectWithFlash(request, catalogProgramPath(programmId), "success", "Service removed from this catalog.");
     }
 
     const data = validateCatalogAddonInput(formData, "Service");
+    const { masterData, price, isActive } = splitProgramPrice(data);
 
     const syncedCount = await prisma.$transaction(async (tx) => {
-      await tx.catalogService.update({
+      const service = await tx.catalogService.update({
         where: { id },
-        data,
+        data: programmId === "IP 2200" ? data : masterData,
       });
-
-      const linkedItems = await tx.kitchenItem.findMany({
+      await tx.catalogServiceProgramPrice.upsert({
+        where: { programmId_catalogServiceId: { programmId, catalogServiceId: id } },
+        create: { programmId, catalogServiceId: id, code: service.code, price, isActive },
+        update: { code: service.code, price, isActive },
+      });
+      await tx.kitchenItem.updateMany({
         where: { catalogServiceId: id },
-        include: {
-          kitchen: { select: { slug: true } },
-          catalogArticle: true,
-          catalogBlende: true,
-          catalogService: true,
-        },
+        data: { name: service.name, nameDe: service.nameDe || null },
       });
-
-      let count = 0;
-      for (const item of linkedItems) {
-        if (!shouldSyncKitchenItemPrice(item, { requireMatched: false })) continue;
-        const price = buildSyncedKitchenItemPrice(item);
-        if (price == null) continue;
-        await tx.kitchenItem.update({
-          where: { id: item.id },
-          data: { price },
-        });
-        count += 1;
-      }
-
-      return count;
+      return syncCatalogProgramKitchenItemPrices(tx, {
+        programmId,
+        where: { catalogServiceId: id },
+      });
     });
 
-    return redirectWithFlash(request, "/admin/catalog/articles", "success", `Service updated. ${syncedCount} linked kitchen item(s) synced.`);
+    return redirectWithFlash(request, catalogProgramPath(programmId), "success", `Service updated. ${syncedCount} linked kitchen item(s) synced.`);
   } catch (error) {
-    return redirectWithFlash(request, "/admin/catalog/articles", "error", mapAdminMutationError(error, "Service"));
+    return redirectWithFlash(request, catalogProgramPath(programmId), "error", mapAdminMutationError(error, "Service"));
   }
 }

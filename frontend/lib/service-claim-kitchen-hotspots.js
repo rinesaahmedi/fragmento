@@ -741,6 +741,10 @@ for (const alias of ["ab-105751", "ab-105754", "ab-105745"]) {
 }
 SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105839"] =
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105842"];
+for (const alias of ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105860"]) {
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] =
+    SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105845"];
+}
 
 function normalizeClaimPart(part) {
   const partKey = String(part?.partKey || "").trim();

@@ -1752,6 +1752,20 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
   };
 }
 
+export function getMissingEmailSmtpConfig(env = process.env) {
+  const smtpHost = String(env.SMTP_HOST || "smtp.gmail.com").trim();
+  const smtpUser = String(env.SMTP_USER || "").trim();
+  const smtpFrom = String(env.SMTP_FROM || "").trim();
+  const smtpPass = String(env.SMTP_PASS || "");
+
+  return [
+    !smtpHost ? "SMTP_HOST" : "",
+    !smtpUser ? "SMTP_USER" : "",
+    !smtpPass ? "SMTP_PASS" : "",
+    !smtpFrom ? "SMTP_FROM" : "",
+  ].filter(Boolean);
+}
+
 export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText, excludedAttachmentKeys = [] }) {
   const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
@@ -1759,14 +1773,9 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();
   const smtpPass = String(process.env.SMTP_PASS || "");
 
-  if (!smtpHost || !smtpUser || !smtpPass || !smtpFrom) {
-    const missing = [
-      !smtpHost ? "SMTP_HOST" : "",
-      !smtpUser ? "SMTP_USER" : "",
-      !smtpPass ? "SMTP_PASS" : "",
-      !smtpFrom ? "SMTP_FROM" : "",
-    ].filter(Boolean).join(", ");
-    throw new Error(`Email SMTP config is missing: ${missing}`);
+  const missingSmtpConfig = getMissingEmailSmtpConfig();
+  if (missingSmtpConfig.length) {
+    throw new Error(`Email SMTP config is missing: ${missingSmtpConfig.join(", ")}`);
   }
 
   const transporter = nodemailer.createTransport({

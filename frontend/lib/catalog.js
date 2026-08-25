@@ -1311,7 +1311,12 @@ async function getOrdersForAdminByKind(filters = {}, orderKind = ORDER_KIND_LIVE
     orderBy: { createdAt: "desc" },
   });
 
-  return addContractOrderSequence(orders, orderKind);
+  const serializableOrders = orders.map((order) => ({
+    ...order,
+    totalPrice: Number(order.totalPrice || 0),
+  }));
+
+  return addContractOrderSequence(serializableOrders, orderKind);
 }
 
 export async function getOrderById(id) {

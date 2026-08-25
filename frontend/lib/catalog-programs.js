@@ -1,4 +1,5 @@
 import { DEFAULT_KITCHEN_PROGRAMM_ID } from "./admin-forms";
+import { getCatalogProgramDisplayName, sortCatalogPrograms } from "./catalog-program-order";
 import { prisma } from "./prisma";
 
 function normalizeProgramId(value) {
@@ -47,10 +48,11 @@ export async function listCatalogPrograms() {
     });
   }
 
-  return [...programById.values()]
-    .map((program) => ({
-      ...program,
-      kitchenCount: kitchenCountByProgramId.get(normalizeProgramId(program.programmId)) || 0,
-    }))
-    .sort((left, right) => left.programmId.localeCompare(right.programmId));
+  const catalogPrograms = [...programById.values()].map((program) => ({
+    ...program,
+    name: getCatalogProgramDisplayName(program),
+    kitchenCount: kitchenCountByProgramId.get(normalizeProgramId(program.programmId)) || 0,
+  }));
+
+  return sortCatalogPrograms(catalogPrograms);
 }

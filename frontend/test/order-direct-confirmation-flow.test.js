@@ -25,6 +25,9 @@ test("paid Stripe checkout sends automatic confirmation after successful payment
   assert.match(stripePaymentsSource, /maybeSendPaidOrderConfirmation\(updatedOrder,\s*\{\s*orderKind\s*\}\)/);
   assert.match(stripePaymentsSource, /paymentStatus:\s*isPaid \? "PAID"/);
   assert.match(stripePaymentsSource, /await sendOrderConfirmationEmail\(\{\s*order\s*\}\)/);
+  assert.match(stripePaymentsSource, /getMissingEmailSmtpConfig\(\)/);
+  assert.match(stripePaymentsSource, /Skipping paid order confirmation email/);
+  assert.match(stripePaymentsSource, /Could not send paid order confirmation email/);
   assert.match(stripePaymentsSource, /data:\s*\{\s*status:\s*"CONFIRMED"\s*\}/);
   assert.match(stripePaymentsSource, /orderStatus === "CONFIRMED" \|\| orderStatus === "EMAILED" \|\| orderStatus === "CANCELLED"/);
 });

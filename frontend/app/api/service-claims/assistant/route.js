@@ -3298,8 +3298,14 @@ function findClaimsChatbotKnowledgeMatch({ question, claim, selectedAreas, conve
   const typedApplianceTypes = detectKnowledgeApplianceTypes(combinedText, selectedAreas);
   const areaApplianceTypes = claimsAreaApplianceTypes(selectedAreas);
   const applianceTypes = dedupe([...typedApplianceTypes, ...areaApplianceTypes]);
+  const disabledProductCodes = new Set(
+    arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.disabledProductCodes)
+      .map((code) => normalizeClaimsMatchText(code))
+      .filter(Boolean)
+  );
 
   const scored = arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries)
+    .filter((entry) => !disabledProductCodes.has(normalizeClaimsMatchText(entry?.productCode)))
     .map((entry) => {
       const aliasMatched = arrayValue(entry?.aliases).some((alias) =>
         compactCombined.includes(normalizeClaimsMatchText(alias))

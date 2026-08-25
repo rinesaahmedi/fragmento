@@ -305,18 +305,23 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105842-FILLER-500": "12",
   "CAB-WALL-AB105842-H6002-L2": "13",
   "CAB-WALL-AB105842-H6002-L3": "14",
-  "WM-AB105845-EWA34660W": "4",
-  "DISH-AB105845-600": "5",
-  "CAB-BASE-AB105845-US2A60": "6",
-  "CAB-WALL-AB105845-US60-1": "7",
-  "CAB-WALL-AB105845-US60-2": "8",
-  "CAB-WALL-AB105845-US60-3": "9",
-  "CAB-WALL-AB105845-US60-4": "10",
-  "LIGHT-AB105845-LED": "11",
+  "SINK-BASE-AB105845-600": "3",
   "REF-AB105845-KGCN388140E": "4",
-  "CAB-COOK-AB105845-US60-L": "5",
-  "CAB-COOK-AB105845-US60-R": "6",
-  "HOOD-AB105845-KHF664611S": "7",
+  "CAB-BASE-AB105845-US60-1": "5",
+  "CAB-BASE-AB105845-US30-1": "6",
+  "CAB-BASE-AB105845-US60-2": "7",
+  "CAB-BASE-AB105845-US60-3": "8",
+  "DISH-AB105845-450": "9",
+  "CAB-BASE-AB105845-US30-2": "10",
+  "CAB-WALL-AB105845-H6002-1": "11",
+  "CAB-WALL-AB105845-H3002-1": "12",
+  "CAB-HOOD-AB105845-600": "13",
+  "HOOD-AB105845-FH664621E": "13",
+  "CAB-WALL-AB105845-H6002-2": "14",
+  "CAB-WALL-AB105845-H6002-3": "15",
+  "CAB-WALL-AB105845-H6002-4": "16",
+  "CAB-WALL-AB105845-H4502": "17",
+  "CAB-WALL-AB105845-H3002-2": "18",
   "CAB-BASE-AB105809-400-R": "5",
   "CAB-BASE-AB105809-500-L": "6",
   "SINKBASE-B-600": "8",
@@ -613,24 +618,23 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-AB105752-FH664621E":
     case "HOOD-AB105755-FH664621E":
     case "HOOD-AB105757-FH664621E":
+    case "HOOD-AB105845-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
-    case "HOOD-AB105845-KHF664611S":
       return translate(
         "configurator.catalogItemNames.chimneyExtractorHood",
         language === "de" ? "Schrägesse + Filter" : "Angled extractor hood + Filter",
       );
     case "LIGHT-B-LED-001":
     case "LIGHT-C-LED-001":
-    case "LIGHT-AB105845-LED":
       return translate("configurator.catalogItemNames.ledLightingSet", "LED Lighting Set");
     case "WM-B-EWA34660W":
     case "WM-C-EWA34660W":
-    case "WM-AB105845-EWA34660W":
       return withDimensions(translate("configurator.catalogItemNames.washingMachine", "Washing machine"));
     case "SINKBASE-B-600":
     case "SINKBASE-AB105806-600":
     case "SINKBASE-AB105807-600":
+    case "SINK-BASE-AB105845-600":
     case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-AB104968-DEFAULT":
     case "SINKBASE-AB105746-DEFAULT":
@@ -641,6 +645,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
       return withDimensions(translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet"));
     case "SINKBASE-LS-600":
       return translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet");
+    case "DISH-AB105845-450":
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
@@ -653,7 +658,6 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "DISH-AB105833-600":
     case "DISH-AB105836-600":
     case "DISH-AB105842-600":
-    case "DISH-AB105845-600":
     case "DISH-AB105834-600":
     case "DISH-AB105837-600":
     case "DISH-AB105840-600":
@@ -815,23 +819,22 @@ export function getLocalizedItemInfoText(item, translate) {
     case "HOOD-AB105746-FH664621E":
     case "HOOD-AB105757-FH664621E":
     case "T3D-HOOD-001":
+    case "HOOD-AB105845-FH664621E":
       return translate("configurator.catalogItemInfo.flatPullOutHood", "Flat pull-out hood, 60 cm");
     case "HOOD-C-FH664621E":
-    case "HOOD-AB105845-KHF664611S":
       return translate("configurator.catalogItemInfo.chimneyHood", "Chimney hood, 60 cm");
     case "LIGHT-B-LED-001":
     case "LIGHT-C-LED-001":
-    case "LIGHT-AB105845-LED":
     case "T3D-LIGHT-001":
       return translate("configurator.catalogItemInfo.ledLightingSet", "LED lighting set");
     case "WM-B-EWA34660W":
     case "WM-C-EWA34660W":
-    case "WM-AB105845-EWA34660W":
     case "T3D-WASHER-001":
       return translate("configurator.catalogItemInfo.washingMachine", "Washing machine, 8 kg, 1400 rpm");
     case "SINKBASE-B-600":
     case "SINKBASE-AB105806-600":
     case "SINKBASE-AB105807-600":
+    case "SINK-BASE-AB105845-600":
     case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-AB104968-DEFAULT":
     case "SINKBASE-AB105746-DEFAULT":
@@ -841,6 +844,8 @@ export function getLocalizedItemInfoText(item, translate) {
       return translate("configurator.catalogItemInfo.defaultSinkBaseCabinet", "Default sink base cabinet");
     case "SINKBASE-LS-600":
       return translate("configurator.catalogItemInfo.us30SinkBaseCabinet", "US30, sink base cabinet");
+    case "DISH-AB105845-450":
+      return translate("configurator.catalogItemInfo.integratedDishwasher", "Fully integrated dishwasher, 45 cm");
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
@@ -853,7 +858,6 @@ export function getLocalizedItemInfoText(item, translate) {
     case "DISH-AB105833-600":
     case "DISH-AB105836-600":
     case "DISH-AB105842-600":
-    case "DISH-AB105845-600":
     case "DISH-AB105834-600":
     case "DISH-AB105837-600":
     case "DISH-AB105840-600":
@@ -923,6 +927,12 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-105845": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105848": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105851": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105854": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105857": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105860": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105744": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1422,7 +1432,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB105833-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105836-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105842-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
-  "DISH-AB105845-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-AB105845-450": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105834-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105837-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105825-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -1466,7 +1476,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "HOOD-AB105757-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB105757-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
-  "HOOD-AB105845-KHF664611S": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
+  "HOOD-AB105845-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-AB105845-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "REF-545-1800-700": KGCN388140E_GALLERY,
   "REF-B-545-1800-700": KGCN388140E_GALLERY,
@@ -1490,7 +1501,6 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB105815-KGCN388140E": KGCN388140E_GALLERY,
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
   "WM-C-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
-  "WM-AB105845-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
   "T3D-WASHER-001": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),
 };
 

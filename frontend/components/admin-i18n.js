@@ -4,6 +4,7 @@ import { Fragment, createContext, useContext, useEffect, useMemo, useRef, useSta
 import { StatusBadgeLabel } from "./admin-ui";
 import de from "../locales/admin.de.json";
 import en from "../locales/admin.en.json";
+import { formatAdminDate } from "../lib/admin-date-time";
 
 const STORAGE_KEY = "adminLanguage";
 const dictionaries = { de, en };
@@ -151,26 +152,6 @@ export function AdminStatusBadge({ status }) {
   const label = translate(`status.${statusKey}`, status === "CONFIRMED" ? "Confirmed / emailed" : status);
 
   return <StatusBadgeLabel status={status} label={label} />;
-}
-
-function formatAdminDate(value, language = "en") {
-  if (!value) return "-";
-
-  const formatter = new Intl.DateTimeFormat(language === "de" ? "de-DE" : "en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  });
-  const parts = Object.fromEntries(formatter.formatToParts(new Date(value)).map((part) => [part.type, part.value]));
-
-  if (language === "de") {
-    return `${parts.day}. ${parts.month} ${parts.year}, ${parts.hour}:${parts.minute}`;
-  }
-
-  return `${parts.day} ${parts.month} ${parts.year}, ${parts.hour}:${parts.minute}`;
 }
 
 function getLocalizedKitchenDisplayName({ slug, name }, language = "en") {

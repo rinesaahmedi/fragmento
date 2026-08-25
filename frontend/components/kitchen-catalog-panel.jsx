@@ -87,6 +87,7 @@ const ICON_MARKUP = {
   delivery_assembly:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm13.5-8.5l1.96 2.5H17V9.5h2.5zM18 18c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-2.2-12.2l-4 4-1.4-1.4-1.4 1.4 2.8 2.8 5.4-5.4-1.4-1.4z"/></svg>',
 };
+ICON_MARKUP.base_cabinet_30 = ICON_MARKUP.drawer_base_two;
 ICON_MARKUP.wall_cabinet_hood = ICON_MARKUP.hood_wall_cabinet;
 
 const TOOLTIP_PREVIEW_BY_CODE = {
@@ -106,6 +107,7 @@ const TOOLTIP_PREVIEW_BY_CODE = {
 const PRODUCT_ASSISTANT_AVATAR_SRC = "/img/Untitled%20design%20(5).png";
 
 const WIDTH_SCALED_CABINET_ICON_KEYS = new Set([
+  "base_cabinet_30",
   "dishwasher",
   "dishwasher_base",
   "drawer_base",

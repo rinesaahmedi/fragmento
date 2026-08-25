@@ -1,37 +1,53 @@
 import { mapAdminMutationError, redirectWithFlash, validateCatalogAddonInput } from "../../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../../lib/auth";
-import { buildSyncedKitchenItemPrice, shouldSyncKitchenItemPrice } from "../../../../../../lib/catalog-pricing";
+import {
+  catalogProgramPath,
+  deleteProgramPriceOrMaster,
+  requireCatalogProgramId,
+  splitProgramPrice,
+  syncCatalogProgramKitchenItemPrices,
+} from "../../../../../../lib/catalog-program-admin";
 import { prisma } from "../../../../../../lib/prisma";
 
 export async function POST(request, { params }) {
   await requireAdminApi();
   const { id } = await params;
+  let programmId = "IP 2200";
 
   try {
     const formData = await request.formData();
+    programmId = requireCatalogProgramId(formData);
     const intentValues = formData.getAll("_intent");
     const intent = String(intentValues[intentValues.length - 1] || "update");
 
     if (intent === "delete") {
-      const linkedCount = await prisma.kitchenItem.count({
-        where: { catalogBlendeId: id },
-      });
-      if (linkedCount > 0) {
-        return redirectWithFlash(request, "/admin/catalog/articles", "error", `Blende is linked to ${linkedCount} kitchen item(s). Remove those links before deleting it.`);
+      const result = await prisma.$transaction((tx) => deleteProgramPriceOrMaster(tx, {
+        programmId,
+        entityId: id,
+        programPriceDelegate: tx.catalogBlendeProgramPrice,
+        programPriceDeleteWhere: { programmId, catalogBlendeId: id },
+        programPriceEntityWhere: { catalogBlendeId: id },
+        masterDelegate: tx.catalogBlende,
+        linkedItemWhere: { catalogBlendeId: id },
+      }));
+      if (result.linkedCount > 0) {
+        return redirectWithFlash(request, catalogProgramPath(programmId), "error", `Blende is linked to ${result.linkedCount} kitchen item(s) in this program. Remove those links before deleting it.`);
       }
-
-      await prisma.catalogBlende.delete({
-        where: { id },
-      });
-      return redirectWithFlash(request, "/admin/catalog/articles", "success", "Blende deleted.");
+      return redirectWithFlash(request, catalogProgramPath(programmId), "success", "Blende removed from this catalog.");
     }
 
     const data = validateCatalogAddonInput(formData, "Blende");
+    const { masterData, price, isActive } = splitProgramPrice(data);
 
     const syncedCount = await prisma.$transaction(async (tx) => {
       const blende = await tx.catalogBlende.update({
         where: { id },
-        data,
+        data: programmId === "IP 2200" ? data : masterData,
+      });
+      await tx.catalogBlendeProgramPrice.upsert({
+        where: { programmId_catalogBlendeId: { programmId, catalogBlendeId: id } },
+        create: { programmId, catalogBlendeId: id, code: blende.code, price, isActive },
+        update: { code: blende.code, price, isActive },
       });
 
       await tx.kitchenItem.updateMany({
@@ -39,37 +55,17 @@ export async function POST(request, { params }) {
         data: {
           blendeCode: blende.code,
           blendeLabel: blende.nameDe || blende.name,
-          blendePrice: blende.price,
         },
       });
-
-      const linkedItems = await tx.kitchenItem.findMany({
+      return syncCatalogProgramKitchenItemPrices(tx, {
+        programmId,
         where: { catalogBlendeId: id },
-        include: {
-          kitchen: { select: { slug: true } },
-          catalogArticle: true,
-          catalogBlende: true,
-          catalogService: true,
-        },
+        syncBlendePrice: true,
       });
-
-      let count = 0;
-      for (const item of linkedItems) {
-        if (!shouldSyncKitchenItemPrice(item, { requireMatched: false })) continue;
-        const price = buildSyncedKitchenItemPrice(item);
-        if (price == null) continue;
-        await tx.kitchenItem.update({
-          where: { id: item.id },
-          data: { price },
-        });
-        count += 1;
-      }
-
-      return count;
     });
 
-    return redirectWithFlash(request, "/admin/catalog/articles", "success", `Blende updated. ${syncedCount} linked kitchen item(s) synced.`);
+    return redirectWithFlash(request, catalogProgramPath(programmId), "success", `Blende updated. ${syncedCount} linked kitchen item(s) synced.`);
   } catch (error) {
-    return redirectWithFlash(request, "/admin/catalog/articles", "error", mapAdminMutationError(error, "Blende"));
+    return redirectWithFlash(request, catalogProgramPath(programmId), "error", mapAdminMutationError(error, "Blende"));
   }
 }

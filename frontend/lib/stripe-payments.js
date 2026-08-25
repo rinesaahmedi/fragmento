@@ -2,7 +2,10 @@ import { prisma } from "./prisma";
 import { getStripeClient } from "./stripe";
 import { getDirectOrderConfirmationEnabled } from "./admin-settings";
 import { buildOrderForNotifications } from "./orders";
-import { sendOrderConfirmationEmail } from "./email/order-notifications";
+import {
+  getMissingEmailSmtpConfig,
+  sendOrderConfirmationEmail,
+} from "./email/order-notifications";
 import { ORDER_KIND_LIVE, getOrderDelegate, isTestOrderKind } from "./order-kind";
 
 export function getPaymentStatusLabel(status) {
@@ -39,8 +42,24 @@ async function maybeSendPaidOrderConfirmation(orderRecord, { orderKind = ORDER_K
     return;
   }
 
+  const missingSmtpConfig = getMissingEmailSmtpConfig();
+  if (missingSmtpConfig.length) {
+    console.warn(
+      `Skipping paid order confirmation email for ${orderRecord.orderNumber}: missing ${missingSmtpConfig.join(", ")}.`,
+    );
+    return;
+  }
+
   const order = buildOrderForNotifications(orderRecord);
-  await sendOrderConfirmationEmail({ order });
+  try {
+    await sendOrderConfirmationEmail({ order });
+  } catch (error) {
+    console.error(
+      `Could not send paid order confirmation email for ${orderRecord.orderNumber}:`,
+      error,
+    );
+    return;
+  }
   await getOrderDelegate(prisma, orderKind).update({
     where: { id: orderRecord.id },
     data: { status: "CONFIRMED" },

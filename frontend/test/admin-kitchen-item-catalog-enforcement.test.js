@@ -17,4 +17,8 @@ test("admin kitchen item writes require catalog links and preserve valid blende 
   assert.match(source, /name:\s*catalogArticle\?\.name/);
   assert.match(source, /nameDe:\s*catalogArticle\?\.nameDe/);
   assert.match(source, /catalogLinkStatus:[^\r\n]+"MATCHED"/);
+  assert.match(source, /programPrices:[^\r\n]+programmId: kitchen\.programmId/);
+  assert.match(source, /getCatalogProgramPrice\(catalogArticle\)/);
+  assert.match(source, /getCatalogProgramPrice\(catalogBlende\)/);
+  assert.match(source, /getCatalogProgramPrice\(catalogService\)/);
 });

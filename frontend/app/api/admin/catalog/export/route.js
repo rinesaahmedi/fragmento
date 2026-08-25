@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
+import { DEFAULT_KITCHEN_PROGRAMM_ID } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
 import { prisma } from "../../../../../lib/prisma";
 
@@ -41,8 +42,9 @@ function appendSheet(workbook, sheetName, rows, widths) {
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 }
 
-export async function GET() {
+export async function GET(request) {
   await requireAdminApi();
+  const programmId = new URL(request.url).searchParams.get("programmId")?.trim() || DEFAULT_KITCHEN_PROGRAMM_ID;
 
   const [articles, blenden, services] = await Promise.all([
     prisma.$queryRaw`
@@ -54,14 +56,22 @@ export async function GET() {
         ca."widthMm",
         ca."heightMm",
         ca."depthMm",
-        ca."price",
+        capp."price",
         ca."itemType",
         ca."isFixedPricePackage",
-        ca."isActive",
+        capp."isActive",
         COUNT(ki."id")::int AS "linkedKitchenItems"
       FROM "CatalogArticle" ca
+      INNER JOIN "CatalogArticleProgramPrice" capp
+        ON capp."catalogArticleId" = ca."id"
+        AND capp."programmId" = ${programmId}
       LEFT JOIN "KitchenItem" ki ON ki."catalogArticleId" = ca."id"
-      GROUP BY ca."id"
+        AND EXISTS (
+          SELECT 1 FROM "Kitchen" linked_kitchen
+          WHERE linked_kitchen."id" = ki."kitchenId"
+            AND linked_kitchen."programmId" = ${programmId}
+        )
+      GROUP BY ca."id", capp."price", capp."isActive"
       ORDER BY ca."itemType" ASC, ca."articleNumber" ASC
     `,
     prisma.$queryRaw`
@@ -70,12 +80,20 @@ export async function GET() {
         cb."name",
         cb."nameDe",
         cb."description",
-        cb."price",
-        cb."isActive",
+        cbp."price",
+        cbp."isActive",
         COUNT(ki."id")::int AS "linkedKitchenItems"
       FROM "CatalogBlende" cb
+      INNER JOIN "CatalogBlendeProgramPrice" cbp
+        ON cbp."catalogBlendeId" = cb."id"
+        AND cbp."programmId" = ${programmId}
       LEFT JOIN "KitchenItem" ki ON ki."catalogBlendeId" = cb."id"
-      GROUP BY cb."id"
+        AND EXISTS (
+          SELECT 1 FROM "Kitchen" linked_kitchen
+          WHERE linked_kitchen."id" = ki."kitchenId"
+            AND linked_kitchen."programmId" = ${programmId}
+        )
+      GROUP BY cb."id", cbp."price", cbp."isActive"
       ORDER BY cb."code" ASC
     `,
     prisma.$queryRaw`
@@ -84,12 +102,20 @@ export async function GET() {
         cs."name",
         cs."nameDe",
         cs."description",
-        cs."price",
-        cs."isActive",
+        csp."price",
+        csp."isActive",
         COUNT(ki."id")::int AS "linkedKitchenItems"
       FROM "CatalogService" cs
+      INNER JOIN "CatalogServiceProgramPrice" csp
+        ON csp."catalogServiceId" = cs."id"
+        AND csp."programmId" = ${programmId}
       LEFT JOIN "KitchenItem" ki ON ki."catalogServiceId" = cs."id"
-      GROUP BY cs."id"
+        AND EXISTS (
+          SELECT 1 FROM "Kitchen" linked_kitchen
+          WHERE linked_kitchen."id" = ki."kitchenId"
+            AND linked_kitchen."programmId" = ${programmId}
+        )
+      GROUP BY cs."id", csp."price", csp."isActive"
       ORDER BY cs."code" ASC
     `,
   ]);
@@ -162,7 +188,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "Content-Disposition": 'attachment; filename="fragmento-catalog.xlsx"',
+      "Content-Disposition": `attachment; filename="fragmento-catalog-${programmId.toLowerCase().replace(/[^a-z0-9]+/g, "-")}.xlsx"`,
       "Cache-Control": "no-store",
     },
   });

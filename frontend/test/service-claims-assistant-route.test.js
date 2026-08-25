@@ -517,21 +517,6 @@ test("claims decision-guide aliases map to the correct knowledge section", () =>
   assert.equal(match.problem, "Weak suction / odours remain");
 });
 
-test("claims decision-guide normal behaviour does not trigger immediate claim creation", async () => {
-  const route = loadRoute();
-  const response = await route.POST(request({
-    language: "en",
-    question: "My KMI 754 000 E induction hob is buzzing.",
-    selectedAreas: [],
-    claim: emptyClaim(),
-  }));
-
-  assert.equal(response.status, 200);
-  assert.match(response.body.answer, /this can be normal/i);
-  assert.match(response.body.answer, /No claim/i);
-  assert.equal(response.body.actions, undefined);
-});
-
 test("claims decision-guide self-check issue asks user to try safe check first", async () => {
   const route = loadRoute();
   const response = await route.POST(request({
@@ -571,7 +556,7 @@ test("claims decision-guide urgent issue stops use and escalates immediately", a
   const route = loadRoute();
   const response = await route.POST(request({
     language: "en",
-    question: "My KMI 754 600 C hob glass is cracked.",
+    question: "My EH92364E-A oven door glass is cracked.",
     selectedAreas: [],
     claim: emptyClaim(),
   }));
@@ -581,6 +566,22 @@ test("claims decision-guide urgent issue stops use and escalates immediately", a
   assert.match(response.body.answer, /Create or escalate the claim immediately/i);
   assert.match(response.body.answer, /Do not open electrical parts/i);
   assert.ok(Array.isArray(response.body.actions));
+});
+
+test("Claims does not use the unverified OL-KMI manual for 9EC744100C", () => {
+  const route = loadRoute();
+  const entries = CLAIMS_CHATBOT_KNOWLEDGE.entries.filter((entry) => entry.itemType === "induction_hob");
+  const match = route.findClaimsChatbotKnowledgeMatch({
+    question: "My 9EC744100C cooktop shows E4.",
+    claim: emptyClaim(),
+    selectedAreas: [],
+    conversationMessages: [],
+  });
+
+  assert.equal(match, null);
+  assert.ok(CLAIMS_CHATBOT_KNOWLEDGE.disabledProductCodes.includes("OL-KMI754000E"));
+  assert.ok(entries.every((entry) => entry.productCode === "OL-KMI754000E"));
+  assert.ok(entries.every((entry) => !entry.aliases.includes("9EC744100C")));
 });
 
 test("oven not working gives only safe checks then direct claim description", async () => {

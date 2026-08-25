@@ -279,6 +279,12 @@ only for items that differ.
    For a linked hood package, also add a small `{ componentKey: "extractor-hood", ... }` box around
    the hood/aspirator drawing under the wall cabinet. This helper component is hidden from the
    catalog, but the stage resolves the hotspot through the linked visible cabinet.
+3. **Dishwasher internal details must always remain light grey.** The basket/rack drawing and
+   appliance marking (for example `GS`) are technical details, not selectable furniture surfaces.
+   Add tight source-coordinate clips for them to `PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG` in
+   `frontend/lib/kitchen-plan-preview-data.js`. The stage re-renders those clipped source lines in
+   light grey above green/blue selection fills. Use separate clips for disconnected details and do
+   not include the cabinet outline, furniture front, handle, plinth, or divider lines.
 
 ### Step 5A — Add the service-claim plan (linear versus L-shaped)
 
@@ -455,6 +461,9 @@ flagged to the user).
 - [ ] Kitchen registered in `DEFAULT_KITCHENS` + a `DEFAULT_KITCHEN_CONTRACTS` entry.
 - [ ] `IMAGE_VIEW_BY_SLUG` + `IMAGE_HOTSPOTS_BY_SLUG` updated, including a linked
       `extractor-hood` hotspot under every hood wall cabinet shown in the drawing.
+- [ ] Dishwasher basket/rack and appliance markings are registered in
+      `PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG` and stay light grey when selected, hovered, locked,
+      and unselected; cabinet outlines and furniture fronts remain outside the light-detail clips.
 - [ ] Callout numbers added for new codes; hood link added to `LINKED_COMPONENT_GROUPS_BY_SLUG`.
 - [ ] Claim source keys exist for `sink-faucet`, `sink-base`, and the `OVEN-` oven component.
 - [ ] Linear: one worktop area, oven/drawer split, cooktop points, and manual Sink/Cooktop controls verified.

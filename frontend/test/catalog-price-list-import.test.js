@@ -3,6 +3,7 @@ import test from "node:test";
 import * as XLSX from "xlsx";
 import {
   buildSyncedKitchenItemPrice,
+  getCatalogProgramPrice,
   shouldSyncKitchenItemPrice,
 } from "../lib/catalog-pricing.js";
 import {
@@ -95,6 +96,11 @@ test("previewCatalogPriceListImport summarizes create update and unchanged rows"
   assert.equal(preview.summary.updated, 1);
   assert.equal(preview.summary.unchanged, 2);
   assert.equal(preview.summary.failed, 0);
+});
+
+test("getCatalogProgramPrice prefers the selected program price and falls back to the master price", () => {
+  assert.equal(getCatalogProgramPrice({ price: "219.00", programPrices: [{ price: "270.00" }] }), "270.00");
+  assert.equal(getCatalogProgramPrice({ price: "219.00", programPrices: [] }), "219.00");
 });
 
 test("applyDueScheduledCatalogPriceListImports ignores stale Prisma clients without import delegate", async () => {

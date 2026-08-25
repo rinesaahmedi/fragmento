@@ -11,6 +11,10 @@ export function moneyToCents(value) {
   return Math.round(Number(value || 0) * 100);
 }
 
+export function getCatalogProgramPrice(catalogRecord) {
+  return catalogRecord?.programPrices?.[0]?.price ?? catalogRecord?.price ?? null;
+}
+
 export function centsToMoney(cents) {
   return (Math.max(0, cents) / 100).toFixed(2);
 }

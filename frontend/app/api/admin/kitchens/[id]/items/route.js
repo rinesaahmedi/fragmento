@@ -11,7 +11,7 @@ export async function POST(request, { params }) {
     const formData = await request.formData();
     const kitchen = await prisma.kitchen.findUnique({
       where: { id },
-      select: { id: true, slug: true },
+      select: { id: true, slug: true, programmId: true },
     });
 
     if (!kitchen) {

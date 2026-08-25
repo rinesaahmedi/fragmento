@@ -1,5 +1,6 @@
 import { ItemType } from "@prisma/client";
 import { validateKitchenItemInput } from "./admin-forms";
+import { getCatalogProgramPrice } from "./catalog-pricing";
 import { findKitchenStructureSlot, getKitchenStructureSlots } from "./kitchen-structure";
 import { getCompatibilityMessage, isItemCompatibleWithSlot } from "./kitchen-slot-compatibility";
 import { prisma } from "./prisma";
@@ -18,11 +19,11 @@ function getBlendeTotalCents({ blendePrice, catalogBlendeQuantity, catalogBlende
   return moneyToCents(blendePrice) * quantity;
 }
 
-function applyBlendePriceDelta(input, existingItem, catalogBlende) {
+function applyBlendePriceDelta(input, existingItem, catalogBlende, catalogBlendePrice = catalogBlende?.price) {
   const newQuantity = catalogBlende ? (input.catalogBlendeQuantity || 1) : null;
   const newBlendeTotalCents = catalogBlende
     ? getBlendeTotalCents({
-        blendePrice: catalogBlende.price,
+        blendePrice: catalogBlendePrice,
         catalogBlendeQuantity: newQuantity,
         catalogBlendeId: catalogBlende.id,
       })
@@ -73,15 +74,28 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
 
   const [catalogArticle, catalogBlende, catalogService] = await Promise.all([
     input.catalogArticleId
-      ? prisma.catalogArticle.findUnique({ where: { id: input.catalogArticleId } })
+      ? prisma.catalogArticle.findUnique({
+          where: { id: input.catalogArticleId },
+          include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
+        })
       : null,
     input.catalogBlendeId
-      ? prisma.catalogBlende.findUnique({ where: { id: input.catalogBlendeId } })
+      ? prisma.catalogBlende.findUnique({
+          where: { id: input.catalogBlendeId },
+          include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
+        })
       : null,
     input.catalogServiceId
-      ? prisma.catalogService.findUnique({ where: { id: input.catalogServiceId } })
+      ? prisma.catalogService.findUnique({
+          where: { id: input.catalogServiceId },
+          include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
+        })
       : null,
   ]);
+
+  const catalogArticlePrice = getCatalogProgramPrice(catalogArticle);
+  const catalogBlendePrice = getCatalogProgramPrice(catalogBlende);
+  const catalogServicePrice = getCatalogProgramPrice(catalogService);
 
   if (input.catalogArticleId && !catalogArticle) {
     throw new Error("Selected catalog article was not found.");
@@ -112,11 +126,11 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
   }
 
   if (catalogArticle) {
-    input.articleBasePrice = String(catalogArticle.price);
+    input.articleBasePrice = String(catalogArticlePrice);
   }
 
   if (catalogService && !catalogArticle && !catalogBlende && moneyToCents(input.price) === 0) {
-    input.price = String(catalogService.price);
+    input.price = String(catalogServicePrice);
   }
 
   const data = {
@@ -124,12 +138,12 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     articleNumber: catalogArticle?.articleNumber || null,
     name: catalogArticle?.name || catalogService?.name || input.name,
     nameDe: catalogArticle?.nameDe || catalogService?.nameDe || input.nameDe || null,
-    price: applyBlendePriceDelta(input, existingItem, catalogBlende),
+    price: applyBlendePriceDelta(input, existingItem, catalogBlende, catalogBlendePrice),
     articleBasePrice: undefined,
     catalogBlendeQuantity: catalogBlende ? (input.catalogBlendeQuantity || 1) : null,
     blendeCode: catalogBlende?.code || null,
     blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || null,
-    blendePrice: catalogBlende ? catalogBlende.price : null,
+    blendePrice: catalogBlende ? catalogBlendePrice : null,
     catalogArticleId: catalogArticle?.id || null,
     catalogServiceId: catalogService?.id || null,
     catalogLinkStatus: catalogArticle || catalogBlende || catalogService ? "MATCHED" : null,

@@ -651,6 +651,8 @@
     "manage": "Verwalten",
     "catalog": "Katalog",
     "catalogDescription": "Wiederverwendbare Artikel, Blenden und Dienstleistungen.",
+    "programCatalogs": "Programmkataloge",
+    "programCatalogsDescription": "Artikel und Preise von Impuls und Burger werden getrennt verwaltet.",
     "exportExcel": "Excel exportieren",
     "priceImports": "Preisimporte",
     "articles": "Artikel",

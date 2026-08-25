@@ -651,6 +651,8 @@
     "manage": "Manage",
     "catalog": "Catalog",
     "catalogDescription": "Reusable articles, blenden, and services.",
+    "programCatalogs": "Program catalogs",
+    "programCatalogsDescription": "Impuls and Burger articles and prices are managed separately.",
     "exportExcel": "Export Excel",
     "priceImports": "Price imports",
     "articles": "Articles",

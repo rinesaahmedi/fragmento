@@ -33,6 +33,7 @@ import { requireAdminPage } from "../../../../lib/auth";
 import { buildKitchenPreviewSvgMarkup } from "../../../../lib/claim-kitchen-preview";
 import { LEGACY_ICON_KEYS, getKitchenById, listKitchenItemCodeOptionsForAdmin } from "../../../../lib/catalog";
 import { listCatalogPrograms } from "../../../../lib/catalog-programs";
+import { getCatalogProgramPrice } from "../../../../lib/catalog-pricing";
 import { getKitchenCatalogImagePreview, getKitchenCatalogPreviewHotspots, getKitchenCatalogPreviewSlot, resolveKitchenCatalogPreviewSlug } from "../../../../lib/kitchen-catalog-preview";
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
@@ -475,14 +476,17 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     listCatalogPrograms(),
     prisma.catalogArticle.findMany({
       where: { isActive: true },
+      include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
       orderBy: [{ itemType: "asc" }, { articleNumber: "asc" }],
     }),
     prisma.catalogBlende.findMany({
       where: { isActive: true },
+      include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
       orderBy: { code: "asc" },
     }),
     prisma.catalogService.findMany({
       where: { isActive: true },
+      include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
       orderBy: { code: "asc" },
     }),
   ]);
@@ -491,24 +495,24 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     code: blende.code,
     name: blende.name,
     nameDe: blende.nameDe,
-    price: Number(blende.price),
-    formattedPrice: formatCurrency(blende.price),
+    price: Number(getCatalogProgramPrice(blende)),
+    formattedPrice: formatCurrency(getCatalogProgramPrice(blende)),
   }));
   const catalogServiceOptions = catalogServices.map((service) => ({
     id: service.id,
     code: service.code,
-      name: service.name,
-      nameDe: service.nameDe,
-      price: Number(service.price),
-      formattedPrice: formatCurrency(service.price),
-    }));
+    name: service.name,
+    nameDe: service.nameDe,
+    price: Number(getCatalogProgramPrice(service)),
+    formattedPrice: formatCurrency(getCatalogProgramPrice(service)),
+  }));
   const catalogArticleOptions = catalogArticles.map((article) => ({
     id: article.id,
     articleNumber: article.articleNumber,
     name: article.name,
     nameDe: article.nameDe,
-    price: Number(article.price),
-    formattedPrice: formatCurrency(article.price),
+    price: Number(getCatalogProgramPrice(article)),
+    formattedPrice: formatCurrency(getCatalogProgramPrice(article)),
   }));
 
   return (
@@ -927,9 +931,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.catalogArticle" fallback="Catalog article" />}>
                     <AdminSelect name="catalogArticleId" defaultValue="" style={inputStyle}>
                       <option value=""><AdminText i18nKey="kitchenDetailAdmin.noArticleLink" fallback="No article link" /></option>
-                      {catalogArticles.map((article) => (
+                      {catalogArticleOptions.map((article) => (
                         <option key={article.id} value={article.id}>
-                          {article.articleNumber} - {article.nameDe || article.name} ({formatCurrency(article.price)})
+                          {article.articleNumber} - {article.nameDe || article.name} ({article.formattedPrice})
                         </option>
                       ))}
                     </AdminSelect>
@@ -937,9 +941,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.blende" fallback="Blende" />}>
                     <AdminSelect name="catalogBlendeId" defaultValue="" style={inputStyle}>
                       <option value=""><AdminText i18nKey="kitchenDetailAdmin.noIncludedBlende" fallback="No blende" /></option>
-                      {catalogBlenden.map((blende) => (
+                      {catalogBlendeOptions.map((blende) => (
                         <option key={blende.id} value={blende.id}>
-                          {blende.code} - {blende.nameDe || blende.name} ({formatCurrency(blende.price)})
+                          {blende.code} - {blende.nameDe || blende.name} ({blende.formattedPrice})
                         </option>
                       ))}
                     </AdminSelect>
@@ -950,9 +954,9 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
                   <FormField label={<AdminText i18nKey="kitchenDetailAdmin.serviceCatalogLink" fallback="Service catalog link" />}>
                     <AdminSelect name="catalogServiceId" defaultValue="" style={inputStyle}>
                       <option value=""><AdminText i18nKey="kitchenDetailAdmin.noServiceLink" fallback="No service link" /></option>
-                      {catalogServices.map((service) => (
+                      {catalogServiceOptions.map((service) => (
                         <option key={service.id} value={service.id}>
-                          {service.code} - {service.nameDe || service.name} ({formatCurrency(service.price)})
+                          {service.code} - {service.nameDe || service.name} ({service.formattedPrice})
                         </option>
                       ))}
                     </AdminSelect>

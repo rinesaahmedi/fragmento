@@ -2502,8 +2502,9 @@ test("two-part kitchen worktop runs become independent left and right claim hots
     { partKey: "worktop-right", sourceComponentKey: "worktop" },
   ];
 
-  for (const slug of ["ab-105833", "ab-105836", "ab-105839", "ab-105842", "ab-105845"]) {
-    const claimParts = slug === "ab-105845"
+  const twoElevationSlugs = ["ab-105845", "ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105860"];
+  for (const slug of ["ab-105833", "ab-105836", "ab-105839", "ab-105842", ...twoElevationSlugs]) {
+    const claimParts = twoElevationSlugs.includes(slug)
       ? splitClaimParts
       : [
         ...splitClaimParts,

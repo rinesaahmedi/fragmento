@@ -1,4 +1,8 @@
-import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "./kitchen-plan-preview-data.js";
+import {
+  PLAN_HOTSPOTS_BY_SLUG,
+  PLAN_IMAGE_BY_SLUG,
+  PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
+} from "./kitchen-plan-preview-data.js";
 
 const PLAN_IMAGE_SOURCE_WIDTH = 842;
 const PLAN_IMAGE_SOURCE_HEIGHT = 595;
@@ -18,8 +22,13 @@ const CORNER_BLENDE_VERTICAL_TOLERANCE = 0.35;
 const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
   "ab-105833": { bottomPadding: 4, bottomLimit: 84 },
   "ab-105842": { bottomPadding: 4.8 },
-  "ab-105845": { bottomPadding: 4.8 },
-  "105845-modul-2": { bottomPadding: 4.8 },
+  "ab-105845": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
+  "ab-105848": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
+  "ab-105851": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
+  "ab-105854": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
+  "ab-105857": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
+  "ab-105860": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
+  "105845-modul-2": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
   "ab-105836": { bottomPadding: 4.8 },
 };
 
@@ -190,9 +199,13 @@ export function getPlanDisplayCrop(hotspots, slug) {
   const trailingX = 100 - bounds.right;
   const trailingY = 100 - bounds.bottom;
   const cropTuning = PLAN_DISPLAY_CROP_TUNING_BY_SLUG[slug] || {};
-  const left = clampPercent(bounds.left - Math.max(2.6, bounds.left * 0.6));
+  const leftPadding = cropTuning.leftPadding ?? Math.max(2.6, bounds.left * 0.6);
+  const left = clampPercent(bounds.left - leftPadding);
   const top = clampPercent(bounds.top - Math.max(4, bounds.top * 0.5));
-  const right = clampPercent(Math.min(99.5, bounds.right + Math.max(3.2, trailingX * 0.92)));
+  const rightLimit = cropTuning.rightLimit ?? 99.5;
+  const right = clampPercent(
+    Math.min(rightLimit, bounds.right + Math.max(3.2, trailingX * 0.92)),
+  );
   const bottomPadding = cropTuning.bottomPadding ?? Math.max(1, trailingY * 0.85);
   const bottomLimit = cropTuning.bottomLimit ?? 99.5;
   const bottom = clampPercent(Math.min(bottomLimit, bounds.bottom + bottomPadding));
@@ -250,10 +263,14 @@ export function prepareKitchenPlanPreview(slug, components = []) {
   if (!imageHref || !hotspots.length) return null;
 
   const crop = getPlanDisplayCrop(hotspots, normalizedSlug);
+  const sourceSize = PLAN_IMAGE_SOURCE_SIZE_BY_SLUG[normalizedSlug] || {
+    width: PLAN_IMAGE_SOURCE_WIDTH,
+    height: PLAN_IMAGE_SOURCE_HEIGHT,
+  };
   return {
     imageHref,
     crop,
-    aspectRatio: `${crop.width * PLAN_IMAGE_SOURCE_WIDTH} / ${crop.height * PLAN_IMAGE_SOURCE_HEIGHT}`,
+    aspectRatio: `${crop.width * sourceSize.width} / ${crop.height * sourceSize.height}`,
     hotspots: hotspots
       .map((hotspot) => cropPlanHotspot(hotspot, crop))
       .filter((hotspot) => hotspot.width > 0 && hotspot.height > 0)
