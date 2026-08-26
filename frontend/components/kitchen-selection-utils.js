@@ -328,6 +328,23 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105845-H6002-4": "16",
   "CAB-WALL-AB105845-H4502": "17",
   "CAB-WALL-AB105845-H3002-2": "18",
+  "SINK-BASE-AB105847-600": "3",
+  "CAB-BASE-AB105847-US60-1": "4",
+  "CAB-BASE-AB105847-US60-2": "5",
+  "CAB-BASE-AB105847-US30-1": "6",
+  "REF-AB105847-KGCN388140E": "7",
+  "CAB-BASE-AB105847-US30-2": "8",
+  "DISH-AB105847-450": "9",
+  "CAB-BASE-AB105847-US60-3": "10",
+  "CAB-WALL-AB105847-H6002-1": "11",
+  "CAB-HOOD-AB105847-600": "12",
+  "HOOD-AB105847-FH664621E": "12",
+  "CAB-WALL-AB105847-H6002-2": "13",
+  "CAB-WALL-AB105847-H3002-1": "14",
+  "CAB-WALL-AB105847-H3002-2": "15",
+  "CAB-WALL-AB105847-H4502": "16",
+  "CAB-WALL-AB105847-H6002-3": "17",
+  "CAB-WALL-AB105847-H6002-4": "18",
   "CAB-BASE-AB105809-400-R": "5",
   "CAB-BASE-AB105809-500-L": "6",
   "SINKBASE-B-600": "8",
@@ -635,6 +652,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "HOOD-AB105755-FH664621E":
     case "HOOD-AB105757-FH664621E":
     case "HOOD-AB105845-FH664621E":
+    case "HOOD-AB105847-FH664621E":
       return translate("configurator.catalogItemNames.extractorHood", "Extractor hood");
     case "HOOD-C-FH664621E":
       return translate(
@@ -651,6 +669,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "SINKBASE-AB105806-600":
     case "SINKBASE-AB105807-600":
     case "SINK-BASE-AB105845-600":
+    case "SINK-BASE-AB105847-600":
     case "SINKBASE-AB105831-DEFAULT":
     case "SINKBASE-AB104968-DEFAULT":
     case "SINKBASE-AB105746-DEFAULT":
@@ -662,6 +681,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "SINKBASE-LS-600":
       return translate("configurator.catalogItemNames.sinkBaseCabinet", "Sink Lower Cabinet");
     case "DISH-AB105845-450":
+    case "DISH-AB105847-450":
     case "DISH-B-600-STD":
     case "DISH-AB105806-600":
     case "DISH-AB105807-600":
@@ -713,6 +733,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     case "REF-AB105819-KGCN388140E":
     case "REF-AB105821-KGCN388140E":
     case "REF-AB105845-KGCN388140E":
+    case "REF-AB105847-KGCN388140E":
     case "REF-AB105825-KGCN388140E":
     case "REF-AB105828-KGCN388140E":
     case "REF-AB104968-KGCN388140E":
@@ -949,6 +970,12 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105854": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105857": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105860": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105847": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105850": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105853": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105856": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105859": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105862": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105744": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105806": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105808": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1254,6 +1281,10 @@ PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105758-FH664621E"] = PRODUCT_INFO_DOCUMEN
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105846-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-AB105846-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105846-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105847-450"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105845-450"] || PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-AB105847-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105847-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["CAB-HOOD-AB105847-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
@@ -1555,6 +1586,10 @@ PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-AB105846-600"] = PRODUCT_IMAGE_GALLERIES_B
 PRODUCT_IMAGE_GALLERIES_BY_CODE["REF-AB105846-KGCN388140E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["REF-B-545-1800-700"];
 PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-AB105846-FH664621E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
 PRODUCT_IMAGE_GALLERIES_BY_CODE["CAB-HOOD-AB105846-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-AB105847-450"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-AB105845-450"] || PRODUCT_IMAGE_GALLERIES_BY_CODE["DISH-B-600-STD"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["REF-AB105847-KGCN388140E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-AB105847-FH664621E"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_IMAGE_GALLERIES_BY_CODE["CAB-HOOD-AB105847-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
 
 export function getProductImagePaths(item) {
   const candidates = [item?.productInfoCode, item?.code, item?.tooltipPreviewCode].filter(Boolean);

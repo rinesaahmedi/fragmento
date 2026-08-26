@@ -14,6 +14,7 @@ import {
 
 const translate = (_key, fallback) => fallback;
 const AB_105845_LAYOUT_CLONES = ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105860"];
+const AB_105847_LAYOUT_CLONES = ["ab-105850", "ab-105853", "ab-105856", "ab-105859", "ab-105862"];
 
 test("AB 105845 keeps the source geometry while rendering dark, legible linework", () => {
   const svg = readFileSync(
@@ -155,4 +156,83 @@ test("AB 105845 layout clones seed distinct kitchens and automatic 670/111 contr
   }
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "670"\)/);
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "111"\)/);
+});
+
+test("AB 105847 uses its supplied 800 by 600 plan and maps all 18 callouts", () => {
+  const svg = readFileSync(
+    new URL("../public/plans/AB 105847.svg", import.meta.url),
+    "utf8",
+  );
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105847"];
+  assert.match(svg, /stroke-width="0\.48"/);
+  assert.doesNotMatch(svg, /stroke-width="\.074"/);
+  assert.equal(PLAN_IMAGE_BY_SLUG["ab-105847"], "/plans/AB%20105847.svg");
+  assert.deepEqual(PLAN_IMAGE_SOURCE_SIZE_BY_SLUG["ab-105847"], { width: 800, height: 600 });
+  assert.equal(hotspots.length, 20);
+  assert.equal(hotspots.filter((hotspot) => hotspot.componentKey.startsWith("wall-cabinet-")).length, 8);
+  assert.equal(hotspots.filter((hotspot) => hotspot.componentKey === "worktop").length, 2);
+  assert.ok(hotspots.some((hotspot) => hotspot.componentKey === "base-module-5"));
+  const faucet = hotspots.find((hotspot) => hotspot.componentKey === "sink-faucet");
+  assert.deepEqual(
+    { left: faucet.left, top: faucet.top, width: faucet.width, height: faucet.height },
+    { left: 59.25, top: 51.65, width: 0.65, height: 2.55 },
+  );
+  assert.ok(hotspots.filter((hotspot) => hotspot.componentKey.startsWith("wall-cabinet-") && hotspot.componentKey !== "wall-cabinet-2").every((hotspot) => hotspot.height === 8.72));
+  const hood = hotspots.find((hotspot) => hotspot.componentKey === "wall-cabinet-2");
+  assert.deepEqual(
+    { left: hood.left, top: hood.top, width: hood.width, height: hood.height },
+    { left: 20.6075, top: 38.54333, width: 5.4275, height: 10.75667 },
+  );
+  assert.deepEqual(
+    PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105847"].map((detail) => detail.componentKey),
+    ["base-module-5", "base-module-5"],
+  );
+});
+
+test("AB 105847 keeps the hood package linked and seeds automatic contracts", () => {
+  const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+  assert.deepEqual(
+    getLinkedComponentIds("ab-105847", "component-wall-cabinet-2"),
+    ["component-wall-cabinet-2", "component-extractor-hood"],
+  );
+  assert.match(seed, /slug: "ab-105847"[\s\S]*?kitchenCode: "105 847"[\s\S]*?items: AB_105847_ITEMS/);
+  assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "670"\)/);
+  assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "111"\)/);
+  assert.match(seed, /DISH-AB105847-450[\s\S]*?price: "0\.00"[\s\S]*?A-EGSPV597210 \+ TGV60/);
+  for (const code of [
+    "CAB-BASE-AB105847-US60-1",
+    "CAB-BASE-AB105847-US30-2",
+    "CAB-BASE-AB105847-US60-3",
+    "CAB-WALL-AB105847-H6002-1",
+    "CAB-WALL-AB105847-H3002-2",
+    "CAB-WALL-AB105847-H6002-4",
+  ]) {
+    const line = seed.split(/\r?\n/).find((entry) => entry.includes(`code: "${code}"`));
+    assert.ok(line?.includes("blendeCode"), `${code} should link its schedule filler panel`);
+  }
+  const noFillerLine = seed.split(/\r?\n/).find((entry) => entry.includes('code: "CAB-BASE-AB105847-US30-1"'));
+  assert.ok(noFillerLine);
+  assert.doesNotMatch(noFillerLine, /blendeCode|UPK20/);
+  const noWallFillerLine = seed.split(/\r?\n/).find((entry) => entry.includes('code: "CAB-WALL-AB105847-H3002-1"'));
+  assert.ok(noWallFillerLine);
+  assert.doesNotMatch(noWallFillerLine, /blendeCode|HPK2002/);
+});
+
+test("AB 105847 layout clones reuse its complete plan, selection model, and contracts", () => {
+  const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+
+  for (const slug of AB_105847_LAYOUT_CLONES) {
+    const code = slug.slice(3);
+    assert.equal(PLAN_IMAGE_BY_SLUG[slug], "/plans/AB%20105847.svg");
+    assert.strictEqual(PLAN_HOTSPOTS_BY_SLUG[slug], PLAN_HOTSPOTS_BY_SLUG["ab-105847"]);
+    assert.deepEqual(PLAN_IMAGE_SOURCE_SIZE_BY_SLUG[slug], { width: 800, height: 600 });
+    assert.deepEqual(
+      getLinkedComponentIds(slug, "component-wall-cabinet-2"),
+      ["component-wall-cabinet-2", "component-extractor-hood"],
+    );
+    assert.match(
+      seed,
+      new RegExp(`slug: "${slug}"[\\s\\S]*?kitchenCode: "${code.slice(0, 3)} ${code.slice(3)}"[\\s\\S]*?items: AB_105847_ITEMS`),
+    );
+  }
 });

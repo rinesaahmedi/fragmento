@@ -3619,6 +3619,11 @@
   width: 100%;
 }
 
+.deliveryWeekSelect {
+  position: relative;
+  width: 100%;
+}
+
 .datePickerTrigger {
   appearance: none;
   width: 100%;
@@ -3646,6 +3651,134 @@
   outline: none;
   border-color: rgba(47, 146, 81, 0.5);
   box-shadow: 0 0 0 3px rgba(47, 146, 81, 0.12);
+}
+
+.deliveryWeekTrigger {
+  appearance: none;
+  width: 100%;
+  min-height: 40px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(120, 90, 64, 0.18);
+  background: #fffdf9;
+  color: #2f2a24;
+  font: inherit;
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.deliveryWeekTrigger:hover,
+.deliveryWeekTrigger:focus-visible,
+.deliveryWeekTrigger[aria-expanded="true"] {
+  outline: none;
+  border-color: rgba(47, 146, 81, 0.5);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(47, 146, 81, 0.12);
+}
+
+.deliveryWeekTrigger span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deliveryWeekTrigger[aria-invalid="true"] {
+  border-color: #d78b52;
+  background: #fff5ec;
+  box-shadow: 0 0 0 3px rgba(215, 139, 82, 0.12);
+}
+
+.deliveryWeekPlaceholder {
+  color: #7a6d60;
+}
+
+.deliveryWeekChevron {
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid rgba(107, 79, 58, 0.72);
+  border-bottom: 2px solid rgba(107, 79, 58, 0.72);
+  transform: translateY(-2px) rotate(45deg);
+  transition: transform 0.18s ease;
+}
+
+.deliveryWeekTrigger[aria-expanded="true"] .deliveryWeekChevron {
+  transform: translateY(2px) rotate(225deg);
+}
+
+.deliveryWeekMenu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(360px, calc(100vw - 40px));
+  display: grid;
+  gap: 3px;
+  padding: 6px;
+  border: 1px solid rgba(120, 90, 64, 0.16);
+  border-radius: 10px;
+  background: #fffdf9;
+  box-shadow: 0 18px 42px rgba(55, 38, 24, 0.14);
+}
+
+.deliveryWeekOption {
+  appearance: none;
+  width: 100%;
+  min-height: 36px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 16px;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #2f2a24;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.deliveryWeekOption span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deliveryWeekOption:hover,
+.deliveryWeekOptionActive {
+  background: #eef8f1;
+  outline: none;
+}
+
+.deliveryWeekOptionSelected {
+  background: rgba(47, 146, 81, 0.12);
+  color: #246f3e;
+  font-weight: 800;
+}
+
+.deliveryWeekOptionSelected.deliveryWeekOptionActive,
+.deliveryWeekOptionSelected:hover {
+  background: rgba(47, 146, 81, 0.16);
+}
+
+.deliveryWeekOptionSelected .deliveryWeekOptionMark {
+  width: 8px;
+  height: 8px;
+  justify-self: center;
+  border-radius: 999px;
+  background: #2f9251;
 }
 
 .datePickerIcon {

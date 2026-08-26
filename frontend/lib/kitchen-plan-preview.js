@@ -28,6 +28,12 @@ const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
   "ab-105854": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
   "ab-105857": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
   "ab-105860": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
+  "ab-105847": { topPadding: 7, bottomPadding: 3, leftPadding: 3, rightLimit: 73, bottomLimit: 70 },
+  "ab-105850": { topPadding: 7, bottomPadding: 3, leftPadding: 3, rightLimit: 73, bottomLimit: 70 },
+  "ab-105853": { topPadding: 7, bottomPadding: 3, leftPadding: 3, rightLimit: 73, bottomLimit: 70 },
+  "ab-105856": { topPadding: 7, bottomPadding: 3, leftPadding: 3, rightLimit: 73, bottomLimit: 70 },
+  "ab-105859": { topPadding: 7, bottomPadding: 3, leftPadding: 3, rightLimit: 73, bottomLimit: 70 },
+  "ab-105862": { topPadding: 7, bottomPadding: 3, leftPadding: 3, rightLimit: 73, bottomLimit: 70 },
   "105845-modul-2": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
   "ab-105836": { bottomPadding: 4.8 },
 };
@@ -201,7 +207,7 @@ export function getPlanDisplayCrop(hotspots, slug) {
   const cropTuning = PLAN_DISPLAY_CROP_TUNING_BY_SLUG[slug] || {};
   const leftPadding = cropTuning.leftPadding ?? Math.max(2.6, bounds.left * 0.6);
   const left = clampPercent(bounds.left - leftPadding);
-  const top = clampPercent(bounds.top - Math.max(4, bounds.top * 0.5));
+  const top = clampPercent(bounds.top - (cropTuning.topPadding ?? Math.max(4, bounds.top * 0.5)));
   const rightLimit = cropTuning.rightLimit ?? 99.5;
   const right = clampPercent(
     Math.min(rightLimit, bounds.right + Math.max(3.2, trailingX * 0.92)),

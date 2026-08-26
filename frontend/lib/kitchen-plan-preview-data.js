@@ -46,6 +46,12 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105842": "/plans/AB%20105842.svg",
   "ab-105839": "/plans/AB%20105842.svg",
   "ab-105845": "/plans/AB%20105845.svg",
+  "ab-105847": "/plans/AB%20105847.svg",
+  "ab-105850": "/plans/AB%20105847.svg",
+  "ab-105853": "/plans/AB%20105847.svg",
+  "ab-105856": "/plans/AB%20105847.svg",
+  "ab-105859": "/plans/AB%20105847.svg",
+  "ab-105862": "/plans/AB%20105847.svg",
   "ab-105848": "/plans/AB%20105845.svg",
   "ab-105851": "/plans/AB%20105845.svg",
   "ab-105854": "/plans/AB%20105845.svg",
@@ -87,6 +93,12 @@ export const PLAN_IMAGE_BY_SLUG = {
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
   "ab-105845": { width: 800, height: 600 },
+  "ab-105847": { width: 800, height: 600 },
+  "ab-105850": { width: 800, height: 600 },
+  "ab-105853": { width: 800, height: 600 },
+  "ab-105856": { width: 800, height: 600 },
+  "ab-105859": { width: 800, height: 600 },
+  "ab-105862": { width: 800, height: 600 },
   "ab-105848": { width: 800, height: 600 },
   "ab-105851": { width: 800, height: 600 },
   "ab-105854": { width: 800, height: 600 },
@@ -104,6 +116,30 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
   "ab-105845": AB_105845_DISHWASHER_LIGHT_DETAILS,
+  "ab-105847": [
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9 },
+    { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
+  ],
+  "ab-105850": [
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9 },
+    { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
+  ],
+  "ab-105853": [
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9 },
+    { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
+  ],
+  "ab-105856": [
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9 },
+    { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
+  ],
+  "ab-105859": [
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9 },
+    { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
+  ],
+  "ab-105862": [
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9 },
+    { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
+  ],
   "ab-105848": AB_105845_DISHWASHER_LIGHT_DETAILS,
   "ab-105851": AB_105845_DISHWASHER_LIGHT_DETAILS,
   "ab-105854": AB_105845_DISHWASHER_LIGHT_DETAILS,
@@ -948,6 +984,29 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "dishwasher-base", left: 86.5275, top: 58.78167, width: 7.56125, height: 19.67, preserveManualSize: true },
     { componentKey: "drawer-module", left: 94.08875, top: 58.78167, width: 5.62875, height: 19.67, preserveManualSize: true },
   ],
+  "ab-105847": [
+    { componentKey: "wall-cabinet-1", left: 14.90875, top: 38.54333, width: 5.69875, height: 8.72, preserveManualSize: true },
+    // The extractor is sold with its HD6002 cabinet; use one contiguous package hit area.
+    { componentKey: "wall-cabinet-2", left: 20.6075, top: 38.54333, width: 5.4275, height: 10.75667, preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", left: 26.035, top: 38.54333, width: 5.42625, height: 8.72, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 31.46125, top: 38.54333, width: 2.71375, height: 8.72, preserveManualSize: true },
+    { componentKey: "worktop", left: 14.90875, top: 54.19833, width: 19.41125, height: 0.48167, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 14.90875, top: 54.68, width: 5.69875, height: 10.58833, preserveManualSize: true },
+    { componentKey: "oven-module", left: 20.6075, top: 54.68, width: 5.4275, height: 10.58833, preserveManualSize: true },
+    { componentKey: "base-module-2", left: 26.035, top: 54.68, width: 5.42625, height: 10.58833, preserveManualSize: true },
+    { componentKey: "base-module-3", left: 31.46125, top: 54.68, width: 2.71375, height: 10.58833, preserveManualSize: true },
+    { componentKey: "refrigerator", left: 34.62125, top: 43.56167, width: 5.02875, height: 21.52667, preserveManualSize: true },
+    { componentKey: "wall-cabinet-5", left: 50.95875, top: 38.54333, width: 3.07625, height: 8.72, preserveManualSize: true },
+    { componentKey: "wall-cabinet-6", left: 54.0775, top: 38.54333, width: 4.07, height: 8.72, preserveManualSize: true },
+    { componentKey: "wall-cabinet-7", left: 58.1475, top: 38.54333, width: 5.42625, height: 8.72, preserveManualSize: true },
+    { componentKey: "wall-cabinet-8", left: 63.57375, top: 38.54333, width: 5.83375, height: 8.72, preserveManualSize: true },
+    { componentKey: "worktop", left: 50.95875, top: 54.19833, width: 18.45125, height: 0.48167, preserveManualSize: true },
+    { componentKey: "sink-faucet", left: 59.25, top: 51.65, width: 0.65, height: 2.55, preserveManualSize: true },
+    { componentKey: "base-module-4", left: 50.95875, top: 54.68, width: 3.07625, height: 10.58833, preserveManualSize: true },
+    { componentKey: "base-module-5", left: 54.0775, top: 54.68, width: 4.07, height: 10.58833, preserveManualSize: true },
+    { componentKey: "sink-base", left: 58.1475, top: 54.68, width: 5.42625, height: 10.58833, preserveManualSize: true },
+    { componentKey: "base-module-6", left: 63.57375, top: 54.68, width: 5.83375, height: 10.58833, preserveManualSize: true },
+  ],
   "ab-105846": [
     // Exact visible faces traced from the source PDF's vector linework.
     { componentKey: "refrigerator", points: [[67.952494, 26.265546], [80.380048, 24.45042], [90.028504, 26.447059], [77.615202, 28.242017]] },
@@ -1330,6 +1389,9 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105828"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105830"] = PLAN_HOTSPOTS_BY_SLUG["ab-105827"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105839"] = PLAN_HOTSPOTS_BY_SLUG["ab-105842"];
 PLAN_HOTSPOTS_BY_SLUG["105845-modul-2"] = PLAN_HOTSPOTS_BY_SLUG["ab-105845"];
+for (const slug of ["ab-105850", "ab-105853", "ab-105856", "ab-105859", "ab-105862"]) {
+  PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105847"];
+}
 for (const slug of ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105860"]) {
   PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105845"];
 }

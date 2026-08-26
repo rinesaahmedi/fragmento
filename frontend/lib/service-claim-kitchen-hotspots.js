@@ -17,6 +17,14 @@ const AB_105846_LAYOUT_ALIAS_SLUGS = [
   "ab-105861",
 ];
 
+const AB_105847_LAYOUT_ALIAS_SLUGS = [
+  "ab-105850",
+  "ab-105853",
+  "ab-105856",
+  "ab-105859",
+  "ab-105862",
+];
+
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
   "ab-105748",
@@ -762,6 +770,9 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
   "ab-105845": {
     indexPartKeys: ["worktop-left", "worktop-right"],
   },
+  "ab-105847": {
+    indexPartKeys: ["worktop-left", "worktop-right"],
+  },
   "ab-105747": splitWorktopDefinition(
     { left: 29.615, top: 55.55, width: 55.34, height: 6.716 },
     [
@@ -825,6 +836,10 @@ SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105839"] =
 for (const alias of ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105860"]) {
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] =
     SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105845"];
+}
+for (const alias of AB_105847_LAYOUT_ALIAS_SLUGS) {
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] =
+    SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105847"];
 }
 
 function normalizeClaimPart(part) {

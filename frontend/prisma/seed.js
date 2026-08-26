@@ -55,6 +55,12 @@ const TWO_PART_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105854",
   "ab-105857",
   "ab-105860",
+  "ab-105847",
+  "ab-105850",
+  "ab-105853",
+  "ab-105856",
+  "ab-105859",
+  "ab-105862",
 ]);
 const WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105743",
@@ -1446,6 +1452,35 @@ const AB_105845_ITEMS = [
   ...defaultServices(),
 ];
 
+// AB 105847: two straight elevations on the supplied 800 x 600 vector plan.
+// The PDF callouts map to a 60/60/30 base run on the left, a 30/45/60/60 run
+// on the right (with a 45 cm dishwasher), and 60/60/60/30 plus 30/45/60/60
+// wall runs. Unique codes keep this plan's callout numbers independent.
+const AB_105847_ITEMS = [
+  { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: DEFAULT_OVEN_HOB_CATALOG_NAME_EN, nameDe: DEFAULT_OVEN_HOB_CATALOG_NAME_DE, price: DEFAULT_OVEN_HOB_CATALOG_PRICE, articleNumber: DEFAULT_OVEN_HOB_CATALOG_ARTICLE, widthMm: 600, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
+  defaultWorktop({ sortOrder: 20 }),
+  { itemType: ItemType.COMPONENT, code: "SINK-BASE-AB105847-600", name: DEFAULT_SINK_BASE_CATALOG_NAME_EN, nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE, price: "0.00", widthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: DEFAULT_SINK_BASE_CATALOG_INFO_TEXT },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105847-US60-1", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPK20", 1), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, infoText: "US60 base storage cabinet with UPK20 filler panel", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105847-US60-2", name: "Base cabinet with drawer", price: articlePrice("US60"), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 50, infoText: "US60 base storage cabinet", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105847-US30-1", name: "Base cabinet with drawer", price: articlePrice("US30"), widthMm: 300, depthMm: 600, iconKey: "base_cabinet_30", colorKey: "#ffbf00", componentKey: "base-module-3", sortOrder: 60, infoText: "US30 base storage cabinet", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105847-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 70, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105847-US30-2", name: "Base cabinet with drawer", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, depthMm: 600, iconKey: "base_cabinet_30", colorKey: "#ffbf00", componentKey: "base-module-4", sortOrder: 80, infoText: "US30 base storage cabinet with UPK20 filler panel", articleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105847-450", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: "0.00", widthMm: 450, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "base-module-5", sortOrder: 90, infoText: "Integrated dishwasher shown as 45 cm in the AB 105847 schedule", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105847-US60-3", name: "Base cabinet with drawer", price: articlePriceWithBlende("US60", "UPK20", 1), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-6", sortOrder: 100, infoText: "US60 base storage cabinet with UPK20 filler panel", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105847-H6002-1", name: "Wall Cabinet", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 110, infoText: "H6002 wall cabinet with HPK2002 filler panel", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105847-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 120, infoText: "HD6002 flat-screen hood cabinet package", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105847-FH664621E", name: "FH664621E Extractor Hood", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 122, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH 664 621 E", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105847-H6002-2", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 130, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105847-H3002-1", name: "Wall Cabinet", price: articlePrice("H3002"), widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 140, infoText: "H3002 wall cabinet, 30 cm", articleNumber: "H3002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105847-H3002-2", name: "Wall Cabinet", price: articlePriceWithBlende("H3002", "HPK2002", 1), widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 150, infoText: "H3002 wall cabinet with HPK2002 filler panel", articleNumber: "H3002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105847-H4502", name: "Wall Cabinet", price: articlePrice("H4502"), widthMm: 450, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 160, infoText: "H4502, 2 adjustable shelves", articleNumber: "H4502" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105847-H6002-3", name: "Wall Cabinet", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-7", sortOrder: 170, infoText: "H6002, 2 adjustable shelves", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105847-H6002-4", name: "Wall Cabinet", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-8", sortOrder: 180, infoText: "H6002 wall cabinet with HPK2002 filler panel", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ sortOrder: 190 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // AB 105841 shares AB 105806's single-wall layout (fridge on the RIGHT). Items whose callout
 // number matches AB 105806's scheme reuse its codes (oven 1, worktop 2, sink base 3, hood 10,
 // wall cabinets 12/13/14, sink+waste); the rest get AB105841 codes so their plan numbers (4-9, 11)
@@ -2173,6 +2208,54 @@ const DEFAULT_KITCHENS = [
     name: "105845",
     description: "Two-elevation kitchen configuration based on frontend/public/pdfs/105845.pdf",
     items: AB_105845_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105847",
+    kitchenCode: "105 847",
+    name: "105847",
+    description: "Two-elevation kitchen configuration based on frontend/public/pdfs/105847.pdf",
+    items: AB_105847_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105850",
+    kitchenCode: "105 850",
+    name: "105850",
+    description: "Kitchen configuration using the AB 105847 two-elevation layout",
+    items: AB_105847_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105853",
+    kitchenCode: "105 853",
+    name: "105853",
+    description: "Kitchen configuration using the AB 105847 two-elevation layout",
+    items: AB_105847_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105856",
+    kitchenCode: "105 856",
+    name: "105856",
+    description: "Kitchen configuration using the AB 105847 two-elevation layout",
+    items: AB_105847_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105859",
+    kitchenCode: "105 859",
+    name: "105859",
+    description: "Kitchen configuration using the AB 105847 two-elevation layout",
+    items: AB_105847_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105862",
+    kitchenCode: "105 862",
+    name: "105862",
+    description: "Kitchen configuration using the AB 105847 two-elevation layout",
+    items: AB_105847_ITEMS,
     reconcileExisting: true,
   },
   {
@@ -3058,7 +3141,7 @@ async function main() {
         : null;
       // The supplied AB 105845 schedule explicitly shows a 45 cm bay while retaining the
       // A-EGSPV597210 + TGV60 article text. Preserve that measured plan width for this item.
-      const resolvedWidthMm = itemCode === "DISH-AB105845-450"
+      const resolvedWidthMm = ["DISH-AB105845-450", "DISH-AB105847-450"].includes(itemCode)
         ? Number(rawItem.widthMm) || 450
         : pickCatalogDimension(catalogDims?.widthMm, item.widthMm);
       const resolvedHeightMm = pickCatalogDimension(catalogDims?.heightMm, item.heightMm);
