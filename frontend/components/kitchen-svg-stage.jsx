@@ -2485,6 +2485,16 @@ export default function useKitchenSvgStage({
                     })}
                   </div>
                   {persistentLightDetails.map((detail) => {
+                    const detailComponentId = componentIdForKey(detail.componentKey);
+                    const detailLinkedIds = getLinkedComponentIds(kitchenSlug, detailComponentId);
+                    const isDetailComponentSelected =
+                      planLockedComponentIds.includes(detailComponentId)
+                      || detailLinkedIds.some((linkedId) => selectedComponentIds.includes(linkedId));
+
+                    // The pale source details belong to the unselected plan drawing.
+                    // Once selected, let the component tint form one clean overlay.
+                    if (isDetailComponentSelected) return null;
+
                     const right = detail.left + detail.width;
                     const bottom = detail.top + detail.height;
                     const clipPath = `polygon(${detail.left}% ${detail.top}%, ${right}% ${detail.top}%, ${right}% ${bottom}%, ${detail.left}% ${bottom}%)`;

@@ -36,6 +36,15 @@ const AB_105846_LAYOUT_ALIAS_SLUGS = [
   "ab-105861",
 ];
 
+const AB_105845_LAYOUT_ALIAS_SLUGS = [
+  "105845-modul-2",
+  "ab-105848",
+  "ab-105851",
+  "ab-105854",
+  "ab-105857",
+  "ab-105860",
+];
+
 test("service kitchen svg loader uses the AB 105808 plan asset", async () => {
   const markup = await loadKitchenSvgMarkup("ab-105808");
 
@@ -3191,6 +3200,40 @@ test("AB 105846 layout aliases reuse its exact plan and claims geometry", () => 
       buildServiceClaimPartHotspots(prepare(sourceWorktop), claimParts, slug),
       sourceClaims,
     );
+  }
+});
+
+test("AB 105845 places the UPK20 on the US30 right side and excludes the wall edge", () => {
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105845"]
+    .filter((hotspot) => hotspot.componentKey === "drawer-module");
+  const blende = {
+    componentId: "component-claim-blende-drawer-module",
+    componentKey: "claim-blende-drawer-module",
+    sourceComponentKey: "drawer-module",
+    sourceWidthMm: 300,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const components = [{
+    componentKey: "drawer-module",
+    widthMm: 300,
+    blendeCode: "UPK20",
+  }];
+
+  for (const slug of ["ab-105845", ...AB_105845_LAYOUT_ALIAS_SLUGS]) {
+    const result = buildServiceClaimBlendeHotspots(sourceHotspots, [blende], components, slug);
+    const cabinet = result.find((hotspot) => hotspot.componentKey === "drawer-module");
+    const filler = result.find((hotspot) => hotspot.claimPartKey === "blende");
+
+    assert.ok(cabinet, `${slug} keeps the US30 cabinet selectable`);
+    assert.ok(filler, `${slug} exposes the UPK20 filler`);
+    assert.notEqual(cabinet.componentId, filler.componentId);
+    assert.equal(filler.blendeSide, "right");
+    assert.ok(Math.abs(cabinet.left - 94.08875) < 0.000001);
+    assert.ok(Math.abs(cabinet.left + cabinet.width - 99.129375) < 0.000001);
+    assert.ok(Math.abs(filler.left - 99.129375) < 0.000001);
+    assert.ok(Math.abs(filler.left + filler.width - 99.7175) < 0.000001);
+    assert.ok(Math.abs(cabinet.left + cabinet.width - filler.left) < 0.000001);
   }
 });
 

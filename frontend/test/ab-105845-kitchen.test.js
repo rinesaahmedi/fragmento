@@ -47,15 +47,34 @@ test("AB 105845 uses the official two-elevation plan with every scheduled face",
 
   const narrowLeftWall = hotspots.find((hotspot) => hotspot.componentKey === "wall-cabinet-2");
   const dishwasher = hotspots.find((hotspot) => hotspot.componentKey === "dishwasher-base");
+  const farRightDrawer = hotspots.find((hotspot) => hotspot.componentKey === "drawer-module");
   assert.ok(Math.abs(narrowLeftWall.width - 5.04125) < 0.00001);
   assert.ok(Math.abs(dishwasher.width - 7.56125) < 0.00001);
+  assert.ok(Math.abs(farRightDrawer.left - 94.08875) < 0.00001);
+  assert.ok(Math.abs(farRightDrawer.left + farRightDrawer.width - 99.7175) < 0.00001);
 });
 
 test("AB 105845 dishwasher internals remain light grey above selection fills", () => {
+  const styles = readFileSync(
+    new URL("../components/kitchen-configurator.module.css", import.meta.url),
+    "utf8",
+  );
+  const stage = readFileSync(
+    new URL("../components/kitchen-svg-stage.jsx", import.meta.url),
+    "utf8",
+  );
+
   assert.deepEqual(
     PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105845"].map((detail) => detail.key),
     ["dishwasher-basket", "dishwasher-gs-mark"],
   );
+  assert.ok(
+    PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105845"].every(
+      (detail) => detail.componentKey === "dishwasher-base",
+    ),
+  );
+  assert.match(styles, /\.planPersistentLightDetail\s*\{[^}]*invert\(92%\)/s);
+  assert.match(stage, /if \(isDetailComponentSelected\) return null/);
 });
 
 test("AB 105845 30 cm lower cabinet has a visible width-scaled catalog icon", () => {
