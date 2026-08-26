@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import { usePublicI18n } from "./public-i18n";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
@@ -229,6 +229,150 @@ function CustomDatePicker({
             <span className={styles.datePickerTodayMarker} aria-hidden="true" />
             <span>{translate("order.today", "Today")}</span>
           </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function CustomDeliveryWeekSelect({
+  id,
+  name,
+  value,
+  options,
+  placeholder,
+  invalid = false,
+  onBlur,
+  onChange,
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const selectRef = useRef(null);
+  const buttonRef = useRef(null);
+  const listboxId = `${id}-listbox`;
+  const selectedValue = value || "";
+  const selectOptions = useMemo(() => [{ value: "", label: placeholder }, ...options], [options, placeholder]);
+  const selectedOption = selectOptions.find((option) => option.value === selectedValue) || selectOptions[0];
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handlePointerDown(event) {
+      if (!selectRef.current?.contains(event.target)) {
+        setIsOpen(false);
+        onBlur?.();
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [isOpen, onBlur]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setActiveIndex(Math.max(0, selectOptions.findIndex((option) => option.value === selectedValue)));
+  }, [isOpen, selectOptions, selectedValue]);
+
+  function chooseOption(option) {
+    onChange(option.value);
+    setIsOpen(false);
+    onBlur?.();
+    buttonRef.current?.focus();
+  }
+
+  function moveActive(direction) {
+    if (!selectOptions.length) return;
+    setActiveIndex((current) => (current + direction + selectOptions.length) % selectOptions.length);
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (!isOpen) setIsOpen(true);
+      else moveActive(1);
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!isOpen) setIsOpen(true);
+      else moveActive(-1);
+      return;
+    }
+
+    if (event.key === "Home") {
+      event.preventDefault();
+      setActiveIndex(0);
+      return;
+    }
+
+    if (event.key === "End") {
+      event.preventDefault();
+      setActiveIndex(selectOptions.length - 1);
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (!isOpen) {
+        setIsOpen(true);
+      } else {
+        chooseOption(selectOptions[activeIndex]);
+      }
+      return;
+    }
+
+    if (event.key === "Escape") {
+      setIsOpen(false);
+      onBlur?.();
+      buttonRef.current?.focus();
+    }
+  }
+
+  return (
+    <div className={styles.deliveryWeekSelect} ref={selectRef}>
+      <input type="hidden" name={name} value={selectedValue} />
+      <button
+        ref={buttonRef}
+        id={id}
+        type="button"
+        className={styles.deliveryWeekTrigger}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-controls={listboxId}
+        aria-invalid={invalid}
+        onClick={() => setIsOpen((current) => !current)}
+        onKeyDown={handleKeyDown}
+      >
+        <span className={selectedValue ? "" : styles.deliveryWeekPlaceholder}>{selectedOption.label}</span>
+        <span className={styles.deliveryWeekChevron} aria-hidden="true" />
+      </button>
+
+      {isOpen ? (
+        <div className={styles.deliveryWeekMenu} id={listboxId} role="listbox" aria-labelledby={id}>
+          {selectOptions.map((option, index) => {
+            const isSelected = option.value === selectedValue;
+            const isActive = index === activeIndex;
+
+            return (
+              <button
+                key={option.value || "placeholder"}
+                type="button"
+                className={[
+                  styles.deliveryWeekOption,
+                  isSelected ? styles.deliveryWeekOptionSelected : "",
+                  isActive ? styles.deliveryWeekOptionActive : "",
+                ].filter(Boolean).join(" ")}
+                role="option"
+                aria-selected={isSelected}
+                onMouseEnter={() => setActiveIndex(index)}
+                onClick={() => chooseOption(option)}
+              >
+                <span>{option.label}</span>
+                <span className={styles.deliveryWeekOptionMark} aria-hidden="true" />
+              </button>
+            );
+          })}
         </div>
       ) : null}
     </div>
@@ -607,7 +751,7 @@ export default function PublicKitchenOrderForm({
             )}
           </div>
 
-          <div className={styles.orderSectionCard}>
+          <div className={[styles.orderSectionCard, styles.deliverySectionCard].join(" ")}>
             <div className={styles.orderSectionHeader}>
               <div>
                 <div className={styles.deliveryHeaderTitle}>
@@ -622,25 +766,19 @@ export default function PublicKitchenOrderForm({
             <div className={styles.sectionFields}>
               <div className={getFieldClassName("preferredDeliveryDate", true, [styles.field, styles.deliveryDateField].join(" "))}>
                 <label htmlFor="preferredDeliveryDate">{translate("order.preferredDeliveryWeek", "Preferred delivery week")}*</label>
-                <select
+                <CustomDeliveryWeekSelect
                   id="preferredDeliveryDate"
                   name="preferred-delivery-date"
-                  required
+                  placeholder={translate("order.selectPreferredDeliveryWeek", "Select delivery week")}
+                  options={deliveryWeekOptions}
                   value={customer.preferredDeliveryDate || ""}
                   onBlur={() => markFieldTouched("preferredDeliveryDate")}
-                  onChange={(event) => {
+                  onChange={(nextValue) => {
                     markFieldTouched("preferredDeliveryDate");
-                    onUpdateCustomer("preferredDeliveryDate", event.target.value);
+                    onUpdateCustomer("preferredDeliveryDate", nextValue);
                   }}
-                  aria-invalid={hasFieldError("preferredDeliveryDate", true)}
-                >
-                  <option value="">{translate("order.selectPreferredDeliveryWeek", "Select delivery week")}</option>
-                  {deliveryWeekOptions.map((option) => (
-                    <option key={option.weeks} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  invalid={hasFieldError("preferredDeliveryDate", true)}
+                />
                 {renderFieldError("preferredDeliveryDate", true)}
               </div>
             </div>
