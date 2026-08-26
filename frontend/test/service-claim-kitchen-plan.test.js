@@ -3342,7 +3342,18 @@ test("AB 105846 selected UPK20 remains independently selectable in service claim
     "BLENDE-AB105846-SINK-END",
     "sink-end-blende",
     "Filler Panel up to 20 cm",
-    { articleNumber: "UPK20", nameDe: "Passblende bis 20 cm" },
+    {
+      articleNumber: "UPK20",
+      nameDe: "Passblende bis 20 cm",
+      iconKey: "blende",
+      catalogBlendeId: "catalog-blende-upk20",
+      catalogBlendeQuantity: 1,
+      catalogBlende: {
+        code: "UPK20",
+        name: "Filler Panel up to 20 cm",
+        nameDe: "Passblende bis 20 cm",
+      },
+    },
   );
   const kitchen = { items: [sink, blende] };
   const result = buildServiceClaimSelectableComponents({
@@ -3361,6 +3372,18 @@ test("AB 105846 selected UPK20 remains independently selectable in service claim
   assert.equal(blendeMeta.componentKey, "sink-end-blende");
   assert.equal(blendeMeta.name, "Filler Panel up to 20 cm");
   assert.equal(blendeMeta.nameDe, "Passblende bis 20 cm");
+  assert.equal(
+    result.selectableComponents.filter((entry) => entry.articleCode === "UPK20").length,
+    1,
+  );
+  assert.ok(!result.selectableComponentIds.includes(
+    "component-claim-blende-sink-end-blende",
+  ));
+  assert.equal(
+    buildServiceClaimComponentChoiceGroups(result.selectableComponents)
+      .some((group) => group.sourceComponentKey === "sink-end-blende"),
+    false,
+  );
 });
 
 test("AB 105846 keeps all three faucet silhouettes but emits one sink bowl", () => {

@@ -1,5 +1,6 @@
 import { ItemType } from "@prisma/client";
 import { componentIdForItem, getLinkedComponentIds } from "../components/kitchen-selection-utils.js";
+import { isStandaloneCatalogBlendeItem } from "./catalog-pricing.js";
 import { stripProductDimensionsFromLabel } from "./product-label-format.js";
 
 const CLAIM_LINKED_COMPONENT_META = {
@@ -231,6 +232,11 @@ function claimBlendeComponentId(componentKey) {
 }
 
 function buildClaimBlendeMeta(item = {}) {
+  // A standalone filler is already its own selectable component. Its catalog
+  // Blende relation describes that item; it must not create a second,
+  // claims-only Blende attached to itself.
+  if (isStandaloneCatalogBlendeItem(item)) return null;
+
   const componentKey = String(item.componentKey || "").trim();
   const savedCode = normalizeClaimBlendeCode(item.blendeCode);
   const catalogCode = normalizeClaimBlendeCode(item.catalogBlende?.code);
