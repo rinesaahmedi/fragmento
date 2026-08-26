@@ -604,6 +604,23 @@
   line-height: 1;
 }
 
+.planSideLabelTwoPart {
+  min-height: 24px;
+  padding: 3px 8px;
+  transform: none;
+}
+
+@media (max-width: 760px) {
+  .planSideLabelTwoPart {
+    min-height: 22px;
+    padding: 2px 6px;
+  }
+
+  .planSideLabelTwoPart strong {
+    font-size: 0.78rem;
+  }
+}
+
 .planHotspot {
   position: absolute;
   margin: 0;

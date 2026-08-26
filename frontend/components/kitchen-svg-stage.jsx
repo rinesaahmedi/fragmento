@@ -22,6 +22,11 @@ import {
   PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data";
+import {
+  getTwoPartMobilePlanCrop,
+  getTwoPartMobilePlanLayout,
+  shiftTwoPartPlanGeometry,
+} from "../lib/two-part-mobile-plan-layout";
 
 const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
   ssr: false,
@@ -1557,6 +1562,19 @@ const SPLIT_SIDE_LABEL_SLUGS = new Set([
   "ab-105836",
   "ab-105839",
   "ab-105842",
+  "ab-105845",
+  "105845-modul-2",
+  "ab-105848",
+  "ab-105851",
+  "ab-105854",
+  "ab-105857",
+  "ab-105860",
+  "ab-105847",
+  "ab-105850",
+  "ab-105853",
+  "ab-105856",
+  "ab-105859",
+  "ab-105862",
 ]);
 
 function isBaseBodyHotspot(definition) {
@@ -1889,14 +1907,16 @@ function getSplitKitchenSideLabels(definitions, crop, slug, translate, language)
     .sort((a, b) => a.left - b.left);
   if (worktopRuns.length < 2) return [];
 
-  const separatedRuns = worktopRuns.filter((run, index) => {
-    const previous = worktopRuns[index - 1];
-    const next = worktopRuns[index + 1];
-    return (
-      (previous && run.left - previous.right >= SPLIT_SIDE_WORKTOP_GAP_PERCENT) ||
-      (next && next.left - run.right >= SPLIT_SIDE_WORKTOP_GAP_PERCENT)
-    );
-  });
+  const separatedRuns = getTwoPartMobilePlanLayout(slug)
+    ? worktopRuns.slice(0, 2)
+    : worktopRuns.filter((run, index) => {
+        const previous = worktopRuns[index - 1];
+        const next = worktopRuns[index + 1];
+        return (
+          (previous && run.left - previous.right >= SPLIT_SIDE_WORKTOP_GAP_PERCENT) ||
+          (next && next.left - run.right >= SPLIT_SIDE_WORKTOP_GAP_PERCENT)
+        );
+      });
   if (separatedRuns.length < 2) return [];
 
   const findRunForComponent = (componentKeys) => {
@@ -2013,6 +2033,72 @@ export function withDerivedSinkFaucet(definitions, components) {
   ];
 }
 
+function CompactMobilePlanArtwork({
+  href,
+  crop,
+  layout,
+  className,
+  style,
+  idSuffix,
+  label = "",
+  clipGeometry = null,
+}) {
+  const safeIdSuffix = String(idSuffix || "plan").replace(/[^a-z0-9_-]/gi, "-");
+  const leftClipId = `compact-plan-left-${safeIdSuffix}`;
+  const rightClipId = `compact-plan-right-${safeIdSuffix}`;
+  const detailClipId = `compact-plan-detail-${safeIdSuffix}`;
+  const rightStart = layout.splitX - layout.shiftX;
+  const planLayers = (
+    <>
+      <g clipPath={`url(#${leftClipId})`}>
+        <image href={href} x="0" y="0" width="100" height="100" preserveAspectRatio="none" />
+      </g>
+      <g clipPath={`url(#${rightClipId})`}>
+        <image
+          href={href}
+          x={-layout.shiftX}
+          y="0"
+          width="100"
+          height="100"
+          preserveAspectRatio="none"
+        />
+      </g>
+    </>
+  );
+
+  return (
+    <svg
+      className={className}
+      style={style}
+      viewBox={`${crop.left} ${crop.top} ${crop.width} ${crop.height}`}
+      preserveAspectRatio="none"
+      role={label ? "img" : undefined}
+      aria-label={label || undefined}
+      aria-hidden={label ? undefined : "true"}
+    >
+      <defs>
+        <clipPath id={leftClipId}>
+          <rect x="0" y="0" width={layout.splitX} height="100" />
+        </clipPath>
+        <clipPath id={rightClipId}>
+          <rect x={rightStart} y="0" width={100 - layout.splitX} height="100" />
+        </clipPath>
+        {clipGeometry ? (
+          <clipPath id={detailClipId}>
+            <rect
+              x={clipGeometry.left}
+              y={clipGeometry.top}
+              width={clipGeometry.width}
+              height={clipGeometry.height}
+            />
+          </clipPath>
+        ) : null}
+      </defs>
+      {clipGeometry ? <g clipPath={`url(#${detailClipId})`}>{planLayers}</g> : planLayers}
+    </svg>
+  );
+}
+
 export default function useKitchenSvgStage({
   svgMarkup,
   kitchenConfig,
@@ -2036,6 +2122,14 @@ export default function useKitchenSvgStage({
   const hasImageView = Boolean(imageViewHref);
   const hasPdfView = Boolean(pdfViewHref);
   const [activeView, setActiveView] = useState("2d");
+  const [isMobilePlanViewport, setIsMobilePlanViewport] = useState(false);
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 760px)");
+    const updateMobilePlanViewport = () => setIsMobilePlanViewport(mediaQuery.matches);
+    updateMobilePlanViewport();
+    mediaQuery.addEventListener?.("change", updateMobilePlanViewport);
+    return () => mediaQuery.removeEventListener?.("change", updateMobilePlanViewport);
+  }, []);
   const resolvedSvgMarkup = useMemo(
     () => applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug),
     [kitchenConfig.kitchen.slug, svgMarkup],
@@ -2121,16 +2215,31 @@ export default function useKitchenSvgStage({
     () => getPlanDisplayCrop(imageHotspots, normalizedKitchenSlug),
     [imageHotspots, normalizedKitchenSlug],
   );
+  const mobilePlanLayout = useMemo(
+    () => getTwoPartMobilePlanLayout(normalizedKitchenSlug),
+    [normalizedKitchenSlug],
+  );
+  const isCompactMobilePlan = Boolean(isMobilePlanViewport && mobilePlanLayout);
+  const compactMobileImageHotspots = useMemo(
+    () => imageHotspots.map((hotspot) => shiftTwoPartPlanGeometry(hotspot, mobilePlanLayout)),
+    [imageHotspots, mobilePlanLayout],
+  );
+  const compactMobilePlanCrop = useMemo(
+    () => getTwoPartMobilePlanCrop(planDisplayCrop, mobilePlanLayout),
+    [planDisplayCrop, mobilePlanLayout],
+  );
+  const activeImageHotspots = isCompactMobilePlan ? compactMobileImageHotspots : imageHotspots;
+  const activePlanDisplayCrop = isCompactMobilePlan ? compactMobilePlanCrop : planDisplayCrop;
   const croppedImageHotspots = useMemo(
     () =>
-      imageHotspots
-        .map((hotspot) => cropPlanHotspot(hotspot, planDisplayCrop))
+      activeImageHotspots
+        .map((hotspot) => cropPlanHotspot(hotspot, activePlanDisplayCrop))
         .filter((hotspot) => hotspot.width > 0 && hotspot.height > 0),
-    [imageHotspots, planDisplayCrop],
+    [activeImageHotspots, activePlanDisplayCrop],
   );
   const splitKitchenSideLabels = useMemo(
-    () => getSplitKitchenSideLabels(imageHotspots, planDisplayCrop, normalizedKitchenSlug, translate, language),
-    [imageHotspots, planDisplayCrop, normalizedKitchenSlug, translate, language],
+    () => getSplitKitchenSideLabels(activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language),
+    [activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language],
   );
   const planImageSourceSize =
     PLAN_IMAGE_SOURCE_SIZE_BY_SLUG[normalizedKitchenSlug] || {
@@ -2139,13 +2248,16 @@ export default function useKitchenSvgStage({
     };
   const persistentLightDetails =
     PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[normalizedKitchenSlug] || [];
+  const activePersistentLightDetails = isCompactMobilePlan
+    ? persistentLightDetails.map((detail) => shiftTwoPartPlanGeometry(detail, mobilePlanLayout))
+    : persistentLightDetails;
   const croppedPlanAspectRatio =
-    `${planDisplayCrop.width * planImageSourceSize.width} / ${planDisplayCrop.height * planImageSourceSize.height}`;
+    `${activePlanDisplayCrop.width * planImageSourceSize.width} / ${activePlanDisplayCrop.height * planImageSourceSize.height}`;
   const planImageInteractiveStyle = {
-    left: `${-(planDisplayCrop.left / planDisplayCrop.width) * 100}%`,
-    top: `${-(planDisplayCrop.top / planDisplayCrop.height) * 100}%`,
-    width: `${(100 / planDisplayCrop.width) * 100}%`,
-    height: `${(100 / planDisplayCrop.height) * 100}%`,
+    left: `${-(activePlanDisplayCrop.left / activePlanDisplayCrop.width) * 100}%`,
+    top: `${-(activePlanDisplayCrop.top / activePlanDisplayCrop.height) * 100}%`,
+    width: `${(100 / activePlanDisplayCrop.width) * 100}%`,
+    height: `${(100 / activePlanDisplayCrop.height) * 100}%`,
   };
   const planLineBoostStyle =
     ["ab-104968", "ab-105734", "ab-105737", "ab-105740"].includes(normalizedKitchenSlug)
@@ -2477,13 +2589,25 @@ export default function useKitchenSvgStage({
                   className={styles.planImageWrap}
                   style={{ aspectRatio: croppedPlanAspectRatio }}
                 >
-                  <img
-                    ref={planTraceImageRef}
-                    src={imageViewHref}
-                    alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
-                    className={styles.planImageInteractive}
-                    style={planImageInteractiveStyle}
-                  />
+                  {isCompactMobilePlan ? (
+                    <CompactMobilePlanArtwork
+                      href={imageViewHref}
+                      crop={activePlanDisplayCrop}
+                      layout={mobilePlanLayout}
+                      idSuffix={`${normalizedKitchenSlug}-base`}
+                      label={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
+                      className={styles.planImageInteractive}
+                      style={{ inset: 0, width: "100%", height: "100%" }}
+                    />
+                  ) : (
+                    <img
+                      ref={planTraceImageRef}
+                      src={imageViewHref}
+                      alt={`${kitchenConfig.kitchen.name || "Kitchen"} plan`}
+                      className={styles.planImageInteractive}
+                      style={planImageInteractiveStyle}
+                    />
+                  )}
                   {planLineBoostStyle ? (
                     <img
                       src={imageViewHref}
@@ -2567,7 +2691,7 @@ export default function useKitchenSvgStage({
                       );
                     })}
                   </div>
-                  {persistentLightDetails.map((detail) => {
+                  {activePersistentLightDetails.map((detail) => {
                     const detailComponentId = componentIdForKey(detail.componentKey);
                     const detailLinkedIds = getLinkedComponentIds(kitchenSlug, detailComponentId);
                     const isDetailComponentSelected =
@@ -2577,6 +2701,21 @@ export default function useKitchenSvgStage({
                     // The pale source details belong to the unselected plan drawing.
                     // Once selected, let the component tint form one clean overlay.
                     if (isDetailComponentSelected) return null;
+
+                    if (isCompactMobilePlan) {
+                      return (
+                        <CompactMobilePlanArtwork
+                          key={detail.key}
+                          href={imageViewHref}
+                          crop={activePlanDisplayCrop}
+                          layout={mobilePlanLayout}
+                          idSuffix={`${normalizedKitchenSlug}-${detail.key}`}
+                          clipGeometry={detail}
+                          className={`${styles.planImageInteractive} ${styles.planPersistentLightDetail}`}
+                          style={{ inset: 0, width: "100%", height: "100%" }}
+                        />
+                      );
+                    }
 
                     const right = detail.left + detail.width;
                     const bottom = detail.top + detail.height;
@@ -2602,7 +2741,7 @@ export default function useKitchenSvgStage({
                       {splitKitchenSideLabels.map((sideLabel) => (
                         <div
                           key={sideLabel.label}
-                          className={styles.planSideLabel}
+                          className={`${styles.planSideLabel} ${mobilePlanLayout ? styles.planSideLabelTwoPart : ""}`}
                           style={{
                             left: `${sideLabel.left}%`,
                             top: `${sideLabel.top}%`,

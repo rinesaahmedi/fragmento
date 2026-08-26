@@ -11,10 +11,56 @@ import {
   PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data.js";
+import {
+  getTwoPartMobilePlanCrop,
+  getTwoPartMobilePlanLayout,
+  shiftTwoPartPlanGeometry,
+} from "../lib/two-part-mobile-plan-layout.js";
 
 const translate = (_key, fallback) => fallback;
 const AB_105845_LAYOUT_CLONES = ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-105860"];
 const AB_105847_LAYOUT_CLONES = ["ab-105850", "ab-105853", "ab-105856", "ab-105859", "ab-105862"];
+
+test("two-part kitchen families close their center gap and grow only in the mobile layout", () => {
+  const layout845 = getTwoPartMobilePlanLayout("ab-105845");
+  const right845 = PLAN_HOTSPOTS_BY_SLUG["ab-105845"].find(
+    (hotspot) => hotspot.componentKey === "wall-cabinet-5",
+  );
+  const shifted845 = shiftTwoPartPlanGeometry(right845, layout845);
+  assert.equal(shifted845.left, right845.left - 12);
+  assert.equal(getTwoPartMobilePlanCrop({ left: 0, right: 100, width: 100 }, layout845).width, 88);
+
+  const layout847 = getTwoPartMobilePlanLayout("ab-105847");
+  const right847 = PLAN_HOTSPOTS_BY_SLUG["ab-105847"].find(
+    (hotspot) => hotspot.componentKey === "wall-cabinet-5",
+  );
+  const shifted847 = shiftTwoPartPlanGeometry(right847, layout847);
+  assert.equal(shifted847.left, right847.left - 8.5);
+  assert.ok(shifted847.left - 39.65 < right847.left - 39.65);
+
+  for (const slug of [...AB_105845_LAYOUT_CLONES, ...AB_105847_LAYOUT_CLONES]) {
+    assert.ok(getTwoPartMobilePlanLayout(slug), `${slug} should inherit compact mobile spacing`);
+  }
+  assert.equal(getTwoPartMobilePlanLayout("ab-105846"), null);
+});
+
+test("AB 105845 and AB 105847 layout families display Side A and Side B labels", () => {
+  const stage = readFileSync(new URL("../components/kitchen-svg-stage.jsx", import.meta.url), "utf8");
+  const styles = readFileSync(new URL("../components/kitchen-configurator.module.css", import.meta.url), "utf8");
+  const labelSlugBlock = stage.match(/const SPLIT_SIDE_LABEL_SLUGS = new Set\(\[([\s\S]*?)\]\);/)?.[1] || "";
+  for (const slug of [
+    "ab-105845",
+    ...AB_105845_LAYOUT_CLONES,
+    "ab-105847",
+    ...AB_105847_LAYOUT_CLONES,
+  ]) {
+    assert.match(labelSlugBlock, new RegExp(`"${slug}"`));
+  }
+  assert.match(stage, /configurator\.splitKitchenSideA/);
+  assert.match(stage, /configurator\.splitKitchenSideB/);
+  assert.match(stage, /styles\.planSideLabelTwoPart/);
+  assert.match(styles, /\.planSideLabelTwoPart\s*\{[\s\S]*?transform:\s*none/);
+});
 
 test("AB 105845 keeps the source geometry while rendering dark, legible linework", () => {
   const svg = readFileSync(
