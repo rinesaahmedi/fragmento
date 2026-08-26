@@ -95,6 +95,31 @@ test("order confirmation can generate purchased kitchen sketch attachment", asyn
   assert.match(text, /Bestellnummer/);
 });
 
+test("AB 105846 layout aliases attach their shared purchased-kitchen sketch", async () => {
+  for (const kitchenCode of ["105849", "105852", "105855", "105858", "105861"]) {
+    const pdf = await generatePurchasedKitchenPdf({
+      orderNumber: `111${kitchenCode}-1`,
+      createdAt: "2026-08-26T10:00:00.000Z",
+      kitchen: {
+        slug: `ab-${kitchenCode}`,
+        name: kitchenCode,
+      },
+      customer: {
+        contractNumber: `111${kitchenCode}`,
+      },
+      components: [],
+      accessories: [],
+      services: [],
+    });
+
+    assert.ok(pdf, `AB ${kitchenCode} should generate its sketch attachment`);
+    assert.equal(pdf.filename, `Gekaufte-Kueche-111${kitchenCode}-1.pdf`);
+    const bytes = Buffer.from(pdf.base64, "base64");
+    assert.equal(bytes.subarray(0, 4).toString("utf8"), "%PDF");
+    assert.ok(bytes.length > 10000);
+  }
+});
+
 test("order confirmation PDF hides type numbers for services", async () => {
   const order = {
     orderNumber: "FRG-TEST-007",

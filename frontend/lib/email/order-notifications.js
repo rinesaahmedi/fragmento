@@ -176,25 +176,31 @@ function normalizeKitchenSlug(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+const AB_KITCHEN_PLAN_SOURCE_CODE_BY_ALIAS_SLUG = {
+  "ab-105813": "105805",
+  "ab-105817": "105805",
+  "ab-105840": "105837",
+  "ab-105843": "105837",
+  "ab-105814": "105810",
+  "ab-105828": "105825",
+  "ab-105824": "105821",
+  "ab-105823": "105822",
+  "ab-105829": "105822",
+  "ab-105832": "105822",
+  "ab-105830": "105827",
+  "ab-105839": "105842",
+  "ab-105838": "105841",
+  "ab-105844": "105841",
+  "ab-105849": "105846",
+  "ab-105852": "105846",
+  "ab-105855": "105846",
+  "ab-105858": "105846",
+  "ab-105861": "105846",
+};
+
 function deriveAbKitchenPlanCode(slug) {
   const normalizedSlug = normalizeKitchenSlug(slug);
-  const aliasBySlug = {
-    "ab-105813": "105805",
-    "ab-105817": "105805",
-    "ab-105840": "105837",
-    "ab-105843": "105837",
-    "ab-105814": "105810",
-    "ab-105828": "105825",
-    "ab-105824": "105821",
-    "ab-105823": "105822",
-    "ab-105829": "105822",
-    "ab-105832": "105822",
-    "ab-105830": "105827",
-    "ab-105839": "105842",
-    "ab-105838": "105841",
-    "ab-105844": "105841",
-  };
-  const aliasedCode = aliasBySlug[normalizedSlug];
+  const aliasedCode = AB_KITCHEN_PLAN_SOURCE_CODE_BY_ALIAS_SLUG[normalizedSlug];
   if (aliasedCode) return aliasedCode;
 
   const match = normalizedSlug.match(/^ab-(\d{6})$/);
@@ -325,6 +331,18 @@ async function loadKitchenPlanPreviewData() {
       (match, target, sourceSlug) => {
         hotspotsBySlug[target] = hotspotsBySlug[sourceSlug] || [];
         return match;
+      },
+    );
+
+    // The configurator applies several shared-plan aliases with runtime loops.
+    // This server-side parser reads object literals, so mirror those aliases
+    // explicitly for email rendering and selection overlays.
+    Object.entries(AB_KITCHEN_PLAN_SOURCE_CODE_BY_ALIAS_SLUG).forEach(
+      ([aliasSlug, sourceCode]) => {
+        const sourceSlug = `ab-${sourceCode}`;
+        imageViews[aliasSlug] ||= imageViews[sourceSlug] || "";
+        hotspotsBySlug[aliasSlug] ||= hotspotsBySlug[sourceSlug] || [];
+        linkedGroupsBySlug[aliasSlug] ||= linkedGroupsBySlug[sourceSlug] || [];
       },
     );
 
