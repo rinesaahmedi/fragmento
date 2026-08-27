@@ -16,11 +16,13 @@ import {
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data.js";
 import {
+  buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
   isLShapedClaimKitchen,
 } from "../lib/service-claim-kitchen-hotspots.js";
 import { getServiceClaimLinkedComponentIds } from "../lib/service-claim-kitchen-plan-selection.js";
 import { serializeKitchenForLegacy } from "../lib/catalog.js";
+import { resolveCutleryCatalogArticles } from "../lib/cutlery-accessories.js";
 
 const translate = (_key, fallback) => fallback;
 
@@ -165,6 +167,35 @@ test("Burger claim worktops preserve both exact configurator polygons", () => {
   }
 });
 
+test("Burger claims separate the US60 cabinet from both UPE65 corner faces", () => {
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["burger-103898"]
+    .filter((hotspot) => hotspot.componentKey === "base-module-2");
+  const claims = buildServiceClaimBlendeHotspots(
+    sourceHotspots,
+    [{
+      componentId: "component-claim-blende-base-module-2",
+      componentKey: "claim-blende-base-module-2",
+      sourceComponentKey: "base-module-2",
+      sourceWidthMm: 600,
+      claimPartKey: "blende",
+      blendeQuantity: 1,
+    }],
+    [{ componentKey: "base-module-2", widthMm: 600, blendeCode: "UPE65" }],
+    "burger-103898",
+  );
+  const cabinetHotspots = claims.filter((hotspot) => hotspot.componentKey === "base-module-2");
+  const fillerHotspots = claims.filter((hotspot) => hotspot.claimPartKey === "blende");
+
+  assert.equal(cabinetHotspots.length, 1);
+  assert.deepEqual(cabinetHotspots[0].points, sourceHotspots[0].points);
+  assert.equal(fillerHotspots.length, 2);
+  assert.deepEqual(fillerHotspots.map((hotspot) => hotspot.points), sourceHotspots.slice(1).map((hotspot) => hotspot.points));
+  assert.equal(Math.max(...cabinetHotspots[0].points.map(([x]) => x)), 53.387173);
+  assert.equal(Math.min(...fillerHotspots.flatMap((hotspot) => hotspot.points.map(([x]) => x))), 53.387173);
+  assert.equal(Math.max(...fillerHotspots.flatMap((hotspot) => hotspot.points.map(([x]) => x))), 54.997625);
+  assert.ok(fillerHotspots.every((hotspot) => hotspot.blendeSide === "right"));
+});
+
 test("public kitchen serialization uses Burger program prices and supplier-facing codes", () => {
   const serialized = serializeKitchenForLegacy({
     id: "kitchen-1",
@@ -256,6 +287,12 @@ test("Burger 103898 uses cabinet-specific dimension labels", () => {
     iconKey: "dishwasher_base",
     widthMm: 600,
   }, "burger-103898"), "60 cm");
+  assert.equal(getStructuredDimensions({
+    code: "REF-BURGER103898-KGCN388140E",
+    iconKey: "tall_refrigerator",
+    widthMm: 545,
+    heightMm: 1800,
+  }, "burger-103898"), "54,5 x 180 cm");
 
   assert.equal(getStructuredDimensions({
     code: "DISH-AB105806-600",
@@ -288,6 +325,9 @@ test("Burger product images and PDFs stay scoped to kitchen 103898", () => {
     "/product-images/gallery/burger-103898/fridge/ol-kgcn388140e-02.jpg",
   ]);
   const display = getCatalogDisplayItem([burgerFridge], "burger-103898", burgerFridge);
+  assert.equal(burgerFridge.name, "Freestanding refrigerator 180 cm");
+  assert.equal(burgerFridge.widthMm, 545);
+  assert.equal(burgerFridge.heightMm, 1800);
   assert.equal(
     display.infoPdfHref,
     "/product-info/burger-103898/refrigerators/ol-kgcn388140e-product-info.pdf",
@@ -313,6 +353,40 @@ test("Burger product images and PDFs stay scoped to kitchen 103898", () => {
 
   assert.equal(regularFridge.productImagePath, "/product-images/regular-fridge.jpg");
   assert.equal(regularFridge.productInfoPdfPath, "/product-info/regular-fridge.pdf");
+});
+
+test("Burger 103898 cutlery widths use Burger supplier prices", () => {
+  const catalogArticles = [
+    {
+      articleNumber: "ZB30SG",
+      name: "Cutlery insert 30 cm",
+      widthMm: 300,
+      price: 19,
+      programPrices: [{ programmId: "IP 2200", price: 19, isActive: true }],
+    },
+    {
+      articleNumber: "ZBE30",
+      name: "Cutlery insert 30 cm",
+      widthMm: 300,
+      price: 13,
+      programPrices: [{ programmId: "BURGER CINDY", price: 13, isActive: true }],
+    },
+  ];
+
+  const [burgerVariant] = resolveCutleryCatalogArticles(
+    catalogArticles,
+    "burger-103898",
+    "BURGER CINDY",
+  );
+  assert.equal(burgerVariant.articleNumber, "ZB30SG");
+  assert.equal(burgerVariant.supplierArticleNumber, "ZBE30");
+  assert.equal(burgerVariant.price, 13);
+  assert.equal(burgerVariant.programPrices[0].price, 13);
+
+  assert.equal(
+    resolveCutleryCatalogArticles(catalogArticles, "ab-105806", "IP 2200")[0].price,
+    19,
+  );
 });
 
 test("order validation accepts Burger supplier-facing article numbers", () => {

@@ -33,9 +33,11 @@ import { prisma } from "./prisma";
 import { resolveProductInformation } from "./product-information";
 import {
   getAvailableCutleryVariantsForComponents,
+  getCutleryCatalogArticleNumbers,
   getCutleryVariant,
   isCutleryAccessoryCode,
   parseCutleryLineFromOrderItem,
+  resolveCutleryCatalogArticles,
 } from "./cutlery-accessories";
 import { normalizeArticleNumber, resolveAuszugVariantSelection } from "./auszug-variants";
 
@@ -563,7 +565,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       where: {
         itemType: ItemType.ACCESSORY,
         isActive: true,
-        articleNumber: { startsWith: "ZB", endsWith: "SG" },
+        articleNumber: { in: getCutleryCatalogArticleNumbers(kitchen.slug) },
       },
       include: { programPrices: true },
     }),
@@ -585,6 +587,11 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       })
       : Promise.resolve([]),
   ]);
+  const resolvedCutleryVariantArticles = resolveCutleryCatalogArticles(
+    cutleryVariantArticles,
+    kitchen.slug,
+    kitchen.programmId,
+  );
 
   // Burger uses supplier code UPE65. Existing 103898 rows may still point at
   // the shared Impuls UPEF65 record because an import with zero synced items
@@ -687,7 +694,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   );
   const selectedAccessories = submittedGroups.accessories.map((item) =>
     mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, {
-      cutleryVariantArticles,
+      cutleryVariantArticles: resolvedCutleryVariantArticles,
       ...programPriceOptions,
     }),
   );

@@ -3,7 +3,12 @@ import { prisma } from "./prisma.js";
 import { ORDER_KIND_LIVE, ORDER_KIND_TEST, getOrderDelegate } from "./order-kind.js";
 import { applyDueScheduledCatalogPriceListImports } from "./catalog-price-list-import.js";
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
-import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
+import {
+  CUTLERY_VARIANTS,
+  getCutleryCatalogArticleNumbers,
+  normalizeCutleryVariants,
+  resolveCutleryCatalogArticles,
+} from "./cutlery-accessories.js";
 import { buildAuszugVariantMetadata } from "./auszug-variants.js";
 import { isStandaloneCatalogBlendeItem } from "./catalog-pricing.js";
 import {
@@ -399,7 +404,7 @@ async function attachCutleryCatalogVariants(kitchen) {
           itemType: ItemType.ACCESSORY,
           isActive: true,
           articleNumber: {
-            in: CUTLERY_VARIANTS.map((variant) => variant.articleNumber),
+            in: getCutleryCatalogArticleNumbers(kitchen.slug),
           },
         },
         include: {
@@ -432,7 +437,7 @@ async function attachCutleryCatalogVariants(kitchen) {
       ...kitchen,
       cutleryVariants: cutleryArticles.length
         ? normalizeCutleryVariants(
-          cutleryArticles.map((article) => ({
+          resolveCutleryCatalogArticles(cutleryArticles, kitchen.slug, kitchen.programmId).map((article) => ({
             articleNumber: article.articleNumber,
             name: article.name,
             nameDe: article.nameDe || "",
@@ -1261,6 +1266,8 @@ export function serializeKitchenForLegacy(kitchen) {
   const claimParts = kitchen.claimParts || [];
   const auszugVariantArticles = kitchen.auszugVariantArticles || [];
   const toClientItem = (item) => {
+    const isBurger103898Refrigerator = kitchen.slug === "burger-103898"
+      && item.code === "REF-BURGER103898-KGCN388140E";
     const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
     const catalogService = item.catalogServiceId ? item.catalogService : null;
     const catalogBlende = item.catalogBlendeId ? item.catalogBlende : null;
@@ -1317,16 +1324,24 @@ export function serializeKitchenForLegacy(kitchen) {
         || catalogArticle?.articleNumber
         || (standaloneCatalogBlende ? catalogBlende?.code : "")
         || "",
-      name: catalogArticle?.name
-        || catalogService?.name
-        || (standaloneCatalogBlende ? catalogBlende?.name : item.name),
-      nameDe: catalogArticle?.nameDe
-        || catalogService?.nameDe
-        || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
-        || "",
+      name: isBurger103898Refrigerator
+        ? "Freestanding refrigerator 180 cm"
+        : catalogArticle?.name
+          || catalogService?.name
+          || (standaloneCatalogBlende ? catalogBlende?.name : item.name),
+      nameDe: isBurger103898Refrigerator
+        ? "Standkühlschrank 180 cm"
+        : catalogArticle?.nameDe
+          || catalogService?.nameDe
+          || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
+          || "",
       price: catalogPrice,
-      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
-      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
+      widthMm: isBurger103898Refrigerator
+        ? 545
+        : catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
+      heightMm: isBurger103898Refrigerator
+        ? 1800
+        : catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
       depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: productInformation.productImagePath,

@@ -72,6 +72,7 @@ export function getStructuredDimensions(item, kitchenSlug = "") {
 
   if (isBurger103898) {
     const widthMm = Number(item?.widthMm) > 0 ? item.widthMm : null;
+    const isRefrigerator = code === "REF-BURGER103898-KGCN388140E";
     const isUpperCabinet = code.startsWith("CAB-WALL-")
       || code.startsWith("CAB-HOOD-")
       || iconKey.startsWith("wall_cabinet")
@@ -81,6 +82,10 @@ export function getStructuredDimensions(item, kitchenSlug = "") {
       || iconKey.startsWith("drawer_base")
       || iconKey.startsWith("base_cabinet")
       || iconKey === "sink_base";
+
+    if (isRefrigerator) {
+      return "54,5 x 180 cm";
+    }
 
     if (isDishwasher || isLowerCabinet) {
       return widthMm ? `${formatDimensionCmPart(widthMm)} cm` : "";

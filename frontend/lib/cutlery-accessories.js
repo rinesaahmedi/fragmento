@@ -11,10 +11,63 @@ export const CUTLERY_VARIANTS = [
   { articleNumber: "ZB100SG", widthCm: 100, price: 36 },
 ];
 
+// Burger's supplier price list uses ZBE codes for the same selectable widths.
+// Keep the public selector keys stable (ZB*SG), but resolve prices from ZBE* for 103898.
+export const BURGER_103898_CUTLERY_VARIANTS = [
+  { articleNumber: "ZB30SG", supplierArticleNumber: "ZBE30", widthCm: 30, price: 13 },
+  { articleNumber: "ZB40SG", supplierArticleNumber: "ZBE40", widthCm: 40, price: 15 },
+  { articleNumber: "ZB45SG", supplierArticleNumber: "ZBE45", widthCm: 45, price: 17 },
+  { articleNumber: "ZB50SG", supplierArticleNumber: "ZBE50", widthCm: 50, price: 18 },
+  { articleNumber: "ZB60SG", supplierArticleNumber: "ZBE60", widthCm: 60, price: 20 },
+  { articleNumber: "ZB80SG", supplierArticleNumber: "ZBE80", widthCm: 80, price: 25 },
+  { articleNumber: "ZB90SG", supplierArticleNumber: "ZBE90", widthCm: 90, price: 26 },
+  { articleNumber: "ZB100SG", supplierArticleNumber: "ZBE100", widthCm: 100, price: 28 },
+];
+
 export const DEFAULT_CUTLERY_ARTICLE_NUMBER = "ZB60SG";
 
 function normalizeArticleNumber(articleNumber) {
   return String(articleNumber || "").trim().toUpperCase();
+}
+
+export function getCutleryCatalogArticleNumbers(kitchenSlug = "") {
+  const isBurger103898 = String(kitchenSlug || "").trim().toLowerCase() === "burger-103898";
+  return isBurger103898
+    ? [...new Set(BURGER_103898_CUTLERY_VARIANTS.flatMap((variant) => [
+      variant.articleNumber,
+      variant.supplierArticleNumber,
+    ]))]
+    : CUTLERY_VARIANTS.map((variant) => variant.articleNumber);
+}
+
+export function resolveCutleryCatalogArticles(articles = [], kitchenSlug = "", programmId = "") {
+  const isBurger103898 = String(kitchenSlug || "").trim().toLowerCase() === "burger-103898";
+  if (!isBurger103898) return articles;
+
+  const articlesByNumber = new Map(
+    articles.map((article) => [normalizeArticleNumber(article?.articleNumber), article]),
+  );
+
+  return BURGER_103898_CUTLERY_VARIANTS.map((variant) => {
+    const supplierArticle = articlesByNumber.get(variant.supplierArticleNumber);
+    const sharedArticle = articlesByNumber.get(variant.articleNumber);
+    const sourceArticle = supplierArticle || sharedArticle || {};
+    const programPrice = (sourceArticle.programPrices || []).find(
+      (entry) => entry.isActive !== false && entry.programmId === programmId,
+    );
+    const price = Number(programPrice?.price ?? sourceArticle.price ?? variant.price);
+
+    return {
+      ...sourceArticle,
+      articleNumber: variant.articleNumber,
+      supplierArticleNumber: variant.supplierArticleNumber,
+      name: sourceArticle.name || `Cutlery insert ${variant.widthCm} cm`,
+      nameDe: sourceArticle.nameDe || `Besteckeinsatz ${variant.widthCm} cm`,
+      widthMm: Number(sourceArticle.widthMm) > 0 ? sourceArticle.widthMm : variant.widthCm * 10,
+      price,
+      programPrices: [{ programmId, price, isActive: true }],
+    };
+  });
 }
 
 function inferCutleryWidthCm(articleNumber, fallbackName = "") {
