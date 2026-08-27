@@ -185,19 +185,38 @@ export function mapCatalogItem(catalogItems, submittedItem, itemType, options = 
   const catalogBlende = matched.catalogBlendeId ? matched.catalogBlende : null;
   const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(matched.catalogBlendeQuantity || 1), 10) || 1);
   const submittedArticleNumber = normalizeArticleNumber(submittedItem.articleNumber);
-  const matchedArticleNumber = normalizeArticleNumber(catalogArticle?.articleNumber || matched.articleNumber);
+  const matchedKitchenArticleNumber = normalizeArticleNumber(matched.articleNumber);
+  const matchedCatalogArticleNumber = normalizeArticleNumber(catalogArticle?.articleNumber);
+  const originallyMatchedArticleNumber = matchedCatalogArticleNumber || matchedKitchenArticleNumber;
+  const matchesConfiguredArticleNumber = Boolean(
+    submittedArticleNumber
+    && (
+      submittedArticleNumber === originallyMatchedArticleNumber
+      || (
+        options.allowKitchenArticleNumberAlias === true
+        && submittedArticleNumber === matchedKitchenArticleNumber
+      )
+    )
+  );
   let selectedArticle = catalogArticle;
+  let selectedComponentArticleNumber = "";
 
   if (
     itemType === ItemType.COMPONENT &&
     submittedArticleNumber &&
-    submittedArticleNumber !== matchedArticleNumber
+    !matchesConfiguredArticleNumber
   ) {
     const selectedVariant = resolveAuszugVariantSelection(matched, submittedArticleNumber, options.auszugVariantArticles || []);
     if (selectedVariant.status !== "variant") {
       return null;
     }
     selectedArticle = selectedVariant.article;
+    selectedComponentArticleNumber = selectedVariant.article.articleNumber;
+  } else if (itemType === ItemType.COMPONENT && submittedArticleNumber) {
+    selectedComponentArticleNumber = options.allowKitchenArticleNumberAlias === true
+      && submittedArticleNumber === matchedKitchenArticleNumber
+      ? matched.articleNumber
+      : catalogArticle?.articleNumber || matched.articleNumber;
   }
 
   if (itemType === ItemType.ACCESSORY && isCutleryAccessoryCode(matched.code) && submittedArticleNumber) {
@@ -218,7 +237,10 @@ export function mapCatalogItem(catalogItems, submittedItem, itemType, options = 
     ...matched,
     name: selectedArticle?.name || catalogService?.name || submittedItem.name || matched.name,
     nameDe: selectedArticle?.nameDe || catalogService?.nameDe || matched.nameDe || "",
-    articleNumber: selectedArticle?.articleNumber || submittedItem.articleNumber || matched.articleNumber,
+    articleNumber: selectedComponentArticleNumber
+      || selectedArticle?.articleNumber
+      || submittedItem.articleNumber
+      || matched.articleNumber,
     price: catalogPrice,
     quantity: submittedItem.quantity || 1,
   };
@@ -555,9 +577,13 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     accessories: normalizeSubmissionItems(orderPayload?.accessories),
     services: normalizeSubmissionItems(orderPayload?.services),
   };
+  const allowKitchenArticleNumberAlias = kitchen.slug === "burger-103898";
 
   const selectedComponents = submittedGroups.components.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, { auszugVariantArticles }),
+    mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, {
+      auszugVariantArticles,
+      allowKitchenArticleNumberAlias,
+    }),
   );
   const selectedAccessories = submittedGroups.accessories.map((item) =>
     mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, { cutleryVariantArticles }),

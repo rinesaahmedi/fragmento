@@ -26,6 +26,7 @@ const AB_105847_LAYOUT_ALIAS_SLUGS = [
 ];
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "burger-103898",
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
@@ -63,6 +64,7 @@ export function isLShapedClaimKitchen(kitchenSlug = "") {
 // Measured from the full-resolution PDF renders. Coordinates are relative to each plan's
 // faucet hotspot so the polygons remain aligned after the plan is cropped for display.
 const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
+  "burger-103898": [[-2.075268817, 0.964447543], [-0.47311828, 0.851516208], [2.806451613, 1.071104915], [1.265232975, 1.181944929]],
   // Four outside sink strokes measured from AB 105743's vector PDF.
   "ab-105743": [[-0.166065, 0.89234], [2.617329, 0.730849], [3.895307, 0.836439], [1.111913, 1]],
   // Outside sink strokes measured from the AB 105748 vector PDF.
@@ -97,6 +99,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 // by several narrow hotspots. These coordinates remain in the uncropped source
 // plan system and are projected into the ASC display crop below.
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
+  "burger-103898": [[57.662708, 59.30084], [64.033254, 58.211765], [77.073634, 60.329412], [70.945368, 61.398319]],
   // Four outside sink-bowl strokes in AB 105846's vector-plan coordinates.
   // The separate faucet silhouettes below remain clickable as one fixture.
   "ab-105846": [
@@ -137,6 +140,7 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 // source plan render. Keeping the values relative to the oven hotspot
 // preserves their alignment when the claim picker applies its display crop.
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
+  "burger-103898": [[-0.236714976, -0.090786819], [0.869565217, -0.045729657], [0, 0.00672495], [-0.834138486, -0.025554808]],
   // Four outside cooktop strokes measured from AB 105743's vector PDF.
   "ab-105743": [
     [0.003788, -0.049606],
@@ -683,6 +687,12 @@ function splitWorktopDefinition(bounds, leftPoints, rightPoints, remainingPartKe
 // families already have one polygon per leg; the three combined outlines are
 // divided at their actual corner seam below.
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  // Burger already has one exact PDF-matched polygon for each worktop run.
+  // Map them directly; treating its first polygon as a legacy combined L-shape
+  // scales the whole-kitchen coordinates into that polygon's small bounds.
+  "burger-103898": {
+    indexPartKeys: ["worktop-left", "worktop-right"],
+  },
   "ab-105805": splitWorktopDefinition(
     { left: 28.4, top: 50.4, width: 58.77, height: 8.87 },
     [

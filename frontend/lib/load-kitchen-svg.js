@@ -10,6 +10,7 @@ function normalizeAssetPaths(input) {
 }
 
 const SVG_BY_SLUG = {
+  "burger-103898": path.join(process.cwd(), "public", "plans", "670 103898.svg"),
   "kitchen-model-b": path.join(process.cwd(), "kitchen-svgs", "active", "kitchen-model-b.svg"),
   "kitchen-model-c": path.join(process.cwd(), "kitchen-svgs", "active", "kitchen-model-c.svg"),
   "l-kitchen-new": path.join(process.cwd(), "kitchen-svgs", "active", "l-kitchen-new.svg"),
