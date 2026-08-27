@@ -136,8 +136,9 @@ test("Burger 103898 seeds a separate Burger program kitchen and contract", () =>
   assert.match(seed, /contractNumber: "670103898", kitchenSlug: "burger-103898"/);
   assert.match(seed, /contractNumber: "111103898", kitchenSlug: "burger-103898"/);
   assert.match(seed, /programmId: kitchen\.programmId \|\| DEFAULT_KITCHEN_PROGRAMM_ID/);
-  assert.match(seed, /CAB-BASE-BURGER103898-US50[\s\S]*?price: "247\.00"/);
-  assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[\s\S]*?price: "349\.00"[\s\S]*?blendeCode: "UPE65"[\s\S]*?blendePrice: "79\.00"/);
+  assert.match(seed, /CAB-BASE-BURGER103898-US50[\s\S]*?price: "247\.00"[\s\S]*?isLocked: true/);
+  assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[\s\S]*?price: "349\.00"[\s\S]*?isLocked: true[\s\S]*?blendeCode: "UPE65"[\s\S]*?blendePrice: "79\.00"/);
+  assert.match(seed, /CAB-BASE-BURGER103898-US30[\s\S]*?price: "222\.00"[\s\S]*?isLocked: true/);
   assert.match(seed, /code: "UPE65"[\s\S]*?price: "79\.00"/);
   assert.match(seed, /DISH-BURGER103898-600[\s\S]*?price: "586\.00"/);
   assert.match(seed, /CAB-HOOD-BURGER103898-HFLH6072[\s\S]*?price: "346\.00"[\s\S]*?catalogArticleNumber: "FH664621E\+FWK124\+HFLH6072"/);
@@ -166,6 +167,24 @@ test("Burger claim worktops preserve both exact configurator polygons", () => {
   for (let index = 0; index < worktops.length; index += 1) {
     assert.deepEqual(claims[index].points, worktops[index].points);
   }
+});
+
+test("Burger 103898 includes the three outlined base cabinets outside the catalog", () => {
+  const configurator = readFileSync(new URL("../components/kitchen-configurator.js", import.meta.url), "utf8");
+  const orders = readFileSync(new URL("../lib/orders.js", import.meta.url), "utf8");
+
+  assert.match(
+    configurator,
+    /"burger-103898": \["sink-base", "base-module-1", "base-module-2", "drawer-module"\]/,
+  );
+  for (const code of [
+    "CAB-BASE-BURGER103898-US50",
+    "CAB-BASE-BURGER103898-US60-UPE65",
+    "CAB-BASE-BURGER103898-US30",
+  ]) {
+    assert.match(orders, new RegExp(`BURGER_103898_INCLUDED_COMPONENT_CODES[\\s\\S]*?${code}`));
+  }
+  assert.match(orders, /kitchen\.slug === "burger-103898"[\s\S]*?BURGER_103898_INCLUDED_COMPONENT_CODES\.has\(selectedItem\.code\)[\s\S]*?isLocked: true/);
 });
 
 test("Burger claims separate the US60 cabinet from both UPE65 corner faces", () => {

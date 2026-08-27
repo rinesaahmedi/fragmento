@@ -59,6 +59,16 @@ const BURGER_103898_CATALOG_ARTICLE_OVERRIDES = [
   { itemCode: "CAB-WALL-BURGER103898-H3072", articleNumber: "H3072", price: 124 },
 ];
 
+// These cabinets are part of the supplied Burger 103898 kitchen. Keep this
+// server-side as well as in the configurator so their price cannot be restored
+// by stale hosted KitchenItem rows or a modified client submission.
+const BURGER_103898_INCLUDED_COMPONENT_CODES = new Set([
+  "SINK-BASE-BURGER103898-600",
+  "CAB-BASE-BURGER103898-US50",
+  "CAB-BASE-BURGER103898-US60-UPE65",
+  "CAB-BASE-BURGER103898-US30",
+]);
+
 function validationError(message) {
   const error = new Error(message);
   error.status = 400;
@@ -702,13 +712,23 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   const useProgramPrices = kitchen.slug === "burger-103898";
   const programPriceOptions = { useProgramPrices, programmId: kitchen.programmId };
 
-  const selectedComponents = submittedGroups.components.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, {
+  const selectedComponents = submittedGroups.components.map((item) => {
+    const selectedItem = mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, {
       auszugVariantArticles,
       allowKitchenArticleNumberAlias,
       ...programPriceOptions,
-    }),
-  );
+    });
+
+    if (
+      selectedItem
+      && kitchen.slug === "burger-103898"
+      && BURGER_103898_INCLUDED_COMPONENT_CODES.has(selectedItem.code)
+    ) {
+      return { ...selectedItem, isLocked: true };
+    }
+
+    return selectedItem;
+  });
   const selectedAccessories = submittedGroups.accessories.map((item) =>
     mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, {
       cutleryVariantArticles: resolvedCutleryVariantArticles,
