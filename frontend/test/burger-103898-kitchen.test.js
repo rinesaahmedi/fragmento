@@ -378,7 +378,8 @@ test("Burger 103898 cutlery widths use Burger supplier prices", () => {
     "burger-103898",
     "BURGER CINDY",
   );
-  assert.equal(burgerVariant.articleNumber, "ZB30SG");
+  assert.equal(burgerVariant.articleNumber, "ZBE30");
+  assert.equal(burgerVariant.sharedArticleNumber, "ZB30SG");
   assert.equal(burgerVariant.supplierArticleNumber, "ZBE30");
   assert.equal(burgerVariant.price, 13);
   assert.equal(burgerVariant.programPrices[0].price, 13);
@@ -387,6 +388,13 @@ test("Burger 103898 cutlery widths use Burger supplier prices", () => {
     resolveCutleryCatalogArticles(catalogArticles, "ab-105806", "IP 2200")[0].price,
     19,
   );
+});
+
+test("Burger drawer variants include imported US2A supplier prices", () => {
+  const catalog = readFileSync(new URL("../lib/catalog.js", import.meta.url), "utf8");
+  const orders = readFileSync(new URL("../lib/orders.js", import.meta.url), "utf8");
+  assert.match(catalog, /kitchen\.slug === "burger-103898" \? \{\} : \{ isActive: true \}/);
+  assert.match(orders, /kitchen\.slug === "burger-103898" \? \{\} : \{ isActive: true \}/);
 });
 
 test("order validation accepts Burger supplier-facing article numbers", () => {

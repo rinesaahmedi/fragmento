@@ -419,7 +419,9 @@ async function attachCutleryCatalogVariants(kitchen) {
       prisma.catalogArticle.findMany({
         where: {
           itemType: ItemType.COMPONENT,
-          isActive: true,
+          // Burger's imported supplier list keeps US2A drawer rows marked
+          // inactive globally; they are nevertheless valid for Burger 103898.
+          ...(kitchen.slug === "burger-103898" ? {} : { isActive: true }),
           articleNumber: { startsWith: "US2A" },
         },
         include: {

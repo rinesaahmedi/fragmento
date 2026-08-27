@@ -59,7 +59,11 @@ export function resolveCutleryCatalogArticles(articles = [], kitchenSlug = "", p
 
     return {
       ...sourceArticle,
-      articleNumber: variant.articleNumber,
+      // Burger's price list is keyed by supplier article numbers (ZBE*).
+      // Use those numbers for the Burger UI/order payload; the shared ZB*SG
+      // number remains available as an alias for catalog lookup.
+      articleNumber: variant.supplierArticleNumber,
+      sharedArticleNumber: variant.articleNumber,
       supplierArticleNumber: variant.supplierArticleNumber,
       name: sourceArticle.name || `Cutlery insert ${variant.widthCm} cm`,
       nameDe: sourceArticle.nameDe || `Besteckeinsatz ${variant.widthCm} cm`,
@@ -228,6 +232,12 @@ export function parseCutleryLineFromOrderItem(orderItem) {
   const quantity = Math.max(1, Math.floor(Number(orderItem?.quantity || 1)));
   const articleNumber = normalizeArticleNumber(orderItem?.articleNumber);
   if (articleNumber && getCutleryVariant(articleNumber)) {
+    return { articleNumber, quantity };
+  }
+  // Burger orders use the supplier-facing ZBE width code. Keep it intact so
+  // order validation can match the Burger-resolved variant instead of
+  // falling back to the shared ZB*SG alias.
+  if (/^ZBE\d{2,3}$/.test(articleNumber)) {
     return { articleNumber, quantity };
   }
 

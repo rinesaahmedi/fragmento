@@ -90,7 +90,22 @@ export function findAuszugVariantOption(item, articleNumber) {
   if (!normalizedArticleNumber) {
     return options.find((option) => option.key === "no") || null;
   }
-  return options.find((option) => normalizeArticleNumber(option.articleNumber) === normalizedArticleNumber) || null;
+  const exactMatch = options.find((option) => normalizeArticleNumber(option.articleNumber) === normalizedArticleNumber);
+  if (exactMatch) return exactMatch;
+
+  // Some supplier-facing component numbers append a required filler code
+  // (for example `US60 + UPE65`). The drawer variant still belongs to the
+  // underlying US60 cabinet, so treat that composite number as the base
+  // (1-drawer) option while preserving the displayed supplier number.
+  const baseOption = options.find((option) => option.key === "no");
+  const baseArticleNumber = normalizeArticleNumber(baseOption?.articleNumber);
+  const compositeArticleNumber = normalizedArticleNumber.replace(/\s+/g, "");
+  const compactBaseArticleNumber = baseArticleNumber.replace(/\s+/g, "");
+  if (baseOption && compactBaseArticleNumber && compositeArticleNumber.startsWith(`${compactBaseArticleNumber}+`)) {
+    return baseOption;
+  }
+
+  return null;
 }
 
 export function applyArticleVariantSelection(item, articleNumber) {

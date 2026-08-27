@@ -556,7 +556,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     prisma.catalogArticle.findMany({
       where: {
         itemType: ItemType.COMPONENT,
-        isActive: true,
+        // Burger's imported US2A rows are marked inactive in the shared
+        // catalog but are valid supplier articles for this kitchen.
+        ...(kitchen.slug === "burger-103898" ? {} : { isActive: true }),
         articleNumber: { startsWith: "US2A" },
       },
       include: { programPrices: true },
@@ -724,9 +726,15 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   const allSelectedComponents = allSelected.filter((item) => item.itemType === ItemType.COMPONENT);
   const allSelectedAccessories = allSelected.filter((item) => item.itemType === ItemType.ACCESSORY);
   const allSelectedServices = allSelected.filter((item) => item.itemType === ItemType.SERVICE);
-  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(allSelectedComponents);
+  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(
+    allSelectedComponents,
+    kitchen.slug === "burger-103898" ? resolvedCutleryVariantArticles : undefined,
+  );
   const availableCutleryByArticle = new Map(
-    availableCutleryVariants.map((variant) => [variant.articleNumber, variant]),
+    availableCutleryVariants.flatMap((variant) => [
+      [variant.articleNumber, variant],
+      ...(variant.sharedArticleNumber ? [[variant.sharedArticleNumber, variant]] : []),
+    ]),
   );
   for (const item of allSelectedAccessories) {
     if (!isCutleryAccessoryCode(item?.code)) continue;
