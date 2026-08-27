@@ -49,6 +49,12 @@ const PAYMENT_METHOD_ALIASES = new Map([
 ]);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DELIVERY_WEEK_OPTION_COUNT = 3;
+const BURGER_103898_CATALOG_ARTICLE_OVERRIDES = [
+  { itemCode: "CAB-WALL-BURGER103898-H5072", articleNumber: "H5072", price: 135 },
+  { itemCode: "CAB-HOOD-BURGER103898-HFLH6072", articleNumber: "FH664621E+FWK124+HFLH6072", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", price: 346 },
+  { itemCode: "CAB-WALL-BURGER103898-H6072", articleNumber: "H6072", price: 146 },
+  { itemCode: "CAB-WALL-BURGER103898-H3072", articleNumber: "H3072", price: 124 },
+];
 
 function validationError(message) {
   const error = new Error(message);
@@ -544,7 +550,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw new Error("Kitchen not found");
   }
 
-  const [auszugVariantArticles, cutleryVariantArticles, burgerBlende, burgerHoodArticle] = await Promise.all([
+  const [auszugVariantArticles, cutleryVariantArticles, burgerBlende, burgerArticles] = await Promise.all([
     prisma.catalogArticle.findMany({
       where: {
         itemType: ItemType.COMPONENT,
@@ -568,11 +574,16 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       })
       : Promise.resolve(null),
     kitchen.slug === "burger-103898"
-      ? prisma.catalogArticle.findUnique({
-        where: { articleNumber: "FH664621E + FWK124 + HFLH6072" },
+      ? prisma.catalogArticle.findMany({
+        where: {
+          articleNumber: {
+            in: BURGER_103898_CATALOG_ARTICLE_OVERRIDES.map((override) => override.articleNumber),
+          },
+          isActive: true,
+        },
         include: { programPrices: true },
       })
-      : Promise.resolve(null),
+      : Promise.resolve([]),
   ]);
 
   // Burger uses supplier code UPE65. Existing 103898 rows may still point at
@@ -605,18 +616,21 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     burgerCornerCabinet.blendeLabel = resolvedBurgerBlende.nameDe || resolvedBurgerBlende.name;
   }
 
-  const burgerHoodCabinet = kitchen.slug === "burger-103898"
-    ? kitchen.items.find((item) => item.code === "CAB-HOOD-BURGER103898-HFLH6072")
-    : null;
-  if (burgerHoodCabinet) {
-    const configuredBurgerPrice = Number(burgerHoodCabinet.price ?? 346);
-    const resolvedBurgerHood = burgerHoodArticle?.isActive
-      ? burgerHoodArticle
+  const burgerArticleByNumber = new Map(
+    burgerArticles.map((article) => [article.articleNumber, article]),
+  );
+  for (const override of kitchen.slug === "burger-103898"
+    ? BURGER_103898_CATALOG_ARTICLE_OVERRIDES
+    : []) {
+    const kitchenItem = kitchen.items.find((item) => item.code === override.itemCode);
+    if (!kitchenItem) continue;
+    const catalogArticle = burgerArticleByNumber.get(override.articleNumber);
+    const configuredBurgerPrice = Number(kitchenItem.price ?? override.price);
+    const resolvedArticle = catalogArticle?.isActive
+      ? catalogArticle
       : {
-        ...(burgerHoodCabinet.catalogArticle || {}),
-        articleNumber: "FH664621E + FWK124 + HFLH6072",
-        name: "Flat screen Extractor hood + Cabinet + Filter 60 cm",
-        nameDe: "Flachschirmhaube + Schrank + Filter 60 cm",
+        ...(kitchenItem.catalogArticle || {}),
+        articleNumber: override.articleNumber,
         price: configuredBurgerPrice,
         programPrices: [{
           programmId: kitchen.programmId,
@@ -624,11 +638,11 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
           isActive: true,
         }],
       };
-    burgerHoodCabinet.catalogArticleId = resolvedBurgerHood.id
-      || burgerHoodCabinet.catalogArticleId
-      || "burger-hood-hflh6072";
-    burgerHoodCabinet.catalogArticle = resolvedBurgerHood;
-    burgerHoodCabinet.articleNumber = "FH664621E + FWK124 + HFLH6072";
+    kitchenItem.catalogArticleId = resolvedArticle.id
+      || kitchenItem.catalogArticleId
+      || `burger-${override.articleNumber}`;
+    kitchenItem.catalogArticle = resolvedArticle;
+    kitchenItem.articleNumber = override.displayArticleNumber || override.articleNumber;
   }
 
   const customer = orderPayload?.customer || {};

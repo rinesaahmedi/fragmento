@@ -126,8 +126,10 @@ test("Burger 103898 seeds a separate Burger program kitchen and contract", () =>
   assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[\s\S]*?price: "349\.00"[\s\S]*?blendeCode: "UPE65"[\s\S]*?blendePrice: "79\.00"/);
   assert.match(seed, /code: "UPE65"[\s\S]*?price: "79\.00"/);
   assert.match(seed, /DISH-BURGER103898-600[\s\S]*?price: "586\.00"/);
-  assert.match(seed, /CAB-HOOD-BURGER103898-HFLH6072[\s\S]*?price: "346\.00"[\s\S]*?catalogArticleNumber: "FH664621E \+ FWK124 \+ HFLH6072"/);
-  assert.match(seed, /displayArticleNumber: "H5072", catalogArticleNumber: "H5002"/);
+  assert.match(seed, /CAB-HOOD-BURGER103898-HFLH6072[\s\S]*?price: "346\.00"[\s\S]*?catalogArticleNumber: "FH664621E\+FWK124\+HFLH6072"/);
+  for (const articleNumber of ["H3072", "H5072", "H6072"]) {
+    assert.match(seed, new RegExp(`displayArticleNumber: "${articleNumber}", catalogArticleNumber: "${articleNumber}"`));
+  }
 });
 
 test("Burger 103898 registers the independent L-shaped claim geometry", () => {
@@ -219,6 +221,6 @@ test("order validation accepts Burger supplier-facing article numbers", () => {
   assert.match(orders, /options\.allowKitchenArticleNumberAlias === true[\s\S]*?submittedArticleNumber === matchedKitchenArticleNumber/);
   assert.match(orders, /mapCatalogItem\(kitchen\.items, item, ItemType\.COMPONENT, \{[\s\S]*?allowKitchenArticleNumberAlias/);
   assert.match(orders, /kitchen\.slug === "burger-103898"[\s\S]*?findUnique\(\{[\s\S]*?code: "UPE65"/);
-  assert.match(orders, /articleNumber: "FH664621E \+ FWK124 \+ HFLH6072"/);
+  assert.match(orders, /articleNumber: "FH664621E\+FWK124\+HFLH6072"[\s\S]*?displayArticleNumber: "FH664621E \+ FWK124 \+ HFLH6072"/);
   assert.match(orders, /const useProgramPrices = kitchen\.slug === "burger-103898"/);
 });

@@ -12,6 +12,12 @@ import {
 } from "./product-information.js";
 
 const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
+const BURGER_103898_CATALOG_ARTICLE_OVERRIDES = [
+  { itemCode: "CAB-WALL-BURGER103898-H5072", articleNumber: "H5072", price: 135 },
+  { itemCode: "CAB-HOOD-BURGER103898-HFLH6072", articleNumber: "FH664621E+FWK124+HFLH6072", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", price: 346 },
+  { itemCode: "CAB-WALL-BURGER103898-H6072", articleNumber: "H6072", price: 146 },
+  { itemCode: "CAB-WALL-BURGER103898-H3072", articleNumber: "H3072", price: 124 },
+];
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
@@ -302,11 +308,14 @@ async function attachBurger103898CatalogOverrides(kitchen, programmId) {
   const cornerCabinet = kitchen.items?.find(
     (item) => item.code === "CAB-BASE-BURGER103898-US60-UPE65",
   );
-  const hoodCabinet = kitchen.items?.find(
-    (item) => item.code === "CAB-HOOD-BURGER103898-HFLH6072",
-  );
+  const configuredArticleOverrides = BURGER_103898_CATALOG_ARTICLE_OVERRIDES
+    .map((override) => ({
+      ...override,
+      item: kitchen.items?.find((item) => item.code === override.itemCode),
+    }))
+    .filter((override) => override.item);
 
-  const [burgerBlende, burgerHoodArticle] = await Promise.all([
+  const [burgerBlende, burgerArticles] = await Promise.all([
     cornerCabinet
       ? prisma.catalogBlende.findUnique({
         where: { code: "UPE65" },
@@ -319,9 +328,12 @@ async function attachBurger103898CatalogOverrides(kitchen, programmId) {
         },
       })
       : Promise.resolve(null),
-    hoodCabinet
-      ? prisma.catalogArticle.findUnique({
-        where: { articleNumber: "FH664621E + FWK124 + HFLH6072" },
+    configuredArticleOverrides.length
+      ? prisma.catalogArticle.findMany({
+        where: {
+          articleNumber: { in: configuredArticleOverrides.map((override) => override.articleNumber) },
+          isActive: true,
+        },
         include: {
           programPrices: {
             where: { programmId, isActive: true },
@@ -330,7 +342,7 @@ async function attachBurger103898CatalogOverrides(kitchen, programmId) {
           },
         },
       })
-      : Promise.resolve(null),
+      : Promise.resolve([]),
   ]);
 
   if (cornerCabinet) {
@@ -353,20 +365,24 @@ async function attachBurger103898CatalogOverrides(kitchen, programmId) {
     cornerCabinet.blendePrice = resolvedBurgerBlende.programPrices?.[0]?.price ?? resolvedBurgerBlende.price;
   }
 
-  if (hoodCabinet) {
-    const resolvedBurgerHood = burgerHoodArticle?.isActive
-      ? burgerHoodArticle
+  const burgerArticleByNumber = new Map(
+    burgerArticles.map((article) => [article.articleNumber, article]),
+  );
+  for (const override of configuredArticleOverrides) {
+    const catalogArticle = burgerArticleByNumber.get(override.articleNumber);
+    const resolvedArticle = catalogArticle?.isActive
+      ? catalogArticle
       : {
-        ...(hoodCabinet.catalogArticle || {}),
-        articleNumber: "FH664621E + FWK124 + HFLH6072",
-        name: "Flat screen Extractor hood + Cabinet + Filter 60 cm",
-        nameDe: "Flachschirmhaube + Schrank + Filter 60 cm",
-        price: Number(hoodCabinet.price ?? 346),
-        programPrices: [{ price: Number(hoodCabinet.price ?? 346) }],
+        ...(override.item.catalogArticle || {}),
+        articleNumber: override.articleNumber,
+        price: Number(override.item.price ?? override.price),
+        programPrices: [{ price: Number(override.item.price ?? override.price) }],
       };
-    hoodCabinet.catalogArticleId = resolvedBurgerHood.id || hoodCabinet.catalogArticleId || "burger-hood-hflh6072";
-    hoodCabinet.catalogArticle = resolvedBurgerHood;
-    hoodCabinet.articleNumber = "FH664621E + FWK124 + HFLH6072";
+    override.item.catalogArticleId = resolvedArticle.id
+      || override.item.catalogArticleId
+      || `burger-${override.articleNumber}`;
+    override.item.catalogArticle = resolvedArticle;
+    override.item.articleNumber = override.displayArticleNumber || override.articleNumber;
   }
 
   return kitchen;
