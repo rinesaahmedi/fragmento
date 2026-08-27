@@ -533,8 +533,9 @@ function injectPurchasedKitchenPdfStyles(markup) {
 }
 
 function applyPurchasedKitchenSelectionToSvg(markup, order) {
+  const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const { selectedComponentIds, lockedComponentIds } = buildPurchasedKitchenPdfSelectionState(order, {
-    defaultLockedComponentKeys: ["worktop"],
+    defaultLockedComponentKeys: slug === "burger-103898" ? ["worktop", "sink-base"] : ["worktop"],
   });
   let nextMarkup = injectPurchasedKitchenPdfStyles(markup);
 
@@ -618,7 +619,9 @@ function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height,
   const hasWorktop = hotspots.some((hotspot) => String(hotspot?.componentKey || "").trim() === "worktop");
   const { selectedComponentKeys, lockedComponentKeys } = buildPurchasedKitchenPdfSelectionState(order, {
     linkedGroups,
-    defaultLockedComponentKeys: hasWorktop ? ["worktop"] : [],
+    defaultLockedComponentKeys: slug === "burger-103898"
+      ? ["worktop", "sink-base"]
+      : (hasWorktop ? ["worktop"] : []),
   });
   const shapes = [];
 
