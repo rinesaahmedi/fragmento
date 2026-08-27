@@ -94,6 +94,9 @@ const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
 };
 
 const DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG = {
+  // Burger 103898 includes the sink lower cabinet in the supplied kitchen plan.
+  // Keep this slug-specific so legacy kitchens retain their existing defaults.
+  "burger-103898": ["sink-base"],
   "ab-105835": ["oven-module", "worktop", "sink-base", "sink-faucet"],
   "l-shaped-kitchen": ["worktop", "oven-base", "base-module-3"],
 };
