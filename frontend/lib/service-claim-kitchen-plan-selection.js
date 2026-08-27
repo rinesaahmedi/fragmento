@@ -303,6 +303,14 @@ const LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS = new Set([
 ]);
 
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  // Burger 103898 draws the hood cabinet, extractor and its two LED symbols as
+  // one supplied assembly. Keep all three claim targets in sync when any face
+  // of that assembly is clicked, hovered, or removed.
+  "burger-103898": [[
+    "component-wall-cabinet-2",
+    "component-extractor-hood",
+    "component-under-cabinet-light",
+  ]],
   // These kitchens share two adjacent UPK20 strips at the same inside corner.
   // Keep their individual PDF-matched hotspots, but treat each pair as one
   // interaction so clicking either strip selects both.

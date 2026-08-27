@@ -11,6 +11,8 @@ import {
   resolveProductInformation,
 } from "./product-information.js";
 
+const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
+
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
   "CAB-BASE-030",
@@ -207,6 +209,11 @@ export async function getActiveKitchens() {
 export async function getKitchenBySlug(slug) {
   const resolvedSlug = resolveKitchenSlugAlias(slug);
   await applyDueScheduledCatalogPriceListImports(prisma);
+  const kitchenProgram = await prisma.kitchen.findUnique({
+    where: { slug: resolvedSlug },
+    select: { programmId: true },
+  });
+  const programmId = kitchenProgram?.programmId || DEFAULT_KITCHEN_PROGRAMM_ID;
 
   try {
     return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
@@ -230,15 +237,33 @@ export async function getKitchenBySlug(slug) {
                 heightMm: true,
                 depthMm: true,
                 ...CATALOG_PRODUCT_INFORMATION_SELECT,
+                programPrices: {
+                  where: { programmId, isActive: true },
+                  select: { price: true },
+                  take: 1,
+                },
               },
             },
-            catalogBlende: true,
+            catalogBlende: {
+              include: {
+                programPrices: {
+                  where: { programmId, isActive: true },
+                  select: { price: true },
+                  take: 1,
+                },
+              },
+            },
             catalogService: {
               select: {
                 code: true,
                 name: true,
                 nameDe: true,
                 price: true,
+                programPrices: {
+                  where: { programmId, isActive: true },
+                  select: { price: true },
+                  take: 1,
+                },
               },
             },
           },
@@ -282,6 +307,13 @@ async function attachCutleryCatalogVariants(kitchen) {
             in: CUTLERY_VARIANTS.map((variant) => variant.articleNumber),
           },
         },
+        include: {
+          programPrices: {
+            where: { programmId: kitchen.programmId, isActive: true },
+            select: { price: true },
+            take: 1,
+          },
+        },
         orderBy: [{ widthMm: "asc" }, { articleNumber: "asc" }],
       }),
       prisma.catalogArticle.findMany({
@@ -289,6 +321,13 @@ async function attachCutleryCatalogVariants(kitchen) {
           itemType: ItemType.COMPONENT,
           isActive: true,
           articleNumber: { startsWith: "US2A" },
+        },
+        include: {
+          programPrices: {
+            where: { programmId: kitchen.programmId, isActive: true },
+            select: { price: true },
+            take: 1,
+          },
         },
         orderBy: [{ widthMm: "asc" }, { articleNumber: "asc" }],
       }),
@@ -303,7 +342,7 @@ async function attachCutleryCatalogVariants(kitchen) {
             name: article.name,
             nameDe: article.nameDe || "",
             widthCm: article.widthMm ? Number(article.widthMm) / 10 : null,
-            price: Number(article.price),
+            price: Number(article.programPrices?.[0]?.price ?? article.price),
           })),
         )
         : normalizeCutleryVariants(CUTLERY_VARIANTS),
@@ -1140,18 +1179,21 @@ export function serializeKitchenForLegacy(kitchen) {
     );
     const productInformation = resolveProductInformation({ ...item, claimProducts });
     const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
+    const articlePrice = catalogArticle?.programPrices?.[0]?.price ?? catalogArticle?.price;
+    const blendePrice = catalogBlende?.programPrices?.[0]?.price ?? catalogBlende?.price;
+    const servicePrice = catalogService?.programPrices?.[0]?.price ?? catalogService?.price;
     const catalogPrice = (() => {
-      if (catalogService?.price != null) {
-        return Number(catalogService.price);
+      if (servicePrice != null) {
+        return Number(servicePrice);
       }
-      if (standaloneCatalogBlende && catalogBlende?.price != null) {
-        return Number(catalogBlende.price);
+      if (standaloneCatalogBlende && blendePrice != null) {
+        return Number(blendePrice);
       }
-      if (catalogArticle?.price == null) {
+      if (articlePrice == null) {
         return Number(item.price);
       }
-      const blendeTotal = catalogBlende?.price != null ? Number(catalogBlende.price) * catalogBlendeQuantity : 0;
-      return Number(catalogArticle.price) + blendeTotal;
+      const blendeTotal = blendePrice != null ? Number(blendePrice) * catalogBlendeQuantity : 0;
+      return Number(articlePrice) + blendeTotal;
     })();
 
     const articleVariants = {};
@@ -1168,8 +1210,9 @@ export function serializeKitchenForLegacy(kitchen) {
       catalogServiceId: item.catalogServiceId || "",
       catalogBlendeId: item.catalogBlendeId || "",
       code: item.code,
-      articleNumber: catalogArticle?.articleNumber
-        || (standaloneCatalogBlende ? catalogBlende?.code : item.articleNumber)
+      articleNumber: item.articleNumber
+        || catalogArticle?.articleNumber
+        || (standaloneCatalogBlende ? catalogBlende?.code : "")
         || "",
       name: catalogArticle?.name
         || catalogService?.name
@@ -1204,8 +1247,8 @@ export function serializeKitchenForLegacy(kitchen) {
       blendeNameDe: standaloneCatalogBlende ? "" : catalogBlende?.nameDe || "",
       blendePrice: standaloneCatalogBlende
         ? null
-        : catalogBlende?.price != null
-          ? Number(catalogBlende.price)
+        : blendePrice != null
+          ? Number(blendePrice)
           : item.blendePrice != null
             ? Number(item.blendePrice)
             : null,

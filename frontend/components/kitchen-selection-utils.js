@@ -188,6 +188,17 @@ function stripDimensionsFromName(name) {
 // kitchen-specific codes are minted when an otherwise identical item appears under a
 // different callout number.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
+  "SINK-BASE-BURGER103898-600": "3",
+  "REF-BURGER103898-KGCN388140E": "4",
+  "CAB-BASE-BURGER103898-US50": "5",
+  "CAB-BASE-BURGER103898-US60-UPE65": "6",
+  "DISH-BURGER103898-600": "7",
+  "CAB-BASE-BURGER103898-US30": "8",
+  "CAB-WALL-BURGER103898-H5072": "9",
+  "CAB-HOOD-BURGER103898-HFLH6072": "10",
+  "HOOD-BURGER103898-FH664621E": "10",
+  "CAB-WALL-BURGER103898-H6072": "11",
+  "CAB-WALL-BURGER103898-H3072": "12",
   "OVEN-B-600-HOB": "1",
   "OVEN-AB105806-600-HOB": "1",
   "TOP-AB105806": "2",
@@ -964,6 +975,11 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "burger-103898": [[
+    "component-wall-cabinet-2",
+    "component-extractor-hood",
+    "component-under-cabinet-light",
+  ]],
   "ab-105845": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105848": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105851": [["component-wall-cabinet-3", "component-extractor-hood"]],
@@ -1288,6 +1304,10 @@ PRODUCT_INFO_DOCUMENTS_BY_CODE["CAB-HOOD-AB105847-600"] = PRODUCT_INFO_DOCUMENTS
 
 PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB105732-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
 PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB105732-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-BURGER103898-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-BURGER103898-KGCN388140E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-BURGER103898-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["CAB-HOOD-BURGER103898-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 
 Object.values(PRODUCT_INFO_DOCUMENTS_BY_CODE).forEach((documents) => {
   documents.forEach((document) => {
@@ -1428,7 +1448,7 @@ export function getLinkedComponentIds(slug, componentId) {
 export function getAutoLinkedAccessoryCodes(slug, selectedComponentIds = []) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
   if (
-    normalizedSlug === "ab-105758"
+    ["ab-105758", "burger-103898"].includes(normalizedSlug)
     && selectedComponentIds.includes("component-extractor-hood")
   ) {
     return ["ACC-LIGHT-003"];
@@ -1474,6 +1494,7 @@ const KGCN388140E_GALLERY = Array.from(
 );
 
 const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
+  "DISH-BURGER103898-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105743-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -1507,6 +1528,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "OVEN-AB105807-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.webp`),
   "T3D-OVEN-HOB-001": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.webp`),
   "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-BURGER103898-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-BURGER103898-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-LS-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105806-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
@@ -1536,6 +1559,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "CAB-HOOD-AB105845-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "REF-545-1800-700": KGCN388140E_GALLERY,
+  "REF-BURGER103898-KGCN388140E": KGCN388140E_GALLERY,
   "REF-B-545-1800-700": KGCN388140E_GALLERY,
   "REF-C-545-1800-700": KGCN388140E_GALLERY,
   "REF-AB105806-KGCN388140E": KGCN388140E_GALLERY,

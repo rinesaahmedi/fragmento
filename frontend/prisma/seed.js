@@ -32,6 +32,7 @@ const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
 const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "burger-103898",
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
@@ -1759,7 +1760,41 @@ const AB_105815_ITEMS = AB_105811_ITEMS.map((item) => ({
   code: item.code.replace("AB105811", "AB105815"),
 }));
 
+// Burger 103898: L-shaped Cindy kitchen from contract plan 670 103898.
+// Supplier schedule codes are retained for display while catalogArticleNumber links
+// each row to the shared catalog identity used by the Burger program price list.
+const BURGER_103898_ITEMS = [
+  defaultOvenHob({ sortOrder: 10 }),
+  defaultWorktop({ sortOrder: 20 }),
+  { itemType: ItemType.COMPONENT, code: "SINK-BASE-BURGER103898-600", name: DEFAULT_SINK_BASE_CATALOG_NAME_EN, nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE, price: "0.00", widthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: DEFAULT_SINK_BASE_CATALOG_INFO_TEXT },
+  { itemType: ItemType.COMPONENT, code: "REF-BURGER103898-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US50", name: "Base cabinet with drawer", price: "247.00", widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US50 base storage cabinet", articleNumber: "US50" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US60-UPE65", name: "Base cabinet with drawer and corner end panel", price: "349.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base cabinet with UPE65 corner end panel", articleNumber: "US60", displayArticleNumber: "US60 + UPE65", catalogArticleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPE65 65 cm", blendePrice: "79.00" },
+  { itemType: ItemType.COMPONENT, code: "DISH-BURGER103898-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: "586.00", widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 70, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US30", name: "Base cabinet with drawer", price: "222.00", widthMm: 300, depthMm: 600, iconKey: "base_cabinet_30", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 80, infoText: "US30 base storage cabinet", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H5072", name: "Wall Cabinet", price: "135.00", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H5072, 2 adjustable shelves", articleNumber: "H5002", displayArticleNumber: "H5072", catalogArticleNumber: "H5002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-BURGER103898-HFLH6072", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "346.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HFLH6072 flat-screen hood cabinet package", articleNumber: "FH664621E + FWK124 + HD6002", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", catalogArticleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-BURGER103898-FH664621E", name: "FH664621E Extractor Hood", price: "346.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH 664 621 E", catalogArticleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H6072", name: "Wall Cabinet", price: "146.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6072, 2 adjustable shelves", articleNumber: "H6002", displayArticleNumber: "H6072", catalogArticleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H3072", name: "Wall Cabinet", price: "124.00", widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "H3072, 2 adjustable shelves", articleNumber: "H3002", displayArticleNumber: "H3072", catalogArticleNumber: "H3002" },
+  defaultSinkWorktop({ sortOrder: 130 }),
+  { itemType: ItemType.ACCESSORY, code: "ACC-WASTE-001", legacyCode: "acc-waste", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", iconKey: "waste_system", sortOrder: 200, infoText: "Blanco Botton 517467", articleNumber: "517467" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-CUTLERY-ZB60SG", legacyCode: "acc-cutlery", name: "Cutlery insert 60 cm", price: "20.00", iconKey: "cutlery_insert", sortOrder: 210, infoText: "Cutlery insert 60 cm", articleNumber: "ZB60SG" },
+  { itemType: ItemType.ACCESSORY, code: "ACC-LIGHT-003", legacyCode: "acc-lighting", name: "Beleuchtungsset 3 LED-Spots", price: "69.00", iconKey: "lighting_set", sortOrder: 220, articleNumber: "KALB KA220043_S3" },
+  { itemType: ItemType.SERVICE, code: "SVC-MONTAGE-001", legacyCode: "service-montage", name: "Delivery, Carry-in, Assembly and Installation", nameDe: "Lieferung, Vertragen, Montage und Anschluss", price: "349.00", iconKey: "delivery_assembly", sortOrder: 300 },
+  { itemType: ItemType.SERVICE, code: "SVC-PICKUP-001", legacyCode: "service-pickup", name: "Pickup at logistics location", nameDe: "Abholung an Logistikstandort", price: "0.00", iconKey: "pickup", sortOrder: 310 },
+];
+
 const DEFAULT_KITCHENS = [
+  {
+    slug: "burger-103898",
+    kitchenCode: "103 898",
+    programmId: "BURGER CINDY",
+    name: "103898",
+    description: "Burger Cindy L-shaped kitchen configuration based on frontend/public/pdfs/670 103898.pdf",
+    reconcileExisting: true,
+    items: BURGER_103898_ITEMS,
+  },
   {
     slug: "ab-105806",
     kitchenCode: "105 806",
@@ -2360,6 +2395,8 @@ const DEFAULT_KITCHENS = [
 
 const DEFAULT_KITCHEN_CONTRACTS = [
   { contractNumber: "670108134", kitchenSlug: "108134-modul-1" },
+  { contractNumber: "670103898", kitchenSlug: "burger-103898" },
+  { contractNumber: "111103898", kitchenSlug: "burger-103898" },
   ...DEFAULT_KITCHENS
     .filter((kitchen) => kitchen.slug.startsWith("ab-"))
     .flatMap((kitchen) => [
@@ -3099,7 +3136,7 @@ async function main() {
 
     const kitchenData = {
       kitchenCode: kitchen.kitchenCode || null,
-      programmId: DEFAULT_KITCHEN_PROGRAMM_ID,
+      programmId: kitchen.programmId || DEFAULT_KITCHEN_PROGRAMM_ID,
       name: kitchen.name,
       status: KitchenStatus.ACTIVE,
       description: kitchen.description,
@@ -3121,11 +3158,11 @@ async function main() {
       const item = applyDefaultCatalogItem(rawItem);
       seededItemCodes.push(item.code);
       const itemCode = String(item.code || "").trim().toUpperCase();
-      const catalogArticleNumber = item.isActive === false
+      const catalogArticleNumber = item.catalogArticleNumber || (item.isActive === false
         && itemCode.startsWith("HOOD-")
         && String(item.articleNumber || "").trim() === "FH 664 621 E"
           ? "FH664621E + FWK124 + HD6002"
-          : String(item.articleNumber || "").trim();
+          : String(item.articleNumber || "").trim());
       const catalogArticle = catalogArticleNumber
         ? catalogArticleByNumber.get(catalogArticleNumber)
         : null;
@@ -3209,7 +3246,8 @@ async function main() {
         productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
         itemType: item.itemType,
         code: item.code,
-        articleNumber: catalogArticle?.articleNumber
+        articleNumber: item.displayArticleNumber
+          || catalogArticle?.articleNumber
           || (isStandaloneCatalogBlende ? catalogBlende?.code : item.articleNumber)
           || null,
         name: catalogArticle?.name
@@ -3366,7 +3404,7 @@ async function main() {
       for (const part of [
         {
           partKey: "dishwasher",
-          articleCode: "A-EGSPV594400",
+          articleCode: kitchen.slug === "burger-103898" ? "A-EGSPV597210" : "A-EGSPV594400",
           name: "Fully Integrated Dishwasher",
           nameDe: "Vollintegrierter Geschirrspüler",
           sortOrder: 32,
@@ -3410,7 +3448,6 @@ async function main() {
         data: { isActive: false },
       });
     }
-
     const ovenBundle = claimSourceItems
       .find((item) => (
         item?.isActive !== false
@@ -3546,6 +3583,30 @@ async function main() {
   }
 
   if (onlyKitchenSlug) {
+    const kitchen = await prisma.kitchen.findUnique({
+      where: { slug: onlyKitchenSlug },
+      select: { id: true },
+    });
+
+    for (const contract of DEFAULT_KITCHEN_CONTRACTS.filter(
+      (entry) => entry.kitchenSlug === onlyKitchenSlug,
+    )) {
+      await prisma.kitchenContract.upsert({
+        where: { contractNumber: contract.contractNumber },
+        update: {
+          kitchenId: kitchen.id,
+          projectId: defaultProjectId,
+          isActive: true,
+        },
+        create: {
+          contractNumber: contract.contractNumber,
+          kitchenId: kitchen.id,
+          projectId: defaultProjectId,
+          isActive: true,
+        },
+      });
+    }
+
     console.log(`Seeded kitchen ${onlyKitchenSlug}.`);
     return;
   }
