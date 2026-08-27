@@ -320,13 +320,16 @@ async function loadKitchenPlanPreviewData() {
   if (kitchenPlanPreviewDataPromise) return kitchenPlanPreviewDataPromise;
 
   kitchenPlanPreviewDataPromise = (async () => {
-    const sourcePath = path.join(process.cwd(), "components", "kitchen-svg-stage.jsx");
+    const sourcePath = await resolveWorkspaceAssetPath("components/kitchen-svg-stage.jsx")
+      || await resolveWorkspaceAssetPath("frontend/components/kitchen-svg-stage.jsx");
+    if (!sourcePath) return { imageViews: {}, hotspotsBySlug: {}, linkedGroupsBySlug: {} };
     const source = await fs.readFile(sourcePath, "utf8");
     const imageViewsLiteral = findBalancedObjectLiteral(source, "IMAGE_VIEW_BY_SLUG");
     const hotspotsLiteral = findBalancedObjectLiteral(source, "IMAGE_HOTSPOTS_BY_SLUG");
     const imageViews = imageViewsLiteral ? Function(`"use strict"; return (${imageViewsLiteral});`)() : {};
     const hotspotsBySlug = hotspotsLiteral ? Function(`"use strict"; return (${hotspotsLiteral});`)() : {};
-    const selectionUtilsPath = path.join(process.cwd(), "components", "kitchen-selection-utils.js");
+    const selectionUtilsPath = await resolveWorkspaceAssetPath("components/kitchen-selection-utils.js")
+      || await resolveWorkspaceAssetPath("frontend/components/kitchen-selection-utils.js");
     const selectionUtilsSource = await fs.readFile(selectionUtilsPath, "utf8").catch(() => "");
     const linkedGroupsLiteral = selectionUtilsSource
       ? findBalancedObjectLiteral(selectionUtilsSource, "LINKED_COMPONENT_GROUPS_BY_SLUG")
@@ -375,6 +378,16 @@ async function resolvePurchasedKitchenSketchPath(order) {
     candidates.push(
       "public/plans/108134 MODUL 1.svg",
       "public/jpg/108134 MODUL 1_page-0001.jpg",
+    );
+  }
+
+  // Keep the recently added 670 103898 plan available when the server is
+  // started from a workspace root where the client-side plan metadata cannot
+  // be parsed (for example, in a standalone test or worker process).
+  if (slug === "burger-103898") {
+    candidates.push(
+      "public/plans/670 103898.svg",
+      "public/jpg/670 103898_page-0001.jpg",
     );
   }
 
@@ -616,6 +629,7 @@ function pointsToOverlayPolygon(points, crop, width, height) {
 }
 
 function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height, linkedGroups = [] }) {
+  const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const hasWorktop = hotspots.some((hotspot) => String(hotspot?.componentKey || "").trim() === "worktop");
   const { selectedComponentKeys, lockedComponentKeys } = buildPurchasedKitchenPdfSelectionState(order, {
     linkedGroups,
