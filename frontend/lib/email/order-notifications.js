@@ -800,7 +800,17 @@ async function buildWhiteBackedProductImage(content) {
 }
 
 function getItemDisplayCode(item) {
-  return String(item?.articleNumber || item?.code || "-").trim() || "-";
+  const articleNumber = String(item?.articleNumber || "").trim();
+  const blendeCode = String(item?.blendeCode || "").trim();
+  // Supplier-facing Burger cabinet numbers can include the filler (e.g.
+  // `US60 + UPE65`). The filler is rendered as its own numbered email row,
+  // so keep only the cabinet code on the parent row.
+  if (articleNumber && blendeCode) {
+    const escapedBlendeCode = blendeCode.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const parentCode = articleNumber.replace(new RegExp(`\\s*\\+\\s*${escapedBlendeCode}\\s*$`, "i"), "").trim();
+    if (parentCode) return parentCode;
+  }
+  return articleNumber || String(item?.code || "-").trim() || "-";
 }
 
 function getItemDisplayName(item) {

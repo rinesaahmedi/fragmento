@@ -23,6 +23,7 @@ import {
 import { getServiceClaimLinkedComponentIds } from "../lib/service-claim-kitchen-plan-selection.js";
 import { serializeKitchenForLegacy } from "../lib/catalog.js";
 import { resolveCutleryCatalogArticles } from "../lib/cutlery-accessories.js";
+import { buildOrderSummaryHtml } from "../lib/email/order-notifications.js";
 
 const translate = (_key, fallback) => fallback;
 
@@ -395,6 +396,34 @@ test("Burger drawer variants include imported US2A supplier prices", () => {
   const orders = readFileSync(new URL("../lib/orders.js", import.meta.url), "utf8");
   assert.match(catalog, /kitchen\.slug === "burger-103898" \? \{\} : \{ isActive: true \}/);
   assert.match(orders, /kitchen\.slug === "burger-103898" \? \{\} : \{ isActive: true \}/);
+});
+
+test("Burger corner cabinet email shows filler code only on its separate row", () => {
+  const html = buildOrderSummaryHtml({
+    orderNumber: "TEST-103898",
+    total: 349,
+    createdAt: "2026-08-27T10:00:00.000Z",
+    kitchen: { slug: "burger-103898", name: "103898" },
+    customer: { contractNumber: "111103898" },
+    components: [{
+      itemType: "COMPONENT",
+      itemCategory: "COMPONENT",
+      code: "CAB-BASE-BURGER103898-US60-UPE65",
+      articleNumber: "US60 + UPE65",
+      nameDe: "Unterschrank mit Schublade 60 cm",
+      price: 349,
+      quantity: 1,
+      blendeCode: "UPE65",
+      blendeLabel: "Eckpassblende Unterschrank",
+      blendePrice: 79,
+      catalogBlendeQuantity: 1,
+    }],
+    accessories: [],
+    services: [],
+  });
+  assert.match(html, /Typen-Nr\.: US60/);
+  assert.match(html, /Typen-Nr\.: UPE65/);
+  assert.doesNotMatch(html, /Typen-Nr\.: US60 \+ UPE65/);
 });
 
 test("order validation accepts Burger supplier-facing article numbers", () => {

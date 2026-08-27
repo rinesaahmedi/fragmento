@@ -16,11 +16,14 @@ function toMoneyNumber(value) {
 
 function articlePayload(article) {
   if (!article) return null;
+  const programPrice = Array.isArray(article.programPrices)
+    ? article.programPrices.find((entry) => entry?.isActive !== false)?.price
+    : null;
   return {
     articleNumber: article.articleNumber || "",
     name: article.name || "",
     nameDe: article.nameDe || "",
-    price: toMoneyNumber(article.price),
+    price: toMoneyNumber(programPrice ?? article.price),
     widthMm: article.widthMm ?? null,
     heightMm: article.heightMm ?? null,
     depthMm: article.depthMm ?? null,
