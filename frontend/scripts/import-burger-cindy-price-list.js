@@ -7,32 +7,83 @@ const prisma = new PrismaClient();
 const PROGRAMM_ID = "BURGER CINDY";
 const DEFAULT_PROGRAMM_ID = "IP 2200";
 const SOURCE_NAME = "260505 Fragmento Otto Wulff Saga VK - Burger - 2.pdf";
-const IMPORT_LABEL = "Burger - Cindy Type price list 2026 (Impuls article set)";
+const IMPORT_LABEL = "Burger - Cindy Type price list 2026 (supplier article codes)";
 
-// Burger uses the Impuls catalog identities. Only these prices come from the
-// Burger supplier list; names and all other fields come from Impuls.
-const ARTICLE_PRICES = {
-  "A-EGSPV587915 + TGV45": 450,
-  "A-EGSPV597210 + TGV60": 586,
-  "EWA34660W + TGV60 + WU16": 655,
-  "FH664621E + FWK124 + HD6002": 346,
-  H10002: 211, H3002: 124, H4002: 128, H4502: 137,
-  H5002: 135, H6002: 146, H8002: 193, H9002: 203,
-  KHF664611S: 195,
-  "KHF664611S + FWP18": 209,
-  "OL-KGCN388140E": 579,
-  US100: 427, US120: 455,
-  US2A100: 718, US2A30: 387, US2A40: 396, US2A45: 414,
-  US2A50: 432, US2A60: 461, US2A80: 672, US2A90: 705,
-  US30: 222, US40: 232, US45: 249, US50: 247,
-  US60: 270, US80: 392, US90: 410,
-  517467: 89,
-  "KALB KA220043_S3": 69,
-  ZB100SG: 28, ZB30SG: 13, ZB40SG: 15, ZB45SG: 17,
-  ZB50SG: 18, ZB60SG: 20, ZB80SG: 25, ZB90SG: 26,
-};
+// The Burger list has its own Typen-NR. values. The source identifier points
+// to the equivalent Impuls record so descriptive metadata can be reused, while
+// target is the exact Burger code shown in the PDF. The two visually clipped
+// bundle codes are completed from the component rows immediately above them.
+const ARTICLE_CODE_MAPPINGS = [
+  { source: "US30", target: "US30", price: 222 },
+  { source: "US40", target: "US40", price: 232 },
+  { source: "US45", target: "US45", price: 249 },
+  { source: "US50", target: "US50", price: 247 },
+  { source: "US60", target: "US60", price: 270 },
+  { source: "US80", target: "US80", price: 392 },
+  { source: "US90", target: "US90", price: 410 },
+  { source: "US100", target: "US100", price: 427 },
+  { source: "US120", target: "US120", price: 455 },
+  { source: "US2A30", target: "US2A30", price: 387 },
+  { source: "US2A40", target: "US2A40", price: 396 },
+  { source: "US2A45", target: "US2A45", price: 414 },
+  { source: "US2A50", target: "US2A50", price: 432 },
+  { source: "US2A60", target: "US2A60", price: 461 },
+  { source: "US2A80", target: "US2A80", price: 672 },
+  { source: "US2A90", target: "US2A90", price: 705 },
+  { source: "US2A100", target: "US2A100", price: 718 },
+  { source: "H3002", target: "H3072", price: 124 },
+  { source: "H4502", target: "H4572", price: 137 },
+  { source: "H6002", target: "H6072", price: 146 },
+  { source: "H4002", target: "H4072", price: 128 },
+  { source: "H5002", target: "H5072", price: 135 },
+  { source: "H8002", target: "H8072", price: 193 },
+  { source: "H9002", target: "H9072", price: 203 },
+  { source: "H10002", target: "H10072", price: 211 },
+  { source: "A-EGSPV597210 + TGV60", target: "A-EGSPV597210 + TGV60", price: 586 },
+  {
+    source: "A-EGSPV587915 + TGV45",
+    target: "A-EGSPV594 + TGV60",
+    price: 687,
+    overrides: {
+      name: "Fully Integrated Dishwasher incl. Furniture Front",
+      nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront",
+      widthMm: 600,
+      isFixedPricePackage: true,
+    },
+  },
+  { source: "OL-KGCN388140E", target: "OL-KGCN388140E", price: 579 },
+  {
+    source: "FH664621E + FWK124 + HD6002",
+    target: "FH664621E+FWK124+HFLH6072",
+    legacyTargets: ["FH664621E + FWK124 + HFLH6072"],
+    price: 346,
+  },
+  {
+    source: "EWA34660W + TGV60 + WU16",
+    target: "EWA34660W+TV60+WU1672",
+    legacyTargets: ["EWA34660W + TV60 + WU1672"],
+    price: 655,
+  },
+  { source: "KHF664611S", target: "KHF664611S", price: 195 },
+  { source: "KHF664611S + FWP18", target: "KHF664611S+FWP18", price: 209 },
+  { source: "517467", target: "Blanco Botton 517467", price: 89 },
+  { source: "ZB30SG", target: "ZBE30", price: 13 },
+  { source: "ZB40SG", target: "ZBE40", price: 15 },
+  { source: "ZB45SG", target: "ZBE45", price: 17 },
+  { source: "ZB50SG", target: "ZBE50", price: 18 },
+  { source: "ZB60SG", target: "ZBE60", price: 20 },
+  { source: "ZB80SG", target: "ZBE80", price: 25 },
+  { source: "ZB90SG", target: "ZBE90", price: 26 },
+  { source: "ZB100SG", target: "ZBE100", price: 28 },
+  { source: "KALB KA220043_S3", target: "KALB KA220043_S3", price: 69 },
+];
 
-const BLENDE_PRICES = { HPEF4302: 79, HPK2002: 35, UPEF65: 79, UPK20: 33 };
+const BLENDE_CODE_MAPPINGS = [
+  { source: "UPK20", target: "UP20K", price: 33 },
+  { source: "HPK2002", target: "HP2072K", price: 35 },
+  { source: "UPEF65", target: "UPE65", price: 79 },
+  { source: "HPEF4302", target: "HPE7072", price: 79 },
+];
 const SERVICE_PRICES = { MONTAGE: 349, PICKUP: 0 };
 
 // The original supplier-code import touched shared master records. Restore the
@@ -139,6 +190,133 @@ async function backfillImpulsProgramPrices(cutoff) {
   return { articles: articles.length, blenden: blenden.length, services: services.length };
 }
 
+async function restoreImpulsCatalogIdentifiers() {
+  let articles = 0;
+  let blenden = 0;
+
+  for (const mapping of ARTICLE_CODE_MAPPINGS.filter((row) => row.source !== row.target)) {
+    const legacyArticleNumbers = [mapping.target, ...(mapping.legacyTargets || [])];
+    const changed = await prisma.$transaction(async (tx) => {
+      const [sourceRecord, legacyRecords] = await Promise.all([
+        tx.catalogArticle.findUnique({ where: { articleNumber: mapping.source } }),
+        tx.catalogArticle.findMany({
+          where: {
+            articleNumber: { in: legacyArticleNumbers },
+            programPrices: { some: { programmId: DEFAULT_PROGRAMM_ID } },
+          },
+          include: { programPrices: { where: { programmId: DEFAULT_PROGRAMM_ID }, take: 1 } },
+        }),
+      ]);
+      if (!legacyRecords.length) return 0;
+
+      if (!sourceRecord) {
+        const legacy = legacyRecords[0];
+        await tx.catalogArticle.update({ where: { id: legacy.id }, data: { articleNumber: mapping.source } });
+        await tx.catalogArticleProgramPrice.updateMany({
+          where: { programmId: DEFAULT_PROGRAMM_ID, catalogArticleId: legacy.id },
+          data: { articleNumber: mapping.source },
+        });
+        await tx.kitchenItem.updateMany({
+          where: { catalogArticleId: legacy.id, kitchen: { programmId: DEFAULT_PROGRAMM_ID } },
+          data: { articleNumber: mapping.source },
+        });
+        return 1;
+      }
+
+      for (const legacy of legacyRecords) {
+        const legacyPrice = legacy.programPrices[0];
+        if (legacyPrice) {
+          await tx.catalogArticleProgramPrice.upsert({
+            where: {
+              programmId_catalogArticleId: {
+                programmId: DEFAULT_PROGRAMM_ID,
+                catalogArticleId: sourceRecord.id,
+              },
+            },
+            create: {
+              programmId: DEFAULT_PROGRAMM_ID,
+              catalogArticleId: sourceRecord.id,
+              articleNumber: mapping.source,
+              price: legacyPrice.price,
+              isActive: legacyPrice.isActive,
+            },
+            update: { articleNumber: mapping.source },
+          });
+        }
+        await tx.kitchenItem.updateMany({
+          where: { catalogArticleId: legacy.id, kitchen: { programmId: DEFAULT_PROGRAMM_ID } },
+          data: { catalogArticleId: sourceRecord.id, articleNumber: mapping.source },
+        });
+        await tx.catalogArticleProgramPrice.deleteMany({
+          where: { programmId: DEFAULT_PROGRAMM_ID, catalogArticleId: legacy.id },
+        });
+      }
+      return legacyRecords.length;
+    });
+    articles += changed;
+  }
+
+  for (const mapping of BLENDE_CODE_MAPPINGS.filter((row) => row.source !== row.target)) {
+    const changed = await prisma.$transaction(async (tx) => {
+      const [sourceRecord, legacyRecord] = await Promise.all([
+        tx.catalogBlende.findUnique({ where: { code: mapping.source } }),
+        tx.catalogBlende.findFirst({
+          where: {
+            code: mapping.target,
+            programPrices: { some: { programmId: DEFAULT_PROGRAMM_ID } },
+          },
+          include: { programPrices: { where: { programmId: DEFAULT_PROGRAMM_ID }, take: 1 } },
+        }),
+      ]);
+      if (!legacyRecord) return 0;
+
+      if (!sourceRecord) {
+        await tx.catalogBlende.update({ where: { id: legacyRecord.id }, data: { code: mapping.source } });
+        await tx.catalogBlendeProgramPrice.updateMany({
+          where: { programmId: DEFAULT_PROGRAMM_ID, catalogBlendeId: legacyRecord.id },
+          data: { code: mapping.source },
+        });
+        await tx.kitchenItem.updateMany({
+          where: { catalogBlendeId: legacyRecord.id, kitchen: { programmId: DEFAULT_PROGRAMM_ID } },
+          data: { blendeCode: mapping.source },
+        });
+        return 1;
+      }
+
+      const legacyPrice = legacyRecord.programPrices[0];
+      if (legacyPrice) {
+        await tx.catalogBlendeProgramPrice.upsert({
+          where: {
+            programmId_catalogBlendeId: {
+              programmId: DEFAULT_PROGRAMM_ID,
+              catalogBlendeId: sourceRecord.id,
+            },
+          },
+          create: {
+            programmId: DEFAULT_PROGRAMM_ID,
+            catalogBlendeId: sourceRecord.id,
+            code: mapping.source,
+            price: legacyPrice.price,
+            isActive: legacyPrice.isActive,
+          },
+          update: { code: mapping.source },
+        });
+      }
+      await tx.kitchenItem.updateMany({
+        where: { catalogBlendeId: legacyRecord.id, kitchen: { programmId: DEFAULT_PROGRAMM_ID } },
+        data: { catalogBlendeId: sourceRecord.id, blendeCode: mapping.source },
+      });
+      await tx.catalogBlendeProgramPrice.deleteMany({
+        where: { programmId: DEFAULT_PROGRAMM_ID, catalogBlendeId: legacyRecord.id },
+      });
+      return 1;
+    });
+    blenden += changed;
+  }
+
+  return { articles, blenden };
+}
+
 async function restoreImpulsMasterMetadata() {
   await prisma.$transaction(async (tx) => {
     for (const [articleNumber, data] of Object.entries(IMPULS_ARTICLE_RESTORES)) {
@@ -157,45 +335,46 @@ async function restoreImpulsMasterMetadata() {
   });
 }
 
-async function removeBurgerOnlyCatalogRecords() {
-  const [impulsArticles, impulsBlenden, impulsServices, burgerArticles, burgerBlenden, burgerServices] = await Promise.all([
-    prisma.catalogArticleProgramPrice.findMany({ where: { programmId: DEFAULT_PROGRAMM_ID }, select: { catalogArticleId: true } }),
-    prisma.catalogBlendeProgramPrice.findMany({ where: { programmId: DEFAULT_PROGRAMM_ID }, select: { catalogBlendeId: true } }),
-    prisma.catalogServiceProgramPrice.findMany({ where: { programmId: DEFAULT_PROGRAMM_ID }, select: { catalogServiceId: true } }),
-    prisma.catalogArticleProgramPrice.findMany({ where: { programmId: PROGRAMM_ID }, select: { catalogArticleId: true } }),
-    prisma.catalogBlendeProgramPrice.findMany({ where: { programmId: PROGRAMM_ID }, select: { catalogBlendeId: true } }),
-    prisma.catalogServiceProgramPrice.findMany({ where: { programmId: PROGRAMM_ID }, select: { catalogServiceId: true } }),
+async function removeObsoleteBurgerProgramPrices() {
+  const validArticleNumbers = ARTICLE_CODE_MAPPINGS.map((row) => row.target);
+  const validBlendeCodes = BLENDE_CODE_MAPPINGS.map((row) => row.target);
+  const validServiceCodes = new Set(Object.keys(SERVICE_PRICES));
+  const [validArticles, validBlenden, burgerArticles, burgerBlenden, burgerServices] = await Promise.all([
+    prisma.catalogArticle.findMany({ where: { articleNumber: { in: validArticleNumbers } }, select: { id: true } }),
+    prisma.catalogBlende.findMany({ where: { code: { in: validBlendeCodes } }, select: { id: true } }),
+    prisma.catalogArticleProgramPrice.findMany({ where: { programmId: PROGRAMM_ID } }),
+    prisma.catalogBlendeProgramPrice.findMany({ where: { programmId: PROGRAMM_ID } }),
+    prisma.catalogServiceProgramPrice.findMany({ where: { programmId: PROGRAMM_ID } }),
   ]);
-  const articleIds = new Set(impulsArticles.map((row) => row.catalogArticleId));
-  const blendeIds = new Set(impulsBlenden.map((row) => row.catalogBlendeId));
-  const serviceIds = new Set(impulsServices.map((row) => row.catalogServiceId));
-  const extraArticleIds = burgerArticles.map((row) => row.catalogArticleId).filter((id) => !articleIds.has(id));
-  const extraBlendeIds = burgerBlenden.map((row) => row.catalogBlendeId).filter((id) => !blendeIds.has(id));
-  const extraServiceIds = burgerServices.map((row) => row.catalogServiceId).filter((id) => !serviceIds.has(id));
+  const validArticleIds = new Set(validArticles.map((row) => row.id));
+  const validBlendeIds = new Set(validBlenden.map((row) => row.id));
+  const obsoleteArticles = burgerArticles.filter((row) => !validArticleIds.has(row.catalogArticleId));
+  const obsoleteBlenden = burgerBlenden.filter((row) => !validBlendeIds.has(row.catalogBlendeId));
+  const obsoleteServices = burgerServices.filter((row) => !validServiceCodes.has(row.code));
 
   await prisma.$transaction(async (tx) => {
-    if (extraArticleIds.length) {
-      await tx.catalogArticleProgramPrice.deleteMany({ where: { programmId: PROGRAMM_ID, catalogArticleId: { in: extraArticleIds } } });
-      await tx.catalogArticle.deleteMany({ where: { id: { in: extraArticleIds }, programPrices: { none: {} }, kitchenItems: { none: {} } } });
+    if (obsoleteArticles.length) {
+      const ids = obsoleteArticles.map((row) => row.catalogArticleId);
+      await tx.catalogArticleProgramPrice.deleteMany({ where: { programmId: PROGRAMM_ID, catalogArticleId: { in: ids } } });
+      await tx.catalogArticle.deleteMany({ where: { id: { in: ids }, programPrices: { none: {} }, kitchenItems: { none: {} } } });
     }
-    if (extraBlendeIds.length) {
-      await tx.catalogBlendeProgramPrice.deleteMany({ where: { programmId: PROGRAMM_ID, catalogBlendeId: { in: extraBlendeIds } } });
-      await tx.catalogBlende.deleteMany({ where: { id: { in: extraBlendeIds }, programPrices: { none: {} }, kitchenItems: { none: {} } } });
+    if (obsoleteBlenden.length) {
+      const ids = obsoleteBlenden.map((row) => row.catalogBlendeId);
+      await tx.catalogBlendeProgramPrice.deleteMany({ where: { programmId: PROGRAMM_ID, catalogBlendeId: { in: ids } } });
+      await tx.catalogBlende.deleteMany({ where: { id: { in: ids }, programPrices: { none: {} }, kitchenItems: { none: {} } } });
     }
-    if (extraServiceIds.length) {
-      await tx.catalogServiceProgramPrice.deleteMany({ where: { programmId: PROGRAMM_ID, catalogServiceId: { in: extraServiceIds } } });
-      await tx.catalogService.deleteMany({ where: { id: { in: extraServiceIds }, programPrices: { none: {} }, kitchenItems: { none: {} } } });
+    if (obsoleteServices.length) {
+      const ids = obsoleteServices.map((row) => row.catalogServiceId);
+      await tx.catalogServiceProgramPrice.deleteMany({ where: { programmId: PROGRAMM_ID, catalogServiceId: { in: ids } } });
+      await tx.catalogService.deleteMany({ where: { id: { in: ids }, programPrices: { none: {} }, kitchenItems: { none: {} } } });
     }
   });
 
-  return { articles: extraArticleIds.length, blenden: extraBlendeIds.length, services: extraServiceIds.length };
-}
-
-function mappedPrice(prices, identifier, kind) {
-  if (!Object.prototype.hasOwnProperty.call(prices, identifier)) {
-    throw new Error(`Burger ${kind} price is missing for Impuls identifier ${identifier}.`);
-  }
-  return Number(prices[identifier]).toFixed(2);
+  return {
+    articles: obsoleteArticles.length,
+    blenden: obsoleteBlenden.length,
+    services: obsoleteServices.length,
+  };
 }
 
 async function buildParsedFromImpulsCatalog() {
@@ -211,37 +390,61 @@ async function buildParsedFromImpulsCatalog() {
     }),
   ]);
 
+  const articleByNumber = new Map(articles.map((row) => [row.catalogArticle.articleNumber, row]));
+  const blendeByCode = new Map(blenden.map((row) => [row.catalogBlende.code, row]));
+  const serviceByCode = new Map(services.map((row) => [row.catalogService.code, row]));
+  const missingArticles = ARTICLE_CODE_MAPPINGS.filter((row) => !articleByNumber.has(row.source)).map((row) => row.source);
+  const missingBlenden = BLENDE_CODE_MAPPINGS.filter((row) => !blendeByCode.has(row.source)).map((row) => row.source);
+  const missingServices = Object.keys(SERVICE_PRICES).filter((code) => !serviceByCode.has(code));
+  if (missingArticles.length || missingBlenden.length || missingServices.length) {
+    throw new Error([
+      missingArticles.length ? `Impuls articles missing: ${missingArticles.join(", ")}` : null,
+      missingBlenden.length ? `Impuls blenden missing: ${missingBlenden.join(", ")}` : null,
+      missingServices.length ? `Impuls services missing: ${missingServices.join(", ")}` : null,
+    ].filter(Boolean).join(". "));
+  }
+
   const parsed = {
-    articles: articles.map(({ catalogArticle: record, isActive }) => ({
-      key: record.articleNumber,
-      data: {
-        articleNumber: record.articleNumber, name: record.name, nameDe: record.nameDe,
-        description: record.description, widthMm: record.widthMm, heightMm: record.heightMm,
-        depthMm: record.depthMm, itemType: record.itemType,
-        price: mappedPrice(ARTICLE_PRICES, record.articleNumber, "article"),
-        isFixedPricePackage: record.isFixedPricePackage, isActive,
-      },
-    })),
-    blenden: blenden.map(({ catalogBlende: record, isActive }) => ({
-      key: record.code,
-      data: {
-        code: record.code, name: record.name, nameDe: record.nameDe,
-        description: record.description, price: mappedPrice(BLENDE_PRICES, record.code, "blende"), isActive,
-      },
-    })),
-    services: services.map(({ catalogService: record, isActive }) => ({
-      key: record.code,
-      data: {
-        code: record.code, name: record.name, nameDe: record.nameDe,
-        description: record.description, price: mappedPrice(SERVICE_PRICES, record.code, "service"), isActive,
-      },
-    })),
+    articles: ARTICLE_CODE_MAPPINGS.map((mapping) => {
+      const { catalogArticle: record, isActive } = articleByNumber.get(mapping.source);
+      return {
+        key: mapping.target,
+        data: {
+          articleNumber: mapping.target, name: record.name, nameDe: record.nameDe,
+          description: record.description, widthMm: record.widthMm, heightMm: record.heightMm,
+          depthMm: record.depthMm, itemType: record.itemType,
+          price: Number(mapping.price).toFixed(2),
+          isFixedPricePackage: record.isFixedPricePackage, isActive,
+          ...(mapping.overrides || {}),
+        },
+      };
+    }),
+    blenden: BLENDE_CODE_MAPPINGS.map((mapping) => {
+      const { catalogBlende: record, isActive } = blendeByCode.get(mapping.source);
+      return {
+        key: mapping.target,
+        data: {
+          code: mapping.target, name: record.name, nameDe: record.nameDe,
+          description: record.description, price: Number(mapping.price).toFixed(2), isActive,
+        },
+      };
+    }),
+    services: Object.entries(SERVICE_PRICES).map(([code, price]) => {
+      const { catalogService: record, isActive } = serviceByCode.get(code);
+      return {
+        key: code,
+        data: {
+          code: record.code, name: record.name, nameDe: record.nameDe,
+          description: record.description, price: Number(price).toFixed(2), isActive,
+        },
+      };
+    }),
     validationErrors: [],
   };
 
   const expectedCounts = {
-    articles: Object.keys(ARTICLE_PRICES).length,
-    blenden: Object.keys(BLENDE_PRICES).length,
+    articles: ARTICLE_CODE_MAPPINGS.length,
+    blenden: BLENDE_CODE_MAPPINGS.length,
     services: Object.keys(SERVICE_PRICES).length,
   };
   for (const kind of ["articles", "blenden", "services"]) {
@@ -259,8 +462,8 @@ async function main() {
     orderBy: { createdAt: "asc" },
   });
   const impulsBackfill = await backfillImpulsProgramPrices(firstBurgerImport?.createdAt || new Date());
+  const impulsIdentifiersRestored = await restoreImpulsCatalogIdentifiers();
   await restoreImpulsMasterMetadata();
-  const removed = await removeBurgerOnlyCatalogRecords();
   const parsed = await buildParsedFromImpulsCatalog();
 
   await prisma.catalogProgram.upsert({
@@ -275,7 +478,7 @@ async function main() {
   });
   if (existingAlignedImport && !force) {
     console.log(`Burger catalog is already aligned by import ${existingAlignedImport.id}.`);
-    console.log(JSON.stringify({ impulsBackfill, removed }, null, 2));
+    console.log(JSON.stringify({ impulsBackfill, impulsIdentifiersRestored }, null, 2));
     return;
   }
 
@@ -287,19 +490,21 @@ async function main() {
     label: IMPORT_LABEL,
     notes: [
       "Source validity: 2026-12-31. Minimum order value: EUR 1,000 excluding services.",
-      "Burger prices are mapped onto the exact Impuls master article, blende, and service records.",
-      "The 45 cm dishwasher is absent from the Burger list and retains the Impuls price as a fallback.",
+      "Burger article and blende identifiers match the Typen-NR. values printed in the supplier PDF.",
+      "The full flat-hood and washing-machine bundle identifiers are completed from their component rows because the total cells are visually clipped.",
     ].join("\n"),
     importedBy: "price-list-script",
     syncLinkedKitchenItems: true,
     includeLocked: false,
     includeTestKitchens: false,
   });
+  const removed = await removeObsoleteBurgerProgramPrices();
 
   console.log(JSON.stringify({
     programmId: PROGRAMM_ID,
     importId: result.importRecord.id,
     impulsBackfill,
+    impulsIdentifiersRestored,
     removed,
     summary: result.summary,
   }, null, 2));
