@@ -825,6 +825,35 @@ Object.assign(PRODUCT_INFO_BY_ARTICLE_NUMBER, {
   "KHF664611S + FWP18": PRODUCT_INFO_BY_CODE["HOOD-C-FH664621E"],
 });
 
+// Product documents supplied specifically for Burger kitchen 103898. These remain
+// kitchen-scoped because several accessory codes are shared with the Impuls kitchens.
+const BURGER_103898_PRODUCT_INFO_BY_CODE = {
+  "DISH-BURGER103898-600": {
+    productImagePath: "/product-images/gallery/burger-103898/dishwasher/a-egspv597210-01.jpg",
+    productInfoPdfPath: "/product-info/burger-103898/dishwashers/a-egspv597210-product-info.pdf",
+  },
+  "CAB-HOOD-BURGER103898-HFLH6072": {
+    productImagePath: "/product-images/gallery/burger-103898/extractor-hood/fh664621e-01.jpg",
+    productInfoPdfPath: "/product-info/burger-103898/extractor-hoods/fh664621e-product-info.pdf",
+  },
+  "HOOD-BURGER103898-FH664621E": {
+    productImagePath: "/product-images/gallery/burger-103898/extractor-hood/fh664621e-01.jpg",
+    productInfoPdfPath: "/product-info/burger-103898/extractor-hoods/fh664621e-product-info.pdf",
+  },
+  "REF-BURGER103898-KGCN388140E": {
+    productImagePath: "/product-images/gallery/burger-103898/fridge/ol-kgcn388140e-01.jpg",
+    productInfoPdfPath: "/product-info/burger-103898/refrigerators/ol-kgcn388140e-product-info.pdf",
+  },
+  "ACC-LIGHT-003": {
+    productImagePath: "/product-images/gallery/burger-103898/leds/led-spots-01.jpg",
+    productInfoPdfPath: "/product-info/burger-103898/lighting/led-spots-product-info.pdf",
+  },
+  "ACC-WASTE-001": {
+    productImagePath: "/product-images/gallery/burger-103898/waste-collector/blanco-517467-01.jpg",
+    productInfoPdfPath: "/product-info/burger-103898/waste-collectors/blanco-517467-product-info.pdf",
+  },
+};
+
 for (const article of CATALOG_ARTICLES) {
   const productInfo = PRODUCT_INFO_BY_ARTICLE_NUMBER[article.articleNumber];
   if (productInfo) {
@@ -3178,11 +3207,17 @@ async function main() {
       const catalogArticle = catalogArticleNumber
         ? catalogArticleByNumber.get(catalogArticleNumber)
         : null;
-      const productInfo =
+      const defaultProductInfo =
         PRODUCT_INFO_BY_CODE[item.code] ||
         PRODUCT_INFO_BY_CODE[rawItem.code] ||
         PRODUCT_INFO_BY_ARTICLE_NUMBER[String(item.articleNumber || "").trim()] ||
         {};
+      const burgerProductInfo = kitchen.slug === "burger-103898"
+        ? BURGER_103898_PRODUCT_INFO_BY_CODE[item.code]
+        : null;
+      const productInfo = burgerProductInfo
+        ? { ...defaultProductInfo, ...burgerProductInfo }
+        : defaultProductInfo;
       // Resolve the item's stored dimensions against the catalog that exists in this database, so
       // the width-based display name (e.g. "Upper Cabinet 60 cm") stays consistent with the dims.
       const catalogDims = catalogArticleNumber

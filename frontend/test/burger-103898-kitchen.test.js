@@ -3,8 +3,10 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import {
   getAutoLinkedAccessoryCodes,
+  getCatalogDisplayItem,
   getLinkedComponentIds,
   getLocalizedItemName,
+  getProductImagePaths,
 } from "../components/kitchen-selection-utils.js";
 import {
   PLAN_HOTSPOTS_BY_SLUG,
@@ -212,6 +214,64 @@ test("public kitchen serialization uses Burger program prices and supplier-facin
   );
   assert.equal(hood.articleNumber, "FH664621E + FWK124 + HFLH6072");
   assert.equal(hood.price, 346);
+  assert.equal(
+    hood.productInfoPdfPath,
+    "/product-info/burger-103898/extractor-hoods/fh664621e-product-info.pdf",
+  );
+  assert.deepEqual(hood.productImagePaths, [
+    "/product-images/gallery/burger-103898/extractor-hood/fh664621e-01.jpg",
+  ]);
+});
+
+test("Burger product images and PDFs stay scoped to kitchen 103898", () => {
+  const burgerFridge = serializeKitchenForLegacy({
+    id: "burger-kitchen",
+    slug: "burger-103898",
+    name: "103898",
+    claimParts: [],
+    items: [{
+      id: "burger-fridge",
+      itemType: "COMPONENT",
+      code: "REF-BURGER103898-KGCN388140E",
+      articleNumber: "OL-KGCN388140E",
+      name: "Burger fridge",
+      price: 579,
+      isLocked: false,
+      productImagePath: "/product-images/old-fridge.jpg",
+      productInfoPdfPath: "/product-info/old-fridge.pdf",
+    }],
+  }).components[0];
+
+  assert.deepEqual(getProductImagePaths(burgerFridge), [
+    "/product-images/gallery/burger-103898/fridge/ol-kgcn388140e-01.jpg",
+    "/product-images/gallery/burger-103898/fridge/ol-kgcn388140e-02.jpg",
+  ]);
+  const display = getCatalogDisplayItem([burgerFridge], "burger-103898", burgerFridge);
+  assert.equal(
+    display.infoPdfHref,
+    "/product-info/burger-103898/refrigerators/ol-kgcn388140e-product-info.pdf",
+  );
+
+  const regularFridge = serializeKitchenForLegacy({
+    id: "regular-kitchen",
+    slug: "ab-105806",
+    name: "105806",
+    claimParts: [],
+    items: [{
+      id: "regular-fridge",
+      itemType: "COMPONENT",
+      code: "REF-AB105806-KGCN388140E",
+      articleNumber: "OL-KGCN388140E",
+      name: "Regular fridge",
+      price: 579,
+      isLocked: false,
+      productImagePath: "/product-images/regular-fridge.jpg",
+      productInfoPdfPath: "/product-info/regular-fridge.pdf",
+    }],
+  }).components[0];
+
+  assert.equal(regularFridge.productImagePath, "/product-images/regular-fridge.jpg");
+  assert.equal(regularFridge.productInfoPdfPath, "/product-info/regular-fridge.pdf");
 });
 
 test("order validation accepts Burger supplier-facing article numbers", () => {

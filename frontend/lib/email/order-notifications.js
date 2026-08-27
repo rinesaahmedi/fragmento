@@ -9,6 +9,7 @@ import sharp from "sharp";
 import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
 import { getPriceBreakdown } from "../price-utils.js";
+import { getBurger103898ProductInfo } from "../burger-103898-product-info.js";
 
 const LETTERHEAD = {
   headerHeight: 74,
@@ -156,7 +157,15 @@ function shouldPreferMappedProductInfoDocuments(item) {
   );
 }
 
-function getProductInfoDocumentsForEmail(item) {
+function getProductInfoDocumentsForEmail(item, kitchenSlug = "") {
+  const kitchenSpecificProductInformation = getBurger103898ProductInfo(kitchenSlug, item?.code);
+  if (kitchenSpecificProductInformation?.productInfoPdfPath) {
+    return [{
+      label: "Produktinfo PDF",
+      href: kitchenSpecificProductInformation.productInfoPdfPath,
+    }];
+  }
+
   const mappedDocuments = getMappedProductInfoDocuments(item);
   if (mappedDocuments.length && shouldPreferMappedProductInfoDocuments(item)) {
     return mappedDocuments;
@@ -761,7 +770,10 @@ function getMappedProductImagePath(item) {
   return "";
 }
 
-function getProductImagePathForEmail(item) {
+function getProductImagePathForEmail(item, kitchenSlug = "") {
+  const kitchenSpecificProductInformation = getBurger103898ProductInfo(kitchenSlug, item?.code);
+  const kitchenSpecificPath = kitchenSpecificProductInformation?.productImagePaths?.[0];
+  if (kitchenSpecificPath) return normalizeProductImageAssetPath(kitchenSpecificPath);
   return normalizeProductImageAssetPath(item?.productImagePath) || getMappedProductImagePath(item);
 }
 
@@ -834,7 +846,7 @@ async function loadProductImageAttachments(order) {
   const cidByAssetPath = new Map();
 
   for (const [index, item] of selectedItems.entries()) {
-    const assetPath = getProductImagePathForEmail(item);
+    const assetPath = getProductImagePathForEmail(item, order.kitchen?.slug);
     if (!assetPath) continue;
 
     if (seenAssetPaths.has(assetPath)) {
@@ -882,7 +894,7 @@ async function loadProductInfoAttachments(order, options = {}) {
   const links = [];
 
   for (const item of selectedItems) {
-    const documents = getProductInfoDocumentsForEmail(item);
+    const documents = getProductInfoDocumentsForEmail(item, order.kitchen?.slug);
 
     for (const document of documents) {
       const assetPath = normalizeProductInfoAssetPath(document.href);
@@ -1611,7 +1623,7 @@ export function buildOrderSummaryHtml(order) {
     const showCodeLine = options.showCodeLine !== false;
     const rows = buildNumberedRows(visibleItems)
       .map(({ item, rowNumber, blendeItems = [] }) => {
-        const productImagePath = getProductImagePathForEmail(item);
+        const productImagePath = getProductImagePathForEmail(item, order.kitchen?.slug);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
         const imageHtml = imageCid
           ? `<td width="50" valign="top" bgcolor="#ffffff" style="width:50px;padding:0 6px 0 0;background-color:#ffffff;"><img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" width="46" style="display:block;width:46px;max-width:46px;max-height:46px;height:auto;object-fit:contain;border:1px solid #eaeaea;border-radius:5px;background-color:#ffffff;" /></td>`

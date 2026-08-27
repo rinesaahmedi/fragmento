@@ -1494,7 +1494,7 @@ const KGCN388140E_GALLERY = Array.from(
 );
 
 const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
-  "DISH-BURGER103898-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-BURGER103898-600": ["/product-images/gallery/burger-103898/dishwasher/a-egspv597210-01.jpg"],
   "DISH-AB105743-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-B-600-STD": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -1528,8 +1528,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "OVEN-AB105807-600-HOB": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.webp`),
   "T3D-OVEN-HOB-001": Array.from({ length: 7 }, (_, index) => `/product-images/gallery/ebx943600s-oven/${String(index + 1).padStart(2, "0")}.webp`),
   "HOOD-600-FLAT": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
-  "HOOD-BURGER103898-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
-  "CAB-HOOD-BURGER103898-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-BURGER103898-FH664621E": ["/product-images/gallery/burger-103898/extractor-hood/fh664621e-01.jpg"],
+  "CAB-HOOD-BURGER103898-HFLH6072": ["/product-images/gallery/burger-103898/extractor-hood/fh664621e-01.jpg"],
   "HOOD-B-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-LS-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105806-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
@@ -1559,7 +1559,10 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "CAB-HOOD-AB105845-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "T3D-HOOD-001": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "REF-545-1800-700": KGCN388140E_GALLERY,
-  "REF-BURGER103898-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-BURGER103898-KGCN388140E": [
+    "/product-images/gallery/burger-103898/fridge/ol-kgcn388140e-01.jpg",
+    "/product-images/gallery/burger-103898/fridge/ol-kgcn388140e-02.jpg",
+  ],
   "REF-B-545-1800-700": KGCN388140E_GALLERY,
   "REF-C-545-1800-700": KGCN388140E_GALLERY,
   "REF-AB105806-KGCN388140E": KGCN388140E_GALLERY,
@@ -1616,6 +1619,9 @@ PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-AB105847-FH664621E"] = PRODUCT_IMAGE_GALLE
 PRODUCT_IMAGE_GALLERIES_BY_CODE["CAB-HOOD-AB105847-600"] = PRODUCT_IMAGE_GALLERIES_BY_CODE["HOOD-B-FH664621E"];
 
 export function getProductImagePaths(item) {
+  if (Array.isArray(item?.productImagePaths) && item.productImagePaths.length) {
+    return item.productImagePaths.filter(Boolean);
+  }
   const candidates = [item?.productInfoCode, item?.code, item?.tooltipPreviewCode].filter(Boolean);
   for (const code of candidates) {
     const gallery = PRODUCT_IMAGE_GALLERIES_BY_CODE[String(code).toUpperCase()];
@@ -1641,6 +1647,18 @@ function isHoodWallCabinetItem(item) {
   return code.startsWith("CAB-HOOD-");
 }
 
+function getCatalogProductInfoDocuments(item, slug) {
+  const directPath = String(item?.productInfoPdfPath || "").trim();
+  if (String(slug || "").trim().toLowerCase() === "burger-103898" && directPath.includes("/burger-103898/")) {
+    return [{ label: "Product information PDF", href: directPath }];
+  }
+  return getProductInfoDocuments(item);
+}
+
+function getCatalogProductInfoHref(item, slug) {
+  return getCatalogProductInfoDocuments(item, slug).at(-1)?.href || "";
+}
+
 export function getCatalogDisplayItem(allItems, slug, item) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
   const linkedItems = getCatalogLinkedItems(allItems, slug, item).map(applyProductInfoDisplayOverrides);
@@ -1655,10 +1673,10 @@ export function getCatalogDisplayItem(allItems, slug, item) {
         productAssistantName: displayItem.name || "",
         productImagePath: displayItem.productImagePath || "",
         productInfoKeyFacts: Array.isArray(displayItem.productInfoKeyFacts) ? displayItem.productInfoKeyFacts : [],
-        productInfoDocuments: getProductInfoDocuments(displayItem),
+        productInfoDocuments: getCatalogProductInfoDocuments(displayItem, normalizedSlug),
       },
       price: Number(displayItem.price || 0),
-      infoPdfHref: getProductInfoHref(displayItem),
+      infoPdfHref: getCatalogProductInfoHref(displayItem, normalizedSlug),
     };
   }
 
@@ -1694,12 +1712,12 @@ export function getCatalogDisplayItem(allItems, slug, item) {
       productInfoUpdatedAt: infoSource?.productInfoUpdatedAt || "",
       productInfoCode: infoSource?.code || primaryItem.code,
       productInfoItemId: infoSource?.id || primaryItem.id,
-      productInfoDocuments: getProductInfoDocuments(infoSource || primaryItem),
+      productInfoDocuments: getCatalogProductInfoDocuments(infoSource || primaryItem, normalizedSlug),
       tooltipPreviewCode: infoSource?.code || primaryItem.code,
       assistantHoverExtractorHoodOnly,
     },
     price: Number((hoodItem || primaryItem).price || 0),
-    infoPdfHref: getProductInfoHref(hoodItem) || getProductInfoHref(primaryItem),
+    infoPdfHref: getCatalogProductInfoHref(hoodItem, normalizedSlug) || getCatalogProductInfoHref(primaryItem, normalizedSlug),
   };
 }
 

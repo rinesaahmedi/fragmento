@@ -10,6 +10,7 @@ import {
   CATALOG_PRODUCT_INFORMATION_SELECT,
   resolveProductInformation,
 } from "./product-information.js";
+import { getBurger103898ProductInfo } from "./burger-103898-product-info.js";
 
 const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
 const BURGER_103898_CATALOG_ARTICLE_OVERRIDES = [
@@ -1271,7 +1272,15 @@ export function serializeKitchenForLegacy(kitchen) {
     const claimProducts = claimParts.filter(
       (part) => String(part?.sourceKitchenItemCode || "") === String(item.code || ""),
     );
-    const productInformation = resolveProductInformation({ ...item, claimProducts });
+    const resolvedProductInformation = resolveProductInformation({ ...item, claimProducts });
+    const kitchenSpecificProductInformation = getBurger103898ProductInfo(kitchen.slug, item.code);
+    const productInformation = kitchenSpecificProductInformation
+      ? {
+          ...resolvedProductInformation,
+          ...kitchenSpecificProductInformation,
+          productImagePath: kitchenSpecificProductInformation.productImagePaths?.[0] || "",
+        }
+      : resolvedProductInformation;
     const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
     const articlePrice = catalogArticle?.programPrices?.[0]?.price ?? catalogArticle?.price;
     const blendePrice = catalogBlende?.programPrices?.[0]?.price ?? catalogBlende?.price;
@@ -1321,6 +1330,7 @@ export function serializeKitchenForLegacy(kitchen) {
       depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: productInformation.productImagePath,
+      productImagePaths: productInformation.productImagePaths || [],
       productInfoPdfPath: productInformation.productInfoPdfPath,
       productInfoSummary: productInformation.productInfoSummary,
       productInfoKeyFacts: productInformation.productInfoKeyFacts,
