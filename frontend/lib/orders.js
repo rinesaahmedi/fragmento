@@ -226,11 +226,24 @@ export function mapCatalogItem(catalogItems, submittedItem, itemType, options = 
     if (!selectedArticle) return null;
   }
 
+  const resolvePrice = (catalogEntry) => {
+    if (!catalogEntry) return null;
+    const programPrice = options.useProgramPrices === true
+      ? catalogEntry.programPrices?.find(
+        (entry) => entry.isActive !== false && entry.programmId === options.programmId,
+      )?.price
+      : null;
+    const resolvedPrice = programPrice ?? catalogEntry.price;
+    return resolvedPrice == null ? null : Number(resolvedPrice);
+  };
   const catalogPrice = (() => {
-    if (catalogService?.price != null) return Number(catalogService.price);
-    if (selectedArticle?.price == null) return submittedItem.price != null ? submittedItem.price : matched.price;
-    const blendeTotal = catalogBlende?.price != null ? Number(catalogBlende.price) * catalogBlendeQuantity : 0;
-    return Number(selectedArticle.price) + blendeTotal;
+    const servicePrice = resolvePrice(catalogService);
+    if (servicePrice != null) return servicePrice;
+    const articlePrice = resolvePrice(selectedArticle);
+    if (articlePrice == null) return submittedItem.price != null ? submittedItem.price : matched.price;
+    const blendePrice = resolvePrice(catalogBlende);
+    const blendeTotal = blendePrice != null ? blendePrice * catalogBlendeQuantity : 0;
+    return articlePrice + blendeTotal;
   })();
 
   return {
@@ -518,9 +531,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       items: {
         where: { isActive: true },
         include: {
-          catalogArticle: true,
-          catalogBlende: true,
-          catalogService: true,
+          catalogArticle: { include: { programPrices: true } },
+          catalogBlende: { include: { programPrices: true } },
+          catalogService: { include: { programPrices: true } },
         },
         orderBy: { sortOrder: "asc" },
       },
@@ -531,13 +544,14 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw new Error("Kitchen not found");
   }
 
-  const [auszugVariantArticles, cutleryVariantArticles] = await Promise.all([
+  const [auszugVariantArticles, cutleryVariantArticles, burgerBlende, burgerHoodArticle] = await Promise.all([
     prisma.catalogArticle.findMany({
       where: {
         itemType: ItemType.COMPONENT,
         isActive: true,
         articleNumber: { startsWith: "US2A" },
       },
+      include: { programPrices: true },
     }),
     prisma.catalogArticle.findMany({
       where: {
@@ -545,8 +559,77 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
         isActive: true,
         articleNumber: { startsWith: "ZB", endsWith: "SG" },
       },
+      include: { programPrices: true },
     }),
+    kitchen.slug === "burger-103898"
+      ? prisma.catalogBlende.findUnique({
+        where: { code: "UPE65" },
+        include: { programPrices: true },
+      })
+      : Promise.resolve(null),
+    kitchen.slug === "burger-103898"
+      ? prisma.catalogArticle.findUnique({
+        where: { articleNumber: "FH664621E + FWK124 + HFLH6072" },
+        include: { programPrices: true },
+      })
+      : Promise.resolve(null),
   ]);
+
+  // Burger uses supplier code UPE65. Existing 103898 rows may still point at
+  // the shared Impuls UPEF65 record because an import with zero synced items
+  // updates the catalog but intentionally does not relink kitchen items.
+  const burgerCornerCabinet = kitchen.slug === "burger-103898"
+    ? kitchen.items.find((item) => item.code === "CAB-BASE-BURGER103898-US60-UPE65")
+    : null;
+  if (burgerCornerCabinet) {
+    const configuredBurgerPrice = Number(burgerCornerCabinet.blendePrice ?? 79);
+    const resolvedBurgerBlende = burgerBlende?.isActive
+      ? burgerBlende
+      : {
+        ...(burgerCornerCabinet.catalogBlende || {}),
+        code: "UPE65",
+        name: "Corner filler panel for Lower cabinet",
+        nameDe: "Eckpassblende Unterschrank",
+        price: configuredBurgerPrice,
+        programPrices: [{
+          programmId: kitchen.programmId,
+          price: configuredBurgerPrice,
+          isActive: true,
+        }],
+      };
+    burgerCornerCabinet.catalogBlendeId = resolvedBurgerBlende.id
+      || burgerCornerCabinet.catalogBlendeId
+      || "burger-upe65";
+    burgerCornerCabinet.catalogBlende = resolvedBurgerBlende;
+    burgerCornerCabinet.blendeCode = "UPE65";
+    burgerCornerCabinet.blendeLabel = resolvedBurgerBlende.nameDe || resolvedBurgerBlende.name;
+  }
+
+  const burgerHoodCabinet = kitchen.slug === "burger-103898"
+    ? kitchen.items.find((item) => item.code === "CAB-HOOD-BURGER103898-HFLH6072")
+    : null;
+  if (burgerHoodCabinet) {
+    const configuredBurgerPrice = Number(burgerHoodCabinet.price ?? 346);
+    const resolvedBurgerHood = burgerHoodArticle?.isActive
+      ? burgerHoodArticle
+      : {
+        ...(burgerHoodCabinet.catalogArticle || {}),
+        articleNumber: "FH664621E + FWK124 + HFLH6072",
+        name: "Flat screen Extractor hood + Cabinet + Filter 60 cm",
+        nameDe: "Flachschirmhaube + Schrank + Filter 60 cm",
+        price: configuredBurgerPrice,
+        programPrices: [{
+          programmId: kitchen.programmId,
+          price: configuredBurgerPrice,
+          isActive: true,
+        }],
+      };
+    burgerHoodCabinet.catalogArticleId = resolvedBurgerHood.id
+      || burgerHoodCabinet.catalogArticleId
+      || "burger-hood-hflh6072";
+    burgerHoodCabinet.catalogArticle = resolvedBurgerHood;
+    burgerHoodCabinet.articleNumber = "FH664621E + FWK124 + HFLH6072";
+  }
 
   const customer = orderPayload?.customer || {};
   validateConsent(customer.consent);
@@ -578,18 +661,24 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     services: normalizeSubmissionItems(orderPayload?.services),
   };
   const allowKitchenArticleNumberAlias = kitchen.slug === "burger-103898";
+  const useProgramPrices = kitchen.slug === "burger-103898";
+  const programPriceOptions = { useProgramPrices, programmId: kitchen.programmId };
 
   const selectedComponents = submittedGroups.components.map((item) =>
     mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, {
       auszugVariantArticles,
       allowKitchenArticleNumberAlias,
+      ...programPriceOptions,
     }),
   );
   const selectedAccessories = submittedGroups.accessories.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, { cutleryVariantArticles }),
+    mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, {
+      cutleryVariantArticles,
+      ...programPriceOptions,
+    }),
   );
   const selectedServices = submittedGroups.services.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.SERVICE),
+    mapCatalogItem(kitchen.items, item, ItemType.SERVICE, programPriceOptions),
   );
 
   if ([...selectedComponents, ...selectedAccessories, ...selectedServices].some((item) => !item)) {

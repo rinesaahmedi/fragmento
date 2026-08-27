@@ -123,9 +123,10 @@ test("Burger 103898 seeds a separate Burger program kitchen and contract", () =>
   assert.match(seed, /contractNumber: "111103898", kitchenSlug: "burger-103898"/);
   assert.match(seed, /programmId: kitchen\.programmId \|\| DEFAULT_KITCHEN_PROGRAMM_ID/);
   assert.match(seed, /CAB-BASE-BURGER103898-US50[\s\S]*?price: "247\.00"/);
-  assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[\s\S]*?price: "349\.00"[\s\S]*?blendeCode: "UPEF65"[\s\S]*?blendePrice: "79\.00"/);
+  assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[\s\S]*?price: "349\.00"[\s\S]*?blendeCode: "UPE65"[\s\S]*?blendePrice: "79\.00"/);
+  assert.match(seed, /code: "UPE65"[\s\S]*?price: "79\.00"/);
   assert.match(seed, /DISH-BURGER103898-600[\s\S]*?price: "586\.00"/);
-  assert.match(seed, /CAB-HOOD-BURGER103898-HFLH6072[\s\S]*?price: "346\.00"/);
+  assert.match(seed, /CAB-HOOD-BURGER103898-HFLH6072[\s\S]*?price: "346\.00"[\s\S]*?catalogArticleNumber: "FH664621E \+ FWK124 \+ HFLH6072"/);
   assert.match(seed, /displayArticleNumber: "H5072", catalogArticleNumber: "H5002"/);
 });
 
@@ -175,10 +176,26 @@ test("public kitchen serialization uses Burger program prices and supplier-facin
         catalogBlendeId: "blende-1",
         catalogBlendeQuantity: 1,
         catalogBlende: {
-          code: "UPEF65",
+          code: "UPE65",
           name: "Corner filler panel",
           price: 68,
           programPrices: [{ price: 79 }],
+        },
+      },
+      {
+        id: "item-2",
+        itemType: "COMPONENT",
+        code: "CAB-HOOD-BURGER103898-HFLH6072",
+        articleNumber: "FH664621E + FWK124 + HFLH6072",
+        name: "Extractor hood package",
+        price: 349,
+        isLocked: false,
+        catalogArticleId: "article-2",
+        catalogArticle: {
+          articleNumber: "FH664621E + FWK124 + HFLH6072",
+          name: "Flat screen extractor hood + cabinet + filter 60 cm",
+          price: 349,
+          programPrices: [{ price: 346 }],
         },
       },
     ],
@@ -188,6 +205,11 @@ test("public kitchen serialization uses Burger program prices and supplier-facin
   assert.equal(serialized.components[0].articleNumber, "US60 + UPE65");
   assert.equal(serialized.components[0].price, 349);
   assert.equal(serialized.components[0].blendePrice, 79);
+  const hood = serialized.components.find(
+    (item) => item.code === "CAB-HOOD-BURGER103898-HFLH6072",
+  );
+  assert.equal(hood.articleNumber, "FH664621E + FWK124 + HFLH6072");
+  assert.equal(hood.price, 346);
 });
 
 test("order validation accepts Burger supplier-facing article numbers", () => {
@@ -196,4 +218,7 @@ test("order validation accepts Burger supplier-facing article numbers", () => {
   assert.match(orders, /const allowKitchenArticleNumberAlias = kitchen\.slug === "burger-103898"/);
   assert.match(orders, /options\.allowKitchenArticleNumberAlias === true[\s\S]*?submittedArticleNumber === matchedKitchenArticleNumber/);
   assert.match(orders, /mapCatalogItem\(kitchen\.items, item, ItemType\.COMPONENT, \{[\s\S]*?allowKitchenArticleNumberAlias/);
+  assert.match(orders, /kitchen\.slug === "burger-103898"[\s\S]*?findUnique\(\{[\s\S]*?code: "UPE65"/);
+  assert.match(orders, /articleNumber: "FH664621E \+ FWK124 \+ HFLH6072"/);
+  assert.match(orders, /const useProgramPrices = kitchen\.slug === "burger-103898"/);
 });

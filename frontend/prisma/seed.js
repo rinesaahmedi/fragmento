@@ -90,6 +90,7 @@ const ARTICLE_PRICES = {
   "EWA34660W + TGV60 + WU16": 639,
   "FH 664 621 E": 349,
   "FH664621E + FWK124 + HD6002": 349,
+  "FH664621E + FWK124 + HFLH6072": 346,
   H3002: 115,
   H4002: 130,
   H4502: 139,
@@ -132,6 +133,7 @@ const ARTICLE_PRICES = {
 const BLENDE_PRICES = {
   HPEF4302: 150,
   HPK2002: 35,
+  UPE65: 79,
   UPEF65: 68,
   UPK20: 25,
 };
@@ -143,6 +145,7 @@ const SERVICE_PRICES = {
 
 const BUNDLE_PRICES = {
   "FH664621E + FWK124 + HD6002": 349,
+  "FH664621E + FWK124 + HFLH6072": 346,
   "KHF664611S + FWP18": 209,
 };
 
@@ -151,6 +154,7 @@ const CATALOG_ARTICLES = [
   { articleNumber: "A-EGSPV597210 + TGV60", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "EWA34660W + TGV60 + WU16", name: "Washing machine + front + side panel", nameDe: "Waschmaschine + Front + Wange", price: "639.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "FH664621E + FWK124 + HD6002", name: "Flat screen extractor hood + cabinet + filter", nameDe: "Flachschirmhaube + Schrank + Filter", price: "349.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
+  { articleNumber: "FH664621E + FWK124 + HFLH6072", name: "Flat screen extractor hood + cabinet + filter 60 cm", nameDe: "Flachschirmhaube + Schrank + Filter 60 cm", widthMm: 600, price: "346.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "H10002", name: "Upper cabinet 100 cm", nameDe: "Oberschrank 100 cm", widthMm: 1000, heightMm: 720, price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "H3002", name: "Upper cabinet 30 cm", nameDe: "Oberschrank 30 cm", widthMm: 300, heightMm: 720, price: "115.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "H4002", name: "Upper cabinet 40 cm", nameDe: "Oberschrank 40 cm", widthMm: 400, heightMm: 720, price: "130.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -237,6 +241,7 @@ for (const article of CATALOG_ARTICLES) {
 }
 
 const CATALOG_BLENDEN = [
+  { code: "UPE65", name: "Corner filler panel for Lower cabinet", nameDe: "Eckpassblende Unterschrank", price: "79.00", isActive: true },
   { code: "HPEF4302", name: "Corner filler panel for Upper cabinet", nameDe: "Eckpassblende Hängeschrank", price: "150.00", isActive: true },
   { code: "HPK2002", name: "Filler Panel up to 20 cm", nameDe: "Passblende bis 20 cm", price: "35.00", isActive: true },
   { code: "UPEF65", name: "Corner filler panel for Lower cabinet", nameDe: "Eckpassblende Unterschrank", price: "68.00", isActive: true },
@@ -399,6 +404,7 @@ function normalizeBlendeCode(value) {
   if (code.startsWith("HPEF4302")) return "HPEF4302";
   if (code.startsWith("UPK20")) return "UPK20";
   if (code.startsWith("UPEF65")) return "UPEF65";
+  if (code.startsWith("UPE65")) return "UPE65";
   if (code.startsWith("HPK2002")) return "HPK2002";
   return "";
 }
@@ -1769,12 +1775,12 @@ const BURGER_103898_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "SINK-BASE-BURGER103898-600", name: DEFAULT_SINK_BASE_CATALOG_NAME_EN, nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE, price: "0.00", widthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: DEFAULT_SINK_BASE_CATALOG_INFO_TEXT },
   { itemType: ItemType.COMPONENT, code: "REF-BURGER103898-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US50", name: "Base cabinet with drawer", price: "247.00", widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US50 base storage cabinet", articleNumber: "US50" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US60-UPE65", name: "Base cabinet with drawer and corner end panel", price: "349.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base cabinet with UPE65 corner end panel", articleNumber: "US60", displayArticleNumber: "US60 + UPE65", catalogArticleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPE65 65 cm", blendePrice: "79.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US60-UPE65", name: "Base cabinet with drawer and corner end panel", price: "349.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base cabinet with UPE65 corner end panel", articleNumber: "US60", displayArticleNumber: "US60 + UPE65", catalogArticleNumber: "US60", blendeCode: "UPE65", blendeLabel: "UPE65 65 cm", blendePrice: "79.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-BURGER103898-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: "586.00", widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 70, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US30", name: "Base cabinet with drawer", price: "222.00", widthMm: 300, depthMm: 600, iconKey: "base_cabinet_30", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 80, infoText: "US30 base storage cabinet", articleNumber: "US30" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H5072", name: "Wall Cabinet", price: "135.00", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H5072, 2 adjustable shelves", articleNumber: "H5002", displayArticleNumber: "H5072", catalogArticleNumber: "H5002" },
-  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-BURGER103898-HFLH6072", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "346.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HFLH6072 flat-screen hood cabinet package", articleNumber: "FH664621E + FWK124 + HD6002", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", catalogArticleNumber: "FH664621E + FWK124 + HD6002" },
-  { itemType: ItemType.COMPONENT, code: "HOOD-BURGER103898-FH664621E", name: "FH664621E Extractor Hood", price: "346.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH 664 621 E", catalogArticleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-BURGER103898-HFLH6072", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "346.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HFLH6072 flat-screen hood cabinet package", articleNumber: "FH664621E + FWK124 + HFLH6072", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", catalogArticleNumber: "FH664621E + FWK124 + HFLH6072" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-BURGER103898-FH664621E", name: "FH664621E Extractor Hood", price: "346.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH 664 621 E", catalogArticleNumber: "FH664621E + FWK124 + HFLH6072", isActive: false },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H6072", name: "Wall Cabinet", price: "146.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6072, 2 adjustable shelves", articleNumber: "H6002", displayArticleNumber: "H6072", catalogArticleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H3072", name: "Wall Cabinet", price: "124.00", widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "H3072, 2 adjustable shelves", articleNumber: "H3002", displayArticleNumber: "H3072", catalogArticleNumber: "H3002" },
   defaultSinkWorktop({ sortOrder: 130 }),

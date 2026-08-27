@@ -216,7 +216,7 @@ export async function getKitchenBySlug(slug) {
   const programmId = kitchenProgram?.programmId || DEFAULT_KITCHEN_PROGRAMM_ID;
 
   try {
-    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
+    const kitchen = await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         claimParts: {
@@ -270,14 +270,15 @@ export async function getKitchenBySlug(slug) {
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
         },
       },
-    }));
+    });
+    return attachCutleryCatalogVariants(await attachBurger103898CatalogOverrides(kitchen, programmId));
   } catch (error) {
     if (!isMissingKitchenItemProductImagePath(error) && !isMissingKitchenItemNameDe(error)) {
       throw error;
     }
 
     // Compatibility fallback for databases that have not applied the productImagePath migration yet.
-    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
+    const kitchen = await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         claimParts: {
@@ -290,8 +291,85 @@ export async function getKitchenBySlug(slug) {
           select: KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH,
         },
       },
-    }));
+    });
+    return attachCutleryCatalogVariants(await attachBurger103898CatalogOverrides(kitchen, programmId));
   }
+}
+
+async function attachBurger103898CatalogOverrides(kitchen, programmId) {
+  if (!kitchen || kitchen.slug !== "burger-103898") return kitchen;
+
+  const cornerCabinet = kitchen.items?.find(
+    (item) => item.code === "CAB-BASE-BURGER103898-US60-UPE65",
+  );
+  const hoodCabinet = kitchen.items?.find(
+    (item) => item.code === "CAB-HOOD-BURGER103898-HFLH6072",
+  );
+
+  const [burgerBlende, burgerHoodArticle] = await Promise.all([
+    cornerCabinet
+      ? prisma.catalogBlende.findUnique({
+        where: { code: "UPE65" },
+        include: {
+          programPrices: {
+            where: { programmId, isActive: true },
+            select: { price: true },
+            take: 1,
+          },
+        },
+      })
+      : Promise.resolve(null),
+    hoodCabinet
+      ? prisma.catalogArticle.findUnique({
+        where: { articleNumber: "FH664621E + FWK124 + HFLH6072" },
+        include: {
+          programPrices: {
+            where: { programmId, isActive: true },
+            select: { price: true },
+            take: 1,
+          },
+        },
+      })
+      : Promise.resolve(null),
+  ]);
+
+  if (cornerCabinet) {
+    const configuredBurgerPrice = Number(cornerCabinet.blendePrice ?? 79);
+    const resolvedBurgerBlende = burgerBlende?.isActive
+      ? burgerBlende
+      : {
+        ...(cornerCabinet.catalogBlende || {}),
+        code: "UPE65",
+        name: "Corner filler panel for Lower cabinet",
+        nameDe: "Eckpassblende Unterschrank",
+        price: configuredBurgerPrice,
+        programPrices: [{ price: configuredBurgerPrice }],
+      };
+
+    cornerCabinet.catalogBlendeId = resolvedBurgerBlende.id || cornerCabinet.catalogBlendeId || "burger-upe65";
+    cornerCabinet.catalogBlende = resolvedBurgerBlende;
+    cornerCabinet.blendeCode = "UPE65";
+    cornerCabinet.blendeLabel = resolvedBurgerBlende.nameDe || resolvedBurgerBlende.name;
+    cornerCabinet.blendePrice = resolvedBurgerBlende.programPrices?.[0]?.price ?? resolvedBurgerBlende.price;
+  }
+
+  if (hoodCabinet) {
+    const resolvedBurgerHood = burgerHoodArticle?.isActive
+      ? burgerHoodArticle
+      : {
+        ...(hoodCabinet.catalogArticle || {}),
+        articleNumber: "FH664621E + FWK124 + HFLH6072",
+        name: "Flat screen Extractor hood + Cabinet + Filter 60 cm",
+        nameDe: "Flachschirmhaube + Schrank + Filter 60 cm",
+        price: Number(hoodCabinet.price ?? 346),
+        programPrices: [{ price: Number(hoodCabinet.price ?? 346) }],
+      };
+    hoodCabinet.catalogArticleId = resolvedBurgerHood.id || hoodCabinet.catalogArticleId || "burger-hood-hflh6072";
+    hoodCabinet.catalogArticle = resolvedBurgerHood;
+    hoodCabinet.articleNumber = "FH664621E + FWK124 + HFLH6072";
+  }
+
+  return kitchen;
 }
 
 async function attachCutleryCatalogVariants(kitchen) {
