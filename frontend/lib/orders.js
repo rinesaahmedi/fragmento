@@ -35,6 +35,7 @@ import {
   getAvailableCutleryVariantsForComponents,
   getCutleryCatalogArticleNumbers,
   getCutleryVariant,
+  BURGER_103898_CUTLERY_VARIANTS,
   isCutleryAccessoryCode,
   parseCutleryLineFromOrderItem,
   resolveCutleryCatalogArticles,
@@ -278,6 +279,8 @@ function getOrderItemEffectivePrice(item) {
 
 export function buildOrderForNotifications(orderRecord) {
   const toNotificationItem = (item) => {
+    const kitchenSlug = String(orderRecord.kitchen?.slug || "").trim().toLowerCase();
+    const isBurger103898 = kitchenSlug === "burger-103898";
     // Old orders can outlive a reseeded KitchenItem row (the relation uses
     // onDelete: SetNull). Resolve its current catalog equivalent so plan PDFs
     // still have the componentKey needed to highlight the purchased element.
@@ -316,22 +319,34 @@ export function buildOrderForNotifications(orderRecord) {
       quantity: item.quantity,
     });
     const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
+    const burgerCutleryVariant = isBurger103898 && cutleryLine
+      ? BURGER_103898_CUTLERY_VARIANTS.find((variant) => variant.widthCm === cutleryVariant?.widthCm)
+      : null;
 
-    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const isBurgerFridge = isBurger103898 && String(item.code || "").toUpperCase().startsWith("REF-BURGER103898");
+    const displayName = isBurgerFridge
+      ? "Freestanding refrigerator 180 cm"
+      : item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
     const displayNameDe = cutleryLine
       ? cutleryVariant?.nameDe || displayName
+      : isBurgerFridge
+        ? "Standkühlschrank 180 cm"
       : item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || item.nameDe || "";
 
     return {
       code: item.code,
-      articleNumber: cutleryLine?.articleNumber || item.articleNumberSnapshot || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
+      articleNumber: burgerCutleryVariant?.supplierArticleNumber || cutleryLine?.articleNumber || item.articleNumberSnapshot || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
       name: displayName,
       nameDe: displayNameDe,
-      price: getOrderItemEffectivePrice(item),
+      price: burgerCutleryVariant
+        ? burgerCutleryVariant.price * Math.max(1, Math.floor(Number(item.quantity || 1)))
+        : getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       isLocked: Boolean(kitchenItem?.isLocked || item.isLocked),
       iconKey: kitchenItem?.iconKey || item.iconKey || "",
       componentKey: kitchenItem?.componentKey || item.componentKey || "",
+      widthMm: isBurgerFridge ? 545 : (kitchenItem?.widthMm || item.widthMm || null),
+      heightMm: isBurgerFridge ? 1800 : (kitchenItem?.heightMm || item.heightMm || null),
       productImagePath: productInformation.productImagePath,
       productInfoPdfPath: productInformation.productInfoPdfPath,
       productInfoSummary: productInformation.productInfoSummary,
