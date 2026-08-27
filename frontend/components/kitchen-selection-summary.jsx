@@ -26,10 +26,21 @@ function isSinkSummaryItem(item) {
   const code = String(item?.code || "").trim().toUpperCase();
   const componentKey = String(item?.componentKey || "").trim().toLowerCase();
   const name = String(item?.name || item?.nameSnapshot || "").trim().toLowerCase();
-  return componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and worktop") || name.includes("sink and waste system");
+  // A sink *cabinet* is a real included component and must remain visible in
+  // the summary. Only merge the synthetic sink-worktop/faucet entry with the
+  // worktop; legacy SINK-* cabinet codes must not be swallowed here.
+  const isSinkCabinet = componentKey === "sink-base" || name === "sink lower cabinet";
+  const isSinkWorktop = code === "SINK-WORKTOP" || name.includes("sink and worktop") || name.includes("sink and waste system");
+  return !isSinkCabinet && (componentKey === "sink-faucet" || isSinkWorktop);
 }
 
-function mergeStandardEquipmentItems(items) {
+function mergeStandardEquipmentItems(items, kitchenSlug = "") {
+  // Burger 103898 has two distinct worktop sections plus a separate sink
+  // cabinet; keep all three default rows visible instead of merging them.
+  if (String(kitchenSlug || "").trim().toLowerCase() === "burger-103898") {
+    return items;
+  }
+
   const worktopItem = items.find(isWorktopSummaryItem);
   const sinkItem = items.find(isSinkSummaryItem);
 
@@ -193,7 +204,7 @@ export default function KitchenSelectionSummary({
 }) {
   const { translate } = usePublicI18n();
   const [isExpanded, setIsExpanded] = useState(false);
-  const mergedDefaultSelectedComponents = mergeStandardEquipmentItems(defaultSelectedComponents);
+  const mergedDefaultSelectedComponents = mergeStandardEquipmentItems(defaultSelectedComponents, kitchenSlug);
   const selectedItemCount =
     selectedComponents.length + selectedAccessories.length + selectedServices.length;
   const shouldCollapseSummary = selectedItemCount > 6;

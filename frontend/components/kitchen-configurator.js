@@ -1012,13 +1012,27 @@ function buildOrderLockedComponentIds(kitchenConfig, initialOrder, kitchenSlug) 
 }
 
 function buildDefaultLockedComponentIds(kitchenSlug, kitchenConfig) {
-  const componentKeys = DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()] || [];
-  if (!componentKeys.length) return [];
+  const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const componentKeys = DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG[normalizedSlug] || [];
 
   const availableComponentIds = new Set(kitchenConfig.components.map((item) => componentIdForItem(item)));
-  return componentKeys
+  const lockedIds = componentKeys
     .map((componentKey) => componentIdForKey(componentKey))
     .filter((componentId) => availableComponentIds.has(componentId));
+
+  // Older hosted Burger records used a generated component key for the sink
+  // item. Resolve that item by its stable supplier code/name as a fallback.
+  if (normalizedSlug === "burger-103898") {
+    kitchenConfig.components.forEach((item) => {
+      const code = String(item?.code || "").trim().toUpperCase();
+      const name = String(item?.name || "").trim().toLowerCase();
+      if (code.startsWith("SINK-BASE") || name === "sink lower cabinet") {
+        lockedIds.push(componentIdForItem(item));
+      }
+    });
+  }
+
+  return [...new Set(lockedIds)];
 }
 
 function buildDefaultLockedPlanComponentIds(kitchenSlug) {
