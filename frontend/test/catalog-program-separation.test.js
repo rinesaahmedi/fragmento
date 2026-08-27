@@ -27,16 +27,21 @@ test("admin catalog separates records and prices by selected program", () => {
   assert.match(articleRoute, /syncCatalogProgramKitchenItemPrices/);
 });
 
-test("Burger import reuses the complete Impuls catalog and changes only program prices", () => {
+test("Burger import uses the supplier article and blende codes printed in the PDF", () => {
   const importer = read("scripts/import-burger-cindy-price-list.js");
 
   assert.match(importer, /backfillImpulsProgramPrices/);
   assert.match(importer, /createdAt: \{ lt: cutoff \}/);
   assert.match(importer, /DEFAULT_PROGRAMM_ID = "IP 2200"/);
   assert.match(importer, /buildParsedFromImpulsCatalog/);
-  assert.match(importer, /include: \{ catalogArticle: true \}/);
-  assert.match(importer, /name: record\.name, nameDe: record\.nameDe/);
-  assert.match(importer, /removeBurgerOnlyCatalogRecords/);
-  assert.match(importer, /programPrices: \{ none: \{\} \}/);
-  assert.match(importer, /Burger prices are mapped onto the exact Impuls master article/);
+  assert.match(importer, /source: "H3002", target: "H3072", price: 124/);
+  assert.match(importer, /source: "H6002", target: "H6072", price: 146/);
+  assert.match(importer, /target: "A-EGSPV594 \+ TGV60"/);
+  assert.match(importer, /target: "FH664621E\+FWK124\+HFLH6072"/);
+  assert.match(importer, /target: "EWA34660W\+TV60\+WU1672"/);
+  assert.match(importer, /source: "ZB60SG", target: "ZBE60", price: 20/);
+  assert.match(importer, /source: "UPK20", target: "UP20K", price: 33/);
+  assert.match(importer, /source: "HPEF4302", target: "HPE7072", price: 79/);
+  assert.match(importer, /removeObsoleteBurgerProgramPrices/);
+  assert.match(importer, /Burger article and blende identifiers match the Typen-NR\./);
 });
