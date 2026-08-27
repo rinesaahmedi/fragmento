@@ -7,6 +7,7 @@ import {
   getLinkedComponentIds,
   getLocalizedItemName,
   getProductImagePaths,
+  getStructuredDimensions,
 } from "../components/kitchen-selection-utils.js";
 import {
   PLAN_HOTSPOTS_BY_SLUG,
@@ -29,6 +30,14 @@ test("Burger 103898 uses its supplied vector plan and exact L-shaped faces", () 
   const keys = hotspots.map((hotspot) => hotspot.componentKey);
 
   assert.match(svg, /width="842" height="595" viewBox="0 0 842 595"/);
+  assert.equal(
+    (svg.match(/stroke="#00ffff"/g) || []).length,
+    3,
+    "the two window frames and short interrupted edge should retain the PDF cyan",
+  );
+  assert.match(svg, /stroke-width="6"[^>]+stroke="#00ffff"[^>]+d="M5547 1978V3439 3866L4666 3956V2473"/);
+  assert.match(svg, /stroke-width="6"[^>]+stroke="#00ffff"[^>]+d="M4629 2072V3960 4008L5547 3914 5584 3910V1975"/);
+  assert.match(svg, /stroke-width="6"[^>]+stroke="#00ffff"[^>]+d="M4666 2300V2068"/);
   assert.equal(PLAN_IMAGE_BY_SLUG["burger-103898"], "/plans/670%20103898.svg");
   assert.deepEqual(PLAN_IMAGE_SOURCE_SIZE_BY_SLUG["burger-103898"], { width: 842, height: 595 });
   assert.ok(hotspots.every((hotspot) => Array.isArray(hotspot.points) && hotspot.points.length >= 4));
@@ -221,6 +230,38 @@ test("public kitchen serialization uses Burger program prices and supplier-facin
   assert.deepEqual(hood.productImagePaths, [
     "/product-images/gallery/burger-103898/extractor-hood/fh664621e-01.jpg",
   ]);
+});
+
+test("Burger 103898 uses cabinet-specific dimension labels", () => {
+  assert.equal(getStructuredDimensions({
+    code: "CAB-BASE-BURGER103898-US50",
+    iconKey: "drawer_base_two",
+    widthMm: 500,
+    depthMm: 600,
+  }, "burger-103898"), "50 cm");
+  assert.equal(getStructuredDimensions({
+    code: "CAB-WALL-BURGER103898-H5072",
+    iconKey: "wall_cabinet_plain",
+    widthMm: 500,
+    heightMm: 723,
+    depthMm: 340,
+  }, "burger-103898"), "50 x 72.3 cm");
+  assert.equal(getStructuredDimensions({
+    code: "CAB-HOOD-BURGER103898-HFLH6072",
+    iconKey: "hood_wall_cabinet",
+    widthMm: 600,
+  }, "burger-103898"), "60 x 72 cm");
+  assert.equal(getStructuredDimensions({
+    code: "DISH-BURGER103898-600",
+    iconKey: "dishwasher_base",
+    widthMm: 600,
+  }, "burger-103898"), "60 cm");
+
+  assert.equal(getStructuredDimensions({
+    code: "DISH-AB105806-600",
+    iconKey: "dishwasher_base",
+    widthMm: 600,
+  }, "ab-105806"), "");
 });
 
 test("Burger product images and PDFs stay scoped to kitchen 103898", () => {

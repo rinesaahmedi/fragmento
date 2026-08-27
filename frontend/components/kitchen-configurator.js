@@ -2519,6 +2519,7 @@ function KitchenConfiguratorContent({
 
           <div className={styles.summaryColumn}>
             <KitchenSelectionSummary
+              kitchenSlug={kitchenSlug}
               selectedComponents={selectedComponents}
               selectedAccessories={selectedAccessories}
               selectedServices={selectedServices}

@@ -63,11 +63,41 @@ export function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
 }
 
-export function getStructuredDimensions(item) {
+export function getStructuredDimensions(item, kitchenSlug = "") {
   const code = String(item?.code || "").trim().toUpperCase();
   const iconKey = String(item?.iconKey || "").trim().toLowerCase();
   const name = String(item?.name || "").trim().toLowerCase();
-  if (code.startsWith("DISH-") || iconKey === "dishwasher_base" || name.includes("dishwasher")) {
+  const isDishwasher = code.startsWith("DISH-") || iconKey === "dishwasher_base" || name.includes("dishwasher");
+  const isBurger103898 = String(kitchenSlug || "").trim().toLowerCase() === "burger-103898";
+
+  if (isBurger103898) {
+    const widthMm = Number(item?.widthMm) > 0 ? item.widthMm : null;
+    const isUpperCabinet = code.startsWith("CAB-WALL-")
+      || code.startsWith("CAB-HOOD-")
+      || iconKey.startsWith("wall_cabinet")
+      || iconKey === "hood_wall_cabinet";
+    const isLowerCabinet = code.startsWith("CAB-BASE-")
+      || code.startsWith("SINK-BASE-")
+      || iconKey.startsWith("drawer_base")
+      || iconKey.startsWith("base_cabinet")
+      || iconKey === "sink_base";
+
+    if (isDishwasher || isLowerCabinet) {
+      return widthMm ? `${formatDimensionCmPart(widthMm)} cm` : "";
+    }
+
+    if (isUpperCabinet) {
+      const heightMm = Number(item?.heightMm) > 0
+        ? item.heightMm
+        : code.startsWith("CAB-HOOD-")
+          ? 720
+          : null;
+      const values = [widthMm, heightMm].filter(Boolean);
+      return values.length ? `${values.map(formatDimensionCmPart).join(" x ")} cm` : "";
+    }
+  }
+
+  if (isDishwasher) {
     return "";
   }
 
@@ -107,10 +137,10 @@ export function splitCatalogItemNameAndDimensions(name) {
   };
 }
 
-export function getCatalogItemDetails(item) {
+export function getCatalogItemDetails(item, kitchenSlug = "") {
   return {
     articleNumber: String(item?.articleNumber || "").trim(),
-    dimensions: getStructuredDimensions(item),
+    dimensions: getStructuredDimensions(item, kitchenSlug),
   };
 }
 

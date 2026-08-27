@@ -992,8 +992,8 @@
 </g>
 <g inkscape:groupmode="layer" inkscape:label="0">
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5608 1972 5547 1978"/>
-<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M5547 1978V3439 3866L4666 3956V2473"/>
-<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4629 2072V3960 4008L5547 3914 5584 3910V1975"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="round" fill="none" stroke="#00ffff" d="M5547 1978V3439 3866L4666 3956V2473"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="round" fill="none" stroke="#00ffff" d="M4629 2072V3960 4008L5547 3914 5584 3910V1975"/>
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4154 2055V4596"/>
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M3414 2131V4672"/>
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4419 2094V4635L4154 4596"/>
@@ -1167,7 +1167,7 @@
 <g inkscape:groupmode="layer" inkscape:label="0">
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4675 2466 4686 2308"/>
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4632 2460 4646 2302"/>
-<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M4666 2300V2068"/>
+<path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="round" stroke-miterlimit="10" stroke-linejoin="round" fill="none" stroke="#00ffff" d="M4666 2300V2068"/>
 </g>
 <g inkscape:groupmode="layer" inkscape:label="REFRIGERATOR">
 <path transform="matrix(.12,0,0,-.12,0,595)" stroke-width="6" stroke-linecap="butt" stroke-miterlimit="10" stroke-linejoin="miter" fill="none" stroke="#000000" d="M1986 1462 1411 1379"/>

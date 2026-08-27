@@ -200,6 +200,7 @@ function getTooltipDocumentLabels(item, translate) {
 
 function CatalogItem({
   item,
+  kitchenSlug,
   selected,
   locked,
   disabled,
@@ -225,7 +226,7 @@ function CatalogItem({
     : getItemPriceWithoutBlende({ ...item, price: displayTotalPrice });
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const itemDisplayName = splitCatalogItemNameAndDimensions(itemName);
-  const { dimensions: itemDimensions } = getCatalogItemDetails(item);
+  const { dimensions: itemDimensions } = getCatalogItemDetails(item, kitchenSlug);
   const auszugVariant = articleVariant || item.articleVariants?.auszug || null;
   const auszugOptions = auszugVariant?.options || [];
   const selectedAuszugOption = findAuszugVariantOption({ articleVariants: { auszug: auszugVariant } }, item.articleNumber);
@@ -797,6 +798,7 @@ export default function KitchenCatalogPanel({
                 <CatalogItem
                   key={item.id}
                   item={cardItem}
+                  kitchenSlug={kitchenSlug}
                   selected={isLinkedComponentSelected(kitchenSlug, selectedComponentIds, componentId)}
                   price={displayItem.price}
                   infoPdfHref={displayItem.infoPdfHref}
@@ -836,6 +838,7 @@ export default function KitchenCatalogPanel({
                 <CatalogItem
                   key={item.id}
                   item={item}
+                  kitchenSlug={kitchenSlug}
                   selected={selectedAccessoryCodes.includes(item.code)}
                   locked={orderLockedAccessoryCodes.has(item.code)}
                   compactIcon
@@ -873,6 +876,7 @@ export default function KitchenCatalogPanel({
                 <CatalogItem
                   key={item.id}
                   item={item}
+                  kitchenSlug={kitchenSlug}
                   selected={selectedServiceCodes.includes(item.code)}
                   locked={orderLockedServiceCodes.has(item.code)}
                   disabled={disabled}
