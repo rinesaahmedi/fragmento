@@ -537,7 +537,7 @@ export default async function AdminCatalogArticlesPage({ searchParams }) {
           description={<AdminText i18nKey="catalogAdmin.catalogDescription" fallback="Reusable articles, blenden, and services." />}
           actions={(
             <div style={actionRowStyle}>
-              <ActionLink href={`/api/admin/catalog/export?programmId=${encodeURIComponent(selectedProgramId)}`} secondary>
+              <ActionLink href="/api/admin/catalog/export?includeAllPrograms=true" secondary>
                 <AdminText i18nKey="catalogAdmin.exportExcel" fallback="Export Excel" />
               </ActionLink>
               <ActionLink href="/admin/catalog/imports">

@@ -23,6 +23,12 @@ test("admin catalog separates records and prices by selected program", () => {
   assert.match(page, /programCatalogTabsStyle/);
   assert.match(exportRoute, /searchParams\.get\("programmId"\)/);
   assert.match(exportRoute, /capp\."programmId" = \$\{programmId\}/);
+  assert.match(exportRoute, /includeAllPrograms/);
+  assert.match(exportRoute, /getSheetName\("Articles"/);
+  assert.match(exportRoute, /appendCatalogSheets/);
+  assert.match(exportRoute, /appendCombinedProgramSheet/);
+  assert.match(exportRoute, /\["Nr", "Type", "Program", "Article number", "Code"/);
+  assert.match(page, /includeAllPrograms=true/);
   assert.match(articleRoute, /catalogArticleProgramPrice\.upsert/);
   assert.match(articleRoute, /syncCatalogProgramKitchenItemPrices/);
 });

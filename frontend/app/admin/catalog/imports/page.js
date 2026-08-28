@@ -133,7 +133,7 @@ export default async function AdminCatalogImportsPage({ searchParams }) {
           description={<AdminText i18nKey="catalogImportsAdmin.description" fallback="Upload supplier price lists, preserve price history, and optionally sync linked kitchen item prices." />}
           actions={(
             <div style={actionRowStyle}>
-              <ActionLink href="/api/admin/catalog/export" secondary>
+              <ActionLink href="/api/admin/catalog/export?includeAllPrograms=true" secondary>
                 <AdminText i18nKey="catalogAdmin.exportExcel" fallback="Export Excel" />
               </ActionLink>
               <ActionLink href="/admin/catalog/articles">
