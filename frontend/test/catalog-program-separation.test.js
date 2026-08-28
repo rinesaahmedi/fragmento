@@ -57,18 +57,24 @@ test("Impuls seed keeps the canonical cabinet casing and dimensions", () => {
   const importer = read("scripts/import-burger-cindy-price-list.js");
   const us50 = seed.match(/\{ articleNumber: "US50",[^\n]+\}/)?.[0] || "";
   const us60 = seed.match(/\{ articleNumber: "US60",[^\n]+\}/)?.[0] || "";
+  const refrigerator = seed.match(/\{ articleNumber: "OL-KGCN388140E",[^\n]+\}/)?.[0] || "";
+  const burgerHood = seed.match(/\{ itemType: ItemType\.COMPONENT, code: "CAB-HOOD-BURGER103898-HFLH6072",[^\n]+\}/)?.[0] || "";
 
   assert.match(seed, /REFRIGERATOR_CATALOG_NAME_EN = "Freestanding Refrigerator 181 cm"/);
   assert.match(seed, /articleNumber: "OL-KGCN388140E"[^\n]+heightMm: 1810/);
+  assert.doesNotMatch(refrigerator, /widthMm/);
   assert.match(seed, /name: "Upper Cabinet 60 cm"/);
   assert.match(seed, /US60: \{ name: "Lower Cabinet with Drawer 60 cm" \}/);
   assert.doesNotMatch(us50, /depthMm/);
   assert.doesNotMatch(us60, /depthMm/);
   assert.match(seed, /where: \{ articleNumber: \{ in: \["US50", "US60"\] \} \}[\s\S]+?depthMm: null/);
   assert.match(importer, /name: "Freestanding Refrigerator 181 cm"[\s\S]+?heightMm: 1810/);
+  assert.match(importer, /"OL-KGCN388140E": \{[\s\S]+?widthMm: null, heightMm: 1810/);
   assert.match(importer, /US50: \{[^\n]+depthMm: null/);
   assert.match(importer, /US60: \{[^\n]+depthMm: null/);
   assert.match(seed, /REF-BURGER103898-KGCN388140E[^\n]+heightMm: 1810/);
+  assert.doesNotMatch(seed.match(/REF-BURGER103898-KGCN388140E[^\n]+/)?.[0] || "", /widthMm/);
+  assert.doesNotMatch(burgerHood, /heightMm/);
   assert.match(seed, /CAB-BASE-BURGER103898-US50[^\n]+name: "Lower Cabinet with Drawer"/);
   assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[^\n]+name: "Lower Cabinet with Drawer and corner end panel"/);
   assert.doesNotMatch(seed.match(/CAB-BASE-BURGER103898-US50[^\n]+/)?.[0] || "", /depthMm/);

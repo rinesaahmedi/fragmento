@@ -301,7 +301,7 @@ test("Burger 103898 uses cabinet-specific dimension labels", () => {
     code: "CAB-HOOD-BURGER103898-HFLH6072",
     iconKey: "hood_wall_cabinet",
     widthMm: 600,
-  }, "burger-103898"), "60 x 72 cm");
+  }, "burger-103898"), "60 cm");
   assert.equal(getStructuredDimensions({
     code: "DISH-BURGER103898-600",
     iconKey: "dishwasher_base",
@@ -310,7 +310,7 @@ test("Burger 103898 uses cabinet-specific dimension labels", () => {
   assert.equal(getStructuredDimensions({
     code: "REF-BURGER103898-KGCN388140E",
     iconKey: "tall_refrigerator",
-    widthMm: 540,
+    widthMm: null,
     heightMm: 1810,
   }, "burger-103898"), "181 cm");
 
@@ -340,7 +340,7 @@ test("Burger product images and PDFs stay scoped to kitchen 103898", () => {
         articleNumber: "OL-KGCN388140E",
         name: "Freestanding Refrigerator 181 cm",
         nameDe: "Standkühlschrank 181 cm",
-        widthMm: 540,
+        widthMm: null,
         heightMm: 1810,
         depthMm: null,
         price: 579,
@@ -358,7 +358,7 @@ test("Burger product images and PDFs stay scoped to kitchen 103898", () => {
   ]);
   const display = getCatalogDisplayItem([burgerFridge], "burger-103898", burgerFridge);
   assert.equal(burgerFridge.name, "Freestanding Refrigerator 181 cm");
-  assert.equal(burgerFridge.widthMm, 540);
+  assert.equal(burgerFridge.widthMm, null);
   assert.equal(burgerFridge.heightMm, 1810);
   assert.equal(
     display.infoPdfHref,

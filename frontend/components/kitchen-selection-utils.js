@@ -93,11 +93,7 @@ export function getStructuredDimensions(item, kitchenSlug = "") {
     }
 
     if (isUpperCabinet) {
-      const heightMm = Number(item?.heightMm) > 0
-        ? item.heightMm
-        : code.startsWith("CAB-HOOD-")
-          ? 720
-          : null;
+      const heightMm = Number(item?.heightMm) > 0 ? item.heightMm : null;
       const values = [widthMm, heightMm].filter(Boolean);
       return values.length ? `${values.map(formatDimensionCmPart).join(" x ")} cm` : "";
     }

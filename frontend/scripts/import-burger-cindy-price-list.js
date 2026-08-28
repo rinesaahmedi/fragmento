@@ -107,7 +107,7 @@ const IMPULS_ARTICLE_RESTORES = {
   },
   "OL-KGCN388140E": {
     name: "Freestanding Refrigerator 181 cm", nameDe: "Standkühlschrank 181 cm",
-    widthMm: 540, heightMm: 1810, depthMm: null,
+    widthMm: null, heightMm: 1810, depthMm: null,
     itemType: "COMPONENT", isFixedPricePackage: false,
   },
   US100: { name: "Lower Cabinet with Drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000 },
