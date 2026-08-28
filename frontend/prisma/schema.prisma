@@ -27,6 +27,12 @@ enum OrderStatus {
   CANCELLED
 }
 
+enum OrderCancellationRequestStatus {
+  RECEIVED
+  APPROVED
+  REJECTED
+}
+
 enum AdminRole {
   SUPERADMIN
   ADMIN
@@ -387,11 +393,42 @@ model Order {
   createdAt               DateTime         @default(now())
   updatedAt               DateTime         @updatedAt
   items                   OrderItem[]
+  cancellationRequests    OrderCancellationRequest[]
 
   @@index([kitchenContractId])
   @@index([kitchenContractId, createdAt])
   @@index([status, createdAt])
   @@index([createdAt])
+}
+
+model OrderCancellationRequest {
+  id                      String                         @id @default(cuid())
+  referenceNumber         String                         @unique
+  orderId                 String?
+  order                   Order?                         @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  submittedContractNumber String
+  consumerName            String
+  confirmationEmail       String
+  language                String                         @default("de")
+  reason                  String?                        @db.Text
+  declarationText         String                         @db.Text
+  status                  OrderCancellationRequestStatus @default(RECEIVED)
+  receivedAt              DateTime                       @default(now())
+  processedAt             DateTime?
+  adminNote               String?                        @db.Text
+  customerEmailStatus     String                         @default("PENDING")
+  customerEmailSentAt     DateTime?
+  internalEmailStatus     String                         @default("PENDING")
+  internalEmailSentAt     DateTime?
+  finalEmailStatus        String                         @default("NOT_REQUIRED")
+  finalEmailSentAt        DateTime?
+  lastEmailError          String?                        @db.Text
+  createdAt               DateTime                       @default(now())
+  updatedAt               DateTime                       @updatedAt
+
+  @@index([orderId, status])
+  @@index([status, receivedAt])
+  @@index([submittedContractNumber, confirmationEmail])
 }
 
 model TestOrder {

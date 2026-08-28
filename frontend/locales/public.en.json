@@ -310,6 +310,7 @@
     "requiredHint": "Fields marked with * are required.",
     "savedTitle": "Thank you",
     "savedHelp": "",
+    "withdrawOrder": "Withdraw from contract",
     "showSavedDetails": "View order details",
     "hideSavedDetails": "Hide order details",
     "savedDetailsTitle": "Submitted details",

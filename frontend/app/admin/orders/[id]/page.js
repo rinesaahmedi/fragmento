@@ -23,10 +23,12 @@ import {
   AdminText,
 } from "../../../../components/admin-i18n";
 import { OrderActionButton, OrderActionFeedback } from "../../../../components/admin-order-action-buttons";
+import { CancellationRequestPanel } from "../../../../components/admin-order-cancellation-panel";
 import { AdminOrderAs400Form } from "../../../../components/admin-order-as400-form";
 import { OrderEmailReviewModal } from "../../../../components/order-email-review-modal";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminPage } from "../../../../lib/auth";
+import { getCancellationRequestsForOrder } from "../../../../lib/order-cancellations";
 import { getOrderById } from "../../../../lib/catalog";
 import { getPriceBreakdown } from "../../../../lib/price-utils";
 import { buildOrderConfirmationAttachmentLabels, buildOrderConfirmationEmailDraft, buildOrderConfirmationEmailStaticHtml } from "../../../../lib/email/order-notifications";
@@ -222,6 +224,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
   const emailDraft = buildOrderConfirmationEmailDraft(notificationOrder);
   const emailStatic = await buildOrderConfirmationEmailStaticHtml(notificationOrder);
   const emailAttachmentLabels = await buildOrderConfirmationAttachmentLabels(notificationOrder, emailStatic.attachmentLinks);
+  const cancellationRequests = await getCancellationRequestsForOrder(order.id);
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -434,6 +437,19 @@ export default async function AdminOrderDetailPage({ params, searchParams }) {
             </article>
           </div>
         </AdminSection>
+
+        {cancellationRequests.length ? (
+          <AdminSection
+            title={<AdminText i18nKey="orderCancellationsAdmin.panelTitle" fallback="Withdrawal requests" />}
+            description={<AdminText i18nKey="orderCancellationsAdmin.panelDescription" fallback="Review the withdrawal declaration and approve or reject it." />}
+          >
+            <CancellationRequestPanel
+              requests={cancellationRequests}
+              returnPath={`/admin/orders/${order.id}`}
+              showOrderLink={false}
+            />
+          </AdminSection>
+        ) : null}
 
         <AdminSection
           title={<AdminText i18nKey="orderDetailAdmin.orderItems" fallback="Order items" />}

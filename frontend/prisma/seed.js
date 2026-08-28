@@ -13,8 +13,8 @@ const prisma = new PrismaClient();
 const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
 const DISHWASHER_CATALOG_NAME_EN = "Fully integrated dishwasher incl. furniture front";
 const DISHWASHER_CATALOG_NAME_DE = "Vollintegrierter Geschirrspüler inkl. Möbelfront";
-const REFRIGERATOR_CATALOG_NAME_EN = "Freestanding refrigerator 178 cm";
-const REFRIGERATOR_CATALOG_NAME_DE = "Standkühlschrank 178 cm";
+const REFRIGERATOR_CATALOG_NAME_EN = "Freestanding Refrigerator 181 cm";
+const REFRIGERATOR_CATALOG_NAME_DE = "Standkühlschrank 181 cm";
 const HOOD_WALL_CABINET_CATALOG_NAME_EN = "Flat screen extractor hood + cabinet + filter 60 cm";
 const HOOD_WALL_CABINET_CATALOG_NAME_DE = "Flachschirmhaube + Schrank + Filter 60 cm";
 const DEFAULT_OVEN_HOB_CATALOG_CODE = "OVEN-B-600-HOB";
@@ -151,34 +151,34 @@ const CATALOG_ARTICLES = [
   { articleNumber: "A-EGSPV597210 + TGV60", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "EWA34660W + TGV60 + WU16", name: "Washing machine + front + side panel", nameDe: "Waschmaschine + Front + Wange", price: "639.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "FH664621E + FWK124 + HD6002", name: "Flat screen extractor hood + cabinet + filter", nameDe: "Flachschirmhaube + Schrank + Filter", price: "349.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
-  { articleNumber: "H10002", name: "Upper cabinet 100 cm", nameDe: "Oberschrank 100 cm", widthMm: 1000, heightMm: 720, price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "H3002", name: "Upper cabinet 30 cm", nameDe: "Oberschrank 30 cm", widthMm: 300, heightMm: 720, price: "115.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "H4002", name: "Upper cabinet 40 cm", nameDe: "Oberschrank 40 cm", widthMm: 400, heightMm: 720, price: "130.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "H4502", name: "Upper cabinet 45 cm", nameDe: "Oberschrank 45 cm", widthMm: 450, heightMm: 720, price: "139.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "H5002", name: "Upper cabinet 50 cm", nameDe: "Oberschrank 50 cm", widthMm: 500, heightMm: 720, price: "135.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "H6002", name: "Upper cabinet 60 cm", nameDe: "Oberschrank 60 cm", widthMm: 600, heightMm: 720, price: "149.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "H8002", name: "Upper cabinet 80 cm", nameDe: "Oberschrank 80 cm", widthMm: 800, heightMm: 720, price: "200.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "H9002", name: "Upper cabinet 90 cm", nameDe: "Oberschrank 90 cm", widthMm: 900, heightMm: 720, price: "203.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H10002", name: "Upper Cabinet 100 cm", nameDe: "Oberschrank 100 cm", widthMm: 1000, heightMm: 720, price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H3002", name: "Upper Cabinet 30 cm", nameDe: "Oberschrank 30 cm", widthMm: 300, heightMm: 720, price: "115.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H4002", name: "Upper Cabinet 40 cm", nameDe: "Oberschrank 40 cm", widthMm: 400, heightMm: 720, price: "130.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H4502", name: "Upper Cabinet 45 cm", nameDe: "Oberschrank 45 cm", widthMm: 450, heightMm: 720, price: "139.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H5002", name: "Upper Cabinet 50 cm", nameDe: "Oberschrank 50 cm", widthMm: 500, heightMm: 720, price: "135.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H6002", name: "Upper Cabinet 60 cm", nameDe: "Oberschrank 60 cm", widthMm: 600, heightMm: 720, price: "149.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H8002", name: "Upper Cabinet 80 cm", nameDe: "Oberschrank 80 cm", widthMm: 800, heightMm: 720, price: "200.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "H9002", name: "Upper Cabinet 90 cm", nameDe: "Oberschrank 90 cm", widthMm: 900, heightMm: 720, price: "203.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KHF664611S", name: "Angled extractor hood", nameDe: "Schrägesse", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KHF664611S + FWP18", name: "Angled extractor hood + filter", nameDe: "Schrägesse + Filter", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
-  { articleNumber: "OL-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", widthMm: 0, heightMm: 1780, depthMm: 0, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US100", name: "Lower cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US120", name: "Lower cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A100", name: "Lower cabinet with Drawer/Soft-close 100", nameDe: "Unterschrank mit Schublade/Auszug 100", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A30", name: "Lower cabinet with Drawer/Soft-close 30", nameDe: "Unterschrank mit Schublade/Auszug 30", widthMm: 300, price: "298.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A40", name: "Lower cabinet with Drawer/Soft-close 40", nameDe: "Unterschrank mit Schublade/Auszug 40", widthMm: 400, price: "305.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A45", name: "Lower cabinet with Drawer/Soft-close 45", nameDe: "Unterschrank mit Schublade/Auszug 45", widthMm: 450, price: "316.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A50", name: "Lower cabinet with Drawer/Soft-close 50", nameDe: "Unterschrank mit Schublade/Auszug 50", widthMm: 500, price: "324.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "OL-KGCN388140E", name: "Freestanding Refrigerator 181 cm", nameDe: "Standkühlschrank 181 cm", widthMm: 540, heightMm: 1810, depthMm: null, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US100", name: "Lower Cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US120", name: "Lower Cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A100", name: "Lower Cabinet with Drawer/Soft-close 100", nameDe: "Unterschrank mit Schublade/Auszug 100", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A30", name: "Lower Cabinet with Drawer/Soft-close 30", nameDe: "Unterschrank mit Schublade/Auszug 30", widthMm: 300, price: "298.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A40", name: "Lower Cabinet with Drawer/Soft-close 40", nameDe: "Unterschrank mit Schublade/Auszug 40", widthMm: 400, price: "305.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A45", name: "Lower Cabinet with Drawer/Soft-close 45", nameDe: "Unterschrank mit Schublade/Auszug 45", widthMm: 450, price: "316.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A50", name: "Lower Cabinet with Drawer/Soft-close 50", nameDe: "Unterschrank mit Schublade/Auszug 50", widthMm: 500, price: "324.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US2A60", name: "Base cabinet with drawers 60 cm", nameDe: "Unterschrank mit Auszügen 60 cm", widthMm: 600, price: "369.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A80", name: "Lower cabinet with Drawer/Soft-close 80", nameDe: "Unterschrank mit Schublade/Auszug 80", widthMm: 800, price: "466.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A90", name: "Lower cabinet with Drawer/Soft-close 90", nameDe: "Unterschrank mit Schublade/Auszug 90", widthMm: 900, price: "471.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US30", name: "Lower cabinet with drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300, price: "175.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US40", name: "Lower cabinet with drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", widthMm: 400, price: "183.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US45", name: "Lower cabinet with drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", widthMm: 450, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US50", name: "Lower cabinet with drawer 50 cm", nameDe: "Unterschrank mit Schublade 50 cm", widthMm: 500, depthMm: 600, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US60", name: "Lower cabinet with drawer 60 cm", nameDe: "Unterschrank mit Schublade 60 cm", widthMm: 600, depthMm: 600, price: "219.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US80", name: "Lower cabinet with drawer 80 cm", nameDe: "Unterschrank mit Schublade 80 cm", widthMm: 800, price: "333.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US90", name: "Lower cabinet with drawer 90 cm", nameDe: "Unterschrank mit Schublade 90 cm", widthMm: 900, price: "339.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A80", name: "Lower Cabinet with Drawer/Soft-close 80", nameDe: "Unterschrank mit Schublade/Auszug 80", widthMm: 800, price: "466.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A90", name: "Lower Cabinet with Drawer/Soft-close 90", nameDe: "Unterschrank mit Schublade/Auszug 90", widthMm: 900, price: "471.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US30", name: "Lower Cabinet with drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300, price: "175.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US40", name: "Lower Cabinet with drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", widthMm: 400, price: "183.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US45", name: "Lower Cabinet with drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", widthMm: 450, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US50", name: "Lower Cabinet with drawer 50 cm", nameDe: "Unterschrank mit Schublade 50 cm", widthMm: 500, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US60", name: "Lower Cabinet with drawer 60 cm", nameDe: "Unterschrank mit Schublade 60 cm", widthMm: 600, price: "219.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US80", name: "Lower Cabinet with drawer 80 cm", nameDe: "Unterschrank mit Schublade 80 cm", widthMm: 800, price: "333.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US90", name: "Lower Cabinet with drawer 90 cm", nameDe: "Unterschrank mit Schublade 90 cm", widthMm: 900, price: "339.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "517467", name: "Waste separation system Blanco Botton", nameDe: "Mülltrennsystem Blanco Botton", price: "89.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KALB KA220043_S3", name: "LED lighting set", nameDe: "LED-Beleuchtungsset", price: "69.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
   { articleNumber: "ZB100SG", name: "Cutlery insert 100 cm", nameDe: "Besteckeinsatz 100 cm", price: "36.00", itemType: ItemType.ACCESSORY, isFixedPricePackage: false, isActive: true },
@@ -213,15 +213,15 @@ const LIVE_CATALOG_ARTICLE_OVERRIDES = {
   H9002: { heightMm: 723 },
   "KHF664611S + FWP18": { name: "Angled Extractor Hood + filter" },
   "OL-KGCN388140E": { widthMm: 540, depthMm: null },
-  US30: { name: "Lower cabinet with Drawer 30 cm" },
-  US40: { name: "Lower cabinet with Drawer 40 cm" },
-  US45: { name: "Lower cabinet with Drawer 45 cm" },
-  US50: { name: "Lower cabinet with Drawer 50 cm" },
-  US60: { name: "Lower cabinet with Drawer 60 cm" },
-  US80: { name: "Lower cabinet with Drawer 80 cm" },
-  US90: { name: "Lower cabinet with Drawer 90 cm" },
-  US100: { name: "Lower cabinet with Drawer 100 cm" },
-  US120: { name: "Lower cabinet with Drawer 120 cm" },
+  US30: { name: "Lower Cabinet with Drawer 30 cm" },
+  US40: { name: "Lower Cabinet with Drawer 40 cm" },
+  US45: { name: "Lower Cabinet with Drawer 45 cm" },
+  US50: { name: "Lower Cabinet with Drawer 50 cm" },
+  US60: { name: "Lower Cabinet with Drawer 60 cm" },
+  US80: { name: "Lower Cabinet with Drawer 80 cm" },
+  US90: { name: "Lower Cabinet with Drawer 90 cm" },
+  US100: { name: "Lower Cabinet with Drawer 100 cm" },
+  US120: { name: "Lower Cabinet with Drawer 120 cm" },
   ZB30SG: { widthMm: 300 },
   ZB40SG: { widthMm: 400 },
   ZB45SG: { widthMm: 450 },
@@ -237,9 +237,9 @@ for (const article of CATALOG_ARTICLES) {
 }
 
 const CATALOG_BLENDEN = [
-  { code: "HPEF4302", name: "Corner filler panel for Upper cabinet", nameDe: "Eckpassblende Hängeschrank", price: "150.00", isActive: true },
+  { code: "HPEF4302", name: "Corner filler panel for Upper Cabinet", nameDe: "Eckpassblende Hängeschrank", price: "150.00", isActive: true },
   { code: "HPK2002", name: "Filler Panel up to 20 cm", nameDe: "Passblende bis 20 cm", price: "35.00", isActive: true },
-  { code: "UPEF65", name: "Corner filler panel for Lower cabinet", nameDe: "Eckpassblende Unterschrank", price: "68.00", isActive: true },
+  { code: "UPEF65", name: "Corner filler panel for Lower Cabinet", nameDe: "Eckpassblende Unterschrank", price: "68.00", isActive: true },
   { code: "UPK20", name: "Filler Panel up to 20 cm", nameDe: "Passblende bis 20 cm", price: "25.00", isActive: true },
 ];
 
@@ -1767,9 +1767,9 @@ const BURGER_103898_ITEMS = [
   defaultOvenHob({ sortOrder: 10 }),
   defaultWorktop({ sortOrder: 20 }),
   { itemType: ItemType.COMPONENT, code: "SINK-BASE-BURGER103898-600", name: DEFAULT_SINK_BASE_CATALOG_NAME_EN, nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE, price: "0.00", widthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: DEFAULT_SINK_BASE_CATALOG_INFO_TEXT },
-  { itemType: ItemType.COMPONENT, code: "REF-BURGER103898-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1780, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 178 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US50", name: "Base cabinet with drawer", price: "247.00", widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US50 base storage cabinet", articleNumber: "US50" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US60-UPE65", name: "Base cabinet with drawer and corner end panel", price: "349.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base cabinet with UPE65 corner end panel", articleNumber: "US60", displayArticleNumber: "US60 + UPE65", catalogArticleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPE65 65 cm", blendePrice: "79.00" },
+  { itemType: ItemType.COMPONENT, code: "REF-BURGER103898-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US50", name: "Lower Cabinet with Drawer", price: "247.00", widthMm: 500, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US50 base storage cabinet", articleNumber: "US50" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US60-UPE65", name: "Lower Cabinet with Drawer and corner end panel", price: "349.00", widthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, infoText: "US60 base cabinet with UPE65 corner end panel", articleNumber: "US60", displayArticleNumber: "US60 + UPE65", catalogArticleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPE65 65 cm", blendePrice: "79.00" },
   { itemType: ItemType.COMPONENT, code: "DISH-BURGER103898-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: "586.00", widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 70, infoText: "Fully integrated dishwasher, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-BURGER103898-US30", name: "Base cabinet with drawer", price: "222.00", widthMm: 300, depthMm: 600, iconKey: "base_cabinet_30", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 80, infoText: "US30 base storage cabinet", articleNumber: "US30" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-BURGER103898-H5072", name: "Wall Cabinet", price: "135.00", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H5072, 2 adjustable shelves", articleNumber: "H5002", displayArticleNumber: "H5072", catalogArticleNumber: "H5002" },
@@ -3083,6 +3083,28 @@ async function main() {
   }
 
   await seedCatalogMasterData();
+  await prisma.catalogArticle.updateMany({
+    where: { articleNumber: "OL-KGCN388140E" },
+    data: {
+      name: REFRIGERATOR_CATALOG_NAME_EN,
+      nameDe: REFRIGERATOR_CATALOG_NAME_DE,
+      heightMm: 1810,
+    },
+  });
+  await prisma.catalogArticle.updateMany({
+    where: { articleNumber: { in: ["US50", "US60"] } },
+    data: {
+      heightMm: null,
+      depthMm: null,
+    },
+  });
+  for (const article of CATALOG_ARTICLES.filter((entry) => /^(?:H\d+|US)/.test(entry.articleNumber))) {
+    await prisma.catalogArticle.updateMany({
+      where: { articleNumber: article.articleNumber },
+      data: { name: article.name },
+    });
+  }
+
   const catalogArticleByNumber = new Map(
     (await prisma.catalogArticle.findMany()).map((article) => [article.articleNumber, article]),
   );
@@ -3092,22 +3114,6 @@ async function main() {
   const catalogServiceByCode = new Map(
     (await prisma.catalogService.findMany()).map((service) => [service.code, service]),
   );
-  await prisma.catalogArticle.updateMany({
-    where: { articleNumber: "OL-KGCN388140E" },
-    data: {
-      name: REFRIGERATOR_CATALOG_NAME_EN,
-      nameDe: REFRIGERATOR_CATALOG_NAME_DE,
-      heightMm: 1780,
-    },
-  });
-  await prisma.catalogArticle.updateMany({
-    where: { articleNumber: { in: ["US50", "US60"] } },
-    data: {
-      heightMm: null,
-      depthMm: 600,
-    },
-  });
-
   if (!onlyKitchenSlug) {
     const housingCompanyCleanup = await pruneNonDefaultHousingCompanies();
     if (housingCompanyCleanup.deletedHousingCompanies || housingCompanyCleanup.unlinkedContracts) {

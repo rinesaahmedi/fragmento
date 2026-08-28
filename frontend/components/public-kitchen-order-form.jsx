@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import { usePublicI18n } from "./public-i18n";
@@ -387,6 +388,7 @@ export default function PublicKitchenOrderForm({
   isSubmitting,
   status,
   statusTone,
+  savedOrderNumber = "",
   onSubmit,
   onUpdateCustomer,
   onToggleUseContractAddress,
@@ -516,6 +518,14 @@ export default function PublicKitchenOrderForm({
               <p>{status}</p>
               {savedHelpText.trim() ? (
                 <p className={styles.orderConfirmationHelp}>{savedHelpText}</p>
+              ) : null}
+              {savedOrderNumber ? (
+                <Link
+                  href={`/widerruf?lang=${language === "de" ? "de" : "en"}${customer.contractNumber ? `&contract=${encodeURIComponent(customer.contractNumber)}` : ""}`}
+                  className={styles.orderConfirmationWithdrawalLink}
+                >
+                  {translate("order.withdrawOrder", "Withdraw from contract")}
+                </Link>
               ) : null}
               <button
                 type="button"

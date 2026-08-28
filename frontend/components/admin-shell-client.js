@@ -11,6 +11,7 @@ const navItems = [
   { href: "/admin/contracts", labelKey: "adminShellLogin.contracts", fallback: "Contracts", icon: ContractsIcon },
   { href: "/admin/property-owners", labelKey: "adminShellLogin.owners", fallback: "Owners", icon: OwnersIcon },
   { href: "/admin/orders", labelKey: "adminShellLogin.orders", fallback: "Orders", icon: OrdersIcon },
+  { href: "/admin/order-cancellations", labelKey: "adminShellLogin.orderCancellations", fallback: "Withdrawals", icon: WithdrawalIcon, badge: "cancellations" },
   { href: "/admin/reports", labelKey: "adminShellLogin.reports", fallback: "Reports", icon: ReportsIcon },
   { href: "/admin/contract-access", labelKey: "adminShellLogin.contractAccess", fallback: "Contract access", icon: ContractsIcon, requiresSuperAdmin: true },
   { href: "/admin/claim-activity", labelKey: "adminShellLogin.claimActivity", fallback: "Claim activity", icon: ClaimsIcon, requiresSuperAdmin: true },
@@ -25,7 +26,7 @@ const navItems = [
 ];
 const DESKTOP_SIDEBAR_WIDTH = "clamp(240px, 18vw, 300px)";
 
-export function AdminShellClient({ adminEmail, adminRole = "ADMIN", initialLanguage = "en", showClaimsNav = false, showUsersNav = false, children }) {
+export function AdminShellClient({ adminEmail, adminRole = "ADMIN", initialLanguage = "en", showClaimsNav = false, showUsersNav = false, openCancellationCount = 0, children }) {
   return (
     <AdminI18nProvider initialLanguage={initialLanguage}>
       <AdminShellContent
@@ -33,6 +34,7 @@ export function AdminShellClient({ adminEmail, adminRole = "ADMIN", initialLangu
         adminRole={adminRole}
         showClaimsNav={showClaimsNav}
         showUsersNav={showUsersNav}
+        openCancellationCount={openCancellationCount}
       >
         {children}
       </AdminShellContent>
@@ -40,7 +42,12 @@ export function AdminShellClient({ adminEmail, adminRole = "ADMIN", initialLangu
   );
 }
 
-function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav, children }) {
+function getNavBadgeCount(item, { openCancellationCount }) {
+  if (item.badge === "cancellations") return Number(openCancellationCount || 0);
+  return 0;
+}
+
+function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav, openCancellationCount = 0, children }) {
   const pathname = usePathname();
   const router = useRouter();
   const { translate } = useAdminI18n();
@@ -198,6 +205,7 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
               {visibleNavItems.map((item) => {
                 const active = isActivePath(pathname, item.href);
                 const Icon = item.icon;
+                const badgeCount = getNavBadgeCount(item, { openCancellationCount });
 
                 return (
                   <Link
@@ -220,6 +228,7 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
                   >
                     <Icon active={active} />
                     <span style={sidebarLabelStyle}>{translate(item.labelKey, item.fallback)}</span>
+                    {badgeCount > 0 ? <span style={navBadgeStyle}>{badgeCount}</span> : null}
                   </Link>
                 );
               })}
@@ -300,6 +309,7 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
             {visibleNavItems.map((item) => {
               const active = isActivePath(pathname, item.href);
               const Icon = item.icon;
+              const badgeCount = getNavBadgeCount(item, { openCancellationCount });
 
               return (
                 <Link
@@ -330,6 +340,7 @@ function AdminShellContent({ adminEmail, adminRole, showClaimsNav, showUsersNav,
                 >
                   <Icon active={active} />
                   <span style={sidebarLabelStyle}>{translate(item.labelKey, item.fallback)}</span>
+                  {badgeCount > 0 ? <span style={navBadgeStyle}>{badgeCount}</span> : null}
                 </Link>
               );
             })}
@@ -713,6 +724,18 @@ function OrdersIcon({ active }) {
   );
 }
 
+function WithdrawalIcon({ active }) {
+  return (
+    <IconFrame active={active}>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <rect x="3" y="2.5" width="10" height="11" rx="2" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M6.25 6.25L9.75 9.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        <path d="M9.75 6.25L6.25 9.75" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      </svg>
+    </IconFrame>
+  );
+}
+
 function ReportsIcon({ active }) {
   return (
     <IconFrame active={active}>
@@ -939,4 +962,21 @@ const sidebarLabelStyle = {
   overflow: "hidden",
   textOverflow: "ellipsis",
   whiteSpace: "nowrap",
+};
+
+const navBadgeStyle = {
+  flex: "0 0 auto",
+  marginLeft: "auto",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  minWidth: 22,
+  height: 22,
+  padding: "0 7px",
+  borderRadius: 999,
+  background: "var(--app-accent)",
+  color: "var(--app-accent-contrast)",
+  fontSize: 12,
+  fontWeight: 900,
+  lineHeight: 1,
 };

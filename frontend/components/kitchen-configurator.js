@@ -1280,6 +1280,7 @@ function KitchenConfiguratorContent({
   const [pendingBlendeConfirmation, setPendingBlendeConfirmation] = useState(null);
   const [status, setStatus] = useState("");
   const [statusTone, setStatusTone] = useState("idle");
+  const [savedOrderNumber, setSavedOrderNumber] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOrderSectionOpen, setIsOrderSectionOpen] = useState(false);
   const [activeProductInfo, setActiveProductInfo] = useState(null);
@@ -2396,6 +2397,7 @@ function KitchenConfiguratorContent({
 
       const emailIssue = payload.notifications?.emailError;
       const webhookIssue = payload.notifications?.webhookError;
+      setSavedOrderNumber(payload.orderNumber || "");
 
       if (payload.checkoutUrl) {
         setStatus(translate(
@@ -2544,6 +2546,7 @@ function KitchenConfiguratorContent({
             isSubmitting={isSubmitting}
             status={status}
             statusTone={statusTone}
+            savedOrderNumber={savedOrderNumber}
             deliveryLeadTimeDays={deliveryLeadTimeDays}
             onSubmit={handleSubmit}
             onUpdateCustomer={updateCustomer}

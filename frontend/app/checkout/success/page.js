@@ -315,6 +315,11 @@ export default async function CheckoutSuccessPage({ searchParams }) {
 
         <div style={actionRowStyle}>
           <Link href={kitchenHref} style={primaryLinkStyle}>Back to kitchen</Link>
+          {order ? (
+            <Link href={`/widerruf?lang=en${order.contractNumber ? `&contract=${encodeURIComponent(order.contractNumber)}` : ""}`} style={withdrawalLinkStyle}>
+              Withdraw from contract
+            </Link>
+          ) : null}
           <Link href="/" style={secondaryLinkStyle}>Back to Fragmento</Link>
         </div>
       </section>
@@ -533,4 +538,10 @@ const secondaryLinkStyle = {
   background: "rgba(255, 255, 255, 0.86)",
   color: "#5d5146",
   border: "1px solid rgba(107, 79, 58, 0.14)",
+};
+
+const withdrawalLinkStyle = {
+  ...secondaryLinkStyle,
+  borderColor: "rgba(119, 61, 45, 0.38)",
+  color: "#773d2d",
 };

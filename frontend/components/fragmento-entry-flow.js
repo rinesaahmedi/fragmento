@@ -8,7 +8,7 @@ import {
   getPublicTrackingContext,
   trackPublicPageOpened,
 } from "../lib/public-page-open-tracking";
-import { normalizeFragmentoLanguage, persistFragmentoLanguage } from "../lib/fragmento-language";
+import { persistFragmentoLanguage } from "../lib/fragmento-language";
 import { activatePublicLanguage } from "../lib/public-language-state";
 import CookieConsentBanner from "./cookie-consent-banner";
 
@@ -370,14 +370,14 @@ const ORDER_CONFIRMED_TEXT = {
   },
 };
 
-export default function FragmentoEntryFlow({ initialLanguage = "de" }) {
+export default function FragmentoEntryFlow() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pageOpenTrackedRef = useRef(false);
   const videoRef = useRef(null);
   const [initialEntryState] = useState(() => getLegalReturnEntryState());
   const [selectedLanguage, setSelectedLanguage] = useState(
-    initialEntryState?.selectedLanguage || normalizeFragmentoLanguage(initialLanguage)
+    initialEntryState?.selectedLanguage || "de"
   );
   const [selectedMode, setSelectedMode] = useState(initialEntryState?.selectedMode || "");
   const [screen, setScreen] = useState(initialEntryState?.screen || "language");
