@@ -11,3 +11,6 @@ frontend/.prisma-preflight-client
 frontend/data/service-claim-uploads
 frontend/voices/
 frontend/vendor/
+backups/database/**/*.dump
+backups/database/**/*.zip
+outputs/pre-burger-20260826-1213/*.xlsx

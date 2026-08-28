@@ -117,7 +117,7 @@ const IMPULS_ARTICLE_RESTORES = {
   US2A40: { name: "Lower Cabinet with Drawer/Soft-close 40", nameDe: "Unterschrank mit Schublade/Auszug 40", widthMm: 400 },
   US2A45: { name: "Lower Cabinet with Drawer/Soft-close 45", nameDe: "Unterschrank mit Schublade/Auszug 45", widthMm: 450 },
   US2A50: { name: "Lower Cabinet with Drawer/Soft-close 50", nameDe: "Unterschrank mit Schublade/Auszug 50", widthMm: 500 },
-  US2A60: { name: "Base cabinet with drawers 60 cm", nameDe: "Unterschrank mit Auszügen 60 cm", widthMm: 600 },
+  US2A60: { name: "Lower Cabinet with Drawer/Soft-close 60", nameDe: "Unterschrank mit Auszügen 60 cm", widthMm: 600 },
   US2A80: { name: "Lower Cabinet with Drawer/Soft-close 80", nameDe: "Unterschrank mit Schublade/Auszug 80", widthMm: 800 },
   US2A90: { name: "Lower Cabinet with Drawer/Soft-close 90", nameDe: "Unterschrank mit Schublade/Auszug 90", widthMm: 900 },
   US30: { name: "Lower Cabinet with Drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300 },

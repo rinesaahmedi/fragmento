@@ -24,7 +24,7 @@ const us60Article = {
 const us2a60Article = {
   id: "article-us2a60",
   articleNumber: "US2A60",
-  name: "Base cabinet with drawers 60 cm",
+  name: "Lower Cabinet with Drawer/Soft-close 60",
   nameDe: "Unterschrank mit Auszuegen 60 cm",
   price: 369,
   widthMm: 600,
@@ -130,7 +130,7 @@ test("client variant application replaces the displayed article and total price"
 
   const selected = applyArticleVariantSelection(item, "US2A60");
   assert.equal(selected.articleNumber, "US2A60");
-  assert.equal(selected.name, "Base cabinet with drawers 60 cm");
+  assert.equal(selected.name, "Lower Cabinet with Drawer/Soft-close 60");
   assert.equal(selected.price, 369);
 });
 
@@ -154,7 +154,7 @@ test("order variant resolution validates and returns the submitted Auszug catalo
 
   assert.equal(selected.status, "variant");
   assert.equal(selected.article.articleNumber, "US2A60");
-  assert.equal(selected.article.name, "Base cabinet with drawers 60 cm");
+  assert.equal(selected.article.name, "Lower Cabinet with Drawer/Soft-close 60");
   assert.equal(selected.article.nameDe, "Unterschrank mit Auszuegen 60 cm");
   assert.equal(selected.article.price, 369);
 });
