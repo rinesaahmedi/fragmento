@@ -120,6 +120,31 @@ test("AB 105846 layout aliases attach their shared purchased-kitchen sketch", as
   }
 });
 
+test("burger 103898 attaches its selected kitchen sketch", async () => {
+  const pdf = await generatePurchasedKitchenPdf({
+    orderNumber: "111670103898-1",
+    createdAt: "2026-08-27T10:00:00.000Z",
+    kitchen: {
+      slug: "burger-103898",
+      name: "670 103898",
+    },
+    customer: {
+      contractNumber: "111670103898",
+    },
+    components: [
+      { componentKey: "dishwasher-base", code: "DISH-670103898", price: 500 },
+    ],
+    accessories: [],
+    services: [],
+  });
+
+  assert.ok(pdf);
+  assert.equal(pdf.filename, "Gekaufte-Kueche-111670103898-1.pdf");
+  const bytes = Buffer.from(pdf.base64, "base64");
+  assert.equal(bytes.subarray(0, 4).toString("utf8"), "%PDF");
+  assert.ok(bytes.length > 10000);
+});
+
 test("order confirmation PDF hides type numbers for services", async () => {
   const order = {
     orderNumber: "FRG-TEST-007",

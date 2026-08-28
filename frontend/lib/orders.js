@@ -33,9 +33,12 @@ import { prisma } from "./prisma";
 import { resolveProductInformation } from "./product-information";
 import {
   getAvailableCutleryVariantsForComponents,
+  getCutleryCatalogArticleNumbers,
   getCutleryVariant,
+  BURGER_103898_CUTLERY_VARIANTS,
   isCutleryAccessoryCode,
   parseCutleryLineFromOrderItem,
+  resolveCutleryCatalogArticles,
 } from "./cutlery-accessories";
 import { normalizeArticleNumber, resolveAuszugVariantSelection } from "./auszug-variants";
 
@@ -49,6 +52,22 @@ const PAYMENT_METHOD_ALIASES = new Map([
 ]);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const DELIVERY_WEEK_OPTION_COUNT = 3;
+const BURGER_103898_CATALOG_ARTICLE_OVERRIDES = [
+  { itemCode: "CAB-WALL-BURGER103898-H5072", articleNumber: "H5072", price: 135 },
+  { itemCode: "CAB-HOOD-BURGER103898-HFLH6072", articleNumber: "FH664621E+FWK124+HFLH6072", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", price: 346 },
+  { itemCode: "CAB-WALL-BURGER103898-H6072", articleNumber: "H6072", price: 146 },
+  { itemCode: "CAB-WALL-BURGER103898-H3072", articleNumber: "H3072", price: 124 },
+];
+
+// These cabinets are part of the supplied Burger 103898 kitchen. Keep this
+// server-side as well as in the configurator so their price cannot be restored
+// by stale hosted KitchenItem rows or a modified client submission.
+const BURGER_103898_INCLUDED_COMPONENT_CODES = new Set([
+  "SINK-BASE-BURGER103898-600",
+  "CAB-BASE-BURGER103898-US50",
+  "CAB-BASE-BURGER103898-US60-UPE65",
+  "CAB-BASE-BURGER103898-US30",
+]);
 
 function validationError(message) {
   const error = new Error(message);
@@ -226,11 +245,24 @@ export function mapCatalogItem(catalogItems, submittedItem, itemType, options = 
     if (!selectedArticle) return null;
   }
 
+  const resolvePrice = (catalogEntry) => {
+    if (!catalogEntry) return null;
+    const programPrice = options.useProgramPrices === true
+      ? catalogEntry.programPrices?.find(
+        (entry) => entry.isActive !== false && entry.programmId === options.programmId,
+      )?.price
+      : null;
+    const resolvedPrice = programPrice ?? catalogEntry.price;
+    return resolvedPrice == null ? null : Number(resolvedPrice);
+  };
   const catalogPrice = (() => {
-    if (catalogService?.price != null) return Number(catalogService.price);
-    if (selectedArticle?.price == null) return submittedItem.price != null ? submittedItem.price : matched.price;
-    const blendeTotal = catalogBlende?.price != null ? Number(catalogBlende.price) * catalogBlendeQuantity : 0;
-    return Number(selectedArticle.price) + blendeTotal;
+    const servicePrice = resolvePrice(catalogService);
+    if (servicePrice != null) return servicePrice;
+    const articlePrice = resolvePrice(selectedArticle);
+    if (articlePrice == null) return submittedItem.price != null ? submittedItem.price : matched.price;
+    const blendePrice = resolvePrice(catalogBlende);
+    const blendeTotal = blendePrice != null ? blendePrice * catalogBlendeQuantity : 0;
+    return articlePrice + blendeTotal;
   })();
 
   return {
@@ -257,6 +289,8 @@ function getOrderItemEffectivePrice(item) {
 
 export function buildOrderForNotifications(orderRecord) {
   const toNotificationItem = (item) => {
+    const kitchenSlug = String(orderRecord.kitchen?.slug || "").trim().toLowerCase();
+    const isBurger103898 = kitchenSlug === "burger-103898";
     // Old orders can outlive a reseeded KitchenItem row (the relation uses
     // onDelete: SetNull). Resolve its current catalog equivalent so plan PDFs
     // still have the componentKey needed to highlight the purchased element.
@@ -295,22 +329,34 @@ export function buildOrderForNotifications(orderRecord) {
       quantity: item.quantity,
     });
     const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
+    const burgerCutleryVariant = isBurger103898 && cutleryLine
+      ? BURGER_103898_CUTLERY_VARIANTS.find((variant) => variant.widthCm === cutleryVariant?.widthCm)
+      : null;
 
-    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const isBurgerFridge = isBurger103898 && String(item.code || "").toUpperCase().startsWith("REF-BURGER103898");
+    const displayName = isBurgerFridge
+      ? "Freestanding refrigerator 180 cm"
+      : item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
     const displayNameDe = cutleryLine
       ? cutleryVariant?.nameDe || displayName
+      : isBurgerFridge
+        ? "Standkühlschrank 180 cm"
       : item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || item.nameDe || "";
 
     return {
       code: item.code,
-      articleNumber: cutleryLine?.articleNumber || item.articleNumberSnapshot || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
+      articleNumber: burgerCutleryVariant?.supplierArticleNumber || cutleryLine?.articleNumber || item.articleNumberSnapshot || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
       name: displayName,
       nameDe: displayNameDe,
-      price: getOrderItemEffectivePrice(item),
+      price: burgerCutleryVariant
+        ? burgerCutleryVariant.price * Math.max(1, Math.floor(Number(item.quantity || 1)))
+        : getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
       isLocked: Boolean(kitchenItem?.isLocked || item.isLocked),
       iconKey: kitchenItem?.iconKey || item.iconKey || "",
       componentKey: kitchenItem?.componentKey || item.componentKey || "",
+      widthMm: isBurgerFridge ? 545 : (kitchenItem?.widthMm || item.widthMm || null),
+      heightMm: isBurgerFridge ? 1800 : (kitchenItem?.heightMm || item.heightMm || null),
       productImagePath: productInformation.productImagePath,
       productInfoPdfPath: productInformation.productInfoPdfPath,
       productInfoSummary: productInformation.productInfoSummary,
@@ -518,9 +564,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       items: {
         where: { isActive: true },
         include: {
-          catalogArticle: true,
-          catalogBlende: true,
-          catalogService: true,
+          catalogArticle: { include: { programPrices: true } },
+          catalogBlende: { include: { programPrices: true } },
+          catalogService: { include: { programPrices: true } },
         },
         orderBy: { sortOrder: "asc" },
       },
@@ -531,22 +577,107 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw new Error("Kitchen not found");
   }
 
-  const [auszugVariantArticles, cutleryVariantArticles] = await Promise.all([
+  const [auszugVariantArticles, cutleryVariantArticles, burgerBlende, burgerArticles] = await Promise.all([
     prisma.catalogArticle.findMany({
       where: {
         itemType: ItemType.COMPONENT,
-        isActive: true,
+        // Burger's imported US2A rows are marked inactive in the shared
+        // catalog but are valid supplier articles for this kitchen.
+        ...(kitchen.slug === "burger-103898" ? {} : { isActive: true }),
         articleNumber: { startsWith: "US2A" },
       },
+      include: { programPrices: true },
     }),
     prisma.catalogArticle.findMany({
       where: {
         itemType: ItemType.ACCESSORY,
         isActive: true,
-        articleNumber: { startsWith: "ZB", endsWith: "SG" },
+        articleNumber: { in: getCutleryCatalogArticleNumbers(kitchen.slug) },
       },
+      include: { programPrices: true },
     }),
+    kitchen.slug === "burger-103898"
+      ? prisma.catalogBlende.findUnique({
+        where: { code: "UPE65" },
+        include: { programPrices: true },
+      })
+      : Promise.resolve(null),
+    kitchen.slug === "burger-103898"
+      ? prisma.catalogArticle.findMany({
+        where: {
+          articleNumber: {
+            in: BURGER_103898_CATALOG_ARTICLE_OVERRIDES.map((override) => override.articleNumber),
+          },
+          isActive: true,
+        },
+        include: { programPrices: true },
+      })
+      : Promise.resolve([]),
   ]);
+  const resolvedCutleryVariantArticles = resolveCutleryCatalogArticles(
+    cutleryVariantArticles,
+    kitchen.slug,
+    kitchen.programmId,
+  );
+
+  // Burger uses supplier code UPE65. Existing 103898 rows may still point at
+  // the shared Impuls UPEF65 record because an import with zero synced items
+  // updates the catalog but intentionally does not relink kitchen items.
+  const burgerCornerCabinet = kitchen.slug === "burger-103898"
+    ? kitchen.items.find((item) => item.code === "CAB-BASE-BURGER103898-US60-UPE65")
+    : null;
+  if (burgerCornerCabinet) {
+    const configuredBurgerPrice = Number(burgerCornerCabinet.blendePrice ?? 79);
+    const resolvedBurgerBlende = burgerBlende?.isActive
+      ? burgerBlende
+      : {
+        ...(burgerCornerCabinet.catalogBlende || {}),
+        code: "UPE65",
+        name: "Corner filler panel for Lower cabinet",
+        nameDe: "Eckpassblende Unterschrank",
+        price: configuredBurgerPrice,
+        programPrices: [{
+          programmId: kitchen.programmId,
+          price: configuredBurgerPrice,
+          isActive: true,
+        }],
+      };
+    burgerCornerCabinet.catalogBlendeId = resolvedBurgerBlende.id
+      || burgerCornerCabinet.catalogBlendeId
+      || "burger-upe65";
+    burgerCornerCabinet.catalogBlende = resolvedBurgerBlende;
+    burgerCornerCabinet.blendeCode = "UPE65";
+    burgerCornerCabinet.blendeLabel = resolvedBurgerBlende.nameDe || resolvedBurgerBlende.name;
+  }
+
+  const burgerArticleByNumber = new Map(
+    burgerArticles.map((article) => [article.articleNumber, article]),
+  );
+  for (const override of kitchen.slug === "burger-103898"
+    ? BURGER_103898_CATALOG_ARTICLE_OVERRIDES
+    : []) {
+    const kitchenItem = kitchen.items.find((item) => item.code === override.itemCode);
+    if (!kitchenItem) continue;
+    const catalogArticle = burgerArticleByNumber.get(override.articleNumber);
+    const configuredBurgerPrice = Number(kitchenItem.price ?? override.price);
+    const resolvedArticle = catalogArticle?.isActive
+      ? catalogArticle
+      : {
+        ...(kitchenItem.catalogArticle || {}),
+        articleNumber: override.articleNumber,
+        price: configuredBurgerPrice,
+        programPrices: [{
+          programmId: kitchen.programmId,
+          price: configuredBurgerPrice,
+          isActive: true,
+        }],
+      };
+    kitchenItem.catalogArticleId = resolvedArticle.id
+      || kitchenItem.catalogArticleId
+      || `burger-${override.articleNumber}`;
+    kitchenItem.catalogArticle = resolvedArticle;
+    kitchenItem.articleNumber = override.displayArticleNumber || override.articleNumber;
+  }
 
   const customer = orderPayload?.customer || {};
   validateConsent(customer.consent);
@@ -578,18 +709,34 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     services: normalizeSubmissionItems(orderPayload?.services),
   };
   const allowKitchenArticleNumberAlias = kitchen.slug === "burger-103898";
+  const useProgramPrices = kitchen.slug === "burger-103898";
+  const programPriceOptions = { useProgramPrices, programmId: kitchen.programmId };
 
-  const selectedComponents = submittedGroups.components.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, {
+  const selectedComponents = submittedGroups.components.map((item) => {
+    const selectedItem = mapCatalogItem(kitchen.items, item, ItemType.COMPONENT, {
       auszugVariantArticles,
       allowKitchenArticleNumberAlias,
+      ...programPriceOptions,
+    });
+
+    if (
+      selectedItem
+      && kitchen.slug === "burger-103898"
+      && BURGER_103898_INCLUDED_COMPONENT_CODES.has(selectedItem.code)
+    ) {
+      return { ...selectedItem, isLocked: true };
+    }
+
+    return selectedItem;
+  });
+  const selectedAccessories = submittedGroups.accessories.map((item) =>
+    mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, {
+      cutleryVariantArticles: resolvedCutleryVariantArticles,
+      ...programPriceOptions,
     }),
   );
-  const selectedAccessories = submittedGroups.accessories.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.ACCESSORY, { cutleryVariantArticles }),
-  );
   const selectedServices = submittedGroups.services.map((item) =>
-    mapCatalogItem(kitchen.items, item, ItemType.SERVICE),
+    mapCatalogItem(kitchen.items, item, ItemType.SERVICE, programPriceOptions),
   );
 
   if ([...selectedComponents, ...selectedAccessories, ...selectedServices].some((item) => !item)) {
@@ -614,9 +761,15 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   const allSelectedComponents = allSelected.filter((item) => item.itemType === ItemType.COMPONENT);
   const allSelectedAccessories = allSelected.filter((item) => item.itemType === ItemType.ACCESSORY);
   const allSelectedServices = allSelected.filter((item) => item.itemType === ItemType.SERVICE);
-  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(allSelectedComponents);
+  const availableCutleryVariants = getAvailableCutleryVariantsForComponents(
+    allSelectedComponents,
+    kitchen.slug === "burger-103898" ? resolvedCutleryVariantArticles : undefined,
+  );
   const availableCutleryByArticle = new Map(
-    availableCutleryVariants.map((variant) => [variant.articleNumber, variant]),
+    availableCutleryVariants.flatMap((variant) => [
+      [variant.articleNumber, variant],
+      ...(variant.sharedArticleNumber ? [[variant.sharedArticleNumber, variant]] : []),
+    ]),
   );
   for (const item of allSelectedAccessories) {
     if (!isCutleryAccessoryCode(item?.code)) continue;

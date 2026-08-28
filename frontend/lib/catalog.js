@@ -3,15 +3,27 @@ import { prisma } from "./prisma.js";
 import { ORDER_KIND_LIVE, ORDER_KIND_TEST, getOrderDelegate } from "./order-kind.js";
 import { applyDueScheduledCatalogPriceListImports } from "./catalog-price-list-import.js";
 import { isMissingKitchenRegistrationTableError } from "./kitchen-registration-db.js";
-import { CUTLERY_VARIANTS, normalizeCutleryVariants } from "./cutlery-accessories.js";
+import {
+  CUTLERY_VARIANTS,
+  getCutleryCatalogArticleNumbers,
+  normalizeCutleryVariants,
+  resolveCutleryCatalogArticles,
+} from "./cutlery-accessories.js";
 import { buildAuszugVariantMetadata } from "./auszug-variants.js";
 import { isStandaloneCatalogBlendeItem } from "./catalog-pricing.js";
 import {
   CATALOG_PRODUCT_INFORMATION_SELECT,
   resolveProductInformation,
 } from "./product-information.js";
+import { getBurger103898ProductInfo } from "./burger-103898-product-info.js";
 
 const DEFAULT_KITCHEN_PROGRAMM_ID = "IP 2200";
+const BURGER_103898_CATALOG_ARTICLE_OVERRIDES = [
+  { itemCode: "CAB-WALL-BURGER103898-H5072", articleNumber: "H5072", price: 135 },
+  { itemCode: "CAB-HOOD-BURGER103898-HFLH6072", articleNumber: "FH664621E+FWK124+HFLH6072", displayArticleNumber: "FH664621E + FWK124 + HFLH6072", price: 346 },
+  { itemCode: "CAB-WALL-BURGER103898-H6072", articleNumber: "H6072", price: 146 },
+  { itemCode: "CAB-WALL-BURGER103898-H3072", articleNumber: "H3072", price: 124 },
+];
 
 export const LOCKED_BASE_COLORS = ["springgreen", "red", "#7f001f", "#980026"];
 export const MONTAGE_REQUIRED_CODES = [
@@ -216,7 +228,7 @@ export async function getKitchenBySlug(slug) {
   const programmId = kitchenProgram?.programmId || DEFAULT_KITCHEN_PROGRAMM_ID;
 
   try {
-    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
+    const kitchen = await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         claimParts: {
@@ -270,14 +282,15 @@ export async function getKitchenBySlug(slug) {
           orderBy: [{ itemType: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
         },
       },
-    }));
+    });
+    return attachCutleryCatalogVariants(await attachBurger103898CatalogOverrides(kitchen, programmId));
   } catch (error) {
     if (!isMissingKitchenItemProductImagePath(error) && !isMissingKitchenItemNameDe(error)) {
       throw error;
     }
 
     // Compatibility fallback for databases that have not applied the productImagePath migration yet.
-    return attachCutleryCatalogVariants(await prisma.kitchen.findUnique({
+    const kitchen = await prisma.kitchen.findUnique({
       where: { slug: resolvedSlug },
       include: {
         claimParts: {
@@ -290,8 +303,95 @@ export async function getKitchenBySlug(slug) {
           select: KITCHEN_ITEM_BASE_SELECT_WITHOUT_PRODUCT_IMAGE_PATH,
         },
       },
-    }));
+    });
+    return attachCutleryCatalogVariants(await attachBurger103898CatalogOverrides(kitchen, programmId));
   }
+}
+
+async function attachBurger103898CatalogOverrides(kitchen, programmId) {
+  if (!kitchen || kitchen.slug !== "burger-103898") return kitchen;
+
+  const cornerCabinet = kitchen.items?.find(
+    (item) => item.code === "CAB-BASE-BURGER103898-US60-UPE65",
+  );
+  const configuredArticleOverrides = BURGER_103898_CATALOG_ARTICLE_OVERRIDES
+    .map((override) => ({
+      ...override,
+      item: kitchen.items?.find((item) => item.code === override.itemCode),
+    }))
+    .filter((override) => override.item);
+
+  const [burgerBlende, burgerArticles] = await Promise.all([
+    cornerCabinet
+      ? prisma.catalogBlende.findUnique({
+        where: { code: "UPE65" },
+        include: {
+          programPrices: {
+            where: { programmId, isActive: true },
+            select: { price: true },
+            take: 1,
+          },
+        },
+      })
+      : Promise.resolve(null),
+    configuredArticleOverrides.length
+      ? prisma.catalogArticle.findMany({
+        where: {
+          articleNumber: { in: configuredArticleOverrides.map((override) => override.articleNumber) },
+          isActive: true,
+        },
+        include: {
+          programPrices: {
+            where: { programmId, isActive: true },
+            select: { price: true },
+            take: 1,
+          },
+        },
+      })
+      : Promise.resolve([]),
+  ]);
+
+  if (cornerCabinet) {
+    const configuredBurgerPrice = Number(cornerCabinet.blendePrice ?? 79);
+    const resolvedBurgerBlende = burgerBlende?.isActive
+      ? burgerBlende
+      : {
+        ...(cornerCabinet.catalogBlende || {}),
+        code: "UPE65",
+        name: "Corner filler panel for Lower cabinet",
+        nameDe: "Eckpassblende Unterschrank",
+        price: configuredBurgerPrice,
+        programPrices: [{ price: configuredBurgerPrice }],
+      };
+
+    cornerCabinet.catalogBlendeId = resolvedBurgerBlende.id || cornerCabinet.catalogBlendeId || "burger-upe65";
+    cornerCabinet.catalogBlende = resolvedBurgerBlende;
+    cornerCabinet.blendeCode = "UPE65";
+    cornerCabinet.blendeLabel = resolvedBurgerBlende.nameDe || resolvedBurgerBlende.name;
+    cornerCabinet.blendePrice = resolvedBurgerBlende.programPrices?.[0]?.price ?? resolvedBurgerBlende.price;
+  }
+
+  const burgerArticleByNumber = new Map(
+    burgerArticles.map((article) => [article.articleNumber, article]),
+  );
+  for (const override of configuredArticleOverrides) {
+    const catalogArticle = burgerArticleByNumber.get(override.articleNumber);
+    const resolvedArticle = catalogArticle?.isActive
+      ? catalogArticle
+      : {
+        ...(override.item.catalogArticle || {}),
+        articleNumber: override.articleNumber,
+        price: Number(override.item.price ?? override.price),
+        programPrices: [{ price: Number(override.item.price ?? override.price) }],
+      };
+    override.item.catalogArticleId = resolvedArticle.id
+      || override.item.catalogArticleId
+      || `burger-${override.articleNumber}`;
+    override.item.catalogArticle = resolvedArticle;
+    override.item.articleNumber = override.displayArticleNumber || override.articleNumber;
+  }
+
+  return kitchen;
 }
 
 async function attachCutleryCatalogVariants(kitchen) {
@@ -304,7 +404,7 @@ async function attachCutleryCatalogVariants(kitchen) {
           itemType: ItemType.ACCESSORY,
           isActive: true,
           articleNumber: {
-            in: CUTLERY_VARIANTS.map((variant) => variant.articleNumber),
+            in: getCutleryCatalogArticleNumbers(kitchen.slug),
           },
         },
         include: {
@@ -319,7 +419,9 @@ async function attachCutleryCatalogVariants(kitchen) {
       prisma.catalogArticle.findMany({
         where: {
           itemType: ItemType.COMPONENT,
-          isActive: true,
+          // Burger's imported supplier list keeps US2A drawer rows marked
+          // inactive globally; they are nevertheless valid for Burger 103898.
+          ...(kitchen.slug === "burger-103898" ? {} : { isActive: true }),
           articleNumber: { startsWith: "US2A" },
         },
         include: {
@@ -337,7 +439,7 @@ async function attachCutleryCatalogVariants(kitchen) {
       ...kitchen,
       cutleryVariants: cutleryArticles.length
         ? normalizeCutleryVariants(
-          cutleryArticles.map((article) => ({
+          resolveCutleryCatalogArticles(cutleryArticles, kitchen.slug, kitchen.programmId).map((article) => ({
             articleNumber: article.articleNumber,
             name: article.name,
             nameDe: article.nameDe || "",
@@ -1166,6 +1268,8 @@ export function serializeKitchenForLegacy(kitchen) {
   const claimParts = kitchen.claimParts || [];
   const auszugVariantArticles = kitchen.auszugVariantArticles || [];
   const toClientItem = (item) => {
+    const isBurger103898Refrigerator = kitchen.slug === "burger-103898"
+      && item.code === "REF-BURGER103898-KGCN388140E";
     const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
     const catalogService = item.catalogServiceId ? item.catalogService : null;
     const catalogBlende = item.catalogBlendeId ? item.catalogBlende : null;
@@ -1177,7 +1281,15 @@ export function serializeKitchenForLegacy(kitchen) {
     const claimProducts = claimParts.filter(
       (part) => String(part?.sourceKitchenItemCode || "") === String(item.code || ""),
     );
-    const productInformation = resolveProductInformation({ ...item, claimProducts });
+    const resolvedProductInformation = resolveProductInformation({ ...item, claimProducts });
+    const kitchenSpecificProductInformation = getBurger103898ProductInfo(kitchen.slug, item.code);
+    const productInformation = kitchenSpecificProductInformation
+      ? {
+          ...resolvedProductInformation,
+          ...kitchenSpecificProductInformation,
+          productImagePath: kitchenSpecificProductInformation.productImagePaths?.[0] || "",
+        }
+      : resolvedProductInformation;
     const catalogBlendeQuantity = Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
     const articlePrice = catalogArticle?.programPrices?.[0]?.price ?? catalogArticle?.price;
     const blendePrice = catalogBlende?.programPrices?.[0]?.price ?? catalogBlende?.price;
@@ -1214,19 +1326,28 @@ export function serializeKitchenForLegacy(kitchen) {
         || catalogArticle?.articleNumber
         || (standaloneCatalogBlende ? catalogBlende?.code : "")
         || "",
-      name: catalogArticle?.name
-        || catalogService?.name
-        || (standaloneCatalogBlende ? catalogBlende?.name : item.name),
-      nameDe: catalogArticle?.nameDe
-        || catalogService?.nameDe
-        || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
-        || "",
+      name: isBurger103898Refrigerator
+        ? "Freestanding refrigerator 180 cm"
+        : catalogArticle?.name
+          || catalogService?.name
+          || (standaloneCatalogBlende ? catalogBlende?.name : item.name),
+      nameDe: isBurger103898Refrigerator
+        ? "Standkühlschrank 180 cm"
+        : catalogArticle?.nameDe
+          || catalogService?.nameDe
+          || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
+          || "",
       price: catalogPrice,
-      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
-      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
+      widthMm: isBurger103898Refrigerator
+        ? 545
+        : catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
+      heightMm: isBurger103898Refrigerator
+        ? 1800
+        : catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
       depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: productInformation.productImagePath,
+      productImagePaths: productInformation.productImagePaths || [],
       productInfoPdfPath: productInformation.productInfoPdfPath,
       productInfoSummary: productInformation.productInfoSummary,
       productInfoKeyFacts: productInformation.productInfoKeyFacts,

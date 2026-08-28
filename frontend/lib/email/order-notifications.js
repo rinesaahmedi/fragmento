@@ -9,6 +9,7 @@ import sharp from "sharp";
 import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
 import { getPriceBreakdown } from "../price-utils.js";
+import { getBurger103898ProductInfo } from "../burger-103898-product-info.js";
 
 const LETTERHEAD = {
   headerHeight: 74,
@@ -156,7 +157,15 @@ function shouldPreferMappedProductInfoDocuments(item) {
   );
 }
 
-function getProductInfoDocumentsForEmail(item) {
+function getProductInfoDocumentsForEmail(item, kitchenSlug = "") {
+  const kitchenSpecificProductInformation = getBurger103898ProductInfo(kitchenSlug, item?.code);
+  if (kitchenSpecificProductInformation?.productInfoPdfPath) {
+    return [{
+      label: "Produktinfo PDF",
+      href: kitchenSpecificProductInformation.productInfoPdfPath,
+    }];
+  }
+
   const mappedDocuments = getMappedProductInfoDocuments(item);
   if (mappedDocuments.length && shouldPreferMappedProductInfoDocuments(item)) {
     return mappedDocuments;
@@ -311,13 +320,16 @@ async function loadKitchenPlanPreviewData() {
   if (kitchenPlanPreviewDataPromise) return kitchenPlanPreviewDataPromise;
 
   kitchenPlanPreviewDataPromise = (async () => {
-    const sourcePath = path.join(process.cwd(), "components", "kitchen-svg-stage.jsx");
+    const sourcePath = await resolveWorkspaceAssetPath("components/kitchen-svg-stage.jsx")
+      || await resolveWorkspaceAssetPath("frontend/components/kitchen-svg-stage.jsx");
+    if (!sourcePath) return { imageViews: {}, hotspotsBySlug: {}, linkedGroupsBySlug: {} };
     const source = await fs.readFile(sourcePath, "utf8");
     const imageViewsLiteral = findBalancedObjectLiteral(source, "IMAGE_VIEW_BY_SLUG");
     const hotspotsLiteral = findBalancedObjectLiteral(source, "IMAGE_HOTSPOTS_BY_SLUG");
     const imageViews = imageViewsLiteral ? Function(`"use strict"; return (${imageViewsLiteral});`)() : {};
     const hotspotsBySlug = hotspotsLiteral ? Function(`"use strict"; return (${hotspotsLiteral});`)() : {};
-    const selectionUtilsPath = path.join(process.cwd(), "components", "kitchen-selection-utils.js");
+    const selectionUtilsPath = await resolveWorkspaceAssetPath("components/kitchen-selection-utils.js")
+      || await resolveWorkspaceAssetPath("frontend/components/kitchen-selection-utils.js");
     const selectionUtilsSource = await fs.readFile(selectionUtilsPath, "utf8").catch(() => "");
     const linkedGroupsLiteral = selectionUtilsSource
       ? findBalancedObjectLiteral(selectionUtilsSource, "LINKED_COMPONENT_GROUPS_BY_SLUG")
@@ -366,6 +378,16 @@ async function resolvePurchasedKitchenSketchPath(order) {
     candidates.push(
       "public/plans/108134 MODUL 1.svg",
       "public/jpg/108134 MODUL 1_page-0001.jpg",
+    );
+  }
+
+  // Keep the recently added 670 103898 plan available when the server is
+  // started from a workspace root where the client-side plan metadata cannot
+  // be parsed (for example, in a standalone test or worker process).
+  if (slug === "burger-103898") {
+    candidates.push(
+      "public/plans/670 103898.svg",
+      "public/jpg/670 103898_page-0001.jpg",
     );
   }
 
@@ -524,8 +546,9 @@ function injectPurchasedKitchenPdfStyles(markup) {
 }
 
 function applyPurchasedKitchenSelectionToSvg(markup, order) {
+  const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const { selectedComponentIds, lockedComponentIds } = buildPurchasedKitchenPdfSelectionState(order, {
-    defaultLockedComponentKeys: ["worktop"],
+    defaultLockedComponentKeys: slug === "burger-103898" ? ["worktop", "sink-base"] : ["worktop"],
   });
   let nextMarkup = injectPurchasedKitchenPdfStyles(markup);
 
@@ -606,10 +629,13 @@ function pointsToOverlayPolygon(points, crop, width, height) {
 }
 
 function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height, linkedGroups = [] }) {
+  const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const hasWorktop = hotspots.some((hotspot) => String(hotspot?.componentKey || "").trim() === "worktop");
   const { selectedComponentKeys, lockedComponentKeys } = buildPurchasedKitchenPdfSelectionState(order, {
     linkedGroups,
-    defaultLockedComponentKeys: hasWorktop ? ["worktop"] : [],
+    defaultLockedComponentKeys: slug === "burger-103898"
+      ? ["worktop", "sink-base"]
+      : (hasWorktop ? ["worktop"] : []),
   });
   const shapes = [];
 
@@ -761,7 +787,10 @@ function getMappedProductImagePath(item) {
   return "";
 }
 
-function getProductImagePathForEmail(item) {
+function getProductImagePathForEmail(item, kitchenSlug = "") {
+  const kitchenSpecificProductInformation = getBurger103898ProductInfo(kitchenSlug, item?.code);
+  const kitchenSpecificPath = kitchenSpecificProductInformation?.productImagePaths?.[0];
+  if (kitchenSpecificPath) return normalizeProductImageAssetPath(kitchenSpecificPath);
   return normalizeProductImageAssetPath(item?.productImagePath) || getMappedProductImagePath(item);
 }
 
@@ -788,7 +817,17 @@ async function buildWhiteBackedProductImage(content) {
 }
 
 function getItemDisplayCode(item) {
-  return String(item?.articleNumber || item?.code || "-").trim() || "-";
+  const articleNumber = String(item?.articleNumber || "").trim();
+  const blendeCode = String(item?.blendeCode || "").trim();
+  // Supplier-facing Burger cabinet numbers can include the filler (e.g.
+  // `US60 + UPE65`). The filler is rendered as its own numbered email row,
+  // so keep only the cabinet code on the parent row.
+  if (articleNumber && blendeCode) {
+    const escapedBlendeCode = blendeCode.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const parentCode = articleNumber.replace(new RegExp(`\\s*\\+\\s*${escapedBlendeCode}\\s*$`, "i"), "").trim();
+    if (parentCode) return parentCode;
+  }
+  return articleNumber || String(item?.code || "-").trim() || "-";
 }
 
 function getItemDisplayName(item) {
@@ -834,7 +873,7 @@ async function loadProductImageAttachments(order) {
   const cidByAssetPath = new Map();
 
   for (const [index, item] of selectedItems.entries()) {
-    const assetPath = getProductImagePathForEmail(item);
+    const assetPath = getProductImagePathForEmail(item, order.kitchen?.slug);
     if (!assetPath) continue;
 
     if (seenAssetPaths.has(assetPath)) {
@@ -882,7 +921,7 @@ async function loadProductInfoAttachments(order, options = {}) {
   const links = [];
 
   for (const item of selectedItems) {
-    const documents = getProductInfoDocumentsForEmail(item);
+    const documents = getProductInfoDocumentsForEmail(item, order.kitchen?.slug);
 
     for (const document of documents) {
       const assetPath = normalizeProductInfoAssetPath(document.href);
@@ -1611,7 +1650,7 @@ export function buildOrderSummaryHtml(order) {
     const showCodeLine = options.showCodeLine !== false;
     const rows = buildNumberedRows(visibleItems)
       .map(({ item, rowNumber, blendeItems = [] }) => {
-        const productImagePath = getProductImagePathForEmail(item);
+        const productImagePath = getProductImagePathForEmail(item, order.kitchen?.slug);
         const imageCid = productImagePath ? imageCidByAssetPath.get(productImagePath) : "";
         const imageHtml = imageCid
           ? `<td width="50" valign="top" bgcolor="#ffffff" style="width:50px;padding:0 6px 0 0;background-color:#ffffff;"><img src="cid:${imageCid}" alt="${escapeHtml(getItemDisplayName(item) || "Produkt")}" width="46" style="display:block;width:46px;max-width:46px;max-height:46px;height:auto;object-fit:contain;border:1px solid #eaeaea;border-radius:5px;background-color:#ffffff;" /></td>`

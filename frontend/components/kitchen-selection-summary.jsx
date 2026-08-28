@@ -26,10 +26,21 @@ function isSinkSummaryItem(item) {
   const code = String(item?.code || "").trim().toUpperCase();
   const componentKey = String(item?.componentKey || "").trim().toLowerCase();
   const name = String(item?.name || item?.nameSnapshot || "").trim().toLowerCase();
-  return componentKey === "sink-faucet" || code.startsWith("SINK-") || name.includes("sink and worktop") || name.includes("sink and waste system");
+  // A sink *cabinet* is a real included component and must remain visible in
+  // the summary. Only merge the synthetic sink-worktop/faucet entry with the
+  // worktop; legacy SINK-* cabinet codes must not be swallowed here.
+  const isSinkCabinet = componentKey === "sink-base" || name === "sink lower cabinet";
+  const isSinkWorktop = code === "SINK-WORKTOP" || name.includes("sink and worktop") || name.includes("sink and waste system");
+  return !isSinkCabinet && (componentKey === "sink-faucet" || isSinkWorktop);
 }
 
-function mergeStandardEquipmentItems(items) {
+function mergeStandardEquipmentItems(items, kitchenSlug = "") {
+  // Burger 103898 has two distinct worktop sections plus a separate sink
+  // cabinet; keep all three default rows visible instead of merging them.
+  if (String(kitchenSlug || "").trim().toLowerCase() === "burger-103898") {
+    return items;
+  }
+
   const worktopItem = items.find(isWorktopSummaryItem);
   const sinkItem = items.find(isSinkSummaryItem);
 
@@ -80,7 +91,7 @@ function getEffectiveSummaryPrice(item) {
   return unitPrice * quantity;
 }
 
-function SummaryRow({ item, onRemove, onOpenInfo }) {
+function SummaryRow({ item, kitchenSlug, onRemove, onOpenInfo }) {
   const { translate, language } = usePublicI18n();
   const price = getEffectiveSummaryPrice(item);
   const quantity = Math.max(1, Math.floor(Number(item?.quantity || 1)));
@@ -91,7 +102,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
   const blendeLabel = getLocalizedBlendeDisplayLabel(item, language);
   const blendeTotal = getItemBlendeTotal(item);
   const cabinetOnlyPrice = getItemPriceWithoutBlende(item);
-  const { articleNumber, dimensions } = getCatalogItemDetails(item);
+  const { articleNumber, dimensions } = getCatalogItemDetails(item, kitchenSlug);
   const itemDimensions = isLocked ? "" : dimensions;
   const infoPdfHref = getProductInfoHref(item);
   const productInfoDocuments = getProductInfoDocuments(item);
@@ -177,6 +188,7 @@ function SummaryRow({ item, onRemove, onOpenInfo }) {
 }
 
 export default function KitchenSelectionSummary({
+  kitchenSlug,
   selectedComponents,
   selectedAccessories,
   selectedServices,
@@ -192,7 +204,7 @@ export default function KitchenSelectionSummary({
 }) {
   const { translate } = usePublicI18n();
   const [isExpanded, setIsExpanded] = useState(false);
-  const mergedDefaultSelectedComponents = mergeStandardEquipmentItems(defaultSelectedComponents);
+  const mergedDefaultSelectedComponents = mergeStandardEquipmentItems(defaultSelectedComponents, kitchenSlug);
   const selectedItemCount =
     selectedComponents.length + selectedAccessories.length + selectedServices.length;
   const shouldCollapseSummary = selectedItemCount > 6;
@@ -220,31 +232,31 @@ export default function KitchenSelectionSummary({
           <div className={styles.summarySectionTitle}>{translate("configurator.summaryStandardEquipment", "Default components")}</div>
         ) : null}
         {mergedDefaultSelectedComponents.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
+          <SummaryRow key={item.id} item={item} kitchenSlug={kitchenSlug} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
         ))}
 
         {confirmedSelectedComponents.length ? (
           <div className={styles.summarySectionTitle}>{translate("configurator.summaryConfirmedComponents", "Already confirmed components")}</div>
         ) : null}
         {confirmedSelectedComponents.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
+          <SummaryRow key={item.id} item={item} kitchenSlug={kitchenSlug} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
         ))}
 
         {optionalSelectedComponents.length ? (
           <div className={styles.summarySectionTitle}>{translate("configurator.summaryAdditionalComponents", "Additional components")}</div>
         ) : null}
         {optionalSelectedComponents.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
+          <SummaryRow key={item.id} item={item} kitchenSlug={kitchenSlug} onRemove={onRemoveComponent} onOpenInfo={onOpenProductInfo} />
         ))}
 
         {selectedAccessories.length ? <div className={styles.summarySectionTitle}>{translate("configurator.summaryAccessories", "Accessories")}</div> : null}
         {selectedAccessories.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveAccessory} onOpenInfo={onOpenProductInfo} />
+          <SummaryRow key={item.id} item={item} kitchenSlug={kitchenSlug} onRemove={onRemoveAccessory} onOpenInfo={onOpenProductInfo} />
         ))}
 
         {selectedServices.length ? <div className={styles.summarySectionTitle}>{translate("configurator.summaryServices", "Services")}</div> : null}
         {selectedServices.map((item) => (
-          <SummaryRow key={item.id} item={item} onRemove={onRemoveService} onOpenInfo={onOpenProductInfo} />
+          <SummaryRow key={item.id} item={item} kitchenSlug={kitchenSlug} onRemove={onRemoveService} onOpenInfo={onOpenProductInfo} />
         ))}
       </div>
       {shouldCollapseSummary ? (

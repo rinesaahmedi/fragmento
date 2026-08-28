@@ -310,6 +310,11 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  // Burger 103898: the US60 front ends at the first corner divider. UPE65
+  // consists of both narrow perspective faces up to the sink-base seam.
+  "burger-103898": {
+    "base-module-2": { side: "right", inner: 53.387173, outer: 54.997625 },
+  },
   // Exact perspective divider strokes from the 842 x 595 AB 105743 PDF.
   "ab-105743": {
     "base-module-1": { side: "left", outer: 21.192399, inner: 21.790974 },

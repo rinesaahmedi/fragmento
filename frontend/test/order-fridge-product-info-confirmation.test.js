@@ -106,3 +106,38 @@ test("order confirmation flat hood bundle uses the current product-info PDF", as
     },
   ]);
 });
+
+test("Burger 103898 confirmation uses only its matching supplier PDFs", async () => {
+  const order = {
+    orderNumber: "BURGER-103898-TEST",
+    total: 1669,
+    kitchen: { name: "103898", slug: "burger-103898" },
+    customer: {
+      contractNumber: "111103898",
+      preferredDeliveryDate: "2026-09-24",
+    },
+    components: [
+      { code: "REF-BURGER103898-KGCN388140E", name: "Burger refrigerator", price: 579 },
+      { code: "DISH-BURGER103898-600", name: "Burger dishwasher", price: 586 },
+      { code: "CAB-HOOD-BURGER103898-HFLH6072", name: "Burger extractor hood", price: 346 },
+    ],
+    accessories: [
+      { code: "ACC-LIGHT-003", name: "Burger LED spots", price: 69 },
+      { code: "ACC-WASTE-001", name: "Burger waste collector", price: 89 },
+    ],
+    services: [],
+  };
+
+  const staticHtml = await buildOrderConfirmationEmailStaticHtml(order);
+  const hrefs = staticHtml.attachmentLinks.map((link) => link.href);
+
+  assert.deepEqual(hrefs, [
+    "/product-info/burger-103898/refrigerators/ol-kgcn388140e-product-info.pdf",
+    "/product-info/burger-103898/dishwashers/a-egspv597210-product-info.pdf",
+    "/product-info/burger-103898/extractor-hoods/fh664621e-product-info.pdf",
+    "/product-info/burger-103898/lighting/led-spots-product-info.pdf",
+    "/product-info/burger-103898/waste-collectors/blanco-517467-product-info.pdf",
+  ]);
+  assert.ok(hrefs.every((href) => href.includes("/burger-103898/")));
+  assert.ok(hrefs.every((href) => !href.includes("a-egspv594400") && !href.includes("khf664611s")));
+});

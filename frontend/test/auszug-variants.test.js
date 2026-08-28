@@ -5,6 +5,7 @@ import {
   applyArticleVariantSelection,
   applyArticleVariantSelectionForDisplay,
   buildAuszugVariantMetadata,
+  findAuszugVariantOption,
   getAuszugVariantArticleNumber,
   resolveAuszugVariantSelection,
 } from "../lib/auszug-variants.js";
@@ -95,6 +96,26 @@ test("Auszug metadata keeps existing blende pricing on top of the selected artic
       ["yes", "US2A60", 394],
     ],
   );
+});
+
+test("Auszug metadata uses the supplied program price for drawer variants", () => {
+  const burgerVariant = buildAuszugVariantMetadata(kitchenItem(), [{
+    ...us2a60Article,
+    price: 369,
+    programPrices: [{ programmId: "BURGER CINDY", price: 461, isActive: true }],
+  }]);
+  assert.equal(burgerVariant.options.find((option) => option.key === "yes")?.price, 461);
+});
+
+test("composite supplier cabinet numbers select the base drawer option", () => {
+  const item = {
+    ...kitchenItem({ articleNumber: "US60 + UPE65" }),
+    articleVariants: {
+      auszug: buildAuszugVariantMetadata(kitchenItem(), [us2a60Article]),
+    },
+  };
+
+  assert.equal(findAuszugVariantOption(item, "US60 + UPE65")?.key, "no");
 });
 
 test("client variant application replaces the displayed article and total price", () => {

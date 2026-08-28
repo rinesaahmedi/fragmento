@@ -94,6 +94,9 @@ const ORDER_COUNTRY_BY_CONTRACT_COUNTRY = {
 };
 
 const DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG = {
+  // Burger 103898 includes these lower cabinets in the supplied kitchen plan.
+  // Keep this slug-specific so legacy kitchens retain their existing defaults.
+  "burger-103898": ["sink-base", "base-module-1", "base-module-2", "drawer-module"],
   "ab-105835": ["oven-module", "worktop", "sink-base", "sink-faucet"],
   "l-shaped-kitchen": ["worktop", "oven-base", "base-module-3"],
 };
@@ -1009,13 +1012,27 @@ function buildOrderLockedComponentIds(kitchenConfig, initialOrder, kitchenSlug) 
 }
 
 function buildDefaultLockedComponentIds(kitchenSlug, kitchenConfig) {
-  const componentKeys = DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG[String(kitchenSlug || "").trim().toLowerCase()] || [];
-  if (!componentKeys.length) return [];
+  const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const componentKeys = DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG[normalizedSlug] || [];
 
   const availableComponentIds = new Set(kitchenConfig.components.map((item) => componentIdForItem(item)));
-  return componentKeys
+  const lockedIds = componentKeys
     .map((componentKey) => componentIdForKey(componentKey))
     .filter((componentId) => availableComponentIds.has(componentId));
+
+  // Older hosted Burger records used a generated component key for the sink
+  // item. Resolve that item by its stable supplier code/name as a fallback.
+  if (normalizedSlug === "burger-103898") {
+    kitchenConfig.components.forEach((item) => {
+      const code = String(item?.code || "").trim().toUpperCase();
+      const name = String(item?.name || "").trim().toLowerCase();
+      if (code.startsWith("SINK-BASE") || name === "sink lower cabinet") {
+        lockedIds.push(componentIdForItem(item));
+      }
+    });
+  }
+
+  return [...new Set(lockedIds)];
 }
 
 function buildDefaultLockedPlanComponentIds(kitchenSlug) {
@@ -2521,6 +2538,7 @@ function KitchenConfiguratorContent({
 
           <div className={styles.summaryColumn}>
             <KitchenSelectionSummary
+              kitchenSlug={kitchenSlug}
               selectedComponents={selectedComponents}
               selectedAccessories={selectedAccessories}
               selectedServices={selectedServices}
