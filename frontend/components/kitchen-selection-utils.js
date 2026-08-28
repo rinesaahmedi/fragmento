@@ -84,7 +84,8 @@ export function getStructuredDimensions(item, kitchenSlug = "") {
       || iconKey === "sink_base";
 
     if (isRefrigerator) {
-      return "54,5 x 180 cm";
+      const heightMm = Number(item?.heightMm) > 0 ? item.heightMm : null;
+      return heightMm ? `${formatDimensionCmPart(heightMm)} cm` : "";
     }
 
     if (isDishwasher || isLowerCabinet) {

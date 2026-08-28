@@ -1268,8 +1268,6 @@ export function serializeKitchenForLegacy(kitchen) {
   const claimParts = kitchen.claimParts || [];
   const auszugVariantArticles = kitchen.auszugVariantArticles || [];
   const toClientItem = (item) => {
-    const isBurger103898Refrigerator = kitchen.slug === "burger-103898"
-      && item.code === "REF-BURGER103898-KGCN388140E";
     const catalogArticle = item.catalogArticleId ? item.catalogArticle : null;
     const catalogService = item.catalogServiceId ? item.catalogService : null;
     const catalogBlende = item.catalogBlendeId ? item.catalogBlende : null;
@@ -1326,24 +1324,16 @@ export function serializeKitchenForLegacy(kitchen) {
         || catalogArticle?.articleNumber
         || (standaloneCatalogBlende ? catalogBlende?.code : "")
         || "",
-      name: isBurger103898Refrigerator
-        ? "Freestanding refrigerator 180 cm"
-        : catalogArticle?.name
-          || catalogService?.name
-          || (standaloneCatalogBlende ? catalogBlende?.name : item.name),
-      nameDe: isBurger103898Refrigerator
-        ? "Standkühlschrank 180 cm"
-        : catalogArticle?.nameDe
-          || catalogService?.nameDe
-          || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
-          || "",
+      name: catalogArticle?.name
+        || catalogService?.name
+        || (standaloneCatalogBlende ? catalogBlende?.name : item.name),
+      nameDe: catalogArticle?.nameDe
+        || catalogService?.nameDe
+        || (standaloneCatalogBlende ? catalogBlende?.nameDe : item.nameDe)
+        || "",
       price: catalogPrice,
-      widthMm: isBurger103898Refrigerator
-        ? 545
-        : catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
-      heightMm: isBurger103898Refrigerator
-        ? 1800
-        : catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
+      widthMm: catalogArticle ? catalogArticle.widthMm ?? null : item.widthMm ?? null,
+      heightMm: catalogArticle ? catalogArticle.heightMm ?? null : item.heightMm ?? null,
       depthMm: catalogArticle ? catalogArticle.depthMm ?? null : item.depthMm ?? null,
       infoText: item.infoText || "",
       productImagePath: productInformation.productImagePath,

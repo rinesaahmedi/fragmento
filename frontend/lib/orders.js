@@ -333,14 +333,9 @@ export function buildOrderForNotifications(orderRecord) {
       ? BURGER_103898_CUTLERY_VARIANTS.find((variant) => variant.widthCm === cutleryVariant?.widthCm)
       : null;
 
-    const isBurgerFridge = isBurger103898 && String(item.code || "").toUpperCase().startsWith("REF-BURGER103898");
-    const displayName = isBurgerFridge
-      ? "Freestanding refrigerator 180 cm"
-      : item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
+    const displayName = item.nameSnapshot || item.name || item.kitchenItem?.name || catalogArticle?.name || catalogService?.name || item.nameDe || item.kitchenItem?.nameDe || "";
     const displayNameDe = cutleryLine
       ? cutleryVariant?.nameDe || displayName
-      : isBurgerFridge
-        ? "Standkühlschrank 180 cm"
       : item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || item.nameDe || "";
 
     return {
@@ -355,8 +350,8 @@ export function buildOrderForNotifications(orderRecord) {
       isLocked: Boolean(kitchenItem?.isLocked || item.isLocked),
       iconKey: kitchenItem?.iconKey || item.iconKey || "",
       componentKey: kitchenItem?.componentKey || item.componentKey || "",
-      widthMm: isBurgerFridge ? 545 : (kitchenItem?.widthMm || item.widthMm || null),
-      heightMm: isBurgerFridge ? 1800 : (kitchenItem?.heightMm || item.heightMm || null),
+      widthMm: kitchenItem?.widthMm || item.widthMm || null,
+      heightMm: kitchenItem?.heightMm || item.heightMm || null,
       productImagePath: productInformation.productImagePath,
       productInfoPdfPath: productInformation.productInfoPdfPath,
       productInfoSummary: productInformation.productInfoSummary,
