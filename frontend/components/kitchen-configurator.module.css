@@ -537,6 +537,12 @@
   pointer-events: none;
 }
 
+/* Claims still need the complete perspective drawing as readable context.
+   Keep unavailable parts muted without making the kitchen look fragmented. */
+.claimPlanImageContext {
+  opacity: 0.28;
+}
+
 .planImagePurchased {
   pointer-events: none;
 }

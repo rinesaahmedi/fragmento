@@ -100,6 +100,15 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 // plan system and are projected into the ASC display crop below.
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
   "burger-103898": [[57.662708, 59.30084], [64.033254, 58.211765], [77.073634, 60.329412], [70.945368, 61.398319]],
+  // Four visible outside sink strokes traced from the AB 105825 source plan.
+  // The wider source hotspot is only a generous click target and crosses the
+  // worktop edges, so it must not be used as the painted selection mask.
+  "ab-105825": [
+    [16.9875, 54.6],
+    [31.0015, 53.0],
+    [37.0075, 54.0],
+    [22.7075, 55.7],
+  ],
   // Four outside sink-bowl strokes in AB 105846's vector-plan coordinates.
   // The separate faucet silhouettes below remain clickable as one fixture.
   "ab-105846": [
@@ -117,6 +126,35 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
     [21.748219, 56.033613],
     [20.494062, 56.013445],
     [15.149644, 54.904202],
+  ],
+};
+
+// These drawings contain one source hotspot for the sink bowl followed by a
+// separate source hotspot for the faucet. Do not assign both claim identities
+// to both shapes.
+const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-105825"]);
+
+// Thin visual silhouettes traced around the faucet body. Source hotspot boxes
+// remain intentionally generous for interaction, but painting those boxes
+// would add rectangular edges that do not exist in the kitchen drawing.
+const FAUCET_SOURCE_POINTS_BY_SLUG = {
+  "ab-105825": [
+    [24.346793, 53.109244],
+    [24.346793, 47.058824],
+    [24.465558, 45.714286],
+    [24.940618, 44.537815],
+    [25.653207, 43.865546],
+    [26.484561, 43.361345],
+    [28.028504, 43.361345],
+    [28.028504, 43.02521],
+    [28.741093, 43.193277],
+    [28.622328, 46.890756],
+    [28.028504, 46.722689],
+    [28.028504, 45.714286],
+    [26.484561, 45.714286],
+    [25.653207, 46.218487],
+    [25.059382, 47.226891],
+    [25.059382, 53.109244],
   ],
 };
 
@@ -1318,6 +1356,16 @@ function lShapedSinkHotspot(hotspot, part, kitchenSlug) {
   return hotspotFromDisplayPoints(hotspot, part, points);
 }
 
+function faucetHotspot(hotspot, part, kitchenSlug) {
+  const sourcePlanPoints = FAUCET_SOURCE_POINTS_BY_SLUG[kitchenSlug];
+  const exactDisplayPoints = sourcePlanPoints
+    ? sourcePlanPointsToDisplay(hotspot, sourcePlanPoints)
+    : null;
+  return exactDisplayPoints
+    ? hotspotFromDisplayPoints(hotspot, part, exactDisplayPoints)
+    : existingClaimPartHotspot(hotspot, part);
+}
+
 function cooktopHotspot(hotspot, part, kitchenSlug) {
   const sourcePlanPoints = COOKTOP_SOURCE_POINTS_BY_SLUG[kitchenSlug];
   const exactDisplayPoints = sourcePlanPoints
@@ -1514,6 +1562,12 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     }
   }
   let worktopIndex = -1;
+  const sinkFixtureHotspotCount = (hotspots || []).filter(
+    (hotspot) => String(hotspot?.componentKey || "").trim() === "sink-faucet",
+  ).length;
+  const hasDedicatedSinkAndFaucetHotspots =
+    DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS.has(normalizedSlug)
+    && sinkFixtureHotspotCount > 1;
   const primarySinkFixtureIndex = (hotspots || []).findIndex(
     (hotspot) => String(hotspot?.componentKey || "").trim() === "sink-faucet",
   );
@@ -1558,18 +1612,24 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     const visibleSourceParts = sourceParts;
 
     return visibleSourceParts.flatMap((part) => {
+      if (
+        sourceComponentKey === "sink-faucet"
+        && hasDedicatedSinkAndFaucetHotspots
+      ) {
+        if (part.partKey === "sink" && hotspotIndex === primarySinkFixtureIndex) {
+          return [];
+        }
+        if (part.partKey === "faucet" && hotspotIndex === primarySinkFixtureIndex) {
+          return [];
+        }
+      }
       if (!hasVisibleSink && part.partKey === "sink") {
         return hotspotIndex === primarySinkFixtureIndex
           ? elevationSinkHotspot(hotspots, part, elevationSinkCabinetSourceKey) || []
           : [];
       }
       if (part.partKey === "faucet") {
-        return {
-          ...hotspot,
-          componentId: part.componentId,
-          componentKey: `claim-${part.partKey}`,
-          claimPartKey: part.partKey,
-        };
+        return faucetHotspot(hotspot, part, normalizedSlug);
       }
       if (hasVisibleSink && part.partKey === "sink") {
         // AB 105758 traces the faucet as three independently clickable
@@ -1577,6 +1637,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
         if (
           L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[normalizedSlug]
           && hotspotIndex !== primarySinkFixtureIndex
+          && !hasDedicatedSinkAndFaucetHotspots
         ) {
           return [];
         }

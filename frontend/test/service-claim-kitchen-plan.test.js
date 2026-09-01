@@ -17,6 +17,7 @@ import {
 import {
   buildServiceClaimComponentChoiceGroups,
   normalizeServiceClaimComponentChoiceSelection,
+  resolveServiceClaimPlanDisplayComponentIds,
 } from "../lib/service-claim-component-choices.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -732,6 +733,40 @@ test("L-shaped kitchens share sink-cabinet, sink, and faucet choices", () => {
         ],
       },
     ],
+  );
+});
+
+test("unresolved sink choices paint the complete shared assembly on the plan", () => {
+  const groups = buildServiceClaimComponentChoiceGroups([
+    { componentId: "component-claim-sink", claimPartKey: "sink", name: "Sink" },
+    { componentId: "component-claim-sink-cabinet", claimPartKey: "sink-cabinet", name: "Sink Cabinet" },
+    { componentId: "component-claim-faucet", claimPartKey: "faucet", name: "Faucet" },
+  ]);
+
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds(
+      ["component-claim-sink-cabinet"],
+      groups,
+      {},
+    ),
+    [
+      "component-claim-sink-cabinet",
+      "component-claim-sink",
+      "component-claim-faucet",
+    ],
+  );
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds(
+      ["component-claim-sink-cabinet"],
+      groups,
+      {
+        "claim-choice-sink-cabinet-sink-faucet": [
+          "component-claim-sink",
+          "component-claim-faucet",
+        ],
+      },
+    ),
+    ["component-claim-sink", "component-claim-faucet"],
   );
 });
 
@@ -1558,7 +1593,7 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(source, /cropPlanHotspot/);
   assert.match(source, /croppedPlanAspectRatio/);
   assert.match(source, /clipPath id=\{imageClipPathId\}/);
-  assert.match(source, /className=\{styles\.planImageUnavailable\}[\s\S]*href=\{imageViewHref\}[\s\S]*preserveAspectRatio="none"/);
+  assert.match(source, /styles\.planImageUnavailable[\s\S]*styles\.claimPlanImageContext[\s\S]*href=\{imageViewHref\}[\s\S]*preserveAspectRatio="none"/);
   assert.match(source, /className=\{styles\.planImagePurchased\}[\s\S]*clipPath=\{`url\(#\$\{imageClipPathId\}\)`\}/);
   assert.match(source, /getHotspotSvgPolygonPoints/);
   assert.match(source, /getServiceClaimLinkedComponentIds\(kitchenSlug,\s*hotspot\.componentId\)[\s\S]*\.includes\(hoveredComponentId\)/);
@@ -1601,7 +1636,7 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(flowSource, /const nextChoiceIds = \[\];/);
   assert.match(flowSource, /return groupIsSelected[\s\S]*withoutGroup[\s\S]*choiceGroup\.triggerComponentId/);
   assert.match(flowSource, /confirmedProblemAreaChoiceByGroupKey/);
-  assert.match(flowSource, /return selectedChoiceIds\.length[\s\S]*choiceGroup\.options\.map\(\(option\) => option\.componentId\)/);
+  assert.match(flowSource, /resolveServiceClaimPlanDisplayComponentIds\([\s\S]*problemComponentIds[\s\S]*problemAreaChoiceGroups[\s\S]*problemAreaPartChoiceByGroupKey/);
   assert.doesNotMatch(flowSource, /confirmProblemAreaPartChoice/);
   assert.doesNotMatch(flowSource, /kitchenPlanPartChoiceConfirm/);
   assert.match(flowSource, /nextSelectedIds\.length[\s\S]*\[choiceGroup\.sourceComponentKey\]: true/);
@@ -2987,6 +3022,45 @@ test("AB 105825 claim sink follows the calibrated bowl polygon", () => {
   assert.equal(faucet.top, 40);
   assert.equal(faucet.width, 8);
   assert.equal(faucet.height, 14);
+});
+
+test("AB 105825 keeps its dedicated sink and faucet masks separate", () => {
+  const result = buildServiceClaimPartHotspots(
+    [
+      {
+        componentKey: "sink-faucet",
+        points: [[17.9, 53.95], [38.8, 52.9], [38.8, 56.75], [17.9, 58.35]],
+        left: 17.9,
+        top: 52.9,
+        width: 20.9,
+        height: 5.45,
+      },
+      {
+        componentKey: "sink-faucet",
+        points: [[22.35, 45.85], [29.5, 45.2], [29.5, 54.3], [22.35, 55.2]],
+        left: 22.35,
+        top: 45.2,
+        width: 7.15,
+        height: 10,
+      },
+    ],
+    [
+      { partKey: "sink", sourceComponentKey: "sink-faucet" },
+      { partKey: "faucet", sourceComponentKey: "sink-faucet" },
+    ],
+    "ab-105825",
+  );
+  const sinks = result.filter((entry) => entry.claimPartKey === "sink");
+  const faucets = result.filter((entry) => entry.claimPartKey === "faucet");
+
+  assert.equal(sinks.length, 1);
+  assert.equal(faucets.length, 1);
+  assert.ok(Math.abs(sinks[0].left - 16.9875) < 0.000001);
+  assert.ok(Math.abs(sinks[0].width - 20.02) < 0.000001);
+  assert.ok(Math.abs(faucets[0].left - 24.346793) < 0.000001);
+  assert.ok(Math.abs(faucets[0].width - 4.3943) < 0.000001);
+  assert.match(sinks[0].clipPath, /^polygon\(/);
+  assert.match(faucets[0].clipPath, /^polygon\(/);
 });
 
 test("all L-shaped claim plans separate the complete faucet from the sink bowl", () => {

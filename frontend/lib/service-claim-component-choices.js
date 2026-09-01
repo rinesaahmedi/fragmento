@@ -197,3 +197,36 @@ export function normalizeServiceClaimComponentChoiceSelection(
 
   return normalizedIds;
 }
+
+/**
+ * Resolve the component masks that should be painted on the plan.
+ *
+ * A newly clicked contextual group has not been narrowed to an affected part
+ * yet, so paint the complete shared assembly. Once the customer chooses one or
+ * more individual parts, paint exactly those choices.
+ */
+export function resolveServiceClaimPlanDisplayComponentIds(
+  componentIds = [],
+  choiceGroups = [],
+  choicesByGroupKey = {},
+) {
+  const groupByOptionId = new Map(
+    (choiceGroups || []).flatMap((group) => (
+      group.options.map((option) => [option.componentId, group])
+    )),
+  );
+
+  return [...new Set((componentIds || []).flatMap((componentId) => {
+    const group = groupByOptionId.get(componentId);
+    if (!group) return [componentId];
+
+    const storedChoices = choicesByGroupKey?.[group.sourceComponentKey];
+    const selectedChoiceIds = Array.isArray(storedChoices)
+      ? storedChoices
+      : storedChoices ? [storedChoices] : [];
+
+    return selectedChoiceIds.length
+      ? selectedChoiceIds
+      : group.options.map((option) => option.componentId);
+  }))];
+}

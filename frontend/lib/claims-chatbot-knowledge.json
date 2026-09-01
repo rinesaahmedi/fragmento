@@ -2747,6 +2747,7 @@
     },
     {
       "id": "ewa-34660-w-cold-water-selected",
+      "userFacingProblem": "Display shows --°C",
       "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",

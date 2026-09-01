@@ -16,6 +16,7 @@ import {
 import {
   buildServiceClaimComponentChoiceGroups,
   normalizeServiceClaimComponentChoiceSelection,
+  resolveServiceClaimPlanDisplayComponentIds,
 } from "../lib/service-claim-component-choices";
 import {
   isServiceClaimContractLookupReady,
@@ -2616,17 +2617,14 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
         : normalized;
     });
   }, [problemAreaChoiceGroups]);
-  const problemPlanDisplayComponentIds = useMemo(() => problemComponentIds.flatMap((componentId) => {
-    const choiceGroup = problemAreaChoiceGroupByComponentId.get(componentId);
-    if (!choiceGroup) return [componentId];
-    const storedChoices = problemAreaPartChoiceByGroupKey[choiceGroup.sourceComponentKey];
-    const selectedChoiceIds = Array.isArray(storedChoices)
-      ? storedChoices
-      : storedChoices ? [storedChoices] : [];
-    return selectedChoiceIds.length
-      ? selectedChoiceIds
-      : choiceGroup.options.map((option) => option.componentId);
-  }), [problemAreaChoiceGroupByComponentId, problemAreaPartChoiceByGroupKey, problemComponentIds]);
+  const problemPlanDisplayComponentIds = useMemo(
+    () => resolveServiceClaimPlanDisplayComponentIds(
+      problemComponentIds,
+      problemAreaChoiceGroups,
+      problemAreaPartChoiceByGroupKey,
+    ),
+    [problemAreaChoiceGroups, problemAreaPartChoiceByGroupKey, problemComponentIds],
+  );
   const selectedProblemAreas = useMemo(() => {
     if (!activeKitchenPlan?.selectableComponents?.length || !problemComponentIds.length) {
       return [];

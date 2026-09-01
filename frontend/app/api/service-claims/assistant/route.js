@@ -3206,6 +3206,22 @@ function claimsAreaApplianceTypes(selectedAreas) {
   }));
 }
 
+function claimsCurrentQuestionApplianceTypes(question) {
+  const compactQuestion = normalizeClaimsMatchText(question);
+  const aliasTypes = arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries)
+    .filter((entry) => entry?.isActive !== false)
+    .filter((entry) => arrayValue(entry?.aliases).some((alias) => {
+      const compactAlias = normalizeClaimsMatchText(alias);
+      return compactAlias && compactQuestion.includes(compactAlias);
+    }))
+    .flatMap(claimsEntryApplianceTypes);
+
+  return dedupe([
+    ...detectKnowledgeApplianceTypes(question),
+    ...aliasTypes,
+  ]);
+}
+
 function getClaimsConversationText(conversationMessages) {
   return normalizeConversationMessages(conversationMessages)
     .filter((message) => message.role === "user")
@@ -3236,9 +3252,15 @@ function claimsTermScore(entry, currentText, combinedText) {
     else if (fuzzyTextHasAny(normalizeLanguageHintText(currentText), [normalized])) score += 18;
   }
 
-  const problemText = normalizeLanguageHintText(entry?.problem);
+  const problemText = normalizeLanguageHintText(entry?.userFacingProblem || entry?.problem);
+  const problemCompact = normalizeClaimsMatchText(entry?.userFacingProblem || entry?.problem);
   const currentNormalized = normalizeLanguageHintText(currentText);
   const combinedNormalized = normalizeLanguageHintText(combinedText);
+  if (problemCompact && currentCompact.includes(problemCompact)) {
+    score += Math.min(80, 20 + problemCompact.length);
+  } else if (problemCompact && combinedCompact.includes(problemCompact)) {
+    score += Math.min(35, 10 + problemCompact.length);
+  }
   if (problemText.includes("not working") && /\bnot working\b|\bdoes not work\b|\bdoesnt work\b|\bis not working\b/.test(currentNormalized)) {
     score += 35;
   } else if (problemText.includes("not working") && /\bnot working\b|\bdoes not work\b|\bdoesnt work\b|\bis not working\b/.test(combinedNormalized)) {
@@ -3295,6 +3317,7 @@ function findClaimsChatbotKnowledgeMatch({ question, claim, selectedAreas, conve
   const combinedText = `${currentText} ${conversationText}`;
   const compactCombined = normalizeClaimsMatchText(combinedText);
   const explicitCodes = extractErrorCodes(currentText);
+  const currentQuestionApplianceTypes = claimsCurrentQuestionApplianceTypes(question);
   const typedApplianceTypes = detectKnowledgeApplianceTypes(combinedText, selectedAreas);
   const areaApplianceTypes = claimsAreaApplianceTypes(selectedAreas);
   const applianceTypes = dedupe([...typedApplianceTypes, ...areaApplianceTypes]);
@@ -3307,11 +3330,17 @@ function findClaimsChatbotKnowledgeMatch({ question, claim, selectedAreas, conve
   const scored = arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries)
     .filter((entry) => entry?.isActive !== false)
     .filter((entry) => !disabledProductCodes.has(normalizeClaimsMatchText(entry?.productCode)))
+    .filter((entry) =>
+      !currentQuestionApplianceTypes.length
+      || claimsEntryApplianceTypes(entry).some((type) => currentQuestionApplianceTypes.includes(type))
+    )
     .map((entry) => {
       const aliasMatched = arrayValue(entry?.aliases).some((alias) =>
         compactCombined.includes(normalizeClaimsMatchText(alias))
       );
-      const applianceMatched = claimsEntryApplianceTypes(entry).some((type) => applianceTypes.includes(type));
+      const applianceMatched = claimsEntryApplianceTypes(entry).some((type) =>
+        (currentQuestionApplianceTypes.length ? currentQuestionApplianceTypes : applianceTypes).includes(type)
+      );
       const entryCodeText = normalizeClaimsMatchText(`${entry?.problem || ""} ${arrayValue(entry?.matchTerms).join(" ")}`);
       const supportsExplicitCode =
         !explicitCodes.length || explicitCodes.some((code) => entryCodeText.includes(normalizeClaimsMatchText(code)));
@@ -3336,7 +3365,7 @@ function buildClaimsEvidenceList(entry) {
 }
 
 function buildClaimsClaimPrompt(entry) {
-  return `Show claim-form help for ${entry.model}: ${entry.problem}`;
+  return `Show claim-form help for ${entry.model}: ${entry.userFacingProblem || entry.problem}`;
 }
 
 function claimsSafeUserCheck(entry) {
@@ -3349,6 +3378,10 @@ function claimsSafeUserCheck(entry) {
     return "Make sure the oven function and temperature are selected correctly, and check whether the household fuse/power supply is working.";
   }
   return safeCheck;
+}
+
+function claimsProblem(entry) {
+  return normalizeText(entry?.userFacingProblem || entry?.problem);
 }
 
 function claimsProductLabel(entry) {
@@ -3439,7 +3472,7 @@ function buildClaimsChatbotKnowledgeAnswer({ language, question, entry, claim, s
       : "If it becomes abnormal, repeated, or combined with another fault, please continue with a claim.";
     return {
       answer: [
-        `For the architecto ${claimsProductLabel(entry)}, this can be normal: ${entry.problem}.`,
+        `For the architecto ${claimsProductLabel(entry)}, this can be normal: ${claimsProblem(entry)}.`,
         safeUserCheck,
         `This can be normal behaviour and does not require a claim by itself. ${entry.claimTrigger}`,
         abnormalEvidence,
@@ -3450,7 +3483,7 @@ function buildClaimsChatbotKnowledgeAnswer({ language, question, entry, claim, s
   if (decision === "URGENT_CLAIM_STOP_USE") {
     return {
       answer: [
-        `For the architecto ${claimsProductLabel(entry)}, this needs urgent claim handling: ${entry.problem}.`,
+        `For the architecto ${claimsProductLabel(entry)}, this needs urgent claim handling: ${claimsProblem(entry)}.`,
         "Stop using the appliance now. Do not open electrical parts, dismantle the appliance, bypass safety features, or keep testing it.",
         safeUserCheck,
         evidenceSection,
@@ -3464,7 +3497,7 @@ function buildClaimsChatbotKnowledgeAnswer({ language, question, entry, claim, s
   if (decision === "CREATE_CLAIM_SERVICE") {
     return {
       answer: [
-        `For the architecto ${claimsProductLabel(entry)}, this likely requires service/claim handling: ${entry.problem}.`,
+        `For the architecto ${claimsProductLabel(entry)}, this likely requires service/claim handling: ${claimsProblem(entry)}.`,
         `Safe check: ${safeUserCheck}`,
         NO_FURTHER_SAFE_SELF_CHECK,
         evidenceSection,
@@ -3502,7 +3535,7 @@ function buildClaimsChatbotKnowledgeAnswer({ language, question, entry, claim, s
 
   return {
     answer: [
-      `For the architecto ${claimsProductLabel(entry)}, try this safe self-check first: ${entry.problem}.`,
+      `For the architecto ${claimsProductLabel(entry)}, try this safe self-check first: ${claimsProblem(entry)}.`,
       safeUserCheck,
       `Did this solve the issue? If it did not, ${NO_FURTHER_SAFE_SELF_CHECK}`,
     ].filter(Boolean).join("\n\n"),
@@ -3674,7 +3707,10 @@ function buildConversationPrompt(messages) {
 }
 
 function buildCurrentApplianceFocus(question, conversationMessages, selectedAreas) {
-  const currentMessageApplianceTypes = detectKnowledgeApplianceTypes(question, selectedAreas);
+  const explicitCurrentApplianceTypes = claimsCurrentQuestionApplianceTypes(question);
+  const currentMessageApplianceTypes = explicitCurrentApplianceTypes.length
+    ? explicitCurrentApplianceTypes
+    : detectKnowledgeApplianceTypes(question, selectedAreas);
   const previousUserMessages = normalizeConversationMessages(conversationMessages)
     .filter((message) => message.role === "user")
     .map((message) => message.text)
@@ -3682,7 +3718,10 @@ function buildCurrentApplianceFocus(question, conversationMessages, selectedArea
 
   const previousConversationApplianceTypes =
     previousUserMessages
-      .map((text) => detectKnowledgeApplianceTypes(text))
+      .map((text) => {
+        const explicitTypes = claimsCurrentQuestionApplianceTypes(text);
+        return explicitTypes.length ? explicitTypes : detectKnowledgeApplianceTypes(text);
+      })
       .find((types) => types.length > 0) || [];
 
   const applianceSwitchFromPrevious =

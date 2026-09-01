@@ -568,6 +568,62 @@ test("claims decision-guide urgent issue stops use and escalates immediately", a
   assert.ok(Array.isArray(response.body.actions));
 });
 
+test("explicit current product overrides an older urgent appliance issue", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const conversationMessages = [
+    { role: "user", text: "I am using my KHF 664 611 S hood without a grease filter." },
+    { role: "assistant", text: "Stop using the hood and create an urgent service claim." },
+  ];
+
+  const washingMachineResponse = await route.POST(request({
+    language: "en",
+    question: "My EWA34660W display shows --°C.",
+    conversationMessages,
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(washingMachineResponse.status, 200);
+  assert.match(washingMachineResponse.body.answer, /cold-water setting|heated washing/i);
+  assert.doesNotMatch(washingMachineResponse.body.answer, /urgent claim handling|grease filter/i);
+
+  const fridgeResponse = await route.POST(request({
+    language: "en",
+    question: "Fast Cool on my KGCN388140E switched off automatically.",
+    conversationMessages: [
+      ...conversationMessages,
+      { role: "user", text: "My EWA34660W display shows --°C." },
+      { role: "assistant", text: washingMachineResponse.body.answer },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(fridgeResponse.status, 200);
+  assert.match(fridgeResponse.body.answer, /Fast Cool (?:switches|stops) off automatically|Fast Cool stops automatically/i);
+  assert.doesNotMatch(fridgeResponse.body.answer, /urgent claim handling|grease filter/i);
+});
+
+test("explicit current appliance overrides an older urgent appliance issue", async () => {
+  delete process.env.OPENAI_API_KEY;
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "Water is collecting because the fridge drain is blocked.",
+    conversationMessages: [
+      { role: "user", text: "I am using my KHF 664 611 S hood without a grease filter." },
+      { role: "assistant", text: "Stop using the hood and create an urgent service claim." },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /accessible discharge opening|drain opening/i);
+  assert.doesNotMatch(response.body.answer, /urgent claim handling|grease filter/i);
+});
+
 test("Claims does not use the unverified OL-KMI manual for 9EC744100C", () => {
   const route = loadRoute();
   const entries = CLAIMS_CHATBOT_KNOWLEDGE.entries.filter((entry) => entry.itemType === "induction_hob");
@@ -1049,6 +1105,48 @@ test("OpenAI context marks appliance switches so latest user issue wins", async 
 
   assert.equal(response.status, 200);
   assert.equal(response.body.answer, "This is about the washing machine now.");
+});
+
+test("OpenAI context recognizes a model-only switch from an older urgent appliance", async () => {
+  process.env.OPENAI_API_KEY = "test-key";
+
+  installFetchMock(async (_url, init) => {
+    const payload = JSON.parse(init.body);
+    const text = payload.input[0].content[0].text;
+
+    assert.match(text, /"current_message_appliance_types": \[\s*"washing_machine"\s*\]/);
+    assert.match(text, /"previous_conversation_appliance_types": \[\s*"extractor_hood"\s*\]/);
+    assert.match(text, /"appliance_switch_from_previous": true/);
+
+    return {
+      ok: true,
+      async json() {
+        return {
+          output_text: JSON.stringify({
+            answer: "The --°C display is the washing machine's cold-water setting.",
+            showClaimFormHelpAction: false,
+            suggestedProblemDescription: null,
+          }),
+        };
+      },
+    };
+  });
+
+  const route = loadRoute();
+  const response = await route.POST(request({
+    language: "en",
+    question: "My EWA34660W display shows --°C.",
+    conversationMessages: [
+      { role: "user", text: "I am using my KHF 664 611 S hood without a grease filter." },
+      { role: "assistant", text: "Stop using the hood and create an urgent service claim." },
+    ],
+    selectedAreas: [],
+    claim: emptyClaim(),
+  }));
+
+  assert.equal(response.status, 200);
+  assert.match(response.body.answer, /washing machine's cold-water setting/i);
+  assert.doesNotMatch(response.body.answer, /grease filter/i);
 });
 
 test("misspelled dishwasher question still opens dishwasher triage", async () => {

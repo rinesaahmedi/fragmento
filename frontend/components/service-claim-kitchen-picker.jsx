@@ -459,7 +459,7 @@ export default function ServiceClaimKitchenPicker({
                 </defs>
                 <image
                   aria-hidden="true"
-                  className={styles.planImageUnavailable}
+                  className={`${styles.planImageUnavailable} ${styles.claimPlanImageContext}`}
                   href={imageViewHref}
                   x={-(planDisplayCrop.left / planDisplayCrop.width) * 100}
                   y={-(planDisplayCrop.top / planDisplayCrop.height) * 100}
