@@ -64,6 +64,12 @@ const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   "ab-105817": { "base-module-2": 2 },
 };
 const CLAIM_BLENDE_META_OVERRIDES_BY_SLUG = {};
+const CLAIM_STANDALONE_BLENDE_SOURCE_KEYS_BY_SLUG = {
+  "ab-105745": new Set(["sink-base"]),
+  "ab-105748": new Set(["sink-base"]),
+  "ab-105751": new Set(["sink-base"]),
+  "ab-105754": new Set(["sink-base"]),
+};
 const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
   "ab-104968": { "base-module-2": 2 },
   "ab-105734": { "base-module-2": 2 },
@@ -85,6 +91,40 @@ const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
   "ab-105756": { "base-module-2": 2 },
 };
 const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
+  // The live AB 105745 kitchen row can predate its UPEF65 metadata. The panel
+  // is visibly drawn beside the sink cabinet and must exist independently in claims.
+  "ab-105745": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPEF65",
+      name: "UPEF65 Corner Filler Panel",
+      nameDe: "UPEF65 Eckpassblende",
+    },
+  ],
+  "ab-105748": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPEF65",
+      name: "UPEF65 Corner Filler Panel",
+      nameDe: "UPEF65 Eckpassblende",
+    },
+  ],
+  "ab-105751": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPEF65",
+      name: "UPEF65 Corner Filler Panel",
+      nameDe: "UPEF65 Eckpassblende",
+    },
+  ],
+  "ab-105754": [
+    {
+      sourceComponentKey: "sink-base",
+      code: "UPEF65",
+      name: "UPEF65 Corner Filler Panel",
+      nameDe: "UPEF65 Eckpassblende",
+    },
+  ],
   // The left end panel beside the US30 is drawn in this shared layout, but
   // legacy KitchenItem data did not retain its commercial UPK20 reference.
   "ab-105822": [
@@ -596,6 +636,9 @@ export function buildServiceClaimSelectableComponents({
   const blendeMetaOverrides = CLAIM_BLENDE_META_OVERRIDES_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
+  const standaloneBlendeSourceKeys = CLAIM_STANDALONE_BLENDE_SOURCE_KEYS_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || new Set();
   const claimBlenden = sourceItems
     .map(({ item }) => buildClaimBlendeMeta(item))
     .filter(Boolean)
@@ -608,6 +651,11 @@ export function buildServiceClaimSelectableComponents({
     .map((entry) => (
       companionBlendeSourceKeys.has(entry.sourceComponentKey)
         ? { ...entry, isCompanionOption: true }
+        : entry
+    ))
+    .map((entry) => (
+      standaloneBlendeSourceKeys.has(entry.sourceComponentKey)
+        ? { ...entry, isStandaloneClaimOption: true }
         : entry
     ))
     .flatMap((entry) => {
@@ -646,9 +694,15 @@ export function buildServiceClaimSelectableComponents({
       },
     });
     if (meta) {
-      const resolvedMeta = companionBlendeSourceKeys.has(meta.sourceComponentKey)
-        ? { ...meta, isCompanionOption: true }
-        : meta;
+      const resolvedMeta = {
+        ...meta,
+        ...(companionBlendeSourceKeys.has(meta.sourceComponentKey)
+          ? { isCompanionOption: true }
+          : {}),
+        ...(standaloneBlendeSourceKeys.has(meta.sourceComponentKey)
+          ? { isStandaloneClaimOption: true }
+          : {}),
+      };
       claimBlenden.push(resolvedMeta);
       claimBlendeSourceKeys.add(resolvedMeta.sourceComponentKey);
     }

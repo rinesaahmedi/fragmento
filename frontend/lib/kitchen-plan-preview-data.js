@@ -486,8 +486,10 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-2", points: [[51.92, 57.31], [62.3, 59.31], [62.3, 91.55], [51.92, 89.52]] },
     { componentKey: "base-module-3", points: [[72.33, 61.34], [82.67, 63.36], [82.67, 95.55], [72.33, 93.56]] },
     { componentKey: "base-module-3", points: [[82.67, 63.46], [94.54, 62.03], [94.54, 93.74], [82.67, 95.55]] },
-    { componentKey: "sink-faucet", points: [[62.31, 59.71], [72.3, 61.25], [72.41, 93.32], [62.22, 91.82]], preserveManualSize: true },
-    { componentKey: "sink-faucet", points: [[70.82, 45.98], [75.81, 46.98], [75.81, 58.89], [71.95, 58.89]], preserveManualSize: true },
+    // The corner cabinet is a separate selectable base; only the small
+    // elevated faucet silhouette belongs to the sink fixture.
+    { componentKey: "corner-base", points: [[62.31, 59.71], [72.3, 61.25], [72.41, 93.32], [62.22, 91.82]], preserveManualSize: true },
+    { componentKey: "sink-faucet", points: [[69.95, 45.98], [76.1, 45.98], [76.1, 58.89], [69.95, 58.89]], preserveManualSize: true },
   ],
   "ab-105837": [
     { componentKey: "refrigerator", points: [[10.86, 29.72], [19.92, 28.48], [29.88, 30.14], [19.92, 31.35]] },
@@ -518,7 +520,9 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     // The broad face at the far right is the separately claimable WU16 cabinet
     // side panel, not a second face of base-module-3.
     { componentKey: "worktop", points: [[80.05, 63.02], [91.22, 61.30], [91.22, 91.1], [80.05, 92.25]], preserveManualSize: true },
-    { componentKey: "sink-faucet", points: [[64.65, 56.05], [76.95, 55.82], [82.35, 57.02], [80.28, 59.28], [67.18, 58.92], [64.0, 57.55]], preserveManualSize: true },
+    // Match the order-page plan: this source shape is the faucet fixture;
+    // the sink bowl is derived separately by the ASC claim-part mapper.
+    { componentKey: "sink-faucet", points: [[68.6, 46.7], [75.1, 46.7], [75.1, 56.5], [68.6, 56.75]], preserveManualSize: true },
   ],
   "ab-105825": [
     {
