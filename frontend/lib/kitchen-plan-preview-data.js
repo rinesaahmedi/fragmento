@@ -1382,8 +1382,8 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
 // AB 105831 measured correction. The original entry above was generated from
 // a cropped draft and duplicated cabinet/worktop faces, which made ASC
 // selections paint over the CAD seams. Keep one polygon per visible face and
-// use the updated report coordinates. Assign after the table so aliases stay
-// untouched.
+// use the corrected source-elevation coordinates. Assign after the table so
+// aliases stay untouched.
 PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = [
   { componentKey: "wall-cabinet-1", points: [[48.02, 15.55], [57.97, 16.85], [57.97, 42.35], [48.02, 40.85]] },
   { componentKey: "wall-cabinet-2", points: [[57.97, 17.14], [67.11, 20.0], [67.11, 43.87], [57.97, 41.45]] },
@@ -1391,16 +1391,19 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = [
   { componentKey: "wall-cabinet-3", points: [[67.11, 20.0], [74.78, 21.25], [74.78, 45.48], [67.11, 43.87]] },
   { componentKey: "wall-cabinet-4", points: [[74.78, 21.25], [79.37, 20.52], [79.37, 36.9], [74.78, 35.32]] },
   { componentKey: "wall-cabinet-4", points: [[79.37, 20.52], [85.58, 21.25], [85.58, 36.9], [79.37, 36.9]] },
-  { componentKey: "worktop", points: [[5.3, 59.85], [14.55, 59.0], [31.45, 58.05], [43.35, 58.3], [43.35, 59.8], [31.45, 60.55], [14.55, 61.2], [5.3, 62.0]] },
-  { componentKey: "worktop", points: [[43.35, 58.3], [53.25, 57.25], [66.5, 59.35], [83.05, 58.55], [83.05, 60.0], [74.75, 62.65], [62.35, 61.55], [53.25, 60.35], [43.35, 59.8]] },
+  { componentKey: "worktop", points: [[5.3, 60.85], [14.55, 59.0], [35.05, 56.45], [43.35, 58.3], [43.35, 59.8], [35.45, 60.55], [15.55, 63.8], [5.3, 62.0]] },
+  { componentKey: "worktop", points: [[43.35, 58.3], [55.25, 56.75], [65.55, 59.05], [74.95, 61.0], [74.75, 62.65], [62.35, 61.55], [53.25, 60.35], [43.35, 59.8]] },
+  // Thin front face of the right worktop. Its upper edge exactly shares the
+  // top surface boundary, avoiding a white seam or an overlap above the top.
+  { componentKey: "worktop", points: [[43.35, 59.8], [53.25, 60.35], [62.35, 61.55], [74.75, 62.65], [74.75, 66.2], [59.35, 62.7], [52.25, 61.5], [45.35, 59.95]], preserveManualSize: true },
   { componentKey: "sink-faucet", points: [[17.8, 57.5], [38.05, 56.9], [38.05, 59.35], [17.8, 60.25]], preserveManualSize: true },
   { componentKey: "sink-faucet", points: [[25.05, 49.15], [30.8, 48.45], [30.8, 58.15], [25.05, 58.65]], preserveManualSize: true },
   { componentKey: "base-module-1", points: [[5.3, 62.0], [14.55, 61.2], [14.55, 92.2], [5.3, 89.8]] },
   { componentKey: "base-module-1", points: [[14.55, 61.2], [20.45, 61.75], [20.45, 91.47], [14.55, 92.2]] },
   { componentKey: "base-module-3", points: [[20.45, 61.75], [31.45, 60.55], [31.45, 90.1], [20.45, 91.47]] },
-  { componentKey: "sink-base", points: [[31.45, 60.55], [42.25, 59.8], [42.25, 88.75], [31.45, 90.1]] },
+  { componentKey: "sink-base", points: [[31.45, 61.55], [42.55, 59.8], [42.25, 89.25], [31.45, 90.8]] },
   { componentKey: "base-module-2", points: [[44.05, 59.8], [53.25, 60.35], [53.25, 89.4], [44.05, 87.85]] },
-  { componentKey: "oven-module", points: [[53.25, 60.35], [62.35, 61.55], [62.35, 91.0], [53.25, 89.4]] },
+  { componentKey: "oven-module", points: [[53.25, 61.55], [62.35, 63.55], [62.35, 92.7], [53.25, 91.2]] },
   { componentKey: "drawer-module", points: [[62.35, 61.55], [70.08, 62.24], [70.08, 92.56], [62.35, 91.0]] },
   { componentKey: "base-module-4", points: [[70.08, 62.24], [74.75, 62.65], [74.75, 93.5], [70.08, 92.56]] },
   { componentKey: "refrigerator", points: [[74.89, 34.31], [83.39, 37.34], [83.39, 96.49], [74.89, 95.16]] },

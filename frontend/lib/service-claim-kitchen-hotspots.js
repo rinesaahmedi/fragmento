@@ -109,11 +109,14 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
     [37.0075, 54.0],
     [22.7075, 55.7],
   ],
+  // Follow the four visible outside corners of the perspective sink. The
+  // source hotspot remains wider for clicking, but this painted mask must not
+  // whiten the surrounding worktop at its square bounding-box corners.
   "ab-105831": [
-    [17.8, 57.5],
-    [38.05, 56.9],
-    [38.05, 59.35],
-    [17.8, 60.25],
+    [17.65, 59.16],
+    [31.82, 56.75],
+    [38.06, 58.18],
+    [23.2, 60.58],
   ],
   // Four outside sink-bowl strokes in AB 105846's vector-plan coordinates.
   // The separate faucet silhouettes below remain clickable as one fixture.
@@ -820,9 +823,8 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel"],
   },
   "ab-105831": {
-    // The measured report provides one complete polygon per worktop run;
-    // mapping the old fascia duplicates created overlapping ASC seams.
-    indexPartKeys: ["worktop-left", "worktop-right"],
+    // The third polygon is the thin front face of the right worktop.
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-right"],
   },
   "ab-105743": {
     // Top surfaces, front fascias, then the floor-height end panel.
