@@ -113,7 +113,7 @@ test("AB 105845 dishwasher internals remain light grey above selection fills", (
 
   assert.deepEqual(
     PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105845"].map((detail) => detail.key),
-    ["dishwasher-basket", "dishwasher-gs-mark"],
+    ["dishwasher-basket"],
   );
   assert.ok(
     PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105845"].every(
@@ -123,6 +123,8 @@ test("AB 105845 dishwasher internals remain light grey above selection fills", (
   assert.match(styles, /\.planPersistentLightDetail\s*\{[^}]*invert\(92%\)/s);
   assert.doesNotMatch(styles, /\.planPersistentLightDetail\s*\{[^}]*mix-blend-mode/s);
   assert.match(stage, /if \(isDetailComponentSelected && !detail\.persistWhenSelected\) return null/);
+  assert.match(stage, /planPersistentLightDetailBacking/);
+  assert.match(styles, /\.planHotspotLayer\s*\{[^}]*z-index:\s*20/);
 });
 
 test("AB 105845 30 cm lower cabinet has a visible width-scaled catalog icon", () => {
@@ -274,6 +276,18 @@ test("AB 105862 basket matches the green selection tint like AB 105825", () => {
   ]);
   assert.equal(details.find((detail) => detail.key === "dishwasher-basket")?.persistWhenSelected, true);
   assert.equal(details.find((detail) => detail.key === "dishwasher-gs-mark")?.persistWhenSelected, undefined);
+  assert.deepEqual(
+    details.find((detail) => detail.key === "dishwasher-basket"),
+    {
+      key: "dishwasher-basket",
+      componentKey: "base-module-5",
+      left: 54.25,
+      top: 58.1,
+      width: 4,
+      height: 2.55,
+      persistWhenSelected: true,
+    },
+  );
 });
 
 test("AB 105847 layout clones reuse its complete plan, selection model, and contracts", () => {

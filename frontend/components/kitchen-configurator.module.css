@@ -556,6 +556,13 @@
   pointer-events: none;
 }
 
+.planPersistentLightDetailBacking {
+  position: absolute;
+  z-index: 14;
+  background: #fff;
+  pointer-events: none;
+}
+
 /* AB 105862 keeps the basket visible after selection, but blends its linework
    into the same light green selection fill as the cabinet beneath it. */
 .planPersistentSelectedDetail {
@@ -567,6 +574,7 @@
 .planHotspotLayer {
   position: absolute;
   inset: 0;
+  z-index: 20;
   isolation: isolate;
   pointer-events: none;
 }

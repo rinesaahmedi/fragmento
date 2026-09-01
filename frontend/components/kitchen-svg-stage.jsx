@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./kitchen-configurator.module.css";
 import {
   componentIdForItem,
@@ -2748,16 +2748,29 @@ export default function useKitchenSvgStage({
 
                     if (isCompactMobilePlan) {
                       return (
-                        <CompactMobilePlanArtwork
-                          key={detail.key}
-                          href={imageViewHref}
-                          crop={activePlanDisplayCrop}
-                          layout={mobilePlanLayout}
-                          idSuffix={`${normalizedKitchenSlug}-${detail.key}`}
-                          clipGeometry={detail}
-                          className={persistentDetailClassName}
-                          style={{ inset: 0, width: "100%", height: "100%" }}
-                        />
+                        <Fragment key={detail.key}>
+                          {!isDetailComponentSelected ? (
+                            <div
+                              className={styles.planPersistentLightDetailBacking}
+                              style={{
+                                left: `${detail.left}%`,
+                                top: `${detail.top}%`,
+                                width: `${detail.width}%`,
+                                height: `${detail.height}%`,
+                              }}
+                            />
+                          ) : null}
+                          <CompactMobilePlanArtwork
+                            key={detail.key}
+                            href={imageViewHref}
+                            crop={activePlanDisplayCrop}
+                            layout={mobilePlanLayout}
+                            idSuffix={`${normalizedKitchenSlug}-${detail.key}`}
+                            clipGeometry={detail}
+                            className={persistentDetailClassName}
+                            style={{ inset: 0, width: "100%", height: "100%" }}
+                          />
+                        </Fragment>
                       );
                     }
 
@@ -2766,18 +2779,30 @@ export default function useKitchenSvgStage({
                     const clipPath = `polygon(${detail.left}% ${detail.top}%, ${right}% ${detail.top}%, ${right}% ${bottom}%, ${detail.left}% ${bottom}%)`;
 
                     return (
-                      <img
-                        key={detail.key}
-                        src={imageViewHref}
-                        alt=""
-                        aria-hidden="true"
-                        className={persistentDetailClassName}
-                        style={{
-                          ...planImageInteractiveStyle,
-                          clipPath,
-                          WebkitClipPath: clipPath,
-                        }}
-                      />
+                      <Fragment key={detail.key}>
+                        {!isDetailComponentSelected ? (
+                          <div
+                            className={styles.planPersistentLightDetailBacking}
+                            style={{
+                              ...planImageInteractiveStyle,
+                              clipPath,
+                              WebkitClipPath: clipPath,
+                            }}
+                          />
+                        ) : null}
+                        <img
+                          key={detail.key}
+                          src={imageViewHref}
+                          alt=""
+                          aria-hidden="true"
+                          className={persistentDetailClassName}
+                          style={{
+                            ...planImageInteractiveStyle,
+                            clipPath,
+                            WebkitClipPath: clipPath,
+                          }}
+                        />
+                      </Fragment>
                     );
                   })}
                   {splitKitchenSideLabels.length ? (

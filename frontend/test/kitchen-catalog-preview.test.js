@@ -123,11 +123,11 @@ test("AB 105828 catalog preview uses the AB 105825 layout", () => {
 test("AB 105831 hood underside belongs to extractor hood instead of cabinet", () => {
   const cabinetFace = PLAN_HOTSPOTS_BY_SLUG["ab-105831"].find((hotspot) =>
     hotspot.componentKey === "wall-cabinet-2"
-    && hotspot.points?.some(([x, y]) => x === 67.11 && y === 43.65)
+    && hotspot.points?.some(([x, y]) => x === 67.11 && y === 43.87)
   );
   const hoodUndersides = PLAN_HOTSPOTS_BY_SLUG["ab-105831"].filter((hotspot) =>
     hotspot.componentKey === "extractor-hood"
-    && hotspot.points?.some(([x, y]) => x === 57.97 && y === 41.45)
+    && hotspot.points?.some(([x, y]) => x === 60.25 && y === 43.0)
   );
 
   assert.ok(cabinetFace);
