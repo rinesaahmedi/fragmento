@@ -174,14 +174,14 @@ const CATALOG_ARTICLES = [
   { articleNumber: "OL-KGCN388140E", name: "Freestanding Refrigerator 181 cm", nameDe: "Standkühlschrank 181 cm", heightMm: 1810, depthMm: null, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US100", name: "Lower Cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US120", name: "Lower Cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A100", name: "Lower Cabinet with 3 Drawers 100 cm", nameDe: "Unterschrank mit Schublade/Auszug 100", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A30", name: "Lower Cabinet with 3 Drawers 30 cm", nameDe: "Unterschrank mit Schublade/Auszug 30", widthMm: 300, price: "298.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A40", name: "Lower Cabinet with 3 Drawers 40 cm", nameDe: "Unterschrank mit Schublade/Auszug 40", widthMm: 400, price: "305.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A45", name: "Lower Cabinet with 3 Drawers 45 cm", nameDe: "Unterschrank mit Schublade/Auszug 45", widthMm: 450, price: "316.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A50", name: "Lower Cabinet with 3 Drawers 50 cm", nameDe: "Unterschrank mit Schublade/Auszug 50", widthMm: 500, price: "324.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit Schublade/Auszug 60", widthMm: 600, price: "369.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A80", name: "Lower Cabinet with 3 Drawers 80 cm", nameDe: "Unterschrank mit Schublade/Auszug 80", widthMm: 800, price: "466.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A90", name: "Lower Cabinet with 3 Drawers 90 cm", nameDe: "Unterschrank mit Schublade/Auszug 90", widthMm: 900, price: "471.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A100", name: "Lower Cabinet with 3 Drawers 100 cm", nameDe: "Unterschrank mit 3 Schubladen 100 cm", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A30", name: "Lower Cabinet with 3 Drawers 30 cm", nameDe: "Unterschrank mit 3 Schubladen 30 cm", widthMm: 300, price: "298.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A40", name: "Lower Cabinet with 3 Drawers 40 cm", nameDe: "Unterschrank mit 3 Schubladen 40 cm", widthMm: 400, price: "305.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A45", name: "Lower Cabinet with 3 Drawers 45 cm", nameDe: "Unterschrank mit 3 Schubladen 45 cm", widthMm: 450, price: "316.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A50", name: "Lower Cabinet with 3 Drawers 50 cm", nameDe: "Unterschrank mit 3 Schubladen 50 cm", widthMm: 500, price: "324.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit 3 Schubladen 60 cm", widthMm: 600, price: "369.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A80", name: "Lower Cabinet with 3 Drawers 80 cm", nameDe: "Unterschrank mit 3 Schubladen 80 cm", widthMm: 800, price: "466.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A90", name: "Lower Cabinet with 3 Drawers 90 cm", nameDe: "Unterschrank mit 3 Schubladen 90 cm", widthMm: 900, price: "471.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US30", name: "Lower Cabinet with drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300, price: "175.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US40", name: "Lower Cabinet with drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", widthMm: 400, price: "183.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US45", name: "Lower Cabinet with drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", widthMm: 450, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -3277,9 +3277,8 @@ async function main() {
       const catalogService = catalogServiceCode
         ? catalogServiceByCode.get(catalogServiceCode)
         : null;
-      const catalogBlendeQuantity = catalogBlende
-        ? isStandaloneCatalogBlende ? 1 : Math.max(1, getBlendeQuantity(item))
-        : null;
+      const catalogBlendeQuantity = catalogBlende ? Math.max(1, getBlendeQuantity(item)) : null;
+      const resolvedCatalogBlendeQuantity = isStandaloneCatalogBlende ? 1 : catalogBlendeQuantity;
       const data = {
         ...productInfo,
         productInfoUpdatedAt: productInfo.productInfoPdfPath ? new Date() : null,
@@ -3314,7 +3313,7 @@ async function main() {
         blendePrice: isStandaloneCatalogBlende ? null : item.blendePrice ?? null,
         catalogArticleId: catalogArticle?.id || null,
         catalogBlendeId: catalogBlende?.id || null,
-        catalogBlendeQuantity,
+        catalogBlendeQuantity: resolvedCatalogBlendeQuantity,
         catalogServiceId: catalogService?.id || null,
         catalogLinkStatus: catalogArticle || catalogBlende || catalogService ? "MATCHED" : null,
       };
@@ -3440,10 +3439,10 @@ async function main() {
         .some((articleCode) => articleCode.trim().toUpperCase() === "TGV60")
     ));
     if (dishwasher60Source) {
-      for (const part of [
+      const dishwasherClaimParts = [
         {
           partKey: "dishwasher",
-          articleCode: kitchen.slug === "burger-103898" ? "A-EGSPV597210" : "A-EGSPV594400",
+          articleCode: "A-EGSPV594400",
           name: "Fully Integrated Dishwasher",
           nameDe: "Vollintegrierter Geschirrspüler",
           sortOrder: 32,
@@ -3455,7 +3454,12 @@ async function main() {
           nameDe: "Möbelfront (Geschirrspüler)",
           sortOrder: 34,
         },
-      ]) {
+      ].map((part) => (
+        kitchen.slug === "burger-103898" && part.partKey === "dishwasher"
+          ? { ...part, articleCode: "A-EGSPV597210" }
+          : part
+      ));
+      for (const part of dishwasherClaimParts) {
         await prisma.kitchenClaimPart.upsert({
           where: {
             kitchenId_partKey: {

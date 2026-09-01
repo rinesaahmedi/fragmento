@@ -22,7 +22,7 @@ const CATALOG_ARTICLES = [
   { articleNumber: "KHF664611S", name: "Angled extractor hood", nameDe: "Schrägesse", price: "209.00", itemType: ItemType.COMPONENT },
   { articleNumber: "KHF664611S + FWP18", name: "Angled extractor hood + filter", nameDe: "Schrägesse + Filter", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true },
   { articleNumber: "OL-KGCN388140E", name: "Freestanding refrigerator 178 cm", nameDe: "Standkühlschrank 178 cm", price: "579.00", itemType: ItemType.COMPONENT },
-  { articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit Schublade/Auszug 60", widthMm: 600, heightMm: 720, depthMm: 600, price: "369.00", itemType: ItemType.COMPONENT },
+  { articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit 3 Schubladen 60 cm", widthMm: 600, heightMm: 720, depthMm: 600, price: "369.00", itemType: ItemType.COMPONENT },
   { articleNumber: "US30", name: "Lower cabinet with drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300, heightMm: 720, depthMm: 600, price: "175.00", itemType: ItemType.COMPONENT },
   { articleNumber: "US40", name: "Lower cabinet with drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", widthMm: 400, heightMm: 720, depthMm: 600, price: "183.00", itemType: ItemType.COMPONENT },
   { articleNumber: "US45", name: "Lower cabinet with drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", widthMm: 450, heightMm: 720, depthMm: 600, price: "198.00", itemType: ItemType.COMPONENT },

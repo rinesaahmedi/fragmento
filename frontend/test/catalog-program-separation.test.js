@@ -65,7 +65,7 @@ test("Impuls seed keeps the canonical cabinet casing and dimensions", () => {
   assert.doesNotMatch(refrigerator, /widthMm/);
   assert.match(seed, /name: "Upper Cabinet 60 cm"/);
   assert.match(seed, /US60: \{ name: "Lower Cabinet with Drawer 60 cm" \}/);
-  assert.match(seed, /articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit Schublade\/Auszug 60"/);
+  assert.match(seed, /articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit 3 Schubladen 60 cm"/);
   for (const width of ["30", "40", "45", "50", "60", "80", "90", "100"]) {
     assert.match(seed, new RegExp(`articleNumber: "US2A${width}", name: "Lower Cabinet with 3 Drawers ${width} cm"`));
   }
