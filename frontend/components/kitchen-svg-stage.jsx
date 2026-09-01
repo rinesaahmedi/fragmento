@@ -2734,8 +2734,8 @@ export default function useKitchenSvgStage({
                       planLockedComponentIds.includes(detailComponentId)
                       || detailLinkedIds.some((linkedId) => selectedComponentIds.includes(linkedId));
 
-                    // Most pale source details belong only to the unselected drawing. Plans
-                    // whose appliance linework must remain grey above the green tint opt in.
+                    // The pale source details belong to the unselected plan drawing. Once the
+                    // component is selected, let the green selection tint show through.
                     if (isDetailComponentSelected && !detail.persistWhenSelected) return null;
 
                     const persistentDetailClassName = [

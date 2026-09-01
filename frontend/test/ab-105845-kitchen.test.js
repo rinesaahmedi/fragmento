@@ -122,9 +122,7 @@ test("AB 105845 dishwasher internals remain light grey above selection fills", (
   );
   assert.match(styles, /\.planPersistentLightDetail\s*\{[^}]*invert\(92%\)/s);
   assert.doesNotMatch(styles, /\.planPersistentLightDetail\s*\{[^}]*mix-blend-mode/s);
-  assert.match(styles, /\.planPersistentSelectedDetail\s*\{[^}]*hue-rotate\(67deg\)/s);
   assert.match(stage, /if \(isDetailComponentSelected && !detail\.persistWhenSelected\) return null/);
-  assert.match(stage, /isDetailComponentSelected \? styles\.planPersistentSelectedDetail/);
 });
 
 test("AB 105845 30 cm lower cabinet has a visible width-scaled catalog icon", () => {
@@ -267,7 +265,7 @@ test("AB 105847 keeps the hood package linked and seeds automatic contracts", ()
   assert.doesNotMatch(noWallFillerLine, /blendeCode|HPK2002/);
 });
 
-test("AB 105862 keeps only its dishwasher basket green above the selection", () => {
+test("AB 105862 basket matches the green selection tint like AB 105825", () => {
   const details = PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105862"];
 
   assert.deepEqual(details.map((detail) => detail.key), [

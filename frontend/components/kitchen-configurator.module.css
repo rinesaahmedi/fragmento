@@ -556,10 +556,12 @@
   pointer-events: none;
 }
 
-/* Match the pale green dishwasher-basket linework in AB 105825 after selection. */
+/* AB 105862 keeps the basket visible after selection, but blends its linework
+   into the same light green selection fill as the cabinet beneath it. */
 .planPersistentSelectedDetail {
-  filter: brightness(0) saturate(100%) invert(94%) sepia(29%) saturate(287%)
-    hue-rotate(67deg) brightness(83%) contrast(112%);
+  filter: invert(75%) sepia(11%) saturate(700%) hue-rotate(88deg) brightness(106%) contrast(89%);
+  mix-blend-mode: screen;
+  opacity: 0.72;
 }
 
 .planHotspotLayer {
