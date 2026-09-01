@@ -174,14 +174,14 @@ const CATALOG_ARTICLES = [
   { articleNumber: "OL-KGCN388140E", name: "Freestanding Refrigerator 181 cm", nameDe: "Standkühlschrank 181 cm", heightMm: 1810, depthMm: null, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US100", name: "Lower Cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US120", name: "Lower Cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A100", name: "Lower Cabinet with Drawer/Soft-close 100", nameDe: "Unterschrank mit Schublade/Auszug 100", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A30", name: "Lower Cabinet with Drawer/Soft-close 30", nameDe: "Unterschrank mit Schublade/Auszug 30", widthMm: 300, price: "298.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A40", name: "Lower Cabinet with Drawer/Soft-close 40", nameDe: "Unterschrank mit Schublade/Auszug 40", widthMm: 400, price: "305.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A45", name: "Lower Cabinet with Drawer/Soft-close 45", nameDe: "Unterschrank mit Schublade/Auszug 45", widthMm: 450, price: "316.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A50", name: "Lower Cabinet with Drawer/Soft-close 50", nameDe: "Unterschrank mit Schublade/Auszug 50", widthMm: 500, price: "324.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A60", name: "Lower Cabinet with Drawer/Soft-close 60", nameDe: "Unterschrank mit Auszügen 60 cm", widthMm: 600, price: "369.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A80", name: "Lower Cabinet with Drawer/Soft-close 80", nameDe: "Unterschrank mit Schublade/Auszug 80", widthMm: 800, price: "466.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "US2A90", name: "Lower Cabinet with Drawer/Soft-close 90", nameDe: "Unterschrank mit Schublade/Auszug 90", widthMm: 900, price: "471.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A100", name: "Lower Cabinet with 3 Drawers 100 cm", nameDe: "Unterschrank mit Schublade/Auszug 100", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A30", name: "Lower Cabinet with 3 Drawers 30 cm", nameDe: "Unterschrank mit Schublade/Auszug 30", widthMm: 300, price: "298.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A40", name: "Lower Cabinet with 3 Drawers 40 cm", nameDe: "Unterschrank mit Schublade/Auszug 40", widthMm: 400, price: "305.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A45", name: "Lower Cabinet with 3 Drawers 45 cm", nameDe: "Unterschrank mit Schublade/Auszug 45", widthMm: 450, price: "316.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A50", name: "Lower Cabinet with 3 Drawers 50 cm", nameDe: "Unterschrank mit Schublade/Auszug 50", widthMm: 500, price: "324.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit Schublade/Auszug 60", widthMm: 600, price: "369.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A80", name: "Lower Cabinet with 3 Drawers 80 cm", nameDe: "Unterschrank mit Schublade/Auszug 80", widthMm: 800, price: "466.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "US2A90", name: "Lower Cabinet with 3 Drawers 90 cm", nameDe: "Unterschrank mit Schublade/Auszug 90", widthMm: 900, price: "471.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US30", name: "Lower Cabinet with drawer 30 cm", nameDe: "Unterschrank mit Schublade 30 cm", widthMm: 300, price: "175.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US40", name: "Lower Cabinet with drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", widthMm: 400, price: "183.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US45", name: "Lower Cabinet with drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", widthMm: 450, price: "198.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -3106,6 +3106,12 @@ async function main() {
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPassword = process.env.ADMIN_PASSWORD;
   const onlyKitchenSlug = String(process.env.SEED_ONLY_KITCHEN_SLUG || "").trim().toLowerCase();
+  // Production deploys must not recreate or overwrite records that an admin
+  // has edited. Set SEED_RECONCILE_EXISTING=true only for an intentional,
+  // operator-approved structural reconciliation.
+  const reconcileExistingEnabled = String(process.env.SEED_RECONCILE_EXISTING || "")
+    .trim()
+    .toLowerCase() === "true";
   const kitchensToSeed = onlyKitchenSlug
     ? DEFAULT_KITCHENS.filter((kitchen) => kitchen.slug === onlyKitchenSlug)
     : DEFAULT_KITCHENS;
@@ -3124,28 +3130,6 @@ async function main() {
   }
 
   await seedCatalogMasterData();
-  await prisma.catalogArticle.updateMany({
-    where: { articleNumber: "OL-KGCN388140E" },
-    data: {
-      name: REFRIGERATOR_CATALOG_NAME_EN,
-      nameDe: REFRIGERATOR_CATALOG_NAME_DE,
-      widthMm: null,
-      heightMm: 1810,
-    },
-  });
-  await prisma.catalogArticle.updateMany({
-    where: { articleNumber: { in: ["US50", "US60"] } },
-    data: {
-      heightMm: null,
-      depthMm: null,
-    },
-  });
-  for (const article of CATALOG_ARTICLES.filter((entry) => /^(?:H\d+|US)/.test(entry.articleNumber))) {
-    await prisma.catalogArticle.updateMany({
-      where: { articleNumber: article.articleNumber },
-      data: { name: article.name },
-    });
-  }
 
   const catalogArticleByNumber = new Map(
     (await prisma.catalogArticle.findMany()).map((article) => [article.articleNumber, article]),
@@ -3177,7 +3161,8 @@ async function main() {
       select: { id: true },
     });
 
-    const reconcileExisting = Boolean(existingKitchen && kitchen.reconcileExisting);
+    const reconcileExisting = reconcileExistingEnabled
+      && Boolean(existingKitchen && kitchen.reconcileExisting);
     if (existingKitchen && !reconcileExisting) {
       continue;
     }

@@ -53,7 +53,9 @@ jobs:
             sudo -u deploy npm run geoip:update
             sudo -u deploy npm run prisma:deploy
             sudo -u deploy npm run prisma:generate
-            sudo -u deploy npm run prisma:seed
+            # Seed is insert-only by default; never reconcile existing kitchens
+            # during a normal deploy because their dashboard edits are live data.
+            sudo -u deploy env SEED_RECONCILE_EXISTING=false npm run prisma:seed
             sudo -u deploy npm run catalog:link
             sudo -u deploy npm run build
 

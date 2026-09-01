@@ -65,9 +65,14 @@ test("Impuls seed keeps the canonical cabinet casing and dimensions", () => {
   assert.doesNotMatch(refrigerator, /widthMm/);
   assert.match(seed, /name: "Upper Cabinet 60 cm"/);
   assert.match(seed, /US60: \{ name: "Lower Cabinet with Drawer 60 cm" \}/);
+  assert.match(seed, /articleNumber: "US2A60", name: "Lower Cabinet with 3 Drawers 60 cm", nameDe: "Unterschrank mit Schublade\/Auszug 60"/);
+  for (const width of ["30", "40", "45", "50", "60", "80", "90", "100"]) {
+    assert.match(seed, new RegExp(`articleNumber: "US2A${width}", name: "Lower Cabinet with 3 Drawers ${width} cm"`));
+  }
+  assert.match(seed, /SEED_RECONCILE_EXISTING=true/);
+  assert.doesNotMatch(seed, /catalogArticle\.updateMany/);
   assert.doesNotMatch(us50, /depthMm/);
   assert.doesNotMatch(us60, /depthMm/);
-  assert.match(seed, /where: \{ articleNumber: \{ in: \["US50", "US60"\] \} \}[\s\S]+?depthMm: null/);
   assert.match(importer, /name: "Freestanding Refrigerator 181 cm"[\s\S]+?heightMm: 1810/);
   assert.match(importer, /"OL-KGCN388140E": \{[\s\S]+?widthMm: null, heightMm: 1810/);
   assert.match(importer, /US50: \{[^\n]+depthMm: null/);
