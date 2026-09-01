@@ -1547,8 +1547,10 @@ test("service claim picker toggles the selected claim component", () => {
   const flowSource = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
 
   assert.match(source, /getServiceClaimLinkedComponentIds/);
-  assert.match(source, /IMAGE_HOTSPOTS_BY_SLUG/);
-  assert.match(source, /IMAGE_VIEW_BY_SLUG/);
+  assert.match(source, /PLAN_HOTSPOTS_BY_SLUG/);
+  assert.match(source, /PLAN_IMAGE_BY_SLUG/);
+  assert.doesNotMatch(source, /IMAGE_HOTSPOTS_BY_SLUG/);
+  assert.doesNotMatch(source, /IMAGE_VIEW_BY_SLUG/);
   assert.match(source, /withBasePlinthExtension/);
   assert.match(source, /withCornerBlendeExtensions/);
   assert.match(source, /withDerivedSinkFaucet/);

@@ -550,6 +550,12 @@
   pointer-events: none;
 }
 
+/* Match the pale green dishwasher-basket linework in AB 105825 after selection. */
+.planPersistentSelectedDetail {
+  filter: brightness(0) saturate(100%) invert(94%) sepia(29%) saturate(287%)
+    hue-rotate(67deg) brightness(83%) contrast(112%);
+}
+
 .planHotspotLayer {
   position: absolute;
   inset: 0;

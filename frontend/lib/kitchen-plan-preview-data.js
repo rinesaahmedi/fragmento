@@ -143,7 +143,7 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
     { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
   ],
   "ab-105862": [
-    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9 },
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
   ],
   "ab-105848": AB_105845_DISHWASHER_LIGHT_DETAILS,

@@ -2734,9 +2734,17 @@ export default function useKitchenSvgStage({
                       planLockedComponentIds.includes(detailComponentId)
                       || detailLinkedIds.some((linkedId) => selectedComponentIds.includes(linkedId));
 
-                    // The pale source details belong to the unselected plan drawing.
-                    // Once selected, let the component tint form one clean overlay.
-                    if (isDetailComponentSelected) return null;
+                    // Most pale source details belong only to the unselected drawing. Plans
+                    // whose appliance linework must remain grey above the green tint opt in.
+                    if (isDetailComponentSelected && !detail.persistWhenSelected) return null;
+
+                    const persistentDetailClassName = [
+                      styles.planImageInteractive,
+                      styles.planPersistentLightDetail,
+                      isDetailComponentSelected ? styles.planPersistentSelectedDetail : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ");
 
                     if (isCompactMobilePlan) {
                       return (
@@ -2747,7 +2755,7 @@ export default function useKitchenSvgStage({
                           layout={mobilePlanLayout}
                           idSuffix={`${normalizedKitchenSlug}-${detail.key}`}
                           clipGeometry={detail}
-                          className={`${styles.planImageInteractive} ${styles.planPersistentLightDetail}`}
+                          className={persistentDetailClassName}
                           style={{ inset: 0, width: "100%", height: "100%" }}
                         />
                       );
@@ -2763,7 +2771,7 @@ export default function useKitchenSvgStage({
                         src={imageViewHref}
                         alt=""
                         aria-hidden="true"
-                        className={`${styles.planImageInteractive} ${styles.planPersistentLightDetail}`}
+                        className={persistentDetailClassName}
                         style={{
                           ...planImageInteractiveStyle,
                           clipPath,

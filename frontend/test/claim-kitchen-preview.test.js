@@ -232,6 +232,22 @@ test("AB 105828 email reuses the dashboard-matched AB 105822 sink geometry", () 
   );
 });
 
+test("every image-based claim view and email use the same shared plan source", () => {
+  const pickerSource = fs.readFileSync(
+    new URL("../components/service-claim-kitchen-picker.jsx", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(pickerSource, /PLAN_HOTSPOTS_BY_SLUG\[kitchenSlug\]/);
+  assert.match(pickerSource, /PLAN_IMAGE_BY_SLUG\[kitchenSlug\]/);
+  assert.doesNotMatch(pickerSource, /IMAGE_HOTSPOTS_BY_SLUG\[kitchenSlug\]/);
+  assert.doesNotMatch(pickerSource, /IMAGE_VIEW_BY_SLUG\[kitchenSlug\]/);
+  assert.deepEqual(
+    Object.keys(PLAN_HOTSPOTS_BY_SLUG).sort(),
+    Object.keys(PLAN_IMAGE_BY_SLUG).sort(),
+  );
+});
+
 test("AB 105831 email uses the dashboard sink and faucet geometry", () => {
   const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105831"];
   const sinkBase = hotspots.find((hotspot) => hotspot.componentKey === "sink-base");

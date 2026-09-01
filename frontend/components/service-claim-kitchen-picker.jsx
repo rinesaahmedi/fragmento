@@ -13,8 +13,6 @@ import {
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
 import {
-  IMAGE_HOTSPOTS_BY_SLUG,
-  IMAGE_VIEW_BY_SLUG,
   PLAN_IMAGE_SOURCE_HEIGHT,
   PLAN_IMAGE_SOURCE_WIDTH,
   cropPlanHotspot,
@@ -24,6 +22,10 @@ import {
   withDerivedSinkFaucet,
   withHotspotSourceBounds,
 } from "./kitchen-svg-stage";
+import {
+  PLAN_HOTSPOTS_BY_SLUG,
+  PLAN_IMAGE_BY_SLUG,
+} from "../lib/kitchen-plan-preview-data";
 import {
   getServiceClaimLinkedComponentIds,
   SERVICE_CLAIM_PART_COMPONENT_IDS,
@@ -150,7 +152,7 @@ export default function ServiceClaimKitchenPicker({
   } = kitchenPlan;
 
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenSlug] || null;
-  const imageViewHref = IMAGE_VIEW_BY_SLUG[kitchenSlug] || "";
+  const imageViewHref = PLAN_IMAGE_BY_SLUG[kitchenSlug] || "";
 
   const resolvedSvgMarkup = useMemo(
     () => applyPlanViewportToMarkup(svgMarkup, kitchenConfig.kitchen.slug),
@@ -210,7 +212,7 @@ export default function ServiceClaimKitchenPicker({
   const selectableKey = (selectableComponentIds || []).join("|");
   const visibleKey = visibleComponentIds.join("|");
   const sourceImageHotspots = useMemo(() => {
-    const definitions = (IMAGE_HOTSPOTS_BY_SLUG[kitchenSlug] || []).map(withHotspotSourceBounds);
+    const definitions = (PLAN_HOTSPOTS_BY_SLUG[kitchenSlug] || []).map(withHotspotSourceBounds);
     const prepared = withBasePlinthExtension(
       withCornerBlendeExtensions(
         withDerivedSinkFaucet(definitions, kitchenConfig.components),
