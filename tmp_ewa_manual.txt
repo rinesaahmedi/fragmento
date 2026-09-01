@@ -1,0 +1,1333 @@
+W ASCHMASCHINEN
+IO-WMS-3445
+(03.2024/1)
+BEDIENUNGSANLEITUNG
+DE
+ST ARTEN SIE DAS GERÄT , NACHDEM SIE SICH MIT DER 
+BEDIENUNGSANLEITUNG VERTRAUT GEMACHT HABEN.
+EW A 34660 W 
+
+2
+ÖKOLOGIE IN DER PRAXIS
+GRUNDINFORMA TIONEN
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+MONT AGEANLEITUNG
+CHARAKTERISTIK DES GERÄTES 
+LÖSEN VON BETRIEBSPROBLEMEN
+PRAKTISCHE HINWEISE 
+ INHAL TSVERZEICHNIS
+3
+7
+8
+19
+22
+28
+32
+
+3
+Seit vielen Jahren verfolgt Amica konsequent die Umweltschutzpolitik. 
+Der Umweltschutz ist für uns genauso wichtig wie die Anwendung moderner Technologien. 
+Durch die Entwicklung von Technologien sind auch unsere Werke umweltfreundlicher geworden 
+– bei der Herstellung wird immer weniger Wasser und Strom verbraucht und dabei entstehen 
+auch weniger Abwasser und Abfälle.
+Große Aufmerksamkeit wird auch den bei der Herstellung eingesetzten Stoffen geschenkt. Wir 
+bemühen uns, nur diejenigen zu verwenden, die keine schädlichen Stoffe enthalten sowie das 
+Recycling und die Entsorgung von Altgeräten ermöglichen.
+ÖKOLOGIE IN DER PRAXIS
+
+
+4
+AUSPACKEN
+Das Gerät wird gegen Transportschä-
+den geschützt. Nach dem Auspacken 
+sind die Verpackungsmaterialien so 
+zu entsorgen, dass dadurch kein Risi-
+ko für die Umwelt entsteht. 
+Alle Materialien, die zur Verpackung 
+verwendet werden, sind umweltver -
+träglich, können hundertprozentig wiederverwertet 
+werden und sind mit entsprechendem Symbol ge-
+kennzeichnet.
+Hinweis! Die Verpackungsmaterialien (Polyethylen-
+beutel, Styroporstücke usw.) sind beim Auspacken 
+außer Kinderreichweite zu halten.
+
+5
+ENTSORGUNG VON 
+ALTGERÄTEN
+Dieses Gerät wurde gemäß der Euro-
+päischen Richtlinie 2012/19/EG. Eine 
+solche Kennzeichnung informiert da-
+rüber, dass dieses Gerät nach dem 
+Ablauf des Nutzungszeitraumes nicht 
+zusammen mit anderen Hausabfällen 
+entsorgt werden darf. 
+Der Benutzer ist verpflichtet, das Gerät an einem 
+Sammelpunkt für verschlissene elektrische und 
+elektronische Geräte abzugeben. Die  für die Ge-
+räteammlung zuständigen Einheiten, darunter loka-
+le Sammelpunkte, Geschäfte und gemeindeeigene 
+Einheiten, bilden ein entsprechendes System, wel-
+ches die Abgabe dieses Gerätes ermöglicht.
+Die richtige Vorgehensweise mit Elektro- und Elek -
+tronikschrott trägt zur Verhinderung schädlicher 
+Folgen für die menschliche Gesundheit und die na -
+türliche Umwelt bei, die aus der Anwesenheit von 
+Schadstoffen sowie einer falschen Lagerung und 
+Weiterverarbeitung solcher Materialien folgen.
+
+6
+Sehr geehrter 
+Kunde,
+Vielen Dank, dass Sie sich für die Firma Amica entschieden haben. 
+Seit Jahren werden von uns hochwertige Haushaltsgeräte gelief -
+ert, mit denen die Pflichten im Haushalt zum wahren Vergnügen 
+werden. Jedes Gerät wurde gründlich auf dessen Sicherheit und 
+Funktionalitäten überprüft, bevor es das Produktionswerk verlassen 
+hat. Ferner sind wir sehr bemüht, dass die moderne Technologie in 
+den Produkten Amica immer mit einzigartigem Design einhergeht.
+Bevor das Gerät in Betrieb genommen wird, lesen Sie bitte die Be-
+dienungsanleitung aufmerksam durch. Werden die darin stehenden 
+Hinweise eingehalten, vermeiden Sie verschiedene Bedienfehler 
+und Ihr Gerät wird lang und einwandfrei funktionieren. Die Kennt -
+nis der Grundsätze der sicheren Bedienung des Gerätes ermöglicht 
+auch, Unfälle zu vermeiden.
+Diese Bedienungsanleitung ist zu erhalten und so aufzubewahren, 
+dass sie jederzeit bei der Hand ist und eingesehen werden kann. 
+Sie enthält alle erforderlichen Informationen, die die Bedienung und 
+Benutzung der Geräte Amica einfach und angenehm machen. Wir 
+möchten Sie auch dazu anregen, andere von uns angebotene Ger-
+äte kennen zu lernen.
+Wir wünschen Ihnen viel Spaß mit den Geräten Amica.
+                               ERKLÄRUNG DES HERSTELLERS
+
+
+7
+GRUNDINFORMA TIONEN
+Vor dem Anschluss des Waschautomaten an die Netzversorgung müssen alle Transport-
+sicherungen unbedingt entfernt und die Maschine richtig ausgerichtet werden. Der Her-
+steller behält sich das Recht vor , Änderungen vorzunehmen, die die Gerätefunktion nicht 
+beeinträchtigen.
+Eine Temperatur unter 0°C kann eine Beschädigung des Gerätes verursachen! 
+Wenn das Gerät bei negativen Temperaturen aufbewahrt oder transportiert 
+wurde, sollte dessen Gebrauch erst nach einer 8 Stunden langen Akklimatisa -
+tionsperiode in einem Raum mit positiver Temperatur erfolgen.
+Der Waschautomat ist nur für den Gebrauch im Haushalt bestimmt 
+und dient zum Waschen von Textilien und Kleidungen, die für die 
+mechanische Wäsche in der Waschflotte geeignet sind.
+Der Hersteller erklärt hiermit, dass das Gerät die 
+grundlegenden Anforderungen erfüllt, die in den 
+nachfolgend genannten Europäischen Richtlinien 
+angeführt werden:
+   Niederspannungsrichtlinie 201 4/35/EU,
+   Richtlinie über Elektromagnetische Verträglichkeit 
+201 4/30/EU, 
+   Niederspannungsrichtlinie 2009/125/EU,
+   Niederspannungsrichtlinie 2011/65/EU,
+und dass das Erzeugnis deshalb mit dem -Zeichen 
+gekennzeichnet und für das Gerät eine Übereinstim-
+mungserklärung ausgestellt wurde, die den Mark-
+taufsichtsorganen zur Verfügung gestellt wurde.
+Die Waschmaschine nur dann bedienen, wenn Sie den Inhalt dieser Gebrauchsan -
+weisung zur Kenntnis genommen haben.
+Die Waschmaschine nie im Freien oder in Räumen benutzen, in denen negative 
+Temperaturen auftreten können.
+Kinder und Personen, die mit dem Inhalt dieser Bedienungsanleitung nicht vertraut 
+worden sind, sollten das Gerät nicht benutzen.
+BENUTZUNG
+                               ERKLÄRUNG DES HERSTELLERS
+
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+Lebensgefahr! Das Gerät kann von Kindern ab 8 Jah-
+ren, von Personen mit reduzierten phy-
+sischen, sensorischen oder geistigen 
+Fähigkeiten und von Personen mit man-
+gelnder Erfahrung oder Wissen bedient 
+werden. Für diese Personen muss eine 
+ordnungsgemäße Aufsicht oder Un-
+terweisung hinsichtlich einer sicheren 
+Bedienung des Gerätes und der damit 
+verbundenen Gefahren gewährleistet 
+werden. Es ist darauf zu achten, dass die 
+Kinder mit dem Gerät nicht spielen und 
+keine Reinigungs- oder Wartungsarbe-
+iten durchführen. Kindern unter dem 
+3. Lebensjahr vom Gerät fernhalten, 
+es sei denn dass sie unter Aufsicht von 
+Erwachsenen stehen.
+Kinder können sich in Geräte einsperren 
+und in Lebensgefahr geraten.
+Erstickungsgefahr! Kinder können sich beim Spielen in Ver-
+packungen/ Folien und Verpackung-
+steile einwickeln oder sich diese über 
+den Kopf ziehen und ersticken. Halten 
+Sie Verpackungen, Folien und Verpack-
+ungsteile von Kindern fern.
+Vergiftungsgefahr! Wasch- und Pflegemittel können bei 
+Verzehr zu Vergiftungen führen. Holen 
+Sie bei versehentlichem Verschlucken 
+ärztlichen Rat ein. Bewahren Sie Wasch- 
+und Pflegemittel für Kinder unzugäng-
+lich auf .
+8
+
+Verbrühungsgefahr! Beim Waschen mit hohen Tem-
+peraturen wird das Glas der 
+Waschmaschinentür heiß.
+Es ist zu verhindern, dass die 
+Kinder heiße Waschlaugen berüh-
+ren.
+Augen-/Hautreizungen! Kontakt mit Wasch- und Pflegemi-
+ttel kann zu Augen-/ Hautreizun-
+gen führen. Spülen Sie bei Kon-
+takt mit Wasch-/ Pflegemitteln 
+gründlich die Augen aus bzw . die 
+Haut ab. Bewahren Sie Wasch- 
+und Pflegemittel für Kinder un-
+zugänglich auf .
+Stromschlaggefahr/ 
+Brandgefahr/ Gefahr ma-
+terieller Schäden / Gefahr 
+der Beschädigung des 
+Gerätes!
+Wenn das Gerät nicht ord-
+nungsgemäß installiert wurde, 
+kann es zu gefährlichen Situ-
+ationen kommen. Man muss sich 
+vergewissern, ob:
+die Spannung in der Steckdose 
+der Angaben zur Spannung auf 
+dem Gerät entspricht 
+(T ypenschild). 
+Die Belastungen und der er-
+forderliche Schutz der Sicherung 
+sind auf dem T ypenschild angege-
+ben. 
+Das Gerät ist nur an eine Wech-
+selstromquelle mittels einer nach 
+den inländischen Standards mon-
+tierten Steckdose mit Erdung 
+angeschlossen.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+9
+
+Stromschlaggefahr/ 
+Brandgefahr/ Gefahr ma-
+terieller Schäden / Gefahr 
+der Beschädigung des Ger-
+ätes!
+das Netzkabel und die Steck-
+dose mit Erdung zueinander 
+passen und ob das Erdungssys-
+tem entsprechend montiert 
+wurde.
+der Querschnitt des Netzkabels 
+ausreichend groß ist.
+der Zugang zum Netzstecker 
+immer gewährleistet ist.
+Sollte ein stationäres LS-Schal-
+ter verwendet werden, sollte 
+nur derjenige Schalter verwen-
+det werden, der folgenderweise 
+gekennzeichnet ist: 
+Diese Kennzeichnung ist die 
+einzige Möglichkeit für die Sich-
+erstellung, dass alle möglichen 
+erforderlichen Anforderungen 
+erfüllt wurden.
+Stromschlaggefahr/ 
+Brandgefahr/ Gefahr ma-
+terieller Schäden / Gefahr 
+der Beschädigung des Ger-
+ätes!
+Sollte das Netzkabel modifiziert 
+werden oder ist dieses beschä-
+digt, kann dies zum Strom-
+schlag, zum Kurzschluss oder 
+zum Brand wegen Überhitzung 
+des Kabels führen. 
+ das Netzkabel nicht verdreht, 
+eingeklemmt ist oder nicht mod-
+ifiziert wurde und auch nicht mit 
+einer Wärmequelle in Berührung 
+kommt.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+10
+
+Brandgefahr/ Gefahr ma-
+terieller Schäden / Gefahr 
+der Beschädigung des Ger-
+ätes!
+Sollten Verlängerungsschnüre 
+oder Verteiler verwendet 
+werden, kann dies zum Brand 
+wegen Überhitzung oder Kur-
+zschluss führen. Das Gerät un-
+mittelbar an eine entsprechend 
+montierte Steckdose mit Erdung 
+anschließen. Keine Verläng-
+erungsschnüre oder Verteiler 
+oder Steckleisten verwenden.
+Gefahr für die Gesundheit / 
+Gefahr materieller Schäden 
+/ Gefahr der Beschädigung 
+des Gerätes!
+Das Gerät kann bei Betrieb vi-
+brieren oder sich bewegen, was 
+eventuell zu Verletzungen oder 
+zur Entstehung von materiel-
+len Schäden führen kann. Auf 
+einem sauberen, ebenen und 
+hartem Boden mit Hilfe einer 
+Richtwaage aufstellen.
+Beim Halten des Gerätes an 
+vorstehenden Bauteilen (z.B. 
+Waschmaschinentür) zwecks 
+Hochheben oder Verschieben 
+können die Bauteile abbrechen 
+und Verletzungen verursachen.
+Zum Verschieben das Gerät nie-
+mals an vorstehenden Bauteilen 
+halten.
+Verletzungsgefahr! Das Gerät ist sehr schwer . Das 
+Heben des Gerätes kann Verlet-
+zungen verursachen. Das Gerät 
+niemals alleine heben.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+11
+
+Verletzungsgefahr! Das Gerät hat scharfe Kanten, die 
+zu Verletzungen der Hände führen 
+können. Das Gerät nicht an scharfen 
+Kanten halten. Das Gerät nur mit 
+Schutzhandschuhen heben.
+Wenn Leitungen oder Stromkabel 
+nicht ordnungsgemäß verlegt sind, 
+kann man darüber stolpern und sich 
+verletzen. Leitungen oder Stromka-
+bel so verlegen, dass sie keine Stolp-
+ergefahr darstellen.
+Hinweis!
+Materielle Schäden /
+Beschädigung des Ger-
+ätes
+Wenn das Wasserniveau zu 
+hoch oder zu niedrig ist, ist es 
+möglich, dass das Gerät nicht ord-
+nungsgemäß funktioniert, was zu 
+materielle Schäden oder Beschädi-
+gung des Gerätes verursachen kann.
+Sicherstellen, dass der Wasserdruck 
+mind. 100 kPa (1 bar) beträgt und 
+1000 kPa (10 bar) nicht überschre-
+itet.
+Wenn die Wasserschläuche modifi-
+ziert wurden oder beschädigt sind, 
+kann dies materielle Schäden oder 
+Beschädigung des Gerätes verur-
+sachen. Die Wasserschläuche dürfen 
+weder verdreht, eingeklemmt, modi-
+fiziert oder durchgeschnitten sein.
+Sollten zum Anschließen des Ger-
+ätes an die Wasserquelle Wasser-
+schläuche anderer Marken verwen-
+det werden, kann dies materielle 
+Schäden oder Beschädigung des 
+Gerätes verursachen.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+12
+
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+13
+Hinweis!
+Materielle Schäden /
+Beschädigung des Gerätes
+Nur die mitgelieferten Schläu-
+che oder die für dieses Gerät 
+bestimmten Original-Ersatzteile 
+verwenden.
+Das Gerät ist für den Transport 
+mit Sicherungsmitteln gesi-
+chert. Sollten vor Beginn der 
+Benutzung des Gerätes bei für 
+den Transport eingesetzten 
+Sicherungsmittel nicht entfernt 
+werden, kann dies zur Beschä-
+digung des Gerätes führen. Vor 
+erstmaliger Benutzung des Ger-
+ätes sind alle für den Transport 
+eingesetzten Sicherungsmittel 
+zu entfernen.
+Darauf achten, dass die für 
+den Transport eingesetzten 
+Sicherungsmittel separat auf-
+bewahrt werden. Sollte das 
+Gerät erneut transportiert 
+werden, sollten zur Vermeidung 
+dessen Beschädigung die für 
+den Transport eingesetzten 
+Sicherungsmittel wieder einge-
+setzt werden.
+Explosionsgefahr / 
+Brandgefahr!
+Das Waschgut, für das lösemit-
+telhaltige Pflegemittel wie z.B. 
+Rostentferner , Reinigungslö-
+semittel verwendet wurden, 
+stellt eine Explosionsgefahr in 
+der Trommel dar .
+Vor dem Waschen in der 
+Waschmaschine sollte das 
+Waschgut mit Wasser gründlich 
+gespült werden.
+
+Vergiftungsgefahr! Giftige Dämpfe können von lö-
+semittelhaltigen Pflegemitteln 
+wie z.B. Reinigungslösemittel 
+freigesetzt werden.
+Keine lösemittelhaltigen 
+Pflegemittel verwenden.
+Verletzungsgefahr! Beim Aufstützen/Aufsetzen auf 
+die geöffnete Waschmaschi-
+nentür kann die Waschmaschine 
+kippen und Verletzungen verur-
+sachen.
+Stützen Sie sich nicht auf die 
+geöffnete Waschmaschinentür .
+Beim Aufsteigen auf die 
+Waschmaschine kann die Arbeit-
+splatte brechen und Verletzun-
+gen verursachen.
+Auf die Waschmaschine nicht 
+steigen.
+Beim Eingreifen in die drehende 
+Trommel kann es zu Verletzun-
+gen der Hände kommen.
+Warten, bis sich die Trommel 
+nicht mehr dreht.
+Verbrühungsgefahr! Beim Waschen mit hohen Tem-
+peraturen kann es bei Berüh-
+rung mit heißer Waschlauge, 
+z.B. beim Abpumpen heißer 
+Waschlauge in ein Waschbeck-
+en, zu Verbrühungen kommen.
+F assen Sie nicht in die heiße 
+Waschlauge.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+14
+
+Augen-/Hautreizungen! Wenn die Waschmittelschublade 
+während des Betriebs geöffnet 
+ist, kann Wasch-/ Pflegemittel 
+ausspritzen.
+Spülen Sie bei Kontakt mit 
+Wasch-/ Pflegemitteln gründlich 
+die Augen aus bzw . die Haut ab.
+ Holen Sie bei versehentlichem 
+Verschlucken ärztlichen Rat ein.
+Hinweis!
+Materielle Schäden /
+Beschädigung des Gerätes
+Wenn die Menge des Wasch-
+gutes im Gerät die Beladungs-
+grenze überschreitet, kann das 
+Gerät nicht ordnungsgemäß 
+funktionieren oder auch  materi-
+elle Schäden oder Beschädigung 
+des Gerätes verursachen.
+Die Beladungsgrenze für 
+trockenes Waschgut nicht über-
+schreiten.
+Darauf achten, dass die Grenzen 
+für die einzelnen Programme 
+nicht überschritten werden.
+Wenn eine nicht entsprechende 
+Menge an Waschmittel oder 
+Reinigungsmittel eingefüllt 
+wird, kann dies materielle 
+Schäden oder Beschädigung des 
+Gerätes verursachen.
+Waschmittel / Weichspüler nach 
+Hinweisen des Herstellers ver-
+wenden.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+15
+
+Lebensgefahr! Das Gerät wird mit Strom ver-
+sorgt. Bei Kontakt mit span-
+nungsführenden Teilen besteht 
+Stromschlaggefahr . Dabei muss 
+Folgendes beachtet werden:
+Das Gerät ausschalten.
+Das Gerät von der Strom-
+versorgung trennen (den 
+Netzstecker ziehen).
+Den Netzstecker niemals mit 
+nassen Händen anfassen.
+Die Netzleitung immer nur am 
+Netzstecker und nie an der Lei-
+tung ziehen, da sie sonst be-
+schädigt werden könnte.
+Keine technischen Veränder-
+ungen des Gerätes oder dessen 
+Teile vornehmen.
+Alle Reparaturen oder sonstige 
+Arbeiten am Gerät sollten nur 
+von unserem Servicedienst oder 
+einem Elektriker durchgeführt 
+werden. Dies gilt auch auf den 
+Wechsel des Netzkabels (soweit 
+erforderlich).
+Ersatz-Netzkabel können bei 
+unserem Servicedienst bestellt 
+werden.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+16
+
+Vergiftungsgefahr! Giftige Dämpfe können von lö-
+semittelhaltigen Pflegemitteln 
+wie z.B. Reinigungslösemittel 
+freigesetzt werden.
+Keine lösemittelhaltigen 
+Pflegemittel verwenden.
+Stromschlaggefahr / Gefahr 
+materieller Schäden / Ge-
+fahr der Beschädigung des 
+Gerätes!
+Sollte Feuchtigkeit ins Gerät 
+gelangen, kann dies Kurzschluss 
+verursachen.
+Für die Reinigung des Gerätes 
+sollten weder Druckreiniger 
+noch Dampfreiniger verwendet 
+werden.
+Gefahr für die Gesundheit / 
+Gefahr materieller Schäden 
+/ Gefahr der Beschädigung 
+des Gerätes!
+Die Verwendung von Ersatz-
+teilen oder Accessoires anderer 
+Marken ist gefährlich und  kann 
+Gesundheitsschäden, materielle 
+Schäden oder Beschädigung des 
+Gerätes verursachen.
+Aus Sicherheitsgründen sollte 
+nur Original-Ersatzteile einge-
+setzt werden.
+Hinweis!
+Materielle Schäden /
+Beschädigung des Gerätes
+Reinigungs- und Imprägni-
+ermittel für Textilien (z.B. 
+Fleckenentferner , Sprays für 
+Vorwäsche usw .) können bei 
+Berührung mit den Geräte-
+flächen Beschädigungen verur-
+sachen.
+Dabei muss Folgendes beachtet 
+werden:
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+17
+
+Hinweis!
+Materielle Schäden /
+Beschädigung des Gerätes
+Sicherstellen, dass diese Mit-
+tel mit der Gerätefläche nicht in 
+Berührung kommen.
+Nur mit Wasser und feuchtem 
+T uch reinigen.
+               BEDEUTUNG DER W ASCHSYMBOLE AUF INNENETIKETTEN VON KLEIDUNG
+Wäsche
+Kochen bei 900 Normalwäsche bei 
+60° C
+Normalwäsche bei 
+40° C
+Nicht waschen!
+Feinwäsche Handwäsche
+Chemische Reinigung
+alle Lösemittel alle außer TRI nur Benzin Nicht 
+chemisch reinigen!
+Trommeltrockner
+normal niedrig hoch Nicht trocknen!
+Bügeln
+1100C 1500C 2000C Nicht bügeln!
+18
+Bei der Programmwahl auf die Symbole auf den Pflegee-
+tiketten achten.
+SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN
+
+               BEDEUTUNG DER W ASCHSYMBOLE AUF INNENETIKETTEN VON KLEIDUNG
+19
+INST ALLA TION
+DES GERÄTES
+4 Blockade-Schrauben mittels 
+Schraubenzieher abschrauben.
+Transportstützen samt Unterlagen und 
+Schrauben aus den Gummi-Kunststoff-Buchsen 
+herausnehmen.
+Öffnungen mit Stöpseln, die im Beutel mit 
+Accessoires beiliegen, schließen.
+Die Waschmaschine auf hartem, ebenem Untergrund 
+aufstellen,
+Die Waschmaschine durch Drehen der Füße mit den Muttern 
+ausrichten (1).
+Mit Unterlagen blockieren (2)
+Die Kunststoffunterlage lösen (2),
+1
+2
+Entfernen von Transportsicherungen 
+(Diese Transportsicherungen sind für eine erneute Verwendung z.B. beim Umzug auf-
+zubewahren).
+Beachten: Die Sicherungen vor der Inbetriebnahme der 
+Waschmaschine unbedingt entfernen!
+Nach der Aufstellung und Ausrichtung der Waschmaschine ist deren Stabil-
+ität durch Andrücken jeder Maschinenecke nachzuprüfen, damit festgestellt 
+werden kann, ob sich die Maschine evtl. bewegt!
+Aufstellung und Ausrichtung der 
+Waschmaschine
+□□□□ □□ □□ □□ □□□□□ □□□□ □□ □□ □□□□ □□□□□ □□□ □□□□
+□□□ □□ □□ □□ □□□□□□□□ □□□□□□□□□□ □□ □□ □□□□□□□□□ □
+□□□□□□□ .
+□□□ □□□ □□□□□□□□□□□□ □□□□□□ □□□ □□□□□□ □□□
+□□ □□□□□□□□□□□□□□□□ □□□□□□□□□.
+□□ □□□□□□ □□ □□ □□□□□□□□□□□□□□ □□ □□□□ -
+□□□□□□□□□ □□□□□□ □□□□□□□□ □□□□□□□□ ,□ □□□□
+□□□□□□□□ □□ □□ □□□□□□□□ □□ □□□□□□□□□ □□□□□□□ .
+□□□ □□□□□□□ □□□□□ □□□ □□□□□□□ □□□□ □□ □□□□□□□
+□□□□□□ □□□□□ □□□ □□□□□□□□□.
+□□ □ □□□ □□□□□□ □□□□□□□□□ □□□□□ □□ □□ □□□□-
+□□□□□□□□□□□□□ □□□□□□□□□.
+□□□□□□□□□□□□□□ □□□□□□□□□□□□ □□□□□□ □□□□□□
+□□□□□ □□□□□□□□□ □□□□□□□ □□□□□□□□□□.
+□□□□ □□ □□ □□ □□□□□ □□□□ □□ □□ □□□□ □□□□□ □□□ □□□□
+□□□ □□ □□ □□ □□□□□□□□ □□□□□□□□□□ □□ □□ □□□□□□□□□ □
+□□□□□□□ .
+□□□ □□□ □□□□□□□□□□□□ □□□□□□ □□□ □□□□□□ □□□
+□□ □□□□□□□□□□□□□□□□ □□□□□□□□□.
+□□ □□ □□□□□□ ,□ □□ □□ □□□□ □□□□ □□□□ □□□□□
+□ □□□□□□ □□ □ □□□ □□ □□ □□ □□ □□ ,□ □□ □□ □□
+□□ □ □□□□□ □□□ □□□□□ ,□ □□ □□□□ □□□ □ □□□ □□ □
+□□ □□ □□ □□□□□□ □□ □□ □□ □□ □□ □□ □□ □
+□□□□□ □□□□□□ .
+□□□ □□□□□□□ □□□□□ □□□ □□□□□□□ □□□□ □□ □□□□□□□
+□□□□□□ □□□□□ □□□ □□□□□□□□□.
+□□ □ □□□ □□□□□□ □□□□□□□□□ □□□□□ □□ □□ □□□□-
+□□□□□□□□□□□□□ □□□□□□□□□.
+□ □□□ □□ □□□□□ □□ □□ □□□□□□ □□□□□□□
+□□□□ □□ □□□□ □□ □□□ □□ □□□□ □ □□□□□□ □□□□□□□ -
+□□ □□□□ □□ □□ □□ □□ □□ □□ □□□□□□ □□ □□□□□,
+□□ □□ □□ □□□□□□□ □□ □□□□□ □□ □ □□□ □
+□□□□□□□□ □□□□□□□ .
+□□□□ □□ □□ □□ □□□□□ □□□□ □□ □□ □□□□ □□□□□ □□□ □□□□
+□□□ □□ □□ □□ □□□□□□□□ □□□□□□□□□□ □□ □□ □□□□□□□□□ □
+□□□□□□□ .
+□□□ □□□ □□□□□□□□□□□□ □□□□□□ □□□ □□□□□□ □□□
+□□ □□□□□□□□□□□□□□□□ □□□□□□□□□.
+□□ □□□□□□ □□ □□ □□□□□□□□□□□□□□ □□ □□□□ -
+□□□□□□□□□ □□□□□□ □□□□□□□□ □□□□□□□□ ,□ □□□□
+□□□□□□□□ □□ □□ □□□□□□□□ □□ □□□□□□□□□ □□□□□□□ .
+□□□ □□□□□□□ □□□□□ □□□ □□□□□□□ □□□□ □□ □□□□□□□
+□□□□□□ □□□□□ □□□ □□□□□□□□□.
+□□ □ □□□ □□□□□□ □□□□□□□□□ □□□□□ □□ □□ □□□□-
+□□□□□□□□□□□□□ □□□□□□□□□.
+□□□□□□□□□□□□□□ □□□□□□□□□□□□ □□□□□□ □□□□□□
+□□□□□ □□□□□□□□□ □□□□□□□ □□□□□□□□□□.
+□□□□ □□ □□ □□ □□□□□ □□□□ □□ □□ □□□□ □□□□□ □□□ □□□□
+□□□ □□ □□ □□ □□□□□□□□ □□□□□□□□□□ □□ □□ □□□□□□□□□ □
+□□□□□□□ .
+□□□ □□□ □□□□□□□□□□□□ □□□□□□ □□□ □□□□□□ □□□
+□□ □□□□□□□□□□□□□□□□ □□□□□□□□□.
+□□ □□ □□□□□□ ,□ □□ □□ □□□□ □□□□ □□□□ □□□□□
+□ □□□□□□ □□ □ □□□ □□ □□ □□ □□ □□ ,□ □□ □□ □□
+□□ □ □□□□□ □□□ □□□□□ ,□ □□ □□□□ □□□ □ □□□ □□ □
+□□ □□ □□ □□□□□□ □□ □□ □□ □□ □□ □□ □□ □
+□□□□□ □□□□□□ .
+□□□ □□□□□□□ □□□□□ □□□ □□□□□□□ □□□□ □□ □□□□□□□
+□□□□□□ □□□□□ □□□ □□□□□□□□□.
+□□ □ □□□ □□□□□□ □□□□□□□□□ □□□□□ □□ □□ □□□□-
+□□□□□□□□□□□□□ □□□□□□□□□.
+□ □□□ □□ □□□□□ □□ □□ □□□□□□ □□□□□□□
+□□□□ □□ □□□□ □□ □□□ □□ □□□□ □ □□□□□□ □□□□□□□ -
+□□ □□□□ □□ □□ □□ □□ □□ □□ □□□□□□ □□ □□□□□,
+□□ □□ □□ □□□□□□□ □□ □□□□□ □□ □ □□□ □
+□□□□□□□□ □□□□□□□ .
+
+4
+Nur neue und vollständige Schläuche einschließlich der notwendigen 
+Ausrüstung verwenden. Gebrauchte Schläuche sind nicht erneut 
+einzusetzen.
+Der Wasserschlauch samt Dichtungen befindet sich in der 
+Waschtrommel. Wasserdruck mind. 0,05 MPa (0,5 bar), max. 
+1 MPa (10 bar).
+Der Abwasserschlauch befindet sich an der Hinterwand der Waschmaschine. Er 
+ist so abzusichern, dass er sich während des Betriebs der Waschmaschine nicht 
+hin und her bewegt . Bei Bedarf für den Abwasserschlauch den Bogen einsetzen 
+(1). Darauf achten, dass der Abwasserschlauch nicht zu tief in das Abflussrohr 
+eingeschoben wird.
+                                  
+3
+Wasseranschluss
+Wasserabfluss
+1). Nach dem Anschluss muss geprüft werden, ob der Schlauch nicht verdreht 
+ist.
+2). Nachdem der Schlauch und das Ventil angeschlossen worden sind, deren 
+Dichtheit überprüfen.
+3). Den Zustand des Wasserschlauchs regelmäßig prüfen.
+Waschmaschine ausschließlich mit Kaltwasser speisen.
+20
+Anschluss 
+auf der linken Seite
+Anschluss auf 
+der rechten Seite
+(1)
+
+
+5
+Die Steckdose, an die die Waschmaschine angeschlossen 
+wird, sollte sich an einer sichtbaren und zugänglichen Stelle 
+befinden,
+Die Waschmaschine nur an eine richtig installierte Steckdose mit 
+Erdungsstift anschließen!
+In keinem F all eine Verlängerungsschnur 
+benutzen!
+Ein beschädigtes Netzkabel darf nur durch eine 
+autorisierte Servicestelle ersetzt werden.
+Das Stromnetz, an das die Waschmaschine angeschlossen wird, 
+muss mit der Sicherung 10 A gesichert sein.
+Anschluss an die elektrische Speisung
+21
+Kleine Gegenstände wie Münzen, Büroklammern, Nadeln usw . 
+können die Wäsche und Elemente der Waschmaschine beschädigen und 
+daher sind einige wichtige Hinweise zu beachten:
+1). Innentaschen der Wäschestücke leeren
+2). Alle Metallteile entfernen
+3). Feinwäsche wie BH oder Strümpfe in speziellen Wäschesäckchen 
+waschen
+4). Reißverschlüsse und Knöpfe schließen
+5). Entfernen von Fremdkörpern aus dem Gerät (z. B. Bügel, Drähte).
+Vorbereitung der Wäsche:
+
+22
+CHARAKTERISTIK DES GERÄTES
+                  BESCHREIBUNG DER W ASCHMASCHINE
+Akcesoria
+Stöpsel für die 
+Transportöff-
+nung
+Stöpsel für 
+die Öffnung 
+(Option)
+Zulaufrohr 
+Kaltwasser 
+Zulaufrohr 
+Warmwasser 
+(Option)
+Bogen für den 
+Ablaufschlauch 
+(Option)
+Zubehör:
+1. Waschmittelfach2. Trommel3. Bedienfeld4. Griff5. Abdeckung des Pumpenfilters
+2
+4
+5
+1 3
+
+23
+2. Die Tür öffnen und die 
+Wäsche einlegen.
+4. Die Tür schließen.
+9. Das Trocknungsprogramm 
+wählen.
+8. Die Taste On/Off drücken
+1. Installation von Waschmaschinen
+3. Waschmittel dosieren
+5. Herausnehmen (Ablauf-
+schlauch befestigen)
+6. Den Wasserhahn öffnen
+7. Ans Stromnetz 
+anschließen.
+10. Die Taste Start/Pause
+drücken
+BEDEUTUNG DER WASCHSYMBOLE AUF INNENETIKETTEN
+ VON KLEIDUNG
+Schnellstart:
+
+                  BESCHREIBUNG DER BEDIENFELDES UND DES DISPLA YS
+24
+1 2
+65 7 8
+1. Programmknopf
+2. Display
+3. Ein / Aus -T aste
+4. T aste  ST ART/P AUSE
+5. T aste der  Zusatzfunktion Startzeitvorwahl
+6. T aste zur Auswahl der Temperatur
+7. T aste zur Auswahl der Schleudergeschwindigkeit
+8. T aste zur Auswahl der Funktion
+6+7. Kindersicherung
+ 
+6 7+
+3
+4
+
+25
+2. Display 
+Bei Betrieb der Waschmaschine wird die Zeit, die bis Ende des Waschprogramms übrig-
+bleibt, angezeigt. Im Display werden auch folgende Symbole angezeigt: Verriegelung der 
+Tür der Waschmaschine       und aktivierte Funktion Child Lock     .
+Die angezeigte Zeit stellt ausschließlich eine Prognose dar und kann von der tatsächli-
+chen Waschzeit in Abhängigkeit von der Temperatur und dem Wasserdruck, der Größe 
+der Einlage, der Menge des zugegebenen Waschmittels usw . abweichen. Die Zeit wird 
+automatisch während des Waschvorgangs aktualisiert, ein zeitweiliges Einfrieren und 
+Zeitsprünge sind möglich.
+Bei der Wahl der Funktion Startverzögerung wird die bis zum Waschbeginn übrig geblie-
+bene Zeit angezeigt.
+Bei der Einstellung der Schleuderumdrehungen werden im Display folgende Werte an-
+gezeigt: 0 (Schleudern ausgeschaltet) - 400 - 600 - 800 - 1000 - 1200 - 1 400.
+Bei der Einstellung der Temperatur werden im Display folgende Werte angezeigt: 
+- -°C (Kaltwasser) - 20°C - 30°C - 40°C - 60°C - 90°C.
+1. Programmknopf
+Der Benutzer kann ein entsprechendes Waschprogramm je nach der Verschmutzung der 
+Wäsche, der Art und Menge des Waschgutes wählen, wodurch ein besseres und wirksa-
+meres Waschergebnis sichergestellt werden kann. Nach dem Einschalten eines Wasch-
+programms bewirkt die Verstellung des Programmknopfes in eine andere Position keine 
+Änderung der Parameter für das zuvor gewählte Waschprogramm.
+3. Taste Standby 
+Dient zum Einschalten / Ausschalten der Waschmaschine sowie zum Abbrechen des 
+Waschprogramms.
+4. Taste Start/Pause 
+Die T aste       Start/Pause dient zum Einschalten der Waschprogramms und dessen Unter-
+brechung.
+Wenn die Waschmaschine in Betrieb ist, blinken im Display „   ” . Im Pause-Modus blinken 
+die Symbole „   ” nicht, sondern sie leuchten dauernd.
+Die Pause-Funktion kann zum Einweichen der Wäsche genutzt werden.
+Nach dem Start des gewählten Programms ca. 10 Minuten abwarten, und anschließend 
+die T aste Start/Pause        drücken. Nach Ablauf der zum Einweichen gewünschten Zeit 
+die T aste Start/Pause          erneut drücken und die Waschmaschine setzt das Waschpro-
+gramm fort. Das Einweichen ermöglicht das Waschergebnis bei stark verschmutzter 
+Wäsche zu verbessern.
+4
+
+
+                  BESCHREIBUNG DER BEDIENFELDES UND DES DISPLA YS
+26
+6. Taste Temperaturwahl             
+Die T aste     dient zur Einstellung der Temperatur für die einzelnen Waschprogramme.
+Wird die T aste         gedrückt, werden die für das jeweilige Waschprogramm verfügbaren 
+Einstellungen der Wassertemperatur oder Waschoptionen für Kaltwasser (ohne Vorwär-
+men) angezeigt. Je nach dem gewählten Waschprogramm werden im Display folgende 
+Einstellungsmöglichkeiten angezeigt: - -°C (Kaltwasser) - 20°C - 30°C - 40°C - 60°C - 
+90°C.
+6
+6
+5. Taste Startvzeitvorwahl 
+Diese T aste dient zur Verzögerung des Waschbeginns. Möglich sind Einstellungen im 
+Bereich von 0 bis 24 Stunden.
+Hinweis! Kommt es beim Abzählen der Verzögerungszeit zur Unterbrechung der 
+Stromversorgung, wird das Abzählen durch die Funktion der Verzögerung wieder direkt 
+nach der Wiederherstellung der Stromversorgung aufgenommen.
+7. Taste Schleuderumdrehungen
+Die T aste 7  dient zur Einstellung der Schleudergeschwindigkeit beim Abpumpen des 
+Wassers. Zur Änderung der Einstellung, die T aste drücken. Je nach dem gewählten Wa-
+schprogramm werden im Display folgende Werte angezeigt - 0 (Schleudern ausgeschal-
+tet) - 400  - 600 - 800 - 1000 - 1200 - 1 400.
+8.  Funktionstaste Extra Spülen / Vorwäsche     
+Mit der Funktionstaste kann eine von zwei Funktionen (Extra Spülen oder Vorwäsche) 
+oder beide Funktionen gleichzeitig gewählt werden. Wird diese Funktion gestartet, 
+leuchtet die Diode über dem Symbol der gewählten Funktion auf .
+Achtung! Die Funktionen Extra Spülen und Vorwäsche sind nicht bei allen Waschpro-
+grammen möglich (siehe: T abelle der Waschprogramme).
+Die Funktion Extra Spülen ist zum Waschen der Unterwäsche sowie der Kleidung für 
+Personen mit empfindlicher Haut besonders gut geeignet. Mit dieser Funktion kommt 
+ein zusätzliches Spülen der Wäsche  zu Stande.
+Die Funktion Vorwäsche verlängert die Waschzeit um ca. 20 Min. Dabei geht der 
+Hauptwäsche eine zusätzliche Wäsche voran. Wird die Funktion Vorwäsche einge-
+schaltet, kann eine sehr gute Waschwirkung erzielt werden, ohne dass das Einweichen 
+der Wäsche zuvor erfolgen muss. Diese Funktion wird bei stark verschmutzter Wäsche 
+empfohlen.
+Achtung! Vor Einschalten der Funktion Vorwäsche muss das Waschmittel ins Waschmit-
+telfach mit dem Symbol „  
+   ” eingefüllt werden.
+
+
+27
+                  SONDERPROGRAMME
+Sehr kurzes Programm zum Waschen kleiner Mengen nur leicht verschmutzter 
+Kleidung.  Dieses Waschprogramm dient zum Auffrischen der Kleidung. Es 
+beinhalten alle Stufen des Waschvorgangs:
+1). Hauptwäsche          2). Spülen          3). Schleudern.
+2
+Express 15’
+1 Dieses Waschprogramm ist für Kinder und Personen mit empfindlicher Haut be -
+stimmt. Die Hauptwäsche erfolgt grundsätzlich bei 60°C (möglich sind Tempera -
+tureinstellungen von 90/60/40/30/20-- „Kaltwasser”).
+Baby Comfort
+Das Programm “eco 40-60” wird zum Waschen normal verschmutzter 
+Baumwollstoffe verwendet, die als geeignet zum Waschen bei 40 ° C oder 60 ° C 
+zusammen im selben Zyklus angesehen werden.
+3
+ECO 40-60
+Wenn Sie bunte Kleidung waschen, können Sie die Farben besser schützen.4
+20°C
+Einschalten / Ausschalten des Tonsignals 
+Um die Funktion zu betätigen, die T aste       ca. 3 Sekunden gedrückt halten.
+Mit dem Tonsignal wird das Einschalten dieser Funktion bestätigt. Zum erneuten Ein-
+schalten der Funktion die T aste       drücken und ca. 3 Sekunden gedrückt halten.Diese 
+Einstellung bleibt bis zur nächsten Änderung gespeichert. 
+6
+6
+Einstellung des Programms Individuell 
+Zur Einstellung des Programms Individuell den Drehregler auf ein beliebiges Waschpro-
+gramm drehen sowie die Temperatur , Drehgeschwindigkeit und zusätzliche Funktionen 
+wählen. Dann die T aste        circa 3 Sekunden gedrückt halten, um die Einstellungen des 
+Programms Individuell zu bestätigen. Voreingestellt ist das Waschprogramm Baumwolle.
+7
+6
+6 + 7 Kindersicherung       
+Die Funktionstasten werden blockiert, indem die Änderung der Einstellungen durch 
+Kinder verhindert wird. Um die Kindersicherung beim Waschen einzuschalten, die T asten       
+(Startverzögerung) und       (Schleuderumdrehungen) gleichzeitig drücken und ca. 3 Se-
+kunden gedrückt halten. Um diese Funktion im Laufe des Waschvorgangs auszuschalten, 
+sind dieselben T asten erneut über ca. 3 Sekunden zu drücken und anzuhalten. 
+Hinweis 1: Wenn die Kindersicherung aktiviert wurde, wird das Symbol        in der Bedi-
+enblende angezeigt.      
+Hinweis 2: Die Blockade wird nach dem Waschende nicht automatisch ausgeschaltet.
+7
+
+
+                  BESCHREIBUNG DER BENUTZUNG
+28
+II. Einstellung der Startverzögerung des Waschvorgangs     
+Die Funktion der Startverzögerung kann genutzt werden, wenn zum Beispiel ein Son-
+dertarif für die Stromgebühren genutzt wird.
+Vorgehensweise:
+1. Die Waschmaschinentür schließen.
+2. Den Programmknopf auf die gewünschte Position stellen (Siehe T abelle der Wasch-
+programme im weiteren Teil der Gebrauchsanweisung).
+3. Je nach dem Bedarf zusätzliche Funktionen wählen oder die Waschparameter än -
+dern.
+4. Die T aste Startverzögerung drücken.
+5. Die Zeiteinstellung im Bereich von 0 bis 24 Stunden wählen. Es wird der Einstellbe-
+reich von 0h bis 24h angezeigt.
+6. Die T aste [Start/Pause] drücken. Die Waschmaschine geht in den Warte-Modus über . 
+Der Waschvorgang beginnt automatisch nach Ablauf der Zeitverzögerung.
+     I. Wahl des Waschprogramms 
+1. Den Programmknopf auf die gewünschte Position stellen (Siehe: T abelle der Wa-
+schprogramme im weiteren Teil der Gebrauchsanweisung).
+2. Zur Anpassung des Waschprogramms an die individuellen Bedürfnisse können die 
+Schleudergeschwindigkeit und die Einstellung der Temperatur geändert werden.
+3. Die T aste 
+ (Start/Pause) drücken.
+IV. Abbrechen und Wechsel des Waschprogramms.  
+Um ein Waschprogramm abzubrechen, die T aste Standby drücken.
+Anschließend die Waschmaschine erneut einschalten, das gewünschte Waschpro-
+gramm wählen und die T aste Start/Pause 
+  drücken.
+V. Display-Energie-Sparmodus 
+Nach circa 10 Minuten ab Waschende wechselt das Display in den Energie-Sparmo-
+dus 
+(statt End blinken „   ” im Display).
+Der Energie-Sparmodus bleibt auch aktiv , nach dem Einschalten der Waschmaschine 
+mit der T aste Standby innerhalb von 10 Minuten weder der Drehregler gedreht noch 
+eine T aste gedrückt wird.
+III. Ende des Waschprogramms 
+1. Nach dem Waschende erscheint „End” im Display und ertönt ein Tonsignal 
+    (wenn diese Funktion aktiv ist). 
+2. Den Wasserhahn schließen.
+3. Die Waschmaschine mit der T aste Standby ausschalten.      
+4. Die Waschmaschine von der Stromversorgung trennen.
+5. Die Waschmaschine öffnen und die Wäsche entnehmen.
+
+
+LÖSEN VON 
+BETRIEBSPROBLEMEN  
+ 
+29
+Problem Wahrscheinliche Ursache / Lösung
+Die Waschmaschine funktioniert 
+nicht
+- Den Wasserhahn öffnen
+- Das Sieb am Wasserzuleitungsschlauch reinigen
+- Die Waschmaschinentür schließen
+- Die T aste [Start/Pause] drücken
+Das Wasser läuft aus - Den Wasserschlauch richtig anschließen.
+Nasses Waschgut in der Trommel - Erneut das Waschgut in die Trommel legen, den Pumpenfilter 
+reinigen.
+Unangenehmer Geruch aus der 
+Trommel
+- Die Selbstreinigung ohne Waschgut einschalten (Siehe: T abelle 
+der Waschprogramme).
+Kein Wasser in der Trommel - Der Wasser-Fehler                  wird im Display angezeigt, den Wasser-
+hahn öffnen.
+In der Weichspüler-Kammer bleibt 
+das Wasser stehen
+- Den „Knopf” in der Mittelkammer nachdrücken.
+Die Wäsche wurde schlecht gespült - Das Waschmittel je nach dem Verschmutzungsgrad und Wasser-
+härte dosieren (Siehe Hinweise auf der Verpackung des Wasch-
+mittels.)
+- Den Pumpenfilter reinigen
+Die Waschmaschine füllt sich mit 
+Wasser nicht auf
+- Den Wasserhahn öffnen
+- Die Einstellung des Waschprogramms prüfen
+- Den Wasserdruck prüfen
+- Den Wasserschlauch erneut anschließen.
+- Die Waschmaschinentür schließen
+- Prüfen, ob der Wasserschlauch nicht geknickt oder blockiert ist
+Gleichzeitiger Zufluss und Abfluss 
+von Wasser
+- Prüfen, ob das Endstück des Abwasserschlauchs sich über dem 
+Wasserspiegel in der Waschmaschine befindet (der Schlauch soll im 
+Höhenbereich von 0,6m-1m liegen)
+Das Wasser fließt nicht ordnung-
+smäßig ab
+- Den Pumpenfilter prüfen
+- Den Abwasserschlauch prüfen
+- Die Höhe des Abwasserschlauchs, der im Höhenbereich von 0,6m-
+1m über dem Fußboden liegen soll, prüfen
+Die Waschmaschine vibriert - Prüfen, ob die Transportsicherungen entfernt wurden
+- Die Waschmaschine ausrichten
+- Die Füße blockieren (Muttern anziehen)
+Im Waschmittelfach kommt es zur 
+Schaumbildung
+- Die Menge des eingesetzten Waschmittels reduzieren
+- Die Wasserhärte und die Menge des eingesetzten Waschmittels 
+sowie die Art des in der Trommel der Waschmaschine eingesetzten 
+Waschmittels prüfen.
+Die Waschmaschine stoppt vor dem 
+Ende des Waschprogramms
+- Die Stromversorgung sowie den Zufluss und Abfluss von Wasser 
+prüfen.
+Lärm, der durch die Abflusspumpe 
+nach dem Abpumpen von Wasser 
+verursacht wird.
+- Das Wasser wurde aus der Trommel abgepumpt, aber ein wenig 
+Wasser blieb noch in der Pumpe und im Abflussrohr stehen Der 
+Dauerbetrieb der Abflusspumpe verursacht Ansaugen von Luft und 
+einen charakteristischen Lärm, der jedoch auf keine Unrichtigkeit 
+hinweist.
+Kurze Unterbrechungen während 
+des Waschprogramms
+- In der Waschmaschine wird das Wasser automatisch nachgefüllt
+- Die Pause ist durch Beseitigen von übermäßigem Schaum verur-
+sach.
+
+
+                  ANZEIGEN DER FEHLER-CODES DER W ASCHMASCHINE
+Die Waschmaschine verfügt über ein Alarmsystem, das mit Hilfe der im Display angezeigten „FEHLER -
+CODES“ beim Auftreten geringerer Probleme, die mit inkorrektem Betrieb verbunden sind, weiterhilft. 
+Mit dem System der FEHLER -CODES” lassen sich die Fehler lokalisieren und deren Ursache feststellen.
+Wird ein Fehler festgestellt, leuchten auf dem Display Anzeige gemäß der nachfolgenden T abelle auf:
+Bei der Feststellung des Fehlers ertönt zusätzlich ein Tonsignal 
+(soweit diese Funktion aktiv ist).
+Anzeige auf 
+dem Display
+Ursache Erklärung
+E10 Niedriger Wasserdruck; 
+kein Wasser in der 
+Waschmaschine.
+Den Wasserhahn öffnen, den Wasserschlauch und den Filter prüfen, 
+den Wasserdruck prüfen.
+E12 Überfüllung Erneute Inbetriebnahme des Gerätes
+E21 Das Wasser fließt nicht 
+ordnungsmäßig ab.
+Die Abflusspumpe und den Filter prüfen.
+E30 Die Waschmaschinentür 
+werden nach dem 
+Schließen nicht ver-
+riegelt.
+Die Waschmaschinentür schließen, prüfen, ob die Kleidung in der 
+Tür nicht eingeschlossen wurde.
+Sonstige Versuchen, die Waschmaschine erneut zu starten oder sich mit dem 
+SER VICEZENTRUM.
+30
+                  W ARTUNG UND REINIGUNG
+
+LÖSEN VON BETRIEBSPROBLEMEN
+                  W ARTUNG UND REINIGUNG
+31
+Das Fach wieder 
+einschieben.
+Alle Teile wieder 
+einsetzen.
+I. Reinigung des Pumpenfilters 
+II. Reinigung des Wasserversorgungsventils.
+Das Pumpenfilter je ca. 20 Wäschen reini-
+gen. Vernachlässigung der Reinigung verur-
+sacht Schwierigkeiten beim Wasserablassen 
+aus der Waschmaschine! 
+Den Wasserschlauch herausdrehen
+Den Bolzen des Filternetzes mit Zange halten
+Herausnehmen und den Filter reinigen (mit einem 
+Pinsel)
+III. Reinigung des Waschmittelfachs - mindestens einmal im Monat reinigen.
+Das Fach herausziehen (die Ausschub-
+begrenzung gleichzeitig drücken).
+Unter fließendem Wasser reinigen 
+(eventuell mit Hilfe einer Bürste oder 
+einem T uch).
+Zum Reinigen des Gehäuses und der Kunststoffteile des Erzeugnisses keine Lösungsmittel 
+sowie scharfe und Scheuerreinigungsmittel anwenden (z.B. Reinigungsmittel- bzw . –milch)! 
+Nur delikate flüssige Mittel und weiche Tücher verwenden. Keine Schwämme verwenden.
+Erneute Montage 
+des Filters - umge-
+kehrte Reihenfol-
+ge. 
+Nach der Trennung vom 
+Stromnetz die Filter-
+klappe öffnen.
+Den Filter - wie 
+abgebildet - nach 
+unten ziehen und alle 
+kleinen Gegenstände 
+entfernen.
+
+
+32
+                  W ASCH- UND VEREDELUNGSMITTEL
+ 
+1
+2
+Waschmittel
+Weichspüler , die beim Spülen eingesetzt werden.
+PRAKTISCHE W ASCHHINWEISE 
+Das Waschmittel in die Kammer des Behälters einfül-
+len, die mit dem Symbol gekennzeichnet ist.
+Das Waschmittel für die Vorwäsche in die Kammer des 
+Behälters einfüllen, die mit dem Symbol  gekennzeich-
+net ist.
+Der Weichspüler in die mittlere Kammer des Waschmittelfachs einfüllen, die mit 
+dem Symbol gekennzeichnet ist. 
+Das an der Kammer des Waschmittelfachs angegebene, maximale Niveau nicht 
+überschreiten. Das Spülmittel wird der letzten Spülung zugefügt.
+Zu empfehlen sind allgemeine Waschmittel 
+(in Pulver- oder flüssiger Form) für vollen Temperaturbereich unter Beachtung der auf der 
+Verpackung angegebenen Hinweise des Herstellers.
+Für weiße Wäsche wird ein festes Waschmittel wie z.B. Waschpulver empfohlen. Flüsis-
+gwaschmittel enthalten keine Bleichmittel. Für weiße Wäsche sollten keine Weichspüler 
+verwendet werden, denn dies kann zum Vergilben der weißen Wäsche führen.
+                  ERSTES W ASCHEN 
+                  VERSCHMUTZUNGEN
+ 
+                  SP AREN
+ 
+
+                  ERSTES W ASCHEN 
+                  VERSCHMUTZUNGEN
+ 
+                  SP AREN
+ 
+1
+2
+3
+Hartnäckige Flecken
+Einschränkung von Strom- und Wasserverbrauch
+Starke Verschmutzung
+Leichte Verschmutzungen
+Die Wäsche vor dem Waschen zusätzlich mit einem Fleckenentferner gemäß 
+Gebrauchsanweisung behandeln.
+Ein entsprechendes Waschprogramm für kleine Mengen von leicht verschmutzter Wäsche z.B. 
+Kurzwäsche nutzen. 
+Zusätzlich erkennt die Waschmaschine bei den meisten Waschprogrammen die Größe der Bela-
+dung. Im Programm Baumwolle werden bei niedriger Beladung der Wasser- und Stromverbrauch 
+reduziert und die Waschdauer verkürzt.
+Die in Bezug auf den Energie- und Wasserverbrauch effektivsten Programme sind im Allge-
+meinen die Programme, mit denen bei niedrigen Temperaturen über längere Zeit gewaschen 
+wird.
+Durch das Beladen von Haushaltswaschmaschinen bis zu der vom Hersteller für die jeweiligen 
+Programme angegebenen Kapazität wird zum Sparen von Energie und Wasser beigetragen.
+Um bessere Waschergebnisse zu erzielen, sollten auf einmal kleinere Mengen der 
+Wäsche gewaschen werden, 
+Mehr Waschmittel zugeben.
+Nach dem Waschen stark verschmutzter Wäsche (z.B. Arbeitskleidung) oder der 
+Wäsche, die F asern verliert, sollte die Waschmaschine durchgespült werden. Zu 
+diesem Zweck das Waschprogramm 60°C, ohne Waschgut, z.B. Baumwolle oder 
+Synthetik, starten.
+Siehe „Sparen” .
+Vor dem ersten Waschen ein Waschprogramm in hoher Temperatur ohne Waschgut 
+nach dem folgenden Verfahren laufen lassen:
+1). Die Waschmaschine an die Stromversorgung anschließen.
+2). Den Wasserhahn öffnen.
+3). Den Programmknopf auf Wäsche in hoher Temperatur stellen, entsprechendes 
+Waschmittel geben und die T aste Start/Pause drücken.
+33
+
+                  W ASSERHÄRTE 
+                  SP ANNUNGSSCHWUND (MEMOR Y DES W ASCHPROGRAMMS)
+                  BEFÜLLUNG
+                  KONTROLLE DER VERTEILUNG DES W ASCHGUTS
+Hartes Wasser bewirkt die Verkalkung von Waschmaschinen. Informationen über die Was-
+serhärte können im nächstliegenden Wasserwerk eingeholt werden. Es wird empfohlen, 
+Wasserwichmacher für jede Wäsche zu verwenden.
+Das Abschalten der Waschmaschine vom Netz bzw . Spannungsschwund löschen das aus-
+gewählte Waschprogramm nicht. Das gestartete Waschprogramm ist gespeichert und wird nach 
+Sicherstellung der Stromversorgung wieder aufgenommen. Die Waschmaschinentür bei Span-
+nungsausfall nicht öffnen.
+Die Beladung der Trommel der Waschmaschine mit Kleidung muss nach den nachfolgend 
+genannten Vorgaben erfolgen:
+1). Baumwolle, Jeans, Kinderwäsche – maximal gefüllte Trommel (Die Kleidung darf nicht gewalt-
+sam in die Trommel hineingedrückt werden, weil dies eine Verschlechterung der Qualität des 
+Waschens bewirkt!).
+2). Synthetik – maximal halb gefüllte Trommel.
+3). Wolle, Seide, feine Stoffe – maximal zu einem Drittel gefüllte Trommel.
+Die elektronische Steuerung der Waschmaschinen ist mit dem System der Gleichgewichtskon-
+trolle ausgestattet. 
+Vor dem Schleudern wird die Verteilung von Waschgut in der Trommel geprüft. Sollte zu großes 
+Ungleichgewicht festgestellt werden, wird vom System mehrmals der Versuch unternommen, 
+die Verteilung der Wäsche in der Waschmaschine zu ändern. Manchmal erweisen sich diese Ver-
+suche für eine entsprechende Verteilung der Wäsche als nicht ausreichend. Diese Schwierig-
+keiten können u.a. durch folgende Umstände entstehen: Frotte-Morgenmäntel, die zusammen 
+mit anderen Arten der Wäsche gewaschen werden, Bettwäsche,die sich zu einer Kugel geformt 
+haben usw .
+Das System kann dann auf zweierlei Art reagieren:
+1). die ungleichmäßige Verteilung der Wäsche nicht akzeptieren, aber die Schleudergeschwind-
+igkeit reduzieren, 
+2).   das Schleudern nicht genehmigen.
+In beiden Fällen nach dem Waschende die Waschmaschinentür öffnen, die Wäsche manuell 
+verteilen, die Tür schließen und erneut das Schleudern wählen.
+Maximales F assungsvermögen der Trommel 8 kg:
+Die Waschmaschine nicht überladen! Bei Überladen der Waschmaschine kann die 
+gewaschene Kleidung beschädigt werden! Bei Überladung wird im Display die Meldung 
+OVL angezeigt - übermäßiges Waschgut herausnehmen und die Waschmaschine wieder 
+starten. Maximale Menge von Waschgut ist je nach dem Waschprogramm der T abelle der 
+Waschprogramme zu entnehmen.
+34
+                  TÜRSPERRE
+                  DOSIERUNG DES W ASCHMITTELS
+                  FEINWÄSCHE
+
+                  TÜRSPERRE
+                  DOSIERUNG DES W ASCHMITTELS
+                  FEINWÄSCHE
+Die Waschmaschine ist mit einer Blockade ausgestattet, die die Öffnung der 
+Waschmaschinentür während des Waschvorgangs verhindert. Nach dem Ende 
+des Waschprogramms entriegelt die Maschine automatisch die Tür .
+Verbleibt das Wasser in der Trommel oder ist die Temperatur zu hoch, lässt sich die Tür 
+nicht öffnen. Das Öffnen der Waschmaschinen ist auch auf manchen Stufen des Wasch-
+vorgangs nicht möglich.
+1
+1
+2
+2
+Wahl des Waschprogramms
+Zu wenig Waschmittel.
+Befüllung
+Zu viel Waschmittel.
+Ein entsprechendes Waschprogramm (Synthetika, Wolle, Feinwäsche) 
+wählen.
+Das Waschgut wird grau, es bilden sich Fettklumpen, es kommt zur 
+Verkalkung.
+Starkes Schäumen, schlechte Effektivität der Wäsche, schlechtes Ausspülen 
+des Waschmittels aus der Wäsche.
+Überladung der Waschmaschine vermeiden, bei feiner Wäsche beträgt die 
+maximale Beladung 2,5 kg, siehe: „Beladung” .
+35
+
+36
+Weitere Informationen über das Produkt bietet die EU-Produktdaten-
+bank EPREL auf der Website  https://eprel.ec.europa.eu. Sie finden die 
+Informationen, indem Sie den QR-Code auf dem Energieetikett scan-
+nen oder das auf dem Energieetikett angegebene Produktmodell in die 
+EPREL-Suchmaschine auf der Website https://eprel.ec.europa.eu/ einge-
+ben.
+GARANTIE, 
+NACHVERKAUFSSERVICE
+Garantie
+Garantieleistungen laut Garantieschein. Der Hersteller übernimmt keine Haftung für Schäden, die durch den unsachgemäßen Betrieb des Produkts entstanden sind.
+Wartung
+• Der Hersteller empfiehlt, jegliche Reparaturen und Einstellarbeiten von einem Werksservice oder vom Hersteller autorisierten Kundendienst durchführen zu lassen. Aus Sicherheitsgründen sollten Sie das Gerät nicht selbst reparieren. • Von Personen ohne die erforderlichen Qualifikationen durchgeführte Reparaturen können für den Gerätebenutzer eine ernste Gefahr verur-sachen.• Der Mindestzeitraum, für den zur Reparatur des Geräts erforderlichen Ersatzteile erhältlich sind, beträgt je nach Art und Zweck des Ersatzteils 7 oder 10 Jahre und entspricht der Verordnung (EU) 2019/2023 der Kommission. • Die Ersatzteilliste und das Bestellverfahren finden Sie auf den Websites des Herstellers, des Einführers und des Vertragshändlers.• Die vom Hersteller, Einführer oder Vertragshändler gewährte Mindest-garantiezeit für das Gerät ist im Garantieschein angegeben.
+• Im Fall unbefugter Anpassungen, Änderungen, der Verletzung von Plomben oder anderer Sicherheitsvorrichtungen des Geräts oder Teilen davon, sowie im Fall sonstiger unbefugter Manipulationen am Gerät, die nicht der Bedienungsanleitung entsprechen, verfällt die Garantie für das Gerät.
+Reparaturmeldungen und Hilfe bei Fehlern
+Wenn das Gerät repariert werden muss, wenden Sie sich bitte an den Kun-dendienst. Die Adresse und Rufnummer des Kundendienstes sind im Ga -rantieschein angegeben. Halten Sie, wenn Sie den Kundendienst anrufen, bitte die Seriennummer des Geräts bereit. Diese befindet sich auf dem Typenschild. Notieren Sie sich die Seriennummer der Einfachheit halber am besten hier:
+
+37
+                  KONTROLLE DER VERTEILUNG DES W ASCHGUTS
+Allgemeine Informationen
+Bevor Sie die Waschmaschine einbauen, lesen Sie bitte diese Anleitung aufmerksam durch 
+und bewahren Sie sie gut auf. Das Gerät ist für den Einbau in Küchenmöbel bestimmt. Die 
+Einbauöffnung sollte mindestens die in der Abbildung angegebenen Maße haben.
+                  EINBAU DER WASCHMASCHINE
+WARNUNG
+Achten Sie beim Einbau in Küchenmöbel darauf, dass die Schläuche in den Öffnungen an der 
+Rückseite des Geräts untergebracht werden. Damit verhindern Sie, dass die Schläuche geknickt oder 
+gequetscht werden.
+1
+825m m
+600mm
+540mm 595mm
+152.5mm
+580mm
+825mm
+
+Vorbereitung und Montage der Tür
+Das Gerät ist für die Montage hinter einer linksöffnende oder einer rechtsöffnenden Tür be-
+stimmt.
+Rechtsöffnende Tür Linksöffnende Tür
+38
+Anhang
+1. Schneidschrauben
+2. Scharniere
+3. Magnet
+4. Distanzplatte
+5. Papierschablone
+(M5*12)(ST4*12) (ST4.8*15)
+x4 x6 x4
+
+39
+Vorbereitung der Papierschablone
+Markieren Sie die Tür entsprechend der Höhe des Schranks und der Waschmaschine.
+Werkzeug
+1. Schraubendreher
+2. Bohrer
+3. Lineal
+4. Bleistift
+Position Paper
+1
+
+Tür mit Schablone.
+Legen Sie die Schablone 
+auf die Tür.
+Schablone ankleben 
+(rechte Tür)
+Schablone ankleben 
+(linke Tür)
+Löcher in die Tür bohren
+Bohren Sie gemäß der Schablone Löcher in die Tür.
+Montage der Scharniere und der Distanzplatten
+Befestigen Sie die Scharniere mit den Schrauben. Die Scharniere können angepasst werden, um 
+eventuelle Unebenheiten der Tür auszugleichen.
+ 
+40
+Position Paper Position Paper
+2
+Top Top
+Left Open Right Open
+16-22mm 12mm
+35mm
+12mm
+2mm
+3
+4
+
+41
+Montage des Magneten
+Das Gerät ist für ein magnetisches Türschließsystem konzipiert.  Damit das Gerät korrekt funktio-
+niert, müssen Sie den Magnet an der Türinnenseite anschrauben.
+ 
+ 
+Einbau der Tür
+Das maximal zulässige Gewicht der Möbelfront beträgt 7,5 kg.
+5
+6
+
+42
+
+43
+
+AMICA S.A.
+UL. MICKIEWICZA 52
+64-510 WRONKI
+TEL. 67 25 46 100
+FA X  67 25 40 320
+WWW .AMICA.PL

@@ -1,0 +1,285 @@
+﻿{
+"product": {
+"brand": "Amica",
+"model": "FH 664 621 E",
+"productCode": "FH664621E",
+"applianceType": "extractor_hood",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+]
+},
+"entries": [
+{
+"id": "fh-664-621-e-aluminium-filter-cleaning-indicator",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "The aluminium-filter cleaning indicator appears on the display",
+"possibleCause": "The indicator appears after approximately 60 hours of fan operation and means that the aluminium filters need cleaning.",
+"safeUserCheck": "Clean the aluminium filters. With the hood switched off, clear the filter-cleaning indication by touching and holding the indicated control for approximately 3 seconds.",
+"claimTrigger": "No service claim is required for the normal filter-cleaning reminder.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"filter warning",
+"filter light",
+"filter symbol",
+"clean filter message",
+"aluminium filter warning",
+"filter reminder",
+"60 hours"
+],
+"sourceSection": "PDF p. 24, ANZEIGE DER REINIGUNG DER ALUMINIUMFILTER ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-clean-aluminium-grease-filter",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Aluminium grease filter requires cleaning",
+"possibleCause": "During normal operation the grease filter collects grease and must be cleaned regularly. A filter saturated with grease is flammable.",
+"safeUserCheck": "Disconnect the hood from the power supply before cleaning. Clean the aluminium grease filter every month in a dishwasher or by hand using a mild detergent or liquid soap, as described in the manual.",
+"claimTrigger": "No service claim is required for normal grease-filter cleaning. Contact service if the hood has a fault that remains after normal filter maintenance.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"clean grease filter",
+"grease filter dirty",
+"aluminium filter dirty",
+"filter full of grease",
+"clean hood filter",
+"grease filter maintenance"
+],
+"sourceSection": "PDF pp. 19-20 and 27, SICHERHEITSHINWEISE / FETTFILTER",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-aluminium-filter-colour-change",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Aluminium filter changes colour after being washed",
+"possibleCause": "The manual states that the colour of the aluminium filter can change after it has been washed several times in a dishwasher.",
+"safeUserCheck": "No corrective action is required for the colour change alone.",
+"claimTrigger": "Do not create a service claim for aluminium-filter discolouration alone. The manual states that this does not mean the filter is defective or needs replacement.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"filter changed colour",
+"filter discoloured",
+"aluminium filter grey",
+"filter colour changed",
+"filter looks different after washing"
+],
+"sourceSection": "PDF p. 27, REINIGUNG UND WARTUNG - WARTUNG",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-replace-activated-charcoal-filter",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Activated charcoal filter requires replacement",
+"possibleCause": "When the hood operates in recirculation mode, the activated charcoal filter absorbs odours until it becomes saturated.",
+"safeUserCheck": "If the hood is used in recirculation mode, replace the activated charcoal filter at least every 3 to 4 months, or more often with intensive use. The charcoal filter cannot be washed or regenerated.",
+"claimTrigger": "No service claim is required for normal charcoal-filter replacement.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"replace charcoal filter",
+"carbon filter",
+"charcoal filter saturated",
+"hood filter smells",
+"recirculation filter",
+"odour filter replacement"
+],
+"sourceSection": "PDF p. 27, REINIGUNG UND WARTUNG - AKTIVKOHLEFILTER",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-fan-starts-when-front-panel-is-extended",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Hood fan starts automatically when the telescopic front panel is pulled out",
+"possibleCause": "The telescopic hood has a limit switch. When the front panel is pulled out, the hood starts at the previously selected fan speed.",
+"safeUserCheck": "No corrective action is required if the hood starts at the previously selected speed when the telescopic front is extended.",
+"claimTrigger": "Do not create a service claim for this normal operating behaviour alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"fan starts by itself",
+"hood starts when pulled out",
+"extractor starts automatically",
+"telescopic panel starts fan",
+"fan remembers speed",
+"previous speed"
+],
+"sourceSection": "PDF p. 25, BEDIENUNG - STEUERUNG DER DUNSTABZUGSHAUBE",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-off-timer-active",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Fan-speed number flashes while the hood continues running",
+"possibleCause": "A flashing fan-speed number indicates that the approximately 15-minute delayed switch-off timer is active.",
+"safeUserCheck": "Allow the timer to finish, or push the telescopic panel in to cancel the delayed switch-off and turn the appliance off.",
+"claimTrigger": "No service claim is required when the flashing display is caused by the normal delayed switch-off timer.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"speed number flashing",
+"display flashing",
+"hood keeps running",
+"15 minute timer",
+"delayed switch off",
+"off timer"
+],
+"sourceSection": "PDF pp. 23-24, TIMER (AUSSCHALTVERZÃ–GERUNG DER DUNSTABZUGSHAUBE)",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-cancel-off-timer",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Delayed switch-off timer needs to be cancelled",
+"possibleCause": "The approximately 15-minute delayed switch-off function has been activated.",
+"safeUserCheck": "Push the telescopic panel in to cancel the delayed switch-off function and turn off the appliance. Set the desired fan speed again if you want to continue using the hood.",
+"claimTrigger": "No service claim is required for normal timer cancellation.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"cancel timer",
+"turn off timer",
+"stop delayed switch off",
+"hood timer",
+"fan keeps running"
+],
+"sourceSection": "PDF pp. 23-24, TIMER (AUSSCHALTVERZÃ–GERUNG DER DUNSTABZUGSHAUBE)",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-damaged-power-cable",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Power cable is damaged",
+"possibleCause": "The manual does not give a customer-repairable cause. It states that a damaged power cable must be replaced by a specialist service centre.",
+"safeUserCheck": "Stop using the hood. Disconnect it from the power supply only if this can be done safely. Do not repair or replace the cable yourself.",
+"claimTrigger": "Create an urgent service claim for a damaged power cable or exposed electrical parts.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of the damaged cable if safe to take",
+"product model and serial number",
+"description of the damage",
+"description of when the damage was noticed"
+],
+"matchTerms": [
+"damaged power cable",
+"power cord damaged",
+"wire exposed",
+"burnt cable",
+"electrical damage",
+"broken power lead"
+],
+"sourceSection": "PDF p. 20, SICHERHEITSHINWEISE",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "fh-664-621-e-lighting-module-service",
+"productCode": "FH664621E",
+"aliases": [
+"FH 664 621 E",
+"FH664621E"
+],
+"itemType": "extractor_hood",
+"model": "FH 664 621 E",
+"problem": "Hood lighting requires replacement",
+"possibleCause": "The manual does not specify a fault cause. Replacement lighting must have the same parameters as the factory-installed light.",
+"safeUserCheck": "Disconnect the hood from the power supply before maintenance. Use only a replacement light with the same parameters as the factory-installed component and follow the lighting-replacement figure in the manual.",
+"claimTrigger": "Contact authorised service if the lighting module cannot be replaced using the procedure provided in the manual or if service intervention is required.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing the lighting problem",
+"product model and serial number",
+"description of the lighting problem",
+"description of checks already completed"
+],
+"matchTerms": [
+"hood light not working",
+"extractor light broken",
+"light won't turn on",
+"replace hood light",
+"LED not working",
+"hood lamp"
+],
+"sourceSection": "PDF p. 27, REINIGUNG UND WARTUNG - BELEUCHTUNG",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+}
+]
+}
+

@@ -10,23 +10,43 @@
       "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher"
     },
     {
+      "alias": "A-EGSPV587915",
+      "sourceSection": "EGSPV 587 915 / A-EGSPV587915 - Dishwasher"
+    },
+    {
+      "alias": "EGSPV 587 915",
+      "sourceSection": "EGSPV 587 915 / A-EGSPV587915 - Dishwasher"
+    },
+    {
+      "alias": "EGSPV587915",
+      "sourceSection": "EGSPV 587 915 / A-EGSPV587915 - Dishwasher"
+    },
+    {
       "alias": "EGSPV 597 210",
       "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher"
     },
     {
+      "alias": "EGSPV597210",
+      "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher"
+    },
+    {
       "alias": "FH 664 621 S",
-      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood"
+      "sourceSection": "FH 664 621 S / FH 664 621 E / FH664621E - Extractor Hood"
     },
     {
       "alias": "FH664621E",
-      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood"
+      "sourceSection": "FH 664 621 S / FH 664 621 E / FH664621E - Extractor Hood"
     },
     {
       "alias": "FH 664 621 E",
-      "sourceSection": "FH 664 621 S / FH664621E - Extractor Hood"
+      "sourceSection": "FH 664 621 S / FH 664 621 E / FH664621E - Extractor Hood"
     },
     {
       "alias": "KHF 664 611 S",
+      "sourceSection": "KHF 664 611 S - Chimney Hood"
+    },
+    {
+      "alias": "KHF664611S",
       "sourceSection": "KHF 664 611 S - Chimney Hood"
     },
     {
@@ -46,6 +66,10 @@
       "sourceSection": "KGC 15495 S / KGCN 388 140 E - Fridge-Freezer"
     },
     {
+      "alias": "KGCN388140E",
+      "sourceSection": "OL-KGCN388140E / KGCN 388 140 E - Fridge-Freezer"
+    },
+    {
       "alias": "OL-KMI 754 000 E",
       "sourceSection": "OL-KMI754000E catalog mapping; manual model KMI 754 000 C / DI 6402 B"
     },
@@ -55,6 +79,22 @@
     },
     {
       "alias": "KMI 754 000 C",
+      "sourceSection": "OL-KMI754000E manual model KMI 754 000 C / DI 6402 B"
+    },
+    {
+      "alias": "KMI754000C",
+      "sourceSection": "OL-KMI754000E manual model KMI 754 000 C / DI 6402 B"
+    },
+    {
+      "alias": "OL-KMI754000E",
+      "sourceSection": "OL-KMI754000E manual model KMI 754 000 C / DI 6402 B"
+    },
+    {
+      "alias": "KMI754000E",
+      "sourceSection": "OL-KMI754000E manual model KMI 754 000 C / DI 6402 B"
+    },
+    {
+      "alias": "DI6402B",
       "sourceSection": "OL-KMI754000E manual model KMI 754 000 C / DI 6402 B"
     },
     {
@@ -72,6 +112,18 @@
     {
       "alias": "EBX 943 600 S",
       "sourceSection": "EBX 943 600 S - Oven"
+    },
+    {
+      "alias": "EBX943600S",
+      "sourceSection": "EBX 943 600 S - Oven"
+    },
+    {
+      "alias": "A-EBX943600S",
+      "sourceSection": "A-EBX943600S / EBX 943 600 S - Oven"
+    },
+    {
+      "alias": "12262.3eETsDHbVlS",
+      "sourceSection": "12262.3eETsDHbVlS / EBX 943 600 S - Oven"
     }
   ],
   "entries": [
@@ -227,7 +279,7 @@
       ],
       "itemType": "dishwasher",
       "model": "EGSPV 597 210",
-      "problem": "Rinse aid indicator is on / display shows “Lsb”",
+      "problem": "Rinse aid indicator is on / display shows ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“Lsb",
       "possibleCause": "Rinse aid is low/empty.",
       "safeUserCheck": "Add rinse aid.",
       "claimTrigger": "No claim unless indicator remains after refill or dispenser is damaged.",
@@ -238,7 +290,7 @@
       ],
       "sourceSection": "EGSPV 597 210 / A-EGSPV597210 - Dishwasher",
       "matchTerms": [
-        "Rinse aid indicator is on / display shows “Lsb”"
+        "Rinse aid indicator is on / display shows ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“Lsb"
       ]
     },
     {
@@ -790,7 +842,7 @@
       "model": "KHF 664 611 S",
       "problem": "Light not working",
       "possibleCause": "Light is switched off or lighting module/bulb issue.",
-      "safeUserCheck": "Press light button and check whether fan still works.",
+      "safeUserCheck": "Activate StandBy mode, then press the light control. Do not open or repair the lighting or wiring; disconnect the hood and contact authorised service if the light remains faulty.",
       "claimTrigger": "Create claim/service if light remains off or replacement is not user-accessible.",
       "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
@@ -837,7 +889,7 @@
       "model": "KHF 664 611 S",
       "problem": "Hood turns off after delay / timer active",
       "possibleCause": "Off-Timer enabled; delay is about 15 minutes to filter fumes after cooking.",
-      "safeUserCheck": "Explain normal timer behaviour. Cancel by pushing retractable panel back in or turning off, depending on model.",
+      "safeUserCheck": "Explain normal timer behaviour. For this touch-control model, press and hold the low-speed sensor for 3 seconds to cancel, change speed, or press On/Off to stop the hood.",
       "claimTrigger": "No claim unless timer cannot be cancelled or behaviour is abnormal.",
       "chatbotDecision": "NO_CLAIM_NORMAL",
       "evidenceToRequest": [
@@ -857,17 +909,18 @@
       "itemType": "extractor_hood",
       "model": "KHF 664 611 S",
       "problem": "Filter-cleaning indication appears",
-      "possibleCause": "Aluminium filter cleaning reminder after approx. 60 hours of fan operation.",
-      "safeUserCheck": "Clean aluminium filters. Clear the indication after cleaning while the appliance is not operating.",
-      "claimTrigger": "No claim unless indication cannot be cleared after cleaning/reset.",
-      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "possibleCause": "This reminder is not documented for the KHF 664 611 S control panel; do not treat an unrelated display symbol as a confirmed filter-warning fault.",
+      "safeUserCheck": "Clean the aluminium filter monthly as described in the manual. If an unfamiliar symbol remains, photograph the display and contact service.",
+      "claimTrigger": "Create a service claim only if an undocumented warning remains or the hood malfunctions after filter maintenance.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "KHF 664 611 S - Chimney Hood",
+      "sourceSection": "KHF 664 611 S - Chimney Hood (filter reminder not documented in supplied manual)",
       "matchTerms": [
         "Filter-cleaning indication appears"
-      ]
+      ],
+      "isActive": false
     },
     {
       "id": "khf-664-611-s-grease-filter-colour-changed-after-washing",
@@ -1618,7 +1671,7 @@
       ],
       "itemType": "induction_hob",
       "model": "OL-KMI754000E",
-      "problem": "Single cooking zone switches off and residual heat “H” is shown",
+      "problem": "Single cooking zone switches off and residual heat ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“H is shown",
       "possibleCause": "Limited cook time, sensor fields covered/dirty, or electronic components overheated.",
       "safeUserCheck": "Switch on zone again; clean sensors; let appliance cool and check ventilation is not blocked.",
       "claimTrigger": "Create claim if zone repeatedly fails or overheating repeats.",
@@ -1628,7 +1681,7 @@
       ],
       "sourceSection": "OL-KMI754000E manual, p. 46 - Troubleshooting",
       "matchTerms": [
-        "Single cooking zone switches off and residual heat “H” is shown",
+        "Single cooking zone switches off and residual heat ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“H is shown",
         "cooking zone switches off H",
         "one zone turns off and H appears",
         "zone overheated"
@@ -2090,7 +2143,7 @@
     },
     {
       "id": "ewa-34660-w-washing-machine-not-working",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2113,7 +2166,7 @@
     },
     {
       "id": "ewa-34660-w-water-leakage",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2139,7 +2192,7 @@
     },
     {
       "id": "ewa-34660-w-load-has-not-been-spun",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2154,7 +2207,7 @@
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W manual, p. 29 - Lösen von Betriebsproblemen; p. 34 - Kontrolle der Verteilung des Waschguts",
+      "sourceSection": "EWA 34660 W manual, p. 29 - LÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¶sen von Betriebsproblemen; p. 34 - Kontrolle der Verteilung des Waschguts",
       "matchTerms": [
         "Load has not been spun",
         "spin speed reduced",
@@ -2166,7 +2219,7 @@
     },
     {
       "id": "ewa-34660-w-unpleasant-smell-in-drum",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2188,7 +2241,7 @@
     },
     {
       "id": "ewa-34660-w-no-water-in-drum",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2210,7 +2263,7 @@
     },
     {
       "id": "ewa-34660-w-water-left-in-fabric-softener-container",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2232,7 +2285,7 @@
     },
     {
       "id": "ewa-34660-w-washing-not-properly-rinsed",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2254,7 +2307,7 @@
     },
     {
       "id": "ewa-34660-w-appliance-does-not-fill-with-water",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2276,7 +2329,7 @@
     },
     {
       "id": "ewa-34660-w-simultaneous-water-intake-and-draining",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2291,14 +2344,14 @@
       "evidenceToRequest": [
         "short description of what the user already checked"
       ],
-      "sourceSection": "EWA 34660 W manual, p. 29 - Lösen von Betriebsproblemen",
+      "sourceSection": "EWA 34660 W manual, p. 29 - LÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¶sen von Betriebsproblemen",
       "matchTerms": [
         "Simultaneous water intake and draining"
       ]
     },
     {
       "id": "ewa-34660-w-water-does-not-drain-properly",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2320,7 +2373,7 @@
     },
     {
       "id": "ewa-34660-w-appliance-vibrating",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2344,7 +2397,7 @@
     },
     {
       "id": "ewa-34660-w-foam-leaks-from-detergent-drawer",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2367,7 +2420,7 @@
     },
     {
       "id": "ewa-34660-w-programme-interrupted-before-finished",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2389,7 +2442,7 @@
     },
     {
       "id": "ewa-34660-w-noise-from-outlet-pump-after-water-removed",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2414,7 +2467,7 @@
     },
     {
       "id": "ewa-34660-w-short-breaks-during-wash-cycle",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2436,7 +2489,7 @@
     },
     {
       "id": "ewa-34660-w-error-e10",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2461,7 +2514,7 @@
     },
     {
       "id": "ewa-34660-w-error-e21",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2486,7 +2539,7 @@
     },
     {
       "id": "ewa-34660-w-error-e30",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2511,7 +2564,7 @@
     },
     {
       "id": "ewa-34660-w-error-e12",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2539,7 +2592,7 @@
     },
     {
       "id": "ewa-34660-w-overload-ovl",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2556,7 +2609,7 @@
         "product model/serial number",
         "short description of the laundry load"
       ],
-      "sourceSection": "EWA 34660 W manual, p. 34 - Befüllung",
+      "sourceSection": "EWA 34660 W manual, p. 34 - BefÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼llung",
       "matchTerms": [
         "OVL",
         "overload",
@@ -2567,7 +2620,7 @@
     },
     {
       "id": "ewa-34660-w-door-cannot-open",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2584,7 +2637,7 @@
         "product model/serial number",
         "short description of whether water remains in the drum"
       ],
-      "sourceSection": "EWA 34660 W manual, p. 35 - Türsperre",
+      "sourceSection": "EWA 34660 W manual, p. 35 - TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼rsperre",
       "matchTerms": [
         "door cannot open",
         "door is locked",
@@ -2595,7 +2648,7 @@
     },
     {
       "id": "ewa-34660-w-child-lock-active",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2623,7 +2676,7 @@
     },
     {
       "id": "ewa-34660-w-start-delay-active",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2636,7 +2689,7 @@
       "claimTrigger": "No claim is needed when Start Delay is active.",
       "chatbotDecision": "NO_CLAIM_NORMAL",
       "evidenceToRequest": [],
-      "sourceSection": "EWA 34660 W manual, p. 28 - Einstellung der Startverzögerung",
+      "sourceSection": "EWA 34660 W manual, p. 28 - Einstellung der StartverzÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¶gerung",
       "matchTerms": [
         "waiting to start",
         "does not start immediately",
@@ -2647,7 +2700,7 @@
     },
     {
       "id": "ewa-34660-w-remaining-time-changes",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2671,7 +2724,7 @@
     },
     {
       "id": "ewa-34660-w-zero-spin-selected",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2694,14 +2747,14 @@
     },
     {
       "id": "ewa-34660-w-cold-water-selected",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
       ],
       "itemType": "washing_machine",
       "model": "EWA 34660 W",
-      "problem": "Display shows --°C",
+      "problem": "Display shows --ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C",
       "possibleCause": "Cold-water washing without preheating is selected.",
       "safeUserCheck": "Select another available wash temperature if heated washing is required.",
       "claimTrigger": "No claim is needed when the cold-water setting is selected.",
@@ -2709,7 +2762,7 @@
       "evidenceToRequest": [],
       "sourceSection": "EWA 34660 W manual, pp. 25-26 - Temperaturwahl",
       "matchTerms": [
-        "--°C",
+        "--ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C",
         "cold water",
         "cold wash",
         "no heating selected"
@@ -2717,7 +2770,7 @@
     },
     {
       "id": "ewa-34660-w-programme-knob-no-change",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2740,7 +2793,7 @@
     },
     {
       "id": "ewa-34660-w-programme-resumes-after-power-loss",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -2763,7 +2816,7 @@
     },
     {
       "id": "ewa-34660-w-other-error-code",
-      "productCode": "EWA 34660 W",
+      "productCode": "EWA34660W",
       "aliases": [
         "EWA 34660 W",
         "EWA34660W"
@@ -3226,6 +3279,2510 @@
         "oven internal fault",
         "oven fault after checks"
       ]
+    },
+    {
+      "id": "egspv-597-210-rapid-indicator-flashing-water-inlet",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Rapid programme indicator flashes quickly",
+      "possibleCause": "Water inlet time is too long. The water valve may be closed, the water inlet may be blocked, or the water pressure may be too low.",
+      "safeUserCheck": "Check that the water valve is open and that water is available. Check the accessible inlet hose for an obvious kink or blockage.",
+      "claimTrigger": "Create a service claim if the indicator continues flashing after the water supply and accessible inlet have been checked.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo or video of the flashing Rapid programme indicator",
+        "product model and serial number",
+        "description of the water valve check",
+        "description of the inlet hose check"
+      ],
+      "matchTerms": [
+        "rapid light flashing",
+        "quick programme flashing",
+        "dishwasher not filling",
+        "water not coming in",
+        "water inlet problem",
+        "low water pressure"
+      ],
+      "sourceSection": "PDF p. 35, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-rapid-self-cleaning-indicators-flashing-heating",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Rapid and Self-cleaning programme indicators flash quickly",
+      "possibleCause": "The required temperature was not reached. The manual identifies a heating-element fault.",
+      "safeUserCheck": "Do not open or repair the appliance. No safe customer repair check is specified.",
+      "claimTrigger": "Create a service claim when the Rapid and Self-cleaning programme indicators flash quickly together.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video showing both flashing indicators",
+        "product model and serial number",
+        "description of when the warning appeared"
+      ],
+      "matchTerms": [
+        "rapid and self clean flashing",
+        "quick and self cleaning lights flashing",
+        "not heating",
+        "water not getting hot",
+        "heating fault"
+      ],
+      "sourceSection": "PDF p. 35, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-eco-indicator-flashing-overfill",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "ECO programme indicator flashes quickly",
+      "possibleCause": "Overfilling. The manual states that part of the dishwasher is leaking.",
+      "safeUserCheck": "Stop using the dishwasher and close the main water tap. If water is present in the lower tray because of overfilling or a small leak, it must be removed before restarting the dishwasher.",
+      "claimTrigger": "Create an urgent service claim for this overfill or leakage condition.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo or video of the flashing ECO indicator",
+        "photo or video of visible water or leakage",
+        "product model and serial number",
+        "description of where water is visible",
+        "description of when the overfill occurred"
+      ],
+      "matchTerms": [
+        "eco light flashing",
+        "dishwasher overflowing",
+        "overfill",
+        "dishwasher leaking",
+        "water under dishwasher",
+        "water in lower tray",
+        "water in base"
+      ],
+      "sourceSection": "PDF p. 35, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-rapid-1h-eco-indicators-flashing-communication",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Rapid, 1-hour and ECO programme indicators flash quickly",
+      "possibleCause": "Communication fault between the main circuit board and the display circuit board. The circuit may be open or the communication connections may be damaged.",
+      "safeUserCheck": "Do not open the appliance or inspect internal wiring. No safe customer check is specified.",
+      "claimTrigger": "Create a service claim when these three programme indicators flash quickly together.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video showing all three flashing indicators",
+        "product model and serial number",
+        "description of when the fault appeared"
+      ],
+      "matchTerms": [
+        "rapid 1 hour eco flashing",
+        "three lights flashing",
+        "communication fault",
+        "display fault",
+        "control board fault"
+      ],
+      "sourceSection": "PDF p. 35, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-rinse-aid-warning",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Rinse-aid warning indicator is lit",
+      "possibleCause": "There is only a small amount of rinse aid left in the dispenser.",
+      "safeUserCheck": "Refill the rinse-aid dispenser with rinse aid intended for household dishwashers.",
+      "claimTrigger": "No service claim is required for the refill warning alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "rinse aid light",
+        "rinse aid warning",
+        "rinse aid indicator",
+        "Lsb",
+        "refill rinse aid"
+      ],
+      "sourceSection": "PDF pp. 17 and 36, DISPLAY I BEDIENPANEL / FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-refill-rinse-aid",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Rinse aid needs refilling",
+      "possibleCause": "The rinse-aid warning indicates that only a small amount remains in the dispenser.",
+      "safeUserCheck": "Refill the rinse-aid dispenser without overfilling it. Wipe away any spilled rinse aid because the manual states that spills can cause excessive foam.",
+      "claimTrigger": "No service claim is required for normal rinse-aid refilling.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "refill rinse aid",
+        "add rinse aid",
+        "rinse aid empty",
+        "rinse aid low",
+        "rinse aid light on"
+      ],
+      "sourceSection": "PDF pp. 23-24, FÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼llen des KlarspÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼lbehÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤lters und Auswahl der Einstellungen",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-salt-warning",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Regeneration-salt warning indicator is lit",
+      "possibleCause": "There is only a small amount of regeneration salt left in the dispenser.",
+      "safeUserCheck": "Refill with regeneration salt intended specifically for dishwashers. The warning may remain lit for a while after refilling while the salt dissolves.",
+      "claimTrigger": "No service claim is required for the refill warning alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "salt light",
+        "salt warning",
+        "salt indicator",
+        "dishwasher salt low",
+        "refill salt"
+      ],
+      "sourceSection": "PDF pp. 17 and 20, DISPLAY I BEDIENPANEL / Salz einfÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼llen",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-refill-dishwasher-salt",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher salt needs refilling",
+      "possibleCause": "The salt warning indicates that regeneration salt is low.",
+      "safeUserCheck": "Refill the salt container with regeneration salt intended for dishwashers. After refilling, start a wash programme immediately, preferably the Rapid programme. If salt was spilled, run the soaking or Rapid programme.",
+      "claimTrigger": "No service claim is required for normal salt refilling.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "refill dishwasher salt",
+        "add salt",
+        "salt container empty",
+        "salt light on",
+        "dishwasher salt low"
+      ],
+      "sourceSection": "PDF pp. 19-20, Salz einfÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼llen",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-self-cleaning-reminder",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Self-cleaning reminder is shown",
+      "possibleCause": "The dishwasher requests self-cleaning after 20 cycles. The indicator flashes for 5 seconds and the reminder remains for 3 cycles.",
+      "safeUserCheck": "Run the Self-cleaning programme.",
+      "claimTrigger": "No service claim is required for the normal self-cleaning reminder.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "self clean light",
+        "self cleaning indicator",
+        "cleaning reminder",
+        "self clean flashing",
+        "dishwasher cleaning reminder"
+      ],
+      "sourceSection": "PDF p. 17, DISPLAY I BEDIENPANEL",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-run-self-cleaning-programme",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher requires its self-cleaning programme",
+      "possibleCause": "The self-cleaning reminder is activated after 20 cycles.",
+      "safeUserCheck": "Select and run the Self-cleaning programme.",
+      "claimTrigger": "No service claim is required for running the normal self-cleaning programme.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "run self clean",
+        "clean dishwasher",
+        "self cleaning programme",
+        "self clean cycle"
+      ],
+      "sourceSection": "PDF pp. 17-18, DISPLAY I BEDIENPANEL",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-end-of-cycle-buzzer",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher gives an audible signal at the end of the wash cycle",
+      "possibleCause": "The audible signal indicates that the wash cycle has ended.",
+      "safeUserCheck": "No corrective action is required.",
+      "claimTrigger": "Do not create a service claim for the normal end-of-cycle audible signal alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "dishwasher beeps",
+        "beeping at end",
+        "buzzer after wash",
+        "alarm when finished",
+        "beeps after cycle"
+      ],
+      "sourceSection": "PDF p. 36, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-open-dry-door-opens-automatically",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher door opens automatically during drying",
+      "possibleCause": "OpenDry automatically opens the door slightly during the drying phase to improve drying results with lower energy consumption.",
+      "safeUserCheck": "Do not close the door when OpenDry has opened it during drying. The manual states that closing it can damage the appliance.",
+      "claimTrigger": "No service claim is required when the door opens automatically during the drying phase as described by the manual.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "door opens by itself",
+        "door opens during drying",
+        "automatic door opening",
+        "OpenDry",
+        "dishwasher door opened",
+        "door opens at end"
+      ],
+      "sourceSection": "PDF p. 31, Nach dem Ende des SpÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼lprogramms - OpenDry. Automatische TÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼rÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¶ffnung",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-does-not-start",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher does not start",
+      "possibleCause": "The door may not be properly closed and latched, the appliance may not be connected to power, Start Delay may be selected, or the start/child lock may be enabled on applicable models.",
+      "safeUserCheck": "Close the door firmly and confirm it is latched. Check the normal power connection. Check whether Start Delay is selected. If fitted, disable the start/child lock according to the operating instructions.",
+      "claimTrigger": "Create a service claim if the dishwasher still does not start after these checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "product model and serial number",
+        "photo or video of the control panel when starting is attempted",
+        "description of the door check",
+        "description of the power and Start Delay checks"
+      ],
+      "matchTerms": [
+        "won't start",
+        "does not start",
+        "nothing happens",
+        "can't start dishwasher",
+        "start button not working",
+        "dishwasher won't run"
+      ],
+      "sourceSection": "PDF pp. 36-37, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-does-not-fill-with-water",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher does not fill with water",
+      "possibleCause": "The water valve may be closed or the door lock may not be correctly engaged.",
+      "safeUserCheck": "Check that the water valve is open and make sure the dishwasher door is fully closed.",
+      "claimTrigger": "Create a service claim if the dishwasher still does not fill after the water valve and door checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "product model and serial number",
+        "photo or video of the control panel",
+        "description of the water-valve check",
+        "description of the door check"
+      ],
+      "matchTerms": [
+        "not filling",
+        "no water coming in",
+        "dishwasher has no water",
+        "doesn't take water",
+        "water inlet",
+        "no water"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-wash-cycle-takes-too-long",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Wash cycle takes longer than expected",
+      "possibleCause": "Programme duration can increase depending on how dirty the dishes are. Selecting the sanitizing option also extends the cycle so the required temperature can be reached. The manual also instructs checking the water connection.",
+      "safeUserCheck": "Check which programme and options were selected and whether the load is heavily soiled. Check the accessible water connection as described in the manual.",
+      "claimTrigger": "Create a service claim if unusually long operation continues and cannot be explained by the selected programme, option, soil level, or water connection.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "selected programme and options",
+        "approximate cycle duration",
+        "product model and serial number",
+        "description of the water-connection check"
+      ],
+      "matchTerms": [
+        "takes too long",
+        "cycle very long",
+        "washing for hours",
+        "programme duration too long",
+        "dishwasher runs too long"
+      ],
+      "sourceSection": "PDF p. 36, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-dishes-not-clean",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishes are not clean enough",
+      "possibleCause": "The manual lists temporarily low water pressure, incoming water that is too cold, dishes placed too close together, incorrect detergent use, an unsuitable wash programme, or a blocked spray arm.",
+      "safeUserCheck": "Use the dishwasher when water pressure is normal. Reload the dishes according to the manual and make sure the spray arms can turn freely. Adjust detergent use to the water hardness and selected programme. Select a suitable longer programme if needed.",
+      "claimTrigger": "Create a service claim if cleaning remains poor after the supported loading, spray-arm, detergent, programme and water-supply checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of dishes after the completed cycle",
+        "selected programme",
+        "detergent type and amount",
+        "description of loading and spray-arm checks",
+        "product model and serial number"
+      ],
+      "matchTerms": [
+        "dishes still dirty",
+        "not cleaning",
+        "poor cleaning",
+        "food left on dishes",
+        "glasses dirty",
+        "plates dirty"
+      ],
+      "sourceSection": "PDF p. 36, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-dishes-not-dry",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishes are not dry enough",
+      "possibleCause": "The rinse-aid supply may be empty or insufficient, the dishes may be loaded incorrectly, or the selected programme may not include a drying phase.",
+      "safeUserCheck": "Refill the rinse-aid dispenser or increase the rinse-aid setting as described in the manual. Reload dishes correctly and choose a programme with a drying phase.",
+      "claimTrigger": "Create a service claim if dishes remain abnormally wet after the rinse-aid, loading and programme checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of dishes after a completed cycle",
+        "selected programme",
+        "rinse-aid setting",
+        "product model and serial number",
+        "description of checks already performed"
+      ],
+      "matchTerms": [
+        "not drying",
+        "dishes wet",
+        "poor drying",
+        "glasses still wet",
+        "water on dishes",
+        "wet dishes"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-spots-and-deposits-on-dishes",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Spots or deposits remain on dishes",
+      "possibleCause": "The manual lists very hard water, incorrect loading, old rinse aid, an empty rinse-aid dispenser, too much detergent with soft water, or incoming water above 70ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C.",
+      "safeUserCheck": "Reload the dishes correctly. Refill with fresh rinse aid if needed. If the water is soft, use less detergent. Check the incoming water temperature only through normal household controls without dismantling the dishwasher.",
+      "claimTrigger": "Create a service claim if spotting or deposits continue after the supported rinse-aid, detergent, loading and water-condition checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the spots or deposits",
+        "detergent and rinse-aid details",
+        "known water hardness if available",
+        "product model and serial number",
+        "description of checks already performed"
+      ],
+      "matchTerms": [
+        "white spots",
+        "water spots",
+        "limescale on dishes",
+        "residue on glasses",
+        "streaks on dishes",
+        "deposits"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-detergent-remains-in-dispenser",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Detergent remains in the dispenser after washing",
+      "possibleCause": "The detergent may be too old or a spray arm may be blocked.",
+      "safeUserCheck": "Use fresh detergent. Reload the dishwasher so that no dish blocks the spray arm and verify that the spray arm can move freely.",
+      "claimTrigger": "Create a service claim if detergent repeatedly remains in the dispenser after these checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of detergent remaining in the dispenser",
+        "detergent type",
+        "photo of the loaded dishwasher",
+        "product model and serial number",
+        "description of the spray-arm check"
+      ],
+      "matchTerms": [
+        "detergent still in compartment",
+        "tablet not dissolved",
+        "soap left in dispenser",
+        "detergent not released",
+        "tablet left after wash"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-detergent-dispenser-will-not-close",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Detergent-dispenser lid does not close correctly",
+      "possibleCause": "The manual states that the detergent-dispenser flap may not be functioning correctly.",
+      "safeUserCheck": "Use the dispenser only as described in the operating instructions. Do not force, dismantle or repair the flap.",
+      "claimTrigger": "Create a service claim if the detergent-dispenser flap cannot be closed or used normally.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video of the dispenser flap",
+        "product model and serial number",
+        "description of what happens when closing the flap"
+      ],
+      "matchTerms": [
+        "detergent door won't close",
+        "soap dispenser broken",
+        "detergent flap stuck",
+        "dispenser lid not closing",
+        "tablet door broken"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-water-remains-after-cycle",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Water remains in the dishwasher after washing",
+      "possibleCause": "The previous wash programme may not have completed or may have been interrupted. The manual also lists food residue or broken glass blocking the pump.",
+      "safeUserCheck": "Confirm that the wash programme was allowed to finish. Do not dismantle the pump or reach into an inaccessible area if broken glass is suspected.",
+      "claimTrigger": "Create a service claim if water remains after a complete programme or if an inaccessible pump blockage or broken glass is suspected.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the standing water",
+        "product model and serial number",
+        "selected programme",
+        "description of whether the programme completed"
+      ],
+      "matchTerms": [
+        "water left inside",
+        "standing water",
+        "water in bottom",
+        "did not drain completely",
+        "water remaining after wash"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-does-not-drain",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher does not drain water correctly",
+      "possibleCause": "The drain may be blocked or the drain hose may be kinked.",
+      "safeUserCheck": "Check the accessible sink trap or drain connection. Check that the visible drain hose is not kinked and is correctly connected.",
+      "claimTrigger": "Create a service claim if drainage is still incorrect after the accessible drain and hose checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of standing water",
+        "photo of the accessible drain-hose routing",
+        "product model and serial number",
+        "description of the drain checks"
+      ],
+      "matchTerms": [
+        "won't drain",
+        "not draining",
+        "water not pumping out",
+        "drain problem",
+        "water stays inside",
+        "standing water"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-excessive-foam",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Excessive foam inside the dishwasher",
+      "possibleCause": "The wrong type of detergent has been used.",
+      "safeUserCheck": "Check that the detergent is specifically suitable for household dishwashers.",
+      "claimTrigger": "Create a service claim if excessive foaming continues while correct dishwasher detergent is being used. Stop using the appliance and create an urgent claim if foam causes a leak or flooding.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo or video of the foam",
+        "photo or name of the detergent used",
+        "product model and serial number"
+      ],
+      "matchTerms": [
+        "too much foam",
+        "suds inside",
+        "dishwasher full of bubbles",
+        "foaming",
+        "soap bubbles"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-water-leak",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher is leaking water",
+      "possibleCause": "The troubleshooting table lists deposits caused by unsuitable detergent and the dishwasher not being level. The fault section also identifies leakage as a cause of overfilling.",
+      "safeUserCheck": "Stop using the dishwasher and close the water supply. Do not dismantle the appliance.",
+      "claimTrigger": "Create an urgent service claim for an active water leak or flooding.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo or video of the leak",
+        "photo showing where the water appears",
+        "product model and serial number",
+        "detergent type used",
+        "description of when the leak occurs"
+      ],
+      "matchTerms": [
+        "dishwasher leaking",
+        "water coming out",
+        "water on floor",
+        "leak under dishwasher",
+        "flooding",
+        "water leak"
+      ],
+      "sourceSection": "PDF pp. 35 and 38, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN / FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-black-grey-marks-on-dishes",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Black or grey marks appear on dishes",
+      "possibleCause": "Aluminium items may have come into contact with the dishes.",
+      "safeUserCheck": "Reload the dishwasher so aluminium items do not contact the affected dishes.",
+      "claimTrigger": "No service claim is required if the marks are caused by aluminium contact.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "black marks on dishes",
+        "grey marks",
+        "dark streaks",
+        "metal marks"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-interior-staining",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Inside of dishwasher is stained or discoloured",
+      "possibleCause": "The manual identifies coffee and tea deposits and reddish staining.",
+      "safeUserCheck": "For coffee or tea deposits, use a suitable certified stain-removal product as described in the manual. For reddish staining, run a wash programme after loading the dishes.",
+      "claimTrigger": "No service claim is normally required for the staining described in the manual.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "inside stained",
+        "dishwasher discoloured",
+        "brown stains",
+        "red stains",
+        "tea stains",
+        "coffee stains"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-normal-dispenser-or-drain-pump-noise",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Noise occurs when the detergent-dispenser lid opens or the drain pump operates",
+      "possibleCause": "The manual explicitly states that this noise is normal.",
+      "safeUserCheck": "No corrective action is required if the sound occurs only during normal dispenser opening or drain-pump operation.",
+      "claimTrigger": "Do not create a claim for this normal operating sound alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "clicking noise",
+        "noise when soap door opens",
+        "pump noise",
+        "drain pump sound",
+        "normal dishwasher noise"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-unusual-noise-continues",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Unusual noise continues after a complete programme",
+      "possibleCause": "The manual states that a hard object may have fallen into the dishwasher mechanism.",
+      "safeUserCheck": "Allow one complete programme to finish. Do not dismantle the appliance to search for an internal object.",
+      "claimTrigger": "Create a service claim if the noise does not stop after one complete programme.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "video or audio recording of the noise",
+        "product model and serial number",
+        "description of when during the cycle the noise occurs",
+        "description of whether it continued after a full programme"
+      ],
+      "matchTerms": [
+        "strange noise",
+        "rattling",
+        "grinding",
+        "loud noise",
+        "object inside",
+        "noise won't stop"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-interior-wet-after-cycle",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Inside of dishwasher is wet after the cycle",
+      "possibleCause": "The manual explicitly states that a wet dishwasher interior after use is normal.",
+      "safeUserCheck": "No corrective action is required for moisture inside the dishwasher alone.",
+      "claimTrigger": "Do not create a service claim for normal internal moisture alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "dishwasher wet inside",
+        "water droplets inside",
+        "interior still wet",
+        "condensation inside",
+        "wet after cycle"
+      ],
+      "sourceSection": "PDF p. 31, Nach dem Ende des SpÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼lprogramms",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-clean-filter-system",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Filter system is dirty or may become blocked",
+      "possibleCause": "The filter system collects larger residues during washing. These residues can block the filters.",
+      "safeUserCheck": "Disconnect the appliance from the mains before maintenance. Check the filters regularly. Remove the filter assembly as described in the manual, rinse larger residues under running water, clean more thoroughly with a soft clean cloth if needed, then reinstall the filters carefully. Never operate the dishwasher without the filters.",
+      "claimTrigger": "Create a service claim if the related problem continues after the filters have been correctly cleaned and reinstalled.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the filter condition before cleaning",
+        "photo of the cleaned and reinstalled filter",
+        "product model and serial number",
+        "description of the problem remaining after cleaning"
+      ],
+      "matchTerms": [
+        "filter dirty",
+        "filter blocked",
+        "clogged filter",
+        "clean dishwasher filter",
+        "food in filter",
+        "filter needs cleaning"
+      ],
+      "sourceSection": "PDF pp. 32-33, REINIGUNG UND WARTUNG - Reinigen der InnenflÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤chen / Filtersystem",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-clean-spray-arms",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Spray arms are dirty or blocked",
+      "possibleCause": "The spray-arm nozzles and bearings can become blocked by substances associated with hard water.",
+      "safeUserCheck": "Disconnect the appliance from the mains before maintenance. Remove the upper and lower spray arms using the user-maintenance procedure in the manual. Clean them with a soft brush in warm soapy water, rinse them, and reinstall them.",
+      "claimTrigger": "Create a service claim if the spray arms remain blocked or the related washing problem continues after cleaning.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the spray arms or blocked nozzles",
+        "photo or video showing whether the spray arms move freely",
+        "product model and serial number",
+        "description of the problem after cleaning"
+      ],
+      "matchTerms": [
+        "spray arm blocked",
+        "spray arm dirty",
+        "spray arm not spinning",
+        "clean spray arms",
+        "blocked spray holes",
+        "spray nozzles blocked"
+      ],
+      "sourceSection": "PDF p. 33, FEHLERBEHEBUNG - SprÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼harme",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-reset-or-cancel-programme",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Current wash programme needs to be cancelled or changed",
+      "possibleCause": "A wash cycle can only be changed if it has been running for a short time. If it has run longer, detergent may already have been released and wash water may already have been drained.",
+      "safeUserCheck": "Open the door slightly to stop the dishwasher. Wait until the spray arm stops before opening the door fully. Hold the Programme button for more than 3 seconds to cancel the current programme and return the appliance to standby. Select the required programme. If detergent has already been released, refill the detergent dispenser.",
+      "claimTrigger": "No service claim is required for a normal programme reset or cancellation.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "reset dishwasher",
+        "cancel programme",
+        "cancel cycle",
+        "change programme",
+        "change wash cycle",
+        "restart programme",
+        "wrong programme selected"
+      ],
+      "sourceSection": "PDF p. 30, EINSCHALTEN DES GERÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾TS UND PROGRAMMWAHL - Programmwechsel",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-interrupted-programme",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Wash programme was interrupted or did not finish",
+      "possibleCause": "The manual states that water may remain in the dishwasher when the previous wash programme was not fully completed or was interrupted.",
+      "safeUserCheck": "Select the appropriate programme and allow it to complete normally. If changing a running programme, use the programme-reset procedure described in the manual.",
+      "claimTrigger": "Create a service claim if the dishwasher still cannot complete a programme or water remains after a complete programme.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of any water remaining inside",
+        "selected programme",
+        "product model and serial number",
+        "description of when the programme was interrupted",
+        "description of checks already completed"
+      ],
+      "matchTerms": [
+        "programme interrupted",
+        "cycle stopped",
+        "programme did not finish",
+        "wash stopped halfway",
+        "cycle incomplete",
+        "dishwasher stopped during wash"
+      ],
+      "sourceSection": "PDF pp. 30 and 37, EINSCHALTEN DES GERÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾TS UND PROGRAMMWAHL - Programmwechsel / FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-add-forgotten-dish",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "A forgotten dish needs to be added during a running programme",
+      "possibleCause": "A forgotten dish can be added before the detergent dispenser has opened.",
+      "safeUserCheck": "Open the door only slightly to stop washing. Wait until the spray arms have stopped before opening the door fully. Add the forgotten dish and close the door. The dishwasher resumes after 10 seconds. Opening the door during washing can expose the customer to hot steam and cause burns.",
+      "claimTrigger": "No service claim is required when adding a forgotten dish according to the manual.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "forgot a dish",
+        "add dish during cycle",
+        "open dishwasher during wash",
+        "add plate while running",
+        "add item during programme",
+        "forgotten item"
+      ],
+      "sourceSection": "PDF p. 30, EINSCHALTEN DES GERÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¾TS UND PROGRAMMWAHL - EinrÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤umen von Geschirr wÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¤hrend des SpÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼lvorgangs",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-visible-transport-damage",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher has visible transport damage before use",
+      "possibleCause": "The manual instructs the customer to check the appliance for transport damage before installation.",
+      "safeUserCheck": "Do not start or use a damaged appliance.",
+      "claimTrigger": "Create a claim and contact the seller if the appliance is damaged or there is doubt about its condition.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photos of the damage",
+        "product model and serial number",
+        "photo of the affected area",
+        "description of when the damage was noticed"
+      ],
+      "matchTerms": [
+        "arrived damaged",
+        "transport damage",
+        "damaged dishwasher",
+        "dent",
+        "broken on delivery",
+        "shipping damage"
+      ],
+      "sourceSection": "PDF p. 6, WICHTIGE SICHERHEITSHINWEISE - Vor dem Aufstellen",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-damaged-power-cable",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Power cable is damaged",
+      "possibleCause": "The manual does not give a customer-repairable cause. It states that power-cable replacement must only be performed by authorised service or a qualified electrician.",
+      "safeUserCheck": "Stop using the appliance. Disconnect it from the mains only if this can be done safely. Do not repair or replace the cable yourself.",
+      "claimTrigger": "Create an urgent service claim for a damaged power cable or exposed electrical parts.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of the damaged cable if safe to take",
+        "product model and serial number",
+        "description of the damage",
+        "description of when the problem occurred"
+      ],
+      "matchTerms": [
+        "damaged cable",
+        "power cord damaged",
+        "wire exposed",
+        "electrical damage",
+        "burnt cable",
+        "broken power lead"
+      ],
+      "sourceSection": "PDF p. 15, ELEKTRISCHER ANSCHLUSS",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-597-210-door-does-not-close",
+      "productCode": "A-EGSPV597210",
+      "aliases": [
+        "EGSPV597210",
+        "EGSPV 597 210"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 597 210",
+      "problem": "Dishwasher door does not close or latch correctly",
+      "possibleCause": "The door may be open, incorrectly aligned, or obstructed by visible objects.",
+      "safeUserCheck": "Check for visible obstructions and confirm the door latches. Do not force or dismantle the door.",
+      "claimTrigger": "Create a service claim if the door still cannot be closed or latched after visible obstructions are removed.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video of the door gap or latch problem",
+        "product model and serial number"
+      ],
+      "sourceSection": "PDF p. 6 and p. 36 - Safety / Troubleshooting",
+      "matchTerms": [
+        "dishwasher door won't close",
+        "door does not latch",
+        "door lock problem"
+      ],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-rapid-indicator-flashing-water-inlet",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Rapid programme indicator flashes quickly",
+      "possibleCause": "Water inlet time is too long. The water valve may be closed, the water inlet may be blocked, or the water pressure may be too low.",
+      "safeUserCheck": "Check that the water valve is open and that water is available. Check the accessible inlet hose for an obvious kink or blockage.",
+      "claimTrigger": "Create a service claim if the indicator continues flashing after the water supply and accessible inlet have been checked.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo or video of the flashing Rapid programme indicator",
+        "product model and serial number",
+        "description of the water valve check",
+        "description of the inlet hose check"
+      ],
+      "matchTerms": [
+        "rapid light flashing",
+        "quick programme flashing",
+        "water not coming in",
+        "dishwasher not filling",
+        "water inlet problem",
+        "low water pressure"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-rapid-self-cleaning-indicators-flashing-heating",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Rapid and Self-cleaning programme indicators flash quickly",
+      "possibleCause": "The required temperature was not reached. The manual identifies a heating-element fault.",
+      "safeUserCheck": "Do not open or repair the appliance. No safe customer repair check is specified.",
+      "claimTrigger": "Create a service claim when the Rapid and Self-cleaning indicators flash quickly together.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video showing both flashing indicators",
+        "product model and serial number",
+        "description of when the warning appeared"
+      ],
+      "matchTerms": [
+        "rapid and self clean flashing",
+        "quick and self cleaning lights flashing",
+        "not heating",
+        "water not getting hot",
+        "heating fault"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-eco-indicator-flashing-overfill-leak",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "ECO programme indicator flashes quickly",
+      "possibleCause": "Overfilling. The manual states that part of the dishwasher is leaking.",
+      "safeUserCheck": "Close the main water tap and stop using the dishwasher.",
+      "claimTrigger": "Create an urgent service claim when the ECO indicator flashes quickly because the manual identifies overfilling and leakage.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo or video of the flashing ECO indicator",
+        "photo or video of any visible water or leak",
+        "product model and serial number",
+        "description of where water is visible"
+      ],
+      "matchTerms": [
+        "eco light flashing",
+        "dishwasher overflowing",
+        "overfill",
+        "dishwasher leaking",
+        "water under dishwasher",
+        "water in base"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-rapid-1h-eco-indicators-flashing-communication",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Rapid, 1-hour and ECO programme indicators flash quickly",
+      "possibleCause": "Communication fault between the main circuit board and display circuit board. The manual states that the circuit may be open or communication connections damaged.",
+      "safeUserCheck": "Do not open the appliance or inspect internal wiring. No safe customer check is specified.",
+      "claimTrigger": "Create a service claim when these three programme indicators flash quickly together.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video showing all three flashing indicators",
+        "product model and serial number",
+        "description of when the fault appeared"
+      ],
+      "matchTerms": [
+        "rapid 1 hour eco flashing",
+        "three lights flashing",
+        "display communication fault",
+        "control board fault",
+        "display fault"
+      ],
+      "sourceSection": "PDF p. 37, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN",
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-rinse-aid-warning",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Rinse-aid warning indicator is lit",
+      "possibleCause": "There is only a small amount of rinse aid left in the dispenser.",
+      "safeUserCheck": "Refill the rinse-aid dispenser with rinse aid intended for household dishwashers.",
+      "claimTrigger": "No service claim is required for the refill warning alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "rinse aid light",
+        "rinse aid warning",
+        "rinse aid indicator",
+        "refill rinse aid",
+        "Lsb"
+      ],
+      "sourceSection": "PDF p. 17, DISPLAY I BEDIENPANEL",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-salt-warning",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Regeneration-salt warning indicator is lit",
+      "possibleCause": "There is only a small amount of regeneration salt left in the dispenser.",
+      "safeUserCheck": "Refill with regeneration salt intended for dishwashers. The indicator may remain lit for a while after refilling while the salt dissolves.",
+      "claimTrigger": "No service claim is required for the refill warning alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "salt light",
+        "salt warning",
+        "salt indicator",
+        "dishwasher salt low",
+        "refill salt"
+      ],
+      "sourceSection": "PDF pp. 17 and 20, DISPLAY I BEDIENPANEL / Salz einfÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼llen",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-run-self-cleaning-programme",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Self-cleaning reminder is shown",
+      "possibleCause": "The dishwasher requests self-cleaning after 20 cycles. The reminder flashes for 5 seconds and remains active for 3 cycles.",
+      "safeUserCheck": "Run the Self-cleaning programme.",
+      "claimTrigger": "No service claim is required for the normal self-cleaning reminder.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "self clean light",
+        "self cleaning indicator",
+        "cleaning reminder",
+        "self clean flashing",
+        "run self clean"
+      ],
+      "sourceSection": "PDF p. 17, DISPLAY I BEDIENPANEL",
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-end-of-cycle-buzzer",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishwasher gives an audible signal at the end of the wash cycle",
+      "possibleCause": "The audible signal indicates that the wash cycle has ended.",
+      "safeUserCheck": "No corrective action is required.",
+      "claimTrigger": "Do not create a service claim for the normal end-of-cycle signal alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "beeping at end",
+        "buzzer after wash",
+        "alarm when finished",
+        "dishwasher beeps",
+        "beeps after cycle"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-does-not-start",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishwasher does not start",
+      "possibleCause": "The door may not be properly closed and latched, the appliance may not be connected to power, Start Delay may be selected, or the start/child lock may be enabled on applicable models.",
+      "safeUserCheck": "Close the door firmly and confirm it is latched. Check the normal power connection. Check whether Start Delay is selected. If fitted, disable the start/child lock according to the operating instructions.",
+      "claimTrigger": "Create a service claim if the dishwasher still does not start after these checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "product model and serial number",
+        "photo or video of the control panel when starting is attempted",
+        "description of the door check",
+        "description of the power and Start Delay checks"
+      ],
+      "matchTerms": [
+        "won't start",
+        "does not start",
+        "nothing happens",
+        "can't start dishwasher",
+        "start button not working",
+        "dishwasher won't run"
+      ],
+      "sourceSection": "PDF pp. 38-39, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-does-not-fill-with-water",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishwasher does not fill with water",
+      "possibleCause": "The water valve may be closed or the door lock may not be correctly engaged.",
+      "safeUserCheck": "Check that the water valve is open and make sure the dishwasher door is fully closed.",
+      "claimTrigger": "Create a service claim if the dishwasher still does not fill after the water valve and door checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "product model and serial number",
+        "photo or video of the control panel",
+        "description of the water valve check",
+        "description of the door check"
+      ],
+      "matchTerms": [
+        "not filling",
+        "no water coming in",
+        "dishwasher has no water",
+        "doesn't take water",
+        "water inlet",
+        "no water"
+      ],
+      "sourceSection": "PDF p. 40, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-does-not-drain",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishwasher does not drain water correctly",
+      "possibleCause": "The drain may be blocked or the drain hose may be kinked.",
+      "safeUserCheck": "Check the accessible sink trap or drain connection. Check that the visible drain hose is not kinked and is correctly connected.",
+      "claimTrigger": "Create a service claim if drainage is still incorrect after the accessible drain and hose checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of standing water",
+        "photo of the accessible drain hose routing",
+        "product model and serial number",
+        "description of the drain checks"
+      ],
+      "matchTerms": [
+        "won't drain",
+        "not draining",
+        "water not pumping out",
+        "drain problem",
+        "water stays inside",
+        "standing water"
+      ],
+      "sourceSection": "PDF p. 40, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-water-remains-after-cycle",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Water remains in the dishwasher after washing",
+      "possibleCause": "The previous wash programme may not have completed or may have been interrupted. The manual also lists food residue or broken glass blocking the pump.",
+      "safeUserCheck": "Confirm that the wash programme was allowed to finish. Do not dismantle the pump or reach into an inaccessible area if broken glass is suspected.",
+      "claimTrigger": "Create a service claim if water remains after a complete programme or if an inaccessible pump blockage or broken glass is suspected.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the standing water",
+        "product model and serial number",
+        "selected programme",
+        "description of whether the programme completed"
+      ],
+      "matchTerms": [
+        "water left inside",
+        "standing water",
+        "water in bottom",
+        "did not drain completely",
+        "water remaining after wash"
+      ],
+      "sourceSection": "PDF p. 39, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-dishes-not-clean",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishes are not clean enough",
+      "possibleCause": "The manual lists temporarily low water pressure, incoming water that is too cold, dishes placed too close together, incorrect detergent use, an unsuitable wash programme, or a blocked spray arm.",
+      "safeUserCheck": "Use the dishwasher when water pressure is normal. Reload the dishes according to the manual and make sure the spray arms can turn freely. Adjust detergent use to the water hardness and selected programme. Select a suitable longer programme if needed.",
+      "claimTrigger": "Create a service claim if cleaning remains poor after the supported loading, spray-arm, detergent, programme and water-supply checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of dishes after the completed cycle",
+        "selected programme",
+        "detergent type and amount",
+        "description of loading and spray-arm checks",
+        "product model and serial number"
+      ],
+      "matchTerms": [
+        "dishes still dirty",
+        "not cleaning",
+        "poor cleaning",
+        "food left on dishes",
+        "glasses dirty",
+        "plates dirty"
+      ],
+      "sourceSection": "PDF p. 38, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-dishes-not-dry",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishes are not dry enough",
+      "possibleCause": "The rinse-aid supply may be empty or insufficient, the dishes may be loaded incorrectly, or the selected programme may not include a drying phase.",
+      "safeUserCheck": "Refill the rinse-aid dispenser or increase the rinse-aid setting as described in the manual. Reload dishes correctly and choose a programme with a drying phase.",
+      "claimTrigger": "Create a service claim if dishes remain abnormally wet after the rinse-aid, loading and programme checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of dishes after a completed cycle",
+        "selected programme",
+        "rinse-aid setting",
+        "product model and serial number",
+        "description of checks already performed"
+      ],
+      "matchTerms": [
+        "not drying",
+        "dishes wet",
+        "poor drying",
+        "glasses still wet",
+        "water on dishes",
+        "wet dishes"
+      ],
+      "sourceSection": "PDF p. 39, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-spots-and-deposits-on-dishes",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Spots or deposits remain on dishes",
+      "possibleCause": "The manual lists very hard water, incorrect loading, old rinse aid, an empty rinse-aid dispenser, too much detergent with soft water, or incoming water above 70ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C.",
+      "safeUserCheck": "Reload the dishes correctly. Refill with fresh rinse aid if needed. If the water is soft, use less detergent. Check the incoming water temperature only through normal household controls without dismantling the dishwasher.",
+      "claimTrigger": "Create a service claim if spotting or deposits continue after the supported rinse-aid, detergent, loading and water-condition checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of the spots or deposits",
+        "detergent and rinse-aid details",
+        "known water hardness if available",
+        "product model and serial number",
+        "description of checks already performed"
+      ],
+      "matchTerms": [
+        "white spots",
+        "water spots",
+        "limescale on dishes",
+        "residue on glasses",
+        "streaks on dishes",
+        "deposits"
+      ],
+      "sourceSection": "PDF p. 39, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-detergent-remains-in-dispenser",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Detergent remains in the dispenser after washing",
+      "possibleCause": "The detergent may be too old or a spray arm may be blocked.",
+      "safeUserCheck": "Use fresh detergent. Reload the dishwasher so that no dish blocks the spray arm and verify that the spray arm can move freely.",
+      "claimTrigger": "Create a service claim if detergent repeatedly remains in the dispenser after these checks.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo of detergent remaining in the dispenser",
+        "detergent type",
+        "photo of the loaded dishwasher",
+        "product model and serial number",
+        "description of the spray-arm check"
+      ],
+      "matchTerms": [
+        "detergent still in compartment",
+        "tablet not dissolved",
+        "soap left in dispenser",
+        "detergent not released",
+        "tablet left after wash"
+      ],
+      "sourceSection": "PDF p. 39, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-detergent-dispenser-will-not-close",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Detergent-dispenser lid does not close correctly",
+      "possibleCause": "The manual states that the detergent-dispenser flap may not be functioning correctly.",
+      "safeUserCheck": "Use the dispenser only as described in the operating instructions. Do not force, dismantle or repair the flap.",
+      "claimTrigger": "Create a service claim if the detergent-dispenser flap cannot be closed or used normally.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video of the dispenser flap",
+        "product model and serial number",
+        "description of what happens when closing the flap"
+      ],
+      "matchTerms": [
+        "detergent door won't close",
+        "soap dispenser broken",
+        "detergent flap stuck",
+        "dispenser lid not closing",
+        "tablet door broken"
+      ],
+      "sourceSection": "PDF p. 39, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-excessive-foam",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Excessive foam inside the dishwasher",
+      "possibleCause": "The wrong type of detergent has been used.",
+      "safeUserCheck": "Check that the detergent is specifically suitable for household dishwashers.",
+      "claimTrigger": "Create a service claim if excessive foaming continues while correct dishwasher detergent is being used. Stop using the appliance and create an urgent claim if foam causes a leak or flooding.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": [
+        "photo or video of the foam",
+        "photo or name of the detergent used",
+        "product model and serial number"
+      ],
+      "matchTerms": [
+        "too much foam",
+        "suds inside",
+        "dishwasher full of bubbles",
+        "foaming",
+        "soap bubbles"
+      ],
+      "sourceSection": "PDF p. 40, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-water-leak",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishwasher is leaking water",
+      "possibleCause": "The troubleshooting table lists deposits caused by unsuitable detergent and the dishwasher not being level. The fault section also identifies leakage as a cause of overfilling.",
+      "safeUserCheck": "Stop using the dishwasher and close the water supply. Do not dismantle the appliance.",
+      "claimTrigger": "Create an urgent service claim for an active water leak or flooding.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo or video of the leak",
+        "photo showing where the water appears",
+        "product model and serial number",
+        "detergent type used",
+        "description of when the leak occurs"
+      ],
+      "matchTerms": [
+        "dishwasher leaking",
+        "water coming out",
+        "water on floor",
+        "leak under dishwasher",
+        "flooding",
+        "water leak"
+      ],
+      "sourceSection": "PDF pp. 37 and 40, FEHLERCODES UND MASSNAHMEN BEI STÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“RUNGEN / FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-unusual-noise-continues",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Unusual noise continues after a complete programme",
+      "possibleCause": "The manual states that a hard object may have fallen into the dishwasher mechanism.",
+      "safeUserCheck": "Allow one complete programme to finish. Do not dismantle the appliance to search for an internal object.",
+      "claimTrigger": "Create a service claim if the noise does not stop after one complete programme.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "video or audio recording of the noise",
+        "product model and serial number",
+        "description of when during the cycle the noise occurs",
+        "description of whether it continued after a full programme"
+      ],
+      "matchTerms": [
+        "strange noise",
+        "rattling",
+        "grinding",
+        "loud noise",
+        "object inside",
+        "noise won't stop"
+      ],
+      "sourceSection": "PDF p. 40, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-normal-dispenser-or-drain-pump-noise",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Noise occurs when the detergent-dispenser lid opens or the drain pump operates",
+      "possibleCause": "The manual explicitly states that this noise is normal.",
+      "safeUserCheck": "No corrective action is required if the sound occurs only during normal dispenser opening or drain-pump operation.",
+      "claimTrigger": "Do not create a claim for this normal operating sound alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "clicking noise",
+        "noise when soap door opens",
+        "pump noise",
+        "drain pump sound",
+        "normal dishwasher noise"
+      ],
+      "sourceSection": "PDF p. 40, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-black-grey-marks-on-dishes",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Black or grey marks appear on dishes",
+      "possibleCause": "Aluminium items may have come into contact with the dishes.",
+      "safeUserCheck": "Reload the dishwasher so aluminium items do not contact the affected dishes.",
+      "claimTrigger": "No service claim is required if the marks are caused by aluminium contact.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "black marks on dishes",
+        "grey marks",
+        "dark streaks",
+        "metal marks"
+      ],
+      "sourceSection": "PDF p. 40, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-interior-staining",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Inside of dishwasher is stained or discoloured",
+      "possibleCause": "The manual identifies coffee and tea deposits and reddish staining.",
+      "safeUserCheck": "For coffee or tea deposits, use a suitable certified stain-removal product as described in the manual. For reddish staining, run a wash programme after loading the dishes.",
+      "claimTrigger": "No service claim is normally required for the staining described in the manual.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "inside stained",
+        "dishwasher discoloured",
+        "brown stains",
+        "red stains",
+        "tea stains",
+        "coffee stains"
+      ],
+      "sourceSection": "PDF p. 40, FEHLERBEHEBUNG",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-interior-wet-after-cycle",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Inside of dishwasher is wet after the cycle",
+      "possibleCause": "The manual explicitly states that a wet dishwasher interior after use is normal.",
+      "safeUserCheck": "No corrective action is required for moisture inside the dishwasher alone.",
+      "claimTrigger": "Do not create a service claim for normal internal moisture alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "matchTerms": [
+        "dishwasher wet inside",
+        "water droplets inside",
+        "interior still wet",
+        "condensation inside",
+        "wet after cycle"
+      ],
+      "sourceSection": "PDF p. 33, Nach dem Ende des SpÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¼lprogramms",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-visible-transport-damage",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishwasher has visible transport damage before use",
+      "possibleCause": "The manual instructs the customer to check the appliance for transport damage before installation.",
+      "safeUserCheck": "Do not start or use a damaged appliance.",
+      "claimTrigger": "Create a claim and contact the seller if the appliance is damaged or there is doubt about its condition.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photos of the damage",
+        "product model and serial number",
+        "photo of the affected area",
+        "description of when the damage was noticed"
+      ],
+      "matchTerms": [
+        "arrived damaged",
+        "transport damage",
+        "damaged dishwasher",
+        "dent",
+        "broken on delivery",
+        "shipping damage"
+      ],
+      "sourceSection": "PDF p. 6, WICHTIGE SICHERHEITSHINWEISE - Vor dem Aufstellen",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-damaged-power-cable",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Power cable is damaged",
+      "possibleCause": "The manual does not give a customer-repairable cause. It states that power-cable replacement must only be carried out by authorised service or a qualified electrician.",
+      "safeUserCheck": "Stop using the appliance. Disconnect it from the mains only if this can be done safely. Do not repair or replace the cable yourself.",
+      "claimTrigger": "Create an urgent service claim for a damaged power cable or exposed electrical parts.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": [
+        "photo of the damaged cable if safe to take",
+        "product model and serial number",
+        "description of the damage",
+        "description of when the problem occurred"
+      ],
+      "matchTerms": [
+        "damaged cable",
+        "power cord damaged",
+        "wire exposed",
+        "electrical damage",
+        "burnt cable",
+        "broken power lead"
+      ],
+      "sourceSection": "PDF p. 15, ELEKTRISCHER ANSCHLUSS",
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "egspv-587-915-door-does-not-close",
+      "productCode": "A-EGSPV587915",
+      "aliases": [
+        "EGSPV587915",
+        "EGSPV 587 915"
+      ],
+      "itemType": "dishwasher",
+      "model": "EGSPV 587 915",
+      "problem": "Dishwasher door does not close or latch correctly",
+      "possibleCause": "The door may be open, incorrectly aligned, or obstructed by visible objects.",
+      "safeUserCheck": "Check for visible obstructions and confirm the door latches. Do not force or dismantle the door.",
+      "claimTrigger": "Create a service claim if the door still cannot be closed or latched after visible obstructions are removed.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": [
+        "photo or video showing the door gap or latch problem",
+        "product model and serial number"
+      ],
+      "sourceSection": "PDF p. 6 and p. 38 - Safety / Troubleshooting",
+      "matchTerms": [
+        "dishwasher door won't close",
+        "door does not latch",
+        "door lock problem"
+      ],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "ewa-34660-w-zero-spin-speed",
+      "productCode": "EWA34660W",
+      "aliases": [
+        "EWA34660W",
+        "EWA 34660 W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Display shows 0 spin speed",
+      "possibleCause": "The spin speed has been set to 0, which disables spinning.",
+      "safeUserCheck": "Select a spin speed higher than 0 if spinning is required.",
+      "claimTrigger": "No claim is required when 0 spin speed was selected intentionally. Create a claim if the machine repeatedly prevents spinning with a valid spin setting.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [
+        "photo of the display or selected spin setting",
+        "product model and serial number"
+      ],
+      "sourceSection": "PDF p. 25, BESCHREIBUNG DES BEDIENFELDES UND DES DISPLAYS - Spin speed",
+      "matchTerms": [
+        "0 spin speed",
+        "spin disabled",
+        "no spin selected",
+        "machine does not spin"
+      ],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "ewa-34660-w-cold-water-temperature-display",
+      "productCode": "EWA34660W",
+      "aliases": [
+        "EWA34660W",
+        "EWA 34660 W"
+      ],
+      "itemType": "washing_machine",
+      "model": "EWA 34660 W",
+      "problem": "Display shows --ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C",
+      "possibleCause": "The cold-water temperature setting is selected.",
+      "safeUserCheck": "No corrective action is required when cold-water washing is intended. Select another temperature if required by the programme and laundry.",
+      "claimTrigger": "No claim is required for the normal --ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C cold-water setting.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 25, BESCHREIBUNG DES BEDIENFELDES UND DES DISPLAYS - Temperature",
+      "matchTerms": [
+        "--ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C",
+        "cold water setting",
+        "temperature shows dashes",
+        "no temperature"
+      ],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-aluminium-filter-cleaning-indicator",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "The aluminium-filter cleaning indicator appears on the display",
+      "possibleCause": "The indicator appears after approximately 60 hours of fan operation and means that the aluminium filters need cleaning.",
+      "safeUserCheck": "Clean the aluminium filters. With the hood switched off, hold the indicated control for approximately 3 seconds to clear the reminder.",
+      "claimTrigger": "No service claim is required for the normal filter-cleaning reminder.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 12/24, Indication to clean the aluminium filters",
+      "matchTerms": ["filter warning", "filter symbol", "clean filter message", "aluminium filter warning", "60 hours"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-clean-aluminium-grease-filter",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Aluminium grease filter requires cleaning",
+      "possibleCause": "The grease filter collects grease during normal operation and must be cleaned regularly; a saturated filter is flammable.",
+      "safeUserCheck": "Disconnect the hood before cleaning. Clean the aluminium grease filter every month in a dishwasher or by hand with mild detergent, as described in the manual.",
+      "claimTrigger": "No service claim is required for normal grease-filter cleaning.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 15/27, Grease filter",
+      "matchTerms": ["clean grease filter", "grease filter dirty", "aluminium filter dirty", "filter full of grease"],
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-aluminium-filter-colour-change",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Aluminium filter changes colour after being washed",
+      "possibleCause": "The filter colour can change after repeated dishwasher washing.",
+      "safeUserCheck": "No corrective action is required for colour change alone.",
+      "claimTrigger": "Do not create a claim for aluminium-filter discolouration alone; it does not indicate a defect.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 15/27, Maintenance",
+      "matchTerms": ["filter changed colour", "filter discoloured", "filter colour changed"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-replace-activated-charcoal-filter",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Activated charcoal filter requires replacement",
+      "possibleCause": "In recirculation mode, the charcoal filter absorbs odours until saturated.",
+      "safeUserCheck": "Only for recirculation use: replace the charcoal filter every 3ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ4 months, or more often with intensive use. It cannot be washed or regenerated.",
+      "claimTrigger": "No service claim is required for normal charcoal-filter replacement.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 15/27, Activated charcoal filter",
+      "matchTerms": ["replace charcoal filter", "carbon filter", "charcoal filter saturated", "recirculation filter"],
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-acrylic-filter-replacement",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Acrylic grease filter requires replacement",
+      "possibleCause": "Some versions use an acrylic filter rather than an aluminium filter.",
+      "safeUserCheck": "Confirm the installed filter type. If it is acrylic, replace it at least every 2 months, or more often with intensive use.",
+      "claimTrigger": "No claim is required for scheduled acrylic-filter replacement.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 15/27, Grease filter",
+      "matchTerms": ["acrylic filter", "replace acrylic filter", "filter replacement every two months"],
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 75,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-operating-without-grease-filter",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Hood is being used without the aluminium grease filter",
+      "possibleCause": "The grease filter has been removed or is missing.",
+      "safeUserCheck": "Stop using the hood and reinstall the correct aluminium grease filter before operation. Do not operate without it because accumulated grease may create a fire hazard.",
+      "claimTrigger": "Escalate if the correct filter cannot be installed or the filter mounting is damaged.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": ["photo of the filter and mounting", "product model and serial number"],
+      "sourceSection": "PDF p. 8/20, Safety instructions",
+      "matchTerms": ["missing grease filter", "no aluminium filter", "hood without filter", "filter missing"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 95,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-fan-starts-when-front-panel-is-extended",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Hood fan starts when the telescopic front panel is pulled out",
+      "possibleCause": "The limit switch starts the hood at the previously selected fan speed.",
+      "safeUserCheck": "No corrective action is required for this normal behaviour.",
+      "claimTrigger": "Do not create a claim for this behaviour alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 13/25, Cooker hood controls",
+      "matchTerms": ["fan starts by itself", "hood starts when pulled out", "telescopic panel starts fan", "previous speed"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-off-timer-active",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Fan-speed number flashes while the hood continues running",
+      "possibleCause": "A flashing fan-speed number indicates the approximately 15-minute delayed switch-off timer is active.",
+      "safeUserCheck": "Allow the timer to finish, or push the telescopic panel in to cancel it.",
+      "claimTrigger": "No service claim is required when the flashing display is caused by the normal timer.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "PDF p. 11/23, Off-timer",
+      "matchTerms": ["speed number flashing", "display flashing", "hood keeps running", "15 minute timer", "delayed switch off"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-damaged-power-cable",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Power cable is damaged",
+      "possibleCause": "A damaged power cable must be replaced by specialist service.",
+      "safeUserCheck": "Stop using the hood. Disconnect it only if safe. Do not repair or replace the cable yourself.",
+      "claimTrigger": "Create an urgent service claim for a damaged cable or exposed electrical parts.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": ["photo of cable if safe", "product model and serial number", "description of damage"],
+      "sourceSection": "PDF p. 8/20, Safety instructions",
+      "matchTerms": ["damaged power cable", "power cord damaged", "wire exposed", "electrical damage"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "fh-664-621-e-lighting-module-service",
+      "productCode": "FH664621E",
+      "aliases": ["FH 664 621 E", "FH664621E"],
+      "itemType": "extractor_hood",
+      "model": "FH 664 621 E",
+      "problem": "Hood lighting does not work",
+      "possibleCause": "The lighting module or its electrical supply may be faulty.",
+      "safeUserCheck": "Check that the lighting control is switched on. Do not open or repair the lighting or wiring. If the light remains faulty, contact authorised service.",
+      "claimTrigger": "Create a service claim if the light remains faulty after checking the control; escalate immediately for damaged wiring or electrical parts.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": ["photo or video of the lighting problem", "product model and serial number", "description of checks completed"],
+      "sourceSection": "PDF p. 15/27, Light",
+      "matchTerms": ["hood light not working", "extractor light broken", "light will not turn on", "LED not working", "hood lamp"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 85,
+      "isActive": true
+    },
+    {
+      "id": "khf-664-611-s-open-flame-or-flambe",
+      "productCode": "KHF 664 611 S",
+      "aliases": ["KHF 664 611 S", "KHF664611S"],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Open flame or flambÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© cooking under the hood",
+      "possibleCause": "An open flame can ignite grease in the hood or filters.",
+      "safeUserCheck": "Extinguish the open flame and never flambÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â© under the hood. Supervise pans containing fat continuously.",
+      "claimTrigger": "Escalate urgently if there is smoke, fire, burning smell, or heat damage.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": ["photo of visible damage if safe", "description of smoke, fire, or burning"],
+      "sourceSection": "PDF p. 8, Safety instructions",
+      "matchTerms": ["open flame", "flambe", "flambÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â©", "fire under hood", "burning grease"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "khf-664-611-s-hood-used-without-grease-filter",
+      "productCode": "KHF 664 611 S",
+      "aliases": ["KHF 664 611 S", "KHF664611S"],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Hood is used without the aluminium grease filter",
+      "possibleCause": "The grease filter is missing or has been removed.",
+      "safeUserCheck": "Stop using the hood and reinstall the correct aluminium grease filter before operation.",
+      "claimTrigger": "Escalate if the filter cannot be installed or its mounting is damaged.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": ["photo of filter and mounting", "product model and serial number"],
+      "sourceSection": "PDF p. 9, Safety instructions",
+      "matchTerms": ["missing grease filter", "hood without filter", "filter missing"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 95,
+      "isActive": true
+    },
+    {
+      "id": "khf-664-611-s-ventilation-with-fuel-burning-appliance",
+      "productCode": "KHF 664 611 S",
+      "aliases": ["KHF 664 611 S", "KHF664611S"],
+      "itemType": "extractor_hood",
+      "model": "KHF 664 611 S",
+      "problem": "Hood operates while a fuel-burning appliance is used in the same room",
+      "possibleCause": "Insufficient fresh-air supply can create dangerous negative pressure and combustion-gas risk.",
+      "safeUserCheck": "Ensure adequate room ventilation and follow local extraction-safety requirements. Stop use if fumes or combustion gases are suspected.",
+      "claimTrigger": "Escalate urgently for smoke, fumes, dizziness, or suspected combustion-gas exposure; installation/ventilation issues require qualified service.",
+      "chatbotDecision": "URGENT_CLAIM_STOP_USE",
+      "evidenceToRequest": ["description of the other appliance", "description of fumes or symptoms", "installation details if available"],
+      "sourceSection": "PDF p. 8, Safety instructions",
+      "matchTerms": ["gas appliance", "fuel burning", "poor ventilation", "fumes", "negative pressure"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 100,
+      "isActive": true
+    },
+    {
+      "id": "kgcn-388-140-e-fast-cool-automatic-stop",
+      "productCode": "KGC 15495 S",
+      "aliases": ["OL-KGCN388140E", "KGCN 388 140 E", "KGCN388140E"],
+      "itemType": "fridge_freezer",
+      "model": "KGCN 388 140 E",
+      "problem": "Fast Cool switches off automatically",
+      "possibleCause": "Fast Cool is designed to stop automatically; the duration depends on the control version (3 hours/2ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°C or 26 hours).",
+      "safeUserCheck": "No action is required when Fast Cool stops automatically. Select the desired temperature with SET to stop it sooner.",
+      "claimTrigger": "No claim is required for automatic Fast Cool deactivation alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, pp. 45-46 - Controls",
+      "matchTerms": ["Fast Cool stopped", "rapid cooling stopped", "super cool switched off"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "kgcn-388-140-e-clean-condensate-drain",
+      "productCode": "KGC 15495 S",
+      "aliases": ["OL-KGCN388140E", "KGCN 388 140 E", "KGCN388140E"],
+      "itemType": "fridge_freezer",
+      "model": "KGCN 388 140 E",
+      "problem": "Accessible refrigerator condensate drain requires cleaning",
+      "possibleCause": "The condensate discharge opening may become clogged, depending on the model.",
+      "safeUserCheck": "If an accessible drain opening is present, disconnect the appliance and carefully clean it with the supplied cleaning plug.",
+      "claimTrigger": "Create a claim if drainage remains blocked or water continues collecting after cleaning.",
+      "chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+      "evidenceToRequest": ["photo of drain area", "description of cleaning attempt"],
+      "sourceSection": "OL-KGCN388140E manual, p. 52 - Defrosting the fridge",
+      "matchTerms": ["clean fridge drain", "blocked drain hole", "condensate drain clogged"],
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "kgcn-388-140-e-do-not-refreeze-thawed-food",
+      "productCode": "KGC 15495 S",
+      "aliases": ["OL-KGCN388140E", "KGCN 388 140 E", "KGCN388140E"],
+      "itemType": "fridge_freezer",
+      "model": "KGCN 388 140 E",
+      "problem": "Frozen food has partially thawed",
+      "possibleCause": "The manual warns that partly thawed food must not be refrozen.",
+      "safeUserCheck": "Do not refreeze partly thawed food. Follow local food-safety guidance and discard food if its safety is uncertain.",
+      "claimTrigger": "No appliance claim is created for the food-safety instruction alone; create a claim only when an appliance fault caused the thawing.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 38 - Safety instructions",
+      "matchTerms": ["food thawed", "partly thawed", "refreeze food", "freezer thawing"],
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 85,
+      "isActive": true
+    },
+    {
+      "id": "kgcn-388-140-e-carbonated-bottles-freezer",
+      "productCode": "KGC 15495 S",
+      "aliases": ["OL-KGCN388140E", "KGCN 388 140 E", "KGCN388140E"],
+      "itemType": "fridge_freezer",
+      "model": "KGCN 388 140 E",
+      "problem": "Carbonated bottle or can stored in the freezer",
+      "possibleCause": "Carbonated drinks can expand and burst when frozen.",
+      "safeUserCheck": "Remove carbonated bottles or cans from the freezer. Do not store them there because they may explode.",
+      "claimTrigger": "Escalate only if an exploding container caused appliance damage or injury.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": ["photo of any resulting damage if safe"],
+      "sourceSection": "OL-KGCN388140E manual, p. 38 - Safety instructions",
+      "matchTerms": ["bottle exploded in freezer", "can burst", "carbonated drink freezer"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 85,
+      "isActive": true
+    },
+    {
+      "id": "kgcn-388-140-e-frozen-product-frostbite-risk",
+      "productCode": "KGC 15495 S",
+      "aliases": ["OL-KGCN388140E", "KGCN 388 140 E", "KGCN388140E"],
+      "itemType": "fridge_freezer",
+      "model": "KGCN 388 140 E",
+      "problem": "Frozen product causes cold injury when eaten immediately",
+      "possibleCause": "Frozen products can cause severe frostbite because of their very low temperature.",
+      "safeUserCheck": "Do not put frozen products or ice directly into the mouth. Allow them to warm appropriately before consuming.",
+      "claimTrigger": "Seek medical assistance for a cold injury; an appliance claim is not created for this warning alone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "OL-KGCN388140E manual, p. 38 - Safety instructions",
+      "matchTerms": ["frostbite from ice", "frozen food injury", "ice burned mouth"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 90,
+      "isActive": true
+    },
+    {
+      "id": "kgcn-388-140-e-service-required-for-unresolved-malfunction",
+      "productCode": "KGC 15495 S",
+      "aliases": ["OL-KGCN388140E", "KGCN 388 140 E", "KGCN388140E"],
+      "itemType": "fridge_freezer",
+      "model": "KGCN 388 140 E",
+      "problem": "Fridge-freezer malfunction remains after manual checks",
+      "possibleCause": "The manual does not provide a customer-repairable cause for unresolved faults.",
+      "safeUserCheck": "Do not open or modify the appliance. Contact authorised service and provide the serial number.",
+      "claimTrigger": "Create a service claim when a malfunction remains after the supported safe checks.",
+      "chatbotDecision": "CREATE_CLAIM_SERVICE",
+      "evidenceToRequest": ["photo or video of the malfunction", "product model and serial number", "checks already completed"],
+      "sourceSection": "OL-KGCN388140E manual, p. 56 - Warranty and after-sales service",
+      "matchTerms": ["fridge needs repair", "freezer fault", "unresolved refrigerator problem", "service required"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "ol-kmi754000e-cooking-zone-off-no-cookware",
+      "productCode": "OL-KMI754000E",
+      "aliases": ["OL-KMI754000E", "KMI 754 000 C", "KMI754000C", "DI 6402 B"],
+      "itemType": "induction_hob",
+      "model": "KMI 754 000 C",
+      "problem": "Cooking zone switches off after approximately one minute because suitable cookware is not detected",
+      "possibleCause": "No cookware is present, or the cookware is unsuitable for induction or too small for the zone.",
+      "safeUserCheck": "Place flat, induction-compatible cookware with a suitable ferromagnetic base on the zone. The automatic shutoff is normal when no suitable cookware is detected.",
+      "claimTrigger": "Create a service claim if suitable cookware is still not detected on an appropriate cooking zone.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": ["photo of cookware base or induction marking", "description of zones and cookware tested"],
+      "sourceSection": "OL-KMI754000E manual, pp. 40-42 - Cookware detection",
+      "matchTerms": ["pan not detected", "zone turns off after one minute", "cookware not recognized", "induction pan symbol"],
+      "topicType": "issue",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "ebx-943-600-s-cancel-timer-or-timed-operation",
+      "productCode": "EBX 943 600 S",
+      "aliases": ["EBX 943 600 S", "EBX943600S", "A-EBX943600S", "12262.3eETsDHbVlS", "EH92364E-A"],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "A Kitchen Timer or timed-operation setting needs to be cancelled",
+      "possibleCause": "A timer or timed cooking programme is active.",
+      "safeUserCheck": "Cancel the Kitchen Timer or timed operation using the programmer controls described in the manual. No claim is needed for normal timer operation.",
+      "claimTrigger": "Create a service claim only if the timer cannot be cancelled or the controls malfunction.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, pp. 64-67 - Electronic timer",
+      "matchTerms": ["cancel oven timer", "stop timed cooking", "timer will not cancel", "oven timer active"],
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 80,
+      "isActive": true
+    },
+    {
+      "id": "ebx-943-600-s-grill-door-closed",
+      "productCode": "EBX 943 600 S",
+      "aliases": ["EBX 943 600 S", "EBX943600S", "A-EBX943600S", "12262.3eETsDHbVlS", "EH92364E-A"],
+      "itemType": "oven",
+      "model": "EBX 943 600 S",
+      "problem": "The grill is being used with the oven door open",
+      "possibleCause": "The manual requires the oven door to remain closed during grilling.",
+      "safeUserCheck": "Close the oven door while grilling and keep children away from hot accessible parts.",
+      "claimTrigger": "No claim is needed when the grill operates normally with the door closed. Escalate only if the door cannot close or the grill malfunctions.",
+      "chatbotDecision": "NO_CLAIM_NORMAL",
+      "evidenceToRequest": [],
+      "sourceSection": "A-EBX943600S manual, p. 69 - Use of the grill",
+      "matchTerms": ["grill door open", "grilling with door open", "oven grill safety", "close oven door grilling"],
+      "topicType": "immediate_step",
+      "code": null,
+      "priority": 85,
+      "isActive": true
     }
   ]
 }

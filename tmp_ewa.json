@@ -1,0 +1,943 @@
+﻿{
+"product": {
+"brand": "Amica",
+"model": "EWA 34660 W",
+"productCode": "EWA 34660 W",
+"applianceType": "washing_machine",
+"aliases": [
+"EWA34660W"
+]
+},
+"entries": [
+{
+"id": "ewa-34660-w-e10-low-water-pressure-no-water",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Error E10: low water pressure or no water in the washing machine",
+"possibleCause": "Low water pressure or no water supply to the washing machine.",
+"safeUserCheck": "Open the water tap. Check the accessible water inlet hose and inlet filter, and check the water pressure.",
+"claimTrigger": "Create a service claim if E10 remains after the water supply, hose, filter, and water pressure have been checked.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of error E10 on the display",
+"product model and serial number",
+"description of the water tap and hose checks",
+"description of the inlet filter check",
+"known water pressure if available"
+],
+"matchTerms": [
+"E10",
+"no water",
+"not filling",
+"low water pressure",
+"water inlet error",
+"washing machine has no water"
+],
+"sourceSection": "PDF p. 30, ANZEIGEN DER FEHLER-CODES DER WASCHMASCHINE",
+"topicType": "error_code",
+"code": "E10",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-e12-overfill",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Error E12: washing machine is overfilled",
+"possibleCause": "The manual identifies the condition as overfilling.",
+"safeUserCheck": "Stop using the washing machine. Close the water supply if safe. Do not dismantle the appliance.",
+"claimTrigger": "Create an urgent service claim for E12 overfilling, especially if water is leaking or flooding is present.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of error E12 on the display",
+"photo or video of any visible water or leakage",
+"product model and serial number",
+"description of when the overfill occurred"
+],
+"matchTerms": [
+"E12",
+"overfill",
+"washing machine overflowing",
+"too much water",
+"water level too high",
+"flooding"
+],
+"sourceSection": "PDF p. 30, ANZEIGEN DER FEHLER-CODES DER WASCHMASCHINE",
+"topicType": "error_code",
+"code": "E12",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-e21-drainage-error",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Error E21: water does not drain correctly",
+"possibleCause": "The water is not draining correctly.",
+"safeUserCheck": "Check the drain pump filter and the accessible drain hose as described in the manual.",
+"claimTrigger": "Create a service claim if E21 remains after the pump filter and drain hose have been checked.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of error E21 on the display",
+"photo of any standing water",
+"product model and serial number",
+"description of the pump filter and drain hose checks"
+],
+"matchTerms": [
+"E21",
+"not draining",
+"water not draining",
+"drain error",
+"standing water",
+"pump problem"
+],
+"sourceSection": "PDF p. 30, ANZEIGEN DER FEHLER-CODES DER WASCHMASCHINE",
+"topicType": "error_code",
+"code": "E21",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-e30-door-not-locking",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Error E30: door does not lock after closing",
+"possibleCause": "The washing machine door is not locking correctly after being closed. Clothing may be trapped in the door.",
+"safeUserCheck": "Close the washing machine door and check that no clothing is trapped in the door.",
+"claimTrigger": "Create a service claim if E30 remains after the door has been closed correctly and any trapped clothing has been removed.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of error E30 on the display",
+"photo of the door area if useful",
+"product model and serial number",
+"description of the door check"
+],
+"matchTerms": [
+"E30",
+"door won't lock",
+"door not locking",
+"door error",
+"washing machine door problem",
+"clothes trapped in door"
+],
+"sourceSection": "PDF p. 30, ANZEIGEN DER FEHLER-CODES DER WASCHMASCHINE",
+"topicType": "error_code",
+"code": "E30",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-other-error-display",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Another error not listed as E10, E12, E21, or E30 is displayed",
+"possibleCause": "The manual does not specify the cause for other errors.",
+"safeUserCheck": "Try restarting the washing machine once.",
+"claimTrigger": "Contact the service centre if the error remains after restarting.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of the displayed error",
+"product model and serial number",
+"description of what happened before the error",
+"description of the restart attempt"
+],
+"matchTerms": [
+"other error",
+"unknown error",
+"error on display",
+"washing machine error",
+"fault code"
+],
+"sourceSection": "PDF p. 30, ANZEIGEN DER FEHLER-CODES DER WASCHMASCHINE",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-overload-ovl-display",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "OVL appears on the display",
+"possibleCause": "The washing machine is overloaded.",
+"safeUserCheck": "Remove excess laundry and restart the washing machine. Do not exceed the programme load limit.",
+"claimTrigger": "No service claim is required if OVL clears after excess laundry is removed.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"OVL",
+"overload",
+"too much laundry",
+"washing machine overloaded",
+"load too heavy"
+],
+"sourceSection": "PDF p. 34, BEFÃœLLUNG",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-does-not-work",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Washing machine does not work",
+"possibleCause": "The manual directs the customer to check the water tap, water inlet filter, door, and Start/Pause control.",
+"safeUserCheck": "Open the water tap. Clean the accessible inlet filter. Close the washing machine door and press Start/Pause.",
+"claimTrigger": "Create a service claim if the washing machine still does not operate after these checks.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video of the control panel",
+"product model and serial number",
+"description of the water tap and filter checks",
+"description of the door and Start/Pause checks"
+],
+"matchTerms": [
+"washing machine not working",
+"won't start",
+"does not run",
+"nothing happens",
+"machine won't work"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-water-leak",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Water is leaking from the washing machine",
+"possibleCause": "The manual states that the water hose may not be connected correctly.",
+"safeUserCheck": "Stop using the washing machine and close the water supply if safe. Check the accessible water hose connection without dismantling the appliance.",
+"claimTrigger": "Create an urgent service claim for an active leak or flooding.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo or video of the leak",
+"photo of the accessible hose connection",
+"product model and serial number",
+"description of when the leak occurs"
+],
+"matchTerms": [
+"water leaking",
+"washing machine leak",
+"water on floor",
+"hose leaking",
+"flooding",
+"water coming out"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-wet-laundry-after-cycle",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Laundry remains unusually wet in the drum",
+"possibleCause": "The manual directs the customer to redistribute the laundry and clean the pump filter.",
+"safeUserCheck": "Redistribute the laundry in the drum and clean the pump filter using the user-maintenance procedure in the manual.",
+"claimTrigger": "Create a service claim if laundry remains unusually wet after redistribution and pump-filter cleaning.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the wet laundry after the cycle",
+"selected programme and spin setting",
+"product model and serial number",
+"description of the pump-filter check"
+],
+"matchTerms": [
+"clothes soaking wet",
+"laundry still wet",
+"not spinning properly",
+"wet clothes",
+"water left in clothes"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-unpleasant-drum-odour",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Unpleasant smell comes from the drum",
+"possibleCause": "The manual provides a self-cleaning cycle as the corrective action.",
+"safeUserCheck": "Run the self-cleaning programme without laundry.",
+"claimTrigger": "Create a service claim if the abnormal odour continues after the self-cleaning programme.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"product model and serial number",
+"description of the smell",
+"description of whether the self-cleaning programme was completed"
+],
+"matchTerms": [
+"bad smell",
+"unpleasant smell",
+"drum smells",
+"washing machine smells",
+"musty smell"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-run-self-cleaning-programme",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Drum requires self-cleaning because of unpleasant odour",
+"possibleCause": "The manual recommends self-cleaning when there is an unpleasant smell from the drum.",
+"safeUserCheck": "Run the self-cleaning programme without laundry.",
+"claimTrigger": "No service claim is required for the normal self-cleaning action.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"self clean washing machine",
+"clean drum",
+"run self cleaning",
+"drum cleaning",
+"remove bad smell"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-water-remains-in-softener-compartment",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Water remains in the fabric-softener compartment",
+"possibleCause": "The manual directs the customer to press the insert in the middle compartment into position.",
+"safeUserCheck": "Press the insert in the middle detergent-drawer compartment firmly into position.",
+"claimTrigger": "Create a service claim if water continues to remain in the compartment after the insert has been correctly positioned.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the water remaining in the compartment",
+"photo of the middle drawer insert",
+"product model and serial number",
+"description of the check already completed"
+],
+"matchTerms": [
+"water in softener compartment",
+"water in detergent drawer",
+"softener drawer full of water",
+"water stays in drawer"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-laundry-poorly-rinsed",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Laundry is poorly rinsed",
+"possibleCause": "Incorrect detergent dosage for the soil level and water hardness, or a dirty pump filter.",
+"safeUserCheck": "Dose detergent according to the soil level, water hardness, and detergent manufacturer's instructions. Clean the pump filter.",
+"claimTrigger": "Create a service claim if rinsing remains poor after correcting detergent dosage and cleaning the pump filter.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of residue on the laundry",
+"detergent type and amount",
+"selected programme",
+"product model and serial number",
+"description of the pump-filter check"
+],
+"matchTerms": [
+"poor rinsing",
+"soap left on clothes",
+"detergent residue",
+"clothes not rinsed",
+"washing powder on clothes"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-does-not-fill-with-water",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Washing machine does not fill with water",
+"possibleCause": "The water tap may be closed, the selected programme may be incorrect, water pressure may be insufficient, the water hose may be connected incorrectly, the door may be open, or the hose may be kinked or blocked.",
+"safeUserCheck": "Open the water tap. Check the programme setting and water pressure. Check that the accessible water hose is correctly connected and not kinked or blocked. Close the washing machine door.",
+"claimTrigger": "Create a service claim if the machine still does not fill after these checks.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video of the control panel",
+"product model and serial number",
+"selected programme",
+"description of the water tap, pressure, hose, and door checks"
+],
+"matchTerms": [
+"not filling",
+"no water coming in",
+"washing machine has no water",
+"water inlet problem",
+"doesn't take water",
+"no water"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-simultaneous-water-inlet-and-drain",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Water enters and drains at the same time",
+"possibleCause": "The end of the drain hose may be below the washing machine water level.",
+"safeUserCheck": "Check that the drain-hose end is positioned above the water level and within the manual's stated height range of 0.6 m to 1 m.",
+"claimTrigger": "Create a service claim if simultaneous filling and draining continues after the drain-hose position has been corrected.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the drain-hose installation",
+"product model and serial number",
+"description of the drain-hose height check"
+],
+"matchTerms": [
+"fills and drains",
+"water goes straight out",
+"simultaneous fill and drain",
+"won't hold water",
+"water immediately drains"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-water-does-not-drain-correctly",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Water does not drain correctly",
+"possibleCause": "The pump filter, drain hose, or drain-hose installation may be causing the drainage problem.",
+"safeUserCheck": "Check and clean the pump filter. Check the accessible drain hose and confirm that its outlet is positioned 0.6 m to 1 m above the floor.",
+"claimTrigger": "Create a service claim if drainage remains incorrect after these checks.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of any standing water",
+"photo of the drain-hose installation",
+"product model and serial number",
+"description of the pump-filter check"
+],
+"matchTerms": [
+"not draining",
+"water won't drain",
+"standing water",
+"drain problem",
+"water stays in drum"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-vibration",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Washing machine vibrates excessively",
+"possibleCause": "Transport restraints may still be installed, the washing machine may not be level, or the feet may not be secured.",
+"safeUserCheck": "Check that the transport restraints have been removed. Check that the washing machine is level and stable, and that the adjustable feet are secured.",
+"claimTrigger": "Create a service claim if excessive vibration continues after these checks.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"video of the vibration",
+"photo showing the installation and floor",
+"product model and serial number",
+"description of the transport-restraint and levelling checks"
+],
+"matchTerms": [
+"washing machine vibrating",
+"shaking",
+"machine moves",
+"vibrates during spin",
+"washing machine jumps"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-excessive-foam-in-detergent-drawer",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Excessive foam appears in the detergent drawer",
+"possibleCause": "Too much detergent may have been used, or the detergent amount or type may not suit the water hardness and washing conditions.",
+"safeUserCheck": "Reduce the amount of detergent. Check the water hardness, detergent amount, and detergent type used.",
+"claimTrigger": "Create a service claim if excessive foaming continues despite correct detergent use.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video of the foam",
+"detergent type and amount",
+"product model and serial number",
+"known water hardness if available"
+],
+"matchTerms": [
+"too much foam",
+"foam in drawer",
+"suds",
+"excessive detergent foam",
+"washing machine foaming"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-stops-before-programme-end",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Washing machine stops before the programme finishes",
+"possibleCause": "The manual directs the customer to check the power supply and the water inlet and drainage.",
+"safeUserCheck": "Check the normal power supply, water supply, and accessible drain path.",
+"claimTrigger": "Create a service claim if the washing machine continues to stop before the programme ends after these checks.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video of the control panel when the machine stops",
+"selected programme",
+"product model and serial number",
+"description of power, water-supply, and drainage checks"
+],
+"matchTerms": [
+"stops before end",
+"cycle stops",
+"programme stops early",
+"washing machine stops halfway",
+"cycle won't finish"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-normal-drain-pump-noise",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Drain pump makes a characteristic noise after water has been pumped out",
+"possibleCause": "A small amount of water remains in the pump and drain pipe after the drum has been emptied. Continuous pump operation then draws in air and causes a characteristic noise.",
+"safeUserCheck": "No corrective action is required when the noise occurs only as described after draining.",
+"claimTrigger": "Do not create a service claim for this normal pump noise alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"pump noise",
+"noise after draining",
+"drain pump sound",
+"air noise",
+"strange noise after water drains"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-short-pauses-during-programme",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Short pauses occur during the wash programme",
+"possibleCause": "The machine may automatically add water, or the pause may occur while excessive foam is being reduced.",
+"safeUserCheck": "No corrective action is required for short pauses caused by automatic water filling or foam reduction.",
+"claimTrigger": "Do not create a service claim for these normal short pauses alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"washing pauses",
+"short pause during wash",
+"machine stops briefly",
+"cycle pauses",
+"programme pauses"
+],
+"sourceSection": "PDF p. 29, LÃ–SEN VON BETRIEBSPROBLEMEN",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-clean-pump-filter",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Pump filter requires cleaning",
+"possibleCause": "The manual states that neglecting pump-filter cleaning can cause difficulty draining water from the washing machine.",
+"safeUserCheck": "Disconnect the washing machine from the power supply. Open the filter flap, remove the pump filter as shown in the manual, remove small foreign objects, and reinstall the filter in reverse order. The manual recommends cleaning it approximately every 20 washes.",
+"claimTrigger": "No service claim is required for normal pump-filter cleaning. Create a claim if drainage problems continue after the filter has been correctly cleaned and reinstalled.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the filter condition",
+"photo of any removed debris",
+"product model and serial number",
+"description of whether drainage improved after cleaning"
+],
+"matchTerms": [
+"clean pump filter",
+"pump filter blocked",
+"filter clogged",
+"drain filter dirty",
+"filter needs cleaning",
+"water not draining"
+],
+"sourceSection": "PDF p. 31, WARTUNG UND REINIGUNG - Reinigung des Pumpenfilters",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-clean-water-inlet-filter",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Water inlet filter requires cleaning",
+"possibleCause": "A dirty inlet filter can contribute to water-supply problems.",
+"safeUserCheck": "Disconnect the appliance from the power supply. Unscrew the accessible water hose, remove the inlet filter screen as described in the manual, clean it with a brush, and reinstall it.",
+"claimTrigger": "No service claim is required for normal inlet-filter cleaning. Create a claim if water-supply problems continue after cleaning.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the inlet filter condition",
+"product model and serial number",
+"description of whether filling improved after cleaning"
+],
+"matchTerms": [
+"clean inlet filter",
+"water filter blocked",
+"inlet screen dirty",
+"water supply filter",
+"washing machine not filling"
+],
+"sourceSection": "PDF p. 31, WARTUNG UND REINIGUNG - Reinigung des Wasserversorgungsventils",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-cancel-or-change-programme",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Current wash programme needs to be cancelled or changed",
+"possibleCause": "The user may need to stop the current programme and select another programme.",
+"safeUserCheck": "Press the Standby button to cancel the wash programme. Switch the washing machine on again, select the desired programme, and press Start/Pause.",
+"claimTrigger": "No service claim is required for normal programme cancellation or changing.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"cancel programme",
+"change programme",
+"reset washing machine",
+"stop cycle",
+"wrong programme",
+"restart programme"
+],
+"sourceSection": "PDF p. 28, BESCHREIBUNG DER BENUTZUNG - Abbrechen und Wechsel des Waschprogramms",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-power-failure-programme-resumes",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Power supply is interrupted during a wash programme",
+"possibleCause": "A power failure or disconnection from the mains has interrupted operation.",
+"safeUserCheck": "The selected programme is stored and resumes after power is restored. Do not open the washing machine door during a power failure.",
+"claimTrigger": "No service claim is required if the programme resumes normally when power returns. Create a claim if the machine does not resume or operate correctly after power is restored.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"power cut",
+"power failure",
+"electricity went off",
+"cycle interrupted by power",
+"programme resumes",
+"memory after power cut"
+],
+"sourceSection": "PDF p. 34, SPANNUNGSSCHWUND (MEMORY DES WASCHPROGRAMMS)",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-door-will-not-open-during-cycle",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Washing machine door will not open during or immediately after washing",
+"possibleCause": "The door is locked during washing. It also remains locked when water is still in the drum or the temperature is too high.",
+"safeUserCheck": "Wait for the programme to finish and for the door to unlock automatically. Do not force the door open.",
+"claimTrigger": "No service claim is required while the door is normally locked during washing or because water or temperature conditions prevent opening. Create a claim if the door remains locked after the programme has finished and safe conditions have returned.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [
+"photo of the door-lock symbol or display if the door remains locked after the programme",
+"product model and serial number",
+"description of whether water remains in the drum"
+],
+"matchTerms": [
+"door won't open",
+"door locked",
+"can't open washing machine",
+"door stuck",
+"washing machine locked"
+],
+"sourceSection": "PDF p. 35, TÃœRSPERRE",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-spin-reduced-or-skipped-unbalanced-load",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Spin speed is reduced or spinning is skipped",
+"possibleCause": "The load is distributed unevenly in the drum and the balance-control system cannot redistribute it sufficiently.",
+"safeUserCheck": "After the programme ends, open the door, redistribute the laundry by hand, close the door, and select the spin programme again.",
+"claimTrigger": "No service claim is required if normal spinning resumes after redistributing the laundry. Create a claim if the issue repeatedly occurs with correctly distributed loads.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"description of the laundry load",
+"selected spin setting",
+"product model and serial number",
+"description of whether redistribution solved the problem"
+],
+"matchTerms": [
+"not spinning",
+"spin skipped",
+"low spin speed",
+"clothes very wet",
+"unbalanced load",
+"won't spin"
+],
+"sourceSection": "PDF p. 34, KONTROLLE DER VERTEILUNG DES WASCHGUTS",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-time-display-changes-or-freezes",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Displayed remaining time changes, pauses, or jumps",
+"possibleCause": "The displayed time is only an estimate and can change depending on temperature, water pressure, load size, detergent amount, and other washing conditions. Temporary freezing and time jumps are possible.",
+"safeUserCheck": "No corrective action is required if the programme continues operating normally.",
+"claimTrigger": "Do not create a service claim for normal time adjustments alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"time display frozen",
+"time jumps",
+"timer changes",
+"remaining time wrong",
+"washing time changes",
+"timer stuck"
+],
+"sourceSection": "PDF p. 25, BESCHREIBUNG DER BEDIENFELDES UND DES DISPLAYS - Display",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-end-display-and-sound",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Display shows End and an audible signal sounds after washing",
+"possibleCause": "The wash programme has finished. The audible signal sounds if the sound function is enabled.",
+"safeUserCheck": "No corrective action is required.",
+"claimTrigger": "Do not create a service claim for the normal End display or end-of-programme sound.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"End on display",
+"beep after wash",
+"washing machine beeps",
+"end signal",
+"programme finished"
+],
+"sourceSection": "PDF p. 28, BESCHREIBUNG DER BENUTZUNG - Ende des Waschprogramms",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ewa-34660-w-damaged-power-cable",
+"productCode": "EWA 34660 W",
+"aliases": [
+"EWA34660W"
+],
+"itemType": "washing_machine",
+"model": "EWA 34660 W",
+"problem": "Power cable is damaged",
+"possibleCause": "The manual states that a damaged or modified power cable can cause electric shock, short circuit, or fire due to overheating.",
+"safeUserCheck": "Stop using the washing machine. Disconnect it from the power supply only if this can be done safely. Do not repair or replace the cable yourself.",
+"claimTrigger": "Create an urgent service claim for a damaged power cable or exposed electrical parts. Cable replacement must be carried out by authorised service or a qualified electrician.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of the damaged cable if safe to take",
+"product model and serial number",
+"description of the damage",
+"description of when it was noticed"
+],
+"matchTerms": [
+"damaged power cable",
+"power cord damaged",
+"wire exposed",
+"burnt cable",
+"electrical damage",
+"broken power lead"
+],
+"sourceSection": "PDF pp. 10, 16 and 21, SICHERHEIT UND KENNZEICHNUNGEN AUF DEN PFLEGEETIKETTEN / Anschluss an die elektrische Speisung",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+}
+]
+}
+

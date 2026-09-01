@@ -1,0 +1,942 @@
+{
+"product": {
+"brand": "Amica",
+"model": "KMI 754 000 C",
+"productCode": "KMI754000C",
+"applianceType": "hob",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+]
+},
+"entries": [
+{
+"id": "kmi-754-000-c-e4-temperature-sensor-damaged",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E4 is displayed",
+"possibleCause": "The temperature sensor is damaged.",
+"safeUserCheck": "Stop using the affected appliance function and contact the Service Centre. Do not open or repair the hob.",
+"claimTrigger": "Create a service claim when error code E4 is displayed.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of error code E4 on the display",
+"product model and serial number",
+"description of when the error appeared",
+"description of checks already completed"
+],
+"matchTerms": [
+"E4",
+"error E4",
+"E4 hob",
+"temperature sensor error",
+"temperature sensor damaged"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E4",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-e5-temperature-sensor-damaged",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E5 is displayed",
+"possibleCause": "The temperature sensor is damaged.",
+"safeUserCheck": "Stop using the affected appliance function and contact the Service Centre. Do not open or repair the hob.",
+"claimTrigger": "Create a service claim when error code E5 is displayed.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of error code E5 on the display",
+"product model and serial number",
+"description of when the error appeared",
+"description of checks already completed"
+],
+"matchTerms": [
+"E5",
+"error E5",
+"E5 hob",
+"temperature sensor error",
+"temperature sensor damaged"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E5",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-e7-igbt-temperature-sensor-damaged",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E7 is displayed",
+"possibleCause": "The IGBT temperature sensor is damaged.",
+"safeUserCheck": "Contact the Service Centre. Do not open, dismantle, or attempt to repair the hob.",
+"claimTrigger": "Create a service claim when error code E7 is displayed.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of error code E7 on the display",
+"product model and serial number",
+"description of when the error appeared"
+],
+"matchTerms": [
+"E7",
+"error E7",
+"E7 hob",
+"IGBT sensor",
+"IGBT temperature sensor"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E7",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-e8-igbt-temperature-sensor-damaged",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E8 is displayed",
+"possibleCause": "The IGBT temperature sensor is damaged.",
+"safeUserCheck": "Contact the Service Centre. Do not open, dismantle, or attempt to repair the hob.",
+"claimTrigger": "Create a service claim when error code E8 is displayed.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of error code E8 on the display",
+"product model and serial number",
+"description of when the error appeared"
+],
+"matchTerms": [
+"E8",
+"error E8",
+"E8 hob",
+"IGBT sensor",
+"IGBT temperature sensor"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E8",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-e2-incorrect-supply-voltage",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E2 is displayed",
+"possibleCause": "The supply voltage is incorrect.",
+"safeUserCheck": "Do not test live electrical voltage yourself. Have the electrical supply checked safely by an appropriately qualified person.",
+"claimTrigger": "Create a service claim or arrange qualified electrical inspection if error E2 remains or the correct supply cannot be confirmed safely.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of error code E2 on the display",
+"product model and serial number",
+"description of when the error appeared",
+"description of any recent electrical supply issue"
+],
+"matchTerms": [
+"E2",
+"error E2",
+"E2 hob",
+"incorrect voltage",
+"supply voltage error",
+"power supply error"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E2",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-e3-incorrect-supply-voltage",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E3 is displayed",
+"possibleCause": "The supply voltage is incorrect.",
+"safeUserCheck": "Do not test live electrical voltage yourself. Have the electrical supply checked safely by an appropriately qualified person.",
+"claimTrigger": "Create a service claim or arrange qualified electrical inspection if error E3 remains or the correct supply cannot be confirmed safely.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of error code E3 on the display",
+"product model and serial number",
+"description of when the error appeared",
+"description of any recent electrical supply issue"
+],
+"matchTerms": [
+"E3",
+"error E3",
+"E3 hob",
+"incorrect voltage",
+"supply voltage error",
+"power supply error"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E3",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-e6-hob-overheated",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E6 is displayed",
+"possibleCause": "The hob has overheated.",
+"safeUserCheck": "Stop cooking and allow the hob to cool down completely before using it again.",
+"claimTrigger": "Create a service claim if error E6 returns after the hob has completely cooled.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of error code E6 on the display",
+"product model and serial number",
+"selected cooking settings",
+"description of whether the code returned after cooling"
+],
+"matchTerms": [
+"E6",
+"error E6",
+"E6 hob",
+"hob overheated",
+"overheating error"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E6",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-e9-hob-overheated",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Error code E9 is displayed",
+"possibleCause": "The hob has overheated.",
+"safeUserCheck": "Stop cooking and allow the hob to cool down completely before using it again.",
+"claimTrigger": "Create a service claim if error E9 returns after the hob has completely cooled.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of error code E9 on the display",
+"product model and serial number",
+"selected cooking settings",
+"description of whether the code returned after cooling"
+],
+"matchTerms": [
+"E9",
+"error E9",
+"E9 hob",
+"hob overheated",
+"overheating error"
+],
+"sourceSection": "PDF p. 47, ERROR CODES ",
+"topicType": "error_code",
+"code": "E9",
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-appliance-does-not-work",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The induction hob does not work",
+"possibleCause": "There may be no power supply to the appliance.",
+"safeUserCheck": "Check the household fuse or circuit breaker. Do not open the hob or work on its electrical connections.",
+"claimTrigger": "Create a service claim if the hob still does not work after the household power protection has been checked.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing that the hob does not operate",
+"product model and serial number",
+"description of the household fuse or circuit-breaker check"
+],
+"matchTerms": [
+"hob not working",
+"induction hob dead",
+"no power",
+"hob won't turn on",
+"cooktop not working",
+"induction not starting"
+],
+"sourceSection": "PDF p. 46, TROUBLESHOOTING ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-sensor-fields-not-responding",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The touch sensor fields do not respond",
+"possibleCause": "The appliance may not be switched on, a sensor may have been touched for less than one second, or several sensors may have been touched at the same time.",
+"safeUserCheck": "Switch the appliance on. Touch one sensor at a time and hold it slightly longer, except where the manual specifically requires simultaneous sensors.",
+"claimTrigger": "Create a service claim if the sensors remain unresponsive after the documented operating checks.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"video showing the unresponsive controls",
+"product model and serial number",
+"description of the control checks already completed"
+],
+"matchTerms": [
+"touch controls not working",
+"sensors not responding",
+"buttons not working",
+"hob controls frozen",
+"touch panel not responding",
+"cannot control hob"
+],
+"sourceSection": "PDF p. 46, TROUBLESHOOTING ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-long-beep-and-no-response",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The hob does not respond and emits a long acoustic signal",
+"possibleCause": "The controls may have been operated incorrectly, or one or more sensor fields may be covered or dirty.",
+"safeUserCheck": "Make sure the sensor fields are uncovered and clean, then switch the hob on again and operate the sensors as described in the manual.",
+"claimTrigger": "Create a service claim if the long signal and lack of response continue after the controls are clean and correctly operated.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"video or audio of the long acoustic signal",
+"photo of the control panel",
+"product model and serial number",
+"description of cleaning and restart checks"
+],
+"matchTerms": [
+"long beep",
+"continuous beep",
+"hob beeping",
+"hob not responding",
+"sensor covered",
+"touch panel beeps"
+],
+"sourceSection": "PDF p. 46, TROUBLESHOOTING ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-appliance-switches-itself-off",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The whole hob switches itself off",
+"possibleCause": "No setting may have been entered shortly after switching the appliance on, or the sensor fields may be covered or dirty.",
+"safeUserCheck": "Make sure the sensor fields are uncovered and clean. Switch the control panel on again and enter the required setting without delay.",
+"claimTrigger": "Create a service claim if the hob continues switching itself off after the controls have been cleaned and used as described.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"video showing the hob switching off",
+"photo of the control panel",
+"product model and serial number",
+"description of checks already completed"
+],
+"matchTerms": [
+"hob switches off",
+"hob turns itself off",
+"cooktop shuts down",
+"induction keeps turning off",
+"hob powers off"
+],
+"sourceSection": "PDF p. 46, TROUBLESHOOTING ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-cooking-zone-switches-off-with-h",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "A cooking zone switches off automatically and H is displayed",
+"possibleCause": "The operating-time limit may have been reached, sensor fields may be covered or dirty, or electronic components may have overheated.",
+"safeUserCheck": "Keep the sensor fields clean and uncovered. If the zone has switched off because of the operating-time limit, switch it on again when safe. If overheating is suspected, allow the hob to cool before using it again.",
+"claimTrigger": "Create a service claim if the cooking zone repeatedly switches off after the hob has cooled and the controls are clean and unobstructed.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing H and the affected cooking zone",
+"product model and serial number",
+"selected heat setting",
+"description of whether the hob was allowed to cool",
+"description of control-panel checks"
+],
+"matchTerms": [
+"zone switches off",
+"H on display",
+"cooking zone stops",
+"hob overheats",
+"zone turns itself off",
+"H after cooking"
+],
+"sourceSection": "PDF p. 46, TROUBLESHOOTING ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-residual-heat-indicator-h",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The display shows H after cooking",
+"possibleCause": "H is the residual heat indicator and means the glass around the cooking zone is still hot.",
+"safeUserCheck": "Do not touch the cooking zone and do not place heat-sensitive objects on it while H is displayed. Allow the cooking zone to cool.",
+"claimTrigger": "No service claim is required for the normal residual heat indicator.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"H on hob",
+"H on display",
+"residual heat",
+"hob still hot",
+"heat warning",
+"H symbol"
+],
+"sourceSection": "PDF p. 42, RESIDUAL HEAT INDICATOR "H"",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-residual-heat-indicator-not-visible-after-power-outage",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The residual heat indicator is not displayed even though a cooking zone may still be hot",
+"possibleCause": "A power outage occurred or the appliance was disconnected from the power supply.",
+"safeUserCheck": "Treat the cooking zones as potentially hot even when H is not displayed after a power outage. Do not touch them until they have cooled.",
+"claimTrigger": "No claim is required when the missing H indicator is caused by a power outage or disconnection as described by the manual.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"H disappeared",
+"no residual heat indicator",
+"hob hot after power cut",
+"power outage",
+"hot zone no H",
+"residual heat light off"
+],
+"sourceSection": "PDF pp. 42 and 46, RESIDUAL HEAT INDICATOR "H" / TROUBLESHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-cracked-glass-cooking-surface",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The glass-ceramic hob surface is cracked, chipped, or broken",
+"possibleCause": "The cooking surface has been physically damaged. The manual warns that liquids can reach live electrical parts through damaged areas and create an electric-shock hazard.",
+"safeUserCheck": "Stop using the hob immediately and disconnect it from the power supply using the plug or main circuit breaker if this can be done safely. Do not touch, repair, or continue using the cracked surface.",
+"claimTrigger": "Create an urgent service claim for any crack, break, or chip in the cooking surface.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of the cracked or chipped glass",
+"product model and serial number",
+"description of how the damage occurred",
+"description of whether the hob was in use when the damage occurred"
+],
+"matchTerms": [
+"cracked hob",
+"broken glass hob",
+"glass cracked",
+"cooktop cracked",
+"chipped hob",
+"ceramic glass broken",
+"hob surface damaged"
+],
+"sourceSection": "PDF pp. 32-34 and 46, SAFETY INSTRUCTIONS / TROUBLESHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-cookware-not-detected",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The cooking zone does not detect the cookware",
+"possibleCause": "There may be no cookware on the active zone, the cookware may not be suitable for induction, or its ferromagnetic base may be too small for the cooking zone.",
+"safeUserCheck": "Use induction-compatible cookware with a flat ferromagnetic base. If the cookware is not detected on one zone, try a cooking zone with a suitably smaller diameter as described in the manual.",
+"claimTrigger": "Create a service claim if known suitable cookware is still not detected on appropriate cooking zones.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video of the cookware-detection indication",
+"photo of the cookware base or induction marking",
+"product model and serial number",
+"description of cookware tested and cooking zones used"
+],
+"matchTerms": [
+"pan not detected",
+"pot not detected",
+"hob doesn't recognize pan",
+"induction pan symbol",
+"cookware not working",
+"zone won't heat pan",
+"wrong pan"
+],
+"sourceSection": "PDF pp. 40-42, BASIC INFORMATION ABOUT YOUR APPLIANCE - Cookware characteristics / If the appliance does not detect the cookware on the operating cooking zone",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-cooking-zone-turns-off-without-suitable-cookware",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "A cooking zone switches off about one minute after no suitable cookware is detected",
+"possibleCause": "The hob is designed to switch the active cooking zone off after approximately one minute if suitable cookware is not placed on it.",
+"safeUserCheck": "Place suitable induction cookware on the cooking zone. No corrective action is needed if the automatic switch-off occurs because no suitable cookware is present.",
+"claimTrigger": "No service claim is required for this normal automatic behaviour.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"zone turns off after one minute",
+"pan not detected",
+"hob goes to standby",
+"cooking zone shuts off",
+"no pan auto off",
+"induction stops heating"
+],
+"sourceSection": "PDF p. 42, IF THE APPLIANCE DOES NOT DETECT THE COOKWARE ON THE OPERATING COOKING ZONE",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-child-lock-active",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The controls are locked and most touch sensors do not operate",
+"possibleCause": "The Child Lock function is active.",
+"safeUserCheck": "Touch and hold the Child Lock sensor for 3 seconds to deactivate the lock. The On/Off control remains available for emergency switch-off.",
+"claimTrigger": "No service claim is required if the controls work normally after the Child Lock is deactivated.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"child lock",
+"hob locked",
+"controls locked",
+"cannot press buttons",
+"lock symbol",
+"unlock hob"
+],
+"sourceSection": "PDF p. 44, OPERATION - Child Lock",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-unlock-child-lock",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The Child Lock needs to be deactivated",
+"possibleCause": "The Child Lock has been enabled.",
+"safeUserCheck": "Touch and hold the Child Lock sensor for 3 seconds until the lock indication disappears.",
+"claimTrigger": "No service claim is required for normal Child Lock deactivation.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"unlock hob",
+"turn off child lock",
+"remove lock",
+"disable child lock",
+"hob locked"
+],
+"sourceSection": "PDF p. 44, OPERATION - Child Lock",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-cooking-zone-automatic-time-limit",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "A cooking zone switches off automatically after operating for a long time",
+"possibleCause": "Each cooking zone has a safety operating-time limit based on the selected heat setting. The function cannot be disabled.",
+"safeUserCheck": "If the cooking zone switched off because the documented operating-time limit was reached, switch the zone on again when it is safe to continue cooking.",
+"claimTrigger": "No service claim is required for the normal safety auto-off function.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"zone auto off",
+"hob switched off automatically",
+"cooking zone timer limit",
+"safety shutoff",
+"zone turns itself off",
+"automatic switch off"
+],
+"sourceSection": "PDF p. 45, OPERATION - Cooking zone auto off",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-booster-reduces-to-level-9",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "Booster power automatically drops to heat setting 9",
+"possibleCause": "The Booster function operates for a maximum of 5 minutes and then automatically reduces the cooking-zone power to level 9.",
+"safeUserCheck": "No corrective action is required if Booster reduces to level 9 after its maximum operating period.",
+"claimTrigger": "No service claim is required for this normal Booster behaviour.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"booster turns off",
+"P changes to 9",
+"booster drops to 9",
+"power reduced",
+"boost stops after five minutes",
+"booster function"
+],
+"sourceSection": "PDF p. 44, OPERATION - Booster function",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-normal-buzzing-fan-noise",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The induction hob makes a buzzing or rough fan sound",
+"possibleCause": "The cooling fan is operating to cool the internal electronic components.",
+"safeUserCheck": "No corrective action is required when the sound matches the normal cooling-fan noise described by the manual.",
+"claimTrigger": "Do not create a service claim for normal cooling-fan noise alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"hob buzzing",
+"buzzing sound",
+"fan noise",
+"hob humming",
+"rough sound",
+"cooling fan"
+],
+"sourceSection": "PDF p. 46, TROUBLESHOOTING ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-normal-hissing-whistling-noise",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The induction hob makes hissing or whistling sounds during cooking",
+"possibleCause": "When several cooking zones are used at full power, the operating frequency of the induction coils can produce hissing or whistling sounds. The exact sound can also depend on the cookware and heat setting.",
+"safeUserCheck": "No corrective action is required if the sound matches the normal induction sounds described by the manual.",
+"claimTrigger": "Do not create a service claim for normal induction hissing or whistling alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"hob whistling",
+"induction hissing",
+"high pitched noise",
+"induction whistle",
+"hob squealing",
+"coil noise",
+"pan whistling"
+],
+"sourceSection": "PDF pp. 40 and 46, BASIC INFORMATION ABOUT YOUR APPLIANCE - Induction hob operation principle / TROUBLESHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-first-use-odour",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "An odour is released when the hob is used for the first time",
+"possibleCause": "The manual states that a temporary odour may be released during the first start-up.",
+"safeUserCheck": "Ventilate the room or open a window. The manual states that the odour is temporary.",
+"claimTrigger": "No service claim is required for the temporary first-use odour described by the manual. Stop using the appliance if there is smoke, burning, or another abnormal safety hazard.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"new hob smell",
+"first use smell",
+"hob odour",
+"strange smell first use",
+"new appliance smell"
+],
+"sourceSection": "PDF p. 42, BEFORE USING THE APPLIANCE FOR THE FIRST TIME",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-controls-cannot-be-operated",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The hob controls cannot be operated while the appliance is switched on",
+"possibleCause": "The manual does not specify a customer-repairable technical cause for complete control failure.",
+"safeUserCheck": "Stop using the appliance. Switch off the main circuit breaker or remove the fuse if this can be done safely and contact customer service. Do not open or repair the hob.",
+"claimTrigger": "Create an urgent service claim if the hob cannot be safely controlled or switched as intended.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"video showing the control failure if safe to record",
+"product model and serial number",
+"description of the control failure",
+"description of checks already completed"
+],
+"matchTerms": [
+"cannot control hob",
+"controls completely dead",
+"hob won't respond",
+"cannot switch hob off",
+"touch controls failed",
+"control panel failure"
+],
+"sourceSection": "PDF p. 49, CLEANING AND MAINTENANCE - Periodic inspections",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-electronics-fault-cooking-zones-not-working",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "The hob does not work and the cooking zones cannot be switched on or operated",
+"possibleCause": "The troubleshooting table identifies faulty electronics as the cause.",
+"safeUserCheck": "Reset the appliance by disconnecting it from the mains for a few minutes using the household fuse or circuit breaker. Do not open the appliance.",
+"claimTrigger": "Create a service claim if the cooking zones still cannot be operated after the supported reset.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"video showing that the cooking zones cannot be operated",
+"product model and serial number",
+"description of the reset already completed",
+"description of any display indications"
+],
+"matchTerms": [
+"electronics fault",
+"cooking zones not working",
+"hob won't operate",
+"zones won't switch on",
+"induction zones dead",
+"hob reset"
+],
+"sourceSection": "PDF p. 46, TROUBLESHOOTING ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-fire-smoke-or-burning",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "There is fire, smoke, or burning on or around the hob",
+"possibleCause": "The manual warns that unattended cooking with fat or oil can result in fire.",
+"safeUserCheck": "Stop using the appliance. Never attempt to extinguish a cooking fire with water. Switch off the appliance if this can be done safely and cover the flame with a lid or fire blanket as described by the manual.",
+"claimTrigger": "Create an urgent claim and stop using the appliance when there is fire, smoke, burning, or related heat damage.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of visible damage only after the situation is safe",
+"product model and serial number",
+"description of what happened",
+"description of any visible heat or fire damage"
+],
+"matchTerms": [
+"hob on fire",
+"smoke from hob",
+"burning smell",
+"oil fire",
+"grease fire",
+"hob burning",
+"cooktop smoking"
+],
+"sourceSection": "PDF pp. 32-33, SAFETY INSTRUCTIONS ",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kmi-754-000-c-unresolved-fault-service-required",
+"productCode": "KMI754000C",
+"aliases": [
+"KMI 754 000 C",
+"KMI754000C"
+],
+"itemType": "hob",
+"model": "KMI 754 000 C",
+"problem": "A hob fault remains after the supported troubleshooting checks",
+"possibleCause": "The manual does not specify a customer-repairable cause for faults that remain after the documented checks.",
+"safeUserCheck": "Disconnect the appliance from the power supply and contact the nearest service centre. Do not dismantle or repair electrical components yourself.",
+"claimTrigger": "Create a service claim when a fault remains after the safe checks described in the manual.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo or video showing the fault",
+"product model and serial number",
+"description of the problem",
+"description of checks already completed"
+],
+"matchTerms": [
+"hob fault",
+"problem not fixed",
+"needs service",
+"hob needs repair",
+"induction fault",
+"service required"
+],
+"sourceSection": "PDF pp. 46 and 50, TROUBLESHOOTING / WARRANTY AND AFTER SALES SERVICE",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+}
+]
+}

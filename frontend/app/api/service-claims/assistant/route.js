@@ -3305,6 +3305,7 @@ function findClaimsChatbotKnowledgeMatch({ question, claim, selectedAreas, conve
   );
 
   const scored = arrayValue(CLAIMS_CHATBOT_KNOWLEDGE?.entries)
+    .filter((entry) => entry?.isActive !== false)
     .filter((entry) => !disabledProductCodes.has(normalizeClaimsMatchText(entry?.productCode)))
     .map((entry) => {
       const aliasMatched = arrayValue(entry?.aliases).some((alias) =>

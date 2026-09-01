@@ -707,7 +707,7 @@ test("EBX oven knowledge has unique IDs and complete model aliases", () => {
   const entries = CLAIMS_CHATBOT_KNOWLEDGE.entries.filter((entry) => entry.productCode === "EBX 943 600 S");
   const ids = entries.map((entry) => entry.id);
 
-  assert.equal(entries.length, 16);
+  assert.equal(entries.length, 18);
   assert.equal(new Set(ids).size, ids.length);
   assert.ok(entries.every((entry) => entry.itemType === "oven"));
   assert.ok(entries.every((entry) => entry.aliases.includes("12262.3eETsDHbVlS")));

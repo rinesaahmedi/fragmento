@@ -1,0 +1,493 @@
+{
+"product": {
+"brand": "Amica",
+"model": "EBX 943 600 S",
+"productCode": "12262.3eETsDHbVlS",
+"applianceType": "oven",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+]
+},
+"entries": [
+{
+"id": "ebx-943-600-s-appliance-does-not-work",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The oven does not work",
+"possibleCause": "There is a break in the power supply.",
+"safeUserCheck": "Check the household fuse box and replace a blown household fuse if appropriate.",
+"claimTrigger": "Create a service claim if the oven still does not work after the household power supply and fuse have been checked.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing that the oven does not operate",
+"product model and serial number",
+"description of the household fuse check",
+"description of checks already completed"
+],
+"matchTerms": [
+"oven not working",
+"oven no power",
+"oven won't turn on",
+"oven dead",
+"oven stopped working",
+"no electricity to oven"
+],
+"sourceSection": "PDF p. 79, OPERATION IN CASE OF EMERGENCY ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-display-shows-0-00-after-power-cut",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The programmer display shows flashing 0.00 or 0:00",
+"possibleCause": "The appliance was disconnected from the mains or there was a temporary power cut.",
+"safeUserCheck": "Set the current time on the electronic programmer as described in the manual.",
+"claimTrigger": "No service claim is required if the display returns to normal after the current time is set.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"0.00 on oven",
+"0:00 flashing",
+"oven clock flashing",
+"clock reset",
+"display flashing after power cut",
+"oven time reset"
+],
+"sourceSection": "PDF pp. 64-65 and 79, OPERATION / OPERATION IN CASE OF EMERGENCY",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-set-clock-before-oven-operation",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The oven cannot be operated because the current time has not been set",
+"possibleCause": "After connection to the power supply or restoration of power, the electronic programmer requires the current time to be set before the oven can operate.",
+"safeUserCheck": "Set the current time using the electronic programmer controls as described in the manual.",
+"claimTrigger": "No service claim is required if the oven operates normally after the clock is set.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"oven won't work after power cut",
+"set oven clock",
+"oven needs time setting",
+"0.00 flashing",
+"oven locked after power cut",
+"clock not set"
+],
+"sourceSection": "PDF pp. 64-65, OPERATION - Before using the oven for the first time / Electronic timer",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-oven-light-not-working",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The oven lighting does not work",
+"possibleCause": "The oven bulb may be loose or damaged.",
+"safeUserCheck": "Disconnect the appliance from the mains before touching the lamp. Tighten or replace the oven lamp using the lamp replacement procedure described in the manual.",
+"claimTrigger": "Create a service claim if the oven light still does not work after the supported lamp check or replacement.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing the lighting problem",
+"product model and serial number",
+"description of the lamp check or replacement",
+"description of checks already completed"
+],
+"matchTerms": [
+"oven light not working",
+"oven lamp broken",
+"inside light not working",
+"oven bulb blown",
+"oven light off",
+"oven lighting failed"
+],
+"sourceSection": "PDF pp. 75 and 79, CLEANING AND MAINTENANCE - Replacing the halogen bulb in the oven / OPERATION IN CASE OF EMERGENCY",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-replace-halogen-oven-bulb",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The oven halogen bulb requires replacement",
+"possibleCause": "The halogen oven bulb is damaged or no longer works.",
+"safeUserCheck": "Disconnect the appliance from the mains. After the oven has cooled, follow the manual's lamp replacement procedure and use a G9 halogen bulb rated 230V and 25W.",
+"claimTrigger": "No service claim is required for normal user-replaceable bulb replacement. Create a claim if the lighting still does not work afterward.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"replace oven bulb",
+"change oven light",
+"G9 oven bulb",
+"halogen oven lamp",
+"oven bulb replacement"
+],
+"sourceSection": "PDF p. 75, CLEANING AND MAINTENANCE - Replacing the halogen bulb in the oven",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-damaged-power-supply-cable",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The oven power supply cable is damaged",
+"possibleCause": "The fixed power supply cable has been damaged. The manual states that it must be replaced by the manufacturer, an authorised service outlet, or a qualified person to avoid danger.",
+"safeUserCheck": "Stop using the oven. Disconnect it from the mains only if this can be done safely. Do not repair or replace the power cable yourself.",
+"claimTrigger": "Create an urgent service claim for a damaged power supply cable.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of the damaged cable if safe to take",
+"product model and serial number",
+"description of the damage",
+"description of when the damage was noticed"
+],
+"matchTerms": [
+"damaged oven cable",
+"power cord damaged",
+"oven wire damaged",
+"exposed wire",
+"broken power cable",
+"burnt power cable"
+],
+"sourceSection": "PDF p. 63, INSTALLATION - Electrical connection",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-technical-fault",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The oven has a technical fault",
+"possibleCause": "The manual does not provide a customer-repairable cause for technical faults.",
+"safeUserCheck": "Stop using the oven and disconnect the power supply. Do not attempt to repair the appliance. Report the fault to the service centre.",
+"claimTrigger": "Create a service claim whenever a technical fault prevents safe or correct operation.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo or video showing the fault",
+"product model and serial number",
+"description of the fault",
+"description of checks already completed"
+],
+"matchTerms": [
+"technical fault",
+"oven faulty",
+"oven malfunction",
+"oven broken",
+"service required",
+"oven needs repair"
+],
+"sourceSection": "PDF p. 57, SAFETY INSTRUCTIONS",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-hot-steam-when-opening-door",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "Hot steam escapes when the oven door is opened during or after cooking",
+"possibleCause": "Hot steam can normally escape from the oven when the door is opened during or after cooking.",
+"safeUserCheck": "Open the oven door carefully and do not lean over the door. The manual notes that hot steam may be invisible depending on its temperature.",
+"claimTrigger": "No service claim is required for normal hot-steam release when opening the oven door.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"steam from oven",
+"hot steam",
+"steam when opening door",
+"oven steam",
+"steam escaped",
+"hot air from oven"
+],
+"sourceSection": "PDF p. 57, SAFETY INSTRUCTIONS",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-timer-alarm-after-countdown",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "An alarm sounds when the Kitchen Timer reaches the end of its countdown",
+"possibleCause": "The selected Kitchen Timer period has elapsed.",
+"safeUserCheck": "Touch and hold MENU or simultaneously touch and hold the < and > sensors to mute the alarm. If it is not manually muted, the alarm stops automatically after approximately 7 minutes.",
+"claimTrigger": "No service claim is required for the normal Kitchen Timer alarm.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"oven alarm",
+"timer beeping",
+"oven keeps beeping",
+"timer finished",
+"kitchen timer alarm",
+"oven buzzer"
+],
+"sourceSection": "PDF p. 65, OPERATION - Electronic timer - Kitchen Timer",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-timed-operation-ended",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The oven switches off automatically and an alarm sounds",
+"possibleCause": "The programmed cooking duration has elapsed.",
+"safeUserCheck": "Set the oven function selector and temperature selector to the off position, then mute the alarm using MENU or the < and > sensors as described in the manual.",
+"claimTrigger": "No service claim is required when the oven switches off because the programmed duration has ended.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"oven switched off automatically",
+"oven timer ended",
+"oven beeping and off",
+"timed cooking finished",
+"duration finished",
+"oven stopped after timer"
+],
+"sourceSection": "PDF pp. 65-66, OPERATION - Electronic timer - Timed operation",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-cancel-timer-or-timed-operation",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "A Kitchen Timer or timed-operation setting needs to be cancelled",
+"possibleCause": "A timer or cooking-duration setting is currently active.",
+"safeUserCheck": "For timed operation, simultaneously touch the < and > sensors. To cancel the Kitchen Timer, select the Kitchen Timer with MENU and then simultaneously touch the < and > sensors.",
+"claimTrigger": "No service claim is required for normal timer cancellation.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"cancel oven timer",
+"reset oven timer",
+"clear cooking time",
+"stop oven timer",
+"cancel duration",
+"remove timer setting"
+],
+"sourceSection": "PDF p. 66, OPERATION - Cancel settings",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-heating-indicator-switches-on-and-off",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The temperature regulator signal light switches on and off during cooking",
+"possibleCause": "The oven thermostat cycles the heating to maintain the selected temperature.",
+"safeUserCheck": "No corrective action is required when the temperature signal light cycles on and off during normal cooking.",
+"claimTrigger": "No service claim is required for normal thermostat cycling.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"oven light turns on and off",
+"heating light blinking",
+"temperature light cycles",
+"thermostat light",
+"oven heating indicator",
+"red light goes on and off"
+],
+"sourceSection": "PDF p. 68, OPERATION - Oven functions and operation",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-heating-does-not-start-until-temperature-set",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "A heating function has been selected but the oven does not heat",
+"possibleCause": "The temperature regulator has not been set. The manual states that a heating function only starts after a temperature is selected.",
+"safeUserCheck": "Select the required oven function and then set the required temperature with the temperature regulator.",
+"claimTrigger": "No service claim is required if the oven begins heating after the temperature is set. Create a claim if it still does not heat.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the function and temperature control settings",
+"product model and serial number",
+"description of whether the heating indicator illuminates",
+"description of checks already completed"
+],
+"matchTerms": [
+"oven not heating",
+"oven function selected but cold",
+"heater not starting",
+"oven won't warm up",
+"temperature not set",
+"oven stays cold"
+],
+"sourceSection": "PDF pp. 67-68, OPERATION - Oven functions and operation",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-grill-door-must-remain-closed",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "The grill is being used with the oven door open",
+"possibleCause": "The manual requires the oven door to remain closed when using the grill.",
+"safeUserCheck": "Close the oven door while grilling. Accessible parts may become hot, so keep children away.",
+"claimTrigger": "No service claim is required when the grill operates normally with the door closed.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"grill door open",
+"oven grill door",
+"how to use grill",
+"grilling with door open",
+"grill safety"
+],
+"sourceSection": "PDF p. 69, OPERATION - Use of the grill",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "ebx-943-600-s-service-required-for-unresolved-fault",
+"productCode": "12262.3eETsDHbVlS",
+"aliases": [
+"EBX943600S",
+"EBX 943 600 S",
+"A-EBX943600S"
+],
+"itemType": "oven",
+"model": "EBX 943 600 S",
+"problem": "An oven fault remains after the supported user checks",
+"possibleCause": "The manual does not provide a customer-repairable cause for faults that remain after the documented checks.",
+"safeUserCheck": "Stop using the oven if it has a technical fault. Disconnect the mains supply and contact an authorised service centre. Do not dismantle or repair the appliance yourself.",
+"claimTrigger": "Create a service claim when a fault remains after the safe checks described in the manual.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo or video showing the fault",
+"product model and serial number",
+"description of the problem",
+"description of checks already completed"
+],
+"matchTerms": [
+"oven still not working",
+"oven fault not fixed",
+"oven needs service",
+"oven needs repair",
+"unresolved oven problem",
+"service centre"
+],
+"sourceSection": "PDF pp. 57, 78-79, SAFETY INSTRUCTIONS / CLEANING AND MAINTENANCE / OPERATION IN CASE OF EMERGENCY",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+}
+]
+}

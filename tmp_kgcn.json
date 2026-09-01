@@ -1,0 +1,701 @@
+{
+"product": {
+"brand": "Amica",
+"model": "KGCN 388 140 E",
+"productCode": "KGCN388140E",
+"applianceType": "fridge_freezer",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+]
+},
+"entries": [
+{
+"id": "kgcn-388-140-e-refrigerator-door-open-alarm",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "A buzzer sounds after the refrigerator door has been open for more than 3 minutes",
+"possibleCause": "The refrigerator door has remained open for more than 3 minutes.",
+"safeUserCheck": "Close the refrigerator door. The alarm can also be silenced by pressing any button, but if the door remains open the alarm will sound again after 3 minutes.",
+"claimTrigger": "No service claim is required when the alarm is caused by the refrigerator door being left open.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"fridge beeping",
+"door alarm",
+"refrigerator alarm",
+"buzzer sounding",
+"door left open",
+"fridge keeps beeping"
+],
+"sourceSection": "PDF pp. 45-46, CONTROLS - Appliance controls ",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-appliance-does-not-work",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The fridge-freezer does not work",
+"possibleCause": "The electric circuit may be disrupted, the plug may not be correctly inserted, the appliance power cable may be damaged, the socket may have no power, or the appliance may not be switched on.",
+"safeUserCheck": "Check that the plug is correctly inserted. Check whether the power cable is visibly damaged. Check whether the socket has power using another normal appliance. Check that the appliance is switched on.",
+"claimTrigger": "Create a service claim if the appliance still does not work after the safe power and control checks. Stop using the appliance if the power cable is damaged.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing that the appliance does not operate",
+"product model and serial number",
+"description of the plug and socket checks",
+"description of whether the power cable is visibly damaged",
+"description of the control setting"
+],
+"matchTerms": [
+"fridge not working",
+"freezer not working",
+"fridge freezer dead",
+"won't turn on",
+"no power",
+"refrigerator stopped working",
+"appliance does not work"
+],
+"sourceSection": "PDF p. 54, TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-interior-light-not-working",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The lighting inside the appliance does not work",
+"possibleCause": "For appliances with bulb lighting, the bulb may be loose or fused. A general appliance power problem can also prevent the light from working.",
+"safeUserCheck": "First perform the safe checks listed for an appliance that does not work. If the appliance uses a replaceable bulb, check the user-replaceable bulb as described in the manual.",
+"claimTrigger": "Create a service claim if the appliance has power but the interior lighting still does not work after the supported user check.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing the lighting problem",
+"product model and serial number",
+"description of whether the appliance otherwise operates normally",
+"description of checks already completed"
+],
+"matchTerms": [
+"fridge light not working",
+"interior light off",
+"refrigerator light broken",
+"light won't turn on",
+"freezer light not working",
+"inside light not working"
+],
+"sourceSection": "PDF p. 54, TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-runs-continuously",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The appliance operates continuously",
+"possibleCause": "The temperature setting may be incorrect, or one of the conditions listed for insufficient cooling may be causing prolonged operation.",
+"safeUserCheck": "Adjust the temperature setting as described in the manual. Also check the safe external causes listed for incorrect temperature, including door opening, food placement, ventilation, heat sources, and ambient temperature.",
+"claimTrigger": "Create a service claim if the appliance continues to operate continuously after the supported external checks and correct settings.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"selected temperature setting",
+"product model and serial number",
+"description of how often the doors are opened",
+"description of ventilation and installation conditions",
+"description of checks already completed"
+],
+"matchTerms": [
+"fridge runs constantly",
+"compressor always running",
+"fridge never stops",
+"freezer runs continuously",
+"motor always on",
+"continuous operation"
+],
+"sourceSection": "PDF p. 54, TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-water-collects-bottom-fridge",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Water collects in the lower part of the refrigerator",
+"possibleCause": "The condensate discharge opening may be clogged, or internal air circulation may be obstructed because food or containers touch the rear wall.",
+"safeUserCheck": "If the appliance has a condensate discharge opening, carefully clean it using the cleaning plug as described in the manual. Arrange food and containers so they do not touch the rear wall.",
+"claimTrigger": "Create a service claim if water continues to collect after the discharge opening and food placement have been checked.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the collected water",
+"photo of the rear wall and food placement",
+"product model and serial number",
+"description of the drainage-opening check"
+],
+"matchTerms": [
+"water in bottom of fridge",
+"water collecting",
+"water under drawers",
+"fridge leaking inside",
+"blocked drain",
+"condensation water"
+],
+"sourceSection": "PDF p. 54, TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-clean-condensate-drain",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The refrigerator condensate discharge opening requires cleaning",
+"possibleCause": "Contaminants carried with condensate during defrosting can clog the discharge opening.",
+"safeUserCheck": "Disconnect the appliance from the mains before cleaning. Carefully unclog the discharge opening using the cleaning plug described in the manual.",
+"claimTrigger": "No service claim is required for normal accessible drain cleaning. Create a claim if drainage remains blocked or water continues to collect.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo of the drain area if the problem continues",
+"product model and serial number",
+"description of whether drainage improved after cleaning"
+],
+"matchTerms": [
+"clean fridge drain",
+"blocked drain hole",
+"condensate drain clogged",
+"water drain blocked",
+"fridge drainage",
+"unclog refrigerator drain"
+],
+"sourceSection": "PDF p. 52, DEFROSTING, WASHING AND MAINTENANCE - Defrosting the fridge",
+"topicType": "immediate_step",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-unusual-noise",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The appliance makes unusual noise",
+"possibleCause": "The appliance may not be level or may be touching furniture or other objects.",
+"safeUserCheck": "Check that the appliance is level and stable. Make sure it has proper clearance and is not touching adjacent furniture or other objects.",
+"claimTrigger": "Create a service claim if unusual noise continues after the appliance is correctly levelled and separated from surrounding objects.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"video or audio of the unusual noise",
+"photo showing the appliance installation",
+"product model and serial number",
+"description of levelling and clearance checks"
+],
+"matchTerms": [
+"fridge strange noise",
+"unusual noise",
+"freezer noisy",
+"fridge vibrating",
+"loud refrigerator",
+"rattling fridge"
+],
+"sourceSection": "PDF pp. 54-55, TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-normal-operating-noises",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Cracking, compressor, thermostat, or refrigerant-flow sounds are heard during operation",
+"possibleCause": "The manual states that these sounds can occur during normal operation because of the thermostat, compressor switching, refrigerant flow, and thermal expansion and contraction of components.",
+"safeUserCheck": "No corrective action is required if the sound matches normal operating sounds described in the manual.",
+"claimTrigger": "Do not create a service claim for normal operating sounds alone. Create a claim if the noise is clearly abnormal and remains after the external installation checks.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"fridge cracking",
+"clicking noise",
+"compressor noise",
+"refrigerant noise",
+"gurgling fridge",
+"normal fridge sounds",
+"popping sound"
+],
+"sourceSection": "PDF pp. 38 and 55, GUIDELINES CONCERNING THE SAFETY OF USE / TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-temperature-too-high-or-too-low",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Temperature inside the fridge-freezer is not low enough or is too high",
+"possibleCause": "Possible causes listed by the manual include an incorrect temperature setting, ambient temperature outside the appliance climate range, direct sunlight or nearby heat sources, a large quantity of warm food, obstructed internal or rear air circulation, frequent or prolonged door opening, a door that does not close completely, the compressor switching on too rarely, or an incorrectly inserted door gasket.",
+"safeUserCheck": "Check the temperature setting and ambient conditions. Make sure the appliance is away from direct sunlight and heat sources, allow up to 72 hours after loading a large amount of warm food, keep food away from the rear wall, keep at least 30 mm clearance behind the appliance, reduce unnecessary door opening, check that food does not prevent the door from closing, and check that the accessible door gasket is correctly seated.",
+"claimTrigger": "Create a service claim if the temperature remains incorrect after the supported external checks and sufficient cooling time.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"temperature setting",
+"photo showing food placement and door closure",
+"product model and serial number",
+"description of ambient and installation conditions",
+"description of checks already completed"
+],
+"matchTerms": [
+"fridge not cold",
+"freezer not freezing",
+"fridge too warm",
+"temperature too high",
+"not cooling enough",
+"food not cold",
+"freezer too warm",
+"cooling problem"
+],
+"sourceSection": "PDF p. 55, TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-door-does-not-close-completely",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The refrigerator or freezer door does not close completely",
+"possibleCause": "Food or containers may interfere with closing, or the door gasket may be incorrectly inserted.",
+"safeUserCheck": "Arrange food and containers so they do not interfere with the door. Check that the accessible door gasket is correctly seated.",
+"claimTrigger": "Create a service claim if the door still does not close completely after food placement and the door gasket have been checked.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"photo or video showing the door not closing",
+"photo of the door gasket",
+"product model and serial number",
+"description of checks already completed"
+],
+"matchTerms": [
+"fridge door won't close",
+"freezer door not closing",
+"door stays open",
+"door seal problem",
+"fridge not sealing",
+"door doesn't shut"
+],
+"sourceSection": "PDF p. 55, TROUBLE-SHOOTING",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-damaged-door-gasket",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The door gasket is damaged",
+"possibleCause": "The manual does not specify the cause of gasket damage. It states that a damaged seal must be replaced because otherwise the door will not shut properly.",
+"safeUserCheck": "Keep the door gasket clean and visually check whether it is damaged or incorrectly seated. Do not dismantle the appliance.",
+"claimTrigger": "Create a service claim if the door gasket is damaged and requires replacement.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo of the damaged door gasket",
+"photo showing the door closure",
+"product model and serial number",
+"description of the sealing problem"
+],
+"matchTerms": [
+"damaged door seal",
+"broken gasket",
+"fridge seal damaged",
+"freezer gasket damaged",
+"door seal torn",
+"fridge door not sealing"
+],
+"sourceSection": "PDF p. 50, USING THE REFRIGERATOR EFFICIENTLY - Practical everyday tips",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-freezer-door-hard-to-open-after-closing",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The freezer door is difficult to reopen immediately after it has been closed",
+"possibleCause": "Negative pressure can temporarily form inside the freezer after the door is closed.",
+"safeUserCheck": "Wait 1 to 2 minutes for the pressure to equalise, then try opening the freezer door again. Do not force the door.",
+"claimTrigger": "No service claim is required if the door opens normally after waiting for the pressure to equalise.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"freezer door stuck",
+"freezer hard to open",
+"door won't reopen",
+"vacuum in freezer",
+"freezer door suction",
+"door difficult to open"
+],
+"sourceSection": "PDF p. 49, OPERATION AND FUNCTIONS - Freezing food",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-condensation-over-vegetable-containers",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Condensation appears above the vegetable containers",
+"possibleCause": "Vegetables containing significant quantities of water can cause condensation to form above the vegetable containers.",
+"safeUserCheck": "No corrective action is required for this condensation alone. Dry vegetables well before storing them, as recommended by the manual.",
+"claimTrigger": "Do not create a service claim for this normal condensation alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"condensation in fridge",
+"water above vegetable drawer",
+"moisture in fridge",
+"vegetable drawer condensation",
+"water droplets",
+"fridge humidity"
+],
+"sourceSection": "PDF p. 48, OPERATION AND FUNCTIONS - Storage of food in the fridge-freezer",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-frost-on-rear-refrigerator-wall",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Frost forms on the rear wall of the refrigerator compartment",
+"possibleCause": "The appliance operates in cooling and defrosting cycles. Frost can form on the rear wall and is removed automatically. In automatic-defrost models, frost can also appear when large quantities of fresh food are stored.",
+"safeUserCheck": "No corrective action is required when frost appears and disappears as part of the normal defrosting cycle.",
+"claimTrigger": "Do not create a service claim for normal rear-wall frost that clears during automatic defrosting. Create a claim if abnormal ice accumulation persists and normal operation is affected.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [
+"photo of persistent abnormal frost if it does not clear",
+"product model and serial number",
+"description of how long the frost remains"
+],
+"matchTerms": [
+"frost on back wall",
+"ice in fridge",
+"rear wall frost",
+"fridge icing",
+"frost inside refrigerator",
+"back wall frozen"
+],
+"sourceSection": "PDF pp. 52-53, DEFROSTING, WASHING AND MAINTENANCE - Defrosting the fridge / Automatic fridge defrosting",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-slight-temperature-fluctuations",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Small temperature changes occur inside the appliance",
+"possibleCause": "The manual states that slight temperature changes are normal, for example after storing large quantities of fresh food or leaving the door open for a longer period.",
+"safeUserCheck": "Allow the appliance to return to the selected temperature. Avoid leaving the door open longer than necessary.",
+"claimTrigger": "Do not create a service claim for slight temporary temperature fluctuations that return to the selected setting.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"temperature changes",
+"fridge temperature fluctuates",
+"temperature goes up and down",
+"temporary warm fridge",
+"temperature variation",
+"fridge temperature unstable"
+],
+"sourceSection": "PDF p. 47, CONTROLS - Additional information on the temperature",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-fast-cool-stops-automatically",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Fast Cool switches off automatically",
+"possibleCause": "The Fast Cool function is designed to switch off automatically after its programmed operating period or after the relevant temperature condition is reached, depending on the control version.",
+"safeUserCheck": "No corrective action is required when Fast Cool switches off automatically as described in the manual.",
+"claimTrigger": "Do not create a service claim for automatic Fast Cool deactivation alone.",
+"chatbotDecision": "NO_CLAIM_NORMAL",
+"evidenceToRequest": [],
+"matchTerms": [
+"fast cool turned off",
+"fast cool stopped",
+"super cool switched off",
+"rapid cooling stopped",
+"fast cool automatic",
+"cooling mode ended"
+],
+"sourceSection": "PDF pp. 45-46, CONTROLS - Appliance controls",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-damaged-power-cable",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The appliance power cable is damaged",
+"possibleCause": "The manual does not provide a customer-repairable cause. A damaged supply cord must be replaced by the manufacturer, service agent, or similarly qualified person to avoid a hazard.",
+"safeUserCheck": "Stop using the appliance. Disconnect it from the mains only if this can be done safely. Do not repair or replace the power cable yourself.",
+"claimTrigger": "Create an urgent service claim for a damaged power cable or exposed electrical parts.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of the damaged cable if safe to take",
+"product model and serial number",
+"description of the damage",
+"description of when the damage was noticed"
+],
+"matchTerms": [
+"damaged power cable",
+"power cord damaged",
+"wire exposed",
+"fridge cable broken",
+"electrical damage",
+"broken power lead"
+],
+"sourceSection": "PDF pp. 38-40, GUIDELINES CONCERNING THE SAFETY OF USE",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-refrigerant-circuit-damaged",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The refrigerant circuit or refrigerant pipe is damaged",
+"possibleCause": "The cooling system or refrigerant pipe has been punctured, broken, or otherwise damaged. The manual states that the refrigerant is flammable.",
+"safeUserCheck": "Stop using the appliance. Do not touch, bend, puncture, or attempt to repair the refrigerant circuit. Ventilate the room for several minutes. Keep ignition sources away and contact service.",
+"claimTrigger": "Create an urgent service claim for any confirmed or suspected refrigerant-circuit damage.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"photo of visible damage if safe to take",
+"product model and serial number",
+"description of how the damage occurred",
+"description of any unusual sound, smell, or loss of cooling"
+],
+"matchTerms": [
+"refrigerant leak",
+"cooling pipe damaged",
+"fridge pipe punctured",
+"cooling circuit damaged",
+"refrigerant escaping",
+"R600a leak",
+"gas leaking from fridge"
+],
+"sourceSection": "PDF pp. 38-40 and 42, GUIDELINES CONCERNING THE SAFETY OF USE / INSTALLATION AND OPERATING CONDITIONS OF THE APPLIANCE",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-refrigerant-eye-contact",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "Refrigerant has come into contact with the eyes",
+"possibleCause": "Refrigerant has escaped from a damaged cooling system and contacted the eyes.",
+"safeUserCheck": "Rinse the eyes with clean water and seek medical assistance immediately. Do not attempt to repair the cooling system.",
+"claimTrigger": "Stop using the appliance and create an urgent service claim because refrigerant leakage indicates damage to the cooling system.",
+"chatbotDecision": "URGENT_CLAIM_STOP_USE",
+"evidenceToRequest": [
+"product model and serial number",
+"description of how the refrigerant release occurred",
+"photo of visible appliance damage if safe to take"
+],
+"matchTerms": [
+"refrigerant in eyes",
+"coolant in eyes",
+"fridge gas in eye",
+"refrigerant exposure",
+"coolant leak injury"
+],
+"sourceSection": "PDF p. 38, GUIDELINES CONCERNING THE SAFETY OF USE",
+"topicType": "issue",
+"code": null,
+"priority": 100,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-transported-or-tilted-over-40-degrees",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The fridge-freezer was tilted by more than 40 degrees during transport, moving, or positioning",
+"possibleCause": "The appliance was transported or positioned at an angle greater than the limit stated by the manual.",
+"safeUserCheck": "Place the appliance correctly and wait at least 2 hours before switching it on.",
+"claimTrigger": "No service claim is required if the appliance operates normally after being correctly positioned and left for at least 2 hours. Create a claim if it does not operate correctly afterward.",
+"chatbotDecision": "SELF_CHECK_FIRST_CLAIM_IF_UNSOLVED",
+"evidenceToRequest": [
+"product model and serial number",
+"description of how the appliance was transported",
+"description of how long it stood upright before being switched on"
+],
+"matchTerms": [
+"fridge transported on side",
+"fridge tilted",
+"moved refrigerator",
+"when can I turn fridge on",
+"fridge laid down",
+"transported freezer"
+],
+"sourceSection": "PDF p. 38, GUIDELINES CONCERNING THE SAFETY OF USE",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+},
+{
+"id": "kgcn-388-140-e-service-required-for-unresolved-malfunction",
+"productCode": "KGCN388140E",
+"aliases": [
+"KGCN 388 140 E",
+"KGCN388140E"
+],
+"itemType": "fridge_freezer",
+"model": "KGCN 388 140 E",
+"problem": "The fridge-freezer has a malfunction that requires repair",
+"possibleCause": "The manual does not provide a customer-repairable cause for faults that remain after the documented troubleshooting checks.",
+"safeUserCheck": "Do not repair or modify the appliance yourself. If the malfunction remains after the safe checks in the manual, contact service and have the appliance serial number ready.",
+"claimTrigger": "Create a service claim when a malfunction remains after the supported safe user checks.",
+"chatbotDecision": "CREATE_CLAIM_SERVICE",
+"evidenceToRequest": [
+"photo or video showing the malfunction",
+"product model and serial number",
+"description of the fault",
+"description of checks already completed"
+],
+"matchTerms": [
+"fridge needs repair",
+"freezer needs service",
+"refrigerator fault",
+"unresolved problem",
+"service required",
+"appliance malfunction"
+],
+"sourceSection": "PDF p. 56, WARRANTY AND AFTER SALES SERVICE - Service",
+"topicType": "issue",
+"code": null,
+"priority": 80,
+"isActive": true
+}
+]
+}
