@@ -636,6 +636,44 @@ test("every cabinet Blende is offered as a contextual choice with its source cab
   }]);
 });
 
+test("AB 105745, AB 105748, AB 105751, and AB 105754 corner Blenden are independently selectable from the sink cabinet", () => {
+  const kitchen = {
+    items: [component("SINKBASE-B-600", "sink-base", "Sink Lower Cabinet", {
+      isLocked: true,
+    })],
+  };
+  for (const kitchenSlug of ["ab-105745", "ab-105748", "ab-105751", "ab-105754"]) {
+    const result = buildServiceClaimSelectableComponents({
+      kitchen,
+      kitchenConfig: { components: kitchen.items },
+      kitchenSlug,
+      claimParts: [
+        { partKey: "sink-cabinet", sourceKitchenItemCode: "SINKBASE-B-600", sourceComponentKey: "sink-base" },
+        { partKey: "sink", sourceKitchenItemCode: "SINKBASE-B-600", sourceComponentKey: "sink-base" },
+        { partKey: "faucet", sourceKitchenItemCode: "SINKBASE-B-600", sourceComponentKey: "sink-base" },
+      ],
+    });
+    const groups = buildServiceClaimComponentChoiceGroups(result.selectableComponents);
+    const sinkGroup = groups.find((group) => group.triggerComponentId === "component-claim-sink-cabinet");
+    const blende = result.selectableComponents.find(
+      (entry) => entry.componentId === "component-claim-blende-sink-base",
+    );
+
+    assert.equal(blende?.isStandaloneClaimOption, true, kitchenSlug);
+    assert.equal(blende?.articleCode, "UPEF65", kitchenSlug);
+    assert.ok(!sinkGroup.options.some((entry) => entry.componentId === blende.componentId), kitchenSlug);
+  }
+
+  const pickerSource = fs.readFileSync(
+    path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"),
+    "utf8",
+  );
+  assert.match(
+    pickerSource,
+    /\["ab-105745",\s*"ab-105748",\s*"ab-105751",\s*"ab-105754"\]\.includes\(kitchenSlug\)[\s\S]*componentId === independentSinkBlendeId[\s\S]*SERVICE_CLAIM_PART_COMPONENT_IDS\["sink-cabinet"\][\s\S]*SERVICE_CLAIM_PART_COMPONENT_IDS\.sink[\s\S]*SERVICE_CLAIM_PART_COMPONENT_IDS\.faucet/,
+  );
+});
+
 test("kitchens expose oven/cooktop/drawer and sink-cabinet/sink/faucet choices", () => {
   const groups = buildServiceClaimComponentChoiceGroups([
     { componentId: "component-claim-oven", claimPartKey: "oven", name: "Built-in Oven" },
@@ -1667,6 +1705,21 @@ test("AB 105834 claim hotspots keep sink and sink cabinet separate", () => {
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"sink-faucet"[\s\S]*\[\[69\.95,\s*45\.98\]/);
 });
 
+test("AB 105834 JPG claim hotspots keep the corner cabinet out of sink selection", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105834"] || [];
+  const corner = hotspots.find((hotspot) => hotspot.componentKey === "corner-base");
+  const sinkFixtures = hotspots.filter((hotspot) => hotspot.componentKey === "sink-faucet");
+
+  assert.ok(corner, "corner cabinet hotspot should be present");
+  assert.deepEqual(corner.points, [
+    [62.31, 59.71], [72.3, 61.25], [72.41, 93.32], [62.22, 91.82],
+  ]);
+  assert.equal(sinkFixtures.length, 1, "only the elevated faucet should be a sink fixture hotspot");
+  assert.deepEqual(sinkFixtures[0].points, [
+    [69.95, 45.98], [76.1, 45.98], [76.1, 58.89], [69.95, 58.89],
+  ]);
+});
+
 test("AB 105747 keeps the 45 cm dishwasher and US30 cabinet independently selectable", () => {
   const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
   const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
@@ -1703,6 +1756,24 @@ test("AB 105837 claim hotspot maps the hood LED strip to extractor hood", () => 
 
   assert.match(source, /"ab-105837":\s*\[[\s\S]*componentKey:\s*"wall-cabinet-2"[\s\S]*\[\[37\.08,\s*15\.17\],\s*\[48\.02,\s*13\.59\],\s*\[48\.02,\s*37\.69\],\s*\[37\.08,\s*39\.38\]\]/);
   assert.match(source, /"ab-105837":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[37\.08,\s*39\.38\],\s*\[48\.02,\s*37\.69\],\s*\[48\.02,\s*39\.38\],\s*\[37\.08,\s*41\.0\]\]/);
+});
+
+test("AB 105837 claims use the order-plan faucet hotspot instead of the broad sink surface", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105837"] || [];
+  const faucet = hotspots.find((hotspot) => hotspot.componentKey === "sink-faucet");
+  assert.deepEqual(faucet?.points, [
+    [68.6, 46.7], [75.1, 46.7], [75.1, 56.5], [68.6, 56.75],
+  ]);
+});
+
+test("AB 105840 uses the same alignment override in claims only", () => {
+  const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"), "utf8");
+  assert.match(source, /\["ab-105837",\s*"ab-105840"\]\.includes\(kitchenSlug\)/);
+});
+
+test("AB 105843 uses the same alignment override in claims only", () => {
+  const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"), "utf8");
+  assert.match(source, /\["ab-105837",\s*"ab-105840",\s*"ab-105843"\]\.includes\(kitchenSlug\)/);
 });
 
 test("AB 105834 claim hotspot maps the hood LED strip to extractor hood", () => {

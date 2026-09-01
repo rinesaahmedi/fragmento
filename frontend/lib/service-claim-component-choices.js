@@ -5,6 +5,7 @@ function sourceKeyForComponent(component = {}) {
 }
 
 function isContextualCompanion(component = {}) {
+  if (component.isStandaloneClaimOption) return false;
   return Boolean(component.isCompanionOption)
     || CONTEXTUAL_COMPANION_PART_KEYS.has(String(component.claimPartKey || "").trim());
 }

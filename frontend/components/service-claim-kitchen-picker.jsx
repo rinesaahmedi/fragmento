@@ -182,7 +182,23 @@ export default function ServiceClaimKitchenPicker({
     ),
     [componentChoiceGroups],
   );
+  const independentSinkBlendeId = ["ab-105745", "ab-105748", "ab-105751", "ab-105754"].includes(kitchenSlug)
+    ? "component-claim-blende-sink-base"
+    : "";
   const togglePlanComponent = useCallback((componentId) => {
+    if (componentId === independentSinkBlendeId) {
+      onChange((current) => current.includes(componentId)
+        ? current.filter((id) => id !== componentId)
+        : [
+          ...current.filter((id) => ![
+            SERVICE_CLAIM_PART_COMPONENT_IDS["sink-cabinet"],
+            SERVICE_CLAIM_PART_COMPONENT_IDS.sink,
+            SERVICE_CLAIM_PART_COMPONENT_IDS.faucet,
+          ].includes(id)),
+          componentId,
+        ]);
+      return;
+    }
     if (typeof onComponentToggle === "function") {
       onComponentToggle(componentId);
       return;
@@ -206,7 +222,7 @@ export default function ServiceClaimKitchenPicker({
         kitchenSlug,
       });
     });
-  }, [componentChoiceGroupByOptionId, kitchenSlug, onChange, onComponentToggle, selectableComponentIds]);
+  }, [componentChoiceGroupByOptionId, independentSinkBlendeId, kitchenSlug, onChange, onComponentToggle, selectableComponentIds]);
 
   const fixedKey = fixedComponentIds.join("|");
   const selectableKey = (selectableComponentIds || []).join("|");
@@ -219,7 +235,18 @@ export default function ServiceClaimKitchenPicker({
       ),
       kitchenSlug,
     );
-    return buildServiceClaimBlendeHotspots(prepared, selectableComponents, kitchenConfig.components, kitchenSlug);
+    const claimsOnlyPrepared = ["ab-105837", "ab-105840", "ab-105843"].includes(kitchenSlug)
+      ? prepared.map((hotspot) => {
+        if (hotspot.componentKey === "oven-module") {
+          return withHotspotSourceBounds({ ...hotspot, points: [[41.07, 59.05], [52.05, 57.45], [52.05, 86.80], [41.07, 88.51]] });
+        }
+        if (hotspot.componentKey === "base-module-4") {
+          return withHotspotSourceBounds({ ...hotspot, points: [[61.64, 59.08], [70.85, 60.88], [70.85, 90.69], [61.64, 88.69]] });
+        }
+        return hotspot;
+      })
+      : prepared;
+    return buildServiceClaimBlendeHotspots(claimsOnlyPrepared, selectableComponents, kitchenConfig.components, kitchenSlug);
   }, [kitchenConfig.components, kitchenSlug, selectableComponents]);
   const planDisplayCrop = useMemo(
     () => getPlanDisplayCrop(sourceImageHotspots, kitchenSlug),
