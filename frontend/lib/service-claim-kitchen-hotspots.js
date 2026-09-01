@@ -109,6 +109,12 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
     [37.0075, 54.0],
     [22.7075, 55.7],
   ],
+  "ab-105831": [
+    [17.8, 57.5],
+    [38.05, 56.9],
+    [38.05, 59.35],
+    [17.8, 60.25],
+  ],
   // Four outside sink-bowl strokes in AB 105846's vector-plan coordinates.
   // The separate faucet silhouettes below remain clickable as one fixture.
   "ab-105846": [
@@ -132,7 +138,7 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
 // These drawings contain one source hotspot for the sink bowl followed by a
 // separate source hotspot for the faucet. Do not assign both claim identities
 // to both shapes.
-const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-105825"]);
+const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-105825", "ab-105831"]);
 
 // Thin visual silhouettes traced around the faucet body. Source hotspot boxes
 // remain intentionally generous for interaction, but painting those boxes
@@ -155,6 +161,12 @@ const FAUCET_SOURCE_POINTS_BY_SLUG = {
     [25.653207, 46.218487],
     [25.059382, 47.226891],
     [25.059382, 53.109244],
+  ],
+  "ab-105831": [
+    [25.05, 49.15],
+    [30.8, 48.45],
+    [30.8, 58.15],
+    [25.05, 58.65],
   ],
 };
 
@@ -808,7 +820,9 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel"],
   },
   "ab-105831": {
-    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
+    // The measured report provides one complete polygon per worktop run;
+    // mapping the old fascia duplicates created overlapping ASC seams.
+    indexPartKeys: ["worktop-left", "worktop-right"],
   },
   "ab-105743": {
     // Top surfaces, front fascias, then the floor-height end panel.

@@ -160,34 +160,65 @@ test("AB 105811 email preview translates the oven to the original SVG coordinate
   const originalOven = sourceHotspots.find((hotspot) => hotspot.componentKey === "oven-module");
   const correctedOven = corrected.find((hotspot) => hotspot.componentKey === "oven-module");
 
-  assert.equal(originalOven.left, 34.84);
+  assert.ok(Math.abs(originalOven.left - 50.712589) < 0.000001);
   assert.ok(Math.abs(correctedOven.left - 50.69358669833729) < 0.000001);
   assert.ok(Math.abs(correctedOven.top - 65.00840336134453) < 0.000001);
   assert.ok(Math.abs(correctedOven.width - 15.676959619952495) < 0.000001);
   assert.ok(Math.abs(correctedOven.height - 32.45042016806723) < 0.000001);
 });
 
-test("AB 105814 email oven uses the dashboard selection coordinates", () => {
+test("AB 105811 plan hotspots follow the source elevation lines", () => {
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105811"];
+  const worktops = hotspots.filter((hotspot) => hotspot.componentKey === "worktop");
+  const oven = hotspots.find((hotspot) => hotspot.componentKey === "oven-module");
+  const refrigerator = hotspots.find((hotspot) => hotspot.componentKey === "refrigerator");
+
+  assert.equal(worktops.length, 1);
+  assert.deepEqual(worktops[0], {
+    componentKey: "worktop",
+    left: 2.850356,
+    top: 63.361345,
+    width: 63.895487,
+    height: 1.512605,
+  });
+  assert.ok(Math.abs(oven.left - 50.712589) < 0.000001);
+  assert.ok(Math.abs(oven.top - 64.873950) < 0.000001);
+  assert.ok(Math.abs(refrigerator.left - 69.714964) < 0.000001);
+});
+
+test("AB 105814 oven follows the source elevation lines", () => {
   const oven = PLAN_HOTSPOTS_BY_SLUG["ab-105814"]
     .find((hotspot) => hotspot.componentKey === "oven-module");
 
   assert.deepEqual(oven, {
     componentKey: "oven-module",
-    left: 28.65,
-    top: 58.37,
-    width: 14.01,
-    height: 29.0,
+    left: 28.622327,
+    top: 58.319328,
+    width: 14.014252,
+    height: 29.07563,
   });
 });
 
-test("AB 105814 email worktop uses the dashboard selection coordinates", () => {
+test("AB 105814 worktop is one continuous source-aligned surface", () => {
   const worktops = PLAN_HOTSPOTS_BY_SLUG["ab-105814"]
     .filter((hotspot) => hotspot.componentKey === "worktop");
 
   assert.deepEqual(worktops, [
-    { componentKey: "worktop", left: 17.77, top: 57.04, width: 76.96, height: 1.33 },
-    { componentKey: "worktop", left: 17.77, top: 57.04, width: 0.37, height: 30.33 },
+    { componentKey: "worktop", left: 17.695962, top: 56.97479, width: 76.95962, height: 1.344538 },
   ]);
+});
+
+test("AB 105814 refrigerator follows the actual left cabinet outline", () => {
+  const refrigerator = PLAN_HOTSPOTS_BY_SLUG["ab-105814"]
+    .find((hotspot) => hotspot.componentKey === "refrigerator");
+
+  assert.deepEqual(refrigerator, {
+    componentKey: "refrigerator",
+    left: 2.375297,
+    top: 27.731092,
+    width: 14.489312,
+    height: 59.663866,
+  });
 });
 
 test("AB 105815 email uses the same oven layout as the dashboard", () => {
@@ -254,15 +285,15 @@ test("AB 105831 email uses the dashboard sink and faucet geometry", () => {
   const faucets = hotspots.filter((hotspot) => hotspot.componentKey === "sink-faucet");
 
   assert.deepEqual(sinkBase.points, [
-    [31.45, 61.55],
-    [42.55, 59.8],
-    [42.25, 89.25],
-    [31.45, 90.8],
+    [31.45, 60.55],
+    [42.25, 59.8],
+    [42.25, 88.75],
+    [31.45, 90.1],
   ]);
-  assert.equal(faucets.length, 1);
-  assert.deepEqual(faucets[0].points, [
-    [25.05, 47.15],
-    [30.8, 47.15],
+  assert.equal(faucets.length, 2);
+  assert.deepEqual(faucets[1].points, [
+    [25.05, 49.15],
+    [30.8, 48.45],
     [30.8, 58.15],
     [25.05, 58.65],
   ]);

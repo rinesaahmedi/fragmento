@@ -25,7 +25,7 @@ const us2a60Article = {
   id: "article-us2a60",
   articleNumber: "US2A60",
   name: "Lower Cabinet with 3 Drawers 60 cm",
-  nameDe: "Unterschrank mit Schublade/Auszug 60",
+  nameDe: "Unterschrank mit 3 Schubladen 60 cm",
   price: 369,
   widthMm: 600,
   heightMm: null,
@@ -155,7 +155,7 @@ test("order variant resolution validates and returns the submitted Auszug catalo
   assert.equal(selected.status, "variant");
   assert.equal(selected.article.articleNumber, "US2A60");
   assert.equal(selected.article.name, "Lower Cabinet with 3 Drawers 60 cm");
-  assert.equal(selected.article.nameDe, "Unterschrank mit Schublade/Auszug 60");
+  assert.equal(selected.article.nameDe, "Unterschrank mit 3 Schubladen 60 cm");
   assert.equal(selected.article.price, 369);
 });
 

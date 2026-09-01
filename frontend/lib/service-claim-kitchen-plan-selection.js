@@ -56,6 +56,15 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-105831": new Set(["base-module-1"]),
   "ab-105834": new Set(["base-module-3"]),
 };
+// In these shared perspective plans the US50 front and exposed side are one
+// cabinet surface. Do not expose the legacy attached UPK20 metadata as a
+// separate claim target for that cabinet.
+const CLAIM_BLENDE_SUPPRESSED_SOURCE_KEYS_BY_SLUG = {
+  "ab-104968": new Set(["base-module-1"]),
+  "ab-105734": new Set(["base-module-1"]),
+  "ab-105737": new Set(["base-module-1"]),
+  "ab-105740": new Set(["base-module-1"]),
+};
 const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   // Both adjacent right-hand strips are independently drawn in this shared plan.
   "ab-105805": { "base-module-2": 2 },
@@ -633,6 +642,9 @@ export function buildServiceClaimSelectableComponents({
   const companionBlendeSourceKeys = CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || new Set();
+  const suppressedBlendeSourceKeys = CLAIM_BLENDE_SUPPRESSED_SOURCE_KEYS_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || new Set();
   const blendeMetaOverrides = CLAIM_BLENDE_META_OVERRIDES_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
@@ -642,6 +654,7 @@ export function buildServiceClaimSelectableComponents({
   const claimBlenden = sourceItems
     .map(({ item }) => buildClaimBlendeMeta(item))
     .filter(Boolean)
+    .filter((entry) => !suppressedBlendeSourceKeys.has(entry.sourceComponentKey))
     .map((entry) => {
       const quantity = Number(blendeQuantityOverrides[entry.sourceComponentKey] || 0);
       return quantity > 0 && entry.code.toUpperCase() === "UPK20"
@@ -759,9 +772,9 @@ export function buildServiceClaimSelectableComponents({
         nameDe: String(part?.nameDe || "").trim(),
         componentKey: String(part?.sourceComponentKey || "").trim(),
         claimPartKey: partKey,
-        contextualChoiceTriggerPartKey: partKey === "worktop-end-panel"
-          ? worktopEndPanelChoicePartKey
-          : "",
+        ...(partKey === "worktop-end-panel"
+          ? { contextualChoiceTriggerPartKey: worktopEndPanelChoicePartKey }
+          : {}),
       };
     })
     .filter(Boolean);

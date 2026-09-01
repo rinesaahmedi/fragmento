@@ -113,7 +113,6 @@ export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
 // selection tints. Keep cabinet outlines, doors, handles, and seams outside these clips.
 const AB_105845_DISHWASHER_LIGHT_DETAILS = [
   { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 87.0625, top: 65.83333, width: 6.5, height: 3.53334 },
-  { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 89.3375, top: 72.11667, width: 1.9375, height: 2.38333 },
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
@@ -143,7 +142,7 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
     { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
   ],
   "ab-105862": [
-    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.4, top: 58.45, width: 3.53, height: 1.9, persistWhenSelected: true },
+    { key: "dishwasher-basket", componentKey: "base-module-5", left: 54.25, top: 58.1, width: 4, height: 2.55, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "base-module-5", left: 55.6, top: 61.8, width: 1.05, height: 1.28 },
   ],
   "ab-105848": AB_105845_DISHWASHER_LIGHT_DETAILS,
@@ -862,23 +861,24 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "drawer-module", left: 81.23, top: 60.16, width: 14.27, height: 29.54 },
   ],
   "ab-105814": [
-    { componentKey: "refrigerator", left: 3.9, top: 27.88, width: 12.97, height: 59.48 },
-    { componentKey: "wall-cabinet-1", left: 18.12, top: 15.77, width: 10.51, height: 23.91 },
-    { componentKey: "wall-cabinet-2", left: 28.63, top: 15.77, width: 14.02, height: 23.91 },
-    { componentKey: "extractor-hood", left: 28.63, top: 39.68, width: 14.02, height: 7.05 },
-    { componentKey: "wall-cabinet-3", left: 42.65, top: 15.77, width: 9.34, height: 23.91 },
-    { componentKey: "wall-cabinet-4", left: 51.99, top: 15.77, width: 14.01, height: 23.91 },
-    { componentKey: "wall-cabinet-5", left: 66, top: 15.77, width: 14.01, height: 23.91 },
-    { componentKey: "wall-cabinet-6", left: 80.01, top: 15.77, width: 14.85, height: 23.91 },
-    { componentKey: "worktop", left: 17.77, top: 57.04, width: 76.96, height: 1.33 },
-    { componentKey: "worktop", left: 17.77, top: 57.04, width: 0.37, height: 30.33 },
+    // Pixel-traced from AB 105814.svg (842x595); the old values were copied
+    // from a cropped dashboard preview and shifted the refrigerator/lower run.
+    { componentKey: "refrigerator", left: 2.375297, top: 27.731092, width: 14.489312, height: 59.663866 },
+    { componentKey: "wall-cabinet-1", left: 18.052257, top: 15.630252, width: 10.570071, height: 24.033613 },
+    { componentKey: "wall-cabinet-2", left: 28.622327, top: 15.630252, width: 14.014252, height: 24.033613 },
+    { componentKey: "extractor-hood", left: 28.622327, top: 39.663866, width: 14.014252, height: 7.058824 },
+    { componentKey: "wall-cabinet-3", left: 42.636579, top: 15.630252, width: 9.382423, height: 24.033613 },
+    { componentKey: "wall-cabinet-4", left: 52.019002, top: 15.630252, width: 14.014252, height: 24.033613 },
+    { componentKey: "wall-cabinet-5", left: 66.033254, top: 15.630252, width: 14.014252, height: 24.033613 },
+    { componentKey: "wall-cabinet-6", left: 80.047506, top: 15.630252, width: 14.608076, height: 24.033613 },
+    { componentKey: "worktop", left: 17.695962, top: 56.974790, width: 76.959620, height: 1.344538 },
     { componentKey: "sink-faucet", left: 68.2, top: 51.95, width: 4.85, height: 8 },
-    { componentKey: "base-module-1", left: 17.51, top: 59.54, width: 10.73, height: 29.7 },
-    { componentKey: "oven-module", left: 28.65, top: 58.37, width: 14.01, height: 29.0 },
-    { componentKey: "base-module-2", left: 42.56, top: 59.54, width: 9.53, height: 29.7 },
-    { componentKey: "base-module-3", left: 52.09, top: 59.54, width: 14.31, height: 29.7 },
-    { componentKey: "sink-base", left: 66.4, top: 59.54, width: 14.31, height: 29.7 },
-    { componentKey: "drawer-module", left: 80.71, top: 59.54, width: 14.3, height: 29.7 },
+    { componentKey: "base-module-1", left: 17.695962, top: 58.319328, width: 10.926365, height: 29.075630 },
+    { componentKey: "oven-module", left: 28.622327, top: 58.319328, width: 14.014252, height: 29.075630 },
+    { componentKey: "base-module-2", left: 42.636579, top: 58.319328, width: 9.263658, height: 29.075630 },
+    { componentKey: "base-module-3", left: 51.900237, top: 58.319328, width: 14.014252, height: 29.075630 },
+    { componentKey: "sink-base", left: 65.914489, top: 58.319328, width: 14.014252, height: 29.075630 },
+    { componentKey: "drawer-module", left: 79.928741, top: 58.319328, width: 14.014252, height: 29.075630 },
   ],
   "ab-105816": [
     { componentKey: "refrigerator", left: 2.96, top: 28.31, width: 13.19, height: 60.44 },
@@ -1175,19 +1175,20 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "refrigerator", left: 85.15, top: 30.75, width: 12.35, height: 56.59 },
   ],
   "ab-105811": [
-    { componentKey: "wall-cabinet-1", left: 1.4, top: 24.03, width: 11.15, height: 19.01 },
-    { componentKey: "wall-cabinet-2", left: 12.55, top: 24.03, width: 11.15, height: 19.01 },
-    { componentKey: "wall-cabinet-3", left: 23.7, top: 24.03, width: 11.14, height: 19.01 },
-    { componentKey: "wall-cabinet-4", left: 34.84, top: 24.03, width: 11.16, height: 19.01 },
-    { componentKey: "extractor-hood", left: 34.84, top: 43.04, width: 11.16, height: 5.46 },
-    { componentKey: "worktop", left: 1.4, top: 56.85, width: 44.6, height: 1.03 },
-    { componentKey: "worktop", left: 46, top: 57.88, width: 0.45, height: 23.11 },
-    { componentKey: "sink-faucet", left: 18.88, top: 49.88, width: 3.79, height: 8 },
-    { componentKey: "base-module-1", left: 1.4, top: 57.88, width: 11.15, height: 23.11 },
-    { componentKey: "sink-base", left: 12.55, top: 57.88, width: 11.15, height: 23.11 },
-    { componentKey: "base-module-2", left: 23.7, top: 57.88, width: 11.14, height: 23.11 },
-    { componentKey: "oven-module", left: 34.84, top: 57.88, width: 11.16, height: 23.11 },
-    { componentKey: "refrigerator", left: 48.39, top: 33.65, width: 10.34, height: 47.34 },
+    // Pixel-traced from the actual 842 x 595 AB 105811 elevation. The old
+    // values belonged to a cropped canvas and compressed the run leftward.
+    { componentKey: "wall-cabinet-1", left: 2.850356, top: 17.310924, width: 16.508314, height: 26.722689 },
+    { componentKey: "wall-cabinet-2", left: 19.358670, top: 17.310924, width: 15.676960, height: 26.722689 },
+    { componentKey: "wall-cabinet-3", left: 35.035629, top: 17.310924, width: 15.676960, height: 26.722689 },
+    { componentKey: "wall-cabinet-4", left: 50.712589, top: 17.310924, width: 15.558195, height: 26.722689 },
+    { componentKey: "extractor-hood", left: 50.712589, top: 44.201681, width: 15.558195, height: 7.058824 },
+    { componentKey: "worktop", left: 2.850356, top: 63.361345, width: 63.895487, height: 1.512605 },
+    { componentKey: "sink-faucet", left: 29.928741, top: 55.966387, width: 3.206651, height: 7.731092 },
+    { componentKey: "base-module-1", left: 3.681710, top: 64.873950, width: 15.676960, height: 32.605042 },
+    { componentKey: "sink-base", left: 19.358670, top: 64.873950, width: 15.676960, height: 32.605042 },
+    { componentKey: "base-module-2", left: 35.035629, top: 64.873950, width: 15.676960, height: 32.605042 },
+    { componentKey: "oven-module", left: 50.712589, top: 64.873950, width: 15.558195, height: 32.605042 },
+    { componentKey: "refrigerator", left: 69.714964, top: 30.756303, width: 14.489312, height: 66.722689 },
   ],
   "ab-105733": [
     { componentKey: "wall-cabinet-1", left: 4.82, top: 17.18, width: 9.22, height: 26.71 },
@@ -1382,6 +1383,34 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
   ],
 };
 
+// AB 105831 measured correction. The original entry above was generated from
+// a cropped draft and duplicated cabinet/worktop faces, which made ASC
+// selections paint over the CAD seams. Keep one polygon per visible face and
+// use the updated report coordinates. Assign after the table so aliases stay
+// untouched.
+PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = [
+  { componentKey: "wall-cabinet-1", points: [[48.02, 15.55], [57.97, 16.85], [57.97, 42.35], [48.02, 40.85]] },
+  { componentKey: "wall-cabinet-2", points: [[57.97, 17.14], [67.11, 20.0], [67.11, 43.87], [57.97, 41.45]] },
+  { componentKey: "extractor-hood", points: [[60.25, 43.0], [66.85, 43.65], [66.85, 48.45], [60.25, 48.0]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-3", points: [[67.11, 20.0], [74.78, 21.25], [74.78, 45.48], [67.11, 43.87]] },
+  { componentKey: "wall-cabinet-4", points: [[74.78, 21.25], [79.37, 20.52], [79.37, 36.9], [74.78, 35.32]] },
+  { componentKey: "wall-cabinet-4", points: [[79.37, 20.52], [85.58, 21.25], [85.58, 36.9], [79.37, 36.9]] },
+  { componentKey: "worktop", points: [[5.3, 59.85], [14.55, 59.0], [31.45, 58.05], [43.35, 58.3], [43.35, 59.8], [31.45, 60.55], [14.55, 61.2], [5.3, 62.0]] },
+  { componentKey: "worktop", points: [[43.35, 58.3], [53.25, 57.25], [66.5, 59.35], [83.05, 58.55], [83.05, 60.0], [74.75, 62.65], [62.35, 61.55], [53.25, 60.35], [43.35, 59.8]] },
+  { componentKey: "sink-faucet", points: [[17.8, 57.5], [38.05, 56.9], [38.05, 59.35], [17.8, 60.25]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[25.05, 49.15], [30.8, 48.45], [30.8, 58.15], [25.05, 58.65]], preserveManualSize: true },
+  { componentKey: "base-module-1", points: [[5.3, 62.0], [14.55, 61.2], [14.55, 92.2], [5.3, 89.8]] },
+  { componentKey: "base-module-1", points: [[14.55, 61.2], [20.45, 61.75], [20.45, 91.47], [14.55, 92.2]] },
+  { componentKey: "base-module-3", points: [[20.45, 61.75], [31.45, 60.55], [31.45, 90.1], [20.45, 91.47]] },
+  { componentKey: "sink-base", points: [[31.45, 60.55], [42.25, 59.8], [42.25, 88.75], [31.45, 90.1]] },
+  { componentKey: "base-module-2", points: [[44.05, 59.8], [53.25, 60.35], [53.25, 89.4], [44.05, 87.85]] },
+  { componentKey: "oven-module", points: [[53.25, 60.35], [62.35, 61.55], [62.35, 91.0], [53.25, 89.4]] },
+  { componentKey: "drawer-module", points: [[62.35, 61.55], [70.08, 62.24], [70.08, 92.56], [62.35, 91.0]] },
+  { componentKey: "base-module-4", points: [[70.08, 62.24], [74.75, 62.65], [74.75, 93.5], [70.08, 92.56]] },
+  { componentKey: "refrigerator", points: [[74.89, 34.31], [83.39, 37.34], [83.39, 96.49], [74.89, 95.16]] },
+  { componentKey: "refrigerator", points: [[83.39, 37.34], [94.33, 34.31], [94.33, 95.16], [83.39, 96.49]] },
+  { componentKey: "refrigerator", points: [[74.89, 34.31], [83.39, 32.9], [94.33, 34.31], [83.39, 37.34]] },
+];
 PLAN_HOTSPOTS_BY_SLUG["ab-105815"] = PLAN_HOTSPOTS_BY_SLUG["ab-105819"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105809"] = PLAN_HOTSPOTS_BY_SLUG["ab-105805"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105813"] = PLAN_HOTSPOTS_BY_SLUG["ab-105805"];

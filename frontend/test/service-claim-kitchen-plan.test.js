@@ -3306,6 +3306,42 @@ test("AB 105825 cooktop follows the four source-plan outside corners", () => {
   assert.doesNotMatch(cooktop.clipPath, /NaN/);
 });
 
+test("AB 105831 ASC uses the measured worktops, sink, and oven seams", () => {
+  const source = PLAN_HOTSPOTS_BY_SLUG["ab-105831"];
+  assert.equal(source.filter((hotspot) => hotspot.componentKey === "worktop").length, 2);
+  assert.deepEqual(source.find((hotspot) => hotspot.componentKey === "sink-base").points, [
+    [31.45, 60.55], [42.25, 59.8], [42.25, 88.75], [31.45, 90.1],
+  ]);
+  const oven = source.find((hotspot) => hotspot.componentKey === "oven-module");
+  assert.deepEqual(oven.points, [
+    [53.25, 60.35], [62.35, 61.55], [62.35, 91.0], [53.25, 89.4],
+  ]);
+  const claim = buildServiceClaimPartHotspots(
+    source.map((hotspot) => {
+      const xs = hotspot.points.map(([x]) => x);
+      const ys = hotspot.points.map(([, y]) => y);
+      return {
+        ...hotspot,
+        left: Math.min(...xs),
+        top: Math.min(...ys),
+        width: Math.max(...xs) - Math.min(...xs),
+        height: Math.max(...ys) - Math.min(...ys),
+      };
+    }),
+    [
+      { partKey: "worktop-left", sourceComponentKey: "worktop" },
+      { partKey: "worktop-right", sourceComponentKey: "worktop" },
+      { partKey: "cooktop", sourceComponentKey: "oven-module" },
+    ],
+    "ab-105831",
+  );
+  assert.deepEqual(claim.filter((hotspot) => hotspot.claimPartKey?.startsWith("worktop-")).map((hotspot) => hotspot.claimPartKey), [
+    "worktop-left", "worktop-right",
+  ]);
+  const cooktop = claim.find((hotspot) => hotspot.claimPartKey === "cooktop");
+  assert.ok(cooktop.top < 58, "cooktop should sit on the measured worktop line");
+});
+
 test("AB 105846 follows the marked depth seam across the worktop surface", () => {
   const worktopHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105846"]
     .filter((hotspot) => hotspot.componentKey === "worktop");
