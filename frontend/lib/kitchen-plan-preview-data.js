@@ -569,16 +569,21 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "worktop",
-      points: [[6.65, 55.63], [16.75, 54.12], [34.92, 51.09], [41.69, 52.77], [43.71, 54.45], [39.55, 55.13], [34.92, 55.8], [15.8, 58.49], [6.65, 56.81]],
+      // Pixel-traced from the 842 x 595 source. Both worktop runs share only
+      // the real inside-corner seam from (366, 317) to (373, 325).
+      points: [
+        [6.650831, 55.630252], [16.745843, 54.117647], [34.916865, 51.092437],
+        [43.467933, 53.277311], [44.299287, 54.621849], [39.548694, 55.12605],
+        [34.916865, 55.798319], [15.795724, 58.487395], [6.650831, 56.806723],
+      ],
     },
     {
       componentKey: "worktop",
-      points: [[43.71, 54.45], [54.51, 51.43], [75.77, 56.13], [75.65, 61.34], [70.43, 59.83], [65.8, 58.82], [55.46, 56.64], [49.64, 55.8]],
-    },
-    {
-      componentKey: "worktop",
-      points: [[43.71, 54.45], [75.65, 59.55], [75.65, 61.12], [70.43, 59.83], [65.8, 58.82], [55.46, 56.64], [49.64, 55.8], [43.71, 54.95]],
-      preserveManualSize: true,
+      points: [
+        [43.467933, 53.277311], [54.513064, 51.428571], [75.771971, 56.134454],
+        [75.653207, 61.344538], [70.427553, 59.831933], [65.795724, 58.823529],
+        [55.463183, 56.638655], [49.643705, 55.798319], [44.299287, 54.621849],
+      ],
     },
     {
       componentKey: "sink-faucet",
@@ -1384,29 +1389,9 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105824"] = PLAN_HOTSPOTS_BY_SLUG["ab-105821"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105823"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105829"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105832"] = PLAN_HOTSPOTS_BY_SLUG["ab-105822"];
-// AB 105822 uses the AB 105825 drawing, but its email preview must use the
-// same calibrated sink sources as the interactive dashboard.
-// Its two worktop runs are pixel-traced from the 842 x 595 drawing and share
-// only the real inside-corner seam from (366, 317) to (373, 325).
-const AB_105822_WORKTOP_POINTS = [
-  [
-    [6.650831, 55.630252], [16.745843, 54.117647], [34.916865, 51.092437],
-    [43.467933, 53.277311], [44.299287, 54.621849], [39.548694, 55.12605],
-    [34.916865, 55.798319], [15.795724, 58.487395], [6.650831, 56.806723],
-  ],
-  [
-    [43.467933, 53.277311], [54.513064, 51.428571], [75.771971, 56.134454],
-    [75.653207, 61.344538], [70.427553, 59.831933], [65.795724, 58.823529],
-    [55.463183, 56.638655], [49.643705, 55.798319], [44.299287, 54.621849],
-  ],
-];
-let ab105822WorktopIndex = 0;
+// AB 105822 uses the AB 105825 drawing and its two exact worktop runs, but its
+// email preview must use the same calibrated sink sources as the dashboard.
 PLAN_HOTSPOTS_BY_SLUG["ab-105822"] = PLAN_HOTSPOTS_BY_SLUG["ab-105825"].flatMap((hotspot) => {
-  if (hotspot.componentKey === "worktop") {
-    const points = AB_105822_WORKTOP_POINTS[ab105822WorktopIndex];
-    ab105822WorktopIndex += 1;
-    return points ? [{ ...hotspot, points }] : [];
-  }
   if (hotspot.componentKey === "sink-faucet") {
     return [];
   }

@@ -356,12 +356,10 @@ export default function ServiceClaimKitchenPicker({
       || hotspot.claimPartKey === "worktop-end-panel"
     ) && selectedIds.has(hotspot.componentId),
   );
-  // Keep unselected appliances visually cut out of a selected worktop. Sink
-  // and cooktop are independent claim articles and should only be tinted when
-  // the user explicitly selects them.
-  const visibleApplianceImageHotspots = applianceImageHotspots.filter(
-    (hotspot) => !displaySelectedIds.has(hotspot.componentId),
-  );
+  // Always restore the source appliance linework above a selected worktop.
+  // The appliance hitboxes sit above this layer, so a selected sink/cooktop is
+  // tinted once instead of stacking its tint with the worktop underneath.
+  const worktopApplianceCutouts = applianceImageHotspots;
   const sinkComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.sink;
   const sinkCabinetComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS["sink-cabinet"];
   const ovenComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS.oven;
@@ -527,7 +525,7 @@ export default function ServiceClaimKitchenPicker({
                 })}
               </svg>
               <div className={styles.planHotspotLayer}>
-                {hasSelectedWorktop && visibleApplianceImageHotspots.length ? (
+                {hasSelectedWorktop && worktopApplianceCutouts.length ? (
                   <svg
                     aria-hidden="true"
                     className={styles.planApplianceCutouts}
@@ -536,7 +534,7 @@ export default function ServiceClaimKitchenPicker({
                   >
                     <defs>
                       <clipPath id={applianceClipPathId} clipPathUnits="userSpaceOnUse">
-                        {visibleApplianceImageHotspots.map((hotspot) => {
+                        {worktopApplianceCutouts.map((hotspot) => {
                           const polygonPoints = getHotspotSvgPolygonPoints(hotspot);
                           const clipKey = `appliance-clip-${hotspot.componentId}-${hotspot.left}-${hotspot.top}-${hotspot.width}-${hotspot.height}`;
                           if (polygonPoints) {

@@ -2615,7 +2615,7 @@ test("service claim picker outlines worktop surfaces but not separate front-edge
   assert.match(styles, /\.planHotspotWorktop[\s\S]*border-color:\s*transparent;[\s\S]*box-shadow:\s*none;/);
 });
 
-test("service claim picker preserves cooktop and calibrated sink cutouts while linear worktops stay continuous", () => {
+test("service claim picker keeps appliance linework between worktop and appliance selection tints", () => {
   const source = fs.readFileSync(
     path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"),
     "utf8",
@@ -2630,15 +2630,16 @@ test("service claim picker preserves cooktop and calibrated sink cutouts while l
   assert.doesNotMatch(source, /hotspot\.claimPartKey === "sink" && !hotspot\.preserveManualSize/);
   assert.match(source, /\(\) => isNonLShapedKitchen\s*\?\s*\[\]\s*:\s*croppedImageHotspots\.filter/);
   assert.match(source, /hotspot\.componentKey === "worktop"/);
-  assert.match(source, /\(hotspot\) => !displaySelectedIds\.has\(hotspot\.componentId\)/);
+  assert.match(source, /const worktopApplianceCutouts = applianceImageHotspots/);
+  assert.doesNotMatch(source, /!displaySelectedIds\.has\(hotspot\.componentId\)/);
   assert.doesNotMatch(source, /hasSelectedWorktop\s*&&\s*hotspot\.claimPartKey === "cooktop"/);
-  assert.match(source, /hasSelectedWorktop\s*&&\s*visibleApplianceImageHotspots\.length/);
+  assert.match(source, /hasSelectedWorktop\s*&&\s*worktopApplianceCutouts\.length/);
   assert.match(source, /className=\{styles\.planApplianceCutouts\}/);
   assert.match(source, /className=\{styles\.planApplianceCutoutBacking\}[\s\S]*clipPath=\{`url\(#\$\{applianceClipPathId\}\)`\}/);
   assert.match(styles, /\.planApplianceCutoutBacking[\s\S]*fill:\s*#fff;/);
   assert.match(
     styles,
-    /\.planApplianceCutouts[\s\S]*z-index:\s*999;[\s\S]*pointer-events:\s*none;/,
+    /\.planApplianceCutouts[\s\S]*z-index:\s*8;[\s\S]*pointer-events:\s*none;/,
   );
 });
 
@@ -3176,23 +3177,62 @@ test("AB 105837 family maps the tall right face to the cabinet side-panel claim"
   }
 });
 
-test("AB 105822 exposes one clean claim hotspot for each worktop run", () => {
-  const worktopHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105822"]
-    .filter((hotspot) => hotspot.componentKey === "worktop");
-  const result = buildServiceClaimPartHotspots(worktopHotspots, [
-    { partKey: "worktop-left", sourceComponentKey: "worktop" },
-    { partKey: "worktop-right", sourceComponentKey: "worktop" },
-  ], "ab-105822");
+test("AB 105825 family exposes two clean worktop runs with one shared corner seam", () => {
+  for (const kitchenSlug of ["ab-105825", "ab-105822", "ab-105828"]) {
+    const worktopHotspots = PLAN_HOTSPOTS_BY_SLUG[kitchenSlug]
+      .filter((hotspot) => hotspot.componentKey === "worktop");
+    const result = buildServiceClaimPartHotspots(worktopHotspots, [
+      { partKey: "worktop-left", sourceComponentKey: "worktop" },
+      { partKey: "worktop-right", sourceComponentKey: "worktop" },
+    ], kitchenSlug);
+    const sharedPoints = worktopHotspots[0].points.filter(([leftX, leftY]) => (
+      worktopHotspots[1].points.some(([rightX, rightY]) => (
+        Math.abs(leftX - rightX) < 0.000001
+        && Math.abs(leftY - rightY) < 0.000001
+      ))
+    ));
 
-  assert.deepEqual(result.map((hotspot) => hotspot.claimPartKey), [
-    "worktop-left",
-    "worktop-right",
-  ]);
-  assert.deepEqual(result.map((hotspot) => hotspot.componentId), [
-    "component-claim-worktop-left",
-    "component-claim-worktop-right",
-  ]);
-  assert.notDeepEqual(result[0].points, result[1].points);
+    assert.equal(worktopHotspots.length, 2, `${kitchenSlug} must not duplicate a worktop fascia`);
+    assert.deepEqual(sharedPoints, [
+      [43.467933, 53.277311],
+      [44.299287, 54.621849],
+    ], `${kitchenSlug} worktops must meet on the pixel-traced corner seam`);
+    assert.deepEqual(result.map((hotspot) => hotspot.claimPartKey), [
+      "worktop-left",
+      "worktop-right",
+    ]);
+    assert.deepEqual(result.map((hotspot) => hotspot.componentId), [
+      "component-claim-worktop-left",
+      "component-claim-worktop-right",
+    ]);
+    assert.notDeepEqual(result[0].points, result[1].points);
+  }
+});
+
+test("AB 105825 cooktop follows the four source-plan outside corners", () => {
+  const source = PLAN_HOTSPOTS_BY_SLUG["ab-105825"].find(
+    (hotspot) => hotspot.componentKey === "oven-base",
+  );
+  const sourceXs = source.points.map(([x]) => x);
+  const sourceYs = source.points.map(([, y]) => y);
+  const oven = {
+    ...source,
+    left: Math.min(...sourceXs),
+    top: Math.min(...sourceYs),
+    width: Math.max(...sourceXs) - Math.min(...sourceXs),
+    height: Math.max(...sourceYs) - Math.min(...sourceYs),
+  };
+  const result = buildServiceClaimPartHotspots([oven], [
+    { partKey: "cooktop", sourceComponentKey: "oven-base" },
+  ], "ab-105825");
+  const cooktop = result[0];
+
+  assert.ok(Math.abs(cooktop.left - 53.206651) < 0.000001);
+  assert.ok(Math.abs(cooktop.top - 53.445378) < 0.000001);
+  assert.ok(Math.abs(cooktop.width - 18.052256) < 0.000001);
+  assert.ok(Math.abs(cooktop.height - 3.361345) < 0.000001);
+  assert.match(cooktop.clipPath, /^polygon\(/);
+  assert.doesNotMatch(cooktop.clipPath, /NaN/);
 });
 
 test("AB 105846 follows the marked depth seam across the worktop surface", () => {

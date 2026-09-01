@@ -315,6 +315,16 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  // AB 105825's cooktop is on the right worktop leg. These four vertices are
+  // traced directly from the 842 x 595 source image (448,327)-(530,318)-
+  // (600,329)-(523,338); projecting them from the oven bounds moved the mask
+  // several pixels above the appliance linework.
+  "ab-105825": [
+    [53.206651, 54.957983],
+    [62.945368, 53.445378],
+    [71.258907, 55.294118],
+    [62.114014, 56.806723],
+  ],
   "ab-105758": [
     [46.218527, 53.189916],
     [56.237530, 51.737815],
@@ -790,7 +800,8 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     ],
   ),
   "ab-105825": {
-    indexPartKeys: ["worktop-left", "worktop-right", "worktop-right"],
+    // The two source polygons already meet on the exact inside-corner seam.
+    indexPartKeys: ["worktop-left", "worktop-right"],
   },
   "ab-105758": {
     // Left/right top surfaces, left/right fascias, then the floor-height end panel.
@@ -855,6 +866,7 @@ for (const alias of ["ab-105809", "ab-105813", "ab-105817"]) {
 }
 for (const alias of ["ab-105822", "ab-105828"]) {
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105825"];
+  COOKTOP_SOURCE_POINTS_BY_SLUG[alias] = COOKTOP_SOURCE_POINTS_BY_SLUG["ab-105825"];
 }
 for (const alias of ["ab-105840", "ab-105843"]) {
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[alias] = SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105837"];

@@ -574,9 +574,9 @@
   inset: 0;
   width: 100%;
   height: 100%;
-  /* Sit above the selected worktop tint, while pointer-events:none keeps the
-     underlying sink/cooktop hitboxes independently clickable. */
-  z-index: 999;
+  /* Sit above worktops (z4) but below sink/cooktop hitboxes (z11/z12), so an
+     appliance selected with its worktop receives only one selection tint. */
+  z-index: 8;
   pointer-events: none;
 }
 
