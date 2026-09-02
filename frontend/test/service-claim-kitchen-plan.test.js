@@ -231,6 +231,60 @@ test("AB 105831 exposes its left US30 Blende as a form-only option", () => {
   assert.equal(blende.isCompanionOption, true);
 });
 
+test("AB 105831 exposes the left inside-corner UPK20 as its own selected component", () => {
+  const cornerBlende = component(
+    "BLENDE-AB105831-CORNER-LEFT",
+    "corner-blende",
+    "Filler Panel up to 20 cm",
+    {
+      articleNumber: "UPK20",
+      nameDe: "Passblende bis 20 cm",
+      iconKey: "blende",
+      catalogBlendeId: "catalog-blende-upk20",
+      catalogBlendeQuantity: 1,
+      catalogBlende: {
+        code: "UPK20",
+        name: "Filler Panel up to 20 cm",
+        nameDe: "Passblende bis 20 cm",
+      },
+    },
+  );
+  const kitchen = { items: [cornerBlende] };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105831",
+    confirmedItems: [cornerBlende],
+  });
+  const blendeMeta = result.selectableComponents.find(
+    (entry) => entry.componentId === "component-corner-blende",
+  );
+
+  assert.ok(result.selectableComponentIds.includes("component-corner-blende"));
+  assert.equal(blendeMeta.articleCode, "UPK20");
+  assert.equal(blendeMeta.componentKey, "corner-blende");
+  assert.ok(!result.selectableComponentIds.includes(
+    "component-claim-blende-corner-blende",
+  ));
+  assert.equal(
+    buildServiceClaimComponentChoiceGroups(result.selectableComponents)
+      .some((group) => group.sourceComponentKey === "corner-blende"),
+    false,
+  );
+});
+
+test("AB 105831 seed keeps the left UPK20 separate and the right UPEF65 with the US60 cabinet", () => {
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const section = seed.match(/const AB_105831_ITEMS = \[([\s\S]*?)\r?\n\];\r?\n\r?\nconst AB_105825_ITEMS/)?.[1] || "";
+  const us60 = section.split("\n").find((line) => line.includes("CAB-BASE-AB105831-US60-L")) || "";
+
+  assert.match(section, /BLENDE-AB105831-CORNER-LEFT/);
+  assert.match(section, /componentKey: "corner-blende"/);
+  assert.match(section, /catalogBlendeCode: "UPK20"/);
+  assert.match(us60, /articlePriceWithBlende\("US60", "UPEF65", 1\)/);
+  assert.match(us60, /blendeCode: "UPEF65"/);
+});
+
 test("AB 105834 exposes the dishwasher Blende as a form-only option", () => {
   const kitchen = {
     items: [
@@ -1018,7 +1072,7 @@ test("L-kitchen quantity-two Blenden are exposed as independent claim selections
   };
 
   [
-    "ab-105822", "ab-105825", "ab-105828", "ab-105831",
+    "ab-105822", "ab-105825", "ab-105828",
     "ab-105834", "ab-105837", "ab-105840", "ab-105843",
   ].forEach((kitchenSlug) => {
     const result = buildServiceClaimSelectableComponents({
@@ -1045,13 +1099,6 @@ test("L-kitchen double Blenden follow the two adjacent PDF corner seams", () => 
       divider: 43.54517,
       inner: 44.286121,
       right: 53.44,
-    },
-    {
-      slugs: ["ab-105831"],
-      outer: 42.376746,
-      divider: 43.288686,
-      inner: 44.029638,
-      right: 53.25,
     },
     {
       slugs: ["ab-105834"],
@@ -1934,7 +1981,6 @@ test("specified L kitchens select both adjacent corner Blenden together", () => 
     "ab-105822",
     "ab-105825",
     "ab-105828",
-    "ab-105831",
     "ab-105834",
     "ab-105837",
     "ab-105840",
@@ -3308,6 +3354,13 @@ test("AB 105825 cooktop follows the four source-plan outside corners", () => {
 
 test("AB 105831 ASC uses the measured worktops, sink, and oven seams", () => {
   const source = PLAN_HOTSPOTS_BY_SLUG["ab-105831"];
+  const cornerBlende = source.find((hotspot) => hotspot.componentKey === "corner-blende");
+  assert.deepEqual(cornerBlende.points, [
+    [42.55, 59.8], [43.288686, 59.8], [43.288686, 88.442133], [42.25, 89.25],
+  ]);
+  const rightCabinet = source.find((hotspot) => hotspot.componentKey === "base-module-2");
+  assert.equal(rightCabinet.points[0][0], 43.288686);
+  assert.equal(rightCabinet.points.at(-1)[0], 43.288686);
   const worktops = source.filter((hotspot) => hotspot.componentKey === "worktop");
   assert.equal(worktops.length, 3);
   assert.deepEqual(worktops[0].points, [

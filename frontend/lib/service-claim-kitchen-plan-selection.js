@@ -53,7 +53,9 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-105822": new Set(["base-module-1"]),
   "ab-105825": new Set(["base-module-1"]),
   "ab-105828": new Set(["base-module-1"]),
-  "ab-105831": new Set(["base-module-1"]),
+  // The left UPK20 is its own component. The right UPEF65 remains physically
+  // and commercially attached to the US60 cabinet.
+  "ab-105831": new Set(["base-module-1", "base-module-2"]),
   "ab-105834": new Set(["base-module-3"]),
 };
 // In these shared perspective plans the US50 front and exposed side are one
@@ -89,7 +91,6 @@ const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
   "ab-105822": { "base-module-2": 2 },
   "ab-105825": { "base-module-2": 2 },
   "ab-105828": { "base-module-2": 2 },
-  "ab-105831": { "base-module-2": 2 },
   "ab-105834": { "base-module-2": 2 },
   "ab-105837": { "base-module-2": 2 },
   "ab-105840": { "base-module-2": 2 },
@@ -372,10 +373,6 @@ const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
     "component-claim-blende-base-module-2-2",
   ]],
   "ab-105828": [[
-    "component-claim-blende-base-module-2",
-    "component-claim-blende-base-module-2-2",
-  ]],
-  "ab-105831": [[
     "component-claim-blende-base-module-2",
     "component-claim-blende-base-module-2-2",
   ]],

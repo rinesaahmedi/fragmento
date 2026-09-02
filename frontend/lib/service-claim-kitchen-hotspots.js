@@ -487,16 +487,11 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     },
     "wall-cabinet-1": { side: "left", outer: 48.161869, inner: 48.902821 },
   },
-  // AB 105831 has the same double corner construction plus a complete
-  // right-hand return face supplied as the base-module-1 UPK20.
+  // AB 105831's right-hand return face is supplied as the base-module-1
+  // UPK20. The inside-corner UPK20 is a standalone kitchen component and
+  // already has its own source hotspot, so it needs no synthetic split here.
   "ab-105831": {
     "base-module-1": { side: "right", inner: 14.55, outer: 20.45 },
-    "base-module-2": {
-      side: "left",
-      inner: 44.029638,
-      outer: 42.376746,
-      bands: [[42.376746, 43.288686], [43.288686, 44.029638]],
-    },
     "wall-cabinet-1": { side: "left", outer: 47.990881, inner: 48.760331 },
   },
   // AB 105834: the two base-module-2 strips share the left corner. The
