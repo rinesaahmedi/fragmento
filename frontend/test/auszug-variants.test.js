@@ -26,7 +26,7 @@ const us2a60Article = {
   articleNumber: "US2A60",
   name: "Lower Cabinet with 3 Drawers 60 cm",
   nameDe: "Unterschrank mit 3 Schubladen 60 cm",
-  price: 369,
+  price: 347,
   widthMm: 600,
   heightMm: null,
   depthMm: 600,
@@ -73,7 +73,7 @@ test("Auszug metadata is available only when a matching active variant article i
     metadata.options.map((option) => [option.key, option.articleNumber, option.price]),
     [
       ["no", "US60", 219],
-      ["yes", "US2A60", 369],
+      ["yes", "US2A60", 347],
     ],
   );
 });
@@ -93,7 +93,7 @@ test("Auszug metadata keeps existing blende pricing on top of the selected artic
     metadata.options.map((option) => [option.key, option.articleNumber, option.price]),
     [
       ["no", "US60", 244],
-      ["yes", "US2A60", 394],
+      ["yes", "US2A60", 372],
     ],
   );
 });
@@ -101,7 +101,7 @@ test("Auszug metadata keeps existing blende pricing on top of the selected artic
 test("Auszug metadata uses the supplied program price for drawer variants", () => {
   const burgerVariant = buildAuszugVariantMetadata(kitchenItem(), [{
     ...us2a60Article,
-    price: 369,
+    price: 347,
     programPrices: [{ programmId: "BURGER CINDY", price: 461, isActive: true }],
   }]);
   assert.equal(burgerVariant.options.find((option) => option.key === "yes")?.price, 461);
@@ -131,7 +131,7 @@ test("client variant application replaces the displayed article and total price"
   const selected = applyArticleVariantSelection(item, "US2A60");
   assert.equal(selected.articleNumber, "US2A60");
   assert.equal(selected.name, "Lower Cabinet with 3 Drawers 60 cm");
-  assert.equal(selected.price, 369);
+  assert.equal(selected.price, 347);
 });
 
 test("display variant application keeps the base cabinet title stable", () => {
@@ -146,7 +146,7 @@ test("display variant application keeps the base cabinet title stable", () => {
   assert.equal(selected.articleNumber, "US2A60");
   assert.equal(selected.name, "Base cabinet with drawer");
   assert.equal(selected.nameDe, "Unterschrank mit Schublade");
-  assert.equal(selected.price, 369);
+  assert.equal(selected.price, 347);
 });
 
 test("order variant resolution validates and returns the submitted Auszug catalog article", () => {
@@ -156,7 +156,7 @@ test("order variant resolution validates and returns the submitted Auszug catalo
   assert.equal(selected.article.articleNumber, "US2A60");
   assert.equal(selected.article.name, "Lower Cabinet with 3 Drawers 60 cm");
   assert.equal(selected.article.nameDe, "Unterschrank mit 3 Schubladen 60 cm");
-  assert.equal(selected.article.price, 369);
+  assert.equal(selected.article.price, 347);
 });
 
 test("order variant resolution rejects unmatched submitted component article variants", () => {
