@@ -9,6 +9,7 @@ import {
   buildServiceClaimSelectableComponents,
   collapseServiceClaimLinkedComponents,
   getServiceClaimLinkedComponentIds,
+  updateServiceClaimLinkedComponentSelection,
 } from "../lib/service-claim-kitchen-plan-selection.js";
 import {
   buildServiceClaimBlendeHotspots,
@@ -1149,6 +1150,33 @@ test("L-kitchen double Blenden follow the two adjacent PDF corner seams", () => 
   });
 });
 
+test("AB 105822 family paints both UPEF65 corner faces for one claim item", () => {
+  const blende = {
+    componentId: "component-claim-blende-base-module-2",
+    componentKey: "claim-blende-base-module-2",
+    sourceComponentKey: "base-module-2",
+    sourceWidthMm: 600,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+
+  for (const kitchenSlug of ["ab-105822", "ab-105825", "ab-105828"]) {
+    const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG[kitchenSlug]
+      .filter((hotspot) => hotspot.componentKey === "base-module-2");
+    const result = buildServiceClaimBlendeHotspots(sourceHotspots, [blende], [], kitchenSlug);
+    const faces = result.filter((hotspot) => hotspot.claimPartKey === "blende");
+
+    assert.equal(faces.length, 2, `${kitchenSlug} exposes both visible UPEF65 faces`);
+    assert.deepEqual(faces.map((hotspot) => hotspot.componentId), [blende.componentId, blende.componentId]);
+    assert.ok(Math.abs(faces[0].left - 42.661727) < 0.000001);
+    assert.ok(Math.abs(faces[0].left + faces[0].width - 43.54517) < 0.000001);
+    assert.ok(Math.abs(faces[1].left - 43.54517) < 0.000001);
+    assert.ok(Math.abs(faces[1].left + faces[1].width - 44.286121) < 0.000001);
+    assert.ok(faces.every((hotspot) => Math.abs(hotspot.top - 54.78) < 0.000001));
+    assert.ok(faces.every((hotspot) => Math.abs(hotspot.top + hotspot.height - 83.36) < 0.000001));
+  }
+});
+
 test("L-kitchen single Blenden use their complete PDF-drawn end faces", () => {
   const cases = [
     ["ab-105825", "wall-cabinet-1", 48.161869, 48.902821, "left"],
@@ -1815,7 +1843,7 @@ test("AB 105837 claims use the order-plan faucet hotspot instead of the broad si
 
 test("AB 105840 uses the same alignment override in claims only", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"), "utf8");
-  assert.match(source, /\["ab-105837",\s*"ab-105840"\]\.includes\(kitchenSlug\)/);
+  assert.match(source, /\["ab-105837",\s*"ab-105840",\s*"ab-105843"\]\.includes\(kitchenSlug\)/);
 });
 
 test("AB 105843 uses the same alignment override in claims only", () => {
@@ -1826,10 +1854,26 @@ test("AB 105843 uses the same alignment override in claims only", () => {
 test("AB 105834 claim hotspot maps the hood LED strip to extractor hood", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
 
-  assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"wall-cabinet-2"[\s\S]*\[\[35\.48,\s*11\.13\],\s*\[47\.48,\s*9\.4\],\s*\[47\.48,\s*35\.86\],\s*\[35\.48,\s*37\.6\]\]/);
+  assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"wall-cabinet-2"[\s\S]*\[\[35\.48,\s*11\.13\],\s*\[47\.48,\s*9\.4\],\s*\[47\.48,\s*37\.86\],\s*\[35\.48,\s*39\.6\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[35\.49,\s*39\.62\],\s*\[35\.48,\s*37\.8\],\s*\[30\.0,\s*38\.62\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[35\.48,\s*37\.9\],\s*\[47\.48,\s*36\.16\],\s*\[47\.48,\s*37\.9\],\s*\[35\.48,\s*39\.57\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[36\.58,\s*44\.08\],\s*\[46\.38,\s*42\.75\],\s*\[46\.38,\s*38\.11\],\s*\[36\.58,\s*39\.57\]\]/);
+});
+
+test("AB 105834 upper cabinet masks follow the source-plan faces", () => {
+  const upperCabinets = (PLAN_HOTSPOTS_BY_SLUG["ab-105834"] || [])
+    .filter((hotspot) => hotspot.componentKey.startsWith("wall-cabinet-"));
+
+  assert.deepEqual(upperCabinets, [
+    { componentKey: "wall-cabinet-1", points: [[19.81, 11.41], [29.52, 10.06], [35.48, 11.13], [25.51, 12.58]] },
+    { componentKey: "wall-cabinet-1", points: [[19.81, 11.41], [25.51, 12.58], [25.51, 26.61], [19.81, 25.44]] },
+    { componentKey: "wall-cabinet-1", points: [[25.51, 12.58], [35.48, 11.13], [35.48, 37.86], [29.52, 37.86], [29.52, 27.34], [25.51, 26.61]] },
+    { componentKey: "wall-cabinet-2", points: [[29.52, 10.06], [42.75, 8.12], [47.48, 9.4], [35.48, 11.13]] },
+    { componentKey: "wall-cabinet-2", points: [[35.48, 11.13], [47.48, 9.4], [47.48, 37.86], [35.48, 39.6]] },
+    { componentKey: "wall-cabinet-3", points: [[42.747221, 8.145161], [53.548019, 6.572581], [60.444571, 7.580645], [47.477914, 9.435484]] },
+    { componentKey: "wall-cabinet-3", points: [[47.477914, 9.435484], [59.447136, 7.741935], [59.447136, 34.233871], [47.477914, 36.008065]] },
+    { componentKey: "wall-cabinet-3", points: [[59.447136, 7.741935], [60.444571, 7.580645], [60.444571, 34.112903], [59.447136, 34.233871]] },
+  ]);
 });
 
 test("service claim plan labels sink separately from worktop", () => {
@@ -2002,6 +2046,30 @@ test("specified L kitchens select both adjacent corner Blenden together", () => 
       [{ componentId: firstBlende, name: "UPK20 Filler Panel" }],
     );
   });
+});
+
+test("AB 105822 keeps both corner Blenden selected through affected-part choices", () => {
+  const firstBlende = "component-claim-blende-base-module-2";
+  const secondBlende = "component-claim-blende-base-module-2-2";
+  const cabinet = "component-base-module-2";
+  const allowedComponentIds = [cabinet, firstBlende, secondBlende];
+
+  const selected = updateServiceClaimLinkedComponentSelection({
+    kitchenSlug: "ab-105822",
+    currentIds: [],
+    componentId: secondBlende,
+    isSelected: true,
+    allowedComponentIds,
+  });
+  assert.deepEqual(selected, [firstBlende, secondBlende]);
+
+  assert.deepEqual(updateServiceClaimLinkedComponentSelection({
+    kitchenSlug: "ab-105822",
+    currentIds: selected,
+    componentId: firstBlende,
+    isSelected: false,
+    allowedComponentIds,
+  }), []);
 });
 
 test("unlinked claim components keep separate problem-area rows", () => {
@@ -3258,6 +3326,24 @@ test("AB 105822 reuses the pixel-matched AB 105825 sink polygon", () => {
     .find((entry) => entry.claimPartKey === "sink");
 
   assert.deepEqual(sinkFor("ab-105822"), sinkFor("ab-105825"));
+});
+
+test("AB 105822 upper cabinets follow every source-plan face", () => {
+  const upperCabinetHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105822"]
+    .filter((hotspot) => hotspot.componentKey.startsWith("wall-cabinet-"))
+    .map(({ componentKey, points }) => ({ componentKey, points }));
+
+  assert.deepEqual(upperCabinetHotspots, [
+    { componentKey: "wall-cabinet-1", points: [[48.1, 12.2], [57.9, 14.08], [57.9, 37.63], [48.1, 35.63]] },
+    { componentKey: "wall-cabinet-1", points: [[48.9, 12.51], [55.16, 11.35], [63.28, 13.32], [57.78, 14.08]] },
+    { componentKey: "wall-cabinet-2", points: [[57.9, 13.98], [66.98, 16.1], [66.98, 39.25], [57.98, 37.42]] },
+    { componentKey: "wall-cabinet-2", points: [[58.08, 13.98], [63.18, 13.15], [72.86, 15.19], [66.5, 16.03]] },
+    { componentKey: "wall-cabinet-3", points: [[66.68, 16.1], [75.65, 17.88], [75.65, 41.34], [66.78, 39.58]] },
+    { componentKey: "wall-cabinet-3", points: [[66.9, 16.0], [75.65, 17.88], [80.98, 17.0], [73.07, 15.09]] },
+    { componentKey: "wall-cabinet-4", points: [[75.65, 17.88], [81.88, 17.03], [85.99, 17.8], [80.29, 18.82]] },
+    { componentKey: "wall-cabinet-4", points: [[75.65, 17.88], [80.29, 18.7], [80.29, 31.26], [75.65, 31.92]] },
+    { componentKey: "wall-cabinet-4", points: [[80.29, 18.82], [86.19, 17.8], [86.19, 30.25], [80.29, 31.26]] },
+  ]);
 });
 
 test("AB 105837 family maps the tall right face to the cabinet side-panel claim", () => {

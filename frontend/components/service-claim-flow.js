@@ -12,6 +12,7 @@ import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-cont
 import {
   collapseServiceClaimLinkedComponents,
   getServiceClaimLinkedComponentIds,
+  updateServiceClaimLinkedComponentSelection,
 } from "../lib/service-claim-kitchen-plan-selection";
 import {
   buildServiceClaimComponentChoiceGroups,
@@ -2622,8 +2623,10 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
       problemComponentIds,
       problemAreaChoiceGroups,
       problemAreaPartChoiceByGroupKey,
-    ),
-    [problemAreaChoiceGroups, problemAreaPartChoiceByGroupKey, problemComponentIds],
+    ).flatMap((componentId) => (
+      getServiceClaimLinkedComponentIds(activeKitchenPlan?.kitchenSlug, componentId)
+    )),
+    [activeKitchenPlan?.kitchenSlug, problemAreaChoiceGroups, problemAreaPartChoiceByGroupKey, problemComponentIds],
   );
   const selectedProblemAreas = useMemo(() => {
     if (!activeKitchenPlan?.selectableComponents?.length || !problemComponentIds.length) {
@@ -2689,7 +2692,10 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
         : [area.componentId];
       const optionById = new Map(choiceGroup?.options.map((option) => [option.componentId, option]) || []);
       const selectedParts = choiceGroup && isPartChoiceConfirmed
-        ? selectedPartComponentIds.map((componentId) => optionById.get(componentId)).filter(Boolean)
+        ? collapseServiceClaimLinkedComponents(
+          activeKitchenPlan?.kitchenSlug,
+          selectedPartComponentIds.map((componentId) => optionById.get(componentId)).filter(Boolean),
+        )
         : [area];
       const rowParts = choiceGroup && !isPartChoiceConfirmed
         ? [null]
@@ -2727,6 +2733,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
       });
     });
   }, [
+    activeKitchenPlan?.kitchenSlug,
     language,
     problemAreaAttachmentsByComponentId,
     problemAreaAttachmentFieldKeysByComponentId,
@@ -3486,9 +3493,13 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
     if (!choiceGroup) return;
 
     const selectedIds = Array.isArray(currentSelectedIds) ? currentSelectedIds : [];
-    const nextSelectedIds = isSelected
-      ? [...selectedIds.filter((id) => id !== nextComponentId), nextComponentId]
-      : selectedIds.filter((id) => id !== nextComponentId);
+    const nextSelectedIds = updateServiceClaimLinkedComponentSelection({
+      kitchenSlug: activeKitchenPlan?.kitchenSlug,
+      currentIds: selectedIds,
+      componentId: nextComponentId,
+      isSelected,
+      allowedComponentIds: choiceGroup.options.map((option) => option.componentId),
+    });
     setProblemAreaPartChoiceByGroupKey((current) => ({
       ...current,
       [choiceGroup.sourceComponentKey]: nextSelectedIds,
@@ -3506,9 +3517,12 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
     });
 
     if (isSelected && !selectedIds.length) {
-      moveProblemAreaRowState(componentId, nextComponentId);
+      moveProblemAreaRowState(componentId, nextSelectedIds[0]);
     } else if (!isSelected && !nextSelectedIds.length) {
-      moveProblemAreaRowState(nextComponentId, componentId);
+      const previousRowComponentId = selectedIds.find((id) => (
+        getServiceClaimLinkedComponentIds(activeKitchenPlan?.kitchenSlug, nextComponentId).includes(id)
+      )) || nextComponentId;
+      moveProblemAreaRowState(previousRowComponentId, componentId);
     } else if (!isSelected) {
       moveProblemAreaRowState(nextComponentId);
     }
@@ -6320,17 +6334,23 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                   {selectedProblemAreasWithDetails.map((area) => {
                     const isProblemAreaAttachmentMissing =
                       showProblemAreaAttachmentErrors && !area.attachments.length;
-                    const singleSelectedPart = area.selectedPartComponentIds.length === 1
-                      ? area.choiceGroup?.options.find(
-                          (option) => option.componentId === area.selectedPartComponentIds[0],
-                        )
+                    const selectedPartOptions = collapseServiceClaimLinkedComponents(
+                      activeKitchenPlan?.kitchenSlug,
+                      area.selectedPartComponentIds
+                        .map((componentId) => area.choiceGroup?.options.find(
+                          (option) => option.componentId === componentId,
+                        ))
+                        .filter(Boolean),
+                    );
+                    const singleSelectedPart = selectedPartOptions.length === 1
+                      ? selectedPartOptions[0]
                       : null;
                     const selectedPartChoiceLabel = area.isPartChoiceConfirmed && singleSelectedPart
                       ? formatClaimAreaName(singleSelectedPart, singleSelectedPart.name, language)
-                      : area.isPartChoiceConfirmed && area.selectedPartComponentIds.length > 1
+                      : area.isPartChoiceConfirmed && selectedPartOptions.length > 1
                         ? t("kitchenPlanPartChoiceSelectedCount").replace(
                           "{count}",
-                          String(area.selectedPartComponentIds.length),
+                          String(selectedPartOptions.length),
                         )
                         : "";
                     const isProblemAreaDetailDisabled = Boolean(

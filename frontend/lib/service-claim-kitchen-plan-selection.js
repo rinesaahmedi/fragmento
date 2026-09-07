@@ -403,6 +403,24 @@ export function getServiceClaimLinkedComponentIds(kitchenSlug, componentId) {
   return linkedGroup ? [...linkedGroup] : [componentId];
 }
 
+export function updateServiceClaimLinkedComponentSelection({
+  kitchenSlug,
+  currentIds = [],
+  componentId,
+  isSelected,
+  allowedComponentIds = [],
+}) {
+  const allowedIds = new Set(allowedComponentIds || []);
+  const linkedIds = getServiceClaimLinkedComponentIds(kitchenSlug, componentId)
+    .filter((id) => !allowedIds.size || allowedIds.has(id));
+  const affectedIds = new Set(linkedIds.length ? linkedIds : [componentId]);
+  const remainingIds = (currentIds || []).filter((id) => (
+    (!allowedIds.size || allowedIds.has(id)) && !affectedIds.has(id)
+  ));
+
+  return isSelected ? [...remainingIds, ...affectedIds] : remainingIds;
+}
+
 export function collapseServiceClaimLinkedComponents(kitchenSlug, components = []) {
   const seenGroups = new Set();
 
