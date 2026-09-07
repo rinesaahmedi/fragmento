@@ -186,6 +186,21 @@ function normalizeKitchenSlug(value) {
 }
 
 const AB_KITCHEN_PLAN_SOURCE_CODE_BY_ALIAS_SLUG = {
+  "ab-105735": "105732",
+  "ab-105738": "105732",
+  "ab-105741": "105732",
+  "ab-105736": "105733",
+  "ab-105739": "105733",
+  "ab-105742": "105733",
+  "ab-105734": "104968",
+  "ab-105737": "104968",
+  "ab-105740": "104968",
+  "ab-105745": "105748",
+  "ab-105751": "105748",
+  "ab-105754": "105748",
+  "ab-105749": "105746",
+  "ab-105752": "105746",
+  "ab-105755": "105746",
   "ab-105813": "105805",
   "ab-105817": "105805",
   "ab-105840": "105837",
@@ -316,7 +331,28 @@ function findBalancedObjectLiteral(source, assignmentName) {
 
 let kitchenPlanPreviewDataPromise = null;
 
-async function loadKitchenPlanPreviewData() {
+function applySinkEndBlendeHotspotSplits(hotspotsBySlug, boundsBySlug) {
+  Object.entries(boundsBySlug || {}).forEach(([slug, sourceBounds]) => {
+    const hotspots = hotspotsBySlug?.[slug];
+    if (!Array.isArray(hotspots) || !hotspots.length) return;
+
+    hotspotsBySlug[slug] = hotspots.flatMap((hotspot) => {
+      if (hotspot?.componentKey !== "sink-base" || hotspot.width == null) return [hotspot];
+
+      return [
+        { ...hotspot, width: Number(sourceBounds.left) - Number(hotspot.left) },
+        {
+          ...hotspot,
+          componentKey: "sink-end-blende",
+          left: Number(sourceBounds.left),
+          width: Number(sourceBounds.width),
+        },
+      ];
+    });
+  });
+}
+
+export async function loadKitchenPlanPreviewData() {
   if (kitchenPlanPreviewDataPromise) return kitchenPlanPreviewDataPromise;
 
   kitchenPlanPreviewDataPromise = (async () => {
@@ -326,8 +362,12 @@ async function loadKitchenPlanPreviewData() {
     const source = await fs.readFile(sourcePath, "utf8");
     const imageViewsLiteral = findBalancedObjectLiteral(source, "IMAGE_VIEW_BY_SLUG");
     const hotspotsLiteral = findBalancedObjectLiteral(source, "IMAGE_HOTSPOTS_BY_SLUG");
+    const sinkEndBlendeBoundsLiteral = findBalancedObjectLiteral(source, "SINK_END_BLENDE_BOUNDS_BY_SLUG");
     const imageViews = imageViewsLiteral ? Function(`"use strict"; return (${imageViewsLiteral});`)() : {};
     const hotspotsBySlug = hotspotsLiteral ? Function(`"use strict"; return (${hotspotsLiteral});`)() : {};
+    const sinkEndBlendeBoundsBySlug = sinkEndBlendeBoundsLiteral
+      ? Function(`"use strict"; return (${sinkEndBlendeBoundsLiteral});`)()
+      : {};
     const selectionUtilsPath = await resolveWorkspaceAssetPath("components/kitchen-selection-utils.js")
       || await resolveWorkspaceAssetPath("frontend/components/kitchen-selection-utils.js");
     const selectionUtilsSource = await fs.readFile(selectionUtilsPath, "utf8").catch(() => "");
@@ -337,6 +377,12 @@ async function loadKitchenPlanPreviewData() {
     const linkedGroupsBySlug = linkedGroupsLiteral
       ? Function(`"use strict"; return (${linkedGroupsLiteral});`)()
       : {};
+
+    // The configurator splits the fixed sink cabinet at these traced bounds so
+    // the optional UPK20 end panel remains an independent green selection.
+    // Mirror that runtime transformation before resolving shared-plan aliases;
+    // otherwise email/PDF previews paint the whole sink area locked blue.
+    applySinkEndBlendeHotspotSplits(hotspotsBySlug, sinkEndBlendeBoundsBySlug);
 
     source.replace(
       /IMAGE_HOTSPOTS_BY_SLUG\["([^"]+)"\]\s*=\s*IMAGE_HOTSPOTS_BY_SLUG\["([^"]+)"\]/g,
