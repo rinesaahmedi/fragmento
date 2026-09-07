@@ -237,7 +237,7 @@ test("AB 105831 exposes its left US30 Blende as a form-only option", () => {
   assert.equal(blende.isCompanionOption, true);
 });
 
-test("AB 105831 exposes the right US60 UPEF65 independently from its cabinet", () => {
+test("AB 105831 pairs the right UPEF65 with its US60 lower cabinet", () => {
   const item = component("CAB-BASE-AB105831-US60-R", "base-module-2", "Base cabinet with drawer", {
     articleNumber: "US60",
     widthMm: 600,
@@ -257,12 +257,39 @@ test("AB 105831 exposes the right US60 UPEF65 independently from its cabinet", (
   assert.ok(result.selectableComponentIds.includes("component-base-module-2"));
   assert.ok(blende);
   assert.equal(blende.articleCode, "UPEF65");
-  assert.equal(blende.isStandaloneClaimOption, true);
-  assert.notEqual(blende.isCompanionOption, true);
-  assert.equal(
-    buildServiceClaimComponentChoiceGroups(result.selectableComponents)
-      .some((group) => group.sourceComponentKey === "base-module-2"),
-    false,
+  assert.notEqual(blende.isStandaloneClaimOption, true);
+  assert.equal(blende.isCompanionOption, true);
+  assert.equal(blende.isPlanSelectableCompanion, true);
+  const group = buildServiceClaimComponentChoiceGroups(result.selectableComponents)
+    .find((entry) => entry.sourceComponentKey === "base-module-2");
+  assert.ok(group);
+  assert.equal(group.triggerComponentId, "component-base-module-2");
+  assert.deepEqual(
+    group.options.map((option) => option.componentId),
+    ["component-base-module-2", "component-claim-blende-base-module-2"],
+  );
+  assert.deepEqual(
+    normalizeServiceClaimComponentChoiceSelection(
+      ["component-base-module-2", "component-claim-blende-base-module-2"],
+      [group],
+    ),
+    ["component-base-module-2"],
+  );
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds(
+      ["component-base-module-2"],
+      [group],
+      { "base-module-2": ["component-base-module-2"] },
+    ),
+    ["component-base-module-2"],
+  );
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds(
+      ["component-base-module-2"],
+      [group],
+      { "base-module-2": ["component-claim-blende-base-module-2"] },
+    ),
+    ["component-claim-blende-base-module-2"],
   );
 });
 
@@ -1115,6 +1142,25 @@ test("dishwasher owns the plan hotspot while the furniture front stays manual", 
   assert.equal(result[0].claimPartKey, "dishwasher");
   assert.equal(result[0].left, sourceHotspot.left);
   assert.equal(result[0].width, sourceHotspot.width);
+});
+
+test("AB 105811 maps the drawn dishwasher panel to its ordered dishwasher", () => {
+  const sourceHotspot = PLAN_HOTSPOTS_BY_SLUG["ab-105811"].find(
+    (hotspot) => hotspot.componentKey === "base-module-3",
+  );
+
+  assert.ok(sourceHotspot);
+  assert.ok(Math.abs(sourceHotspot.left - 35.035629) < 0.000001);
+  assert.ok(Math.abs(sourceHotspot.width - 15.676960) < 0.000001);
+
+  const result = buildServiceClaimPartHotspots([sourceHotspot], [
+    { partKey: "dishwasher", sourceComponentKey: "base-module-3" },
+    { partKey: "furniture-front", sourceComponentKey: "base-module-3" },
+  ], "ab-105811");
+
+  assert.equal(result.length, 1);
+  assert.equal(result[0].componentId, "component-claim-dishwasher");
+  assert.equal(result[0].claimPartKey, "dishwasher");
 });
 
 test("45 cm dishwasher bundles remain unchanged without 60 cm claim parts", () => {
@@ -2636,7 +2682,8 @@ test("AB 105831 splits the US60 and UPEF65 at their PDF divider", () => {
     componentKey: "claim-blende-base-module-2",
     claimPartKey: "blende",
     sourceComponentKey: "base-module-2",
-    isStandaloneClaimOption: true,
+    isCompanionOption: true,
+    isPlanSelectableCompanion: true,
   }], [], "ab-105831");
   const cabinet = result.find((entry) => entry.componentId === "component-base-module-2");
   const blende = result.find(
@@ -2732,9 +2779,14 @@ test("AB 104968 worktops include each side's PDF front fascia", () => {
   assert.ok(Math.abs(right.top + right.height - 61.640336) < 0.000001);
   assert.match(left.clipPath, /^polygon\(/);
   assert.match(right.clipPath, /^polygon\(/);
+  assert.equal(
+    (right.clipPath.match(/%/g) || []).length / 2,
+    6,
+    "the right worktop follows both segments of the left-owned corner seam",
+  );
 });
 
-test("AB 104968 variants keep the US50 front and exposed side as one cabinet", () => {
+test("AB 104968 variants pair the US50 and UPK20 but keep them separately selectable", () => {
   ["ab-104968", "ab-105734", "ab-105737", "ab-105740"].forEach((kitchenSlug) => {
     const kitchen = {
       items: [
@@ -2757,9 +2809,49 @@ test("AB 104968 variants keep the US50 front and exposed side as one cabinet", (
     ));
 
     assert.ok(result.selectableComponentIds.includes("component-base-module-1"));
-    assert.equal(blenden.length, 0);
-    assert.ok(!result.selectableComponentIds.includes("component-claim-blende-base-module-1"));
+    assert.equal(blenden.length, 1);
+    assert.equal(blenden[0].isCompanionOption, true);
+    assert.equal(blenden[0].isPlanSelectableCompanion, true);
+    const group = buildServiceClaimComponentChoiceGroups(result.selectableComponents)
+      .find((entry) => entry.sourceComponentKey === "base-module-1");
+    assert.deepEqual(
+      group.options.map((option) => option.componentId),
+      ["component-base-module-1", "component-claim-blende-base-module-1"],
+    );
   });
+});
+
+test("AB 104968 selects only the thin UPK20 between both US50 cabinet faces", () => {
+  const result = buildServiceClaimBlendeHotspots([{
+    componentId: "component-base-module-1",
+    componentKey: "base-module-1",
+    points: [[6.69, 87.24], [6.59, 58.41], [14.44, 60.01], [24.75, 58.68], [24.75, 87.79], [14.44, 89.13], [14.53, 88.96], [6.78, 87.22]],
+  }], [{
+    componentId: "component-claim-blende-base-module-1",
+    componentKey: "claim-blende-base-module-1",
+    claimPartKey: "blende",
+    sourceComponentKey: "base-module-1",
+    isCompanionOption: true,
+    isPlanSelectableCompanion: true,
+  }], [], "ab-104968");
+  const cabinetHotspots = result.filter(
+    (entry) => entry.componentId === "component-base-module-1",
+  );
+  const blende = result.find(
+    (entry) => entry.componentId === "component-claim-blende-base-module-1",
+  );
+  const cabinetFront = cabinetHotspots.find((entry) => entry.left > blende.left);
+  const cabinetSide = cabinetHotspots.find((entry) => entry.left < blende.left);
+
+  assert.equal(cabinetHotspots.length, 2);
+  assert.ok(blende);
+  assert.ok(cabinetFront);
+  assert.ok(cabinetSide);
+  assert.ok(Math.abs(cabinetSide.left - 6.59) < 0.000001);
+  assert.ok(Math.abs(cabinetSide.left + cabinetSide.width - 14.72209) < 0.000001);
+  assert.ok(Math.abs(blende.left - 14.72209) < 0.000001);
+  assert.ok(Math.abs(blende.left + blende.width - 15.805226) < 0.000001);
+  assert.ok(Math.abs(cabinetFront.left - 15.805226) < 0.000001);
 });
 
 test("AB 104968 cooktop uses the four outside vector-PDF strokes", () => {

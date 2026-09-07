@@ -32,16 +32,15 @@ const CLAIM_BLENDE_LABELS_BY_CODE = {
     nameDe: "Eckpassblende Unterschrank",
   },
 };
-// These Blenden belong to the sink-cabinet claim in the plan. They remain a
-// separate form row so a customer can describe the panel issue, but they must
-// not split the cabinet into an additional clickable surface.
+// These Blenden share one form row with their source cabinet. Most are form-only
+// companions; specific plans can still expose a separately clickable surface.
 const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
 const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   // AB 105743's exposed left end face is part of the US30 cabinet, not an
   // independently selectable filler-panel claim surface.
   "ab-105743": new Set(["base-module-1"]),
-  // The exposed left side and front are two perspective faces of one US50
-  // cabinet in this shared plan, not an independently claimable Blende.
+  // The US50 and its supplied UPK20 share a form row, while their two PDF
+  // faces remain independently selectable in the plan.
   "ab-104968": new Set(["base-module-1"]),
   "ab-105734": new Set(["base-module-1"]),
   "ab-105737": new Set(["base-module-1"]),
@@ -53,19 +52,19 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-105822": new Set(["base-module-1"]),
   "ab-105825": new Set(["base-module-1"]),
   "ab-105828": new Set(["base-module-1"]),
-  // The left US30 UPK20 remains a form-only companion. The right US60 UPEF65
-  // has its own visible corner face and is independently selectable in ASC.
-  "ab-105831": new Set(["base-module-1"]),
+  // Both supplied Blenden stay paired with their source lower cabinets in ASC.
+  // The left corner UPK20 is a separate kitchen item and is unaffected here.
+  "ab-105831": new Set(["base-module-1", "base-module-2"]),
   "ab-105834": new Set(["base-module-3"]),
 };
-// In these shared perspective plans the US50 front and exposed side are one
-// cabinet surface. Do not expose the legacy attached UPK20 metadata as a
-// separate claim target for that cabinet.
-const CLAIM_BLENDE_SUPPRESSED_SOURCE_KEYS_BY_SLUG = {
+const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
   "ab-104968": new Set(["base-module-1"]),
   "ab-105734": new Set(["base-module-1"]),
   "ab-105737": new Set(["base-module-1"]),
   "ab-105740": new Set(["base-module-1"]),
+  // The UPEF65 is paired with the US60 in the form, but the PDF contains an
+  // exact divider and both pieces must remain independently selectable.
+  "ab-105831": new Set(["base-module-2"]),
 };
 const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   // Both adjacent right-hand strips are independently drawn in this shared plan.
@@ -80,7 +79,6 @@ const CLAIM_STANDALONE_BLENDE_SOURCE_KEYS_BY_SLUG = {
   "ab-105748": new Set(["sink-base"]),
   "ab-105751": new Set(["sink-base"]),
   "ab-105754": new Set(["sink-base"]),
-  "ab-105831": new Set(["base-module-2"]),
 };
 // Legacy confirmed orders can predate a separately drawn component even when
 // its ASC hotspot is present. Expose only the missing drawn target in
@@ -671,9 +669,10 @@ export function buildServiceClaimSelectableComponents({
   const companionBlendeSourceKeys = CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || new Set();
-  const suppressedBlendeSourceKeys = CLAIM_BLENDE_SUPPRESSED_SOURCE_KEYS_BY_SLUG[
-    String(kitchenSlug || "").toLowerCase()
-  ] || new Set();
+  const planSelectableCompanionBlendeSourceKeys =
+    CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG[
+      String(kitchenSlug || "").toLowerCase()
+    ] || new Set();
   const blendeMetaOverrides = CLAIM_BLENDE_META_OVERRIDES_BY_SLUG[
     String(kitchenSlug || "").toLowerCase()
   ] || {};
@@ -683,7 +682,6 @@ export function buildServiceClaimSelectableComponents({
   const claimBlenden = sourceItems
     .map(({ item }) => buildClaimBlendeMeta(item))
     .filter(Boolean)
-    .filter((entry) => !suppressedBlendeSourceKeys.has(entry.sourceComponentKey))
     .map((entry) => {
       const quantity = Number(blendeQuantityOverrides[entry.sourceComponentKey] || 0);
       return quantity > 0 && entry.code.toUpperCase() === "UPK20"
@@ -692,7 +690,13 @@ export function buildServiceClaimSelectableComponents({
     })
     .map((entry) => (
       companionBlendeSourceKeys.has(entry.sourceComponentKey)
-        ? { ...entry, isCompanionOption: true }
+        ? {
+          ...entry,
+          isCompanionOption: true,
+          ...(planSelectableCompanionBlendeSourceKeys.has(entry.sourceComponentKey)
+            ? { isPlanSelectableCompanion: true }
+            : {}),
+        }
         : entry
     ))
     .map((entry) => (
@@ -739,7 +743,12 @@ export function buildServiceClaimSelectableComponents({
       const resolvedMeta = {
         ...meta,
         ...(companionBlendeSourceKeys.has(meta.sourceComponentKey)
-          ? { isCompanionOption: true }
+          ? {
+            isCompanionOption: true,
+            ...(planSelectableCompanionBlendeSourceKeys.has(meta.sourceComponentKey)
+              ? { isPlanSelectableCompanion: true }
+              : {}),
+          }
           : {}),
         ...(standaloneBlendeSourceKeys.has(meta.sourceComponentKey)
           ? { isStandaloneClaimOption: true }

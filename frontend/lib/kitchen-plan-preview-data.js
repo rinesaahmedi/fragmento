@@ -1187,7 +1187,9 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-faucet", left: 29.928741, top: 55.966387, width: 3.206651, height: 7.731092 },
     { componentKey: "base-module-1", left: 3.681710, top: 64.873950, width: 15.676960, height: 32.605042 },
     { componentKey: "sink-base", left: 19.358670, top: 64.873950, width: 15.676960, height: 32.605042 },
-    { componentKey: "base-module-2", left: 35.035629, top: 64.873950, width: 15.676960, height: 32.605042 },
+    // This drawn panel is the ordered 60 cm dishwasher. Its kitchen item and
+    // claim parts use base-module-3, so the plan hotspot must use the same key.
+    { componentKey: "base-module-3", left: 35.035629, top: 64.873950, width: 15.676960, height: 32.605042 },
     { componentKey: "oven-module", left: 50.712589, top: 64.873950, width: 15.558195, height: 32.605042 },
     { componentKey: "refrigerator", left: 69.714964, top: 30.756303, width: 14.489312, height: 66.722689 },
   ],
