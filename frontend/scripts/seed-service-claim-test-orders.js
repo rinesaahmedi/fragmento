@@ -35,8 +35,35 @@ function calculateOrderTotal(items) {
   return items.reduce((total, item) => total + Number(item.price || 0), 0).toFixed(2);
 }
 
-async function syncKitchenTestOrder(prisma, kitchen) {
-  const contractNumber = buildClaimsTestContractNumber(kitchen);
+function buildClaimsTestContractAssignments(kitchens) {
+  const grouped = new Map();
+
+  for (const kitchen of kitchens) {
+    const baseContractNumber = buildClaimsTestContractNumber(kitchen);
+    if (!grouped.has(baseContractNumber)) grouped.set(baseContractNumber, []);
+    grouped.get(baseContractNumber).push(kitchen);
+  }
+
+  const assignments = new Map();
+  for (const [baseContractNumber, matches] of grouped) {
+    const code = baseContractNumber.slice(CONTRACT_PREFIX.length);
+    const canonicalSlug = `ab-${code}`;
+    const ordered = [...matches].sort((left, right) => {
+      const leftCanonical = left.slug === canonicalSlug ? 0 : 1;
+      const rightCanonical = right.slug === canonicalSlug ? 0 : 1;
+      return leftCanonical - rightCanonical || left.slug.localeCompare(right.slug);
+    });
+
+    ordered.forEach((kitchen, index) => {
+      assignments.set(kitchen.id, index === 0 ? baseContractNumber : `${baseContractNumber}-${index + 1}`);
+    });
+  }
+
+  return assignments;
+}
+
+async function syncKitchenTestOrder(prisma, kitchen, assignedContractNumber = null) {
+  const contractNumber = assignedContractNumber || buildClaimsTestContractNumber(kitchen);
   const orderNumber = `${contractNumber}-1`;
   const sourceProjectId = kitchen.contracts[0]?.projectId || null;
 
@@ -171,18 +198,11 @@ async function main() {
       throw new Error("No active kitchens found. Run the main seed first.");
     }
 
-    const contractNumbers = new Set();
-    for (const kitchen of kitchens) {
-      const contractNumber = buildClaimsTestContractNumber(kitchen);
-      if (contractNumbers.has(contractNumber)) {
-        throw new Error(`More than one active kitchen resolves to contract ${contractNumber}.`);
-      }
-      contractNumbers.add(contractNumber);
-    }
+    const contractAssignments = buildClaimsTestContractAssignments(kitchens);
 
     const results = [];
     for (const kitchen of kitchens) {
-      const result = await syncKitchenTestOrder(prisma, kitchen);
+      const result = await syncKitchenTestOrder(prisma, kitchen, contractAssignments.get(kitchen.id));
       results.push(result);
       console.log(`${kitchen.slug}: ${result.contractNumber} / ${result.orderNumber} (${result.itemCount} items)`);
     }
@@ -213,6 +233,7 @@ module.exports = {
   TEST_DATA_MARKER,
   TEST_ORDER_EMAIL,
   buildClaimsTestContractNumber,
+  buildClaimsTestContractAssignments,
   buildOrderItemData,
   calculateOrderTotal,
   syncKitchenTestOrder,

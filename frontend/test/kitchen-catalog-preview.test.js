@@ -123,31 +123,33 @@ test("AB 105828 catalog preview uses the AB 105825 layout", () => {
 test("AB 105831 hood underside belongs to extractor hood instead of cabinet", () => {
   const cabinetFace = PLAN_HOTSPOTS_BY_SLUG["ab-105831"].find((hotspot) =>
     hotspot.componentKey === "wall-cabinet-2"
-    && hotspot.points?.some(([x, y]) => x === 67.11 && y === 43.87)
+    && hotspot.points?.some(([x, y]) => x === 67.11 && y === 43.85)
   );
   const hoodUndersides = PLAN_HOTSPOTS_BY_SLUG["ab-105831"].filter((hotspot) =>
     hotspot.componentKey === "extractor-hood"
-    && hotspot.points?.some(([x, y]) => x === 60.25 && y === 43.0)
   );
 
   assert.ok(cabinetFace);
   assert.ok(cabinetFace.points.every(([, y]) => y < 44));
-  assert.ok(hoodUndersides.length >= 1);
+  assert.equal(hoodUndersides.length, 2);
+  assert.deepEqual(hoodUndersides[0].points, [
+    [57.97, 42.05], [67.11, 43.85], [66.85, 49.85], [58.25, 48.0],
+  ]);
 });
 
 test("AB 105837 hood LED strip belongs to extractor hood instead of cabinet", () => {
   const cabinetFace = PLAN_HOTSPOTS_BY_SLUG["ab-105837"].find((hotspot) =>
     hotspot.componentKey === "wall-cabinet-2"
-    && hotspot.points?.some(([x, y]) => x === 48.02 && y === 38.69)
+    && hotspot.points?.some(([x, y]) => x === 48.02 && y === 37.69)
   );
   const hoodLedStrip = PLAN_HOTSPOTS_BY_SLUG["ab-105837"].find((hotspot) =>
     hotspot.componentKey === "extractor-hood"
-    && hotspot.points?.some(([x, y]) => x === 37.08 && y === 40.38)
-    && hotspot.points?.some(([x, y]) => x === 48.02 && y === 39.78)
+    && hotspot.points?.some(([x, y]) => x === 37.08 && y === 39.38)
+    && hotspot.points?.some(([x, y]) => x === 48.02 && y === 39.38)
   );
 
   assert.ok(cabinetFace);
-  assert.ok(cabinetFace.points.every(([, y]) => y <= 40.38));
+  assert.ok(cabinetFace.points.every(([, y]) => y <= 39.38));
   assert.ok(hoodLedStrip);
 });
 

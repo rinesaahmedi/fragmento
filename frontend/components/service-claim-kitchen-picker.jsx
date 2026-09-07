@@ -633,6 +633,8 @@ export default function ServiceClaimKitchenPicker({
                             ? 12
                             : hotspot.claimPartKey === "blende"
                             ? 14
+                            : hotspot.componentKey === "corner-blende"
+                            ? 14
                             : hotspot.claimPartKey === "sink"
                             ? 11
                             : hotspot.componentKey === "sink-faucet"

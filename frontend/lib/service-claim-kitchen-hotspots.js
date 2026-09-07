@@ -166,10 +166,24 @@ const FAUCET_SOURCE_POINTS_BY_SLUG = {
     [25.059382, 53.109244],
   ],
   "ab-105831": [
-    [25.05, 49.15],
-    [30.8, 48.45],
-    [30.8, 58.15],
-    [25.05, 58.65],
+    [25.05, 58.3],
+    [25.05, 52.0],
+    [25.1, 51.1],
+    [25.4, 50.3],
+    [26.0, 49.7],
+    [26.7, 49.35],
+    [29.0, 48.4],
+    [29.05, 47.6],
+    [29.7, 47.65],
+    [29.55, 51.2],
+    [28.95, 51.1],
+    [29.0, 50.6],
+    [26.9, 49.9],
+    [26.2, 50.1],
+    [25.7, 50.5],
+    [25.45, 51.0],
+    [25.35, 51.7],
+    [25.35, 58.3],
   ],
 };
 
@@ -347,6 +361,12 @@ const COOKTOP_SOURCE_POINTS_BY_SLUG = {
     [60.612827, 54.258824],
     [55.596200, 54.984874],
   ],
+  "ab-105831": [
+    [53.2363409, 60.25207295],
+    [62.9453675, 58.73949125],
+    [71.9418095, 60.58824375],
+    [62.351547, 62.26891085],
+  ],
 };
 
 const RIGHT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
@@ -488,10 +508,12 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     "wall-cabinet-1": { side: "left", outer: 48.161869, inner: 48.902821 },
   },
   // AB 105831's right-hand return face is supplied as the base-module-1
-  // UPK20. The inside-corner UPK20 is a standalone kitchen component and
-  // already has its own source hotspot, so it needs no synthetic split here.
+  // UPK20. The inside-corner UPK20 already has its own source hotspot. The
+  // US60 begins at the x=44.05 PDF divider, leaving its attached UPEF65 as a
+  // separate narrow face between that divider and the corner-blende boundary.
   "ab-105831": {
     "base-module-1": { side: "right", inner: 14.55, outer: 20.45 },
+    "base-module-2": { side: "left", outer: 43.288686, inner: 44.05 },
     "wall-cabinet-1": { side: "left", outer: 47.990881, inner: 48.760331 },
   },
   // AB 105834: the two base-module-2 strips share the left corner. The
@@ -713,6 +735,20 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105831": {
+    oven: [
+      [53.25, 61.55],
+      [62.35, 63.55],
+      [62.35, 82.789],
+      [53.25, 81.119],
+    ],
+    "oven-drawer": [
+      [53.25, 81.119],
+      [62.35, 82.789],
+      [62.35, 92.94],
+      [53.25, 91.05],
+    ],
+  },
   "ab-105758": {
     oven: [
       [46.218527, 54.783193],
@@ -818,8 +854,8 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right", "worktop-end-panel"],
   },
   "ab-105831": {
-    // The third polygon is the thin front face of the right worktop.
-    indexPartKeys: ["worktop-left", "worktop-right", "worktop-right"],
+    // FRG supplies the two top surfaces followed by their two front fascias.
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
   },
   "ab-105743": {
     // Top surfaces, front fascias, then the floor-height end panel.

@@ -53,9 +53,9 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-105822": new Set(["base-module-1"]),
   "ab-105825": new Set(["base-module-1"]),
   "ab-105828": new Set(["base-module-1"]),
-  // The left UPK20 is its own component. The right UPEF65 remains physically
-  // and commercially attached to the US60 cabinet.
-  "ab-105831": new Set(["base-module-1", "base-module-2"]),
+  // The left US30 UPK20 remains a form-only companion. The right US60 UPEF65
+  // has its own visible corner face and is independently selectable in ASC.
+  "ab-105831": new Set(["base-module-1"]),
   "ab-105834": new Set(["base-module-3"]),
 };
 // In these shared perspective plans the US50 front and exposed side are one
@@ -80,6 +80,20 @@ const CLAIM_STANDALONE_BLENDE_SOURCE_KEYS_BY_SLUG = {
   "ab-105748": new Set(["sink-base"]),
   "ab-105751": new Set(["sink-base"]),
   "ab-105754": new Set(["sink-base"]),
+  "ab-105831": new Set(["base-module-2"]),
+};
+// Legacy confirmed orders can predate a separately drawn component even when
+// its ASC hotspot is present. Expose only the missing drawn target in
+// claims; this does not modify the FRG order or its purchased-item snapshot.
+const CLAIM_DRAWN_COMPONENT_OVERRIDES_BY_SLUG = {
+  "ab-105831": [{
+    componentId: "component-corner-blende",
+    code: "BLENDE-AB105831-CORNER-LEFT",
+    articleCode: "UPK20",
+    name: "Filler Panel up to 20 cm",
+    nameDe: "Passblende bis 20 cm",
+    componentKey: "corner-blende",
+  }],
 };
 const CLAIM_INDEPENDENT_BLENDE_QUANTITY_BY_SLUG = {
   "ab-104968": { "base-module-2": 2 },
@@ -734,6 +748,12 @@ export function buildServiceClaimSelectableComponents({
       );
     }
   }
+
+  (CLAIM_DRAWN_COMPONENT_OVERRIDES_BY_SLUG[
+    String(kitchenSlug || "").toLowerCase()
+  ] || []).forEach(({ componentId, ...fallbackMeta }) => {
+    addSelectableComponent(componentId, fallbackMeta);
+  });
 
   const separatedSourceComponentIds = new Set(
     eligibleClaimParts

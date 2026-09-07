@@ -4,7 +4,12 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadKitchenSvgMarkup } from "../lib/load-kitchen-svg.js";
-import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
+import {
+  AB_105831_FRG_ORDER_HOTSPOTS,
+  AB_105837_FRG_ORDER_HOTSPOTS,
+  PLAN_HOTSPOTS_BY_SLUG,
+  PLAN_IMAGE_BY_SLUG,
+} from "../lib/kitchen-plan-preview-data.js";
 import {
   buildServiceClaimSelectableComponents,
   collapseServiceClaimLinkedComponents,
@@ -231,6 +236,35 @@ test("AB 105831 exposes its left US30 Blende as a form-only option", () => {
   assert.equal(blende.isCompanionOption, true);
 });
 
+test("AB 105831 exposes the right US60 UPEF65 independently from its cabinet", () => {
+  const item = component("CAB-BASE-AB105831-US60-R", "base-module-2", "Base cabinet with drawer", {
+    articleNumber: "US60",
+    widthMm: 600,
+    isLocked: true,
+    blendeCode: "UPEF65",
+    blendeLabel: "Eckpassblende Unterschrank",
+  });
+  const result = buildServiceClaimSelectableComponents({
+    kitchen: { items: [item] },
+    kitchenConfig: { components: [item] },
+    kitchenSlug: "ab-105831",
+  });
+  const blende = result.selectableComponents.find(
+    (entry) => entry.componentId === "component-claim-blende-base-module-2",
+  );
+
+  assert.ok(result.selectableComponentIds.includes("component-base-module-2"));
+  assert.ok(blende);
+  assert.equal(blende.articleCode, "UPEF65");
+  assert.equal(blende.isStandaloneClaimOption, true);
+  assert.notEqual(blende.isCompanionOption, true);
+  assert.equal(
+    buildServiceClaimComponentChoiceGroups(result.selectableComponents)
+      .some((group) => group.sourceComponentKey === "base-module-2"),
+    false,
+  );
+});
+
 test("AB 105831 exposes the left inside-corner UPK20 as its own selected component", () => {
   const cornerBlende = component(
     "BLENDE-AB105831-CORNER-LEFT",
@@ -270,6 +304,46 @@ test("AB 105831 exposes the left inside-corner UPK20 as its own selected compone
     buildServiceClaimComponentChoiceGroups(result.selectableComponents)
       .some((group) => group.sourceComponentKey === "corner-blende"),
     false,
+  );
+});
+
+test("ASC keeps standalone corner Blenden above neighboring cabinet hit targets", () => {
+  const pickerSource = fs.readFileSync(
+    path.join(repoRoot, "components", "service-claim-kitchen-picker.jsx"),
+    "utf8",
+  );
+
+  assert.match(
+    pickerSource,
+    /hotspot\.componentKey === "corner-blende"\s*\? 14/,
+  );
+});
+
+test("AB 105831 exposes its drawn corner Blende for legacy orders missing the item snapshot", () => {
+  const sinkCabinet = component("SINKBASE-AB105831-DEFAULT", "sink-base", "Sink Lower Cabinet");
+  const adjacentCabinet = component(
+    "CAB-BASE-AB105831-US60-L",
+    "base-module-2",
+    "Base cabinet with drawer",
+    { articleNumber: "US60" },
+  );
+  const kitchen = { items: [sinkCabinet, adjacentCabinet] };
+  const result = buildServiceClaimSelectableComponents({
+    kitchen,
+    kitchenConfig: { components: kitchen.items },
+    kitchenSlug: "ab-105831",
+    confirmedItems: [sinkCabinet, adjacentCabinet],
+  });
+  const cornerBlende = result.selectableComponents.find(
+    (entry) => entry.componentId === "component-corner-blende",
+  );
+
+  assert.ok(result.selectableComponentIds.includes("component-corner-blende"));
+  assert.equal(cornerBlende.articleCode, "UPK20");
+  assert.equal(cornerBlende.componentKey, "corner-blende");
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-105831", cornerBlende.componentId),
+    ["component-corner-blende"],
   );
 });
 
@@ -1805,6 +1879,27 @@ test("AB 105837 claim hotspot maps the hood LED strip to extractor hood", () => 
   assert.match(source, /"ab-105837":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[37\.08,\s*39\.38\],\s*\[48\.02,\s*37\.69\],\s*\[48\.02,\s*39\.38\],\s*\[37\.08,\s*41\.0\]\]/);
 });
 
+test("AB 105837 ASC reuses the complete FRG order-page geometry", () => {
+  const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105837"];
+
+  assert.strictEqual(hotspots, AB_105837_FRG_ORDER_HOTSPOTS);
+  assert.match(stageSource, /IMAGE_HOTSPOTS_BY_SLUG\["ab-105837"\]\s*=\s*AB_105837_FRG_ORDER_HOTSPOTS/);
+  assert.deepEqual(
+    hotspots.filter((hotspot) => hotspot.componentKey === "refrigerator").map((hotspot) => hotspot.points),
+    [
+      [[10.74, 29.62], [20.82, 28.18], [29.74, 30.02], [19.92, 31.56]],
+      [[10.74, 29.62], [19.92, 31.56], [19.92, 90.92], [10.8, 89.05]],
+      [[19.92, 31.56], [30.2, 30.02], [30.2, 89.62], [19.92, 90.92]],
+    ],
+  );
+  assert.equal(hotspots.filter((hotspot) => hotspot.componentKey === "extractor-hood").length, 3);
+  assert.deepEqual(
+    hotspots.find((hotspot) => hotspot.componentKey === "base-module-3")?.points,
+    [[70.85, 61.08], [80.05, 62.82], [80.05, 92.25], [70.85, 90.55]],
+  );
+});
+
 test("AB 105837 claims use the order-plan faucet hotspot instead of the broad sink surface", () => {
   const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105837"] || [];
   const faucet = hotspots.find((hotspot) => hotspot.componentKey === "sink-faucet");
@@ -1830,6 +1925,19 @@ test("AB 105834 claim hotspot maps the hood LED strip to extractor hood", () => 
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[35\.49,\s*39\.62\],\s*\[35\.48,\s*37\.8\],\s*\[30\.0,\s*38\.62\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[35\.48,\s*37\.9\],\s*\[47\.48,\s*36\.16\],\s*\[47\.48,\s*37\.9\],\s*\[35\.48,\s*39\.57\]\]/);
   assert.match(source, /"ab-105834":\s*\[[\s\S]*componentKey:\s*"extractor-hood"[\s\S]*\[\[36\.58,\s*44\.08\],\s*\[46\.38,\s*42\.75\],\s*\[46\.38,\s*38\.11\],\s*\[36\.58,\s*39\.57\]\]/);
+});
+
+test("AB 105834 ASC right upper cabinet follows its FRG order-page outline", () => {
+  const source = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
+  const sectionStart = source.indexOf('"ab-105834": [');
+  const sectionEnd = source.indexOf('"ab-105747": [', sectionStart);
+  const kitchenSection = source.slice(sectionStart, sectionEnd);
+
+  assert.ok(sectionStart >= 0 && sectionEnd > sectionStart);
+  assert.match(kitchenSection, /componentKey:\s*"wall-cabinet-3",\s*points:\s*\[\[42\.75,\s*8\.32\],\s*\[54\.83,\s*5\.76\],\s*\[60\.28,\s*7\.78\],\s*\[47\.48,\s*9\.55\]\]/);
+  assert.match(kitchenSection, /componentKey:\s*"wall-cabinet-3",\s*points:\s*\[\[47\.48,\s*9\.55\],\s*\[59\.48,\s*7\.84\],\s*\[59\.48,\s*33\.98\],\s*\[47\.48,\s*37\.48\]\]/);
+  assert.match(kitchenSection, /componentKey:\s*"wall-cabinet-3",\s*points:\s*\[\[59\.48,\s*7\.84\],\s*\[60\.28,\s*7\.78\],\s*\[60\.28,\s*33\.9\],\s*\[59\.48,\s*33\.98\]\]/);
+  assert.doesNotMatch(kitchenSection, /54\.53,\s*6\.76|47\.48,\s*36\.18|60\.58/);
 });
 
 test("service claim plan labels sink separately from worktop", () => {
@@ -2262,8 +2370,8 @@ test("oven, drawer, and cooktop use independent claim hotspots", () => {
     assert.equal(aliasCooktop.clipPath, kitchen105805Cooktop.clipPath);
   }
 
-  // Use the exact live AB 105831 oven bounds from kitchen-svg-stage.jsx. They
-  // differ from the canonical preview table and previously shifted the cooktop down.
+  // Use the exact AB 105831 outline, including its perspective plinth. The
+  // independently measured cooktop and drawer must remain on their source seams.
   const kitchen105831 = buildServiceClaimPartHotspots(
     [{
       componentKey: "oven-module",
@@ -2276,8 +2384,13 @@ test("oven, drawer, and cooktop use independent claim hotspots", () => {
     claimParts,
     "ab-105831",
   );
+  const kitchen105831Oven = kitchen105831.find((entry) => entry.claimPartKey === "oven");
   const kitchen105831Cooktop = kitchen105831.find((entry) => entry.claimPartKey === "cooktop");
   const kitchen105831Drawer = kitchen105831.find((entry) => entry.claimPartKey === "oven-drawer");
+  assert.ok(Math.abs(kitchen105831Oven.left - 53.25) < 0.001);
+  assert.ok(Math.abs(kitchen105831Oven.top - 61.55) < 0.001);
+  assert.ok(Math.abs(kitchen105831Oven.width - 9.1) < 0.001);
+  assert.ok(Math.abs(kitchen105831Oven.height - 21.239) < 0.001);
   assert.ok(Math.abs(kitchen105831Cooktop.left - 53.23634) < 0.001);
   assert.ok(Math.abs(kitchen105831Cooktop.top - 58.73949) < 0.001);
   assert.ok(Math.abs(kitchen105831Cooktop.width - 18.70547) < 0.001);
@@ -2285,8 +2398,8 @@ test("oven, drawer, and cooktop use independent claim hotspots", () => {
   assert.ok(Math.abs(kitchen105831Drawer.left - 53.25) < 0.001);
   assert.ok(Math.abs(kitchen105831Drawer.top - 81.119) < 0.001);
   assert.ok(Math.abs(kitchen105831Drawer.width - 9.1) < 0.001);
-  assert.ok(Math.abs(kitchen105831Drawer.height - 11.581) < 0.001);
-  assert.match(kitchen105831Drawer.clipPath, /^polygon\(0% 0%, 100% 14\.42\d*%, 100% 100%, 0% 87\.04\d*%\)$/);
+  assert.ok(Math.abs(kitchen105831Drawer.height - 11.821) < 0.001);
+  assert.match(kitchen105831Drawer.clipPath, /^polygon\(0% 0%, 100% 14\.12\d*%, 100% 100%, 0% 84\.01\d*%\)$/);
 
   const kitchen105837 = buildServiceClaimPartHotspots(
     [{ componentKey: "oven-module", left: 41.07, top: 57.45, width: 10.98, height: 31.06 }],
@@ -2443,6 +2556,33 @@ test("AB 105805 uses separate PDF surface and front-edge seam points through the
   assert.ok(Math.abs(right.left + right.width - 87.17) < 0.001);
   assert.match(left.clipPath, /^polygon\(/);
   assert.match(right.clipPath, /^polygon\(/);
+});
+
+test("AB 105831 splits the US60 and UPEF65 at their PDF divider", () => {
+  const result = buildServiceClaimBlendeHotspots([{
+    componentId: "component-base-module-2",
+    componentKey: "base-module-2",
+    points: [[43.288686, 59.8], [53.25, 61.55], [53.25, 91.05], [43.288686, 89.03]],
+  }], [{
+    componentId: "component-claim-blende-base-module-2",
+    componentKey: "claim-blende-base-module-2",
+    claimPartKey: "blende",
+    sourceComponentKey: "base-module-2",
+    isStandaloneClaimOption: true,
+  }], [], "ab-105831");
+  const cabinet = result.find((entry) => entry.componentId === "component-base-module-2");
+  const blende = result.find(
+    (entry) => entry.componentId === "component-claim-blende-base-module-2",
+  );
+
+  assert.equal(result.length, 2);
+  assert.ok(cabinet);
+  assert.ok(blende);
+  assert.ok(Math.abs(cabinet.left - 44.05) < 0.000001);
+  assert.ok(Math.abs(blende.left - 43.288686) < 0.000001);
+  assert.ok(Math.abs(blende.left + blende.width - cabinet.left) < 0.000001);
+  assert.equal(blende.claimPartKey, "blende");
+  assert.equal(blende.sourceComponentKey, "base-module-2");
 });
 
 test("AB 104968 independent claim Blenden follow their PDF end faces", () => {
@@ -3352,8 +3492,17 @@ test("AB 105825 cooktop follows the four source-plan outside corners", () => {
   assert.doesNotMatch(cooktop.clipPath, /NaN/);
 });
 
-test("AB 105831 ASC uses the measured worktops, sink, and oven seams", () => {
+test("AB 105831 ASC reuses the FRG order-page cabinet geometry", () => {
   const source = PLAN_HOTSPOTS_BY_SLUG["ab-105831"];
+  const cabinetKeys = new Set([
+    "base-module-1", "base-module-2", "base-module-3", "sink-base",
+    "corner-blende", "oven-module", "drawer-module", "base-module-4", "refrigerator",
+    "wall-cabinet-1", "wall-cabinet-2", "wall-cabinet-3", "wall-cabinet-4", "extractor-hood",
+  ]);
+  assert.deepEqual(
+    source.filter((hotspot) => cabinetKeys.has(hotspot.componentKey)),
+    AB_105831_FRG_ORDER_HOTSPOTS.filter((hotspot) => cabinetKeys.has(hotspot.componentKey)),
+  );
   const cornerBlende = source.find((hotspot) => hotspot.componentKey === "corner-blende");
   assert.deepEqual(cornerBlende.points, [
     [42.55, 59.8], [43.288686, 59.8], [43.288686, 88.442133], [42.25, 89.25],
@@ -3361,8 +3510,9 @@ test("AB 105831 ASC uses the measured worktops, sink, and oven seams", () => {
   const rightCabinet = source.find((hotspot) => hotspot.componentKey === "base-module-2");
   assert.equal(rightCabinet.points[0][0], 43.288686);
   assert.equal(rightCabinet.points.at(-1)[0], 43.288686);
+  assert.deepEqual(rightCabinet.points.slice(2), [[53.25, 91.05], [43.288686, 89.03]]);
   const worktops = source.filter((hotspot) => hotspot.componentKey === "worktop");
-  assert.equal(worktops.length, 3);
+  assert.equal(worktops.length, 4);
   assert.deepEqual(worktops[0].points, [
     [5.3, 60.85], [14.55, 59.0], [35.05, 56.45], [43.35, 58.3],
     [43.35, 59.8], [35.45, 60.55], [15.55, 63.8], [5.3, 62.0],
@@ -3372,7 +3522,11 @@ test("AB 105831 ASC uses the measured worktops, sink, and oven seams", () => {
     [74.75, 62.65], [62.35, 61.55], [53.25, 60.35], [43.35, 59.8],
   ]);
   assert.deepEqual(worktops[2].points, [
-    [43.35, 59.8], [53.25, 60.35], [62.35, 61.55], [74.75, 62.65],
+    [31.45, 60.55], [42.35, 59.8], [35.35, 60.95],
+    [30.05, 61.5], [10.55, 62.55], [7.3, 63.05],
+  ]);
+  assert.deepEqual(worktops[3].points, [
+    [43.5, 59.8], [55.25, 60.35], [62.35, 61.55], [75.05, 62.65],
     [74.75, 66.2], [59.35, 62.7], [52.25, 61.5], [45.35, 59.95],
   ]);
   assert.deepEqual(source.find((hotspot) => hotspot.componentKey === "sink-base").points, [
@@ -3381,6 +3535,12 @@ test("AB 105831 ASC uses the measured worktops, sink, and oven seams", () => {
   const oven = source.find((hotspot) => hotspot.componentKey === "oven-module");
   assert.deepEqual(oven.points, [
     [53.25, 61.55], [62.35, 63.55], [62.35, 92.7], [53.25, 91.2],
+  ]);
+  const refrigerator = source.filter((hotspot) => hotspot.componentKey === "refrigerator");
+  const upperRightCabinet = source.find((hotspot) => hotspot.componentKey === "wall-cabinet-4");
+  assert.deepEqual(refrigerator[2].points.slice(0, 3), upperRightCabinet.points.slice(-3).reverse());
+  assert.deepEqual(refrigerator[2].points.slice(3), [
+    refrigerator[1].points[1], refrigerator[0].points[1], refrigerator[0].points[0],
   ]);
   const claim = buildServiceClaimPartHotspots(
     source.map((hotspot) => {
@@ -3403,7 +3563,7 @@ test("AB 105831 ASC uses the measured worktops, sink, and oven seams", () => {
     "ab-105831",
   );
   assert.deepEqual(claim.filter((hotspot) => hotspot.claimPartKey?.startsWith("worktop-")).map((hotspot) => hotspot.claimPartKey), [
-    "worktop-left", "worktop-right", "worktop-right",
+    "worktop-left", "worktop-right", "worktop-left", "worktop-right",
   ]);
   const sink = claim.find((hotspot) => hotspot.claimPartKey === "sink");
   assert.ok(Math.abs(sink.left - 17.65) < 0.000001);

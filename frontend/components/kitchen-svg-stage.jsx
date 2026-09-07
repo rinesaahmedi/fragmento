@@ -19,6 +19,8 @@ import {
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
 import {
+  AB_105831_FRG_ORDER_HOTSPOTS,
+  AB_105837_FRG_ORDER_HOTSPOTS,
   PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data";
@@ -437,9 +439,9 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "extractor-hood", points: [[35.49, 39.62], [35.48, 37.8], [30.0, 38.62]], preserveManualSize: true },
     { componentKey: "extractor-hood", points: [[35.48, 37.9], [47.48, 36.16], [47.48, 37.9], [35.48, 39.57]], preserveManualSize: true },
     { componentKey: "extractor-hood", points: [[36.58, 44.08], [46.38, 42.75], [46.38, 38.11], [36.58, 39.57]] },
-    { componentKey: "wall-cabinet-3", points: [[42.75, 8.32], [54.53, 6.76], [60.28, 7.78], [47.48, 9.55]] },
-    { componentKey: "wall-cabinet-3", points: [[47.48, 9.55], [59.48, 7.84], [59.48, 33.98], [47.48, 36.18]] },
-    { componentKey: "wall-cabinet-3", points: [[59.48, 7.84], [60.58, 7.78], [60.58, 33.9], [59.48, 33.98]] },
+    { componentKey: "wall-cabinet-3", points: [[42.75, 8.32], [54.83, 5.76], [60.28, 7.78], [47.48, 9.55]] },
+    { componentKey: "wall-cabinet-3", points: [[47.48, 9.55], [59.48, 7.84], [59.48, 33.98], [47.48, 37.48]] },
+    { componentKey: "wall-cabinet-3", points: [[59.48, 7.84], [60.28, 7.78], [60.28, 33.9], [59.48, 33.98]] },
     {
       componentKey: "worktop",
       points: [
@@ -1327,6 +1329,10 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
   ],
 };
 
+// FRG and ASC intentionally share the exact same AB 105831 cabinet polygons.
+IMAGE_HOTSPOTS_BY_SLUG["ab-105831"] = AB_105831_FRG_ORDER_HOTSPOTS;
+// Keep the AB 105837 order-page polygons as the shared source for ASC claims.
+IMAGE_HOTSPOTS_BY_SLUG["ab-105837"] = AB_105837_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-105815"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105819"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105809"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105813"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105805"];

@@ -2,10 +2,21 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 
 const {
+  buildClaimsTestContractAssignments,
   buildClaimsTestContractNumber,
   buildOrderItemData,
   calculateOrderTotal,
 } = require("../scripts/seed-service-claim-test-orders.js");
+
+test("duplicate kitchen codes keep the canonical AB slug on the plain 222 contract", () => {
+  const assignments = buildClaimsTestContractAssignments([
+    { id: "legacy", slug: "105806", kitchenCode: "105806" },
+    { id: "canonical", slug: "ab-105806", kitchenCode: "105806" },
+  ]);
+
+  assert.equal(assignments.get("canonical"), "222105806");
+  assert.equal(assignments.get("legacy"), "222105806-2");
+});
 
 test("builds a stable 222 contract number from the kitchen code", () => {
   assert.equal(

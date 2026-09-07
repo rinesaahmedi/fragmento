@@ -491,18 +491,19 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-faucet", points: [[69.95, 45.98], [76.1, 45.98], [76.1, 58.89], [69.95, 58.89]], preserveManualSize: true },
   ],
   "ab-105837": [
-    { componentKey: "refrigerator", points: [[10.86, 29.72], [19.92, 28.48], [29.88, 30.14], [19.92, 31.35]] },
-    { componentKey: "refrigerator", points: [[10.86, 29.72], [19.92, 31.35], [19.92, 91.0], [10.74, 89.15]] },
-    { componentKey: "refrigerator", points: [[19.92, 31.35], [29.88, 30.14], [30.09, 90.04], [19.92, 91.0]] },
-    { componentKey: "wall-cabinet-1", points: [[19.92, 15.16], [30.09, 14.17], [37.08, 13.17], [26.1, 16.0]] },
-    { componentKey: "wall-cabinet-1", points: [[19.92, 15.16], [26.1, 16.0], [26.1, 26.3], [20.05, 28.0]] },
-    { componentKey: "wall-cabinet-1", points: [[26.1, 16.0], [37.08, 13.17], [37.08, 40.18], [30.09, 39.45], [30.09, 29.68], [26.1, 26.3]] },
-    { componentKey: "wall-cabinet-2", points: [[30.09, 14.17], [41.07, 12.6], [48.02, 11.59], [37.08, 13.17]] },
-    { componentKey: "wall-cabinet-2", points: [[37.08, 13.17], [48.02, 11.59], [48.02, 38.69], [37.08, 40.38]] },
-    { componentKey: "extractor-hood", points: [[37.08, 40.38], [48.02, 38.69], [48.02, 39.78], [37.08, 41.0]] },
-    { componentKey: "wall-cabinet-3", points: [[41.07, 12.72], [54.55, 11.05], [59.76, 11.9], [48.02, 11.75]] },
-    { componentKey: "wall-cabinet-3", points: [[48.02, 11.75], [59.02, 11.96], [59.02, 36.0], [48.02, 38.55]] },
-    { componentKey: "wall-cabinet-3", points: [[59.02, 11.96], [59.76, 11.9], [59.76, 35.82], [59.02, 36.0]] },
+    { componentKey: "refrigerator", points: [[10.74, 29.62], [20.82, 28.18], [29.74, 30.02], [19.92, 31.56]] },
+    { componentKey: "refrigerator", points: [[10.74, 29.62], [19.92, 31.56], [19.92, 90.92], [10.8, 89.05]] },
+    { componentKey: "refrigerator", points: [[19.92, 31.56], [30.2, 30.02], [30.2, 89.62], [19.92, 90.92]] },
+    { componentKey: "wall-cabinet-1", points: [[20.92, 15.56], [32.09, 13.87], [37.08, 15.07], [26.1, 16.5]] },
+    { componentKey: "wall-cabinet-1", points: [[20.92, 15.5], [26.1, 16.5], [26.1, 29.25], [20.8, 28.3]] },
+    { componentKey: "wall-cabinet-1", points: [[26.1, 16.7], [37.08, 15.07], [37.08, 39.28], [30.09, 40.45], [30.09, 30.25], [26.1, 29.15]] },
+    { componentKey: "wall-cabinet-2", points: [[37.1, 15.17], [48.07, 13.6], [43.02, 12.29], [32.08, 13.87]] },
+    { componentKey: "wall-cabinet-2", points: [[37.08, 15.17], [48.02, 13.59], [48.02, 37.69], [37.08, 39.38]] },
+    { componentKey: "extractor-hood", points: [[37.09, 41.05], [37.08, 39.28], [32.08, 40.08]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[37.08, 39.38], [48.02, 37.69], [48.02, 39.38], [37.08, 41.0]], preserveManualSize: true },
+    { componentKey: "extractor-hood", points: [[38.08, 45.38], [47.02, 44.09], [47.02, 39.58], [38.08, 41.0]] },
+    { componentKey: "wall-cabinet-3", points: [[43.1, 12.22], [53.55, 10.85], [58.76, 11.9], [48.02, 13.75]] },
+    { componentKey: "wall-cabinet-3", points: [[48.02, 13.55], [60.02, 11.8], [60.02, 36.0], [48.02, 37.85]] },
     // Pixel-traced split on the red-marked wall line: source pixels
     // (1919, 1300) to (1858, 1386) in the 3509 x 2480 plan render.
     { componentKey: "worktop", points: [[30.34, 56.08], [33.07, 55.93], [43.76, 54.03], [52.05, 53.0], [53.98, 52.7], [54.687945, 52.419355], [52.949558, 55.887097], [52.05, 55.82], [41.07, 58.02], [30.34, 60.02]] },
@@ -511,11 +512,11 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     // the midpoint line from (53.015, 55.885) to (53.015, 57.4343).
     { componentKey: "worktop", points: [[30.34, 60.02], [41.07, 58.02], [52.05, 55.82], [53.015, 55.885], [53.015, 57.4343], [52.05, 57.45], [41.07, 59.05], [30.09, 60.73]], preserveManualSize: true },
     { componentKey: "worktop", points: [[53.015, 55.885], [53.98, 55.95], [61.64, 57.48], [70.85, 59.38], [80.05, 61.82], [91.22, 60.48], [91.22, 61.3], [80.05, 63.02], [70.85, 61.08], [61.64, 59.08], [53.015, 57.4343]], preserveManualSize: true },
-    { componentKey: "base-module-1", points: [[30.09, 60.3], [41.07, 58.25], [41.07, 89.01], [30.09, 90.0]] },
-    { componentKey: "oven-module", points: [[41.07, 58.25], [52.05, 56.25], [52.05, 87.42], [41.07, 89.01]] },
-    { componentKey: "base-module-2", points: [[52.05, 56.25], [61.64, 57.72], [61.64, 88.1], [52.05, 87.42]] },
-    { componentKey: "base-module-4", points: [[61.64, 57.48], [70.85, 59.38], [70.85, 89.25], [61.64, 87.85]] },
-    { componentKey: "base-module-3", points: [[70.85, 59.38], [80.05, 61.42], [80.05, 91.25], [70.85, 89.25]] },
+    { componentKey: "base-module-1", points: [[30.09, 60.73], [41.07, 59.05], [41.07, 88.51], [30.09, 89.9]] },
+    { componentKey: "oven-module", points: [[41.07, 59.05], [52.05, 57.45], [52.05, 86.8], [41.07, 88.51]] },
+    { componentKey: "base-module-2", points: [[52.05, 57.25], [61.64, 58.92], [61.64, 88.5], [52.05, 86.62]] },
+    { componentKey: "base-module-4", points: [[61.64, 59.08], [70.85, 60.88], [70.85, 90.69], [61.64, 88.69]] },
+    { componentKey: "base-module-3", points: [[70.85, 61.08], [80.05, 62.82], [80.05, 92.25], [70.85, 90.55]] },
     // The broad face at the far right is the separately claimable WU16 cabinet
     // side panel, not a second face of base-module-3.
     { componentKey: "worktop", points: [[80.05, 63.02], [91.22, 61.30], [91.22, 91.1], [80.05, 92.25]], preserveManualSize: true },
@@ -1383,38 +1384,49 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
   ],
 };
 
-// AB 105831 measured correction. The original entry above was generated from
-// a cropped draft and duplicated cabinet/worktop faces, which made ASC
-// selections paint over the CAD seams. Keep one polygon per visible face and
-// use the corrected source-elevation coordinates. Assign after the table so
-// aliases stay untouched.
-PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = [
-  { componentKey: "wall-cabinet-1", points: [[48.02, 15.55], [57.97, 16.85], [57.97, 42.35], [48.02, 40.85]] },
-  { componentKey: "wall-cabinet-2", points: [[57.97, 17.14], [67.11, 20.0], [67.11, 43.87], [57.97, 41.45]] },
-  { componentKey: "extractor-hood", points: [[60.25, 43.0], [66.85, 43.65], [66.85, 48.45], [60.25, 48.0]], preserveManualSize: true },
+// Shared source geometry from the FRG order-page configurator. ASC derives its
+// claim-only targets from these polygons instead of maintaining another set of
+// cabinet coordinates that can drift out of alignment.
+export const AB_105831_FRG_ORDER_HOTSPOTS = [
+  { componentKey: "wall-cabinet-1", points: [[48.02, 15.85], [57.97, 17.85], [57.97, 41.9], [48.02, 40.35]] },
+  { componentKey: "wall-cabinet-1", points: [[48.02, 15.85], [54.05, 15.05], [64.05, 16.85], [57.97, 17.85]] },
+  { componentKey: "wall-cabinet-2", points: [[57.97, 18.14], [67.11, 20.0], [67.11, 43.85], [57.97, 42.45]] },
+  { componentKey: "wall-cabinet-2", points: [[57.97, 18.14], [67.11, 20.0], [73.9, 19.24], [64.05, 16.85]] },
+  { componentKey: "extractor-hood", points: [[57.97, 42.05], [67.11, 43.85], [66.85, 49.85], [58.25, 48.0]], preserveManualSize: true },
+  { componentKey: "extractor-hood", points: [[66.85, 43.55], [70.55, 45.05], [66.85, 45.75]], preserveManualSize: true },
   { componentKey: "wall-cabinet-3", points: [[67.11, 20.0], [74.78, 21.25], [74.78, 45.48], [67.11, 43.87]] },
-  { componentKey: "wall-cabinet-4", points: [[74.78, 21.25], [79.37, 20.52], [79.37, 36.9], [74.78, 35.32]] },
-  { componentKey: "wall-cabinet-4", points: [[79.37, 20.52], [85.58, 21.25], [85.58, 36.9], [79.37, 36.9]] },
+  { componentKey: "wall-cabinet-3", points: [[67.11, 20.0], [74.78, 21.25], [80.87, 20.18], [73.9, 19.24]] },
+  { componentKey: "wall-cabinet-4", points: [[74.78, 21.25], [79.37, 20.52], [85.58, 21.25], [85.58, 33.9], [79.37, 34.9], [74.78, 35.32]] },
   { componentKey: "worktop", points: [[5.3, 60.85], [14.55, 59.0], [35.05, 56.45], [43.35, 58.3], [43.35, 59.8], [35.45, 60.55], [15.55, 63.8], [5.3, 62.0]] },
   { componentKey: "worktop", points: [[43.35, 58.3], [55.25, 56.75], [65.55, 59.05], [74.95, 61.0], [74.75, 62.65], [62.35, 61.55], [53.25, 60.35], [43.35, 59.8]] },
-  // Thin front face of the right worktop. Its upper edge exactly shares the
-  // top surface boundary, avoiding a white seam or an overlap above the top.
-  { componentKey: "worktop", points: [[43.35, 59.8], [53.25, 60.35], [62.35, 61.55], [74.75, 62.65], [74.75, 66.2], [59.35, 62.7], [52.25, 61.5], [45.35, 59.95]], preserveManualSize: true },
-  { componentKey: "sink-faucet", points: [[17.8, 57.5], [38.05, 56.9], [38.05, 59.35], [17.8, 60.25]], preserveManualSize: true },
-  { componentKey: "sink-faucet", points: [[25.05, 49.15], [30.8, 48.45], [30.8, 58.15], [25.05, 58.65]], preserveManualSize: true },
-  { componentKey: "base-module-1", points: [[5.3, 62.0], [14.55, 61.2], [14.55, 92.2], [5.3, 89.8]] },
-  { componentKey: "base-module-1", points: [[14.55, 61.2], [20.45, 61.75], [20.45, 91.47], [14.55, 92.2]] },
-  { componentKey: "base-module-3", points: [[20.45, 61.75], [31.45, 60.55], [31.45, 90.1], [20.45, 91.47]] },
+  { componentKey: "worktop", points: [[31.45, 60.55], [42.35, 59.8], [35.35, 60.95], [30.05, 61.5], [10.55, 62.55], [7.3, 63.05]], preserveManualSize: true },
+  { componentKey: "worktop", points: [[43.5, 59.8], [55.25, 60.35], [62.35, 61.55], [75.05, 62.65], [74.75, 66.2], [59.35, 62.7], [52.25, 61.5], [45.35, 59.95]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[25.05, 47.15], [30.8, 47.15], [30.8, 58.15], [25.05, 58.65]], preserveManualSize: true },
+  { componentKey: "base-module-1", points: [[5.3, 61.7], [14.55, 63.82], [14.55, 93.2], [5.3, 91.3]] },
+  { componentKey: "base-module-1", points: [[14.55, 63.92], [20.45, 62.75], [20.45, 92.27], [14.55, 93.2]] },
+  { componentKey: "base-module-3", points: [[20.45, 62.85], [31.45, 61.45], [31.45, 90.8], [20.45, 92.27]] },
   { componentKey: "sink-base", points: [[31.45, 61.55], [42.55, 59.8], [42.25, 89.25], [31.45, 90.8]] },
   { componentKey: "corner-blende", points: [[42.55, 59.8], [43.288686, 59.8], [43.288686, 88.442133], [42.25, 89.25]] },
-  { componentKey: "base-module-2", points: [[43.288686, 59.8], [53.25, 60.35], [53.25, 89.4], [43.288686, 88.442133]] },
+  { componentKey: "base-module-2", points: [[43.288686, 59.8], [53.25, 61.55], [53.25, 91.05], [43.288686, 89.03]] },
   { componentKey: "oven-module", points: [[53.25, 61.55], [62.35, 63.55], [62.35, 92.7], [53.25, 91.2]] },
-  { componentKey: "drawer-module", points: [[62.35, 61.55], [70.08, 62.24], [70.08, 92.56], [62.35, 91.0]] },
-  { componentKey: "base-module-4", points: [[70.08, 62.24], [74.75, 62.65], [74.75, 93.5], [70.08, 92.56]] },
-  { componentKey: "refrigerator", points: [[74.89, 34.31], [83.39, 37.34], [83.39, 96.49], [74.89, 95.16]] },
-  { componentKey: "refrigerator", points: [[83.39, 37.34], [94.33, 34.31], [94.33, 95.16], [83.39, 96.49]] },
-  { componentKey: "refrigerator", points: [[74.89, 34.31], [83.39, 32.9], [94.33, 34.31], [83.39, 37.34]] },
+  { componentKey: "drawer-module", points: [[62.35, 63.55], [70.08, 65.24], [70.08, 94.56], [62.35, 93.0]] },
+  { componentKey: "base-module-4", points: [[70.08, 65.24], [74.75, 65.95], [74.65, 95.5], [70.08, 94.56]] },
+  { componentKey: "refrigerator", points: [[74.89, 35.45], [83.39, 37.34], [83.39, 96.49], [74.89, 95.16]] },
+  { componentKey: "refrigerator", points: [[83.39, 37.34], [94.33, 35.65], [94.33, 95.16], [83.39, 96.49]] },
+  { componentKey: "refrigerator", points: [[74.78, 35.32], [79.37, 34.9], [85.58, 33.9], [94.33, 35.65], [83.39, 37.34], [74.89, 35.45]] },
 ];
+PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = AB_105831_FRG_ORDER_HOTSPOTS.flatMap((hotspot) => {
+  if (hotspot.componentKey === "sink-faucet") {
+    return [
+      { componentKey: "sink-faucet", points: [[17.8, 57.5], [38.05, 56.9], [38.05, 59.35], [17.8, 60.25]], preserveManualSize: true },
+      { componentKey: "sink-faucet", points: [[25.05, 58.3], [25.05, 52.0], [25.1, 51.1], [25.4, 50.3], [26.0, 49.7], [26.7, 49.35], [29.0, 48.4], [29.05, 47.6], [29.7, 47.65], [29.55, 51.2], [28.95, 51.1], [29.0, 50.6], [26.9, 49.9], [26.2, 50.1], [25.7, 50.5], [25.45, 51.0], [25.35, 51.7], [25.35, 58.3]], preserveManualSize: true },
+    ];
+  }
+  return [hotspot];
+});
+// AB 105837 and its perspective aliases use the same order-page source in FRG
+// and ASC. Keep one table so cabinet faces cannot drift between both flows.
+export const AB_105837_FRG_ORDER_HOTSPOTS = PLAN_HOTSPOTS_BY_SLUG["ab-105837"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105815"] = PLAN_HOTSPOTS_BY_SLUG["ab-105819"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105809"] = PLAN_HOTSPOTS_BY_SLUG["ab-105805"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105813"] = PLAN_HOTSPOTS_BY_SLUG["ab-105805"];
