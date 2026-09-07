@@ -2968,7 +2968,7 @@ test("service claim picker keeps appliance linework between worktop and applianc
   );
 });
 
-test("AB 105837 worktop surfaces split on the pixel-traced wall junction", () => {
+test("AB 105837 worktop surfaces split on the other red-marked seam", () => {
   const source = fs.readFileSync(
     path.join(repoRoot, "components", "kitchen-svg-stage.jsx"),
     "utf8",
@@ -2976,15 +2976,15 @@ test("AB 105837 worktop surfaces split on the pixel-traced wall junction", () =>
 
   assert.match(
     source,
-    /componentKey:\s*"worktop",\s*points:\s*\[\[30\.34,\s*56\.08\][\s\S]*\[54\.687945,\s*52\.419355\],\s*\[52\.949558,\s*55\.887097\]/,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[30\.34,\s*56\.08\][\s\S]*\[43\.76,\s*54\.03\],\s*\[46\.195497,\s*53\.669355\],\s*\[52\.949558,\s*55\.887097\]/,
   );
   assert.match(
     source,
-    /componentKey:\s*"worktop",\s*points:\s*\[\[54\.687945,\s*52\.419355\],\s*\[61\.64,\s*53\.95\][\s\S]*\[52\.949558,\s*55\.887097\]\]/,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[46\.195497,\s*53\.669355\],\s*\[52\.05,\s*53\.0\][\s\S]*\[52\.949558,\s*55\.887097\]\]/,
   );
   assert.doesNotMatch(
     source,
-    /componentKey:\s*"worktop",\s*points:\s*\[\[53\.98,\s*52\.7\],\s*\[61\.64,\s*53\.95\]/,
+    /componentKey:\s*"worktop",\s*points:\s*\[\[54\.687945,\s*52\.419355\],\s*\[52\.949558,\s*55\.887097\]/,
   );
   assert.match(
     source,
