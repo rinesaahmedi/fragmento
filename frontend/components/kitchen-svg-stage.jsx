@@ -216,8 +216,8 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-faucet", points: [[16.261, 48.450], [16.318, 47.724], [16.575, 46.756], [17.002, 45.970], [17.658, 45.506], [20.309, 44.800], [20.252, 45.768], [17.686, 46.474], [17.359, 46.676], [17.045, 47.119], [16.846, 47.745], [16.789, 48.390]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[16.261, 48.450], [16.789, 48.390], [16.860, 55.106], [16.375, 55.166]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[20.337, 43.771], [20.993, 43.852], [20.793, 47.462], [20.109, 47.361]], preserveManualSize: true },
-    // The exposed outer side of the fixed end sink belongs to the optional UPK20.
-    { componentKey: "sink-end-blende", points: [[12.299, 56.679], [20.038, 58.272], [19.724, 88.383], [12.299, 86.266]], preserveManualSize: true },
+    // The optional UPK20 is the narrow divider beside the fixed end sink.
+    { componentKey: "sink-base", points: [[12.299, 56.679], [20.038, 58.272], [19.724, 88.383], [12.299, 86.266]], preserveManualSize: true },
     { componentKey: "sink-end-blende", points: [[20.038, 58.272], [21.734, 58.030], [21.734, 88.202], [19.724, 88.383]], preserveManualSize: true },
     { componentKey: "sink-base", points: [[21.734, 58.030], [32.979, 56.397], [32.979, 86.588], [21.734, 88.202]], preserveManualSize: true },
     { componentKey: "base-module-3", points: [[32.979, 56.397], [44.223, 54.783], [44.223, 84.955], [32.979, 86.588]], preserveManualSize: true },

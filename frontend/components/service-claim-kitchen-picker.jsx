@@ -182,7 +182,9 @@ export default function ServiceClaimKitchenPicker({
   );
   const independentSinkBlendeId = ["ab-105745", "ab-105748", "ab-105751", "ab-105754"].includes(kitchenSlug)
     ? "component-claim-blende-sink-base"
-    : "";
+    : kitchenSlug === "ab-105758"
+      ? "component-sink-end-blende"
+      : "";
   const togglePlanComponent = useCallback((componentId) => {
     if (componentId === independentSinkBlendeId) {
       onChange((current) => current.includes(componentId)

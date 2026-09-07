@@ -400,7 +400,12 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   },
   // Exact perspective divider strokes from the 842 x 595 AB 105743 PDF.
   "ab-105743": {
-    "base-module-1": { side: "left", outer: 21.192399, inner: 21.790974 },
+    "base-module-1": {
+      side: "left",
+      outer: 21.192399,
+      inner: 21.790974,
+      preserveOuterCabinetFace: true,
+    },
     "base-module-3": {
       side: "right",
       inner: 50.194774,

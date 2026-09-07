@@ -36,8 +36,8 @@ const CLAIM_BLENDE_LABELS_BY_CODE = {
 // companions; specific plans can still expose a separately clickable surface.
 const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
 const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
-  // AB 105743's exposed left end face is part of the US30 cabinet, not an
-  // independently selectable filler-panel claim surface.
+  // The US30 and its UPK20 share a form row; only the thin PDF-drawn strip is
+  // the Blende, while the exposed outer face remains part of the cabinet.
   "ab-105743": new Set(["base-module-1"]),
   // The US50 and its supplied UPK20 share a form row, while their two PDF
   // faces remain independently selectable in the plan.
@@ -58,6 +58,7 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-105834": new Set(["base-module-3"]),
 };
 const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
+  "ab-105743": new Set(["base-module-1"]),
   "ab-104968": new Set(["base-module-1"]),
   "ab-105734": new Set(["base-module-1"]),
   "ab-105737": new Set(["base-module-1"]),
@@ -84,6 +85,16 @@ const CLAIM_STANDALONE_BLENDE_SOURCE_KEYS_BY_SLUG = {
 // its ASC hotspot is present. Expose only the missing drawn target in
 // claims; this does not modify the FRG order or its purchased-item snapshot.
 const CLAIM_DRAWN_COMPONENT_OVERRIDES_BY_SLUG = {
+  // This legacy ASC order does not always retain its optional UPK20 line, but
+  // the narrow panel is explicitly drawn and claimable on the source plan.
+  "ab-105758": [{
+    componentId: "component-sink-end-blende",
+    code: "BLENDE-AB105758-SINK-END",
+    articleCode: "UPK20",
+    name: "Filler Panel up to 20 cm",
+    nameDe: "Passblende bis 20 cm",
+    componentKey: "sink-end-blende",
+  }],
   "ab-105831": [{
     componentId: "component-corner-blende",
     code: "BLENDE-AB105831-CORNER-LEFT",
