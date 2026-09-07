@@ -21,6 +21,13 @@ export function getRequestClientIp(request) {
 }
 
 export function enforceRateLimit(key, { limit, windowMs }) {
+  // Local development involves repeated contract and claim lookups while
+  // testing. Keep those requests unrestricted without weakening deployed
+  // environments, where Next.js sets NODE_ENV to "production".
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+
   const now = Date.now();
   cleanupExpiredEntries(now);
 

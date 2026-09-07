@@ -504,6 +504,9 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       inner: 44.286121,
       outer: 42.661727,
       bands: [[42.661727, 43.54517], [43.54517, 44.286121]],
+      includeAdjacentFace: true,
+      top: 54.78,
+      bottom: 83.36,
     },
     "wall-cabinet-1": { side: "left", outer: 48.161869, inner: 48.902821 },
   },
@@ -1180,6 +1183,24 @@ function fitClaimHotspotToXRange(hotspot, minX, maxX, useExactRange = false) {
   return clipHotspotToXRange(hotspot, minX, maxX);
 }
 
+function fitClaimHotspotToExactRect(hotspot, minX, maxX, minY, maxY) {
+  if (maxX - minX < 0.01) return null;
+  const bounds = hotspotBounds(hotspot);
+  const top = Number.isFinite(minY) ? minY : bounds.top;
+  const bottom = Number.isFinite(maxY) ? maxY : bounds.bottom;
+  if (bottom - top < 0.01) return null;
+  const rectHotspot = { ...hotspot };
+  delete rectHotspot.points;
+  delete rectHotspot.clipPath;
+  return {
+    ...rectHotspot,
+    left: minX,
+    top,
+    width: maxX - minX,
+    height: bottom - top,
+  };
+}
+
 function isSameCabinetBand(sourceKey, candidateKey) {
   const isWall = String(sourceKey || "").startsWith("wall-cabinet-");
   const candidateIsWall = String(candidateKey || "").startsWith("wall-cabinet-");
@@ -1289,6 +1310,38 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
       }
     }
     const calibratedBands = Array.isArray(calibration?.bands) ? calibration.bands : null;
+    if (calibration?.includeAdjacentFace && calibratedBands?.length && sourceBlenden.length === 1) {
+      const bandValues = calibratedBands.flat().map(Number).filter(Number.isFinite);
+      const cabinetMinX = calibration.side === "left" ? Math.max(...bandValues) : sourceBounds.left;
+      const cabinetMaxX = calibration.side === "right" ? Math.min(...bandValues) : sourceBounds.right;
+      const cabinetHotspot = fitClaimHotspotToXRange(hotspot, cabinetMinX, cabinetMaxX, true);
+      const result = cabinetHotspot ? [{ ...cabinetHotspot, claimBlendeSplit: true }] : [];
+
+      calibratedBands.forEach((band, index) => {
+        const minX = Math.min(...band.map(Number));
+        const maxX = Math.max(...band.map(Number));
+        const blendeHotspot = fitClaimHotspotToExactRect(
+          hotspot,
+          minX,
+          maxX,
+          Number(calibration.top),
+          Number(calibration.bottom),
+        );
+        if (!blendeHotspot) return;
+        result.push({
+          ...blendeHotspot,
+          componentId: blende.componentId,
+          componentKey: blende.componentKey || `claim-blende-${sourceKey}`,
+          claimPartKey: "blende",
+          claimBlendeSplit: true,
+          sourceComponentKey: sourceKey,
+          blendeSide: calibration.side,
+          blendeIndex: index + 1,
+          claimBlendeAdjacentFace: index === 0,
+        });
+      });
+      return result;
+    }
     if (calibratedBands?.length && sourceBlenden.length > 1) {
       const bandSide = calibration?.side === "left" ? "left" : "right";
       const bandValues = calibratedBands.flat().map(Number).filter(Number.isFinite);

@@ -29,6 +29,7 @@ import {
 import {
   getServiceClaimLinkedComponentIds,
   SERVICE_CLAIM_PART_COMPONENT_IDS,
+  updateServiceClaimLinkedComponentSelection,
 } from "../lib/service-claim-kitchen-plan-selection";
 import {
   buildServiceClaimBlendeHotspots,
@@ -88,16 +89,13 @@ function toggleClaimComponentSelection({ currentIds, componentId, selectableComp
   const ids = getServiceClaimLinkedComponentIds(kitchenSlug, componentId).filter((id) => selectable.has(id));
   const current = new Set(currentIds);
   const shouldRemove = ids.some((id) => current.has(id));
-
-  ids.forEach((id) => {
-    if (shouldRemove) {
-      current.delete(id);
-    } else {
-      current.add(id);
-    }
+  return updateServiceClaimLinkedComponentSelection({
+    kitchenSlug,
+    currentIds,
+    componentId,
+    isSelected: !shouldRemove,
+    allowedComponentIds: selectableComponentIds,
   });
-
-  return [...current].filter((id) => selectable.has(id));
 }
 
 function toSvgClipPathId(value) {

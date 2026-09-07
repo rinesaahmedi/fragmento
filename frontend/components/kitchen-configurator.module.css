@@ -537,8 +537,8 @@
   pointer-events: none;
 }
 
-/* Claims still need the complete perspective drawing as readable context.
-   Keep unavailable parts muted without making the kitchen look fragmented. */
+/* Keep unpurchased claim-plan elements visible as muted context while the
+   purchased elements are overlaid at full opacity. */
 .claimPlanImageContext {
   opacity: 0.28;
 }

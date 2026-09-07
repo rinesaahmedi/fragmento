@@ -18,7 +18,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105813": "/jpg/AB%20105805_page-0001.jpg",
   "ab-105817": "/jpg/AB%20105805_page-0001.jpg",
   "ab-105834": "/jpg/AB%20105834_page-0001.jpg",
-  "ab-104968": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-104968": "/plans/AB%20104968.svg",
   "ab-105837": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105840": "/jpg/AB%20105837_page-0001.jpg",
   "ab-105843": "/jpg/AB%20105837_page-0001.jpg",
@@ -70,11 +70,11 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105739": "/plans/AB%20105733.svg",
   "ab-105742": "/plans/AB%20105733.svg",
   "ab-105732": "/plans/AB%20105732.svg",
-  "ab-105734": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105734": "/plans/AB%20104968.svg",
   "ab-105735": "/plans/AB%20105732.svg",
-  "ab-105737": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105737": "/plans/AB%20104968.svg",
   "ab-105738": "/plans/AB%20105732.svg",
-  "ab-105740": "/jpg/AB%20104968_page-0001.jpg",
+  "ab-105740": "/plans/AB%20104968.svg",
   "ab-105741": "/plans/AB%20105732.svg",
   "ab-105743": "/plans/AB%20105743.svg",
   "ab-105744": "/plans/AB%20105744.svg",
@@ -470,9 +470,9 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "extractor-hood", points: [[35.49, 39.62], [35.48, 37.8], [30.0, 38.62]], preserveManualSize: true },
     { componentKey: "extractor-hood", points: [[35.48, 37.9], [47.48, 36.16], [47.48, 37.9], [35.48, 39.57]], preserveManualSize: true },
     { componentKey: "extractor-hood", points: [[36.58, 44.08], [46.38, 42.75], [46.38, 38.11], [36.58, 39.57]] },
-    { componentKey: "wall-cabinet-3", points: [[42.75, 8.32], [54.83, 5.76], [60.28, 7.78], [47.48, 9.55]] },
-    { componentKey: "wall-cabinet-3", points: [[47.48, 9.55], [59.48, 7.84], [59.48, 33.98], [47.48, 37.48]] },
-    { componentKey: "wall-cabinet-3", points: [[59.48, 7.84], [60.28, 7.78], [60.28, 33.9], [59.48, 33.98]] },
+    { componentKey: "wall-cabinet-3", points: [[42.747221, 8.145161], [53.548019, 6.572581], [60.444571, 7.580645], [47.477914, 9.435484]] },
+    { componentKey: "wall-cabinet-3", points: [[47.477914, 9.435484], [59.447136, 7.741935], [59.447136, 34.233871], [47.477914, 36.008065]] },
+    { componentKey: "wall-cabinet-3", points: [[59.447136, 7.741935], [60.444571, 7.580645], [60.444571, 34.112903], [59.447136, 34.233871]] },
     {
       componentKey: "worktop",
       points: [
@@ -527,19 +527,19 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
   "ab-105825": [
     {
       componentKey: "wall-cabinet-1",
-      points: [[48.1, 12.61], [58.08, 13.78], [58.08, 39.33], [48.1, 35.63]],
+      points: [[48.1, 12.2], [57.9, 14.08], [57.9, 37.63], [48.1, 35.63]],
     },
     {
       componentKey: "wall-cabinet-1",
-      points: [[48.1, 12.61], [54.16, 10.92], [58.08, 11.72], [58.08, 13.78]],
+      points: [[48.9, 12.51], [55.16, 11.35], [63.28, 13.32], [57.78, 14.08]],
     },
     {
       componentKey: "wall-cabinet-2",
-      points: [[58.08, 13.78], [66.98, 16.3], [66.98, 39.25], [58.08, 37.42]],
+      points: [[57.9, 13.98], [66.98, 16.1], [66.98, 39.25], [57.98, 37.42]],
     },
     {
       componentKey: "wall-cabinet-2",
-      points: [[58.08, 13.78], [63.18, 12.77], [75.06, 15.29], [66.98, 16.3]],
+      points: [[58.08, 13.98], [63.18, 13.15], [72.86, 15.19], [66.5, 16.03]],
     },
     {
       componentKey: "extractor-hood",
@@ -553,23 +553,23 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "wall-cabinet-3",
-      points: [[66.98, 16.3], [75.65, 17.48], [75.65, 41.34], [66.98, 41.18]],
+      points: [[66.68, 16.1], [75.65, 17.88], [75.65, 41.34], [66.78, 39.58]],
     },
     {
       componentKey: "wall-cabinet-3",
-      points: [[66.98, 16.3], [75.65, 17.48], [80.88, 16.13], [73.87, 15.29]],
+      points: [[66.9, 16.0], [75.65, 17.88], [80.98, 17.0], [73.07, 15.09]],
     },
     {
       componentKey: "wall-cabinet-4",
-      points: [[75.65, 17.48], [80.88, 16.13], [85.99, 17.48], [80.29, 18.32]],
+      points: [[75.65, 17.88], [81.88, 17.03], [85.99, 17.8], [80.29, 18.82]],
     },
     {
       componentKey: "wall-cabinet-4",
-      points: [[75.65, 17.48], [80.29, 18.32], [80.29, 31.26], [75.65, 29.92]],
+      points: [[75.65, 17.88], [80.29, 18.7], [80.29, 31.26], [75.65, 31.92]],
     },
     {
       componentKey: "wall-cabinet-4",
-      points: [[80.29, 18.32], [85.99, 17.48], [85.99, 30.25], [80.29, 31.26]],
+      points: [[80.29, 18.82], [86.19, 17.8], [86.19, 30.25], [80.29, 31.26]],
     },
     {
       componentKey: "worktop",
