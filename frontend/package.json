@@ -13,6 +13,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "seed:px-contracts": "node scripts/seed-px-contracts.js",
     "seed:claims-test-orders": "node scripts/seed-service-claim-test-orders.js",
+    "import:arc-kitchens": "node scripts/import-arc-kitchens.cjs",
     "db:setup": "prisma migrate deploy && prisma db push --skip-generate && node prisma/seed.js",
     "test:product-info-route": "node --test test/product-info-ask-route.test.js",
     "test:service-claims-assistant-route": "node --test test/service-claims-assistant-route.test.js",
