@@ -1067,7 +1067,7 @@ test("sink, faucet, and sink-cabinet selections collapse to one choice group", (
 });
 
 
-test("60 cm dishwasher bundles split into price-list dishwasher and furniture-front claims", () => {
+test("60 cm dishwasher bundles split into matching FRG dishwasher and furniture-front claims", () => {
   const dishwasherBundle = component(
     "DISH-AB105806-600",
     "base-module-3",
@@ -1080,7 +1080,7 @@ test("60 cm dishwasher bundles split into price-list dishwasher and furniture-fr
   const claimParts = [
     {
       partKey: "dishwasher",
-      articleCode: "A-EGSPV594400",
+      articleCode: "A-EGSPV597210",
       name: "Fully Integrated Dishwasher",
       nameDe: "Vollintegrierter Geschirrspüler",
       sourceKitchenItemCode: dishwasherBundle.code,
@@ -1117,7 +1117,7 @@ test("60 cm dishwasher bundles split into price-list dishwasher and furniture-fr
     [
       {
         componentId: "component-claim-dishwasher",
-        articleCode: "A-EGSPV594400",
+        articleCode: "A-EGSPV597210",
         name: "Fully Integrated Dishwasher",
         nameDe: "Vollintegrierter Geschirrspüler",
       },
@@ -1150,7 +1150,7 @@ test("optional dishwasher claim parts stay hidden until the dishwasher is ordere
   const claimParts = [
     {
       partKey: "dishwasher",
-      articleCode: "A-EGSPV594400",
+      articleCode: "A-EGSPV597210",
       name: "Fully Integrated Dishwasher",
       nameDe: "Vollintegrierter Geschirrspüler",
       sourceKitchenItemCode: dishwasherBundle.code,
@@ -1177,7 +1177,7 @@ test("optional dishwasher claim parts stay hidden until the dishwasher is ordere
   assert.deepEqual(result.selectableComponentIds, ["component-base-module-1"]);
   assert.ok(!result.selectableComponentIds.includes("component-claim-dishwasher"));
   assert.ok(!result.selectableComponentIds.includes("component-claim-furniture-front"));
-  assert.ok(!result.selectableComponents.some((entry) => entry.code === "A-EGSPV594400"));
+  assert.ok(!result.selectableComponents.some((entry) => entry.code === "A-EGSPV597210"));
   assert.ok(!result.selectableComponents.some((entry) => entry.code === "TGV60"));
 });
 
@@ -1235,6 +1235,64 @@ test("45 cm dishwasher bundles remain unchanged without 60 cm claim parts", () =
 
   assert.deepEqual(result.selectableComponentIds, ["component-base-module-3"]);
   assert.equal(result.selectableComponents[0].articleCode, "A-EGSPV587915 + TGV45");
+});
+
+test("ASC links every 45 cm dishwasher family to its exact plan component", () => {
+  for (const { slug, code, componentKey } of [
+    { slug: "ab-105747", code: "DISH-AB105747-450", componentKey: "base-module-3" },
+    { slug: "ab-105748", code: "DISH-AB105748-450", componentKey: "base-module-3" },
+    { slug: "ab-105845", code: "DISH-AB105845-450", componentKey: "dishwasher-base" },
+    { slug: "ab-105847", code: "DISH-AB105847-450", componentKey: "base-module-5" },
+  ]) {
+    const dishwasherBundle = component(code, componentKey, "Dishwasher 45 cm", {
+      articleNumber: "A-EGSPV587915 + TGV45",
+      widthMm: 450,
+      isLocked: true,
+    });
+    const claimParts = [
+      {
+        partKey: "dishwasher",
+        articleCode: "A-EGSPV587915",
+        name: "Fully Integrated Dishwasher 45 cm",
+        sourceKitchenItemCode: code,
+        sourceComponentKey: componentKey,
+      },
+      {
+        partKey: "furniture-front",
+        articleCode: "TGV45",
+        name: "Furniture Front (Dishwasher)",
+        sourceKitchenItemCode: code,
+        sourceComponentKey: componentKey,
+      },
+    ];
+    const selection = buildServiceClaimSelectableComponents({
+      kitchen: { items: [dishwasherBundle] },
+      kitchenConfig: { components: [dishwasherBundle] },
+      kitchenSlug: slug,
+      claimParts,
+    });
+
+    assert.deepEqual(
+      selection.selectableComponentIds,
+      ["component-claim-dishwasher", "component-claim-furniture-front"],
+      `${slug} should expose the 45 cm appliance and its front`,
+    );
+    assert.deepEqual(
+      selection.selectableComponents.map((entry) => entry.articleCode),
+      ["A-EGSPV587915", "TGV45"],
+      `${slug} should not reuse the 60 cm ASC identities`,
+    );
+    assert.deepEqual(selection.visibleComponentIds, [`component-${componentKey}`]);
+
+    const sourceHotspot = PLAN_HOTSPOTS_BY_SLUG[slug].find(
+      (hotspot) => hotspot.componentKey === componentKey,
+    );
+    assert.ok(sourceHotspot, `${slug} should retain its dishwasher face`);
+    const claimHotspots = buildServiceClaimPartHotspots([sourceHotspot], claimParts, slug);
+    assert.equal(claimHotspots.length, 1);
+    assert.equal(claimHotspots[0].componentId, "component-claim-dishwasher");
+    assert.equal(claimHotspots[0].claimPartKey, "dishwasher");
+  }
 });
 
 test("L-kitchen quantity-two Blenden are exposed as independent claim selections", () => {
@@ -3351,7 +3409,7 @@ test("AB 105748 uses its measured vector plan, Excel articles, and split claim g
   assert.match(stageSource, /componentKey:\s*"wall-cabinet-3",\s*points:\s*\[\[51\.648456,\s*11\.784874\][\s\S]*\[56\.579572,\s*12\.813445\]\]/);
   assert.match(stageSource, /componentKey:\s*"sink-faucet",\s*points:\s*\[\[60\.897862,\s*45\.344538\],\s*\[65\.273159,\s*45\.344538\],\s*\[65\.273159,\s*54\.763025\],\s*\[60\.897862,\s*54\.763025\]\]/);
   assert.match(stageSource, /componentKey:\s*"worktop",\s*points:\s*\[\[72\.342043,\s*60\.127731\][\s\S]*\[82\.95962,\s*86\.547899\]/);
-  assert.match(seedSource, /const AB_105748_ITEMS[\s\S]*code:\s*"DISH-AB105748-450"[\s\S]*articleNumber:\s*"A-EGSPV597210 \+ TGV60"/);
+  assert.match(seedSource, /const AB_105748_ITEMS[\s\S]*code:\s*"DISH-AB105748-450"[\s\S]*articleNumber:\s*"A-EGSPV587915 \+ TGV45"/);
   assert.match(seedSource, /code:\s*"CAB-BASE-AB105748-US30"[\s\S]*articlePriceWithBlende\("US30",\s*"UPK20",\s*1\)/);
   assert.match(seedSource, /code:\s*"CAB-WALL-AB105748-H6002"[\s\S]*articlePriceWithBlende\("H6002",\s*"HPK2002",\s*1\)/);
   assert.match(seedSource, /slug:\s*"ab-105748"[\s\S]*items:\s*AB_105748_ITEMS/);
@@ -3491,7 +3549,6 @@ test("filter migration adds FWK124 only to the claims table", () => {
     "utf8",
   );
   const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
-
   assert.match(migration, /INSERT INTO "KitchenClaimPart"/);
   assert.match(migration, /'filter'/);
   assert.match(migration, /'FWK124'/);
@@ -3502,12 +3559,16 @@ test("filter migration adds FWK124 only to the claims table", () => {
   assert.match(seed, /partKey:\s*"filter"[\s\S]*articleCode:\s*"FWK124"/);
 });
 
-test("dishwasher migration stores the exact price-list claim identities", () => {
+test("historic dishwasher migration is superseded by the FRG-matching 60 cm correction", () => {
   const migration = fs.readFileSync(
     path.join(repoRoot, "prisma", "migrations", "20260714160000_add_dishwasher_claim_parts", "migration.sql"),
     "utf8",
   );
   const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const correction = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260908130000_correct_60cm_dishwasher_claim_article", "migration.sql"),
+    "utf8",
+  );
 
   assert.match(migration, /INSERT INTO "KitchenClaimPart"/);
   assert.match(migration, /'dishwasher', 'Fully Integrated Dishwasher', 'Vollintegrierter Geschirrspüler', 'A-EGSPV594400'/);
@@ -3515,8 +3576,36 @@ test("dishwasher migration stores the exact price-list claim identities", () => 
   assert.match(migration, /LIKE '%TGV60%'/);
   assert.doesNotMatch(migration, /TGV45|A-EGSPV587915/);
   assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
-  assert.match(seed, /partKey:\s*"dishwasher"[\s\S]*articleCode:\s*"A-EGSPV594400"/);
-  assert.match(seed, /partKey:\s*"furniture-front"[\s\S]*articleCode:\s*"TGV60"/);
+  assert.match(correction, /"articleCode" = 'A-EGSPV597210'/);
+  assert.match(correction, /part\."articleCode" = 'A-EGSPV594400'/);
+  assert.match(correction, /item\."articleNumber"[^;]*A-EGSPV597210/i);
+  assert.match(correction, /item\."articleNumber"[^;]*TGV60/i);
+  assert.match(seed, /partKey:\s*"dishwasher"[\s\S]*articleCode:\s*isDishwasher45 \? "A-EGSPV587915" : "A-EGSPV597210"/);
+  assert.match(seed, /partKey:\s*"furniture-front"[\s\S]*articleCode:\s*isDishwasher45 \? "TGV45" : "TGV60"/);
+});
+
+test("45 cm dishwasher migration backfills FRG items and ASC claim identities", () => {
+  const migration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260908120000_add_45cm_dishwasher_claim_parts", "migration.sql"),
+    "utf8",
+  );
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+
+  assert.match(migration, /upper\(item\."code"\) LIKE 'DISH-%-450'/);
+  assert.match(migration, /"articleNumber" = 'A-EGSPV587915 \+ TGV45'/);
+  assert.match(migration, /"widthMm" = 450/);
+  assert.match(migration, /'dishwasher', 'A-EGSPV587915'/);
+  assert.match(migration, /'furniture-front', 'TGV45'/);
+  assert.match(migration, /ON CONFLICT \("kitchenId", "partKey"\) DO UPDATE/);
+  assert.match(migration, /"sourceKitchenItemCode" = EXCLUDED\."sourceKitchenItemCode"/);
+  assert.match(migration, /"sourceComponentKey" = EXCLUDED\."sourceComponentKey"/);
+
+  assert.match(seed, /const isDishwasher45 = dishwasherCode\.endsWith\("-450"\)/);
+  assert.match(seed, /articleCode: isDishwasher45 \? "A-EGSPV587915" : "A-EGSPV597210"/);
+  assert.match(seed, /articleCode: isDishwasher45 \? "TGV45" : "TGV60"/);
+  assert.match(seed, /sourceKitchenItemCode: dishwasherSource\.code/);
+  assert.match(seed, /sourceComponentKey: dishwasherSource\.componentKey/);
+  assert.match(seed, /itemCode\.startsWith\("DISH-"\) && itemCode\.endsWith\("-450"\)/);
 });
 
 test("AB 105825 claim sink follows the calibrated bowl polygon", () => {

@@ -52,6 +52,8 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105753",
   "ab-105756",
   "ab-105846",
+  "ab-110140",
+  "ab-110510",
   ...AB_105846_LAYOUT_ALIAS_SLUGS,
 ]);
 
@@ -87,6 +89,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "ab-105837": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   // Four outside sink-bowl strokes measured from AB 105846's vector PDF.
   "ab-105846": [[-0.411949686, 0.97810219], [3.13836478, 0.768248175], [4.600628931, 0.894160584], [1.116352201, 1.138686131]],
+  "ab-110140": [[-0.418439702, 0.981557439], [2.950354839, 0.778688555], [4.60992953, 0.889344227], [1.148936228, 1.11475412]],
   "ab-105840": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105843": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105747": [[-1.595113, 0.977883], [-0.291908, 0.862681], [1.089858, 1.017135], [-0.359432, 1.115202]],
@@ -126,6 +129,23 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
     [33.976247, 57.606723],
     [18.185273, 60.309244],
   ],
+  "ab-110140": [
+    [31.140143, 55.751261],
+    [44.679335, 53.754622],
+    [51.349169, 54.843697],
+    [37.43943, 57.062185],
+  ],
+  "ab-110510": [
+    [59.330166, 52.685714],
+    [65.586698, 53.633613],
+    [67.011876, 52.746218],
+    [78.356295, 55.085714],
+    [78.228029, 56.235294],
+    [71.971496, 55.327731],
+    [71.102138, 56.215126],
+    [65.258907, 55.166387],
+    [59.2019, 53.87563],
+  ],
   "ab-105758": [
     [15.263658, 54.621849],
     [29.045131, 52.625210],
@@ -147,6 +167,36 @@ const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-105825", "ab-105831
 // remain intentionally generous for interaction, but painting those boxes
 // would add rectangular edges that do not exist in the kitchen drawing.
 const FAUCET_SOURCE_POINTS_BY_SLUG = {
+  "ab-110510": [
+    [67.752969, 45.163025],
+    [70.361045, 45.203361],
+    [71.729216, 47.663866],
+    [71.729216, 50.305882],
+    [72.042755, 54.157983],
+    [72.042755, 54.50084],
+    [70.902613, 54.50084],
+    [70.902613, 54.157983],
+    [71.344418, 54.319328],
+    [71.344418, 50.426891],
+    [71.216152, 50.366387],
+    [71.216152, 47.72437],
+    [70.31829, 46.110924],
+    [67.824228, 46.151261],
+  ],
+  "ab-110140": [
+    [32.821853, 55.892437],
+    [32.821853, 51.939496],
+    [32.921615, 51.919328],
+    [32.921615, 49.277311],
+    [34.07601, 46.816807],
+    [36.256532, 46.937815],
+    [36.213777, 47.885714],
+    [34.104513, 47.764706],
+    [33.349169, 49.378151],
+    [33.349169, 52.020168],
+    [33.448931, 52.020168],
+    [33.448931, 55.932773],
+  ],
   "ab-105825": [
     [24.346793, 53.109244],
     [24.346793, 47.058824],
@@ -207,6 +257,7 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 // source plan render. Keeping the values relative to the oven hotspot
 // preserves their alignment when the claim picker applies its display crop.
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
+  "ab-110140": [[1.118461627, -0.096485619], [2.112307687, -0.038977633], [1.023076953, 0.012140566], [0.029230786, -0.049201273]],
   "burger-103898": [[-0.236714976, -0.090786819], [0.869565217, -0.045729657], [0, 0.00672495], [-0.834138486, -0.025554808]],
   // Four outside cooktop strokes measured from AB 105743's vector PDF.
   "ab-105743": [
@@ -344,6 +395,18 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  "ab-110510": [
+    [30.356295, 55.54958],
+    [41.030879, 53.996639],
+    [49.054632, 55.589916],
+    [37.752969, 57.304202],
+  ],
+  "ab-110140": [
+    [67.268409, 56.678992],
+    [76.475059, 58.494118],
+    [66.384798, 60.107563],
+    [57.178147, 58.171429],
+  ],
   // AB 105825's cooktop is on the right worktop leg. These four vertices are
   // traced directly from the 842 x 595 source image (448,327)-(530,318)-
   // (600,329)-(523,338); projecting them from the oven bounds moved the mask
@@ -696,6 +759,34 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     "base-module-1": { side: "right", inner: 50.123515, outer: 52.033254 },
     "wall-cabinet-1": { side: "left", outer: 46.118765, inner: 46.988124 },
   },
+  // The narrow inside-corner face is attached to base-module-2. Treat that
+  // complete source polygon as the Blende and leave the wider right polygon
+  // as the cabinet so either click can open the same affected-part choice.
+  "ab-110140": {
+    "base-module-2": {
+      side: "left",
+      outer: 47.629454,
+      inner: 45.933492,
+      includeOuterFace: true,
+    },
+  },
+  "ab-110510": {
+    "base-module-2": { side: "right", inner: 57.035629, outer: 58.731591 },
+    "base-module-3": {
+      side: "right",
+      inner: 74.166271,
+      outer: 75.961995,
+      preserveOuterCabinetFace: true,
+    },
+    "wall-cabinet-4": {
+      side: "right",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        { left: 58.817102, right: 64.988124, top: 9.203361, bottom: 10.292437 },
+        { left: 64.061758, right: 64.988124, top: 10.151261, bottom: 34.67563 },
+      ],
+    },
+  },
 };
 for (const alias of ["ab-105822", "ab-105828"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105825"];
@@ -845,6 +936,28 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
       [51.163895, 57.42521], [51.163895, 55.912605],
     ],
   ),
+  "ab-110140": splitWorktopDefinition(
+    { left: 29.35867, top: 52.685714, width: 55.596199, height: 10.527731 },
+    // The supplier drawing continues the left (sink) worktop through the
+    // corner to 57.904988 / 54.581513. Split from there to the inner corner;
+    // using 48.627078 as the seam incorrectly gives that corner wedge to the
+    // right worktop.
+    [
+      [29.35867, 55.468908], [48.627078, 52.685714],
+      [57.904988, 54.581513], [46.859857, 56.194958],
+      [46.859857, 57.667227],
+      [29.35867, 60.067227],
+    ],
+    [
+      [57.904988, 54.581513], [84.954869, 60.147899],
+      [84.954869, 61.620168],
+      [73.909739, 63.213445], [46.859857, 57.667227],
+      [46.859857, 56.194958],
+    ],
+  ),
+  "ab-110510": {
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
+  },
   "ab-104968": splitWorktopDefinition(
     { left: 5.57, top: 50.91, width: 66.77, height: 10.64 },
     // Each polygon includes the horizontal surface and its thin front fascia.
@@ -1306,6 +1419,31 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
     if (!blende || !sourceBounds || sourceBounds.width <= 0) return [hotspot];
 
     const calibration = CLAIM_BLENDE_CALIBRATION_BY_SLUG[String(kitchenSlug || "").toLowerCase()]?.[sourceKey];
+    const wholeBlendeFaces = Array.isArray(calibration?.wholeBlendeFaces)
+      ? calibration.wholeBlendeFaces
+      : [];
+    if (wholeBlendeFaces.length) {
+      const bounds = hotspotBounds(hotspot);
+      const matchesWholeFace = wholeBlendeFaces.some((face) => (
+        Math.abs(bounds.left - Number(face.left)) <= 0.002
+        && Math.abs(bounds.right - Number(face.right)) <= 0.002
+        && Math.abs(bounds.top - Number(face.top)) <= 0.002
+        && Math.abs(bounds.bottom - Number(face.bottom)) <= 0.002
+      ));
+      if (matchesWholeFace) {
+        return [{
+          ...hotspot,
+          componentId: blende.componentId,
+          componentKey: blende.componentKey || `claim-blende-${sourceKey}`,
+          claimPartKey: "blende",
+          claimBlendeSplit: true,
+          sourceComponentKey: sourceKey,
+          blendeSide: calibration.side,
+          claimBlendeOuterFace: true,
+        }];
+      }
+      if (calibration.wholeFacesOnly) return [hotspot];
+    }
     if (calibration?.includeOuterFace) {
       const bounds = hotspotBounds(hotspot);
       const outer = Number(calibration.outer);
@@ -1757,6 +1895,22 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     const visibleSourceParts = sourceParts;
 
     return visibleSourceParts.flatMap((part) => {
+      if (hotspot.claimApplianceSurface === "cooktop") {
+        return part.partKey === "cooktop"
+          ? [existingClaimPartHotspot(hotspot, part)]
+          : [];
+      }
+      if (hotspot.claimApplianceSurface === "oven" && part.partKey === "cooktop") {
+        return [];
+      }
+      if (
+        hotspot.claimFixturePartKey
+        && sourceComponentKey === "sink-faucet"
+      ) {
+        return part.partKey === hotspot.claimFixturePartKey
+          ? [existingClaimPartHotspot(hotspot, part)]
+          : [];
+      }
       if (
         sourceComponentKey === "sink-faucet"
         && hasDedicatedSinkAndFaucetHotspots

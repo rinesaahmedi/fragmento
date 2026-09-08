@@ -247,7 +247,7 @@ test("AB 105847 keeps the hood package linked and seeds automatic contracts", ()
   assert.match(seed, /slug: "ab-105847"[\s\S]*?kitchenCode: "105 847"[\s\S]*?items: AB_105847_ITEMS/);
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "670"\)/);
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "111"\)/);
-  assert.match(seed, /DISH-AB105847-450[\s\S]*?price: "0\.00"[\s\S]*?A-EGSPV597210 \+ TGV60/);
+  assert.match(seed, /DISH-AB105847-450[\s\S]*?price: "0\.00"[\s\S]*?A-EGSPV587915 \+ TGV45/);
   for (const code of [
     "CAB-BASE-AB105847-US60-1",
     "CAB-BASE-AB105847-US30-2",
