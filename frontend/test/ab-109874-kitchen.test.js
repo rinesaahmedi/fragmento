@@ -41,6 +41,19 @@ test("AB 109874 uses its exact vector plan and polygon-only selection geometry",
   }
 });
 
+test("AB 109874 faucet tint follows the complete PDF spout instead of crossing its arc", () => {
+  const faucet = PLAN_HOTSPOTS_BY_SLUG["ab-109874"]
+    .filter((hotspot) => hotspot.componentKey === "sink-faucet");
+  const spout = faucet[1];
+
+  assert.equal(faucet.length, 3);
+  assert.equal(spout.points.length, 36);
+  assert.deepEqual(spout.points[0], [47.786223, 45.94958]);
+  assert.ok(spout.points.some(([x, y]) => x === 51.263658 && y === 47.92605));
+  assert.ok(spout.points.some(([x, y]) => x === 50.821853 && y === 48.188235));
+  assert.deepEqual(spout.points.at(-1), [47.84323, 46.816807]);
+});
+
 test("AB 109874 maps every schedule callout from 3 through 14", () => {
   const expectedByCode = {
     "SINK-BASE-AB109874-DEFAULT": "3",
@@ -93,7 +106,7 @@ test("AB 109874 is seeded as an L-shaped kitchen with six locked schedule defaul
   assert.equal((items.match(/isLocked: true/g) || []).length, 3);
   assert.match(claims, /L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-109874"/);
   assert.match(claims, /COOKTOP_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-109874"/);
-  assert.match(claims, /indexPartKeys: \["worktop-left", "worktop-right", "worktop-left", "worktop-right"\]/);
+  assert.match(claims, /"ab-109874": splitWorktopDefinition\([\s\S]*?\[31\.795724466, 52\.645378151\]/);
 });
 
 test("AB 109874 claims keep sink, faucet, cooktop, oven, drawer, and both worktop legs separate", () => {
@@ -123,7 +136,14 @@ test("AB 109874 claims keep sink, faucet, cooktop, oven, drawer, and both workto
   assert.equal(result.filter((entry) => entry.claimPartKey === "cooktop").length, 1);
   assert.equal(result.filter((entry) => entry.claimPartKey === "oven").length, 1);
   assert.equal(result.filter((entry) => entry.claimPartKey === "oven-drawer").length, 1);
-  assert.equal(result.filter((entry) => entry.claimPartKey === "worktop-left").length, 2);
-  assert.equal(result.filter((entry) => entry.claimPartKey === "worktop-right").length, 2);
+  const leftWorktop = result.filter((entry) => entry.claimPartKey === "worktop-left");
+  const rightWorktop = result.filter((entry) => entry.claimPartKey === "worktop-right");
+  const rightCornerWedge = rightWorktop.find((entry) => entry.width < 10 && entry.top < 53);
+
+  assert.equal(leftWorktop.length, 2);
+  assert.equal(rightWorktop.length, 3);
+  assert.ok(rightCornerWedge, "the return beyond the depth seam should belong to the right worktop");
+  assert.ok(Math.abs(rightCornerWedge.left - 31.795724466) < 0.000001);
+  assert.ok(Math.abs((rightCornerWedge.left + rightCornerWedge.width) - 40.346793) < 0.000001);
   assert.ok(result.every((entry) => !String(entry.clipPath || "").includes("NaN")));
 });
