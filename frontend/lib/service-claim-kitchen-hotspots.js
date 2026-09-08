@@ -400,7 +400,12 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   },
   // Exact perspective divider strokes from the 842 x 595 AB 105743 PDF.
   "ab-105743": {
-    "base-module-1": { side: "left", outer: 21.192399, inner: 21.790974 },
+    "base-module-1": {
+      side: "left",
+      outer: 21.192399,
+      inner: 21.790974,
+      preserveOuterCabinetFace: true,
+    },
     "base-module-3": {
       side: "right",
       inner: 50.194774,
@@ -434,6 +439,14 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   // AB 104968 uses complete perspective end faces. The US40 includes two
   // commercially supplied UPK20 pieces on the same narrow corner face.
   "ab-104968": {
+    // The UPK20 is only the thin strip between the exposed cabinet side and
+    // its front. Keep both cabinet faces selectable as US50 around this band.
+    "base-module-1": {
+      side: "left",
+      outer: 14.72209,
+      inner: 15.805226,
+      preserveOuterCabinetFace: true,
+    },
     "base-module-2": {
       side: "right",
       inner: 43.054632,
@@ -845,7 +858,7 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     [
       [34.817102, 52.584874], [45.719715, 51.011765],
       [72.39905, 56.477311], [72.39905, 61.640336],
-      [43.966746, 55.791597],
+      [43.966746, 55.791597], [43.966746, 54.460504],
     ],
   ),
   "ab-105825": {
@@ -1262,7 +1275,10 @@ function resolveClaimBlendeWidth(sourceKey, sourceBounds, blende, boundsByKey, c
 /** Split commercially attached cabinet Blenden into claims-only selectable areas. */
 export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = [], components = [], kitchenSlug = "") {
   const blenden = (claimBlenden || []).filter((entry) =>
-    entry?.claimPartKey === "blende" && !entry.isCompanionOption && entry.sourceComponentKey && entry.componentId,
+    entry?.claimPartKey === "blende"
+      && (!entry.isCompanionOption || entry.isPlanSelectableCompanion)
+      && entry.sourceComponentKey
+      && entry.componentId,
   );
   if (!blenden.length) return hotspots;
 
@@ -1402,6 +1418,23 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
       Boolean(calibration),
     );
     if (cabinetHotspot) result.push({ ...cabinetHotspot, claimBlendeSplit: true });
+    if (calibration?.preserveOuterCabinetFace) {
+      const outerCabinetMinX = calibration.side === "left"
+        ? sourceBounds.left
+        : Math.max(Number(calibration.inner), Number(calibration.outer));
+      const outerCabinetMaxX = calibration.side === "left"
+        ? Math.min(Number(calibration.inner), Number(calibration.outer))
+        : sourceBounds.right;
+      const outerCabinetHotspot = fitClaimHotspotToXRange(
+        hotspot,
+        outerCabinetMinX,
+        outerCabinetMaxX,
+        true,
+      );
+      if (outerCabinetHotspot) {
+        result.push({ ...outerCabinetHotspot, claimBlendeSplit: true });
+      }
+    }
 
     sides.forEach((side) => {
       const minX = calibration

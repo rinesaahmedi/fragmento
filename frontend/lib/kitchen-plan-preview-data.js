@@ -226,7 +226,9 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-faucet", points: [[16.261, 48.450], [16.789, 48.390], [16.860, 55.106], [16.375, 55.166]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[20.337, 43.771], [20.993, 43.852], [20.793, 47.462], [20.109, 47.361]], preserveManualSize: true },
     { componentKey: "sink-base", points: [[12.299, 56.679], [20.038, 58.272], [19.724, 88.383], [12.299, 86.266]], preserveManualSize: true },
-    { componentKey: "sink-base", points: [[20.038, 58.272], [21.734, 58.030], [21.734, 88.202], [19.724, 88.383]], preserveManualSize: true },
+    // UPK20 is the narrow divider beside the end sink; it is claimed on its
+    // own and must not turn the whole sink cabinet green.
+    { componentKey: "sink-end-blende", points: [[20.038, 58.272], [21.734, 58.030], [21.734, 88.202], [19.724, 88.383]], preserveManualSize: true },
     { componentKey: "sink-base", points: [[21.734, 58.030], [32.979, 56.397], [32.979, 86.588], [21.734, 88.202]], preserveManualSize: true },
     { componentKey: "base-module-3", points: [[32.979, 56.397], [44.223, 54.783], [44.223, 84.955], [32.979, 86.588]], preserveManualSize: true },
     { componentKey: "base-module-3", points: [[44.223, 54.783], [45.349, 54.622], [45.349, 84.793], [44.223, 84.955]], preserveManualSize: true },
@@ -504,10 +506,10 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "extractor-hood", points: [[38.08, 45.38], [47.02, 44.09], [47.02, 39.58], [38.08, 41.0]] },
     { componentKey: "wall-cabinet-3", points: [[43.1, 12.22], [53.55, 10.85], [58.76, 11.9], [48.02, 13.75]] },
     { componentKey: "wall-cabinet-3", points: [[48.02, 13.55], [60.02, 11.8], [60.02, 36.0], [48.02, 37.85]] },
-    // Pixel-traced split on the red-marked wall line: source pixels
-    // (1919, 1300) to (1858, 1386) in the 3509 x 2480 plan render.
-    { componentKey: "worktop", points: [[30.34, 56.08], [33.07, 55.93], [43.76, 54.03], [52.05, 53.0], [53.98, 52.7], [54.687945, 52.419355], [52.949558, 55.887097], [52.05, 55.82], [41.07, 58.02], [30.34, 60.02]] },
-    { componentKey: "worktop", points: [[54.687945, 52.419355], [61.64, 53.95], [70.85, 55.88], [80.05, 57.72], [91.22, 59.92], [91.22, 60.48], [80.05, 61.82], [70.85, 59.38], [61.64, 57.48], [53.98, 55.95], [52.949558, 55.887097]] },
+    // Keep the ASC worktop split on the other red-marked seam: source pixels
+    // (1621, 1331) to (1858, 1386) in the 3509 x 2480 plan render.
+    { componentKey: "worktop", points: [[30.34, 56.08], [33.07, 55.93], [43.76, 54.03], [46.195497, 53.669355], [52.949558, 55.887097], [52.05, 55.82], [41.07, 58.02], [30.34, 60.02]] },
+    { componentKey: "worktop", points: [[46.195497, 53.669355], [52.05, 53.0], [53.98, 52.7], [54.687945, 52.419355], [61.64, 53.95], [70.85, 55.88], [80.05, 57.72], [91.22, 59.92], [91.22, 60.48], [80.05, 61.82], [70.85, 59.38], [61.64, 57.48], [53.98, 55.95], [52.949558, 55.887097]] },
     // Split the short inside-corner fascia exactly in half. Both runs meet on
     // the midpoint line from (53.015, 55.885) to (53.015, 57.4343).
     { componentKey: "worktop", points: [[30.34, 60.02], [41.07, 58.02], [52.05, 55.82], [53.015, 55.885], [53.015, 57.4343], [52.05, 57.45], [41.07, 59.05], [30.09, 60.73]], preserveManualSize: true },
@@ -1190,7 +1192,9 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-faucet", left: 29.928741, top: 55.966387, width: 3.206651, height: 7.731092 },
     { componentKey: "base-module-1", left: 3.681710, top: 64.873950, width: 15.676960, height: 32.605042 },
     { componentKey: "sink-base", left: 19.358670, top: 64.873950, width: 15.676960, height: 32.605042 },
-    { componentKey: "base-module-2", left: 35.035629, top: 64.873950, width: 15.676960, height: 32.605042 },
+    // This drawn panel is the ordered 60 cm dishwasher. Its kitchen item and
+    // claim parts use base-module-3, so the plan hotspot must use the same key.
+    { componentKey: "base-module-3", left: 35.035629, top: 64.873950, width: 15.676960, height: 32.605042 },
     { componentKey: "oven-module", left: 50.712589, top: 64.873950, width: 15.558195, height: 32.605042 },
     { componentKey: "refrigerator", left: 69.714964, top: 30.756303, width: 14.489312, height: 66.722689 },
   ],

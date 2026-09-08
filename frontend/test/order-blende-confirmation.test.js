@@ -7,6 +7,7 @@ import {
   buildOrderSummaryHtml,
   generateOrderConfirmationPdf,
   generatePurchasedKitchenPdf,
+  loadKitchenPlanPreviewData,
 } from "../lib/email/order-notifications.js";
 
 async function extractPdfText(base64) {
@@ -93,6 +94,22 @@ test("order confirmation can generate purchased kitchen sketch attachment", asyn
   const text = await extractPdfText(pdf.base64);
   assert.doesNotMatch(text, /AB 105806 Kitchen/);
   assert.match(text, /Bestellnummer/);
+});
+
+test("purchased kitchen preview keeps the optional sink-end blende green-selectable", async () => {
+  const previewData = await loadKitchenPlanPreviewData();
+  const hotspots = previewData.hotspotsBySlug["ab-105738"] || [];
+  const sinkHotspots = hotspots.filter((hotspot) => hotspot.componentKey === "sink-base");
+  const blendeHotspots = hotspots.filter((hotspot) => hotspot.componentKey === "sink-end-blende");
+
+  assert.ok(sinkHotspots.length > 0);
+  assert.equal(blendeHotspots.length, 1);
+  assert.equal(blendeHotspots[0].left, 86.394299);
+  assert.equal(blendeHotspots[0].width, 1.296912);
+  assert.ok(
+    sinkHotspots.every((hotspot) => hotspot.left + hotspot.width <= blendeHotspots[0].left),
+    "the locked sink overlay must stop before the independently selected blende",
+  );
 });
 
 test("AB 105846 layout aliases attach their shared purchased-kitchen sketch", async () => {
