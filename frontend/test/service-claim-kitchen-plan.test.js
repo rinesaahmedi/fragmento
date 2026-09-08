@@ -3351,7 +3351,7 @@ test("AB 105748 uses its measured vector plan, Excel articles, and split claim g
   assert.match(stageSource, /componentKey:\s*"wall-cabinet-3",\s*points:\s*\[\[51\.648456,\s*11\.784874\][\s\S]*\[56\.579572,\s*12\.813445\]\]/);
   assert.match(stageSource, /componentKey:\s*"sink-faucet",\s*points:\s*\[\[60\.897862,\s*45\.344538\],\s*\[65\.273159,\s*45\.344538\],\s*\[65\.273159,\s*54\.763025\],\s*\[60\.897862,\s*54\.763025\]\]/);
   assert.match(stageSource, /componentKey:\s*"worktop",\s*points:\s*\[\[72\.342043,\s*60\.127731\][\s\S]*\[82\.95962,\s*86\.547899\]/);
-  assert.match(seedSource, /const AB_105748_ITEMS[\s\S]*code:\s*"DISH-AB105748-450"[\s\S]*articleNumber:\s*"A-EGSPV597210 \+ TGV60"/);
+  assert.match(seedSource, /const AB_105748_ITEMS[\s\S]*code:\s*"DISH-AB105748-450"[\s\S]*articleNumber:\s*"A-EGSPV587915 \+ TGV45"/);
   assert.match(seedSource, /code:\s*"CAB-BASE-AB105748-US30"[\s\S]*articlePriceWithBlende\("US30",\s*"UPK20",\s*1\)/);
   assert.match(seedSource, /code:\s*"CAB-WALL-AB105748-H6002"[\s\S]*articlePriceWithBlende\("H6002",\s*"HPK2002",\s*1\)/);
   assert.match(seedSource, /slug:\s*"ab-105748"[\s\S]*items:\s*AB_105748_ITEMS/);
