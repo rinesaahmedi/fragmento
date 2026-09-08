@@ -613,7 +613,10 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "sink-base",
-      points: [[32.19, 55.97], [43.47, 53.78], [43.47, 83.36], [32.19, 84.87]],
+      // Stop at the calibrated UPEF65 boundary. The previous 43.47% edge
+      // overlapped the independently selectable corner Blende beside it. The
+      // top follows the cabinet seam below the worktop fascia, not its surface.
+      points: [[32.19, 56.37], [42.661727, 54.78], [42.661727, 83.36], [32.19, 84.87]],
     },
     {
       componentKey: "base-module-2",

@@ -602,7 +602,9 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     },
     {
       componentKey: "sink-base",
-      points: [[32.19, 56.37], [42.67, 54.78], [42.67, 83.36], [32.19, 84.87]],
+      // Stop at the calibrated UPEF65 boundary so this cabinet never paints
+      // or captures the independently selectable corner Blende beside it.
+      points: [[32.19, 56.37], [42.661727, 54.78], [42.661727, 83.36], [32.19, 84.87]],
     },
     {
       componentKey: "base-module-2",

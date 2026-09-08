@@ -19,9 +19,14 @@ const OVEN_SERIAL_NUMBER_HELP_IMAGES = [
   { src: "/serial%20nr%20img/oven/Amica%20oven%20ARROW.png", alt: "Oven serial number location" },
 ];
 
+const EXTRACTOR_HOOD_SERIAL_NUMBER_HELP_IMAGES = [
+  { src: "/serial%20nr%20img/extractor-hood/filter-location.jpeg", alt: "Extractor hood filter covering the serial number label location" },
+  { src: "/serial%20nr%20img/extractor-hood/rating-plate.jpeg", alt: "Extractor hood serial number on the rating plate behind the filter" },
+];
+
 export const SERIAL_NUMBER_HELP_IMAGES_BY_APPLIANCE_TYPE = {
   dishwasher: DISHWASHER_SERIAL_NUMBER_HELP_IMAGES,
-  extractor_hood: GENERIC_AMICA_SERIAL_NUMBER_HELP_IMAGES,
+  extractor_hood: EXTRACTOR_HOOD_SERIAL_NUMBER_HELP_IMAGES,
   fridge: FRIDGE_SERIAL_NUMBER_HELP_IMAGES,
   freezer: FRIDGE_SERIAL_NUMBER_HELP_IMAGES,
   hob: GENERIC_AMICA_SERIAL_NUMBER_HELP_IMAGES,

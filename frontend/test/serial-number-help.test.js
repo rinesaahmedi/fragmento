@@ -20,6 +20,11 @@ test("serial-number help images are separated by appliance type", () => {
     resolvedLabel: "Fridge-freezer",
     articleCode: "OL-KGCN388140E",
   });
+  const extractorHoodImages = getSerialNumberHelpImages({
+    componentId: "component-extractor-hood",
+    resolvedLabel: "Extractor Hood",
+    articleCode: "FH664621E",
+  });
 
   assert.deepEqual(ovenImages.map((entry) => entry.src), [
     "/serial%20nr%20img/oven/Amica%20oven%20ARROW.png",
@@ -29,6 +34,10 @@ test("serial-number help images are separated by appliance type", () => {
   ]);
   assert.deepEqual(fridgeImages.map((entry) => entry.src), [
     "/serial%20nr%20img/fridge/Amica%20fridge%20ARROW.png",
+  ]);
+  assert.deepEqual(extractorHoodImages.map((entry) => entry.src), [
+    "/serial%20nr%20img/extractor-hood/filter-location.jpeg",
+    "/serial%20nr%20img/extractor-hood/rating-plate.jpeg",
   ]);
 });
 

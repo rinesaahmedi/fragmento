@@ -1251,6 +1251,44 @@ test("AB 105822 family paints both UPEF65 corner faces for one claim item", () =
   }
 });
 
+test("AB 105825 sink cabinet stops before its independently selectable corner Blende", () => {
+  const blende = {
+    componentId: "component-claim-blende-base-module-2",
+    componentKey: "claim-blende-base-module-2",
+    sourceComponentKey: "base-module-2",
+    sourceWidthMm: 600,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const splitHotspots = buildServiceClaimBlendeHotspots(
+    PLAN_HOTSPOTS_BY_SLUG["ab-105825"],
+    [blende],
+    [],
+    "ab-105825",
+  );
+  const claimHotspots = buildServiceClaimPartHotspots(
+    splitHotspots,
+    [{
+      partKey: "sink-cabinet",
+      sourceComponentKey: "sink-base",
+      componentId: "component-claim-sink-cabinet",
+    }],
+    "ab-105825",
+  );
+  const sinkCabinet = claimHotspots.find((hotspot) => hotspot.claimPartKey === "sink-cabinet");
+  const cornerBlenden = claimHotspots.filter((hotspot) => hotspot.claimPartKey === "blende");
+  const sinkRight = Math.max(...sinkCabinet.points.map(([x]) => x));
+  const blendeLeft = Math.min(...cornerBlenden.map((hotspot) => hotspot.left));
+
+  assert.deepEqual(sinkCabinet.points.slice(0, 2), [
+    [32.19, 56.37],
+    [42.661727, 54.78],
+  ]);
+  assert.equal(sinkRight, 42.661727);
+  assert.equal(blendeLeft, 42.661727);
+  assert.ok(sinkRight <= blendeLeft);
+});
+
 test("L-kitchen single Blenden use their complete PDF-drawn end faces", () => {
   const cases = [
     ["ab-105825", "wall-cabinet-1", 48.161869, 48.902821, "left"],
