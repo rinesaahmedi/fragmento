@@ -52,6 +52,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105753",
   "ab-105756",
   "ab-105846",
+  "ab-109874",
   ...AB_105846_LAYOUT_ALIAS_SLUGS,
 ]);
 
@@ -87,6 +88,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "ab-105837": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   // Four outside sink-bowl strokes measured from AB 105846's vector PDF.
   "ab-105846": [[-0.411949686, 0.97810219], [3.13836478, 0.768248175], [4.600628931, 0.894160584], [1.116352201, 1.138686131]],
+  "ab-109874": [[-1.44262254, 0.986456027], [-0.081967077, 0.855530511], [2.301639093, 1.0835215], [0.855737585, 1.198645603]],
   "ab-105840": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105843": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105747": [[-1.595113, 0.977883], [-0.291908, 0.862681], [1.089858, 1.017135], [-0.359432, 1.115202]],
@@ -125,6 +127,12 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
     [27.349169, 56.215126],
     [33.976247, 57.606723],
     [18.185273, 60.309244],
+  ],
+  "ab-109874": [
+    [40.916865, 53.996639],
+    [46.831354, 52.826891],
+    [57.192399, 54.863866],
+    [50.907363, 55.892437],
   ],
   "ab-105758": [
     [15.263658, 54.621849],
@@ -194,6 +202,7 @@ const RIGHT_LEG_COOKTOP_SLUGS = new Set([
   "ab-105825",
   "ab-105828",
   "ab-105831",
+  "ab-109874",
 ]);
 
 const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
@@ -299,6 +308,14 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
     [1.039617486, 0.014781126],
     [0.046448087, -0.040932348],
   ],
+  "ab-109874": [
+    [0, -0.050401766],
+    [1.033391937, -0.094229376],
+    [2.00175762, -0.037983912],
+    [2.00175762, -0.030679334],
+    [1.022847206, 0.010956903],
+    [0.073696586, -0.046018983],
+  ],
   "ab-105840": [
     [-0.768612, -0.055883],
     [0.245432, -0.109993],
@@ -366,6 +383,14 @@ const COOKTOP_SOURCE_POINTS_BY_SLUG = {
     [62.9453675, 58.73949125],
     [71.9418095, 60.58824375],
     [62.351547, 62.26891085],
+  ],
+  "ab-109874": [
+    [57.990499, 57.828571],
+    [66.370546, 56.618487],
+    [74.223278, 58.171429],
+    [74.223278, 58.373109],
+    [66.285036, 59.522689],
+    [58.588124, 57.94958],
   ],
 };
 
@@ -696,6 +721,29 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
     "base-module-1": { side: "right", inner: 50.123515, outer: 52.033254 },
     "wall-cabinet-1": { side: "left", outer: 46.118765, inner: 46.988124 },
   },
+  // Each filler boundary is taken from the AB 109874 CAD strokes. The base
+  // corner contains three narrow UPEF65 faces and the first base/upper units
+  // each retain their separately visible outer cabinet face.
+  "ab-109874": {
+    "base-module-1": {
+      side: "left",
+      outer: 10.845606,
+      inner: 11.871734,
+      preserveOuterCabinetFace: true,
+    },
+    "base-module-3": {
+      side: "right",
+      inner: 39.27791,
+      outer: 41.016627,
+      bands: [[39.27791, 39.534442], [39.534442, 40.346793], [40.346793, 41.016627]],
+    },
+    "wall-cabinet-1": {
+      side: "left",
+      outer: 39.733967,
+      inner: 40.546318,
+      preserveOuterCabinetFace: true,
+    },
+  },
 };
 for (const alias of ["ab-105822", "ab-105828"]) {
   CLAIM_BLENDE_CALIBRATION_BY_SLUG[alias] = CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105825"];
@@ -807,6 +855,10 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
   // scales the whole-kitchen coordinates into that polygon's small bounds.
   "burger-103898": {
     indexPartKeys: ["worktop-left", "worktop-right"],
+  },
+  // Four source polygons: top surface and fascia for each L-shaped leg.
+  "ab-109874": {
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
   },
   "ab-105805": splitWorktopDefinition(
     { left: 28.4, top: 50.4, width: 58.77, height: 8.87 },
