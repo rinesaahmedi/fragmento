@@ -101,6 +101,7 @@ test("AB 109873 maps all schedule rows and preserves dishwasher details", () => 
 test("AB 109873 links its SP120, US90 and H9002 faces and hood package", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
   const configurator = readFileSync(new URL("../components/kitchen-configurator.js", import.meta.url), "utf8");
+  const catalogPanel = readFileSync(new URL("../components/kitchen-catalog-panel.jsx", import.meta.url), "utf8");
   const picker = readFileSync(new URL("../components/service-claim-kitchen-picker.jsx", import.meta.url), "utf8");
   const items = seed.match(/const AB_109873_ITEMS = \[([\s\S]*?)\n\];/)?.[1] || "";
 
@@ -115,6 +116,15 @@ test("AB 109873 links its SP120, US90 and H9002 faces and hood package", () => {
   assert.match(items, /code: "CAB-WALL-AB109873-H9002-HPK2002-R"[^\n]+price: articlePriceWithBlende\("H9002", "HPK2002", 1\)[^\n]+widthMm: 900[^\n]+heightMm: 723[^\n]+componentKey: "wall-cabinet-5"[^\n]+articleNumber: "H9002"/);
   assert.match(seed, /H9002: 203/);
   assert.match(seed, /articleNumber: "H9002"[^\n]+price: "203\.00"/);
+  assert.match(
+    catalogPanel,
+    /viewBox="0 0 90 72\.3"[\s\S]*?x1="45"[\s\S]*?x1="40"[\s\S]*?x1="50"/,
+    "the H9002 catalog icon should show its two real cabinet fronts and handles",
+  );
+  assert.match(
+    catalogPanel,
+    /articleNumber === "H9002" && iconKey\.startsWith\("wall_cabinet"\)/,
+  );
   assert.doesNotMatch(items, /CAB-BASE-AB109873-DEFAULT-1/);
   assert.doesNotMatch(items, /CAB-BASE-AB109873-DEFAULT-2/);
   assert.doesNotMatch(items, /CAB-BASE-AB109873-DEFAULT-UPK20-R/);
