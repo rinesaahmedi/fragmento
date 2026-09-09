@@ -56,6 +56,10 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   // The left corner UPK20 is a separate kitchen item and is unaffected here.
   "ab-105831": new Set(["base-module-1", "base-module-2"]),
   "ab-105834": new Set(["base-module-3"]),
+  // The default inside-corner Blende and the cabinet on its right share the
+  // same plan area, so ASC must ask which physical part is affected.
+  "ab-110140": new Set(["base-module-2"]),
+  "ab-110510": new Set(["base-module-2", "base-module-3", "wall-cabinet-4"]),
 };
 const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
   "ab-105743": new Set(["base-module-1"]),
@@ -66,6 +70,8 @@ const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
   // The UPEF65 is paired with the US60 in the form, but the PDF contains an
   // exact divider and both pieces must remain independently selectable.
   "ab-105831": new Set(["base-module-2"]),
+  "ab-110140": new Set(["base-module-2"]),
+  "ab-110510": new Set(["base-module-2", "base-module-3", "wall-cabinet-4"]),
 };
 const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   // Both adjacent right-hand strips are independently drawn in this shared plan.
@@ -242,6 +248,14 @@ const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
       code: "HPK2002",
       name: "HPK2002 Filler Panel",
       nameDe: "HPK2002 Passblende",
+    },
+  ],
+  "ab-110140": [
+    {
+      sourceComponentKey: "base-module-2",
+      code: "BLENDE-AB110140-CORNER",
+      name: "Corner Blende",
+      nameDe: "Eckblende",
     },
   ],
 };

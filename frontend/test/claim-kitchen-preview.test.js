@@ -310,12 +310,12 @@ test("email preview falls back from a selected claim part to its actual kitchen 
     height: 20,
   };
   const selected = resolveSelectedClaimPlanHotspots({
-    selectedAreas: [{ componentId: "component-claim-dishwasher", code: "A-EGSPV594400" }],
+    selectedAreas: [{ componentId: "component-claim-dishwasher", code: "A-EGSPV597210" }],
     claimHotspots: [],
     sourceHotspots: [sourceHotspot],
     selectableComponents: [{
       componentId: "component-claim-dishwasher",
-      articleCode: "A-EGSPV594400",
+      articleCode: "A-EGSPV597210",
       sourceComponentKey: "dishwasher-base",
     }],
   });

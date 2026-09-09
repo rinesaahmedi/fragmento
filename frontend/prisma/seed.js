@@ -43,6 +43,8 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105834", "ab-105837", "ab-105840", "ab-105843",
   "ab-105747", "ab-105750", "ab-105753", "ab-105756",
   "ab-105846",
+  "ab-110140",
+  "ab-110510",
   "ab-109874",
   "ab-110401",
   ...AB_105846_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
@@ -1780,6 +1782,55 @@ const AB_105831_ITEMS = [
   ...defaultServices(),
 ];
 
+// AB 110140: L-shaped vector plan with six supplier-schedule DEFAULT rows.
+// The plan's white callout labels place row 4 on the tall left-hand refrigerator
+// and rows 3/5/6/7 on the lower run, so component keys follow those source marks.
+const AB_110140_ITEMS = [
+  defaultOvenHob({ sortOrder: 10, widthMm: 600 }),
+  defaultWorktop({ sortOrder: 20 }),
+  defaultSinkBase({
+    // Preserve callout 3 instead of normalizing to the shared legacy sink code,
+    // whose global photo label is 8 in older kitchens.
+    code: "SINK-BASE-AB110140-DEFAULT",
+    sortOrder: 30,
+    widthMm: 600,
+    depthMm: 600,
+  }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB110140-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110140-DEFAULT-SINK-RUN", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, isLocked: true, infoText: "Included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110140-DEFAULT-LEFT", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110140-DEFAULT-RIGHT", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: "0.00", widthMm: 500, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110140-H6002-HPK2002", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002 wall cabinet with the supplied HPK2002 filler panel", articleNumber: "H6002", displayArticleNumber: "H6002 + HPK2002(35E)", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110140-H6002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "H6002 wall cabinet, 60 cm", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB110140-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "HD6002 cabinet, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB110140-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110140-H5002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "135.00", widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H5002 wall cabinet, 50 cm", articleNumber: "H5002" },
+  defaultSinkWorktop({ sortOrder: 120 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
+// AB 110510: L-shaped vector plan with six supplier-schedule DEFAULT rows.
+// Rows 6, 7, and 11 include commercially linked Blenden whose bracketed
+// amounts are added to the source cabinet price.
+const AB_110510_ITEMS = [
+  defaultOvenHob({ sortOrder: 10, widthMm: 600 }),
+  defaultWorktop({ sortOrder: 20 }),
+  defaultSinkBase({ code: "SINK-BASE-AB110510-DEFAULT", componentKey: "sink-base", sortOrder: 30, widthMm: 400, depthMm: 600 }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB110510-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-LEFT", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: "0.00", widthMm: 450, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, isLocked: true, infoText: "Included with the default kitchen configuration" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-CORNER", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: blendePrice("UPEF65", 1), widthMm: 400, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Included cabinet with UPEF65 corner filler panel", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-SINK-RUN", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: blendePrice("UPK20", 1), widthMm: 400, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included cabinet with UPK20 filler panel", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110510-H4502", name: "Wall Cabinet", nameDe: "Oberschrank", price: "139.00", widthMm: 450, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H4502 wall cabinet, 45 cm", articleNumber: "H4502" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB110510-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002 cabinet, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB110510-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110510-H4002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "130.00", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H4002 wall cabinet, 40 cm", articleNumber: "H4002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110510-H6002-HPK2002", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002 wall cabinet with HPK2002 filler panel", articleNumber: "H6002", displayArticleNumber: "H6002 + HPK2002(35E)", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ sortOrder: 120 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 const AB_105825_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", widthMm: 600, heightMm: null, depthMm: null, iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-base", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
@@ -2499,6 +2550,22 @@ const DEFAULT_KITCHENS = [
     name: "105744",
     description: "Kitchen configuration based on frontend/public/jpg/AB 105744_page-0001.jpg",
     items: AB_105744_ITEMS,
+  },
+  {
+    slug: "ab-110140",
+    kitchenCode: "110 140",
+    name: "110140",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 110140.svg",
+    items: AB_110140_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-110510",
+    kitchenCode: "110 510",
+    name: "110510",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 110510.svg",
+    items: AB_110510_ITEMS,
+    reconcileExisting: true,
   },
 ];
 
@@ -3283,7 +3350,11 @@ async function main() {
       const catalogDims = catalogArticleNumber
         ? catalogArticleDimsByNumber.get(catalogArticleNumber)
         : null;
-      const resolvedWidthMm = pickCatalogDimension(catalogDims?.widthMm, item.widthMm);
+      // A 45 cm dishwasher must keep the FRG width even if an existing database row
+      // was previously linked to the generic 60 cm dishwasher catalog article.
+      const resolvedWidthMm = itemCode.startsWith("DISH-") && itemCode.endsWith("-450")
+        ? Number(rawItem.widthMm) || 450
+        : pickCatalogDimension(catalogDims?.widthMm, item.widthMm);
       const resolvedHeightMm = pickCatalogDimension(catalogDims?.heightMm, item.heightMm);
       const resolvedDepthMm = pickCatalogDimension(catalogDims?.depthMm, item.depthMm);
       const itemForName = { ...item, widthMm: resolvedWidthMm };
@@ -3494,35 +3565,36 @@ async function main() {
       });
     }
 
-    const dishwasher60Source = claimSourceItems.find((item) => (
+    const dishwasherSource = claimSourceItems.find((item) => (
       item?.isActive !== false
       && String(item?.code || "").toUpperCase().startsWith("DISH-")
-      && !String(item?.code || "").toUpperCase().endsWith("-450")
       && String(item?.articleNumber || "")
         .split("+")
-        .some((articleCode) => articleCode.trim().toUpperCase() === "TGV60")
+        .some((articleCode) => ["TGV45", "TGV60"].includes(articleCode.trim().toUpperCase()))
     ));
-    if (dishwasher60Source) {
+    if (dishwasherSource) {
+      const dishwasherCode = String(dishwasherSource.code || "").trim().toUpperCase();
+      const dishwasherArticles = String(dishwasherSource.articleNumber || "")
+        .split("+")
+        .map((articleCode) => articleCode.trim().toUpperCase());
+      const isDishwasher45 = dishwasherCode.endsWith("-450")
+        || dishwasherArticles.includes("TGV45");
       const dishwasherClaimParts = [
         {
           partKey: "dishwasher",
-          articleCode: "A-EGSPV594400",
-          name: "Fully Integrated Dishwasher",
-          nameDe: "Vollintegrierter Geschirrspüler",
+          articleCode: isDishwasher45 ? "A-EGSPV587915" : "A-EGSPV597210",
+          name: isDishwasher45 ? "Fully Integrated Dishwasher 45 cm" : "Fully Integrated Dishwasher",
+          nameDe: isDishwasher45 ? "Vollintegrierter Geschirrspüler 45 cm" : "Vollintegrierter Geschirrspüler",
           sortOrder: 32,
         },
         {
           partKey: "furniture-front",
-          articleCode: "TGV60",
+          articleCode: isDishwasher45 ? "TGV45" : "TGV60",
           name: "Furniture Front (Dishwasher)",
           nameDe: "Möbelfront (Geschirrspüler)",
           sortOrder: 34,
         },
-      ].map((part) => (
-        kitchen.slug === "burger-103898" && part.partKey === "dishwasher"
-          ? { ...part, articleCode: "A-EGSPV597210" }
-          : part
-      ));
+      ];
       for (const part of dishwasherClaimParts) {
         await prisma.kitchenClaimPart.upsert({
           where: {
@@ -3533,15 +3605,23 @@ async function main() {
           },
           update: {
             ...part,
-            sourceKitchenItemCode: dishwasher60Source.code,
-            sourceComponentKey: dishwasher60Source.componentKey,
+            sourceKitchenItemCode: dishwasherSource.code,
+            sourceComponentKey: dishwasherSource.componentKey,
+            ...(isDishwasher45 ? {
+              productImagePath: null,
+              productInfoPdfPath: null,
+              productInfoSummary: null,
+              productInfoKeyFacts: null,
+              productInfoExtractedText: null,
+              productInfoUpdatedAt: null,
+            } : {}),
             isActive: true,
           },
           create: {
             kitchenId: kitchenRecord.id,
             ...part,
-            sourceKitchenItemCode: dishwasher60Source.code,
-            sourceComponentKey: dishwasher60Source.componentKey,
+            sourceKitchenItemCode: dishwasherSource.code,
+            sourceComponentKey: dishwasherSource.componentKey,
             isActive: true,
           },
         });
