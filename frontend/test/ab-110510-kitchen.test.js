@@ -45,6 +45,15 @@ test("AB 110510 uses its vector plan and covers every visible perspective face",
   assert.ok(keys.includes("extractor-hood"));
 });
 
+test("AB 110510 FRG extractor selection follows the complete left side seam", () => {
+  const stage = readFileSync(new URL("../components/kitchen-svg-stage.jsx", import.meta.url), "utf8");
+
+  assert.match(
+    stage,
+    /componentKey: "extractor-hood", points: \[\[32\.437055, 39\.294118\], \[34\.631829, 38\.931092\], \[34\.631829, 40\.625210\]\]/,
+  );
+});
+
 test("AB 110510 preserves six DEFAULT rows and the corrected Excel schedule", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
   const block = seed.match(/const AB_110510_ITEMS = \[([\s\S]*?)\n\];/)?.[1] || "";
@@ -110,6 +119,17 @@ test("AB 110510 claims preserve exact sink, faucet, cooktop, and worktop polygon
   const sink = result.find((hotspot) => hotspot.claimPartKey === "sink");
   assert.ok(Math.abs(sink.left - 59.2019) < 0.000001);
   assert.ok(Math.abs(sink.top - 52.685714) < 0.000001);
+  assert.deepEqual(sink.points, [
+    [59.330166, 53.633613],
+    [65.586698, 52.685714],
+    [67.011876, 52.746218],
+    [78.356295, 55.085714],
+    [78.228029, 55.327731],
+    [71.971496, 56.235294],
+    [71.102138, 56.215126],
+    [65.258907, 55.226891],
+    [59.2019, 53.87563],
+  ]);
   assert.ok(result.every((hotspot) => !String(hotspot.clipPath).includes("NaN")));
 });
 

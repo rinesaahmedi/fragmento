@@ -9,6 +9,8 @@ import {
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data.js";
 import { buildServiceClaimPartHotspots } from "../lib/service-claim-kitchen-hotspots.js";
+import { buildServiceClaimComponentChoiceGroups } from "../lib/service-claim-component-choices.js";
+import { buildServiceClaimSelectableComponents } from "../lib/service-claim-kitchen-plan-selection.js";
 import { prepareKitchenPlanPreview } from "../lib/kitchen-plan-preview.js";
 
 const slug = "ab-109955";
@@ -68,6 +70,8 @@ test("AB 109955 preserves all ten schedule rows, prices, and four defaults", () 
     assert.match(items, new RegExp(`${code}[^;]+price: "${price}"`));
   }
   assert.match(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+catalogArticleNumber: "H6002"/);
+  assert.match(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+displayArticleNumber: "H6002 \+ HPK2002"/);
+  assert.doesNotMatch(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+HPK2002\s*\(35E\)/);
 });
 
 test("AB 109955 maps PDF callouts and links the complete hood package", () => {
@@ -124,5 +128,40 @@ test("AB 109955 keeps dishwasher markings light and exposes exact ASC parts", ()
   assert.equal(result.filter((entry) => entry.claimPartKey === "oven").length, 1);
   assert.equal(result.filter((entry) => entry.claimPartKey === "oven-drawer").length, 1);
   assert.equal(result.filter((entry) => entry.claimPartKey === "cooktop").length, 1);
+  const ovenDrawer = result.find((entry) => entry.claimPartKey === "oven-drawer");
+  assert.equal(ovenDrawer.top + ovenDrawer.height, 87.092437);
   assert.ok(result.every((entry) => !String(entry.clipPath || "").includes("NaN")));
+});
+
+test("AB 109955 exposes the sink Blende as its own claim row", () => {
+  const sinkBase = {
+    itemType: "COMPONENT",
+    code: "SINK-BASE-AB109955-DEFAULT-UPK20",
+    name: "Sink Lower Cabinet",
+    nameDe: "Spülenunterschrank",
+    componentKey: "sink-base",
+    widthMm: 600,
+    isLocked: true,
+    blendeCode: "UPK20",
+    blendeLabel: "UPK20 20 cm",
+  };
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items: [sinkBase] },
+    kitchenConfig: { components: [sinkBase] },
+    kitchenSlug: slug,
+    claimParts: [
+      { partKey: "sink-cabinet", sourceKitchenItemCode: sinkBase.code, sourceComponentKey: "sink-base" },
+      { partKey: "sink", sourceKitchenItemCode: sinkBase.code, sourceComponentKey: "sink-base" },
+      { partKey: "faucet", sourceKitchenItemCode: sinkBase.code, sourceComponentKey: "sink-base" },
+    ],
+  });
+  const blende = selection.selectableComponents.find(
+    (entry) => entry.componentId === "component-claim-blende-sink-base",
+  );
+  const sinkGroup = buildServiceClaimComponentChoiceGroups(selection.selectableComponents)
+    .find((group) => group.triggerComponentId === "component-claim-sink-cabinet");
+
+  assert.equal(blende?.isStandaloneClaimOption, true);
+  assert.ok(selection.selectableComponentIds.includes(blende.componentId));
+  assert.ok(!sinkGroup.options.some((option) => option.componentId === blende.componentId));
 });

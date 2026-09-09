@@ -82,6 +82,7 @@ const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
 };
 const CLAIM_BLENDE_META_OVERRIDES_BY_SLUG = {};
 const CLAIM_STANDALONE_BLENDE_SOURCE_KEYS_BY_SLUG = {
+  "ab-109955": new Set(["sink-base"]),
   "ab-105745": new Set(["sink-base"]),
   "ab-105748": new Set(["sink-base"]),
   "ab-105751": new Set(["sink-base"]),

@@ -50,6 +50,19 @@ test("AB 110140 uses its sharp vector plan and exact perspective faces", () => {
   assert.ok(keys.includes("extractor-hood"));
 });
 
+test("AB 110140 FRG extractor selection includes the fascia and bounded right side", () => {
+  const stage = readFileSync(new URL("../components/kitchen-svg-stage.jsx", import.meta.url), "utf8");
+
+  assert.match(
+    stage,
+    /componentKey: "extractor-hood", points: \[\[70\.959620, 43\.206723\], \[76\.118765, 44\.255462\], \[70\.959620, 44\.900840\]\]/,
+  );
+  assert.match(
+    stage,
+    /componentKey: "extractor-hood", points: \[\[61\.695962, 41\.290756\], \[70\.959620, 43\.206723\], \[70\.959620, 44\.900840\], \[61\.695962, 42\.984874\]\]/,
+  );
+});
+
 test("AB 110140 schedule preserves six DEFAULT rows and all priced articles", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
   const block = seed.match(/const AB_110140_ITEMS = \[([\s\S]*?)\n\];/)?.[1] || "";

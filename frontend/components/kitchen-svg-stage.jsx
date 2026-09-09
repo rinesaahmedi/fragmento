@@ -1432,6 +1432,9 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-110140"] = [
   { componentKey: "wall-cabinet-2", points: [[52.418052, 14.971429], [58.674584, 14.063866], [67.952494, 15.979832], [61.695962, 16.887395]], preserveManualSize: true },
   { componentKey: "wall-cabinet-3", points: [[61.695962, 16.887395], [70.959620, 18.783193], [70.959620, 43.206723], [61.695962, 41.290756]], preserveManualSize: true },
   { componentKey: "wall-cabinet-3", points: [[61.695962, 16.887395], [67.952494, 15.979832], [77.230404, 17.875630], [70.959620, 18.783193]], preserveManualSize: true },
+  // The pull-out hood has a front fascia plus a separate right side face.
+  // End the side face at the PDF's short diagonal seam (CAD point 5341,2764).
+  { componentKey: "extractor-hood", points: [[70.959620, 43.206723], [76.118765, 44.255462], [70.959620, 44.900840]], preserveManualSize: true },
   { componentKey: "extractor-hood", points: [[61.695962, 41.290756], [70.959620, 43.206723], [70.959620, 44.900840], [61.695962, 42.984874]], preserveManualSize: true },
   { componentKey: "wall-cabinet-4", points: [[70.959620, 18.783193], [78.698337, 20.376471], [78.698337, 44.800000], [70.959620, 43.206723]], preserveManualSize: true },
   { componentKey: "wall-cabinet-4", points: [[70.959620, 18.783193], [77.230404, 17.875630], [84.954869, 19.468908], [78.698337, 20.376471]], preserveManualSize: true },
@@ -1459,6 +1462,9 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-110510"] = [
   { componentKey: "wall-cabinet-1", points: [[26.351544, 15.737815], [34.631829, 14.547899], [34.631829, 38.931092], [30.356295, 39.636975], [30.356295, 29.250420], [26.351544, 28.423529]], preserveManualSize: true },
   { componentKey: "wall-cabinet-2", points: [[29.372922, 13.458824], [40.418052, 11.865546], [45.662708, 12.954622], [34.631829, 14.547899]], preserveManualSize: true },
   { componentKey: "wall-cabinet-2", points: [[34.631829, 14.547899], [45.662708, 12.954622], [45.662708, 37.337815], [34.631829, 38.931092]], preserveManualSize: true },
+  // Left side face of the pull-out hood, trimmed at the PDF's short diagonal
+  // seam so the selection does not continue along the unrelated upper line.
+  { componentKey: "extractor-hood", points: [[32.437055, 39.294118], [34.631829, 38.931092], [34.631829, 40.625210]], preserveManualSize: true },
   { componentKey: "extractor-hood", points: [[34.631829, 38.931092], [45.662708, 37.337815], [45.662708, 39.032000], [34.631829, 40.625210]], preserveManualSize: true },
   { componentKey: "wall-cabinet-3", points: [[40.418052, 11.865546], [47.771971, 10.796639], [53.030879, 11.885714], [45.662708, 12.954622]], preserveManualSize: true },
   { componentKey: "wall-cabinet-3", points: [[45.662708, 12.954622], [53.030879, 11.885714], [53.030879, 36.268908], [45.662708, 37.337815]], preserveManualSize: true },
