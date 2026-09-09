@@ -61,6 +61,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105846": "/plans/AB%20105846.svg",
   "ab-109873": "/plans/AB%20109873.svg",
   "ab-109874": "/plans/AB%20109874.svg",
+  "ab-109955": "/plans/AB%20109955.svg",
   "ab-110401": "/plans/AB%20110401.svg",
   "105845-modul-2": "/plans/AB%20105845.svg",
   "ab-105833": "/plans/AB%20105833.svg",
@@ -101,6 +102,7 @@ export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
   "burger-103898": { width: 842, height: 595 },
   "ab-109873": { width: 842, height: 595 },
   "ab-109874": { width: 842, height: 595 },
+  "ab-109955": { width: 842, height: 595 },
   "ab-110401": { width: 842, height: 595 },
   "ab-105845": { width: 800, height: 600 },
   "ab-105847": { width: 800, height: 600 },
@@ -135,6 +137,10 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
   "ab-109874": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 50.64, top: 66.64, width: 6.64, height: 7.4, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 53.35, top: 76.83, width: 2.2, height: 2.35, persistWhenSelected: true },
+  ],
+  "ab-109955": [
+    { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 17.472684, top: 70.211765, width: 10.308789, height: 6.070588, persistWhenSelected: true },
+    { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 21.505938, top: 79.085714, width: 2.280285, height: 2.944538, persistWhenSelected: true },
   ],
   "ab-110401": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 40.25, top: 67.95, width: 10.2, height: 8.7, persistWhenSelected: true },
@@ -209,6 +215,30 @@ export const AB_109873_FRG_ORDER_HOTSPOTS = [
   { componentKey: "sink-faucet", points: [[18.228029, 55.610084], [19.054632, 55.610084], [19.054632, 62.951261], [18.228029, 62.951261]], preserveManualSize: true },
   { componentKey: "sink-faucet", points: [[17.885986, 58.453782], [19.396675, 58.453782], [19.396675, 60.107563], [17.885986, 60.107563]], preserveManualSize: true },
   { componentKey: "sink-faucet", points: [[17.885986, 62.951261], [19.396675, 62.951261], [19.396675, 63.213445], [17.885986, 63.213445]], preserveManualSize: true },
+];
+
+// AB 109955 is a straight elevation. Every boundary below comes directly from
+// the 842 x 595 PDF vectors; the two left fillers remain part of their supplied
+// sink/upper-cabinet packages instead of becoming dead strips.
+export const AB_109955_FRG_ORDER_HOTSPOTS = [
+  { componentKey: "wall-cabinet-1", points: [[0.39905, 23.280672], [16.289786, 23.280672], [16.289786, 44.578151], [0.39905, 44.578151]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-2", points: [[16.289786, 23.280672], [28.774347, 23.280672], [28.774347, 44.578151], [16.289786, 44.578151]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-3", points: [[28.774347, 23.280672], [41.273159, 23.280672], [41.273159, 44.578151], [28.774347, 44.578151]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-4", points: [[41.273159, 23.280672], [53.75772, 23.280672], [53.75772, 44.578151], [41.273159, 44.578151]], preserveManualSize: true },
+  { componentKey: "extractor-hood", points: [[41.273159, 44.578151], [53.75772, 44.578151], [53.75772, 46.05042], [41.273159, 46.05042]], preserveManualSize: true },
+  { componentKey: "worktop", points: [[0.39905, 60.047059], [53.75772, 60.047059], [53.75772, 61.236975], [0.39905, 61.236975]], preserveManualSize: true },
+  // Lower selections include the complete plinth down to the final PDF line.
+  { componentKey: "sink-base", points: [[0.39905, 61.236975], [16.289786, 61.236975], [16.289786, 87.092437], [0.39905, 87.092437]], preserveManualSize: true },
+  { componentKey: "dishwasher-base", points: [[16.289786, 61.236975], [28.774347, 61.236975], [28.774347, 87.092437], [16.289786, 87.092437]], preserveManualSize: true },
+  { componentKey: "base-module-1", points: [[28.774347, 61.236975], [41.273159, 61.236975], [41.273159, 87.092437], [28.774347, 87.092437]], preserveManualSize: true },
+  { componentKey: "oven-module", points: [[41.273159, 61.236975], [53.75772, 61.236975], [53.75772, 87.092437], [41.273159, 87.092437]], preserveManualSize: true },
+  { componentKey: "refrigerator", points: [[54.940618, 34.070588], [66.513064, 34.070588], [66.513064, 86.648739], [54.940618, 86.648739]], preserveManualSize: true },
+  // Faucet cap, body, handles and pedestal follow the separate vector outlines.
+  { componentKey: "sink-faucet", points: [[12.912114, 54.117647], [13.567696, 54.117647], [13.567696, 55.045378], [12.912114, 55.045378]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[12.741093, 54.702521], [13.724466, 54.702521], [13.724466, 59.845378], [12.741093, 59.845378]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[12.684086, 56.336134], [12.912114, 56.336134], [12.912114, 57.52605], [12.684086, 57.52605]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[13.567696, 56.336134], [13.795724, 56.336134], [13.795724, 57.52605], [13.567696, 57.52605]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[12.655582, 59.845378], [13.824228, 59.845378], [13.824228, 60.047059], [12.655582, 60.047059]], preserveManualSize: true },
 ];
 
 // Exact visible faces traced from the 842 x 595 vector source PDF. Perspective
@@ -1566,6 +1596,7 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = AB_105831_FRG_ORDER_HOTSPOTS.flatMap((hotsp
 });
 PLAN_HOTSPOTS_BY_SLUG["ab-109873"] = AB_109873_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-109874"] = AB_109874_FRG_ORDER_HOTSPOTS;
+PLAN_HOTSPOTS_BY_SLUG["ab-109955"] = AB_109955_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 // AB 105837 and its perspective aliases use the same order-page source in FRG
 // and ASC. Keep one table so cabinet faces cannot drift between both flows.

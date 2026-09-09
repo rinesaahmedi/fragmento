@@ -20,6 +20,7 @@ const CORNER_BLENDE_MIN_HEIGHT = 15;
 const CORNER_BLENDE_EDGE_TOLERANCE = 1.2;
 const CORNER_BLENDE_VERTICAL_TOLERANCE = 0.35;
 const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
+  "ab-109955": { rightLimit: 70.5 },
   "ab-105833": { bottomPadding: 4, bottomLimit: 84 },
   "ab-105842": { bottomPadding: 4.8 },
   "ab-105845": { bottomPadding: 4.8, leftPadding: 3, rightLimit: 100 },
