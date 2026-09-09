@@ -59,6 +59,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105857": "/plans/AB%20105845.svg",
   "ab-105860": "/plans/AB%20105845.svg",
   "ab-105846": "/plans/AB%20105846.svg",
+  "ab-109873": "/plans/AB%20109873.svg",
   "ab-109874": "/plans/AB%20109874.svg",
   "ab-109955": "/plans/AB%20109955.svg",
   "ab-110401": "/plans/AB%20110401.svg",
@@ -99,6 +100,7 @@ export const PLAN_IMAGE_BY_SLUG = {
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
   "burger-103898": { width: 842, height: 595 },
+  "ab-109873": { width: 842, height: 595 },
   "ab-109874": { width: 842, height: 595 },
   "ab-109955": { width: 842, height: 595 },
   "ab-110401": { width: 842, height: 595 },
@@ -127,6 +129,10 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
   "burger-103898": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 66.449, top: 72.222, width: 8.85, height: 7.95 },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 69.962, top: 82.595, width: 1.924, height: 3.489 },
+  ],
+  "ab-109873": [
+    { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 37.45, top: 75.7, width: 14.8, height: 7.7, persistWhenSelected: true },
+    { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 43.4, top: 87.5, width: 3.1, height: 3.95, persistWhenSelected: true },
   ],
   "ab-109874": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 50.64, top: 66.64, width: 6.64, height: 7.4, persistWhenSelected: true },
@@ -183,6 +189,33 @@ const AB_105846_LAYOUT_ALIAS_SLUGS = [
 AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   PLAN_IMAGE_BY_SLUG[slug] = PLAN_IMAGE_BY_SLUG["ab-105846"];
 });
+
+// Exact cabinet rectangles and fixture silhouettes from the 842 x 595 vector
+// PDF. The end HPK2002/UPK20 faces are intentionally included with their
+// adjoining schedule cabinets, while dishwasher internals stay light grey.
+export const AB_109873_FRG_ORDER_HOTSPOTS = [
+  { componentKey: "wall-cabinet-1", left: 4.275534, top: 16.141176, width: 16.532067, height: 27.267227, preserveManualSize: true },
+  { componentKey: "wall-cabinet-2", left: 20.807601, top: 16.141176, width: 15.990499, height: 27.267227, preserveManualSize: true },
+  { componentKey: "wall-cabinet-3", left: 36.798100, top: 16.141176, width: 15.990499, height: 27.267227, preserveManualSize: true },
+  { componentKey: "wall-cabinet-4", left: 52.788599, top: 16.221849, width: 15.990498, height: 27.267227, preserveManualSize: true },
+  { componentKey: "extractor-hood", left: 52.788599, top: 43.489076, width: 15.990498, height: 1.875630, preserveManualSize: true },
+  { componentKey: "under-cabinet-light", points: [[56.408551, 46.695798], [57.078385, 46.695798], [57.762470, 46.695798], [58.646081, 49.862185], [57.078385, 49.862185], [55.524941, 49.862185]], preserveManualSize: true },
+  { componentKey: "under-cabinet-light", points: [[64.503563, 46.695798], [65.187648, 46.695798], [65.857482, 46.695798], [66.741093, 49.862185], [65.187648, 49.862185], [63.634204, 49.862185]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-5", left: 68.779097, top: 16.221849, width: 11.985749, height: 27.267227, preserveManualSize: true },
+  { componentKey: "wall-cabinet-6", left: 80.764846, top: 16.221849, width: 14.394299, height: 27.267227, preserveManualSize: true },
+  { componentKey: "worktop", left: 4.275534, top: 63.213445, width: 90.883611, height: 1.512605, preserveManualSize: true },
+  // Each lower-unit selection continues through its own plinth/toe-kick section
+  // to the final PDF baseline at 97.842017%, without crossing cabinet dividers.
+  { componentKey: "sink-base", left: 4.275534, top: 64.726050, width: 16.532067, height: 33.115967, preserveManualSize: true },
+  { componentKey: "base-module-1", left: 20.807601, top: 64.726050, width: 15.990499, height: 33.115967, preserveManualSize: true },
+  { componentKey: "dishwasher-base", left: 36.798100, top: 64.726050, width: 15.990499, height: 33.115967, preserveManualSize: true },
+  { componentKey: "oven-module", left: 52.788599, top: 64.726050, width: 15.990498, height: 33.115967, preserveManualSize: true },
+  { componentKey: "base-module-2", left: 68.779097, top: 64.726050, width: 11.985749, height: 33.115967, preserveManualSize: true },
+  { componentKey: "base-module-3", left: 80.764846, top: 64.726050, width: 14.394299, height: 33.115967, preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[18.228029, 55.610084], [19.054632, 55.610084], [19.054632, 62.951261], [18.228029, 62.951261]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[17.885986, 58.453782], [19.396675, 58.453782], [19.396675, 60.107563], [17.885986, 60.107563]], preserveManualSize: true },
+  { componentKey: "sink-faucet", points: [[17.885986, 62.951261], [19.396675, 62.951261], [19.396675, 63.213445], [17.885986, 63.213445]], preserveManualSize: true },
+];
 
 // AB 109955 is a straight elevation. Every boundary below comes directly from
 // the 842 x 595 PDF vectors; the two left fillers remain part of their supplied
@@ -1561,6 +1594,7 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = AB_105831_FRG_ORDER_HOTSPOTS.flatMap((hotsp
   }
   return [hotspot];
 });
+PLAN_HOTSPOTS_BY_SLUG["ab-109873"] = AB_109873_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-109874"] = AB_109874_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-109955"] = AB_109955_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
