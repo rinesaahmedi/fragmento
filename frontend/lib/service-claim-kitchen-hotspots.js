@@ -424,6 +424,14 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  // The straight elevation exposes the complete 600 mm cooktop/worktop segment
+  // directly above the oven source cabinet.
+  "ab-109955": [
+    [41.273159, 60.047059],
+    [53.75772, 60.047059],
+    [53.75772, 61.236975],
+    [41.273159, 61.236975],
+  ],
   "ab-110510": [
     [30.356295, 55.54958],
     [41.030879, 53.996639],
@@ -902,6 +910,8 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   // on this line and the independently selectable drawer starts on the same line.
   "ab-105743": 0.661358,
   "ab-105748": 0.66065,
+  // Extend through the complete oven unit to its lower horizontal end line.
+  "ab-105757": 0.8019469404861692,
   // Exact seam joining the oven quad to the drawer quad in the vector PDF.
   "ab-105758": 0.8229792919171677,
   "ab-105808": 0.681,
@@ -927,6 +937,20 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-109955": {
+    oven: [
+      [41.273159, 61.236975],
+      [53.75772, 61.236975],
+      [53.75772, 78.339496],
+      [41.273159, 78.339496],
+    ],
+    "oven-drawer": [
+      [41.273159, 78.339496],
+      [53.75772, 78.339496],
+      [53.75772, 82.534454],
+      [41.273159, 82.534454],
+    ],
+  },
   "ab-110401": {
     oven: [
       [50.87886, 57.929412],

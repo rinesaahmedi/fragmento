@@ -21,6 +21,7 @@ import {
 import {
   AB_110401_FRG_ORDER_HOTSPOTS,
   AB_109874_FRG_ORDER_HOTSPOTS,
+  AB_109955_FRG_ORDER_HOTSPOTS,
   AB_105831_FRG_ORDER_HOTSPOTS,
   AB_105837_FRG_ORDER_HOTSPOTS,
   PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
@@ -124,6 +125,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105860": "/plans/AB%20105845.svg",
   "ab-105846": "/plans/AB%20105846.svg",
   "ab-109874": "/plans/AB%20109874.svg",
+  "ab-109955": "/plans/AB%20109955.svg",
   "ab-110401": "/plans/AB%20110401.svg",
   "105845-modul-2": "/plans/AB%20105845.svg",
   "ab-105833": "/plans/AB%20105833.svg",
@@ -1340,6 +1342,7 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
 // FRG and ASC intentionally share the exact same AB 105831 cabinet polygons.
 IMAGE_HOTSPOTS_BY_SLUG["ab-105831"] = AB_105831_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-109874"] = AB_109874_FRG_ORDER_HOTSPOTS;
+IMAGE_HOTSPOTS_BY_SLUG["ab-109955"] = AB_109955_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 // Keep the AB 105837 order-page polygons as the shared source for ASC claims.
 IMAGE_HOTSPOTS_BY_SLUG["ab-105837"] = AB_105837_FRG_ORDER_HOTSPOTS;
@@ -1582,6 +1585,11 @@ const BASE_PLINTH_EXTENSION_PERCENT = 5.25;
 // plinth is included and do not extend (avoids double-counting on older hotspot maps).
 const BASE_PLINTH_ALREADY_INCLUDED_GAP = 8;
 const PLAN_DISPLAY_CROP_TUNING_BY_SLUG = {
+  // Keep a small visual margin after the refrigerator instead of retaining
+  // the unused right third of the source CAD sheet.
+  "ab-109955": {
+    rightLimit: 70.5,
+  },
   // AB 105833 has a split run with a large blank page area below the lower cabinets.
   // Keep the crop close to the plinth/floor line instead of carrying the full page tail.
   "ab-105833": {

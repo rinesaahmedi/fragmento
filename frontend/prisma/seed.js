@@ -1736,6 +1736,25 @@ const AB_109874_ITEMS = [
   ...defaultServices(),
 ];
 
+// AB 109955: straight four-module kitchen traced from the supplied vector PDF.
+// Schedule rows 1, 2, 3 and 5 are DEFAULT and remain selected and locked.
+const AB_109955_ITEMS = [
+  defaultOvenHob({ sortOrder: 10, widthMm: 600 }),
+  defaultWorktop({ sortOrder: 20 }),
+  { itemType: ItemType.COMPONENT, code: "SINK-BASE-AB109955-DEFAULT-UPK20", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: blendePrice("UPK20", 1), widthMm: 600, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Included sink base cabinet with supplied UPK20 filler panel", articleNumber: "DEFAULT", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB109955-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: "579.00", widthMm: 600, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 40, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109955-DEFAULT", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: "0.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, isLocked: true, infoText: "Included with the default kitchen configuration", articleNumber: "DEFAULT" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB109955-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 60, infoText: "Freestanding fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109955-H6002-HPK2002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002 wall cabinet with supplied HPK2002 filler panel", articleNumber: "H6002", displayArticleNumber: "H6002 + HPK2002(35E)", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109955-H6002-2", name: "Wall Cabinet", nameDe: "Oberschrank", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H6002 wall cabinet, 60 cm", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109955-H6002-3", name: "Wall Cabinet", nameDe: "Oberschrank", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "H6002 wall cabinet, 60 cm", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB109955-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "HD6002 cabinet, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB109955-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  defaultSinkWorktop({ sortOrder: 110 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // AB 110401: L-shaped kitchen traced from the supplied vector PDF. Schedule
 // rows 1-5, 7 and 8 are DEFAULT and remain selected and locked.
 const AB_110401_ITEMS = [
@@ -2491,6 +2510,14 @@ const DEFAULT_KITCHENS = [
     name: "109874",
     description: "L-shaped kitchen configuration based on frontend/public/pdfs/AB 109874.pdf",
     items: AB_109874_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-109955",
+    kitchenCode: "109 955",
+    name: "109955",
+    description: "Straight kitchen configuration based on frontend/public/pdfs/AB 109955.pdf",
+    items: AB_109955_ITEMS,
     reconcileExisting: true,
   },
   {

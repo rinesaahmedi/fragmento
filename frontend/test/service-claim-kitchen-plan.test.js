@@ -3088,6 +3088,23 @@ test("AB 105758 ASC uses the exact sink, cooktop, oven, and drawer vector faces"
   assert.equal((cooktop.clipPath.match(/,/g) || []).length, 4);
 });
 
+test("AB 105757 ASC extends the oven selection to its lower end line", () => {
+  const result = buildServiceClaimPartHotspots([
+    { componentKey: "oven-module", left: 13.12, top: 63.4, width: 14.05, height: 23.86 },
+  ], [
+    { partKey: "oven", sourceComponentKey: "oven-module" },
+    { partKey: "oven-drawer", sourceComponentKey: "oven-module" },
+  ], "ab-105757");
+  const oven = result.find((entry) => entry.claimPartKey === "oven");
+  const drawer = result.find((entry) => entry.claimPartKey === "oven-drawer");
+
+  assert.equal(oven.left, 13.12);
+  assert.equal(oven.top, 63.4);
+  assert.ok(Math.abs(oven.width - 14.05) < 0.000001);
+  assert.ok(Math.abs(oven.top + oven.height - 82.534454) < 0.000001);
+  assert.ok(Math.abs(drawer.top - 82.534454) < 0.000001);
+});
+
 test("selected service claim components have accessible per-row remove buttons", () => {
   const source = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
 
