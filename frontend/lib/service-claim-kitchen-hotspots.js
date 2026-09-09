@@ -507,6 +507,23 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  // AB 109873 stores each 90 cm cabinet as one commercial item but draws it
+  // with two door hotspots. Its filler is the complete outer end face after
+  // x=92.764846, not the internal door seam at x=80.764846.
+  "ab-109873": {
+    "base-module-2": {
+      hotspotSourceKey: "base-module-3",
+      side: "right",
+      inner: 92.764846,
+      outer: 95.159145,
+    },
+    "wall-cabinet-5": {
+      hotspotSourceKey: "wall-cabinet-6",
+      side: "right",
+      inner: 92.764846,
+      outer: 95.159145,
+    },
+  },
   // AB 109955 combines the 600 mm sink cabinet and its UPK20 in one FRG
   // hotspot. In ASC, split them on the exact x=267 PDF divider so the left
   // filler is independently claimable and the sink cabinet starts beside it.
@@ -1554,9 +1571,13 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
   );
   const blendenBySourceKey = new Map();
   blenden.forEach((entry) => {
-    const current = blendenBySourceKey.get(entry.sourceComponentKey) || [];
+    const entryCalibration = CLAIM_BLENDE_CALIBRATION_BY_SLUG[
+      String(kitchenSlug || "").toLowerCase()
+    ]?.[entry.sourceComponentKey];
+    const hotspotSourceKey = entryCalibration?.hotspotSourceKey || entry.sourceComponentKey;
+    const current = blendenBySourceKey.get(hotspotSourceKey) || [];
     current.push(entry);
-    blendenBySourceKey.set(entry.sourceComponentKey, current);
+    blendenBySourceKey.set(hotspotSourceKey, current);
   });
 
   return (hotspots || []).flatMap((hotspot) => {
@@ -1566,7 +1587,11 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
     const sourceBounds = boundsByKey.get(sourceKey);
     if (!blende || !sourceBounds || sourceBounds.width <= 0) return [hotspot];
 
-    const calibration = CLAIM_BLENDE_CALIBRATION_BY_SLUG[String(kitchenSlug || "").toLowerCase()]?.[sourceKey];
+    const calibrationBySourceKey = CLAIM_BLENDE_CALIBRATION_BY_SLUG[
+      String(kitchenSlug || "").toLowerCase()
+    ];
+    const calibration = calibrationBySourceKey?.[blende.sourceComponentKey]
+      || calibrationBySourceKey?.[sourceKey];
     const wholeBlendeFaces = Array.isArray(calibration?.wholeBlendeFaces)
       ? calibration.wholeBlendeFaces
       : [];
@@ -1585,7 +1610,7 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
           componentKey: blende.componentKey || `claim-blende-${sourceKey}`,
           claimPartKey: "blende",
           claimBlendeSplit: true,
-          sourceComponentKey: sourceKey,
+          sourceComponentKey: blende.sourceComponentKey || sourceKey,
           blendeSide: calibration.side,
           claimBlendeOuterFace: true,
         }];
@@ -1605,7 +1630,7 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
           componentKey: blende.componentKey || `claim-blende-${sourceKey}`,
           claimPartKey: "blende",
           claimBlendeSplit: true,
-          sourceComponentKey: sourceKey,
+          sourceComponentKey: blende.sourceComponentKey || sourceKey,
           blendeSide: calibration.side,
           claimBlendeOuterFace: true,
         }];
@@ -1636,7 +1661,7 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
           componentKey: blende.componentKey || `claim-blende-${sourceKey}`,
           claimPartKey: "blende",
           claimBlendeSplit: true,
-          sourceComponentKey: sourceKey,
+          sourceComponentKey: blende.sourceComponentKey || sourceKey,
           blendeSide: calibration.side,
           blendeIndex: index + 1,
           claimBlendeAdjacentFace: index === 0,
@@ -1674,7 +1699,7 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
           componentKey: sourceBlende.componentKey,
           claimPartKey: "blende",
           claimBlendeSplit: true,
-          sourceComponentKey: sourceKey,
+          sourceComponentKey: sourceBlende.sourceComponentKey || sourceKey,
           blendeSide: bandSide,
           blendeIndex: index + 1,
         });
@@ -1737,7 +1762,7 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
         componentKey: blende.componentKey || `claim-blende-${sourceKey}`,
         claimPartKey: "blende",
         claimBlendeSplit: true,
-        sourceComponentKey: sourceKey,
+        sourceComponentKey: blende.sourceComponentKey || sourceKey,
         blendeSide: side,
       });
     });

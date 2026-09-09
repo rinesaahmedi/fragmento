@@ -38,7 +38,7 @@ const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
 const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   // SP120, its sink, faucet and supplied UPK20 are one initial ASC set.
   // The affected-part control can then narrow the claim to any single part.
-  "ab-109873": new Set(["sink-base"]),
+  "ab-109873": new Set(["sink-base", "base-module-2", "wall-cabinet-5"]),
   // The US30 and its UPK20 share a form row; only the thin PDF-drawn strip is
   // the Blende, while the exposed outer face remains part of the cabinet.
   "ab-105743": new Set(["base-module-1"]),
@@ -65,7 +65,7 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-110510": new Set(["base-module-2", "base-module-3", "wall-cabinet-4"]),
 };
 const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
-  "ab-109873": new Set(["sink-base"]),
+  "ab-109873": new Set(["sink-base", "base-module-2", "wall-cabinet-5"]),
   "ab-105743": new Set(["base-module-1"]),
   "ab-104968": new Set(["base-module-1"]),
   "ab-105734": new Set(["base-module-1"]),
@@ -395,6 +395,15 @@ const LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS = new Set([
 ]);
 
 const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  // US90 has two adjacent 45 cm fronts but is one commercial cabinet. Keep
+  // both faces synchronized in ASC and collapse them to one claim form row.
+  "ab-109873": [[
+    "component-base-module-2",
+    "component-base-module-3",
+  ], [
+    "component-wall-cabinet-5",
+    "component-wall-cabinet-6",
+  ]],
   // Burger 103898 draws the hood cabinet, extractor and its two LED symbols as
   // one supplied assembly. Keep all three claim targets in sync when any face
   // of that assembly is clicked, hovered, or removed.
@@ -443,6 +452,31 @@ export function getServiceClaimLinkedComponentIds(kitchenSlug, componentId) {
     .find((group) => group.includes(normalizedComponentId));
 
   return linkedGroup ? [...linkedGroup] : [componentId];
+}
+
+/**
+ * Store one stable, canonical id for each commercial component that is drawn
+ * with multiple linked faces. The plan may still expand that id back to every
+ * face for painting, while contextual part choices (for example a filler
+ * panel) can replace the complete component without leaving a second face
+ * selected in form state.
+ */
+export function normalizeServiceClaimLinkedComponentSelection(
+  kitchenSlug,
+  componentIds = [],
+) {
+  const seenIds = new Set();
+  const normalizedIds = [];
+
+  for (const componentId of componentIds || []) {
+    const linkedIds = getServiceClaimLinkedComponentIds(kitchenSlug, componentId);
+    const normalizedId = linkedIds[0] || componentId;
+    if (seenIds.has(normalizedId)) continue;
+    seenIds.add(normalizedId);
+    normalizedIds.push(normalizedId);
+  }
+
+  return normalizedIds;
 }
 
 export function updateServiceClaimLinkedComponentSelection({

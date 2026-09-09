@@ -1720,23 +1720,23 @@ const AB_105846_LAYOUT_ALIAS_ITEMS = AB_105846_ITEMS_WITH_SINK_END_BLENDE.map((i
 
 // AB 109873: straight 330 cm run traced from the supplied vector PDF. The
 // white PDF callouts place rows 1-7 on the base run and rows 8-13 on the wall
-// run. The two left-hand 60 cm faces form one locked SP120 sink cabinet; ASC
-// selects both faces together while keeping one commercial article. The two
-// parenthesized Blenden use the centralized EUR 25 / EUR 35 schedule prices.
+// run. The two left-hand 60 cm faces form one locked SP120 sink cabinet and
+// the two right-hand 45 cm faces form one locked US90 lower cabinet. The two
+// right-hand upper faces form one optional H9002 wall cabinet. FRG and ASC
+// select each pair together while keeping one commercial article per pair.
+// The parenthesized Blenden use the centralized EUR 25 / EUR 35 schedule prices.
 const AB_109873_ITEMS = [
   defaultOvenHob({ sortOrder: 10, widthMm: 600 }),
   defaultWorktop({ sortOrder: 20, widthMm: 3300, depthMm: 600 }),
   defaultSinkBase({ code: "SINK-BASE-AB109873-SP120", sortOrder: 30, widthMm: 1200, heightMm: 878, depthMm: 600, articleNumber: "SP120", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1), price: blendePrice("UPK20", 1), infoText: "Included SP120 sink cabinet with UPK20 filler panel" }),
   { itemType: ItemType.COMPONENT, code: "DISH-AB109873-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109873-DEFAULT-2", name: "Base cabinet", nameDe: "Unterschrank", price: "0.00", widthMm: 450, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Base cabinet included with the default kitchen configuration", articleNumber: "DEFAULT" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109873-DEFAULT-UPK20-R", name: "Base cabinet", nameDe: "Unterschrank", price: blendePrice("UPK20", 1), widthMm: 450, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included base cabinet with right UPK20 filler panel", articleNumber: "DEFAULT", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109873-US90", name: "Lower Cabinet with Drawer 90 cm", nameDe: "Unterschrank mit Schublade 90 cm", price: articlePriceWithBlende("US90", "UPK20", 1), widthMm: 900, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Included US90 lower cabinet with right UPK20 filler panel", articleNumber: "US90", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109873-H6002-HPK2002-L", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002 wall cabinet with left HPK2002 filler panel", articleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 35 cm", blendePrice: blendePrice("HPK2002", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109873-H6002-2", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "H6002 wall cabinet", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109873-H6002-3", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 600, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H6002 wall cabinet", articleNumber: "H6002" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB109873-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 600, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "HD6002 cabinet, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB109873-FH664621E", name: "FH664621E Extractor Hood", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 112, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109873-H4502-1", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H4502"), widthMm: 450, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H4502 wall cabinet", articleNumber: "H4502" },
-  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109873-H4502-HPK2002-R", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H4502", "HPK2002", 1), widthMm: 450, heightMm: 720, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 130, infoText: "H4502 wall cabinet with right HPK2002 filler panel", articleNumber: "H4502", blendeCode: "HPK2002", blendeLabel: "HPK2002 35 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB109873-H9002-HPK2002-R", name: "Upper Cabinet 90 cm", nameDe: "Oberschrank 90 cm", price: articlePriceWithBlende("H9002", "HPK2002", 1), widthMm: 900, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, infoText: "H9002 upper cabinet with right HPK2002 filler panel", articleNumber: "H9002", blendeCode: "HPK2002", blendeLabel: "HPK2002 35 cm", blendePrice: blendePrice("HPK2002", 1) },
   defaultSinkWorktop({ sortOrder: 140 }),
   ...defaultAccessories(),
   ...defaultServices(),
@@ -2559,7 +2559,7 @@ const DEFAULT_KITCHENS = [
     slug: "ab-109873",
     kitchenCode: "109 873",
     name: "109873",
-    description: "Linear kitchen configuration based on frontend/public/pdfs/AB 109873.pdf",
+    description: "Linear kitchen configuration based on frontend/public/pdfs/AB 109873 fin.pdf",
     items: AB_109873_ITEMS,
     reconcileExisting: true,
   },
