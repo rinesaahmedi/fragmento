@@ -3497,26 +3497,6 @@
   line-height: 1.35;
 }
 
-.deliveryHeaderTitle {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.deliveryHeaderTitle span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 24px;
-  padding: 0 10px;
-  border: 1px solid rgba(42, 145, 85, 0.18);
-  border-radius: 999px;
-  background: #eef8f1;
-  color: #257147;
-  font-size: 0.74rem;
-  font-weight: 800;
-}
-
 .summaryKeyValueGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));

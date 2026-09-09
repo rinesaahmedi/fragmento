@@ -764,10 +764,7 @@ export default function PublicKitchenOrderForm({
           <div className={[styles.orderSectionCard, styles.deliverySectionCard].join(" ")}>
             <div className={styles.orderSectionHeader}>
               <div>
-                <div className={styles.deliveryHeaderTitle}>
-                  <h3>{translate("order.deliveryTitle", "Preferred delivery")}</h3>
-                  <span>{translate("order.deliveryBadge", "Recommended")}</span>
-                </div>
+                <h3>{translate("order.deliveryTitle", "Preferred delivery")}</h3>
                 <p>
                   {translate("order.deliveryWeekHelp", "Choose how many weeks after your order you would prefer delivery.")}
                 </p>

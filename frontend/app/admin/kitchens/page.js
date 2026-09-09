@@ -21,11 +21,12 @@ import {
 } from "../../../components/admin-ui";
 import { AdminShell } from "../../../components/admin-shell";
 import { AdminPagination } from "../../../components/admin-pagination";
-import { AdminDateTime, AdminKitchenDisplayName, AdminPluralText, AdminStatusBadge, AdminText, AdminTranslatedTextarea } from "../../../components/admin-i18n";
+import { AdminDateTime, AdminKitchenDisplayName, AdminPluralText, AdminStatusBadge, AdminText, AdminTranslatedInput, AdminTranslatedTextarea } from "../../../components/admin-i18n";
 import AdminSelect from "../../../components/admin-select";
 import { listKitchensForAdmin } from "../../../lib/catalog";
 import { listCatalogPrograms } from "../../../lib/catalog-programs";
 import { getFormMessage } from "../../../lib/admin-forms";
+import { filterAdminKitchens, normalizeKitchenSearchQuery } from "../../../lib/admin-kitchen-search";
 import { requireAdminPage } from "../../../lib/auth";
 import { paginateAdminItems } from "../../../lib/admin-pagination";
 
@@ -46,7 +47,9 @@ export default async function AdminKitchensPage({ searchParams }) {
     listKitchensForAdmin(),
     listCatalogPrograms(),
   ]);
-  const pagination = paginateAdminItems(allKitchens, resolvedSearchParams.page);
+  const kitchenSearchQuery = normalizeKitchenSearchQuery(resolvedSearchParams.q);
+  const filteredKitchens = filterAdminKitchens(allKitchens, kitchenSearchQuery);
+  const pagination = paginateAdminItems(filteredKitchens, resolvedSearchParams.page);
   const kitchens = pagination.items;
 
   return (
@@ -104,6 +107,40 @@ export default async function AdminKitchensPage({ searchParams }) {
         <AdminSection
           title={<AdminText i18nKey="adminShellLogin.kitchens" fallback="Kitchens" />}
         >
+          <form action="/admin/kitchens" method="get" style={searchPanelStyle}>
+            <label style={searchFieldStyle}>
+              <span><AdminText i18nKey="kitchensAdmin.search" fallback="Search kitchens" /></span>
+              <AdminTranslatedInput
+                name="q"
+                type="search"
+                defaultValue={kitchenSearchQuery}
+                placeholderKey="kitchensAdmin.searchPlaceholder"
+                placeholderFallback="Search by kitchen name, code, or program..."
+                style={searchInputStyle}
+              />
+            </label>
+            <div style={searchActionsStyle}>
+              <button type="submit" style={primaryButtonStyle}>
+                <AdminText i18nKey="kitchensAdmin.searchButton" fallback="Search" />
+              </button>
+              {kitchenSearchQuery ? (
+                <ActionLink href="/admin/kitchens">
+                  <AdminText i18nKey="kitchensAdmin.clearSearch" fallback="Clear" />
+                </ActionLink>
+              ) : null}
+            </div>
+          </form>
+
+          {kitchenSearchQuery ? (
+            <p style={searchResultsStyle}>
+              <AdminText
+                i18nKey="kitchensAdmin.searchResults"
+                fallback="{shown} of {total} kitchens found"
+                values={{ shown: String(filteredKitchens.length), total: String(allKitchens.length) }}
+              />
+            </p>
+          ) : null}
+
           <div className="admin-list-table" style={tableWrapStyle}>
             <table style={tableStyle}>
               <thead>
@@ -217,4 +254,42 @@ export default async function AdminKitchensPage({ searchParams }) {
     </AdminShell>
   );
 }
+
+const searchPanelStyle = {
+  display: "flex",
+  gap: 12,
+  alignItems: "end",
+  flexWrap: "wrap",
+  padding: "16px 18px",
+  border: "1px solid var(--app-border)",
+  borderRadius: 16,
+  background: "var(--app-surface-muted)",
+};
+
+const searchFieldStyle = {
+  display: "grid",
+  gap: 8,
+  flex: "1 1 320px",
+  color: "var(--app-text)",
+  fontWeight: 700,
+};
+
+const searchInputStyle = {
+  ...inputStyle,
+  width: "100%",
+  minHeight: 48,
+};
+
+const searchActionsStyle = {
+  display: "flex",
+  gap: 10,
+  alignItems: "center",
+  flexWrap: "wrap",
+};
+
+const searchResultsStyle = {
+  margin: 0,
+  color: "var(--app-text-muted)",
+  fontSize: 14,
+};
 
