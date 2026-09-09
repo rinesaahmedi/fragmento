@@ -1747,9 +1747,9 @@ const AB_109873_ITEMS = [
 const AB_109874_ITEMS = [
   defaultOvenHob({ sortOrder: 10, widthMm: 600 }),
   defaultWorktop({ sortOrder: 20 }),
-  defaultSinkBase({ code: "SINK-BASE-AB109874-DEFAULT", sortOrder: 30, widthMm: 600, depthMm: 600 }),
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109874-DEFAULT-UPK20", name: "Base cabinet", nameDe: "Unterschrank", price: blendePrice("UPK20", 1), widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, isLocked: true, infoText: "Included base cabinet with UPK20 filler panel", articleNumber: "DEFAULT", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109874-DEFAULT-2", name: "Base cabinet", nameDe: "Unterschrank", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 50, isLocked: true, infoText: "Base cabinet included with the default kitchen configuration", articleNumber: "DEFAULT" },
+  defaultSinkBase({ code: "SINK-BASE-AB109874-DEFAULT", sortOrder: 30, widthMm: 1250, heightMm: 878, depthMm: 600, articleNumber: "SPEB125", infoText: "Included SPEB125 sink cabinet" }),
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109874-DEFAULT-UPK20", name: "Lower Cabinet 50 cm", nameDe: "Unterschrank 50 cm", price: blendePrice("UPK20", 1), widthMm: 500, heightMm: 878, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, isLocked: true, infoText: "Included U50 lower cabinet with UPK20 filler panel", articleNumber: "U50", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109874-DEFAULT-2", name: "Lower Cabinet 60 cm", nameDe: "Unterschrank 60 cm", price: "0.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 50, isLocked: true, infoText: "Included U60 lower cabinet", articleNumber: "U60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109874-US60-UPEF65", name: "Base cabinet with drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US60", "UPEF65", 1), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 60, infoText: "US60 base storage cabinet with UPEF65 corner filler panel", articleNumber: "US60", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB109874-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 70, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109874-DEFAULT-3", name: "Base cabinet", nameDe: "Unterschrank", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-4", sortOrder: 80, isLocked: true, infoText: "Base cabinet included with the default kitchen configuration", articleNumber: "DEFAULT" },
@@ -3594,10 +3594,11 @@ async function main() {
       item?.isActive !== false
       && String(item?.componentKey || "").toLowerCase() === "sink-faucet"
     ));
-    const isSp120SinkCabinet = String(sinkCabinet?.articleNumber || "").trim().toUpperCase() === "SP120";
+    const sinkCabinetArticleCode = String(sinkCabinet?.articleNumber || "").trim().toUpperCase() || "SP60";
+    const isSp120SinkCabinet = sinkCabinetArticleCode === "SP120";
     for (const part of [
       { partKey: "sink", articleCode: "526335", name: "Built-in Sink BLANCO TIPO 45 S", nameDe: "Einbau-Spüle BLANCO TIPO 45 S", source: sinkFixture, sortOrder: 10 },
-      { partKey: "sink-cabinet", articleCode: isSp120SinkCabinet ? "SP120" : "SP60", name: isSp120SinkCabinet ? "Sink Base Cabinet 120 cm" : "Sink Lower Cabinet", nameDe: isSp120SinkCabinet ? "Spülenschrank 120 cm" : "Spülen-Unterschrank", source: sinkCabinet, sortOrder: 20 },
+      { partKey: "sink-cabinet", articleCode: sinkCabinetArticleCode, name: isSp120SinkCabinet ? "Sink Base Cabinet 120 cm" : "Sink Lower Cabinet", nameDe: isSp120SinkCabinet ? "Spülenschrank 120 cm" : "Spülen-Unterschrank", source: sinkCabinet, sortOrder: 20 },
       { partKey: "faucet", articleCode: "517720", name: "Kitchen Faucet BLANCO DARAS HD", nameDe: "Küchenarmatur BLANCO DARAS HD", source: sinkFixture, sortOrder: 30 },
     ]) {
       if (!part.source) continue;

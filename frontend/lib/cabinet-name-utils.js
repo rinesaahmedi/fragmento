@@ -1,4 +1,5 @@
 const LOWER_CABINET_ICON_KEYS = new Set([
+  "base_cabinet_plain",
   "base_cabinet_30",
   "drawer_base",
   "drawer_base_two",
@@ -114,6 +115,7 @@ export function getCabinetWidthMm(item) {
 
 export function getCabinetKind(item) {
   const code = normalizeCode(item?.code);
+  const articleNumber = normalizeCode(item?.articleNumber);
   const iconKey = normalizeKey(item?.iconKey);
   const componentKey = normalizeKey(item?.componentKey);
   const name = normalizeKey(item?.name);
@@ -121,6 +123,9 @@ export function getCabinetKind(item) {
   if (!code && !iconKey && !componentKey && !name) return null;
   if (EXCLUDED_CABINET_CODE_PREFIXES.some((prefix) => code.startsWith(prefix))) return null;
   if (EXCLUDED_CABINET_ICON_KEYS.has(iconKey)) return null;
+  if (/^U\d{2,3}$/.test(articleNumber)) {
+    return "lower-plain";
+  }
   if (code.startsWith("CAB-BASE-")
     || code.startsWith("CAB-COOK-")
     || code.startsWith("CAB-DRAWER-")
@@ -158,8 +163,10 @@ export function formatCabinetWidthLabel(kind, widthMm, language = "en") {
     ? String(widthCm)
     : String(Number(widthCm.toFixed(2))).replace(/\.0+$/, "");
   if (language === "de") {
+    if (kind === "lower-plain") return `Unterschrank ${widthLabel} cm`;
     return kind === "lower" ? `Unterschrank mit Schublade ${widthLabel} cm` : `Oberschrank ${widthLabel} cm`;
   }
+  if (kind === "lower-plain") return `Lower Cabinet ${widthLabel} cm`;
   return kind === "lower"
     ? `Lower Cabinet with Drawer ${widthLabel} cm`
     : `Upper Cabinet ${widthLabel} cm`;
