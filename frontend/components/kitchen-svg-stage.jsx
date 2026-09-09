@@ -20,6 +20,7 @@ import {
 } from "./kitchen-svg-plan-utils";
 import {
   AB_110401_FRG_ORDER_HOTSPOTS,
+  AB_109873_FRG_ORDER_HOTSPOTS,
   AB_109874_FRG_ORDER_HOTSPOTS,
   AB_105831_FRG_ORDER_HOTSPOTS,
   AB_105837_FRG_ORDER_HOTSPOTS,
@@ -123,6 +124,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105857": "/plans/AB%20105845.svg",
   "ab-105860": "/plans/AB%20105845.svg",
   "ab-105846": "/plans/AB%20105846.svg",
+  "ab-109873": "/plans/AB%20109873.svg",
   "ab-109874": "/plans/AB%20109874.svg",
   "ab-110401": "/plans/AB%20110401.svg",
   "105845-modul-2": "/plans/AB%20105845.svg",
@@ -1339,6 +1341,7 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
 
 // FRG and ASC intentionally share the exact same AB 105831 cabinet polygons.
 IMAGE_HOTSPOTS_BY_SLUG["ab-105831"] = AB_105831_FRG_ORDER_HOTSPOTS;
+IMAGE_HOTSPOTS_BY_SLUG["ab-109873"] = AB_109873_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-109874"] = AB_109874_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 // Keep the AB 105837 order-page polygons as the shared source for ASC claims.

@@ -500,6 +500,18 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105757-H6002-2": "12",
   "CAB-WALL-AB105757-H6002-3": "13",
   "CAB-WALL-AB105757-H6002-4": "14",
+  "SINK-BASE-AB109873-DEFAULT": "3",
+  "CAB-BASE-AB109873-DEFAULT-1": "4",
+  "DISH-AB109873-600": "5",
+  "CAB-BASE-AB109873-DEFAULT-2": "6",
+  "CAB-BASE-AB109873-DEFAULT-UPK20-R": "7",
+  "CAB-WALL-AB109873-H6002-HPK2002-L": "8",
+  "CAB-WALL-AB109873-H6002-2": "9",
+  "CAB-WALL-AB109873-H6002-3": "10",
+  "CAB-HOOD-AB109873-600": "11",
+  "HOOD-AB109873-FH664621E": "11",
+  "CAB-WALL-AB109873-H4502-1": "12",
+  "CAB-WALL-AB109873-H4502-HPK2002-R": "13",
   "SINKBASE-AB105825-600": "3",
   "CAB-BASE-AB105825-US30-R": "4",
   "DISH-AB105825-600": "5",
@@ -1118,6 +1130,11 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105846": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-110140": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-110510": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-109873": [[
+    "component-wall-cabinet-4",
+    "component-extractor-hood",
+    "component-under-cabinet-light",
+  ]],
   "ab-109874": [[
     "component-wall-cabinet-4",
     "component-extractor-hood",
@@ -1549,7 +1566,7 @@ export function getLinkedComponentIds(slug, componentId) {
 export function getAutoLinkedAccessoryCodes(slug, selectedComponentIds = []) {
   const normalizedSlug = String(slug || "").trim().toLowerCase();
   if (
-    ["ab-105758", "ab-109874", "burger-103898"].includes(normalizedSlug)
+    ["ab-105758", "ab-109873", "ab-109874", "burger-103898"].includes(normalizedSlug)
     && selectedComponentIds.includes("component-extractor-hood")
   ) {
     return ["ACC-LIGHT-003"];
