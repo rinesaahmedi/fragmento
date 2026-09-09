@@ -271,8 +271,14 @@ export default function ServiceClaimKitchenPicker({
   }, [croppedImageHotspots, selectableComponentIds, selectableKey]);
   const isNonLShapedKitchen = !isLShapedClaimKitchen(kitchenSlug);
   const displaySelectedComponentIds = useMemo(() => {
-    return [...new Set(visualValue || [])];
-  }, [visualValue]);
+    return [
+      ...new Set(
+        (visualValue || []).flatMap((componentId) => (
+          getServiceClaimLinkedComponentIds(kitchenSlug, componentId)
+        )),
+      ),
+    ];
+  }, [kitchenSlug, visualValue]);
   const shouldUseImagePlan = Boolean(imageViewHref && imageHotspots.length);
   const imageClipPathId = useMemo(
     () => toSvgClipPathId(rawImageClipPathId),

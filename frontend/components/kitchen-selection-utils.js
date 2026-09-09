@@ -500,8 +500,7 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105757-H6002-2": "12",
   "CAB-WALL-AB105757-H6002-3": "13",
   "CAB-WALL-AB105757-H6002-4": "14",
-  "SINK-BASE-AB109873-DEFAULT": "3",
-  "CAB-BASE-AB109873-DEFAULT-1": "4",
+  "SINK-BASE-AB109873-SP120": "3",
   "DISH-AB109873-600": "5",
   "CAB-BASE-AB109873-DEFAULT-2": "6",
   "CAB-BASE-AB109873-DEFAULT-UPK20-R": "7",
@@ -1155,6 +1154,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
     "component-wall-cabinet-4",
     "component-extractor-hood",
     "component-under-cabinet-light",
+  ], [
+    "component-sink-base",
+    "component-base-module-1",
   ]],
   "ab-109874": [[
     "component-wall-cabinet-4",

@@ -12,7 +12,18 @@ import {
   PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data.js";
-import { isLShapedClaimKitchen } from "../lib/service-claim-kitchen-hotspots.js";
+import {
+  buildServiceClaimSelectableComponents,
+  collapseServiceClaimLinkedComponents,
+} from "../lib/service-claim-kitchen-plan-selection.js";
+import {
+  buildServiceClaimPartHotspots,
+  isLShapedClaimKitchen,
+} from "../lib/service-claim-kitchen-hotspots.js";
+import {
+  buildServiceClaimComponentChoiceGroups,
+  resolveServiceClaimPlanDisplayComponentIds,
+} from "../lib/service-claim-component-choices.js";
 
 const translate = (_key, fallback) => fallback;
 
@@ -56,8 +67,7 @@ test("AB 109873 uses its exact vector plan and complete selection geometry", () 
 
 test("AB 109873 maps all schedule rows and preserves dishwasher details", () => {
   const expectedByCode = {
-    "SINK-BASE-AB109873-DEFAULT": "3",
-    "CAB-BASE-AB109873-DEFAULT-1": "4",
+    "SINK-BASE-AB109873-SP120": "3",
     "DISH-AB109873-600": "5",
     "CAB-BASE-AB109873-DEFAULT-2": "6",
     "CAB-BASE-AB109873-DEFAULT-UPK20-R": "7",
@@ -81,16 +91,35 @@ test("AB 109873 maps all schedule rows and preserves dishwasher details", () => 
   assert.ok(details.every((detail) => detail.persistWhenSelected === true));
 });
 
-test("AB 109873 links the hood package and is seeded as a linear kitchen", () => {
+test("AB 109873 links the SP120 faces and hood package and is seeded as a linear kitchen", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+  const configurator = readFileSync(new URL("../components/kitchen-configurator.js", import.meta.url), "utf8");
+  const picker = readFileSync(new URL("../components/service-claim-kitchen-picker.jsx", import.meta.url), "utf8");
   const items = seed.match(/const AB_109873_ITEMS = \[([\s\S]*?)\n\];/)?.[1] || "";
 
   assert.equal(isLShapedClaimKitchen("ab-109873"), false);
   assert.match(seed, /slug: "ab-109873"[\s\S]*?kitchenCode: "109 873"[\s\S]*?items: AB_109873_ITEMS/);
   assert.match(items, /defaultOvenHob/);
   assert.match(items, /defaultWorktop/);
-  assert.match(items, /defaultSinkBase/);
-  assert.equal((items.match(/isLocked: true/g) || []).length, 3);
+  assert.match(items, /defaultSinkBase\(\{ code: "SINK-BASE-AB109873-SP120"[^\n]+widthMm: 1200[^\n]+articleNumber: "SP120"/);
+  assert.match(seed, /articleNumber: "SP120", name: "Sink Base Cabinet 120 cm"/);
+  assert.doesNotMatch(items, /CAB-BASE-AB109873-DEFAULT-1/);
+  assert.equal((items.match(/isLocked: true/g) || []).length, 2);
+  assert.deepEqual(
+    getLinkedComponentIds("ab-109873", "component-sink-base"),
+    ["component-sink-base", "component-base-module-1"],
+  );
+  assert.deepEqual(collapseServiceClaimLinkedComponents("ab-109873", [
+    { componentId: "component-claim-sink-cabinet", articleCode: "SP120" },
+  ]), [{ componentId: "component-claim-sink-cabinet", articleCode: "SP120" }]);
+  assert.match(
+    picker,
+    /\(visualValue \|\| \[\]\)\.flatMap\(\(componentId\) => \([\s\S]*?getServiceClaimLinkedComponentIds\(kitchenSlug, componentId\)/,
+  );
+  assert.match(
+    configurator,
+    /const lockedComponentIds = useMemo\([\s\S]*?return expandLinkedComponentIds\(kitchenSlug, lockedIds\)/,
+  );
   assert.deepEqual(
     getLinkedComponentIds("ab-109873", "component-wall-cabinet-4"),
     ["component-wall-cabinet-4", "component-extractor-hood", "component-under-cabinet-light"],
@@ -98,5 +127,72 @@ test("AB 109873 links the hood package and is seeded as a linear kitchen", () =>
   assert.deepEqual(
     getAutoLinkedAccessoryCodes("ab-109873", ["component-extractor-hood"]),
     ["ACC-LIGHT-003"],
+  );
+});
+
+test("AB 109873 ASC starts with the complete SP120 sink set and narrows to individual parts", () => {
+  const sinkCabinet = {
+    id: "sp120-item",
+    itemType: "COMPONENT",
+    code: "SINK-BASE-AB109873-SP120",
+    articleNumber: "SP120",
+    name: "Sink Base Cabinet 120 cm",
+    nameDe: "Spülenschrank 120 cm",
+    componentKey: "sink-base",
+    blendeCode: "UPK20",
+    blendeLabel: "UPK20 20 cm",
+    isLocked: true,
+  };
+  const sinkFixture = {
+    id: "sink-fixture-item",
+    itemType: "COMPONENT",
+    code: "SINK-WORKTOP",
+    name: "Worktop",
+    componentKey: "sink-faucet",
+    isLocked: true,
+  };
+  const claimParts = [
+    { partKey: "sink", articleCode: "526335", name: "Built-in Sink BLANCO TIPO 45 S", sourceKitchenItemCode: "SINK-WORKTOP", sourceComponentKey: "sink-faucet", isActive: true },
+    { partKey: "sink-cabinet", articleCode: "SP120", name: "Sink Base Cabinet 120 cm", sourceKitchenItemCode: "SINK-BASE-AB109873-SP120", sourceComponentKey: "sink-base", isActive: true },
+    { partKey: "faucet", articleCode: "517720", name: "Kitchen Faucet BLANCO DARAS HD", sourceKitchenItemCode: "SINK-WORKTOP", sourceComponentKey: "sink-faucet", isActive: true },
+  ];
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items: [sinkCabinet, sinkFixture] },
+    kitchenConfig: { components: [sinkCabinet, sinkFixture] },
+    kitchenSlug: "ab-109873",
+    claimParts,
+  });
+  const group = buildServiceClaimComponentChoiceGroups(selection.selectableComponents)
+    .find((entry) => entry.triggerComponentId === "component-claim-sink-cabinet");
+  const optionIds = group.options.map((option) => option.componentId);
+
+  assert.deepEqual(optionIds, [
+    "component-claim-sink-cabinet",
+    "component-claim-sink",
+    "component-claim-faucet",
+    "component-claim-blende-sink-base",
+  ]);
+  assert.ok(!selection.selectableComponentIds.includes("component-base-module-1"));
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds([group.triggerComponentId], [group], {}),
+    optionIds,
+  );
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds(
+      [group.triggerComponentId],
+      [group],
+      { [group.sourceComponentKey]: ["component-claim-sink"] },
+    ),
+    ["component-claim-sink"],
+  );
+
+  const claimHotspots = buildServiceClaimPartHotspots(
+    PLAN_HOTSPOTS_BY_SLUG["ab-109873"],
+    claimParts,
+    "ab-109873",
+  );
+  assert.equal(
+    claimHotspots.filter((hotspot) => hotspot.componentId === "component-claim-sink-cabinet").length,
+    2,
   );
 });

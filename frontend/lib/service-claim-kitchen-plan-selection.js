@@ -36,6 +36,9 @@ const CLAIM_BLENDE_LABELS_BY_CODE = {
 // companions; specific plans can still expose a separately clickable surface.
 const SERVICE_CLAIM_FILTER_ARTICLE_CODE = "FWK124";
 const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
+  // SP120, its sink, faucet and supplied UPK20 are one initial ASC set.
+  // The affected-part control can then narrow the claim to any single part.
+  "ab-109873": new Set(["sink-base"]),
   // The US30 and its UPK20 share a form row; only the thin PDF-drawn strip is
   // the Blende, while the exposed outer face remains part of the cabinet.
   "ab-105743": new Set(["base-module-1"]),
@@ -62,6 +65,7 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   "ab-110510": new Set(["base-module-2", "base-module-3", "wall-cabinet-4"]),
 };
 const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
+  "ab-109873": new Set(["sink-base"]),
   "ab-105743": new Set(["base-module-1"]),
   "ab-104968": new Set(["base-module-1"]),
   "ab-105734": new Set(["base-module-1"]),
@@ -820,6 +824,9 @@ export function buildServiceClaimSelectableComponents({
     (part) => String(part?.partKey || "").trim() === "worktop-right",
   );
   const normalizedKitchenSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const hiddenLinkedClaimFaceIds = normalizedKitchenSlug === "ab-109873"
+    ? new Set(["component-base-module-1"])
+    : new Set();
   const worktopEndPanelChoicePartKey = hasSplitWorktopClaimParts
     ? LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS.has(normalizedKitchenSlug)
       ? "worktop-left"
@@ -851,12 +858,18 @@ export function buildServiceClaimSelectableComponents({
 
   const separatedClaimPartIds = new Set(separatedClaimParts.map((part) => part.componentId));
   const resolvedSelectableIds = [
-    ...[...selectableIds].filter((componentId) => !separatedSourceComponentIds.has(componentId)),
+    ...[...selectableIds].filter((componentId) => (
+      !separatedSourceComponentIds.has(componentId)
+      && !hiddenLinkedClaimFaceIds.has(componentId)
+    )),
     ...separatedClaimParts.map((part) => part.componentId),
     ...claimBlenden.map((blende) => blende.componentId),
   ];
   const resolvedSelectableMeta = [
-    ...selectableMeta.filter((entry) => !separatedSourceComponentIds.has(entry.componentId)),
+    ...selectableMeta.filter((entry) => (
+      !separatedSourceComponentIds.has(entry.componentId)
+      && !hiddenLinkedClaimFaceIds.has(entry.componentId)
+    )),
     ...separatedClaimParts,
     ...claimBlenden,
   ].filter((entry) => resolvedSelectableIds.includes(entry.componentId) || separatedClaimPartIds.has(entry.componentId));

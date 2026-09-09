@@ -1215,14 +1215,19 @@ function KitchenConfiguratorContent({
   const kitchenSlug = String(kitchenConfig.kitchen.slug || "").trim().toLowerCase();
   const planViewport = PLAN_VIEWPORT_BY_SLUG[kitchenConfig.kitchen.slug];
   const lockedComponentIds = useMemo(
-    () =>
-      [
+    () => {
+      const lockedIds = [
         ...(kitchenConfig.lockedBaseColors || []),
         ...kitchenConfig.components
           .filter((item) => item.isLocked)
           .map((item) => (item.componentKey ? item.componentKey : normalizeColor(item.colorKey))),
-      ].map((value) => componentIdForKey(value)),
-    [kitchenConfig],
+      ].map((value) => componentIdForKey(value));
+
+      // A locked commercial article can span multiple drawn faces (for example
+      // AB 109873 SP120). Every linked face must use the same fixed blue state.
+      return expandLinkedComponentIds(kitchenSlug, lockedIds);
+    },
+    [kitchenConfig, kitchenSlug],
   );
   const defaultLockedComponentIds = useMemo(
     () => buildDefaultLockedComponentIds(kitchenSlug, kitchenConfig),

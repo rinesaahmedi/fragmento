@@ -110,6 +110,7 @@ const ARTICLE_PRICES = {
   KHF664611S: 209,
   "KHF664611S + FWP18": 209,
   "OL-KGCN388140E": 579,
+  SP120: 0,
   US100: 353,
   US120: 403,
   US2A30: 298,
@@ -176,6 +177,7 @@ const CATALOG_ARTICLES = [
   { articleNumber: "KHF664611S", name: "Angled extractor hood", nameDe: "Schrägesse", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KHF664611S + FWP18", name: "Angled extractor hood + filter", nameDe: "Schrägesse + Filter", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "OL-KGCN388140E", name: "Freestanding Refrigerator 181 cm", nameDe: "Standkühlschrank 181 cm", heightMm: 1810, depthMm: null, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "SP120", name: "Sink Base Cabinet 120 cm", nameDe: "Spülenschrank 120 cm", widthMm: 1200, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US100", name: "Lower Cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US120", name: "Lower Cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US2A100", name: "Lower Cabinet with 3 Drawers 100 cm", nameDe: "Unterschrank mit 3 Schubladen 100 cm", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -1718,13 +1720,13 @@ const AB_105846_LAYOUT_ALIAS_ITEMS = AB_105846_ITEMS_WITH_SINK_END_BLENDE.map((i
 
 // AB 109873: straight 330 cm run traced from the supplied vector PDF. The
 // white PDF callouts place rows 1-7 on the base run and rows 8-13 on the wall
-// run. DEFAULT rows remain selected and locked; the two parenthesized Blenden
-// use the centralized EUR 25 / EUR 35 article prices from the schedule.
+// run. The two left-hand 60 cm faces form one locked SP120 sink cabinet; ASC
+// selects both faces together while keeping one commercial article. The two
+// parenthesized Blenden use the centralized EUR 25 / EUR 35 schedule prices.
 const AB_109873_ITEMS = [
   defaultOvenHob({ sortOrder: 10, widthMm: 600 }),
   defaultWorktop({ sortOrder: 20, widthMm: 3300, depthMm: 600 }),
-  defaultSinkBase({ code: "SINK-BASE-AB109873-DEFAULT", sortOrder: 30, widthMm: 600, heightMm: 878, depthMm: 600, articleNumber: "DEFAULT", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1), price: blendePrice("UPK20", 1), infoText: "Included sink cabinet with UPK20 filler panel" }),
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109873-DEFAULT-1", name: "Base cabinet", nameDe: "Unterschrank", price: "0.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, isLocked: true, infoText: "Base cabinet included with the default kitchen configuration", articleNumber: "DEFAULT" },
+  defaultSinkBase({ code: "SINK-BASE-AB109873-SP120", sortOrder: 30, widthMm: 1200, heightMm: 878, depthMm: 600, articleNumber: "SP120", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1), price: blendePrice("UPK20", 1), infoText: "Included SP120 sink cabinet with UPK20 filler panel" }),
   { itemType: ItemType.COMPONENT, code: "DISH-AB109873-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109873-DEFAULT-2", name: "Base cabinet", nameDe: "Unterschrank", price: "0.00", widthMm: 450, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Base cabinet included with the default kitchen configuration", articleNumber: "DEFAULT" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB109873-DEFAULT-UPK20-R", name: "Base cabinet", nameDe: "Unterschrank", price: blendePrice("UPK20", 1), widthMm: 450, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included base cabinet with right UPK20 filler panel", articleNumber: "DEFAULT", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
@@ -3592,9 +3594,10 @@ async function main() {
       item?.isActive !== false
       && String(item?.componentKey || "").toLowerCase() === "sink-faucet"
     ));
+    const isSp120SinkCabinet = String(sinkCabinet?.articleNumber || "").trim().toUpperCase() === "SP120";
     for (const part of [
       { partKey: "sink", articleCode: "526335", name: "Built-in Sink BLANCO TIPO 45 S", nameDe: "Einbau-Spüle BLANCO TIPO 45 S", source: sinkFixture, sortOrder: 10 },
-      { partKey: "sink-cabinet", articleCode: "SP60", name: "Sink Lower Cabinet", nameDe: "Spülen-Unterschrank", source: sinkCabinet, sortOrder: 20 },
+      { partKey: "sink-cabinet", articleCode: isSp120SinkCabinet ? "SP120" : "SP60", name: isSp120SinkCabinet ? "Sink Base Cabinet 120 cm" : "Sink Lower Cabinet", nameDe: isSp120SinkCabinet ? "Spülenschrank 120 cm" : "Spülen-Unterschrank", source: sinkCabinet, sortOrder: 20 },
       { partKey: "faucet", articleCode: "517720", name: "Kitchen Faucet BLANCO DARAS HD", nameDe: "Küchenarmatur BLANCO DARAS HD", source: sinkFixture, sortOrder: 30 },
     ]) {
       if (!part.source) continue;
