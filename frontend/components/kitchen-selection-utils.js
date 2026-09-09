@@ -595,6 +595,18 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-HOOD-AB110401-600": "13",
   "HOOD-AB110401-FH664621E": "13",
   "CAB-WALL-AB110401-H6002-HPK2002": "14",
+  "SINK-BASE-AB110402-DEFAULT": "3",
+  "CAB-BASE-AB110402-DEFAULT-UPK20-1": "4",
+  "DISH-AB110402-600": "5",
+  "CAB-BASE-AB110402-DEFAULT-2": "6",
+  "CAB-BASE-AB110402-DEFAULT-UPK20-2": "7",
+  "CAB-WALL-AB110402-H3002-HPK2002": "8",
+  "CAB-HOOD-AB110402-600": "9",
+  "HOOD-AB110402-FH664621E": "9",
+  "CAB-WALL-AB110402-H6002": "10",
+  "CAB-WALL-AB110402-H4002-1": "11",
+  "CAB-WALL-AB110402-H4002-2": "12",
+  "CAB-WALL-AB110402-H4002-HPK2002": "13",
 };
 
 ["105840", "105843"].forEach((targetCode) => {
@@ -1153,6 +1165,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   ]],
   "ab-109955": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-110401": [["component-wall-cabinet-5", "component-extractor-hood"]],
+  "ab-110402": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105849": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105852": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105855": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1397,6 +1410,9 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   PRODUCT_INFO_DOCUMENTS_BY_CODE[`REF-AB${targetCode}-KGCN388140E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["REF-B-545-1800-700"];
   PRODUCT_INFO_DOCUMENTS_BY_CODE[`HOOD-AB${targetCode}-FH664621E`] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 });
+
+PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-AB110402-600"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["DISH-B-600-STD"];
+PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-AB110402-FH664621E"] = PRODUCT_INFO_DOCUMENTS_BY_CODE["HOOD-B-FH664621E"];
 
 ["105751", "105754", "105745"].forEach((targetCode) => {
   Object.entries(AB_105806_PHOTO_NUMBER_BY_CODE)

@@ -140,14 +140,14 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
     [37.43943, 57.062185],
   ],
   "ab-110510": [
-    [59.330166, 52.685714],
-    [65.586698, 53.633613],
+    [59.330166, 53.633613],
+    [65.586698, 52.685714],
     [67.011876, 52.746218],
     [78.356295, 55.085714],
-    [78.228029, 56.235294],
-    [71.971496, 55.327731],
+    [78.228029, 55.327731],
+    [71.971496, 56.235294],
     [71.102138, 56.215126],
-    [65.258907, 55.166387],
+    [65.258907, 55.226891],
     [59.2019, 53.87563],
   ],
   "ab-109874": [
@@ -507,6 +507,12 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  // AB 109955 combines the 600 mm sink cabinet and its UPK20 in one FRG
+  // hotspot. In ASC, split them on the exact x=267 PDF divider so the left
+  // filler is independently claimable and the sink cabinet starts beside it.
+  "ab-109955": {
+    "sink-base": { side: "left", outer: 0.39905, inner: 3.805226 },
+  },
   // Burger 103898: the US60 front ends at the first corner divider. UPE65
   // consists of both narrow perspective faces up to the sink-base seam.
   "burger-103898": {
@@ -947,8 +953,8 @@ const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
     "oven-drawer": [
       [41.273159, 78.339496],
       [53.75772, 78.339496],
-      [53.75772, 82.534454],
-      [41.273159, 82.534454],
+      [53.75772, 87.092437],
+      [41.273159, 87.092437],
     ],
   },
   "ab-110401": {

@@ -3088,6 +3088,68 @@ test("AB 105758 ASC uses the exact sink, cooktop, oven, and drawer vector faces"
   assert.equal((cooktop.clipPath.match(/,/g) || []).length, 4);
 });
 
+test("AB 109955 claims split the sink UPK20 exactly and extend the oven drawer to the baseline", () => {
+  const source = PLAN_HOTSPOTS_BY_SLUG["ab-109955"].map((hotspot) => {
+    const xs = hotspot.points.map(([x]) => x);
+    const ys = hotspot.points.map(([, y]) => y);
+    return {
+      ...hotspot,
+      left: Math.min(...xs),
+      top: Math.min(...ys),
+      width: Math.max(...xs) - Math.min(...xs),
+      height: Math.max(...ys) - Math.min(...ys),
+    };
+  });
+  const blende = {
+    componentId: "component-claim-blende-sink-base",
+    componentKey: "claim-blende-sink-base",
+    sourceComponentKey: "sink-base",
+    sourceWidthMm: 600,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const split = buildServiceClaimBlendeHotspots(source, [blende], [{
+    componentKey: "sink-base",
+    widthMm: 600,
+    blendeCode: "UPK20",
+  }], "ab-109955");
+  const claims = buildServiceClaimPartHotspots(split, [
+    { partKey: "sink-cabinet", sourceComponentKey: "sink-base" },
+    { partKey: "oven", sourceComponentKey: "oven-module" },
+    { partKey: "oven-drawer", sourceComponentKey: "oven-module" },
+  ], "ab-109955");
+  const filler = claims.find((hotspot) => hotspot.claimPartKey === "blende");
+  const sinkCabinet = claims.find((hotspot) => hotspot.claimPartKey === "sink-cabinet");
+  const ovenDrawer = claims.find((hotspot) => hotspot.claimPartKey === "oven-drawer");
+  const bounds = (hotspot) => {
+    if (!hotspot.points?.length) {
+      return {
+        left: hotspot.left,
+        right: hotspot.left + hotspot.width,
+        bottom: hotspot.top + hotspot.height,
+      };
+    }
+    return {
+      left: Math.min(...hotspot.points.map(([x]) => x)),
+      right: Math.max(...hotspot.points.map(([x]) => x)),
+      bottom: Math.max(...hotspot.points.map(([, y]) => y)),
+    };
+  };
+
+  assert.deepEqual(bounds(filler), {
+    left: 0.39905,
+    right: 3.805226,
+    bottom: 87.092437,
+  });
+  assert.deepEqual(bounds(sinkCabinet), {
+    left: 3.805226,
+    right: 16.289786,
+    bottom: 87.092437,
+  });
+  assert.ok(Math.abs(bounds(ovenDrawer).bottom - 87.092437) < 0.000001);
+  assert.notEqual(filler.componentId, sinkCabinet.componentId);
+});
+
 test("AB 105757 ASC extends the oven selection to its lower end line", () => {
   const result = buildServiceClaimPartHotspots([
     { componentKey: "oven-module", left: 13.12, top: 63.4, width: 14.05, height: 23.86 },
