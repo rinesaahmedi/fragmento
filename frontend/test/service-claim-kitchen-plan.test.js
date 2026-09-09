@@ -2029,7 +2029,7 @@ test("service claim picker toggles the selected claim component", () => {
   assert.match(flowSource, /nextSelectedIds\.length[\s\S]*\[choiceGroup\.sourceComponentKey\]: true/);
   assert.match(flowSource, /!area\.selectedPartComponentIds\.length \|\| !area\.isPartChoiceConfirmed/);
   assert.match(flowSource, /confirmedChoiceGroupsJson/);
-  assert.match(source, /return \[\.\.\.new Set\(visualValue \|\| \[\]\)\]/);
+  assert.match(source, /\(visualValue \|\| \[\]\)\.flatMap\(\(componentId\) => \([\s\S]*?getServiceClaimLinkedComponentIds\(kitchenSlug, componentId\)/);
   assert.match(flowSource, /problemComponentIds[\s\S]*\.map\(\(componentId\) => componentById\.get\(componentId\)\)/);
   assert.match(flowSource, /collapseServiceClaimLinkedComponents\([\s\S]*selectedComponentsInSelectionOrder/);
   assert.doesNotMatch(source, /hasManualWorktopEndPanelOption/);
