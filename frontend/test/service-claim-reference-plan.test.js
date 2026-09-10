@@ -80,6 +80,19 @@ test("service form renders the reference sketch and requires affected component 
   assert.doesNotMatch(flow, /Selectable article data is not available/);
 });
 
+test("JPG-only ASC serial-number help chooses an appliance before showing photos", () => {
+  const flow = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
+  const styles = fs.readFileSync(path.join(repoRoot, "app", "globals.css"), "utf8");
+
+  assert.match(flow, /isReferenceOnlyPlan && !serialHelpApplianceType/);
+  assert.match(flow, /SERIAL_NUMBER_HELP_APPLIANCES\.map/);
+  assert.match(flow, /setSerialHelpApplianceType\(appliance\.type\)/);
+  assert.match(flow, /serialNumberHelpBack/);
+  assert.match(flow, /setSerialHelpApplianceType\(""\)/);
+  assert.match(styles, /\.service-serial-help__appliance-grid/);
+  assert.match(styles, /\.service-serial-help__appliance/);
+});
+
 test("dashboard contract forms accept sketch and optional PDF uploads", () => {
   const createForm = fs.readFileSync(path.join(repoRoot, "components", "admin-contract-create-form.js"), "utf8");
   const editPage = fs.readFileSync(path.join(repoRoot, "app", "admin", "contracts", "[id]", "page.js"), "utf8");

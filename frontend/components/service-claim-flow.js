@@ -25,7 +25,10 @@ import {
   normalizeServiceClaimContractNumber,
 } from "../lib/service-claim-lookup";
 import { isElectricalApplianceProblemArea } from "../lib/service-claim-serial-number";
-import { getSerialNumberHelpImages } from "../lib/serial-number-help";
+import {
+  getSerialNumberHelpImages,
+  SERIAL_NUMBER_HELP_APPLIANCES,
+} from "../lib/serial-number-help";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
 import { trackPublicPageOpened } from "../lib/public-page-open-tracking";
 import { normalizeServiceLanguage, persistServiceLanguage } from "../lib/service-language";
@@ -695,6 +698,14 @@ const COPY = {
     serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
     serialNumberHelpTitle: "Seriennummer finden",
     serialNumberHelpBody: "Die Seriennummer finden Sie meist auf dem Typenschild im Ger\u00e4t oder an der Innenwand. Die Beispiele unten zeigen typische Positionen.",
+    serialNumberHelpChooseBody: "W\u00e4hlen Sie zuerst das Elektroger\u00e4t aus.",
+    serialNumberHelpBack: "Zur\u00fcck zu den Elektroger\u00e4ten",
+    serialNumberApplianceDishwasher: "Geschirrsp\u00fcler",
+    serialNumberApplianceFridge: "K\u00fchlschrank / Gefrierschrank",
+    serialNumberApplianceOven: "Backofen",
+    serialNumberApplianceHob: "Kochfeld",
+    serialNumberApplianceExtractorHood: "Dunstabzugshaube",
+    serialNumberApplianceWashingMachine: "Waschmaschine",
     serialNumberHelpAlt1: "Beispiel: Seriennummer auf dem Typenschild",
     serialNumberHelpAlt2: "Beispiel: Seriennummer im K\u00fchlschrank",
     attachments: "Anh\u00e4nge (optional)",
@@ -993,6 +1004,14 @@ const COPY = {
     serialNumberHelpAria: "Help: where to find the serial number",
     serialNumberHelpTitle: "Finding the serial number",
     serialNumberHelpBody: "You can usually find the serial number on the appliance rating plate or on an inside wall. The examples below show typical locations.",
+    serialNumberHelpChooseBody: "First select the electrical appliance.",
+    serialNumberHelpBack: "Back to appliances",
+    serialNumberApplianceDishwasher: "Dishwasher",
+    serialNumberApplianceFridge: "Fridge / freezer",
+    serialNumberApplianceOven: "Oven",
+    serialNumberApplianceHob: "Cooktop / hob",
+    serialNumberApplianceExtractorHood: "Extractor hood",
+    serialNumberApplianceWashingMachine: "Washing machine",
     serialNumberHelpAlt1: "Example: serial number on the appliance label",
     serialNumberHelpAlt2: "Example: serial number inside the fridge",
     attachments: "Attachments (optional)",
@@ -1308,6 +1327,14 @@ const COPY = {
     serialNumberHelpAria: "Yard\u0131m: seri numaras\u0131 nerede bulunur?",
     serialNumberHelpTitle: "Seri numaras\u0131n\u0131 bulma",
     serialNumberHelpBody: "Seri numaras\u0131n\u0131 genelde cihaz etiketinde veya i\u00e7 taraftaki bir y\u00fczeyde bulabilirsiniz. A\u015fa\u011f\u0131daki \u00f6rnekler tipik konumlar\u0131 g\u00f6sterir.",
+    serialNumberHelpChooseBody: "\u00d6nce elektrikli cihaz\u0131 se\u00e7in.",
+    serialNumberHelpBack: "Cihazlara geri d\u00f6n",
+    serialNumberApplianceDishwasher: "Bula\u015f\u0131k makinesi",
+    serialNumberApplianceFridge: "Buzdolab\u0131 / dondurucu",
+    serialNumberApplianceOven: "F\u0131r\u0131n",
+    serialNumberApplianceHob: "Ocak",
+    serialNumberApplianceExtractorHood: "Davlumbaz",
+    serialNumberApplianceWashingMachine: "\u00c7ama\u015f\u0131r makinesi",
     serialNumberHelpAlt1: "\u00d6rnek: cihaz etiketindeki seri numaras\u0131",
     serialNumberHelpAlt2: "\u00d6rnek: buzdolab\u0131 i\u00e7indeki seri numaras\u0131",
     attachments: "Ekler (iste\u011fe ba\u011fl\u0131)",
@@ -1545,6 +1572,14 @@ const COPY = {
     serialNumberHelpAria: "Ayuda: d\u00f3nde encontrar el n\u00famero de serie",
     serialNumberHelpTitle: "Encontrar el n\u00famero de serie",
     serialNumberHelpBody: "Normalmente puede encontrar el n\u00famero de serie en la placa del aparato o en una pared interior. Los ejemplos siguientes muestran ubicaciones t\u00edpicas.",
+    serialNumberHelpChooseBody: "Seleccione primero el electrodom\u00e9stico.",
+    serialNumberHelpBack: "Volver a los electrodom\u00e9sticos",
+    serialNumberApplianceDishwasher: "Lavavajillas",
+    serialNumberApplianceFridge: "Frigor\u00edfico / congelador",
+    serialNumberApplianceOven: "Horno",
+    serialNumberApplianceHob: "Placa de cocci\u00f3n",
+    serialNumberApplianceExtractorHood: "Campana extractora",
+    serialNumberApplianceWashingMachine: "Lavadora",
     serialNumberHelpAlt1: "Ejemplo: n\u00famero de serie en la etiqueta del aparato",
     serialNumberHelpAlt2: "Ejemplo: n\u00famero de serie dentro del frigor\u00edfico",
     attachments: "Adjuntos (opcional)",
@@ -1782,6 +1817,14 @@ const COPY = {
     serialNumberHelpAria: "Aide : o\u00f9 trouver le num\u00e9ro de s\u00e9rie",
     serialNumberHelpTitle: "Trouver le num\u00e9ro de s\u00e9rie",
     serialNumberHelpBody: "Vous trouverez g\u00e9n\u00e9ralement le num\u00e9ro de s\u00e9rie sur la plaque signal\u00e9tique de l'appareil ou sur une paroi int\u00e9rieure. Les exemples ci-dessous montrent les emplacements les plus courants.",
+    serialNumberHelpChooseBody: "S\u00e9lectionnez d'abord l'appareil \u00e9lectrique.",
+    serialNumberHelpBack: "Retour aux appareils",
+    serialNumberApplianceDishwasher: "Lave-vaisselle",
+    serialNumberApplianceFridge: "R\u00e9frig\u00e9rateur / cong\u00e9lateur",
+    serialNumberApplianceOven: "Four",
+    serialNumberApplianceHob: "Plaque de cuisson",
+    serialNumberApplianceExtractorHood: "Hotte aspirante",
+    serialNumberApplianceWashingMachine: "Lave-linge",
     serialNumberHelpAlt1: "Exemple : num\u00e9ro de s\u00e9rie sur l'\u00e9tiquette de l'appareil",
     serialNumberHelpAlt2: "Exemple : num\u00e9ro de s\u00e9rie \u00e0 l'int\u00e9rieur du r\u00e9frig\u00e9rateur",
     attachments: "Pi\u00e8ces jointes (facultatif)",
@@ -2018,6 +2061,14 @@ const COPY = {
     serialNumberHelpAria: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430: \u0433\u0434\u0435 \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
     serialNumberHelpTitle: "\u041a\u0430\u043a \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
     serialNumberHelpBody: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043e\u0431\u044b\u0447\u043d\u043e \u0443\u043a\u0430\u0437\u0430\u043d \u043d\u0430 \u0437\u0430\u0432\u043e\u0434\u0441\u043a\u043e\u0439 \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0435 \u043f\u0440\u0438\u0431\u043e\u0440\u0430 \u0438\u043b\u0438 \u043d\u0430 \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0435\u0439 \u0441\u0442\u0435\u043d\u043a\u0435. \u041d\u0438\u0436\u0435 \u043f\u043e\u043a\u0430\u0437\u0430\u043d\u044b \u0442\u0438\u043f\u0438\u0447\u043d\u044b\u0435 \u043c\u0435\u0441\u0442\u0430.",
+    serialNumberHelpChooseBody: "\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043f\u0440\u0438\u0431\u043e\u0440.",
+    serialNumberHelpBack: "\u041d\u0430\u0437\u0430\u0434 \u043a \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043f\u0440\u0438\u0431\u043e\u0440\u0430\u043c",
+    serialNumberApplianceDishwasher: "\u041f\u043e\u0441\u0443\u0434\u043e\u043c\u043e\u0435\u0447\u043d\u0430\u044f \u043c\u0430\u0448\u0438\u043d\u0430",
+    serialNumberApplianceFridge: "\u0425\u043e\u043b\u043e\u0434\u0438\u043b\u044c\u043d\u0438\u043a / \u043c\u043e\u0440\u043e\u0437\u0438\u043b\u044c\u043d\u0438\u043a",
+    serialNumberApplianceOven: "\u0414\u0443\u0445\u043e\u0432\u043e\u0439 \u0448\u043a\u0430\u0444",
+    serialNumberApplianceHob: "\u0412\u0430\u0440\u043e\u0447\u043d\u0430\u044f \u043f\u0430\u043d\u0435\u043b\u044c",
+    serialNumberApplianceExtractorHood: "\u0412\u044b\u0442\u044f\u0436\u043a\u0430",
+    serialNumberApplianceWashingMachine: "\u0421\u0442\u0438\u0440\u0430\u043b\u044c\u043d\u0430\u044f \u043c\u0430\u0448\u0438\u043d\u0430",
     serialNumberHelpAlt1: "\u041f\u0440\u0438\u043c\u0435\u0440: \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430 \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0435 \u043f\u0440\u0438\u0431\u043e\u0440\u0430",
     serialNumberHelpAlt2: "\u041f\u0440\u0438\u043c\u0435\u0440: \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0432\u043d\u0443\u0442\u0440\u0438 \u0445\u043e\u043b\u043e\u0434\u0438\u043b\u044c\u043d\u0438\u043a\u0430",
     attachments: "\u0412\u043b\u043e\u0436\u0435\u043d\u0438\u044f (\u043d\u0435\u043e\u0431\u044f\u0437\u0430\u0442\u0435\u043b\u044c\u043d\u043e)",
@@ -2430,11 +2481,16 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
   const [isContractNumberHelpOpen, setIsContractNumberHelpOpen] = useState(false);
   const [isSerialNumberHelpOpen, setIsSerialNumberHelpOpen] = useState(false);
   const [serialNumberHelpProduct, setSerialNumberHelpProduct] = useState(null);
+  const [serialHelpApplianceType, setSerialHelpApplianceType] = useState("");
   const [contractHelpSlide, setContractHelpSlide] = useState(0);
   const [serialHelpSlide, setSerialHelpSlide] = useState(0);
   const serialNumberHelpImages = useMemo(
-    () => getSerialNumberHelpImages(serialNumberHelpProduct),
-    [serialNumberHelpProduct],
+    () => getSerialNumberHelpImages(
+      serialHelpApplianceType
+        ? { claimPartKey: serialHelpApplianceType }
+        : serialNumberHelpProduct,
+    ),
+    [serialHelpApplianceType, serialNumberHelpProduct],
   );
   const serialHelpSlideCount = serialNumberHelpImages.length;
   const [isClaimAssistantOpen, setIsClaimAssistantOpen] = useState(false);
@@ -3995,6 +4051,12 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
 
   function goSerialHelpNext() {
     setSerialHelpSlide((s) => Math.min(serialHelpSlideCount - 1, s + 1));
+  }
+
+  function closeSerialNumberHelp() {
+    setIsSerialNumberHelpOpen(false);
+    setSerialHelpApplianceType("");
+    setSerialHelpSlide(0);
   }
 
   function onContractHelpTouchStart(event) {
@@ -6125,6 +6187,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                                     aria-label={t("serialNumberHelpAria")}
                                     onClick={() => {
                                       setSerialNumberHelpProduct({ resolvedLabel: issue.component || t("referenceElectricalComponent") });
+                                      setSerialHelpApplianceType("");
                                       setSerialHelpSlide(0);
                                       setIsSerialNumberHelpOpen(true);
                                     }}
@@ -6535,6 +6598,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                               aria-label={t("serialNumberHelpAria")}
                               onClick={() => {
                                 setSerialNumberHelpProduct(area);
+                                setSerialHelpApplianceType("");
                                 setSerialHelpSlide(0);
                                 setIsSerialNumberHelpOpen(true);
                               }}
@@ -7015,7 +7079,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
             className="service-contract-help__backdrop"
             tabIndex={-1}
             aria-label={t("contractNumberHelpClose")}
-            onClick={() => setIsSerialNumberHelpOpen(false)}
+            onClick={closeSerialNumberHelp}
           />
           <div
             className="service-contract-help__dialog"
@@ -7031,86 +7095,135 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                 type="button"
                 className="service-contract-help__close"
                 aria-label={t("contractNumberHelpClose")}
-                onClick={() => setIsSerialNumberHelpOpen(false)}
+                onClick={closeSerialNumberHelp}
               >
                 &times;
               </button>
             </div>
-            {serialNumberHelpProduct?.resolvedLabel ? (
+            {serialHelpApplianceType ? (
+              <p className="service-contract-help__eyebrow">
+                {t(SERIAL_NUMBER_HELP_APPLIANCES.find(
+                  (appliance) => appliance.type === serialHelpApplianceType,
+                )?.labelKey)}
+              </p>
+            ) : !isReferenceOnlyPlan && serialNumberHelpProduct?.resolvedLabel ? (
               <p className="service-contract-help__eyebrow">{serialNumberHelpProduct.resolvedLabel}</p>
             ) : null}
-            <p className="service-contract-help__intro">{t("serialNumberHelpBody")}</p>
-            <p className="service-contract-help__sr" aria-live="polite">
-              {serialHelpSlideAriaLabel(serialHelpSlide)}
+            <p className="service-contract-help__intro">
+              {isReferenceOnlyPlan && !serialHelpApplianceType
+                ? t("serialNumberHelpChooseBody")
+                : t("serialNumberHelpBody")}
             </p>
-            <div className="service-contract-help__carousel">
-              <button
-                type="button"
-                className="service-contract-help__arrow service-contract-help__arrow--prev"
-                onClick={goSerialHelpPrev}
-                disabled={serialHelpSlide <= 0}
-                aria-label={t("contractNumberHelpPrev")}
-              >
-                &#8249;
-              </button>
-              <div
-                className="service-contract-help__viewport"
-                onTouchStart={onSerialHelpTouchStart}
-                onTouchEnd={onSerialHelpTouchEnd}
-              >
-                <div
-                  className="service-contract-help__track"
-                  style={{
-                    width: `${serialHelpSlideCount * 100}%`,
-                    transform: `translateX(-${(100 * serialHelpSlide) / serialHelpSlideCount}%)`,
-                  }}
-                >
-                  {serialNumberHelpImages.map((entry) => (
-                    <figure
-                      key={entry.src}
-                      className="service-contract-help__figure service-contract-help__slide"
-                      style={{ flex: `0 0 ${100 / serialHelpSlideCount}%` }}
+            {isReferenceOnlyPlan && !serialHelpApplianceType ? (
+              <div className="service-serial-help__appliance-grid">
+                {SERIAL_NUMBER_HELP_APPLIANCES.map((appliance) => {
+                  const [previewImage] = getSerialNumberHelpImages({ claimPartKey: appliance.type });
+                  return (
+                    <button
+                      key={appliance.type}
+                      type="button"
+                      className="service-serial-help__appliance"
+                      onClick={() => {
+                        setSerialHelpApplianceType(appliance.type);
+                        setSerialHelpSlide(0);
+                      }}
+                      aria-label={t(appliance.labelKey)}
                     >
-                      <img
-                        src={entry.src}
-                        alt={entry.alt || t(entry.altKey)}
-                        className="service-contract-help__img"
-                        loading="lazy"
-                        decoding="async"
-                        draggable={false}
-                      />
-                    </figure>
+                      <span className="service-serial-help__appliance-image" aria-hidden="true">
+                        <img src={previewImage.src} alt="" loading="lazy" decoding="async" />
+                      </span>
+                      <span>{t(appliance.labelKey)}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                <p className="service-contract-help__sr" aria-live="polite">
+                  {serialHelpSlideAriaLabel(serialHelpSlide)}
+                </p>
+                <div className="service-contract-help__carousel">
+                  <button
+                    type="button"
+                    className="service-contract-help__arrow service-contract-help__arrow--prev"
+                    onClick={goSerialHelpPrev}
+                    disabled={serialHelpSlide <= 0}
+                    aria-label={t("contractNumberHelpPrev")}
+                  >
+                    &#8249;
+                  </button>
+                  <div
+                    className="service-contract-help__viewport"
+                    onTouchStart={onSerialHelpTouchStart}
+                    onTouchEnd={onSerialHelpTouchEnd}
+                  >
+                    <div
+                      className="service-contract-help__track"
+                      style={{
+                        width: `${serialHelpSlideCount * 100}%`,
+                        transform: `translateX(-${(100 * serialHelpSlide) / serialHelpSlideCount}%)`,
+                      }}
+                    >
+                      {serialNumberHelpImages.map((entry) => (
+                        <figure
+                          key={entry.src}
+                          className="service-contract-help__figure service-contract-help__slide"
+                          style={{ flex: `0 0 ${100 / serialHelpSlideCount}%` }}
+                        >
+                          <img
+                            src={entry.src}
+                            alt={entry.alt || t(entry.altKey)}
+                            className="service-contract-help__img"
+                            loading="lazy"
+                            decoding="async"
+                            draggable={false}
+                          />
+                        </figure>
+                      ))}
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="service-contract-help__arrow service-contract-help__arrow--next"
+                    onClick={goSerialHelpNext}
+                    disabled={serialHelpSlide >= serialHelpSlideCount - 1}
+                    aria-label={t("contractNumberHelpNext")}
+                  >
+                    &#8250;
+                  </button>
+                </div>
+                <div className="service-contract-help__dots" role="tablist" aria-label={t("serialNumberHelpTitle")}>
+                  {serialNumberHelpImages.map((_, index) => (
+                    <button
+                      key={String(index)}
+                      type="button"
+                      role="tab"
+                      aria-selected={index === serialHelpSlide}
+                      aria-label={serialHelpSlideAriaLabel(index)}
+                      className={`service-contract-help__dot${index === serialHelpSlide ? " is-active" : ""}`}
+                      onClick={() => setSerialHelpSlide(index)}
+                    />
                   ))}
                 </div>
-              </div>
-              <button
-                type="button"
-                className="service-contract-help__arrow service-contract-help__arrow--next"
-                onClick={goSerialHelpNext}
-                disabled={serialHelpSlide >= serialHelpSlideCount - 1}
-                aria-label={t("contractNumberHelpNext")}
-              >
-                &#8250;
-              </button>
-            </div>
-            <div className="service-contract-help__dots" role="tablist" aria-label={t("serialNumberHelpTitle")}>
-              {serialNumberHelpImages.map((_, index) => (
-                <button
-                  key={String(index)}
-                  type="button"
-                  role="tab"
-                  aria-selected={index === serialHelpSlide}
-                  aria-label={serialHelpSlideAriaLabel(index)}
-                  className={`service-contract-help__dot${index === serialHelpSlide ? " is-active" : ""}`}
-                  onClick={() => setSerialHelpSlide(index)}
-                />
-              ))}
-            </div>
+              </>
+            )}
             <div className="service-contract-help__actions">
+              {isReferenceOnlyPlan && serialHelpApplianceType ? (
+                <button
+                  type="button"
+                  className="service-button service-button--secondary"
+                  onClick={() => {
+                    setSerialHelpApplianceType("");
+                    setSerialHelpSlide(0);
+                  }}
+                >
+                  {t("serialNumberHelpBack")}
+                </button>
+              ) : null}
               <button
                 type="button"
                 className="service-button service-button--secondary"
-                onClick={() => setIsSerialNumberHelpOpen(false)}
+                onClick={closeSerialNumberHelp}
               >
                 {t("contractNumberHelpClose")}
               </button>
