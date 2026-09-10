@@ -56,7 +56,7 @@ test("AB 109955 preserves all ten schedule rows, prices, and four defaults", () 
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "670"\)/);
   assert.match(items, /defaultOvenHob\(\{[\s\S]*?catalogArticleNumber: "A-EH923640E \+ 9EC744100C"/);
   assert.match(items, /defaultWorktop/);
-  assert.match(items, /SINK-BASE-AB109955-DEFAULT-UPK20[^;]+blendeCode: "UPK20"/);
+  assert.match(items, /SINK-BASE-AB109955-DEFAULT-UPK20[^;]+articleNumber: "SP60"[^;]+blendeCode: "UPK20"/);
   assert.match(items, /CAB-BASE-AB109955-DEFAULT[^;]+name: "Lower Cabinet with Drawer 60 cm"[^;]+price: "0\.00"[^;]+isLocked: true[^;]+articleNumber: "US60"/);
   assert.equal((items.match(/isLocked: true/g) || []).length, 2);
   for (const [code, price] of [
@@ -195,6 +195,7 @@ test("AB 109955 exposes the sink Blende as its own claim row", () => {
     name: "Sink Lower Cabinet",
     nameDe: "Spülenunterschrank",
     componentKey: "sink-base",
+    articleNumber: "SP60",
     widthMm: 600,
     isLocked: true,
     blendeCode: "UPK20",
@@ -205,7 +206,7 @@ test("AB 109955 exposes the sink Blende as its own claim row", () => {
     kitchenConfig: { components: [sinkBase] },
     kitchenSlug: slug,
     claimParts: [
-      { partKey: "sink-cabinet", sourceKitchenItemCode: sinkBase.code, sourceComponentKey: "sink-base" },
+      { partKey: "sink-cabinet", articleCode: "SP60", sourceKitchenItemCode: sinkBase.code, sourceComponentKey: "sink-base" },
       { partKey: "sink", sourceKitchenItemCode: sinkBase.code, sourceComponentKey: "sink-base" },
       { partKey: "faucet", sourceKitchenItemCode: sinkBase.code, sourceComponentKey: "sink-base" },
     ],
@@ -217,6 +218,10 @@ test("AB 109955 exposes the sink Blende as its own claim row", () => {
     .find((group) => group.triggerComponentId === "component-claim-sink-cabinet");
 
   assert.equal(blende?.isStandaloneClaimOption, true);
+  assert.equal(
+    selection.selectableComponents.find((entry) => entry.claimPartKey === "sink-cabinet")?.articleCode,
+    "SP60",
+  );
   assert.ok(selection.selectableComponentIds.includes(blende.componentId));
   assert.ok(!sinkGroup.options.some((option) => option.componentId === blende.componentId));
 });
