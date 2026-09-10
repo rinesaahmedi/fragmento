@@ -502,15 +502,13 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105757-H6002-4": "14",
   "SINK-BASE-AB109873-SP120": "3",
   "DISH-AB109873-600": "5",
-  "CAB-BASE-AB109873-DEFAULT-2": "6",
-  "CAB-BASE-AB109873-DEFAULT-UPK20-R": "7",
+  "CAB-BASE-AB109873-US90": "6",
   "CAB-WALL-AB109873-H6002-HPK2002-L": "8",
   "CAB-WALL-AB109873-H6002-2": "9",
   "CAB-WALL-AB109873-H6002-3": "10",
   "CAB-HOOD-AB109873-600": "11",
   "HOOD-AB109873-FH664621E": "11",
-  "CAB-WALL-AB109873-H4502-1": "12",
-  "CAB-WALL-AB109873-H4502-HPK2002-R": "13",
+  "CAB-WALL-AB109873-H9002-HPK2002-R": "12",
   "SINKBASE-AB105825-600": "3",
   "CAB-BASE-AB105825-US30-R": "4",
   "DISH-AB105825-600": "5",
@@ -1157,6 +1155,12 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   ], [
     "component-sink-base",
     "component-base-module-1",
+  ], [
+    "component-base-module-2",
+    "component-base-module-3",
+  ], [
+    "component-wall-cabinet-5",
+    "component-wall-cabinet-6",
   ]],
   "ab-109874": [[
     "component-wall-cabinet-4",

@@ -12,6 +12,7 @@ import { buildServiceClaimAutofillFromContract } from "../lib/service-claim-cont
 import {
   collapseServiceClaimLinkedComponents,
   getServiceClaimLinkedComponentIds,
+  normalizeServiceClaimLinkedComponentSelection,
   updateServiceClaimLinkedComponentSelection,
 } from "../lib/service-claim-kitchen-plan-selection";
 import {
@@ -2608,8 +2609,12 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
   }, [problemAreaChoiceGroups]);
   useEffect(() => {
     setProblemComponentIds((current) => {
-      const normalized = normalizeServiceClaimComponentChoiceSelection(
+      const linkedNormalized = normalizeServiceClaimLinkedComponentSelection(
+        activeKitchenPlan?.kitchenSlug,
         current,
+      );
+      const normalized = normalizeServiceClaimComponentChoiceSelection(
+        linkedNormalized,
         problemAreaChoiceGroups,
       );
       return normalized.length === current.length
@@ -2617,7 +2622,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
         ? current
         : normalized;
     });
-  }, [problemAreaChoiceGroups]);
+  }, [activeKitchenPlan?.kitchenSlug, problemAreaChoiceGroups, problemComponentIds]);
   const problemPlanDisplayComponentIds = useMemo(
     () => resolveServiceClaimPlanDisplayComponentIds(
       problemComponentIds,
@@ -3435,19 +3440,23 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
     const choiceGroup = problemAreaChoiceGroupByComponentId.get(componentId);
     if (!choiceGroup) {
       const selectableIds = new Set(activeKitchenPlan?.selectableComponentIds || []);
-      const linkedComponentIds = getServiceClaimLinkedComponentIds(
+      const canonicalComponentId = normalizeServiceClaimLinkedComponentSelection(
         activeKitchenPlan?.kitchenSlug,
-        componentId,
-      ).filter((id) => selectableIds.has(id));
-      const isAddingComponent = !linkedComponentIds.some((id) => problemComponentIds.includes(id));
+        [componentId],
+      )[0] || componentId;
+      const currentCanonicalIds = normalizeServiceClaimLinkedComponentSelection(
+        activeKitchenPlan?.kitchenSlug,
+        problemComponentIds,
+      );
+      const isAddingComponent = !currentCanonicalIds.includes(canonicalComponentId);
       setProblemComponentIds((current) => {
-        const shouldRemove = linkedComponentIds.some((id) => current.includes(id));
-        const next = new Set(current);
-        linkedComponentIds.forEach((id) => {
-          if (shouldRemove) next.delete(id);
-          else next.add(id);
-        });
-        return [...next].filter((id) => selectableIds.has(id));
+        const normalizedCurrent = normalizeServiceClaimLinkedComponentSelection(
+          activeKitchenPlan?.kitchenSlug,
+          current,
+        ).filter((id) => selectableIds.has(id));
+        return normalizedCurrent.includes(canonicalComponentId)
+          ? normalizedCurrent.filter((id) => id !== canonicalComponentId)
+          : [...normalizedCurrent, canonicalComponentId].filter((id) => selectableIds.has(id));
       });
       setIsClaimRequiredAlertDismissed(false);
       if (isAddingComponent) {

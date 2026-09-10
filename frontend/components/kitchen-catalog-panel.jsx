@@ -38,6 +38,9 @@ import { usePublicI18n } from "./public-i18n";
 const DISHWASHER_BASE_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="20" y1="14" x2="40" y2="14" stroke-linecap="round" stroke-width="1.5"/><g stroke="#ccc" stroke-width="0.5"><path d="M 10 24 L 14 44 H 46 L 50 24 Z"/><line x1="18" y1="26" x2="20" y2="44"/><line x1="26" y1="26" x2="26" y2="44"/><line x1="34" y1="26" x2="34" y2="44"/><line x1="42" y1="26" x2="40" y2="44"/><line x1="12" y1="32" x2="48" y2="32"/><line x1="13" y1="38" x2="47" y2="38"/></g><rect x="24" y="58" width="12" height="8" fill="white"/><text x="30" y="64" font-family="sans-serif" font-size="5" text-anchor="middle" fill="currentColor" stroke="none">GS</text></svg>';
 
+const WALL_CABINET_DOUBLE_DOOR_MARKUP =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 72.3" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="89" height="71.3"/><line x1="45" y1="0.5" x2="45" y2="71.8"/><line x1="40" y1="36.5" x2="40" y2="53.5" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="36.5" x2="50" y2="53.5" stroke-linecap="round" stroke-width="1.5"/></svg>';
+
 const ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
   refrigerator: '<img src="/img/foto6.png" alt="Kühlschrank">',
@@ -59,6 +62,8 @@ const ICON_MARKUP = {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="16" x2="60" y2="16"/><rect x="44" y="6" width="4" height="4"/><rect x="52" y="6" width="4" height="4"/><line x1="0" y1="56" x2="60" y2="56"/><rect x="8" y="22" width="44" height="26"/><line x1="7" y1="24" x2="53" y2="24" stroke-linecap="round" stroke-width="1.5"/><rect x="12" y="26" width="36" height="18"/><line x1="22" y1="62" x2="38" y2="62" stroke-linecap="round" stroke-width="1.5"/></svg>',
   drawer_base:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="0" y1="18" x2="60" y2="18"/><line x1="21.5" y1="10" x2="38.5" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>',
+  base_cabinet_plain:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="59" height="2"/><rect x="0.5" y="2.5" width="59" height="69"/><rect x="0.5" y="72.5" width="59" height="9"/><line x1="50" y1="31" x2="50" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>',
   worktop:
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 20" fill="none" stroke="currentColor" stroke-width="1"><line x1="2" y1="7" x2="118" y2="7"/><line x1="2" y1="13" x2="118" y2="13"/><line x1="118" y1="7" x2="118" y2="13"/></svg>',
   blende:
@@ -107,6 +112,7 @@ const TOOLTIP_PREVIEW_BY_CODE = {
 const PRODUCT_ASSISTANT_AVATAR_SRC = "/img/Untitled%20design%20(5).png";
 
 const WIDTH_SCALED_CABINET_ICON_KEYS = new Set([
+  "base_cabinet_plain",
   "base_cabinet_30",
   "dishwasher",
   "dishwasher_base",
@@ -149,7 +155,13 @@ function getCatalogCabinetIconSizePx(item) {
 }
 
 function getCatalogIconMarkup(item, stretchWidthOnly) {
-  const markup = ICON_MARKUP[item?.iconKey] || "";
+  const articleNumber = String(
+    item?.articleNumber || item?.catalogArticle?.articleNumber || "",
+  ).trim().toUpperCase();
+  const iconKey = String(item?.iconKey || "");
+  const markup = articleNumber === "H9002" && iconKey.startsWith("wall_cabinet")
+    ? WALL_CABINET_DOUBLE_DOOR_MARKUP
+    : ICON_MARKUP[iconKey] || "";
   if (!stretchWidthOnly || !markup.trim().startsWith("<svg")) return markup;
 
   return markup.replace(
