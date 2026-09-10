@@ -1388,6 +1388,16 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-105828"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105825"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105830"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105827"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105839"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105842"];
 IMAGE_HOTSPOTS_BY_SLUG["105845-modul-2"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105845"];
+
+// A WU16 side panel is visible only as the narrow seam between the final base
+// cabinet and the refrigerator. Keep it as a visual indicator instead of a
+// hotspot so it cannot alter the worktop selection or order value.
+const PLAN_SIDE_PANEL_INDICATORS_BY_SLUG = {
+  "ab-105825": { left: 75.65, top: 61.2, height: 28.55 },
+  "ab-105828": { left: 75.65, top: 61.2, height: 28.55 },
+  "ab-105831": { left: 74.75, top: 65.95, height: 29.55 },
+};
+
 IMAGE_HOTSPOTS_BY_SLUG["ab-105847"] = [
   { componentKey: "wall-cabinet-1", left: 14.90875, top: 38.54333, width: 5.69875, height: 8.72, preserveManualSize: true },
   // The extractor is sold with its HD6002 cabinet; highlight the complete package once.
@@ -2375,6 +2385,15 @@ export default function useKitchenSvgStage({
         .filter((hotspot) => hotspot.width > 0 && hotspot.height > 0),
     [activeImageHotspots, activePlanDisplayCrop],
   );
+  const sidePanelIndicator = useMemo(() => {
+    const indicator = PLAN_SIDE_PANEL_INDICATORS_BY_SLUG[normalizedKitchenSlug];
+    if (!indicator) return null;
+
+    return cropPlanBox(
+      { ...indicator, width: 0.001 },
+      activePlanDisplayCrop,
+    );
+  }, [activePlanDisplayCrop, normalizedKitchenSlug]);
   const splitKitchenSideLabels = useMemo(
     () => getSplitKitchenSideLabels(activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language),
     [activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language],
@@ -2828,6 +2847,17 @@ export default function useKitchenSvgStage({
                         </button>
                       );
                     })}
+                    {sidePanelIndicator ? (
+                      <span
+                        aria-hidden="true"
+                        className={styles.planSidePanelIndicator}
+                        style={{
+                          left: `${sidePanelIndicator.left}%`,
+                          top: `${sidePanelIndicator.top}%`,
+                          height: `${sidePanelIndicator.height}%`,
+                        }}
+                      />
+                    ) : null}
                   </div>
                   {activePersistentLightDetails.map((detail) => {
                     const detailComponentId = componentIdForKey(detail.componentKey);
