@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { syncDishwasherClaimPartsForAdminItem } from "../../../../../lib/admin-dishwasher-claim-parts";
 import { prepareKitchenItemMutation } from "../../../../../lib/admin-kitchen-items";
 import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/admin-forms";
 import { requireAdminApi } from "../../../../../lib/auth";
@@ -17,6 +18,10 @@ export async function POST(request, { params }) {
       where: { id },
       select: {
         kitchenId: true,
+        code: true,
+        articleNumber: true,
+        componentKey: true,
+        isActive: true,
         price: true,
         blendePrice: true,
         catalogBlendeId: true,
@@ -51,10 +56,26 @@ export async function POST(request, { params }) {
       existingItem,
     });
 
-    const item = await prisma.kitchenItem.update({
-      where: { id },
-      data,
-      select: { kitchenId: true },
+    const item = await prisma.$transaction(async (tx) => {
+      const updatedItem = await tx.kitchenItem.update({
+        where: { id },
+        data,
+        select: {
+          kitchenId: true,
+          code: true,
+          articleNumber: true,
+          componentKey: true,
+          isActive: true,
+        },
+      });
+
+      await syncDishwasherClaimPartsForAdminItem({
+        tx,
+        item: updatedItem,
+        previousItem: existingItem,
+      });
+
+      return updatedItem;
     });
 
     return redirectWithFlash(request, `/admin/kitchens/${item.kitchenId}`, "success", "Item updated.");
