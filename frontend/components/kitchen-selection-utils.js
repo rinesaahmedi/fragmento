@@ -1173,7 +1173,11 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
     ["component-sink-base", "component-base-module-2"],
     ["component-wall-cabinet-2", "component-wall-cabinet-3"],
   ],
-  "ab-110402": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-110402": [
+    ["component-wall-cabinet-2", "component-extractor-hood"],
+    ["component-sink-base", "component-base-module-2"],
+    ["component-wall-cabinet-4", "component-wall-cabinet-5"],
+  ],
   "ab-105849": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105852": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105855": [["component-wall-cabinet-2", "component-extractor-hood"]],

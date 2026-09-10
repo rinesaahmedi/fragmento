@@ -123,7 +123,7 @@ test("AB 109873 links its SP120, US90 and H9002 faces and hood package", () => {
   );
   assert.match(
     catalogPanel,
-    /articleNumber === "H9002" && iconKey\.startsWith\("wall_cabinet"\)/,
+    /DOUBLE_DOOR_WALL_CABINET_ARTICLES\.has\(articleNumber\) && iconKey\.startsWith\("wall_cabinet"\)/,
   );
   assert.doesNotMatch(items, /CAB-BASE-AB109873-DEFAULT-1/);
   assert.doesNotMatch(items, /CAB-BASE-AB109873-DEFAULT-2/);
