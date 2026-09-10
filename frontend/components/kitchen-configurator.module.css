@@ -582,9 +582,9 @@
 .planSidePanelIndicator {
   position: absolute;
   z-index: 12;
-  width: 1px;
+  width: 2px;
   background: rgba(37, 99, 235, 0.95);
-  box-shadow: 0 0 0 0.25px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 0 0 0.35px rgba(37, 99, 235, 0.35);
   pointer-events: none;
 }
 

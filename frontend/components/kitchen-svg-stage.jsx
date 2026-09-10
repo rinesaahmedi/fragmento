@@ -470,7 +470,9 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "oven-module", points: [[39.81, 59.51], [51.81, 57.35], [51.81, 89.52], [39.81, 91.94]] },
     { componentKey: "base-module-2", points: [[51.92, 57.31], [62.3, 59.31], [62.3, 91.55], [51.92, 89.52]] },
     { componentKey: "base-module-3", points: [[72.33, 61.34], [82.67, 63.36], [82.67, 95.55], [72.33, 93.56]] },
-    { componentKey: "base-module-3", points: [[82.67, 63.46], [94.54, 62.03], [94.54, 93.74], [82.67, 95.55]] },
+    // The broad exposed return is the fixed WU16 cabinet side panel, not a
+    // second face of the optional dishwasher. Keep it with the locked worktop.
+    { componentKey: "worktop", points: [[82.67, 63.46], [94.54, 62.03], [94.54, 93.74], [82.67, 95.55]], preserveManualSize: true },
     { componentKey: "corner-base", points: [[62.31, 59.71], [72.3, 61.25], [72.41, 93.32], [62.22, 91.82]], preserveManualSize: true },
     { componentKey: "sink-faucet", points: [[69.95, 45.98], [76.1, 45.98], [76.1, 58.89], [69.95, 58.89]], preserveManualSize: true },
   ],
@@ -1398,9 +1400,14 @@ IMAGE_HOTSPOTS_BY_SLUG["105845-modul-2"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105845"];
 // cabinet and the refrigerator. Keep it as a visual indicator instead of a
 // hotspot so it cannot alter the worktop selection or order value.
 const PLAN_SIDE_PANEL_INDICATORS_BY_SLUG = {
-  "ab-105825": { left: 75.65, top: 61.2, height: 28.55 },
-  "ab-105828": { left: 75.65, top: 61.2, height: 28.55 },
-  "ab-105831": { left: 74.75, top: 65.95, height: 29.55 },
+  "ab-105825": [{ left: 75.65, top: 61.2, height: 28.55 }],
+  "ab-105828": [{ left: 75.65, top: 61.2, height: 28.55 }],
+  "ab-105831": [{ left: 74.75, top: 65.95, height: 29.55 }],
+  "ab-105834": [
+    { left: 29.55, top: 60.65, height: 32.44 },
+    { left: 82.55, top: 63.46, height: 32.09 },
+    { left: 94.42, top: 62.03, height: 31.71 },
+  ],
 };
 
 // The AB 105825 drawing splits its L-shaped worktop across overlapping source
@@ -2411,14 +2418,12 @@ export default function useKitchenSvgStage({
         .filter((hotspot) => hotspot.width > 0 && hotspot.height > 0),
     [activeImageHotspots, activePlanDisplayCrop],
   );
-  const sidePanelIndicator = useMemo(() => {
-    const indicator = PLAN_SIDE_PANEL_INDICATORS_BY_SLUG[normalizedKitchenSlug];
-    if (!indicator) return null;
-
-    return cropPlanBox(
+  const sidePanelIndicators = useMemo(() => {
+    const indicators = PLAN_SIDE_PANEL_INDICATORS_BY_SLUG[normalizedKitchenSlug] || [];
+    return indicators.map((indicator) => cropPlanBox(
       { ...indicator, width: 0.001 },
       activePlanDisplayCrop,
-    );
+    ));
   }, [activePlanDisplayCrop, normalizedKitchenSlug]);
   const splitKitchenSideLabels = useMemo(
     () => getSplitKitchenSideLabels(activeImageHotspots, activePlanDisplayCrop, normalizedKitchenSlug, translate, language),
@@ -2873,17 +2878,18 @@ export default function useKitchenSvgStage({
                         </button>
                       );
                     })}
-                    {sidePanelIndicator ? (
+                    {sidePanelIndicators.map((indicator) => (
                       <span
+                        key={`${indicator.left}-${indicator.top}-${indicator.height}`}
                         aria-hidden="true"
                         className={styles.planSidePanelIndicator}
                         style={{
-                          left: `${sidePanelIndicator.left}%`,
-                          top: `${sidePanelIndicator.top}%`,
-                          height: `${sidePanelIndicator.height}%`,
+                          left: `${indicator.left}%`,
+                          top: `${indicator.top}%`,
+                          height: `${indicator.height}%`,
                         }}
                       />
-                    ) : null}
+                    ))}
                   </div>
                   {activePersistentLightDetails.map((detail) => {
                     const detailComponentId = componentIdForKey(detail.componentKey);
