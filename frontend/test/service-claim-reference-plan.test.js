@@ -89,6 +89,9 @@ test("JPG-only ASC serial-number help chooses an appliance before showing photos
   assert.match(flow, /setSerialHelpApplianceType\(appliance\.type\)/);
   assert.match(flow, /serialNumberHelpBack/);
   assert.match(flow, /setSerialHelpApplianceType\(""\)/);
+  assert.match(flow, /getSerialNumberHelpApplianceType\(serialNumberHelpProduct\)/);
+  assert.match(flow, /serialNumberHelpBodyExtractorHood/);
+  assert.match(flow, /serialNumberHelpBodyHob/);
   assert.match(styles, /\.service-serial-help__appliance-grid/);
   assert.match(styles, /\.service-serial-help__appliance/);
 });

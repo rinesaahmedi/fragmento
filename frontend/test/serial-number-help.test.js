@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  getSerialNumberHelpApplianceType,
   getSerialNumberHelpImages,
   SERIAL_NUMBER_HELP_APPLIANCES,
 } from "../lib/serial-number-help.js";
@@ -27,6 +28,19 @@ test("cooktop and hob use the oven serial-number image", () => {
 
   assert.deepEqual(hobImages, ovenImages);
   assert.deepEqual(cooktopImages, ovenImages);
+});
+
+test("ASC choices and FRG components resolve hood and hob help copy types", () => {
+  assert.equal(getSerialNumberHelpApplianceType({ claimPartKey: "hob" }), "hob");
+  assert.equal(getSerialNumberHelpApplianceType({ claimPartKey: "cooktop" }), "hob");
+  assert.equal(
+    getSerialNumberHelpApplianceType({ componentId: "component-claim-cooktop" }),
+    "hob",
+  );
+  assert.equal(
+    getSerialNumberHelpApplianceType({ componentId: "component-extractor-hood" }),
+    "extractor_hood",
+  );
 });
 
 test("serial-number help images are separated by appliance type", () => {

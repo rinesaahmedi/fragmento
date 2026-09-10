@@ -27,6 +27,7 @@ import {
 import { isElectricalApplianceProblemArea } from "../lib/service-claim-serial-number";
 import {
   getSerialNumberHelpImages,
+  getSerialNumberHelpApplianceType,
   SERIAL_NUMBER_HELP_APPLIANCES,
 } from "../lib/serial-number-help";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
@@ -698,6 +699,8 @@ const COPY = {
     serialNumberHelpAria: "Hilfe: Wo finde ich die Seriennummer?",
     serialNumberHelpTitle: "Seriennummer finden",
     serialNumberHelpBody: "Die Seriennummer finden Sie meist auf dem Typenschild im Ger\u00e4t oder an der Innenwand. Die Beispiele unten zeigen typische Positionen.",
+    serialNumberHelpBodyExtractorHood: "Die Seriennummer befindet sich hinter dem Metall-Fettfilter und dem Aktivkohlefilter. Schalten Sie das Ger\u00e4t aus und entfernen Sie beide Filter, um das Typenschild mit der Seriennummer zu sehen.",
+    serialNumberHelpBodyHob: "Die Seriennummer des Kochfelds befindet sich unter dem Ger\u00e4t und ist nach dem Einbau normalerweise nicht sichtbar. Unsere Kochfelder und Back\u00f6fen werden meist als Herdset mit einer gemeinsamen Seriennummer verkauft. Sie finden diese Seriennummer auf der Innenseite der Backofent\u00fcr.",
     serialNumberHelpChooseBody: "W\u00e4hlen Sie zuerst das Elektroger\u00e4t aus.",
     serialNumberHelpBack: "Zur\u00fcck zu den Elektroger\u00e4ten",
     serialNumberApplianceDishwasher: "Geschirrsp\u00fcler",
@@ -1004,6 +1007,8 @@ const COPY = {
     serialNumberHelpAria: "Help: where to find the serial number",
     serialNumberHelpTitle: "Finding the serial number",
     serialNumberHelpBody: "You can usually find the serial number on the appliance rating plate or on an inside wall. The examples below show typical locations.",
+    serialNumberHelpBodyExtractorHood: "The serial number is located behind the metal grease filter and the activated carbon filter. Switch off the appliance and remove both filters to see the serial-number label.",
+    serialNumberHelpBodyHob: "The cooktop's serial number is underneath the appliance and is normally not visible after installation. Our cooktops and ovens are usually sold as one stove set with a shared serial number. You can find this serial number on the inside of the oven door.",
     serialNumberHelpChooseBody: "First select the electrical appliance.",
     serialNumberHelpBack: "Back to appliances",
     serialNumberApplianceDishwasher: "Dishwasher",
@@ -1327,6 +1332,8 @@ const COPY = {
     serialNumberHelpAria: "Yard\u0131m: seri numaras\u0131 nerede bulunur?",
     serialNumberHelpTitle: "Seri numaras\u0131n\u0131 bulma",
     serialNumberHelpBody: "Seri numaras\u0131n\u0131 genelde cihaz etiketinde veya i\u00e7 taraftaki bir y\u00fczeyde bulabilirsiniz. A\u015fa\u011f\u0131daki \u00f6rnekler tipik konumlar\u0131 g\u00f6sterir.",
+    serialNumberHelpBodyExtractorHood: "Seri numaras\u0131 metal ya\u011f filtresinin ve aktif karbon filtresinin arkas\u0131ndad\u0131r. Cihaz\u0131 kapat\u0131n ve seri numaras\u0131 etiketini g\u00f6rmek i\u00e7in her iki filtreyi de \u00e7\u0131kar\u0131n.",
+    serialNumberHelpBodyHob: "Oca\u011f\u0131n seri numaras\u0131 cihaz\u0131n alt\u0131ndad\u0131r ve montajdan sonra normalde g\u00f6r\u00fcnmez. Ocaklar\u0131m\u0131z ve f\u0131r\u0131nlar\u0131m\u0131z genellikle ortak seri numaras\u0131na sahip tek bir set olarak sat\u0131l\u0131r. Bu seri numaras\u0131n\u0131 f\u0131r\u0131n kapa\u011f\u0131n\u0131n i\u00e7 taraf\u0131nda bulabilirsiniz.",
     serialNumberHelpChooseBody: "\u00d6nce elektrikli cihaz\u0131 se\u00e7in.",
     serialNumberHelpBack: "Cihazlara geri d\u00f6n",
     serialNumberApplianceDishwasher: "Bula\u015f\u0131k makinesi",
@@ -1572,6 +1579,8 @@ const COPY = {
     serialNumberHelpAria: "Ayuda: d\u00f3nde encontrar el n\u00famero de serie",
     serialNumberHelpTitle: "Encontrar el n\u00famero de serie",
     serialNumberHelpBody: "Normalmente puede encontrar el n\u00famero de serie en la placa del aparato o en una pared interior. Los ejemplos siguientes muestran ubicaciones t\u00edpicas.",
+    serialNumberHelpBodyExtractorHood: "El n\u00famero de serie se encuentra detr\u00e1s del filtro met\u00e1lico antigrasa y del filtro de carb\u00f3n activo. Apague el aparato y retire ambos filtros para ver la etiqueta del n\u00famero de serie.",
+    serialNumberHelpBodyHob: "El n\u00famero de serie de la placa de cocci\u00f3n se encuentra debajo del aparato y normalmente no es visible despu\u00e9s de la instalaci\u00f3n. Nuestras placas y hornos suelen venderse como un solo conjunto con un n\u00famero de serie compartido. Encontrar\u00e1 este n\u00famero en el interior de la puerta del horno.",
     serialNumberHelpChooseBody: "Seleccione primero el electrodom\u00e9stico.",
     serialNumberHelpBack: "Volver a los electrodom\u00e9sticos",
     serialNumberApplianceDishwasher: "Lavavajillas",
@@ -1817,6 +1826,8 @@ const COPY = {
     serialNumberHelpAria: "Aide : o\u00f9 trouver le num\u00e9ro de s\u00e9rie",
     serialNumberHelpTitle: "Trouver le num\u00e9ro de s\u00e9rie",
     serialNumberHelpBody: "Vous trouverez g\u00e9n\u00e9ralement le num\u00e9ro de s\u00e9rie sur la plaque signal\u00e9tique de l'appareil ou sur une paroi int\u00e9rieure. Les exemples ci-dessous montrent les emplacements les plus courants.",
+    serialNumberHelpBodyExtractorHood: "Le num\u00e9ro de s\u00e9rie se trouve derri\u00e8re le filtre m\u00e9tallique \u00e0 graisse et le filtre \u00e0 charbon actif. \u00c9teignez l'appareil et retirez les deux filtres pour voir l'\u00e9tiquette du num\u00e9ro de s\u00e9rie.",
+    serialNumberHelpBodyHob: "Le num\u00e9ro de s\u00e9rie de la plaque de cuisson se trouve sous l'appareil et n'est normalement plus visible apr\u00e8s l'installation. Nos plaques de cuisson et nos fours sont g\u00e9n\u00e9ralement vendus comme un ensemble avec un num\u00e9ro de s\u00e9rie commun. Vous trouverez ce num\u00e9ro \u00e0 l'int\u00e9rieur de la porte du four.",
     serialNumberHelpChooseBody: "S\u00e9lectionnez d'abord l'appareil \u00e9lectrique.",
     serialNumberHelpBack: "Retour aux appareils",
     serialNumberApplianceDishwasher: "Lave-vaisselle",
@@ -2061,6 +2072,8 @@ const COPY = {
     serialNumberHelpAria: "\u0421\u043f\u0440\u0430\u0432\u043a\u0430: \u0433\u0434\u0435 \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
     serialNumberHelpTitle: "\u041a\u0430\u043a \u043d\u0430\u0439\u0442\u0438 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440",
     serialNumberHelpBody: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043e\u0431\u044b\u0447\u043d\u043e \u0443\u043a\u0430\u0437\u0430\u043d \u043d\u0430 \u0437\u0430\u0432\u043e\u0434\u0441\u043a\u043e\u0439 \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0435 \u043f\u0440\u0438\u0431\u043e\u0440\u0430 \u0438\u043b\u0438 \u043d\u0430 \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0435\u0439 \u0441\u0442\u0435\u043d\u043a\u0435. \u041d\u0438\u0436\u0435 \u043f\u043e\u043a\u0430\u0437\u0430\u043d\u044b \u0442\u0438\u043f\u0438\u0447\u043d\u044b\u0435 \u043c\u0435\u0441\u0442\u0430.",
+    serialNumberHelpBodyExtractorHood: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430\u0445\u043e\u0434\u0438\u0442\u0441\u044f \u0437\u0430 \u043c\u0435\u0442\u0430\u043b\u043b\u0438\u0447\u0435\u0441\u043a\u0438\u043c \u0436\u0438\u0440\u043e\u0432\u044b\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u043e\u043c \u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u043e\u043c \u0441 \u0430\u043a\u0442\u0438\u0432\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u043c \u0443\u0433\u043b\u0451\u043c. \u0412\u044b\u043a\u043b\u044e\u0447\u0438\u0442\u0435 \u043f\u0440\u0438\u0431\u043e\u0440 \u0438 \u0441\u043d\u0438\u043c\u0438\u0442\u0435 \u043e\u0431\u0430 \u0444\u0438\u043b\u044c\u0442\u0440\u0430, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0443 \u0441 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u043c \u043d\u043e\u043c\u0435\u0440\u043e\u043c.",
+    serialNumberHelpBodyHob: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0432\u0430\u0440\u043e\u0447\u043d\u043e\u0439 \u043f\u0430\u043d\u0435\u043b\u0438 \u043d\u0430\u0445\u043e\u0434\u0438\u0442\u0441\u044f \u0441\u043d\u0438\u0437\u0443 \u0438 \u043e\u0431\u044b\u0447\u043d\u043e \u043d\u0435 \u0432\u0438\u0434\u0435\u043d \u043f\u043e\u0441\u043b\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0438. \u041d\u0430\u0448\u0438 \u0432\u0430\u0440\u043e\u0447\u043d\u044b\u0435 \u043f\u0430\u043d\u0435\u043b\u0438 \u0438 \u0434\u0443\u0445\u043e\u0432\u044b\u0435 \u0448\u043a\u0430\u0444\u044b \u043e\u0431\u044b\u0447\u043d\u043e \u043f\u0440\u043e\u0434\u0430\u044e\u0442\u0441\u044f \u043a\u0430\u043a \u043e\u0434\u0438\u043d \u043a\u043e\u043c\u043f\u043b\u0435\u043a\u0442 \u0441 \u043e\u0431\u0449\u0438\u043c \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u043c \u043d\u043e\u043c\u0435\u0440\u043e\u043c. \u042d\u0442\u043e\u0442 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430\u0445\u043e\u0434\u0438\u0442\u0441\u044f \u043d\u0430 \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0435\u0439 \u0441\u0442\u043e\u0440\u043e\u043d\u0435 \u0434\u0432\u0435\u0440\u0446\u044b \u0434\u0443\u0445\u043e\u0432\u043e\u0433\u043e \u0448\u043a\u0430\u0444\u0430.",
     serialNumberHelpChooseBody: "\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043f\u0440\u0438\u0431\u043e\u0440.",
     serialNumberHelpBack: "\u041d\u0430\u0437\u0430\u0434 \u043a \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043f\u0440\u0438\u0431\u043e\u0440\u0430\u043c",
     serialNumberApplianceDishwasher: "\u041f\u043e\u0441\u0443\u0434\u043e\u043c\u043e\u0435\u0447\u043d\u0430\u044f \u043c\u0430\u0448\u0438\u043d\u0430",
@@ -2492,6 +2505,13 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
     ),
     [serialHelpApplianceType, serialNumberHelpProduct],
   );
+  const resolvedSerialHelpApplianceType = serialHelpApplianceType
+    || getSerialNumberHelpApplianceType(serialNumberHelpProduct);
+  const serialNumberHelpBodyKey = resolvedSerialHelpApplianceType === "extractor_hood"
+    ? "serialNumberHelpBodyExtractorHood"
+    : resolvedSerialHelpApplianceType === "hob"
+      ? "serialNumberHelpBodyHob"
+      : "serialNumberHelpBody";
   const serialHelpSlideCount = serialNumberHelpImages.length;
   const [isClaimAssistantOpen, setIsClaimAssistantOpen] = useState(false);
   const [claimAssistantMessages, setClaimAssistantMessages] = useState(EMPTY_CLAIM_ASSISTANT_MESSAGES);
@@ -7112,7 +7132,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
             <p className="service-contract-help__intro">
               {isReferenceOnlyPlan && !serialHelpApplianceType
                 ? t("serialNumberHelpChooseBody")
-                : t("serialNumberHelpBody")}
+                : t(serialNumberHelpBodyKey)}
             </p>
             {isReferenceOnlyPlan && !serialHelpApplianceType ? (
               <div className="service-serial-help__appliance-grid">
