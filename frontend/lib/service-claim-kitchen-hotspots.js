@@ -524,11 +524,29 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       outer: 95.159145,
     },
   },
-  // AB 109955 combines the 600 mm sink cabinet and its UPK20 in one FRG
-  // hotspot. In ASC, split them on the exact x=267 PDF divider so the left
-  // filler is independently claimable and the sink cabinet starts beside it.
+  // AB 109955 combines each left 600 mm cabinet with its filler in the FRG
+  // hotspots. Split both pairs on the shared exact x=267 PDF divider so the
+  // upper and lower ASC highlights stop on the same visible line.
   "ab-109955": {
     "sink-base": { side: "left", outer: 0.39905, inner: 3.805226 },
+    "wall-cabinet-1": { side: "left", outer: 0.39905, inner: 3.805226 },
+  },
+  // AB 110401 draws the far-right US60 with its front, a narrow UPK20 strip,
+  // and the exposed cabinet side. Split only the middle strip as the Blende;
+  // both surrounding faces continue to belong to the US60 cabinet.
+  "ab-110401": {
+    "base-module-1": {
+      side: "left",
+      outer: 14.508314,
+      inner: 14.950119,
+      preserveOuterCabinetFace: true,
+    },
+    "base-module-4": {
+      side: "right",
+      inner: 80.622328,
+      outer: 83.102138,
+      preserveOuterCabinetFace: true,
+    },
   },
   // Burger 103898: the US60 front ends at the first corner divider. UPE65
   // consists of both narrow perspective faces up to the sink-base seam.
@@ -1982,7 +2000,11 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
   });
 
   const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
-  const sp120SinkCabinetPart = normalizedSlug === "ab-109873"
+  const linkedSinkCabinetFaceKeys = {
+    "ab-109873": new Set(["base-module-1"]),
+    "ab-110401": new Set(["base-module-2"]),
+  }[normalizedSlug] || new Set();
+  const linkedSinkCabinetPart = linkedSinkCabinetFaceKeys.size
     ? normalizedParts.find((part) => part.partKey === "sink-cabinet")
     : null;
   const hasVisibleSink = isLShapedClaimKitchen(normalizedSlug);
@@ -2034,11 +2056,10 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
   return (hotspots || []).flatMap((sourceHotspot, hotspotIndex) => {
     const hotspot = trimCabinetAtWorktopEndPanel(sourceHotspot, worktopEndPanels);
     const sourceComponentKey = String(hotspot?.componentKey || "").trim();
-    // SP120 is one cabinet with two 60 cm fronts in the drawing. Give both
-    // fronts the same ASC claim identity so the cabinet option paints both,
-    // while sink, faucet and Blende keep their own independent identities.
-    if (sourceComponentKey === "base-module-1" && sp120SinkCabinetPart) {
-      return [existingClaimPartHotspot(hotspot, sp120SinkCabinetPart)];
+    // Wide sink cabinets can be drawn as two adjacent fronts. Give every front
+    // the same ASC claim identity while keeping sink and faucet independent.
+    if (linkedSinkCabinetFaceKeys.has(sourceComponentKey) && linkedSinkCabinetPart) {
+      return [existingClaimPartHotspot(hotspot, linkedSinkCabinetPart)];
     }
     const sourceParts = partsBySourceKey.get(sourceComponentKey) || [];
     if (!sourceParts.length) {

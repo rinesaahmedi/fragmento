@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
-import { getLinkedComponentIds, getLocalizedItemName } from "../components/kitchen-selection-utils.js";
+import { getLinkedComponentIds, getLocalizedItemName, getProductInfoDocuments } from "../components/kitchen-selection-utils.js";
 import {
   PLAN_HOTSPOTS_BY_SLUG,
   PLAN_IMAGE_BY_SLUG,
@@ -54,10 +54,10 @@ test("AB 109955 preserves all ten schedule rows, prices, and four defaults", () 
 
   assert.match(seed, /slug: "ab-109955"[\s\S]*?kitchenCode: "109 955"[\s\S]*?items: AB_109955_ITEMS/);
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "670"\)/);
-  assert.match(items, /defaultOvenHob/);
+  assert.match(items, /defaultOvenHob\(\{[\s\S]*?catalogArticleNumber: "A-EH923640E \+ 9EC744100C"/);
   assert.match(items, /defaultWorktop/);
   assert.match(items, /SINK-BASE-AB109955-DEFAULT-UPK20[^;]+blendeCode: "UPK20"/);
-  assert.match(items, /CAB-BASE-AB109955-DEFAULT[^;]+isLocked: true/);
+  assert.match(items, /CAB-BASE-AB109955-DEFAULT[^;]+name: "Lower Cabinet with Drawer 60 cm"[^;]+price: "0\.00"[^;]+isLocked: true[^;]+articleNumber: "US60"/);
   assert.equal((items.match(/isLocked: true/g) || []).length, 2);
   for (const [code, price] of [
     ["DISH-AB109955-600", "579.00"],
@@ -72,6 +72,61 @@ test("AB 109955 preserves all ten schedule rows, prices, and four defaults", () 
   assert.match(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+catalogArticleNumber: "H6002"/);
   assert.match(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+displayArticleNumber: "H6002 \+ HPK2002"/);
   assert.doesNotMatch(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+HPK2002\s*\(35E\)/);
+});
+
+test("AB 109955 uses its kitchen-specific A-EH923640E oven document", () => {
+  const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+  const migration = readFileSync(
+    new URL("../prisma/migrations/20260910130000_set_ab109955_oven_product_information/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(seed, /ovenArticleCode = String\(ovenBundle\.articleNumber[\s\S]*?PRODUCT_INFO_BY_ARTICLE_NUMBER\[ovenArticleCode\]/);
+  assert.doesNotMatch(seed, /normalizedKitchenSlug === "ab-109955"/);
+  assert.match(seed, /AB_109955_OVEN_CLAIM_PRODUCT_INFO[\s\S]*?a-eh923640e-product-info\.pdf/);
+  assert.match(migration, /kitchen\."slug" = 'ab-109955'/);
+  assert.match(migration, /"catalogArticleId" = article\."id"/);
+  assert.match(migration, /article\."articleNumber" = 'A-EH923640E \+ 9EC744100C'/);
+  assert.match(migration, /"articleCode" = 'A-EH923640E'/);
+  assert.match(migration, /a-eh923640e-product-info\.pdf/);
+
+  assert.deepEqual(getProductInfoDocuments({
+    code: "OVEN-B-600-HOB",
+    articleNumber: "A-EH923640E + 9EC744100C",
+  }), [
+    { label: "Backofen PDF", href: "/product-info/ovens/eh923640e/a-eh923640e-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
+  ]);
+  assert.ok(!getProductInfoDocuments({
+    code: "OVEN-B-600-HOB",
+    articleNumber: "A-EH923640E + 9EC744100C",
+  }).some((document) => /e-label/i.test(document.label)));
+});
+
+test("the additional kitchens link their default oven to the A-EH923640E catalog package", () => {
+  const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+  const migration = readFileSync(
+    new URL("../prisma/migrations/20260910140000_link_additional_kitchens_to_a_eh923640e/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  for (const kitchenCode of ["110140", "110401", "110402", "110510"]) {
+    const items = seed.match(
+      new RegExp(`const AB_${kitchenCode}_ITEMS = \\[([\\s\\S]*?)\\n\\];`),
+    )?.[1] || "";
+    assert.match(
+      items,
+      /defaultOvenHob\(\{[^\n]+catalogArticleNumber: "A-EH923640E \+ 9EC744100C"/,
+      `AB ${kitchenCode} should use the A-EH923640E catalog package`,
+    );
+    assert.match(migration, new RegExp(`'ab-${kitchenCode}'`));
+  }
+
+  assert.match(migration, /item\."code" = 'OVEN-B-600-HOB'/);
+  assert.match(migration, /article\."articleNumber" = 'A-EH923640E \+ 9EC744100C'/);
+  assert.match(migration, /part\."partKey" = 'oven'/);
+  assert.match(migration, /"articleCode" = 'A-EH923640E'/);
+  assert.doesNotMatch(migration, /e-label/i);
 });
 
 test("AB 109955 maps PDF callouts and links the complete hood package", () => {
@@ -164,4 +219,29 @@ test("AB 109955 exposes the sink Blende as its own claim row", () => {
   assert.equal(blende?.isStandaloneClaimOption, true);
   assert.ok(selection.selectableComponentIds.includes(blende.componentId));
   assert.ok(!sinkGroup.options.some((option) => option.componentId === blende.componentId));
+});
+
+test("AB 109955 exposes the included US60 identity in ASC", () => {
+  const us60 = {
+    itemType: "COMPONENT",
+    code: "CAB-BASE-AB109955-DEFAULT",
+    name: "Lower Cabinet with Drawer 60 cm",
+    nameDe: "Unterschrank mit Schublade 60 cm",
+    articleNumber: "US60",
+    componentKey: "base-module-1",
+    widthMm: 600,
+    isLocked: true,
+  };
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items: [us60] },
+    kitchenConfig: { components: [us60] },
+    kitchenSlug: slug,
+    claimParts: [],
+  });
+  const cabinet = selection.selectableComponents.find(
+    (entry) => entry.componentId === "component-base-module-1",
+  );
+
+  assert.equal(cabinet?.articleCode, "US60");
+  assert.equal(cabinet?.name, "Lower Cabinet with Drawer 60 cm");
 });

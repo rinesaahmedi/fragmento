@@ -6,7 +6,7 @@ import { stripProductDimensionsFromLabel } from "./product-label-format.js";
 const CLAIM_LINKED_COMPONENT_META = {
   "component-extractor-hood": {
     code: "HOOD-B-FH664621E",
-    articleCode: "FH 664 621 E",
+    articleCode: "FH664621E",
     name: "Extractor Hood",
     nameDe: "Flachschirmhaube",
   },
@@ -258,9 +258,9 @@ const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
   "ab-110140": [
     {
       sourceComponentKey: "base-module-2",
-      code: "BLENDE-AB110140-CORNER",
-      name: "Corner Blende",
-      nameDe: "Eckblende",
+      code: "UPEF65",
+      name: "Corner filler panel for Lower cabinet",
+      nameDe: "Eckpassblende Unterschrank",
     },
   ],
 };
@@ -404,6 +404,11 @@ const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
     "component-wall-cabinet-5",
     "component-wall-cabinet-6",
   ]],
+  // H9002 is drawn as two adjacent 45 cm fronts but is one 90 cm cabinet.
+  "ab-110401": [[
+    "component-wall-cabinet-2",
+    "component-wall-cabinet-3",
+  ]],
   // Burger 103898 draws the hood cabinet, extractor and its two LED symbols as
   // one supplied assembly. Keep all three claim targets in sync when any face
   // of that assembly is clicked, hovered, or removed.
@@ -540,7 +545,12 @@ function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
 function resolveServiceClaimArticleCode(meta = {}) {
   const articleNumber = String(meta.articleNumber || meta.articleCode || "").trim();
   if (articleNumber) {
-    const articleParts = articleNumber.split("+").map((part) => part.trim()).filter(Boolean);
+    const articleParts = articleNumber.split("+").map((part) => {
+      const trimmedPart = part.trim();
+      return trimmedPart.replace(/\s+/g, "").toUpperCase() === "FH664621E"
+        ? "FH664621E"
+        : trimmedPart;
+    }).filter(Boolean);
     if (String(meta.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
       const cabinetArticle = articleParts.find((part) => /^HD\d+/i.test(part));
       if (cabinetArticle) return cabinetArticle;

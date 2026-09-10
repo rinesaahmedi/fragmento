@@ -80,8 +80,46 @@ test("AB 110140 schedule preserves six DEFAULT rows and all priced articles", ()
     assert.ok(line?.includes(`price: "${price}"`), `${code} should cost ${price}`);
   }
   assert.match(block, /code: "REF-AB110140-KGCN388140E"[^\n]+articleNumber: "OL-KGCN388140E"/);
+  assert.match(block, /code: "SINK-BASE-AB110140-DEFAULT"[\s\S]*?widthMm: 1100[\s\S]*?articleNumber: "SPEB110"/);
+  assert.match(block, /code: "CAB-BASE-AB110140-DEFAULT-SINK-RUN"[^\n]+name: "Lower Cabinet 45 cm"[^\n]+widthMm: 450[^\n]+componentKey: "base-module-1"[^\n]+articleNumber: "U45"/);
+  assert.match(block, /code: "CAB-BASE-AB110140-DEFAULT-LEFT"[^\n]+name: "Lower Cabinet with Drawer 60 cm"[^\n]+widthMm: 600[^\n]+componentKey: "base-module-2"[^\n]+articleNumber: "US60"[^\n]+blendeCode: "UPEF65"[^\n]+blendePrice: blendePrice\("UPEF65", 1\)/);
+  assert.match(block, /code: "CAB-BASE-AB110140-DEFAULT-RIGHT"[^\n]+name: "Lower Cabinet 50 cm"[^\n]+widthMm: 500[^\n]+componentKey: "base-module-3"[^\n]+articleNumber: "U50"/);
   assert.match(block, /code: "CAB-WALL-AB110140-H6002-HPK2002"[^\n]+price: articlePriceWithBlende\("H6002", "HPK2002", 1\)[^\n]+blendeCode: "HPK2002"[^\n]+blendePrice: blendePrice\("HPK2002", 1\)/);
   assert.doesNotMatch(block, /A-EGSPV597210|TGV60|DISH-AB110140/);
+});
+
+test("AB 110140 exposes SPEB110, U45, US60, and U50 in ASC", () => {
+  const items = [
+    { itemType: "COMPONENT", code: "SINK-BASE-AB110140-DEFAULT", name: "Sink Lower Cabinet", articleNumber: "SPEB110", componentKey: "sink-base", widthMm: 1100, isLocked: true },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB110140-DEFAULT-SINK-RUN", name: "Lower Cabinet 45 cm", articleNumber: "U45", componentKey: "base-module-1", widthMm: 450, isLocked: true },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB110140-DEFAULT-LEFT", name: "Lower Cabinet with Drawer 60 cm", articleNumber: "US60", componentKey: "base-module-2", widthMm: 600, isLocked: true, blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", catalogBlende: { code: "UPEF65", name: "Corner filler panel for Lower cabinet", nameDe: "Eckpassblende Unterschrank" } },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB110140-DEFAULT-RIGHT", name: "Lower Cabinet 50 cm", articleNumber: "U50", componentKey: "base-module-3", widthMm: 500, isLocked: true },
+  ];
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items },
+    kitchenConfig: { components: items },
+    kitchenSlug: slug,
+    claimParts: [{
+      partKey: "sink-cabinet",
+      name: "Sink Lower Cabinet",
+      articleCode: "SPEB110",
+      sourceKitchenItemCode: "SINK-BASE-AB110140-DEFAULT",
+      sourceComponentKey: "sink-base",
+    }],
+  });
+
+  const articleBySourceKey = Object.fromEntries(
+    selection.selectableComponents
+      .filter((entry) => (
+        entry.claimPartKey !== "blende"
+        && ["sink-base", "base-module-1", "base-module-2", "base-module-3"].includes(entry.sourceComponentKey || entry.componentKey)
+      ))
+      .map((entry) => [entry.sourceComponentKey || entry.componentKey, entry.articleCode]),
+  );
+  assert.equal(articleBySourceKey["sink-base"], "SPEB110");
+  assert.equal(articleBySourceKey["base-module-1"], "U45");
+  assert.equal(articleBySourceKey["base-module-2"], "US60");
+  assert.equal(articleBySourceKey["base-module-3"], "U50");
 });
 
 test("AB 110140 maps schedule callouts and links the complete hood package", () => {
@@ -169,8 +207,16 @@ test("AB 110140 offers cabinet and corner Blende choices from their shared claim
     itemType: "COMPONENT",
     code: "CAB-BASE-AB110140-DEFAULT-LEFT",
     componentKey: "base-module-2",
-    name: "Included base cabinet",
-    nameDe: "Inklusiver Unterschrank",
+    name: "Lower Cabinet with Drawer 60 cm",
+    nameDe: "Unterschrank mit Schublade 60 cm",
+    articleNumber: "US60",
+    blendeCode: "UPEF65",
+    blendeLabel: "UPEF65 Corner filler panel",
+    catalogBlende: {
+      code: "UPEF65",
+      name: "Corner filler panel for Lower cabinet",
+      nameDe: "Eckpassblende Unterschrank",
+    },
     widthMm: 600,
     isLocked: true,
     isActive: true,
@@ -186,8 +232,9 @@ test("AB 110140 offers cabinet and corner Blende choices from their shared claim
   const group = buildServiceClaimComponentChoiceGroups(selection.selectableComponents)
     .find((entry) => entry.sourceComponentKey === "base-module-2");
 
-  assert.equal(blende?.name, "Corner Blende");
-  assert.equal(blende?.nameDe, "Eckblende");
+  assert.equal(blende?.articleCode, "UPEF65");
+  assert.equal(blende?.name, "Corner filler panel for Lower cabinet");
+  assert.equal(blende?.nameDe, "Eckpassblende Unterschrank");
   assert.equal(blende?.isCompanionOption, true);
   assert.equal(blende?.isPlanSelectableCompanion, true);
   assert.deepEqual(
