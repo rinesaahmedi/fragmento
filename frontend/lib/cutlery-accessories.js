@@ -49,6 +49,13 @@ const CUTLERY_INCOMPATIBLE_COMPONENT_KEYS = new Set([
   "washing-machine-base",
 ]);
 
+// Some commercial articles span several physical drawer fronts. Keep the
+// article width as an available insert size, while also exposing the real
+// drawer widths and quantities visible in the supplied kitchen plan.
+const CUTLERY_ADDITIONAL_WIDTHS_MM_BY_COMPONENT_CODE = new Map([
+  ["CAB-BASE-AB109873-US90", [450, 450]],
+]);
+
 function normalizeArticleNumber(articleNumber) {
   return String(articleNumber || "").trim().toUpperCase();
 }
@@ -174,14 +181,21 @@ export function getAvailableCutleryVariantsForComponents(components = [], varian
   for (const item of components || []) {
     if (!isCutleryInsertCompatibleCabinet(item)) continue;
 
-    const widthMm = getCabinetWidthMm(item);
-    const widthCm = Number(widthMm) / 10;
-    if (!Number.isFinite(widthCm) || widthCm <= 0) continue;
+    const code = String(item?.code || "").trim().toUpperCase();
+    const compatibleWidthsMm = [
+      getCabinetWidthMm(item),
+      ...(CUTLERY_ADDITIONAL_WIDTHS_MM_BY_COMPONENT_CODE.get(code) || []),
+    ];
 
-    const key = Number.isInteger(widthCm)
-      ? String(widthCm)
-      : String(Number(widthCm.toFixed(2))).replace(/\.0+$/, "");
-    widthCounts.set(key, (widthCounts.get(key) || 0) + 1);
+    for (const widthMm of compatibleWidthsMm) {
+      const widthCm = Number(widthMm) / 10;
+      if (!Number.isFinite(widthCm) || widthCm <= 0) continue;
+
+      const key = Number.isInteger(widthCm)
+        ? String(widthCm)
+        : String(Number(widthCm.toFixed(2))).replace(/\.0+$/, "");
+      widthCounts.set(key, (widthCounts.get(key) || 0) + 1);
+    }
   }
 
   const available = normalizeCutleryVariants(variants)

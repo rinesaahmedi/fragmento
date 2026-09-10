@@ -12,7 +12,7 @@ test("base cabinet width uses lower cabinet label", () => {
       widthMm: 300,
       iconKey: "drawer_base_two",
     }),
-    "Lower Cabinet with Drawer 30",
+    "Lower Cabinet with Drawer 30 cm",
   );
 });
 
@@ -24,7 +24,7 @@ test("wall cabinet width uses upper cabinet label", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper Cabinet 60",
+    "Upper Cabinet 60 cm",
   );
 });
 
@@ -106,7 +106,7 @@ test("localized hood wall cabinet uses upper cabinet with extractor hood label",
       "en",
       false,
     ),
-    "Upper Cabinet with Extractor Hood 60",
+    "Upper Cabinet with Extractor Hood 60 cm",
   );
 });
 
@@ -194,7 +194,7 @@ test("wall cabinet width falls back to code", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }),
-    "Upper Cabinet 60",
+    "Upper Cabinet 60 cm",
   );
 });
 
@@ -206,7 +206,7 @@ test("structured width wins over misleading code width", () => {
       widthMm: 500,
       iconKey: "wall_cabinet_standard",
     }),
-    "Upper Cabinet 50",
+    "Upper Cabinet 50 cm",
   );
 });
 
@@ -218,7 +218,7 @@ test("cabinet labels use German names when requested", () => {
       widthMm: 600,
       iconKey: "drawer_base_two",
     }, "de"),
-    "Unterschrank mit Schublade 60",
+    "Unterschrank mit Schublade 60 cm",
   );
   assert.equal(
     getCabinetWidthDisplayName({
@@ -227,7 +227,7 @@ test("cabinet labels use German names when requested", () => {
       widthMm: 600,
       iconKey: "wall_cabinet_plain",
     }, "de"),
-    "Oberschrank 60",
+    "Oberschrank 60 cm",
   );
 });
 
