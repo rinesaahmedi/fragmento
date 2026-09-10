@@ -64,6 +64,11 @@ export async function POST(request, { params }) {
   try {
     const formData = await request.formData();
     const data = validateClaimProductInput(formData);
+    // Source links are structural ASC metadata, not editable product fields.
+    // The grouped catalog form intentionally does not submit them, so allowing
+    // the validated null values through would detach every linked kitchen part.
+    delete data.sourceKitchenItemCode;
+    delete data.sourceComponentKey;
     const submittedIds = String(formData.get("claimProductIds") || "")
       .split(",")
       .map((value) => value.trim())
