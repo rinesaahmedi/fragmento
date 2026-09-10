@@ -14,6 +14,11 @@ const ORIGINAL_OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const ORIGINAL_CLAIM_MODEL = process.env.OPENAI_CLAIM_ASSISTANT_MODEL;
 const ORIGINAL_FETCH = global.fetch;
 
+test("ASC assistant is not blocked by a per-IP request cap", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+  assert.doesNotMatch(source, /enforceRateLimit|getRequestClientIp/);
+});
+
 function loadRoute(overrides = {}) {
   const source = fs
     .readFileSync(routePath, "utf8")

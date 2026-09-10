@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 import { prisma } from "../../../../lib/prisma";
 import { getServiceClaimKitchenPlan } from "../../../../lib/service-claim-kitchen-plan";
 import CLAIMS_CHATBOT_KNOWLEDGE from "../../../../lib/claims-chatbot-knowledge.json";
@@ -3956,12 +3955,6 @@ async function buildOpenAiAnswer({ language, question, context, selectedAreas, c
 
 export async function POST(request) {
   try {
-    const clientIp = getRequestClientIp(request);
-    enforceRateLimit(`service-claims-assistant:${clientIp}`, {
-      limit: 20,
-      windowMs: 15 * 60 * 1000,
-    });
-
     const body = await request.json();
     const conversationMessages = normalizeConversationMessages(body?.conversationMessages);
     const language = resolveAssistantLanguage({

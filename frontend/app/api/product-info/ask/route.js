@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { enforceRateLimit, getRequestClientIp } from "../../../../lib/rate-limit";
 import {
   NOT_FOUND_ANSWER_BY_LANGUAGE,
   NO_INFO_ANSWER_BY_LANGUAGE,
@@ -43,12 +42,6 @@ import {
 export async function POST(request) {
   let responseLanguage = "en";
   try {
-    const clientIp = getRequestClientIp(request);
-    enforceRateLimit(`product-info-ask:${clientIp}`, {
-      limit: 40,
-      windowMs: 15 * 60 * 1000,
-    });
-
     const body = await request.json().catch(() => ({}));
     const question = String(body?.question || "").trim();
     responseLanguage = body?.language ? normalizeLanguage(body.language) : detectQuestionLanguage(question);
@@ -237,7 +230,7 @@ export async function POST(request) {
     const status = Number.isInteger(error?.status) ? error.status : 500;
     const failedError = FAILED_ERROR_BY_LANGUAGE[responseLanguage] || FAILED_ERROR_BY_LANGUAGE.en;
     console.error("Product info assistant failed:", error);
-    return jsonError(status === 429 ? error.message : failedError, status);
+    return jsonError(failedError, status);
   }
 }
 

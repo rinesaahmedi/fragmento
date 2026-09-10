@@ -1081,8 +1081,8 @@ test("60 cm dishwasher bundles split into matching FRG dishwasher and furniture-
     {
       partKey: "dishwasher",
       articleCode: "A-EGSPV597210",
-      name: "Fully Integrated Dishwasher",
-      nameDe: "Vollintegrierter Geschirrspüler",
+      name: "Fully Integrated Dishwasher 60 cm",
+      nameDe: "Vollintegrierter Geschirrspüler 60 cm",
       sourceKitchenItemCode: dishwasherBundle.code,
       sourceComponentKey: dishwasherBundle.componentKey,
     },
@@ -1118,8 +1118,8 @@ test("60 cm dishwasher bundles split into matching FRG dishwasher and furniture-
       {
         componentId: "component-claim-dishwasher",
         articleCode: "A-EGSPV597210",
-        name: "Fully Integrated Dishwasher",
-        nameDe: "Vollintegrierter Geschirrspüler",
+        name: "Fully Integrated Dishwasher 60 cm",
+        nameDe: "Vollintegrierter Geschirrspüler 60 cm",
       },
       {
         componentId: "component-claim-furniture-front",
@@ -1151,8 +1151,8 @@ test("optional dishwasher claim parts stay hidden until the dishwasher is ordere
     {
       partKey: "dishwasher",
       articleCode: "A-EGSPV597210",
-      name: "Fully Integrated Dishwasher",
-      nameDe: "Vollintegrierter Geschirrspüler",
+      name: "Fully Integrated Dishwasher 60 cm",
+      nameDe: "Vollintegrierter Geschirrspüler 60 cm",
       sourceKitchenItemCode: dishwasherBundle.code,
       sourceComponentKey: dishwasherBundle.componentKey,
     },
@@ -3668,6 +3668,11 @@ test("60 cm dishwasher repair relinks both ASC parts to the exact FRG item", () 
     path.join(repoRoot, "prisma", "migrations", "20260910110000_relink_60cm_dishwasher_claim_parts", "migration.sql"),
     "utf8",
   );
+  const labelMigration = fs.readFileSync(
+    path.join(repoRoot, "prisma", "migrations", "20260910120000_label_60cm_dishwasher_claim_part", "migration.sql"),
+    "utf8",
+  );
+  const seed = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
   const route = fs.readFileSync(
     path.join(repoRoot, "app", "api", "admin", "catalog", "claim-products", "[id]", "route.js"),
     "utf8",
@@ -3682,6 +3687,10 @@ test("60 cm dishwasher repair relinks both ASC parts to the exact FRG item", () 
   assert.match(migration, /"sourceComponentKey" = EXCLUDED\."sourceComponentKey"/);
   assert.match(migration, /ON CONFLICT \("kitchenId", "partKey"\) DO UPDATE/);
   assert.doesNotMatch(migration, /UPDATE\s+"KitchenItem"/i);
+  assert.match(labelMigration, /"name" = 'Fully Integrated Dishwasher 60 cm'/);
+  assert.match(labelMigration, /"nameDe" = 'Vollintegrierter Geschirrspüler 60 cm'/);
+  assert.match(labelMigration, /"articleCode" = 'A-EGSPV597210'/);
+  assert.match(seed, /isDishwasher45 \? "Fully Integrated Dishwasher 45 cm" : "Fully Integrated Dishwasher 60 cm"/);
 
   const preserveSourceLinksIndex = route.indexOf("delete data.sourceKitchenItemCode");
   const updateClaimPartsIndex = route.indexOf("prisma.kitchenClaimPart.updateMany");
