@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import test from "node:test";
@@ -320,9 +321,9 @@ test("AB 105743 pairs US30 with UPK20 while keeping the thin strip selectable", 
   );
 
   const hotspots = buildServiceClaimBlendeHotspots([
-    { componentId: "component-base-module-1", componentKey: "base-module-1", points: [[14.266033, 57.606723], [21.192399, 58.715966], [21.192399, 82.776471], [14.266033, 81.142857]] },
-    { componentId: "component-base-module-1", componentKey: "base-module-1", points: [[21.192399, 58.715966], [21.790974, 58.635294], [21.790974, 82.695798], [21.192399, 82.776471]] },
-    { componentId: "component-base-module-1", componentKey: "base-module-1", points: [[21.790974, 58.635294], [26.266033, 57.989916], [26.266033, 82.05042], [21.790974, 82.695798]] },
+    { componentId: "component-base-module-1", componentKey: "base-module-1", points: [[8.351544, 57.42521], [16.118765, 59.119328], [16.118765, 86.12437], [8.351544, 84.289076]] },
+    { componentId: "component-base-module-1", componentKey: "base-module-1", points: [[16.118765, 59.119328], [16.788599, 59.018487], [16.788599, 86.023529], [16.118765, 86.12437]] },
+    { componentId: "component-base-module-1", componentKey: "base-module-1", points: [[16.788599, 59.018487], [21.819477, 58.292437], [21.819477, 85.297479], [16.788599, 86.023529]] },
   ], [blendeMeta], [item], "ab-105743");
   const cabinetHotspots = hotspots.filter(
     (entry) => entry.componentId === "component-base-module-1",
@@ -333,8 +334,8 @@ test("AB 105743 pairs US30 with UPK20 while keeping the thin strip selectable", 
 
   assert.equal(cabinetHotspots.length, 2);
   assert.ok(blendeHotspot);
-  assert.ok(Math.abs(blendeHotspot.left - 21.192399) < 0.000001);
-  assert.ok(Math.abs(blendeHotspot.left + blendeHotspot.width - 21.790974) < 0.000001);
+  assert.ok(Math.abs(blendeHotspot.left - 16.118765) < 0.000001);
+  assert.ok(Math.abs(blendeHotspot.left + blendeHotspot.width - 16.788599) < 0.000001);
 });
 
 test("AB 105743 keeps each worktop surface and fascia on its own side", () => {
@@ -3478,22 +3479,27 @@ test("L kitchens use one UPEF65 instead of two UPK20 filler panels", () => {
   assert.match(seed, /const catalogBlendeQuantity = catalogBlende \? Math\.max\(1, getBlendeQuantity\(item\)\) : null/);
 });
 
-test("AB 105743 uses its measured vector plan and exact Excel selection mapping", () => {
+test("AB 105743 uses its replacement vector plan and exact Excel selection mapping", () => {
   const stageSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-svg-stage.jsx"), "utf8");
   const selectionSource = fs.readFileSync(path.join(repoRoot, "components", "kitchen-selection-utils.js"), "utf8");
   const claimSource = fs.readFileSync(path.join(repoRoot, "lib", "service-claim-kitchen-hotspots.js"), "utf8");
   const seedSource = fs.readFileSync(path.join(repoRoot, "prisma", "seed.js"), "utf8");
+  const pdfBytes = fs.readFileSync(path.join(repoRoot, "public", "pdfs", "AB 105743.pdf"));
 
+  assert.equal(
+    createHash("sha256").update(pdfBytes).digest("hex"),
+    "7992b3ea3eb98b1945774f294c09cc6e217b61a2aa97d7eac651920a0f087dbe",
+  );
   assert.match(stageSource, /"ab-105743":\s*"\/plans\/AB%20105743\.svg"/);
   assert.match(stageSource, /"ab-105743":\s*\[[\s\S]*componentKey:\s*"base-module-1"[\s\S]*componentKey:\s*"base-module-2"[\s\S]*componentKey:\s*"sink-base"[\s\S]*componentKey:\s*"base-module-3"[\s\S]*componentKey:\s*"oven-module"[\s\S]*componentKey:\s*"drawer-module"/);
-  assert.match(stageSource, /componentKey:\s*"wall-cabinet-3"[\s\S]*\[70\.56057,\s*21\.788235\][\s\S]*\[75\.648456,\s*31\.428571\]/);
-  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[59\.900238,\s*52\.020168\][\s\S]*\[66\.88361,\s*56\.598319\][\s\S]*\[50\.935867,\s*53\.310924\]/);
-  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[20\.294537,\s*57\.747899\][\s\S]*\[50\.935867,\s*54\.420168\][\s\S]*\[20\.294537,\s*58\.857143\]/);
+  assert.match(stageSource, /componentKey:\s*"wall-cabinet-3"[\s\S]*\[71\.529691,17\.67395\][\s\S]*\[77\.230404,28\.484034\]/);
+  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[59\.572447,51\.596639\][\s\S]*\[67\.396675,56\.719328\][\s\S]*\[49\.496437,53\.048739\]/);
+  assert.match(stageSource, /componentKey:\s*"worktop"[\s\S]*\[16\.118765,57\.889076\][\s\S]*\[49\.496437,54\.278992\][\s\S]*\[16\.118765,59\.119328\]/);
   assert.match(seedSource, /code:\s*"DISH-AB105743-600"[\s\S]*articlePriceWithBlende\("A-EGSPV597210 \+ TGV60",\s*"UPEF65",\s*1\)/);
   assert.match(seedSource, /code:\s*"CAB-BASE-AB105743-US30-R"[\s\S]*articlePriceWithBlende\("US30",\s*"UPK20",\s*1\)/);
   assert.match(seedSource, /slug:\s*"ab-105743"[\s\S]*items:\s*AB_105743_ITEMS/);
   assert.match(selectionSource, /"ab-105743":\s*\[\["component-wall-cabinet-2",\s*"component-extractor-hood"\]\]/);
-  assert.match(claimSource, /"ab-105743":\s*\{[\s\S]*"base-module-3"[\s\S]*bands:\s*\[\[50\.194774,\s*50\.935867\],\s*\[50\.935867,\s*51\.562945\]\]/);
+  assert.match(claimSource, /"ab-105743":\s*\{[\s\S]*"base-module-3"[\s\S]*bands:\s*\[\[48\.669834,\s*49\.496437\],\s*\[49\.496437,\s*50\.209026\]\]/);
 });
 
 test("AB 105748 uses its measured vector plan, Excel articles, and split claim geometry", () => {
