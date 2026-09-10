@@ -1,6 +1,33 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getSerialNumberHelpImages } from "../lib/serial-number-help.js";
+import {
+  getSerialNumberHelpImages,
+  SERIAL_NUMBER_HELP_APPLIANCES,
+} from "../lib/serial-number-help.js";
+
+test("ASC serial-number help exposes an ordered appliance chooser", () => {
+  assert.deepEqual(SERIAL_NUMBER_HELP_APPLIANCES.map((entry) => entry.type), [
+    "dishwasher",
+    "fridge",
+    "oven",
+    "hob",
+    "extractor_hood",
+  ]);
+
+  for (const appliance of SERIAL_NUMBER_HELP_APPLIANCES) {
+    assert.ok(appliance.labelKey);
+    assert.ok(getSerialNumberHelpImages({ claimPartKey: appliance.type }).length > 0);
+  }
+});
+
+test("cooktop and hob use the oven serial-number image", () => {
+  const ovenImages = getSerialNumberHelpImages({ claimPartKey: "oven" });
+  const hobImages = getSerialNumberHelpImages({ claimPartKey: "hob" });
+  const cooktopImages = getSerialNumberHelpImages({ claimPartKey: "cooktop" });
+
+  assert.deepEqual(hobImages, ovenImages);
+  assert.deepEqual(cooktopImages, ovenImages);
+});
 
 test("serial-number help images are separated by appliance type", () => {
   const ovenImages = getSerialNumberHelpImages({

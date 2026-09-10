@@ -65,6 +65,7 @@ test("AB 110402 uses its vector PDF and exact shared FRG/ASC rectangles", () => 
 
 test("AB 110402 uses SPB80, U30 and US40 for its corrected defaults", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+  const catalogPanel = readFileSync(new URL("../components/kitchen-catalog-panel.jsx", import.meta.url), "utf8");
   const items = seed.match(/const AB_110402_ITEMS = \[([\s\S]*?)\n\];/)?.[1] || "";
 
   assert.match(seed, /slug: "ab-110402"[\s\S]*?kitchenCode: "110 402"[\s\S]*?items: AB_110402_ITEMS/);
@@ -90,6 +91,7 @@ test("AB 110402 uses SPB80, U30 and US40 for its corrected defaults", () => {
   }
   assert.match(items, /CAB-WALL-AB110402-H3002-HPK2002[^\n]+displayArticleNumber: "H3002 \+ HPK2002"/);
   assert.match(items, /CAB-WALL-AB110402-H4002-1[^\n]+price: articlePrice\("H8002"\)[^\n]+widthMm: 800[^\n]+componentKey: "wall-cabinet-4"[^\n]+articleNumber: "H8002"/);
+  assert.match(catalogPanel, /DOUBLE_DOOR_WALL_CABINET_ARTICLES = new Set\(\["H8002", "H9002"\]\)/);
   assert.doesNotMatch(items, /CAB-WALL-AB110402-H4002-2/);
   assert.match(items, /CAB-WALL-AB110402-H4002-HPK2002[^\n]+displayArticleNumber: "H4002 \+ HPK2002"/);
   assert.doesNotMatch(items, /\((?:25|35)E\)/);

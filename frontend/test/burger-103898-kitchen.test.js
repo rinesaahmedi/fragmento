@@ -132,6 +132,13 @@ test("Burger 103898 maps all twelve plan callouts and links the hood package", (
 
 test("Burger 103898 seeds a separate Burger program kitchen and contract", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+  const upe65Migration = readFileSync(
+    new URL(
+      "../prisma/migrations/20260910170000_correct_burger103898_upe65_reference/migration.sql",
+      import.meta.url,
+    ),
+    "utf8",
+  );
   assert.match(seed, /slug: "burger-103898"[\s\S]*?kitchenCode: "103 898"[\s\S]*?programmId: "BURGER CINDY"[\s\S]*?items: BURGER_103898_ITEMS/);
   assert.match(seed, /contractNumber: "670103898", kitchenSlug: "burger-103898"/);
   assert.match(seed, /contractNumber: "111103898", kitchenSlug: "burger-103898"/);
@@ -140,6 +147,9 @@ test("Burger 103898 seeds a separate Burger program kitchen and contract", () =>
   assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[\s\S]*?price: "349\.00"[\s\S]*?isLocked: true[\s\S]*?blendeCode: "UPE65"[\s\S]*?blendePrice: "79\.00"/);
   assert.match(seed, /CAB-BASE-BURGER103898-US30[\s\S]*?price: "222\.00"[\s\S]*?isLocked: true/);
   assert.match(seed, /code: "UPE65"[\s\S]*?price: "79\.00"/);
+  assert.match(upe65Migration, /kitchen\."slug" = 'burger-103898'/);
+  assert.match(upe65Migration, /item\."code" = 'CAB-BASE-BURGER103898-US60-UPE65'/);
+  assert.match(upe65Migration, /upe65\."code" = 'UPE65'/);
   assert.match(seed, /DISH-BURGER103898-600[\s\S]*?price: "586\.00"/);
   assert.match(seed, /CAB-HOOD-BURGER103898-HFLH6072[\s\S]*?price: "346\.00"[\s\S]*?catalogArticleNumber: "FH664621E\+FWK124\+HFLH6072"/);
   for (const articleNumber of ["H3072", "H5072", "H6072"]) {

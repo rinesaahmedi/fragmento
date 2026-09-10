@@ -41,6 +41,8 @@ const DISHWASHER_BASE_MARKUP =
 const WALL_CABINET_DOUBLE_DOOR_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 72.3" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="89" height="71.3"/><line x1="45" y1="0.5" x2="45" y2="71.8"/><line x1="40" y1="36.5" x2="40" y2="53.5" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="36.5" x2="50" y2="53.5" stroke-linecap="round" stroke-width="1.5"/></svg>';
 
+const DOUBLE_DOOR_WALL_CABINET_ARTICLES = new Set(["H8002", "H9002"]);
+
 const ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
   refrigerator: '<img src="/img/foto6.png" alt="Kühlschrank">',
@@ -159,7 +161,7 @@ function getCatalogIconMarkup(item, stretchWidthOnly) {
     item?.articleNumber || item?.catalogArticle?.articleNumber || "",
   ).trim().toUpperCase();
   const iconKey = String(item?.iconKey || "");
-  const markup = articleNumber === "H9002" && iconKey.startsWith("wall_cabinet")
+  const markup = DOUBLE_DOOR_WALL_CABINET_ARTICLES.has(articleNumber) && iconKey.startsWith("wall_cabinet")
     ? WALL_CABINET_DOUBLE_DOOR_MARKUP
     : ICON_MARKUP[iconKey] || "";
   if (!stretchWidthOnly || !markup.trim().startsWith("<svg")) return markup;

@@ -29,10 +29,18 @@ export const SERIAL_NUMBER_HELP_IMAGES_BY_APPLIANCE_TYPE = {
   extractor_hood: EXTRACTOR_HOOD_SERIAL_NUMBER_HELP_IMAGES,
   fridge: FRIDGE_SERIAL_NUMBER_HELP_IMAGES,
   freezer: FRIDGE_SERIAL_NUMBER_HELP_IMAGES,
-  hob: GENERIC_AMICA_SERIAL_NUMBER_HELP_IMAGES,
+  hob: OVEN_SERIAL_NUMBER_HELP_IMAGES,
   oven: OVEN_SERIAL_NUMBER_HELP_IMAGES,
   washing_machine: GENERIC_AMICA_SERIAL_NUMBER_HELP_IMAGES,
 };
+
+export const SERIAL_NUMBER_HELP_APPLIANCES = [
+  { type: "dishwasher", labelKey: "serialNumberApplianceDishwasher" },
+  { type: "fridge", labelKey: "serialNumberApplianceFridge" },
+  { type: "oven", labelKey: "serialNumberApplianceOven" },
+  { type: "hob", labelKey: "serialNumberApplianceHob" },
+  { type: "extractor_hood", labelKey: "serialNumberApplianceExtractorHood" },
+];
 
 // Add product-specific help photos here when they arrive. Use the product's
 // article number as the key and place the files below /public/help/serial-number/.

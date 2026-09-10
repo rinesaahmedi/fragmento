@@ -286,6 +286,13 @@ function normalizeClaimBlendeCode(value) {
   return String(value || "").trim().replace(/\s+x\s*\d+$/i, "").trim();
 }
 
+function normalizeClaimArticlePartCode(value) {
+  return normalizeClaimBlendeCode(value)
+    .replace(/\s*\([^)]*\)\s*$/g, "")
+    .replace(/\s+/g, "")
+    .toUpperCase();
+}
+
 function isFlatScreenHoodCabinet(item = {}) {
   if (!String(item.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
     return false;
@@ -550,12 +557,18 @@ function resolveServiceClaimComponentNameDe(componentId, meta = {}) {
 function resolveServiceClaimArticleCode(meta = {}) {
   const articleNumber = String(meta.articleNumber || meta.articleCode || "").trim();
   if (articleNumber) {
+    const attachedBlendeCode = normalizeClaimArticlePartCode(
+      meta.blendeCode || meta.catalogBlende?.code,
+    );
     const articleParts = articleNumber.split("+").map((part) => {
       const trimmedPart = part.trim();
       return trimmedPart.replace(/\s+/g, "").toUpperCase() === "FH664621E"
         ? "FH664621E"
         : trimmedPart;
-    }).filter(Boolean);
+    }).filter((part) => (
+      Boolean(part)
+      && (!attachedBlendeCode || normalizeClaimArticlePartCode(part) !== attachedBlendeCode)
+    ));
     if (String(meta.code || "").trim().toUpperCase().startsWith("CAB-HOOD-")) {
       const cabinetArticle = articleParts.find((part) => /^HD\d+/i.test(part));
       if (cabinetArticle) return cabinetArticle;

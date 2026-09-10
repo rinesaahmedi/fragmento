@@ -2376,6 +2376,54 @@ textarea {
   color: rgba(107, 79, 58, 0.82);
 }
 
+.service-serial-help__appliance-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  max-height: min(64vh, 590px);
+  overflow-y: auto;
+  padding: 2px;
+}
+
+.service-serial-help__appliance {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(107, 79, 58, 0.18);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--app-text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 750;
+  text-align: center;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.service-serial-help__appliance:hover,
+.service-serial-help__appliance:focus-visible {
+  border-color: rgba(217, 122, 38, 0.58);
+  box-shadow: 0 8px 22px rgba(107, 79, 58, 0.12);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.service-serial-help__appliance-image {
+  display: block;
+  height: 120px;
+  overflow: hidden;
+  border-radius: 11px;
+  background: #f5f1eb;
+}
+
+.service-serial-help__appliance-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
 .service-contract-help__sr {
   position: absolute;
   width: 1px;
@@ -2609,7 +2657,22 @@ textarea {
 .service-contract-help__actions {
   margin-top: 20px;
   display: flex;
+  gap: 10px;
   justify-content: flex-end;
+}
+
+@media (max-width: 680px) {
+  .service-serial-help__appliance-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .service-serial-help__appliance-image {
+    height: 96px;
+  }
+
+  .service-contract-help__actions {
+    flex-wrap: wrap;
+  }
 }
 
 .service-field input,

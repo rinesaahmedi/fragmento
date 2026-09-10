@@ -158,6 +158,41 @@ test("service claims expose a cabinet blende as its own selectable component", (
   });
 });
 
+test("service claims do not repeat an attached Blende code in the cabinet option", () => {
+  [
+    ["ab-110402", "H3002 + HPK2002", "HPK2002", "H3002"],
+    ["ab-110140", "H6002 + HPK2002(35E)", "HPK2002", "H6002"],
+    ["ab-109955", "H6002 + HPK2002", "HPK2002", "H6002"],
+  ].forEach(([kitchenSlug, articleNumber, blendeCode, expectedCabinetCode]) => {
+    const item = component("CAB-WALL-WITH-BLENDE", "wall-cabinet-1", "Upper Cabinet", {
+      articleNumber,
+      widthMm: 600,
+      isLocked: true,
+      blendeCode,
+      blendeLabel: `${blendeCode} Filler Panel`,
+      catalogBlende: {
+        code: blendeCode,
+        name: "Filler Panel up to 20 cm",
+        nameDe: "Passblende bis 20 cm",
+      },
+    });
+    const result = buildServiceClaimSelectableComponents({
+      kitchen: { items: [item] },
+      kitchenConfig: { components: [item] },
+      kitchenSlug,
+    });
+    const cabinet = result.selectableComponents.find(
+      (entry) => entry.componentId === "component-wall-cabinet-1",
+    );
+    const blende = result.selectableComponents.find(
+      (entry) => entry.componentId === "component-claim-blende-wall-cabinet-1",
+    );
+
+    assert.equal(cabinet?.articleCode, expectedCabinetCode, kitchenSlug);
+    assert.equal(blende?.articleCode, blendeCode, kitchenSlug);
+  });
+});
+
 test("plan-only lower Blenden are exposed separately from their sink cabinets", () => {
   [
     "ab-105732", "ab-105735", "ab-105738", "ab-105741",
