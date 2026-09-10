@@ -1398,6 +1398,21 @@ const PLAN_SIDE_PANEL_INDICATORS_BY_SLUG = {
   "ab-105831": { left: 74.75, top: 65.95, height: 29.55 },
 };
 
+// The AB 105825 drawing splits its L-shaped worktop across overlapping source
+// faces. Use one mask for an even tint, while preserving the inward white
+// recess above the two real angled worktop seams at the inside corner.
+const AB_105825_COMBINED_WORKTOP_MASK = [
+  [6.65, 55.63], [16.75, 54.12], [34.92, 51.09], [41.69, 52.77],
+  [42.2, 53.45], [54.51, 51.43], [75.77, 56.13], [75.65, 61.55],
+  [44.71, 54.45],
+  [43.71, 54.45], [39.55, 55.13], [34.92, 55.8], [15.8, 58.49],
+  [6.65, 56.81],
+];
+const PLAN_COMBINED_WORKTOP_MASKS_BY_SLUG = {
+  "ab-105825": AB_105825_COMBINED_WORKTOP_MASK,
+  "ab-105828": AB_105825_COMBINED_WORKTOP_MASK,
+};
+
 IMAGE_HOTSPOTS_BY_SLUG["ab-105847"] = [
   { componentKey: "wall-cabinet-1", left: 14.90875, top: 38.54333, width: 5.69875, height: 8.72, preserveManualSize: true },
   // The extractor is sold with its HD6002 cabinet; highlight the complete package once.
@@ -2305,7 +2320,19 @@ export default function useKitchenSvgStage({
   }
 
   const imageHotspots = useMemo(() => {
-    const sourceDefinitions = (IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [])
+    const rawDefinitions = IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [];
+    const combinedWorktopMask = PLAN_COMBINED_WORKTOP_MASKS_BY_SLUG[normalizedKitchenSlug];
+    const visualDefinitions = combinedWorktopMask
+      ? [
+          ...rawDefinitions.filter((definition) => definition.componentKey !== "worktop"),
+          {
+            componentKey: "worktop",
+            points: combinedWorktopMask,
+            preserveManualSize: true,
+          },
+        ]
+      : rawDefinitions;
+    const sourceDefinitions = visualDefinitions
       .map(withHotspotSourceBounds);
     const definitions = withBasePlinthExtension(
       withCornerBlendeExtensions(
