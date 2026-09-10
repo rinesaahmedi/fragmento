@@ -106,6 +106,7 @@ test("AB 109874 is seeded as an L-shaped kitchen with six locked schedule defaul
   assert.match(items, /defaultSinkBase\(\{ code: "SINK-BASE-AB109874-DEFAULT"[^\n]+widthMm: 1250[^\n]+articleNumber: "SPEB125"/);
   assert.match(items, /code: "CAB-BASE-AB109874-DEFAULT-UPK20"[^\n]+name: "Lower Cabinet 50 cm"[^\n]+widthMm: 500[^\n]+componentKey: "base-module-1"[^\n]+articleNumber: "U50"/);
   assert.match(items, /code: "CAB-BASE-AB109874-DEFAULT-2"[^\n]+name: "Lower Cabinet 60 cm"[^\n]+widthMm: 600[^\n]+componentKey: "base-module-2"[^\n]+articleNumber: "U60"/);
+  assert.match(items, /code: "CAB-BASE-AB109874-DEFAULT-3"[^\n]+name: "Lower Cabinet with Drawer 60 cm"[^\n]+widthMm: 600[^\n]+componentKey: "base-module-4"[^\n]+articleNumber: "US60"/);
   assert.equal(
     getCabinetWidthDisplayName({ code: "CAB-BASE-AB109874-DEFAULT-UPK20", articleNumber: "U50", widthMm: 500 }),
     "Lower Cabinet 50 cm",
@@ -113,6 +114,10 @@ test("AB 109874 is seeded as an L-shaped kitchen with six locked schedule defaul
   assert.equal(
     getCabinetWidthDisplayName({ code: "CAB-BASE-AB109874-DEFAULT-2", articleNumber: "U60", widthMm: 600 }),
     "Lower Cabinet 60 cm",
+  );
+  assert.equal(
+    getCabinetWidthDisplayName({ code: "CAB-BASE-AB109874-DEFAULT-3", articleNumber: "US60", widthMm: 600 }),
+    "Lower Cabinet with Drawer 60 cm",
   );
   assert.equal((items.match(/isLocked: true/g) || []).length, 3);
   assert.match(claims, /L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-109874"/);

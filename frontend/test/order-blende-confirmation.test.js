@@ -112,6 +112,22 @@ test("purchased kitchen preview keeps the optional sink-end blende green-selecta
   );
 });
 
+test("purchased kitchen preview splits the AB 105823 aliased sink-end blende", async () => {
+  const previewData = await loadKitchenPlanPreviewData();
+  const hotspots = previewData.hotspotsBySlug["ab-105823"] || [];
+  const sinkHotspots = hotspots.filter((hotspot) => hotspot.componentKey === "sink-base");
+  const blendeHotspots = hotspots.filter((hotspot) => hotspot.componentKey === "sink-end-blende");
+
+  assert.ok(sinkHotspots.length > 0);
+  assert.equal(blendeHotspots.length, 1);
+  assert.equal(blendeHotspots[0].left, 92.109264);
+  assert.equal(blendeHotspots[0].width, 1.895487);
+  assert.ok(
+    sinkHotspots.every((hotspot) => hotspot.left + hotspot.width <= blendeHotspots[0].left),
+    "AB 105823's locked sink overlay must stop before the independently selected green Blende",
+  );
+});
+
 test("AB 105846 layout aliases attach their shared purchased-kitchen sketch", async () => {
   for (const kitchenCode of ["105849", "105852", "105855", "105858", "105861"]) {
     const pdf = await generatePurchasedKitchenPdf({
@@ -321,6 +337,61 @@ test("order confirmation summary renders blende as a cabinet subtitle", () => {
   assert.match(html, /219/);
   assert.match(html, /25/);
   assert.match(html, /244/);
+});
+
+test("order confirmation excludes Blenden attached to default locked cabinets", () => {
+  const order = {
+    orderNumber: "111109873-1",
+    createdAt: "2026-09-09T10:00:00.000Z",
+    total: 184,
+    kitchen: { slug: "ab-109873", name: "109873" },
+    customer: { contractNumber: "111109873", preferredDeliveryDate: "2026-10-07" },
+    components: [
+      {
+        code: "SINK-BASE-AB109873-SP120",
+        articleNumber: "SP120",
+        name: "Sink Base Cabinet 120 cm",
+        nameDe: "Spülenschrank 120 cm",
+        price: 25,
+        isLocked: true,
+        blendeCode: "UPK20",
+        blendeLabel: "Passblende bis 20 cm",
+        blendePrice: 25,
+      },
+      {
+        code: "CAB-BASE-AB109873-US90",
+        articleNumber: "US90",
+        name: "Lower Cabinet with Drawer 90 cm",
+        nameDe: "Unterschrank mit Schublade 90 cm",
+        price: 364,
+        isLocked: true,
+        blendeCode: "UPK20",
+        blendeLabel: "Passblende bis 20 cm",
+        blendePrice: 25,
+      },
+      {
+        code: "CAB-WALL-AB109873-H6002-HPK2002-L",
+        articleNumber: "H6002",
+        name: "Upper Cabinet 60 cm",
+        nameDe: "Oberschrank 60 cm",
+        price: 184,
+        blendeCode: "HPK2002",
+        blendeLabel: "Passblende bis 20 cm",
+        blendePrice: 35,
+      },
+    ],
+    accessories: [],
+    services: [],
+  };
+
+  const html = buildOrderSummaryHtml(order);
+
+  assert.doesNotMatch(html, /SP120/);
+  assert.doesNotMatch(html, /US90/);
+  assert.doesNotMatch(html, /UPK20/);
+  assert.match(html, /Oberschrank 60 cm/);
+  assert.match(html, /Typen-Nr\.: H6002/);
+  assert.match(html, /Typen-Nr\.: HPK2002/);
 });
 
 test("order confirmation groups multiple blendes under their parent cabinet", () => {

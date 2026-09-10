@@ -335,6 +335,7 @@ function applySinkEndBlendeHotspotSplits(hotspotsBySlug, boundsBySlug) {
   Object.entries(boundsBySlug || {}).forEach(([slug, sourceBounds]) => {
     const hotspots = hotspotsBySlug?.[slug];
     if (!Array.isArray(hotspots) || !hotspots.length) return;
+    if (hotspots.some((hotspot) => hotspot?.componentKey === "sink-end-blende")) return;
 
     hotspotsBySlug[slug] = hotspots.flatMap((hotspot) => {
       if (hotspot?.componentKey !== "sink-base" || hotspot.width == null) return [hotspot];
@@ -378,10 +379,8 @@ export async function loadKitchenPlanPreviewData() {
       ? Function(`"use strict"; return (${linkedGroupsLiteral});`)()
       : {};
 
-    // The configurator splits the fixed sink cabinet at these traced bounds so
-    // the optional UPK20 end panel remains an independent green selection.
-    // Mirror that runtime transformation before resolving shared-plan aliases;
-    // otherwise email/PDF previews paint the whole sink area locked blue.
+    // Split source plans first so aliases without their own traced boundary
+    // inherit the already separated sink and optional end Blende.
     applySinkEndBlendeHotspotSplits(hotspotsBySlug, sinkEndBlendeBoundsBySlug);
 
     source.replace(
@@ -403,6 +402,11 @@ export async function loadKitchenPlanPreviewData() {
         linkedGroupsBySlug[aliasSlug] ||= linkedGroupsBySlug[sourceSlug] || [];
       },
     );
+
+    // Kitchens such as AB 105823 receive their hotspot array through a runtime
+    // assignment but have their own traced boundary. Apply the idempotent split
+    // again after aliases so their separately selectable Blende paints green.
+    applySinkEndBlendeHotspotSplits(hotspotsBySlug, sinkEndBlendeBoundsBySlug);
 
     return { imageViews, hotspotsBySlug, linkedGroupsBySlug };
   })();
@@ -1126,11 +1130,19 @@ function expandItemsWithBlende(items = []) {
 }
 
 function getPaidConfirmationItems(items = []) {
-  return items.filter((item) => Number(item?.price || 0) > 0);
+  return items.filter((item) => (
+    !item?.isLocked
+    && !item?.isOrderLocked
+    && Number(item?.price || 0) > 0
+  ));
 }
 
 function getVisibleConfirmationItems(items = []) {
-  return expandItemsWithBlende(items).filter((item) => Number(item?.price || 0) > 0);
+  // Remove included/default and previously confirmed items before expanding
+  // their attached Blenden. Otherwise a zero-price locked cabinet disappears,
+  // while its configured Blende is recreated as a paid confirmation row.
+  return expandItemsWithBlende(getPaidConfirmationItems(items))
+    .filter((item) => Number(item?.price || 0) > 0);
 }
 
 function isElectricalComponentItem(item) {
