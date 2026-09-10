@@ -6133,8 +6133,11 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                         {referenceElectricalIssues.map((issue, index) => {
                           const isComponentMissing = showClaimRequiredErrors && !String(issue.component || "").trim();
                           const isProblemMissing = showClaimRequiredErrors && String(issue.problem || "").trim().length < MIN_REFERENCE_PROBLEM_LENGTH;
-                          const isSerialMissing = showClaimRequiredErrors
-                            && (!String(issue.serialNumber || "").trim() || !issue.serialNumberImage);
+                          const isSerialNumberMissing = showClaimRequiredErrors
+                            && !String(issue.serialNumber || "").trim();
+                          const isSerialPhotoMissing = showClaimRequiredErrors
+                            && !issue.serialNumberImage;
+                          const isSerialMissing = isSerialNumberMissing || isSerialPhotoMissing;
                           const isDamagePhotoMissing = showClaimRequiredErrors && !issue.damagePhotos.length;
                           return (
                             <div key={issue.id} className="service-reference-flow__row">
@@ -6222,7 +6225,8 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                                     onChange={(event) => updateReferenceElectricalIssue(issue.id, "serialNumber", event.target.value)}
                                     placeholder={copy.serialPlaceholder}
                                     aria-label={t("referenceSerialTypedOption")}
-                                    aria-invalid={isSerialMissing}
+                                    aria-invalid={isSerialNumberMissing}
+                                    aria-describedby={isSerialMissing ? `reference-serial-error-${issue.id}` : undefined}
                                     data-reference-required-field
                                   />
                                   <div className="service-reference-flow__serial-divider">{t("serialEvidenceAnd")}</div>
@@ -6234,10 +6238,12 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                                       className="service-field__problem-area-file"
                                       accept={SERIAL_NUMBER_IMAGE_ACCEPT}
                                       onChange={(event) => handleReferenceSerialNumberImageSelected(issue.id, event)}
+                                      aria-invalid={isSerialPhotoMissing}
+                                      aria-describedby={isSerialMissing ? `reference-serial-error-${issue.id}` : undefined}
                                     />
                                     <label
                                       htmlFor={`reference-serial-image-${issue.id}`}
-                                      className="service-field__problem-area-serial-upload"
+                                      className={`service-field__problem-area-serial-upload${isSerialPhotoMissing ? " is-error" : ""}`}
                                     >
                                       {t("referenceSerialPhotoOption")}
                                     </label>
@@ -6259,7 +6265,11 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                                   />
                                 ) : null}
                                 {isSerialMissing ? (
-                                  <span className="service-field__problem-area-error" role="alert">
+                                  <span
+                                    id={`reference-serial-error-${issue.id}`}
+                                    className="service-field__problem-area-error"
+                                    role="alert"
+                                  >
                                     {t("serialNumberRequired")}
                                   </span>
                                 ) : null}

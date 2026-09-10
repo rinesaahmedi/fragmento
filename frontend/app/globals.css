@@ -4849,6 +4849,13 @@ textarea {
   border-radius: 8px;
 }
 
+.service-reference-flow__serial-upload .service-field__problem-area-serial-upload.is-error {
+  border-color: rgba(179, 38, 30, 0.72);
+  background: rgba(255, 247, 246, 0.98);
+  box-shadow: 0 0 0 4px rgba(179, 38, 30, 0.08);
+  color: #a12820;
+}
+
 .service-reference-flow__damage-photos {
   grid-column: 1 / -1;
   display: grid;
