@@ -69,8 +69,8 @@ export function isLShapedClaimKitchen(kitchenSlug = "") {
 // faucet hotspot so the polygons remain aligned after the plan is cropped for display.
 const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "burger-103898": [[-2.075268817, 0.964447543], [-0.47311828, 0.851516208], [2.806451613, 1.071104915], [1.265232975, 1.181944929]],
-  // Four outside sink strokes measured from AB 105743's vector PDF.
-  "ab-105743": [[-0.166065, 0.89234], [2.617329, 0.730849], [3.895307, 0.836439], [1.111913, 1]],
+  // Four outside sink strokes measured from the replacement AB 105743 vector PDF.
+  "ab-105743": [[-0.200000081, 0.962376212], [3.192157039, 0.788118787], [4.741176765, 0.900990074], [1.349019645, 1.075247499]],
   // Outside sink strokes measured from the AB 105748 vector PDF.
   "ab-105748": [[-2.13834, 0.978923], [-0.217391, 0.864169], [2.743083, 1.119438], [0.841897, 1.234192]],
   // Four outside sink strokes measured from AB 105758's 842 x 595 PDF.
@@ -280,12 +280,12 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
   "ab-110140": [[1.118461627, -0.096485619], [2.112307687, -0.038977633], [1.023076953, 0.012140566], [0.029230786, -0.049201273]],
   "burger-103898": [[-0.236714976, -0.090786819], [0.869565217, -0.045729657], [0, 0.00672495], [-0.834138486, -0.025554808]],
-  // Four outside cooktop strokes measured from AB 105743's vector PDF.
+  // Four outside cooktop strokes measured from the replacement AB 105743 vector PDF.
   "ab-105743": [
-    [0.003788, -0.049606],
-    [1.066288, -0.094488],
-    [2.024621, -0.037008],
-    [0.998106, 0.007087],
+    [0.003378393, -0.049122804],
+    [1.065878347, -0.094035085],
+    [2.025337765, -0.03719298],
+    [0.998310782, 0.007017546],
   ],
   // Outside cooktop strokes measured from the AB 105748 vector PDF.
   "ab-105748": [
@@ -559,21 +559,21 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   "burger-103898": {
     "base-module-2": { side: "right", inner: 53.387173, outer: 54.997625 },
   },
-  // Exact perspective divider strokes from the 842 x 595 AB 105743 PDF.
+  // Exact perspective divider strokes from the replacement 842 x 595 AB 105743 PDF.
   "ab-105743": {
     "base-module-1": {
       side: "left",
-      outer: 21.192399,
-      inner: 21.790974,
+      outer: 16.118765,
+      inner: 16.788599,
       preserveOuterCabinetFace: true,
     },
     "base-module-3": {
       side: "right",
-      inner: 50.194774,
-      outer: 51.562945,
-      bands: [[50.194774, 50.935867], [50.935867, 51.562945]],
+      inner: 48.669834,
+      outer: 50.209026,
+      bands: [[48.669834, 49.496437], [49.496437, 50.209026]],
     },
-    "wall-cabinet-1": { side: "left", outer: 47.301663, inner: 47.985748 },
+    "wall-cabinet-1": { side: "left", outer: 45.420428, inner: 46.190024 },
   },
   // Exact UPEF65, UPK20, and HPK2002 divider strokes from AB 105748.
   "ab-105748": {
