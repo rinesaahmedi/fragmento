@@ -233,6 +233,45 @@ test("order confirmation PDF hides type numbers for services", async () => {
   assert.doesNotMatch(html, /Typen-Nr\.: SVC-MONTAGE-001/);
 });
 
+test("AB 109955 order confirmation keeps its linked default oven package hidden", async () => {
+  const order = {
+    orderNumber: "FRG-AB109955",
+    createdAt: "2026-09-10T10:00:00.000Z",
+    total: 0,
+    kitchen: { slug: "ab-109955", name: "109955" },
+    customer: {
+      contractNumber: "111109955",
+      firstName: "Test",
+      lastName: "Customer",
+      address1: "Example Street 1",
+      postalCode: "38124",
+      city: "Braunschweig",
+      country: "Deutschland",
+      email: "customer@example.com",
+      phone: "+49 531 000000",
+    },
+    components: [{
+      code: "OVEN-B-600-HOB",
+      articleNumber: "A-EH923640E + 9EC744100C",
+      name: "Built-in oven and ceramic cooktop",
+      nameDe: "Einbauherd und Glaskeramikkochfeld",
+      iconKey: "oven_base",
+      componentKey: "oven-module",
+      price: 0,
+      isLocked: true,
+    }],
+    accessories: [],
+    services: [],
+  };
+
+  const pdf = await generateOrderConfirmationPdf(order);
+  const text = await extractPdfText(pdf.base64);
+
+  assert.doesNotMatch(text, /Einbauherd und Glaskeramikkochfeld/);
+  assert.doesNotMatch(text, /A-EH923640E/);
+  assert.doesNotMatch(text, /9EC744100C/);
+});
+
 test("order confirmation summary renders blende as a cabinet subtitle", () => {
   const order = {
     orderNumber: "FRG-TEST-001",

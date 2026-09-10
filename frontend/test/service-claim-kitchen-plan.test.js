@@ -704,7 +704,7 @@ test("hood cabinet, extractor, and FWK124 filter use separate claim identities",
   assert.equal(cabinetMeta.nameDe, "Schrank");
   assert.equal(cabinetMeta.articleCode, "HD6002");
   assert.equal(extractorMeta.name, "Extractor Hood");
-  assert.equal(extractorMeta.articleCode, "FH 664 621 E");
+  assert.equal(extractorMeta.articleCode, "FH664621E");
   assert.deepEqual(filterMeta, {
     componentId: "component-claim-filter",
     code: "FWK124",
@@ -757,7 +757,7 @@ test("legacy and future FWK124 kitchen slugs also expose the extractor separatel
   );
   assert.equal(
     result.selectableComponents.find((entry) => entry.componentId === "component-extractor-hood").articleCode,
-    "FH 664 621 E",
+    "FH664621E",
   );
 });
 
@@ -3088,7 +3088,7 @@ test("AB 105758 ASC uses the exact sink, cooktop, oven, and drawer vector faces"
   assert.equal((cooktop.clipPath.match(/,/g) || []).length, 4);
 });
 
-test("AB 109955 claims split the sink UPK20 exactly and extend the oven drawer to the baseline", () => {
+test("AB 109955 claims align both left fillers and extend the oven drawer to the baseline", () => {
   const source = PLAN_HOTSPOTS_BY_SLUG["ab-109955"].map((hotspot) => {
     const xs = hotspot.points.map(([x]) => x);
     const ys = hotspot.points.map(([, y]) => y);
@@ -3100,26 +3100,41 @@ test("AB 109955 claims split the sink UPK20 exactly and extend the oven drawer t
       height: Math.max(...ys) - Math.min(...ys),
     };
   });
-  const blende = {
+  const blenden = [{
     componentId: "component-claim-blende-sink-base",
     componentKey: "claim-blende-sink-base",
     sourceComponentKey: "sink-base",
     sourceWidthMm: 600,
     claimPartKey: "blende",
     blendeQuantity: 1,
-  };
-  const split = buildServiceClaimBlendeHotspots(source, [blende], [{
-    componentKey: "sink-base",
-    widthMm: 600,
-    blendeCode: "UPK20",
+  }, {
+    componentId: "component-claim-blende-wall-cabinet-1",
+    componentKey: "claim-blende-wall-cabinet-1",
+    sourceComponentKey: "wall-cabinet-1",
+    sourceWidthMm: 600,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  }];
+  const split = buildServiceClaimBlendeHotspots(source, blenden, [{
+    componentKey: "sink-base", widthMm: 600, blendeCode: "UPK20",
+  }, {
+    componentKey: "wall-cabinet-1", widthMm: 600, blendeCode: "HPK2002",
   }], "ab-109955");
   const claims = buildServiceClaimPartHotspots(split, [
     { partKey: "sink-cabinet", sourceComponentKey: "sink-base" },
     { partKey: "oven", sourceComponentKey: "oven-module" },
     { partKey: "oven-drawer", sourceComponentKey: "oven-module" },
   ], "ab-109955");
-  const filler = claims.find((hotspot) => hotspot.claimPartKey === "blende");
+  const filler = claims.find((hotspot) =>
+    hotspot.claimPartKey === "blende" && hotspot.sourceComponentKey === "sink-base"
+  );
   const sinkCabinet = claims.find((hotspot) => hotspot.claimPartKey === "sink-cabinet");
+  const upperFiller = split.find((hotspot) =>
+    hotspot.claimPartKey === "blende" && hotspot.sourceComponentKey === "wall-cabinet-1"
+  );
+  const upperCabinet = split.find((hotspot) =>
+    hotspot.componentKey === "wall-cabinet-1" && hotspot.claimBlendeSplit
+  );
   const ovenDrawer = claims.find((hotspot) => hotspot.claimPartKey === "oven-drawer");
   const bounds = (hotspot) => {
     if (!hotspot.points?.length) {
@@ -3145,6 +3160,16 @@ test("AB 109955 claims split the sink UPK20 exactly and extend the oven drawer t
     left: 3.805226,
     right: 16.289786,
     bottom: 87.092437,
+  });
+  assert.deepEqual(bounds(upperFiller), {
+    left: 0.39905,
+    right: 3.805226,
+    bottom: 44.578151,
+  });
+  assert.deepEqual(bounds(upperCabinet), {
+    left: 3.805226,
+    right: 16.289786,
+    bottom: 44.578151,
   });
   assert.ok(Math.abs(bounds(ovenDrawer).bottom - 87.092437) < 0.000001);
   assert.notEqual(filler.componentId, sinkCabinet.componentId);

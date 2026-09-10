@@ -1168,7 +1168,11 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
     "component-under-cabinet-light",
   ]],
   "ab-109955": [["component-wall-cabinet-4", "component-extractor-hood"]],
-  "ab-110401": [["component-wall-cabinet-5", "component-extractor-hood"]],
+  "ab-110401": [
+    ["component-wall-cabinet-5", "component-extractor-hood"],
+    ["component-sink-base", "component-base-module-2"],
+    ["component-wall-cabinet-2", "component-wall-cabinet-3"],
+  ],
   "ab-110402": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105849": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105852": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1402,6 +1406,19 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
   ],
 };
 
+const PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER = {
+  "A-EH923640E + 9EC744100C": [
+    { label: "Backofen PDF", href: "/product-info/ovens/eh923640e/a-eh923640e-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
+  ],
+};
+
+function getConfiguredProductInfoDocuments(item) {
+  const articleNumber = String(item?.articleNumber || "").trim().toUpperCase();
+  return PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER[articleNumber]
+    || PRODUCT_INFO_DOCUMENTS_BY_CODE[item?.code];
+}
+
 ["105840", "105843"].forEach((targetCode) => {
   ["DISH-AB105837-600", "HOOD-AB105837-FH664621E"].forEach((sourceCode) => {
     PRODUCT_INFO_DOCUMENTS_BY_CODE[sourceCode.replace("AB105837", `AB${targetCode}`)] =
@@ -1521,7 +1538,7 @@ function applyProductInfoDisplayOverrides(item) {
 }
 
 export function getProductInfoHref(item) {
-  const mappedDocuments = PRODUCT_INFO_DOCUMENTS_BY_CODE[item?.code];
+  const mappedDocuments = getConfiguredProductInfoDocuments(item);
   const documents = Array.isArray(mappedDocuments) && mappedDocuments.length
     ? mappedDocuments
     : getMappedProductInfoDocuments(item);
@@ -1576,7 +1593,7 @@ function getMappedProductInfoDocuments(item) {
 }
 
 export function getProductInfoDocuments(item) {
-  const mappedDocuments = PRODUCT_INFO_DOCUMENTS_BY_CODE[item?.code];
+  const mappedDocuments = getConfiguredProductInfoDocuments(item);
   if (Array.isArray(mappedDocuments) && mappedDocuments.length) {
     return mappedDocuments;
   }

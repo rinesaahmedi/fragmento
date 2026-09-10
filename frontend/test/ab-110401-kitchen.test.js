@@ -12,9 +12,15 @@ import {
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data.js";
 import {
+  buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
   isLShapedClaimKitchen,
 } from "../lib/service-claim-kitchen-hotspots.js";
+import {
+  buildServiceClaimSelectableComponents,
+  collapseServiceClaimLinkedComponents,
+  getServiceClaimLinkedComponentIds,
+} from "../lib/service-claim-kitchen-plan-selection.js";
 
 const translate = (_key, fallback) => fallback;
 
@@ -52,17 +58,15 @@ test("AB 110401 faucet follows all three PDF silhouettes", () => {
   assert.equal(faucet[2].points.length, 13);
 });
 
-test("AB 110401 maps every schedule callout from 3 through 14", () => {
+test("AB 110401 maps every active schedule item", () => {
   const expectedByCode = {
     "SINK-BASE-AB110401-DEFAULT": "3",
     "CAB-BASE-AB110401-DEFAULT-UPK20-1": "4",
-    "CAB-BASE-AB110401-DEFAULT-2": "5",
     "DISH-AB110401-600": "6",
     "CAB-BASE-AB110401-DEFAULT-3": "7",
     "CAB-BASE-AB110401-DEFAULT-UPK20-2": "8",
     "CAB-WALL-AB110401-H4502-1": "9",
     "CAB-WALL-AB110401-H4502-2": "10",
-    "CAB-WALL-AB110401-H4502-3": "11",
     "CAB-WALL-AB110401-H6002-1": "12",
     "CAB-HOOD-AB110401-600": "13",
     "HOOD-AB110401-FH664621E": "13",
@@ -84,9 +88,146 @@ test("AB 110401 preserves dishwasher details and links its hood package", () => 
     getLinkedComponentIds("ab-110401", "component-wall-cabinet-5"),
     ["component-wall-cabinet-5", "component-extractor-hood"],
   );
+  assert.deepEqual(
+    getLinkedComponentIds("ab-110401", "component-sink-base"),
+    ["component-sink-base", "component-base-module-2"],
+  );
+  assert.deepEqual(
+    getLinkedComponentIds("ab-110401", "component-base-module-2"),
+    ["component-sink-base", "component-base-module-2"],
+  );
+  assert.deepEqual(
+    getLinkedComponentIds("ab-110401", "component-wall-cabinet-2"),
+    ["component-wall-cabinet-2", "component-wall-cabinet-3"],
+  );
 });
 
-test("AB 110401 is seeded as an L-shaped kitchen with seven schedule defaults", () => {
+test("AB 110401 treats both H9002 upper-cabinet faces as one ASC component", () => {
+  const firstFace = "component-wall-cabinet-2";
+  const secondFace = "component-wall-cabinet-3";
+
+  assert.deepEqual(
+    getServiceClaimLinkedComponentIds("ab-110401", secondFace),
+    [firstFace, secondFace],
+  );
+  assert.deepEqual(
+    collapseServiceClaimLinkedComponents("ab-110401", [
+      { componentId: firstFace, articleNumber: "H9002" },
+      { componentId: secondFace, articleNumber: "H9002" },
+    ]),
+    [{ componentId: firstFace, articleNumber: "H9002" }],
+  );
+});
+
+test("AB 110401 separates the far-right US60 from its UPK20 Blende in ASC", () => {
+  const cabinet = {
+    id: "ab-110401-us60",
+    itemType: "COMPONENT",
+    code: "CAB-BASE-AB110401-DEFAULT-UPK20-2",
+    articleNumber: "US60",
+    name: "Lower Cabinet with Drawer 60 cm",
+    componentKey: "base-module-4",
+    widthMm: 600,
+    isLocked: true,
+    blendeCode: "UPK20",
+    blendeLabel: "UPK20 20 cm",
+    catalogBlendeQuantity: 1,
+    catalogBlende: {
+      code: "UPK20",
+      name: "Filler Panel up to 20 cm",
+      nameDe: "Passblende bis 20 cm",
+    },
+  };
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items: [cabinet] },
+    kitchenConfig: { components: [cabinet] },
+    kitchenSlug: "ab-110401",
+  });
+  const blende = selection.selectableComponents.find(
+    (entry) => entry.componentId === "component-claim-blende-base-module-4",
+  );
+
+  assert.ok(selection.selectableComponentIds.includes("component-base-module-4"));
+  assert.ok(blende);
+  assert.equal(blende.articleCode, "UPK20");
+  assert.equal(blende.isCompanionOption, undefined);
+
+  const split = buildServiceClaimBlendeHotspots(
+    PLAN_HOTSPOTS_BY_SLUG["ab-110401"],
+    [blende],
+    [cabinet],
+    "ab-110401",
+  );
+  const cabinetFaces = split.filter((entry) => entry.componentKey === "base-module-4");
+  const blendeFaces = split.filter(
+    (entry) => entry.componentId === "component-claim-blende-base-module-4",
+  );
+
+  assert.equal(cabinetFaces.length, 2);
+  assert.equal(blendeFaces.length, 1);
+  assert.deepEqual(blendeFaces[0].points, [
+    [80.622328, 59.845378],
+    [83.102138, 60.34958],
+    [83.102138, 90.016807],
+    [80.622328, 89.512605],
+  ]);
+});
+
+test("AB 110401 separates the left US45 from its UPK20 Blende in ASC", () => {
+  const cabinet = {
+    id: "ab-110401-us45",
+    itemType: "COMPONENT",
+    code: "CAB-BASE-AB110401-DEFAULT-UPK20-1",
+    articleNumber: "US45",
+    name: "Lower Cabinet with Drawer 45 cm",
+    componentKey: "base-module-1",
+    widthMm: 450,
+    isLocked: true,
+    blendeCode: "UPK20",
+    blendeLabel: "UPK20 20 cm",
+    catalogBlendeQuantity: 1,
+    catalogBlende: {
+      code: "UPK20",
+      name: "Filler Panel up to 20 cm",
+      nameDe: "Passblende bis 20 cm",
+    },
+  };
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items: [cabinet] },
+    kitchenConfig: { components: [cabinet] },
+    kitchenSlug: "ab-110401",
+  });
+  const blende = selection.selectableComponents.find(
+    (entry) => entry.componentId === "component-claim-blende-base-module-1",
+  );
+
+  assert.ok(selection.selectableComponentIds.includes("component-base-module-1"));
+  assert.ok(blende);
+  assert.equal(blende.articleCode, "UPK20");
+  assert.equal(blende.isCompanionOption, undefined);
+
+  const split = buildServiceClaimBlendeHotspots(
+    PLAN_HOTSPOTS_BY_SLUG["ab-110401"],
+    [blende],
+    [cabinet],
+    "ab-110401",
+  );
+  const cabinetFaces = split.filter((entry) => entry.componentKey === "base-module-1");
+  const blendeFaces = split.filter(
+    (entry) => entry.componentId === "component-claim-blende-base-module-1",
+  );
+
+  assert.equal(cabinetFaces.length, 2);
+  assert.equal(blendeFaces.length, 1);
+  assert.deepEqual(blendeFaces[0].points, [
+    [14.508314, 63.193277],
+    [14.950119, 63.132773],
+    [14.950119, 92.779832],
+    [14.508314, 92.840336],
+  ]);
+});
+
+test("AB 110401 uses SPB90, US45, UE115, and US60 for its default base cabinets", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
   const claims = readFileSync(new URL("../lib/service-claim-kitchen-hotspots.js", import.meta.url), "utf8");
   const items = seed.match(/const AB_110401_ITEMS = \[([\s\S]*?)\n\];/)?.[1] || "";
@@ -95,8 +236,16 @@ test("AB 110401 is seeded as an L-shaped kitchen with seven schedule defaults", 
   assert.match(seed, /slug: "ab-110401"[\s\S]*?kitchenCode: "110 401"[\s\S]*?items: AB_110401_ITEMS/);
   assert.match(items, /defaultOvenHob/);
   assert.match(items, /defaultWorktop/);
-  assert.match(items, /defaultSinkBase/);
-  assert.equal((items.match(/isLocked: true/g) || []).length, 4);
+  assert.match(items, /defaultSinkBase\(\{ code: "SINK-BASE-AB110401-DEFAULT"[^\n]+widthMm: 900[^\n]+articleNumber: "SPB90"/);
+  assert.match(items, /CAB-BASE-AB110401-DEFAULT-UPK20-1[^\n]+componentKey: "base-module-1"[^\n]+articleNumber: "US45"[^\n]+blendeCode: "UPK20"/);
+  assert.match(items, /CAB-BASE-AB110401-DEFAULT-3[^\n]+widthMm: 1150[^\n]+componentKey: "base-module-3"[^\n]+articleNumber: "UE115"/);
+  assert.match(items, /CAB-BASE-AB110401-DEFAULT-UPK20-2[^\n]+componentKey: "base-module-4"[^\n]+articleNumber: "US60"[^\n]+blendeCode: "UPK20"/);
+  assert.doesNotMatch(items, /CAB-BASE-AB110401-DEFAULT-2/);
+  assert.equal((items.match(/isLocked: true/g) || []).length, 3);
+  assert.match(seed, /articleNumber: "SPB90"[^\n]+name: "Sink Base Cabinet 90 cm"/);
+  assert.match(seed, /articleNumber: "UE115"[^\n]+name: "Lower Corner Cabinet 115 cm"/);
+  assert.match(items, /CAB-WALL-AB110401-H4502-2[^\n]+price: articlePrice\("H9002"\)[^\n]+widthMm: 900[^\n]+componentKey: "wall-cabinet-2"[^\n]+articleNumber: "H9002"/);
+  assert.doesNotMatch(items, /CAB-WALL-AB110401-H4502-3/);
   assert.match(claims, /L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-110401"/);
   assert.match(claims, /COOKTOP_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-110401"/);
   assert.match(claims, /"ab-110401": \{\s*indexPartKeys: \["worktop-left", "worktop-right", "worktop-left", "worktop-right"\]/);
@@ -116,6 +265,7 @@ test("AB 110401 claims keep sink, faucet, cooktop, oven, drawer and both worktop
   });
   const result = buildServiceClaimPartHotspots(source, [
     { partKey: "sink", sourceComponentKey: "sink-faucet" },
+    { partKey: "sink-cabinet", articleCode: "SPB90", sourceComponentKey: "sink-base" },
     { partKey: "faucet", sourceComponentKey: "sink-faucet" },
     { partKey: "oven", sourceComponentKey: "oven-module" },
     { partKey: "oven-drawer", sourceComponentKey: "oven-module" },
@@ -125,6 +275,12 @@ test("AB 110401 claims keep sink, faucet, cooktop, oven, drawer and both worktop
   ], "ab-110401");
 
   assert.equal(result.filter((entry) => entry.claimPartKey === "sink").length, 1);
+  const sinkCabinetFaces = result.filter((entry) => entry.claimPartKey === "sink-cabinet");
+  assert.equal(sinkCabinetFaces.length, 2);
+  assert.deepEqual(
+    sinkCabinetFaces.map((entry) => entry.componentId),
+    ["component-claim-sink-cabinet", "component-claim-sink-cabinet"],
+  );
   assert.equal(result.filter((entry) => entry.claimPartKey === "faucet").length, 3);
   assert.equal(result.filter((entry) => entry.claimPartKey === "cooktop").length, 1);
   assert.equal(result.filter((entry) => entry.claimPartKey === "oven").length, 1);
