@@ -548,6 +548,12 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       preserveOuterCabinetFace: true,
     },
   },
+  // The straight AB 110402 plan includes one UPK20 inside each outer lower
+  // cabinet hotspot. Split the exact PDF bands from U30 and US40 in ASC.
+  "ab-110402": {
+    "base-module-1": { side: "left", outer: 12.541568, inner: 13.909739 },
+    "base-module-3": { side: "right", inner: 85.866983, outer: 86.907363 },
+  },
   // Burger 103898: the US60 front ends at the first corner divider. UPE65
   // consists of both narrow perspective faces up to the sink-base seam.
   "burger-103898": {
@@ -2003,6 +2009,7 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
   const linkedSinkCabinetFaceKeys = {
     "ab-109873": new Set(["base-module-1"]),
     "ab-110401": new Set(["base-module-2"]),
+    "ab-110402": new Set(["base-module-2"]),
   }[normalizedSlug] || new Set();
   const linkedSinkCabinetPart = linkedSinkCabinetFaceKeys.size
     ? normalizedParts.find((part) => part.partKey === "sink-cabinet")

@@ -409,6 +409,11 @@ const SERVICE_CLAIM_LINKED_COMPONENT_GROUPS_BY_SLUG = {
     "component-wall-cabinet-2",
     "component-wall-cabinet-3",
   ]],
+  // H8002 is drawn as two adjacent 40 cm fronts but is one 80 cm cabinet.
+  "ab-110402": [[
+    "component-wall-cabinet-4",
+    "component-wall-cabinet-5",
+  ]],
   // Burger 103898 draws the hood cabinet, extractor and its two LED symbols as
   // one supplied assembly. Keep all three claim targets in sync when any face
   // of that assembly is clicked, hovered, or removed.
@@ -868,9 +873,13 @@ export function buildServiceClaimSelectableComponents({
     (part) => String(part?.partKey || "").trim() === "worktop-right",
   );
   const normalizedKitchenSlug = String(kitchenSlug || "").trim().toLowerCase();
-  const hiddenLinkedClaimFaceIds = normalizedKitchenSlug === "ab-109873"
-    ? new Set(["component-base-module-1"])
-    : new Set();
+  const hiddenLinkedClaimFaceIds = new Set({
+    "ab-109873": ["component-base-module-1"],
+    // These ids are only the second drawn face of the commercial SPB cabinet.
+    // The sink-cabinet claim part owns both faces and must produce one row.
+    "ab-110401": ["component-base-module-2"],
+    "ab-110402": ["component-base-module-2"],
+  }[normalizedKitchenSlug] || []);
   const worktopEndPanelChoicePartKey = hasSplitWorktopClaimParts
     ? LEFT_WORKTOP_END_PANEL_KITCHEN_SLUGS.has(normalizedKitchenSlug)
       ? "worktop-left"
