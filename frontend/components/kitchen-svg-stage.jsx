@@ -448,17 +448,19 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
   "ab-105834": [
     { componentKey: "refrigerator", points: [[8.38, 26.9], [18.41, 25.44], [29.52, 27.34], [18.41, 28.95]] },
     { componentKey: "refrigerator", points: [[8.38, 26.9], [18.41, 28.95], [29.52, 27.34], [29.52, 92.94], [18.41, 93.99], [8.38, 91.94]] },
-    { componentKey: "wall-cabinet-1", points: [[19.81, 11.41], [29.52, 10.06], [35.48, 11.13], [25.51, 12.58]] },
-    { componentKey: "wall-cabinet-1", points: [[19.81, 11.41], [25.51, 12.58], [25.51, 26.61], [19.81, 25.44]] },
-    { componentKey: "wall-cabinet-1", points: [[25.51, 12.58], [35.48, 11.13], [35.48, 37.86], [29.52, 37.86], [29.52, 27.34], [25.51, 26.61]] },
-    { componentKey: "wall-cabinet-2", points: [[29.52, 10.06], [42.75, 8.12], [47.48, 9.4], [35.48, 11.13]] },
-    { componentKey: "wall-cabinet-2", points: [[35.48, 11.13], [47.48, 9.4], [47.48, 37.86], [35.48, 39.6]] },
-    { componentKey: "extractor-hood", points: [[35.49, 39.62], [35.48, 37.8], [30.0, 38.62]], preserveManualSize: true },
-    { componentKey: "extractor-hood", points: [[35.48, 37.9], [47.48, 36.16], [47.48, 37.9], [35.48, 39.57]], preserveManualSize: true },
-    { componentKey: "extractor-hood", points: [[36.58, 44.08], [46.38, 42.75], [46.38, 38.11], [36.58, 39.57]] },
-    { componentKey: "wall-cabinet-3", points: [[42.75, 8.32], [54.83, 5.76], [60.28, 7.78], [47.48, 9.55]] },
-    { componentKey: "wall-cabinet-3", points: [[47.48, 9.55], [59.48, 7.84], [59.48, 33.98], [47.48, 37.48]] },
-    { componentKey: "wall-cabinet-3", points: [[59.48, 7.84], [60.28, 7.78], [60.28, 33.9], [59.48, 33.98]] },
+    // Trace shared cabinet/hood seams from the 3509 x 2480 source JPG.
+    // Adjacent faces use identical endpoints to avoid gaps and doubled tint.
+    { componentKey: "wall-cabinet-1", points: [[19.80621, 11.49194], [29.75207, 10.04032], [35.48019, 11.20968], [25.50584, 12.66129]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", points: [[19.80621, 11.49194], [25.50584, 12.66129], [25.50584, 26.6129], [19.80621, 25.40323]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", points: [[25.50584, 12.66129], [35.48019, 11.20968], [35.48019, 37.74194], [29.52408, 38.58871], [29.52408, 27.33871], [25.50584, 26.6129]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", points: [[29.75207, 10.04032], [41.69279, 8.30645], [47.47791, 9.43548], [35.48019, 11.20968]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", points: [[35.48019, 11.20968], [47.47791, 9.43548], [47.47791, 36.00806], [35.48019, 37.74194]], preserveManualSize: true },
+    // The fascia ends at the hood cabinet's right edge, above the light symbols.
+    { componentKey: "extractor-hood", points: [[29.52408, 38.58871], [35.48019, 37.74194], [47.47791, 36.00806], [47.47791, 37.8629], [46.37988, 38.02177], [46.37988, 42.75], [36.57994, 44.07984], [36.57994, 39.40121], [35.48019, 39.55645]], preserveManualSize: true },
+    // Follow the cabinet's sloping top outline, including its visible right return.
+    { componentKey: "wall-cabinet-3", points: [[41.69279, 8.30645], [53.74751, 6.53226], [59.47563, 7.70161], [47.47791, 9.43548]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[47.47791, 9.43548], [59.47563, 7.70161], [59.47563, 34.27419], [47.47791, 36.00806]], preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", points: [[59.47563, 7.70161], [60.50157, 7.58065], [60.50157, 34.1129], [59.47563, 34.27419]], preserveManualSize: true },
     {
       componentKey: "worktop",
       points: [
@@ -1396,9 +1398,9 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-105830"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105827"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105839"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105842"];
 IMAGE_HOTSPOTS_BY_SLUG["105845-modul-2"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105845"];
 
-// A WU16 side panel is visible only as the narrow seam between the final base
-// cabinet and the refrigerator. Keep it as a visual indicator instead of a
-// hotspot so it cannot alter the worktop selection or order value.
+// Some side panels are visible only as narrow seams between adjacent units.
+// Keep them as visual indicators instead of hotspots so they cannot alter the
+// worktop selection or order value.
 const PLAN_SIDE_PANEL_INDICATORS_BY_SLUG = {
   "ab-105825": [{ left: 75.65, top: 61.2, height: 28.55 }],
   "ab-105828": [{ left: 75.65, top: 61.2, height: 28.55 }],
@@ -1408,6 +1410,7 @@ const PLAN_SIDE_PANEL_INDICATORS_BY_SLUG = {
     { left: 82.55, top: 63.46, height: 32.09 },
     { left: 94.42, top: 62.03, height: 31.71 },
   ],
+  "ab-105838": [{ left: 68.36, top: 59.9, height: 27.44 }],
 };
 
 // The AB 105825 drawing splits its L-shaped worktop across overlapping source
