@@ -89,8 +89,23 @@ test("JPG-only ASC serial-number help chooses an appliance before showing photos
   assert.match(flow, /setSerialHelpApplianceType\(appliance\.type\)/);
   assert.match(flow, /serialNumberHelpBack/);
   assert.match(flow, /setSerialHelpApplianceType\(""\)/);
+  assert.match(flow, /getSerialNumberHelpApplianceType\(serialNumberHelpProduct\)/);
+  assert.match(flow, /serialNumberHelpBodyExtractorHood/);
+  assert.match(flow, /serialNumberHelpBodyHob/);
   assert.match(styles, /\.service-serial-help__appliance-grid/);
   assert.match(styles, /\.service-serial-help__appliance/);
+});
+
+test("JPG-only ASC serial validation highlights the missing field independently", () => {
+  const flow = fs.readFileSync(path.join(repoRoot, "components", "service-claim-flow.js"), "utf8");
+  const styles = fs.readFileSync(path.join(repoRoot, "app", "globals.css"), "utf8");
+
+  assert.match(flow, /const isSerialNumberMissing = showClaimRequiredErrors/);
+  assert.match(flow, /const isSerialPhotoMissing = showClaimRequiredErrors/);
+  assert.match(flow, /aria-invalid=\{isSerialNumberMissing\}/);
+  assert.match(flow, /aria-invalid=\{isSerialPhotoMissing\}/);
+  assert.match(flow, /isSerialPhotoMissing \? " is-error"/);
+  assert.match(styles, /problem-area-serial-upload\.is-error/);
 });
 
 test("dashboard contract forms accept sketch and optional PDF uploads", () => {

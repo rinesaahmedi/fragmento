@@ -58,7 +58,7 @@ function normalizeText(value) {
   return String(value || "").trim().toLowerCase();
 }
 
-function detectApplianceType(product = {}) {
+export function getSerialNumberHelpApplianceType(product = {}) {
   product = product || {};
   const claimPartKey = normalizeText(product.claimPartKey);
   if (claimPartKey === "cooktop") return "hob";
@@ -107,7 +107,7 @@ export function getSerialNumberHelpImages(product) {
     }
   }
 
-  const applianceType = detectApplianceType(product);
+  const applianceType = getSerialNumberHelpApplianceType(product);
   const typeImages = SERIAL_NUMBER_HELP_IMAGES_BY_APPLIANCE_TYPE[applianceType];
   if (Array.isArray(typeImages) && typeImages.length) {
     return typeImages;
