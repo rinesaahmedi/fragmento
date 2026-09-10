@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import test from "node:test";
 import {
+  buildPurchasedKitchenOverlaySvg,
   buildOrderConfirmationRecipients,
   buildOrderConfirmationEmailPreview,
   buildOrderConfirmationEmailStaticHtml,
@@ -8,7 +10,13 @@ import {
   generateOrderConfirmationPdf,
   generatePurchasedKitchenPdf,
   loadKitchenPlanPreviewData,
+  preparePurchasedKitchenPlanGeometry,
 } from "../lib/email/order-notifications.js";
+import {
+  getPlanDisplayCrop,
+  prepareKitchenPlanGeometry,
+} from "../lib/kitchen-plan-geometry.js";
+import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
 
 async function extractPdfText(base64) {
   const { PDFParse } = await import("pdf-parse");
@@ -94,6 +102,92 @@ test("order confirmation can generate purchased kitchen sketch attachment", asyn
   const text = await extractPdfText(pdf.base64);
   assert.doesNotMatch(text, /AB 105806 Kitchen/);
   assert.match(text, /Bestellnummer/);
+});
+
+test("AB 105830 purchased-kitchen selection reaches the same plinth line as the configurator", async () => {
+  const previewData = await loadKitchenPlanPreviewData();
+  const source = previewData.hotspotsBySlug["ab-105830"] || [];
+  const rawOven = source.find((hotspot) => hotspot.componentKey === "oven-module");
+  const { hotspots } = preparePurchasedKitchenPlanGeometry(
+    { kitchen: { slug: "ab-105830" }, components: [] },
+    source,
+  );
+  const emailOven = hotspots.find((hotspot) => hotspot.componentKey === "oven-module");
+
+  assert.ok(rawOven);
+  assert.ok(emailOven);
+  assert.ok(emailOven.height > rawOven.height);
+  assert.equal(emailOven.top + emailOven.height, 84.73);
+});
+
+test("AB 105830 confirmation overlay paints the selected oven through the plinth", async () => {
+  const previewData = await loadKitchenPlanPreviewData();
+  const source = previewData.hotspotsBySlug["ab-105830"] || [];
+  const order = {
+    kitchen: { slug: "ab-105830" },
+    components: [{ componentKey: "oven-module", isLocked: true }],
+  };
+  const { hotspots, crop } = preparePurchasedKitchenPlanGeometry(order, source);
+  const width = 1000;
+  const height = 800;
+  const overlay = buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height });
+  const markup = overlay.toString("utf8");
+  const lockedFill = 'fill="rgba(37,99,235,0.26)"';
+  const oven = hotspots.find((hotspot) => hotspot.componentKey === "oven-module");
+  const expectedX = ((oven.left - crop.left) / crop.width) * width;
+  const expectedY = ((oven.top - crop.top) / crop.height) * height;
+  const expectedWidth = (oven.width / crop.width) * width;
+  const expectedHeight = (oven.height / crop.height) * height;
+  const expectedRect = `<rect x="${expectedX}" y="${expectedY}" width="${expectedWidth}" height="${expectedHeight}" rx="8" ry="8" ${lockedFill}`;
+
+  assert.ok(overlay);
+  assert.ok(markup.includes(expectedRect));
+  assert.ok(Math.abs(expectedY + expectedHeight - ((84.73 - crop.top) / crop.height) * height) < 0.000001);
+});
+
+test("configurator and confirmation renderer stay wired to shared plan geometry", () => {
+  const stageSource = fs.readFileSync(
+    new URL("../components/kitchen-svg-stage.jsx", import.meta.url),
+    "utf8",
+  );
+  const emailSource = fs.readFileSync(
+    new URL("../lib/email/order-notifications.js", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(stageSource, /const definitions = prepareKitchenPlanGeometry\(/);
+  assert.match(stageSource, /getSharedPlanDisplayCrop\(imageHotspots, normalizedKitchenSlug\)/);
+  assert.match(emailSource, /const hotspots = prepareKitchenPlanGeometry\(sourceHotspots, slug/);
+  assert.match(emailSource, /crop: getPlanDisplayCrop\(hotspots, slug\)/);
+  assert.doesNotMatch(emailSource, /function getKitchenPlanDisplayCrop\(/);
+});
+
+test("every AB purchased-kitchen preview uses configurator geometry and crop", async () => {
+  const previewData = await loadKitchenPlanPreviewData();
+  const abSlugs = Object.keys(previewData.hotspotsBySlug)
+    .filter((slug) => slug.startsWith("ab-") && previewData.hotspotsBySlug[slug]?.length)
+    .sort();
+
+  assert.ok(abSlugs.length > 0);
+  assert.deepEqual(
+    abSlugs,
+    Object.keys(PLAN_HOTSPOTS_BY_SLUG)
+      .filter((slug) => slug.startsWith("ab-") && PLAN_HOTSPOTS_BY_SLUG[slug]?.length)
+      .sort(),
+  );
+  for (const slug of abSlugs) {
+    const source = previewData.hotspotsBySlug[slug];
+    const components = [...new Set(source.map((hotspot) => hotspot.componentKey).filter(Boolean))]
+      .map((componentKey) => ({ componentKey }));
+    const expectedHotspots = prepareKitchenPlanGeometry(source, slug, components);
+    const actual = preparePurchasedKitchenPlanGeometry(
+      { kitchen: { slug }, components },
+      source,
+    );
+
+    assert.deepEqual(actual.hotspots, expectedHotspots, `${slug} hotspot geometry must match`);
+    assert.deepEqual(actual.crop, getPlanDisplayCrop(expectedHotspots, slug), `${slug} crop must match`);
+  }
 });
 
 test("purchased kitchen preview keeps the optional sink-end blende green-selectable", async () => {

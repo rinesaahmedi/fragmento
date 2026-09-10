@@ -10,6 +10,14 @@ import { getCabinetWidthDisplayName } from "../cabinet-name-utils.js";
 import { getPreferredDeliveryWeekDisplay } from "../preferred-delivery.js";
 import { getPriceBreakdown } from "../price-utils.js";
 import { getBurger103898ProductInfo } from "../burger-103898-product-info.js";
+import {
+  getPlanDisplayCrop,
+  prepareKitchenPlanGeometry,
+} from "../kitchen-plan-geometry.js";
+import {
+  PLAN_HOTSPOTS_BY_SLUG,
+  PLAN_IMAGE_BY_SLUG,
+} from "../kitchen-plan-preview-data.js";
 
 const LETTERHEAD = {
   headerHeight: 74,
@@ -408,6 +416,15 @@ export async function loadKitchenPlanPreviewData() {
     // again after aliases so their separately selectable Blende paints green.
     applySinkEndBlendeHotspotSplits(hotspotsBySlug, sinkEndBlendeBoundsBySlug);
 
+    // Newer and runtime-generated layouts may not appear inside the component's
+    // object literal. Keep every configurator/claim-plan slug renderable in email.
+    Object.entries(PLAN_IMAGE_BY_SLUG).forEach(([slug, imageHref]) => {
+      imageViews[slug] ||= imageHref;
+    });
+    Object.entries(PLAN_HOTSPOTS_BY_SLUG).forEach(([slug, hotspots]) => {
+      hotspotsBySlug[slug] ||= hotspots;
+    });
+
     return { imageViews, hotspotsBySlug, linkedGroupsBySlug };
   })();
 
@@ -613,61 +630,6 @@ function applyPurchasedKitchenSelectionToSvg(markup, order) {
   return nextMarkup;
 }
 
-function hotspotBounds(definition) {
-  const points = Array.isArray(definition?.points) ? definition.points : [];
-  if (points.length) {
-    const xs = points.map((point) => Number(point[0])).filter(Number.isFinite);
-    const ys = points.map((point) => Number(point[1])).filter(Number.isFinite);
-    return {
-      left: Math.min(...xs),
-      top: Math.min(...ys),
-      right: Math.max(...xs),
-      bottom: Math.max(...ys),
-    };
-  }
-
-  const left = Number(definition?.left || 0);
-  const top = Number(definition?.top || 0);
-  return {
-    left,
-    top,
-    right: left + Number(definition?.width || 0),
-    bottom: top + Number(definition?.height || 0),
-  };
-}
-
-function getKitchenPlanDisplayCrop(hotspots = []) {
-  if (!hotspots.length) return { left: 0, top: 0, right: 100, bottom: 100, width: 100, height: 100 };
-
-  const bounds = hotspots.reduce(
-    (current, hotspot) => {
-      const box = hotspotBounds(hotspot);
-      return {
-        left: Math.min(current.left, box.left),
-        top: Math.min(current.top, box.top),
-        right: Math.max(current.right, box.right),
-        bottom: Math.max(current.bottom, box.bottom),
-      };
-    },
-    { left: 100, top: 100, right: 0, bottom: 0 },
-  );
-  const trailingX = 100 - bounds.right;
-  const trailingY = 100 - bounds.bottom;
-  const left = Math.max(0, bounds.left - Math.max(2.6, bounds.left * 0.6));
-  const top = Math.max(0, bounds.top - Math.max(4, bounds.top * 0.5));
-  const right = Math.min(99.5, bounds.right + Math.max(3.2, trailingX * 0.92));
-  const bottom = Math.min(99.5, bounds.bottom + Math.max(1, trailingY * 0.85));
-
-  return {
-    left,
-    top,
-    right,
-    bottom,
-    width: Math.max(right - left, 1),
-    height: Math.max(bottom - top, 1),
-  };
-}
-
 function pointsToOverlayPolygon(points, crop, width, height) {
   return points
     .map(([x, y]) => {
@@ -678,7 +640,7 @@ function pointsToOverlayPolygon(points, crop, width, height) {
     .join(" ");
 }
 
-function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height, linkedGroups = [] }) {
+export function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height, linkedGroups = [] }) {
   const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const hasWorktop = hotspots.some((hotspot) => String(hotspot?.componentKey || "").trim() === "worktop");
   const { selectedComponentKeys, lockedComponentKeys } = buildPurchasedKitchenPdfSelectionState(order, {
@@ -719,6 +681,15 @@ function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, height,
   return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes.join("")}</svg>`);
 }
 
+export function preparePurchasedKitchenPlanGeometry(order, sourceHotspots = []) {
+  const slug = normalizeKitchenSlug(order?.kitchen?.slug);
+  const hotspots = prepareKitchenPlanGeometry(sourceHotspots, slug, order?.components || []);
+  return {
+    hotspots,
+    crop: getPlanDisplayCrop(hotspots, slug),
+  };
+}
+
 async function renderPurchasedKitchenImagePlanPng(order, source) {
   const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const previewData = await loadKitchenPlanPreviewData().catch(() => null);
@@ -734,14 +705,16 @@ async function renderPurchasedKitchenImagePlanPng(order, source) {
         previewData.hotspotsBySlug?.[candidateSlug]?.length,
       )
     : "";
-  const hotspots = directHotspots.length
+  const sourceHotspots = directHotspots.length
     ? directHotspots
     : (previewData?.hotspotsBySlug?.[sharedPlanSlug] || []);
   const linkedGroups = previewData?.linkedGroupsBySlug?.[slug] || [];
-  if (!hotspots.length) return null;
+  if (!sourceHotspots.length) return null;
+
+  // Use the exact same geometry preparation as the interactive configurator.
+  const { hotspots, crop } = preparePurchasedKitchenPlanGeometry(order, sourceHotspots);
 
   const rendered = await sharp(source).png().toBuffer({ resolveWithObject: true });
-  const crop = getKitchenPlanDisplayCrop(hotspots);
   const extractLeft = Math.max(0, Math.floor((crop.left / 100) * rendered.info.width));
   const extractTop = Math.max(0, Math.floor((crop.top / 100) * rendered.info.height));
   const extractWidth = Math.min(rendered.info.width - extractLeft, Math.ceil((crop.width / 100) * rendered.info.width));

@@ -34,6 +34,11 @@ import {
   getTwoPartMobilePlanLayout,
   shiftTwoPartPlanGeometry,
 } from "../lib/two-part-mobile-plan-layout";
+import {
+  cropPlanHotspot as cropSharedPlanHotspot,
+  getPlanDisplayCrop as getSharedPlanDisplayCrop,
+  prepareKitchenPlanGeometry,
+} from "../lib/kitchen-plan-geometry";
 
 const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
   ssr: false,
@@ -2295,16 +2300,10 @@ export default function useKitchenSvgStage({
   }
 
   const imageHotspots = useMemo(() => {
-    const sourceDefinitions = (IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [])
-      .map(withHotspotSourceBounds);
-    const definitions = withBasePlinthExtension(
-      withCornerBlendeExtensions(
-        withDerivedSinkFaucet(
-          sourceDefinitions,
-          kitchenConfig.components,
-        ),
-      ),
+    const definitions = prepareKitchenPlanGeometry(
+      IMAGE_HOTSPOTS_BY_SLUG[normalizedKitchenSlug] || [],
       normalizedKitchenSlug,
+      kitchenConfig.components,
     );
     if (!definitions.length) return [];
 
@@ -2350,7 +2349,7 @@ export default function useKitchenSvgStage({
         ? translate("configurator.stageLegendClickMobile", "Tap the plan or choose below")
         : translate("configurator.stageLegendChooseBelow", "Choose elements below");
   const planDisplayCrop = useMemo(
-    () => getPlanDisplayCrop(imageHotspots, normalizedKitchenSlug),
+    () => getSharedPlanDisplayCrop(imageHotspots, normalizedKitchenSlug),
     [imageHotspots, normalizedKitchenSlug],
   );
   const mobilePlanLayout = useMemo(
@@ -2371,7 +2370,7 @@ export default function useKitchenSvgStage({
   const croppedImageHotspots = useMemo(
     () =>
       activeImageHotspots
-        .map((hotspot) => cropPlanHotspot(hotspot, activePlanDisplayCrop))
+        .map((hotspot) => cropSharedPlanHotspot(hotspot, activePlanDisplayCrop))
         .filter((hotspot) => hotspot.width > 0 && hotspot.height > 0),
     [activeImageHotspots, activePlanDisplayCrop],
   );
