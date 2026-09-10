@@ -26,8 +26,61 @@ export const BURGER_103898_CUTLERY_VARIANTS = [
 
 export const DEFAULT_CUTLERY_ARTICLE_NUMBER = "ZB60SG";
 
+const CUTLERY_DRAWER_ICON_KEYS = new Set([
+  "base_cabinet_30",
+  "drawer_base",
+  "drawer_base_two",
+  "drawer_base_three",
+]);
+
+const CUTLERY_INCOMPATIBLE_CODE_PREFIXES = [
+  "CAB-COOK-",
+  "DISH-",
+  "OVEN-",
+  "SINK-",
+  "SINKBASE-",
+  "WM-",
+];
+
+const CUTLERY_INCOMPATIBLE_COMPONENT_KEYS = new Set([
+  "dishwasher-base",
+  "oven-module",
+  "sink-base",
+  "washing-machine-base",
+]);
+
 function normalizeArticleNumber(articleNumber) {
   return String(articleNumber || "").trim().toUpperCase();
+}
+
+/**
+ * A matching width alone is not enough: cutlery inserts belong only in a
+ * drawer-capable lower cabinet. Prefer the supplier's US/US2A article family,
+ * then explicit drawer metadata retained by legacy/default kitchen rows.
+ */
+export function isCutleryInsertCompatibleCabinet(item) {
+  if (getCabinetKind(item) !== "lower") return false;
+
+  const code = String(item?.code || "").trim().toUpperCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  if (CUTLERY_INCOMPATIBLE_CODE_PREFIXES.some((prefix) => code.startsWith(prefix))) return false;
+  if (CUTLERY_INCOMPATIBLE_COMPONENT_KEYS.has(componentKey)) return false;
+
+  const articleParts = normalizeArticleNumber(item?.articleNumber)
+    .split("+")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (articleParts.some((part) => /^US(?:2A)?\d{2,3}$/.test(part))) return true;
+
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  if (CUTLERY_DRAWER_ICON_KEYS.has(iconKey)) return true;
+  if (code.includes("DRAWER")) return true;
+
+  const description = [item?.name, item?.nameDe, item?.infoText]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(" ");
+  return /\b(drawers?|schublade[n]?|auszug)\b/i.test(description);
 }
 
 export function getCutleryCatalogArticleNumbers(kitchenSlug = "") {
@@ -119,7 +172,7 @@ export function getAvailableCutleryVariantsForComponents(components = [], varian
   const widthCounts = new Map();
 
   for (const item of components || []) {
-    if (getCabinetKind(item) !== "lower") continue;
+    if (!isCutleryInsertCompatibleCabinet(item)) continue;
 
     const widthMm = getCabinetWidthMm(item);
     const widthCm = Number(widthMm) / 10;
