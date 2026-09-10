@@ -139,10 +139,22 @@ test("Burger 103898 seeds a separate Burger program kitchen and contract", () =>
     ),
     "utf8",
   );
+  const ovenMigration = readFileSync(
+    new URL(
+      "../prisma/migrations/20260910190000_link_burger103898_to_a_eh923640e/migration.sql",
+      import.meta.url,
+    ),
+    "utf8",
+  );
   assert.match(seed, /slug: "burger-103898"[\s\S]*?kitchenCode: "103 898"[\s\S]*?programmId: "BURGER CINDY"[\s\S]*?items: BURGER_103898_ITEMS/);
   assert.match(seed, /contractNumber: "670103898", kitchenSlug: "burger-103898"/);
   assert.match(seed, /contractNumber: "111103898", kitchenSlug: "burger-103898"/);
   assert.match(seed, /programmId: kitchen\.programmId \|\| DEFAULT_KITCHEN_PROGRAMM_ID/);
+  assert.match(seed, /const BURGER_103898_ITEMS = \[[\s\S]*?defaultOvenHob\(\{ catalogArticleNumber: "A-EH923640E \+ 9EC744100C"/);
+  assert.match(ovenMigration, /kitchen\."slug" = 'burger-103898'/);
+  assert.match(ovenMigration, /article\."articleNumber" = 'A-EH923640E \+ 9EC744100C'/);
+  assert.match(ovenMigration, /"articleCode" = 'A-EH923640E'/);
+  assert.match(ovenMigration, /a-eh923640e-product-info\.pdf/);
   assert.match(seed, /CAB-BASE-BURGER103898-US50[\s\S]*?price: "247\.00"[\s\S]*?isLocked: true/);
   assert.match(seed, /CAB-BASE-BURGER103898-US60-UPE65[\s\S]*?price: "349\.00"[\s\S]*?isLocked: true[\s\S]*?blendeCode: "UPE65"[\s\S]*?blendePrice: "79\.00"/);
   assert.match(seed, /CAB-BASE-BURGER103898-US30[\s\S]*?price: "222\.00"[\s\S]*?isLocked: true/);

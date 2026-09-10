@@ -1914,11 +1914,11 @@ const AB_110140_ITEMS = [
 const AB_110510_ITEMS = [
   defaultOvenHob({ catalogArticleNumber: "A-EH923640E + 9EC744100C", infoText: "Built-in oven + ceramic cooktop", sortOrder: 10, widthMm: 600 }),
   defaultWorktop({ sortOrder: 20 }),
-  defaultSinkBase({ code: "SINK-BASE-AB110510-DEFAULT", componentKey: "sink-base", sortOrder: 30, widthMm: 400, depthMm: 600 }),
+  defaultSinkBase({ code: "SINK-BASE-AB110510-DEFAULT", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", componentKey: "sink-base", sortOrder: 30, widthMm: 1100, heightMm: 878, depthMm: 600, articleNumber: "SPEB110", infoText: "Included SPEB110 sink cabinet" }),
   { itemType: ItemType.COMPONENT, code: "REF-AB110510-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-LEFT", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: "0.00", widthMm: 450, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, isLocked: true, infoText: "Included with the default kitchen configuration" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-CORNER", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: blendePrice("UPEF65", 1), widthMm: 400, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Included cabinet with UPEF65 corner filler panel", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-SINK-RUN", name: "Included base cabinet", nameDe: "Inklusiver Unterschrank", price: blendePrice("UPK20", 1), widthMm: 400, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included cabinet with UPK20 filler panel", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-LEFT", name: "Lower Cabinet 40 cm", nameDe: "Unterschrank 40 cm", price: "0.00", widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, isLocked: true, infoText: "Included U40 lower cabinet to the left of the oven", articleNumber: "U40", useCatalogArticle: false, preserveName: true },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-CORNER", name: "Lower Cabinet 45 cm", nameDe: "Unterschrank 45 cm", price: blendePrice("UPEF65", 1), widthMm: 450, heightMm: 878, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Included U45 lower cabinet with UPEF65 corner filler panel", articleNumber: "U45", useCatalogArticle: false, preserveName: true, blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110510-DEFAULT-SINK-RUN", name: "Lower Cabinet with Drawer 50 cm", nameDe: "Unterschrank mit Schublade 50 cm", price: blendePrice("UPK20", 1), widthMm: 500, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included US50 lower cabinet with drawer and UPK20 filler panel", articleNumber: "US50", preserveName: true, blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110510-H4502", name: "Wall Cabinet", nameDe: "Oberschrank", price: "139.00", widthMm: 450, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H4502 wall cabinet, 45 cm", articleNumber: "H4502" },
   { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB110510-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "HD6002 cabinet, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
   { itemType: ItemType.COMPONENT, code: "HOOD-AB110510-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
@@ -2006,7 +2006,7 @@ const AB_105815_ITEMS = AB_105811_ITEMS.map((item) => ({
 // Supplier schedule codes are retained for display while catalogArticleNumber links
 // each row to the shared catalog identity used by the Burger program price list.
 const BURGER_103898_ITEMS = [
-  defaultOvenHob({ sortOrder: 10 }),
+  defaultOvenHob({ catalogArticleNumber: "A-EH923640E + 9EC744100C", infoText: "Built-in oven + ceramic cooktop", sortOrder: 10, widthMm: 600 }),
   defaultWorktop({ sortOrder: 20 }),
   { itemType: ItemType.COMPONENT, code: "SINK-BASE-BURGER103898-600", name: DEFAULT_SINK_BASE_CATALOG_NAME_EN, nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE, price: "0.00", widthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: DEFAULT_SINK_BASE_CATALOG_INFO_TEXT },
   { itemType: ItemType.COMPONENT, code: "REF-BURGER103898-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: "579.00", heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
@@ -3448,11 +3448,13 @@ async function main() {
       const item = applyDefaultCatalogItem(rawItem);
       seededItemCodes.push(item.code);
       const itemCode = String(item.code || "").trim().toUpperCase();
-      const catalogArticleNumber = item.catalogArticleNumber || (item.isActive === false
-        && itemCode.startsWith("HOOD-")
-        && String(item.articleNumber || "").trim() === "FH 664 621 E"
-          ? "FH664621E + FWK124 + HD6002"
-          : String(item.articleNumber || "").trim());
+      const catalogArticleNumber = item.useCatalogArticle === false
+        ? ""
+        : item.catalogArticleNumber || (item.isActive === false
+          && itemCode.startsWith("HOOD-")
+          && String(item.articleNumber || "").trim() === "FH 664 621 E"
+            ? "FH664621E + FWK124 + HD6002"
+            : String(item.articleNumber || "").trim());
       const catalogArticle = catalogArticleNumber
         ? catalogArticleByNumber.get(catalogArticleNumber)
         : null;
@@ -3480,8 +3482,8 @@ async function main() {
       const resolvedHeightMm = pickCatalogDimension(catalogDims?.heightMm, item.heightMm);
       const resolvedDepthMm = pickCatalogDimension(catalogDims?.depthMm, item.depthMm);
       const itemForName = { ...item, widthMm: resolvedWidthMm };
-      const cabinetWidthName = getCabinetWidthDisplayName(itemForName);
-      const cabinetWidthNameDe = getCabinetWidthDisplayName(itemForName, "de");
+      const cabinetWidthName = item.preserveName ? "" : getCabinetWidthDisplayName(itemForName);
+      const cabinetWidthNameDe = item.preserveName ? "" : getCabinetWidthDisplayName(itemForName, "de");
       const isDishwasherItem = itemCode.startsWith("DISH-")
         || item.iconKey === "dishwasher_base";
       const isRefrigeratorItem = itemCode.startsWith("REF-")
@@ -3545,11 +3547,15 @@ async function main() {
           || catalogArticle?.articleNumber
           || (isStandaloneCatalogBlende ? catalogBlende?.code : item.articleNumber)
           || null,
-        name: catalogArticle?.name
-          || (isStandaloneCatalogBlende ? catalogBlende?.name : itemName),
-        nameDe: catalogArticle?.nameDe
-          || (isStandaloneCatalogBlende ? catalogBlende?.nameDe : itemNameDe)
-          || null,
+        name: item.preserveName
+          ? itemName
+          : catalogArticle?.name
+            || (isStandaloneCatalogBlende ? catalogBlende?.name : itemName),
+        nameDe: item.preserveName
+          ? itemNameDe
+          : catalogArticle?.nameDe
+            || (isStandaloneCatalogBlende ? catalogBlende?.nameDe : itemNameDe)
+            || null,
         price: isStandaloneCatalogBlende && catalogBlende ? catalogBlende.price : item.price,
         widthMm: resolvedWidthMm,
         heightMm: resolvedHeightMm,

@@ -71,7 +71,47 @@ test("AB 110510 preserves six DEFAULT rows and the corrected Excel schedule", ()
   }
   assert.match(block, /CAB-BASE-AB110510-DEFAULT-CORNER[^\n]+blendeCode: "UPEF65"/);
   assert.match(block, /CAB-BASE-AB110510-DEFAULT-SINK-RUN[^\n]+blendeCode: "UPK20"/);
+  assert.match(block, /code: "SINK-BASE-AB110510-DEFAULT"[^\n]+name: "Sink Lower Cabinet"[^\n]+widthMm: 1100[^\n]+articleNumber: "SPEB110"/);
+  assert.match(block, /code: "CAB-BASE-AB110510-DEFAULT-LEFT"[^\n]+name: "Lower Cabinet 40 cm"[^\n]+widthMm: 400[^\n]+componentKey: "base-module-1"[^\n]+articleNumber: "U40"[^\n]+useCatalogArticle: false[^\n]+preserveName: true/);
+  assert.match(block, /code: "CAB-BASE-AB110510-DEFAULT-CORNER"[^\n]+name: "Lower Cabinet 45 cm"[^\n]+widthMm: 450[^\n]+componentKey: "base-module-2"[^\n]+articleNumber: "U45"[^\n]+useCatalogArticle: false[^\n]+preserveName: true[^\n]+blendeCode: "UPEF65"/);
+  assert.match(block, /code: "CAB-BASE-AB110510-DEFAULT-SINK-RUN"[^\n]+name: "Lower Cabinet with Drawer 50 cm"[^\n]+widthMm: 500[^\n]+componentKey: "base-module-3"[^\n]+articleNumber: "US50"[^\n]+preserveName: true[^\n]+blendeCode: "UPK20"/);
   assert.match(block, /CAB-WALL-AB110510-H6002-HPK2002[^\n]+articlePriceWithBlende\("H6002", "HPK2002", 1\)[^\n]+blendeCode: "HPK2002"/);
+});
+
+test("AB 110510 exposes SPEB110, U40, U45, and US50 in ASC", () => {
+  const items = [
+    { itemType: "COMPONENT", code: "SINK-BASE-AB110510-DEFAULT", name: "Sink Lower Cabinet", articleNumber: "SPEB110", componentKey: "sink-base", widthMm: 1100, isLocked: true },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB110510-DEFAULT-LEFT", name: "Lower Cabinet 40 cm", articleNumber: "U40", componentKey: "base-module-1", widthMm: 400, isLocked: true },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB110510-DEFAULT-CORNER", name: "Lower Cabinet 45 cm", articleNumber: "U45", componentKey: "base-module-2", widthMm: 450, isLocked: true, blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel" },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB110510-DEFAULT-SINK-RUN", name: "Lower Cabinet with Drawer 50 cm", articleNumber: "US50", componentKey: "base-module-3", widthMm: 500, isLocked: true, blendeCode: "UPK20", blendeLabel: "UPK20 20 cm" },
+  ];
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items },
+    kitchenConfig: { components: items },
+    kitchenSlug: slug,
+    claimParts: [{
+      partKey: "sink-cabinet",
+      name: "Sink Lower Cabinet",
+      articleCode: "SPEB110",
+      sourceKitchenItemCode: "SINK-BASE-AB110510-DEFAULT",
+      sourceComponentKey: "sink-base",
+    }],
+  });
+
+  const articleBySourceKey = Object.fromEntries(
+    selection.selectableComponents
+      .filter((entry) => (
+        entry.claimPartKey !== "blende"
+        && ["sink-base", "base-module-1", "base-module-2", "base-module-3"].includes(entry.sourceComponentKey || entry.componentKey)
+      ))
+      .map((entry) => [entry.sourceComponentKey || entry.componentKey, entry.articleCode]),
+  );
+  assert.deepEqual(articleBySourceKey, {
+    "sink-base": "SPEB110",
+    "base-module-1": "U40",
+    "base-module-2": "U45",
+    "base-module-3": "US50",
+  });
 });
 
 test("AB 110510 maps Excel callouts and links the complete hood package", () => {
