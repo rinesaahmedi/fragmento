@@ -3714,8 +3714,8 @@ async function main() {
         {
           partKey: "dishwasher",
           articleCode: isDishwasher45 ? "A-EGSPV587915" : "A-EGSPV597210",
-          name: isDishwasher45 ? "Fully Integrated Dishwasher 45 cm" : "Fully Integrated Dishwasher",
-          nameDe: isDishwasher45 ? "Vollintegrierter Geschirrspüler 45 cm" : "Vollintegrierter Geschirrspüler",
+          name: isDishwasher45 ? "Fully Integrated Dishwasher 45 cm" : "Fully Integrated Dishwasher 60 cm",
+          nameDe: isDishwasher45 ? "Vollintegrierter Geschirrspüler 45 cm" : "Vollintegrierter Geschirrspüler 60 cm",
           sortOrder: 32,
         },
         {

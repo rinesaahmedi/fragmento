@@ -9,6 +9,11 @@ const productInformationPath = path.join(__dirname, "..", "lib", "product-inform
 const configuratorPath = path.join(__dirname, "..", "components", "kitchen-configurator.js");
 const publicEnPath = path.join(__dirname, "..", "locales", "public.en.json");
 
+test("Fragmento product assistant is not blocked by a per-IP request cap", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+  assert.doesNotMatch(source, /enforceRateLimit|getRequestClientIp/);
+});
+
 function loadModuleSource(filePath) {
   return fs
     .readFileSync(filePath, "utf8")
