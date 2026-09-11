@@ -69,8 +69,8 @@ test("AB 109955 preserves all ten schedule rows, prices, and four defaults", () 
   ]) {
     assert.match(items, new RegExp(`${code}[^;]+price: "${price}"`));
   }
-  assert.match(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+catalogArticleNumber: "H6002"/);
-  assert.match(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+displayArticleNumber: "H6002 \+ HPK2002"/);
+  assert.match(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+articleNumber: "H6002"[^;]+catalogArticleNumber: "H6002"[^;]+blendeCode: "HPK2002"/);
+  assert.doesNotMatch(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+displayArticleNumber/);
   assert.doesNotMatch(items, /CAB-WALL-AB109955-H6002-HPK2002[^;]+HPK2002\s*\(35E\)/);
 });
 

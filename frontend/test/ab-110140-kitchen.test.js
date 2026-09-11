@@ -84,7 +84,8 @@ test("AB 110140 schedule preserves six DEFAULT rows and all priced articles", ()
   assert.match(block, /code: "CAB-BASE-AB110140-DEFAULT-SINK-RUN"[^\n]+name: "Lower Cabinet 45 cm"[^\n]+widthMm: 450[^\n]+componentKey: "base-module-1"[^\n]+articleNumber: "U45"/);
   assert.match(block, /code: "CAB-BASE-AB110140-DEFAULT-LEFT"[^\n]+name: "Lower Cabinet with Drawer 60 cm"[^\n]+widthMm: 600[^\n]+componentKey: "base-module-2"[^\n]+articleNumber: "US60"[^\n]+blendeCode: "UPEF65"[^\n]+blendePrice: blendePrice\("UPEF65", 1\)/);
   assert.match(block, /code: "CAB-BASE-AB110140-DEFAULT-RIGHT"[^\n]+name: "Lower Cabinet 50 cm"[^\n]+widthMm: 500[^\n]+componentKey: "base-module-3"[^\n]+articleNumber: "U50"/);
-  assert.match(block, /code: "CAB-WALL-AB110140-H6002-HPK2002"[^\n]+price: articlePriceWithBlende\("H6002", "HPK2002", 1\)[^\n]+blendeCode: "HPK2002"[^\n]+blendePrice: blendePrice\("HPK2002", 1\)/);
+  assert.match(block, /code: "CAB-WALL-AB110140-H6002-HPK2002"[^\n]+price: articlePriceWithBlende\("H6002", "HPK2002", 1\)[^\n]+articleNumber: "H6002"[^\n]+catalogArticleNumber: "H6002"[^\n]+blendeCode: "HPK2002"[^\n]+blendePrice: blendePrice\("HPK2002", 1\)/);
+  assert.doesNotMatch(block, /CAB-WALL-AB110140-H6002-HPK2002[^\n]+displayArticleNumber/);
   assert.doesNotMatch(block, /A-EGSPV597210|TGV60|DISH-AB110140/);
 });
 

@@ -89,11 +89,12 @@ test("AB 110402 uses SPB80, U30 and US40 for its corrected defaults", () => {
     assert.match(row, new RegExp(article));
     assert.ok(row.includes(price), `${code} should retain supplier/catalog price ${price}`);
   }
-  assert.match(items, /CAB-WALL-AB110402-H3002-HPK2002[^\n]+displayArticleNumber: "H3002 \+ HPK2002"/);
+  assert.match(items, /CAB-WALL-AB110402-H3002-HPK2002[^\n]+articleNumber: "H3002"[^\n]+catalogArticleNumber: "H3002"[^\n]+blendeCode: "HPK2002"/);
   assert.match(items, /CAB-WALL-AB110402-H4002-1[^\n]+price: articlePrice\("H8002"\)[^\n]+widthMm: 800[^\n]+componentKey: "wall-cabinet-4"[^\n]+articleNumber: "H8002"/);
   assert.match(catalogPanel, /DOUBLE_DOOR_WALL_CABINET_ARTICLES = new Set\(\["H8002", "H9002"\]\)/);
   assert.doesNotMatch(items, /CAB-WALL-AB110402-H4002-2/);
-  assert.match(items, /CAB-WALL-AB110402-H4002-HPK2002[^\n]+displayArticleNumber: "H4002 \+ HPK2002"/);
+  assert.match(items, /CAB-WALL-AB110402-H4002-HPK2002[^\n]+articleNumber: "H4002"[^\n]+catalogArticleNumber: "H4002"[^\n]+blendeCode: "HPK2002"/);
+  assert.doesNotMatch(items, /CAB-WALL-AB110402-(?:H3002|H4002)-HPK2002[^\n]+displayArticleNumber/);
   assert.doesNotMatch(items, /\((?:25|35)E\)/);
 });
 

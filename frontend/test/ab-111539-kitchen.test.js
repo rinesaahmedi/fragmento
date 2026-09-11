@@ -60,10 +60,11 @@ test("AB 111539 matches the ten-row schedule and locks SP50, US40 and U30", () =
   assert.match(block, /DISH-AB111539-450[^\n]+price: "450\.00"[^\n]+widthMm: 450[^\n]+A-EGSPV587915 \+ TGV45/);
   assert.match(block, /CAB-BASE-AB111539-US40-DEFAULT[^\n]+price: "183\.00"[^\n]+widthMm: 400[^\n]+isLocked: true[^\n]+articleNumber: "US40"/);
   assert.match(block, /CAB-BASE-AB111539-U30-DEFAULT[^\n]+price: "0\.00"[^\n]+widthMm: 300[^\n]+isLocked: true[^\n]+articleNumber: "U30"[^\n]+useCatalogArticle: false/);
-  assert.match(block, /CAB-WALL-AB111539-H6002-HPK2002[^\n]+price: "149\.00"[^\n]+displayArticleNumber: "H6002 \+ HPK2002\(35E\)"/);
+  assert.match(block, /CAB-WALL-AB111539-H6002-HPK2002[^\n]+price: "149\.00"[^\n]+articleNumber: "H6002"[^\n]+catalogArticleNumber: "H6002"[^\n]+blendeCode: "HPK2002"/);
   assert.match(block, /CAB-WALL-AB111539-H4002[^\n]+price: "130\.00"/);
   assert.match(block, /CAB-HOOD-AB111539-600[^\n]+price: "349\.00"/);
-  assert.match(block, /CAB-WALL-AB111539-H3002-HPK2002[^\n]+price: "115\.00"[^\n]+displayArticleNumber: "H3002 \+ HPK2002\(35E\)"/);
+  assert.match(block, /CAB-WALL-AB111539-H3002-HPK2002[^\n]+price: "115\.00"[^\n]+articleNumber: "H3002"[^\n]+catalogArticleNumber: "H3002"[^\n]+blendeCode: "HPK2002"/);
+  assert.doesNotMatch(block, /CAB-WALL-AB111539-(?:H6002|H3002)-HPK2002[^\n]+displayArticleNumber/);
 });
 
 test("AB 111539 maps all PDF callouts", () => {
