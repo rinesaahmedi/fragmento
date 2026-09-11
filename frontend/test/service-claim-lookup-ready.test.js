@@ -1,11 +1,16 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 import {
   isJunkServiceClaimVisitEvent,
   isServiceClaimContractLookupReady,
   normalizeServiceClaimContractNumber,
   SERVICE_CLAIM_LOOKUP_MIN_LENGTH,
 } from "../lib/service-claim-lookup.js";
+
+const testDir = path.dirname(fileURLToPath(import.meta.url));
 
 test("normalizeServiceClaimContractNumber strips spaces anywhere in ASC contract numbers", () => {
   assert.equal(normalizeServiceClaimContractNumber(" 670 888 888 "), "670888888");
@@ -16,6 +21,20 @@ test("normalizeServiceClaimContractNumber strips spaces anywhere in ASC contract
 
 test("normalizeServiceClaimContractNumber strips copy-pasted invisible spacing", () => {
   assert.equal(normalizeServiceClaimContractNumber("670\u00a0103\u200b827"), "670103827");
+});
+
+test("service claim input preserves typed spaces while requests use the normalized value", () => {
+  const flowSource = fs.readFileSync(
+    path.join(testDir, "..", "components", "service-claim-flow.js"),
+    "utf8",
+  );
+
+  assert.match(flowSource, /const normalizedContractNumber = normalizeServiceClaimContractNumber\(formValues\.contractNumber\)/);
+  assert.match(flowSource, /contractNumber: normalizedContractNumber/);
+  assert.doesNotMatch(
+    flowSource,
+    /field === ["']contractNumber["']\s*\?\s*normalizeServiceClaimContractNumber\(value\)/,
+  );
 });
 
 test("lookup readiness rejects placeholders and short input", () => {
