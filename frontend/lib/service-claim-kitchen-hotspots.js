@@ -899,6 +899,34 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       ],
     },
   },
+  // The two slim inside-corner faces form the supplied UPEF65. The wider
+  // drawer/door polygon remains the independently claimable US40 cabinet.
+  "ab-111539": {
+    // The ordinary UPK20 sits between the exposed sink-run side and SP50.
+    // Preserve both surrounding cabinet faces and split only the slim panel.
+    "sink-base": {
+      side: "left",
+      outer: 20.921615,
+      inner: 23.686461,
+      preserveOuterCabinetFace: true,
+    },
+    "base-module-1": {
+      side: "left",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        { left: 43.268409, right: 45.477435, top: 56.336134, bottom: 89.835294 },
+        { left: 45.477435, right: 46.603325, top: 56.336134, bottom: 89.754622 },
+      ],
+    },
+    // U30 owns the narrow UPK20 between its front and exposed return side.
+    // It is an ordinary filler, not the inside-corner UPEF65 beside US40.
+    "base-module-2": {
+      side: "left",
+      outer: 69.092637,
+      inner: 70.817102,
+      preserveOuterCabinetFace: true,
+    },
+  },
   // Each filler boundary is taken from the AB 109874 CAD strokes. The base
   // corner contains three narrow UPEF65 faces and the first base/upper units
   // each retain their separately visible outer cabinet face.

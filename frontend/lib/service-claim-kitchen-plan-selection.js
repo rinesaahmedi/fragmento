@@ -63,6 +63,9 @@ const CLAIM_BLENDE_COMPANION_SOURCE_KEYS_BY_SLUG = {
   // same plan area, so ASC must ask which physical part is affected.
   "ab-110140": new Set(["base-module-2"]),
   "ab-110510": new Set(["base-module-2", "base-module-3", "wall-cabinet-4"]),
+  // The UPEF65 stays paired with US40 and the UPK20 stays paired with U30.
+  // The sink-run UPK20 is intentionally a separate ASC claim row.
+  "ab-111539": new Set(["base-module-1", "base-module-2"]),
 };
 const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
   "ab-109873": new Set(["sink-base", "base-module-2", "wall-cabinet-5"]),
@@ -76,6 +79,7 @@ const CLAIM_PLAN_SELECTABLE_COMPANION_BLENDE_SOURCE_KEYS_BY_SLUG = {
   "ab-105831": new Set(["base-module-2"]),
   "ab-110140": new Set(["base-module-2"]),
   "ab-110510": new Set(["base-module-2", "base-module-3", "wall-cabinet-4"]),
+  "ab-111539": new Set(["base-module-1", "base-module-2"]),
 };
 const CLAIM_BLENDE_QUANTITY_OVERRIDES_BY_SLUG = {
   // Both adjacent right-hand strips are independently drawn in this shared plan.
@@ -91,6 +95,7 @@ const CLAIM_STANDALONE_BLENDE_SOURCE_KEYS_BY_SLUG = {
   "ab-105748": new Set(["sink-base"]),
   "ab-105751": new Set(["sink-base"]),
   "ab-105754": new Set(["sink-base"]),
+  "ab-111539": new Set(["sink-base"]),
 };
 // Legacy confirmed orders can predate a separately drawn component even when
 // its ASC hotspot is present. Expose only the missing drawn target in

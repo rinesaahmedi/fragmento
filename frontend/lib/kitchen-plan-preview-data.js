@@ -279,7 +279,11 @@ export const AB_111539_FRG_ORDER_HOTSPOTS = [
   { componentKey: "sink-base", points: [[10.546318, 57.747899], [20.921615, 59.885714], [20.921615, 93.082353], [10.546318, 90.944538]], preserveManualSize: true },
   { componentKey: "sink-base", points: [[20.921615, 59.885714], [33.990499, 57.989916], [33.990499, 91.186555], [20.921615, 93.082353]], preserveManualSize: true },
   { componentKey: "dishwasher-base", points: [[33.990499, 57.989916], [43.268409, 56.658824], [43.268409, 89.835294], [33.990499, 91.186555]], preserveManualSize: true },
-  { componentKey: "dishwasher-base", points: [[43.268409, 56.658824], [43.5962, 56.598319], [45.477435, 56.336134], [45.477435, 89.512605], [43.5962, 89.794958], [43.268409, 89.835294]], preserveManualSize: true },
+  // The corner return/filler and the drawer/door front are visible parts of
+  // the supplied US40, not of the adjacent 45 cm dishwasher. Keep one
+  // component key so the complete default cabinet is painted in FRG/ASC and
+  // exposed as one US40 claim line.
+  { componentKey: "base-module-1", points: [[43.268409, 56.658824], [43.5962, 56.598319], [45.477435, 56.336134], [45.477435, 89.512605], [43.5962, 89.794958], [43.268409, 89.835294]], preserveManualSize: true },
   { componentKey: "base-module-1", points: [[45.477435, 56.336134], [46.603325, 56.557983], [46.603325, 89.754622], [45.477435, 89.512605]], preserveManualSize: true },
   { componentKey: "base-module-1", points: [[46.603325, 56.557983], [53.515439, 57.989916], [53.515439, 91.166387], [46.603325, 89.754622]], preserveManualSize: true },
   { componentKey: "oven-module", points: [[53.515439, 57.989916], [63.904988, 60.127731], [63.904988, 93.304202], [53.515439, 91.166387]], preserveManualSize: true },

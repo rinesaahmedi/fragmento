@@ -8,6 +8,7 @@ import {
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data.js";
 import {
+  buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
   isLShapedClaimKitchen,
 } from "../lib/service-claim-kitchen-hotspots.js";
@@ -38,8 +39,8 @@ test("AB 111539 uses its vector plan and exact perspective hotspots", () => {
   assert.ok(hotspots.every((hotspot) => hotspot.points.length >= 4));
   assert.equal(keys.filter((key) => key === "worktop").length, 4);
   assert.equal(keys.filter((key) => key === "sink-base").length, 2);
-  assert.equal(keys.filter((key) => key === "dishwasher-base").length, 2);
-  assert.equal(keys.filter((key) => key === "base-module-1").length, 2);
+  assert.equal(keys.filter((key) => key === "dishwasher-base").length, 1);
+  assert.equal(keys.filter((key) => key === "base-module-1").length, 3);
   assert.equal(keys.filter((key) => key === "base-module-2").length, 2);
   assert.equal(keys.filter((key) => key === "under-cabinet-light").length, 2);
   assert.deepEqual(
@@ -56,10 +57,10 @@ test("AB 111539 matches the ten-row schedule and locks SP50, US40 and U30", () =
   assert.match(seed, /slug: "ab-111539"[\s\S]*?kitchenCode: "111 539"[\s\S]*?items: AB_111539_ITEMS/);
   assert.match(block, /defaultOvenHob\(\{ catalogArticleNumber: "A-EH923640E \+ 9EC744100C"/);
   assert.match(seed, /articleNumber: "SP50"[^\n]+name: "Sink Lower Cabinet 50 cm"[^\n]+widthMm: 500/);
-  assert.match(block, /SINK-BASE-AB111539-SP50[^\n]+widthMm: 500[^\n]+articleNumber: "SP50"[^\n]+catalogArticleNumber: "SP50"/);
+  assert.match(block, /SINK-BASE-AB111539-SP50[^\n]+widthMm: 500[^\n]+articleNumber: "SP50"[^\n]+catalogArticleNumber: "SP50"[^\n]+blendeCode: "UPK20"[^\n]+blendePrice: "0\.00"/);
   assert.match(block, /DISH-AB111539-450[^\n]+price: "450\.00"[^\n]+widthMm: 450[^\n]+A-EGSPV587915 \+ TGV45/);
-  assert.match(block, /CAB-BASE-AB111539-US40-DEFAULT[^\n]+price: "183\.00"[^\n]+widthMm: 400[^\n]+isLocked: true[^\n]+articleNumber: "US40"/);
-  assert.match(block, /CAB-BASE-AB111539-U30-DEFAULT[^\n]+price: "0\.00"[^\n]+widthMm: 300[^\n]+isLocked: true[^\n]+articleNumber: "U30"[^\n]+useCatalogArticle: false/);
+  assert.match(block, /CAB-BASE-AB111539-US40-DEFAULT[^\n]+price: "183\.00"[^\n]+widthMm: 400[^\n]+isLocked: true[^\n]+articleNumber: "US40"[^\n]+blendeCode: "UPEF65"[^\n]+blendePrice: "0\.00"/);
+  assert.match(block, /CAB-BASE-AB111539-U30-DEFAULT[^\n]+price: "0\.00"[^\n]+widthMm: 300[^\n]+isLocked: true[^\n]+articleNumber: "U30"[^\n]+useCatalogArticle: false[^\n]+blendeCode: "UPK20"[^\n]+blendePrice: "0\.00"/);
   assert.match(block, /CAB-WALL-AB111539-H6002-HPK2002[^\n]+price: "149\.00"[^\n]+articleNumber: "H6002"[^\n]+catalogArticleNumber: "H6002"[^\n]+blendeCode: "HPK2002"/);
   assert.match(block, /CAB-WALL-AB111539-H4002[^\n]+price: "130\.00"/);
   assert.match(block, /CAB-HOOD-AB111539-600[^\n]+price: "349\.00"/);
@@ -86,9 +87,9 @@ test("AB 111539 maps all PDF callouts", () => {
 
 test("AB 111539 exposes each default cabinet and every split fixture in ASC", () => {
   const items = [
-    { itemType: "COMPONENT", code: "SINK-BASE-AB111539-SP50", name: "Sink Lower Cabinet 50 cm", articleNumber: "SP50", componentKey: "sink-base", isLocked: true },
-    { itemType: "COMPONENT", code: "CAB-BASE-AB111539-US40-DEFAULT", name: "Lower Cabinet with Drawer 40 cm", articleNumber: "US40", componentKey: "base-module-1", isLocked: true },
-    { itemType: "COMPONENT", code: "CAB-BASE-AB111539-U30-DEFAULT", name: "Lower Cabinet 30 cm", articleNumber: "U30", componentKey: "base-module-2", isLocked: true },
+    { itemType: "COMPONENT", code: "SINK-BASE-AB111539-SP50", name: "Sink Lower Cabinet 50 cm", articleNumber: "SP50", componentKey: "sink-base", widthMm: 500, isLocked: true, blendeCode: "UPK20", blendeLabel: "UPK20 Filler panel" },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB111539-US40-DEFAULT", name: "Lower Cabinet with Drawer 40 cm", articleNumber: "US40", componentKey: "base-module-1", widthMm: 400, isLocked: true, blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel" },
+    { itemType: "COMPONENT", code: "CAB-BASE-AB111539-U30-DEFAULT", name: "Lower Cabinet 30 cm", articleNumber: "U30", componentKey: "base-module-2", widthMm: 300, isLocked: true, blendeCode: "UPK20", blendeLabel: "UPK20 Filler panel" },
     { itemType: "COMPONENT", code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", componentKey: "oven-module", isLocked: true },
     { itemType: "COMPONENT", code: "SINK-WORKTOP", name: "Sink and faucet", componentKey: "sink-faucet", isLocked: true },
     { itemType: "COMPONENT", code: "TOP-AB105806", name: "Worktop", componentKey: "worktop", isLocked: true },
@@ -110,13 +111,63 @@ test("AB 111539 exposes each default cabinet and every split fixture in ASC", ()
   const articleCodes = new Set(selection.selectableComponents.map((entry) => entry.articleCode));
 
   assert.equal(isLShapedClaimKitchen(slug), true);
-  for (const code of ["SP50", "US40", "U30", "526335", "517720", "A-EH923640E", "UHK", "9EC744100C", "PLR60-1", "PLR60-2"]) {
+  for (const code of ["SP50", "US40", "UPEF65", "U30", "526335", "517720", "A-EH923640E", "UHK", "9EC744100C", "PLR60-1", "PLR60-2"]) {
     assert.ok(articleCodes.has(code), `${code} should be independently claimable`);
   }
   const u30Claims = selection.selectableComponents.filter((entry) => entry.articleCode === "U30");
   assert.equal(u30Claims.length, 1);
   assert.equal(u30Claims[0].componentId, "component-base-module-2");
   assert.equal(u30Claims[0].claimPartKey, "cabinet-base-module-2");
+  const us40Claims = selection.selectableComponents.filter((entry) => entry.articleCode === "US40");
+  assert.equal(us40Claims.length, 1);
+  assert.equal(us40Claims[0].componentId, "component-base-module-1");
+  assert.equal(us40Claims[0].claimPartKey, undefined);
+  assert.equal(
+    PLAN_HOTSPOTS_BY_SLUG[slug].filter((hotspot) => hotspot.componentKey === "base-module-1").length,
+    3,
+    "the complete corner return and the US40 front must select one claim component",
+  );
+  const cornerFillerClaims = selection.selectableComponents.filter((entry) => entry.articleCode === "UPEF65");
+  assert.equal(cornerFillerClaims.length, 1);
+  assert.equal(cornerFillerClaims[0].componentId, "component-claim-blende-base-module-1");
+  assert.equal(cornerFillerClaims[0].claimPartKey, "blende");
+  assert.equal(cornerFillerClaims[0].isCompanionOption, true);
+  assert.equal(cornerFillerClaims[0].isPlanSelectableCompanion, true);
+  const regularFillerClaims = selection.selectableComponents.filter((entry) => entry.articleCode === "UPK20");
+  assert.equal(regularFillerClaims.length, 2);
+  assert.deepEqual(
+    regularFillerClaims.map((entry) => entry.sourceComponentKey).sort(),
+    ["base-module-2", "sink-base"],
+  );
+  const sinkFillerClaim = regularFillerClaims.find((entry) => entry.sourceComponentKey === "sink-base");
+  assert.equal(sinkFillerClaim.isCompanionOption, undefined);
+  assert.equal(sinkFillerClaim.isPlanSelectableCompanion, undefined);
+  assert.equal(sinkFillerClaim.isStandaloneClaimOption, true);
+  const u30FillerClaim = regularFillerClaims.find((entry) => entry.sourceComponentKey === "base-module-2");
+  assert.equal(u30FillerClaim.isCompanionOption, true);
+  assert.equal(u30FillerClaim.isPlanSelectableCompanion, true);
+  assert.equal(u30FillerClaim.isStandaloneClaimOption, undefined);
+
+  const splitCabinetHotspots = buildServiceClaimBlendeHotspots(
+    PLAN_HOTSPOTS_BY_SLUG[slug].map(withBounds),
+    [cornerFillerClaims[0], ...regularFillerClaims],
+    items,
+    slug,
+  );
+  assert.equal(
+    splitCabinetHotspots.filter((hotspot) => hotspot.componentId === "component-claim-blende-base-module-1").length,
+    2,
+  );
+  assert.equal(
+    splitCabinetHotspots.filter((hotspot) => hotspot.componentKey === "base-module-1").length,
+    1,
+  );
+  for (const filler of regularFillerClaims) {
+    assert.ok(
+      splitCabinetHotspots.some((hotspot) => hotspot.componentId === filler.componentId),
+      `${filler.sourceComponentKey} must expose its UPK20 as a separate plan target`,
+    );
+  }
 
   const hotspots = buildServiceClaimPartHotspots(PLAN_HOTSPOTS_BY_SLUG[slug].map(withBounds), claimParts, slug);
   assert.deepEqual(
