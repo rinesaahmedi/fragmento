@@ -94,6 +94,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105757": "/plans/AB%20105757.svg",
   "ab-110140": "/plans/AB%20110140.svg",
   "ab-110510": "/plans/AB%20110510.svg",
+  "ab-111539": "/plans/AB%20111539.svg",
   "108134-modul-1": "/plans/108134%20MODUL%201.svg",
 };
 
@@ -106,6 +107,7 @@ export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
   "ab-109955": { width: 842, height: 595 },
   "ab-110401": { width: 842, height: 595 },
   "ab-110402": { width: 842, height: 595 },
+  "ab-111539": { width: 842, height: 595 },
   "ab-105845": { width: 800, height: 600 },
   "ab-105847": { width: 800, height: 600 },
   "ab-105850": { width: 800, height: 600 },
@@ -151,6 +153,10 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
   "ab-110402": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 38.665083, top: 75.858824, width: 14.494062, height: 7.240336, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 44.551069, top: 87.596639, width: 2.907363, height: 3.771428, persistWhenSelected: true },
+  ],
+  "ab-111539": [
+    { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 35.11639, top: 68.638655, width: 7.068884, height: 6.352941, persistWhenSelected: true },
+    { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 37.635392, top: 80.889076, width: 2.567696, height: 2.695798, persistWhenSelected: true },
   ],
   "ab-105845": AB_105845_DISHWASHER_LIGHT_DETAILS,
   "ab-105847": [
@@ -245,6 +251,40 @@ export const AB_109955_FRG_ORDER_HOTSPOTS = [
   { componentKey: "sink-faucet", points: [[12.684086, 56.336134], [12.912114, 56.336134], [12.912114, 57.52605], [12.684086, 57.52605]], preserveManualSize: true },
   { componentKey: "sink-faucet", points: [[13.567696, 56.336134], [13.795724, 56.336134], [13.795724, 57.52605], [13.567696, 57.52605]], preserveManualSize: true },
   { componentKey: "sink-faucet", points: [[12.655582, 59.845378], [13.824228, 59.845378], [13.824228, 60.047059], [12.655582, 60.047059]], preserveManualSize: true },
+];
+
+// AB 111539 is an L-shaped 50/45 cm sink run and 40/60/30 cm cooking run.
+// Every polygon follows the official 842 x 595 vector plan. Repeated keys join
+// perspective fronts, sides, tops and fascias to the same physical FRG item.
+export const AB_111539_FRG_ORDER_HOTSPOTS = [
+  { componentKey: "wall-cabinet-1", points: [[40.460808, 4.72605], [41.586698, 4.968067], [51.961995, 7.105882], [51.961995, 34.433613], [41.586698, 32.295798], [40.460808, 32.07395]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-1", points: [[41.586698, 4.968067], [48.598575, 3.959664], [58.973872, 6.077311], [51.961995, 7.105882]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-2", points: [[51.961995, 7.105882], [58.874109, 8.517647], [58.874109, 35.845378], [51.961995, 34.433613]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-2", points: [[51.961995, 7.105882], [58.973872, 6.077311], [65.885986, 7.509244], [58.874109, 8.517647]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-3", points: [[58.874109, 8.517647], [69.263658, 10.655462], [69.263658, 37.983193], [58.874109, 35.845378]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-3", points: [[58.874109, 8.517647], [65.885986, 7.509244], [76.275534, 9.647059], [69.263658, 10.655462]], preserveManualSize: true },
+  { componentKey: "extractor-hood", points: [[58.874109, 35.845378], [69.263658, 37.983193], [69.263658, 39.878992], [58.874109, 37.741176]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-4", points: [[69.263658, 10.655462], [74.451306, 11.72437], [74.451306, 39.052101], [69.263658, 37.983193]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-4", points: [[69.263658, 10.655462], [76.275534, 9.647059], [81.463183, 10.715966], [74.451306, 11.72437]], preserveManualSize: true },
+  { componentKey: "wall-cabinet-4", points: [[74.451306, 11.72437], [81.463183, 10.715966], [81.463183, 38.043697], [76.589074, 38.608403], [76.589074, 39.354622], [76.175772, 39.415126], [74.451306, 39.052101]], preserveManualSize: true },
+  { componentKey: "under-cabinet-light", points: [[61.225653, 39.556303], [62.109264, 39.737815], [62.679335, 43.02521], [61.667458, 39.636975], [60.655582, 42.601681]], preserveManualSize: true },
+  { componentKey: "under-cabinet-light", points: [[66.484561, 40.62521], [67.368171, 40.806723], [67.938242, 44.094118], [66.926366, 40.72605], [65.914489, 43.690756]], preserveManualSize: true },
+  { componentKey: "worktop", points: [[10.546318, 56.235294], [47.472684, 50.890756], [45.477435, 54.823529], [20.921615, 58.373109]], preserveManualSize: true },
+  { componentKey: "worktop", points: [[47.472684, 50.890756], [83.187648, 58.231933], [70.817102, 60.026891], [45.477435, 54.823529]], preserveManualSize: true },
+  { componentKey: "worktop", points: [[10.546318, 56.235294], [20.921615, 58.373109], [45.477435, 54.823529], [45.477435, 56.336134], [20.921615, 59.885714], [10.546318, 57.747899]], preserveManualSize: true },
+  { componentKey: "worktop", points: [[45.477435, 54.823529], [70.817102, 60.026891], [83.187648, 58.231933], [83.187648, 59.744538], [70.817102, 61.539496], [45.477435, 56.336134]], preserveManualSize: true },
+  { componentKey: "sink-faucet", claimFixturePartKey: "sink", points: [[17.543943, 55.368067], [32.693587, 53.169748], [40.175772, 54.4], [23.814727, 57.122689]], preserveManualSize: true },
+  { componentKey: "sink-faucet", claimFixturePartKey: "faucet", points: [[25.610451, 50.447059], [26.308789, 50.547899], [26.308789, 54.904202], [25.610451, 54.863866]], preserveManualSize: true },
+  { componentKey: "sink-faucet", claimFixturePartKey: "faucet", points: [[25.724466, 50.426891], [25.724466, 47.462185], [27.007126, 44.719328], [29.458432, 44.840336], [29.415677, 43.912605], [30.099762, 44.154622], [29.914489, 47.885714], [27.007126, 47.563025], [26.209026, 50.527731]], preserveManualSize: true },
+  { componentKey: "sink-base", points: [[10.546318, 57.747899], [20.921615, 59.885714], [20.921615, 93.082353], [10.546318, 90.944538]], preserveManualSize: true },
+  { componentKey: "sink-base", points: [[20.921615, 59.885714], [33.990499, 57.989916], [33.990499, 91.186555], [20.921615, 93.082353]], preserveManualSize: true },
+  { componentKey: "dishwasher-base", points: [[33.990499, 57.989916], [43.268409, 56.658824], [43.268409, 89.835294], [33.990499, 91.186555]], preserveManualSize: true },
+  { componentKey: "dishwasher-base", points: [[43.268409, 56.658824], [43.5962, 56.598319], [45.477435, 56.336134], [45.477435, 89.512605], [43.5962, 89.794958], [43.268409, 89.835294]], preserveManualSize: true },
+  { componentKey: "base-module-1", points: [[45.477435, 56.336134], [46.603325, 56.557983], [46.603325, 89.754622], [45.477435, 89.512605]], preserveManualSize: true },
+  { componentKey: "base-module-1", points: [[46.603325, 56.557983], [53.515439, 57.989916], [53.515439, 91.166387], [46.603325, 89.754622]], preserveManualSize: true },
+  { componentKey: "oven-module", points: [[53.515439, 57.989916], [63.904988, 60.127731], [63.904988, 93.304202], [53.515439, 91.166387]], preserveManualSize: true },
+  { componentKey: "base-module-2", points: [[63.904988, 60.127731], [69.092637, 61.176471], [69.092637, 94.373109], [63.904988, 93.304202]], preserveManualSize: true },
+  { componentKey: "base-module-2", points: [[69.092637, 61.176471], [70.817102, 61.539496], [83.187648, 59.744538], [83.187648, 92.941176], [70.817102, 94.736134], [69.092637, 94.373109]], preserveManualSize: true },
 ];
 
 // AB 110402 is a straight 30/60/60/40/40/40 cm elevation. Coordinates are
@@ -1626,6 +1666,7 @@ PLAN_HOTSPOTS_BY_SLUG["ab-105831"] = AB_105831_FRG_ORDER_HOTSPOTS.flatMap((hotsp
 PLAN_HOTSPOTS_BY_SLUG["ab-109873"] = AB_109873_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-109874"] = AB_109874_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-109955"] = AB_109955_FRG_ORDER_HOTSPOTS;
+PLAN_HOTSPOTS_BY_SLUG["ab-111539"] = AB_111539_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-110402"] = AB_110402_FRG_ORDER_HOTSPOTS;
 // AB 105837 and its perspective aliases use the same order-page source in FRG

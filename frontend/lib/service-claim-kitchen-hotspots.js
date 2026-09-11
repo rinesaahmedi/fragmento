@@ -1,4 +1,4 @@
-import { SERVICE_CLAIM_PART_COMPONENT_IDS } from "./service-claim-kitchen-plan-selection.js";
+import { getServiceClaimPartComponentId } from "./service-claim-kitchen-plan-selection.js";
 
 const AB_105845_LAYOUT_ALIAS_SLUGS = [
   "105845-modul-2",
@@ -54,6 +54,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105846",
   "ab-110140",
   "ab-110510",
+  "ab-111539",
   "ab-109874",
   "ab-110401",
   ...AB_105846_LAYOUT_ALIAS_SLUGS,
@@ -94,6 +95,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "ab-110140": [[-0.418439702, 0.981557439], [2.950354839, 0.778688555], [4.60992953, 0.889344227], [1.148936228, 1.11475412]],
   "ab-109874": [[-1.44262254, 0.986456027], [-0.081967077, 0.855530511], [2.301639093, 1.0835215], [0.855737585, 1.198645603]],
   "ab-110401": [[-0.538461538,1.712062257],[3.521367521,1.33463035],[5.525641026,1.548638132],[5.44017094,1.595330739],[1.371794872,1.980544747],[1.004273504,1.976653696],[-0.572649573,1.766536965],[-0.538461538,1.719844358]],
+  "ab-111539": [[-1.796825393, 1.042201784], [1.577777971, 0.84220182], [3.244444637, 0.954128413], [-0.399999911, 1.20183482]],
   "ab-105840": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105843": [[-1.09, 1.02], [-0.04, 0.93], [1.9, 1.18], [0.86, 1.28]],
   "ab-105747": [[-1.595113, 0.977883], [-0.291908, 0.862681], [1.089858, 1.017135], [-0.359432, 1.115202]],
@@ -149,6 +151,12 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
     [71.102138, 56.215126],
     [65.258907, 55.226891],
     [59.2019, 53.87563],
+  ],
+  "ab-111539": [
+    [17.543943, 55.368067],
+    [32.693587, 53.169748],
+    [40.175772, 54.4],
+    [23.814727, 57.122689],
   ],
   "ab-109874": [
     [40.916865, 53.996639],
@@ -424,6 +432,12 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  "ab-111539": [
+    [53.543943, 56.477311],
+    [65.159145, 54.803361],
+    [75.448931, 56.840336],
+    [64.16152, 58.655462],
+  ],
   // The straight elevation exposes the complete 600 mm cooktop/worktop segment
   // directly above the oven source cabinet.
   "ab-109955": [
@@ -984,6 +998,20 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-111539": {
+    oven: [
+      [53.515439, 57.989916],
+      [63.904988, 60.127731],
+      [63.904988, 82.05042],
+      [53.515439, 79.932773],
+    ],
+    "oven-drawer": [
+      [53.515439, 79.932773],
+      [63.904988, 82.05042],
+      [63.904988, 93.304202],
+      [53.515439, 91.166387],
+    ],
+  },
   "ab-109955": {
     oven: [
       [41.273159, 61.236975],
@@ -1063,6 +1091,9 @@ function splitWorktopDefinition(bounds, leftPoints, rightPoints, remainingPartKe
 // families already have one polygon per leg; the three combined outlines are
 // divided at their actual corner seam below.
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-111539": {
+    indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
+  },
   // Burger already has one exact PDF-matched polygon for each worktop run.
   // Map them directly; treating its first polygon as a legacy combined L-shape
   // scales the whole-kitchen coordinates into that polygon's small bounds.
@@ -1274,7 +1305,7 @@ for (const alias of AB_105847_LAYOUT_ALIAS_SLUGS) {
 
 function normalizeClaimPart(part) {
   const partKey = String(part?.partKey || "").trim();
-  const componentId = SERVICE_CLAIM_PART_COMPONENT_IDS[partKey];
+  const componentId = getServiceClaimPartComponentId(part);
   const sourceComponentKey = String(part?.sourceComponentKey || "").trim();
   return componentId && sourceComponentKey
     ? { ...part, partKey, componentId, sourceComponentKey }

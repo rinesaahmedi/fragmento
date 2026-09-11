@@ -376,6 +376,23 @@ export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
   "worktop-end-panel": "component-claim-worktop-end-panel",
 };
 
+export function getServiceClaimPartComponentId(part = {}) {
+  const partKey = String(part?.partKey || "").trim();
+  const fixedComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS[partKey];
+  if (fixedComponentId) return fixedComponentId;
+
+  // DEFAULT Uxx cabinets are claim-only products without a commercial price.
+  // Reuse their existing kitchen component identity so claim metadata never
+  // creates a duplicate form row or a second hotspot in ASC.
+  if (partKey.startsWith("cabinet-")) {
+    return componentIdForItem({
+      componentKey: String(part?.sourceComponentKey || "").trim(),
+    });
+  }
+
+  return "";
+}
+
 const ADDITIVE_SERVICE_CLAIM_PART_KEYS = new Set([
   // This panel is sold with the worktop but remains independently selectable
   // in claims. It must not replace the existing horizontal worktop selector.
@@ -877,6 +894,7 @@ export function buildServiceClaimSelectableComponents({
   const separatedSourceComponentIds = new Set(
     eligibleClaimParts
       .filter((part) => !ADDITIVE_SERVICE_CLAIM_PART_KEYS.has(String(part?.partKey || "").trim()))
+      .filter((part) => getServiceClaimPartComponentId(part))
       .map((part) => componentIdForItem({ componentKey: part?.sourceComponentKey }))
       .filter(Boolean),
   );
@@ -901,7 +919,7 @@ export function buildServiceClaimSelectableComponents({
   const separatedClaimParts = eligibleClaimParts
     .map((part) => {
       const partKey = String(part?.partKey || "").trim();
-      const componentId = SERVICE_CLAIM_PART_COMPONENT_IDS[partKey];
+      const componentId = getServiceClaimPartComponentId(part);
       if (!componentId) {
         return null;
       }

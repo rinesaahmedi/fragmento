@@ -45,6 +45,7 @@ const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "ab-105846",
   "ab-110140",
   "ab-110510",
+  "ab-111539",
   "ab-109874",
   "ab-110401",
   ...AB_105846_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
@@ -110,6 +111,7 @@ const ARTICLE_PRICES = {
   KHF664611S: 209,
   "KHF664611S + FWP18": 209,
   "OL-KGCN388140E": 579,
+  SP50: 0,
   SP120: 0,
   US100: 353,
   US120: 403,
@@ -178,6 +180,7 @@ const CATALOG_ARTICLES = [
   { articleNumber: "KHF664611S", name: "Angled extractor hood", nameDe: "Schrägesse", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "KHF664611S + FWP18", name: "Angled extractor hood + filter", nameDe: "Schrägesse + Filter", price: "209.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "OL-KGCN388140E", name: "Freestanding Refrigerator 181 cm", nameDe: "Standkühlschrank 181 cm", heightMm: 1810, depthMm: null, price: "579.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "SP50", name: "Sink Lower Cabinet 50 cm", nameDe: "Spülenunterschrank 50 cm", widthMm: 500, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "SP120", name: "Sink Base Cabinet 120 cm", nameDe: "Spülenschrank 120 cm", widthMm: 1200, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "SPB80", name: "Sink Base Cabinet 80 cm", nameDe: "Spülenschrank 80 cm", widthMm: 800, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "SPB90", name: "Sink Base Cabinet 90 cm", nameDe: "Spülenschrank 90 cm", widthMm: 900, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -1819,7 +1822,7 @@ const AB_110402_ITEMS = [
   defaultOvenHob({ catalogArticleNumber: "A-EH923640E + 9EC744100C", infoText: "Built-in oven + ceramic cooktop", sortOrder: 10, widthMm: 600 }),
   defaultWorktop({ sortOrder: 20, widthMm: 3200, depthMm: 600 }),
   defaultSinkBase({ code: "SINK-BASE-AB110402-DEFAULT", name: "Sink Base Cabinet 80 cm", nameDe: "Spülenschrank 80 cm", sortOrder: 30, widthMm: 800, heightMm: 878, depthMm: 600, articleNumber: "SPB80", infoText: "Included SPB80 sink cabinet with two connected fronts" }),
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110402-DEFAULT-UPK20-1", name: "Lower Cabinet 30 cm", nameDe: "Unterschrank 30 cm", price: blendePrice("UPK20", 1), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, isLocked: true, infoText: "Included U30 lower cabinet with left UPK20 filler panel", articleNumber: "U30", blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110402-DEFAULT-UPK20-1", name: "Lower Cabinet 30 cm", nameDe: "Unterschrank 30 cm", price: blendePrice("UPK20", 1), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, isLocked: true, infoText: "Included U30 lower cabinet with left UPK20 filler panel", articleNumber: "U30", useCatalogArticle: false, preserveName: true, blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB110402-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher incl. furniture front", articleNumber: "A-EGSPV597210 + TGV60" },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110402-DEFAULT-UPK20-2", name: "Lower Cabinet with Drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", price: blendePrice("UPK20", 1), widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included US40 lower cabinet with right UPK20 filler panel", articleNumber: "US40", blendeCode: "UPK20", blendeLabel: "UPK20", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110402-H3002-HPK2002", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H3002", "HPK2002", 1), widthMm: 300, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H3002 wall cabinet with left HPK2002 filler panel", articleNumber: "H3002", displayArticleNumber: "H3002 + HPK2002", catalogArticleNumber: "H3002", blendeCode: "HPK2002", blendeLabel: "HPK2002", blendePrice: blendePrice("HPK2002", 1) },
@@ -1925,6 +1928,26 @@ const AB_110510_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110510-H4002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "130.00", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "H4002 wall cabinet, 40 cm", articleNumber: "H4002" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110510-H6002-HPK2002", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002 wall cabinet with HPK2002 filler panel", articleNumber: "H6002", displayArticleNumber: "H6002 + HPK2002(35E)", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
   defaultSinkWorktop({ sortOrder: 120 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
+// AB 111539: L-shaped kitchen from the supplied vector PDF and schedule.
+// SP50, US40 and U30 are supplier DEFAULT cabinets and therefore stay locked
+// in FRG while remaining separate physical targets in the ASC claim plan.
+const AB_111539_ITEMS = [
+  defaultOvenHob({ catalogArticleNumber: "A-EH923640E + 9EC744100C", infoText: "Built-in oven + ceramic cooktop", sortOrder: 10, widthMm: 600 }),
+  defaultWorktop({ sortOrder: 20 }),
+  defaultSinkBase({ code: "SINK-BASE-AB111539-SP50", name: "Sink Lower Cabinet 50 cm", nameDe: "Spülenunterschrank 50 cm", sortOrder: 30, widthMm: 500, heightMm: 878, depthMm: 600, articleNumber: "SP50", catalogArticleNumber: "SP50", infoText: "Included SP50 sink cabinet" }),
+  { itemType: ItemType.COMPONENT, code: "DISH-AB111539-450", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: "450.00", widthMm: 450, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 40, infoText: "Fully integrated dishwasher incl. TGV45 furniture front, 45 cm", articleNumber: "A-EGSPV587915 + TGV45" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB111539-US40-DEFAULT", name: "Lower Cabinet with Drawer 40 cm", nameDe: "Unterschrank mit Schublade 40 cm", price: "183.00", widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, isLocked: true, infoText: "Included US40 lower cabinet with drawer", articleNumber: "US40" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB111539-U30-DEFAULT", name: "Lower Cabinet 30 cm", nameDe: "Unterschrank 30 cm", price: "0.00", widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, isLocked: true, infoText: "Included U30 lower cabinet", articleNumber: "U30", useCatalogArticle: false, preserveName: true },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB111539-H6002-HPK2002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "149.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 70, infoText: "H6002 wall cabinet with supplied HPK2002 filler panel", articleNumber: "H6002", displayArticleNumber: "H6002 + HPK2002(35E)", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 35 cm", blendePrice: "0.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB111539-H4002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "130.00", widthMm: 400, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 80, infoText: "H4002 wall cabinet", articleNumber: "H4002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB111539-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "349.00", widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 90, infoText: "HD6002 cabinet, flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB111539-FH664621E", name: "FH664621E Extractor Hood", nameDe: "FH664621E Flachschirmhaube", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 92, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB111539-H3002-HPK2002", name: "Wall Cabinet", nameDe: "Oberschrank", price: "115.00", widthMm: 300, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 100, infoText: "H3002 wall cabinet with supplied HPK2002 filler panel", articleNumber: "H3002", displayArticleNumber: "H3002 + HPK2002(35E)", catalogArticleNumber: "H3002", blendeCode: "HPK2002", blendeLabel: "HPK2002 35 cm", blendePrice: "0.00" },
+  defaultSinkWorktop({ sortOrder: 110 }),
   ...defaultAccessories(),
   ...defaultServices(),
 ];
@@ -2687,6 +2710,14 @@ const DEFAULT_KITCHENS = [
     name: "110510",
     description: "L-shaped kitchen configuration based on frontend/public/plans/AB 110510.svg",
     items: AB_110510_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-111539",
+    kitchenCode: "111 539",
+    name: "111539",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 111539.svg",
+    items: AB_111539_ITEMS,
     reconcileExisting: true,
   },
 ];
@@ -3664,6 +3695,58 @@ async function main() {
           sourceComponentKey: source.componentKey,
           isActive: true,
         },
+      });
+    }
+
+    // Plain Uxx cabinets are supplier DEFAULT items with no commercial price.
+    // Store them as claim-only products linked to their existing KitchenItem
+    // and componentKey, so ASC reuses the exact cabinet hotspot.
+    const claimOnlyCabinets = claimSourceItems.filter((item) => (
+      item?.isActive !== false
+      && item?.isLocked
+      && /^U\d+$/i.test(String(item?.articleNumber || "").trim())
+      && String(item?.componentKey || "").trim()
+    ));
+    const claimOnlyCabinetPartKeys = [];
+    for (const cabinet of claimOnlyCabinets) {
+      const componentKey = String(cabinet.componentKey || "").trim();
+      const articleCode = String(cabinet.articleNumber || "").trim().toUpperCase();
+      const partKey = `cabinet-${componentKey}`;
+      claimOnlyCabinetPartKeys.push(partKey);
+      const claimCabinet = {
+        partKey,
+        articleCode,
+        name: cabinet.name || `Lower Cabinet ${articleCode.slice(1)} cm`,
+        nameDe: cabinet.nameDe || `Unterschrank ${articleCode.slice(1)} cm`,
+        sourceKitchenItemCode: cabinet.code,
+        sourceComponentKey: componentKey,
+        sortOrder: Number(cabinet.sortOrder || 0),
+        isActive: true,
+      };
+      await prisma.kitchenClaimPart.upsert({
+        where: {
+          kitchenId_partKey: {
+            kitchenId: kitchenRecord.id,
+            partKey,
+          },
+        },
+        update: claimCabinet,
+        create: {
+          kitchenId: kitchenRecord.id,
+          ...claimCabinet,
+        },
+      });
+    }
+    if (reconcileExisting) {
+      await prisma.kitchenClaimPart.updateMany({
+        where: {
+          kitchenId: kitchenRecord.id,
+          partKey: {
+            startsWith: "cabinet-",
+            ...(claimOnlyCabinetPartKeys.length ? { notIn: claimOnlyCabinetPartKeys } : {}),
+          },
+        },
+        data: { isActive: false },
       });
     }
 
