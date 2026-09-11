@@ -38,6 +38,12 @@ test("AB 111539 uses its vector plan and exact perspective hotspots", () => {
   assert.equal(hotspots.length, 28);
   assert.ok(hotspots.every((hotspot) => hotspot.points.length >= 4));
   assert.equal(keys.filter((key) => key === "worktop").length, 4);
+  const [leftWorktop, rightWorktop] = hotspots.filter((hotspot) => hotspot.componentKey === "worktop");
+  const worktopJoint = [57.847981, 53.028571];
+  assert.ok(leftWorktop.points.some((point) => point[0] === worktopJoint[0] && point[1] === worktopJoint[1]));
+  assert.ok(rightWorktop.points.some((point) => point[0] === worktopJoint[0] && point[1] === worktopJoint[1]));
+  assert.ok(leftWorktop.points.some((point) => point[0] === 45.477435 && point[1] === 54.823529));
+  assert.ok(rightWorktop.points.some((point) => point[0] === 45.477435 && point[1] === 54.823529));
   assert.equal(keys.filter((key) => key === "sink-base").length, 2);
   assert.equal(keys.filter((key) => key === "dishwasher-base").length, 1);
   assert.equal(keys.filter((key) => key === "base-module-1").length, 3);

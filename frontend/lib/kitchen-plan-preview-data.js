@@ -269,8 +269,11 @@ export const AB_111539_FRG_ORDER_HOTSPOTS = [
   { componentKey: "wall-cabinet-4", points: [[74.451306, 11.72437], [81.463183, 10.715966], [81.463183, 38.043697], [76.589074, 38.608403], [76.589074, 39.354622], [76.175772, 39.415126], [74.451306, 39.052101]], preserveManualSize: true },
   { componentKey: "under-cabinet-light", points: [[61.225653, 39.556303], [62.109264, 39.737815], [62.679335, 43.02521], [61.667458, 39.636975], [60.655582, 42.601681]], preserveManualSize: true },
   { componentKey: "under-cabinet-light", points: [[66.484561, 40.62521], [67.368171, 40.806723], [67.938242, 44.094118], [66.926366, 40.72605], [65.914489, 43.690756]], preserveManualSize: true },
-  { componentKey: "worktop", points: [[10.546318, 56.235294], [47.472684, 50.890756], [45.477435, 54.823529], [20.921615, 58.373109]], preserveManualSize: true },
-  { componentKey: "worktop", points: [[47.472684, 50.890756], [83.187648, 58.231933], [70.817102, 60.026891], [45.477435, 54.823529]], preserveManualSize: true },
+  // Split the two claimable worktops on the supplier line from the inner L
+  // corner (3191/2240) to 4059/2329. The previous diagonal to the back wall
+  // cut the selection before the visible joint marked on the plan.
+  { componentKey: "worktop", points: [[10.546318, 56.235294], [47.472684, 50.890756], [57.847981, 53.028571], [45.477435, 54.823529], [20.921615, 58.373109]], preserveManualSize: true },
+  { componentKey: "worktop", points: [[57.847981, 53.028571], [83.187648, 58.231933], [70.817102, 60.026891], [45.477435, 54.823529]], preserveManualSize: true },
   { componentKey: "worktop", points: [[10.546318, 56.235294], [20.921615, 58.373109], [45.477435, 54.823529], [45.477435, 56.336134], [20.921615, 59.885714], [10.546318, 57.747899]], preserveManualSize: true },
   { componentKey: "worktop", points: [[45.477435, 54.823529], [70.817102, 60.026891], [83.187648, 58.231933], [83.187648, 59.744538], [70.817102, 61.539496], [45.477435, 56.336134]], preserveManualSize: true },
   { componentKey: "sink-faucet", claimFixturePartKey: "sink", points: [[17.543943, 55.368067], [32.693587, 53.169748], [40.175772, 54.4], [23.814727, 57.122689]], preserveManualSize: true },
