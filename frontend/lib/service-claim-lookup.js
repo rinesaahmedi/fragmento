@@ -14,7 +14,9 @@ const LOOKUP_PLACEHOLDER_VALUES = new Set([
 ]);
 
 export function normalizeServiceClaimContractNumber(value) {
-  return String(value || "").trim().replace(/\s+/g, "");
+  // Contract numbers are stored without formatting. Ignore spacing users type
+  // themselves as well as invisible spacing commonly introduced by PDF copies.
+  return String(value || "").replace(/[\s\u200B\u2060]+/g, "");
 }
 
 /**

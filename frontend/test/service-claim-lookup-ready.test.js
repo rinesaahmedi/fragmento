@@ -7,8 +7,15 @@ import {
   SERVICE_CLAIM_LOOKUP_MIN_LENGTH,
 } from "../lib/service-claim-lookup.js";
 
-test("normalizeServiceClaimContractNumber strips spaces", () => {
+test("normalizeServiceClaimContractNumber strips spaces anywhere in ASC contract numbers", () => {
   assert.equal(normalizeServiceClaimContractNumber(" 670 888 888 "), "670888888");
+  assert.equal(normalizeServiceClaimContractNumber("670103828"), "670103828");
+  assert.equal(normalizeServiceClaimContractNumber("67 0 103827"), "670103827");
+  assert.equal(normalizeServiceClaimContractNumber("6 07 10 38 27"), "607103827");
+});
+
+test("normalizeServiceClaimContractNumber strips copy-pasted invisible spacing", () => {
+  assert.equal(normalizeServiceClaimContractNumber("670\u00a0103\u200b827"), "670103827");
 });
 
 test("lookup readiness rejects placeholders and short input", () => {

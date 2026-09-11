@@ -3375,7 +3375,11 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
     setForm((current) => {
       const next = {
         ...current,
-        [field]: field === "preferredContactDate" ? normalizeShortDateInput(value) : value,
+        [field]: field === "preferredContactDate"
+          ? normalizeShortDateInput(value)
+          : field === "contractNumber"
+            ? normalizeServiceClaimContractNumber(value)
+            : value,
       };
       if (field === "preferredContactTimeWindow" && value !== "custom") {
         next.preferredContactTimeFrom = "";
