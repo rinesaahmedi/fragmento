@@ -30,6 +30,18 @@ async function extractPdfText(base64) {
   }
 }
 
+async function extractPdfPages(base64) {
+  const { PDFParse } = await import("pdf-parse");
+  const parser = new PDFParse({ data: Buffer.from(base64, "base64") });
+
+  try {
+    const result = await parser.getText();
+    return result.pages.map((page) => page.text);
+  } finally {
+    await parser.destroy();
+  }
+}
+
 test("order confirmation recipients include the sender as a copy", () => {
   assert.deepEqual(
     buildOrderConfirmationRecipients("343@gmail.com", "315@gmail.com"),
@@ -325,6 +337,56 @@ test("order confirmation PDF hides type numbers for services", async () => {
   assert.match(html, /Neu best.tigte Dienstleistungen/);
   assert.match(html, /Delivery, Carry-in, Assembly and Installation/);
   assert.doesNotMatch(html, /Typen-Nr\.: SVC-MONTAGE-001/);
+});
+
+test("order confirmation PDF moves a section header with its first row", async () => {
+  const order = {
+    orderNumber: "FRG-PAGINATION-001",
+    createdAt: "2026-09-14T10:00:00.000Z",
+    total: 1473,
+    kitchen: { slug: "ab-pagination-test", name: "Pagination Test" },
+    customer: {
+      contractNumber: "KV-PAGINATION",
+      firstName: "Test",
+      lastName: "Customer",
+      address1: "Example Street 1",
+      postalCode: "38124",
+      city: "Braunschweig",
+      country: "Deutschland",
+      email: "customer@example.com",
+      phone: "+49 531 000000",
+    },
+    components: [
+      ...Array.from({ length: 6 }, (_, index) => ({
+        code: `CAB-PAGINATION-${index + 1}`,
+        articleNumber: "H6002",
+        name: "Upper Cabinet 60 cm",
+        nameDe: "Oberschrank 60 cm",
+        iconKey: "wall_cabinet_plain",
+        componentKey: `wall-cabinet-${index + 1}`,
+        price: 149,
+      })),
+      {
+        code: "DISH-PAGINATION-600",
+        articleNumber: "A-EGSPV597210 + TGV60",
+        name: "Fully integrated dishwasher incl. furniture front",
+        nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront",
+        iconKey: "dishwasher_base",
+        componentKey: "dishwasher-base",
+        price: 579,
+      },
+    ],
+    accessories: [],
+    services: [],
+  };
+
+  const pdf = await generateOrderConfirmationPdf(order);
+  const pages = await extractPdfPages(pdf.base64);
+  const electricalPage = pages.find((page) => /Elektroger.te/.test(page));
+
+  assert.ok(pages.length >= 2, "fixture should exercise a page boundary");
+  assert.ok(electricalPage, "electrical section should be present");
+  assert.match(electricalPage, /Vollintegrierter Geschirrsp.ler/);
 });
 
 test("AB 109955 order confirmation keeps its linked default oven package hidden", async () => {

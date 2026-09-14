@@ -21,6 +21,7 @@ import {
   collapseServiceClaimLinkedComponents,
   getServiceClaimLinkedComponentIds,
 } from "../lib/service-claim-kitchen-plan-selection.js";
+import { serializeKitchenForLegacy } from "../lib/catalog.js";
 
 const translate = (_key, fallback) => fallback;
 
@@ -227,6 +228,51 @@ test("AB 110401 separates the left US45 from its UPK20 Blende in ASC", () => {
   ]);
 });
 
+test("AB 110401 separates the UE115 inside-corner filler from its 60 cm cabinet in ASC", () => {
+  const cabinet = {
+    id: "ab-110401-ue115",
+    itemType: "COMPONENT",
+    code: "CAB-BASE-AB110401-DEFAULT-3",
+    articleNumber: "UE115",
+    name: "Lower Cabinet 60 cm",
+    componentKey: "base-module-3",
+    widthMm: 1150,
+    isLocked: true,
+  };
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items: [cabinet] },
+    kitchenConfig: { components: [cabinet] },
+    kitchenSlug: "ab-110401",
+  });
+  const blende = selection.selectableComponents.find(
+    (entry) => entry.componentId === "component-claim-blende-base-module-3",
+  );
+
+  assert.ok(selection.selectableComponentIds.includes("component-base-module-3"));
+  assert.ok(blende);
+  assert.equal(blende.articleCode, "UPEF65");
+  assert.equal(blende.name, "Corner filler panel for Lower cabinet");
+  assert.equal(blende.isCompanionOption, undefined);
+
+  const split = buildServiceClaimBlendeHotspots(
+    PLAN_HOTSPOTS_BY_SLUG["ab-110401"],
+    [blende],
+    [cabinet],
+    "ab-110401",
+  );
+  const cabinetFaces = split.filter((entry) => entry.componentKey === "base-module-3");
+  const blendeFaces = split.filter(
+    (entry) => entry.componentId === "component-claim-blende-base-module-3",
+  );
+
+  assert.equal(cabinetFaces.length, 1);
+  assert.equal(blendeFaces.length, 2);
+  assert.deepEqual(blendeFaces.map((entry) => entry.points), [
+    [[61.92399, 56.336134], [62.850356, 56.194958], [62.850356, 85.842017], [61.92399, 85.983193]],
+    [[62.850356, 56.194958], [63.619952, 56.356303], [63.619952, 86.003361], [62.850356, 85.842017]],
+  ]);
+});
+
 test("AB 110401 uses SPB90, US45, UE115, and US60 for its default base cabinets", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
   const claims = readFileSync(new URL("../lib/service-claim-kitchen-hotspots.js", import.meta.url), "utf8");
@@ -238,17 +284,127 @@ test("AB 110401 uses SPB90, US45, UE115, and US60 for its default base cabinets"
   assert.match(items, /defaultWorktop/);
   assert.match(items, /defaultSinkBase\(\{ code: "SINK-BASE-AB110401-DEFAULT"[^\n]+widthMm: 900[^\n]+articleNumber: "SPB90"/);
   assert.match(items, /CAB-BASE-AB110401-DEFAULT-UPK20-1[^\n]+componentKey: "base-module-1"[^\n]+articleNumber: "US45"[^\n]+blendeCode: "UPK20"/);
-  assert.match(items, /CAB-BASE-AB110401-DEFAULT-3[^\n]+widthMm: 1150[^\n]+componentKey: "base-module-3"[^\n]+articleNumber: "UE115"/);
+  assert.match(items, /CAB-BASE-AB110401-DEFAULT-3[^\n]+name: "Lower Cabinet 60 cm"[^\n]+nameDe: "Unterschrank 60 cm"[^\n]+widthMm: 1150[^\n]+componentKey: "base-module-3"[^\n]+articleNumber: "UE115"[^\n]+preserveName: true/);
   assert.match(items, /CAB-BASE-AB110401-DEFAULT-UPK20-2[^\n]+componentKey: "base-module-4"[^\n]+articleNumber: "US60"[^\n]+blendeCode: "UPK20"/);
   assert.doesNotMatch(items, /CAB-BASE-AB110401-DEFAULT-2/);
   assert.equal((items.match(/isLocked: true/g) || []).length, 3);
   assert.match(seed, /articleNumber: "SPB90"[^\n]+name: "Sink Base Cabinet 90 cm"/);
-  assert.match(seed, /articleNumber: "UE115"[^\n]+name: "Lower Corner Cabinet 115 cm"/);
+  assert.match(seed, /articleNumber: "UE115"[^\n]+name: "Lower Cabinet 60 cm"/);
   assert.match(items, /CAB-WALL-AB110401-H4502-2[^\n]+price: articlePrice\("H9002"\)[^\n]+widthMm: 900[^\n]+componentKey: "wall-cabinet-2"[^\n]+articleNumber: "H9002"/);
   assert.doesNotMatch(items, /CAB-WALL-AB110401-H4502-3/);
   assert.match(claims, /L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-110401"/);
   assert.match(claims, /COOKTOP_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-110401"/);
   assert.match(claims, /"ab-110401": \{\s*indexPartKeys: \["worktop-left", "worktop-right", "worktop-left", "worktop-right"\]/);
+});
+
+test("AB 110401 gets the UE115 display name from its database catalog article", () => {
+  const serialized = serializeKitchenForLegacy({
+    id: "ab-110401",
+    slug: "ab-110401",
+    name: "110 401",
+    claimParts: [],
+    items: [{
+      id: "ab-110401-ue115",
+      itemType: "COMPONENT",
+      code: "CAB-BASE-AB110401-DEFAULT-3",
+      articleNumber: "UE115",
+      name: "Lower Cabinet 60 cm",
+      nameDe: "Unterschrank 60 cm",
+      price: 0,
+      isLocked: true,
+      catalogArticleId: "catalog-ue115",
+      catalogArticle: {
+        articleNumber: "UE115",
+        name: "Database UE115 name",
+        nameDe: "Datenbankname UE115",
+        price: 0,
+      },
+    }],
+  });
+
+  assert.equal(serialized.components[0].articleNumber, "UE115");
+  assert.equal(serialized.components[0].name, "Database UE115 name");
+  assert.equal(serialized.components[0].nameDe, "Datenbankname UE115");
+  assert.equal(serialized.components[0].price, 0);
+});
+
+test("AB 110401 UE115 name migration preserves dashboard-managed prices", () => {
+  const migration = readFileSync(
+    new URL("../prisma/migrations/20260914140000_correct_ab110401_ue115_display_name/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(migration, /kitchen\."slug" = 'ab-110401'/);
+  assert.match(migration, /item\."articleNumber" = 'UE115'/);
+  assert.match(migration, /"name" = 'Lower Cabinet 60 cm'/);
+  assert.match(migration, /"nameDe" = 'Unterschrank 60 cm'/);
+  assert.doesNotMatch(migration, /"price"\s*=/);
+});
+
+test("AB 110401 keeps UE115 claim-only without deleting a dashboard-created program price", () => {
+  const publishMigration = readFileSync(
+    new URL("../prisma/migrations/20260914160000_publish_ue115_in_ip2200_catalog/migration.sql", import.meta.url),
+    "utf8",
+  );
+  const claimOnlyMigration = readFileSync(
+    new URL("../prisma/migrations/20260914170000_keep_ue115_claim_only/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(publishMigration, /UPDATE "CatalogArticle"[\s\S]*?"articleNumber" = 'UE115'/);
+  assert.match(publishMigration, /"name" = 'Lower Cabinet 60 cm'/);
+  assert.match(claimOnlyMigration, /DELETE FROM "CatalogArticleProgramPrice"/);
+  assert.match(claimOnlyMigration, /"id" = 'catalog-article-program-price-ip2200-ue115'/);
+  assert.match(claimOnlyMigration, /"articleNumber" = 'UE115'/);
+  assert.doesNotMatch(claimOnlyMigration, /DELETE FROM "CatalogArticle"/);
+  assert.doesNotMatch(claimOnlyMigration, /UPDATE "CatalogArticleProgramPrice"/);
+});
+
+test("AB 110401 registers UE115 as a claim product linked to its existing cabinet hotspot", () => {
+  const migration = readFileSync(
+    new URL("../prisma/migrations/20260914180000_add_ab110401_ue115_claim_product/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(migration, /INSERT INTO "KitchenClaimPart"/);
+  assert.match(migration, /'cabinet-base-module-3'/);
+  assert.match(migration, /'UE115'/);
+  assert.match(migration, /'CAB-BASE-AB110401-DEFAULT-3'/);
+  assert.match(migration, /'base-module-3'/);
+  assert.doesNotMatch(migration, /CatalogArticleProgramPrice/);
+});
+
+test("AB 110401 claim-product metadata reuses the UE115 cabinet selection instead of duplicating it", () => {
+  const cabinet = {
+    id: "ab-110401-ue115",
+    itemType: "COMPONENT",
+    code: "CAB-BASE-AB110401-DEFAULT-3",
+    articleNumber: "UE115",
+    name: "Lower Cabinet 60 cm",
+    componentKey: "base-module-3",
+    isLocked: true,
+  };
+  const selection = buildServiceClaimSelectableComponents({
+    kitchen: { items: [cabinet] },
+    kitchenConfig: { components: [cabinet] },
+    kitchenSlug: "ab-110401",
+    claimParts: [{
+      partKey: "cabinet-base-module-3",
+      articleCode: "UE115",
+      name: "Lower Cabinet 60 cm",
+      nameDe: "Unterschrank 60 cm",
+      sourceKitchenItemCode: cabinet.code,
+      sourceComponentKey: cabinet.componentKey,
+      isActive: true,
+    }],
+  });
+  const ue115Rows = selection.selectableComponents.filter(
+    (entry) => entry.componentId === "component-base-module-3",
+  );
+
+  assert.equal(ue115Rows.length, 1);
+  assert.equal(ue115Rows[0].articleCode, "UE115");
+  assert.equal(ue115Rows[0].claimPartKey, "cabinet-base-module-3");
 });
 
 test("AB 110401 claims keep sink, faucet, cooktop, oven, drawer and both worktop legs separate", () => {

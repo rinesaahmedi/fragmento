@@ -555,6 +555,12 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       inner: 14.950119,
       preserveOuterCabinetFace: true,
     },
+    "base-module-3": {
+      side: "left",
+      outer: 61.92399,
+      inner: 63.619952,
+      bands: [[61.92399, 62.850356], [62.850356, 63.619952]],
+    },
     "base-module-4": {
       side: "right",
       inner: 80.622328,
@@ -950,6 +956,12 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       outer: 14.508314,
       inner: 14.950119,
       preserveOuterCabinetFace: true,
+    },
+    "base-module-3": {
+      side: "left",
+      outer: 61.92399,
+      inner: 63.619952,
+      bands: [[61.92399, 62.850356], [62.850356, 63.619952]],
     },
     "base-module-4": {
       side: "right",

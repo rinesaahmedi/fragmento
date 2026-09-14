@@ -268,6 +268,16 @@ const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
       nameDe: "Eckpassblende Unterschrank",
     },
   ],
+  // UE115 includes a narrow structural panel at the inside corner. It is not
+  // a separately purchasable item, but it must be selectable apart in ASC.
+  "ab-110401": [
+    {
+      sourceComponentKey: "base-module-3",
+      code: "UPEF65",
+      name: "Corner filler panel for Lower cabinet",
+      nameDe: "Eckpassblende Unterschrank",
+    },
+  ],
 };
 
 // These PDF families draw a lower UPK20 beside the locked sink cabinet, but

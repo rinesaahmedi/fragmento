@@ -1381,12 +1381,6 @@ export async function generateOrderConfirmationPdf(order) {
     const visibleItems = options.itemsAreVisible ? items : getVisibleConfirmationItems(items);
     if (!visibleItems.length) return;
     const showCodeColumn = options.showCodeColumn !== false;
-
-    ensureSpace(78);
-    doc.setFont("helvetica", "bold").setFontSize(11).text(title, margin, y);
-    y += 16;
-    const headerTop = y;
-    const headerHeight = 32;
     const headerX = margin;
     const headerRight = pageWidth - margin;
     const numberX = margin + 15;
@@ -1396,6 +1390,41 @@ export async function generateOrderConfirmationPdf(order) {
     const priceX = pageWidth - margin - 15;
     const typeColumnWidth = showCodeColumn ? 208 : priceX - typeX - 30;
     const codeColumnWidth = showCodeColumn ? priceX - codeX - 58 : 0;
+    doc.setFont("helvetica", "normal").setFontSize(10);
+    const rowLayouts = buildNumberedRows(visibleItems).map(({ item, rowNumber, blendeItems = [] }) => {
+      const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), typeColumnWidth);
+      const codeLines = showCodeColumn ? doc.splitTextToSize(getItemDisplayCode(item), codeColumnWidth) : [];
+      const blendeLineGroups = blendeItems.map((blendeItem) => ({
+        item: blendeItem,
+        rowNumber: blendeItem.rowNumber,
+        nameLines: doc.splitTextToSize(getBlendeDisplayNameWithQuantity(blendeItem), typeColumnWidth),
+        codeLines: showCodeColumn ? doc.splitTextToSize(getItemDisplayCode(blendeItem), codeColumnWidth) : [],
+        price: formatCurrency(blendeItem.price),
+      }));
+      const parentBandHeight = Math.max(36, Math.max(nameLines.length, codeLines.length || 1) * lineHeight + 21);
+      const blendeBandHeights = blendeLineGroups.map((group) =>
+        Math.max(36, Math.max(group.nameLines.length, group.codeLines.length || 1) * lineHeight + 21)
+      );
+      return {
+        item,
+        rowNumber,
+        nameLines,
+        codeLines,
+        blendeLineGroups,
+        parentBandHeight,
+        blendeBandHeights,
+        rowHeight: parentBandHeight + blendeBandHeights.reduce((sum, height) => sum + height, 0),
+      };
+    });
+    const headerHeight = 32;
+    const sectionLeadHeight = 16 + headerHeight + 8;
+
+    // Never orphan a section title/table header at the bottom of a page. The
+    // complete heading block and its first commercial row move together.
+    ensureSpace(sectionLeadHeight + rowLayouts[0].rowHeight);
+    doc.setFont("helvetica", "bold").setFontSize(11).text(title, margin, y);
+    y += 16;
+    const headerTop = y;
     doc.setFillColor(249, 249, 249);
     doc.rect(headerX, headerTop, headerRight - headerX, headerHeight, "F");
     doc.setDrawColor(234, 234, 234);
@@ -1417,21 +1446,16 @@ export async function generateOrderConfirmationPdf(order) {
       doc.setDrawColor(40, 40, 40);
     };
 
-    buildNumberedRows(visibleItems).forEach(({ item, rowNumber, blendeItems = [] }) => {
-      const nameLines = doc.splitTextToSize(getItemDisplayNameWithQuantity(item), typeColumnWidth);
-      const codeLines = showCodeColumn ? doc.splitTextToSize(getItemDisplayCode(item), codeColumnWidth) : [];
-      const blendeLineGroups = blendeItems.map((blendeItem) => ({
-        item: blendeItem,
-        rowNumber: blendeItem.rowNumber,
-        nameLines: doc.splitTextToSize(getBlendeDisplayNameWithQuantity(blendeItem), typeColumnWidth),
-        codeLines: showCodeColumn ? doc.splitTextToSize(getItemDisplayCode(blendeItem), codeColumnWidth) : [],
-        price: formatCurrency(blendeItem.price),
-      }));
-      const parentBandHeight = Math.max(36, Math.max(nameLines.length, codeLines.length || 1) * lineHeight + 21);
-      const blendeBandHeights = blendeLineGroups.map((group) =>
-        Math.max(36, Math.max(group.nameLines.length, group.codeLines.length || 1) * lineHeight + 21)
-      );
-      const rowHeight = parentBandHeight + blendeBandHeights.reduce((sum, height) => sum + height, 0);
+    rowLayouts.forEach(({
+      item,
+      rowNumber,
+      nameLines,
+      codeLines,
+      blendeLineGroups,
+      parentBandHeight,
+      blendeBandHeights,
+      rowHeight,
+    }) => {
       ensureSpace(rowHeight);
       const rowTop = y;
       const rowTextY = rowTop + 18;

@@ -248,8 +248,24 @@ export async function generateOrderPdf(order) {
     if (!visibleItems.length) return;
     const showCodeColumn = options.showCodeColumn !== false;
     const nameColumnWidth = showCodeColumn ? 220 : pageWidth - margin * 2 - 110;
+    doc.setFont("helvetica", "normal").setFontSize(11);
+    const rowLayouts = visibleItems.map((item, itemIndex) => {
+      const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
+      const lineTotal = Number(item.price || 0) * quantity;
+      const itemName = getItemDisplayName(item);
+      const displayName = quantity > 1 ? `${itemName} (${quantity}x)` : itemName;
+      const nameLines = doc.splitTextToSize(displayName, nameColumnWidth);
+      return {
+        item,
+        itemIndex,
+        lineTotal,
+        nameLines,
+        rowHeight: Math.max(28, Math.max(nameLines.length, 1) * lineHeight + 12),
+      };
+    });
 
-    ensureSpace(55);
+    // Keep the section heading, table header, and first row on one page.
+    ensureSpace(50 + rowLayouts[0].rowHeight);
     doc.setFont("helvetica", "bold").text(title, margin, y);
     y += 10;
     doc.setDrawColor(200).line(margin, y, pageWidth - margin, y);
@@ -263,13 +279,7 @@ export async function generateOrderPdf(order) {
     y += 20;
     doc.setFont("helvetica", "normal");
 
-    visibleItems.forEach((item, itemIndex) => {
-      const quantity = Math.max(1, Math.floor(Number(item.quantity || 1)));
-      const lineTotal = Number(item.price || 0) * quantity;
-      const itemName = getItemDisplayName(item);
-      const displayName = quantity > 1 ? `${itemName} (${quantity}x)` : itemName;
-      const nameLines = doc.splitTextToSize(displayName, nameColumnWidth);
-      const rowHeight = Math.max(28, Math.max(nameLines.length, 1) * lineHeight + 12);
+    rowLayouts.forEach(({ item, itemIndex, lineTotal, nameLines, rowHeight }) => {
       ensureSpace(rowHeight);
       const rowTop = y;
       const rowTextY = rowTop + 12;

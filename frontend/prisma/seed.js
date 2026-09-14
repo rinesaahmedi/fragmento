@@ -185,7 +185,7 @@ const CATALOG_ARTICLES = [
   { articleNumber: "SPB80", name: "Sink Base Cabinet 80 cm", nameDe: "Spülenschrank 80 cm", widthMm: 800, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "SPB90", name: "Sink Base Cabinet 90 cm", nameDe: "Spülenschrank 90 cm", widthMm: 900, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "U30", name: "Lower Cabinet 30 cm", nameDe: "Unterschrank 30 cm", widthMm: 300, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
-  { articleNumber: "UE115", name: "Lower Corner Cabinet 115 cm", nameDe: "Eckunterschrank 115 cm", widthMm: 1150, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "UE115", name: "Lower Cabinet 60 cm", nameDe: "Unterschrank 60 cm", widthMm: 1150, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US100", name: "Lower Cabinet with drawer 100 cm", nameDe: "Unterschrank mit Schublade 100 cm", widthMm: 1000, price: "353.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US120", name: "Lower Cabinet with drawer 120 cm", nameDe: "Unterschrank mit Schublade 120 cm", widthMm: 1200, price: "403.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "US2A100", name: "Lower Cabinet with 3 Drawers 100 cm", nameDe: "Unterschrank mit 3 Schubladen 100 cm", widthMm: 1000, price: "514.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -1845,7 +1845,7 @@ const AB_110401_ITEMS = [
   defaultSinkBase({ code: "SINK-BASE-AB110401-DEFAULT", name: "Sink Base Cabinet 90 cm", nameDe: "Spülenschrank 90 cm", sortOrder: 30, widthMm: 900, heightMm: 878, depthMm: 600, articleNumber: "SPB90", infoText: "Included SPB90 sink cabinet with two connected fronts" }),
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110401-DEFAULT-UPK20-1", name: "Lower Cabinet with Drawer 45 cm", nameDe: "Unterschrank mit Schublade 45 cm", price: "0.00", widthMm: 450, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 40, isLocked: true, infoText: "Included US45 lower cabinet with separate UPK20 filler panel to the left of the sink", articleNumber: "US45", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "DISH-AB110401-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 60, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
-  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110401-DEFAULT-3", name: "Lower Corner Cabinet 115 cm", nameDe: "Eckunterschrank 115 cm", price: "0.00", widthMm: 1150, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included UE115 lower corner cabinet", articleNumber: "UE115" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110401-DEFAULT-3", name: "Lower Cabinet 60 cm", nameDe: "Unterschrank 60 cm", price: "0.00", widthMm: 1150, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, isLocked: true, infoText: "Included UE115 lower cabinet, displayed as 60 cm", articleNumber: "UE115", preserveName: true },
   { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB110401-DEFAULT-UPK20-2", name: "Lower Cabinet with Drawer 60 cm", nameDe: "Unterschrank mit Schublade 60 cm", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-4", sortOrder: 80, isLocked: true, infoText: "Included US60 lower cabinet with separate UPK20 filler panel at the far right", articleNumber: "US60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110401-H4502-1", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H4502"), widthMm: 450, heightMm: 600, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H4502 wall cabinet, 45 x 60 cm", articleNumber: "H4502" },
   { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB110401-H4502-2", name: "Upper Cabinet 90 cm", nameDe: "Oberschrank 90 cm", price: articlePrice("H9002"), widthMm: 900, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "H9002 upper cabinet with two connected fronts", articleNumber: "H9002" },
@@ -3708,7 +3708,13 @@ async function main() {
     const claimOnlyCabinets = claimSourceItems.filter((item) => (
       item?.isActive !== false
       && item?.isLocked
-      && /^U\d+$/i.test(String(item?.articleNumber || "").trim())
+      && (
+        /^U\d+$/i.test(String(item?.articleNumber || "").trim())
+        || (
+          kitchen.slug === "ab-110401"
+          && String(item?.articleNumber || "").trim().toUpperCase() === "UE115"
+        )
+      )
       && String(item?.componentKey || "").trim()
     ));
     const claimOnlyCabinetPartKeys = [];
