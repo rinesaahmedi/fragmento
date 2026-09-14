@@ -49,10 +49,10 @@ const CUTLERY_INCOMPATIBLE_COMPONENT_KEYS = new Set([
   "washing-machine-base",
 ]);
 
-// Some commercial articles span several physical drawer fronts. Keep the
-// article width as an available insert size, while also exposing the real
-// drawer widths and quantities visible in the supplied kitchen plan.
-const CUTLERY_ADDITIONAL_WIDTHS_MM_BY_COMPONENT_CODE = new Map([
+// Some commercial articles span several physical drawer fronts. For cutlery
+// inserts, use the physical drawer widths instead of the commercial cabinet
+// width shown in the price list.
+const CUTLERY_PHYSICAL_WIDTHS_MM_BY_COMPONENT_CODE = new Map([
   ["CAB-BASE-AB109873-US90", [450, 450]],
 ]);
 
@@ -182,10 +182,8 @@ export function getAvailableCutleryVariantsForComponents(components = [], varian
     if (!isCutleryInsertCompatibleCabinet(item)) continue;
 
     const code = String(item?.code || "").trim().toUpperCase();
-    const compatibleWidthsMm = [
-      getCabinetWidthMm(item),
-      ...(CUTLERY_ADDITIONAL_WIDTHS_MM_BY_COMPONENT_CODE.get(code) || []),
-    ];
+    const compatibleWidthsMm = CUTLERY_PHYSICAL_WIDTHS_MM_BY_COMPONENT_CODE.get(code)
+      || [getCabinetWidthMm(item)];
 
     for (const widthMm of compatibleWidthsMm) {
       const widthCm = Number(widthMm) / 10;

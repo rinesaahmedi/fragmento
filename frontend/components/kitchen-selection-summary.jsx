@@ -11,6 +11,7 @@ import {
   getLocalizedItemName,
   getProductInfoDocuments,
   getProductInfoHref,
+  shouldHideComponentFromSelectionSummary,
 } from "./kitchen-selection-utils";
 import { usePublicI18n } from "./public-i18n";
 import { getPriceBreakdown } from "../lib/price-utils";
@@ -204,7 +205,10 @@ export default function KitchenSelectionSummary({
 }) {
   const { translate } = usePublicI18n();
   const [isExpanded, setIsExpanded] = useState(false);
-  const mergedDefaultSelectedComponents = mergeStandardEquipmentItems(defaultSelectedComponents, kitchenSlug);
+  const visibleDefaultSelectedComponents = defaultSelectedComponents.filter(
+    (item) => !shouldHideComponentFromSelectionSummary(kitchenSlug, item),
+  );
+  const mergedDefaultSelectedComponents = mergeStandardEquipmentItems(visibleDefaultSelectedComponents, kitchenSlug);
   const selectedItemCount =
     selectedComponents.length + selectedAccessories.length + selectedServices.length;
   const shouldCollapseSummary = selectedItemCount > 6;

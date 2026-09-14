@@ -5,6 +5,7 @@ import {
   getAutoLinkedAccessoryCodes,
   getLinkedComponentIds,
   getLocalizedItemName,
+  shouldHideComponentFromSelectionSummary,
 } from "../components/kitchen-selection-utils.js";
 import {
   PLAN_HOTSPOTS_BY_SLUG,
@@ -36,7 +37,8 @@ test("AB 109874 uses its exact vector plan and polygon-only selection geometry",
   assert.equal(keys.filter((key) => key === "refrigerator").length, 3);
   assert.equal(keys.filter((key) => key === "sink-faucet").length, 3);
   assert.equal(keys.filter((key) => key === "under-cabinet-light").length, 2);
-  assert.equal(keys.filter((key) => key === "base-module-3").length, 4);
+  assert.equal(keys.filter((key) => key === "base-module-3").length, 1);
+  assert.equal(keys.filter((key) => key === "corner-blende").length, 3);
   for (const key of ["oven-module", "sink-base", "dishwasher-base", "extractor-hood"]) {
     assert.ok(keys.includes(key), `${key} should have an exact selectable polygon`);
   }
@@ -93,7 +95,7 @@ test("AB 109874 preserves dishwasher details and links its hood package", () => 
   );
 });
 
-test("AB 109874 is seeded as an L-shaped kitchen with six locked schedule defaults", () => {
+test("AB 109874 is seeded with its locked, non-purchasable UPEF65 corner filler", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
   const claims = readFileSync(new URL("../lib/service-claim-kitchen-hotspots.js", import.meta.url), "utf8");
   const items = seed.match(/const AB_109874_ITEMS = \[([\s\S]*?)\n\];/)?.[1] || "";
@@ -106,6 +108,9 @@ test("AB 109874 is seeded as an L-shaped kitchen with six locked schedule defaul
   assert.match(items, /defaultSinkBase\(\{ code: "SINK-BASE-AB109874-DEFAULT"[^\n]+widthMm: 1250[^\n]+articleNumber: "SPEB125"/);
   assert.match(items, /code: "CAB-BASE-AB109874-DEFAULT-UPK20"[^\n]+name: "Lower Cabinet 50 cm"[^\n]+widthMm: 500[^\n]+componentKey: "base-module-1"[^\n]+articleNumber: "U50"/);
   assert.match(items, /code: "CAB-BASE-AB109874-DEFAULT-2"[^\n]+name: "Lower Cabinet 60 cm"[^\n]+widthMm: 600[^\n]+componentKey: "base-module-2"[^\n]+articleNumber: "U60"/);
+  assert.match(items, /code: "CAB-BASE-AB109874-US60-UPEF65"[^\n]+price: articlePrice\("US60"\)[^\n]+componentKey: "base-module-3"[^\n]+articleNumber: "US60"/);
+  assert.doesNotMatch(items.match(/code: "CAB-BASE-AB109874-US60-UPEF65"[^\n]+/)?.[0] || "", /blendeCode/);
+  assert.match(items, /code: "BLENDE-AB109874-UPEF65-DEFAULT"[^\n]+price: "0\.00"[^\n]+componentKey: "corner-blende"[^\n]+isLocked: true[^\n]+articleNumber: "UPEF65"[^\n]+catalogPriceSyncMode: "LOCKED_INCLUDED"[^\n]+useCatalogArticle: false/);
   assert.match(items, /code: "CAB-BASE-AB109874-DEFAULT-3"[^\n]+name: "Lower Cabinet with Drawer 60 cm"[^\n]+widthMm: 600[^\n]+componentKey: "base-module-4"[^\n]+articleNumber: "US60"/);
   assert.equal(
     getCabinetWidthDisplayName({ code: "CAB-BASE-AB109874-DEFAULT-UPK20", articleNumber: "U50", widthMm: 500 }),
@@ -119,10 +124,40 @@ test("AB 109874 is seeded as an L-shaped kitchen with six locked schedule defaul
     getCabinetWidthDisplayName({ code: "CAB-BASE-AB109874-DEFAULT-3", articleNumber: "US60", widthMm: 600 }),
     "Lower Cabinet with Drawer 60 cm",
   );
-  assert.equal((items.match(/isLocked: true/g) || []).length, 3);
+  assert.equal((items.match(/isLocked: true/g) || []).length, 4);
   assert.match(claims, /L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-109874"/);
   assert.match(claims, /COOKTOP_SOURCE_POINTS_BY_SLUG[\s\S]*?"ab-109874"/);
   assert.match(claims, /"ab-109874": splitWorktopDefinition\([\s\S]*?\[31\.795724466, 52\.645378151\]/);
+});
+
+test("AB 109874 production migration preserves dashboard-managed prices", () => {
+  const migration = readFileSync(
+    new URL("../prisma/migrations/20260914130000_separate_ab109874_default_corner_blende/migration.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(migration, /kitchen\."slug" = 'ab-109874'/);
+  assert.match(migration, /item\."code" = 'CAB-BASE-AB109874-US60-UPEF65'/);
+  assert.match(migration, /'BLENDE-AB109874-UPEF65-DEFAULT'/);
+  assert.match(migration, /'corner-blende'/);
+  assert.match(migration, /'LOCKED_INCLUDED'/);
+  assert.match(migration, /ON CONFLICT \("kitchenId", "code"\) DO NOTHING/);
+  assert.doesNotMatch(migration, /UPDATE[\s\S]*?SET[\s\S]*?"price"\s*=/);
+});
+
+test("AB 109874 keeps its structural corner filler out of the customer default summary", () => {
+  const cornerFiller = {
+    code: "BLENDE-AB109874-UPEF65-DEFAULT",
+    componentKey: "corner-blende",
+    isLocked: true,
+  };
+
+  assert.equal(shouldHideComponentFromSelectionSummary("ab-109874", cornerFiller), true);
+  assert.equal(shouldHideComponentFromSelectionSummary("ab-109874", {
+    code: "CAB-BASE-AB109874-DEFAULT-2",
+    isLocked: true,
+  }), false);
+  assert.equal(shouldHideComponentFromSelectionSummary("ab-109955", cornerFiller), false);
 });
 
 test("AB 109874 claims keep sink, faucet, cooktop, oven, drawer, and both worktop legs separate", () => {

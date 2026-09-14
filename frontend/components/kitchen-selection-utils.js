@@ -59,6 +59,17 @@ export function componentIdForItem(item) {
   return componentIdForColor(normalizeColor(item?.colorKey));
 }
 
+export function shouldHideComponentFromSelectionSummary(kitchenSlug, item) {
+  const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
+  const code = String(item?.code || "").trim().toUpperCase();
+
+  // AB 109874's UPEF65 is a structural, included corner face. It remains
+  // selected for the plan and available for claims, but is not a separate
+  // customer-facing default selection.
+  return normalizedSlug === "ab-109874"
+    && code === "BLENDE-AB109874-UPEF65-DEFAULT";
+}
+
 export function selectedMap(items, codes) {
   return items.filter((item) => codes.includes(item.code));
 }

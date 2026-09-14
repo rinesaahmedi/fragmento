@@ -927,21 +927,15 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       preserveOuterCabinetFace: true,
     },
   },
-  // Each filler boundary is taken from the AB 109874 CAD strokes. The base
-  // corner contains three narrow UPEF65 faces and the first base/upper units
-  // each retain their separately visible outer cabinet face.
+  // Each filler boundary is taken from the AB 109874 CAD strokes. UPEF65 is a
+  // separate locked component; the first base/upper units retain their own
+  // separately visible outer cabinet faces.
   "ab-109874": {
     "base-module-1": {
       side: "left",
       outer: 10.845606,
       inner: 11.871734,
       preserveOuterCabinetFace: true,
-    },
-    "base-module-3": {
-      side: "right",
-      inner: 39.27791,
-      outer: 41.016627,
-      bands: [[39.27791, 39.534442], [39.534442, 40.346793], [40.346793, 41.016627]],
     },
     "wall-cabinet-1": {
       side: "left",

@@ -45,7 +45,7 @@ test("legacy drawer metadata remains compatible and controls maximum quantity", 
   );
 });
 
-test("AB 109873 offers 90 cm plus two 45 cm inserts for its split US90 drawers", () => {
+test("AB 109873 offers only two 45 cm inserts for its split US90 drawers", () => {
   const available = getAvailableCutleryVariantsForComponents([
     { code: "SINK-BASE-AB109873-SP120", articleNumber: "SP120", widthMm: 1200, iconKey: "sink_base", componentKey: "sink-base", name: "Sink Base Cabinet 120 cm" },
     { code: "DISH-AB109873-600", widthMm: 600, iconKey: "dishwasher_base", componentKey: "dishwasher-base", name: "Dishwasher 60 cm" },
@@ -55,9 +55,6 @@ test("AB 109873 offers 90 cm plus two 45 cm inserts for its split US90 drawers",
 
   assert.deepEqual(
     available.map(({ articleNumber, widthCm, maxQuantity }) => ({ articleNumber, widthCm, maxQuantity })),
-    [
-      { articleNumber: "ZB90SG", widthCm: 90, maxQuantity: 1 },
-      { articleNumber: "ZB45SG", widthCm: 45, maxQuantity: 2 },
-    ],
+    [{ articleNumber: "ZB45SG", widthCm: 45, maxQuantity: 2 }],
   );
 });
