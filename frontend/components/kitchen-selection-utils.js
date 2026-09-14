@@ -5,6 +5,7 @@ export function formatCurrency(value) {
     style: "currency",
     currency: "EUR",
     minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(Number(value || 0));
 }
 

@@ -7,6 +7,7 @@ import {
   buildOrderConfirmationEmailPreview,
   buildOrderConfirmationEmailStaticHtml,
   buildOrderSummaryHtml,
+  formatCurrency,
   generateOrderConfirmationPdf,
   generatePurchasedKitchenPdf,
   loadKitchenPlanPreviewData,
@@ -17,6 +18,43 @@ import {
   prepareKitchenPlanGeometry,
 } from "../lib/kitchen-plan-geometry.js";
 import { PLAN_HOTSPOTS_BY_SLUG } from "../lib/kitchen-plan-preview-data.js";
+
+test("order detail loaders hydrate linked catalog blendes for confirmations", () => {
+  const catalogSource = fs.readFileSync(new URL("../lib/catalog.js", import.meta.url), "utf8");
+  const loaderSource = catalogSource.match(
+    /async function getOrderByIdByKind[\s\S]*?(?=\nasync function attachHousingCompaniesToOrderContracts)/,
+  )?.[0];
+
+  assert.ok(loaderSource, "getOrderByIdByKind must exist");
+  assert.match(loaderSource, /kitchenItem:\s*\{\s*include:\s*\{/);
+  assert.match(loaderSource, /catalogBlende:\s*true/);
+});
+
+test("all order confirmations always format EUR amounts with two decimals", () => {
+  const normalizeSpace = (value) => value.replace(/\u00a0/g, " ");
+
+  assert.equal(normalizeSpace(formatCurrency(2135)), "2.135,00 €");
+  assert.equal(normalizeSpace(formatCurrency(349)), "349,00 €");
+  assert.equal(normalizeSpace(formatCurrency(340.88)), "340,88 €");
+});
+
+test("order confirmation email body keeps two decimals for net, VAT, and total", () => {
+  const html = buildOrderSummaryHtml({
+    orderNumber: "FORMAT-TEST",
+    createdAt: "2026-09-14T10:00:00.000Z",
+    total: 334,
+    customer: {},
+    kitchen: {},
+    components: [],
+    accessories: [],
+    services: [],
+    productImageCids: new Map(),
+  }).replace(/\u00a0/g, " ");
+
+  assert.match(html, /Preis: 280,67 €/);
+  assert.match(html, /MwSt\. \(19%\): 53,33 €/);
+  assert.match(html, /Gesamtpreis: 334,00 €/);
+});
 
 async function extractPdfText(base64) {
   const { PDFParse } = await import("pdf-parse");

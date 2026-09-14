@@ -1516,7 +1516,15 @@ async function getOrderByIdByKind(id, orderKind = ORDER_KIND_LIVE) {
       kitchenContract: true,
       items: {
         orderBy: { createdAt: "asc" },
-        include: { kitchenItem: true },
+        include: {
+          kitchenItem: {
+            include: {
+              catalogArticle: true,
+              catalogBlende: true,
+              catalogService: true,
+            },
+          },
+        },
       },
     },
   });

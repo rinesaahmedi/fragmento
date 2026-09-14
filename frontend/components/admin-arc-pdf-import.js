@@ -84,7 +84,17 @@ export default function AdminArcPdfImport() {
       entries.push(entry);
       byAbCode.set(entry.abCode, entries);
     }
-    return nextRows.map((row) => ({ ...row, contracts: byAbCode.get(row.abCode) || [] }));
+    return nextRows.map((row) => {
+      const contracts = byAbCode.get(row.abCode) || [];
+      const hasDatabaseChange = contracts.some((entry) => entry.action === "create" || entry.action === "update");
+      return {
+        ...row,
+        contracts,
+        // Rows that are already current (or only conflict) remain visible for
+        // verification, but must not look as if they will be imported again.
+        selected: contracts.length && !hasDatabaseChange ? false : row.selected,
+      };
+    });
   }
 
   async function planAndSet(nextRows, nextPrefixes = prefixes) {
@@ -230,7 +240,12 @@ export default function AdminArcPdfImport() {
 
   async function importSelected() {
     const activePrefixes = selectedPrefixes(prefixes);
-    const selectedRows = rows.filter((row) => row.selected && row.phase === "ready" && row.product && row.contracts?.length);
+    const selectedRows = rows.filter((row) => (
+      row.selected
+      && row.phase === "ready"
+      && row.product
+      && row.contracts?.some((entry) => entry.action === "create" || entry.action === "update")
+    ));
     if (!selectedRows.length || !activePrefixes.length) return;
     const question = translate("contractsAdmin.arcImport.confirm", "Import the selected ARC kitchen sketches?");
     if (!window.confirm(question)) return;
@@ -275,7 +290,11 @@ export default function AdminArcPdfImport() {
     router.refresh();
   }
 
-  const importableCount = rows.filter((row) => row.selected && row.phase === "ready" && row.contracts?.length).length;
+  const importableCount = rows.filter((row) => (
+    row.selected
+    && row.phase === "ready"
+    && row.contracts?.some((entry) => entry.action === "create" || entry.action === "update")
+  )).length;
   const progressPercent = progress.total ? Math.round((progress.done / progress.total) * 100) : 0;
 
   return (

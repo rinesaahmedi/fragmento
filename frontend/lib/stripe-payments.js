@@ -92,7 +92,15 @@ export async function updateOrderFromCheckoutSession(session, options = {}) {
     kitchen: true,
     items: {
       orderBy: { createdAt: "asc" },
-      include: { kitchenItem: true },
+      include: {
+        kitchenItem: {
+          include: {
+            catalogArticle: true,
+            catalogBlende: true,
+            catalogService: true,
+          },
+        },
+      },
     },
   };
 

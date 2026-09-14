@@ -1034,11 +1034,10 @@ function drawSenderAddressBlock(doc, x, y) {
 }
 
 export function formatCurrency(num) {
-  const hasFraction = Number(num) % 1 !== 0;
   return new Intl.NumberFormat("de-DE", {
     style: "currency",
     currency: "EUR",
-    minimumFractionDigits: hasFraction ? 2 : 0,
+    minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(Number(num || 0));
 }
