@@ -1737,6 +1737,8 @@ PLAN_HOTSPOTS_BY_SLUG["ab-110140"] = [
   { componentKey: "wall-cabinet-3", points: [[61.695962, 16.887395], [70.959620, 18.783193], [70.959620, 43.206723], [61.695962, 41.290756]], preserveManualSize: true },
   { componentKey: "wall-cabinet-3", points: [[61.695962, 16.887395], [67.952494, 15.979832], [77.230404, 17.875630], [70.959620, 18.783193]], preserveManualSize: true },
   { componentKey: "extractor-hood", points: [[61.695962, 41.290756], [70.959620, 43.206723], [70.959620, 44.900840], [61.695962, 42.984874]], preserveManualSize: true },
+  // Visible side triangle ends at source SVG point (5341, 2764).
+  { componentKey: "extractor-hood", points: [[70.959620, 43.206723], [76.118765, 44.255462], [70.959620, 44.900840]], preserveManualSize: true },
   { componentKey: "wall-cabinet-4", points: [[70.959620, 18.783193], [78.698337, 20.376471], [78.698337, 44.800000], [70.959620, 43.206723]], preserveManualSize: true },
   { componentKey: "wall-cabinet-4", points: [[70.959620, 18.783193], [77.230404, 17.875630], [84.954869, 19.468908], [78.698337, 20.376471]], preserveManualSize: true },
   { componentKey: "wall-cabinet-4", points: [[78.698337, 20.376471], [84.954869, 19.468908], [84.954869, 43.892437], [78.698337, 44.800000]], preserveManualSize: true },

@@ -170,6 +170,25 @@ test("AB 105830 purchased-kitchen selection reaches the same plinth line as the 
   assert.equal(emailOven.top + emailOven.height, 84.73);
 });
 
+test("AB 110140 extractor hood covers its side triangle and leaves the light rays unfilled", async () => {
+  const previewData = await loadKitchenPlanPreviewData();
+  const source = previewData.hotspotsBySlug["ab-110140"] || [];
+  const hoodHotspots = source.filter((hotspot) => hotspot.componentKey === "extractor-hood");
+
+  const contains = ([x, y], points) => {
+    let inside = false;
+    for (let i = 0, j = points.length - 1; i < points.length; j = i++) {
+      const [xi, yi] = points[i], [xj, yj] = points[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+    }
+    return inside;
+  };
+  assert.ok(hoodHotspots.some(({ points }) => contains([72, 44.2], points)));
+  for (const rayPoint of [[64.2, 46], [68.9, 47]]) {
+    assert.ok(!hoodHotspots.some(({ points }) => contains(rayPoint, points)));
+  }
+});
+
 test("AB 105830 confirmation overlay paints the selected oven through the plinth", async () => {
   const previewData = await loadKitchenPlanPreviewData();
   const source = previewData.hotspotsBySlug["ab-105830"] || [];
