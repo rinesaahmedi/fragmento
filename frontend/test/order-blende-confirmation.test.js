@@ -3,6 +3,7 @@ import fs from "node:fs";
 import test from "node:test";
 import {
   buildPurchasedKitchenOverlaySvg,
+  buildPurchasedKitchenCropClosureSvg,
   buildOrderConfirmationRecipients,
   buildOrderConfirmationEmailPreview,
   buildOrderConfirmationEmailStaticHtml,
@@ -187,6 +188,31 @@ test("AB 110140 extractor hood covers its side triangle and leaves the light ray
   for (const rayPoint of [[64.2, 46], [68.9, 47]]) {
     assert.ok(!hoodHotspots.some(({ points }) => contains(rayPoint, points)));
   }
+});
+
+test("cropped straight kitchen plans close only their missing room-frame edge", async () => {
+  const previewData = await loadKitchenPlanPreviewData();
+  const cases = [
+    { slug: "ab-110402", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
+    { slug: "ab-109955", edge: /<line x1="1399" y1="[^\"]+" x2="1399" y2="[^\"]+"\/>/ },
+  ];
+
+  for (const { slug, edge } of cases) {
+    const { crop } = preparePurchasedKitchenPlanGeometry(
+      { kitchen: { slug }, components: [] },
+      previewData.hotspotsBySlug[slug],
+    );
+    const closure = buildPurchasedKitchenCropClosureSvg({ slug, crop, width: 1400, height: 900 });
+    assert.ok(closure);
+    assert.match(closure.toString("utf8"), edge);
+  }
+
+  assert.equal(buildPurchasedKitchenCropClosureSvg({
+    slug: "ab-111539",
+    crop: { left: 0, top: 0, width: 100, height: 100 },
+    width: 1400,
+    height: 900,
+  }), null);
 });
 
 test("AB 105830 confirmation overlay paints the selected oven through the plinth", async () => {

@@ -681,6 +681,30 @@ export function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, 
   return Buffer.from(`<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">${shapes.join("")}</svg>`);
 }
 
+const PURCHASED_KITCHEN_CROP_CLOSURES = {
+  // The crop keeps the kitchen large, but cuts the room-frame line above it.
+  "ab-110402": { edge: "top", start: 12.541568, end: 86.907363 },
+  // The source drawing has a wide empty area on the right. Close its frame at
+  // the crop edge instead of shrinking the kitchen to retain the remote line.
+  "ab-109955": { edge: "right", start: 13.156303, end: 87.092437 },
+};
+
+export function buildPurchasedKitchenCropClosureSvg({ slug, crop, width, height }) {
+  const closure = PURCHASED_KITCHEN_CROP_CLOSURES[normalizeKitchenSlug(slug)];
+  if (!closure) return null;
+
+  const toX = (value) => ((Number(value) - crop.left) / crop.width) * width;
+  const toY = (value) => ((Number(value) - crop.top) / crop.height) * height;
+  const inset = 1;
+  const line = closure.edge === "top"
+    ? `<line x1="${toX(closure.start)}" y1="${inset}" x2="${toX(closure.end)}" y2="${inset}"/>`
+    : `<line x1="${width - inset}" y1="${toY(closure.start)}" x2="${width - inset}" y2="${toY(closure.end)}"/>`;
+
+  return Buffer.from(
+    `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg"><g fill="none" stroke="rgba(55,65,81,0.72)" stroke-width="1.25">${line}</g></svg>`,
+  );
+}
+
 export function preparePurchasedKitchenPlanGeometry(order, sourceHotspots = []) {
   const slug = normalizeKitchenSlug(order?.kitchen?.slug);
   const hotspots = prepareKitchenPlanGeometry(sourceHotspots, slug, order?.components || []);
@@ -729,14 +753,23 @@ async function renderPurchasedKitchenImagePlanPng(order, source) {
     height: finalHeight,
     linkedGroups,
   });
+  const cropClosure = buildPurchasedKitchenCropClosureSvg({
+    slug,
+    crop,
+    width: finalWidth,
+    height: finalHeight,
+  });
 
   const pipeline = sharp(rendered.data)
     .extract({ left: extractLeft, top: extractTop, width: extractWidth, height: extractHeight })
     .resize({ width: finalWidth })
     .png();
 
-  const output = overlay
-    ? await pipeline.composite([{ input: overlay, left: 0, top: 0 }]).toBuffer({ resolveWithObject: true })
+  const composites = [overlay, cropClosure]
+    .filter(Boolean)
+    .map((input) => ({ input, left: 0, top: 0 }));
+  const output = composites.length
+    ? await pipeline.composite(composites).toBuffer({ resolveWithObject: true })
     : await pipeline.toBuffer({ resolveWithObject: true });
 
   return {
