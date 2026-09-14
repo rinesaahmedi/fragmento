@@ -13,6 +13,7 @@ import { AdminShell } from "../../../components/admin-shell";
 import { AdminPagination } from "../../../components/admin-pagination";
 import AdminContractsFilters from "../../../components/admin-contracts-filters";
 import AdminContractCreateForm from "../../../components/admin-contract-create-form";
+import AdminArcPdfImport from "../../../components/admin-arc-pdf-import";
 import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../components/admin-i18n";
 import { getFormMessage } from "../../../lib/admin-forms";
 import { requireAdminPage } from "../../../lib/auth";
@@ -297,6 +298,17 @@ export default async function AdminContractsPage({ searchParams = {} }) {
                 defaultProjectId={filters.projectId}
                 returnTo={returnTo}
               />
+            </div>
+          </details>
+        </AdminSection>
+
+        <AdminSection>
+          <details style={createContractDetailsStyle}>
+            <summary className="create-contract-summary" style={createContractSummaryStyle}>
+              <AdminText i18nKey="contractsAdmin.arcImport.title" fallback="Import ARC from PDF folder" />
+            </summary>
+            <div style={createContractBodyStyle}>
+              <AdminArcPdfImport />
             </div>
           </details>
         </AdminSection>

@@ -114,6 +114,8 @@ test("AB 109873 links its SP120, US90 and H9002 faces and hood package", () => {
   assert.match(items, /code: "CAB-BASE-AB109873-US90"[^\n]+widthMm: 900[^\n]+componentKey: "base-module-2"[^\n]+articleNumber: "US90"/);
   assert.match(seed, /articleNumber: "US90", name: "Lower Cabinet with drawer 90 cm"/i);
   assert.match(items, /code: "CAB-WALL-AB109873-H9002-HPK2002-R"[^\n]+price: articlePriceWithBlende\("H9002", "HPK2002", 1\)[^\n]+widthMm: 900[^\n]+heightMm: 723[^\n]+componentKey: "wall-cabinet-5"[^\n]+articleNumber: "H9002"/);
+  assert.match(items, /code: "CAB-WALL-AB109873-H9002-HPK2002-R"[^\n]+blendeLabel: "Passblende bis 20 cm"/);
+  assert.doesNotMatch(items, /HPK2002 35 cm/);
   assert.match(seed, /H9002: 203/);
   assert.match(seed, /articleNumber: "H9002"[^\n]+price: "203\.00"/);
   assert.match(
@@ -182,7 +184,7 @@ test("AB 109873 ASC represents both H9002 fronts as one linked claim item", () =
     nameDe: "Oberschrank 90 cm",
     componentKey: "wall-cabinet-5",
     blendeCode: "HPK2002",
-    blendeLabel: "HPK2002 35 cm",
+    blendeLabel: "Passblende bis 20 cm",
     widthMm: 900,
     isLocked: false,
   };
