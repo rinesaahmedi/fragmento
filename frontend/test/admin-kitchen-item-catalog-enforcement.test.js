@@ -22,4 +22,14 @@ test("admin kitchen item writes require catalog links and preserve valid blende 
   assert.match(source, /getCatalogProgramPrice\(catalogArticle\)/);
   assert.match(source, /getCatalogProgramPrice\(catalogBlende\)/);
   assert.match(source, /getCatalogProgramPrice\(catalogService\)/);
+  assert.match(source, /catalogArticle\.programPrices\.length === 0/);
+  assert.match(source, /catalogBlende\.programPrices\.length === 0/);
+  assert.match(source, /catalogService\.programPrices\.length === 0/);
+});
+
+test("admin kitchen item selectors only list records priced for the kitchen program", () => {
+  const source = fs.readFileSync(path.join(repoRoot, "app", "admin", "kitchens", "[id]", "page.js"), "utf8");
+  const programFilter = /programPrices:\s*\{\s*some:\s*\{\s*programmId:\s*kitchen\.programmId,\s*isActive:\s*true\s*\}\s*\}/g;
+
+  assert.equal(source.match(programFilter)?.length, 3);
 });

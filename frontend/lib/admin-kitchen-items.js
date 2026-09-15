@@ -110,6 +110,18 @@ export async function prepareKitchenItemMutation({ formData, kitchen, excludeIte
     throw new Error("Selected service was not found.");
   }
 
+  if (catalogArticle && catalogArticle.programPrices.length === 0) {
+    throw new Error(`Selected catalog article is not available for kitchen program ${kitchen.programmId}.`);
+  }
+
+  if (catalogBlende && catalogBlende.programPrices.length === 0) {
+    throw new Error(`Selected blende is not available for kitchen program ${kitchen.programmId}.`);
+  }
+
+  if (catalogService && catalogService.programPrices.length === 0) {
+    throw new Error(`Selected service is not available for kitchen program ${kitchen.programmId}.`);
+  }
+
   const standaloneCatalogBlende = isStandaloneCatalogBlendeItem({
     ...input,
     catalogArticle,

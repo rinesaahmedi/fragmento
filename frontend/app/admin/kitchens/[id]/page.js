@@ -475,17 +475,26 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
     listKitchenItemCodeOptionsForAdmin(),
     listCatalogPrograms(),
     prisma.catalogArticle.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        programPrices: { some: { programmId: kitchen.programmId, isActive: true } },
+      },
       include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
       orderBy: [{ itemType: "asc" }, { articleNumber: "asc" }],
     }),
     prisma.catalogBlende.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        programPrices: { some: { programmId: kitchen.programmId, isActive: true } },
+      },
       include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
       orderBy: { code: "asc" },
     }),
     prisma.catalogService.findMany({
-      where: { isActive: true },
+      where: {
+        isActive: true,
+        programPrices: { some: { programmId: kitchen.programmId, isActive: true } },
+      },
       include: { programPrices: { where: { programmId: kitchen.programmId, isActive: true }, take: 1 } },
       orderBy: { code: "asc" },
     }),
