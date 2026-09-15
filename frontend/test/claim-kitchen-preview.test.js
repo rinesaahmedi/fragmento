@@ -3,6 +3,9 @@ import fs from "node:fs";
 import test from "node:test";
 import sharp from "sharp";
 import {
+  REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH,
+  REFERENCE_PLAN_EMAIL_PIXEL_RATIO,
+  REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER,
   applyClaimPreviewSourceHotspotOverrides,
   applyVisibleComponentsToSvgMarkup,
   buildKitchenPreviewSvgMarkup,
@@ -368,29 +371,42 @@ test("AB 105758 email oven polygon uses the exact service-view coordinates after
   assert.ok(Math.abs(emailOven.height - ((76.685714 - 54.783193) / crop.height) * 100) < 0.0001);
 });
 
-test("reference-plan email renderer composites numbered markers without changing dimensions", async () => {
-  const source = await sharp({
-    create: {
-      width: 240,
-      height: 120,
-      channels: 4,
-      background: "#ffffff",
-    },
-  }).png().toBuffer();
+test("reference-plan email markers keep the view size across source resolutions", async () => {
+  const redBounds = [];
 
-  const rendered = await renderReferencePlanMarkersPng({
-    content: source,
-    markers: [{ markerNumber: 2, x: 50, y: 50 }],
-  });
-  const { data, info } = await sharp(rendered).raw().toBuffer({ resolveWithObject: true });
-  let redPixelCount = 0;
-  for (let offset = 0; offset < data.length; offset += info.channels) {
-    if (data[offset] > 120 && data[offset + 1] < 90 && data[offset + 2] < 90) {
-      redPixelCount += 1;
+  for (const sourceWidth of [240, 842, 2400]) {
+    const source = await sharp({
+      create: {
+        width: sourceWidth,
+        height: Math.round(sourceWidth / 2),
+        channels: 4,
+        background: "#ffffff",
+      },
+    }).png().toBuffer();
+
+    const rendered = await renderReferencePlanMarkersPng({
+      content: source,
+      markers: [{ markerNumber: 2, x: 50, y: 50 }],
+    });
+    const { data, info } = await sharp(rendered).raw().toBuffer({ resolveWithObject: true });
+    let minX = info.width;
+    let maxX = -1;
+    for (let y = 0; y < info.height; y += 1) {
+      for (let x = 0; x < info.width; x += 1) {
+        const offset = (y * info.width + x) * info.channels;
+        if (data[offset] > 120 && data[offset + 1] < 90 && data[offset + 2] < 90) {
+          minX = Math.min(minX, x);
+          maxX = Math.max(maxX, x);
+        }
+      }
     }
+
+    assert.equal(info.width, REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH * REFERENCE_PLAN_EMAIL_PIXEL_RATIO);
+    assert.equal(info.height, REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH * REFERENCE_PLAN_EMAIL_PIXEL_RATIO / 2);
+    redBounds.push(maxX - minX + 1);
   }
 
-  assert.equal(info.width, 240);
-  assert.equal(info.height, 120);
-  assert.ok(redPixelCount > 100);
+  assert.equal(new Set(redBounds).size, 1);
+  assert.ok(redBounds[0] >= 54 && redBounds[0] <= 58);
+  assert.equal(REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER, 34);
 });

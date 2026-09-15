@@ -12,6 +12,10 @@ import {
   isLShapedClaimKitchen,
 } from "./service-claim-kitchen-hotspots.js";
 
+export const REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH = 480;
+export const REFERENCE_PLAN_EMAIL_PIXEL_RATIO = 2;
+export const REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER = 34;
+
 export const PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG = {
   "kitchen-model-b": {
     "wall-cabinet-1": { x: 239, y: 214, width: 84, height: 118 },
@@ -792,23 +796,29 @@ export async function renderReferencePlanMarkersPng({
     ));
   if (!content?.length || !normalizedMarkers.length) return null;
 
+  // Normalize the attachment before drawing markers. Email clients display this image at
+  // 480 CSS pixels, so a 2x raster keeps both the sketch and the 34px marker crisp while
+  // making the marker's apparent size independent of the uploaded image resolution.
+  const rasterWidth = REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH * REFERENCE_PLAN_EMAIL_PIXEL_RATIO;
   const canonical = await sharp(content)
     .rotate()
+    .resize({ width: rasterWidth })
     .png()
     .toBuffer({ resolveWithObject: true });
   const width = Number(canonical.info?.width || 0);
   const height = Number(canonical.info?.height || 0);
   if (!width || !height) return null;
 
-  const markerDiameter = Math.max(30, Math.min(64, Math.round(width * 0.045)));
-  const fontSize = Math.max(13, Math.round(markerDiameter * 0.42));
-  const strokeWidth = Math.max(3, Math.round(markerDiameter * 0.08));
+  const markerDiameter = REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER * REFERENCE_PLAN_EMAIL_PIXEL_RATIO;
+  const fontSize = Math.round(12.5 * REFERENCE_PLAN_EMAIL_PIXEL_RATIO);
+  const strokeWidth = 3 * REFERENCE_PLAN_EMAIL_PIXEL_RATIO;
+  const markerRadius = (markerDiameter - strokeWidth) / 2;
   const markerMarkup = normalizedMarkers.map((marker) => {
     const cx = (marker.x / 100) * width;
     const cy = (marker.y / 100) * height;
     return `
       <g transform="translate(${cx} ${cy})">
-        <circle r="${markerDiameter / 2}" fill="#b42318" stroke="#ffffff" stroke-width="${strokeWidth}" />
+        <circle r="${markerRadius}" fill="#b42318" stroke="#ffffff" stroke-width="${strokeWidth}" />
         <text
           x="0"
           y="${fontSize * 0.35}"
@@ -816,7 +826,7 @@ export async function renderReferencePlanMarkersPng({
           fill="#ffffff"
           font-family="Arial, Helvetica, sans-serif"
           font-size="${fontSize}"
-          font-weight="700"
+          font-weight="900"
         >X</text>
       </g>
     `;
@@ -829,6 +839,6 @@ export async function renderReferencePlanMarkersPng({
 
   return sharp(canonical.data)
     .composite([{ input: overlay, left: 0, top: 0 }])
-    .png()
+    .png({ compressionLevel: 9 })
     .toBuffer();
 }

@@ -95,9 +95,22 @@ test("service-claims route validates optional ARC sketch markers and renders the
   assert.match(source, /Invalid kitchen-sketch marker coordinates/);
   assert.match(source, /renderReferencePlanMarkersPng/);
   assert.match(source, /arc-kitchen-sketch-marked-/);
-  assert.match(source, /annotatedContent \|\| previewAsset\.content/);
+  assert.match(source, /const emailContent = annotatedContent \|\| previewAsset\.content/);
+  assert.match(source, /emailImageMetadata = await sharp\(emailContent\)\.metadata/);
+  assert.match(source, /width:\s*emailImageMetadata\?\.width/);
+  assert.match(source, /isArcReferenceImage:\s*true/);
   assert.match(source, />Skizzenposition</);
   assert.match(source, /markerNumber:\s*area\.planMarker \? index \+ 1 : null/);
+});
+
+test("service-claim email limits only ARC reference sketches to the marker renderer's display width", () => {
+  const source = fs.readFileSync(routePath, "utf8");
+
+  assert.match(source, /previewDisplayWidth = REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH/);
+  assert.match(source, /previewAttachment\?\.isArcReferenceImage/);
+  assert.match(source, /width:\$\{previewDisplayWidth\}px;max-width:100%;height:auto/);
+  assert.match(source, /width:100%;max-width:540px;height:auto/);
+  assert.match(source, /style="\$\{previewImageStyle\}"/);
 });
 test("service-claims route resolves item names and article numbers from the contract kitchen database", () => {
   const source = fs.readFileSync(routePath, "utf8");
