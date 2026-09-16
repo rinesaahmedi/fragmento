@@ -59,6 +59,42 @@ jobs:
             sudo -u deploy npm run catalog:link
             sudo -u deploy npm run build
 
+            # Install the daily report only on the hosted Hetzner server. The
+            # report script itself also refuses to run unless this service sets
+            # CONTRACT_ACCESS_REPORT_ENABLED=true.
+            cat >/etc/systemd/system/fragmento-contract-access-report.service <<'EOF'
+            [Unit]
+            Description=Fragmento daily contract access report
+            After=network-online.target postgresql.service
+            Wants=network-online.target
+
+            [Service]
+            Type=oneshot
+            User=deploy
+            WorkingDirectory=/var/www/fragmento/frontend
+            Environment=NODE_ENV=production
+            Environment=CONTRACT_ACCESS_REPORT_ENABLED=true
+            Environment=CONTRACT_ACCESS_REPORT_EMAIL=primexdevelopment@gmail.com,334primex.eu@gmail.com,01primex.eu@gmail.com
+            ExecStart=/usr/bin/npm run report:contract-access
+            EOF
+
+            cat >/etc/systemd/system/fragmento-contract-access-report.timer <<'EOF'
+            [Unit]
+            Description=Run Fragmento contract access report every day at 08:00 Europe/Berlin
+
+            [Timer]
+            OnCalendar=*-*-* 08:00:00 Europe/Berlin
+            Persistent=true
+            AccuracySec=1min
+            Unit=fragmento-contract-access-report.service
+
+            [Install]
+            WantedBy=timers.target
+            EOF
+
+            systemctl daemon-reload
+            systemctl enable --now fragmento-contract-access-report.timer
+
             systemctl restart fragmento.service
             systemctl is-active fragmento.service
             systemctl --no-pager --full status fragmento.service | head -n 20

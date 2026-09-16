@@ -668,6 +668,7 @@ model PublicVisitEvent {
   visitorKey          String?
   kitchenContractId   String?
   kitchenContract     KitchenContract? @relation(fields: [kitchenContractId], references: [id], onDelete: SetNull)
+  contractNumber      String?          @db.VarChar(200)
   contractNumberHash  String?
   contractNumberLast4 String?
   ipHash              String?

@@ -1,0 +1,200 @@
+import nodemailer from "nodemailer";
+import { PUBLIC_VISIT_EVENT_TYPES } from "../public-visit-tracking.js";
+
+export const CONTRACT_ACCESS_REPORT_EVENT_TYPES = [
+  PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED,
+  PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED,
+  PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED,
+];
+
+const RESULT_LABELS = {
+  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED]: "Erfolgreich",
+  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED]: "Testvertrag",
+  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED]: "Abgelehnt",
+};
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function getContractNumber(event) {
+  return event?.kitchenContract?.contractNumber
+    || event?.contractNumber
+    || (event?.contractNumberLast4 ? `••••${event.contractNumberLast4}` : "-");
+}
+
+function getSource(event) {
+  return event?.source || event?.referrerHost || "Direkt";
+}
+
+function getDevice(event) {
+  return [event?.deviceType, event?.browserFamily, event?.operatingSystem]
+    .filter(Boolean)
+    .join(" / ") || "-";
+}
+
+export function getContractAccessReportWindow(now = new Date()) {
+  const end = new Date(now);
+  const start = new Date(end.getTime() - 24 * 60 * 60 * 1000);
+  return { start, end };
+}
+
+export function buildContractAccessReport({ events = [], start, end }) {
+  const dateFormatter = new Intl.DateTimeFormat("de-DE", {
+    dateStyle: "medium",
+    timeStyle: "medium",
+    timeZone: "Europe/Berlin",
+  });
+  const period = `${dateFormatter.format(start)} – ${dateFormatter.format(end)}`;
+  const count = events.length;
+  const subject = `[Fragmento] Vertragszugriffe der letzten 24 Stunden (${count})`;
+
+  const rows = events.map((event) => {
+    const values = [
+      dateFormatter.format(new Date(event.createdAt)),
+      getContractNumber(event),
+      RESULT_LABELS[event.eventType] || event.eventType,
+      event.countryCode || "-",
+      getSource(event),
+      getDevice(event),
+    ];
+    return `<tr>${values.map((value) => `<td style="padding:9px 10px;border-bottom:1px solid #eadfd3;vertical-align:top;">${escapeHtml(value)}</td>`).join("")}</tr>`;
+  }).join("");
+
+  const emptyRow = `
+    <tr>
+      <td colspan="6" style="padding:18px 10px;color:#74665b;text-align:center;">Keine Zugriffsversuche in diesem Zeitraum.</td>
+    </tr>`;
+
+  const html = `<!doctype html>
+  <html lang="de">
+    <body style="margin:0;padding:24px;background:#f3ebe2;font-family:Arial,Helvetica,sans-serif;color:#332820;">
+      <div style="max-width:980px;margin:0 auto;background:#fff;border:1px solid #dfd1c3;border-radius:14px;overflow:hidden;">
+        <div style="padding:22px 26px;background:#7b3f2d;color:#fff;">
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#f5d9ca;">Fragmento · Sicherheitsbericht</div>
+          <h1 style="margin:7px 0 0;font-size:24px;">Vertragszugriffe der letzten 24 Stunden</h1>
+        </div>
+        <div style="padding:22px 26px;">
+          <p style="margin:0 0 6px;"><strong>${count}</strong> Zugriffsversuch${count === 1 ? "" : "e"}</p>
+          <p style="margin:0 0 18px;color:#74665b;">Zeitraum: ${escapeHtml(period)}</p>
+          <div style="overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:13px;">
+              <thead>
+                <tr style="background:#f8f1ea;text-align:left;">
+                  <th style="padding:9px 10px;">Zeit</th>
+                  <th style="padding:9px 10px;">Vertragsnummer</th>
+                  <th style="padding:9px 10px;">Ergebnis</th>
+                  <th style="padding:9px 10px;">Land</th>
+                  <th style="padding:9px 10px;">Quelle</th>
+                  <th style="padding:9px 10px;">Gerät</th>
+                </tr>
+              </thead>
+              <tbody>${rows || emptyRow}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </body>
+  </html>`;
+
+  const textRows = events.map((event) => [
+    dateFormatter.format(new Date(event.createdAt)),
+    getContractNumber(event),
+    RESULT_LABELS[event.eventType] || event.eventType,
+    event.countryCode || "-",
+    getSource(event),
+    getDevice(event),
+  ].join(" | "));
+
+  return {
+    subject,
+    html,
+    text: [
+      "Fragmento – Vertragszugriffe der letzten 24 Stunden",
+      `Zeitraum: ${period}`,
+      `Zugriffsversuche: ${count}`,
+      "",
+      ...(textRows.length ? textRows : ["Keine Zugriffsversuche in diesem Zeitraum."]),
+    ].join("\n"),
+  };
+}
+
+function getMailConfig(env) {
+  const host = String(env.SMTP_HOST || "smtp.gmail.com").trim();
+  const port = Number.parseInt(env.SMTP_PORT || "587", 10);
+  const user = String(env.SMTP_USER || "").trim();
+  const pass = String(env.SMTP_PASS || "");
+  const from = String(env.SMTP_FROM || "").trim();
+  const recipients = String(
+    env.CONTRACT_ACCESS_REPORT_EMAIL
+      || "primexdevelopment@gmail.com,334primex.eu@gmail.com,01primex.eu@gmail.com",
+  )
+    .split(",")
+    .map((address) => address.trim())
+    .filter(Boolean);
+  const missing = [!host && "SMTP_HOST", !user && "SMTP_USER", !pass && "SMTP_PASS", !from && "SMTP_FROM", !recipients.length && "CONTRACT_ACCESS_REPORT_EMAIL"].filter(Boolean);
+
+  if (missing.length) throw new Error(`Contract access report email config is missing: ${missing.join(", ")}`);
+
+  return { host, port, user, pass, from, recipients };
+}
+
+export async function sendContractAccessReport({ db, now = new Date(), env = process.env }) {
+  if (env.CONTRACT_ACCESS_REPORT_ENABLED !== "true") {
+    throw new Error("Contract access report is disabled. Set CONTRACT_ACCESS_REPORT_ENABLED=true on the Hetzner report service.");
+  }
+
+  const { start, end } = getContractAccessReportWindow(now);
+  const events = await db.publicVisitEvent.findMany({
+    where: {
+      eventType: { in: CONTRACT_ACCESS_REPORT_EVENT_TYPES },
+      createdAt: { gt: start, lte: end },
+    },
+    select: {
+      eventType: true,
+      createdAt: true,
+      contractNumber: true,
+      contractNumberLast4: true,
+      countryCode: true,
+      source: true,
+      referrerHost: true,
+      deviceType: true,
+      browserFamily: true,
+      operatingSystem: true,
+      kitchenContract: { select: { contractNumber: true } },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+  const report = buildContractAccessReport({ events, start, end });
+  const config = getMailConfig(env);
+  const transporter = nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: env.SMTP_SECURE === "true",
+    auth: { user: config.user, pass: config.pass },
+  });
+  const delivery = await transporter.sendMail({
+    from: config.from,
+    to: config.recipients,
+    subject: report.subject,
+    text: report.text,
+    html: report.html,
+  });
+  const accepted = new Set(
+    (delivery.accepted || []).map((address) => String(address).trim().toLowerCase()),
+  );
+  const rejectedRecipients = config.recipients.filter(
+    (address) => !accepted.has(address.toLowerCase()),
+  );
+
+  if (rejectedRecipients.length) {
+    throw new Error(`SMTP did not accept the contract access report recipient(s): ${rejectedRecipients.join(", ")}`);
+  }
+
+  return { count: events.length, recipients: config.recipients, start, end };
+}

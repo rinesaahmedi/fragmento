@@ -209,6 +209,7 @@ export async function trackPublicVisitEvent({
   if (!normalizedEventType) return null;
 
   const normalizedContractNumber = normalizeContractNumber(contractNumber);
+  const storedContractNumber = cleanText(normalizedContractNumber, 200);
   ensurePublicVisitCleanupTimer();
   const userAgent = request?.headers?.get("user-agent") || "";
   const ip = request ? getPublicRequestClientIp(request) : "";
@@ -231,8 +232,9 @@ export async function trackPublicVisitEvent({
       operatingSystem: device.operatingSystem || null,
       visitorKey: optedOut ? null : getDailyVisitorKey({ ip, userAgent, now }),
       kitchenContractId: cleanText(kitchenContractId, 40),
-      contractNumberHash: hashValue(normalizedContractNumber),
-      contractNumberLast4: normalizedContractNumber ? normalizedContractNumber.slice(-4) : null,
+      contractNumber: storedContractNumber,
+      contractNumberHash: hashValue(storedContractNumber),
+      contractNumberLast4: storedContractNumber ? storedContractNumber.slice(-4) : null,
       ipHash: null,
       userAgentHash: null,
       metadata,

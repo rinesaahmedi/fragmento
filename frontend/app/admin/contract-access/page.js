@@ -119,7 +119,7 @@ export default async function AdminContractAccessPage({ searchParams = {} }) {
                       <td style={tdStyle}>
                         {contract ? (
                           <Link href={`/admin/contracts/${contract.id}`} style={contractLinkStyle}>{contract.contractNumber}</Link>
-                        ) : event.contractNumberLast4 ? `••••${event.contractNumberLast4}` : "-"}
+                        ) : event.contractNumber || (event.contractNumberLast4 ? `••••${event.contractNumberLast4}` : "-")}
                         {contract?.kitchen?.name ? <span style={mutedLineStyle}>{contract.kitchen.name}</span> : null}
                       </td>
                       <td style={tdStyle}>
