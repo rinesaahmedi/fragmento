@@ -83,6 +83,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105741": "/plans/AB%20105732.svg",
   "ab-105743": "/plans/AB%20105743.svg",
   "ab-105744": "/plans/AB%20105744.svg",
+  "ab-105760": "/plans/AB%20105760-61.svg",
   "ab-105745": "/plans/AB%20105748.svg",
   "ab-105746": "/plans/AB%20105746.svg",
   "ab-105748": "/plans/AB%20105748.svg",
@@ -130,6 +131,10 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-105760": [
+    { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 24.855107, top: 76.100840, width: 14.551069, height: 8.047059, persistWhenSelected: true },
+    { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 30.783848, top: 87.717647, width: 2.878860, height: 3.731092, persistWhenSelected: true },
+  ],
   "burger-103898": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 66.449, top: 72.222, width: 8.85, height: 7.95 },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 69.962, top: 82.595, width: 1.924, height: 3.489 },
@@ -1603,6 +1608,23 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
       componentKey: "refrigerator",
       points: [[83.22, 32.19], [96.5, 32.19], [96.5, 93.08], [83.22, 93.08]],
     },
+  ],
+  "ab-105760": [
+    { componentKey: "wall-cabinet-1", left: 6.256532, top: 17.089076, width: 18.099762, height: 26.964706, preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", left: 24.356295, top: 17.089076, width: 15.805225, height: 26.964706, preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", left: 40.161520, top: 17.089076, width: 15.790974, height: 26.964706, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 40.161520, top: 44.053782, width: 15.790974, height: 6.366386, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 55.952494, top: 17.089076, width: 15.805226, height: 26.964706, preserveManualSize: true },
+    { componentKey: "worktop", left: 6.256532, top: 63.616807, width: 65.743468, height: 1.492437, preserveManualSize: true },
+    // The right support panel belongs to the fixed worktop, not the adjacent base cabinet.
+    { componentKey: "worktop", left: 71.586698, top: 65.109244, width: 0.413302, height: 32.732773, preserveManualSize: true },
+    { componentKey: "sink-faucet", left: 18.598575, top: 56.114286, width: 1.482185, height: 7.502521, preserveManualSize: true },
+    { componentKey: "sink-end-blende", left: 6.256532, top: 65.109244, width: 2.109264, height: 32.732773, preserveManualSize: true },
+    { componentKey: "sink-base", left: 8.365796, top: 65.109244, width: 15.805225, height: 32.732773, preserveManualSize: true },
+    { componentKey: "dishwasher-base", left: 24.171021, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "oven-module", left: 39.976247, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 55.781473, top: 65.109244, width: 15.805225, height: 32.732773, preserveManualSize: true },
+    { componentKey: "refrigerator", left: 75.178147, top: 30.742857, width: 14.650832, height: 67.099160, preserveManualSize: true },
   ],
   "108134-modul-1": [
     { componentKey: "wall-cabinet-1", left: 7.78, top: 16.96, width: 14.62, height: 24.92 },

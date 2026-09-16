@@ -2026,6 +2026,27 @@ const AB_105815_ITEMS = AB_105811_ITEMS.map((item) => ({
   code: item.code.replace("AB105811", "AB105815"),
 }));
 
+// AB 105760-61: straight four-unit run with the refrigerator on the right.
+// Schedule rows 1-3 are the included oven, worktop, and sink cabinet. The
+// separately priced UPK20 is the slim left end filler beside the sink.
+const AB_105760_ITEMS = [
+  defaultOvenHob({ catalogArticleNumber: "A-EH923640E + 9EC744100C", widthMm: 600, sortOrder: 10 }),
+  defaultWorktop({ sortOrder: 20 }),
+  defaultSinkBase({ widthMm: 600, heightMm: 878, depthMm: 600, sortOrder: 30 }),
+  sinkEndBlende("105760", { sortOrder: 40, catalogBlendeCode: "UPK20" }),
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105760-600", name: "Fully integrated dishwasher incl. furniture front", nameDe: "Vollintegrierter Geschirrspüler inkl. Möbelfront", price: "579.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105760-US60", name: "Lower Cabinet with Drawer 60 cm", nameDe: "Unterschrank mit Schublade 60 cm", price: "219.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 60, infoText: "US60 lower cabinet at the right end of the run", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105760-KGCN388140E", name: "Freestanding refrigerator", nameDe: "Standkühlschrank", price: "579.00", widthMm: 540, heightMm: 1810, depthMm: 576, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 70, infoText: "Freestanding fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105760-H6002-HPK2002", name: "Upper Cabinet 60 cm", nameDe: "Oberschrank 60 cm", price: "149.00", widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, infoText: "H6002 upper cabinet with supplied HPK2002 filler panel", articleNumber: "H6002", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 (35E)", blendePrice: "0.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105760-H6002-2", name: "Upper Cabinet 60 cm", nameDe: "Oberschrank 60 cm", price: "149.00", widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 90, infoText: "H6002 upper cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105760-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "349.00", widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 100, infoText: "FH664621E extractor hood, FWK124 filter, and HD6002 upper cabinet", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105760-FH664621E", name: "FH664621E Extractor Hood", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood, 60 cm", articleNumber: "FH 664 621 E", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105760-H6002-4", name: "Upper Cabinet 60 cm", nameDe: "Oberschrank 60 cm", price: "149.00", widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, infoText: "H6002 upper cabinet", articleNumber: "H6002" },
+  defaultSinkWorktop({ sortOrder: 120 }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // Burger 103898: L-shaped Cindy kitchen from contract plan 670 103898.
 // Supplier schedule codes are retained for display while catalogArticleNumber links
 // each row to the shared catalog identity used by the Burger program price list.
@@ -2264,6 +2285,14 @@ const DEFAULT_KITCHENS = [
     name: "105815",
     description: "Kitchen configuration based on frontend/public/plans/AB 105815.svg",
     items: AB_105815_ITEMS,
+  },
+  {
+    slug: "ab-105760",
+    kitchenCode: "105 760",
+    name: "105760",
+    description: "Straight kitchen configuration based on frontend/public/plans/AB 105760-61.svg",
+    items: AB_105760_ITEMS,
+    reconcileExisting: true,
   },
   {
     slug: "ab-105828",

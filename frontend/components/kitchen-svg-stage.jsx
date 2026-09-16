@@ -144,6 +144,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105844": "/plans/AB%20105841.svg",
   "ab-105811": "/plans/AB%20105811.svg",
   "ab-105744": "/plans/AB%20105744.svg",
+  "ab-105760": "/plans/AB%20105760-61.svg",
   "ab-110140": "/plans/AB%20110140.svg",
   "ab-110510": "/plans/AB%20110510.svg",
   "ab-111539": "/plans/AB%20111539.svg",
@@ -1348,6 +1349,25 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
       componentKey: "refrigerator",
       points: [[83.22, 32.19], [96.5, 32.19], [96.5, 93.08], [83.22, 93.08]],
     },
+  ],
+  // AB 105760-61: exact rectangles measured from the 842 x 595 vector PDF.
+  // The separately priced UPK20 keeps its own narrow hotspot at the left end.
+  "ab-105760": [
+    { componentKey: "wall-cabinet-1", left: 6.256532, top: 17.089076, width: 18.099762, height: 26.964706, preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", left: 24.356295, top: 17.089076, width: 15.805225, height: 26.964706, preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", left: 40.161520, top: 17.089076, width: 15.790974, height: 26.964706, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 40.161520, top: 44.053782, width: 15.790974, height: 6.366386, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 55.952494, top: 17.089076, width: 15.805226, height: 26.964706, preserveManualSize: true },
+    { componentKey: "worktop", left: 6.256532, top: 63.616807, width: 65.743468, height: 1.492437, preserveManualSize: true },
+    // The 29-unit-wide right support panel is the downstand of the fixed worktop.
+    { componentKey: "worktop", left: 71.586698, top: 65.109244, width: 0.413302, height: 32.732773, preserveManualSize: true },
+    { componentKey: "sink-faucet", left: 18.598575, top: 56.114286, width: 1.482185, height: 7.502521, preserveManualSize: true },
+    { componentKey: "sink-end-blende", left: 6.256532, top: 65.109244, width: 2.109264, height: 32.732773, preserveManualSize: true },
+    { componentKey: "sink-base", left: 8.365796, top: 65.109244, width: 15.805225, height: 32.732773, preserveManualSize: true },
+    { componentKey: "dishwasher-base", left: 24.171021, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "oven-module", left: 39.976247, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 55.781473, top: 65.109244, width: 15.805225, height: 32.732773, preserveManualSize: true },
+    { componentKey: "refrigerator", left: 75.178147, top: 30.742857, width: 14.650832, height: 67.099160, preserveManualSize: true },
   ],
 };
 
