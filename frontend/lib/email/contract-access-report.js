@@ -132,7 +132,7 @@ function getMailConfig(env) {
   const from = String(env.SMTP_FROM || "").trim();
   const recipients = String(
     env.CONTRACT_ACCESS_REPORT_EMAIL
-      || "primexdevelopment@gmail.com,334primex.eu@gmail.com,01primex.eu@gmail.com",
+      || "it@forestdream.de,334primex.eu@gmail.com,01primex.eu@gmail.com",
   )
     .split(",")
     .map((address) => address.trim())

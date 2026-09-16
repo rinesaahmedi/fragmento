@@ -73,7 +73,7 @@ test("Hetzner deployment owns the 08:00 Europe-Berlin schedule", () => {
   assert.match(workflow, /EnvironmentFile=\/etc\/fragmento-contract-access-report\.env/);
   assert.match(
     workflow,
-    /Environment=CONTRACT_ACCESS_REPORT_EMAIL=primexdevelopment@gmail\.com,334primex\.eu@gmail\.com,01primex\.eu@gmail\.com/,
+    /Environment=CONTRACT_ACCESS_REPORT_EMAIL=it@forestdream\.de,334primex\.eu@gmail\.com,01primex\.eu@gmail\.com/,
   );
   assert.match(workflow, /systemctl enable --now fragmento-contract-access-report\.timer/);
 });
