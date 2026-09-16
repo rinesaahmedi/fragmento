@@ -193,6 +193,8 @@ test("AB 110140 extractor hood covers its side triangle and leaves the light ray
 test("cropped straight kitchen plans close only their missing room-frame edge", async () => {
   const previewData = await loadKitchenPlanPreviewData();
   const cases = [
+    { slug: "ab-105759", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
+    { slug: "ab-105760", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
     { slug: "ab-110402", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
     { slug: "ab-109955", edge: /<line x1="1399" y1="[^\"]+" x2="1399" y2="[^\"]+"\/>/ },
   ];

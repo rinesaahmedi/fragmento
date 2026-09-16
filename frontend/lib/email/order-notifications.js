@@ -682,6 +682,10 @@ export function buildPurchasedKitchenOverlaySvg({ order, hotspots, crop, width, 
 }
 
 const PURCHASED_KITCHEN_CROP_CLOSURES = {
+  // The source room-frame top sits just outside the display crop. Restore it
+  // between the two visible side rails in the purchased-kitchen attachment.
+  "ab-105759": { edge: "top", start: 0.37, end: 99.02 },
+  "ab-105760": { edge: "top", start: 6.175772, end: 93.111639 },
   // The crop keeps the kitchen large, but cuts the room-frame line above it.
   "ab-110402": { edge: "top", start: 12.541568, end: 86.907363 },
   // The source drawing has a wide empty area on the right. Close its frame at
