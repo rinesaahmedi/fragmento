@@ -55,6 +55,7 @@ test("Hetzner deployment owns the 08:00 Europe-Berlin schedule", () => {
 
   assert.match(workflow, /OnCalendar=\*-\*-\* 08:00:00 Europe\/Berlin/);
   assert.match(workflow, /Environment=CONTRACT_ACCESS_REPORT_ENABLED=true/);
+  assert.match(workflow, /EnvironmentFile=\/etc\/fragmento-contract-access-report\.env/);
   assert.match(
     workflow,
     /Environment=CONTRACT_ACCESS_REPORT_EMAIL=primexdevelopment@gmail\.com,334primex\.eu@gmail\.com,01primex\.eu@gmail\.com/,

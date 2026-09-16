@@ -75,6 +75,8 @@ jobs:
             Environment=NODE_ENV=production
             Environment=CONTRACT_ACCESS_REPORT_ENABLED=true
             Environment=CONTRACT_ACCESS_REPORT_EMAIL=primexdevelopment@gmail.com,334primex.eu@gmail.com,01primex.eu@gmail.com
+            # Dedicated sender credentials live outside the repository, root-only.
+            EnvironmentFile=/etc/fragmento-contract-access-report.env
             ExecStart=/usr/bin/npm run report:contract-access
             EOF
 
