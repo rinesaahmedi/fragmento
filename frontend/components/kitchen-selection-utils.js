@@ -1888,6 +1888,10 @@ export function getProductImagePaths(item) {
     const gallery = PRODUCT_IMAGE_GALLERIES_BY_CODE[String(code).toUpperCase()];
     if (gallery?.length) return gallery;
   }
+  const articleNumber = String(
+    item?.articleNumber || item?.catalogArticle?.articleNumber || "",
+  ).trim().toUpperCase();
+  if (articleNumber === "OL-KGCN388140E") return KGCN388140E_GALLERY;
   return item?.productImagePath ? [item.productImagePath] : [];
 }
 
