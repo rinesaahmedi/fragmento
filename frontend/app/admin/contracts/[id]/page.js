@@ -12,6 +12,9 @@ import {
 } from "../../../../components/admin-ui";
 import { AdminShell } from "../../../../components/admin-shell";
 import AdminContractLinkFields from "../../../../components/admin-contract-link-fields";
+import AdminContractApplianceFields from "../../../../components/admin-contract-appliance-fields";
+import AdminApplianceSummary from "../../../../components/admin-appliance-summary";
+import { loadContractApplianceInventory } from "../../../../lib/contract-appliance-inventory";
 import AdminFileInput from "../../../../components/admin-file-input";
 import { AdminDateTime, AdminKitchenDisplayName, AdminStatusBadge, AdminText } from "../../../../components/admin-i18n";
 import { requireAdminPage } from "../../../../lib/auth";
@@ -183,6 +186,7 @@ export default async function AdminContractDetailPage({ params }) {
   }
 
   const returnTo = `/admin/contracts/${contract.id}`;
+  const applianceInventory = await loadContractApplianceInventory(contract);
   const claimPlanAssetBase = `/api/service-claims/contracts/${encodeURIComponent(contract.contractNumber)}/plan-assets`;
 
   return (
@@ -234,6 +238,14 @@ export default async function AdminContractDetailPage({ params }) {
               ]} />
             </DetailField>
           </div>
+        </AdminSection>
+
+        <AdminSection
+          title={<AdminText i18nKey="contractDetailAdmin.appliances" fallback="Electrical appliances" />}
+          description={<AdminText i18nKey="contractDetailAdmin.appliancesSummary" fallback="Installed appliance brands used to select serial-number help photos for this contract." />}
+        >
+          <AdminApplianceSummary appliances={applianceInventory.appliances} />
+          {applianceInventory.manual && !applianceInventory.configured ? <p style={mutedTextStyle}><AdminText i18nKey="contractDetailAdmin.inventoryUnreviewed" fallback="This appliance list has not been checked yet. Remove missing appliances and save to confirm it." /></p> : null}
         </AdminSection>
 
         <AdminSection id="orders" title={<AdminText i18nKey="adminShellLogin.orders" fallback="Orders" />}>
@@ -304,6 +316,7 @@ export default async function AdminContractDetailPage({ params }) {
                 />
               </>
             )}
+            <AdminContractApplianceFields initialInventory={applianceInventory} kitchenId={contract.kitchenId} contractId={contract.id} contractType={contract.contractType} />
             <div style={editActionsStyle}>
               <button type="submit" style={primaryButtonStyle}>
                 <AdminText i18nKey="contractDetailAdmin.saveContractType" fallback="Save {type} contract" values={{ type: contract.contractType }} />
@@ -342,6 +355,21 @@ const overviewGridStyle = {
   display: "grid",
   gap: 16,
   gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+};
+
+const applianceSummaryGridStyle = {
+  display: "grid",
+  gap: 10,
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+};
+
+const applianceSummaryStyle = {
+  background: "rgba(255,255,255,0.7)",
+  border: "1px solid var(--app-border)",
+  borderRadius: 12,
+  display: "grid",
+  gap: 5,
+  padding: 12,
 };
 
 const detailFieldStyle = {

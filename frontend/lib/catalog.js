@@ -1045,7 +1045,17 @@ export async function listKitchenContractsForAdmin(filters = {}) {
 
 export async function getKitchenContractForAdmin(id) {
   const contracts = await listKitchenContractsForAdmin({ contractId: id });
-  return contracts[0] || null;
+  const contract = contracts[0] || null;
+  if (!contract) return null;
+
+  const appliances = await prisma.contractAppliance.findMany({
+    where: { kitchenContractId: contract.id },
+    orderBy: [{ applianceType: "asc" }],
+  });
+  const inventoryState = await prisma.kitchenContract.findUnique({
+    where: { id }, select: { appliancesConfigured: true },
+  });
+  return { ...contract, appliances, appliancesConfigured: inventoryState?.appliancesConfigured || false };
 }
 
 async function attachRegistrationsToContracts(contracts) {

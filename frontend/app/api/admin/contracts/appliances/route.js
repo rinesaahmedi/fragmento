@@ -1,0 +1,24 @@
+import { NextResponse } from "next/server";
+import { requireAdminApi } from "../../../../../lib/auth";
+import { prisma } from "../../../../../lib/prisma";
+import { loadContractApplianceInventory } from "../../../../../lib/contract-appliance-inventory";
+
+export async function GET(request) {
+  await requireAdminApi();
+  const params = new URL(request.url).searchParams;
+  const contractId = params.get("contractId");
+  const stored = contractId ? await prisma.kitchenContract.findUnique({
+    where: { id: contractId }, include: { appliances: true },
+  }) : null;
+  if (contractId && !stored) return NextResponse.json({ error: "Contract not found." }, { status: 404 });
+  const kitchenId = params.get("kitchenId") || "";
+  if (kitchenId && !await prisma.kitchen.findUnique({ where: { id: kitchenId }, select: { id: true } })) {
+    return NextResponse.json({ error: "Kitchen not found." }, { status: 404 });
+  }
+  const sameKitchen = stored?.kitchenId === kitchenId;
+  const contract = {
+    ...(sameKitchen ? stored : {}), kitchenId,
+    contractType: stored?.contractType || (params.get("contractType") === "ARC" ? "ARC" : "FRG"),
+  };
+  return NextResponse.json(await loadContractApplianceInventory(contract), { headers: { "Cache-Control": "no-store" } });
+}

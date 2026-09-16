@@ -947,6 +947,22 @@
     }
   },
   "contractDetailAdmin": {
+    "manualAppliancesHelp": "Nur vorhandene Geräte beibehalten. Entfernte Geräte können bei Reklamationen nicht ausgewählt werden.",
+    "linkedAppliancesHelp": "Geräte werden aus der Küche und bestätigten Bestellungen ermittelt. Die Marke nur überschreiben, wenn das eingebaute Gerät abweicht.",
+    "inventoryUnreviewed": "Diese Geräteliste wurde noch nicht geprüft. Fehlende Geräte entfernen und die Liste durch Speichern bestätigen.",
+    "inventoryLoading": "Geräte werden geladen…",
+    "inventoryLoadError": "Geräte konnten nicht geladen werden. Vor dem Speichern erneut versuchen.",
+    "inventoryRetry": "Erneut versuchen",
+    "noInstalledAppliances": "Diese Küche und ihre bestätigten Bestellungen enthalten keine Elektrogeräte.",
+    "removeAppliance": "Gerät entfernen",
+    "restoreAppliance": "Gerät wiederherstellen",
+    "automaticAppliance": "Verknüpftes Produkt verwenden",
+    "applianceBrandConflict": "Die gespeicherte Marke weicht vom verknüpften Produkt ab. Bitte das eingebaute Gerät prüfen.",
+    "applianceSourceORDER": "Bestätigte Bestellung",
+    "applianceSourceMANUAL": "Manuelle Konfiguration",
+    "applianceSourceKITCHEN_ITEM": "Küchenartikel",
+    "kitchenAppliancesHelp": "Enthaltene Küchengeräte. Vertragsdetails zeigen zusätzlich bestätigte optionale Geräte und abweichende Gerätemarken.",
+
     "contractNotFound": "Vertrag nicht gefunden",
     "backToContracts": "Zurück zu den Vertragsnummern",
     "contractTitle": "Vertrag {contractNumber}",
@@ -968,7 +984,19 @@
     "pdfOnlyKitchen": "Nur-PDF-Küche (automatisch)",
     "replaceOrAddKitchenSketch": "Küchenskizze ersetzen/hinzufügen (JPG, PNG oder WebP)",
     "replaceOrAddPdf": "Originalen Küchenplan ersetzen/hinzufügen (PDF)",
-    "saveContractType": "{type}-Vertrag speichern"
+    "saveContractType": "{type}-Vertrag speichern",
+    "appliances": "Elektrische Ger\u00e4te",
+    "appliancesHelp": "Legen Sie die installierte Marke je Ger\u00e4t fest. Damit werden die passenden Seriennummer-Hilfefotos ausgew\u00e4hlt; die Artikelnummer kann eine genauere Zuordnung liefern.",
+    "appliancesSummary": "Installierte Ger\u00e4temarken f\u00fcr die Auswahl der Seriennummer-Hilfefotos dieses Vertrags.",
+    "noAppliancesConfigured": "Keine vertragsspezifischen Ger\u00e4temarken konfiguriert. Es werden Produkt- und Standardhilfen verwendet.",
+    "brand": "Marke",
+    "articleNumber": "Artikelnummer",
+    "notSpecified": "Nicht angegeben",
+    "applianceDishwasher": "Geschirrsp\u00fcler",
+    "applianceFridge": "K\u00fchlschrank / Gefrierschrank",
+    "applianceOven": "Backofen",
+    "applianceHob": "Kochfeld",
+    "applianceExtractorHood": "Dunstabzugshaube"
   },
   "contractAddressFields": {
     "country": "Land",

@@ -30,6 +30,10 @@ import {
   getSerialNumberHelpApplianceType,
   SERIAL_NUMBER_HELP_APPLIANCES,
 } from "../lib/serial-number-help";
+import {
+  findContractAppliance,
+  getContractApplianceBrandLabel,
+} from "../lib/contract-appliances";
 import { getContractNumberStickyState } from "../lib/service-claim-sticky";
 import { trackPublicPageOpened } from "../lib/public-page-open-tracking";
 import { normalizeServiceLanguage, persistServiceLanguage } from "../lib/service-language";
@@ -702,6 +706,7 @@ const COPY = {
     serialNumberHelpBodyExtractorHood: "Die Seriennummer befindet sich hinter dem Metall-Fettfilter und dem Aktivkohlefilter. Schalten Sie das Ger\u00e4t aus und entfernen Sie beide Filter, um das Typenschild mit der Seriennummer zu sehen.",
     serialNumberHelpBodyHob: "Die Seriennummer des Kochfelds befindet sich unter dem Ger\u00e4t und ist nach dem Einbau normalerweise nicht sichtbar. Unsere Kochfelder und Back\u00f6fen werden meist als Herdset mit einer gemeinsamen Seriennummer verkauft. Sie finden diese Seriennummer auf der Innenseite der Backofent\u00fcr.",
     serialNumberHelpChooseBody: "W\u00e4hlen Sie zuerst das Elektroger\u00e4t aus.",
+    serialNumberHelpImagesUnavailable: "F\u00fcr diese Marke sind noch keine passenden Hilfefotos hinterlegt.",
     serialNumberHelpBack: "Zur\u00fcck zu den Elektroger\u00e4ten",
     serialNumberApplianceDishwasher: "Geschirrsp\u00fcler",
     serialNumberApplianceFridge: "K\u00fchlschrank / Gefrierschrank",
@@ -1010,6 +1015,7 @@ const COPY = {
     serialNumberHelpBodyExtractorHood: "The serial number is located behind the metal grease filter and the activated carbon filter. Switch off the appliance and remove both filters to see the serial-number label.",
     serialNumberHelpBodyHob: "The cooktop's serial number is underneath the appliance and is normally not visible after installation. Our cooktops and ovens are usually sold as one stove set with a shared serial number. You can find this serial number on the inside of the oven door.",
     serialNumberHelpChooseBody: "First select the electrical appliance.",
+    serialNumberHelpImagesUnavailable: "No matching help photos have been added for this brand yet.",
     serialNumberHelpBack: "Back to appliances",
     serialNumberApplianceDishwasher: "Dishwasher",
     serialNumberApplianceFridge: "Fridge / freezer",
@@ -1335,6 +1341,7 @@ const COPY = {
     serialNumberHelpBodyExtractorHood: "Seri numaras\u0131 metal ya\u011f filtresinin ve aktif karbon filtresinin arkas\u0131ndad\u0131r. Cihaz\u0131 kapat\u0131n ve seri numaras\u0131 etiketini g\u00f6rmek i\u00e7in her iki filtreyi de \u00e7\u0131kar\u0131n.",
     serialNumberHelpBodyHob: "Oca\u011f\u0131n seri numaras\u0131 cihaz\u0131n alt\u0131ndad\u0131r ve montajdan sonra normalde g\u00f6r\u00fcnmez. Ocaklar\u0131m\u0131z ve f\u0131r\u0131nlar\u0131m\u0131z genellikle ortak seri numaras\u0131na sahip tek bir set olarak sat\u0131l\u0131r. Bu seri numaras\u0131n\u0131 f\u0131r\u0131n kapa\u011f\u0131n\u0131n i\u00e7 taraf\u0131nda bulabilirsiniz.",
     serialNumberHelpChooseBody: "\u00d6nce elektrikli cihaz\u0131 se\u00e7in.",
+    serialNumberHelpImagesUnavailable: "Bu marka i\u00e7in hen\u00fcz uygun yard\u0131m foto\u011fraflar\u0131 eklenmedi.",
     serialNumberHelpBack: "Cihazlara geri d\u00f6n",
     serialNumberApplianceDishwasher: "Bula\u015f\u0131k makinesi",
     serialNumberApplianceFridge: "Buzdolab\u0131 / dondurucu",
@@ -1582,6 +1589,7 @@ const COPY = {
     serialNumberHelpBodyExtractorHood: "El n\u00famero de serie se encuentra detr\u00e1s del filtro met\u00e1lico antigrasa y del filtro de carb\u00f3n activo. Apague el aparato y retire ambos filtros para ver la etiqueta del n\u00famero de serie.",
     serialNumberHelpBodyHob: "El n\u00famero de serie de la placa de cocci\u00f3n se encuentra debajo del aparato y normalmente no es visible despu\u00e9s de la instalaci\u00f3n. Nuestras placas y hornos suelen venderse como un solo conjunto con un n\u00famero de serie compartido. Encontrar\u00e1 este n\u00famero en el interior de la puerta del horno.",
     serialNumberHelpChooseBody: "Seleccione primero el electrodom\u00e9stico.",
+    serialNumberHelpImagesUnavailable: "Todav\u00eda no se han a\u00f1adido fotos de ayuda para esta marca.",
     serialNumberHelpBack: "Volver a los electrodom\u00e9sticos",
     serialNumberApplianceDishwasher: "Lavavajillas",
     serialNumberApplianceFridge: "Frigor\u00edfico / congelador",
@@ -1829,6 +1837,7 @@ const COPY = {
     serialNumberHelpBodyExtractorHood: "Le num\u00e9ro de s\u00e9rie se trouve derri\u00e8re le filtre m\u00e9tallique \u00e0 graisse et le filtre \u00e0 charbon actif. \u00c9teignez l'appareil et retirez les deux filtres pour voir l'\u00e9tiquette du num\u00e9ro de s\u00e9rie.",
     serialNumberHelpBodyHob: "Le num\u00e9ro de s\u00e9rie de la plaque de cuisson se trouve sous l'appareil et n'est normalement plus visible apr\u00e8s l'installation. Nos plaques de cuisson et nos fours sont g\u00e9n\u00e9ralement vendus comme un ensemble avec un num\u00e9ro de s\u00e9rie commun. Vous trouverez ce num\u00e9ro \u00e0 l'int\u00e9rieur de la porte du four.",
     serialNumberHelpChooseBody: "S\u00e9lectionnez d'abord l'appareil \u00e9lectrique.",
+    serialNumberHelpImagesUnavailable: "Aucune photo d'aide correspondante n'a encore \u00e9t\u00e9 ajout\u00e9e pour cette marque.",
     serialNumberHelpBack: "Retour aux appareils",
     serialNumberApplianceDishwasher: "Lave-vaisselle",
     serialNumberApplianceFridge: "R\u00e9frig\u00e9rateur / cong\u00e9lateur",
@@ -2075,6 +2084,7 @@ const COPY = {
     serialNumberHelpBodyExtractorHood: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430\u0445\u043e\u0434\u0438\u0442\u0441\u044f \u0437\u0430 \u043c\u0435\u0442\u0430\u043b\u043b\u0438\u0447\u0435\u0441\u043a\u0438\u043c \u0436\u0438\u0440\u043e\u0432\u044b\u043c \u0444\u0438\u043b\u044c\u0442\u0440\u043e\u043c \u0438 \u0444\u0438\u043b\u044c\u0442\u0440\u043e\u043c \u0441 \u0430\u043a\u0442\u0438\u0432\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u043c \u0443\u0433\u043b\u0451\u043c. \u0412\u044b\u043a\u043b\u044e\u0447\u0438\u0442\u0435 \u043f\u0440\u0438\u0431\u043e\u0440 \u0438 \u0441\u043d\u0438\u043c\u0438\u0442\u0435 \u043e\u0431\u0430 \u0444\u0438\u043b\u044c\u0442\u0440\u0430, \u0447\u0442\u043e\u0431\u044b \u0443\u0432\u0438\u0434\u0435\u0442\u044c \u0442\u0430\u0431\u043b\u0438\u0447\u043a\u0443 \u0441 \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u043c \u043d\u043e\u043c\u0435\u0440\u043e\u043c.",
     serialNumberHelpBodyHob: "\u0421\u0435\u0440\u0438\u0439\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u0432\u0430\u0440\u043e\u0447\u043d\u043e\u0439 \u043f\u0430\u043d\u0435\u043b\u0438 \u043d\u0430\u0445\u043e\u0434\u0438\u0442\u0441\u044f \u0441\u043d\u0438\u0437\u0443 \u0438 \u043e\u0431\u044b\u0447\u043d\u043e \u043d\u0435 \u0432\u0438\u0434\u0435\u043d \u043f\u043e\u0441\u043b\u0435 \u0443\u0441\u0442\u0430\u043d\u043e\u0432\u043a\u0438. \u041d\u0430\u0448\u0438 \u0432\u0430\u0440\u043e\u0447\u043d\u044b\u0435 \u043f\u0430\u043d\u0435\u043b\u0438 \u0438 \u0434\u0443\u0445\u043e\u0432\u044b\u0435 \u0448\u043a\u0430\u0444\u044b \u043e\u0431\u044b\u0447\u043d\u043e \u043f\u0440\u043e\u0434\u0430\u044e\u0442\u0441\u044f \u043a\u0430\u043a \u043e\u0434\u0438\u043d \u043a\u043e\u043c\u043f\u043b\u0435\u043a\u0442 \u0441 \u043e\u0431\u0449\u0438\u043c \u0441\u0435\u0440\u0438\u0439\u043d\u044b\u043c \u043d\u043e\u043c\u0435\u0440\u043e\u043c. \u042d\u0442\u043e\u0442 \u043d\u043e\u043c\u0435\u0440 \u043d\u0430\u0445\u043e\u0434\u0438\u0442\u0441\u044f \u043d\u0430 \u0432\u043d\u0443\u0442\u0440\u0435\u043d\u043d\u0435\u0439 \u0441\u0442\u043e\u0440\u043e\u043d\u0435 \u0434\u0432\u0435\u0440\u0446\u044b \u0434\u0443\u0445\u043e\u0432\u043e\u0433\u043e \u0448\u043a\u0430\u0444\u0430.",
     serialNumberHelpChooseBody: "\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043f\u0440\u0438\u0431\u043e\u0440.",
+    serialNumberHelpImagesUnavailable: "\u0414\u043b\u044f \u044d\u0442\u043e\u0439 \u043c\u0430\u0440\u043a\u0438 \u043f\u043e\u043a\u0430 \u043d\u0435\u0442 \u043f\u043e\u0434\u0445\u043e\u0434\u044f\u0449\u0438\u0445 \u0444\u043e\u0442\u043e\u0433\u0440\u0430\u0444\u0438\u0439-\u043f\u043e\u0434\u0441\u043a\u0430\u0437\u043e\u043a.",
     serialNumberHelpBack: "\u041d\u0430\u0437\u0430\u0434 \u043a \u044d\u043b\u0435\u043a\u0442\u0440\u043e\u043f\u0440\u0438\u0431\u043e\u0440\u0430\u043c",
     serialNumberApplianceDishwasher: "\u041f\u043e\u0441\u0443\u0434\u043e\u043c\u043e\u0435\u0447\u043d\u0430\u044f \u043c\u0430\u0448\u0438\u043d\u0430",
     serialNumberApplianceFridge: "\u0425\u043e\u043b\u043e\u0434\u0438\u043b\u044c\u043d\u0438\u043a / \u043c\u043e\u0440\u043e\u0437\u0438\u043b\u044c\u043d\u0438\u043a",
@@ -2502,17 +2512,25 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
       serialHelpApplianceType
         ? { claimPartKey: serialHelpApplianceType }
         : serialNumberHelpProduct,
+      contractLookup.kitchenPlan?.appliances,
     ),
-    [serialHelpApplianceType, serialNumberHelpProduct],
+    [contractLookup.kitchenPlan?.appliances, serialHelpApplianceType, serialNumberHelpProduct],
   );
   const resolvedSerialHelpApplianceType = serialHelpApplianceType
     || getSerialNumberHelpApplianceType(serialNumberHelpProduct);
-  const serialNumberHelpBodyKey = resolvedSerialHelpApplianceType === "extractor_hood"
+  const serialNumberHelpBodyKey = resolvedSerialHelpApplianceType === "extractor_hood" && findContractAppliance(contractLookup.kitchenPlan?.appliances, "extractor_hood")?.brand === "amica"
     ? "serialNumberHelpBodyExtractorHood"
-    : resolvedSerialHelpApplianceType === "hob"
+    : resolvedSerialHelpApplianceType === "hob" && findContractAppliance(contractLookup.kitchenPlan?.appliances, "hob")?.sharesOvenSerial
       ? "serialNumberHelpBodyHob"
       : "serialNumberHelpBody";
   const serialHelpSlideCount = serialNumberHelpImages.length;
+  const serialHelpConfiguredAppliance = findContractAppliance(
+    contractLookup.kitchenPlan?.appliances,
+    resolvedSerialHelpApplianceType,
+  );
+  const serialHelpConfiguredBrandLabel = getContractApplianceBrandLabel(
+    serialHelpConfiguredAppliance?.brand,
+  );
   const [isClaimAssistantOpen, setIsClaimAssistantOpen] = useState(false);
   const [claimAssistantMessages, setClaimAssistantMessages] = useState(EMPTY_CLAIM_ASSISTANT_MESSAGES);
   const [claimAssistantQuestion, setClaimAssistantQuestion] = useState("");
@@ -2665,6 +2683,8 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
     normalizedContractNumber,
   ]);
   const isReferenceOnlyPlan = activeKitchenPlan?.selectionMode === "reference-pdf";
+  const availableSerialHelpAppliances = SERIAL_NUMBER_HELP_APPLIANCES.filter((entry) =>
+    activeKitchenPlan?.appliances?.some((appliance) => appliance.applianceType === entry.type && appliance.isPresent !== false));
   const activeContractType = (
     contractLookup.status === "found" &&
     contractLookup.contractNumber === normalizedContractNumber
@@ -2840,6 +2860,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
   const hasMissingReferenceElectricalDetails = isReferenceOnlyPlan && hasReferenceElectricalIssues && (
     !referenceElectricalIssues.length ||
     referenceElectricalIssues.some((issue) => (
+      !availableSerialHelpAppliances.some((entry) => entry.type === issue.applianceType) ||
       !String(issue.component || "").trim() ||
       String(issue.problem || "").trim().length < MIN_REFERENCE_PROBLEM_LENGTH ||
       !String(issue.serialNumber || "").trim() ||
@@ -3921,6 +3942,10 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
         return {
           ...issue,
           [field]: value,
+          ...(field === "applianceType" ? {
+            component: t(SERIAL_NUMBER_HELP_APPLIANCES.find((entry) => entry.type === value)?.labelKey || "referenceElectricalComponent"),
+            serialNumber: "", serialNumberImage: null,
+          } : {}),
         };
       }),
     );
@@ -4612,6 +4637,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
           componentId: `reference-electrical-${issue.id}`,
           name: String(issue.component || "").trim(),
           code: "REFERENCE-ELECTRICAL",
+          applianceType: issue.applianceType,
           detail: String(issue.problem || "").trim(),
           serialNumber: String(issue.serialNumber || "").trim(),
         })),
@@ -6116,7 +6142,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                     }}
                   />
                   <div className="service-reference-flow">
-                    <div
+                    {availableSerialHelpAppliances.length ? <div
                       className="service-reference-flow__question"
                       data-reference-issue-choice="true"
                       tabIndex={-1}
@@ -6128,12 +6154,12 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                         noLabel={t("hausmeisterNo")}
                         onChange={handleReferenceElectricalInvolvedChange}
                       />
-                    </div>
+                    </div> : null}
 
                     {referenceElectricalInvolved === "yes" ? (
                       <div className="service-reference-flow__group service-reference-flow__group--issues">
                         {referenceElectricalIssues.map((issue, index) => {
-                          const isComponentMissing = showClaimRequiredErrors && !String(issue.component || "").trim();
+                          const isComponentMissing = showClaimRequiredErrors && !issue.applianceType;
                           const isProblemMissing = showClaimRequiredErrors && String(issue.problem || "").trim().length < MIN_REFERENCE_PROBLEM_LENGTH;
                           const isSerialNumberMissing = showClaimRequiredErrors
                             && !String(issue.serialNumber || "").trim();
@@ -6164,14 +6190,15 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                                   {t("referenceElectricalComponent")}
                                   <RequiredFieldMark title={requiredFieldTitle} />
                                 </span>
-                                <input
-                                  type="text"
-                                  value={issue.component}
-                                  onChange={(event) => updateReferenceElectricalIssue(issue.id, "component", event.target.value)}
-                                  placeholder={t("referenceElectricalComponentPlaceholder")}
+                                <select
+                                  value={issue.applianceType || ""}
+                                  onChange={(event) => updateReferenceElectricalIssue(issue.id, "applianceType", event.target.value)}
                                   aria-invalid={isComponentMissing}
                                   data-reference-required-field
-                                />
+                                >
+                                  <option value="">{t("serialNumberHelpChooseBody")}</option>
+                                  {availableSerialHelpAppliances.map((entry) => <option key={entry.type} value={entry.type}>{t(entry.labelKey)}</option>)}
+                                </select>
                               </label>
                               <label className="service-field service-reference-flow__problem">
                                 <span>
@@ -6212,7 +6239,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                                     aria-label={t("serialNumberHelpAria")}
                                     onClick={() => {
                                       setSerialNumberHelpProduct({ resolvedLabel: issue.component || t("referenceElectricalComponent") });
-                                      setSerialHelpApplianceType("");
+                                      setSerialHelpApplianceType(issue.applianceType || "");
                                       setSerialHelpSlide(0);
                                       setIsSerialNumberHelpOpen(true);
                                     }}
@@ -7137,9 +7164,13 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                 {t(SERIAL_NUMBER_HELP_APPLIANCES.find(
                   (appliance) => appliance.type === serialHelpApplianceType,
                 )?.labelKey)}
+                {serialHelpConfiguredBrandLabel ? ` \u00b7 ${serialHelpConfiguredBrandLabel}` : ""}
               </p>
             ) : !isReferenceOnlyPlan && serialNumberHelpProduct?.resolvedLabel ? (
-              <p className="service-contract-help__eyebrow">{serialNumberHelpProduct.resolvedLabel}</p>
+              <p className="service-contract-help__eyebrow">
+                {serialNumberHelpProduct.resolvedLabel}
+                {serialHelpConfiguredBrandLabel ? ` \u00b7 ${serialHelpConfiguredBrandLabel}` : ""}
+              </p>
             ) : null}
             <p className="service-contract-help__intro">
               {isReferenceOnlyPlan && !serialHelpApplianceType
@@ -7148,8 +7179,11 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
             </p>
             {isReferenceOnlyPlan && !serialHelpApplianceType ? (
               <div className="service-serial-help__appliance-grid">
-                {SERIAL_NUMBER_HELP_APPLIANCES.map((appliance) => {
-                  const [previewImage] = getSerialNumberHelpImages({ claimPartKey: appliance.type });
+                {availableSerialHelpAppliances.map((appliance) => {
+                  const [previewImage] = getSerialNumberHelpImages(
+                    { claimPartKey: appliance.type },
+                    activeKitchenPlan?.appliances,
+                  );
                   return (
                     <button
                       key={appliance.type}
@@ -7162,14 +7196,14 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                       aria-label={t(appliance.labelKey)}
                     >
                       <span className="service-serial-help__appliance-image" aria-hidden="true">
-                        <img src={previewImage.src} alt="" loading="lazy" decoding="async" />
+                        {previewImage ? <img src={previewImage.src} alt="" loading="lazy" decoding="async" /> : null}
                       </span>
                       <span>{t(appliance.labelKey)}</span>
                     </button>
                   );
                 })}
               </div>
-            ) : (
+            ) : serialHelpSlideCount ? (
               <>
                 <p className="service-contract-help__sr" aria-live="polite">
                   {serialHelpSlideAriaLabel(serialHelpSlide)}
@@ -7185,7 +7219,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                     &#8249;
                   </button>
                   <div
-                    className="service-contract-help__viewport"
+                    className="service-contract-help__viewport service-contract-help__viewport--serial"
                     onTouchStart={onSerialHelpTouchStart}
                     onTouchEnd={onSerialHelpTouchEnd}
                   >
@@ -7202,14 +7236,23 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                           className="service-contract-help__figure service-contract-help__slide"
                           style={{ flex: `0 0 ${100 / serialHelpSlideCount}%` }}
                         >
-                          <img
-                            src={entry.src}
-                            alt={entry.alt || t(entry.altKey)}
-                            className="service-contract-help__img"
-                            loading="lazy"
-                            decoding="async"
-                            draggable={false}
-                          />
+                          <a
+                            href={entry.src}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="service-contract-help__image-link"
+                            aria-label={entry.alt || t(entry.altKey)}
+                            title={entry.alt || t(entry.altKey)}
+                          >
+                            <img
+                              src={entry.src}
+                              alt={entry.alt || t(entry.altKey)}
+                              className="service-contract-help__img"
+                              loading="lazy"
+                              decoding="async"
+                              draggable={false}
+                            />
+                          </a>
                         </figure>
                       ))}
                     </div>
@@ -7238,6 +7281,13 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                   ))}
                 </div>
               </>
+            ) : (
+              <p className="service-contract-help__intro" role="status">
+                {t("serialNumberHelpImagesUnavailable")}
+                {serialHelpConfiguredBrandLabel
+                  ? ` (${serialHelpConfiguredBrandLabel})`
+                  : ""}
+              </p>
             )}
             <div className="service-contract-help__actions">
               {isReferenceOnlyPlan && serialHelpApplianceType ? (

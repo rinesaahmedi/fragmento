@@ -490,10 +490,30 @@ model KitchenContract {
   registrations        KitchenRegistration[]
   visitEvents          PublicVisitEvent[]
   claimPlanAsset       KitchenContractClaimPlanAsset?
+  appliances           ContractAppliance[]
+  appliancesConfigured Boolean                        @default(false)
 
   @@index([kitchenId])
   @@index([projectId])
   @@index([contractType])
+}
+
+model ContractAppliance {
+  id                String          @id @default(cuid())
+  kitchenContractId String
+  kitchenContract   KitchenContract @relation(fields: [kitchenContractId], references: [id], onDelete: Cascade)
+  applianceType     String
+  brand             String?
+  articleNumber     String?
+  serialHelpProfile String?
+  source            String          @default("MANUAL")
+  isPresent         Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([kitchenContractId, applianceType])
+  @@index([kitchenContractId])
+  @@index([applianceType, brand])
 }
 
 model KitchenContractClaimPlanAsset {

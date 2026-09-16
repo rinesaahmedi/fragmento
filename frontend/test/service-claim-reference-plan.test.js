@@ -58,6 +58,21 @@ test("a PDF-only contract produces a reference plan with no selectable component
   assert.equal(plan.kitchenName, "");
   assert.deepEqual(plan.selectableComponentIds, []);
   assert.deepEqual(plan.selectableComponents, []);
+  assert.deepEqual(plan.appliances, []);
+});
+
+test("a reference plan carries contract appliance profiles without kitchen items", () => {
+  const appliances = [
+    { applianceType: "fridge", brand: "amica", articleNumber: "KGC-1" },
+    { applianceType: "oven", brand: "bosch", articleNumber: "HBA-1" },
+  ];
+  const plan = buildServiceClaimReferencePlan({
+    claimPlanPreviewPath: "/jpg/example-plan.jpg",
+    kitchen: { slug: "pdf-only-kitchen", name: "Archived kitchen plan" },
+    appliances,
+  });
+
+  assert.deepEqual(plan.appliances, appliances);
 });
 
 test("service form renders the reference sketch and requires affected component details", () => {
@@ -85,7 +100,7 @@ test("JPG-only ASC serial-number help chooses an appliance before showing photos
   const styles = fs.readFileSync(path.join(repoRoot, "app", "globals.css"), "utf8");
 
   assert.match(flow, /isReferenceOnlyPlan && !serialHelpApplianceType/);
-  assert.match(flow, /SERIAL_NUMBER_HELP_APPLIANCES\.map/);
+  assert.match(flow, /availableSerialHelpAppliances\.map/);
   assert.match(flow, /setSerialHelpApplianceType\(appliance\.type\)/);
   assert.match(flow, /serialNumberHelpBack/);
   assert.match(flow, /setSerialHelpApplianceType\(""\)/);
@@ -94,6 +109,8 @@ test("JPG-only ASC serial-number help chooses an appliance before showing photos
   assert.match(flow, /serialNumberHelpBodyHob/);
   assert.match(styles, /\.service-serial-help__appliance-grid/);
   assert.match(styles, /\.service-serial-help__appliance/);
+  assert.match(styles, /\.service-contract-help__viewport--serial[\s\S]*?62vh/);
+  assert.match(styles, /\.service-contract-help__image-link[\s\S]*?cursor:\s*zoom-in/);
 });
 
 test("JPG-only ASC serial validation highlights the missing field independently", () => {

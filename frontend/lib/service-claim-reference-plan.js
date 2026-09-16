@@ -72,6 +72,7 @@ export function buildServiceClaimReferencePlan(contract) {
     selectableComponents: [],
     visibleComponentIds: [],
     claimParts: [],
+    appliances: Array.isArray(contract?.appliances) ? contract.appliances : [],
   };
 }
 

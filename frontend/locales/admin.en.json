@@ -947,6 +947,22 @@
     }
   },
   "contractDetailAdmin": {
+    "manualAppliancesHelp": "Keep only the installed appliances. Removed appliances cannot be selected in claims.",
+    "linkedAppliancesHelp": "Appliances come from the kitchen and confirmed orders. Set a brand override only when the installed appliance differs.",
+    "inventoryUnreviewed": "This appliance list has not been checked yet. Remove missing appliances and save to confirm it.",
+    "inventoryLoading": "Loading appliances…",
+    "inventoryLoadError": "Could not load appliances. Retry before saving.",
+    "inventoryRetry": "Retry",
+    "noInstalledAppliances": "No electrical appliances are included in this kitchen or its confirmed orders.",
+    "removeAppliance": "Remove appliance",
+    "restoreAppliance": "Restore appliance",
+    "automaticAppliance": "Use linked product",
+    "applianceBrandConflict": "The saved brand differs from the linked product. Verify the installed appliance.",
+    "applianceSourceORDER": "Confirmed order",
+    "applianceSourceMANUAL": "Manual configuration",
+    "applianceSourceKITCHEN_ITEM": "Kitchen item",
+    "kitchenAppliancesHelp": "Included kitchen appliances. Contract details also include confirmed optional appliances and installed-brand overrides.",
+
     "contractNotFound": "Contract not found",
     "backToContracts": "Back to contract numbers",
     "contractTitle": "Contract {contractNumber}",
@@ -968,7 +984,19 @@
     "pdfOnlyKitchen": "PDF-only kitchen (automatic)",
     "replaceOrAddKitchenSketch": "Replace/add kitchen sketch (JPG, PNG, or WebP)",
     "replaceOrAddPdf": "Replace/add original kitchen plan (PDF)",
-    "saveContractType": "Save {type} contract"
+    "saveContractType": "Save {type} contract",
+    "appliances": "Electrical appliances",
+    "appliancesHelp": "Set the installed brand for each appliance. This controls which serial-number help photos the customer sees; the article number can provide a more specific match.",
+    "appliancesSummary": "Installed appliance brands used to select serial-number help photos for this contract.",
+    "noAppliancesConfigured": "No contract-specific appliance brands have been configured. Product and generic serial-number help will be used.",
+    "brand": "Brand",
+    "articleNumber": "Article number",
+    "notSpecified": "Not specified",
+    "applianceDishwasher": "Dishwasher",
+    "applianceFridge": "Fridge / freezer",
+    "applianceOven": "Oven",
+    "applianceHob": "Cooktop / hob",
+    "applianceExtractorHood": "Extractor hood"
   },
   "contractAddressFields": {
     "country": "Country",

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import AdminContractLinkFields from "./admin-contract-link-fields";
+import AdminContractApplianceFields from "./admin-contract-appliance-fields";
 import AdminFileInput from "./admin-file-input";
 import AdminSelect from "./admin-select";
 import { AdminText, useAdminI18n } from "./admin-i18n";
@@ -17,6 +18,7 @@ export default function AdminContractCreateForm({
   returnTo = "/admin/contracts",
 }) {
   const [contractType, setContractType] = useState("");
+  const [kitchenId, setKitchenId] = useState(defaultKitchenId || "");
   const { translate } = useAdminI18n();
 
   return (
@@ -75,6 +77,7 @@ export default function AdminContractCreateForm({
               required
             />
           </FormField>
+          <AdminContractApplianceFields contractType="ARC" />
           <div style={actionStyle}>
             <button type="submit" style={primaryButtonStyle}>
               <AdminText i18nKey="contractsAdmin.createArcContract" fallback="Create ARC contract" />
@@ -94,7 +97,7 @@ export default function AdminContractCreateForm({
           <input type="hidden" name="returnTo" value={returnTo} />
           <input type="hidden" name="contractType" value="FRG" />
           <FormField label={<AdminText i18nKey="kitchensAdmin.kitchen" fallback="Kitchen" />}>
-            <AdminSelect name="kitchenId" defaultValue={defaultKitchenId || ""} style={compactInputStyle}>
+            <AdminSelect name="kitchenId" value={kitchenId} onChange={(event) => setKitchenId(event.target.value)} style={compactInputStyle}>
               <option value=""><AdminText i18nKey="contractsAdmin.selectKitchen" fallback="Select kitchen" /></option>
               {kitchens.map((kitchen) => (
                 <option key={kitchen.id} value={kitchen.id}>{kitchen.name}</option>
@@ -131,6 +134,7 @@ export default function AdminContractCreateForm({
             compact
             contract={{}}
           />
+          <AdminContractApplianceFields kitchenId={kitchenId} />
           <div style={actionStyle}>
             <button type="submit" style={primaryButtonStyle}>
               <AdminText i18nKey="contractsAdmin.createFrgContract" fallback="Create FRG contract" />

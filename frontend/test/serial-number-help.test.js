@@ -21,13 +21,14 @@ test("ASC serial-number help exposes an ordered appliance chooser", () => {
   }
 });
 
-test("cooktop and hob use the oven serial-number image", () => {
+test("cooktop and hob use the dedicated Amica cooktop image", () => {
   const ovenImages = getSerialNumberHelpImages({ claimPartKey: "oven" });
   const hobImages = getSerialNumberHelpImages({ claimPartKey: "hob" });
   const cooktopImages = getSerialNumberHelpImages({ claimPartKey: "cooktop" });
 
-  assert.deepEqual(hobImages, ovenImages);
-  assert.deepEqual(cooktopImages, ovenImages);
+  assert.notDeepEqual(hobImages, ovenImages);
+  assert.deepEqual(cooktopImages, hobImages);
+  assert.match(hobImages[0].src, /amica\/cooktop/);
 });
 
 test("ASC choices and FRG components resolve hood and hob help copy types", () => {
@@ -68,30 +69,30 @@ test("serial-number help images are separated by appliance type", () => {
   });
 
   assert.deepEqual(ovenImages.map((entry) => entry.src), [
-    "/serial%20nr%20img/oven/Amica%20oven%20ARROW.png",
+    "/serial%20nr%20img/amica/oven/Amica%20oven%20ARROW.png",
   ]);
   assert.deepEqual(dishwasherImages.map((entry) => entry.src), [
-    "/serial%20nr%20img/dishwasher/Amica%20dishwasher%20ARROW.png",
+    "/serial%20nr%20img/amica/dishwasher/Amica%20dishwasher%20ARROW.png",
   ]);
   assert.deepEqual(fridgeImages.map((entry) => entry.src), [
-    "/serial%20nr%20img/fridge/Amica%20fridge%20ARROW.png",
+    "/serial%20nr%20img/amica/fridge/Amica%20fridge%20ARROW.png",
   ]);
   assert.deepEqual(extractorHoodImages.map((entry) => entry.src), [
-    "/serial%20nr%20img/extractor-hood/filter-location.jpeg",
-    "/serial%20nr%20img/extractor-hood/rating-plate.jpeg",
+    "/serial%20nr%20img/amica/extractor-hood/filter-location.jpeg",
+    "/serial%20nr%20img/amica/extractor-hood/rating-plate.jpeg",
   ]);
 });
 
 test("serial-number help falls back to both generic examples for unknown products", () => {
   assert.deepEqual(getSerialNumberHelpImages({ resolvedLabel: "Electrical appliance" }), [
-    { src: "/img/AMICA%20SR%20NR.webp", altKey: "serialNumberHelpAlt1" },
-    { src: "/img/AMICA%20FRIDGE.webp", altKey: "serialNumberHelpAlt2" },
+    { src: "/serial%20nr%20img/amica/oven/Amica%20oven%20ARROW.png", altKey: "serialNumberHelpAlt1" },
+    { src: "/serial%20nr%20img/amica/fridge/Amica%20fridge%20ARROW.png", altKey: "serialNumberHelpAlt2" },
   ]);
 });
 
 test("serial-number help handles an unselected product", () => {
   assert.deepEqual(getSerialNumberHelpImages(null), [
-    { src: "/img/AMICA%20SR%20NR.webp", altKey: "serialNumberHelpAlt1" },
-    { src: "/img/AMICA%20FRIDGE.webp", altKey: "serialNumberHelpAlt2" },
+    { src: "/serial%20nr%20img/amica/oven/Amica%20oven%20ARROW.png", altKey: "serialNumberHelpAlt1" },
+    { src: "/serial%20nr%20img/amica/fridge/Amica%20fridge%20ARROW.png", altKey: "serialNumberHelpAlt2" },
   ]);
 });

@@ -29,6 +29,8 @@ import { getFormMessage } from "../../../lib/admin-forms";
 import { filterAdminKitchens, normalizeKitchenSearchQuery } from "../../../lib/admin-kitchen-search";
 import { requireAdminPage } from "../../../lib/auth";
 import { paginateAdminItems } from "../../../lib/admin-pagination";
+import { loadKitchenApplianceInventories } from "../../../lib/contract-appliance-inventory";
+import AdminApplianceSummary from "../../../components/admin-appliance-summary";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +53,7 @@ export default async function AdminKitchensPage({ searchParams }) {
   const filteredKitchens = filterAdminKitchens(allKitchens, kitchenSearchQuery);
   const pagination = paginateAdminItems(filteredKitchens, resolvedSearchParams.page);
   const kitchens = pagination.items;
+  const applianceInventories = await loadKitchenApplianceInventories(kitchens.map((kitchen) => kitchen.id));
 
   return (
     <AdminShell adminEmail={admin.email}>
@@ -165,6 +168,10 @@ export default async function AdminKitchensPage({ searchParams }) {
                 {kitchens.map((kitchen) => (
                   <tr key={kitchen.id}>
                     <td style={tdStyle}>
+                      <details style={{ marginBottom: 8 }}>
+                        <summary><AdminText i18nKey="contractDetailAdmin.appliances" fallback="Electrical appliances" /></summary>
+                        <AdminApplianceSummary appliances={applianceInventories[kitchen.id]} compact />
+                      </details>
                       <Link
                         href={`/admin/kitchens/${kitchen.id}`}
                         style={{ color: "var(--app-accent)", fontWeight: 800, textDecoration: "none" }}

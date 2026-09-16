@@ -11,6 +11,7 @@ import {
   readContractClaimPlanUploads,
   upsertContractClaimPlanUploads,
 } from "../../../../lib/contract-claim-plan-assets";
+import { saveContractApplianceInventory } from "../../../../lib/contract-appliance-inventory";
 
 export async function GET(request) {
   await requireAdminApi();
@@ -196,6 +197,7 @@ export async function POST(request) {
         createdContract.id,
         isArcContract ? { preview: claimPlanUploads.preview, pdf: null } : claimPlanUploads,
       );
+      await saveContractApplianceInventory(tx, createdContract, formData);
     });
 
     return redirectWithFlash(request, returnPath, "success", "Contract number created.");

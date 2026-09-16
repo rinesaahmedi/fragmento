@@ -1,6 +1,6 @@
 import { ItemType, KitchenStatus, OrderStatus } from "@prisma/client";
-import { getOrderDelegate } from "./order-kind";
-import { prisma } from "./prisma";
+import { getOrderDelegate } from "./order-kind.js";
+import { prisma } from "./prisma.js";
 
 export const CONTRACT_ERRORS = {
   REQUIRED: "Contract number is required.",

@@ -65,6 +65,7 @@ export function parseServiceClaimProblemAreas(raw) {
           name,
           ...(nameDe ? { nameDe } : {}),
           code,
+          ...(area?.applianceType ? { applianceType: String(area.applianceType).trim() } : {}),
           ...(articleCode ? { articleCode } : {}),
           ...(detail ? { detail } : {}),
           ...(serialNumber ? { serialNumber } : {}),

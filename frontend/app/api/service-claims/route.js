@@ -30,6 +30,7 @@ import { isElectricalApplianceProblemArea } from "../../../lib/service-claim-ser
 import { formatServiceClaimEmailSubject } from "../../../lib/service-claim-email-subject";
 import { getServiceClaimKitchenPlan } from "../../../lib/service-claim-kitchen-plan";
 import { buildServiceClaimComponentChoiceGroups } from "../../../lib/service-claim-component-choices";
+import { validateReferenceAppliances } from "../../../lib/contract-appliances";
 import { stripProductDimensionsFromLabel } from "../../../lib/product-label-format";
 import { getOrderKindForContractNumber } from "../../../lib/order-kind";
 import {
@@ -157,6 +158,7 @@ function normalizeReferenceIssuesJson(referenceIssuesJsonRaw) {
       componentId,
       name,
       code: isElectrical ? "REFERENCE-ELECTRICAL" : "REFERENCE-FURNITURE",
+      ...(isElectrical ? { applianceType: area.applianceType } : {}),
       detail,
       ...(isElectrical ? { serialNumber: requiredString(area.serialNumber, "Serial number") } : {}),
       ...(area.planMarker ? { planMarker: area.planMarker } : {}),
@@ -1556,12 +1558,13 @@ export async function POST(request) {
       normalizeProblemAreasJson(body.problemAreasJson),
       body.confirmedChoiceGroupsJson,
     );
-    const referenceIssues = normalizeReferenceIssuesJson(body.referenceIssuesJson);
+    let referenceIssues = normalizeReferenceIssuesJson(body.referenceIssuesJson);
     if (referenceIssues.length) {
       const kitchenPlan = await getServiceClaimKitchenPlan(contractNumber);
       if (kitchenPlan?.selectionMode !== "reference-pdf") {
         throw new Error("Reference-plan components are not allowed for this contract.");
       }
+      referenceIssues = validateReferenceAppliances(referenceIssues, kitchenPlan);
     }
     const allProblemAreas = [
       ...parseServiceClaimProblemAreas(resolvedProblemAreasJson),

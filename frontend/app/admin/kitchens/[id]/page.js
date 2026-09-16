@@ -38,6 +38,8 @@ import { getKitchenCatalogImagePreview, getKitchenCatalogPreviewHotspots, getKit
 import { getKitchenStructureSlots } from "../../../../lib/kitchen-structure";
 import { loadKitchenSvgMarkup } from "../../../../lib/load-kitchen-svg";
 import { prisma } from "../../../../lib/prisma";
+import { loadKitchenApplianceInventories } from "../../../../lib/contract-appliance-inventory";
+import AdminApplianceSummary from "../../../../components/admin-appliance-summary";
 
 export const dynamic = "force-dynamic";
 
@@ -420,6 +422,7 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
   const { id } = await params;
   const resolvedSearchParams = (await searchParams) || {};
   const kitchen = await getKitchenById(id);
+  const applianceInventories = kitchen ? await loadKitchenApplianceInventories([id]) : {};
 
   if (!kitchen) {
     return (
@@ -579,6 +582,10 @@ export default async function AdminKitchenDetailPage({ params, searchParams }) {
               <AdminStatusBadge status={kitchen.status} />
             </div>
           </form>
+        </AdminSection>
+
+        <AdminSection title={<AdminText i18nKey="contractDetailAdmin.appliances" fallback="Electrical appliances" />} description={<AdminText i18nKey="contractDetailAdmin.kitchenAppliancesHelp" fallback="Included kitchen appliances. Contract details also include confirmed optional appliances and installed-brand overrides." />}>
+          <AdminApplianceSummary appliances={applianceInventories[id]} />
         </AdminSection>
 
         <div style={contractNoticeStyle}>

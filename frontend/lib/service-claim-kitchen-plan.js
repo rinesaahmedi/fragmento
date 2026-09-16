@@ -7,6 +7,7 @@ import { prisma } from "./prisma.js";
 import { buildServiceClaimSelectableComponents } from "./service-claim-kitchen-plan-selection.js";
 import { normalizeServiceClaimContractNumber } from "./service-claims.js";
 import { buildServiceClaimReferencePlan } from "./service-claim-reference-plan.js";
+import { loadContractApplianceInventory } from "./contract-appliance-inventory.js";
 
 async function loadKitchenClaimParts(kitchenId) {
   try {
@@ -46,12 +47,19 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
   try {
     const contract = await prisma.kitchenContract.findUnique({
       where: { contractNumber: normalized },
-      include: { kitchen: true },
+      include: {
+        kitchen: true,
+        appliances: {
+          orderBy: [{ applianceType: "asc" }],
+        },
+      },
     });
 
     if (!contract?.isActive) {
       return null;
     }
+
+    const applianceInventory = await loadContractApplianceInventory(contract);
 
     // Read reference assets explicitly so a running dev server can pick up a
     // newly migrated optional column without requiring a Prisma engine restart.
@@ -81,6 +89,8 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       return {
         ...referencePlan,
         contractType: contract.contractType,
+        appliances: applianceInventory.appliances,
+        appliancesConfigured: applianceInventory.configured,
       };
     }
 
@@ -121,6 +131,8 @@ export async function getServiceClaimKitchenPlan(contractNumber) {
       selectableComponents: selectable.selectableComponents,
       visibleComponentIds: selectable.visibleComponentIds,
       claimParts,
+      appliances: applianceInventory.appliances,
+      appliancesConfigured: applianceInventory.configured,
     };
   } catch (error) {
     console.warn("Service claim kitchen plan:", error?.message || error);

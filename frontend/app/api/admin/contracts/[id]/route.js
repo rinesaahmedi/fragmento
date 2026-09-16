@@ -7,6 +7,7 @@ import {
   readContractClaimPlanUploads,
   upsertContractClaimPlanUploads,
 } from "../../../../../lib/contract-claim-plan-assets";
+import { saveContractApplianceInventory } from "../../../../../lib/contract-appliance-inventory";
 
 function getReturnPath(formData, fallback) {
   const rawPath = String(formData.get("returnTo") || "").trim();
@@ -182,6 +183,7 @@ export async function POST(request, { params }) {
             preview: claimPlanUploads.preview,
             pdf: null,
           });
+          await saveContractApplianceInventory(tx, { ...contract, kitchenId: referenceKitchen.id }, formData);
         });
 
         return redirectWithFlash(request, returnPath, "success", "ARC contract updated.");
@@ -234,6 +236,11 @@ export async function POST(request, { params }) {
           },
         });
         await upsertContractClaimPlanUploads(tx, id, claimPlanUploads);
+        if (resolvedKitchenId !== contract.kitchenId) {
+          await tx.contractAppliance.deleteMany({ where: { kitchenContractId: id } });
+          await tx.kitchenContract.update({ where: { id }, data: { appliancesConfigured: false } });
+        }
+        await saveContractApplianceInventory(tx, { ...contract, contractNumber: data.contractNumber, kitchenId: resolvedKitchenId }, formData);
       });
 
       return redirectWithFlash(request, returnPath, "success", "Contract number updated.");
