@@ -8,9 +8,9 @@ export const CONTRACT_ACCESS_REPORT_EVENT_TYPES = [
 ];
 
 const RESULT_LABELS = {
-  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED]: "Erfolgreich",
-  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED]: "Testvertrag",
-  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED]: "Abgelehnt",
+  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED]: "Accepted",
+  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED]: "Test contract",
+  [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED]: "Rejected",
 };
 
 function escapeHtml(value) {
@@ -29,7 +29,7 @@ function getContractNumber(event) {
 }
 
 function getSource(event) {
-  return event?.source || event?.referrerHost || "Direkt";
+  return event?.source || event?.referrerHost || "Direct";
 }
 
 function getDevice(event) {
@@ -45,14 +45,14 @@ export function getContractAccessReportWindow(now = new Date()) {
 }
 
 export function buildContractAccessReport({ events = [], start, end }) {
-  const dateFormatter = new Intl.DateTimeFormat("de-DE", {
+  const dateFormatter = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
     timeStyle: "medium",
     timeZone: "Europe/Berlin",
   });
   const period = `${dateFormatter.format(start)} – ${dateFormatter.format(end)}`;
   const count = events.length;
-  const subject = `[Fragmento] Vertragszugriffe der letzten 24 Stunden (${count})`;
+  const subject = `[Fragmento] Contract access attempts in the last 24 hours (${count})`;
 
   const rows = events.map((event) => {
     const values = [
@@ -68,30 +68,30 @@ export function buildContractAccessReport({ events = [], start, end }) {
 
   const emptyRow = `
     <tr>
-      <td colspan="6" style="padding:18px 10px;color:#74665b;text-align:center;">Keine Zugriffsversuche in diesem Zeitraum.</td>
+      <td colspan="6" style="padding:18px 10px;color:#74665b;text-align:center;">No access attempts during this period.</td>
     </tr>`;
 
   const html = `<!doctype html>
-  <html lang="de">
+  <html lang="en">
     <body style="margin:0;padding:24px;background:#f3ebe2;font-family:Arial,Helvetica,sans-serif;color:#332820;">
       <div style="max-width:980px;margin:0 auto;background:#fff;border:1px solid #dfd1c3;border-radius:14px;overflow:hidden;">
         <div style="padding:22px 26px;background:#7b3f2d;color:#fff;">
-          <div style="font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#f5d9ca;">Fragmento · Sicherheitsbericht</div>
-          <h1 style="margin:7px 0 0;font-size:24px;">Vertragszugriffe der letzten 24 Stunden</h1>
+          <div style="font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#f5d9ca;">Fragmento · Security report</div>
+          <h1 style="margin:7px 0 0;font-size:24px;">Contract access attempts in the last 24 hours</h1>
         </div>
         <div style="padding:22px 26px;">
-          <p style="margin:0 0 6px;"><strong>${count}</strong> Zugriffsversuch${count === 1 ? "" : "e"}</p>
-          <p style="margin:0 0 18px;color:#74665b;">Zeitraum: ${escapeHtml(period)}</p>
+          <p style="margin:0 0 6px;"><strong>${count}</strong> access attempt${count === 1 ? "" : "s"}</p>
+          <p style="margin:0 0 18px;color:#74665b;">Period (Europe/Berlin): ${escapeHtml(period)}</p>
           <div style="overflow-x:auto;">
             <table style="width:100%;border-collapse:collapse;font-size:13px;">
               <thead>
                 <tr style="background:#f8f1ea;text-align:left;">
-                  <th style="padding:9px 10px;">Zeit</th>
-                  <th style="padding:9px 10px;">Vertragsnummer</th>
-                  <th style="padding:9px 10px;">Ergebnis</th>
-                  <th style="padding:9px 10px;">Land</th>
-                  <th style="padding:9px 10px;">Quelle</th>
-                  <th style="padding:9px 10px;">Gerät</th>
+                  <th style="padding:9px 10px;">Time</th>
+                  <th style="padding:9px 10px;">Contract number</th>
+                  <th style="padding:9px 10px;">Result</th>
+                  <th style="padding:9px 10px;">Country</th>
+                  <th style="padding:9px 10px;">Source</th>
+                  <th style="padding:9px 10px;">Device</th>
                 </tr>
               </thead>
               <tbody>${rows || emptyRow}</tbody>
@@ -115,11 +115,11 @@ export function buildContractAccessReport({ events = [], start, end }) {
     subject,
     html,
     text: [
-      "Fragmento – Vertragszugriffe der letzten 24 Stunden",
-      `Zeitraum: ${period}`,
-      `Zugriffsversuche: ${count}`,
+      "Fragmento – Contract access attempts in the last 24 hours",
+      `Period (Europe/Berlin): ${period}`,
+      `Access attempts: ${count}`,
       "",
-      ...(textRows.length ? textRows : ["Keine Zugriffsversuche in diesem Zeitraum."]),
+      ...(textRows.length ? textRows : ["No access attempts during this period."]),
     ].join("\n"),
   };
 }

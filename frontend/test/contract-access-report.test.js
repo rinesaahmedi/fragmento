@@ -43,8 +43,23 @@ test("daily contract report contains complete attempted numbers and outcomes", (
   assert.match(report.subject, /\(2\)$/);
   assert.match(report.html, /334123456/);
   assert.match(report.html, /670103898/);
-  assert.match(report.html, /Abgelehnt/);
-  assert.match(report.html, /Erfolgreich/);
+  assert.match(report.html, /Rejected/);
+  assert.match(report.html, /Accepted/);
+  assert.match(report.subject, /Contract access attempts in the last 24 hours/);
+  assert.match(report.html, /<html lang="en">/);
+  assert.match(report.html, /Contract number/);
+  assert.match(report.text, /Access attempts: 2/);
+  assert.match(report.text, /16 Sept 2026/);
+});
+
+test("empty daily report uses English in both email formats", () => {
+  const report = buildContractAccessReport({
+    start: new Date("2026-09-15T06:00:00.000Z"),
+    end: new Date("2026-09-16T06:00:00.000Z"),
+  });
+
+  assert.match(report.html, /No access attempts during this period\./);
+  assert.match(report.text, /No access attempts during this period\./);
 });
 
 test("Hetzner deployment owns the 08:00 Europe-Berlin schedule", () => {
