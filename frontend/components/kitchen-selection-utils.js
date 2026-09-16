@@ -706,7 +706,7 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   if (code === "SVC-PICKUP-001") {
     return translate("configurator.catalogItemNames.servicePickup", "Pickup at logistics location");
   }
-  if (articleNumber.replace(/\s+/g, "") === "EH92364E-A+9EC744100C+UHK") {
+  if (articleNumber.replace(/\s+/g, "") === "A-EH923640E+9EC744100C") {
     return withDimensions(translate(
       "configurator.itemNameOvenCeramicHob",
       language === "de"
@@ -1471,11 +1471,6 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
 const PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER = {
   "A-EH923640E + 9EC744100C": [
     { label: "Backofen PDF", href: "/product-info/ovens/eh923640e/a-eh923640e-product-info.pdf" },
-    { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
-  ],
-  "EH92364E-A + 9EC744100C + UHK": [
-    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
-    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
     { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
   ],
 };

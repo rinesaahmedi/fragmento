@@ -5,6 +5,7 @@ import { runInNewContext } from "node:vm";
 import {
   getLinkedComponentIds,
   getLocalizedItemName,
+  getProductInfoDocuments,
 } from "../components/kitchen-selection-utils.js";
 import {
   PLAN_HOTSPOTS_BY_SLUG,
@@ -88,7 +89,7 @@ test("AB 105759 hood cabinet and extractor select as one catalog package", () =>
 test("AB 105759 uses the concise oven package name even when catalog linked", () => {
   const item = {
     code: "OVEN-B-600-HOB",
-    articleNumber: "EH92364E-A + 9EC744100C + UHK",
+    articleNumber: "A-EH923640E + 9EC744100C",
     catalogArticleId: "catalog-oven-105759",
     name: "Built-in Oven / Ceramic Cooktop 60 cm / Lower Cabinet for Built-in Oven",
   };
@@ -172,7 +173,7 @@ test("AB 105759 seeds dual contracts and catalog links for every schedule row", 
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "111"\)/);
   assert.match(seed, /articleNumber: "SP60"/);
   assert.match(seed, /articleNumber: "PLR60"/);
-  assert.match(seed, /const AB_105759_OVEN_HOB_CATALOG_ARTICLE = "EH92364E-A \+ 9EC744100C \+ UHK"/);
+  assert.match(seed, /const AB_105759_OVEN_HOB_CATALOG_ARTICLE = "A-EH923640E \+ 9EC744100C"/);
   assert.match(items, /articleNumber: AB_105759_OVEN_HOB_CATALOG_ARTICLE/);
   assert.match(items, /catalogArticleNumber: AB_105759_OVEN_HOB_CATALOG_ARTICLE/);
   assert.match(seed, /articleNumber: "526335 \+ 517720"/);
@@ -197,4 +198,17 @@ test("AB 105759 seeds dual contracts and catalog links for every schedule row", 
   assert.match(catalog, /widthMm: catalogArticle \? catalogArticle\.widthMm \?\? null : item\.widthMm \?\? null/);
   assert.match(catalog, /heightMm: catalogArticle \? catalogArticle\.heightMm \?\? null : item\.heightMm \?\? null/);
   assert.match(catalog, /depthMm: catalogArticle \? catalogArticle\.depthMm \?\? null : item\.depthMm \?\? null/);
+});
+
+test("EH923640E oven packages show only model-specific oven and cooktop PDFs, without E-label", () => {
+  const documents = getProductInfoDocuments({
+    code: "OVEN-B-600-HOB",
+    articleNumber: "A-EH923640E + 9EC744100C",
+  });
+  assert.deepEqual(documents.map(({ label }) => label), ["Backofen PDF", "Kochfeld PDF"]);
+  for (const { href } of documents) {
+    assert.ok(existsSync(new URL(`../public${href}`, import.meta.url)), `${href} must exist`);
+    assert.doesNotMatch(href, /ebx|92364e-a|elabel/i);
+  }
+  assert.match(documents[0].href, /a-eh923640e-product-info\.pdf$/);
 });

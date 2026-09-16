@@ -22,7 +22,7 @@ const DEFAULT_OVEN_HOB_CATALOG_NAME_EN = "Built-in oven and induction hob";
 const DEFAULT_OVEN_HOB_CATALOG_NAME_DE = "Einbaubackofen und Kochfeld";
 const DEFAULT_OVEN_HOB_CATALOG_ARTICLE = "EBX943600S + OL-KMI754000E";
 const DEFAULT_OVEN_HOB_CATALOG_PRICE = "0.00";
-const AB_105759_OVEN_HOB_CATALOG_ARTICLE = "EH92364E-A + 9EC744100C + UHK";
+const AB_105759_OVEN_HOB_CATALOG_ARTICLE = "A-EH923640E + 9EC744100C";
 const DEFAULT_SINK_BASE_CATALOG_CODE = "SINKBASE-B-600";
 const DEFAULT_SINK_BASE_CATALOG_NAME_EN = "Sink Lower Cabinet";
 const DEFAULT_SINK_BASE_CATALOG_NAME_DE = "Spülenunterschrank";
@@ -162,7 +162,6 @@ const BUNDLE_PRICES = {
 
 const CATALOG_ARTICLES = [
   { articleNumber: DEFAULT_OVEN_HOB_CATALOG_ARTICLE, name: DEFAULT_OVEN_HOB_CATALOG_NAME_EN, nameDe: DEFAULT_OVEN_HOB_CATALOG_NAME_DE, widthMm: 600, price: DEFAULT_OVEN_HOB_CATALOG_PRICE, itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
-  { articleNumber: AB_105759_OVEN_HOB_CATALOG_ARTICLE, name: "Built-in oven and ceramic cooktop", nameDe: "Einbauherd und Glaskeramikkochfeld", widthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "PLR60", name: DEFAULT_WORKTOP_CATALOG_NAME_EN, nameDe: DEFAULT_WORKTOP_CATALOG_NAME_DE, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "SP60", name: DEFAULT_SINK_BASE_CATALOG_NAME_EN, nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE, widthMm: 600, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "526335 + 517720", name: "Sink and faucet set", nameDe: "Spüle und Armatur", price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
@@ -820,7 +819,6 @@ const AB_109955_OVEN_CLAIM_PRODUCT_INFO = {
 };
 PRODUCT_INFO_BY_ARTICLE_NUMBER["A-EH923640E"] = AB_109955_OVEN_CLAIM_PRODUCT_INFO;
 PRODUCT_INFO_BY_ARTICLE_NUMBER["A-EH923640E + 9EC744100C"] = AB_109955_OVEN_CLAIM_PRODUCT_INFO;
-PRODUCT_INFO_BY_ARTICLE_NUMBER[AB_105759_OVEN_HOB_CATALOG_ARTICLE] = OVEN_CLAIM_PRODUCT_INFO;
 const COOKTOP_CLAIM_PRODUCT_INFO = {
   productImagePath: PRODUCT_IMAGE_FILES.hob,
   productInfoPdfPath: PRODUCT_INFO_FILES.cooktop,
@@ -1234,7 +1232,7 @@ const AB_105759_ITEMS = [
     catalogArticleNumber: AB_105759_OVEN_HOB_CATALOG_ARTICLE,
     name: "Built-in oven and ceramic cooktop",
     nameDe: "Einbauherd und Glaskeramikkochfeld",
-    infoText: "EH92364E-A oven, 9EC744100C ceramic cooktop and UHK lower cabinet",
+    infoText: "A-EH923640E oven, 9EC744100C ceramic cooktop and UHK lower cabinet",
     sortOrder: 10,
     widthMm: 600,
   }),
@@ -2073,7 +2071,7 @@ const AB_105815_ITEMS = AB_105811_ITEMS.map((item) => ({
 // Schedule rows 1-3 are the included oven, worktop, and sink cabinet. The
 // separately priced UPK20 is the slim left end filler beside the sink.
 const AB_105760_ITEMS = [
-  defaultOvenHob({ catalogArticleNumber: "A-EH923640E + 9EC744100C", widthMm: 600, sortOrder: 10 }),
+  defaultOvenHob({ catalogArticleNumber: "A-EH923640E + 9EC744100C", infoText: "A-EH923640E oven, 9EC744100C ceramic cooktop and UHK lower cabinet", widthMm: 600, sortOrder: 10 }),
   defaultWorktop({ sortOrder: 20 }),
   defaultSinkBase({ widthMm: 600, heightMm: 878, depthMm: 600, sortOrder: 30 }),
   sinkEndBlende("105760", { sortOrder: 40, catalogBlendeCode: "UPK20" }),

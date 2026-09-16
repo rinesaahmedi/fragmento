@@ -955,7 +955,11 @@ function mergeInitialOrderItemFields(item, itemType, initialOrderItemLookup) {
 
   return {
     ...item,
-    articleNumber: initialItem.articleNumber || item.articleNumber,
+    // Included catalog packages use the current catalog identity. Historical
+    // order snapshots still identify paid items and their selected variants.
+    articleNumber: item.isLocked
+      ? item.articleNumber
+      : initialItem.articleNumber || item.articleNumber,
     blendeCode: initialItem.blendeCode || item.blendeCode,
     blendeLabel: initialItem.blendeLabel || item.blendeLabel,
     blendeName: initialItem.blendeName || item.blendeName,
