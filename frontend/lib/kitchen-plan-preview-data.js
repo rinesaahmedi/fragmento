@@ -93,6 +93,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105754": "/plans/AB%20105748.svg",
   "ab-105755": "/plans/AB%20105746.svg",
   "ab-105757": "/plans/AB%20105757.svg",
+  "ab-105759": "/plans/AB%20105759.svg",
   "ab-110140": "/plans/AB%20110140.svg",
   "ab-110510": "/plans/AB%20110510.svg",
   "ab-111539": "/plans/AB%20111539.svg",
@@ -134,6 +135,10 @@ export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
   "ab-105760": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 24.855107, top: 76.100840, width: 14.551069, height: 8.047059, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 30.783848, top: 87.717647, width: 2.878860, height: 3.731092, persistWhenSelected: true },
+  ],
+  "ab-105759": [
+    { key: "dishwasher-basket", componentKey: "base-module-3", left: 62.25, top: 71.8, width: 12.85, height: 8.45, persistWhenSelected: true },
+    { key: "dishwasher-gs-mark", componentKey: "base-module-3", left: 68.1, top: 82.9, width: 2.8, height: 4.05, persistWhenSelected: true },
   ],
   "burger-103898": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 66.449, top: 72.222, width: 8.85, height: 7.95 },
@@ -1586,6 +1591,27 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-3", left: 55.31, top: 63.4, width: 14.05, height: 23.86 },
     { componentKey: "drawer-module", left: 69.36, top: 63.4, width: 14.07, height: 23.86 },
     { componentKey: "refrigerator", left: 84.07, top: 32.7, width: 13.02, height: 59.2 },
+  ],
+  // AB 105759-56: 400/600/300/600/600/900 mm linear run, fridge left.
+  "ab-105759": [
+    { componentKey: "refrigerator", left: 2.56, top: 31.45, width: 13.27, height: 60.43 },
+    { componentKey: "wall-cabinet-1", left: 16.73, top: 19.13, width: 9.56, height: 24.46 },
+    { componentKey: "wall-cabinet-2", left: 26.29, top: 19.13, width: 14.33, height: 24.46 },
+    { componentKey: "extractor-hood", left: 26.29, top: 43.59, width: 14.33, height: 6.75 },
+    { componentKey: "wall-cabinet-3", left: 40.62, top: 19.13, width: 7.16, height: 24.46 },
+    { componentKey: "wall-cabinet-4", left: 47.78, top: 19.13, width: 14.33, height: 24.46 },
+    { componentKey: "wall-cabinet-5", left: 62.11, top: 19.13, width: 14.32, height: 24.46 },
+    { componentKey: "wall-cabinet-6", left: 76.43, top: 19.13, width: 22.59, height: 24.46 },
+    { componentKey: "worktop", left: 16.24, top: 61.31, width: 82.78, height: 1.37 },
+    { componentKey: "worktop", left: 16.24, top: 62.68, width: 0.4, height: 24.44, separateLockedSidePanel: true },
+    { componentKey: "worktop", left: 76.318039, top: 62.66129, width: 0.370476, height: 24.435484, separateLockedSidePanel: true },
+    { componentKey: "sink-faucet", left: 49.75, top: 54.25, width: 3, height: 7.06 },
+    { componentKey: "base-module-1", left: 16.64, top: 62.68, width: 9.55, height: 24.44 },
+    { componentKey: "oven-module", left: 26.19, top: 62.68, width: 14.33, height: 24.44 },
+    { componentKey: "base-module-2", left: 40.52, top: 62.68, width: 7.16, height: 24.44 },
+    { componentKey: "sink-base", left: 47.68, top: 62.68, width: 14.33, height: 24.44 },
+    { componentKey: "base-module-3", left: 62.01, top: 62.68, width: 14.308039, height: 24.44 },
+    { componentKey: "drawer-module", left: 76.688515, top: 62.68, width: 22.31405, height: 24.44 },
   ],
   "ab-105744": [
     { componentKey: "wall-cabinet-1", left: 0.85, top: 19.8, width: 14.8, height: 24.45 },

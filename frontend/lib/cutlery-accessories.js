@@ -53,6 +53,7 @@ const CUTLERY_INCOMPATIBLE_COMPONENT_KEYS = new Set([
 // inserts, use the physical drawer widths instead of the commercial cabinet
 // width shown in the price list.
 const CUTLERY_PHYSICAL_WIDTHS_MM_BY_COMPONENT_CODE = new Map([
+  ["CAB-BASE-AB105759-US90-UPK20", [450, 450]],
   ["CAB-BASE-AB109873-US90", [450, 450]],
 ]);
 

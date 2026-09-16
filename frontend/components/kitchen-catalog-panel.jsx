@@ -41,7 +41,13 @@ const DISHWASHER_BASE_MARKUP =
 const WALL_CABINET_DOUBLE_DOOR_MARKUP =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 72.3" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="89" height="71.3"/><line x1="45" y1="0.5" x2="45" y2="71.8"/><line x1="40" y1="36.5" x2="40" y2="53.5" stroke-linecap="round" stroke-width="1.5"/><line x1="50" y1="36.5" x2="50" y2="53.5" stroke-linecap="round" stroke-width="1.5"/></svg>';
 
+const LOWER_CABINET_DOUBLE_FRONT_MARKUP =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="89" height="2"/><rect x="0.5" y="2.5" width="89" height="69"/><rect x="0.5" y="72.5" width="89" height="9"/><line x1="0" y1="18" x2="90" y2="18"/><line x1="45" y1="2.5" x2="45" y2="71.5"/><line x1="14" y1="10" x2="31" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="59" y1="10" x2="76" y2="10" stroke-linecap="round" stroke-width="1.5"/><line x1="39" y1="31" x2="39" y2="48" stroke-linecap="round" stroke-width="1.5"/><line x1="51" y1="31" x2="51" y2="48" stroke-linecap="round" stroke-width="1.5"/></svg>';
+
 const DOUBLE_DOOR_WALL_CABINET_ARTICLES = new Set(["H8002", "H9002"]);
+const DOUBLE_FRONT_LOWER_CABINET_ARTICLES = new Set(["US90"]);
+const DOUBLE_FRONT_THREE_DRAWER_MARKUP =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 82" fill="none" stroke="currentColor" stroke-width="1"><rect x="0.5" y="0.5" width="89" height="2"/><rect x="0.5" y="2.5" width="89" height="69"/><rect x="0.5" y="72.5" width="89" height="9"/><line x1="45" y1="2.5" x2="45" y2="71.5"/><line x1="0" y1="16" x2="90" y2="16"/><line x1="0" y1="44" x2="90" y2="44"/><g stroke-linecap="round" stroke-width="1.5"><line x1="14" y1="9" x2="31" y2="9"/><line x1="59" y1="9" x2="76" y2="9"/><line x1="14" y1="30" x2="31" y2="30"/><line x1="59" y1="30" x2="76" y2="30"/><line x1="14" y1="58" x2="31" y2="58"/><line x1="59" y1="58" x2="76" y2="58"/></g></svg>';
 
 const ICON_MARKUP = {
   dishwasher: DISHWASHER_BASE_MARKUP,
@@ -161,9 +167,18 @@ function getCatalogIconMarkup(item, stretchWidthOnly) {
     item?.articleNumber || item?.catalogArticle?.articleNumber || "",
   ).trim().toUpperCase();
   const iconKey = String(item?.iconKey || "");
-  const markup = DOUBLE_DOOR_WALL_CABINET_ARTICLES.has(articleNumber) && iconKey.startsWith("wall_cabinet")
-    ? WALL_CABINET_DOUBLE_DOOR_MARKUP
-    : ICON_MARKUP[iconKey] || "";
+  const isDoubleFrontThreeDrawerCabinet =
+    articleNumber === "US2A90" && iconKey === "drawer_base_three";
+  const isDoubleFrontLowerCabinet =
+    DOUBLE_FRONT_LOWER_CABINET_ARTICLES.has(articleNumber)
+    && (iconKey.startsWith("drawer_base") || iconKey.startsWith("base_cabinet"));
+  const markup = isDoubleFrontThreeDrawerCabinet
+    ? DOUBLE_FRONT_THREE_DRAWER_MARKUP
+    : isDoubleFrontLowerCabinet
+      ? LOWER_CABINET_DOUBLE_FRONT_MARKUP
+      : DOUBLE_DOOR_WALL_CABINET_ARTICLES.has(articleNumber) && iconKey.startsWith("wall_cabinet")
+        ? WALL_CABINET_DOUBLE_DOOR_MARKUP
+        : ICON_MARKUP[iconKey] || "";
   if (!stretchWidthOnly || !markup.trim().startsWith("<svg")) return markup;
 
   return markup.replace(
@@ -457,13 +472,13 @@ function CatalogItem({
             {
               option: noAuszugOption,
               label: translate("configurator.auszugBaseOptionLabel", "1 Drawer"),
-              iconMarkup: ICON_MARKUP.drawer_base_two,
+              iconMarkup: getCatalogIconMarkup({ ...item, articleNumber: noAuszugOption.articleNumber, iconKey: "drawer_base_two" }, false),
               upgradePrice: 0,
             },
             {
               option: yesAuszugOption,
               label: translate("configurator.auszugOptionLabel", "3 Drawers"),
-              iconMarkup: ICON_MARKUP.drawer_base_three,
+              iconMarkup: getCatalogIconMarkup({ ...item, articleNumber: yesAuszugOption.articleNumber, iconKey: "drawer_base_three" }, false),
               upgradePrice: auszugUpgradePrice,
             },
           ].map(({ option, label, iconMarkup: variantIconMarkup, upgradePrice }) => {

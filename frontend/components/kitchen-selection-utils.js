@@ -530,6 +530,20 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB105757-H6002-2": "12",
   "CAB-WALL-AB105757-H6002-3": "13",
   "CAB-WALL-AB105757-H6002-4": "14",
+  "TOP-AB105759": "2",
+  "SINK-BASE-AB105759-SP60": "3",
+  "REF-AB105759-KGCN388140E": "4",
+  "CAB-BASE-AB105759-US40": "5",
+  "CAB-BASE-AB105759-US30": "6",
+  "DISH-AB105759-600": "7",
+  "CAB-BASE-AB105759-US90-UPK20": "8",
+  "CAB-WALL-AB105759-H4002": "9",
+  "CAB-HOOD-AB105759-600": "10",
+  "HOOD-AB105759-FH664621E": "10",
+  "CAB-WALL-AB105759-H3002": "11",
+  "CAB-WALL-AB105759-H6002-1": "12",
+  "CAB-WALL-AB105759-H6002-2": "13",
+  "CAB-WALL-AB105759-H9002-HPK2002": "14",
   "SINK-BASE-AB109873-SP120": "3",
   "DISH-AB109873-600": "5",
   "CAB-BASE-AB109873-US90": "6",
@@ -661,6 +675,9 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
 
 export function getLocalizedItemName(item, translate, language = "en", includeCalloutNumber = true) {
   const code = String(item?.code || "").trim().toUpperCase();
+  const articleNumber = String(
+    item?.articleNumber || item?.catalogArticle?.articleNumber || "",
+  ).trim().toUpperCase();
   const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
   const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
   const rawTitle = stripDimensionsFromName(rawName);
@@ -688,6 +705,14 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   }
   if (code === "SVC-PICKUP-001") {
     return translate("configurator.catalogItemNames.servicePickup", "Pickup at logistics location");
+  }
+  if (articleNumber.replace(/\s+/g, "") === "EH92364E-A+9EC744100C+UHK") {
+    return withDimensions(translate(
+      "configurator.itemNameOvenCeramicHob",
+      language === "de"
+        ? "Einbauherd und Glaskeramikkochfeld"
+        : "Built-in oven and ceramic cooktop",
+    ));
   }
   if ((item?.catalogArticleId || item?.catalogServiceId) && rawName) {
     return withPhotoNumber(rawName);
@@ -1226,6 +1251,7 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-104968": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105746": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105757": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105759": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105749": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105752": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105755": [["component-wall-cabinet-2", "component-extractor-hood"]],
@@ -1445,6 +1471,11 @@ const PRODUCT_INFO_DOCUMENTS_BY_CODE = {
 const PRODUCT_INFO_DOCUMENTS_BY_ARTICLE_NUMBER = {
   "A-EH923640E + 9EC744100C": [
     { label: "Backofen PDF", href: "/product-info/ovens/eh923640e/a-eh923640e-product-info.pdf" },
+    { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
+  ],
+  "EH92364E-A + 9EC744100C + UHK": [
+    { label: "Backofen E-Label", href: "/product-info/ebx-943-600-s-elabel-1901.pdf" },
+    { label: "Backofen PDF", href: "/product-info/ebx-943-600-s-product-info.pdf" },
     { label: "Kochfeld PDF", href: "/product-info/hobs/ec744100c/ec744100c-product-info.pdf" },
   ],
 };
@@ -1726,6 +1757,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "DISH-AB104968-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105746-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105757-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
+  "DISH-AB105759-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105841-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105811-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
   "DISH-AB105815-600": Array.from({ length: 20 }, (_, index) => `/product-images/gallery/a-egspv597210-dishwasher/${String(index + 1).padStart(2, "0")}.webp`),
@@ -1762,6 +1794,8 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "CAB-HOOD-AB105746-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-AB105757-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB105757-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "HOOD-AB105759-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
+  "CAB-HOOD-AB105759-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "HOOD-C-FH664621E": ["/product-images/gallery/khf664611s-chimney-hood/01.jpg"],
   "HOOD-AB105845-FH664621E": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
   "CAB-HOOD-AB105845-600": ["/product-images/gallery/fh664621s-flat-hood/01.webp"],
@@ -1788,6 +1822,7 @@ const PRODUCT_IMAGE_GALLERIES_BY_CODE = {
   "REF-AB104968-KGCN388140E": KGCN388140E_GALLERY,
   "REF-AB105746-KGCN388140E": KGCN388140E_GALLERY,
   "REF-AB105757-KGCN388140E": KGCN388140E_GALLERY,
+  "REF-AB105759-KGCN388140E": KGCN388140E_GALLERY,
   "REF-AB105811-KGCN388140E": KGCN388140E_GALLERY,
   "REF-AB105815-KGCN388140E": KGCN388140E_GALLERY,
   "WM-B-EWA34660W": Array.from({ length: 8 }, (_, index) => `/product-images/gallery/ewa34660w-washing-machine/${String(index + 1).padStart(2, "0")}.webp`),

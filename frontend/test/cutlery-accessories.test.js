@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   getAvailableCutleryVariantsForComponents,
   isCutleryInsertCompatibleCabinet,
+  normalizeCutleryLines,
 } from "../lib/cutlery-accessories.js";
 
 test("cutlery inserts require a drawer-capable lower cabinet", () => {
@@ -43,6 +44,32 @@ test("legacy drawer metadata remains compatible and controls maximum quantity", 
     available.map(({ articleNumber, widthCm, maxQuantity }) => ({ articleNumber, widthCm, maxQuantity })),
     [{ articleNumber: "ZB45SG", widthCm: 45, maxQuantity: 2 }],
   );
+});
+
+test("AB 105759 offers catalog-priced 45 cm inserts for both drawer variants", () => {
+  for (const articleNumber of ["US90", "US2A90"]) {
+    const available = getAvailableCutleryVariantsForComponents([
+      { code: "CAB-BASE-AB105759-US40", articleNumber: "US40", widthMm: 400, iconKey: "drawer_base_two", componentKey: "base-module-1" },
+      { code: "CAB-BASE-AB105759-US30", articleNumber: "US30", widthMm: 300, iconKey: "drawer_base_two", componentKey: "base-module-2" },
+      { code: "CAB-BASE-AB105759-US90-UPK20", articleNumber, widthMm: 900, iconKey: articleNumber === "US90" ? "drawer_base_two" : "drawer_base_three", componentKey: "drawer-module" },
+    ], [
+      { articleNumber: "ZB30SG", widthCm: 30, price: 19 },
+      { articleNumber: "ZB40SG", widthCm: 40, price: 19 },
+      { articleNumber: "ZB45SG", widthCm: 45, price: 24, catalogArticleId: "catalog-45" },
+      { articleNumber: "ZB90SG", widthCm: 90, price: 31 },
+    ]);
+    assert.deepEqual(available.map(({ articleNumber, maxQuantity }) => ({ articleNumber, maxQuantity })), [
+      { articleNumber: "ZB45SG", maxQuantity: 2 },
+      { articleNumber: "ZB40SG", maxQuantity: 1 },
+      { articleNumber: "ZB30SG", maxQuantity: 1 },
+    ]);
+    assert.equal(available[0].price, 24);
+    assert.equal(available[0].catalogArticleId, "catalog-45");
+    assert.deepEqual(normalizeCutleryLines([
+      { articleNumber: "ZB90SG", quantity: 1 },
+      { articleNumber: "ZB45SG", quantity: 3 },
+    ], available), [{ id: "cutlery-ZB45SG", articleNumber: "ZB45SG", quantity: 2 }]);
+  }
 });
 
 test("AB 109873 offers only two 45 cm inserts for its split US90 drawers", () => {
