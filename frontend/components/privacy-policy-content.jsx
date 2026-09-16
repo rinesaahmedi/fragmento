@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import translations from "../locales/privacy-policy.json";
 import { getActivePublicLanguage } from "../lib/public-language-state";
 import ImpressumBackLink from "./impressum-back-link";
+import { ARCHITECTO_PRIVACY_URL, legalLinkCopy } from "../lib/legal-links";
 
 export default function PrivacyPolicyContent({ initialLanguage = "de" }) {
   const [language, setLanguage] = useState(() => translations[initialLanguage] ? initialLanguage : "de");
@@ -31,12 +32,19 @@ export default function PrivacyPolicyContent({ initialLanguage = "de" }) {
         <ImpressumBackLink label={copy.back} />
         <h1>{copy.title}</h1>
 
-        {copy.sections.map((section) => (
+        {copy.sections.map((section, index) => (
           <section key={section.title} className="legal-page__section">
             <h2>{section.title}</h2>
             {section.paragraphs.map((paragraph) => (
               <p key={paragraph} style={{ whiteSpace: "pre-line" }}>{paragraph}</p>
             ))}
+            {index === 0 ? (
+              <p>
+                <a href={ARCHITECTO_PRIVACY_URL} target="_blank" rel="noopener noreferrer">
+                  {(legalLinkCopy[language] || legalLinkCopy.de).privacy}
+                </a>
+              </p>
+            ) : null}
             {section.bullets ? (
               <ul>
                 {section.bullets.map((bullet) => <li key={bullet}>{bullet}</li>)}

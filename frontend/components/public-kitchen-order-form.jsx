@@ -6,6 +6,7 @@ import styles from "./kitchen-configurator.module.css";
 import { usePublicI18n } from "./public-i18n";
 import { COUNTRY_CITY_OPTIONS, POSTAL_CODE_OPTIONS } from "./kitchen-order-form";
 import { getPreferredDeliveryDateAfterWeeks } from "../lib/preferred-delivery.js";
+import { AGB_PDF_URL } from "../lib/legal-links";
 
 const COUNTRY_LABELS = {
   Deutschland: "Germany",
@@ -847,7 +848,7 @@ export default function PublicKitchenOrderForm({
                 />
                 <label htmlFor="termsConsent">
                   {translate("order.termsConsentPrefix", "I have read the ")}
-                  <a href="/legal/architecto-agb-2026.pdf?v=2026052102" target="_blank" rel="noreferrer">
+                  <a href={AGB_PDF_URL} target="_blank" rel="noopener noreferrer">
                     {translate("order.termsAndConditions", "terms and conditions")}
                   </a>
                   {translate("order.termsConsentSuffix", " and agree.*")}

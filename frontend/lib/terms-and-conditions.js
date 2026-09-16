@@ -2,6 +2,8 @@ import frenchTermsAndConditions from "../locales/terms.fr.json.js";
 import russianTermsAndConditions from "../locales/terms.ru.json.js";
 import spanishTermsAndConditions from "../locales/terms.es.json.js";
 import turkishTermsAndConditions from "../locales/terms.tr.json.js";
+import { WITHDRAWAL_URL, WITHDRAWAL_FORM_PDF_URL } from "./legal-links.js";
+import { addOnlineWithdrawal } from "./terms-online-withdrawal.js";
 
 const text = (content) => content.trim().split("\n\n");
 
@@ -61,7 +63,7 @@ Telefon:+49 (0)531 261 34 - 6700
 E-Mail:info@myarchitecto.de
 mittels einer eindeutigen Erklärung (z.B. ein mit der Post versandter Brief, Telefax oder E-Mail) über seinen Entschluss, diesen Vertrag zu widerrufen, informieren. Der Kunde kann dafür das beigefügte Muster-Widerrufsformular verwenden, das jedoch nicht vorgeschrieben ist.
 
-Der Kunde kann sein Widerrufsrecht auch online unter [Internetadresse/URL oder anderen geeigneten Hinweis darüber eingeben, wo die Widerrufsfunktion verfügbar ist] ausüben. Wenn der Kunde diese Online-Funktion nutzt, übermittelt der Unternehmer dem Kunden auf einem dauerhaften Datenträger (z. B. durch eine E-Mail) unverzüglich eine Eingangsbestätigung mit Informationen zum Inhalt der Widerrufserklärung sowie dem Datum und der Uhrzeit ihres Eingangs.
+Der Kunde kann sein Widerrufsrecht auch online über die Funktion „Vertrag widerrufen“ im Fußbereich der Fragmento-Website (${WITHDRAWAL_URL}) ausüben. Wenn der Kunde diese Online-Funktion nutzt, übermittelt der Unternehmer dem Kunden auf einem dauerhaften Datenträger (z. B. durch eine E-Mail) unverzüglich eine Eingangsbestätigung mit Informationen zum Inhalt der Widerrufserklärung sowie dem Datum und der Uhrzeit ihres Eingangs.
 
 Wenn der Kunde den Vertrag widerruft, hat der Unternehmer alle Zahlungen, die er vom Kunden erhalten hat, einschließlich der Lieferkosten (mit Ausnahme der zusätzlichen Kosten, die sich daraus ergeben, dass der Kunde eine andere Art der Lieferung als die vom Unternehmer angebotene, günstigste Standardlieferung gewählt haben), unverzüglich und spätestens binnen vierzehn Tagen ab dem Tag zurückzuzahlen, an dem die Mitteilung über den Widerruf dieses Vertrages bei dem Unternehmer eingegangen ist. Für diese Rückzahlung verwendet der Unternehmer dasselbe Zahlungsmittel, das der Kunde bei der ursprünglichen Transaktion eingesetzt hat, es sei denn, mit dem Kunden wurde ausdrücklich etwas anderes vereinbart; in keinem Fall werden dem Kunden wegen dieser Rückzahlung Entgelte berechnet.
 
@@ -73,7 +75,7 @@ Muster-Widerrufsformular
 
 Das Muster-Widerrufsformular ist hier als PDF zum Downloaden und Ausdrucken verfügbar:
 
-[BITTE HIER URL EINFÜGEN]
+${WITHDRAWAL_FORM_PDF_URL}
 
 ENDE DER WIDERRUFSBELEHRUNG`),
       },
@@ -347,5 +349,5 @@ export function getTermsAndConditions(language) {
     tr: turkishTermsAndConditions,
   };
 
-  return translations[language] || germanTermsAndConditions;
+  return addOnlineWithdrawal(translations[language] || germanTermsAndConditions, language);
 }
