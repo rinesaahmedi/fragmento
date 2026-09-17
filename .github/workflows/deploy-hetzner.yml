@@ -64,7 +64,7 @@ jobs:
             # CONTRACT_ACCESS_REPORT_ENABLED=true.
             cat >/etc/systemd/system/fragmento-contract-access-report.service <<'EOF'
             [Unit]
-            Description=Fragmento daily contract access report
+            Description=Fragmento daily contract and ASC access reports
             After=network-online.target postgresql.service
             Wants=network-online.target
 
@@ -82,7 +82,7 @@ jobs:
 
             cat >/etc/systemd/system/fragmento-contract-access-report.timer <<'EOF'
             [Unit]
-            Description=Run Fragmento contract access report every day at 08:00 Europe/Berlin
+            Description=Run Fragmento contract and ASC access reports every day at 08:00 Europe/Berlin
 
             [Timer]
             OnCalendar=*-*-* 08:00:00 Europe/Berlin

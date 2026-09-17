@@ -7,10 +7,20 @@ export const CONTRACT_ACCESS_REPORT_EVENT_TYPES = [
   PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED,
 ];
 
+export const ASC_ACCESS_REPORT_EVENT_TYPES = [
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND,
+  PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND,
+];
+
 const RESULT_LABELS = {
   [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED]: "Accepted",
   [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_TEST_ACCEPTED]: "Test contract",
   [PUBLIC_VISIT_EVENT_TYPES.CONTRACT_REJECTED]: "Rejected",
+};
+
+const ASC_RESULT_LABELS = {
+  [PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND]: "Found",
+  [PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND]: "Not found",
 };
 
 function escapeHtml(value) {
@@ -44,7 +54,14 @@ export function getContractAccessReportWindow(now = new Date()) {
   return { start, end };
 }
 
-export function buildContractAccessReport({ events = [], start, end }) {
+function buildAccessReport({
+  events = [],
+  start,
+  end,
+  subjectLabel,
+  heading,
+  resultLabels,
+}) {
   const dateFormatter = new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
     timeStyle: "medium",
@@ -52,13 +69,13 @@ export function buildContractAccessReport({ events = [], start, end }) {
   });
   const period = `${dateFormatter.format(start)} – ${dateFormatter.format(end)}`;
   const count = events.length;
-  const subject = `[Fragmento] Contract access attempts in the last 24 hours (${count})`;
+  const subject = `[Fragmento] ${subjectLabel} (${count})`;
 
   const rows = events.map((event) => {
     const values = [
       dateFormatter.format(new Date(event.createdAt)),
       getContractNumber(event),
-      RESULT_LABELS[event.eventType] || event.eventType,
+      resultLabels[event.eventType] || event.eventType,
       event.countryCode || "-",
       getSource(event),
       getDevice(event),
@@ -77,7 +94,7 @@ export function buildContractAccessReport({ events = [], start, end }) {
       <div style="max-width:980px;margin:0 auto;background:#fff;border:1px solid #dfd1c3;border-radius:14px;overflow:hidden;">
         <div style="padding:22px 26px;background:#7b3f2d;color:#fff;">
           <div style="font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:#f5d9ca;">Fragmento · Security report</div>
-          <h1 style="margin:7px 0 0;font-size:24px;">Contract access attempts in the last 24 hours</h1>
+          <h1 style="margin:7px 0 0;font-size:24px;">${escapeHtml(heading)}</h1>
         </div>
         <div style="padding:22px 26px;">
           <p style="margin:0 0 6px;"><strong>${count}</strong> access attempt${count === 1 ? "" : "s"}</p>
@@ -105,7 +122,7 @@ export function buildContractAccessReport({ events = [], start, end }) {
   const textRows = events.map((event) => [
     dateFormatter.format(new Date(event.createdAt)),
     getContractNumber(event),
-    RESULT_LABELS[event.eventType] || event.eventType,
+    resultLabels[event.eventType] || event.eventType,
     event.countryCode || "-",
     getSource(event),
     getDevice(event),
@@ -115,13 +132,35 @@ export function buildContractAccessReport({ events = [], start, end }) {
     subject,
     html,
     text: [
-      "Fragmento – Contract access attempts in the last 24 hours",
+      `Fragmento – ${heading}`,
       `Period (Europe/Berlin): ${period}`,
       `Access attempts: ${count}`,
       "",
       ...(textRows.length ? textRows : ["No access attempts during this period."]),
     ].join("\n"),
   };
+}
+
+export function buildContractAccessReport({ events = [], start, end }) {
+  return buildAccessReport({
+    events,
+    start,
+    end,
+    subjectLabel: "Contract access attempts in the last 24 hours",
+    heading: "Contract access attempts in the last 24 hours",
+    resultLabels: RESULT_LABELS,
+  });
+}
+
+export function buildAscAccessReport({ events = [], start, end }) {
+  return buildAccessReport({
+    events,
+    start,
+    end,
+    subjectLabel: "ASC contract lookups in the last 24 hours",
+    heading: "ASC contract lookups in the last 24 hours",
+    resultLabels: ASC_RESULT_LABELS,
+  });
 }
 
 function getMailConfig(env) {
@@ -144,7 +183,7 @@ function getMailConfig(env) {
   return { host, port, user, pass, from, recipients };
 }
 
-export async function sendContractAccessReport({ db, now = new Date(), env = process.env }) {
+async function sendAccessReport({ db, now, env, eventTypes, buildReport }) {
   if (env.CONTRACT_ACCESS_REPORT_ENABLED !== "true") {
     throw new Error("Contract access report is disabled. Set CONTRACT_ACCESS_REPORT_ENABLED=true on the Hetzner report service.");
   }
@@ -152,7 +191,7 @@ export async function sendContractAccessReport({ db, now = new Date(), env = pro
   const { start, end } = getContractAccessReportWindow(now);
   const events = await db.publicVisitEvent.findMany({
     where: {
-      eventType: { in: CONTRACT_ACCESS_REPORT_EVENT_TYPES },
+      eventType: { in: eventTypes },
       createdAt: { gt: start, lte: end },
     },
     select: {
@@ -170,7 +209,7 @@ export async function sendContractAccessReport({ db, now = new Date(), env = pro
     },
     orderBy: { createdAt: "desc" },
   });
-  const report = buildContractAccessReport({ events, start, end });
+  const report = buildReport({ events, start, end });
   const config = getMailConfig(env);
   const transporter = nodemailer.createTransport({
     host: config.host,
@@ -197,4 +236,24 @@ export async function sendContractAccessReport({ db, now = new Date(), env = pro
   }
 
   return { count: events.length, recipients: config.recipients, start, end };
+}
+
+export async function sendContractAccessReport({ db, now = new Date(), env = process.env }) {
+  return sendAccessReport({
+    db,
+    now,
+    env,
+    eventTypes: CONTRACT_ACCESS_REPORT_EVENT_TYPES,
+    buildReport: buildContractAccessReport,
+  });
+}
+
+export async function sendAscAccessReport({ db, now = new Date(), env = process.env }) {
+  return sendAccessReport({
+    db,
+    now,
+    env,
+    eventTypes: ASC_ACCESS_REPORT_EVENT_TYPES,
+    buildReport: buildAscAccessReport,
+  });
 }
