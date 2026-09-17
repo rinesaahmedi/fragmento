@@ -685,6 +685,9 @@ const PURCHASED_KITCHEN_CROP_CLOSURES = {
   // The source room-frame top sits just outside the display crop. Restore it
   // between the two visible side rails in the purchased-kitchen attachment.
   "ab-105759": { edge: "top", start: 0.37, end: 99.02 },
+  "ab-105763": { edge: "top", start: 0.37, end: 99.02 },
+  "ab-105767": { edge: "top", start: 0.37, end: 99.02 },
+  "ab-105771": { edge: "top", start: 0.37, end: 99.02 },
   "ab-105760": { edge: "top", start: 6.175772, end: 93.111639 },
   "ab-105764": { edge: "top", start: 6.175772, end: 93.111639 },
   "ab-105768": { edge: "top", start: 6.175772, end: 93.111639 },

@@ -1007,6 +1007,9 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   "ab-105748": 0.66065,
   // AB 105759: base body y=1554..2160; the UHK drawer starts on y=2040.
   "ab-105759": (2040 - 1554) / (2160 - 1554),
+  "ab-105763": (2040 - 1554) / (2160 - 1554),
+  "ab-105767": (2040 - 1554) / (2160 - 1554),
+  "ab-105771": (2040 - 1554) / (2160 - 1554),
   // Extend through the complete oven unit to its lower horizontal end line.
   "ab-105757": 0.8019469404861692,
   // Exact seam joining the oven quad to the drawer quad in the vector PDF.

@@ -9,7 +9,7 @@ async function main() {
     throw new Error("Contract access report is disabled outside the Hetzner report service.");
   }
 
-  const [{ prisma }, { sendContractAccessReport }] = await Promise.all([
+  const [{ prisma }, { sendAscAccessReport, sendContractAccessReport }] = await Promise.all([
     import("../lib/prisma.js"),
     import("../lib/email/contract-access-report.js"),
   ]);
@@ -17,6 +17,8 @@ async function main() {
   try {
     const result = await sendContractAccessReport({ db: prisma });
     console.log(`Contract access report sent to ${result.recipients.join(", ")}: ${result.count} attempts.`);
+    const ascResult = await sendAscAccessReport({ db: prisma });
+    console.log(`ASC access report sent to ${ascResult.recipients.join(", ")}: ${ascResult.count} lookups.`);
   } finally {
     await prisma.$disconnect();
   }

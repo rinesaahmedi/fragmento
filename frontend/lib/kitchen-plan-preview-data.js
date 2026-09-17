@@ -223,6 +223,17 @@ AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   PLAN_IMAGE_BY_SLUG[slug] = PLAN_IMAGE_BY_SLUG["ab-105846"];
 });
 
+export const AB_105759_LAYOUT_ALIAS_SLUGS = [
+  "ab-105763",
+  "ab-105767",
+  "ab-105771",
+];
+AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  PLAN_IMAGE_BY_SLUG[slug] = PLAN_IMAGE_BY_SLUG["ab-105759"];
+  PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[slug] =
+    PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105759"];
+});
+
 // Exact cabinet rectangles and fixture silhouettes from the 842 x 595 vector
 // PDF. The end HPK2002/UPK20 faces are intentionally included with their
 // adjoining schedule cabinets, while dishwasher internals stay light grey.
@@ -1783,6 +1794,9 @@ for (const slug of ["ab-105848", "ab-105851", "ab-105854", "ab-105857", "ab-1058
 }
 PLAN_HOTSPOTS_BY_SLUG["ab-105838"] = PLAN_HOTSPOTS_BY_SLUG["ab-105841"];
 PLAN_HOTSPOTS_BY_SLUG["ab-105844"] = PLAN_HOTSPOTS_BY_SLUG["ab-105841"];
+AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105759"];
+});
 AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105846"];
 });

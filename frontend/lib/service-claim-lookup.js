@@ -1,7 +1,9 @@
 /** Minimum length before the public form triggers a contract lookup / visit tracking. */
 export const SERVICE_CLAIM_LOOKUP_MIN_LENGTH = 8;
+export const SERVICE_CLAIM_MONITOR_PROBE = "__monitor_probe_not_found__";
 
 const LOOKUP_PLACEHOLDER_VALUES = new Set([
+  SERVICE_CLAIM_MONITOR_PROBE,
   "undefined",
   "null",
   "nan",
@@ -21,7 +23,8 @@ export function normalizeServiceClaimContractNumber(value) {
 
 /**
  * True when a typed/requested value is worth looking up and recording as claim activity.
- * Rejects empty, placeholder strings (e.g. "undefined"), and short partial input while typing.
+ * Rejects empty values, monitoring probes, placeholder strings (e.g. "undefined"),
+ * and short partial input while typing.
  */
 export function isServiceClaimContractLookupReady(value) {
   const normalized = normalizeServiceClaimContractNumber(value);
