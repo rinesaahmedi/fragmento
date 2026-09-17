@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { PUBLIC_VISIT_EVENT_TYPES } from "../public-visit-tracking.js";
+import { isJunkServiceClaimVisitEvent } from "../service-claim-lookup.js";
 
 export const CONTRACT_ACCESS_REPORT_EVENT_TYPES = [
   PUBLIC_VISIT_EVENT_TYPES.CONTRACT_ACCEPTED,
@@ -154,7 +155,7 @@ export function buildContractAccessReport({ events = [], start, end }) {
 
 export function buildAscAccessReport({ events = [], start, end }) {
   return buildAccessReport({
-    events,
+    events: events.filter((event) => !isJunkServiceClaimVisitEvent(event)),
     start,
     end,
     subjectLabel: "ASC contract lookups in the last 24 hours",

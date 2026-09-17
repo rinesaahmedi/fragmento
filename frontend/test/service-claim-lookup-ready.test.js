@@ -41,6 +41,7 @@ test("lookup readiness rejects placeholders and short input", () => {
   assert.equal(isServiceClaimContractLookupReady(""), false);
   assert.equal(isServiceClaimContractLookupReady("undefined"), false);
   assert.equal(isServiceClaimContractLookupReady("null"), false);
+  assert.equal(isServiceClaimContractLookupReady("__monitor_probe_not_found__"), false);
   assert.equal(isServiceClaimContractLookupReady("670"), false);
   assert.equal(isServiceClaimContractLookupReady("67088"), false);
   assert.equal(isServiceClaimContractLookupReady("670888"), false);
@@ -58,6 +59,14 @@ test("junk visit events match placeholder last4 without linked contract", () => 
   );
   assert.equal(
     isJunkServiceClaimVisitEvent({ contractNumberLast4: "null", kitchenContractId: null }),
+    true,
+  );
+  assert.equal(
+    isJunkServiceClaimVisitEvent({
+      contractNumber: "__monitor_probe_not_found__",
+      contractNumberLast4: "nd__",
+      kitchenContractId: null,
+    }),
     true,
   );
   assert.equal(

@@ -78,6 +78,12 @@ test("ASC report contains complete attempted numbers and lookup outcomes", () =>
         eventType: PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_FOUND,
         kitchenContract: { contractNumber: "670103898" },
       },
+      {
+        createdAt: new Date("2026-09-17T04:30:00.000Z"),
+        eventType: PUBLIC_VISIT_EVENT_TYPES.SERVICE_CONTRACT_NOT_FOUND,
+        contractNumber: "__monitor_probe_not_found__",
+        contractNumberLast4: "nd__",
+      },
     ],
   });
 
@@ -86,6 +92,7 @@ test("ASC report contains complete attempted numbers and lookup outcomes", () =>
   assert.match(report.html, /670103898/);
   assert.match(report.html, /Not found/);
   assert.match(report.html, /Found/);
+  assert.doesNotMatch(report.html, /monitor_probe_not_found/);
 });
 
 test("Hetzner deployment owns the 08:00 Europe-Berlin schedule", () => {
