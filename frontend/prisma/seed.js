@@ -2088,6 +2088,16 @@ const AB_105760_ITEMS = [
   ...defaultServices(),
 ];
 
+const cloneAB105760ItemsForKitchen = (kitchenNumber) =>
+  AB_105760_ITEMS.map((item) => ({
+    ...item,
+    code: item.code.replaceAll("AB105760", `AB${kitchenNumber}`),
+  }));
+
+const AB_105764_ITEMS = cloneAB105760ItemsForKitchen("105764");
+const AB_105768_ITEMS = cloneAB105760ItemsForKitchen("105768");
+const AB_105772_ITEMS = cloneAB105760ItemsForKitchen("105772");
+
 // Burger 103898: L-shaped Cindy kitchen from contract plan 670 103898.
 // Supplier schedule codes are retained for display while catalogArticleNumber links
 // each row to the shared catalog identity used by the Burger program price list.
@@ -2333,6 +2343,30 @@ const DEFAULT_KITCHENS = [
     name: "105760",
     description: "Straight kitchen configuration based on frontend/public/plans/AB 105760-61.svg",
     items: AB_105760_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105764",
+    kitchenCode: "105 764",
+    name: "105764",
+    description: "Straight kitchen configuration using the AB 105760 layout and element selection",
+    items: AB_105764_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105768",
+    kitchenCode: "105 768",
+    name: "105768",
+    description: "Straight kitchen configuration using the AB 105760 layout and element selection",
+    items: AB_105768_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105772",
+    kitchenCode: "105 772",
+    name: "105772",
+    description: "Straight kitchen configuration using the AB 105760 layout and element selection",
+    items: AB_105772_ITEMS,
     reconcileExisting: true,
   },
   {

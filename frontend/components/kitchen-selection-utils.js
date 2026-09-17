@@ -651,6 +651,14 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-WALL-AB110402-H4002-HPK2002": "13",
 };
 
+["105764", "105768", "105772"].forEach((targetCode) => {
+  Object.entries(AB_105806_PHOTO_NUMBER_BY_CODE)
+    .filter(([sourceCode]) => sourceCode.includes("AB105760"))
+    .forEach(([sourceCode, photoNumber]) => {
+      AB_105806_PHOTO_NUMBER_BY_CODE[sourceCode.replace("AB105760", `AB${targetCode}`)] = photoNumber;
+    });
+});
+
 ["105840", "105843"].forEach((targetCode) => {
   [
     "CAB-BASE-AB105837-US60-R",
@@ -1173,6 +1181,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105818": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105815": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105760": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105764": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105768": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105772": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105819": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105820": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105732": [["component-wall-cabinet-2", "component-extractor-hood"]],

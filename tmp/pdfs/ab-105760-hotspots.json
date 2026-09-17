@@ -1,0 +1,15 @@
+[
+  { "componentKey": "wall-cabinet-1", "left": 6.256532, "top": 17.089076, "width": 18.099762, "height": 26.964706 },
+  { "componentKey": "wall-cabinet-2", "left": 24.356295, "top": 17.089076, "width": 15.805225, "height": 26.964706 },
+  { "componentKey": "wall-cabinet-3", "left": 40.161520, "top": 17.089076, "width": 15.790974, "height": 26.964706 },
+  { "componentKey": "extractor-hood", "left": 40.161520, "top": 44.053782, "width": 15.790974, "height": 6.366386 },
+  { "componentKey": "wall-cabinet-4", "left": 55.952494, "top": 17.089076, "width": 15.805226, "height": 26.964706 },
+  { "componentKey": "worktop", "left": 6.256532, "top": 63.616807, "width": 65.743468, "height": 1.492437 },
+  { "componentKey": "sink-faucet", "left": 18.598575, "top": 56.114286, "width": 1.482185, "height": 7.502521 },
+  { "componentKey": "sink-end-blende", "left": 6.256532, "top": 65.109244, "width": 2.109264, "height": 32.732773 },
+  { "componentKey": "sink-base", "left": 8.365796, "top": 65.109244, "width": 15.805225, "height": 32.732773 },
+  { "componentKey": "dishwasher-base", "left": 24.171021, "top": 65.109244, "width": 15.805226, "height": 32.732773 },
+  { "componentKey": "oven-module", "left": 39.976247, "top": 65.109244, "width": 15.805226, "height": 32.732773 },
+  { "componentKey": "base-module-1", "left": 55.781473, "top": 65.109244, "width": 16.218527, "height": 32.732773 },
+  { "componentKey": "refrigerator", "left": 75.178147, "top": 30.742857, "width": 14.650832, "height": 67.099160 }
+]

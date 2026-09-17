@@ -84,6 +84,9 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-105743": "/plans/AB%20105743.svg",
   "ab-105744": "/plans/AB%20105744.svg",
   "ab-105760": "/plans/AB%20105760-61.svg",
+  "ab-105764": "/plans/AB%20105760-61.svg",
+  "ab-105768": "/plans/AB%20105760-61.svg",
+  "ab-105772": "/plans/AB%20105760-61.svg",
   "ab-105745": "/plans/AB%20105748.svg",
   "ab-105746": "/plans/AB%20105746.svg",
   "ab-105748": "/plans/AB%20105748.svg",
@@ -208,6 +211,14 @@ const AB_105846_LAYOUT_ALIAS_SLUGS = [
   "ab-105858",
   "ab-105861",
 ];
+const AB_105760_LAYOUT_ALIAS_SLUGS = [
+  "ab-105764",
+  "ab-105768",
+  "ab-105772",
+];
+AB_105760_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[slug] = PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG["ab-105760"];
+});
 AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   PLAN_IMAGE_BY_SLUG[slug] = PLAN_IMAGE_BY_SLUG["ab-105846"];
 });
@@ -1724,6 +1735,9 @@ PLAN_HOTSPOTS_BY_SLUG["ab-109955"] = AB_109955_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-111539"] = AB_111539_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 PLAN_HOTSPOTS_BY_SLUG["ab-110402"] = AB_110402_FRG_ORDER_HOTSPOTS;
+AB_105760_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  PLAN_HOTSPOTS_BY_SLUG[slug] = PLAN_HOTSPOTS_BY_SLUG["ab-105760"];
+});
 // AB 105837 and its perspective aliases use the same order-page source in FRG
 // and ASC. Keep one table so cabinet faces cannot drift between both flows.
 export const AB_105837_FRG_ORDER_HOTSPOTS = PLAN_HOTSPOTS_BY_SLUG["ab-105837"];

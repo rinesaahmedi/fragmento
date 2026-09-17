@@ -12,6 +12,7 @@ import {
 } from "../lib/kitchen-plan-preview-data.js";
 
 const slug = "ab-105760";
+const matchingKitchenSlugs = ["ab-105764", "ab-105768", "ab-105772"];
 const translate = (_key, fallback) => fallback;
 
 test("AB 105760 uses the sharp 105760-61 plan and measured element rectangles", () => {
@@ -114,4 +115,49 @@ test("AB 105760 is available under both 670 and 111 contract prefixes", () => {
   assert.match(seed, /contractNumber: buildKitchenContractNumber\(kitchen, "111"\)/);
   assert.equal(`670${"105 760".replace(/\D/g, "")}`, "670105760");
   assert.equal(`111${"105 760".replace(/\D/g, "")}`, "111105760");
+});
+
+test("AB 105764, 105768, and 105772 reuse the complete AB 105760 configuration", () => {
+  const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
+
+  for (const aliasSlug of matchingKitchenSlugs) {
+    const kitchenNumber = aliasSlug.replace("ab-", "");
+    const formattedKitchenNumber = `${kitchenNumber.slice(0, 3)} ${kitchenNumber.slice(3)}`;
+    const itemConstant = `AB_${kitchenNumber}_ITEMS`;
+
+    assert.equal(PLAN_IMAGE_BY_SLUG[aliasSlug], PLAN_IMAGE_BY_SLUG[slug]);
+    assert.strictEqual(PLAN_HOTSPOTS_BY_SLUG[aliasSlug], PLAN_HOTSPOTS_BY_SLUG[slug]);
+    assert.strictEqual(
+      PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[aliasSlug],
+      PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG[slug],
+    );
+    assert.deepEqual(
+      getLinkedComponentIds(aliasSlug, "component-wall-cabinet-3"),
+      ["component-wall-cabinet-3", "component-extractor-hood"],
+    );
+    assert.match(
+      seed,
+      new RegExp(`slug: "${aliasSlug}"[\\s\\S]*?kitchenCode: "${formattedKitchenNumber}"[\\s\\S]*?items: ${itemConstant}`),
+    );
+
+    for (const prefix of ["670", "111"]) {
+      assert.equal(`${prefix}${kitchenNumber}`, `${prefix}${formattedKitchenNumber.replace(/\D/g, "")}`);
+    }
+
+    for (const [sourceCode, number] of Object.entries({
+      "BLENDE-AB105760-SINK-END": "4",
+      "DISH-AB105760-600": "5",
+      "CAB-BASE-AB105760-US60": "6",
+      "REF-AB105760-KGCN388140E": "7",
+      "CAB-WALL-AB105760-H6002-HPK2002": "8",
+      "CAB-WALL-AB105760-H6002-2": "9",
+      "CAB-HOOD-AB105760-600": "10",
+      "HOOD-AB105760-FH664621E": "10",
+      "CAB-WALL-AB105760-H6002-4": "11",
+    })) {
+      const aliasCode = sourceCode.replace("AB105760", `AB${kitchenNumber}`);
+      const label = getLocalizedItemName({ code: aliasCode, name: "Kitchen item" }, translate, "en", true);
+      assert.ok(label.startsWith(`${number}. `), `${aliasCode} should use callout ${number}`);
+    }
+  }
 });
