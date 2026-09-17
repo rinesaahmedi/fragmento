@@ -2365,6 +2365,27 @@ const DEFAULT_KITCHENS = [
     reconcileExisting: true,
   },
   {
+    slug: "ab-105763",
+    kitchenCode: "105 763",
+    name: "105763",
+    description: "Kitchen configuration using the AB 105759 layout and element selection",
+    items: AB_105759_ITEMS,
+  },
+  {
+    slug: "ab-105767",
+    kitchenCode: "105 767",
+    name: "105767",
+    description: "Kitchen configuration using the AB 105759 layout and element selection",
+    items: AB_105759_ITEMS,
+  },
+  {
+    slug: "ab-105771",
+    kitchenCode: "105 771",
+    name: "105771",
+    description: "Kitchen configuration using the AB 105759 layout and element selection",
+    items: AB_105759_ITEMS,
+  },
+  {
     slug: "ab-105746",
     kitchenCode: "105 746",
     name: "105746",

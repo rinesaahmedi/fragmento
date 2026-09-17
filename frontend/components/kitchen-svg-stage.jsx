@@ -19,6 +19,7 @@ import {
   syncKitchenPlan,
 } from "./kitchen-svg-plan-utils";
 import {
+  AB_105759_LAYOUT_ALIAS_SLUGS,
   AB_110401_FRG_ORDER_HOTSPOTS,
   AB_110402_FRG_ORDER_HOTSPOTS,
   AB_109873_FRG_ORDER_HOTSPOTS,
@@ -161,6 +162,9 @@ const AB_105846_LAYOUT_ALIAS_SLUGS = [
 ];
 AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105846"];
+});
+AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105759"];
 });
 
 
@@ -1509,6 +1513,9 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-105838"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105841"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-105844"] = IMAGE_HOTSPOTS_BY_SLUG["ab-105841"];
 AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105846"];
+});
+AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105759"];
 });
 // Exact visible faces traced from the 842 x 595 AB 110140 vector PDF. Repeated
 // component keys make every exposed top, front, side, fascia, and fixture face

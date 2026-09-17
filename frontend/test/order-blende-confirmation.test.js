@@ -194,6 +194,9 @@ test("cropped straight kitchen plans close only their missing room-frame edge", 
   const previewData = await loadKitchenPlanPreviewData();
   const cases = [
     { slug: "ab-105759", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
+    { slug: "ab-105763", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
+    { slug: "ab-105767", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
+    { slug: "ab-105771", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
     { slug: "ab-105760", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
     { slug: "ab-110402", edge: /<line x1="[^\"]+" y1="1" x2="[^\"]+" y2="1"\/>/ },
     { slug: "ab-109955", edge: /<line x1="1399" y1="[^\"]+" x2="1399" y2="[^\"]+"\/>/ },
