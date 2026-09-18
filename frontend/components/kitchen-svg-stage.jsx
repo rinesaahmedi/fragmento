@@ -147,6 +147,9 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105811": "/plans/AB%20105811.svg",
   "ab-105744": "/plans/AB%20105744.svg",
   "ab-105760": "/plans/AB%20105760-61.svg",
+  "ab-105761": "/plans/AB%20105761-62.svg",
+  "ab-105765": "/plans/AB%20105761-62.svg",
+  "ab-105769": "/plans/AB%20105761-62.svg",
   "ab-105764": "/plans/AB%20105760-61.svg",
   "ab-105768": "/plans/AB%20105760-61.svg",
   "ab-105772": "/plans/AB%20105760-61.svg",
@@ -1399,6 +1402,23 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "base-module-1", left: 55.781473, top: 65.109244, width: 15.805225, height: 32.732773, preserveManualSize: true },
     { componentKey: "refrigerator", left: 75.178147, top: 30.742857, width: 14.650832, height: 67.099160, preserveManualSize: true },
   ],
+  // AB 105761-62: exact rectangles measured from the 842 x 595 vector PDF.
+  "ab-105761": [
+    { componentKey: "wall-cabinet-1", left: 26.579572, top: 17.089076, width: 15.805226, height: 26.964706, preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", left: 42.384798, top: 17.089076, width: 15.805226, height: 26.964706, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 42.384798, top: 44.053782, width: 15.805226, height: 6.366387, preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", left: 58.190024, top: 17.089076, width: 15.805226, height: 26.964706, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 73.995249, top: 17.089076, width: 17.871734, height: 26.964706, preserveManualSize: true },
+    { componentKey: "worktop", left: 26.123515, top: 63.616807, width: 65.743468, height: 1.492437, preserveManualSize: true },
+    { componentKey: "worktop", left: 26.123515, top: 65.109244, width: 0.413302, height: 32.732773, preserveManualSize: true },
+    { componentKey: "sink-faucet", left: 77.173397, top: 56.114286, width: 1.482185, height: 7.502521, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 26.536817, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "oven-module", left: 42.342043, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "dishwasher-base", left: 58.147268, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "sink-base", left: 73.952494, top: 65.109244, width: 15.805226, height: 32.732773, preserveManualSize: true },
+    { componentKey: "sink-end-blende", left: 89.757720, top: 65.109244, width: 2.109264, height: 32.732773, preserveManualSize: true },
+    { componentKey: "refrigerator", left: 10.446556, top: 30.742857, width: 14.650831, height: 67.099160, preserveManualSize: true },
+  ],
 };
 
 // FRG and ASC intentionally share the exact same AB 105831 cabinet polygons.
@@ -1411,6 +1431,9 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-110402"] = AB_110402_FRG_ORDER_HOTSPOTS;
 ["ab-105764", "ab-105768", "ab-105772"].forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105760"];
+});
+["ab-105765", "ab-105769"].forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105761"];
 });
 // Keep the AB 105837 order-page polygons as the shared source for ASC claims.
 IMAGE_HOTSPOTS_BY_SLUG["ab-105837"] = AB_105837_FRG_ORDER_HOTSPOTS;

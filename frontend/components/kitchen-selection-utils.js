@@ -313,6 +313,15 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "CAB-HOOD-AB105760-600": "10",
   "HOOD-AB105760-FH664621E": "10",
   "CAB-WALL-AB105760-H6002-4": "11",
+  "REF-AB105761-KGCN388140E": "4",
+  "CAB-BASE-AB105761-US60": "5",
+  "DISH-AB105761-600": "6",
+  "BLENDE-AB105761-SINK-END": "7",
+  "CAB-WALL-AB105761-H6002-1": "8",
+  "CAB-HOOD-AB105761-600": "9",
+  "HOOD-AB105761-FH664621E": "9",
+  "CAB-WALL-AB105761-H6002-3": "10",
+  "CAB-WALL-AB105761-H6002-HPK2002": "11",
   "CAB-BASE-AB105810-US45": "5",
   "CAB-BASE-AB105810-FILLER-400": "6",
   "CAB-WALL-AB105810-H4502": "9",
@@ -656,6 +665,14 @@ const AB_105806_PHOTO_NUMBER_BY_CODE = {
     .filter(([sourceCode]) => sourceCode.includes("AB105760"))
     .forEach(([sourceCode, photoNumber]) => {
       AB_105806_PHOTO_NUMBER_BY_CODE[sourceCode.replace("AB105760", `AB${targetCode}`)] = photoNumber;
+    });
+});
+
+["105765", "105769"].forEach((targetCode) => {
+  Object.entries(AB_105806_PHOTO_NUMBER_BY_CODE)
+    .filter(([sourceCode]) => sourceCode.includes("AB105761"))
+    .forEach(([sourceCode, photoNumber]) => {
+      AB_105806_PHOTO_NUMBER_BY_CODE[sourceCode.replace("AB105761", `AB${targetCode}`)] = photoNumber;
     });
 });
 
@@ -1181,6 +1198,9 @@ const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-105818": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105815": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "ab-105760": [["component-wall-cabinet-3", "component-extractor-hood"]],
+  "ab-105761": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105765": [["component-wall-cabinet-2", "component-extractor-hood"]],
+  "ab-105769": [["component-wall-cabinet-2", "component-extractor-hood"]],
   "ab-105764": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105768": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "ab-105772": [["component-wall-cabinet-3", "component-extractor-hood"]],
