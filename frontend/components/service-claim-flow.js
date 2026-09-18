@@ -2808,7 +2808,10 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
         const resolvedPart = selectedPart || (!choiceGroup ? area : null);
         return {
           ...area,
-          rowKey: `${area.componentId}:${rowComponentId}`,
+          // Keep the group's menu mounted when its first selected part changes.
+          rowKey: choiceGroup && rowIndex === 0
+            ? `choice-group:${choiceGroup.sourceComponentKey}`
+            : `${area.componentId}:${rowComponentId}`,
           rowComponentId,
           choiceGroup,
           showPartChoiceControl: !choiceGroup || rowIndex === 0,
@@ -6598,7 +6601,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                           disabled={isProblemAreaDetailDisabled}
                         />
                         <input
-                          key={area.attachmentFieldKey}
+                          key={`${area.rowComponentId}:${area.attachmentFieldKey}`}
                           type="file"
                           className="service-field__problem-area-file"
                           accept="image/*"
@@ -6694,7 +6697,7 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
                             />
                             <span className="service-field__problem-area-serial-or">{t("serialEvidenceAnd")}</span>
                             <input
-                              key={area.serialNumberImageFieldKey}
+                              key={`${area.rowComponentId}:${area.serialNumberImageFieldKey}`}
                               id={`problem-area-serial-image-${area.rowComponentId}`}
                               type="file"
                               className="service-field__problem-area-file"
