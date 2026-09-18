@@ -135,6 +135,24 @@ export function AdminClaimUploadsPanel({ claimId, files }) {
       <ul style={attachmentListStyle}>
         {files.map((file) => (
           <li key={`${file.filename}-${file.index}`} style={attachmentItemStyle}>
+            {isInlineImage(getPreviewContentType(file)) ? (
+              <button
+                type="button"
+                aria-label={`${translate("claimsAdmin.viewAttachment", "View")}: ${file.filename}`}
+                onClick={() => {
+                  setMediaError(false);
+                  setPreview({ index: file.index, filename: file.filename, contentType: getPreviewContentType(file) });
+                }}
+                style={{ display: "block", padding: 0, marginBottom: 8, border: "1px solid var(--app-border)", borderRadius: 10, background: "#fff", cursor: "pointer", overflow: "hidden", maxWidth: "100%" }}
+              >
+                <img
+                  src={attachmentViewerUrl(claimId, file.index)}
+                  alt={file.filename}
+                  loading="lazy"
+                  style={{ display: "block", width: 240, maxWidth: "100%", height: 160, objectFit: "contain" }}
+                />
+              </button>
+            ) : null}
             <div style={attachmentRowStyle}>
               <span style={attachmentFilenameStyle}>{file.filename}</span>
               <span style={attachmentActionsStyle}>

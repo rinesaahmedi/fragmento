@@ -14,10 +14,11 @@ import { AdminDateTime, AdminText } from "../../../../components/admin-i18n";
 import { AdminShell } from "../../../../components/admin-shell";
 import { getFormMessage } from "../../../../lib/admin-forms";
 import { requireAdminClaimsPage } from "../../../../lib/admin-claims-access";
-import { renderClaimKitchenPreviewSvg } from "../../../../lib/claim-kitchen-preview";
+import { renderClaimKitchenPreviewPng } from "../../../../lib/claim-kitchen-preview";
 import { prisma } from "../../../../lib/prisma";
 import { formatServiceClaimProblemArea, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../../lib/service-claim-problem-areas";
 import { queryServiceClaimById } from "../../../../lib/service-claim-admin-query";
+import { getServiceClaimKitchenPlan } from "../../../../lib/service-claim-kitchen-plan";
 
 export const dynamic = "force-dynamic";
 
@@ -133,10 +134,18 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
   const customerGender = getClaimCustomerGender(claim.fullName);
   const claimKitchenName = String(claim.kitchenName || "").trim();
   const claimSelectedAreas = formatServiceClaimProblemAreaList(claim.problemAreasJson, { includeCode: false });
-  const claimKitchenPreview = await renderClaimKitchenPreviewSvg({
+  const storedSketchIndex = rawUploadedAttachments.findIndex((file) => file.role === "kitchen_preview");
+  const referencePlan = storedSketchIndex < 0
+    ? await getServiceClaimKitchenPlan(claim.contractNumber).catch(() => null)
+    : null;
+  const referenceSketchUrl = storedSketchIndex >= 0
+    ? `/api/admin/claims/${claim.id}/attachments/${storedSketchIndex}?view=1`
+    : referencePlan?.selectionMode === "reference-pdf" ? referencePlan.previewImagePath : null;
+  const claimKitchenPreview = referenceSketchUrl ? null : await renderClaimKitchenPreviewPng({
     kitchenSlug: claim.kitchenSlug,
     selectedAreas: claim.problemAreasJson,
     contractNumber: claim.contractNumber,
+    width: 1040,
   }).catch(() => null);
   const uploadedAttachmentFiles = rawUploadedAttachments.map((file, index) => ({
     index,
@@ -149,7 +158,7 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
     areaCode: file.areaCode || "",
     meta: buildAttachmentMetaText(file),
   }));
-  const generalUploadedAttachments = uploadedAttachmentFiles.filter((file) => file.role !== "problem_area");
+  const generalUploadedAttachments = uploadedAttachmentFiles.filter((file) => file.role !== "problem_area" && file.role !== "kitchen_preview");
   const uploadedAttachments = generalUploadedAttachments;
   const problemAreaSections = parsedProblemAreas.map((area) => ({
     ...area,
@@ -220,16 +229,23 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                 <div>
                   <span style={detailLabelStyle}><AdminText i18nKey="claimsAdmin.kitchen" fallback="Kitchen" /></span>
                   <div style={claimKitchenSectionStyle}>
-                    {claimKitchenPreview?.markup ? (
+                    {referenceSketchUrl ? (
+                      <div style={claimKitchenPreviewCardStyle}>
+                        <a href={referenceSketchUrl} target="_blank" rel="noopener noreferrer">
+                          <img src={referenceSketchUrl} alt={claimKitchenName || "Kitchen sketch"} style={{ display: "block", width: "100%", height: "auto", borderRadius: 8 }} />
+                        </a>
+                      </div>
+                    ) : null}
+                    {claimKitchenPreview?.content ? (
                       <div style={claimKitchenPreviewCardStyle}>
                         <span id={`claim-kitchen-preview-${claim.id}`} style={visuallyHiddenStyle}>
                           <AdminText i18nKey="claimsAdmin.kitchenPreview" fallback="Kitchen preview" />
                         </span>
-                        <div
-                          role="img"
+                        <img
+                          alt={claimKitchenName || "Kitchen preview"}
                           aria-labelledby={`claim-kitchen-preview-${claim.id}`}
-                          style={claimKitchenPreviewWrapStyle}
-                          dangerouslySetInnerHTML={{ __html: claimKitchenPreview.markup }}
+                          style={{ ...claimKitchenPreviewWrapStyle, display: "block", height: "auto" }}
+                          src={`data:image/png;base64,${claimKitchenPreview.content.toString("base64")}`}
                         />
                       </div>
                     ) : null}
@@ -313,8 +329,8 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                   </span>
                   <AdminClaimUploadsPanel
                     claimId={claim.id}
-                    files={uploadedAttachments.map((file, index) => ({
-                      index,
+                    files={uploadedAttachments.map((file) => ({
+                      index: file.index,
                       filename: file.filename,
                       contentType: file.contentType || "",
                       meta: `${file.contentType || "file"} · ${formatBytes(file.size)}`,

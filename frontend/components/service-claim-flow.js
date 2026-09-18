@@ -4653,6 +4653,17 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
         "sketchMarkersJson",
         JSON.stringify(referenceSketchMarkers.map(({ x, y }) => ({ x, y }))),
       );
+      const sketchStage = selectedServicePanelRef.current?.querySelector(".service-claim-reference-plan__image-stage");
+      const sketchMarker = sketchStage?.querySelector(".service-claim-plan-marker");
+      const sketchWidth = sketchStage?.clientWidth;
+      if (sketchMarker && sketchWidth > 0) {
+        const markerStyle = window.getComputedStyle(sketchMarker);
+        formData.append("sketchMarkerAppearanceJson", JSON.stringify({
+          diameter: sketchMarker.offsetWidth / sketchWidth,
+          fontSize: parseFloat(markerStyle.fontSize) / sketchWidth,
+          borderWidth: parseFloat(markerStyle.borderTopWidth) / sketchWidth,
+        }));
+      }
       for (const area of electricalProblemAreas) {
         if (area.serialNumberImage) {
           formData.append(`serialNumberImage:${area.rowComponentId}`, area.serialNumberImage);

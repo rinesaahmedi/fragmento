@@ -5,7 +5,6 @@ import sharp from "sharp";
 import {
   REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH,
   REFERENCE_PLAN_EMAIL_PIXEL_RATIO,
-  REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER,
   applyClaimPreviewSourceHotspotOverrides,
   applyVisibleComponentsToSvgMarkup,
   buildKitchenPreviewSvgMarkup,
@@ -371,7 +370,7 @@ test("AB 105758 email oven polygon uses the exact service-view coordinates after
   assert.ok(Math.abs(emailOven.height - ((76.685714 - 54.783193) / crop.height) * 100) < 0.0001);
 });
 
-test("reference-plan email markers keep the view size across source resolutions", async () => {
+test("reference-plan email markers keep proportional fallback size across source resolutions", async () => {
   const redBounds = [];
 
   for (const sourceWidth of [240, 842, 2400]) {
@@ -407,6 +406,49 @@ test("reference-plan email markers keep the view size across source resolutions"
   }
 
   assert.equal(new Set(redBounds).size, 1);
-  assert.ok(redBounds[0] >= 54 && redBounds[0] <= 58);
-  assert.equal(REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER, 34);
+  assert.ok(redBounds[0] >= 30 && redBounds[0] <= 34);
+});
+
+test("reference-plan email preserves desktop and mobile marker proportions and positions", async () => {
+  const source = await sharp({
+    create: { width: 1200, height: 800, channels: 4, background: "#ffffff" },
+  }).png().toBuffer();
+
+  for (const [viewWidth, diameter, borderWidth, fontSize] of [
+    [850, 34, 3, 12.48],
+    [640, 34, 3, 12.48],
+    [360, 24, 2, 10.24],
+  ]) {
+    const rendered = await renderReferencePlanMarkersPng({
+      content: source,
+      markers: [{ x: 25, y: 75 }],
+      appearance: {
+        diameter: diameter / viewWidth,
+        borderWidth: borderWidth / viewWidth,
+        fontSize: fontSize / viewWidth,
+      },
+    });
+    // Check both normal email display and a narrower email client.
+    for (const displayWidth of [480, 320]) {
+      const { data, info } = await sharp(rendered).resize({ width: displayWidth })
+        .raw().toBuffer({ resolveWithObject: true });
+      let minX = info.width, maxX = -1, minY = info.height, maxY = -1;
+      for (let y = 0; y < info.height; y += 1) {
+        for (let x = 0; x < info.width; x += 1) {
+          const offset = (y * info.width + x) * info.channels;
+          if (data[offset] > 120 && data[offset + 1] < 90 && data[offset + 2] < 90) {
+            minX = Math.min(minX, x);
+            maxX = Math.max(maxX, x);
+            minY = Math.min(minY, y);
+            maxY = Math.max(maxY, y);
+          }
+        }
+      }
+      const expectedRedDiameter = (diameter - 2 * borderWidth) * displayWidth / viewWidth;
+      assert.ok(Math.abs(maxX - minX + 1 - expectedRedDiameter) <= 2);
+      assert.ok(Math.abs(maxY - minY + 1 - expectedRedDiameter) <= 2);
+      assert.ok(Math.abs((minX + maxX + 1) / 2 - info.width * 0.25) <= 1);
+      assert.ok(Math.abs((minY + maxY + 1) / 2 - info.height * 0.75) <= 1);
+    }
+  }
 });

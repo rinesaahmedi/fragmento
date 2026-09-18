@@ -5,6 +5,7 @@ import https from "https";
 import nodemailer from "nodemailer";
 import sharp from "sharp";
 import { resolveServiceClaimEmailRecipient } from "../../../lib/service-claim-email-recipient";
+import { normalizeReferencePlanMarkerAppearance } from "../../../lib/reference-plan-marker-appearance";
 import { Prisma } from "@prisma/client";
 import { after, NextResponse } from "next/server";
 import { getPublicContractClaimPlanAsset } from "../../../lib/contract-claim-plan-assets";
@@ -350,7 +351,7 @@ async function postWebhook(payload) {
   }
 }
 
-async function sendComplaintEmail(payload, attachmentParts = []) {
+async function sendComplaintEmail(payload, attachmentParts = [], referenceSnapshot = null) {
   const recipient = resolveServiceClaimEmailRecipient(payload.contractNumber);
   const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpFrom = String(process.env.SMTP_FROM || "").trim();
@@ -369,7 +370,7 @@ async function sendComplaintEmail(payload, attachmentParts = []) {
     },
   });
 
-  const kitchenPreviewAttachment = await buildClaimKitchenPreviewAttachment(payload);
+  const kitchenPreviewAttachment = referenceSnapshot || await buildClaimKitchenPreviewAttachment(payload);
   const emailAttachmentParts = attachmentParts.map((part, index) => ({
     ...part,
     cid: isEmailInlineImage(part.contentType) ? buildUserAttachmentCid(payload.id, index) : "",
@@ -1008,6 +1009,7 @@ async function buildArcReferencePlanEmailAttachment(payload) {
       ? await renderReferencePlanMarkersPng({
           content: previewAsset.content,
           markers,
+          appearance: payload.sketchMarkerAppearance,
         }).catch(() => null)
       : null;
     const emailContent = annotatedContent || previewAsset.content;
@@ -1733,6 +1735,7 @@ export async function POST(request) {
       problemDescription,
       problemAreasJson,
       sketchMarkers,
+      sketchMarkerAppearance: normalizeReferencePlanMarkerAppearance(body.sketchMarkerAppearanceJson),
       serialNumber: rawSerialNumber || (hasSerialNumberImage ? "Siehe Seriennummernfoto in den Anhängen." : "Nicht zutreffend"),
       requestType: "complaint",
       hasSerialNumberImage,
@@ -1754,6 +1757,19 @@ export async function POST(request) {
       );
     }
 
+    // Store the submitted sketch as a claim attachment so the dashboard retains
+    // exactly the same marked image even if the contract sketch changes later.
+    const referenceSnapshot = await buildClaimKitchenPreviewAttachment(payload).catch(() => null);
+    const storedAttachmentParts = [...attachmentParts];
+    if (referenceSnapshot?.content?.length && referenceSnapshot.contentType?.startsWith("image/")) {
+      storedAttachmentParts.push(referenceSnapshot);
+      payload.attachmentsMeta.push({
+        filename: referenceSnapshot.filename,
+        contentType: referenceSnapshot.contentType,
+        size: referenceSnapshot.content.length,
+        role: "kitchen_preview",
+      });
+    }
     payload.attachmentsJson =
       payload.attachmentsMeta.length > 0 ? JSON.stringify(payload.attachmentsMeta) : null;
 
@@ -1777,13 +1793,13 @@ export async function POST(request) {
     // for file storage, image rendering, SMTP, or the external webhook.
     after(async () => {
       await Promise.all([
-        attachmentParts.length
-          ? persistServiceClaimAttachments(payload.id, attachmentParts).catch((persistError) => {
+        storedAttachmentParts.length
+          ? persistServiceClaimAttachments(payload.id, storedAttachmentParts).catch((persistError) => {
               console.error("Service claim attachment persist error:", persistError);
               return false;
             })
           : Promise.resolve(true),
-        sendComplaintEmail(payload, attachmentParts).catch((error) => {
+        sendComplaintEmail(payload, attachmentParts, referenceSnapshot).catch((error) => {
           console.warn("Service claim email delivery failed:", formatServiceClaimErrorMessage(error));
           return false;
         }),

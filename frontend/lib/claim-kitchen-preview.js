@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import sharp from "sharp";
+import { normalizeReferencePlanMarkerAppearance } from "./reference-plan-marker-appearance.js";
 import { componentIdForItem } from "../components/kitchen-selection-utils.js";
 import { getKitchenBySlug, serializeKitchenForLegacy } from "./catalog.js";
 import { PLAN_HOTSPOTS_BY_SLUG, PLAN_IMAGE_BY_SLUG } from "./kitchen-plan-preview-data.js";
@@ -14,7 +15,6 @@ import {
 
 export const REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH = 480;
 export const REFERENCE_PLAN_EMAIL_PIXEL_RATIO = 2;
-export const REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER = 34;
 
 export const PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG = {
   "kitchen-model-b": {
@@ -780,6 +780,7 @@ export async function renderClaimKitchenPreviewPng({
 export async function renderReferencePlanMarkersPng({
   content,
   markers = [],
+  appearance,
 }) {
   const normalizedMarkers = markers
     .map((marker) => ({
@@ -796,9 +797,8 @@ export async function renderReferencePlanMarkersPng({
     ));
   if (!content?.length || !normalizedMarkers.length) return null;
 
-  // Normalize the attachment before drawing markers. Email clients display this image at
-  // 480 CSS pixels, so a 2x raster keeps both the sketch and the 34px marker crisp while
-  // making the marker's apparent size independent of the uploaded image resolution.
+  // Keep the 2x raster crisp, but scale every marker dimension with the sketch
+  // using the actual proportions measured in the form at submission time.
   const rasterWidth = REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH * REFERENCE_PLAN_EMAIL_PIXEL_RATIO;
   const canonical = await sharp(content)
     .rotate()
@@ -809,9 +809,10 @@ export async function renderReferencePlanMarkersPng({
   const height = Number(canonical.info?.height || 0);
   if (!width || !height) return null;
 
-  const markerDiameter = REFERENCE_PLAN_MARKER_DISPLAY_DIAMETER * REFERENCE_PLAN_EMAIL_PIXEL_RATIO;
-  const fontSize = Math.round(12.5 * REFERENCE_PLAN_EMAIL_PIXEL_RATIO);
-  const strokeWidth = 3 * REFERENCE_PLAN_EMAIL_PIXEL_RATIO;
+  const markerAppearance = normalizeReferencePlanMarkerAppearance(appearance);
+  const markerDiameter = markerAppearance.diameter * width;
+  const fontSize = markerAppearance.fontSize * width;
+  const strokeWidth = markerAppearance.borderWidth * width;
   const markerRadius = (markerDiameter - strokeWidth) / 2;
   const markerMarkup = normalizedMarkers.map((marker) => {
     const cx = (marker.x / 100) * width;
