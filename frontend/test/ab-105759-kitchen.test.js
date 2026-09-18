@@ -19,9 +19,11 @@ const translate = (_key, fallback) => fallback;
 test("AB 105759 uses the supplied vector plan and pixel-measured selection faces", () => {
   const hotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105759"];
   const keys = hotspots.map((hotspot) => hotspot.componentKey);
+  const planSvg = readFileSync(new URL("../public/plans/AB 105759.svg", import.meta.url), "utf8");
 
   assert.equal(PLAN_IMAGE_BY_SLUG["ab-105759"], "/plans/AB%20105759.svg");
   assert.ok(existsSync(new URL("../public/plans/AB 105759.svg", import.meta.url)));
+  assert.doesNotMatch(planSvg, /<use data-text="[78]"/);
   assert.equal(keys.filter((key) => key.startsWith("wall-cabinet-")).length, 6);
   assert.equal(keys.filter((key) => key === "worktop").length, 3);
   assert.ok(keys.includes("refrigerator"));
