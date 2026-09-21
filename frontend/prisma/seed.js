@@ -32,8 +32,11 @@ const DEFAULT_WORKTOP_CATALOG_NAME_EN = "Worktop";
 const DEFAULT_WORKTOP_CATALOG_NAME_DE = "Arbeitsplatte";
 const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kitchen configuration";
 const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
+const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "burger-103898",
+  "ab-105762",
+  ...AB_105762_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
@@ -1255,6 +1258,43 @@ const AB_105759_ITEMS = [
   ...defaultServices(),
 ];
 
+// AB 105762-63: L-shaped kitchen with a 40/60/50 cm left leg and a
+// 60/60/30 cm sink return. The supplier schedule has thirteen callouts.
+// Its layout aliases below share the drawing and catalog-linked selection while
+// retaining separate kitchen, contract, order, and saved-selection records.
+const AB_105762_ITEMS = [
+  defaultOvenHob({
+    articleNumber: "A-EH923640E + 9EC744100C",
+    catalogArticleNumber: "A-EH923640E + 9EC744100C",
+    name: "Built-in oven and ceramic cooktop",
+    nameDe: "Einbauherd und Glaskeramikkochfeld",
+    infoText: "A-EH923640E oven, 9EC744100C ceramic cooktop and UHK lower cabinet",
+    sortOrder: 10,
+    widthMm: 600,
+  }),
+  defaultWorktop({
+    code: "TOP-AB105762",
+    articleNumber: "PLR60-1 + PLR60-2",
+    displayArticleNumber: "PLR60-1 + PLR60-2",
+    catalogArticleNumber: "PLR60",
+    sortOrder: 20,
+  }),
+  { itemType: ItemType.COMPONENT, code: "SINK-BASE-AB105762-SP60", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", price: "0.00", widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "sink_base", colorKey: "springgreen", componentKey: "sink-base", sortOrder: 30, isLocked: true, infoText: "Included SP60 sink base cabinet", articleNumber: "SP60" },
+  { itemType: ItemType.COMPONENT, code: "SINK-WORKTOP-AB105762", name: "Sink and faucet set", nameDe: "Spüle und Armatur", price: "0.00", iconKey: "sink_faucet", colorKey: "black", componentKey: "sink-faucet", sortOrder: 40, isLocked: true, infoText: "Included 526335 sink and 517720 faucet", articleNumber: "526335 + 517720", displayArticleNumber: "517720 + 526335", catalogArticleNumber: "526335 + 517720" },
+  { itemType: ItemType.COMPONENT, code: "REF-AB105762-KGCN388140E", name: "Freestanding refrigerator", nameDe: "Standkühlschrank", price: articlePrice("OL-KGCN388140E"), widthMm: 540, heightMm: 1810, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 50, infoText: "Freestanding fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105762-US40", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US40"), widthMm: 400, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 60, infoText: "US40 lower cabinet on the left leg", articleNumber: "US40" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105762-US50", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US50", "UPEF65", 1), widthMm: 500, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#ffbf00", componentKey: "base-module-2", sortOrder: 70, infoText: "US50 lower cabinet with UPEF65 corner filler panel", articleNumber: "US50", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105762-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 80, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105762-US30-UPK20", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US30"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 90, infoText: "US30 lower cabinet with supplied UPK20 filler panel", articleNumber: "US30", catalogArticleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 (25E)", blendePrice: "0.00" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105762-H4002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H4002"), widthMm: 400, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 100, infoText: "H4002 upper cabinet", articleNumber: "H4002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105762-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: "349.00", widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 110, infoText: "FH664621E flat pull-out hood, FWK124 filter and matching upper cabinet", articleNumber: "FH664621E + FWK124", displayArticleNumber: "FH664621E + FWK124", catalogArticleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105762-FH664621E", name: "FH664621E Extractor Hood", nameDe: "FH664621E Flachschirmhaube", price: "349.00", widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 112, infoText: "Flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002", catalogArticleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105762-H5002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H5002"), widthMm: 500, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 120, infoText: "H5002 upper cabinet", articleNumber: "H5002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105762-H6002-HPK2002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 130, infoText: "H6002 upper cabinet with supplied HPK2002 filler panel", articleNumber: "H6002", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 (35E)", blendePrice: "0.00" },
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 const AB_105732_ITEMS = [
   { itemType: ItemType.COMPONENT, code: "OVEN-B-600-HOB", name: "Built-in oven and induction hob", nameDe: "Einbaubackofen und Kochfeld", articleNumber: "EBX943600S + OL-KMI754000E", iconKey: "oven_base", colorKey: "springgreen", componentKey: "oven-module", sortOrder: 10, infoText: "Built-in oven + induction hob", isLocked: true },
   { itemType: ItemType.COMPONENT, code: "TOP-AB105806", name: "Worktop", price: "0.00", iconKey: "worktop", colorKey: "springgreen", componentKey: "worktop", sortOrder: 20, isLocked: true, infoText: "Worktop included with the default kitchen configuration" },
@@ -2458,6 +2498,22 @@ const DEFAULT_KITCHENS = [
     items: AB_105759_ITEMS,
     reconcileExisting: true,
   },
+  {
+    slug: "ab-105762",
+    kitchenCode: "105 762",
+    name: "105762",
+    description: "L-shaped kitchen configuration based on frontend/public/plans/AB 105762-63.svg",
+    items: AB_105762_ITEMS,
+    reconcileExisting: true,
+  },
+  ...AB_105762_LAYOUT_ALIAS_CODES.map((code) => ({
+    slug: `ab-${code}`,
+    kitchenCode: `${code.slice(0, 3)} ${code.slice(3)}`,
+    name: code,
+    description: "Independent kitchen configuration using the AB 105762-63 layout, items, and catalog selection",
+    items: AB_105762_ITEMS,
+    reconcileExisting: true,
+  })),
   {
     slug: "ab-105763",
     kitchenCode: "105 763",
@@ -4135,6 +4191,14 @@ async function main() {
           },
         });
       }
+    } else if (reconcileExisting) {
+      await prisma.kitchenClaimPart.updateMany({
+        where: {
+          kitchenId: kitchenRecord.id,
+          partKey: { in: ["worktop-left", "worktop-right"] },
+        },
+        data: { isActive: false },
+      });
     }
 
     if (worktop && WORKTOP_END_PANEL_CLAIM_KITCHEN_SLUGS.has(normalizedKitchenSlug)) {

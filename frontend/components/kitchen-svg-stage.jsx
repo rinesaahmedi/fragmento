@@ -20,6 +20,7 @@ import {
 } from "./kitchen-svg-plan-utils";
 import {
   AB_105759_LAYOUT_ALIAS_SLUGS,
+  AB_105762_LAYOUT_ALIAS_SLUGS,
   AB_110401_FRG_ORDER_HOTSPOTS,
   AB_110402_FRG_ORDER_HOTSPOTS,
   AB_109873_FRG_ORDER_HOTSPOTS,
@@ -28,6 +29,7 @@ import {
   AB_111539_FRG_ORDER_HOTSPOTS,
   AB_105831_FRG_ORDER_HOTSPOTS,
   AB_105837_FRG_ORDER_HOTSPOTS,
+  PLAN_HOTSPOTS_BY_SLUG,
   PLAN_IMAGE_SOURCE_SIZE_BY_SLUG,
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data";
@@ -98,6 +100,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105746": "/plans/AB%20105746.svg",
   "ab-105757": "/plans/AB%20105757.svg",
   "ab-105759": "/plans/AB%20105759.svg",
+  "ab-105762": "/plans/AB%20105762-63.svg?v=4",
   "ab-105749": "/plans/AB%20105746.svg",
   "ab-105752": "/plans/AB%20105746.svg",
   "ab-105755": "/plans/AB%20105746.svg",
@@ -171,6 +174,9 @@ AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 });
 AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105759"];
+});
+AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  IMAGE_VIEW_BY_SLUG[slug] = IMAGE_VIEW_BY_SLUG["ab-105762"];
 });
 
 
@@ -1545,6 +1551,10 @@ AB_105846_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
 });
 AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105759"];
+});
+IMAGE_HOTSPOTS_BY_SLUG["ab-105762"] = PLAN_HOTSPOTS_BY_SLUG["ab-105762"];
+AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105762"];
 });
 // Exact visible faces traced from the 842 x 595 AB 110140 vector PDF. Repeated
 // component keys make every exposed top, front, side, fascia, and fixture face

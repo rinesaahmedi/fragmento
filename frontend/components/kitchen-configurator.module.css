@@ -674,6 +674,16 @@
   box-shadow: none;
 }
 
+/* Straight elevation worktops can be less than 10 px tall after the plan is
+   cropped for ASC. Keep their painted selection on the exact PDF face while
+   providing a practical click target immediately around that thin face. */
+.planHotspotNarrowWorktop::before {
+  position: absolute;
+  inset: -8px 0;
+  content: "";
+  background: transparent;
+}
+
 /* Hover/preview: a light green tint (previews "this becomes one of my selections"). */
 .planHotspotHover {
   border-color: rgba(42, 145, 85, 0.8);

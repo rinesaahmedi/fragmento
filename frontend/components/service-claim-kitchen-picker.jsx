@@ -621,6 +621,9 @@ export default function ServiceClaimKitchenPicker({
                         || hotspot.claimPartKey === "worktop-end-panel"
                           ? styles.planHotspotWorktop
                           : "",
+                        hotspot.componentKey === "worktop" && Number(hotspot.height) < 2.5
+                          ? styles.planHotspotNarrowWorktop
+                          : "",
                         hotspot.claimBlendeSplit ? styles.planHotspotBlendeSplit : "",
                         isHovered ? styles.planHotspotHover : "",
                         isSelected ? styles.planHotspotSelected : "",

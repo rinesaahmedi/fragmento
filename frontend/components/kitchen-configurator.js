@@ -110,6 +110,10 @@ const DEFAULT_LOCKED_ACCESSORY_CODES_BY_SLUG = {
 };
 
 const CONFIGURATOR_DRAFT_REVISION_BY_SLUG = {
+  "ab-105762": "corner-blende-v1",
+  "ab-105766": "corner-blende-v1",
+  "ab-105770": "corner-blende-v1",
+  "ab-105774": "corner-blende-v1",
   "ab-105805": "default-components-v2-cutlery-v1",
   "ab-105809": "default-components-v2-cutlery-v1",
   "ab-105813": "default-components-v2-cutlery-v1",
@@ -1869,6 +1873,7 @@ function KitchenConfiguratorContent({
   function getBlendeItemsForComponent(componentId) {
     return getLinkedComponentIds(kitchenSlug, componentId)
       .map((linkedId) => kitchenConfig.components.find((item) => componentIdForItem(item) === linkedId))
+      .map((item) => (item ? applyArticleVariantSelectionForDisplay(item, "") : item))
       .filter((item) => item && itemRequiresBlendeConfirmation(item, language));
   }
 

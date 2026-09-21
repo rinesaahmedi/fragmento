@@ -53,6 +53,23 @@ test("interactive configurator aliases use the 105759 image renderer and calibra
   );
 });
 
+test("ASC gives the thin 105759 worktop a practical click target", () => {
+  const picker = readFileSync(
+    new URL("../components/service-claim-kitchen-picker.jsx", import.meta.url),
+    "utf8",
+  );
+  const styles = readFileSync(
+    new URL("../components/kitchen-configurator.module.css", import.meta.url),
+    "utf8",
+  );
+
+  assert.match(
+    picker,
+    /hotspot\.componentKey === "worktop" && Number\(hotspot\.height\) < 2\.5[\s\S]*?planHotspotNarrowWorktop/,
+  );
+  assert.match(styles, /\.planHotspotNarrowWorktop::before\s*\{[\s\S]*?inset: -8px 0;/);
+});
+
 test("105759 layout aliases preserve the measured UHK drawer seam", () => {
   const oven = PLAN_HOTSPOTS_BY_SLUG["ab-105759"]
     .find((hotspot) => hotspot.componentKey === "oven-module");

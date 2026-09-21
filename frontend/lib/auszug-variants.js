@@ -14,6 +14,28 @@ function toMoneyNumber(value) {
   return Number.isFinite(number) ? number : 0;
 }
 
+const AB_105762_CORNER_BLENDE_ITEM_CODES = new Set([
+  "CAB-BASE-AB105762-US50",
+]);
+
+export function applyRequiredCornerBlendeFallback(item) {
+  const code = String(item?.code || "").trim().toUpperCase();
+  if (!AB_105762_CORNER_BLENDE_ITEM_CODES.has(code)) return item;
+  if (String(item?.blendeCode || "").trim()) return item;
+
+  const blendePrice = 68;
+  return {
+    ...item,
+    price: toMoneyNumber(item?.price) + blendePrice,
+    blendeCode: "UPEF65",
+    blendeLabel: "UPEF65 Corner filler panel",
+    blendeName: "Corner filler panel for Lower cabinet",
+    blendeNameDe: "Eckpassblende Unterschrank",
+    blendePrice,
+    catalogBlendeQuantity: 1,
+  };
+}
+
 function articlePayload(article) {
   if (!article) return null;
   const programPrice = Array.isArray(article.programPrices)
@@ -132,15 +154,16 @@ export function applyArticleVariantSelection(item, articleNumber) {
 }
 
 export function applyArticleVariantSelectionForDisplay(item, articleNumber) {
-  const selectedItem = applyArticleVariantSelection(item, articleNumber);
-  if (selectedItem === item) {
-    return item;
+  const normalizedItem = applyRequiredCornerBlendeFallback(item);
+  const selectedItem = applyArticleVariantSelection(normalizedItem, articleNumber);
+  if (selectedItem === normalizedItem) {
+    return normalizedItem;
   }
 
   return {
     ...selectedItem,
-    name: item?.name || selectedItem.name,
-    nameDe: item?.nameDe || selectedItem.nameDe || "",
+    name: normalizedItem?.name || selectedItem.name,
+    nameDe: normalizedItem?.nameDe || selectedItem.nameDe || "",
   };
 }
 

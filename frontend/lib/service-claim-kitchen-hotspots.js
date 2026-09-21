@@ -25,8 +25,16 @@ const AB_105847_LAYOUT_ALIAS_SLUGS = [
   "ab-105862",
 ];
 
+const AB_105762_LAYOUT_ALIAS_SLUGS = [
+  "ab-105766",
+  "ab-105770",
+  "ab-105774",
+];
+
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "burger-103898",
+  "ab-105762",
+  ...AB_105762_LAYOUT_ALIAS_SLUGS,
   "ab-105743",
   "ab-105748",
   "ab-105751", "ab-105754", "ab-105745",
@@ -70,6 +78,7 @@ export function isLShapedClaimKitchen(kitchenSlug = "") {
 // faucet hotspot so the polygons remain aligned after the plan is cropped for display.
 const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "burger-103898": [[-2.075268817, 0.964447543], [-0.47311828, 0.851516208], [2.806451613, 1.071104915], [1.265232975, 1.181944929]],
+  "ab-105762": [[-1.570532556,0.966873712],[-0.244514078,0.877846782],[1.059561153,0.991718454],[2.310344479,1.101449353],[1.053291465,1.19254667],[-0.394984162,1.091097317]],
   // Four outside sink strokes measured from the replacement AB 105743 vector PDF.
   "ab-105743": [[-0.200000081, 0.962376212], [3.192157039, 0.788118787], [4.741176765, 0.900990074], [1.349019645, 1.075247499]],
   // Outside sink strokes measured from the AB 105748 vector PDF.
@@ -109,6 +118,7 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 // plan system and are projected into the ASC display crop below.
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
   "burger-103898": [[57.662708, 59.30084], [64.033254, 58.211765], [77.073634, 60.329412], [70.945368, 61.398319]],
+  "ab-105762": [[58.118765,56.578151],[64.147268,55.710924],[70.07601,56.820168],[75.76247,57.889076],[70.047506,58.776471],[63.463183,57.788235]],
   // Four visible outside sink strokes traced from the AB 105825 source plan.
   // The wider source hotspot is only a generous click target and crosses the
   // worktop edges, so it must not be used as the painted selection mask.
@@ -286,6 +296,7 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 // source plan render. Keeping the values relative to the oven hotspot
 // preserves their alignment when the claim picker applies its display crop.
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
+  "ab-105762": [[-0.693421063,-0.052666216],[0.296052645,-0.103357487],[1.022368395,-0.05200789],[0,0.002633303]],
   "ab-110140": [[1.118461627, -0.096485619], [2.112307687, -0.038977633], [1.023076953, 0.012140566], [0.029230786, -0.049201273]],
   "burger-103898": [[-0.236714976, -0.090786819], [0.869565217, -0.045729657], [0, 0.00672495], [-0.834138486, -0.025554808]],
   // Four outside cooktop strokes measured from the replacement AB 105743 vector PDF.
@@ -1007,6 +1018,10 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   "ab-105748": 0.66065,
   // AB 105759: base body y=1554..2160; the UHK drawer starts on y=2040.
   "ab-105759": (2040 - 1554) / (2160 - 1554),
+  // The seam at y=80.295798% / 78.722689% separates the oven from UHK.
+  // The lower line at y=85.015126% / 83.442017% is the drawer/plinth seam;
+  // the UHK selection continues through the plinth to the module baseline.
+  "ab-105762": 0.6614,
   "ab-105763": (2040 - 1554) / (2160 - 1554),
   "ab-105767": (2040 - 1554) / (2160 - 1554),
   "ab-105771": (2040 - 1554) / (2160 - 1554),
@@ -1037,6 +1052,10 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
 };
 
 const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
+  "ab-105762": {
+    oven: [[36,61.07563],[46.831354,59.502521],[46.831354,78.722689],[36,80.295798]],
+    "oven-drawer": [[36,80.295798],[46.831354,78.722689],[46.831354,88.584874],[36,90.137815]],
+  },
   "ab-111539": {
     oven: [
       [53.515439, 57.989916],
@@ -1129,7 +1148,21 @@ function splitWorktopDefinition(bounds, leftPoints, rightPoints, remainingPartKe
 // The claim overlay uses the existing PDF-matched worktop polygons. Some plan
 // families already have one polygon per leg; the three combined outlines are
 // divided at their actual corner seam below.
+const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
+  { left: 28.489311, top: 53.310924, width: 30.014252, height: 7.522689 },
+  [
+    [28.489311, 57.647059], [47.672209, 54.884034],
+    [56.764846, 56.739496], [28.489311, 60.833613],
+  ],
+  [
+    [47.672209, 54.884034], [58.503563, 53.310924],
+    [56.764846, 56.739496],
+  ],
+  ["worktop-left", "worktop-right", "worktop-right", "worktop-right", "worktop-left"],
+);
+
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-105762": AB_105762_WORKTOP_SPLIT,
   "ab-111539": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
   },
@@ -1284,6 +1317,22 @@ const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
     ],
   ),
 };
+
+// These are independent kitchens with the exact AB 105762 drawing. Reuse every
+// measured ASC polygon so sink, faucet, oven, drawer, cooktop, and both worktop
+// legs remain pixel-identical while selections stay isolated by kitchen slug.
+AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
+  L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG[slug] =
+    L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG["ab-105762"];
+  L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG[slug] =
+    L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG["ab-105762"];
+  COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG[slug] =
+    COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG["ab-105762"];
+  OVEN_DRAWER_TOP_RATIO_BY_SLUG[slug] = OVEN_DRAWER_TOP_RATIO_BY_SLUG["ab-105762"];
+  OVEN_PART_SOURCE_POINTS_BY_SLUG[slug] = OVEN_PART_SOURCE_POINTS_BY_SLUG["ab-105762"];
+  SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[slug] =
+    SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105762"];
+});
 
 // The AB 105807 PDF draws a narrow floor-height return at the right end of the
 // horizontal worktop. Coordinates are measured from the 3509 x 2480 render.

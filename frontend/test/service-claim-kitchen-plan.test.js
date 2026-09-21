@@ -980,6 +980,31 @@ test("oven, cooktop, and oven-drawer selections collapse to one choice group", (
     ], groups),
     ["component-claim-oven"],
   );
+
+  const group = groups[0];
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds(
+      [group.triggerComponentId],
+      groups,
+      {},
+    ),
+    [
+      "component-claim-oven",
+      "component-claim-cooktop",
+      "component-claim-oven-drawer",
+    ],
+    "the initial oven click should paint the complete group until the dropdown is chosen",
+  );
+  assert.deepEqual(
+    resolveServiceClaimPlanDisplayComponentIds(
+      [group.triggerComponentId],
+      groups,
+      { [group.sourceComponentKey]: ["component-claim-oven"] },
+    ),
+    ["component-claim-oven"],
+    "after the dropdown choice, only the chosen oven part should remain painted",
+  );
+
 });
 
 test("hood cabinet, extractor, and filter selections collapse to one choice group", () => {

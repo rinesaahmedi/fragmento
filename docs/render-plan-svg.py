@@ -33,6 +33,8 @@ def normalize_plan_svg_strokes(svg: str, dark_strokes: bool = False) -> str:
         color = match.group(1).lower()
         if color == "#f0f0f0":
             return f'stroke="{DARK_PLAN_STROKE}"' if dark_strokes else 'stroke="#f0f0f0"'
+        if color == "#00ffff":
+            return 'stroke="#00ffff"'
         return 'stroke="#000000"'
 
     svg = re.sub(
