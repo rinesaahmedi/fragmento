@@ -590,6 +590,23 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   "burger-103898": {
     "base-module-2": { side: "right", inner: 53.387173, outer: 54.997625 },
   },
+  // AB 105762 draws the US30 front and its exposed UPK20 end panel as
+  // separate perspective faces. Keep the narrow cabinet front selectable as
+  // US30 and assign only the large far-right end face to the Blende.
+  "ab-105762": {
+    "drawer-module": {
+      side: "right",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        {
+          left: 81.961995,
+          right: 92.437055,
+          top: 61.620168,
+          bottom: 91.710924,
+        },
+      ],
+    },
+  },
   // Exact perspective divider strokes from the replacement 842 x 595 AB 105743 PDF.
   "ab-105743": {
     "base-module-1": {
@@ -1332,6 +1349,8 @@ AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   OVEN_PART_SOURCE_POINTS_BY_SLUG[slug] = OVEN_PART_SOURCE_POINTS_BY_SLUG["ab-105762"];
   SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG[slug] =
     SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG["ab-105762"];
+  CLAIM_BLENDE_CALIBRATION_BY_SLUG[slug] =
+    CLAIM_BLENDE_CALIBRATION_BY_SLUG["ab-105762"];
 });
 
 // The AB 105807 PDF draws a narrow floor-height return at the right end of the

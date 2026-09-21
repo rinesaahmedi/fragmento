@@ -12,6 +12,7 @@ import {
   PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG,
 } from "../lib/kitchen-plan-preview-data.js";
 import {
+  buildServiceClaimBlendeHotspots,
   buildServiceClaimPartHotspots,
   isLShapedClaimKitchen,
 } from "../lib/service-claim-kitchen-hotspots.js";
@@ -218,6 +219,32 @@ test("AB 105762 keeps the required UPEF65 on stale and current US50 client data"
 
   const currentItem = { ...staleItem, price: 266, blendeCode: "UPEF65", blendePrice: 68 };
   assert.strictEqual(applyArticleVariantSelectionForDisplay(currentItem, ""), currentItem);
+});
+
+test("AB 105762 ASC keeps US30 on its front and UPK20 on the far-right end face", () => {
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105762"]
+    .filter((hotspot) => hotspot.componentKey === "drawer-module");
+  const blende = {
+    componentId: "component-claim-blende-drawer-module",
+    componentKey: "claim-blende-drawer-module",
+    sourceComponentKey: "drawer-module",
+    sourceWidthMm: 300,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const components = [{ componentKey: "drawer-module", widthMm: 300, blendeCode: "UPK20" }];
+
+  for (const slug of ["ab-105762", ...aliasSlugs]) {
+    const result = buildServiceClaimBlendeHotspots(sourceHotspots, [blende], components, slug);
+    const cabinetFaces = result.filter((hotspot) => hotspot.componentKey === "drawer-module");
+    const blendeFaces = result.filter((hotspot) => hotspot.claimPartKey === "blende");
+
+    assert.equal(cabinetFaces.length, 2, `${slug} should keep the US30 front faces`);
+    assert.equal(blendeFaces.length, 1, `${slug} should expose one UPK20 end face`);
+    assert.deepEqual(cabinetFaces[0].points, sourceHotspots[0].points);
+    assert.deepEqual(blendeFaces[0].points, sourceHotspots[2].points);
+    assert.equal(blendeFaces[0].componentId, blende.componentId);
+  }
 });
 
 test("AB 105762 accepts its configured worktop and sink bundle article numbers", () => {
