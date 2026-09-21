@@ -17,6 +17,10 @@ import {
 } from "../lib/service-claim-kitchen-hotspots.js";
 import { loadKitchenSvgMarkup } from "../lib/load-kitchen-svg.js";
 import { applyArticleVariantSelectionForDisplay } from "../lib/auszug-variants.js";
+import {
+  allowsKitchenArticleNumberAlias,
+  matchesConfiguredArticleNumber,
+} from "../lib/order-article-aliases.js";
 
 const translate = (_key, fallback) => fallback;
 const aliasSlugs = ["ab-105766", "ab-105770", "ab-105774"];
@@ -214,6 +218,31 @@ test("AB 105762 keeps the required UPEF65 on stale and current US50 client data"
 
   const currentItem = { ...staleItem, price: 266, blendeCode: "UPEF65", blendePrice: 68 };
   assert.strictEqual(applyArticleVariantSelectionForDisplay(currentItem, ""), currentItem);
+});
+
+test("AB 105762 accepts its configured worktop and sink bundle article numbers", () => {
+  assert.equal(allowsKitchenArticleNumberAlias("ab-105762"), true);
+  for (const slug of aliasSlugs) {
+    assert.equal(allowsKitchenArticleNumberAlias(slug), true);
+  }
+
+  for (const [submittedArticleNumber, catalogArticleNumber] of [
+    ["PLR60-1 + PLR60-2", "PLR60"],
+    ["517720 + 526335", "526335 + 517720"],
+  ]) {
+    assert.equal(matchesConfiguredArticleNumber({
+      submittedArticleNumber,
+      catalogArticleNumber,
+      kitchenArticleNumber: submittedArticleNumber,
+      allowKitchenArticleNumberAlias: allowsKitchenArticleNumberAlias("ab-105762"),
+    }), true);
+    assert.equal(matchesConfiguredArticleNumber({
+      submittedArticleNumber,
+      catalogArticleNumber,
+      kitchenArticleNumber: submittedArticleNumber,
+      allowKitchenArticleNumberAlias: false,
+    }), false);
+  }
 });
 
 test("AB 105762 schedule rows are complete and catalog linked", () => {

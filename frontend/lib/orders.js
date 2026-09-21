@@ -41,6 +41,10 @@ import {
   resolveCutleryCatalogArticles,
 } from "./cutlery-accessories";
 import { normalizeArticleNumber, resolveAuszugVariantSelection } from "./auszug-variants";
+import {
+  allowsKitchenArticleNumberAlias,
+  matchesConfiguredArticleNumber,
+} from "./order-article-aliases";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -206,24 +210,19 @@ export function mapCatalogItem(catalogItems, submittedItem, itemType, options = 
   const submittedArticleNumber = normalizeArticleNumber(submittedItem.articleNumber);
   const matchedKitchenArticleNumber = normalizeArticleNumber(matched.articleNumber);
   const matchedCatalogArticleNumber = normalizeArticleNumber(catalogArticle?.articleNumber);
-  const originallyMatchedArticleNumber = matchedCatalogArticleNumber || matchedKitchenArticleNumber;
-  const matchesConfiguredArticleNumber = Boolean(
-    submittedArticleNumber
-    && (
-      submittedArticleNumber === originallyMatchedArticleNumber
-      || (
-        options.allowKitchenArticleNumberAlias === true
-        && submittedArticleNumber === matchedKitchenArticleNumber
-      )
-    )
-  );
+  const matchesConfiguredArticle = matchesConfiguredArticleNumber({
+    submittedArticleNumber,
+    catalogArticleNumber: matchedCatalogArticleNumber,
+    kitchenArticleNumber: matchedKitchenArticleNumber,
+    allowKitchenArticleNumberAlias: options.allowKitchenArticleNumberAlias === true,
+  });
   let selectedArticle = catalogArticle;
   let selectedComponentArticleNumber = "";
 
   if (
     itemType === ItemType.COMPONENT &&
     submittedArticleNumber &&
-    !matchesConfiguredArticleNumber
+    !matchesConfiguredArticle
   ) {
     const selectedVariant = resolveAuszugVariantSelection(matched, submittedArticleNumber, options.auszugVariantArticles || []);
     if (selectedVariant.status !== "variant") {
@@ -703,7 +702,10 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     accessories: normalizeSubmissionItems(orderPayload?.accessories),
     services: normalizeSubmissionItems(orderPayload?.services),
   };
-  const allowKitchenArticleNumberAlias = kitchen.slug === "burger-103898";
+  // These kitchens intentionally use supplier-facing display bundles on the
+  // KitchenItem while pricing and validation remain linked to one canonical
+  // catalog article. Accept either configured value for the matched item.
+  const allowKitchenArticleNumberAlias = allowsKitchenArticleNumberAlias(kitchen.slug);
   const useProgramPrices = kitchen.slug === "burger-103898";
   const programPriceOptions = { useProgramPrices, programmId: kitchen.programmId };
 
