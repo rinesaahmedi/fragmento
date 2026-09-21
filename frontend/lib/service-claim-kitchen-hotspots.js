@@ -590,10 +590,22 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   "burger-103898": {
     "base-module-2": { side: "right", inner: 53.387173, outer: 54.997625 },
   },
-  // AB 105762 draws the US30 front and its exposed UPK20 end panel as
-  // separate perspective faces. Keep the narrow cabinet front selectable as
-  // US30 and assign only the large far-right end face to the Blende.
+  // AB 105762 draws both attached base-cabinet Blenden as complete, separate
+  // perspective faces. Keep each cabinet face intact and assign only the
+  // corresponding exposed face to its Blende.
   "ab-105762": {
+    "base-module-2": {
+      side: "right",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        {
+          left: 55.852732,
+          right: 57.52019,
+          top: 58.211765,
+          bottom: 87.294118,
+        },
+      ],
+    },
     "drawer-module": {
       side: "right",
       wholeFacesOnly: true,

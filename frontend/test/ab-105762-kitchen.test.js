@@ -247,6 +247,32 @@ test("AB 105762 ASC keeps US30 on its front and UPK20 on the far-right end face"
   }
 });
 
+test("AB 105762 ASC separates the US50 cabinet from its corner Blende", () => {
+  const sourceHotspots = PLAN_HOTSPOTS_BY_SLUG["ab-105762"]
+    .filter((hotspot) => hotspot.componentKey === "base-module-2");
+  const blende = {
+    componentId: "component-claim-blende-base-module-2",
+    componentKey: "claim-blende-base-module-2",
+    sourceComponentKey: "base-module-2",
+    sourceWidthMm: 500,
+    claimPartKey: "blende",
+    blendeQuantity: 1,
+  };
+  const components = [{ componentKey: "base-module-2", widthMm: 500, blendeCode: "UPEF65" }];
+
+  for (const slug of ["ab-105762", ...aliasSlugs]) {
+    const result = buildServiceClaimBlendeHotspots(sourceHotspots, [blende], components, slug);
+    const cabinetFaces = result.filter((hotspot) => hotspot.componentKey === "base-module-2");
+    const blendeFaces = result.filter((hotspot) => hotspot.claimPartKey === "blende");
+
+    assert.equal(cabinetFaces.length, 1, `${slug} should keep only the complete US50 front`);
+    assert.equal(blendeFaces.length, 1, `${slug} should expose only the complete UPEF65 face`);
+    assert.deepEqual(cabinetFaces[0].points, sourceHotspots[0].points);
+    assert.deepEqual(blendeFaces[0].points, sourceHotspots[1].points);
+    assert.equal(blendeFaces[0].componentId, blende.componentId);
+  }
+});
+
 test("AB 105762 accepts its configured worktop and sink bundle article numbers", () => {
   assert.equal(allowsKitchenArticleNumberAlias("ab-105762"), true);
   for (const slug of aliasSlugs) {
