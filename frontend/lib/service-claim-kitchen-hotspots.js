@@ -590,10 +590,22 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
   "burger-103898": {
     "base-module-2": { side: "right", inner: 53.387173, outer: 54.997625 },
   },
-  // AB 105762 draws both attached base-cabinet Blenden as complete, separate
+  // AB 105762 draws its attached cabinet Blenden as complete, separate
   // perspective faces. Keep each cabinet face intact and assign only the
-  // corresponding exposed face to its Blende.
+  // corresponding exposed upper or lower face to its Blende.
   "ab-105762": {
+    "wall-cabinet-4": {
+      side: "right",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        {
+          left: 62.750594,
+          right: 63.648456,
+          top: 14.386555,
+          bottom: 38.447059,
+        },
+      ],
+    },
     "base-module-2": {
       side: "right",
       wholeFacesOnly: true,
@@ -611,10 +623,10 @@ const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
       wholeFacesOnly: true,
       wholeBlendeFaces: [
         {
-          left: 81.961995,
-          right: 92.437055,
-          top: 61.620168,
-          bottom: 91.710924,
+          left: 80.23753,
+          right: 81.961995,
+          top: 62.890756,
+          bottom: 92.194958,
         },
       ],
     },
