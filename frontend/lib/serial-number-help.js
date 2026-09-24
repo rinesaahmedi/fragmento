@@ -40,6 +40,10 @@ const BOSCH_OVEN_SERIAL_NUMBER_HELP_IMAGES = [
   { src: "/serial%20nr%20img/bosch/oven/BOSCH%20oven%20ARROW.png", alt: "BOSCH oven serial number location" },
 ];
 
+const BOSCH_HOB_SERIAL_NUMBER_HELP_IMAGES = [
+  { src: "/serial%20nr%20img/bosch/cooktop/BOSCH%20oven%20ARROW.png", alt: "BOSCH cooktop serial number location" },
+];
+
 const BOSCH_EXTRACTOR_HOOD_SERIAL_NUMBER_HELP_IMAGES = [
   { src: "/serial%20nr%20img/bosch/extractor-hood/WhatsApp%20Image%202026-08-07%20at%2009.04.57.jpeg", alt: "BOSCH extractor hood serial number location" },
   { src: "/serial%20nr%20img/bosch/extractor-hood/WhatsApp%20Image%202026-08-07%20at%2009.04.57%20(1).jpeg", alt: "BOSCH extractor hood rating plate location" },
@@ -78,7 +82,7 @@ export const SERIAL_NUMBER_HELP_IMAGES_BY_PROFILE = {
     extractor_hood: BOSCH_EXTRACTOR_HOOD_SERIAL_NUMBER_HELP_IMAGES,
     fridge: BOSCH_FRIDGE_SERIAL_NUMBER_HELP_IMAGES,
     oven: BOSCH_OVEN_SERIAL_NUMBER_HELP_IMAGES,
-    hob: [],
+    hob: BOSCH_HOB_SERIAL_NUMBER_HELP_IMAGES,
     washing_machine: [],
   },
   aeg: {

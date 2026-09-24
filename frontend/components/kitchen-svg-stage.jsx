@@ -101,6 +101,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105757": "/plans/AB%20105757.svg",
   "ab-105759": "/plans/AB%20105759.svg",
   "ab-105762": "/plans/AB%20105762-63.svg?v=4",
+  "ab-105775": "/plans/AB%20105775%20-%2064.svg?v=4",
   "ab-105749": "/plans/AB%20105746.svg",
   "ab-105752": "/plans/AB%20105746.svg",
   "ab-105755": "/plans/AB%20105746.svg",
@@ -156,6 +157,7 @@ export const IMAGE_VIEW_BY_SLUG = {
   "ab-105764": "/plans/AB%20105760-61.svg",
   "ab-105768": "/plans/AB%20105760-61.svg",
   "ab-105772": "/plans/AB%20105760-61.svg",
+  "ab-105776": "/plans/AB%20105776%20-%2066.svg",
   "ab-110140": "/plans/AB%20110140.svg",
   "ab-110510": "/plans/AB%20110510.svg",
   "ab-111539": "/plans/AB%20111539.svg",
@@ -1425,6 +1427,26 @@ export const IMAGE_HOTSPOTS_BY_SLUG = {
     { componentKey: "sink-end-blende", left: 89.757720, top: 65.109244, width: 2.109264, height: 32.732773, preserveManualSize: true },
     { componentKey: "refrigerator", left: 10.446556, top: 30.742857, width: 14.650831, height: 67.099160, preserveManualSize: true },
   ],
+  // AB 105776-66: exact rectangles measured from the 3509 x 2480 PDF render.
+  // The HPK2002 is included in the rightmost wall cabinet; UPK20 stays separate.
+  "ab-105776": [
+    { componentKey: "refrigerator", left: 4.132231, top: 30.483871, width: 14.705045, height: 67.338710, preserveManualSize: true },
+    { componentKey: "wall-cabinet-1", left: 20.661157, top: 16.733871, width: 15.873468, height: 27.096774, preserveManualSize: true },
+    { componentKey: "wall-cabinet-2", left: 36.534625, top: 16.733871, width: 15.873468, height: 27.096774, preserveManualSize: true },
+    { componentKey: "extractor-hood", left: 36.534625, top: 43.830645, width: 15.873468, height: 7.177420, preserveManualSize: true },
+    { componentKey: "wall-cabinet-3", left: 52.408093, top: 16.733871, width: 15.844971, height: 27.096774, preserveManualSize: true },
+    { componentKey: "wall-cabinet-4", left: 68.253064, top: 16.733871, width: 13.251638, height: 27.096774, preserveManualSize: true },
+    { componentKey: "wall-cabinet-5", left: 81.504702, top: 16.733871, width: 17.127387, height: 27.096774, preserveManualSize: true },
+    { componentKey: "worktop", left: 20.176689, top: 63.427419, width: 78.455400, height: 1.532258, preserveManualSize: true },
+    { componentKey: "worktop", left: 20.176689, top: 64.959677, width: 0.427472, height: 32.862904, preserveManualSize: true, separateLockedSidePanel: true },
+    { componentKey: "sink-faucet", left: 84.640923, top: 55.645161, width: 2.650328, height: 7.782258, preserveManualSize: true },
+    { componentKey: "dishwasher-base", left: 20.604161, top: 64.959677, width: 15.901966, height: 32.862904, preserveManualSize: true },
+    { componentKey: "oven-module", left: 36.506127, top: 64.959677, width: 15.844970, height: 32.862904, preserveManualSize: true },
+    { componentKey: "base-module-1", left: 52.351097, top: 64.959677, width: 15.873468, height: 32.862904, preserveManualSize: true },
+    { componentKey: "base-module-2", left: 68.224565, top: 64.959677, width: 13.222571, height: 32.862904, preserveManualSize: true },
+    { componentKey: "sink-base", left: 81.447706, top: 64.959677, width: 15.873468, height: 32.862904, preserveManualSize: true },
+    { componentKey: "sink-end-blende", left: 97.321174, top: 64.959677, width: 1.310915, height: 32.862904, preserveManualSize: true },
+  ],
 };
 
 // FRG and ASC intentionally share the exact same AB 105831 cabinet polygons.
@@ -1553,6 +1575,7 @@ AB_105759_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105759"];
 });
 IMAGE_HOTSPOTS_BY_SLUG["ab-105762"] = PLAN_HOTSPOTS_BY_SLUG["ab-105762"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-105775"] = PLAN_HOTSPOTS_BY_SLUG["ab-105775"];
 AB_105762_LAYOUT_ALIAS_SLUGS.forEach((slug) => {
   IMAGE_HOTSPOTS_BY_SLUG[slug] = IMAGE_HOTSPOTS_BY_SLUG["ab-105762"];
 });

@@ -4,6 +4,8 @@ const KITCHEN_ARTICLE_NUMBER_ALIAS_SLUGS = new Set([
   "ab-105766",
   "ab-105770",
   "ab-105774",
+  "ab-105775",
+  "ab-105776",
 ]);
 
 export function allowsKitchenArticleNumberAlias(kitchenSlug) {

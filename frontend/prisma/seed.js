@@ -36,6 +36,7 @@ const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "burger-103898",
   "ab-105762",
+  "ab-105775",
   ...AB_105762_LAYOUT_ALIAS_CODES.map((code) => `ab-${code}`),
   "ab-105743",
   "ab-105748",
@@ -2174,6 +2175,91 @@ const AB_105764_ITEMS = cloneAB105760ItemsForKitchen("105764");
 const AB_105768_ITEMS = cloneAB105760ItemsForKitchen("105768");
 const AB_105772_ITEMS = cloneAB105760ItemsForKitchen("105772");
 
+// AB 105776-66: straight elevation with the refrigerator on the left.
+// Supplier schedule rows 1-3 are the included oven, worktop, and sink cabinet.
+// The right-end UPK20 remains a separate catalog-linked customer selection.
+const AB_105776_ITEMS = [
+  defaultOvenHob({
+    articleNumber: "A-EH923640E + 9EC744100C",
+    catalogArticleNumber: "A-EH923640E + 9EC744100C",
+    infoText: "A-EH923640E oven, 9EC744100C ceramic cooktop and UHK lower cabinet",
+    widthMm: 600,
+    sortOrder: 10,
+  }),
+  defaultWorktop({ code: "TOP-AB105776", sortOrder: 20, catalogArticleNumber: "PLR60" }),
+  defaultSinkBase({
+    code: "SINK-BASE-AB105776-SP60",
+    widthMm: 600,
+    heightMm: 878,
+    depthMm: 600,
+    articleNumber: "SP60",
+    catalogArticleNumber: "SP60",
+    infoText: "Included SP60 sink base cabinet",
+    sortOrder: 30,
+  }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB105776-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), widthMm: 540, heightMm: 1810, depthMm: 576, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Freestanding fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105776-600", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePrice("A-EGSPV597210 + TGV60"), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 50, infoText: "Fully integrated dishwasher incl. furniture front, 60 cm", articleNumber: "A-EGSPV597210 + TGV60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105776-US60", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US60"), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 60, infoText: "US60 lower cabinet with drawer", articleNumber: "US60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105776-US50", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US50"), widthMm: 500, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 70, infoText: "US50 lower cabinet with drawer", articleNumber: "US50" },
+  sinkEndBlende("105776", { sortOrder: 80, catalogBlendeCode: "UPK20" }),
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105776-H6002-1", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 90, infoText: "H6002 upper cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105776-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-2", sortOrder: 100, infoText: "HD6002 cabinet, FH664621E flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105776-FH664621E", name: "FH664621E Extractor Hood", nameDe: "FH664621E Flachschirmhaube", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105776-H6002-2", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-3", sortOrder: 110, infoText: "H6002 upper cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105776-H5002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H5002"), widthMm: 500, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 120, infoText: "H5002 upper cabinet", articleNumber: "H5002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105776-H6002-HPK2002", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 720, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 130, infoText: "H6002 upper cabinet with supplied HPK2002 filler panel", articleNumber: "H6002", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 (35E)", blendePrice: "0.00" },
+  defaultSinkWorktop({ sortOrder: 140, catalogArticleNumber: "526335 + 517720" }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
+// AB 105775-64: two-leg perspective kitchen. Supplier rows 1-3 are the
+// included oven, split worktop, and sink cabinet. Every secondary UPK/UPEF/HPK
+// article remains attached to its scheduled cabinet through a catalog Blende.
+const AB_105775_ITEMS = [
+  defaultOvenHob({
+    articleNumber: "A-EH923640E + 9EC744100C",
+    catalogArticleNumber: "A-EH923640E + 9EC744100C",
+    infoText: "A-EH923640E oven, 9EC744100C ceramic cooktop and UHK lower cabinet",
+    widthMm: 600,
+    sortOrder: 10,
+  }),
+  defaultWorktop({
+    code: "TOP-AB105775",
+    articleNumber: "PLR60-1 + PLR60-2",
+    displayArticleNumber: "PLR60-1 + PLR60-2",
+    catalogArticleNumber: "PLR60",
+    sortOrder: 20,
+  }),
+  defaultSinkBase({
+    code: "SINK-BASE-AB105775-SP60",
+    widthMm: 600,
+    heightMm: 878,
+    depthMm: 600,
+    articleNumber: "SP60",
+    catalogArticleNumber: "SP60",
+    infoText: "Included SP60 sink base cabinet",
+    sortOrder: 30,
+  }),
+  { itemType: ItemType.COMPONENT, code: "REF-AB105775-KGCN388140E", name: REFRIGERATOR_CATALOG_NAME_EN, nameDe: REFRIGERATOR_CATALOG_NAME_DE, price: articlePrice("OL-KGCN388140E"), widthMm: 540, heightMm: 1810, depthMm: 576, iconKey: "tall_refrigerator", colorKey: "black", componentKey: "refrigerator", sortOrder: 40, infoText: "Freestanding fridge-freezer, 181 cm", articleNumber: "OL-KGCN388140E" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105775-US50-UPEF65", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US50", "UPEF65", 1), widthMm: 500, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 50, infoText: "US50 lower cabinet with UPEF65 corner filler panel", articleNumber: "US50", catalogArticleNumber: "US50", blendeCode: "UPEF65", blendeLabel: "UPEF65 Corner filler panel", blendePrice: blendePrice("UPEF65", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105775-US30-1", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US30"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-2", sortOrder: 60, infoText: "US30 lower cabinet", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105775-US30-UPK20", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePriceWithBlende("US30", "UPK20", 1), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "base-module-3", sortOrder: 70, infoText: "US30 lower cabinet with UPK20 filler panel", articleNumber: "US30", catalogArticleNumber: "US30", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB105775-US30-2", name: "Lower Cabinet with Drawer", nameDe: "Unterschrank mit Schublade", price: articlePrice("US30"), widthMm: 300, heightMm: 878, depthMm: 600, iconKey: "drawer_base_two", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 80, infoText: "US30 lower cabinet on the sink leg", articleNumber: "US30" },
+  { itemType: ItemType.COMPONENT, code: "DISH-AB105775-600-UPK20", name: DISHWASHER_CATALOG_NAME_EN, nameDe: DISHWASHER_CATALOG_NAME_DE, price: articlePriceWithBlende("A-EGSPV597210 + TGV60", "UPK20", 1), widthMm: 600, heightMm: 878, depthMm: 600, iconKey: "dishwasher_base", colorKey: "#001f7f", componentKey: "dishwasher-base", sortOrder: 90, infoText: "Fully integrated dishwasher incl. furniture front and UPK20 filler panel", articleNumber: "A-EGSPV597210 + TGV60", catalogArticleNumber: "A-EGSPV597210 + TGV60", blendeCode: "UPK20", blendeLabel: "UPK20 20 cm", blendePrice: blendePrice("UPK20", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105775-H6002-HPK2002-L", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 100, infoText: "H6002 upper cabinet with left HPK2002 filler panel", articleNumber: "H6002", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105775-H3002-1", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H3002"), widthMm: 300, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 110, infoText: "H3002 upper cabinet", articleNumber: "H3002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB105775-600", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 120, infoText: "HD6002 cabinet, FH664621E flat pull-out hood and FWK124 filter", articleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB105775-FH664621E", name: "FH664621E Extractor Hood", nameDe: "FH664621E Flachschirmhaube", price: bundlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 122, infoText: "Flat pull-out hood + cabinet + filter, 60 cm", articleNumber: "FH664621E + FWK124 + HD6002", isActive: false },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105775-H3002-2", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H3002", "HPK2002", 1), widthMm: 300, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 130, infoText: "H3002 upper cabinet with HPK2002 filler panel", articleNumber: "H3002", catalogArticleNumber: "H3002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105775-H3002-3", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H3002"), widthMm: 300, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 140, infoText: "H3002 upper cabinet on the sink leg", articleNumber: "H3002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105775-H6002-1", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-6", sortOrder: 150, infoText: "H6002 upper cabinet", articleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB105775-H6002-HPK2002-R", name: "Upper Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002", 1), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-7", sortOrder: 160, infoText: "H6002 upper cabinet with right HPK2002 filler panel", articleNumber: "H6002", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002 20 cm", blendePrice: blendePrice("HPK2002", 1) },
+  defaultSinkWorktop({ code: "SINK-WORKTOP-AB105775", sortOrder: 170, articleNumber: "526335 + 517720", displayArticleNumber: "517720 + 526335", catalogArticleNumber: "526335 + 517720" }),
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // Burger 103898: L-shaped Cindy kitchen from contract plan 670 103898.
 // Supplier schedule codes are retained for display while catalogArticleNumber links
 // each row to the shared catalog identity used by the Burger program price list.
@@ -2467,6 +2553,22 @@ const DEFAULT_KITCHENS = [
     name: "105772",
     description: "Straight kitchen configuration using the AB 105760 layout and element selection",
     items: AB_105772_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105776",
+    kitchenCode: "105 776",
+    name: "105776",
+    description: "Straight kitchen configuration based on frontend/public/plans/AB 105776 - 66.svg",
+    items: AB_105776_ITEMS,
+    reconcileExisting: true,
+  },
+  {
+    slug: "ab-105775",
+    kitchenCode: "105 775",
+    name: "105775",
+    description: "Two-leg perspective kitchen configuration based on frontend/public/plans/AB 105775 - 64.svg",
+    items: AB_105775_ITEMS,
     reconcileExisting: true,
   },
   {

@@ -14,6 +14,8 @@ export const CONTRACT_APPLIANCE_BRANDS = [
   { value: "aeg", label: "AEG" },
 ];
 
+export const ARC_DEFAULT_APPLIANCE_BRAND = "bosch";
+
 const APPLIANCE_TYPE_SET = new Set(CONTRACT_APPLIANCE_TYPES.map((entry) => entry.type));
 const APPLIANCE_BRAND_SET = new Set(CONTRACT_APPLIANCE_BRANDS.map((entry) => entry.value));
 
@@ -115,9 +117,16 @@ export function deriveKitchenAppliances({ selectableComponents = [], items = [],
   return CONTRACT_APPLIANCE_TYPES.flatMap(({ type }) => byType.has(type) ? [byType.get(type)] : []);
 }
 
-export function resolveContractAppliances({ automatic = [], saved = [], manual = false, configured = false } = {}) {
+export function resolveContractAppliances({ automatic = [], saved = [], manual = false, configured = false, defaultBrand = "" } = {}) {
+  const normalizedDefaultBrand = normalizeContractApplianceBrand(defaultBrand);
   const base = manual
-    ? CONTRACT_APPLIANCE_TYPES.map(({ type }) => ({ applianceType: type, isPresent: !configured, source: "MANUAL" }))
+    ? CONTRACT_APPLIANCE_TYPES.map(({ type }) => ({
+        applianceType: type,
+        brand: normalizedDefaultBrand || null,
+        serialHelpProfile: normalizedDefaultBrand || null,
+        isPresent: !configured,
+        source: "MANUAL",
+      }))
     : automatic;
   const entries = base.map((entry) => {
     const override = findContractAppliance(saved, entry.applianceType);

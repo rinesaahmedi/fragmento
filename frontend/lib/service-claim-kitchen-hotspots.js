@@ -34,6 +34,7 @@ const AB_105762_LAYOUT_ALIAS_SLUGS = [
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
   "burger-103898",
   "ab-105762",
+  "ab-105775",
   ...AB_105762_LAYOUT_ALIAS_SLUGS,
   "ab-105743",
   "ab-105748",
@@ -79,6 +80,7 @@ export function isLShapedClaimKitchen(kitchenSlug = "") {
 const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
   "burger-103898": [[-2.075268817, 0.964447543], [-0.47311828, 0.851516208], [2.806451613, 1.071104915], [1.265232975, 1.181944929]],
   "ab-105762": [[-1.570532556,0.966873712],[-0.244514078,0.877846782],[1.059561153,0.991718454],[2.310344479,1.101449353],[1.053291465,1.19254667],[-0.394984162,1.091097317]],
+  "ab-105775": [[-2.094650206,0.997690531],[-0.740740741,0.877598152],[3.041152263,1.072363356],[3.069958848,1.212471132],[1.448559671,1.2147806],[-1.995884774,1.013856813]],
   // Four outside sink strokes measured from the replacement AB 105743 vector PDF.
   "ab-105743": [[-0.200000081, 0.962376212], [3.192157039, 0.788118787], [4.741176765, 0.900990074], [1.349019645, 1.075247499]],
   // Outside sink strokes measured from the AB 105748 vector PDF.
@@ -119,6 +121,9 @@ const L_SHAPED_SINK_POINTS_RELATIVE_TO_FAUCET_BY_SLUG = {
 const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
   "burger-103898": [[57.662708, 59.30084], [64.033254, 58.211765], [77.073634, 60.329412], [70.945368, 61.398319]],
   "ab-105762": [[58.118765,56.578151],[64.147268,55.710924],[70.07601,56.820168],[75.76247,57.889076],[70.047506,58.776471],[63.463183,57.788235]],
+  // Complete outside sink rim, including the left bowl and right drainer.
+  // The earlier six-point mask cut through both end corners of the fixture.
+  "ab-105775": [[67.581948,64.746218],[67.667458,64.685714],[73.524941,63.717647],[85.368171,65.431933],[85.467933,65.67395],[80.87886,66.621849],[79.795724,66.642017],[67.92399,64.907563]],
   // Four visible outside sink strokes traced from the AB 105825 source plan.
   // The wider source hotspot is only a generous click target and crosses the
   // worktop edges, so it must not be used as the painted selection mask.
@@ -297,6 +302,7 @@ const LEFT_LEG_COOKTOP_POINTS_RELATIVE_TO_OVEN = [
 // preserves their alignment when the claim picker applies its display crop.
 const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
   "ab-105762": [[-0.693421063,-0.052666216],[0.296052645,-0.103357487],[1.022368395,-0.05200789],[0,0.002633303]],
+  "ab-105775": [[0.033873343,-0.098082596],[1.615611193,-0.044247788],[1.04712813,0.007374631],[0.033873343,-0.044247788]],
   "ab-110140": [[1.118461627, -0.096485619], [2.112307687, -0.038977633], [1.023076953, 0.012140566], [0.029230786, -0.049201273]],
   "burger-103898": [[-0.236714976, -0.090786819], [0.869565217, -0.045729657], [0, 0.00672495], [-0.834138486, -0.025554808]],
   // Four outside cooktop strokes measured from the replacement AB 105743 vector PDF.
@@ -443,6 +449,16 @@ const COOKTOP_POINTS_RELATIVE_TO_OVEN_BY_SLUG = {
 };
 
 const COOKTOP_SOURCE_POINTS_BY_SLUG = {
+  // Exact outside cooktop strokes from the AB 105775 vector plan. The
+  // dedicated source polygon keeps the ASC mask on the glass perimeter
+  // instead of re-projecting it from the taller oven cabinet.
+  "ab-105775": [
+    [42.470309, 59.018487],
+    [49.980998, 60.107563],
+    [49.980998, 60.773109],
+    [44.47981, 61.902521],
+    [34.674584, 60.490756],
+  ],
   "ab-111539": [
     [53.543943, 56.477311],
     [65.159145, 54.803361],
@@ -532,6 +548,54 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  // AB 105775 draws most supplied Blenden as independent perspective faces.
+  // Assign those complete faces to the filler products and leave the adjacent
+  // cabinet fronts/sides selectable as their own articles. The two remaining
+  // UPK/HPK strips end at the measured PDF edge of their source cabinet.
+  "ab-105775": {
+    "base-module-1": {
+      side: "right",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        { left: 28.033254, right: 29.515439, top: 60.994958, bottom: 86.971429 },
+      ],
+    },
+    "base-module-3": {
+      side: "right",
+      // The cabinet/filler divider is the transformed x=3485 CAD stroke.
+      // Starting at 49.540998 left one visible vertical face unselected.
+      inner: 49.290471,
+      outer: 49.980998,
+    },
+    "dishwasher-base": {
+      side: "right",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        { left: 86.736342, right: 87.691211, top: 69.284034, bottom: 95.381513 },
+      ],
+    },
+    "wall-cabinet-1": {
+      side: "left",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        { left: 22.56057, right: 23.35867, top: 21.868908, bottom: 43.368067 },
+      ],
+    },
+    "wall-cabinet-4": {
+      // HPK2002 exists commercially, but the perspective view does not draw
+      // it as an independent face. Keep it form-selectable without cutting
+      // the visible H3002 cabinet hotspot.
+      cabinetOwnsWholeHotspot: true,
+    },
+    "wall-cabinet-7": {
+      side: "right",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        { left: 90.256532, right: 91.225653, top: 31.085714, bottom: 52.584874 },
+        { left: 91.225653, right: 91.496437, top: 31.166387, bottom: 52.584874 },
+      ],
+    },
+  },
   // AB 109873 stores each 90 cm cabinet as one commercial item but draws it
   // with two door hotspots. Its filler is the complete outer end face after
   // x=92.764846, not the internal door seam at x=80.764846.
@@ -1063,6 +1127,7 @@ const OVEN_DRAWER_TOP_RATIO_BY_SLUG = {
   // The lower line at y=85.015126% / 83.442017% is the drawer/plinth seam;
   // the UHK selection continues through the plinth to the module baseline.
   "ab-105762": 0.6614,
+  "ab-105775": 0.627581121,
   "ab-105763": (2040 - 1554) / (2160 - 1554),
   "ab-105767": (2040 - 1554) / (2160 - 1554),
   "ab-105771": (2040 - 1554) / (2160 - 1554),
@@ -1096,6 +1161,10 @@ const OVEN_PART_SOURCE_POINTS_BY_SLUG = {
   "ab-105762": {
     oven: [[36,61.07563],[46.831354,59.502521],[46.831354,78.722689],[36,80.295798]],
     "oven-drawer": [[36,80.295798],[46.831354,78.722689],[46.831354,88.584874],[36,90.137815]],
+  },
+  "ab-105775": {
+    oven: [[34.346793,61.70084],[44.023753,63.092437],[44.023753,80.255462],[34.346793,78.863866]],
+    "oven-drawer": [[34.346793,78.863866],[44.023753,80.255462],[44.023753,89.048739],[34.346793,87.657143]],
   },
   "ab-111539": {
     oven: [
@@ -1204,6 +1273,9 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
   "ab-105762": AB_105762_WORKTOP_SPLIT,
+  "ab-105775": {
+    indexPartKeys: ["worktop-left", "worktop-left", "worktop-left", "worktop-left", "worktop-right"],
+  },
   "ab-111539": {
     indexPartKeys: ["worktop-left", "worktop-right", "worktop-left", "worktop-right"],
   },
@@ -1778,6 +1850,9 @@ export function buildServiceClaimBlendeHotspots(hotspots = [], claimBlenden = []
     ];
     const calibration = calibrationBySourceKey?.[blende.sourceComponentKey]
       || calibrationBySourceKey?.[sourceKey];
+    if (calibration?.cabinetOwnsWholeHotspot) {
+      return [hotspot];
+    }
     const wholeBlendeFaces = Array.isArray(calibration?.wholeBlendeFaces)
       ? calibration.wholeBlendeFaces
       : [];

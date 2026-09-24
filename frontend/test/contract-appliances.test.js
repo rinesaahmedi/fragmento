@@ -76,6 +76,32 @@ test("unknown ARC inventories preserve legacy choices and explicit empty invento
   assert.deepEqual(empty.appliances, []);
   assert.equal(empty.configured, true);
 });
+test("ARC inventories default to Bosch without changing explicit overrides or empty inventories", async () => {
+  const defaults = await loadContractApplianceInventory({ contractType: "ARC", appliances: [], appliancesConfigured: false }, {});
+  assert.equal(defaults.appliances.length, 5);
+  assert.ok(defaults.appliances.every((entry) => entry.brand === "bosch"));
+  assert.ok(defaults.appliances.every((entry) => entry.serialHelpProfile === "bosch"));
+  assert.match(getSerialNumberHelpImages(
+    { claimPartKey: "oven" },
+    defaults.appliances,
+  )[0].src, /bosch\/oven/);
+
+  const overridden = await loadContractApplianceInventory({
+    contractType: "ARC",
+    appliancesConfigured: true,
+    appliances: [{ applianceType: "oven", isPresent: true, brand: "aeg", serialHelpProfile: "aeg" }],
+  }, {});
+  assert.equal(overridden.appliances.length, 1);
+  assert.equal(overridden.appliances[0].brand, "aeg");
+
+  const empty = await loadContractApplianceInventory({ contractType: "ARC", appliances: [], appliancesConfigured: true }, {});
+  assert.deepEqual(empty.appliances, []);
+});
+test("the ARC Bosch default does not affect manual FRG inventories", async () => {
+  const inventory = await loadContractApplianceInventory({ contractType: "FRG", appliances: [], appliancesConfigured: false }, {});
+  assert.equal(inventory.appliances.length, 5);
+  assert.ok(inventory.appliances.every((entry) => entry.brand === null));
+});
 test("ARC removal survives reload, restoration and another contract", () => {
   const removed = { applianceType: "dishwasher", isPresent: false, brand: "bosch" };
   assert.equal(resolveContractAppliances({ manual: true, saved: [removed] }).appliances.some((entry) => entry.applianceType === "dishwasher"), false);
@@ -143,4 +169,14 @@ test("manual inventory loading uses contract settings even when all ARC contract
   const two = await loadContractApplianceInventory({ kitchenId: "shared", contractType: "ARC", appliancesConfigured: true, appliances: [] }, client);
   assert.equal(one.appliances[0].brand, "aeg");
   assert.deepEqual(two.appliances, []);
+});
+test("the production migration backfills only ARC appliance brands without changing presence", () => {
+  const migration = fs.readFileSync(
+    new URL("../prisma/migrations/20260922120000_default_arc_appliances_to_bosch/migration.sql", import.meta.url),
+    "utf8",
+  );
+  assert.match(migration, /WHERE contract\."contractType" = 'ARC'/);
+  assert.match(migration, /'bosch'/);
+  assert.match(migration, /ON CONFLICT \("kitchenContractId", "applianceType"\)/);
+  assert.doesNotMatch(migration, /DO UPDATE SET[\s\S]*?"isPresent"\s*=/);
 });

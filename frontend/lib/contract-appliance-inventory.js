@@ -2,7 +2,12 @@ import { prisma } from "./prisma.js";
 import { getContractOrderState } from "./kitchen-contracts.js";
 import { getOrderKindForContractNumber } from "./order-kind.js";
 import { buildServiceClaimSelectableComponents } from "./service-claim-kitchen-plan-selection.js";
-import { deriveKitchenAppliances, resolveContractAppliances, parseContractAppliances } from "./contract-appliances.js";
+import {
+  ARC_DEFAULT_APPLIANCE_BRAND,
+  deriveKitchenAppliances,
+  resolveContractAppliances,
+  parseContractAppliances,
+} from "./contract-appliances.js";
 
 export async function loadKitchenApplianceInventories(kitchenIds, client = prisma) {
   const kitchens = await client.kitchen.findMany({ where: { id: { in: kitchenIds } }, include: {
@@ -38,7 +43,13 @@ export async function loadContractApplianceInventory(contract, client = prisma) 
     });
     automatic = deriveKitchenAppliances({ ...selectable, items: kitchen.items, confirmedItems });
   }
-  return resolveContractAppliances({ automatic, saved: contract.appliances || [], manual, configured: contract.appliancesConfigured });
+  return resolveContractAppliances({
+    automatic,
+    saved: contract.appliances || [],
+    manual,
+    configured: contract.appliancesConfigured,
+    defaultBrand: contract.contractType === "ARC" ? ARC_DEFAULT_APPLIANCE_BRAND : "",
+  });
 }
 
 export async function saveContractApplianceInventory(tx, contract, formData) {

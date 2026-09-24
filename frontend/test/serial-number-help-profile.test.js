@@ -46,7 +46,7 @@ test("an installed appliance without a selected brand defaults to Amica", () => 
 });
 
 test("supplied BOSCH and AEG photos are registered by appliance type", () => {
-  for (const type of ["dishwasher", "extractor_hood", "fridge", "oven"]) {
+  for (const type of ["dishwasher", "extractor_hood", "fridge", "oven", "hob"]) {
     assert.ok(SERIAL_NUMBER_HELP_IMAGES_BY_PROFILE.bosch[type].length > 0);
   }
   for (const type of ["dishwasher", "fridge", "oven"]) {
@@ -103,13 +103,14 @@ test("contract appliance brand selects the matching type-specific photo set", ()
   assert.match(images[0].src, /Amica%20fridge/);
 });
 
-test("a configured brand never falls back to another manufacturer's photos", () => {
+test("a configured Bosch hob uses its dedicated Bosch cooktop photo", () => {
   const images = getSerialNumberHelpImages(
     { claimPartKey: "hob" },
     [{ applianceType: "hob", brand: "bosch" }],
   );
 
-  assert.deepEqual(images, []);
+  assert.equal(images.length, 1);
+  assert.match(images[0].src, /^\/serial%20nr%20img\/bosch\/cooktop\//);
 });
 
 test("legacy contracts without appliance configuration keep existing help photos", () => {
