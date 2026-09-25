@@ -14,6 +14,7 @@
     "reports": "Reports",
     "contractAccess": "Contract access",
     "claimActivity": "Claim activity",
+    "pxClaims": "PX claims",
     "claims": "Claims",
     "catalogArticles": "Catalog",
     "catalogImports": "Price imports",
@@ -1197,6 +1198,11 @@
     "stripeSession": "Stripe session",
     "card": "Card",
     "orderItems": "PX order items"
+  },
+  "pxClaimsAdmin": {
+    "title": "PX claims",
+    "deleteAll": "Delete all PX claims",
+    "deleteAllConfirm": "Delete all PX claims?\nThis removes every 111 test claim and cannot be undone."
   },
   "reportsAdmin": {
     "reports": "Reports",

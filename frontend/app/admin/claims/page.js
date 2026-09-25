@@ -21,6 +21,7 @@ import { requireAdminClaimsPage } from "../../../lib/admin-claims-access";
 import { prisma } from "../../../lib/prisma";
 import { queryServiceClaimsList } from "../../../lib/service-claim-admin-query";
 import { paginateAdminItems } from "../../../lib/admin-pagination";
+import { isTestContractNumber } from "../../../lib/order-kind";
 
 export const dynamic = "force-dynamic";
 
@@ -43,12 +44,14 @@ function truncate(value, max = 140) {
   return `${text.slice(0, max - 3)}...`;
 }
 
-export default async function AdminClaimsPage({ searchParams = {} }) {
+export default async function AdminClaimsPage({ searchParams = {}, pxOnly = false }) {
   const admin = await requireAdminClaimsPage();
   const resolvedSearchParams = (await searchParams) || {};
+  const basePath = pxOnly ? "/admin/px-claims" : "/admin/claims";
   const filters = {
     q: normalizeParam(resolvedSearchParams.q).trim(),
     city: normalizeParam(resolvedSearchParams.city).trim(),
+    claimType: pxOnly ? "px" : "live",
     dateFrom: normalizeParam(resolvedSearchParams.dateFrom).trim(),
     dateTo: normalizeParam(resolvedSearchParams.dateTo).trim(),
   };
@@ -66,7 +69,9 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
     <AdminShell adminEmail={admin.email}>
       <div style={pageGridStyle}>
         <AdminSection
-          title={<AdminText i18nKey="claimsAdmin.claims" fallback="Claims" />}
+          title={pxOnly
+            ? <AdminText i18nKey="pxClaimsAdmin.title" fallback="PX claims" />
+            : <AdminText i18nKey="claimsAdmin.claims" fallback="Claims" />}
           description={
             <AdminPluralText
               count={claims.length}
@@ -76,11 +81,12 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
               pluralFallback="{count} claims match the current filters."
             />
           }
+          actions={pxOnly && allClaims.length ? <DeleteAllPxClaimsAction /> : null}
         >
           {successMessage ? <FlashMessage tone="success" message={successMessage} /> : null}
           {errorMessage ? <FlashMessage tone="error" message={errorMessage} /> : null}
 
-          <form action="/admin/claims" method="get" style={filterPanelStyle}>
+          <form action={basePath} method="get" style={filterPanelStyle}>
             <div style={filterHeaderStyle}>
               <span style={filterEyebrowStyle}><AdminText i18nKey="contractsAdmin.filters" fallback="Filters" /></span>
               <span style={filterHintStyle}>
@@ -120,7 +126,7 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
               </label>
               <div style={filterActionsStyle}>
                 <button type="submit" style={filterApplyButtonStyle}><AdminText i18nKey="contractsAdmin.applyFilters" fallback="Apply filters" /></button>
-                <Link href="/admin/claims" style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
+                <Link href={basePath} style={filterClearLinkStyle}><AdminText i18nKey="contractsAdmin.clear" fallback="Clear" /></Link>
               </div>
             </div>
           </form>
@@ -167,7 +173,7 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                         <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
                           <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
                         </Link>
-                        <DeleteClaimAction claimId={claim.id} />
+                        {pxOnly && isTestContractNumber(claim.contractNumber) ? <DeleteClaimAction claimId={claim.id} returnPath={basePath} /> : null}
                       </div>
                     </td>
                   </tr>
@@ -198,14 +204,14 @@ export default async function AdminClaimsPage({ searchParams = {} }) {
                     <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
                       <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
                     </Link>
-                    <DeleteClaimAction claimId={claim.id} compact />
+                    {pxOnly && isTestContractNumber(claim.contractNumber) ? <DeleteClaimAction claimId={claim.id} returnPath={basePath} compact /> : null}
                   </div>
                 </div>
               </article>
             ))}
           </div>
 
-          <AdminPagination basePath="/admin/claims" searchParams={resolvedSearchParams} {...pagination} />
+          <AdminPagination basePath={basePath} searchParams={resolvedSearchParams} {...pagination} />
 
           <style>{`
             .admin-claims-cards {
@@ -270,9 +276,10 @@ function ClaimRequestTypeText({ requestType }) {
   return requestType || "-";
 }
 
-function DeleteClaimAction({ claimId, compact = false }) {
+function DeleteClaimAction({ claimId, returnPath = "/admin/claims", compact = false }) {
   return (
     <form action={`/api/admin/claims/${claimId}`} method="post" style={deleteFormStyle}>
+      <input type="hidden" name="_returnPath" value={returnPath} />
       <AdminConfirmSubmitButton
         name="_intent"
         value="delete"
@@ -281,6 +288,22 @@ function DeleteClaimAction({ claimId, compact = false }) {
         confirmFallback={"Delete this claim?\nThis action cannot be undone."}
       >
         <AdminText i18nKey="ordersAdmin.delete" fallback="Delete" />
+      </AdminConfirmSubmitButton>
+    </form>
+  );
+}
+
+function DeleteAllPxClaimsAction() {
+  return (
+    <form action="/api/admin/px-claims" method="post" style={deleteFormStyle}>
+      <AdminConfirmSubmitButton
+        name="_intent"
+        value="delete-all"
+        style={deleteAllButtonStyle}
+        confirmKey="pxClaimsAdmin.deleteAllConfirm"
+        confirmFallback={"Delete all PX claims?\nThis removes every 111 test claim and cannot be undone."}
+      >
+        <AdminText i18nKey="pxClaimsAdmin.deleteAll" fallback="Delete all PX claims" />
       </AdminConfirmSubmitButton>
     </form>
   );
@@ -335,6 +358,13 @@ const deleteButtonStyle = {
 
 const compactDeleteButtonStyle = {
   ...deleteButtonStyle,
+};
+
+const deleteAllButtonStyle = {
+  ...deleteButtonStyle,
+  minHeight: 42,
+  padding: "10px 14px",
+  background: "rgba(217, 92, 92, 0.1)",
 };
 
 const customerNameStyle = {

@@ -1,8 +1,12 @@
 export const ORDER_KIND_LIVE = "live";
 export const ORDER_KIND_TEST = "test";
 
+export function isTestContractNumber(contractNumber) {
+  return String(contractNumber || "").trim().replace(/\s+/g, "").startsWith("111");
+}
+
 export function getOrderKindForContractNumber(contractNumber) {
-  return String(contractNumber || "").trim().replace(/\s+/g, "").startsWith("111")
+  return isTestContractNumber(contractNumber)
     ? ORDER_KIND_TEST
     : ORDER_KIND_LIVE;
 }

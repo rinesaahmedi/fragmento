@@ -180,6 +180,12 @@ export function buildServiceClaimListWhere(filters, {
     conditions.push(Prisma.sql`LOWER(COALESCE(${claim}."clientCity", '')) = LOWER(${filters.city})`);
   }
 
+  if (filters.claimType === "px") {
+    conditions.push(Prisma.sql`REGEXP_REPLACE(COALESCE(${claim}."contractNumber", ''), '[[:space:]]+', '', 'g') LIKE '111%'`);
+  } else if (filters.claimType === "live") {
+    conditions.push(Prisma.sql`REGEXP_REPLACE(COALESCE(${claim}."contractNumber", ''), '[[:space:]]+', '', 'g') NOT LIKE '111%'`);
+  }
+
   if (filters.dateFrom) {
     conditions.push(Prisma.sql`${claim}."createdAt" >= ${new Date(`${filters.dateFrom}T00:00:00.000Z`)}`);
   }

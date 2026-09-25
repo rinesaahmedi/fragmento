@@ -156,3 +156,38 @@ test("queryServiceClaimById selects the kitchen slug for claim previews", async 
   assert.match(queries[1], /k\."slug" AS "kitchenSlug"/);
   assert.match(queries[1], /k\."name" AS "kitchenName"/);
 });
+
+test("queryServiceClaimsList filters PX claims by normalized 111 contract prefix", async () => {
+  resetServiceClaimQueryColumnSupportCache();
+  const queries = [];
+  const prisma = {
+    async $queryRaw(strings, ...values) {
+      const sql = renderSqlTemplate(strings, values);
+      queries.push(sql);
+      if (sql.includes(`FROM "information_schema"."columns"`)) return [];
+      return [];
+    },
+  };
+
+  await queryServiceClaimsList(prisma, { claimType: "px" });
+
+  assert.equal(queries.length, 2);
+  assert.match(queries[1], /REGEXP_REPLACE\(COALESCE\(sc\."contractNumber", ''\), '\[\[:space:\]\]\+', '', 'g'\) LIKE '111%'/);
+});
+
+test("queryServiceClaimsList excludes PX claims from the live claims page", async () => {
+  resetServiceClaimQueryColumnSupportCache();
+  const queries = [];
+  const prisma = {
+    async $queryRaw(strings, ...values) {
+      const sql = renderSqlTemplate(strings, values);
+      queries.push(sql);
+      if (sql.includes(`FROM "information_schema"."columns"`)) return [];
+      return [];
+    },
+  };
+
+  await queryServiceClaimsList(prisma, { claimType: "live" });
+
+  assert.match(queries[1], /REGEXP_REPLACE\(COALESCE\(sc\."contractNumber", ''\), '\[\[:space:\]\]\+', '', 'g'\) NOT LIKE '111%'/);
+});

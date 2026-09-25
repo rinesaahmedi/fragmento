@@ -14,6 +14,7 @@
     "reports": "Berichte",
     "contractAccess": "Vertragszugriffe",
     "claimActivity": "Reklamationsaktivität",
+    "pxClaims": "PX-Reklamationen",
     "claims": "Reklamationen",
     "catalogArticles": "Katalog",
     "catalogImports": "Preisimporte",
@@ -1197,6 +1198,11 @@
     "stripeSession": "Stripe-Sitzung",
     "card": "Karte",
     "orderItems": "Artikel der PX-Bestellung"
+  },
+  "pxClaimsAdmin": {
+    "title": "PX-Reklamationen",
+    "deleteAll": "Alle PX-Reklamationen löschen",
+    "deleteAllConfirm": "Alle PX-Reklamationen löschen?\nDadurch werden alle 111-Testreklamationen unwiderruflich entfernt."
   },
   "reportsAdmin": {
     "reports": "Berichte",
