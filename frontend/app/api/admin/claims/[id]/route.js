@@ -2,7 +2,6 @@ import { mapAdminMutationError, redirectWithFlash } from "../../../../../lib/adm
 import { requireAdminClaimsApi } from "../../../../../lib/admin-claims-access";
 import { prisma } from "../../../../../lib/prisma";
 import { deleteServiceClaimAttachments } from "../../../../../lib/service-claim-attachments-storage";
-import { isTestContractNumber } from "../../../../../lib/order-kind";
 
 export async function POST(request, { params }) {
   await requireAdminClaimsApi();
@@ -17,31 +16,13 @@ export async function POST(request, { params }) {
       returnPath = String(formData.get("_returnPath") || "") === "/admin/px-claims"
         ? "/admin/px-claims"
         : "/admin/claims";
-      const claims = await prisma.$queryRaw`
-        SELECT "contractNumber"
-        FROM "ServiceClaim"
-        WHERE "id" = ${id}
-        LIMIT 1
-      `;
-      const claim = claims[0];
-
-      if (!claim || !isTestContractNumber(claim.contractNumber)) {
-        return redirectWithFlash(
-          request,
-          returnPath,
-          "error",
-          "Nur PX-Reklamationen mit Vertragsnummern, die mit 111 beginnen, können gelöscht werden.",
-        );
-      }
-
       const deletedCount = await prisma.$executeRaw`
         DELETE FROM "ServiceClaim"
         WHERE "id" = ${id}
-          AND REGEXP_REPLACE(COALESCE("contractNumber", ''), '[[:space:]]+', '', 'g') LIKE '111%'
       `;
 
       if (!deletedCount) {
-        return redirectWithFlash(request, returnPath, "error", "Die PX-Reklamation konnte nicht gelöscht werden.");
+        return redirectWithFlash(request, returnPath, "error", "Die Reklamation konnte nicht gelöscht werden.");
       }
 
       await deleteServiceClaimAttachments(id).catch(() => {});

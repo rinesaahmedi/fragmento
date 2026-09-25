@@ -19,7 +19,6 @@ import { prisma } from "../../../../lib/prisma";
 import { formatServiceClaimProblemArea, formatServiceClaimProblemAreaList, parseServiceClaimProblemAreas } from "../../../../lib/service-claim-problem-areas";
 import { queryServiceClaimById } from "../../../../lib/service-claim-admin-query";
 import { getServiceClaimKitchenPlan } from "../../../../lib/service-claim-kitchen-plan";
-import { isTestContractNumber } from "../../../../lib/order-kind";
 
 export const dynamic = "force-dynamic";
 
@@ -190,19 +189,17 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
               <span aria-hidden="true">·</span>
               <span><AdminDateTime value={claim.createdAt} /></span>
             </div>
-            {isTestContractNumber(claim.contractNumber) ? (
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <AdminConfirmSubmitButton
-                  name="_intent"
-                  value="delete"
-                  style={deleteClaimButtonStyle}
-                  confirmKey="claimsAdmin.deleteConfirmMessage"
-                  confirmFallback={"Delete this claim?\nThis action cannot be undone."}
-                >
-                  <AdminText i18nKey="claimsAdmin.deleteClaim" fallback="Delete claim" />
-                </AdminConfirmSubmitButton>
-              </div>
-            ) : null}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <AdminConfirmSubmitButton
+                name="_intent"
+                value="delete"
+                style={deleteClaimButtonStyle}
+                confirmKey="claimsAdmin.deleteConfirmMessage"
+                confirmFallback={"Delete this claim?\nThis action cannot be undone."}
+              >
+                <AdminText i18nKey="claimsAdmin.deleteClaim" fallback="Delete claim" />
+              </AdminConfirmSubmitButton>
+            </div>
           </form>
 
           <div style={splitGridStyle}>

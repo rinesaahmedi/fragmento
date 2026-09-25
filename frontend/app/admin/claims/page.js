@@ -21,7 +21,6 @@ import { requireAdminClaimsPage } from "../../../lib/admin-claims-access";
 import { prisma } from "../../../lib/prisma";
 import { queryServiceClaimsList } from "../../../lib/service-claim-admin-query";
 import { paginateAdminItems } from "../../../lib/admin-pagination";
-import { isTestContractNumber } from "../../../lib/order-kind";
 
 export const dynamic = "force-dynamic";
 
@@ -173,7 +172,7 @@ export default async function AdminClaimsPage({ searchParams = {}, pxOnly = fals
                         <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
                           <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
                         </Link>
-                        {pxOnly && isTestContractNumber(claim.contractNumber) ? <DeleteClaimAction claimId={claim.id} returnPath={basePath} /> : null}
+                        <DeleteClaimAction claimId={claim.id} returnPath={basePath} />
                       </div>
                     </td>
                   </tr>
@@ -204,7 +203,7 @@ export default async function AdminClaimsPage({ searchParams = {}, pxOnly = fals
                     <Link href={`/admin/claims/${claim.id}`} style={detailsLinkStyle}>
                       <AdminText i18nKey="ordersAdmin.openDetails" fallback="Open details" />
                     </Link>
-                    {pxOnly && isTestContractNumber(claim.contractNumber) ? <DeleteClaimAction claimId={claim.id} returnPath={basePath} compact /> : null}
+                    <DeleteClaimAction claimId={claim.id} returnPath={basePath} compact />
                   </div>
                 </div>
               </article>
