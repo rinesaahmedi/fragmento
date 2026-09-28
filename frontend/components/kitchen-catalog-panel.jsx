@@ -534,7 +534,9 @@ function CutleryInsertAccessoryCard({
   const { translate, language } = usePublicI18n();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const variants = normalizeCutleryVariants(cutleryVariants);
+  const variants = normalizeCutleryVariants(cutleryVariants)
+    .slice()
+    .sort((left, right) => left.widthCm - right.widthCm);
   const itemName = translate("configurator.cutleryInsertTitle", "Cutlery insert");
   const itemInfoText = getLocalizedItemInfoText(item, translate);
   const selectedArticleNumbers = new Set(lines.map((line) => line.articleNumber));

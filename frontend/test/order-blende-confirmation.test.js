@@ -155,6 +155,29 @@ test("order confirmation can generate purchased kitchen sketch attachment", asyn
   assert.match(text, /Bestellnummer/);
 });
 
+test("AB 105762 attaches the versioned 105762-63 kitchen sketch", async () => {
+  const pdf = await generatePurchasedKitchenPdf({
+    orderNumber: "111105762-1",
+    createdAt: "2026-09-28T10:00:00.000Z",
+    kitchen: {
+      slug: "ab-105762",
+      name: "105762",
+    },
+    customer: {
+      contractNumber: "111105762",
+    },
+    components: [],
+    accessories: [],
+    services: [],
+  });
+
+  assert.ok(pdf);
+  assert.equal(pdf.filename, "Gekaufte-Kueche-111105762-1.pdf");
+  const bytes = Buffer.from(pdf.base64, "base64");
+  assert.equal(bytes.subarray(0, 4).toString("utf8"), "%PDF");
+  assert.ok(bytes.length > 10000);
+});
+
 test("AB 105830 purchased-kitchen selection reaches the same plinth line as the configurator", async () => {
   const previewData = await loadKitchenPlanPreviewData();
   const source = previewData.hotspotsBySlug["ab-105830"] || [];

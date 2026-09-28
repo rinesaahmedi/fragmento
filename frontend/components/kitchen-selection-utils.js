@@ -746,8 +746,13 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
     item?.articleNumber || item?.catalogArticle?.articleNumber || "",
   ).trim().toUpperCase();
   const rawName = String(language === "de" && item?.nameDe ? item.nameDe : item?.name || "").trim();
+  const iconKey = String(item?.iconKey || "").trim().toLowerCase();
+  const componentKey = String(item?.componentKey || "").trim().toLowerCase();
+  const isStandaloneBlende = iconKey === "blende"
+    || componentKey.endsWith("-blende")
+    || code.startsWith("BLENDE-");
   const rawDimensions = rawName.match(/\((\d+(?:[.,]\d+)?\s*(?:x|×)\s*\d+(?:[.,]\d+)?(?:\s*(?:x|×)\s*\d+(?:[.,]\d+)?)?\s*(?:mm|cm|m))\)/i)?.[1] || "";
-  const rawTitle = stripDimensionsFromName(rawName);
+  const rawTitle = isStandaloneBlende ? rawName : stripDimensionsFromName(rawName);
   const photoNumber = AB_105806_PHOTO_NUMBER_BY_CODE[code] || "";
   const withPhotoNumber = (label) => (
     includeCalloutNumber && photoNumber ? `${photoNumber}. ${label}` : label
@@ -764,6 +769,9 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
   );
 
   if (item?.isCutleryLine && rawName) {
+    return withPhotoNumber(rawName);
+  }
+  if (isStandaloneBlende && rawName) {
     return withPhotoNumber(rawName);
   }
 
@@ -791,7 +799,6 @@ export function getLocalizedItemName(item, translate, language = "en", includeCa
 
   // General appliance naming across every kitchen: any dishwasher/refrigerator (identified by
   // its icon) shows a single short name instead of the longer per-kitchen product description.
-  const iconKey = String(item?.iconKey || "").trim();
   if (iconKey === "dishwasher_base") {
     return withDimensions(dishwasherName());
   }

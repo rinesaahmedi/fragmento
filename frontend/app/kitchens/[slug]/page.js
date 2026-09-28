@@ -31,25 +31,43 @@ function getOrderItemArticleNumber(item) {
 
 function serializeOrderItems(items = [], locked = false) {
   return items.map((item) => {
-    const catalogArticle = item.kitchenItem?.catalogArticleId ? item.kitchenItem.catalogArticle : null;
-    const catalogService = item.kitchenItem?.catalogServiceId ? item.kitchenItem.catalogService : null;
-    const catalogBlende = item.kitchenItem?.catalogBlendeId ? item.kitchenItem.catalogBlende : null;
+    const kitchenItem = item.kitchenItem || {};
+    const catalogArticle = kitchenItem.catalogArticleId ? kitchenItem.catalogArticle : null;
+    const catalogService = kitchenItem.catalogServiceId ? kitchenItem.catalogService : null;
+    const catalogBlende = kitchenItem.catalogBlendeId ? kitchenItem.catalogBlende : null;
+    const itemCode = String(item.code || kitchenItem.code || "").trim();
+    const iconKey = String(kitchenItem.iconKey || item.iconKey || "").trim();
+    const componentKey = String(kitchenItem.componentKey || item.componentKey || "").trim();
+    const isStandaloneCatalogBlende = Boolean(
+      catalogBlende
+      && !catalogArticle
+      && !catalogService
+      && (
+        iconKey === "blende"
+        || componentKey.endsWith("-blende")
+        || itemCode.toUpperCase().startsWith("BLENDE-")
+      )
+    );
 
     return {
       itemType: String(item.itemType || "").toLowerCase(),
-      code: item.code || "",
-      name: item.nameSnapshot || catalogArticle?.name || catalogService?.name || "",
-      nameDe: item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || item.kitchenItem?.nameDe || "",
+      code: itemCode,
+      name: item.nameSnapshot || catalogArticle?.name || catalogService?.name || catalogBlende?.name || kitchenItem.name || "",
+      nameDe: item.nameDeSnapshot || catalogArticle?.nameDe || catalogService?.nameDe || catalogBlende?.nameDe || kitchenItem.nameDe || "",
       articleNumber: getOrderItemArticleNumber(item),
-      blendeCode: catalogBlende?.code || item.kitchenItem?.blendeCode || item.blendeCode || "",
-      blendeLabel: catalogBlende?.nameDe || catalogBlende?.name || item.kitchenItem?.blendeLabel || item.blendeLabel || "",
-      blendeName: catalogBlende?.name || item.blendeName || "",
-      blendeNameDe: catalogBlende?.nameDe || item.blendeNameDe || "",
-      blendePrice: catalogBlende?.price != null
-        ? Number(catalogBlende.price)
-        : item.kitchenItem?.blendePrice != null
-          ? Number(item.kitchenItem.blendePrice)
-          : (item.blendePrice != null ? Number(item.blendePrice) : null),
+      iconKey,
+      componentKey,
+      blendeCode: isStandaloneCatalogBlende ? "" : catalogBlende?.code || kitchenItem.blendeCode || item.blendeCode || "",
+      blendeLabel: isStandaloneCatalogBlende ? "" : catalogBlende?.nameDe || catalogBlende?.name || kitchenItem.blendeLabel || item.blendeLabel || "",
+      blendeName: isStandaloneCatalogBlende ? "" : catalogBlende?.name || item.blendeName || "",
+      blendeNameDe: isStandaloneCatalogBlende ? "" : catalogBlende?.nameDe || item.blendeNameDe || "",
+      blendePrice: isStandaloneCatalogBlende
+        ? null
+        : catalogBlende?.price != null
+          ? Number(catalogBlende.price)
+          : kitchenItem.blendePrice != null
+            ? Number(kitchenItem.blendePrice)
+            : (item.blendePrice != null ? Number(item.blendePrice) : null),
       quantity: item.quantity || 1,
       locked,
       sourceOrderId: item.sourceOrderId || "",

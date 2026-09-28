@@ -263,7 +263,10 @@ async function resolveWorkspaceAssetPath(relativePath) {
 }
 
 function decodePublicAssetHref(href) {
-  const normalized = String(href || "").trim().replace(/^\/+/, "");
+  const normalized = String(href || "")
+    .trim()
+    .split(/[?#]/, 1)[0]
+    .replace(/^\/+/, "");
   return normalized ? `public/${decodeURIComponent(normalized)}` : "";
 }
 

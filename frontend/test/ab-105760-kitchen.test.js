@@ -108,6 +108,29 @@ test("AB 105760 maps callouts 4-11 and links the third upper cabinet to its hood
   );
 });
 
+test("standalone UPK20 keeps its full catalog name instead of stripping 20 cm", () => {
+  const item = {
+    code: "BLENDE-AB105760-SINK-END",
+    articleNumber: "UPK20",
+    name: "Filler Panel up to 20 cm",
+    nameDe: "Passblende bis 20 cm",
+    iconKey: "blende",
+    componentKey: "sink-end-blende",
+  };
+
+  assert.equal(getLocalizedItemName(item, translate, "en", false), "Filler Panel up to 20 cm");
+  assert.equal(getLocalizedItemName(item, translate, "de", false), "Passblende bis 20 cm");
+});
+
+test("confirmed standalone Blenden are not serialized as an included cabinet filler", () => {
+  const pageSource = readFileSync(new URL("../app/kitchens/[slug]/page.js", import.meta.url), "utf8");
+
+  assert.match(pageSource, /const isStandaloneCatalogBlende = Boolean\(/);
+  assert.match(pageSource, /blendeCode: isStandaloneCatalogBlende \? ""/);
+  assert.match(pageSource, /blendeLabel: isStandaloneCatalogBlende \? ""/);
+  assert.match(pageSource, /blendePrice: isStandaloneCatalogBlende\s*\? null/);
+});
+
 test("AB 105760 is available under both 670 and 111 contract prefixes", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
 
