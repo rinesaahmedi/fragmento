@@ -5,7 +5,7 @@ import {
   generateOrderConfirmationPdf,
   generatePurchasedKitchenPdf,
 } from "../../../../../../../lib/email/order-notifications";
-import { buildOrderForNotifications } from "../../../../../../../lib/orders";
+import { buildOrderForNotificationsWithConfirmedBaseline } from "../../../../../../../lib/orders";
 
 function asciiDispositionFilename(name) {
   const s = String(name || "file.pdf").replace(/[^\x20-\x7E]+/g, "_");
@@ -44,7 +44,7 @@ export async function GET(request, { params }) {
     return NextResponse.json({ error: "PX order not found." }, { status: 404 });
   }
 
-  const notificationOrder = buildOrderForNotifications(order);
+  const notificationOrder = await buildOrderForNotificationsWithConfirmedBaseline(order, "test");
 
   if (type === "order-confirmation") {
     return pdfResponse(await generateOrderConfirmationPdf(notificationOrder), request);

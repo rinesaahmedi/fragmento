@@ -55,7 +55,8 @@ test("Stripe paid confirmation includes each cabinet's linked filler without cha
     getOrderDelegate: () => delegate,
     isTestOrderKind: () => true,
     getMissingEmailSmtpConfig: () => [],
-    buildOrderForNotifications,
+    buildOrderForNotificationsWithConfirmedBaseline: async (orderRecord) =>
+      buildOrderForNotifications(orderRecord),
     sendOrderConfirmationEmail: async ({ order }) => {
       emailHtml = buildOrderSummaryHtml(order).replace(/\u00a0/g, " ");
     },

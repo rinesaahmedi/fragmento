@@ -257,7 +257,7 @@ test("configurator and confirmation renderer stay wired to shared plan geometry"
 
   assert.match(stageSource, /const definitions = prepareKitchenPlanGeometry\(/);
   assert.match(stageSource, /getSharedPlanDisplayCrop\(imageHotspots, normalizedKitchenSlug\)/);
-  assert.match(emailSource, /const hotspots = prepareKitchenPlanGeometry\(sourceHotspots, slug/);
+  assert.match(emailSource, /const hotspots = prepareKitchenPlanGeometry\(\s*sourceHotspots,\s*slug/);
   assert.match(emailSource, /crop: getPlanDisplayCrop\(hotspots, slug\)/);
   assert.doesNotMatch(emailSource, /function getKitchenPlanDisplayCrop\(/);
 });

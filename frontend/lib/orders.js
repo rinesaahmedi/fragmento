@@ -286,7 +286,7 @@ function getOrderItemEffectivePrice(item) {
   return unitPrice * quantity;
 }
 
-export function buildOrderForNotifications(orderRecord) {
+export function buildOrderForNotifications(orderRecord, { confirmedItems = [] } = {}) {
   const toNotificationItem = (item) => {
     const kitchenSlug = String(orderRecord.kitchen?.slug || "").trim().toLowerCase();
     const isBurger103898 = kitchenSlug === "burger-103898";
@@ -346,7 +346,7 @@ export function buildOrderForNotifications(orderRecord) {
         ? burgerCutleryVariant.price * Math.max(1, Math.floor(Number(item.quantity || 1)))
         : getOrderItemEffectivePrice(item),
       quantity: Math.max(1, Math.floor(Number(item.quantity || 1))),
-      isLocked: Boolean(kitchenItem?.isLocked || item.isLocked),
+      isLocked: Boolean(kitchenItem?.isLocked || item.isLocked || item.isOrderLocked),
       iconKey: kitchenItem?.iconKey || item.iconKey || "",
       componentKey: kitchenItem?.componentKey || item.componentKey || "",
       widthMm: kitchenItem?.widthMm || item.widthMm || null,
@@ -375,6 +375,25 @@ export function buildOrderForNotifications(orderRecord) {
     name: "Arbeitsplatte",
     nameDe: "Arbeitsplatte",
     price: getOrderItemEffectivePrice(sinkItem) + getOrderItemEffectivePrice(worktopItem),
+  }));
+  const currentComponentCodes = new Set(
+    (orderRecord.items || [])
+      .filter((item) => item.itemType === ItemType.COMPONENT)
+      .map((item) => item.code),
+  );
+  const purchasedKitchenItems = mergeSinkAndWorktopItems([
+    ...(orderRecord.items || []),
+    ...confirmedItems
+      .filter((item) => item.itemType === ItemType.COMPONENT && !currentComponentCodes.has(item.code))
+      .map((item) => ({ ...item, isOrderLocked: true })),
+  ], (sinkItem, worktopItem) => ({
+    ...sinkItem,
+    itemType: sinkItem.itemType,
+    code: SINK_AND_WORKTOP_CODE,
+    name: "Arbeitsplatte",
+    nameDe: "Arbeitsplatte",
+    price: getOrderItemEffectivePrice(sinkItem) + getOrderItemEffectivePrice(worktopItem),
+    isOrderLocked: Boolean(sinkItem.isOrderLocked || worktopItem.isOrderLocked),
   }));
 
   return {
@@ -407,6 +426,12 @@ export function buildOrderForNotifications(orderRecord) {
     components: notificationItems
       .filter((item) => item.itemType === ItemType.COMPONENT)
       .map(toNotificationItem),
+    // The commercial confirmation contains only this order's new lines. The
+    // kitchen sketch, however, must also show components confirmed by earlier
+    // orders for the same contract; those are painted as locked/blue.
+    purchasedKitchenComponents: purchasedKitchenItems
+      .filter((item) => item.itemType === ItemType.COMPONENT)
+      .map(toNotificationItem),
     accessories: notificationItems
       .filter((item) => item.itemType === ItemType.ACCESSORY)
       .map(toNotificationItem),
@@ -414,6 +439,35 @@ export function buildOrderForNotifications(orderRecord) {
       .filter((item) => item.itemType === ItemType.SERVICE)
       .map(toNotificationItem),
   };
+}
+
+export async function buildOrderForNotificationsWithConfirmedBaseline(
+  orderRecord,
+  orderKind = ORDER_KIND_LIVE,
+) {
+  const contractOrderState = orderRecord?.kitchenContractId
+    ? await getContractOrderState(orderRecord.kitchenContractId, prisma, orderKind)
+    : { confirmedItems: [] };
+  const currentConfirmedIndex = contractOrderState.confirmedOrders?.findIndex(
+    (order) => order.id === orderRecord.id,
+  ) ?? -1;
+  const relevantConfirmedOrderIds = currentConfirmedIndex >= 0
+    ? new Set(
+      contractOrderState.confirmedOrders
+        .slice(0, currentConfirmedIndex + 1)
+        .map((order) => order.id),
+    )
+    : null;
+  const currentCreatedAt = orderRecord?.createdAt ? new Date(orderRecord.createdAt).getTime() : Number.POSITIVE_INFINITY;
+  const confirmedItems = (contractOrderState.confirmedItems || []).filter((item) =>
+    relevantConfirmedOrderIds
+      ? relevantConfirmedOrderIds.has(item.sourceOrderId)
+      : new Date(item.sourceOrderCreatedAt || 0).getTime() <= currentCreatedAt,
+  );
+
+  return buildOrderForNotifications(orderRecord, {
+    confirmedItems,
+  });
 }
 
 function readEmailOverrides(input = {}) {
@@ -950,7 +1004,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
     throw new Error("Order could not be saved");
   }
 
-  const orderForNotifications = buildOrderForNotifications(savedOrder);
+  const orderForNotifications = buildOrderForNotifications(savedOrder, {
+    confirmedItems: contractOrderState.confirmedItems,
+  });
   const notificationResult = await processOrderNotifications({
     order: orderForNotifications,
     pdfBase64: null,
@@ -968,8 +1024,9 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
 }
 
 export async function resendOrderEmail(orderId, emailOverrides = {}) {
-  const orderRecord = await getOrderRecordForOperations(orderId, emailOverrides.orderKind || ORDER_KIND_LIVE);
-  const order = buildOrderForNotifications(orderRecord);
+  const orderKind = emailOverrides.orderKind || ORDER_KIND_LIVE;
+  const orderRecord = await getOrderRecordForOperations(orderId, orderKind);
+  const order = await buildOrderForNotificationsWithConfirmedBaseline(orderRecord, orderKind);
   const { subject, bodyText, excludedAttachmentKeys } = readEmailOverrides(emailOverrides);
 
   await sendOrderConfirmationEmail({ order, subject, bodyText, excludedAttachmentKeys });
@@ -1041,7 +1098,7 @@ export async function confirmOrder(orderId, emailOverrides = {}) {
     throw validationError("Cancelled orders cannot be confirmed.");
   }
 
-  const order = buildOrderForNotifications(orderRecord);
+  const order = await buildOrderForNotificationsWithConfirmedBaseline(orderRecord, orderKind);
   const { subject, bodyText, excludedAttachmentKeys } = readEmailOverrides(emailOverrides);
   await sendOrderConfirmationEmail({ order, subject, bodyText, excludedAttachmentKeys });
 

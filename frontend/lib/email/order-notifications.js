@@ -534,7 +534,7 @@ function buildPurchasedKitchenPdfSelectionState(order, options = {}) {
   const selectedComponentKeys = new Set();
   const lockedComponentKeys = new Set();
 
-  for (const item of order?.components || []) {
+  for (const item of order?.purchasedKitchenComponents || order?.components || []) {
     const componentId = componentIdForPdfItem(item);
     if (!componentId) continue;
     const componentKey = String(item?.componentKey || "").trim();
@@ -717,7 +717,11 @@ export function buildPurchasedKitchenCropClosureSvg({ slug, crop, width, height 
 
 export function preparePurchasedKitchenPlanGeometry(order, sourceHotspots = []) {
   const slug = normalizeKitchenSlug(order?.kitchen?.slug);
-  const hotspots = prepareKitchenPlanGeometry(sourceHotspots, slug, order?.components || []);
+  const hotspots = prepareKitchenPlanGeometry(
+    sourceHotspots,
+    slug,
+    order?.purchasedKitchenComponents || order?.components || [],
+  );
   return {
     hotspots,
     crop: getPlanDisplayCrop(hotspots, slug),

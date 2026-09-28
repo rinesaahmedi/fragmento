@@ -1,7 +1,7 @@
 import { prisma } from "./prisma";
 import { getStripeClient } from "./stripe";
 import { getDirectOrderConfirmationEnabled } from "./admin-settings";
-import { buildOrderForNotifications } from "./orders";
+import { buildOrderForNotificationsWithConfirmedBaseline } from "./orders";
 import {
   getMissingEmailSmtpConfig,
   sendOrderConfirmationEmail,
@@ -50,7 +50,7 @@ async function maybeSendPaidOrderConfirmation(orderRecord, { orderKind = ORDER_K
     return;
   }
 
-  const order = buildOrderForNotifications(orderRecord);
+  const order = await buildOrderForNotificationsWithConfirmedBaseline(orderRecord, orderKind);
   try {
     await sendOrderConfirmationEmail({ order });
   } catch (error) {
