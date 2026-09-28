@@ -45,6 +45,7 @@ import {
   allowsKitchenArticleNumberAlias,
   matchesConfiguredArticleNumber,
 } from "./order-article-aliases";
+import { getNotificationArticleNumber } from "./notification-article-number.js";
 
 const PAYMENT_METHOD_ALIASES = new Map([
   ["card", "card"],
@@ -339,7 +340,14 @@ export function buildOrderForNotifications(orderRecord, { confirmedItems = [] } 
 
     return {
       code: item.code,
-      articleNumber: burgerCutleryVariant?.supplierArticleNumber || cutleryLine?.articleNumber || item.articleNumberSnapshot || catalogArticle?.articleNumber || item.kitchenItem?.articleNumber || item.articleNumber || "",
+      articleNumber: getNotificationArticleNumber({
+        kitchenSlug,
+        item,
+        kitchenItem,
+        catalogArticle,
+        cutleryArticleNumber: cutleryLine?.articleNumber,
+        burgerCutleryArticleNumber: burgerCutleryVariant?.supplierArticleNumber,
+      }),
       name: displayName,
       nameDe: displayNameDe,
       price: burgerCutleryVariant

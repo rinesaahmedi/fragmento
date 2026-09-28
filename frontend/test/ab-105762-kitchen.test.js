@@ -22,6 +22,7 @@ import {
   allowsKitchenArticleNumberAlias,
   matchesConfiguredArticleNumber,
 } from "../lib/order-article-aliases.js";
+import { getNotificationArticleNumber } from "../lib/notification-article-number.js";
 
 const translate = (_key, fallback) => fallback;
 const aliasSlugs = ["ab-105766", "ab-105770", "ab-105774"];
@@ -345,7 +346,7 @@ test("AB 105762 schedule rows are complete and catalog linked", () => {
     "US30",
     "UPK20",
     "H4002",
-    "FH664621E + FWK124",
+    "FH664621E + FWK124 + HD6002",
     "H5002",
     "H6002",
     "HPK2002",
@@ -355,7 +356,7 @@ test("AB 105762 schedule rows are complete and catalog linked", () => {
   assert.match(block, /CAB-BASE-AB105762-US30-UPK20[^\n]+catalogArticleNumber: "US30"[^\n]+blendeCode: "UPK20"[^\n]+blendePrice: "0\.00"/);
   assert.match(block, /CAB-BASE-AB105762-US50[^\n]+articlePriceWithBlende\("US50", "UPEF65", 1\)[^\n]+blendeCode: "UPEF65"[^\n]+blendePrice: blendePrice\("UPEF65", 1\)/);
   assert.match(block, /CAB-WALL-AB105762-H6002-HPK2002[^\n]+catalogArticleNumber: "H6002"[^\n]+blendeCode: "HPK2002"[^\n]+blendePrice: "0\.00"/);
-  assert.match(block, /CAB-HOOD-AB105762-600[^\n]+articleNumber: "FH664621E \+ FWK124"[^\n]+catalogArticleNumber: "FH664621E \+ FWK124 \+ HD6002"/);
+  assert.match(block, /CAB-HOOD-AB105762-600[^\n]+articleNumber: "FH664621E \+ FWK124 \+ HD6002"[^\n]+displayArticleNumber: "FH664621E \+ FWK124 \+ HD6002"[^\n]+catalogArticleNumber: "FH664621E \+ FWK124 \+ HD6002"/);
   assert.match(block, /\.\.\.defaultAccessories\(\)/);
   assert.match(block, /\.\.\.defaultServices\(\)/);
 });
@@ -444,4 +445,22 @@ test("AB 105762 aliases seed as independent kitchens with identical catalog-link
   assert.match(seed, /const AB_105762_LAYOUT_ALIAS_CODES = \["105766", "105770", "105774"\]/);
   assert.match(seed, /slug: `ab-\$\{code\}`[\s\S]*?items: AB_105762_ITEMS[\s\S]*?reconcileExisting: true/);
   assert.match(seed, /\.flatMap\(\(kitchen\) => \[[\s\S]*?buildKitchenContractNumber\(kitchen, "670"\)[\s\S]*?buildKitchenContractNumber\(kitchen, "111"\)/);
+});
+
+test("AB 105762 family restores HD6002 in old order PDFs", () => {
+  for (const slug of ["ab-105762", ...aliasSlugs]) {
+    const articleNumber = getNotificationArticleNumber({
+      kitchenSlug: slug,
+      item: {
+        code: "CAB-HOOD-AB105762-600",
+        articleNumberSnapshot: "FH664621E + FWK124",
+      },
+    });
+
+    assert.equal(
+      articleNumber,
+      "FH664621E + FWK124 + HD6002",
+      `${slug} should render the complete hood package even for an old snapshot`,
+    );
+  }
 });

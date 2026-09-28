@@ -131,6 +131,14 @@ test("confirmed standalone Blenden are not serialized as an included cabinet fil
   assert.match(pageSource, /blendePrice: isStandaloneCatalogBlende\s*\? null/);
 });
 
+test("standalone filler icon has no raised horizontal plinth line", () => {
+  const catalogSource = readFileSync(new URL("../components/kitchen-catalog-panel.jsx", import.meta.url), "utf8");
+  const blendeMarkup = catalogSource.match(/blende:\s*\n\s*'([^']+)'/)?.[1] || "";
+
+  assert.match(blendeMarkup, /<rect x="5\.5" y="0\.5" width="19" height="81"\/>/);
+  assert.doesNotMatch(blendeMarkup, /y="72\.5"/);
+});
+
 test("AB 105760 is available under both 670 and 111 contract prefixes", () => {
   const seed = readFileSync(new URL("../prisma/seed.js", import.meta.url), "utf8");
 
