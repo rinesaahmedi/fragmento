@@ -4965,6 +4965,29 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
           <button
             type="button"
             className={[
+              "service-choice-card service-choice-card--complaint",
+              isComplaintMode ? "is-active" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            onClick={() => handleModeSelect("complaint")}
+          >
+            <span className="service-choice-card__logo-slot">
+              <Image
+                src="/img/260513-asc-logo-03 copy.png"
+                alt="Architecto Service Center"
+                width={168}
+                height={54}
+                className="service-choice-card__logo service-choice-card__logo--complaint"
+              />
+            </span>
+            <strong>{copy.complaintTitle}</strong>
+            <p>{copy.complaintText}</p>
+            <span className="service-choice-card__cta">{copy.complaintCta || copy.complaintTitle}</span>
+          </button>
+          <button
+            type="button"
+            className={[
               "service-choice-card service-choice-card--purchase",
               mode === "nachkauf" ? "is-active" : "",
             ]
@@ -4984,30 +5007,6 @@ export default function ServiceClaimFlow({ initialLanguage = "de" }) {
             <strong>{copy.purchaseTitle}</strong>
             <p>{copy.purchaseText}</p>
             <span className="service-choice-card__cta">{copy.purchaseCta || copy.openConfigurator}</span>
-          </button>
-          <button
-            type="button"
-            className={[
-              "service-choice-card service-choice-card--complaint",
-              isComplaintMode ? "is-active" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-            onClick={() => handleModeSelect("complaint")}
-          >
-            <span className="service-choice-card__logo-slot">
-              <Image
-                src="/img/260513-asc-logo-03 copy.png"
-                alt="Architecto Service Center"
-                width={168}
-                height={54}
-                className="service-choice-card__logo service-choice-card__logo--complaint"
-              />
-            </span>
-            
-            <strong>{copy.complaintTitle}</strong>
-            <p>{copy.complaintText}</p>
-            <span className="service-choice-card__cta">{copy.complaintCta || copy.complaintTitle}</span>
           </button>
           <button
             type="button"
