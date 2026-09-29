@@ -14,3 +14,4 @@ frontend/vendor/
 backups/database/**/*.dump
 backups/database/**/*.zip
 outputs/pre-burger-20260826-1213/*.xlsx
+.env.production

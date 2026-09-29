@@ -10,6 +10,7 @@ export default function AdminConfirmSubmitButton({
   name,
   value,
   style,
+  className,
 }) {
   const { translate } = useAdminI18n();
   let confirmMessage = confirmKey ? translate(confirmKey, confirmFallback || "") : confirmFallback;
@@ -23,6 +24,7 @@ export default function AdminConfirmSubmitButton({
       name={name}
       value={value}
       style={style}
+      className={className}
       onClick={(event) => {
         if (confirmMessage && !window.confirm(confirmMessage)) {
           event.preventDefault();

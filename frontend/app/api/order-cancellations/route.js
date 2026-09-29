@@ -19,6 +19,18 @@ export async function POST(request) {
     return NextResponse.json({
       success: true,
       referenceNumber: result.request.referenceNumber,
+      withdrawal: {
+        referenceNumber: result.request.referenceNumber,
+        submittedContractNumber: result.request.submittedContractNumber,
+        consumerName: result.request.consumerName,
+        consumerAddress: result.request.consumerAddress,
+        confirmationEmail: result.request.confirmationEmail,
+        productDescription: result.request.productDescription,
+        orderedOn: result.request.orderedOn,
+        receivedOn: result.request.receivedOn,
+        declarationText: result.request.declarationText,
+        receivedAt: result.request.receivedAt,
+      },
       duplicate: result.duplicate,
       notificationPending: result.emailErrors.length > 0,
       message: "Your withdrawal has been registered and will be reviewed. The order is not cancelled yet.",

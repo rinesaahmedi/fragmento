@@ -34,6 +34,17 @@ function optionalString(value, maxLength) {
   return normalized;
 }
 
+function optionalDate(value, label) {
+  const normalized = optionalString(value, 10);
+  if (!normalized) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) throw validationError(`${label} is invalid.`);
+  const date = new Date(`${normalized}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== normalized) {
+    throw validationError(`${label} is invalid.`);
+  }
+  return date;
+}
+
 function normalizeComparable(value) {
   return String(value || "").trim().replace(/\s+/g, " ").toLocaleLowerCase("de-DE");
 }
@@ -52,19 +63,20 @@ function normalizeLanguage(value) {
   return String(value || "").toLowerCase() === "en" ? "en" : "de";
 }
 
-function buildReferenceNumber(now = new Date()) {
-  const date = now.toISOString().slice(0, 10).replaceAll("-", "");
-  return `WD-${date}-${randomBytes(4).toString("hex").toUpperCase()}`;
+function buildReferenceNumber(contractNumber) {
+  const contractPart = String(contractNumber || "ORDER")
+    .replace(/[^A-Z0-9-]/gi, "")
+    .slice(0, 24)
+    .toUpperCase() || "ORDER";
+  return `OC-${contractPart}-${randomBytes(3).toString("hex").toUpperCase()}`;
 }
 
 function namesMatch(order, submittedName) {
   return normalizeComparable(`${order.firstName} ${order.lastName}`) === normalizeComparable(submittedName);
 }
 
-function buildDeclaration({ consumerName, submittedContractNumber, language }) {
-  return language === "en"
-    ? `I, ${consumerName}, hereby withdraw from the complete order with contract number ${submittedContractNumber}.`
-    : `Ich, ${consumerName}, widerrufe hiermit die vollständige Bestellung mit der Vertragsnummer ${submittedContractNumber}.`;
+function buildDeclaration({ consumerName, submittedContractNumber, productDescription }) {
+  return `Ich, ${consumerName}, widerrufe hiermit den Vertrag über den Kauf der folgenden Waren bzw. die Erbringung der folgenden Dienstleistung (${productDescription}), Vertragsnummer ${submittedContractNumber}.`;
 }
 
 function getAdminRequestUrl(origin, request) {
@@ -80,7 +92,7 @@ export async function deliverInitialCancellationEmails(request, { origin = "", f
   const errors = [];
   if (force || request.customerEmailStatus !== "SENT") {
     try {
-      await sendCancellationReceiptEmail(request, request.language);
+      await sendCancellationReceiptEmail(request);
       request = await updateEmailResult(request.id, { customerEmailStatus: "SENT", customerEmailSentAt: new Date() });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Customer email failed.";
@@ -108,10 +120,19 @@ export async function deliverInitialCancellationEmails(request, { origin = "", f
 
 export async function createCancellationRequest(input, { origin = "" } = {}) {
   const submittedContractNumber = normalizeContractNumber(input.contractNumber);
-  const consumerName = requiredString(input.consumerName, "Name", 160);
+  const productDescription = requiredString(input.productDescription, "Goods or service", 2000);
+  const orderedOn = optionalDate(input.orderedOn, "Order date");
+  const receivedOn = optionalDate(input.receivedOn, "Receipt date");
+  const firstName = requiredString(input.firstName, "First name", 80);
+  const lastName = requiredString(input.lastName, "Last name", 80);
+  const street = requiredString(input.street, "Street and house number", 500);
+  const city = requiredString(input.city, "City", 160);
+  const postalCode = requiredString(input.postalCode, "Postal code", 20);
+  // Preserve the existing database, email and PDF representation.
+  const consumerName = `${firstName} ${lastName}`;
+  const consumerAddress = `${street}, ${postalCode} ${city}`;
   const confirmationEmail = normalizeEmail(input.email);
   const reason = optionalString(input.reason, 2000);
-  if (!reason) throw validationError("Reason is required.");
   const language = normalizeLanguage(input.language);
 
   const order = await prisma.order.findFirst({
@@ -134,17 +155,27 @@ export async function createCancellationRequest(input, { origin = "" } = {}) {
     where: duplicateWhere,
     orderBy: { receivedAt: "desc" },
   });
-  if (existing) return { request: existing, duplicate: true, emailErrors: [] };
+  if (existing) {
+    if (existing.customerEmailStatus === "SENT" && existing.internalEmailStatus === "SENT") {
+      return { request: existing, duplicate: true, emailErrors: [] };
+    }
+    const delivery = await deliverInitialCancellationEmails(existing, { origin });
+    return { request: delivery.request, duplicate: true, emailErrors: delivery.errors };
+  }
 
   const request = await prisma.orderCancellationRequest.create({
     data: {
-      referenceNumber: buildReferenceNumber(),
+      referenceNumber: buildReferenceNumber(submittedContractNumber),
       orderId: matchesOrder ? order.id : null,
       submittedContractNumber,
+      productDescription,
+      orderedOn,
+      receivedOn,
       consumerName,
+      consumerAddress,
       confirmationEmail,
       reason: reason || null,
-      declarationText: buildDeclaration({ consumerName, submittedContractNumber, language }),
+      declarationText: buildDeclaration({ consumerName, submittedContractNumber, productDescription }),
       language,
     },
   });

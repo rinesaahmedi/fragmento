@@ -407,7 +407,11 @@ model OrderCancellationRequest {
   orderId                 String?
   order                   Order?                         @relation(fields: [orderId], references: [id], onDelete: SetNull)
   submittedContractNumber String
+  productDescription      String?                        @db.Text
+  orderedOn               DateTime?
+  receivedOn              DateTime?
   consumerName            String
+  consumerAddress         String?                        @db.Text
   confirmationEmail       String
   language                String                         @default("de")
   reason                  String?                        @db.Text

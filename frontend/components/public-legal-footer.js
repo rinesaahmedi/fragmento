@@ -40,6 +40,13 @@ export default function PublicLegalFooter() {
         </div>
         <div className="public-legal-footer__links">
           <Link
+            href={`/widerruf?lang=${encodeURIComponent(language === "de" ? "de" : "en")}`}
+            className="public-legal-footer__link public-legal-footer__link--withdraw"
+            onClick={rememberPublicLegalReturnPath}
+          >
+            {copy.withdraw}
+          </Link>
+          <Link
             href="/impressum"
             className="public-legal-footer__link"
             onClick={rememberPublicLegalReturnPath}
