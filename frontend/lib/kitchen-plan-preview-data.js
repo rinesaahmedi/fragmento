@@ -106,6 +106,7 @@ export const PLAN_IMAGE_BY_SLUG = {
   "ab-110140": "/plans/AB%20110140.svg",
   "ab-110510": "/plans/AB%20110510.svg",
   "ab-111539": "/plans/AB%20111539.svg",
+  "ab-101246": "/plans/670%20101246.svg",
   "108134-modul-1": "/plans/108134%20MODUL%201.svg",
 };
 
@@ -119,6 +120,7 @@ export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
   "ab-110401": { width: 842, height: 595 },
   "ab-110402": { width: 842, height: 595 },
   "ab-111539": { width: 842, height: 595 },
+  "ab-101246": { width: 842, height: 595 },
   "ab-105845": { width: 800, height: 600 },
   "ab-105847": { width: 800, height: 600 },
   "ab-105850": { width: 800, height: 600 },
@@ -141,6 +143,10 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-101246": [
+    { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 35.6295, top: 77.1429, width: 12.9454, height: 7.2269, persistWhenSelected: true },
+    { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 40.6176, top: 88.0672, width: 2.9691, height: 3.6975, persistWhenSelected: true },
+  ],
   "ab-105760": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 24.855107, top: 76.100840, width: 14.551069, height: 8.047059, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 30.783848, top: 87.717647, width: 2.878860, height: 3.731092, persistWhenSelected: true },
@@ -486,6 +492,22 @@ export const AB_110401_FRG_ORDER_HOTSPOTS = [
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const PLAN_HOTSPOTS_BY_SLUG = {
+  "ab-101246": [
+    { componentKey: "wall-cabinet-1", left: 8.4323, top: 21.6807, width: 13.7767, height: 25.3782 },
+    { componentKey: "wall-cabinet-2", left: 22.2090, top: 21.6807, width: 12.3516, height: 25.3782 },
+    { componentKey: "wall-cabinet-3", left: 34.5606, top: 21.6807, width: 14.8456, height: 25.3782 },
+    { componentKey: "wall-cabinet-4", left: 49.4062, top: 21.6807, width: 14.8456, height: 25.3782 },
+    { componentKey: "extractor-hood", left: 49.4062, top: 47.0589, width: 14.8456, height: 1.6806 },
+    { componentKey: "wall-cabinet-5", left: 64.2518, top: 21.6807, width: 9.9762, height: 25.3782 },
+    { componentKey: "worktop", left: 8.4323, top: 65.3782, width: 65.7957, height: 1.5126 },
+    { componentKey: "sink-faucet", left: 30.1663, top: 57.9832, width: 1.6627, height: 7.3950 },
+    { componentKey: "base-module-1", left: 8.4323, top: 66.8908, width: 13.7767, height: 30.9243 },
+    { componentKey: "sink-base", left: 22.2090, top: 66.8908, width: 12.3516, height: 30.9243 },
+    { componentKey: "dishwasher-base", left: 34.5606, top: 66.8908, width: 14.8456, height: 30.9243 },
+    { componentKey: "oven-module", left: 49.4062, top: 66.8908, width: 14.8456, height: 30.9243 },
+    { componentKey: "base-module-2", left: 64.2518, top: 66.8908, width: 9.9762, height: 30.9243 },
+    { componentKey: "refrigerator", left: 75.4157, top: 34.4538, width: 13.8955, height: 62.8571 },
+  ],
   "burger-103898": [
     { componentKey: "refrigerator", points: [[9.562945, 36.813445], [17.75772, 35.139496], [28.304038, 36.652101], [20.109264, 38.346218]], preserveManualSize: true },
     { componentKey: "refrigerator", points: [[9.562945, 36.813445], [20.109264, 38.346218], [20.109264, 95.563025], [9.562945, 94.030252]], preserveManualSize: true },

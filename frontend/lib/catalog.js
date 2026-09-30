@@ -404,13 +404,13 @@ async function attachCutleryCatalogVariants(kitchen) {
           itemType: ItemType.ACCESSORY,
           isActive: true,
           articleNumber: {
-            in: getCutleryCatalogArticleNumbers(kitchen.slug),
+            in: getCutleryCatalogArticleNumbers(kitchen.slug, kitchen.programmId),
           },
         },
         include: {
           programPrices: {
             where: { programmId: kitchen.programmId, isActive: true },
-            select: { price: true },
+            select: { programmId: true, price: true, isActive: true },
             take: 1,
           },
         },

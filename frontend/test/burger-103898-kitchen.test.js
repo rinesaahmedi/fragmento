@@ -482,10 +482,10 @@ test("Burger corner cabinet email shows filler code only on its separate row", (
 test("order validation accepts Burger supplier-facing article numbers", () => {
   const orders = readFileSync(new URL("../lib/orders.js", import.meta.url), "utf8");
 
-  assert.match(orders, /const allowKitchenArticleNumberAlias = kitchen\.slug === "burger-103898"/);
+  assert.match(orders, /const allowKitchenArticleNumberAlias = allowsKitchenArticleNumberAlias\(kitchen\.slug\)/);
   assert.match(orders, /options\.allowKitchenArticleNumberAlias === true[\s\S]*?submittedArticleNumber === matchedKitchenArticleNumber/);
   assert.match(orders, /mapCatalogItem\(kitchen\.items, item, ItemType\.COMPONENT, \{[\s\S]*?allowKitchenArticleNumberAlias/);
   assert.match(orders, /kitchen\.slug === "burger-103898"[\s\S]*?findUnique\(\{[\s\S]*?code: "UPE65"/);
   assert.match(orders, /articleNumber: "FH664621E\+FWK124\+HFLH6072"[\s\S]*?displayArticleNumber: "FH664621E \+ FWK124 \+ HFLH6072"/);
-  assert.match(orders, /const useProgramPrices = kitchen\.slug === "burger-103898"/);
+  assert.match(orders, /const useProgramPrices = kitchen\.programmId === "BURGER CINDY"/);
 });

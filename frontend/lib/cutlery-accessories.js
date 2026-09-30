@@ -91,9 +91,13 @@ export function isCutleryInsertCompatibleCabinet(item) {
   return /\b(drawers?|schublade[n]?|auszug)\b/i.test(description);
 }
 
-export function getCutleryCatalogArticleNumbers(kitchenSlug = "") {
-  const isBurger103898 = String(kitchenSlug || "").trim().toLowerCase() === "burger-103898";
-  return isBurger103898
+function usesBurgerCutleryCatalog(kitchenSlug = "", programmId = "") {
+  return String(programmId || "").trim().toUpperCase() === "BURGER CINDY"
+    || ["burger-103898", "ab-101246"].includes(String(kitchenSlug || "").trim().toLowerCase());
+}
+
+export function getCutleryCatalogArticleNumbers(kitchenSlug = "", programmId = "") {
+  return usesBurgerCutleryCatalog(kitchenSlug, programmId)
     ? [...new Set(BURGER_103898_CUTLERY_VARIANTS.flatMap((variant) => [
       variant.articleNumber,
       variant.supplierArticleNumber,
@@ -102,8 +106,7 @@ export function getCutleryCatalogArticleNumbers(kitchenSlug = "") {
 }
 
 export function resolveCutleryCatalogArticles(articles = [], kitchenSlug = "", programmId = "") {
-  const isBurger103898 = String(kitchenSlug || "").trim().toLowerCase() === "burger-103898";
-  if (!isBurger103898) return articles;
+  if (!usesBurgerCutleryCatalog(kitchenSlug, programmId)) return articles;
 
   const articlesByNumber = new Map(
     articles.map((article) => [normalizeArticleNumber(article?.articleNumber), article]),

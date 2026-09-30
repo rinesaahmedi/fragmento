@@ -232,6 +232,19 @@ function stripDimensionsFromName(name) {
 // kitchen-specific codes are minted when an otherwise identical item appears under a
 // different callout number.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
+  "TOP-AB101246": "1",
+  "CAB-BASE-AB101246-US50-DEFAULT": "2",
+  "SINK-BASE-AB101246-SP50": "3",
+  "DISH-AB101246-600": "4",
+  "OVEN-AB101246-DEFAULT": "5",
+  "CAB-BASE-AB101246-U40-DEFAULT": "6",
+  "REF-AB101246-KGCN388140E": "7",
+  "CAB-WALL-AB101246-H5002-1-DEFAULT": "8",
+  "CAB-WALL-AB101246-H5002-2-DEFAULT": "9",
+  "CAB-WALL-AB101246-H6002-DEFAULT": "10",
+  "CAB-HOOD-AB101246-DEFAULT": "11",
+  "HOOD-AB101246-FH664621E": "11",
+  "CAB-WALL-AB101246-H4002-DEFAULT": "12",
   "SINK-BASE-BURGER103898-600": "3",
   "REF-BURGER103898-KGCN388140E": "4",
   "CAB-BASE-BURGER103898-US50": "5",
@@ -1215,6 +1228,7 @@ export function getLocalizedItemInfoText(item, translate) {
 }
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
+  "ab-101246": [["component-wall-cabinet-4", "component-extractor-hood"]],
   "burger-103898": [[
     "component-wall-cabinet-2",
     "component-extractor-hood",

@@ -648,7 +648,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
       where: {
         itemType: ItemType.ACCESSORY,
         isActive: true,
-        articleNumber: { in: getCutleryCatalogArticleNumbers(kitchen.slug) },
+        articleNumber: { in: getCutleryCatalogArticleNumbers(kitchen.slug, kitchen.programmId) },
       },
       include: { programPrices: true },
     }),
@@ -768,7 +768,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   // KitchenItem while pricing and validation remain linked to one canonical
   // catalog article. Accept either configured value for the matched item.
   const allowKitchenArticleNumberAlias = allowsKitchenArticleNumberAlias(kitchen.slug);
-  const useProgramPrices = kitchen.slug === "burger-103898";
+  const useProgramPrices = kitchen.programmId === "BURGER CINDY";
   const programPriceOptions = { useProgramPrices, programmId: kitchen.programmId };
 
   const selectedComponents = submittedGroups.components.map((item) => {
@@ -822,7 +822,7 @@ export async function createOrderFromSubmission({ kitchenSlug, orderPayload, pdf
   const allSelectedServices = allSelected.filter((item) => item.itemType === ItemType.SERVICE);
   const availableCutleryVariants = getAvailableCutleryVariantsForComponents(
     allSelectedComponents,
-    kitchen.slug === "burger-103898" ? resolvedCutleryVariantArticles : undefined,
+    useProgramPrices ? resolvedCutleryVariantArticles : undefined,
   );
   const availableCutleryByArticle = new Map(
     availableCutleryVariants.flatMap((variant) => [
