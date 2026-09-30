@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
+import { readFile } from "fs/promises";
+import path from "path";
 import { requireAdminClaimsApi } from "../../../../../../../lib/admin-claims-access";
+import { findReferencePlanMarkersInSnapshot, renderReferencePlanMarkersPng } from "../../../../../../../lib/claim-kitchen-preview";
+import { getPublicContractClaimPlanAsset } from "../../../../../../../lib/contract-claim-plan-assets";
 import { prisma } from "../../../../../../../lib/prisma";
 import { queryServiceClaimById } from "../../../../../../../lib/service-claim-admin-query";
 import { readServiceClaimAttachmentBytes } from "../../../../../../../lib/service-claim-attachments-storage";
+import { getServiceClaimKitchenPlan } from "../../../../../../../lib/service-claim-kitchen-plan";
+import { normalizeServiceClaimPlanPreviewPath } from "../../../../../../../lib/service-claim-reference-plan";
 
 function parseAttachmentsJson(raw) {
   if (raw == null || raw === "") {
@@ -48,6 +54,19 @@ function wantsInlineView(request) {
   return String(disposition || "").toLowerCase() === "inline";
 }
 
+async function readReferencePlanPreview(contractNumber, previewImagePath) {
+  const previewPath = normalizeServiceClaimPlanPreviewPath(previewImagePath);
+  if (!previewPath) return null;
+  if (previewPath.startsWith("/api/service-claims/contracts/")) {
+    const asset = await getPublicContractClaimPlanAsset(prisma, contractNumber, "preview");
+    return asset?.bytes ? Buffer.from(asset.bytes) : null;
+  }
+  const publicRoot = path.resolve(process.cwd(), "public");
+  const assetPath = path.resolve(publicRoot, decodeURIComponent(previewPath).replace(/^[/\\]+/, ""));
+  if (!assetPath.startsWith(`${publicRoot}${path.sep}`)) return null;
+  return readFile(assetPath).catch(() => null);
+}
+
 export async function GET(request, { params }) {
   try {
     await requireAdminClaimsApi();
@@ -77,7 +96,7 @@ export async function GET(request, { params }) {
   }
 
   const meta = attachments[index] || {};
-  const buffer = await readServiceClaimAttachmentBytes(id, index);
+  let buffer = await readServiceClaimAttachmentBytes(id, index);
   if (!buffer) {
     return NextResponse.json(
       {
@@ -93,13 +112,27 @@ export async function GET(request, { params }) {
     typeof meta.contentType === "string" && meta.contentType.trim()
       ? meta.contentType.trim()
       : "";
-  const contentType =
+  let contentType =
     declaredContentType && declaredContentType.toLowerCase().split(";")[0].trim() !== "application/octet-stream"
       ? declaredContentType
       : inferContentTypeFromFilename(filename) || "application/octet-stream";
   const asciiName = asciiDispositionFilename(filename);
   const starName = encodeURIComponent(filename);
   const inline = wantsInlineView(request);
+  if (inline && meta.role === "kitchen_preview" && new URL(request.url).searchParams.get("compactMarkers") === "1") {
+    const compactPreview = await (async () => {
+      const plan = await getServiceClaimKitchenPlan(claim.contractNumber);
+      if (plan?.selectionMode !== "reference-pdf") return null;
+      const markers = await findReferencePlanMarkersInSnapshot(buffer);
+      if (!markers.length) return null;
+      const source = await readReferencePlanPreview(claim.contractNumber, plan.previewImagePath);
+      return source?.length ? renderReferencePlanMarkersPng({ content: source, markers }) : null;
+    })().catch(() => null);
+    if (compactPreview) {
+      buffer = compactPreview;
+      contentType = "image/png";
+    }
+  }
   const dispositionType = inline ? "inline" : "attachment";
 
   return new Response(buffer, {

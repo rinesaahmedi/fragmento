@@ -15,6 +15,7 @@ import {
 
 export const REFERENCE_PLAN_EMAIL_DISPLAY_WIDTH = 480;
 export const REFERENCE_PLAN_EMAIL_PIXEL_RATIO = 2;
+const REFERENCE_PLAN_MARKER_MAX_DIAMETER = 30 / 850;
 
 export const PREVIEW_HIGHLIGHT_BOUNDS_BY_SLUG = {
   "kitchen-model-b": {
@@ -809,7 +810,13 @@ export async function renderReferencePlanMarkersPng({
   const height = Number(canonical.info?.height || 0);
   if (!width || !height) return null;
 
-  const markerAppearance = normalizeReferencePlanMarkerAppearance(appearance);
+  const submittedAppearance = normalizeReferencePlanMarkerAppearance(appearance);
+  const markerScale = Math.min(1, REFERENCE_PLAN_MARKER_MAX_DIAMETER / submittedAppearance.diameter);
+  const markerAppearance = {
+    diameter: submittedAppearance.diameter * markerScale,
+    fontSize: Math.max(submittedAppearance.fontSize * markerScale, submittedAppearance.diameter * markerScale * 0.46),
+    borderWidth: submittedAppearance.borderWidth * markerScale,
+  };
   const markerDiameter = markerAppearance.diameter * width;
   const fontSize = markerAppearance.fontSize * width;
   const strokeWidth = markerAppearance.borderWidth * width;
@@ -842,4 +849,49 @@ export async function renderReferencePlanMarkersPng({
     .composite([{ input: overlay, left: 0, top: 0 }])
     .png({ compressionLevel: 9 })
     .toBuffer();
+}
+
+export async function findReferencePlanMarkersInSnapshot(content) {
+  const { data, info } = await sharp(content).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+  const { width, height, channels } = info;
+  const visited = new Uint8Array(width * height);
+  const markers = [];
+  const isMarkerRed = (pixel) => {
+    const offset = pixel * channels;
+    return Math.abs(data[offset] - 180) <= 18
+      && Math.abs(data[offset + 1] - 35) <= 18
+      && Math.abs(data[offset + 2] - 24) <= 18
+      && data[offset + 3] > 200;
+  };
+
+  for (let pixel = 0; pixel < width * height; pixel += 1) {
+    if (visited[pixel] || !isMarkerRed(pixel)) continue;
+    const queue = [pixel];
+    visited[pixel] = 1;
+    let left = width;
+    let right = 0;
+    let top = height;
+    let bottom = 0;
+    for (let index = 0; index < queue.length; index += 1) {
+      const current = queue[index];
+      const x = current % width;
+      const y = Math.floor(current / width);
+      left = Math.min(left, x);
+      right = Math.max(right, x);
+      top = Math.min(top, y);
+      bottom = Math.max(bottom, y);
+      for (const neighbor of [current - 1, current + 1, current - width, current + width]) {
+        if (neighbor < 0 || neighbor >= width * height || visited[neighbor]) continue;
+        const nx = neighbor % width;
+        if (Math.abs(nx - x) > 1 || !isMarkerRed(neighbor)) continue;
+        visited[neighbor] = 1;
+        queue.push(neighbor);
+      }
+    }
+    const diameter = Math.max(right - left + 1, bottom - top + 1);
+    if (queue.length < 80 || diameter < 15 || diameter > width * 0.25) continue;
+    if (Math.abs((right - left) - (bottom - top)) > diameter * 0.25) continue;
+    markers.push({ x: ((left + right) / 2 / width) * 100, y: ((top + bottom) / 2 / height) * 100 });
+  }
+  return markers;
 }
