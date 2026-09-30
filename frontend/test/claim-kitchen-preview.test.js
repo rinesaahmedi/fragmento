@@ -11,6 +11,7 @@ import {
   cropClaimPlanHotspot,
   inferKitchenSlugFromSelectedAreas,
   resolveClaimPreviewComponentKeys,
+  resolveClaimPlanSourcePath,
   resolveSelectedClaimPlanHotspots,
   renderReferencePlanMarkersPng,
 } from "../lib/claim-kitchen-preview.js";
@@ -25,6 +26,14 @@ const SAMPLE_KITCHEN_SVG = `
   <g data-component-id="component-sink-base"><rect x="3" y="3" width="1" height="1"/></g>
 </svg>
 `;
+
+test("versioned AB 105762 plan URLs resolve to the actual SVG for email rendering", () => {
+  for (const slug of ["ab-105762", "ab-105766"]) {
+    const sourcePath = resolveClaimPlanSourcePath(PLAN_IMAGE_BY_SLUG[slug]);
+    assert.match(sourcePath, /AB 105762-63\.svg$/);
+    assert.ok(fs.existsSync(sourcePath));
+  }
+});
 
 test("buildKitchenPreviewSvgMarkup injects one highlight for one selected component", () => {
   const markup = buildKitchenPreviewSvgMarkup({

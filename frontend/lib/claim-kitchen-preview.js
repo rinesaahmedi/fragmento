@@ -533,6 +533,11 @@ function normalizedClaimPreviewValue(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+export function resolveClaimPlanSourcePath(sourceHref) {
+  const assetPath = String(sourceHref || "").split(/[?#]/, 1)[0];
+  return path.join(process.cwd(), "public", decodeURIComponent(assetPath).replace(/^[/\\]+/, ""));
+}
+
 export function resolveSelectedClaimPlanHotspots({
   selectedAreas = [],
   claimHotspots = [],
@@ -643,7 +648,7 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
       ))
     : [];
 
-  const sourcePath = path.join(process.cwd(), "public", decodeURIComponent(sourceHref).replace(/^[/\\]+/, ""));
+  const sourcePath = resolveClaimPlanSourcePath(sourceHref);
   const sourceBytes = await fs.readFile(sourcePath).catch(() => null);
   if (!sourceBytes) {
     return null;
