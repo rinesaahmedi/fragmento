@@ -7,7 +7,6 @@ import {
   splitGridStyle,
   subMetaStyle,
 } from "../../../../components/admin-ui";
-import { Fragment } from "react";
 import { AdminClaimUploadsPanel } from "../../../../components/admin-claim-uploads-panel";
 import AdminConfirmSubmitButton from "../../../../components/admin-confirm-submit-button";
 import { AdminClaimLocalizedText } from "../../../../components/admin-claim-localized-text";
@@ -349,27 +348,32 @@ export default async function AdminClaimDetailPage({ params, searchParams }) {
                     <p style={detailTextStyle}><AdminClaimLocalizedText text={additionalClaimDetails} /></p>
                   </div>
                 ) : null}
-                {problemAreaSections.map((area) => (
-                  <Fragment key={area.componentId || area.label}>
-                    <div style={customerDetailRowStyle}>
-                      <span style={customerDetailLabelStyle}><AdminText i18nKey="claimsAdmin.selectedPart" fallback="Affected items" /></span>
-                      <strong>{area.label || "-"}</strong>
+                {problemAreaSections.map((area, index) => (
+                  <section key={area.componentId || area.label} style={selectedPartGroupStyle} aria-labelledby={`claim-part-${claim.id}-${index}`}>
+                    <div style={selectedPartHeaderStyle}>
+                      <span style={selectedPartNumberStyle} aria-hidden="true">{index + 1}</span>
+                      <div>
+                        <span style={selectedPartEyebrowStyle}><AdminText i18nKey="claimsAdmin.selectedPart" fallback="Selected part" /> {index + 1}</span>
+                        <strong id={`claim-part-${claim.id}-${index}`} style={selectedPartNameStyle}>{area.label || "-"}</strong>
+                      </div>
                     </div>
-                    <div style={customerDetailRowStyle}>
-                      <span style={customerDetailLabelStyle}><AdminText i18nKey="claimsAdmin.problemDescription" fallback="Problem description" /></span>
-                      <p style={detailTextStyle}>
-                        {area.detail ? <AdminClaimLocalizedText text={area.detail} /> : <AdminText i18nKey="claimsAdmin.noItemDescription" fallback="No item-specific description provided." />}
-                      </p>
+                    <div style={selectedPartBodyStyle}>
+                      <div style={selectedPartDetailRowStyle}>
+                        <span style={customerDetailLabelStyle}><AdminText i18nKey="claimsAdmin.problemDescription" fallback="Problem description" /></span>
+                        <p style={detailTextStyle}>
+                          {area.detail ? <AdminClaimLocalizedText text={area.detail} /> : <AdminText i18nKey="claimsAdmin.noItemDescription" fallback="No item-specific description provided." />}
+                        </p>
+                      </div>
+                      <div style={{ ...selectedPartDetailRowStyle, borderBottom: "none" }}>
+                        <span style={customerDetailLabelStyle}><AdminText i18nKey="claimsAdmin.partFiles" fallback="Part files" /></span>
+                        {area.files.length ? (
+                          <AdminClaimUploadsPanel claimId={claim.id} files={area.files} />
+                        ) : (
+                          <p style={detailTextStyle}><AdminText i18nKey="claimsAdmin.noItemFiles" fallback="No item-specific files uploaded." /></p>
+                        )}
+                      </div>
                     </div>
-                    <div style={customerDetailRowStyle}>
-                      <span style={customerDetailLabelStyle}><AdminText i18nKey="claimsAdmin.partFiles" fallback="Part files" /></span>
-                      {area.files.length ? (
-                        <AdminClaimUploadsPanel claimId={claim.id} files={area.files} />
-                      ) : (
-                        <p style={detailTextStyle}><AdminText i18nKey="claimsAdmin.noItemFiles" fallback="No item-specific files uploaded." /></p>
-                      )}
-                    </div>
-                  </Fragment>
+                  </section>
                 ))}
                 <div style={customerDetailRowStyle}>
                   <span style={customerDetailLabelStyle}>
@@ -472,6 +476,56 @@ const customerDetailLabelStyle = {
   fontSize: 13,
   fontWeight: 800,
   lineHeight: 1.5,
+};
+
+const selectedPartGroupStyle = {
+  marginTop: 14,
+  border: "1px solid var(--app-border)",
+  borderLeft: "4px solid var(--app-accent)",
+  borderRadius: 12,
+  overflow: "hidden",
+  background: "#fff",
+};
+
+const selectedPartHeaderStyle = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  padding: "12px 14px",
+  background: "var(--app-accent-soft)",
+};
+
+const selectedPartNumberStyle = {
+  display: "grid",
+  placeItems: "center",
+  flex: "0 0 28px",
+  height: 28,
+  borderRadius: "50%",
+  background: "var(--app-accent)",
+  color: "var(--app-accent-contrast)",
+  fontSize: 13,
+  fontWeight: 800,
+};
+
+const selectedPartEyebrowStyle = {
+  display: "block",
+  color: "var(--app-text-muted)",
+  fontSize: 12,
+  fontWeight: 700,
+};
+
+const selectedPartNameStyle = {
+  display: "block",
+  lineHeight: 1.4,
+};
+
+const selectedPartBodyStyle = {
+  padding: "0 14px",
+};
+
+const selectedPartDetailRowStyle = {
+  ...customerDetailRowStyle,
+  padding: "12px 0",
 };
 
 const detailTextStyle = {
