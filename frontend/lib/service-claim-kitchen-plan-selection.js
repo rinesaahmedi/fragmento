@@ -381,6 +381,7 @@ export const SERVICE_CLAIM_PART_COMPONENT_IDS = {
   "sink-cabinet": "component-claim-sink-cabinet",
   faucet: "component-claim-faucet",
   oven: "component-claim-oven",
+  "oven-set": "component-claim-oven-set",
   "oven-drawer": "component-claim-oven-drawer",
   cooktop: "component-claim-cooktop",
   dishwasher: "component-claim-dishwasher",
@@ -395,6 +396,12 @@ export function getServiceClaimPartComponentId(part = {}) {
   const partKey = String(part?.partKey || "").trim();
   const fixedComponentId = SERVICE_CLAIM_PART_COMPONENT_IDS[partKey];
   if (fixedComponentId) return fixedComponentId;
+
+  // Housing articles use their own claim identities; all faces belonging to
+  // one supplied article share its part key and produce a single form row.
+  if (partKey.startsWith("housing-")) {
+    return `component-claim-${partKey}`;
+  }
 
   // DEFAULT Uxx cabinets are claim-only products without a commercial price.
   // Reuse their existing kitchen component identity so claim metadata never

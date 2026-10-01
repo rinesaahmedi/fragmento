@@ -64,6 +64,12 @@ export function shouldHideComponentFromSelectionSummary(kitchenSlug, item) {
   const normalizedSlug = String(kitchenSlug || "").trim().toLowerCase();
   const code = String(item?.code || "").trim().toUpperCase();
 
+  // 104296's oven cabinet and fillers are included structural parts,
+  // retained for plan selection and claims without separate default rows.
+  if (normalizedSlug === "ab-104296") {
+    return ["CAB-OVEN-AB104296-UHS60", "BLENDE-AB104296-UPE65", "PANEL-AB104296-SP20214K", "PANEL-AB104296-DBK50"].includes(code);
+  }
+
   // AB 109874's UPEF65 is a structural, included corner face. It remains
   // selected for the plan and available for claims, but is not a separate
   // customer-facing default selection.
@@ -233,6 +239,21 @@ function stripDimensionsFromName(name) {
 // different callout number.
 const AB_105806_PHOTO_NUMBER_BY_CODE = {
   "TOP-AB101246": "1",
+  "TOP-AB104296": "1",
+  "SINK-BASE-AB104296-SPDT60-R": "2",
+  "FRONT-AB104296-TV60": "3",
+  "OVEN-AB104296-SET": "4",
+  "CAB-OVEN-AB104296-UHS60": "4",
+  "CAB-BASE-AB104296-US2A30": "5",
+  "CAB-BASE-AB104296-US2A50": "6",
+  "BLENDE-AB104296-UPE65": "6",
+  "CAB-TALL-AB104296-GI88214-01-L": "7",
+  "CAB-WALL-AB104296-H6002-1": "8",
+  "CAB-WALL-AB104296-H3002": "9",
+  "CAB-HOOD-AB104296-HD6002": "10",
+  "HOOD-AB104296-FH664621E": "10",
+  "CAB-WALL-AB104296-H6002-2": "11",
+  "CAB-WALL-AB104296-H6002-3": "12",
   "CAB-BASE-AB101246-US50-DEFAULT": "2",
   "SINK-BASE-AB101246-SP50": "3",
   "DISH-AB101246-600": "4",
@@ -1229,6 +1250,7 @@ export function getLocalizedItemInfoText(item, translate) {
 
 const LINKED_COMPONENT_GROUPS_BY_SLUG = {
   "ab-101246": [["component-wall-cabinet-4", "component-extractor-hood"]],
+  "ab-104296": [["component-wall-cabinet-3", "component-extractor-hood"]],
   "burger-103898": [[
     "component-wall-cabinet-2",
     "component-extractor-hood",
@@ -1723,6 +1745,13 @@ function getMappedProductInfoDocuments(item) {
   const componentKey = String(item?.componentKey || "").trim().toLowerCase();
   const name = `${item?.name || ""} ${item?.nameDe || ""}`.toLowerCase();
   const haystack = `${code} ${articleNumber} ${iconKey} ${componentKey} ${name}`;
+
+  // A refrigerator housing is furniture; its name must not imply that the
+  // refrigerator appliance is supplied. Explicit cabinet PDFs still resolve
+  // through the normal productInfoPdfPath fallback.
+  if (["fridge-cabinet", "fridge-side-filler", "fridge-top-panel"].includes(componentKey)) {
+    return [];
+  }
 
   if (
     code.startsWith("REF-") ||

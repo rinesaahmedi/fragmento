@@ -146,6 +146,7 @@ function inferSerialHelpProfileFromProduct(product) {
 export function getSerialNumberHelpApplianceType(product = {}) {
   product = product || {};
   const claimPartKey = normalizeText(product.claimPartKey);
+  if (claimPartKey === "oven-set") return "oven";
   if (claimPartKey === "cooktop") return "hob";
   if (SERIAL_NUMBER_HELP_IMAGES_BY_APPLIANCE_TYPE[claimPartKey]) {
     return claimPartKey;

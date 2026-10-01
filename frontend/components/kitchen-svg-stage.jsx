@@ -57,6 +57,7 @@ const Kitchen3DViewer = dynamic(() => import("./Kitchen3DViewer"), {
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
 export const IMAGE_VIEW_BY_SLUG = {
+  "ab-104296": "/plans/670%20104296.svg",
   "burger-103898": "/plans/670%20103898.svg",
   "ab-105806": "/plans/AB%20105806.svg",
   "ab-105807": "/plans/AB%20105807.svg",
@@ -1457,6 +1458,7 @@ IMAGE_HOTSPOTS_BY_SLUG["ab-109874"] = AB_109874_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-109955"] = AB_109955_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-111539"] = AB_111539_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-101246"] = PLAN_HOTSPOTS_BY_SLUG["ab-101246"];
+IMAGE_HOTSPOTS_BY_SLUG["ab-104296"] = PLAN_HOTSPOTS_BY_SLUG["ab-104296"];
 IMAGE_HOTSPOTS_BY_SLUG["ab-110401"] = AB_110401_FRG_ORDER_HOTSPOTS;
 IMAGE_HOTSPOTS_BY_SLUG["ab-110402"] = AB_110402_FRG_ORDER_HOTSPOTS;
 ["ab-105764", "ab-105768", "ab-105772"].forEach((slug) => {
@@ -2944,7 +2946,9 @@ export default function useKitchenSvgStage({
                         width: `${hotspot.width}%`,
                         height: `${hotspot.height}%`,
                         zIndex:
-                          hotspot.componentKey === "sink-faucet"
+                          hotspot.claimApplianceSurface === "cooktop"
+                            ? 12
+                            : hotspot.componentKey === "sink-faucet"
                             ? 10
                             : hotspot.componentKey === "worktop"
                               ? 4

@@ -34,6 +34,7 @@ const DEFAULT_WORKTOP_CATALOG_INFO_TEXT = "Worktop included with the default kit
 const AB_105846_LAYOUT_ALIAS_CODES = ["105849", "105852", "105855", "105858", "105861"];
 const AB_105762_LAYOUT_ALIAS_CODES = ["105766", "105770", "105774"];
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-104296",
   "burger-103898",
   "ab-105762",
   "ab-105775",
@@ -165,6 +166,15 @@ const BUNDLE_PRICES = {
 };
 
 const CATALOG_ARTICLES = [
+  // 670 104296: supplier-included furniture and the supplied ceramic cooker set.
+  // The fridge and dishwasher appliances belong to the customer.
+  { articleNumber: "GI88214-01", name: "Refrigerator housing cabinet", nameDe: "Geräteschrank für Kühlgerät", widthMm: 600, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "SP20214K", name: "Tall cabinet side filler panel", nameDe: "Seitliche Passblende für Hochschrank", widthMm: 91, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "DBK50", name: "Tall cabinet top closing panel", nameDe: "Obere Abschlussblende für Hochschrank", widthMm: 600, heightMm: 425, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "TV60", name: "Furniture front for dishwasher", nameDe: "Möbelfront für kundeneigenen Geschirrspüler", widthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "SPDT60", name: "Sink Lower Cabinet", nameDe: "Spülenunterschrank", widthMm: 600, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
+  { articleNumber: "EHCX9330S-A", name: "Built-in oven and ceramic cooktop set", nameDe: "Einbauherd und Glaskeramikkochfeld", widthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
+  { articleNumber: "UHS60", name: "Lower cabinet for built-in oven", nameDe: "Herdunterschrank", widthMm: 600, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: DEFAULT_OVEN_HOB_CATALOG_ARTICLE, name: DEFAULT_OVEN_HOB_CATALOG_NAME_EN, nameDe: DEFAULT_OVEN_HOB_CATALOG_NAME_DE, widthMm: 600, price: DEFAULT_OVEN_HOB_CATALOG_PRICE, itemType: ItemType.COMPONENT, isFixedPricePackage: true, isActive: true },
   { articleNumber: "PLR60", name: DEFAULT_WORKTOP_CATALOG_NAME_EN, nameDe: DEFAULT_WORKTOP_CATALOG_NAME_DE, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
   { articleNumber: "SP60", name: DEFAULT_SINK_BASE_CATALOG_NAME_EN, nameDe: DEFAULT_SINK_BASE_CATALOG_NAME_DE, widthMm: 600, heightMm: 878, depthMm: 600, price: "0.00", itemType: ItemType.COMPONENT, isFixedPricePackage: false, isActive: true },
@@ -1900,6 +1910,37 @@ const AB_109955_ITEMS = [
   ...defaultServices(),
 ];
 
+// 670 104296: Excel callouts 1..7 are included. The customer's refrigerator
+// and dishwasher are represented only by their supplied furniture. The cooker
+// is one EHCX9330S-A appliance; UHS60 is its separate furniture cabinet.
+const AB_104296_HOUSING_CLAIM_PARTS = [
+  { partKey: "housing-top-front", name: "Tall cabinet top closing panel", nameDe: "Obere Abschlussblende für Hochschrank", articleCode: "DBK50", sourceComponentKey: "fridge-top-panel", sortOrder: 80 },
+  { partKey: "housing-cabinet", name: "Refrigerator housing cabinet", nameDe: "Kühlschrankumbau", sortOrder: 81 },
+  { partKey: "housing-side-panel", name: "Tall cabinet side filler panel", nameDe: "Seitliche Passblende für Hochschrank", articleCode: "SP20214K", sourceComponentKey: "fridge-side-filler", sortOrder: 85 },
+];
+const AB_104296_ITEMS = [
+  defaultWorktop({ code: "TOP-AB104296", sortOrder: 10, catalogArticleNumber: "PLR60" }),
+  defaultSinkBase({ code: "SINK-BASE-AB104296-SPDT60-R", sortOrder: 20, widthMm: 600, depthMm: 600, articleNumber: "SPDT60", catalogArticleNumber: "SPDT60" }),
+  defaultSinkWorktop({ code: "FAUCET-AB104296", name: "Sink and faucet set", nameDe: "Spüle und Armatur", sortOrder: 22, articleNumber: "526335 + 517720", catalogArticleNumber: "526335 + 517720", infoText: "Included BLANCO TIPO 45 S sink and faucet" }),
+  { itemType: ItemType.COMPONENT, code: "FRONT-AB104296-TV60", name: "Furniture front for dishwasher", nameDe: "Möbelfront für kundeneigenen Geschirrspüler", price: "0.00", widthMm: 600, iconKey: "base_cabinet_plain", colorKey: "#001f7f", componentKey: "dishwasher-front", sortOrder: 30, isLocked: true, articleNumber: "TV60", catalogArticleNumber: "TV60", infoText: "Included furniture front only; dishwasher supplied by customer" },
+  defaultOvenHob({ code: "OVEN-AB104296-SET", name: "Built-in oven and ceramic cooktop set", nameDe: "Einbauherd und Glaskeramikkochfeld", sortOrder: 40, widthMm: 600, articleNumber: "EHCX9330S-A", catalogArticleNumber: "EHCX9330S-A", infoText: "Included oven and ceramic cooktop as one appliance set" }),
+  { itemType: ItemType.COMPONENT, code: "CAB-OVEN-AB104296-UHS60", name: "Lower cabinet for built-in oven", nameDe: "Herdunterschrank", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "base_cabinet_plain", colorKey: "springgreen", componentKey: "oven-cabinet", sortOrder: 42, isLocked: true, articleNumber: "UHS60", catalogArticleNumber: "UHS60" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104296-US2A30", name: "Lower Cabinet with Drawers", nameDe: "Unterschrank mit Schubladen", price: "0.00", widthMm: 300, depthMm: 600, iconKey: "drawer_base_three", colorKey: "#f0a500", componentKey: "drawer-module", sortOrder: 50, isLocked: true, articleNumber: "US2A30", catalogArticleNumber: "US2A30" },
+  { itemType: ItemType.COMPONENT, code: "CAB-BASE-AB104296-US2A50", name: "Lower Cabinet with Drawers", nameDe: "Unterschrank mit Schubladen", price: "0.00", widthMm: 500, depthMm: 600, iconKey: "drawer_base_three", colorKey: "#f0a500", componentKey: "base-module-1", sortOrder: 60, isLocked: true, articleNumber: "US2A50", catalogArticleNumber: "US2A50" },
+  { itemType: ItemType.COMPONENT, code: "BLENDE-AB104296-UPE65", name: "Corner filler panel", nameDe: "Eckpassblende Unterschrank", price: "0.00", iconKey: "blende", colorKey: "springgreen", componentKey: "corner-blende", sortOrder: 62, isLocked: true, catalogBlendeCode: "UPE65", articleNumber: "UPE65", catalogPriceSyncMode: "LOCKED_INCLUDED" },
+  { itemType: ItemType.COMPONENT, code: "CAB-TALL-AB104296-GI88214-01-L", name: "Refrigerator housing cabinet", nameDe: "Geräteschrank für Kühlgerät", price: "0.00", widthMm: 600, depthMm: 600, iconKey: "tall_cabinet", colorKey: "springgreen", componentKey: "fridge-cabinet", sortOrder: 70, isLocked: true, articleNumber: "GI88214-01", catalogArticleNumber: "GI88214-01", infoText: "Included housing with BLUM Aventos HK-S lift-up front, refrigerator furniture door, drawer, lower door and shelves; refrigerator supplied by customer" },
+  { itemType: ItemType.COMPONENT, code: "PANEL-AB104296-SP20214K", name: "Tall cabinet side filler panel", nameDe: "Seitliche Passblende für Hochschrank", price: "0.00", widthMm: 91, iconKey: "blende", colorKey: "springgreen", componentKey: "fridge-side-filler", sortOrder: 72, isLocked: true, articleNumber: "SP20214K", catalogArticleNumber: "SP20214K", catalogPriceSyncMode: "LOCKED_INCLUDED", infoText: "Included side filler, cut to fit during installation" },
+  { itemType: ItemType.COMPONENT, code: "PANEL-AB104296-DBK50", name: "Tall cabinet top closing panel", nameDe: "Obere Abschlussblende für Hochschrank", price: "0.00", widthMm: 600, heightMm: 425, iconKey: "blende", colorKey: "springgreen", componentKey: "fridge-top-panel", sortOrder: 74, isLocked: true, articleNumber: "DBK50", catalogArticleNumber: "DBK50", catalogPriceSyncMode: "LOCKED_INCLUDED" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104296-H6002-1", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePriceWithBlende("H6002", "HPK2002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-1", sortOrder: 80, articleNumber: "H6002", catalogArticleNumber: "H6002", blendeCode: "HPK2002", blendeLabel: "HPK2002", blendePrice: blendePrice("HPK2002", 1) },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104296-H3002", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H3002"), widthMm: 300, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-2", sortOrder: 90, articleNumber: "H3002", catalogArticleNumber: "H3002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-HOOD-AB104296-HD6002", name: HOOD_WALL_CABINET_CATALOG_NAME_EN, nameDe: HOOD_WALL_CABINET_CATALOG_NAME_DE, price: articlePrice("FH664621E + FWK124 + HD6002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "hood_wall_cabinet", colorKey: "#394c00", componentKey: "wall-cabinet-3", sortOrder: 100, articleNumber: "FH664621E + FWK124 + HD6002", catalogArticleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "HOOD-AB104296-FH664621E", name: "Extractor Hood", price: articlePrice("FH664621E + FWK124 + HD6002"), widthMm: 599, heightMm: 173, depthMm: 303, iconKey: "extractor_hood", colorKey: "#394c00", componentKey: "extractor-hood", sortOrder: 102, isActive: false, articleNumber: "FH664621E + FWK124 + HD6002", catalogArticleNumber: "FH664621E + FWK124 + HD6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104296-H6002-2", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-4", sortOrder: 110, articleNumber: "H6002", catalogArticleNumber: "H6002" },
+  { itemType: ItemType.COMPONENT, code: "CAB-WALL-AB104296-H6002-3", name: "Wall Cabinet", nameDe: "Oberschrank", price: articlePrice("H6002"), widthMm: 600, heightMm: 723, depthMm: 340, iconKey: "wall_cabinet_plain", colorKey: "#00ffbf", componentKey: "wall-cabinet-5", sortOrder: 120, articleNumber: "H6002", catalogArticleNumber: "H6002" },
+  ...defaultAccessories(),
+  ...defaultServices(),
+];
+
 // 670 101246: the supplier schedule has ten included rows. The catalog
 // articles below identify the visible modules inferred from their plan widths;
 // the two priced schedule rows are the dishwasher (4) and refrigerator (7).
@@ -3098,6 +3139,16 @@ const DEFAULT_KITCHENS = [
     reconcileExisting: true,
   },
   {
+    slug: "ab-104296",
+    kitchenCode: "104 296",
+    programmId: "BURGER CINDY",
+    seedCatalogProgramPrices: true,
+    name: "104296",
+    description: "L-shaped kitchen based on frontend/public/pdfs/670 104296.pdf; customer-owned fridge and dishwasher",
+    items: AB_104296_ITEMS,
+    reconcileExisting: true,
+  },
+  {
     slug: "ab-101246",
     kitchenCode: "101 246",
     programmId: "BURGER CINDY",
@@ -3655,6 +3706,76 @@ function compactSeedRecord(record) {
   );
 }
 
+// Upgrade the first 104296 import without changing kitchen-item IDs/codes or
+// creating a second sink/faucet package that differs only by an orientation.
+async function normalizeAb104296CatalogArticles() {
+  const mappings = [
+    ["GI88214-01 L", "GI88214-01"],
+    ["SPDT60 R", "SPDT60"],
+    ["526335 R + 517720", "526335 + 517720"],
+  ];
+  await prisma.$transaction(async (tx) => {
+    for (const [sourceNumber, targetNumber] of mappings) {
+      const source = await tx.catalogArticle.findUnique({
+        where: { articleNumber: sourceNumber }, include: { programPrices: true },
+      });
+      if (!source) continue;
+      const target = await tx.catalogArticle.findUnique({ where: { articleNumber: targetNumber } });
+      if (target) {
+        await tx.kitchenItem.updateMany({
+          where: { catalogArticleId: source.id },
+          data: { catalogArticleId: target.id, articleNumber: targetNumber },
+        });
+        for (const price of source.programPrices) {
+          await tx.catalogArticleProgramPrice.upsert({
+            where: { programmId_catalogArticleId: { programmId: price.programmId, catalogArticleId: target.id } },
+            create: { programmId: price.programmId, catalogArticleId: target.id, articleNumber: targetNumber, price: price.price, isActive: price.isActive },
+            update: {},
+          });
+        }
+        await tx.catalogArticlePriceHistory.updateMany({
+          where: { catalogArticleId: source.id },
+          data: { catalogArticleId: target.id, articleNumber: targetNumber },
+        });
+        await tx.catalogArticle.delete({ where: { id: source.id } });
+      } else {
+        await tx.catalogArticle.update({ where: { id: source.id }, data: { articleNumber: targetNumber } });
+        await tx.kitchenItem.updateMany({ where: { catalogArticleId: source.id }, data: { articleNumber: targetNumber } });
+        await tx.catalogArticleProgramPrice.updateMany({ where: { catalogArticleId: source.id }, data: { articleNumber: targetNumber } });
+      }
+    }
+  });
+}
+
+// Explicitly opted-in kitchens register their actual linked records in their
+// program's catalog. Existing supplier prices and other programs are preserved.
+async function seedKitchenCatalogProgramPrices(kitchenRecord) {
+  const programmId = kitchenRecord.programmId;
+  const items = await prisma.kitchenItem.findMany({
+    where: { kitchenId: kitchenRecord.id },
+    include: { catalogArticle: true, catalogBlende: true, catalogService: true },
+  });
+  await prisma.catalogProgram.upsert({
+    where: { programmId },
+    create: { programmId, name: programmId === "BURGER CINDY" ? "Burger - Cindy Type" : programmId, isActive: true },
+    update: {},
+  });
+  for (const [relation, delegate, idField, identifierField] of [
+    ["catalogArticle", "catalogArticleProgramPrice", "catalogArticleId", "articleNumber"],
+    ["catalogBlende", "catalogBlendeProgramPrice", "catalogBlendeId", "code"],
+    ["catalogService", "catalogServiceProgramPrice", "catalogServiceId", "code"],
+  ]) {
+    const records = new Map(items.filter((item) => item[relation]).map((item) => [item[relation].id, item[relation]]));
+    for (const record of records.values()) {
+      await prisma[delegate].upsert({
+        where: { [`programmId_${idField}`]: { programmId, [idField]: record.id } },
+        create: { programmId, [idField]: record.id, [identifierField]: record[identifierField], price: record.price, isActive: record.isActive },
+        update: {},
+      });
+    }
+  }
+}
+
 async function seedCatalogMasterData() {
   const result = {
     articlesCreated: 0,
@@ -3803,6 +3924,9 @@ async function main() {
     });
   }
 
+  if (kitchensToSeed.some((kitchen) => kitchen.slug === "ab-104296")) {
+    await normalizeAb104296CatalogArticles();
+  }
   await seedCatalogMasterData();
 
   const catalogArticleByNumber = new Map(
@@ -4036,6 +4160,10 @@ async function main() {
       });
     }
 
+    if (kitchen.seedCatalogProgramPrices) {
+      await seedKitchenCatalogProgramPrices(kitchenRecord);
+    }
+
     const claimSourceItems = kitchen.items.map(applyDefaultCatalogItem);
     const sinkCabinet = claimSourceItems.find((item) => (
       item?.isActive !== false
@@ -4260,11 +4388,14 @@ async function main() {
     if (ovenBundle) {
       const ovenArticleCode = String(ovenBundle.articleNumber || "").split("+")[0].trim() || "EH92364E-A";
       const ovenProductInfo = PRODUCT_INFO_BY_ARTICLE_NUMBER[ovenArticleCode] || OVEN_CLAIM_PRODUCT_INFO;
-      for (const part of [
+      const ovenClaimParts = kitchen.slug === "ab-104296" ? [
+        { partKey: "oven-set", articleCode: "EHCX9330S-A", name: "Built-in oven and ceramic cooktop set", nameDe: "Einbauherd und Glaskeramikkochfeld", sortOrder: 40 },
+      ] : [
         { partKey: "oven", articleCode: ovenArticleCode, name: "Built-in Oven", nameDe: "Einbauherd", sortOrder: 40, ...ovenProductInfo },
         { partKey: "oven-drawer", articleCode: "UHK", name: "Lower Cabinet for Built-in Oven", nameDe: "Unterschrank für Einbauherde", sortOrder: 45 },
         { partKey: "cooktop", articleCode: "9EC744100C", name: "Ceramic Cooktop 60cm", nameDe: "Glaskeramikkochfeld 60 cm", sortOrder: 50, ...COOKTOP_CLAIM_PRODUCT_INFO },
-      ]) {
+      ];
+      for (const part of ovenClaimParts) {
         await prisma.kitchenClaimPart.upsert({
           where: {
             kitchenId_partKey: {
@@ -4288,6 +4419,38 @@ async function main() {
             isActive: true,
           },
         });
+      }
+    }
+
+    if (kitchen.slug === "ab-104296") {
+      const housing = claimSourceItems.find((item) => item.componentKey === "fridge-cabinet" && item.isActive !== false);
+      if (housing) {
+        // GI88214-01 is one supplied article, including its fronts, body and plinth.
+        // Retire the earlier physical splits without deleting their stored records.
+        await prisma.kitchenClaimPart.updateMany({
+          where: {
+            kitchenId: kitchenRecord.id,
+            partKey: { in: ["housing-upper-front", "housing-middle-front", "housing-drawer-front", "housing-lower-front", "housing-plinth", "housing-carcase"] },
+          },
+          data: { isActive: false },
+        });
+        for (const definition of AB_104296_HOUSING_CLAIM_PARTS) {
+          const sourceComponentKey = definition.sourceComponentKey || housing.componentKey;
+          const source = claimSourceItems.find((item) => item.componentKey === sourceComponentKey && item.isActive !== false);
+          if (!source) throw new Error(`Missing housing claim source: ${sourceComponentKey}`);
+          const data = {
+            ...definition,
+            articleCode: source.articleNumber,
+            sourceKitchenItemCode: source.code,
+            sourceComponentKey,
+            isActive: true,
+          };
+          await prisma.kitchenClaimPart.upsert({
+            where: { kitchenId_partKey: { kitchenId: kitchenRecord.id, partKey: definition.partKey } },
+            update: data,
+            create: { kitchenId: kitchenRecord.id, ...data },
+          });
+        }
       }
     }
 

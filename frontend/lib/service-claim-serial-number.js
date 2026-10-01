@@ -2,6 +2,7 @@ const ELECTRICAL_APPLIANCE_CLAIM_PART_KEYS = new Set([
   "cooktop",
   "dishwasher",
   "oven",
+  "oven-set",
 ]);
 
 const NON_APPLIANCE_CLAIM_PART_KEYS = new Set([

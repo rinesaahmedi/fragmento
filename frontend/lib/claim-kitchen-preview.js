@@ -642,6 +642,7 @@ async function renderClaimPdfPlanPreviewPng({ kitchenSlug, selectedAreas, contra
     ? claimHotspots.filter((hotspot) => (
         (
           hotspot?.claimPartKey === "cooktop"
+          || hotspot?.claimApplianceSurface === "cooktop"
           || hotspot?.claimPartKey === "sink"
         )
         && !selectedHotspotIds.has(claimPlanComponentId(hotspot))

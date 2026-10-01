@@ -32,6 +32,7 @@ const AB_105762_LAYOUT_ALIAS_SLUGS = [
 ];
 
 const L_SHAPED_CLAIM_KITCHEN_SLUGS = new Set([
+  "ab-104296",
   "burger-103898",
   "ab-105762",
   "ab-105775",
@@ -204,7 +205,7 @@ const L_SHAPED_SINK_SOURCE_POINTS_BY_SLUG = {
 // These drawings contain one source hotspot for the sink bowl followed by a
 // separate source hotspot for the faucet. Do not assign both claim identities
 // to both shapes.
-const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-105825", "ab-105831"]);
+const DEDICATED_SINK_AND_FAUCET_HOTSPOT_SLUGS = new Set(["ab-104296", "ab-105825", "ab-105831"]);
 
 // Thin visual silhouettes traced around the faucet body. Source hotspot boxes
 // remain intentionally generous for interaction, but painting those boxes
@@ -548,6 +549,16 @@ const CLAIM_BLENDE_DEFAULT_WIDTH = 0.44;
 const CLAIM_BLENDE_MIN_WIDTH = 0.35;
 const CLAIM_BLENDE_MAX_WIDTH = 3;
 const CLAIM_BLENDE_CALIBRATION_BY_SLUG = {
+  "ab-104296": {
+    "wall-cabinet-1": {
+      side: "left",
+      wholeFacesOnly: true,
+      wholeBlendeFaces: [
+        { left: 34.845606, right: 36.156770, top: 12.873950, bottom: 37.559664 },
+        { left: 34.845606, right: 36.527316, top: 12.813445, bottom: 13.136134 },
+      ],
+    },
+  },
   // AB 105775 draws most supplied Blenden as independent perspective faces.
   // Assign those complete faces to the filler products and leave the adjacent
   // cabinet fronts/sides selectable as their own articles. The two remaining
@@ -1272,6 +1283,7 @@ const AB_105762_WORKTOP_SPLIT = splitWorktopDefinition(
 );
 
 const SEPARATED_WORKTOP_DEFINITIONS_BY_SLUG = {
+  "ab-104296": { indexPartKeys: ["worktop-left", "worktop-right"] },
   "ab-105762": AB_105762_WORKTOP_SPLIT,
   "ab-105775": {
     indexPartKeys: ["worktop-left", "worktop-left", "worktop-left", "worktop-left", "worktop-right"],
@@ -2342,6 +2354,18 @@ export function buildServiceClaimPartHotspots(hotspots = [], claimParts = [], ki
     const visibleSourceParts = sourceParts;
 
     return visibleSourceParts.flatMap((part) => {
+      if (hotspot.claimFurniturePartKey) {
+        return part.partKey === hotspot.claimFurniturePartKey
+          ? [existingClaimPartHotspot(hotspot, part)]
+          : [];
+      }
+      // Some supplier sets have one appliance identity across oven and hob.
+      // Use both measured source faces without creating a second claim choice.
+      if (hotspot.claimAppliancePartKey) {
+        return part.partKey === hotspot.claimAppliancePartKey
+          ? [existingClaimPartHotspot(hotspot, part)]
+          : [];
+      }
       if (hotspot.claimApplianceSurface === "cooktop") {
         return part.partKey === "cooktop"
           ? [existingClaimPartHotspot(hotspot, part)]

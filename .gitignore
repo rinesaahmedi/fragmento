@@ -15,3 +15,6 @@ backups/database/**/*.dump
 backups/database/**/*.zip
 outputs/pre-burger-20260826-1213/*.xlsx
 .env.production
+
+# Local test-order PDFs and SMTP delivery receipts
+/output/pdf/order-*/

@@ -1,7 +1,10 @@
 // Vector plans (rendered from the source PDFs via docs/render-plan-svg.py) so the drawing
 // stays razor-sharp at any zoom. The pixel-perfect hotspot overlay sits on top unchanged
 // (the SVG keeps the PDF's aspect ratio, so the %-based boxes still line up exactly).
+import { AB_104296_HOTSPOTS } from './ab-104296-plan.js';
+
 export const PLAN_IMAGE_BY_SLUG = {
+  "ab-104296": "/plans/670%20104296.svg",
   "burger-103898": "/plans/670%20103898.svg",
   "ab-105747": "/plans/AB%20105747.svg",
   "ab-105758": "/plans/AB%20105758.svg",
@@ -113,6 +116,7 @@ export const PLAN_IMAGE_BY_SLUG = {
 // Most legacy drawings use the 842 x 595 CAD sheet. Keep native dimensions for
 // plans exported on a different page size so neither the artwork nor hotspots stretch.
 export const PLAN_IMAGE_SOURCE_SIZE_BY_SLUG = {
+  "ab-104296": { width: 842, height: 595 },
   "burger-103898": { width: 842, height: 595 },
   "ab-109873": { width: 842, height: 595 },
   "ab-109874": { width: 842, height: 595 },
@@ -143,6 +147,10 @@ const AB_105845_DISHWASHER_LIGHT_DETAILS = [
 ];
 
 export const PLAN_PERSISTENT_LIGHT_DETAILS_BY_SLUG = {
+  "ab-104296": [
+    { key: "customer-dishwasher-basket", componentKey: "dishwasher-front", left: 54.9, top: 72.5, width: 8.25, height: 8.4, persistWhenSelected: true },
+    { key: "customer-dishwasher-gs-mark", componentKey: "dishwasher-front", left: 58.05, top: 83.25, width: 1.95, height: 3.9, persistWhenSelected: true },
+  ],
   "ab-101246": [
     { key: "dishwasher-basket", componentKey: "dishwasher-base", left: 35.6295, top: 77.1429, width: 12.9454, height: 7.2269, persistWhenSelected: true },
     { key: "dishwasher-gs-mark", componentKey: "dishwasher-base", left: 40.6176, top: 88.0672, width: 2.9691, height: 3.6975, persistWhenSelected: true },
@@ -492,6 +500,7 @@ export const AB_110401_FRG_ORDER_HOTSPOTS = [
 // linework (see docs/detect-plan-hotspots.py). Values are % of image width/height, so they
 // stay pixel-aligned at any display size. Use ?calibrate=1 on the kitchen page to verify.
 export const PLAN_HOTSPOTS_BY_SLUG = {
+  "ab-104296": AB_104296_HOTSPOTS,
   "ab-101246": [
     { componentKey: "wall-cabinet-1", left: 8.4323, top: 21.6807, width: 13.7767, height: 25.3782 },
     { componentKey: "wall-cabinet-2", left: 22.2090, top: 21.6807, width: 12.3516, height: 25.3782 },

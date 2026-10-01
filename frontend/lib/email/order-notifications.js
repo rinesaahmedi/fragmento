@@ -86,6 +86,12 @@ function getMappedProductInfoDocuments(item) {
   const displayName = String(getItemDisplayName(item)).toLowerCase();
   const haystack = `${code} ${articleNumber} ${iconKey} ${componentKey} ${displayName}`;
 
+  // These components are furniture for customer-owned appliances.
+  // Only explicitly attached furniture documentation belongs in the email.
+  if (["fridge-cabinet", "fridge-side-filler", "fridge-top-panel", "dishwasher-front"].includes(componentKey)) {
+    return [];
+  }
+
   if (
     code.startsWith("DISH-") ||
     iconKey === "dishwasher_base" ||
@@ -1897,7 +1903,7 @@ export async function buildOrderConfirmationEmailPreview(order, overrides = {}) 
     excludedAttachmentKeys: overrides.excludedAttachmentKeys,
   });
   const recipients = buildOrderConfirmationRecipients(order.customer.email, overrides.senderEmail, {
-    suppressSenderCopy: shouldSuppressOrderSenderCopy(order),
+    suppressSenderCopy: overrides.suppressSenderCopy === true || shouldSuppressOrderSenderCopy(order),
   });
 
   return {
@@ -1927,7 +1933,7 @@ export function getMissingEmailSmtpConfig(env = process.env) {
   ].filter(Boolean);
 }
 
-export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText, excludedAttachmentKeys = [] }) {
+export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename, subject, bodyText, excludedAttachmentKeys = [], suppressSenderCopy = false }) {
   const smtpHost = String(process.env.SMTP_HOST || "smtp.gmail.com").trim();
   const smtpPort = Number.parseInt(process.env.SMTP_PORT || "587", 10);
   const smtpUser = String(process.env.SMTP_USER || "").trim();
@@ -1991,12 +1997,13 @@ export async function sendOrderConfirmationEmail({ order, pdfBase64, pdfFilename
     subject,
     bodyText,
     senderEmail: smtpFrom,
+    suppressSenderCopy,
     excludedAttachmentKeys: excludedAttachments,
   });
   attachments.push(...(emailPreview.productImageAttachments || []));
 
   try {
-    await transporter.sendMail({
+    return await transporter.sendMail({
       from: `"Fragmento" <${smtpFrom}>`,
       to: emailPreview.to,
       cc: emailPreview.cc,

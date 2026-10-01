@@ -10,14 +10,20 @@ function iconKind(option = {}, choiceGroup = null) {
   const isHoodGroup = groupComponentIds.has("component-extractor-hood")
     && groupComponentIds.has("component-claim-filter");
 
-  if (partKey === "furniture-front") return "front";
+  if (partKey === "housing-side-panel") return "panel";
+  if (partKey === "housing-top-front") return "panel";
+  if (partKey === "housing-carcase") return "side-panel";
+  if (partKey === "housing-plinth") return "panel";
+  if (partKey === "housing-drawer-front") return "drawer";
+  if (partKey.startsWith("housing-") && partKey.endsWith("-front")) return "front";
+  if (partKey === "furniture-front" || componentKey === "dishwasher-front") return "front";
   if (partKey === "dishwasher" || identity.includes("dishwasher")) return "dishwasher";
   if (partKey === "sink-cabinet") return "sink-cabinet";
   if (partKey === "sink") return "sink";
   if (partKey === "faucet") return "faucet";
   if (partKey === "oven-drawer") return "drawer";
   if (partKey === "cooktop") return "cooktop";
-  if (partKey === "oven") return "oven";
+  if (partKey === "oven" || partKey === "oven-set") return "oven";
   if (partKey === "filter") return "filter";
   if (partKey === "worktop-end-panel") return "side-panel";
   if (

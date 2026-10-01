@@ -294,6 +294,7 @@ export default function ServiceClaimKitchenPicker({
       : croppedImageHotspots.filter(
         (hotspot) => (
           hotspot.claimPartKey === "cooktop"
+          || hotspot.claimApplianceSurface === "cooktop"
           || hotspot.claimPartKey === "sink"
         ),
       ),
@@ -639,6 +640,7 @@ export default function ServiceClaimKitchenPicker({
                         WebkitClipPath: hotspot.clipPath || undefined,
                         zIndex:
                           hotspot.claimPartKey === "cooktop"
+                          || hotspot.claimApplianceSurface === "cooktop"
                             ? 12
                             : hotspot.claimPartKey === "blende"
                             ? 14

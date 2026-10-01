@@ -323,12 +323,14 @@ export function buildOrderForNotifications(orderRecord, { confirmedItems = [] } 
       : Math.max(1, Number.parseInt(String(item.catalogBlendeQuantity || 1), 10) || 1);
     const cutleryLine = parseCutleryLineFromOrderItem({
       code: item.code,
-      articleNumber: item.articleNumber,
+      articleNumber: item.articleNumberSnapshot || item.articleNumber,
       name: item.nameSnapshot || item.name,
       nameSnapshot: item.nameSnapshot,
       quantity: item.quantity,
     });
-    const cutleryVariant = cutleryLine ? getCutleryVariant(cutleryLine.articleNumber) : null;
+    const cutleryVariant = cutleryLine
+      ? getCutleryVariant(cutleryLine.articleNumber.replace(/^ZBE(\d{2,3})$/, "ZB$1SG"))
+      : null;
     const burgerCutleryVariant = isBurger103898 && cutleryLine
       ? BURGER_103898_CUTLERY_VARIANTS.find((variant) => variant.widthCm === cutleryVariant?.widthCm)
       : null;

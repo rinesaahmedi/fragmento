@@ -64,11 +64,12 @@ export function parseContractAppliances(formData) {
 // cabinet. Never classify fronts, filters or oven drawers as appliances.
 export function getInventoryApplianceTypes(component = {}) {
   if (component.claimPartKey) {
+    if (component.claimPartKey === "oven-set") return ["oven", "hob"];
     const type = normalizeContractApplianceType(component.claimPartKey);
     return type ? [type] : [];
   }
   const key = String(component.componentKey || component.componentId || "").toLowerCase();
-  if (/blende|drawer|furniture-front|filter|light/.test(key)) return [];
+  if (/blende|drawer|furniture-front|dishwasher-front|filter|light/.test(key)) return [];
   if (/oven-(?:module|hob)|oven_hob/.test(key)) return ["oven", "hob"];
   // Bare furniture slots are not evidence of an installed electrical appliance.
   if (/cabinet|base-module|sink|worktop/.test(key)) return [];
@@ -110,7 +111,10 @@ export function deriveKitchenAppliances({ selectableComponents = [], items = [],
         sourceKitchenItemId: item?.id || null,
         sourceComponentId: component.componentId,
         sourceOrderId: orderItem?.sourceOrderId || null,
-        sharesOvenSerial: applianceType === "hob" && /EH92364(?:0E|E-A).*\+.*9EC744100C/i.test(item?.articleNumber || item?.catalogArticle?.articleNumber || ""),
+        sharesOvenSerial: applianceType === "hob" && (
+          component.claimPartKey === "oven-set"
+          || /EH92364(?:0E|E-A).*\+.*9EC744100C/i.test(item?.articleNumber || item?.catalogArticle?.articleNumber || "")
+        ),
       });
     }
   }
