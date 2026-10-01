@@ -116,9 +116,9 @@ test("AB 101246 claims split both left Burger Blenden from their cabinets", () =
   });
   const byId = new Map(selectable.selectableComponents.map((entry) => [entry.componentId, entry]));
   assert.equal(byId.get("component-wall-cabinet-1")?.articleCode, "H10072");
-  assert.equal(byId.get("component-claim-blende-wall-cabinet-1")?.articleCode, "HP2072K");
+  assert.equal(byId.get("component-claim-blende-wall-cabinet-1")?.articleCode, "HP1072K");
   assert.equal(byId.get("component-base-module-1")?.articleCode, "US50");
-  assert.equal(byId.get("component-claim-blende-base-module-1")?.articleCode, "UP20K");
+  assert.equal(byId.get("component-claim-blende-base-module-1")?.articleCode, "UP10K");
 
   const hotspots = buildServiceClaimBlendeHotspots(
     PLAN_HOTSPOTS_BY_SLUG["ab-101246"],
@@ -138,6 +138,61 @@ test("AB 101246 claims split both left Burger Blenden from their cabinets", () =
     assert.equal(blende[0].top, cabinet[0].top);
     assert.equal(blende[0].height, cabinet[0].height);
   }
+});
+
+test("AB 101246 exposes ten replacement article codes only in ASC", () => {
+  const items = [
+    component("CAB-BASE-AB101246-US50-DEFAULT", "base-module-1", "Lower Cabinet 50 cm", { articleNumber: "US50", isLocked: true }),
+    component("SINK-BASE-AB101246-SP50", "sink-base", "Sink Lower Cabinet 50 cm", { articleNumber: "SP50", isLocked: true }),
+    component("FAUCET-AB101246", "sink-faucet", "Sink and faucet", { articleNumber: "526335 + 517720", isLocked: true }),
+    component("CAB-BASE-AB101246-U40-DEFAULT", "base-module-2", "Lower Cabinet 40 cm", { articleNumber: "U40", isLocked: true }),
+    component("CAB-WALL-AB101246-H10072-DEFAULT", "wall-cabinet-1", "Upper Cabinet 100 cm", { articleNumber: "H10072", isLocked: true }),
+    component("CAB-HOOD-AB101246-DEFAULT", "wall-cabinet-4", "Hood cabinet", { articleNumber: "FH664621E+FWK124+HFLH6072", isLocked: true }),
+    component("OVEN-AB101246-DEFAULT", "oven-module", "Oven and cooktop", { articleNumber: "A-EH923640E + 9EC744100C", isLocked: true }),
+  ];
+  const claimParts = [
+    { partKey: "sink-cabinet", articleCode: "SPDT50", sourceKitchenItemCode: "SINK-BASE-AB101246-SP50", sourceComponentKey: "sink-base" },
+    { partKey: "faucet", articleCode: "519723", sourceKitchenItemCode: "FAUCET-AB101246", sourceComponentKey: "sink-faucet" },
+    { partKey: "blende-base-module-1", articleCode: "UP10K", sourceKitchenItemCode: "CAB-BASE-AB101246-US50-DEFAULT", sourceComponentKey: "base-module-1", name: "Lower filler" },
+    { partKey: "blende-wall-cabinet-1", articleCode: "HP1072K", sourceKitchenItemCode: "CAB-WALL-AB101246-H10072-DEFAULT", sourceComponentKey: "wall-cabinet-1", name: "Upper filler" },
+    { partKey: "cabinet-base-module-2", articleCode: "UDT40", sourceKitchenItemCode: "CAB-BASE-AB101246-U40-DEFAULT", sourceComponentKey: "base-module-2" },
+    { partKey: "cabinet-extractor-hood", articleCode: "9FH17161E", sourceKitchenItemCode: "CAB-HOOD-AB101246-DEFAULT", sourceComponentKey: "extractor-hood" },
+    { partKey: "filter", articleCode: "KF17146", sourceKitchenItemCode: "CAB-HOOD-AB101246-DEFAULT", sourceComponentKey: "wall-cabinet-4" },
+    { partKey: "oven", articleCode: "EH9236SM-A", sourceKitchenItemCode: "OVEN-AB101246-DEFAULT", sourceComponentKey: "oven-module" },
+    { partKey: "cooktop", articleCode: "9EC744100E", sourceKitchenItemCode: "OVEN-AB101246-DEFAULT", sourceComponentKey: "oven-module" },
+    { partKey: "oven-drawer", articleCode: "UH60", sourceKitchenItemCode: "OVEN-AB101246-DEFAULT", sourceComponentKey: "oven-module" },
+  ];
+  const selected = buildServiceClaimSelectableComponents({
+    kitchen: { items }, kitchenConfig: { components: items }, kitchenSlug: "ab-101246", claimParts,
+  });
+  const byId = new Map(selected.selectableComponents.map((entry) => [entry.componentId, entry.articleCode]));
+  for (const [id, code] of [
+    ["component-claim-sink-cabinet", "SPDT50"],
+    ["component-claim-faucet", "519723"],
+    ["component-claim-blende-base-module-1", "UP10K"],
+    ["component-claim-blende-wall-cabinet-1", "HP1072K"],
+    ["component-base-module-2", "UDT40"],
+    ["component-extractor-hood", "9FH17161E"],
+    ["component-claim-filter", "KF17146"],
+    ["component-claim-oven", "EH9236SM-A"],
+    ["component-claim-cooktop", "9EC744100E"],
+    ["component-claim-oven-drawer", "UH60"],
+  ]) assert.equal(byId.get(id), code, id);
+  assert.equal(selected.selectableComponents.filter((entry) => entry.componentId === "component-base-module-2").length, 1);
+  assert.equal(items.find((item) => item.componentKey === "base-module-2").articleNumber, "U40");
+  assert.equal(items.find((item) => item.componentKey === "oven-module").articleNumber, "A-EH923640E + 9EC744100C");
+  const choiceGroups = buildServiceClaimComponentChoiceGroups(selected.selectableComponents);
+  const hoodChoices = choiceGroups.find((group) => group.triggerComponentId === "component-wall-cabinet-4");
+  assert.deepEqual(hoodChoices.options.map((option) => option.articleCode), ["HFLH6072", "9FH17161E", "KF17146"]);
+  const leftUpperChoices = choiceGroups.find((group) => group.triggerComponentId === "component-wall-cabinet-1");
+  assert.deepEqual(leftUpperChoices.options.map((option) => option.articleCode), ["H10072", "HP1072K"]);
+  const leftLowerChoices = choiceGroups.find((group) => group.triggerComponentId === "component-base-module-1");
+  assert.deepEqual(leftLowerChoices.options.map((option) => option.articleCode), ["US50", "UP10K"]);
+
+  const otherKitchen = buildServiceClaimSelectableComponents({
+    kitchen: { items: [items[3]] }, kitchenConfig: { components: [items[3]] }, kitchenSlug: "ab-111539",
+  });
+  assert.equal(otherKitchen.selectableComponents[0].articleCode, "U40");
 });
 
 test("AB 101246 ASC uses Burger upper-cabinet and hood article codes", () => {

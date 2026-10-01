@@ -145,13 +145,13 @@ const CLAIM_BLENDE_OVERRIDES_BY_SLUG = {
   "ab-101246": [
     {
       sourceComponentKey: "wall-cabinet-1",
-      code: "HP2072K",
+      code: "HP1072K",
       name: "Filler Panel for Upper Cabinet",
       nameDe: "Passblende Hängeschrank",
     },
     {
       sourceComponentKey: "base-module-1",
-      code: "UP20K",
+      code: "UP10K",
       name: "Filler Panel for Lower Cabinet",
       nameDe: "Passblende Unterschrank",
     },
@@ -905,6 +905,31 @@ export function buildServiceClaimSelectableComponents({
       claimBlendeSourceKeys.add(resolvedMeta.sourceComponentKey);
     }
   });
+  // AB 101246 claim catalog parts replace the identity of its two included
+  // cabinet fillers without changing the kitchen/order catalog items.
+  eligibleClaimParts
+    .filter((part) => String(kitchenSlug || "").trim().toLowerCase() === "ab-101246"
+      && String(part?.partKey || "").startsWith("blende-"))
+    .forEach((part) => {
+      const sourceComponentKey = String(part.sourceComponentKey || "").trim();
+      const sourceItem = sourceItemByComponentKey.get(sourceComponentKey);
+      const articleCode = String(part.articleCode || "").trim();
+      if (!sourceItem || !articleCode) return;
+      const meta = buildClaimBlendeMeta({
+        ...sourceItem,
+        blendeCode: articleCode,
+        blendeLabel: part.name,
+        catalogBlende: {
+          code: articleCode,
+          name: part.name,
+          nameDe: part.nameDe,
+        },
+      });
+      if (!meta) return;
+      const existingIndex = claimBlenden.findIndex((entry) => entry.sourceComponentKey === sourceComponentKey);
+      if (existingIndex >= 0) claimBlenden.splice(existingIndex, 1, meta);
+      else claimBlenden.push(meta);
+    });
 
   for (const entry of sourceItems) {
     const componentId = componentIdForItem(entry.item);
