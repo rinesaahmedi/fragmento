@@ -103,6 +103,7 @@ const DEFAULT_LOCKED_COMPONENT_KEYS_BY_SLUG = {
 
 const DEFAULT_LOCKED_PLAN_COMPONENT_KEYS_BY_SLUG = {
   "l-shaped-kitchen": ["sink-faucet"],
+  "ab-101246": ["under-cabinet-light"],
 };
 
 const DEFAULT_LOCKED_ACCESSORY_CODES_BY_SLUG = {

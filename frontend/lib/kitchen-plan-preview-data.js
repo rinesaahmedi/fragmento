@@ -498,6 +498,12 @@ export const PLAN_HOTSPOTS_BY_SLUG = {
     { componentKey: "wall-cabinet-4", left: 49.4062, top: 21.6807, width: 14.8456, height: 25.3782 },
     { componentKey: "extractor-hood", left: 49.4062, top: 47.0589, width: 14.8456, height: 1.6806 },
     { componentKey: "wall-cabinet-5", left: 64.2518, top: 21.6807, width: 9.9762, height: 25.3782 },
+    // Trace the outer rays of each PDF light symbol; all five share one lighting set.
+    { componentKey: "under-cabinet-light", points: [[17.771971, 49.136134], [19.040380, 49.136134], [19.852732, 52.080672], [16.959620, 52.080672]], preserveManualSize: true },
+    { componentKey: "under-cabinet-light", points: [[26.266033, 49.136134], [27.534442, 49.136134], [28.346793, 52.080672], [25.453682, 52.080672]], preserveManualSize: true },
+    { componentKey: "under-cabinet-light", points: [[40.859857, 49.015126], [42.114014, 49.015126], [42.940618, 51.959664], [40.033254, 51.959664]], preserveManualSize: true },
+    { componentKey: "under-cabinet-light", points: [[52.389549, 50.265546], [53.657957, 50.265546], [54.484561, 53.210084], [51.577197, 53.210084]], preserveManualSize: true },
+    { componentKey: "under-cabinet-light", points: [[59.942993, 50.265546], [61.211401, 50.265546], [62.023753, 53.210084], [59.130641, 53.210084]], preserveManualSize: true },
     { componentKey: "worktop", left: 8.4323, top: 65.3782, width: 65.7957, height: 1.5126 },
     { componentKey: "sink-faucet", left: 30.1663, top: 57.9832, width: 1.6627, height: 7.3950 },
     { componentKey: "base-module-1", left: 8.4323, top: 66.8908, width: 13.7767, height: 30.9243 },
